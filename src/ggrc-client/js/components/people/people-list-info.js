@@ -8,7 +8,7 @@ import template from './people-list-info.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var viewModel = can.Map.extend({
+  let viewModel = can.Map.extend({
     instance: null,
     isOpen: false,
     isHidden: false

@@ -6,10 +6,10 @@
 describe('can.mustache.helper.isInAuthList', function () {
   'use strict';
 
-  var html;
-  var render; // the rendering function returned by the template compilation
-  var renderedText;
-  var templateContext;
+  let html;
+  let render; // the rendering function returned by the template compilation
+  let renderedText;
+  let templateContext;
 
   /**
    * A factory for creating fake authorization object instances.
@@ -20,7 +20,7 @@ describe('can.mustache.helper.isInAuthList', function () {
    * @return {can.Map} - authorization object mock
    */
   function fakeAuthObj(personAttrs) {
-    var result = new can.Map({
+    let result = new can.Map({
       instance: {
         person: personAttrs
       }
@@ -33,7 +33,7 @@ describe('can.mustache.helper.isInAuthList', function () {
   }
 
   beforeAll(function () {
-    var template = [
+    let template = [
       '<div>',
       '  {{#isInAuthList person authorizations}}',
       '    yes',
@@ -65,7 +65,7 @@ describe('can.mustache.helper.isInAuthList', function () {
   it(
     'renders the truthy block if a person is listed in authorization list',
     function () {
-      var authList = [
+      let authList = [
         fakeAuthObj({id: 15, email: 'person15@foo.bar'}),
         fakeAuthObj({id: 42, email: 'person42@foo.bar'}),
         fakeAuthObj({id: 101, email: 'person101@foo.bar'})
@@ -86,7 +86,7 @@ describe('can.mustache.helper.isInAuthList', function () {
   it(
     'renders the falsy block if a person is not listed in authorization list',
     function () {
-      var authList = [
+      let authList = [
         fakeAuthObj({id: 15, email: 'person15@foo.bar'}),
         fakeAuthObj({id: 101, email: 'person101@foo.bar'})
       ];

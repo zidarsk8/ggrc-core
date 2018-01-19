@@ -36,14 +36,14 @@ import template from './multiselect_dropdown.mustache';
           type: 'boolean',
           value: false,
           get: function () {
-            var options = this.attr('options') || [];
+            let options = this.attr('options') || [];
 
             return Array.prototype.every.call(options, function (item) {
               return item.attr('checked');
             });
           },
           set: function (value) {
-            var options = this.attr('options') || [];
+            let options = this.attr('options') || [];
 
             options.forEach(function (option) {
               option.attr('checked', value);
@@ -59,7 +59,7 @@ import template from './multiselect_dropdown.mustache';
         options: {
           type: '*',
           set: function (value) {
-            var self = this;
+            let self = this;
             this.attr('selected', []);
             if (value) {
               value.forEach(function (item) {
@@ -74,9 +74,9 @@ import template from './multiselect_dropdown.mustache';
         }
       },
       updateSelected: function (item) {
-        var selected = this.attr('selected');
-        var index = -1;
-        var duplicates;
+        let selected = this.attr('selected');
+        let index = -1;
+        let duplicates;
 
         this.attr('_stateWasUpdated', true);
 
@@ -142,7 +142,7 @@ import template from './multiselect_dropdown.mustache';
     events:
     {
       '{options} change': function (scope, ev, propertyName) {
-        var target = ev.target;
+        let target = ev.target;
 
         // igore all propetries except 'checked'
         if (propertyName.indexOf('checked') === -1) {

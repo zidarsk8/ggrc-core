@@ -6,7 +6,7 @@
 describe('can.mustache.helper.assignee_types', function () {
   'use strict';
 
-  var helper;
+  let helper;
 
   beforeAll(function () {
     helper = can.Mustache._helpers.assignee_types.fn;

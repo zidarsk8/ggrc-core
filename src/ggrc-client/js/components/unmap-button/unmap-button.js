@@ -8,7 +8,7 @@ import {DESTINATION_UNMAPPED} from '../../events/eventTypes';
 (function (can, GGRC, CMS) {
   'use strict';
 
-  var defaultType = 'Relationship';
+  let defaultType = 'Relationship';
 
   GGRC.Components('unmapButton', {
     tag: 'unmap-button',
@@ -33,10 +33,10 @@ import {DESTINATION_UNMAPPED} from '../../events/eventTypes';
           });
       },
       getMapping: function () {
-        var type = this.attr('mappingType') || defaultType;
-        var destinations;
-        var sources;
-        var mapping;
+        let type = this.attr('mappingType') || defaultType;
+        let destinations;
+        let sources;
+        let mapping;
         if (type === defaultType) {
           destinations = this.attr('destination.related_destinations')
           .concat(this.attr('destination.related_sources'));

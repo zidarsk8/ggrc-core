@@ -29,7 +29,7 @@ const ModelRefreshQueue = can.Construct({}, {
     return this;
   },
   trigger: function () {
-    var self = this;
+    let self = this;
     if (!this.triggered) {
       this.triggered = true;
       if (this.ids.length && this.model) {
@@ -47,7 +47,7 @@ const ModelRefreshQueue = can.Construct({}, {
     return this.deferred;
   },
   trigger_with_debounce: function (delay, manager) {
-    var msToWait = (delay || 0) + this.updated_at - Date.now();
+    let msToWait = (delay || 0) + this.updated_at - Date.now();
 
     if (!this.triggered) {
       if (msToWait < 0 &&
@@ -86,11 +86,11 @@ const RefreshQueueManager = can.Construct({
     });
   },
   enqueue: function (obj, force) {
-    var self = this;
-    var model = obj.constructor;
-    var modelName = model.shortName;
-    var foundQueue = null;
-    var id = obj.id;
+    let self = this;
+    let model = obj.constructor;
+    let modelName = model.shortName;
+    let foundQueue = null;
+    let id = obj.id;
 
     if (!obj.selfLink) {
       if (obj instanceof can.Model) {
@@ -129,7 +129,7 @@ const RefreshQueueManager = can.Construct({
         this.queues.push(foundQueue);
         foundQueue.enqueue(id);
         foundQueue.deferred.done(function () {
-          var index = self.queues.indexOf(foundQueue);
+          let index = self.queues.indexOf(foundQueue);
           if (index > -1)
             self.queues.splice(index, 1);
         });
@@ -143,20 +143,20 @@ const RefreshQueueManager = can.Construct({
 const RefreshQueue = can.Construct({
   refresh_queue_manager: new RefreshQueueManager(),
   refresh_all: function (instance, props, force) {
-    var dfd = new can.Deferred();
+    let dfd = new can.Deferred();
 
     refreshAll(instance, props, dfd);
     return dfd;
 
     // Helper function called recursively for each property
     function refreshAll(instance, props, dfd) {
-      var prop = props[0];
-      var nextProps = props.slice(1);
-      var next = instance[prop];
-      var refreshQueue = new RefreshQueue();
-      var dfds = [];
-      var deferred;
-      var hasBinding;
+      let prop = props[0];
+      let nextProps = props.slice(1);
+      let next = instance[prop];
+      let refreshQueue = new RefreshQueue();
+      let dfds = [];
+      let deferred;
+      let hasBinding;
 
       if (next) {
         refreshQueue.enqueue(next, force);
@@ -178,7 +178,7 @@ const RefreshQueue = can.Construct({
         deferred.then(function (refreshedItems) {
           if (nextProps.length) {
             can.each(refreshedItems, function (item) {
-              var df = new can.Deferred();
+              let df = new can.Deferred();
               refreshAll(item, nextProps, df);
               dfds.push(df);
             });
@@ -217,7 +217,7 @@ const RefreshQueue = can.Construct({
     return this;
   },
   enqueue: function (obj, force) {
-    var queue;
+    let queue;
     if (!obj) {
       return;
     }
@@ -240,8 +240,8 @@ const RefreshQueue = can.Construct({
     return this;
   },
   trigger: function (delay) {
-    var self = this;
-    var deferreds = [];
+    let self = this;
+    let deferreds = [];
 
     if (!delay) {
       delay = 150;

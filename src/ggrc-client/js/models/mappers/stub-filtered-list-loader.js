@@ -13,8 +13,8 @@
         this.filter_fn = filterFn;
       },
       init_listeners: function (binding) {
-        var self = this;
-        var matchingResults;
+        let self = this;
+        let matchingResults;
 
         if (typeof this.source === 'string') {
           binding.source_binding = binding.instance.get_binding(this.source);
@@ -42,7 +42,7 @@
       _refresh_stubs: function (binding) {
         return binding.source_binding.refresh_stubs()
           .then(function (results) {
-            var matchingResults = can.map(can.makeArray(results),
+            let matchingResults = can.map(can.makeArray(results),
               function (result) {
                 if (this.filter_fn(result)) {
                   return this.make_result(result.instance, [result], binding);

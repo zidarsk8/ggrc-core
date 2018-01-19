@@ -15,7 +15,7 @@ import childModelsMap from './child-models-map';
 (function (can, GGRC) {
   'use strict';
 
-  var viewModel = can.Map.extend({
+  let viewModel = can.Map.extend({
     define: {
       parentModel: {
         type: String,
@@ -69,7 +69,7 @@ import childModelsMap from './child-models-map';
       isOpen: {
         type: Boolean,
         set: function (newValue, setValue) {
-          var isReady = this.attr('dataIsReady');
+          let isReady = this.attr('dataIsReady');
 
           if (!isReady && newValue) {
             if (!this.attr('childModels')) {
@@ -101,7 +101,7 @@ import childModelsMap from './child-models-map';
       cssClasses: {
         type: String,
         get: function () {
-          var classes = [];
+          let classes = [];
 
           if (this.attr('loading')) {
             classes.push('loading');
@@ -121,9 +121,9 @@ import childModelsMap from './child-models-map';
     deepLevel: 0,
     _collapseAfterUnmapCallBack: null,
     initializeChildModels: function () {
-      var parentModel = this.attr('parentModel');
-      var savedModels = childModelsMap.getModels(parentModel);
-      var defaultModels = TreeViewUtils.getModelsForSubTier(parentModel);
+      let parentModel = this.attr('parentModel');
+      let savedModels = childModelsMap.getModels(parentModel);
+      let defaultModels = TreeViewUtils.getModelsForSubTier(parentModel);
 
       this.attr('childModels', savedModels || defaultModels.selected);
 
@@ -133,7 +133,7 @@ import childModelsMap from './child-models-map';
       }.bind(this));
     },
     expandNotDirectlyRelated: function () {
-      var isExpanded = this.attr('notDirectlyExpanded');
+      let isExpanded = this.attr('notDirectlyExpanded');
       this.attr('notDirectlyExpanded', !isExpanded);
     },
     /**
@@ -142,10 +142,10 @@ import childModelsMap from './child-models-map';
      * @return {*}
      */
     loadItems: function (models) {
-      var parentType = this.attr('parentModel');
-      var parentId = this.attr('parentId');
-      var deepLevel = this.attr('deepLevel');
-      var filter = this.getDepthFilter(deepLevel);
+      let parentType = this.attr('parentModel');
+      let parentId = this.attr('parentId');
+      let deepLevel = this.attr('deepLevel');
+      let filter = this.getDepthFilter(deepLevel);
 
       models = models || this.attr('childModels') || [];
       models = can.makeArray(models);

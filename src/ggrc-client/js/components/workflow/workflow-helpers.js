@@ -7,8 +7,8 @@ import {confirm} from '../../plugins/utils/modals';
 
 export default {
   generateCycle: function (workflow) {
-    var dfd = new $.Deferred();
-    var cycle;
+    let dfd = new $.Deferred();
+    let cycle;
 
     confirm({
       modal_title: 'Confirm',
@@ -20,7 +20,7 @@ export default {
         '/workflows/confirm_start.mustache',
       instance: workflow,
     }, function (params, option) {
-      var data = {};
+      let data = {};
 
       can.each(params, function (item) {
         data[item.name] = item.value;

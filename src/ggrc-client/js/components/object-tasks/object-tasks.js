@@ -12,8 +12,8 @@ import template from './object-tasks.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var REQUIRED_TYPE = 'CycleTaskGroupObjectTask';
-  var REQUIRED_FIELDS = Object.freeze([
+  let REQUIRED_TYPE = 'CycleTaskGroupObjectTask';
+  let REQUIRED_FIELDS = Object.freeze([
     'title',
     'status',
     'next_due_date',
@@ -21,14 +21,14 @@ import template from './object-tasks.mustache';
     'is_verification_needed',
   ]);
 
-  var viewModel = can.Map.extend({
+  let viewModel = can.Map.extend({
     instanceId: null,
     instanceType: null,
     tasks: [],
     loadTasks: function () {
-      var id = this.attr('instanceId');
-      var type = this.attr('instanceType');
-      var params = buildParam(
+      let id = this.attr('instanceId');
+      let type = this.attr('instanceType');
+      let params = buildParam(
         REQUIRED_TYPE,
         {},
         {
@@ -40,7 +40,7 @@ import template from './object-tasks.mustache';
 
       return batchRequests(params)
         .then(function (response) {
-          var tasks = [];
+          let tasks = [];
 
           response[REQUIRED_TYPE].values.forEach(function (item) {
             tasks.push(CMS.Models[REQUIRED_TYPE].model(item));

@@ -9,7 +9,7 @@ import Component from '../advanced-search-filter-state';
 describe('GGRC.Components.advancedSearchFilterState', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(() => {
     viewModel = new Component.prototype.viewModel();
@@ -18,7 +18,7 @@ describe('GGRC.Components.advancedSearchFilterState', function () {
   describe('stateModel set() method', function () {
     it('initializes all "filterStates" checked if "stateModel" is empty',
     function () {
-      var states = ['state1', 'state2', 'state3'];
+      let states = ['state1', 'state2', 'state3'];
       spyOn(StateUtils, 'getDefaultStatesForModel')
         .and.returnValue(states);
       spyOn(StateUtils, 'getStatesForModel')
@@ -48,7 +48,7 @@ describe('GGRC.Components.advancedSearchFilterState', function () {
 
     it('initializes "filterStates" checked with items from "stateModel"',
     function () {
-      var selectedItems;
+      let selectedItems;
       viewModel.attr('modelName', 'Section');
       viewModel.attr('stateModel', {
         items: ['Active'],
@@ -64,8 +64,8 @@ describe('GGRC.Components.advancedSearchFilterState', function () {
 
   describe('saveTreeStates() method', function () {
     it('updates items collection', function () {
-      var items;
-      var selectedStates = [{value: 'Active'}, {value: 'Draft'}];
+      let items;
+      let selectedStates = [{value: 'Active'}, {value: 'Draft'}];
       viewModel.attr('stateModel', new can.Map({
         items: [],
       }));

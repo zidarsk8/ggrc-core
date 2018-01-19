@@ -5,7 +5,7 @@
 
 import template from './bulk-update-target-state.mustache';
 
-var objectStateToWarningMap = {
+let objectStateToWarningMap = {
   CycleTaskGroupObjectTask: {
     InProgress: 'Please be aware that Finished, Declined and Verified ' +
       'tasks cannot be moved to In Progress state.',
@@ -25,8 +25,8 @@ export default can.Component.extend({
     define: {
       warningMessage: {
         get: function () {
-          var model = this.attr('modelName');
-          var targetState = this.attr('targetState');
+          let model = this.attr('modelName');
+          let targetState = this.attr('targetState');
           return objectStateToWarningMap[model]
             && objectStateToWarningMap[model][targetState]
             || '';

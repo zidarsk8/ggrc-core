@@ -32,7 +32,7 @@ export default can.Component.extend({
     isLoading: false,
     notificationsInfo: 'Send Notifications',
     getCommentData: function () {
-      var source = this.attr('instance');
+      let source = this.attr('instance');
 
       return {
         comment: source.attr('context'),
@@ -57,8 +57,8 @@ export default can.Component.extend({
       });
     },
     onCommentCreated: function (e) {
-      var comment = e.comment;
-      var self = this;
+      let comment = e.comment;
+      let self = this;
 
       self.attr('isSaving', true);
       comment = self.updateComment(comment);

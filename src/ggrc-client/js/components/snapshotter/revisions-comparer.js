@@ -45,10 +45,10 @@ export default can.Component.extend({
           let confirmSelf = this;
           that.getRevisions(currentRevisionID, newRevisionID)
             .then(function (data) {
-              var revisions = that.prepareInstances(data);
-              var fragLeft = can.view(view, revisions[0]);
-              var fragRight = can.view(view, revisions[1]);
-              var attachmentsDfds =
+              let revisions = that.prepareInstances(data);
+              let fragLeft = can.view(view, revisions[0]);
+              let fragRight = can.view(view, revisions[1]);
+              let attachmentsDfds =
                 that.isContainsAttachments(that.instance) ?
                 that.getAttachmentsDfds(revisions) :
                 [];
@@ -110,7 +110,7 @@ export default can.Component.extend({
       return can.Deferred().resolve();
     },
     buildAttachmentsDfd: function (instance, bindingName) {
-      var dfd = new can.Deferred();
+      let dfd = new can.Deferred();
       instance.bind(bindingName, function (target, isLoaded) {
         if (isLoaded) {
           dfd.resolve();
@@ -124,15 +124,15 @@ export default can.Component.extend({
       return dfd;
     },
     getAttachmentsDfds: function (revisions) {
-      var dfds = [];
-      var that = this;
+      let dfds = [];
+      let that = this;
 
       if (!revisions) {
         return [];
       }
 
       revisions.forEach(function (revision) {
-        var instance = revision.attr('instance');
+        let instance = revision.attr('instance');
 
         if (instance.folder) {
           dfds.push(
@@ -146,10 +146,10 @@ export default can.Component.extend({
       return instance.type === 'Control';
     },
     getRevisions: function (currentRevisionID, newRevisionID) {
-      var Revision = CMS.Models.Revision;
-      var notCached = [];
-      var cached = [currentRevisionID, newRevisionID].map(function (id) {
-        var cache = Revision.findInCacheById(id);
+      let Revision = CMS.Models.Revision;
+      let notCached = [];
+      let cached = [currentRevisionID, newRevisionID].map(function (id) {
+        let cache = Revision.findInCacheById(id);
         if (!cache) {
           notCached.push(id);
         }
@@ -157,7 +157,7 @@ export default can.Component.extend({
       }).filter(function (revision) {
         return !!revision;
       });
-      var result;
+      let result;
 
       if (cached.length === 2) {
         result = can.when(cached);
@@ -194,7 +194,7 @@ export default can.Component.extend({
 
         if (content.access_control_list) {
           content.access_control_list.forEach(function (item) {
-            var stub = new CMS.Models.Person({id: item.person_id}).stub();
+            let stub = new CMS.Models.Person({id: item.person_id}).stub();
             item.attr('person', stub);
           });
         }
@@ -223,7 +223,7 @@ export default can.Component.extend({
       });
     },
     updateRevision: function () {
-      var instance = new CMS.Models.Snapshot(this.instance.snapshot);
+      let instance = new CMS.Models.Snapshot(this.instance.snapshot);
 
       // close info-pane
       $('info-pin-buttons:visible [data-trigger="close"]')
@@ -236,7 +236,7 @@ export default can.Component.extend({
         return instance.save();
       })
       .then(function () {
-        var forceRefresh = true;
+        let forceRefresh = true;
 
         return $('tree-widget-container:visible')
           .first()
@@ -244,7 +244,7 @@ export default can.Component.extend({
           .display(forceRefresh);
       })
       .then(function () {
-        var message = instance.child_type +
+        let message = instance.child_type +
         ' was refreshed successfully.';
         GGRC.Errors.notifier('success', [message]);
       });
@@ -271,15 +271,15 @@ export default can.Component.extend({
       const listSelector = 'ul li, .object-list-item';
       const attributesSelector = '.row-fluid h6 + *, .row-fluid .state-value' +
         ', related-documents';
-      var infoPanes = $target.find('.info .tier-content');
-      var valuesOld = infoPanes.eq(0).find(attributesSelector);
-      var valuesNew = infoPanes.eq(1).find(attributesSelector);
+      let infoPanes = $target.find('.info .tier-content');
+      let valuesOld = infoPanes.eq(0).find(attributesSelector);
+      let valuesNew = infoPanes.eq(1).find(attributesSelector);
 
       valuesOld.each(function (index, valueOld) {
-        var $valueNew = $(valuesNew[index]);
-        var $valueOld = $(valueOld);
-        var listOld = [];
-        var listNew = [];
+        let $valueNew = $(valuesNew[index]);
+        let $valueOld = $(valueOld);
+        let listOld = [];
+        let listNew = [];
         if ($valueOld.html() !== $valueNew.html()) {
           listOld = $valueOld.find(listSelector);
           listNew = $valueNew.find(listSelector);
@@ -310,7 +310,7 @@ export default can.Component.extend({
        */
       function compareLists(liFirst, liLast) {
         liFirst.each(function (i, li) {
-          var atLeastOneIsEqual = false;
+          let atLeastOneIsEqual = false;
           liLast.each(function (j, li2) {
             if (li.innerHTML === li2.innerHTML) {
               atLeastOneIsEqual = true;
@@ -338,8 +338,8 @@ export default can.Component.extend({
        * @param {Object} $secondItem - jQuery object
        */
       function equalValuesHeight($firstItem, $secondItem) {
-        var firstItemHeight = $firstItem.outerHeight();
-        var secondItemHeight = $secondItem.outerHeight();
+        let firstItemHeight = $firstItem.outerHeight();
+        let secondItemHeight = $secondItem.outerHeight();
         if (firstItemHeight > secondItemHeight) {
           $secondItem.outerHeight(firstItemHeight);
         } else if (firstItemHeight < secondItemHeight) {
@@ -482,18 +482,18 @@ export default can.Component.extend({
      *   revision diff comparison pane
      */
     highlightCustomRoles: function ($target) {
-      var HIGHLIGHT_CLASS = 'diff-highlighted';
+      let HIGHLIGHT_CLASS = 'diff-highlighted';
 
-      var $rolesPanes = $target
+      let $rolesPanes = $target
         .find('related-people-access-control');
-      var $roleBlocksOld = $rolesPanes.eq(0)
+      let $roleBlocksOld = $rolesPanes.eq(0)
         .find('related-people-access-control-group');
-      var $roleBlocksNew = $rolesPanes.eq(1)
+      let $roleBlocksNew = $rolesPanes.eq(1)
         .find('related-people-access-control-group');
 
       $roleBlocksOld.each((i) => {
-        var $blockOld = $roleBlocksOld.eq(i);
-        var $blockNew = $roleBlocksNew.eq(i); // the block count is the same
+        let $blockOld = $roleBlocksOld.eq(i);
+        let $blockNew = $roleBlocksNew.eq(i); // the block count is the same
         compareRoleBlocks($blockOld, $blockNew);
         this.equalizeHeights($blockOld, $blockNew);
       });
@@ -510,11 +510,11 @@ export default can.Component.extend({
        *   in time
        */
       function compareRoleBlocks($blockOld, $blockNew) {
-        var oldUserIds = {};
-        var newUserIds = {};
+        let oldUserIds = {};
+        let newUserIds = {};
 
-        var $oldGrantees = $blockOld.find('person-list-item');
-        var $newGrantees = $blockNew.find('person-list-item');
+        let $oldGrantees = $blockOld.find('person-list-item');
+        let $newGrantees = $blockNew.find('person-list-item');
 
         oldUserIds = extractPeopleIds($oldGrantees);
         newUserIds = extractPeopleIds($newGrantees);
@@ -533,9 +533,9 @@ export default can.Component.extend({
        * @return {Object} - the list of people IDs as object keys
        */
       function extractPeopleIds($grantees) {
-        var peopleIds = {};
+        let peopleIds = {};
         $grantees.each(function (i, personInfo) {
-          var personId = $(personInfo)
+          let personId = $(personInfo)
             .viewModel().attr('person.id');
           peopleIds[personId] = true;
         });
@@ -553,8 +553,8 @@ export default can.Component.extend({
        */
       function highlightChanges($grantees, comparisonIds) {
         $grantees.each(function (i, grantee) {
-          var $grantee = $(grantee);
-          var personId = $grantee.viewModel().attr('person.id');
+          let $grantee = $(grantee);
+          let personId = $grantee.viewModel().attr('person.id');
 
           if (!(personId in comparisonIds)) {
             $grantee.addClass(HIGHLIGHT_CLASS);
@@ -569,8 +569,8 @@ export default can.Component.extend({
      * @param {jQuery} $block2 - the second block element
      */
     equalizeHeights($block, $block2) {
-      var height;
-      var height2;
+      let height;
+      let height2;
 
       $block.css('max-width', 'none');
       $block2.css('max-width', 'none');

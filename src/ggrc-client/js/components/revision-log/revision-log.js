@@ -13,7 +13,7 @@ import template from './revision-log.mustache';
 
   const EMPTY_DIFF_VALUE = '—';
 
-  var _DATE_FIELDS = {
+  let _DATE_FIELDS = {
     created_at: 1,
     updated_at: 1,
     start_date: 1,
@@ -24,10 +24,10 @@ import template from './revision-log.mustache';
     verified_date: 1
   };
 
-  var _LIST_FIELDS = {
+  let _LIST_FIELDS = {
     recipients: 1
   };
-  var _EMBED_MAPPINGS = {
+  let _EMBED_MAPPINGS = {
     Request: ['Comment', 'Document'],
     Assessment: ['Comment', 'Document']
   };
@@ -55,7 +55,7 @@ import template from './revision-log.mustache';
       fetchItems: function () {
         this._fetchRevisionsData()
           .done(function (revisions) {
-            var changeHistory;
+            let changeHistory;
             // calculate history of role changes
             this.attr('roleHistory',
               this._computeRoleChanges(revisions));
@@ -97,8 +97,8 @@ import template from './revision-log.mustache';
        *      mappings
        */
       _fetchRevisionsData: function () {
-        var findAll = function (attr) {
-          var query = {__sort: 'updated_at'};
+        let findAll = function (attr) {
+          let query = {__sort: 'updated_at'};
           query[attr + '_type'] = this.attr('instance.type');
           query[attr + '_id'] = this.attr('instance.id');
           return CMS.Models.Revision.findAll(query);
@@ -109,7 +109,7 @@ import template from './revision-log.mustache';
         ).then(function (objRevisions, mappingsSrc, mappingsDest) {
           // manually include people for modified_by since using __include would
           // result in a lot of duplication
-          var rq = new RefreshQueue();
+          let rq = new RefreshQueue();
           _.each(objRevisions.concat(mappingsSrc, mappingsDest),
             function (revision) {
               if (revision.modified_by) {
@@ -137,7 +137,7 @@ import template from './revision-log.mustache';
           return this._fetchEmbeddedRevisionData(rq.objects, rq)
             .then(function (embedded) {
               return rq.trigger().then(function () {
-                var reify = function (revision) {
+                let reify = function (revision) {
                   _.each(['modified_by', 'source', 'destination'],
                     function (field) {
                       if (revision[field] && revision[field].reify) {
@@ -146,7 +146,7 @@ import template from './revision-log.mustache';
                     });
                   return revision;
                 };
-                var mappings = mappingsSrc.concat(mappingsDest, embedded);
+                let mappings = mappingsSrc.concat(mappingsDest, embedded);
                 return {
                   object: _.map(objRevisions, reify),
                   mappings: _.map(mappings, reify)
@@ -168,13 +168,13 @@ import template from './revision-log.mustache';
        *   revisons of the indirect mappings.
        */
       _fetchEmbeddedRevisionData: function (mappedObjects, rq) {
-        var instance = this.attr('instance');
-        var id = this.attr('instance.id');
-        var type = this.attr('instance.type');
-        var filterElegible = function (obj) {
+        let instance = this.attr('instance');
+        let id = this.attr('instance.id');
+        let type = this.attr('instance.type');
+        let filterElegible = function (obj) {
           return _.contains(this.attr('_EMBED_MAPPINGS')[type], obj.type);
         }.bind(this);
-        var dfds;
+        let dfds;
 
         function fetchRevisions(obj) {
           return [
@@ -250,9 +250,9 @@ import template from './revision-log.mustache';
        *   element follows the format returned by the `_objectChangeDiff` method.
        */
       _computeObjectChanges: function (revisions) {
-        var diffList = _.map(revisions, function (revision, i) {
+        let diffList = _.map(revisions, function (revision, i) {
           // default to empty revision
-          var prev = revisions[i - 1] || {content: {}};
+          let prev = revisions[i - 1] || {content: {}};
           return this._objectChangeDiff(prev, revision);
         }.bind(this));
         return _.filter(diffList, 'changes.length');
@@ -425,23 +425,23 @@ import template from './revision-log.mustache';
        *         - newVal: the attribute's new (modified) value
        */
       _objectChangeDiff: function (rev1, rev2) {
-        var diff = {
+        let diff = {
           madeBy: null,
           updatedAt: null,
           changes: [],
           role: null
         };
-        var attrDefs = GGRC.model_attr_defs[rev2.resource_type];
-        var madeByPersonId = rev2.modified_by ? rev2.modified_by.id : null;
+        let attrDefs = GGRC.model_attr_defs[rev2.resource_type];
+        let madeByPersonId = rev2.modified_by ? rev2.modified_by.id : null;
 
         diff.madeBy = rev2.modified_by;
         diff.updatedAt = rev2.updated_at;
         diff.role = this._getRoleAtTime(madeByPersonId, rev2.updated_at);
 
         can.each(rev2.content, function (value, fieldName) {
-          var origVal = rev1.content[fieldName];
-          var displayName;
-          var unifyValue = function (value) {
+          let origVal = rev1.content[fieldName];
+          let displayName;
+          let unifyValue = function (value) {
             value = value || EMPTY_DIFF_VALUE;
             value = value.length ? value : EMPTY_DIFF_VALUE;
             if (_.isObject(value)) {
@@ -502,10 +502,10 @@ import template from './revision-log.mustache';
         return diff;
       },
       _objectCADiff: function (origValues, origDefs, newValues, newDefs) {
-        var ids;
-        var defs;
-        var showValue = function (value, def) {
-          var obj;
+        let ids;
+        let defs;
+        let showValue = function (value, def) {
+          let obj;
           switch (def.attribute_type) {
             case 'Checkbox':
               return value.attribute_value ? '✓' : undefined;
@@ -536,8 +536,8 @@ import template from './revision-log.mustache';
 
         return _.chain(ids)
           .map(function (id) {
-            var def = defs[id];
-            var diff = {
+            let def = defs[id];
+            let diff = {
               fieldName: def.title,
               origVal:
                 showValue(origValues[id] || {}, def) || EMPTY_DIFF_VALUE,
@@ -564,7 +564,7 @@ import template from './revision-log.mustache';
        *   method.
        */
       _computeMappingChanges: function (revisions) {
-        var chains = _.chain(revisions)
+        let chains = _.chain(revisions)
           .groupBy('resource_id')
           .mapValues(function (chain) {
             return _.sortBy(chain, 'updated_at');
@@ -597,14 +597,14 @@ import template from './revision-log.mustache';
        *         - newVal: the attribute's new (modified) value
        */
       _mappingChange: function (revision, chain) {
-        var object;
-        var displayName;
-        var displayType;
-        var fieldName;
-        var origVal;
-        var newVal;
-        var previous;
-        var madeByPersonId;
+        let object;
+        let displayName;
+        let displayType;
+        let fieldName;
+        let origVal;
+        let newVal;
+        let previous;
+        let madeByPersonId;
 
         if (revision.destination_type === this.attr('instance.type') &&
           revision.destination_id === this.attr('instance.id')) {
@@ -670,16 +670,16 @@ import template from './revision-log.mustache';
        *   role history through time ordered in increasing order.
        */
       _computeRoleChanges: function (revisions) {
-        var mappings = _.sortBy(revisions.mappings, 'updated_at');
-        var instance = this.attr('instance');
-        var assigneeList = this.attr('instance.class.assignable_list');
-        var perPersonMappings;
-        var perPersonRoleHistory;
-        var modifiers;
-        var currentAssignees;
-        var assigneeRoles;
-        var unmodifiedAssignees;
-        var unassignedPeople;
+        let mappings = _.sortBy(revisions.mappings, 'updated_at');
+        let instance = this.attr('instance');
+        let assigneeList = this.attr('instance.class.assignable_list');
+        let perPersonMappings;
+        let perPersonRoleHistory;
+        let modifiers;
+        let currentAssignees;
+        let assigneeRoles;
+        let unmodifiedAssignees;
+        let unassignedPeople;
 
         perPersonMappings = _(mappings)
           .filter(function (rev) {
@@ -698,7 +698,7 @@ import template from './revision-log.mustache';
 
         perPersonRoleHistory = _.zipObject(
           _.map(perPersonMappings, function (revisions, pid) {
-            var history = _.map(revisions, function (rev) {
+            let history = _.map(revisions, function (rev) {
               // Add extra check to fix possible issue with inconsistent data
               if (rev.action === 'deleted' || !rev.content.attrs.AssigneeType) {
                 return {
@@ -750,8 +750,8 @@ import template from './revision-log.mustache';
           _.keys(assigneeRoles), _.keys(perPersonRoleHistory));
 
         _.forEach(unmodifiedAssignees, function (pid) {
-          var existingRoles = assigneeRoles[pid];
-          var role = GGRC.Utils.get_highest_assignee_role(
+          let existingRoles = assigneeRoles[pid];
+          let role = GGRC.Utils.get_highest_assignee_role(
             instance, existingRoles);
           perPersonRoleHistory[pid] = [{
             updated_at: instance.created_at,
@@ -779,9 +779,9 @@ import template from './revision-log.mustache';
        * @return {String} - Lowercase role string
        */
       _getRoleAtTime: function (personId, timePoint) {
-        var personHistory = this.attr('roleHistory')[personId] || [];
-        var role = _.last(_.takeWhile(personHistory, function (roleChange) {
-          var updateAt = new Date(roleChange.updated_at).getTime();
+        let personHistory = this.attr('roleHistory')[personId] || [];
+        let role = _.last(_.takeWhile(personHistory, function (roleChange) {
+          let updateAt = new Date(roleChange.updated_at).getTime();
           timePoint = new Date(timePoint).getTime();
           return updateAt <= timePoint;
         }));

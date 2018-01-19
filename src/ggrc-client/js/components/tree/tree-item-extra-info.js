@@ -11,7 +11,7 @@ import template from './templates/tree-item-extra-info.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var viewModel = can.Map.extend({
+  let viewModel = can.Map.extend({
     define: {
       isSubTreeItem: {
         type: 'htmlbool',
@@ -96,11 +96,11 @@ import template from './templates/tree-item-extra-info.mustache';
       isOverdue: {
         type: 'boolean',
         get: function () {
-          var isWorkflowOverdue =
+          let isWorkflowOverdue =
             this.attr('drawStatuses') &&
             this.attr('instance.workflow_state') === 'Overdue';
 
-          var isCycleTasksOverdue =
+          let isCycleTasksOverdue =
             this.attr('isCycleTasks') &&
             this.attr('instance.isOverdue');
 
@@ -110,7 +110,7 @@ import template from './templates/tree-item-extra-info.mustache';
       cssClasses: {
         type: 'string',
         get: function () {
-          var classes = [];
+          let classes = [];
 
           if (this.attr('isOverdue')) {
             classes.push('state-overdue');
@@ -140,8 +140,8 @@ import template from './templates/tree-item-extra-info.mustache';
       this.attr('active', false);
     },
     addContent: function (dataPromise) {
-      var dfds = this.attr('contentPromises');
-      var dfdReady = this.attr('dfdReady');
+      let dfds = this.attr('contentPromises');
+      let dfdReady = this.attr('dfdReady');
 
       if (dfdReady.state() === 'pending') {
         this.attr('spin', true);

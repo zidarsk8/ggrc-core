@@ -17,16 +17,16 @@ export default can.Component.extend({
   tag: 'object-bulk-update',
   template: template,
   viewModel: function (attrs, parentViewModel) {
-    var type = attrs.type;
-    var targetStates = getBulkStatesForModel(type);
-    var targetState = targetStates.length ? targetStates[0] : null;
+    let type = attrs.type;
+    let targetStates = getBulkStatesForModel(type);
+    let targetState = targetStates.length ? targetStates[0] : null;
 
     return ObjectOperationsBaseVM.extend({
       type: attrs.type,
       object: attrs.object,
       availableTypes: function () {
-        var object = this.attr('object');
-        var type = GGRC.Mappings.getMappingType(object);
+        let object = this.attr('object');
+        let type = GGRC.Mappings.getMappingType(object);
         return type;
       },
       reduceToOwnedItems: true,
@@ -46,7 +46,7 @@ export default can.Component.extend({
       this.closeModal();
     },
     '.btn-update click': function () {
-      var callback = this.viewModel.callback;
+      let callback = this.viewModel.callback;
 
       callback(this, {
         selected: this.viewModel.attr('selected'),

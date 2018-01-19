@@ -9,18 +9,18 @@ import '../tree/tree-view';
 describe('CMS.Controllers.TreeView', function () {
   'use strict';
 
-  var Ctrl;  // the controller under test
+  let Ctrl;  // the controller under test
 
   beforeAll(function () {
     Ctrl = CMS.Controllers.TreeView;
   });
 
   describe('init() method', function () {
-    var ctrlInst;  // fake controller instance
-    var dfdSingleton;
-    var method;
-    var options;
-    var $element;
+    let ctrlInst;  // fake controller instance
+    let dfdSingleton;
+    let method;
+    let options;
+    let $element;
 
     beforeEach(function () {
       options = {};
@@ -45,10 +45,10 @@ describe('CMS.Controllers.TreeView', function () {
   });
 
   describe('{original_list} remove event handler', function () {
-    var ctrlInst; // fake controller instance
-    var method;
-    var removeEventHandler;
-    var tvClass = 'cms_controllers_tree_view_node';
+    let ctrlInst; // fake controller instance
+    let method;
+    let removeEventHandler;
+    let tvClass = 'cms_controllers_tree_view_node';
 
     function genFilteredList(num) {
       let items = [];

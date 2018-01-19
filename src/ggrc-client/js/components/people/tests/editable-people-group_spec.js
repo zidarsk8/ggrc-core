@@ -8,8 +8,8 @@ import Component from '../editable-people-group';
 describe('GGRC.Components.editablePeopleGroup', function () {
   'use strict';
 
-  var viewModel;
-  var peopleItems = [
+  let viewModel;
+  let peopleItems = [
     {id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6},
   ];
 
@@ -48,7 +48,7 @@ describe('GGRC.Components.editablePeopleGroup', function () {
     it('"showSeeMoreLink" should be FALSE. People length less than 5',
       function () {
         // get 4 persons
-        var people = peopleItems.slice(0, 4);
+        let people = peopleItems.slice(0, 4);
         viewModel.attr('people', people);
         viewModel.attr('canEdit', true);
 
@@ -61,7 +61,7 @@ describe('GGRC.Components.editablePeopleGroup', function () {
     it('"showPeopleGroupModal" should be FALSE. People length less than 5',
       function () {
         // get 4 persons
-        var people = peopleItems.slice(0, 4);
+        let people = peopleItems.slice(0, 4);
         viewModel.attr('people', people);
 
         // trigger editableMode setter

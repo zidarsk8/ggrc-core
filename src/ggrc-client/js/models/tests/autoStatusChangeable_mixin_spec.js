@@ -8,15 +8,15 @@ import * as ModalsUtils from '../../plugins/utils/modals';
 describe('CMS.Models.Mixins.autoStatusChangeable', function () {
   'use strict';
 
-  var Mixin;
+  let Mixin;
 
   beforeAll(function () {
     Mixin = CMS.Models.Mixins.autoStatusChangeable;
   });
 
   describe('confirmBeginEdit() method', function () {
-    var instance;
-    var method;
+    let instance;
+    let method;
 
     beforeEach(function () {
       instance = new can.Map({
@@ -29,11 +29,11 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
     });
 
     it('displays a confirmation dialog with correct texts', function () {
-      var callArgs;
-      var expectedBodyText;
-      var expectedTitle;
-      var modalOptions;
-      var spy;
+      let callArgs;
+      let expectedBodyText;
+      let expectedTitle;
+      let modalOptions;
+      let spy;
 
       instance.attr('type', 'MagicType');
       instance.attr('status', 'In Limbo');
@@ -57,10 +57,10 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
     });
 
     it('resolves the given promise if the dialog gets confimred', function () {
-      var callArgs;
-      var confirmCallback;
-      var promise;
-      var spy;
+      let callArgs;
+      let confirmCallback;
+      let promise;
+      let spy;
 
       instance.attr('status', 'In Limbo');
 
@@ -81,10 +81,10 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
     });
 
     it('rejects the given promise if the dialog gets cancelled', function () {
-      var callArgs;
-      var rejectCallback;
-      var promise;
-      var spy;
+      let callArgs;
+      let rejectCallback;
+      let promise;
+      let spy;
 
       instance.attr('status', 'In Limbo');
 
@@ -107,8 +107,8 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
     it('returns a resolved promise if in "In Progress" state without ' +
       'opening the modal',
       function () {
-        var promise;
-        var spy = ModalsUtils.confirm;
+        let promise;
+        let spy = ModalsUtils.confirm;
 
         instance.attr('status', 'In Progress');
         promise = method();
@@ -121,8 +121,8 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
     it('returns a resolved promise if in "Not Started" state without ' +
       'opening the modal',
       function () {
-        var promise;
-        var spy = ModalsUtils.confirm;
+        let promise;
+        let spy = ModalsUtils.confirm;
 
         instance.attr('status', 'Not Started');
         promise = method();

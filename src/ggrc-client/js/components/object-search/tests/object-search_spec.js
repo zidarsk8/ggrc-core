@@ -6,7 +6,7 @@
 describe('GGRC.Components.objectSearch', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(function () {
     viewModel = new GGRC.Components.getViewModel('objectSearch')();
@@ -14,7 +14,7 @@ describe('GGRC.Components.objectSearch', function () {
 
   describe('availableTypes() method', function () {
     it('correctly calls getMappingTypes', function () {
-      var result;
+      let result;
       spyOn(GGRC.Mappings, 'getMappingTypes').and.returnValue('types');
       viewModel.attr('object', 'testObject');
 

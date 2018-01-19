@@ -11,7 +11,7 @@ import {
 (function (can, $, _, GGRC) {
   'use strict';
 
-  var DOCUMENT_TYPES_MAP = {};
+  let DOCUMENT_TYPES_MAP = {};
 
   DOCUMENT_TYPES_MAP[CMS.Models.Document.EVIDENCE] = 'document_evidence';
   DOCUMENT_TYPES_MAP[CMS.Models.Document.URL] = 'document_url';
@@ -34,12 +34,12 @@ import {
         }
       },
       getDocumentsQuery: function () {
-        var relevantFilters = [{
+        let relevantFilters = [{
           type: this.attr('instance.type'),
           id: this.attr('instance.id'),
           operation: 'relevant'
         }];
-        var additionalFilter = this.attr('documentType') ?
+        let additionalFilter = this.attr('documentType') ?
         {
           expression: {
             left: 'document_type',
@@ -49,21 +49,21 @@ import {
         } :
         [];
 
-        var query =
+        let query =
           buildParam('Document', {}, relevantFilters, [], additionalFilter);
         query.order_by = [{name: 'created_at', desc: true}];
 
         return query;
       },
       loadDocuments: function () {
-        var promise;
-        var self = this;
-        var query = this.getDocumentsQuery();
+        let promise;
+        let self = this;
+        let query = this.getDocumentsQuery();
 
         this.attr('isLoading', true);
         promise = batchRequests(query).then(
           function (response) {
-            var documents = response.Document.values;
+            let documents = response.Document.values;
             self.attr('documents').replace(documents);
             self.attr('isLoading', false);
           }
@@ -71,11 +71,11 @@ import {
         return promise;
       },
       setDocuments: function () {
-        var instance = this.attr('instance');
-        var documentType = this.attr('documentType');
-        var isSnapshot = this.attr('isSnapshot');
-        var documentPath;
-        var documents;
+        let instance = this.attr('instance');
+        let documentType = this.attr('documentType');
+        let isSnapshot = this.attr('isSnapshot');
+        let documentPath;
+        let documents;
 
         // load documents for non-snapshots objects
         if (!isSnapshot) {
@@ -95,31 +95,31 @@ import {
         this.attr('documents').replace(documents);
       },
       removeDocument: function (event) {
-        var item = event.item;
-        var index = this.attr('documents').indexOf(item);
+        let item = event.item;
+        let index = this.attr('documents').indexOf(item);
         this.attr('isLoading', true);
         return this.attr('documents').splice(index, 1);
       },
       addDocuments: function (event) {
-        var items = event.items;
+        let items = event.items;
         this.attr('isLoading', true);
         return this.attr('documents').unshift
           .apply(this.attr('documents'), items);
       },
       getRelationship: function (document, instance) {
-        var instanceRelatedObjects = instance.attr('related_destinations')
+        let instanceRelatedObjects = instance.attr('related_destinations')
           .concat(instance.attr('related_sources'));
-        var documentRelatedObjects = document.attr('related_destinations')
+        let documentRelatedObjects = document.attr('related_destinations')
           .concat(document.attr('related_sources'));
-        var targetRelatedObject = _.find(instanceRelatedObjects,
+        let targetRelatedObject = _.find(instanceRelatedObjects,
           function (instanceRelatedObject) {
-            var instanceRelatedObjectId = _.get(
+            let instanceRelatedObjectId = _.get(
               instanceRelatedObject,
               'id'
             );
             return _.some(documentRelatedObjects,
               function (documentRelatedObject) {
-                var documentRelatedObjectId = _.get(
+                let documentRelatedObjectId = _.get(
                   documentRelatedObject,
                   'id'
                 );
@@ -131,8 +131,8 @@ import {
         return new CMS.Models.Relationship(targetRelatedObject);
       },
       createDocument: function (data) {
-        var date = new Date();
-        var document = new CMS.Models.Document({
+        let date = new Date();
+        let document = new CMS.Models.Document({
           link: data,
           title: data,
           created_at: date.toISOString(),
@@ -147,7 +147,7 @@ import {
         return document.save();
       },
       createRelationship: function (document) {
-        var relationship = new CMS.Models.Relationship({
+        let relationship = new CMS.Models.Relationship({
           source: this.instance,
           destination: document,
           context: this.instance.context ||
@@ -156,8 +156,8 @@ import {
         return relationship.save();
       },
       createRelatedDocument: function (data) {
-        var self = this;
-        var document = this.createDocument(data);
+        let self = this;
+        let document = this.createDocument(data);
 
         this.attr('documents').unshift(document);
         this.attr('isLoading', true);
@@ -182,9 +182,9 @@ import {
           });
       },
       removeRelatedDocument: function (document) {
-        var self = this;
-        var documents;
-        var relationship = this.getRelationship(document, this.instance);
+        let self = this;
+        let documents;
+        let relationship = this.getRelationship(document, this.instance);
 
         if (!relationship.id) {
           console.log('Unable to find relationship');
@@ -213,7 +213,7 @@ import {
           });
       },
       markDocumentForDeletion: function (document) {
-        var documents = this.attr('documents').filter(function (item) {
+        let documents = this.attr('documents').filter(function (item) {
           return item !== document;
         });
 
@@ -222,8 +222,8 @@ import {
         this.attr('pendingItemsChanged', true);
       },
       markDocumentForAddition: function (data) {
-        var self = this;
-        var document = this.createDocument(data);
+        let self = this;
+        let document = this.createDocument(data);
 
         this.attr('documents').unshift(document);
         this.attr('isLoading', true);
@@ -249,9 +249,9 @@ import {
       }
     },
     init: function () {
-      var instance = this.viewModel.attr('instance');
-      var isNew = instance.isNew();
-      var isSnapshot = !!(instance.snapshot || instance.isRevision);
+      let instance = this.viewModel.attr('instance');
+      let isNew = instance.isNew();
+      let isSnapshot = !!(instance.snapshot || instance.isRevision);
 
       // don't need to load documents for unsaved instance
       if (!isNew) {

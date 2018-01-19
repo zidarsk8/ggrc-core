@@ -8,10 +8,10 @@ import Permission from '../../permission';
 'use strict';
 
 describe('GGRC utils allowed_to_map() method', function () {
-  var allowedToMap;
-  var fakeOptions;
-  var fakeProgram;
-  var fakeAudit;
+  let allowedToMap;
+  let fakeOptions;
+  let fakeProgram;
+  let fakeAudit;
 
   beforeAll(function () {
     allowedToMap = GGRC.Utils.allowed_to_map;
@@ -33,20 +33,20 @@ describe('GGRC utils allowed_to_map() method', function () {
     });
 
     it('returns false for Audit as source and Program as target', function () {
-      var result = allowedToMap(fakeAudit, fakeProgram, fakeOptions);
+      let result = allowedToMap(fakeAudit, fakeProgram, fakeOptions);
       expect(result).toBe(false);
     });
 
     it('returns false for Program as source and Audit as target', function () {
-      var result = allowedToMap(fakeProgram, fakeAudit, fakeOptions);
+      let result = allowedToMap(fakeProgram, fakeAudit, fakeOptions);
       expect(result).toBe(false);
     });
   });
 
   describe('given a Person instance', function () {
-    var origShortName;
-    var otherInstance;
-    var person;
+    let origShortName;
+    let otherInstance;
+    let person;
 
     beforeAll(function () {
       origShortName = can.Model.shortName;
@@ -63,18 +63,18 @@ describe('GGRC utils allowed_to_map() method', function () {
     });
 
     it('returns false for any object', function () {
-      var result = allowedToMap(otherInstance, person);
+      let result = allowedToMap(otherInstance, person);
       expect(result).toBe(false);
     });
   });
 });
 
 describe('GGRC utils getMappableTypes() method', function () {
-  var mapper;
+  let mapper;
 
   beforeAll(function () {
-    var canonicalMappings = {};
-    var OBJECT_TYPES = [
+    let canonicalMappings = {};
+    let OBJECT_TYPES = [
       'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
       'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
       'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
@@ -90,43 +90,43 @@ describe('GGRC utils getMappableTypes() method', function () {
   });
 
   it('excludes the References type from the result', function () {
-    var result = mapper('Reference');
+    let result = mapper('Reference');
     expect(_.contains(result, 'Reference')).toBe(false);
   });
   it('does not return Issue type for Person', function () {
-    var result = mapper('Person');
+    let result = mapper('Person');
     expect(_.contains(result, 'Issue')).toBe(false);
   });
   it('returns only Audit type for AssessmentTemplate', function () {
-    var result = mapper('AssessmentTemplate');
+    let result = mapper('AssessmentTemplate');
     expect(result.length).toBe(1);
     expect(result[0]).toBe('Audit');
   });
   it('always returns whitelisted items', function () {
-    var whitelisted = ['Hello', 'World'];
-    var result = mapper('AssessmentTemplate', {
+    let whitelisted = ['Hello', 'World'];
+    let result = mapper('AssessmentTemplate', {
       whitelist: whitelisted
     });
     expect(_.intersection(result, whitelisted)).toEqual(whitelisted);
   });
   it('always remove forbidden items', function () {
-    var forbidden = ['Policy', 'Process', 'Product', 'Program'];
-    var list = mapper('DataAsset');
-    var result = mapper('DataAsset', {
+    let forbidden = ['Policy', 'Process', 'Product', 'Program'];
+    let list = mapper('DataAsset');
+    let result = mapper('DataAsset', {
       forbidden: forbidden
     });
     expect(_.difference(list, result).sort()).toEqual(forbidden.sort());
   });
   it('always leave whitelisted and remove forbidden items', function () {
-    var forbidden = ['Policy', 'Process', 'Product', 'Program'];
-    var whitelisted = ['Hello', 'World'];
-    var list = mapper('DataAsset');
-    var result = mapper('DataAsset', {
+    let forbidden = ['Policy', 'Process', 'Product', 'Program'];
+    let whitelisted = ['Hello', 'World'];
+    let list = mapper('DataAsset');
+    let result = mapper('DataAsset', {
       forbidden: forbidden,
       whitelist: whitelisted
     });
-    var input = _.difference(list, result).concat(_.difference(result, list));
-    var output = forbidden.concat(whitelisted);
+    let input = _.difference(list, result).concat(_.difference(result, list));
+    let output = forbidden.concat(whitelisted);
 
     expect(input.sort()).toEqual(output.sort());
   });
@@ -134,11 +134,11 @@ describe('GGRC utils getMappableTypes() method', function () {
 
 describe('GGRC utils isMappableType() method', function () {
   it('returns false for AssessmentTemplate and  any type', function () {
-    var result = GGRC.Utils.isMappableType('AssessmentTemplate', 'Program');
+    let result = GGRC.Utils.isMappableType('AssessmentTemplate', 'Program');
     expect(result).toBe(false);
   });
   it('returns true for Program and Control', function () {
-    var result = GGRC.Utils.isMappableType('Program', 'Control');
+    let result = GGRC.Utils.isMappableType('Program', 'Control');
     expect(result).toBe(true);
   });
 });
@@ -180,7 +180,7 @@ describe('GGRC utils getAssigneeType() method', function () {
   });
 
   it('should return null. Empty ACL', function () {
-    var userType = method(instance);
+    let userType = method(instance);
     expect(userType).toBeNull();
   });
 

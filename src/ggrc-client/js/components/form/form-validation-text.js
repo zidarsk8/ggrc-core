@@ -4,9 +4,9 @@
  */
 
 'use strict';
-var tag = 'form-validation-text';
+let tag = 'form-validation-text';
 
-var textMap = {
+let textMap = {
   input: 'This field is required.',
   checkbox: 'This checkbox is required.',
   dropdownNoInfo: 'Add required info by click on the link.'
@@ -25,7 +25,7 @@ GGRC.Components('formValidationText', {
         validation: {},
         value: 'This field is required.',
         get: function () {
-          var text;
+          let text;
 
           switch (this.attr('type')) {
             case 'dropdown':

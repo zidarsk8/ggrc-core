@@ -10,7 +10,7 @@ import template from './comment-list-item.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var tag = 'comment-list-item';
+  let tag = 'comment-list-item';
   /**
    * Simple component to show Comment Objects
    */

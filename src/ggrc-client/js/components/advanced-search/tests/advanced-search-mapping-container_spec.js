@@ -9,7 +9,7 @@ import Component from '../advanced-search-mapping-container';
 describe('GGRC.Components.advancedSearchMappingContainer', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(() => {
     viewModel = new Component.prototype.viewModel();
@@ -17,7 +17,7 @@ describe('GGRC.Components.advancedSearchMappingContainer', function () {
 
   describe('addMappingCriteria() method', function () {
     it('adds only criteria if list is empty', function () {
-      var items;
+      let items;
       viewModel.attr('items', can.List());
 
       viewModel.addMappingCriteria();
@@ -28,7 +28,7 @@ describe('GGRC.Components.advancedSearchMappingContainer', function () {
     });
 
     it('adds operator and criteria if list is not empty', function () {
-      var items;
+      let items;
       viewModel.attr('items',
         [AdvancedSearch.create.mappingCriteria()]);
       viewModel.addMappingCriteria();
@@ -44,7 +44,7 @@ describe('GGRC.Components.advancedSearchMappingContainer', function () {
   describe('createGroup() method', function () {
     it('transforms criteria to group with 2 criteria and operator inside',
     function () {
-      var viewItems;
+      let viewItems;
       viewModel.attr('items', new can.List([
         AdvancedSearch.create.mappingCriteria({field: 'first'}),
         AdvancedSearch.create.operator(),

@@ -9,7 +9,7 @@ import template from './editable-document-object-list-item.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var tag = 'editable-document-object-list-item';
+  let tag = 'editable-document-object-list-item';
 
   GGRC.Components('editableDocumentObjectListItem', {
     tag: tag,

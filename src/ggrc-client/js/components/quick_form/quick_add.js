@@ -45,11 +45,11 @@ import {confirm} from '../../plugins/utils/modals';
         }
       },
       create_url: function () {
-        var value = $.trim(this.element.find("input[type='text']").val());
-        var dfd;
-        var context = this.viewModel.attr('parent_instance.context') ||
+        let value = $.trim(this.element.find("input[type='text']").val());
+        let dfd;
+        let context = this.viewModel.attr('parent_instance.context') ||
             new CMS.Models.Context({id: null});
-        var attrs = {
+        let attrs = {
           link: value,
           title: value,
           context: context,
@@ -90,12 +90,12 @@ import {confirm} from '../../plugins/utils/modals';
           }.bind(this));
       },
       'a[data-toggle=submit]:not(.disabled):not([disabled]) click': function (el, ev) {
-        var scope = this.viewModel;
-        var join_model_class;
-        var join_object;
-        var quick_create;
-        var created_dfd;
-        var verify_dfd = can.Deferred();
+        let scope = this.viewModel;
+        let join_model_class;
+        let join_object;
+        let quick_create;
+        let created_dfd;
+        let verify_dfd = can.Deferred();
         scope.attr('disabled', true);
         scope.attr('verify_event',
           !!this.element.context.attributes.verify_event);
@@ -144,7 +144,7 @@ import {confirm} from '../../plugins/utils/modals';
 
           if (created_dfd.state() === 'rejected') {
             created_dfd.fail(function (error) {
-              var instance = scope.attr('instance');
+              let instance = scope.attr('instance');
               scope.dispatch({
                 type: 'afterCreate',
                 items: [instance],
@@ -198,7 +198,7 @@ import {confirm} from '../../plugins/utils/modals';
             this.bindXHRToButton(
               join_object.save()
                 .done(function () {
-                  var instance = scope.attr('instance');
+                  let instance = scope.attr('instance');
                   el.trigger('modal:success', join_object);
 
                   scope.dispatch({
@@ -208,7 +208,7 @@ import {confirm} from '../../plugins/utils/modals';
                   });
                 })
                 .fail(function () {
-                  var instance = scope.attr('instance');
+                  let instance = scope.attr('instance');
 
                   scope.dispatch({
                     type: 'afterCreate',
@@ -228,7 +228,7 @@ import {confirm} from '../../plugins/utils/modals';
       // this works like autocomplete_select on all modal forms and
       //  descendant class objects.
       autocomplete_select: function(el, event, ui) {
-        var that = this;
+        let that = this;
         setTimeout(function() {
           that.scope.attr('instance', ui.item);
         });
@@ -242,13 +242,13 @@ import {confirm} from '../../plugins/utils/modals';
         this.scope.attributes.attr(el.attr("name"), el.val());
       },
       ".ui-autocomplete-input modal:success" : function(el, ev, data, options) {
-        var that = this,
+        let that = this,
           multi_map = data.multi_map,
           join_model_class,
           join_object;
 
         if(multi_map){
-          var length = data.arr.length,
+          let length = data.arr.length,
               my_data;
 
           if (length == 1){
@@ -268,7 +268,7 @@ import {confirm} from '../../plugins/utils/modals';
           }
 
           else{
-            for(var i = 0; i < length-1; i++){
+            for(let i = 0; i < length-1; i++){
               my_data = data.arr[i];
 
               GGRC.Mappings.make_join_object(
@@ -323,7 +323,7 @@ import {confirm} from '../../plugins/utils/modals';
       //  be decorated with data-mapping attributes.
       mapping_autocomplete : function(options) {
         return function(el) {
-          var $el = $(el);
+          let $el = $(el);
           $el.ggrc_mapping_autocomplete({
             controller : options.contexts.attr("controller"),
             model : $el.data("model"),

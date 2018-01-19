@@ -7,15 +7,15 @@ describe('GGRC.Components.dropdown', function () {
   'use strict';
 
   describe('rendering option list', function () {
-    var template;
+    let template;
 
     beforeAll(function () {
       template = can.view.mustache('<dropdown options-list="list"></dropdown>');
     });
 
     it('when input is an array of strings', function () {
-      var list = ['a', 'b', 'c', 'd'];
-      var frag = template({
+      let list = ['a', 'b', 'c', 'd'];
+      let frag = template({
         list: list
       });
       frag = $(frag);
@@ -29,7 +29,7 @@ describe('GGRC.Components.dropdown', function () {
     });
 
     it('when input is an array of values', function () {
-      var list = [{
+      let list = [{
         title: 'a',
         value: 1
       }, {
@@ -42,14 +42,14 @@ describe('GGRC.Components.dropdown', function () {
         title: 'd',
         value: 4
       }];
-      var frag = template({
+      let frag = template({
         list: list
       });
       frag = $(frag);
 
       expect(frag.find('option').length).toEqual(list.length);
       $.each(frag.find('option'), function (index, el) {
-        var item = list[index];
+        let item = list[index];
         el = $(el);
         expect(el.text()).toEqual(item.title);
         expect(el.val()).toEqual(String(item.value));
@@ -57,7 +57,7 @@ describe('GGRC.Components.dropdown', function () {
     });
 
     it('when input is an array of grouped values', function () {
-      var list = [{
+      let list = [{
         title: 'a',
         value: 1
       }, {
@@ -91,22 +91,22 @@ describe('GGRC.Components.dropdown', function () {
           value: 24
         }]
       }];
-      var frag = template({
+      let frag = template({
         list: list
       });
-      var groups = _.filter(list, function (item) {
+      let groups = _.filter(list, function (item) {
         return item.group;
       });
       frag = $(frag);
 
       expect(frag.find('optgroup').length).toEqual(groups.length);
       $.each(frag.find('optgroup'), function (index, el) {
-        var item = groups[index];
+        let item = groups[index];
         el = $(el);
         expect(el.attr('label')).toEqual(item.group);
       });
       $.each(frag.find('optgroup:first options'), function (index, el) {
-        var subitem = list[1].subitems[index];
+        let subitem = list[1].subitems[index];
         el = $(el);
         expect(el.attr('label')).toEqual(subitem.title);
         expect(el.val()).toEqual(String(subitem.value));
@@ -115,14 +115,14 @@ describe('GGRC.Components.dropdown', function () {
   });
 
   describe('build of options', function () {
-    var viewModel;
-    var optionsList = [
+    let viewModel;
+    let optionsList = [
       {title: 'title 1', value: 'value1'},
       {title: 'title 2', value: 'value2'},
       {title: 'title 3', value: 'value3'}
     ];
 
-    var optionsGroups = {
+    let optionsGroups = {
       group1: {
         name: 'group 1',
         items: [
@@ -146,7 +146,7 @@ describe('GGRC.Components.dropdown', function () {
     });
 
     it('should build list from optionsList', function () {
-      var list;
+      let list;
       viewModel.attr('optionsList', optionsList);
       list = viewModel.attr('options');
 
@@ -156,7 +156,7 @@ describe('GGRC.Components.dropdown', function () {
     });
 
     it('should build list from optionsList with None', function () {
-      var list;
+      let list;
 
       viewModel.attr('optionsList', optionsList);
       viewModel.attr('noValue', true);
@@ -169,7 +169,7 @@ describe('GGRC.Components.dropdown', function () {
     });
 
     it('should build list from optionsGroups', function () {
-      var list;
+      let list;
       viewModel.attr('optionsGroups', optionsGroups);
       viewModel.attr('isGroupedDropdown', true);
       list = viewModel.attr('options');
@@ -182,7 +182,7 @@ describe('GGRC.Components.dropdown', function () {
     });
 
     it('should build list from optionsGroups with None', function () {
-      var list;
+      let list;
       viewModel.attr('optionsGroups', optionsGroups);
       viewModel.attr('isGroupedDropdown', true);
       viewModel.attr('noValue', true);

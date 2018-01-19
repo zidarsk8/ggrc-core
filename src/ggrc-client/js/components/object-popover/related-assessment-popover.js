@@ -48,7 +48,7 @@ import template from './related-assessment-popover.mustache';
         },
         selectedAssessmentFields: {
           get: function () {
-            var caValues =
+            let caValues =
               this.attr('selectedAssessment.data.custom_attribute_values');
             return caValues ? convertValuesToFormFields(caValues) : [];
           },

@@ -45,7 +45,7 @@ export default GGRC.Components('tabContainer', {
         this.attr('instance.selectedTabIndex', tabIndex);
       }
       this.attr('panels').forEach(function (panel) {
-        var isActive = (panel.attr('tabIndex') === tabIndex);
+        let isActive = (panel.attr('tabIndex') === tabIndex);
         panel.attr('active', isActive);
         panel.dispatch('updateActiveTab');
       });
@@ -54,8 +54,8 @@ export default GGRC.Components('tabContainer', {
      * Update selected item and set it to the fist item if no previous selection is available
      */
     setDefaultActivePanel: function () {
-      var tabIndex = this.attr('selectedTabIndex');
-      var panels = this.attr('panels');
+      let tabIndex = this.attr('selectedTabIndex');
+      let panels = this.attr('panels');
       // Select the first panel if tabIndex is not defined
       if (!tabIndex && panels.length) {
         tabIndex = panels[0].attr('tabIndex');

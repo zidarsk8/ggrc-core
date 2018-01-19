@@ -8,7 +8,7 @@ import * as StateUtils from './state-utils';
 /**
  * Factory allowing to create Advanced Search Filter Items.
  */
-var create = {
+let create = {
   /**
    * Creates Filter Attribute.
    * @param {object} value - Filter Attribute data.
@@ -69,14 +69,14 @@ var create = {
 /**
  * Contains rich Status Filter operators.
  */
-var richOperators = {
+let richOperators = {
   /**
    * @param {Array} values - filter statements.
    * @param {String} modelName - model name
    * @return {string} - filter string.
    */
   ANY: function (values, modelName) {
-    var statusField = StateUtils.getStatusFieldName(
+    let statusField = StateUtils.getStatusFieldName(
       modelName);
     return _.map(values, function (value) {
       return '"' + statusField + '"="' + value + '"';
@@ -88,7 +88,7 @@ var richOperators = {
    * @return {string} - filter string.
    */
   NONE: function (values, modelName) {
-    var statusField = StateUtils.getStatusFieldName(
+    let statusField = StateUtils.getStatusFieldName(
       modelName);
     return _.map(values, function (value) {
       return '"' + statusField + '"!="' + value + '"';
@@ -99,7 +99,7 @@ var richOperators = {
 /**
  * Contains QueryAPI filter builders.
  */
-var builders = {
+let builders = {
   attribute: attributeToFilter,
   operator: operatorToFilter,
   state: stateToFilter,
@@ -151,7 +151,7 @@ function groupToFilter(items, request) {
  * @return {string} - Valid QueryAPI filter string.
  */
 function mappingCriteriaToFilter(criteria, request) {
-  var criteriaId = addMappingCriteria(criteria, request);
+  let criteriaId = addMappingCriteria(criteria, request);
   return previousToFilter(criteriaId);
 }
 /**
@@ -169,9 +169,9 @@ function previousToFilter(requestId) {
  * @return {number} - QueryAPI request id.
  */
 function addMappingCriteria(mapping, request) {
-  var filterObject = GGRC.query_parser
+  let filterObject = GGRC.query_parser
     .parse(attributeToFilter(mapping.filter.value));
-  var relevantResult;
+  let relevantResult;
   if (mapping.mappedTo) {
     relevantResult =
       builders[mapping.mappedTo.type](mapping.mappedTo.value, request);
@@ -194,7 +194,7 @@ function addMappingCriteria(mapping, request) {
  * @return {string} - valid QueryAPI filter string.
  */
 function buildFilter(data, request) {
-  var result = '';
+  let result = '';
   request = request || [];
   _.each(data, function (item) {
     result += builders[item.type](item.value, request);

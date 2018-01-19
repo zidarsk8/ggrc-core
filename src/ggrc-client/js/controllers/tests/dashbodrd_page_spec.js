@@ -4,20 +4,20 @@
 */
 
 describe('GGRC.Components.dashboardWidgets', function () {
-  var methods;
-  var method;
+  let methods;
+  let method;
 
   beforeEach(function () {
     methods = GGRC.Components.get('dashboardWidgets').prototype;
   });
 
   describe('update_tasks_for_workflow() method', function () {
-    var workflow;
-    var tasks;
+    let workflow;
+    let tasks;
 
     function generatePreConditions(states, endDates = [], isOverdue = []) {
-      var refresh_instances;
-      var data = states.map(function (state) {
+      let refresh_instances;
+      let data = states.map(function (state) {
         return {
           instance: {status: state},
         };
@@ -46,10 +46,10 @@ describe('GGRC.Components.dashboardWidgets', function () {
     });
 
     it('generates tasks percentage and counts into workflow', function (done) {
-      var states = ['Assigned', 'Assigned',
+      let states = ['Assigned', 'Assigned',
         'Verified', 'Finished', 'InProgress', 'Declined'];
-      var isOverdue = [true, true];
-      var expectedResult = {
+      let isOverdue = [true, true];
+      let expectedResult = {
         task_count: 6,
         assigned: 2,
         assigned_percentage: '33.33',

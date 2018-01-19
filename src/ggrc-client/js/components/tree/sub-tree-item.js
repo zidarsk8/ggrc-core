@@ -9,7 +9,7 @@ import template from './templates/sub-tree-item.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var viewModel = BaseTreeItemVM.extend({
+  let viewModel = BaseTreeItemVM.extend({
     define: {
       dueDate: {
         type: 'date',
@@ -21,7 +21,7 @@ import template from './templates/sub-tree-item.mustache';
       dueDateCssClass: {
         type: 'string',
         get: function () {
-          var isOverdue = this.attr('instance.isOverdue');
+          let isOverdue = this.attr('instance.isOverdue');
           return isOverdue ? 'state-overdue' : '';
         }
       },
@@ -35,8 +35,8 @@ import template from './templates/sub-tree-item.mustache';
       cssClasses: {
         type: String,
         get: function () {
-          var classes = [];
-          var instance = this.attr('instance');
+          let classes = [];
+          let instance = this.attr('instance');
 
           if (instance.snapshot) {
             classes.push('snapshot');
@@ -52,7 +52,7 @@ import template from './templates/sub-tree-item.mustache';
       title: {
         type: String,
         get: function () {
-          var instance = this.attr('instance');
+          let instance = this.attr('instance');
           return instance.title || instance.description_inline ||
             instance.name || instance.email || '';
         }
@@ -68,9 +68,9 @@ import template from './templates/sub-tree-item.mustache';
     viewModel: viewModel,
     events: {
       inserted: function () {
-        var viewModel = this.viewModel;
-        var instance = viewModel.attr('instance');
-        var resultDfd;
+        let viewModel = this.viewModel;
+        let instance = viewModel.attr('instance');
+        let resultDfd;
         viewModel.attr('$el', this.element);
 
         if (instance instanceof CMS.Models.Person) {

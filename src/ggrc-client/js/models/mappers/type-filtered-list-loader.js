@@ -7,9 +7,9 @@
   GGRC.ListLoaders.StubFilteredListLoader(
     'GGRC.ListLoaders.TypeFilteredListLoader', {}, {
       init: function (source, modelNames) {
-        var filterFn = function (result) {
-          var i;
-          var modelName;
+        let filterFn = function (result) {
+          let i;
+          let modelName;
           for (i = 0; i < modelNames.length; i++) {
             modelName = modelNames[i];
             if (typeof modelName !== 'string')

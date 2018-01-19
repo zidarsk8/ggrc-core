@@ -19,7 +19,7 @@ import './object-list-item/editable-document-object-list-item';
       parentInstance: null,
       mappedObjects: [],
       isExpandable: function () {
-        var expandable = this.attr('expandable');
+        let expandable = this.attr('expandable');
         if (expandable === null || expandable === undefined) {
           return true;
         } else if (typeof expandable === 'string') {
@@ -29,8 +29,8 @@ import './object-list-item/editable-document-object-list-item';
       }
     },
     init: function (element) {
-      var el = $(element);
-      var binding;
+      let el = $(element);
+      let binding;
 
       _.each(['mapping', 'itemTemplate'], function (prop) {
         if (!this.scope.attr(prop)) {
@@ -66,8 +66,8 @@ import './object-list-item/editable-document-object-list-item';
       *                   mappedObjects.
       */
     _sortObjects: function (mappedObjects) {
-      var sortField = this.scope.attr('sortField');
-      var sortOrder = this.scope.attr('sortOrder');
+      let sortField = this.scope.attr('sortField');
+      let sortOrder = this.scope.attr('sortOrder');
       if (sortField) {
         return _.sortByOrder(mappedObjects, sortField, sortOrder);
       }
@@ -75,10 +75,10 @@ import './object-list-item/editable-document-object-list-item';
     },
     events: {
       '[data-toggle=unmap] click': function (el, ev) {
-        var instance = el.find('.result').data('result');
-        var mappings = this.scope.parentInstance.get_mapping(
+        let instance = el.find('.result').data('result');
+        let mappings = this.scope.parentInstance.get_mapping(
           this.scope.mapping);
-        var binding;
+        let binding;
 
         ev.stopPropagation();
         // Refactor and show spinner instead (for all lists)

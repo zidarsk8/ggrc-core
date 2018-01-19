@@ -1,6 +1,6 @@
 describe('GGRC.Components.checkboxFormField', function () {
   'use strict';
-  var viewModel;
+  let viewModel;
 
   beforeEach(function () {
     viewModel = GGRC.Components

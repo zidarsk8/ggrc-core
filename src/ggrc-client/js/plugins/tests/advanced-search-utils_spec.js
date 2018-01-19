@@ -10,13 +10,13 @@ import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 describe('AdvancedSearch', function () {
   describe('buildFilter() method', function () {
     it('builds correct statuses with "ANY" operator', function () {
-      var items = [
+      let items = [
         AdvancedSearch.create.state({
           items: ['Active', 'Draft', 'Deprecated'],
           operator: 'ANY'
         })
       ];
-      var expectedResult = '("Status"="Active" ' +
+      let expectedResult = '("Status"="Active" ' +
                            'OR "Status"="Draft" ' +
                            'OR "Status"="Deprecated")';
 
@@ -27,14 +27,14 @@ describe('AdvancedSearch', function () {
     it(`builds correct statuses with "ANY" operator for
       CycleTaskGroupObjectTask`,
       function () {
-        var items = [
+        let items = [
           AdvancedSearch.create.state({
             items: ['Active', 'Draft', 'Deprecated'],
             operator: 'ANY',
             modelName: 'CycleTaskGroupObjectTask',
           }),
         ];
-        var expectedResult = '("Task State"="Active" ' +
+        let expectedResult = '("Task State"="Active" ' +
                              'OR "Task State"="Draft" ' +
                              'OR "Task State"="Deprecated")';
 
@@ -43,13 +43,13 @@ describe('AdvancedSearch', function () {
       });
 
     it('builds correct statuses with "NONE" operator', function () {
-      var items = [
+      let items = [
         AdvancedSearch.create.state({
           items: ['Active', 'Draft', 'Deprecated'],
           operator: 'NONE',
         }),
       ];
-      var expectedResult = '("Status"!="Active" ' +
+      let expectedResult = '("Status"!="Active" ' +
                            'AND "Status"!="Draft" ' +
                            'AND "Status"!="Deprecated")';
 
@@ -60,14 +60,14 @@ describe('AdvancedSearch', function () {
     it(`builds correct statuses with "NONE" operator for
       CycleTaskGroupObjectTask`,
       function () {
-        var items = [
+        let items = [
           AdvancedSearch.create.state({
             items: ['Active', 'Draft', 'Deprecated'],
             operator: 'NONE',
             modelName: 'CycleTaskGroupObjectTask',
           }),
         ];
-        var expectedResult = '("Task State"!="Active" ' +
+        let expectedResult = '("Task State"!="Active" ' +
                              'AND "Task State"!="Draft" ' +
                              'AND "Task State"!="Deprecated")';
 
@@ -76,7 +76,7 @@ describe('AdvancedSearch', function () {
       });
 
     it('builds correct filter string', function () {
-      var items = [
+      let items = [
         AdvancedSearch.create.state({
           items: ['Active', 'Draft'],
           operator: 'ANY'
@@ -102,7 +102,7 @@ describe('AdvancedSearch', function () {
           })
         ])
       ];
-      var expectedResult = '("Status"="Active" OR "Status"="Draft") ' +
+      let expectedResult = '("Status"="Active" OR "Status"="Draft") ' +
                            'AND "Title" ~ "test" ' +
                            'OR ("Para" = "meter" AND "Other" ~= "value")';
       expect(AdvancedSearch.buildFilter(items))
@@ -110,7 +110,7 @@ describe('AdvancedSearch', function () {
     });
 
     it('builds correct mapping filters', function () {
-      var items = [
+      let items = [
         AdvancedSearch.create.mappingCriteria({
           objectName: 'product',
           filter: AdvancedSearch.create.attribute({
@@ -156,8 +156,8 @@ describe('AdvancedSearch', function () {
           ])
         })
       ];
-      var expectedFilters = '#__previous__,1# AND #__previous__,4#';
-      var expectedRequest = [
+      let expectedFilters = '#__previous__,1# AND #__previous__,4#';
+      let expectedRequest = [
         {
           object_name: 'system',
           type: 'ids',
@@ -268,9 +268,9 @@ describe('AdvancedSearch', function () {
           }
         }
       ];
-      var request = [];
+      let request = [];
 
-      var result = AdvancedSearch.buildFilter(items, request);
+      let result = AdvancedSearch.buildFilter(items, request);
 
       expect(result).toBe(expectedFilters);
       expect(JSON.parse(JSON.stringify(request))).toEqual(expectedRequest);

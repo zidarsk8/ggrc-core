@@ -27,26 +27,26 @@
         'remove', binding.bound_remove_from_source_binding);
     },
     insert_from_source_binding: function (binding, ev, localResults, index) {
-      var self = this;
+      let self = this;
       can.each(localResults, function (localResult) {
         // FIXME: This is identical to code in _refresh_stubs
-        var remoteBinding = self.insert_local_result(binding, localResult);
+        let remoteBinding = self.insert_local_result(binding, localResult);
         remoteBinding.refresh_instance().then(function () {
           remoteBinding.refresh_stubs();
         });
       });
     },
     remove_from_source_binding: function (binding, ev, localResults, index) {
-      var self = this;
+      let self = this;
       can.each(localResults, function (localResult) {
         self.remove_local_result(binding, localResult);
       });
     },
     insert_local_result: function (binding, localResult) {
-      var self = this;
-      var i;
-      var localResults;
-      var remoteBinding;
+      let self = this;
+      let i;
+      let localResults;
+      let remoteBinding;
 
       if (!binding.remote_bindings)
         binding.remote_bindings = [];
@@ -78,10 +78,10 @@
       return remoteBinding;
     },
     remove_local_result: function (binding, localResult) {
-      var self = this;
-      var remoteBinding;
-      var i;
-      var remoteBindingIndex;
+      let self = this;
+      let remoteBinding;
+      let i;
+      let remoteBindingIndex;
 
       if (!binding.remote_bindings)
         binding.remote_bindings = [];
@@ -109,28 +109,28 @@
       binding.remote_bindings.splice(remoteBindingIndex, 1);
     },
     insert_from_remote_binding: function (binding, remoteBinding, ev, results) {
-      var self = this;
-      var newResults = can.map(results, function (result) {
+      let self = this;
+      let newResults = can.map(results, function (result) {
         return self.make_result(result.instance, [result], binding);
       });
       this.insert_results(binding, newResults);
     },
     remove_from_remote_binding: function (binding, remoteBinding, ev, results) {
-      var self = this;
+      let self = this;
       can.each(results, function (result) {
         self.remove_instance(binding, result.instance, result);
       });
     },
     _refresh_stubs: function (binding) {
-      var self = this;
+      let self = this;
 
       return binding.source_binding.refresh_stubs()
         .then(function (localResults) {
-          var deferreds = [];
+          let deferreds = [];
 
           can.each(localResults, function (localResult) {
-            var remoteBinding = self.insert_local_result(binding, localResult);
-            var deferred = remoteBinding.refresh_instance().then(function () {
+            let remoteBinding = self.insert_local_result(binding, localResult);
+            let deferred = remoteBinding.refresh_instance().then(function () {
               return remoteBinding.refresh_stubs();
             });
 

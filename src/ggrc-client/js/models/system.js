@@ -83,7 +83,7 @@ can.Model.Cacheable('CMS.Models.SystemOrProcess', {
   }
 }, {
   system_or_process: function () {
-    var result;
+    let result;
     if (this.attr('is_biz_process')) {
       result = 'process';
     } else {
@@ -92,7 +92,7 @@ can.Model.Cacheable('CMS.Models.SystemOrProcess', {
     return result;
   },
   system_or_process_capitalized: function () {
-    var str = this.system_or_process();
+    let str = this.system_or_process();
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 });

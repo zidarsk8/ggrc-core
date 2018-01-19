@@ -6,8 +6,8 @@
 describe('GGRC.Components.datepicker', function () {
   'use strict';
 
-  var Component;  // the component under test
-  var events;
+  let Component;  // the component under test
+  let events;
 
   beforeAll(function () {
     Component = GGRC.Components.get('datepicker');
@@ -15,7 +15,7 @@ describe('GGRC.Components.datepicker', function () {
   });
 
   describe('viewModel', function () {
-    var viewModel;
+    let viewModel;
 
     beforeEach(function () {
       viewModel = Component.prototype.viewModel();
@@ -68,11 +68,11 @@ describe('GGRC.Components.datepicker', function () {
 
   describe('events', function () {
     describe('inserted() method', function () {
-      var method;
-      var that;
-      var viewModel;
-      var altField;
-      var element;
+      let method;
+      let that;
+      let viewModel;
+      let altField;
+      let element;
 
       beforeEach(function () {
         viewModel = Component.prototype.viewModel();
@@ -140,9 +140,9 @@ describe('GGRC.Components.datepicker', function () {
     });
 
     describe('getDate() method', function () {
-      var method;
-      var that;
-      var viewModel;
+      let method;
+      let that;
+      let viewModel;
 
       beforeEach(function () {
         viewModel = Component.prototype.viewModel();
@@ -165,8 +165,8 @@ describe('GGRC.Components.datepicker', function () {
     });
 
     describe('isValidDate() method', function () {
-      var method;
-      var that;
+      let method;
+      let that;
 
       beforeEach(function () {
         that = {
@@ -185,8 +185,8 @@ describe('GGRC.Components.datepicker', function () {
     });
 
     describe('updateDate() method', function () {
-      var method;
-      var that;
+      let method;
+      let that;
 
       beforeEach(function () {
         that = new can.Map({
@@ -206,7 +206,7 @@ describe('GGRC.Components.datepicker', function () {
       });
 
       it('returns a date incremented by a day for maxDate', function () {
-        var result = method('maxDate', new Date(2017, 0, 1));
+        let result = method('maxDate', new Date(2017, 0, 1));
 
         expect(result.getDate()).toBe(31);
         expect(result.getFullYear()).toBe(2016);
@@ -214,7 +214,7 @@ describe('GGRC.Components.datepicker', function () {
       });
 
       it('returns a date decremented by a day for minDate', function () {
-        var result = method('minDate', new Date(2017, 0, 1));
+        let result = method('minDate', new Date(2017, 0, 1));
 
         expect(result.getDate()).toBe(2);
         expect(result.getFullYear()).toBe(2017);
@@ -223,8 +223,8 @@ describe('GGRC.Components.datepicker', function () {
     });
 
     describe('prepareDate() method', function () {
-      var method;
-      var viewModel;
+      let method;
+      let viewModel;
 
       beforeEach(function () {
         viewModel = Component.prototype.viewModel();
@@ -246,9 +246,9 @@ describe('GGRC.Components.datepicker', function () {
     });
 
     describe('"{viewModel} setMinDate" handler', function () {
-      var method;
-      var viewModel;
-      var that;
+      let method;
+      let viewModel;
+      let that;
 
       beforeEach(function () {
         viewModel = Component.prototype.viewModel();
@@ -285,8 +285,8 @@ describe('GGRC.Components.datepicker', function () {
     });
 
     describe('"{viewModel} setMaxDate" handler', function () {
-      var method;
-      var that;
+      let method;
+      let that;
       beforeEach(function () {
         that = {
           updateDate: jasmine.createSpy()
@@ -295,16 +295,16 @@ describe('GGRC.Components.datepicker', function () {
       });
       it('calls updateDate with "maxDate" and new date as arguments',
         function () {
-          var date = '11-11-2011';
+          let date = '11-11-2011';
           method({}, {}, date);
           expect(that.updateDate).toHaveBeenCalledWith('maxDate', date);
         });
     });
 
     describe('"{viewModel} _date" handler', function () {
-      var method;
-      var that;
-      var viewModel;
+      let method;
+      let that;
+      let viewModel;
 
       beforeEach(function () {
         viewModel = Component.prototype.viewModel();
@@ -330,9 +330,9 @@ describe('GGRC.Components.datepicker', function () {
     });
 
     describe('"{window} mousedown" handler', function () {
-      var method;
-      var that;
-      var viewModel;
+      let method;
+      let that;
+      let viewModel;
 
       beforeEach(function () {
         viewModel = Component.prototype.viewModel();

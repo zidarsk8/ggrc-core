@@ -14,7 +14,7 @@
    */
   can.Model.Cacheable('CMS.Models.CustomAttributable', {
     findAll: function () {
-      var types = _.sortByOrder(GGRC.custom_attributable_types,
+      let types = _.sortByOrder(GGRC.custom_attributable_types,
         'category', false);
 
       return can.when(can.map(types, function (type, i) {
@@ -69,9 +69,9 @@
        *   is returned if the validation passes.
        */
       multiChoiceOptions: function (newVal, propName) {
-        var choices;
-        var nonBlanks;
-        var uniques;
+        let choices;
+        let nonBlanks;
+        let uniques;
 
         if (propName !== 'multi_choice_options') {
           return '';  // nothing  to validate here

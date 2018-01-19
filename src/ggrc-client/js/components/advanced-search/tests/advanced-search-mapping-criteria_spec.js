@@ -10,7 +10,7 @@ import Component from '../advanced-search-mapping-criteria';
 describe('GGRC.Components.advancedSearchMappingCriteria', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(() => {
     viewModel = new Component.prototype.viewModel();
@@ -81,7 +81,7 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
   describe('relevantToGroup() method', function () {
     it('transforms criteria to group with 2 criteria and operator inside',
     function () {
-      var relevant;
+      let relevant;
       viewModel.attr('criteria.mappedTo',
         AdvancedSearch.create.mappingCriteria()
       );
@@ -97,7 +97,7 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
   });
 
   describe('mappingTypes() method', function () {
-    var cmsModels;
+    let cmsModels;
     beforeEach(function () {
       spyOn(GGRC.Mappings, 'get_canonical_mappings_for').and.returnValue({
         type1: {},
@@ -141,7 +141,7 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
     });
 
     it('returns correct filtered and sorted types', function () {
-      var result = viewModel.mappingTypes();
+      let result = viewModel.mappingTypes();
 
       expect(result).toEqual([
         {
@@ -175,7 +175,7 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
 
   describe('availableAttributes() method', function () {
     it('returns available attributes', function () {
-      var attributes = ['attr1', 'attr2'];
+      let attributes = ['attr1', 'attr2'];
       spyOn(TreeViewUtils, 'getColumnsForModel').and.returnValue({
         available: attributes,
       });

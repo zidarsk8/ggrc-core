@@ -12,7 +12,7 @@ import {
   getWidgetConfig,
 } from '../../plugins/utils/object-versions-utils';
 
-var viewModel = can.Map.extend({
+let viewModel = can.Map.extend({
   define: {
     isActive: {
       type: Boolean,
@@ -29,7 +29,7 @@ var viewModel = can.Map.extend({
     },
     selectedModels: {
       set: function (newModels) {
-        var modelsList = this.attr('modelsList') || [];
+        let modelsList = this.attr('modelsList') || [];
 
         modelsList.forEach(function (item) {
           item.attr('display', newModels.indexOf(item.name) !== -1);
@@ -39,8 +39,8 @@ var viewModel = can.Map.extend({
     },
   },
   init: function () {
-    var modelName = this.attr('type');
-    var defaultModels = getModelsForSubTier(modelName).selected;
+    let modelName = this.attr('type');
+    let defaultModels = getModelsForSubTier(modelName).selected;
     this.attr('modelsList', this.getDisplayModels(modelName));
 
     // list of models can be changed in others tree-items
@@ -57,7 +57,7 @@ var viewModel = can.Map.extend({
   },
   // is called when "Set Visibility" button is clicked
   setVisibility: function (ev) {
-    var selectedModels = this.getSelectedModels();
+    let selectedModels = this.getSelectedModels();
 
     childModelsMap.setModels(this.attr('type'), selectedModels);
 
@@ -65,10 +65,10 @@ var viewModel = can.Map.extend({
     ev.stopPropagation();
   },
   getDisplayModels: function (parentType) {
-    var savedModels = childModelsMap.getModels(parentType);
-    var defaultModels = getModelsForSubTier(parentType);
-    var selectedModels = savedModels || defaultModels.selected;
-    var displayList;
+    let savedModels = childModelsMap.getModels(parentType);
+    let defaultModels = getModelsForSubTier(parentType);
+    let selectedModels = savedModels || defaultModels.selected;
+    let displayList;
 
     displayList = defaultModels.available.map(function (model) {
       return {
@@ -97,7 +97,7 @@ var viewModel = can.Map.extend({
   },
 });
 
-var events = {
+let events = {
   '.sub-tree-models mouseleave': function () {
     this.viewModel.attr('isActive', false);
   },

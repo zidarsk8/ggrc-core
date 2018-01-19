@@ -8,7 +8,7 @@ import template from './collapsible-panel-body.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var tag = 'collapsible-panel-body';
+  let tag = 'collapsible-panel-body';
   /**
    * Collapsible Panel component to add collapsing behavior
    */

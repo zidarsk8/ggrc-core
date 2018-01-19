@@ -10,7 +10,7 @@ import Component from '../advanced-search-filter-container';
 describe('GGRC.Components.advancedSearchFilterContainer', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(() => {
     spyOn(StateUtils, 'getDefaultStatesForModel')
@@ -21,7 +21,7 @@ describe('GGRC.Components.advancedSearchFilterContainer', function () {
   describe('items get() method', function () {
     it('initializes "items" property with state filter if it is empty ' +
     'and model is not stateless', function () {
-      var items;
+      let items;
       spyOn(StateUtils, 'hasFilter').and.returnValue(true);
       viewModel.attr('items', []);
 
@@ -34,7 +34,7 @@ describe('GGRC.Components.advancedSearchFilterContainer', function () {
 
   describe('addFilterCriterion() method', function () {
     it('adds only attribute if list is empty', function () {
-      var items;
+      let items;
       viewModel.attr('items', can.List());
 
       viewModel.addFilterCriterion();
@@ -45,7 +45,7 @@ describe('GGRC.Components.advancedSearchFilterContainer', function () {
     });
 
     it('adds operator and attribute', function () {
-      var items;
+      let items;
       viewModel.attr('items',
         [AdvancedSearch.create.attribute()]);
 
@@ -62,7 +62,7 @@ describe('GGRC.Components.advancedSearchFilterContainer', function () {
   describe('createGroup() method', function () {
     it('transforms attribute to group with 2 attributes and operator inside',
     function () {
-      var viewItems;
+      let viewItems;
       viewModel.attr('items', new can.List([
         AdvancedSearch.create.attribute({field: 'first'}),
         AdvancedSearch.create.operator(),

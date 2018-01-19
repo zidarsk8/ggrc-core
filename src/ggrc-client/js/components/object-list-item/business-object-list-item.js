@@ -8,7 +8,7 @@ import template from './business-object-list-item.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var tag = 'business-object-list-item';
+  let tag = 'business-object-list-item';
   /**
    * Mapped objects item view component
    */

@@ -6,8 +6,8 @@
 describe('GGRC.Components.subTreeWrapper', function () {
   'use strict';
 
-  var vm;
-  var fakeEvent;
+  let vm;
+  let fakeEvent;
 
   beforeEach(function () {
     vm = GGRC.Components.getViewModel('cycleTaskActions');
@@ -18,8 +18,8 @@ describe('GGRC.Components.subTreeWrapper', function () {
   });
 
   describe('changeStatus() method', function () {
-    var changeStatus;
-    var fakeElement;
+    let changeStatus;
+    let fakeElement;
 
     beforeEach(function () {
       spyOn(vm, 'setStatus');
@@ -59,7 +59,7 @@ describe('GGRC.Components.subTreeWrapper', function () {
   });
 
   describe('undo() method', function () {
-    var undo;
+    let undo;
 
     beforeEach(function () {
       spyOn(vm, 'setStatus');

@@ -104,19 +104,19 @@ import template from './info-pane.mustache';
         },
         assessmentTypeNameSingular: {
           get: function () {
-            var type = this.attr('instance.assessment_type');
+            let type = this.attr('instance.assessment_type');
             return CMS.Models[type].title_singular;
           },
         },
         assessmentTypeNamePlural: {
           get: function () {
-            var type = this.attr('instance.assessment_type');
+            let type = this.attr('instance.assessment_type');
             return CMS.Models[type].title_plural;
           },
         },
         assessmentTypeObjects: {
           get: function () {
-            var self = this;
+            let self = this;
             return this.attr('mappedSnapshots')
               .filter(function (item) {
                 return item.child_type === self
@@ -126,7 +126,7 @@ import template from './info-pane.mustache';
         },
         relatedInformation: {
           get: function () {
-            var self = this;
+            let self = this;
             return this.attr('mappedSnapshots')
               .filter(function (item) {
                 return item.child_type !== self
@@ -198,7 +198,7 @@ import template from './info-pane.mustache';
         this.onStateChange({state: 'In Progress', undo: false});
       },
       getQuery: function (type, sortObj, additionalFilter) {
-        var relevantFilters = [{
+        let relevantFilters = [{
           type: this.attr('instance.type'),
           id: this.attr('instance.id'),
           operation: 'relevant',
@@ -217,21 +217,21 @@ import template from './info-pane.mustache';
         return this.getQuery('Snapshot');
       },
       getDocumentQuery: function (documentType) {
-        var query = this.getQuery(
+        let query = this.getQuery(
           'Document',
           {sortBy: 'created_at', sortDirection: 'desc'},
           this.getDocumentAdditionFilter(documentType));
         return query;
       },
       requestQuery: function (query, type) {
-        var dfd = can.Deferred();
+        let dfd = can.Deferred();
         type = type || '';
         this.attr('isUpdating' + can.capitalize(type), true);
 
         batchRequests(query)
           .done(function (response) {
-            var type = Object.keys(response)[0];
-            var values = response[type].values;
+            let type = Object.keys(response)[0];
+            let values = response[type].values;
             dfd.resolve(values);
           })
           .fail(function () {
@@ -247,25 +247,25 @@ import template from './info-pane.mustache';
         return dfd;
       },
       loadSnapshots: function () {
-        var query = this.getSnapshotQuery();
+        let query = this.getSnapshotQuery();
         return this.requestQuery(query);
       },
       loadComments: function () {
-        var query = this.getCommentQuery();
+        let query = this.getCommentQuery();
         return this.requestQuery(query, 'comments');
       },
       loadEvidences: function () {
-        var query = this.getDocumentQuery(
+        let query = this.getDocumentQuery(
           this.attr('documentTypes.evidences'));
         return this.requestQuery(query, 'evidences');
       },
       loadUrls: function () {
-        var query = this.getDocumentQuery(
+        let query = this.getDocumentQuery(
           this.attr('documentTypes.urls'));
         return this.requestQuery(query, 'urls');
       },
       loadReferenceUrls: function () {
-        var query = this.getDocumentQuery(
+        let query = this.getDocumentQuery(
           this.attr('documentTypes.referenceUrls'));
         return this.requestQuery(query, 'referenceUrls');
       },
@@ -275,10 +275,10 @@ import template from './info-pane.mustache';
         }.bind(this));
       },
       afterCreate: function (event, type) {
-        var createdItems = event.items;
-        var success = event.success;
-        var items = this.attr(type);
-        var resultList = items
+        let createdItems = event.items;
+        let success = event.success;
+        let items = this.attr(type);
+        let resultList = items
           .map(function (item) {
             createdItems.forEach(function (newItem) {
               if (item._stamp && item._stamp === newItem._stamp) {
@@ -300,7 +300,7 @@ import template from './info-pane.mustache';
         items.replace(resultList);
       },
       addItems: function (event, type) {
-        var items = event.items;
+        let items = event.items;
         this.attr('isUpdating' + can.capitalize(type), true);
         return this.attr(type).unshift.apply(this.attr(type),
           can.makeArray(items));
@@ -317,8 +317,8 @@ import template from './info-pane.mustache';
           [];
       },
       addAction: function (actionType, related) {
-        var assessment = this.attr('instance');
-        var path = 'actions.' + actionType;
+        let assessment = this.attr('instance');
+        let path = 'actions.' + actionType;
 
         if (!assessment.attr('actions')) {
           assessment.attr('actions', {});
@@ -330,8 +330,8 @@ import template from './info-pane.mustache';
         }
       },
       addRelatedItem: function (event, type) {
-        var self = this;
-        var related = {
+        let self = this;
+        let related = {
           id: event.item.attr('id'),
           type: event.item.attr('type'),
         };
@@ -361,13 +361,13 @@ import template from './info-pane.mustache';
         });
       },
       removeRelatedItem: function (item, type) {
-        var self = this;
-        var related = {
+        let self = this;
+        let related = {
           id: item.attr('id'),
           type: item.attr('type'),
         };
-        var items = self.attr(type);
-        var index = items.indexOf(item);
+        let items = self.attr(type);
+        let index = items.indexOf(item);
         this.attr('isUpdating' + can.capitalize(type), true);
         items.splice(index, 1);
 
@@ -403,7 +403,7 @@ import template from './info-pane.mustache';
           });
       },
       initializeFormFields: function () {
-        var cavs =
+        let cavs =
           getCustomAttributes(
             this.attr('instance'),
             CUSTOM_ATTRIBUTE_TYPE.LOCAL
@@ -413,7 +413,7 @@ import template from './info-pane.mustache';
         );
       },
       initGlobalAttributes: function () {
-        var cavs =
+        let cavs =
           getCustomAttributes(
             this.attr('instance'),
             CUSTOM_ATTRIBUTE_TYPE.GLOBAL
@@ -431,10 +431,10 @@ import template from './info-pane.mustache';
           }.bind(this), 1000, true));
       },
       onStateChange: function (event) {
-        var isUndo = event.undo;
-        var newStatus = event.state;
-        var instance = this.attr('instance');
-        var previousStatus = instance.attr('previousStatus') || 'In Progress';
+        let isUndo = event.undo;
+        let newStatus = event.state;
+        let instance = this.attr('instance');
+        let previousStatus = instance.attr('previousStatus') || 'In Progress';
         let stopFn = tracker.start(instance.type,
           tracker.USER_JOURNEY_KEYS.NAVIGATION,
           tracker.USER_ACTIONS.ASSESSMENT.CHANGE_STATUS);
@@ -474,23 +474,23 @@ import template from './info-pane.mustache';
           .fail(resetStatusOnConflict);
       },
       saveGlobalAttributes: function (event) {
-        var globalAttributes = event.globalAttributes;
-        var caValues = this.attr('instance.custom_attribute_values');
+        let globalAttributes = event.globalAttributes;
+        let caValues = this.attr('instance.custom_attribute_values');
         applyChangesToCustomAttributeValue(caValues, globalAttributes);
 
         return this.attr('instance').save();
       },
       showRequiredInfoModal: function (e, field) {
-        var scope = field || e.field;
-        var errors = scope.attr('errorsMap');
-        var errorsList = can.Map.keys(errors)
+        let scope = field || e.field;
+        let errors = scope.attr('errorsMap');
+        let errorsList = can.Map.keys(errors)
           .map(function (error) {
             return errors[error] ? error : null;
           })
           .filter(function (errorCode) {
             return !!errorCode;
           });
-        var data = {
+        let data = {
           options: scope.attr('options'),
           contextScope: scope,
           fields: errorsList,
@@ -498,7 +498,7 @@ import template from './info-pane.mustache';
           title: scope.attr('title'),
           type: scope.attr('type'),
         };
-        var title = 'Required ' +
+        let title = 'Required ' +
           data.fields.map(function (field) {
             return can.capitalize(field);
           }).join(' and ');

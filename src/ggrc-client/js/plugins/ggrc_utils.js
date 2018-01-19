@@ -63,7 +63,7 @@ import Permission from '../permission';
         };
       },
       applyTypeFilter: function (items, filterObj, getTypeSelectFn) {
-        var filter = GGRC.Utils.filters.makeTypeFilter(filterObj);
+        let filter = GGRC.Utils.filters.makeTypeFilter(filterObj);
         return GGRC.Utils.filters.applyFilter(items, filter, getTypeSelectFn);
       }
     },
@@ -84,8 +84,8 @@ import Permission from '../permission';
       }
     },
     inViewport: function (el) {
-      var bounds;
-      var isVisible;
+      let bounds;
+      let isVisible;
 
       el = el instanceof $ ? el[0] : el;
       bounds = el.getBoundingClientRect();
@@ -96,13 +96,13 @@ import Permission from '../permission';
       return isVisible;
     },
     formatDate: function (date, hideTime) {
-      var currentTimezone = moment.tz.guess();
-      var formats = [
+      let currentTimezone = moment.tz.guess();
+      let formats = [
         'YYYY-MM-DD',
         'YYYY-MM-DDTHH:mm:ss',
         'YYYY-MM-DDTHH:mm:ss.SSSSSS',
       ];
-      var inst;
+      let inst;
 
       if ( !date ) {
         return '';
@@ -166,15 +166,15 @@ import Permission from '../permission';
       });
     },
     download: function (filename, text) {
-      var TMP_FILENAME = filename || 'export_objects.csv';
+      let TMP_FILENAME = filename || 'export_objects.csv';
 
       // a helper for opening the "Save File" dialog to save downloaded data
       function promptSaveFile() {
-        var downloadURL = [
+        let downloadURL = [
           'filesystem:', window.location.origin, '/temporary/', TMP_FILENAME
         ].join('');
 
-        var link = document.createElement('a');
+        let link = document.createElement('a');
 
         link.setAttribute('href', downloadURL);
         link.setAttribute('download', TMP_FILENAME);
@@ -198,12 +198,12 @@ import Permission from '../permission';
       // and then opens the "Save File" dialog
       function fileEntryObtained(fileEntry) {
         fileEntry.createWriter(function (fileWriter) {
-          var truncated = false;
+          let truncated = false;
 
           // the onwriteevent fires twice - once after truncating the file,
           // and then after writing the downloaded text content to it
           fileWriter.onwriteend = function (ev) {
-            var blob;
+            let blob;
             if (!truncated) {
               truncated = true;
               blob = new Blob([text], {type: 'text/plain'});
@@ -227,7 +227,7 @@ import Permission from '../permission';
         window.TEMPORARY, text.length, fileSystemObtained, errorHandler);
     },
     loadScript: function (url, callback) {
-      var script = document.createElement('script');
+      let script = document.createElement('script');
       script.type = 'text/javascript';
       if (script.readyState) {
         script.onreadystatechange = function () {
@@ -273,7 +273,7 @@ import Permission from '../permission';
       });
     },
     hasPending: function (parentInstance, instance, how) {
-      var list = parentInstance._pending_joins;
+      let list = parentInstance._pending_joins;
       how = how || 'add';
 
       if (!list || !list.length) {
@@ -284,7 +284,7 @@ import Permission from '../permission';
       }
 
       return _.find(list, function (pending) {
-        var method = pending.how === how;
+        let method = pending.how === how;
         if (!instance) {
           return method;
         }
@@ -292,8 +292,8 @@ import Permission from '../permission';
       });
     },
     is_mapped: function (target, destination, mapping) {
-      var tablePlural;
-      var bindings;
+      let tablePlural;
+      let bindings;
 
       // Should check all passed arguments are presented
       if (!target || !destination) {
@@ -329,11 +329,11 @@ import Permission from '../permission';
      * @return {Array} - List of mappable objects
      */
     getMappableTypes: function (type, options) {
-      var result;
-      var canonical = GGRC.Mappings.get_canonical_mappings_for(type);
-      var list = GGRC.tree_view.base_widgets_by_type[type];
-      var forbidden;
-      var forbiddenList = {
+      let result;
+      let canonical = GGRC.Mappings.get_canonical_mappings_for(type);
+      let list = GGRC.tree_view.base_widgets_by_type[type];
+      let forbidden;
+      let forbiddenList = {
         Program: ['Audit'],
         Audit: ['Assessment', 'Program'],
         Assessment: ['Workflow', 'TaskGroup'],
@@ -365,7 +365,7 @@ import Permission from '../permission';
      * @return {Boolean} - true if mapping is allowed, false otherwise
      */
     isMappableType: function (target, source, options) {
-      var result;
+      let result;
       if (!target || !source) {
         return false;
       }
@@ -386,18 +386,18 @@ import Permission from '../permission';
      * @return {Boolean} - true if mapping is allowed, false otherwise
      */
     allowed_to_map: function (source, target, options) {
-      var canMap = false;
-      var types;
-      var targetType;
-      var sourceType;
-      var targetContext;
-      var sourceContext;
-      var createContexts;
-      var canonical;
-      var hasWidget;
-      var canonicalMapping;
+      let canMap = false;
+      let types;
+      let targetType;
+      let sourceType;
+      let targetContext;
+      let sourceContext;
+      let createContexts;
+      let canonical;
+      let hasWidget;
+      let canonicalMapping;
 
-      var FORBIDDEN = Object.freeze({
+      let FORBIDDEN = Object.freeze({
         oneWay: Object.freeze({
           // mapping audit to issue is not allowed,
           // but unmap can be possible
@@ -521,7 +521,7 @@ import Permission from '../permission';
      *   none found.
      */
     get_highest_assignee_role: function (obj, roles) {
-      var roleOrder = _.map(
+      let roleOrder = _.map(
         _.map(obj.class.assignable_list, 'type'),
         _.capitalize);
 
@@ -535,11 +535,11 @@ import Permission from '../permission';
       return _.max(roles, Array.prototype.indexOf.bind(roleOrder));
     },
     hasRoleForContext: function (userId, contextId, roleName) {
-      var deferred = $.Deferred();
-      var contextRoles;
-      var filteredRoles;
-      var hasRole;
-      var userDfd =
+      let deferred = $.Deferred();
+      let contextRoles;
+      let filteredRoles;
+      let hasRole;
+      let userDfd =
         CMS.Models.Person.findInCacheById(userId) ||
         CMS.Models.Person.findOne({id: userId});
 

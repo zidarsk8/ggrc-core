@@ -49,13 +49,13 @@ import Permission from '../../permission';
         return instance.class.isProposable;
       },
       initCustomAttributes: function () {
-        var result = [];
+        let result = [];
 
         can.each(this.attr('instance.custom_attribute_definitions'),
           function (cad) {
-            var type = getCustomAttributeType(cad.attribute_type);
-            var value;
-            var options = cad.multi_choice_options &&
+            let type = getCustomAttributeType(cad.attribute_type);
+            let value;
+            let options = cad.multi_choice_options &&
               typeof cad.multi_choice_options === 'string' ?
                 cad.multi_choice_options.split(',') : [];
 
@@ -86,10 +86,10 @@ import Permission from '../../permission';
         this.attr('items', result);
       },
       saveCustomAttributes: function (event, field) {
-        var id = field.id;
-        var type = field.type;
-        var value = event.value;
-        var instance = this.attr('instance');
+        let id = field.id;
+        let type = field.type;
+        let value = event.value;
+        let instance = this.attr('instance');
 
         this.attr('isSaving', true);
 

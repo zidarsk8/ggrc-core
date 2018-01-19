@@ -10,7 +10,7 @@ import template from './advanced-search-filter-operator.mustache';
  * Contains logic used in Filter Operator component
  * @constructor
  */
-var viewModel = can.Map.extend({
+let viewModel = can.Map.extend({
   /**
    * Contains operation name.
    * @type {string}

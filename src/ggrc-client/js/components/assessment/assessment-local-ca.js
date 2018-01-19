@@ -49,12 +49,12 @@ import Permission from '../../permission';
         },
         isEvidenceRequired: {
           get: function () {
-            var optionsWithEvidence = this.attr('fields')
+            let optionsWithEvidence = this.attr('fields')
               .filter(function (item) {
                 return item.attr('type') === 'dropdown';
               })
               .filter(function (item) {
-                var requiredOption =
+                let requiredOption =
                   item.attr('validationConfig')[item.attr('value')];
                 return requiredOption === CA_DD_REQUIRED_DEPS.EVIDENCE ||
                    requiredOption ===
@@ -94,17 +94,17 @@ import Permission from '../../permission';
         }
       },
       performValidation: function (field) {
-        var fieldValid;
-        var hasMissingEvidence;
-        var hasMissingComment;
-        var hasMissingValue;
-        var requiresEvidence;
-        var requiresComment;
-        var value = field.value;
-        var valCfg = field.validationConfig;
-        var fieldValidationConf = valCfg && valCfg[value];
-        var isMandatory = field.validation.mandatory;
-        var errorsMap = field.errorsMap || {
+        let fieldValid;
+        let hasMissingEvidence;
+        let hasMissingComment;
+        let hasMissingValue;
+        let requiresEvidence;
+        let requiresComment;
+        let value = field.value;
+        let valCfg = field.validationConfig;
+        let fieldValidationConf = valCfg && valCfg[value];
+        let isMandatory = field.validation.mandatory;
+        let errorsMap = field.errorsMap || {
           evidence: false,
           comment: false,
         };
@@ -165,13 +165,13 @@ import Permission from '../../permission';
         }
       },
       updateEvidenceValidation: function () {
-        var isEvidenceRequired = this.attr('isEvidenceRequired');
+        let isEvidenceRequired = this.attr('isEvidenceRequired');
         this.attr('fields')
           .filter(function (item) {
             return item.attr('type') === 'dropdown';
           })
           .each(function (item) {
-            var isCommentRequired;
+            let isCommentRequired;
             if ((item.attr('validationConfig')[item.attr('value')] === 2 ||
                 item.attr('validationConfig')[item.attr('value')] === 3)) {
               isCommentRequired = item.attr('errorsMap.comment');
@@ -193,7 +193,7 @@ import Permission from '../../permission';
         this.attr('isDirty', true);
 
         this.attr('deferredSave').push(function () {
-          var caValues = self.attr('instance.custom_attribute_values');
+          let caValues = self.attr('instance.custom_attribute_values');
           applyChangesToCustomAttributeValue(
             caValues,
             new can.Map(changes));
@@ -242,16 +242,16 @@ import Permission from '../../permission';
         this.viewModel.validateForm();
       },
       '{viewModel.instance} showInvalidField': function (ev) {
-        var pageType = GGRC.page_instance().type;
-        var $container = (pageType === 'Assessment') ?
+        let pageType = GGRC.page_instance().type;
+        let $container = (pageType === 'Assessment') ?
           $('.object-area') : $('.cms_controllers_info_pin');
-        var $body = (pageType === 'Assessment') ?
+        let $body = (pageType === 'Assessment') ?
           $('.inner-content.widget-area') : $('.info-pane__body');
-        var field;
-        var index;
+        let field;
+        let index;
 
         index = _.findIndex(this.viewModel.attr('fields'), function (field) {
-          var validation = field.attr('validation');
+          let validation = field.attr('validation');
           return validation.show && !validation.valid;
         });
 

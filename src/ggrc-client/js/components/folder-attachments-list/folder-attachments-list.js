@@ -9,7 +9,7 @@ import template from './folder-attachments-list.mustache';
 (function (GGRC, can) {
   'use strict';
 
-  var tag = 'folder-attachments-list';
+  let tag = 'folder-attachments-list';
 
   /**
    * Wrapper Component for rendering and managing of folder and

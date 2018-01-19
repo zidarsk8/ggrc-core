@@ -6,14 +6,14 @@
 describe('GGRC.Components.autocomplete', function () {
   'use strict';
 
-  var Component;  // the component under test
+  let Component;  // the component under test
 
   beforeAll(function () {
     Component = GGRC.Components.get('autocomplete');
   });
 
   describe('defining default viewModel values', function () {
-    var viewModel;
+    let viewModel;
 
     beforeAll(function () {
       viewModel = Component.prototype.viewModel;
@@ -25,12 +25,12 @@ describe('GGRC.Components.autocomplete', function () {
   });
 
   describe('item selected event handler', function () {
-    var eventData;
-    var eventObj;
-    var fakeViewModel;
-    var handler;  // the event handler under test
-    var $childInput;
-    var $element;
+    let eventData;
+    let eventObj;
+    let fakeViewModel;
+    let handler;  // the event handler under test
+    let $childInput;
+    let $element;
 
     beforeEach(function () {
       fakeViewModel = new can.Map({});

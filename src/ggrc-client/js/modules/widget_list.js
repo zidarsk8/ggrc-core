@@ -33,8 +33,8 @@ import InfoWidget from '../controllers/info_widget_controller';
        widget descriptor cache.
     */
     get_widget_list_for: function (pageType) {
-      var widgets = {};
-      var descriptors = {};
+      let widgets = {};
+      let descriptors = {};
 
       can.each(this.modules, function (module) {
         can.each(module[pageType], function (descriptor, id) {
@@ -47,8 +47,8 @@ import InfoWidget from '../controllers/info_widget_controller';
       });
 
       can.each(widgets, function (widget, widgetId) {
-        var ctrl = widget.content_controller;
-        var options = widget.content_controller_options;
+        let ctrl = widget.content_controller;
+        let options = widget.content_controller_options;
 
         if (ctrl && ctrl === InfoWidget) {
           descriptors[widgetId] = GGRC.WidgetDescriptor.make_info_widget(

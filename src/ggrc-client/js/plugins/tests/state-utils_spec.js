@@ -10,11 +10,11 @@ describe('StateUtils', function () {
   describe('statusFilter() method', function () {
     it('statusFilter() should return filter with all statuses',
       function () {
-        var statuses = [
+        let statuses = [
           'Draft', 'Active', 'Deprecated'
         ];
 
-        var statesFilter = StateUtils.statusFilter(statuses, '');
+        let statesFilter = StateUtils.statusFilter(statuses, '');
 
         expect(statesFilter.indexOf('"Status"="Active"') > -1)
           .toBe(true);
@@ -27,11 +27,11 @@ describe('StateUtils', function () {
 
     it('statesFilter should not update Assessmnet statuses',
       function () {
-        var statuses = [
+        let statuses = [
           'Not Started', 'In Progress', 'In Review'
         ];
 
-        var statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
+        let statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
 
         expect(statesFilter.indexOf('"Status"="Not Started"') > -1)
           .toBe(true);
@@ -46,11 +46,11 @@ describe('StateUtils', function () {
 
     it('statesFilter should have "Completed" status and "verified=true"',
       function () {
-        var statuses = [
+        let statuses = [
           'In Review', 'Completed and Verified'
         ];
 
-        var statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
+        let statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
 
         expect(statesFilter.indexOf('"Status"="In Review"') > -1)
           .toBe(true);
@@ -66,11 +66,11 @@ describe('StateUtils', function () {
 
     it('statesFilter should have "Completed" status and "verified=false"',
       function () {
-        var statuses = [
+        let statuses = [
           'In Review', 'Completed (no verification)'
         ];
 
-        var statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
+        let statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
 
         expect(statesFilter.indexOf('"Status"="In Review"') > -1)
           .toBe(true);
@@ -87,12 +87,12 @@ describe('StateUtils', function () {
 
     it('statesFilter should have "Completed" status',
       function () {
-        var statuses = [
+        let statuses = [
           'In Progress', 'Completed (no verification)',
           'Completed and Verified'
         ];
 
-        var statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
+        let statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
 
         expect(statesFilter.indexOf('"Status"="In Progress"') > -1)
           .toBe(true);
@@ -114,7 +114,7 @@ describe('StateUtils', function () {
 
   describe('getDefaultStatesForModel() method', function () {
     it('get default states for "MyAssessments" page', function () {
-      var defaultStates;
+      let defaultStates;
 
       spyOn(CurrentPageUtils, 'isMyAssessments')
         .and.returnValue(true);
@@ -126,7 +126,7 @@ describe('StateUtils', function () {
     });
 
     it('get default states for "Control" type', function () {
-      var defaultStates;
+      let defaultStates;
 
       spyOn(CurrentPageUtils, 'isMyAssessments')
         .and.returnValue(false);
@@ -140,24 +140,24 @@ describe('StateUtils', function () {
 
   describe('getStatusFieldName() method', function () {
     it('returns "Task State" for CycleTaskGroupObjectTask', function () {
-      var expected = 'Task State';
+      let expected = 'Task State';
 
-      var actual = StateUtils.getStatusFieldName('CycleTaskGroupObjectTask');
+      let actual = StateUtils.getStatusFieldName('CycleTaskGroupObjectTask');
 
       expect(actual).toEqual(expected);
     });
 
     it('returns "Status" when model is not provided', function () {
-      var expected = 'Status';
+      let expected = 'Status';
 
-      var actual = StateUtils.getStatusFieldName('');
+      let actual = StateUtils.getStatusFieldName('');
 
       expect(actual).toEqual(expected);
     });
 
     it('returns "Status" for non-CycleTaskGroupObjectTask models',
       function () {
-        var models = ['Standard', 'Regulation', 'Section', 'Objective',
+        let models = ['Standard', 'Regulation', 'Section', 'Objective',
           'Control', 'Product', 'System', 'Process', 'AccessGroup',
           'Assessment', 'Clause', 'Contract', 'DataAsset', 'Facility',
           'Issue', 'Market', 'OrgGroup', 'Policy', 'Program', 'Project',
@@ -174,27 +174,27 @@ describe('StateUtils', function () {
 
   describe('getBulkStatesForModel() method', function () {
     it('returns expected states for CycleTaskGroupObjectTask', function () {
-      var expected = ['InProgress', 'Finished',
+      let expected = ['InProgress', 'Finished',
         'Declined', 'Deprecated', 'Verified'];
 
-      var actual = StateUtils
+      let actual = StateUtils
         .getBulkStatesForModel('CycleTaskGroupObjectTask');
 
       expect(actual).toEqual(expected);
     });
 
     it('returns an empty array when model is not provided', function () {
-      var expected = [];
+      let expected = [];
 
-      var actual = StateUtils.getBulkStatesForModel('');
+      let actual = StateUtils.getBulkStatesForModel('');
 
       expect(actual).toEqual(expected);
     });
 
     it('returns an empty array for non-CycleTaskGroupObjectTask models',
       function () {
-        var expected = [];
-        var models = ['Standard', 'Regulation', 'Section', 'Objective',
+        let expected = [];
+        let models = ['Standard', 'Regulation', 'Section', 'Objective',
           'Control', 'Product', 'System', 'Process', 'AccessGroup',
           'Assessment', 'Clause', 'Contract', 'DataAsset', 'Facility',
           'Issue', 'Market', 'OrgGroup', 'Policy', 'Program', 'Project',

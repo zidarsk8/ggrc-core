@@ -15,8 +15,8 @@
       values: {}
     },
     init: function () {
-      var scope = this.scope;
-      var values = scope.attr('instance.' + scope.attr('property'));
+      let scope = this.scope;
+      let values = scope.attr('instance.' + scope.attr('property'));
 
       if (values && _.isString(values)) {
         _.each(_.splitTrim(values, ','), function (val) {
@@ -28,8 +28,8 @@
     },
     events: {
       '{scope.values} change': function () {
-        var scope = this.scope;
-        var values = _.getExistingKeys(scope.attr('values').serialize());
+        let scope = this.scope;
+        let values = _.getExistingKeys(scope.attr('values').serialize());
         scope.instance.attr(scope.attr('property'), values.join(','));
       }
     }

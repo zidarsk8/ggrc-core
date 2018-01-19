@@ -16,8 +16,8 @@ export default GGRC.Components('addIssueButton', {
     define: {
       prepareJSON: {
         get: function () {
-          var instance = this.attr('relatedInstance');
-          var json = {
+          let instance = this.attr('relatedInstance');
+          let json = {
             assessment: {
               title: instance.title,
               id: instance.id,

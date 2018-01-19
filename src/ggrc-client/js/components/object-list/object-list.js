@@ -10,7 +10,7 @@ import template from './object-list.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var tag = 'object-list';
+  let tag = 'object-list';
   /**
    * Object List component
    */
@@ -64,8 +64,8 @@ import template from './object-list.mustache';
        * @param {jQuery.Event} ev - click event
        */
       modifySelection: function (ctx, el, ev) {
-        var selectionFilter = this.attr('itemSelector');
-        var isSelected = selectionFilter ?
+        let selectionFilter = this.attr('itemSelector');
+        let isSelected = selectionFilter ?
           can.$(ev.target).closest(selectionFilter, el).length :
           true;
         this.clearSelection();
@@ -90,7 +90,7 @@ import template from './object-list.mustache';
        * Event Handler executed on each viewport click
        */
       onOuterClick: function () {
-        var isInnerClick = this.attr('isInnerClick');
+        let isInnerClick = this.attr('isInnerClick');
         if (!isInnerClick) {
           this.clearSelection();
         }

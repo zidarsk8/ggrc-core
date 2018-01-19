@@ -31,10 +31,10 @@ export default GGRC.Components('relatedPeopleAccessControl', {
       });
     },
     updateAccessContolList: function (people, roleId) {
-      var instance = this.attr('instance');
+      let instance = this.attr('instance');
 
       // remove all people with current role
-      var listWithoutRole = instance
+      let listWithoutRole = instance
         .attr('access_control_list').filter(function (item) {
           return item.ac_role_id !== roleId;
         });
@@ -84,7 +84,7 @@ export default GGRC.Components('relatedPeopleAccessControl', {
         // with each other group (otherConflictGroups)
         otherConflictGroups.forEach((group) => {
           // get 2 people ids arrays
-          var peopleIds = [conflictGroup, group]
+          let peopleIds = [conflictGroup, group]
             .map((group) => group.people)
             .map((people) => people.map((person) => person.id));
 
@@ -119,11 +119,11 @@ export default GGRC.Components('relatedPeopleAccessControl', {
       return hasConflict;
     },
     buildGroups: function (role, roleAssignments) {
-      var includeRoles = this.attr('includeRoles');
-      var groupId = role.id;
-      var title = role.name;
-      var group;
-      var people;
+      let includeRoles = this.attr('includeRoles');
+      let groupId = role.id;
+      let title = role.name;
+      let group;
+      let people;
 
       if (includeRoles.length && includeRoles.indexOf(title) === -1) {
         return;
@@ -210,10 +210,10 @@ export default GGRC.Components('relatedPeopleAccessControl', {
       return groups;
     },
     getRoleList: function () {
-      var roleAssignments;
-      var roles;
-      var groups;
-      var instance = this.attr('instance');
+      let roleAssignments;
+      let roles;
+      let groups;
+      let instance = this.attr('instance');
 
       if (!instance) {
         this.attr('rolesInfo', []);

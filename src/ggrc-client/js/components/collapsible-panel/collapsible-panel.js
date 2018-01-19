@@ -10,8 +10,8 @@ import template from './collapsible-panel.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var tag = 'collapsible-panel';
-  var viewModel = can.Map.extend({
+  let tag = 'collapsible-panel';
+  let viewModel = can.Map.extend({
     titleText: '@',
     titleIcon: '@',
     extraCssClass: '@',

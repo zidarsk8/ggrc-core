@@ -101,7 +101,7 @@ export default GGRC.Components('relatedAssessments', {
         });
     },
     reuseSelected: function () {
-      var reusedObjectList =
+      let reusedObjectList =
         this.getMapObjects(
           this.attr('instance'),
           this.attr('documentList'));

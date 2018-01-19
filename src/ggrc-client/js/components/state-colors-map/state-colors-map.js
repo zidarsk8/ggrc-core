@@ -6,14 +6,14 @@
 (function (can, GGRC) {
   'use strict';
   /* Default Sate for Assessment should be 'Not Started' */
-  var defaultState = 'Not Started';
-  var tpl = '<span class="state-value-dot state-{{suffix}}">{{state}}</span>';
+  let defaultState = 'Not Started';
+  let tpl = '<span class="state-value-dot state-{{suffix}}">{{state}}</span>';
 
   /**
    * can.Map(ViewModel) presenting behavior of State Colors Map Component
    * @type {can.Map}
    */
-  var viewModel = can.Map.extend({
+  let viewModel = can.Map.extend({
     define: {
       state: {
         type: 'string',
@@ -21,7 +21,7 @@
       },
       suffix: {
         get: function () {
-          var state = this.attr('state') || defaultState;
+          let state = this.attr('state') || defaultState;
           return state.toLowerCase().replace(/[\s\t]+/g, '');
         }
       }

@@ -25,13 +25,13 @@ const ObjectMapper = can.Control.extend({
     component: objectMapperTemplate,
   },
   launch: function ($trigger, options) {
-    var href = $trigger ?
+    let href = $trigger ?
       $trigger.attr('data-href') || $trigger.attr('href') :
       '';
-    var modalId = 'ajax-modal-' + (href || '')
+    let modalId = 'ajax-modal-' + (href || '')
         .replace(/[\/\?=\&#%]/g, '-')
         .replace(/^-/, '');
-    var $target =
+    let $target =
       $('<div id="' + modalId +
       '" class="modal modal-selector object-modal hide"></div>');
 
@@ -56,8 +56,8 @@ const ObjectMapper = can.Control.extend({
   },
   isLoading: false,
   openMapper: function (data, disableMapper, btn) {
-    var self = this;
-    var isSearch = /unified-search/ig.test(data.toggle);
+    let self = this;
+    let isSearch = /unified-search/ig.test(data.toggle);
 
     if (disableMapper || this.isLoading) {
       return;
@@ -79,9 +79,9 @@ const ObjectMapper = can.Control.extend({
     // each object type will be perceived as a snapshot, except types with
     // special config
     function openForSnapshots(data) {
-      var inScopeObject;
-      var config = getBaseConfig();
-      var special = [{
+      let inScopeObject;
+      let config = getBaseConfig();
+      let special = [{
         types: ['Issue'],
         // set config like for common objects
         config: getConfigForCommonObjects(data).general,
@@ -116,7 +116,7 @@ const ObjectMapper = can.Control.extend({
       inScopeObject =
         CMS.Models[data.join_object_type].store[data.join_object_id];
       inScopeObject.updateScopeObject().then(function () {
-        var scopeObject = inScopeObject.attr('audit');
+        let scopeObject = inScopeObject.attr('audit');
 
         if (!scopeObject.id) {
           GGRC.Errors.notifier('error', DATA_CORRUPTION_MESSAGE);
@@ -144,7 +144,7 @@ const ObjectMapper = can.Control.extend({
     }
 
     function openForCommonObjects(data, isSearch) {
-      var config = getConfigForCommonObjects(data);
+      let config = getConfigForCommonObjects(data);
 
       if (isSearch) {
         ObjectSearch.launch(btn, can.extend(config, data));
@@ -169,7 +169,7 @@ const ObjectMapper = can.Control.extend({
     }
 
     function getConfigForCommonObjects(data) {
-      var base = getBaseConfig();
+      let base = getBaseConfig();
 
       _.extend(base.general, {
         object: data.join_object_type,

@@ -9,7 +9,7 @@ import ObjectOperationsBaseVM from '../object-operations-base-vm';
 describe('ObjectOperationsBaseVM', function () {
   'use strict';
 
-  var baseVM;
+  let baseVM;
 
   beforeEach(function () {
     baseVM = ObjectOperationsBaseVM();
@@ -22,7 +22,7 @@ describe('ObjectOperationsBaseVM', function () {
     });
 
     it('correctly calls getMappingTypes', function () {
-      var result;
+      let result;
       spyOn(GGRC.Mappings, 'getMappingTypes').and.returnValue('types');
       baseVM.attr('object', 'testObject');
 
@@ -40,14 +40,14 @@ describe('ObjectOperationsBaseVM', function () {
     });
 
     it('returns parentInstance', function () {
-      var result = baseVM.attr('parentInstance');
+      let result = baseVM.attr('parentInstance');
       expect(result).toEqual('parentInstance');
     });
   });
 
   describe('set() for baseVM.type', function () {
-    var method;
-    var vm;
+    let method;
+    let vm;
 
     beforeEach(function () {
       vm = new can.Map({
@@ -75,21 +75,21 @@ describe('ObjectOperationsBaseVM', function () {
     });
 
     it('sets passed type', function () {
-      var type = 'Type1';
-      var result = method(type);
+      let type = 'Type1';
+      let result = method(type);
       expect(result).toBe(type);
     });
 
     it('calls update method if type is set for the first time',
     function () {
-      var type = 'Type1';
+      let type = 'Type1';
       method(type);
       expect(vm.update).toHaveBeenCalled();
     });
 
     it('removes "type" property from config passed in appopriate ' +
     'config handler', function () {
-      var args;
+      let args;
       method('Type1');
 
       args = vm.update.calls.argsFor(0);
@@ -108,13 +108,13 @@ describe('ObjectOperationsBaseVM', function () {
 
   describe('modelFromType() method', function () {
     it('returns undefined if no models', function () {
-      var result = baseVM.modelFromType('program');
+      let result = baseVM.modelFromType('program');
       expect(result).toEqual(undefined);
     });
 
     it('returns model config by model value', function () {
-      var result;
-      var types = {
+      let result;
+      let types = {
         governance: {
           items: [{
             value: 'v1',
@@ -135,9 +135,9 @@ describe('ObjectOperationsBaseVM', function () {
   });
 
   describe('update() method', function () {
-    var baseConfig;
-    var method;
-    var vm;
+    let baseConfig;
+    let method;
+    let vm;
 
     beforeEach(function () {
       baseConfig = {
@@ -152,7 +152,7 @@ describe('ObjectOperationsBaseVM', function () {
     });
 
     it('sets new values for VM', function () {
-      var config = {
+      let config = {
         a: 'new A',
         b: {
           h: 'new H',
@@ -166,7 +166,7 @@ describe('ObjectOperationsBaseVM', function () {
 
     it('does not set values for VM from config if appopriate fields from ' +
     'VM and config have the same values', function () {
-      var allArgs;
+      let allArgs;
       method(baseConfig);
 
       allArgs = vm.attr.calls.allArgs();
@@ -178,8 +178,8 @@ describe('ObjectOperationsBaseVM', function () {
   });
 
   describe('prepareConfig() method', function () {
-    var method;
-    var vm;
+    let method;
+    let vm;
 
     beforeEach(function () {
       vm = {
@@ -189,7 +189,7 @@ describe('ObjectOperationsBaseVM', function () {
     });
 
     it('calls update method with config from param', function () {
-      var config = {};
+      let config = {};
       method(config);
 
       expect(vm.update).toHaveBeenCalledWith(config);
@@ -197,8 +197,8 @@ describe('ObjectOperationsBaseVM', function () {
   });
 
   describe('extractConfig() method', function () {
-    var method;
-    var config;
+    let method;
+    let config;
 
     beforeAll(function () {
       method = ObjectOperationsBaseVM.extractConfig;
@@ -222,13 +222,13 @@ describe('ObjectOperationsBaseVM', function () {
 
     it('extracts general config if there is no special config for type',
     function () {
-      var result = method('T0', config);
+      let result = method('T0', config);
       expect(result).toBe(config.general);
     });
 
     it('extracts special config if there is special config for type',
     function () {
-      var result = method('T2', config);
+      let result = method('T2', config);
       expect(result).toEqual(config.special[0].config);
     });
   });

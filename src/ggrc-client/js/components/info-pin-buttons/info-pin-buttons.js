@@ -21,8 +21,8 @@ import template from './info-pin-buttons.mustache';
         }
       },
       toggleSize: function (el, ev) {
-        var maximized = !this.attr('maximized');
-        var onChangeMaximizedState =
+        let maximized = !this.attr('maximized');
+        let onChangeMaximizedState =
            Mustache.resolve(this.onChangeMaximizedState);
         ev.preventDefault();
 
@@ -37,7 +37,7 @@ import template from './info-pin-buttons.mustache';
         }.bind(this), 0);
       },
       close: function (el, ev) {
-        var onClose = Mustache.resolve(this.onClose);
+        let onClose = Mustache.resolve(this.onClose);
         $(el).find('[rel="tooltip"]').tooltip('hide');
         ev.preventDefault();
         onClose();

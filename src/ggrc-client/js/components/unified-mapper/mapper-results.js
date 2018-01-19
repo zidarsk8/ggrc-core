@@ -74,7 +74,7 @@ export default GGRC.Components('mapperResults', {
     deferredList: [],
     disabledIds: [],
     init: function () {
-      var self = this;
+      let self = this;
       this.attr('submitCbs').add(this.onSearch.bind(this, true));
       CMS.Models.DisplayPrefs.getSingleton().then(function (displayPrefs) {
         self.attr('displayPrefs', displayPrefs);
@@ -102,7 +102,7 @@ export default GGRC.Components('mapperResults', {
         });
     },
     setColumnsConfiguration: function () {
-      var columns =
+      let columns =
         TreeViewUtils.getColumnsForModel(
           this.getDisplayModel().model_singular,
           this.attr('displayPrefs')
@@ -120,7 +120,7 @@ export default GGRC.Components('mapperResults', {
       this.attr('sort.direction', sortingInfo.direction);
     },
     setRelatedAssessments: function () {
-      var Model = this.getDisplayModel();
+      let Model = this.getDisplayModel();
       if (this.attr('useSnapshots')) {
         this.attr('relatedAssessments.show', false);
         return;
@@ -140,8 +140,8 @@ export default GGRC.Components('mapperResults', {
       this.attr('refreshItems', true);
     },
     prepareRelevantQuery: function () {
-      var relevantList = this.attr('relevantTo') || [];
-      var filters = relevantList.map(function (relevant) {
+      let relevantList = this.attr('relevantTo') || [];
+      let filters = relevantList.map(function (relevant) {
         return {
           type: relevant.type,
           operation: 'relevant',
@@ -162,11 +162,11 @@ export default GGRC.Components('mapperResults', {
         }, filter);
     },
     prepareUnlockedFilter: function () {
-      var filterString = StateUtils.unlockedFilter();
+      let filterString = StateUtils.unlockedFilter();
       return GGRC.query_parser.parse(filterString);
     },
     prepareOwnedFilter: function () {
-      var userId = GGRC.current_user.id;
+      let userId = GGRC.current_user.id;
       return {
         expression: {
           object_name: 'Person',
@@ -184,22 +184,22 @@ export default GGRC.Components('mapperResults', {
       this.attr('allItems', this.loadAllItemsIds());
     },
     getQuery: function (queryType, addPaging) {
-      var result = {};
-      var paging = {};
-      var modelName = this.attr('type');
-      var query;
-      var relatedQuery;
+      let result = {};
+      let paging = {};
+      let modelName = this.attr('type');
+      let query;
+      let relatedQuery;
 
       // prepare QueryAPI data from advanced search
-      var request = [];
-      var status;
-      var filters = GGRC.query_parser.parse(
+      let request = [];
+      let status;
+      let filters = GGRC.query_parser.parse(
         AdvancedSearch.buildFilter(this.attr('filterItems'),
         request));
-      var mappings = GGRC.query_parser.parse(
+      let mappings = GGRC.query_parser.parse(
         AdvancedSearch.buildFilter(this.attr('mappingItems'),
         request));
-      var advancedFilters = GGRC.query_parser.join_queries(filters, mappings);
+      let advancedFilters = GGRC.query_parser.join_queries(filters, mappings);
 
       // the edge case caused by stateless objects
       if (this.attr('statusItem.value.items')) {
@@ -284,7 +284,7 @@ export default GGRC.Components('mapperResults', {
       });
     },
     setSelectedItems: function (allItems) {
-      var selectedItems;
+      let selectedItems;
 
       // get items which were selected before adding of new entries
       if (this.attr('prevSelected') && this.attr('prevSelected').length > 0) {
@@ -304,7 +304,7 @@ export default GGRC.Components('mapperResults', {
       });
     },
     transformValue: function (value) {
-      var Model = this.getDisplayModel();
+      let Model = this.getDisplayModel();
       if (this.attr('useSnapshots')) {
         value.snapshotObject =
           toObject(value);
@@ -315,21 +315,21 @@ export default GGRC.Components('mapperResults', {
       return Model.model(value);
     },
     load: function () {
-      var self = this;
-      var modelKey = this.getModelKey();
-      var dfd = can.Deferred();
-      var query = this.getQuery('values', true);
+      let self = this;
+      let modelKey = this.getModelKey();
+      let dfd = can.Deferred();
+      let query = this.getQuery('values', true);
       this.attr('isLoading', true);
 
       makeRequest({data: query.request})
         .done(function (responseArr) {
-          var data = responseArr[query.queryIndex];
-          var relatedData = this.buildRelatedData(
+          let data = responseArr[query.queryIndex];
+          let relatedData = this.buildRelatedData(
             responseArr[query.relatedQueryIndex],
             modelKey);
-          var disabledIds;
+          let disabledIds;
 
-          var result =
+          let result =
             data[modelKey].values.map(function (value) {
               return {
                 id: value.id,
@@ -357,9 +357,9 @@ export default GGRC.Components('mapperResults', {
       return dfd;
     },
     buildRelatedData: function (relatedData, type) {
-      var deferredList = this.attr('deferredList');
-      var ids;
-      var empty = {};
+      let deferredList = this.attr('deferredList');
+      let ids;
+      let empty = {};
 
       if (!deferredList || !deferredList.length) {
         return relatedData;
@@ -392,17 +392,17 @@ export default GGRC.Components('mapperResults', {
       return relatedData;
     },
     loadAllItemsIds: function () {
-      var modelKey = this.getModelKey();
-      var dfd = can.Deferred();
-      var queryType = 'ids';
-      var query = this.getQuery(queryType, false);
+      let modelKey = this.getModelKey();
+      let dfd = can.Deferred();
+      let queryType = 'ids';
+      let query = this.getQuery(queryType, false);
 
       makeRequest({data: query.request})
         .done(function (responseArr) {
-          var data = responseArr[query.queryIndex];
-          var relatedData = responseArr[query.relatedQueryIndex];
-          var values = data[modelKey][queryType];
-          var result = values.map(function (item) {
+          let data = responseArr[query.queryIndex];
+          let relatedData = responseArr[query.relatedQueryIndex];
+          let values = data[modelKey][queryType];
+          let result = values.map(function (item) {
             return {
               id: item,
               type: modelKey,

@@ -16,12 +16,12 @@ import RefreshQueue from './refresh_queue';
         this._super.apply(this, arguments);
       }
       function reinit(ev, instance) {
-        var refreshQueue;
+        let refreshQueue;
         if (instance instanceof can.Model.Join) {
           instance.reinit();
           refreshQueue = new RefreshQueue();
           can.each(instance.constructor.join_keys, function (cls, key) {
-            var obj;
+            let obj;
             if (instance[key]) {
               if (instance[key].reify && instance[key].reify().refresh) {
                 obj = instance[key].reify();
@@ -57,8 +57,8 @@ import RefreshQueue from './refresh_queue';
     },
 
     init_join_object_with_type: function (attr) {
-      var objectId;
-      var objectType;
+      let objectId;
+      let objectType;
       if (this[attr] instanceof can.Model) {
         return;
       }
@@ -78,7 +78,7 @@ import RefreshQueue from './refresh_queue';
     },
 
     init_join_object: function (attr, modelName) {
-      var objectId = this[attr + '_id'] || (this[attr] || {}).id;
+      let objectId = this[attr + '_id'] || (this[attr] || {}).id;
 
       if (objectId) {
         this.attr(
@@ -91,7 +91,7 @@ import RefreshQueue from './refresh_queue';
     },
 
     init_join_objects: function () {
-      var that = this
+      let that = this
         ;
 
       can.each(this.constructor.join_keys, function (model, attr) {
@@ -128,7 +128,7 @@ import RefreshQueue from './refresh_queue';
     }
   }, {
     reinit: function () {
-      var revision = CMS.Models.Revision.findInCacheById(this.revision_id);
+      let revision = CMS.Models.Revision.findInCacheById(this.revision_id);
       this.content = revision.content;
     },
     display_name: function () {
@@ -206,13 +206,13 @@ import RefreshQueue from './refresh_queue';
      * found or an empty list if instances are not related.
      */
     getRelationshipBetweenInstances: function rec(first, second, noRefresh) {
-      var relationshipIds = _.intersection(getRelationshipsIds(first),
+      let relationshipIds = _.intersection(getRelationshipsIds(first),
         getRelationshipsIds(second));
-      var relationships;
-      var result = $.Deferred();
+      let relationships;
+      let result = $.Deferred();
 
       function getRelationshipsIds(obj) {
-        var union = _.union(obj.related_sources, obj.related_destinations);
+        let union = _.union(obj.related_sources, obj.related_destinations);
         return _.map(union, 'id');
       }
       if (!relationshipIds.length && noRefresh) {
@@ -288,8 +288,8 @@ import RefreshQueue from './refresh_queue';
     }
   }, {
     save: function () {
-      var role;
-      var _super = this._super;
+      let role;
+      let _super = this._super;
 
       if (this.role && !this.role_name) {
         return _super.apply(this, arguments);

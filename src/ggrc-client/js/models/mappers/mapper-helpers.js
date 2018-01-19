@@ -56,9 +56,9 @@
 
   GGRC.all_local_results = function (instance) {
     // Returns directly-linked objects
-    var loaders;
-    var multiLoader;
-    var localLoaders = [];
+    let loaders;
+    let multiLoader;
+    let localLoaders = [];
 
     if (instance._all_local_results_binding)
       return instance._all_local_results_binding.refresh_stubs();

@@ -6,21 +6,21 @@
 describe('can.Control', function () {
   'use strict';
 
-  var Control;
+  let Control;
 
   beforeEach(function () {
     Control = can.Control.prototype;
   });
 
   describe('bindXHRToButton() method', function () {
-    var dfd;
+    let dfd;
 
     beforeEach(function () {
       dfd = new can.Deferred();
     });
 
     function callBindXHRToButton(done, actualInnerHtml, newtext, disable) {
-      var element = $('<button>' + actualInnerHtml + '</button>');
+      let element = $('<button>' + actualInnerHtml + '</button>');
 
       // call bindXHRToButton()
       Control.bindXHRToButton(dfd, element, newtext, disable);
@@ -90,7 +90,7 @@ describe('can.Control', function () {
 
     it('bindXHRToButton() should resolve empty element',
       function (done) {
-        var element = $('');
+        let element = $('');
 
         // call bindXHRToButton()
         Control.bindXHRToButton(dfd, element);

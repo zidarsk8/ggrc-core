@@ -5,9 +5,9 @@
 (function (can, GGRC) {
   'use strict';
 
-  var ALL_SAVED_TEXT = 'All changes saved';
-  var UNSAVED_TEXT = 'Unsaved changes';
-  var IS_SAVING_TEXT = 'Saving...';
+  let ALL_SAVED_TEXT = 'All changes saved';
+  let UNSAVED_TEXT = 'Unsaved changes';
+  let IS_SAVING_TEXT = 'Saving...';
 
   GGRC.Components('localCustomAttributesStatus', {
     tag: 'custom-attributes-status',

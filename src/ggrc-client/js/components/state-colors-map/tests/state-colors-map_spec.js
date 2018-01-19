@@ -6,12 +6,12 @@
 describe('GGRC.Components.stateColorsMap', function () {
   'use strict';
 
-  var completedState = 'In Progress';
-  var completedSuffix = 'inprogress';
-  var defaultSuffix = 'notstarted';
+  let completedState = 'In Progress';
+  let completedSuffix = 'inprogress';
+  let defaultSuffix = 'notstarted';
 
   describe('in case state is set as "In Progress"', function () {
-    var viewModel;
+    let viewModel;
 
     beforeEach(function () {
       viewModel = GGRC.Components.getViewModel('stateColorsMap');
@@ -24,7 +24,7 @@ describe('GGRC.Components.stateColorsMap', function () {
   });
 
   describe('in case state is not defined', function () {
-    var viewModel;
+    let viewModel;
 
     beforeEach(function () {
       viewModel = GGRC.Components.getViewModel('stateColorsMap');

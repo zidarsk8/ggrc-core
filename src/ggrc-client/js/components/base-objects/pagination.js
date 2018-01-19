@@ -13,8 +13,8 @@ export default can.Map.extend({
       type: 'number',
       value: 1,
       set: function (newValue) {
-        var disabled = this.attr('disabled');
-        var count = this.attr('count');
+        let disabled = this.attr('disabled');
+        let count = this.attr('count');
         if (newValue >= 1 &&
           (_.isUndefined(count) || newValue <= count) &&
           !disabled) {
@@ -54,8 +54,8 @@ export default can.Map.extend({
     limits: {
       type: can.List,
       get: function () {
-        var first = 0;
-        var last = 0;
+        let first = 0;
+        let last = 0;
         if (this.current && this.pageSize) {
           first = (this.current - 1) * this.pageSize;
           last = this.current * this.pageSize;
@@ -70,7 +70,7 @@ export default can.Map.extend({
     total: {
       type: 'number',
       set: function (itemsCount) {
-        var count = Math.ceil(itemsCount / this.pageSize);
+        let count = Math.ceil(itemsCount / this.pageSize);
         this.attr('count', count);
         return itemsCount;
       }

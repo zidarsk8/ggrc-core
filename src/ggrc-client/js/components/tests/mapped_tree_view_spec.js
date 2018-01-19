@@ -6,7 +6,7 @@
 describe('GGRC.Components.mappingTreeView', function () {
   'use strict';
 
-  var unsortedArray = [
+  let unsortedArray = [
     {
       value: 1,
       field: 'a'
@@ -24,17 +24,17 @@ describe('GGRC.Components.mappingTreeView', function () {
       field: 'b'
     }
   ];
-  var sortedAsc = _.sortByOrder(unsortedArray, 'field');
-  var sortedDesc = _.sortByOrder(unsortedArray, 'field', 'desc');
-  var Component;  // the component under test
+  let sortedAsc = _.sortByOrder(unsortedArray, 'field');
+  let sortedDesc = _.sortByOrder(unsortedArray, 'field', 'desc');
+  let Component;  // the component under test
 
   beforeAll(function () {
     Component = GGRC.Components.get('mappingTreeView');
   });
 
   describe('_sortObjects() method', function () {
-    var method;
-    var scope;
+    let method;
+    let scope;
 
     beforeAll(function () {
       scope = new can.Map({

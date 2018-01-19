@@ -6,8 +6,8 @@
 describe('GGRC.Components.relatedDocuments', function () {
   'use strict';
 
-  var viewModel;
-  var instance;
+  let viewModel;
+  let instance;
 
   beforeEach(function () {
     viewModel = GGRC.Components.getViewModel('relatedDocuments');
@@ -21,8 +21,8 @@ describe('GGRC.Components.relatedDocuments', function () {
 
   describe('"getDocumentsQuery" method', function () {
     function checkAdditionFilter(documentType) {
-      var query;
-      var additionFilter;
+      let query;
+      let additionFilter;
       viewModel.attr('documentType', documentType);
       query = viewModel.getDocumentsQuery();
 
@@ -41,8 +41,8 @@ describe('GGRC.Components.relatedDocuments', function () {
     });
 
     it('should get query for all documents', function () {
-      var query;
-      var expression;
+      let query;
+      let expression;
       viewModel.attr('documentType', undefined);
       query = viewModel.getDocumentsQuery();
       expression = query.filters.expression;

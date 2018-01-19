@@ -6,14 +6,14 @@
 describe('GGRC.Components.repeatOnButton', function () {
   'use strict';
 
-  var viewModel;
-  var events;
-  var getTitle = function (option) {
+  let viewModel;
+  let events;
+  let getTitle = function (option) {
     return option.title;
   };
 
   beforeAll(function () {
-    var Component = GGRC.Components.get('repeatOnButton');
+    let Component = GGRC.Components.get('repeatOnButton');
     events = Component.prototype.events;
   });
 
@@ -23,13 +23,13 @@ describe('GGRC.Components.repeatOnButton', function () {
 
   describe('buttonText getter', function () {
     it('returns Off-indication when no unit was selected', function () {
-      var result = viewModel.attr('buttonText');
+      let result = viewModel.attr('buttonText');
 
       expect(result).toEqual('Repeat Off');
     });
 
     it('returns on-indication when unit was selected', function () {
-      var result;
+      let result;
       viewModel.attr('unit', 'day');
 
       result = viewModel.attr('buttonText');
@@ -40,13 +40,13 @@ describe('GGRC.Components.repeatOnButton', function () {
 
   describe('modalTitle getter', function () {
     it('returns Off-indication when repeat was disabled', function () {
-      var result = viewModel.attr('modalTitle');
+      let result = viewModel.attr('modalTitle');
 
       expect(result).toEqual('Repeat Off');
     });
 
     it('returns on-indication when repeat was enabled', function () {
-      var result;
+      let result;
       viewModel.attr('repeatEnabled', true);
 
       result = viewModel.attr('modalTitle');
@@ -56,7 +56,7 @@ describe('GGRC.Components.repeatOnButton', function () {
   });
 
   describe('updateRepeatEveryOptions method', function () {
-    var repeatOptions = [
+    let repeatOptions = [
       {
         value: 1,
         title: '1'
@@ -65,7 +65,7 @@ describe('GGRC.Components.repeatOnButton', function () {
         value: 2,
         title: '2'
       }];
-    var unitOptions = [
+    let unitOptions = [
       {title: 'Daily', value: 'day', plural: 'days', singular: 'day'},
       {title: 'Weekly', value: 'week', plural: 'weeks', singular: 'week'},
       {title: 'Monthly', value: 'month', plural: 'months', singular: 'month'}
@@ -78,8 +78,8 @@ describe('GGRC.Components.repeatOnButton', function () {
 
     it('should not update options when unit was not selected',
     function () {
-      var actualTitles;
-      var expectedTitles = repeatOptions.map(getTitle);
+      let actualTitles;
+      let expectedTitles = repeatOptions.map(getTitle);
 
       viewModel.updateRepeatEveryOptions();
 
@@ -90,8 +90,8 @@ describe('GGRC.Components.repeatOnButton', function () {
 
     it('should update options when unit was not selected',
     function () {
-      var actualTitles;
-      var expectedTitles = ['1 week', '2 weeks'];
+      let actualTitles;
+      let expectedTitles = ['1 week', '2 weeks'];
       viewModel.attr('state.result.unit', 'week');
 
       viewModel.updateRepeatEveryOptions();
@@ -105,8 +105,8 @@ describe('GGRC.Components.repeatOnButton', function () {
   describe('initSelectedOptions method', function () {
     it('should initialize values from injected properties',
     function () {
-      var unit = 'day';
-      var repeatEvery = '2';
+      let unit = 'day';
+      let repeatEvery = '2';
       viewModel.attr('unit', unit);
       viewModel.attr('repeatEvery', repeatEvery);
 
@@ -121,8 +121,8 @@ describe('GGRC.Components.repeatOnButton', function () {
   describe('init method', function () {
     it('should initialize values from injected properties',
     function () {
-      var unit = 'day';
-      var repeatEvery = '2';
+      let unit = 'day';
+      let repeatEvery = '2';
       viewModel.attr('unit', unit);
       viewModel.attr('repeatEvery', repeatEvery);
 
@@ -135,7 +135,7 @@ describe('GGRC.Components.repeatOnButton', function () {
   });
 
   describe('save method', function () {
-    var saveDfd;
+    let saveDfd;
     beforeEach(function () {
       saveDfd = can.Deferred();
       viewModel.attr('onSaveRepeat', function () {
@@ -145,8 +145,8 @@ describe('GGRC.Components.repeatOnButton', function () {
 
     it('should notify with selected values when repeat is enabled',
     function () {
-      var unit = 'day';
-      var repeatEvery = '2';
+      let unit = 'day';
+      let repeatEvery = '2';
       viewModel.attr('state.result.unit', unit);
       viewModel.attr('state.result.repeatEvery', repeatEvery);
       viewModel.attr('repeatEnabled', true);
@@ -173,9 +173,9 @@ describe('GGRC.Components.repeatOnButton', function () {
   });
 
   describe('unit update event', function () {
-    var unitChanged;
-    var context;
-    var repeatOptions = [
+    let unitChanged;
+    let context;
+    let repeatOptions = [
       {
         value: 1,
         title: '1'
@@ -195,8 +195,8 @@ describe('GGRC.Components.repeatOnButton', function () {
 
     it('should update repeat options when unit changed',
     function () {
-      var actualTitles;
-      var expectedTitles = ['1 weekday', '2 weekdays'];
+      let actualTitles;
+      let expectedTitles = ['1 weekday', '2 weekdays'];
       context.viewModel.attr('state.result.unit', 'day');
 
       unitChanged.apply(context);
@@ -208,8 +208,8 @@ describe('GGRC.Components.repeatOnButton', function () {
   });
 
   describe('open update event', function () {
-    var openChanged;
-    var context;
+    let openChanged;
+    let context;
 
     beforeAll(function () {
       openChanged = events['{state} open'];
@@ -220,8 +220,8 @@ describe('GGRC.Components.repeatOnButton', function () {
 
     it('should set saved values for options when modal with unit opens',
     function () {
-      var unit = 'day';
-      var repeatEvery = '2';
+      let unit = 'day';
+      let repeatEvery = '2';
       context.viewModel.attr('state.open', true);
       context.viewModel.attr('unit', unit);
       context.viewModel.attr('repeatEvery', repeatEvery);

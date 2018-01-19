@@ -6,8 +6,8 @@
   /**
    * Util methods for work with Object versions.
    */
-var cachedObjects = {};
-var modelsIncludeVersions = [
+let cachedObjects = {};
+let modelsIncludeVersions = [
   'Issue'
 ];
 
@@ -34,8 +34,8 @@ function parentHasObjectVersions(parentModelName) {
 }
 
 function _getObjectVersionConfig(modelName, forceBuildFromOriginal) {
-  var originalModelName;
-  var objectVersion = {};
+  let originalModelName;
+  let objectVersion = {};
   if (!forceBuildFromOriginal) {
     if (!isObjectVersion(modelName)) {
       return objectVersion;
@@ -59,12 +59,12 @@ function _getObjectVersionConfig(modelName, forceBuildFromOriginal) {
 }
 
 function getWidgetConfig(modelName, buildVersionFromOriginal) {
-  var config;
-  var isObjectVersion;
-  var originalModelName;
-  var additionalFilter;
-  var responseType;
-  var configObject;
+  let config;
+  let isObjectVersion;
+  let originalModelName;
+  let additionalFilter;
+  let responseType;
+  let configObject;
 
   // Workflow approach
   if (_.isObject(modelName)) {
@@ -103,7 +103,7 @@ function getWidgetConfig(modelName, buildVersionFromOriginal) {
 }
 
 function getWidgetConfigs(modelNames) {
-  var configs = modelNames.map(function (modelName) {
+  let configs = modelNames.map(function (modelName) {
     return getWidgetConfig(modelName);
   });
   return configs;

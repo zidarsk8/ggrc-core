@@ -4,11 +4,11 @@
 */
 
 (function ($) {
-  var delegate = '[data-toggle="tooltip"], [rel=tooltip]';
-  var tooltipPrototype = $.fn.tooltip.Constructor.prototype;
-  var bootstrapTooltipShow = tooltipPrototype.show;
-  var bootstrapTooltipHide = tooltipPrototype.hide;
-  var actions = {};
+  let delegate = '[data-toggle="tooltip"], [rel=tooltip]';
+  let tooltipPrototype = $.fn.tooltip.Constructor.prototype;
+  let bootstrapTooltipShow = tooltipPrototype.show;
+  let bootstrapTooltipHide = tooltipPrototype.hide;
+  let actions = {};
 
 
   /**
@@ -112,8 +112,8 @@
   }
 
   function tooltipInit(e) {
-    var $currentTarget = $(e.currentTarget);
-    var delay = {
+    let $currentTarget = $(e.currentTarget);
+    let delay = {
       show: 500,
       hide: 0
     };
@@ -132,7 +132,7 @@
   }
 
   function tooltipClick(e) {
-    var $currentTarget = $(e.currentTarget);
+    let $currentTarget = $(e.currentTarget);
     actions.isClicked = true;
     if ($currentTarget.data('tooltip')) {
       $currentTarget.tooltip('hide');

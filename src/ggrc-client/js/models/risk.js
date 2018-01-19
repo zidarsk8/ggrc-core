@@ -48,7 +48,7 @@
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
-      var reqFields = ['title', 'description'];
+      let reqFields = ['title', 'description'];
       if (this._super) {
         this._super.apply(this, arguments);
       }

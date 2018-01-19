@@ -8,7 +8,7 @@ import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 describe('GGRC.Components.subTreeWrapper', function () {
   'use strict';
 
-  var vm;
+  let vm;
 
   beforeEach(function () {
     vm = GGRC.Components.getViewModel('subTreeWrapper');
@@ -18,7 +18,7 @@ describe('GGRC.Components.subTreeWrapper', function () {
   });
 
   describe('loadItems() method', function () {
-    var method;
+    let method;
     beforeEach(function () {
       vm.attr('parent', {
         type: 'Foo',

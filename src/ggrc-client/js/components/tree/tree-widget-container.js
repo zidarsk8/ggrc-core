@@ -51,7 +51,7 @@ import tracker from '../../tracker';
 import router from '../../router';
 import Permission from '../../permission';
 
-var viewModel;
+let viewModel;
 
 viewModel = can.Map.extend({
   define: {
@@ -71,11 +71,11 @@ viewModel = can.Map.extend({
     currentFilter: {
       type: String,
       get: function () {
-        var filters = can.makeArray(this.attr('filters'));
-        var additionalFilter = this.attr('additionalFilter');
-        var optionsData;
-        var objectVersionfilter;
-        var isObjectVersion = this.attr('options.objectVersion');
+        let filters = can.makeArray(this.attr('filters'));
+        let additionalFilter = this.attr('additionalFilter');
+        let optionsData;
+        let objectVersionfilter;
+        let isObjectVersion = this.attr('options.objectVersion');
 
         if (this.attr('advancedSearch.filter')) {
           return this.attr('advancedSearch.filter');
@@ -109,7 +109,7 @@ viewModel = can.Map.extend({
     },
     optionsData: {
       get: function () {
-        var modelName = this.attr('modelName');
+        let modelName = this.attr('modelName');
         if (!this.attr('options.objectVersion')) {
           return {
             name: modelName,
@@ -137,7 +137,7 @@ viewModel = can.Map.extend({
     cssClasses: {
       type: String,
       get: function () {
-        var classes = [];
+        let classes = [];
 
         if (this.attr('loading')) {
           classes.push('loading');
@@ -159,8 +159,8 @@ viewModel = can.Map.extend({
     allow_mapping: {
       type: Boolean,
       get: function () {
-        var allowMapping = true;
-        var options = this.attr('options');
+        let allowMapping = true;
+        let options = this.attr('options');
 
         if ('allow_mapping' in options) {
           allowMapping = options.allow_mapping;
@@ -172,8 +172,8 @@ viewModel = can.Map.extend({
     allow_creating: {
       type: Boolean,
       get: function () {
-        var allowCreating = true;
-        var options = this.attr('options');
+        let allowCreating = true;
+        let options = this.attr('options');
 
         if ('allow_creating' in options) {
           allowCreating = options.allow_creating;
@@ -194,8 +194,8 @@ viewModel = can.Map.extend({
     isSnapshots: {
       type: Boolean,
       get: function () {
-        var parentInstance = this.attr('parent_instance');
-        var model = this.attr('model');
+        let parentInstance = this.attr('parent_instance');
+        let model = this.attr('model');
 
         return (isSnapshotScope(parentInstance) &&
           isSnapshotModel(model.model_singular)) ||
@@ -205,8 +205,8 @@ viewModel = can.Map.extend({
     showGenerateAssessments: {
       type: Boolean,
       get: function () {
-        var parentInstance = this.attr('parent_instance');
-        var model = this.attr('model');
+        let parentInstance = this.attr('parent_instance');
+        let model = this.attr('model');
 
         return parentInstance.type === 'Audit' &&
           model.shortName === 'Assessment';
@@ -277,18 +277,18 @@ viewModel = can.Map.extend({
   refreshLoaded: true,
   canOpenInfoPin: true,
   loadItems: function () {
-    var {widgetId} = this.attr('optionsData');
-    var pageInfo = this.attr('pageInfo');
-    var sortingInfo = this.attr('sortingInfo');
-    var parent = this.attr('parent_instance');
-    var filter = this.attr('currentFilter');
-    var page = {
+    let {widgetId} = this.attr('optionsData');
+    let pageInfo = this.attr('pageInfo');
+    let sortingInfo = this.attr('sortingInfo');
+    let parent = this.attr('parent_instance');
+    let filter = this.attr('currentFilter');
+    let page = {
       current: pageInfo.current,
       pageSize: pageInfo.pageSize,
       sortBy: sortingInfo.sortBy,
       sortDirection: sortingInfo.sortDirection,
     };
-    var request = this.attr('advancedSearch.request');
+    let request = this.attr('advancedSearch.request');
 
     pageInfo.attr('disabled', true);
     this.attr('loading', true);
@@ -328,7 +328,7 @@ viewModel = can.Map.extend({
     return this.attr('loaded');
   },
   setColumnsConfiguration: function () {
-    var columns = TreeViewUtils.getColumnsForModel(
+    let columns = TreeViewUtils.getColumnsForModel(
       this.attr('model').model_singular,
       this.attr('displayPrefs'),
       this.attr('optionsData').widgetId
@@ -340,15 +340,15 @@ viewModel = can.Map.extend({
     this.attr('columns.disableConfiguration', columns.disableConfiguration);
   },
   setSortingConfiguration: function () {
-    var sortingInfo = TreeViewUtils
+    let sortingInfo = TreeViewUtils
       .getSortingForModel(this.attr('modelName'));
 
     this.attr('sortingInfo.sortBy', sortingInfo.key);
     this.attr('sortingInfo.sortDirection', sortingInfo.direction);
   },
   onUpdateColumns: function (event) {
-    var selectedColumns = event.columns;
-    var columns = TreeViewUtils.setColumnsForModel(
+    let selectedColumns = event.columns;
+    let columns = TreeViewUtils.setColumnsForModel(
       this.attr('model').model_singular,
       selectedColumns,
       this.attr('displayPrefs'),
@@ -374,7 +374,7 @@ viewModel = can.Map.extend({
     this.closeInfoPane();
   },
   getDepthFilter: function (deepLevel) {
-    var filters = can.makeArray(this.attr('filters'));
+    let filters = can.makeArray(this.attr('filters'));
 
     return filters.filter(function (options) {
       return options.filter &&
@@ -389,9 +389,9 @@ viewModel = can.Map.extend({
     return this.attr('refreshLoaded');
   },
   initCount: function () {
-    var $el = this.attr('$el');
-    var counts = getCounts();
-    var countsName = this.attr('options').countsName ||
+    let $el = this.attr('$el');
+    let counts = getCounts();
+    let countsName = this.attr('options').countsName ||
       this.attr('optionsData.widgetId');
 
     if ($el) {
@@ -414,7 +414,7 @@ viewModel = can.Map.extend({
    * @private
    */
   _concatFilters: function (filter, options) {
-    var operation = options.operation || 'AND';
+    let operation = options.operation || 'AND';
 
     if (filter) {
       filter = GGRC.query_parser.join_queries(
@@ -436,7 +436,7 @@ viewModel = can.Map.extend({
    * @private
    */
   _combineFilters(filter, options) {
-    var operation = options.operation || 'AND';
+    let operation = options.operation || 'AND';
 
     if (filter) {
       filter += ' ' + operation + ' ' + options.filter;
@@ -447,7 +447,7 @@ viewModel = can.Map.extend({
     return filter;
   },
   _getFilterByName: function (name) {
-    var filter = _.findWhere(this.attr('filters'), {name: name});
+    let filter = _.findWhere(this.attr('filters'), {name: name});
 
     return filter && filter.filter ? filter.filter : null;
   },
@@ -455,10 +455,10 @@ viewModel = can.Map.extend({
     this._triggerListeners(true);
   },
   _widgetShown: function () {
-    var modelName = this.attr('optionsData').widgetId;
-    var loaded = this.attr('loaded');
-    var total = this.attr('pageInfo.total');
-    var counts = _.get(getCounts(), modelName);
+    let modelName = this.attr('optionsData').widgetId;
+    let loaded = this.attr('loaded');
+    let total = this.attr('pageInfo.total');
+    let counts = _.get(getCounts(), modelName);
 
     if ((modelName === 'Issue') && !_.isNull(loaded) && (total !== counts)) {
       this.loadItems();
@@ -467,11 +467,11 @@ viewModel = can.Map.extend({
     this._triggerListeners();
   },
   _triggerListeners: (function () {
-    var activeTabModel;
-    var self;
+    let activeTabModel;
+    let self;
 
     function onCreated(ev, instance) {
-      var parentInstance = self.attr('parent_instance');
+      let parentInstance = self.attr('parent_instance');
 
       function callback() {
         parentInstance.unbind('change', callback);
@@ -490,9 +490,9 @@ viewModel = can.Map.extend({
     }
 
     function onDestroyed(ev, instance) {
-      var current;
-      var destType;
-      var srcType;
+      let current;
+      let destType;
+      let srcType;
 
       if (_verifyRelationship(instance, activeTabModel) ||
         instance instanceof CMS.Models[activeTabModel] ||
@@ -611,10 +611,10 @@ viewModel = can.Map.extend({
     this.attr('advancedSearch.open', true);
   },
   applyAdvancedFilters: function () {
-    var filters = this.attr('advancedSearch.filterItems');
-    var mappings = this.attr('advancedSearch.mappingItems');
-    var request = can.List();
-    var advancedFilters;
+    let filters = this.attr('advancedSearch.filterItems');
+    let mappings = this.attr('advancedSearch.mappingItems');
+    let request = can.List();
+    let advancedFilters;
 
     this.attr('advancedSearch.appliedFilterItems', filters);
     this.attr('advancedSearch.appliedMappingItems', mappings);
@@ -650,23 +650,23 @@ viewModel = can.Map.extend({
       .close();
   },
   getAbsoluteItemNumber: function (instance) {
-    var showedItems = this.attr('showedItems');
-    var pageInfo = this.attr('pageInfo');
-    var startIndex = pageInfo.pageSize * (pageInfo.current - 1);
-    var relativeItemIndex = _.findIndex(showedItems,
+    let showedItems = this.attr('showedItems');
+    let pageInfo = this.attr('pageInfo');
+    let startIndex = pageInfo.pageSize * (pageInfo.current - 1);
+    let relativeItemIndex = _.findIndex(showedItems,
       {id: instance.id, type: instance.type});
     return relativeItemIndex > -1 ?
       startIndex + relativeItemIndex :
       relativeItemIndex;
   },
   getRelativeItemNumber: function (absoluteNumber, pageSize) {
-    var pageNumber = Math.floor(absoluteNumber / pageSize);
-    var startIndex = pageSize * pageNumber;
+    let pageNumber = Math.floor(absoluteNumber / pageSize);
+    let startIndex = pageSize * pageNumber;
     return absoluteNumber - startIndex;
   },
   getNextItemPage: function (absoluteNumber, pageInfo) {
-    var pageNumber = Math.floor(absoluteNumber / pageInfo.pageSize) + 1;
-    var dfd = can.Deferred().resolve();
+    let pageNumber = Math.floor(absoluteNumber / pageInfo.pageSize) + 1;
+    let dfd = can.Deferred().resolve();
 
     if (pageInfo.current !== pageNumber) {
       this.attr('loading', true);
@@ -677,7 +677,7 @@ viewModel = can.Map.extend({
     return dfd;
   },
   updateActiveItemIndicator: function (index) {
-    var element = this.attr('$el');
+    let element = this.attr('$el');
     element
       .find('.item-active')
       .removeClass('item-active');
@@ -696,14 +696,14 @@ export default GGRC.Components('treeWidgetContainer', {
   template: template,
   viewModel: viewModel,
   init: function () {
-    var viewModel = this.viewModel;
-    var parentInstance = viewModel.attr('parent_instance');
-    var allowMapping = viewModel.attr('allow_mapping');
-    var allowCreating = viewModel.attr('allow_creating');
+    let viewModel = this.viewModel;
+    let parentInstance = viewModel.attr('parent_instance');
+    let allowMapping = viewModel.attr('allow_mapping');
+    let allowCreating = viewModel.attr('allow_creating');
 
     function setAllowMapping() {
-      var isAccepted = parentInstance.attr('status') === 'Accepted';
-      var admin = Permission.is_allowed('__GGRC_ADMIN__');
+      let isAccepted = parentInstance.attr('status') === 'Accepted';
+      let admin = Permission.is_allowed('__GGRC_ADMIN__');
 
       viewModel.attr('allow_mapping_or_creating',
         (admin || !isAccepted) && (allowMapping || allowCreating));
@@ -735,15 +735,15 @@ export default GGRC.Components('treeWidgetContainer', {
       this.viewModel.loadItems();
     },
     ' selectTreeItem': function (el, ev, selectedEl, instance) {
-      var parent = this.viewModel.attr('parent_instance');
-      var setInstanceDfd;
-      var infoPaneOptions = new can.Map({
+      let parent = this.viewModel.attr('parent_instance');
+      let setInstanceDfd;
+      let infoPaneOptions = new can.Map({
         instance: instance,
         parent_instance: parent,
         options: this.viewModel,
       });
-      var itemNumber = this.viewModel.getAbsoluteItemNumber(instance);
-      var isSubTreeItem = itemNumber === -1;
+      let itemNumber = this.viewModel.getAbsoluteItemNumber(instance);
+      let isSubTreeItem = itemNumber === -1;
 
       ev.stopPropagation();
 
@@ -768,17 +768,17 @@ export default GGRC.Components('treeWidgetContainer', {
       }.bind(this));
     },
     '{viewModel} selectedItem': function () {
-      var componentSelector = 'assessment-info-pane';
-      var itemIndex = this.viewModel.attr('selectedItem');
-      var pageInfo = this.viewModel.attr('pageInfo');
-      var newInstance;
-      var items;
+      let componentSelector = 'assessment-info-pane';
+      let itemIndex = this.viewModel.attr('selectedItem');
+      let pageInfo = this.viewModel.attr('pageInfo');
+      let newInstance;
+      let items;
 
-      var relativeIndex = this.viewModel
+      let relativeIndex = this.viewModel
         .getRelativeItemNumber(itemIndex, pageInfo.pageSize);
-      var pageLoadDfd = this.viewModel
+      let pageLoadDfd = this.viewModel
         .getNextItemPage(itemIndex, pageInfo);
-      var pinControl = $('.pin-content').control();
+      let pinControl = $('.pin-content').control();
 
       if (!this.viewModel.attr('canOpenInfoPin')) {
         return;
@@ -821,7 +821,7 @@ export default GGRC.Components('treeWidgetContainer', {
       this.viewModel.loadItems();
     },
     inserted: function () {
-      var viewModel = this.viewModel;
+      let viewModel = this.viewModel;
       viewModel.attr('$el', this.element);
 
       this.element.closest('.widget')

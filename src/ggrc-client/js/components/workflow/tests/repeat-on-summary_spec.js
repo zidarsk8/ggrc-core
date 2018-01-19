@@ -6,14 +6,14 @@
 describe('GGRC.Components.repeatOnSummary', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(function () {
     viewModel = GGRC.Components.getViewModel('repeatOnSummary');
   });
 
   describe('unitText getter', function () {
-    var unitOptions;
+    let unitOptions;
     beforeAll(function () {
       unitOptions = GGRC.Workflow.unitOptions;
       GGRC.Workflow.unitOptions = [
@@ -39,7 +39,7 @@ describe('GGRC.Components.repeatOnSummary', function () {
     });
 
     it('returns empty text when unit is not specified', function () {
-      var result;
+      let result;
 
       result = viewModel.attr('unitText');
 
@@ -47,7 +47,7 @@ describe('GGRC.Components.repeatOnSummary', function () {
     });
 
     it('returns empty text when incorrect unit specified', function () {
-      var result;
+      let result;
       viewModel.attr('unit', 'Hour');
 
       result = viewModel.attr('unitText');
@@ -56,7 +56,7 @@ describe('GGRC.Components.repeatOnSummary', function () {
     });
 
     it('returns appropriate when correct unit specified', function () {
-      var result;
+      let result;
       viewModel.attr('unit', 'Week');
 
       result = viewModel.attr('unitText');
@@ -65,7 +65,7 @@ describe('GGRC.Components.repeatOnSummary', function () {
     });
 
     it('returns appropriate when correct unit specified', function () {
-      var result;
+      let result;
       viewModel.attr('unit', 'Week');
       viewModel.attr('repeatEvery', 4);
 

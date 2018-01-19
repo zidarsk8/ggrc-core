@@ -6,15 +6,15 @@
 import Component from '../csv-template';
 
 describe('GGRC.Components.csvTemplate', function () {
-  var events = Component.prototype.events;
+  let events = Component.prototype.events;
 
   describe('events', function () {
-    var scope;
-    var handler;
+    let scope;
+    let handler;
 
     describe('".import-button click" handler', function () {
-      var exportDfd;
-      var selected;
+      let exportDfd;
+      let selected;
 
       beforeEach(function () {
         scope = new can.Map();
@@ -33,7 +33,7 @@ describe('GGRC.Components.csvTemplate', function () {
       });
 
       it('requests export with proper data', function () {
-        var objects = _.map(selected, function (el) {
+        let objects = _.map(selected, function (el) {
           return {
             object_name: el.value,
             fields: 'all',

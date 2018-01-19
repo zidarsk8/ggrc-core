@@ -6,9 +6,9 @@
 describe('GGRC.Components.multiselectDropdown', function () {
   'use strict';
 
-  var Component;
-  var events;
-  var viewModel;
+  let Component;
+  let events;
+  let viewModel;
 
   beforeAll(function () {
     Component = GGRC.Components.get('multiselectDropdown');
@@ -41,8 +41,8 @@ describe('GGRC.Components.multiselectDropdown', function () {
 
   describe('events', function () {
     describe('"{window} click" handler', function () {
-      var method;
-      var that;
+      let method;
+      let that;
 
       beforeEach(function () {
         that = {

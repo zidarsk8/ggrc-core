@@ -9,7 +9,7 @@ import Component from '../advanced-search-filter-group';
 describe('GGRC.Components.advancedSearchFilterGroup', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(() => {
     viewModel = Component.prototype.viewModel();
@@ -17,7 +17,7 @@ describe('GGRC.Components.advancedSearchFilterGroup', function () {
 
   describe('addFilterCriterion() method', function () {
     it('adds operator and attribute', function () {
-      var items;
+      let items;
       viewModel.attr('items', [AdvancedSearch.create.attribute()]);
       viewModel.addFilterCriterion();
 

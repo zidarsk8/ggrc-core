@@ -6,15 +6,15 @@
 import RefreshQueue from '../refresh_queue';
 
 (function (GGRC, can) {
-  var Proxy = GGRC.MapperHelpers.Proxy;
-  var Direct = GGRC.MapperHelpers.Direct;
-  var Indirect = GGRC.MapperHelpers.Indirect;
-  var Search = GGRC.MapperHelpers.Search;
-  var Multi = GGRC.MapperHelpers.Multi;
-  var TypeFilter = GGRC.MapperHelpers.TypeFilter;
-  var AttrFilter = GGRC.MapperHelpers.AttrFilter;
-  var CustomFilter = GGRC.MapperHelpers.CustomFilter;
-  var Cross = GGRC.MapperHelpers.Cross;
+  let Proxy = GGRC.MapperHelpers.Proxy;
+  let Direct = GGRC.MapperHelpers.Direct;
+  let Indirect = GGRC.MapperHelpers.Indirect;
+  let Search = GGRC.MapperHelpers.Search;
+  let Multi = GGRC.MapperHelpers.Multi;
+  let TypeFilter = GGRC.MapperHelpers.TypeFilter;
+  let AttrFilter = GGRC.MapperHelpers.AttrFilter;
+  let CustomFilter = GGRC.MapperHelpers.CustomFilter;
+  let Cross = GGRC.MapperHelpers.Cross;
 
   new GGRC.Mappings('ggrc_core', {
     base: {},
@@ -316,7 +316,7 @@ import RefreshQueue from '../refresh_queue';
       extended_related_projects: Multi(['related_projects', 'owned_projects']),
       extended_related_systems: Multi(['related_systems', 'owned_systems']),
       related_objects_via_search: Search(function (binding) {
-        var types = this.observe_types;
+        let types = this.observe_types;
 
         // checkfor window.location
         if (/^\/objectBrowser\/?$/.test(window.location.pathname)) {

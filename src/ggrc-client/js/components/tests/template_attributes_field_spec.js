@@ -6,13 +6,13 @@
 describe('GGRC.Components.templateAttributesField', function () {
   'use strict';
 
-  var Component;  // the component under test
-  var scope;
-  var pads = new can.Map({
+  let Component;  // the component under test
+  let scope;
+  let pads = new can.Map({
     COMMENT: 0,
     ATTACHMENT: 1
   });
-  var parentScope;
+  let parentScope;
 
   beforeAll(function () {
     parentScope = new can.Map({
@@ -24,7 +24,7 @@ describe('GGRC.Components.templateAttributesField', function () {
   });
 
   describe('denormalize_mandatory() method', function () {
-    var denormalizeMandatory;
+    let denormalizeMandatory;
 
     beforeAll(function () {
       scope = Component.prototype.scope({}, parentScope);
@@ -32,11 +32,11 @@ describe('GGRC.Components.templateAttributesField', function () {
     });
 
     it('returns correct denormalized field', function () {
-      var field = new can.Map({
+      let field = new can.Map({
         multi_choice_options: 'foo,bar,baz,bam',
         multi_choice_mandatory: '0,1,2,3'
       });
-      var result = denormalizeMandatory(field, pads);
+      let result = denormalizeMandatory(field, pads);
 
       expect(result.length).toEqual(4);
       expect(result[0].attachment).toEqual(false);
@@ -51,11 +51,11 @@ describe('GGRC.Components.templateAttributesField', function () {
 
     it('returns false for attachment and comment for missing mandatory',
       function () {
-        var field = new can.Map({
+        let field = new can.Map({
           multi_choice_options: 'one,two,three,four,five',
           multi_choice_mandatory: '0,1,2'
         });
-        var result = denormalizeMandatory(field, pads);
+        let result = denormalizeMandatory(field, pads);
 
         expect(result.length).toEqual(5);
         expect(result[0].attachment).toEqual(false);
@@ -72,11 +72,11 @@ describe('GGRC.Components.templateAttributesField', function () {
       });
 
     it('returns values only for defined options', function () {
-      var field = new can.Map({
+      let field = new can.Map({
         multi_choice_options: 'one,two,three',
         multi_choice_mandatory: '0,1,2,2,0'
       });
-      var result = denormalizeMandatory(field, pads);
+      let result = denormalizeMandatory(field, pads);
 
       expect(result.length).toEqual(3);
       expect(result[0].attachment).toEqual(false);
@@ -89,7 +89,7 @@ describe('GGRC.Components.templateAttributesField', function () {
   });
 
   describe('normalize_mandatory() method', function () {
-    var normalizeMandatory;
+    let normalizeMandatory;
 
     beforeAll(function () {
       scope = Component.prototype.scope({}, parentScope);
@@ -97,13 +97,13 @@ describe('GGRC.Components.templateAttributesField', function () {
     });
 
     it('returns correct normalized attrs', function () {
-      var attrs = new can.List([
+      let attrs = new can.List([
         {attachment: false, comment: false},
         {attachment: true, comment: false},
         {attachment: false, comment: true},
         {attachment: true, comment: true}
       ]);
-      var result = normalizeMandatory(attrs, pads);
+      let result = normalizeMandatory(attrs, pads);
 
       expect(result).toEqual('0,2,1,3');
     });
@@ -111,15 +111,15 @@ describe('GGRC.Components.templateAttributesField', function () {
 
   describe('emitting events', function () {
     describe('on-remove event', function () {
-      var $root;  // the component's root DOM element
-      var onRemoveCallback;
+      let $root;  // the component's root DOM element
+      let onRemoveCallback;
 
       beforeEach(function () {
-        var $body = $('body');
-        var docFragment;
-        var htmlSnippet;
-        var renderer;
-        var templateContext;
+        let $body = $('body');
+        let docFragment;
+        let htmlSnippet;
+        let renderer;
+        let templateContext;
 
         onRemoveCallback = jasmine.createSpy('onRemoveCallback');
 
@@ -156,7 +156,7 @@ describe('GGRC.Components.templateAttributesField', function () {
       });
 
       it('invokes the provided handler when element is removed', function () {
-        var $btnDelete = $root.find('.fa-trash').closest('a');
+        let $btnDelete = $root.find('.fa-trash').closest('a');
         $btnDelete.click();
         expect(onRemoveCallback).toHaveBeenCalled();
       });

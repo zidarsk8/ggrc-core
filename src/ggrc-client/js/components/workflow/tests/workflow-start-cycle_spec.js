@@ -7,15 +7,15 @@ import component from '../workflow-start-cycle';
 import helpers from '../workflow-helpers';
 
 describe('GGRC.WorkflowStartCycle', function () {
-  var events;
+  let events;
   beforeAll(function () {
     events = component.prototype.events;
   });
 
   describe('click event handler', function () {
-    var handler;
-    var workflowMock;
-    var generateDfd;
+    let handler;
+    let workflowMock;
+    let generateDfd;
 
     beforeEach(function () {
       handler = events.click;

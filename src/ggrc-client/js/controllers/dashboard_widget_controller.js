@@ -12,7 +12,7 @@ export default can.Control({
     isLoading: true
   },
   init: function () {
-    var that = this;
+    let that = this;
     $(function () {
       if (GGRC.page_object) {
         $.extend(that.defaults, {
@@ -24,8 +24,8 @@ export default can.Control({
   }
 }, {
   init: function () {
-    var frag;
-    var dashboards =
+    let frag;
+    let dashboards =
       getDashboards(this.options.instance);
 
     this.options.context = new can.Map({

@@ -7,7 +7,7 @@
  */
 
 (function (can) {
-  var path = GGRC.mustache_path + "/risk_assessments";
+  let path = GGRC.mustache_path + "/risk_assessments";
 
   can.Model.Cacheable("CMS.Models.RiskAssessment", {
     root_object: "risk_assessment",

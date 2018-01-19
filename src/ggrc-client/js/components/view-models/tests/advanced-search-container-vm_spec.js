@@ -9,7 +9,7 @@ import AdvancedSearchContainer from '../../view-models/advanced-search-container
 describe('AdvancedSearchContainer', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(function () {
     viewModel = new AdvancedSearchContainer();
@@ -18,7 +18,7 @@ describe('AdvancedSearchContainer', function () {
   describe('removeItem() method', function () {
     it('removes attribute and operator behind if item is first',
     function () {
-      var viewItems;
+      let viewItems;
       viewModel.attr('items', [
         AdvancedSearch.create.attribute({field: 'first'}),
         AdvancedSearch.create.operator(),
@@ -35,7 +35,7 @@ describe('AdvancedSearchContainer', function () {
 
     it('removes attribute and operator in front if item is not first',
     function () {
-      var viewItems;
+      let viewItems;
       viewModel.attr('items', [
         AdvancedSearch.create.attribute({field: 'first'}),
         AdvancedSearch.create.operator(),
@@ -52,7 +52,7 @@ describe('AdvancedSearchContainer', function () {
 
     it('calls remove() if it is group and single attribute was removed',
     function () {
-      var viewItems;
+      let viewItems;
       viewModel.attr('items', [
         AdvancedSearch.create.attribute({field: 'single'})
       ]);
@@ -67,7 +67,7 @@ describe('AdvancedSearchContainer', function () {
     it('does not calls remove() if it is not group' +
       ' and single attribute was removed',
     function () {
-      var viewItems;
+      let viewItems;
       viewModel.attr('items', [
         AdvancedSearch.create.attribute({field: 'single'})
       ]);

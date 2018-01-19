@@ -15,7 +15,7 @@ import RefreshQueue from '../refresh_queue';
     },
 
     attach: function (instance) {
-      var binding = this.constructor.binding_factory(instance, this);
+      let binding = this.constructor.binding_factory(instance, this);
       this.init_listeners(binding);
       return binding;
     },
@@ -25,9 +25,9 @@ import RefreshQueue from '../refresh_queue';
     },
 
     find_result_by_instance: function (result, list) {
-      var i;
-      var foundResult = null;
-      var oldResult;
+      let i;
+      let foundResult = null;
+      let oldResult;
 
       for (i = 0; !foundResult && i < list.length; i++) {
         oldResult = list[i];
@@ -42,8 +42,8 @@ import RefreshQueue from '../refresh_queue';
     },
 
     is_duplicate_result: function (oldResult, newResult) {
-      var old = oldResult;
-      var new_ = newResult;
+      let old = oldResult;
+      let new_ = newResult;
 
       if (old.instance === new_.instance) {// && o.binding  === n.binding) {
         if (old.mappings === new_.mappings) {
@@ -79,14 +79,14 @@ import RefreshQueue from '../refresh_queue';
     },
 
     insert_results: function (binding, results) {
-      var self = this;
-      var allBindingResults = [];
-      var newInstanceResults = [];
-      var instancesToRefresh = [];
+      let self = this;
+      let allBindingResults = [];
+      let newInstanceResults = [];
+      let instancesToRefresh = [];
 
       can.each(results, function (newResult) {
-        var foundResult = null;
-        var mappingAttr;
+        let foundResult = null;
+        let mappingAttr;
 
         foundResult = self.find_result_by_instance(newResult, binding.list);
 
@@ -159,13 +159,13 @@ import RefreshQueue from '../refresh_queue';
     },
 
     remove_instance: function (binding, instance, mappings) {
-      var indexesToRemove = [];
+      let indexesToRemove = [];
 
       if (!(can.isArray(mappings) || mappings instanceof can.Observe.List))
         mappings = [mappings];
 
       can.each(binding.list, function (data, instanceIndex) {
-        var mappingAttr = binding.list[instanceIndex].mappings;
+        let mappingAttr = binding.list[instanceIndex].mappings;
 
         if (data.instance.id === instance.id &&
           data.instance.constructor.shortName ===
@@ -174,7 +174,7 @@ import RefreshQueue from '../refresh_queue';
             indexesToRemove.push(instanceIndex);
           } else {
             can.each(mappings, function (mapping) {
-              var wasRemoved = data.remove_mapping(mapping);
+              let wasRemoved = data.remove_mapping(mapping);
               if (wasRemoved) {
                 if (mappingAttr.length === 0)
                   indexesToRemove.push(instanceIndex);
@@ -219,7 +219,7 @@ import RefreshQueue from '../refresh_queue';
     _refresh_instances: function (binding, force) {
       return this.refresh_stubs(binding)
         .then(function () {
-          var refreshQueue = new RefreshQueue();
+          let refreshQueue = new RefreshQueue();
           can.each(binding.list, function (result) {
             refreshQueue.enqueue(result.instance, force);
           });

@@ -4,9 +4,9 @@
  */
 describe('CMS.Models.Relationship ', function () {
   describe('getRelationshipBetweenInstances() method', function () {
-    var method;
-    var instance1;
-    var instance2;
+    let method;
+    let instance1;
+    let instance2;
 
     beforeAll(function () {
       method = CMS.Models.Relationship.getRelationshipBetweenInstances;
@@ -30,7 +30,7 @@ describe('CMS.Models.Relationship ', function () {
       });
 
       it('return intersecting Relationships', function (done) {
-        var result;
+        let result;
         instance1 = {
           related_sources: [{id: 1}, {id: 2}, {id: 3}],
           related_destinations: [{id: 4}]
@@ -50,7 +50,7 @@ describe('CMS.Models.Relationship ', function () {
       });
 
       it('returns undefined for not related instances', function (done) {
-        var result;
+        let result;
 
         instance1 = {
           related_sources: [{id: 1}, {id: 2}, {id: 3}],
@@ -78,7 +78,7 @@ describe('CMS.Models.Relationship ', function () {
 
       it('returns undefined for not related instances, without refresh',
         function (done) {
-          var result;
+          let result;
           instance1 = {
             related_sources: [{id: 1}, {id: 2}, {id: 3}],
             related_destinations: [{id: 4}]
@@ -97,7 +97,7 @@ describe('CMS.Models.Relationship ', function () {
         });
 
       it('returns intersecting RS after refresh instance', function (done) {
-        var result;
+        let result;
         instance1 = {
           related_sources: [{id: 1}, {id: 2}, {id: 3}],
           related_destinations: [{id: 4}],
@@ -109,7 +109,7 @@ describe('CMS.Models.Relationship ', function () {
           related_sources: [{id: 7}, {id: 5}, {id: 6}],
           related_destinations: [{id: 8}],
           refresh: function () {
-            var self = this;
+            let self = this;
             self.related_destinations.push({id: 4});
             return self;
           }
@@ -125,7 +125,7 @@ describe('CMS.Models.Relationship ', function () {
       });
 
       it('returns all RS for multiple intersection', function (done) {
-        var result;
+        let result;
         instance1 = {
           related_sources: [{id: 1}, {id: 2}, {id: 3}],
           related_destinations: [{id: 4}, {id: 5}]
@@ -155,7 +155,7 @@ describe('CMS.Models.Relationship ', function () {
       });
 
       it('returns RS instance', function (done) {
-        var result;
+        let result;
         instance1 = {
           related_sources: [{id: 1}, {id: 2}, {id: 3}],
           related_destinations: [{id: 4}],
@@ -167,7 +167,7 @@ describe('CMS.Models.Relationship ', function () {
           related_sources: [{id: 7}, {id: 5}, {id: 6}],
           related_destinations: [{id: 8}],
           refresh: function () {
-            var self = this;
+            let self = this;
             self.related_destinations.push({id: 4});
             return self;
           }
@@ -185,7 +185,7 @@ describe('CMS.Models.Relationship ', function () {
   });
 
   describe('unmap() method', function () {
-    var model;
+    let model;
 
     beforeEach(function () {
       model = new CMS.Models.Relationship({id: 'testId'});

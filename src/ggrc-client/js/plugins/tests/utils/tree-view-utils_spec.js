@@ -8,8 +8,8 @@ import * as module from '../../../plugins/utils/tree-view-utils';
 describe('TreeViewUtils module', function () {
   'use strict';
 
-  var method;
-  var origPageType;
+  let method;
+  let origPageType;
 
   beforeAll(function () {
     origPageType = GGRC.pageType;
@@ -21,9 +21,9 @@ describe('TreeViewUtils module', function () {
   });
 
   describe('getColumnsForModel() method', function () {
-    var origCustomAttrDefs;
-    var origRoleList;
-    var origAttrs;
+    let origCustomAttrDefs;
+    let origRoleList;
+    let origAttrs;
 
     beforeAll(function () {
       method = module.getColumnsForModel;
@@ -62,11 +62,11 @@ describe('TreeViewUtils module', function () {
     });
 
     it('includes custom roles info in the result ', function () {
-      var result = method('Audit', null);
+      let result = method('Audit', null);
       result = _.filter(result.available, {attr_type: 'role'});
 
       ['Role 3', 'Role 9'].forEach(function (title) {
-        var expected = {
+        let expected = {
           attr_type: 'role',
           attr_title: 'Role 9',
           attr_name: 'Role 9',
@@ -78,7 +78,7 @@ describe('TreeViewUtils module', function () {
   });
 
   describe('getSortingForModel() method', function () {
-    var noDefaultSortingModels = [
+    let noDefaultSortingModels = [
       'Cycle',
       'TaskGroup',
       'TaskGroupTask',
@@ -101,8 +101,8 @@ describe('TreeViewUtils module', function () {
   });
 
   describe('getModelsForSubTier() method', function () {
-    var baseWidgetsByType;
-    var origFilter;
+    let baseWidgetsByType;
+    let origFilter;
 
     beforeAll(function () {
       baseWidgetsByType = GGRC.tree_view.attr('base_widgets_by_type');
@@ -122,7 +122,7 @@ describe('TreeViewUtils module', function () {
 
     it('gets selected models from model\'s default_filter when available',
     function () {
-      var result;
+      let result;
 
       CMS.Models.CycleTaskGroupObjectTask
         .sub_tree_view_options.default_filter = ['Audit'];
@@ -135,7 +135,7 @@ describe('TreeViewUtils module', function () {
 
     it('returns all available models as selected when ' +
       'model\'s default_filter is not available', function () {
-      var result;
+      let result;
 
       CMS.Models.CycleTaskGroupObjectTask
         .sub_tree_view_options.default_filter = null;

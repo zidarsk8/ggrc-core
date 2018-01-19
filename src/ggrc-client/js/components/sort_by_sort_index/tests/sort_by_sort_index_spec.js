@@ -6,15 +6,15 @@
 describe('GGRC.Components.tasksSortList', function () {
   'use strict';
 
-  var Component;  // the component under test
+  let Component;  // the component under test
 
   beforeAll(function () {
     Component = GGRC.Components.get('tasksSortList');
   });
 
   describe('compareTasks() method', function () {
-    var fakeContext;
-    var method;  // the method under test
+    let fakeContext;
+    let method;  // the method under test
 
     function fakeGetTaskDate(instance, type) {
       if (!_.contains(['start', 'end'], type)) {
@@ -36,14 +36,14 @@ describe('GGRC.Components.tasksSortList', function () {
     it('returns a negative number if the 1st task\'s start date comes ' +
       'before the 2nd task\'s start date',
       function () {
-        var task = new can.Map({
+        let task = new can.Map({
           instance: {start_date: '2016-05-12'}
         });
-        var task2 = new can.Map({
+        let task2 = new can.Map({
           instance: {start_date: '2016-05-13'}
         });
 
-        var result = method(task, task2);
+        let result = method(task, task2);
 
         expect(typeof result).toEqual('number');
         expect(result).toBeLessThan(0);
@@ -53,14 +53,14 @@ describe('GGRC.Components.tasksSortList', function () {
     it('returns a positive number if the 1st task\'s start date comes ' +
       'after the 2nd task\'s start date',
       function () {
-        var task = new can.Map({
+        let task = new can.Map({
           instance: {start_date: '2016-05-12'}
         });
-        var task2 = new can.Map({
+        let task2 = new can.Map({
           instance: {start_date: '2016-05-11'}
         });
 
-        var result = method(task, task2);
+        let result = method(task, task2);
 
         expect(typeof result).toEqual('number');
         expect(result).toBeGreaterThan(0);
@@ -68,8 +68,8 @@ describe('GGRC.Components.tasksSortList', function () {
     );
 
     describe('comparing tasks with the same start dates', function () {
-      var task;
-      var task2;
+      let task;
+      let task2;
 
       beforeEach(function () {
         task = new can.Map({
@@ -83,7 +83,7 @@ describe('GGRC.Components.tasksSortList', function () {
       it('returns a negative number if the 1st task\'s end date comes ' +
         'before the 2nd task\'s end date',
         function () {
-          var result;
+          let result;
 
           task.instance.attr('end_date', '2016-09-16');
           task2.instance.attr('end_date', '2016-09-17');
@@ -98,7 +98,7 @@ describe('GGRC.Components.tasksSortList', function () {
       it('returns a positive number if the 1st task\'s end date comes ' +
         'after the 2nd task\'s end date',
         function () {
-          var result;
+          let result;
 
           task.instance.attr('end_date', '2016-09-16');
           task2.instance.attr('end_date', '2016-09-15');
@@ -111,7 +111,7 @@ describe('GGRC.Components.tasksSortList', function () {
       );
 
       it('returns zero if both tasks\' end dates are the same', function () {
-        var result;
+        let result;
 
         task.instance.attr('end_date', '2016-09-16');
         task2.instance.attr('end_date', '2016-09-16');
@@ -125,7 +125,7 @@ describe('GGRC.Components.tasksSortList', function () {
   });
 
   describe('getTaskDate() method', function () {
-    var method;  // the method under test
+    let method;  // the method under test
 
     beforeAll(function () {
       method = Component.prototype.getTaskDate;
@@ -140,26 +140,26 @@ describe('GGRC.Components.tasksSortList', function () {
     });
 
     it('returns task\'s start date if requested and date exists', function () {
-      var task = new can.Map({
+      let task = new can.Map({
         start_date: '2016-01-25',
         end_date: '2016-04-18'
       });
 
-      var result = method(task, 'start');
-      var expected = moment.utc('2016-01-25');
+      let result = method(task, 'start');
+      let expected = moment.utc('2016-01-25');
 
       expect(moment.isMoment(result)).toBe(true);
       expect(result.isSame(expected)).toBe(true);
     });
 
     it('returns task\'s end date if requested and date exists', function () {
-      var task = new can.Map({
+      let task = new can.Map({
         start_date: '2016-01-25',
         end_date: '2016-04-18'
       });
 
-      var result = method(task, 'end');
-      var expected = moment.utc('2016-04-18');
+      let result = method(task, 'end');
+      let expected = moment.utc('2016-04-18');
 
       expect(moment.isMoment(result)).toBe(true);
       expect(result.isSame(expected)).toBe(true);
@@ -168,10 +168,10 @@ describe('GGRC.Components.tasksSortList', function () {
     it('returns a date relative to the current year if start date ' +
       'is not set on the task',
       function () {
-        var expected;
-        var result;
-        var task;
-        var fakeToday = moment.utc('2013-11-20T14:30:52.012Z');
+        let expected;
+        let result;
+        let task;
+        let fakeToday = moment.utc('2013-11-20T14:30:52.012Z');
 
         jasmine.clock().mockDate(fakeToday.toDate());
 
@@ -195,10 +195,10 @@ describe('GGRC.Components.tasksSortList', function () {
     it('returns a date relative to the current date if end date ' +
       'is not set on the task',
       function () {
-        var expected;
-        var result;
-        var task;
-        var fakeToday = moment.utc('2013-11-20T14:30:52.012Z');
+        let expected;
+        let result;
+        let task;
+        let fakeToday = moment.utc('2013-11-20T14:30:52.012Z');
 
         jasmine.clock().mockDate(fakeToday.toDate());
 
@@ -222,10 +222,10 @@ describe('GGRC.Components.tasksSortList', function () {
     it('returns the last day of the current month if the task\'s month ' +
       'offset is not set and the days offset would cause a month overflow',
       function () {
-        var expected;
-        var result;
-        var task;
-        var fakeToday = moment.utc('2013-09-24T14:30:52.012Z');
+        let expected;
+        let result;
+        let task;
+        let fakeToday = moment.utc('2013-09-24T14:30:52.012Z');
 
         jasmine.clock().mockDate(fakeToday.toDate());
 

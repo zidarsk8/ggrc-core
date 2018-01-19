@@ -7,7 +7,7 @@ import RefreshQueue from './refresh_queue';
 import {getClosestWeekday} from '../plugins/utils/date-util';
 
 (function (can) {
-  var _mustachePath;
+  let _mustachePath;
 
   function refreshAttr(instance, attr) {
     if (instance.attr(attr).reify().selfLink) {
@@ -48,8 +48,8 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
     }
 
     workflow.refresh_all('cycles').then(function (cycleList) {
-      var activeCycleList = _.filter(cycleList, {is_current: true});
-      var activeCycle;
+      let activeCycleList = _.filter(cycleList, {is_current: true});
+      let activeCycle;
 
       if (!activeCycleList.length) {
         $(document.body).trigger(
@@ -106,7 +106,7 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
       disable_columns_configuration: true
     },
     init: function () {
-      var that = this;
+      let that = this;
       this._super.apply(this, arguments);
       this.bind('created', refreshAttrWrap('workflow').bind(this));
       this.bind('destroyed', function (ev, inst) {
@@ -125,7 +125,7 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
     }
   }, {
     init: function () {
-      var that = this;
+      let that = this;
       this._super.apply(this, arguments);
     }
   });
@@ -186,13 +186,13 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
     },
 
     init: function () {
-      var that = this;
+      let that = this;
       this._super.apply(this, arguments);
 
       this.validateNonBlank('contact');
       this.validateContact(['_transient.contact', 'contact']);
       this.bind('updated', function (ev, instance) {
-        var dfd;
+        let dfd;
         if (instance instanceof that) {
           dfd = instance.refresh_all_force('cycle', 'workflow');
           dfd.then(function () {
@@ -312,8 +312,8 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
       default_filter: ['Control'],
     },
     init: function () {
-      var that = this;
-      var assigneeRole = _.find(GGRC.access_control_roles, {
+      let that = this;
+      let assigneeRole = _.find(GGRC.access_control_roles, {
         object_type: 'CycleTaskGroupObjectTask',
         name: 'Task Assignees',
       });
@@ -329,8 +329,8 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
       //   .replace(...) doesn't raise change event
       // that's why we subscribe on access_control_list.length
       this.validate('access_control_list.length', function () {
-        var that = this;
-        var hasAssignee = assigneeRole && _.some(that.access_control_list, {
+        let that = this;
+        let hasAssignee = assigneeRole && _.some(that.access_control_list, {
           ac_role_id: assigneeRole.id,
         });
 
@@ -364,10 +364,10 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
       populateFromWorkflow(this, workflow);
     },
     form_preload: function (newObjectForm, objectParams) {
-      var form = this;
-      var workflows;
-      var _workflow;
-      var cycle;
+      let form = this;
+      let workflows;
+      let _workflow;
+      let cycle;
       let startDate;
       let endDate;
 
@@ -408,8 +408,8 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
      *   false otherwise
      */
     responseOptionsEditable: function () {
-      var cycle = this.attr('cycle').reify();
-      var status = this.attr('status');
+      let cycle = this.attr('cycle').reify();
+      let status = this.attr('status');
 
       return cycle.attr('is_current') &&
         !_.contains(['Finished', 'Verified'], status);

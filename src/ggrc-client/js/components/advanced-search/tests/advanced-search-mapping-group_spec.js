@@ -9,7 +9,7 @@ import Component from '../advanced-search-mapping-group';
 describe('GGRC.Components.advancedSearchMappingGroup', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(() => {
     viewModel = new Component.prototype.viewModel();
@@ -17,7 +17,7 @@ describe('GGRC.Components.advancedSearchMappingGroup', function () {
 
   describe('addMappingCriteria() method', function () {
     it('adds operator and criteria', function () {
-      var items;
+      let items;
       viewModel.attr('items',
         [AdvancedSearch.create.mappingCriteria()]);
       viewModel.addMappingCriteria();

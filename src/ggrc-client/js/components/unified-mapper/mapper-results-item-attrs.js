@@ -10,7 +10,7 @@ import template from './templates/mapper-results-item-attrs.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var DEFAULT_ATTR_TEMPLATE =
+  let DEFAULT_ATTR_TEMPLATE =
     '/static/mustache/base_objects/tree-item-attr.mustache';
 
   GGRC.Components('mapperResultsItemAttrs', {
@@ -18,8 +18,8 @@ import template from './templates/mapper-results-item-attrs.mustache';
     template: template,
     viewModel: {
       init: function () {
-        var Model = CMS.Models[this.attr('modelType')];
-        var attrTemplate = Model.tree_view_options.attr_view;
+        let Model = CMS.Models[this.attr('modelType')];
+        let attrTemplate = Model.tree_view_options.attr_view;
         this.attr('attrTemplate', attrTemplate || DEFAULT_ATTR_TEMPLATE);
       },
       instance: null,

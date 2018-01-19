@@ -7,11 +7,11 @@
   /**
    * Util methods for integration with Dashboards.
    */
-var DASHBOARD_CA_TYPES = ['text'];
+let DASHBOARD_CA_TYPES = ['text'];
 
 function getCaConfiguration() {
-  var caNameRegexpString;
-  var caValueRegexpString;
+  let caNameRegexpString;
+  let caValueRegexpString;
 
   if (GGRC.DASHBOARD_INTEGRATION) {
     caNameRegexpString = GGRC.DASHBOARD_INTEGRATION.ca_name_regexp;
@@ -34,7 +34,7 @@ function getCaConfiguration() {
  * @return {Boolean} True or False
  */
 function isDashboardEnabled(instance) {
-  var configuration = getCaConfiguration();
+  let configuration = getCaConfiguration();
 
   if (!configuration) {
     return false;
@@ -53,7 +53,7 @@ function isDashboardEnabled(instance) {
  * @return {Object} Url
  */
 function getDashboards(instance) {
-  var configuration = getCaConfiguration();
+  let configuration = getCaConfiguration();
 
   return getDashboardsFromCas(
     instance,
@@ -68,8 +68,8 @@ function instanceHasValidCas(instance, caNameRegexp, caValueRegexp) {
 }
 
 function getDashboardsFromCas(instance, caNameRegexp, caValueRegexp) {
-  var cads = can.makeArray(instance.attr('custom_attribute_definitions'));
-  var cavs = can.makeArray(instance.attr('custom_attribute_values'));
+  let cads = can.makeArray(instance.attr('custom_attribute_definitions'));
+  let cavs = can.makeArray(instance.attr('custom_attribute_values'));
   if (!cads.length || !cavs.length) {
     return [];
   }
@@ -79,12 +79,12 @@ function getDashboardsFromCas(instance, caNameRegexp, caValueRegexp) {
   });
 
   return cads.reduce(function (result, cad) {
-    var caType = cad.attr('attribute_type');
-    var dashboardName;
-    var caName;
-    var caNameMatches;
-    var caValue;
-    var cav;
+    let caType = cad.attr('attribute_type');
+    let dashboardName;
+    let caName;
+    let caNameMatches;
+    let caValue;
+    let cav;
 
     if (!DASHBOARD_CA_TYPES.includes(caType.toLowerCase())) {
       return result;

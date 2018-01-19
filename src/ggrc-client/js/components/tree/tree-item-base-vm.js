@@ -25,7 +25,7 @@ export default can.Map.extend({
   itemSelector: '',
   $el: null,
   onExpand: function (event) {
-    var isExpanded = this.attr('expanded');
+    let isExpanded = this.attr('expanded');
 
     if (event && isExpanded !== event.state) {
       if (isExpanded !== event.state) {
@@ -36,7 +36,7 @@ export default can.Map.extend({
     }
   },
   onClick: function ($element) {
-    var instance = this.attr('instance');
+    let instance = this.attr('instance');
 
     switch (instance.attr('type')) {
       case 'Person':
@@ -71,8 +71,8 @@ export default can.Map.extend({
       });
   },
   select: function ($element) {
-    var instance = this.attr('instance');
-    var itemSelector = this.attr('itemSelector');
+    let instance = this.attr('instance');
+    let itemSelector = this.attr('itemSelector');
 
     if (instance.type === 'Assessment') {
       tracker.start(instance.type,

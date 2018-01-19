@@ -18,7 +18,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
   }
 
   GGRC.register_hook = function(path, hook) {
-    var h, parent_path, last;
+    let h, parent_path, last;
     parent_path = path.split(".");
     last = parent_path.pop();
     parent_path = can.getObject(parent_path.join("."), GGRC.hooks, true);
@@ -29,9 +29,9 @@ import PersistentNotifier from './plugins/persistent_notifier';
     h.push(hook);
   };
 
-  var onbeforeunload = function (evnt) {
+  let onbeforeunload = function (evnt) {
       evnt = evnt || window.event;
-      var message = 'There are operations in progress. Are you sure you want to leave the page?';
+      let message = 'There are operations in progress. Are you sure you want to leave the page?';
       if (evnt) {
         evnt.returnValue = message;
       }
@@ -49,7 +49,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
 
   $.extend(GGRC, {
     get_object_type_decision_tree: function() {
-      var tree = {},
+      let tree = {},
         extensions = GGRC.extensions || []
       ;
 
@@ -67,11 +67,11 @@ import PersistentNotifier from './plugins/persistent_notifier';
     },
 
     infer_object_type: function(data) {
-      var decision_tree = GGRC.get_object_type_decision_tree();
+      let decision_tree = GGRC.get_object_type_decision_tree();
 
       function resolve_by_key(subtree, data) {
-        var kind = data[subtree._key];
-        var model;
+        let kind = data[subtree._key];
+        let model;
         can.each(subtree, function(v, k) {
           if (k != "_key" && v.meta_kinds.indexOf(kind) >= 0) {
             model = v;
@@ -118,7 +118,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
     eventqueueTimegap: 20, //ms
 
     queue_exec_next: function() {
-      var fn = GGRC.eventqueue.shift();
+      let fn = GGRC.eventqueue.shift();
       if (fn)
         fn();
       if (GGRC.eventqueue.length > 0)
@@ -150,7 +150,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
   });
 
   GGRC.Errors = (function () {
-    var messages = {
+    let messages = {
       'default': 'There was an error!',
       '401': 'The server says you are not authorized. Are you logged in?',
       '403': 'You don\'t have the permission to access the ' +
@@ -170,7 +170,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
      * @param  {Object} [data] data to populate mustache template
      */
     function notifier(type, message, data) {
-      var props = {};
+      let props = {};
 
       if ( message && data ) {
         message = can.mustache(message);
@@ -184,7 +184,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
 
     function notifierXHR(type, message) {
       return function (err) {
-        var status = err && err.status ? err.status : null;
+        let status = err && err.status ? err.status : null;
 
         if (status && !message) {
           message = GGRC.Errors.messages[status];
@@ -220,7 +220,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
       @return the sum of the numbers represented in a and b, as a decimal notation string.
     */
     string_add: function(a, b) {
-      var _a, _b, i,
+      let _a, _b, i,
         _c = 0,
         ret = [],
         adi = a.indexOf("."),
@@ -271,7 +271,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
       @return one half of the number represented in a, as a decimal notation string.
     */
     string_half: function(a) {
-      var i, _a,
+      let i, _a,
         _c = 0,
         ret = [];
 
@@ -321,7 +321,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
       @return true if the number represented in a is less than that in b, false otherwise
     */
     string_less_than: function(a, b) {
-      var i,
+      let i,
         _a = ("" + a).replace(/^0*/, ""),
         _b = ("" + b).replace(/^0*/, ""),
         adi = _a.indexOf("."),
@@ -380,7 +380,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
     * @return {string|null} - Date object or null if string is not in ISO format or null
     */
     getDate(date, format = GGRC.Date.MOMENT_ISO_DATE) {
-      var momDate;
+      let momDate;
 
       if (date instanceof Date) {
         return date;

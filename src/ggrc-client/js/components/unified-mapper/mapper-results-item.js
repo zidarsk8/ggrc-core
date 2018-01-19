@@ -23,21 +23,21 @@ import template from './templates/mapper-results-item.mustache';
       selectedColumns: [],
       showDetails: false,
       title: function () {
-        var displayItem = this.displayItem();
+        let displayItem = this.displayItem();
         return displayItem.title ||
           displayItem.description_inline ||
           displayItem.name ||
           displayItem.email;
       },
       displayItem: function () {
-        var itemData = this.attr('itemData');
+        let itemData = this.attr('itemData');
         return itemData.revision ?
           itemData.revision.content :
           itemData;
       },
       objectTypeIcon: function () {
-        var objectType = this.objectType();
-        var Model = CMS.Models[objectType];
+        let objectType = this.objectType();
+        let Model = CMS.Models[objectType];
         return 'fa-' + Model.table_singular;
       },
       toggleIconCls: function () {

@@ -7,7 +7,7 @@ import Component from '../cycle-task-group-object-task';
 import RefreshQueue from '../../../../models/refresh_queue';
 
 describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
-  var viewModel;
+  let viewModel;
 
   beforeEach(function () {
     viewModel = new Component.prototype.viewModel({
@@ -22,7 +22,7 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
 
   describe('viewModel scope', function () {
     describe('init() method', function () {
-      var cycleDfd;
+      let cycleDfd;
 
       beforeEach(function () {
         cycleDfd = new can.Deferred();
@@ -45,9 +45,9 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
 
     describe('loadCycle() method', function () {
       describe('when reified cycle is not empty', function () {
-        var trigger;
-        var triggerDfd;
-        var reifiedCycle;
+        let trigger;
+        let triggerDfd;
+        let reifiedCycle;
 
         beforeEach(function () {
           reifiedCycle = new can.Map({data: 'Data'});
@@ -60,7 +60,7 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
         });
 
         it('adds reified cycle to the refresh queue', function () {
-          var enqueue = spyOn(RefreshQueue.prototype, 'enqueue')
+          let enqueue = spyOn(RefreshQueue.prototype, 'enqueue')
             .and.returnValue({trigger: trigger});
           viewModel.loadCycle();
           expect(enqueue).toHaveBeenCalledWith(reifiedCycle);
@@ -72,13 +72,13 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
         });
 
         it('returns deferred result', function () {
-          var result = viewModel.loadCycle();
+          let result = viewModel.loadCycle();
           expect(can.isDeferred(result)).toBe(true);
         });
 
         describe('when the refresh queue was resolved', function () {
           it('returns first result of response', function (done) {
-            var data = {data: 'Data'};
+            let data = {data: 'Data'};
             triggerDfd.resolve([data]);
             viewModel.loadCycle().then(function (response) {
               expect(response).toBe(data);
@@ -87,7 +87,7 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
           });
 
           it('sets cycle to viewModel', function (done) {
-            var data = 'cycle';
+            let data = 'cycle';
             triggerDfd.resolve([data]);
             viewModel.loadCycle().then(function () {
               expect(viewModel.attr('cycle')).toEqual(data);
@@ -104,10 +104,10 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
 
     describe('loadWorkflow() method', function () {
       describe('when cycle was loaded successfully', function () {
-        var trigger;
-        var triggerDfd;
-        var reifiedObject;
-        var cycle;
+        let trigger;
+        let triggerDfd;
+        let reifiedObject;
+        let cycle;
 
         beforeEach(function () {
           cycle = new can.Map({
@@ -123,7 +123,7 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
         });
 
         describe('before workflow loading', function () {
-          var enqueue;
+          let enqueue;
 
           beforeEach(function () {
             enqueue = spyOn(RefreshQueue.prototype, 'enqueue')
@@ -151,7 +151,7 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
         describe('after workflow loading', function () {
           it('sets first value of loaded data to workflow field',
           function (done) {
-            var data = {data: 'Data'};
+            let data = {data: 'Data'};
             triggerDfd.resolve([data]);
             viewModel.loadWorkflow(cycle)
               .then(function () {
@@ -164,8 +164,8 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
     });
 
     describe('onStateChange() method', function () {
-      var refreshDfd;
-      var event;
+      let refreshDfd;
+      let event;
 
       beforeEach(function () {
         event = {};
@@ -181,7 +181,7 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
       });
 
       describe('when refresh operation was resolved', function () {
-        var refreshed;
+        let refreshed;
 
         beforeEach(function () {
           refreshed = new can.Map({
@@ -210,7 +210,7 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
     });
 
     describe('showLink() method', function () {
-      var pageInstance;
+      let pageInstance;
 
       beforeEach(function () {
         pageInstance = spyOn(GGRC, 'page_instance');
@@ -218,7 +218,7 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
 
       describe('returns true', function () {
         it('if the workflow is not a page instance', function () {
-          var pageInstanceObj = {
+          let pageInstanceObj = {
             type: 'Type',
           };
           pageInstance.and.returnValue(pageInstanceObj);
@@ -228,7 +228,7 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
 
       describe('returns false', function () {
         it('if the workflow is a page instance', function () {
-          var pageInstanceObj = {
+          let pageInstanceObj = {
             type: 'Workflow',
           };
           pageInstance.and.returnValue(pageInstanceObj);

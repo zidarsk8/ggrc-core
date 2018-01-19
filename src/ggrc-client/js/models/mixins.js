@@ -14,11 +14,11 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
 (function (can, GGRC) {
   can.Construct.extend('can.Model.Mixin', {
     extend: function (fullName, klass, proto) {
-      var tempname;
-      var mixinName;
-      var parts;
-      var shortName;
-      var Constructor;
+      let tempname;
+      let mixinName;
+      let parts;
+      let shortName;
+      let Constructor;
 
       if (typeof fullName === 'string') {
         // Mixins do not go into the global namespace.
@@ -53,11 +53,11 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
       }
       function setupFns(obj) {
         return function (fn, key) {
-          var blockedKeys = ['fullName', 'defaults', '_super', 'constructor'];
-          var aspect = ~key.indexOf(':') ?
+          let blockedKeys = ['fullName', 'defaults', '_super', 'constructor'];
+          let aspect = ~key.indexOf(':') ?
             key.substr(0, key.indexOf(':')) :
             'after';
-          var oldfn;
+          let oldfn;
 
           key = ~key.indexOf(':') ? key.substr(key.indexOf(':') + 1) : key;
           if (fn !== can.Model.Mixin[key] && !~can.inArray(key, blockedKeys)) {
@@ -148,7 +148,7 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
     }
   }, {
     before_create: function () {
-      var person = {
+      let person = {
         id: GGRC.current_user.id,
         type: 'Person'
       };
@@ -157,7 +157,7 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
       }
     },
     form_preload: function (newObjectForm) {
-      var person = {
+      let person = {
         id: GGRC.current_user.id,
         type: 'Person'
       };
@@ -210,10 +210,10 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
 
   can.Model.Mixin('inScopeObjects', {}, {
     updateScopeObject: function () {
-      var objType = 'Audit';
-      var queryType = 'values';
-      var queryFields = ['id', 'type', 'title', 'context', 'issue_tracker'];
-      var query =
+      let objType = 'Audit';
+      let queryType = 'values';
+      let queryFields = ['id', 'type', 'title', 'context', 'issue_tracker'];
+      let query =
         buildParam(objType, {
           current: 1,
           pageSize: 1
@@ -224,7 +224,7 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
         }, queryFields);
       return batchRequests(query)
         .done(function (valueArr) {
-          var audit = valueArr[objType][queryType][0];
+          let audit = valueArr[objType][queryType][0];
 
           this.attr('audit', audit);
           if (audit && audit.issue_tracker) {
@@ -330,21 +330,21 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
      *   confirm/reject the dialog.
      */
     confirmBeginEdit: function () {
-      var STATUS_NOT_STARTED = 'Not Started';
-      var STATUS_IN_PROGRESS = 'In Progress';
-      var IGNORED_STATES = [STATUS_NOT_STARTED, STATUS_IN_PROGRESS];
+      let STATUS_NOT_STARTED = 'Not Started';
+      let STATUS_IN_PROGRESS = 'In Progress';
+      let IGNORED_STATES = [STATUS_NOT_STARTED, STATUS_IN_PROGRESS];
 
-      var TITLE = [
+      let TITLE = [
         'Confirm moving ', this.type, ' to "', STATUS_IN_PROGRESS, '"'
       ].join('');
 
-      var DESCRIPTION = [
+      let DESCRIPTION = [
         'If you modify a value, the status of the ', this.type,
         ' will move from "', this.status, '" to "',
         STATUS_IN_PROGRESS, '" - are you sure about that?'
       ].join('');
 
-      var confirmation = can.Deferred();
+      let confirmation = can.Deferred();
 
       if (_.includes(IGNORED_STATES, this.status)) {
         confirmation.resolve();
@@ -427,13 +427,13 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
       }.bind(this));
     },
     _isOverdue: function () {
-      var doneState = this.attr('is_verification_needed') ?
+      let doneState = this.attr('is_verification_needed') ?
         'Verified' : 'Finished';
-      var endDate = moment(
+      let endDate = moment(
         this.attr('next_due_date') || this.attr('end_date'));
-      var today = moment().startOf('day');
-      var startOfDate = moment(endDate).startOf('day');
-      var isOverdue = endDate && today.diff(startOfDate, 'days') > 0;
+      let today = moment().startOf('day');
+      let startOfDate = moment(endDate).startOf('day');
+      let isOverdue = endDate && today.diff(startOfDate, 'days') > 0;
 
       if (this.attr('status') === doneState) {
         return false;
@@ -447,7 +447,7 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
    */
   can.Model.Mixin('refetchHash', {
     getHashFragment: function () {
-      var widgetName = this.constructor.table_singular;
+      let widgetName = this.constructor.table_singular;
       if (window.location.hash
           .startsWith(['#', widgetName, '_widget'].join(''))) {
         return;

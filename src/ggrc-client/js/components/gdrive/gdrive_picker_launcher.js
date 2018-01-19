@@ -38,13 +38,13 @@ import RefreshQueue from '../../models/refresh_queue';
         return slug.toLowerCase().replace(/\W+/g, '-');
       },
       removeOldSuffix: function (fileName) {
-        var delPos = fileName.lastIndexOf('_ggrc_');
+        let delPos = fileName.lastIndexOf('_ggrc_');
         return delPos > 0 ? fileName.substring(0, delPos) : fileName;
       },
       addFileSuffix: function (fileName) {
-        var assesmentSlug =
+        let assesmentSlug =
           this.sanitizeSlug(this.attr('instance').attr('slug'));
-        var suffixArr = ['ggrc', assesmentSlug];
+        let suffixArr = ['ggrc', assesmentSlug];
 
         suffixArr = suffixArr.concat(
           this.attr('assessmentTypeObjects').map(function (obj) {
@@ -67,7 +67,7 @@ import RefreshQueue from '../../models/refresh_queue';
        * @return {Object}             gapi.client.request object
        */
       createEditRequest: function (file) {
-        var requestBody = {};
+        let requestBody = {};
 
         requestBody.name = file.attr('name');
 
@@ -91,7 +91,7 @@ import RefreshQueue from '../../models/refresh_queue';
        * @return {Object}             gapi.client.request object
        */
       createCopyRequest: function (file, newParentId) {
-        var requestBody = {
+        let requestBody = {
           parents: [newParentId || 'root'],
         };
 
@@ -118,8 +118,8 @@ import RefreshQueue from '../../models/refresh_queue';
        * @return {Promise} Promise which resolves to array of renamed file objects
        */
       runRenameBatch: function (requestsBatch, originalFileNames) {
-        var fileRenameBatch = gapi.client.newBatch();
-        var resultFiles = new can.Deferred();
+        let fileRenameBatch = gapi.client.newBatch();
+        let resultFiles = new can.Deferred();
 
         if ( !requestsBatch.length ) {
           return resultFiles.resolve([]);
@@ -133,8 +133,8 @@ import RefreshQueue from '../../models/refresh_queue';
         // even when some of requests failed so we manually parsing the
         // response object to find errors
         fileRenameBatch.then((batchRes) => {
-          var newFiles = [];
-          var errors = [];
+          let newFiles = [];
+          let errors = [];
 
           can.each(batchRes.result, function (response, fileId) {
             if ( response.status === 200 ) {
@@ -176,31 +176,31 @@ import RefreshQueue from '../../models/refresh_queue';
        * @return {Promise}          Promise which resolves to array of new files
        */
       addFilesSuffixes: function (opts = {}, files) {
-        var fileRenameDfd = can.Deferred();
-        var requestsBatch = [];
-        var originalFileNames = {};
-        var newParentId = opts.dest && opts.dest.id;
-        var untouchedFiles = [];
+        let fileRenameDfd = can.Deferred();
+        let requestsBatch = [];
+        let originalFileNames = {};
+        let newParentId = opts.dest && opts.dest.id;
+        let untouchedFiles = [];
 
         files.forEach((file) => {
-          var req;
+          let req;
 
           // TODO: maybe pick the one format (the one that comes after refresh)?
-          var originalFileName = file.attr('title') ||
+          let originalFileName = file.attr('title') ||
             file.attr('originalFilename') || file.attr('name');
 
-          var newFileName = this.addFileSuffix(originalFileName);
+          let newFileName = this.addFileSuffix(originalFileName);
 
-          var parents = (file.parents && file.parents.attr()) || [];
+          let parents = (file.parents && file.parents.attr()) || [];
 
-          var originalFileExistsInDest = Boolean(
+          let originalFileExistsInDest = Boolean(
             parents.find((parent) =>
               (parent.id === newParentId) || (!newParentId && parent.isRoot))
           );
-          var newFileExistsInDest = originalFileExistsInDest &&
+          let newFileExistsInDest = originalFileExistsInDest &&
             ( newFileName === originalFileName );
 
-          var sharedFile = file.attr('userPermission.role') !== 'owner';
+          let sharedFile = file.attr('userPermission.role') !== 'owner';
 
           file.attr('title', newFileName);
           file.attr('name', newFileName);
@@ -244,7 +244,7 @@ import RefreshQueue from '../../models/refresh_queue';
         return fileRenameDfd;
       },
       beforeCreateHandler: function (files) {
-        var tempFiles = files.map(function (file) {
+        let tempFiles = files.map(function (file) {
           return {
             title: this.addFileSuffix(file.name),
             link: file.url,
@@ -270,13 +270,13 @@ import RefreshQueue from '../../models/refresh_queue';
         }
       },
       onClickHandler: function (scope, el, event) {
-        var eventType = this.attr('click_event');
-        var handler = this[eventType] || function () {};
-        var confirmation = can.isFunction(this.confirmationCallback) ?
+        let eventType = this.attr('click_event');
+        let handler = this[eventType] || function () {};
+        let confirmation = can.isFunction(this.confirmationCallback) ?
           this.confirmationCallback() :
           null;
-        var args = arguments;
-        var that = this;
+        let args = arguments;
+        let that = this;
 
         event.preventDefault();
         can.when(confirmation).then(function () {
@@ -322,9 +322,9 @@ import RefreshQueue from '../../models/refresh_queue';
 
       trigger_upload_parent: function (scope, el) {
         // upload files with a parent folder (audits and workflows)
-        var that = this;
-        var parentFolderDfd;
-        var folderId;
+        let that = this;
+        let parentFolderDfd;
+        let folderId;
 
         if (that.instance.attr('_transient.folder')) {
           parentFolderDfd = can.when(
@@ -353,7 +353,7 @@ import RefreshQueue from '../../models/refresh_queue';
               })
               .fail(function () {
                 // This case happens when user have no access to write in audit folder
-                var error = _.last(arguments);
+                let error = _.last(arguments);
                 if (error && error.code === 403) {
                   GGRC.Errors.notifier('error', GGRC.Errors.messages[403]);
 
@@ -376,15 +376,15 @@ import RefreshQueue from '../../models/refresh_queue';
       },
 
       handle_file_upload: function (files) {
-        var that = this;
+        let that = this;
 
-        var dfdDocs = files.map(function (file) {
+        let dfdDocs = files.map(function (file) {
           return new CMS.Models.Document({
             context: that.instance.context || {id: null},
             title: file.title,
             link: file.alternateLink
           }).save().then(function (doc) {
-            var objectDoc;
+            let objectDoc;
 
             if (that.deferred) {
               that.instance.mark_for_addition('documents', doc, {
@@ -409,8 +409,8 @@ import RefreshQueue from '../../models/refresh_queue';
     },
     events: {
       '{viewModel} modal:success': function () {
-        var instance = this.viewModel.instance;
-        var itemsUploadedCallback = this.viewModel.itemsUploadedCallback;
+        let instance = this.viewModel.instance;
+        let itemsUploadedCallback = this.viewModel.itemsUploadedCallback;
 
         if (can.isFunction(itemsUploadedCallback)) {
           itemsUploadedCallback();
@@ -420,7 +420,7 @@ import RefreshQueue from '../../models/refresh_queue';
         }
       },
       '{viewModel} resetItems': function () {
-        var itemsUploadedCallback = this.viewModel.itemsUploadedCallback;
+        let itemsUploadedCallback = this.viewModel.itemsUploadedCallback;
 
         if (can.isFunction(itemsUploadedCallback)) {
           itemsUploadedCallback();

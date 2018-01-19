@@ -9,11 +9,11 @@ import RefreshQueue from '../../../models/refresh_queue';
 describe('GGRC.Components.objectMapper', function () {
   'use strict';
 
-  var Component;
-  var events;
-  var viewModel;
-  var handler;
-  var helpers;
+  let Component;
+  let events;
+  let viewModel;
+  let handler;
+  let helpers;
 
   beforeAll(function () {
     Component = GGRC.Components.get('objectMapper');
@@ -22,7 +22,7 @@ describe('GGRC.Components.objectMapper', function () {
   });
 
   describe('viewModel() method', function () {
-    var parentViewModel;
+    let parentViewModel;
     beforeEach(function () {
       parentViewModel = new can.Map({
         general: {
@@ -56,20 +56,20 @@ describe('GGRC.Components.objectMapper', function () {
     });
 
     it('returns object with function "isLoadingOrSaving"', function () {
-      var result = Component.prototype.viewModel({}, parentViewModel)();
+      let result = Component.prototype.viewModel({}, parentViewModel)();
       expect(result.isLoadingOrSaving).toEqual(jasmine.any(Function));
     });
 
     describe('initializes useSnapshots flag', function () {
       it('with true if set with help a general config', function () {
-        var result;
+        let result;
         parentViewModel.general.useSnapshots = true;
         result = Component.prototype.viewModel({}, parentViewModel)();
         expect(result.attr('useSnapshots')).toEqual(true);
       });
 
       it('do not use Snapshots if not an in-scope model', function () {
-        var result;
+        let result;
         spyOn(SnapshotUtils, 'isInScopeModel')
           .and.returnValue(false);
         result = Component.prototype.viewModel({}, parentViewModel)();
@@ -117,7 +117,7 @@ describe('GGRC.Components.objectMapper', function () {
     });
 
     describe('onSubmit() method', function () {
-      var vm;
+      let vm;
 
       beforeEach(function () {
         vm = new Component.prototype.viewModel({}, parentViewModel)();
@@ -142,7 +142,7 @@ describe('GGRC.Components.objectMapper', function () {
   });
 
   describe('".create-control modal:success" event', function () {
-    var spyObj;
+    let spyObj;
 
     beforeEach(function () {
       viewModel.attr({
@@ -185,7 +185,7 @@ describe('GGRC.Components.objectMapper', function () {
   });
 
   describe('".create-control click" event', function () {
-    var element = {};
+    let element = {};
 
     beforeEach(function () {
       viewModel.attr({});
@@ -219,9 +219,9 @@ describe('GGRC.Components.objectMapper', function () {
   });
 
   describe('"{window} modal:dismiss" event', function () {
-    var options;
-    var spyObj;
-    var element = {};
+    let options;
+    let spyObj;
+    let element = {};
 
     beforeEach(function () {
       viewModel.attr({
@@ -301,7 +301,7 @@ describe('GGRC.Components.objectMapper', function () {
   });
 
   describe('"inserted" event', function () {
-    var that;
+    let that;
 
     beforeEach(function () {
       viewModel.attr({
@@ -328,8 +328,8 @@ describe('GGRC.Components.objectMapper', function () {
   });
 
   describe('"closeModal" event', function () {
-    var element;
-    var spyObj;
+    let element;
+    let spyObj;
 
     beforeEach(function () {
       viewModel.attr({});
@@ -363,8 +363,8 @@ describe('GGRC.Components.objectMapper', function () {
   });
 
   describe('"deferredSave" event', function () {
-    var that;
-    var spyObj;
+    let that;
+    let spyObj;
 
     beforeEach(function () {
       spyObj = {
@@ -401,9 +401,9 @@ describe('GGRC.Components.objectMapper', function () {
   });
 
   describe('".modal-footer .btn-map click" handler', function () {
-    var that;
-    var event;
-    var element;
+    let that;
+    let event;
+    let element;
 
     beforeEach(function () {
       viewModel.attr({
@@ -435,14 +435,14 @@ describe('GGRC.Components.objectMapper', function () {
     });
 
     it('does nothing if element has class "disabled"', function () {
-      var result;
+      let result;
       element.addClass('disabled');
       result = handler.call(that, element, event);
       expect(result).toEqual(undefined);
     });
 
     it('calls deferredSave if it is deferred', function () {
-      var result;
+      let result;
       viewModel.attr('deferred', true);
       result = handler.call(that, element, event);
       expect(result).toEqual('deferredSave');
@@ -461,14 +461,14 @@ describe('GGRC.Components.objectMapper', function () {
   });
 
   describe('get_title() helper', function () {
-    var helper;
+    let helper;
     beforeEach(function () {
       helper = helpers.get_title;
     });
 
     it('returns title of parentInstance if parentInstance defined',
       function () {
-        var result;
+        let result;
         spyOn(CMS.Models, 'get_instance').and.returnValue({
           title: 'mockTitle',
         });
@@ -477,7 +477,7 @@ describe('GGRC.Components.objectMapper', function () {
       });
     it('returns object if parentInstance undefined',
       function () {
-        var result;
+        let result;
         viewModel.attr({
           object: 'mockInstance',
           parentInstance: undefined,
@@ -488,14 +488,14 @@ describe('GGRC.Components.objectMapper', function () {
   });
 
   describe('get_object() helper', function () {
-    var helper;
+    let helper;
 
     beforeEach(function () {
       helper = helpers.get_object;
     });
 
     it('returns type.title_plural if it is defined', function () {
-      var result;
+      let result;
       viewModel.attr({
         type: 'Program',
       });
@@ -503,7 +503,7 @@ describe('GGRC.Components.objectMapper', function () {
       expect(result).toEqual('Programs');
     });
     it('returns "Objects" if type.title_plural is null', function () {
-      var result;
+      let result;
       viewModel.attr({
         type: null,
       });
@@ -513,7 +513,7 @@ describe('GGRC.Components.objectMapper', function () {
   });
 
   describe('allowedToCreate() method', function () {
-    var originalVM;
+    let originalVM;
 
     beforeAll(function () {
       originalVM = viewModel.attr();
@@ -525,7 +525,7 @@ describe('GGRC.Components.objectMapper', function () {
 
     it('returns true if it is not an in-scope model',
       function () {
-        var result;
+        let result;
         spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(false);
         result = viewModel.allowedToCreate();
         expect(result).toEqual(true);
@@ -534,7 +534,7 @@ describe('GGRC.Components.objectMapper', function () {
     it('returns true if it is an in-scope model but mapped type is not ' +
     'snapshotable',
       function () {
-        var result;
+        let result;
         spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(true);
         result = viewModel.allowedToCreate();
         expect(result).toEqual(true);
@@ -543,7 +543,7 @@ describe('GGRC.Components.objectMapper', function () {
     it('returns false if it is an in-scope model and mapped type is ' +
     'snapshotable',
       function () {
-        var result;
+        let result;
         viewModel.attr('type', 'Control');
         spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(true);
         result = viewModel.allowedToCreate();
@@ -552,7 +552,7 @@ describe('GGRC.Components.objectMapper', function () {
   });
 
   describe('showWarning() method', function () {
-    var originalVM;
+    let originalVM;
 
     beforeAll(function () {
       originalVM = viewModel.attr();
@@ -563,7 +563,7 @@ describe('GGRC.Components.objectMapper', function () {
     });
 
     it('returns false if is an in-scope model', function () {
-      var result;
+      let result;
       spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(true);
       result = viewModel.showWarning();
       expect(result).toEqual(false);
@@ -571,7 +571,7 @@ describe('GGRC.Components.objectMapper', function () {
 
     it('returns true if source object is a Snapshot parent and mapped type ' +
     'is snapshotable', function () {
-      var result;
+      let result;
       spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(false);
       viewModel.attr('object', 'Audit');
       viewModel.attr('type', 'Control');
@@ -581,7 +581,7 @@ describe('GGRC.Components.objectMapper', function () {
 
     it('returns true if mapped object is both a ' +
       'Snapshot parent and snapshotable', function () {
-      var result;
+      let result;
       spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(false);
       spyOn(SnapshotUtils, 'isSnapshotParent').and.callFake(function (v) {
         return v === 'o';

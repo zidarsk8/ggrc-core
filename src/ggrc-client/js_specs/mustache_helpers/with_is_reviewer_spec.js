@@ -6,9 +6,9 @@
 import Permission from '../../js/permission';
 
 describe('can.mustache.helper.with_is_reviewer', function () {
-  var fakeOptions;
-  var helper;
-  var assigneeRole;
+  let fakeOptions;
+  let helper;
+  let assigneeRole;
 
   beforeAll(function () {
     fakeOptions = {
@@ -46,7 +46,7 @@ describe('can.mustache.helper.with_is_reviewer', function () {
 
     it('is {is_reviewer: false} when ACL person does not match current user',
       function () {
-        var instance = [{
+        let instance = [{
           access_control_list: {
             ac_role_id: assigneeRole.id,
             person: {
@@ -63,7 +63,7 @@ describe('can.mustache.helper.with_is_reviewer', function () {
 
     it('is {is_reviewer: false} when ACL role non-Task Assignees for user',
       function () {
-        var instance = [{
+        let instance = [{
           access_control_list: {
             ac_role_id: 12,
             person: {
@@ -80,7 +80,7 @@ describe('can.mustache.helper.with_is_reviewer', function () {
 
     it('is {is_reviewer: true} when ACL person role matches current user',
       function () {
-        var instance = [{
+        let instance = [{
           access_control_list: {
             ac_role_id: assigneeRole.id,
             person: {

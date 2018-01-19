@@ -12,13 +12,13 @@ import template from './templates/tree-item.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var viewModel = BaseTreeItemVM.extend({
+  let viewModel = BaseTreeItemVM.extend({
     define: {
       extraClasses: {
         type: String,
         get: function () {
-          var classes = [];
-          var instance = this.attr('instance');
+          let classes = [];
+          let instance = this.attr('instance');
 
           if (instance.snapshot) {
             classes.push('snapshot');
@@ -38,8 +38,8 @@ import template from './templates/tree-item.mustache';
       selectableSize: {
         type: Number,
         get: function () {
-          var attrCount = this.attr('selectedColumns').length;
-          var result = 3;
+          let attrCount = this.attr('selectedColumns').length;
+          let result = 3;
 
           if (attrCount < 4) {
             result = 1;
@@ -66,9 +66,9 @@ import template from './templates/tree-item.mustache';
     viewModel: viewModel,
     events: {
       inserted: function () {
-        var viewModel = this.viewModel;
-        var instance = viewModel.attr('instance');
-        var resultDfd;
+        let viewModel = this.viewModel;
+        let instance = viewModel.attr('instance');
+        let resultDfd;
 
         viewModel.attr('$el', this.element.find('.tree-item-wrapper'));
         if (instance instanceof CMS.Models.Person) {

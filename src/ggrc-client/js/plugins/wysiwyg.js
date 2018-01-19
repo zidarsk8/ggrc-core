@@ -25,7 +25,7 @@ import wysihtml5ParserRules from 'wysihtml5/advanced';
       parserRules: wysihtml5ParserRules
     });
     this.each(function() {
-      var $that = $(this),
+      let $that = $(this),
         editor = $that.data("wysihtml5").editor,
         $textarea = $(editor.textarea.element);
 
@@ -36,7 +36,7 @@ import wysihtml5ParserRules from 'wysihtml5/advanced';
         $that.val(this.getValue()).trigger('change');
       });
 
-      var $wysiarea = $that.closest(".wysiwyg-area").resizable({
+      let $wysiarea = $that.closest(".wysiwyg-area").resizable({
         handles: "s",
         minHeight: 100,
         alsoResize: "#" + $that.uniqueId().attr("id") + ", #" + $that.closest(".wysiwyg-area").uniqueId().attr("id") + " iframe",
@@ -51,11 +51,11 @@ import wysihtml5ParserRules from 'wysihtml5/advanced';
         editor.composer.style(); // re-copy new size of textarea to composer
         editor.fire('change_view', editor.currentView.name);
       });
-      var $sandbox = $wysiarea.find(".wysihtml5-sandbox");
+      let $sandbox = $wysiarea.find(".wysihtml5-sandbox");
 
       $($sandbox.prop("contentWindow"))
         .bind("mouseover mousemove mouseup", function(ev) {
-          var e = new $.Event(ev.type === "mouseup" ? "mouseup" : "mousemove"); //jQUI resize listens on this.
+          let e = new $.Event(ev.type === "mouseup" ? "mouseup" : "mousemove"); //jQUI resize listens on this.
           e.pageX = $sandbox.offset().left + ev.pageX;
           e.pageY = $sandbox.offset().top + ev.pageY;
           $sandbox.trigger(e);

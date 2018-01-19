@@ -21,7 +21,7 @@ let viewModel = can.Map.extend({
       type: '*',
       Value: can.List,
       set: function (attributes) {
-        var attribute = this.attr('attribute');
+        let attribute = this.attr('attribute');
         if (attributes.length &&
           attributes[0].attr_title &&
           !attribute.field) {

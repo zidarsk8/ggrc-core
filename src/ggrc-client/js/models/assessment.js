@@ -170,8 +170,8 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
      * @return {Object} - parsed object with normalized data
      */
     parseModel: function (attributes) {
-      var values;
-      var definitions;
+      let values;
+      let definitions;
       attributes = this.prepareAttributes(attributes);
       values = attributes.custom_attribute_values || [];
       definitions = attributes.custom_attribute_definitions || [];
@@ -185,9 +185,9 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       return attributes;
     },
     model: function (attributes, oldModel) {
-      var model;
-      var id;
-      var backup;
+      let model;
+      let id;
+      let backup;
       if (!attributes) {
         return;
       }
@@ -259,7 +259,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       this._checkIssueTrackerWarnings();
     },
     before_save: function () {
-      var mappedObjectsChanges = this.attr('mappedObjectsChanges');
+      let mappedObjectsChanges = this.attr('mappedObjectsChanges');
       if ( mappedObjectsChanges ) {
         mappedObjectsChanges.forEach((mo)=>{
           mo.extra = {
@@ -280,7 +280,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       this.attr('operationally', '');
     },
     _transformBackupProperty: function (badProperties) {
-      var backupInstance = this._backupStore();
+      let backupInstance = this._backupStore();
       if (!backupInstance) {
         return;
       }
@@ -303,11 +303,11 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       return this._super(checkAssociations);
     },
     form_preload: function (newObjectForm) {
-      var pageInstance = GGRC.page_instance();
-      var currentUser = CMS.Models.get_instance('Person',
+      let pageInstance = GGRC.page_instance();
+      let currentUser = CMS.Models.get_instance('Person',
         GGRC.current_user.id, GGRC.current_user);
-      var auditLead;
-      var self = this;
+      let auditLead;
+      let self = this;
 
       if (pageInstance && (!this.audit || !this.audit.id || !this.audit.type)) {
         if (pageInstance.type === 'Audit') {
@@ -341,12 +341,12 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       }
 
       function markForAddition(instance, user, type) {
-        var rolesNames = type.split(',');
-        var roles = GGRC.access_control_roles;
-        var acl = instance.attr('access_control_list');
+        let rolesNames = type.split(',');
+        let roles = GGRC.access_control_roles;
+        let acl = instance.attr('access_control_list');
 
         rolesNames.forEach((roleName) => {
-          var role = _.head(
+          let role = _.head(
             roles.filter((role) =>
               role.object_type === 'Assessment' &&
               role.name === roleName)
@@ -365,9 +365,9 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       }
     },
     refresh: function () {
-      var dfd;
-      var href = this.selfLink || this.href;
-      var that = this;
+      let dfd;
+      let href = this.selfLink || this.href;
+      let that = this;
 
       if (!href) {
         return can.Deferred().reject();
@@ -376,7 +376,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
         this._pending_refresh = {
           dfd: can.Deferred(),
           fn: _.throttle(function () {
-            var dfd = that._pending_refresh.dfd;
+            let dfd = that._pending_refresh.dfd;
             can.ajax({
               url: href,
               type: 'get',

@@ -6,7 +6,7 @@
 describe('GGRC.Components.attachButton', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(function () {
     viewModel = GGRC.Components.getViewModel('attachButton');
@@ -57,7 +57,7 @@ describe('GGRC.Components.attachButton', function () {
 
     it('set correct isFolderAttached if instance refreshes during ' +
       'request to GDrive', function () {
-      var dfd = can.Deferred();
+      let dfd = can.Deferred();
       spyOn(CMS.Models.GDriveFolder, 'findOne').and.returnValue(dfd);
 
       viewModel.attr('instance.folder', 'gdrive_folder_id');

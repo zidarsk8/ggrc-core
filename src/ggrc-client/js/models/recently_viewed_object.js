@@ -6,7 +6,7 @@
 export default can.Model.LocalStorage('GGRC.Models.RecentlyViewedObject', {
   newInstance : function(attrs) {
     if(attrs instanceof can.Model) {
-      var title = (attrs.title && attrs.title.trim()) ||
+      let title = (attrs.title && attrs.title.trim()) ||
         (attrs.name && attrs.name.trim()) ||
         (attrs.email && attrs.email.trim());
 

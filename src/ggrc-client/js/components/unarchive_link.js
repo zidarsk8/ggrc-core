@@ -18,8 +18,8 @@
                '</a>'].join(''),
     events: {
       'a click': function (el, event) {
-        var instance = this.scope.attr('instance');
-        var notifyText = instance.display_name() + ' ' +
+        let instance = this.scope.attr('instance');
+        let notifyText = instance.display_name() + ' ' +
           this.scope.attr('notifyText');
 
         event.preventDefault();
@@ -33,7 +33,7 @@
           instance.removeAttr('custom_attributes');
           instance.save()
             .then(function () {
-              var instance = this.scope.attr('instance');
+              let instance = this.scope.attr('instance');
               instance.setup_custom_attributes();
               if (this.scope.attr('notify')) {
                 $('body').trigger('ajax:flash', {success: notifyText});

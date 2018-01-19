@@ -8,9 +8,9 @@ import {getInScopeModels} from '../../../plugins/utils/snapshot-utils';
 describe('GGRC.Mappings', function () {
   'use strict';
 
-  var allTypes = [];
-  var notMappableModels = [];
-  var modules = {
+  let allTypes = [];
+  let notMappableModels = [];
+  let modules = {
     core: {
       models: [
         'AccessGroup',
@@ -63,14 +63,14 @@ describe('GGRC.Mappings', function () {
       ],
     },
   };
-  var directives = ['Contract', 'Policy', 'Regulation', 'Standard'];
-  var mappingRules;
-  var filtered;
+  let directives = ['Contract', 'Policy', 'Regulation', 'Standard'];
+  let mappingRules;
+  let filtered;
 
   function getModelsFromGroups(groups, groupNames) {
-    var models = [];
+    let models = [];
     groupNames.forEach(function (groupName) {
-      var groupModels = groups[groupName].items.map(function (item) {
+      let groupModels = groups[groupName].items.map(function (item) {
         return item.singular;
       });
       models = models.concat(groupModels);
@@ -135,8 +135,8 @@ describe('GGRC.Mappings', function () {
   });
 
   describe('getMappingTypes() method', function () {
-    var EXPECTED_GROUPS = ['entities', 'business', 'governance'];
-    var modelsForTests = _.difference(allTypes, [
+    let EXPECTED_GROUPS = ['entities', 'business', 'governance'];
+    let modelsForTests = _.difference(allTypes, [
       'CycleTaskEntry',
       'CycleTaskGroup',
       'CycleTaskGroupObject',
@@ -145,10 +145,10 @@ describe('GGRC.Mappings', function () {
 
     modelsForTests.forEach(function (type) {
       it('returns mappable types for ' + type, function () {
-        var expectedModels = mappingRules[type];
-        var result = GGRC.Mappings.getMappingTypes(type, [], getInScopeModels());
-        var resultGroups = Object.keys(result);
-        var resultModels = getModelsFromGroups(result, EXPECTED_GROUPS);
+        let expectedModels = mappingRules[type];
+        let result = GGRC.Mappings.getMappingTypes(type, [], getInScopeModels());
+        let resultGroups = Object.keys(result);
+        let resultModels = getModelsFromGroups(result, EXPECTED_GROUPS);
 
         expect(EXPECTED_GROUPS).toEqual(resultGroups);
         expect(expectedModels.sort()).toEqual(resultModels.sort());
@@ -157,14 +157,14 @@ describe('GGRC.Mappings', function () {
   });
 
   describe('_prepareCorrectTypeFormat() method', function () {
-    var cmsModel = {
+    let cmsModel = {
       category: 'category',
       title_plural: 'title_plural',
       model_singular: 'model_singular',
       table_plural: 'table_plural',
       title_singular: 'title_singular',
     };
-    var expectedResult = {
+    let expectedResult = {
       category: 'category',
       name: 'title_plural',
       value: 'model_singular',
@@ -175,14 +175,14 @@ describe('GGRC.Mappings', function () {
     };
 
     it('returns specified object', function () {
-      var result;
+      let result;
       result = GGRC.Mappings._prepareCorrectTypeFormat(cmsModel);
       expect(result).toEqual(expectedResult);
     });
 
     it('converts models plural title to a snake_case', function () {
-      var result;
-      var cmsModel1 = _.assign({}, cmsModel, {
+      let result;
+      let cmsModel1 = _.assign({}, cmsModel, {
         title_plural: 'Title Plural',
       });
       result = GGRC.Mappings._prepareCorrectTypeFormat(cmsModel1);
@@ -191,8 +191,8 @@ describe('GGRC.Mappings', function () {
   });
 
   describe('addFormattedType() method', function () {
-    var groups;
-    var type = {
+    let groups;
+    let type = {
       category: 'category',
     };
 

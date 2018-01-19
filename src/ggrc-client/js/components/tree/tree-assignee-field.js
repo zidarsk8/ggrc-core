@@ -20,9 +20,9 @@
         }.bind(this));
       },
       sliceAssignees: function () {
-        var result = '';
-        var assignees;
-        var instance = this.attr('instance');
+        let result = '';
+        let assignees;
+        let instance = this.attr('instance');
         if (!instance || !instance.assignees) {
           return result;
         }

@@ -8,17 +8,17 @@ import '../tree/tree-view-node';
 describe('CMS.Controllers.TreeViewNode', function () {
   'use strict';
 
-  var Ctrl;  // the controller under test
+  let Ctrl;  // the controller under test
 
   beforeAll(function () {
     Ctrl = CMS.Controllers.TreeViewNode;
   });
 
   describe('draw_node() method', function () {
-    var ctrlInst;  // fake controller instance
-    var ifNotRemovedResult;  // fake return value of the _ifNotRemoved() method
-    var method;
-    var $element;
+    let ctrlInst;  // fake controller instance
+    let ifNotRemovedResult;  // fake return value of the _ifNotRemoved() method
+    let method;
+    let $element;
 
     beforeEach(function () {
       ifNotRemovedResult = {};
@@ -48,8 +48,8 @@ describe('CMS.Controllers.TreeViewNode', function () {
 
     it('renders the DOM element with the "active" CSS class if node active',
       function () {
-        var callArgs;
-        var callback;
+        let callArgs;
+        let callback;
 
         ctrlInst.options.attr('isActive', false);
         ctrlInst.options.attr('disable_lazy_loading', true);
@@ -78,8 +78,8 @@ describe('CMS.Controllers.TreeViewNode', function () {
     it('renders the DOM element without the "active" CSS class if ' +
       'node not active',
       function () {
-        var callArgs;
-        var callback;
+        let callArgs;
+        let callback;
 
         ctrlInst.options.attr('isActive', false);
         ctrlInst.options.attr('disable_lazy_loading', true);
@@ -106,10 +106,10 @@ describe('CMS.Controllers.TreeViewNode', function () {
   });
 
   describe('expand() method', function () {
-    var ctrlInst;  // fake controller instance
-    var displaySubtreesDfd;
-    var method;
-    var $tree;
+    let ctrlInst;  // fake controller instance
+    let displaySubtreesDfd;
+    let method;
+    let $tree;
 
     beforeEach(function () {
       $tree = $([

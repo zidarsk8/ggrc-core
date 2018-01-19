@@ -22,8 +22,8 @@
       this.object_attr = objectAttr;
     },
     init_listeners: function (binding) {
-      var self = this;
-      var model = CMS.Models[this.model_name];
+      let self = this;
+      let model = CMS.Models[this.model_name];
 
       model.bind('created', function (ev, mapping) {
         if (mapping instanceof model)
@@ -41,8 +41,8 @@
       });
     },
     is_valid_mapping: function (binding, mapping) {
-      var model = CMS.Models[this.model_name];
-      var objectModel = binding.instance.constructor;
+      let model = CMS.Models[this.model_name];
+      let objectModel = binding.instance.constructor;
 
       return (mapping instanceof model && mapping[this.object_attr] &&
       (mapping[this.object_attr].reify() === binding.instance ||
@@ -52,8 +52,8 @@
       mapping[this.object_attr].id === binding.instance.id)));
     },
     filter_and_insert_instances_from_mappings: function (binding, mappings) {
-      var self = this;
-      var matchingMappings;
+      let self = this;
+      let matchingMappings;
 
       matchingMappings = can.map(can.makeArray(mappings), function (mapping) {
         if (self.is_valid_mapping(binding, mapping))
@@ -62,8 +62,8 @@
       return this.insert_instances_from_mappings(binding, matchingMappings);
     },
     insert_instances_from_mappings: function (binding, mappings) {
-      var self = this;
-      var newResults;
+      let self = this;
+      let newResults;
 
       newResults = can.map(can.makeArray(mappings), function (mapping) {
         return self.get_result_from_mapping(binding, mapping);
@@ -71,8 +71,8 @@
       this.insert_results(binding, newResults);
     },
     remove_instance_from_mapping: function (binding, mapping) {
-      var instance;
-      var result;
+      let instance;
+      let result;
       if (this.is_valid_mapping(binding, mapping)) {
         instance = this.get_instance_from_mapping(binding, mapping);
         result = this.find_result_from_mapping(binding, mapping);
@@ -95,8 +95,8 @@
       return mapping;
     },
     find_result_from_mapping: function (binding, mapping) {
-      var result;
-      var resultInd;
+      let result;
+      let resultInd;
 
       for (resultInd = 0; resultInd < binding.list.length; resultInd++) {
         result = binding.list[resultInd];
@@ -106,18 +106,18 @@
       }
     },
     _refresh_stubs: function (binding) {
-      var model = CMS.Models[this.model_name];
-      var objectJoinAttr =
+      let model = CMS.Models[this.model_name];
+      let objectJoinAttr =
         ('indirect_' + (this.object_join_attr || model.table_plural));
-      var mappings = binding.instance[objectJoinAttr] &&
+      let mappings = binding.instance[objectJoinAttr] &&
         binding.instance[objectJoinAttr].reify();
-      var params = {};
-      var objectAttr = this.object_attr +
+      let params = {};
+      let objectAttr = this.object_attr +
         (this.object_attr !== 'context' &&
         model.attributes[this.object_attr].indexOf('stubs') > -1 ?
           '.id' : '_id');
-      var result;
-      var self = this;
+      let result;
+      let self = this;
 
       params[objectAttr] =
         this.object_attr === 'context' ?

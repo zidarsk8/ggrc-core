@@ -38,8 +38,8 @@ const Dashboard = can.Control({
   },
 
   init_tree_view_settings: function () {
-    var validModels;
-    var savedChildTreeDisplayList;
+    let validModels;
+    let savedChildTreeDisplayList;
     if (GGRC.pageType && GGRC.pageType === 'ADMIN') { // Admin dashboard
       return;
     }
@@ -57,7 +57,7 @@ const Dashboard = can.Control({
   },
 
   init_page_title: function () {
-    var pageTitle = null;
+    let pageTitle = null;
     if (typeof (this.options.page_title) === 'function') {
       pageTitle = this.options.page_title(this);
     } else if (this.options.page_title) {
@@ -69,7 +69,7 @@ const Dashboard = can.Control({
   },
 
   init_page_help: function () {
-    var pageHelp = null;
+    let pageHelp = null;
     if (typeof (this.options.page_help) === 'function') {
       pageHelp = this.options.page_help(this);
     } else if (this.options.page_help) {
@@ -81,7 +81,7 @@ const Dashboard = can.Control({
   },
 
   init_page_header: function () {
-    var $pageHeader = this.element.find('#page-header');
+    let $pageHeader = this.element.find('#page-header');
 
     if (this.options.header_view && $pageHeader.length) {
       $pageHeader.html(can.view(this.options.header_view));
@@ -101,7 +101,7 @@ const Dashboard = can.Control({
   },
 
   init_inner_nav: function () {
-    var $internav = this.element.find('.internav');
+    let $internav = this.element.find('.internav');
     if ($internav.length) {
       this.inner_nav_controller = new InnerNav(
         this.element.find('.internav'), {
@@ -120,7 +120,7 @@ const Dashboard = can.Control({
 
   init_default_widgets: function () {
     can.each(this.options.default_widgets, function (name) {
-      var descriptor = this.options.widget_descriptors[name];
+      let descriptor = this.options.widget_descriptors[name];
       this.add_dashboard_widget_from_descriptor(descriptor);
     }.bind(this));
   },
@@ -154,12 +154,12 @@ const Dashboard = can.Control({
   },
 
   add_widget_from_descriptor: function () {
-    var descriptor = {};
-    var that = this;
-    var $element;
-    var control;
-    var $container;
-    var $lastWidget;
+    let descriptor = {};
+    let that = this;
+    let $element;
+    let control;
+    let $container;
+    let $lastWidget;
 
     // Construct the final descriptor from one or more arguments
     can.each(arguments, function (nameOrDescriptor) {
@@ -216,7 +216,7 @@ const Dashboard = can.Control({
   },
 
   add_dashboard_widget_from_name: function (name) {
-    var descriptor = this.options.widget_descriptors[name];
+    let descriptor = this.options.widget_descriptors[name];
     if (!descriptor) {
       console.debug('Unknown descriptor: ', name);
     } else {
@@ -248,8 +248,8 @@ Dashboard({
 
   init_page_title: function () {
     // Reset title when page object is modified
-    var that = this;
-    var thatSuper = this._super;
+    let that = this;
+    let thatSuper = this._super;
 
     this.options.instance.bind('change', function () {
       thatSuper.apply(that);

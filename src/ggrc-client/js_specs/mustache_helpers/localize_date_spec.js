@@ -6,9 +6,9 @@
 describe('can.mustache.helper.localize_date', function () {
   'use strict';
 
-  var helper;
-  var testDate;
-  var fakeOptions;
+  let helper;
+  let testDate;
+  let fakeOptions;
 
   beforeAll(function () {
     helper = can.Mustache._helpers.localize_date.fn;

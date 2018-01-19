@@ -8,14 +8,14 @@ import Spinner from 'spin.js';
 
 (function ($) {
   const body = $('body');
-  var defaults = {
+  let defaults = {
     delay: {
       show: 500,
       hide: 100
     },
     placement: 'left',
     content: function (trigger) {
-      var $el = $(new Spinner().spin().el);
+      let $el = $(new Spinner().spin().el);
       $el.css({
         width: '100px',
         height: '100px',
@@ -36,10 +36,10 @@ import Spinner from 'spin.js';
         .sticky_popover($.extend({}, defaults, {
           trigger: 'sticky-hover',
           placement: function () {
-            var $el = this.$element;
-            var spaceLeft = $(document).width() - ($el.offset().left + $el.width());
-            var spaceRight = $el.offset().left;
-            var popover_size = 620;
+            let $el = this.$element;
+            let spaceLeft = $(document).width() - ($el.offset().left + $el.width());
+            let spaceRight = $el.offset().left;
+            let popover_size = 620;
             // Display on right if there is enough space
             if ($el.closest('.widget-area:first-child').length && spaceLeft > popover_size) {
               return 'right';
@@ -68,9 +68,9 @@ import Spinner from 'spin.js';
   function showhide(upsel, downsel) {
     return function (command) {
       $(this).each(function () {
-        var $this = $(this);
-        var $content = $this.closest(upsel).find(downsel);
-        var cmd = command;
+        let $this = $(this);
+        let $content = $this.closest(upsel).find(downsel);
+        let cmd = command;
 
         if (typeof cmd !== 'string' || cmd === 'toggle') {
           cmd = $this.hasClass('active') ? 'hide' : 'show';
@@ -108,12 +108,12 @@ import Spinner from 'spin.js';
 
   function oneline(command) {
     $(this).each(function () {
-      var $this = $(this);
-      var $leaf = $this.closest('[class*=span]').parent().children('[class*=span]:first');
-      var $title = $leaf.find('.oneline');
-      var $description = $leaf.find('.description');
-      var $view = $leaf.closest('.row-fluid').find('.view-more');
-      var cmd = command;
+      let $this = $(this);
+      let $leaf = $this.closest('[class*=span]').parent().children('[class*=span]:first');
+      let $title = $leaf.find('.oneline');
+      let $description = $leaf.find('.description');
+      let $view = $leaf.closest('.row-fluid').find('.view-more');
+      let cmd = command;
 
       if ($description.length > 0) {
         if (typeof cmd !== 'string') {
@@ -146,7 +146,7 @@ import Spinner from 'spin.js';
   // Close other popovers when one is shown
   body.on('show.popover', function (e) {
     $('[data-sticky_popover]').each(function () {
-      var popover = $(this).data('sticky_popover');
+      let popover = $(this).data('sticky_popover');
       // popover && popover.hide();
       popover.hide();
     });

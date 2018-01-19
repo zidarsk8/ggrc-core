@@ -5,9 +5,9 @@
 
 describe('GGRC.ListLoaders.TreeBaseLoader', function () {
   'use strict';
-  var treeBaseLoader;
-  var person;
-  var audit;
+  let treeBaseLoader;
+  let person;
+  let audit;
 
   beforeEach(function () {
     person = new CMS.Models.Person();
@@ -16,10 +16,10 @@ describe('GGRC.ListLoaders.TreeBaseLoader', function () {
   });
 
   describe('makeResult() method', function () {
-    var method;
-    var getUserRolesSpy;
-    var dfd;
-    var binding;
+    let method;
+    let getUserRolesSpy;
+    let dfd;
+    let binding;
 
     beforeEach(function () {
       dfd = $.when();

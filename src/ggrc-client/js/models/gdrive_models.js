@@ -8,9 +8,9 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
 (function (can) {
   'use strict';
 
-  var gdrive_findAll;
-  var gapi_request_with_auth;
-  var scopes = ['https://www.googleapis.com/auth/drive',
+  let gdrive_findAll;
+  let gapi_request_with_auth;
+  let scopes = ['https://www.googleapis.com/auth/drive',
     'https://www.googleapis.com/auth/apps.groups.settings'];
 
   /*
@@ -23,8 +23,8 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
     https://developers.google.com/drive/search-parameters
   */
   window.process_gapi_query = function (params) {
-    var qstr = [];
-    var i;
+    let qstr = [];
+    let i;
 
     for (i in params) {
       if (params.hasOwnProperty(i)) {
@@ -50,9 +50,9 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
   // https://developers.google.com/drive/v2/reference/files/list
   gdrive_findAll = function (extra_params, extra_path) {
     return function (params) {
-      var that = this;
-      var path = '/drive/v2/files';
-      var q;
+      let that = this;
+      let path = '/drive/v2/files';
+      let q;
 
       params = params || {};
 
@@ -89,7 +89,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
         path: path,
         method: 'get', // "post"
         callback: function (dfd, result) {
-          var objs;
+          let objs;
           if (!result || result.error) {
             dfd.reject(result ? result.error : JSON.parse(arguments[1]));
           } else if (result.items) {
@@ -305,7 +305,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
     findAll: gdrive_findAll({}, '/permissions'),
     id: 'etag', // id is a user's Permission ID, so using etags instead for cache keys.
     create: function (params) {
-      var file = typeof params.file === 'object' ? params.file.id : params.file;
+      let file = typeof params.file === 'object' ? params.file.id : params.file;
 
       return gapi_request_with_auth({
         path: '/drive/v2/files/' + file + '/permissions?sendNotificationEmails=false',
@@ -330,7 +330,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
       return this.cache[etag].destroy();
     },
     findUserPermissionId: function (person) {
-      var person_email = typeof person === 'string' ? person : person.email;
+      let person_email = typeof person === 'string' ? person : person.email;
 
       return gapi_request_with_auth({
         path: '/drive/v2/permissionIds/' + person_email,
@@ -347,7 +347,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
     }
   }, {
     destroy: function () {
-      var that = this;
+      let that = this;
 
       return gapi_request_with_auth({
         path: this.selfLink.replace(/https?:\/\/[^\/]+/, ''), // have to relativize the url
@@ -368,7 +368,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
 
   CMS.Models.GDriveFilePermission('CMS.Models.GDriveFolderPermission', {
     create: function (params) {
-      var folder = typeof params.folder === 'object' ? params.folder.id : params.folder;
+      let folder = typeof params.folder === 'object' ? params.folder.id : params.folder;
 
       return gapi_request_with_auth({
         path: '/drive/v2/files/' + folder + '/permissions?sendNotificationEmails=false',

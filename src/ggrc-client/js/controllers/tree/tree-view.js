@@ -57,9 +57,9 @@ import Permission from '../../permission';
   }, {
     // prototype properties
     setup: function (el, opts) {
-      var defaultOptions;
-      var optionsProperty;
-      var defaults = this.constructor.defaults;
+      let defaultOptions;
+      let optionsProperty;
+      let defaults = this.constructor.defaults;
       if (typeof this._super === 'function') {
         this._super(el);
       }
@@ -76,14 +76,14 @@ import Permission from '../../permission';
       }
     },
     deselect: function () {
-      var active = this.element.find('.cms_controllers_tree_view_node.active');
+      let active = this.element.find('.cms_controllers_tree_view_node.active');
       active
         .removeClass('active')
         .removeClass('maximized-info-pane');
       this.update_hash_fragment(active.length);
     },
     update_hash_fragment: function (status) {
-      var hash;
+      let hash;
       if (!status) {
         return;
       }
@@ -93,10 +93,10 @@ import Permission from '../../permission';
     },
 
     init: function (el, opts) {
-      var setAllowMapping;
-      var states = StateUtils.getStatesForModel(this.options.model.shortName);
+      let setAllowMapping;
+      let states = StateUtils.getStatesForModel(this.options.model.shortName);
 
-      var filterStates = states.map(function (state) {
+      let filterStates = states.map(function (state) {
         return {value: state};
       });
 
@@ -107,7 +107,7 @@ import Permission from '../../permission';
       this.element.closest('.widget')
         .on('widget_shown', this.widget_shown.bind(this));
       CMS.Models.DisplayPrefs.getSingleton().then(function (displayPrefs) {
-        var allowed;
+        let allowed;
 
         this.display_prefs = displayPrefs;
 
@@ -118,8 +118,8 @@ import Permission from '../../permission';
 
         if ('parent_instance' in opts && 'status' in opts.parent_instance) {
           setAllowMapping = function () {
-            var isAccepted = opts.parent_instance.attr('status') === 'Accepted';
-            var admin = Permission.is_allowed('__GGRC_ADMIN__');
+            let isAccepted = opts.parent_instance.attr('status') === 'Accepted';
+            let admin = Permission.is_allowed('__GGRC_ADMIN__');
             this.options.attr('allow_mapping_or_creating',
               (admin || !isAccepted) &&
               (this.options.allow_mapping || this.options.allow_creating));
@@ -174,10 +174,10 @@ import Permission from '../../permission';
     },
 
     init_view: function () {
-      var self = this;
-      var dfds = [];
-      var optionsDfd;
-      var statusControl;
+      let self = this;
+      let dfds = [];
+      let optionsDfd;
+      let statusControl;
 
       if (this.options.header_view && this.options.show_header) {
         optionsDfd = $.when(this.options);
@@ -190,7 +190,7 @@ import Permission from '../../permission';
                 .find('.tree-filter__status-wrap');
               // set state filter (checkboxes)
               can.bind.call(statusControl.ready(function () {
-                var selectStateList = self.options.attr('selectStateList');
+                let selectStateList = self.options.attr('selectStateList');
 
                 self.options.attr('filter_states').forEach(function (item) {
                   if (selectStateList.indexOf(item.value) > -1) {
@@ -217,10 +217,10 @@ import Permission from '../../permission';
     },
 
     init_count: function () {
-      var self = this;
-      var options = this.options;
-      var counts;
-      var countsName = options.countsName || options.model.shortName;
+      let self = this;
+      let options = this.options;
+      let counts;
+      let countsName = options.countsName || options.model.shortName;
 
       if (this.options.parent_instance && this.options.mapping) {
         counts = getCounts();
@@ -304,9 +304,9 @@ import Permission from '../../permission';
       //    <model_instance>
       //    { instance: <model instance>, mappings: [...] }
       //    <TreeOptions>
-      var tmp;
-      var that = this;
-      var original = v;
+      let tmp;
+      let that = this;
+      let original = v;
       if (v._child_options_prepared && !forceReload) {
         return v._child_options_prepared;
       }
@@ -330,10 +330,10 @@ import Permission from '../../permission';
         }
       }
       v.attr('child_count', can.compute(function () {
-        var totalChildren = 0;
+        let totalChildren = 0;
         if (v.attr('child_options')) {
           can.each(v.attr('child_options'), function (childCptions) {
-            var list = childCptions.attr('list');
+            let list = childCptions.attr('list');
             if (list) {
               totalChildren += list.attr('length');
             }
@@ -345,13 +345,13 @@ import Permission from '../../permission';
       return v;
     },
     el_position: function (el) {
-      var se = this.options.scroll_element;
-      var seO = se.offset().top;
-      var seH = se.outerHeight();
-      var elO;
-      var elH;
-      var aboveTop;
-      var belowBottom;
+      let se = this.options.scroll_element;
+      let seO = se.offset().top;
+      let seH = se.outerHeight();
+      let elO;
+      let elH;
+      let aboveTop;
+      let belowBottom;
       if (!(el instanceof jQuery)) {
         el = $(el);
       }
@@ -371,23 +371,23 @@ import Permission from '../../permission';
     },
     draw_visible_call_count: 0,
     draw_visible: _.debounce(function () {
-      var MAX_STEPS = 100;
-      var elPosition;
-      var children;
-      var lo;
-      var hi;
-      var max;
-      var steps;
-      var visible;
-      var alreadyVisible;
-      var toRender;
-      var i;
-      var control;
-      var index;
-      var pageCount;
-      var mid;
-      var pos;
-      var options = this.options;
+      let MAX_STEPS = 100;
+      let elPosition;
+      let children;
+      let lo;
+      let hi;
+      let max;
+      let steps;
+      let visible;
+      let alreadyVisible;
+      let toRender;
+      let i;
+      let control;
+      let index;
+      let pageCount;
+      let mid;
+      let pos;
+      let options = this.options;
 
       if (options.disable_lazy_loading ||
         !this.element ||
@@ -490,13 +490,13 @@ import Permission from '../../permission';
     },
 
     '.tree-item-placeholder click': function (el, ev) {
-      var node = el.control();
+      let node = el.control();
       node.draw_node();
       node.select();
     },
 
     '{original_list} remove': function (list, ev, removedItems, index) {
-      var removedItemsIds = removedItems.map((remItem) => {
+      let removedItemsIds = removedItems.map((remItem) => {
         return remItem.attr('id');
       });
 
@@ -515,11 +515,11 @@ import Permission from '../../permission';
     },
 
     '{original_list} add': function (list, ev, newVals, index) {
-      var that = this;
-      var realAdd = [];
+      let that = this;
+      let realAdd = [];
 
       can.each(newVals, function (newVal) {
-        var _newVal = newVal.instance ? newVal.instance : newVal;
+        let _newVal = newVal.instance ? newVal.instance : newVal;
         if (that.oldList && ~can.inArray(_newVal, that.oldList)) {
           that.oldList.splice(can.inArray(_newVal, that.oldList), 1);
         } else if (that.element) {
@@ -530,8 +530,8 @@ import Permission from '../../permission';
     },
 
     '.tree-structure subtree_loaded': function (el, ev) {
-      var instanceId;
-      var parent;
+      let instanceId;
+      let parent;
       ev.stopPropagation();
       instanceId = el.closest('.tree-item').data('object-id');
       parent = can.reduce(this.options.list, function (a, b) {
@@ -547,13 +547,13 @@ import Permission from '../../permission';
     },
     // add child options to every item (TreeViewOptions instance) in the drawing list at this level of the tree.
     add_child_lists: function (list) {
-      var that = this;
-      var currentList = can.makeArray(list);
-      var listWindow = [];
-      var finalDfd;
-      var queue = [];
-      var BATCH = 200;
-      var opId = this._add_child_lists_id = (this._add_child_lists_id || 0) + 1;
+      let that = this;
+      let currentList = can.makeArray(list);
+      let listWindow = [];
+      let finalDfd;
+      let queue = [];
+      let BATCH = 200;
+      let opId = this._add_child_lists_id = (this._add_child_lists_id || 0) + 1;
 
       can.each(currentList, function (item) {
         listWindow.push(item);
@@ -569,13 +569,13 @@ import Permission from '../../permission';
       this.options.attr('filteredList', []);
       finalDfd = _.foldl(queue, function (dfd, listWindow) {
         return dfd.then(function () {
-          var res = can.Deferred();
+          let res = can.Deferred();
           if (that._add_child_lists_id !== opId) {
             return dfd;
           }
           setTimeout(function () {
-            var draw;
-            var drawDfd;
+            let draw;
+            let drawDfd;
             if (that._add_child_lists_id !== opId) {
               return;
             }
@@ -594,8 +594,8 @@ import Permission from '../../permission';
       }, can.Deferred().resolve());
 
       finalDfd.done(this._ifNotRemoved(function () {
-        var shown = this.element[0].children.length;
-        var count = this.options.list.length;
+        let shown = this.element[0].children.length;
+        let count = this.options.list.length;
         // We need to hide `of` in case the numbers are same
         if (shown === count && shown > 0) {
           shown = false;
@@ -608,17 +608,17 @@ import Permission from '../../permission';
       return finalDfd;
     },
     draw_items: function (optionsList) {
-      var items;
-      var $footer = this.element.children('.tree-item-add').first();
-      var drawItemsDfds = [];
-      var filteredItems = this.options.attr('filteredList') || [];
-      var res;
+      let items;
+      let $footer = this.element.children('.tree-item-add').first();
+      let drawItemsDfds = [];
+      let filteredItems = this.options.attr('filteredList') || [];
+      let res;
 
       items = can.makeArray(optionsList);
 
       items = _.map(items, function (options) {
-        var control;
-        var elem = document.createElement('li');
+        let control;
+        let elem = document.createElement('li');
         if (this.options.disable_lazy_loading) {
           options.disable_lazy_loading = true;
         }
@@ -664,7 +664,7 @@ import Permission from '../../permission';
     },
 
     '.edit-object modal:success': function (el, ev, data) {
-      var model = el.closest('[data-model]').data('model');
+      let model = el.closest('[data-model]').data('model');
       model.attr(data[model.constructor.root_object] || data);
       ev.stopPropagation();
     },
@@ -682,7 +682,7 @@ import Permission from '../../permission';
     },
 
     '[custom-event] click': function (el, ev) {
-      var eventName = el.attr('custom-event');
+      let eventName = el.attr('custom-event');
       if (this.options.events &&
         typeof this.options.events[eventName] === 'function') {
         this.options.events[eventName].apply(this, arguments);

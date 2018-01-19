@@ -4,7 +4,7 @@ import '../modal-form';
 
 describe('Flash message', function () {
   it('should trigger ajax:flash with extra data', function () {
-    var triggerData = {
+    let triggerData = {
       error: can.mustache(template),
       data: {
         errors: [

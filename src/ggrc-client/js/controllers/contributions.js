@@ -72,13 +72,13 @@
 
     launch: function ($trigger, options) {
       // Extract parameters from data attributes
-      var href = $trigger.attr('data-href') || $trigger.attr('href');
-      var modalId =
+      let href = $trigger.attr('data-href') || $trigger.attr('href');
+      let modalId =
         'ajax-modal-' + href.replace(/[\/\?=\&#%]/g, '-').replace(/^-/, '');
-      var $target = $(
+      let $target = $(
         '<div id="' + modalId + '" class="modal modal-selector hide"></div>'
       );
-      var scope = $trigger.attr('data-modal-scope') || null;
+      let scope = $trigger.attr('data-modal-scope') || null;
 
       options.scope = scope;
       $target.modal_form({}, $trigger);
@@ -109,8 +109,8 @@
     },
 
     init_view: function () {
-      var self = this;
-      var deferred = $.Deferred();
+      let self = this;
+      let deferred = $.Deferred();
 
       can.view(
         this.options.base_modal_view,
@@ -150,7 +150,7 @@
     },
 
     update_active_list: function () {
-      var self = this;
+      let self = this;
 
       self.active_list.replace(
         can.map(self.join_list, function (join) {
@@ -165,7 +165,7 @@
     },
 
     refresh_object_list: function () {
-      var self = this;
+      let self = this;
 
       return this.options.object_model.findAll(
         $.extend({}, this.options.object_query),
@@ -178,9 +178,9 @@
     },
 
     refresh_option_list: function () {
-      var self = this;
-      var instance = GGRC.page_instance();
-      var params = {};
+      let self = this;
+      let instance = GGRC.page_instance();
+      let params = {};
 
       // If this is a private model, set the scope
       if (self.options.scope) {
@@ -206,7 +206,7 @@
       return this.options.option_model.findAll(
         $.extend(params, this.option_query),
         function (options) {
-          var description;
+          let description;
 
           options = can.makeArray(_.sortBy(options, 'role_order'));
 
@@ -235,9 +235,9 @@
     },
 
     refresh_join_list: function () {
-      var self = this;
-      var joinObject = this.get_join_object();
-      var joinQuery;
+      let self = this;
+      let joinObject = this.get_join_object();
+      let joinQuery;
 
       if (joinObject) {
         joinQuery = can.extend({}, this.options.extra_join_query);
@@ -259,7 +259,7 @@
     },
 
     update_option_radios: function () {
-      var allowedIds = can.map(this.context.options, function (join) {
+      let allowedIds = can.map(this.context.options, function (join) {
         return join.id;
       });
       if (!allowedIds.length) {
@@ -269,7 +269,7 @@
         this.context.attr('selected_id', 0);
       }
       this.join_list.forEach(function (join) {
-        var id = join[this.options.option_attr].id;
+        let id = join[this.options.option_attr].id;
         if (allowedIds.indexOf(id) >= 0) {
           this.context.attr('selected_id', id);
         }
@@ -289,19 +289,19 @@
     },
 
     change_option: function (el_, ev) {
-      var self = this;
-      var el = $('.people-selector').find('input[type=radio]:checked');
-      var li = el.closest('li');
-      var clickedOption = li.data('option') || {};
-      var join;
-      var deleteDfds;
-      var alreadyExists = false;
+      let self = this;
+      let el = $('.people-selector').find('input[type=radio]:checked');
+      let li = el.closest('li');
+      let clickedOption = li.data('option') || {};
+      let join;
+      let deleteDfds;
+      let alreadyExists = false;
 
       // Look for and remove the existing join.
       deleteDfds = $.map(li.parent().children(), function (el) {
-        var $el = $(el);
-        var option = $el.closest('li').data('option');
-        var join = self.find_join(option.id);
+        let $el = $(el);
+        let option = $el.closest('li').data('option');
+        let join = self.find_join(option.id);
 
         if (join && join.role.id === clickedOption.id) {
           // Don't delete the role we marked to add.
@@ -343,7 +343,7 @@
     // HELPERS
 
     find_join: function (optionId) {
-      var self = this
+      let self = this
         ;
 
       return can.reduce(
@@ -368,7 +368,7 @@
     },
 
     get_new_join: function (optionId, optionScope, optionType) {
-      var joinParams = {};
+      let joinParams = {};
       joinParams[this.options.option_attr] = {};
       joinParams[this.options.option_attr].id = optionId;
       joinParams[this.options.option_attr].type = optionType;
@@ -392,17 +392,17 @@
     },
 
     get_join_object_type: function () {
-      var joinObject = this.get_join_object();
+      let joinObject = this.get_join_object();
       return (joinObject ? joinObject.constructor.shortName : null);
     }
   });
 
   function getOptionSet(name, data) {
     // Construct options for Authorizations selector
-    var context;
-    var objectQuery = {};
-    var baseModalView;
-    var extraJoinQuery;
+    let context;
+    let objectQuery = {};
+    let baseModalView;
+    let extraJoinQuery;
 
     // Set object-specific context if requested (for Audits)
     if (data.params && data.params.context) {
@@ -477,10 +477,10 @@
       'click',
       '[data-toggle="user-roles-modal-selector"]',
       function (ev) {
-        var $this = $(this);
-        var options = $this.data('modal-selector-options');
-        var dataSet = can.extend({}, $this.data());
-        var objectParams = $this.attr('data-object-params');
+        let $this = $(this);
+        let options = $this.data('modal-selector-options');
+        let dataSet = can.extend({}, $this.data());
+        let objectParams = $this.attr('data-object-params');
 
         dataSet.params = objectParams && JSON.parse(
           objectParams.replace(/\\n/g, '\\n')
@@ -488,7 +488,7 @@
 
         can.each($this.data(), function (v, k) {
           //  This is just a mapping of keys to underscored keys
-          var newKey = k.replace(
+          let newKey = k.replace(
               /[A-Z]/g,
               function (str) {
                 return '_' + str.toLowerCase();

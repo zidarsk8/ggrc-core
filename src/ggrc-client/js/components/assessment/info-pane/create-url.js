@@ -13,10 +13,10 @@
       context: null,
       type: null,
       create: function () {
-        var value = this.attr('value');
-        var self = this;
-        var document;
-        var attrs;
+        let value = this.attr('value');
+        let self = this;
+        let document;
+        let attrs;
 
         if (!value || !value.length) {
           GGRC.Errors.notifier('error', 'Please enter a URL.');

@@ -16,7 +16,7 @@ import template from './detailed-business-object-list-item.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var tag = 'detailed-business-object-list-item';
+  let tag = 'detailed-business-object-list-item';
   /**
    * Assessment specific mapped objects popover view component
    */

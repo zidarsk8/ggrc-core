@@ -22,7 +22,7 @@ let viewModel = can.Map.extend({
     stateModel: {
       type: '*',
       set: function (state) {
-        var filterStates =
+        let filterStates =
           StateUtils.getStatesForModel(this.attr('modelName'));
 
         state.items = state.items ||
@@ -82,7 +82,7 @@ let viewModel = can.Map.extend({
    * @param {Array} selectedStates - selected states.
    */
   saveTreeStates: function (selectedStates) {
-    var states;
+    let states;
 
     // in this case we save previous states
     if (!selectedStates) {

@@ -6,9 +6,9 @@
 describe('can.mustache.helper.if_string', function () {
   'use strict';
 
-  var fakeOptions;  // fake mustache options object passed to the helper
-  var helper;
-  var someContext;
+  let fakeOptions;  // fake mustache options object passed to the helper
+  let helper;
+  let someContext;
 
   beforeAll(function () {
     helper = can.Mustache._helpers.if_string.fn;
@@ -26,8 +26,8 @@ describe('can.mustache.helper.if_string', function () {
 
   it('triggers rendering of the "truthy" block for string arguments',
     function () {
-      var callArgs;
-      var expectedArgs = [someContext];
+      let callArgs;
+      let expectedArgs = [someContext];
 
       helper('this is a string', fakeOptions);
 
@@ -39,9 +39,9 @@ describe('can.mustache.helper.if_string', function () {
 
   it('triggers rendering of the inverse block for non-string arguments',
     function () {
-      var callArgs;
-      var expectedArgs = [someContext];
-      var params = [
+      let callArgs;
+      let expectedArgs = [someContext];
+      let params = [
         ['not', 'a', 'string'],
         {isString: false},
         1234,

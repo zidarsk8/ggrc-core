@@ -12,8 +12,8 @@
       define: {
         objectTypes: {
           get: function () {
-            var self = this;
-            var objectTypes = GGRC.Mappings
+            let self = this;
+            let objectTypes = GGRC.Mappings
               .getMappingTypes('AssessmentTemplate', [], ['Issue']);
             // remove ignored types and sort the rest
             _.each(objectTypes, function (objGroup) {

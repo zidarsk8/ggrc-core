@@ -6,7 +6,7 @@
 (function (can, GGRC) {
   'use strict';
 
-  var viewModel = can.Map.extend({
+  let viewModel = can.Map.extend({
     define: {
       trigger: {
         type: 'boolean',

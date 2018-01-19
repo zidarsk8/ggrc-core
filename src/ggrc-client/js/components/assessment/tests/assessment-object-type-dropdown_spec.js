@@ -6,7 +6,7 @@
 describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(function () {
     viewModel = GGRC.Components
@@ -14,9 +14,9 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
   });
 
   it('returns the types obtained from the GGRC.Mappings', function () {
-    var result;
+    let result;
 
-    var objectTypes = {
+    let objectTypes = {
       groupFoo: {
         name: 'Foo Objects',
         items: [{name: 'Foo1'}, {value: 'Foo2'}]
@@ -33,9 +33,9 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
   });
 
   it('sorts types within a group by name', function () {
-    var result;
+    let result;
 
-    var objectTypes = {
+    let objectTypes = {
       groupFoo: {
         name: 'Bar-ish Objects',
         items: [
@@ -44,7 +44,7 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
       }
     };
 
-    var expected = [
+    let expected = [
       {name: 'Bar'}, {name: 'Car'}, {name: 'Dar'}, {name: 'Zar'}
     ];
 
@@ -55,9 +55,9 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
   });
 
   it('omits the all_objects group from result', function () {
-    var result;
+    let result;
 
-    var objectTypes = {
+    let objectTypes = {
       all_objects: {
         models: ['Foo', 'Bar', 'Baz'],
         name: 'FooBarBaz-type Objects'
@@ -72,9 +72,9 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
 
   it('omits the types not relevant to the AssessmentTemplate from result',
     function () {
-      var result;
+      let result;
 
-      var objectTypes = {
+      let objectTypes = {
         groupFoo: {
           name: 'Foo Objects',
           items: [
@@ -100,7 +100,7 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
         }
       };
 
-      var expected = {
+      let expected = {
         groupFoo: {
           name: 'Foo Objects',
           items: [{value: 'Contract'}]

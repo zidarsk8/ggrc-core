@@ -5,7 +5,7 @@
 
 (function (ns, can) {
   function getAccessControlList() {
-    var adminRole;
+    let adminRole;
     adminRole = _.filter(GGRC.access_control_roles, {
       object_type: 'Document',
       name: 'Admin'

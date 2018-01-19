@@ -9,17 +9,17 @@ import {
 import InfoWidget from '../controllers/info_widget_controller';
 
 (function ($, CMS, GGRC) {
-  var WorkflowExtension = {};
-  var _workflowObjectTypes = Array.prototype.concat.call(
+  let WorkflowExtension = {};
+  let _workflowObjectTypes = Array.prototype.concat.call(
     [],
     'Program Regulation Policy Standard Contract Clause Section'.split(' '),
     'Request Control Objective OrgGroup Vendor AccessGroup'.split(' '),
     'System Process DataAsset Product Project Facility Market'.split(' '),
     'Issue Assessment Risk Threat'.split(' ')
   );
-  var _taskSortFunction = function (a, b) {
-    var dateA = Number(new Date(a.end_date));
-    var dateB = Number(new Date(b.end_date));
+  let _taskSortFunction = function (a, b) {
+    let dateA = Number(new Date(a.end_date));
+    let dateB = Number(new Date(b.end_date));
 
     if (dateA === dateB) {
       if (a.id < b.id) {
@@ -35,13 +35,13 @@ import InfoWidget from '../controllers/info_widget_controller';
     return 1;
   };
 
-  var draftOnUpdateMixin;
+  let draftOnUpdateMixin;
 
-  var historyWidgetCountsName = 'cycles:history';
-  var currentWidgetCountsName = 'cycles:active';
+  let historyWidgetCountsName = 'cycles:history';
+  let currentWidgetCountsName = 'cycles:active';
 
-  var historyWidgetFilter = 'is_current = 0';
-  var currentWidgetFilter = 'is_current = 1';
+  let historyWidgetFilter = 'is_current = 0';
+  let currentWidgetFilter = 'is_current = 1';
 
   // Register `workflows` extension with GGRC
   GGRC.extensions.push(WorkflowExtension);
@@ -76,17 +76,17 @@ import InfoWidget from '../controllers/info_widget_controller';
 
   // Configure mapping extensions for ggrc_workflows
   WorkflowExtension.init_mappings = function () {
-    var Proxy = GGRC.MapperHelpers.Proxy;
-    var Direct = GGRC.MapperHelpers.Direct;
-    var Cross = GGRC.MapperHelpers.Cross;
-    var Multi = GGRC.MapperHelpers.Multi;
-    var CustomFilter = GGRC.MapperHelpers.CustomFilter;
-    var Reify = GGRC.MapperHelpers.Reify;
-    var Search = GGRC.MapperHelpers.Search;
-    var TypeFilter = GGRC.MapperHelpers.TypeFilter;
+    let Proxy = GGRC.MapperHelpers.Proxy;
+    let Direct = GGRC.MapperHelpers.Direct;
+    let Cross = GGRC.MapperHelpers.Cross;
+    let Multi = GGRC.MapperHelpers.Multi;
+    let CustomFilter = GGRC.MapperHelpers.CustomFilter;
+    let Reify = GGRC.MapperHelpers.Reify;
+    let Search = GGRC.MapperHelpers.Search;
+    let TypeFilter = GGRC.MapperHelpers.TypeFilter;
 
     // Add mappings for basic workflow objects
-    var mappings = {
+    let mappings = {
       TaskGroup: {
         _canonical: {
           objects: _workflowObjectTypes.concat(['Cacheable'])
@@ -283,7 +283,7 @@ import InfoWidget from '../controllers/info_widget_controller';
 
     // Insert `workflows` mappings to all business object types
     can.each(_workflowObjectTypes, function (type) {
-      var model = CMS.Models[type];
+      let model = CMS.Models[type];
       if (model === undefined || model === null) {
         return;
       }
@@ -330,14 +330,14 @@ import InfoWidget from '../controllers/info_widget_controller';
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
   // Initialize widgets for workflow page
   WorkflowExtension.init_widgets = function () {
-    var pageInstance = GGRC.page_instance();
-    var treeWidgets = GGRC.tree_view.base_widgets_by_type;
-    var subTrees = GGRC.tree_view.sub_tree_for;
-    var subTreeItems = ['Cycle'];
-    var models = ['TaskGroup', 'Workflow', 'CycleTaskEntry',
+    let pageInstance = GGRC.page_instance();
+    let treeWidgets = GGRC.tree_view.base_widgets_by_type;
+    let subTrees = GGRC.tree_view.sub_tree_for;
+    let subTreeItems = ['Cycle'];
+    let models = ['TaskGroup', 'Workflow', 'CycleTaskEntry',
       'CycleTaskGroupObjectTask', 'CycleTaskGroupObject', 'CycleTaskGroup'];
     _.each(_workflowObjectTypes, function (type) {
-      var widget;
+      let widget;
       if (!type || !treeWidgets[type]) {
         return;
       }
@@ -359,7 +359,7 @@ import InfoWidget from '../controllers/info_widget_controller';
       }
     });
     subTreeItems.concat(models).forEach(function (item) {
-      var defaults = {
+      let defaults = {
         model_list: GGRC.tree_view.basic_model_list,
         display_list: can.Map.keys(GGRC.tree_view.base_widgets_by_type)
       };
@@ -384,8 +384,8 @@ import InfoWidget from '../controllers/info_widget_controller';
   };
 
   WorkflowExtension.init_widgets_for_other_pages = function () {
-    var descriptor = {};
-    var pageInstance = GGRC.page_instance();
+    let descriptor = {};
+    let pageInstance = GGRC.page_instance();
 
     if (
       pageInstance &&
@@ -436,13 +436,13 @@ import InfoWidget from '../controllers/info_widget_controller';
   };
 
   WorkflowExtension.init_widgets_for_workflow_page = function () {
-    var newWidgetDescriptors = {};
-    var newDefaultWidgets = [
+    let newWidgetDescriptors = {};
+    let newDefaultWidgets = [
       'info', 'task_group', 'current', 'history'
     ];
-    var historyWidgetDescriptor;
-    var currentWidgetDescriptor;
-    var object = GGRC.page_instance();
+    let historyWidgetDescriptor;
+    let currentWidgetDescriptor;
+    let object = GGRC.page_instance();
 
     can.each(
       GGRC.WidgetList.get_current_page_widgets(),
@@ -551,8 +551,8 @@ import InfoWidget from '../controllers/info_widget_controller';
   };
 
   WorkflowExtension.init_widgets_for_person_page = function () {
-    var descriptor = {};
-    var pageInstance = GGRC.page_instance();
+    let descriptor = {};
+    let pageInstance = GGRC.page_instance();
     const isObjectBrowser = /^\/objectBrowser\/?$/
       .test(window.location.pathname);
 
@@ -618,7 +618,7 @@ import InfoWidget from '../controllers/info_widget_controller';
     }
   });
   can.each(_workflowObjectTypes, function (modelName) {
-    var model = CMS.Models[modelName];
+    let model = CMS.Models[modelName];
     if (model === undefined || model === null) {
       return;
     }

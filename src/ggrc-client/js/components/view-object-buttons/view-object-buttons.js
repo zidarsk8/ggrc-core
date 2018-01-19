@@ -16,8 +16,8 @@ import template from './view-object-buttons.mustache';
       openIsHidden: false,
       viewIsHidden: false,
       maximizeObject: function (scope, el, ev) {
-        var tree = el.closest('.cms_controllers_tree_view_node');
-        var node = tree.control();
+        let tree = el.closest('.cms_controllers_tree_view_node');
+        let node = tree.control();
         ev.preventDefault();
         ev.stopPropagation();
         if (node) {

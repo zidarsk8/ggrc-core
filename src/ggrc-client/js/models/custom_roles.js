@@ -20,10 +20,10 @@
     findAll: function () {
       // We do not query the backend, this implementation is used to diplay
       // a list of objects in the Custom Roles widget.
-      var types = _.sortByOrder(GGRC.roleableTypes, 'category', false);
+      let types = _.sortByOrder(GGRC.roleableTypes, 'category', false);
 
-      var instances = can.map(types, function (type, i) {
-        var withId = can.extend(type, {id: i});
+      let instances = can.map(types, function (type, i) {
+        let withId = can.extend(type, {id: i});
         return new CMS.Models.Roleable(withId);
       });
 

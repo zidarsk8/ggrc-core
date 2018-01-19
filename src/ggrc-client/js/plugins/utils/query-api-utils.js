@@ -23,8 +23,8 @@
  */
 
 const BATCH_TIMEOUT = 100;
-var batchQueue = [];
-var batchTimeout = null;
+let batchQueue = [];
+let batchTimeout = null;
 
 /**
  * Collect requests to Query API.
@@ -35,7 +35,7 @@ var batchTimeout = null;
  * @return {Promise} Promise on Query API request.
  */
 function batchRequests(params) {
-  var dfd = can.Deferred();
+  let dfd = can.Deferred();
   batchQueue.push({dfd: dfd, params: params});
 
   if (_.isNumber(batchTimeout)) {
@@ -87,7 +87,7 @@ function buildParams(objName, page, relevant, additionalFilter) {
  * @return {Object} Object of QueryAPIRequest
  */
 function buildRelevantIdsQuery(objName, page, relevant, additionalFilter) {
-  var param = buildParam(objName, page, relevant, null, additionalFilter);
+  let param = buildParam(objName, page, relevant, null, additionalFilter);
   param.type = 'ids';
   return param;
 }
@@ -111,9 +111,9 @@ function buildRelevantIdsQuery(objName, page, relevant, additionalFilter) {
  * @return {Object} Object of QueryAPIRequest
  */
 function buildParam(objName, page, relevant, fields, additionalFilter) {
-  var first;
-  var last;
-  var params = {};
+  let first;
+  let last;
+  let params = {};
 
   if (!objName) {
     return {};
@@ -149,14 +149,14 @@ function buildParam(objName, page, relevant, fields, additionalFilter) {
  * @return {Array} Array of QueryAPIRequests
  */
 function buildCountParams(types, relevant, filter) {
-  var params;
+  let params;
 
   if (!types || !Array.isArray(types)) {
     return [];
   }
 
   params = types.map(function (objName) {
-    var param = {};
+    let param = {};
 
     if (!objName) {
       return {};
@@ -183,7 +183,7 @@ function buildCountParams(types, relevant, filter) {
  * @return {Promise} Promise on Query API request.
  */
 function makeRequest(params) {
-  var reqParams = params.data || [];
+  let reqParams = params.data || [];
   return can.ajax({
     type: 'POST',
     headers: $.extend({
@@ -195,7 +195,7 @@ function makeRequest(params) {
 }
 
 function _makeRelevantFilter(filter) {
-  var relevantFilter = GGRC.query_parser.parse('#' + filter.type + ',' +
+  let relevantFilter = GGRC.query_parser.parse('#' + filter.type + ',' +
     filter.id + '#');
 
   if (filter && !filter.operation) {
@@ -211,8 +211,8 @@ function _makeRelevantFilter(filter) {
 }
 
 function _makeFilter(filter, relevant, additionalFilter) {
-  var relevantFilters;
-  var filterList = [];
+  let relevantFilters;
+  let filterList = [];
 
   if (relevant) {
     relevant = Array.isArray(relevant) ?
@@ -249,7 +249,7 @@ function _resolveBatch(queue) {
     }),
   }).then(function (result) {
     result.forEach(function (info, i) {
-      var req = queue[i];
+      let req = queue[i];
 
       req.dfd.resolve(info);
     });

@@ -7,8 +7,8 @@ describe('GGRC.Components.multiselectDropdown', function () {
   'use strict';
 
   describe('updateSelected() method', function () {
-    var options;
-    var viewModel;
+    let options;
+    let viewModel;
 
     beforeEach(function () {
       viewModel = GGRC.Components.getViewModel('multiselectDropdown');
@@ -33,8 +33,8 @@ describe('GGRC.Components.multiselectDropdown', function () {
 
     it('updateSelected() should add new item in "selected"',
       function () {
-        var selected;
-        var item = viewModel.attr('options')[1];
+        let selected;
+        let item = viewModel.attr('options')[1];
         item.checked = true;
 
         viewModel.updateSelected(item);
@@ -47,9 +47,9 @@ describe('GGRC.Components.multiselectDropdown', function () {
 
     it('updateSelected() should remove item from "selected"',
       function () {
-        var selected = viewModel.attr('selected');
-        var options = viewModel.attr('options');
-        var item;
+        let selected = viewModel.attr('selected');
+        let options = viewModel.attr('options');
+        let item;
 
         expect(selected.length).toEqual(0);
 
@@ -73,8 +73,8 @@ describe('GGRC.Components.multiselectDropdown', function () {
 
     it('updateSelected() should not add duplicates in "selected"',
       function () {
-        var selected;
-        var item = viewModel.attr('options')[1];
+        let selected;
+        let item = viewModel.attr('options')[1];
         item.checked = true;
 
         // double call
@@ -90,11 +90,11 @@ describe('GGRC.Components.multiselectDropdown', function () {
   });
 
   describe('_displayValue attribute', function () {
-    var viewModel;
-    var options;
-    var draftItem;
-    var activeItem;
-    var openItem;
+    let viewModel;
+    let options;
+    let draftItem;
+    let activeItem;
+    let openItem;
 
     beforeEach(function () {
       viewModel = GGRC.Components.getViewModel('multiselectDropdown');
@@ -158,7 +158,7 @@ describe('GGRC.Components.multiselectDropdown', function () {
   });
 
   describe('"open/close" state of component', function () {
-    var viewModel;
+    let viewModel;
 
     beforeEach(function () {
       viewModel = GGRC.Components.getViewModel('multiselectDropdown');
@@ -194,7 +194,7 @@ describe('GGRC.Components.multiselectDropdown', function () {
 
     it('close dropdown with changing of options',
       function () {
-        var item = viewModel.attr('options')[0];
+        let item = viewModel.attr('options')[0];
         spyOn(can, 'trigger');
         viewModel.attr('isOpen', true);
         viewModel.attr('_stateWasUpdated', false);

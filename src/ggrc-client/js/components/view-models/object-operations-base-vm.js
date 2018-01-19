@@ -36,8 +36,8 @@ const ObjectOperationsBaseVM = can.Map.extend({
    * @return {Object} - extracted config.
    */
   extractConfig: function (type, config) {
-    var resultConfig;
-    var special = _.result(
+    let resultConfig;
+    let special = _.result(
       _.find(
         config.special,
         function (special) {
@@ -69,10 +69,10 @@ const ObjectOperationsBaseVM = can.Map.extend({
      * general config, otherwise special config.
      */
       set: function (mapType) {
-        var config = this.attr('config') || {};
-        var type = this.attr('type');
-        var configHandler;
-        var resultConfig = ObjectOperationsBaseVM.extractConfig(
+        let config = this.attr('config') || {};
+        let type = this.attr('type');
+        let configHandler;
+        let resultConfig = ObjectOperationsBaseVM.extractConfig(
           mapType,
           config.serialize()
         );
@@ -125,7 +125,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
   showResults: true,
   type: 'Control', // We set default as Control
   availableTypes: function () {
-    var types = GGRC.Mappings.getMappingTypes(
+    let types = GGRC.Mappings.getMappingTypes(
       this.attr('object'),
       [],
       getInScopeModels().concat('TaskGroup'));
@@ -145,7 +145,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
   submitCbs: $.Callbacks(),
   useSnapshots: false,
   modelFromType: function (type) {
-    var types = _.reduce(_.values(
+    let types = _.reduce(_.values(
       this.availableTypes()), function (memo, val) {
       if (val.items) {
         return memo.concat(val.items);
@@ -176,8 +176,8 @@ const ObjectOperationsBaseVM = can.Map.extend({
 
     // do not update fields with the same values in VM and config
     _.each(config, function (value, key) {
-      var vmValue = this.attr(key);
-      var hasSerialize = Boolean(vmValue && vmValue.serialize);
+      let vmValue = this.attr(key);
+      let hasSerialize = Boolean(vmValue && vmValue.serialize);
 
       if (hasSerialize) {
         vmValue = vmValue.serialize();

@@ -20,14 +20,14 @@ import template from './questions-link.mustache';
         hasQuestions: {
           type: Boolean,
           get: function () {
-            var instance = this.attr('instance');
+            let instance = this.attr('instance');
             return hasQuestions(instance.class.title_singular);
           }
         },
         questionsUrl: {
           type: String,
           get: function () {
-            var instance = this.attr('instance');
+            let instance = this.attr('instance');
             return getQuestionsUrl(instance);
           }
         }

@@ -10,10 +10,10 @@
  * @param {boolean} sequentially - The flag indicates that transactions must be completed sequentially.
  */
 export default function (completeTransaction, timeout, sequentially) {
-  var deferredQueue = [];
-  var timeoutId = null;
+  let deferredQueue = [];
+  let timeoutId = null;
 
-  var sequence = {
+  let sequence = {
     transactionDfd: can.Deferred().resolve(),
     callbackAdded: false
   };
@@ -39,8 +39,8 @@ export default function (completeTransaction, timeout, sequentially) {
   }
 
   function processQueue() {
-    var batchDfd = can.Deferred();
-    var currentBatch = deferredQueue.splice(0, deferredQueue.length);
+    let batchDfd = can.Deferred();
+    let currentBatch = deferredQueue.splice(0, deferredQueue.length);
 
     runBatch(currentBatch);
     completeTransaction(
@@ -83,7 +83,7 @@ export default function (completeTransaction, timeout, sequentially) {
    * @return {object} - The canJS promise indicates result of the transaction.
    */
   this.push = function (action) {
-    var dfd = can.Deferred();
+    let dfd = can.Deferred();
     deferredQueue.push({
       deferred: dfd,
       action: action

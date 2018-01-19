@@ -25,7 +25,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
       widgetView [optional] - a template for rendering the info.
     */
     make_info_widget: function (instance, widgetView) {
-      var defaultInfoWidgetView = GGRC.mustache_path +
+      let defaultInfoWidgetView = GGRC.mustache_path +
                                      '/base_objects/info.mustache';
       return new this(
         instance.constructor.shortName + ':info', {
@@ -54,7 +54,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
       widgetView [optional] - a template for rendering the info.
     */
     make_summary_widget: function (instance, widgetView) {
-      var defaultView = GGRC.mustache_path +
+      let defaultView = GGRC.mustache_path +
         '/base_objects/summary.mustache';
       return new this(
         instance.constructor.shortName + ':summary', {
@@ -74,7 +74,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
         });
     },
     make_dashboard_widget: function (instance, widgetView) {
-      var defaultView = GGRC.mustache_path +
+      let defaultView = GGRC.mustache_path +
         '/base_objects/dashboard.mustache';
       return new this(
         instance.constructor.shortName + ':dashboard', {
@@ -104,8 +104,8 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
       extenders [optional] - an array of objects that will extend the default widget config.
     */
     make_tree_view: function (instance, farModel, extenders, id) {
-      var descriptor;
-      var objectVersionConfig = getWidgetConfig(id);
+      let descriptor;
+      let objectVersionConfig = getWidgetConfig(id);
       // Should not even try to create descriptor if configuration options are missing
       if (!instance || !farModel) {
         console
@@ -128,10 +128,10 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
           return true;
         },
         widget_name: function () {
-          var farModelName = objectVersionConfig.isObjectVersion ?
+          let farModelName = objectVersionConfig.isObjectVersion ?
             objectVersionConfig.widgetName :
             farModel.title_plural;
-          var $objectArea = $('.object-area');
+          let $objectArea = $('.object-area');
           if (
             $objectArea.hasClass('dashboard-area') ||
             instance.constructor.title_singular === 'Person'
@@ -169,7 +169,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
       );
     },
     newInstance: function (id, opts) {
-      var ret;
+      let ret;
       if (!opts && typeof id === 'object') {
         opts = id;
         id = opts.widget_id;

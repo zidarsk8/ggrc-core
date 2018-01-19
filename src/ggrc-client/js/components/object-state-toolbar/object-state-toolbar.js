@@ -9,8 +9,8 @@ import template from './object-state-toolbar.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var tag = 'object-state-toolbar';
-  var activeStates = ['In Progress', 'Rework Needed', 'Not Started'];
+  let tag = 'object-state-toolbar';
+  let activeStates = ['In Progress', 'Rework Needed', 'Not Started'];
   // Helper function - might be some util/helpers method
   function checkIsCurrentUserVerifier(verifiers) {
     return verifiers

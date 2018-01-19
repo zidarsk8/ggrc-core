@@ -66,8 +66,8 @@ import template from './inline.mustache';
         this.attr('context.value', null);
       },
       save: function () {
-        var oldValue = this.attr('value');
-        var value = this.attr('context.value');
+        let oldValue = this.attr('value');
+        let value = this.attr('context.value');
 
         if (!this.attr('isValid')) {
           return;
@@ -93,12 +93,12 @@ import template from './inline.mustache';
         });
       },
       cancel: function () {
-        var value = this.attr('value');
+        let value = this.attr('value');
         this.attr('editMode', false);
         this.attr('context.value', value);
       },
       updateContext: function () {
-        var value = this.attr('value');
+        let value = this.attr('value');
         this.attr('context.value', value);
       },
       fieldValueChanged: function (args) {
@@ -116,9 +116,9 @@ import template from './inline.mustache';
         }
       },
       '{window} mousedown': function (el, ev) {
-        var viewModel = this.viewModel;
-        var isInside;
-        var editMode;
+        let viewModel = this.viewModel;
+        let isInside;
+        let editMode;
 
         // prevent closing of current inline after opening...
         if (viewModel.attr('isLastOpenInline')) {

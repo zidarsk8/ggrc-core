@@ -16,12 +16,12 @@ export default ModalsController({
   },
   'a.btn[data-toggle=archive]:not(:disabled) click': function (el, ev) {
     // Disable the cancel button.
-    var cancelButton = this.element.find('a.btn[data-dismiss=modal]');
-    var modalBackdrop = this.element.data('modal_form').$backdrop;
+    let cancelButton = this.element.find('a.btn[data-dismiss=modal]');
+    let modalBackdrop = this.element.data('modal_form').$backdrop;
 
     this.bindXHRToButton(this.options.instance.refresh()
       .then(function () {
-        var instance = this.options.instance;
+        let instance = this.options.instance;
         instance.attr('archived', true);
 
         // Need to be fixed via new API:
@@ -31,8 +31,8 @@ export default ModalsController({
         return this.options.instance.save();
       }.bind(this))
       .then(function () {
-        var instance = this.options.instance;
-        var msg;
+        let instance = this.options.instance;
+        let msg;
 
         instance.setup_custom_attributes();
 

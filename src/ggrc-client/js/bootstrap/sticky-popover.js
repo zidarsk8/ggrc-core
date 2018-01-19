@@ -11,7 +11,7 @@
  /* STICKY_POPOVER PUBLIC CLASS DEFINITION
 * =============================== */
 
-  var StickyPopover = function ( element, options ) {
+  let StickyPopover = function ( element, options ) {
     this.init('sticky_popover', element, options)
   }
 
@@ -87,7 +87,7 @@
       }
     }
   , trigger_load: function() {
-      var self = this,
+      let self = this,
           href = this.$element.data('popover-href'),
           loaded = this.$element.data('popover-loaded');
 
@@ -99,7 +99,7 @@
           , type : "get"
           , dataType : "html"
           , success : function(data) {
-            var $data = $(data.trim());
+            let $data = $(data.trim());
             self.$element.attr('data-original-title', $data.filter('.popover-title').html());
             self.$element.attr('data-content', $data.filter('.popover-content').html());
             self.$element.data('popover-loaded', true);
@@ -131,7 +131,7 @@
 
   $.fn.sticky_popover = function (option) {
     return this.each(function () {
-      var $this = $(this)
+      let $this = $(this)
         , data = $this.data('sticky_popover')
         , options = typeof option == 'object' && option
       if (!data) {

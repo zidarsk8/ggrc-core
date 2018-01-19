@@ -6,8 +6,8 @@
 describe('ggrc.autocomplete widget', function () {
   'use strict';
 
-  var context;
-  var method;
+  let context;
+  let method;
 
   beforeEach(function () {
     context = {};

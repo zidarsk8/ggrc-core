@@ -6,7 +6,7 @@
 describe('GGRC.Components.lazyRender', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(function () {
     viewModel = GGRC.Components.getViewModel('lazyRender');

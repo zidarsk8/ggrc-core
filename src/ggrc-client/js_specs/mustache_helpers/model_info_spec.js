@@ -6,10 +6,10 @@
 describe('can.mustache.helper.model_info', function () {
   'use strict';
 
-  var helper;
-  var fakeModel;
-  var fakeOptions;  // a fake "options" argument
-  var origModel;  // the original model, if any, in the CMS.Models
+  let helper;
+  let fakeModel;
+  let fakeOptions;  // a fake "options" argument
+  let origModel;  // the original model, if any, in the CMS.Models
 
   beforeAll(function () {
     helper = can.Mustache._helpers.model_info.fn;
@@ -28,7 +28,7 @@ describe('can.mustache.helper.model_info', function () {
   });
 
   it('returns the value of the correct model attribute', function () {
-    var result;
+    let result;
     fakeModel.someAttribute = 'foo bar baz';
     result = helper('ModelFoo', 'someAttribute', fakeOptions);
     expect(result).toEqual('foo bar baz');

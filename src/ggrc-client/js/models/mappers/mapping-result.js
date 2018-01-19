@@ -67,7 +67,7 @@
     },
 
     trigger_observe_trigger: function () {
-      var observeTrigger = this.observe_trigger();
+      let observeTrigger = this.observe_trigger();
       observeTrigger.attr('change_count', observeTrigger.change_count + 1);
     },
 
@@ -80,8 +80,8 @@
     },
 
     remove_mapping: function (mapping) {
-      var ret;
-      var mappingIndex = this.mappings.indexOf(mapping);
+      let ret;
+      let mappingIndex = this.mappings.indexOf(mapping);
       if (mappingIndex > -1) {
         ret = this.mappings.splice(mappingIndex, 1);
         //  Trigger change event
@@ -94,7 +94,7 @@
     //  - Returns a list of the `ListBinding` instances which are the source
     //    of 'first-level mappings'.
     get_bindings: function () {
-      var bindings = [];
+      let bindings = [];
 
       this.walk_instances(function (instance, result, depth) {
         if (depth === 1)
@@ -110,7 +110,7 @@
     },
 
     get_bindings_compute: function () {
-      var self = this;
+      let self = this;
 
       return can.compute(function () {
         // Unnecessarily access observe_trigger to be able to trigger change
@@ -127,8 +127,8 @@
     //    if any of the "first-level mappings" exist, the instance will
     //    appear in the list.
     get_mappings: function () {
-      var self = this;
-      var mappings = [];
+      let self = this;
+      let mappings = [];
 
       this.walk_instances(function (instance, result, depth) {
         if (depth === 1) {
@@ -148,7 +148,7 @@
     },
 
     get_mappings_compute: function () {
-      var self = this;
+      let self = this;
 
       return can.compute(function () {
         // Unnecessarily access _observe_trigger to be able to trigger change
@@ -164,7 +164,7 @@
     //    iterates over these "virtual" levels to emit instances only once
     //    per time they appear in a traversal path of `binding.mappings`.
     walk_instances: function (fn, lastInstance, depth) {
-      var i;
+      let i;
       if (!depth)
         depth = 0;
       if (this.instance !== lastInstance) {

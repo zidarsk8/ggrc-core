@@ -69,7 +69,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
 }, {
   init : function() {
     this._super && this._super.apply(this, arguments);
-    var that = this;
+    let that = this;
   }
   , lowercase_kind : function() { return this.kind ? this.kind.toLowerCase() : undefined; }
 });

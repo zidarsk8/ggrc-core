@@ -8,28 +8,28 @@ import helpers from '../workflow-helpers';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 
 describe('GGRC.WorkflowActivate', function () {
-  var scope;
+  let scope;
 
   beforeAll(function () {
     scope = component.prototype.scope;
   });
 
   describe('_activate() method', function () {
-    var method;
-    var workflow;
-    var scopeMock;
-    var refreshDfd;
-    var saveDfd;
-    var saveCycleDfd;
-    var initCountsDfd;
-    var refreshAllDfd;
-    var generateDfd;
-    var workflowExtension = {
+    let method;
+    let workflow;
+    let scopeMock;
+    let refreshDfd;
+    let saveDfd;
+    let saveCycleDfd;
+    let initCountsDfd;
+    let refreshAllDfd;
+    let generateDfd;
+    let workflowExtension = {
       countsMap: {
         activeCycles: 'active cycles',
       },
     };
-    var cycleMock;
+    let cycleMock;
 
     beforeEach(function () {
       scopeMock = jasmine.createSpyObj('scope',
@@ -262,11 +262,11 @@ describe('GGRC.WorkflowActivate', function () {
   });
 
   describe('_can_activate_def() method', function () {
-    var refreshAllDfd;
-    var scopeMock;
-    var method;
-    var workflow;
-    var taskGroups;
+    let refreshAllDfd;
+    let scopeMock;
+    let method;
+    let workflow;
+    let taskGroups;
 
     beforeEach(function () {
       taskGroups = new can.List([]);

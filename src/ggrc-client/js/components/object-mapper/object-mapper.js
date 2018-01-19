@@ -25,7 +25,7 @@ import RefreshQueue from '../../models/refresh_queue';
 (function (can, $) {
   'use strict';
 
-  var DEFAULT_OBJECT_MAP = {
+  let DEFAULT_OBJECT_MAP = {
     Assessment: 'Control',
     Objective: 'Control',
     Section: 'Objective',
@@ -55,9 +55,9 @@ import RefreshQueue from '../../models/refresh_queue';
     TaskGroup: 'Control',
   };
 
-  var getDefaultType = function (type, object) {
-    var treeView = GGRC.tree_view.sub_tree_for[object];
-    var defaultType =
+  let getDefaultType = function (type, object) {
+    let treeView = GGRC.tree_view.sub_tree_for[object];
+    let defaultType =
       (CMS.Models[type] && type) ||
       DEFAULT_OBJECT_MAP[object] ||
       (treeView ? treeView.display_list[0] : 'Control');
@@ -73,12 +73,12 @@ import RefreshQueue from '../../models/refresh_queue';
     template: can.view(GGRC.mustache_path +
       '/components/object-mapper/object-mapper.mustache'),
     viewModel: function (attrs, parentViewModel) {
-      var config = {
+      let config = {
         general: parentViewModel.attr('general'),
         special: parentViewModel.attr('special'),
       };
 
-      var resolvedConfig = ObjectOperationsBaseVM.extractConfig(
+      let resolvedConfig = ObjectOperationsBaseVM.extractConfig(
         config.general.type,
         config
       );
@@ -103,7 +103,7 @@ import RefreshQueue from '../../models/refresh_queue';
         allowedToCreate: function () {
           // Don't allow to create new instances for "In Scope" Objects that
           // are snapshots
-          var isInScopeSrc = isInScopeModel(this.attr('object'));
+          let isInScopeSrc = isInScopeModel(this.attr('object'));
 
           return !isInScopeSrc ||
             (isInScopeSrc && !isSnapshotModel(this.attr('type')));
@@ -115,13 +115,13 @@ import RefreshQueue from '../../models/refresh_queue';
           return false;
         },
         showWarning: function () {
-          var isInScopeSrc = isInScopeModel(this.attr('object'));
-          var isSnapshotParentSrc = isSnapshotParent(this.attr('object'));
-          var isSnapshotParentDst = isSnapshotParent(this.attr('type'));
-          var isSnapshotModelSrc = isSnapshotModel(this.attr('object'));
-          var isSnapshotModelDst = isSnapshotModel(this.attr('type'));
+          let isInScopeSrc = isInScopeModel(this.attr('object'));
+          let isSnapshotParentSrc = isSnapshotParent(this.attr('object'));
+          let isSnapshotParentDst = isSnapshotParent(this.attr('type'));
+          let isSnapshotModelSrc = isSnapshotModel(this.attr('object'));
+          let isSnapshotModelDst = isSnapshotModel(this.attr('type'));
 
-          var result =
+          let result =
             // Dont show message if source is inScope model, for example Assessment.
             !isInScopeSrc &&
             // Show message if source is snapshotParent and destination is snapshotable.
@@ -157,7 +157,7 @@ import RefreshQueue from '../../models/refresh_queue';
         this.element.trigger('hideModal');
       },
       '{window} modal:dismiss': function (el, ev, options) {
-        var joinObjectId = this.viewModel.attr('join_object_id');
+        let joinObjectId = this.viewModel.attr('join_object_id');
 
         // mapper sets uniqueId for modal-ajax.
         // we can check using unique id which modal-ajax is closing
@@ -170,8 +170,8 @@ import RefreshQueue from '../../models/refresh_queue';
         }
       },
       inserted: function () {
-        var self = this;
-        var deferredToList;
+        let self = this;
+        let deferredToList;
         this.viewModel.attr('selected').replace([]);
         this.viewModel.attr('entries').replace([]);
 
@@ -197,9 +197,9 @@ import RefreshQueue from '../../models/refresh_queue';
         }
       },
       deferredSave: function () {
-        var source = this.viewModel.attr('deferred_to').instance ||
+        let source = this.viewModel.attr('deferred_to').instance ||
           this.viewModel.attr('object');
-        var data = {};
+        let data = {};
 
         data = {
           multi_map: true,
@@ -233,23 +233,23 @@ import RefreshQueue from '../../models/refresh_queue';
         this.mapObjects(this.viewModel.attr('selected'));
       },
       mapObjects: function (objects) {
-        var type = this.viewModel.attr('type');
-        var object = this.viewModel.attr('object');
-        var instance = CMS.Models[object].findInCacheById(
+        let type = this.viewModel.attr('type');
+        let object = this.viewModel.attr('object');
+        let instance = CMS.Models[object].findInCacheById(
           this.viewModel.attr('join_object_id'));
-        var mapping;
-        var Model;
-        var data = {};
-        var defer = [];
-        var que = new RefreshQueue();
+        let mapping;
+        let Model;
+        let data = {};
+        let defer = [];
+        let que = new RefreshQueue();
 
         que.enqueue(instance).trigger().done(function (inst) {
           data.context = instance.context || null;
           objects.forEach(function (destination) {
-            var modelInstance;
-            var isMapped;
-            var isAllowed;
-            var isPersonMapping = type === 'Person';
+            let modelInstance;
+            let isMapped;
+            let isAllowed;
+            let isPersonMapping = type === 'Person';
             // Use simple Relationship Model to map Snapshot
             if (this.viewModel.attr('useSnapshots')) {
               modelInstance = new CMS.Models.Relationship({
@@ -300,7 +300,7 @@ import RefreshQueue from '../../models/refresh_queue';
               refreshCounts();
 
               _.each($('sub-tree-wrapper'), function (wrapper) {
-                var vm = $(wrapper).viewModel();
+                let vm = $(wrapper).viewModel();
 
                 if (vm.attr('parent') === instance) {
                   if (vm.attr('isOpen') && vm.attr('dataIsReady')) {
@@ -321,7 +321,7 @@ import RefreshQueue from '../../models/refresh_queue';
 
     helpers: {
       get_title: function (options) {
-        var instance = this.attr('parentInstance');
+        let instance = this.attr('parentInstance');
         return (
           (instance && instance.title) ?
             instance.title :
@@ -329,7 +329,7 @@ import RefreshQueue from '../../models/refresh_queue';
         );
       },
       get_object: function (options) {
-        var type = CMS.Models[this.attr('type')];
+        let type = CMS.Models[this.attr('type')];
         if (type && type.title_plural) {
           return type.title_plural;
         }

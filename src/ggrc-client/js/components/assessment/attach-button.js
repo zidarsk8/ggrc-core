@@ -9,7 +9,7 @@ import template from './attach-button.mustache';
 (function (GGRC, can) {
   'use strict';
 
-  var tag = 'attach-button';
+  let tag = 'attach-button';
 
   GGRC.Components('attachButton', {
     tag: tag,
@@ -19,7 +19,7 @@ import template from './attach-button.mustache';
       define: {
         hasPermissions: {
           get: function (prevValue, setValue) {
-            var instance = this.attr('instance');
+            let instance = this.attr('instance');
             if (Permission.is_allowed_for('update', instance) &&
               !instance.archived) {
               this.checkFolder().always(function () {
@@ -38,7 +38,7 @@ import template from './attach-button.mustache';
       instance: null,
       isAttachActionDisabled: false,
       onBeforeCreate: function (event) {
-        var items = event.items;
+        let items = event.items;
         this.dispatch({type: 'beforeCreate', items: items});
       },
       itemsUploadedCallback: function () {
@@ -49,7 +49,7 @@ import template from './attach-button.mustache';
         }
       },
       checkFolder: function () {
-        var self = this;
+        let self = this;
 
         return this.findFolder().then(function (folder) {
           /*
@@ -69,8 +69,8 @@ import template from './attach-button.mustache';
         });
       },
       findFolder: function () {
-        var GFolder = CMS.Models.GDriveFolder;
-        var folderId = this.attr('instance.folder');
+        let GFolder = CMS.Models.GDriveFolder;
+        let folderId = this.attr('instance.folder');
 
         if (!folderId) {
           return can.Deferred().resolve();

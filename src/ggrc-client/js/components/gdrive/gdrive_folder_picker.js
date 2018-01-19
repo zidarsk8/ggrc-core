@@ -74,7 +74,7 @@ import {
         }.bind(this));
       },
       setCurrent: function (folderId) {
-        var gdriveFolder;
+        let gdriveFolder;
 
         this.attr('_folder_change_pending', true);
 
@@ -101,7 +101,7 @@ import {
         this.attr('current_folder', null);
       },
       setRevisionFolder: function () {
-        var folderId;
+        let folderId;
 
         if (!this.attr('hasRevisionFolder')) {
           this.attr('isRevisionFolderLoaded', true);
@@ -122,8 +122,8 @@ import {
 
     events: {
       inserted: function () {
-        var viewModel = this.viewModel;
-        var folderId;
+        let viewModel = this.viewModel;
+        let folderId;
 
         if (viewModel.attr('hasRevisionFolder')) {
           viewModel.setRevisionFolder();
@@ -138,7 +138,7 @@ import {
       },
 
       '{viewModel.instance} change': function (inst, ev, attr) {
-        var folderId;
+        let folderId;
 
         // Error recovery from previous refresh_instances error when we couldn't set up the binding.
         if (!this.viewModel.folder_error) {
@@ -160,8 +160,8 @@ import {
        * @param {Object} ev - The event object.
        */
       'a[data-toggle=gdrive-remover] click': function (el, ev) {
-        var viewModel = this.viewModel;
-        var dfd;
+        let viewModel = this.viewModel;
+        let dfd;
 
         if (viewModel.deferred) {
           viewModel.instance.attr('folder', null);
@@ -209,10 +209,10 @@ import {
        *     in the GDrive folder picker modal.
        */
       '.entry-attachment picked': function (el, ev, data) {
-        var dfd;
-        var files = data.files || [];
-        var folderId;
-        var viewModel = this.viewModel;
+        let dfd;
+        let files = data.files || [];
+        let folderId;
+        let viewModel = this.viewModel;
 
         if (el.data('type') === 'folders' &&
             files.length &&

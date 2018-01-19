@@ -26,7 +26,7 @@
       return this.findAll({person_id: GGRC.current_user.id});
     },
     setActive: function(active){
-      var existing_types, all_types, valid_types;
+      let existing_types, all_types, valid_types;
 
       if(!GGRC.current_user){
         console.warn('User object is not set.');
@@ -43,7 +43,7 @@
           return config.notif_type;
         });
         all_types = $.map(valid_types, function(type){
-          var index = existing_types.indexOf(type);
+          let index = existing_types.indexOf(type);
           if(index == -1){
             // Create a new notificationConfig if it doesn't exist yet
             return new CMS.Models.NotificationConfig({
@@ -56,7 +56,7 @@
           return configs[index];
         });
         return $.when.apply($, $.map(all_types, function(config){
-          var enabled = active.indexOf(config.notif_type) != -1;
+          let enabled = active.indexOf(config.notif_type) != -1;
           if(config.attr('enable_flag') === enabled){
             // There was no change to this config object
             return;

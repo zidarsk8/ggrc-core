@@ -14,7 +14,7 @@
         instance.custom_attribute_definitions.length);
     },
     '{CMS.Models.Issue} created': function (model, ev, instance) {
-      var dfd;
+      let dfd;
 
       if (!(instance instanceof CMS.Models.Issue)) {
         return;
@@ -30,7 +30,7 @@
       }.bind(this));
     },
     '{CMS.Models.Section} created': function (model, ev, instance) {
-      var directiveDfd;
+      let directiveDfd;
 
       if (!(instance instanceof CMS.Models.Section)) {
         return;
@@ -42,7 +42,7 @@
       }.bind(this));
     },
     _after_pending_joins: function (instance, callback) {
-      var dfd = instance.attr('_pending_joins_dfd');
+      let dfd = instance.attr('_pending_joins_dfd');
       if (!dfd) {
         dfd = new $.Deferred().resolve();
       }

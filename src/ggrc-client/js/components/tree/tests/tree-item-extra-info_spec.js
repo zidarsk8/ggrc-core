@@ -6,8 +6,8 @@
 describe('GGRC.Components.treeItemExtraInfo', function () {
   'use strict';
 
-  var viewModel;
-  var activeModel = ['Regulation', 'Contract', 'Policy', 'Standard', 'Section'];
+  let viewModel;
+  let activeModel = ['Regulation', 'Contract', 'Policy', 'Standard', 'Section'];
 
   beforeEach(function () {
     viewModel = GGRC.Components.getViewModel('treeItemExtraInfo');
@@ -28,8 +28,8 @@ describe('GGRC.Components.treeItemExtraInfo', function () {
   });
 
   describe('is not active if', function () {
-    var allModels = Object.keys(GGRC.tree_view.attr('base_widgets_by_type'));
-    var notActiveModels = _.difference(allModels, activeModel);
+    let allModels = Object.keys(GGRC.tree_view.attr('base_widgets_by_type'));
+    let notActiveModels = _.difference(allModels, activeModel);
 
     it('workflow_state is not defined', function () {
       viewModel.attr('instance', {title: 'FooBar'});
@@ -48,7 +48,7 @@ describe('GGRC.Components.treeItemExtraInfo', function () {
 
   describe('isOverdue property', function () {
     it('returns true if workflow_status is "Overdue"', function () {
-      var result;
+      let result;
       viewModel.attr('instance', {
         workflow_state: 'Overdue'
       });
@@ -59,7 +59,7 @@ describe('GGRC.Components.treeItemExtraInfo', function () {
     });
 
     it('returns false if workflow_status is not "Overdue"', function () {
-      var result;
+      let result;
       viewModel.attr('instance', {
         workflow_state: 'AnyState'
       });
@@ -70,8 +70,8 @@ describe('GGRC.Components.treeItemExtraInfo', function () {
     });
 
     it('returns true if instance is "CycleTasks" and overdue', function () {
-      var result;
-      var instance = new CMS.Models.CycleTaskGroupObjectTask();
+      let result;
+      let instance = new CMS.Models.CycleTaskGroupObjectTask();
       instance.attr('end_date', moment().subtract(5, 'd'));
       viewModel.attr('instance', instance);
 
@@ -82,8 +82,8 @@ describe('GGRC.Components.treeItemExtraInfo', function () {
 
     it('returns false if instance is "CycleTasks" and not overdue',
     function () {
-      var result;
-      var instance = new CMS.Models.CycleTaskGroupObjectTask();
+      let result;
+      let instance = new CMS.Models.CycleTaskGroupObjectTask();
       instance.attr('end_date', moment().add(5, 'd'));
       viewModel.attr('instance', instance);
 

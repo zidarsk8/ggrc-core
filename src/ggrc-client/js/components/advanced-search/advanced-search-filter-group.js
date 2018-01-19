@@ -22,7 +22,7 @@ let viewModel = AdvancedSearchContainer.extend({
    * Adds Filter Operator and Filter Attribute to the collection.
    */
   addFilterCriterion: function () {
-    var items = this.attr('items');
+    let items = this.attr('items');
     items.push(AdvancedSearch.create.operator('AND'));
     items.push(AdvancedSearch.create.attribute());
   },

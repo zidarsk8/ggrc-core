@@ -4,7 +4,7 @@
 */
 (function($, moment) {
   // On-demand creation of datepicker() objects
-  var $body = $("body"),
+  let $body = $("body"),
       format = {
         changeMonth: true,
         changeYear: true,
@@ -14,7 +14,7 @@
       };
 
   $body.on("focus", "[data-toggle=\"datepicker\"]", function (ev) {
-    var $this = $(this);
+    let $this = $(this);
 
     if ($this.data("datepicker")) {
       return;
@@ -28,7 +28,7 @@
 
   // On-demand creation of datepicker() objects, initial date today or later
   $body.on("focus", "[data-toggle=\"datepicker_today_or_later\"]", function (ev) {
-    var $this = $(this);
+    let $this = $(this);
 
     if ($this.data("datepicker")) {
       return;

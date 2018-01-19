@@ -4,18 +4,18 @@
  */
 (function ($) {
   function openclose(command) {
-    var $that = $(this);
-    var useSlide = $that.length < 100;
+    let $that = $(this);
+    let useSlide = $that.length < 100;
 
     $that.each(function () {
-      var $this = $(this);
-      var $main = $this.closest('.item-main');
-      var $li = $main.closest('li');
-      var $content = $li.children('.item-content');
-      var $peopleInfo = $li.children('people-list-info');
-      var $icon = $main.find('.openclose');
-      var $parentTree = $this.closest('ul.new-tree');
-      var cmd = command;
+      let $this = $(this);
+      let $main = $this.closest('.item-main');
+      let $li = $main.closest('li');
+      let $content = $li.children('.item-content');
+      let $peopleInfo = $li.children('people-list-info');
+      let $icon = $main.find('.openclose');
+      let $parentTree = $this.closest('ul.new-tree');
+      let cmd = command;
 
       if (typeof cmd !== 'string' || cmd === 'toggle') {
         cmd = $icon.hasClass('active') ? 'close' : 'open';

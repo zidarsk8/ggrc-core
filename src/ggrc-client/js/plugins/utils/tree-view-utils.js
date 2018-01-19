@@ -34,14 +34,14 @@ import {
 * TreeView-specific utils.
 */
 
-var baseWidgets = GGRC.tree_view.attr('base_widgets_by_type');
-var defaultOrderTypes = GGRC.tree_view.attr('defaultOrderTypes');
-var allTypes = Object.keys(baseWidgets.attr());
-var orderedModelsForSubTier = {};
+let baseWidgets = GGRC.tree_view.attr('base_widgets_by_type');
+let defaultOrderTypes = GGRC.tree_view.attr('defaultOrderTypes');
+let allTypes = Object.keys(baseWidgets.attr());
+let orderedModelsForSubTier = {};
 
 
-var SUB_TREE_ELEMENTS_LIMIT = 20;
-var SUB_TREE_FIELDS = Object.freeze([
+let SUB_TREE_ELEMENTS_LIMIT = 20;
+let SUB_TREE_FIELDS = Object.freeze([
   'child_id',
   'child_type',
   'context',
@@ -68,13 +68,13 @@ var SUB_TREE_FIELDS = Object.freeze([
   'user_roles',
 ]);
 
-var FULL_SUB_LEVEL_LIST = Object.freeze([
+let FULL_SUB_LEVEL_LIST = Object.freeze([
   'Cycle',
   'CycleTaskGroup',
   'CycleTaskGroupObjectTask',
 ]);
 
-var NO_FIELDS_LIMIT_LIST = Object.freeze([
+let NO_FIELDS_LIMIT_LIST = Object.freeze([
   'Assessment',
 ]);
 
@@ -87,12 +87,12 @@ const NO_DEFAULT_SORTING_LIST = Object.freeze([
   'CycleTaskGroupObjectTask',
 ]);
 
-var treeViewExcess = {
+let treeViewExcess = {
   AssessmentTemplate: ['os_state'],
 };
 
 allTypes.forEach(function (type) {
-  var related = baseWidgets[type].slice(0);
+  let related = baseWidgets[type].slice(0);
 
   orderedModelsForSubTier[type] = _.chain(related)
     .map(function (type) {
@@ -112,8 +112,8 @@ orderedModelsForSubTier.CycleTaskGroup = ['CycleTaskGroupObjectTask'];
 orderedModelsForSubTier.CycleTaskGroupObjectTask = [];
 
 function getSubTreeFields(parent, child) {
-  var noFieldsLimitOnChild = hasNoFieldsLimit(child);
-  var noFieldsLimitOnParent = _isFullSubTree(parent);
+  let noFieldsLimitOnChild = hasNoFieldsLimit(child);
+  let noFieldsLimitOnParent = _isFullSubTree(parent);
   return noFieldsLimitOnChild || noFieldsLimitOnParent ?
     [] :
     SUB_TREE_FIELDS;
@@ -146,28 +146,28 @@ function skipUnusable(modelName, attrList) {
  * @return {Object} Table columns configuration.
  */
 function getColumnsForModel(modelType, displayPrefs, modelName) {
-  var Cacheable = can.Model.Cacheable;
-  var Model = CMS.Models[modelType];
-  var modelDefinition = Model().class.root_object;
-  var mandatoryAttrNames =
+  let Cacheable = can.Model.Cacheable;
+  let Model = CMS.Models[modelType];
+  let modelDefinition = Model().class.root_object;
+  let mandatoryAttrNames =
     Model.tree_view_options.mandatory_attr_names ||
     Cacheable.tree_view_options.mandatory_attr_names;
-  var savedAttrList = displayPrefs ?
+  let savedAttrList = displayPrefs ?
     displayPrefs.getTreeViewHeaders(modelName || Model.model_singular) :
     [];
-  var displayAttrNames =
+  let displayAttrNames =
     savedAttrList.length ? savedAttrList :
       (Model.tree_view_options.display_attr_names ||
       Cacheable.tree_view_options.display_attr_names);
-  var disableConfiguration =
+  let disableConfiguration =
     !!Model.tree_view_options.disable_columns_configuration;
-  var mandatoryColumns;
-  var displayColumns;
-  var attrs;
-  var customAttrs;
-  var allAttrs;
-  var modelRoles;
-  var roleAttrs;
+  let mandatoryColumns;
+  let displayColumns;
+  let attrs;
+  let customAttrs;
+  let allAttrs;
+  let modelRoles;
+  let roleAttrs;
 
   attrs = can.makeArray(
     Model.tree_view_options.mapper_attr_list ||
@@ -198,7 +198,7 @@ function getColumnsForModel(modelType, displayPrefs, modelName) {
     [] :
     GGRC.custom_attr_defs
       .filter(function (def) {
-        var include = def.definition_type === modelDefinition;
+        let include = def.definition_type === modelDefinition;
 
         return include;
       }).map(function (def) {
@@ -268,10 +268,10 @@ function getColumnsForModel(modelType, displayPrefs, modelName) {
  */
 function setColumnsForModel(modelType, columnNames, displayPrefs,
   modelName) {
-  var availableColumns =
+  let availableColumns =
     getColumnsForModel(modelType, displayPrefs).available;
-  var selectedColumns = [];
-  var selectedNames = [];
+  let selectedColumns = [];
+  let selectedNames = [];
 
   availableColumns.forEach(function (attr) {
     if (columnNames.indexOf(attr.attr_name) !== -1) {
@@ -351,9 +351,9 @@ function getSortingForModel(modelType) {
  * @return {Object} Sub tier filter configuration.
  */
 function getModelsForSubTier(modelName) {
-  var Model = CMS.Models[modelName];
-  var availableModels;
-  var selectedModels;
+  let Model = CMS.Models[modelName];
+  let availableModels;
+  let selectedModels;
 
   // getMappableTypes can't be run at once,
   // cause GGRC.Mappings is not loaded yet
@@ -399,17 +399,17 @@ function loadFirstTierItems(modelName,
                             filterInfo,
                             filter,
                             request) {
-  var modelConfig = getWidgetConfig(modelName);
+  let modelConfig = getWidgetConfig(modelName);
 
-  var params = buildParam(
+  let params = buildParam(
     modelConfig.responseType,
     filterInfo,
     makeRelevantExpression(modelConfig.name, parent.type, parent.id),
     null,
     filter
   );
-  var requestedType;
-  var requestData = request.slice() || can.List();
+  let requestedType;
+  let requestData = request.slice() || can.List();
 
   if ((isSnapshotScope(parent) && isSnapshotModel(modelConfig.name))) {
     params = transformQuery(params);
@@ -438,30 +438,30 @@ function loadFirstTierItems(modelName,
  * @return {Promise} - Items for sub tier.
  */
 function loadItemsForSubTier(models, type, id, filter) {
-  var relevant = {
+  let relevant = {
     type: type,
     id: id,
     operation: 'relevant',
   };
-  var showMore = false;
-  var loadedModelObjects = [];
+  let showMore = false;
+  let loadedModelObjects = [];
 
   return _buildSubTreeCountMap(models, relevant, filter)
     .then(function (result) {
-      var countMap = result.countsMap;
-      var dfds;
-      var mappedDfd;
-      var resultDfd;
+      let countMap = result.countsMap;
+      let dfds;
+      let mappedDfd;
+      let resultDfd;
 
       loadedModelObjects = getWidgetConfigs(Object.keys(countMap));
       showMore = result.showMore;
 
       dfds = loadedModelObjects.map(function (modelObject) {
-        var subTreeFields = getSubTreeFields(type, modelObject.name);
-        var pageInfo = {
+        let subTreeFields = getSubTreeFields(type, modelObject.name);
+        let pageInfo = {
           filter: filter,
         };
-        var params;
+        let params;
 
         if (countMap[modelObject.name]) {
           pageInfo.current = 1;
@@ -498,12 +498,12 @@ function loadItemsForSubTier(models, type, id, filter) {
       return resultDfd;
     })
     .then(function () {
-      var directlyRelated = [];
-      var notRelated = [];
-      var response = can.makeArray(arguments);
+      let directlyRelated = [];
+      let notRelated = [];
+      let response = can.makeArray(arguments);
 
       loadedModelObjects.forEach(function (modelObject, index) {
-        var values;
+        let values;
 
         if (isSnapshotModel(modelObject.name) &&
           response[index].Snapshot) {
@@ -513,7 +513,7 @@ function loadItemsForSubTier(models, type, id, filter) {
         }
 
         values.forEach(function (source) {
-          var instance = _createInstance(source, modelObject.name);
+          let instance = _createInstance(source, modelObject.name);
 
           if (isDirectlyRelated(instance)) {
             directlyRelated.push(instance);
@@ -543,9 +543,9 @@ function makeRelevantExpression(requestedType,
                                 relevantToType,
                                 relevantToId,
                                 operation) {
-  var isObjectBrowser = /^\/objectBrowser\/?$/
+  let isObjectBrowser = /^\/objectBrowser\/?$/
     .test(window.location.pathname);
-  var expression;
+  let expression;
 
   if (!isObjectBrowser) {
     expression = {
@@ -566,11 +566,11 @@ function makeRelevantExpression(requestedType,
  * @return {Boolean} Is associated with the current context.
  */
 function isDirectlyRelated(instance) {
-  var needToSplit = isObjectContextPage() &&
+  let needToSplit = isObjectContextPage() &&
     getPageType() !== 'Workflow';
-  var relates = related.attr(instance.type);
-  var result = true;
-  var instanceId = isSnapshot(instance) ?
+  let relates = related.attr(instance.type);
+  let result = true;
+  let instanceId = isSnapshot(instance) ?
     instance.snapshot.id :
     instance.id;
 
@@ -590,11 +590,11 @@ function isDirectlyRelated(instance) {
  * @private
  */
 function _getQuerryObjectVersion(models, relevant, filter) {
-  var countQuery = [];
+  let countQuery = [];
   models.forEach(function (model) {
-    var widgetConfig = getWidgetConfig(model);
-    var name = widgetConfig.name;
-    var query = buildCountParams([name], relevant, filter);
+    let widgetConfig = getWidgetConfig(model);
+    let name = widgetConfig.name;
+    let query = buildCountParams([name], relevant, filter);
 
     if (widgetConfig.isObjectVersion) {
       query = transformQuery(query[0]);
@@ -616,9 +616,9 @@ function _getQuerryObjectVersion(models, relevant, filter) {
  * @private
  */
 function _buildSubTreeCountMap(models, relevant, filter) {
-  var countQuery;
-  var result;
-  var countMap = {};
+  let countQuery;
+  let result;
+  let countMap = {};
 
   if (_isFullSubTree(relevant.type)) {
     models.forEach(function (model) {
@@ -645,9 +645,9 @@ function _buildSubTreeCountMap(models, relevant, filter) {
 
     result = makeRequest({data: countQuery})
       .then(function (response) {
-        var total = 0;
-        var showMore = models.some(function (model, index) {
-          var count = response[index][model] ?
+        let total = 0;
+        let showMore = models.some(function (model, index) {
+          let count = response[index][model] ?
             response[index][model].total :
             response[index].Snapshot.total;
 
@@ -687,7 +687,7 @@ function _isFullSubTree(type) {
  * @private
  */
 function _createInstance(source, modelName) {
-  var instance;
+  let instance;
 
   if (source.type === 'Snapshot') {
     instance = toObject(source);
@@ -698,8 +698,8 @@ function _createInstance(source, modelName) {
 }
 
 function _getTreeViewOperation(objectName) {
-  var isDashboard = isMyWork();
-  var operation;
+  let isDashboard = isMyWork();
+  let operation;
   if (isDashboard) {
     operation = 'owned';
   } else if (!isDashboard && objectName === 'Person') {

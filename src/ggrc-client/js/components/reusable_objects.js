@@ -22,7 +22,7 @@
     },
     helpers: {
       isDisabled: function (instance, options) {
-        var isMapped = GGRC.Utils.is_mapped(
+        let isMapped = GGRC.Utils.is_mapped(
           this.attr('baseInstance'), instance, this.attr('mapping'));
 
         if (isMapped) {

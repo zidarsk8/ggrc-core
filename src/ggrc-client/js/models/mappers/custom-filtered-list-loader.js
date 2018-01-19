@@ -21,7 +21,7 @@ import RefreshQueue from '../refresh_queue';
   GGRC.ListLoaders.StubFilteredListLoader(
     'GGRC.ListLoaders.CustomFilteredListLoader', {}, {
       process_result: function (binding, result, newResult, include) {
-        var self = this;
+        let self = this;
         if (include) {
           if (typeof include.then === 'function') {
             // return nothing yet. push in later if it is needed.
@@ -44,7 +44,7 @@ import RefreshQueue from '../refresh_queue';
       },
 
       init_listeners: function (binding) {
-        var self = this;
+        let self = this;
         function resultCompute(result) {
           return can.compute(function () {
             return self.filter_fn(result);
@@ -65,7 +65,7 @@ import RefreshQueue from '../refresh_queue';
               })
             ).trigger().done(function () {
               can.map(can.makeArray(results), function (result) {
-                var newResult =
+                let newResult =
                   self.make_result(result.instance, [result], binding);
                 newResult.compute = resultCompute(result);
                 newResult.compute.bind('change',
@@ -85,7 +85,7 @@ import RefreshQueue from '../refresh_queue';
       },
 
       _refresh_stubs: function (binding) {
-        var self = this;
+        let self = this;
 
         return binding.source_binding.refresh_instances()
           .then(function (results) {
@@ -95,7 +95,7 @@ import RefreshQueue from '../refresh_queue';
               })
             ).trigger().done(function () {
               can.map(can.makeArray(results), function (result) {
-                var newResult =
+                let newResult =
                   self.make_result(result.instance, [result], binding);
                 newResult.compute = can.compute(function () {
                   return self.filter_fn(result);

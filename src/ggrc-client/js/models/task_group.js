@@ -48,7 +48,7 @@
     },
 
     init: function () {
-      var that = this;
+      let that = this;
       if (this._super) {
         this._super.apply(this, arguments);
       }
@@ -117,8 +117,8 @@
     },
 
     init: function () {
-      var that = this;
-      var assigneeRole = _.find(GGRC.access_control_roles, {
+      let that = this;
+      let assigneeRole = _.find(GGRC.access_control_roles, {
         object_type: 'TaskGroupTask',
         name: 'Task Assignees',
       });
@@ -132,8 +132,8 @@
       //   .replace(...) doesn't raise change event
       // that's why we subscribe on access_control_list.length
       this.validate('access_control_list.length', function () {
-        var that = this;
-        var hasAssignee = assigneeRole && _.some(that.access_control_list, {
+        let that = this;
+        let hasAssignee = assigneeRole && _.some(that.access_control_list, {
           ac_role_id: assigneeRole.id,
         });
 
@@ -143,11 +143,11 @@
       });
 
       this.validate(['start_date', 'end_date'], function () {
-        var that = this;
-        var workflow = GGRC.page_instance();
-        var datesAreValid = true;
-        var startDate = GGRC.Date.getDate(that.attr('start_date'));
-        var endDate = GGRC.Date.getDate(that.attr('end_date'));
+        let that = this;
+        let workflow = GGRC.page_instance();
+        let datesAreValid = true;
+        let startDate = GGRC.Date.getDate(that.attr('start_date'));
+        let endDate = GGRC.Date.getDate(that.attr('end_date'));
 
         if (!(workflow instanceof CMS.Models.Workflow)) {
           return;
@@ -205,9 +205,9 @@
       this.attr('minStartDate', new Date());
 
       this.bind('task_group', function (ev, newTask) {
-        var task;
-        var taskGroup;
-        var props = [
+        let task;
+        let taskGroup;
+        let props = [
           'relative_start_day',
           'relative_start_month',
           'relative_end_day',
@@ -241,8 +241,8 @@
     _refresh_workflow_people: function () {
       //  TaskGroupTask assignment may add mappings and role assignments in
       //  the backend, so ensure these changes are reflected.
-      var workflow;
-      var taskGroup = this.task_group.reify();
+      let workflow;
+      let taskGroup = this.task_group.reify();
       if (taskGroup.selfLink) {
         workflow = taskGroup.workflow.reify();
         return workflow.refresh();

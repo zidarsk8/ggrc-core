@@ -21,29 +21,29 @@ import template from './prev-next-buttons.mustache';
         },
         hasNext: {
           get: function () {
-            var current = this.attr('currentIndex');
-            var total = this.attr('totalCount');
+            let current = this.attr('currentIndex');
+            let total = this.attr('totalCount');
             return current < total - 1;
           }
         },
         hasPrev: {
           get: function () {
-            var current = this.attr('currentIndex');
+            let current = this.attr('currentIndex');
             return current > 0;
           }
         }
       },
       setNext: function () {
-        var current = this.attr('currentIndex');
-        var hasNext = this.attr('hasNext');
+        let current = this.attr('currentIndex');
+        let hasNext = this.attr('hasNext');
 
         if (hasNext) {
           this.attr('currentIndex', current + 1);
         }
       },
       setPrev: function () {
-        var current = this.attr('currentIndex');
-        var hasPrev = this.attr('hasPrev');
+        let current = this.attr('currentIndex');
+        let hasPrev = this.attr('hasPrev');
 
         if (hasPrev) {
           this.attr('currentIndex', current - 1);

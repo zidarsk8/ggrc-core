@@ -16,7 +16,7 @@ import PersistentNotifier from '../plugins/persistent_notifier';
 import RefreshQueue from './refresh_queue';
 
 (function (can, GGRC, CMS) {
-  var _oldAttr;
+  let _oldAttr;
   function makeFindRelated(thistype, othertype) {
     return function (params) {
       if (!params[thistype + '_type']) {
@@ -24,10 +24,10 @@ import RefreshQueue from './refresh_queue';
       }
       return CMS.Models.Relationship.findAll(params).then(
         function (relationships) {
-          var dfds = [];
-          var things = new can.Model.List();
+          let dfds = [];
+          let things = new can.Model.List();
           can.each(relationships, function (rel, idx) {
-            var dfd;
+            let dfd;
             if (rel[othertype].selfLink) {
               things.push(rel[othertype]);
             } else {
@@ -46,8 +46,8 @@ import RefreshQueue from './refresh_queue';
   }
 
   function dateConverter(date, oldValue, fn, key) {
-    var conversion = 'YYYY-MM-DD\\THH:mm:ss\\Z';
-    var ret;
+    let conversion = 'YYYY-MM-DD\\THH:mm:ss\\Z';
+    let ret;
     if (typeof date === 'object' && date) {
       date = date.getTime();
     }
@@ -93,12 +93,12 @@ import RefreshQueue from './refresh_queue';
   }
 
   function makeDateSerializer(type, key) {
-    var conversion = type === 'date' ?
+    let conversion = type === 'date' ?
       'YYYY-MM-DD' :
       'YYYY-MM-DD\\THH:mm:ss\\Z';
     return function (date) {
-      var retstr;
-      var retval;
+      let retstr;
+      let retval;
       if (date === null || date === undefined) {
         return '';
       }
@@ -187,9 +187,9 @@ import RefreshQueue from './refresh_queue';
 
     makeFindAll: function (finder) {
       return function (params, success, error) {
-        var deferred = can.Deferred();
-        var sourceDeferred = finder.call(this, params);
-        var self = this;
+        let deferred = can.Deferred();
+        let sourceDeferred = finder.call(this, params);
+        let self = this;
 
         deferred.then(success, error);
         sourceDeferred.then(function (sourceData) {
@@ -214,7 +214,7 @@ import RefreshQueue from './refresh_queue';
     },
 
     setup: function (construct, name, statics, prototypes) {
-      var overrideFindAll = false;
+      let overrideFindAll = false;
 
       if (this.fullName === 'can.Model.Cacheable') {
         this.findAll = function () {
@@ -252,10 +252,10 @@ import RefreshQueue from './refresh_queue';
     //  whether it gets in and when.  --BM 3/4/14
     // this.__bindEvents = {};
 
-      var that = this;
+      let that = this;
       if (statics.mixins) {
         can.each(statics.mixins, function (mixin) {
-          var _mixin = mixin;
+          let _mixin = mixin;
           if (typeof _mixin === 'string') {
             _mixin = can.getObject(_mixin, CMS.Models.Mixins);
           }
@@ -269,7 +269,7 @@ import RefreshQueue from './refresh_queue';
         delete this.mixins;
       }
 
-      var ret = this._super.apply(this, arguments);
+      let ret = this._super.apply(this, arguments);
       if (overrideFindAll)
         this.findAll = can.Model.Cacheable.findAll;
 
@@ -283,11 +283,11 @@ import RefreshQueue from './refresh_queue';
     },
 
     init: function () {
-      var id_key = this.id;
-      var _update = this.update;
-      var _create = this.create;
+      let id_key = this.id;
+      let _update = this.update;
+      let _create = this.create;
       this.bind('created', function (ev, new_obj) {
-        var cache = can.getObject('cache', new_obj.constructor, true);
+        let cache = can.getObject('cache', new_obj.constructor, true);
         if (new_obj[id_key] || new_obj[id_key] === 0) {
           if (!isSnapshot(new_obj)) {
             cache[new_obj[id_key]] = new_obj;
@@ -305,7 +305,7 @@ import RefreshQueue from './refresh_queue';
     //  This leads to conflicts not actually rejecting because on the second go-round
     //  the local and remote objects look the same.  --BM 2015-02-06
       this.update = function (id, params) {
-        var ret = _update
+        let ret = _update
         .call(this, id, this.process_args(params))
         .then(
           this.resolve_deferred_bindings.bind(this),
@@ -320,7 +320,7 @@ import RefreshQueue from './refresh_queue';
         return ret;
       };
       this.create = function (params) {
-        var ret = _create
+        let ret = _create
         .call(this, this.process_args(params))
         .then(this.resolve_deferred_bindings.bind(this));
         delete ret.hasFailCallback;
@@ -345,10 +345,10 @@ import RefreshQueue from './refresh_queue';
     },
 
     resolve_deferred_bindings: function (obj) {
-      var _pjs;
-      var refresh_dfds = [];
-      var dfds = [];
-      var dfds_apply;
+      let _pjs;
+      let refresh_dfds = [];
+      let dfds = [];
+      let dfds_apply;
       if (obj._pending_joins && obj._pending_joins.length) {
         _pjs = obj._pending_joins.slice(0); // refresh of bindings later will muck up the pending joins on the object
         can.each(can.unique(can.map(_pjs, function (pj) {
@@ -360,9 +360,9 @@ import RefreshQueue from './refresh_queue';
         return $.when.apply($, refresh_dfds)
       .then(function () {
         can.each(obj._pending_joins, function (pj) {
-          var inst;
-          var binding = obj.get_binding(pj.through);
-          var model = (CMS.Models[binding.loader.model_name] ||
+          let inst;
+          let binding = obj.get_binding(pj.through);
+          let model = (CMS.Models[binding.loader.model_name] ||
                        GGRC.Models[binding.loader.model_name]);
           if (pj.how === 'add') {
             // Don't re-add -- if the object is already mapped (could be direct or through a proxy)
@@ -444,10 +444,10 @@ import RefreshQueue from './refresh_queue';
     },
 
     newInstance: function (args) {
-      var cache = can.getObject('cache', this, true);
-      var isKeyExists = args && args[this.id];
-      var isObjectExists = isKeyExists && cache[args[this.id]];
-      var notSnapshot = args && !isSnapshot(args);
+      let cache = can.getObject('cache', this, true);
+      let isKeyExists = args && args[this.id];
+      let isObjectExists = isKeyExists && cache[args[this.id]];
+      let notSnapshot = args && !isSnapshot(args);
       if (isObjectExists && notSnapshot) {
         // cache[args.id].attr(args, false); //CanJS has bugs in recursive merging
         // (merging -- adding properties from an object without removing existing ones
@@ -457,16 +457,16 @@ import RefreshQueue from './refresh_queue';
       return this._super.apply(this, arguments);
     },
     process_args: function (args) {
-      var pargs = {};
-      var obj = pargs;
-      var src;
-      var go_names;
+      let pargs = {};
+      let obj = pargs;
+      let src;
+      let go_names;
       if (this.root_object && !(this.root_object in args)) {
         obj = pargs[this.root_object] = {};
       }
       src = args.serialize ? args.serialize() : args;
       go_names = Object.keys(src);
-      for (var i = 0; i < (go_names.length || 0); i++) {
+      for (let i = 0; i < (go_names.length || 0); i++) {
         obj[go_names[i]] = src[go_names[i]];
       }
       return pargs;
@@ -476,7 +476,7 @@ import RefreshQueue from './refresh_queue';
     findRelatedSource: makeFindRelated('destination', 'source'),
 
     models: function (params) {
-      var ms;
+      let ms;
       if (params[this.root_collection + '_collection']) {
         params = params[this.root_collection + '_collection'];
       }
@@ -494,13 +494,13 @@ import RefreshQueue from './refresh_queue';
     },
 
     query: function (request) {
-      var deferred = can.Deferred();
-      var self = this;
+      let deferred = can.Deferred();
+      let self = this;
 
       makeRequest(request)
         .then(function (sourceData) {
-          var values = [];
-          var listDfd = can.Deferred();
+          let values = [];
+          let listDfd = can.Deferred();
           if (sourceData.length) {
             sourceData = sourceData[0];
           } else {
@@ -533,11 +533,11 @@ import RefreshQueue from './refresh_queue';
     },
 
     queryAll: function (request) {
-      var deferred = can.Deferred();
+      let deferred = can.Deferred();
 
       makeRequest(request)
         .then(function (sourceData) {
-          var values = [];
+          let values = [];
 
           sourceData = sourceData.length ? sourceData : {};
 
@@ -563,13 +563,13 @@ import RefreshQueue from './refresh_queue';
     },
 
   _modelize: function (sourceData, deferred) {
-    var obsList = new this.List([]);
-    var index = 0;
-    var self = this;
+    let obsList = new this.List([]);
+    let index = 0;
+    let self = this;
     function modelizeMS(ms) {
-      var item;
-      var start;
-      var instances = [];
+      let item;
+      let start;
+      let instances = [];
 
       start = Date.now();
       while (sourceData.length > index && (Date.now() - start) < ms) {
@@ -596,12 +596,12 @@ import RefreshQueue from './refresh_queue';
   },
 
     object_from_resource: function (params) {
-      var obj_name = this.root_object;
+      let obj_name = this.root_object;
       if (!params) {
         return params;
       }
       if (typeof obj_name !== 'undefined' && params[obj_name]) {
-        for (var i in params[obj_name]) {
+        for (let i in params[obj_name]) {
           if (params[obj_name].hasOwnProperty(i)) {
             params.attr
             ? params.attr(i, params[obj_name][i])
@@ -633,7 +633,7 @@ import RefreshQueue from './refresh_queue';
       return this.model(params).stub();
     },
     model: function (params) {
-      var model;
+      let model;
       params = this.object_from_resource(params);
       if (!params)
         return params;
@@ -696,12 +696,12 @@ import RefreshQueue from './refresh_queue';
      * "GET /api/programs". If this assumption is invalid, this function
      * WILL NOT work correctly.
      */
-      var parts;
-      var method;
-      var collectionUrl;
-      var baseParams;
+      let parts;
+      let method;
+      let collectionUrl;
+      let baseParams;
 
-      var that = this;
+      let that = this;
 
       function makePaginator(paging, baseParams, scope) {
         function getPage(pageName) {
@@ -732,15 +732,15 @@ import RefreshQueue from './refresh_queue';
       }
 
       function findPageFunc(url, data, params, scope) {
-        var ajaxOptions = can.extend({
+        let ajaxOptions = can.extend({
           url: url,
           data: data
         }, params);
 
         return can.ajax(ajaxOptions).then(function (response) {
-          var collection = response[that.root_collection + '_collection'];
-          var paginator = makePaginator(collection.paging, params, scope);
-          var ret = {
+          let collection = response[that.root_collection + '_collection'];
+          let paginator = makePaginator(collection.paging, params, scope);
+          let ret = {
             paging: paginator
           };
           ret[scope.root_collection + '_collection'] =
@@ -778,8 +778,8 @@ import RefreshQueue from './refresh_queue';
     },
 
     get_mapper: function (name) {
-      var mapper;
-      var mappers = GGRC.Mappings.get_mappings_for(this.shortName);
+      let mapper;
+      let mappers = GGRC.Mappings.get_mappings_for(this.shortName);
       if (mappers) {
         mapper = mappers[name];
         return mapper;
@@ -787,9 +787,9 @@ import RefreshQueue from './refresh_queue';
     }
   }, {
     init: function () {
-      var cache = can.getObject('cache', this.constructor, true);
-      var id_key = this.constructor.id;
-      var that = this;
+      let cache = can.getObject('cache', this.constructor, true);
+      let id_key = this.constructor.id;
+      let that = this;
       setAttrs(this);
       if ((this[id_key] || this[id_key] === 0) &&
         !isSnapshot(this)) {
@@ -803,7 +803,7 @@ import RefreshQueue from './refresh_queue';
       }
     },
     load_custom_attribute_definitions: function () {
-      var definitions;
+      let definitions;
       if (this.attr('custom_attribute_definitions')) {
         return;
       }
@@ -812,7 +812,7 @@ import RefreshQueue from './refresh_queue';
         console.warn('Missing injected custom attribute definitions');
       }
       definitions = can.map(GGRC.custom_attr_defs, function (def) {
-        var idCheck = !def.definition_id || def.definition_id === this.id;
+        let idCheck = !def.definition_id || def.definition_id === this.id;
         if (idCheck && def.definition_type === this.constructor.table_singular) {
           return def;
         }
@@ -825,8 +825,8 @@ import RefreshQueue from './refresh_queue';
    * values, if necessary.
    */
     setup_custom_attributes: function () {
-      var self = this;
-      var key;
+      let self = this;
+      let key;
 
     // Remove existing custom_attribute validations,
     // some of them might have changed
@@ -854,9 +854,9 @@ import RefreshQueue from './refresh_queue';
       if (!this.custom_attributes) {
         this.attr('custom_attributes', new can.Map());
         can.each(this.custom_attribute_values, function (value) {
-          var def;
-          var attributeValue;
-          var object;
+          let def;
+          let attributeValue;
+          let object;
           value = value.isStub ? value : value.reify();
           def = _.find(this.custom_attribute_definitions, {
             id: value.custom_attribute_id
@@ -886,7 +886,7 @@ import RefreshQueue from './refresh_queue';
     },
 
     _custom_attribute_map: function (attrId, object) {
-      var definition;
+      let definition;
       attrId = Number(attrId); // coming from mustache this will be a string
       definition = _.find(this.custom_attribute_definitions, {id: attrId});
 
@@ -904,7 +904,7 @@ import RefreshQueue from './refresh_queue';
       }
     },
     computed_errors: function () {
-      var errors = this.errors();
+      let errors = this.errors();
       if (this.attr('_suppress_errors')) {
         return null;
       }
@@ -914,7 +914,7 @@ import RefreshQueue from './refresh_queue';
       return this.errors();
     },
     get_list_counter: function (name) {
-      var binding = this.get_binding(name);
+      let binding = this.get_binding(name);
       if (!binding) {
         return can.Deferred().reject();
       }
@@ -922,12 +922,12 @@ import RefreshQueue from './refresh_queue';
     },
 
     get_list_loader: function (name) {
-      var binding = this.get_binding(name);
+      let binding = this.get_binding(name);
       return binding.refresh_list();
     },
 
     get_mapping: function (name) {
-      var binding = this.get_binding(name);
+      let binding = this.get_binding(name);
       if (binding) {
         binding.refresh_list();
         return binding.list;
@@ -944,9 +944,9 @@ import RefreshQueue from './refresh_queue';
         return can.Deferred().reject();
       }
       return this.get_list_loader('orphaned_objects').then(function (list) {
-        var objects = [];
-        var mappings = [];
-        var result = [];
+        let objects = [];
+        let mappings = [];
+        let result = [];
 
         function is_join(mapping) {
           if (mapping.mappings.length > 0) {
@@ -961,7 +961,7 @@ import RefreshQueue from './refresh_queue';
             mapping.instance;
         }
         can.each(list, function (mapping) {
-          var inst;
+          let inst;
           if (inst = is_join(mapping))
             mappings.push(inst);
           else
@@ -985,9 +985,9 @@ import RefreshQueue from './refresh_queue';
   // checks if binding exists without throwing debug statements
   // modeled after what get_binding is doing
     has_binding: function (mapper) {
-      var binding;
-      var mapping;
-      var binding_attr = this._get_binding_attr(mapper);
+      let binding;
+      let mapping;
+      let binding_attr = this._get_binding_attr(mapper);
 
       if (binding_attr) {
         binding = this[binding_attr];
@@ -1008,9 +1008,9 @@ import RefreshQueue from './refresh_queue';
     },
 
     get_binding: function (mapper) {
-      var mapping;
-      var binding;
-      var binding_attr = this._get_binding_attr(mapper);
+      let mapping;
+      let binding;
+      let binding_attr = this._get_binding_attr(mapper);
 
       if (binding_attr) {
         binding = this[binding_attr];
@@ -1038,9 +1038,9 @@ import RefreshQueue from './refresh_queue';
       return binding;
     },
     refresh: function (params) {
-      var dfd;
-      var href = this.selfLink || this.href;
-      var that = this;
+      let dfd;
+      let href = this.selfLink || this.href;
+      let that = this;
 
       if (!href) {
         return can.Deferred().reject();
@@ -1049,7 +1049,7 @@ import RefreshQueue from './refresh_queue';
         this._pending_refresh = {
           dfd: can.Deferred(),
           fn: _.throttle(function () {
-            var dfd = that._pending_refresh.dfd;
+            let dfd = that._pending_refresh.dfd;
             can.ajax({
               url: href,
               params: params,
@@ -1077,9 +1077,9 @@ import RefreshQueue from './refresh_queue';
     },
   // TODO: should be refactored and sliced on multiple functions
     serialize: function () {
-      var serial = {};
-      var fnName;
-      var val;
+      let serial = {};
+      let fnName;
+      let val;
       if (arguments.length) {
         return this._super.apply(this, arguments);
       }
@@ -1108,7 +1108,7 @@ import RefreshQueue from './refresh_queue';
           serial[name] = val.stub().serialize();
         } else if (typeof val === 'object' && val !== null && val.length) {
           serial[name] = can.map(val, function (v) {
-            var isModel = v && can.isFunction(v.save);
+            let isModel = v && can.isFunction(v.save);
             return isModel ?
                    v.stub().serialize() :
                    (v && v.serialize) ? v.serialize() : v;
@@ -1126,7 +1126,7 @@ import RefreshQueue from './refresh_queue';
       return serial;
     },
     display_name: function () {
-      var displayName = this.title || this.name;
+      let displayName = this.title || this.name;
 
       if (_.isUndefined(displayName)) {
         return '"' + this.type + ' ID: ' + this.id + '" (DELETED)';
@@ -1141,8 +1141,8 @@ import RefreshQueue from './refresh_queue';
       return this.title;
     },
     get_permalink: function () {
-      var dfd = can.Deferred();
-      var constructor = this.constructor;
+      let dfd = can.Deferred();
+      let constructor = this.constructor;
       if (!constructor.permalink_options) {
         return dfd.resolve(this.viewLink);
       }
@@ -1197,8 +1197,8 @@ import RefreshQueue from './refresh_queue';
     },
 
     remove_duplicate_pending_joins: function (obj) {
-      var joins;
-      var len;
+      let joins;
+      let len;
       if (!this._pending_joins) {
         this.attr('_pending_joins', []);
       }
@@ -1216,12 +1216,12 @@ import RefreshQueue from './refresh_queue';
       return this.notifier.queue(dfd);
     },
     _save: function () {
-      var that = this;
-      var _super = Array.prototype.pop.call(arguments);
-      var isNew = this.isNew();
-      var xhr;
-      var dfd = this._dfd;
-      var pre_save_notifier =
+      let that = this;
+      let _super = Array.prototype.pop.call(arguments);
+      let isNew = this.isNew();
+      let xhr;
+      let dfd = this._dfd;
+      let pre_save_notifier =
         new PersistentNotifier({name:
         this.constructor.model_singular + ' (pre-save)'});
 
@@ -1283,17 +1283,17 @@ import RefreshQueue from './refresh_queue';
       return this._dfd;
     },
     refresh_all: function () {
-      var props = Array.prototype.slice.call(arguments, 0);
+      let props = Array.prototype.slice.call(arguments, 0);
 
       return RefreshQueue.refresh_all(this, props);
     },
     refresh_all_force: function () {
-      var props = Array.prototype.slice.call(arguments, 0);
+      let props = Array.prototype.slice.call(arguments, 0);
 
       return RefreshQueue.refresh_all(this, props, true);
     },
     hash_fragment: function () {
-      var type = can.spaceCamelCase(this.type || '')
+      let type = can.spaceCamelCase(this.type || '')
             .toLowerCase()
             .replace(/ /g, '_');
 
@@ -1313,8 +1313,8 @@ import RefreshQueue from './refresh_queue';
   };
 
   can.Observe.prototype.stub = function () {
-    var type;
-    var id;
+    let type;
+    let id;
 
     if (!(this instanceof can.Model || this instanceof can.Stub))
       console.debug('.stub() called on non-stub, non-instance object', this);
@@ -1348,9 +1348,9 @@ import RefreshQueue from './refresh_queue';
 
   can.Observe('can.Stub', {
     get_or_create: function (obj) {
-      var id = obj.id;
-      var stub;
-      var type = obj.type;
+      let id = obj.id;
+      let stub;
+      let type = obj.type;
 
       CMS.Models.stub_cache = CMS.Models.stub_cache || {};
       CMS.Models.stub_cache[type] = CMS.Models.stub_cache[type] || {};
@@ -1362,7 +1362,7 @@ import RefreshQueue from './refresh_queue';
     }
   }, {
     init: function () {
-      var that = this;
+      let that = this;
       this._super.apply(this, arguments);
       this._instance().bind('destroyed', function (ev) {
         // Trigger propagating `change` event to convey `stub-destroyed` message
@@ -1395,8 +1395,8 @@ import RefreshQueue from './refresh_queue';
   };
 
   can.Observe.prototype.reify = function () {
-    var type;
-    var model;
+    let type;
+    let model;
 
     if (this instanceof can.Model) {
       return this;

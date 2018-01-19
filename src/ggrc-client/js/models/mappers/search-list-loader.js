@@ -20,8 +20,8 @@
       this.query_function = queryFunction;
     },
     init_listeners: function (binding) {
-      var model = can.Model.Cacheable;
-      var that = this;
+      let model = can.Model.Cacheable;
+      let that = this;
 
       model.bind('created', function (ev, mapping) {
         if (mapping instanceof model) {
@@ -46,8 +46,8 @@
       return true;
     },
     filter_and_insert_instances_from_mappings: function (binding, mappings) {
-      var self = this;
-      var matchingMappings;
+      let self = this;
+      let matchingMappings;
 
       matchingMappings = can.map(can.makeArray(mappings), function (mapping) {
         if (self.is_valid_mapping(binding, mapping))
@@ -56,8 +56,8 @@
       return this.insert_instances_from_mappings(binding, matchingMappings);
     },
     insert_instances_from_mappings: function (binding, mappings) {
-      var self = this;
-      var newResults;
+      let self = this;
+      let newResults;
 
       newResults = can.map(can.makeArray(mappings), function (mapping) {
         return self.get_result_from_mapping(binding, mapping);
@@ -65,8 +65,8 @@
       this.insert_results(binding, newResults);
     },
     remove_instance_from_mapping: function (binding, mapping) {
-      var instance;
-      var result;
+      let instance;
+      let result;
       if (this.is_valid_mapping(binding, mapping)) {
         instance = this.get_instance_from_mapping(binding, mapping);
         result = this.find_result_from_mapping(binding, mapping);
@@ -89,8 +89,8 @@
       return mapping;
     },
     find_result_from_mapping: function (binding, mapping) {
-      var result;
-      var resultInd;
+      let result;
+      let resultInd;
 
       for (resultInd = 0; resultInd < binding.list.length; resultInd++) {
         result = binding.list[resultInd];
@@ -100,12 +100,12 @@
       }
     },
     _refresh_stubs: function (binding) {
-      var objectJoinAttr = ('search_' + (this.object_join_attr ||
+      let objectJoinAttr = ('search_' + (this.object_join_attr ||
       binding.instance.constructor.table_plural));
-      var mappings = binding.instance[objectJoinAttr] &&
+      let mappings = binding.instance[objectJoinAttr] &&
         binding.instance[objectJoinAttr].reify();
-      var self = this;
-      var result;
+      let self = this;
+      let result;
 
       if (mappings) {
         this.insert_instances_from_mappings(binding, mappings);
@@ -114,7 +114,7 @@
         result = this.query_function(binding);
         result.pipe(function (mappings) {
           can.each(mappings, function (entry, i) {
-            var _class = (can.getObject('CMS.Models.' + entry.type) ||
+            let _class = (can.getObject('CMS.Models.' + entry.type) ||
             can.getObject('GGRC.Models.' + entry.type));
             mappings[i] = new _class({id: entry.id});
           });

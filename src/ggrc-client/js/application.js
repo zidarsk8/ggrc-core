@@ -4,7 +4,7 @@
 */
 
 (function (root, GGRC, $, can) {
-  var doc = root.document,
+  let doc = root.document,
     body = doc.body,
     $win = $(root),
     $doc = $(doc),
@@ -19,7 +19,7 @@
   }
   ModelError.prototype = Error.prototype;
   root.cms_singularize = function (type) {
-    var _type = type.trim().toLowerCase();
+    let _type = type.trim().toLowerCase();
     switch (_type) {
       case 'facilities':
         type = type[0] + 'acility';
@@ -42,9 +42,9 @@
     return type;
   };
   root.calculate_spinner_z_index = function () {
-    var zindex = 0;
+    let zindex = 0;
     $(this).parents().each(function () {
-      var z = parseInt($(this).css('z-index'), 10);
+      let z = parseInt($(this).css('z-index'), 10);
       if (z) {
         zindex = z;
         return false;
@@ -55,10 +55,10 @@
 
   $doc.ready(function () {
     // monitor target, where flash messages are added
-    var AUTOHIDE_TIMEOUT = 10000;
-    var timeoutId;
-    var target = $('section.content div.flash')[0];
-    var observer = new MutationObserver(function (mutations) {
+    let AUTOHIDE_TIMEOUT = 10000;
+    let timeoutId;
+    let target = $('section.content div.flash')[0];
+    let observer = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
         // check for new nodes
         if (mutation.addedNodes && mutation.addedNodes.length > 0) {
@@ -73,7 +73,7 @@
       });
     });
 
-    var config = {
+    let config = {
       attributes: true,
       childList: true,
       characterData: true
@@ -85,7 +85,7 @@
   });
 
   $win.load(function () {
-    var lastPopover;
+    let lastPopover;
     $body.on('click', 'ul.tree-structure .item-main .grcobject,' +
       ' ul.tree-structure .item-main .openclose', function (ev) {
         ev.stopPropagation();
@@ -93,7 +93,7 @@
       });
     // Google Circle CTA Button
     $body.on('mouseenter', '.square-trigger', function () {
-      var $this = $(this),
+      let $this = $(this),
         $popover = $this.closest('.circle-holder').find('.square-popover');
 
       $popover.slideDown('fast');
@@ -101,7 +101,7 @@
       return false;
     });
     $body.on('mouseleave', '.square-popover', function () {
-      var $this = $(this),
+      let $this = $(this),
         $trigger = $this.closest('.circle-holder').find('.square-trigger');
 
       $this.slideUp('fast');
@@ -119,9 +119,9 @@
     // Popover trigger for person tooltip in styleguide
     // The popover disappears if the show/hide isn't controlled manually
     $body.on('mouseenter', '.person-tooltip-trigger', function (ev) {
-      var popover;
-      var target = $(ev.currentTarget);
-      var content = target
+      let popover;
+      let target = $(ev.currentTarget);
+      let content = target
           .closest('.person-holder')
           .find('.custom-popover-content')
           .html();
@@ -175,8 +175,8 @@
     $body.on('mouseleave', '.person-holder,' +
       ' .person-tooltip-trigger, .popover,' +
       ' .popover .square-popover', function (ev) {
-        var target = $(ev.currentTarget);
-        var popover;
+        let target = $(ev.currentTarget);
+        let popover;
 
       if (target.is('.person-tooltip-trigger')) {
         target = target.closest('.person-holder');
@@ -203,7 +203,7 @@
     // Tab indexing form fields in modal
     $body.on('focus', '.modal', function () {
       $('.wysiwyg-area').each(function () {
-        var $this = $(this),
+        let $this = $(this),
           $textarea = $this.find('textarea.wysihtml5').attr('tabindex'),
           $descriptionField = $this.find('iframe.wysihtml5-sandbox');
 
@@ -216,7 +216,7 @@
 
     // Prevent link popup in code mode
     $body.on('click', 'a[data-wysihtml5-command=popupCreateLink]', function (e) {
-      var $this = $(this);
+      let $this = $(this);
       if ($this.hasClass('disabled')) {
         // The button is disabled, close the modal immediately
         $('body').find('.bootstrap-wysihtml5-insert-link-modal').modal('hide');
@@ -225,7 +225,7 @@
     });
     // top nav dropdown position
     function dropdownPosition() {
-      var $this = $(this),
+      let $this = $(this),
         $dropdown = $this.closest('.hidden-widgets-list').find('.dropdown-menu'),
         $menu_item = $dropdown.find('.inner-nav-item').find('a'),
         offset = $this.offset(),

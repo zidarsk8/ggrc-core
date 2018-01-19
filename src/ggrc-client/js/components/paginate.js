@@ -29,7 +29,7 @@
         * @param {Object} ev - click event handler
         */
       setPrevious: function (scope, el, ev) {
-        var current = this.attr('current') - 1;
+        let current = this.attr('current') - 1;
 
         ev.preventDefault();
         if (current >= 0) {
@@ -44,8 +44,8 @@
         * @param {Object} ev - click event handler
         */
       setNext: function (scope, el, ev) {
-        var current = this.attr('current') + 1;
-        var total = this.attr('totalPages');
+        let current = this.attr('current') + 1;
+        let total = this.attr('totalPages');
 
         ev.preventDefault();
         if (current < total) {
@@ -61,9 +61,9 @@
         * @return {Array} - List of enteries for current page
         */
       entries: function () {
-        var list = this.attr('list');
-        var perPage = Number(this.attr('perPage'));
-        var current = this.attr('current');
+        let list = this.attr('list');
+        let perPage = Number(this.attr('perPage'));
+        let current = this.attr('current');
 
         return list.slice(current * perPage, current * perPage + perPage);
       },
@@ -77,8 +77,8 @@
         *                   }
         */
       totalPages: can.compute(function () {
-        var list = this.attr('list');
-        var perPage = Number(this.attr('perPage'));
+        let list = this.attr('list');
+        let perPage = Number(this.attr('perPage'));
 
         return Math.ceil(list.length / perPage);
       })

@@ -53,7 +53,7 @@
        * @param {jQuery.Event} ev - the onRemove event object
        */
       fieldRemoved: function (instance, $el, ev) {
-        var idx = _.findIndex(this.fields, {title: instance.title});
+        let idx = _.findIndex(this.fields, {title: instance.title});
         if (idx >= 0) {
           this.fields.splice(idx, 1);
         } else {
@@ -64,8 +64,8 @@
     },
     events: {
       inserted: function () {
-        var el = $(this.element);
-        var list = el.find('.sortable-list');
+        let el = $(this.element);
+        let list = el.find('.sortable-list');
         list.sortable({
           items: 'li.sortable-item',
           placeholder: 'sortable-placeholder'
@@ -73,8 +73,8 @@
         list.find('.sortable-item').disableSelection();
       },
       '.sortable-list sortstop': function () {
-        var el = $(this.element);
-        var sortables = el.find('li.sortable-item');
+        let el = $(this.element);
+        let sortables = el.find('li.sortable-item');
         // It's not nice way to rely on DOM for sorting,
         // but it was easiest for implementation
         this.scope.fields.replace(_.map(sortables,
@@ -129,10 +129,10 @@
          * ]
          */
         denormalize_mandatory: function (field, pads) {
-          var options = _.splitTrim(field.attr('multi_choice_options'));
-          var vals = _.splitTrim(field.attr('multi_choice_mandatory'));
-          var isEqualLength = options.length === vals.length;
-          var range;
+          let options = _.splitTrim(field.attr('multi_choice_options'));
+          let vals = _.splitTrim(field.attr('multi_choice_mandatory'));
+          let isEqualLength = options.length === vals.length;
+          let range;
 
           if (!isEqualLength && options.length < vals.length) {
             vals.length = options.length;
@@ -145,10 +145,10 @@
           }
 
           return _.zip(options, vals).map(function (zip) {
-            var attr = new can.Map();
-            var val = zip[1];
-            var attachment = !!(val & 1 << pads.ATTACHMENT);
-            var comment = !!(val & 1 << pads.COMMENT);
+            let attr = new can.Map();
+            let val = zip[1];
+            let attachment = !!(val & 1 << pads.ATTACHMENT);
+            let comment = !!(val & 1 << pads.COMMENT);
             attr.attr('value', zip[0]);
             attr.attr('attachment', attachment);
             attr.attr('comment', comment);
@@ -165,8 +165,8 @@
          */
         normalize_mandatory: function (attrs, pads) {
           return can.map(attrs, function (attr) {
-            var attach = attr.attr('attachment') << pads.ATTACHMENT;
-            var comment = attr.attr('comment') << pads.COMMENT;
+            let attach = attr.attr('attachment') << pads.ATTACHMENT;
+            let comment = attr.attr('comment') << pads.COMMENT;
             return attach | comment;
           }).join(',');
         }
@@ -181,11 +181,11 @@
        * @param {Object} options - the component instantiation options
        */
       init: function (element, options) {
-        var field = this.scope.attr('field');
-        var pads = this.scope.attr('pads');
-        var denormalized = this.scope.denormalize_mandatory(field, pads);
-        var types = this.scope.attr('types');
-        var item = _.find(types, function (obj) {
+        let field = this.scope.attr('field');
+        let pads = this.scope.attr('pads');
+        let denormalized = this.scope.denormalize_mandatory(field, pads);
+        let types = this.scope.attr('types');
+        let item = _.find(types, function (obj) {
           return obj.type === field.attr('attribute_type');
         });
         this.scope.field.attr('attribute_name', item.name);
@@ -194,9 +194,9 @@
         this.scope.attr('$rootEl', $(element));
       },
       '{attrs} change': function () {
-        var attrs = this.scope.attr('attrs');
-        var pads = this.scope.attr('pads');
-        var normalized = this.scope.normalize_mandatory(attrs, pads);
+        let attrs = this.scope.attr('attrs');
+        let pads = this.scope.attr('pads');
+        let normalized = this.scope.normalize_mandatory(attrs, pads);
         this.scope.field.attr('multi_choice_mandatory', normalized);
       }
     }
@@ -224,12 +224,12 @@
          * @param {Object} ev - the event object
          */
         addField: function (scope, el, ev) {
-          var fields = scope.attr('fields');
-          var selected = scope.attr('selected');
-          var title = _.trim(selected.title);
-          var type = _.trim(selected.type);
-          var invalidInput = false;
-          var values = _.splitTrim(selected.values, {
+          let fields = scope.attr('fields');
+          let selected = scope.attr('selected');
+          let title = _.trim(selected.title);
+          let type = _.trim(selected.type);
+          let invalidInput = false;
+          let values = _.splitTrim(selected.values, {
             unique: true
           }).join(',');
           ev.preventDefault();
@@ -273,7 +273,7 @@
           return _.contains(valueAttrs, type) && !values;
         },
         isDublicateTitle: function (fields, selectedTitle) {
-          var duplicateField = _.some(fields, function (item) {
+          let duplicateField = _.some(fields, function (item) {
             return item.title === selectedTitle && !item._pending_delete;
           });
           return fields.length && duplicateField;
@@ -288,7 +288,7 @@
        * Set default dropdown type on init
        */
       init: function () {
-        var types = this.scope.attr('types');
+        let types = this.scope.attr('types');
         if (!this.scope.attr('selected.type')) {
           this.scope.attr('selected.type', _.first(types).attr('type'));
         }
@@ -301,8 +301,8 @@
        * @param {Object} options - Mustache options
        */
       placeholder: function (options) {
-        var types = this.attr('types');
-        var item = _.findWhere(types, {
+        let types = this.attr('types');
+        let item = _.findWhere(types, {
           type: this.attr('selected.type')
         });
         if (item) {

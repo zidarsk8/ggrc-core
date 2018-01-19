@@ -37,7 +37,7 @@
        * @description Moves focus to the create url input element
        */
       moveFocusToInput: function () {
-        var inputElements = this.element.find('input');
+        let inputElements = this.element.find('input');
         if (inputElements.length) {
           inputElements[0].focus();
         }
@@ -76,9 +76,9 @@
        * @return {Boolean} - it returns false to prevent page refresh
        */
       submitCreateReferenceUrlForm: function (url) {
-        var existingUrls;
-        var trimmedUrl = url.trim();
-        var isValid = this.validateUserInput(trimmedUrl);
+        let existingUrls;
+        let trimmedUrl = url.trim();
+        let isValid = this.validateUserInput(trimmedUrl);
 
         // non-valid user input case - empty string
         if (!isValid) {

@@ -4,7 +4,7 @@
 */
 
 function checkValues(baseAttrs, attrs, remoteAttrs, obj) {
-  var conflict = false;
+  let conflict = false;
   can.each(baseAttrs, function (val, key) {
     // We skip the updated_at key because we know it has changed
     if (key === 'updated_at') {
@@ -33,11 +33,11 @@ function checkValues(baseAttrs, attrs, remoteAttrs, obj) {
 }
 
 export default function resolveConflict(xhr, obj) {
-  var attrs = can.extend(true, {}, obj.attr());
-  var baseAttrs = can.extend(true, {}, obj._backupStore()) || {};
+  let attrs = can.extend(true, {}, obj.attr());
+  let baseAttrs = can.extend(true, {}, obj._backupStore()) || {};
   return obj.refresh().then(function (obj) {
-    var conflict = false;
-    var remoteAttrs = can.extend(true, {}, obj.attr());
+    let conflict = false;
+    let remoteAttrs = can.extend(true, {}, obj.attr());
 
     if (can.Object.same(remoteAttrs, attrs)) {
       // current state is same as server state -- do nothing.

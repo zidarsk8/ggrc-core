@@ -7,12 +7,12 @@ describe('CMS.Models.Comment', function () {
   'use strict';
 
   describe('updateDescription() method', function () {
-    var comment;
-    var dfdSave;
-    var eventObj;
-    var method;
-    var $element;
-    var trigger;
+    let comment;
+    let dfdSave;
+    let eventObj;
+    let method;
+    let $element;
+    let trigger;
 
     beforeEach(function () {
       $element = $('<div />');
@@ -70,8 +70,8 @@ describe('CMS.Models.Comment', function () {
   });
 
   describe('display_name() method', function () {
-    var fakeComment;
-    var method;
+    let fakeComment;
+    let method;
 
     beforeEach(function () {
       fakeComment = new can.Map({});
@@ -80,7 +80,7 @@ describe('CMS.Models.Comment', function () {
 
     it('returns an empty string if comment does not have a description set',
       function () {
-        var result;
+        let result;
         fakeComment.attr('description', undefined);
         result = method();
         expect(result).toEqual('');
@@ -88,7 +88,7 @@ describe('CMS.Models.Comment', function () {
     );
 
     it('returns comment\'s description if the latter exists', function () {
-      var result;
+      let result;
       fakeComment.attr('description', 'The comment content.');
       result = method();
       expect(result).toEqual('The comment content.');

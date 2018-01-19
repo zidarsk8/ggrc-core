@@ -11,7 +11,7 @@ import {confirm} from '../plugins/utils/modals';
   /* MODAL_FORM PUBLIC CLASS DEFINITION
    * =============================== */
 
-  var ModalForm = function (element, options, trigger) {
+  let ModalForm = function (element, options, trigger) {
     this.options = options;
     this.$element = $(element);
     this.$trigger = $(trigger);
@@ -67,8 +67,8 @@ import {confirm} from '../plugins/utils/modals';
     },
     delete_object: function (e, data, xhr) {
         // If this modal is contained within another modal, pass the event onward
-      var $trigger_modal = this.$trigger.closest('.modal');
-      var delete_target;
+      let $trigger_modal = this.$trigger.closest('.modal');
+      let delete_target;
 
       if ($trigger_modal.length > 0) {
         $trigger_modal.trigger('delete-object', [data, xhr]);
@@ -91,13 +91,13 @@ import {confirm} from '../plugins/utils/modals';
     },
 
     is_form_dirty: function (cache_values) {
-      var that = this;
-      var cache = {};
-      var dirty = false;
+      let that = this;
+      let cache = {};
+      let dirty = false;
 
       // Generate a hash of the form values
       can.each(this.$form().serializeArray(), function (field) {
-        var val;
+        let val;
         if (cache[field.name]) {
           val = cache[field.name] + ',' + field.value;
         } else {
@@ -123,8 +123,8 @@ import {confirm} from '../plugins/utils/modals';
     },
 
     submit: function (e) {
-      var $form = this.$form();
-      var that = this;
+      let $form = this.$form();
+      let that = this;
 
       if (!$form.data('submitpending')) {
         $('[data-toggle=modal-submit]', $form)
@@ -163,7 +163,7 @@ import {confirm} from '../plugins/utils/modals';
     },
 
     reset: function (e) {
-      var form = this.$form()[0];
+      let form = this.$form()[0];
       if (form) {
         form.reset();
       }
@@ -171,10 +171,10 @@ import {confirm} from '../plugins/utils/modals';
     },
 
     hide: function (e, verifyChanges) {
-      var instance = this.instance;
-      var pending;
-      var hasPending;
-      var changedInstance;
+      let instance = this.instance;
+      let pending;
+      let hasPending;
+      let changedInstance;
 
       if (e) {
         e.preventDefault();
@@ -242,9 +242,9 @@ import {confirm} from '../plugins/utils/modals';
     },
 
     focus_first_input: function (ev) {
-      var that = this;
+      let that = this;
       setTimeout(function () {
-        var $first_input;
+        let $first_input;
         $first_input = that.$element.find('*[autofocus]');
         if (!$first_input.length) {
           $first_input = that.$element
@@ -261,9 +261,9 @@ import {confirm} from '../plugins/utils/modals';
 
   $.fn.modal_form = function (option, trigger, params) {
     return this.each(function () {
-      var $this = $(this);
-      var data = $this.data('modal_form');
-      var options = $.extend({}, $.fn.modal_form.defaults,
+      let $this = $(this);
+      let data = $this.data('modal_form');
+      let options = $.extend({}, $.fn.modal_form.defaults,
         $this.data(), typeof option === 'object' && option);
 
       if (!data) {
@@ -286,10 +286,10 @@ import {confirm} from '../plugins/utils/modals';
 
   $(function () {
     $('body').on('click.modal-form.data-api', '[data-toggle="modal-form"]', function (e) {
-      var $this = $(this);
-      var href;
-      var $target = $($this.attr('data-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')); // strip for ie7
-      var option = $target.data('modal-form') ? 'toggle' : $.extend({}, $target.data(), $this.data());
+      let $this = $(this);
+      let href;
+      let $target = $($this.attr('data-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')); // strip for ie7
+      let option = $target.data('modal-form') ? 'toggle' : $.extend({}, $target.data(), $this.data());
 
       e.preventDefault();
       $target.modal_form(option);
@@ -300,12 +300,12 @@ import {confirm} from '../plugins/utils/modals';
   $(function () {
     // Default form complete handler
     $('body').on('ajax:complete', function (e, xhr, status) {
-      var data = null;
-      var modal_form;
-      var flash_types;
-      var type_i;
-      var message;
-      var flash;
+      let data = null;
+      let modal_form;
+      let flash_types;
+      let type_i;
+      let message;
+      let flash;
 
       try {
         data = JSON.parse(xhr.responseText);
@@ -368,22 +368,22 @@ import {confirm} from '../plugins/utils/modals';
     });
 
     $('body').on('ajax:flash', function (e, flash, redirectLink) {
-      var $target;
-      var $flashHolder;
-      var type;
-      var message;
-      var messageI;
-      var flashClass;
-      var addLink;
-      var $link;
-      var flashClassMappings = {
+      let $target;
+      let $flashHolder;
+      let type;
+      let message;
+      let messageI;
+      let flashClass;
+      let addLink;
+      let $link;
+      let flashClassMappings = {
         notice: 'success',
         Running: 'progress',
         Pending: 'progress'
       };
-      var textContainer;
-      var $html;
-      var gotMessage = _.some(_.values(flash), function (msg) {
+      let textContainer;
+      let $html;
+      let gotMessage = _.some(_.values(flash), function (msg) {
         return !!msg;
       });
 
@@ -472,8 +472,8 @@ import {confirm} from '../plugins/utils/modals';
     });
 
     $('body').on('ajax:html', '.modal > form', function (e, html, xhr) {
-      var sel = "script[type='text/javascript'], script[language='javascript'], script:not([type])";
-      var $frag = $(html);
+      let sel = "script[type='text/javascript'], script[language='javascript'], script:not([type])";
+      let $frag = $(html);
       $frag.filter(sel).add($frag.find(sel)).each(function () {
         $(this).remove();
         setTimeout($(this).html(), 10);

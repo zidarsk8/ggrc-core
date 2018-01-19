@@ -7,8 +7,8 @@ import Component from '../bulk-update-button';
 import updateService from '../../../plugins/utils/bulk-update-service';
 
 describe('GGRC.Components.bulkUpdateButton', function () {
-  var viewModel;
-  var events;
+  let viewModel;
+  let events;
 
   beforeAll(function () {
     viewModel = new (can.Map.extend(Component.prototype.viewModel));
@@ -16,15 +16,15 @@ describe('GGRC.Components.bulkUpdateButton', function () {
   });
 
   describe('button click event', function () {
-    var event;
+    let event;
     beforeAll(function () {
       event = events['a click'].bind({viewModel});
       spyOn(viewModel, 'openBulkUpdateModal');
     });
 
     it('should open ObjectBulkUpdate modal', function () {
-      var type = 'some model';
-      var element = {};
+      let type = 'some model';
+      let element = {};
       viewModel.attr('model', {
         model_singular: type,
       });
@@ -37,10 +37,10 @@ describe('GGRC.Components.bulkUpdateButton', function () {
   });
 
   describe('updateObjects method', function () {
-    var updateDfd;
-    var context;
-    var args;
-    var resMessage;
+    let updateDfd;
+    let context;
+    let args;
+    let resMessage;
     let el;
     const parentEl = {};
 
@@ -120,29 +120,29 @@ describe('GGRC.Components.bulkUpdateButton', function () {
   });
 
   describe('getResultNotification method', function () {
-    var model = {
+    let model = {
       name_singular: 'Task',
       name_plural: 'Tasks',
     };
 
     it('returns correct message when no objects were updated', function () {
-      var expected = 'No tasks were updated.';
-      var actual = viewModel.getResultNotification(model, 0);
+      let expected = 'No tasks were updated.';
+      let actual = viewModel.getResultNotification(model, 0);
 
       expect(actual).toEqual(expected);
     });
 
     it('returns correct message when 1 object was updated', function () {
-      var expected = '1 task was updated successfully.';
-      var actual = viewModel.getResultNotification(model, 1);
+      let expected = '1 task was updated successfully.';
+      let actual = viewModel.getResultNotification(model, 1);
 
       expect(actual).toEqual(expected);
     });
 
     it('returns correct message when multiple objects were updated',
       function () {
-        var expected = '4 tasks were updated successfully.';
-        var actual = viewModel.getResultNotification(model, 4);
+        let expected = '4 tasks were updated successfully.';
+        let actual = viewModel.getResultNotification(model, 4);
 
         expect(actual).toEqual(expected);
       });

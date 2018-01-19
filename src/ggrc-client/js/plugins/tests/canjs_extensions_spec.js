@@ -7,7 +7,7 @@ describe('CanJS extensions', function () {
   'use strict';
 
   describe('using camelCaseToDashCase', function () {
-    var method;
+    let method;
 
     beforeEach(function () {
       method = can.camelCaseToDashCase;
@@ -33,7 +33,7 @@ describe('CanJS extensions', function () {
   });
 
   describe('using camelCaseToUnderscore', function () {
-    var method;
+    let method;
 
     beforeEach(function () {
       method = can.camelCaseToUnderscore;
@@ -63,7 +63,7 @@ describe('CanJS extensions', function () {
   });
 
   describe('using spaceCamelCase', function () {
-    var method;
+    let method;
 
     beforeEach(function () {
       method = can.spaceCamelCase;

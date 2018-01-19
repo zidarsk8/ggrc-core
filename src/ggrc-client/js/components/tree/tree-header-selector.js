@@ -19,11 +19,11 @@
       },
 
       disable_attrs: function (el, ev) {
-        var MAX_ATTR = 7;
-        var $check = this.element.find('.attr-checkbox');
-        var $mandatory = $check.filter('.mandatory');
-        var $selected = $check.filter(':checked');
-        var $not_selected = $check.not(':checked');
+        let MAX_ATTR = 7;
+        let $check = this.element.find('.attr-checkbox');
+        let $mandatory = $check.filter('.mandatory');
+        let $selected = $check.filter(':checked');
+        let $not_selected = $check.not(':checked');
 
         if ($selected.length === MAX_ATTR) {
           $not_selected.prop('disabled', true)

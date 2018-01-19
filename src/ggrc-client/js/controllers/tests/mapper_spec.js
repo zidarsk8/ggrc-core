@@ -12,12 +12,12 @@ describe('ObjectMapper', function () {
   'use strict';
 
   describe('static openMapper method()', function () {
-    var method;
-    var fakeCtrlInst;
-    var fakeData;
-    var originalModel;
-    var updateScopeObject;
-    var scopeObject;
+    let method;
+    let fakeCtrlInst;
+    let fakeData;
+    let originalModel;
+    let updateScopeObject;
+    let scopeObject;
 
     beforeAll(function () {
       originalModel = CMS.Models.Assessment;
@@ -72,7 +72,7 @@ describe('ObjectMapper', function () {
 
     it('throws Error with message if data.join_object_type does not exist',
     function () {
-      var closure = function () {
+      let closure = function () {
         method({});
       };
 
@@ -82,7 +82,7 @@ describe('ObjectMapper', function () {
     describe('shows mapper for snapshots', function () {
       it('calls launch method with params',
       function (done) {
-        var btn = {};
+        let btn = {};
         method(fakeData, false, btn);
 
         updateScopeObject.resolve().then(function () {
@@ -101,7 +101,7 @@ describe('ObjectMapper', function () {
       it(`extends generalConfig with "object", "type" "isNew" and "relevantTo"
       'if data has is_new`,
       function (done) {
-        var args;
+        let args;
         method(_.extend(fakeData, {
           is_new: true,
         }), false);
@@ -127,7 +127,7 @@ describe('ObjectMapper', function () {
 
       it('throws Error with message if data.join_object_id does not exist',
       function () {
-        var closure = function () {
+        let closure = function () {
           method(_.omit(fakeData, 'join_object_id'));
         };
 
@@ -149,7 +149,7 @@ describe('ObjectMapper', function () {
     });
 
     describe('shows mapper for common objects', function () {
-      var fakeDataForCommon;
+      let fakeDataForCommon;
 
       beforeEach(function () {
         fakeDataForCommon = _.extend({}, fakeData, {
@@ -160,7 +160,7 @@ describe('ObjectMapper', function () {
 
       it('sets config without relevantTo section if data.join_object_type ' +
       'is not in scope model', function () {
-        var args;
+        let args;
         method(fakeDataForCommon, false, {});
         args = ObjectSearch.launch.calls.argsFor(0);
 
@@ -171,7 +171,7 @@ describe('ObjectMapper', function () {
 
       it('calls launch for ObjectSearch with passed btn and config if ' +
       'data.toggle contains "unified-search" string', function () {
-        var btn = {};
+        let btn = {};
         method(fakeDataForCommon, false, btn);
 
         expect(ObjectSearch.launch).toHaveBeenCalledWith(
@@ -182,7 +182,7 @@ describe('ObjectMapper', function () {
 
       it('calls launch for ObjectMapper with passed btn and config if ' +
       'data.toggle contains "unified-search" string', function (done) {
-        var btn = {};
+        let btn = {};
         fakeDataForCommon.toggle = '';
         method(fakeDataForCommon, false, btn);
 

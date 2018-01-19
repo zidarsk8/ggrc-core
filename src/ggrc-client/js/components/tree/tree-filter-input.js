@@ -8,7 +8,7 @@ import template from './templates/tree-filter-input.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var viewModel = can.Map.extend({
+  let viewModel = can.Map.extend({
     define: {
       filter: {
         type: 'string',
@@ -40,11 +40,11 @@ import template from './templates/tree-filter-input.mustache';
     options: {},
     filters: null,
     init: function () {
-      var options = this.attr('options');
-      var filter = this.attr('filter');
-      var operation = this.attr('operation');
-      var depth = this.attr('depth');
-      var filterDeepLimit = this.attr('filterDeepLimit');
+      let options = this.attr('options');
+      let filter = this.attr('filter');
+      let operation = this.attr('operation');
+      let depth = this.attr('depth');
+      let filterDeepLimit = this.attr('filterDeepLimit');
 
       options.attr('filter', filter);
       options.attr('operation', operation);
@@ -60,8 +60,8 @@ import template from './templates/tree-filter-input.mustache';
       this.dispatch('submit');
     },
     onFilterChange: function (newValue) {
-      var filter = GGRC.query_parser.parse(newValue);
-      var isExpression =
+      let filter = GGRC.query_parser.parse(newValue);
+      let isExpression =
         !!filter && !!filter.expression.op &&
         filter.expression.op.name !== 'text_search' &&
         filter.expression.op.name !== 'exclude_text_search';

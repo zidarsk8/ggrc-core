@@ -14,8 +14,8 @@ export default can.Component.extend({
     define: {
       canEdit: {
         get: function () {
-          var instance = this.attr('instance');
-          var canEdit = !this.attr('isReadonly') &&
+          let instance = this.attr('instance');
+          let canEdit = !this.attr('isReadonly') &&
             !isSnapshot(instance) &&
             !instance.attr('archived') &&
             !this.attr('readOnly') &&
@@ -76,7 +76,7 @@ export default can.Component.extend({
       this.addPerson(args.person, args.groupId);
     },
     addPerson: function (person, groupId) {
-      var exist = _.find(this.attr('people'), {id: person.id});
+      let exist = _.find(this.attr('people'), {id: person.id});
 
       if (exist) {
         console.warn('User ', person.id,
@@ -92,8 +92,8 @@ export default can.Component.extend({
       }
     },
     removePerson: function (args) {
-      var person = args.person;
-      var idx = _.findIndex(
+      let person = args.person;
+      let idx = _.findIndex(
         this.attr('people'),
         {id: person.id});
 
@@ -107,7 +107,7 @@ export default can.Component.extend({
   },
   events: {
     init: function ($element, options) {
-      var vm = this.viewModel;
+      let vm = this.viewModel;
       vm.attr('backUpPeople').replace(vm.attr('people'));
     },
   },

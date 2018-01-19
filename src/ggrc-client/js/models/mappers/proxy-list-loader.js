@@ -28,9 +28,9 @@ import RefreshQueue from '../refresh_queue';
       this.option_model_name = optionModelName;
     },
     init_listeners: function (binding) {
-      var self = this;
-      var model = CMS.Models[this.model_name];
-      var objectJoinValue = binding.instance[this.object_join_attr];
+      let self = this;
+      let model = CMS.Models[this.model_name];
+      let objectJoinValue = binding.instance[this.object_join_attr];
 
       binding.instance.bind(this.object_join_attr, function (ev, _new, _old) {
         if (binding._refresh_stubs_deferred &&
@@ -62,9 +62,9 @@ import RefreshQueue from '../refresh_queue';
       });
     },
     is_valid_mapping: function (binding, mapping) {
-      var model = CMS.Models[this.model_name];
-      var objectModel = binding.instance.constructor;
-      var optionModel = CMS.Models[this.option_model_name];
+      let model = CMS.Models[this.model_name];
+      let objectModel = binding.instance.constructor;
+      let optionModel = CMS.Models[this.option_model_name];
 
       return (mapping.constructor === model && mapping[this.object_attr] &&
       (mapping[this.object_attr].reify() === binding.instance ||
@@ -74,8 +74,8 @@ import RefreshQueue from '../refresh_queue';
       mapping[this.option_attr].reify() instanceof optionModel)));
     },
     filter_and_insert_instances_from_mappings: function (binding, mappings) {
-      var self = this;
-      var matchingMappings;
+      let self = this;
+      let matchingMappings;
 
       matchingMappings = can.map(can.makeArray(mappings), function (mapping) {
         if (self.is_valid_mapping(binding, mapping))
@@ -84,8 +84,8 @@ import RefreshQueue from '../refresh_queue';
       return this.insert_instances_from_mappings(binding, matchingMappings);
     },
     insert_instances_from_mappings: function (binding, mappings) {
-      var self = this;
-      var newResults;
+      let self = this;
+      let newResults;
 
       newResults = can.map(can.makeArray(mappings), function (mapping) {
         return self.get_result_from_mapping(binding, mapping);
@@ -93,8 +93,8 @@ import RefreshQueue from '../refresh_queue';
       this.insert_results(binding, newResults);
     },
     remove_instance_from_mapping: function (binding, mapping) {
-      var instance;
-      var result;
+      let instance;
+      let result;
       if (this.is_valid_mapping(binding, mapping)) {
         instance = this.get_instance_from_mapping(binding, mapping);
         result = this.find_result_from_mapping(binding, mapping);
@@ -120,10 +120,10 @@ import RefreshQueue from '../refresh_queue';
       return mapping[this.option_attr] && mapping[this.option_attr].reify();
     },
     find_result_from_mapping: function (binding, mapping) {
-      var mapInd;
-      var result;
-      var resultInd;
-      var mappingResult;
+      let mapInd;
+      let result;
+      let resultInd;
+      let mappingResult;
 
       for (resultInd = 0; resultInd < binding.list.length; resultInd++) {
         result = binding.list[resultInd];
@@ -135,9 +135,9 @@ import RefreshQueue from '../refresh_queue';
       }
     },
     _refresh_stubs: function (binding) {
-      var model = CMS.Models[this.model_name];
-      var refreshQueue = new RefreshQueue();
-      var objectJoinAttr = this.object_join_attr || model.table_plural;
+      let model = CMS.Models[this.model_name];
+      let refreshQueue = new RefreshQueue();
+      let objectJoinAttr = this.object_join_attr || model.table_plural;
 
       // These properties only exist if the user has read access
       if (binding.instance[objectJoinAttr]) {
@@ -153,8 +153,8 @@ import RefreshQueue from '../refresh_queue';
     filter_for_valid_mappings: function (binding, mappings) {
       // Remove incomplete mappings, including those not in our context
       //   (which the server refused to provide).
-      var i;
-      var validMappings = [];
+      let i;
+      let validMappings = [];
 
       for (i = 0; i < mappings.length; i++) {
         if (mappings[i][this.option_attr])

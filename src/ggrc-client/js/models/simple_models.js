@@ -105,7 +105,7 @@
     root_collection: 'options',
     cache_by_role: {},
     for_role: function (role) {
-      var self = this;
+      let self = this;
 
       if (!this.cache_by_role[role]) {
         this.cache_by_role[role] =
@@ -239,7 +239,7 @@
     }
   }, {
     allowed: function (operation, objectOrClass) {
-      var cls = typeof objectOrClass === 'function' ?
+      let cls = typeof objectOrClass === 'function' ?
         objectOrClass : objectOrClass.constructor;
       return !!~can.inArray(cls.model_singular, this.permissions[operation]);
     },
@@ -247,7 +247,7 @@
       return this.attr('scope') !== 'System';
     },
     permission_summary: function () {
-      var RoleList = {
+      let RoleList = {
         ProgramOwner: 'Program Manager',
         ProgramEditor: 'Program Editor',
         ProgramReader: 'Program Reader',
@@ -275,9 +275,9 @@
     defaults: {}
   }, {
     poll: function () {
-      var dfd = new $.Deferred();
-      var self = this;
-      var wait = 2000;
+      let dfd = new $.Deferred();
+      let self = this;
+      let wait = 2000;
 
       function _poll() {
         self.refresh().then(function (task) {
@@ -295,10 +295,10 @@
   });
 
   CMS.Models.get_instance = function (objectType, objectId, paramsOrObject) {
-    var model;
-    var params = {};
-    var instance;
-    var href;
+    let model;
+    let params = {};
+    let instance;
+    let href;
 
     if (typeof objectType === 'object' || objectType instanceof can.Stub) {
       // assume we only passed in params_or_object
@@ -356,7 +356,7 @@
   };
 
   CMS.Models.get_stub = function (object) {
-    var instance = CMS.Models.get_instance(object);
+    let instance = CMS.Models.get_instance(object);
     if (!instance) {
       return;
     }
@@ -375,8 +375,8 @@
   };
 
   CMS.Models.get_instances = function (objects) {
-    var i;
-    var instances = [];
+    let i;
+    let instances = [];
     if (!objects) {
       return [];
     }
@@ -387,8 +387,8 @@
   };
 
   CMS.Models.get_link_type = function (instance, attr) {
-    var type;
-    var model;
+    let type;
+    let model;
 
     type = instance[attr + '_type'];
     if (!type) {

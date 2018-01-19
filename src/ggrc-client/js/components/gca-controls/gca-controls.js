@@ -28,16 +28,16 @@ import template from './gca-controls.mustache';
       modifiedFields: {},
       validateControls: function () {
           // counting failed mandatory fields
-        var valid = this.attr('items')
+        let valid = this.attr('items')
             .filter(function (itm) {
-              var val = itm.value ? String(itm.value) : '';
+              let val = itm.value ? String(itm.value) : '';
 
-              var hasError = !val.trim();
-              var errorMessages = {
+              let hasError = !val.trim();
+              let errorMessages = {
                 _any: can.Map.validationMessages.non_blank,
                 checkbox: can.Map.validationMessages.must_be_checked,
               };
-              var errorMessage = errorMessages[itm.type] || errorMessages._any;
+              let errorMessage = errorMessages[itm.type] || errorMessages._any;
 
               if (itm.required) {
                 itm.attr('caError', hasError ? errorMessage : '');
@@ -48,7 +48,7 @@ import template from './gca-controls.mustache';
         this.instance.attr('_gca_valid', valid);
       },
       initGlobalAttributes: function () {
-        var cavs;
+        let cavs;
         ensureGlobalCA(this.attr('instance'));
         cavs = getCustomAttributes(this.attr('instance'),
           CUSTOM_ATTRIBUTE_TYPE.GLOBAL);

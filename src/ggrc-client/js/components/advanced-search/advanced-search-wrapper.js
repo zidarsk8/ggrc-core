@@ -24,21 +24,21 @@ export default can.Component.extend({
     statusItem: AdvancedSearch.create.state(),
     relevantTo: [],
     availableAttributes: function () {
-      var available = getColumnsForModel(
+      let available = getColumnsForModel(
         this.attr('modelName'),
         null
       ).available;
       return available;
     },
     addFilterAttribute: function () {
-      var items = this.attr('filterItems');
+      let items = this.attr('filterItems');
       if (items.length) {
         items.push(AdvancedSearch.create.operator('AND'));
       }
       items.push(AdvancedSearch.create.attribute());
     },
     addMappingFilter: function () {
-      var items = this.attr('mappingItems');
+      let items = this.attr('mappingItems');
       if (items.length) {
         items.push(AdvancedSearch.create.operator('AND'));
       }

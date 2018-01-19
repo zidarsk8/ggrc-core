@@ -38,8 +38,8 @@ import template from './tree_pagination.mustache';
        * @param {Object} event - DOM event
        */
       setCurrentPage: function (object, input, event) {
-        var _value;
-        var _page;
+        let _value;
+        let _page;
         event.stopPropagation();
         if (!this.paging.attr('disabled') && input.val() !== '') {
           _value = parseInt(input.val(), 10);
@@ -63,11 +63,11 @@ import template from './tree_pagination.mustache';
         this.paging.attr('current', this.paging.current + 1);
       },
       getPaginationInfo: function () {
-        var _current = this.attr('paging.current');
-        var _size = this.attr('paging.pageSize');
-        var _total = this.attr('paging.total');
-        var _first;
-        var _last;
+        let _current = this.attr('paging.current');
+        let _size = this.attr('paging.pageSize');
+        let _total = this.attr('paging.total');
+        let _first;
+        let _last;
 
         _first = (_current - 1) * _size + 1;
         _last = _current * _size < _total ? _current * _size : _total;
@@ -76,8 +76,8 @@ import template from './tree_pagination.mustache';
           'No records';
       },
       getPaginationPlaceholder: function () {
-        var _current = this.attr('paging.current');
-        var _count = this.attr('paging.count');
+        let _current = this.attr('paging.current');
+        let _count = this.attr('paging.count');
 
         if (_count && _count >= _current) {
           return 'Page ' + _current + ' of ' + _count;
