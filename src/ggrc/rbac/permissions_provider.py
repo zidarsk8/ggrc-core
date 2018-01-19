@@ -158,11 +158,14 @@ def is_auditor(instance, **_):
              if acl.ac_role.name == "Auditors" and acl.person == current_user)
 
 
-def is_allowed_based_on(instance, property_name, action, **kwargs):
+def is_allowed_based_on(instance, property_name, action, **_):
   """Check permissions based on permission seted up as attribute instance."""
   related_object = getattr(instance, property_name, None)
   if related_object is None:
     return False
+  # pylint: disable=protected-access
+  # This is the proper way of getting permissions, but the function is private
+  # due to code debt
   return find_permissions()._is_allowed_for(related_object, action)
 
 
