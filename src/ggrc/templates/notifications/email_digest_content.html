@@ -233,9 +233,6 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                     <li {{ style.list_item() }} >
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
-                      {% if assessment_data.get('start_date_statement') %}
-                        {{ assessment_data['start_date_statement'] }}.
-                      {% endif %}
                     </li>
                   {% endfor %}
                   </ul>
@@ -333,36 +330,6 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
                         ({{ assessment_data['notif_created_at'].values()[0] }})
-                    </li>
-                  {% endfor %}
-                  </ul>
-                {% endif %}
-
-                {% if digest.get('request_open') %}
-                  <h2 {{ style.sub_title() }} >New Requests</h2>
-                  <ul {{ style.list_wrap() }} >
-                  {% for request_id, request_data in digest['request_open'].iteritems() %}
-                    <li {{ style.list_item() }} >
-                      Request:
-                      <a href="{{ request_data['url'] }}" {{ style.link_text() }} >
-                        {{ request_data['title'] }}</a>
-                      {% if request_data.get('start_date_statement') %}
-                        {{ request_data['start_date_statement'] }}.
-                      {% endif %}
-                    </li>
-                  {% endfor %}
-                  </ul>
-                {% endif %}
-
-                {% if digest.get('request_declined') %}
-                  <h2 {{ style.sub_title() }} >Declined Requests</h2>
-                  <ul {{ style.list_wrap() }} >
-                  {% for request_id, request_data in digest['request_declined'].iteritems() %}
-                    <li {{ style.list_item() }} >
-                      Request:
-                      <a href="{{ request_data['url'] }}" {{ style.link_text() }} >
-                        {{ request_data['title'] }}
-                      </a>
                     </li>
                   {% endfor %}
                   </ul>
