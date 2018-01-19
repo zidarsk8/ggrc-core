@@ -4,4 +4,4 @@
 */
 
 import '../../images/favicon.ico';
-import '../../stylesheets/dashboard.scss';
+import '../../styles/dashboard.scss';

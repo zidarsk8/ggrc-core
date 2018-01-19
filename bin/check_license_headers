@@ -11,11 +11,11 @@ cd "${SCRIPTPATH}/../"
 
 git grep "Copyright (C) 2018 Google Inc." . | \
   grep -o "^[^:]*" | \
-  grep -v "^third_party" | \
+  grep -v "^src/ggrc-client/vendor" | \
   grep -v ".csv$" | \
   sort -u > with_copyright
 
-git ls-files | grep -v "^third_party" | grep -v ".csv$" | sort > all_files 
+git ls-files | grep -v "^src/ggrc-client/vendor" | grep -v ".csv$" | sort > all_files
 
 diff all_files with_copyright | grep "^<" > license_header_diff
 

@@ -115,7 +115,6 @@ misspell :
 		! -path "*/.*"\
 		! -path "./node_modules/*"\
 		! -path "./tmp/*"\
-		! -path "./third_party/*"\
 		! -path "./*.sql"\
 		! -path "./*.zip"\
 		! -path "./*.png"\
@@ -124,6 +123,7 @@ misspell :
 		! -path "./venv/*"\
 		! -path "./src/ggrc/assets/vendor/*"\
 		! -path "./src/ggrc/static/*"\
+		! -path "./src/ggrc-client/vendor/*"\
 		! -path "./test/*.out"\
 		! -path "./test/*.xml"\
 		! -path "./src/ggrc/assets/stylesheets/dashboard.css"\
