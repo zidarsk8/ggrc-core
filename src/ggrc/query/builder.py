@@ -283,7 +283,7 @@ class QueryHelper(object):
         query = query.filter(filter_expression)
     if object_query.get("order_by"):
       with benchmark("Sorting: _get_ids > order_by"):
-        query = self._apply_order_by(
+        query = apply_order_by(
             object_class,
             query,
             object_query["order_by"],
@@ -344,103 +344,6 @@ class QueryHelper(object):
 
     return ids, total
 
-  def _apply_order_by(self, model, query, order_by, tgt_class):
-    """Add ordering parameters to a query for objects.
-
-    This works only on direct model properties and related objects defined with
-    foreign keys and fails if any CAs are specified in order_by.
-
-    Args:
-      model: the model instances of which are requested in query;
-      query: a query to get objects from the db;
-      order_by: a list of dicts with keys "name" (the name of the field by
-                which to sort) and "desc" (optional; do reverse sort if True);
-      tgt_class: the snapshotted model if `model` is Snapshot else `model`.
-
-    If sorting by a relationship field is requested, the following sorting is
-    applied:
-    1. If the field is a relationship to a Titled model, sort by its title.
-    2. If the field is a relationship to Person, sort by its name or email (if
-       name is None or empty string for a person object).
-    3. Otherwise, raise a NotImplementedError.
-
-    Returns:
-      the query with sorting parameters.
-    """
-    # Dictionary used to allow changing non local var inside the by_fulltext
-    # function.
-    count = {"ft": 0}
-
-    def joins_and_order(clause):
-      """Get join operations and ordering field from item of order_by list.
-
-      Args:
-        clause: {"name": the name of model's field,
-                 "desc": reverse sort on this field if True}
-
-      Returns:
-        ([joins], order) - a tuple of joins required for this ordering to work
-                           and ordering clause itself; join is None if no join
-                           required or [(aliased entity, relationship field)]
-                           if joins required.
-      """
-
-      def by_fulltext():
-        """Join fulltext index table, order by indexed CA value."""
-
-        count["ft"] += 1
-        alias = sa.orm.aliased(Record, name=u"fulltext_{}".format(count["ft"]))
-        joins = [(alias, sa.and_(
-            alias.key == model.id,
-            alias.type == model.__name__,
-            alias.property == key,
-            alias.subproperty.in_(["", "__sort__"]))
-        )]
-        order = alias.content
-        return joins, order
-
-      def by_foreign_key():
-        """Join the related model, order by title or name/email."""
-        related_model = attr.property.mapper.class_
-        if issubclass(related_model, models.mixins.Titled):
-          joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
-          order = alias.title
-        else:
-          raise NotImplementedError(u"Sorting by {model.__name__} is "
-                                    u"not implemented yet."
-                                    .format(model=related_model))
-        return joins, order
-
-      # transform clause["name"] into a model's field name
-      key = clause["name"].lower()
-
-      key, _ = tgt_class.attributes_map().get(key, (key, None))
-      if key in custom_operators.GETATTR_WHITELIST:
-        attr = getattr(model, key.encode('utf-8'), None)
-        if (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
-            isinstance(attr.property,
-                       sa.orm.properties.RelationshipProperty)):
-          joins, order = by_foreign_key()
-        else:
-          # a simple attribute
-          joins, order = None, attr
-      else:
-        # Snapshot or non object attributes are treated as custom attributes
-        joins, order = by_fulltext()
-
-      if clause.get("desc", False):
-        order = order.desc()
-
-      return joins, order
-
-    join_lists, orders = zip(*[joins_and_order(clause) for clause in order_by])
-    for join_list in join_lists:
-      if join_list is not None:
-        for join in join_list:
-          query = query.outerjoin(*join)
-
-    return query.order_by(*orders)
-
   @staticmethod
   def _slugs_to_ids(object_name, slugs):
     """Convert SLUG to proper ids for the given objec."""
@@ -450,3 +353,101 @@ class QueryHelper(object):
     ids = [c.id for c in object_class.query.filter(
         object_class.slug.in_(slugs)).all()]
     return ids
+
+
+def apply_order_by(model, query, order_by, tgt_class):
+  """Add ordering parameters to a query for objects.
+
+  This works only on direct model properties and related objects defined with
+  foreign keys and fails if any CAs are specified in order_by.
+
+  Args:
+    model: the model instances of which are requested in query;
+    query: a query to get objects from the db;
+    order_by: a list of dicts with keys "name" (the name of the field by
+              which to sort) and "desc" (optional; do reverse sort if True);
+    tgt_class: the snapshotted model if `model` is Snapshot else `model`.
+
+  If sorting by a relationship field is requested, the following sorting is
+  applied:
+  1. If the field is a relationship to a Titled model, sort by its title.
+  2. If the field is a relationship to Person, sort by its name or email (if
+     name is None or empty string for a person object).
+  3. Otherwise, raise a NotImplementedError.
+
+  Returns:
+    the query with sorting parameters.
+  """
+  # Dictionary used to allow changing non local var inside the by_fulltext
+  # function.
+  count = {"ft": 0}
+
+  def joins_and_order(clause):
+    """Get join operations and ordering field from item of order_by list.
+
+    Args:
+      clause: {"name": the name of model's field,
+               "desc": reverse sort on this field if True}
+
+    Returns:
+      ([joins], order) - a tuple of joins required for this ordering to work
+                         and ordering clause itself; join is None if no join
+                         required or [(aliased entity, relationship field)]
+                         if joins required.
+    """
+
+    def by_fulltext():
+      """Join fulltext index table, order by indexed CA value."""
+
+      count["ft"] += 1
+      alias = sa.orm.aliased(Record, name=u"fulltext_{}".format(count["ft"]))
+      joins = [(alias, sa.and_(
+          alias.key == model.id,
+          alias.type == model.__name__,
+          alias.property == key,
+          alias.subproperty.in_(["", "__sort__"]))
+      )]
+      order = alias.content
+      return joins, order
+
+    def by_foreign_key():
+      """Join the related model, order by title or name/email."""
+      related_model = attr.property.mapper.class_
+      if issubclass(related_model, models.mixins.Titled):
+        joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
+        order = alias.title
+      else:
+        raise NotImplementedError(u"Sorting by {model.__name__} is "
+                                  u"not implemented yet."
+                                  .format(model=related_model))
+      return joins, order
+
+    # transform clause["name"] into a model's field name
+    key = clause["name"].lower()
+
+    key, _ = tgt_class.attributes_map().get(key, (key, None))
+    if key in custom_operators.GETATTR_WHITELIST:
+      attr = getattr(model, key.encode('utf-8'), None)
+      if (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
+          isinstance(attr.property,
+                     sa.orm.properties.RelationshipProperty)):
+        joins, order = by_foreign_key()
+      else:
+        # a simple attribute
+        joins, order = None, attr
+    else:
+      # Snapshot or non object attributes are treated as custom attributes
+      joins, order = by_fulltext()
+
+    if clause.get("desc", False):
+      order = order.desc()
+
+    return joins, order
+
+  join_lists, orders = zip(*[joins_and_order(clause) for clause in order_by])
+  for join_list in join_lists:
+    if join_list is not None:
+      for join in join_list:
+        query = query.outerjoin(*join)
+
+  return query.order_by(*orders)
