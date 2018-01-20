@@ -48,7 +48,7 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
     )
     return all_people
 
-  def _get_object_people():
+  def _get_object_people(contact_id, model_names):
     """Objects to which the user is 'mapped'."""
     object_people_query = db.session.query(
         ObjectPerson.personable_id.label('id'),
@@ -62,7 +62,7 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
     )
     return object_people_query
 
-  def _get_object_mapped_ca():
+  def _get_object_mapped_ca(contact_id, model_names):
     """Objects to which the user is mapped via a custom attribute."""
     ca_mapped_objects_query = db.session.query(
         CustomAttributeValue.attributable_id.label('id'),
@@ -77,7 +77,7 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
     )
     return ca_mapped_objects_query
 
-  def _get_objects_user_assigned():
+  def _get_objects_user_assigned(contact_id, model_names):
     """Objects for which the user is assigned."""
     dst_assignee_query = db.session.query(
         Relationship.destination_id.label('id'),
@@ -103,7 +103,7 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
     )
     return dst_assignee_query.union(src_assignee_query)
 
-  def _get_results_by_context(model):
+  def _get_results_by_context(contact_id, model):
     """Objects based on the context of the current model.
 
     Return the objects that are in private contexts via UserRole.
@@ -217,7 +217,7 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
 
     return context_query
 
-  def _get_custom_roles():
+  def _get_custom_roles(contact_id, model_names):
     """Objects for which the user is an 'owner'."""
     custom_roles_query = db.session.query(
         all_models.AccessControlList.object_id.label('id'),
@@ -240,12 +240,14 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
   # Note: We don't return mapped objects for the Creator because being mapped
   # does not give the Creator necessary permissions to view the object.
   if not is_creator:
-    type_union_queries.append(_get_object_people())
+    type_union_queries.append(_get_object_people(contact_id, model_names))
 
-  type_union_queries.extend((_get_object_mapped_ca(),
-                             _get_objects_user_assigned(),
-                             _get_context_relationships(),
-                             _get_custom_roles(),))
+  type_union_queries.extend((
+      _get_object_mapped_ca(contact_id, model_names),
+      _get_objects_user_assigned(contact_id, model_names),
+      _get_context_relationships(),
+      _get_custom_roles(contact_id, model_names),
+  ))
 
   for model in type_models:
     query = _get_model_specific_query(model)
@@ -257,6 +259,6 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
     if model is all_models.Person:
       type_union_queries.append(_get_people())
     if model in (all_models.Program, all_models.Audit, all_models.Workflow):
-      type_union_queries.append(_get_results_by_context(model))
+      type_union_queries.append(_get_results_by_context(contact_id, model))
 
   return alias(union(*type_union_queries))
