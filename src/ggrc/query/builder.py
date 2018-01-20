@@ -383,6 +383,7 @@ class QueryHelper(object):
       """
       def by_fulltext():
         """Join fulltext index table, order by indexed CA value."""
+        self._count += 1
         alias = sa.orm.aliased(Record, name=u"fulltext_{}".format(self._count))
         joins = [(alias, sa.and_(
             alias.key == model.id,
@@ -420,7 +421,6 @@ class QueryHelper(object):
           joins, order = None, attr
       else:
         # Snapshot or non object attributes are treated as custom attributes
-        self._count += 1
         joins, order = by_fulltext()
 
       if clause.get("desc", False):
