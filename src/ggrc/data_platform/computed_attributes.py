@@ -127,6 +127,22 @@ def get_aggregate_function(attribute):
       return source_id, value
 
     return max_
+  elif function_name == "last":
+    def last_(aggregate_values, rel_map):
+      """Get maximum value and id from which the value was taken."""
+      values = [
+          (aggregate_values[aggregate_id], aggregate_id)
+          for aggregate_id in rel_map
+          if aggregate_values.get(aggregate_id) is not None
+      ]
+      if not values:
+        return None, None
+
+      # Last value  = value with maximal id
+      value, source_id = max(values, key=lambda i: i[1])
+      return source_id, value
+
+    return last_
   raise AttributeError("Attribute aggregate_function contains invalid data.")
 
 
