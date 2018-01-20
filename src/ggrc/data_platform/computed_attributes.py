@@ -408,10 +408,10 @@ def _get_relationships(aggregate_type, objects):
     return set()
 
   src = db.session.query(
-      models.Relationship.destination_type,
-      models.Relationship.destination_id,
       models.Relationship.source_type,
       models.Relationship.source_id,
+      models.Relationship.destination_type,
+      models.Relationship.destination_id,
   ).filter(
       sa.tuple_(
           models.Relationship.destination_type,
@@ -420,10 +420,10 @@ def _get_relationships(aggregate_type, objects):
       models.Relationship.source_type == aggregate_type,
   )
   dst = db.session.query(
-      models.Relationship.source_type,
-      models.Relationship.source_id,
       models.Relationship.destination_type,
       models.Relationship.destination_id,
+      models.Relationship.source_type,
+      models.Relationship.source_id,
   ).filter(
       sa.tuple_(
           models.Relationship.source_type,
