@@ -5,7 +5,6 @@
 import sqlalchemy as sa
 from sqlalchemy import and_
 from sqlalchemy import literal
-from sqlalchemy import or_
 from sqlalchemy import true, false
 from sqlalchemy import union
 from sqlalchemy import alias
@@ -15,7 +14,6 @@ from ggrc.models import all_models
 from ggrc.models.object_person import ObjectPerson
 from ggrc.models.relationship import Relationship
 from ggrc.models.custom_attribute_value import CustomAttributeValue
-from ggrc.query import utils as query_utils
 from ggrc_basic_permissions import backlog_workflows
 from ggrc_basic_permissions.models import UserRole, Role
 from ggrc_workflows.models import Cycle
@@ -123,17 +121,6 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
     )
     return context_query
 
-  def _get_assigned_to_records(model):
-    """Get query by models contacts fields.
-
-    Objects for which the user is the 'contact' or 'secondary contact'.
-    """
-    model_type_queries = []
-    for attr in ('contact_id', 'secondary_contact_id'):
-      if hasattr(model, attr):
-        model_type_queries.append(getattr(model, attr) == contact_id)
-    return model_type_queries
-
   def _get_tasks_in_cycle(model):
     """Filter tasks with particular statuses and cycle.
 
@@ -193,15 +180,6 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
     model_type_query = None
     if model is all_models.CycleTaskGroupObjectTask:
       model_type_query = _get_tasks_in_cycle(model)
-    else:
-      model_type_queries = _get_assigned_to_records(model)
-      if model_type_queries:
-        type_column = query_utils.get_type_select_column(model)
-        model_type_query = db.session.query(
-            model.id.label('id'),
-            type_column.label('type'),
-            literal(None).label('context_id')
-        ).filter(or_(*model_type_queries)).distinct()
     return model_type_query
 
   def _get_context_relationships():
@@ -265,9 +243,9 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
     type_union_queries.append(_get_object_people())
 
   type_union_queries.extend((_get_object_mapped_ca(),
-                            _get_objects_user_assigned(),
-                            _get_context_relationships(),
-                            _get_custom_roles(),))
+                             _get_objects_user_assigned(),
+                             _get_context_relationships(),
+                             _get_custom_roles(),))
 
   for model in type_models:
     query = _get_model_specific_query(model)
