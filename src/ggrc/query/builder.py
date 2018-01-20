@@ -83,7 +83,6 @@ class QueryHelper(object):
 
   def __init__(self, query):
     self.query = self._clean_query(query)
-    self._count = 0
 
   def _get_snapshot_child_type(self, object_query):
     """Return child_type for snapshot from a query"""
@@ -368,6 +367,10 @@ class QueryHelper(object):
     Returns:
       the query with sorting parameters.
     """
+    # Dictionary used to allow changing non local var inside the by_fulltext
+    # function.
+    count = {"ft": 0}
+
     def joins_and_order(clause):
       """Get join operations and ordering field from item of order_by list.
 
@@ -381,10 +384,12 @@ class QueryHelper(object):
                            required or [(aliased entity, relationship field)]
                            if joins required.
       """
+
       def by_fulltext():
         """Join fulltext index table, order by indexed CA value."""
-        self._count += 1
-        alias = sa.orm.aliased(Record, name=u"fulltext_{}".format(self._count))
+
+        count["ft"] += 1
+        alias = sa.orm.aliased(Record, name=u"fulltext_{}".format(count["ft"]))
         joins = [(alias, sa.and_(
             alias.key == model.id,
             alias.type == model.__name__,
@@ -414,7 +419,7 @@ class QueryHelper(object):
         attr = getattr(model, key.encode('utf-8'), None)
         if (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
             isinstance(attr.property,
-                        sa.orm.properties.RelationshipProperty)):
+                       sa.orm.properties.RelationshipProperty)):
           joins, order = by_foreign_key()
         else:
           # a simple attribute
