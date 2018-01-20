@@ -53,6 +53,13 @@ class Attributable(object):
         for attr in self._attributes  # pylint: disable=not-an-iterable
     }
 
+  @builder.simple_property
+  def attribute_objs(self):
+    return {
+        attr.attribute_template.attribute_definition.name: attr
+        for attr in self._attributes  # pylint: disable=not-an-iterable
+    }
+
   @classmethod
   def eager_query(cls):
     """Define fields to be loaded eagerly to lower the count of DB queries."""
