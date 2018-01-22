@@ -110,12 +110,11 @@ export default can.Control({
         }));
       });
   },
-  prepareView: function (opts, el, maximizedState, setHtml) {
+  prepareView: function (opts, el, maximizedState) {
     var instance = opts.attr('instance');
     var options = this.findOptions(el);
     var populatedOpts = opts.attr('options');
-    var confirmEdit = instance.class.confirmEditModal ?
-      instance.class.confirmEditModal : {};
+    var confirmEdit = instance.class.confirmEditModal || {};
     var view = this.findView(instance);
     instance.attr('view', view);
 
@@ -127,14 +126,10 @@ export default can.Control({
       confirmEdit.confirm = this.confirmEdit;
     }
 
-    if (setHtml) {
-      this.setHtml(opts, view, confirmEdit, options, maximizedState);
-    }
+    this.setHtml(opts, view, confirmEdit, options, maximizedState);
   },
   setInstance: function (opts, el, maximizedState) {
     var instance = opts.attr('instance');
-    var panelHeight = this.getPinHeight(maximizedState);
-    var currentPanelHeight;
     var infoPaneOpenDfd = can.Deferred();
     var isSubtreeItem = opts.attr('options.isSubTreeItem');
 
@@ -142,27 +137,21 @@ export default can.Control({
       !isSubtreeItem ||
       TreeViewUtils.isDirectlyRelated(instance));
 
-    this.prepareView(opts, el, maximizedState, true);
+    this.prepareView(opts, el, maximizedState);
 
     if (instance.info_pane_preload) {
       instance.info_pane_preload();
     }
 
-    // Make sure pin is visible
-    currentPanelHeight = this.element.height();
-    if (!currentPanelHeight || currentPanelHeight !== panelHeight) {
-      this.element.css('height', this.getPinHeight(true));
-    } else {
-      this.ensureElementVisible(el);
-    }
-
-    this.element.css('z-index', 1);
-    this.element.css('opacity', 1);
+    this.element.css({
+      height: this.getPinHeight(maximizedState),
+      'z-index': 1,
+      opacity: 1
+    });
 
     // Temporary solution...
     setTimeout(infoPaneOpenDfd.resolve, 1000);
 
-    this.element.trigger('scroll');
     return infoPaneOpenDfd;
   },
   updateInstance: function (selector, instance) {
@@ -179,43 +168,6 @@ export default can.Control({
     this.element.find(selector)
       .viewModel()
       .attr('isLoading', isLoading);
-  },
-  ensureElementVisible: function (el) {
-    var $objectArea;
-    var $header;
-    var $filter;
-    var elTop;
-    var elBottom;
-    var headerTop;
-    var headerBottom;
-    var infoTop;
-
-    $(window).trigger('resize');
-    $objectArea = $('.object-area');
-    $header = $('.tree-header:visible');
-    $filter = $('.tree-filter:visible');
-
-    if (_.isEmpty(el) || _.isEmpty($header)) {
-      return;
-    }
-
-    elTop = el.offset().top;
-    elBottom = elTop + el.height();
-
-    headerTop = $header.offset().top;
-    headerBottom = headerTop + $header.height();
-    infoTop = this.element.offset().top;
-
-    if (elTop < headerBottom || elBottom > infoTop) {
-      el[0].scrollIntoView(false);
-      if (elTop < headerBottom) {
-        el[0].scrollIntoView(true);
-        $objectArea.scrollTop(
-          $objectArea.scrollTop() - $header.height() - $filter.height());
-      } else {
-        el[0].scrollIntoView(false);
-      }
-    }
   },
   confirmEdit: function (instance, modalDetails) {
     var confirmDfd = $.Deferred();
