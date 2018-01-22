@@ -13,19 +13,6 @@ let customAttributesType = {
   Dropdown: 'dropdown',
 };
 
-/**
- * @deprecated Use constants from custom-attribute-config.
- */
-let CA_DD_REQUIRED_DEPS = Object.freeze({
-  NONE: 0,
-  COMMENT: 1,
-  EVIDENCE: 2,
-  COMMENT_AND_EVIDENCE: 3,
-});
-
-/**
- * @deprecated Use constants from custom-attribute-config.
- */
 let CUSTOM_ATTRIBUTE_TYPE = Object.freeze({
   LOCAL: 1,
   GLOBAL: 2,
@@ -241,8 +228,7 @@ function prepareCustomAttributes(definitions, values) {
  */
 function isEvidenceRequired(field) {
   const fieldValidationConf = field.attr(`validationConfig.${field.value}`);
-  return fieldValidationConf === CA_DD_REQUIRED_DEPS.EVIDENCE ||
-    fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+  return ddValidationValueToMap(fieldValidationConf).attachment;
 }
 
 /**
@@ -253,8 +239,7 @@ function isEvidenceRequired(field) {
  */
 function isCommentRequired(field) {
   const fieldValidationConf = field.attr(`validationConfig.${field.value}`);
-  return fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT ||
-    fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+  return ddValidationValueToMap(fieldValidationConf).comment;
 }
 /**
  * @deprecated Use CustomAttributeObject API to get access to the necessary custom
@@ -461,7 +446,6 @@ export {
   applyChangesToCustomAttributeValue,
   ensureGlobalCA,
   CUSTOM_ATTRIBUTE_TYPE,
-  CA_DD_REQUIRED_DEPS,
   CA_DD_FLAGS,
   ddValidationValueToMap,
   ddValidationMapToValue,
