@@ -34,6 +34,7 @@ import RefreshQueue from '../../models/refresh_queue';
       confirmationCallback: '@',
       pickerActive: false,
       disabled: false,
+      isUploading: false,
       sanitizeSlug: function (slug) {
         return slug.toLowerCase().replace(/\W+/g, '-');
       },
@@ -286,6 +287,7 @@ import RefreshQueue from '../../models/refresh_queue';
       trigger_upload: function (scope, el) {
         // upload files without a parent folder (risk assesment)
 
+        this.attr('isUploading', true);
         uploadFiles({
           parentId: el.data('folder-id'),
           pickFolder: el.data('type') === 'folders',
@@ -307,12 +309,15 @@ import RefreshQueue from '../../models/refresh_queue';
               if ( error ) {
                 GGRC.Errors.notifier('error', error && error.message);
               }
+            })
+            .always(() => {
+              this.attr('isUploading', false);
             });
-        })
-        .fail((err)=>{
+        }).fail((err)=>{
           if ( err && err.type === GDRIVE_PICKER_ERR_CANCEL ) {
             el.trigger('rejected');
           }
+          this.attr('isUploading', false);
         });
       },
 
@@ -342,6 +347,7 @@ import RefreshQueue from '../../models/refresh_queue';
 
         parentFolderDfd
           .done(function (parentFolder) {
+            that.attr('isUploading', true);
             parentFolder.uploadFiles()
               .then(that.beforeCreateHandler.bind(that))
               .then(that.addFilesSuffixes.bind(that, {dest: parentFolder}))
@@ -349,6 +355,7 @@ import RefreshQueue from '../../models/refresh_queue';
                 that.handle_file_upload(files).then(function (docs) {
                   can.trigger(that, 'modal:success', {arr: docs});
                   el.trigger('modal:success', {arr: docs});
+                  that.attr('isUploading', false);
                 });
               })
               .fail(function () {
@@ -366,6 +373,7 @@ import RefreshQueue from '../../models/refresh_queue';
 
                   GGRC.Errors.notifier('error', error && error.message);
                 }
+                that.attr('isUploading', false);
               });
           })
           .fail(function () {

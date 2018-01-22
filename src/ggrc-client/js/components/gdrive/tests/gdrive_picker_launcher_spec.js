@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as pickerUtils from '../../../plugins/utils/gdrive-picker-utils';
+
 describe('GGRC.Components.gDrivePickerLauncher', function () {
   'use strict';
 
@@ -323,6 +325,123 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
         method();
         expect(viewModel.instance.reify).toHaveBeenCalled();
         expect(viewModel.instance.refresh).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('trigger_upload() method', function () {
+    let uploadFilesDfd;
+    let renameFileDfd;
+    let el;
+
+    beforeEach(function () {
+      el = jasmine.createSpyObj(['data', 'trigger']);
+      uploadFilesDfd = can.Deferred();
+      spyOn(pickerUtils, 'uploadFiles').and.returnValue(uploadFilesDfd);
+    });
+
+    it('sets "isUploading" flag to true', function () {
+      viewModel.attr('isUploading', false);
+
+      viewModel.trigger_upload(viewModel, el);
+
+      expect(viewModel.attr('isUploading')).toBe(true);
+    });
+
+    describe('sets "isUploading" flag to false', function () {
+      beforeEach(function () {
+        renameFileDfd = can.Deferred();
+        viewModel.attr('isUploading', true);
+        spyOn(viewModel, 'beforeCreateHandler');
+        spyOn(viewModel, 'addFilesSuffixes').and.returnValue(renameFileDfd);
+      });
+
+      it('when uploadFiles() was failed', function () {
+        uploadFilesDfd.reject();
+
+        viewModel.trigger_upload(viewModel, el);
+
+        expect(viewModel.attr('isUploading')).toBe(false);
+      });
+
+      it('after addFilesSuffixes() success', function () {
+        uploadFilesDfd.resolve();
+        renameFileDfd.resolve([]);
+
+        viewModel.trigger_upload(viewModel, el);
+
+        expect(viewModel.attr('isUploading')).toBe(false);
+      });
+
+      it('when addFilesSuffixes() was failed', function () {
+        uploadFilesDfd.resolve();
+        renameFileDfd.reject();
+
+        viewModel.trigger_upload(viewModel, el);
+
+        expect(viewModel.attr('isUploading')).toBe(false);
+      });
+    });
+  });
+
+  describe('trigger_upload_parent() method', function () {
+    let uploadFilesDfd;
+    let renameFileDfd;
+    let parentFolderDfd;
+    let el;
+    let parentFolderStub;
+
+    beforeEach(function () {
+      el = jasmine.createSpyObj(['data', 'trigger']);
+
+      uploadFilesDfd = can.Deferred();
+      parentFolderStub = {
+        uploadFiles: jasmine.createSpy().and.returnValue(uploadFilesDfd),
+      };
+
+      parentFolderDfd = can.Deferred();
+      spyOn(CMS.Models, 'GDriveFolder').and.returnValue({
+        refresh: jasmine.createSpy().and.returnValue(parentFolderDfd),
+      });
+    });
+
+    it('sets "isUploading" flag to true', function () {
+      parentFolderDfd.resolve(parentFolderStub);
+      viewModel.attr('isUploading', false);
+
+      viewModel.trigger_upload_parent(viewModel, el);
+
+      expect(viewModel.attr('isUploading')).toBe(true);
+    });
+
+    describe('sets "isUploading" flag to false', function () {
+      beforeEach(function () {
+        viewModel.attr('isUploading', true);
+        spyOn(viewModel, 'addFilesSuffixes').and.returnValue(renameFileDfd);
+        spyOn(viewModel, 'beforeCreateHandler')
+          .and.returnValue(can.Deferred().resolve());
+        renameFileDfd = can.Deferred();
+      });
+
+      it('after uploadFiles() success', function () {
+        spyOn(viewModel, 'handle_file_upload')
+          .and.returnValue(can.Deferred().resolve());
+        parentFolderDfd.resolve(parentFolderStub);
+        uploadFilesDfd.resolve();
+        renameFileDfd.reject();
+
+        viewModel.trigger_upload_parent(viewModel, el);
+
+        expect(viewModel.attr('isUploading')).toBe(false);
+      });
+
+      it('when uploadFiles() was failed', function () {
+        parentFolderDfd.resolve(parentFolderStub);
+        uploadFilesDfd.reject();
+
+        viewModel.trigger_upload_parent(viewModel, el);
+
+        expect(viewModel.attr('isUploading')).toBe(false);
       });
     });
   });
