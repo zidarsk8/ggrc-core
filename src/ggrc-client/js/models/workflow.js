@@ -81,33 +81,39 @@
     }
   }, {
     save: function () {
+      const dfd = new can.Deferred();
       var taskGroupTitle = this.task_group_title;
       var isNew = this.isNew();
       var redirectLink;
       var taskGroup;
-      var dfd;
 
-      dfd = this._super.apply(this, arguments);
-      dfd.then(function (instance) {
-        redirectLink = instance.viewLink + '#task_group_widget';
-        instance.attr('_redirect', redirectLink);
-        if (!taskGroupTitle || !isNew || instance.clone) {
-          return instance;
-        }
-        taskGroup = new CMS.Models.TaskGroup({
-          title: taskGroupTitle,
-          workflow: instance,
-          contact: instance.people && instance.people[0] || instance.modified_by,
-          context: instance.context
-        });
-        return taskGroup.save()
-          .then(function (tg) {
-            // Prevent the redirect form workflow_page.js
-            taskGroup.attr('_no_redirect', true);
-            instance.attr('_redirect', redirectLink + '/task_group/' + tg.id);
-            return this;
-          }.bind(this));
-      }.bind(this));
+      this._super(...arguments)
+        .then((instance) => {
+          redirectLink = `${instance.viewLink}#task_group_widget`;
+          instance.attr('_redirect', redirectLink);
+          if (!taskGroupTitle || !isNew || instance.clone) {
+            dfd.resolve(instance);
+            // skip next 'then' chain
+            return can.Deferred().reject();
+          }
+          taskGroup = new CMS.Models.TaskGroup({
+            title: taskGroupTitle,
+            workflow: instance,
+            contact: instance.people && instance.people[0]
+              || instance.modified_by,
+            context: instance.context,
+          });
+          return taskGroup.save();
+        })
+        .then((tg) => {
+          // Prevent the redirect form workflow_page.js
+          taskGroup.attr('_no_redirect', true);
+          this.attr('_redirect', `${redirectLink}/task_group/${tg.id}`);
+          dfd.resolve(this);
+          return this;
+        })
+        .fail(dfd.reject);
+
       return dfd;
     },
   });
