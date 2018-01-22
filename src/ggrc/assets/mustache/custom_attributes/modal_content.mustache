@@ -9,7 +9,7 @@
   <custom-attributes-wrap instance="instance">
     <div class="hideable-holder bare">
       <div class="row-fluid">
-        {{#getValues}}
+        {{#each attributeValues}}
           <div class="custom-attribute {{^cad.mandatory}}hidable{{/cad.mandatory}} span6
             {{#ca_validation_error instance.computed_errors id}}field-failure{{/ca_validation_error}}">
 
@@ -41,7 +41,7 @@
               {{#cad.helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{cad.helptext}}"></i>{{/cad.helptext}}
               {{#unless cad.mandatory}}<a href="javascript://" class="field-hide" tabindex="-1">hide</a>{{/unless}}
             </label>
-            <select class="input-block-level" name="custom_attributes.{{cad.id}}" null-if-empty="null-if-empty" tabindex="20">
+            <select class="input-block-level" name="custom_attributes.{{cad.id}}" null-if-empty="null-if-empty" tabindex="{{add_index 20 @index}}">
               <option value="" {{#if_equals "" cav.attribute_value}}selected="true"{{/if_equals}}>---</option>
               {{#iterate_string cad.multi_choice_options ','}}
                 <option {{#if_equals iterator cav.attribute_value}}selected="true"{{/if_equals}}>{{iterator}}</option>
@@ -65,6 +65,7 @@
               <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
             {{/unless}}
             <datepicker
+              tabindex="{{add_index 20 @index}}"
               {label}="cad.title"
               date="instance.custom_attributes.{{cad.id}}"
               required="{{cad.mandatory}}"
@@ -86,6 +87,7 @@
                     data-lookup-cb="_custom_attribute_map {{cad.id}}"
                     null-if-empty="null-if-empty"
                     type="text"
+                    tabindex="{{add_index 20 @index}}"
                     value="{{person.email}}" />
               {{else}}
               <inline-autocomplete-wrapper
@@ -93,6 +95,7 @@
                 {text-value}="person.email"
                 {display-prop}="'email'">
                 <external-data-autocomplete
+                  tabindex="{{add_index 20 @index}}"
                   {type}="'Person'"
                   {placeholder}="'Enter email address'"
                   (item-selected)="setCustomAttribute(%event.selectedItem, cad.id)"
@@ -111,7 +114,7 @@
             <label class="help-inline warning">{{errors.0}}</label>
           {{/ca_validation_error}}
         </div>
-        {{/getValues}}
+        {{/each}}
       </div>
     </div>
   </custom-attributes-wrap>
