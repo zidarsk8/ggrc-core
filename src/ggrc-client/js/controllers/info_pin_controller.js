@@ -28,6 +28,10 @@ import '../components/sort/sort-by';
 import * as TreeViewUtils from '../plugins/utils/tree-view-utils';
 import {confirm} from '../plugins/utils/modals';
 
+export const pinContentHiddenClass = 'pin-content--hidden';
+export const pinContentMaximizedClass = 'pin-content--maximized';
+export const pinContentMinimizedClass = 'pin-content--minimized';
+
 export default can.Control({
   pluginName: 'cms_controllers_info_pin',
   defaults: {
@@ -35,11 +39,10 @@ export default can.Control({
   }
 }, {
   init: function (el, options) {
-    this.element.height(0);
+    this.unsetInstance();
   },
   isPinVisible() {
-    const height = this.element.height();
-    return height > 0;
+    return !this.element.hasClass(pinContentHiddenClass);
   },
   findView: function (instance) {
     var view = instance.class.table_plural + '/info';
@@ -65,23 +68,14 @@ export default can.Control({
     }
     return options;
   },
-  getPinHeight: function (maximizedState) {
-    if (maximizedState) {
-      return Math.floor($(window).height() * 3 / 4);
-    }
-    return Math.floor($(window).height() / 3);
-  },
   hideInstance: function () {
     this.unsetInstance();
     $(window).trigger('resize');
   },
   unsetInstance: function () {
     this.element
-      .css({
-        height: 0,
-        'z-index': -1,
-        opacity: 0
-      })
+      .addClass(pinContentHiddenClass)
+      .removeClass(`${pinContentMaximizedClass} ${pinContentMinimizedClass}`)
       .html('');
   },
   setHtml: function (opts, view, confirmEdit, options, maximizedState) {
@@ -143,16 +137,24 @@ export default can.Control({
       instance.info_pane_preload();
     }
 
-    this.element.css({
-      height: this.getPinHeight(maximizedState),
-      'z-index': 1,
-      opacity: 1
-    });
+    this.showInstance(maximizedState);
 
     // Temporary solution...
     setTimeout(infoPaneOpenDfd.resolve, 1000);
 
     return infoPaneOpenDfd;
+  },
+  showInstance(maximizedState) {
+    this.element
+      .removeClass(`${pinContentMaximizedClass} ${pinContentMinimizedClass}`)
+      .removeClass(pinContentHiddenClass);
+
+    if (maximizedState) {
+      this.element.addClass(pinContentMaximizedClass);
+    }
+    else {
+      this.element.addClass(pinContentMinimizedClass);
+    }
   },
   updateInstance: function (selector, instance) {
     var vm = this.element.find(selector).viewModel();
@@ -181,11 +183,9 @@ export default can.Control({
     return confirmDfd;
   },
   changeMaximizedState: function (maximizedState) {
+    this.showInstance(maximizedState);
+
     var $activeTree = $('.cms_controllers_tree_view_node.active');
-    var size = this.getPinHeight(maximizedState);
-
-    this.element.css('height', size);
-
     if (maximizedState) {
       $activeTree
         .addClass('maximized-info-pane');
