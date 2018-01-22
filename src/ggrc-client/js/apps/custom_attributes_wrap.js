@@ -4,11 +4,11 @@
  */
 
 import {getCustomAttributeType} from '../plugins/utils/ca-utils';
+const tag = 'custom-attributes-wrap';
 
 export default can.Component.extend({
-  tag: 'custom-attributes-wrap',
-  template: '<content/>',
-  scope: {
+  tag,
+  viewModel: {
     define: {
       attributeValues: {
         get() {
@@ -46,25 +46,24 @@ export default can.Component.extend({
     },
     instance: null,
     items: [],
-    setItems: function (isReady) {
+    setItems(isReady) {
       let values = [];
       if (isReady) {
-        values = this.attr('attributeValues').sort(function (a, b) {
-          return a.cad.id - b.cad.id;
-        });
+        values = this.attr('attributeValues')
+          .sort((a, b) => a.cad.id - b.cad.id);
         this.attr('items', values);
       }
     },
   },
-  init: function () {
-    if (this.scope.instance.class.is_custom_attributable) {
-      this.scope.instance.setup_custom_attributes();
+  init() {
+    if (this.viewModel.instance.class.is_custom_attributable) {
+      this.viewModel.instance.setup_custom_attributes();
     }
-    this.scope.setItems(true);
+    this.viewModel.setItems(true);
   },
   events: {
-    '{scope.instance} readyForRender': function (sc, ev, isReady) {
-      this.scope.setItems(isReady);
+    '{viewModel.instance} readyForRender'(sc, ev, isReady) {
+      this.viewModel.setItems(isReady);
     },
   },
 });
