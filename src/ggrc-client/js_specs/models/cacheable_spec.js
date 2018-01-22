@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {failAll} from '../spec_helpers';
+
 describe('can.Model.Cacheable', function () {
   beforeAll(function () {
     can.Model.Mixin('dummyable');

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../three-dots-menu';
 
 describe('three-dots-menu component', function () {
@@ -161,4 +162,3 @@ describe('three-dots-menu component', function () {
     });
   });
 });
-

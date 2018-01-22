@@ -9,7 +9,7 @@
  */
 
 // polls check function and calls done when truthy
-window.waitsFor = function (check, done) {
+function waitsFor(check, done) {
   if (!check()) {
     setTimeout(function () {
       waitsFor(check, done);
@@ -17,12 +17,12 @@ window.waitsFor = function (check, done) {
   } else {
     done();
   }
-};
+}
 
 // This is primarily useful for passing as the fail case for
 //  promises, since every item passed to it will show up in
 //  the jasmine output.
-window.failAll = function (done) {
+function failAll(done) {
   return function () {
     can.each(arguments, function (arg) {
       fail(JSON.stringify(arg));
@@ -31,13 +31,19 @@ window.failAll = function (done) {
       done();
     }
   };
-};
+}
 
-window.getComponentVM = (Component) => {
+function getComponentVM(Component) {
   const viewModelConfig = Component.prototype.viewModel;
 
   if (can.isFunction(viewModelConfig)) {
     return new viewModelConfig();
   }
   return new (can.Map.extend(viewModelConfig));
+}
+
+export {
+  waitsFor,
+  failAll,
+  getComponentVM,
 };
