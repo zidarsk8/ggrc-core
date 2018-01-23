@@ -112,6 +112,11 @@ class CycleTaskGroup(mixins.WithContact,
   ]
 
   @property
+  def workflow(self):
+    """Property which returns parent workflow object."""
+    return self.cycle.workflow
+
+  @property
   def _task_assignees(self):
     """Property. Return the list of persons as assignee of related tasks."""
     persons = {}

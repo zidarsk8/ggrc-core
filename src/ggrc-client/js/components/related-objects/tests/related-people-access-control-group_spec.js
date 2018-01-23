@@ -60,6 +60,17 @@ import Permission from '../../../permission';
        expect(vm.attr('canEdit')).toEqual(false);
      });
 
+     it('returns "false" when is readonly', () => {
+       spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
+       spyOn(Permission, 'is_allowed_for').and.returnValue(false);
+       vm.instance.attr('archived', false);
+       vm.attr('updatableGroupId', null);
+       vm.attr('isNewInstance', true);
+       vm.attr('isReadonly', true);
+
+       expect(vm.attr('canEdit')).toEqual(false);
+    });
+
      it('returns "true" when new instance', () => {
        spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
        spyOn(Permission, 'is_allowed_for').and.returnValue(false);

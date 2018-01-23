@@ -10,6 +10,7 @@ from ggrc.app import app  # NOQA
 from ggrc import db
 from ggrc.models import all_models
 from integration.ggrc import TestCase
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import Generator
 from integration.ggrc.generator import ObjectGenerator
@@ -216,14 +217,8 @@ class TestCreatorProgram(TestCase):
           "system": {
               "title": random_title,
               "context": None,
-              "access_control_list": [{
-                  "person": {
-                      "id": creator.id,
-                      "type": "Person",
-                  },
-                  "ac_role_id": acr_id,
-                  "context": None
-              }],
+              "access_control_list": [
+                  acl_helper.get_acl_json(acr_id, creator.id)],
           },
       })
       self.assertEqual(response.status_code, 201)

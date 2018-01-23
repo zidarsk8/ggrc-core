@@ -9,6 +9,7 @@ import ddt
 from integration.ggrc import TestCase
 from ggrc.models import get_model
 from ggrc.models import all_models
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import Generator
 from integration.ggrc.generator import ObjectGenerator
@@ -142,14 +143,8 @@ class TestCreator(TestCase):
         "policy": {
             "title": "Creator Policy",
             "context": None,
-            "access_control_list": [{
-                "person": {
-                    "id": self.users["creator"].id,
-                    "type": "Person",
-                },
-                "ac_role_id": acr_id,
-                "context": None
-            }],
+            "access_control_list": [
+                acl_helper.get_acl_json(acr_id, self.users["creator"].id)],
         },
     })
     response.json.get("policy").get("id")
@@ -235,14 +230,8 @@ class TestCreator(TestCase):
         name="Admin"
     ).first().id
     linked_acl = {
-        "access_control_list": [{
-            "person": {
-                "id": self.users["creator"].id,
-                "type": "Person",
-            },
-            "ac_role_id": acr_id,
-            "context": None
-        }]
+        "access_control_list": [
+            acl_helper.get_acl_json(acr_id, self.users["creator"].id)],
     }
     check(obj_1, 0)
     obj_2 = gen("Test Section 2", linked_acl)

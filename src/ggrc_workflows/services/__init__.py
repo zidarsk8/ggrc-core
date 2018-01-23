@@ -11,7 +11,6 @@ def contributed_services():
   from ggrc_workflows import models
   return [
       service(models.Workflow.__tablename__, models.Workflow),
-      service(models.WorkflowPerson.__tablename__, models.WorkflowPerson),
       service(models.TaskGroup.__tablename__, models.TaskGroup),
       service(models.TaskGroupTask.__tablename__, models.TaskGroupTask),
       service(models.TaskGroupObject.__tablename__, models.TaskGroupObject),

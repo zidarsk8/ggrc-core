@@ -18,12 +18,12 @@ from sqlalchemy.ext import hybrid
 
 from ggrc import builder
 from ggrc import db
+from ggrc.access_control import roleable, role
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
 from ggrc.models import mixins
 from ggrc.models import reflection
-from ggrc.models.associationproxy import association_proxy
 from ggrc.models.context import HasOwnContext
 from ggrc.models.deferred import deferred
 from ggrc_workflows.models import cycle
@@ -31,7 +31,8 @@ from ggrc_workflows.models import cycle_task_group
 from ggrc_workflows.services import google_holidays
 
 
-class Workflow(mixins.CustomAttributable,
+class Workflow(roleable.Roleable,
+               mixins.CustomAttributable,
                HasOwnContext,
                mixins.Timeboxed,
                mixins.Described,
@@ -65,11 +66,6 @@ class Workflow(mixins.CustomAttributable,
       db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
 
   recurrences = db.Column(db.Boolean, default=False, nullable=False)
-
-  workflow_people = db.relationship(
-      'WorkflowPerson', backref='workflow', cascade='all, delete-orphan')
-  people = association_proxy(
-      'workflow_people', 'person', 'WorkflowPerson')
 
   task_groups = db.relationship(
       'TaskGroup', backref='workflow', cascade='all, delete-orphan')
@@ -254,8 +250,6 @@ class Workflow(mixins.CustomAttributable,
   ]
 
   _api_attrs = reflection.ApiAttributes(
-      'workflow_people',
-      reflection.Attribute('people', create=False, update=False),
       'task_groups',
       'notify_on_change',
       'notify_custom_message',
@@ -296,27 +290,10 @@ class Workflow(mixins.CustomAttributable,
           "display_name": "Force real-time email updates",
           "mandatory": False,
       },
-      "workflow_owner": {
-          "display_name": "Manager",
-          "mandatory": True,
-          "filter_by": "_filter_by_workflow_owner",
-      },
-      "workflow_member": {
-          "display_name": "Member",
-          "filter_by": "_filter_by_workflow_member",
-      },
       "status": None,
       "start_date": None,
       "end_date": None,
   }
-
-  @classmethod
-  def _filter_by_workflow_owner(cls, predicate):
-    return cls._filter_by_role("WorkflowOwner", predicate)
-
-  @classmethod
-  def _filter_by_workflow_member(cls, predicate):
-    return cls._filter_by_role("WorkflowMember", predicate)
 
   def copy(self, _other=None, **kwargs):
     """Create a partial copy of the current workflow.
@@ -330,7 +307,18 @@ class Workflow(mixins.CustomAttributable,
                'repeat_every',
                'unit',
                'is_verification_needed']
-    target = self.copy_into(_other, columns, **kwargs)
+    if kwargs.get('clone_people', False):
+      access_control_list = [{"ac_role": acl.ac_role, "person": acl.person}
+                             for acl in self.access_control_list]
+    else:
+      role_id = {
+          name: ind
+          for (ind, name) in role.get_custom_roles_for(self.type).iteritems()
+      }['Admin']
+      access_control_list = [{"ac_role_id": role_id,
+                              "person": {"id": get_current_user().id}}]
+    target = self.copy_into(_other, columns,
+                            access_control_list=access_control_list, **kwargs)
     return target
 
   def copy_task_groups(self, target, **kwargs):
@@ -369,7 +357,6 @@ class Workflow(mixins.CustomAttributable,
         ).undefer_group(
             'TaskGroupTask_complete'
         ),
-        orm.subqueryload('workflow_people'),
     )
 
   @classmethod

@@ -21,7 +21,7 @@ class TestCTGOT(BaseTestCase):
   """Test suite for CycleTaskGroupObjectTask specific logic."""
 
   NOBODY = "nobody@example.com"
-  WORKFLOW_OWNER = "wfo@example.com"
+  WORKFLOW_ADMIN = "wfa@example.com"
   TASK_ASSIGNEE_1 = "assignee_1@example.com"
   TASK_ASSIGNEE_2 = "assignee_2@example.com"
 
@@ -33,13 +33,11 @@ class TestCTGOT(BaseTestCase):
     with factories.single_commit():
       assignee_1 = factories.PersonFactory(email=self.TASK_ASSIGNEE_1)
       assignee_2 = factories.PersonFactory(email=self.TASK_ASSIGNEE_2)
-      workflow_owner = factories.PersonFactory(email=self.WORKFLOW_OWNER)
+      workflow_admin = factories.PersonFactory(email=self.WORKFLOW_ADMIN)
       nobody = factories.PersonFactory(email=self.NOBODY)
 
-      workflow_owner_role = (all_models.Role.query
-                             .filter_by(name="WorkflowOwner").one())
       reader_role = all_models.Role.query.filter_by(name="Reader").one()
-      for person in [assignee_1, assignee_2, workflow_owner, nobody]:
+      for person in [assignee_1, assignee_2, workflow_admin, nobody]:
         bp_factories.UserRoleFactory(person=person,
                                      role=reader_role,
                                      context=None)
@@ -48,27 +46,30 @@ class TestCTGOT(BaseTestCase):
       taskgroup = wf_factories.TaskGroupFactory(workflow=workflow)
       task_1 = wf_factories.TaskGroupTaskFactory(task_group=taskgroup)
       task_2 = wf_factories.TaskGroupTaskFactory(task_group=taskgroup)
-      role = all_models.AccessControlRole.query.filter(
+      task_role = all_models.AccessControlRole.query.filter(
           all_models.AccessControlRole.name == "Task Assignees",
           all_models.AccessControlRole.object_type == task_1.type,
       ).one()
-      factories.AccessControlListFactory(ac_role=role,
+      factories.AccessControlListFactory(ac_role=task_role,
                                          object=task_1,
                                          person=assignee_1)
-      factories.AccessControlListFactory(ac_role=role,
+      factories.AccessControlListFactory(ac_role=task_role,
                                          object=task_2,
                                          person=assignee_2)
-
-      bp_factories.UserRoleFactory(person=workflow_owner,
-                                   role=workflow_owner_role,
-                                   context=workflow.context)
+      wf_admin_role = all_models.AccessControlRole.query.filter(
+          all_models.AccessControlRole.name == "Admin",
+          all_models.AccessControlRole.object_type == workflow.type,
+      ).one()
+      factories.AccessControlListFactory(ac_role=wf_admin_role,
+                                         object=workflow,
+                                         person=workflow_admin)
 
     generator = wf_generator.WorkflowsGenerator()
     self.cycle_id = generator.generate_cycle(workflow)[1].id
     generator.activate_workflow(workflow)
 
   @ddt.data((NOBODY, [False, False]),
-            (WORKFLOW_OWNER, [True, True]),
+            (WORKFLOW_ADMIN, [True, True]),
             (TASK_ASSIGNEE_1, [True, False]),
             (TASK_ASSIGNEE_2, [False, True]))
   @ddt.unpack
@@ -104,7 +105,7 @@ class TestCTGOT(BaseTestCase):
         all_models.Cycle.is_current: cycle_is_current,
     })
     db.session.commit()
-    user_mail = self.WORKFLOW_OWNER
+    user_mail = self.WORKFLOW_ADMIN
     user = all_models.Person.query.filter_by(email=user_mail).one()
     self.api.set_user(user)
     response = self.api.get_query(all_models.CycleTaskGroupObjectTask,
@@ -123,24 +124,15 @@ class TestCTGOT(BaseTestCase):
 
   def test_context_after_task_delete(self):
     """Test UserRoles context keeping after cycle task deletion."""
-    workflow_owner_role = all_models.Role.query.filter_by(
-        name="WorkflowOwner"
-    ).one()
     ctask = all_models.CycleTaskGroupObjectTask.query.first()
     ctask_context_id = ctask.context_id
     self.assertTrue(ctask_context_id)
 
-    user = all_models.Person.query.filter_by(email=self.WORKFLOW_OWNER).one()
+    user = all_models.Person.query.filter_by(email=self.WORKFLOW_ADMIN).one()
     self.api.set_user(user)
 
     response = self.api.delete(ctask)
     self.assert200(response)
-
-    user_role = all_models.UserRole.query.filter_by(
-        role_id=workflow_owner_role.id,
-        person_id=user.id,
-    ).one()
-    self.assertEqual(user_role.context_id, ctask_context_id)
 
     for ctask in all_models.CycleTaskGroupObjectTask.query.all():
       self.assertEqual(ctask.context_id, ctask_context_id)

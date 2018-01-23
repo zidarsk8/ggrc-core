@@ -137,6 +137,11 @@ class TaskGroupTask(roleable.Roleable,
       }
   }
 
+  @property
+  def workflow(self):
+    """Property which returns parent workflow object."""
+    return self.task_group.workflow
+
   @classmethod
   def _filter_by_task_group(cls, predicate):
     return TaskGroup.query.filter(

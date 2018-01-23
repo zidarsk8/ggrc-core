@@ -26,6 +26,26 @@
   .item-data {
     .tree-title-area {
       font-size: 16px;
+
+      &__subtitle {
+        display: flex;
+        flex-wrap: nowrap;
+        font-size: 11px;
+        line-height: 16px;
+
+        &-label {
+          color: $gray;
+        }
+
+        people-with-role-inline-field {
+          width: calc(100% - 55px);
+
+          .inline-aggregate-field {
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+      }
     }
   }
 }

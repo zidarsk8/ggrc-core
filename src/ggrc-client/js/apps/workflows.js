@@ -59,7 +59,6 @@ import InfoWidget from '../controllers/info_widget_controller';
       countsName: currentWidgetCountsName,
       additionalFilter: currentWidgetFilter
     },
-    person: 'Person',
     taskGroup: 'TaskGroup'
   };
 
@@ -104,7 +103,6 @@ import InfoWidget from '../controllers/info_widget_controller';
       Workflow: {
         _canonical: {
           task_groups: 'TaskGroup',
-          people: 'Person',
           context: 'Context'
         },
         task_groups: Direct(
@@ -126,34 +124,8 @@ import InfoWidget from '../controllers/info_widget_controller';
         current_all_tasks: Cross(
           'current_task_groups', 'cycle_task_group_tasks'
         ),
-
-        people: Proxy(
-          'Person',
-          'person', 'WorkflowPerson',
-          'workflow', 'workflow_people'
-        ),
         context: Direct(
           'Context', 'related_object', 'context'),
-        authorization_contexts: Multi(['context']),
-        authorizations: Cross('context', 'user_roles'),
-        authorized_people: Cross(
-          'authorization_contexts', 'authorized_people'),
-        mapped_and_or_authorized_people: Multi([
-          'people', 'authorized_people']),
-        roles: Cross('authorizations', 'role'),
-
-        // This is a dummy mapping that ensures the WorkflowOwner role is loaded
-        //  before we do the custom filter for owner_authorizations.
-        authorizations_and_roles: Multi(['authorizations', 'roles']),
-        owner_authorizations: CustomFilter(
-          'authorizations_and_roles',
-          function (binding) {
-            return binding.instance instanceof CMS.Models.UserRole &&
-                binding.instance.attr('role') &&
-                binding.instance.role.reify().attr('name') === 'WorkflowOwner';
-          }
-        ),
-        owners: Cross('owner_authorizations', 'person'),
         orphaned_objects: Multi([
           'cycles',
           'task_groups',
@@ -292,16 +264,6 @@ import InfoWidget from '../controllers/info_widget_controller';
           'cycle_task_entries',
           'cycle_task_group_object_task'),
         workflow: Cross('cycle', 'workflow')
-      },
-
-      People: {
-        _canonical: {
-          workflows: 'Workflow'
-        },
-        workflows: Proxy(
-          'Workflow', 'workflow', 'WorkflowPerson', 'person', 'workflow_people'
-        )
-
       },
       Person: {
         assigned_tasks: Search(function (binding) {
@@ -476,7 +438,7 @@ import InfoWidget from '../controllers/info_widget_controller';
   WorkflowExtension.init_widgets_for_workflow_page = function () {
     var newWidgetDescriptors = {};
     var newDefaultWidgets = [
-      'info', 'person', 'task_group', 'current', 'history'
+      'info', 'task_group', 'current', 'history'
     ];
     var historyWidgetDescriptor;
     var currentWidgetDescriptor;
@@ -507,21 +469,6 @@ import InfoWidget from '../controllers/info_widget_controller';
           content_controller: InfoWidget,
           content_controller_options: {
             widget_view: GGRC.mustache_path + '/workflows/info.mustache'
-          }
-        },
-        person: {
-          widget_id: 'person',
-          widget_name: 'People',
-          widget_icon: 'person',
-          widgetType: 'treeview',
-          treeViewDepth: 3,
-          model: CMS.Models.Person,
-          content_controller_options: {
-            parent_instance: object,
-            model: CMS.Models.Person,
-            mapping: 'mapped_and_or_authorized_people',
-            add_item_view:
-              GGRC.mustache_path + '/wf_people/tree_add_item.mustache'
           }
         },
         task_group: {
@@ -592,7 +539,6 @@ import InfoWidget from '../controllers/info_widget_controller';
     initCounts([
         WorkflowExtension.countsMap.history,
         WorkflowExtension.countsMap.activeCycles,
-        WorkflowExtension.countsMap.person,
         WorkflowExtension.countsMap.taskGroup
       ],
         object.type,
@@ -602,16 +548,6 @@ import InfoWidget from '../controllers/info_widget_controller';
       'ggrc_workflows',
       {Workflow: newWidgetDescriptors}
     );
-
-    // Setup extra refresh required due to automatic creation of permissions
-    // on creation of WorkflowPerson
-    CMS.Models.WorkflowPerson.bind('created', function (ev, instance) {
-      if (instance instanceof CMS.Models.WorkflowPerson) {
-        if (instance.context) {
-          instance.context.reify().refresh();
-        }
-      }
-    });
   };
 
   WorkflowExtension.init_widgets_for_person_page = function () {

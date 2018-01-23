@@ -15,7 +15,8 @@ export default can.Component.extend({
       canEdit: {
         get: function () {
           var instance = this.attr('instance');
-          var canEdit = !isSnapshot(instance) &&
+          var canEdit = !this.attr('isReadonly') &&
+            !isSnapshot(instance) &&
             !instance.attr('archived') &&
             !this.attr('readOnly') &&
             !this.attr('updatableGroupId') &&

@@ -3,7 +3,7 @@ Person,name,email,company,role,,,,,
 ,user 1,user1@ggrc.com,google,Administrator,,,,,
 ,,,,,,,,,
 Object type,,,,,,,,,
-Workflow,code*,title*,description ,manager,unit,repeat every,force real-time email updates,custom email message,Need Verification
+Workflow,code*,title*,description ,admin,unit,repeat every,force real-time email updates,custom email message,Need Verification
 ,wf-1,wf-1,test,user1@ggrc.com,-,-,no,this is super custom ,True
 ,,,,,,,,,
 Object type,,,,,,,,,

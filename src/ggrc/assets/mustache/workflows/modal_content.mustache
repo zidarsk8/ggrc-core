@@ -3,136 +3,134 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="hideable-holder">
-<form action="javascript://">
-  {{> /static/mustache/base_objects/form_restore.mustache}}
-
-  <div class="row-fluid">
-    <div class="span8">
-      <label>
-        Title
-        <span class="required">*</span>
-        <i class="fa fa-question-circle" rel="tooltip" title="Title goes here"></i>
-      </label>
-      <input data-id="title_txtbx" class="input-block-level required" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1" autofocus>
-      <br>
-    </div>
-    <div data-id="owner_hidden" class="span4 hidable">
-      {{#with_mapping "authorizations" instance}}
-      {{#using owner=instance.owners.0 model_singular=model.model_singular}}
-      {{#with_current_user_as 'current_user'}}
-        <label>
-          Manager
-          <i class="fa fa-question-circle" rel="tooltip" title="Workflow Managers are managed in the People widget."></i>
-          <a data-id="hide_owner_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+<div class="ggrc-form">
+  <form action="javascript://">
+    <div class="ggrc-form-item">
+      <div class="ggrc-form-item__row {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
+        <label class="form-label required-label ggrc-form-item__label">
+          Title
+          <i class="fa fa-asterisk"></i>
         </label>
-        <input data-id="owner_txtbx"  type="hidden" name="owners.0.email" data-lookup="Person" value="" />
-        <input data-id="owner_2_txtbx" class="input-block-level" readonly="true" disabled="true" type="text" value="{{workflow_owner instance modal_title}}"  tabindex="2" />
-      {{/with_current_user_as}}
-      {{/using}}
-      {{/with_mapping}}
-    </div>
-  </div>
-
-  <div class="row-fluid">
-    <div data-id="description_hidden" class="span8 hidable">
-      <label>
-        Description
-        <i class="fa fa-question-circle" rel="tooltip" title="Description goes here"></i>
-        <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-      </label>
-      <div class="wysiwyg-area">
-        <textarea id="workflow_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="3">{{{instance.description}}}</textarea>
+        <input
+          tabindex="1"
+          class="input-block-level"
+          placeholder="Enter Title"
+          name="title"
+          type="text"
+          {$value}="instance.title" autofocus>
+        {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
       </div>
     </div>
 
-    <div class="span4 hide-wrap hidable">
-      <div class="row-fluid inner-hide">
-        <div data-id="frequency_hidden" class="span12 hidable">
-          <label>
-            Repeat Workflow
-            <a data-id="hide_frequency_hidden_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-          </label>
-          {{#if instance.isNew}}
-            <repeat-on-button-wrapper {(instance)}="instance"></repeat-on-button-wrapper>
-          {{/if}}
-          <repeat-on-summary {unit}="instance.unit" {repeat-every}="instance.repeat_every"
-                             {hide-repeat-off}="instance.isNew">
-          </repeat-on-summary>
+    <div class="ggrc-form-item ggrc-form-item_m-b-0">
+      <div class="ggrc-form-item__row">
+        <label class="ggrc-form-item__label">
+          Description
+        </label>
+        <div class="wysiwyg-area">
+          <textarea id="workflow_description" class="span12 double wysihtml5"
+            name="description" placeholder="Enter Description" tabindex="3">
+            {{{instance.description}}}
+          </textarea>
         </div>
       </div>
-      <div class="row-fluid inner-hide">
-        <div data-id="email_preferences_hidden" class="span12 hidable">
-          <label class="second-in-column">
-            Email preferences
-            <i class="fa fa-question-circle" rel="tooltip" title="This setting will override user email preferences"></i>
-            <a data-id="hide_email_preferences_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-          </label>
-          <input data-id="email_preferences_chkbx" type="checkbox" name="notify_on_change" {{#if instance.notify_on_change}}checked="checked"{{/if}} tabindex="5">
+    </div>
+
+    <access-control-list-roles-helper
+      {instance}="instance"
+      {is-new-instance}="instance.isNew">
+    </access-control-list-roles-helper>
+
+    <div class="ggrc-form-item">
+      <div class="ggrc-form-item__multiple-row">
+        <label class="ggrc-form-item__label">
+          Repeat Workflow
+        </label>
+        {{#if instance.isNew}}
+          <repeat-on-button-wrapper {(instance)}="instance"></repeat-on-button-wrapper>
+        {{/if}}
+        <repeat-on-summary {unit}="instance.unit" {repeat-every}="instance.repeat_every"
+                           {hide-repeat-off}="instance.isNew">
+        </repeat-on-summary>
+      </div>
+      <div class="ggrc-form-item__multiple-row">
+        <label class="ggrc-form-item__label">
+          Email preferences
+          <i class="fa fa-question-circle" rel="tooltip" title="This setting will override user email preferences"></i>
+        </label>
+        <input
+          type="checkbox"
+          can-value="instance.notify_on_change"
+          tabindex="3">
           Force real-time email updates
-        </div>
+      </div>
+      <div class="ggrc-form-item__multiple-row">
+        <label class="ggrc-form-item__label">
+          Need Verification for tasks?
+        </label>
+        <input
+          type="checkbox"
+          can-value="instance.is_verification_needed"
+          {{#if instance.status}}
+            {{^is instance.status 'Draft'}}disabled{{/is}}
+          {{/if}}
+          tabindex="4">
+        Show Verify button next to tasks
       </div>
     </div>
-  </div>
 
+    <div class="ggrc-form-item">
+      <div class="ggrc-form-item__row">
+        <label class="ggrc-form-item__label">
+          Attachment
+          <i class="fa fa-question-circle" rel="tooltip" title="If selected, all Workflow attachments go here."></i>
+        </label>
+        {{{render_hooks "Workflow.storage_folder_picker"}}}
+      </div>
+    </div>
 
-  <div class="row-fluid">
-    {{{render_hooks "Workflow.storage_folder_picker"}}}
-
-    <div class="span4 hide-wrap hidable">
-      <div class="row-fluid inner-hide">
-        <div class="span12 hidable">
-          <label>
-            Need Verification for tasks?
+    {{#if instance.isNew}}
+      <div class="ggrc-form-item">
+        <div class="ggrc-form-item__row">
+          <label class="ggrc-form-item__label">
+            First task group's title
           </label>
-          <input type="checkbox" name="is_verification_needed"
-            {{#if instance.is_verification_needed}}checked="checked"{{/if}}
-            {{#if instance.status}}
-              {{^is instance.status 'Draft'}}disabled{{/is}}
-            {{/if}}
-            tabindex="-1">
-          Show Verify button next to tasks
+          <input
+            class="input-block-level"
+            placeholder="Enter Title"
+            type="text"
+            tabindex="5"
+            {($value)}="instance.task_group_title">
         </div>
       </div>
-    </div>
-  </div>
+    {{/if}}
 
-  {{#if new_object_form}}
-  <div class="row-fluid">
-    <div data-id="first_task_group_title_hidden" class="span8 hidable">
-      <label>
-        First task group's title
-        <i class="fa fa-question-circle" rel="tooltip" title="The name of the first task group"></i>
-        <a data-id="hide_first_task_group_title_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-      </label>
-      <input data-id="first_task_group_title_chkbx" class="input-block-level" placeholder="Enter Title" name="task_group_title" type="text" tabindex="7" value="Task Group 1" autofocus>
-      <br>
-    </div>
-  </div>
-  {{/if}}
-
-  <div class="row-fluid">
-    <div data-id="custom_start_workflow_email_message_hidden" class="span8 hidable">
-      <label>
-        Custom "Start Workflow" email message
-        <i class="fa fa-question-circle" rel="tooltip" title="This email will be sent to all workflow members once workflow starts"></i>
-        <a data-id="hide_custom_start_workflow_email_message_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-      </label>
-      <div class="wysiwyg-area">
-        <textarea data-id="custom_start_workflow_email_message_txtbx" id="wf_modal_notify_message" class="span12 double wysihtml5" name="notify_custom_message" placeholder="Enter custom message here" tabindex="8">{{{instance.notify_custom_message}}}</textarea>
+    <div class="ggrc-form-item">
+      <div class="ggrc-form-item__row">
+        <label class="ggrc-form-item__label">
+          Custom "Start Workflow" email message
+          <i class="fa fa-question-circle" rel="tooltip" title="This email will be sent to all workflow members once workflow starts"></i>
+        </label>
+        <rich-text tab-Index="6"
+              hidden-toolbar="true"
+              placeholder="Enter custom message here"
+              {(text)}="instance.notify_custom_message">
+        </rich-text>
       </div>
     </div>
-  </div>
-  <div class="row-fluid">
-    <div data-id="code_hidden" class="span4 hidable">
-      <label>
-        Code
-        <i class="fa fa-question-circle" rel="tooltip" title="The GGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
-        <a data-id="hide_code_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-      </label>
-      <input data-id="code_txtbx" tabindex="8" class="input-block-level" name="slug" placeholder="WORKFLOW-XXX" type="text" value="{{instance.slug}}">
-    </div>
-  </div>
 
-</form>
+    <div class="ggrc-form-item">
+      <div class="ggrc-form-item__multiple-row">
+        <label class="ggrc-form-item__label">
+          Code
+        </label>
+        <input
+          tabindex="8"
+          class="input-block-level"
+          placeholder="WORKFLOW-XXX"
+          type="text"
+          {($value)}="instance.slug">
+      </div>
+    </div>
+  </form>
 </div>

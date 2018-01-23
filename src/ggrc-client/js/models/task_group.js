@@ -4,6 +4,7 @@
  */
 
  import {getClosestWeekday} from '../plugins/utils/date-util';
+ import Permission from '../permission';
 
 (function (can, GGRC) {
   'use strict';
@@ -59,7 +60,10 @@
       // Refresh workflow people:
       this.bind('created', function (ev, instance) {
         if (instance instanceof that) {
-          instance.refresh_all_force('workflow', 'context');
+          Permission.refresh()
+            .then(() => {
+              instance.refresh_all_force('workflow', 'context');
+            });
         }
       });
       this.bind('updated', function (ev, instance) {
@@ -241,9 +245,7 @@
       var taskGroup = this.task_group.reify();
       if (taskGroup.selfLink) {
         workflow = taskGroup.workflow.reify();
-        return workflow.refresh().then(function (workflow) {
-          return workflow.context.reify().refresh();
-        });
+        return workflow.refresh();
       }
     }
   });

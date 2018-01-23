@@ -88,22 +88,6 @@ class ProgramReaderColumnHandler(ObjectRoleColumnHandler):
         row_converter, key, **options)
 
 
-class WorkflowOwnerColumnHandler(ObjectRoleColumnHandler):
-
-  def __init__(self, row_converter, key, **options):
-    self.role = row_converter.block_converter.get_role("WorkflowOwner")
-    super(WorkflowOwnerColumnHandler, self).__init__(
-        row_converter, key, **options)
-
-
-class WorkflowMemberColumnHandler(ObjectRoleColumnHandler):
-
-  def __init__(self, row_converter, key, **options):
-    self.role = row_converter.block_converter.get_role("WorkflowMember")
-    super(WorkflowMemberColumnHandler, self).__init__(
-        row_converter, key, **options)
-
-
 class AuditAuditorColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
@@ -199,7 +183,5 @@ COLUMN_HANDLERS = {
         "program_reader": ProgramReaderColumnHandler,
         "user_role": UserRoleColumnHandler,
         "user_role:Auditor": AuditAuditorColumnHandler,
-        "workflow_member": WorkflowMemberColumnHandler,
-        "workflow_owner": WorkflowOwnerColumnHandler,
     },
 }

@@ -4,7 +4,7 @@
 }}
 {{#if allow_mapping_or_creating}}
 {{#if allow_creating}}
-{{#is_allowed 'create' 'TaskGroup' context=parent_instance.context}}
+{{#is_allowed 'update' parent_instance context='for'}}
 {{^if_equals parent_instance.status 'Inactive'}}
   <a href="javascript://"
      rel="tooltip"

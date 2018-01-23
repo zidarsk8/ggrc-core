@@ -32,14 +32,14 @@ class TestCycleTaskStatusUpdate(ggrc_test.TestCase):
   def setUpClass(cls):
     """Setup special hooks to that test class."""
     cls._current_user_wfo_or_assignee = (
-        all_models.CycleTaskGroupObjectTask.current_user_wfo_or_assignee
+        all_models.CycleTaskGroupObjectTask.current_user_wfa_or_assignee
     )
-    all_models.CycleTaskGroupObjectTask.current_user_wfo_or_assignee = (
+    all_models.CycleTaskGroupObjectTask.current_user_wfa_or_assignee = (
         mock.MagicMock(return_value=True))
 
   @classmethod
   def tearDownClass(cls):
-    all_models.CycleTaskGroupObjectTask.current_user_wfo_or_assignee = (
+    all_models.CycleTaskGroupObjectTask.current_user_wfa_or_assignee = (
         cls._current_user_wfo_or_assignee
     )
 

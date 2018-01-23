@@ -251,8 +251,6 @@
         ProgramOwner: 'Program Manager',
         ProgramEditor: 'Program Editor',
         ProgramReader: 'Program Reader',
-        WorkflowOwner: 'Workflow Manager',
-        WorkflowMember: 'Workflow Member',
         Mapped: 'No Role',
         Owner: 'Manager',
       };

@@ -3,9 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#is_allowed 'create' 'TaskGroupTask' context=instance.context}}
-{{#if_task_group_assignee_privileges instance}}
-{{^if_equals parent_instance.status 'Inactive'}}
+{{#is_allowed 'update' instance context='for'}}
+{{^if_equals instance.status 'Inactive'}}
 <div class="tree-item-add">
   <a
     class="btn btn-small btn-darkBlue"
@@ -22,5 +21,4 @@
   </a>
 </div>
 {{/if_equals}}
-{{/if}}
 {{/is_allowed}}

@@ -127,34 +127,6 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
     init: function () {
       var that = this;
       this._super.apply(this, arguments);
-      this.bind('status', function (ev, newVal) {
-        if (newVal === 'Verified') {
-          new RefreshQueue().enqueue(this.workflow.reify())
-            .trigger()
-            .then(function (wfs) {
-              return wfs[0].get_binding('owners').refresh_instances();
-            })
-            .then(function (wfOwnerBindings) {
-              var currentUser = CMS.Models.get_instance(
-                'Person', GGRC.current_user.id);
-              if (
-                ~can.inArray(
-                  currentUser,
-                  can.map(wfOwnerBindings, function (wfOwnerBinding) {
-                    return wfOwnerBinding.instance;
-                  })
-                )
-              ) {
-                that.refresh().then(function () {
-                  if (that.attr('is_current')) {
-                    that.attr('is_current', false);
-                    that.save();
-                  }
-                });
-              }
-            });
-        }
-      });
     }
   });
 

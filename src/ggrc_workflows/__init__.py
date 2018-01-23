@@ -10,7 +10,7 @@ import itertools
 from datetime import datetime, date
 from logging import getLogger
 from flask import Blueprint
-from sqlalchemy import inspect, and_, orm
+from sqlalchemy import inspect, orm
 
 from ggrc import db
 from ggrc.login import get_current_user
@@ -24,6 +24,7 @@ from ggrc_workflows import models, notification
 from ggrc_workflows import services
 from ggrc_workflows.models import relationship_helper
 from ggrc_workflows.models import WORKFLOW_OBJECT_TYPES
+from ggrc_workflows.models import hooks
 from ggrc_workflows.notification import pusher
 from ggrc_workflows.converters import IMPORTABLE, EXPORTABLE
 from ggrc_workflows.converters.handlers import COLUMN_HANDLERS
@@ -32,7 +33,7 @@ from ggrc_workflows.roles import (
     WorkflowOwner, WorkflowMember, BasicWorkflowReader, WorkflowBasicReader,
     WorkflowEditor
 )
-from ggrc_basic_permissions.models import Role, UserRole, ContextImplication
+from ggrc_basic_permissions.models import ContextImplication
 from ggrc_basic_permissions.contributed_roles import (
     RoleContributions, RoleDeclarations, DeclarativeRoleImplications
 )
@@ -60,6 +61,11 @@ for type_ in WORKFLOW_OBJECT_TYPES:
       models.workflow.WorkflowState,
   ) + model.__bases__
   model.late_init_task_groupable()
+
+
+def init_hooks():
+  """Initialize Workflow related SQLAlchemy hooks."""
+  hooks.init_hooks()
 
 
 def get_public_config(current_user):  # noqa
@@ -257,12 +263,9 @@ def build_cycle(workflow, cycle=None, current_user=None):
   # Determine the relevant Workflow
   cycle = cycle or models.Cycle()
 
-  # Use WorkflowOwner role when this is called via the cron job.
+  # Use Admin role when this is called via the cron job.
   if not current_user:
-    for user_role in workflow.context.user_roles:
-      if user_role.role.name == "WorkflowOwner":
-        current_user = user_role.person
-        break
+    current_user = workflow.get_persons_for_rolename("Admin")[0]
   # Populate the top-level Cycle object
   cycle.workflow = workflow
   cycle.is_current = True
@@ -453,45 +456,6 @@ def update_cycle_task_group_parent_state(objs):
     Signals.status_change.send(models.Cycle, objs=updated_cycles)
 
 
-def ensure_assignee_is_workflow_member(workflow, assignee, assignee_id=None):
-  """Checks what role assignee has in the context of
-  a workflow. If he has none he gets the Workflow Member role."""
-  if not assignee and not assignee_id:
-    return
-  if assignee_id is None:
-    assignee_id = assignee.id
-  if assignee and assignee_id != assignee.id:
-    raise ValueError("Conflict value assignee and assignee_id")
-  if any(assignee_id == wp.person_id for wp in workflow.workflow_people):
-    return
-
-  # Check if assignee is mapped to the Workflow
-  workflow_people = models.WorkflowPerson.query.filter(
-      models.WorkflowPerson.workflow_id == workflow.id,
-      models.WorkflowPerson.person_id == assignee_id).count()
-  if not workflow_people:
-    models.WorkflowPerson(
-        person=assignee,
-        person_id=assignee_id,
-        workflow=workflow,
-        context=workflow.context
-    )
-
-  # Check if assignee has a role assignment
-  user_roles = UserRole.query.filter(
-      UserRole.context_id == workflow.context_id,
-      UserRole.person_id == assignee_id).count()
-  if not user_roles:
-    workflow_member_role = _find_role('WorkflowMember')
-    UserRole(
-        person=assignee,
-        person_id=assignee_id,
-        role=workflow_member_role,
-        context=workflow.context,
-        modified_by=get_current_user(),
-    )
-
-
 def start_end_date_validator(tgt):
   if tgt.start_date > tgt.end_date:
     raise ValueError('End date can not be behind Start date')
@@ -524,11 +488,6 @@ def calculate_new_next_cycle_start_date(workflow):
 @signals.Restful.model_posted.connect_via(models.TaskGroupTask)
 def handle_task_group_task_put_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   start_end_date_validator(obj)
-  if inspect(obj).attrs._access_control_list.history.has_changes():
-    for person_id in obj.get_person_ids_for_rolename("Task Assignees"):
-      ensure_assignee_is_workflow_member(obj.task_group.workflow,
-                                         None,
-                                         person_id)
 
   # If relative days were change we must update workflow next cycle start date
   if inspect(obj).attrs.start_date.history.has_changes():
@@ -558,7 +517,7 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):  # noqa py
     )
     obj.title = source_task_group.title + ' (copy ' + str(obj.id) + ')'
 
-  ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
+  obj.ensure_assignee_is_workflow_member()
   calculate_new_next_cycle_start_date(obj.workflow)
 
 
@@ -573,18 +532,13 @@ def handle_task_group_delete(sender, obj=None, src=None, service=None):  # noqa 
 @signals.Restful.model_put.connect_via(models.TaskGroup)
 def handle_task_group_put(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.contact.history.has_changes():
-    ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
+    obj.ensure_assignee_is_workflow_member()
   calculate_new_next_cycle_start_date(obj.workflow)
 
 
 @signals.Restful.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_put(
         sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
-
-  if inspect(obj).attrs._access_control_list.history.has_changes():
-    for person_id in obj.get_person_ids_for_rolename("Task Assignees"):
-      ensure_assignee_is_workflow_member(obj.cycle.workflow, None, person_id)
-
   if inspect(obj).attrs.status.history.has_changes():
     # TODO: check why update_cycle_object_parent_state destroys object history
     # when accepting the only task in a cycle. The listener below is a
@@ -629,10 +583,6 @@ def handle_cycle_object_status(
 @signals.Restful.model_posted.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_post(
         sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
-  if obj.cycle.workflow.kind != "Backlog":
-    for person_id in obj.get_person_ids_for_rolename("Task Assignees"):
-      ensure_assignee_is_workflow_member(obj.cycle.workflow, None, person_id)
-
   Signals.status_change.send(
       obj.__class__,
       objs=[
@@ -751,48 +701,6 @@ def handle_cycle_task_status_change(sender, objs=None):
       obj.instance.verified_date = None
 
 
-def _get_or_create_personal_context(user):
-  """Get or create personal context.
-
-  Args:
-      user: User instance.
-  Returns:
-      Personal context instance.
-  """
-  personal_context = user.get_or_create_object_context(
-      context=1,
-      name='Personal Context for {0}'.format(user.id),
-      description='',
-  )
-  personal_context.modified_by = get_current_user()
-  db.session.add(personal_context)
-  return personal_context
-
-
-def _find_role(role_name):
-  """Find role by its name.
-
-  Args:
-      role_name: User role name.
-  Returns:
-      Role instance.
-  """
-  return db.session.query(Role).filter(Role.name == role_name).first()
-
-
-# noqa pylint: disable=unused-argument
-@signals.Restful.model_posted.connect_via(models.WorkflowPerson)
-def handle_workflow_person_post(sender, obj=None, src=None, service=None):
-  # add a user_roles mapping assigning the user creating the workflow
-  # the WorkflowOwner role in the workflow's context.
-  UserRole(
-      person=obj.person,
-      role=_find_role('WorkflowMember'),
-      context=obj.context,
-      modified_by=get_current_user(),
-  )
-
-
 def _validate_post_workflow_fields(workflow):
   """Validates Workflow's 'repeat_every' and 'unit' fields dependency.
 
@@ -822,46 +730,38 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
     source_workflow = models.Workflow.query.filter_by(
         id=source_workflow_id
     ).first()
-    source_workflow.copy(obj)
+    source_workflow.copy(obj, clone_people=src.get('clone_people', False))
     obj.title = source_workflow.title + ' (copy ' + str(obj.id) + ')'
 
   # get the personal context for this logged in user
   user = get_current_user()
   personal_context = user.get_or_create_object_context(context=1)
-  context = obj.get_or_create_object_context(personal_context)
-  obj.context = context
+  workflow_context = obj.get_or_create_object_context(personal_context)
+  obj.context = workflow_context
 
-  if not obj.workflow_people:
-    # add a user_roles mapping assigning the user creating the workflow
-    # the WorkflowOwner role in the workflow's context.
-    workflow_owner_role = _find_role('WorkflowOwner')
-    user_role = UserRole(
-        person=user,
-        role=workflow_owner_role,
-        context=context,
-        modified_by=get_current_user(),
-    )
-    models.WorkflowPerson(
-        person=user,
-        workflow=obj,
-        context=context,
-        modified_by=get_current_user(),
-    )
-    # pass along a temporary attribute for logging the events.
-    user_role._display_related_title = obj.title
-
-  # Create the context implication for Workflow roles to default context
-  ContextImplication(
-      source_context=context,
+  # ContextImplications linked only with `workflow_context` object, which
+  # was created but not added to DB yet. ContextImlications should be added to
+  # session explicitly due to SQLAlchemy Garbage collector deletes such
+  # objects, and it will not be added to session. On the other hand
+  # `workflow_context` was added to session automatically, because it is linked
+  # to `personal_context` that is already in DB.
+  # Create context implication for Workflow roles to default context.
+  db.session.add(ContextImplication(
+      source_context=workflow_context,
       context=None,
       source_context_scope='Workflow',
       context_scope=None,
       modified_by=get_current_user(),
-  )
-
-  if not src.get('private'):
-    # Add role implication - all users can read a public workflow
-    add_public_workflow_context_implication(context)
+  ))
+  # Add role implication - global users can perform defined actions on workflow
+  # and its related objects.
+  db.session.add(ContextImplication(
+      source_context=None,
+      context=workflow_context,
+      source_context_scope=None,
+      context_scope='Workflow',
+      modified_by=get_current_user(),
+  ))
 
   if src.get('clone'):
     source_workflow.copy_task_groups(
@@ -870,37 +770,6 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
         clone_tasks=src.get('clone_tasks', False),
         clone_objects=src.get('clone_objects', False)
     )
-
-    if src.get('clone_people'):
-      workflow_member_role = _find_role('WorkflowMember')
-      for authorization in source_workflow.context.user_roles:
-        # Current user has already been added as workflow owner
-        if authorization.person != user:
-          UserRole(
-              person=authorization.person,
-              role=workflow_member_role,
-              context=context,
-              modified_by=user)
-      for person in source_workflow.people:
-        if person != user:
-          models.WorkflowPerson(
-              person=person,
-              workflow=obj,
-              context=context)
-
-
-def add_public_workflow_context_implication(context, check_exists=False):
-  if check_exists and db.session.query(ContextImplication).filter(
-      and_(ContextImplication.context_id == context.id,
-           ContextImplication.source_context_id == None)).count() > 0:  # noqa
-    return
-  db.session.add(ContextImplication(
-      source_context=None,
-      context=context,
-      source_context_scope=None,
-      context_scope='Workflow',
-      modified_by=get_current_user(),
-  ))
 
 
 def init_extra_views(app):
@@ -962,6 +831,7 @@ class WorkflowRoleDeclarations(RoleDeclarations):
 
   def roles(self):
     return {
+        # TODO: remove owner and member roles on Worklow ACl cleanup migration
         'WorkflowOwner': WorkflowOwner,
         'WorkflowEditor': WorkflowEditor,
         'WorkflowMember': WorkflowMember,
@@ -981,8 +851,6 @@ class WorkflowRoleImplications(DeclarativeRoleImplications):
           'Creator': ['WorkflowBasicReader'],
       },
       ('Workflow', None): {
-          'WorkflowOwner': ['WorkflowBasicReader'],
-          'WorkflowMember': ['WorkflowBasicReader'],
           'WorkflowEditor': ['WorkflowBasicReader'],
       },
   }
