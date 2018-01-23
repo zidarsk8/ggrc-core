@@ -163,6 +163,18 @@ def is_workflow_admin(instance, **_):
   return any(acl for acl in instance.workflow.access_control_list
              if acl.ac_role.name == "Admin" and acl.person == current_user)
 
+
+def is_allowed_based_on(instance, property_name, action, **_):
+  """Check permissions based on permission seted up as attribute instance."""
+  related_object = getattr(instance, property_name, None)
+  if related_object is None:
+    return False
+  # pylint: disable=protected-access
+  # This is the proper way of getting permissions, but the function is private
+  # due to code debt
+  return find_permissions()._is_allowed_for(related_object, action)
+
+
 """
 All functions with a signature
 
@@ -179,6 +191,7 @@ _CONDITIONS_MAP = {
     'has_changed': has_changed_condition,
     'is_auditor': is_auditor,
     'is_workflow_admin': is_workflow_admin,
+    'is_allowed_based_on': is_allowed_based_on,
 }
 
 
