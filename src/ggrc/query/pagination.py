@@ -58,6 +58,66 @@ def apply_limit(query, limit):
   return ids, total
 
 
+def _joins_and_order(counter, clause, model, tgt_class):
+  """Get join operations and ordering field from item of order_by list.
+
+  Args:
+    clause: {"name": the name of model's field,
+              "desc": reverse sort on this field if True}
+
+  Returns:
+    ([joins], order) - a tuple of joins required for this ordering to work
+                        and ordering clause itself; join is None if no join
+                        required or [(aliased entity, relationship field)]
+                        if joins required.
+  """
+
+  def by_fulltext():
+    """Join fulltext index table, order by indexed CA value."""
+    alias = sa.orm.aliased(Record, name=u"fulltext_{}".format(counter))
+    joins = [(alias, sa.and_(
+        alias.key == model.id,
+        alias.type == model.__name__,
+        alias.property == key,
+        alias.subproperty.in_(["", "__sort__"]))
+    )]
+    order = alias.content
+    return joins, order
+
+  def by_foreign_key():
+    """Join the related model, order by title or name/email."""
+    related_model = attr.property.mapper.class_
+    if issubclass(related_model, models.mixins.Titled):
+      joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
+      order = alias.title
+    else:
+      raise NotImplementedError(u"Sorting by {model.__name__} is "
+                                u"not implemented yet."
+                                .format(model=related_model))
+    return joins, order
+
+  # transform clause["name"] into a model's field name
+  key = clause["name"].lower()
+
+  key, _ = tgt_class.attributes_map().get(key, (key, None))
+  if key in custom_operators.GETATTR_WHITELIST:
+    attr = getattr(model, key.encode('utf-8'), None)
+    if (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
+        isinstance(attr.property,
+                   sa.orm.properties.RelationshipProperty)):
+      joins, order = by_foreign_key()
+    else:
+      # a simple attribute
+      joins, order = None, attr
+  else:
+    # Snapshot or non object attributes are treated as custom attributes
+    joins, order = by_fulltext()
+
+  if clause.get("desc", False):
+    order = order.desc()
+
+  return joins, order
+
 
 def apply_order_by(model, query, order_by, tgt_class):
   """Add ordering parameters to a query for objects.
@@ -82,67 +142,6 @@ def apply_order_by(model, query, order_by, tgt_class):
   Returns:
     the query with sorting parameters.
   """
-
-  def _joins_and_order(counter, clause, model, tgt_class):
-    """Get join operations and ordering field from item of order_by list.
-
-    Args:
-      clause: {"name": the name of model's field,
-                "desc": reverse sort on this field if True}
-
-    Returns:
-      ([joins], order) - a tuple of joins required for this ordering to work
-                          and ordering clause itself; join is None if no join
-                          required or [(aliased entity, relationship field)]
-                          if joins required.
-    """
-
-    def by_fulltext():
-      """Join fulltext index table, order by indexed CA value."""
-      alias = sa.orm.aliased(Record, name=u"fulltext_{}".format(counter))
-      joins = [(alias, sa.and_(
-          alias.key == model.id,
-          alias.type == model.__name__,
-          alias.property == key,
-          alias.subproperty.in_(["", "__sort__"]))
-      )]
-      order = alias.content
-      return joins, order
-
-    def by_foreign_key():
-      """Join the related model, order by title or name/email."""
-      related_model = attr.property.mapper.class_
-      if issubclass(related_model, models.mixins.Titled):
-        joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
-        order = alias.title
-      else:
-        raise NotImplementedError(u"Sorting by {model.__name__} is "
-                                  u"not implemented yet."
-                                  .format(model=related_model))
-      return joins, order
-
-    # transform clause["name"] into a model's field name
-    key = clause["name"].lower()
-
-    key, _ = tgt_class.attributes_map().get(key, (key, None))
-    if key in custom_operators.GETATTR_WHITELIST:
-      attr = getattr(model, key.encode('utf-8'), None)
-      if (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
-          isinstance(attr.property,
-                     sa.orm.properties.RelationshipProperty)):
-        joins, order = by_foreign_key()
-      else:
-        # a simple attribute
-        joins, order = None, attr
-    else:
-      # Snapshot or non object attributes are treated as custom attributes
-      joins, order = by_fulltext()
-
-    if clause.get("desc", False):
-      order = order.desc()
-
-    return joins, order
-
 
   join_pairs = [
       _joins_and_order(counter, clause, model, tgt_class)
