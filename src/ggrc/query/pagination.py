@@ -150,7 +150,7 @@ def apply_order_by(model, query, order_by, tgt_class):
   ]
   join_lists, orders = zip(*join_pairs)
   join_lists = [join_list for join_list in join_lists if join_list is not None]
-  all_joins = sum(join_lists, [])  # flatten nested lists of joins
-  query = query.outerjoin(*all_joins)
+  for join_list in join_lists:
+    query = query.outerjoin(*join_list)
 
   return query.order_by(*orders)
