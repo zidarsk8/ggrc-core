@@ -472,19 +472,10 @@ viewModel = can.Map.extend({
     let self;
 
     function onCreated(ev, instance) {
-      let parentInstance = self.attr('parent_instance');
-
-      function callback() {
-        parentInstance.unbind('change', callback);
-        _refresh(true);
-      }
-
-      if (_verifyRelationship(instance, activeTabModel, parentInstance)) {
-        parentInstance.on('change', callback);
-      } else if (activeTabModel === instance.type) {
+      if (activeTabModel === instance.type) {
         _refresh(true);
       } else if (activeTabModel === 'Person' && isPerson(instance)) {
-        parentInstance.refresh().then(function () {
+        self.attr('parent_instance').refresh().then(function () {
           _refresh();
         });
       }
@@ -815,13 +806,25 @@ export default GGRC.Components('treeWidgetContainer', {
           pinControl.setLoadingIndicator(componentSelector, false);
         });
     },
-    ' refreshTree': function (el, ev) {
+    ' refreshTree'(el, ev) {
       ev.stopPropagation();
-
-      this.viewModel.closeInfoPane();
-      this.viewModel.loadItems();
+      this.reloadTree();
     },
-    inserted: function () {
+    '{viewModel.parent_instance} refreshMapping'(scope, ev) {
+      const vm = this.viewModel;
+      let currentModelName;
+
+      if (!vm.attr('model')) {
+        return;
+      }
+
+      currentModelName = vm.attr('model').shortName;
+
+      if (currentModelName === ev.destinationType) {
+        this.reloadTree();
+      }
+    },
+    inserted() {
       let viewModel = this.viewModel;
       viewModel.attr('$el', this.element);
 
@@ -830,6 +833,10 @@ export default GGRC.Components('treeWidgetContainer', {
       this.element.closest('.widget')
         .on('widget_shown', viewModel._widgetShown.bind(viewModel));
       viewModel._widgetShown();
+    },
+    reloadTree() {
+      this.viewModel.closeInfoPane();
+      this.viewModel.loadItems();
     },
   },
 });

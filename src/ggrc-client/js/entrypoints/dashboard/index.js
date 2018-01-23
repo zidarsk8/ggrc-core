@@ -6,7 +6,6 @@
 import '../commons';
 
 // Controllers
-import '../../controllers/automapper_controller';
 import '../../controllers/dashboard_controller';
 
 // Modules and Apps
