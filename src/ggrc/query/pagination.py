@@ -58,6 +58,7 @@ def apply_limit(query, limit):
   return ids, total
 
 
+
 def apply_order_by(model, query, order_by, tgt_class):
   """Add ordering parameters to a query for objects.
 
@@ -81,29 +82,24 @@ def apply_order_by(model, query, order_by, tgt_class):
   Returns:
     the query with sorting parameters.
   """
-  # Dictionary used to allow changing non local var inside the by_fulltext
-  # function.
-  count = {"ft": 0}
 
-  def joins_and_order(clause):
+  def _joins_and_order(counter, clause, model, tgt_class):
     """Get join operations and ordering field from item of order_by list.
 
     Args:
       clause: {"name": the name of model's field,
-               "desc": reverse sort on this field if True}
+                "desc": reverse sort on this field if True}
 
     Returns:
       ([joins], order) - a tuple of joins required for this ordering to work
-                         and ordering clause itself; join is None if no join
-                         required or [(aliased entity, relationship field)]
-                         if joins required.
+                          and ordering clause itself; join is None if no join
+                          required or [(aliased entity, relationship field)]
+                          if joins required.
     """
 
     def by_fulltext():
       """Join fulltext index table, order by indexed CA value."""
-
-      count["ft"] += 1
-      alias = sa.orm.aliased(Record, name=u"fulltext_{}".format(count["ft"]))
+      alias = sa.orm.aliased(Record, name=u"fulltext_{}".format(counter))
       joins = [(alias, sa.and_(
           alias.key == model.id,
           alias.type == model.__name__,
@@ -147,7 +143,12 @@ def apply_order_by(model, query, order_by, tgt_class):
 
     return joins, order
 
-  join_lists, orders = zip(*[joins_and_order(clause) for clause in order_by])
+
+  join_pairs = [
+      _joins_and_order(counter, clause, model, tgt_class)
+      for counter, clause in enumerate(order_by)
+  ]
+  join_lists, orders = zip(*join_pairs)
   join_lists = [join_list for join_list in join_lists if join_list is not None]
   all_joins = sum(join_lists, [])  # flatten nested lists of joins
   query = query.outerjoin(*all_joins)
