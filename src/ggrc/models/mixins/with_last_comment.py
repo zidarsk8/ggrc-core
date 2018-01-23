@@ -32,13 +32,11 @@ class WithLastComment(attributable.Attributable):
   _fulltext_attrs = [attributes.FullTextAttr("last_comment", "last_comment")]
 
   @simple_property
-  def last_comment_ca(self):
-    return self.attribute_objs.get("last_comment")
-
-  @simple_property
   def last_comment(self):
-    return self.last_comment_ca.value_string if self.last_comment_ca else None
+    lc_attr = self.attributes.get("last_comment")
+    return lc_attr.value_string if lc_attr else None
 
   @simple_property
   def last_comment_id(self):
-    return self.last_comment_ca.source_id if self.last_comment_ca else None
+    lc_attr = self.attributes.get("last_comment")
+    return lc_attr.source_id if lc_attr else None

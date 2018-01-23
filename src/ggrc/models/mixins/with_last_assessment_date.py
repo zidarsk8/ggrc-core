@@ -34,4 +34,5 @@ class WithLastAssessmentDate(attributable.Attributable):
 
   @simple_property
   def last_assessment_date(self):
-    return self.attributes.get("last_assessment_date", {}).get("value")
+    lad_attr = self.attributes.get("last_assessment_date")
+    return lad_attr.value_datetime if lad_attr else None
