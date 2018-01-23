@@ -283,6 +283,14 @@ class Revision(Base, db.Model):
         result.append(categorization)
     return {key_name: result}
 
+  def populate_cads(self):
+    """Populate custom_attribute_values based on custom_attributes."""
+    if "custom_attributes" not in self._content:
+      return {}
+    if "custom_attribute_values" in self._content:
+      return {}
+    return {"custom_attribute_values": self._content["custom_attributes"]}
+
   @builder.simple_property
   def content(self):
     """Property. Contains the revision content dict.
@@ -297,6 +305,7 @@ class Revision(Base, db.Model):
     populated_content.update(self._document_evidence_hack())
     populated_content.update(self.populate_categoies("categories"))
     populated_content.update(self.populate_categoies("assertions"))
+    populated_content.update(self.populate_cads())
     return populated_content
 
   @content.setter
