@@ -1,4 +1,4 @@
-# # Copyright (C) 2017 Google Inc.
+# # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 #
 # See https://developers.google.com/appengine/docs/python/config/appconfig
@@ -7,4 +7,8 @@ cron:
 - description: GGRC workflow - starting point for all batch jobs
   url: /nightly_cron_endpoint
   schedule: every day 01:00
+  timezone: US/Pacific
+- description: GGRC - half hour jobs
+  url: /half_hour_cron_endpoint
+  schedule: every 30 mins
   timezone: US/Pacific

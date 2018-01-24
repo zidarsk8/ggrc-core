@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 import logging
@@ -30,6 +30,7 @@ class GrcEncoder(json.JSONEncoder):
   """
 
   def default(self, obj):
+    from ggrc.models import mixins
     if isinstance(obj, datetime.datetime):
       if not obj.time():
         return obj.date().isoformat()
@@ -40,6 +41,10 @@ class GrcEncoder(json.JSONEncoder):
       return (datetime.datetime.min + obj).time().isoformat()
     elif isinstance(obj, set):
       return list(obj)
+    elif isinstance(obj, mixins.Base):
+      return {"id": obj.id, "type": obj.type}
+    elif callable(obj):
+      return obj()
     else:
       return super(GrcEncoder, self).default(obj)
 

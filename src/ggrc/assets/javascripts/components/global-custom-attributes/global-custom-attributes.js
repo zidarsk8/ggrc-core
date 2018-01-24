@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2017 Google Inc.
+ Copyright (C) 2018 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -30,6 +30,7 @@ import Permission from '../../permission';
             return this.attr('instance.snapshot') ||
               this.attr('instance.isRevision') ||
               this.attr('instance.archived') ||
+              this.isReadOnlyForInstance(this.attr('instance')) ||
               !Permission.is_allowed_for('update', this.attr('instance'));
           },
         },
@@ -40,6 +41,13 @@ import Permission from '../../permission';
        * @type {can.List}
        */
       items: [],
+      isReadOnlyForInstance(instance) {
+        if (!instance) {
+          return false;
+        }
+
+        return instance.class.isProposable;
+      },
       initCustomAttributes: function () {
         var result = [];
 

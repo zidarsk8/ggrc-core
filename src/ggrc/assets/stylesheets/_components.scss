@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Google Inc.
+ * Copyright (C) 2018 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -52,4 +52,7 @@
 @import "components/related-objects/related-reference-urls";
 @import "components/object-list-item/person-list-item";
 @import "components/loading/loading-status";
-@import "components/multi-select-label/multi-select-label"
+@import "components/multi-select-label/multi-select-label";
+@import "components/proposal/proposal";
+@import "components/object-history/object-history";
+@import "components/revision-history/revision-history";

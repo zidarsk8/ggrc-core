@@ -1,0 +1,25 @@
+{{!
+  Copyright (C) 2018 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#column}}
+  <label class="checkbox-inline" title="{{title}}">
+    {{#if selected}}
+      <input type="checkbox"
+        checked="checked"
+        {{#mandatory}}disabled{{/mandatory}}
+        ($change)="onChange"
+        value="{{name}}"
+        class="notify-wrap attr-checkbox {{#mandatory}}mandatory{{/mandatory}}">
+    {{else}}
+      <input type="checkbox"
+        {{#mandatory}}disabled{{/mandatory}}
+        ($change)="onChange"
+        value="{{name}}"
+        class="notify-wrap attr-checkbox {{#mandatory}}mandatory{{/mandatory}}">
+    {{/if}}
+
+    {{title}}
+  </label>
+{{/column}}

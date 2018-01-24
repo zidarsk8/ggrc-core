@@ -1,5 +1,5 @@
-/*!
-    Copyright (C) 2017 Google Inc.
+/*
+    Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -20,6 +20,7 @@
       'timeboxed',
       'accessControlList',
       'base-notifications',
+      'proposable',
     ],
     is_custom_attributable: true,
     isRoleable: true,

@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc import db
@@ -80,6 +80,7 @@ class Categorizable(object):
             ation, 'category',
             creator=lambda category: Categorization(
                 category_id=category.id,
+                category=category,
                 category_type=category.__class__.__name__,
                 categorizable_type=cls.__name__
             )

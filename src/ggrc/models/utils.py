@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 from .exceptions import ValidationError
 
@@ -41,3 +41,20 @@ class PolymorphicRelationship(object):
       setattr(obj, self._id_attr, value.id)
       setattr(obj, self._type_attr, value.__class__.__name__)
       setattr(obj, self._make_backref_attr(obj), value)
+
+
+class FasadeProperty(object):
+
+  FIELD_NAME = None
+
+  def __init__(self):
+    assert self.FIELD_NAME
+
+  def __call__(self, obj, json_obj):
+    return self.prepare(json_obj)
+
+  def prepare(self, data):
+    return data
+
+  def __set__(self, obj, value):
+    setattr(obj, self.FIELD_NAME, value)

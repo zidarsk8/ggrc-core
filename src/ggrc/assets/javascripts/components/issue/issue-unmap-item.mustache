@@ -1,5 +1,5 @@
 {{!
-  Copyright (C) 2017 Google Inc.
+  Copyright (C) 2018 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -26,19 +26,20 @@
                 This action will also unmap the list of objects:
             </p>
         </div>
+        {{#if relatedAudit.title}}
         <div class="simple-modal__section">
             <div class="simple-modal__section-title">
                 Related Audit
             </div>
-            {{#if relatedAudit.title}}
-                <div class="related-snapshots__audit-container">
-                    <business-object-list-item
-                        ($click)="openObject({relatedAudit})"
-                        {instance}="relatedAudit">
-                    </business-object-list-item>
-                </div>
-            {{/if}}
+            <div class="related-snapshots__audit-container">
+                <business-object-list-item
+                    ($click)="openObject({relatedAudit})"
+                    {instance}="relatedAudit">
+                </business-object-list-item>
+            </div>
         </div>
+        {{/if}}
+        {{#if relatedSnapshots.length}}
         <div class="simple-modal__section">
             <div class="simple-modal__section-title">
                 Related Snapshots
@@ -57,10 +58,9 @@
                     </div>
                 </object-list>
             </div>
-            {{#if paging.total}}
             <tree-pagination {paging}="paging"></tree-pagination>
-            {{/if}}
         </div>
+        {{/if}}
     </div>
     <div class="simple-modal__footer">
         <div class="simple-modal__toolbar">

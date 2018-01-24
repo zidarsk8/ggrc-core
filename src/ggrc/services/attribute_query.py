@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 import datetime
@@ -147,7 +147,7 @@ class AttributeQueryBuilder(object):
         filter_expressions.extend(filters)
       except BadRequest:
         # FIXME: raise BadRequest when client-side is ready for it
-        # * when fixed, remove appropriate @wip's in 
+        # * when fixed, remove appropriate @wip's in
         #   service_specs/query.feature
         pass
     if filter_expressions:

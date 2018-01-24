@@ -1,5 +1,5 @@
-/*!
- Copyright (C) 2017 Google Inc.
+/*
+ Copyright (C) 2018 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -32,6 +32,7 @@ import '../../components/gca-controls/gca-controls';
 import '../../components/datepicker/datepicker';
 import '../../components/external-data-autocomplete/inline-autocomplete-wrapper';
 import '../../components/multi-select-label/multi-select-label';
+import '../../components/proposal/create-proposal';
 import {BUTTON_VIEW_DONE} from '../../plugins/utils/modals'
 import {
   checkPreconditions,
@@ -58,6 +59,7 @@ export default can.Control({
     reset_visible: false,
     extraCssClass: '',
     afterFetch: function () {},
+    isProposal: false,
     isSaving: false  // is there a save/map operation currently in progress
   },
 
@@ -379,6 +381,7 @@ export default can.Control({
 
   draw: function (content, header, footer, customAttributes) {
     var modalTitle = this.options.modal_title;
+    var isProposal = this.options.isProposal;
     var isObjectModal = modalTitle && (modalTitle.indexOf('Edit') === 0 ||
       modalTitle.indexOf('New') === 0);
     var $form;
@@ -412,7 +415,7 @@ export default can.Control({
       this.options.$footer.html(footer);
     }
 
-    if (customAttributes != null && isObjectModal) {
+    if (customAttributes != null && (isObjectModal || isProposal)) {
       this.options.$content.append(customAttributes);
     }
     this.setup_wysihtml5();

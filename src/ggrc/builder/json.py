@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """JSON resource state representation handler for GGRC models."""
@@ -291,6 +291,11 @@ class UpdateAttrHandler(object):
   def simple_property(cls, obj, json_obj, attr_name, class_attr):
     """Translate the JSON value for an attr decorated with @simple_property."""
     return json_obj.get(attr_name)
+
+  @classmethod
+  def callable_property(cls, obj, json_obj, attr_name, class_attr):
+    """Translate the JSON value for attrs decorated by @colable_property."""
+    return json_obj.get(attr_name)()
 
 
 """

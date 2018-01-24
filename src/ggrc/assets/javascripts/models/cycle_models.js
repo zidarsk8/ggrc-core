@@ -1,5 +1,5 @@
-/*!
-    Copyright (C) 2017 Google Inc.
+/*
+    Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -258,6 +258,7 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
     update: 'PUT /api/cycle_task_group_object_tasks/{id}',
     destroy: 'DELETE /api/cycle_task_group_object_tasks/{id}',
     title_singular: 'Cycle Task',
+    title_plural: 'Cycle Tasks',
     name_singular: 'Task',
     name_plural: 'Tasks',
     attributes: {

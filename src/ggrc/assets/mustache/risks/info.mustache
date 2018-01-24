@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2017 Google Inc.
+    Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -15,7 +15,7 @@
     <div class="tier-content">
       {{>'/static/mustache/base_objects/general-page-header.mustache'}}
 
-      <tab-container>
+      <tab-container {instance}="instance">
         <tab-panel {(panels)}="panels" title-text="Attributes">
         <div class="info-pane__body">
           <div class="info-pane__main-content {{^if isSnapshot}}info-pane__main-content-with-sidebar{{/if}}">
@@ -89,15 +89,34 @@
                 {notifications-info}="'Notify Admins, Primary and Secondary Contacts'">
               </comment-add-form>
               {{/unless}}
-              <mapped-comments {mapped-items}="comments"></mapped-comments>
+              <mapped-comments {base-instance}="instance" {mapped-items}="comments"></mapped-comments>
             </comment-data-provider>
           </div>
           {{/if}}
         </div>
         </tab-panel>
-        <tab-panel {(panels)}="panels" title-text="Change Log">
+        {{^if isSnapshot}}
+          <tab-panel
+            warning-text="Some proposals are pending approval"
+            title-text="Change Proposals"
+            extra-classes="proposal proposal__tab-warning"
+            tab-id="tab-related-proposals"
+            {(panels)}="panels"
+            {parent-instance}="instance"
+            {can-display-warning}="true"
+            {pre-render-content}="true">
+            <related-proposals
+              (update-proposals-warning)="updateWarningState(%event)"
+              {base-instance}="instance">
+            </related-proposals>
+          </tab-panel>
+          <tab-panel {(panels)}="panels" title-text="Version History">
+            <related-revisions {instance}="instance"></related-revisions>
+          </tab-panel>
+          <tab-panel {(panels)}="panels" title-text="Change Log">
             <revision-log {instance}="instance"></revision-log>
-        </tab-panel>
+          </tab-panel>
+        {{/if}}
       </tab-container>
     </div><!-- tier-content end -->
   </section>

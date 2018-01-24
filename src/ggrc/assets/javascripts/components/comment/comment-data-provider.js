@@ -1,9 +1,10 @@
 /*
- Copyright (C) 2017 Google Inc.
+ Copyright (C) 2018 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
 import * as QueryAPI from '../../plugins/utils/query-api-utils';
+import {REFRESH_COMMENTS} from '../../events/eventTypes';
 
 export default GGRC.Components('commentDataProvider', {
   tag: 'comment-data-provider',
@@ -78,5 +79,10 @@ export default GGRC.Components('commentDataProvider', {
   },
   init() {
     this.viewModel.loadComments();
+  },
+  events: {
+    [`{viewModel.instance} ${REFRESH_COMMENTS.type}`]() {
+      this.viewModel.loadComments();
+    },
   },
 });

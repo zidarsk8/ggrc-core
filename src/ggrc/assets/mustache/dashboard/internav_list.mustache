@@ -1,12 +1,12 @@
 {{!
-    Copyright (C) 2017 Google Inc.
+    Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
 {{#if_helpers '\
   ^is_empty' counts '\
   or #is_admin_page' }}
-<div class="tabs priority">
+<div class="tabs priority {{^is instance.type 'Audit'}}single-set{{/is}}">
   <ul class="internav {{#if_equals instance.type 'Audit'}}audit{{/if_equals}}">
     {{#priorityTabs}}
       <li class="{{internav_icon}} {{widgetType}} {{#if_equals contexts.active_widget.selector selector}}active{{/if_equals}}">
@@ -40,10 +40,9 @@
           {add-tab-title}="'Add Tab'"></add-tab-button>
       {{/hasHiddenWidgets}}
     {{/if}}
-
+    {{{render_hooks 'ObjectNav.Actions'}}}
   </ul>
 </div>
-{{{render_hooks 'ObjectNav.Actions'}}}
 
 {{#if_equals instance.type 'Audit'}}
 <div class="tabs not-priority">

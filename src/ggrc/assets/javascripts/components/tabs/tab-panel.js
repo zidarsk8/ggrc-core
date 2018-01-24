@@ -1,5 +1,5 @@
-/*!
- Copyright (C) 2017 Google Inc., authors, and contributors
+/*
+ Copyright (C) 2018 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -52,6 +52,10 @@ export default GGRC.Components('tabPanel', {
     tabId: '@', // used in REFRESH_TAB_CONTENT event handler
     panels: [],
     tabIndex: null,
+    canDisplayWarning: false,
+    warningState: false,
+    warningText: '@',
+    extraClasses: '@',
     clearCache: function () {
       this.attr('forceClearContent', true);
       this.attr('forceClearContent', false);
@@ -81,7 +85,10 @@ export default GGRC.Components('tabPanel', {
         panels.splice(indexToRemove, 1);
         panels.dispatch('panelRemoved');
       }
-    }
+    },
+    updateWarningState(event) {
+      this.attr('warningState', event.warning);
+    },
   },
   events: {
     /**

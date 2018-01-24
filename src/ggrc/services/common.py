@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 
@@ -988,7 +988,11 @@ class Resource(ModelView):
     memcache_client = self.request.cache_manager.cache_object.memcache_client
     for match in matches:
       key = get_cache_key(None, id=match[0], type=match[1])
-      val = memcache_client.get(key) or {}
+      val = memcache_client.get(key)
+      if val:
+        val = json.loads(val)
+      else:
+        val = {}
       if "selfLink" in val:
         resources[match] = val
     return resources
@@ -996,9 +1000,13 @@ class Resource(ModelView):
   def add_resources_to_cache(self, match_obj_pairs):
     """Add resources to cache if they are not blocked by DeleteOp entries"""
     # Skip right to memcache
-    memcache_client = self.request.cache_manager.cache_object.memcache_client
+    cache_manager = self.request.cache_manager
+    memcache_client = cache_manager.cache_object.memcache_client
     for match, obj in match_obj_pairs.items():
-      memcache_client.add(get_cache_key(None, id=match[0], type=match[1]), obj)
+      if obj.__class__.__name__ in cache_manager.supported_classes:
+        memcache_client.add(
+            get_cache_key(None, id=match[0], type=match[1]),
+            as_json(obj))
 
   def invalidate_cache_to(self, obj):
     """Invalidate api cache for sent object."""
