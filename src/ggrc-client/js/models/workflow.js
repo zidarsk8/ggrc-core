@@ -80,7 +80,13 @@
       });
     }
   }, {
-    save: function () {
+    /**
+     * Saves or updates workflow
+     * @param {Boolean} createDefaultTaskGroup if set to true default TaskGroup
+     *                                         is created after workflow saving
+     * @return {can.Deferred}
+    **/
+    save: function (createDefaultTaskGroup = true) {
       const dfd = new can.Deferred();
       let taskGroupTitle = this.task_group_title;
       let isNew = this.isNew();
@@ -91,7 +97,8 @@
         .then((instance) => {
           redirectLink = `${instance.viewLink}#task_group_widget`;
           instance.attr('_redirect', redirectLink);
-          if (!taskGroupTitle || !isNew || instance.clone) {
+          if (!createDefaultTaskGroup || !taskGroupTitle ||
+            !isNew || instance.clone) {
             dfd.resolve(instance);
             // skip next 'then' chain
             return can.Deferred().reject();
