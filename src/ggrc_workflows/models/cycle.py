@@ -155,11 +155,10 @@ class Cycle(mixins.WithContact,
   @property
   def _task_assignees(self):
     """Property. Return the list of persons as assignee of related tasks."""
-    persons = {}
-    for task in self.cycle_task_group_object_tasks:
-      for person in task.get_persons_for_rolename("Task Assignees"):
-        persons[person.id] = person
-    return persons.values()
+    people = set()
+    for ctask in self.cycle_task_group_object_tasks:
+      people.update(ctask.get_persons_for_rolename("Task Assignees"))
+    return list(people)
 
   @property
   def _task_secondary_assignees(self):
