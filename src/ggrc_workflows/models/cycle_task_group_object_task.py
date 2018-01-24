@@ -223,10 +223,11 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
     return self.cycle.is_current and self.current_user_wfa_or_assignee()
 
   def current_user_wfa_or_assignee(self):
-    """Current user is Workflow Admin or Assignee for self."""
-    wfa_person_ids = self.cycle.workflow.get_person_ids_for_rolename("Admin")
-    assignees_ids = self.get_person_ids_for_rolename("Task Assignees")
-    return login.get_current_user_id() in set(wfa_person_ids + assignees_ids)
+    """Current user is WF Admin, Assignee or Secondary Assignee for self."""
+    wfa_ids = self.workflow.get_person_ids_for_rolename("Admin")
+    ta_ids = self.get_person_ids_for_rolename("Task Assignees")
+    tsa_ids = self.get_person_ids_for_rolename("Task Secondary Assignees")
+    return login.get_current_user_id() in set().union(wfa_ids, ta_ids, tsa_ids)
 
   @classmethod
   def _filter_by_cycle(cls, predicate):
