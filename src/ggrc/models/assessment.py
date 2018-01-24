@@ -212,14 +212,6 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       },
   }
 
-  similarity_options = {
-      "relevant_types": {
-          "Objective": {"weight": 2},
-          "Control": {"weight": 2},
-      },
-      "threshold": 1,
-  }
-
   def __init__(self, *args, **kwargs):
     super(Assessment, self).__init__(*args, **kwargs)
     self._warnings = collections.defaultdict(list)
