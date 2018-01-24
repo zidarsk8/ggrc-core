@@ -290,9 +290,9 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
           attr_sort_field: 'task due date'
         },
         {
-          attr_title: 'Task last updated',
+          attr_title: 'Task last updated date',
           attr_name: 'updated_at',
-          attr_sort_field: 'task last updated'
+          attr_sort_field: 'task last updated date'
         },
         {
           attr_title: 'Task last updated by',

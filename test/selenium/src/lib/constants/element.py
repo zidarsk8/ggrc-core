@@ -150,8 +150,8 @@ class CommonModalSetVisibleFields(Common):
   TITLE = Common.TITLE
   CODE = Common.CODE
   STATE = Base.STATE
-  LAST_UPDATED = "Last Updated"
-  LAST_UPDATED_BY = LAST_UPDATED + " By"
+  LAST_UPDATED = "Last Updated Date"
+  LAST_UPDATED_BY = "Last Updated By"
   SET_FIELDS = "Set Fields"
 
 

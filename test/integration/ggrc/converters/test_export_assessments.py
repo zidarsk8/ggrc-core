@@ -77,7 +77,7 @@ class TestExport(TestCase):
                                    self.assessment.created_at,
                                    [self.assessment.slug])
 
-  @data("updated_at", "Last Updated", "Last Updated")
+  @data("updated_at", "Last Updated Date", "Last Updated Date")
   def test_filter_by_updated_at(self, alias):
     """Test filter by updated at"""
     self.assert_filter_by_datetime(alias,

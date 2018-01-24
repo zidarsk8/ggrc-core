@@ -67,7 +67,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
         attr_name: 'created_at',
         order: 7,
       }, {
-        attr_title: 'Last Updated',
+        attr_title: 'Last Updated Date',
         attr_name: 'updated_at',
         order: 8,
       }, {

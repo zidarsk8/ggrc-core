@@ -73,7 +73,7 @@ import Permission from '../permission';
         attr_name: 'status',
         order: 4,
       }, {
-        attr_title: 'Last Updated',
+        attr_title: 'Last Updated Date',
         attr_name: 'updated_at',
         order: 5,
       }, {
