@@ -133,6 +133,12 @@ class Cycle(mixins.WithContact,
           ["name", "email"],
           False,
       ),
+      ft_attributes.MultipleSubpropertyFullTextAttr(
+          "task secondary assignees",
+          "_task_secondary_assignees",
+          ["name", "email"],
+          False,
+      ),
       ft_attributes.DateFullTextAttr("due date", "next_due_date"),
       ft_attributes.MultipleSubpropertyFullTextAttr(
           "task comments",
@@ -154,6 +160,14 @@ class Cycle(mixins.WithContact,
       for person in task.get_persons_for_rolename("Task Assignees"):
         persons[person.id] = person
     return persons.values()
+
+  @property
+  def _task_secondary_assignees(self):
+    """Property. Returns people list as Secondary Assignee of related tasks."""
+    people = set()
+    for ctask in self.cycle_task_group_object_tasks:
+      people.update(ctask.get_persons_for_rolename("Task Secondary Assignees"))
+    return list(people)
 
   AUTO_REINDEX_RULES = [
       ft_mixin.ReindexRule("CycleTaskGroup", lambda x: x.cycle),
