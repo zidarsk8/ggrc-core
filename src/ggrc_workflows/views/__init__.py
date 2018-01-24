@@ -56,7 +56,8 @@ def get_user_task_count():
             all_models.AccessControlList.ac_role_id,
             all_models.AccessControlRole.object_type ==
             "CycleTaskGroupObjectTask",
-            all_models.AccessControlRole.name == "Task Assignees",
+            all_models.AccessControlRole.name.in_(
+                ("Task Assignees", "Task Secondary Assignees")),
         )
     ).filter(
         CycleTaskGroupObjectTask.status.in_(
