@@ -54,3 +54,15 @@ class Attributable(object):
         orm.subqueryload('_attributes')
     )
     return query
+
+  @classmethod
+  def indexed_query(cls):
+    return super(Attributable, cls).indexed_query().options(
+        orm.Load(cls).subqueryload(
+            "_attributes"
+        ).load_only(
+            "value_datetime",
+            "value_string",
+            "value_integer",
+        )
+    )
