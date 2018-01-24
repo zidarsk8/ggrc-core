@@ -130,8 +130,8 @@ export default can.Control({
         .then(this.proxy('autocomplete'))
         .then(function () {
           this.options.afterFetch(this.element);
+          this.restore_ui_status_from_storage();
         }.bind(this));
-      this.restore_ui_status_from_storage();
     }.bind(this));
   },
 
