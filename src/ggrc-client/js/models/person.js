@@ -96,7 +96,6 @@ import RefreshQueue from './refresh_queue';
         attr_name: 'updated_at',
       }],
       display_attr_names: ['title', 'email', 'authorizations', 'updated_at'],
-      disable_columns_configuration: true,
     },
     list_view_options: {
       find_params: {__sort: 'name,email'}
