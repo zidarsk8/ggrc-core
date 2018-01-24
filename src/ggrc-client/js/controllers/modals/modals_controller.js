@@ -739,8 +739,6 @@ export default can.Control({
   '{$content} a.field-hide click': function (el, ev) { // field hide
     var $el = $(el);
     var $hidable = $el.closest('[class*="span"].hidable');
-    var $showButton = $(this.element).find('#formRestore');
-    var $hideButton = $(this.element).find('#formHide');
     var totalInner = $el.closest('.hide-wrap.hidable')
       .find('.inner-hide').length;
     var totalHidden;
@@ -753,7 +751,7 @@ export default can.Control({
       .find('.inner-hidable').length;
     // $hidable.hide();
     $hidable.addClass('hidden');
-    this.options.reset_visible = true;
+    this.options.attr('reset_visible', true);
     // update ui array
     uiUnit = $hidable.find('[tabindex]');
     for (i = 0; i < uiUnit.length; i++) {
@@ -769,15 +767,12 @@ export default can.Control({
       $el.closest('.inner-hide').parent('.hidable').addClass('hidden');
     }
 
-    $hideButton.hide();
-    $showButton.show();
     return false;
   },
 
-  '{$content} #formHide click': function (el, ev) {
+  '{$content} #formHide click': function () {
     var i;
     var uiArrLength = this.options.ui_array.length;
-    var $showButton = this.element.find('#formRestore');
     var $hidables = this.element.find('.hidable');
     var hiddenElements = $hidables.find('[tabindex]');
     var $hiddenElement;
@@ -786,7 +781,7 @@ export default can.Control({
       this.options.ui_array[i] = 0;
     }
 
-    this.options.reset_visible = true;
+    this.options.attr('reset_visible', true);
 
     $hidables.addClass('hidden');
     this.element.find('.inner-hide').addClass('inner-hidable');
@@ -805,19 +800,16 @@ export default can.Control({
       }
     }
 
-    el.hide();
-    $showButton.show();
     return false;
   },
 
-  '{$content} #formRestore click': function (el, ev) {
+  '{$content} #formRestore click': function () {
     // Update UI status array to initial state
     var i;
     var uiArrLength = this.options.ui_array.length;
     var $form = this.element.find('form');
     var $body = $form.closest('.modal-body');
     var uiElements = $body.find('[uiindex]');
-    var $hideButton = this.element.find('#formHide');
     var $el;
     var tabVal;
 
@@ -835,11 +827,9 @@ export default can.Control({
       $el.attr('tabindex', tabVal);
     }
 
-    this.options.reset_visible = false;
+    this.options.attr('reset_visible', false);
     this.element.find('.hidden').removeClass('hidden');
     this.element.find('.inner-hide').removeClass('inner-hidable');
-    el.hide();
-    $hideButton.show();
     return false;
   },
 
@@ -876,10 +866,10 @@ export default can.Control({
     // set up reset_visible and ui_array
     if (displayState !== null) {
       if (displayState.reset_visible) {
-        this.options.reset_visible = displayState.reset_visible;
+        this.options.attr('reset_visible', displayState.reset_visible);
       }
       if (displayState.ui_array) {
-        this.options.ui_array = displayState.ui_array;
+        this.options.ui_array = displayState.ui_array.slice();
       }
     }
     this.restore_ui_status();
@@ -892,16 +882,13 @@ export default can.Control({
     var i;
     var $form;
     var $body;
-    var $hideButton;
-    var $showButton;
+
     // walk through the ui_array, for the one values,
     // select the element with tab index and hide it
 
-    if (this.options.reset_visible) {// some elements are hidden
+    if (this.options.attr('reset_visible')) {// some elements are hidden
       $form = this.element.find('form');
       $body = $form.closest('.modal-body');
-      $hideButton = $form.find('#formHide');
-      $showButton = $form.find('#formRestore');
 
       for (i = 0; i < this.options.ui_array.length; i++) {
         if (this.options.ui_array[i] == 1) {
@@ -918,9 +905,6 @@ export default can.Control({
           }
         }
       }
-
-      $hideButton.hide();
-      $showButton.show();
 
       return false;
     }
