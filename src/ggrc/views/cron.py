@@ -1,7 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Collects specific cton views."""
+""" Cron job endpoints initialization and running stuff """
 
 from logging import getLogger
 from traceback import format_exc
@@ -37,7 +37,7 @@ def run_job(job):
 
 
 def job_runner(name):
-  """Run jobs related to sent name."""
+  """Run all contributed jobs from all extension modules"""
   cron_jobs = extensions.get_module_contributions(name)
   for job in cron_jobs:
     run_job(job)
@@ -55,11 +55,12 @@ def hourly_issue_tracker_sync_endpoint():
 
 
 def half_hour_cron_endpoint():
+  """Endpoint running half hourly jobs from all modules"""
   return job_runner("HALF_HOUR_CRON_JOBS")
 
 
 def init_cron_views(app):
-  """Init cron views."""
+  """Init all cron jobs' endpoints"""
   app.add_url_rule(
       "/nightly_cron_endpoint", "nightly_cron_endpoint",
       view_func=nightly_cron_endpoint)
