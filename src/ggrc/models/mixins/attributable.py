@@ -13,6 +13,7 @@ from sqlalchemy.orm import relationship
 
 from ggrc import builder
 
+from ggrc.data_platform import attributes
 
 # pylint: disable=invalid-name
 logger = getLogger(__name__)
@@ -65,4 +66,15 @@ class Attributable(object):
             "value_string",
             "value_integer",
         )
+    )
+
+  @classmethod
+  def get_delete_ca_query_for(cls, ids):
+    """Return delete CA record query. If ids are empty, will return None."""
+    if not ids:
+      return
+    return attributes.Attributes.__table__.delete().where(
+        attributes.Attributes.object_type == cls.__name__
+    ).where(
+        attributes.Attributes.object_id.in_(ids)
     )
