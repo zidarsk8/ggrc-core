@@ -50,6 +50,6 @@
               }.bind(this));
             this.insert_results(binding, matchingResults);
           }.bind(this));
-      }
+      },
     });
 })(window.GGRC, window.can);

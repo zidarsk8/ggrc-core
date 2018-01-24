@@ -14,7 +14,7 @@ import template from './person-form-field-view.mustache';
     template: template,
     viewModel: {
       value: null,
-      disabled: false
-    }
+      disabled: false,
+    },
   });
 })(window.can, window.GGRC);

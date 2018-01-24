@@ -37,6 +37,6 @@
           $el.removeAttr("disabled").removeClass("disabled pending-ajax")[0].innerHTML = oldtext;
         }
       });
-    }
+    },
   });
 })(window.can);

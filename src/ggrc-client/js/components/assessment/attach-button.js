@@ -28,8 +28,8 @@ import template from './attach-button.mustache';
             } else {
               setValue(false);
             }
-          }
-        }
+          },
+        },
       },
       assessmentTypeObjects: [],
       canAttach: false,
@@ -77,7 +77,7 @@ import template from './attach-button.mustache';
         }
 
         return GFolder.findOne({id: folderId});
-      }
-    }
+      },
+    },
   });
 })(window.GGRC, window.can);

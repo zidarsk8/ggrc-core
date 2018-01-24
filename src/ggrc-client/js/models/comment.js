@@ -22,7 +22,7 @@
       if (this._super) {
         this._super.apply(this, arguments);
       }
-    }
+    },
   }, {
     form_preload: function () {
       let pageInstance = GGRC.page_instance();
@@ -48,12 +48,12 @@
         }.bind(this))
         .done(function () {
           $body.trigger('ajax:flash', {
-            success: 'Saved.'
+            success: 'Saved.',
           });
         })
         .fail(function () {
           $body.trigger('ajax:flash', {
-            error: 'There was a problem with saving.'
+            error: 'There was a problem with saving.',
           });
           this.attr('description', ev.oldVal);
         }.bind(this));
@@ -69,6 +69,6 @@
      */
     display_name: function () {
       return this.description || '';
-    }
+    },
   });
 })(window.can, window.GGRC, window.CMS);

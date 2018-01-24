@@ -9,7 +9,7 @@ let tag = 'form-validation-text';
 let textMap = {
   input: 'This field is required.',
   checkbox: 'This checkbox is required.',
-  dropdownNoInfo: 'Add required info by click on the link.'
+  dropdownNoInfo: 'Add required info by click on the link.',
 };
 
 /**
@@ -42,11 +42,11 @@ GGRC.Components('formValidationText', {
               break;
           }
           return text;
-        }
-      }
+        },
+      },
     },
     validation: {},
     highlightInvalidFields: '@',
-    type: 'input'
-  }
+    type: 'input',
+  },
 });

@@ -24,13 +24,13 @@ describe('CMS.Models.Person', function () {
         'fakeProgramInstance', ['getInstance']
       );
       fakeProgramInstance.getInstance.and.returnValue({
-        context_id: 666
+        context_id: 666,
       });
       instance = {
         context: {
-          id: 444
+          id: 444,
         },
-        program: fakeProgramInstance
+        program: fakeProgramInstance,
       };
       person = new CMS.Models.Person();
       method = CMS.Models.Person.getUserRoles;
@@ -61,12 +61,12 @@ describe('CMS.Models.Person', function () {
         let dfd;
         refreshedUserRoles = [{
           context: {
-            id: 444
-          }
+            id: 444,
+          },
         }, {
           context: {
-            id: 555
-          }
+            id: 555,
+          },
         }];
         dfd = $.when(refreshedUserRoles);
         spyOn(RefreshQueue.prototype, 'enqueue');
@@ -85,12 +85,12 @@ describe('CMS.Models.Person', function () {
         specificObject = 'program';
         refreshedUserRoles = [{
           context: {
-            id: 555
-          }
+            id: 555,
+          },
         }, {
           context: {
-            id: 666
-          }
+            id: 666,
+          },
         }];
       });
 

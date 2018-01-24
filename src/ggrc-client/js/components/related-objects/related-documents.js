@@ -30,22 +30,22 @@ import {
         // automatically refresh instance on related document create/remove
         autorefresh: {
           type: 'boolean',
-          value: true
-        }
+          value: true,
+        },
       },
       getDocumentsQuery: function () {
         let relevantFilters = [{
           type: this.attr('instance.type'),
           id: this.attr('instance.id'),
-          operation: 'relevant'
+          operation: 'relevant',
         }];
         let additionalFilter = this.attr('documentType') ?
         {
           expression: {
             left: 'document_type',
             op: {name: '='},
-            right: this.attr('documentType')
-          }
+            right: this.attr('documentType'),
+          },
         } :
         [];
 
@@ -137,9 +137,9 @@ import {
           title: data,
           created_at: date.toISOString(),
           context: this.instance.context || new CMS.Models.Context({
-            id: null
+            id: null,
           }),
-          document_type: this.documentType
+          document_type: this.documentType,
         });
         return document;
       },
@@ -151,7 +151,7 @@ import {
           source: this.instance,
           destination: document,
           context: this.instance.context ||
-            new CMS.Models.Context({id: null})
+            new CMS.Models.Context({id: null}),
         });
         return relationship.save();
       },
@@ -189,7 +189,7 @@ import {
         if (!relationship.id) {
           console.log('Unable to find relationship');
           return can.Deferred().reject({
-            error: 'Unable to find relationship'
+            error: 'Unable to find relationship',
           });
         }
 
@@ -246,7 +246,7 @@ import {
         if (this.autorefresh) {
           this.loadDocuments();
         }
-      }
+      },
     },
     init: function () {
       let instance = this.viewModel.attr('instance');
@@ -262,7 +262,7 @@ import {
     events: {
       '{viewModel.instance} resolvePendingBindings': function () {
         this.viewModel.refreshRelatedDocuments();
-      }
-    }
+      },
+    },
   });
 })(window.can, window.can.$, window._, window.GGRC);

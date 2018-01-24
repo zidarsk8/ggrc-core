@@ -6,7 +6,7 @@
 ;(function(CMS, GGRC, can, $) {
   can.Control("GGRC.Controllers.WorkflowPage", {
     defaults: {
-    }
+    },
   }, {
     //  FIXME: This should trigger expansion of the TreeNode, without using
     //    global event listeners or routes or timeouts, but currently object
@@ -23,6 +23,6 @@
             'task_group_widget/task_group/' + instance.id;
         }, 250);
       }
-    }
+    },
   });
 })(window.CMS, window.GGRC, window.can, window.can.$);

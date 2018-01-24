@@ -31,8 +31,8 @@
         Workflow_All: {},
         Workflow_Active: {status: 'Active'},
         Workflow_Inactive: {status: 'Inactive'},
-        Workflow_Draft: {status: 'Draft'}
-      }
+        Workflow_Draft: {status: 'Draft'},
+      },
     },
     defaults: {
       task_group_title: 'Task Group 1',
@@ -47,7 +47,7 @@
         {attr_title: 'Code', attr_name: 'slug'},
         {attr_title: 'State', attr_name: 'status'},
         {attr_title: 'Last Updated Date', attr_name: 'updated_at'},
-        {attr_title: 'Last Updated By', attr_name: 'modified_by'}
+        {attr_title: 'Last Updated By', attr_name: 'modified_by'},
       ],
       display_attr_names: ['title', 'status', 'updated_at', 'Admin',
         'Workflow Member'],
@@ -78,7 +78,7 @@
           });
         }
       });
-    }
+    },
   }, {
     save: function () {
       const dfd = new can.Deferred();

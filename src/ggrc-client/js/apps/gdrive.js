@@ -10,24 +10,24 @@
   new GGRC.Mappings('ggrc_gdrive_integration', {
     revisionable: {
       _canonical: {
-        revisions: "GDriveFileRevision"
+        revisions: "GDriveFileRevision",
       },
-      revisions: new GGRC.ListLoaders.DirectListLoader("GDriveFileRevision", "id")
+      revisions: new GGRC.ListLoaders.DirectListLoader("GDriveFileRevision", "id"),
     },
     GDriveFolder: {
       _mixins: ["revisionable"],
       _canonical: {
-        permissions: "GDriveFolderPermission"
+        permissions: "GDriveFolderPermission",
       },
-      permissions: new GGRC.ListLoaders.DirectListLoader("GDriveFolderPermission", "id")
+      permissions: new GGRC.ListLoaders.DirectListLoader("GDriveFolderPermission", "id"),
     },
     GDriveFile: {
       _mixins: ["revisionable"],
       _canonical: {
-        permissions: "GDriveFilePermission"
+        permissions: "GDriveFilePermission",
       },
-      permissions: new GGRC.ListLoaders.DirectListLoader("GDriveFilePermission", "id")
-    }
+      permissions: new GGRC.ListLoaders.DirectListLoader("GDriveFilePermission", "id"),
+    },
   });
 
   GGRC.gapi_request_with_auth =

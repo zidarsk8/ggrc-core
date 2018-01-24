@@ -15,17 +15,17 @@ describe('GGRC.Components.multiselectDropdown', function () {
 
       options = [
         {
-          value: 'Draft'
+          value: 'Draft',
         },
         {
-          value: 'Active'
+          value: 'Active',
         },
         {
-          value: 'Open'
+          value: 'Open',
         },
         {
-          value: 'Deprecated'
-        }
+          value: 'Deprecated',
+        },
       ];
 
       viewModel.attr('options', options);
@@ -101,17 +101,17 @@ describe('GGRC.Components.multiselectDropdown', function () {
 
       options = [
         {
-          value: 'Draft'
+          value: 'Draft',
         },
         {
-          value: 'Active'
+          value: 'Active',
         },
         {
-          value: 'Open'
+          value: 'Open',
         },
         {
-          value: 'Deprecated'
-        }
+          value: 'Deprecated',
+        },
       ];
 
       viewModel.attr('options', options);

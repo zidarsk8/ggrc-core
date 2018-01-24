@@ -26,14 +26,14 @@ describe('CMS.Controllers.TreeViewNode', function () {
 
       ctrlInst = {
         options: new can.Map({
-          show_view: '/foo/bar.mustache'
+          show_view: '/foo/bar.mustache',
         }),
         element: $element,
         _draw_node_in_progress: false,
         _draw_node_deferred: new can.Deferred(),
         add_child_lists_to_child: jasmine.createSpy(),
         _ifNotRemoved: jasmine.createSpy().and.returnValue(ifNotRemovedResult),
-        replace_element: jasmine.createSpy()
+        replace_element: jasmine.createSpy(),
       };
 
       method = Ctrl.prototype.draw_node.bind(ctrlInst);
@@ -117,7 +117,7 @@ describe('CMS.Controllers.TreeViewNode', function () {
         '  <div>',
         '    <div class="openclose"></div>',
         '  </div>',
-        '</li>'
+        '</li>',
       ].join(''));
 
       displaySubtreesDfd = new can.Deferred();
@@ -125,14 +125,14 @@ describe('CMS.Controllers.TreeViewNode', function () {
       ctrlInst = {
         element: $tree,
         options: new can.Map({
-          show_view: '/foo/bar.mustache'
+          show_view: '/foo/bar.mustache',
         }),
         _ifNotRemoved: jasmine.createSpy().and.callFake(function (callback) {
           return callback;
         }),
         add_child_lists_to_child: jasmine.createSpy(),
         display_subtrees:
-          jasmine.createSpy().and.returnValue(displaySubtreesDfd)
+          jasmine.createSpy().and.returnValue(displaySubtreesDfd),
       };
 
       method = Ctrl.prototype.expand.bind(ctrlInst);

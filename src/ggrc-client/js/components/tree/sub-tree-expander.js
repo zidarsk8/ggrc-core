@@ -19,8 +19,8 @@ import {
           type: String,
           get: function () {
             return getPageType();
-          }
-        }
+          },
+        },
       },
       expandNotDirectly: function () {
         this.dispatch('expandNotDirectly');
@@ -31,7 +31,7 @@ import {
       onExpand: function () {
         this.attr('expanded', !this.attr('expanded'));
         this.onChangeState(this.attr('expanded'));
-      }
-    }
+      },
+    },
   });
 })(window.can);

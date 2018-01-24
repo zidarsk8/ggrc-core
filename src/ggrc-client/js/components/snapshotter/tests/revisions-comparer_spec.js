@@ -149,7 +149,7 @@ describe('GGRC.Components.revisionsComparer', function () {
           expect(result.length).toEqual(2);
 
           expect(Revision.findAll).toHaveBeenCalledWith({
-            id__in: '42,11'
+            id__in: '42,11',
           });
 
           expect(Revision.findOne).not.toHaveBeenCalled();

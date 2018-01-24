@@ -25,14 +25,14 @@ import template from './simple-modal.mustache';
       replaceContent: false,
       isDisabled: false,
       state: {
-        open: false
+        open: false,
       },
       hide: function () {
         this.attr('state.open', false);
       },
       show: function () {
         this.attr('state.open', true);
-      }
+      },
     },
     helpers: {
       modalWrapper: function (showContent) {
@@ -46,7 +46,7 @@ import template from './simple-modal.mustache';
             }
           });
         };
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

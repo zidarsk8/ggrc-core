@@ -142,6 +142,6 @@
         .then(function () {
           return binding.list;
         });
-    }
+    },
   });
 })(window.GGRC, window.can);

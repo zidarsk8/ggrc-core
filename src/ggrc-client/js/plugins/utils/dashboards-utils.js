@@ -24,7 +24,7 @@ function getCaConfiguration() {
 
   return {
     caNameRegexp: new RegExp(caNameRegexpString),
-    caValueRegexp: new RegExp(caValueRegexpString)
+    caValueRegexp: new RegExp(caValueRegexpString),
   };
 }
 
@@ -113,7 +113,7 @@ function getDashboardsFromCas(instance, caNameRegexp, caValueRegexp) {
 
     return result.concat({
       name: dashboardName,
-      url: caValue.replace('{{OBJECT_ID}}', instance.id)
+      url: caValue.replace('{{OBJECT_ID}}', instance.id),
     });
   }, []);
 }

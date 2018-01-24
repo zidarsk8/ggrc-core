@@ -50,7 +50,7 @@ describe('GGRC.Components.treeItemExtraInfo', function () {
     it('returns true if workflow_status is "Overdue"', function () {
       let result;
       viewModel.attr('instance', {
-        workflow_state: 'Overdue'
+        workflow_state: 'Overdue',
       });
 
       result = viewModel.attr('isOverdue');
@@ -61,7 +61,7 @@ describe('GGRC.Components.treeItemExtraInfo', function () {
     it('returns false if workflow_status is not "Overdue"', function () {
       let result;
       viewModel.attr('instance', {
-        workflow_state: 'AnyState'
+        workflow_state: 'AnyState',
       });
 
       result = viewModel.attr('isOverdue');

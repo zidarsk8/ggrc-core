@@ -16,19 +16,19 @@ import template from './templates/tree-filter-input.mustache';
           this.attr('options.filter', newValue || '');
           this.onFilterChange(newValue);
           return newValue;
-        }
+        },
       },
       operation: {
         type: 'string',
-        value: 'AND'
+        value: 'AND',
       },
       depth: {
         type: 'boolean',
-        value: false
+        value: false,
       },
       isExpression: {
         type: 'boolean',
-        value: false
+        value: false,
       },
       filterDeepLimit: {
         type: 'number',
@@ -72,7 +72,7 @@ import template from './templates/tree-filter-input.mustache';
     },
     removeAdvancedFilters: function () {
       this.dispatch('removeAdvanced');
-    }
+    },
   });
 
   GGRC.Components('treeFilterInput', {
@@ -90,7 +90,7 @@ import template from './templates/tree-filter-input.mustache';
       },
       '{viewModel} disabled': function () {
         this.viewModel.attr('filter', '');
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

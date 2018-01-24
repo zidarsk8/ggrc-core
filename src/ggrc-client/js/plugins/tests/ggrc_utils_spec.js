@@ -79,7 +79,7 @@ describe('GGRC utils getMappableTypes() method', function () {
       'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
       'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
       'Objective', 'Audit', 'Assessment', 'AccessGroup',
-      'Document', 'Risk', 'Threat'
+      'Document', 'Risk', 'Threat',
     ];
     mapper = GGRC.Utils.getMappableTypes;
     OBJECT_TYPES.forEach(function (item) {
@@ -105,7 +105,7 @@ describe('GGRC utils getMappableTypes() method', function () {
   it('always returns whitelisted items', function () {
     let whitelisted = ['Hello', 'World'];
     let result = mapper('AssessmentTemplate', {
-      whitelist: whitelisted
+      whitelist: whitelisted,
     });
     expect(_.intersection(result, whitelisted)).toEqual(whitelisted);
   });
@@ -113,7 +113,7 @@ describe('GGRC utils getMappableTypes() method', function () {
     let forbidden = ['Policy', 'Process', 'Product', 'Program'];
     let list = mapper('DataAsset');
     let result = mapper('DataAsset', {
-      forbidden: forbidden
+      forbidden: forbidden,
     });
     expect(_.difference(list, result).sort()).toEqual(forbidden.sort());
   });
@@ -123,7 +123,7 @@ describe('GGRC utils getMappableTypes() method', function () {
     let list = mapper('DataAsset');
     let result = mapper('DataAsset', {
       forbidden: forbidden,
-      whitelist: whitelisted
+      whitelist: whitelisted,
     });
     let input = _.difference(list, result).concat(_.difference(result, list));
     let output = forbidden.concat(whitelisted);

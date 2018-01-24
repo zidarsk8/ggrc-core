@@ -23,14 +23,14 @@ describe('can.Model.AssessmentTemplate', function () {
 
       instance.attr('default_people', {
         assignees: 'Rabbits',
-        verifiers: 'Turtles'
+        verifiers: 'Turtles',
       });
 
       result = instance._packPeopleData();
 
       expect(result).toEqual({
         assignees: 'Rabbits',
-        verifiers: 'Turtles'
+        verifiers: 'Turtles',
       });
     });
 
@@ -42,7 +42,7 @@ describe('can.Model.AssessmentTemplate', function () {
 
         instance.attr('default_people', {
           assignees: 'other',
-          verifiers: 'Whatever'
+          verifiers: 'Whatever',
         });
 
         assessorIds = new can.Map({'17': true, '2': true, '9': true});
@@ -52,7 +52,7 @@ describe('can.Model.AssessmentTemplate', function () {
 
         expect(result).toEqual({
           assignees: [2, 9, 17],
-          verifiers: 'Whatever'
+          verifiers: 'Whatever',
         });
       }
     );
@@ -65,7 +65,7 @@ describe('can.Model.AssessmentTemplate', function () {
 
         instance.attr('default_people', {
           assignees: 'Whatever',
-          verifiers: 'other'
+          verifiers: 'other',
         });
 
         verifierIds = new can.Map({'12': true, '6': true, '11': true});
@@ -75,7 +75,7 @@ describe('can.Model.AssessmentTemplate', function () {
 
         expect(result).toEqual({
           assignees: 'Whatever',
-          verifiers: [6, 11, 12]
+          verifiers: [6, 11, 12],
         });
       }
     );
@@ -84,7 +84,7 @@ describe('can.Model.AssessmentTemplate', function () {
   describe('_unpackPeopleData() method', function () {
     it('builds an IDs dict from the default assignees list', function () {
       instance.attr('default_people', {
-        assignees: new can.List([5, 7, 12])
+        assignees: new can.List([5, 7, 12]),
       });
       instance.attr('assigneesList', {});
 
@@ -99,7 +99,7 @@ describe('can.Model.AssessmentTemplate', function () {
       // this is needed when the default assignees setting is actually
       // a list of User IDs...
       instance.attr('default_people', {
-        assignees: new can.List([5, 7, 12])
+        assignees: new can.List([5, 7, 12]),
       });
 
       instance._unpackPeopleData();
@@ -110,7 +110,7 @@ describe('can.Model.AssessmentTemplate', function () {
     it('clears the assignees IDs dict if needed', function () {
       instance.attr('assigneesList', {'42': true});
       instance.attr('default_people', {
-        assignees: 'Some User Group'  // not a list of IDs
+        assignees: 'Some User Group',  // not a list of IDs
       });
 
       instance._unpackPeopleData();
@@ -120,7 +120,7 @@ describe('can.Model.AssessmentTemplate', function () {
 
     it('builds an IDs dict from the default verifiers list', function () {
       instance.attr('default_people', {
-        verifiers: new can.List([5, 7, 12])
+        verifiers: new can.List([5, 7, 12]),
       });
       instance.attr('verifiersList', {});
 
@@ -135,7 +135,7 @@ describe('can.Model.AssessmentTemplate', function () {
       // this is needed when the default verifiers setting is actually
       // a list of User IDs...
       instance.attr('default_people', {
-        verifiers: new can.List([5, 7, 12])
+        verifiers: new can.List([5, 7, 12]),
       });
 
       instance._unpackPeopleData();
@@ -146,7 +146,7 @@ describe('can.Model.AssessmentTemplate', function () {
     it('clears the verifiers IDs dict if needed', function () {
       instance.attr('verifiersList', {'42': true});
       instance.attr('default_people', {
-        verifiers: 'Some User Group'  // not a list of IDs
+        verifiers: 'Some User Group',  // not a list of IDs
       });
 
       instance._unpackPeopleData();

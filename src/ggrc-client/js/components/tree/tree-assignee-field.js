@@ -33,7 +33,7 @@
           }).join(' ');
         }
         return result;
-      }
-    })
+      },
+    }),
   });
 })(window.can);

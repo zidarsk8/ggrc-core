@@ -110,10 +110,10 @@ import RefreshQueue from '../refresh_queue';
           mappings: [{
             instance: true,
             mappings: [],
-            binding: binding
+            binding: binding,
           }],
-          binding: binding
-        }]
+          binding: binding,
+        }],
       });
     },
     get_instance_from_mapping: function (binding, mapping) {
@@ -161,6 +161,6 @@ import RefreshQueue from '../refresh_queue';
           validMappings.push(mappings[i]);
       }
       return validMappings;
-    }
+    },
   });
 })(window.GGRC, window.can);

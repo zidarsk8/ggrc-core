@@ -25,9 +25,9 @@ let mapper = {
     return new CMS.Models.Relationship({
       context: source.context || {id: null},
       source: source,
-      destination: destination
+      destination: destination,
     });
-  }
+  },
 };
 
 export default GGRC.Components('relatedAssessments', {
@@ -38,12 +38,12 @@ export default GGRC.Components('relatedAssessments', {
       baseInstanceDocuments: {
         get: function () {
           return this.attr('urls').concat(this.attr('evidences'));
-        }
+        },
       },
       hasSelected: {
         get: function () {
           return this.attr('documentList.length');
-        }
+        },
       },
       needReuse: {
         type: 'boolean',
@@ -62,7 +62,7 @@ export default GGRC.Components('relatedAssessments', {
       },
       mappedSnapshots: {
         type: 'boolean',
-        value: true
+        value: true,
       },
       relatedObjectsFilter: {
         get: function () {
@@ -70,7 +70,7 @@ export default GGRC.Components('relatedAssessments', {
             only: [this.attr('relatedObjectType')],
             exclude: [],
           };
-        }
+        },
       },
       relatedObjectsTitle: {
         get: function () {
@@ -115,6 +115,6 @@ export default GGRC.Components('relatedAssessments', {
       this.attr('isSaving', false);
       this.dispatch('afterObjectReused');
       this.attr('instance').dispatch('refreshInstance');
-    }
-  }
+    },
+  },
 });

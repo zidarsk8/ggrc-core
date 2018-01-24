@@ -55,11 +55,11 @@
                 mappings: [{
                   instance: true,
                   mappings: [],
-                  binding: binding
-                }]
+                  binding: binding,
+                }],
               };
             }), binding);
         });
-    }
+    },
   });
 })(GGRC, can);

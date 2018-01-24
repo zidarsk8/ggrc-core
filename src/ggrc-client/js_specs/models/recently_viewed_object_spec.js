@@ -19,7 +19,7 @@ describe("can.Model.RecentlyViewedObjects", function() {
       can.Model("RVO");
       let obj = new RVO({
           viewLink: "/"
-          , title: "blah"
+          , title: "blah",
       });
       let rvo_obj = GGRC.Models.RecentlyViewedObject.newInstance(obj);
       expect(rvo_obj.type).toBe("RVO");
@@ -33,7 +33,7 @@ describe("can.Model.RecentlyViewedObjects", function() {
     it("include title and view link", function() {
       let obj = {
           viewLink: "/"
-          , title: "blah"
+          , title: "blah",
       };
       let rvo_obj = new GGRC.Models.RecentlyViewedObject(obj).stub();
       expect(rvo_obj.title).toBe("blah");

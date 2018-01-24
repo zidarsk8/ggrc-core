@@ -19,7 +19,7 @@ describe('can.Model.Mixin.isOverdue', function () {
     beforeEach(function () {
       instance = new can.Map({
         next_due_date: '2030-01-01',
-        status: 'Not Started'
+        status: 'Not Started',
       });
       method = Mixin.prototype._isOverdue;
     });

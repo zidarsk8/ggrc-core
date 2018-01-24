@@ -25,10 +25,10 @@ import RefreshQueue from './refresh_queue';
           response(can.$.map(data, function (item) {
             return can.extend({}, item.person, {
               label: item.person.email,
-              value: item.person.id
+              value: item.person.id,
             });
           }));
-        }
+        },
       });
     },
     is_custom_attributable: true,
@@ -40,14 +40,14 @@ import RefreshQueue from './refresh_queue';
       user_roles: 'CMS.Models.UserRole.stubs',
       name: 'trimmed',
       email: 'trimmedLower',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     mixins: ['ca_update'],
     defaults: {
       name: '',
       email: '',
       contact: null,
-      owners: null
+      owners: null,
     },
     convert: {
       trimmed: function (val) {
@@ -55,7 +55,7 @@ import RefreshQueue from './refresh_queue';
       },
       trimmedLower: function (val) {
         return ((val && val.trim) ? val.trim() : val).toLowerCase();
-      }
+      },
     },
     serialize: {
       trimmed: function (val) {
@@ -63,7 +63,7 @@ import RefreshQueue from './refresh_queue';
       },
       trimmedLower: function (val) {
         return ((val && val.trim) ? val.trim() : val).toLowerCase();
-      }
+      },
     },
     findInCacheById: function (id) {
       return this.store[id] || this.cache ? this.cache[id] : null;
@@ -98,7 +98,7 @@ import RefreshQueue from './refresh_queue';
       display_attr_names: ['title', 'email', 'authorizations', 'updated_at'],
     },
     list_view_options: {
-      find_params: {__sort: 'name,email'}
+      find_params: {__sort: 'name,email'},
     },
     sub_tree_view_options: {
       default_filter: ['Program', 'Control', 'Risk', 'Assessment'],
@@ -191,7 +191,7 @@ import RefreshQueue from './refresh_queue';
         result.resolve(userRoles);
       });
       return result.promise();
-    }
+    },
   }, {
     display_name: function () {
       return this.email;

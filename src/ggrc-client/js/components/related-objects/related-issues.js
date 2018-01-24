@@ -17,14 +17,14 @@ import template from './related-issues.mustache';
       define: {
         orderBy: {
           type: 'string',
-          value: 'created_at'
+          value: 'created_at',
         },
         allRelatedSnapshots: {
-          Value: can.List
+          Value: can.List,
         },
         itemsType: {
           type: 'string',
-          value: 'Issue'
+          value: 'Issue',
         },
         relatedIssuesFilter: {
           type: '*',
@@ -36,20 +36,20 @@ import template from './related-issues.mustache';
                 left: {
                   object_name: type,
                   op: {name: 'relevant'},
-                  ids: [id]
+                  ids: [id],
                 },
                 right: {
                   object_name: type,
                   op: {name: 'similar'},
-                  ids: [id]
+                  ids: [id],
                 },
-                op: {name: 'OR'}
-              }
+                op: {name: 'OR'},
+              },
             };
-          }
-        }
+          },
+        },
       },
-      baseInstance: null
-    }
+      baseInstance: null,
+    },
   });
 })(window.can, window.GGRC);

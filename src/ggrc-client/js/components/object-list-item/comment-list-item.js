@@ -23,56 +23,56 @@ import template from './comment-list-item.mustache';
       define: {
         showIcon: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         iconCls: {
           get: function () {
             return this.attr('showIcon') ?
             'fa-' + this.attr('itemData.title').toLowerCase() :
             '';
-          }
+          },
         },
         itemData: {
           get: function () {
             return this.attr('instance');
-          }
+          },
         },
         commentText: {
           get: function () {
             return this.attr('itemData.description');
-          }
+          },
         },
         commentCreationDate: {
           type: 'date',
           get: function () {
             return new Date(this.attr('itemData.created_at'));
-          }
+          },
         },
         commentAuthor: {
           get: function () {
             return this.attr('itemData.modified_by') || false;
-          }
+          },
         },
         commentAuthorType: {
           get: function () {
             return this.attr('itemData.assignee_type') || false;
-          }
+          },
         },
         hasRevision: {
           get: function () {
             return this.attr('commentRevision') || false;
-          }
+          },
         },
         commentRevision: {
           get: function () {
             return this.attr('itemData.custom_attribute_revision');
-          }
+          },
         },
         customAttributeData: {
           get: function () {
             return this.attr('commentRevision.custom_attribute.title') +
            ':' + this.attr('commentRevision.custom_attribute_stored_value');
-          }
+          },
         },
         isProposalHeaderLink: {
           get() {

@@ -16,12 +16,12 @@ import template from './cycle-task-actions.mustache';
       cycle: {
         get: function () {
           return this.attr('instance').cycle;
-        }
+        },
       },
       workflow: {
         get: function () {
           return this.attr('instance.cycle.workflow');
-        }
+        },
       },
       cssClasses: {
         type: String,
@@ -33,7 +33,7 @@ import template from './cycle-task-actions.mustache';
           }
 
           return classes.join(' ');
-        }
+        },
       },
       isShowActionButtons: {
         get: function () {
@@ -55,7 +55,7 @@ import template from './cycle-task-actions.mustache';
       let status = el.data('value');
       let instance = this.attr('instance');
       let oldValue = {
-        status: instance.attr('status')
+        status: instance.attr('status'),
       };
 
       ev.stopPropagation();
@@ -80,7 +80,7 @@ import template from './cycle-task-actions.mustache';
       }).then(function () {
         this.attr('disabled', false);
       }.bind(this));
-    }
+    },
   });
 
   /**
@@ -92,7 +92,7 @@ import template from './cycle-task-actions.mustache';
     viewModel: viewModel,
     events: {
       inserted: function () {
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

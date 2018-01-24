@@ -22,7 +22,7 @@ import template from './rich-text-form-field.mustache';
             if (!_.isNull(newValue)) {
               this.attr('_value', newValue);
             }
-          }
+          },
         },
         _value: {
           set: function (newValue, setValue, onError, oldValue) {
@@ -37,8 +37,8 @@ import template from './rich-text-form-field.mustache';
             setTimeout(function () {
               this.checkValueChanged();
             }.bind(this), 5000);
-          }
-        }
+          },
+        },
       },
       fieldId: null,
       checkValueChanged: function () {
@@ -52,17 +52,17 @@ import template from './rich-text-form-field.mustache';
         this.dispatch({
           type: 'valueChanged',
           fieldId: this.fieldId,
-          value: newValue
+          value: newValue,
         });
       },
       onBlur: function () {
         this.checkValueChanged();
-      }
+      },
     },
     events: {
       '.ql-editor blur': function () {
         this.viewModel.onBlur();
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

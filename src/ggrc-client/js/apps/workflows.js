@@ -52,14 +52,14 @@ import InfoWidget from '../controllers/info_widget_controller';
     history: {
       name: 'Cycle',
       countsName: historyWidgetCountsName,
-      additionalFilter: historyWidgetFilter
+      additionalFilter: historyWidgetFilter,
     },
     activeCycles: {
       name: 'Cycle',
       countsName: currentWidgetCountsName,
-      additionalFilter: currentWidgetFilter
+      additionalFilter: currentWidgetFilter,
     },
-    taskGroup: 'TaskGroup'
+    taskGroup: 'TaskGroup',
   };
 
   // Register Workflow models for use with `infer_object_type`
@@ -70,7 +70,7 @@ import InfoWidget from '../controllers/info_widget_controller';
       cycle_task_group: CMS.Models.CycleTaskGroup,
       cycle_task_group_object_task: CMS.Models.CycleTaskGroupObjectTask,
       task_group: CMS.Models.TaskGroup,
-      workflow: CMS.Models.Workflow
+      workflow: CMS.Models.Workflow,
     };
   };
 
@@ -89,7 +89,7 @@ import InfoWidget from '../controllers/info_widget_controller';
     let mappings = {
       TaskGroup: {
         _canonical: {
-          objects: _workflowObjectTypes.concat(['Cacheable'])
+          objects: _workflowObjectTypes.concat(['Cacheable']),
         },
         task_group_tasks: Direct(
           'TaskGroupTask', 'task_group', 'task_group_tasks'),
@@ -97,13 +97,13 @@ import InfoWidget from '../controllers/info_widget_controller';
           null, 'object', 'TaskGroupObject', 'task_group',
           'task_group_objects'),
         workflow: Direct(
-          'Workflow', 'task_groups', 'workflow')
+          'Workflow', 'task_groups', 'workflow'),
       },
 
       Workflow: {
         _canonical: {
           task_groups: 'TaskGroup',
-          context: 'Context'
+          context: 'Context',
         },
         task_groups: Direct(
           'TaskGroup', 'workflow', 'task_groups'),
@@ -131,15 +131,15 @@ import InfoWidget from '../controllers/info_widget_controller';
           'task_groups',
           'tasks',
           'current_task_groups',
-          'current_tasks'
-        ])
+          'current_tasks',
+        ]),
       },
 
       Cycle: {
         cycle_task_groups: Direct(
           'CycleTaskGroup', 'cycle', 'cycle_task_groups'),
         reify_cycle_task_groups: Reify('cycle_task_groups'),
-        workflow: Direct('Workflow', 'cycles', 'workflow')
+        workflow: Direct('Workflow', 'cycles', 'workflow'),
       },
 
       CycleTaskGroup: {
@@ -155,7 +155,7 @@ import InfoWidget from '../controllers/info_widget_controller';
         cycle_task_group_object_tasks: Direct(
           'CycleTaskGroupObjectTask',
           'cycle_task_group',
-          'cycle_task_group_tasks')
+          'cycle_task_group_tasks'),
       },
 
       CycleTaskGroupObjectTask: {
@@ -165,8 +165,8 @@ import InfoWidget from '../controllers/info_widget_controller';
             'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
             'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
             'Objective', 'Audit', 'Assessment', 'AccessGroup',
-            'Document', 'Risk', 'Threat'
-          ]
+            'Document', 'Risk', 'Threat',
+          ],
         },
         related_objects_as_source: Proxy(
           null,
@@ -234,9 +234,9 @@ import InfoWidget from '../controllers/info_widget_controller';
         declining_cycle_task_entries: Search(function (binding) {
           return CMS.Models.CycleTaskEntry.findAll({
             cycle_task_group_object_task_id: binding.instance.id,
-            is_declining_review: 1
+            is_declining_review: 1,
           });
-        }, 'Cycle')
+        }, 'Cycle'),
       },
 
       CycleTaskEntry: {
@@ -263,22 +263,22 @@ import InfoWidget from '../controllers/info_widget_controller';
           'CycleTaskGroupObjectTask',
           'cycle_task_entries',
           'cycle_task_group_object_task'),
-        workflow: Cross('cycle', 'workflow')
+        workflow: Cross('cycle', 'workflow'),
       },
       Person: {
         assigned_tasks: Search(function (binding) {
           return CMS.Models.CycleTaskGroupObjectTask.findAll({
             contact_id: binding.instance.id,
             'cycle.is_current': true,
-            status__in: 'Assigned,InProgress,Finished,Declined,Deprecated'
+            status__in: 'Assigned,InProgress,Finished,Declined,Deprecated',
           });
         }, 'Cycle'),
         assigned_tasks_with_history: Search(function (binding) {
           return CMS.Models.CycleTaskGroupObjectTask.findAll({
-            contact_id: binding.instance.id
+            contact_id: binding.instance.id,
           });
-        }, 'Cycle')
-      }
+        }, 'Cycle'),
+      },
     };
 
     // Insert `workflows` mappings to all business object types
@@ -307,12 +307,12 @@ import InfoWidget from '../controllers/info_widget_controller';
         current_approval_cycles: Cross('approval_workflows', 'current_cycle'),
         _canonical: {
           workflows: 'Workflow',
-          task_groups: 'TaskGroup'
-        }
+          task_groups: 'TaskGroup',
+        },
       };
       mappings[type].orphaned_objects = Multi([
         GGRC.Mappings.get_mappings_for(type).orphaned_objects,
-        mappings[type].workflows
+        mappings[type].workflows,
       ]);
 
       CMS.Models[type].attributes.task_group_objects =
@@ -353,15 +353,15 @@ import InfoWidget from '../controllers/info_widget_controller';
             .concat({
               display_name: CMS.Models.CycleTaskGroupObjectTask.title_singular,
               display_status: true,
-              model_name: 'CycleTaskGroupObjectTask'
-            })
+              model_name: 'CycleTaskGroupObjectTask',
+            }),
         });
       }
     });
     subTreeItems.concat(models).forEach(function (item) {
       let defaults = {
         model_list: GGRC.tree_view.basic_model_list,
-        display_list: can.Map.keys(GGRC.tree_view.base_widgets_by_type)
+        display_list: can.Map.keys(GGRC.tree_view.base_widgets_by_type),
       };
       defaults.display_list.concat(models);
 
@@ -370,7 +370,7 @@ import InfoWidget from '../controllers/info_widget_controller';
       subTrees.attr(item, {
         display_list: defaults.display_list
           .concat(models),
-        model_list: defaults.model_list
+        model_list: defaults.model_list,
       });
     });
 
@@ -400,8 +400,8 @@ import InfoWidget from '../controllers/info_widget_controller';
           content_controller_options: {
             mapping: 'workflows',
             parent_instance: pageInstance,
-            model: CMS.Models.Workflow
-          }
+            model: CMS.Models.Workflow,
+          },
         },
         task: {
           widget_id: 'task',
@@ -422,23 +422,23 @@ import InfoWidget from '../controllers/info_widget_controller';
               'show-history': function (el, ev) {
                 this.options.attr('mapping', el.attr('mapping'));
                 this.reload_list();
-              }
-            }
-          }
-        }
+              },
+            },
+          },
+        },
       };
     }
 
     new GGRC.WidgetList('ggrc_workflows', descriptor, [
       'info_widget',
-      'task_widget'
+      'task_widget',
     ]);
   };
 
   WorkflowExtension.init_widgets_for_workflow_page = function () {
     let newWidgetDescriptors = {};
     let newDefaultWidgets = [
-      'info', 'task_group', 'current', 'history'
+      'info', 'task_group', 'current', 'history',
     ];
     let historyWidgetDescriptor;
     let currentWidgetDescriptor;
@@ -468,8 +468,8 @@ import InfoWidget from '../controllers/info_widget_controller';
         info: {
           content_controller: InfoWidget,
           content_controller_options: {
-            widget_view: GGRC.mustache_path + '/workflows/info.mustache'
-          }
+            widget_view: GGRC.mustache_path + '/workflows/info.mustache',
+          },
         },
         task_group: {
           widget_id: 'task_group',
@@ -484,9 +484,9 @@ import InfoWidget from '../controllers/info_widget_controller';
             sortable: true,
             sort_property: 'sort_index',
             mapping: 'task_groups',
-            draw_children: true
-          }
-        }
+            draw_children: true,
+          },
+        },
       }
     );
 
@@ -506,8 +506,8 @@ import InfoWidget from '../controllers/info_widget_controller';
         model: CMS.Models.Cycle,
         countsName: historyWidgetCountsName,
         mapping: 'previous_cycles',
-        additional_filter: historyWidgetFilter
-      }
+        additional_filter: historyWidgetFilter,
+      },
     };
 
     currentWidgetDescriptor = {
@@ -529,8 +529,8 @@ import InfoWidget from '../controllers/info_widget_controller';
         additional_filter: currentWidgetFilter,
         add_item_view:
           GGRC.mustache_path +
-          '/cycle_task_group_object_tasks/tree_add_item.mustache'
-      }
+          '/cycle_task_group_object_tasks/tree_add_item.mustache',
+      },
     };
 
     newWidgetDescriptors.history = historyWidgetDescriptor;
@@ -539,7 +539,7 @@ import InfoWidget from '../controllers/info_widget_controller';
     initCounts([
         WorkflowExtension.countsMap.history,
         WorkflowExtension.countsMap.activeCycles,
-        WorkflowExtension.countsMap.taskGroup
+        WorkflowExtension.countsMap.taskGroup,
       ],
         object.type,
         object.id);
@@ -578,10 +578,10 @@ import InfoWidget from '../controllers/info_widget_controller';
             'show-history': function (el, ev) {
               this.options.attr('mapping', el.attr('mapping'));
               this.reload_list();
-            }
-          }
-        }
-      }
+            },
+          },
+        },
+      },
     };
 
     // add 'Workflows' tab for 'All Objects' view
@@ -594,13 +594,13 @@ import InfoWidget from '../controllers/info_widget_controller';
         content_controller_options: {
           mapping: 'workflows',
           parent_instance: pageInstance,
-          model: CMS.Models.Workflow
-        }
+          model: CMS.Models.Workflow,
+        },
       };
     }
     new GGRC.WidgetList('ggrc_workflows', descriptor, [
       'info_widget',
-      'task_widget'
+      'task_widget',
     ]);
   };
 
@@ -615,7 +615,7 @@ import InfoWidget from '../controllers/info_widget_controller';
       if (this.status && this.os_state === 'Approved') {
         this.attr('status', 'Draft');
       }
-    }
+    },
   });
   can.each(_workflowObjectTypes, function (modelName) {
     let model = CMS.Models[modelName];

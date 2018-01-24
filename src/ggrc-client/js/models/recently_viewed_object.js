@@ -14,12 +14,12 @@ export default can.Model.LocalStorage('GGRC.Models.RecentlyViewedObject', {
         type : attrs.constructor.shortName,
         model : attrs.constructor,
         viewLink : attrs.viewLink,
-        title : title
+        title : title,
       });
     } else {
       return this._super(attrs);
     }
-  }
+  },
 }, {
   init : function() {
     this.attr('model', GGRC.Models[this.type] || CMS.Models[this.type]);
@@ -27,7 +27,7 @@ export default can.Model.LocalStorage('GGRC.Models.RecentlyViewedObject', {
   stub : function() {
     return can.extend(this._super(), {
       title : this.title,
-      viewLink : this.viewLink
+      viewLink : this.viewLink,
     });
-  }
+  },
 });

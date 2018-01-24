@@ -9,7 +9,7 @@ export default can.Control({
   defaults: {
     model: null,
     instance: null,
-    isLoading: true
+    isLoading: true,
   },
   init: function () {
     let that = this;
@@ -17,11 +17,11 @@ export default can.Control({
       if (GGRC.page_object) {
         $.extend(that.defaults, {
           model: GGRC.infer_object_type(GGRC.page_object),
-          instance: GGRC.page_instance()
+          instance: GGRC.page_instance(),
         });
       }
     });
-  }
+  },
 }, {
   init: function () {
     let frag;
@@ -36,12 +36,12 @@ export default can.Control({
       showDashboardList: dashboards.length > 1,
       selectDashboard: function (dashboard) {
         this.attr('activeDashboard', dashboard);
-      }
+      },
     });
 
     frag = can.view(this.options.widget_view,
                     this.options.context);
     this.element.html(frag);
     return 0;
-  }
+  },
 });

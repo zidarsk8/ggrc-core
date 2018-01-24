@@ -12,7 +12,7 @@
     scope: {
       property: '@',
       instance: null,
-      values: {}
+      values: {},
     },
     init: function () {
       let scope = this.scope;
@@ -31,7 +31,7 @@
         let scope = this.scope;
         let values = _.getExistingKeys(scope.attr('values').serialize());
         scope.instance.attr(scope.attr('property'), values.join(','));
-      }
-    }
+      },
+    },
   });
 })(window.can, window.can.$);

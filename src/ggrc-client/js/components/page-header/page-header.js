@@ -35,7 +35,7 @@ import template from './page-header.mustache';
     Section: 'header-style-4',
     Control: 'header-style-4',
     Objective: 'header-style-4',
-    Program: 'header-style-5'
+    Program: 'header-style-5',
   };
 
   let viewModel = can.Map.extend({
@@ -48,28 +48,28 @@ import template from './page-header.mustache';
       },
       showTitles: {
         type: Boolean,
-        value: true
+        value: true,
       },
       model: {
         get: function () {
           return this.attr('instance').class;
-        }
+        },
       },
       instance: {
         get: function () {
           return GGRC.page_instance();
-        }
+        },
       },
       current_user: {
         get: function () {
           return GGRC.current_user;
-        }
+        },
       },
       headerStyle: {
         type: 'string',
         get: function () {
           return colorsMap[this.attr('instance.type')] || '';
-        }
+        },
       },
       logo: {
         type: 'string',
@@ -94,7 +94,7 @@ import template from './page-header.mustache';
       } else {
         this.attr('showTitles', true);
       }
-    }
+    },
   });
 
   GGRC.Components('pageHeader', {
@@ -107,7 +107,7 @@ import template from './page-header.mustache';
       }, 100),
       inserted: function () {
         this.viewModel.showHideTitles(this.element);
-      }
-    }
+      },
+    },
   });
 })(window.GGRC, window.can);

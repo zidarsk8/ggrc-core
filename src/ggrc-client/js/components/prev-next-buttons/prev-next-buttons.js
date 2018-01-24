@@ -14,24 +14,24 @@ import template from './prev-next-buttons.mustache';
     viewModel: {
       define: {
         currentIndex: {
-          type: 'number'
+          type: 'number',
         },
         totalCount: {
-          type: 'number'
+          type: 'number',
         },
         hasNext: {
           get: function () {
             let current = this.attr('currentIndex');
             let total = this.attr('totalCount');
             return current < total - 1;
-          }
+          },
         },
         hasPrev: {
           get: function () {
             let current = this.attr('currentIndex');
             return current > 0;
-          }
-        }
+          },
+        },
       },
       setNext: function () {
         let current = this.attr('currentIndex');
@@ -48,7 +48,7 @@ import template from './prev-next-buttons.mustache';
         if (hasPrev) {
           this.attr('currentIndex', current - 1);
         }
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC, window.CMS);

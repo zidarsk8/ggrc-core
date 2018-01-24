@@ -13,7 +13,7 @@ describe('GGRC.Components.relatedDocuments', function () {
     viewModel = GGRC.Components.getViewModel('relatedDocuments');
     instance = {
       id: '5',
-      type: 'Assessment'
+      type: 'Assessment',
     };
 
     viewModel.attr('instance', instance);

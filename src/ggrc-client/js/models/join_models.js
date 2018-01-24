@@ -40,7 +40,7 @@ import RefreshQueue from './refresh_queue';
         this.bind('created', reinit);
         this.bind('destroyed', reinit);
       }
-    }
+    },
   }, {
     init: function () {
       this._super.apply(this, arguments);
@@ -101,7 +101,7 @@ import RefreshQueue from './refresh_queue';
           that.init_join_object(attr, model.shortName);
         }
       });
-    }
+    },
   });
 
   can.Model.Join('CMS.Models.Snapshot', {
@@ -110,22 +110,22 @@ import RefreshQueue from './refresh_queue';
     attributes: {
       context: 'CMS.Models.Context.stub',
       modified_by: 'CMS.Models.Person.stub',
-      parent: 'CMS.Models.Cacheable.stub'
+      parent: 'CMS.Models.Cacheable.stub',
     },
     join_keys: {
       parent: can.Model.Cacheable,
-      revision: can.Model.Revision
+      revision: can.Model.Revision,
     },
     defaults: {
       parent: null,
-      revision: null
+      revision: null,
     },
     findAll: 'GET /api/snapshots',
     update: 'PUT /api/snapshots/{id}',
     child_instance: function (snapshotData) {
     },
     snapshot_instance: function (snapshotData) {
-    }
+    },
   }, {
     reinit: function () {
       let revision = CMS.Models.Revision.findInCacheById(this.revision_id);
@@ -139,7 +139,7 @@ import RefreshQueue from './refresh_queue';
     },
     description: function () {
       return '';
-    }
+    },
   });
 
   can.Model.Join('CMS.Models.Relationship', {
@@ -149,15 +149,15 @@ import RefreshQueue from './refresh_queue';
       context: 'CMS.Models.Context.stub',
       modified_by: 'CMS.Models.Person.stub',
       source: 'CMS.Models.get_stub',
-      destination: 'CMS.Models.get_stub'
+      destination: 'CMS.Models.get_stub',
     },
     join_keys: {
       source: can.Model.Cacheable,
-      destination: can.Model.Cacheable
+      destination: can.Model.Cacheable,
     },
     defaults: {
       source: null,
-      destination: null
+      destination: null,
     },
     findAll: 'GET /api/relationships',
     create: 'POST /api/relationships',
@@ -166,19 +166,19 @@ import RefreshQueue from './refresh_queue';
     createAssignee: function (options) {
       return new this({
         attrs: {
-          AssigneeType: options.role
+          AssigneeType: options.role,
         },
         source: {
           href: options.source.href,
           type: options.source.type,
-          id: options.source.id
+          id: options.source.id,
         },
         context: options.context,
         destination: {
           href: options.destination.href,
           type: options.destination.type,
-          id: options.destination.id
-        }
+          id: options.destination.id,
+        },
       });
     },
     get_relationship: function (source, destination) {
@@ -237,7 +237,7 @@ import RefreshQueue from './refresh_queue';
       });
       result.resolve(relationships);
       return result.promise();
-    }
+    },
   }, {
     reinit: function () {
       this.attr('source', CMS.Models.get_instance(
@@ -261,12 +261,12 @@ import RefreshQueue from './refresh_queue';
       return $.ajax({
         type: 'DELETE',
         url: '/api/relationships/' + this.attr('id') +
-          '?cascade=' + cascade
+          '?cascade=' + cascade,
       })
       .done(function () {
         can.trigger(this.constructor, 'destroyed', this);
       }.bind(this));
-    }
+    },
   });
 
   can.Model.Join('CMS.Models.UserRole', {
@@ -280,12 +280,12 @@ import RefreshQueue from './refresh_queue';
       context: 'CMS.Models.Context.stub',
       modified_by: 'CMS.Models.Person.stub',
       person: 'CMS.Models.Person.stub',
-      role: 'CMS.Models.Role.stub'
+      role: 'CMS.Models.Role.stub',
     },
     join_keys: {
       person: CMS.Models.Person,
-      role: CMS.Models.Role
-    }
+      role: CMS.Models.Role,
+    },
   }, {
     save: function () {
       let role;
@@ -301,7 +301,7 @@ import RefreshQueue from './refresh_queue';
         return _super.apply(this, arguments);
       }
       return CMS.Models.Role.findAll({
-        name__in: this.role_name
+        name__in: this.role_name,
       }).then(function (role) {
         if (!role.length) {
           return new $.Deferred().reject('Role not found');
@@ -310,7 +310,7 @@ import RefreshQueue from './refresh_queue';
         this.attr('role', role.stub());
         return _super.apply(this, arguments);
       }.bind(this));
-    }
+    },
   });
 
   can.Model.Join('CMS.Models.ObjectPerson', {
@@ -322,19 +322,19 @@ import RefreshQueue from './refresh_queue';
     destroy: 'DELETE /api/object_people/{id}',
     join_keys: {
       personable: can.Model.Cacheable,
-      person: CMS.Models.Person
+      person: CMS.Models.Person,
     },
     attributes: {
       context: 'CMS.Models.Context.stub',
       modified_by: 'CMS.Models.Person.stub',
       person: 'CMS.Models.Person.stub',
-      personable: 'CMS.Models.get_stub'
-    }
+      personable: 'CMS.Models.get_stub',
+    },
 
   }, {});
 
   can.Model.Join('CMS.Models.MultitypeSearchJoin', {
-    join_keys: {}
+    join_keys: {},
   }, {});
 
   can.Model.Join('CMS.Models.AuditObject', {
@@ -345,13 +345,13 @@ import RefreshQueue from './refresh_queue';
     destroy: 'DELETE /api/audit_objects/{id}',
     join_keys: {
       auditable: can.Model.Cacheable,
-      audit: CMS.Models.Audit
+      audit: CMS.Models.Audit,
     },
     attributes: {
       context: 'CMS.Models.Context.stub',
       modified_by: 'CMS.Models.Person.stub',
       audit: 'CMS.Models.Audit.stub',
-      auditable: 'CMS.Models.get_stub'
-    }
+      auditable: 'CMS.Models.get_stub',
+    },
   }, {});
 })(window.can, window.can.$);

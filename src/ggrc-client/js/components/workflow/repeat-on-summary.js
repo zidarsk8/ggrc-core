@@ -30,15 +30,15 @@
               }
             }
             return result;
-          }
+          },
         },
         hideRepeatOff: {
           type: 'boolean',
-          value: true
-        }
+          value: true,
+        },
       },
       unit: null,
-      repeatEvery: null
-    }
+      repeatEvery: null,
+    },
   });
 })(window.can, window.GGRC);

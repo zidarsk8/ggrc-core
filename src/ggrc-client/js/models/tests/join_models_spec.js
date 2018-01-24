@@ -33,11 +33,11 @@ describe('CMS.Models.Relationship ', function () {
         let result;
         instance1 = {
           related_sources: [{id: 1}, {id: 2}, {id: 3}],
-          related_destinations: [{id: 4}]
+          related_destinations: [{id: 4}],
         };
         instance2 = {
           related_sources: [{id: 4}, {id: 5}, {id: 6}],
-          related_destinations: [{id: 7}]
+          related_destinations: [{id: 7}],
         };
 
         result = method(instance1, instance2);
@@ -57,14 +57,14 @@ describe('CMS.Models.Relationship ', function () {
           related_destinations: [{id: 4}],
           refresh: function () {
             return this;
-          }
+          },
         };
         instance2 = {
           related_sources: [{id: 7}, {id: 5}, {id: 6}],
           related_destinations: [{id: 8}],
           refresh: function () {
             return this;
-          }
+          },
         };
 
         result = method(instance1, instance2);
@@ -81,11 +81,11 @@ describe('CMS.Models.Relationship ', function () {
           let result;
           instance1 = {
             related_sources: [{id: 1}, {id: 2}, {id: 3}],
-            related_destinations: [{id: 4}]
+            related_destinations: [{id: 4}],
           };
           instance2 = {
             related_sources: [{id: 7}, {id: 5}, {id: 6}],
-            related_destinations: [{id: 8}]
+            related_destinations: [{id: 8}],
           };
           result = method(instance1, instance2, true);
 
@@ -103,7 +103,7 @@ describe('CMS.Models.Relationship ', function () {
           related_destinations: [{id: 4}],
           refresh: function () {
             return this;
-          }
+          },
         };
         instance2 = {
           related_sources: [{id: 7}, {id: 5}, {id: 6}],
@@ -112,7 +112,7 @@ describe('CMS.Models.Relationship ', function () {
             let self = this;
             self.related_destinations.push({id: 4});
             return self;
-          }
+          },
         };
 
         result = method(instance1, instance2);
@@ -128,11 +128,11 @@ describe('CMS.Models.Relationship ', function () {
         let result;
         instance1 = {
           related_sources: [{id: 1}, {id: 2}, {id: 3}],
-          related_destinations: [{id: 4}, {id: 5}]
+          related_destinations: [{id: 4}, {id: 5}],
         };
         instance2 = {
           related_sources: [{id: 4}, {id: 7}, {id: 5}, {id: 6}],
-          related_destinations: [{id: 8}]
+          related_destinations: [{id: 8}],
         };
 
         result = method(instance1, instance2);
@@ -161,7 +161,7 @@ describe('CMS.Models.Relationship ', function () {
           related_destinations: [{id: 4}],
           refresh: function () {
             return this;
-          }
+          },
         };
         instance2 = {
           related_sources: [{id: 7}, {id: 5}, {id: 6}],
@@ -170,7 +170,7 @@ describe('CMS.Models.Relationship ', function () {
             let self = this;
             self.related_destinations.push({id: 4});
             return self;
-          }
+          },
         };
 
         result = method(instance1, instance2);

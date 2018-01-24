@@ -16,8 +16,8 @@
     attributes: {
       context: 'CMS.Models.Context.stub',
       related_object: 'CMS.Models.get_stub',
-      user_roles: 'CMS.Models.UserRole.stubs'
-    }
+      user_roles: 'CMS.Models.UserRole.stubs',
+    },
   }, {});
 
   can.Model.Cacheable('CMS.Models.Program', {
@@ -51,7 +51,7 @@
       directives: 'CMS.Models.Directive.stubs',
       controls: 'CMS.Models.Control.stubs',
       audits: 'CMS.Models.Audit.stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/programs/tree-item-attr.mustache',
@@ -59,16 +59,16 @@
         {
           attr_title: 'Manager',
           attr_name: 'owner',
-          attr_sort_field: 'authorizations.0.person.name|email'
-        }
+          attr_sort_field: 'authorizations.0.person.name|email',
+        },
       ].concat(can.Model.Cacheable.attr_list.filter(function (attr) {
         return attr.attr_name !== 'owner';
       })).concat([
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
-        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
+        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       ]),
-      add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+      add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
     },
     sub_tree_view_options: {
       default_filter: ['Standard'],
@@ -83,16 +83,16 @@
       DataAsset: {},
       AccessGroup: {},
       Product: {},
-      Market: {}
+      Market: {},
     },
     defaults: {
-      status: 'Draft'
+      status: 'Draft',
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
       this.validateNonBlank('title');
       this._super.apply(this, arguments);
-    }
+    },
   }, {});
 
   can.Model.Cacheable('CMS.Models.Option', {
@@ -115,7 +115,7 @@
           });
       }
       return $.when(this.cache_by_role[role]);
-    }
+    },
   }, {});
 
   can.Model.Cacheable('CMS.Models.Objective', {
@@ -147,7 +147,7 @@
       related_sources: 'CMS.Models.Relationship.stubs',
       related_destinations: 'CMS.Models.Relationship.stubs',
       objective_objects: 'CMS.Models.ObjectObjective.stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/objectives/tree-item-attr.mustache',
@@ -155,9 +155,9 @@
         {
           attr_title: 'Last Assessment Date',
           attr_name: 'last_assessment_date',
-          order: 45 // between State and Primary Contact
+          order: 45, // between State and Primary Contact
         },
-        {attr_title: 'Reference URL', attr_name: 'reference_url'}
+        {attr_title: 'Reference URL', attr_name: 'reference_url'},
       ]),
       display_attr_names: ['title', 'owner', 'status', 'last_assessment_date',
         'updated_at'],
@@ -165,19 +165,19 @@
       create_link: true,
       show_related_assessments: true,
       // draw_children: true,
-      start_expanded: false
+      start_expanded: false,
     },
     sub_tree_view_options: {
       default_filter: ['Control'],
     },
     defaults: {
-      status: 'Draft'
+      status: 'Draft',
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
       this.validateNonBlank('title');
       this._super.apply(this, arguments);
-    }
+    },
   }, {});
 
   can.Model.Cacheable('CMS.Models.Help', {
@@ -187,7 +187,7 @@
     findOne: 'GET /api/help/{id}',
     update: 'PUT /api/help/{id}',
     destroy: 'DELETE /api/help/{id}',
-    create: 'POST /api/help'
+    create: 'POST /api/help',
   }, {});
 
   can.Model.Cacheable('CMS.Models.Label', {
@@ -208,12 +208,12 @@
     findAll: 'GET /api/events',
     list_view_options: {
       find_params: {
-        __include: 'revisions'
-      }
+        __include: 'revisions',
+      },
     },
     attributes: {
-      modified_by: 'CMS.Models.Person.stub'
-    }
+      modified_by: 'CMS.Models.Person.stub',
+    },
   }, {});
 
   can.Model.Cacheable('CMS.Models.Role', {
@@ -227,16 +227,16 @@
     scopes: [
       'Private Program',
       'Workflow',
-      'System'
+      'System',
     ],
     defaults: {
       permissions: {
         read: [],
         update: [],
         create: [],
-        'delete': []
-      }
-    }
+        'delete': [],
+      },
+    },
   }, {
     allowed: function (operation, objectOrClass) {
       let cls = typeof objectOrClass === 'function' ?
@@ -258,7 +258,7 @@
         return RoleList[this.name];
       }
       return this.name;
-    }
+    },
   });
 
   can.Model.Cacheable('CMS.Models.MultitypeSearch', {}, {});
@@ -272,7 +272,7 @@
     destroy: 'DELETE /api/background_tasks/{id}',
     create: 'POST /api/background_tasks',
     scopes: [],
-    defaults: {}
+    defaults: {},
   }, {
     poll: function () {
       let dfd = new $.Deferred();
@@ -291,7 +291,7 @@
       }
       _poll();
       return dfd;
-    }
+    },
   });
 
   CMS.Models.get_instance = function (objectType, objectId, paramsOrObject) {
@@ -348,7 +348,7 @@
       } else {
         instance = new model({
           id: objectId,
-          href: (paramsOrObject || {}).href
+          href: (paramsOrObject || {}).href,
         });
       }
     }

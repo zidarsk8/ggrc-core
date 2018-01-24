@@ -16,7 +16,7 @@ import Clipboard from 'clipboard';
       notify: '@',
       isActive: false,
       timeout: '@',
-      notifyText: 'Link has been copied to your clipboard.'
+      notifyText: 'Link has been copied to your clipboard.',
     },
     template: ['<a data-clipboard-text="{{text}}" {{#isActive}}class="active"{{/isActive}} href="#">',
                '<i class="fa fa-link"></i> {{title}}',
@@ -38,8 +38,8 @@ import Clipboard from 'clipboard';
             this.scope.attr('isActive', false);
           }.bind(this), timeout);
         }.bind(this));
-      }
-    }
+      },
+    },
   });
 
 })(window.can, window.can.$);

@@ -8,7 +8,7 @@
    */
 let cachedObjects = {};
 let modelsIncludeVersions = [
-  'Issue'
+  'Issue',
 ];
 
 /**
@@ -46,7 +46,7 @@ function _getObjectVersionConfig(modelName, forceBuildFromOriginal) {
       originalModelName: originalModelName,
       widgetId: modelName,
       widgetName: CMS.Models[originalModelName].title_plural +
-        ' Versions'
+        ' Versions',
     };
   }
 
@@ -54,7 +54,7 @@ function _getObjectVersionConfig(modelName, forceBuildFromOriginal) {
     originalModelName: modelName,
     widgetId: modelName + '_versions',
     widgetName: CMS.Models[modelName].title_plural +
-      ' Versions'
+      ' Versions',
   };
 }
 
@@ -95,7 +95,7 @@ function getWidgetConfig(modelName, buildVersionFromOriginal) {
     countsName: modelName,
     responseType: responseType,
     additionalFilter: additionalFilter,
-    isObjectVersion: isObjectVersion
+    isObjectVersion: isObjectVersion,
   };
 
   cachedObjects.modelName = configObject;

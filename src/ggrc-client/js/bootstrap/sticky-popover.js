@@ -105,7 +105,7 @@
             self.$element.data('popover-loaded', true);
             if (self.displayState === 'show')
               self.show(true);
-          }
+          },
         });
       }
     }
@@ -122,7 +122,7 @@
       //   in the wrong place
       e.currentTarget = this.$element[0];
       $.fn.popover.Constructor.prototype.leave.apply(this, arguments);
-    }
+    },
   })
 
 

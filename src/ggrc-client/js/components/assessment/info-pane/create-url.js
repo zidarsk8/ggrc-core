@@ -30,7 +30,7 @@
           document_type: this.attr('type'),
           created_at: new Date(),
           isDraft: true,
-          _stamp: Date.now()
+          _stamp: Date.now(),
         };
 
         document = new CMS.Models.Document(attrs);
@@ -46,7 +46,7 @@
       },
       clear: function () {
         this.attr('value', null);
-      }
-    }
+      },
+    },
   });
 })(window.GGRC, window.CMS, window.can);

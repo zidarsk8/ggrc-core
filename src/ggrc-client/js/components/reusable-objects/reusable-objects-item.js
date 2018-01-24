@@ -30,8 +30,8 @@ import template from './reusable-objects-item.mustache';
 
             return this.attr('instance.isMapped') ||
               isMapped;
-          }
-        }
+          },
+        },
       },
       isSaving: false,
       instance: {},
@@ -57,7 +57,7 @@ import template from './reusable-objects-item.mustache';
         if (isChecked && !this.isSelected()) {
           list.push({
             id: this.attr('instance.id'),
-            type: this.attr('instance.type')
+            type: this.attr('instance.type'),
           });
         } else if (!isChecked) {
           list.forEach(function (item, i) {
@@ -73,7 +73,7 @@ import template from './reusable-objects-item.mustache';
             list.splice(index, 1);
           }
         }
-      }
+      },
     },
     init: function () {
       if (this.viewModel.isSelected()) {
@@ -83,7 +83,7 @@ import template from './reusable-objects-item.mustache';
     events: {
       '{viewModel} isChecked': function (scope, ev, isChecked) {
         this.viewModel.toggleSelection(isChecked);
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

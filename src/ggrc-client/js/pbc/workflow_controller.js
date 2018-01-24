@@ -58,9 +58,9 @@
       return new CMS.Models.Relationship({
         source: source.stub(),
         destination: destination,
-        context: context
+        context: context,
       }).save();
-    }
+    },
   });
 
   $(function () {

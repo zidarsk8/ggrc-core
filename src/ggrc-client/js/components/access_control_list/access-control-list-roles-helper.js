@@ -17,7 +17,7 @@ export default GGRC.Components('accessControlListRolesHelper', {
       let instance = this.attr('instance');
       let autoPopulatedRoles = _.filter(GGRC.access_control_roles, {
         object_type: instance.class.model_singular,
-        default_to_current_user: true
+        default_to_current_user: true,
       });
 
       if (!autoPopulatedRoles.length) {
@@ -31,16 +31,16 @@ export default GGRC.Components('accessControlListRolesHelper', {
       autoPopulatedRoles.forEach(function (role) {
         instance.attr('access_control_list').push({
           ac_role_id: role.id,
-          person: {type: 'Person', id: GGRC.current_user.id}
+          person: {type: 'Person', id: GGRC.current_user.id},
         });
       });
-    }
+    },
   },
   events: {
     inserted: function () {
       if (this.viewModel.attr('isNewInstance')) {
         this.viewModel.setAutoPopulatedRoles();
       }
-    }
-  }
+    },
+  },
 });

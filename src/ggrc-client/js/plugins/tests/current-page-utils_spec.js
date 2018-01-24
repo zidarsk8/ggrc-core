@@ -138,7 +138,7 @@ describe('GGRC Utils CurrentPage', function () {
         .and.returnValue({
           control: {},
           Assessment: {},
-          objective: {}
+          objective: {},
         });
       method = CurrentPageUtils.getWidgetList;
     });
@@ -177,7 +177,7 @@ describe('GGRC Utils CurrentPage', function () {
         control: {},
         assessment: {},
         objective: {},
-        info: {}
+        info: {},
       }, '/assessments_view');
 
       expect(result).toContain('info');
@@ -188,7 +188,7 @@ describe('GGRC Utils CurrentPage', function () {
         control: {},
         assessment: {},
         objective: {},
-        info: {}
+        info: {},
       }, '/objectBrowser/');
 
       expect(result).not.toContain('info');
@@ -205,33 +205,33 @@ describe('GGRC Utils CurrentPage', function () {
             widgetType: 'treeview',
             content_controller_options: {
               model: {
-                shortName: 'Control'
-              }
-            }
+                shortName: 'Control',
+              },
+            },
           },
           Assessment: {
             widgetType: 'treeview',
             content_controller_options: {
               model: {
-                shortName: 'Assessment'
-              }
-            }
+                shortName: 'Assessment',
+              },
+            },
           },
           objective: {
             widgetType: 'treeview',
             content_controller_options: {
               model: {
-                shortName: 'Objective'
-              }
-            }
+                shortName: 'Objective',
+              },
+            },
           },
           info: {
             content_controller_options: {
               model: {
-                shortName: 'Info'
-              }
-            }
-          }
+                shortName: 'Info',
+              },
+            },
+          },
         });
       method = CurrentPageUtils.getWidgetModels;
     });
@@ -284,7 +284,7 @@ describe('GGRC Utils CurrentPage', function () {
         .and.returnValue({
           type: 'Assessment',
           id: id,
-          operation: 'owned'
+          operation: 'owned',
         });
       spyOn(SnapshotUtils, 'isSnapshotRelated')
         .and.callFake(function (type, widgetType) {
@@ -293,7 +293,7 @@ describe('GGRC Utils CurrentPage', function () {
       spyOn(QueryAPI, 'buildParam')
         .and.callFake(function (objName) {
           return {
-            objectName: objName
+            objectName: objName,
           };
         });
 
@@ -325,8 +325,8 @@ describe('GGRC Utils CurrentPage', function () {
 
       queryDfd.resolve({
         Snapshot: {
-          total: 10
-        }
+          total: 10,
+        },
       });
 
       result = getCounts();
@@ -342,14 +342,14 @@ describe('GGRC Utils CurrentPage', function () {
       expect(QueryAPI.batchRequests)
         .toHaveBeenCalledWith({
           type: 'count',
-          objectName: 'Assessment'
+          objectName: 'Assessment',
         }
         );
 
       queryDfd.resolve({
         Assessment: {
-          total: 10
-        }
+          total: 10,
+        },
       });
 
       result = getCounts();
@@ -362,19 +362,19 @@ describe('GGRC Utils CurrentPage', function () {
 
       method([{
         name: 'Cycle',
-        countsName: 'ActiveCycle'
+        countsName: 'ActiveCycle',
       }], 'Control', 1);
 
       expect(QueryAPI.batchRequests)
         .toHaveBeenCalledWith({
           type: 'count',
-          objectName: 'Cycle'
+          objectName: 'Cycle',
         });
 
       queryDfd.resolve({
         Cycle: {
-          total: 10
-        }
+          total: 10,
+        },
       });
 
       result = getCounts();
@@ -394,7 +394,7 @@ describe('GGRC Utils CurrentPage', function () {
         .and.callFake(function (objName, page, relevant, additionalFilter) {
           return {
             model: objName,
-            operation: 'relevant'
+            operation: 'relevant',
           };
         });
 
@@ -435,8 +435,8 @@ describe('GGRC Utils CurrentPage', function () {
         requestDfds.forEach(function (dfd) {
           dfd.resolve({
             Snapshot: {
-              ids: snapshotIds
-            }
+              ids: snapshotIds,
+            },
           });
         });
       });
@@ -460,8 +460,8 @@ describe('GGRC Utils CurrentPage', function () {
         requestDfds.forEach(function (dfd) {
           dfd.resolve({
             Assessment: {
-              ids: nonSnapshotIds
-            }
+              ids: nonSnapshotIds,
+            },
           });
         });
       });

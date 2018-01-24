@@ -16,7 +16,7 @@ describe('GGRC.Components.dropdown', function () {
     it('when input is an array of strings', function () {
       let list = ['a', 'b', 'c', 'd'];
       let frag = template({
-        list: list
+        list: list,
       });
       frag = $(frag);
 
@@ -31,19 +31,19 @@ describe('GGRC.Components.dropdown', function () {
     it('when input is an array of values', function () {
       let list = [{
         title: 'a',
-        value: 1
+        value: 1,
       }, {
         title: 'b',
-        value: 2
+        value: 2,
       }, {
         title: 'c',
-        value: 3
+        value: 3,
       }, {
         title: 'd',
-        value: 4
+        value: 4,
       }];
       let frag = template({
-        list: list
+        list: list,
       });
       frag = $(frag);
 
@@ -59,40 +59,40 @@ describe('GGRC.Components.dropdown', function () {
     it('when input is an array of grouped values', function () {
       let list = [{
         title: 'a',
-        value: 1
+        value: 1,
       }, {
         group: 'AA',
         subitems: [{
           title: 'aa',
-          value: 11
+          value: 11,
         }, {
           title: 'ab',
-          value: 12
+          value: 12,
         }, {
           title: 'ac',
-          value: 13
+          value: 13,
         }, {
           title: 'ad',
-          value: 14
-        }]
+          value: 14,
+        }],
       }, {
         group: 'BB',
         subitems: [{
           title: 'ba',
-          value: 21
+          value: 21,
         }, {
           title: 'bb',
-          value: 22
+          value: 22,
         }, {
           title: 'bc',
-          value: 23
+          value: 23,
         }, {
           title: 'bd',
-          value: 24
-        }]
+          value: 24,
+        }],
       }];
       let frag = template({
-        list: list
+        list: list,
       });
       let groups = _.filter(list, function (item) {
         return item.group;
@@ -119,7 +119,7 @@ describe('GGRC.Components.dropdown', function () {
     let optionsList = [
       {title: 'title 1', value: 'value1'},
       {title: 'title 2', value: 'value2'},
-      {title: 'title 3', value: 'value3'}
+      {title: 'title 3', value: 'value3'},
     ];
 
     let optionsGroups = {
@@ -128,16 +128,16 @@ describe('GGRC.Components.dropdown', function () {
         items: [
           {value: 'gr_1_value_1', name: 'gr 1 name 1'},
           {value: 'gr_1_value_2', name: 'gr 1 name 2'},
-          {value: 'gr_1_value_3', name: 'gr 1 name 3'}
-        ]
+          {value: 'gr_1_value_3', name: 'gr 1 name 3'},
+        ],
       },
       group2: {
         name: 'group 2',
         items: [
           {value: 'gr_2_value_1', name: 'gr 2 name 1'},
-          {value: 'gr_2_value_2', name: 'gr 2 name 2'}
-        ]
-      }
+          {value: 'gr_2_value_2', name: 'gr 2 name 2'},
+        ],
+      },
     };
 
     beforeEach(function () {

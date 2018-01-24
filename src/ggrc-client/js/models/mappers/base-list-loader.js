@@ -9,7 +9,7 @@ import RefreshQueue from '../refresh_queue';
   can.Construct('GGRC.ListLoaders.BaseListLoader', {
     binding_factory: function (instance, loader) {
       return new GGRC.ListLoaders.ListBinding(instance, loader);
-    }
+    },
   }, {
     init: function () {
     },
@@ -225,6 +225,6 @@ import RefreshQueue from '../refresh_queue';
           });
           return refreshQueue.trigger();
         });
-    }
+    },
   });
 })(window.GGRC, window.can);

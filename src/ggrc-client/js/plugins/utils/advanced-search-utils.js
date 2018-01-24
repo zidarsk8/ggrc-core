@@ -17,7 +17,7 @@ let create = {
   attribute: function (value) {
     return {
       type: 'attribute',
-      value: value || { }
+      value: value || { },
     };
   },
   /**
@@ -28,7 +28,7 @@ let create = {
   group: function (value) {
     return {
       type: 'group',
-      value: value || []
+      value: value || [],
     };
   },
   /**
@@ -39,7 +39,7 @@ let create = {
   operator: function (value) {
     return {
       type: 'operator',
-      value: value || ''
+      value: value || '',
     };
   },
   /**
@@ -50,7 +50,7 @@ let create = {
   state: function (value) {
     return {
       type: 'state',
-      value: value || { }
+      value: value || { },
     };
   },
   /**
@@ -61,9 +61,9 @@ let create = {
   mappingCriteria: function (value) {
     return {
       type: 'mappingCriteria',
-      value: value || { }
+      value: value || { },
     };
-  }
+  },
 };
 
 /**
@@ -104,7 +104,7 @@ let builders = {
   operator: operatorToFilter,
   state: stateToFilter,
   group: groupToFilter,
-  mappingCriteria: mappingCriteriaToFilter
+  mappingCriteria: mappingCriteriaToFilter,
 };
 /**
  * Transforms Filter Attribute model to valid QueryAPI filter string.
@@ -183,7 +183,7 @@ function addMappingCriteria(mapping, request) {
   request.push({
     object_name: mapping.objectName,
     type: 'ids',
-    filters: filterObject
+    filters: filterObject,
   });
   return request.length - 1;
 }

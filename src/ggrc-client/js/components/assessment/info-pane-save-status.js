@@ -9,7 +9,7 @@
   GGRC.Components('infoPaneSaveStatus', {
     tag: 'info-pane-save-status',
     viewModel: {
-      infoPaneSaving: false
-    }
+      infoPaneSaving: false,
+    },
   });
 })(window.can, window.GGRC);

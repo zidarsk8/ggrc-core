@@ -16,7 +16,7 @@ import template from './readonly-inline-content.mustache';
     viewModel: {
       withReadMore: false,
       value: '@',
-      withDetails: false
-    }
+      withDetails: false,
+    },
   });
 })(window.can, window.GGRC);

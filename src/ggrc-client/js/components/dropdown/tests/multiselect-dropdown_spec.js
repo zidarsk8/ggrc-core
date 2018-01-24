@@ -46,7 +46,7 @@ describe('GGRC.Components.multiselectDropdown', function () {
 
       beforeEach(function () {
         that = {
-          viewModel: viewModel
+          viewModel: viewModel,
         };
         method = events['{window} click'].bind(that);
       });

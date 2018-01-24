@@ -22,9 +22,9 @@ import template from './custom-attributes.mustache';
           type: 'valueChanged',
           fieldId: e.fieldId,
           value: e.value,
-          field: field
+          field: field,
         });
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC, window.jQuery);

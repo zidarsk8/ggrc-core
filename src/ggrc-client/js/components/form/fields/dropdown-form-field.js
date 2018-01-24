@@ -18,7 +18,7 @@ import template from './dropdown-form-field.mustache';
           get: function () {
             return this.attr('value') === null &&
               this.attr('disabled');
-          }
+          },
         },
         _value: {
           type: 'string',
@@ -29,17 +29,17 @@ import template from './dropdown-form-field.mustache';
               return;
             }
             this.valueChanged(newValue);
-          }
+          },
         },
         value: {
           set: function (newValue, setValue) {
             setValue(newValue);
             this.attr('_value', newValue);
-          }
+          },
         },
         fieldId: {
-          type: 'number'
-        }
+          type: 'number',
+        },
       },
       options: [],
       isGroupedDropdown: false,
@@ -49,9 +49,9 @@ import template from './dropdown-form-field.mustache';
         this.dispatch({
           type: 'valueChanged',
           fieldId: this.attr('fieldId'),
-          value: newValue
+          value: newValue,
         });
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

@@ -33,13 +33,13 @@ describe('GGRC.Components.dateFormField', function () {
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',
-      value: 'newValue'
+      value: 'newValue',
     });
     viewModel.attr('_value', 'newValue2');
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',
-      value: 'newValue2'
+      value: 'newValue2',
     });
   });
 });

@@ -28,19 +28,19 @@ describe('GGRC.Components.objectList', function () {
     let scope = new can.Map({
       instance: {
         type: 'a',
-        id: 1
+        id: 1,
       },
-      isSelected: false
+      isSelected: false,
     });
 
     let items = new can.List([
       scope, {
         instance: {
           type: 'b',
-          id: 1
+          id: 1,
         },
-        isSelected: false
-      }
+        isSelected: false,
+      },
     ]);
     beforeEach(function () {
       viewModel = GGRC.Components.getViewModel('objectList');
@@ -66,16 +66,16 @@ describe('GGRC.Components.objectList', function () {
       scope = new can.Map({
         instance: {
           type: 'a',
-          id: 1
+          id: 1,
         },
-        isSelected: false
+        isSelected: false,
       });
       items = new can.List([scope, {
         instance: {
           type: 'b',
-          id: 1
+          id: 1,
         },
-        isSelected: false
+        isSelected: false,
       }]);
       viewModel = GGRC.Components.getViewModel('objectList');
       viewModel.attr('items', items);
@@ -83,8 +83,8 @@ describe('GGRC.Components.objectList', function () {
       viewModel.attr('selectedItem', {
         el: 'some object',
         data: new can.Map({
-          field: 'someData'
-        })
+          field: 'someData',
+        }),
       });
     });
 

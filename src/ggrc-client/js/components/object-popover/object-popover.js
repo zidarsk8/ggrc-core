@@ -22,8 +22,8 @@ import template from './object-popover.mustache';
       define: {
         hideTitle: {
           type: Boolean,
-          value: false
-        }
+          value: false,
+        },
       },
       expanded: false,
       direction: 'left',
@@ -59,7 +59,7 @@ import template from './object-popover.mustache';
         this.attr('active', style.length);
         this.attr('openStyle', style);
         this.attr('expanded', false);
-      }
+      },
     },
     events: {
       '{viewModel.item} el': function (scope, ev, el) {
@@ -74,7 +74,7 @@ import template from './object-popover.mustache';
           defaultMaxInnerHeight * 2 :
           defaultMaxInnerHeight;
         this.viewModel.attr('maxInnerHeight', maxInnerHeight);
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

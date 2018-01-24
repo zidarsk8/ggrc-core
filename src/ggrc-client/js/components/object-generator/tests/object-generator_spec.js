@@ -61,10 +61,10 @@ describe('GGRC.Components.objectGenerator', function () {
       viewModel.attr({
         selected: [1, 2, 3],
         entries: [3, 2, 1],
-        onSubmit: function () {}
+        onSubmit: function () {},
       });
       that = {
-        viewModel: viewModel
+        viewModel: viewModel,
       };
       handler = events.inserted;
     });
@@ -88,12 +88,12 @@ describe('GGRC.Components.objectGenerator', function () {
     beforeEach(function () {
       viewModel.attr({});
       spyObj = {
-        trigger: function () {}
+        trigger: function () {},
       };
       element = {
         find: function () {
           return spyObj;
-        }
+        },
       };
       spyOn(spyObj, 'trigger');
       handler = events.closeModal;
@@ -103,14 +103,14 @@ describe('GGRC.Components.objectGenerator', function () {
       viewModel.attr('is_saving', true);
       handler.call({
         element: element,
-        viewModel: viewModel
+        viewModel: viewModel,
       });
       expect(viewModel.attr('is_saving')).toEqual(false);
     });
     it('dismiss the modal', function () {
       handler.call({
         element: element,
-        viewModel: viewModel
+        viewModel: viewModel,
       });
       expect(spyObj.trigger).toHaveBeenCalledWith('click');
     });
@@ -130,18 +130,18 @@ describe('GGRC.Components.objectGenerator', function () {
         object: 'Program',
         assessmentTemplate: 'template',
         join_object_id: '123',
-        selected: []
+        selected: [],
       });
       spyOn(CMS.Models.Program, 'findInCacheById')
         .and.returnValue('instance');
       event = {
-        preventDefault: function () {}
+        preventDefault: function () {},
       };
       element = $('<div></div>');
       handler = events['.modal-footer .btn-map click'];
       that = {
         viewModel: viewModel,
-        closeModal: jasmine.createSpy()
+        closeModal: jasmine.createSpy(),
       };
       spyOn(RefreshQueue.prototype, 'enqueue')
         .and.returnValue({
@@ -170,7 +170,7 @@ describe('GGRC.Components.objectGenerator', function () {
         target: 'Program',
         instance: 'instance',
         assessmentTemplate: 'template',
-        context: that
+        context: that,
       });
     });
   });

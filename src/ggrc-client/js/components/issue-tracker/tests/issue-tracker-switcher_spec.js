@@ -62,7 +62,7 @@ describe('GGRC.Components.issueTrackerSwitcher', () => {
           title: '',
         },
         title: 'My Assessment',
-        type: 'Assessment'
+        type: 'Assessment',
       };
 
       setDefaultIssueTitle = viewModel.setDefaultIssueTitle

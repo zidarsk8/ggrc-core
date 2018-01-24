@@ -10,7 +10,7 @@
         changeYear: true,
         prevText: "",
         nextText: "",
-        dateFormat: "mm/dd/yy"
+        dateFormat: "mm/dd/yy",
       };
 
   $body.on("focus", "[data-toggle=\"datepicker\"]", function (ev) {

@@ -29,8 +29,8 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
       instance = new CMS.Models.CycleTaskGroupObjectTask({
         status: 'Assigned',
         cycle: {
-          is_current: false
-        }
+          is_current: false,
+        },
       });
 
       spyOn(instance.cycle, 'reify').and.returnValue(instance.cycle);

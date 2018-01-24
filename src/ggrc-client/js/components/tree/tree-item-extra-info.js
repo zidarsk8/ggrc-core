@@ -15,7 +15,7 @@ import template from './templates/tree-item-extra-info.mustache';
     define: {
       isSubTreeItem: {
         type: 'htmlbool',
-        value: false
+        value: false,
       },
       isActive: {
         type: 'boolean',
@@ -24,32 +24,32 @@ import template from './templates/tree-item-extra-info.mustache';
             this.attr('isDirective') ||
             this.attr('isCycleTasks') ||
             this.attr('isSection');
-        }
+        },
       },
       isDirective: {
         type: 'boolean',
         get: function () {
           return this.attr('instance') instanceof CMS.Models.Directive;
-        }
+        },
       },
       isSection: {
         type: 'boolean',
         get: function () {
           return this.attr('instance') instanceof CMS.Models.Section;
-        }
+        },
       },
       isCycleTaskGroupObjectTask: {
         type: 'boolean',
         get: function () {
           return this.attr('instance') instanceof
             CMS.Models.CycleTaskGroupObjectTask;
-        }
+        },
       },
       isCycleTaskGroup: {
         type: 'boolean',
         get: function () {
           return this.attr('instance') instanceof CMS.Models.CycleTaskGroup;
-        }
+        },
       },
       isCycleTasks: {
         type: 'boolean',
@@ -57,41 +57,41 @@ import template from './templates/tree-item-extra-info.mustache';
           return this.attr('isCycleTaskGroup') ||
             this.attr('isCycleTaskGroupObjectTask') ||
             this.attr('instance') instanceof CMS.Models.Cycle;
-        }
+        },
       },
       isLoading: {
         type: 'boolean',
-        value: false
+        value: false,
       },
       readyStatus: {
         type: 'boolean',
-        value: false
+        value: false,
       },
       raisePopover: {
         type: 'boolean',
         value: false,
         get: function () {
           return this.attr('hovered') || this.attr('readyStatus');
-        }
+        },
       },
       disablePopover: {
         type: 'boolean',
         get: function () {
           return this.attr('instance') instanceof CMS.Models.Cycle;
-        }
+        },
       },
       drawStatuses: {
         type: 'boolean',
         get: function () {
           return !!this.attr('instance.workflow_state');
-        }
+        },
       },
       isShowOverdue: {
         type: 'boolean',
         get: function () {
           return this.attr('isCycleTaskGroup') ||
             this.attr('isCycleTaskGroupObjectTask');
-        }
+        },
       },
       isOverdue: {
         type: 'boolean',
@@ -105,7 +105,7 @@ import template from './templates/tree-item-extra-info.mustache';
             this.attr('instance.isOverdue');
 
           return isWorkflowOverdue || isCycleTasksOverdue;
-        }
+        },
       },
       cssClasses: {
         type: 'string',
@@ -127,8 +127,8 @@ import template from './templates/tree-item-extra-info.mustache';
           }
 
           return classes.join(' ');
-        }
-      }
+        },
+      },
     },
     onEnter: function () {
       this.attr('active', true);
@@ -156,12 +156,12 @@ import template from './templates/tree-item-extra-info.mustache';
     contentPromises: [],
     dfdReady: can.Deferred(),
     classes: [],
-    instance: null
+    instance: null,
   });
 
   GGRC.Components('treeItemExtraInfo', {
     tag: 'tree-item-extra-info',
     template: template,
-    viewModel: viewModel
+    viewModel: viewModel,
   });
 })(window.can, window.GGRC);

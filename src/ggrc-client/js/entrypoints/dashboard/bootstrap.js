@@ -32,7 +32,7 @@ extraPageOptions = {
   Program: {
     page_title: function (controller) {
       return 'GRC Program: ' + controller.options.instance.title;
-    }
+    },
   },
   Person: {
     page_title: function (controller) {
@@ -42,8 +42,8 @@ extraPageOptions = {
         'GRC Profile: ' +
         (instance.name && instance.name.trim()) ||
         (instance.email && instance.email.trim());
-    }
-  }
+    },
+  },
 };
 
 initWidgets();
@@ -68,5 +68,5 @@ $area.cms_controllers_page_object(can.extend({
   page_help: function (controller) {
     return controller.options.instance.constructor.table_singular;
   },
-  current_user: GGRC.current_user
+  current_user: GGRC.current_user,
 }, extraPageOptions[modelName]));

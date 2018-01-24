@@ -23,7 +23,7 @@
       updateContent: function () {
         let array = this.attr('array') || [];
         this.attr('content', array.join(this.attr('delimeter')));
-      }
+      },
     },
     events: {
       'textarea change': function (el, ev) {
@@ -31,7 +31,7 @@
         this.scope.attr('array',
           $.map(val.split(','), $.proxy(''.trim.call, ''.trim)));
         this.scope.updateContent();
-      }
-    }
+      },
+    },
   });
 })(window.can);

@@ -20,7 +20,7 @@ import template from './collapsible-panel-body.mustache';
         return this.attr('softMode') || this.attr('expanded');
       },
       softMode: false,
-      expanded: null
-    }
+      expanded: null,
+    },
   });
 })(window.can, window.GGRC);

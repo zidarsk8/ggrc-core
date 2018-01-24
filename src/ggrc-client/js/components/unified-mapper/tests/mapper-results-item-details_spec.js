@@ -23,14 +23,14 @@ describe('GGRC.Components.mapperResultsItemDetails', function () {
     let instance;
     beforeEach(function () {
       instance = {
-        type: 'Control'
+        type: 'Control',
       };
       viewModel.attr('instance', instance);
     });
     it('sets correct instance for Snapshot objects', function () {
       let result;
       let snapshotInstance = {
-        snapshotObject: 'snapshotObject'
+        snapshotObject: 'snapshotObject',
       };
       viewModel.attr('instance', snapshotInstance);
       viewModel.init();

@@ -30,7 +30,7 @@
     'Section',
     'Standard',
     'System',
-    'Vendor'
+    'Vendor',
   ];
   let relatedObjectDescriptors = {};
   let threatDescriptor;
@@ -45,7 +45,7 @@
   RisksExtension.object_type_decision_tree = function () {
     return {
       risk: CMS.Models.Risk,
-      threat: CMS.Models.Threat
+      threat: CMS.Models.Threat,
     };
   };
 
@@ -64,11 +64,11 @@
         related_objects_as_destination: Proxy(
           null, 'source', 'Relationship', 'destination', 'related_sources'),
         related_objects:
-          Multi(['related_objects_as_source', 'related_objects_as_destination'])
+          Multi(['related_objects_as_source', 'related_objects_as_destination']),
       },
       related_objects: {
         _canonical: {
-          related_objects_as_source: riskObjectTypes
+          related_objects_as_source: riskObjectTypes,
         },
         related_programs: TypeFilter('related_objects', 'Program'),
         related_data_assets: TypeFilter('related_objects', 'DataAsset'),
@@ -91,28 +91,28 @@
         related_assessments: TypeFilter('related_objects', 'Assessment'),
         related_people: TypeFilter('related_objects', 'Person'),
         related_org_groups: TypeFilter('related_objects', 'OrgGroup'),
-        related_vendors: TypeFilter('related_objects', 'Vendor')
+        related_vendors: TypeFilter('related_objects', 'Vendor'),
 
       },
       related_risk: {
         _canonical: {
-          related_objects_as_source: ['Risk'].concat(riskObjectTypes)
+          related_objects_as_source: ['Risk'].concat(riskObjectTypes),
         },
-        related_risks: TypeFilter('related_objects', 'Risk')
+        related_risks: TypeFilter('related_objects', 'Risk'),
       },
       related_threat: {
         _canonical: {
-          related_objects_as_source: ['Threat'].concat(riskObjectTypes)
+          related_objects_as_source: ['Threat'].concat(riskObjectTypes),
         },
-        related_threats: TypeFilter('related_objects', 'Threat')
+        related_threats: TypeFilter('related_objects', 'Threat'),
       },
       Risk: {
         _mixins: ['related', 'related_objects', 'related_threat'],
-        orphaned_objects: Multi([])
+        orphaned_objects: Multi([]),
       },
       Threat: {
         _mixins: ['related', 'related_objects', 'related_risk'],
-        orphaned_objects: Multi([])
+        orphaned_objects: Multi([]),
       },
       Person: {
         owned_risks: TypeFilter('related_objects_via_search', 'Risk'),
@@ -122,8 +122,8 @@
         }),
         all_threats: Search(function (binding) {
           return CMS.Models.Threat.findAll({});
-        })
-      }
+        }),
+      },
     };
 
     // patch Person to extend query for dashboard
@@ -134,9 +134,9 @@
     can.each(riskObjectTypes, function (type) {
       mappings[type] = _.extend(mappings[type] || {}, {
         _canonical: {
-          related_objects_as_source: ['Risk', 'Threat']
+          related_objects_as_source: ['Risk', 'Threat'],
         },
-        _mixins: ['related', 'related_risk', 'related_threat']
+        _mixins: ['related', 'related_risk', 'related_threat'],
       });
     });
     new GGRC.Mappings('ggrc_risks', mappings);
@@ -188,8 +188,8 @@
           draw_children: true,
           parent_instance: pageInstance,
           model: model,
-          mapping: 'related_' + model.table_plural
-        }
+          mapping: 'related_' + model.table_plural,
+        },
       };
     });
 
@@ -204,14 +204,14 @@
 
       GGRC.tree_view.basic_model_list.push({
         model_name: name,
-        display_name: CMS.Models[name].title_singular
+        display_name: CMS.Models[name].title_singular,
       });
 
       can.each(widgetList, function (item) {
         if (extendedModuleTypes.indexOf(item) !== -1) {
           childModelList.push({
             model_name: item,
-            display_name: CMS.Models[item].title_singular
+            display_name: CMS.Models[item].title_singular,
           });
         }
       });
@@ -221,7 +221,7 @@
           model_list: childModelList,
           display_list:
           CMS.Models[name].tree_view_options.child_tree_display_list ||
-          widgetList
+          widgetList,
         });
       }
     });
@@ -236,8 +236,8 @@
         draw_children: true,
         parent_instance: pageInstance,
         model: CMS.Models.Threat,
-        mapping: relatedOrOwned + CMS.Models.Threat.table_plural
-      }
+        mapping: relatedOrOwned + CMS.Models.Threat.table_plural,
+      },
     };
     riskDescriptor = {
       widgetType: 'treeview',
@@ -250,8 +250,8 @@
         draw_children: true,
         parent_instance: pageInstance,
         model: CMS.Models.Risk,
-        mapping: relatedOrOwned + CMS.Models.Risk.table_plural
-      }
+        mapping: relatedOrOwned + CMS.Models.Risk.table_plural,
+      },
     };
 
     if (pageInstance instanceof CMS.Models.Risk) {
@@ -268,34 +268,34 @@
   RisksExtension.init_widgets_for_risk_page = function () {
     let riskDescriptors = $.extend({},
       relatedObjectDescriptors, {
-        Threat: threatDescriptor
+        Threat: threatDescriptor,
       }
     );
     new GGRC.WidgetList('ggrc_risks', {
-      Risk: riskDescriptors
+      Risk: riskDescriptors,
     });
   };
 
   RisksExtension.init_widgets_for_threat_page = function () {
     let threatDescriptors = $.extend({},
       relatedObjectDescriptors, {
-        Risk: riskDescriptor
+        Risk: riskDescriptor,
       }
     );
     new GGRC.WidgetList('ggrc_risks', {
-      Threat: threatDescriptors
+      Threat: threatDescriptors,
     });
   };
 
   RisksExtension.init_widgets_for_person_page = function () {
     let peopleWidgets = $.extend({}, {
-      Threat: threatDescriptor
+      Threat: threatDescriptor,
     }, {
-      Risk: riskDescriptor
+      Risk: riskDescriptor,
     });
 
     new GGRC.WidgetList('ggrc_risks', {
-      Person: peopleWidgets
+      Person: peopleWidgets,
     });
   };
 
@@ -306,7 +306,7 @@
       ~can.inArray(pageInstance.constructor.shortName, riskObjectTypes)) {
       descriptor[pageInstance.constructor.shortName] = {
         risk: riskDescriptor,
-        threat: threatDescriptor
+        threat: threatDescriptor,
       };
     }
     new GGRC.WidgetList('ggrc_risks', descriptor);

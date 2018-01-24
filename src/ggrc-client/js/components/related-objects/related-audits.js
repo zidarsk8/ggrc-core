@@ -14,16 +14,16 @@
     viewModel: {
       define: {
         parentInstance: {
-          value: {}
+          value: {},
         },
         // Load only Audits
         relatedTypes: {
           type: String,
           value: function () {
             return 'Audit';
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   });
 })(window.can);

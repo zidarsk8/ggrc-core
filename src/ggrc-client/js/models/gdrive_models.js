@@ -102,7 +102,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
             dfd.resolve(result);
           }
         },
-        scopes: scopes
+        scopes: scopes,
       });
     };
   };
@@ -116,7 +116,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
   */
   can.Model.Cacheable('CMS.Models.GDriveFile', {
     findAll: gdrive_findAll({
-      mimeTypeNot: 'application/vnd.google-apps.folder'
+      mimeTypeNot: 'application/vnd.google-apps.folder',
     }),
     findOne: gdrive_findAll({}),
     addToParent: function (object, parent) {
@@ -135,7 +135,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
             dfd.resolve();
           }
         },
-        scopes: scopes
+        scopes: scopes,
       }).done(function () {
         object.refresh();
       });
@@ -157,7 +157,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
             dfd.resolve(result);
           }
         },
-        scopes: scopes
+        scopes: scopes,
       });
     },
 
@@ -175,7 +175,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
             dfd.resolve();
           }
         },
-        scopes: scopes
+        scopes: scopes,
       }).done(function () {
         object.refresh();
       });
@@ -191,7 +191,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
             dfd.resolve(result);
           }
         },
-        scopes: scopes
+        scopes: scopes,
       });
     },
     from_id: function (id) {
@@ -199,8 +199,8 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
     },
     attributes: {
       permissions: 'CMS.Models.GDriveFilePermission.models',
-      revisions: 'CMS.Models.GDriveFileRevision.models'
-    }
+      revisions: 'CMS.Models.GDriveFileRevision.models',
+    },
   }, {
     findPermissions: function () {
       return CMS.Models.GDriveFilePermission.findAll(this.serialize());
@@ -226,7 +226,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
     },
     removeFromParent: function (parent) {
       return this.constructor.removeFromParent(this, parent.id || parent);
-    }
+    },
   });
 
   /**
@@ -239,7 +239,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
   CMS.Models.GDriveFile('CMS.Models.GDriveFolder', {
 
     findAll: gdrive_findAll({
-      mimeType: 'application/vnd.google-apps.folder'
+      mimeType: 'application/vnd.google-apps.folder',
     }),
     create: function (params) {
       if (!params.parents) {
@@ -251,7 +251,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
         body: {
           mimeType: 'application/vnd.google-apps.folder',
           title: params.title,
-          parents: params.parents.push ? params.parents : [params.parents]
+          parents: params.parents.push ? params.parents : [params.parents],
         },
         callback: function (dfd, result) {
           if (result.error) {
@@ -260,7 +260,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
             dfd.resolve(result);
           }
         },
-        scopes: scopes
+        scopes: scopes,
       });
     },
     findChildFolders: function (params) {
@@ -280,8 +280,8 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
     // property, but we can't modelize these permissions because they always have ID "me"
     attributes: {
       permissions: 'CMS.Models.GDriveFolderPermission.models',
-      revisions: 'CMS.Models.GDriveFileRevision.models'
-    }
+      revisions: 'CMS.Models.GDriveFileRevision.models',
+    },
   }, {
     findChildFolders: function () {
       return this.constructor.findChildFolders(this);
@@ -313,7 +313,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
         body: {
           role: params.role || 'writer',
           type: params.permission_type || 'user',
-          value: params.email || CMS.Models.get_instance('Person', params.person.id).email
+          value: params.email || CMS.Models.get_instance('Person', params.person.id).email,
         },
         callback: function (dfd, result) {
           if (result.error) {
@@ -323,7 +323,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
             dfd.resolve(result);
           }
         },
-        scopes: scopes
+        scopes: scopes,
       });
     },
     destroy: function (etag) {
@@ -342,9 +342,9 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
             dfd.resolve(result.id);
           }
         },
-        scopes: scopes
+        scopes: scopes,
       });
-    }
+    },
   }, {
     destroy: function () {
       let that = this;
@@ -361,9 +361,9 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
             dfd.resolve(result);
           }
         },
-        scopes: scopes
+        scopes: scopes,
       });
-    }
+    },
   });
 
   CMS.Models.GDriveFilePermission('CMS.Models.GDriveFolderPermission', {
@@ -376,7 +376,7 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
         body: {
           role: params.role || 'writer',
           type: params.permission_type || 'user',
-          value: params.email || CMS.Models.get_instance('Person', params.person.id).email
+          value: params.email || CMS.Models.get_instance('Person', params.person.id).email,
         },
         callback: function (dfd, result) {
           if (result.error) {
@@ -386,17 +386,17 @@ import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
             dfd.resolve(result);
           }
         },
-        scopes: scopes
+        scopes: scopes,
       });
-    }
+    },
   }, {});
 
   can.Model.Cacheable('CMS.Models.GDriveFileRevision', {
     findAll: gdrive_findAll({}, '/revisions'),
     id: 'etag', // id is a user's Permission ID, so using etags instead for cache keys.
     attributes: {
-      modifiedDate: 'datetime'
-    }
+      modifiedDate: 'datetime',
+    },
   }, {
   });
 

@@ -221,7 +221,7 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
   let events;
   let viewModel;
   let eventStub = {
-    preventDefault: function () {}
+    preventDefault: function () {},
   };
 
   beforeAll(function () {
@@ -247,7 +247,7 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
       let thenSpy = jasmine.createSpy('then');
       spyOn(viewModel, 'confirmationCallback').and.returnValue(dfd);
       spyOn(can, 'when').and.returnValue({
-        then: thenSpy
+        then: thenSpy,
       });
 
       viewModel.onClickHandler(null, null, eventStub);
@@ -259,7 +259,7 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
     it('pass null to can.when() when callback is not provided', function () {
       let thenSpy = jasmine.createSpy('then');
       spyOn(can, 'when').and.returnValue({
-        then: thenSpy
+        then: thenSpy,
       });
 
       viewModel.onClickHandler(null, null, eventStub);
@@ -306,7 +306,7 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
 
       beforeEach(function () {
         that = {
-          viewModel: viewModel
+          viewModel: viewModel,
         };
         method = events['{viewModel} modal:success'].bind(that);
       });

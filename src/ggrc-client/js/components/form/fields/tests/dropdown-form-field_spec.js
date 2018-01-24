@@ -34,13 +34,13 @@ describe('GGRC.Components.dropdownFormField', function () {
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 1,
-      value: 'newValue'
+      value: 'newValue',
     });
     viewModel.attr('_value', 'newValue2');
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 1,
-      value: 'newValue2'
+      value: 'newValue2',
     });
   });
 });

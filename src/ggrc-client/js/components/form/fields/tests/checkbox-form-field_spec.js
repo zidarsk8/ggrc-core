@@ -25,13 +25,13 @@ describe('GGRC.Components.checkboxFormField', function () {
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',
-      value: true
+      value: true,
     });
     viewModel.attr('_value', false);
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',
-      value: false
+      value: false,
     });
   });
 });

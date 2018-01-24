@@ -19,17 +19,17 @@ describe('GGRC.Components.tabContainer', function () {
       selectedScope = new can.Map({
         tabIndex: selectionIndex,
         titleText: 'Some test value ',
-        active: false
+        active: false,
       });
       secondScope = new can.Map({
         tabIndex: 9999,
         titleText: 'Some test value ',
-        active: false
+        active: false,
       });
       thirdScope = new can.Map({
         tabIndex: 8888,
         titleText: 'Some test value ',
-        active: false
+        active: false,
       });
       viewModel.attr('panels').push(secondScope, selectedScope, thirdScope);
     });
@@ -53,12 +53,12 @@ describe('GGRC.Components.tabContainer', function () {
       scope = new can.Map({
         tabIndex: 1111,
         titleText: 'Some test value ',
-        active: false
+        active: false,
       });
       secondScope = new can.Map({
         tabIndex: 9999,
         titleText: 'Some test value ',
-        active: false
+        active: false,
       });
       viewModel.attr('panels').push(scope, secondScope);
     });

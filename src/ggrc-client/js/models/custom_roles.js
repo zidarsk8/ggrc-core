@@ -28,10 +28,10 @@
       });
 
       return can.when(instances);
-    }
+    },
   }, {
     // Cacheable checks if selfLink is set when the findAll deferred is done
-    selfLink: '/custom_roles_list'  // TODO: what path here?
+    selfLink: '/custom_roles_list',  // TODO: what path here?
   });
 
   /**
@@ -53,16 +53,16 @@
     defaults: {
       read: true,
       update: true,
-      delete: true
+      delete: true,
     },
     links_to: {},
     init: function () {
       this.validateNonBlank('name');
       this._super.apply(this, arguments);
-    }
+    },
   }, {
     init: function () {
       this._super.apply(this, arguments);
-    }
+    },
   });
 })(window.can, window.GGRC, window.CMS);

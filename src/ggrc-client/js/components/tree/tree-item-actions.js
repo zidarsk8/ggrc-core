@@ -23,29 +23,29 @@ import {
     define: {
       deepLimit: {
         type: 'number',
-        value: 0
+        value: 0,
       },
       canExpand: {
         type: 'boolean',
-        value: false
+        value: false,
       },
       expandIcon: {
         type: 'string',
         get: function () {
           return this.attr('expanded') ? 'compress' : 'expand';
-        }
+        },
       },
       expanderTitle: {
         type: 'string',
         get: function () {
           return this.attr('expanded') ? 'Collapse tree' : 'Expand tree';
-        }
+        },
       },
       isSnapshot: {
         type: 'boolean',
         get: function () {
           return isSnapshot(this.attr('instance'));
-        }
+        },
       },
       isAllowedToEdit: {
         type: 'boolean',
@@ -55,7 +55,7 @@ import {
           let isArchived = this.attr('instance.archived');
           let isInForbiddenList = forbiddenEditList.indexOf(type) > -1;
           return !(isSnapshot || isInForbiddenList || isArchived);
-        }
+        },
       },
       isAllowedToMap: {
         type: 'boolean',
@@ -65,8 +65,8 @@ import {
           let isInForbiddenList = forbiddenMapList.indexOf(type) > -1;
 
           return isAllowedToEdit && !isInForbiddenList;
-        }
-      }
+        },
+      },
     },
     maximizeObject: function (scope, el, ev) {
       ev.preventDefault();
@@ -74,7 +74,7 @@ import {
 
       this.dispatch({
         type: 'preview',
-        element: el
+        element: el,
       });
     },
     $el: null,
@@ -101,7 +101,7 @@ import {
       let instanceTypes = [
         'Cycle',
         'CycleTaskGroup',
-        'CycleTaskGroupObjectTask'
+        'CycleTaskGroupObjectTask',
       ];
       return _.contains(pages, getPageType()) &&
         _.contains(instanceTypes, this.attr('instance').type);
@@ -114,7 +114,7 @@ import {
       ];
       return _.contains(pages, getPageType()) &&
         _.contains(instanceTypes, this.attr('instance').type);
-    }
+    },
   });
 
   GGRC.Components('treeItemActions', {
@@ -136,7 +136,7 @@ import {
         }
         // event not needed after render of content
         el.off(ev);
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

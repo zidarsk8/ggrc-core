@@ -21,38 +21,38 @@ import template from './object-list.mustache';
       define: {
         itemSelector: {
           type: 'string',
-          value: ''
+          value: '',
         },
         isLoading: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         showSpinner: {
           get: function () {
             return this.attr('isLoading');
-          }
+          },
         },
         items: {
           value: function () {
             return [];
-          }
+          },
         },
         selectedItem: {
           value: function () {
             return {
               el: null,
-              data: null
+              data: null,
             };
-          }
+          },
         },
         isInnerClick: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         emptyMessage: {
           type: 'string',
-          value: 'None'
-        }
+          value: 'None',
+        },
       },
       spinnerCss: '@',
       isDisabled: false,
@@ -95,7 +95,7 @@ import template from './object-list.mustache';
           this.clearSelection();
         }
         this.attr('isInnerClick', false);
-      }
+      },
     },
     events: {
       '.object-list__item click': function () {
@@ -103,7 +103,7 @@ import template from './object-list.mustache';
       },
       '{window} click': function () {
         this.viewModel.onOuterClick();
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

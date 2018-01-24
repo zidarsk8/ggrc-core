@@ -21,7 +21,7 @@ describe('GGRC.Components.templateAttributes', function () {
 
     beforeEach(function () {
       scope = new can.Map({
-        fields: []
+        fields: [],
       });
       method = Component.prototype.scope.fieldRemoved.bind(scope);
       $el = $('<p></p>');
@@ -34,7 +34,7 @@ describe('GGRC.Components.templateAttributes', function () {
       let currentFields = [
         new can.Map({id: 17, title: 'foo'}),
         new can.Map({id: 4, title: 'bar'}),
-        new can.Map({id: 52, title: 'baz'})
+        new can.Map({id: 52, title: 'baz'}),
       ];
       scope.attr('fields').replace(currentFields);
 
@@ -50,7 +50,7 @@ describe('GGRC.Components.templateAttributes', function () {
       let currentFields = [
         new can.Map({id: 17, title: 'foo'}),
         new can.Map({title: 'bar'}),
-        new can.Map({id: 52, title: 'baz'})
+        new can.Map({id: 52, title: 'baz'}),
       ];
       scope.attr('fields').replace(currentFields);
 
@@ -66,7 +66,7 @@ describe('GGRC.Components.templateAttributes', function () {
       let currentFields = [
         new can.Map({id: 17, title: 'foo'}),
         new can.Map({id: 4, title: 'bar'}),
-        new can.Map({id: 52, title: 'baz'})
+        new can.Map({id: 52, title: 'baz'}),
       ];
       scope.attr('fields').replace(currentFields);
 

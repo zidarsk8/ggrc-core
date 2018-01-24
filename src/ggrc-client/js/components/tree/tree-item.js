@@ -33,7 +33,7 @@ import template from './templates/tree-item.mustache';
           }
 
           return classes.join(' ');
-        }
+        },
       },
       selectableSize: {
         type: Number,
@@ -48,8 +48,8 @@ import template from './templates/tree-item.mustache';
           }
 
           return result;
-        }
-      }
+        },
+      },
     },
     selectedColumns: [],
     mandatory: [],
@@ -79,6 +79,6 @@ import template from './templates/tree-item.mustache';
           viewModel.attr('resultDfd', resultDfd);
         }
       },
-    }
+    },
   });
 })(window.can, window.GGRC);

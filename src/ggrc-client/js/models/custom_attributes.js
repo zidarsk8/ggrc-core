@@ -19,13 +19,13 @@
 
       return can.when(can.map(types, function (type, i) {
         return new CMS.Models.CustomAttributable(can.extend(type, {
-          id: i
+          id: i,
         }));
       }));
-    }
+    },
   }, {
     // Cacheable checks if selfLink is set when the findAll deferred is done
-    selfLink: '/custom_attribute_list'
+    selfLink: '/custom_attribute_list',
   });
 
   can.Model.Cacheable('CMS.Models.CustomAttributeDefinition', {
@@ -41,12 +41,12 @@
     mixins: [],
     attributes: {
       values: 'CMS.Models.CustomAttributeValue.stubs',
-      modified_by: 'CMS.Models.Person.stub'
+      modified_by: 'CMS.Models.Person.stub',
     },
     links_to: {},
     defaults: {
       title: '',
-      attribute_type: 'Text'
+      attribute_type: 'Text',
     },
     attributeTypes: ['Text', 'Rich Text', 'Date', 'Checkbox', 'Dropdown',
       'Map:Person'],
@@ -98,7 +98,7 @@
         }
 
         return '';  // no errors
-      }
+      },
     },
 
     init: function () {
@@ -114,11 +114,11 @@
       );
 
       this._super.apply(this, arguments);
-    }
+    },
   }, {
     init: function () {
       this._super.apply(this, arguments);
-    }
+    },
   });
 
   can.Model.Cacheable('CMS.Models.CustomAttributeValue', {
@@ -134,15 +134,15 @@
     mixins: [],
     attributes: {
       definition: 'CMS.Models.CustomAttributeDefinition.stub',
-      modified_by: 'CMS.Models.Person.stub'
+      modified_by: 'CMS.Models.Person.stub',
     },
     links_to: {},
     init: function () {
       this._super.apply(this, arguments);
-    }
+    },
   }, {
     init: function () {
       this._super.apply(this, arguments);
-    }
+    },
   });
 })(window.can, window.GGRC, window.CMS);

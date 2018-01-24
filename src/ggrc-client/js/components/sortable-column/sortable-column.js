@@ -14,14 +14,14 @@ GGRC.Components('sortableColumn', {
         type: 'boolean',
         get: function () {
           return this.attr('sort.field') === this.attr('sortField');
-        }
+        },
       },
       isSortedAsc: {
         type: 'boolean',
         get: function () {
           return this.attr('sort.direction') === 'asc';
-        }
-      }
+        },
+      },
     },
     sort: null,
     sortField: '@',
@@ -41,11 +41,11 @@ GGRC.Components('sortableColumn', {
       } else {
         this.attr('sort.direction', 'asc');
       }
-    }
+    },
   },
   events: {
     '{$content} click': function () {
       this.viewModel.applySort();
-    }
-  }
+    },
+  },
 });

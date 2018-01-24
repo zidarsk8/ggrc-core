@@ -27,11 +27,11 @@ import template from './dropdown.mustache';
             let none = isGroupedDropdown ?
               [{
                 group: noneValue,
-                subitems: [{title: noneValue, value: ''}]
+                subitems: [{title: noneValue, value: ''}],
               }] :
               [{
                 title: noneValue,
-                value: ''
+                value: '',
               }];
             let list = [];
             if (!isGroupedDropdown) {
@@ -39,7 +39,7 @@ import template from './dropdown.mustache';
                 if (_.isString(option)) {
                   return {
                     value: option,
-                    title: option
+                    title: option,
                   };
                 }
                 return option;
@@ -52,9 +52,9 @@ import template from './dropdown.mustache';
                   subitems: group.attr('items').map(function (item) {
                     return {
                       value: item.value,
-                      title: item.name
+                      title: item.name,
                     };
-                  })
+                  }),
                 };
               });
             }
@@ -62,8 +62,8 @@ import template from './dropdown.mustache';
               return none.concat(list);
             }
             return list;
-          }
-        }
+          },
+        },
       },
       name: '@',
       className: '@',
@@ -81,7 +81,7 @@ import template from './dropdown.mustache';
        */
       optionsList: [],
       optionsGroups: {},
-      isDisabled: false
+      isDisabled: false,
     },
     init: function (element, options) {
       let $el = $(element);
@@ -102,6 +102,6 @@ import template from './dropdown.mustache';
       }
 
       viewModel.attr('isDisabled', disable);
-    }
+    },
   });
 })(window.can, window.can.$);

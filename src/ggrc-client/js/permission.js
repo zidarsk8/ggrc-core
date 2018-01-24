@@ -45,7 +45,7 @@ let _CONDITIONS_MAP = {
   },
   has_not_changed: function (instance, args) {
     return !(instance.attr(args.property_name) === args.prevent_if);
-  }
+  },
 };
 let permissions_compute = can.compute(GGRC.permissions);
 
@@ -211,12 +211,12 @@ const Permission = can.Construct({
     return $.ajax({
       url: '/permissions',
       type: 'get',
-      dataType: 'json'
+      dataType: 'json',
     }).then(function (perm) {
       permissions_compute(perm);
       GGRC.permissions = perm;
     });
-  }
+  },
 }, {
   // prototype
   setup: function (action, resource_type, context_id) {
@@ -224,7 +224,7 @@ const Permission = can.Construct({
     this.resource_type = resource_type;
     this.context_id = context_id;
     return this;
-  }
+  },
 });
 
 ADMIN_PERMISSION = new Permission('__GGRC_ADMIN__', '__GGRC_ALL__', 0);

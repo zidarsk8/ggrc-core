@@ -40,5 +40,5 @@ export default can.Map.extend({
    */
   remove: function () {
     this.dispatch('remove');
-  }
+  },
 });

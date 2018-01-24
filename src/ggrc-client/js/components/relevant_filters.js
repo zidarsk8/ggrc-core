@@ -11,8 +11,8 @@
       define: {
         disableCreate: {
           type: 'boolean',
-          'default': false
-        }
+          'default': false,
+        },
       },
       relevant_menu_item: '@',
       show_all: '@',
@@ -24,7 +24,7 @@
              !this.attr('has_parent')) {
           menu.unshift({
             title_singular: 'Previous objects',
-            model_singular: '__previous__'
+            model_singular: '__previous__',
           });
         }
 
@@ -33,7 +33,7 @@
           filter: new can.Map(),
           textValue: '',
           menu: menu,
-          model_name: menu[0].model_singular
+          model_name: menu[0].model_singular,
         });
       },
       menu: function () {
@@ -62,7 +62,7 @@
           .some(function (item) {
             return item.readOnly && item.type === type;
           });
-      }
+      },
     },
     events: {
       init: function () {
@@ -78,7 +78,7 @@
             filter: model,
             textValue: '',
             menu: this.scope.attr('menu'),
-            model_name: model.constructor.shortName
+            model_name: model.constructor.shortName,
           });
         }, this);
       },
@@ -111,7 +111,7 @@
         }
         item.target.attr('filter', new can.Map());
         item.target.attr('value', false);
-      }
-    }
+      },
+    },
   }, true);
 })(window.can, window.can.$, window.GGRC);

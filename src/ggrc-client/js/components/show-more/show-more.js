@@ -21,19 +21,19 @@ import template from './show-more.mustache';
       define: {
         limit: {
           type: 'number',
-          value: 5
+          value: 5,
         },
         items: {
           value: function () {
             return [];
-          }
+          },
         },
         shouldShowAllItems: {
           type: 'boolean',
           value: function () {
             let isOverLimit = this.attr('isOverLimit');
             return isOverLimit;
-          }
+          },
         },
         isOverLimit: {
           get: function () {
@@ -41,7 +41,7 @@ import template from './show-more.mustache';
             let limit = this.attr('limit');
 
             return items && items.length > limit;
-          }
+          },
         },
         visibleItems: {
           get: function () {
@@ -53,7 +53,7 @@ import template from './show-more.mustache';
             return (isOverLimit && !shouldShowAllItems) ?
               items.slice(0, limit) :
               items;
-          }
+          },
         },
         showAllButtonText: {
           get: function () {
@@ -64,15 +64,15 @@ import template from './show-more.mustache';
             return !shouldShowAllItems ?
               'Show more (' + (items.length - limit) + ')' :
               'Show less';
-          }
-        }
+          },
+        },
       },
       toggleShowAll: function (event) {
         let newValue;
         event.stopPropagation();
         newValue = !this.attr('shouldShowAllItems');
         this.attr('shouldShowAllItems', newValue);
-      }
-    }
+      },
+    },
   });
 })(window.GGRC, window.can);

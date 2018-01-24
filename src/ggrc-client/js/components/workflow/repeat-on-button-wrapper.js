@@ -17,8 +17,8 @@
       define: {
         autoSave: {
           type: 'boolean',
-          value: false
-        }
+          value: false,
+        },
       },
       instance: {},
       setRepeatOn: function (unit, repeatEvery) {
@@ -32,12 +32,12 @@
         instance.save()
           .done(function () {
             $(document.body).trigger('ajax:flash', {
-              success: 'Repeat updated successfully'
+              success: 'Repeat updated successfully',
             });
           })
           .fail(function () {
             $(document.body).trigger('ajax:flash', {
-              error: 'An error occurred'
+              error: 'An error occurred',
             });
           })
           .always(function () {
@@ -53,7 +53,7 @@
         }
 
         return $.Deferred().resolve();
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC, window.can.$);

@@ -15,7 +15,7 @@ describe('GGRC.Components.exportGroup', function () {
 
       beforeEach(function () {
         that = {
-          addPanel: jasmine.createSpy()
+          addPanel: jasmine.createSpy(),
         };
         method = Component.prototype.events.inserted.bind(that);
       });
@@ -23,7 +23,7 @@ describe('GGRC.Components.exportGroup', function () {
         method();
         expect(that.addPanel).toHaveBeenCalledWith(jasmine.objectContaining({
           type: 'Program',
-          isSnapshots: undefined
+          isSnapshots: undefined,
         }));
       });
     });
@@ -36,11 +36,11 @@ describe('GGRC.Components.exportGroup', function () {
         viewModel = new can.Map({
           _index: 0,
           panels: {
-            items: []
-          }
+            items: [],
+          },
         });
         method = Component.prototype.events.addPanel.bind({
-          viewModel: viewModel
+          viewModel: viewModel,
         });
       });
       it('adds panel with "Program" type if data.type is undefined',
@@ -59,7 +59,7 @@ describe('GGRC.Components.exportGroup', function () {
       ' type equal to "Snapshot" if it is snapshot', function () {
         data = {
           type: 'Control',
-          isSnapshots: 'true'
+          isSnapshots: 'true',
         };
         method(data);
         expect(viewModel.attr('panels.items')[0].type).toEqual('Snapshot');

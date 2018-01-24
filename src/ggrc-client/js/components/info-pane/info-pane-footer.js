@@ -17,7 +17,7 @@ import template from './info-pane-footer.mustache';
     viewModel: {
       createdAt: '',
       modifiedAt: '',
-      modifiedBy: {}
-    }
+      modifiedBy: {},
+    },
   });
 })(window.can, window.GGRC);

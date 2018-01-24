@@ -54,7 +54,7 @@
         this.scope.$rootEl.removeClass('open');
         this.scope.$rootEl.parents('.dropdown-menu')
           .parent().removeClass('open');
-      }
-    }
+      },
+    },
   });
 })(window.can, window.can.$);

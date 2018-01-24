@@ -21,12 +21,12 @@ describe('can.Model.Cacheable', function () {
       update: 'PUT /api/dummy_models/{id}',
       mixins: ['dummyable'],
       attributes: {dummy_attribute: 'dummy_convert'},
-      is_custom_attributable: true
+      is_custom_attributable: true,
     }, {});
 
     can.Model.Cacheable.extend('CMS.Models.DummyJoin', {
       root_object: 'dummy_join',
-      root_collection: 'dummy_joins'
+      root_collection: 'dummy_joins',
     }, {});
   });
 
@@ -46,7 +46,7 @@ describe('can.Model.Cacheable', function () {
         title_singular: 'Right Name',
         model_plural: 'RightNames',
         table_plural: 'right_names',
-        title_plural: 'Right Names'
+        title_plural: 'Right Names',
       }, {});
       // note that these are not explicit in beforeAll above.
       // model singular is CamelCased form of root_object
@@ -91,7 +91,7 @@ describe('can.Model.Cacheable', function () {
       expect(CMS.Models.DummyModel.attributes).toEqual({
         created_at: 'datetime',
         updated_at: 'datetime',
-        dummy_attribute: 'dummy_convert'
+        dummy_attribute: 'dummy_convert',
       });
     });
   });
@@ -300,7 +300,7 @@ describe('can.Model.Cacheable', function () {
     it('only pushes instances into the list for 100ms before yielding', function (done) {
       let list = new CMS.Models.DummyModel.List();
       let dummy_models = [
-          {id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}, {id: 7}
+          {id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}, {id: 7},
       ];
       // Have our modelized instances ready for when
       let dummy_insts = CMS.Models.DummyModel.models(dummy_models);
@@ -372,7 +372,7 @@ describe('can.Model.Cacheable', function () {
       inst.refresh().then(function () {
         expect(can.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
           url: '/api/dummy_models/1',
-          type: 'get'
+          type: 'get',
         }));
         done();
       }, fail);
@@ -409,14 +409,14 @@ describe('can.Model.Cacheable', function () {
 
       obj.custom_attribute_definitions = [{
         id: 1,
-        attribute_type: 'Map:DummyModel'
+        attribute_type: 'Map:DummyModel',
       }];
       obj.custom_attributes = can.Map();
 
       target.stub = function () {
         return {
           type: 'DummyModel',
-          id: 1
+          id: 1,
         };
       };
 

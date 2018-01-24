@@ -18,7 +18,7 @@
     tag: 'reusable-object',
     template: '<content></content>',
     scope: {
-      list: null
+      list: null,
     },
     helpers: {
       isDisabled: function (instance, options) {
@@ -29,7 +29,7 @@
           return options.fn(options.contexts);
         }
         return options.inverse(options.context);
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

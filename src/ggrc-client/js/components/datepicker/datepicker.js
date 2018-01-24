@@ -23,32 +23,32 @@
       define: {
         readonly: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         disabled: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         required: {
           type: 'htmlbool',
-          value: false
+          value: false,
         },
         persistent: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         isShown: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         noWeekends: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         denyInput: {
           type: 'boolean',
-          value: false
-        }
+          value: false,
+        },
       },
       onSelect: function (val, ev) {
         this.attr('date', val);
@@ -82,7 +82,7 @@
           dateFormat: GGRC.Date.PICKER_ISO_DATE,
           altField: this.element.find('.datepicker__input'),
           altFormat: GGRC.Date.PICKER_DISPLAY_FMT,
-          onSelect: this.viewModel.onSelect.bind(this.viewModel)
+          onSelect: this.viewModel.onSelect.bind(this.viewModel),
         };
 
         if (viewModel.attr('noWeekends')) {
@@ -153,7 +153,7 @@
           },
           maxDate: function () {
             date.subtract(1, 'day');
-          }
+          },
         };
 
         if (!date) {
@@ -236,7 +236,7 @@
         if (this.viewModel.isShown && !isInside) {
           this.viewModel.attr('isShown', false);
         }
-      }
+      },
     },
     helpers: {
       isHidden: function (opts) {
@@ -244,7 +244,7 @@
           return opts.inverse();
         }
         return opts.fn();
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC, moment);

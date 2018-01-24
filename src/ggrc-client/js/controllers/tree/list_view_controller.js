@@ -32,8 +32,8 @@
       list_view: '/static/mustache/dashboard/object_list.mustache',
       list_objects: null,
       list_loader: null,
-      tooltip_view: '/static/mustache/dashboard/object_tooltip.mustache'
-    }
+      tooltip_view: '/static/mustache/dashboard/object_tooltip.mustache',
+    },
   }, {
     init: function () {
       let that = this;
@@ -50,8 +50,8 @@
         pager: {
           has_next: function () {
             return false;
-          }
-        }
+          },
+        },
       });
       this.context.attr('has_next_page', can.compute(function () {
         let pager = that.context.attr('pager');
@@ -242,6 +242,6 @@
     },
 
     '.search-filters button[type=reset] click': 'reset_search',
-    '.btn-add modal:success': 'reset_search'
+    '.btn-add modal:success': 'reset_search',
   });
 })(window.can, window.can.$);

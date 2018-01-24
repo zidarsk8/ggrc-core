@@ -26,7 +26,7 @@ import template from './view-object-buttons.mustache';
       },
       openObject: function (scope, el, ev) {
         ev.stopPropagation();
-      }
-    }
+      },
+    },
   });
 })(window.can);

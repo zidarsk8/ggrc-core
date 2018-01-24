@@ -22,7 +22,7 @@ GGRC.register_modal_hook("approvalform", function($target, $trigger, option) {
     .ggrc_controllers_approval_workflow({
       object_params : object_params,
       current_user : GGRC.current_user,
-      instance : instance
+      instance : instance,
     });
 });
 

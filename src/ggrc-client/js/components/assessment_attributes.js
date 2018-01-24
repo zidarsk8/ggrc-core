@@ -18,27 +18,27 @@
       types: new can.List([{
         type: 'Text',
         name: 'Text',
-        text: 'Enter description'
+        text: 'Enter description',
       }, {
         type: 'Rich Text',
         name: 'Rich Text',
-        text: 'Enter description'
+        text: 'Enter description',
       }, {
         type: 'Date',
         name: 'Date',
-        text: 'MM/DD/YYYY'
+        text: 'MM/DD/YYYY',
       }, {
         type: 'Checkbox',
         name: 'Checkbox',
-        text: ''
+        text: '',
       }, {
         type: 'Dropdown',
         name: 'Dropdown',
-        text: 'Enter values separated by comma'
+        text: 'Enter values separated by comma',
       }, {
         type: 'Map:Person',
         name: 'Person',
-        text: ''
+        text: '',
       }]),
 
       /**
@@ -60,7 +60,7 @@
           console.warn('The list of CAD doesn\'t contain item with "' +
             instance.title + '" title');
         }
-      }
+      },
     },
     events: {
       inserted: function () {
@@ -68,7 +68,7 @@
         let list = el.find('.sortable-list');
         list.sortable({
           items: 'li.sortable-item',
-          placeholder: 'sortable-placeholder'
+          placeholder: 'sortable-placeholder',
         });
         list.find('.sortable-item').disableSelection();
       },
@@ -82,8 +82,8 @@
              return $(item).data('field');
            }
         ));
-      }
-    }
+      },
+    },
   });
   /*
    * Template field
@@ -99,7 +99,7 @@
         types: parentScope.attr('types'),
         pads: {
           COMMENT: 0,
-          ATTACHMENT: 1
+          ATTACHMENT: 1,
         },
 
         _EV_FIELD_REMOVED: 'on-remove',
@@ -114,7 +114,7 @@
           // must happen before changing any of the scope attributes that
           // cause changes in the template.
           this.$rootEl.triggerHandler({
-            type: this._EV_FIELD_REMOVED
+            type: this._EV_FIELD_REMOVED,
           });
 
           scope.attr('_pending_delete', true);
@@ -169,7 +169,7 @@
             let comment = attr.attr('comment') << pads.COMMENT;
             return attach | comment;
           }).join(',');
-        }
+        },
       };
     },
     events: {
@@ -198,8 +198,8 @@
         let pads = this.scope.attr('pads');
         let normalized = this.scope.normalize_mandatory(attrs, pads);
         this.scope.field.attr('multi_choice_mandatory', normalized);
-      }
-    }
+      },
+    },
   });
 
   GGRC.Components('addTemplateField', {
@@ -230,7 +230,7 @@
           let type = _.trim(selected.type);
           let invalidInput = false;
           let values = _.splitTrim(selected.values, {
-            unique: true
+            unique: true,
           }).join(',');
           ev.preventDefault();
           scope.attr('selected.invalidTitle', false);
@@ -261,7 +261,7 @@
               id: scope.attr('id'),
               title: title,
               attribute_type: type,
-              multi_choice_options: values
+              multi_choice_options: values,
             });
             _.each(['title', 'values', 'multi_choice_options'],
               function (type) {
@@ -280,7 +280,7 @@
         },
         isEmptyTitle: function (selectedTitle) {
           return !selectedTitle;
-        }
+        },
       });
     },
     events: {
@@ -292,7 +292,7 @@
         if (!this.scope.attr('selected.type')) {
           this.scope.attr('selected.type', _.first(types).attr('type'));
         }
-      }
+      },
     },
     helpers: {
       /*
@@ -303,12 +303,12 @@
       placeholder: function (options) {
         let types = this.attr('types');
         let item = _.findWhere(types, {
-          type: this.attr('selected.type')
+          type: this.attr('selected.type'),
         });
         if (item) {
           return item.text;
         }
-      }
-    }
+      },
+    },
   });
 })(window.can, window.can.$);

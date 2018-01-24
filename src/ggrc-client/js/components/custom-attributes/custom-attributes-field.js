@@ -20,8 +20,8 @@ import template from './custom-attributes-field.mustache';
     viewModel: {
       define: {
         disabled: {
-          type: 'htmlbool'
-        }
+          type: 'htmlbool',
+        },
       },
       type: null,
       value: null,
@@ -33,9 +33,9 @@ import template from './custom-attributes-field.mustache';
           type: 'valueChanged',
           fieldId: e.fieldId,
           value: e.value,
-          field: scope
+          field: scope,
         });
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

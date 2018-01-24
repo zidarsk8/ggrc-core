@@ -17,7 +17,7 @@
         return this.attr('loadingState.auditLoading') ||
           this.attr('loadingState.evidencesAndUrlsLoading') ||
           this.attr('loadingState.controlsLoading');
-      }
-    }
+      },
+    },
   });
 })(window.can);

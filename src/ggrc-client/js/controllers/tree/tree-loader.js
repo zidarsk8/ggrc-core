@@ -13,12 +13,12 @@ import RefreshQueue from '../../models/refresh_queue';
     defaults: {
       instance: undefined,
       parent: null,
-      children_drawn: false
-    }
+      children_drawn: false,
+    },
   }, {});
 
   can.Control.extend('CMS.Controllers.TreeLoader', {
-    defaults: {}
+    defaults: {},
   }, {
     init_spinner: function () {
       let renderer;
@@ -44,7 +44,7 @@ import RefreshQueue from '../../models/refresh_queue';
           '  size="large"',
           '  extra-css-class="tree-items"',
           '>',
-          '</spinner>'
+          '</spinner>',
         ].join('');
         renderer = can.view.mustache(spinner);
         spinner = renderer({showMe: true});
@@ -302,6 +302,6 @@ import RefreshQueue from '../../models/refresh_queue';
       }
 
       return dfd;
-    }
+    },
   });
 })(window.can, window.$);

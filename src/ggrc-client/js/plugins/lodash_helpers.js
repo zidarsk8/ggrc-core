@@ -64,6 +64,6 @@
      */
     getExistingKeys: function (object) {
       return _.keys(_.pick(object, _.identity));
-    }
+    },
   });
 })(_);

@@ -70,7 +70,7 @@
       }.bind(this),
       content: function () {
         return this.template.find('.popup__content').html();
-      }.bind(this)
+      }.bind(this),
     }).data('popover');
   };
 

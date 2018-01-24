@@ -30,7 +30,7 @@ describe('GGRC.Components.relatedReferenceUrls', function () {
       expect(viewModel.dispatch)
         .toHaveBeenCalledWith({
           type: 'createReferenceUrl',
-          payload: url
+          payload: url,
         });
     });
   });
@@ -50,7 +50,7 @@ describe('GGRC.Components.relatedReferenceUrls', function () {
       expect(viewModel.dispatch)
         .toHaveBeenCalledWith({
           type: 'removeReferenceUrl',
-          payload: url
+          payload: url,
         });
     });
   });
@@ -118,7 +118,7 @@ describe('GGRC.Components.relatedReferenceUrls', function () {
         viewModel.attr('urls', [
           new can.Map({link: 'www.xyz.com', title: 'www.xyz.com'}),
           new can.Map({link: 'www.bar.com', title: 'www.bar.com'}),
-          new can.Map({link: 'www.baz.org', title: 'www.baz.org'})
+          new can.Map({link: 'www.baz.org', title: 'www.baz.org'}),
         ]);
 
         url = 'www.bar.com';
@@ -133,7 +133,7 @@ describe('GGRC.Components.relatedReferenceUrls', function () {
         viewModel.attr('urls', [
           new can.Map({link: 'www.xyz.com', title: 'www.xyz.com'}),
           new can.Map({link: 'www.bar.com', title: 'www.bar.com'}),
-          new can.Map({link: 'www.baz.org', title: 'www.baz.org'})
+          new can.Map({link: 'www.baz.org', title: 'www.baz.org'}),
         ]);
 
         method('www.bar.com');

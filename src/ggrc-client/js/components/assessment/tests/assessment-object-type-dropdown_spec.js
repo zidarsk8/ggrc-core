@@ -19,12 +19,12 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
     let objectTypes = {
       groupFoo: {
         name: 'Foo Objects',
-        items: [{name: 'Foo1'}, {value: 'Foo2'}]
+        items: [{name: 'Foo1'}, {value: 'Foo2'}],
       },
       groupBar: {
         name: 'Bar Objects',
-        items: [{value: 'Bar1'}, {value: 'Bar2'}]
-      }
+        items: [{value: 'Bar1'}, {value: 'Bar2'}],
+      },
     };
 
     spyOn(GGRC.Mappings, 'getMappingTypes').and.returnValue(objectTypes);
@@ -39,13 +39,13 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
       groupFoo: {
         name: 'Bar-ish Objects',
         items: [
-          {name: 'Car'}, {name: 'Bar'}, {name: 'Zar'}, {name: 'Dar'}
-        ]
-      }
+          {name: 'Car'}, {name: 'Bar'}, {name: 'Zar'}, {name: 'Dar'},
+        ],
+      },
     };
 
     let expected = [
-      {name: 'Bar'}, {name: 'Car'}, {name: 'Dar'}, {name: 'Zar'}
+      {name: 'Bar'}, {name: 'Car'}, {name: 'Dar'}, {name: 'Zar'},
     ];
 
     spyOn(GGRC.Mappings, 'getMappingTypes').and.returnValue(objectTypes);
@@ -60,8 +60,8 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
     let objectTypes = {
       all_objects: {
         models: ['Foo', 'Bar', 'Baz'],
-        name: 'FooBarBaz-type Objects'
-      }
+        name: 'FooBarBaz-type Objects',
+      },
     };
 
     spyOn(GGRC.Mappings, 'getMappingTypes').and.returnValue(objectTypes);
@@ -81,34 +81,34 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
             {value: 'Contract'},  // this object type is relevant
             {value: 'Assessment'},
             {value: 'Audit'},
-            {value: 'CycleTaskGroupObjectTask'}
-          ]
+            {value: 'CycleTaskGroupObjectTask'},
+          ],
         },
         groupBar: {
           name: 'Bar Objects',
           items: [
             {value: 'Policy'},  // this object type is relevant
             {value: 'TaskGroup'},
-            {value: 'TaskGroupTask'}
-          ]
+            {value: 'TaskGroupTask'},
+          ],
         },
         groupBaz: {
           name: 'Baz Objects',
           items: [
-            {value: 'Workflow'}
-          ]
-        }
+            {value: 'Workflow'},
+          ],
+        },
       };
 
       let expected = {
         groupFoo: {
           name: 'Foo Objects',
-          items: [{value: 'Contract'}]
+          items: [{value: 'Contract'}],
         },
         groupBar: {
           name: 'Bar Objects',
-          items: [{value: 'Policy'}]
-        }
+          items: [{value: 'Policy'}],
+        },
         // the groupBaz group, being empty, is expected to have been removed
       };
 

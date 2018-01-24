@@ -15,7 +15,7 @@ describe('GGRC.Components.mapperResultsItemsHeader', function () {
 
   describe('isSorted() method', function () {
     let attr = new can.Map({
-      attr_sort_field: 'Title'
+      attr_sort_field: 'Title',
     });
 
     it('returns true if attr_sort_field equal to viewModel.sortKey',
@@ -58,7 +58,7 @@ describe('GGRC.Components.mapperResultsItemsHeader', function () {
     it('toggles sort direction if sorted by current attribute',
       function () {
         let attr = new can.Map({
-          attr_sort_field: 'Title'
+          attr_sort_field: 'Title',
         });
         viewModel.applySort(attr);
         expect(viewModel.attr('sortDirection')).toEqual('desc');
@@ -67,7 +67,7 @@ describe('GGRC.Components.mapperResultsItemsHeader', function () {
     it('changes sortKey if sorted by another attribute',
       function () {
         let attr = new can.Map({
-          attr_sort_field: 'State'
+          attr_sort_field: 'State',
         });
         viewModel.applySort(attr);
         expect(viewModel.attr('sortKey')).toEqual('State');
@@ -76,7 +76,7 @@ describe('GGRC.Components.mapperResultsItemsHeader', function () {
     it('sets sortDirection to "asc" if sorted by another attribute',
       function () {
         let attr = new can.Map({
-          attr_sort_field: 'State'
+          attr_sort_field: 'State',
         });
         viewModel.applySort(attr);
         expect(viewModel.attr('sortDirection')).toEqual('asc');

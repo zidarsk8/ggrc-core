@@ -20,21 +20,21 @@ let statesModels = [
     models: ['AssessmentTemplate', 'Project', 'Program']
       .concat(snapshotableObject)
       .concat(objectVersions),
-    states: ['Active', 'Draft', 'Deprecated']
+    states: ['Active', 'Draft', 'Deprecated'],
   },
   {
     models: ['Assessment'],
     states: [
       'Not Started', 'In Progress', 'In Review', 'Rework Needed',
-      'Completed and Verified', 'Completed (no verification)', 'Deprecated'
-    ]
+      'Completed and Verified', 'Completed (no verification)', 'Deprecated',
+    ],
   },
   {
     models: ['Audit'],
     states: [
       'Planned', 'In Progress', 'Manager Review',
-      'Ready for External Review', 'Completed', 'Deprecated'
-    ]
+      'Ready for External Review', 'Completed', 'Deprecated',
+    ],
   },
   {
     models: [
@@ -58,9 +58,9 @@ let statesModels = [
   {
     models: ['Issue'],
     states: [
-      'Active', 'Draft', 'Deprecated', 'Fixed', 'Fixed and Verified'
-    ]
-  }
+      'Active', 'Draft', 'Deprecated', 'Fixed', 'Fixed and Verified',
+    ],
+  },
 ];
 
 /**

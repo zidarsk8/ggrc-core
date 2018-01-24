@@ -80,9 +80,9 @@
         mappings: [{
           instance: true,
           mappings: [],
-          binding: binding
+          binding: binding,
         }],
-        binding: binding
+        binding: binding,
       });
     },
     get_instance_from_mapping: function (binding, mapping) {
@@ -128,6 +128,6 @@
     },
     refresh_list: function (binding) {
       return this._refresh_stubs(binding);
-    }
+    },
   });
 })(window.GGRC, window.can);

@@ -69,8 +69,8 @@ describe('GGRC.Components.TasksCounter', function () {
           return {
             getTasksCount: () => can.Deferred().resolve({
               open_task_count: 5,
-              has_overdue: true
-            })
+              has_overdue: true,
+            }),
           };
         });
       });

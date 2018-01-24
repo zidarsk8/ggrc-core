@@ -17,15 +17,15 @@
     define: {
       state: {
         type: 'string',
-        value: defaultState
+        value: defaultState,
       },
       suffix: {
         get: function () {
           let state = this.attr('state') || defaultState;
           return state.toLowerCase().replace(/[\s\t]+/g, '');
-        }
-      }
-    }
+        },
+      },
+    },
   });
   /**
    * Simple Component to add color indication for Assessment State Name
@@ -33,6 +33,6 @@
   GGRC.Components('stateColorsMap', {
     tag: 'state-colors-map',
     template: tpl,
-    viewModel: viewModel
+    viewModel: viewModel,
   });
 })(window.can, window.GGRC);

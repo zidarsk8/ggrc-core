@@ -30,7 +30,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       assessment_type: 'Control',
       status: 'Not Started',
       send_by_default: true,  // notifications when a comment is added
-      recipients: 'Assignees,Creators,Verifiers'  // user roles to be notified
+      recipients: 'Assignees,Creators,Verifiers',  // user roles to be notified
     },
     statuses: ['Not Started', 'In Progress', 'In Review',
       'Verified', 'Completed', 'Deprecated', 'Rework Needed'],
@@ -120,7 +120,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       title: 'Confirm moving Assessment to "In Progress"',
       description: 'You are about to move Assessment from ' +
       '"{{status}}" to "In Progress" - are you sure about that?',
-      button: 'Confirm'
+      button: 'Confirm',
     },
     conclusions: ['Effective', 'Ineffective', 'Needs improvement',
       'Not Applicable'],
@@ -229,7 +229,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
      */
     findInCacheById: function (id) {
       return this.store[id];
-    }
+    },
   }, {
     init: function () {
       if (this._super) {
@@ -380,7 +380,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
             can.ajax({
               url: href,
               type: 'get',
-              dataType: 'json'
+              dataType: 'json',
             })
           .then(function (model) {
             delete that._pending_refresh;
@@ -396,7 +396,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
           .fail(function () {
             dfd.reject.apply(dfd, arguments);
           });
-          }, 300, {trailing: false})
+          }, 300, {trailing: false}),
         };
       }
       dfd = this._pending_refresh.dfd;

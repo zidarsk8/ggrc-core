@@ -17,9 +17,9 @@ GGRC.Components('attachFolderButton', {
          return !Permission
            .is_allowed_for('update', this.attr('instance')) ||
            this.attr('instance.archived');
-       }
-     }
+       },
+     },
    },
-   instance: null
- }
+   instance: null,
+ },
 });

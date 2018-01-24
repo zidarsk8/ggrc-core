@@ -15,7 +15,7 @@ import template from './editable-document-object-list-item.mustache';
     tag: tag,
     template: template,
     viewModel: {
-      document: {}
-    }
+      document: {},
+    },
   });
 })(window.can, window.GGRC);

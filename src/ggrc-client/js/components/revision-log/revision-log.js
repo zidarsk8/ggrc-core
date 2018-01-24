@@ -21,15 +21,15 @@ import template from './revision-log.mustache';
     requested_on: 1,
     due_on: 1,
     finished_date: 1,
-    verified_date: 1
+    verified_date: 1,
   };
 
   let _LIST_FIELDS = {
-    recipients: 1
+    recipients: 1,
   };
   let _EMBED_MAPPINGS = {
     Request: ['Comment', 'Document'],
-    Assessment: ['Comment', 'Document']
+    Assessment: ['Comment', 'Document'],
   };
 
   /**
@@ -45,8 +45,8 @@ import template from './revision-log.mustache';
       _EMBED_MAPPINGS: _EMBED_MAPPINGS,
       define: {
         changeHistory: {
-          Value: can.List
-        }
+          Value: can.List,
+        },
       },
       instance: null,
       isLoading: true,
@@ -120,7 +120,7 @@ import template from './revision-log.mustache';
             if (revision.destination_type && revision.destination_id) {
               revision.destination = can.Stub.get_or_create({
                 id: revision.destination_id,
-                type: revision.destination_type
+                type: revision.destination_type,
               });
               rq.enqueue(revision.destination);
             }
@@ -129,7 +129,7 @@ import template from './revision-log.mustache';
             if (revision.source_type && revision.source_id) {
               revision.source = can.Stub.get_or_create({
                 id: revision.source_id,
-                type: revision.source_type
+                type: revision.source_type,
               });
               rq.enqueue(revision.source);
             }
@@ -149,7 +149,7 @@ import template from './revision-log.mustache';
                 let mappings = mappingsSrc.concat(mappingsDest, embedded);
                 return {
                   object: _.map(objRevisions, reify),
-                  mappings: _.map(mappings, reify)
+                  mappings: _.map(mappings, reify),
                 };
               });
             });
@@ -181,7 +181,7 @@ import template from './revision-log.mustache';
             CMS.Models.Revision.findAll({
               source_type: obj.type,
               source_id: obj.id,
-              __sort: 'updated_at'
+              __sort: 'updated_at',
             }).then(function (revisions) {
               return _.map(revisions, function (revision) {
                 revision = new can.Map(revision.serialize());
@@ -192,8 +192,8 @@ import template from './revision-log.mustache';
                   source: instance,
                   destination: can.Stub.get_or_create({
                     type: revision.destination_type,
-                    id: revision.destination_id
-                  })
+                    id: revision.destination_id,
+                  }),
                 });
                 rq.enqueue(revision.destination);
                 return revision;
@@ -202,7 +202,7 @@ import template from './revision-log.mustache';
             CMS.Models.Revision.findAll({
               destination_type: obj.type,
               destination_id: obj.id,
-              __sort: 'updated_at'
+              __sort: 'updated_at',
             }).then(function (revisions) {
               return _.map(revisions, function (revision) {
                 revision = new can.Map(revision.serialize());
@@ -213,13 +213,13 @@ import template from './revision-log.mustache';
                   destination: instance,
                   source: can.Stub.get_or_create({
                     type: revision.source_type,
-                    id: revision.source_id
-                  })
+                    id: revision.source_id,
+                  }),
                 });
                 rq.enqueue(revision.source);
                 return revision;
               });
-            })
+            }),
           ];
         }
 
@@ -429,7 +429,7 @@ import template from './revision-log.mustache';
           madeBy: null,
           updatedAt: null,
           changes: [],
-          role: null
+          role: null,
         };
         let attrDefs = GGRC.model_attr_defs[rev2.resource_type];
         let madeByPersonId = rev2.modified_by ? rev2.modified_by.id : null;
@@ -484,7 +484,7 @@ import template from './revision-log.mustache';
                 diff.changes.push({
                   fieldName: displayName,
                   origVal: origVal,
-                  newVal: value
+                  newVal: value,
                 });
               }
             }
@@ -642,8 +642,8 @@ import template from './revision-log.mustache';
           changes: {
             origVal: origVal,
             newVal: newVal,
-            fieldName: fieldName
-          }
+            fieldName: fieldName,
+          },
         };
       },
       /**
@@ -703,21 +703,21 @@ import template from './revision-log.mustache';
               if (rev.action === 'deleted' || !rev.content.attrs.AssigneeType) {
                 return {
                   updated_at: rev.updated_at,
-                  role: 'none'
+                  role: 'none',
                 };
               }
               return {
                 updated_at: rev.updated_at,
                 role: GGRC.Utils.get_highest_assignee_role(
                   instance,
-                  rev.content.attrs.AssigneeType.split(','))
+                  rev.content.attrs.AssigneeType.split(',')),
               };
             });
 
             if (revisions[0].action !== 'created') {
               history.unshift({
                 role: 'none',
-                updated_at: instance.created_at
+                updated_at: instance.created_at,
               });
             }
             return [pid, history];
@@ -736,7 +736,7 @@ import template from './revision-log.mustache';
               function (person) {
                 return {
                   id: person.instance.id,
-                  type: assignableType.type
+                  type: assignableType.type,
                 };
               });
           })), 'id');
@@ -755,7 +755,7 @@ import template from './revision-log.mustache';
             instance, existingRoles);
           perPersonRoleHistory[pid] = [{
             updated_at: instance.created_at,
-            role: role
+            role: role,
           }];
         });
 
@@ -765,7 +765,7 @@ import template from './revision-log.mustache';
         _.forEach(unassignedPeople, function (pid) {
           perPersonRoleHistory[pid] = [{
             updated_at: instance.created_at,
-            role: 'none'
+            role: 'none',
           }];
         });
 
@@ -789,7 +789,7 @@ import template from './revision-log.mustache';
           return role.role;
         }
         return 'none';
-      }
+      },
     },
     /**
      * The component's entry point. Invoked when a new component instance has
@@ -801,7 +801,7 @@ import template from './revision-log.mustache';
     events: {
       '{viewModel.instance} refreshInstance': function () {
         this.viewModel.fetchItems();
-      }
-    }
+      },
+    },
   });
 })(window.GGRC, window.can);

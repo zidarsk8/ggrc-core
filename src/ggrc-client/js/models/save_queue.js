@@ -45,7 +45,7 @@
             if (bucket.background) {
               xhr.setRequestHeader('X-GGRC-BackgroundTask', 'true');
             }
-          }
+          },
         }).promise();
         dfd.always(function (data, type) {
           if (type === 'error') {
@@ -55,7 +55,7 @@
           }
           if ('background_task' in data) {
             return CMS.Models.BackgroundTask.findOne({
-              id: data.background_task.id
+              id: data.background_task.id,
             }).then(function (task) {
               // Resolve all the dfds with the task
               can.each(objs, function (obj) {
@@ -138,7 +138,7 @@
             background: obj.run_in_background,
             // List of batch request responses that are yet to be processed.
             save_responses: [],
-            in_flight: false // is there a "thread" running for this bucket
+            in_flight: false, // is there a "thread" running for this bucket
           };
           this._buckets[bucketName] = bucket;
         }
@@ -150,7 +150,7 @@
         bucket.in_flight = true;
       }
       this._step(elem);
-    }
+    },
   }, {
     init: function (queue) {
       this._queue = queue;
@@ -166,6 +166,6 @@
       $.when.apply($, objs.map(function (fn) {
         return fn.apply(this);
       }.bind(this.constructor))).always(this._resolve.bind(this)); // Move on to the next one
-    }
+    },
   });
 })(window.can, window.can.$);

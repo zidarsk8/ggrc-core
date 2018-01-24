@@ -58,6 +58,6 @@ import RefreshQueue from '../refresh_queue';
       let refreshQueue = new RefreshQueue();
       refreshQueue.enqueue(this.instance);
       return refreshQueue.trigger();
-    }
+    },
   });
 })(window.GGRC, window.can);

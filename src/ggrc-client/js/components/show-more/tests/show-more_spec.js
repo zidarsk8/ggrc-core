@@ -116,7 +116,7 @@ describe('showMore', function () {
 
   describe('toggleShowAll() method', function () {
     let eventMock = {
-      stopPropagation: function () {}
+      stopPropagation: function () {},
     };
 
     beforeEach(function () {
