@@ -163,7 +163,7 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
         all_models.AccessControlList,
         sa.and_(
             all_models.AccessControlList.object_type ==
-            "CycleTaskGroupObjectTask",
+            all_models.CycleTaskGroupObjectTask.__name__,
             all_models.AccessControlList.object_id ==
             all_models.CycleTaskGroupObjectTask.id,
             all_models.AccessControlList.person_id == contact_id,
@@ -174,7 +174,7 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
             all_models.AccessControlRole.id ==
             all_models.AccessControlList.ac_role_id,
             all_models.AccessControlRole.object_type ==
-            "CycleTaskGroupObjectTask",
+            all_models.CycleTaskGroupObjectTask.__name__,
             all_models.AccessControlRole.name == "Task Assignees",
         )
     ).filter(

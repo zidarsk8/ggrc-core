@@ -43,7 +43,7 @@ def get_user_task_count():
         all_models.AccessControlList,
         sa.and_(
             all_models.AccessControlList.object_type ==
-            "CycleTaskGroupObjectTask",
+            CycleTaskGroupObjectTask.__name__,
             all_models.AccessControlList.object_id ==
             CycleTaskGroupObjectTask.id,
             all_models.AccessControlList.person_id ==
@@ -55,7 +55,7 @@ def get_user_task_count():
             all_models.AccessControlRole.id ==
             all_models.AccessControlList.ac_role_id,
             all_models.AccessControlRole.object_type ==
-            "CycleTaskGroupObjectTask",
+            CycleTaskGroupObjectTask.__name__,
             all_models.AccessControlRole.name.in_(
                 ("Task Assignees", "Task Secondary Assignees")),
         )
