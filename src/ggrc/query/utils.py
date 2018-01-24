@@ -3,18 +3,17 @@
 
 """Utils module for query generation."""
 
-from sqlalchemy import case
-from sqlalchemy import literal
+import sqlalchemy as sa
 
 
 def get_type_select_column(model):
   """Get column name,taking into account polymorphic types."""
-  mapper = model._sa_class_manager.mapper
+  mapper = model._sa_class_manager.mapper  # pylint: disable=protected-access
   if mapper.polymorphic_on is None:
-    type_column = literal(mapper.class_.__name__)
+    type_column = sa.literal(mapper.class_.__name__)
   else:
     # Handle polymorphic types with CASE
-    type_column = case(
+    type_column = sa.case(
         value=mapper.polymorphic_on,
         whens={
             val: m.class_.__name__
