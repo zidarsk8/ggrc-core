@@ -9,14 +9,14 @@ import Component from '../comment-input';
 describe('GGRC.Component.CommentInput', function () {
   'use strict';
 
-  var testingText = 'Lorem ipsum ' +
+  let testingText = 'Lorem ipsum ' +
     'dolor sit amet, consectetur adipiscing elit.' +
     ' Mauris accumsan porta nisl ut lobortis.' +
     ' Proin sollicitudin enim ante,' +
     ' sit amet elementum ipsum fringilla sed';
 
   describe('.setValues() method', function () {
-    var scope;
+    let scope;
 
     beforeEach(function () {
       scope = getComponentVM(Component);

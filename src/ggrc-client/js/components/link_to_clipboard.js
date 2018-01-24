@@ -26,7 +26,7 @@ import Clipboard from 'clipboard';
         evnt.preventDefault();
       },
       'inserted': function (el, evnt) {
-        var timeout = this.scope.attr('timeout') || 10000;
+        let timeout = this.scope.attr('timeout') || 10000;
         this._clip = new Clipboard(el.find('a')[0]);
 
         this._clip.on('success', function () {

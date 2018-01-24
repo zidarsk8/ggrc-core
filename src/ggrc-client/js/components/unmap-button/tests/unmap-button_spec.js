@@ -5,11 +5,11 @@
 
 describe('GGRC.Components.unmapButton', function () {
   'use strict';
-  var events;
-  var viewModel;
+  let events;
+  let viewModel;
 
   beforeAll(function () {
-    var Component = GGRC.Components.get('unmapButton');
+    let Component = GGRC.Components.get('unmapButton');
     events = Component.prototype.events;
   });
 
@@ -18,7 +18,7 @@ describe('GGRC.Components.unmapButton', function () {
   });
 
   describe('"click" event handler', function () {
-    var handler;
+    let handler;
     beforeEach(function () {
       handler = events.click;
     });

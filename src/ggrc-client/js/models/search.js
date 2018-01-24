@@ -7,7 +7,7 @@ can.Model('GGRC.Models.Search', {
 
   findOne: 'GET /search',
   init: function () {
-    var _findOne;
+    let _findOne;
     if (this._super) {
       this._super.apply(this, arguments);
     }
@@ -32,7 +32,7 @@ can.Model('GGRC.Models.Search', {
     }, params));
   },
   search_for_types: function (str, types, params) {
-    var result;
+    let result;
     if ((!str || str.trim().length === 0) && (!params || params.length === 0)) {
       // Empty search, so actually hit normal endpoints instead of search
       // This returns a search instance which will search across all given types.
@@ -62,7 +62,7 @@ can.Model('GGRC.Models.Search', {
       }, params));
   },
   load_via_model_endpoints: function (types) {
-    var dfds;
+    let dfds;
 
     dfds = can.map(types, function (model_name) {
       // FIXME: This should use __stubs_only=true when paging is used
@@ -73,8 +73,8 @@ can.Model('GGRC.Models.Search', {
     });
 
     return $.when.apply($, dfds).then(function () {
-      var model_results = can.makeArray(arguments);
-      var search_response = {
+      let model_results = can.makeArray(arguments);
+      let search_response = {
         entries: {},
         selfLink: 'Fake'
       };
@@ -91,13 +91,13 @@ can.Model('GGRC.Models.Search', {
   },
 }, {
   getResultsFor: function (type) {
-    var _class = type.shortName ? type :
+    let _class = type.shortName ? type :
       (can.getObject('CMS.Models.' + type) ||
         can.getObject('GGRC.Models.' + type));
 
     type = _class.shortName;
     return can.map(this.entries, function (v) {
-      var inst;
+      let inst;
       if (v.type === type) {
         inst = new _class({id: v.id});
         return inst;
@@ -105,8 +105,8 @@ can.Model('GGRC.Models.Search', {
     });
   },
   getResultsForType: function (model_name) {
-    var model = CMS.Models[model_name];
-    var entries;
+    let model = CMS.Models[model_name];
+    let entries;
 
     if (!(this.entries instanceof Array ||
       this.entries instanceof can.Observe.List)) {
@@ -124,7 +124,7 @@ can.Model('GGRC.Models.Search', {
     });
   },
   getCountFor: function (type) {
-    var result;
+    let result;
 
     if (type && type.shortName) {
       type = type.shortName;

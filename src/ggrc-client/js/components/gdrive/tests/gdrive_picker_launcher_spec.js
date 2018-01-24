@@ -6,7 +6,7 @@
 describe('GGRC.Components.gDrivePickerLauncher', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
   const optsAuditFolder = {
     dest: {
       id: 'some-folder-id',
@@ -56,7 +56,7 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
   });
 
   it('should test sanitizeSlug() method', function () {
-    var sanitizationCheck = {
+    let sanitizationCheck = {
       'abc-test-code-1.CA-865': 'abc-test-code-1-ca-865',
       'AC01.CA-1121': 'ac01-ca-1121',
 
@@ -79,11 +79,11 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
   });
 
   it('should test addFileSuffix() method', function () {
-    var fakeInstance = new can.Map({
+    let fakeInstance = new can.Map({
       slug: 'ASSESSMENT-12345',
     });
 
-    var fileNameTransformationMap = {
+    let fileNameTransformationMap = {
       'Screenshot 2016-04-29 12.56.30.png':
         'Screenshot 2016-04-29 12.56.30_ggrc_assessment' +
         '-12345_control-345_control-678.png',
@@ -128,7 +128,7 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
   });
 
   it('should reuse file picked from the same folder', function () {
-    var file = genUploadedFile(FILE_PICKED, optsAuditFolder.dest.id);
+    let file = genUploadedFile(FILE_PICKED, optsAuditFolder.dest.id);
 
     spyOn(viewModel, 'createEditRequest');
     spyOn(viewModel, 'createCopyRequest');
@@ -186,7 +186,7 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
   });
 
   it('should reuse file picked from the same root folder', function () {
-    var file = genUploadedFile(FILE_PICKED);
+    let file = genUploadedFile(FILE_PICKED);
 
     spyOn(viewModel, 'createEditRequest');
     spyOn(viewModel, 'createCopyRequest');
@@ -217,10 +217,10 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
 describe('GGRC.Components.gDrivePickerLauncher', function () {
   'use strict';
 
-  var Component;
-  var events;
-  var viewModel;
-  var eventStub = {
+  let Component;
+  let events;
+  let viewModel;
+  let eventStub = {
     preventDefault: function () {}
   };
 
@@ -243,8 +243,8 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
     });
 
     it('pass callbackResult to can.when()', function () {
-      var dfd = can.Deferred();
-      var thenSpy = jasmine.createSpy('then');
+      let dfd = can.Deferred();
+      let thenSpy = jasmine.createSpy('then');
       spyOn(viewModel, 'confirmationCallback').and.returnValue(dfd);
       spyOn(can, 'when').and.returnValue({
         then: thenSpy
@@ -257,7 +257,7 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
     });
 
     it('pass null to can.when() when callback is not provided', function () {
-      var thenSpy = jasmine.createSpy('then');
+      let thenSpy = jasmine.createSpy('then');
       spyOn(can, 'when').and.returnValue({
         then: thenSpy
       });
@@ -301,8 +301,8 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
 
   describe('events', function () {
     describe('"{viewModel} modal:success" handler', function () {
-      var method;
-      var that;
+      let method;
+      let that;
 
       beforeEach(function () {
         that = {

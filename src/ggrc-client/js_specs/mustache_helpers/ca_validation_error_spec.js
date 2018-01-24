@@ -6,8 +6,8 @@
 describe('can.mustache.helper.ca_validation_error', function () {
   'use strict';
 
-  var helper;
-  var fakeOptions;
+  let helper;
+  let fakeOptions;
 
   beforeAll(function () {
     helper = can.Mustache._helpers.ca_validation_error.fn;
@@ -26,7 +26,7 @@ describe('can.mustache.helper.ca_validation_error', function () {
   it('renders the "truthy" block if there are validation errors for the ' +
     'custom attribute',
     function () {
-      var validationErrors = {
+      let validationErrors = {
         'custom_attributes.4': ['invalid value']
       };
       helper(validationErrors, 4, fakeOptions);
@@ -37,7 +37,7 @@ describe('can.mustache.helper.ca_validation_error', function () {
   it('adds the errors list to the scope if there are validation errors for ' +
     'the custom attribute',
     function () {
-      var validationErrors = {
+      let validationErrors = {
         'custom_attributes.1': ['invalid  date format'],
         'custom_attributes.4': ['value is too short', 'not a number']
       };
@@ -51,7 +51,7 @@ describe('can.mustache.helper.ca_validation_error', function () {
   it('renders the "falsy" block if there are no validation errors for the ' +
     'custom attribute',
     function () {
-      var validationErrors = {
+      let validationErrors = {
         'custom_attributes.4': ['invalid value']
       };
       helper(validationErrors, 8, fakeOptions);

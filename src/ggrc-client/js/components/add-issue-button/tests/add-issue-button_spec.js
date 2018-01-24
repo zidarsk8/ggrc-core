@@ -10,9 +10,9 @@ import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 describe('GGRC.Components.addIssueButton', function () {
   'use strict';
 
-  var Component;
-  var viewModel;
-  var events;
+  let Component;
+  let viewModel;
+  let events;
 
   beforeAll(function () {
     Component = GGRC.Components.get('addIssueButton');
@@ -24,9 +24,9 @@ describe('GGRC.Components.addIssueButton', function () {
   });
 
   describe('refreshIssueList() method', function () {
-    var relatedInstance;
-    var handler;
-    var that;
+    let relatedInstance;
+    let handler;
+    let that;
 
     beforeEach(function () {
       that = {
@@ -38,9 +38,9 @@ describe('GGRC.Components.addIssueButton', function () {
     });
 
     describe('in case of Issue instance', function () {
-      var issueWidgetName = 'Issue';
-      var fakeIssueInstance;
-      var fakePageInstance = {
+      let issueWidgetName = 'Issue';
+      let fakeIssueInstance;
+      let fakePageInstance = {
         type: 'TYPE',
         id: 'ID'
       };
@@ -72,7 +72,7 @@ describe('GGRC.Components.addIssueButton', function () {
   });
 
   describe('prepareJSON get() method', function () {
-    var isJson;
+    let isJson;
 
     beforeEach(function () {
       viewModel.attr('relatedInstance', {
@@ -87,14 +87,14 @@ describe('GGRC.Components.addIssueButton', function () {
     });
 
     it('returns json-format string', function () {
-      var result = viewModel.attr('prepareJSON');
+      let result = viewModel.attr('prepareJSON');
       expect(isJson(result)).toBe(true);
     });
 
     describe('for returned json-format string', function () {
       it('sets assessment field', function () {
-        var result;
-        var relatedInstance = {
+        let result;
+        let relatedInstance = {
           title: 'title',
           id: 1,
           type: 'type',

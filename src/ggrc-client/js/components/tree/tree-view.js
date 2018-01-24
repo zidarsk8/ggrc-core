@@ -9,7 +9,7 @@ import template from './templates/tree-view.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var viewModel = can.Map.extend({
+  let viewModel = can.Map.extend({
     define: {
       notResult: {
         type: Boolean,
@@ -40,9 +40,9 @@ import template from './templates/tree-view.mustache';
     viewModel: viewModel,
     events: {
       inserted: function () {
-        var model = this.viewModel.attr('model');
-        var mapping = this.viewModel.attr('mapping');
-        var parentInstance = this.viewModel.attr('parentInstance');
+        let model = this.viewModel.attr('model');
+        let mapping = this.viewModel.attr('mapping');
+        let parentInstance = this.viewModel.attr('parentInstance');
 
         this.viewModel.attr('_loader',
           new GGRC.ListLoaders.TreeBaseLoader(model, parentInstance, mapping));

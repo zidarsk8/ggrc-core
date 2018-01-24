@@ -8,14 +8,14 @@ import RefreshQueue from '../../../models/refresh_queue';
 describe('GGRC.Components.personItem', function () {
   'use strict';
 
-  var Component;  // the component under test
+  let Component;  // the component under test
 
   beforeAll(function () {
     Component = GGRC.Components.get('personItem');
   });
 
   describe('defining default scope values', function () {
-    var scope;
+    let scope;
 
     beforeAll(function () {
       scope = Component.prototype.scope;
@@ -27,10 +27,10 @@ describe('GGRC.Components.personItem', function () {
   });
 
   describe('init() method', function () {
-    var dfdFindOne;
-    var template;  // the DOM element passed to the component instance
-    var component;
-    var frag;
+    let dfdFindOne;
+    let template;  // the DOM element passed to the component instance
+    let component;
+    let frag;
 
     beforeEach(function () {
       dfdFindOne = new can.Deferred();
@@ -44,7 +44,7 @@ describe('GGRC.Components.personItem', function () {
     it('sets the personObj in scope to the cached Person object ' +
       'if found there',
       function () {
-        var person42 = new CMS.Models.Person({
+        let person42 = new CMS.Models.Person({
           id: 42, name: 'John', email: 'john@doe.com'
         });
 
@@ -62,7 +62,7 @@ describe('GGRC.Components.personItem', function () {
     it('sets the personObj in scope to the fetched Person object ' +
       'if not found in cache',
       function () {
-        var person123 = new can.Map({
+        let person123 = new can.Map({
           id: 123, name: 'Mike', email: 'mike@mike.com'
         });
 
@@ -85,8 +85,8 @@ describe('GGRC.Components.personItem', function () {
     it('sets the personObj in scope to the fetched Person object ' +
       'for partially loaded objects in cache',
       function () {
-        var person123 = new can.Map({id: 123, name: '', email: ''});
-        var fetchedPerson = new can.Map({
+        let person123 = new can.Map({id: 123, name: '', email: ''});
+        let fetchedPerson = new can.Map({
           id: 123, name: 'John', email: 'john@doe.com'
         });
 
@@ -120,7 +120,7 @@ describe('GGRC.Components.personItem', function () {
       }
     );
     it('gets stub from cache and then makes a request', function () {
-      var person123 = new CMS.Models.Person({
+      let person123 = new CMS.Models.Person({
         id: 123, name: '', type: 'Person'
       });
 
@@ -135,7 +135,7 @@ describe('GGRC.Components.personItem', function () {
       expect(RefreshQueue.prototype.trigger).toHaveBeenCalled();
     });
     it('gets person object from and doesn\'t make a request', function () {
-      var personObj = new can.Map({
+      let personObj = new can.Map({
         id: 123, name: '', type: 'Person'
       });
       new CMS.Models.Person({
@@ -156,7 +156,7 @@ describe('GGRC.Components.personItem', function () {
     });
     it('gets person object from context and it doesn\'t trigger ' +
        'the RefreshQueue', function () {
-      var personObj = new CMS.Models.Person({
+      let personObj = new CMS.Models.Person({
         id: 123, name: 'Ivan', email: 'ivan@google.com', type: 'Person'
       });
 
@@ -175,8 +175,8 @@ describe('GGRC.Components.personItem', function () {
   });
 
   describe('unmap person click event handler', function () {
-    var handler;  // the event handler under test
-    var componentInst;  // fake component instance
+    let handler;  // the event handler under test
+    let componentInst;  // fake component instance
 
     beforeEach(function () {
       componentInst = {
@@ -193,7 +193,7 @@ describe('GGRC.Components.personItem', function () {
     it('triggers the person-remove event with the person object as the ' +
       'event argument',
       function () {
-        var call;
+        let call;
         componentInst.scope.attr('personObj', {id: 123, name: 'John'});
 
         handler();
@@ -208,7 +208,7 @@ describe('GGRC.Components.personItem', function () {
 
     it('emits the person-remove event using the dispatch mechanism',
       function () {
-        var call;
+        let call;
         componentInst.viewModel.attr('personObj', {id: 123, name: 'John'});
         spyOn(componentInst.viewModel, 'dispatch');
 

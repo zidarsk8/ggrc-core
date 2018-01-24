@@ -41,8 +41,8 @@ import {
           })
           .then(function () {
             // We need to update person's assigned_tasks mapping manually
-            var person = CMS.Models.Person.cache[GGRC.current_user.id];
-            var binding = person.get_binding('assigned_tasks');
+            let person = CMS.Models.Person.cache[GGRC.current_user.id];
+            let binding = person.get_binding('assigned_tasks');
 
             // FIXME: Find a better way of removing stagnant
             // items from the list.
@@ -50,8 +50,8 @@ import {
             return binding.loader.refresh_list(binding);
           })
           .then(function () {
-            var pageInstance = GGRC.page_instance();
-            var WorkflowExtension =
+            let pageInstance = GGRC.page_instance();
+            let WorkflowExtension =
               GGRC.extensions.find(function (extension) {
                 return extension.name === 'workflows';
               });

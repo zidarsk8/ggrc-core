@@ -4,7 +4,7 @@
  */
 
 const toBulkModel = (instances, targetProps)=> {
-  var state = targetProps.state;
+  let state = targetProps.state;
   return _.map(instances, (item)=> {
     return {
       id: item.id,

@@ -13,7 +13,7 @@ import template from './advanced-search-mapping-criteria.mustache';
  * Contains logic used in Mapping Criteria component.
  * @constructor
  */
-var viewModel = can.Map.extend({
+let viewModel = can.Map.extend({
   define: {
     /**
      * Contains object represents criteria.
@@ -95,7 +95,7 @@ var viewModel = can.Map.extend({
    * @return {can.List} - List of available attributes.
    */
   availableAttributes: function () {
-    var available = getColumnsForModel(
+    let available = getColumnsForModel(
       this.attr('criteria.objectName'),
       null
     ).available;
@@ -106,9 +106,9 @@ var viewModel = can.Map.extend({
    * @return {Array} - List of available mapping types.
    */
   mappingTypes: function () {
-    var mappings = GGRC.Mappings
+    let mappings = GGRC.Mappings
       .get_canonical_mappings_for(this.attr('modelName'));
-    var types = _.chain(mappings)
+    let types = _.chain(mappings)
       .keys()
       .map(function (mapping) {
         return CMS.Models[mapping];

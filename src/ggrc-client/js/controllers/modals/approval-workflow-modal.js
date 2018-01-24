@@ -7,7 +7,7 @@ import ModalsController from './modals_controller';
 import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
 
 let ApprovalWorkflowErrors = function () {
-  var errors = null;
+  let errors = null;
   if (!this.attr('contact')) {
     errors = {
       contact: 'Must be defined'
@@ -27,14 +27,14 @@ let ApprovalWorkflow = can.Observe({
   }
 }, {
   save: function () {
-    var that = this;
-    var aws_dfd = this.original_object.get_binding('approval_workflows').refresh_list();
-    var reviewTemplate = _.template('Object review for ${type} "${title}"');
-    var notifyTemplate = _.template('<br/><br/> ${name} (${email}) asked ' +
+    let that = this;
+    let aws_dfd = this.original_object.get_binding('approval_workflows').refresh_list();
+    let reviewTemplate = _.template('Object review for ${type} "${title}"');
+    let notifyTemplate = _.template('<br/><br/> ${name} (${email}) asked ' +
       'you to review newly created ${type} "${title}" before ${before}. ' +
       'Click <a href="${href}#workflows_widget">here</a> to perform a review.'
     );
-    var assigneeRole = _.find(GGRC.access_control_roles, {
+    let assigneeRole = _.find(GGRC.access_control_roles, {
       object_type: 'TaskGroupTask',
       name: 'Task Assignees',
     });
@@ -44,7 +44,7 @@ let ApprovalWorkflow = can.Observe({
     });
 
     return aws_dfd.then(function (aws) {
-      var ret;
+      let ret;
       var user = GGRC.current_user;
       if (aws.length < 1) {
         ret = $.when(
@@ -152,7 +152,7 @@ let ApprovalWorkflow = can.Observe({
       }
 
       return ret.then(function (wf) {
-        var cycleDfd = new CMS.Models.Cycle({
+        let cycleDfd = new CMS.Models.Cycle({
           workflow: wf,
           autogenerate: true,
           context: wf.context

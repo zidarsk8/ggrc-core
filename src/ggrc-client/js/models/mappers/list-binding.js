@@ -30,7 +30,7 @@ import RefreshQueue from '../refresh_queue';
     //  - Attempts to do the minimal work (e.g., loading only stubs, not full
     //    instances) to return an accurate length
     refresh_count: function () {
-      var self = this;
+      let self = this;
       return this.refresh_stubs().then(function () {
         return can.compute(function () {
           return self.list.attr('length');
@@ -42,9 +42,9 @@ import RefreshQueue from '../refresh_queue';
     //  - Returns a list which will *only* ever contain fully loaded / reified
     //    instances
     refresh_list: function () {
-      var loader = new GGRC.ListLoaders.ReifyingListLoader(this);
-      var binding = loader.attach(this.instance);
-      var self = this;
+      let loader = new GGRC.ListLoaders.ReifyingListLoader(this);
+      let binding = loader.attach(this.instance);
+      let self = this;
 
       binding.name = this.name + '_instances';
       //  FIXME: `refresh_instances` should not need to be called twice, but
@@ -55,7 +55,7 @@ import RefreshQueue from '../refresh_queue';
     },
 
     refresh_instance: function () {
-      var refreshQueue = new RefreshQueue();
+      let refreshQueue = new RefreshQueue();
       refreshQueue.enqueue(this.instance);
       return refreshQueue.trigger();
     }

@@ -6,7 +6,7 @@
 describe('GGRC.Components.objectList', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   describe('should have some default values', function () {
     beforeEach(function () {
@@ -25,7 +25,7 @@ describe('GGRC.Components.objectList', function () {
   });
 
   describe('modifySelection() method ', function () {
-    var scope = new can.Map({
+    let scope = new can.Map({
       instance: {
         type: 'a',
         id: 1
@@ -33,7 +33,7 @@ describe('GGRC.Components.objectList', function () {
       isSelected: false
     });
 
-    var items = new can.List([
+    let items = new can.List([
       scope, {
         instance: {
           type: 'b',
@@ -59,8 +59,8 @@ describe('GGRC.Components.objectList', function () {
   });
 
   describe('clearSelection() method ', function () {
-    var scope;
-    var items;
+    let scope;
+    let items;
 
     beforeEach(function () {
       scope = new can.Map({

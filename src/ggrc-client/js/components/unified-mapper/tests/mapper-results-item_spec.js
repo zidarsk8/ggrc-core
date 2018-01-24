@@ -6,7 +6,7 @@
 describe('GGRC.Components.mapperResultsItem', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(function () {
     viewModel = GGRC.Components.getViewModel('mapperResultsItem');
@@ -15,7 +15,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
   describe('displayItem() method', function () {
     it('returns content of revesion if itemData.revesion defined',
      function () {
-       var result;
+       let result;
        viewModel.attr('itemData', {
          revision: {
            content: 'mockData'
@@ -27,7 +27,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
 
     it('returns itemData if itemData.revesion undefined',
       function () {
-        var result;
+        let result;
         viewModel.attr('itemData', 'mockData');
         result = viewModel.displayItem();
         expect(result).toEqual('mockData');
@@ -35,7 +35,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
   });
 
   describe('title() method', function () {
-    var itemData;
+    let itemData;
     beforeEach(function () {
       itemData = {
         title: 'mockTitle',
@@ -46,14 +46,14 @@ describe('GGRC.Components.mapperResultsItem', function () {
     });
 
     it('returns item title', function () {
-      var result;
+      let result;
       viewModel.attr('itemData', itemData);
       result = viewModel.title();
       expect(result).toEqual('mockTitle');
     });
 
     it('returns item description if no title', function () {
-      var result;
+      let result;
       viewModel.attr('itemData', _.assign(itemData, {
         title: undefined
       }));
@@ -62,7 +62,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
     });
 
     it('returns item name if no title and description', function () {
-      var result;
+      let result;
       viewModel.attr('itemData', _.assign(itemData, {
         title: undefined,
         description_inline: undefined
@@ -73,7 +73,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
 
     it('returns item email if no title, description, name',
       function () {
-        var result;
+        let result;
         viewModel.attr('itemData', _.assign(itemData, {
           title: undefined,
           description_inline: undefined,
@@ -86,7 +86,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
 
   describe('toggleIconCls() method', function () {
     it('returns fa-caret-down if showDetails is true', function () {
-      var result;
+      let result;
       viewModel.attr('showDetails', true);
       result = viewModel.toggleIconCls();
       expect(result).toEqual('fa-caret-down');
@@ -94,7 +94,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
 
     it('returns fa-caret-right if showDetails is false',
       function () {
-        var result;
+        let result;
         viewModel.attr('showDetails', false);
         result = viewModel.toggleIconCls();
         expect(result).toEqual('fa-caret-right');
@@ -116,7 +116,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
 
   describe('isSnapshot() method', function () {
     it('returns true if it is snapshot', function () {
-      var result;
+      let result;
       viewModel.attr('itemData', {
         type: CMS.Models.Snapshot.model_singular
       });
@@ -125,7 +125,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
     });
 
     it('returns false if it is not snapshot', function () {
-      var result;
+      let result;
       viewModel.attr('itemData', {
         type: 'mockType'
       });
@@ -136,7 +136,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
 
   describe('objectType() method', function () {
     it('returns child_type if it is snapshot', function () {
-      var result;
+      let result;
       viewModel.attr('itemData', {
         type: CMS.Models.Snapshot.model_singular,
         child_type: 'mockType'
@@ -146,7 +146,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
     });
 
     it('returns type if it is not snapshot', function () {
-      var result;
+      let result;
       viewModel.attr('itemData', {
         type: 'mockType'
       });
@@ -157,8 +157,8 @@ describe('GGRC.Components.mapperResultsItem', function () {
 
   describe('objectTypeIcon() method', function () {
     it('returns object type icon', function () {
-      var postfix;
-      var result;
+      let postfix;
+      let result;
       viewModel.attr('itemData', {
         type: 'Program'
       });

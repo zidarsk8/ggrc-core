@@ -7,18 +7,18 @@ import Component from '../object-bulk-update';
 import * as stateUtils from '../../../plugins/utils/state-utils';
 
 describe('GGRC.Components.objectBulkUpdate', function () {
-  var events;
+  let events;
 
   beforeAll(function () {
     events = Component.prototype.events;
   });
 
   describe('viewModel() method', function () {
-    var parentViewModel;
-    var method;
-    var targetStates;
-    var mappingType;
-    var result;
+    let parentViewModel;
+    let method;
+    let targetStates;
+    let mappingType;
+    let result;
 
     beforeEach(function () {
       parentViewModel = new can.Map();
@@ -41,7 +41,7 @@ describe('GGRC.Components.objectBulkUpdate', function () {
     });
 
     it('returns correct target states', function () {
-      var actual = can.makeArray(result.targetStates);
+      let actual = can.makeArray(result.targetStates);
       expect(actual).toEqual(targetStates);
     });
 
@@ -64,11 +64,11 @@ describe('GGRC.Components.objectBulkUpdate', function () {
   });
 
   describe('closeModal event', function () {
-    var event;
-    var element;
+    let event;
+    let element;
 
     beforeAll(function () {
-      var scope;
+      let scope;
       element = {
         trigger: jasmine.createSpy(),
       };
@@ -89,10 +89,10 @@ describe('GGRC.Components.objectBulkUpdate', function () {
 
   describe('.btn-cancel click event', function () {
     it('closes modal', function () {
-      var context = {
+      let context = {
         closeModal: jasmine.createSpy(),
       };
-      var event = events['.btn-cancel click'].bind(context);
+      let event = events['.btn-cancel click'].bind(context);
 
       event();
 
@@ -101,8 +101,8 @@ describe('GGRC.Components.objectBulkUpdate', function () {
   });
 
   describe('.btn-update click event', function () {
-    var event;
-    var context;
+    let event;
+    let context;
 
     beforeEach(function () {
       context = {

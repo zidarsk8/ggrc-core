@@ -15,7 +15,7 @@
     },
 
     init: function () {
-      var mapping = this.scope.attr('mapping');
+      let mapping = this.scope.attr('mapping');
       this.sort(mapping);
       mapping.bind('change', _.bind(this.sort, this, mapping));
     },
@@ -27,9 +27,9 @@
      *   mapped to the "parent" object
      */
     sort: function (mapping) {
-      var arr = _.toArray(mapping);
-      var last;
-      var lastIndex;
+      let arr = _.toArray(mapping);
+      let last;
+      let lastIndex;
 
       arr.sort(this.compareTasks.bind(this));
       this.scope.attr('sorted', arr);
@@ -58,9 +58,9 @@
      *   and "b" are considered equal to each other.
      */
     compareTasks: function (a, b) {
-      var ad = this.getTaskDate(a.instance, 'start');
-      var bd = this.getTaskDate(b.instance, 'start');
-      var result = ad - bd;
+      let ad = this.getTaskDate(a.instance, 'start');
+      let bd = this.getTaskDate(b.instance, 'start');
+      let result = ad - bd;
 
       if (!result) {  // if same start dates
         ad = this.getTaskDate(a.instance, 'end');
@@ -84,10 +84,10 @@
      * @return {moment} - the date read from the task
      */
     getTaskDate: function (instance, type) {
-      var month = instance['relative_' + type + '_month'];
-      var day = instance['relative_' + type + '_day'];
+      let month = instance['relative_' + type + '_month'];
+      let day = instance['relative_' + type + '_day'];
 
-      var value = instance[type + '_date'];
+      let value = instance[type + '_date'];
       if (value) {
         return moment.utc(value);
       }
@@ -106,20 +106,20 @@
 
     events: {
       ' sortupdate': function (el, ev, ui) {
-        var mapping = this.scope.attr('mapping');
-        var instanceIndex = _.indexBy(_.pluck(mapping, 'instance'), 'id');
+        let mapping = this.scope.attr('mapping');
+        let instanceIndex = _.indexBy(_.pluck(mapping, 'instance'), 'id');
 
-        var instances = _.map(ui.item.parent()
+        let instances = _.map(ui.item.parent()
           .children('.task_group_tasks__list-item'), function (el) {
             return instanceIndex[$(el).data('object-id')];
         });
 
-        var targetIndex = _.findIndex(instances, {
+        let targetIndex = _.findIndex(instances, {
           id: ui.item.data('object-id')
         });
 
-        var nexts = []; // index for constant time next element lookup
-        var dirty = []; // instances to be saved
+        let nexts = []; // index for constant time next element lookup
+        let dirty = []; // instances to be saved
         instances[targetIndex].attr('sort_index', null);
         nexts[instances.length] = Number.MAX_SAFE_INTEGER.toString();
         _.eachRight(instances, function (instance, index) {
@@ -129,8 +129,8 @@
         // in most cases this will only update sort_index for targetIndex
         // but will also correctly resolve missing or duplicate sort_index-es
         _.each(instances, function (instance, index) {
-          var prev;
-          var next;
+          let prev;
+          let next;
           if (instance.sort_index &&
               instance.sort_index !== nexts[index + 1]) {
             return;
@@ -144,7 +144,7 @@
         });
 
         _.each(dirty, function (instance) {
-          var index = instance.sort_index;
+          let index = instance.sort_index;
           return instance.refresh().then(function (instance) {
             instance.attr('sort_index', index);
             instance.save();

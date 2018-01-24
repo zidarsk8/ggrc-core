@@ -7,10 +7,10 @@ import Pagination from '../../base-objects/pagination';
 
 describe('GGRC.Components.treePagination', function () {
   'use strict';
-  var viewModel;
+  let viewModel;
 
   beforeAll(function () {
-    var Component = GGRC.Components.get('treePagination');
+    let Component = GGRC.Components.get('treePagination');
     viewModel = new can.Map(Component.prototype.viewModel);
   });
 
@@ -25,7 +25,7 @@ describe('GGRC.Components.treePagination', function () {
 
   describe('paginationInfo() method in helpers', function () {
     it('returns info about visible items on page', function () {
-      var result;
+      let result;
       viewModel.attr('paging.pageSize', 10);
       viewModel.attr('paging.total', 3000);
       viewModel.attr('paging.current', 15);
@@ -34,7 +34,7 @@ describe('GGRC.Components.treePagination', function () {
     });
 
     it('returns "No records" if we don\'t have elements', function () {
-      var result;
+      let result;
       viewModel.paging.attr('current', 0);
       viewModel.paging.attr('total', 0);
       result = viewModel.getPaginationInfo();
@@ -43,7 +43,7 @@ describe('GGRC.Components.treePagination', function () {
   });
   describe('paginationPlaceholder() method in helpers', function () {
     it('returns placeholder into page input', function () {
-      var result;
+      let result;
       viewModel.attr('paging.pageSize', 10);
       viewModel.attr('paging.current', 3);
       viewModel.attr('paging.total', 30);
@@ -52,14 +52,14 @@ describe('GGRC.Components.treePagination', function () {
       expect(result).toEqual('Page 3 of 10');
     });
     it('returns empty string if we don\'t have amount of pages', function () {
-      var result;
+      let result;
       viewModel.paging.attr('count', null);
       result = viewModel.getPaginationPlaceholder();
       expect(result).toEqual('');
     });
     it('returns empty string if current page bigger than amount of pages',
       function () {
-        var result;
+        let result;
         viewModel.paging.attr('pageSize', 2);
         viewModel.paging.attr('total', 0);
         viewModel.paging.attr('current', 10);
@@ -135,8 +135,8 @@ describe('GGRC.Components.treePagination', function () {
       });
   });
   describe('setCurrentPage() method ', function () {
-    var input;
-    var event;
+    let input;
+    let event;
     beforeEach(function () {
       input = {
         value: null,

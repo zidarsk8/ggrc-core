@@ -15,11 +15,11 @@ export default GGRC.Components('csvTemplate', {
   },
   events: {
     '#importSelect change': function (el, ev) {
-      var $items = el.find(':selected');
-      var selected = this.scope.attr('selected');
+      let $items = el.find(':selected');
+      let selected = this.scope.attr('selected');
 
       $items.each(function () {
-        var $item = $(this);
+        let $item = $(this);
         if (_.findWhere(selected, {value: $item.val()})) {
           return;
         }
@@ -30,7 +30,7 @@ export default GGRC.Components('csvTemplate', {
       });
     },
     '.import-button click': function (el, ev) {
-      var objects;
+      let objects;
       ev.preventDefault();
 
       objects = _.map(this.scope.attr('selected'), function (el) {
@@ -53,13 +53,13 @@ export default GGRC.Components('csvTemplate', {
       });
     },
     '.import-list a click': function (el, ev) {
-      var index = el.data('index');
-      var item = this.scope.attr('selected').splice(index, 1)[0];
+      let index = el.data('index');
+      let item = this.scope.attr('selected').splice(index, 1)[0];
 
       ev.preventDefault();
 
       this.element.find('#importSelect option:selected').each(function () {
-        var $item = $(this);
+        let $item = $(this);
         if ($item.val() === item.value) {
           $item.prop('selected', false);
         }

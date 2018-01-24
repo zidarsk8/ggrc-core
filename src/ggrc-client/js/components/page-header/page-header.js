@@ -14,7 +14,7 @@ import template from './page-header.mustache';
 
 (function (GGRC, can) {
   'use strict';
-  var colorsMap = {
+  let colorsMap = {
     System: 'header-style-1',
     Process: 'header-style-1',
     DataAsset: 'header-style-1',
@@ -38,7 +38,7 @@ import template from './page-header.mustache';
     Program: 'header-style-5'
   };
 
-  var viewModel = can.Map.extend({
+  let viewModel = can.Map.extend({
     define: {
       isMyAssessments: {
         type: Boolean,
@@ -83,9 +83,9 @@ import template from './page-header.mustache';
       },
     },
     showHideTitles: function (element) {
-      var elWidth = element.width();
-      var $menu = element.find('.menu');
-      var $title = element.find('h1');
+      let elWidth = element.width();
+      let $menu = element.find('.menu');
+      let $title = element.find('h1');
 
       this.attr('showTitles', true);
 

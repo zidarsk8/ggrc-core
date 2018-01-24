@@ -6,8 +6,8 @@
 (function (_) {
   _.mixin({
     exists: function (obj, key) {
-      var keys;
-      var slice = Array.prototype.slice;
+      let keys;
+      let slice = Array.prototype.slice;
 
       if (!key) {
         return obj;

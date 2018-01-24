@@ -6,7 +6,7 @@
 import Component from '../related-people-access-control';
 
 describe('GGRC.relatedPeopleAccessControl', function () {
-  var viewModel;
+  let viewModel;
 
   beforeAll(function () {
     viewModel = new (can.Map.extend(Component.prototype.viewModel));
@@ -26,8 +26,8 @@ describe('GGRC.relatedPeopleAccessControl', function () {
   });
 
   describe('"getFilteredRoles" method', function () {
-    var instance;
-    var getFilteredRolesMethod;
+    let instance;
+    let getFilteredRolesMethod;
 
     beforeAll(function () {
       instance = {
@@ -46,13 +46,13 @@ describe('GGRC.relatedPeopleAccessControl', function () {
     });
 
     it('should return all roles related to instance type', function () {
-      var roles = getFilteredRolesMethod();
+      let roles = getFilteredRolesMethod();
       expect(roles.length).toBe(5);
     });
 
     it('should return roles from IncludeRoles list', function () {
-      var roles;
-      var include = ['Admin', 'Secondary Contacts', 'Principal Assignees'];
+      let roles;
+      let include = ['Admin', 'Secondary Contacts', 'Principal Assignees'];
 
       viewModel.attr('includeRoles', include);
       roles = getFilteredRolesMethod();
@@ -63,8 +63,8 @@ describe('GGRC.relatedPeopleAccessControl', function () {
 
     it('should return all roles except roles from ExcludeRoles list',
       function () {
-        var roles;
-        var exclude = ['Admin', 'Secondary Contacts', 'Principal Assignees'];
+        let roles;
+        let exclude = ['Admin', 'Secondary Contacts', 'Principal Assignees'];
 
         viewModel.attr('excludeRoles', exclude);
         roles = getFilteredRolesMethod();
@@ -76,9 +76,9 @@ describe('GGRC.relatedPeopleAccessControl', function () {
 
     it('should return roles from IncludeRoles withou roles from ExcludeRoles',
       function () {
-        var roles;
-        var include = ['Admin', 'Secondary Contacts', 'Principal Assignees'];
-        var exclude = ['Admin', 'Principal Assignees', 'Primary Contacts'];
+        let roles;
+        let include = ['Admin', 'Secondary Contacts', 'Principal Assignees'];
+        let exclude = ['Admin', 'Principal Assignees', 'Primary Contacts'];
 
         viewModel.attr('includeRoles', include);
         viewModel.attr('excludeRoles', exclude);
@@ -91,7 +91,7 @@ describe('GGRC.relatedPeopleAccessControl', function () {
   });
 
   describe('"checkConflicts" method', function () {
-    var instance;
+    let instance;
 
     beforeAll(function () {
       instance = new can.Map({

@@ -69,7 +69,7 @@ let statesModels = [
  * @return {Boolean} True or False
  */
 function hasState(model) {
-  var pair = getStatesModelsPair(model);
+  let pair = getStatesModelsPair(model);
 
   if (!pair) {
     return false;
@@ -102,7 +102,7 @@ function hasFilterTooltip(model) {
  * @return {Object} object with 'models' and 'states' properties
  */
 function getStatesModelsPair(model) {
-  var pairs = statesModels.filter(function (item) {
+  let pairs = statesModels.filter(function (item) {
     return item.models.indexOf(model) > -1;
   });
 
@@ -115,7 +115,7 @@ function getStatesModelsPair(model) {
  * @return {Array} array of strings
  */
 function getStatesForModel(model) {
-  var pair = getStatesModelsPair(model);
+  let pair = getStatesModelsPair(model);
   return pair ? pair.states : [];
 }
 
@@ -126,7 +126,7 @@ function getStatesForModel(model) {
  * @return {Array} array of strings
  */
 function getBulkStatesForModel(model) {
-  var pair = getStatesModelsPair(model);
+  let pair = getStatesModelsPair(model);
   return pair && pair.bulkStates ? pair.bulkStates : [];
 }
 
@@ -138,7 +138,7 @@ function getBulkStatesForModel(model) {
  * @return {String} The transformed query
  */
 function statusFilter(statuses, filterString, modelName) {
-  var filter = modelName === 'Assessment' ?
+  let filter = modelName === 'Assessment' ?
     buildAssessmentFilter(statuses, buildStatusesFilterString) :
     buildStatusesFilterString(statuses, modelName);
 
@@ -169,7 +169,7 @@ function unlockedFilter() {
  * @return {String} The transformed query
  */
 function buildStatusFilter(statuses, builder, modelName) {
-  var filter = modelName === 'Assessment' ?
+  let filter = modelName === 'Assessment' ?
     buildAssessmentFilter(statuses, builder) :
     builder(statuses, modelName);
   return filter;
@@ -182,7 +182,7 @@ function buildStatusFilter(statuses, builder, modelName) {
  * @return {String} statuses filter
  */
 function buildStatusesFilterString(statuses, modelName) {
-  var fieldName = getStatusFieldName(modelName);
+  let fieldName = getStatusFieldName(modelName);
 
   return statuses.map(function (item) {
     // wrap in quotes
@@ -196,10 +196,10 @@ function buildStatusesFilterString(statuses, modelName) {
 * @return {String} status field name
 */
 function getStatusFieldName(modelName) {
-  var modelToStateFieldMap = {
+  let modelToStateFieldMap = {
     CycleTaskGroupObjectTask: 'Task State',
   };
-  var fieldName = modelToStateFieldMap[modelName] || 'Status';
+  let fieldName = modelToStateFieldMap[modelName] || 'Status';
 
   return fieldName;
 }
@@ -211,10 +211,10 @@ function getStatusFieldName(modelName) {
  * @return {String} statuses filter
  */
 function buildAssessmentFilter(statuses, builder) {
-  var verifiedIndex = statuses.indexOf('Completed and Verified');
-  var completedIndex = statuses.indexOf('Completed (no verification)');
-  var isVerified = false;
-  var filter;
+  let verifiedIndex = statuses.indexOf('Completed and Verified');
+  let completedIndex = statuses.indexOf('Completed (no verification)');
+  let isVerified = false;
+  let filter;
 
   // copy array. Do not change original
   statuses = statuses.slice();

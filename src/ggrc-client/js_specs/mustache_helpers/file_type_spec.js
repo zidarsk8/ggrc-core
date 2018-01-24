@@ -6,7 +6,7 @@
 describe("can.mustache.helper.file_type", function () {
   "use strict";
 
-  var helper,
+  let helper,
       instance;  // the argument passed to the helper on invocation
 
   beforeAll(function () {
@@ -22,7 +22,7 @@ describe("can.mustache.helper.file_type", function () {
 
   it("raises an error if passed an object of type other than Document",
     function () {
-      var callWithInvalid,
+      let callWithInvalid,
           errMsg = "Cannot determine file type for a non-document object";
 
       instance.type = "FooBar";
@@ -33,7 +33,7 @@ describe("can.mustache.helper.file_type", function () {
   );
 
   it("raises an error if the file name cannot be determined", function () {
-    var callWithInvalid,
+    let callWithInvalid,
         errMsg = "Cannot determine the object's file name";
 
     instance.title = undefined;

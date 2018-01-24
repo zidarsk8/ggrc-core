@@ -32,8 +32,8 @@ export default can.Component.extend({
     isDisabled: false,
     isSaving: false,
     createComment: function () {
-      var comment;
-      var description = this.attr('value');
+      let comment;
+      let description = this.attr('value');
 
       if (this.attr('disabled')) {
         return;

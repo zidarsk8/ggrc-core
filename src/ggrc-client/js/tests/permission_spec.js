@@ -9,7 +9,7 @@ describe('Permission', function () {
   describe('_admin_permission_for_context() method', function () {
     it('returns new admin permission for specified context_id',
       function () {
-        var result = Permission._admin_permission_for_context(23);
+        let result = Permission._admin_permission_for_context(23);
         expect(result.action).toEqual('__GGRC_ADMIN__');
         expect(result.resource_type).toEqual('__GGRC_ALL__');
         expect(result.context_id).toEqual(23);
@@ -17,7 +17,7 @@ describe('Permission', function () {
   });
 
   describe('_all_resource_permission() method', function () {
-    var permission;
+    let permission;
 
     beforeEach(function () {
       permission = {
@@ -26,7 +26,7 @@ describe('Permission', function () {
       };
     });
     it('returns new all resource permission', function () {
-      var result = Permission._all_resource_permission(permission);
+      let result = Permission._all_resource_permission(permission);
       expect(result.action).toEqual(permission.action);
       expect(result.resource_type).toEqual('__GGRC_ALL__');
       expect(result.context_id).toEqual(permission.context_id);
@@ -34,7 +34,7 @@ describe('Permission', function () {
   });
 
   describe('_permission_match() method', function () {
-    var permissions;
+    let permissions;
 
     beforeEach(function () {
       permissions = {
@@ -47,7 +47,7 @@ describe('Permission', function () {
     });
     it('returns true if permissions contains specified permission',
       function () {
-        var permission = {
+        let permission = {
           action: 'create',
           resource_type: 'Program',
           context_id: 1
@@ -57,7 +57,7 @@ describe('Permission', function () {
       });
     it('returns false if permissions does not contain specified permission',
       function () {
-        var permissionCollection = _.map([
+        let permissionCollection = _.map([
           ['create', 'Program', 111],
           ['delete', 'Program', 1],
           ['create', 'Control', 1]
@@ -77,8 +77,8 @@ describe('Permission', function () {
   });
 
   describe('_is_allowed() method', function () {
-    var permissions;
-    var permission;
+    let permissions;
+    let permission;
 
     beforeEach(function () {
       permissions = {};
@@ -141,7 +141,7 @@ describe('Permission', function () {
   });
 
   describe('_resolve_permission_variable', function () {
-    var value;
+    let value;
 
     it('returns "value" if its type is not string', function () {
       value = {};
@@ -154,14 +154,14 @@ describe('Permission', function () {
       });
     it('returns current user instance ' +
     'if value is equal to "$current_user"', function () {
-      var currentUser = CMS.Models.get_instance('Person', GGRC.current_user.id);
+      let currentUser = CMS.Models.get_instance('Person', GGRC.current_user.id);
       value = '$current_user';
       expect(Permission._resolve_permission_variable(value))
         .toEqual(currentUser);
     });
     it('throws error if value is not equal to "$current_user"' +
     ' but its first symbol is "$"', function () {
-      var foo = function () {
+      let foo = function () {
         value = '$user';
         Permission._resolve_permission_variable(value);
       };
@@ -170,9 +170,9 @@ describe('Permission', function () {
   });
 
   describe('_is_allowed_for() method', function () {
-    var permissions;
-    var instance;
-    var result;
+    let permissions;
+    let instance;
+    let result;
 
     beforeEach(function () {
       permissions = {};
@@ -508,7 +508,7 @@ describe('Permission', function () {
   });
 
   describe('is_allowed() method', function () {
-    var object;
+    let object;
 
     beforeEach(function () {
       object = {
@@ -520,8 +520,8 @@ describe('Permission', function () {
       spyOn(Permission, '_is_allowed').and.returnValue(object);
     });
     it('delegates the check to the _is_allowed() method', function () {
-      var _isAllowedResult = Permission._is_allowed();
-      var isAllowedResult = Permission.is_allowed('create', 'UserRole', 1);
+      let _isAllowedResult = Permission._is_allowed();
+      let isAllowedResult = Permission.is_allowed('create', 'UserRole', 1);
 
       expect(isAllowedResult).toBe(_isAllowedResult);
       expect(Permission._is_allowed)
@@ -533,15 +533,15 @@ describe('Permission', function () {
   });
 
   describe('is_allowed_for() method', function () {
-    var object;
+    let object;
 
     beforeEach(function () {
       object = {};
       spyOn(Permission, '_is_allowed_for').and.returnValue(object);
     });
     it('delegates the check to the _is_allowed_for() method', function () {
-      var _isAllowedForResult = Permission._is_allowed_for();
-      var isAllowedForResult = Permission.is_allowed_for('create', 'UserRole');
+      let _isAllowedForResult = Permission._is_allowed_for();
+      let isAllowedForResult = Permission.is_allowed_for('create', 'UserRole');
 
       expect(isAllowedForResult).toBe(_isAllowedForResult);
       expect(Permission._is_allowed_for)
@@ -575,7 +575,7 @@ describe('Permission', function () {
 
   describe('page_context_id() method', function () {
     it('return page instance context id', function () {
-      var context = {
+      let context = {
         id: 711
       };
       spyOn(GGRC, 'page_instance')
@@ -588,7 +588,7 @@ describe('Permission', function () {
   });
 
   describe('refresh() method', function () {
-    var GGRC_PERMISSIONS;
+    let GGRC_PERMISSIONS;
 
     beforeAll(function () {
       GGRC_PERMISSIONS = GGRC.permissions;

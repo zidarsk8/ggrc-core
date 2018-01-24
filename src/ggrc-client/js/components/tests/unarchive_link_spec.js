@@ -6,21 +6,21 @@
 describe('GGRC.Components.UnarchiveLink', function () {
   'use strict';
 
-  var Component;
+  let Component;
 
   beforeAll(function () {
     Component = GGRC.Components.get('unarchiveLink');
   });
 
   describe('click() event', function () {
-    var displayName = 'DISPLAY NAME';
-    var notifyText = 'was unarchived successfully';
-    var eventObj;
-    var instance;
-    var pendingSave;
-    var scope;
-    var $element;
-    var event;
+    let displayName = 'DISPLAY NAME';
+    let notifyText = 'was unarchived successfully';
+    let eventObj;
+    let instance;
+    let pendingSave;
+    let scope;
+    let $element;
+    let event;
 
     beforeEach(function () {
       pendingSave = new can.Deferred();
@@ -67,7 +67,7 @@ describe('GGRC.Components.UnarchiveLink', function () {
     });
 
     it('instance was saved without notification', function () {
-      var successMessage = displayName + ' ' + notifyText;
+      let successMessage = displayName + ' ' + notifyText;
       instance.attr('archived', true);
       scope.attr('notify', true);
 

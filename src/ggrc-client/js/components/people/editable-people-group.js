@@ -13,7 +13,7 @@ import template from './editable-people-group.mustache';
 
 const SHOW_MODAL_LIMIT = 4;
 
-var viewModel = peopleGroupVM.extend({
+let viewModel = peopleGroupVM.extend({
   title: '@',
   canEdit: {},
   showPeopleGroupModal: false,
@@ -88,9 +88,9 @@ export default GGRC.Components('editablePeopleGroup', {
   viewModel: viewModel,
   events: {
     '{window} mousedown': function (el, ev) {
-      var viewModel = this.viewModel;
-      var isInside = GGRC.Utils.events.isInnerClick(this.element, ev.target);
-      var editableMode = viewModel.attr('editableMode');
+      let viewModel = this.viewModel;
+      let isInside = GGRC.Utils.events.isInnerClick(this.element, ev.target);
+      let editableMode = viewModel.attr('editableMode');
 
       if (!isInside && editableMode) {
         viewModel.save();

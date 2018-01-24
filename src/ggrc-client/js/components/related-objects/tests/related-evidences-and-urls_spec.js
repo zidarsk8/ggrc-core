@@ -6,8 +6,8 @@
 describe('GGRC.Components.relatedEvidencesAndUrls', function () {
   'use strict';
 
-  var viewModel;
-  var instance;
+  let viewModel;
+  let instance;
 
   beforeEach(function () {
     viewModel = GGRC.Components.getViewModel('relatedEvidencesAndUrls');
@@ -21,8 +21,8 @@ describe('GGRC.Components.relatedEvidencesAndUrls', function () {
 
   describe('"getDocumentsQuery" method', function () {
     function checkAdditionFilter(leftDocType, rightDocType) {
-      var query;
-      var additionFilter;
+      let query;
+      let additionFilter;
       query = viewModel.getDocumentsQuery();
 
       expect(query.filters.expression).toBeDefined();

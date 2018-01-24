@@ -63,10 +63,10 @@ export default can.Control({
   },
 
   route: function (path) {
-    var widgetList = this.options.widget_list;
+    let widgetList = this.options.widget_list;
 
     // Find and make active the widget specified by `path`
-    var widget = this.widget_by_selector('#' + path);
+    let widget = this.widget_by_selector('#' + path);
     if (!widget && widgetList.length) {
       // Target was not found, but we can select the first widget in the list
       let widgetId = widgetList[0].internav_id + '_widget';
@@ -81,9 +81,9 @@ export default can.Control({
   },
 
   display_widget: function (refetch) {
-    var activeWidgetSelector = this.options.contexts.active_widget.selector;
-    var $activeWidget = $(activeWidgetSelector);
-    var widgetController = $activeWidget.control();
+    let activeWidgetSelector = this.options.contexts.active_widget.selector;
+    let $activeWidget = $(activeWidgetSelector);
+    let widgetController = $activeWidget.control();
 
     if (widgetController && widgetController.display) {
       return widgetController.display(refetch);
@@ -105,8 +105,8 @@ export default can.Control({
   },
 
   show_active_widget: function (widgetModel) {
-    var widget = $(widgetModel.selector);
-    var dashboardCtr = this.options.dashboard_controller;
+    let widget = $(widgetModel.selector);
+    let dashboardCtr = this.options.dashboard_controller;
 
     if (dashboardCtr.hideInfoPin) {
       dashboardCtr.hideInfoPin();
@@ -137,18 +137,18 @@ export default can.Control({
   },
 
   update_widget: function (widgetElement, index) {
-    var $widget = $(widgetElement);
-    var widget = this.widget_by_selector('#' + $widget.attr('id'));
-    var $header = $widget.find('.header h2');
-    var icon = $header.find('i').attr('class');
-    var menuItem = $header.text().trim();
-    var match = menuItem ?
+    let $widget = $(widgetElement);
+    let widget = this.widget_by_selector('#' + $widget.attr('id'));
+    let $header = $widget.find('.header h2');
+    let icon = $header.find('i').attr('class');
+    let menuItem = $header.text().trim();
+    let match = menuItem ?
       menuItem.match(/\s*(\S.*?)\s*(?:\((?:(\d+)|\.*)(\/\d+)?\))?$/) : {};
-    var title = match[1];
-    var count = match[2] || undefined;
-    var existingIndex;
-    var widgetOptions;
-    var widgetName;
+    let title = match[1];
+    let count = match[2] || undefined;
+    let existingIndex;
+    let widgetOptions;
+    let widgetName;
 
     function getWidgetType(widgetId) {
       return isObjectVersion(widgetId) ? 'version' : '';
@@ -211,8 +211,8 @@ export default can.Control({
   },
 
   update_widget_count: function ($el, count) {
-    var widgetId = $el.closest('.widget').attr('id');
-    var widget = this.widget_by_selector('#' + widgetId);
+    let widgetId = $el.closest('.widget').attr('id');
+    let widget = this.widget_by_selector('#' + widgetId);
 
     if (widget) {
       widget.attr({
@@ -224,10 +224,10 @@ export default can.Control({
   },
 
   update_add_more_link: function () {
-    var hasHiddenWidgets = false;
-    var instance = this.options.instance || {};
-    var model = instance.constructor;
-    var showAllTabs = false;
+    let hasHiddenWidgets = false;
+    let instance = this.options.instance || {};
+    let model = instance.constructor;
+    let showAllTabs = false;
 
     if (model.obj_nav_options) {
       showAllTabs = model.obj_nav_options.show_all_tabs;
@@ -239,8 +239,8 @@ export default can.Control({
 
     // Update has hidden widget attr
     this.options.widget_list.forEach((widget) => {
-      var forceShowList = model.obj_nav_options.force_show_list;
-      var forceShow = false;
+      let forceShowList = model.obj_nav_options.force_show_list;
+      let forceShow = false;
       widget.attr('placeInAddTab', false);
       if (forceShowList) {
         forceShow = forceShowList.indexOf(widget.internav_display) > -1;
@@ -268,8 +268,8 @@ export default can.Control({
   },
   '.closed click': function (el, ev) {
     let widgetSelector = el.data('widget');
-    var widget = this.widget_by_selector(widgetSelector);
-    var widgets = this.options.widget_list;
+    let widget = this.widget_by_selector(widgetSelector);
+    let widgets = this.options.widget_list;
 
     widget.attr('force_show', false);
     this.route(widgets[0].selector); // Switch to the first widget
@@ -279,12 +279,12 @@ export default can.Control({
 
   // top nav dropdown position
   '.dropdown-toggle click': function (el, ev) {
-    var $dropdown = el.closest('.hidden-widgets-list').find('.dropdown-menu');
-    var $menuItem = $dropdown.find('.inner-nav-item').find('a');
-    var offset = el.offset();
-    var leftPos = offset.left;
-    var win = $(window);
-    var winWidth = win.width();
+    let $dropdown = el.closest('.hidden-widgets-list').find('.dropdown-menu');
+    let $menuItem = $dropdown.find('.inner-nav-item').find('a');
+    let offset = el.offset();
+    let leftPos = offset.left;
+    let win = $(window);
+    let winWidth = win.width();
 
     if (winWidth - leftPos < 322) {
       $dropdown.addClass('right-pos');

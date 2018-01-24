@@ -41,7 +41,7 @@
       });
   };
   Popover.prototype.clickOutside = function (evnt) {
-    var $target = $(evnt.target);
+    let $target = $(evnt.target);
 
     if (!this.inElement($target, [this.popover.tip(), this.$el])) {
       this.close();
@@ -76,7 +76,7 @@
 
   function Plugin(option) {
     return this.each(function () {
-      var $this = $(this),
+      let $this = $(this),
           data = $this.data('popover-template');
 
       if (!data) {

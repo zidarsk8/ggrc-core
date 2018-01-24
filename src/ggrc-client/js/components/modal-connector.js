@@ -51,9 +51,9 @@ import {
     },
     events: {
       init: function () {
-        var that = this;
-        var key;
-        var sourceMappingSource;
+        let that = this;
+        let key;
+        let sourceMappingSource;
         this.viewModel.attr('controller', this);
         if (!this.viewModel.instance) {
           this.viewModel.attr('deferred', true);
@@ -62,8 +62,8 @@ import {
         }
 
         this.viewModel.default_mappings.forEach(function (defaultMapping) {
-          var model;
-          var objectToAdd;
+          let model;
+          let objectToAdd;
           if (defaultMapping.id && defaultMapping.type) {
             model = CMS.Models[defaultMapping.type];
             objectToAdd = model.findInCacheById(defaultMapping.id);
@@ -119,14 +119,14 @@ import {
         this.viewModel.parent_instance.removeAttr('_changes');
       },
       setListItems: function (list) {
-        var currentList = this.viewModel.attr('list');
+        let currentList = this.viewModel.attr('list');
         this.viewModel.attr('list', currentList.concat(can.map(list,
           function (binding) {
             return binding.instance || binding;
           })));
       },
       '{viewModel} list': function () {
-        var person;
+        let person;
         // Workaround so we render pre-defined users.
         if (~['owners'].indexOf(this.viewModel.mapping) &&
           this.viewModel.list && !this.viewModel.list.length) {
@@ -137,8 +137,8 @@ import {
         }
       },
       deferred_update: function () {
-        var changes = this.viewModel.changes;
-        var instance = this.viewModel.instance;
+        let changes = this.viewModel.changes;
+        let instance = this.viewModel.instance;
 
         if (!changes.length) {
           if (instance && instance._pending_joins &&
@@ -152,7 +152,7 @@ import {
           .attr(this.viewModel.instance_attr).reify());
         // Add pending operations
         can.each(changes, function (item) {
-          var mapping = this.viewModel.mapping ||
+          let mapping = this.viewModel.mapping ||
               GGRC.Mappings.get_canonical_mapping_name(
                 this.viewModel.instance.constructor.shortName,
                 item.what.constructor.shortName);
@@ -175,8 +175,8 @@ import {
       // this works like autocomplete_select on all modal forms and
       // descendant class objects.
       autocomplete_select: function (el, event, ui) {
-        var mapping;
-        var extraAttrs;
+        let mapping;
+        let extraAttrs;
         if (!this.element) {
           return;
         }
@@ -222,9 +222,9 @@ import {
         ev.stopPropagation();
 
         can.map(el.find('.result'), function (resultEl) {
-          var obj = $(resultEl).data('result');
-          var len = this.viewModel.list.length;
-          var mapping;
+          let obj = $(resultEl).data('result');
+          let len = this.viewModel.list.length;
+          let mapping;
 
           if (this.viewModel.attr('deferred')) {
             this.viewModel.changes.push({what: obj, how: 'remove'});
@@ -265,12 +265,12 @@ import {
           }
         },
       'a[data-toggle=submit]:not(.disabled) click': function (el, ev) {
-        var obj;
-        var mapping;
-        var that = this;
-        var binding = this.viewModel.instance
+        let obj;
+        let mapping;
+        let that = this;
+        let binding = this.viewModel.instance
           .get_binding(this.viewModel.mapping);
-        var extraAttrs = can.reduce(
+        let extraAttrs = can.reduce(
           this.element.find('input:not([data-mapping], [data-lookup])').get(),
           function (attrs, el) {
             if ($(el).attr('model')) {
@@ -307,7 +307,7 @@ import {
       'a[data-object-source] modal:success': 'addMapings',
       'defer:add': 'addMapings',
       addMapings: function (el, ev, data) {
-        var mapping;
+        let mapping;
         ev.stopPropagation();
 
         can.each(data.arr || [data], function (obj) {
@@ -326,8 +326,8 @@ import {
         }, this);
       },
       '.ui-autocomplete-input modal:success': function (el, ev, data, options) {
-        var that = this;
-        var extraAttrs = can.reduce(this.element
+        let that = this;
+        let extraAttrs = can.reduce(this.element
             .find('input:not([data-mapping], [data-lookup])').get(),
           function (attrs, el) {
             if ($(el).attr('model')) {
@@ -340,7 +340,7 @@ import {
           }, {});
 
         can.each(data.arr || [data], function (obj) {
-          var mapping;
+          let mapping;
           if (that.viewModel.attr('deferred')) {
             that.viewModel.changes
               .push({what: obj, how: 'add', extra: extraAttrs});
@@ -356,7 +356,7 @@ import {
         });
       },
       addListItem: function (item) {
-        var snapshotObject;
+        let snapshotObject;
 
         if (isSnapshotType(item) &&
           item.snapshotObject) {
@@ -386,18 +386,18 @@ import {
         );
       },
       getMappedObjects: function () {
-        var auditQuery = this.buildQuery('Audit')[0];
-        var issueQuery = this.buildQuery('Issue')[0];
-        var snapshotQuery = this.buildQuery('Snapshot')[0];
+        let auditQuery = this.buildQuery('Audit')[0];
+        let issueQuery = this.buildQuery('Issue')[0];
+        let snapshotQuery = this.buildQuery('Snapshot')[0];
 
         return makeRequest({data: [auditQuery, issueQuery, snapshotQuery]})
           .then(function (response) {
-            var snapshots;
-            var list;
+            let snapshots;
+            let list;
 
             snapshots = response[2].Snapshot.values;
             snapshots.forEach(function (snapshot) {
-              var object = toObject(snapshot);
+              let object = toObject(snapshot);
 
               snapshot.class = object.class;
               snapshot.snapshot_object_class = 'snapshot-object';
@@ -421,7 +421,7 @@ import {
       //  be decorated with data-mapping attributes.
       mapping_autocomplete: function (options) {
         return function (el) {
-          var $el = $(el);
+          let $el = $(el);
           $el.ggrc_mapping_autocomplete({
             controller: options.contexts.attr('controller'),
             model: $el.data('model'),

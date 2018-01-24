@@ -16,10 +16,10 @@ import {
 (function (can, GGRC) {
   'use strict';
 
-  var forbiddenEditList = ['Cycle', 'CycleTaskGroup'];
-  var forbiddenMapList = ['Workflow', 'RiskAssessment'];
+  let forbiddenEditList = ['Cycle', 'CycleTaskGroup'];
+  let forbiddenMapList = ['Workflow', 'RiskAssessment'];
 
-  var viewModel = can.Map.extend({
+  let viewModel = can.Map.extend({
     define: {
       deepLimit: {
         type: 'number',
@@ -50,19 +50,19 @@ import {
       isAllowedToEdit: {
         type: 'boolean',
         get: function () {
-          var type = this.attr('instance.type');
-          var isSnapshot = this.attr('isSnapshot');
-          var isArchived = this.attr('instance.archived');
-          var isInForbiddenList = forbiddenEditList.indexOf(type) > -1;
+          let type = this.attr('instance.type');
+          let isSnapshot = this.attr('isSnapshot');
+          let isArchived = this.attr('instance.archived');
+          let isInForbiddenList = forbiddenEditList.indexOf(type) > -1;
           return !(isSnapshot || isInForbiddenList || isArchived);
         }
       },
       isAllowedToMap: {
         type: 'boolean',
         get: function () {
-          var type = this.attr('instance.type');
-          var isAllowedToEdit = this.attr('isAllowedToEdit');
-          var isInForbiddenList = forbiddenMapList.indexOf(type) > -1;
+          let type = this.attr('instance.type');
+          let isAllowedToEdit = this.attr('isAllowedToEdit');
+          let isInForbiddenList = forbiddenMapList.indexOf(type) > -1;
 
           return isAllowedToEdit && !isInForbiddenList;
         }
@@ -97,8 +97,8 @@ import {
     expanded: false,
     activated: false,
     showReducedIcon: function () {
-      var pages = ['Workflow'];
-      var instanceTypes = [
+      let pages = ['Workflow'];
+      let instanceTypes = [
         'Cycle',
         'CycleTaskGroup',
         'CycleTaskGroupObjectTask'
@@ -107,8 +107,8 @@ import {
         _.contains(instanceTypes, this.attr('instance').type);
     },
     showReducedOptions: function () {
-      var pages = ['Workflow'];
-      var instanceTypes = [
+      let pages = ['Workflow'];
+      let instanceTypes = [
         'Cycle',
         'CycleTaskGroup',
       ];
@@ -123,13 +123,13 @@ import {
     viewModel: viewModel,
     events: {
       inserted: function () {
-        var parents = this.element.parents('sub-tree-wrapper').length;
-        var canExpand = parents < this.viewModel.attr('deepLimit');
+        let parents = this.element.parents('sub-tree-wrapper').length;
+        let canExpand = parents < this.viewModel.attr('deepLimit');
         this.viewModel.attr('canExpand', canExpand);
         this.viewModel.attr('$el', this.element);
       },
       '.tree-item-actions__content mouseenter': function (el, ev) {
-        var vm = this.viewModel;
+        let vm = this.viewModel;
 
         if (!vm.attr('activated')) {
           vm.attr('activated', true);

@@ -42,8 +42,8 @@ import template from './rich-text-form-field.mustache';
       },
       fieldId: null,
       checkValueChanged: function () {
-        var newValue = this.attr('_value');
-        var oldValue = this.attr('_oldValue');
+        let newValue = this.attr('_value');
+        let oldValue = this.attr('_oldValue');
         if (newValue !== oldValue) {
           this.valueChanged(newValue);
         }

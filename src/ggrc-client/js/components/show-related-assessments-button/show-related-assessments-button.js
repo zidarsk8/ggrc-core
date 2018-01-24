@@ -52,7 +52,7 @@ import template from './show-related-assessments-button.mustache';
       },
       // Temporary put this logic on the level of Component itself
       isAllowedToShow: function () {
-        var type = this.attr('instance.type');
+        let type = this.attr('instance.type');
         return type === 'Control' || type === 'Objective';
       }
     }

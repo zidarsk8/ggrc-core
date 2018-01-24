@@ -106,7 +106,7 @@
     }
   }, {
     init: function () {
-      var that = this;
+      let that = this;
       this._super.apply(this, arguments);
       this.bind('change', function (ev, attr, how, newVal, oldVal) {
         // Emit the 'orphaned' event when the directive attribute is removed

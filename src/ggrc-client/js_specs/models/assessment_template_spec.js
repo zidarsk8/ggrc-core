@@ -6,8 +6,8 @@
 describe('can.Model.AssessmentTemplate', function () {
   'use strict';
 
-  var AssessmentTemplate;
-  var instance;  // an AssessmentTemplate instance
+  let AssessmentTemplate;
+  let instance;  // an AssessmentTemplate instance
 
   beforeAll(function () {
     AssessmentTemplate = CMS.Models.AssessmentTemplate;
@@ -19,7 +19,7 @@ describe('can.Model.AssessmentTemplate', function () {
 
   describe('_packPeopleData() method', function () {
     it('packs default people data into a JSON string', function () {
-      var result;
+      let result;
 
       instance.attr('default_people', {
         assignees: 'Rabbits',
@@ -37,8 +37,8 @@ describe('can.Model.AssessmentTemplate', function () {
     it('uses the list of chosen assignee IDs if default assignees are set ' +
       'to "other"',
       function () {
-        var assessorIds;
-        var result;
+        let assessorIds;
+        let result;
 
         instance.attr('default_people', {
           assignees: 'other',
@@ -60,8 +60,8 @@ describe('can.Model.AssessmentTemplate', function () {
     it('uses the list of chosen verifier IDs if default verifiers are set ' +
       'to "other"',
       function () {
-        var verifierIds;
-        var result;
+        let verifierIds;
+        let result;
 
         instance.attr('default_people', {
           assignees: 'Whatever',
@@ -156,9 +156,9 @@ describe('can.Model.AssessmentTemplate', function () {
   });
 
   describe('assigneeAdded() method', function () {
-    var context;
-    var $element;
-    var eventObj;
+    let context;
+    let $element;
+    let eventObj;
 
     beforeEach(function () {
       context = {};
@@ -189,9 +189,9 @@ describe('can.Model.AssessmentTemplate', function () {
   });
 
   describe('assigneeRemoved() method', function () {
-    var context;
-    var $element;
-    var eventObj;
+    let context;
+    let $element;
+    let eventObj;
 
     beforeEach(function () {
       context = {};
@@ -222,9 +222,9 @@ describe('can.Model.AssessmentTemplate', function () {
   });
 
   describe('verifierAdded() method', function () {
-    var context;
-    var $element;
-    var eventObj;
+    let context;
+    let $element;
+    let eventObj;
 
     beforeEach(function () {
       context = {};
@@ -255,9 +255,9 @@ describe('can.Model.AssessmentTemplate', function () {
   });
 
   describe('verifierRemoved() method', function () {
-    var context;
-    var $element;
-    var eventObj;
+    let context;
+    let $element;
+    let eventObj;
 
     beforeEach(function () {
       context = {};
@@ -288,11 +288,11 @@ describe('can.Model.AssessmentTemplate', function () {
   });
 
   describe('defaultAssigneesChanged() method', function () {
-    var context;
-    var $element;
-    var eventObj;
-    var greenList;
-    var redList;
+    let context;
+    let $element;
+    let eventObj;
+    let greenList;
+    let redList;
 
     beforeEach(function () {
       context = {};
@@ -358,9 +358,9 @@ describe('can.Model.AssessmentTemplate', function () {
   });
 
   describe('defaultVerifiersChanged() method', function () {
-    var context;
-    var $element;
-    var eventObj;
+    let context;
+    let $element;
+    let eventObj;
 
     beforeEach(function () {
       context = {};

@@ -68,7 +68,7 @@ let viewModel = AdvancedSearchContainer.extend({
    * Adds Filter Operator and Filter Attribute to the collection.
    */
   addFilterCriterion: function () {
-    var items = this.attr('items');
+    let items = this.attr('items');
     if (items.length) {
       items.push(AdvancedSearch.create.operator('AND'));
     }
@@ -79,8 +79,8 @@ let viewModel = AdvancedSearchContainer.extend({
    * @param {can.Map} attribute - Filter Attribute.
    */
   createGroup: function (attribute) {
-    var items = this.attr('items');
-    var index = items.indexOf(attribute);
+    let items = this.attr('items');
+    let index = items.indexOf(attribute);
     items.attr(index, AdvancedSearch.create.group([
       attribute,
       AdvancedSearch.create.operator('AND'),

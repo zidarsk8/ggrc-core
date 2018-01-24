@@ -10,7 +10,7 @@ import RefreshQueue from '../../models/refresh_queue';
 (function (can, GGRC) {
   'use strict';
 
-  var tag = 'object-list-item-updater';
+  let tag = 'object-list-item-updater';
 
   GGRC.Components('objectListItemUpdater', {
     tag: tag,

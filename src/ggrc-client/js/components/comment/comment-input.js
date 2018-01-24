@@ -22,7 +22,7 @@ export default can.Component.extend({
         type: 'boolean',
         value: true,
         get: function () {
-          var value = this.attr('value') || '';
+          let value = this.attr('value') || '';
           return !value.length;
         },
       },

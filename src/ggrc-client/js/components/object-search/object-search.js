@@ -24,7 +24,7 @@ import template from './object-search.mustache';
         object: 'MultitypeSearch',
         type: 'Control',
         availableTypes: function () {
-          var types = GGRC.Mappings.getMappingTypes(
+          let types = GGRC.Mappings.getMappingTypes(
             this.attr('object'),
             ['TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask'],
             []);
@@ -39,7 +39,7 @@ import template from './object-search.mustache';
     },
     helpers: {
       displayCount: function (countObserver) {
-        var count = countObserver();
+        let count = countObserver();
         if (count) {
           return '(' + count + ')';
         }

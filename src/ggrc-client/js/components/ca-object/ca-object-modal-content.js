@@ -55,11 +55,11 @@ import template from './ca-object-modal-content.mustache';
         });
       },
       onCommentCreated: function (e) {
-        var comment = e.comment;
-        var instance = this.attr('instance');
-        var context = instance.attr('context');
-        var self = this;
-        var addComment = function (data) {
+        let comment = e.comment;
+        let instance = this.attr('instance');
+        let context = instance.attr('context');
+        let self = this;
+        let addComment = function (data) {
           return comment.attr(data)
             .save()
             .done(function (comment) {

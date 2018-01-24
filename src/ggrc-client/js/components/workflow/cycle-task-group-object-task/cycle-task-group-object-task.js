@@ -8,9 +8,9 @@ import '../../object-change-state/object-change-state';
 import '../../dropdown/dropdown';
 import RefreshQueue from '../../../models/refresh_queue';
 
-var viewModel = can.Map.extend({
+let viewModel = can.Map.extend({
   showLink: function () {
-    var pageInstance = GGRC.page_instance();
+    let pageInstance = GGRC.page_instance();
 
     return pageInstance.type !== 'Workflow';
   },
@@ -23,8 +23,8 @@ var viewModel = can.Map.extend({
       .then(this.loadWorkflow.bind(this));
   },
   loadCycle: function () {
-    var stubCycle = this.attr('instance.cycle').reify();
-    var dfdResult;
+    let stubCycle = this.attr('instance.cycle').reify();
+    let dfdResult;
 
     if (!_.isEmpty(stubCycle)) {
       dfdResult = new RefreshQueue()
@@ -42,7 +42,7 @@ var viewModel = can.Map.extend({
     return dfdResult;
   },
   loadWorkflow: function (cycle) {
-    var workflow = cycle.attr('workflow').reify();
+    let workflow = cycle.attr('workflow').reify();
 
     return new RefreshQueue().enqueue(workflow)
       .trigger()
@@ -52,8 +52,8 @@ var viewModel = can.Map.extend({
       }.bind(this));
   },
   onStateChange: function (event) {
-    var instance = this.attr('instance');
-    var newStatus = event.state;
+    let instance = this.attr('instance');
+    let newStatus = event.state;
 
     instance.refresh()
       .then(function (refreshed) {

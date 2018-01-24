@@ -30,7 +30,7 @@ let viewModel = AdvancedSearchContainer.extend({
    * Adds Filter Operator and Mapping Criteria to the collection.
    */
   addMappingCriteria: function () {
-    var items = this.attr('items');
+    let items = this.attr('items');
     items.push(AdvancedSearch.create.operator('AND'));
     items.push(AdvancedSearch.create.mappingCriteria());
   },

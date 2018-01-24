@@ -26,8 +26,8 @@
         this.attr('instance.repeat_every', repeatEvery);
       },
       updateRepeatOn: function () {
-        var deferred = $.Deferred();
-        var instance = this.attr('instance');
+        let deferred = $.Deferred();
+        let instance = this.attr('instance');
 
         instance.save()
           .done(function () {

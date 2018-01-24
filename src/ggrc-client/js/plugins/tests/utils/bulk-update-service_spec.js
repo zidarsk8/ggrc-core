@@ -7,8 +7,8 @@ import service from '../../utils/bulk-update-service';
 
 describe('GGRC.Utils.BulkUpdateService', function () {
   describe('update() method', function () {
-    var method;
-    var ajaxRes;
+    let method;
+    let ajaxRes;
 
     beforeEach(function () {
       method = service.update;
@@ -22,10 +22,10 @@ describe('GGRC.Utils.BulkUpdateService', function () {
     });
 
     it('makes ajax call with transformed data', function () {
-      var model = {
+      let model = {
         table_plural: 'some_model',
       };
-      var data = [{
+      let data = [{
         id: 1,
       }];
 

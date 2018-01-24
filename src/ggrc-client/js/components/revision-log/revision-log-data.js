@@ -5,7 +5,7 @@
 
 import template from './revision-log-data.mustache';
 
-var viewModel = can.Map.extend({
+let viewModel = can.Map.extend({
   data: null,
   isLoading: false,
   define: {

@@ -10,13 +10,13 @@ import exportGroupTemplate from './templates/export-group.mustache';
 import csvExportTemplate from './templates/csv-export.mustache';
 import {confirm} from '../../plugins/utils/modals';
 
-var url = can.route.deparam(window.location.search.substr(1));
-var filterModel = can.Map({
+let url = can.route.deparam(window.location.search.substr(1));
+let filterModel = can.Map({
   model_name: 'Program',
   value: '',
   filter: {},
 });
-var panelModel = can.Map({
+let panelModel = can.Map({
   models: null,
   type: 'Program',
   filter: '',
@@ -27,10 +27,10 @@ var panelModel = can.Map({
   localAttributes: new can.List(),
   mappings: new can.List(),
 });
-var panelsModel = can.Map({
+let panelsModel = can.Map({
   items: new can.List()
 });
-var exportModel = can.Map({
+let exportModel = can.Map({
   panels: new panelsModel(),
   loading: false,
   url: '/_service/export_csv',
@@ -39,8 +39,8 @@ var exportModel = can.Map({
   filename: 'export_objects.csv',
   format: 'gdrive'
 });
-var exportGroup;
-var exportPanel;
+let exportGroup;
+let exportPanel;
 
 GGRC.Components('csvExport', {
   tag: 'csv-export',
@@ -51,7 +51,7 @@ GGRC.Components('csvExport', {
   },
   events: {
     toggleIndicator: function (currentFilter) {
-      var isExpression =
+      let isExpression =
           !!currentFilter &&
           !!currentFilter.expression.op &&
           currentFilter.expression.op.name !== 'text_search' &&
@@ -65,17 +65,17 @@ GGRC.Components('csvExport', {
       this.viewModel.attr('isFilterActive', false);
     },
     getObjectsForExport: function () {
-      var panels = this.viewModel.attr('export.panels.items');
+      let panels = this.viewModel.attr('export.panels.items');
 
       return _.map(panels, function (panel, index) {
-        var relevantFilter;
-        var predicates;
-        var allItems = panel.attr('attributes')
+        let relevantFilter;
+        let predicates;
+        let allItems = panel.attr('attributes')
           .concat(panel.attr('mappings'))
           .concat(panel.attr('localAttributes'));
 
         predicates = _.map(panel.attr('relevant'), function (el) {
-          var id = el.model_name === '__previous__' ?
+          let id = el.model_name === '__previous__' ?
             index - 1 : el.filter.id;
           return id ? '#' + el.model_name + ',' + id + '#' : null;
         });
@@ -109,7 +109,7 @@ GGRC.Components('csvExport', {
           current_time: GGRC.Utils.fileSafeCurrentDate(),
         },
       }).then(function (data, status, jqXHR) {
-        var link;
+        let link;
 
         if (this.viewModel.attr('export.chosenFormat') === 'gdrive') {
           link = 'https://docs.google.com/spreadsheets/d/' + data.id;
@@ -156,7 +156,7 @@ exportGroup = GGRC.Components('exportGroup', {
       });
     },
     addPanel: function (data) {
-      var index = this.viewModel.attr('index') + 1;
+      let index = this.viewModel.attr('index') + 1;
 
       data = data || {};
       if (!data.type) {
@@ -175,7 +175,7 @@ exportGroup = GGRC.Components('exportGroup', {
         .viewModel().attr('panel_number'));
     },
     '.remove_filter_group click': function (el, ev) {
-      var index = this.getIndex(el);
+      let index = this.getIndex(el);
 
       ev.preventDefault();
       this.viewModel.attr('panels.items').splice(index, 1);
@@ -227,7 +227,7 @@ exportPanel = GGRC.Components('exportPanel', {
     panel_number: '@',
     has_parent: false,
     fetch_relevant_data: function (id, type) {
-      var dfd = CMS.Models[type].findOne({id: id});
+      let dfd = CMS.Models[type].findOne({id: id});
       dfd.then(function (result) {
         this.attr('item.relevant').push(new filterModel({
           model_name: url.relevant_type,
@@ -248,17 +248,17 @@ exportPanel = GGRC.Components('exportPanel', {
         attr.display_name.indexOf('unmap:') === -1;
     },
     refreshItems: function () {
-      var currentPanel = this.attr('item');
-      var definitions = this
+      let currentPanel = this.attr('item');
+      let definitions = this
         .getModelAttributeDefenitions(currentPanel.attr('type'));
-      var localAttributes;
+      let localAttributes;
 
-      var attributes = _.filter(definitions, function (el) {
+      let attributes = _.filter(definitions, function (el) {
         return this.filterModelAttributes(el,
           el.type !== 'mapping' && el.type !== 'object_custom');
       }.bind(this));
 
-      var mappings = _.filter(definitions, function (el) {
+      let mappings = _.filter(definitions, function (el) {
         return this.filterModelAttributes(el, el.type === 'mapping');
       }.bind(this));
 
@@ -289,7 +289,7 @@ exportPanel = GGRC.Components('exportPanel', {
   },
   events: {
     inserted: function () {
-      var panelNumber = Number(this.viewModel.attr('panel_number'));
+      let panelNumber = Number(this.viewModel.attr('panel_number'));
 
       if (!panelNumber && url.relevant_id && url.relevant_type) {
         this.viewModel.fetch_relevant_data(url.relevant_id, url.relevant_type);
@@ -298,9 +298,9 @@ exportPanel = GGRC.Components('exportPanel', {
       this.viewModel.setSelected();
     },
     '[data-action=select_toggle] click': function (el, ev) {
-      var type = el.data('type');
-      var value = el.data('value');
-      var targetList;
+      let type = el.data('type');
+      let value = el.data('value');
+      let targetList;
 
       switch (type) {
         case 'local_attributes': {

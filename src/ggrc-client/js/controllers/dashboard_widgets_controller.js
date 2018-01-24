@@ -51,9 +51,9 @@ export default Filterable({
       .attr('id', this.options.widget_id + '_widget');
 
     if (this.options.widgetType && this.options.widgetType === 'treeview') {
-      var counts = getCounts();
+      let counts = getCounts();
 
-      var countsName = this.options.countsName ||
+      let countsName = this.options.countsName ||
         (this.options.content_controller_options &&
           this.options.content_controller_options.countsName) ||
         this.options.model.shortName;
@@ -85,7 +85,7 @@ export default Filterable({
 
     this.element.html(frag[0]);
 
-    var content = this.element
+    let content = this.element
       , controller_content = null;
 
     if (prefs.getCollapsed(window.getPageToken(), this.element.attr("id"))) {
@@ -132,11 +132,11 @@ export default Filterable({
       'DashboardWidget', 'display', this.options.model.shortName);
 
     this._display_deferred = this.prepare().then(function () {
-      var dfd;
-      var $containerVM = that.element
+      let dfd;
+      let $containerVM = that.element
         .find('tree-widget-container')
         .viewModel();
-      var FORCE_REFRESH = true;
+      let FORCE_REFRESH = true;
 
       if (!that.content_controller && $containerVM.needToRefresh()) {
         dfd = $containerVM.display(FORCE_REFRESH);

@@ -11,9 +11,9 @@ describe('CMS.Controllers.InnerNav', function () {
   'use strict';
 
   describe('sortWidgets() method', function () {
-    var ctrlInst; // fake controller instance
-    var sortWidgets;
-    var options;
+    let ctrlInst; // fake controller instance
+    let sortWidgets;
+    let options;
 
     beforeEach(function () {
       options = {
@@ -28,8 +28,8 @@ describe('CMS.Controllers.InnerNav', function () {
     });
 
     it('sorts widgets by their "order" attribute', function () {
-      var widgetOrder;
-      var widgets = [
+      let widgetOrder;
+      let widgets = [
         {internav_display: 'aaa', order: 40},
         {internav_display: 'bbb', order: 20},
         {internav_display: 'ccc', order: 50},
@@ -46,8 +46,8 @@ describe('CMS.Controllers.InnerNav', function () {
 
     it('places widgets with unknown "order" at' +
       'the end and sort them in alphabetical order', function () {
-      var widgetOrder;
-      var widgets = [
+      let widgetOrder;
+      let widgets = [
         {internav_display: 'abc'},
         {internav_display: 'aaa', order: 40},
         {internav_display: 'cba'},

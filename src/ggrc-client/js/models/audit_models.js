@@ -130,8 +130,8 @@ import Permission from '../permission';
 
       this.validate(['_transient.audit_firm', 'audit_firm'],
         function () {
-          var auditFirm = this.attr('audit_firm');
-          var transientAuditFirm = this.attr('_transient.audit_firm');
+          let auditFirm = this.attr('audit_firm');
+          let transientAuditFirm = this.attr('_transient.audit_firm');
 
           if (!auditFirm && transientAuditFirm) {
             if (_.isObject(transientAuditFirm) &&
@@ -150,7 +150,7 @@ import Permission from '../permission';
       return CMS.Models[this.attr('object_type')];
     },
     clone: function (options) {
-      var model = CMS.Models.Audit;
+      let model = CMS.Models.Audit;
       return new model({
         operation: 'clone',
         cloneOptions: options.cloneOptions,
@@ -160,8 +160,8 @@ import Permission from '../permission';
     },
     save: function () {
       // Make sure the context is always set to the parent program
-      var _super = this._super;
-      var args = arguments;
+      let _super = this._super;
+      let args = arguments;
       if (!this.context || !this.context.id) {
         return this.program.reify().refresh().then(function (program) {
           this.attr('context', program.context);
@@ -340,7 +340,7 @@ import Permission from '../permission';
      * @param {jQuery.Event} ev - the event that was triggered
      */
     assigneeAdded: function (context, $el, ev) {
-      var user = ev.selectedItem;
+      let user = ev.selectedItem;
       this.assigneesList.attr(user.id, true);
     },
 
@@ -353,7 +353,7 @@ import Permission from '../permission';
      * @param {jQuery.Event} ev - the event that was triggered
      */
     assigneeRemoved: function (context, $el, ev) {
-      var user = ev.person;
+      let user = ev.person;
       this.assigneesList.removeAttr(String(user.id));
     },
 
@@ -366,7 +366,7 @@ import Permission from '../permission';
      * @param {jQuery.Event} ev - the event that was triggered
      */
     verifierAdded: function (context, $el, ev) {
-      var user = ev.selectedItem;
+      let user = ev.selectedItem;
       this.verifiersList.attr(user.id, true);
     },
 
@@ -379,7 +379,7 @@ import Permission from '../permission';
      * @param {jQuery.Event} ev - the event that was triggered
      */
     verifierRemoved: function (context, $el, ev) {
-      var user = ev.person;
+      let user = ev.person;
       this.verifiersList.removeAttr(String(user.id));
     },
 
@@ -391,7 +391,7 @@ import Permission from '../permission';
      * @param {jQuery.Event} ev - the event that was triggered
      */
     defaultAssigneesChanged: function (context, $el, ev) {
-      var changedList = [
+      let changedList = [
         'Auditors', 'Principal Assignees', 'Secondary Assignees',
         'Primary Contacts', 'Secondary Contacts'
       ];
@@ -419,7 +419,7 @@ import Permission from '../permission';
      *   or "verifiers"
      */
     _updateDropdownEnabled: function (name) {
-      var disable = this.attr('default_people.' + name) !== 'other';
+      let disable = this.attr('default_people.' + name) !== 'other';
       this.attr(name + 'ListDisable', disable);
     },
 
@@ -429,7 +429,7 @@ import Permission from '../permission';
      * @return {String} - the JSON-packed default people data
      */
     _packPeopleData: function () {
-      var data = {};
+      let data = {};
 
       /**
        * Create a sorted (ascending) list of numbers from the given map's keys.
@@ -438,7 +438,7 @@ import Permission from '../permission';
        * @return {Array} - ordered IDs
        */
       function makeList(peopleIds) {
-        var result = Object.keys(peopleIds.attr()).map(Number);
+        let result = Object.keys(peopleIds.attr()).map(Number);
         return result.sort(function (x, y) {
           return x - y;
         });
@@ -464,12 +464,12 @@ import Permission from '../permission';
      * corresponding text input fields.
      */
     _unpackPeopleData: function () {
-      var instance = this;  // the AssessmentTemplate model instance
-      var peopleData = instance.default_people;
+      let instance = this;  // the AssessmentTemplate model instance
+      let peopleData = instance.default_people;
 
       ['assignees', 'verifiers'].forEach(function (name) {
-        var idsMap;
-        var peopleIds = peopleData[name];
+        let idsMap;
+        let peopleIds = peopleData[name];
 
         if (peopleIds instanceof can.List) {
           idsMap = new can.Map();

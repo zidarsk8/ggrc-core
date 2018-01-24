@@ -11,7 +11,7 @@ import template from './cycle-task-actions.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var viewModel = can.Map.extend({
+  let viewModel = can.Map.extend({
     define: {
       cycle: {
         get: function () {
@@ -26,7 +26,7 @@ import template from './cycle-task-actions.mustache';
       cssClasses: {
         type: String,
         get: function () {
-          var classes = [];
+          let classes = [];
 
           if (this.attr('disabled')) {
             classes.push('disabled');
@@ -37,8 +37,8 @@ import template from './cycle-task-actions.mustache';
       },
       isShowActionButtons: {
         get: function () {
-          var pageType = getPageType();
-          var allowChangeState = this.attr('instance.allow_change_state');
+          let pageType = getPageType();
+          let allowChangeState = this.attr('instance.allow_change_state');
 
           if (pageType === 'Workflow') {
             return this.attr('cycle').reify().attr('is_current');
@@ -52,9 +52,9 @@ import template from './cycle-task-actions.mustache';
     disabled: false,
     oldValues: [],
     changeStatus: function (ctx, el, ev) {
-      var status = el.data('value');
-      var instance = this.attr('instance');
-      var oldValue = {
+      let status = el.data('value');
+      let instance = this.attr('instance');
+      let oldValue = {
         status: instance.attr('status')
       };
 
@@ -64,13 +64,13 @@ import template from './cycle-task-actions.mustache';
       this.setStatus(status);
     },
     undo: function (ctx, el, ev) {
-      var newValue = this.attr('oldValues').shift();
+      let newValue = this.attr('oldValues').shift();
       ev.stopPropagation();
 
       this.setStatus(newValue.status);
     },
     setStatus: function (status) {
-      var instance = this.attr('instance');
+      let instance = this.attr('instance');
 
       this.attr('disabled', true);
       instance.refresh().then(function (refreshed) {

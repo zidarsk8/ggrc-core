@@ -18,13 +18,13 @@ import template from './mapping-type-selector.mustache';
       selectedType: ''
     },
     init: function () {
-      var selectedType = this.viewModel.selectedType;
-      var types = this.viewModel.types;
-      var groups = ['business', 'entities', 'governance'];
-      var values = [];
+      let selectedType = this.viewModel.selectedType;
+      let types = this.viewModel.types;
+      let groups = ['business', 'entities', 'governance'];
+      let values = [];
 
       groups.forEach(function (name) {
-        var groupItems = types.attr(name + '.items');
+        let groupItems = types.attr(name + '.items');
         values = values.concat(_.pluck(groupItems, 'value'));
       });
       if (values.indexOf(selectedType) < 0) {

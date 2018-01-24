@@ -9,15 +9,15 @@ describe('CMS.Models.Person', function () {
   'use strict';
 
   describe('getUserRoles() method', function () {
-    var method;
-    var person;
-    var fakeUserRole1;
-    var fakeUserRole2;
-    var fakeUserRoleInstace1;
-    var fakeUserRoleInstace2;
-    var instance;
-    var refreshedUserRoles = [];
-    var fakeProgramInstance;
+    let method;
+    let person;
+    let fakeUserRole1;
+    let fakeUserRole2;
+    let fakeUserRoleInstace1;
+    let fakeUserRoleInstace2;
+    let instance;
+    let refreshedUserRoles = [];
+    let fakeProgramInstance;
 
     beforeEach(function () {
       fakeProgramInstance = jasmine.createSpyObj(
@@ -44,7 +44,7 @@ describe('CMS.Models.Person', function () {
     });
 
     it('should enqueue user roles instances for refresh', function () {
-      var dfd = $.when();
+      let dfd = $.when();
       spyOn(RefreshQueue.prototype, 'enqueue');
       spyOn(RefreshQueue.prototype, 'trigger').and.returnValue(dfd);
       method(instance, person);
@@ -58,7 +58,7 @@ describe('CMS.Models.Person', function () {
     it('should apply a filter to user roles based on ' +
       'the instance and role contexts after refresh',
       function (done) {
-        var dfd;
+        let dfd;
         refreshedUserRoles = [{
           context: {
             id: 444
@@ -79,7 +79,7 @@ describe('CMS.Models.Person', function () {
     );
 
     describe('when specificObject is passed', function () {
-      var specificObject;
+      let specificObject;
 
       beforeEach(function () {
         specificObject = 'program';
@@ -98,8 +98,8 @@ describe('CMS.Models.Person', function () {
         'the specificObject and role contexts after refresh' +
         'if all user roles were rejected for the instance context',
         function (done) {
-          var dfd = $.when(refreshedUserRoles);
-          var validateExpectation = function (roles) {
+          let dfd = $.when(refreshedUserRoles);
+          let validateExpectation = function (roles) {
             expect(roles).toEqual([refreshedUserRoles[1]]);
             done();
           };

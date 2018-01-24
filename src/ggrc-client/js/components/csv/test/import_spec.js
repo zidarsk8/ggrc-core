@@ -8,8 +8,8 @@ import Component from '../import';
 describe('GGRC.Components.csvImportWidget', function () {
   'use strict';
 
-  var method;  // the method under test
-  var fakeScope;
+  let method;  // the method under test
+  let fakeScope;
 
   beforeEach(function () {
     fakeScope = new can.Map({});
@@ -22,7 +22,7 @@ describe('GGRC.Components.csvImportWidget', function () {
 
     describe('the returned "import" state config\'s isDisabled() method',
       function () {
-        var isDisabled;  // the method under test
+        let isDisabled;  // the method under test
 
         /**
          * A factory function for dummy import block info objects.
@@ -43,16 +43,16 @@ describe('GGRC.Components.csvImportWidget', function () {
          * @return {can.Map} - a new dummy import block info instance
          */
         function makeImportBlock(objectType, rowCounts, hasErrors) {
-          var COUNT_FIELD_NAMES = ['created', 'updated', 'deleted', 'ignored'];
-          var COUNT_ERR = 'Invalid row counts, the sum of created, updated, ' +
+          let COUNT_FIELD_NAMES = ['created', 'updated', 'deleted', 'ignored'];
+          let COUNT_ERR = 'Invalid row counts, the sum of created, updated, ' +
               'deleted, and ignored must equal the total row count.';
 
-          var blockOptions = {
+          let blockOptions = {
             name: objectType,
             rows: rowCounts.totalRows || 0,
             block_errors: hasErrors ? new can.List({}) : new can.List()
           };
-          var combinedCount = 0;
+          let combinedCount = 0;
 
           COUNT_FIELD_NAMES.forEach(function (field) {
             blockOptions[field] = rowCounts[field] || 0;
@@ -67,29 +67,29 @@ describe('GGRC.Components.csvImportWidget', function () {
         }
 
         beforeEach(function () {
-          var importStateConfig;
+          let importStateConfig;
           fakeScope.attr('state', 'import');
           importStateConfig = method();
           isDisabled = importStateConfig.isDisabled;
         });
 
         it('returns true when import blocks list not available', function () {
-          var result;
+          let result;
           fakeScope.attr('import', null);
           result = isDisabled();
           expect(result).toBe(true);
         });
 
         it('returns true when import blocks list is empty', function () {
-          var result;
+          let result;
           fakeScope.attr('import', []);
           result = isDisabled();
           expect(result).toBe(true);
         });
 
         it('returns true if all blocks in the list empty', function () {
-          var result;
-          var importBlocks = [
+          let result;
+          let importBlocks = [
             makeImportBlock('Assessment', {totalRows: 0}),
             makeImportBlock('Market', {totalRows: 0})
           ];
@@ -101,8 +101,8 @@ describe('GGRC.Components.csvImportWidget', function () {
         });
 
         it('returns true if blocks has errors', function () {
-          var result;
-          var importBlocks = [
+          let result;
+          let importBlocks = [
             makeImportBlock('Assessment', {totalRows: 4, ignored: 4}, true),
             makeImportBlock('Market', {totalRows: 0, ignored: 0}),
             makeImportBlock(
@@ -117,8 +117,8 @@ describe('GGRC.Components.csvImportWidget', function () {
 
         it('returns true for non-empty block that have all rows ignored',
           function () {
-            var result;
-            var importBlocks = [
+            let result;
+            let importBlocks = [
               makeImportBlock('Assessment', {totalRows: 4, ignored: 4})
             ];
             fakeScope.attr('import', importBlocks);
@@ -132,8 +132,8 @@ describe('GGRC.Components.csvImportWidget', function () {
         it('returns false if there are non-empty blocks containing ' +
           'non-ignored lines',
           function () {
-            var result;
-            var importBlocks = [
+            let result;
+            let importBlocks = [
               makeImportBlock('Assessment', {totalRows: 4, ignored: 4}),
               makeImportBlock('Market', {totalRows: 0, ignored: 0}),
               makeImportBlock(
@@ -151,7 +151,7 @@ describe('GGRC.Components.csvImportWidget', function () {
   });
 
   describe('requestImport() method', function () {
-    var importDfd;
+    let importDfd;
 
     beforeEach(function () {
       method = Component.prototype.scope.requestImport.bind(fakeScope);
@@ -194,7 +194,7 @@ describe('GGRC.Components.csvImportWidget', function () {
     });
 
     describe('after getting response', function () {
-      var checkObject;
+      let checkObject;
 
       beforeEach(function () {
         fakeScope.element = 'element';
@@ -207,7 +207,7 @@ describe('GGRC.Components.csvImportWidget', function () {
 
       describe('in case of success', function () {
         it('calls prepareDataForCheck method', function (done) {
-          var mockData = {data: 'data'};
+          let mockData = {data: 'data'};
           importDfd.resolve(mockData);
           method({});
           expect(fakeScope.prepareDataForCheck).toHaveBeenCalledWith(mockData);
@@ -231,7 +231,7 @@ describe('GGRC.Components.csvImportWidget', function () {
       });
 
       describe('in case of fail', function () {
-        var failData;
+        let failData;
 
         beforeEach(function () {
           failData = {
@@ -267,7 +267,7 @@ describe('GGRC.Components.csvImportWidget', function () {
 
   describe('"#import_btn.state-select click" handler',
   function () {
-    var authDfd;
+    let authDfd;
 
     beforeEach(function () {
       method = Component.prototype

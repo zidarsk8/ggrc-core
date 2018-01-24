@@ -8,24 +8,24 @@ import ModalsController from '../modals/modals_controller';
 describe('ModalsController', function () {
   'use strict';
 
-  var Ctrl;  // the controller under test
+  let Ctrl;  // the controller under test
 
   beforeAll(function () {
     Ctrl = ModalsController;
   });
 
   describe('init() method', function () {
-    var ctrlInst;  // fake controller instance
-    var init;  // the method under tests
+    let ctrlInst;  // fake controller instance
+    let init;  // the method under tests
 
     beforeEach(function () {
-      var html = [
+      let html = [
         '<div>',
         '  <div class="modal-body"></div>',
         '</div>'
       ].join('');
 
-      var $el = $(html);
+      let $el = $(html);
 
       ctrlInst = {
         options: new can.Map({}),
@@ -38,9 +38,9 @@ describe('ModalsController', function () {
 
     it('waits until current user is pre-fetched if not yet in cache',
       function () {
-        var userId = GGRC.current_user.id;
-        var dfdFetch = new can.Deferred();
-        var fetchedUser = new can.Map({id: userId, email: 'john@doe.com'});
+        let userId = GGRC.current_user.id;
+        let dfdFetch = new can.Deferred();
+        let fetchedUser = new can.Map({id: userId, email: 'john@doe.com'});
 
         spyOn(CMS.Models.Person, 'findOne').and.returnValue(dfdFetch.promise());
         delete CMS.Models.Person.cache[userId];
@@ -55,11 +55,11 @@ describe('ModalsController', function () {
 
     it('waits until current user is pre-fetched if only partially in cache',
       function () {
-        var userId = GGRC.current_user.id;
-        var dfdRefresh = new can.Deferred();
-        var fetchedUser = new can.Map({id: userId, email: 'john@doe.com'});
+        let userId = GGRC.current_user.id;
+        let dfdRefresh = new can.Deferred();
+        let fetchedUser = new can.Map({id: userId, email: 'john@doe.com'});
 
-        var partialUser = new can.Map({
+        let partialUser = new can.Map({
           id: userId,
           email: '',  // simulate user object only partially loaded
           refresh: jasmine.createSpy().and.returnValue(dfdRefresh.promise())
@@ -78,10 +78,10 @@ describe('ModalsController', function () {
 
     it('does not wait for fetching the current user if already in cache',
       function () {
-        var dfdRefresh = new can.Deferred();
-        var userId = GGRC.current_user.id;
+        let dfdRefresh = new can.Deferred();
+        let userId = GGRC.current_user.id;
 
-        var fullUser = new can.Map({
+        let fullUser = new can.Map({
           id: userId,
           email: 'john@doe.com',
           refresh: jasmine.createSpy().and.returnValue(dfdRefresh.promise())
@@ -99,8 +99,8 @@ describe('ModalsController', function () {
   });
 
   describe('save_error method', function () {
-    var method;
-    var foo;
+    let method;
+    let foo;
 
     beforeEach(function () {
       foo = jasmine.createSpy();
@@ -121,7 +121,7 @@ describe('ModalsController', function () {
     });
     it('calls GGRC.Errors.notifier with specified text' +
     ' if error status is 409', function () {
-      var error = {status: 409};
+      let error = {status: 409};
       method({}, error);
       expect(GGRC.Errors.notifierXHR)
         .toHaveBeenCalledWith('warning');

@@ -6,7 +6,7 @@
 describe('GGRC.Components.mapperResultsItemsHeader', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(function () {
     viewModel = GGRC.Components
@@ -14,20 +14,20 @@ describe('GGRC.Components.mapperResultsItemsHeader', function () {
   });
 
   describe('isSorted() method', function () {
-    var attr = new can.Map({
+    let attr = new can.Map({
       attr_sort_field: 'Title'
     });
 
     it('returns true if attr_sort_field equal to viewModel.sortKey',
       function () {
-        var result;
+        let result;
         viewModel.attr('sortKey', 'Title');
         result = viewModel.isSorted(attr);
         expect(result).toEqual(true);
       });
     it('returns false if attr_sort_field not equal to viewModel.sortKey',
       function () {
-        var result;
+        let result;
         viewModel.attr('sortKey', 'Date');
         result = viewModel.isSorted(attr);
         expect(result).toEqual(false);
@@ -36,13 +36,13 @@ describe('GGRC.Components.mapperResultsItemsHeader', function () {
 
   describe('isSortedAsc() method', function () {
     it('returns true if sorted by ascending', function () {
-      var result;
+      let result;
       viewModel.attr('sortDirection', 'asc');
       result = viewModel.isSortedAsc();
       expect(result).toEqual(true);
     });
     it('returns true if sorted not by ascending', function () {
-      var result;
+      let result;
       viewModel.attr('sortDirection', 'desc');
       result = viewModel.isSortedAsc();
       expect(result).toEqual(false);
@@ -57,7 +57,7 @@ describe('GGRC.Components.mapperResultsItemsHeader', function () {
 
     it('toggles sort direction if sorted by current attribute',
       function () {
-        var attr = new can.Map({
+        let attr = new can.Map({
           attr_sort_field: 'Title'
         });
         viewModel.applySort(attr);
@@ -66,7 +66,7 @@ describe('GGRC.Components.mapperResultsItemsHeader', function () {
 
     it('changes sortKey if sorted by another attribute',
       function () {
-        var attr = new can.Map({
+        let attr = new can.Map({
           attr_sort_field: 'State'
         });
         viewModel.applySort(attr);
@@ -75,7 +75,7 @@ describe('GGRC.Components.mapperResultsItemsHeader', function () {
 
     it('sets sortDirection to "asc" if sorted by another attribute',
       function () {
-        var attr = new can.Map({
+        let attr = new can.Map({
           attr_sort_field: 'State'
         });
         viewModel.applySort(attr);

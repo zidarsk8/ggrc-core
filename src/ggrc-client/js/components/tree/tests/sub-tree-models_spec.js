@@ -11,8 +11,8 @@ import {
 } from '../../../plugins/utils/object-versions-utils';
 
 describe('GGRC.Components.subTreeModels', function () {
-  var vm;
-  var originalInit;
+  let vm;
+  let originalInit;
 
   beforeEach(function () {
     originalInit = viewModel.prototype.init;
@@ -23,9 +23,9 @@ describe('GGRC.Components.subTreeModels', function () {
   });
 
   describe('setter for selectedModels', function () {
-    var selectedModels;
-    var modelsList;
-    var expectedResult;
+    let selectedModels;
+    let modelsList;
+    let expectedResult;
 
     beforeEach(function () {
       modelsList = [
@@ -48,8 +48,8 @@ describe('GGRC.Components.subTreeModels', function () {
   });
 
   describe('init() method', function () {
-    var modelsList = 'mockList';
-    var defaultModels = {selected: 'mockDefaultModels'};
+    let modelsList = 'mockList';
+    let defaultModels = {selected: 'mockDefaultModels'};
 
     beforeEach(function () {
       spyOn(vm, 'getDisplayModels').and.returnValue(modelsList);
@@ -75,7 +75,7 @@ describe('GGRC.Components.subTreeModels', function () {
 
   describe('get() of uniqueModelsList', function () {
     it('sets random stringified number to inputIdPrefix', function () {
-      var result;
+      let result;
       vm.attr('modelsList', new can.List([
         {}, {}, {}, {}, {},
       ]));
@@ -98,8 +98,8 @@ describe('GGRC.Components.subTreeModels', function () {
   });
 
   describe('setVisibility() method', function () {
-    var event;
-    var selectedModels;
+    let event;
+    let selectedModels;
 
     beforeEach(function () {
       selectedModels = 'models';
@@ -127,10 +127,10 @@ describe('GGRC.Components.subTreeModels', function () {
   });
 
   describe('getDisplayModels() method', function () {
-    var defaultModels;
-    var expectedResult;
-    var savedModels;
-    var spy;
+    let defaultModels;
+    let expectedResult;
+    let savedModels;
+    let spy;
     function generateResult(availableModels, selectedModels) {
       return availableModels.map(function (model) {
         return {
@@ -170,8 +170,8 @@ describe('GGRC.Components.subTreeModels', function () {
   });
 
   describe('getSelectedModels() method', function () {
-    var modelsList;
-    var expectedResult;
+    let modelsList;
+    let expectedResult;
 
     beforeEach(function () {
       modelsList = new can.List([
@@ -191,8 +191,8 @@ describe('GGRC.Components.subTreeModels', function () {
   });
 
   describe('selectAll(), selectNone() methods', function () {
-    var modelsList;
-    var event;
+    let modelsList;
+    let event;
 
     beforeEach(function () {
       modelsList = new can.List([
@@ -208,7 +208,7 @@ describe('GGRC.Components.subTreeModels', function () {
     });
 
     it('selectAll() sets display true to all models in list', function () {
-      var result;
+      let result;
 
       vm.selectAll(event);
       result = _.every(vm.attr('modelsList'), function (item) {
@@ -218,7 +218,7 @@ describe('GGRC.Components.subTreeModels', function () {
     });
 
     it('selectNone() sets display false to all models in list', function () {
-      var result;
+      let result;
 
       vm.selectNone(event);
       result = _.every(vm.attr('modelsList'), function (item) {
@@ -229,8 +229,8 @@ describe('GGRC.Components.subTreeModels', function () {
   });
 
   describe('".sub-tree-models mouseleave" handler', function () {
-    var handler;
-    var viewModel;
+    let handler;
+    let viewModel;
 
     beforeEach(function () {
       viewModel = new can.Map();

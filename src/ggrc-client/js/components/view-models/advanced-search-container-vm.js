@@ -20,8 +20,8 @@ export default can.Map.extend({
    * @param {boolean} isGroup - Flag indicates that current component is group.
    */
   removeItem: function (item, isGroup) {
-    var items = this.attr('items');
-    var index = items.indexOf(item);
+    let items = this.attr('items');
+    let index = items.indexOf(item);
     // we have to remove operator in front of each item except the first
     if (index > 0) {
       index--;

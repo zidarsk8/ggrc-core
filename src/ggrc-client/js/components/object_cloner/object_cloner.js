@@ -17,13 +17,13 @@ import {confirm} from '../../plugins/utils/modals';
       modalDescription: '@',
       includeObjects: {},
       getIncluded: function () {
-        var included = this.attr('includeObjects');
+        let included = this.attr('includeObjects');
         return _.filter(can.Map.keys(included), function (val) {
           return included[val];
         });
       },
       cloneObject: function (scope, el, ev) {
-        var instance = this.instance;
+        let instance = this.instance;
         this.attr('includeObjects', {});
 
         confirm({
@@ -36,7 +36,7 @@ import {confirm} from '../../plugins/utils/modals';
           skip_refresh: true,
           button_view: GGRC.mustache_path + '/modals/prompt_buttons.mustache'
         }, function () {
-          var clonedInstance = instance.clone({
+          let clonedInstance = instance.clone({
             cloneOptions: {
               sourceObjectId: instance.id,
               mappedObjects: this.getIncluded()

@@ -8,10 +8,10 @@ import RefreshQueue from '../../../models/refresh_queue';
 describe('GGRC.Components.objectGenerator', function () {
   'use strict';
 
-  var Component;
-  var events;
-  var viewModel;
-  var handler;
+  let Component;
+  let events;
+  let viewModel;
+  let handler;
 
   beforeAll(function () {
     Component = GGRC.Components.get('objectGenerator');
@@ -19,12 +19,12 @@ describe('GGRC.Components.objectGenerator', function () {
   });
 
   describe('viewModel() method', function () {
-    var parentViewModel;
+    let parentViewModel;
     beforeEach(function () {
       parentViewModel = new can.Map();
     });
     it('returns object with function "isLoadingOrSaving"', function () {
-      var result = new Component.prototype.viewModel({}, parentViewModel)();
+      let result = new Component.prototype.viewModel({}, parentViewModel)();
       expect(result.isLoadingOrSaving).toEqual(jasmine.any(Function));
     });
 
@@ -55,7 +55,7 @@ describe('GGRC.Components.objectGenerator', function () {
   });
 
   describe('"inserted" event', function () {
-    var that;
+    let that;
 
     beforeEach(function () {
       viewModel.attr({
@@ -82,8 +82,8 @@ describe('GGRC.Components.objectGenerator', function () {
   });
 
   describe('"closeModal" event', function () {
-    var element;
-    var spyObj;
+    let element;
+    let spyObj;
 
     beforeEach(function () {
       viewModel.attr({});
@@ -117,10 +117,10 @@ describe('GGRC.Components.objectGenerator', function () {
   });
 
   describe('".modal-footer .btn-map click" handler', function () {
-    var that;
-    var event;
-    var element;
-    var callback;
+    let that;
+    let event;
+    let element;
+    let callback;
 
     beforeEach(function () {
       callback = jasmine.createSpy().and.returnValue('expectedResult');
@@ -152,14 +152,14 @@ describe('GGRC.Components.objectGenerator', function () {
     });
 
     it('does nothing if element has class "disabled"', function () {
-      var result;
+      let result;
       element.addClass('disabled');
       result = handler.call(that, element, event);
       expect(result).toEqual(undefined);
     });
 
     it('sets true to is_saving and returns callback', function () {
-      var result;
+      let result;
       result = handler.call(that, element, event);
       expect(viewModel.attr('is_saving')).toEqual(true);
       expect(result).toEqual('expectedResult');

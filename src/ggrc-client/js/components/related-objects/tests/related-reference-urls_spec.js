@@ -6,8 +6,8 @@
 describe('GGRC.Components.relatedReferenceUrls', function () {
   'use strict';
 
-  var viewModel;
-  var instance;
+  let viewModel;
+  let instance;
 
   beforeEach(function () {
     viewModel = GGRC.Components.getViewModel('relatedReferenceUrls');
@@ -16,8 +16,8 @@ describe('GGRC.Components.relatedReferenceUrls', function () {
   });
 
   describe('createReferenceUrl() method', function () {
-    var method;
-    var url;
+    let method;
+    let url;
 
     beforeEach(function () {
       method = viewModel.createReferenceUrl.bind(viewModel);
@@ -36,8 +36,8 @@ describe('GGRC.Components.relatedReferenceUrls', function () {
   });
 
   describe('removeReferenceUrl() method', function () {
-    var method;
-    var url;
+    let method;
+    let url;
 
     beforeEach(function () {
       method = viewModel.removeReferenceUrl.bind(viewModel);
@@ -56,7 +56,7 @@ describe('GGRC.Components.relatedReferenceUrls', function () {
   });
 
   describe('toggleFormVisibility() method', function () {
-    var method;
+    let method;
 
     beforeEach(function () {
       method = viewModel.toggleFormVisibility.bind(viewModel);
@@ -89,7 +89,7 @@ describe('GGRC.Components.relatedReferenceUrls', function () {
   });
 
   describe('submitCreateReferenceUrlForm() method', function () {
-    var method;
+    let method;
 
     beforeEach(function () {
       method = viewModel.submitCreateReferenceUrlForm.bind(viewModel);
@@ -99,7 +99,7 @@ describe('GGRC.Components.relatedReferenceUrls', function () {
     });
 
     describe('in case of non-empty input', function () {
-      var url;
+      let url;
 
       beforeEach(function () {
         spyOn(viewModel, 'validateUserInput').and.returnValue(true);
@@ -113,7 +113,7 @@ describe('GGRC.Components.relatedReferenceUrls', function () {
       });
 
       it('prevents adding duplicate URLs', function () {
-        var matches;
+        let matches;
 
         viewModel.attr('urls', [
           new can.Map({link: 'www.xyz.com', title: 'www.xyz.com'}),
@@ -156,7 +156,7 @@ describe('GGRC.Components.relatedReferenceUrls', function () {
     });
 
     describe('in case of empty input', function () {
-      var url;
+      let url;
 
       beforeEach(function () {
         spyOn(viewModel, 'validateUserInput').and.returnValue(false);

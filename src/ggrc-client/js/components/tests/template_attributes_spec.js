@@ -6,18 +6,18 @@
 describe('GGRC.Components.templateAttributes', function () {
   'use strict';
 
-  var Component;  // the component under test
+  let Component;  // the component under test
 
   beforeAll(function () {
     Component = GGRC.Components.get('templateAttributes');
   });
 
   describe('fieldRemoved() method', function () {
-    var method;  // the method under test
-    var scope;
-    var remainingFields;
-    var $el;
-    var eventObj;
+    let method;  // the method under test
+    let scope;
+    let remainingFields;
+    let $el;
+    let eventObj;
 
     beforeEach(function () {
       scope = new can.Map({
@@ -29,9 +29,9 @@ describe('GGRC.Components.templateAttributes', function () {
     });
 
     it('removes the deleted field from the fields list', function () {
-      var deletedField = new can.Map({id: 4, title: 'bar'});
+      let deletedField = new can.Map({id: 4, title: 'bar'});
 
-      var currentFields = [
+      let currentFields = [
         new can.Map({id: 17, title: 'foo'}),
         new can.Map({id: 4, title: 'bar'}),
         new can.Map({id: 52, title: 'baz'})
@@ -45,9 +45,9 @@ describe('GGRC.Components.templateAttributes', function () {
     });
 
     it('removes the field without id from the fields list', function () {
-      var deletedField = new can.Map({title: 'bar'});
+      let deletedField = new can.Map({title: 'bar'});
 
-      var currentFields = [
+      let currentFields = [
         new can.Map({id: 17, title: 'foo'}),
         new can.Map({title: 'bar'}),
         new can.Map({id: 52, title: 'baz'})
@@ -61,9 +61,9 @@ describe('GGRC.Components.templateAttributes', function () {
     });
 
     it('doesn\'t change the fields list if field doesn\'t match', function () {
-      var deletedField = new can.Map({title: 'barbaz'});
+      let deletedField = new can.Map({title: 'barbaz'});
 
-      var currentFields = [
+      let currentFields = [
         new can.Map({id: 17, title: 'foo'}),
         new can.Map({id: 4, title: 'bar'}),
         new can.Map({id: 52, title: 'baz'})

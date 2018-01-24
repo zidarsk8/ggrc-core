@@ -6,7 +6,7 @@
 describe('GGRC.Components.tabPanel', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(function () {
     viewModel = GGRC.Components.getViewModel('tabPanel');

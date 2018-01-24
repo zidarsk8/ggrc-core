@@ -9,7 +9,7 @@
     //   - useful for callbacks which depend on the controller's presence in
     //     the DOM
     _ifNotRemoved: function(fn) {
-      var that = this;
+      let that = this;
       return function() {
         if (!that.element) {
           return;
@@ -21,8 +21,8 @@
     //make buttons non-clickable when saving
     bindXHRToButton : function(xhr, el, newtext, disable) {
       // binding of an ajax to a click is something we do manually
-      var $el = $(el);
-      var oldtext = $el[0] ? $el[0].innerHTML : '';
+      let $el = $(el);
+      let oldtext = $el[0] ? $el[0].innerHTML : '';
 
       if(newtext) {
         $el[0].innerHTML = newtext;

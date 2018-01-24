@@ -29,7 +29,7 @@ let viewModel = AdvancedSearchContainer.extend({
    * Adds only Mapping Criteria if collection is empty.
    */
   addMappingCriteria: function () {
-    var items = this.attr('items');
+    let items = this.attr('items');
     if (items.length) {
       items.push(AdvancedSearch.create.operator('AND'));
     }
@@ -40,8 +40,8 @@ let viewModel = AdvancedSearchContainer.extend({
    * @param {can.Map} criteria - Mapping Criteria.
    */
   createGroup: function (criteria) {
-    var items = this.attr('items');
-    var index = items.indexOf(criteria);
+    let items = this.attr('items');
+    let index = items.indexOf(criteria);
     items.attr(index, AdvancedSearch.create.group([
       criteria,
       AdvancedSearch.create.operator('AND'),

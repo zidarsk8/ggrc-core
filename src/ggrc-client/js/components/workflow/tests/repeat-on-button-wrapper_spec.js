@@ -6,7 +6,7 @@
 describe('GGRC.Components.repeatOnButtonWrapper', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(function () {
     viewModel = GGRC.Components.getViewModel('repeatOnButtonWrapper');
@@ -14,8 +14,8 @@ describe('GGRC.Components.repeatOnButtonWrapper', function () {
 
   describe('setRepeatOn method', function () {
     it('should set unit and repeat_every properties', function () {
-      var unit = 'Day';
-      var repeatEvery = '2';
+      let unit = 'Day';
+      let repeatEvery = '2';
 
       viewModel.setRepeatOn(unit, repeatEvery);
 
@@ -27,8 +27,8 @@ describe('GGRC.Components.repeatOnButtonWrapper', function () {
   });
 
   describe('updateRepeatOn method', function () {
-    var saveDfd;
-    var instance;
+    let saveDfd;
+    let instance;
 
     beforeEach(function () {
       instance = viewModel.attr('instance');
@@ -63,8 +63,8 @@ describe('GGRC.Components.repeatOnButtonWrapper', function () {
   });
 
   describe('onSetRepeat method', function () {
-    var saveDfd;
-    var instance;
+    let saveDfd;
+    let instance;
     beforeEach(function () {
       instance = viewModel.attr('instance');
       saveDfd = can.Deferred();
@@ -76,8 +76,8 @@ describe('GGRC.Components.repeatOnButtonWrapper', function () {
 
     it('should update instance values when auto-save disabled',
     function () {
-      var unit = 'Week';
-      var repeatEvery = '22';
+      let unit = 'Week';
+      let repeatEvery = '22';
       viewModel.onSetRepeat(unit, repeatEvery);
       expect(instance.save.calls.count()).toEqual(0);
       expect(viewModel.attr('instance.unit'))
@@ -88,8 +88,8 @@ describe('GGRC.Components.repeatOnButtonWrapper', function () {
 
     it('should save instance when auto-save enabled',
     function () {
-      var unit = 'Week';
-      var repeatEvery = '22';
+      let unit = 'Week';
+      let repeatEvery = '22';
       viewModel.attr('autoSave', true);
       viewModel.onSetRepeat(unit, repeatEvery);
       saveDfd.resolve();

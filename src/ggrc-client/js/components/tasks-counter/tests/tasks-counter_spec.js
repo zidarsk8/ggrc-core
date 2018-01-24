@@ -6,7 +6,7 @@
 describe('GGRC.Components.TasksCounter', function () {
   'use strict';
 
-  var viewModel;  // the viewModel under test
+  let viewModel;  // the viewModel under test
 
   beforeEach(function () {
     viewModel = GGRC.Components.getViewModel('tasksCounter');

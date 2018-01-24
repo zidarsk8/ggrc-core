@@ -40,7 +40,7 @@ export default can.Control({
     }
   },
   init: function () {
-    var that = this;
+    let that = this;
     $(function () {
       if (GGRC.page_object) {
         $.extend(that.defaults, {
@@ -52,7 +52,7 @@ export default can.Control({
   }
 }, {
   init: function () {
-    var frag;
+    let frag;
     if (this.element.data('widget-view')) {
       this.options.widget_view = GGRC.mustache_path +
         this.element.data('widget-view');
@@ -93,7 +93,7 @@ export default can.Control({
     }
   },
   get_widget_view: function (el) {
-    var widgetView = $(el)
+    let widgetView = $(el)
       .closest('[data-widget-view]')
       .attr('data-widget-view');
     return (widgetView && widgetView.length > 0) ?
@@ -112,17 +112,17 @@ export default can.Control({
     return false;
   },
   reloadSummary: function () {
-    var that = this;
+    let that = this;
     this.loadChartLibrary(function () {
       that.reloadChart('Assessment', 'piechart_audit_assessments_chart');
     });
   },
   reloadChart: function (type, elementId) {
-    var that = this;
-    var chartOptions = this.options.context.charts[type];
+    let that = this;
+    let chartOptions = this.options.context.charts[type];
     // Note that chart will be refreshed only if counts were changed.
     // State changes are not checked.
-    var countsChanged = getCounts().attr(type) !== chartOptions.attr('total');
+    let countsChanged = getCounts().attr(type) !== chartOptions.attr('total');
     if (chartOptions.attr('isInitialized') && !countsChanged &&
     !this.options.forceRefresh) {
       return;
@@ -132,19 +132,19 @@ export default can.Control({
 
     that.setState(type, {total: 0, statuses: { }}, true);
     that.getStatuses(that.options.instance.id).then(function (raw) {
-      var data = that.parseStatuses(type, raw);
-      var chart = that.drawChart(elementId, data);
+      let data = that.parseStatuses(type, raw);
+      let chart = that.drawChart(elementId, data);
 
       that.prepareLegend(type, chart, data);
       that.setState(type, data, false);
     });
   },
   drawChart: function (elementId, raw) {
-    var chart;
-    var that = this;
-    var options = this.getChartOptions(raw);
-    var data = new google.visualization.DataTable();
-    var statuses = raw.statuses.map(function (item) {
+    let chart;
+    let that = this;
+    let options = this.getChartOptions(raw);
+    let data = new google.visualization.DataTable();
+    let statuses = raw.statuses.map(function (item) {
       return item.map(function (status) {
         return that.prepareTitle(status);
       });
@@ -188,10 +188,10 @@ export default can.Control({
     return status;
   },
   prepareLegend: function (type, chart, data) {
-    var legendData = [];
-    var that = this;
-    var chartOptions = this.options.context.charts[type];
-    var colorsMap = this.options.colorsMap;
+    let legendData = [];
+    let that = this;
+    let chartOptions = this.options.context.charts[type];
+    let colorsMap = this.options.colorsMap;
 
     data.statuses.forEach(function (statusData, rowIndex) {
       legendData.push({
@@ -208,8 +208,8 @@ export default can.Control({
     this.element.find('#piechart_audit_assessments_chart-legend tbody')
       .off('mouseenter', 'tr')
       .on('mouseenter', 'tr', function () {
-        var $el = $(this);
-        var rowIndex = $el.data('row-index');
+        let $el = $(this);
+        let rowIndex = $el.data('row-index');
 
         if (_.isNumber(rowIndex)) {
           chart.setSelection([{row: rowIndex, column: null}]);
@@ -220,8 +220,8 @@ export default can.Control({
       });
   },
   getChartOptions: function (raw) {
-    var options = _.assign({}, this.options.chartOptions);
-    var colorMaps = this.options.colorsMap;
+    let options = _.assign({}, this.options.chartOptions);
+    let colorMaps = this.options.colorsMap;
     options.colors = raw.statuses.map(function (e) {
       return colorMaps[e[0]];
     });
@@ -229,17 +229,17 @@ export default can.Control({
     return options;
   },
   '{window} resize': function (ev) {
-    var chart = this.options.chart;
-    var data = this.options.data;
-    var options = this.options.chartOptions;
-    var isSummaryWidgetShown = this.options.isShown;
+    let chart = this.options.chart;
+    let data = this.options.data;
+    let options = this.options.chartOptions;
+    let isSummaryWidgetShown = this.options.isShown;
 
     if (isSummaryWidgetShown && chart && options && data) {
       chart.draw(data, options);
     }
   },
   setState: function (type, data, isLoading) {
-    var chartOptions = this.options.context.charts[type];
+    let chartOptions = this.options.context.charts[type];
     chartOptions.attr('total', data.total);
     chartOptions.attr('any', data.total > 0);
     chartOptions.attr('none', isLoading || data.total === 0);
@@ -250,9 +250,9 @@ export default can.Control({
     }
   },
   parseStatuses: function (type, data) {
-    var statuses = CMS.Models[type].statuses;
-    var groups = _.object(statuses, new Array(statuses.length).fill(0));
-    var result;
+    let statuses = CMS.Models[type].statuses;
+    let groups = _.object(statuses, new Array(statuses.length).fill(0));
+    let result;
     data.forEach(function (item) {
       if (item[1]) {
         item[0] = 'Verified';

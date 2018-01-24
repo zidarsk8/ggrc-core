@@ -6,7 +6,7 @@
 import Component from '../object-change-state';
 
 describe('GGRC.Components.objectChangeState', function () {
-  var viewModel;
+  let viewModel;
 
   beforeEach(function () {
     viewModel = new Component.prototype.viewModel;
@@ -15,7 +15,7 @@ describe('GGRC.Components.objectChangeState', function () {
   describe('viewModel scope', function () {
     describe('changeState() method', function () {
       it('dipatches onStateChange event with passed status', function () {
-        var newState = 'newState';
+        let newState = 'newState';
 
         spyOn(viewModel, 'dispatch');
         viewModel.changeState(newState);
@@ -29,18 +29,18 @@ describe('GGRC.Components.objectChangeState', function () {
   });
 
   describe('event scope', function () {
-    var events;
+    let events;
 
     beforeEach(function () {
       events = Component.prototype.events;
     });
 
     describe('click handler', function () {
-      var handler;
-      var fakeEvent;
+      let handler;
+      let fakeEvent;
 
       beforeEach(function () {
-        var eventScope = {
+        let eventScope = {
           viewModel: viewModel,
         };
         fakeEvent = new Event('click');
@@ -49,7 +49,7 @@ describe('GGRC.Components.objectChangeState', function () {
 
       it('changes state to viewModel.toState value with help a viewModel ' +
       'changeState method', function () {
-        var toState = 'toState';
+        let toState = 'toState';
         spyOn(viewModel, 'changeState');
         viewModel.attr('toState', toState);
         handler({}, fakeEvent);

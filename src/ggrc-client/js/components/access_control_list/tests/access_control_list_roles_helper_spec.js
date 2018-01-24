@@ -6,7 +6,7 @@
 describe('GGRC.Components.accessControlListRolesHelper', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeAll(function () {
     GGRC.access_control_roles = [
@@ -47,7 +47,7 @@ describe('GGRC.Components.accessControlListRolesHelper', function () {
   });
 
   describe('"setAutoPopulatedRoles" method', function () {
-    var instance;
+    let instance;
 
     it('should set current user for 2 roles', function () {
       instance = new CMS.Models.Assessment({id: 25});

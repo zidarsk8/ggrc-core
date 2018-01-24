@@ -18,8 +18,8 @@ export default can.Component.extend({
     waiting: true,
     can_activate: false,
     _can_activate_def: function () {
-      var self = this;
-      var workflow = GGRC.page_instance();
+      let self = this;
+      let workflow = GGRC.page_instance();
 
       self.attr('waiting', true);
       $.when(
@@ -30,8 +30,8 @@ export default can.Component.extend({
         self.attr('waiting', false);
       })
       .done(function () {
-        var taskGroups = workflow.task_groups.reify();
-        var canActivate = taskGroups.length;
+        let taskGroups = workflow.task_groups.reify();
+        let canActivate = taskGroups.length;
 
         taskGroups.each(function (taskGroup) {
           if (!taskGroup.task_group_tasks.length) {
@@ -45,7 +45,7 @@ export default can.Component.extend({
       });
     },
     _handle_refresh: function (model) {
-      var models = ['TaskGroup', 'TaskGroupTask', 'TaskGroupObject'];
+      let models = ['TaskGroup', 'TaskGroupTask', 'TaskGroupObject'];
       if (models.indexOf(model.shortName) > -1) {
         this._can_activate_def();
       }
@@ -54,9 +54,9 @@ export default can.Component.extend({
       this.attr('waiting', false);
     },
     _activate: function () {
-      var workflow = GGRC.page_instance();
-      var scope = this;
-      var restoreButton = scope._restore_button.bind(scope);
+      let workflow = GGRC.page_instance();
+      let scope = this;
+      let restoreButton = scope._restore_button.bind(scope);
 
       scope.attr('waiting', true);
       if (workflow.unit !== null) {
@@ -77,7 +77,7 @@ export default can.Component.extend({
             }
           })
           .then(function () {
-            var WorkflowExtension =
+            let WorkflowExtension =
               _.find(GGRC.extensions, function (extension) {
                 return extension.name === 'workflows';
               });

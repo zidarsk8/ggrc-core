@@ -15,8 +15,8 @@ import template from './reusable-objects-item.mustache';
       define: {
         disabled: {
           get: function () {
-            var isMapped;
-            var baseInstanceObjects = this.attr('baseInstanceDocuments');
+            let isMapped;
+            let baseInstanceObjects = this.attr('baseInstanceDocuments');
 
             if (!baseInstanceObjects) {
               return false;
@@ -43,7 +43,7 @@ import template from './reusable-objects-item.mustache';
         return this.attr('disabled');
       },
       isSelected: function () {
-        var instanceId = this.attr('instance.id');
+        let instanceId = this.attr('instance.id');
 
         return this.attr('selectedList')
             .map(function (item) {
@@ -52,8 +52,8 @@ import template from './reusable-objects-item.mustache';
             .indexOf(instanceId) > -1;
       },
       toggleSelection: function (isChecked) {
-        var list = this.attr('selectedList');
-        var index = -1;
+        let list = this.attr('selectedList');
+        let index = -1;
         if (isChecked && !this.isSelected()) {
           list.push({
             id: this.attr('instance.id'),
@@ -61,7 +61,7 @@ import template from './reusable-objects-item.mustache';
           });
         } else if (!isChecked) {
           list.forEach(function (item, i) {
-            var type = this.attr('instance.snapshot') ?
+            let type = this.attr('instance.snapshot') ?
               'Snapshot' :
               this.attr('instance.type');
             if (this.attr('instance.id') === item.attr('id') &&

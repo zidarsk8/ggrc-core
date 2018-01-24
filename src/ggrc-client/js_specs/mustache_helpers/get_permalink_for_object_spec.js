@@ -4,7 +4,7 @@
 */
 
 describe("can.mustache.helper.get_permalink_for_object", function () {
-  var fakeOptions,
+  let fakeOptions,
       helper;
 
   beforeAll(function () {
@@ -17,7 +17,7 @@ describe("can.mustache.helper.get_permalink_for_object", function () {
 
   it("concatenates window.location.origin and objects view link",
     function () {
-      var instance = {
+      let instance = {
         viewLink: "/facility/1"
       };
       expect(helper(instance)).toBe(window.location.origin + "/facility/1");
@@ -26,7 +26,7 @@ describe("can.mustache.helper.get_permalink_for_object", function () {
 
   it("returns empty string when objects view link is not present",
     function () {
-      var instance = {};
+      let instance = {};
       expect(helper(instance)).toBe("");
     }
   );

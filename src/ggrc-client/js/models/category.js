@@ -14,7 +14,7 @@ can.Model.Cacheable("CMS.Models.CategoryBase", {
   , findOne : "GET /api/category_bases/{id}"
   , cache_by_scope: {}
   , for_scope: function(scope) {
-      var self = this;
+      let self = this;
 
       if (!this.cache_by_scope[scope])
         this.cache_by_scope[scope] =

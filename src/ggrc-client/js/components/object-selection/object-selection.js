@@ -6,7 +6,7 @@
 (function (can) {
   'use strict';
 
-  var tag = 'object-selection';
+  let tag = 'object-selection';
   /**
    * Object Selection component
    */
@@ -34,8 +34,8 @@
         }
       },
       deselect: function (id, type) {
-        var list = this.attr('selectedItems');
-        var index = this.indexOfSelected(id, type);
+        let list = this.attr('selectedItems');
+        let index = this.indexOfSelected(id, type);
         if (index >= 0) {
           list.splice(index, 1);
           this.markItem(id, type, false);
@@ -43,8 +43,8 @@
         }
       },
       indexOfSelected: function (id, type) {
-        var list = this.attr('selectedItems');
-        var index = -1;
+        let list = this.attr('selectedItems');
+        let index = -1;
         list.each(function (item, i) {
           if (id === item.attr('id') && type === item.attr('type')) {
             index = i;
@@ -84,8 +84,8 @@
         this.emptySelection();
       },
       selectAll: function () {
-        var selectedItems;
-        var disabledIds = this.attr('disabledIds');
+        let selectedItems;
+        let disabledIds = this.attr('disabledIds');
         this.attr('allSelected', true);
         // Replace with actual items loaded from Query API
         this.attr('allItems')

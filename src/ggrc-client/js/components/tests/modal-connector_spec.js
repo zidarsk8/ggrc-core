@@ -9,9 +9,9 @@ import * as QueryAPI from '../../plugins/utils/query-api-utils';
 describe('GGRC.Components.modalConnector', function () {
   'use strict';
 
-  var Component;
-  var viewModel;
-  var events;
+  let Component;
+  let viewModel;
+  let events;
 
   beforeAll(function () {
     Component = GGRC.Components.get('modalConnector');
@@ -21,10 +21,10 @@ describe('GGRC.Components.modalConnector', function () {
     viewModel = new can.Map();
   });
   describe('init() method', function () {
-    var handler;
-    var that;
-    var reifiedInstance;
-    var binding;
+    let handler;
+    let that;
+    let reifiedInstance;
+    let binding;
     beforeEach(function () {
       binding = {
         refresh_instances: jasmine.createSpy()
@@ -147,8 +147,8 @@ describe('GGRC.Components.modalConnector', function () {
     });
   });
   describe('destroy() method', function () {
-    var handler;
-    var that;
+    let handler;
+    let that;
     beforeEach(function () {
       that = {
         viewModel: {
@@ -164,8 +164,8 @@ describe('GGRC.Components.modalConnector', function () {
     });
   });
   describe('setListItems() method', function () {
-    var handler;
-    var that;
+    let handler;
+    let that;
     beforeEach(function () {
       that = {
         viewModel: new can.Map({
@@ -185,11 +185,11 @@ describe('GGRC.Components.modalConnector', function () {
       });
   });
   describe('[data-toggle=unmap] click', function () {
-    var handler;
-    var that;
-    var element;
-    var result;
-    var event;
+    let handler;
+    let that;
+    let element;
+    let result;
+    let event;
     beforeEach(function () {
       element = $('body');
       result = $('<div class="result"></div>');
@@ -228,9 +228,9 @@ describe('GGRC.Components.modalConnector', function () {
     });
   });
   describe('addMapings() method', function () {
-    var handler;
-    var that;
-    var event;
+    let handler;
+    let that;
+    let event;
     beforeEach(function () {
       event = {
         stopPropagation: jasmine.createSpy(),
@@ -263,9 +263,9 @@ describe('GGRC.Components.modalConnector', function () {
     });
   });
   describe('autocomplete_select() method', function () {
-    var handler;
-    var that;
-    var element;
+    let handler;
+    let that;
+    let element;
     beforeEach(function () {
       element = $('body');
       that = {
@@ -297,9 +297,9 @@ describe('GGRC.Components.modalConnector', function () {
   });
 
   describe('buildQuery() method', function () {
-    var handler;
-    var eventScope;
-    var viewModel;
+    let handler;
+    let eventScope;
+    let viewModel;
 
     beforeEach(function () {
       viewModel = new (can.Map.extend(Component.prototype.viewModel));
@@ -318,25 +318,25 @@ describe('GGRC.Components.modalConnector', function () {
 
     describe('returns as a first array item a query param which contains',
     function () {
-      var type;
+      let type;
 
       beforeEach(function () {
         type = 'Type';
       });
 
       it('object_name equals to type', function () {
-        var result = _.flow(handler, _.first)(type);
+        let result = _.flow(handler, _.first)(type);
         expect(result.object_name).toBe(type);
       });
 
       it('filters.expression.op.name equals to "relevant"', function () {
-        var result = _.flow(handler, _.first)(type);
+        let result = _.flow(handler, _.first)(type);
         expect(result.filters.expression.op.name).toBe('relevant');
       });
 
       it('filters.expression.object_name equals to instance.type', function () {
-        var result;
-        var instanceType = 'instanceType';
+        let result;
+        let instanceType = 'instanceType';
 
         viewModel.attr('instance', {type: instanceType});
         result = _.flow(handler, _.first)(type);
@@ -347,8 +347,8 @@ describe('GGRC.Components.modalConnector', function () {
       it('filters.expression.ids array contains only id from instance.id ' +
       'converted to string',
       function () {
-        var result;
-        var instanceId = 12345;
+        let result;
+        let instanceId = 12345;
 
         viewModel.attr('instance', {id: instanceId});
         result = _.flow(handler, _.first)(type);
@@ -358,23 +358,23 @@ describe('GGRC.Components.modalConnector', function () {
       });
 
       it('has default order_by object', function () {
-        var expectedOrderByObject = {
+        let expectedOrderByObject = {
           keys: [],
           order: '',
           compare: null,
         };
-        var result = _.flow(handler, _.first)(type);
+        let result = _.flow(handler, _.first)(type);
         expect(result.filters.order_by).toEqual(expectedOrderByObject);
       });
     });
   });
 
   describe('getMappedObjects() method', function () {
-    var handler;
-    var eventScope;
-    var makeRequestDfd;
-    var makeRequest;
-    var ORDER;
+    let handler;
+    let eventScope;
+    let makeRequestDfd;
+    let makeRequest;
+    let ORDER;
 
     beforeAll(function () {
       ORDER = {
@@ -397,7 +397,7 @@ describe('GGRC.Components.modalConnector', function () {
     });
 
     describe('makes request which', function () {
-      var getParam;
+      let getParam;
 
       beforeAll(function () {
         getParam = function (spy, index) {
@@ -406,8 +406,8 @@ describe('GGRC.Components.modalConnector', function () {
       });
 
       it('contains query to Audit', function () {
-        var object = {type: 'Audit'};
-        var data;
+        let object = {type: 'Audit'};
+        let data;
 
         eventScope.buildQuery.and.returnValue([object]);
         handler();
@@ -418,8 +418,8 @@ describe('GGRC.Components.modalConnector', function () {
       });
 
       it('contains query to Issue', function () {
-        var object = {type: 'Issue'};
-        var data;
+        let object = {type: 'Issue'};
+        let data;
 
         eventScope.buildQuery.and.returnValue([object]);
         handler();
@@ -430,8 +430,8 @@ describe('GGRC.Components.modalConnector', function () {
       });
 
       it('contains query to Snapshot', function () {
-        var object = {type: 'Snapshot'};
-        var data;
+        let object = {type: 'Snapshot'};
+        let data;
 
         eventScope.buildQuery.and.returnValue([object]);
         handler();
@@ -443,7 +443,7 @@ describe('GGRC.Components.modalConnector', function () {
     });
 
     describe('when request was resolved', function () {
-      var response;
+      let response;
 
       beforeEach(function () {
         response = [
@@ -466,7 +466,7 @@ describe('GGRC.Components.modalConnector', function () {
         function (done) {
           handler()
             .then(function (list) {
-              var objects = response[ORDER.FIRST].Audit.values;
+              let objects = response[ORDER.FIRST].Audit.values;
 
               _.each(objects, function (object) {
                 expect(list).toContain(object);
@@ -480,7 +480,7 @@ describe('GGRC.Components.modalConnector', function () {
         function (done) {
           handler()
             .then(function (list) {
-              var objects = response[ORDER.SECOND].Issue.values;
+              let objects = response[ORDER.SECOND].Issue.values;
 
               _.each(objects, function (object) {
                 expect(list).toContain(object);
@@ -494,9 +494,9 @@ describe('GGRC.Components.modalConnector', function () {
         function (done) {
           handler()
             .then(function (list) {
-              var objects = response[ORDER.THIRD].Snapshot.values;
+              let objects = response[ORDER.THIRD].Snapshot.values;
               _.each(objects, function (snapshot) {
-                var convertedObject = SnapshotUtils.toObject(snapshot);
+                let convertedObject = SnapshotUtils.toObject(snapshot);
 
                 snapshot.class = convertedObject.class;
                 snapshot.snapshot_object_class = 'snapshot-object';

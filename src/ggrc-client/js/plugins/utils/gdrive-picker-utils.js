@@ -16,10 +16,10 @@ export const GDRIVE_PICKER_ERR_CANCEL = 'GDRIVE_PICKER_ERR_CANCEL';
  * @return {Promise.<Array.<GDriveFile>>} A Promise which resolves to an array of GDriveFile instances and a picker action as a second parameter
  */
 export function uploadFiles(opts = {}) {
-  var {parentId=null, pickFolder=false, multiSelect=true} = opts;
-  var dfd = new $.Deferred();
-  var pickerBuilder;
-  var picker;
+  let {parentId=null, pickFolder=false, multiSelect=true} = opts;
+  let dfd = new $.Deferred();
+  let pickerBuilder;
+  let picker;
 
   GGRC.Controllers.GAPI
     .reAuthorize(gapi.auth.getToken())
@@ -31,8 +31,8 @@ export function uploadFiles(opts = {}) {
     // Create and render a Picker object for searching images.
   function createPicker() {
     GGRC.Controllers.GAPI.oauth_dfd.done(function (token, oauthUser) {
-      var dialog;
-      var view;
+      let dialog;
+      let view;
 
       pickerBuilder = new google.picker.PickerBuilder();
 
@@ -72,13 +72,13 @@ export function uploadFiles(opts = {}) {
 
     // A simple callback implementation.
   function pickerCallback(data) {
-    var ACTION = google.picker.Response.ACTION;
-    var CANCEL = google.picker.Action.CANCEL;
-    var PICKED = google.picker.Action.PICKED;
-    var DOCUMENTS = google.picker.Response.DOCUMENTS;
-    var files;
-    var err;
-    var model = pickFolder ? CMS.Models.GDriveFolder : CMS.Models.GDriveFile;
+    let ACTION = google.picker.Response.ACTION;
+    let CANCEL = google.picker.Action.CANCEL;
+    let PICKED = google.picker.Action.PICKED;
+    let DOCUMENTS = google.picker.Response.DOCUMENTS;
+    let files;
+    let err;
+    let model = pickFolder ? CMS.Models.GDriveFolder : CMS.Models.GDriveFile;
 
     // sometimes pickerCallback is called with data == { action: 'loaded' }
     // which is not described in the Picker API Docs

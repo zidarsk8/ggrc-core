@@ -3,12 +3,12 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-var ADMIN_PERMISSION;
-var _CONDITIONS_MAP = {
+let ADMIN_PERMISSION;
+let _CONDITIONS_MAP = {
   contains: function (instance, args) {
-    var value = Permission._resolve_permission_variable(args.value);
-    var list_value = instance[args.list_property] || [];
-    var i;
+    let value = Permission._resolve_permission_variable(args.value);
+    let list_value = instance[args.list_property] || [];
+    let i;
     for (i = 0; i < list_value.length; i++) {
       if (list_value[i].id == value.id) {
         return true;
@@ -17,10 +17,10 @@ var _CONDITIONS_MAP = {
     return false;
   },
   is: function (instance, args) {
-    var value = Permission._resolve_permission_variable(args.value);
-    var propertyValue = _.reduce(args.property_name.split('.'),
+    let value = Permission._resolve_permission_variable(args.value);
+    let propertyValue = _.reduce(args.property_name.split('.'),
       function (obj, key) {
-        var value = obj.attr(key);
+        let value = obj.attr(key);
         if (value instanceof can.Stub) {
           value = value.reify();
         }
@@ -29,15 +29,15 @@ var _CONDITIONS_MAP = {
     return value == propertyValue;
   },
   'in': function (instance, args) {
-    var value = Permission._resolve_permission_variable(args.value);
-    var property_value = instance[args.property_name];
+    let value = Permission._resolve_permission_variable(args.value);
+    let property_value = instance[args.property_name];
     if (property_value instanceof can.Stub) {
       property_value = property_value.reify();
     }
     return value.indexOf(property_value) >= 0;
   },
   forbid: function (instance, args, action) {
-    var blacklist = args.blacklist[action] || [];
+    let blacklist = args.blacklist[action] || [];
     return blacklist.indexOf(instance.type) < 0;
   },
   has_changed: function (instance, args) {
@@ -47,7 +47,7 @@ var _CONDITIONS_MAP = {
     return !(instance.attr(args.property_name) === args.prevent_if);
   }
 };
-var permissions_compute = can.compute(GGRC.permissions);
+let permissions_compute = can.compute(GGRC.permissions);
 
 const Permission = can.Construct({
   _admin_permission_for_context: function (context_id) {
@@ -61,9 +61,9 @@ const Permission = can.Construct({
   },
 
   _permission_match: function (permissions, permission) {
-    var resource_types = permissions[permission.action] || {};
-    var resource_type = resource_types[permission.resource_type] || {};
-    var contexts = resource_type.contexts || [];
+    let resource_types = permissions[permission.action] || {};
+    let resource_type = resource_types[permission.resource_type] || {};
+    let contexts = resource_type.contexts || [];
 
     return (contexts.indexOf(permission.context_id) > -1);
   },
@@ -115,11 +115,11 @@ const Permission = can.Construct({
 
   _is_allowed_for: function (permissions, instance, action) {
     // Check for admin permission
-    var checkAdmin = function (contextId) {
-      var permission = this._admin_permission_for_context(contextId);
-      var conditions;
-      var i;
-      var condition;
+    let checkAdmin = function (contextId) {
+      let permission = this._admin_permission_for_context(contextId);
+      let conditions;
+      let i;
+      let condition;
       if (this._permission_match(permissions, permission)) {
         conditions = _.toArray(_.exists(permissions,
           permission.action,
@@ -141,16 +141,16 @@ const Permission = can.Construct({
       return false;
     }.bind(this);
 
-    var action_obj = permissions[action] || {};
-    var shortName = instance.constructor && instance.constructor.shortName;
-    var instance_type = shortName || instance.type;
-    var type_obj = action_obj[instance_type] || {};
-    var conditions_by_context = type_obj.conditions || {};
-    var resources = type_obj.resources || [];
-    var context = instance.context || {id: null};
-    var conditions = conditions_by_context[context.id] || [];
-    var condition;
-    var i;
+    let action_obj = permissions[action] || {};
+    let shortName = instance.constructor && instance.constructor.shortName;
+    let instance_type = shortName || instance.type;
+    let type_obj = action_obj[instance_type] || {};
+    let conditions_by_context = type_obj.conditions || {};
+    let resources = type_obj.resources || [];
+    let context = instance.context || {id: null};
+    let conditions = conditions_by_context[context.id] || [];
+    let condition;
+    let i;
 
     conditions = conditions.concat(conditions_by_context.null || []);
 
@@ -192,8 +192,8 @@ const Permission = can.Construct({
   },
 
   is_allowed_any: function (action, resource_type) {
-    var allowed = this.is_allowed(action, resource_type);
-    var perms = permissions_compute();
+    let allowed = this.is_allowed(action, resource_type);
+    let perms = permissions_compute();
 
     if (!allowed) {
       allowed = _.exists(perms, action, resource_type, 'contexts', 'length');
@@ -202,7 +202,7 @@ const Permission = can.Construct({
   },
 
   page_context_id: function () {
-    var page_instance = GGRC.page_instance();
+    let page_instance = GGRC.page_instance();
     return (page_instance && page_instance.context &&
             page_instance.context.id) || null;
   },

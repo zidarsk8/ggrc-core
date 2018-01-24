@@ -31,8 +31,8 @@
    * @return {Function} - the created component constructor
    */
   function Components(name, config, isLegacy) {
-    var constructor;
-    var definitions;
+    let constructor;
+    let definitions;
 
     if (!name || !_.isString(name)) {
       throw new Error('Component name must be a nonempty string.');
@@ -69,7 +69,7 @@
    */
   Components._extendScope = function (originalScope, definitions) {
     return function (scope, parentScope, element) {
-      var val;
+      let val;
       scope = scope || {};
       parentScope = parentScope || {};
       element = element instanceof jQuery ? element : $(element);
@@ -80,7 +80,7 @@
         }
       });
       _.each(definitions, function (obj, key) {
-        var prefix = '';
+        let prefix = '';
         if (obj.type === 'function') {
           prefix = 'can-';
         }
@@ -106,7 +106,7 @@
    * @return {Any} - Returns casted types
    */
   Components._castValue = function (val, type, parentScope) {
-    var types = {
+    let types = {
       'boolean': function (bool) {
         if (_.isBoolean(bool)) {
           return bool;
@@ -186,7 +186,7 @@
    * @return {Function} - the component's constructor function
    */
   Components.get = function (name) {
-    var component = Components._registry[name];
+    let component = Components._registry[name];
 
     if (!component) {
       throw new Error('Component not found: ' + name);
@@ -202,7 +202,7 @@
    * @return {can.Map|Error} - Component's View Model
    */
   Components.getViewModel = function (name) {
-    var viewModelConfig = Components.get(name).prototype.viewModel;
+    let viewModelConfig = Components.get(name).prototype.viewModel;
     // if viewModelConfig is already a can.Map constructor no need to create a temporary class
     if (can.isFunction(viewModelConfig)) {
       return new viewModelConfig();

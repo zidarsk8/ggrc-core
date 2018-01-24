@@ -50,7 +50,7 @@ import '../components/inline/people-with-role-inline-field';
       this.init_my_workflows();
     },
     init_my_workflows: function() {
-      var self = this,
+      let self = this,
           my_view = this.scope.workflow_view,
           workflow_data = {},
           wfs,              // list of all workflows
@@ -63,8 +63,8 @@ import '../components/inline/people-with-role-inline-field';
 
       GGRC.Models.Search.search_for_types('', ['Workflow'], {contact_id: GGRC.current_user.id})
       .then(function(result_set){
-          var wf_data = result_set.getResultsForType('Workflow');
-          var refresh_queue = new RefreshQueue();
+          let wf_data = result_set.getResultsForType('Workflow');
+          let refresh_queue = new RefreshQueue();
           refresh_queue.enqueue(wf_data);
           return refresh_queue.trigger();
       }).then(function(options){
@@ -99,7 +99,7 @@ import '../components/inline/people-with-role-inline-field';
       return 0;
     },
     update_tasks_for_workflow: function(workflow){
-      var self = this,
+      let self = this,
           dfd = $.Deferred(),
           task_count = 0,
           finished = 0,
@@ -113,10 +113,10 @@ import '../components/inline/people-with-role-inline-field';
           task_data = {};
 
         workflow.get_binding('current_all_tasks').refresh_instances().then(function(d){
-          var mydata = d;
+          let mydata = d;
           task_count = mydata.length;
-          for(var i = 0; i < task_count; i++){
-            var data = mydata[i].instance,
+          for(let i = 0; i < task_count; i++){
+            let data = mydata[i].instance,
                 end_date = new Date(data.end_date || null);
 
             //Calculate first_end_date for the workflow / earliest end for all the tasks in a workflow
@@ -168,8 +168,8 @@ import '../components/inline/people-with-role-inline-field';
             if(today.getTime() >= first_end_date.getTime())
               task_data.days_left_for_first_task = 0;
             else {
-              var time_interval = first_end_date.getTime() - today.getTime();
-              var day_in_milli_secs = 24 * 60 * 60 * 1000;
+              let time_interval = first_end_date.getTime() - today.getTime();
+              let day_in_milli_secs = 24 * 60 * 60 * 1000;
               task_data.days_left_for_first_task = Math.floor(time_interval/day_in_milli_secs);
             }
             task_data.completed_percentage = workflow.is_verification_needed ?
@@ -193,7 +193,7 @@ import '../components/inline/people-with-role-inline-field';
       For workflow with current tasks, task_data.task_count must be > 0;
     */
     filter_current_workflows: function(workflows){
-      var filtered_wfs = [];
+      let filtered_wfs = [];
 
       can.each(workflows, function(item){
         if (item.task_data) {

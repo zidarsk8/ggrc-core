@@ -6,10 +6,10 @@
 describe('GGRC.Components.treeAssigneeField', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(function () {
-    var newViewModel;
+    let newViewModel;
     viewModel = GGRC.Components.get('treeAssigneeField').prototype
       .viewModel.prototype;
     //  avoiding of calling init() in creation of viewModel object
@@ -21,7 +21,7 @@ describe('GGRC.Components.treeAssigneeField', function () {
   });
 
   describe('init() method', function () {
-    var instance;
+    let instance;
 
     beforeEach(function () {
       spyOn(viewModel, 'sliceAssignees')
@@ -43,7 +43,7 @@ describe('GGRC.Components.treeAssigneeField', function () {
   });
 
   describe('sliceAssignees() method', function () {
-    var result;
+    let result;
     it('returns empty string if instance is falsy', function () {
       viewModel.attr('instance', false);
       result = viewModel.sliceAssignees();

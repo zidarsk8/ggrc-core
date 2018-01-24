@@ -6,19 +6,19 @@
 describe('GGRC.Components.addTemplateField', function () {
   'use strict';
 
-  var Component;  // the component under test
+  let Component;  // the component under test
 
   beforeAll(function () {
     Component = GGRC.Components.get('addTemplateField');
   });
 
   describe('addField() method', function () {
-    var addField;  // the method under test
-    var $el;
-    var ev;
-    var scope;
-    var parentScope;
-    var scope_;
+    let addField;  // the method under test
+    let $el;
+    let ev;
+    let scope;
+    let parentScope;
+    let scope_;
 
     beforeEach(function () {
       parentScope = {
@@ -46,7 +46,7 @@ describe('GGRC.Components.addTemplateField', function () {
 
     it('does not require the "values" field to add a field of type Map:Person',
       function (done) {
-        var selectedObj = new can.Map({
+        let selectedObj = new can.Map({
           title: 'External Reviewer',
           type: 'Map:Person',
           values: ''
@@ -67,7 +67,7 @@ describe('GGRC.Components.addTemplateField', function () {
     );
     it('requires the "values" field to add a field of type Dropdown',
       function (done) {
-        var selectedObj = new can.Map({
+        let selectedObj = new can.Map({
           title: 'External Reviewer',
           type: 'Dropdown',
           values: 'value0 value1'
@@ -82,7 +82,7 @@ describe('GGRC.Components.addTemplateField', function () {
     );
     it('requires the "values" field to add a field of type Dropdown',
       function (done) {
-        var selectedObj = new can.Map({
+        let selectedObj = new can.Map({
           title: 'External Reviewer',
           type: 'Dropdown',
           values: ''
@@ -97,7 +97,7 @@ describe('GGRC.Components.addTemplateField', function () {
     );
     it('requires the "values" field to add a field of type Text',
       function (done) {
-        var selectedObj = new can.Map({
+        let selectedObj = new can.Map({
           title: 'External Reviewer',
           type: 'Text',
           values: ''
@@ -112,7 +112,7 @@ describe('GGRC.Components.addTemplateField', function () {
     );
     it('requires the "title" field to add a field',
       function (done) {
-        var selectedObj = new can.Map({
+        let selectedObj = new can.Map({
           title: '',
           type: 'Text',
           values: ''
@@ -128,17 +128,17 @@ describe('GGRC.Components.addTemplateField', function () {
   });
 
   describe('isEmptyTitle() method', function () {
-    var isEmptyTitle;  // the method under test
-    var result;
-    var selectedTitle;
+    let isEmptyTitle;  // the method under test
+    let result;
+    let selectedTitle;
 
     beforeAll(function () {
-      var parentScope = {
+      let parentScope = {
         attr: function () {
           return {};
         }
       };
-      var scope_ = Component.prototype.scope({}, parentScope);
+      let scope_ = Component.prototype.scope({}, parentScope);
       isEmptyTitle = scope_.isEmptyTitle;
     });
 
@@ -159,18 +159,18 @@ describe('GGRC.Components.addTemplateField', function () {
   });
 
   describe('isDublicateTitle() method', function () {
-    var isDublicateTitle;  // the method under test
-    var result;
-    var selectedTitle;
-    var fields;
+    let isDublicateTitle;  // the method under test
+    let result;
+    let selectedTitle;
+    let fields;
 
     beforeAll(function () {
-      var parentScope = {
+      let parentScope = {
         attr: function () {
           return {};
         }
       };
-      var scope_ = Component.prototype.scope({}, parentScope);
+      let scope_ = Component.prototype.scope({}, parentScope);
       isDublicateTitle = scope_.isDublicateTitle;
     });
 
@@ -217,11 +217,11 @@ describe('GGRC.Components.addTemplateField', function () {
   });
 
   describe('isInvalidValues() method', function () {
-    var isInvalidValues;  // the method under test
-    var valueAttrs;
-    var result;
-    var parentScope;
-    var scope_;
+    let isInvalidValues;  // the method under test
+    let valueAttrs;
+    let result;
+    let parentScope;
+    let scope_;
 
     beforeAll(function () {
       valueAttrs = ['Dropdown'];

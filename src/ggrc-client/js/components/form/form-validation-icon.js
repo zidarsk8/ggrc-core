@@ -5,11 +5,11 @@
 
 (function (can, GGRC) {
   'use strict';
-  var tag = 'form-validation-icon';
+  let tag = 'form-validation-icon';
   /**
    * State object to present possible icons for validation
    */
-  var icons = {
+  let icons = {
     noValidation: 'fa-check-circle',
     empty: '',
     valid: 'fa-check form-validation-icon__color-valid',
@@ -27,7 +27,7 @@
         validation: {},
         iconCls: {
           get: function () {
-            var icon = icons.empty;
+            let icon = icons.empty;
 
             if (this.attr('validation.mandatory')) {
               icon = this.attr('validation.valid') ?

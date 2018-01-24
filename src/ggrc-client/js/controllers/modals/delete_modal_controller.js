@@ -15,10 +15,10 @@ export default ModalsController({
     this._super();
   },
   '{$footer} a.btn[data-toggle=delete]:not(:disabled) click': function (el, ev) {
-    var that = this;
+    let that = this;
     // Disable the cancel button.
-    var cancelButton = this.element.find('a.btn[data-dismiss=modal]');
-    var modalBackdrop = this.element.data('modal_form').$backdrop;
+    let cancelButton = this.element.find('a.btn[data-dismiss=modal]');
+    let modalBackdrop = this.element.data('modal_form').$backdrop;
 
     this.bindXHRToButton(this.options.instance.refresh()
       .then(function (instance) {
@@ -26,9 +26,9 @@ export default ModalsController({
       }).then(function (instance) {
         // If this modal is spawned from an edit modal, make sure that one does
         // not refresh the instance post-delete.
-        var parentController = $(that.options.$trigger)
+        let parentController = $(that.options.$trigger)
           .closest('.modal').control();
-        var msg;
+        let msg;
         if (parentController) {
           parentController.options.skip_refresh = true;
         }
@@ -42,7 +42,7 @@ export default ModalsController({
         return new $.Deferred(); // on success, just let the modal be destroyed or navigation happen.
                                  // Do not re-enable the form elements.
       }).fail(function (xhr, status) {
-        var message = xhr.responseJSON;
+        let message = xhr.responseJSON;
 
         if (xhr.responseJSON && xhr.responseJSON.message) {
           message = xhr.responseJSON.message;

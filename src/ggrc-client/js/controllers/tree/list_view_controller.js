@@ -5,12 +5,12 @@
 
 (function (can, $) {
   function modelListLoader(controller, params) {
-    var model = controller.options.model;
-    var page = new $.Deferred();
+    let model = controller.options.model;
+    let page = new $.Deferred();
 
     model.findPage(params).then(function (results) {
-      var collectionName = model.root_collection + '_collection';
-      var collection = results[collectionName] || [];
+      let collectionName = model.root_collection + '_collection';
+      let collection = results[collectionName] || [];
 
       page.resolve(new can.Observe.List(collection), results.paging);
     });
@@ -36,7 +36,7 @@
     }
   }, {
     init: function () {
-      var that = this;
+      let that = this;
       if (!this.options.extra_params) {
         this.options.extra_params = {};
       }
@@ -54,11 +54,11 @@
         }
       });
       this.context.attr('has_next_page', can.compute(function () {
-        var pager = that.context.attr('pager');
+        let pager = that.context.attr('pager');
         return pager && pager.has_next && pager.has_next();
       }));
       this.context.attr('has_prev_page', can.compute(function () {
-        var pager = that.context.attr('pager');
+        let pager = that.context.attr('pager');
         return pager && pager.has_prev && pager.has_prev();
       }));
       this.context.attr(this.options);
@@ -78,8 +78,8 @@
     },
 
     prepare: function () {
-      var that = this;
-      var params = $.extend({}, this.options.extra_params || {});
+      let that = this;
+      let params = $.extend({}, this.options.extra_params || {});
 
       if (this._prepare_deferred) {
         return this._prepare_deferred;
@@ -99,9 +99,9 @@
 
     fetch_list: function (params) {
       // Assemble extra search params
-      var extraParams = this.options.extra_params || {};
-      var searchParams = this.options.search_params;
-      var that = this;
+      let extraParams = this.options.extra_params || {};
+      let searchParams = this.options.search_params;
+      let that = this;
 
       this.element.trigger('loading');
 
@@ -139,7 +139,7 @@
     },
 
     draw_list: function (list) {
-      var that = this;
+      let that = this;
 
       if (list && this.options.fetch_post_process) {
         list = this.options.fetch_post_process(list);
@@ -166,7 +166,7 @@
     },
 
     init_view: function () {
-      var that = this;
+      let that = this;
       return can.view(this.options.list_view, this.context, function (frag) {
         that.element.find('.spinner, .tree-structure').hide();
         that.element
@@ -200,12 +200,12 @@
     '{list} change': 'update_count',
 
     '.view-more-paging click': function (el, ev) {
-      var that = this;
-      var collectionName = that.options.model.root_collection + '_collection';
-      var isNext = el.data('next');
-      var canLoad = isNext ?
+      let that = this;
+      let collectionName = that.options.model.root_collection + '_collection';
+      let isNext = el.data('next');
+      let canLoad = isNext ?
         that.options.pager.has_next() : that.options.pager.has_prev();
-      var load = isNext ? that.options.pager.next : that.options.pager.prev;
+      let load = isNext ? that.options.pager.next : that.options.pager.prev;
 
       that.options.list.replace([]);
       that.element.find('.spinner').show();
@@ -230,7 +230,7 @@
     },
 
     '.search-filters select[name=user_role] change': function (el, ev) {
-      var value = el.val();
+      let value = el.val();
       if (value === 'no-role') {
         this.options.search_params.noRole = true;
         this.options.search_params.role_id = undefined;

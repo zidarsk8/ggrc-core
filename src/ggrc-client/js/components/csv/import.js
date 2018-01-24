@@ -23,8 +23,8 @@ export default GGRC.Components('csvImportWidget', {
     state: 'select',
     helpUrl: GGRC.config.external_import_help_url,
     states: function () {
-      var state = this.attr('state') || 'select';
-      var states = {
+      let state = this.attr('state') || 'select';
+      let states = {
             select: {
               'class': 'btn-green',
               text: 'Choose file to import',
@@ -40,9 +40,9 @@ export default GGRC.Components('csvImportWidget', {
               text: 'Import',
               isDisabled: function () {
                 // info on blocks to import
-                var toImport = this.import;
-                var nonEmptyBlockExists;
-                var hasErrors;
+                let toImport = this.import;
+                let nonEmptyBlockExists;
+                let hasErrors;
 
                 if (!toImport || toImport.length < 1) {
                   return true;
@@ -78,7 +78,7 @@ export default GGRC.Components('csvImportWidget', {
       return _.extend(states[state], {state: state});
     },
     prepareDataForCheck: function (requestData) {
-      var checkResult = {
+      let checkResult = {
         hasDeprecations: false,
         hasDeletions: false,
       };
@@ -126,7 +126,7 @@ export default GGRC.Components('csvImportWidget', {
       this.attr('state', 'import');
     },
     needWarning: function (checkObj, data) {
-      var hasWarningTypes = _.every(data, function (item) {
+      let hasWarningTypes = _.every(data, function (item) {
         return hasWarningType({type: item.name});
       });
       return hasWarningTypes &&
@@ -136,8 +136,8 @@ export default GGRC.Components('csvImportWidget', {
         );
     },
     beforeProcess: function (check, data, element) {
-      var operation;
-      var needWarning = this.needWarning(check, data);
+      let operation;
+      let needWarning = this.needWarning(check, data);
 
       if (needWarning) {
         operation = this.getOperationNameFromCheckObj(check);
@@ -164,11 +164,11 @@ export default GGRC.Components('csvImportWidget', {
       this.processLoadedInfo(data);
     },
     getOperationNameFromCheckObj: function (checkObj) {
-      var action = _.compact([
+      let action = _.compact([
         checkObj.hasDeletions ? 'deletion' : '',
         checkObj.hasDeprecations ? 'deprecation' : '',
       ]).join(' and ');
-      var pastForm = _.compact([
+      let pastForm = _.compact([
         checkObj.hasDeletions ? 'deleted' : '',
         checkObj.hasDeprecations ? 'deprecated' : '',
       ]).join(' and ');
@@ -224,7 +224,7 @@ export default GGRC.Components('csvImportWidget', {
         data: {id: this.scope.attr('fileId')},
       }, false)
       .done(function (data) {
-        var result_count = data.reduce(function (prev, curr) {
+        let result_count = data.reduce(function (prev, curr) {
               _.each(Object.keys(prev), function (key) {
                 prev[key] += curr[key] || 0;
               });
@@ -243,8 +243,8 @@ export default GGRC.Components('csvImportWidget', {
       }.bind(this));
     },
     '#import_btn.state-select click': function (el, ev) {
-      var that = this;
-      var allowedTypes = ['text/csv', 'application/vnd.google-apps.document',
+      let that = this;
+      let allowedTypes = ['text/csv', 'application/vnd.google-apps.document',
         'application/vnd.google-apps.spreadsheet'];
 
       GGRC.Controllers.GAPI
@@ -255,10 +255,10 @@ export default GGRC.Components('csvImportWidget', {
 
       function createPicker() {
         GGRC.Controllers.GAPI.oauth_dfd.done(function (token, oauth_user) {
-          var dialog;
-          var docsUploadView;
-          var docsView;
-          var picker = new google.picker.PickerBuilder()
+          let dialog;
+          let docsUploadView;
+          let docsView;
+          let picker = new google.picker.PickerBuilder()
                 .setOAuthToken(gapi.auth.getToken().access_token)
                 .setDeveloperKey(GGRC.config.GAPI_KEY)
                 .setCallback(pickerCallback);
@@ -283,11 +283,11 @@ export default GGRC.Components('csvImportWidget', {
       }
 
       function pickerCallback(data) {
-        var file;
-        var model;
-        var PICKED = google.picker.Action.PICKED;
-        var ACTION = google.picker.Response.ACTION;
-        var DOCUMENTS = google.picker.Response.DOCUMENTS;
+        let file;
+        let model;
+        let PICKED = google.picker.Action.PICKED;
+        let ACTION = google.picker.Response.ACTION;
+        let DOCUMENTS = google.picker.Response.DOCUMENTS;
 
         if (data[ACTION] === PICKED) {
           model = CMS.Models.GDriveFile;

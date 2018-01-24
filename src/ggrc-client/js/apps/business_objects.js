@@ -12,7 +12,7 @@ import {
 } from '../plugins/utils/object-versions-utils';
 
 (function (can, $) {
-  var CoreExtension = {};
+  let CoreExtension = {};
 
   CoreExtension.name = 'core"';
   GGRC.extensions.push(CoreExtension);
@@ -59,20 +59,20 @@ import {
       };
     },
     init_widgets: function () {
-      var baseWidgetsByType = GGRC.tree_view.base_widgets_by_type;
-      var widgetList = new GGRC.WidgetList('ggrc_core');
-      var objectClass = GGRC.infer_object_type(GGRC.page_object);
-      var objectTable = objectClass && objectClass.table_plural;
-      var object = GGRC.page_instance();
-      var path = GGRC.mustache_path;
-      var infoWidgetViews;
-      var summaryWidgetViews;
-      var modelNames;
-      var possibleModelType;
-      var farModels;
-      var extraDescriptorOptions;
-      var overriddenModels;
-      var extraContentControllerOptions;
+      let baseWidgetsByType = GGRC.tree_view.base_widgets_by_type;
+      let widgetList = new GGRC.WidgetList('ggrc_core');
+      let objectClass = GGRC.infer_object_type(GGRC.page_object);
+      let objectTable = objectClass && objectClass.table_plural;
+      let object = GGRC.page_instance();
+      let path = GGRC.mustache_path;
+      let infoWidgetViews;
+      let summaryWidgetViews;
+      let modelNames;
+      let possibleModelType;
+      let farModels;
+      let extraDescriptorOptions;
+      let overriddenModels;
+      let extraContentControllerOptions;
 
       // TODO: Really ugly way to avoid executing IIFE - needs cleanup
       if (!GGRC.page_object) {
@@ -130,9 +130,9 @@ import {
       modelNames.sort();
       possibleModelType = modelNames.slice();
       can.each(modelNames, function (name) {
-        var w_list;
-        var child_model_list = [];
-        var widgetConfig = getWidgetConfig(name);
+        let w_list;
+        let child_model_list = [];
+        let widgetConfig = getWidgetConfig(name);
         name = widgetConfig.name;
         GGRC.tree_view.basic_model_list.push({
           model_name: name,
@@ -143,7 +143,7 @@ import {
         w_list = baseWidgetsByType[name];
 
         can.each(w_list, function (item) {
-          var childConfig;
+          let childConfig;
           if (possibleModelType.indexOf(item) !== -1) {
             childConfig = getWidgetConfig(name);
             child_model_list.push({
@@ -163,11 +163,11 @@ import {
       }
 
       function apply_mixins(definitions) {
-        var mappings = {};
+        let mappings = {};
 
         // Recursively handle mixins
         function reify_mixins(definition) {
-          var final_definition = {};
+          let final_definition = {};
           if (definition._mixins) {
             can.each(definition._mixins, function (mixin) {
               if (typeof (mixin) === 'string') {
@@ -215,8 +215,8 @@ import {
 
       extraDescriptorOptions = {
         all: (function () {
-          var defOrder = GGRC.tree_view.attr('defaultOrderTypes');
-          var all = {};
+          let defOrder = GGRC.tree_view.attr('defaultOrderTypes');
+          let all = {};
           Object.keys(defOrder).forEach(function (type) {
             all[type] = {
               order: defOrder[type],
@@ -233,7 +233,7 @@ import {
         Contract: {
           Clause: {
             widget_name: function () {
-              var $objectArea = $('.object-area');
+              let $objectArea = $('.object-area');
               return $objectArea.hasClass('dashboard-area') ?
                 'Clauses' : 'Mapped Clauses';
             },
@@ -749,7 +749,7 @@ import {
 
       // Disable editing on profile pages, as long as it isn't audits on the dashboard
       if (GGRC.page_instance() instanceof CMS.Models.Person) {
-        var person_options = extraContentControllerOptions.Person;
+        let person_options = extraContentControllerOptions.Person;
         can.each(person_options, function (options, model_name) {
           if (model_name !== 'Audit' || !/dashboard/.test(window.location)) {
             can.extend(options, {
@@ -761,12 +761,12 @@ import {
       }
 
       can.each(farModels, function (model_name) {
-        var widgetConfig = getWidgetConfig(model_name);
+        let widgetConfig = getWidgetConfig(model_name);
         model_name = widgetConfig.name;
 
         if ((overriddenModels.all && overriddenModels.all.hasOwnProperty(model_name) && !overriddenModels[model_name]) || (overriddenModels[object.constructor.shortName] && overriddenModels[object.constructor.shortName].hasOwnProperty(model_name) && !overriddenModels[object.constructor.shortName][model_name]))
           return;
-        var sources = [],
+        let sources = [],
           far_model, descriptor = {},
           widget_id;
 

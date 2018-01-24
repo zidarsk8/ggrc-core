@@ -25,7 +25,7 @@
     }
   }, {
     form_preload: function () {
-      var pageInstance = GGRC.page_instance();
+      let pageInstance = GGRC.page_instance();
       this.attr('comment', pageInstance);
     },
     /**
@@ -37,7 +37,7 @@
      * @param {jQuery.Event} ev - the onUpdate event object
      */
     updateDescription: function (instance, $el, ev) {
-      var $body = $(document.body);
+      let $body = $(document.body);
 
       // for some reason the instance must be refreshed before saving to avoid
       // the HTTP "precondition required" error

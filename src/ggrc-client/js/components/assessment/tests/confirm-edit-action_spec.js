@@ -6,7 +6,7 @@
 import * as ModalsUtils from '../../../plugins/utils/modals';
 
 describe('GGRC.Components.confirmEditAction', function () {
-  var viewModel;
+  let viewModel;
 
   beforeEach(function () {
     viewModel = GGRC.Components.getViewModel('confirmEditAction');
@@ -53,7 +53,7 @@ describe('GGRC.Components.confirmEditAction', function () {
   });
 
   describe('showConfirm() method', function () {
-    var dfd;
+    let dfd;
 
     beforeEach(function () {
       dfd = new can.Deferred();
@@ -104,7 +104,7 @@ describe('GGRC.Components.confirmEditAction', function () {
     });
 
     it('rejects Deferred if modal has been canceled', function () {
-      var result;
+      let result;
       dfd.reject();
 
       result = viewModel.showConfirm();

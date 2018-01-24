@@ -59,11 +59,11 @@ import template from './object-generator.mustache';
         }
       },
       '.modal-footer .btn-map click': function (el, ev) {
-        var type = this.viewModel.attr('type');
-        var object = this.viewModel.attr('object');
-        var assessmentTemplate =
+        let type = this.viewModel.attr('type');
+        let object = this.viewModel.attr('object');
+        let assessmentTemplate =
           this.viewModel.attr('assessmentTemplate');
-        var instance = CMS.Models[object].findInCacheById(
+        let instance = CMS.Models[object].findInCacheById(
           this.viewModel.attr('join_object_id'));
 
         ev.preventDefault();
@@ -82,7 +82,7 @@ import template from './object-generator.mustache';
         });
       },
       '{viewModel} assessmentTemplate': function (viewModel, ev, val, oldVal) {
-        var type;
+        let type;
         if (_.isEmpty(val)) {
           return this.viewModel.attr('block_type_change', false);
         }

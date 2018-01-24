@@ -8,9 +8,9 @@ import DeferredTransaction from '../../utils/deferred-transaction-utils';
 describe('DeferredTransaction module', function () {
   'use strict';
 
-  var deferredTransaction;
-  var completeTransactionCount;
-  var completeActionsCount;
+  let deferredTransaction;
+  let completeTransactionCount;
+  let completeActionsCount;
 
   function action() {
     completeActionsCount++;

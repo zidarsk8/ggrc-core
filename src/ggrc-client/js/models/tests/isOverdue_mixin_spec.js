@@ -6,15 +6,15 @@
 describe('can.Model.Mixin.isOverdue', function () {
   'use strict';
 
-  var Mixin;
+  let Mixin;
 
   beforeAll(function () {
     Mixin = CMS.Models.Mixins.isOverdue;
   });
 
   describe('_isOverdue() method: ', function () {
-    var instance;
-    var method;
+    let instance;
+    let method;
 
     beforeEach(function () {
       instance = new can.Map({
@@ -59,7 +59,7 @@ describe('can.Model.Mixin.isOverdue', function () {
     });
 
     it('returns true, if next_due_date is earlier than today', function () {
-      var result;
+      let result;
       instance.attr('next_due_date', moment().subtract(1, 'd'));
 
       result = method.apply(instance);
@@ -68,7 +68,7 @@ describe('can.Model.Mixin.isOverdue', function () {
     });
 
     it('returns false, if next_due_date is today', function () {
-      var result;
+      let result;
       instance.attr('next_due_date', moment());
 
       result = method.apply(instance);

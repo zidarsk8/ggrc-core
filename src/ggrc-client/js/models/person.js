@@ -69,8 +69,8 @@ import RefreshQueue from './refresh_queue';
       return this.store[id] || this.cache ? this.cache[id] : null;
     },
     findInCacheByEmail: function (email) {
-      var result = null;
-      var cache = this.store || this.cache || {};
+      let result = null;
+      let cache = this.store || this.cache || {};
       can.each(Object.keys(cache), function (k) {
         if (cache[k].email === email) {
           result = cache[k];
@@ -104,7 +104,7 @@ import RefreshQueue from './refresh_queue';
       default_filter: ['Program', 'Control', 'Risk', 'Assessment'],
     },
     init: function () {
-      var rEmail =
+      let rEmail =
         /^[-!#$%&*+\\.\/0-9=?A-Z^_`{|}~]+@([-0-9A-Z]+\.)+([0-9A-Z]){2,4}$/i;
       this._super.apply(this, arguments);
 
@@ -125,18 +125,18 @@ import RefreshQueue from './refresh_queue';
      */
 
     getUserRoles: function (instance, person, specificObject) {
-      var result = $.Deferred();
-      var refreshQueue = new RefreshQueue();
-      var userRoles;
+      let result = $.Deferred();
+      let refreshQueue = new RefreshQueue();
+      let userRoles;
 
       can.each(person.user_roles, function (ur) {
         refreshQueue.enqueue(ur.getInstance());
       });
 
       refreshQueue.trigger().then(function (roles) {
-        var object;
-        var objectInstance;
-        var objectContextId;
+        let object;
+        let objectInstance;
+        let objectContextId;
 
         userRoles = _.filter(roles, function (role) {
           return instance.context && role.context &&
@@ -158,18 +158,18 @@ import RefreshQueue from './refresh_queue';
       return result.promise();
     },
     getPersonMappings: function (instance, person, specificObject) {
-      var result = $.Deferred();
-      var mappingObject = instance[specificObject];
-      var mappingsRQ = new RefreshQueue();
-      var userRolesRQ = new RefreshQueue();
+      let result = $.Deferred();
+      let mappingObject = instance[specificObject];
+      let mappingsRQ = new RefreshQueue();
+      let userRolesRQ = new RefreshQueue();
 
       can.each(mappingObject, function (obj) {
         mappingsRQ.enqueue(obj);
       });
 
       mappingsRQ.trigger().then(function (objects) {
-        var userRoles;
-        var objectPeopleFiltered = _.filter(objects, function (item) {
+        let userRoles;
+        let objectPeopleFiltered = _.filter(objects, function (item) {
           return item.person && item.person.id === person.id;
         });
 

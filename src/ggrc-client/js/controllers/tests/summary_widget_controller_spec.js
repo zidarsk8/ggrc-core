@@ -10,8 +10,8 @@ describe('SummaryWidgetController', function () {
   'use strict';
 
   describe('"{CMS.Models.Assessment} updated" handler', function () {
-    var method;
-    var ctrlInst;
+    let method;
+    let ctrlInst;
 
     beforeEach(function () {
       ctrlInst = {
@@ -23,15 +23,15 @@ describe('SummaryWidgetController', function () {
     });
 
     it('sets true to options.forceRefresh', function () {
-      var assessment = new CMS.Models.Assessment();
+      let assessment = new CMS.Models.Assessment();
       method({}, {}, assessment);
       expect(ctrlInst.options.forceRefresh).toBe(true);
     });
   });
 
   describe('onRelationshipChange() method', function () {
-    var method;
-    var ctrlInst;
+    let method;
+    let ctrlInst;
 
     beforeEach(function () {
       ctrlInst = {
@@ -45,7 +45,7 @@ describe('SummaryWidgetController', function () {
     it('sets true to options.forceRefresh if destination type is Document' +
     'and source type is Assessment',
       function () {
-        var relationship = new CMS.Models.Relationship({
+        let relationship = new CMS.Models.Relationship({
           destination: {
             type: 'Document',
             id: 1
@@ -60,7 +60,7 @@ describe('SummaryWidgetController', function () {
 
     it('does not set true to options.forceRefresh' +
     ' if destination type is not Document', function () {
-      var relationship = new CMS.Models.Relationship({
+      let relationship = new CMS.Models.Relationship({
         destination: {
           type: 'Control',
           id: 1
@@ -75,7 +75,7 @@ describe('SummaryWidgetController', function () {
 
     it('does not set true to options.forceRefresh' +
     ' if source type is not Assessment', function () {
-      var relationship = new CMS.Models.Relationship({
+      let relationship = new CMS.Models.Relationship({
         destination: {
           type: 'Document',
           id: 1
@@ -90,9 +90,9 @@ describe('SummaryWidgetController', function () {
   });
 
   describe('reloadChart() method', function () {
-    var method;
-    var ctrlInst;
-    var raw;
+    let method;
+    let ctrlInst;
+    let raw;
 
     beforeEach(function () {
       raw = [{type: 'Assessment'}];
@@ -142,9 +142,9 @@ describe('SummaryWidgetController', function () {
   });
 
   describe('widget_shown(event) method', function () {
-    var method;
-    var ctrlInst;
-    var resizeHandler;
+    let method;
+    let ctrlInst;
+    let resizeHandler;
 
     beforeEach(function () {
       ctrlInst = {
@@ -164,7 +164,7 @@ describe('SummaryWidgetController', function () {
     });
 
     it('returns false', function () {
-      var result = method();
+      let result = method();
       expect(result).toBe(false);
     });
 
@@ -180,8 +180,8 @@ describe('SummaryWidgetController', function () {
   });
 
   describe('widget_hidden(event) method', function () {
-    var method;
-    var ctrlInst;
+    let method;
+    let ctrlInst;
 
     beforeEach(function () {
       ctrlInst = {
@@ -194,7 +194,7 @@ describe('SummaryWidgetController', function () {
     });
 
     it('returns false', function () {
-      var result = method();
+      let result = method();
       expect(result).toBe(false);
     });
 
@@ -205,9 +205,9 @@ describe('SummaryWidgetController', function () {
   });
 
   describe('"{window} resize" handler', function () {
-    var method;
-    var ctrlInst;
-    var chart;
+    let method;
+    let ctrlInst;
+    let chart;
 
     beforeEach(function () {
       chart = {

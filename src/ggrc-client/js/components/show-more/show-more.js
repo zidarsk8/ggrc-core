@@ -31,24 +31,24 @@ import template from './show-more.mustache';
         shouldShowAllItems: {
           type: 'boolean',
           value: function () {
-            var isOverLimit = this.attr('isOverLimit');
+            let isOverLimit = this.attr('isOverLimit');
             return isOverLimit;
           }
         },
         isOverLimit: {
           get: function () {
-            var items = this.attr('items');
-            var limit = this.attr('limit');
+            let items = this.attr('items');
+            let limit = this.attr('limit');
 
             return items && items.length > limit;
           }
         },
         visibleItems: {
           get: function () {
-            var limit = this.attr('limit');
-            var isOverLimit = this.attr('isOverLimit');
-            var shouldShowAllItems = this.attr('shouldShowAllItems');
-            var items = this.attr('items');
+            let limit = this.attr('limit');
+            let isOverLimit = this.attr('isOverLimit');
+            let shouldShowAllItems = this.attr('shouldShowAllItems');
+            let items = this.attr('items');
 
             return (isOverLimit && !shouldShowAllItems) ?
               items.slice(0, limit) :
@@ -57,9 +57,9 @@ import template from './show-more.mustache';
         },
         showAllButtonText: {
           get: function () {
-            var items = this.attr('items');
-            var limit = this.attr('limit');
-            var shouldShowAllItems = this.attr('shouldShowAllItems');
+            let items = this.attr('items');
+            let limit = this.attr('limit');
+            let shouldShowAllItems = this.attr('shouldShowAllItems');
 
             return !shouldShowAllItems ?
               'Show more (' + (items.length - limit) + ')' :
@@ -68,7 +68,7 @@ import template from './show-more.mustache';
         }
       },
       toggleShowAll: function (event) {
-        var newValue;
+        let newValue;
         event.stopPropagation();
         newValue = !this.attr('shouldShowAllItems');
         this.attr('shouldShowAllItems', newValue);

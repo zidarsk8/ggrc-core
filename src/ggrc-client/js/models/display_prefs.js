@@ -5,27 +5,27 @@
 
 import * as StateUtils from '../plugins/utils/state-utils';
 
-var COLLAPSE = 'collapse';
-var LHN_SIZE = 'lhn_size';
-var OBJ_SIZE = 'obj_size';
-var SORTS = 'sorts';
-var LHN_STATE = 'lhn_state';
-var TREE_VIEW_HEADERS = 'tree_view_headers';
-var TREE_VIEW_STATES = 'tree_view_states';
-var TREE_VIEW = 'tree_view';
-var CHILD_TREE_DISPLAY_LIST = 'child_tree_display_list';
-var MODAL_STATE = 'modal_state';
-var path = window.location.pathname.replace(/\./g, '/');
+let COLLAPSE = 'collapse';
+let LHN_SIZE = 'lhn_size';
+let OBJ_SIZE = 'obj_size';
+let SORTS = 'sorts';
+let LHN_STATE = 'lhn_state';
+let TREE_VIEW_HEADERS = 'tree_view_headers';
+let TREE_VIEW_STATES = 'tree_view_states';
+let TREE_VIEW = 'tree_view';
+let CHILD_TREE_DISPLAY_LIST = 'child_tree_display_list';
+let MODAL_STATE = 'modal_state';
+let path = window.location.pathname.replace(/\./g, '/');
 
 can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   autoupdate: true,
   version: 20150129, // Last updated to add 2 accessors
 
   findAll: function () {
-    var that = this;
-    var objsDfd = this._super.apply(this, arguments)
+    let that = this;
+    let objsDfd = this._super.apply(this, arguments)
     .then(function (objs) {
-      var i;
+      let i;
       for (i = objs.length; i--;) {
         if (!objs[i].version || objs[i].version < that.version) {
           objs[i].destroy();
@@ -38,11 +38,11 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   findOne: function () {
-    var that = this;
-    var objDfd = this._super.apply(this, arguments)
+    let that = this;
+    let objDfd = this._super.apply(this, arguments)
     .then(function (obj) {
-      var dfd;
-      var p;
+      let dfd;
+      let p;
       if (!obj.version || obj.version < that.version) {
         obj.destroy();
         dfd = new $.Deferred();
@@ -67,7 +67,7 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   getSingleton: function () {
-    var prefs;
+    let prefs;
     if (this.cache) {
       return $.when(this.cache);
     }
@@ -89,10 +89,10 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   makeObject: function () {
-    var retval = this;
-    var args = can.makeArray(arguments);
+    let retval = this;
+    let args = can.makeArray(arguments);
     can.each(args, function (arg) {
-      var tval = can.getObject(arg, retval);
+      let tval = can.getObject(arg, retval);
       if (!tval || !(tval instanceof can.Observe)) {
         tval = new can.Observe(tval);
         retval.attr(arg, tval);
@@ -103,7 +103,7 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   getObject: function () {
-    var args = can.makeArray(arguments);
+    let args = can.makeArray(arguments);
     args[0] === null && args.splice(0, 1);
     return can.getObject(args.join('.'), this);
   },
@@ -120,7 +120,7 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   getCollapsed: function (pageId, widgetId) {
-    var collapsed = this.getObject(pageId === null ? pageId : path, COLLAPSE);
+    let collapsed = this.getObject(pageId === null ? pageId : path, COLLAPSE);
     if (!collapsed) {
       collapsed = this.makeObject(pageId === null ? pageId : path, COLLAPSE)
         .attr(this.makeObject(COLLAPSE, pageId).serialize());
@@ -130,8 +130,8 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   setTreeViewHeaders: function (modelName, displayList) {
-    var hdr = this.getObject(path, TREE_VIEW_HEADERS);
-    var obj = {};
+    let hdr = this.getObject(path, TREE_VIEW_HEADERS);
+    let obj = {};
     if (!hdr) {
       hdr = this.makeObject(path, TREE_VIEW_HEADERS);
     }
@@ -144,7 +144,7 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   getTreeViewHeaders: function (modelName) {
-    var value = this.getObject(path, TREE_VIEW_HEADERS);
+    let value = this.getObject(path, TREE_VIEW_HEADERS);
 
     if (!value || !value[modelName]) {
       return [];
@@ -154,8 +154,8 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   setTreeViewStates: function (modelName, statusList) {
-    var hdr = this.getObject(TREE_VIEW_STATES);
-    var obj = {};
+    let hdr = this.getObject(TREE_VIEW_STATES);
+    let obj = {};
     if (!hdr) {
       hdr = this.makeObject(TREE_VIEW_STATES);
     }
@@ -167,7 +167,7 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   getTreeViewStates: function (modelName) {
-    var value = this.getObject(TREE_VIEW_STATES);
+    let value = this.getObject(TREE_VIEW_STATES);
 
     if (!value || !value[modelName]) {
       return [];
@@ -183,9 +183,9 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   setModalState: function (modelName, displayState) {
-    var path = null;
-    var modalState = this.getObject(path, MODAL_STATE);
-    var obj = {};
+    let path = null;
+    let modalState = this.getObject(path, MODAL_STATE);
+    let obj = {};
 
     if (!modalState) {
       modalState = this.makeObject(path, MODAL_STATE);
@@ -199,7 +199,7 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   getModalState: function (modelName) {
-    var modalState = this.getObject(null, MODAL_STATE);
+    let modalState = this.getObject(null, MODAL_STATE);
 
     if (!modalState || !modalState[modelName]) {
       return null;
@@ -209,8 +209,8 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   setChildTreeDisplayList: function (modelName, displayList) {
-    var hdr = this.getObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST);
-    var obj = {};
+    let hdr = this.getObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST);
+    let obj = {};
     if (!hdr) {
       hdr = this.makeObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST);
     }
@@ -223,7 +223,7 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   getChildTreeDisplayList: function (modelName) {
-    var value = this.getObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST);
+    let value = this.getObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST);
 
     if (!value || !value[modelName]) {
       return null; // in this case user should use default list an empty list, [], is different  than null
@@ -240,7 +240,7 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   getLHNavSize: function (pageId, widgetId) {
-    var size = this.getObject(pageId === null ? pageId : path, LHN_SIZE);
+    let size = this.getObject(pageId === null ? pageId : path, LHN_SIZE);
     if (!size) {
       size = this.makeObject(pageId === null ? pageId : path, LHN_SIZE)
         .attr(this.makeObject(LHN_SIZE, pageId).serialize());
@@ -253,7 +253,7 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   // This is also use at page load to determine which widgets need to be
   // generated client-side.
   getSorts: function (pageId, columnId) {
-    var sorts = this.getObject(path, SORTS);
+    let sorts = this.getObject(path, SORTS);
     if (!sorts) {
       sorts = this.makeObject(path, SORTS)
         .attr(this.makeObject(SORTS, pageId).serialize());
@@ -264,7 +264,7 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   setSorts: function (pageId, widgetId, sorts) {
-    var pageSorts = this.makeObject(path, SORTS);
+    let pageSorts = this.makeObject(path, SORTS);
 
     if (typeof sorts === 'undefined' && typeof widgetId === 'object') {
       sorts = widgetId;
@@ -284,7 +284,7 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   setPageAsDefault: function (pageId) {
-    var that = this;
+    let that = this;
     can.each([COLLAPSE, LHN_SIZE, OBJ_SIZE, SORTS],
       function (key) {
         that.makeObject(key)
@@ -299,7 +299,7 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
   setLHNState: function (newPrefs, val) {
-    var prefs = this.makeObject(LHN_STATE);
+    let prefs = this.makeObject(LHN_STATE);
     can.each(
       ['open_category', 'panel_scroll', 'category_scroll', 'search_text',
         'my_work', 'filter_params', 'is_open', 'is_pinned']

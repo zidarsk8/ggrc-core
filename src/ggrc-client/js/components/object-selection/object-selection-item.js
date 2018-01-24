@@ -18,13 +18,13 @@ import template from './object-selection-item.mustache';
       isDisabled: false,
       isSelected: false,
       toggleSelection: function (scope, el, isSelected) {
-        var event = isSelected ? 'selectItem' : 'deselectItem';
+        let event = isSelected ? 'selectItem' : 'deselectItem';
         can.trigger(el, event, [scope.objectId, scope.objectType]);
       }
     },
     events: {
       'input[type="checkbox"] click': function (el, ev) {
-        var isSelected = el[0].checked;
+        let isSelected = el[0].checked;
         ev.preventDefault();
         ev.stopPropagation();
         this.viewModel

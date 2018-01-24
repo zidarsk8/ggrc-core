@@ -7,11 +7,11 @@ describe('CMS.Models.Assessment', function () {
   'use strict';
 
   describe('before_create() method', function () {
-    var assessment;
-    var audit;
-    var auditWithoutContext;
-    var context;
-    var program;
+    let assessment;
+    let audit;
+    let auditWithoutContext;
+    let context;
+    let program;
 
     beforeEach(function () {
       assessment = new CMS.Models.Assessment();
@@ -55,7 +55,7 @@ describe('CMS.Models.Assessment', function () {
   });
 
   describe('_transformBackupProperty() method', function () {
-    var assessment;
+    let assessment;
 
     beforeEach(function () {
       assessment = new CMS.Models.Assessment();
@@ -91,7 +91,7 @@ describe('CMS.Models.Assessment', function () {
       });
   });
   describe('isDirty() method', function () {
-    var assessment;
+    let assessment;
 
     beforeEach(function () {
       assessment = new CMS.Models.Assessment();
@@ -106,7 +106,7 @@ describe('CMS.Models.Assessment', function () {
       });
     it('returns result of inherited function, true if instance is dirty',
       function () {
-        var result;
+        let result;
         assessment.attr('name', 'assessment1');
         assessment.backup();
         assessment.attr('name', 'assessment1.1');
@@ -115,7 +115,7 @@ describe('CMS.Models.Assessment', function () {
       });
     it('returns result of inherited function, false if instance is not dirty',
       function () {
-        var result;
+        let result;
         assessment.attr('name', 'assessment1');
         assessment.backup();
         result = assessment.isDirty();
@@ -131,7 +131,7 @@ describe('CMS.Models.Assessment', function () {
     });
 
     it('updates backup if backup was created', function () {
-      var model = new CMS.Models.Assessment();
+      let model = new CMS.Models.Assessment();
       model.backup();
       CMS.Models.Assessment.model({data: 'test'}, model);
       expect(model._backupStore().data).toBe('test');
@@ -167,7 +167,7 @@ describe('CMS.Models.Assessment', function () {
     });
 
     it('populates access control roles based on audit roles', function () {
-      var model = new CMS.Models.Assessment();
+      let model = new CMS.Models.Assessment();
       spyOn(model, 'before_create');
 
       // Mock out the findRoles function
@@ -197,7 +197,7 @@ describe('CMS.Models.Assessment', function () {
     });
     it('defaults correctly when auditors/audit captains are undefined',
        function () {
-      var model = new CMS.Models.Assessment();
+      let model = new CMS.Models.Assessment();
       spyOn(model, 'before_create');
 
       // Mock out the findRoles function

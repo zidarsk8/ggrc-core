@@ -4,8 +4,8 @@
  */
 
 (function ($, CMS, GGRC) {
-  var RiskAssessmentsExtension = {};
-  var _risk_assessments_object_types = ['Program'];
+  let RiskAssessmentsExtension = {};
+  let _risk_assessments_object_types = ['Program'];
   GGRC.extensions.push(RiskAssessmentsExtension);
 
   RiskAssessmentsExtension.name = 'risk_assessments';
@@ -21,12 +21,12 @@
 
   // Configure mapping extensions for ggrc_risk_assessments
   RiskAssessmentsExtension.init_mappings = function () {
-    var Proxy = GGRC.MapperHelpers.Proxy;
-    var Direct = GGRC.MapperHelpers.Direct;
-    var Multi = GGRC.MapperHelpers.Multi;
-    var TypeFilter = GGRC.MapperHelpers.TypeFilter;
+    let Proxy = GGRC.MapperHelpers.Proxy;
+    let Direct = GGRC.MapperHelpers.Direct;
+    let Multi = GGRC.MapperHelpers.Multi;
+    let TypeFilter = GGRC.MapperHelpers.TypeFilter;
 
-    var mappings = {
+    let mappings = {
       Program: {
         risk_assessments: Direct('RiskAssessment',
           'program', 'risk_assessments')
@@ -57,9 +57,9 @@
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
   // Initialize widgets for risk assessment page
   RiskAssessmentsExtension.init_widgets = function init_widgets() {
-    var descriptor = {};
-    var page_instance = GGRC.page_instance();
-    var tree_widgets = GGRC.tree_view.base_widgets_by_type;
+    let descriptor = {};
+    let page_instance = GGRC.page_instance();
+    let tree_widgets = GGRC.tree_view.base_widgets_by_type;
 
     _.each(_risk_assessments_object_types, function (type) {
       if (!type || !tree_widgets[type]) {

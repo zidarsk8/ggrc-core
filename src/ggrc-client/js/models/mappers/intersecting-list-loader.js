@@ -12,13 +12,13 @@
         this.sources = sources || [];
       },
       init_listeners: function (binding) {
-        var self = this;
+        let self = this;
 
         if (!binding.source_bindings)
           binding.source_bindings = [];
 
         can.each(this.sources, function (source) {
-          var sourceBinding = null;
+          let sourceBinding = null;
           // Here is a deviation from the norm, since we want to
           //  allow source bindings from possibly several disparate
           //  instances.  Pass them in as already created objects
@@ -35,9 +35,9 @@
         self.init_source_listeners(binding, binding.source_bindings);
       },
       insert_from_source_binding: function (binding, results, index) {
-        var self = this;
-        var newResults;
-        var lists = can.map(
+        let self = this;
+        let newResults;
+        let lists = can.map(
           binding.source_bindings,
           function (source) {
             return [can.map(
@@ -58,7 +58,7 @@
         self.insert_results(binding, newResults);
       },
       init_source_listeners: function (binding, sourceBindings) {
-        var self = this;
+        let self = this;
 
         can.each(sourceBindings, function (sourceBinding) {
           self.insert_from_source_binding(binding, sourceBinding.list);
@@ -75,7 +75,7 @@
         });
       },
       _refresh_stubs: function (binding) {
-        var deferreds = [];
+        let deferreds = [];
 
         can.each(binding.source_bindings, function (sourceBinding) {
           deferreds.push(sourceBinding.refresh_stubs());

@@ -8,9 +8,9 @@ import '../dropdown/dropdown';
 (function (can, GGRC, $) {
   'use strict';
 
-  var template = can.view(GGRC.mustache_path +
+  let template = can.view(GGRC.mustache_path +
     '/base_objects/repeat-on-button.mustache');
-  var config = GGRC.Workflow;
+  let config = GGRC.Workflow;
 
   GGRC.Components('repeatOnButton', {
     tag: 'repeat-on-button',
@@ -74,16 +74,16 @@ import '../dropdown/dropdown';
         this.attr('state.open', true);
       },
       updateRepeatEveryOptions: function () {
-        var selectedRepeatEvery;
-        var repeatOptions = this.attr('repeatOptions');
-        var unitOptions = this.attr('unitOptions');
+        let selectedRepeatEvery;
+        let repeatOptions = this.attr('repeatOptions');
+        let unitOptions = this.attr('unitOptions');
 
         if (this.attr('state.result.unit')) {
           selectedRepeatEvery = _.find(unitOptions, function (option) {
             return option.value === this.attr('state.result.unit');
           }.bind(this));
           repeatOptions.forEach(function (option) {
-            var unitName = option.value > 1 ?
+            let unitName = option.value > 1 ?
               selectedRepeatEvery.plural :
               selectedRepeatEvery.singular;
             option.attr('title',
@@ -104,7 +104,7 @@ import '../dropdown/dropdown';
           config.defaultRepeatValues.repeatEvery);
       },
       initSelectedOptions: function () {
-        var repeatEnabled = !!this.attr('unit');
+        let repeatEnabled = !!this.attr('unit');
         this.attr('repeatEnabled', repeatEnabled);
 
         this.setResultOptions(this.attr('unit'),
@@ -116,9 +116,9 @@ import '../dropdown/dropdown';
         this.updateRepeatEveryOptions();
       },
       save: function () {
-        var unit = null;
-        var repeatEvery = null;
-        var onSave = this.attr('onSaveRepeat');
+        let unit = null;
+        let repeatEvery = null;
+        let onSave = this.attr('onSaveRepeat');
 
         if (this.attr('repeatEnabled')) {
           unit = this.attr('state.result.unit');

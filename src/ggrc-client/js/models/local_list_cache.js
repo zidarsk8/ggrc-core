@@ -10,11 +10,11 @@ can.Model.LocalStorage("CMS.Models.LocalListCache", {
   }
   , convert : {
     modelize : function(serial) {
-      var ml = this.type ? this.type.List : can.List;
-      var insts;
+      let ml = this.type ? this.type.List : can.List;
+      let insts;
       can.batch.start();
       insts = new ml(can.map(serial, function(s) {
-        var inst = CMS.Models.get_instance(s);
+        let inst = CMS.Models.get_instance(s);
         if(!inst.selfLink) {
           inst.attr(s); // Add any other attributes in the serial form, like title
         }
@@ -25,7 +25,7 @@ can.Model.LocalStorage("CMS.Models.LocalListCache", {
     }
   }
   , init : function() {
-    var that = this
+    let that = this
     , _update = this.update;
 
     this.update = function(id, params) {
@@ -36,7 +36,7 @@ can.Model.LocalStorage("CMS.Models.LocalListCache", {
   }
 }, {
   save : function() {
-    var that = this
+    let that = this
     , ct = this.constructor;
 
     return ct.findAll({ name : this.name }).then(function(to_del) {
@@ -48,7 +48,7 @@ can.Model.LocalStorage("CMS.Models.LocalListCache", {
     });
   }
   , serialize : function() {
-    var that = this;
+    let that = this;
     return {
       id : this.id
       , name : this.name
@@ -60,7 +60,7 @@ can.Model.LocalStorage("CMS.Models.LocalListCache", {
         if(that.type && d.constructor.shortName !== that.type)
           return;
 
-        var obj = {
+        let obj = {
           id : d.id
           , type : that.type
           , href : d.href || d.selfLink || ("/api/" + that.type + "/" + d.id)

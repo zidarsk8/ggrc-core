@@ -11,7 +11,7 @@ import BaseTreeItemVM from '../tree-item-base-vm';
 describe('GGRC.VM.BaseTreeItemVM', function () {
   'use strict';
 
-  var vm;
+  let vm;
 
   beforeEach(function () {
     vm = new BaseTreeItemVM();

@@ -22,7 +22,7 @@ import {
  * Util methods for work with Current Page.
  */
 
-var relatedToCurrentInstance = new can.Map({
+let relatedToCurrentInstance = new can.Map({
   define: {
     initialized: {
       type: 'boolean',
@@ -31,7 +31,7 @@ var relatedToCurrentInstance = new can.Map({
   },
 });
 
-var widgetsCounts = new can.Map({});
+let widgetsCounts = new can.Map({});
 
 let CUSTOM_COUNTERS = {
   MY_WORK: () => _getCurrentUser().getWidgetCountForMyWorkPage(),
@@ -39,15 +39,15 @@ let CUSTOM_COUNTERS = {
 };
 
 function initMappedInstances() {
-  var currentPageInstance = GGRC.page_instance();
-  var models = GGRC.Mappings.getMappingList(currentPageInstance.type);
-  var reqParams = [];
+  let currentPageInstance = GGRC.page_instance();
+  let models = GGRC.Mappings.getMappingList(currentPageInstance.type);
+  let reqParams = [];
 
   relatedToCurrentInstance.attr('initialized', true);
   models = can.makeArray(models);
 
   models.forEach(function (model) {
-    var query = buildRelevantIdsQuery(
+    let query = buildRelevantIdsQuery(
       model,
       {},
       {
@@ -63,13 +63,13 @@ function initMappedInstances() {
 
   return can.when.apply(can, reqParams)
     .then(function () {
-      var response = can.makeArray(arguments);
+      let response = can.makeArray(arguments);
 
       models.forEach(function (model, idx) {
-        var ids = response[idx][model] ?
+        let ids = response[idx][model] ?
           response[idx][model].ids :
           response[idx].Snapshot.ids;
-        var map = ids.reduce(function (mapped, id) {
+        let map = ids.reduce(function (mapped, id) {
           mapped[id] = true;
           return mapped;
         }, {});
@@ -117,8 +117,8 @@ function isObjectContextPage() {
  * @return {Object} - widget list object
  */
 function getWidgetList(modelName, path) {
-  var widgetList = {};
-  var isAssessmentsView;
+  let widgetList = {};
+  let isAssessmentsView;
 
   if (!modelName) {
     return widgetList;
@@ -151,9 +151,9 @@ function getWidgetModels(modelName, path) {
 }
 
 function getDefaultWidgets(widgetList, path) {
-  var defaults = Object.keys(widgetList);
+  let defaults = Object.keys(widgetList);
   // Needs refactoring: Should be removed and replaced with Routing!!!
-  var isObjectBrowser = /^\/objectBrowser\/?$/.test(path);
+  let isObjectBrowser = /^\/objectBrowser\/?$/.test(path);
 
   // Remove info tab from object-browser list of tabs
   if (isObjectBrowser) {
@@ -197,11 +197,11 @@ function initWidgetCounts(widgets, type, id) {
 function _initWidgetCounts(widgets, type, id) {
   // Request params generation logic should be moved in
   // a separate place
-  var widgetsObject = getWidgetConfigs(can.makeArray(widgets));
+  let widgetsObject = getWidgetConfigs(can.makeArray(widgets));
 
-  var params = widgetsObject.map(function (widgetObject) {
-    var param;
-    var expression = TreeViewUtils
+  let params = widgetsObject.map(function (widgetObject) {
+    let param;
+    let expression = TreeViewUtils
       .makeRelevantExpression(widgetObject.name, type, id);
 
     if (isSnapshotRelated(type, widgetObject.name)) {
@@ -226,11 +226,11 @@ function _initWidgetCounts(widgets, type, id) {
   }
 
   return $.when(...params).then((...data) => {
-    var countsMap = {};
+    let countsMap = {};
     data.forEach(function (info, i) {
-      var widget = widgetsObject[i];
-      var name = widget.responseType;
-      var countsName = widget.countsName || widget.name;
+      let widget = widgetsObject[i];
+      let name = widget.responseType;
+      let countsName = widget.countsName || widget.name;
 
       if (isSnapshotRelated(type, name)) {
         name = 'Snapshot';
@@ -242,9 +242,9 @@ function _initWidgetCounts(widgets, type, id) {
 }
 
 function refreshCounts() {
-  var pageInstance = GGRC.page_instance();
-  var widgets;
-  var location = window.location.pathname;
+  let pageInstance = GGRC.page_instance();
+  let widgets;
+  let location = window.location.pathname;
 
   if (!pageInstance) {
     return can.Deferred().resolve();

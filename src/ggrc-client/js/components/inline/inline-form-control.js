@@ -13,8 +13,8 @@
       instance: null,
 
       saveInlineForm: function (args) {
-        var self = this;
-        var oldValue = this.attr('instance.' + args.propName);
+        let self = this;
+        let oldValue = this.attr('instance.' + args.propName);
 
         this.attr('deferredSave').push(function () {
           self.attr('instance.' + args.propName, args.value);

@@ -6,8 +6,8 @@
 describe('can.mustache.helper.validation_error', function () {
   'use strict';
 
-  var helper;
-  var fakeOptions;
+  let helper;
+  let fakeOptions;
 
   beforeAll(function () {
     helper = can.Mustache._helpers.validation_error.fn;
@@ -26,7 +26,7 @@ describe('can.mustache.helper.validation_error', function () {
   it('renders the "truthy" block if there are validation errors for the ' +
     'property',
     function () {
-      var validationErrors = {
+      let validationErrors = {
         'property_name.1': ['invalid value']
       };
       helper(validationErrors, 'property_name.1', fakeOptions);
@@ -37,7 +37,7 @@ describe('can.mustache.helper.validation_error', function () {
   it('adds the errors list to the scope if there are validation errors for ' +
     'the property',
     function () {
-      var validationErrors = {
+      let validationErrors = {
         'property_name.1': ['invalid  date format'],
         'property_name.4': ['value is too short', 'not a number']
       };
@@ -51,7 +51,7 @@ describe('can.mustache.helper.validation_error', function () {
   it('renders the "falsy" block if there are no validation errors for the ' +
     'property',
     function () {
-      var validationErrors = {
+      let validationErrors = {
         'property_name.4': ['invalid value']
       };
       helper(validationErrors, 'property_name', fakeOptions);

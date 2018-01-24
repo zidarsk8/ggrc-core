@@ -73,12 +73,12 @@
 
     events: {
       inserted: function () {
-        var viewModel = this.viewModel;
-        var element = this.element.find('.datepicker__calendar');
-        var minDate;
-        var maxDate;
-        var date;
-        var options = {
+        let viewModel = this.viewModel;
+        let element = this.element.find('.datepicker__calendar');
+        let minDate;
+        let maxDate;
+        let date;
+        let options = {
           dateFormat: GGRC.Date.PICKER_ISO_DATE,
           altField: this.element.find('.datepicker__input'),
           altFormat: GGRC.Date.PICKER_DISPLAY_FMT,
@@ -145,9 +145,9 @@
        * @return {Date|null} - the new date value
        */
       updateDate: function (type, date) {
-        var viewModel = this.viewModel;
+        let viewModel = this.viewModel;
 
-        var types = {
+        let types = {
           minDate: function () {
             date.add(1, 'day');
           },
@@ -188,8 +188,8 @@
        * @return {string|null} - the new date value
        */
       prepareDate: function (viewModel, val) {
-        var valISO = null;
-        var valF = null;
+        let valISO = null;
+        let valF = null;
 
         if (val) {
           val = val.trim();
@@ -202,8 +202,8 @@
       },
 
       '{viewModel} setMinDate': function (viewModel, ev, date) {
-        var currentDateObj = null;
-        var updated = this.updateDate('minDate', date);
+        let currentDateObj = null;
+        let updated = this.updateDate('minDate', date);
 
         if (viewModel.date) {
           currentDateObj = moment.utc(viewModel.date).toDate();
@@ -220,13 +220,13 @@
       },
 
       '{viewModel} _date': function (viewModel, ev, val) {
-        var valISO = this.prepareDate(viewModel, val);
+        let valISO = this.prepareDate(viewModel, val);
         viewModel.attr('date', valISO);
         viewModel.picker.datepicker('setDate', valISO);
       },
 
       '{window} mousedown': function (el, ev) {
-        var isInside;
+        let isInside;
 
         if (this.viewModel.attr('persistent')) {
           return;

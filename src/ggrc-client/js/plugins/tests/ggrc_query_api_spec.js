@@ -8,10 +8,10 @@ import * as CurrentPageUtils from '../utils/current-page-utils';
 
 describe('GGRC Utils Query API', function () {
   describe('buildParams() method', function () {
-    var relevant;
-    var objectName;
-    var paging;
-    var method;
+    let relevant;
+    let objectName;
+    let paging;
+    let method;
 
     beforeEach(function () {
       paging = {
@@ -32,7 +32,7 @@ describe('GGRC Utils Query API', function () {
       });
 
       it('return default params for paging request', function () {
-        var result = method(objectName, paging, relevant)[0];
+        let result = method(objectName, paging, relevant)[0];
 
         expect(result.object_name).toEqual('Assessment');
         expect(result.limit).toEqual([0, 10]);
@@ -40,7 +40,7 @@ describe('GGRC Utils Query API', function () {
       });
 
       it('return limit for 3rd page', function () {
-        var result;
+        let result;
         paging.current = 3;
         paging.pageSize = 50;
 
@@ -60,7 +60,7 @@ describe('GGRC Utils Query API', function () {
       });
 
       it('return default params for paging request', function () {
-        var result = method(objectName, paging, relevant)[0];
+        let result = method(objectName, paging, relevant)[0];
 
         expect(result.object_name).toEqual('Audit');
         expect(result.limit).toEqual([0, 10]);
@@ -68,7 +68,7 @@ describe('GGRC Utils Query API', function () {
       });
 
       it('return expression for filter', function () {
-        var filterResult;
+        let filterResult;
         paging.filter = 'status="in progress"';
 
         filterResult =
@@ -91,7 +91,7 @@ describe('GGRC Utils Query API', function () {
       });
 
       it('return correct ids', function () {
-        var result = method(objectName, paging, relevant)[0];
+        let result = method(objectName, paging, relevant)[0];
 
         expect(result.filters.expression.ids.length).toEqual(1);
         expect(result.filters.expression.ids).toContain('28');
@@ -109,7 +109,7 @@ describe('GGRC Utils Query API', function () {
       });
 
       it('return owned as operation type', function () {
-        var result = method(objectName, paging, relevant)[0];
+        let result = method(objectName, paging, relevant)[0];
 
         expect(result.object_name).toEqual('Assessment');
         expect(result.filters.expression.object_name).toEqual('Person');
@@ -118,19 +118,19 @@ describe('GGRC Utils Query API', function () {
     });
 
     describe('filter builder', function () {
-      var relevantType = 'dummyType1';
-      var requestedType = 'dummyType2';
-      var pageWithFilter = {filter: 'field = value'};
-      var pageNoFilter = {filter: undefined};
-      var relevant = {id: 1, type: relevantType};
-      var additionalFilter = {
+      let relevantType = 'dummyType1';
+      let requestedType = 'dummyType2';
+      let pageWithFilter = {filter: 'field = value'};
+      let pageNoFilter = {filter: undefined};
+      let relevant = {id: 1, type: relevantType};
+      let additionalFilter = {
         expression: {
           op: {name: '~'},
           left: 'foo',
           right: 'bar'
         }
       };
-      var result;
+      let result;
 
       var flattenOps = function (expression) {
         if (expression && expression.op) {
@@ -140,7 +140,7 @@ describe('GGRC Utils Query API', function () {
         return [];
       };
 
-      var checkOps = function (expression, expectedOps) {
+      let checkOps = function (expression, expectedOps) {
         return _.isEqual(flattenOps(expression).sort(),
                          expectedOps.sort());
       };
@@ -217,7 +217,7 @@ describe('GGRC Utils Query API', function () {
   });
 
   describe('batchRequests() method', function () {
-    var batchRequests = QueryAPI.batchRequests;
+    let batchRequests = QueryAPI.batchRequests;
 
     beforeEach(function () {
       spyOn(can, 'ajax')
@@ -257,7 +257,7 @@ describe('GGRC Utils Query API', function () {
   });
 
   describe('buildCountParams() method', function () {
-    var relevant = {
+    let relevant = {
       type: 'Audit',
       id: '555',
       operation: 'relevant'
@@ -265,7 +265,7 @@ describe('GGRC Utils Query API', function () {
 
     it('empty arguments. buildCountParams should return empty array',
       function () {
-        var queries = QueryAPI.buildCountParams();
+        let queries = QueryAPI.buildCountParams();
         expect(Array.isArray(queries)).toBe(true);
         expect(queries.length).toEqual(0);
       }
@@ -273,10 +273,10 @@ describe('GGRC Utils Query API', function () {
 
     it('No relevant. buildCountParams should return array of queries',
       function () {
-        var types = ['Assessment', 'Control'];
+        let types = ['Assessment', 'Control'];
 
-        var queries = QueryAPI.buildCountParams(types);
-        var query = queries[0];
+        let queries = QueryAPI.buildCountParams(types);
+        let query = queries[0];
 
         expect(queries.length).toEqual(types.length);
         expect(query.object_name).toEqual(types[0]);
@@ -287,11 +287,11 @@ describe('GGRC Utils Query API', function () {
 
     it('Pass relevant. buildCountParams should return array of queries',
       function () {
-        var types = ['Assessment', 'Control'];
+        let types = ['Assessment', 'Control'];
 
-        var queries = QueryAPI.buildCountParams(types, relevant);
-        var query = queries[0];
-        var expression = query.filters.expression;
+        let queries = QueryAPI.buildCountParams(types, relevant);
+        let query = queries[0];
+        let expression = query.filters.expression;
 
         expect(queries.length).toEqual(types.length);
         expect(query.object_name).toEqual(types[0]);

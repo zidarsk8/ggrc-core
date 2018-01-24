@@ -61,8 +61,8 @@ export default GGRC.Components('tabPanel', {
       this.attr('forceClearContent', false);
     },
     addPanel: function () {
-      var panels = this.attr('panels');
-      var isAlreadyAdded = panels.indexOf(this) > -1;
+      let panels = this.attr('panels');
+      let isAlreadyAdded = panels.indexOf(this) > -1;
       if (isAlreadyAdded) {
         return;
       }
@@ -71,9 +71,9 @@ export default GGRC.Components('tabPanel', {
       panels.dispatch('panelAdded');
     },
     removePanel: function () {
-      var itemTabIndex = this.attr('tabIndex');
-      var panels = this.attr('panels');
-      var indexToRemove;
+      let itemTabIndex = this.attr('tabIndex');
+      let panels = this.attr('panels');
+      let indexToRemove;
 
       panels.each(function (panel, index) {
         if (panel.attr('tabIndex') === itemTabIndex) {

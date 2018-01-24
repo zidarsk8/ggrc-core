@@ -9,12 +9,12 @@ import template from './mapped-control-related-objects.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var tag = 'assessment-mapped-control-related-objects';
+  let tag = 'assessment-mapped-control-related-objects';
   /**
    * ViewModel for Assessment Mapped Controls Related Objectives and Regulations.
    * @type {can.Map}
    */
-  var viewModel = can.Map.extend({
+  let viewModel = can.Map.extend({
     define: {
       items: {
         value: []

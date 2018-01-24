@@ -7,9 +7,9 @@ import * as ModalsUtils from '../../../plugins/utils/modals';
 
 describe('GGRC.Components.quickAdd', function () {
   'use strict';
-  var Component;
-  var events;
-  var scope;
+  let Component;
+  let events;
+  let scope;
 
   beforeAll(function () {
     Component = GGRC.Components.get('quickAdd');
@@ -18,15 +18,15 @@ describe('GGRC.Components.quickAdd', function () {
 
   describe('"a[data-toggle=submit]:not(.disabled):not([disabled])' +
   ' click" event', function () {
-    var handler;
-    var element;
-    var expectedParam = {
+    let handler;
+    let element;
+    let expectedParam = {
       modal_description: 'newDescription',
       modal_confirm: 'button',
       modal_title: 'title',
       button_view: '/static/mustache/quick_form/confirm_buttons.mustache'
     };
-    var verifyDfd;
+    let verifyDfd;
 
     beforeEach(function () {
       handler =

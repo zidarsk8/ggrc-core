@@ -7,7 +7,7 @@ import RefreshQueue from '../../js/models/refresh_queue';
 
 describe("mappers", function() {
 
-  var LL;
+  let LL;
   beforeEach(function() {
     LL = GGRC.ListLoaders;
     if(!GGRC.Jasmine || !GGRC.Jasmine.MockModel) {
@@ -20,7 +20,7 @@ describe("mappers", function() {
     describe("#init", function() {
 
       it("sets instance and loader to supplied arguments", function() {
-        var lb = new LL.ListBinding(1, 2);
+        let lb = new LL.ListBinding(1, 2);
         expect(lb.instance).toBe(1);
         expect(lb.loader).toBe(2);
       });
@@ -34,8 +34,8 @@ describe("mappers", function() {
     describe("#refresh_stubs", function() {
 
       it("calls refresh_stubs on its loader", function() {
-        var loader = jasmine.createSpyObj('loader', ['refresh_stubs']);
-        var binding = new LL.ListBinding({}, loader);
+        let loader = jasmine.createSpyObj('loader', ['refresh_stubs']);
+        let binding = new LL.ListBinding({}, loader);
         binding.refresh_stubs();
         expect(loader.refresh_stubs).toHaveBeenCalledWith(binding);
       });
@@ -45,8 +45,8 @@ describe("mappers", function() {
     describe("#refresh_instances", function() {
 
       it("calls refresh_instances on its loader", function() {
-        var loader = jasmine.createSpyObj('loader', ['refresh_instances']);
-        var binding = new LL.ListBinding({}, loader);
+        let loader = jasmine.createSpyObj('loader', ['refresh_instances']);
+        let binding = new LL.ListBinding({}, loader);
         binding.refresh_instances();
         expect(loader.refresh_instances).toHaveBeenCalledWith(binding, undefined);
       });
@@ -55,7 +55,7 @@ describe("mappers", function() {
 
     describe("#refresh_count", function() {
 
-      var binding;
+      let binding;
       beforeEach(function() {
         binding = new LL.ListBinding({}, {});
       });
@@ -67,7 +67,7 @@ describe("mappers", function() {
       });
 
       it("returns a deferred that resolves to a compute", function(done) {
-        var deferred;
+        let deferred;
         spyOn(binding, "refresh_stubs").and.returnValue($.when());
         deferred = binding.refresh_count();
         expect(typeof deferred.then).toBe("function");
@@ -80,7 +80,7 @@ describe("mappers", function() {
       });
 
       it("...and the compute returns the list length", function(done) {
-        var deferred;
+        let deferred;
         binding.list.push(1, 2, 3);
         spyOn(binding, "refresh_stubs").and.returnValue($.when());
         deferred = binding.refresh_count();
@@ -96,7 +96,7 @@ describe("mappers", function() {
 
     describe("#refresh_list", function() {
 
-      var binding, loader, other_binding;
+      let binding, loader, other_binding;
       beforeEach(function() {
         other_binding = jasmine.createSpyObj('other_binding', ['refresh_instances']);
         other_binding.refresh_instances.and.returnValue($.when());
@@ -126,7 +126,7 @@ describe("mappers", function() {
       });
 
       it("refreshes its own instances after refreshing the new binding's instances", function(done) {
-        var dfd = binding.refresh_list();
+        let dfd = binding.refresh_list();
         dfd.then(function() {
           expect(binding.refresh_instances).toHaveBeenCalledWith();
           done();
@@ -147,7 +147,7 @@ describe("mappers", function() {
       });
 
       it("returns the deferred from the refresh queue", function() {
-        var dfd = $.when();
+        let dfd = $.when();
         spyOn(RefreshQueue.prototype, "enqueue");
         spyOn(RefreshQueue.prototype, "trigger").and.returnValue(dfd);
         expect(new LL.ListBinding(1, {}).refresh_instance()).toBe(dfd);
@@ -162,7 +162,7 @@ describe("mappers", function() {
     describe("#init", function() {
 
       it("sets the named properties to the positional parameters", function() {
-        var mr;
+        let mr;
         spyOn(LL.MappingResult.prototype, "_make_mappings").and.callFake(function(mapping_name) {
           expect(mapping_name).toBe("mappings");
           return "_mapping";
@@ -176,7 +176,7 @@ describe("mappers", function() {
       });
 
       it("sets the named properties to the object properties if called with an object", function() {
-        var mr;
+        let mr;
         spyOn(LL.MappingResult.prototype, "_make_mappings").and.callFake(function(mapping_name) {
           expect(mapping_name).toBe("mappings");
           return "_mapping";
@@ -193,7 +193,7 @@ describe("mappers", function() {
 
     describe("#_make_mappings", function() {
       it("converts all elements of the supplied array to mapping results", function() {
-        var mr = new LL.MappingResult("foo", ["bar"], "baz");
+        let mr = new LL.MappingResult("foo", ["bar"], "baz");
         expect(mr._make_mappings(["baz", "quux", mr]))
           .toEqual([
             jasmine.any(LL.MappingResult),
@@ -206,9 +206,9 @@ describe("mappers", function() {
     describe("#get_bindings", function() {
 
       it("finds all depth-1 bindings touched by walk_instances", function() {
-        var mr = new LL.MappingResult("foo", ["bar"], "baz");
-        var phony_binding = {};
-        var phony_result = { binding: phony_binding };
+        let mr = new LL.MappingResult("foo", ["bar"], "baz");
+        let phony_binding = {};
+        let phony_result = { binding: phony_binding };
         spyOn(mr, "walk_instances").and.callFake(function(fn) {
           fn({}, phony_result, 1);
           fn({}, { binding: {} }, 2);
@@ -220,13 +220,13 @@ describe("mappers", function() {
 
     describe("#bindings_compute", function() {
 
-      var mr;
+      let mr;
       beforeEach(function() {
         mr = new LL.MappingResult("foo", ["bar"], "baz");
       })
 
       it("returns the saved compute if it exists.", function() {
-        var compute = can.compute();
+        let compute = can.compute();
         mr._bindings_compute = compute;
         expect(mr.bindings_compute()).toBe(compute);
       });
@@ -241,20 +241,20 @@ describe("mappers", function() {
 
     describe("#get_bindings_compute", function() {
 
-      var mr;
+      let mr;
       beforeEach(function() {
         mr = new LL.MappingResult("foo", ["bar"], "baz");
       });
 
       it("returns a can.compute", function() {
-        var result = mr.get_bindings_compute();
+        let result = mr.get_bindings_compute();
         expect(typeof result).toBe("function");
         expect(result.isComputed).toBe(true);
       });
 
       describe("returned compute", function() {
         it("returns the bindings", function() {
-          var result, phony_binding = {};
+          let result, phony_binding = {};
           spyOn(mr, "get_bindings").and.returnValue([phony_binding]);
           result = (mr.get_bindings_compute())();
           expect(result).toEqual([phony_binding]);
@@ -272,14 +272,14 @@ describe("mappers", function() {
     describe("#get_mappings", function() {
 
       it("calls walk_instances", function() {
-        var mr = new LL.MappingResult("foo", ["bar"], "baz");
+        let mr = new LL.MappingResult("foo", ["bar"], "baz");
         spyOn(mr, "walk_instances");
         mr.get_mappings();
         expect(mr.walk_instances).toHaveBeenCalled();
       });
 
       it("gets all instances where depth is 1", function() {
-        var mr = new LL.MappingResult("foo", ["bar"], "baz");
+        let mr = new LL.MappingResult("foo", ["bar"], "baz");
         spyOn(mr, "walk_instances").and.callFake(function(fn) {
           fn("foo", {}, 1);
           fn("bar", {}, 2);
@@ -288,8 +288,8 @@ describe("mappers", function() {
       });
 
       it("adds self for depth=1 and instance=true", function() {
-        var instance = {};
-        var mr = new LL.MappingResult(instance, ["bar"], "baz");
+        let instance = {};
+        let mr = new LL.MappingResult(instance, ["bar"], "baz");
         spyOn(mr, "walk_instances").and.callFake(function(fn) {
           fn(true, {}, 1);
         });
@@ -300,13 +300,13 @@ describe("mappers", function() {
 
     describe("#mappings_compute", function() {
 
-      var mr;
+      let mr;
       beforeEach(function() {
         mr = new LL.MappingResult("foo", ["bar"], "baz");
       })
 
       it("returns the saved compute if it exists.", function() {
-        var compute = can.compute();
+        let compute = can.compute();
         mr._mappings_compute = compute;
         expect(mr.mappings_compute()).toBe(compute);
       });
@@ -321,20 +321,20 @@ describe("mappers", function() {
 
     describe("#get_mappings_compute", function() {
 
-      var mr;
+      let mr;
       beforeEach(function() {
         mr = new LL.MappingResult("foo", ["bar"], "baz");
       });
 
       it("returns a can.compute", function() {
-        var result = mr.get_mappings_compute();
+        let result = mr.get_mappings_compute();
         expect(typeof result).toBe("function");
         expect(result.isComputed).toBe(true);
       });
 
       describe("returned compute", function() {
         it("returns the mappings", function() {
-          var result, phony_binding = {};
+          let result, phony_binding = {};
           spyOn(mr, "get_mappings").and.returnValue([phony_binding]);
           result = (mr.get_mappings_compute())();
           expect(result).toEqual([phony_binding]);
@@ -353,8 +353,8 @@ describe("mappers", function() {
 
       describe("when last_instance is not this MappingResult's instance", function() {
         it("calls the function on itself", function() {
-          var sanity_check = false;
-          var mr = new LL.MappingResult("foo", [], "bar");
+          let sanity_check = false;
+          let mr = new LL.MappingResult("foo", [], "bar");
           mr.walk_instances(function(instance, _result, depth) {
             expect(instance).toBe("foo");
             expect(depth).toBe(0);
@@ -365,10 +365,10 @@ describe("mappers", function() {
 
         describe("when mappings length is greater than zero", function() {
           it("calls walk_instances on each mapping with depth incremented", function() {
-            var fake_result = jasmine.createSpyObj("fake_result", ['walk_instances']);
+            let fake_result = jasmine.createSpyObj("fake_result", ['walk_instances']);
             spyOn(LL.MappingResult.prototype, "_make_mappings").and.returnValue([fake_result]);
-            var mr = new LL.MappingResult("foo", [], "bar");
-            var func = function() {};
+            let mr = new LL.MappingResult("foo", [], "bar");
+            let func = function() {};
             mr.walk_instances(func, "bar", 0);
             expect(fake_result.walk_instances).toHaveBeenCalledWith(func, "foo", 1);
           });
@@ -380,18 +380,18 @@ describe("mappers", function() {
 
         describe("when mappings length is greater than zero", function() {
           it("calls walk_instances on each mapping without incrementing depth", function() {
-            var fake_result = jasmine.createSpyObj("fake_result", ['walk_instances']);
+            let fake_result = jasmine.createSpyObj("fake_result", ['walk_instances']);
             spyOn(LL.MappingResult.prototype, "_make_mappings").and.returnValue([fake_result]);
-            var mr = new LL.MappingResult("foo", [], "bar");
-            var func = function() {};
+            let mr = new LL.MappingResult("foo", [], "bar");
+            let func = function() {};
             mr.walk_instances(func, "foo", 0);
             expect(fake_result.walk_instances).toHaveBeenCalledWith(func, "foo", 0);
           });
         });
 
         it("no action is taken", function() {
-          var sanity_check = false;
-          var mr = new LL.MappingResult("foo", [], "bar");
+          let sanity_check = false;
+          let mr = new LL.MappingResult("foo", [], "bar");
           mr.walk_instances(function(instance, _result, depth) {
             fail("fn was called");
           }, "foo", 0);
@@ -405,7 +405,7 @@ describe("mappers", function() {
 
   describe("GGRC.ListLoaders.BaseListLoader", function() {
 
-    var ll;
+    let ll;
     beforeEach(function() {
       ll = new GGRC.ListLoaders.BaseListLoader();
       //init_listeners is abstract -- called by base init but not implemented in base.
@@ -422,7 +422,7 @@ describe("mappers", function() {
       });
 
       it("inits the listeners", function() {
-        var fake_binding = {};
+        let fake_binding = {};
         spyOn(GGRC.ListLoaders.BaseListLoader, "binding_factory").and.returnValue(fake_binding);
 
         ll.attach("instance");
@@ -433,7 +433,7 @@ describe("mappers", function() {
 
     describe("#find_result_by_instance", function() {
 
-      var not_found, found, list;
+      let not_found, found, list;
       beforeEach(function() {
         not_found = new GGRC.Jasmine.MockModel({ id : 1 });
         found = new GGRC.Jasmine.MockModel({ id : 2 });
@@ -489,7 +489,7 @@ describe("mappers", function() {
 
     describe("#insert_results", function() {
 
-      var binding, fake_find_result;
+      let binding, fake_find_result;
       beforeEach(function() {
         fake_find_result = { mappings : [] };
         spyOn(ll, "find_result_by_instance");
@@ -499,20 +499,20 @@ describe("mappers", function() {
       });
 
       it("returns an empty list, and pushes nothing to binding, if no results", function() {
-        var ret = ll.insert_results(binding, []);
+        let ret = ll.insert_results(binding, []);
         expect(ret).toEqual([]);
         expect(binding.list).toEqual([]);
       });
 
 
       it("returns a list with inserted bindings, if results", function() {
-        var ret = ll.insert_results(binding, ['a']);
+        let ret = ll.insert_results(binding, ['a']);
         expect(ret).toEqual([fake_find_result]);
         expect(binding.list).toEqual([fake_find_result]);
       });
 
       it("returns an empty list, and pushes nothing to binding, if results are duplicates", function() {
-        var ret;
+        let ret;
         ll.find_result_by_instance.and.returnValue(fake_find_result);
         ll.is_duplicate_result.and.returnValue(true);
         ret = ll.insert_results(binding, ['a']);
@@ -524,40 +524,40 @@ describe("mappers", function() {
 
     describe("#remove_instances", function() {
 
-      var Dummy;
+      let Dummy;
       beforeAll(function() {
         Dummy = can.Map.extend();
         Dummy.shortName = "Dummy";
       });
 
       it("removes no instance when nothing is supplied to remove", function() {
-        var instance =  new Dummy({ id : 3 });
-        var binding = { list : [{ instance : instance, mappings : [] }] };
+        let instance =  new Dummy({ id : 3 });
+        let binding = { list : [{ instance : instance, mappings : [] }] };
         ll.remove_instance(binding, {}, 'b');
         expect(binding.list).toEqual([{ instance : instance, mappings : [] }]);
       });
 
       it("removes no instance when instance doesn't match type", function() {
-        var instance =  new Dummy({ id : 3 });
-        var WrongClass = can.Map.extend();
+        let instance =  new Dummy({ id : 3 });
+        let WrongClass = can.Map.extend();
         WrongClass.shortName = "Wrong";
-        var wrong_instance = new WrongClass({ id : 3 });
-        var binding = { list : [{ instance : instance, mappings : [] }] };
+        let wrong_instance = new WrongClass({ id : 3 });
+        let binding = { list : [{ instance : instance, mappings : [] }] };
         ll.remove_instance(binding, wrong_instance, 'b');
         expect(binding.list).toEqual([{ instance : instance, mappings : [] }]);
       });
 
       it("removes the instance from mappings when matching", function() {
-        var instance =  new Dummy({ id : 3 });
-        var binding = { list : [{ instance : instance, mappings : [] }] };
+        let instance =  new Dummy({ id : 3 });
+        let binding = { list : [{ instance : instance, mappings : [] }] };
         ll.remove_instance(binding, instance, 'b');
         expect(binding.list).toEqual([]);
       });
 
       it("removes the instance from mappings on just type and ID match", function() {
-        var instance =  new Dummy({ id : 3 });
-        var matching_instance = new Dummy({ id : 3 });
-        var binding = { list : [{ instance : instance, mappings : [] }] };
+        let instance =  new Dummy({ id : 3 });
+        let matching_instance = new Dummy({ id : 3 });
+        let binding = { list : [{ instance : instance, mappings : [] }] };
         expect(matching_instance).not.toBe(instance);
         ll.remove_instance(binding, matching_instance, 'b');
         expect(binding.list).toEqual([]);
@@ -566,13 +566,13 @@ describe("mappers", function() {
       describe("with mappings defined", function() {
 
         it("deletes only if all mappings are accounted for in instance", function() {
-          var instance =  new Dummy({ id : 3 });
-          var binding = {
+          let instance =  new Dummy({ id : 3 });
+          let binding = {
             list : [{
               instance : instance,
               mappings : ['a', 'b'],
               remove_mapping: function(mapping) {
-                var idx = can.inArray(mapping, this.mappings);
+                let idx = can.inArray(mapping, this.mappings);
                 if(~idx) {
                   this.mappings.splice(idx, 1);
                   return true;
@@ -585,13 +585,13 @@ describe("mappers", function() {
         });
 
         it("does not delete if not all mappings are accounted for", function() {
-          var instance =  new Dummy({ id : 3 });
-          var binding = {
+          let instance =  new Dummy({ id : 3 });
+          let binding = {
             list : [{
               instance : instance,
               mappings : ['a', 'b'],
               remove_mapping: function(mapping) {
-                var idx = can.inArray(mapping, this.mappings);
+                let idx = can.inArray(mapping, this.mappings);
                 if(~idx) {
                   this.mappings.splice(idx, 1);
                   return true;
@@ -609,7 +609,7 @@ describe("mappers", function() {
     describe("#refresh_stubs", function() {
 
       it("returns promise based on existing deferred, returning binding list, if it exists", function() {
-        var binding = { list : [] },
+        let binding = { list : [] },
             source_dfd = binding._refresh_stubs_deferred = new $.Deferred(),
             ret = ll.refresh_stubs(binding),
             sanity = false;
@@ -624,7 +624,7 @@ describe("mappers", function() {
       });
 
       it("makes new refresh stubs deferred, returning binding list, if it does not already exist", function() {
-        var ret,
+        let ret,
             binding = { list : [] },
             sanity = false;
         ll._refresh_stubs = jasmine.createSpy().and.returnValue($.when());
@@ -643,7 +643,7 @@ describe("mappers", function() {
     describe("#refresh_instances", function() {
 
       it("returns promise based on existing deferred, returning binding list, if it exists", function() {
-        var binding = { list : [] },
+        let binding = { list : [] },
             source_dfd = binding._refresh_instances_deferred = new $.Deferred(),
             ret = ll.refresh_instances(binding),
             sanity = false;
@@ -658,7 +658,7 @@ describe("mappers", function() {
       });
 
       it("makes new refresh instances deferred, returning binding list, if it does not already exist", function() {
-        var ret,
+        let ret,
             binding = { list : [] },
             sanity = false;
         ll._refresh_instances = jasmine.createSpy().and.returnValue($.when());
@@ -677,7 +677,7 @@ describe("mappers", function() {
     describe("#_refresh_instances", function() {
 
       it("returns promise based on binding list", function() {
-        var ret,
+        let ret,
             binding = { list : [{instance : 'a'}] },
             sanity = false;
         spyOn(ll, "refresh_stubs").and.returnValue($.when());
@@ -707,14 +707,14 @@ describe("mappers", function() {
       });
 
       it("sets source_binding property if binding is a ListBinding", function() {
-        var binding = new LL.ListBinding(),
+        let binding = new LL.ListBinding(),
             rll = new LL.ReifyingListLoader(binding);
         expect(rll.source_binding).toBe(binding);
         expect(rll.binding).not.toBeDefined();
       });
 
       it("sets source property if binding is not a ListBinding", function() {
-        var binding = {},
+        let binding = {},
             rll = new LL.ReifyingListLoader(binding);
         expect(rll.source).toBe(binding);
         expect(rll.source_binding).not.toBeDefined();
@@ -730,9 +730,9 @@ describe("mappers", function() {
       });
 
       it('makes a new binding referencing the instance and old mappings', function () {
-        var rll = new LL.ReifyingListLoader();
-        var binding = {};
-        var result = rll.make_result({testField: 1}, []);
+        let rll = new LL.ReifyingListLoader();
+        let binding = {};
+        let result = rll.make_result({testField: 1}, []);
         spyOn(rll, 'insert_results');
 
         rll.insert_from_source_binding(binding, [result]);
@@ -744,9 +744,9 @@ describe("mappers", function() {
     });
 
     describe('#init_listeners', function () {
-      var rll;
-      var binding;
-      var source_binding;
+      let rll;
+      let binding;
+      let source_binding;
 
       beforeEach(function () {
         source_binding = new LL.ListBinding();
@@ -772,7 +772,7 @@ describe("mappers", function() {
     });
 
     describe("listeners", function() {
-      var rll, binding, source_binding;
+      let rll, binding, source_binding;
       beforeEach(function() {
         source_binding = new LL.ListBinding();
         binding = new LL.ListBinding();
@@ -781,7 +781,7 @@ describe("mappers", function() {
 
       describe("source_binding.list add", function() {
         it("calls insert_from_source_binding on the list loader", function() {
-          var new_result = new LL.MappingResult({id : 1}, []);
+          let new_result = new LL.MappingResult({id : 1}, []);
           spyOn(rll, "insert_from_source_binding");
           rll.init_listeners(binding);
           source_binding.list.push(new_result);
@@ -791,7 +791,7 @@ describe("mappers", function() {
 
       describe("source_binding.list remove", function() {
         it("calls remove_instance on the list loader for each item", function() {
-          var new_result = new LL.MappingResult({id : 1}, []);
+          let new_result = new LL.MappingResult({id : 1}, []);
           spyOn(RefreshQueue.prototype, "trigger").and.returnValue($.when()); //Avoid AJAX
           spyOn(rll, "remove_instance");
           binding.list.push(new_result);
@@ -806,7 +806,7 @@ describe("mappers", function() {
 
   describe("GGRC.ListLoaders.CustomFilteredListLoader", function() {
 
-    var cfll, binding;
+    let cfll, binding;
     beforeEach(function() {
       binding = new LL.ListBinding();
       binding.source_binding = new LL.ListBinding();
@@ -816,7 +816,7 @@ describe("mappers", function() {
     describe("_refresh_stubs", function() {
 
       it("gets results from binding's source binding", function() {
-        var mock_inst = new GGRC.Jasmine.MockModel({ value : 'a' });
+        let mock_inst = new GGRC.Jasmine.MockModel({ value : 'a' });
         spyOn(binding.source_binding, "refresh_instances").and.returnValue(new $.Deferred().reject());
 
         cfll._refresh_stubs(binding);
@@ -824,8 +824,8 @@ describe("mappers", function() {
       });
 
       it("runs all results from source binding through filter function", function() {
-        var mock_inst = new GGRC.Jasmine.MockModel({ value : 'a' });
-        var mock_result = { instance : mock_inst, mappings: [] };
+        let mock_inst = new GGRC.Jasmine.MockModel({ value : 'a' });
+        let mock_result = { instance : mock_inst, mappings: [] };
         spyOn(binding.source_binding, "refresh_instances").and.returnValue(new $.Deferred().resolve([mock_result]));
 
         // Items are sent through a refresh queue before continuing.
@@ -838,7 +838,7 @@ describe("mappers", function() {
     });
 
     describe("listeners", function() {
-      var cfll, binding, source_binding, new_result;
+      let cfll, binding, source_binding, new_result;
       beforeEach(function() {
         new_result = new LL.MappingResult({id : 1}, []);
         source_binding = new LL.ListBinding();
@@ -857,7 +857,7 @@ describe("mappers", function() {
         });
 
         it("adds the new item when the filter func returns true", function() {
-          var filter_result = new LL.MappingResult({id : 2}, [new_result]);
+          let filter_result = new LL.MappingResult({id : 2}, [new_result]);
           cfll.filter_fn.and.returnValue(true);
           cfll.init_listeners(binding);
           spyOn(cfll, "make_result").and.returnValue(filter_result);
@@ -867,7 +867,7 @@ describe("mappers", function() {
         });
 
         it("does not add the new item when the filter func returns false", function() {
-          var filter_result = new LL.MappingResult({id : 2}, [new_result]);
+          let filter_result = new LL.MappingResult({id : 2}, [new_result]);
           cfll.filter_fn.and.returnValue(false);
           cfll.init_listeners(binding);
           spyOn(cfll, "make_result").and.returnValue(filter_result);
@@ -879,7 +879,7 @@ describe("mappers", function() {
         });
 
         it("adds the new item when the filter func returns a deferred resolving to true", function() {
-          var filter_result = new LL.MappingResult({id : 2}, [new_result]);
+          let filter_result = new LL.MappingResult({id : 2}, [new_result]);
           cfll.filter_fn.and.returnValue($.when(true));
           cfll.init_listeners(binding);
           spyOn(cfll, "make_result").and.returnValue(filter_result);
@@ -889,7 +889,7 @@ describe("mappers", function() {
         });
 
         it("does not add the new item when the filter func returns a deferred resolving to false", function() {
-          var filter_result = new LL.MappingResult({id : 2}, [new_result]);
+          let filter_result = new LL.MappingResult({id : 2}, [new_result]);
           cfll.filter_fn.and.returnValue($.when(false));
           cfll.init_listeners(binding);
           spyOn(cfll, "make_result").and.returnValue(filter_result);
@@ -901,7 +901,7 @@ describe("mappers", function() {
         });
 
         it("does not add the new item when the filter func returns a deferred that rejects", function() {
-          var filter_result = new LL.MappingResult({id : 2}, [new_result]);
+          let filter_result = new LL.MappingResult({id : 2}, [new_result]);
           cfll.filter_fn.and.returnValue(new $.Deferred().reject());
           cfll.init_listeners(binding);
           spyOn(cfll, "make_result").and.returnValue(filter_result);
@@ -916,7 +916,7 @@ describe("mappers", function() {
 
       describe("source_binding.list remove", function() {
         it("calls remove_instance on the list loader for each item", function() {
-          var new_result = new LL.MappingResult({id : 1}, []);
+          let new_result = new LL.MappingResult({id : 1}, []);
           spyOn(cfll, "remove_instance");
           binding.list.push(new_result);
           source_binding.list.push(new_result);

@@ -11,13 +11,13 @@
       this.sources = sources || [];
     },
     init_listeners: function (binding) {
-      var self = this;
+      let self = this;
 
       if (!binding.source_bindings)
         binding.source_bindings = [];
 
       can.each(this.sources, function (source) {
-        var sourceBinding = binding.instance.get_binding(source);
+        let sourceBinding = binding.instance.get_binding(source);
         if (source) {
           binding.source_bindings.push(sourceBinding);
           self.init_source_listeners(binding, sourceBinding);
@@ -25,8 +25,8 @@
       });
     },
     insert_from_source_binding: function (binding, results, index) {
-      var self = this;
-      var newResults;
+      let self = this;
+      let newResults;
 
       newResults = can.map(results, function (result) {
         return self.make_result(result.instance, [result], binding);
@@ -34,7 +34,7 @@
       self.insert_results(binding, newResults);
     },
     init_source_listeners: function (binding, sourceBinding) {
-      var self = this;
+      let self = this;
 
       self.insert_from_source_binding(binding, sourceBinding.list);
 
@@ -49,7 +49,7 @@
       });
     },
     _refresh_stubs: function (binding) {
-      var deferreds = [];
+      let deferreds = [];
 
       can.each(binding.source_bindings, function (sourceBinding) {
         deferreds.push(sourceBinding.refresh_stubs());

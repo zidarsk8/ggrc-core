@@ -16,13 +16,13 @@ can.Control('CMS.Controllers.InfiniteScroll', {
   prevent_overscroll: function ($el, ev) {
     // Based on Troy Alford's response on StackOverflow:
     //   http://stackoverflow.com/a/16324762
-    var scrollTop = $el[0].scrollTop;
-    var scrollHeight = $el[0].scrollHeight;
-    var height = $el.height();
-    var scrollTopMax = scrollHeight - height;
-    var delta;
-    var up;
-    var loadTriggerOffset = 50;
+    let scrollTop = $el[0].scrollTop;
+    let scrollHeight = $el[0].scrollHeight;
+    let height = $el.height();
+    let scrollTopMax = scrollHeight - height;
+    let delta;
+    let up;
+    let loadTriggerOffset = 50;
 
     if (ev.type === 'DOMMouseScroll') {
       delta = ev.originalEvent.detail * -40;
@@ -92,9 +92,9 @@ can.Control('CMS.Controllers.LHN_Tooltips', {
   '{$extended} mouseleave': 'on_mouseleave',
   '{$extended} mouseenter': 'on_tooltip_mouseenter',
   on_mouseenter: function (el, ev) {
-    var instance = el.closest('[data-model]').data('model') ||
+    let instance = el.closest('[data-model]').data('model') ||
         el.closest(':data(model)').data('model');
-    var delay = this.options.fade_in_delay;
+    let delay = this.options.fade_in_delay;
 
     // There isn't tooltip data available for recently viewed objects
     if (instance instanceof RecentlyViewedObject) {
@@ -117,13 +117,13 @@ can.Control('CMS.Controllers.LHN_Tooltips', {
     }
   },
   ensure_tooltip_visibility: function () {
-    var offset = this.options.$extended.offset().top;
-    var height = this.options.$extended.height();
+    let offset = this.options.$extended.offset().top;
+    let height = this.options.$extended.height();
       // "- 24" compensates for the Chrome URL display when hovering a link
       // "348" should be the widht of the Chrome URL display when displaying javascript://
-    var windowHeight = $(window).height() + $(window).scrollTop() -
+    let windowHeight = $(window).height() + $(window).scrollTop() -
         (this.options.$extended.offset().left > 348 ? 0 : 24);
-    var newOffset;
+    let newOffset;
 
     if (offset + height > windowHeight) {
       if (height > windowHeight) {
@@ -135,9 +135,9 @@ can.Control('CMS.Controllers.LHN_Tooltips', {
     }
   },
   get_tooltip_view: function (el) {
-    var tooltipView = $(el).closest('[data-tooltip-view]')
+    let tooltipView = $(el).closest('[data-tooltip-view]')
       .attr('data-tooltip-view');
-    var path;
+    let path;
 
     if (tooltipView && tooltipView.length > 0) {
       if (tooltipView === 'null') {
@@ -152,16 +152,16 @@ can.Control('CMS.Controllers.LHN_Tooltips', {
     return path;
   },
   on_fade_in_timeout: function (el, instance) {
-    var self = this;
-    var tooltipView = this.get_tooltip_view(el);
+    let self = this;
+    let tooltipView = this.get_tooltip_view(el);
 
     if (tooltipView) {
       this.fade_in_timeout = null;
       can.view(tooltipView, {instance: instance}, function (frag) {
-        var tooltipWidth = self.options.$extended.outerWidth();
-        var offset = el.parent().offset();
-        var elLeft = offset ? offset.left : 0;
-        var offsetLeft = elLeft - tooltipWidth > 0 ?
+        let tooltipWidth = self.options.$extended.outerWidth();
+        let offset = el.parent().offset();
+        let elLeft = offset ? offset.left : 0;
+        let offsetLeft = elLeft - tooltipWidth > 0 ?
           elLeft - tooltipWidth : elLeft + el.parent().width();
 
         self.options.$extended

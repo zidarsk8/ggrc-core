@@ -30,7 +30,7 @@ export default ModalsController({
     }), el);
   },
    '{$header} .help-edit click': function (el, ev) {
-    var that = this;
+    let that = this;
     setTimeout(function () {
       that.options.edit_btn_active =
         that.options.$content.find('#helpedit').is('.in');

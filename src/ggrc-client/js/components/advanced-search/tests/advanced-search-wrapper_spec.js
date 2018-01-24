@@ -8,16 +8,16 @@ import Component from '../advanced-search-wrapper';
 describe('GGRC.Components.advancedSearchWrapper', function () {
   'use strict';
 
-  var viewModel;
-  var events;
+  let viewModel;
+  let events;
   beforeEach(() => {
     viewModel = new Component.prototype.viewModel();
     events = Component.prototype.events;
   });
 
   describe('"{viewModel} modelName" handler', function () {
-    var that;
-    var handler;
+    let that;
+    let handler;
     beforeEach(function () {
       that = {
         viewModel: viewModel,

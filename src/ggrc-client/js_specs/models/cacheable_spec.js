@@ -38,7 +38,7 @@ describe('can.Model.Cacheable', function () {
 
   describe('::setup', function () {
     it('prefers pre-set static names over root object & collection', function () {
-      var Model = can.Model.Cacheable.extend('CSM.Models.Dummy', {
+      let Model = can.Model.Cacheable.extend('CSM.Models.Dummy', {
         root_object: 'wrong_name',
         root_collection: 'wrong_names',
         model_singular: 'RightName',
@@ -77,7 +77,7 @@ describe('can.Model.Cacheable', function () {
 
     it('sets findAll to default based on root_collection if not set', function () {
       spyOn(can.Model, 'setup');
-      var Model = can.Model.Cacheable.extend('CMS.Models.DummyFind',
+      let Model = can.Model.Cacheable.extend('CMS.Models.DummyFind',
         {root_collection: 'foos'}, {});
       expect(Model.findAll).toBe('GET /api/foos');
     });
@@ -106,14 +106,14 @@ describe('can.Model.Cacheable', function () {
   });
 
   describe('::makeDestroy', function () {
-    var destroy_spy;
+    let destroy_spy;
     beforeEach(function () {
       destroy_spy = jasmine.createSpy('destroy');
       spyOn(CMS.Models.BackgroundTask, 'findOne').and.returnValue($.when());
     });
 
     it('finds background task if specified in return object', function (done) {
-      var destroy = CMS.Models.DummyModel.makeDestroy(destroy_spy);
+      let destroy = CMS.Models.DummyModel.makeDestroy(destroy_spy);
       destroy_spy.and.returnValue($.when({background_task: {id: 1}}));
 
       destroy(2).then(function () {
@@ -123,8 +123,8 @@ describe('can.Model.Cacheable', function () {
     });
 
     it('polls background task if found', function (done) {
-      var destroy = CMS.Models.DummyModel.makeDestroy(destroy_spy);
-      var poll_spy = jasmine.createSpyObj('poll_spy', ['poll']);
+      let destroy = CMS.Models.DummyModel.makeDestroy(destroy_spy);
+      let poll_spy = jasmine.createSpyObj('poll_spy', ['poll']);
       destroy_spy.and.returnValue($.when({background_task: {id: 1}}));
       CMS.Models.BackgroundTask.findOne.and.returnValue($.when(poll_spy));
 
@@ -136,7 +136,7 @@ describe('can.Model.Cacheable', function () {
     });
 
     it('continues normally if no background task specified', function (done) {
-      var destroy = CMS.Models.DummyModel.makeDestroy(destroy_spy);
+      let destroy = CMS.Models.DummyModel.makeDestroy(destroy_spy);
       destroy_spy.and.returnValue($.when({dummy: {id: 1}}));
 
       destroy(2).then(function () {
@@ -147,8 +147,8 @@ describe('can.Model.Cacheable', function () {
   });
 
   describe('::update', function () {
-    var _obj;
-    var id = 0;
+    let _obj;
+    let id = 0;
 
     beforeEach(function (done) {
       _obj = new CMS.Models.DummyModel({id: ++id});
@@ -156,7 +156,7 @@ describe('can.Model.Cacheable', function () {
     });
 
     it('processes args before sending', function (done) {
-      var obj = _obj;
+      let obj = _obj;
       spyOn(CMS.Models.DummyModel, 'process_args');
       spyOn(can, 'ajax').and.returnValue($.when({}));
       CMS.Models.DummyModel.update(obj.id, obj).then(function () {
@@ -166,7 +166,7 @@ describe('can.Model.Cacheable', function () {
     });
 
     it('calls resolve_deferred_bindings after send success', function (done) {
-      var obj = _obj;
+      let obj = _obj;
       spyOn(CMS.Models.DummyModel, 'resolve_deferred_bindings')
         .and
         .returnValue(obj);
@@ -183,8 +183,8 @@ describe('can.Model.Cacheable', function () {
 
   describe('::resolve_deferred_bindings', function () {
     it('iterates _pending_joins, calling refresh_stubs on each binding', function () {
-      var instance = jasmine.createSpyObj('instance', ['get_binding']);
-      var binding = jasmine.createSpyObj('binding', ['refresh_stubs']);
+      let instance = jasmine.createSpyObj('instance', ['get_binding']);
+      let binding = jasmine.createSpyObj('binding', ['refresh_stubs']);
       instance._pending_joins = [{what: {}, how: 'add', through: 'foo'}];
       instance.get_binding.and.returnValue(binding);
       spyOn($.when, 'apply').and.returnValue(new $.Deferred().reject());
@@ -194,9 +194,9 @@ describe('can.Model.Cacheable', function () {
     });
 
     describe('add case', function () {
-      var instance;
-      var binding;
-      var dummy;
+      let instance;
+      let binding;
+      let dummy;
       beforeEach(function () {
         dummy = new CMS.Models.DummyModel({id: 1});
         instance = jasmine.createSpyObj('instance',
@@ -230,10 +230,10 @@ describe('can.Model.Cacheable', function () {
     });
 
     describe('remove case', function () {
-      var instance;
-      var binding;
-      var dummy;
-      var dummy_join;
+      let instance;
+      let binding;
+      let dummy;
+      let dummy_join;
       beforeEach(function () {
         dummy = new CMS.Models.DummyModel({id: 1});
         dummy_join = new CMS.Models.DummyJoin({id: 1});
@@ -298,16 +298,16 @@ describe('can.Model.Cacheable', function () {
     //  since that function is used in more places than just our modelize function.
     //  -- BM 2015-02-03
     it('only pushes instances into the list for 100ms before yielding', function (done) {
-      var list = new CMS.Models.DummyModel.List();
-      var dummy_models = [
+      let list = new CMS.Models.DummyModel.List();
+      let dummy_models = [
           {id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}, {id: 7}
       ];
       // Have our modelized instances ready for when
-      var dummy_insts = CMS.Models.DummyModel.models(dummy_models);
+      let dummy_insts = CMS.Models.DummyModel.models(dummy_models);
       // we want to see how our observable list gets items over time, so spy on the push method
       spyOn(list, 'push').and.callThrough();
       spyOn(can, 'ajax').and.returnValue($.when(dummy_models));
-      var st = 3; // preload Date.now() because it's called once before we even get to modelizing
+      let st = 3; // preload Date.now() because it's called once before we even get to modelizing
       spyOn(Date, 'now').and.callFake(function () {
         // Date.now() is called once per item.
         if ((++st % 5) === 0)
@@ -320,7 +320,7 @@ describe('can.Model.Cacheable', function () {
       //  models calls new DummyModel.List() which we're already spying out,
       //  so spy models() out in order to *not* call it.
       spyOn(CMS.Models.DummyModel, 'models').and.callFake(function (items) {
-        var ids = can.map(items, function (item) { return item.id; });
+        let ids = can.map(items, function (item) { return item.id; });
         return can.map(dummy_insts, function (inst) {
           return ~can.inArray(inst.id, ids) ? inst : undefined;
         });
@@ -355,7 +355,7 @@ describe('can.Model.Cacheable', function () {
   });
 
   describe('#refresh', function () {
-    var inst;
+    let inst;
     beforeEach(function () {
       inst = new CMS.Models.DummyModel({href: '/api/dummy_models/1'});
       spyOn(can, 'ajax').and.returnValue(new $.Deferred(function (dfd) {
@@ -404,8 +404,8 @@ describe('can.Model.Cacheable', function () {
 
   describe('::_custom_attribute_map', function () {
     it('sets a custom attribute mapping', function () {
-      var obj = CMS.Models.DummyModel();
-      var target = CMS.Models.DummyModel();
+      let obj = CMS.Models.DummyModel();
+      let target = CMS.Models.DummyModel();
 
       obj.custom_attribute_definitions = [{
         id: 1,

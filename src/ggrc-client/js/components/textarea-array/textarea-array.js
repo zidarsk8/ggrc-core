@@ -21,13 +21,13 @@
         this.updateContent();
       },
       updateContent: function () {
-        var array = this.attr('array') || [];
+        let array = this.attr('array') || [];
         this.attr('content', array.join(this.attr('delimeter')));
       }
     },
     events: {
       'textarea change': function (el, ev) {
-        var val = $(el).val();
+        let val = $(el).val();
         this.scope.attr('array',
           $.map(val.split(','), $.proxy(''.trim.call, ''.trim)));
         this.scope.updateContent();

@@ -13,7 +13,7 @@ import template from './mapped-objects.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var tag = 'mapped-objects';
+  let tag = 'mapped-objects';
   /**
    * Mapped objects view component
    */
@@ -77,7 +77,7 @@ import template from './mapped-objects.mustache';
         exclude: []
       },
       toggleShowAll: function () {
-        var isShown = this.attr('showAll');
+        let isShown = this.attr('showAll');
         this.attr('showAll', !isShown);
       },
       filterMappedObjects: function (items) {
@@ -93,13 +93,13 @@ import template from './mapped-objects.mustache';
         return this.attr('parentInstance').get_binding(this.attr('mapping'));
       },
       getSnapshotQueryFilters: function () {
-        var includeTypes = this.attr('filter.only').attr();
-        var excludeTypes = this.attr('filter.exclude').attr();
-        var includeFilters = {
+        let includeTypes = this.attr('filter.only').attr();
+        let excludeTypes = this.attr('filter.exclude').attr();
+        let includeFilters = {
           keys: [],
           expression: {}
         };
-        var excludeFilters = excludeTypes.map(function (type) {
+        let excludeFilters = excludeTypes.map(function (type) {
           return {
             expression: {
               op: {name: '!='},
@@ -123,34 +123,34 @@ import template from './mapped-objects.mustache';
         return excludeFilters;
       },
       getSnapshotQuery: function () {
-        var relevantFilters = [{
+        let relevantFilters = [{
           type: this.attr('parentInstance.type'),
           id: this.attr('parentInstance.id'),
           operation: 'relevant'
         }];
-        var filters = this.getSnapshotQueryFilters();
+        let filters = this.getSnapshotQueryFilters();
 
         return buildParam('Snapshot', {}, relevantFilters, [], filters);
       },
       getObjectQuery: function () {
-        var relevantFilters = [{
+        let relevantFilters = [{
           type: this.attr('parentInstance.type'),
           id: this.attr('parentInstance.id'),
           operation: 'relevant'
         }];
-        var type = this.attr('relatedTypes');
+        let type = this.attr('relatedTypes');
 
         return buildParam(type, {}, relevantFilters, [], []);
       },
       requestQuery: function (query) {
-        var dfd = can.Deferred();
+        let dfd = can.Deferred();
         this.attr('isLoading', true);
 
         batchRequests(query)
           .done(function (response) {
-            var type = Object.keys(response)[0];
-            var values = response[type].values;
-            var result = values.map(function (item) {
+            let type = Object.keys(response)[0];
+            let values = response[type].values;
+            let result = values.map(function (item) {
               return {instance: item, isSelected: false};
             });
             dfd.resolve(result);
@@ -164,16 +164,16 @@ import template from './mapped-objects.mustache';
         return dfd;
       },
       loadSnapshots: function () {
-        var query = this.getSnapshotQuery();
+        let query = this.getSnapshotQuery();
         return this.requestQuery(query);
       },
       loadObjects: function () {
-        var query = this.getObjectQuery();
+        let query = this.getObjectQuery();
         return this.requestQuery(query);
       },
       load: function () {
-        var dfd = can.Deferred();
-        var binding = this.getBinding();
+        let dfd = can.Deferred();
+        let binding = this.getBinding();
 
         if (!binding) {
           dfd.resolve([]);
@@ -195,10 +195,10 @@ import template from './mapped-objects.mustache';
         return dfd;
       },
       setMappedObjects: function () {
-        var useSnapshots = this.attr('mappedSnapshots');
-        var hasMapping = this.attr('mapping');
-        var loadFn;
-        var objects;
+        let useSnapshots = this.attr('mappedSnapshots');
+        let hasMapping = this.attr('mapping');
+        let loadFn;
+        let objects;
         if (useSnapshots) {
           loadFn = this.loadSnapshots;
         } else {

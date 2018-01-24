@@ -24,8 +24,8 @@ import RefreshQueue from '../refresh_queue';
       this.object_join_attr = objectJoinAttr;
     },
     init_listeners: function (binding) {
-      var self = this;
-      var model = CMS.Models[this.model_name] || can.Model.Cacheable;
+      let self = this;
+      let model = CMS.Models[this.model_name] || can.Model.Cacheable;
 
       binding.instance.bind(this.object_join_attr, function (ev, _new, _old) {
         if (binding._refresh_stubs_deferred &&
@@ -50,8 +50,8 @@ import RefreshQueue from '../refresh_queue';
       });
     },
     is_valid_mapping: function (binding, mapping) {
-      var model = CMS.Models[this.model_name] || can.Model.Cacheable;
-      var objectModel = binding.instance.constructor;
+      let model = CMS.Models[this.model_name] || can.Model.Cacheable;
+      let objectModel = binding.instance.constructor;
 
       return (mapping instanceof model && mapping[this.object_attr] &&
       (mapping[this.object_attr].reify() === binding.instance ||
@@ -59,8 +59,8 @@ import RefreshQueue from '../refresh_queue';
       mapping[this.object_attr].id === binding.instance.id)));
     },
     filter_and_insert_instances_from_mappings: function (binding, mappings) {
-      var self = this;
-      var matchingMappings;
+      let self = this;
+      let matchingMappings;
 
       matchingMappings = can.map(can.makeArray(mappings), function (mapping) {
         if (self.is_valid_mapping(binding, mapping))
@@ -69,8 +69,8 @@ import RefreshQueue from '../refresh_queue';
       return this.insert_instances_from_mappings(binding, matchingMappings);
     },
     insert_instances_from_mappings: function (binding, mappings) {
-      var self = this;
-      var newResults;
+      let self = this;
+      let newResults;
 
       newResults = can.map(can.makeArray(mappings), function (mapping) {
         return self.get_result_from_mapping(binding, mapping);
@@ -78,8 +78,8 @@ import RefreshQueue from '../refresh_queue';
       this.insert_results(binding, newResults);
     },
     remove_instance_from_mapping: function (binding, mapping) {
-      var instance;
-      var result;
+      let instance;
+      let result;
       if (this.is_valid_mapping(binding, mapping)) {
         instance = this.get_instance_from_mapping(binding, mapping);
         result = this.find_result_from_mapping(binding, mapping);
@@ -102,8 +102,8 @@ import RefreshQueue from '../refresh_queue';
       return mapping;
     },
     find_result_from_mapping: function (binding, mapping) {
-      var result;
-      var resultInd;
+      let result;
+      let resultInd;
 
       for (resultInd = 0; resultInd < binding.list.length; resultInd++) {
         result = binding.list[resultInd];
@@ -113,14 +113,14 @@ import RefreshQueue from '../refresh_queue';
       }
     },
     _refresh_stubs: function (binding) {
-      var that = this;
-      var refreshQueue = new RefreshQueue();
+      let that = this;
+      let refreshQueue = new RefreshQueue();
 
       refreshQueue.enqueue(binding.instance);
 
       return refreshQueue.trigger().then(function () {
-        var objectJoinAttr = that.object_join_attr;
-        var mappings = binding.instance[objectJoinAttr] &&
+        let objectJoinAttr = that.object_join_attr;
+        let mappings = binding.instance[objectJoinAttr] &&
           binding.instance[objectJoinAttr].reify();
 
         that.insert_instances_from_mappings(binding, mappings);

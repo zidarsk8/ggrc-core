@@ -25,7 +25,7 @@ function getInScopeModels() {
  */
 function setAttrs(instance) {
   // Get list of objects that supports 'snapshot scope' from config
-  var className = instance.type;
+  let className = instance.type;
   if (isSnapshotParent(className)) {
     instance.attr('is_snapshotable', true);
   }
@@ -46,7 +46,7 @@ function isSnapshot(instance) {
  * @return {Boolean} True or False
  */
 function isSnapshotScope(parentInstance) {
-  var instance = parentInstance || GGRC.page_instance();
+  let instance = parentInstance || GGRC.page_instance();
   return instance ?
     instance.is_snapshotable || isInScopeModel(instance.type) :
     false;
@@ -93,14 +93,14 @@ function _buildACL(content) {
    * @param {Object} content - revision contant dict
    * @return {Array} Access Control List created from old contact fields
    */
-  var mapper = {
+  let mapper = {
     contact_id: 'Primary Contacts',
     secondary_contact_id: 'Secondary Contacts',
     principal_assessor_id: 'Principal Assignees',
     secondary_assessor_id: 'Secondary Assignees',
   };
   return _.filter(_.map(mapper, function (v, k) {
-    var role = _.find(GGRC.access_control_roles, function (acr) {
+    let role = _.find(GGRC.access_control_roles, function (acr) {
       return acr.name === v && acr.object_type === content.type;
     });
     if (!role || !content[k]) {
@@ -119,10 +119,10 @@ function _buildACL(content) {
  * @return {Object} The object
  */
 function toObject(instance) {
-  var object;
-  var model = CMS.Models[instance.child_type];
-  var content = instance.revision.content;
-  var audit;
+  let object;
+  let model = CMS.Models[instance.child_type];
+  let content = instance.revision.content;
+  let audit;
 
   content.isLatestRevision = instance.is_latest_revision;
   content.originalLink = getParentUrl(instance);
@@ -165,8 +165,8 @@ function toObject(instance) {
     CMS.Models.Audit.findInCacheById(instance.parent.id)) {
     audit = CMS.Models.Audit.findInCacheById(instance.parent.id);
     audit.bind('change', function () {
-      var field = arguments[1];
-      var newValue = arguments[3];
+      let field = arguments[1];
+      let newValue = arguments[3];
       if (field !== 'archived' || !object.snapshot) {
         return;
       }
@@ -184,9 +184,9 @@ function toObject(instance) {
  * @return {String} Url
  */
 function getParentUrl(instance) {
-  var model = CMS.Models[instance.child_type];
-  var plural = model.table_plural;
-  var link = '/' + plural + '/' + instance.child_id;
+  let model = CMS.Models[instance.child_type];
+  let plural = model.table_plural;
+  let link = '/' + plural + '/' + instance.child_id;
 
   return link;
 }
@@ -206,8 +206,8 @@ function toObjects(values) {
  * @return {Object} The transformed query
  */
 function transformQuery(query) {
-  var type = query.object_name;
-  var expression = query.filters.expression;
+  let type = query.object_name;
+  let expression = query.filters.expression;
   query.object_name = 'Snapshot';
   query.filters.expression = {
     left: {
@@ -238,12 +238,12 @@ function isSnapshotType(instance) {
  * @return {Object} Query object
  */
 function getSnapshotItemQuery(instance, childId, childType) {
-  var relevantFilters = [{
+  let relevantFilters = [{
     type: instance.type,
     id: instance.id,
     operation: 'relevant',
   }];
-  var filters = {
+  let filters = {
     expression: {
       left: {
         left: 'child_type',
@@ -258,7 +258,7 @@ function getSnapshotItemQuery(instance, childId, childType) {
       },
     },
   };
-  var query = buildParam('Snapshot', {}, relevantFilters, [], filters);
+  let query = buildParam('Snapshot', {}, relevantFilters, [], filters);
   return {data: [query]};
 }
 

@@ -14,8 +14,8 @@ export default GGRC.Components('accessControlListRolesHelper', {
     isNewInstance: false,
     isProposal: false,
     setAutoPopulatedRoles: function () {
-      var instance = this.attr('instance');
-      var autoPopulatedRoles = _.filter(GGRC.access_control_roles, {
+      let instance = this.attr('instance');
+      let autoPopulatedRoles = _.filter(GGRC.access_control_roles, {
         object_type: instance.class.model_singular,
         default_to_current_user: true
       });

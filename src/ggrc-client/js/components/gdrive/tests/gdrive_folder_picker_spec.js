@@ -6,10 +6,10 @@
 describe('GGRC.Components.gDriveFolderPicker', function () {
   'use strict';
 
-  var Component;
-  var events;
-  var viewModel;
-  var folderId = 'folder id';
+  let Component;
+  let events;
+  let viewModel;
+  let folderId = 'folder id';
 
   beforeAll(function () {
     Component = GGRC.Components.get('gDriveFolderPicker');
@@ -22,8 +22,8 @@ describe('GGRC.Components.gDriveFolderPicker', function () {
 
   describe('events', function () {
     describe('"inserted" handler', function () {
-      var method;
-      var that;
+      let method;
+      let that;
 
       beforeEach(function () {
         that = {
@@ -72,8 +72,8 @@ describe('GGRC.Components.gDriveFolderPicker', function () {
     });
 
     describe('"a[data-toggle=gdrive-remover] click" handler', function () {
-      var method;
-      var that;
+      let method;
+      let that;
 
       beforeEach(function () {
         viewModel.attr('instance', {
@@ -149,10 +149,10 @@ describe('GGRC.Components.gDriveFolderPicker', function () {
     });
 
     describe('".entry-attachment picked" handler', function () {
-      var method;
-      var that;
-      var element;
-      var pickedFolders;
+      let method;
+      let that;
+      let element;
+      let pickedFolders;
 
       beforeEach(function () {
         element = $('<div></div>').data('type', 'folders');
@@ -173,7 +173,7 @@ describe('GGRC.Components.gDriveFolderPicker', function () {
       });
 
       it('notifies when selected not a folder', function () {
-        var data = {
+        let data = {
           files: [{mimeType: 'not a folder mime type'}]
         };
         spyOn($.fn, 'trigger').and.callThrough();

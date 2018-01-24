@@ -7,7 +7,7 @@ import Component from '../issue-unmap-dropdown-item';
 
 describe('GGRC.Components.issueUnmapDropdownItem', function () {
   describe('viewModel scope', function () {
-    var viewModel;
+    let viewModel;
 
     beforeEach(function () {
       viewModel = new (can.Map.extend(Component.prototype.viewModel));

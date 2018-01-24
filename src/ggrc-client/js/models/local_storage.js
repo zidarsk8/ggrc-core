@@ -17,12 +17,12 @@
         return findOne;
       } else {
         return function (params, success, error) {
-          var instance;
-          var def = new can.Deferred();
+          let instance;
+          let def = new can.Deferred();
           // Key to be used for local storage
-          var key = [this._shortName, params.id].join(':');
+          let key = [this._shortName, params.id].join(':');
           // Grab the current data, if any
-          var data = window.localStorage.getItem( key );
+          let data = window.localStorage.getItem( key );
 
           params = params || {};
 
@@ -54,16 +54,16 @@
         return findAll;
       } else {
         return function (params, success, error) {
-          var def = new can.Deferred();
-          var allData = window.localStorage.getItem(`${this._shortName}:ids`);
-          var returns = new can.Model.List();
-          var that = this;
+          let def = new can.Deferred();
+          let allData = window.localStorage.getItem(`${this._shortName}:ids`);
+          let returns = new can.Model.List();
+          let that = this;
           params = params || {};
 
           if (allData) {
             can.each(JSON.parse(allData), function (id) {
-              var data;
-              var pkeys;
+              let data;
+              let pkeys;
               if (params.id == null || params.id === id) {
                 data = window.localStorage.getItem(`${that._shortName}:${id}`);
 
@@ -90,11 +90,11 @@
         return create;
       } else {
         return function (params) {
-          var item;
-          var key = [this._shortName, 'ids'].join(':');
-          var data = window.localStorage.getItem( key );
-          var newkey = 1;
-          var def = new can.Deferred();
+          let item;
+          let key = [this._shortName, 'ids'].join(':');
+          let data = window.localStorage.getItem( key );
+          let newkey = 1;
+          let def = new can.Deferred();
 
 
           // add to list
@@ -124,10 +124,10 @@
         return update;
       } else {
         return function (id, params) {
-          var item;
-          var key = [this._shortName, id].join(':');
-          var data = window.localStorage.getItem( key );
-          var def = new can.Deferred();
+          let item;
+          let key = [this._shortName, id].join(':');
+          let data = window.localStorage.getItem( key );
+          let def = new can.Deferred();
 
           if (data) {
             data = JSON.parse(data);
@@ -162,10 +162,10 @@
         return findAll;
       } else {
         return function (id) {
-          var def = new can.Deferred();
-          var key = [this._shortName, id].join(':');
-          var item = this.model({id: id});
-          var data;
+          let def = new can.Deferred();
+          let key = [this._shortName, id].join(':');
+          let item = this.model({id: id});
+          let data;
 
           if (window.localStorage.getItem(key)) {
             window.localStorage.removeItem(key);

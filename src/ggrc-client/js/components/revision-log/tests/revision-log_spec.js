@@ -6,7 +6,7 @@
 describe('GGRC.Components.revisionLog', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeAll(function () {
     viewModel = GGRC.Components.getViewModel('revisionLog');
@@ -27,7 +27,7 @@ describe('GGRC.Components.revisionLog', function () {
   });
 
   describe('fetchItems() method', function () {
-    var dfdFetchData;
+    let dfdFetchData;
 
     beforeEach(function () {
       dfdFetchData = new can.Deferred();
@@ -43,7 +43,7 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     it('displays a toaster error if fetching the data fails', function () {
-      var trigger = spyOn($.prototype, 'trigger');
+      let trigger = spyOn($.prototype, 'trigger');
 
       viewModel.fetchItems();
       dfdFetchData.reject('Server error');
@@ -57,10 +57,10 @@ describe('GGRC.Components.revisionLog', function () {
     it('on successfully fetching the data it sets the correctly sorted ' +
       'change history in the scope',
       function () {
-        var actual;
-        var expected;
+        let actual;
+        let expected;
 
-        var fetchedRevisions = new can.Map({
+        let fetchedRevisions = new can.Map({
           object: new can.List([
             {id: 10}
           ]),
@@ -69,12 +69,12 @@ describe('GGRC.Components.revisionLog', function () {
           ])
         });
 
-        var mapChange = {updatedAt: new Date('2015-12-21')};
-        var mapChange2 = {updatedAt: new Date('2016-03-17')};
+        let mapChange = {updatedAt: new Date('2015-12-21')};
+        let mapChange2 = {updatedAt: new Date('2016-03-17')};
 
-        var objChange = {updatedAt: new Date('2016-04-14')};
-        var objChange2 = {updatedAt: new Date('2014-11-18')};
-        var objChange3 = {updatedAt: new Date('2016-01-09')};
+        let objChange = {updatedAt: new Date('2016-04-14')};
+        let objChange2 = {updatedAt: new Date('2014-11-18')};
+        let objChange3 = {updatedAt: new Date('2016-01-09')};
 
         viewModel.attr('changeHistory', []);
 
@@ -119,8 +119,8 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     it('computes an empty list on empty Revision history', function () {
-      var result;
-      var revisions = new can.List();
+      let result;
+      let revisions = new can.List();
 
       spyOn(viewModel, '_objectChangeDiff');
       result = viewModel._computeObjectChanges(revisions);
@@ -129,19 +129,19 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     it('computes diff objects for all successive Revision pairs', function () {
-      var result;
+      let result;
 
-      var revisions = [
+      let revisions = [
         {id: 10}, {id: 20}, {id: 30}
       ];
 
-      var diff = {
+      let diff = {
         madeBy: 'John',
         changes: [
           {fieldName: 'foo'}
         ]
       };
-      var diff2 = {
+      let diff2 = {
         madeBy: 'Doe',
         changes: [
           {fieldName: 'bar'}
@@ -161,13 +161,13 @@ describe('GGRC.Components.revisionLog', function () {
 
     it('omits the diff objects with an empty changes list from the result',
       function () {
-        var result;
+        let result;
 
-        var revisions = [
+        let revisions = [
           {id: 10}, {id: 20}
         ];
 
-        var diff = {
+        let diff = {
           changes: []
         };
         spyOn(viewModel, '_objectChangeDiff').and.returnValue(diff);
@@ -180,7 +180,7 @@ describe('GGRC.Components.revisionLog', function () {
   });
 
   describe('_objectChangeDiff() method', function () {
-    var origModelAttrDefs = GGRC.model_attr_defs;  // original user-friendly attribute name settings
+    let origModelAttrDefs = GGRC.model_attr_defs;  // original user-friendly attribute name settings
 
     beforeAll(function () {
       spyOn(viewModel, '_objectCADiff').and.returnValue({});
@@ -198,70 +198,70 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     it('includes the modification time in the result', function () {
-      var rev1 = {
+      let rev1 = {
         updated_at: '2016-01-24T10:05:42',
         modified_by: 'User 1',
         content: {}
       };
-      var rev2 = {
+      let rev2 = {
         updated_at: '2016-01-30T08:15:11',
         modified_by: 'User 1',
         content: {}
       };
 
-      var result = viewModel._objectChangeDiff(rev1, rev2);
+      let result = viewModel._objectChangeDiff(rev1, rev2);
 
       expect(result.updatedAt).toEqual('2016-01-30T08:15:11');
     });
 
     it('includes the author of the change(s) in the result', function () {
-      var rev1 = {
+      let rev1 = {
         updated_at: '2016-01-24T10:05:42',
         modified_by: 'User 6',
         content: {}
       };
-      var rev2 = {
+      let rev2 = {
         updated_at: '2016-01-30T08:15:11',
         modified_by: 'User 7',
         content: {}
       };
 
-      var result = viewModel._objectChangeDiff(rev1, rev2);
+      let result = viewModel._objectChangeDiff(rev1, rev2);
 
       expect(result.madeBy).toEqual('User 7');
     });
 
     it('includes the author\'s role of the change(s) in the result',
       function () {
-        var rev1 = {
+        let rev1 = {
           updated_at: '2016-01-24T10:05:42',
           modified_by: 'User 6',
           content: {}
         };
-        var rev2 = {
+        let rev2 = {
           updated_at: '2016-01-30T08:15:11',
           modified_by: 'User 7',
           content: {}
         };
 
-        var result = viewModel._objectChangeDiff(rev1, rev2);
+        let result = viewModel._objectChangeDiff(rev1, rev2);
         expect(result.role).toEqual('none');
       });
 
     it('dooes not include author\'s details ' +
       'when person is not presented', function () {
-      var rev1 = {
+      let rev1 = {
         updated_at: '2016-01-24T10:05:42',
         modified_by: 'User 6',
         content: {}
       };
-      var rev2 = {
+      let rev2 = {
         updated_at: '2016-01-30T08:15:11',
         modified_by: null,
         content: {}
       };
 
-      var result = viewModel._objectChangeDiff(rev1, rev2);
+      let result = viewModel._objectChangeDiff(rev1, rev2);
       expect(result.madeBy).toBeNull();
       expect(viewModel._getRoleAtTime)
         .toHaveBeenCalledWith(null, rev2.updated_at);
@@ -270,13 +270,13 @@ describe('GGRC.Components.revisionLog', function () {
 
     describe('with model attributes definitions defined', function () {
       it('uses the fields\' display names in the result', function () {
-        var expectedChange = {
+        let expectedChange = {
           fieldName: 'Object Name',
           origVal: 'Audit 1.0',
           newVal: 'My Audit 1.0'
         };
 
-        var rev1 = {
+        let rev1 = {
           updated_at: '2016-01-25T16:36:29',
           modified_by: {
             reify: function () {
@@ -288,7 +288,7 @@ describe('GGRC.Components.revisionLog', function () {
             title: 'Audit 1.0'
           }
         };
-        var rev2 = {
+        let rev2 = {
           updated_at: '2016-01-30T13:22:59',
           modified_by: {
             reify: function () {
@@ -300,7 +300,7 @@ describe('GGRC.Components.revisionLog', function () {
             title: 'My Audit 1.0'
           }
         };
-        var result;
+        let result;
 
         GGRC.model_attr_defs = {
           Audit: [
@@ -315,7 +315,7 @@ describe('GGRC.Components.revisionLog', function () {
 
       it('compacts the list fields in the diff',
         function () {
-          var rev1 = {
+          let rev1 = {
             updated_at: '2016-01-25T16:36:29',
             modified_by: {
               reify: function () {
@@ -327,7 +327,7 @@ describe('GGRC.Components.revisionLog', function () {
               fake_list: 'foo,,bar,'
             }
           };
-          var rev2 = {
+          let rev2 = {
             updated_at: '2016-01-30T13:22:59',
             modified_by: {
               reify: function () {
@@ -339,7 +339,7 @@ describe('GGRC.Components.revisionLog', function () {
               fake_list: ',,bar,baz'
             }
           };
-          var result;
+          let result;
           GGRC.model_attr_defs = {
             Audit: [
               {attr_name: 'title', display_name: 'Object Name'},
@@ -360,18 +360,18 @@ describe('GGRC.Components.revisionLog', function () {
 
   describe('_objectCADiff() method', function () {
     it('detects set attributes', function () {
-      var oldValues = [];
-      var oldDefs = [];
-      var newValues = [{
+      let oldValues = [];
+      let oldDefs = [];
+      let newValues = [{
         custom_attribute_id: 1,
         attribute_value: 'custom value'
       }];
-      var newDefs = [{
+      let newDefs = [{
         id: 1,
         title: 'CA',
         attribute_type: 'text'
       }];
-      var result = viewModel
+      let result = viewModel
         ._objectCADiff(oldValues, oldDefs, newValues, newDefs);
       expect(result).toEqual([{
         fieldName: 'CA',
@@ -381,18 +381,18 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     it('detects unset attributes', function () {
-      var oldValues = [{
+      let oldValues = [{
         custom_attribute_id: 1,
         attribute_value: 'custom value'
       }];
-      var oldDefs = [{
+      let oldDefs = [{
         id: 1,
         title: 'CA',
         attribute_type: 'text'
       }];
-      var newValues = [];
-      var newDefs = [];
-      var result = viewModel
+      let newValues = [];
+      let newDefs = [];
+      let result = viewModel
         ._objectCADiff(oldValues, oldDefs, newValues, newDefs);
       expect(result).toEqual([{
         fieldName: 'CA',
@@ -402,7 +402,7 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     it('detects multiple changed attributes', function () {
-      var oldValues = [{
+      let oldValues = [{
         custom_attribute_id: 1,
         attribute_value: 'v1'
       }, {
@@ -413,7 +413,7 @@ describe('GGRC.Components.revisionLog', function () {
         attribute_value: 'v3'
       }];
 
-      var oldDefs = [{
+      let oldDefs = [{
         id: 1,
         title: 'CA1',
         attribute_type: 'text'
@@ -427,7 +427,7 @@ describe('GGRC.Components.revisionLog', function () {
         attribute_type: 'text'
       }];
 
-      var newValues = [{
+      let newValues = [{
         custom_attribute_id: 1,
         attribute_value: 'v3'
       }, {
@@ -438,7 +438,7 @@ describe('GGRC.Components.revisionLog', function () {
         attribute_value: 'v3'
       }];
 
-      var result = viewModel
+      let result = viewModel
         ._objectCADiff(oldValues, oldDefs, newValues, oldDefs);
       expect(result).toEqual([{
         fieldName: 'CA1',
@@ -453,12 +453,12 @@ describe('GGRC.Components.revisionLog', function () {
   });
 
   describe('_fetchRevisionsData() method', function () {
-    var Revision;  // the Revision object constructor
+    let Revision;  // the Revision object constructor
 
     // fake Deferred objects to return from the mocked Revision.findAll()
-    var dfdResource;
-    var dfdSource;
-    var dfdDestination;
+    let dfdResource;
+    let dfdSource;
+    let dfdDestination;
 
     beforeEach(function () {
       // obtain a reference to the method under test, and bind it to a fake
@@ -533,22 +533,22 @@ describe('GGRC.Components.revisionLog', function () {
     );
 
     it('resolves the returned Deferred with the fetched data', function () {
-      var result;
-      var successHandler;
+      let result;
+      let successHandler;
 
-      var objRevisions = new can.List([
+      let objRevisions = new can.List([
         {revision: 'objFoo'}, {revision: 'objBar'}
       ]);
-      var mappingSrcRevisions = new can.List([
+      let mappingSrcRevisions = new can.List([
         {revision: 'mappingSrcFoo'}
       ]);
-      var mappingDestRevisions = new can.List([
+      let mappingDestRevisions = new can.List([
         {revision: 'mappingDestFoo'}
       ]);
 
       successHandler = jasmine.createSpy().and.callFake(function (revisions) {
-        var objRevisions = can.makeArray(revisions.object);
-        var mappingsRevisions = can.makeArray(revisions.mappings);
+        let objRevisions = can.makeArray(revisions.object);
+        let mappingsRevisions = can.makeArray(revisions.mappings);
 
         function canMapToObject(item) {
           return item.attr();
@@ -590,8 +590,8 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     it('creates a list of mapping changes from a Revision list', function () {
-      var result;
-      var revisions = new can.List([
+      let result;
+      let revisions = new can.List([
         {id: 10, madeBy: 'John'},
         {id: 20, madeBy: 'Doe'}
       ]);
@@ -625,7 +625,7 @@ describe('GGRC.Components.revisionLog', function () {
     it('returns correct change information when the instance is at the ' +
       '"source" end of the mapping',
       function () {
-        var revision = {
+        let revision = {
           modified_by: 'User 17',
           updated_at: new Date('2015-05-17T17:24:01'),
           action: 'created',
@@ -641,7 +641,7 @@ describe('GGRC.Components.revisionLog', function () {
           source_type: 'OtherObject'
         };
 
-        var result = viewModel._mappingChange(revision, [revision]);
+        let result = viewModel._mappingChange(revision, [revision]);
 
         expect(result).toEqual({
           madeBy: 'User 17',
@@ -659,7 +659,7 @@ describe('GGRC.Components.revisionLog', function () {
     it('returns correct change information when the instance is at the ' +
       '"destination" end of the mapping',
       function () {
-        var revision = {
+        let revision = {
           modified_by: 'User 17',
           updated_at: new Date('2015-05-17T17:24:01'),
           action: 'deleted',
@@ -675,7 +675,7 @@ describe('GGRC.Components.revisionLog', function () {
           destination_type: 'ObjectFoo'
         };
 
-        var result = viewModel._mappingChange(revision, [revision]);
+        let result = viewModel._mappingChange(revision, [revision]);
 
         expect(result).toEqual({
           madeBy: 'User 17',
@@ -692,7 +692,7 @@ describe('GGRC.Components.revisionLog', function () {
 
     it('returns correct change information ' +
       'when author of the change(s) is not presented', function () {
-      var revision = {
+      let revision = {
         modified_by: null,
         updated_at: new Date('2015-05-17T17:24:01'),
         source: {
@@ -707,7 +707,7 @@ describe('GGRC.Components.revisionLog', function () {
         destination_type: 'ObjectFoo'
       };
 
-      var result = viewModel._mappingChange(revision, [revision]);
+      let result = viewModel._mappingChange(revision, [revision]);
 
       expect(viewModel._getRoleAtTime)
         .toHaveBeenCalledWith(null, revision.updated_at);
@@ -725,7 +725,7 @@ describe('GGRC.Components.revisionLog', function () {
   });
 
   describe('_computeRoleChanges method', function () {
-    var corruptedRevision = new can.Map({
+    let corruptedRevision = new can.Map({
       object: new can.List([
         {
           id: 10,
@@ -753,7 +753,7 @@ describe('GGRC.Components.revisionLog', function () {
         }
       ])
     });
-    var revisions = new can.Map({
+    let revisions = new can.Map({
       object: new can.List([
         {
           id: 10,
@@ -856,7 +856,7 @@ describe('GGRC.Components.revisionLog', function () {
           }]
         },
         get_binding: function (mappingName) {
-          var bindingData = {
+          let bindingData = {
             related_requesters: {
               list: [
                 {
@@ -888,7 +888,7 @@ describe('GGRC.Components.revisionLog', function () {
       viewModel = GGRC.Components.getViewModel('revisionLog');
     });
     it('returns current max role when no revisions exist', function () {
-      var roleHistory = viewModel._computeRoleChanges([]);
+      let roleHistory = viewModel._computeRoleChanges([]);
       expect(roleHistory).toEqual({
         '166': [{
           role: 'Verifier',
@@ -898,7 +898,7 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     it('returns correct full history when present', function () {
-      var roleHistory = viewModel._computeRoleChanges(revisions);
+      let roleHistory = viewModel._computeRoleChanges(revisions);
       expect(roleHistory).toEqual({
         '166': [
           {
@@ -922,7 +922,7 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     it('builds correct full history when creation is not present', function () {
-      var roleHistory;
+      let roleHistory;
       revisions.mappings.shift(); // remove first ("created") mapping
       roleHistory = viewModel._computeRoleChanges(revisions);
       expect(roleHistory).toEqual({
@@ -948,7 +948,7 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     it('builds correct history when data is corrupted', function () {
-      var roleHistory;
+      let roleHistory;
 
       roleHistory = viewModel._computeRoleChanges(corruptedRevision);
       expect(roleHistory).toEqual({

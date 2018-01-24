@@ -7,7 +7,7 @@ import {waitsFor} from '../spec_helpers';
 
 describe("display prefs model", function() {
 
-  var display_prefs, exp;
+  let display_prefs, exp;
   beforeAll(function() {
     display_prefs = new CMS.Models.DisplayPrefs();
     exp = CMS.Models.DisplayPrefs.exports;
@@ -43,13 +43,13 @@ describe("display prefs model", function() {
 
       it("returns an empty can.Observe when the key does not resolve to an Observable", function() {
         expect(display_prefs.makeObject("foo")).not.toBe("bar");
-        var newval = display_prefs.makeObject("baz");
+        let newval = display_prefs.makeObject("baz");
         expect(newval instanceof can.Observe).toBeTruthy();
         expect(newval.serialize()).toEqual({});
       });
 
       it("makes a nested path of can.Observes when the key has multiple levels", function() {
-        var newval = display_prefs.makeObject("baz", "quux");
+        let newval = display_prefs.makeObject("baz", "quux");
         expect(display_prefs.baz.quux instanceof can.Observe).toBeTruthy();
       });
 
@@ -82,19 +82,19 @@ describe("display prefs model", function() {
   });
 
   function getSpecs (func, token, fooValue, barValue) {
-    var fooMatcher = typeof fooValue === "object" ? "toEqual" : "toBe";
-    var barMatcher = typeof barValue === "object" ? "toEqual" : "toBe";
+    let fooMatcher = typeof fooValue === "object" ? "toEqual" : "toBe";
+    let barMatcher = typeof barValue === "object" ? "toEqual" : "toBe";
 
     return function() {
       function getTest() {
-        var fooActual = display_prefs[func]("unit_test", "foo");
-        var barActual = display_prefs[func]("unit_test", "bar");
+        let fooActual = display_prefs[func]("unit_test", "foo");
+        let barActual = display_prefs[func]("unit_test", "bar");
 
         expect(fooActual.serialize ? fooActual.serialize() : fooActual)[fooMatcher](fooValue);
         expect(barActual.serialize ? barActual.serialize() : barActual)[barMatcher](barValue);
       }
 
-      var exp_token;
+      let exp_token;
       beforeEach(function() {
         exp_token = exp[token]; //late binding b/c not available when describe block is created
       });
@@ -126,7 +126,7 @@ describe("display prefs model", function() {
 
         it("sets the default value as the page value", function() {
           display_prefs[func]("unit_test", "foo");
-          var fooActual = display_prefs.attr([exp.path, exp_token, "foo"].join("."));
+          let fooActual = display_prefs.attr([exp.path, exp_token, "foo"].join("."));
           expect(fooActual.serialize ? fooActual.serialize() : fooActual)[fooMatcher](fooValue);
         });
       });
@@ -140,7 +140,7 @@ describe("display prefs model", function() {
 
   function setSpecs(func, token, fooValue, barValue) {
     return function() {
-      var exp_token;
+      let exp_token;
       beforeEach(function() {
         exp_token = exp[token];
       });
@@ -152,14 +152,14 @@ describe("display prefs model", function() {
 
       it("sets the value for a widget", function() {
         display_prefs[func]("this arg is ignored", "foo", fooValue);
-        var fooActual  = display_prefs.attr([exp.path, exp_token, "foo"].join("."));
+        let fooActual  = display_prefs.attr([exp.path, exp_token, "foo"].join("."));
         expect(fooActual.serialize ? fooActual.serialize() : fooActual).toEqual(fooValue);
       });
 
       it("sets all values as a collection", function() {
         display_prefs[func]("this arg is ignored", {"foo" : fooValue, "bar" : barValue});
-        var fooActual = display_prefs.attr([exp.path, exp_token, "foo"].join("."));
-        var barActual = display_prefs.attr([exp.path, exp_token, "bar"].join("."));
+        let fooActual = display_prefs.attr([exp.path, exp_token, "foo"].join("."));
+        let barActual = display_prefs.attr([exp.path, exp_token, "bar"].join("."));
         expect(fooActual.serialize ? fooActual.serialize() : fooActual).toEqual(fooValue);
         expect(barActual.serialize ? barActual.serialize() : barActual).toEqual(barValue);
       });
@@ -230,7 +230,7 @@ describe("display prefs model", function() {
   });
 
   describe("#findAll", function() {
-    var dp_noversion, dp2_outdated, dp3_current;
+    let dp_noversion, dp2_outdated, dp3_current;
     beforeEach(function() {
       dp_noversion = new CMS.Models.DisplayPrefs({});
       dp2_outdated = new CMS.Models.DisplayPrefs({ version : 1});
@@ -242,7 +242,7 @@ describe("display prefs model", function() {
       spyOn(dp3_current, "destroy");
     });
     it("deletes any prefs that do not have a version set", function(done) {
-      var dfd = CMS.Models.DisplayPrefs.findAll().done(function(dps) {
+      let dfd = CMS.Models.DisplayPrefs.findAll().done(function(dps) {
         expect(dps).not.toContain(dp_noversion);
         expect(dp_noversion.destroy).toHaveBeenCalled();
       });
@@ -266,7 +266,7 @@ describe("display prefs model", function() {
   });
 
   describe("#findOne", function() {
-    var dp_noversion, dp2_outdated, dp3_current;
+    let dp_noversion, dp2_outdated, dp3_current;
     beforeEach(function() {
       dp_noversion = new CMS.Models.DisplayPrefs({});
       dp2_outdated = new CMS.Models.DisplayPrefs({ version : 1});
@@ -275,7 +275,7 @@ describe("display prefs model", function() {
     it("404s if the display pref does not have a version set", function(done) {
       spyOn(can.Model.LocalStorage, "findOne").and.returnValue(new $.Deferred().resolve(dp_noversion));
       spyOn(dp_noversion, "destroy");
-      var dfd = CMS.Models.DisplayPrefs.findOne().done(function(dps) {
+      let dfd = CMS.Models.DisplayPrefs.findOne().done(function(dps) {
         fail("Should not have resolved findOne for the unversioned display pref");
       }).fail(function(pseudoxhr) {
         expect(pseudoxhr.status).toBe(404);

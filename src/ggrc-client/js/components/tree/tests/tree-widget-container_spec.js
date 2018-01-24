@@ -12,8 +12,8 @@ import * as ObjectVersions from '../../../plugins/utils/object-versions-utils';
 describe('GGRC.Components.treeWidgetContainer', function () {
   'use strict';
 
-  var vm;
-  var Component;
+  let vm;
+  let Component;
 
   beforeEach(function () {
     Component = GGRC.Components.get('treeWidgetContainer');
@@ -21,7 +21,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
   });
 
   describe('optionsData get() method', function () {
-    var shortModelName = 'ModelName';
+    let shortModelName = 'ModelName';
 
     beforeEach(function () {
       vm.attr('model', {
@@ -35,8 +35,8 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       });
 
       it('returns appopriate object', function () {
-        var modelName = shortModelName;
-        var expectedResult = {
+        let modelName = shortModelName;
+        let expectedResult = {
           name: modelName,
           loadItemsModelName: modelName,
           widgetId: modelName,
@@ -56,10 +56,10 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
       it('returns result of ObjectVersions.getWidgetConfig with ' +
       'passed params', function () {
-        var expectedResult = {};
-        var getWidgetConfig = spyOn(ObjectVersions, 'getWidgetConfig')
+        let expectedResult = {};
+        let getWidgetConfig = spyOn(ObjectVersions, 'getWidgetConfig')
           .and.returnValue(expectedResult);
-        var result = vm.attr('optionsData');
+        let result = vm.attr('optionsData');
 
         expect(result).toBe(expectedResult);
         expect(getWidgetConfig).toHaveBeenCalledWith(shortModelName, true);
@@ -68,8 +68,8 @@ describe('GGRC.Components.treeWidgetContainer', function () {
   });
 
   describe('display() method', function () {
-    var display;
-    var dfd;
+    let display;
+    let dfd;
 
     beforeEach(function () {
       dfd = new $.Deferred();
@@ -99,7 +99,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
     });
 
     it('returns value of loaded field', function () {
-      var result;
+      let result;
       vm.attr('loaded', dfd);
       result = display();
       expect(result).toBe(dfd);
@@ -123,14 +123,14 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       });
 
       it('returns options.add_item_view if it exists', function () {
-        var expectedData = new can.Map({});
+        let expectedData = new can.Map({});
         vm.attr('options.add_item_view', expectedData);
         expect(vm.attr('addItem')).toBe(expectedData);
       });
 
       it('returns model.tree_view_options.add_item_view by default',
       function () {
-        var expectedData = new can.Map({});
+        let expectedData = new can.Map({});
         vm.attr('options.add_item_view', null);
         vm.attr('model', {
           tree_view_options: {
@@ -143,8 +143,8 @@ describe('GGRC.Components.treeWidgetContainer', function () {
   });
 
   describe('isSnapshot get() method', function () {
-    var isSnapshotScope;
-    var isSnapshotModel;
+    let isSnapshotScope;
+    let isSnapshotModel;
 
     beforeEach(function () {
       isSnapshotScope = spyOn(SnapshotUtils, 'isSnapshotScope');
@@ -198,7 +198,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
   });
 
   describe('onSort() method', function () {
-    var onSort;
+    let onSort;
 
     beforeEach(function () {
       onSort = vm.onSort.bind(vm);
@@ -223,7 +223,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
   });
 
   describe('loadItems() method', function () {
-    var loadItems;
+    let loadItems;
 
     beforeEach(function () {
       vm.attr({
@@ -251,7 +251,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
   });
 
   describe('setRefreshFlag() method', function () {
-    var setRefreshFlag;
+    let setRefreshFlag;
 
     beforeEach(function () {
       setRefreshFlag = vm.setRefreshFlag.bind(vm);
@@ -272,8 +272,8 @@ describe('GGRC.Components.treeWidgetContainer', function () {
   });
 
   describe('needToRefresh() method', function () {
-    var needToRefresh;
-    var setRefreshFlag;
+    let needToRefresh;
+    let setRefreshFlag;
 
     beforeEach(function () {
       needToRefresh = vm.needToRefresh.bind(vm);
@@ -283,7 +283,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
     it('returns true if refreshLoaded field is true',
     function () {
-      var result;
+      let result;
       setRefreshFlag(true);
       result = needToRefresh();
 
@@ -292,7 +292,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
     it('returns false if refreshLoaded field is false',
     function () {
-      var result;
+      let result;
       setRefreshFlag(false);
       result = needToRefresh();
 
@@ -301,7 +301,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
   });
 
   describe('on widget appearing', function () {
-    var _widgetShown;
+    let _widgetShown;
 
     beforeEach(function () {
       _widgetShown = vm._widgetShown.bind(vm);
@@ -311,7 +311,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
     describe('for any viewModel except Issue', function () {
       beforeEach(function () {
-        var modelName = 'Model';
+        let modelName = 'Model';
         spyOn(CurrentPageUtils, 'getCounts').and.returnValue(
           _.set({}, modelName, 123)
         );
@@ -335,7 +335,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
     });
 
     describe('for Issue viewModel that wasn\'t loaded before', function () {
-      var modelName = 'Issue';
+      let modelName = 'Issue';
 
       beforeEach(function () {
         vm.attr({
@@ -364,7 +364,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       'in case of equality between counts on tab ' +
       'and total counts in viewModel',
       function () {
-        var modelName = 'Issue';
+        let modelName = 'Issue';
 
         beforeEach(function () {
           vm.attr({
@@ -394,7 +394,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       'in case of inequality between counts on tab ' +
       'and total counts in viewModel',
       function () {
-        var modelName = 'Issue';
+        let modelName = 'Issue';
 
         beforeEach(function () {
           vm.attr({
@@ -423,10 +423,10 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
   describe('openAdvancedFilter() method', function () {
     it('copies applied filter and mapping items', function () {
-      var appliedFilterItems = new can.List([
+      let appliedFilterItems = new can.List([
         AdvancedSearch.create.attribute()
       ]);
-      var appliedMappingItems = new can.List([
+      let appliedMappingItems = new can.List([
         AdvancedSearch.create.mappingCriteria({
           filter: AdvancedSearch.create.attribute()
         })
@@ -454,10 +454,10 @@ describe('GGRC.Components.treeWidgetContainer', function () {
   });
 
   describe('applyAdvancedFilters() method', function () {
-    var filterItems = new can.List([
+    let filterItems = new can.List([
       AdvancedSearch.create.attribute()
     ]);
-    var mappingItems = new can.List([
+    let mappingItems = new can.List([
       AdvancedSearch.create.mappingCriteria({
         filter: AdvancedSearch.create.attribute()
       })
@@ -606,7 +606,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
     it('should return correct item number when item is on page',
       function () {
-        var result;
+        let result;
 
         result = vm.getAbsoluteItemNumber({id: 2, type: 'object'});
 
@@ -615,7 +615,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
     it('should return "-1" when item is not on page',
        function () {
-         var result;
+         let result;
 
          result = vm.getAbsoluteItemNumber({id: 4, type: 'object'});
 
@@ -623,7 +623,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
        });
     it('should return "-1" when item is of different type',
       function () {
-        var result;
+        let result;
 
         result = vm.getAbsoluteItemNumber({id: 3, type: 'snapshot'});
 
@@ -631,7 +631,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       });
     it('should return correct item number for first item on non first page',
        function () {
-         var result;
+         let result;
 
          result = vm.getAbsoluteItemNumber({id: 1, type: 'object'});
 
@@ -641,7 +641,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
   describe('getRelativeItemNumber() method', function () {
     it('should return correct item number on page', function () {
-      var result = vm.getRelativeItemNumber(12, 5);
+      let result = vm.getRelativeItemNumber(12, 5);
 
       expect(result).toEqual(2);
     });

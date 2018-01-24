@@ -12,10 +12,10 @@
       destination: {},
       source: {},
       unmapInstance: function () {
-        var objectPerson = this.getObjectMapping();
-        var userRole = this.getRoleMapping();
+        let objectPerson = this.getObjectMapping();
+        let userRole = this.getRoleMapping();
 
-        var dfds = [this.deleteObject(userRole),
+        let dfds = [this.deleteObject(userRole),
           this.deleteObject(objectPerson)];
 
         $.when.apply($, dfds)
@@ -27,11 +27,11 @@
           }.bind(this));
       },
       getObjectMapping: function () {
-        var destinationType = this.attr('destination.type');
-        var mappingType;
-        var sources;
-        var destinations;
-        var mapping;
+        let destinationType = this.attr('destination.type');
+        let mappingType;
+        let sources;
+        let destinations;
+        let mapping;
 
         sources = this.attr('source.object_people');
         destinations = this.attr('destination.object_people');
@@ -51,8 +51,8 @@
         return new CMS.Models[mappingType](mapping || {});
       },
       getRoleMapping: function () {
-        var contextId = this.attr('destination.context.id');
-        var roles = this.attr('source.user_roles');
+        let contextId = this.attr('destination.context.id');
+        let roles = this.attr('source.user_roles');
 
         roles = roles.map(function (role) {
           return new CMS.Models.UserRole({id: role.id});
@@ -63,7 +63,7 @@
         return roles.length ? roles[0] : new CMS.Models.UserRole({});
       },
       deleteObject: function (obj) {
-        var deferred = can.Deferred();
+        let deferred = can.Deferred();
         obj
           .refresh()
           .then(function (item) {

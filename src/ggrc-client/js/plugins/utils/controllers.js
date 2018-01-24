@@ -8,12 +8,12 @@ import {warning} from './modals';
 /**
  * Utils methods shared between GGRC controllers (GGRC.Controllers)
  */
-var typesWithWarning = ['System', 'Process', 'Product'];
+let typesWithWarning = ['System', 'Process', 'Product'];
 
 function checkPreconditions(options, success) {
-  var instance = options.instance;
-  var operation = options.operation;
-  var conditions = options.extraConditions || [];
+  let instance = options.instance;
+  let operation = options.operation;
+  let conditions = options.extraConditions || [];
 
   if (!hasWarningType(instance)) {
     success();
@@ -32,7 +32,7 @@ function checkPreconditions(options, success) {
 }
 
 function becameDeprecated(instance, prevStatus) {
-  var status = instance && instance.status;
+  let status = instance && instance.status;
 
   return (
     !_.isEqual(status, prevStatus) && // status was changed

@@ -5,7 +5,7 @@
 
 ;(function(can, $, GGRC, CMS) {
 GGRC.register_modal_hook("approvalform", function($target, $trigger, option) {
-  var instance,
+  let instance,
       object_params = JSON.parse($trigger.attr('data-object-params') || "{}");
 
   if($trigger.attr('data-object-id') === "page") {
@@ -33,7 +33,7 @@ GGRC.register_modal_hook("approvalform", function($target, $trigger, option) {
 
 jQuery(function($){
   $('body').on('click', '.calendar-auth', function(e) {
-    var calenderAuthWin = null,
+    let calenderAuthWin = null,
       href = window.location.origin + "/calendar_oauth_request", //"https://ggrc-dev.googleplex.com/calendar_oauth_request"
       name = "Calendar Authentication";
 

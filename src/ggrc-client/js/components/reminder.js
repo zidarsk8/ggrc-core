@@ -25,7 +25,7 @@ import {confirm} from '../plugins/utils/modals';
        * @param {jQuery.Event} ev - the event object
        */
       reminder: function (scope, $el, ev) {
-        var instance = scope.instance;
+        let instance = scope.instance;
 
         instance
           .refresh()

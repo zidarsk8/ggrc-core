@@ -4,15 +4,15 @@
 */
 
 (function (GGRC, can) {
-  var Proxy = GGRC.MapperHelpers.Proxy;
-  var Direct = GGRC.MapperHelpers.Direct;
-  var Indirect = GGRC.MapperHelpers.Indirect;
-  var Search = GGRC.MapperHelpers.Search;
-  var Multi = GGRC.MapperHelpers.Multi;
-  var TypeFilter = GGRC.MapperHelpers.TypeFilter;
-  var AttrFilter = GGRC.MapperHelpers.AttrFilter;
-  var CustomFilter = GGRC.MapperHelpers.CustomFilter;
-  var Cross = GGRC.MapperHelpers.Cross;
+  let Proxy = GGRC.MapperHelpers.Proxy;
+  let Direct = GGRC.MapperHelpers.Direct;
+  let Indirect = GGRC.MapperHelpers.Indirect;
+  let Search = GGRC.MapperHelpers.Search;
+  let Multi = GGRC.MapperHelpers.Multi;
+  let TypeFilter = GGRC.MapperHelpers.TypeFilter;
+  let AttrFilter = GGRC.MapperHelpers.AttrFilter;
+  let CustomFilter = GGRC.MapperHelpers.CustomFilter;
+  let Cross = GGRC.MapperHelpers.Cross;
   /*
     class GGRC.Mappings
     represents everything known about how GGRC objects connect to each other.
@@ -70,7 +70,7 @@
      * @return {Array} - list of allowed for mapping Models
      */
     getMappingList: function (type, include, exclude) {
-      var baseModel = GGRC.Utils.getModelByType(type);
+      let baseModel = GGRC.Utils.getModelByType(type);
       exclude = exclude || [];
       include = include || [];
       if (!baseModel) {
@@ -100,8 +100,8 @@
      * @return {Array} - list of allowed for mapping Models
      */
     getMappingTypes: function (type, include, exclude) {
-      var list = this.getMappingList(type, include, exclude);
-      var groups = this.getTypeGroups();
+      let list = this.getMappingList(type, include, exclude);
+      let groups = this.getTypeGroups();
 
       list.forEach(function (modelName) {
         return this._addFormattedType(modelName, groups);
@@ -114,7 +114,7 @@
      * @return {Array} - object with one allowed for mapping Model
      */
     getMappingType: function (type) {
-      var groups = this.getTypeGroups();
+      let groups = this.getTypeGroups();
       this._addFormattedType(type, groups);
       return groups;
     },
@@ -140,9 +140,9 @@
      * @param {object} groups - type groups
      */
     _addFormattedType: function (modelName, groups) {
-      var group;
-      var type;
-      var cmsModel;
+      let group;
+      let type;
+      let cmsModel;
       cmsModel = GGRC.Utils.getModelByType(modelName);
       if (!cmsModel || !cmsModel.title_singular ||
         cmsModel.title_singular === 'Reference') {
@@ -163,7 +163,7 @@
       Example: GGRC.Mappings.get_mappings_for('Program')
     */
     get_mappings_for: function (object) {
-      var mappings = {};
+      let mappings = {};
       can.each(this.modules, function (mod, name) {
         if (mod[object]) {
           can.each(mod[object], function (mapping, mappingName) {
@@ -183,7 +183,7 @@
       return: an instance of GGRC.ListLoaders.BaseListLoader (mappings are implemented as ListLoaders)
     */
     get_canonical_mapping: function (object, option) {
-      var mapping = null;
+      let mapping = null;
       can.each(this.modules, function (mod, name) {
         if (mod._canonical_mappings && mod._canonical_mappings[object] &&
           mod._canonical_mappings[object][option]) {
@@ -203,7 +203,7 @@
       return: an instance of GGRC.ListLoaders.BaseListLoader (mappings are implemented as ListLoaders)
     */
     get_canonical_mapping_name: function (object, option) {
-      var mappingName = null;
+      let mappingName = null;
       can.each(this.modules, function (mod, name) {
         if (mod._canonical_mappings && mod._canonical_mappings[object] &&
           mod._canonical_mappings[object][option]) {
@@ -220,7 +220,7 @@
       return: a keyed object of all mappings (instances of GGRC.ListLoaders.BaseListLoader) by option type
     */
     get_canonical_mappings_for: function (object) {
-      var mappings = {};
+      let mappings = {};
       can.each(this.modules, function (mod, name) {
         if (mod._canonical_mappings && mod._canonical_mappings[object]) {
           can.each(mod._canonical_mappings[object],
@@ -239,8 +239,8 @@
       return: a string of the shortName of the join model (subclass of can.Model.Join) or null
     */
     join_model_name_for: function (modelNameA, modelNameB) {
-      var joinDescriptor = this.get_canonical_mapping(modelNameA, modelNameB);
-      var result;
+      let joinDescriptor = this.get_canonical_mapping(modelNameA, modelNameB);
+      let result;
       if (joinDescriptor instanceof GGRC.ListLoaders.ProxyListLoader) {
         result = joinDescriptor.model_name;
       } else {
@@ -258,18 +258,18 @@
       return: an instance of the join model (subclass of can.Model.Join) or null
     */
     make_join_object: function (object, option, joinAttrs) {
-      var joinModel;
-      var joinMapping = this.get_canonical_mapping(object.constructor.shortName,
+      let joinModel;
+      let joinMapping = this.get_canonical_mapping(object.constructor.shortName,
         option.constructor.shortName);
-      var objectAttrs = {
+      let objectAttrs = {
         id: object.id,
         type: object.constructor.shortName
       };
-      var optionAttrs = {
+      let optionAttrs = {
         id: option.id,
         type: option.constructor.shortName
       };
-      var result;
+      let result;
 
       if (joinMapping && joinMapping.model_name) {
         joinModel = CMS.Models[joinMapping.model_name];
@@ -289,8 +289,8 @@
       kick off the application of mixins to the mappings and resolve canonical mappings
     */
     init: function (name, opts) {
-      var createdMappings;
-      var that = this;
+      let createdMappings;
+      let that = this;
       this.constructor.modules[name] = this;
       this._canonical_mappings = {};
       if (this.groups) {
@@ -321,8 +321,8 @@
     },
     // Recursively handle mixins -- this function should not be called directly.
     reify_mixins: function (definition, definitions) {
-      var that = this;
-      var finalDefinition = {};
+      let that = this;
+      let finalDefinition = {};
       if (definition._mixins) {
         can.each(definition._mixins, function (mixin) {
           if (typeof (mixin) === 'string') {
@@ -369,7 +369,7 @@
 
     // create mappings for definitions -- this function should not be called directly/
     create_mappings: function (definitions) {
-      var mappings = {};
+      let mappings = {};
 
       can.each(definitions, function (definition, name) {
         // Only output the mappings if it's a model, e.g., uppercase first letter

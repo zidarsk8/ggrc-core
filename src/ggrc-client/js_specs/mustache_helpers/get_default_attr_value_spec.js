@@ -6,8 +6,8 @@
 describe('can.mustache.helper.get_default_attr_value', function () {
   'use strict';
 
-  var helper;
-  var instance;  // an object the helper retrieves an attribute value from
+  let helper;
+  let instance;  // an object the helper retrieves an attribute value from
 
   beforeAll(function () {
     helper = can.Mustache._helpers.get_default_attr_value.fn;
@@ -18,13 +18,13 @@ describe('can.mustache.helper.get_default_attr_value', function () {
   });
 
   it('returns an empty string if the attribute is missing', function () {
-    var result = helper('does_not_exist', instance);
+    let result = helper('does_not_exist', instance);
     expect(result).toEqual('');
   });
 
   it('returns an empty string if the attribute is not considered as "default"',
     function () {
-      var result;
+      let result;
       instance.attr('is_not_default', true);
       result = helper('is_not_default', instance);
       expect(result).toEqual('');
@@ -36,7 +36,7 @@ describe('can.mustache.helper.get_default_attr_value', function () {
     });
 
     it('returns a correct value through the .attr() method', function () {
-      var result;
+      let result;
       spyOn(instance, 'attr').and.returnValue('In progress');
 
       result = helper('status', instance);
@@ -46,14 +46,14 @@ describe('can.mustache.helper.get_default_attr_value', function () {
     });
 
     it('returns "true" string when boolean attr value is true', function () {
-      var result;
+      let result;
       instance.attr('archived', true);
       result = helper('archived', instance);
       expect(result).toEqual('true');
     });
 
     it('returns "false" string when boolean attr value is false', function () {
-      var result;
+      let result;
       instance.attr('archived', false);
       result = helper('archived', instance);
       expect(result).toEqual('false');
@@ -67,7 +67,7 @@ describe('can.mustache.helper.get_default_attr_value', function () {
 
     it('returns a correctly formatted value through the .attr() method',
       function () {
-        var result;
+        let result;
         spyOn(instance, 'attr').and.returnValue('2016-01-22');
 
         result = helper('start_date', instance);

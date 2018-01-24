@@ -6,7 +6,7 @@
 (function (can, GGRC) {
   'use strict';
 
-  var template = can.view(GGRC.mustache_path +
+  let template = can.view(GGRC.mustache_path +
     '/base_objects/repeat-on-summary.mustache');
 
   GGRC.Components('repeatOnSummary', {
@@ -16,9 +16,9 @@
       define: {
         unitText: {
           get: function () {
-            var result = '';
-            var repeatEvery = this.attr('repeatEvery');
-            var unit = _.find(GGRC.Workflow.unitOptions, function (option) {
+            let result = '';
+            let repeatEvery = this.attr('repeatEvery');
+            let unit = _.find(GGRC.Workflow.unitOptions, function (option) {
               return option.value === this.attr('unit');
             }.bind(this));
 

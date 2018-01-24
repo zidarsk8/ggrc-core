@@ -4,8 +4,8 @@
  */
 
 (function (can, $, CMS, GGRC) {
-  var random = Date.now();
-  var scopes = new can.List(['https://www.googleapis.com/auth/userinfo.email']);
+  let random = Date.now();
+  let scopes = new can.List(['https://www.googleapis.com/auth/userinfo.email']);
 
   new GGRC.Mappings('ggrc_gdrive_integration', {
     revisionable: {

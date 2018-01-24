@@ -4,10 +4,10 @@
  */
 
 (function ($, CMS, GGRC) {
-  var RisksExtension = {};
+  let RisksExtension = {};
 
   // Insert risk mappings to all gov/business object types
-  var riskObjectTypes = [
+  let riskObjectTypes = [
     'AccessGroup',
     'Assessment',
     'Clause',
@@ -32,9 +32,9 @@
     'System',
     'Vendor'
   ];
-  var relatedObjectDescriptors = {};
-  var threatDescriptor;
-  var riskDescriptor;
+  let relatedObjectDescriptors = {};
+  let threatDescriptor;
+  let riskDescriptor;
 
   // Register `risks` extension with GGRC
   GGRC.extensions.push(RisksExtension);
@@ -51,13 +51,13 @@
 
   // Configure mapping extensions for ggrc_risks
   RisksExtension.init_mappings = function () {
-    var Proxy = GGRC.MapperHelpers.Proxy;
-    var Search = GGRC.MapperHelpers.Search;
-    var TypeFilter = GGRC.MapperHelpers.TypeFilter;
-    var Multi = GGRC.MapperHelpers.Multi;
+    let Proxy = GGRC.MapperHelpers.Proxy;
+    let Search = GGRC.MapperHelpers.Search;
+    let TypeFilter = GGRC.MapperHelpers.TypeFilter;
+    let Multi = GGRC.MapperHelpers.Multi;
 
     // Add mappings for risk objects
-    var mappings = {
+    let mappings = {
       related: {
         related_objects_as_source: Proxy(null, 'destination', 'Relationship',
           'source', 'related_destinations'),
@@ -145,27 +145,27 @@
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
   // Initialize widgets for risk page
   RisksExtension.init_widgets = function () {
-    var pageInstance = GGRC.page_instance();
-    var isMyWork = function () {
+    let pageInstance = GGRC.page_instance();
+    let isMyWork = function () {
       return pageInstance && pageInstance.type === 'Person';
     };
 
-    var relatedOrOwned = isMyWork() ? 'owned_' : 'related_';
-    var sortedWidgetTypes = _.sortBy(riskObjectTypes, function (type) {
-      var model = CMS.Models[type] || {};
+    let relatedOrOwned = isMyWork() ? 'owned_' : 'related_';
+    let sortedWidgetTypes = _.sortBy(riskObjectTypes, function (type) {
+      let model = CMS.Models[type] || {};
       return model.title_plural || type;
     });
-    var baseWidgetsByType = GGRC.tree_view.base_widgets_by_type;
-    var moduleObjectNames = ['Risk', 'Threat'];
-    var extendedModuleTypes = riskObjectTypes.concat(moduleObjectNames);
-    var subTrees = GGRC.tree_view.sub_tree_for;
+    let baseWidgetsByType = GGRC.tree_view.base_widgets_by_type;
+    let moduleObjectNames = ['Risk', 'Threat'];
+    let extendedModuleTypes = riskObjectTypes.concat(moduleObjectNames);
+    let subTrees = GGRC.tree_view.sub_tree_for;
 
     if (/^\/objectBrowser\/?$/.test(window.location.pathname)) {
       relatedOrOwned = 'all_';
     }
     // Init widget descriptors:
     can.each(sortedWidgetTypes, function (modelName) {
-      var model;
+      let model;
 
       if (modelName === 'MultitypeSearch' || !baseWidgetsByType[modelName]) {
         return;
@@ -197,8 +197,8 @@
     // tree_view.basic_model_list and tree_view.sub_tree_for for risk module
     // objects
     can.each(moduleObjectNames, function (name) {
-      var widgetList = baseWidgetsByType[name];
-      var childModelList = [];
+      let widgetList = baseWidgetsByType[name];
+      let childModelList = [];
 
       baseWidgetsByType[name] = extendedModuleTypes;
 
@@ -266,7 +266,7 @@
   };
 
   RisksExtension.init_widgets_for_risk_page = function () {
-    var riskDescriptors = $.extend({},
+    let riskDescriptors = $.extend({},
       relatedObjectDescriptors, {
         Threat: threatDescriptor
       }
@@ -277,7 +277,7 @@
   };
 
   RisksExtension.init_widgets_for_threat_page = function () {
-    var threatDescriptors = $.extend({},
+    let threatDescriptors = $.extend({},
       relatedObjectDescriptors, {
         Risk: riskDescriptor
       }
@@ -288,7 +288,7 @@
   };
 
   RisksExtension.init_widgets_for_person_page = function () {
-    var peopleWidgets = $.extend({}, {
+    let peopleWidgets = $.extend({}, {
       Threat: threatDescriptor
     }, {
       Risk: riskDescriptor
@@ -300,8 +300,8 @@
   };
 
   RisksExtension.init_widgets_for_other_pages = function () {
-    var descriptor = {};
-    var pageInstance = GGRC.page_instance();
+    let descriptor = {};
+    let pageInstance = GGRC.page_instance();
     if (pageInstance &&
       ~can.inArray(pageInstance.constructor.shortName, riskObjectTypes)) {
       descriptor[pageInstance.constructor.shortName] = {

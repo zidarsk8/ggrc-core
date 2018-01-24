@@ -8,7 +8,7 @@ import Component from '../advanced-search-filter-attribute';
 describe('GGRC.Components.advancedSearchFilterAttribute', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeEach(() => {
     viewModel = new Component.prototype.viewModel();
@@ -57,7 +57,7 @@ describe('GGRC.Components.advancedSearchFilterAttribute', function () {
 
   describe('setValue() method', function () {
     it('updates "attribute value" from $element value', function () {
-      var $element;
+      let $element;
 
       viewModel.attr('attribute').value = 'old value';
 

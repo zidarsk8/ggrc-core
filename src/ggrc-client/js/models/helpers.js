@@ -13,7 +13,7 @@
       this.attr('owners', new CMS.Models.Person.List(this.owners));
     },
     save: function () {
-      var Task;
+      let Task;
 
       // FIXME: temporary fix for 'Could not get any raw data while
       // converting using .models'
@@ -35,7 +35,7 @@
 
       return Task.save()
         .then(function (taskGroupTask) {
-          var CycleTask = new CMS.Models.CycleTaskGroupObjectTask({
+          let CycleTask = new CMS.Models.CycleTaskGroupObjectTask({
             cycle: this.cycle,
             start_date: this.cycle.reify().start_date,
             end_date: this.cycle.reify().end_date,
@@ -51,7 +51,7 @@
         }.bind(this));
     },
     computed_errors: function () {
-      var errors = null;
+      let errors = null;
       if (!this.attr('title')) {
         errors = {
           title: 'Must be defined'

@@ -29,8 +29,8 @@ import template from './related-issues.mustache';
         relatedIssuesFilter: {
           type: '*',
           get: function () {
-            var id = this.attr('baseInstance.id');
-            var type = this.attr('baseInstance.type');
+            let id = this.attr('baseInstance.id');
+            let type = this.attr('baseInstance.type');
             return {
               expression: {
                 left: {

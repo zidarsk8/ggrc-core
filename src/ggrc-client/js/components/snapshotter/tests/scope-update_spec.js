@@ -9,9 +9,9 @@ import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 describe('GGRC.Components.SnapshotScopeUpdater', function () {
   'use strict';
 
-  var updaterViewModel;
-  var containerVM;
-  var originalHtml;
+  let updaterViewModel;
+  let containerVM;
+  let originalHtml;
 
   beforeAll(function () {
     originalHtml = document.body.innerHTML;
@@ -45,7 +45,7 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
   });
 
   describe('upsertIt() method', function () {
-    var method;
+    let method;
 
     beforeEach(function () {
       method = updaterViewModel.upsertIt.bind(updaterViewModel);
@@ -76,8 +76,8 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
   });
 
   describe('_refreshContainers() method', function () {
-    var method;
-    var refreshDfd;
+    let method;
+    let refreshDfd;
 
     beforeEach(function () {
       method = updaterViewModel._refreshContainers.bind(updaterViewModel);
@@ -86,7 +86,7 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
     });
 
     it('refreshes all page counters', function (done) {
-      var result = method();
+      let result = method();
       result.then(
         function () {
           expect(CurrentPageUtils.refreshCounts).toHaveBeenCalled();
@@ -100,7 +100,7 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
       method();
 
       $('tree-widget-container').each(function () {
-        var viewModel = $(this).viewModel();
+        let viewModel = $(this).viewModel();
         expect(viewModel.setRefreshFlag).toHaveBeenCalledWith(true);
       });
     });
@@ -110,15 +110,15 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
       _.extend(containerVM.model, {model_singular: 'Something'});
       method();
       $('tree-widget-container').each(function () {
-        var viewModel = $(this).viewModel();
+        let viewModel = $(this).viewModel();
         expect(viewModel.setRefreshFlag).not.toHaveBeenCalled();
       });
     });
   });
 
   describe('_success() method', function () {
-    var method;
-    var refreshDfd;
+    let method;
+    let refreshDfd;
 
     beforeEach(function () {
       method = updaterViewModel._success.bind(updaterViewModel);
@@ -141,10 +141,10 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
       });
 
       it('sets snapshots attr for the instance', function () {
-        var expectedResult = {
+        let expectedResult = {
           operation: 'upsert'
         };
-        var wrongValue = {
+        let wrongValue = {
           operation: 'wrongValue'
         };
         updaterViewModel.instance.attr('snapshots', wrongValue);

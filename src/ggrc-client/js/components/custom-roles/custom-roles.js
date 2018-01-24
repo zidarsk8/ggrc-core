@@ -11,7 +11,7 @@ import template from './custom-roles.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var tag = 'custom-roles';
+  let tag = 'custom-roles';
 
   GGRC.Components('customRoles', {
     tag: tag,
@@ -40,7 +40,7 @@ import template from './custom-roles.mustache';
         return instance.class.isProposable;
       },
       save: function (args) {
-        var self = this;
+        let self = this;
         this.attr('updatableGroupId', args.groupId);
         this.attr('instance').save()
           .then(function () {

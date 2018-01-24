@@ -6,8 +6,8 @@
 describe('can.mustache.helper.localize_date_today', function () {
   'use strict';
 
-  var helper;
-  var testDate;
+  let helper;
+  let testDate;
 
   beforeAll(function () {
     helper = can.Mustache._helpers.localize_date_today.fn;
@@ -19,16 +19,16 @@ describe('can.mustache.helper.localize_date_today', function () {
   });
 
   it('returns date for tomorrow', function () {
-    var today = new Date();
-    var tomorrow = today.getDate() + 1;
-    var expected = moment(tomorrow).format('MM/DD/YYYY');
+    let today = new Date();
+    let tomorrow = today.getDate() + 1;
+    let expected = moment(tomorrow).format('MM/DD/YYYY');
     expect(helper(tomorrow)).toEqual(expected);
   });
 
   it('returns date for yesterday', function () {
-    var yesterday = new Date();
+    let yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    var expected = moment(yesterday).format('MM/DD/YYYY');
+    let expected = moment(yesterday).format('MM/DD/YYYY');
     expect(helper(yesterday)).toEqual(expected);
   });
 

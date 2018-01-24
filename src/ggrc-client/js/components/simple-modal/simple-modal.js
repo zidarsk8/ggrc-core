@@ -36,7 +36,7 @@ import template from './simple-modal.mustache';
     },
     helpers: {
       modalWrapper: function (showContent) {
-        var self = this;
+        let self = this;
         return function (el) {
           showContent.bind('change', function (ev, val) {
             if (val) {

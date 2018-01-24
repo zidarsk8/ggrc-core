@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-var customAttributesType = {
+let customAttributesType = {
   Text: 'input',
   'Rich Text': 'text',
   'Map:Person': 'person',
@@ -13,13 +13,13 @@ var customAttributesType = {
   Dropdown: 'dropdown'
 };
 
-var CA_DD_REQUIRED_DEPS = Object.freeze({
+let CA_DD_REQUIRED_DEPS = Object.freeze({
   NONE: 0,
   COMMENT: 1,
   EVIDENCE: 2,
   COMMENT_AND_EVIDENCE: 3
 });
-var CUSTOM_ATTRIBUTE_TYPE = Object.freeze({
+let CUSTOM_ATTRIBUTE_TYPE = Object.freeze({
   LOCAL: 1,
   GLOBAL: 2
 });
@@ -41,10 +41,10 @@ function getCustomAttributeType(type) {
 }
 
 function isEmptyCustomAttribute(value, type, cav) {
-  var result = false;
-  var types = ['Text', 'Rich Text', 'Date', 'Checkbox', 'Dropdown',
+  let result = false;
+  let types = ['Text', 'Rich Text', 'Date', 'Checkbox', 'Dropdown',
     'Map:Person'];
-  var options = {
+  let options = {
     Checkbox: function (value) {
       return !value || value === '0';
     },
@@ -113,12 +113,12 @@ function convertFromCaValue(type, value, valueObj) {
  */
 function prepareCustomAttributes(definitions, values) {
   return definitions.map(function (def) {
-    var valueData = false;
-    var id = def.id;
-    var options = (def.multi_choice_options || '').split(',');
-    var optionsRequirements = (def.multi_choice_mandatory || '').split(',');
-    var type = getCustomAttributeType(def.attribute_type);
-    var stub = {
+    let valueData = false;
+    let id = def.id;
+    let options = (def.multi_choice_options || '').split(',');
+    let optionsRequirements = (def.multi_choice_mandatory || '').split(',');
+    let type = getCustomAttributeType(def.attribute_type);
+    let stub = {
       id: null,
       custom_attribute_id: id,
       attribute_value: null,
@@ -138,7 +138,7 @@ function prepareCustomAttributes(definitions, values) {
     };
 
     values.forEach(function (value) {
-      var errors = [];
+      let errors = [];
       if (value.custom_attribute_id === id) {
         errors = value.preconditions_failed || [];
         value.def = def;
@@ -203,7 +203,7 @@ function convertValuesToFormFields(customAttributeValues) {
 }
 
 function convertToFormViewField(attr) {
-  var options = attr.def.multi_choice_options;
+  let options = attr.def.multi_choice_options;
   return {
     type: attr.attributeType,
     id: attr.def.id,
@@ -223,7 +223,7 @@ function convertToFormViewField(attr) {
 }
 
 function convertToEditableField(attr) {
-  var options = attr.def.multi_choice_options;
+  let options = attr.def.multi_choice_options;
   return {
     type: attr.attributeType,
     id: attr.def.id,
@@ -256,8 +256,8 @@ function convertToEditableField(attr) {
  * @return {Array}            Array of filtered custom attributes
  */
 function getCustomAttributes(instance, type) {
-  var filterFn;
-  var values = instance && instance.attr('custom_attribute_values') || [];
+  let filterFn;
+  let values = instance && instance.attr('custom_attribute_values') || [];
   switch (type) {
     case CUSTOM_ATTRIBUTE_TYPE.LOCAL:
       filterFn = function (v) {
@@ -278,7 +278,7 @@ function getCustomAttributes(instance, type) {
 }
 
 function updateCustomAttributeValue(ca, value) {
-  var id;
+  let id;
   if (ca.attr('attributeType') === 'person') {
     id = value || null;
     ca.attr('attribute_value', 'Person');
@@ -312,9 +312,9 @@ function applyChangesToCustomAttributeValue(values, changes) {
  *                   the assessment instance
  */
 function ensureGlobalCA(instance) {
-  var definitions;
-  var values;
-  var def = can.Deferred();
+  let definitions;
+  let values;
+  let def = can.Deferred();
   if (instance.attr('id')) {
     def.resolve();
     return def.promise();

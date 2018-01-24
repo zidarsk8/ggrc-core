@@ -22,19 +22,19 @@ import {
       documents: [],
       isLoading: false,
       getDocumentsQuery: function () {
-        var documentTypes = [
+        let documentTypes = [
           CMS.Models.Document.EVIDENCE,
           CMS.Models.Document.URL];
-        var relevantFilters = [{
+        let relevantFilters = [{
           type: this.attr('parentInstance.type'),
           id: this.attr('parentInstance.id'),
           operation: 'relevant'
         }];
-        var includeFilters = {
+        let includeFilters = {
           keys: [],
           expression: {}
         };
-        var query;
+        let query;
 
         documentTypes.forEach(function (type) {
           includeFilters = GGRC.query_parser.join_queries({
@@ -54,13 +54,13 @@ import {
         return query;
       },
       loadDocuments: function () {
-        var self = this;
-        var query = this.getDocumentsQuery();
+        let self = this;
+        let query = this.getDocumentsQuery();
 
         this.attr('isLoading', true);
         return batchRequests(query).then(
           function (response) {
-            var documents = response.Document.values;
+            let documents = response.Document.values;
             self.attr('documents').replace(documents);
             self.attr('isLoading', false);
           }

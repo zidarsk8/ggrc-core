@@ -15,7 +15,7 @@ import {
 
 (function (can, $) {
   function _firstElementChild(el) {
-    var i;
+    let i;
     if (el.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
       for (i = 0; i < el.childNodes.length; i++) {
         if (el.childNodes[i].nodeType !== Node.TEXT_NODE) {
@@ -41,7 +41,7 @@ import {
     }
   }, {
     setup: function (el, opts) {
-      var that = this;
+      let that = this;
       if (typeof this._super === 'function') {
         this._super(el);
       }
@@ -105,9 +105,9 @@ import {
     },
 
     markNotRelatedItem: function () {
-      var instance = this.options.instance;
-      var relatedInstances = related.attr(instance.type);
-      var instanceId = isSnapshot(instance) ?
+      let instance = this.options.instance;
+      let relatedInstances = related.attr(instance.type);
+      let instanceId = isSnapshot(instance) ?
                         instance.snapshot.child_id :
                         instance.id;
       if (!relatedInstances || relatedInstances &&
@@ -123,9 +123,9 @@ import {
      * @param {Boolean} force - indicates redraw is/is not mandatory
      */
     draw_node: function (force) {
-      var isActive;
-      var isPlaceholder;
-      var lazyLoading = this.options.disable_lazy_loading;
+      let isActive;
+      let isPlaceholder;
+      let lazyLoading = this.options.disable_lazy_loading;
 
       if (!this.element) {
         return;
@@ -166,7 +166,7 @@ import {
         GGRC.mustache_path + '/base_objects/tree_placeholder.mustache',
         this.options,
         this._ifNotRemoved(function (frag) {
-          var model = CMS.Models[this.options.instance.type];
+          let model = CMS.Models[this.options.instance.type];
           this.replace_element(frag);
           this._draw_node_deferred.resolve();
           this.options.expanded = false;
@@ -180,7 +180,7 @@ import {
     },
 
     should_draw_children: function () {
-      var drawChildren = this.options.draw_children;
+      let drawChildren = this.options.draw_children;
       if (can.isFunction(drawChildren)) {
         return drawChildren.apply(this.options);
       }
@@ -189,8 +189,8 @@ import {
 
     // add all child options to one TreeViewOptions object
     add_child_lists_to_child: function () {
-      var originalChildList = this.options.child_options;
-      var newChildList = [];
+      let originalChildList = this.options.child_options;
+      let newChildList = [];
 
       if (this.options.attr('_added_child_list')) {
         return;
@@ -203,7 +203,7 @@ import {
 
       if (this.should_draw_children()) {
         can.each(originalChildList, function (data, i) {
-          var options = new can.Map();
+          let options = new can.Map();
           data.each(function (v, k) {
             options.attr(k, v);
           });
@@ -224,7 +224,7 @@ import {
 
     // data is an entry from child options.  if child options is an array, run once for each.
     add_child_list: function (item, data) {
-      var findParams;
+      let findParams;
       data.attr({start_expanded: false});
       if (can.isFunction(item.instance[data.property])) {
         // Special case for handling mappings which are functions until
@@ -261,9 +261,9 @@ import {
     },
 
     replace_element: function (el) {
-      var oldEl = this.element;
-      var oldData;
-      var firstchild;
+      let oldEl = this.element;
+      let oldData;
+      let firstchild;
 
       if (!this.element) {
         return;
@@ -293,13 +293,13 @@ import {
     },
 
     display_subtrees: function () {
-      var childTreeDfds = [];
-      var that = this;
+      let childTreeDfds = [];
+      let that = this;
 
       this.element.find('.' + CMS.Controllers.TreeView._fullName)
         .each(function (_, el) {
-          var $el = $(el);
-          var childTreeControl;
+          let $el = $(el);
+          let childTreeControl;
 
           //  Ensure this targets only direct child trees, not sub-tree trees
           if ($el.closest('.' + that.constructor._fullName).is(that.element)) {
@@ -324,7 +324,7 @@ import {
      *   nodes have been loaded and displayed
      */
     expand: function () {
-      var $el = this.element;
+      let $el = this.element;
 
       this.add_child_lists_to_child();
       if (this._expand_deferred && $el.find('.openclose').is('.active')) {
@@ -360,8 +360,8 @@ import {
     },
 
     '.select:not(.disabled) click': function (el, ev) {
-      var tree = el.closest('.cms_controllers_tree_view_node');
-      var node = tree.control();
+      let tree = el.closest('.cms_controllers_tree_view_node');
+      let node = tree.control();
       if (node) {
         node.select();
       }
@@ -418,7 +418,7 @@ import {
     },
 
     trigger_expand: function () {
-      var $expandEl = this.element.find('.openclose').first();
+      let $expandEl = this.element.find('.openclose').first();
       if (!$expandEl.hasClass('active')) {
         $expandEl.trigger('click');
       }
@@ -426,7 +426,7 @@ import {
     },
 
     hash_fragment: function () {
-      var parentFragment = '';
+      let parentFragment = '';
 
       if (this.options.parent) {
         parentFragment = this.options.parent.hash_fragment();
@@ -437,7 +437,7 @@ import {
     },
 
     update_hash_fragment: function () {
-      var hash = window.location.hash.split('/')[0];
+      let hash = window.location.hash.split('/')[0];
 
       window.location.hash = [hash,
         this.hash_fragment()].join('');

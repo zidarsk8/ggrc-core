@@ -6,7 +6,7 @@
 describe('GGRC.Components.treeItem', function () {
   'use strict';
 
-  var vm;
+  let vm;
 
   beforeEach(function () {
     vm = GGRC.Components.getViewModel('treeItem');

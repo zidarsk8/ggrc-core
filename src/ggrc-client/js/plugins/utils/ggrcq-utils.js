@@ -10,7 +10,7 @@ import {
   /**
    * Util methods for integration with GGRCQ.
    */
-var models = ['Process', 'Product', 'System'];
+let models = ['Process', 'Product', 'System'];
 
 /**
  * Determine whether model type could have mapped questions.
@@ -28,7 +28,7 @@ function hasQuestions(model) {
  * @return {String} Url to questions
  */
 function getUrl(id, model) {
-  var url = GGRC.GGRC_Q_INTEGRATION_URL;
+  let url = GGRC.GGRC_Q_INTEGRATION_URL;
   if (!url) {
     return '';
   }
@@ -45,7 +45,7 @@ function getUrl(id, model) {
  * @return {String} Url to questions
  */
 function getQuestionsUrl(instance) {
-  var id = isSnapshot(instance) && instance.snapshot ?
+  let id = isSnapshot(instance) && instance.snapshot ?
       instance.snapshot.child_id :
       instance.id;
   return getUrl(id, instance.class.title_singular);

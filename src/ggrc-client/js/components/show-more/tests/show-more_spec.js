@@ -6,7 +6,7 @@
 describe('showMore', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   describe('should have some default values', function () {
     beforeEach(function () {
@@ -21,7 +21,7 @@ describe('showMore', function () {
   });
 
   describe('isOverLimit property', function () {
-    var items = new can.List([{id: 1}, {id: 2}]);
+    let items = new can.List([{id: 1}, {id: 2}]);
 
     beforeEach(function () {
       viewModel = GGRC.Components.getViewModel('showMore');
@@ -29,7 +29,7 @@ describe('showMore', function () {
     });
 
     it('should return true when more items than limit property', function () {
-      var result;
+      let result;
 
       viewModel.attr('limit', 1);
       result = viewModel.attr('isOverLimit');
@@ -38,7 +38,7 @@ describe('showMore', function () {
     });
 
     it('should return false when less items than limit property', function () {
-      var result;
+      let result;
 
       viewModel.attr('limit', 10);
       result = viewModel.attr('isOverLimit');
@@ -48,7 +48,7 @@ describe('showMore', function () {
   });
 
   describe('showAllButtonText property', function () {
-    var items = new can.List([{id: 1}, {id: 2}]);
+    let items = new can.List([{id: 1}, {id: 2}]);
 
     beforeEach(function () {
       viewModel = GGRC.Components.getViewModel('showMore');
@@ -56,7 +56,7 @@ describe('showMore', function () {
     });
 
     it('should return collapsible text when all items are shown', function () {
-      var result;
+      let result;
 
       viewModel.attr('shouldShowAllItems', true);
       result = viewModel.attr('showAllButtonText');
@@ -66,7 +66,7 @@ describe('showMore', function () {
 
     it('should return expandable text when part of items are shown',
     function () {
-      var result;
+      let result;
 
       viewModel.attr('shouldShowAllItems', false);
       viewModel.attr('limit', 1);
@@ -77,7 +77,7 @@ describe('showMore', function () {
   });
 
   describe('visibleItems property', function () {
-    var items = new can.List([{id: 1}, {id: 2}]);
+    let items = new can.List([{id: 1}, {id: 2}]);
 
     beforeEach(function () {
       viewModel = GGRC.Components.getViewModel('showMore');
@@ -86,7 +86,7 @@ describe('showMore', function () {
 
     it('should return limited items list when should not show all',
       function () {
-        var result;
+        let result;
 
         viewModel.attr('limit', 1);
         result = viewModel.attr('visibleItems');
@@ -95,7 +95,7 @@ describe('showMore', function () {
       });
 
     it('should return all items when should show all', function () {
-      var result;
+      let result;
 
       viewModel.attr('shouldShowAllItems', true);
       result = viewModel.attr('visibleItems');
@@ -105,7 +105,7 @@ describe('showMore', function () {
 
     it('should return all items when items count is less than limit',
       function () {
-        var result;
+        let result;
 
         viewModel.attr('limit', 3);
         result = viewModel.attr('visibleItems');
@@ -115,7 +115,7 @@ describe('showMore', function () {
   });
 
   describe('toggleShowAll() method', function () {
-    var eventMock = {
+    let eventMock = {
       stopPropagation: function () {}
     };
 
@@ -125,7 +125,7 @@ describe('showMore', function () {
 
     it('should set shouldShowAll property when was false',
       function () {
-        var result;
+        let result;
 
         viewModel.toggleShowAll(eventMock);
         result = viewModel.attr('shouldShowAllItems');
@@ -134,7 +134,7 @@ describe('showMore', function () {
       });
 
     it('should reset shouldShowAll property when was true', function () {
-      var result;
+      let result;
 
       viewModel.attr('shouldShowAllItems', true);
       viewModel.toggleShowAll(eventMock);

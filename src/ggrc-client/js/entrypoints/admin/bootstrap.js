@@ -34,7 +34,7 @@ const adminListDescriptors = {
     model: CMS.Models.Person,
     roles: new can.List(),
     init: function () {
-      var self = this;
+      let self = this;
       CMS.Models.Role
         .findAll({scope__in: 'System,Admin'})
         .done(function (roles) {

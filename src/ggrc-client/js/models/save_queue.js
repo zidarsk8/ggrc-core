@@ -28,16 +28,16 @@
     _timeout: null,
 
     _enqueue_bucket: function (bucket) {
-      var that = this;
+      let that = this;
       return function () {
-        var size = bucket.background ? bucket.objs.length : that.BATCH_SIZE;
-        var objs = bucket.objs.splice(0, size);
-        var body = _.map(objs, function (obj) {
-          var list = {};
+        let size = bucket.background ? bucket.objs.length : that.BATCH_SIZE;
+        let objs = bucket.objs.splice(0, size);
+        let body = _.map(objs, function (obj) {
+          let list = {};
           list[bucket.type] = obj.serialize();
           return list;
         });
-        var dfd = $.ajax({
+        let dfd = $.ajax({
           type: 'POST',
           url: '/api/' + bucket.plural,
           data: body,
@@ -82,9 +82,9 @@
 
     _process_save_responses: function (bucket) {
       can.each(bucket.save_responses, function (resp) {
-        var objs = resp[0];
-        var data = resp[1];
-        var cb = function (single) {
+        let objs = resp[0];
+        let data = resp[1];
+        let cb = function (single) {
           return function () {
             this.created(single[1][bucket.type]);
             return $.when(
@@ -92,7 +92,7 @@
           };
         };
         can.each(objs, function (obj, idx) {
-          var single = data[idx];
+          let single = data[idx];
           // Add extra check to avoid possible exceptions
           single = Array.isArray(single) ? single : false;
           if (single && single[0] >= 200 && single[0] < 300) {
@@ -117,11 +117,11 @@
     },
 
     enqueue: function (obj, args) {
-      var type;
-      var bucket;
-      var bucketName;
-      var plural;
-      var elem = function () {
+      let type;
+      let bucket;
+      let bucketName;
+      let plural;
+      let elem = function () {
         return obj._save.apply(obj, args);
       };
       if (obj.isNew()) {
@@ -157,7 +157,7 @@
       this._resolve();
     },
     _resolve: function () {
-      var objs;
+      let objs;
       if (!this._queue.length) {
         // Finished
         return;

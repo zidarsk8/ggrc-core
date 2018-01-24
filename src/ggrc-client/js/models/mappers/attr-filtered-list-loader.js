@@ -13,7 +13,7 @@
             return;
           }
           return _.any(binding.mappings, function (mapping) {
-            var instance = mapping.instance;
+            let instance = mapping.instance;
             if (instance instanceof CMS.Models.Relationship) {
               if (_.exists(instance, 'attrs') &&
                   instance.attrs[prop] && (!value ||
@@ -38,11 +38,11 @@
         }
 
         CMS.Models.Relationship.bind('updated', function (ev, model) {
-          var value;
-          var needle;
-          var active;
-          var activeInList;
-          var contains;
+          let value;
+          let needle;
+          let active;
+          let activeInList;
+          let contains;
           if (!(model instanceof CMS.Models.Relationship)) {
             return;
           }

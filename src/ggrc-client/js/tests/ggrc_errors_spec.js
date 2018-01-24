@@ -6,9 +6,9 @@
 'use strict';
 
 xdescribe('GGRC.Errors module', function () {
-  var notifier;
-  var trigger;
-  var _originalMessages;
+  let notifier;
+  let trigger;
+  let _originalMessages;
 
   beforeAll(function () {
     _originalMessages = _.assign({}, GGRC.Errors.messages);

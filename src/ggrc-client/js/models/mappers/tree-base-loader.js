@@ -13,8 +13,8 @@
       this.binding = instance.get_binding(mapping);
     },
     insertInstancesFromMappings: function (mappings) {
-      var self = this;
-      var result;
+      let self = this;
+      let result;
 
       result = can.map(can.makeArray(mappings), function (mapping) {
         return self.getResultFromMapping(mapping);
@@ -24,11 +24,11 @@
       });
     },
     getResultFromMapping: function (mapping) {
-      var binding = this.binding;
+      let binding = this.binding;
       return this.makeResult(mapping.reify(), binding);
     },
     makeResult: function (instance, binding) {
-      var result;
+      let result;
       if (instance instanceof CMS.Models.Person) {
         if (binding.instance.object_people &&
           binding.instance.object_people.length) {

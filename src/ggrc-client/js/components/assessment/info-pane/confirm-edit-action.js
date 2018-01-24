@@ -26,12 +26,12 @@ import {confirm} from '../../../plugins/utils/modals';
         }.bind(this));
       },
       isInEditableState: function () {
-        var editableStates = ['In Progress', 'Not Started', 'Rework Needed'];
+        let editableStates = ['In Progress', 'Not Started', 'Rework Needed'];
         return _.contains(editableStates, this.attr('instance.status'));
       },
       showConfirm: function () {
-        var self = this;
-        var confirmation = can.Deferred();
+        let self = this;
+        let confirmation = can.Deferred();
         confirm({
           modal_title: 'Confirm moving Assessment to "In Progress"',
           modal_description: 'You are about to move Assessment from "' +

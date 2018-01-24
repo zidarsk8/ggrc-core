@@ -21,10 +21,10 @@ import RefreshQueue from '../../models/refresh_queue';
     defaults: {}
   }, {
     init_spinner: function () {
-      var renderer;
-      var spinner;
-      var $footer;
-      var $wrapper;
+      let renderer;
+      let spinner;
+      let $footer;
+      let $wrapper;
 
       if (this.element) {
         $footer = this.element.children('.tree-item-add').first();
@@ -84,8 +84,8 @@ import RefreshQueue from '../../models/refresh_queue';
     },
 
     display: function (refetch) {
-      var that = this;
-      var loader = this.fetch_list.bind(this);
+      let that = this;
+      let loader = this.fetch_list.bind(this);
 
       if (refetch) {
         this._draw_list_deferred = null;
@@ -101,7 +101,7 @@ import RefreshQueue from '../../models/refresh_queue';
 
       this._display_deferred = this._display_deferred
         .then(this._ifNotRemoved(function () {
-          var dfds = [loader()];
+          let dfds = [loader()];
           if (that._init_view_deferred) {
             dfds.push(that._init_view_deferred);
           } else {
@@ -155,7 +155,7 @@ import RefreshQueue from '../../models/refresh_queue';
     },
 
     _loading_started: function () {
-      var $contentContainer;
+      let $contentContainer;
 
       if (!this._loading_deferred) {
         this._loading_deferred = can.Deferred();
@@ -173,7 +173,7 @@ import RefreshQueue from '../../models/refresh_queue';
     },
 
     _loading_finished: function () {
-      var loadingDeferred;
+      let loadingDeferred;
 
       if (this._loading_deferred) {
         this.element.trigger('loaded');
@@ -193,13 +193,13 @@ import RefreshQueue from '../../models/refresh_queue';
     },
 
     enqueue_items: function (items, isReload, forcePrepareChildren) {
-      var childTreeDisplayList = [];
-      var filteredItems = [];
-      var i;
-      var refreshedDeferred;
-      var that = this;
-      var parentModelName;
-      var parentInstanceType;
+      let childTreeDisplayList = [];
+      let filteredItems = [];
+      let i;
+      let refreshedDeferred;
+      let that = this;
+      let parentModelName;
+      let parentInstanceType;
       isReload = isReload === true;
 
       // find current widget model and check if first layer tree
@@ -238,12 +238,12 @@ import RefreshQueue from '../../models/refresh_queue';
       if (!isReload) {
         refreshedDeferred = $.when.apply($,
           can.map(filteredItems, function (item) {
-            var instance = item.instance || item;
+            let instance = item.instance || item;
             if (instance.custom_attribute_values &&
               !isSnapshot(instance)) {
               return instance.refresh_all('custom_attribute_values')
                 .then(function (values) {
-                  var rq = new RefreshQueue();
+                  let rq = new RefreshQueue();
                   _.each(values, function (value) {
                     if (value.attribute_object) {
                       rq.enqueue(value.attribute_object);
@@ -268,11 +268,11 @@ import RefreshQueue from '../../models/refresh_queue';
     },
 
     insert_items: function (items, forcePrepareChildren) {
-      var that = this;
-      var preppedItems = [];
-      var idMap = {};
-      var toInsert;
-      var dfd;
+      let that = this;
+      let preppedItems = [];
+      let idMap = {};
+      let toInsert;
+      let dfd;
 
       if (this.options.attr('is_subtree')) {
         // Check the list of items to be inserted for any duplicate items.
@@ -287,7 +287,7 @@ import RefreshQueue from '../../models/refresh_queue';
       }
 
       can.each(toInsert, function (item) {
-        var prepped = that.prepare_child_options(item, forcePrepareChildren);
+        let prepped = that.prepare_child_options(item, forcePrepareChildren);
         // Should we skip items without selfLink?
         if (prepped.instance.selfLink) {
           preppedItems.push(prepped);

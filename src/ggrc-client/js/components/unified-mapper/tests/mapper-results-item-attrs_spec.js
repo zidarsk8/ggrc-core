@@ -6,13 +6,13 @@
 describe('GGRC.Components.mapperResultsItemAttrs', function () {
   'use strict';
 
-  var viewModel;
-  var DEFAULT_ATTR_TEMPLATE =
+  let viewModel;
+  let DEFAULT_ATTR_TEMPLATE =
     GGRC.mustache_path + '/base_objects/tree-item-attr.mustache';
 
   beforeEach(function () {
-    var Component = GGRC.Components.get('mapperResultsItemAttrs');
-    var init = Component.prototype.viewModel.init;
+    let Component = GGRC.Components.get('mapperResultsItemAttrs');
+    let init = Component.prototype.viewModel.init;
     Component.prototype.viewModel.init = undefined;
     viewModel = GGRC.Components.getViewModel('mapperResultsItemAttrs');
     Component.prototype.viewModel.init = init;
@@ -22,7 +22,7 @@ describe('GGRC.Components.mapperResultsItemAttrs', function () {
   describe('init() method', function () {
     it('sets mustache template path to attributes view of model' +
     ' in viewModel.attrTemplate', function () {
-      var result;
+      let result;
       viewModel.attr('modelType', 'Control');
       viewModel.init();
       result = viewModel.attr('attrTemplate');
@@ -32,7 +32,7 @@ describe('GGRC.Components.mapperResultsItemAttrs', function () {
 
     it('sets default mustache template path in viewModel.attrTemplate' +
     ' if attributes view of model not defined', function () {
-      var result;
+      let result;
       viewModel.attr('modelType', 'AuditObject');
       viewModel.init();
       result = viewModel.attr('attrTemplate');

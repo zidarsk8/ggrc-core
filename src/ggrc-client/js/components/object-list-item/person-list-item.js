@@ -9,7 +9,7 @@ import template from './person-list-item.mustache';
 (function (can, GGRC, CMS) {
   'use strict';
 
-  var tag = 'person-list-item';
+  let tag = 'person-list-item';
   /**
    * Person List Item Component
    */
@@ -28,7 +28,7 @@ import template from './person-list-item.mustache';
         person: {
           Type: CMS.Models.Person,
           set: function (newVal, setVal) {
-            var actualPerson;
+            let actualPerson;
             if (!newVal.id) {
               setVal({});
               return;

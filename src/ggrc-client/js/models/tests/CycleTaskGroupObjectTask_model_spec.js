@@ -7,10 +7,10 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
   'use strict';
 
   describe('responseOptionsEditable method', function () {
-    var instance;
-    var method;  // the method under test
-    var Model;
-    var origCycleConfig;
+    let instance;
+    let method;  // the method under test
+    let Model;
+    let origCycleConfig;
 
     beforeAll(function () {
       Model = CMS.Models.CycleTaskGroupObjectTask;
@@ -41,7 +41,7 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
     it('returns false if the Task\'s Cycle is not current for ' +
       'a non-finished task',
       function () {
-        var isEditable;
+        let isEditable;
         instance.attr('status', 'InProgress');
         instance.cycle.attr('is_current', false);
 
@@ -52,8 +52,8 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
     );
 
     it('returns false if a Task in a current cycle is completed', function () {
-      var END_STATES = ['Verified', 'Finished'];
-      var isEditable;
+      let END_STATES = ['Verified', 'Finished'];
+      let isEditable;
 
       instance.cycle.attr('is_current', true);
 
@@ -66,7 +66,7 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
 
     it('returns true if a Task is in a current cycle and not completed',
       function () {
-        var isEditable;
+        let isEditable;
         instance.cycle.attr('is_current', true);
         instance.attr('status', 'InProgress');
 
@@ -78,7 +78,7 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
   });
 
   describe('form_preload method', function () {
-    var instance;
+    let instance;
 
     beforeEach(function () {
       instance = new CMS.Models.CycleTaskGroupObjectTask({
@@ -92,11 +92,11 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
     it('populates the workflow and related objects ' +
       'when creating new task from workflow page',
     function () {
-      var cycles = [{
+      let cycles = [{
         id: 'cycle id',
         is_current: true}];
 
-      var workflow = new CMS.Models.Workflow({
+      let workflow = new CMS.Models.Workflow({
         id: 'workflow id',
         context: {
           id: 'context id',

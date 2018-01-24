@@ -6,11 +6,11 @@
 describe('GGRC.Components.mapperResultsItemDetails', function () {
   'use strict';
 
-  var Component;
-  var viewModel;
+  let Component;
+  let viewModel;
 
   beforeEach(function () {
-    var init;
+    let init;
     Component = GGRC.Components.get('mapperResultsItemDetails');
     init = Component.prototype.viewModel.init;
     Component.prototype.viewModel.init = undefined;
@@ -20,7 +20,7 @@ describe('GGRC.Components.mapperResultsItemDetails', function () {
   });
 
   describe('init() method', function () {
-    var instance;
+    let instance;
     beforeEach(function () {
       instance = {
         type: 'Control'
@@ -28,8 +28,8 @@ describe('GGRC.Components.mapperResultsItemDetails', function () {
       viewModel.attr('instance', instance);
     });
     it('sets correct instance for Snapshot objects', function () {
-      var result;
-      var snapshotInstance = {
+      let result;
+      let snapshotInstance = {
         snapshotObject: 'snapshotObject'
       };
       viewModel.attr('instance', snapshotInstance);
@@ -39,7 +39,7 @@ describe('GGRC.Components.mapperResultsItemDetails', function () {
     });
 
     it('sets model for non-snapshot objects', function () {
-      var result;
+      let result;
       viewModel.init();
       result = viewModel.attr('model');
       expect(result.model_singular)

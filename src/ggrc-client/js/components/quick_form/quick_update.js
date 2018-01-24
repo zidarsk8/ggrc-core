@@ -36,9 +36,9 @@
       //  to a connected object (assuming we are operating on a proxy object) will trigger
       //  a deletion of the proxy object and creation of a new one.
       autocomplete_select : function(el, event, ui) {
-        var that = this;
+        let that = this;
         setTimeout(function() {
-          var serial = that.scope.instance.serialize();
+          let serial = that.scope.instance.serialize();
           delete serial[el.attr("name")];
           delete serial[el.attr("name") + "_id"];
           delete serial[el.attr("name") + "_type"];
@@ -65,8 +65,8 @@
       //  mapping to a parent instance.  The mapping_autocomplete helper defined below is
       //  generally for these.
       "input:not([data-mapping]), select change" : function(el) {
-        var isCheckbox = el.is("[type=checkbox][multiple]");
-        var isDropdown = el.is('select');
+        let isCheckbox = el.is("[type=checkbox][multiple]");
+        let isDropdown = el.is('select');
         if (isCheckbox) {
           if(!this.scope.instance[el.attr("name")]) {
             this.scope.instance.attr(el.attr("name"), new can.List());

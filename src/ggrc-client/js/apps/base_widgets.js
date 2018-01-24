@@ -8,7 +8,7 @@
   /**
    * Tree View Widgets Configuration module
    */
-  var allCoreTypes = [
+  let allCoreTypes = [
     'AccessGroup',
     'Assessment',
     'AssessmentTemplate',
@@ -38,7 +38,7 @@
   ];
   // NOTE: Widgets that have the order value are sorted by an increase values,
   // the rest of widgets are sorted alphabetically
-  var defaultOrderTypes = {
+  let defaultOrderTypes = {
     Standard: 10,
     Regulation: 20,
     Section: 30,
@@ -51,28 +51,28 @@
     Person: 100,
   };
   // Items allowed for mapping via snapshot.
-  var snapshotWidgetsConfig = GGRC.config.snapshotable_objects || [];
-  var objectVersions = _.map(snapshotWidgetsConfig, function (obj) {
+  let snapshotWidgetsConfig = GGRC.config.snapshotable_objects || [];
+  let objectVersions = _.map(snapshotWidgetsConfig, function (obj) {
     return obj + '_versions';
   });
 
   // Items allowed for relationship mapping
-  var excludeMappingConfig = [
+  let excludeMappingConfig = [
     'AssessmentTemplate',
   ];
   // Extra Tree View Widgets require to be rendered on Audit View
-  var auditInclusion = [
+  let auditInclusion = [
     'Assessment',
     'Person',
     'Program',
     'Issue',
   ];
-  var baseWidgetsByType;
+  let baseWidgetsByType;
 
-  var filteredTypes = _.difference(allCoreTypes, excludeMappingConfig);
+  let filteredTypes = _.difference(allCoreTypes, excludeMappingConfig);
   // Audit is excluded and created a separate logic for it
 
-  var objectVersionWidgets = {};
+  let objectVersionWidgets = {};
   snapshotWidgetsConfig.forEach(function (model) {
     objectVersionWidgets[model + '_versions'] = [model];
   });

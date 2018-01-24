@@ -6,8 +6,8 @@
 describe('GGRC component registry', function () {
   'use strict';
 
-  var origStorage;  // the existing component private storage
-  var Components;  // the component registry utility
+  let origStorage;  // the existing component private storage
+  let Components;  // the component registry utility
 
   beforeAll(function () {
     Components = GGRC.Components;
@@ -23,8 +23,8 @@ describe('GGRC component registry', function () {
   });
 
   describe('using the Components registry as a function', function () {
-    var componentConfig;
-    var fakeComponent;
+    let componentConfig;
+    let fakeComponent;
 
     beforeEach(function () {
       componentConfig = {
@@ -43,14 +43,14 @@ describe('GGRC component registry', function () {
     });
 
     it('returns the newly created component', function () {
-      var result;
+      let result;
       delete Components._registry.foo;
       result = Components('foo', componentConfig);
       expect(result).toBe(fakeComponent);
     });
 
     it('throws an error if a component is already registered', function () {
-      var componentConfig = {};
+      let componentConfig = {};
 
       Components._registry.foo = function FooBar() {};
 
@@ -62,7 +62,7 @@ describe('GGRC component registry', function () {
 
     it('throws an error if registering a component under a blank name',
       function () {
-        var componentConfig = {};
+        let componentConfig = {};
 
         expect(function () {
           Components('', componentConfig);
@@ -72,7 +72,7 @@ describe('GGRC component registry', function () {
     );
 
     it('throws an error if the given name is not a string', function () {
-      var componentConfig = {};
+      let componentConfig = {};
 
       expect(function () {
         Components(123, componentConfig);
@@ -113,7 +113,7 @@ describe('GGRC component registry', function () {
 
   describe('get() method', function () {
     it('returns the component registered under the given name', function () {
-      var componentFoo = function () {};
+      let componentFoo = function () {};
       Components._registry.foo = componentFoo;
       expect(Components.get('foo')).toBe(componentFoo);
     });
@@ -132,8 +132,8 @@ describe('GGRC component registry', function () {
     it('gets the component\'s viewModel' +
       'by registered component\'s name' +
       ' and viewModel is defined as simple Object', function () {
-      var componentFoo = function () {};
-      var viewModel = {a: 1, b: 2};
+      let componentFoo = function () {};
+      let viewModel = {a: 1, b: 2};
       componentFoo.prototype.viewModel = viewModel;
       Components._registry.foo = componentFoo;
       expect(Components.getViewModel('foo').attr().a).toBe(viewModel.a);
@@ -143,8 +143,8 @@ describe('GGRC component registry', function () {
     it('gets the component\'s viewModel' +
       'by registered component\'s name' +
       ' and viewModel is defined as Can Map Object', function () {
-      var componentFoo = function () {};
-      var viewModel = can.Map.extend({a: 1, b: 2});
+      let componentFoo = function () {};
+      let viewModel = can.Map.extend({a: 1, b: 2});
       componentFoo.prototype.viewModel = viewModel;
       Components._registry.foo = componentFoo;
       // create new Instance
@@ -164,10 +164,10 @@ describe('GGRC component registry', function () {
   });
 
   describe('casting default values', function () {
-    var componentConfig;
-    var template;
-    var frag;
-    var control;
+    let componentConfig;
+    let template;
+    let frag;
+    let control;
 
     beforeEach(function () {
       template = null;

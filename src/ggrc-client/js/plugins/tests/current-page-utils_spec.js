@@ -9,7 +9,7 @@ import * as CurrentPageUtils from '../utils/current-page-utils';
 import * as QueryAPI from '../utils/query-api-utils';
 
 describe('GGRC Utils CurrentPage', function () {
-  var pageType;
+  let pageType;
 
   beforeAll(() => {
     pageType = GGRC.pageType;
@@ -31,7 +31,7 @@ describe('GGRC Utils CurrentPage', function () {
     GGRC.pageType = undefined;
   });
   describe('getPageType() method', function () {
-    var method;
+    let method;
 
     beforeEach(function () {
       method = CurrentPageUtils.getPageType;
@@ -48,7 +48,7 @@ describe('GGRC Utils CurrentPage', function () {
   });
 
   describe('isMyAssessments() method', function () {
-    var method;
+    let method;
 
     beforeEach(function () {
       method = CurrentPageUtils.isMyAssessments;
@@ -70,7 +70,7 @@ describe('GGRC Utils CurrentPage', function () {
   });
 
   describe('isMyWork() method', function () {
-    var method;
+    let method;
 
     beforeEach(function () {
       method = CurrentPageUtils.isMyWork;
@@ -92,7 +92,7 @@ describe('GGRC Utils CurrentPage', function () {
   });
 
   describe('isAdmin() method', function () {
-    var method;
+    let method;
 
     beforeEach(function () {
       method = CurrentPageUtils.isAdmin;
@@ -114,7 +114,7 @@ describe('GGRC Utils CurrentPage', function () {
   });
 
   describe('isObjectContextPage() method', function () {
-    var method;
+    let method;
 
     beforeEach(function () {
       method = CurrentPageUtils.isObjectContextPage;
@@ -131,7 +131,7 @@ describe('GGRC Utils CurrentPage', function () {
   });
 
   describe('getWidgetList() method', function () {
-    var method;
+    let method;
 
     beforeEach(function () {
       spyOn(GGRC.WidgetList, 'get_widget_list_for')
@@ -144,36 +144,36 @@ describe('GGRC Utils CurrentPage', function () {
     });
 
     it('returns an empty object when model is not provided', function () {
-      var result = method('', 'assessments_view');
+      let result = method('', 'assessments_view');
 
       expect(result.assessment).toBeUndefined();
     });
 
     it('returns assessments widget for assessment view', function () {
-      var result = method('assessment', '/assessments_view');
-      var keys = Object.keys(result);
+      let result = method('assessment', '/assessments_view');
+      let keys = Object.keys(result);
 
       expect(keys.length).toEqual(1);
       expect(keys).toContain('assessment');
     });
 
     it('returns widgets for non-assessment view', function () {
-      var result = method('assessment', '/controls_view');
-      var keys = Object.keys(result);
+      let result = method('assessment', '/controls_view');
+      let keys = Object.keys(result);
 
       expect(keys.length).toEqual(3);
     });
   });
 
   describe('getDefaultWidgets() method', function () {
-    var method;
+    let method;
 
     beforeEach(function () {
       method = CurrentPageUtils.getDefaultWidgets;
     });
 
     it('should return "Info" widget for non-object browser path', function () {
-      var result = method({
+      let result = method({
         control: {},
         assessment: {},
         objective: {},
@@ -184,7 +184,7 @@ describe('GGRC Utils CurrentPage', function () {
     });
 
     it('should return "Info" widget for non-object browser path', function () {
-      var result = method({
+      let result = method({
         control: {},
         assessment: {},
         objective: {},
@@ -196,7 +196,7 @@ describe('GGRC Utils CurrentPage', function () {
   });
 
   describe('getWidgetModels() method', function () {
-    var method;
+    let method;
 
     beforeEach(function () {
       spyOn(GGRC.WidgetList, 'get_widget_list_for')
@@ -237,20 +237,20 @@ describe('GGRC Utils CurrentPage', function () {
     });
 
     it('returns an empty array when model is not provided', function () {
-      var result = method('', 'assessments_view');
+      let result = method('', 'assessments_view');
 
       expect(result.length).toEqual(0);
     });
 
     it('returns assessment model name only for assessment view', function () {
-      var result = method('assessment', '/assessments_view');
+      let result = method('assessment', '/assessments_view');
 
       expect(result).toContain('Assessment');
     });
 
     it('returns appropriate models for non-assessment view',
       function () {
-        var result = method('assessment', '/controls_view');
+        let result = method('assessment', '/controls_view');
 
         expect(result).toContain('Assessment');
         expect(result).toContain('Control');
@@ -260,7 +260,7 @@ describe('GGRC Utils CurrentPage', function () {
 
     it('returns non-info models for object browser view',
       function () {
-        var result = method('assessment', '/objectBrowser/');
+        let result = method('assessment', '/objectBrowser/');
 
         expect(result).toContain('Assessment');
         expect(result).toContain('Control');
@@ -270,10 +270,10 @@ describe('GGRC Utils CurrentPage', function () {
   });
 
   describe('initCounts() method', function () {
-    var method;
-    var queryDfd;
-    var getCounts;
-    var id = 1;
+    let method;
+    let queryDfd;
+    let getCounts;
+    let id = 1;
 
     beforeEach(function () {
       queryDfd = can.Deferred();
@@ -313,7 +313,7 @@ describe('GGRC Utils CurrentPage', function () {
     });
 
     it('should init counts for snapshotable objects', function () {
-      var result;
+      let result;
 
       method(['Control'], 'Assessment', 1);
 
@@ -335,7 +335,7 @@ describe('GGRC Utils CurrentPage', function () {
     });
 
     it('should init counts for non-snapshotable objects', function () {
-      var result;
+      let result;
 
       method(['Assessment'], 'Control', 1);
 
@@ -358,7 +358,7 @@ describe('GGRC Utils CurrentPage', function () {
     });
 
     it('should init counts for virtual objects', function () {
-      var result;
+      let result;
 
       method([{
         name: 'Cycle',
@@ -384,11 +384,11 @@ describe('GGRC Utils CurrentPage', function () {
   });
 
   describe('initMappedInstances() method', function () {
-    var requestDfds = [];
-    var method;
+    let requestDfds = [];
+    let method;
 
     beforeEach(function () {
-      var requestDfd;
+      let requestDfd;
 
       spyOn(QueryAPI, 'buildRelevantIdsQuery')
         .and.callFake(function (objName, page, relevant, additionalFilter) {
@@ -419,7 +419,7 @@ describe('GGRC Utils CurrentPage', function () {
 
     it('should init mappings for snapshotable objects',
       function (done) {
-        var snapshotIds = [1, 2, 3];
+        let snapshotIds = [1, 2, 3];
 
         function validateResult(result) {
           snapshotIds.forEach(function (id) {
@@ -443,7 +443,7 @@ describe('GGRC Utils CurrentPage', function () {
 
     it('should init mappings for non-snapshotable objects',
       function (done) {
-        var nonSnapshotIds = [4, 5, 6];
+        let nonSnapshotIds = [4, 5, 6];
 
         function validateResult(result) {
           nonSnapshotIds.forEach(function (id) {
@@ -468,8 +468,8 @@ describe('GGRC Utils CurrentPage', function () {
   });
 
   describe('refreshCounts() method', function () {
-    var widgets;
-    var refreshCounts;
+    let widgets;
+    let refreshCounts;
     let countsMap;
 
     beforeEach(function () {
@@ -520,8 +520,8 @@ describe('GGRC Utils CurrentPage', function () {
     it('should reinit counts', function (done) {
       refreshCounts()
         .then(function (counts) {
-          var reqParams;
-          var reqParamNames;
+          let reqParams;
+          let reqParamNames;
 
           expect(can.ajax.calls.count()).toEqual(1);
           reqParams = JSON.parse(can.ajax.calls.argsFor(0)[0].data);

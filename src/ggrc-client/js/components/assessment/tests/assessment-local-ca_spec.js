@@ -14,7 +14,7 @@ describe('assessmentLocalCa component', () => {
   });
 
   describe('canEdit getter', () => {
-    var spy;
+    let spy;
 
     beforeEach(() => {
       spy = spyOn(Permission, 'is_allowed_for');
@@ -46,10 +46,10 @@ describe('assessmentLocalCa component', () => {
   });
 
   describe('check performValidation', function () {
-    var inputField;
-    var dropdownField;
-    var checkboxField;
-    var performValidation;
+    let inputField;
+    let dropdownField;
+    let checkboxField;
+    let performValidation;
 
     beforeEach(function () {
       viewModel.attr('evidenceAmount', 0);

@@ -6,7 +6,7 @@
 describe('GGRC.query_parser', function () {
   'use strict';
 
-  var parserStructure = {
+  let parserStructure = {
     parse: jasmine.any(Function),
     join_queries: jasmine.any(Function),
     generated: {
@@ -21,7 +21,7 @@ describe('GGRC.query_parser', function () {
 
   describe('parse', function () {
     it('parses an empty query', function () {
-      var emptyResult = {
+      let emptyResult = {
         expression: {},
         keys: [],
         order_by: {keys: [], order: '', compare: null},
@@ -35,7 +35,7 @@ describe('GGRC.query_parser', function () {
     });
 
     it('parses exclude text search queries', function () {
-      var textSearchQueries = [
+      let textSearchQueries = [
         '!~a',
         '!~word',
         '!~ --this --is',
@@ -46,7 +46,7 @@ describe('GGRC.query_parser', function () {
       ];
 
       can.each(textSearchQueries, function (queryStr) {
-        var text = queryStr.replace('!~', '').trim();
+        let text = queryStr.replace('!~', '').trim();
         expect(GGRC.query_parser.parse(queryStr)).toEqual({
           expression: {
             text: text,
@@ -59,7 +59,7 @@ describe('GGRC.query_parser', function () {
     });
 
     it('parses text search queries', function () {
-      var textSearchQueries = [
+      let textSearchQueries = [
         'a',
         'word',
         ' --this --is',
@@ -74,7 +74,7 @@ describe('GGRC.query_parser', function () {
       ];
 
       can.each(textSearchQueries, function (queryStr) {
-        var text = queryStr.replace('~', '').trim();
+        let text = queryStr.replace('~', '').trim();
         expect(GGRC.query_parser.parse(queryStr)).toEqual({
           expression: {
             text: text,
@@ -108,7 +108,7 @@ describe('GGRC.query_parser', function () {
         ];
 
         can.each(simpleQueries, function (queryStr) {
-          var query = queryStr.split(op);
+          let query = queryStr.split(op);
           expect(GGRC.query_parser.parse(queryStr)).toEqual({
             expression: {
               left: query[0].trim().replace(/"/g, ''),
@@ -333,7 +333,7 @@ describe('GGRC.query_parser', function () {
     });
 
     it('correctly handles escaped symbols inside quotes', function () {
-      var queries = [
+      let queries = [
         'title ~ "test\\\\"',
         'title ~ "test\\%"',
         'title ~ "test\\_"',
@@ -341,15 +341,15 @@ describe('GGRC.query_parser', function () {
       ];
 
       _.each(queries, function (query) {
-        var value = query.split('~')[1].trim().replace(/^"|"$/g, '');
-        var result = GGRC.query_parser.parse(query);
+        let value = query.split('~')[1].trim().replace(/^"|"$/g, '');
+        let result = GGRC.query_parser.parse(query);
 
         expect(result.expression.right).toEqual(value);
       });
     });
 
     it('correctly handles escaped symbols outside quotes', function () {
-      var queries = [
+      let queries = [
         'title ~ test\\\\',
         'title ~ test\\%',
         'title ~ test\\_',
@@ -357,25 +357,25 @@ describe('GGRC.query_parser', function () {
       ];
 
       _.each(queries, function (query) {
-        var value = query.split('~')[1].trim();
-        var result = GGRC.query_parser.parse(query);
+        let value = query.split('~')[1].trim();
+        let result = GGRC.query_parser.parse(query);
 
         expect(result.expression.right).toEqual(value);
       });
     });
 
     it('does not change escaped symbols in case of text search', function () {
-      var query = 'some \\\\ test \\% \\_ query';
+      let query = 'some \\\\ test \\% \\_ query';
 
-      var result = GGRC.query_parser.parse(query);
+      let result = GGRC.query_parser.parse(query);
 
       expect(result.expression.op.name).toBe('text_search');
       expect(result.expression.text).toBe(query);
     });
 
     it('correctly handles escaped symbol inside attribute name', function () {
-      var query = '"my \\" quote" ~ aaa';
-      var result = GGRC.query_parser.parse(query);
+      let query = '"my \\" quote" ~ aaa';
+      let result = GGRC.query_parser.parse(query);
 
       expect(result.expression.left).toEqual('my \\" quote');
     });
@@ -383,7 +383,7 @@ describe('GGRC.query_parser', function () {
 
   describe('join_queries', function () {
     it('joins two queries with AND by default', function () {
-      var sameQueries = [
+      let sameQueries = [
         ['a=b and c=d', 'a=b', 'c=d'],
         ['(a=b) and (c=d)', 'a=b', 'c=d'],
         ['(a=b or c=A) and (c=d)', 'a=b or c=A', 'c=d'],
@@ -409,7 +409,7 @@ describe('GGRC.query_parser', function () {
     });
 
     it('joins two queries with OR', function () {
-      var sameQueries = [
+      let sameQueries = [
         ['a=b or c=d', 'a=b', 'c=d'],
         ['(a=b) or (c=d)', 'a=b', 'c=d'],
         ['(a=b and c=A) or (c=d)', 'a=b and c=A', 'c=d'],

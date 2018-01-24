@@ -6,20 +6,20 @@
 describe('GGRC.Components.reminder', function () {
   'use strict';
 
-  var Component;  // the component under test
+  let Component;  // the component under test
 
   beforeAll(function () {
     Component = GGRC.Components.get('reminder');
   });
 
   describe('reminder() method', function () {
-    var eventObj;
-    var instance;
-    var method;  // the method under test
-    var pendingRefresh;
-    var pendingSave;
-    var scope;
-    var $element;
+    let eventObj;
+    let instance;
+    let method;  // the method under test
+    let pendingRefresh;
+    let pendingSave;
+    let scope;
+    let $element;
 
     beforeEach(function () {
       pendingRefresh = new can.Deferred();

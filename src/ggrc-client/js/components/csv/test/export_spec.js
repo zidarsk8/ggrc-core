@@ -10,8 +10,8 @@ describe('GGRC.Components.exportGroup', function () {
 
   describe('events', function () {
     describe('inserted() method', function () {
-      var method;  // the method under test
-      var that;
+      let method;  // the method under test
+      let that;
 
       beforeEach(function () {
         that = {
@@ -28,9 +28,9 @@ describe('GGRC.Components.exportGroup', function () {
       });
     });
     describe('addPanel() method', function () {
-      var method;  // the method under test
-      var data;
-      var viewModel;
+      let method;  // the method under test
+      let data;
+      let viewModel;
 
       beforeEach(function () {
         viewModel = new can.Map({
@@ -73,8 +73,8 @@ describe('GGRC.Components.exportGroup', function () {
 describe('GGRC.Components.exportPanel', function () {
   'use strict';
 
-  var viewModel;
-  var modelAttributeDefenitions = {
+  let viewModel;
+  let modelAttributeDefenitions = {
     Assessment: [
       {
         display_name: 'Code',
@@ -112,10 +112,10 @@ describe('GGRC.Components.exportPanel', function () {
   });
 
   describe('refreshItems functions', function () {
-    var refreshItemsFunction;
+    let refreshItemsFunction;
 
     beforeEach(function () {
-      var panelModel = new can.Map({
+      let panelModel = new can.Map({
         attributes: new can.List(),
         localAttributes: new can.List(),
         mappings: new can.List(),
@@ -131,8 +131,8 @@ describe('GGRC.Components.exportPanel', function () {
     });
 
     it('refreshItems function should set item', function () {
-      var mappingsItem;
-      var attributesItem;
+      let mappingsItem;
+      let attributesItem;
 
       refreshItemsFunction();
 
@@ -149,7 +149,7 @@ describe('GGRC.Components.exportPanel', function () {
   });
 
   describe('filterModelAttributes functions', function () {
-    var filterModelAttributesFunc;
+    let filterModelAttributesFunc;
 
     beforeEach(function () {
       filterModelAttributesFunc = viewModel.filterModelAttributes
@@ -157,8 +157,8 @@ describe('GGRC.Components.exportPanel', function () {
     });
 
     it('filterModelAttributes should return TRUE', function () {
-      var item = modelAttributeDefenitions.Assessment[0];
-      var predicate = item.type !== 'mapping';
+      let item = modelAttributeDefenitions.Assessment[0];
+      let predicate = item.type !== 'mapping';
 
       expect(filterModelAttributesFunc(item, predicate))
         .toBe(true);
@@ -166,8 +166,8 @@ describe('GGRC.Components.exportPanel', function () {
 
     it('filterModelAttributes should return FALSE. Wrong predicate',
       function () {
-        var item = modelAttributeDefenitions.Assessment[0];
-        var predicate = item.type === 'mapping';
+        let item = modelAttributeDefenitions.Assessment[0];
+        let predicate = item.type === 'mapping';
 
         expect(filterModelAttributesFunc(item, predicate))
           .toBe(false);
@@ -176,8 +176,8 @@ describe('GGRC.Components.exportPanel', function () {
 
     it('filterModelAttributes should return FALSE. import_only is true',
       function () {
-        var item = modelAttributeDefenitions.Assessment[2];
-        var predicate = item.type === 'mapping';
+        let item = modelAttributeDefenitions.Assessment[2];
+        let predicate = item.type === 'mapping';
 
         expect(filterModelAttributesFunc(item, predicate))
           .toBe(false);
@@ -186,8 +186,8 @@ describe('GGRC.Components.exportPanel', function () {
 
     it('filterModelAttributes should return FALSE. unmapped item',
       function () {
-        var item = modelAttributeDefenitions.Assessment[4];
-        var predicate = item.type === 'mapping';
+        let item = modelAttributeDefenitions.Assessment[4];
+        let predicate = item.type === 'mapping';
 
         expect(filterModelAttributesFunc(item, predicate))
           .toBe(false);

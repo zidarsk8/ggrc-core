@@ -7,7 +7,7 @@ import RefreshQueue from './models/refresh_queue';
 import Permission from './permission';
 
 (function (can, $) {
-  var Mustache = can.Mustache;
+  let Mustache = can.Mustache;
   /*
    sort_index_at_end mustache helper
 
@@ -21,12 +21,12 @@ import Permission from './permission';
    @param list a list of objects or bindings
    */
   Mustache.registerHelper('sort_index_at_end', function (list, options) {
-    var max_int = Number.MAX_SAFE_INTEGER.toString(10);
-    var list_max = '0';
+    let max_int = Number.MAX_SAFE_INTEGER.toString(10);
+    let list_max = '0';
 
     list = Mustache.resolve(list);
     can.each(list, function (item) {
-      var idx;
+      let idx;
       if (item.reify) {
         item = item.reify();
       }
@@ -59,14 +59,14 @@ import Permission from './permission';
    @hashbparam inverse whether to invert the boolean check of val.
    */
   Mustache.registerHelper('sortable_if', function () {
-    var args = can.makeArray(arguments).slice(0, arguments.length - 1);
-    var options = arguments[arguments.length - 1];
-    var inverse = options.hash && options.hash.inverse;
+    let args = can.makeArray(arguments).slice(0, arguments.length - 1);
+    let options = arguments[arguments.length - 1];
+    let inverse = options.hash && options.hash.inverse;
 
     return function (el) {
       can.view.live.attributes(el, can.compute(function () {
-        var val = Mustache.resolve(args[0]);
-        var sortable_opts = args[1];
+        let val = Mustache.resolve(args[0]);
+        let sortable_opts = args[1];
 
         if (val ^ inverse) {  // value XOR inverse, one must be true, one false
           $(el).sortable(JSON.parse(sortable_opts || '{}'));

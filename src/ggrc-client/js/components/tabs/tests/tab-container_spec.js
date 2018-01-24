@@ -6,13 +6,13 @@
 describe('GGRC.Components.tabContainer', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   describe('setActivePanel() method ', function () {
-    var selectedScope;
-    var secondScope;
-    var thirdScope;
-    var selectionIndex = Date.now();
+    let selectedScope;
+    let secondScope;
+    let thirdScope;
+    let selectionIndex = Date.now();
 
     beforeEach(function () {
       viewModel = GGRC.Components.getViewModel('tabContainer');
@@ -36,7 +36,7 @@ describe('GGRC.Components.tabContainer', function () {
 
     it('should select panel with correct tabIndex', function () {
       // Get index of selectedScope
-      var index = viewModel.attr('panels').indexOf(selectedScope);
+      let index = viewModel.attr('panels').indexOf(selectedScope);
 
       viewModel.setActivePanel(selectedScope.attr('tabIndex'));
 
@@ -45,8 +45,8 @@ describe('GGRC.Components.tabContainer', function () {
   });
 
   describe('setDefaultActivePanel() method ', function () {
-    var scope;
-    var secondScope;
+    let scope;
+    let secondScope;
 
     beforeEach(function () {
       viewModel = GGRC.Components.getViewModel('tabContainer');

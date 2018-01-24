@@ -6,7 +6,7 @@
 describe('GGRC.Components.revisionLogData', function () {
   'use strict';
 
-  var viewModel;
+  let viewModel;
 
   beforeAll(function () {
     viewModel = GGRC.Components.getViewModel('revisionLogData');

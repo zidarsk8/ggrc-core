@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-var viewModel = can.Map.extend({
+let viewModel = can.Map.extend({
   toState: '@',
   changeState: function (newState) {
     this.dispatch({
@@ -13,9 +13,9 @@ var viewModel = can.Map.extend({
   },
 });
 
-var events = {
+let events = {
   click: function (element, event) {
-    var newState = this.viewModel.attr('toState');
+    let newState = this.viewModel.attr('toState');
     this.viewModel.changeState(newState);
     event.preventDefault();
   },

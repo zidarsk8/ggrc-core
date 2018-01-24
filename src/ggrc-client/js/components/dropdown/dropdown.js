@@ -21,10 +21,10 @@ import template from './dropdown.mustache';
       define: {
         options: {
           get: function () {
-            var isGroupedDropdown = this.attr('isGroupedDropdown');
-            var optionsGroups = this.attr('optionsGroups');
-            var noneValue = this.attr('noValueLabel') || '--';
-            var none = isGroupedDropdown ?
+            let isGroupedDropdown = this.attr('isGroupedDropdown');
+            let optionsGroups = this.attr('optionsGroups');
+            let noneValue = this.attr('noValueLabel') || '--';
+            let none = isGroupedDropdown ?
               [{
                 group: noneValue,
                 subitems: [{title: noneValue, value: ''}]
@@ -33,7 +33,7 @@ import template from './dropdown.mustache';
                 title: noneValue,
                 value: ''
               }];
-            var list = [];
+            let list = [];
             if (!isGroupedDropdown) {
               list = can.map(this.attr('optionsList') || [], function (option) {
                 if (_.isString(option)) {
@@ -46,7 +46,7 @@ import template from './dropdown.mustache';
               });
             } else {
               list = can.Map.keys(optionsGroups).map(function (key) {
-                var group = optionsGroups.attr(key);
+                let group = optionsGroups.attr(key);
                 return {
                   group: group.attr('name'),
                   subitems: group.attr('items').map(function (item) {
@@ -84,10 +84,10 @@ import template from './dropdown.mustache';
       isDisabled: false
     },
     init: function (element, options) {
-      var $el = $(element);
-      var attrVal = $el.attr('is-disabled');
-      var disable;
-      var viewModel = this.viewModel;
+      let $el = $(element);
+      let attrVal = $el.attr('is-disabled');
+      let disable;
+      let viewModel = this.viewModel;
 
       // By default CanJS evaluates the component element's attribute values in
       // the current context, but we want to support passing in literal values

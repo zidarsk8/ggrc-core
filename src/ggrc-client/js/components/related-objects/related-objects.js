@@ -13,7 +13,7 @@ import Pagination from '../base-objects/pagination';
 (function (can, GGRC, CMS) {
   'use strict';
 
-  var defaultOrderBy = 'created_at';
+  let defaultOrderBy = 'created_at';
 
   GGRC.Components('relatedObjects', {
     tag: 'related-objects',
@@ -49,10 +49,10 @@ import Pagination from '../base-objects/pagination';
       selectedItem: {},
       objectSelectorEl: '.grid-data__action-column button',
       getFilters: function (id, type) {
-        var predefinedFilter = this.attr('predefinedFilter');
-        var filters;
+        let predefinedFilter = this.attr('predefinedFilter');
+        let filters;
 
-        var hasSimilar = _.includes(['Assessment', 'Control', 'Objective'],
+        let hasSimilar = _.includes(['Assessment', 'Control', 'Objective'],
           this.attr('baseInstance.type'));
 
         if (predefinedFilter) {
@@ -69,12 +69,12 @@ import Pagination from '../base-objects/pagination';
         return filters;
       },
       getParams: function () {
-        var id;
-        var type;
-        var relatedType = this.attr('relatedItemsType');
-        var isSnapshot = !!this.attr('baseInstance.snapshot');
-        var filters;
-        var params = {};
+        let id;
+        let type;
+        let relatedType = this.attr('relatedItemsType');
+        let isSnapshot = !!this.attr('baseInstance.snapshot');
+        let filters;
+        let params = {};
 
         if (isSnapshot) {
           id = this.attr('baseInstance.snapshot.child_id');
@@ -93,16 +93,16 @@ import Pagination from '../base-objects/pagination';
         return params;
       },
       loadRelatedItems: function () {
-        var dfd = can.Deferred();
-        var params = this.getParams();
+        let dfd = can.Deferred();
+        let params = this.getParams();
         this.attr('isLoading', true);
 
         makeRequest(params)
           .done(function (responseArr) {
-            var relatedType = this.attr('relatedItemsType');
-            var data = responseArr[0];
-            var values = data[relatedType].values;
-            var result = values.map(function (item) {
+            let relatedType = this.attr('relatedItemsType');
+            let data = responseArr[0];
+            let values = data[relatedType].values;
+            let result = values.map(function (item) {
               return {
                 instance: CMS.Models[relatedType].model(item),
               };
@@ -120,8 +120,8 @@ import Pagination from '../base-objects/pagination';
         return dfd;
       },
       getSortingInfo: function () {
-        var orderBy = this.attr('orderBy');
-        var defaultOrder;
+        let orderBy = this.attr('orderBy');
+        let defaultOrder;
 
         if (!orderBy.attr('field')) {
           defaultOrder = this.attr('initialOrderBy') || defaultOrderBy;

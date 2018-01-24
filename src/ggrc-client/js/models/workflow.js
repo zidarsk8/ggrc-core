@@ -82,10 +82,10 @@
   }, {
     save: function () {
       const dfd = new can.Deferred();
-      var taskGroupTitle = this.task_group_title;
-      var isNew = this.isNew();
-      var redirectLink;
-      var taskGroup;
+      let taskGroupTitle = this.task_group_title;
+      let isNew = this.isNew();
+      let redirectLink;
+      let taskGroup;
 
       this._super(...arguments)
         .then((instance) => {

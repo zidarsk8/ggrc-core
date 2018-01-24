@@ -43,11 +43,11 @@ import template from './person.mustache';
      * @param {Object} options - the component instantiation options
      */
     init: function (element, options) {
-      var scope = this.scope;
-      var personId = scope.attr('personId');
-      var person = scope.attr('personObj');
-      var personModel;
-      var noPerson = _.isEmpty(
+      let scope = this.scope;
+      let personId = scope.attr('personId');
+      let person = scope.attr('personObj');
+      let personModel;
+      let noPerson = _.isEmpty(
         person && person.serialize ? person.serialize() : person);
 
       if (noPerson && isNaN(personId)) {

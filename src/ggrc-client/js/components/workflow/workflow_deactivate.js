@@ -12,7 +12,7 @@
     template: "<content/>",
     events: {
       click: function() {
-        var workflow = GGRC.page_instance();
+        let workflow = GGRC.page_instance();
         workflow.refresh().then(function(workflow) {
           workflow.attr('recurrences', false).save();
         });

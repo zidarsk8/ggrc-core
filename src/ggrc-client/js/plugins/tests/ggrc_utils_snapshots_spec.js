@@ -7,7 +7,7 @@ import * as SnapshotUtils from '../utils/snapshot-utils';
 
 describe('SnapshotUtils', function () {
   describe('isSnapshotType() method', function () {
-    var instance;
+    let instance;
 
     beforeEach(function () {
       instance = {
@@ -36,20 +36,20 @@ describe('SnapshotUtils', function () {
   describe('getSnapshotItemQuery() method', function () {
     it('getSnapshotItemQuery() should return correct expression',
       function () {
-        var relevantInstance = {
+        let relevantInstance = {
           type: 'Assessment',
           viewLink: '/assessments/123'
         };
-        var childId = 10;
-        var childType = 'Control';
+        let childId = 10;
+        let childType = 'Control';
 
-        var query = SnapshotUtils
+        let query = SnapshotUtils
           .getSnapshotItemQuery(relevantInstance, childId, childType);
 
-        var queryData = query.data[0];
-        var queryExpression = queryData.filters.expression;
-        var objectName = queryData.object_name;
-        var rightNodes = queryExpression.right;
+        let queryData = query.data[0];
+        let queryExpression = queryData.filters.expression;
+        let objectName = queryData.object_name;
+        let rightNodes = queryExpression.right;
 
         expect(objectName).toEqual('Snapshot');
         expect(queryExpression.left.object_name).toEqual('Assessment');
@@ -62,8 +62,8 @@ describe('SnapshotUtils', function () {
   });
 
   describe('toObject() method', function () {
-    var snapshot;
-    var toObject;
+    let snapshot;
+    let toObject;
 
     beforeAll(function () {
       toObject = SnapshotUtils.toObject;
@@ -93,7 +93,7 @@ describe('SnapshotUtils', function () {
     });
 
     it('adds person stubs to access control list items', function () {
-      var result = toObject(snapshot);
+      let result = toObject(snapshot);
 
       expect(result.access_control_list).toBeDefined();
 
@@ -105,7 +105,7 @@ describe('SnapshotUtils', function () {
     });
 
     it('sets original link to snapshot object', function () {
-      var result = toObject(snapshot);
+      let result = toObject(snapshot);
 
       expect(result.attr('originalLink')).toEqual('/controls/42');
     });

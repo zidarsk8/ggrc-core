@@ -6,12 +6,12 @@
 describe('GGRC.Components.detailedBusinessObjectListItem', function () {
   'use strict';
 
-  var snapshotParentTitle = 'Control title #1';
-  var snapshotParentUrl = '/controls/55';
-  var vendorObjectTitle = 'Vendor title 123';
-  var vendorObjectLink = '/vendors/33';
+  let snapshotParentTitle = 'Control title #1';
+  let snapshotParentUrl = '/controls/55';
+  let vendorObjectTitle = 'Vendor title 123';
+  let vendorObjectLink = '/vendors/33';
 
-  var snapshotObject = {
+  let snapshotObject = {
     selfLink: '/api/snapshots/123',
     viewLink: '/snapshots/123',
     type: 'Snapshot',
@@ -24,7 +24,7 @@ describe('GGRC.Components.detailedBusinessObjectListItem', function () {
     }
   };
 
-  var vendorObject = {
+  let vendorObject = {
     selfLink: '/api/vendors/33',
     viewLink: vendorObjectLink,
     type: 'Vendor',
@@ -33,7 +33,7 @@ describe('GGRC.Components.detailedBusinessObjectListItem', function () {
   };
 
   describe('objectLink property', function () {
-    var viewModel;
+    let viewModel;
 
     beforeEach(function () {
       viewModel = GGRC.Components
@@ -52,7 +52,7 @@ describe('GGRC.Components.detailedBusinessObjectListItem', function () {
   });
 
   describe('objectTitle property', function () {
-    var viewModel;
+    let viewModel;
 
     beforeEach(function () {
       viewModel = GGRC.Components

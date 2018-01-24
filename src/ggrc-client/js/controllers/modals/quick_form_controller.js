@@ -22,10 +22,10 @@ export default ModalsController({
     }
   },
   'input, textarea, select change': function (el) {
-    var self = this;
-    var val;
-    var prop;
-    var oldValue;
+    let self = this;
+    let val;
+    let prop;
+    let oldValue;
     if (el.data('toggle') === 'datepicker') {
       val = el.datepicker('getDate');
       prop = el.attr('name');
@@ -48,12 +48,12 @@ export default ModalsController({
     }
   },
   autocomplete_select: function (el, event, ui) {
-    var self = this;
-    var prop = el.attr('name').split('.').slice(0, -1).join('.');
+    let self = this;
+    let prop = el.attr('name').split('.').slice(0, -1).join('.');
     if (this._super.apply(this, arguments) !== false) {
       setTimeout(function () {
         self.options.instance.save().then(function () {
-          var obj = self.options.instance.attr(prop);
+          let obj = self.options.instance.attr(prop);
           if (obj.attr) {
             obj.attr('saved', true);
           }
@@ -73,7 +73,7 @@ export default ModalsController({
     ev.stopPropagation();
   },
   '.dropdown-menu > li click': function (el, ev) {
-    var self = this;
+    let self = this;
     ev.stopPropagation();
     this.set_value({name: el.data('name'), value: el.data('value')});
     setTimeout(function () {
@@ -82,12 +82,12 @@ export default ModalsController({
     }, 100);
   },
   'button[data-name][data-value]:not(.disabled), a.undoable[data-toggle*=modal] click': function (el, ev) {
-    var self = this;
-    var name = el.data('name');
-    var oldValue = {};
-    var action;
-    var openclose;
-    var isOpened;
+    let self = this;
+    let name = el.data('name');
+    let oldValue = {};
+    let action;
+    let openclose;
+    let isOpened;
 
     if (el.data('openclose')) {
       action = el.data('openclose');
@@ -135,8 +135,8 @@ export default ModalsController({
     }
   },
   'a.undo click': function (el, ev) {
-    var self = this;
-    var newValue = this.options.instance.attr('_undo').shift();
+    let self = this;
+    let newValue = this.options.instance.attr('_undo').shift();
     ev.stopPropagation();
 
     this.options.instance.attr('_disabled', 'disabled');

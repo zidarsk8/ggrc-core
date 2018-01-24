@@ -15,7 +15,7 @@ import {getCustomAttributeType} from '../plugins/utils/ca-utils';
       instance: null,
       items: [],
       setItems: function (isReady) {
-        var values = [];
+        let values = [];
         if (isReady) {
           values = this.getValues().sort(function (a, b) {
             return a.cad.id - b.cad.id;
@@ -24,12 +24,12 @@ import {getCustomAttributeType} from '../plugins/utils/ca-utils';
         }
       },
       getValues: function () {
-        var result = [];
+        let result = [];
 
         can.each(this.attr('instance.custom_attribute_definitions'),
           function (cad) {
-            var cav;
-            var type = cad.attribute_type;
+            let cav;
+            let type = cad.attribute_type;
             can.each(this.attr('instance.custom_attribute_values'),
               function (val) {
                 val = val.isStub ? val : val.reify();

@@ -9,10 +9,10 @@ import wysihtml5 from 'wysihtml5/wysihtml5-0.4.0pre';
   "use strict"; // jshint ;_;
 
   // Insert http:// before links
-  var createLink = wysihtml5.commands.createLink
+  let createLink = wysihtml5.commands.createLink
     , old_exec = createLink.exec;
   createLink.exec = function(composer, command, value) {
-    var url = typeof(value) === "object" ? value.href : value;
+    let url = typeof(value) === "object" ? value.href : value;
 
     // Inject the http:// if no prefix was included
     url = url.indexOf('//') > -1 ? url : 'http://' + url;
@@ -65,7 +65,7 @@ import wysihtml5 from 'wysihtml5/wysihtml5-0.4.0pre';
 
   // We took the implementation from https://github.com/Voog/wysihtml
   // We trigger events in fake textarea
-  var originalObserve = wysihtml5.views.Composer.prototype.observe,
+  let originalObserve = wysihtml5.views.Composer.prototype.observe,
     dom = wysihtml5.dom,
     browser = wysihtml5.browser,
     handleUserInteraction = function (event) {
@@ -75,12 +75,12 @@ import wysihtml5 from 'wysihtml5/wysihtml5-0.4.0pre';
       }).bind(this), 0);
     },
     addListeners = function (target, events, callback) {
-      for (var i = 0, max = events.length; i < max; i++) {
+      for (let i = 0, max = events.length; i < max; i++) {
         target.addEventListener(events[i], callback, false);
       }
     };
   wysihtml5.views.Composer.prototype.observe = function () {
-    var element = this.element,
+    let element = this.element,
         focusBlurElement = browser.supportsEventsInIframeCorrectly() ? element : this.sandbox.getWindow();
 
     addListeners(focusBlurElement, ["focus", "keyup"], handleUserInteraction.bind(this));

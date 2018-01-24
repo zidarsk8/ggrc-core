@@ -17,7 +17,7 @@ import template from './templates/mapper-results-item-details.mustache';
     template: template,
     viewModel: {
       init: function () {
-        var instance = this.attr('instance');
+        let instance = this.attr('instance');
         if (instance.snapshotObject) {
           this.attr('instance', instance.snapshotObject);
         } else {

@@ -15,8 +15,8 @@ describe('GGRC.Components.revisionsComparer', function () {
   });
 
   describe('prepareInstances() method', function () {
-    var fakeData;
-    var method; // the method under test
+    let fakeData;
+    let method; // the method under test
 
     beforeEach(function () {
       method = viewModel.prepareInstances.bind(viewModel);
@@ -34,7 +34,7 @@ describe('GGRC.Components.revisionsComparer', function () {
     });
 
     it('returns instances of necessary type and with isRevision', function () {
-      var result = method(fakeData);
+      let result = method(fakeData);
       result.forEach(function (item) {
         expect(item.instance instanceof CMS.Models.Control).toBeTruthy();
         expect(item.instance.type).toBe('Control');
@@ -43,23 +43,23 @@ describe('GGRC.Components.revisionsComparer', function () {
     });
 
     it('returns the same length of instances as passed', function () {
-      var result = method(fakeData);
+      let result = method(fakeData);
       expect(result.length).toBe(fakeData.length);
     });
 
     it('returns the same data as passed with extra properties', function () {
-      var result = method(fakeData);
-      var data = fakeData;
+      let result = method(fakeData);
+      let data = fakeData;
       result.forEach(function (item, index) {
         expect(item.instance.id).toEqual(data[index].content.id);
       });
     });
 
     it('adds person stubs to access control list items', function () {
-      var result;
+      let result;
 
       fakeData.forEach(function (item, i) {
-        var acl = new can.List([
+        let acl = new can.List([
           {ac_role_id: i * 10, person_id: i * 10},
           {ac_role_id: i * 10, person_id: i * 10},
         ]);
@@ -81,13 +81,13 @@ describe('GGRC.Components.revisionsComparer', function () {
   });
 
   describe('getAttachmentsDfds() method', function () {
-    var method;
-    var revisions;
+    let method;
+    let revisions;
 
     beforeEach(function () {
-      var prepareInstancesMethod = viewModel.prepareInstances
+      let prepareInstancesMethod = viewModel.prepareInstances
         .bind(viewModel);
-      var fakeData = [
+      let fakeData = [
         {
           id: 1,
           content: new can.Map({id: 1}),
@@ -104,14 +104,14 @@ describe('GGRC.Components.revisionsComparer', function () {
     });
 
     it('getAttachmentsDfds() should return 1 dfd', function () {
-      var dfds;
+      let dfds;
       revisions[0].attr('instance').folder = 'EWheNKvwjhrcwWer';
       dfds = method(revisions);
       expect(dfds.length).toEqual(1);
     });
 
     it('getAttachmentsDfds() should return 2 dfds', function () {
-      var dfds;
+      let dfds;
       revisions[0].attr('instance').folder = 'EWheNKvwjhrcwWer';
       revisions[1].attr('instance').folder = 'vewbetWhercwWer';
       dfds = method(revisions);
@@ -119,14 +119,14 @@ describe('GGRC.Components.revisionsComparer', function () {
     });
 
     it('getAttachmentsDfds() should return empty array', function () {
-      var dfds = method();
+      let dfds = method();
       expect(dfds.length).toEqual(0);
     });
   });
 
   describe('getRevisions() method', function () {
-    var method;
-    var Revision;
+    let method;
+    let Revision;
 
     beforeEach(function () {
       method = viewModel.getRevisions;

@@ -7,7 +7,7 @@ describe('CMS.Models.Cacheable', function () {
   'use strict';
 
   describe('setup_custom_attributes() method', function () {
-    var instance;
+    let instance;
 
     function customAttrFactory(id, type, title) {
       return new can.Map({
@@ -25,8 +25,8 @@ describe('CMS.Models.Cacheable', function () {
     });
 
     it('sorts custom attribute definitions by ascending IDs', function () {
-      var expectedIdOrder;
-      var definitions = new can.List([
+      let expectedIdOrder;
+      let definitions = new can.List([
         customAttrFactory(3, 'Text', 'CA three'),
         customAttrFactory(5, 'Text', 'CA five'),
         customAttrFactory(2, 'Text', 'CA two'),
@@ -42,7 +42,7 @@ describe('CMS.Models.Cacheable', function () {
     });
 
     it('skips sorting if no custom attribute definitions', function () {
-      var actualOrder;
+      let actualOrder;
       instance.attr('custom_attribute_definitions', undefined);
       instance.setup_custom_attributes();
       actualOrder = _.map(instance.custom_attribute_definitions, 'id');
@@ -51,11 +51,11 @@ describe('CMS.Models.Cacheable', function () {
   });
 
   describe('mark_for_addition() method', function () {
-    var instance;
-    var obj;
-    var extraAttrs;
-    var options;
-    var joinAttr;
+    let instance;
+    let obj;
+    let extraAttrs;
+    let options;
+    let joinAttr;
 
     beforeEach(function () {
       instance = new can.Model.Cacheable({
@@ -88,9 +88,9 @@ describe('CMS.Models.Cacheable', function () {
   });
 
   describe('remove_duplicate_pending_joins() method', function () {
-    var instance;
-    var obj;
-    var extraAttrs;
+    let instance;
+    let obj;
+    let extraAttrs;
 
     beforeEach(function () {
       instance = new can.Model.Cacheable({

@@ -6,8 +6,8 @@
 describe('can.mustache.helper.get_item', function () {
   'use strict';
 
-  var helper;
-  var fakeOptions;  // a fake "options" argument
+  let helper;
+  let fakeOptions;  // a fake "options" argument
 
   beforeAll(function () {
     helper = can.Mustache._helpers.get_item.fn;
@@ -18,14 +18,14 @@ describe('can.mustache.helper.get_item', function () {
   });
 
   it('raises an error on missing arguments', function () {
-    var obj = {foo: 'foo123', bar: 'bar123'};
+    let obj = {foo: 'foo123', bar: 'bar123'};
     expect(function () {
       helper(obj, fakeOptions);
     }).toThrow(new Error('Invalid number of arguments (1), expected 2.'));
   });
 
   it('raises an error on too many arguments', function () {
-    var obj = {foo: 'foo123', bar: 'bar123'};
+    let obj = {foo: 'foo123', bar: 'bar123'};
     expect(function () {
       helper(obj, 'foo', 'bar', fakeOptions);
     }).toThrow(new Error('Invalid number of arguments (3), expected 2.'));
@@ -38,8 +38,8 @@ describe('can.mustache.helper.get_item', function () {
   });
 
   it('returns the value of the correct model attribute', function () {
-    var obj = {foo: 'foo123', bar: 'bar456'};
-    var result = helper(obj, 'bar', fakeOptions);
+    let obj = {foo: 'foo123', bar: 'bar456'};
+    let result = helper(obj, 'bar', fakeOptions);
     expect(result).toEqual('bar456');
   });
 
@@ -48,14 +48,14 @@ describe('can.mustache.helper.get_item', function () {
   it('returns the value of the correct model attribute if given ' +
     'function arguments',
     function () {
-      var obj = function () {
+      let obj = function () {
         return {foo: 'foo123', bar: 'bar456'};
       };
-      var key = function () {
+      let key = function () {
         return 'bar';
       };
 
-      var result = helper(obj, key, fakeOptions);
+      let result = helper(obj, key, fakeOptions);
 
       expect(result).toEqual('bar456');
     }

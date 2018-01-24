@@ -26,7 +26,7 @@ export default can.Component.extend({
         value: '',
       };
       _.each(responses, function (instance) {
-        var type;
+        let type;
         type = instance.template_object_type;
         if (!result[type]) {
           result[type] = {

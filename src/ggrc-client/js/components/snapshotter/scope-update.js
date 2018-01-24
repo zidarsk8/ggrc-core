@@ -43,8 +43,8 @@ import {
           // tell each container with snapshots that it should refresh own data
             $('tree-widget-container')
               .each(function () {
-                var vm = $(this).viewModel();
-                var modelName = vm.model.model_singular;
+                let vm = $(this).viewModel();
+                let modelName = vm.model.model_singular;
 
                 if (!isSnapshotModel(modelName)) {
                   return true;
@@ -54,13 +54,13 @@ import {
           });
       },
       _success: function () {
-        var instance = this.instance;
+        let instance = this.instance;
 
         this._showProgressWindow();
         instance
           .refresh()
           .then(function () {
-            var data = {
+            let data = {
               operation: 'upsert'
             };
             instance.attr('snapshots', data);
@@ -75,14 +75,14 @@ import {
       },
       _dismiss: _.identity,
       _showProgressWindow: function () {
-        var message =
+        let message =
           'Audit refresh is in progress. This may take several minutes.';
 
         GGRC.Errors.notifier('progress', [message]);
       },
       _updateVisibleContainer: function () {
-        var visibleContainer = $('tree-widget-container:visible');
-        var forceRefresh = true;
+        let visibleContainer = $('tree-widget-container:visible');
+        let forceRefresh = true;
         if (visibleContainer.length === 0) {
           return;
         }
@@ -91,7 +91,7 @@ import {
         visibleContainer.viewModel().display(forceRefresh);
       },
       _showSuccessMsg: function () {
-        var message = 'Audit was refreshed successfully.';
+        let message = 'Audit was refreshed successfully.';
         $('alert-progress').remove();
         GGRC.Errors.notifier('success', [message]);
       }

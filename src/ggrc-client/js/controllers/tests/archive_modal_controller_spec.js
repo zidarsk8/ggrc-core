@@ -9,14 +9,14 @@ describe('ToggleArchive modal', function () {
   'use strict';
 
   describe('click() event', function () {
-    var displayName = 'DISPLAY NAME';
-    var event;
-    var eventObj;
-    var $element;
-    var instance;
-    var ctrlInst;
-    var pendingRefresh;
-    var pendingSave;
+    let displayName = 'DISPLAY NAME';
+    let event;
+    let eventObj;
+    let $element;
+    let instance;
+    let ctrlInst;
+    let pendingRefresh;
+    let pendingSave;
 
     beforeEach(function () {
       pendingRefresh = new can.Deferred();
@@ -50,7 +50,7 @@ describe('ToggleArchive modal', function () {
     });
 
     it('was notified when was archived successfully', function () {
-      var successMessage = displayName + ' archived successfully';
+      let successMessage = displayName + ' archived successfully';
       event($element, eventObj);
       pendingRefresh.resolve();
       pendingSave.resolve();
@@ -63,7 +63,7 @@ describe('ToggleArchive modal', function () {
     });
 
     it('was notified when was not archived successfully', function () {
-      var errorMessage = 'Internal error';
+      let errorMessage = 'Internal error';
       event($element, eventObj);
       pendingRefresh.resolve();
       pendingSave.reject({responseText: errorMessage});
@@ -75,7 +75,7 @@ describe('ToggleArchive modal', function () {
     });
 
     it('was notified when was not refreshed successfully', function () {
-      var errorMessage = 'Internal error';
+      let errorMessage = 'Internal error';
       event($element, eventObj);
       pendingRefresh.reject({responseText: errorMessage});
 

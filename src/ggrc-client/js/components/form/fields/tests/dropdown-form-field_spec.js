@@ -1,6 +1,6 @@
 describe('GGRC.Components.dropdownFormField', function () {
   'use strict';
-  var viewModel;
+  let viewModel;
 
   beforeEach(function () {
     viewModel = GGRC.Components

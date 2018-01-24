@@ -16,9 +16,9 @@ import RefreshQueue from '../refresh_queue';
         this.source = source;
     },
     insert_from_source_binding: function (binding, results) {
-      var self = this;
-      var refreshQueue = new RefreshQueue();
-      var newResults = [];
+      let self = this;
+      let refreshQueue = new RefreshQueue();
+      let newResults = [];
 
       can.each(results, function (result) {
         refreshQueue.enqueue(result.instance);
@@ -29,7 +29,7 @@ import RefreshQueue from '../refresh_queue';
       });
     },
     init_listeners: function (binding) {
-      var self = this;
+      let self = this;
 
       if (this.source_binding)
         binding.source_binding = this.source_binding;
