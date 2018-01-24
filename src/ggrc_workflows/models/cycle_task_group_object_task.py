@@ -50,7 +50,7 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
   IMPORTABLE_FIELDS = (
       'slug', 'title', 'description', 'start_date',
       'end_date', 'finished_date', 'verified_date',
-      'status', '__acl__:Task Assignees',
+      'status', '__acl__:Task Assignees', '__acl__:Task Secondary Assignees',
   )
 
   @classmethod
