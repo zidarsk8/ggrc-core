@@ -175,7 +175,8 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
             all_models.AccessControlList.ac_role_id,
             all_models.AccessControlRole.object_type ==
             all_models.CycleTaskGroupObjectTask.__name__,
-            all_models.AccessControlRole.name == "Task Assignees",
+            all_models.AccessControlRole.name.in_(
+                ("Task Assignees", "Task Secondary Assignees")),
         )
     ).filter(
         Cycle.is_current == true(),
