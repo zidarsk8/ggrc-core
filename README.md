@@ -326,6 +326,10 @@ Solution 2:
 - Delete any images which have cached the invalid DNS settings.
 - Build again and the problem should be solved.
 
+### Unable to run Docker as non-root user
+
+Please check the [Official documentation](https://docs.docker.com/engine/installation/linux/linux-postinstall/) on this.
+
 ### Environment Variables
 
 *GGRC_SETTINGS_MODULE*:
