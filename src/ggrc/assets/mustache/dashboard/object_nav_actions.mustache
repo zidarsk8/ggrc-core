@@ -4,11 +4,11 @@
 }}
 
 
-{{#is_allowed 'update' instance context='for'}}
 <li class="inner-nav-button">
   <workflow-activate
     {instance}="instance"
     {task-group-amount}="instance.task_groups.length">
+    {{#is_allowed 'update' instance context='for'}}
       <spinner toggle="waiting"></spinner>
 
       {{#if_equals instance.status "Draft"}}
@@ -29,6 +29,6 @@
         {{/if}}
         {{/if_equals}}
       {{/if_equals}}
+    {{/is_allowed}}
   </workflow-activate>
 </li>
-{{/is_allowed}}
