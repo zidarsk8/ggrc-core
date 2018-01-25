@@ -37,7 +37,6 @@ import template from './ca-object-modal-content.mustache';
           },
         },
       },
-      formSavedDeferred: can.Deferred(),
       isUpdatingEvidences: false,
       content: {
         contextScope: {},
@@ -46,6 +45,7 @@ import template from './ca-object-modal-content.mustache';
         type: 'dropdown',
         value: null,
         options: [],
+        saveDfd: null,
       },
       afterCreation: function (comment, success) {
         this.dispatch({
@@ -88,7 +88,7 @@ import template from './ca-object-modal-content.mustache';
         this.attr('state.open', false);
         this.attr('state.save', false);
 
-        this.attr('formSavedDeferred')
+        this.attr('content.saveDfd')
           .then(function () {
             addComment({
               context: context,

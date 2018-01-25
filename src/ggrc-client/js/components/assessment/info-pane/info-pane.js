@@ -336,29 +336,26 @@ import template from './info-pane.mustache';
           type: event.item.attr('type'),
         };
 
-        // dispatching event on instance to pass to the auto-save-form
-        this.attr('instance').dispatch({
-          type: 'afterCommentCreated',
-        });
-
         this.attr('deferredSave').push(function () {
           self.addAction('add_related', related);
         })
-        .done(function () {
-          self.afterCreate({
-            items: [event.item],
-            success: true,
-          }, type);
-        })
-        .fail(function () {
-          self.afterCreate({
-            items: [event.item],
-            success: false,
-          }, type);
-        })
-        .always(function (assessment) {
-          assessment.removeAttr('actions');
-        });
+          .done(function () {
+            self.afterCreate({
+              items: [event.item],
+              success: true,
+            }, type);
+          })
+          .fail(function () {
+            self.afterCreate({
+              items: [event.item],
+              success: false,
+            }, type);
+          })
+          .always(function (assessment) {
+            assessment.removeAttr('actions');
+            // dispatching event on instance to pass to the auto-save-form
+            self.attr('instance').dispatch(RELATED_ITEMS_LOADED);
+          });
       },
       removeRelatedItem: function (item, type) {
         let self = this;
@@ -453,24 +450,18 @@ import template from './info-pane.mustache';
         }
         instance.attr('isPending', true);
 
-        return this.attr('formState.formSavedDeferred')
-          .then(() => {
-            instance.attr('status', isUndo ? previousStatus : newStatus);
+        instance.attr('status', isUndo ? previousStatus : newStatus);
+        if (instance.attr('status') === 'In Review' && !isUndo) {
+          $(document.body).trigger('ajax:flash',
+            {hint: 'The assessment is complete. ' +
+            'The verifier may revert it if further input is needed.'});
+        }
 
-            if (instance.attr('status') === 'In Review' && !isUndo) {
-              $(document.body).trigger('ajax:flash',
-                {hint: 'The assessment is complete. ' +
-                'The verifier may revert it if further input is needed.'});
-            }
-
-            return instance.save();
-          })
-          .then(() => {
-            this.initializeFormFields();
-            this.attr('onStateChangeDfd').resolve();
-            stopFn();
-          })
-          .always(() => instance.attr('isPending', false))
+        return instance.save().then(() => {
+          this.initializeFormFields();
+          this.attr('onStateChangeDfd').resolve();
+          stopFn();
+        }).always(() => instance.attr('isPending', false))
           .fail(resetStatusOnConflict);
       },
       saveGlobalAttributes: function (event) {
@@ -497,6 +488,7 @@ import template from './info-pane.mustache';
           value: scope.attr('value'),
           title: scope.attr('title'),
           type: scope.attr('type'),
+          saveDfd: e.saveDfd || can.Deferred().resolve(),
         };
         let title = 'Required ' +
           data.fields.map(function (field) {

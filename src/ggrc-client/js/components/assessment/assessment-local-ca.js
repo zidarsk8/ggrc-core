@@ -19,7 +19,6 @@ import Permission from '../../permission';
     tag: 'assessment-local-ca',
     viewModel: {
       instance: null,
-      formSavedDeferred: can.Deferred().resolve(),
       fields: [],
       isDirty: false,
       saving: false,
@@ -67,6 +66,7 @@ import Permission from '../../permission';
       validateForm: function ({
         triggerField = null,
         triggerAttachmentModals = false,
+        saveDfd = null,
       } = {}) {
         let hasValidationErrors = false;
         this.attr('fields')
@@ -81,6 +81,7 @@ import Permission from '../../permission';
               this.dispatch({
                 type: 'validationChanged',
                 field,
+                saveDfd,
               });
             }
           });
@@ -192,7 +193,7 @@ import Permission from '../../permission';
 
         this.attr('isDirty', true);
 
-        this.attr('deferredSave').push(function () {
+        return this.attr('deferredSave').push(function () {
           let caValues = self.attr('instance.custom_attribute_values');
           applyChangesToCustomAttributeValue(
             caValues,
@@ -200,7 +201,6 @@ import Permission from '../../permission';
 
           self.attr('saving', true);
         })
-        .done(() => this.attr('formSavedDeferred').resolve())
         // todo: error handling
         .always(() => {
           this.attr('saving', false);
@@ -223,19 +223,17 @@ import Permission from '../../permission';
           e.field.attr('errorsMap.comment', true);
         }
 
+        let saveDfd = this.save(e.fieldId, e.value);
+
         this.validateForm({
           triggerAttachmentModals: true,
           triggerField: e.field,
+          saveDfd: saveDfd,
         });
-        this.attr('formSavedDeferred', can.Deferred());
-        this.save(e.fieldId, e.value);
       },
     },
     events: {
       '{viewModel} evidenceAmount': function () {
-        this.viewModel.validateForm();
-      },
-      '{viewModel.instance} afterCommentCreated': function () {
         this.viewModel.validateForm();
       },
       [`{viewModel.instance} ${RELATED_ITEMS_LOADED.type}`]: function () {

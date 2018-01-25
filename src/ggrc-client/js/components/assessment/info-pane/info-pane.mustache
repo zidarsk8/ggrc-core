@@ -194,7 +194,6 @@
                         {fields}="formFields"
                         {edit-mode}="editMode"
                         {^saving}="formState.saving"
-                        {^form-saved-deferred}="formState.formSavedDeferred"
                         {^is-dirty}="formState.isDirty"
                         (validation-error)="setLastErrorTab(tabIndex)"
                         (validation-changed)="showRequiredInfoModal(%event)">
@@ -216,7 +215,6 @@
                                                    {state}="state"
                                                    {evidences}="evidences"
                                                    {is-updating-evidences}="isUpdatingEvidences"
-                                                   {form-saved-deferred}="formState.formSavedDeferred"
                                                    (before-comment-created)="addItems(%event, 'comments')"
                                                    (after-comment-created)="addRelatedItem(%event, 'comments')"
                           ></ca-object-modal-content>
