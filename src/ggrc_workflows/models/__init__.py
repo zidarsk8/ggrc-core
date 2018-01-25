@@ -9,7 +9,6 @@ from .task_group_task import TaskGroupTask
 from .task_group import TaskGroup
 from .task_group_object import TaskGroupObject
 from .workflow import Workflow
-from .workflow_person import WorkflowPerson
 from .cycle import Cycle
 from .cycle_task_entry import CycleTaskEntry
 from .cycle_task_group import CycleTaskGroup
@@ -20,7 +19,6 @@ register_model(TaskGroup)
 register_model(TaskGroupObject)
 register_model(TaskGroupTask)
 register_model(Workflow)
-register_model(WorkflowPerson)
 
 register_model(Cycle)
 register_model(CycleTaskEntry)

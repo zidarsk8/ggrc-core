@@ -15,6 +15,7 @@ from ggrc.converters import errors
 
 from integration import ggrc
 from integration.ggrc import generator
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.models import factories
 from integration.ggrc.models.test_assessment_base import TestAssessmentBase
 
@@ -123,12 +124,7 @@ class TestAssessment(TestAssessmentBase):
                 "type": "Audit"
             },
             "access_control_list": [
-                {
-                    "ac_role_id": role_id,
-                    "person": {
-                        "id": person.id
-                    }
-                }
+                acl_helper.get_acl_json(role_id, person.id)
                 for role_id in self.assignee_roles.values()
             ],
             "context": {
@@ -183,12 +179,7 @@ class TestAssessment(TestAssessmentBase):
     # Add verifier to Assessment
     response = self.api.put(assessment, {
         "access_control_list": [
-            {
-                "ac_role_id": role_id,
-                "person": {
-                    "id": person.id
-                }
-            }
+            acl_helper.get_acl_json(role_id, person.id)
             for role_id in self.assignee_roles.values()
         ]
     })
@@ -271,12 +262,7 @@ class TestAssessment(TestAssessmentBase):
     # Remove verifier and assignee from Assessment
     response = self.api.put(assessment, {
         "access_control_list": [
-            {
-                "ac_role_id": self.assignee_roles["Creators"],
-                "person": {
-                    "id": person.id
-                }
-            }
+            acl_helper.get_acl_json(self.assignee_roles["Creators"], person.id)
         ]
     })
     self.assertEqual(response.status_code, 200)
@@ -304,13 +290,7 @@ class TestAssessment(TestAssessmentBase):
     # Remove assignee roles for first person
     response = self.api.put(assessment, {
         "access_control_list": [
-            {
-                "ac_role_id": role_id,
-                "person": {
-                    "id": person_ids[1]
-                }
-
-            }
+            acl_helper.get_acl_json(role_id, person_ids[1])
             for role_id in self.assignee_roles.values()
         ]
     })

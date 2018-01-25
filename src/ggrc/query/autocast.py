@@ -70,8 +70,8 @@ def get_parsers(klass, key):
   if fulltext_parser:
     if isinstance(fulltext_parser, DatetimeValue):
       return (fulltext_parser, None)
-    else:
-      return (None, fulltext_parser)
+    return (None, fulltext_parser)
+
   columns = {i.name: i.type for i in klass.__table__.columns}
   if key in columns:
     attr_type = columns[key]

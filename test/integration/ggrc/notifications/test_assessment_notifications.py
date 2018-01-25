@@ -8,6 +8,7 @@ from ggrc.models import Person, Assessment, AccessControlRole
 from ggrc.models import all_models
 from integration.ggrc import api_helper
 from integration.ggrc import TestCase
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.models import factories
 
 
@@ -48,22 +49,8 @@ class TestAssessmentNotification(TestCase):
                 "type": "Audit",
             },
             "access_control_list": [
-                {
-                    "person": {
-                        "id": self.auditor.id,
-                        "type": "Person",
-                    },
-                    "ac_role_id": self.primary_role_id,
-                    "context": None
-                },
-                {
-                    "person": {
-                        "id": self.auditor.id,
-                        "type": "Person",
-                    },
-                    "ac_role_id": assignee_acr.id,
-                    "context": None
-                }
+                acl_helper.get_acl_json(self.primary_role_id, self.auditor.id),
+                acl_helper.get_acl_json(assignee_acr.id, self.auditor.id),
             ],
             "status": "In Progress",
         }
@@ -176,22 +163,8 @@ class TestAssessmentNotification(TestCase):
     ).first()
     response = self.api.put(self.assessment, {
         "access_control_list": [
-            {
-                "person": {
-                    "id": self.auditor.id,
-                    "type": "Person",
-                },
-                "ac_role_id": self.secondary_role_id,
-                "context": None
-            },
-            {
-                "person": {
-                    "id": self.auditor.id,
-                    "type": "Person",
-                },
-                "ac_role_id": assignee_acr.id,
-                "context": None
-            }
+            acl_helper.get_acl_json(self.secondary_role_id, self.auditor.id),
+            acl_helper.get_acl_json(assignee_acr.id, self.auditor.id)
         ],
     })
     self.assert200(response)

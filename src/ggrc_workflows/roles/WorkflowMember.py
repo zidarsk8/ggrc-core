@@ -1,45 +1,14 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+# TODO: delete this file on Worklow ACl cleanup migration
 scope = "Workflow"
 description = """
   """
 permissions = {
-    "read": [
-        "Workflow",
-        "WorkflowPerson",
-        "TaskGroup",
-        "TaskGroupObject",
-        "TaskGroupTask",
-        "Cycle",
-        "CycleTaskGroup",
-        "CycleTaskGroupObject",
-        "CycleTaskGroupObjectTask",
-        "CycleTaskEntry",
-        "UserRole",
-        "Context",
-        "Document",
-    ],
-    "create": [
-        "WorkflowPerson",
-        "CycleTaskEntry",
-        "Document",
-    ],
-    "update": [
-        "WorkflowPerson",
-        "Cycle",
-        "CycleTaskGroup",
-        "CycleTaskGroupObject",
-        "CycleTaskGroupObjectTask",
-        "CycleTaskEntry",
-        "Document",
-    ],
-    "delete": [
-        "WorkflowPerson",
-        "CycleTaskEntry",
-        "Document",
-    ],
-    "view_object_page": [
-        "Workflow",
-    ],
+    "read": [],
+    "create": [],
+    "update": [],
+    "delete": [],
+    "view_object_page": [],
 }

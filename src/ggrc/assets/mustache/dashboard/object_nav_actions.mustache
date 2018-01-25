@@ -22,9 +22,7 @@
         {{^if_equals instance.status 'Inactive'}}
         {{^if waiting}}
           {{^can_activate}}
-            {{^if_equals instance.kind "Backlog"}}
             <p class="alert tiny-help-text" style="margin-bottom:0px;"><strong>Note:</strong> At least one of the task groups is missing either a task or an object.</p>
-            {{/if_equals}}
           {{/can_activate}}
         {{/if}}
         {{/if_equals}}

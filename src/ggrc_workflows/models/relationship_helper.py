@@ -10,7 +10,6 @@ from ggrc_workflows.models import TaskGroup
 from ggrc_workflows.models import TaskGroupObject
 from ggrc_workflows.models import TaskGroupTask
 from ggrc_workflows.models import Workflow
-from ggrc_workflows.models import WorkflowPerson
 from ggrc_workflows.models import WORKFLOW_OBJECT_TYPES
 
 
@@ -257,26 +256,6 @@ def wf_ctgo(object_type, related_type, related_ids):
     return join_by_source_id.union(join_by_destination_id)
 
 
-def workflow_person(object_type, related_type, related_ids):
-  """Relationships between Workflows and People."""
-  if object_type == "Workflow" and related_type == "Person":
-    return db.session.query(
-        WorkflowPerson.workflow_id,
-    ).filter(
-        WorkflowPerson.person_id.in_(related_ids),
-    )
-  elif object_type == "Person" and related_type == "Workflow":
-    return db.session.query(
-        WorkflowPerson.person_id,
-    ).filter(
-        WorkflowPerson.workflow_id.in_(related_ids),
-    )
-  else:
-    raise ValueError("Expected (object_type, related_type) to be "
-                     "('Workflow', 'Person') or ('Person', 'Workflow'), "
-                     "got ({!r}, {!r}) instead"
-                     .format(object_type, related_type))
-
 _function_map = {
     ("Cycle", "CycleTaskGroup"): cycle_ctg,
     ("Cycle", "CycleTaskGroupObjectTask"): cycle_ctogt,
@@ -287,7 +266,6 @@ _function_map = {
     ("TaskGroup", "TaskGroupTask"): tg_task,
     ("TaskGroup", "Workflow"): workflow_tg,
     ("TaskGroupTask", "Workflow"): workflow_tgt,
-    ("Person", "Workflow"): workflow_person,
 }
 
 for wot in WORKFLOW_OBJECT_TYPES:

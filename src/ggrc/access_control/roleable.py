@@ -132,6 +132,8 @@ class Roleable(object):
     for role_id, name in role.get_custom_roles_for(self.type).iteritems():
       if name != role_name:
         continue
+      # TODO: use ac_role_id as temporary solution until GGRC-3784 implemented
       return [i.person.id for i in self.access_control_list
-              if i.ac_role.id == role_id]
+              if (i.ac_role and i.ac_role.id == role_id) or
+              (i.ac_role_id and i.ac_role_id == role_id)]
     return []

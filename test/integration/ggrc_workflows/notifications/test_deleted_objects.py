@@ -87,7 +87,7 @@ class TestNotificationsForDeletedObjects(TestCase):
         "title": "quarterly wf 1",
         "notify_on_change": True,
         "description": "",
-        "owners": [person_dict(self.user.id)],
+        # admin will be current user with id == 1
         "unit": "month",
         "repeat_every": 3,
         "task_groups": [{

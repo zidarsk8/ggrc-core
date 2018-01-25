@@ -158,6 +158,12 @@ def is_auditor(instance, **_):
              if acl.ac_role.name == "Auditors" and acl.person == current_user)
 
 
+def is_workflow_admin(instance, **_):
+  """Check if current user has Admin role in scope of parent Workflow object"""
+  return any(acl for acl in instance.workflow.access_control_list
+             if acl.ac_role.name == "Admin" and acl.person == current_user)
+
+
 def is_allowed_based_on(instance, property_name, action, **_):
   """Check permissions based on permission seted up as attribute instance."""
   related_object = getattr(instance, property_name, None)
@@ -184,6 +190,7 @@ _CONDITIONS_MAP = {
     'has_not_changed': has_not_changed_condition,
     'has_changed': has_changed_condition,
     'is_auditor': is_auditor,
+    'is_workflow_admin': is_workflow_admin,
     'is_allowed_based_on': is_allowed_based_on,
 }
 

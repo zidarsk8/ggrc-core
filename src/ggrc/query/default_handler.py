@@ -86,5 +86,4 @@ class DefaultHandler(QueryHelper):
     """Get the time of last update of an object in the list."""
     if not objects or not hasattr(model, "updated_at"):
       return None
-    else:
-      return max(obj.updated_at for obj in objects)
+    return max(obj.updated_at for obj in objects)

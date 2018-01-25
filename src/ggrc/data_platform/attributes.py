@@ -27,7 +27,10 @@ class Attributes(base.Base, db.Model):
       db.ForeignKey('attribute_templates.attribute_template_id')
   )
 
-  value_string = db.Column(db.UnicodeText)
+  # value string is not nullable to avoid weird filtering behavior. This is
+  # different than on data platform, but needed here because we decided to make
+  # all text fields mandatory with default empty string
+  value_string = db.Column(db.UnicodeText, nullable=False, default=u"")
   value_integer = db.Column(db.Integer)
   value_datetime = db.Column(db.DateTime)
 

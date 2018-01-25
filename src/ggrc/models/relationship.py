@@ -11,6 +11,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from ggrc import db
 from ggrc.models.mixins import Base
 from ggrc.models import reflection
+from ggrc.models.exceptions import ValidationError
 
 
 class Relationship(Base, db.Model):
@@ -53,6 +54,7 @@ class Relationship(Base, db.Model):
   def source(self, value):
     self.source_id = getattr(value, 'id', None)
     self.source_type = getattr(value, 'type', None)
+    self.validate_relatable_type("source", value)
     return setattr(self, self.source_attr, value)
 
   @property
@@ -67,6 +69,7 @@ class Relationship(Base, db.Model):
   def destination(self, value):
     self.destination_id = getattr(value, 'id', None)
     self.destination_type = getattr(value, 'type', None)
+    self.validate_relatable_type("destination", value)
     return setattr(self, self.destination_attr, value)
 
   @classmethod
@@ -105,8 +108,35 @@ class Relationship(Base, db.Model):
     return "{}:{} <-> {}:{}".format(self.source_type, self.source_id,
                                     self.destination_type, self.destination_id)
 
+  def validate_relatable_type(self, field, value):
+    tgt_type = self.source_type
+    tgt_id = self.source_id
+    if field == "source":
+      tgt_type = self.destination_type
+      tgt_id = self.destination_id
+    if value and getattr(value, "type") == "Snapshot":
+      if not tgt_type:
+        return
+      if value.child_type == tgt_type and value.child_id == tgt_id:
+        raise ValidationError(
+            u"Invalid source-destination types pair for {}: "
+            u"source_type={!r}, destination_type={!r}"
+            .format(self.type, self.source_type, self.destination_type)
+        )
+    # else check if the opposite is a Snapshot
+    elif tgt_type == "Snapshot":
+      from ggrc.models import Snapshot
+      snapshot = db.session.query(Snapshot).get(tgt_id)
+      if snapshot.child_type == value.type and snapshot.child_id == value.id:
+        raise ValidationError(
+            u"Invalid source-destination types pair for {}: "
+            u"source_type={!r}, destination_type={!r}"
+            .format(self.type, self.source_type, self.destination_type)
+        )
+
 
 class Relatable(object):
+  """Mixin adding Relationship functionality to an object"""
 
   @declared_attr
   def related_sources(cls):  # pylint: disable=no-self-argument

@@ -82,7 +82,6 @@ dashboard-js-template-files:
   - dashboard/internav_list.mustache
   - dashboard/info/info.mustache
   - dashboard/info/get_started.mustache
-  - dashboard/info/wf_owner.mustache
   - access_groups/modal_content.mustache
   - data_assets/modal_content.mustache
   - documents/active_column.mustache
@@ -108,10 +107,10 @@ dashboard-js-template-files:
   - modals/close_buttons.mustache
   - modals/confirm.mustache
   - modals/prompt_buttons.mustache
-  - modals/confirm_buttons.mustache
   - modals/confirm_cancel_buttons.mustache
   - modals/confirm_button.mustache
   - modals/delete_cancel_buttons.mustache
+  - modals/discard_buttons.mustache
   - modals/done_buttons.mustache
   - modals/modal_header.mustache
   - modals/modal_compare_header.mustache
@@ -191,9 +190,6 @@ dashboard-js-template-files:
   - modals/restore_revision.mustache
   - modals/review_proposal.mustache
   # ggrc_basic_permissions
-  - people_roles/authorizations_by_person_list.mustache
-  - people_roles/authorizations_by_person_tree_add_item.mustache
-  - people_roles/authorizations_modal_actions.mustache
   - people_roles/base_modal.mustache
   - people_roles/object_column.mustache
   - people_roles/object_detail.mustache
@@ -236,7 +232,6 @@ dashboard-js-template-files:
   - cycle_task_groups/info.mustache
   - cycle_task_groups/autocomplete_result.mustache
   - cycle_task_groups/extended_info.mustache
-  - cycle_task_group_objects/info.mustache
   - cycle_task_group_object_tasks/info.mustache
   - cycle_task_group_object_tasks/tree-item-attr.mustache
   - cycle_task_group_object_tasks/modal_content.mustache
@@ -257,15 +252,12 @@ dashboard-js-template-files:
   - workflows/confirm_start_buttons.mustache
   - workflows/modal_content.mustache
   - workflows/info.mustache
-  - workflows/contacts.mustache
   - workflows/tree-item-attr.mustache
   - workflows/search_result.mustache
   - workflows/lhn_search.mustache
   - workflows/extended_info.mustache
   - wf_objects/autocomplete_result.mustache
-  - wf_people/tree_add_item.mustache
   - task_groups/tier2_content.mustache
   - wf_objects/approval_modal_content.mustache
-  - cycle_task_group_object_tasks/current_tg_tree_footer.mustache
   - workflows/clone_modal_content.mustache
   - task_groups/clone_modal_content.mustache

@@ -211,7 +211,7 @@ class ChangeTracked(object):
 
   _aliases = {
       "updated_at": {
-          "display_name": "Last Updated",
+          "display_name": "Last Updated Date",
           "mandatory": False,
       },
       "modified_by": {

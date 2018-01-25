@@ -133,7 +133,11 @@ class TestExportTasks(TestCase):
   @data(
       (
           "updated_at",
-          ["task Last updated", "task last updated", "task updated_at"],
+          [
+              "task Last Updated Date",
+              "task last updated date",
+              "task updated_at"
+          ],
       ),
       (
           "created_at",

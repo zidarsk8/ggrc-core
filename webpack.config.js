@@ -13,6 +13,11 @@ const path = require('path');
 const ENV = process.env;
 const isProd = ENV.NODE_ENV === 'production';
 
+const contextDir = path.resolve(__dirname, 'src', 'ggrc-client');
+const imagesDir = path.resolve(contextDir, 'images');
+const vendorDir = path.resolve(contextDir, 'vendor');
+const nodeModulesDir = path.resolve(__dirname, 'node_modules');
+
 const STATIC_FOLDER = '/static/';
 
 module.exports = function (env) {
@@ -22,12 +27,13 @@ module.exports = function (env) {
     // disable: isDev
   });
   const config = {
+    context: contextDir,
     entry: {
       vendor: 'entrypoints/vendor',
       styles: 'entrypoints/styles',
       dashboard: getEntryModules('dashboard'),
-      import: getEntryModules('import'),
-      export: getEntryModules('export'),
+      'import': getEntryModules('import'),
+      'export': getEntryModules('export'),
       admin: getEntryModules('admin'),
       login: 'entrypoints/login',
     },
@@ -46,7 +52,7 @@ module.exports = function (env) {
           loader: 'file-loader',
           options: {
             name: 'fonts/[name].[hash:8].[ext]',
-          }
+          },
         }],
       }, {
         test: /\.css$/,
@@ -59,34 +65,29 @@ module.exports = function (env) {
       }, {
         test: /\.(png|jpe?g|gif)$/,
         exclude: /node_modules/,
-        include: [
-          path.resolve(__dirname, 'src', 'ggrc', 'assets', 'images'),
-          path.resolve(__dirname, 'third_party'),
-        ],
+        include: [imagesDir, vendorDir],
         use: [{
           loader: 'url-loader',
           options: {
-            limit: 10000
-          }
+            limit: 10000,
+          },
         }],
       }, {
         test: /\.svg$/,
-        include: [
-          path.resolve(__dirname, 'src', 'ggrc', 'assets', 'images'),
-        ],
+        include: [imagesDir],
         use: [{
           loader: 'file-loader',
           options: {
-            name: 'images/[name].[ext]?[hash:8]'
-          }
+            name: 'images/[name].[ext]?[hash:8]',
+          },
         }],
       }, {
         test: /\.ico$/,
         use: [{
           loader: 'file-loader',
           options: {
-            name: '[name].[ext]'
-          }
+            name: '[name].[ext]',
+          },
         }],
       }, {
         test: /\.scss$/,
@@ -115,7 +116,7 @@ module.exports = function (env) {
         loader: 'raw-loader',
       }, {
         test: /\.js$/,
-        exclude: /(node_modules|third_party)/,
+        exclude: /(node_modules|vendor)/,
         loader: 'babel-loader',
         query: {
           cacheDirectory: true,
@@ -124,13 +125,10 @@ module.exports = function (env) {
     },
     devtool: isProd ? 'source-map' : 'cheap-module-eval-source-map',
     resolve: {
-      modules: ['node_modules', 'third_party']
-        .map(function (dir) {
-          return path.join(__dirname, dir);
-        }),
+      modules: [nodeModulesDir, vendorDir],
       alias: {
         can: 'canjs/amd/can/',
-        entrypoints: './src/ggrc/assets/javascripts/entrypoints',
+        entrypoints: './js/entrypoints',
       },
     },
     plugins: [

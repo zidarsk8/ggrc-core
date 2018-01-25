@@ -15,12 +15,15 @@ from freezegun import freeze_time
 import ddt
 
 from ggrc import db
+from ggrc.access_control import role
 from ggrc.converters import errors
 from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import CycleTaskGroupObjectTask
+from ggrc_workflows.models import Workflow
 from integration.ggrc_workflows.models import factories
 from integration.ggrc.models import factories as ggrc_factories
 from integration.ggrc import TestCase
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 
@@ -182,10 +185,16 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
           "type": "Person"
       }
 
+    wf_admin_role_id = {
+        n: i
+        for (i, n) in role.get_custom_roles_for(Workflow.__name__).iteritems()
+    }['Admin']
+
     self.workflow_active = {
         "title": "workflow active title",
         "description": "workflow active description",
-        "owners": [person_dict(self.person_1.id)],
+        "access_control_list": [
+            acl_helper.get_acl_json(wf_admin_role_id, self.person_1.id)],
         "notify_on_change": False,
     }
 
@@ -279,7 +288,8 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     self.workflow_historical = {
         "title": "workflow historical title",
         "description": "workflow historical description",
-        "owners": [person_dict(self.person_1.id)],
+        "access_control_list": [
+            acl_helper.get_acl_json(wf_admin_role_id, self.person_1.id)],
         "notify_on_change": False,
     }
 

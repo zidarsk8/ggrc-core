@@ -518,7 +518,7 @@ class TestAssessmentImport(TestCase):
 
   @ddt.data(
       (
-          "Last Updated",
+          "Last Updated Date",
           lambda: datetime.date.today() - datetime.timedelta(7),
       ),
       (

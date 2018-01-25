@@ -1,6 +1,6 @@
 ,,,,,,,,,,,,,,,,,,,,
 Object type,,,,,,,,,,,,,,,,,,,,
-Workflow,code*,title*,description,Manager,unit,repeat every,force real-time email updates,custom email message,member,Need Verification,,,,,,,,,,
+Workflow,code*,title*,description,admin,unit,repeat every,force real-time email updates,custom email message,workflow member,Need Verification,,,,,,,,,,
 ,wf-1,Workflow T1000,test,user1@ggrc.com,-,-,no,this is super custom,user2@ggrc.com,True,,,,,,,,,,
 ,wf-2,Workflow T1001,test,user1@ggrc.com,Week,1,yes,this is super custom,user2@ggrc.com,True,,,,,,,,,,
 ,wf-3,Workflow T1002,test,user1@ggrc.com,Month,1,no,this is super custom,user2@ggrc.com,True,,,,,,,,,,

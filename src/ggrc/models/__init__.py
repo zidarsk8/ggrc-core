@@ -84,8 +84,15 @@ def init_models(app):
 
 
 def init_hooks():
+  """Initialize main and extensions related SQLAlchemy hooks."""
+  from ggrc.extensions import get_extension_modules
   from ggrc.models import hooks
+
   hooks.init_hooks()
+  for extension_module in get_extension_modules():
+    ext_init_hooks = getattr(extension_module, 'init_hooks', None)
+    if ext_init_hooks:
+      ext_init_hooks()
 
 
 def init_all_models(app):

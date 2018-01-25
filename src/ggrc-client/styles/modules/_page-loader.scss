@@ -1,0 +1,34 @@
+/*
+ * Copyright (C) 2018 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+.page-loader {
+  display: none;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  position: fixed;
+
+  &__wrapper {
+    margin: -50px 0 0 -150px;
+    display: block;
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    width: 300px;
+    text-align: center;
+  }
+  &__icon {
+    background: url('../images/ajax-loader.gif') no-repeat;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+  }
+  &__text {
+    margin-top: 1em;
+    font-style: italic;
+    display: block;
+    color: #666;
+  }
+}
