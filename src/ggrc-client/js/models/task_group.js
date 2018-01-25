@@ -57,13 +57,10 @@
       this.validateNonBlank('workflow');
       this.validateContact(['_transient.contact', 'contact']);
 
-      // Refresh workflow people:
-      this.bind('created', function (ev, instance) {
-        if (instance instanceof that) {
-          Permission.refresh()
-            .then(() => {
-              instance.refresh_all_force('workflow', 'context');
-            });
+      this.bind('created', function (ev, taskGroup) {
+        if (taskGroup instanceof that) {
+          Permission.refresh();
+          taskGroup.refresh_all_force('workflow', 'context');
         }
       });
       this.bind('updated', function (ev, instance) {
