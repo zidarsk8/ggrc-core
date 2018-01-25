@@ -126,7 +126,7 @@ class PersonResource(common.ExtendedResource):
                   c.is_verification_needed = 1 AND
                   c.is_current = 1 AND
                   acl.person_id = :person_id AND
-                  acr.name = "Task Assignees"
+                  acr.name IN ("Task Assignees", "Task Secondary Assignees")
               GROUP BY overdue
 
               UNION ALL
@@ -147,7 +147,7 @@ class PersonResource(common.ExtendedResource):
                   c.is_verification_needed = 0 AND
                   c.is_current = 1 AND
                   acl.person_id = :person_id AND
-                  acr.name = "Task Assignees"
+                  acr.name IN ("Task Assignees", "Task Secondary Assignees")
               GROUP BY overdue
           ) as temp
           GROUP BY overdue
