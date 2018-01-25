@@ -17,8 +17,10 @@ import {DESTINATION_UNMAPPED} from '../../events/eventTypes';
       objectProp: '@',
       destination: {},
       source: {},
+      isUnmapping: false,
       preventClick: false,
       unmapInstance: function () {
+        this.attr('isUnmapping', true);
         this.dispatch({type: 'beforeUnmap', item: this.attr('source')});
         this.getMapping()
           .refresh()
@@ -29,7 +31,13 @@ import {DESTINATION_UNMAPPED} from '../../events/eventTypes';
                 this.attr('destination').dispatch('refreshInstance');
                 this.attr('destination').dispatch(DESTINATION_UNMAPPED);
                 this.dispatch('afterUnmap');
+              })
+              .always(() => {
+                this.attr('isUnmapping', false);
               });
+          })
+          .fail(() => {
+            this.attr('isUnmapping', false);
           });
       },
       getMapping: function () {
