@@ -32,9 +32,7 @@ describe('GGRC.WorkflowActivate', function () {
     let cycleMock;
 
     beforeEach(function () {
-      scopeMock = jasmine.createSpyObj('scope',
-        ['attr', '_restore_button']);
-      method = scope._activate.bind(scopeMock);
+      scopeMock = new can.Map();
       refreshDfd = can.Deferred();
       saveDfd = can.Deferred();
       initCountsDfd = can.Deferred();
@@ -59,9 +57,8 @@ describe('GGRC.WorkflowActivate', function () {
         .and.returnValue(refreshAllDfd);
       spyOn(workflow, 'save')
         .and.returnValue(saveDfd);
+      scopeMock.attr('instance', workflow);
 
-      spyOn(GGRC, 'page_instance')
-        .and.returnValue(workflow);
       spyOn(_, 'find')
         .and.returnValue(workflowExtension);
       spyOn(CurrentPageUtils, 'initCounts')
@@ -70,6 +67,12 @@ describe('GGRC.WorkflowActivate', function () {
         .and.returnValue(generateDfd);
       spyOn(CMS.Models, 'Cycle')
         .and.returnValue(cycleMock);
+
+      scopeMock.attr({
+        _restore_button: jasmine.createSpy('_restore_button')
+      });
+
+      method = scope._activate.bind(scopeMock);
     });
 
     describe('for recurrent workflow', function () {
@@ -79,8 +82,7 @@ describe('GGRC.WorkflowActivate', function () {
 
       it('should be in waiting state while refresh is in progress',
         function () {
-          expect(scopeMock.attr)
-            .toHaveBeenCalledWith('waiting', true);
+          expect(scopeMock.attr('waiting')).toBe(true);
           expect(workflow.refresh)
             .toHaveBeenCalled();
         });
@@ -203,8 +205,7 @@ describe('GGRC.WorkflowActivate', function () {
 
       it('should be in waiting state while cycle generation starts',
         function () {
-          expect(scopeMock.attr)
-            .toHaveBeenCalledWith('waiting', true);
+          expect(scopeMock.attr('waiting')).toBe(true);
           expect(helpers.generateCycle)
             .toHaveBeenCalled();
         });
@@ -269,9 +270,9 @@ describe('GGRC.WorkflowActivate', function () {
     let taskGroups;
 
     beforeEach(function () {
+      const taskGroupModel = new can.Map();
       taskGroups = new can.List([]);
-      scopeMock = jasmine.createSpyObj('scope',
-        ['attr']);
+      scopeMock = new can.Map();
       refreshAllDfd = can.Deferred();
       method = scope._can_activate_def.bind(scopeMock);
       workflow = {
@@ -279,22 +280,18 @@ describe('GGRC.WorkflowActivate', function () {
         refresh_all: jasmine.createSpy('refreshAll')
           .and.returnValue(refreshAllDfd),
         attr: jasmine.createSpy('attr'),
-        task_groups: {
-          reify: jasmine.createSpy('reify')
-            .and.returnValue(taskGroups),
-        },
+        task_groups: taskGroupModel,
       };
-
-      spyOn(GGRC, 'page_instance')
-        .and.returnValue(workflow);
+      spyOn(taskGroupModel, 'reify')
+        .and.returnValue(taskGroups);
+      scopeMock.attr('instance', workflow);
     });
 
     it('should be in waiting state while refresh is in progress',
       function () {
         method();
 
-        expect(scopeMock.attr)
-          .toHaveBeenCalledWith('waiting', true);
+        expect(scopeMock.attr('waiting')).toBe(true);
         expect(workflow.refresh_all)
           .toHaveBeenCalled();
       });
@@ -308,28 +305,22 @@ describe('GGRC.WorkflowActivate', function () {
 
       refreshAllDfd.resolve();
 
-      expect(scopeMock.attr)
-        .toHaveBeenCalledWith('can_activate', 1);
-      expect(scopeMock.attr)
-        .toHaveBeenCalledWith('waiting', false);
+      expect(scopeMock.attr('can_activate')).toBe(1);
+      expect(scopeMock.attr('waiting')).toBe(false);
     });
 
     it('shouldn\'t allow activation when TGTs for all TGs exist', function () {
-      taskGroups.push({
-        task_group_tasks: [{id: 1}],
-      });
-      taskGroups.push({
-        task_group_tasks: [],
-      });
+      taskGroups.push(...[
+        {task_group_tasks: [{id: 1}]},
+        {task_group_tasks: []}
+      ]);
 
       method();
 
       refreshAllDfd.resolve();
 
-      expect(scopeMock.attr)
-        .toHaveBeenCalledWith('can_activate', false);
-      expect(scopeMock.attr)
-        .toHaveBeenCalledWith('waiting', false);
+      expect(scopeMock.attr('can_activate')).toBe(false);
+      expect(scopeMock.attr('waiting')).toBe(false);
     });
 
     it('should log an error when refresh fails', function () {
