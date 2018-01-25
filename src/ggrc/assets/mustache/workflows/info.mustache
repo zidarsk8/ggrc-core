@@ -45,9 +45,11 @@
             {{#if instance.recurrences}}
               <li>
                 <workflow-start-cycle workflow="instance">
-                  <workflow-activate workflow="instance" deferredData="can_activate">
+                  <workflow-activate
+                    {instance}="instance"
+                    {task-group-amount}="instance.task_groups.length">
                     {{#can_activate}}
-                      <a href="#workflowStart" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
+                      <a href="#workflowStart" {{^taskGroupAmount}}disabled="disabled"{{/taskGroupAmount}}>
                         <i class="fa fa-sliders"></i>
                         Manually Start a Cycle
                       </a>

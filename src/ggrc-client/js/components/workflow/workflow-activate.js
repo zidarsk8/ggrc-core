@@ -1,4 +1,4 @@
-  /*
+/*
   Copyright (C) 2018 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
@@ -15,11 +15,13 @@ export default can.Component.extend({
     this.scope._can_activate_def();
   },
   scope: {
+    taskGroupAmount: 0,
+    instance: {},
     waiting: true,
     can_activate: false,
     _can_activate_def: function () {
       let self = this;
-      let workflow = GGRC.page_instance();
+      const workflow = this.attr('instance');
 
       self.attr('waiting', true);
       $.when(
@@ -45,7 +47,7 @@ export default can.Component.extend({
       });
     },
     _handle_refresh: function (model) {
-      let models = ['TaskGroup', 'TaskGroupTask', 'TaskGroupObject'];
+      let models = ['TaskGroupTask', 'TaskGroupObject'];
       if (models.indexOf(model.shortName) > -1) {
         this._can_activate_def();
       }
@@ -54,7 +56,7 @@ export default can.Component.extend({
       this.attr('waiting', false);
     },
     _activate: function () {
-      let workflow = GGRC.page_instance();
+      const workflow = this.attr('instance');
       let scope = this;
       let restoreButton = scope._restore_button.bind(scope);
 
@@ -105,6 +107,9 @@ export default can.Component.extend({
     },
   },
   events: {
+    '{scope} taskGroupAmount'() {
+      this.scope._can_activate_def();
+    },
     '{can.Model.Cacheable} created': function (model) {
       this.scope._handle_refresh(model);
     },
