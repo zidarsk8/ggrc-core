@@ -32,6 +32,6 @@
           let matchingResults = results[0];
           self.insert_results(binding, matchingResults);
         });
-    }
+    },
   });
 })(window.GGRC, window.can);

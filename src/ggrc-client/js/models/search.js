@@ -28,7 +28,7 @@ can.Model('GGRC.Models.Search', {
   },
   search: function (str, params) {
     return this.findOne($.extend({
-      q: this._escapeSymbols(str)
+      q: this._escapeSymbols(str),
     }, params));
   },
   search_for_types: function (str, types, params) {
@@ -41,7 +41,7 @@ can.Model('GGRC.Models.Search', {
       // This returns a Search instance, NOT a model instance.
       result = this.findOne($.extend({
         q: this._escapeSymbols(str),
-        types: types.join(',')
+        types: types.join(','),
       }, params));
     }
     return result;
@@ -49,7 +49,7 @@ can.Model('GGRC.Models.Search', {
   counts: function (str, params) {
     return this.findOne($.extend({
       q: this._escapeSymbols(str),
-      counts_only: true
+      counts_only: true,
     }, params));
   },
   counts_for_types: function (str, types, params, extra_columns) {
@@ -58,7 +58,7 @@ can.Model('GGRC.Models.Search', {
         q: this._escapeSymbols(str),
         types: types.join(','),
         counts_only: true,
-        extra_columns: extra_columns && extra_columns.join(',')
+        extra_columns: extra_columns && extra_columns.join(','),
       }, params));
   },
   load_via_model_endpoints: function (types) {
@@ -68,7 +68,7 @@ can.Model('GGRC.Models.Search', {
       // FIXME: This should use __stubs_only=true when paging is used
       return CMS.Models[model_name].findAll({
         __stubs_only: true,
-        __sort: 'title,email'
+        __sort: 'title,email',
       });
     });
 
@@ -76,7 +76,7 @@ can.Model('GGRC.Models.Search', {
       let model_results = can.makeArray(arguments);
       let search_response = {
         entries: {},
-        selfLink: 'Fake'
+        selfLink: 'Fake',
       };
       // Mock the search resource format
       can.each(types, function (model_name, index) {
@@ -135,5 +135,5 @@ can.Model('GGRC.Models.Search', {
       result = this.counts[type];
     }
     return result;
-  }
+  },
 });

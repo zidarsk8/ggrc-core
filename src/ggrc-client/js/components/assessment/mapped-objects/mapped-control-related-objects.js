@@ -17,11 +17,11 @@ import template from './mapped-control-related-objects.mustache';
   let viewModel = can.Map.extend({
     define: {
       items: {
-        value: []
-      }
+        value: [],
+      },
     },
     titleText: '@',
-    type: '@'
+    type: '@',
   });
   /**
    * Specific Wrapper Component to present Controls only inner popover data.
@@ -30,6 +30,6 @@ import template from './mapped-control-related-objects.mustache';
   GGRC.Components('assessmentMappedControlsPopover', {
     tag: tag,
     template: template,
-    viewModel: viewModel
+    viewModel: viewModel,
   });
 })(window.can, window.GGRC);

@@ -22,8 +22,8 @@ describe('can.mustache.helper.isInAuthList', function () {
   function fakeAuthObj(personAttrs) {
     let result = new can.Map({
       instance: {
-        person: personAttrs
-      }
+        person: personAttrs,
+      },
     });
 
     spyOn(result.instance.person, 'reify')
@@ -40,7 +40,7 @@ describe('can.mustache.helper.isInAuthList', function () {
       '  {{else}}',
       '    no',
       '  {{/isInAuthList}}',
-      '</div>'
+      '</div>',
     ].join('');
 
     render = can.view.mustache(template);
@@ -52,7 +52,7 @@ describe('can.mustache.helper.isInAuthList', function () {
     function () {
       templateContext = {
         person: null,
-        authorizations: null
+        authorizations: null,
       };
 
       html = render(templateContext);
@@ -68,12 +68,12 @@ describe('can.mustache.helper.isInAuthList', function () {
       let authList = [
         fakeAuthObj({id: 15, email: 'person15@foo.bar'}),
         fakeAuthObj({id: 42, email: 'person42@foo.bar'}),
-        fakeAuthObj({id: 101, email: 'person101@foo.bar'})
+        fakeAuthObj({id: 101, email: 'person101@foo.bar'}),
       ];
 
       templateContext = {
         person: {id: 42, email: 'person42@foo.bar'},
-        authorizations: authList
+        authorizations: authList,
       };
 
       html = render(templateContext);
@@ -88,12 +88,12 @@ describe('can.mustache.helper.isInAuthList', function () {
     function () {
       let authList = [
         fakeAuthObj({id: 15, email: 'person15@foo.bar'}),
-        fakeAuthObj({id: 101, email: 'person101@foo.bar'})
+        fakeAuthObj({id: 101, email: 'person101@foo.bar'}),
       ];
 
       templateContext = {
         person: {id: 42, email: 'person42@foo.bar'},
-        authorizations: authList
+        authorizations: authList,
       };
 
       html = render(templateContext);

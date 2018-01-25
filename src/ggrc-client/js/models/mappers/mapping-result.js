@@ -174,6 +174,6 @@
       for (i = 0; i < this.mappings.length; i++) {
         this.mappings[i].walk_instances(fn, this.instance, depth);
       }
-    }
+    },
   });
 })(window.GGRC, window.can);

@@ -40,7 +40,7 @@
       'active_column_view',
       'option_object_view',
       'active_object_view',
-      'option_detail_view'
+      'option_detail_view',
     ],
 
     defaults: {
@@ -67,7 +67,7 @@
       modal_title: null,
       option_list_title: null,
       active_list_title: null,
-      new_object_title: null
+      new_object_title: null,
     },
 
     launch: function ($trigger, options) {
@@ -84,7 +84,7 @@
       $target.modal_form({}, $trigger);
       this.newInstance($target[0], $.extend({$trigger: $trigger}, options));
       return $target;
-    }
+    },
   }, {
     init: function () {
       this.object_list = new can.Observe.List();
@@ -143,7 +143,7 @@
           actives: this.active_list,
           selected_object: null,
           selected_option: null,
-          page_model: GGRC.page_model
+          page_model: GGRC.page_model,
         }, this.options));
       }
       return this.context;
@@ -159,7 +159,7 @@
               CMS.Models.get_link_type(join, self.options.option_attr),
               join[self.options.option_attr].id
             ),
-            join: join
+            join: join,
           });
         }));
     },
@@ -228,7 +228,7 @@
             name: 'No role',
             id: 0,
             description: description,
-            scope: params.scope || 'System'
+            scope: params.scope || 'System',
           });
           self.option_list.replace(options);
         });
@@ -394,7 +394,7 @@
     get_join_object_type: function () {
       let joinObject = this.get_join_object();
       return (joinObject ? joinObject.constructor.shortName : null);
-    }
+    },
   });
 
   function getOptionSet(name, data) {
@@ -466,9 +466,9 @@
       join_type_field: null,
 
       extra_join_fields: {
-        context: context
+        context: context,
       },
-      extra_join_query: extraJoinQuery
+      extra_join_query: extraJoinQuery,
     };
   }
 

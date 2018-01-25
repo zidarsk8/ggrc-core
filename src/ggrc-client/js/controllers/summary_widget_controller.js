@@ -31,13 +31,13 @@ export default can.Control({
       pieSliceText: 'value-and-percentage',
       chartArea: {
         width: '100%',
-        height: '90%'
+        height: '90%',
       },
       height: 300,
       legend: {
-        position: 'none'
-      }
-    }
+        position: 'none',
+      },
+    },
   },
   init: function () {
     let that = this;
@@ -45,11 +45,11 @@ export default can.Control({
       if (GGRC.page_object) {
         $.extend(that.defaults, {
           model: GGRC.infer_object_type(GGRC.page_object),
-          instance: GGRC.page_instance()
+          instance: GGRC.page_instance(),
         });
       }
     });
-  }
+  },
 }, {
   init: function () {
     let frag;
@@ -68,9 +68,9 @@ export default can.Control({
       error: true,
       charts: {
         Assessment: {
-          legend: []
-        }
-      }
+          legend: [],
+        },
+      },
     });
     frag = can.view(this.get_widget_view(this.element),
                     this.options.context);
@@ -199,7 +199,7 @@ export default can.Control({
         count: statusData[1],
         percent: (statusData[1] / data.total * 100).toFixed(1),
         rowIndex: rowIndex,
-        color: colorsMap[statusData[0]]
+        color: colorsMap[statusData[0]],
       });
     });
 
@@ -262,7 +262,7 @@ export default can.Control({
     result = _.pairs(groups);
     return {
       total: data.length,
-      statuses: result
+      statuses: result,
     };
   },
   /**
@@ -292,5 +292,5 @@ export default can.Control({
       google.charts.load('45', {packages: ['corechart']});
       google.charts.setOnLoadCallback(callback);
     });
-  }
+  },
 });

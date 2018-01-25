@@ -35,11 +35,11 @@ describe('GGRC.Components.autocomplete', function () {
     beforeEach(function () {
       fakeViewModel = new can.Map({});
       handler = Component.prototype.events['autocomplete:select'].bind({
-        viewModel: fakeViewModel
+        viewModel: fakeViewModel,
       });
 
       eventData = {
-        item: {id: 123, type: 'Foo'}
+        item: {id: 123, type: 'Foo'},
       };
       eventObj = $.Event('autocomplete:select');
 
@@ -64,7 +64,7 @@ describe('GGRC.Components.autocomplete', function () {
 
         expect($element.triggerHandler).toHaveBeenCalledWith({
           type: Component.prototype._EV_ITEM_SELECTED,
-          selectedItem: {id: 123, type: 'Foo'}
+          selectedItem: {id: 123, type: 'Foo'},
         });
       }
     );
@@ -77,7 +77,7 @@ describe('GGRC.Components.autocomplete', function () {
 
         expect(fakeViewModel.dispatch).toHaveBeenCalledWith({
           type: 'itemSelected',
-          selectedItem: {id: 123, type: 'Foo'}
+          selectedItem: {id: 123, type: 'Foo'},
         });
       }
     );

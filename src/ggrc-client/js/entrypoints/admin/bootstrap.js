@@ -48,7 +48,7 @@ const adminListDescriptors = {
       '/static/mustache/people/filters.mustache',
     list_view: '/static/mustache/people/object_list.mustache',
     draw_children: true,
-    fetch_post_process: sortByNameEmail
+    fetch_post_process: sortByNameEmail,
   },
   roles: {
     model: CMS.Models.Role,
@@ -56,13 +56,13 @@ const adminListDescriptors = {
     object_category: 'governance',
     object_display: 'Roles',
     list_view: '/static/mustache/roles/object_list.mustache',
-    fetch_post_process: sortByNameEmail
+    fetch_post_process: sortByNameEmail,
   },
   events: {
     model: CMS.Models.Event,
     object_category: 'governance',
     object_display: 'Events',
-    list_view: '/static/mustache/events/object_list.mustache'
+    list_view: '/static/mustache/events/object_list.mustache',
   },
   custom_attributes: {
     parent_instance: CMS.Models.CustomAttributable,
@@ -84,8 +84,8 @@ const adminListDescriptors = {
       GGRC.mustache_path +
       '/custom_attribute_definitions/subtree.mustache',
       footer_view: null,
-      add_item_view: null
-    }]
+      add_item_view: null,
+    }],
   },
   custom_roles: {
     parent_instance: CMS.Models.Roleable,
@@ -105,9 +105,9 @@ const adminListDescriptors = {
       show_view:
       GGRC.mustache_path + '/access_control_roles/subtree.mustache',
       footer_view: null,
-      add_item_view: null
-    }]
-  }
+      add_item_view: null,
+    }],
+  },
 };
 
 new GGRC.WidgetList('ggrc_admin', {
@@ -124,7 +124,7 @@ new GGRC.WidgetList('ggrc_admin', {
       },
       widget_info: function () {
         return '';
-      }
+      },
     },
     roles: {
       model: CMS.Models.Role,
@@ -138,7 +138,7 @@ new GGRC.WidgetList('ggrc_admin', {
       },
       widget_info: function () {
         return '';
-      }
+      },
     },
     events: {
       model: CMS.Models.Event,
@@ -151,7 +151,7 @@ new GGRC.WidgetList('ggrc_admin', {
       },
       widget_info: function () {
         return '';
-      }
+      },
     },
     custom_attributes: {
       widget_id: 'custom_attribute',
@@ -165,7 +165,7 @@ new GGRC.WidgetList('ggrc_admin', {
       '  class="tree-structure new-tree colored-list"' +
       '  data-no-pin="true"' +
       '></ul>',
-      content_controller_options: adminListDescriptors.custom_attributes
+      content_controller_options: adminListDescriptors.custom_attributes,
     },
     custom_roles: {
       widget_id: 'custom_roles',
@@ -179,17 +179,17 @@ new GGRC.WidgetList('ggrc_admin', {
         '<ul',
         '  class="tree-structure new-tree colored-list"',
         '  data-no-pin="true"',
-        '></ul>'
-      ].join('\n')
-    }
-  }
+        '></ul>',
+      ].join('\n'),
+    },
+  },
 });
 
 $area.cms_controllers_dashboard({
   widget_descriptors: GGRC.WidgetList.get_widget_list_for('admin'),
   menu_tree_spec: GGRC.admin_menu_spec,
   default_widgets: [
-    'people', 'roles', 'events', 'custom_attributes', 'custom_roles'
-  ]
+    'people', 'roles', 'events', 'custom_attributes', 'custom_roles',
+  ],
 });
 initWidgets();

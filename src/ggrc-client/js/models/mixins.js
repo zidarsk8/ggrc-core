@@ -105,14 +105,14 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
         }.bind(this));
         can.each(this.prototype, setupFns(cls.prototype));
       }
-    }
+    },
   }, {});
   can.Model.Mixin('requestorable', {
     before_create: function () {
       if (!this.requestor) {
         this.attr('requestor', {
           id: GGRC.current_user.id,
-          type: 'Person'
+          type: 'Person',
         });
       }
     },
@@ -121,11 +121,11 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
         if (!this.requestor) {
           this.attr('requestor', {
             id: GGRC.current_user.id,
-            type: 'Person'
+            type: 'Person',
           });
         }
       }
-    }
+    },
   });
 
   can.Model.Mixin('ownable', {
@@ -133,7 +133,7 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
       if (!this.owners) {
         this.attr('owners', []);
       }
-    }
+    },
   });
 
   can.Model.Mixin('contactable', {
@@ -144,13 +144,13 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
     //  in the child class's static init function.
     'extend:attributes': {
       contact: 'CMS.Models.Person.stub',
-      secondary_contact: 'CMS.Models.Person.stub'
-    }
+      secondary_contact: 'CMS.Models.Person.stub',
+    },
   }, {
     before_create: function () {
       let person = {
         id: GGRC.current_user.id,
-        type: 'Person'
+        type: 'Person',
       };
       if (!this.contact) {
         this.attr('contact', person);
@@ -159,7 +159,7 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
     form_preload: function (newObjectForm) {
       let person = {
         id: GGRC.current_user.id,
-        type: 'Person'
+        type: 'Person',
       };
       if (newObjectForm && !this.contact) {
         this.attr('contact', person);
@@ -167,7 +167,7 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
       } else if (this.contact) {
         this.attr('_transient.contact', this.contact);
       }
-    }
+    },
   });
 
   can.Model.Mixin('accessControlList', {
@@ -197,7 +197,7 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
     },
     info_pane_preload: function () {
       this.refresh();
-    }
+    },
   });
 
   can.Model.Mixin('inScopeObjectsPreload', {}, {
@@ -216,11 +216,11 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
       let query =
         buildParam(objType, {
           current: 1,
-          pageSize: 1
+          pageSize: 1,
         }, {
           type: this.attr('type'),
           operation: 'relevant',
-          id: this.attr('id')
+          id: this.attr('id'),
         }, queryFields);
       return batchRequests(query)
         .done(function (valueArr) {
@@ -232,7 +232,7 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
               audit.issue_tracker.enabled);
           }
         }.bind(this));
-    }
+    },
   });
 
   function getAllowedMappings(allowed) {
@@ -244,11 +244,11 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
   }
 
   can.Model.Mixin('mapping-limit', {
-    getAllowedMappings: getAllowedMappings
+    getAllowedMappings: getAllowedMappings,
   }, {});
 
   can.Model.Mixin('mapping-limit-issue', {
-    getAllowedMappings: _.partial(getAllowedMappings, ['Program', 'Project', 'TaskGroup'])
+    getAllowedMappings: _.partial(getAllowedMappings, ['Program', 'Project', 'TaskGroup']),
   }, {});
 
   can.Model.Mixin('issueTrackerIntegratable', {
@@ -335,13 +335,13 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
       let IGNORED_STATES = [STATUS_NOT_STARTED, STATUS_IN_PROGRESS];
 
       let TITLE = [
-        'Confirm moving ', this.type, ' to "', STATUS_IN_PROGRESS, '"'
+        'Confirm moving ', this.type, ' to "', STATUS_IN_PROGRESS, '"',
       ].join('');
 
       let DESCRIPTION = [
         'If you modify a value, the status of the ', this.type,
         ' will move from "', this.status, '" to "',
-        STATUS_IN_PROGRESS, '" - are you sure about that?'
+        STATUS_IN_PROGRESS, '" - are you sure about that?',
       ].join('');
 
       let confirmation = can.Deferred();
@@ -352,12 +352,12 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
         confirm({
           modal_description: DESCRIPTION,
           modal_title: TITLE,
-          button_view: GGRC.mustache_path + '/gdrive/confirm_buttons.mustache'
+          button_view: GGRC.mustache_path + '/gdrive/confirm_buttons.mustache',
         }, confirmation.resolve, confirmation.reject);
       }
 
       return confirmation.promise();
-    }
+    },
   });
 
   can.Model.Mixin('unique_title', {
@@ -369,7 +369,7 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
           return newVal; // the title error is the error
         }
       });
-    }
+    },
   }, {
     save_error: function (val) {
       if (/title values must be unique\.$/.test(val)) {
@@ -385,7 +385,7 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
         this._transient) {
         this.attr('_transient.title', null);
       }
-    }
+    },
   });
 
   /**
@@ -396,7 +396,7 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
   can.Model.Mixin('timeboxed', {
     'extend:attributes': {
       start_date: 'date',
-      end_date: 'date'
+      end_date: 'date',
     },
 
     // Override default CanJS's conversion/serialization of dates, because
@@ -406,14 +406,14 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
     serialize: {
       date: function (val, type) {
         return val;
-      }
+      },
     },
 
     convert: {
       date: function (val, oldVal, fn, type) {
         return val;
-      }
-    }
+      },
+    },
   }, {});
   /**
    * Specific Model mixin to check overdue status
@@ -439,7 +439,7 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
         return false;
       }
       return isOverdue;
-    }
+    },
   });
 
   /**
@@ -457,7 +457,7 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
               '_widget/',
               this.hash_fragment(),
               '&refetch=true'].join('');
-    }
+    },
   });
 
   can.Model.Mixin('proposable', {

@@ -35,7 +35,7 @@ import RefreshQueue from '../models/refresh_queue';
         rq.enqueue(getRefreshableObjects(refreshInstance));
       });
       rq.trigger();
-    }
+    },
   };
 
   let flashWarning = function () {
@@ -44,7 +44,7 @@ import RefreshQueue from '../models/refresh_queue';
     setTimeout(function () {
       $(document.body).trigger('ajax:flash', {
         warning: 'Automatic mappings were not created because that would ' +
-        'result in too many new mappings'
+        'result in too many new mappings',
       });
     }, 2000); // 2000 is a magic number that feels nice in the UI
   };
@@ -66,7 +66,7 @@ import RefreshQueue from '../models/refresh_queue';
         rq.enqueue(instance.personable);
         rq.trigger();
       }
-    }
+    },
   });
 
   function isPersonInstance(instance) {

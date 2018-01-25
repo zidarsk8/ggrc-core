@@ -19,11 +19,11 @@ export default GGRC.Components('tasksCounter', {
         value: 0,
         set: function (newValue) {
           return newValue < 0 ? 0 : newValue;
-        }
+        },
       },
       hasOverdue: {
         type: 'boolean',
-        value: false
+        value: false,
       },
       person: {
         set(value, setValue) {
@@ -40,8 +40,8 @@ export default GGRC.Components('tasksCounter', {
             return baseCmpName + '__empty-state';
           }
           return this.attr('hasOverdue') ? baseCmpName + '__overdue-state' : '';
-        }
-      }
+        },
+      },
     },
     loadTasks: function () {
       let id = this.attr('person.id');
@@ -65,6 +65,6 @@ export default GGRC.Components('tasksCounter', {
     },
     '{CMS.Models.CycleTaskGroupObjectTask} updated': 'onModelChange',
     '{CMS.Models.CycleTaskGroupObjectTask} destroyed': 'onModelChange',
-    '{CMS.Models.CycleTaskGroupObjectTask} created': 'onModelChange'
-  }
+    '{CMS.Models.CycleTaskGroupObjectTask} created': 'onModelChange',
+  },
 });

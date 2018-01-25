@@ -9,7 +9,7 @@ describe("can.mustache.helper.get_permalink_for_object", function () {
 
   beforeAll(function () {
     fakeOptions = {
-      fn: jasmine.createSpy()
+      fn: jasmine.createSpy(),
     };
 
     helper = can.Mustache._helpers["get_permalink_for_object"].fn;
@@ -18,7 +18,7 @@ describe("can.mustache.helper.get_permalink_for_object", function () {
   it("concatenates window.location.origin and objects view link",
     function () {
       let instance = {
-        viewLink: "/facility/1"
+        viewLink: "/facility/1",
       };
       expect(helper(instance)).toBe(window.location.origin + "/facility/1");
     }

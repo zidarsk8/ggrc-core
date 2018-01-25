@@ -15,7 +15,7 @@ import '../components/inline/people-with-role-inline-field';
       workflow_view: GGRC.mustache_path + "/dashboard/info/workflow_progress.mustache",
       workflow_data: {},
       workflow_count: 0,
-      workflow_show_all: false
+      workflow_show_all: false,
     },
     events: {
       // Click action to show all workflows
@@ -44,7 +44,7 @@ import '../components/inline/people-with-role-inline-field';
         el.addClass('active');
         this.element.find('.workflow-wrap-main').show();
         ev.stopPropagation();
-      }
+      },
     },
     init: function() {
       this.init_my_workflows();
@@ -209,7 +209,7 @@ import '../components/inline/people-with-role-inline-field';
     */
     sort_by_end_date: function(a, b) {
         return (a.task_data.first_end_dateD.getTime() - b.task_data.first_end_dateD.getTime());
-    }
+    },
 
   });
 })(window.CMS, window.GGRC, window.can, window.can.$);

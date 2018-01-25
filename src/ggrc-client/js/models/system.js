@@ -45,7 +45,7 @@ can.Model.Cacheable('CMS.Models.SystemOrProcess', {
     controls: 'CMS.Models.Control.stubs',
     sections: 'CMS.Models.get_stubs',
     network_zone: 'CMS.Models.Option.stub',
-    custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+    custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
   },
   tree_view_options: {
     attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
@@ -53,14 +53,14 @@ can.Model.Cacheable('CMS.Models.SystemOrProcess', {
       {
         attr_title: 'Network Zone',
         attr_name: 'network_zone',
-        attr_sort_field: 'network_zone'
+        attr_sort_field: 'network_zone',
       },
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url'}
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
     ]),
     add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
-    link_buttons: true
+    link_buttons: true,
   },
   links_to: {
     System: {},
@@ -79,8 +79,8 @@ can.Model.Cacheable('CMS.Models.SystemOrProcess', {
     Policy: {},
     Standard: {},
     Contract: {},
-    Objective: {}
-  }
+    Objective: {},
+  },
 }, {
   system_or_process: function () {
     let result;
@@ -94,7 +94,7 @@ can.Model.Cacheable('CMS.Models.SystemOrProcess', {
   system_or_process_capitalized: function () {
     let str = this.system_or_process();
     return str.charAt(0).toUpperCase() + str.slice(1);
-  }
+  },
 });
 
 CMS.Models.SystemOrProcess('CMS.Models.System', {
@@ -112,7 +112,7 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
   defaults: {
     title: '',
     url: '',
-    status: 'Draft'
+    status: 'Draft',
   },
   sub_tree_view_options: {
     default_filter: ['Product'],
@@ -127,7 +127,7 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
         add_item_view: GGRC.mustache_path +
         (GGRC.infer_object_type(GGRC.page_object) === CMS.Models.Program ?
           '/snapshots/tree_add_item.mustache' :
-          '/base_objects/tree_add_item.mustache')
+          '/base_objects/tree_add_item.mustache'),
       });
     this.validateNonBlank('title');
   },
@@ -135,7 +135,7 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
   init: function () {
     this._super && this._super.apply(this, arguments);
     this.attr('is_biz_process', false);
-  }
+  },
 });
 
 CMS.Models.SystemOrProcess('CMS.Models.Process', {
@@ -159,7 +159,7 @@ CMS.Models.SystemOrProcess('CMS.Models.Process', {
   defaults: {
     title: '',
     url: '',
-    status: 'Draft'
+    status: 'Draft',
   },
   sub_tree_view_options: {
     default_filter: ['Risk'],
@@ -176,5 +176,5 @@ CMS.Models.SystemOrProcess('CMS.Models.Process', {
   init: function () {
     this._super && this._super.apply(this, arguments);
     this.attr('is_biz_process', true);
-  }
+  },
 });

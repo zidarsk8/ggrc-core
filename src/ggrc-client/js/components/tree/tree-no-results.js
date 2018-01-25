@@ -17,14 +17,14 @@ import template from './templates/tree-no-results.mustache';
           value: 'No results, please check your filter criteria',
           set: function (value) {
             return value || 'No results...';
-          }
+          },
         },
         show: {
           set: function (value) {
             return value || false;
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   });
 })(window.can, window.GGRC);

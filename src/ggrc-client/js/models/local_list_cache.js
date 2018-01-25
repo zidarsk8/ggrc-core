@@ -6,7 +6,7 @@
 
 can.Model.LocalStorage("CMS.Models.LocalListCache", {
   attributes : {
-    objects : "modelize"
+    objects : "modelize",
   }
   , convert : {
     modelize : function(serial) {
@@ -22,7 +22,7 @@ can.Model.LocalStorage("CMS.Models.LocalListCache", {
       }));
       can.batch.stop();
       return insts;
-    }
+    },
   }
   , init : function() {
     let that = this
@@ -33,7 +33,7 @@ can.Model.LocalStorage("CMS.Models.LocalListCache", {
         return that.create(params);
       });
     };
-  }
+  },
 }, {
   save : function() {
     let that = this
@@ -63,15 +63,15 @@ can.Model.LocalStorage("CMS.Models.LocalListCache", {
         let obj = {
           id : d.id
           , type : that.type
-          , href : d.href || d.selfLink || ("/api/" + that.type + "/" + d.id)
+          , href : d.href || d.selfLink || ("/api/" + that.type + "/" + d.id),
         };
         can.each(that.keys, function(key) {
           obj[key] = (d[key] && d[key].serialize) ? d[key].serialize() : d[key];
         });
         return obj;
       })
-      , keys : this.keys.serialize ? this.keys.serialize() : this.keys
+      , keys : this.keys.serialize ? this.keys.serialize() : this.keys,
     };
-  }
+  },
 });
 })(window.can);

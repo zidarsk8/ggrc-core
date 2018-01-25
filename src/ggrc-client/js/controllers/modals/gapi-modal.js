@@ -9,12 +9,12 @@ export default ModalsController({
   pluginName: 'ggrc_controllers_gapi_modal',
   defaults: {
     skip_refresh: true,
-    content_view: GGRC.mustache_path + '/gdrive/auth_button.mustache'
+    content_view: GGRC.mustache_path + '/gdrive/auth_button.mustache',
   },
   init: function () {
     this._super.apply(this, arguments);
     this.defaults.button_view = can.view.mustache('');
-  }
+  },
 }, {
   init: function () {
     this._super();
@@ -35,5 +35,5 @@ export default ModalsController({
       GGRC.Controllers.GAPI.oauth_dfd.reject('User canceled operation');
     }
     this.element && this.element.remove();
-  }
+  },
 });

@@ -25,7 +25,7 @@
         if (this.indexOfSelected(id, type) < 0) {
           this.attr('selectedItems').push({
             id: id,
-            type: type
+            type: type,
           });
           this.markItem(id, type, true);
         } else {
@@ -100,7 +100,7 @@
           .fail(function () {
             this.clearSelection();
           }.bind(this));
-      }
+      },
     },
     events: {
       '{viewModel} refreshSelection': function (scope, ev, refreshSelection) {
@@ -123,7 +123,7 @@
         } else {
           this.viewModel.deselectAll();
         }
-      }
-    }
+      },
+    },
   });
 })(window.can);

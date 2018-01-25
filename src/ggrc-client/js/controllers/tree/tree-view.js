@@ -52,8 +52,8 @@ import Permission from '../../permission';
       'original_list',
       'single_object',
       'find_function',
-      'find_all_deferred'
-    ]
+      'find_all_deferred',
+    ],
   }, {
     // prototype properties
     setup: function (el, opts) {
@@ -691,6 +691,6 @@ import Permission from '../../permission';
 
     clearList: function () {
       this.element.children('.tree-item, .tree-item-placeholder').remove();
-    }
+    },
   });
 })(window.can, window.$);

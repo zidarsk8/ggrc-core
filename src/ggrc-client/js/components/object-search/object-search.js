@@ -34,7 +34,7 @@ import template from './object-search.mustache';
         onSubmit: function () {
           this.attr('resultsRequested', true);
           this._super();
-        }
+        },
       });
     },
     helpers: {
@@ -43,7 +43,7 @@ import template from './object-search.mustache';
         if (count) {
           return '(' + count + ')';
         }
-      }
-    }
+      },
+    },
   });
 })(window.can, window.can.$);

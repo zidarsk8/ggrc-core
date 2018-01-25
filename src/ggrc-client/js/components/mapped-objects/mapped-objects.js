@@ -24,25 +24,25 @@ import template from './mapped-objects.mustache';
       define: {
         emptyMessage: {
           type: 'string',
-          value: 'None'
+          value: 'None',
         },
         relatedTypes: {
           type: 'string',
           value: function () {
             return '';
-          }
+          },
         },
         mappedItems: {
-          Value: can.List
+          Value: can.List,
         },
         mappedSnapshots: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         requireLimit: {
           get: function () {
             return this.attr('mappedItems.length') > this.attr('visibleItems');
-          }
+          },
         },
         showItems: {
           type: can.List,
@@ -50,23 +50,23 @@ import template from './mapped-objects.mustache';
             return this.attr('showAll') ?
               this.attr('mappedItems') :
               this.attr('mappedItems').slice(0, this.attr('visibleItems'));
-          }
+          },
         },
         showAll: {
           value: false,
-          type: Boolean
+          type: Boolean,
         },
         showAllButtonText: {
           get: function () {
             return !this.attr('showAll') ?
             'Show All (' + this.attr('mappedItems.length') + ')' :
               'Show Less';
-          }
+          },
         },
         visibleItems: {
           type: Number,
-          value: 5
-        }
+          value: 5,
+        },
       },
       isLoading: false,
       mapping: '@',
@@ -74,7 +74,7 @@ import template from './mapped-objects.mustache';
       selectedItem: {},
       filter: {
         only: [],
-        exclude: []
+        exclude: [],
       },
       toggleShowAll: function () {
         let isShown = this.attr('showAll');
@@ -97,16 +97,16 @@ import template from './mapped-objects.mustache';
         let excludeTypes = this.attr('filter.exclude').attr();
         let includeFilters = {
           keys: [],
-          expression: {}
+          expression: {},
         };
         let excludeFilters = excludeTypes.map(function (type) {
           return {
             expression: {
               op: {name: '!='},
               left: 'child_type',
-              right: type
+              right: type,
             },
-            keys: []
+            keys: [],
           };
         });
         includeTypes.forEach(function (type) {
@@ -114,9 +114,9 @@ import template from './mapped-objects.mustache';
             expression: {
               op: {name: '='},
               left: 'child_type',
-              right: type
+              right: type,
             },
-            keys: []
+            keys: [],
           }, includeFilters, 'OR');
         });
         excludeFilters.push(includeFilters);
@@ -126,7 +126,7 @@ import template from './mapped-objects.mustache';
         let relevantFilters = [{
           type: this.attr('parentInstance.type'),
           id: this.attr('parentInstance.id'),
-          operation: 'relevant'
+          operation: 'relevant',
         }];
         let filters = this.getSnapshotQueryFilters();
 
@@ -136,7 +136,7 @@ import template from './mapped-objects.mustache';
         let relevantFilters = [{
           type: this.attr('parentInstance.type'),
           id: this.attr('parentInstance.id'),
-          operation: 'relevant'
+          operation: 'relevant',
         }];
         let type = this.attr('relatedTypes');
 
@@ -206,7 +206,7 @@ import template from './mapped-objects.mustache';
         }
         objects = loadFn.call(this);
         this.attr('mappedItems').replace(objects);
-      }
+      },
     },
     init: function () {
       this.viewModel.setMappedObjects();
@@ -214,7 +214,7 @@ import template from './mapped-objects.mustache';
     events: {
       '{viewModel.parentInstance} refreshInstance': function () {
         this.viewModel.setMappedObjects();
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

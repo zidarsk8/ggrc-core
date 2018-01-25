@@ -18,17 +18,17 @@ import template from './base-inline-control-title.mustache';
             return !this.attr('editMode') &&
               !this.attr('isLoading') &&
               !this.attr('isEditIconDenied');
-          }
-        }
+          },
+        },
       },
       isLoading: false,
       editMode: false,
-      isEditIconDenied: false
+      isEditIconDenied: false,
     },
     events: {
       '.inline-edit-icon click': function () {
         this.viewModel.dispatch('setEditModeInline');
-      }
-    }
+      },
+    },
   });
 })(window.can);

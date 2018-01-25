@@ -25,10 +25,10 @@
             return _.any(this.attr('assessments'), function (item) {
               return item.attr('itemLoading');
             });
-          }
-        }
+          },
+        },
       },
-      assessments: null
-    }
+      assessments: null,
+    },
   });
 })(window.can);

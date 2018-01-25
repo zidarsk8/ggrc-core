@@ -37,7 +37,7 @@ import {confirm} from '../../../plugins/utils/modals';
           modal_description: 'You are about to move Assessment from "' +
             this.instance.status +
             '" to "In Progress" - are you sure about that?',
-          button_view: GGRC.mustache_path + '/modals/prompt_buttons.mustache'
+          button_view: GGRC.mustache_path + '/modals/prompt_buttons.mustache',
         }, confirmation.resolve, confirmation.reject);
 
         return confirmation.then(function (data) {
@@ -53,9 +53,9 @@ import {confirm} from '../../../plugins/utils/modals';
         // send 'isLastOpenInline' when inline is opening without confirm
         this.dispatch({
           type: 'setEditMode',
-          isLastOpenInline: true
+          isLastOpenInline: true,
         });
-      }
-    }
+      },
+    },
   });
 })(window.can);

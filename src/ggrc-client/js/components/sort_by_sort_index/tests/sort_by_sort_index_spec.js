@@ -28,7 +28,7 @@ describe('GGRC.Components.tasksSortList', function () {
 
     beforeEach(function () {
       fakeContext = new can.Map({
-        getTaskDate: fakeGetTaskDate
+        getTaskDate: fakeGetTaskDate,
       });
       method = Component.prototype.compareTasks.bind(fakeContext);
     });
@@ -37,10 +37,10 @@ describe('GGRC.Components.tasksSortList', function () {
       'before the 2nd task\'s start date',
       function () {
         let task = new can.Map({
-          instance: {start_date: '2016-05-12'}
+          instance: {start_date: '2016-05-12'},
         });
         let task2 = new can.Map({
-          instance: {start_date: '2016-05-13'}
+          instance: {start_date: '2016-05-13'},
         });
 
         let result = method(task, task2);
@@ -54,10 +54,10 @@ describe('GGRC.Components.tasksSortList', function () {
       'after the 2nd task\'s start date',
       function () {
         let task = new can.Map({
-          instance: {start_date: '2016-05-12'}
+          instance: {start_date: '2016-05-12'},
         });
         let task2 = new can.Map({
-          instance: {start_date: '2016-05-11'}
+          instance: {start_date: '2016-05-11'},
         });
 
         let result = method(task, task2);
@@ -73,10 +73,10 @@ describe('GGRC.Components.tasksSortList', function () {
 
       beforeEach(function () {
         task = new can.Map({
-          instance: {start_date: '2016-05-12'}
+          instance: {start_date: '2016-05-12'},
         });
         task2 = new can.Map({
-          instance: {start_date: '2016-05-12'}
+          instance: {start_date: '2016-05-12'},
         });
       });
 
@@ -142,7 +142,7 @@ describe('GGRC.Components.tasksSortList', function () {
     it('returns task\'s start date if requested and date exists', function () {
       let task = new can.Map({
         start_date: '2016-01-25',
-        end_date: '2016-04-18'
+        end_date: '2016-04-18',
       });
 
       let result = method(task, 'start');
@@ -155,7 +155,7 @@ describe('GGRC.Components.tasksSortList', function () {
     it('returns task\'s end date if requested and date exists', function () {
       let task = new can.Map({
         start_date: '2016-01-25',
-        end_date: '2016-04-18'
+        end_date: '2016-04-18',
       });
 
       let result = method(task, 'end');
@@ -181,7 +181,7 @@ describe('GGRC.Components.tasksSortList', function () {
           relative_start_day: 31,
           relative_start_month: 12,
           relative_end_day: 28,
-          relative_end_month: 8
+          relative_end_month: 8,
         });
 
         result = method(task, 'start');
@@ -208,7 +208,7 @@ describe('GGRC.Components.tasksSortList', function () {
           relative_start_day: 29,
           relative_start_month: 9,
           relative_end_day: 31,
-          relative_end_month: 12
+          relative_end_month: 12,
         });
 
         result = method(task, 'end');
@@ -235,7 +235,7 @@ describe('GGRC.Components.tasksSortList', function () {
           relative_start_day: 31,
           relative_start_month: undefined,
           relative_end_day: 31,
-          relative_end_month: 12
+          relative_end_month: 12,
         });
 
         result = method(task, 'start');

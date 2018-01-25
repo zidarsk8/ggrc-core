@@ -78,7 +78,7 @@ import template from './object-generator.mustache';
           target: object,
           instance: instance,
           assessmentTemplate: assessmentTemplate,
-          context: this
+          context: this,
         });
       },
       '{viewModel} assessmentTemplate': function (viewModel, ev, val, oldVal) {
@@ -91,7 +91,7 @@ import template from './object-generator.mustache';
         type = val[1];
         this.viewModel.attr('block_type_change', true);
         this.viewModel.attr('type', type);
-      }
-    }
+      },
+    },
   });
 })(window.can, window.can.$);

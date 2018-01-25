@@ -59,12 +59,12 @@ import {
             can.trigger(el, 'refreshTree');
 
             return initCounts([
-                WorkflowExtension.countsMap.history
+                WorkflowExtension.countsMap.history,
               ],
                 pageInstance.type,
                 pageInstance.id);
           }.bind(this));
-      }
-    }
+      },
+    },
   });
 })(window.GGRC, window.can);

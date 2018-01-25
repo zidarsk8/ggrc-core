@@ -14,16 +14,16 @@
     viewModel: {
       define: {
         parentInstance: {
-          value: {}
+          value: {},
         },
         // Load only Comment
         relatedTypes: {
           type: String,
           value: function () {
             return 'Comment';
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   });
 })(window.can);

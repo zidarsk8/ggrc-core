@@ -22,7 +22,7 @@ describe('GGRC.Components.subTreeWrapper', function () {
     beforeEach(function () {
       vm.attr('parent', {
         type: 'Foo',
-        id: 13
+        id: 13,
       });
 
       method = vm.loadItems.bind(vm);
@@ -44,7 +44,7 @@ describe('GGRC.Components.subTreeWrapper', function () {
         .returnValue(can.Deferred().resolve({
           directlyItems: [],
           notDirectlyItems: [],
-          showMore: false
+          showMore: false,
         }));
 
       method().then(function () {

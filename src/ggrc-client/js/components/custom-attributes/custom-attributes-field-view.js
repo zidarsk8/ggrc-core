@@ -18,7 +18,7 @@ import template from './custom-attributes-field-view.mustache';
     template: template,
     viewModel: {
       type: null,
-      value: null
-    }
+      value: null,
+    },
   });
 })(window.can, window.GGRC);

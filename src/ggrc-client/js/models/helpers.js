@@ -7,7 +7,7 @@
   can.Observe('CMS.ModelHelpers.CycleTask', {
     findInCacheById: function () {
       return null;
-    }
+    },
   }, {
     init: function () {
       this.attr('owners', new CMS.Models.Person.List(this.owners));
@@ -20,7 +20,7 @@
       this._data.owners = $.map(this._data.owners, function (owner) {
         return {
           id: owner.id,
-          type: owner.type
+          type: owner.type,
         };
       });
 
@@ -30,7 +30,7 @@
         description: this.description,
         sort_index: Number.MAX_SAFE_INTEGER / 2,
         contact: this.contact,
-        context: this.context
+        context: this.context,
       });
 
       return Task.save()
@@ -45,7 +45,7 @@
             description: this.description,
             status: 'Assigned',
             contact: this.contact,
-            context: this.context
+            context: this.context,
           });
           return CycleTask.save();
         }.bind(this));
@@ -54,10 +54,10 @@
       let errors = null;
       if (!this.attr('title')) {
         errors = {
-          title: 'Must be defined'
+          title: 'Must be defined',
         };
       }
       return errors;
-    }
+    },
   });
 })(window.can, window.can.$, window.CMS);

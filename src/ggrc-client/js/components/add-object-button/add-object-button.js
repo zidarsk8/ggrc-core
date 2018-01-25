@@ -21,9 +21,9 @@ import template from './add-object-button.mustache';
       define: {
         noparams: {
           type: 'htmlbool',
-          value: false
-        }
-      }
-    }
+          value: false,
+        },
+      },
+    },
   });
 })(window.can);

@@ -15,7 +15,7 @@
       define: {
         disabled: {
           type: 'htmlbool',
-          value: false
+          value: false,
         },
         disabledCss: {
           type: 'string',
@@ -24,9 +24,9 @@
             return this.attr('disabled') ?
               'action-toolbar__controls-item-disabled' :
               '';
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   });
 })(window.GGRC);

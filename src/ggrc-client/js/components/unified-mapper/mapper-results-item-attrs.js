@@ -25,7 +25,7 @@ import template from './templates/mapper-results-item-attrs.mustache';
       instance: null,
       columns: [],
       modelType: '',
-      attrTemplate: DEFAULT_ATTR_TEMPLATE
-    }
+      attrTemplate: DEFAULT_ATTR_TEMPLATE,
+    },
   });
 })(window.can, window.GGRC);

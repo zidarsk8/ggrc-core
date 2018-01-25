@@ -18,8 +18,8 @@ describe('GGRC.Components.mapperResultsItem', function () {
        let result;
        viewModel.attr('itemData', {
          revision: {
-           content: 'mockData'
-         }
+           content: 'mockData',
+         },
        });
        result = viewModel.displayItem();
        expect(result).toEqual('mockData');
@@ -41,7 +41,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
         title: 'mockTitle',
         description_inline: 'mockDescription',
         name: 'mockName',
-        email: 'mockEmail'
+        email: 'mockEmail',
       };
     });
 
@@ -55,7 +55,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
     it('returns item description if no title', function () {
       let result;
       viewModel.attr('itemData', _.assign(itemData, {
-        title: undefined
+        title: undefined,
       }));
       result = viewModel.title();
       expect(result).toEqual('mockDescription');
@@ -65,7 +65,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
       let result;
       viewModel.attr('itemData', _.assign(itemData, {
         title: undefined,
-        description_inline: undefined
+        description_inline: undefined,
       }));
       result = viewModel.title();
       expect(result).toEqual('mockName');
@@ -77,7 +77,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
         viewModel.attr('itemData', _.assign(itemData, {
           title: undefined,
           description_inline: undefined,
-          name: undefined
+          name: undefined,
         }));
         result = viewModel.title();
         expect(result).toEqual('mockEmail');
@@ -118,7 +118,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
     it('returns true if it is snapshot', function () {
       let result;
       viewModel.attr('itemData', {
-        type: CMS.Models.Snapshot.model_singular
+        type: CMS.Models.Snapshot.model_singular,
       });
       result = viewModel.isSnapshot();
       expect(result).toEqual(true);
@@ -127,7 +127,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
     it('returns false if it is not snapshot', function () {
       let result;
       viewModel.attr('itemData', {
-        type: 'mockType'
+        type: 'mockType',
       });
       result = viewModel.isSnapshot();
       expect(result).toEqual(false);
@@ -139,7 +139,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
       let result;
       viewModel.attr('itemData', {
         type: CMS.Models.Snapshot.model_singular,
-        child_type: 'mockType'
+        child_type: 'mockType',
       });
       result = viewModel.objectType();
       expect(result).toEqual('mockType');
@@ -148,7 +148,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
     it('returns type if it is not snapshot', function () {
       let result;
       viewModel.attr('itemData', {
-        type: 'mockType'
+        type: 'mockType',
       });
       result = viewModel.objectType();
       expect(result).toEqual('mockType');
@@ -160,7 +160,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
       let postfix;
       let result;
       viewModel.attr('itemData', {
-        type: 'Program'
+        type: 'Program',
       });
       postfix = CMS.Models.Program.table_singular;
       result = viewModel.objectTypeIcon();
@@ -176,7 +176,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
       expect(viewModel.dispatch).toHaveBeenCalledWith(
         jasmine.objectContaining({
           type: 'showRelatedAssessments',
-          instance: 'mockData'
+          instance: 'mockData',
         })
       );
     });

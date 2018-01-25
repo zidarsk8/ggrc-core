@@ -16,21 +16,21 @@ import template from './templates/sub-tree-item.mustache';
         get: function () {
           return this.attr('instance.next_due_date') ||
             this.attr('instance.end_date');
-        }
+        },
       },
       dueDateCssClass: {
         type: 'string',
         get: function () {
           let isOverdue = this.attr('instance.isOverdue');
           return isOverdue ? 'state-overdue' : '';
-        }
+        },
       },
       isCycleTaskGroupObjectTask: {
         type: 'boolean',
         get: function () {
           return this.attr('instance') instanceof
             CMS.Models.CycleTaskGroupObjectTask;
-        }
+        },
       },
       cssClasses: {
         type: String,
@@ -47,7 +47,7 @@ import template from './templates/sub-tree-item.mustache';
           }
 
           return classes.join(' ');
-        }
+        },
       },
       title: {
         type: String,
@@ -55,8 +55,8 @@ import template from './templates/sub-tree-item.mustache';
           let instance = this.attr('instance');
           return instance.title || instance.description_inline ||
             instance.name || instance.email || '';
-        }
-      }
+        },
+      },
     },
     itemSelector: '.sub-item-content',
     extraCss: '@',
@@ -81,6 +81,6 @@ import template from './templates/sub-tree-item.mustache';
           viewModel.attr('resultDfd', resultDfd);
         }
       },
-    }
+    },
   });
 })(window.can, window.GGRC);

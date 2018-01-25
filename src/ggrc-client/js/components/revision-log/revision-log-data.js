@@ -13,13 +13,13 @@ let viewModel = can.Map.extend({
       type: 'boolean',
       get: function () {
         return _.isObject(this.attr('data'));
-      }
-    }
-  }
+      },
+    },
+  },
 });
 
 GGRC.Components('revisionLogData', {
   tag: 'revision-log-data',
   template: template,
-  viewModel: viewModel
+  viewModel: viewModel,
 });

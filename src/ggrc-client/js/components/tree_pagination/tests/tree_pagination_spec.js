@@ -17,7 +17,7 @@ describe('GGRC.Components.treePagination', function () {
   beforeEach(function () {
     viewModel.attr('paging', new Pagination({
       pageSize: 10,
-      disabled: false
+      disabled: false,
     }));
     viewModel.paging.attr('count', 3);
     viewModel.paging.attr('current', 1);
@@ -143,10 +143,10 @@ describe('GGRC.Components.treePagination', function () {
         val: function () {
           return this.value;
         },
-        blur: jasmine.createSpy()
+        blur: jasmine.createSpy(),
       };
       event = {
-        stopPropagation: jasmine.createSpy()
+        stopPropagation: jasmine.createSpy(),
       };
     });
     it('changes current if value more than 1 and less than amount of pages',

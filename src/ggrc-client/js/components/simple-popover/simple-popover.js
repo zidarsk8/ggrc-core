@@ -20,7 +20,7 @@ import template from './simple-popover.mustache';
       },
       hide: function () {
         this.attr('open', false);
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

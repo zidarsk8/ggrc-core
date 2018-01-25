@@ -22,10 +22,10 @@ import template from './custom-attributes.mustache';
         this.attr('modifiedFields').attr(field.id, event.value);
         this.dispatch({
           type: 'onUpdateAttributes',
-          globalAttributes: this.attr('modifiedFields')
+          globalAttributes: this.attr('modifiedFields'),
         });
         this.attr('modifiedFields', {}, true);
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

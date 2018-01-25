@@ -107,6 +107,6 @@ import RefreshQueue from '../refresh_queue';
               });
             });
           });
-      }
+      },
     });
 })(window.GGRC, window.can);

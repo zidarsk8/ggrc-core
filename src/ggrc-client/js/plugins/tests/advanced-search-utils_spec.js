@@ -13,8 +13,8 @@ describe('AdvancedSearch', function () {
       let items = [
         AdvancedSearch.create.state({
           items: ['Active', 'Draft', 'Deprecated'],
-          operator: 'ANY'
-        })
+          operator: 'ANY',
+        }),
       ];
       let expectedResult = '("Status"="Active" ' +
                            'OR "Status"="Draft" ' +
@@ -79,28 +79,28 @@ describe('AdvancedSearch', function () {
       let items = [
         AdvancedSearch.create.state({
           items: ['Active', 'Draft'],
-          operator: 'ANY'
+          operator: 'ANY',
         }),
         AdvancedSearch.create.operator('AND'),
         AdvancedSearch.create.attribute({
           field: 'Title',
           operator: '~',
-          value: ' test'
+          value: ' test',
         }),
         AdvancedSearch.create.operator('OR'),
         AdvancedSearch.create.group([
           AdvancedSearch.create.attribute({
             field: 'Para',
             operator: '=',
-            value: 'meter'
+            value: 'meter',
           }),
           AdvancedSearch.create.operator('AND'),
           AdvancedSearch.create.attribute({
             field: 'Other',
             operator: '~=',
-            value: 'value '
-          })
-        ])
+            value: 'value ',
+          }),
+        ]),
       ];
       let expectedResult = '("Status"="Active" OR "Status"="Draft") ' +
                            'AND "Title" ~ "test" ' +
@@ -116,16 +116,16 @@ describe('AdvancedSearch', function () {
           filter: AdvancedSearch.create.attribute({
             field: 'title',
             operator: '~',
-            value: 'A'
+            value: 'A',
           }),
           mappedTo: AdvancedSearch.create.mappingCriteria({
             objectName: 'system',
             filter: AdvancedSearch.create.attribute({
               field: 'title',
               operator: '~',
-              value: 'B'
-            })
-          })
+              value: 'B',
+            }),
+          }),
         }),
         AdvancedSearch.create.operator('AND'),
         AdvancedSearch.create.mappingCriteria({
@@ -133,7 +133,7 @@ describe('AdvancedSearch', function () {
           filter: AdvancedSearch.create.attribute({
             field: 'title',
             operator: '~',
-            value: 'C'
+            value: 'C',
           }),
           mappedTo: AdvancedSearch.create.group([
             AdvancedSearch.create.mappingCriteria({
@@ -141,8 +141,8 @@ describe('AdvancedSearch', function () {
               filter: AdvancedSearch.create.attribute({
                 field: 'title',
                 operator: '~',
-                value: 'D'
-              })
+                value: 'D',
+              }),
             }),
             AdvancedSearch.create.operator('OR'),
             AdvancedSearch.create.mappingCriteria({
@@ -150,11 +150,11 @@ describe('AdvancedSearch', function () {
               filter: AdvancedSearch.create.attribute({
                 field: 'title',
                 operator: '~',
-                value: 'E'
-              })
-            })
-          ])
-        })
+                value: 'E',
+              }),
+            }),
+          ]),
+        }),
       ];
       let expectedFilters = '#__previous__,1# AND #__previous__,4#';
       let expectedRequest = [
@@ -165,15 +165,15 @@ describe('AdvancedSearch', function () {
             expression: {
               left: 'title',
               op: {name: '~'},
-              right: 'B'
+              right: 'B',
             },
             keys: ['title'],
             order_by: {
               keys: [],
               order: '',
-              compare: null
-            }
-          }
+              compare: null,
+            },
+          },
         },
         {
           object_name: 'product',
@@ -183,22 +183,22 @@ describe('AdvancedSearch', function () {
               left: {
                 left: 'title',
                 op: {name: '~'},
-                right: 'A'
+                right: 'A',
               },
               op: {name: 'AND'},
               right: {
                 object_name: '__previous__',
                 op: {name: 'relevant'},
-                ids: ['0']
-              }
+                ids: ['0'],
+              },
             },
             keys: ['title'],
             order_by: {
               keys: [],
               order: '',
-              compare: null
-            }
-          }
+              compare: null,
+            },
+          },
         },
         {
           object_name: 'system',
@@ -207,15 +207,15 @@ describe('AdvancedSearch', function () {
             expression: {
               left: 'title',
               op: {name: '~'},
-              right: 'D'
+              right: 'D',
             },
             keys: ['title'],
             order_by: {
               keys: [],
               order: '',
-              compare: null
-            }
-          }
+              compare: null,
+            },
+          },
         },
         {
           object_name: 'system',
@@ -224,15 +224,15 @@ describe('AdvancedSearch', function () {
             expression: {
               left: 'title',
               op: {name: '~'},
-              right: 'E'
+              right: 'E',
             },
             keys: ['title'],
             order_by: {
               keys: [],
               order: '',
-              compare: null
-            }
-          }
+              compare: null,
+            },
+          },
         },
         {
           object_name: 'control',
@@ -242,31 +242,31 @@ describe('AdvancedSearch', function () {
               left: {
                 left: 'title',
                 op: {name: '~'},
-                right: 'C'
+                right: 'C',
               },
               op: {name: 'AND'},
               right: {
                 left: {
                   object_name: '__previous__',
                   op: {name: 'relevant'},
-                  ids: ['2']
+                  ids: ['2'],
                 },
                 op: {name: 'OR'},
                 right: {
                   object_name: '__previous__',
                   op: {name: 'relevant'},
-                  ids: ['3']
-                }
-              }
+                  ids: ['3'],
+                },
+              },
             },
             keys: ['title'],
             order_by: {
               keys: [],
               order: '',
-              compare: null
-            }
-          }
-        }
+              compare: null,
+            },
+          },
+        },
       ];
       let request = [];
 

@@ -21,21 +21,21 @@ import template from './ca-object-modal-content.mustache';
           get: function () {
             return this.attr('content.fields').indexOf('comment') > -1 &&
               this.attr('state.open');
-          }
+          },
         },
         evidence: {
           get: function () {
             return this.attr('content.fields').indexOf('evidence') > -1 &&
               this.attr('state.open');
-          }
+          },
         },
         state: {
           value: {
             open: false,
             save: false,
-            controls: false
-          }
-        }
+            controls: false,
+          },
+        },
       },
       formSavedDeferred: can.Deferred(),
       isUpdatingEvidences: false,
@@ -45,13 +45,13 @@ import template from './ca-object-modal-content.mustache';
         title: '',
         type: 'dropdown',
         value: null,
-        options: []
+        options: [],
       },
       afterCreation: function (comment, success) {
         this.dispatch({
           type: 'afterCommentCreated',
           item: comment,
-          success: success
+          success: success,
         });
       },
       onCommentCreated: function (e) {
@@ -76,11 +76,11 @@ import template from './ca-object-modal-content.mustache';
             assignee_type: GGRC.Utils.getAssigneeType(instance),
             custom_attribute_revision: {
               custom_attribute: {
-                title: this.attr('content.title')
+                title: this.attr('content.title'),
               },
-              custom_attribute_stored_value: this.attr('content.value')
-            }
-          })]
+              custom_attribute_stored_value: this.attr('content.value'),
+            },
+          })],
         });
         this.attr('content.contextScope.errorsMap.comment', false);
         this.attr('content.contextScope.validation.valid',
@@ -95,15 +95,15 @@ import template from './ca-object-modal-content.mustache';
               assignee_type: GGRC.Utils.getAssigneeType(instance),
               custom_attribute_revision_upd: {
                 custom_attribute_value: {
-                  id: self.attr('content.contextScope.valueId')()
+                  id: self.attr('content.contextScope.valueId')(),
                 },
                 custom_attribute_definition: {
-                  id: self.attr('content.contextScope.id')
-                }
-              }
+                  id: self.attr('content.contextScope.id'),
+                },
+              },
             });
           });
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

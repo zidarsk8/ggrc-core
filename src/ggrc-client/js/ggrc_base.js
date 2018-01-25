@@ -44,7 +44,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
       when_queue_empties: function() {
         window.onbeforeunload = $.noop;
       },
-      name: 'GGRC/window'
+      name: 'GGRC/window',
     });
 
   $.extend(GGRC, {
@@ -146,7 +146,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
       notifier.on_empty(go);
     },
 
-    delay_leaving_page_until: $.proxy(notifier, "queue")
+    delay_leaving_page_until: $.proxy(notifier, "queue"),
   });
 
   GGRC.Errors = (function () {
@@ -160,7 +160,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
       ' Your changes have not been saved yet.' +
       ' Please refresh the page and try saving again',
       '412': 'One of the form fields isn\'t right. ' +
-      'Check the form for any highlighted fields.'
+      'Check the form for any highlighted fields.',
     };
 
     /**
@@ -201,7 +201,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
     return {
       messages: messages,
       notifier: notifier,
-      notifierXHR: notifierXHR
+      notifierXHR: notifierXHR,
     };
   })();
 
@@ -353,7 +353,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
         }
       }
       return _b.length >= _a.length ? false : true;
-    }
+    },
 
   });
 

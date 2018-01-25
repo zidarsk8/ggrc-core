@@ -75,6 +75,6 @@
             this.insert_results(binding, [active]);
           }
         }.bind(this));
-      }
+      },
     });
 })(window.GGRC, window.can);

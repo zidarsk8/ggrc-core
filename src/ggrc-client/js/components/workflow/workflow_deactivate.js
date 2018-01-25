@@ -16,7 +16,7 @@
         workflow.refresh().then(function(workflow) {
           workflow.attr('recurrences', false).save();
         });
-      }
-    }
+      },
+    },
   });
 })(window.GGRC, window.can);

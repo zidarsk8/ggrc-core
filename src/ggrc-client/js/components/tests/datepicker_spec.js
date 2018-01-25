@@ -88,7 +88,7 @@ describe('GGRC.Components.datepicker', function () {
           getDate: function (date) {
             return date;
           },
-          updateDate: jasmine.createSpy()
+          updateDate: jasmine.createSpy(),
         };
         method = events.inserted.bind(that);
       });
@@ -148,7 +148,7 @@ describe('GGRC.Components.datepicker', function () {
         viewModel = Component.prototype.viewModel();
         that = {
           viewModel: viewModel,
-          isValidDate: events.isValidDate.bind(that)
+          isValidDate: events.isValidDate.bind(that),
         };
         method = events.getDate.bind(that);
       });
@@ -170,7 +170,7 @@ describe('GGRC.Components.datepicker', function () {
 
       beforeEach(function () {
         that = {
-          viewModel: Component.prototype.viewModel()
+          viewModel: Component.prototype.viewModel(),
         };
         method = events.isValidDate.bind(that);
       });
@@ -192,9 +192,9 @@ describe('GGRC.Components.datepicker', function () {
         that = new can.Map({
           viewModel: {
             picker: {
-              datepicker: jasmine.createSpy()
-            }
-          }
+              datepicker: jasmine.createSpy(),
+            },
+          },
         });
         method = events.updateDate.bind(that);
       });
@@ -253,7 +253,7 @@ describe('GGRC.Components.datepicker', function () {
       beforeEach(function () {
         viewModel = Component.prototype.viewModel();
         that = {
-          viewModel: viewModel
+          viewModel: viewModel,
         };
         method = events['{viewModel} setMinDate'].bind(that);
       });
@@ -289,7 +289,7 @@ describe('GGRC.Components.datepicker', function () {
       let that;
       beforeEach(function () {
         that = {
-          updateDate: jasmine.createSpy()
+          updateDate: jasmine.createSpy(),
         };
         method = events['{viewModel} setMaxDate'].bind(that);
       });
@@ -309,11 +309,11 @@ describe('GGRC.Components.datepicker', function () {
       beforeEach(function () {
         viewModel = Component.prototype.viewModel();
         viewModel.picker = {
-          datepicker: jasmine.createSpy()
+          datepicker: jasmine.createSpy(),
         };
         that = {
           prepareDate: jasmine.createSpy()
-            .and.returnValue('ISODate')
+            .and.returnValue('ISODate'),
         };
         method = events['{viewModel} _date'].bind(that);
       });
@@ -337,7 +337,7 @@ describe('GGRC.Components.datepicker', function () {
       beforeEach(function () {
         viewModel = Component.prototype.viewModel();
         that = {
-          viewModel: viewModel
+          viewModel: viewModel,
         };
         method = events['{window} mousedown'].bind(that);
       });

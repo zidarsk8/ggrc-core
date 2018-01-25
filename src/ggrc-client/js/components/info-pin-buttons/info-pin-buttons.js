@@ -17,8 +17,8 @@ import template from './info-pin-buttons.mustache';
       define: {
         maximized: {
           type: 'boolean',
-          'default': false
-        }
+          'default': false,
+        },
       },
       toggleSize: function (el, ev) {
         let maximized = !this.attr('maximized');
@@ -41,7 +41,7 @@ import template from './info-pin-buttons.mustache';
         $(el).find('[rel="tooltip"]').tooltip('hide');
         ev.preventDefault();
         onClose();
-      }
-    }
+      },
+    },
   }, true);
 })(window.can);

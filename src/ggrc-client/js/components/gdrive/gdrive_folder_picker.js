@@ -19,18 +19,18 @@ import {
       define: {
         readonly: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         hasRevisionFolder: {
           type: 'boolean',
           get: function () {
             return this.attr('readonly') &&
               this.instance.folder;
-          }
+          },
         },
         hideLabel: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         showAssignFolder: {
           type: 'boolean',
@@ -80,7 +80,7 @@ import {
 
         gdriveFolder = new CMS.Models.GDriveFolder({
           id: folderId,
-          href: '/drive/v2/files/' + folderId
+          href: '/drive/v2/files/' + folderId,
         });
 
         return gdriveFolder.refresh()
@@ -117,7 +117,7 @@ import {
               this.attr('isRevisionFolderLoaded', true);
             }.bind(this));
         }
-      }
+      },
     },
 
     events: {
@@ -219,7 +219,7 @@ import {
             files[0].mimeType !== 'application/vnd.google-apps.folder'
         ) {
           $(document.body).trigger('ajax:flash', {
-            error: 'ERROR: Something other than a Drive folder was chosen for a folder slot.  Please choose a folder.'
+            error: 'ERROR: Something other than a Drive folder was chosen for a folder slot.  Please choose a folder.',
           });
           return;
         }
@@ -241,7 +241,7 @@ import {
             }
           });
         return dfd;
-      }
-    }
+      },
+    },
   });
 })(window.can, window.can.$);

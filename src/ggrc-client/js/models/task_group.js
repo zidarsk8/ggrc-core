@@ -22,7 +22,7 @@
     permalink_options: {
       url: '<%= base.viewLink %>#task_group_widget/' +
       'task_group/<%= instance.id %>',
-      base: 'workflow'
+      base: 'workflow',
     },
     attributes: {
       workflow: 'CMS.Models.Workflow.stub',
@@ -32,7 +32,7 @@
       objects: 'CMS.Models.get_stubs',
       modified_by: 'CMS.Models.Person.stub',
       context: 'CMS.Models.Context.stub',
-      end_date: 'date'
+      end_date: 'date',
     },
 
     tree_view_options: {
@@ -42,9 +42,9 @@
       mapper_attr_list: [
         {attr_title: 'Summary', attr_name: 'title'},
         {attr_title: 'Assignee', attr_name: 'assignee',
-          attr_sort_field: 'contact'}
+          attr_sort_field: 'contact'},
       ],
-      disable_columns_configuration: true
+      disable_columns_configuration: true,
     },
 
     init: function () {
@@ -84,7 +84,7 @@
           inst.refresh_all_force('workflow', 'context');
         }
       });
-    }
+    },
   }, {});
 
   can.Model.Cacheable('CMS.Models.TaskGroupTask', {
@@ -99,12 +99,12 @@
     permalink_options: {
       url: '<%= base.viewLink %>#task_group_widget/' +
       'task_group/<%= instance.task_group.id %>',
-      base: 'task_group:workflow'
+      base: 'task_group:workflow',
     },
     attributes: {
       context: 'CMS.Models.Context.stub',
       modified_by: 'CMS.Models.Person.stub',
-      task_group: 'CMS.Models.TaskGroup.stub'
+      task_group: 'CMS.Models.TaskGroup.stub',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path +
@@ -185,7 +185,7 @@
           }
         }
       });
-    }
+    },
   }, {
     init: function () {
       // default start and end date
@@ -213,7 +213,7 @@
           'relative_end_day',
           'relative_end_month',
           'start_date',
-          'end_date'
+          'end_date',
         ];
         if (!newTask) {
           return;
@@ -247,6 +247,6 @@
         workflow = taskGroup.workflow.reify();
         return workflow.refresh();
       }
-    }
+    },
   });
 })(window.can, window.GGRC);

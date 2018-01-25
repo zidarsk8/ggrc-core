@@ -31,12 +31,12 @@ describe('GGRC.Components.UnarchiveLink', function () {
         display_name: function () {
           return displayName;
         },
-        setup_custom_attributes: jasmine.createSpy()
+        setup_custom_attributes: jasmine.createSpy(),
       });
 
       scope = new can.Map({
         instance: instance,
-        notifyText: notifyText
+        notifyText: notifyText,
       });
       eventObj = $.Event();
       $element = $('<div></div>');

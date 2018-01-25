@@ -16,7 +16,7 @@ describe("can.mustache.helper.file_type", function () {
   beforeEach(function () {
     instance = {
       type: "Document",
-      title: "foo.bar"
+      title: "foo.bar",
     };
   });
 

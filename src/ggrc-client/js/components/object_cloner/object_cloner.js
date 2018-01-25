@@ -34,19 +34,19 @@ import {confirm} from '../../plugins/utils/modals';
             instance.class.root_collection + '/object_cloner.mustache',
           modal_confirm: 'Clone',
           skip_refresh: true,
-          button_view: GGRC.mustache_path + '/modals/prompt_buttons.mustache'
+          button_view: GGRC.mustache_path + '/modals/prompt_buttons.mustache',
         }, function () {
           let clonedInstance = instance.clone({
             cloneOptions: {
               sourceObjectId: instance.id,
-              mappedObjects: this.getIncluded()
-            }
+              mappedObjects: this.getIncluded(),
+            },
           });
           clonedInstance.save().done(function (object) {
             GGRC.navigate(object.viewLink);
           });
         }.bind(this));
-      }
-    }
+      },
+    },
   });
 })(window.can, window.can.$);

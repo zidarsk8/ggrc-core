@@ -24,14 +24,14 @@ describe('GGRC.Components.addTemplateField', function () {
       parentScope = {
         attr: function () {
           return {};
-        }
+        },
       };
       scope_ = Component.prototype.scope({}, parentScope);
       addField = scope_.addField;
 
       $el = $('<div></div>');
       ev = {
-        preventDefault: jasmine.createSpy()
+        preventDefault: jasmine.createSpy(),
       };
       scope = new can.Map({
         fields: new can.List(),
@@ -40,7 +40,7 @@ describe('GGRC.Components.addTemplateField', function () {
         id: 123,
         isDublicateTitle: scope_.isDublicateTitle.bind(scope),
         isEmptyTitle: scope_.isEmptyTitle.bind(scope),
-        isInvalidValues: scope_.isInvalidValues.bind(scope)
+        isInvalidValues: scope_.isInvalidValues.bind(scope),
       });
     });
 
@@ -49,7 +49,7 @@ describe('GGRC.Components.addTemplateField', function () {
         let selectedObj = new can.Map({
           title: 'External Reviewer',
           type: 'Map:Person',
-          values: ''
+          values: '',
         });
         scope.attr('selected', selectedObj);
         addField.call(scope, scope, $el, ev);
@@ -70,7 +70,7 @@ describe('GGRC.Components.addTemplateField', function () {
         let selectedObj = new can.Map({
           title: 'External Reviewer',
           type: 'Dropdown',
-          values: 'value0 value1'
+          values: 'value0 value1',
         });
         scope.attr('selected', selectedObj);
         addField.call(scope, scope, $el, ev);
@@ -85,7 +85,7 @@ describe('GGRC.Components.addTemplateField', function () {
         let selectedObj = new can.Map({
           title: 'External Reviewer',
           type: 'Dropdown',
-          values: ''
+          values: '',
         });
         scope.attr('selected', selectedObj);
         addField.call(scope, scope, $el, ev);
@@ -100,7 +100,7 @@ describe('GGRC.Components.addTemplateField', function () {
         let selectedObj = new can.Map({
           title: 'External Reviewer',
           type: 'Text',
-          values: ''
+          values: '',
         });
         scope.attr('selected', selectedObj);
         addField.call(scope, scope, $el, ev);
@@ -115,7 +115,7 @@ describe('GGRC.Components.addTemplateField', function () {
         let selectedObj = new can.Map({
           title: '',
           type: 'Text',
-          values: ''
+          values: '',
         });
         scope.attr('selected', selectedObj);
         addField.call(scope, scope, $el, ev);
@@ -136,7 +136,7 @@ describe('GGRC.Components.addTemplateField', function () {
       let parentScope = {
         attr: function () {
           return {};
-        }
+        },
       };
       let scope_ = Component.prototype.scope({}, parentScope);
       isEmptyTitle = scope_.isEmptyTitle;
@@ -168,7 +168,7 @@ describe('GGRC.Components.addTemplateField', function () {
       let parentScope = {
         attr: function () {
           return {};
-        }
+        },
       };
       let scope_ = Component.prototype.scope({}, parentScope);
       isDublicateTitle = scope_.isDublicateTitle;
@@ -186,7 +186,7 @@ describe('GGRC.Components.addTemplateField', function () {
           title: 'title',
           attribute_type: 'Text',
           multi_choice_options: '',
-          opts: new can.Map()
+          opts: new can.Map(),
         });
         selectedTitle = 'title';
 
@@ -204,7 +204,7 @@ describe('GGRC.Components.addTemplateField', function () {
           title: 'title',
           attribute_type: 'Text',
           multi_choice_options: '',
-          opts: new can.Map()
+          opts: new can.Map(),
         });
         selectedTitle = 'new title';
 
@@ -228,7 +228,7 @@ describe('GGRC.Components.addTemplateField', function () {
       parentScope = {
         attr: function () {
           return {};
-        }
+        },
       };
       scope_ = Component.prototype.scope({}, parentScope);
       isInvalidValues = scope_.isInvalidValues;

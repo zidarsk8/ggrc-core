@@ -16,8 +16,8 @@ import {
     viewModel: {
       define: {
         parentInstance: {
-          value: {}
-        }
+          value: {},
+        },
       },
       documents: [],
       isLoading: false,
@@ -28,11 +28,11 @@ import {
         let relevantFilters = [{
           type: this.attr('parentInstance.type'),
           id: this.attr('parentInstance.id'),
-          operation: 'relevant'
+          operation: 'relevant',
         }];
         let includeFilters = {
           keys: [],
-          expression: {}
+          expression: {},
         };
         let query;
 
@@ -41,9 +41,9 @@ import {
             expression: {
               op: {name: '='},
               left: 'document_type',
-              right: type
+              right: type,
             },
-            keys: []
+            keys: [],
           }, includeFilters, 'OR');
         });
 
@@ -65,10 +65,10 @@ import {
             self.attr('isLoading', false);
           }
         );
-      }
+      },
     },
     init: function () {
       this.viewModel.loadDocuments();
-    }
+    },
   });
 })(window.can, window.can.$, window._, window.GGRC);

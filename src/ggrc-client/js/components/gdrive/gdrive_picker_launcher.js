@@ -21,8 +21,8 @@ import RefreshQueue from '../../models/refresh_queue';
         isInactive: {
           get: function () {
             return this.attr('disabled');
-          }
-        }
+          },
+        },
       },
       tooltip: null,
       assessmentTypeObjects: [],
@@ -250,12 +250,12 @@ import RefreshQueue from '../../models/refresh_queue';
             title: this.addFileSuffix(file.name),
             link: file.url,
             created_at: new Date(),
-            isDraft: true
+            isDraft: true,
           };
         }.bind(this));
         this.dispatch({
           type: 'onBeforeAttach',
-          items: tempFiles
+          items: tempFiles,
         });
         return files;
       },
@@ -340,7 +340,7 @@ import RefreshQueue from '../../models/refresh_queue';
 
           parentFolderDfd = new CMS.Models.GDriveFolder({
             id: folderId,
-            href: '/drive/v2/files/' + folderId
+            href: '/drive/v2/files/' + folderId,
           }).refresh();
         }
         can.Control.prototype.bindXHRToButton(parentFolderDfd, el);
@@ -368,7 +368,7 @@ import RefreshQueue from '../../models/refresh_queue';
                   el.trigger('modal:success');
                 } else if ( error && error.type !== GDRIVE_PICKER_ERR_CANCEL ) {
                   that.dispatch({
-                    type: 'resetItems'
+                    type: 'resetItems',
                   });
 
                   GGRC.Errors.notifier('error', error && error.message);
@@ -378,7 +378,7 @@ import RefreshQueue from '../../models/refresh_queue';
           })
           .fail(function () {
             el.trigger('ajax:flash', {
-              warning: 'Can\'t upload: No GDrive folder found'
+              warning: 'Can\'t upload: No GDrive folder found',
             });
           });
       },
@@ -390,19 +390,19 @@ import RefreshQueue from '../../models/refresh_queue';
           return new CMS.Models.Document({
             context: that.instance.context || {id: null},
             title: file.title,
-            link: file.alternateLink
+            link: file.alternateLink,
           }).save().then(function (doc) {
             let objectDoc;
 
             if (that.deferred) {
               that.instance.mark_for_addition('documents', doc, {
-                context: that.instance.context || {id: null}
+                context: that.instance.context || {id: null},
               });
             } else {
               objectDoc = new CMS.Models.Relationship({
                 context: that.instance.context || {id: null},
                 source: that.instance,
-                destination: doc
+                destination: doc,
               }).save();
             }
 
@@ -413,7 +413,7 @@ import RefreshQueue from '../../models/refresh_queue';
         return can.when(...dfdDocs).then(function () {
           return can.makeArray(arguments);
         });
-      }
+      },
     },
     events: {
       '{viewModel} modal:success': function () {
@@ -433,7 +433,7 @@ import RefreshQueue from '../../models/refresh_queue';
         if (can.isFunction(itemsUploadedCallback)) {
           itemsUploadedCallback();
         }
-      }
-    }
+      },
+    },
   });
 })(window.can, window.can.$, window.GGRC, window.CMS);

@@ -59,16 +59,16 @@ describe('GGRC.Components.repeatOnButton', function () {
     let repeatOptions = [
       {
         value: 1,
-        title: '1'
+        title: '1',
       },
       {
         value: 2,
-        title: '2'
+        title: '2',
       }];
     let unitOptions = [
       {title: 'Daily', value: 'day', plural: 'days', singular: 'day'},
       {title: 'Weekly', value: 'week', plural: 'weeks', singular: 'week'},
-      {title: 'Monthly', value: 'month', plural: 'months', singular: 'month'}
+      {title: 'Monthly', value: 'month', plural: 'months', singular: 'month'},
     ];
 
     beforeEach(function () {
@@ -178,18 +178,18 @@ describe('GGRC.Components.repeatOnButton', function () {
     let repeatOptions = [
       {
         value: 1,
-        title: '1'
+        title: '1',
       },
       {
         value: 2,
-        title: '2'
+        title: '2',
       }];
 
     beforeAll(function () {
       unitChanged = events['{state.result} unit'];
       viewModel.attr('repeatOptions', repeatOptions);
       context = {
-        viewModel: viewModel
+        viewModel: viewModel,
       };
     });
 
@@ -214,7 +214,7 @@ describe('GGRC.Components.repeatOnButton', function () {
     beforeAll(function () {
       openChanged = events['{state} open'];
       context = {
-        viewModel: viewModel
+        viewModel: viewModel,
       };
     });
 

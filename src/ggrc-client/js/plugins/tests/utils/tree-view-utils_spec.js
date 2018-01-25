@@ -43,13 +43,13 @@ describe('TreeViewUtils module', function () {
       origCustomAttrDefs = GGRC.custom_attr_defs;
       GGRC.custom_attr_defs = [{
         id: 16, attribute_type: 'Text',
-        definition_type: 'market', title: 'CA def 16'
+        definition_type: 'market', title: 'CA def 16',
       }, {
         id: 5, attribute_type: 'Text',
-        definition_type: 'policy', title: 'CA def 5'
+        definition_type: 'policy', title: 'CA def 5',
       }, {
         id: 11, attribute_type: 'Text',
-        definition_type: 'audit', title: 'CA def 11'
+        definition_type: 'audit', title: 'CA def 11',
       }];
     });
 
@@ -70,7 +70,7 @@ describe('TreeViewUtils module', function () {
           attr_type: 'role',
           attr_title: 'Role 9',
           attr_name: 'Role 9',
-          attr_sort_field: 'Role 9'
+          attr_sort_field: 'Role 9',
         };
         expect(result).toContain(jasmine.objectContaining(expected));
       });

@@ -24,7 +24,7 @@ describe('GGRC.ListLoaders.TreeBaseLoader', function () {
     beforeEach(function () {
       dfd = $.when();
       binding = {
-        instance: audit
+        instance: audit,
       };
       method = treeBaseLoader.makeResult;
       getUserRolesSpy = spyOn(CMS.Models.Person, 'getUserRoles')

@@ -22,7 +22,7 @@ import wysihtml5ParserRules from 'wysihtml5/advanced';
       image: false,
       html: true,
       'font-styles': false,
-      parserRules: wysihtml5ParserRules
+      parserRules: wysihtml5ParserRules,
     });
     this.each(function() {
       let $that = $(this),
@@ -40,12 +40,12 @@ import wysihtml5ParserRules from 'wysihtml5/advanced';
         handles: "s",
         minHeight: 100,
         alsoResize: "#" + $that.uniqueId().attr("id") + ", #" + $that.closest(".wysiwyg-area").uniqueId().attr("id") + " iframe",
-        autoHide: false
+        autoHide: false,
       }).bind("resizestop", function(ev) {
         ev.stopPropagation();
         $that.css({
           "display": "block",
-          "height": $that.height() + 20
+          "height": $that.height() + 20,
         }); //10px offset between reported height and styled height.
         $textarea.css('width', $textarea.width() + 20);
         editor.composer.style(); // re-copy new size of textarea to composer

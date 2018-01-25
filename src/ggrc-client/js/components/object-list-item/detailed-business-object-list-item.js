@@ -32,21 +32,21 @@ import template from './detailed-business-object-list-item.mustache';
         isSnapshot: {
           get: function () {
             return this.attr('instance.type') === 'Snapshot';
-          }
+          },
         },
         itemData: {
           get: function () {
             return this.attr('isSnapshot') ?
               this.attr('instance.revision.content') :
               this.attr('instance');
-          }
+          },
         },
         objectLink: {
           get: function () {
             return this.attr('isSnapshot') ?
               getParentUrl(this.attr('instance')) :
               this.attr('itemData.viewLink');
-          }
+          },
         },
         objectTitle: {
           get: function () {
@@ -54,9 +54,9 @@ import template from './detailed-business-object-list-item.mustache';
               this.attr('itemData.description_inline') ||
               this.attr('itemData.name') ||
               this.attr('itemData.email') || false;
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   });
 })(window.can, window.GGRC);

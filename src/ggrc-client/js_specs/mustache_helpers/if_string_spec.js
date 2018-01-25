@@ -20,7 +20,7 @@ describe('can.mustache.helper.if_string', function () {
     fakeOptions = {
       fn: jasmine.createSpy(),
       inverse: jasmine.createSpy(),
-      context: someContext
+      context: someContext,
     };
   });
 
@@ -45,7 +45,7 @@ describe('can.mustache.helper.if_string', function () {
         ['not', 'a', 'string'],
         {isString: false},
         1234,
-        function foo() {}
+        function foo() {},
       ];
 
       params.forEach(function (param) {

@@ -229,8 +229,8 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       vm.attr({
         model: {shortName: 'modelName'},
         options: {
-          parent_instance: {}
-        }
+          parent_instance: {},
+        },
       });
       loadItems = vm.loadItems.bind(vm);
     });
@@ -239,7 +239,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       spyOn(TreeViewUtils, 'loadFirstTierItems')
         .and.returnValue(can.Deferred().resolve({
           total: 100,
-          values: []
+          values: [],
         }));
 
       loadItems().then(function () {
@@ -317,13 +317,13 @@ describe('GGRC.Components.treeWidgetContainer', function () {
         );
         vm.attr({
           model: {
-            shortName: modelName
+            shortName: modelName,
           },
           modelName: modelName,
           loaded: {},
           pageInfo: {
-            total: 123
-          }
+            total: 123,
+          },
         });
       });
 
@@ -340,13 +340,13 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       beforeEach(function () {
         vm.attr({
           model: {
-            shortName: modelName
+            shortName: modelName,
           },
-          modelName: modelName
+          modelName: modelName,
         });
         vm.attr('loaded', null);
         vm.attr('pageInfo', {
-          total: 123
+          total: 123,
         });
         spyOn(CurrentPageUtils, 'getCounts').and.returnValue(
           _.set({}, modelName, 123)
@@ -369,13 +369,13 @@ describe('GGRC.Components.treeWidgetContainer', function () {
         beforeEach(function () {
           vm.attr({
             model: {
-              shortName: modelName
+              shortName: modelName,
             },
-            modelName: modelName
+            modelName: modelName,
           });
           vm.attr('loaded', {});
           vm.attr('pageInfo', {
-            total: 123
+            total: 123,
           });
           spyOn(CurrentPageUtils, 'getCounts').and.returnValue(
             _.set({}, modelName, 123)
@@ -399,13 +399,13 @@ describe('GGRC.Components.treeWidgetContainer', function () {
         beforeEach(function () {
           vm.attr({
             model: {
-              shortName: modelName
+              shortName: modelName,
             },
-            modelName: modelName
+            modelName: modelName,
           });
           vm.attr('loaded', {});
           vm.attr('pageInfo', {
-            total: 123
+            total: 123,
           });
           spyOn(CurrentPageUtils, 'getCounts').and.returnValue(
             _.set({}, modelName, 124)
@@ -424,12 +424,12 @@ describe('GGRC.Components.treeWidgetContainer', function () {
   describe('openAdvancedFilter() method', function () {
     it('copies applied filter and mapping items', function () {
       let appliedFilterItems = new can.List([
-        AdvancedSearch.create.attribute()
+        AdvancedSearch.create.attribute(),
       ]);
       let appliedMappingItems = new can.List([
         AdvancedSearch.create.mappingCriteria({
-          filter: AdvancedSearch.create.attribute()
-        })
+          filter: AdvancedSearch.create.attribute(),
+        }),
       ]);
       vm.attr('advancedSearch.appliedFilterItems', appliedFilterItems);
       vm.attr('advancedSearch.appliedMappingItems', appliedMappingItems);
@@ -455,12 +455,12 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
   describe('applyAdvancedFilters() method', function () {
     let filterItems = new can.List([
-      AdvancedSearch.create.attribute()
+      AdvancedSearch.create.attribute(),
     ]);
     let mappingItems = new can.List([
       AdvancedSearch.create.mappingCriteria({
-        filter: AdvancedSearch.create.attribute()
-      })
+        filter: AdvancedSearch.create.attribute(),
+      }),
     ]);
     beforeEach(function () {
       vm.attr('advancedSearch.filterItems', filterItems);
@@ -485,7 +485,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
     it('initializes advancedSearch.filter property', function () {
       spyOn(GGRC.query_parser, 'join_queries').and.returnValue({
-        name: 'test'
+        name: 'test',
       });
       vm.attr('advancedSearch.filter', null);
 
@@ -525,10 +525,10 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
     it('removes applied filter and mapping items', function () {
       vm.attr('advancedSearch.appliedFilterItems', new can.List([
-        {title: 'item'}
+        {title: 'item'},
       ]));
       vm.attr('advancedSearch.appliedMappingItems', new can.List([
-        {title: 'item'}
+        {title: 'item'},
       ]));
 
       vm.removeAdvancedFilters();
@@ -571,7 +571,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
   describe('resetAdvancedFilters() method', function () {
     it('resets filter items', function () {
       vm.attr('advancedSearch.filterItems', new can.List([
-        {title: 'item'}
+        {title: 'item'},
       ]));
 
       vm.resetAdvancedFilters();
@@ -581,7 +581,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
     it('resets mapping items', function () {
       vm.attr('advancedSearch.mappingItems', new can.List([
-        {title: 'item'}
+        {title: 'item'},
       ]));
 
       vm.resetAdvancedFilters();
@@ -595,11 +595,11 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       vm.attr({
         pageInfo: {
           pageSize: 10,
-          count: 5
+          count: 5,
         },
         showedItems: [{id: 1, type: 'object'},
           {id: 2, type: 'object'},
-          {id: 3, type: 'object'}]
+          {id: 3, type: 'object'}],
       });
       vm.attr('pageInfo.current', 3);
     });

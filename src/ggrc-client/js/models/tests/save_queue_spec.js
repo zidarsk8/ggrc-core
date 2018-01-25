@@ -21,7 +21,7 @@ describe('GGRC.SaveQueue', function () {
         plural: 'audits',
         background: false,
         save_responses: [],
-        in_flight: false
+        in_flight: false,
       };
     });
 
@@ -32,14 +32,14 @@ describe('GGRC.SaveQueue', function () {
         type: objType,
         id: objId,
         _save: jasmine.createSpy('_save'),
-        _dfd: new can.Deferred()
+        _dfd: new can.Deferred(),
       };
 
       let response = [
         [modelInstance],
         [
-          [201, {audit: modelInstance}]
-        ]
+          [201, {audit: modelInstance}],
+        ],
       ];
 
       return response;

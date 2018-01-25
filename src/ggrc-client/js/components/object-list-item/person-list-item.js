@@ -23,7 +23,7 @@ import template from './person-list-item.mustache';
           set: function (newVal) {
             this.attr('person', {id: newVal});
             return newVal;
-          }
+          },
         },
         person: {
           Type: CMS.Models.Person,
@@ -53,25 +53,25 @@ import template from './person-list-item.mustache';
                     'Failed to fetch data for person ' + newVal.id + '.');
                 });
             }
-          }
+          },
         },
         personEmail: {
           get: function () {
             return this.attr('person.email') || false;
-          }
+          },
         },
         personName: {
           get: function () {
             return this.attr('person.name') || this.attr('personEmail');
-          }
+          },
         },
         hasNoAccess: {
           get: function () {
             return this.attr('person.system_wide_role') === 'No Access';
-          }
-        }
+          },
+        },
       },
-      withDetails: true
-    }
+      withDetails: true,
+    },
   });
 })(window.can, window.GGRC, window.CMS);

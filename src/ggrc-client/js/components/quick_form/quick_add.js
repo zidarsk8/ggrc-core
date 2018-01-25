@@ -41,8 +41,8 @@ import {confirm} from '../../plugins/utils/modals';
       define: {
         deferred: {
           type: 'boolean',
-          'default': false
-        }
+          'default': false,
+        },
       },
       create_url: function () {
         let value = $.trim(this.element.find("input[type='text']").val());
@@ -56,7 +56,7 @@ import {confirm} from '../../plugins/utils/modals';
           document_type: this.viewModel.attr('type'),
           created_at: new Date(),
           isDraft: true,
-          _stamp: Date.now()
+          _stamp: Date.now(),
         };
         this.viewModel.dispatch({type: 'beforeCreate', items: [attrs]});
         // We are not validating the URL because application can locally we can
@@ -68,13 +68,13 @@ import {confirm} from '../../plugins/utils/modals';
         if (!value || _.isEmpty(value)) {
           dfd = can.Deferred();
           dfd.reject({
-            message: 'Please enter a URL'
+            message: 'Please enter a URL',
           });
           return dfd.promise();
         }
         dfd = new CMS.Models.Document(attrs);
         return dfd.save();
-      }
+      },
     },
     events: {
       init: function () {
@@ -111,7 +111,7 @@ import {confirm} from '../../plugins/utils/modals';
             modal_description: scope.attr("modal_description"),
             modal_confirm: scope.attr("modal_button"),
             modal_title: scope.attr("modal_title"),
-            button_view: GGRC.mustache_path + "/quick_form/confirm_buttons.mustache"
+            button_view: GGRC.mustache_path + "/quick_form/confirm_buttons.mustache",
           }, verify_dfd.resolve, verify_dfd.reject);
         } else {
           verify_dfd.resolve();
@@ -126,7 +126,7 @@ import {confirm} from '../../plugins/utils/modals';
                 created_dfd
                   .fail(function (error) {
                     $(document.body).trigger('ajax:flash', {
-                      error: error.message
+                      error: error.message,
                     });
                   })
                   .done(function (data) {
@@ -148,10 +148,10 @@ import {confirm} from '../../plugins/utils/modals';
               scope.dispatch({
                 type: 'afterCreate',
                 items: [instance],
-                success: false
+                success: false,
               });
               $(document.body).trigger('ajax:flash', {
-                error: error.message
+                error: error.message,
               });
             });
             return;
@@ -180,7 +180,7 @@ import {confirm} from '../../plugins/utils/modals';
                 join_object,
                 {
                   context: this.scope.parent_instance.context
-                              || new CMS.Models.Context({id : null})
+                              || new CMS.Models.Context({id : null}),
                 },
                 this.scope.attributes.serialize()
               ));
@@ -190,7 +190,7 @@ import {confirm} from '../../plugins/utils/modals';
                 this.scope.instance || this.scope.attributes.instance,
                 $.extend({
                   context: this.scope.parent_instance.context
-                            || new CMS.Models.Context({id : null})
+                            || new CMS.Models.Context({id : null}),
                           },
                           this.scope.attributes.serialize())
               );
@@ -204,7 +204,7 @@ import {confirm} from '../../plugins/utils/modals';
                   scope.dispatch({
                     type: 'afterCreate',
                     items: [instance],
-                    success: true
+                    success: true,
                   });
                 })
                 .fail(function () {
@@ -213,7 +213,7 @@ import {confirm} from '../../plugins/utils/modals';
                   scope.dispatch({
                     type: 'afterCreate',
                     items: [instance],
-                    success: false
+                    success: false,
                   });
                 }));
           }.bind(this))
@@ -259,7 +259,7 @@ import {confirm} from '../../plugins/utils/modals';
               my_data,
               $.extend({
                 context : this.scope.parent_instance.context
-                        || new CMS.Models.Context({id : null})
+                        || new CMS.Models.Context({id : null}),
                         },
                         this.scope.attributes.serialize())
             ).save().done(function() {
@@ -276,7 +276,7 @@ import {confirm} from '../../plugins/utils/modals';
                 my_data,
                 $.extend({
                   context : this.scope.parent_instance.context
-                          || new CMS.Models.Context({id : null})
+                          || new CMS.Models.Context({id : null}),
                           },
                           this.scope.attributes.serialize())
               ).save().done(function(){});
@@ -287,7 +287,7 @@ import {confirm} from '../../plugins/utils/modals';
               my_data,
               $.extend({
                 context : this.scope.parent_instance.context
-                        || new CMS.Models.Context({id : null})
+                        || new CMS.Models.Context({id : null}),
                         },
                         this.scope.attributes.serialize())
             ).save().done(function() {
@@ -306,7 +306,7 @@ import {confirm} from '../../plugins/utils/modals';
               data,
               $.extend({
                 context : this.scope.parent_instance.context
-                          || new CMS.Models.Context({id : null})
+                          || new CMS.Models.Context({id : null}),
                         },
                         this.scope.attributes.serialize())
             );
@@ -315,7 +315,7 @@ import {confirm} from '../../plugins/utils/modals';
              that.element.find("a[data-toggle=submit]").trigger("modal:success");
           });
         }
-      }
+      },
     },
     helpers: {
       // Mapping-based autocomplete selectors use this helper to
@@ -327,10 +327,10 @@ import {confirm} from '../../plugins/utils/modals';
           $el.ggrc_mapping_autocomplete({
             controller : options.contexts.attr("controller"),
             model : $el.data("model"),
-            mapping : false
+            mapping : false,
           });
         };
-      }
-    }
+      },
+    },
   }, true);
 })(window.can, window.can.$);

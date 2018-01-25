@@ -20,23 +20,23 @@ import template from './checkbox-form-field.mustache';
               return;
             }
             this.valueChanged(newValue);
-          }
+          },
         },
         value: {
           set: function (newValue, setValue) {
             setValue(newValue);
             this.attr('_value', newValue);
-          }
-        }
+          },
+        },
       },
       fieldId: null,
       valueChanged: function (newValue) {
         this.dispatch({
           type: 'valueChanged',
           fieldId: this.fieldId,
-          value: newValue
+          value: newValue,
         });
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

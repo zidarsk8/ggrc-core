@@ -11,7 +11,7 @@ import template from './people-list-info.mustache';
   let viewModel = can.Map.extend({
     instance: null,
     isOpen: false,
-    isHidden: false
+    isHidden: false,
   });
 
   GGRC.Components('peopleListInfo', {
@@ -25,7 +25,7 @@ import template from './people-list-info.mustache';
         }
         this.viewModel.attr('isHidden', arguments[2]);
         this.viewModel.attr('isOpen', true);
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

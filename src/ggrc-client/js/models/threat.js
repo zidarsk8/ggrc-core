@@ -44,14 +44,14 @@
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
-        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
-      ])
+        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
+      ]),
     },
     sub_tree_view_options: {
       default_filter: ['Risk'],
     },
     defaults: {
-      status: 'Draft'
+      status: 'Draft',
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
@@ -59,6 +59,6 @@
         this._super.apply(this, arguments);
       }
       this.validatePresenceOf('title');
-    }
+    },
   }, {});
 })(window.can);

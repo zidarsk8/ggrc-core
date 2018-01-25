@@ -22,7 +22,7 @@ describe('ModalsController', function () {
       let html = [
         '<div>',
         '  <div class="modal-body"></div>',
-        '</div>'
+        '</div>',
       ].join('');
 
       let $el = $(html);
@@ -30,7 +30,7 @@ describe('ModalsController', function () {
       ctrlInst = {
         options: new can.Map({}),
         element: $el,
-        after_preload: jasmine.createSpy()
+        after_preload: jasmine.createSpy(),
       };
 
       init = Ctrl.prototype.init.bind(ctrlInst);
@@ -62,7 +62,7 @@ describe('ModalsController', function () {
         let partialUser = new can.Map({
           id: userId,
           email: '',  // simulate user object only partially loaded
-          refresh: jasmine.createSpy().and.returnValue(dfdRefresh.promise())
+          refresh: jasmine.createSpy().and.returnValue(dfdRefresh.promise()),
         });
 
         spyOn(partialUser, 'reify').and.returnValue(partialUser);
@@ -84,7 +84,7 @@ describe('ModalsController', function () {
         let fullUser = new can.Map({
           id: userId,
           email: 'john@doe.com',
-          refresh: jasmine.createSpy().and.returnValue(dfdRefresh.promise())
+          refresh: jasmine.createSpy().and.returnValue(dfdRefresh.promise()),
         });
 
         spyOn(fullUser, 'reify').and.returnValue(fullUser);

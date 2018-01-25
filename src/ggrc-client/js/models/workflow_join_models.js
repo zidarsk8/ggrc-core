@@ -22,7 +22,7 @@
     findAll: "GET /api/task_group_objects",
     create: "POST /api/task_group_objects",
     update: "PUT /api/task_group_objects/{id}",
-    destroy: "DELETE /api/task_group_objects/{id}"
+    destroy: "DELETE /api/task_group_objects/{id}",
   }, {
   });
 })(window.can);

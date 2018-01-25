@@ -19,9 +19,9 @@ describe('GGRC.Components.detailedBusinessObjectListItem', function () {
     child_type: 'Control',
     revision: {
       content: {
-        title: snapshotParentTitle
-      }
-    }
+        title: snapshotParentTitle,
+      },
+    },
   };
 
   let vendorObject = {
@@ -29,7 +29,7 @@ describe('GGRC.Components.detailedBusinessObjectListItem', function () {
     viewLink: vendorObjectLink,
     type: 'Vendor',
     title: vendorObjectTitle,
-    id: 33
+    id: 33,
   };
 
   describe('objectLink property', function () {

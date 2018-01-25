@@ -168,7 +168,7 @@ export default can.Component.extend({
           });
       } else {
         result = Revision.findAll({
-          id__in: notCached.join(',')
+          id__in: notCached.join(','),
         });
       }
 

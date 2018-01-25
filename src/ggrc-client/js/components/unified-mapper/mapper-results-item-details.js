@@ -29,7 +29,7 @@ import template from './templates/mapper-results-item-details.mustache';
       model: null,
       isMapperDetails: true,
       adminRole: ['Admin'],
-      deletableAdmin: false
-    }
+      deletableAdmin: false,
+    },
   });
 })(window.can, window.GGRC, window.CMS);

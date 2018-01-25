@@ -10,7 +10,7 @@ describe('GGRC.Components.templateAttributesField', function () {
   let scope;
   let pads = new can.Map({
     COMMENT: 0,
-    ATTACHMENT: 1
+    ATTACHMENT: 1,
   });
   let parentScope;
 
@@ -18,7 +18,7 @@ describe('GGRC.Components.templateAttributesField', function () {
     parentScope = new can.Map({
       attr: function () {
         return {};
-      }
+      },
     });
     Component = GGRC.Components.get('templateAttributesField');
   });
@@ -34,7 +34,7 @@ describe('GGRC.Components.templateAttributesField', function () {
     it('returns correct denormalized field', function () {
       let field = new can.Map({
         multi_choice_options: 'foo,bar,baz,bam',
-        multi_choice_mandatory: '0,1,2,3'
+        multi_choice_mandatory: '0,1,2,3',
       });
       let result = denormalizeMandatory(field, pads);
 
@@ -53,7 +53,7 @@ describe('GGRC.Components.templateAttributesField', function () {
       function () {
         let field = new can.Map({
           multi_choice_options: 'one,two,three,four,five',
-          multi_choice_mandatory: '0,1,2'
+          multi_choice_mandatory: '0,1,2',
         });
         let result = denormalizeMandatory(field, pads);
 
@@ -74,7 +74,7 @@ describe('GGRC.Components.templateAttributesField', function () {
     it('returns values only for defined options', function () {
       let field = new can.Map({
         multi_choice_options: 'one,two,three',
-        multi_choice_mandatory: '0,1,2,2,0'
+        multi_choice_mandatory: '0,1,2,2,0',
       });
       let result = denormalizeMandatory(field, pads);
 
@@ -101,7 +101,7 @@ describe('GGRC.Components.templateAttributesField', function () {
         {attachment: false, comment: false},
         {attachment: true, comment: false},
         {attachment: false, comment: true},
-        {attachment: true, comment: true}
+        {attachment: true, comment: true},
       ]);
       let result = normalizeMandatory(attrs, pads);
 
@@ -127,7 +127,7 @@ describe('GGRC.Components.templateAttributesField', function () {
           '<template-field ',
           '  field="fieldDefinition"',
           '  can-on-remove="callMeOnRemove">',
-          '</template-field>'
+          '</template-field>',
         ].join('');
 
         templateContext = new can.Map({
@@ -135,13 +135,13 @@ describe('GGRC.Components.templateAttributesField', function () {
             {
               type: 'Text',
               name: 'Text',
-              text: 'Enter description'
-            }
+              text: 'Enter description',
+            },
           ]),
           fieldDefinition: {
-            attribute_type: 'Text'
+            attribute_type: 'Text',
           },
-          callMeOnRemove: onRemoveCallback
+          callMeOnRemove: onRemoveCallback,
         });
 
         renderer = can.view.mustache(htmlSnippet);

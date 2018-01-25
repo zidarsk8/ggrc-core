@@ -20,7 +20,7 @@ import template from './object-selection-item.mustache';
       toggleSelection: function (scope, el, isSelected) {
         let event = isSelected ? 'selectItem' : 'deselectItem';
         can.trigger(el, event, [scope.objectId, scope.objectType]);
-      }
+      },
     },
     events: {
       'input[type="checkbox"] click': function (el, ev) {
@@ -29,7 +29,7 @@ import template from './object-selection-item.mustache';
         ev.stopPropagation();
         this.viewModel
           .toggleSelection(this.viewModel, this.element, isSelected);
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

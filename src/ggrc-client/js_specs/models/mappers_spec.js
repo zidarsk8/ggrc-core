@@ -198,7 +198,7 @@ describe("mappers", function() {
           .toEqual([
             jasmine.any(LL.MappingResult),
             jasmine.any(LL.MappingResult),
-            mr
+            mr,
           ]);
       });
     });
@@ -577,8 +577,8 @@ describe("mappers", function() {
                   this.mappings.splice(idx, 1);
                   return true;
                 }
-              }
-            }]
+              },
+            }],
           };
           ll.remove_instance(binding, instance, ['a', 'b']);
           expect(binding.list).toEqual([]);
@@ -596,8 +596,8 @@ describe("mappers", function() {
                   this.mappings.splice(idx, 1);
                   return true;
                 }
-              }
-            }]
+              },
+            }],
           };
           ll.remove_instance(binding, instance, ['a']); //only one of the mappings
           expect(binding.list).toEqual([{ instance : instance, mappings : ['b'], remove_mapping: jasmine.any(Function) }]);

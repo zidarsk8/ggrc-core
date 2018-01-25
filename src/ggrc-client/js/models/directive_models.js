@@ -19,9 +19,9 @@ can.Model.Cacheable("CMS.Models.Directive", {
     , attr_list : can.Model.Cacheable.attr_list.concat([
       {attr_title: 'Reference URL', attr_name: 'reference_url'},
       {attr_title: 'Effective Date', attr_name: 'start_date'},
-      {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
+      {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
     ])
-    , add_item_view : GGRC.mustache_path + "/snapshots/tree_add_item.mustache"
+    , add_item_view : GGRC.mustache_path + "/snapshots/tree_add_item.mustache",
     }
 
   , model : function(params) {
@@ -56,7 +56,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
       programs: 'CMS.Models.Program.stubs',
       sections: 'CMS.Models.get_stubs',
       controls: 'CMS.Models.Control.stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     }
   , defaults : {
   }
@@ -65,13 +65,13 @@ can.Model.Cacheable("CMS.Models.Directive", {
     //this.validateInclusionOf("kind", this.meta_kinds);
     this._super.apply(this, arguments);
   }
-  , meta_kinds : []
+  , meta_kinds : [],
 }, {
   init : function() {
     this._super && this._super.apply(this, arguments);
     let that = this;
   }
-  , lowercase_kind : function() { return this.kind ? this.kind.toLowerCase() : undefined; }
+  , lowercase_kind : function() { return this.kind ? this.kind.toLowerCase() : undefined; },
 });
 
 CMS.Models.Directive("CMS.Models.Standard", {
@@ -95,17 +95,17 @@ CMS.Models.Directive("CMS.Models.Standard", {
   mixins: ['accessControlList']
   , cache : can.getObject("cache", CMS.Models.Directive, true),
   sub_tree_view_options: {
-    default_filter: ['Section']
+    default_filter: ['Section'],
   },
   defaults: {
     status: 'Draft',
-    kind: 'Standard'
+    kind: 'Standard',
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
     can.extend(this.attributes, CMS.Models.Directive.attributes);
     this._super.apply(this, arguments);
-  }
+  },
 }, {});
 
 CMS.Models.Directive("CMS.Models.Regulation", {
@@ -129,17 +129,17 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , meta_kinds : [ "Regulation" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true),
   sub_tree_view_options: {
-    default_filter: ['Section']
+    default_filter: ['Section'],
   },
   defaults: {
     status: 'Draft',
-    kind: 'Regulation'
+    kind: 'Regulation',
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
     can.extend(this.attributes, CMS.Models.Directive.attributes);
     this._super.apply(this, arguments);
-  }
+  },
 }, {});
 
 CMS.Models.Directive("CMS.Models.Policy", {
@@ -168,7 +168,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
   },
   defaults: {
     status: 'Draft',
-    kind: null
+    kind: null,
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
@@ -178,14 +178,14 @@ CMS.Models.Directive("CMS.Models.Policy", {
       {
         attr_title: 'Kind/Type',
         attr_name: 'kind',
-        attr_sort_field: 'kind'
+        attr_sort_field: 'kind',
       },
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url'}
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
     ]);
     this._super.apply(this, arguments);
-  }
+  },
 }, {});
 
 CMS.Models.Directive("CMS.Models.Contract", {
@@ -214,13 +214,13 @@ CMS.Models.Directive("CMS.Models.Contract", {
   },
   defaults: {
     status: 'Draft',
-    kind: 'Contract'
+    kind: 'Contract',
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
     can.extend(this.attributes, CMS.Models.Directive.attributes);
     this._super.apply(this, arguments);
-  }
+  },
 }, {});
 
 })(window.can);

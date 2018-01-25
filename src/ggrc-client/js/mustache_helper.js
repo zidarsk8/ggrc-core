@@ -62,7 +62,7 @@ import _ from 'lodash';
 
         abort: function () {
           template = null;
-        }
+        },
       };
     }
   });
@@ -523,10 +523,10 @@ Mustache.registerHelper("option_select", function (object, attr_name, role, opti
           ,   selected_id == option.id ? ' selected=selected' : ''
           , '>'
           ,   option.title
-          , '</option>'
+          , '</option>',
           ].join('');
         }).join('\n')
-      , '</select>'
+      , '</select>',
     ].join('');
   }
 
@@ -565,7 +565,7 @@ Mustache.registerHelper("category_select", function (object, attr_name, category
     return [
       selectOpenTag,
       optionTags,
-      selectCloseTag
+      selectCloseTag,
     ].join('');
   };
 
@@ -614,7 +614,7 @@ Mustache.registerHelper("get_permalink_for_object", function (instance, options)
         '  target="_blank"',
         '  class="view-link">',
         linkText,
-        '</a>'
+        '</a>',
       ].join('');
       return html;
     }
@@ -690,7 +690,7 @@ Mustache.registerHelper("show_long", function () {
           }();
         }
       })
-    , ">...more</a>"
+    , ">...more</a>",
   ].join('');
 });
 
@@ -797,7 +797,7 @@ Mustache.registerHelper("person_roles", function (person, scope, options) {
             && ~GGRC.config.BOOTSTRAP_ADMIN_USERS.indexOf(person.email)) {
           roles.unshift({
             permission_summary: "Superuser",
-            name: "Superuser"
+            name: "Superuser",
           });
         }
         roles_deferred.resolve(roles);
@@ -863,7 +863,7 @@ Mustache.registerHelper("each_with_extras_as", function (name, list, options) {
       , isFirst : i === 0
       , isLast : i === length - 1
       , isSecondToLast : i === length - 2
-      , length : length
+      , length : length,
     };
     frame[name] = list[i];
     output.push(options.fn(new can.Observe(frame)));
@@ -1134,7 +1134,7 @@ function localizeDate(date, options, tmpl, allowNonISO) {
 
 can.each({
   localize_date: 'MM/DD/YYYY',
-  localize_datetime: 'MM/DD/YYYY hh:mm:ss A Z'
+  localize_datetime: 'MM/DD/YYYY hh:mm:ss A Z',
 }, function (tmpl, fn) {
   Mustache.registerHelper(fn, function (date, allowNonISO, options) {
     // allowNonIso was not passed
@@ -1228,13 +1228,13 @@ Mustache.registerHelper("with_program_roles_as", function (result, options) {
       if (mapping instanceof CMS.Models.UserRole) {
         frame.attr("roles").push({
           user_role: mapping,
-          role: mapping.role.reify()
+          role: mapping.role.reify(),
         });
       } else {
         frame.attr("roles").push({
           role: {
-            "permission_summary": "Mapped"
-          }
+            "permission_summary": "Mapped",
+          },
         });
       }
     });
@@ -1496,7 +1496,7 @@ Mustache.registerHelper("if_helpers", function () {
     , helper_result
     , helper_options = can.extend({}, options, {
         fn: function () { helper_result = 'fn'; }
-      , inverse: function () { helper_result = 'inverse'; }
+      , inverse: function () { helper_result = 'inverse'; },
       })
     ;
 
@@ -1523,7 +1523,7 @@ Mustache.registerHelper("if_helpers", function () {
               fn_name: match[3] === '^' ? 'inverse' : 'fn'
             , helper: Mustache.getHelper(match[4], options.contexts)
             , args: []
-            , logic: match[2] === 'or' ? 'or' : 'and'
+            , logic: match[2] === 'or' ? 'or' : 'and',
           };
 
           // Add hash arguments
@@ -1572,7 +1572,7 @@ Mustache.registerHelper("if_helpers", function () {
 
         helper_result = null;
         stmt.helper.fn.apply(stmt.helper, stmt.args.concat([
-          can.extend({}, helper_options, { hash: stmt.hash || helper_options.hash })
+          can.extend({}, helper_options, { hash: stmt.hash || helper_options.hash }),
         ]));
         helper_result = helper_result === stmt.fn_name;
         return current_result && helper_result;
@@ -1733,8 +1733,8 @@ Mustache.registerHelper("switch", function (value, options) {
           options.context.attr ? options.context.attr("default", false) : (options.context.default = false);
           return options.fn(options.contexts);
         }
-      }
-    }
+      },
+    },
   });
 });
 
@@ -1757,7 +1757,7 @@ Mustache.registerHelper("switch", function (value, options) {
 
       finish = function (tasks) {
         return options.fn(options.contexts.add({
-          person: tasks[0].instance.contact
+          person: tasks[0].instance.contact,
         }));
       };
       progress = function () {
@@ -1765,7 +1765,7 @@ Mustache.registerHelper("switch", function (value, options) {
       };
 
       return defer_render('span', {
-        done: finish, progress: progress
+        done: finish, progress: progress,
       }, binding.refresh_instances());
     });
 
@@ -1795,7 +1795,7 @@ Mustache.registerHelper("switch", function (value, options) {
         },
         progress: function () {
           return options.inverse(options.contexts);
-        }
+        },
       },
         instance.get_list_counter(mappingName)
       );
@@ -1827,7 +1827,7 @@ Mustache.registerHelper('autocomplete_select', function (disableCreate, opt) {
       let $ctl = $(this).parents(':data(controls)');
       $(this).ggrc_autocomplete($.extend({}, options.hash, {
         controller: cls ? $ctl.control(cls) : $ctl.control(),
-        disableCreate: _disableCreate
+        disableCreate: _disableCreate,
       }));
     });
   };
@@ -1935,7 +1935,7 @@ Mustache.registerHelper("file_type", function (instance) {
     PDF: "pdf",
     OFFICE_DOC: "doc",
     OFFICE_SHEET: "xls",
-    ARCHIVE: "zip"
+    ARCHIVE: "zip",
   });
 
   FILE_EXTENSION_TYPES = Object.freeze({
@@ -1968,7 +1968,7 @@ Mustache.registerHelper("file_type", function (instance) {
     rar: FILE_TYPES.ARCHIVE,
     "7z": FILE_TYPES.ARCHIVE,
     gz: FILE_TYPES.ARCHIVE,
-    tar: FILE_TYPES.ARCHIVE
+    tar: FILE_TYPES.ARCHIVE,
   });
 
   if (instance.type !== "Document") {
@@ -2262,7 +2262,7 @@ Example:
     function (comment, parentInstance, options) {
       let END_STATES = Object.freeze({
         Verified: true,
-        Completed: true
+        Completed: true,
       });
 
       let canEdit = true;
@@ -2436,7 +2436,7 @@ Example:
     let titlesMap = {
       Cycle: 'Cycle ',
       CycleTaskGroup: 'Group ',
-      CycleTaskGroupObjectTask: 'Task '
+      CycleTaskGroupObjectTask: 'Task ',
     };
     type = Mustache.resolve(type);
 

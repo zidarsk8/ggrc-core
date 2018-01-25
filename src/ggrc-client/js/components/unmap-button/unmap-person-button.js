@@ -75,12 +75,12 @@
           });
 
         return deferred;
-      }
+      },
     },
     events: {
       click: function () {
         this.viewModel.unmapInstance();
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC, window.CMS, window.can.$);

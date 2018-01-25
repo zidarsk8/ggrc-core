@@ -16,8 +16,8 @@ describe('SummaryWidgetController', function () {
     beforeEach(function () {
       ctrlInst = {
         options: {
-          forceRefresh: false
-        }
+          forceRefresh: false,
+        },
       };
       method = Ctrl.prototype['{CMS.Models.Assessment} updated'].bind(ctrlInst);
     });
@@ -36,8 +36,8 @@ describe('SummaryWidgetController', function () {
     beforeEach(function () {
       ctrlInst = {
         options: {
-          forceRefresh: false
-        }
+          forceRefresh: false,
+        },
       };
       method = Ctrl.prototype.onRelationshipChange.bind(ctrlInst);
     });
@@ -48,11 +48,11 @@ describe('SummaryWidgetController', function () {
         let relationship = new CMS.Models.Relationship({
           destination: {
             type: 'Document',
-            id: 1
+            id: 1,
           }, source: {
             type: 'Assessment',
-            id: 1
-          }
+            id: 1,
+          },
         });
         method({}, {}, relationship);
         expect(ctrlInst.options.forceRefresh).toBe(true);
@@ -63,11 +63,11 @@ describe('SummaryWidgetController', function () {
       let relationship = new CMS.Models.Relationship({
         destination: {
           type: 'Control',
-          id: 1
+          id: 1,
         }, source: {
           type: 'Assessment',
-          id: 1
-        }
+          id: 1,
+        },
       });
       method({}, {}, relationship);
       expect(ctrlInst.options.forceRefresh).toBe(false);
@@ -78,11 +78,11 @@ describe('SummaryWidgetController', function () {
       let relationship = new CMS.Models.Relationship({
         destination: {
           type: 'Document',
-          id: 1
+          id: 1,
         }, source: {
           type: 'Issue',
-          id: 1
-        }
+          id: 1,
+        },
       });
       method({}, {}, relationship);
       expect(ctrlInst.options.forceRefresh).toBe(false);
@@ -99,21 +99,21 @@ describe('SummaryWidgetController', function () {
       ctrlInst = {
         options: {
           instance: {
-            id: 123
+            id: 123,
           },
           forceRefresh: false,
           context: {
             charts: {
-              Assessment: new can.Map({total: 3, isInitialized: true})
-            }
-          }
+              Assessment: new can.Map({total: 3, isInitialized: true}),
+            },
+          },
         },
         setState: jasmine.createSpy(),
         getStatuses: jasmine.createSpy().and
           .returnValue(new can.Deferred().resolve(raw)),
         parseStatuses: jasmine.createSpy(),
         drawChart: jasmine.createSpy(),
-        prepareLegend: jasmine.createSpy()
+        prepareLegend: jasmine.createSpy(),
       };
       method = Ctrl.prototype.reloadChart.bind(ctrlInst);
       spyOn(CurrentPageUtils, 'getCounts')
@@ -151,8 +151,8 @@ describe('SummaryWidgetController', function () {
         widget_shown: jasmine.createSpy('widget_shown'),
         reloadSummary: jasmine.createSpy('reloadSummary'),
         options: {
-          context: new can.Map({})
-        }
+          context: new can.Map({}),
+        },
       };
       method = Ctrl.prototype.widget_shown.bind(ctrlInst);
       resizeHandler = jasmine.createSpy('resizeHandler');
@@ -187,8 +187,8 @@ describe('SummaryWidgetController', function () {
       ctrlInst = {
         widget_hidden: jasmine.createSpy('widget_hidden'),
         options: {
-          context: new can.Map({})
-        }
+          context: new can.Map({}),
+        },
       };
       method = Ctrl.prototype.widget_hidden.bind(ctrlInst);
     });
@@ -211,15 +211,15 @@ describe('SummaryWidgetController', function () {
 
     beforeEach(function () {
       chart = {
-        draw: jasmine.createSpy()
+        draw: jasmine.createSpy(),
       };
       ctrlInst = {
         options: {
           chart: chart,
           chartOptions: 'options',
           data: 'data',
-          isShown: true
-        }
+          isShown: true,
+        },
       };
       method = Ctrl.prototype['{window} resize'].bind(ctrlInst);
     });

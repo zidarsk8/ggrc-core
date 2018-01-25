@@ -109,7 +109,7 @@ import InfoWidget from '../controllers/info_widget_controller';
     },
     get_default_widget_sort: function () {
       return this.sort;
-    }
+    },
   }, {
     init: function (name, opts, sort) {
       this.constructor.modules[name] = this;
@@ -139,13 +139,13 @@ import InfoWidget from '../controllers/info_widget_controller';
       this[pageType] = this[pageType] || {};
       if (this[pageType][id]) {
         can.extend(true, this[pageType][id], {
-          suppressed: true
+          suppressed: true,
         });
       } else {
         this[pageType][id] = {
-          suppressed: true
+          suppressed: true,
         };
       }
-    }
+    },
   });
 })(window.can.$, window.CMS, window.GGRC);

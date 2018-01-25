@@ -12,7 +12,7 @@ import template from './templates/mapper-results-item-status.mustache';
     tag: 'mapper-results-item-status',
     template: template,
     viewModel: {
-      itemData: {}
-    }
+      itemData: {},
+    },
   });
 })(window.can, window.GGRC);

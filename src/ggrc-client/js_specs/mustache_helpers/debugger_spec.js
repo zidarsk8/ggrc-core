@@ -9,7 +9,7 @@ describe("can.mustache.helper.debugger", function () {
 
   beforeAll(function () {
     fakeOptions = {
-      fn: jasmine.createSpy()
+      fn: jasmine.createSpy(),
     };
 
     helper = can.Mustache._helpers["debugger"].fn;

@@ -11,7 +11,7 @@ import Spinner from 'spin.js';
   let defaults = {
     delay: {
       show: 500,
-      hide: 100
+      hide: 100,
     },
     placement: 'left',
     content: function (trigger) {
@@ -21,10 +21,10 @@ import Spinner from 'spin.js';
         height: '100px',
         left: '50px',
         top: '50px',
-        zIndex: calculate_spinner_z_index
+        zIndex: calculate_spinner_z_index,
       });
       return $el[0];
-    }
+    },
   };
 
   // Listeners for initial mouseovers for stick-hover
@@ -47,7 +47,7 @@ import Spinner from 'spin.js';
               return 'left';
             }
             return 'top';
-          }
+          },
         }))
         .triggerHandler(e);
     }
@@ -59,7 +59,7 @@ import Spinner from 'spin.js';
     if (!$(e.currentTarget).data('sticky_popover')) {
       $(e.currentTarget)
         .sticky_popover($.extend({}, defaults, {
-          trigger: 'click'
+          trigger: 'click',
         }))
         .triggerHandler(e);
     }

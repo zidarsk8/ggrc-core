@@ -56,7 +56,7 @@ describe('GGRC.Components.treeAssigneeField', function () {
     });
     it('returns empty string if instance.assignees.type is falsy', function () {
       viewModel.attr('instance', {
-        assignees: {}
+        assignees: {},
       });
       viewModel.attr('type', 'Verifier');
       result = viewModel.sliceAssignees();
@@ -67,9 +67,9 @@ describe('GGRC.Components.treeAssigneeField', function () {
         viewModel.attr('instance', {
           assignees: {
             Verifier: [
-              {email: 'mock1@google.com'}, {email: 'mock2@google.com'}
-            ]
-          }
+              {email: 'mock1@google.com'}, {email: 'mock2@google.com'},
+            ],
+          },
         });
         viewModel.attr('type', 'Verifier');
         result = viewModel.sliceAssignees();

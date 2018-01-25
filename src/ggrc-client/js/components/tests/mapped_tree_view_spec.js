@@ -9,20 +9,20 @@ describe('GGRC.Components.mappingTreeView', function () {
   let unsortedArray = [
     {
       value: 1,
-      field: 'a'
+      field: 'a',
     },
     {
       value: 4,
-      field: 'd'
+      field: 'd',
     },
     {
       value: 3,
-      field: 'c'
+      field: 'c',
     },
     {
       value: 2,
-      field: 'b'
-    }
+      field: 'b',
+    },
   ];
   let sortedAsc = _.sortByOrder(unsortedArray, 'field');
   let sortedDesc = _.sortByOrder(unsortedArray, 'field', 'desc');
@@ -39,8 +39,8 @@ describe('GGRC.Components.mappingTreeView', function () {
     beforeAll(function () {
       scope = new can.Map({
         scope: {
-          sortField: null
-        }
+          sortField: null,
+        },
       });
       method = Component.prototype._sortObjects.bind(scope);
     });

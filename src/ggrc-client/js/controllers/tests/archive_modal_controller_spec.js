@@ -33,15 +33,15 @@ describe('ToggleArchive modal', function () {
           .and.returnValue(pendingRefresh.promise()),
         display_name: function () {
           return displayName;
-        }
+        },
       });
 
       ctrlInst = {
         bindXHRToButton: jasmine.createSpy('bindXHRToButton'),
         element: $element,
         options: {
-          instance: instance
-        }
+          instance: instance,
+        },
       };
       spyOn($.fn, 'trigger').and.callThrough();
       event = Ctrl.prototype['a.btn[data-toggle=archive]:not(:disabled) click']

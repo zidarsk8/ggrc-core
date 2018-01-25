@@ -32,7 +32,7 @@
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
@@ -41,8 +41,8 @@
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
-        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
-      ])
+        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
+      ]),
     },
     sub_tree_view_options: {
       default_filter: ['Program'],
@@ -58,10 +58,10 @@
       Project: {},
       DataAsset: {},
       AccessGroup: {},
-      Market: {}
+      Market: {},
     },
     defaults: {
-      status: 'Draft'
+      status: 'Draft',
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
@@ -70,7 +70,7 @@
       }
 
       this.validateNonBlank('title');
-    }
+    },
   }, {});
 
   can.Model.Cacheable('CMS.Models.Project', {
@@ -101,16 +101,16 @@
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
-        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
+        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       ]),
-      add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+      add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
     },
     sub_tree_view_options: {
       default_filter: ['Program'],
@@ -126,10 +126,10 @@
       Project: {},
       DataAsset: {},
       AccessGroup: {},
-      Market: {}
+      Market: {},
     },
     defaults: {
-      status: 'Draft'
+      status: 'Draft',
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
@@ -138,7 +138,7 @@
         }
 
         this.validateNonBlank('title');
-      }
+      },
   }, {});
 
   can.Model.Cacheable('CMS.Models.Facility', {
@@ -169,17 +169,17 @@
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
-        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
+        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       ]),
       add_item_view:
-        GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+        GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
     },
     sub_tree_view_options: {
       default_filter: ['Program'],
@@ -195,10 +195,10 @@
       Project: {},
       DataAsset: {},
       AccessGroup: {},
-      Market: {}
+      Market: {},
     },
     defaults: {
-      status: 'Draft'
+      status: 'Draft',
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
@@ -207,7 +207,7 @@
       }
 
       this.validateNonBlank('title');
-    }
+    },
   }, {});
 
   can.Model.Cacheable('CMS.Models.Product', {
@@ -239,7 +239,7 @@
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
       kind: 'CMS.Models.Option.stub',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
@@ -249,7 +249,7 @@
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       ]),
       add_item_view:
-        GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+        GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
     },
     sub_tree_view_options: {
       default_filter: ['System'],
@@ -265,11 +265,11 @@
       Project: {},
       DataAsset: {},
       AccessGroup: {},
-      Market: {}
+      Market: {},
     },
     defaults: {
       status: 'Draft',
-      kind: null
+      kind: null,
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
@@ -278,7 +278,7 @@
       }
 
       this.validateNonBlank('title');
-    }
+    },
   }, {});
 
   can.Model.Cacheable('CMS.Models.DataAsset', {
@@ -309,17 +309,17 @@
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
-        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
+        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       ]),
       add_item_view:
-        GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+        GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
     },
     sub_tree_view_options: {
       default_filter: ['Policy'],
@@ -335,10 +335,10 @@
       Project: {},
       DataAsset: {},
       AccessGroup: {},
-      Market: {}
+      Market: {},
     },
     defaults: {
-      status: 'Draft'
+      status: 'Draft',
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
@@ -347,7 +347,7 @@
       }
 
       this.validateNonBlank('title');
-    }
+    },
   }, {});
 
   can.Model.Cacheable('CMS.Models.AccessGroup', {
@@ -377,17 +377,17 @@
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
-        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
+        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       ]),
       add_item_view:
-        GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+        GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
     },
     sub_tree_view_options: {
       default_filter: ['System'],
@@ -403,10 +403,10 @@
       Project: {},
       DataAsset: {},
       AccessGroup: {},
-      Market: {}
+      Market: {},
     },
     defaults: {
-      status: 'Draft'
+      status: 'Draft',
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
@@ -415,7 +415,7 @@
       }
 
       this.validateNonBlank('title');
-    }
+    },
   }, {});
 
   can.Model.Cacheable('CMS.Models.Market', {
@@ -446,16 +446,16 @@
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
-        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
+        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       ]),
-      add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+      add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
     },
     sub_tree_view_options: {
       default_filter: ['Program'],
@@ -471,10 +471,10 @@
       Project: {},
       DataAsset: {},
       AccessGroup: {},
-      Market: {}
+      Market: {},
     },
     defaults: {
-      status: 'Draft'
+      status: 'Draft',
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
@@ -483,7 +483,7 @@
       }
 
       this.validateNonBlank('title');
-    }
+    },
   }, {});
 
   can.Model.Cacheable('CMS.Models.Vendor', {
@@ -514,17 +514,17 @@
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
-        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
+        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       ]),
       add_item_view:
-        GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+        GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
     },
     sub_tree_view_options: {
       default_filter: ['Program'],
@@ -540,10 +540,10 @@
       Project: {},
       DataAsset: {},
       AccessGroup: {},
-      Market: {}
+      Market: {},
     },
     defaults: {
-      status: 'Draft'
+      status: 'Draft',
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
@@ -552,6 +552,6 @@
       }
 
       this.validateNonBlank('title');
-    }
+    },
   }, {});
 })(window.can);

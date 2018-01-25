@@ -59,9 +59,9 @@ import template from './templates/mapper-results-item.mustache';
       showRelatedAssessments: function () {
         this.dispatch({
           type: 'showRelatedAssessments',
-          instance: this.displayItem()
+          instance: this.displayItem(),
         });
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC, window.CMS);

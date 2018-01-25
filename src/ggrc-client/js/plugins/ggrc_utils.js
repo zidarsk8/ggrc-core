@@ -65,7 +65,7 @@ import Permission from '../permission';
       applyTypeFilter: function (items, filterObj, getTypeSelectFn) {
         let filter = GGRC.Utils.filters.makeTypeFilter(filterObj);
         return GGRC.Utils.filters.applyFilter(items, filter, getTypeSelectFn);
-      }
+      },
     },
     sortingHelpers: {
       commentSort: function (a, b) {
@@ -75,13 +75,13 @@ import Permission from '../permission';
           return -1;
         }
         return 0;
-      }
+      },
     },
     events: {
       isInnerClick: function (el, target) {
         el = el instanceof $ ? el : $(el);
         return el.has(target).length || el.is(target);
-      }
+      },
     },
     inViewport: function (el) {
       let bounds;
@@ -171,7 +171,7 @@ import Permission from '../permission';
       // a helper for opening the "Save File" dialog to save downloaded data
       function promptSaveFile() {
         let downloadURL = [
-          'filesystem:', window.location.origin, '/temporary/', TMP_FILENAME
+          'filesystem:', window.location.origin, '/temporary/', TMP_FILENAME,
         ].join('');
 
         let link = document.createElement('a');
@@ -251,10 +251,10 @@ import Permission from '../permission';
         headers: $.extend({
           'Content-Type': 'application/json',
           'X-export-view': 'blocks',
-          'X-requested-by': 'GGRC'
+          'X-requested-by': 'GGRC',
         }, request.headers || {}),
         url: '/_service/export_csv',
-        data: JSON.stringify(request.data || {})
+        data: JSON.stringify(request.data || {}),
       });
     },
     import_request: function (request, isTest) {

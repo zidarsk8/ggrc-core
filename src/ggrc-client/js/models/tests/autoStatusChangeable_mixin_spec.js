@@ -21,7 +21,7 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
     beforeEach(function () {
       instance = new can.Map({
         type: 'MyModel',
-        status: 'Not Started'
+        status: 'Not Started',
       });
       method = Mixin.prototype.confirmBeginEdit.bind(instance);
 
@@ -51,7 +51,7 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
 
       expectedBodyText = [
         'If you modify a value, the status of the MagicType will move',
-        'from "In Limbo" to "In Progress" - are you sure about that?'
+        'from "In Limbo" to "In Progress" - are you sure about that?',
       ].join(' ');
       expect(modalOptions.modal_description).toEqual(expectedBodyText);
     });

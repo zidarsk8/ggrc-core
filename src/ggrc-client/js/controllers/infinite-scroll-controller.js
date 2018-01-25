@@ -6,7 +6,7 @@
 import RecentlyViewedObject from '../models/recently_viewed_object';
 
 can.Control('CMS.Controllers.InfiniteScroll', {
-  defaults: {}
+  defaults: {},
 }, {
   init: function () {},
   ' DOMMouseScroll': 'prevent_overscroll',
@@ -59,7 +59,7 @@ can.Control('CMS.Controllers.InfiniteScroll', {
   },
   show_more: function ($el) {
     this.element.trigger('scrollNext');
-  }
+  },
 });
 
 can.Control('CMS.Controllers.LHN_Tooltips', {
@@ -67,8 +67,8 @@ can.Control('CMS.Controllers.LHN_Tooltips', {
     tooltip_view: GGRC.mustache_path + '/base_objects/extended_info.mustache',
     trigger_selector: '.show-extended',
     fade_in_delay: 300,
-    fade_out_delay: 300
-  }
+    fade_out_delay: 300,
+  },
 }, {
   init: function () {
     if (!this.options.$extended) {
@@ -201,5 +201,5 @@ can.Control('CMS.Controllers.LHN_Tooltips', {
   destroy: function () {
     this._super();
     this.on_mouseleave();
-  }
+  },
 });

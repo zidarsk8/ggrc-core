@@ -22,17 +22,17 @@ import template from './person-form-field.mustache';
               return;
             }
             this.valueChanged(newValue);
-          }
+          },
         },
         value: {
           set: function (newValue, setValue) {
             setValue(newValue);
             this.attr('_value', newValue);
-          }
+          },
         },
         fieldId: {
-          type: 'number'
-        }
+          type: 'number',
+        },
       },
       withDetails: false,
       setPerson: function (ev) {
@@ -46,9 +46,9 @@ import template from './person-form-field.mustache';
         this.dispatch({
           type: 'valueChanged',
           fieldId: this.attr('fieldId'),
-          value: newValue
+          value: newValue,
         });
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

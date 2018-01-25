@@ -85,25 +85,25 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
       workflow: 'CMS.Models.Workflow.stub',
       cycle_task_groups: 'CMS.Models.CycleTaskGroup.stubs',
       modified_by: 'CMS.Models.Person.stub',
-      context: 'CMS.Models.Context.stub'
+      context: 'CMS.Models.Context.stub',
     },
     tree_view_options: {
       draw_children: true,
       attr_list: [{
         attr_title: 'Title',
         attr_name: 'title',
-        order: 10
+        order: 10,
       }, {
         attr_title: 'State ',
         attr_name: 'status',
-        order: 15
+        order: 15,
       }, {
         attr_title: 'End Date',
         attr_name: 'end_date',
-        order: 20
+        order: 20,
       }],
       mandatory_attr_name: ['title', 'status', 'end_date'],
-      disable_columns_configuration: true
+      disable_columns_configuration: true,
     },
     init: function () {
       let that = this;
@@ -122,12 +122,12 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
           });
         }
       });
-    }
+    },
   }, {
     init: function () {
       let that = this;
       this._super.apply(this, arguments);
-    }
+    },
   });
 
   _mustachePath = GGRC.mustache_path + '/cycle_task_entries';
@@ -146,19 +146,19 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
       cycle_task_group_object_task: 'CMS.Models.CycleTaskGroupObjectTask.stub',
       modified_by: 'CMS.Models.Person.stub',
       context: 'CMS.Models.Context.stub',
-      cycle: 'CMS.Models.Cycle.stub'
+      cycle: 'CMS.Models.Cycle.stub',
     },
 
     tree_view_options: {
       show_view: _mustachePath + '/tree.mustache',
-      footer_view: _mustachePath + '/tree_footer.mustache'
+      footer_view: _mustachePath + '/tree_footer.mustache',
     },
     init: function () {
       this._super.apply(this, arguments);
       this.bind('created',
         refreshAttrWrap('cycle_task_group_object_task').bind(this));
       this.validateNonBlank('description');
-    }
+    },
   }, {});
 
   _mustachePath = GGRC.mustache_path + '/cycle_task_groups';
@@ -177,12 +177,12 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
       task_group: 'CMS.Models.TaskGroup.stub',
       cycle_task_group_tasks: 'CMS.Models.CycleTaskGroupObjectTask.stubs',
       modified_by: 'CMS.Models.Person.stub',
-      context: 'CMS.Models.Context.stub'
+      context: 'CMS.Models.Context.stub',
     },
 
     tree_view_options: {
       sort_property: 'sort_index',
-      draw_children: true
+      draw_children: true,
     },
 
     init: function () {
@@ -215,7 +215,7 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
           });
         }
       });
-    }
+    },
   }, {});
 
   _mustachePath = GGRC.mustache_path + '/cycle_task_group_object_tasks';
@@ -239,26 +239,26 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
       cycle_task_entries: 'CMS.Models.CycleTaskEntry.stubs',
       modified_by: 'CMS.Models.Person.stub',
       context: 'CMS.Models.Context.stub',
-      cycle: 'CMS.Models.Cycle.stub'
+      cycle: 'CMS.Models.Cycle.stub',
     },
     permalink_options: {
       url: '<%= base.viewLink %>#current_widget' +
       '/cycle/<%= instance.cycle.id %>' +
       '/cycle_task_group/<%= instance.cycle_task_group.id %>' +
       '/cycle_task_group_object_task/<%= instance.id %>',
-      base: 'cycle:workflow'
+      base: 'cycle:workflow',
     },
     info_pane_options: {
       mapped_objects: {
         model: can.Model.Cacheable,
         mapping: 'info_related_objects',
-        show_view: GGRC.mustache_path + '/base_templates/subtree.mustache'
+        show_view: GGRC.mustache_path + '/base_templates/subtree.mustache',
       },
       comments: {
         model: can.Model.Cacheable,
         mapping: 'cycle_task_entries',
-        show_view: GGRC.mustache_path + '/cycle_task_entries/tree.mustache'
-      }
+        show_view: GGRC.mustache_path + '/cycle_task_entries/tree.mustache',
+      },
     },
     tree_view_options: {
       sort_property: 'sort_index',
@@ -267,38 +267,38 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
         {
           attr_title: 'Task title',
           attr_name: 'title',
-          attr_sort_field: 'task title'
+          attr_sort_field: 'task title',
         },
         {
           attr_title: 'Cycle title',
           attr_name: 'workflow',
-          attr_sort_field: 'cycle title'
+          attr_sort_field: 'cycle title',
         },
         {
           attr_title: 'Task state',
           attr_name: 'status',
-          attr_sort_field: 'task state'
+          attr_sort_field: 'task state',
         },
         {
           attr_title: 'Task start date',
           attr_name: 'start_date',
-          attr_sort_field: 'task start date'
+          attr_sort_field: 'task start date',
         },
         {
           attr_title: 'Task due date',
           attr_name: 'end_date',
-          attr_sort_field: 'task due date'
+          attr_sort_field: 'task due date',
         },
         {
           attr_title: 'Task last updated date',
           attr_name: 'updated_at',
-          attr_sort_field: 'task last updated date'
+          attr_sort_field: 'task last updated date',
         },
         {
           attr_title: 'Task last updated by',
           attr_name: 'modified_by',
-          attr_sort_field: 'task last updated by'
-        }
+          attr_sort_field: 'task last updated by',
+        },
       ],
       display_attr_names: ['title',
                            'status',
@@ -306,7 +306,7 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
                            'start_date',
                            'end_date'],
       mandatory_attr_name: ['title'],
-      draw_children: true
+      draw_children: true,
     },
     sub_tree_view_options: {
       default_filter: ['Control'],
@@ -347,7 +347,7 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
           });
         }
       });
-    }
+    },
   }, {
     _workflow: function () {
       return this.refresh_all('cycle', 'workflow').then(function (workflow) {
@@ -413,6 +413,6 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
 
       return cycle.attr('is_current') &&
         !_.contains(['Finished', 'Verified'], status);
-    }
+    },
   });
 })(window.can);

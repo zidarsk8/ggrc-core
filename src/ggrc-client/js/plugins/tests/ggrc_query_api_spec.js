@@ -19,7 +19,7 @@ describe('GGRC Utils Query API', function () {
         total: null,
         pageSize: 10,
         filter: '',
-        count: 6
+        count: 6,
       };
 
       method = QueryAPI.buildParams;
@@ -54,7 +54,7 @@ describe('GGRC Utils Query API', function () {
       beforeEach(function () {
         relevant = {
           id: 1,
-          type: 'Assessment'
+          type: 'Assessment',
         };
         objectName = 'Audit';
       });
@@ -85,7 +85,7 @@ describe('GGRC Utils Query API', function () {
         relevant = {
           id: 28,
           type: 'foo',
-          operation: 'op'
+          operation: 'op',
         };
         objectName = 'bar';
       });
@@ -103,7 +103,7 @@ describe('GGRC Utils Query API', function () {
         relevant = {
           id: 1,
           type: 'Person',
-          operation: 'owned'
+          operation: 'owned',
         };
         objectName = 'Assessment';
       });
@@ -127,8 +127,8 @@ describe('GGRC Utils Query API', function () {
         expression: {
           op: {name: '~'},
           left: 'foo',
-          right: 'bar'
-        }
+          right: 'bar',
+        },
       };
       let result;
 
@@ -260,7 +260,7 @@ describe('GGRC Utils Query API', function () {
     let relevant = {
       type: 'Audit',
       id: '555',
-      operation: 'relevant'
+      operation: 'relevant',
     };
 
     it('empty arguments. buildCountParams should return empty array',

@@ -21,7 +21,7 @@
       instance: null,
       source_mapping: null,
       model: null,
-      attributes: {}
+      attributes: {},
     },
     events: {
       init: function() {
@@ -102,7 +102,7 @@
         return function(el) {
           $(el).ggrc_mapping_autocomplete({ controller : options.contexts.attr("controller") });
         };
-      }
+      },
     },
   });
 })(window.can, window.can.$);
