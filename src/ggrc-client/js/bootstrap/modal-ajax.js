@@ -145,6 +145,10 @@ import Permission from '../permission';
     },
 
     form: function ($target, $trigger, option) {
+      const needToRefresh = (
+        $trigger.data('refresh') ||
+        $trigger.data('refresh') === undefined
+      );
       var formTarget = $trigger.data('form-target');
       var objectParams = $trigger.attr('data-object-params');
       var triggerParent = $trigger.closest('.add-button');
@@ -203,6 +207,7 @@ import Permission from '../permission';
             shouldApplyPreconditions(instance),
           current_user: GGRC.current_user,
           instance: instance,
+          skip_refresh: !needToRefresh,
           modal_title: objectParams.modal_title || modalTitle,
           content_view: contentView,
           mapping: mapping,
@@ -219,7 +224,9 @@ import Permission from '../permission';
         ].join(' ');
         var args = arguments;
 
-        if (formTarget === 'refresh') {
+        if (formTarget === 'nothing') {
+          return;
+        } else if (formTarget === 'refresh') {
           refreshPage();
         } else if (formTarget === 'redirect') {
           if (typeof xhr !== 'undefined' && 'getResponseHeader' in xhr) {
@@ -229,8 +236,6 @@ import Permission from '../permission';
           } else {
             GGRC.navigate(data.selfLink.replace('/api', ''));
           }
-        } else if (formTarget === 'refresh_page_instance') {
-          GGRC.page_instance().refresh();
         } else {
           $target.modal_form('hide');
           if ($trigger.data('dirty')) {
