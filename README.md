@@ -330,6 +330,22 @@ Solution 2:
 
 Please check the [Official documentation](https://docs.docker.com/engine/installation/linux/linux-postinstall/) on this.
 
+### `IOError: Can not access file in context: /<ggrc-core>/src/packages`
+
+Latest Docker (at least `Docker version 18.01.0-ce, build 03596f51b1`) tries to
+resolve our symlinks in the project directory (which we use to store
+dependencies installed from inside the container) on the host machine.
+
+A workaround for this is to create the corresponding directories on the host
+machine as a placeholder so the symlinks aren't considered broken:
+
+```sh
+$ sudo mkdir -p /vagrant-dev/node_modules
+$ sudo mkdir -p /vagrant-dev/opt/gae_packages
+```
+
+Docker doesn't use these directories on the host machine.
+
 ### Environment Variables
 
 *GGRC_SETTINGS_MODULE*:
