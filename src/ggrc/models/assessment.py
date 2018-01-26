@@ -14,6 +14,7 @@ from sqlalchemy import orm
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.builder import simple_property
+from ggrc.fulltext import mixin
 from ggrc.models.comment import Commentable
 from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
 from ggrc.models import issuetracker_issue
@@ -150,6 +151,10 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       'design',
       'operationally',
       'folder',
+  ]
+
+  AUTO_REINDEX_RULES = [
+      mixin.ReindexRule("Audit", lambda x: x.assessments, ["archived"]),
   ]
 
   _custom_publish = {
