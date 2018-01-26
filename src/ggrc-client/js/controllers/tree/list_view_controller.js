@@ -194,7 +194,7 @@
     },
 
     insert_items: function (items) {
-      this.options.list.push.apply(this.options.list, items);
+      this.options.list.push(...items);
       return can.Deferred().resolve();
     },
 

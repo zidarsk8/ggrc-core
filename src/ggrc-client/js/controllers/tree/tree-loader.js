@@ -49,7 +49,7 @@
           this.element.children('.tree-structure').length > 0) {
           this.element.children('.tree-structure')
             .addClass('new-tree_loading').append($wrapper);
-        } else if ($footer.length === 0) {  // My work
+        } else if ($footer.length === 0) { // My work
           this.element.addClass('new-tree_loading').append($wrapper);
         } else {
           $footer.before($wrapper);
@@ -102,7 +102,7 @@
           } else {
             dfds.push(that.init_view());
           }
-          return $.when.apply($, dfds);
+          return $.when(...dfds);
         }))
         .then(that._ifNotRemoved(that.proxy('draw_list')));
 
@@ -134,7 +134,7 @@
       });
 
       if (!this.element) {
-        return undefined;  // controller has been destroyed
+        return undefined; // controller has been destroyed
       }
 
       this.clearList();
@@ -161,7 +161,7 @@
           .find('spinner[extra-css-class="initial-spinner"]')
           .remove();
 
-        this.init_spinner();  // the tree view's own items loading spinner
+        this.init_spinner(); // the tree view's own items loading spinner
         this.element.trigger('loading');
       }
     },
@@ -260,7 +260,7 @@
       });
 
       if (preppedItems.length > 0) {
-        this.options.list.push.apply(this.options.list, preppedItems);
+        this.options.list.push(...preppedItems);
         dfd = this.add_child_lists(preppedItems);
       } else {
         dfd = can.Deferred().resolve();
