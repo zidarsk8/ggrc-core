@@ -31,6 +31,7 @@ class TestExportTasks(TestCase):
   @staticmethod
   def generate_tasks_for_cycle(cycle_count, task_count):
     """generate seceted number of cycles and tasks"""
+    role_names = ("Task Assignees", "Task Secondary Assignees")
     results = {}
     with ggrc_factories.single_commit():
       for _ in range(cycle_count):
@@ -48,26 +49,29 @@ class TestExportTasks(TestCase):
         for _ in range(task_count):
           task_group_task = factories.TaskGroupTaskFactory(
               task_group=task_group)
-          role = all_models.AccessControlRole.query.filter(
-              all_models.AccessControlRole.name == "Task Assignees",
-              all_models.AccessControlRole.object_type == task_group_task.type,
-          ).one()
-          ggrc_factories.AccessControlListFactory(ac_role=role,
-                                                  object=task_group_task,
-                                                  person=person)
+          for r_name in role_names:
+            role = all_models.AccessControlRole.query.filter(
+                all_models.AccessControlRole.name == r_name,
+                all_models.AccessControlRole.object_type ==
+                task_group_task.type,
+            ).one()
+            ggrc_factories.AccessControlListFactory(ac_role=role,
+                                                    object=task_group_task,
+                                                    person=person)
           cycle_task_group = factories.CycleTaskGroupFactory(
               cycle=cycle, contact=person)
 
           task = factories.CycleTaskFactory(cycle=cycle,
                                             cycle_task_group=cycle_task_group,
                                             task_group_task=task_group_task)
-          role = all_models.AccessControlRole.query.filter(
-              all_models.AccessControlRole.name == "Task Assignees",
-              all_models.AccessControlRole.object_type == task.type,
-          ).one()
-          ggrc_factories.AccessControlListFactory(ac_role=role,
-                                                  object=task,
-                                                  person=person)
+          for r_name in role_names:
+            role = all_models.AccessControlRole.query.filter(
+                all_models.AccessControlRole.name == r_name,
+                all_models.AccessControlRole.object_type == task.type,
+            ).one()
+            ggrc_factories.AccessControlListFactory(ac_role=role,
+                                                    object=task,
+                                                    person=person)
           results[task.id] = cycle.slug
     return results
 
@@ -218,6 +222,31 @@ class TestExportTasks(TestCase):
       self.assertEqual(1, len(assignees))
       self.assertCycles("task assignees", assignees[0].email, [slug])
       self.assertCycles("task assignees", assignees[0].name, [slug])
+
+  @data(
+      #  (Cycle count, tasks in cycle)
+      (0, 0),
+      (1, 1),
+      (2, 1),
+      (2, 1),
+      (2, 2),
+  )
+  @unpack
+  def test_filter_by_task_secondary_assignee(self, cycle_count, task_count):
+    """Test filter cycles by task secondary assignee name or email"""
+    task_cycle_filter = self.generate_tasks_for_cycle(cycle_count, task_count)
+    self.assertEqual(bool(cycle_count), bool(task_cycle_filter))
+    for task_id, slug in task_cycle_filter.iteritems():
+      task = all_models.CycleTaskGroupObjectTask.query.filter(
+          all_models.CycleTaskGroupObjectTask.id == task_id
+      ).one()
+      s_assignees = list(self.get_persons_for_role_name(
+          task, "Task Secondary Assignees"))
+      self.assertEqual(1, len(s_assignees))
+      self.assertCycles("task secondary assignees",
+                        s_assignees[0].email, [slug])
+      self.assertCycles("task secondary assignees",
+                        s_assignees[0].name, [slug])
 
   @data(
       #  (Cycle count, tasks in cycle)
