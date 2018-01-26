@@ -196,14 +196,12 @@ others regular checks, namely the following:
 -  Migrations work on a populated database (using the data from the
    ``ggrc-qa`` or ``ggrc-test`` instance).
 -  Database state after downgrade is the same as before the upgrade.
-   Before applying a migration do:
+   Before applying a migration do a mysqldump
 
    .. code-block:: bash
 
-       alembic <module_name> revision --autogenerate
+       mysqldump db_name > backup-file.sql
 
-   It will generate a new migration file with all the differences
-   between the actual database state and the models' definitions.
    Afterwards do the upgrade and downgrade to the previous state
    and do autogenerate again:
 
@@ -211,9 +209,9 @@ others regular checks, namely the following:
 
        alembic <module_name> upgrade <new_revision>
        alembic <module_name> downgrade <old_revision>
-       alembic <module_name> revision --autogenerate
+       mysqldump db_name > backup-file1.sql
 
-   Compare the two generated files, they should be identical.
+   Compare the two generated backup files, they should be identical.
 
 .. _acceptance-criteria:
 
