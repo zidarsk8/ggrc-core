@@ -33,7 +33,7 @@ def ScriptDirectory_from_config(cls, config):
   # Override location of `versions` directory to be independent of `env.py`
   versions_location = config.get_main_option('versions_location')
   if versions_location:
-    script_directory.versions = versions_location
+    script_directory._version_locations = [versions_location]
   return script_directory
 ScriptDirectory.from_config = ScriptDirectory_from_config
 
