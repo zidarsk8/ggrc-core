@@ -677,7 +677,7 @@ import Permission from '../../permission';
       this._is_scrolling_up = false;
       this.find_all_deferred = false;
       this.options.list.replace([]);
-      this.draw_list(this.options.original_list, true, forceReload);
+      this.draw_list(this.options.original_list, forceReload);
       this.init_count();
     },
 

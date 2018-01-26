@@ -195,6 +195,7 @@
 
     insert_items: function (items) {
       this.options.list.push.apply(this.options.list, items);
+      return can.Deferred().resolve();
     },
 
     '{list} change': 'update_count',
