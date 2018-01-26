@@ -28,6 +28,10 @@ import '../components/sort/sort-by';
 import * as TreeViewUtils from '../plugins/utils/tree-view-utils';
 import {confirm} from '../plugins/utils/modals';
 
+export const pinContentHiddenClass = 'pin-content--hidden';
+export const pinContentMaximizedClass = 'pin-content--maximized';
+export const pinContentMinimizedClass = 'pin-content--minimized';
+
 export default can.Control({
   pluginName: 'cms_controllers_info_pin',
   defaults: {
@@ -35,11 +39,10 @@ export default can.Control({
   }
 }, {
   init: function (el, options) {
-    this.element.height(0);
+    this.unsetInstance();
   },
   isPinVisible() {
-    const height = this.element.height();
-    return height > 0;
+    return !this.element.hasClass(pinContentHiddenClass);
   },
   findView: function (instance) {
     var view = instance.class.table_plural + '/info';
@@ -65,23 +68,14 @@ export default can.Control({
     }
     return options;
   },
-  getPinHeight: function (maximizedState) {
-    if (maximizedState) {
-      return Math.floor($(window).height() * 3 / 4);
-    }
-    return Math.floor($(window).height() / 3);
-  },
   hideInstance: function () {
     this.unsetInstance();
     $(window).trigger('resize');
   },
   unsetInstance: function () {
     this.element
-      .css({
-        height: 0,
-        'z-index': -1,
-        opacity: 0
-      })
+      .addClass(pinContentHiddenClass)
+      .removeClass(`${pinContentMaximizedClass} ${pinContentMinimizedClass}`)
       .html('');
   },
   setHtml: function (opts, view, confirmEdit, options, maximizedState) {
@@ -110,12 +104,11 @@ export default can.Control({
         }));
       });
   },
-  prepareView: function (opts, el, maximizedState, setHtml) {
+  prepareView: function (opts, el, maximizedState) {
     var instance = opts.attr('instance');
     var options = this.findOptions(el);
     var populatedOpts = opts.attr('options');
-    var confirmEdit = instance.class.confirmEditModal ?
-      instance.class.confirmEditModal : {};
+    var confirmEdit = instance.class.confirmEditModal || {};
     var view = this.findView(instance);
     instance.attr('view', view);
 
@@ -127,14 +120,10 @@ export default can.Control({
       confirmEdit.confirm = this.confirmEdit;
     }
 
-    if (setHtml) {
-      this.setHtml(opts, view, confirmEdit, options, maximizedState);
-    }
+    this.setHtml(opts, view, confirmEdit, options, maximizedState);
   },
   setInstance: function (opts, el, maximizedState) {
     var instance = opts.attr('instance');
-    var panelHeight = this.getPinHeight(maximizedState);
-    var currentPanelHeight;
     var infoPaneOpenDfd = can.Deferred();
     var isSubtreeItem = opts.attr('options.isSubTreeItem');
 
@@ -142,28 +131,30 @@ export default can.Control({
       !isSubtreeItem ||
       TreeViewUtils.isDirectlyRelated(instance));
 
-    this.prepareView(opts, el, maximizedState, true);
+    this.prepareView(opts, el, maximizedState);
 
     if (instance.info_pane_preload) {
       instance.info_pane_preload();
     }
 
-    // Make sure pin is visible
-    currentPanelHeight = this.element.height();
-    if (!currentPanelHeight || currentPanelHeight !== panelHeight) {
-      this.element.css('height', this.getPinHeight(true));
-    } else {
-      this.ensureElementVisible(el);
-    }
-
-    this.element.css('z-index', 1);
-    this.element.css('opacity', 1);
+    this.showInstance(maximizedState);
 
     // Temporary solution...
     setTimeout(infoPaneOpenDfd.resolve, 1000);
 
-    this.element.trigger('scroll');
     return infoPaneOpenDfd;
+  },
+  showInstance(maximizedState) {
+    this.element
+      .removeClass(`${pinContentMaximizedClass} ${pinContentMinimizedClass}`)
+      .removeClass(pinContentHiddenClass);
+
+    if (maximizedState) {
+      this.element.addClass(pinContentMaximizedClass);
+    }
+    else {
+      this.element.addClass(pinContentMinimizedClass);
+    }
   },
   updateInstance: function (selector, instance) {
     var vm = this.element.find(selector).viewModel();
@@ -180,43 +171,6 @@ export default can.Control({
       .viewModel()
       .attr('isLoading', isLoading);
   },
-  ensureElementVisible: function (el) {
-    var $objectArea;
-    var $header;
-    var $filter;
-    var elTop;
-    var elBottom;
-    var headerTop;
-    var headerBottom;
-    var infoTop;
-
-    $(window).trigger('resize');
-    $objectArea = $('.object-area');
-    $header = $('.tree-header:visible');
-    $filter = $('.tree-filter:visible');
-
-    if (_.isEmpty(el) || _.isEmpty($header)) {
-      return;
-    }
-
-    elTop = el.offset().top;
-    elBottom = elTop + el.height();
-
-    headerTop = $header.offset().top;
-    headerBottom = headerTop + $header.height();
-    infoTop = this.element.offset().top;
-
-    if (elTop < headerBottom || elBottom > infoTop) {
-      el[0].scrollIntoView(false);
-      if (elTop < headerBottom) {
-        el[0].scrollIntoView(true);
-        $objectArea.scrollTop(
-          $objectArea.scrollTop() - $header.height() - $filter.height());
-      } else {
-        el[0].scrollIntoView(false);
-      }
-    }
-  },
   confirmEdit: function (instance, modalDetails) {
     var confirmDfd = $.Deferred();
     var renderer = can.view.mustache(modalDetails.description);
@@ -229,11 +183,9 @@ export default can.Control({
     return confirmDfd;
   },
   changeMaximizedState: function (maximizedState) {
+    this.showInstance(maximizedState);
+
     var $activeTree = $('.cms_controllers_tree_view_node.active');
-    var size = this.getPinHeight(maximizedState);
-
-    this.element.css('height', size);
-
     if (maximizedState) {
       $activeTree
         .addClass('maximized-info-pane');
