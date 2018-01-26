@@ -152,6 +152,10 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
       reflection.Attribute('verified_date', create=False, update=False),
       reflection.Attribute('allow_change_state', create=False, update=False),
       reflection.Attribute('folder', create=False, update=False),
+      reflection.Attribute('workflow', create=False, update=False),
+      reflection.Attribute('workflow_title', create=False, update=False),
+      reflection.Attribute('cycle_task_group_title', create=False,
+                           update=False),
   )
 
   default_description = "<ol>"\
@@ -198,7 +202,17 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
       "start_date": "Start Date",
   }
 
-  @property
+  @builder.simple_property
+  def cycle_task_group_title(self):
+    """Property. Returns parent CycleTaskGroup title."""
+    return self.cycle_task_group.title
+
+  @builder.simple_property
+  def workflow_title(self):
+    """Property. Returns parent Workflow's title."""
+    return self.workflow.title
+
+  @builder.simple_property
   def workflow(self):
     """Property which returns parent workflow object."""
     return self.cycle.workflow
