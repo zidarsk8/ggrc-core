@@ -102,17 +102,31 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
       });
     });
 
-    describe('loadWorkflow() method', function () {
+    describe('loadWorkflow() method', () => {
+      let cycle;
+
+      beforeEach(function () {
+        cycle = new can.Map();
+      });
+
+      describe('when a user doesn\'t have enough permissions to get ' +
+      'informations about workflow', () => {
+        it('builds trimmed workflow object', function () {
+          const expectedResult = new can.Map();
+          spyOn(viewModel, 'buildTrimmedWorkflowObject')
+            .and.returnValue(expectedResult);
+          viewModel.loadWorkflow(cycle);
+          expect(viewModel.attr('workflow')).toBe(expectedResult);
+        });
+      });
+
       describe('when cycle was loaded successfully', function () {
         let trigger;
         let triggerDfd;
         let reifiedObject;
-        let cycle;
 
         beforeEach(function () {
-          cycle = new can.Map({
-            workflow: {},
-          });
+          cycle.attr('workflow', {});
           reifiedObject = {};
           cycle.attr('workflow').reify = jasmine.createSpy('reify')
             .and.returnValue(reifiedObject);
@@ -160,6 +174,37 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
               });
           });
         });
+      });
+    });
+
+    describe('buildTrimmedWorkflowObject() method', () => {
+      describe('returns built trimmed workflow object which contains', () => {
+        it('a link to the workfolw', function () {
+          const link = 'www.example.com';
+          let wf;
+          spyOn(viewModel, 'buildWorkflowLink').and.returnValue(link);
+          wf = viewModel.buildTrimmedWorkflowObject();
+          expect(wf.attr('viewLink')).toBe(link);
+        });
+
+        it('a workflow title', function () {
+          const title = '123';
+          let wf;
+          viewModel.attr('instance.workflow_title', title);
+          wf = viewModel.buildTrimmedWorkflowObject();
+          expect(wf.attr('title')).toBe(title);
+        });
+      });
+    });
+
+    describe('buildWorkflowLink() method', () => {
+      it('returns link based on workflow id', function () {
+        const id = 1;
+        const expectedLink = `/workflows/${id}`;
+        let result;
+        viewModel.attr('instance.workflow', {id});
+        result = viewModel.buildWorkflowLink();
+        expect(result).toBe(expectedLink);
       });
     });
 
