@@ -292,7 +292,8 @@ class QueryHelper(object):
     with benchmark("Apply limit"):
       limit = object_query.get("limit")
       if limit:
-        ids, total = pagination.apply_limit(query, limit)
+        limit_query, total = pagination.apply_limit(query, limit)
+        ids = [obj.id for obj in limit_query]
       else:
         ids = [obj.id for obj in query]
         total = len(ids)
