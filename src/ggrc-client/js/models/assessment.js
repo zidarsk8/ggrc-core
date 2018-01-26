@@ -403,7 +403,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       this._pending_refresh.fn();
       return dfd;
     },
-    getRelatedObjects () {
+    getRelatedObjects() {
       return $.get(`/api/assessments/${this.attr('id')}/related_objects`)
         .then((response) => {
           let auditTitle = response.Audit.title;

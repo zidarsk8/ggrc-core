@@ -317,20 +317,5 @@ import {confirm} from '../../plugins/utils/modals';
         }
       },
     },
-    helpers: {
-      // Mapping-based autocomplete selectors use this helper to
-      //  attach the mapping autocomplete ui widget.  These elements should
-      //  be decorated with data-mapping attributes.
-      mapping_autocomplete : function(options) {
-        return function(el) {
-          let $el = $(el);
-          $el.ggrc_mapping_autocomplete({
-            controller : options.contexts.attr("controller"),
-            model : $el.data("model"),
-            mapping : false,
-          });
-        };
-      },
-    },
   }, true);
 })(window.can, window.can.$);

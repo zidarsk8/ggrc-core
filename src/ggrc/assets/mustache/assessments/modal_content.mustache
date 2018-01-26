@@ -5,7 +5,8 @@
 
 {{!div class="modal-body"}}
   <div class="ggrc-form">
-    {{#instance}}
+    <assessment-modal {instance}="instance" {is-new-instance}="new_object_form">
+      {{#instance}}
     <form action="javascript://">
 
       {{^if new_object_form}}
@@ -134,7 +135,8 @@
                   parent_instance="instance"
                   instance="instance"
                   mapping="related_objects_as_source"
-                  from-query-api="true"
+                  custom-related-loader="true"
+                  {list}="mappedObjects"
                   {type}="instance.assessment_type"
                   {new-instance}="instance.isNew"
                   deferred="true"
@@ -218,6 +220,8 @@
             instance={instance}
             document-type="REFERENCE_URL"
             autorefresh="false"
+            custom-loader="true"
+            {documents}="referenceUrls"
             {^pending-items-changed}="referenceUrlChanged">
             <related-reference-urls class="related-reference-urls"
               {(urls)}="documents"
@@ -327,5 +331,6 @@
 
     </form>
     {{/instance}}
+    </assessment-modal>
   </div>
 {{!/div}}
