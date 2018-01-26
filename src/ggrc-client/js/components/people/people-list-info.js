@@ -32,13 +32,13 @@ import template from './people-list-info.mustache';
     template: template,
     viewModel: viewModel,
     events: {
-      click: function () {
-        if (arguments[2] === undefined) {
-          return;
-        }
-        this.viewModel.attr('isHidden', arguments[2]);
+      ' open'() {
+        this.viewModel.attr('isHidden', false);
         this.viewModel.attr('isOpen', true);
         this.viewModel.refreshInstance();
+      },
+      ' close'() {
+        this.viewModel.attr('isHidden', true);
       },
     },
   });
