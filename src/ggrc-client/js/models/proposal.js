@@ -15,4 +15,8 @@ export default can.Model.Cacheable('CMS.Models.Proposal', {
   update: 'PUT /api/proposals/{id}',
   destroy: 'DELETE /api/proposals/{id}',
   create: 'POST /api/proposals',
+  attributes: {
+    decline_datetime: 'datetime',
+    apply_datetime: 'datetime',
+  },
 }, {});
