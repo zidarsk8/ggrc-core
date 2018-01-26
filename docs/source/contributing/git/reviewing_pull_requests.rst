@@ -192,9 +192,9 @@ others regular checks, namely the following:
 -  The migration works from a clean database,
 -  Downgrading and upgrading work on a clean database,
 -  Migrations work from the current database state on the main
-   ``develop`` branch,
+   ``dev`` branch,
 -  Migrations work on a populated database (using the data from the
-   ``grc-dev`` instance).
+   ``ggrc-qa`` or ``ggrc-test`` instance).
 -  Database state after downgrade is the same as before the upgrade.
    Before applying a migration do:
 
@@ -273,10 +273,10 @@ A pull request can be merged only if **all** of the following is true:
    least one of the reviewers has requested changes.
 
 NOTE: After merging a PR that contains a database migration step, the reviewer
-must mark all other currently open migration PRs with the ``needs work`` label,
-and add a note containing the new ``down_revision`` value in the database
-migration chain, so that the authors of those PRs can update their migration
-scripts accordingly.
+must mark all other currently open migration PRs with the
+``check migration chain`` label, and add a note containing the new
+``down_revision`` value in the database migration chain, so that the authors
+of those PRs can update their migration scripts accordingly.
 Mind that this only applies to the PRs containing migration scripts in the same
 application module as the just merged PR.
 
