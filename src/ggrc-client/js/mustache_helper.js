@@ -2447,8 +2447,17 @@ Example:
     'withRoleForInstance',
     function (instance, roleName, options) {
       let userId = GGRC.current_user.id;
-      let hasRoleForContextDfd;
+      let internalRoles = GGRC.internal_access_control_roles;
+      let role;
+      let hasRole;
       instance = resolve_computed(instance);
+      roleName = resolve_computed(roleName);
+      role = internalRoles.find((a) => a.name === roleName);
+
+      if (!role) {
+        console.warn(roleName, 'is not an internal access control name');
+        return;
+      }
 
       // As a Creator user we seem to invoke this helper with a null instance.
       // In this case we simply return and wait for the helper to be invoked a
@@ -2456,18 +2465,13 @@ Example:
       if (!instance) {
         return;
       }
+      hasRole = instance.access_control_list.filter((acl) => {
+        return acl.ac_role_id === role.id && acl.person_id === userId;
+      }).length > 0;
 
-      if (!instance.contextId) {
-        instance = CMS.Models[instance.type].findInCacheById(instance.id);
-      }
-
-      hasRoleForContextDfd =
-        GGRC.Utils.hasRoleForContext(userId, instance.context_id, roleName);
-
-      return Mustache.defer_render('span',
-        function (hasRole) {
-          return options.fn(options.contexts.add({hasRole: hasRole}));
-        }, hasRoleForContextDfd);
+      return options.fn(options.contexts.add({
+        hasRole: hasRole,
+      }));
     });
 
   Mustache.registerHelper('displayWidgetTab',
@@ -2520,14 +2524,14 @@ Example:
   );
   Mustache.registerHelper('is_auditor', function (options) {
     const auditor = GGRC.access_control_roles.find(
-        (role) => role.name === 'Auditors');
+      (role) => role.name === 'Auditors');
     const audit = GGRC.page_instance();
     if (audit.type !== 'Audit') {
       console.warn('is_auditor called on non audit page');
       return options.inverse(options.contexts);
     }
     const isAuditor = audit.access_control_list.filter(
-        (acl) => acl.ac_role_id === auditor.id &&
+      (acl) => acl.ac_role_id === auditor.id &&
                  acl.person_id === GGRC.current_user.id).length;
 
     if (isAuditor) {
