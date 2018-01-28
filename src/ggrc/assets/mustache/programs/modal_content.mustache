@@ -45,10 +45,25 @@
   </div>
   <div class="row">
     <div class="span12 hide-wrap hidable">
-      <access-control-list-roles-helper
-        {instance}="."
-        {is-new-instance}="new_object_form">
-      </access-control-list-roles-helper>
+      {{#new_object_form}}
+        <access-control-list-roles-helper
+          {instance}="instance"
+          {is-new-instance}="new_object_form">
+        </access-control-list-roles-helper>
+      {{/new_object_form}}
+      {{^new_object_form}}
+        <access-control-list-roles-helper
+          {instance}="instance"
+          {is-new-instance}="new_object_form"
+          {read-only}="instance.readOnlyProgramRoles"
+          {include-roles}="instance.class.programRoles">
+        </access-control-list-roles-helper>
+        <access-control-list-roles-helper
+          {instance}="instance"
+          {is-new-instance}="new_object_form"
+          {exclude-roles}="instance.class.programRoles">
+        </access-control-list-roles-helper>
+      {{/new_object_form}}
     </div>
   </div>
 
