@@ -1,10 +1,14 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Custom Resource for Relationship that creates Snapshots when needed.
+"""Custom resource for related assessments
 
-When Audit-Snapshottable Relationship is POSTed, a Snapshot should be created
-instead.
+This resource works with the following queries:
+  - /api/related_assess with get parameters:
+    - object_type=Control
+    - object_id=XXX
+    - optional: limit=from,to
+    - optional: order_by=field_name[,asc|,desc]
 """
 
 from collections import defaultdict
