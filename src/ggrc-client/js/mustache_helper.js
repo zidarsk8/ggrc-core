@@ -2542,18 +2542,21 @@ Example:
 
   Mustache.registerHelper('page_roles', function (person, options) {
     const pageInstance = Mustache.resolve(GGRC.page_instance);
+    const allRoles = GGRC.access_control_roles.concat(
+      GGRC.internal_access_control_roles);
     const roles = {};
-    can.each(GGRC.access_control_roles, (role) => {
+    can.each(allRoles, (role) => {
       roles[role.id] = role;
     });
 
     person = Mustache.resolve(person);
 
-    const allRoleNames = pageInstance.access_control_list.filter((acl) => {
-      return acl.person.id === person.id && acl.ac_role_id in roles;
-    }).map((acl) => {
+    const allRoleNames = _.uniq(pageInstance.access_control_list.filter(
+      (acl) => {
+        return acl.person.id === person.id && acl.ac_role_id in roles;
+      }).map((acl) => {
       return roles[acl.ac_role_id].name;
-    });
+    }));
 
     return options.fn({
       'short': allRoleNames[0],
