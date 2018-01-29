@@ -302,12 +302,6 @@ def build_cycle(workflow, cycle=None, current_user=None):
                        destination=object_)
 
   update_cycle_dates(cycle)
-  Signals.workflow_cycle_start.send(
-      cycle.__class__,
-      obj=cycle,
-      new_status=cycle.status,
-      old_status=None
-  )
   workflow.repeat_multiplier += 1
   workflow.next_cycle_start_date = workflow.calc_next_adjusted_date(
       workflow.min_task_start_date)
