@@ -1,7 +1,19 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""All hooks required by program acl roles business cases"""
+"""All hooks required by program acl roles business cases
+
+Program Readers, Program Editors, Program Managers acl roles get propagated to:
+- Mapped objects (through relationships)
+  - Comments & Documents
+- Audit
+  - Assessment Templates
+  - Snapshots
+  - Assessments
+    - Comments & Documents
+  - Issues
+    - Comments & Documents
+"""
 
 
 import sqlalchemy as sa
@@ -12,6 +24,58 @@ from ggrc.models import all_models
 from ggrc.models.hooks.acl.acl_manager import ACLManager
 from ggrc.models.relationship import Stub, RelationshipsCache
 from ggrc.models.hooks.relationship import related
+
+# The dictionary below describes how program roles (Program Managers, Program
+# Editors and Program Readers) propagate to mapped objects.
+PROGRAM_ACL_PROPAGATION_RULES = {
+    "roles": {
+        "Program Managers",
+        "Program Readers",
+        "Program Editors"
+    },
+    "relationships": {
+        "type": "any",
+        "new_role": "add mapped",
+        "propagate": {
+            "roles": {
+                "Program Managers Mapped",
+                "Program Readers Mapped",
+                "Program Editors Mapped"
+            },
+            "relationships": {
+                "type": "Comment,Document",
+                "new_role": "same"
+            }
+        }
+    },
+    "audits": {
+        "propagate": {
+            "roles": {
+                "Program Managers Mapped",
+                "Program Readers Mapped",
+                "Program Editors Mapped"
+            },
+            "relationships": {
+                "type": "Assessment,Issue,AssessmentTemplate",
+                "new_role": "same",
+                "propagate": {
+                    "roles": {
+                        "Program Managers Mapped",
+                        "Program Readers Mapped",
+                        "Program Editors Mapped"
+                    },
+                    "relationships": {
+                        "type": "Comment,Document",
+                        "new_role": "same"
+                    }
+                }
+            },
+            "snapshots": {
+
+            }
+        }
+    }
+}
 
 
 def _get_acr_id(acl):
@@ -112,70 +176,9 @@ class ProgramRolesHandler(object):
       self.handle_snapshots(propagation["snapshots"], acl)
 
   def handle_access_control_list(self, obj):
-    """Handle cases where new program roles are added
-
-      Program Readers, Program Editors, Program Managers
-
-      - Mapped objects (through relationships)
-        - Comments & Documents
-      - Audit
-        - Assessment Templates
-        - Snapshots
-        - Assessments
-          - Comments & Documents
-        - Issues
-          - Comments & Documents
-    """
-    propagation = {
-        "roles": {
-            "Program Managers",
-            "Program Readers",
-            "Program Editors"
-        },
-        "relationships": {
-            "type": "any",
-            "new_role": "add mapped",
-            "propagate": {
-                "roles": {
-                    "Program Managers Mapped",
-                    "Program Readers Mapped",
-                    "Program Editors Mapped"
-                },
-                "relationships": {
-                    "type": "Comment,Document",
-                    "new_role": "same"
-                }
-            }
-        },
-        "audits": {
-            "propagate": {
-                "roles": {
-                    "Program Managers Mapped",
-                    "Program Readers Mapped",
-                    "Program Editors Mapped"
-                },
-                "relationships": {
-                    "type": "Assessment,Issue,AssessmentTemplate",
-                    "new_role": "same",
-                    "propagate": {
-                        "roles": {
-                            "Program Managers Mapped",
-                            "Program Readers Mapped",
-                            "Program Editors Mapped"
-                        },
-                        "relationships": {
-                            "type": "Comment,Document",
-                            "new_role": "same"
-                        }
-                    }
-                },
-                "snapshots": {
-
-                }
-            }
-        }
-    }
-    self.handle_propagation(propagation, obj)
+    """Handle PROGRAM_ACL_PROPAGATION_RULES dict to create all needed
+       propagations"""
+    self.handle_propagation(PROGRAM_ACL_PROPAGATION_RULES, obj)
 
   def handle_snapshot(self, obj):
     """When a snapshot is created propagate program roles"""
