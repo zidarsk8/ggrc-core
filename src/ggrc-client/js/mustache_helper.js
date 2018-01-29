@@ -1597,21 +1597,6 @@ Mustache.registerHelper("with_model_as", function (var_name, model_name, options
   return options.fn(options.contexts.add(frame));
 });
 
-Mustache.registerHelper("private_program_owner", function (instance, modal_title, options) {
-  let state = options.contexts.attr('__private_program_owner');
-  if (resolve_computed(modal_title).indexOf('New ') === 0) {
-    return GGRC.current_user.email;
-  }
-  else {
-    let loader = resolve_computed(instance).get_binding('authorizations');
-    return $.map(loader.list, function (binding) {
-      if (binding.instance.role && binding.instance.role.reify().attr('name') === 'ProgramOwner') {
-        return binding.instance.person.reify().attr('email');
-      }
-    }).join(', ');
-  }
-});
-
 // Verify if the Program has multiple owners
 // Usage: {{#if_multi_owner instance modal_title}}
 Mustache.registerHelper("if_multi_owner", function (instance, modal_title, options) {
