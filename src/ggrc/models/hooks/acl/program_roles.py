@@ -35,7 +35,6 @@ PROGRAM_ACL_PROPAGATION_RULES = {
     },
     "relationships": {
         "type": "any",
-        "new_role": "add mapped",
         "propagate": {
             "roles": {
                 "Program Managers Mapped",
@@ -43,8 +42,7 @@ PROGRAM_ACL_PROPAGATION_RULES = {
                 "Program Editors Mapped"
             },
             "relationships": {
-                "type": "Comment,Document",
-                "new_role": "same"
+                "type": "Comment,Document"
             }
         }
     },
@@ -57,7 +55,6 @@ PROGRAM_ACL_PROPAGATION_RULES = {
             },
             "relationships": {
                 "type": "Assessment,Issue,AssessmentTemplate",
-                "new_role": "same",
                 "propagate": {
                     "roles": {
                         "Program Managers Mapped",
@@ -65,8 +62,7 @@ PROGRAM_ACL_PROPAGATION_RULES = {
                         "Program Editors Mapped"
                     },
                     "relationships": {
-                        "type": "Comment,Document",
-                        "new_role": "same"
+                        "type": "Comment,Document"
                     }
                 }
             },
@@ -75,6 +71,16 @@ PROGRAM_ACL_PROPAGATION_RULES = {
             }
         }
     }
+}
+
+# Role propagation
+ROLE_PROPAGATION = {
+    "Program Managers": "Program Managers Mapped",
+    "Program Editors": "Program Editors Mapped",
+    "Program Readers": "Program Readers Mapped",
+    "Program Managers Mapped": "Program Managers Mapped",
+    "Program Editors Mapped": "Program Editors Mapped",
+    "Program Readers Mapped": "Program Readers Mapped",
 }
 
 
@@ -138,7 +144,7 @@ class ProgramRolesHandler(object):
     for audit in acl.object.audits:
       child = acl_manager.get_or_create(
           audit, acl, acl.person,
-          role_map[self._get_acr_name(acl) + " Mapped"])
+          role_map[ROLE_PROPAGATION[self._get_acr_name(acl)]])
       if "propagate" in propagation:
         self.handle_propagation(propagation["propagate"], child)
 
@@ -153,13 +159,7 @@ class ProgramRolesHandler(object):
       if not (propagation["type"] == "any" or
               stub.type in propagation["type"].split(",")):
         continue
-      if propagation["new_role"] == "same":
-        role_id = _get_acr_id(acl)
-      elif propagation["new_role"] == "add mapped":
-        role_id = role_map[self._get_acr_name(acl) + " Mapped"]
-      else:
-        raise ValueError("Wrong value for new_role field " +
-                         propagation["new_role"])
+      role_id = role_map[ROLE_PROPAGATION[self._get_acr_name(acl)]]
       child = acl_manager.get_or_create(
           stub, acl, acl.person, role_id)
       if "propagate" in propagation:
@@ -211,7 +211,8 @@ class ProgramRolesHandler(object):
           continue
 
         acl_manager.get_or_create(
-            other, acl, acl.person, role_map[role_name + " Mapped"])
+            other, acl, acl.person,
+            role_map[ROLE_PROPAGATION[self._get_acr_name(acl)]])
       return
 
     comment_or_document, other = related_to(obj, {
@@ -257,8 +258,9 @@ class ProgramRolesHandler(object):
           "Program Managers"
       }:
         continue
-      acl_manager.get_or_create(obj, acl, acl.person,
-                                role_map[role_name + " Mapped"])
+      acl_manager.get_or_create(
+          obj, acl, acl.person,
+          role_map[ROLE_PROPAGATION[self._get_acr_name(acl)]])
 
   def after_flush(self, session, _):
     """Handle program related acl"""
