@@ -254,14 +254,14 @@ class RelatedAssessmentsResource(common.Resource):
     with benchmark("dispatch related_assessments request"):
       try:
 
+        if request.method != 'GET':
+          raise BadRequest()
+
         object_type = request.args.get("object_type")
         object_id = int(request.args.get("object_id"))
         order_by = self._get_order_by_parameter()
         limit_string = request.args.get("limit", "")
         limit = [int(i) for i in limit_string.split(",") if i]
-
-        if request.method != 'GET':
-          raise BadRequest()
 
         model = models.inflector.get_model(object_type)
         obj = model.query.get(object_id)
