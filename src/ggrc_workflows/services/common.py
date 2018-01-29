@@ -26,10 +26,3 @@ class Signals():
     This is used to signal any listeners of any changes in model object status
     attribute
     """)
-
-  workflow_cycle_start = signals.signal(
-      'Workflow Cycle Started ',
-      """
-    This is used to signal any listeners of any workflow cycle start
-    attribute
-    """)
