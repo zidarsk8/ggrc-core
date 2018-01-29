@@ -30,7 +30,7 @@ def _get_cache(expr, name):
   return result
 
 
-def _get_acl_audit_roles():
+def _get_acl_non_editable_roles():
   """Cache captain and auditor roles"""
   return _get_cache(lambda: {
       role.name: role.id for role in
@@ -39,7 +39,7 @@ def _get_acl_audit_roles():
           all_models.AccessControlRole.non_editable == true()
       ).options(
           load_only("id", "name")).all()
-  }, "acl_audit_roles")
+  }, "acl_non_editable_roles")
 
 
 def _get_acr_id(acl):
@@ -123,7 +123,7 @@ class AuditRolesHandler(object):
 
   def handle_access_control_list(self, obj):
     """Handle Access Control List creation"""
-    audit_roles = _get_acl_audit_roles()
+    audit_roles = _get_acl_non_editable_roles()
     role_handlers = {
         audit_roles["Audit Captains"]: self._audit_captains_handler,
         audit_roles["Auditors"]: self._auditors_handler,
@@ -133,7 +133,7 @@ class AuditRolesHandler(object):
 
   def handle_snapshot(self, obj):
     """Handle snapshot creation"""
-    audit_roles = _get_acl_audit_roles()
+    audit_roles = _get_acl_non_editable_roles()
     access_control_list = obj.parent.access_control_list
     role_map = {
         audit_roles["Auditors"]: audit_roles["Auditors Snapshot Mapped"],
@@ -175,7 +175,7 @@ class AuditRolesHandler(object):
                               all_models.Comment)):
       return
 
-    audit_roles = _get_acl_audit_roles()
+    audit_roles = _get_acl_non_editable_roles()
     auditors_mapped_dict = defaultdict(
         lambda: audit_roles["Auditors Mapped"], {
             all_models.Assessment: audit_roles["Auditors Assessment Mapped"],
