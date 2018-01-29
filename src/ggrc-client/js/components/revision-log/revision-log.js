@@ -535,9 +535,10 @@ import template from './revision-log.mustache';
         defs = _.merge(origDefs, newDefs);
 
         return _.chain(ids)
-          .map(function (id) {
-            let def = defs[id];
-            let diff = {
+          .filter((id) => !!defs[id])
+          .map((id) => {
+            const def = defs[id];
+            const diff = {
               fieldName: def.title,
               origVal:
                 showValue(origValues[id] || {}, def) || EMPTY_DIFF_VALUE,

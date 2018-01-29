@@ -450,6 +450,23 @@ describe('GGRC.Components.revisionLog', function () {
         newVal: 'v4',
       }]);
     });
+
+    it('should not return diffs if definitions are empty', () => {
+      const defs = [];
+      const oldValues = [{
+        custom_attribute_id: 1,
+        attribute_value: 'v1',
+      }];
+
+      const newValues = [{
+        custom_attribute_id: 1,
+        attribute_value: 'v3',
+      }];
+
+      const result = viewModel
+        ._objectCADiff(oldValues, defs, newValues, defs);
+      expect(result.length).toBe(0);
+    });
   });
 
   describe('_fetchRevisionsData() method', function () {
