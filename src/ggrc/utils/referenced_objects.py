@@ -14,7 +14,8 @@ from ggrc.models.mixins import customattributable
 
 def get(type_, id_):
   """Check flask.g.referenced_objects for the object or get it from the DB."""
-  if not id_:
+  # id == 0 is a valid case if id is an int; therefore "not id" doesn't fit
+  if id_ is None:
     return None
 
   ref_objects = getattr(flask.g, "referenced_objects", {})
