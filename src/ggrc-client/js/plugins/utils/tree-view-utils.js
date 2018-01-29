@@ -29,6 +29,8 @@ import {
   getWidgetConfigs,
   getWidgetConfig,
 } from './object-versions-utils';
+import {getRolesForType} from './acl-utils';
+
 
 /**
 * TreeView-specific utils.
@@ -214,9 +216,7 @@ function getColumnsForModel(modelType, displayPrefs, modelName) {
   allAttrs = attrs.concat(customAttrs);
 
   // add custom roles information
-  modelRoles = _.filter(GGRC.access_control_roles, {
-    object_type: modelType,
-  });
+  modelRoles = getRolesForType(modelType);
   roleAttrs = modelRoles.map(function (role) {
     return {
       attr_title: role.name,

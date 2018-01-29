@@ -97,4 +97,7 @@ function peopleWithRoleName(instance, roleName) {
 
 export {
   peopleWithRoleName,
+  getRolesForType,
+  getRole,
+  getRoleById,
 };

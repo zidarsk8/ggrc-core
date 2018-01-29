@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {getRole} from '../plugins/utils/acl-utils';
+
 (function (can) {
   can.Model.Cacheable('CMS.Models.Context', {
     root_object: 'context',
@@ -100,9 +102,8 @@
       if (allowedRoles.indexOf(GGRC.current_user.system_wide_role) > -1) {
         return false;
       }
-      const programManagerRole = GGRC.access_control_roles.find((acr) => {
-        return acr.name === 'Program Managers' && acr.object_type === 'Program';
-      }).id;
+      const programManagerRole = getRole('Program', 'Program Managers').id;
+
       return this.access_control_list.filter((acl) => {
         return acl.person_id === GGRC.current_user.id &&
                acl.ac_role_id === programManagerRole;

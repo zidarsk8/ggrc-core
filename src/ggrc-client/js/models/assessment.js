@@ -4,6 +4,7 @@
  */
 
 import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
+import {getRole} from '../plugins/utils/acl-utils';
 
 (function (can, GGRC, CMS) {
   'use strict';
@@ -336,15 +337,10 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
 
       function markForAddition(instance, user, type) {
         let rolesNames = type.split(',');
-        let roles = GGRC.access_control_roles;
         let acl = instance.attr('access_control_list');
 
         rolesNames.forEach((roleName) => {
-          let role = _.head(
-            roles.filter((role) =>
-              role.object_type === 'Assessment' &&
-              role.name === roleName)
-          );
+          let role = getRole('Assessment', roleName);
 
           if (role) {
             acl.push({

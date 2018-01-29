@@ -5,6 +5,7 @@
 
 import RefreshQueue from '../models/refresh_queue';
 import Permission from '../permission';
+import {getRolesForType} from '../plugins/utils/acl-utils';
 
 (function ($, GGRC, moment, CMS) {
   'use strict';
@@ -542,8 +543,7 @@ import Permission from '../permission';
      */
     getAssigneeType: function (instance) {
       let currentUser = GGRC.current_user;
-      let roles = GGRC.access_control_roles
-        .filter((item) => item.object_type === instance.type);
+      let roles = getRolesForType(instance.type);
       let userType = null;
 
       if (!instance || !currentUser) {
