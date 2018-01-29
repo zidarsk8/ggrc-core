@@ -249,6 +249,22 @@ class RelatedAssessmentsResource(common.Resource):
       }]
     return order_by
 
+  @classmethod
+  def _get_limit_parameters(cls):
+    """Parse limit parameter.
+
+    This function parses order by parameters such as:
+      - limit=from,to
+
+    Returns:
+      list with From and To integers for query pagination.
+    """
+    limit_string = request.args.get("limit", "")
+    limit = [int(i) for i in limit_string.split(",") if i]
+    if limit and len(limit) != 2:
+      raise ValueError
+    return limit
+
   def dispatch_request(self, *args, **kwargs):  # noqa
     """Dispatch request for related_assessments."""
     with benchmark("dispatch related_assessments request"):
@@ -260,8 +276,7 @@ class RelatedAssessmentsResource(common.Resource):
         object_type = request.args.get("object_type")
         object_id = int(request.args.get("object_id"))
         order_by = self._get_order_by_parameter()
-        limit_string = request.args.get("limit", "")
-        limit = [int(i) for i in limit_string.split(",") if i]
+        limit = self._get_limit_parameters()
 
         model = models.inflector.get_model(object_type)
         obj = model.query.get(object_id)
