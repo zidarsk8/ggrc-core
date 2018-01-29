@@ -457,10 +457,6 @@ import InfoWidget from '../controllers/info_widget_controller';
     // initialization area
     $(document.body).ggrc_controllers_workflow_page();
 
-    GGRC.register_hook(
-        'ObjectNav.Actions',
-        GGRC.mustache_path + '/dashboard/object_nav_actions');
-
     $.extend(
       true,
       newWidgetDescriptors,
