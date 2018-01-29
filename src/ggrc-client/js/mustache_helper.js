@@ -1367,7 +1367,7 @@ Mustache.registerHelper("last_approved", function (instance, options) {
 
 Mustache.registerHelper('with_is_reviewer', function (reviewTask, options) {
   let assigneeRole = _.find(GGRC.access_control_roles, {
-    object_type: 'TaskGroupTask',
+    object_type: 'CycleTaskGroupObjectTask',
     name: 'Task Assignees',
   });
   let currentUserId = GGRC.current_user.id;
