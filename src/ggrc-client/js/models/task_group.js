@@ -111,6 +111,7 @@
       ],
       disable_columns_configuration: true,
       assigneeRoleName: 'Task Assignees',
+      secondaryAssigneeRoleName: 'Task Secondary Assignees',
     },
 
     init: function () {

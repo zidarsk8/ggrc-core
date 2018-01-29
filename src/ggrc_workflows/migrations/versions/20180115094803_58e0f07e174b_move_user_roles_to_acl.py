@@ -18,7 +18,6 @@ from alembic import op
 # revision identifiers, used by Alembic.
 revision = '58e0f07e174b'
 down_revision = '3355d60d65d8'
-conn = op.get_bind()
 
 acl_table = sa.sql.table(
     'access_control_list',
@@ -38,6 +37,7 @@ _NOW = datetime.utcnow()
 
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
+  conn = op.get_bind()
   rows = conn.execute(
       """
       SELECT id, name
