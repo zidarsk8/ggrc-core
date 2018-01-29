@@ -59,7 +59,7 @@
               data-lookup-cb="set_properties_from_workflow"
               placeholder="Select a Workflow"
               type="text"
-              value="{{workflow.title}}"
+              value="{{firstnonempty instance.workflow_title workflow.title}}"
               tabindex="4" />
             {{#instance.computed_errors.workflow}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.workflow}}
             {{^instance.computed_errors.workflow}}{{#instance.computed_errors.cycle}}<label class="help-inline warning">No active cycles in this workflow</label>{{/instance.computed_errors.cycle}}{{/instance.computed_errors.workflow}}
@@ -68,7 +68,7 @@
               class="input-block-level"
               type="text"
               disabled
-              {$value}="workflow.title" />
+              value="{{firstnonempty instance.workflow_title workflow.title}}" />
           {{/if}}
         {{/using}}
       </div>
@@ -91,7 +91,7 @@
               data-query-relevant-id="{{instance.cycle.id}}"
               placeholder="Select a Task Group"
               type="text"
-              value="{{cycle_task_group.title}}"
+              value="{{firstnonempty instance.cycle_task_group_title cycle_task_group.title}}"
               data-template="/cycle_task_groups/autocomplete_result.mustache"
               tabindex="5" />
             {{else}}
@@ -99,7 +99,7 @@
                 class="input-block-level"
                 type="text"
                 disabled
-                {$value}="cycle_task_group.title" />
+                value="{{firstnonempty instance.cycle_task_group_title instance.workflow_title cycle_task_group.title}}" />
             {{/if}}
         {{/using}}
       {{#instance.computed_errors.cycle_task_group}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.cycle_task_group}}
