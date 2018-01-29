@@ -189,8 +189,8 @@ class ProgramRolesHandler(object):
       acl_cache = self.caches["access_control_list_cache"]
       acl_cache.add(obj, acl, acl.person, acl.ac_role.id)
 
-  def handle_crelationships(self, obj):
-    """Handle relationships"""
+  def handle_relationship_creation(self, obj):
+    """Handle relationship creation"""
     acl_cache = self.caches["access_control_list_cache"]
     role_map = self.caches["program_roles"]
     program, other = related_to(obj, "Program")
@@ -260,7 +260,7 @@ class ProgramRolesHandler(object):
     handlers = {
         all_models.AccessControlList: self.handle_access_control_list,
         all_models.Snapshot: self.handle_snapshot,
-        all_models.Relationship: self.handle_crelationships,
+        all_models.Relationship: self.handle_relationship_creation,
         all_models.Audit: self.handle_audit_creation
     }
     for obj in session.new:

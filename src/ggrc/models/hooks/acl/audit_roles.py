@@ -113,8 +113,8 @@ class AuditRolesHandler(object):
 
     # Add program editor to program
     program = audit.program
-    if not any(pacl for pacl in program.access_control_list
-               if pacl.person == acl.person):
+    if not any(pacl.person == acl.person for pacl in
+               program.access_control_list):
       acl_cache = self.caches["access_control_list_cache"]
       acl_cache.add(program, acl, acl.person, audit_roles["Program Editors"])
 
