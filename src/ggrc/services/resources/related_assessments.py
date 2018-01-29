@@ -226,6 +226,29 @@ class RelatedAssessmentsResource(common.Resource):
 
     return snapshot_json_map
 
+  @classmethod
+  def _get_order_by_parameter(cls):
+    """Parse order_by parameter.
+
+    This function parses order by parameters such as:
+      - order_by=attribute_name[,(asc | desc)]
+
+    Returns:
+      list of dicts with order_by parameters for the query api pagination.
+    """
+    request_param = request.args.get("order_by", "")
+    order_by = None
+    if request_param:
+      param_list = request_param.split(",")
+      desc = False
+      if len(param_list) == 2:
+        desc = param_list[1] == "desc"
+      order_by = [{
+          "name": param_list[0],
+          "desc": desc,
+      }]
+    return order_by
+
   def dispatch_request(self, *args, **kwargs):  # noqa
     """Dispatch request for related_assessments."""
     with benchmark("dispatch related_assessments request"):
@@ -233,7 +256,7 @@ class RelatedAssessmentsResource(common.Resource):
 
         object_type = request.args.get("object_type")
         object_id = int(request.args.get("object_id"))
-        order_by = request.args.get("order_by", "")
+        order_by = self._get_order_by_parameter()
         limit_string = request.args.get("limit", "")
         limit = [int(i) for i in limit_string.split(",") if i]
 
