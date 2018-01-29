@@ -44,20 +44,19 @@ describe('SummaryWidgetController', function () {
     });
 
     it('sets true to options.forceRefresh if destination type is Document' +
-    'and source type is Assessment',
-      function () {
-        let relationship = new CMS.Models.Relationship({
-          destination: {
-            type: 'Document',
-            id: 1,
-          }, source: {
-            type: 'Assessment',
-            id: 1,
-          },
-        });
-        method({}, {}, relationship);
-        expect(ctrlInst.options.forceRefresh).toBe(true);
+    'and source type is Assessment', function () {
+      let relationship = new CMS.Models.Relationship({
+        destination: {
+          type: 'Document',
+          id: 1,
+        }, source: {
+          type: 'Assessment',
+          id: 1,
+        },
       });
+      method({}, {}, relationship);
+      expect(ctrlInst.options.forceRefresh).toBe(true);
+    });
 
     it('does not set true to options.forceRefresh' +
     ' if destination type is not Document', function () {
