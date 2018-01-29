@@ -91,8 +91,8 @@ class ProgramRolesHandler(object):
       elif propagation["new_role"] == "add mapped":
         role_id = role_map[self._get_acr_name(acl) + " Mapped"]
       else:
-        raise Exception("Wrong value for new_role field " +
-                        propagation["new_role"])
+        raise ValueError("Wrong value for new_role field " +
+                         propagation["new_role"])
       child = acl_cache.add(
           stub, acl, acl.person, role_id)
       if "propagate" in propagation:
