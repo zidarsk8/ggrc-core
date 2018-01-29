@@ -199,3 +199,56 @@ class CycleTaskQueryAPI(query_helper.WithQueryApi, TestCTGOT):
     result = self._get_first_result_set(data, "CycleTaskGroupObjectTask",
                                         "total")
     self.assertEqual(result, 1)
+
+  def test_query_by_task_secondary_assignee_on_active_cycles_tab(self):  # noqa pylint: disable=invalid-name
+    """Test QueryAPI request for CycleTasks on Active Cycles tab."""
+    data = [
+        {
+            "object_name": "Cycle",
+            "filters": {
+                "expression": {
+                    "left": {
+                        "object_name": "Workflow",
+                        "op": {
+                            "name": "relevant"
+                        },
+                        "ids": [all_models.Workflow.query.one().id],
+                    },
+                    "op": {
+                        "name": "AND"
+                    },
+                    "right": {
+                        "left": {
+                            "left": "is_current",
+                            "op": {
+                                "name": "="
+                            },
+                            "right": "1"
+                        },
+                        "op": {
+                            "name": "AND"
+                        },
+                        "right": {
+                            "left": "task secondary assignees",
+                            "op": {
+                                "name": "~"
+                            },
+                            "right": self.TASK_SEC_ASSIGNEE
+                        }
+                    }
+                },
+                "keys": [
+                    "is_current",
+                    "task secondary assignees"
+                ],
+                "order_by": {
+                    "keys": [],
+                    "order": "",
+                    "compare": None
+                }
+            },
+            "limit": [0, 10]
+        }
+    ]
+    result = self._get_first_result_set(data, "Cycle", "total")
+    self.assertEqual(result, 1)
