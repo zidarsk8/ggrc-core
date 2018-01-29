@@ -9,7 +9,7 @@ from sqlalchemy.orm import load_only
 from sqlalchemy.orm.session import Session
 
 from ggrc.models import all_models
-from ggrc.models.hooks.acl.cache import AccessControlListCache
+from ggrc.models.hooks.acl.acl_manager import ACLManager
 from ggrc.models.relationship import Stub, RelationshipsCache
 from ggrc.models.hooks.relationship import related
 
@@ -53,10 +53,10 @@ class ProgramRolesHandler(object):
 
   def handle_snapshots(self, _, acl):
     """Handle audit propagation"""
-    acl_cache = self.caches["access_control_list_cache"]
+    acl_manager = self.caches["access_control_list_manager"]
     audit = acl.object
     for snapshot in audit.snapshotted_objects:
-      acl_cache.add(
+      acl_manager.get_or_create(
           snapshot, acl, acl.person, acl.ac_role_id)
 
   def _get_acr_name(self, acl):
@@ -68,10 +68,11 @@ class ProgramRolesHandler(object):
   def handle_audits(self, propagation, acl):
     """Handle audit propagation"""
     role_map = self.caches["program_roles"]
-    acl_cache = self.caches["access_control_list_cache"]
+    acl_manager = self.caches["access_control_list_manager"]
     for audit in acl.object.audits:
-      child = acl_cache.add(audit, acl, acl.person,
-                            role_map[self._get_acr_name(acl) + " Mapped"])
+      child = acl_manager.get_or_create(
+          audit, acl, acl.person,
+          role_map[self._get_acr_name(acl) + " Mapped"])
       if "propagate" in propagation:
         self.handle_propagation(propagation["propagate"], child)
 
@@ -79,7 +80,7 @@ class ProgramRolesHandler(object):
     """Hanle relationships"""
     relationship_cache = self.caches["relationship_cache"]
     role_map = self.caches["program_roles"]
-    acl_cache = self.caches["access_control_list_cache"]
+    acl_manager = self.caches["access_control_list_manager"]
     program_stub = Stub(acl.object_type, acl.object_id)
     related_stubs = related([program_stub], relationship_cache)
     for stub in related_stubs[program_stub]:
@@ -93,7 +94,7 @@ class ProgramRolesHandler(object):
       else:
         raise ValueError("Wrong value for new_role field " +
                          propagation["new_role"])
-      child = acl_cache.add(
+      child = acl_manager.get_or_create(
           stub, acl, acl.person, role_id)
       if "propagate" in propagation:
         self.handle_propagation(propagation["propagate"], child)
@@ -186,12 +187,12 @@ class ProgramRolesHandler(object):
           "Program Managers Mapped"
       }:
         continue
-      acl_cache = self.caches["access_control_list_cache"]
-      acl_cache.add(obj, acl, acl.person, acl.ac_role.id)
+      acl_manager = self.caches["access_control_list_manager"]
+      acl_manager.get_or_create(obj, acl, acl.person, acl.ac_role.id)
 
   def handle_relationship_creation(self, obj):
     """Handle relationship creation"""
-    acl_cache = self.caches["access_control_list_cache"]
+    acl_manager = self.caches["access_control_list_manager"]
     role_map = self.caches["program_roles"]
     program, other = related_to(obj, "Program")
     if program:
@@ -204,7 +205,8 @@ class ProgramRolesHandler(object):
         }:
           continue
 
-        acl_cache.add(other, acl, acl.person, role_map[role_name + " Mapped"])
+        acl_manager.get_or_create(
+            other, acl, acl.person, role_map[role_name + " Mapped"])
       return
 
     comment_or_document, other = related_to(obj, {
@@ -218,7 +220,8 @@ class ProgramRolesHandler(object):
             "Program Managers Mapped"
         }:
           continue
-        acl_cache.add(comment_or_document, acl, acl.person, _get_acr_id(acl))
+        acl_manager.get_or_create(
+            comment_or_document, acl, acl.person, _get_acr_id(acl))
       return
 
     assessment_or_issue, other = related_to(obj, {
@@ -233,12 +236,13 @@ class ProgramRolesHandler(object):
             "Program Managers Mapped"
         }:
           continue
-        acl_cache.add(assessment_or_issue, acl, acl.person, _get_acr_id(acl))
+        acl_manager.get_or_create(assessment_or_issue, acl, acl.person,
+                                  _get_acr_id(acl))
       return
 
   def handle_audit_creation(self, obj):
     """Propagate roles when audit is created or cloned"""
-    acl_cache = self.caches["access_control_list_cache"]
+    acl_manager = self.caches["access_control_list_manager"]
     role_map = self.caches["program_roles"]
     for acl in obj.program.access_control_list:
       role_name = self._get_acr_name(acl)
@@ -248,12 +252,13 @@ class ProgramRolesHandler(object):
           "Program Managers"
       }:
         continue
-      acl_cache.add(obj, acl, acl.person, role_map[role_name + " Mapped"])
+      acl_manager.get_or_create(obj, acl, acl.person,
+                                role_map[role_name + " Mapped"])
 
   def after_flush(self, session, _):
     """Handle program related acl"""
     self.caches = {
-        "access_control_list_cache": AccessControlListCache(),
+        "access_control_list_manager": ACLManager(),
         "relationship_cache": RelationshipsCache(),
         "program_roles": _get_program_roles()
     }

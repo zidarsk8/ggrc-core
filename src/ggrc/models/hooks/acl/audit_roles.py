@@ -14,7 +14,7 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.expression import true
 
 from ggrc.models import all_models
-from ggrc.models.hooks.acl.cache import AccessControlListCache
+from ggrc.models.hooks.acl.acl_manager import ACLManager
 from ggrc.models.relationship import Stub, RelationshipsCache
 from ggrc.models.hooks.relationship import related
 
@@ -65,7 +65,7 @@ class AuditRolesHandler(object):
 
     # Add Audit Captains Mapped role to all the objects in the audit
     snapshots_cache = self.caches["snapshots_cache"]
-    acl_cache = self.caches["access_control_list_cache"]
+    acl_manager = self.caches["access_control_list_manager"]
     relationship_cache = self.caches["relationship_cache"]
 
     if audit.id not in snapshots_cache:
@@ -75,7 +75,8 @@ class AuditRolesHandler(object):
       ).options(load_only("id")).all()
 
     for snapshot in snapshots_cache[audit.id]:
-      acl_cache.add(snapshot, acl, acl.person, role_map["Snapshot"])
+      acl_manager.get_or_create(
+          snapshot, acl, acl.person, role_map["Snapshot"])
 
     # Add Audit Captains Mapped to all related
     audit_stub = Stub(acl.object_type, acl.object_id)
@@ -85,7 +86,7 @@ class AuditRolesHandler(object):
       if stub.type not in ("Assessment", "AssessmentTemplate", "Issue",
                            "Comment", "Document"):
         continue
-      acl_cache.add(stub, acl, acl.person, role_map[stub.type])
+      acl_manager.get_or_create(stub, acl, acl.person, role_map[stub.type])
 
     # Add Audit Captains Mapped to all realted comments and documents
     mapped_stubs = related(related_stubs[audit_stub], relationship_cache)
@@ -93,7 +94,7 @@ class AuditRolesHandler(object):
       for stub in mapped_stubs[parent]:
         if stub.type not in ("Comment", "Document"):
           continue
-        acl_cache.add(stub, acl, acl.person, role_map[stub.type])
+        acl_manager.get_or_create(stub, acl, acl.person, role_map[stub.type])
 
   def _auditors_handler(self, acl, audit_roles):
     """Handle auditor role propagation"""
@@ -115,8 +116,9 @@ class AuditRolesHandler(object):
     program = audit.program
     if not any(pacl.person == acl.person for pacl in
                program.access_control_list):
-      acl_cache = self.caches["access_control_list_cache"]
-      acl_cache.add(program, acl, acl.person, audit_roles["Program Editors"])
+      acl_manager = self.caches["access_control_list_manager"]
+      acl_manager.get_or_create(
+          program, acl, acl.person, audit_roles["Program Editors"])
 
     role_map = defaultdict(lambda: audit_roles['Audit Captains Mapped'])
     self._create_mapped_acls(acl, role_map)
@@ -142,8 +144,8 @@ class AuditRolesHandler(object):
     for acl in access_control_list:
       if acl.ac_role.id not in role_map:
         continue
-      acl_cache = self.caches["access_control_list_cache"]
-      acl_cache.add(obj, acl, acl.person, role_map[acl.ac_role.id])
+      acl_manager = self.caches["access_control_list_manager"]
+      acl_manager.get_or_create(obj, acl, acl.person, role_map[acl.ac_role.id])
 
   def handle_relationship(self, obj):
     """Handle relationship creation"""
@@ -197,16 +199,16 @@ class AuditRolesHandler(object):
       ac_role_id = _get_acr_id(acl)
       if ac_role_id not in role_map:
         continue
-      acl_cache = self.caches["access_control_list_cache"]
-      acl_cache.add(other, acl, acl.person,
-                    role_map[ac_role_id][type(other)])
+      acl_manager = self.caches["access_control_list_manager"]
+      acl_manager.get_or_create(other, acl, acl.person,
+                                role_map[ac_role_id][type(other)])
 
   def after_flush(self, session, _):
     """Handle legacy audit captain -> program editor role propagation"""
     self.caches = {
         "relationship_cache": RelationshipsCache(),
         "snapshots_cache": {},
-        "access_control_list_cache": AccessControlListCache()
+        "access_control_list_manager": ACLManager()
     }
     handlers = {
         all_models.AccessControlList: self.handle_access_control_list,
