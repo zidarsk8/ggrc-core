@@ -112,12 +112,14 @@ class ProgramRolesHandler(object):
   """Handle program role propagation"""
 
   def __init__(self):
-    self.caches = {}
+    self.access_control_list_manager = None
+    self.relationship_cache = None
+    self.program_roles = None
     self.done = set()
 
   def handle_snapshots(self, _, acl):
     """Handle audit propagation"""
-    acl_manager = self.caches["access_control_list_manager"]
+    acl_manager = self.access_control_list_manager
     audit = acl.object
     for snapshot in audit.snapshotted_objects:
       acl_manager.get_or_create(
@@ -125,14 +127,14 @@ class ProgramRolesHandler(object):
 
   def _get_acr_name(self, acl):
     """Helper for retrieving access control name"""
-    role_map = self.caches["program_roles"]
+    role_map = self.program_roles
     id_ = _get_acr_id(acl)
     return role_map[id_]
 
   def handle_audits(self, propagation, acl):
     """Handle audit propagation"""
-    role_map = self.caches["program_roles"]
-    acl_manager = self.caches["access_control_list_manager"]
+    role_map = self.program_roles
+    acl_manager = self.access_control_list_manager
     for audit in acl.object.audits:
       child = acl_manager.get_or_create(
           audit, acl, acl.person,
@@ -142,9 +144,9 @@ class ProgramRolesHandler(object):
 
   def handle_relationships(self, propagation, acl):
     """Hanle relationships"""
-    relationship_cache = self.caches["relationship_cache"]
-    role_map = self.caches["program_roles"]
-    acl_manager = self.caches["access_control_list_manager"]
+    relationship_cache = self.relationship_cache
+    role_map = self.program_roles
+    acl_manager = self.access_control_list_manager
     program_stub = Stub(acl.object_type, acl.object_id)
     related_stubs = related([program_stub], relationship_cache)
     for stub in related_stubs[program_stub]:
@@ -190,13 +192,13 @@ class ProgramRolesHandler(object):
           "Program Managers Mapped"
       }:
         continue
-      acl_manager = self.caches["access_control_list_manager"]
+      acl_manager = self.access_control_list_manager
       acl_manager.get_or_create(obj, acl, acl.person, acl.ac_role.id)
 
   def handle_relationship_creation(self, obj):
     """Handle relationship creation"""
-    acl_manager = self.caches["access_control_list_manager"]
-    role_map = self.caches["program_roles"]
+    acl_manager = self.access_control_list_manager
+    role_map = self.program_roles
     program, other = related_to(obj, "Program")
     if program:
       for acl in program.access_control_list:
@@ -245,8 +247,8 @@ class ProgramRolesHandler(object):
 
   def handle_audit_creation(self, obj):
     """Propagate roles when audit is created or cloned"""
-    acl_manager = self.caches["access_control_list_manager"]
-    role_map = self.caches["program_roles"]
+    acl_manager = self.access_control_list_manager
+    role_map = self.program_roles
     for acl in obj.program.access_control_list:
       role_name = self._get_acr_name(acl)
       if role_name not in {
@@ -260,11 +262,10 @@ class ProgramRolesHandler(object):
 
   def after_flush(self, session, _):
     """Handle program related acl"""
-    self.caches = {
-        "access_control_list_manager": ACLManager(),
-        "relationship_cache": RelationshipsCache(),
-        "program_roles": _get_program_roles()
-    }
+    self.access_control_list_manager = ACLManager()
+    self.relationship_cache = RelationshipsCache()
+    self.program_roles = _get_program_roles()
+
     handlers = {
         all_models.AccessControlList: self.handle_access_control_list,
         all_models.Snapshot: self.handle_snapshot,
