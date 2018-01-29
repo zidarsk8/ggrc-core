@@ -28,7 +28,7 @@ from sqlalchemy import text
 
 # revision identifiers, used by Alembic.
 revision = '242b8dc8493b'
-down_revision = '1035f388d822'
+down_revision = '568f400e4a62'
 
 AC_TABLE = namedtuple("AC_TABLE", "type table role parent_role")
 AC_PERMISSIONS = namedtuple(
