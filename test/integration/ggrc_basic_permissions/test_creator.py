@@ -262,3 +262,34 @@ class TestCreator(TestCase):
     self.assertIn("Person", resp.json["results"]["counts"])
     self.assertEqual(all_models.Person.query.count(),
                      resp.json["results"]["counts"]["Person"])
+
+  @ddt.data(
+      ("/api/revisions?resource_type={}&resource_id={}", 1),
+      ("/api/revisions?source_type={}&source_id={}", 0),
+      ("/api/revisions?destination_type={}&destination_id={}", 1),
+  )
+  @ddt.unpack
+  def test_changelog_access(self, link, revision_count):
+    """Test accessing changelog under GC user who is assigned to object"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      asmnt = factories.AssessmentFactory(audit=audit)
+      asmnt_id = asmnt.id
+      factories.RelationshipFactory(source=audit, destination=asmnt)
+      verifier_role = all_models.AccessControlRole.query.filter_by(
+          object_type="Assessment",
+          name="Verifiers",
+      ).first()
+      factories.AccessControlListFactory(
+          person=self.users["creator"],
+          ac_role=verifier_role,
+          object=asmnt,
+      )
+
+    self.api.set_user(self.users["creator"])
+    response = self.api.client.get(link.format("Assessment", asmnt_id))
+    self.assert200(response)
+    self.assertEqual(
+        len(response.json.get("revisions_collection", {}).get("revisions")),
+        revision_count
+    )
