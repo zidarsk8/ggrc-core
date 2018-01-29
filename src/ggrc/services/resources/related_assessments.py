@@ -81,9 +81,9 @@ class RelatedAssessmentsResource(common.Resource):
           models.Assessment,
       )
     if limit:
-      limit_query, total = pagination.apply_limit(query, limit)
+      query, _ = pagination.apply_limit(query, limit)
 
-    return limit_query, total
+    return query
 
   def _get_documents(self, assessments):
 
@@ -282,7 +282,7 @@ class RelatedAssessmentsResource(common.Resource):
         obj = model.query.get(object_id)
 
         with benchmark("get related assessments"):
-          assessments, total = self._get_assessments(
+          assessments = self._get_assessments(
               model, object_type, object_id, order_by, limit)
 
         with benchmark("get documents of related assessments"):
