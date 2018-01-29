@@ -2524,7 +2524,7 @@ Example:
   );
   Mustache.registerHelper('is_auditor', function (options) {
     const auditor = GGRC.access_control_roles.find(
-      (role) => role.name === 'Auditors');
+      (role) => role.name === 'Auditors' && role.object_type === 'Audit');
     const audit = GGRC.page_instance();
     if (audit.type !== 'Audit') {
       console.warn('is_auditor called on non audit page');

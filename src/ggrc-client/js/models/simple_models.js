@@ -101,7 +101,7 @@
         return false;
       }
       const programManagerRole = GGRC.access_control_roles.find((acr) => {
-        return acr.name === 'Program Managers';
+        return acr.name === 'Program Managers' && acr.object_type === 'Program';
       }).id;
       return this.access_control_list.filter((acl) => {
         return acl.person_id === GGRC.current_user.id &&
