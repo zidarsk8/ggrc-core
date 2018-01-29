@@ -45,14 +45,6 @@ class Program(HasObjectState,
   }
 
   @classmethod
-  def _filter_by_program_editor(cls, predicate):
-    return cls._filter_by_role("ProgramEditor", predicate)
-
-  @classmethod
-  def _filter_by_program_reader(cls, predicate):
-    return cls._filter_by_role("ProgramReader", predicate)
-
-  @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
 
