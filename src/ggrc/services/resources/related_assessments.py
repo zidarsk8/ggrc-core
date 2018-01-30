@@ -100,7 +100,9 @@ class RelatedAssessmentsResource(common.Resource):
 
     return query
 
-  def _get_documents(self, assessments):
+  @classmethod
+  def _get_documents(cls, assessments):
+    """Get documents mapped to assessments and their mappings."""
 
     assessment_ids = [asmt.id for asmt in assessments]
 
@@ -164,6 +166,11 @@ class RelatedAssessmentsResource(common.Resource):
 
   @staticmethod
   def _get_snapshots_json(assessment, assessment_snapshot_map, snapshots_map):
+    """Get json representation of related snapshots.
+
+    This does not return a full json of the snapshot but only title which is
+    needed for displaying on the related assessment modal.
+    """
     snapshots_json = []
     for snapshot_id in assessment_snapshot_map[assessment.id]:
       snapshot = snapshots_map[snapshot_id]
@@ -177,34 +184,13 @@ class RelatedAssessmentsResource(common.Resource):
     return snapshots_json
 
   def _get_snapshots(self, obj, assessments):
+    """Get all snapshot data for current related_assessments."""
     assessment_type = obj.__class__.__name__
     if assessment_type == "Assessment":
       assessment_type = obj.assessment_type
     assessment_ids = [asmt.id for asmt in assessments]
 
-    snapshot_base_query = models.Snapshot.eager_inclusions(
-        models.Snapshot.query.options(
-            orm.Load(models.Snapshot).undefer_group("Snapshot_complete")
-        ),
-        ["revision"]
-    )
-
-    source_query = db.session.query(
-        models.Relationship.destination_id.label("assessment_id"),
-        models.Relationship.source_id.label("snapshot_id")
-    ).join(
-        models.Snapshot,
-        and_(
-            models.Relationship.source_type == models.Snapshot.__name__,
-            models.Relationship.source_id == models.Snapshot.id
-        )
-    ).filter(
-        models.Relationship.destination_id.in_(assessment_ids),
-        models.Relationship.destination_type == models.Assessment.__name__,
-        models.Snapshot.child_type == assessment_type
-    )
-
-    destination_query = db.session.query(
+    assessment_snapshot_query = db.session.query(
         models.Relationship.source_id.label("assessment_id"),
         models.Relationship.destination_id.label("snapshot_id")
     ).join(
@@ -217,15 +203,35 @@ class RelatedAssessmentsResource(common.Resource):
         models.Relationship.source_id.in_(assessment_ids),
         models.Relationship.source_type == models.Assessment.__name__,
         models.Snapshot.child_type == assessment_type
+    ).union(
+        db.session.query(
+            models.Relationship.destination_id.label("assessment_id"),
+            models.Relationship.source_id.label("snapshot_id")
+        ).join(
+            models.Snapshot,
+            and_(
+                models.Relationship.source_type == models.Snapshot.__name__,
+                models.Relationship.source_id == models.Snapshot.id
+            )
+        ).filter(
+            models.Relationship.destination_id.in_(assessment_ids),
+            models.Relationship.destination_type == models.Assessment.__name__,
+            models.Snapshot.child_type == assessment_type
+        )
     )
 
     assessment_snapshot_map = defaultdict(set)
     all_snapshot_ids = set()
-    for assessment_id, snapshot_id in source_query.union(destination_query):
+    for assessment_id, snapshot_id in assessment_snapshot_query:
       assessment_snapshot_map[assessment_id].add(snapshot_id)
       all_snapshot_ids.add(snapshot_id)
 
-    snapshots = snapshot_base_query.filter(
+    snapshots = models.Snapshot.eager_inclusions(
+        models.Snapshot.query.options(
+            orm.Load(models.Snapshot).undefer_group("Snapshot_complete")
+        ),
+        ["revision"]
+    ).filter(
         models.Snapshot.id.in_(all_snapshot_ids)
     ).all()
 
