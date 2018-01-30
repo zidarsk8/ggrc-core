@@ -428,11 +428,13 @@ describe('assessmentLocalCa component', () => {
     let attributeChanged;
     let validateFormSpy;
     let saveSpy;
+    let saveDfd;
 
     beforeEach(function () {
       attributeChanged = viewModel.attributeChanged.bind(viewModel);
       validateFormSpy = spyOn(viewModel, 'validateForm');
-      saveSpy = spyOn(viewModel, 'save');
+      saveDfd = can.Deferred();
+      saveSpy = spyOn(viewModel, 'save').and.returnValue(saveDfd);
 
       inputField = new can.Map({
         id: 1,
@@ -473,11 +475,13 @@ describe('assessmentLocalCa component', () => {
         });
 
         attributeChanged(fieldChangeEvent);
+
+        expect(saveSpy).toHaveBeenCalledWith(inputField.id, inputField.value);
         expect(validateFormSpy).toHaveBeenCalledWith({
           triggerField: inputField,
           triggerAttachmentModals: true,
+          saveDfd,
         });
-        expect(saveSpy).toHaveBeenCalledWith(inputField.id, inputField.value);
         expect(inputField.attr('value')).toEqual(fieldChangeEvent.value);
       });
 
@@ -490,12 +494,15 @@ describe('assessmentLocalCa component', () => {
         });
 
         attributeChanged(fieldChangeEvent);
+
+        expect(saveSpy).toHaveBeenCalledWith(
+          dropdownField.id,
+          dropdownField.value);
         expect(validateFormSpy).toHaveBeenCalledWith({
           triggerField: dropdownField,
           triggerAttachmentModals: true,
+          saveDfd,
         });
-        expect(saveSpy)
-          .toHaveBeenCalledWith(dropdownField.id, dropdownField.value);
         expect(dropdownField.attr('value')).toEqual(fieldChangeEvent.value);
         expect(dropdownField.attr('errorsMap.comment')).toEqual(true);
       });
