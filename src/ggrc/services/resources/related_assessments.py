@@ -31,6 +31,14 @@ from ggrc.query.exceptions import BadQueryException
 class RelatedAssessmentsResource(common.Resource):
   """Resource handler for audits."""
 
+  def patch(self):
+    """PATCH operation handler."""
+    raise NotImplementedError()
+
+  def post(*args, **kwargs):
+    """POST operation handler."""
+    raise NotImplementedError()
+
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
     view_func = cls.as_view(cls.endpoint_name())
