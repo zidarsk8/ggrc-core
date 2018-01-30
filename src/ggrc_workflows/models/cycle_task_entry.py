@@ -31,6 +31,9 @@ class CycleTaskEntry(Relatable, Described, Base, mixin.Indexed, db.Model):
       db.ForeignKey('cycle_task_group_object_tasks.id', ondelete="CASCADE"),
       nullable=False,
   )
+  # `cascade` option must be added on parent's (CycleTask's) side relationship.
+  # Because we are using backref on child side, backref must initialize cascade
+  # option explicitly for parent's (CycleTask's) part of the relationship.
   cycle_task_group_object_task = db.relationship(
       'CycleTaskGroupObjectTask',
       foreign_keys='CycleTaskEntry.cycle_task_group_object_task_id',
