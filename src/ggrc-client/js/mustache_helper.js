@@ -1204,52 +1204,6 @@ Mustache.registerHelper("visibility_delay", function (delay, options) {
   };
 });
 
-Mustache.registerHelper("with_program_roles_as", function (result, options) {
-  let dfd = $.when()
-    , frame = new can.Observe()
-    , user_roles = []
-    , mappings
-    , refresh_queue = new RefreshQueue()
-    ;
-
-  result = resolve_computed(result);
-  mappings = resolve_computed(result.get_mappings_compute());
-
-  frame.attr("roles", []);
-
-  can.each(mappings, function (mapping) {
-    if (mapping instanceof CMS.Models.UserRole) {
-      refresh_queue.enqueue(mapping.role);
-    }
-  });
-
-  dfd = refresh_queue.trigger().then(function (roles) {
-    can.each(mappings, function (mapping) {
-      if (mapping instanceof CMS.Models.UserRole) {
-        frame.attr("roles").push({
-          user_role: mapping,
-          role: mapping.role.reify(),
-        });
-      } else {
-        frame.attr("roles").push({
-          role: {
-            "permission_summary": "Mapped",
-          },
-        });
-      }
-    });
-  });
-
-  function finish(list) {
-    return options.fn(options.contexts.add(frame));
-  }
-  function fail(error) {
-    return options.inverse(options.contexts.add({error : error}));
-  }
-
-  return defer_render('span', { done : finish, fail : fail }, dfd);
-});
-
 function get_observe_context(scope) {
   if (!scope) return null;
   if (scope._context instanceof can.Observe) return scope._context;
