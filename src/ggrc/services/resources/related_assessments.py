@@ -35,7 +35,7 @@ class RelatedAssessmentsResource(common.Resource):
     """PATCH operation handler."""
     raise NotImplementedError()
 
-  def post(*args, **kwargs):
+  def post(self, *args, **kwargs):
     """POST operation handler."""
     raise NotImplementedError()
 
