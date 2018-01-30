@@ -53,9 +53,9 @@ ROLE_MIGRATION = {
 }
 
 ROLE_PROPAGATION = {
-    "Program Managers": "Program Manager Mapped",
-    "Program Editors": "Program Editor Mapped",
-    "Program Readers": "Program Reader Mapped"
+    "Program Managers": "Program Managers Mapped",
+    "Program Editors": "Program Editors Mapped",
+    "Program Readers": "Program Readers Mapped"
 }
 
 
