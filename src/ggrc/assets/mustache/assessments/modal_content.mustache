@@ -12,8 +12,8 @@
   {{#if_in instance.status "Completed,Verified,In Review"}}
           {{#if_helpers '\\n #if' instance.isDirty '\\n or #if' mappedObjectsChanges.length '\\n or #if' referenceUrlChanged}}
           <div class="ggrc-form-item">
-            <div class="alert warning width-100">
-              <i class="fa fa-exclamation-triangle red"></i>
+            <div class="alert width-100">
+              <i class="fa fa-exclamation-triangle"></i>
               You are about to move assessment from "{{instance.status}}" to "In Progress".
             </div>
           </div>
