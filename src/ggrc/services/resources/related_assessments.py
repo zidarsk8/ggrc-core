@@ -44,7 +44,7 @@ class RelatedAssessmentsResource(common.Resource):
     view_func = cls.as_view(cls.endpoint_name())
     app.add_url_rule(url, view_func=view_func, methods=['GET'])
 
-  def _get_assessments(self, model, object_type, object_id, order_by, limit):
+  def _get_assessments(self, model, object_type, object_id):
     """Get a list of assessments.
 
     Get a list of assessments with all their data from the db, according to the
@@ -52,6 +52,8 @@ class RelatedAssessmentsResource(common.Resource):
     """
 
     ids_query = model.get_similar_objects_query(object_id, "Assessment")
+    order_by = self._get_order_by_parameter()
+    limit = self._get_limit_parameters()
 
     if not permissions.has_system_wide_read():
       if not permissions.is_allowed_read(object_id, object_type, None):
@@ -288,15 +290,12 @@ class RelatedAssessmentsResource(common.Resource):
 
         object_type = request.args.get("object_type")
         object_id = int(request.args.get("object_id"))
-        order_by = self._get_order_by_parameter()
-        limit = self._get_limit_parameters()
 
         model = models.inflector.get_model(object_type)
         obj = model.query.get(object_id)
 
         with benchmark("get related assessments"):
-          assessments = self._get_assessments(
-              model, object_type, object_id, order_by, limit)
+          assessments = self._get_assessments(model, object_type, object_id)
 
         with benchmark("get documents of related assessments"):
           document_json_map = self._get_documents(assessments)
