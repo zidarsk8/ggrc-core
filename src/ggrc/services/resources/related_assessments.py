@@ -45,6 +45,11 @@ class RelatedAssessmentsResource(common.Resource):
     app.add_url_rule(url, view_func=view_func, methods=['GET'])
 
   def _get_assessments(self, model, object_type, object_id, order_by, limit):
+    """Get a list of assessments.
+
+    Get a list of assessments with all their data from the db, according to the
+    request GET parameters.
+    """
 
     ids_query = model.get_similar_objects_query(object_id, "Assessment")
 
