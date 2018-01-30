@@ -121,7 +121,7 @@ def _migrate_program_roles(connection):
   for old_role, new_role in ROLE_MIGRATION.items():
     connection.execute(
         text("""
-    INSERT INTO access_control_list(
+    INSERT IGNORE INTO access_control_list(
         person_id, ac_role_id, object_id, object_type,
         created_at, updated_at, context_id)
     SELECT ur.person_id, acr.id, c.related_object_id, c.related_object_type,
@@ -139,7 +139,7 @@ def _insert_acl_from_mapped(tables, connection):
   for table in tables:
     connection.execute(
         text("""
-    INSERT INTO access_control_list(
+    INSERT IGNORE INTO access_control_list(
         person_id, ac_role_id, object_id, object_type,
         created_at, updated_at, context_id, parent_id)
     SELECT acl.person_id, nacr.id, s.id, '{type}',
@@ -160,7 +160,7 @@ def _insert_acl_from_second_level(tables, connection):
     # Mapped through source:
     connection.execute(
         text("""
-    INSERT INTO access_control_list(
+    INSERT IGNORE INTO access_control_list(
         person_id, ac_role_id, object_id, object_type,
         created_at, updated_at, context_id, parent_id)
     SELECT acl.person_id, acrn.id, r.destination_id, r.destination_type,
@@ -178,7 +178,7 @@ def _insert_acl_from_second_level(tables, connection):
     # Mapped through destination:
     connection.execute(
         text("""
-    INSERT INTO access_control_list(
+    INSERT IGNORE INTO access_control_list(
         person_id, ac_role_id, object_id, object_type,
         created_at, updated_at, context_id, parent_id)
     SELECT acl.person_id, acrn.id, r.source_id, r.source_type,
@@ -205,7 +205,7 @@ def _propagate_to_mapped(connection):
     # Mapped through source:
     connection.execute(
         text("""
-    INSERT INTO access_control_list(
+    INSERT IGNORE INTO access_control_list(
         person_id, ac_role_id, object_id, object_type,
         created_at, updated_at, context_id, parent_id)
     SELECT acl.person_id, acrn.id, r.destination_id, r.destination_type,
@@ -221,7 +221,7 @@ def _propagate_to_mapped(connection):
     # Mapped through destination:
     connection.execute(
         text("""
-    INSERT INTO access_control_list(
+    INSERT IGNORE INTO access_control_list(
         person_id, ac_role_id, object_id, object_type,
         created_at, updated_at, context_id, parent_id)
     SELECT acl.person_id, acrn.id, r.source_id, r.source_type,
@@ -240,7 +240,7 @@ def _propagate_to_mapped(connection):
       # Mapped through source:
       connection.execute(
           text("""
-      INSERT INTO access_control_list(
+      INSERT IGNORE INTO access_control_list(
           person_id, ac_role_id, object_id, object_type,
           created_at, updated_at, context_id, parent_id)
       SELECT acl.person_id, acrn.id, r.destination_id, r.destination_type,
@@ -257,7 +257,7 @@ def _propagate_to_mapped(connection):
       # Mapped through destination:
       connection.execute(
           text("""
-      INSERT INTO access_control_list(
+      INSERT IGNORE INTO access_control_list(
           person_id, ac_role_id, object_id, object_type,
           created_at, updated_at, context_id, parent_id)
       SELECT acl.person_id, acrn.id, r.source_id, r.source_type,
@@ -287,7 +287,7 @@ def _propagate_to_audit(connection):
     # Program Roles -> Audit
     connection.execute(
         text("""
-    INSERT INTO access_control_list(
+    INSERT IGNORE INTO access_control_list(
         person_id, ac_role_id, object_id, object_type,
         created_at, updated_at, context_id, parent_id)
     SELECT acl.person_id, acrn.id, a.id, 'Audit',
