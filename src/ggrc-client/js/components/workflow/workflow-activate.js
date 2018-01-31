@@ -7,6 +7,7 @@ import workflowHelpers from './workflow-helpers';
 import {
   initCounts,
 } from '../../plugins/utils/current-page-utils';
+import Permission from '../../permission';
 
 export default can.Component.extend({
   tag: 'workflow-activate',
@@ -68,6 +69,7 @@ export default can.Component.extend({
             workflow.attr('status', 'Active');
             return workflow.save();
           })
+          .then(() => Permission.refresh())
           .then(function () {
             let WorkflowExtension =
               _.find(GGRC.extensions, function (extension) {
