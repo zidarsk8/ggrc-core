@@ -74,6 +74,7 @@ class Audit(Snapshotable,
   issues = db.relationship('Issue', backref='audit')
   archived = deferred(db.Column(db.Boolean,
                       nullable=False, default=False), 'Audit')
+  assessment_templates = db.relationship('AssessmentTemplate', backref='audit')
 
   _api_attrs = reflection.ApiAttributes(
       'report_start_date',
