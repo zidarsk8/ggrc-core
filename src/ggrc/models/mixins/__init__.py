@@ -437,8 +437,7 @@ class VerifiedDate(object):
             self.status not in self.VERIFIED_STATES):
       self.verified_date = datetime.datetime.now()
       value = self.FINAL_STATE
-    elif (value not in self.VERIFIED_STATES and
-          value not in self.DONE_STATES and
+    elif (value not in self.END_STATES and
           (self.status in self.VERIFIED_STATES or
            self.status in self.DONE_STATES)):
       self.verified_date = None
