@@ -3,11 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {
-  isSnapshot,
-} from '../../plugins/utils/snapshot-utils';
-import RefreshQueue from '../../models/refresh_queue';
-
 (function (can, $) {
   can.Map.extend('CMS.Models.TreeViewOptions', {
     defaults: {
@@ -54,7 +49,7 @@ import RefreshQueue from '../../models/refresh_queue';
           this.element.children('.tree-structure').length > 0) {
           this.element.children('.tree-structure')
             .addClass('new-tree_loading').append($wrapper);
-        } else if ($footer.length === 0) {  // My work
+        } else if ($footer.length === 0) { // My work
           this.element.addClass('new-tree_loading').append($wrapper);
         } else {
           $footer.before($wrapper);
@@ -107,15 +102,14 @@ import RefreshQueue from '../../models/refresh_queue';
           } else {
             dfds.push(that.init_view());
           }
-          return $.when.apply($, dfds);
+          return $.when(...dfds);
         }))
         .then(that._ifNotRemoved(that.proxy('draw_list')));
 
       return this._display_deferred;
     },
 
-    draw_list: function (list, isReload, forcePrepareChildren) {
-      isReload = isReload === true;
+    draw_list: function (list, forcePrepareChildren) {
       // TODO figure out why this happens and fix the root of the problem
       if (!list && !this.options.list) {
         return undefined;
@@ -140,7 +134,7 @@ import RefreshQueue from '../../models/refresh_queue';
       });
 
       if (!this.element) {
-        return undefined;  // controller has been destroyed
+        return undefined; // controller has been destroyed
       }
 
       this.clearList();
@@ -150,7 +144,7 @@ import RefreshQueue from '../../models/refresh_queue';
       this.on();
 
       this._draw_list_deferred =
-        this.enqueue_items(list, isReload, forcePrepareChildren);
+        this.enqueue_items(list, forcePrepareChildren);
       return this._draw_list_deferred;
     },
 
@@ -167,7 +161,7 @@ import RefreshQueue from '../../models/refresh_queue';
           .find('spinner[extra-css-class="initial-spinner"]')
           .remove();
 
-        this.init_spinner();  // the tree view's own items loading spinner
+        this.init_spinner(); // the tree view's own items loading spinner
         this.element.trigger('loading');
       }
     },
@@ -192,15 +186,12 @@ import RefreshQueue from '../../models/refresh_queue';
       }
     },
 
-    enqueue_items: function (items, isReload, forcePrepareChildren) {
+    enqueue_items: function (items, forcePrepareChildren) {
       let childTreeDisplayList = [];
       let filteredItems = [];
       let i;
-      let refreshedDeferred;
-      let that = this;
       let parentModelName;
       let parentInstanceType;
-      isReload = isReload === true;
 
       // find current widget model and check if first layer tree
       if (GGRC.page_object && this.options.parent) { // this is a second label tree
@@ -221,7 +212,7 @@ import RefreshQueue from '../../models/refresh_queue';
         } else {
           for (i = 0; i < items.length; i++) {
             if (childTreeDisplayList
-                .indexOf(items[i].instance.class.model_singular) !== -1) {
+              .indexOf(items[i].instance.class.model_singular) !== -1) {
               filteredItems.push(items[i]);
             }
           }
@@ -235,33 +226,7 @@ import RefreshQueue from '../../models/refresh_queue';
         this._loading_started();
       }
 
-      if (!isReload) {
-        refreshedDeferred = $.when.apply($,
-          can.map(filteredItems, function (item) {
-            let instance = item.instance || item;
-            if (instance.custom_attribute_values &&
-              !isSnapshot(instance)) {
-              return instance.refresh_all('custom_attribute_values')
-                .then(function (values) {
-                  let rq = new RefreshQueue();
-                  _.each(values, function (value) {
-                    if (value.attribute_object) {
-                      rq.enqueue(value.attribute_object);
-                    }
-                  });
-                  return rq.trigger().then(function () {
-                    return values;
-                  });
-                });
-            }
-          }));
-      } else {
-        refreshedDeferred = can.Deferred().resolve();
-      }
-      refreshedDeferred
-        .then(function () {
-          return that.insert_items(filteredItems, forcePrepareChildren);
-        })
+      this.insert_items(filteredItems, forcePrepareChildren)
         .then(this._ifNotRemoved(this.proxy('_loading_finished')));
 
       return this._loading_deferred;
@@ -295,7 +260,7 @@ import RefreshQueue from '../../models/refresh_queue';
       });
 
       if (preppedItems.length > 0) {
-        this.options.list.push.apply(this.options.list, preppedItems);
+        this.options.list.push(...preppedItems);
         dfd = this.add_child_lists(preppedItems);
       } else {
         dfd = can.Deferred().resolve();
