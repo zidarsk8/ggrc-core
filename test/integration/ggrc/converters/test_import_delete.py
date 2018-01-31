@@ -1,6 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+from ggrc import models
 from integration.ggrc import TestCase
 
 
@@ -17,5 +18,9 @@ class TestBasicCsvImport(TestCase):
     filename = "ca_deletion.csv"
     response_data = self.import_file(filename)
 
-    self.assertEqual(response_data[0]["deleted"], 2)
-    self.assertEqual(response_data[0]["ignored"], 0)
+    self.assertEqual(response_data[0]["deleted"], 0)
+    self.assertEqual(response_data[0]["ignored"], 2)
+    self.assertEqual(
+        models.Control.query.count(),
+        2,
+    )
