@@ -233,4 +233,4 @@ class TestCheckPopulatedContent(unittest.TestCase):
     obj.id = self.object_id
     obj.__class__.__name__ = self.object_type
     revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
-    self.assertEqual(expected_content, revision.populate_cads())
+    self.assertEqual(expected_content, revision.populate_cavs())

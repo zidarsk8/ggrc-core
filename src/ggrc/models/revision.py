@@ -283,7 +283,7 @@ class Revision(Base, db.Model):
         result.append(categorization)
     return {key_name: result}
 
-  def populate_cads(self):
+  def populate_cavs(self):
     """Populate custom_attribute_values based on custom_attributes."""
     if "custom_attributes" not in self._content:
       return {}
@@ -305,7 +305,7 @@ class Revision(Base, db.Model):
     populated_content.update(self._document_evidence_hack())
     populated_content.update(self.populate_categoies("categories"))
     populated_content.update(self.populate_categoies("assertions"))
-    populated_content.update(self.populate_cads())
+    populated_content.update(self.populate_cavs())
     return populated_content
 
   @content.setter
