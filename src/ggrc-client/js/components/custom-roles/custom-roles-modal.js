@@ -23,5 +23,6 @@ export default can.Component.extend({
     includeRoles: [],
     excludeRoles: [],
     readOnly: false,
+    orderOfRoles: [],
   },
 });

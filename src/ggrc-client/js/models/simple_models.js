@@ -53,7 +53,8 @@
       audits: 'CMS.Models.Audit.stubs',
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
-    programRoles: ['Program Managers', 'Program Readers', 'Program Editors'],
+    programRoles: ['Program Managers', 'Program Editors', 'Program Readers'],
+    orderOfRoles: ['Program Managers', 'Program Editors', 'Program Readers'],
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/programs/tree-item-attr.mustache',
       attr_list: [

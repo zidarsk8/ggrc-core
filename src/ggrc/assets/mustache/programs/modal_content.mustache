@@ -48,7 +48,8 @@
       {{#new_object_form}}
         <access-control-list-roles-helper
           {instance}="instance"
-          {is-new-instance}="new_object_form">
+          {is-new-instance}="new_object_form"
+          {order-of-roles}="instance.class.orderOfRoles">
         </access-control-list-roles-helper>
       {{/new_object_form}}
       {{^new_object_form}}
