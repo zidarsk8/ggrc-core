@@ -38,7 +38,7 @@ let parserSrc;
 let ggrcParser;
 let parserGrammar = '/vagrant/src/parser/parser.pegjs';
 let parserTemplateFile = '/vagrant/src/parser/parser_template.js';
-let ggrcParserFolder = '/vagrant/src/ggrc/assets/javascripts/generated/';
+let ggrcParserFolder = '/vagrant/src/ggrc-client/js/generated/';
 let ggrcParserJsFile = 'ggrc_filter_query_parser.js';
 let peg = require('pegjs');
 let fs = require('fs');
