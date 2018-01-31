@@ -68,16 +68,6 @@ export default can.Component.extend({
             workflow.attr('status', 'Active');
             return workflow.save();
           })
-          .then(function (workflow) {
-            if (moment(workflow.next_cycle_start_date)
-                .isSame(moment(), 'day')) {
-              return new CMS.Models.Cycle({
-                context: workflow.context.stub(),
-                workflow: {id: workflow.id, type: 'Workflow'},
-                autogenerate: true,
-              }).save();
-            }
-          })
           .then(function () {
             let WorkflowExtension =
               _.find(GGRC.extensions, function (extension) {
