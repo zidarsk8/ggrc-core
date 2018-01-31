@@ -215,36 +215,19 @@ class ProgramRolesHandler(object):
             role_map[ROLE_PROPAGATION[self._get_acr_name(acl)]])
       return
 
-    comment_or_document, other = related_to(obj, {
-        "Document",
-        "Comment"})
-    if comment_or_document:
-      for acl in other.access_control_list:
-        if self._get_acr_name(acl) not in {
-            "Program Readers Mapped",
-            "Program Editors Mapped",
-            "Program Managers Mapped"
-        }:
-          continue
-        acl_manager.get_or_create(
-            comment_or_document, acl, acl.person, _get_acr_id(acl))
-      return
-
-    assessment_or_issue, other = related_to(obj, {
-        "Assessment",
-        "Issue",
-        "AssessmentTemplate"})
-    if assessment_or_issue:
-      for acl in other.access_control_list:
-        if self._get_acr_name(acl) not in {
-            "Program Readers Mapped",
-            "Program Editors Mapped",
-            "Program Managers Mapped"
-        }:
-          continue
-        acl_manager.get_or_create(assessment_or_issue, acl, acl.person,
-                                  _get_acr_id(acl))
-      return
+    for related_object in ("Audit", "Assessment", "Issue"):
+      parent, other = related_to(obj, related_object)
+      if parent:
+        for acl in parent.access_control_list:
+          if self._get_acr_name(acl) not in {
+              "Program Readers Mapped",
+              "Program Editors Mapped",
+              "Program Managers Mapped"
+          }:
+            continue
+          acl_manager.get_or_create(other, acl, acl.person,
+                                    _get_acr_id(acl))
+        return
 
   def handle_audit_creation(self, obj):
     """Propagate roles when audit is created or cloned"""
