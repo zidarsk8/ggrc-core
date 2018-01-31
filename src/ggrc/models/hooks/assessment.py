@@ -9,6 +9,7 @@
 """
 import collections
 import itertools
+import logging
 
 from sqlalchemy import orm
 
@@ -20,6 +21,9 @@ from ggrc.models.hooks import common
 from ggrc.models.hooks import issue_tracker
 from ggrc.services import signals
 from ggrc.utils import referenced_objects
+
+
+logger = logging.getLogger(__name__)
 
 
 def _load_templates(template_ids):
@@ -197,11 +201,23 @@ def generate_role_object_dict(snapshot, audit):
   acl_dict = collections.defaultdict(list)
   # populated content should have access_control_list
   for acl in snapshot.revision.content["access_control_list"]:
-    acl_dict[acr_dict[acl["ac_role_id"]]].append(acl["person_id"])
+    acr = acr_dict.get(acl["ac_role_id"])
+    if not acr:
+      # This can happen when we try to create an assessment for a control that
+      # had a custom attribute role removed. This can not cause a bug as we
+      # only use the acl_list for getting new assessment assignees and those
+      # can only be from non editable roles, meaning the roles that we actually
+      # need can not be removed. Non essential roles that are removed might
+      # should not affect this assessment generation.
+      logger.info("Snapshot %d contains deleted role %d",
+                  snapshot.id, acl["ac_role_id"])
+      continue
+    acl_dict[acr].append(acl["person_id"])
+
   # populate Access Control List by generated role from the related Audit
   acl_dict["Audit Lead"].extend([acl.person_id
-                                for acl in audit.access_control_list
-                                if acl.ac_role_id == leads_role])
+                                 for acl in audit.access_control_list
+                                 if acl.ac_role_id == leads_role])
   auditors = [
       acl.person_id for acl in audit.access_control_list
       if acl.ac_role_id == auditors_role
