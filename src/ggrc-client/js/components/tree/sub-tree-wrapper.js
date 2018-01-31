@@ -117,7 +117,6 @@ import childModelsMap from './child-models-map';
     parent: null,
     directlyItems: [],
     notDirectlyItems: [],
-    _loader: null,
     deepLevel: 0,
     _collapseAfterUnmapCallBack: null,
     initializeChildModels: function () {
