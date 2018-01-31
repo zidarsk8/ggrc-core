@@ -85,6 +85,10 @@ export default can.Component.extend({
           .then(function () {
             return workflow.refresh_all('task_groups', 'task_group_tasks');
           })
+          .then(() => {
+            const cycleStub = workflow.attr('cycles')[0];
+            workflowHelpers.redirectToCycle(cycleStub);
+          })
           .always(restoreButton);
       } else {
         workflowHelpers.generateCycle(workflow)
