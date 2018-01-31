@@ -17,7 +17,7 @@ from ggrc.builder import simple_property
 from ggrc.fulltext import mixin
 from ggrc.models.comment import Commentable
 from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
-from ggrc.models import issuetracker_issue
+from ggrc.models import issuetracker_issue, audit
 from ggrc.models.mixins import with_last_comment
 from ggrc.models.mixins.audit_relationship import AuditRelationship
 from ggrc.models.mixins import BusinessObject
@@ -42,22 +42,6 @@ from ggrc.models import reflection
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
 from ggrc.fulltext.mixin import Indexed
-
-
-def _build_audit_stub(assessment_obj):
-  """Returns a stub of audit model to which assessment is related to."""
-  audit_id = assessment_obj.audit_id
-  if audit_id is None:
-    return None
-  issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
-      'Audit', audit_id)
-  return {
-      'type': 'Audit',
-      'id': audit_id,
-      'context_id': assessment_obj.context_id,
-      'href': u'/api/audits/%d' % audit_id,
-      'issue_tracker': issue_obj.to_dict() if issue_obj is not None else {},
-  }
 
 
 class Assessment(Roleable, statusable.Statusable, AuditRelationship,
@@ -163,7 +147,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
   ]
 
   _custom_publish = {
-      'audit': _build_audit_stub,
+      'audit': audit.build_audit_stub,
   }
 
   @classmethod

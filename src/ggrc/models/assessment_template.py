@@ -93,6 +93,10 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
       "archived"
   ]
 
+  _custom_publish = {
+      'audit': audit.build_audit_stub,
+  }
+
   _aliases = {
       "status": {
           "display_name": "State",
