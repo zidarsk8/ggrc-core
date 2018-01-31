@@ -34,27 +34,25 @@ and run with the test folder
 */
 
 
-var parser,
-    parser_src,
-    ggrc_parser,
-    parser_grammar = '/vagrant/src/parser/parser.pegjs',
-    parser_template_file = '/vagrant/src/parser/parser_template.js', 
-    ggrc_parser_folder = '/vagrant/src/ggrc/assets/javascripts/generated/',
-    ggrc_parser_js_file = 'ggrc_filter_query_parser.js',
-    peg = require('pegjs'),
-    fs = require('fs'),
-    mkdirp = require('mkdirp'),
-    parser_string = fs.readFileSync(parser_grammar, 'utf8'),
-    filter_template = fs.readFileSync(parser_template_file, 'utf8');
+let parserSrc;
+let ggrcParser;
+let parserGrammar = '/vagrant/src/parser/parser.pegjs';
+let parserTemplateFile = '/vagrant/src/parser/parser_template.js';
+let ggrcParserFolder = '/vagrant/src/ggrc/assets/javascripts/generated/';
+let ggrcParserJsFile = 'ggrc_filter_query_parser.js';
+let peg = require('pegjs');
+let fs = require('fs');
+let mkdirp = require('mkdirp');
+let parserString = fs.readFileSync(parserGrammar, 'utf8');
+let filterTemplate = fs.readFileSync(parserTemplateFile, 'utf8');
 
 console.log('building parser');
-parser = peg.buildParser(parser_string);
-parser_src = peg.buildParser(parser_string, {output: "source"});
+parserSrc = peg.buildParser(parserString, {output: 'source'});
 
 console.log('saving parser to js files');
-ggrc_parser = filter_template.replace('"GENERATED_PLACEHOLDER"', parser_src);
+ggrcParser = filterTemplate.replace('"GENERATED_PLACEHOLDER"', parserSrc);
 
-mkdirp.sync(ggrc_parser_folder);
-fs.writeFileSync(ggrc_parser_folder + ggrc_parser_js_file, ggrc_parser);
+mkdirp.sync(ggrcParserFolder);
+fs.writeFileSync(ggrcParserFolder + ggrcParserJsFile, ggrcParser);
 
 console.log('\ndone :)');
