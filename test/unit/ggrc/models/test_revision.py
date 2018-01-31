@@ -222,11 +222,12 @@ class TestCheckPopulatedContent(unittest.TestCase):
       ({}, {}),
       ({"custom_attribute_values": [], "custom_attributes": []}, {}),
       ({"custom_attributes": []}, {"custom_attribute_values": []}),
-      ({"custom_attributes": [1,2,3]}, {"custom_attribute_values": [1,2,3]}),
-      ({"custom_attribute_values": [1,2,3]}, {}),
+      ({"custom_attributes": [1, 2, 3]},
+       {"custom_attribute_values": [1, 2, 3]}),
+      ({"custom_attribute_values": [1, 2, 3]}, {}),
   )
   @ddt.unpack
-  def test_populated_content_evidence(self, content, expected_content):
+  def test_populated_content_cavs(self, content, expected_content):
     """Test populated cavs content for revision if start content is {0}."""
     obj = mock.Mock()
     obj.id = self.object_id
