@@ -99,9 +99,9 @@ class TestOneTimeWfEndDateChange(TestCase):
 
   @patch("ggrc.notifications.common.send_email")
   def test_move_end_date_to_future(self, mock_mail):
-    """
-    test moving the end date to the future, befor due_in and due_today
-    notifications have been sent
+    """Test moving the end date to the future.
+
+    It is done before due_in and due_today notifications have been sent.
     """
     def get_person(person_id):
       return db.session.query(Person).filter(Person.id == person_id).one()
