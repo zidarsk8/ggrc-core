@@ -5,7 +5,41 @@
 
 import {confirm} from '../../plugins/utils/modals';
 
+/**
+ * A set of properties which describe minimum information
+ * about cycle.
+ * @typedef {Object} CycleStub
+ * @property {number} id - cycle id.
+ * @property {string} type - cycle type.
+ * @example
+ * // stub for cycle
+ * const cycleStub = {
+ *  id: 123,
+ *  type: "Cycle",
+ * };
+ */
+
 export default {
+  /**
+   * Creates cycle instance.
+   * @param {CMS.Models.Workflow} workflow - a workflow instance.
+   * @return {CMS.Models.Cycle} - a new cycle based on workflow.
+   */
+  createCycle(workflow) {
+    return new CMS.Models.Cycle({
+      context: workflow.context.stub(),
+      workflow: {id: workflow.id, type: 'Workflow'},
+      autogenerate: true,
+    });
+  },
+  /**
+   * Redirects to cycle with certain id.
+   * @param {CMS.Models.Cycle|CycleStub} cycle - an object containing cycle id.
+   * @param {number} id - cycle id.
+   */
+  redirectToCycle({id}) {
+    window.location.hash = `current_widget/cycle/${id}`;
+  },
   generateCycle: function (workflow) {
     let dfd = new $.Deferred();
     let cycle;
@@ -19,24 +53,20 @@ export default {
       content_view: GGRC.mustache_path +
         '/workflows/confirm_start.mustache',
       instance: workflow,
-    }, function (params, option) {
+    }, (params, option) => {
       let data = {};
 
       can.each(params, function (item) {
         data[item.name] = item.value;
       });
 
-      cycle = new CMS.Models.Cycle({
-        context: workflow.context.stub(),
-        workflow: {id: workflow.id, type: 'Workflow'},
-        autogenerate: true,
-      });
+      cycle = this.createCycle(workflow);
 
-      cycle.save().then(function (cycle) {
+      cycle.save().then((cycle) => {
         // Cycle created. Workflow started.
-        setTimeout(function () {
+        setTimeout(() => {
           dfd.resolve();
-          window.location.hash = 'current_widget/cycle/' + cycle.id;
+          this.redirectToCycle(cycle);
         }, 250);
       });
     }, function () {

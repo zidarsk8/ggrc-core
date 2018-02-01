@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import Permission from '../permission';
 import RefreshQueue from './refresh_queue';
 import {getClosestWeekday} from '../plugins/utils/date-util';
 
@@ -18,6 +19,7 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
   function refreshAttrWrap(attr) {
     return function (ev, instance) {
       if (instance instanceof this) {
+        Permission.refresh();
         refreshAttr(instance, attr);
       }
     };
