@@ -21,10 +21,9 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
 
   function genUploadedFile(
     fileType = FILE_PICKED, parentFolderId = ROOT_FOLDER_ID, role = 'owner') {
-    return new can.Map({
+    return {
       newUpload: fileType === FILE_NEW_UPLOAD,
       title: 'my-file.png',
-      name: 'my-file.png',
       parents: [
         {
           isRoot: parentFolderId === ROOT_FOLDER_ID,
@@ -35,7 +34,7 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
         id: 'me',
         role,
       },
-    });
+    };
   }
 
   beforeEach(function () {
@@ -136,7 +135,7 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
     spyOn(viewModel, 'createCopyRequest');
 
     // making the file name to already have a slug
-    file.attr('title', viewModel.addFileSuffix(file.attr('title')));
+    file.title = viewModel.addFileSuffix(file.title);
     viewModel.addFilesSuffixes(optsAuditFolder, [
       file,
     ]);
@@ -194,7 +193,7 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
     spyOn(viewModel, 'createCopyRequest');
 
     // making the file name to already have a slug
-    file.attr('title', viewModel.addFileSuffix(file.attr('title')));
+    file.title = viewModel.addFileSuffix(file.title);
     viewModel.addFilesSuffixes(optsWithoutAuditFolder, [
       file,
     ]);
@@ -393,16 +392,12 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
 
     beforeEach(function () {
       el = jasmine.createSpyObj(['data', 'trigger']);
-
-      uploadFilesDfd = can.Deferred();
-      parentFolderStub = {
-        uploadFiles: jasmine.createSpy().and.returnValue(uploadFilesDfd),
-      };
-
+      parentFolderStub = {id: 'id'};
       parentFolderDfd = can.Deferred();
-      spyOn(CMS.Models, 'GDriveFolder').and.returnValue({
-        refresh: jasmine.createSpy().and.returnValue(parentFolderDfd),
-      });
+      uploadFilesDfd = can.Deferred();
+
+      spyOn(pickerUtils, 'findGDriveItemById').and.returnValue(parentFolderDfd);
+      spyOn(pickerUtils, 'uploadFiles').and.returnValue(uploadFilesDfd);
     });
 
     it('sets "isUploading" flag to true', function () {

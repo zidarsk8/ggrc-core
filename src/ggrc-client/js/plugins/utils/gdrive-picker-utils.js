@@ -3,8 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import RefreshQueue from '../../models/refresh_queue';
-
 export const GDRIVE_PICKER_ERR_CANCEL = 'GDRIVE_PICKER_ERR_CANCEL';
 
 /**
@@ -70,54 +68,72 @@ export function uploadFiles(opts = {}) {
     });
   }
 
-    // A simple callback implementation.
+  // A simple callback implementation.
   function pickerCallback(data) {
     let ACTION = google.picker.Response.ACTION;
     let CANCEL = google.picker.Action.CANCEL;
     let PICKED = google.picker.Action.PICKED;
     let DOCUMENTS = google.picker.Response.DOCUMENTS;
-    let files;
-    let err;
-    let model = pickFolder ? CMS.Models.GDriveFolder : CMS.Models.GDriveFile;
 
     // sometimes pickerCallback is called with data == { action: 'loaded' }
     // which is not described in the Picker API Docs
     if ( data[ACTION] === PICKED || data[ACTION] === CANCEL ) {
-     picker.dispose();
+      picker.dispose();
     }
 
     if (data[ACTION] === PICKED) {
-      // adding a newUpload flag so we can later distinguish newly
-      // uploaded files from the picked ones.
-      // isNew is not reliable later as we have a similar method on
-      // the model and it will be overwritten when we create Models
-      // from file objects
-      data[DOCUMENTS].forEach((file) => {
-        file.newUpload = file.isNew;
-      });
-
-      files = model.models(data[DOCUMENTS]);
-
+      let pickedFiles = data[DOCUMENTS];
       // NB: picker file object have different format then GDrive file objects
       // "name" <=> "title", "url" <=> "alternateLink"
       // RefreshQueue converts picker file objects into GDrive file objects
-
-      return new RefreshQueue()
-        .enqueue(files)
-        .trigger()
-        .then((files)=>{
-          dfd.resolve(files);
-        }, dfd.reject);
+      let pickedFilesById = _.indexBy(pickedFiles, 'id');
+      let refreshDfds = pickedFiles.map((file)=> findGDriveItemById(file.id));
+      can.when(...refreshDfds).then((...files)=> {
+        // adding a newUpload flag so we can later distinguish newly
+        // uploaded files from the picked ones.
+        files.forEach((file)=>{
+          file.newUpload = pickedFilesById[file.id].isNew;
+        });
+        dfd.resolve(files);
+      }, dfd.reject);
     } else if (data[ACTION] === CANCEL) {
-      err = new Error('Canceled by user');
+      let err = new Error('Canceled by user');
       err.type = GDRIVE_PICKER_ERR_CANCEL;
       dfd.reject(err);
     }
     // sometimes pickerCallback is called with data == { action: 'loaded' }
     // which is not described in the Picker API Docs
     if ( data[ACTION] === PICKED || data[ACTION] === CANCEL ) {
-     picker.dispose();
+      picker.dispose();
     }
   }
   return dfd.promise();
+}
+
+export function findGDriveItemById(id) {
+  let path = `/drive/v2/files/${id}`;
+  let scopes = [
+    'https://www.googleapis.com/auth/drive',
+    'https://www.googleapis.com/auth/apps.groups.settings',
+  ];
+
+  return GGRC.Controllers.GAPI.gapi_request_with_auth({
+    path: path,
+    method: 'get', // "post"
+    callback: function (dfd, result) {
+      let objs;
+      if (!result || result.error) {
+        dfd.reject(result ? result.error : JSON.parse(arguments[1]));
+      } else if (result.items) {
+        objs = result.items;
+        can.each(objs, function (obj) {
+          obj.selfLink = obj.selfLink || '#';
+        });
+        dfd.resolve(objs);
+      } else { // single object case
+        dfd.resolve(result);
+      }
+    },
+    scopes: scopes,
+  });
 }

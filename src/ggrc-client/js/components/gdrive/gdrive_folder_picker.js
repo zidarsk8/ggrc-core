@@ -6,6 +6,7 @@
 import '../action-toolbar/action-toolbar';
 import {
   uploadFiles,
+  findGDriveItemById,
   GDRIVE_PICKER_ERR_CANCEL,
 } from '../../plugins/utils/gdrive-picker-utils';
 
@@ -74,20 +75,13 @@ import {
         }.bind(this));
       },
       setCurrent: function (folderId) {
-        let gdriveFolder;
-
         this.attr('_folder_change_pending', true);
 
-        gdriveFolder = new CMS.Models.GDriveFolder({
-          id: folderId,
-          href: '/drive/v2/files/' + folderId,
-        });
-
-        return gdriveFolder.refresh()
+        return findGDriveItemById(folderId)
           .always(function () {
             this.attr('_folder_change_pending', false);
           }.bind(this))
-          .done(function () {
+          .done(function (gdriveFolder) {
             this.attr('current_folder', gdriveFolder);
             this.attr('folder_error', null);
           }.bind(this))
