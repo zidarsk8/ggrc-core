@@ -10,6 +10,7 @@ import json
 import logging
 
 import sqlalchemy
+from sqlalchemy import true
 from flask import flash
 from flask import g
 from flask import render_template
@@ -275,6 +276,19 @@ def get_access_control_roles_json():
     return as_json(published)
 
 
+def get_internal_roles_json():
+  """Get a list of all access control roles"""
+  with benchmark("Get access roles JSON"):
+    attrs = all_models.AccessControlRole.query.options(
+        sqlalchemy.orm.undefer_group("AccessControlRole_complete")
+    ).filter(all_models.AccessControlRole.internal == true()).all()
+    published = []
+    for attr in attrs:
+      published.append(publish(attr))
+    published = publish_representation(published)
+    return as_json(published)
+
+
 def get_attributes_json():
   """Get a list of all custom attribute definitions"""
   with benchmark("Get attributes JSON"):
@@ -357,6 +371,7 @@ def base_context():
       full_user_json=get_full_user_json,
       attributes_json=get_attributes_json,
       access_control_roles_json=get_access_control_roles_json,
+      internal_access_control_roles_json=get_internal_roles_json,
       roles_json=get_roles_json,
       all_attributes_json=get_all_attributes_json,
       import_definitions=get_import_definitions,

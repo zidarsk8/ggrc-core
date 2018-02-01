@@ -81,7 +81,6 @@ import RefreshQueue from './refresh_queue';
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/people/tree-item-attr.mustache',
-      add_item_view: GGRC.mustache_path + '/people/tree_add_item.mustache',
       attr_list: [{
         attr_title: 'Name',
         attr_name: 'title',

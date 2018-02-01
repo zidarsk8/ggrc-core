@@ -534,41 +534,6 @@ import Permission from '../permission';
       roles.unshift('none');
       return _.max(roles, Array.prototype.indexOf.bind(roleOrder));
     },
-    hasRoleForContext: function (userId, contextId, roleName) {
-      let deferred = $.Deferred();
-      let contextRoles;
-      let filteredRoles;
-      let hasRole;
-      let userDfd =
-        CMS.Models.Person.findInCacheById(userId) ||
-        CMS.Models.Person.findOne({id: userId});
-
-      $.when(userDfd)
-        .then(function (user) {
-          return user.get_mapping_deferred('authorizations');
-        })
-        .then(function (uRoles) {
-          contextRoles = _.filter(uRoles, function (role) {
-            return role.context_id === contextId;
-          }).map(function (role) {
-            return role.reify();
-          });
-
-          filteredRoles = GGRC.roles.filter(function (role) {
-            return contextRoles.some(function (cr) {
-              return cr.role.id === role.id;
-            });
-          });
-
-          hasRole = filteredRoles.some(function (cr) {
-            return cr.name === roleName;
-          });
-
-          deferred.resolve(hasRole);
-        });
-
-      return deferred;
-    },
 
     /**
      * Build string of assignees types separated by commas.

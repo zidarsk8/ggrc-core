@@ -168,6 +168,13 @@ class CustomRoleAttr(FullTextAttr):
     results = {}
     sorted_roles = defaultdict(list)
     for acl in getattr(instance, self.alias, []):
+      if not acl.ac_role:
+        # If acl is not properly set the acl record was *most likely* created
+        # through acl propagation hook and probably shouldn't be indexed at
+        # all, because we are creating internal roles. In any case we can
+        # properly check for the internal property on the role once GGRC-3784
+        # is done.
+        continue
       ac_role = acl.ac_role.name
       person_id = acl.person.id
       if not results.get(acl.ac_role.name, None):

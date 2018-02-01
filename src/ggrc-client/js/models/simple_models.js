@@ -53,6 +53,8 @@
       audits: 'CMS.Models.Audit.stubs',
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
+    programRoles: ['Program Managers', 'Program Editors', 'Program Readers'],
+    orderOfRoles: ['Program Managers', 'Program Editors', 'Program Readers'],
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/programs/tree-item-attr.mustache',
       attr_list: [
@@ -93,7 +95,21 @@
       this.validateNonBlank('title');
       this._super.apply(this, arguments);
     },
-  }, {});
+  }, {
+    readOnlyProgramRoles: function () {
+      const allowedRoles = ['Superuser', 'Administrator', 'Editor'];
+      if (allowedRoles.indexOf(GGRC.current_user.system_wide_role) > -1) {
+        return false;
+      }
+      const programManagerRole = GGRC.access_control_roles.find((acr) => {
+        return acr.name === 'Program Managers' && acr.object_type === 'Program';
+      }).id;
+      return this.access_control_list.filter((acl) => {
+        return acl.person_id === GGRC.current_user.id &&
+               acl.ac_role_id === programManagerRole;
+      }).length === 0;
+    },
+  });
 
   can.Model.Cacheable('CMS.Models.Option', {
     root_object: 'option',

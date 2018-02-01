@@ -13,6 +13,10 @@ export default GGRC.Components('accessControlListRolesHelper', {
     instance: {},
     isNewInstance: false,
     isProposal: false,
+    includeRoles: [],
+    excludeRoles: [],
+    readOnly: false,
+    orderOfRoles: [],
     setAutoPopulatedRoles: function () {
       let instance = this.attr('instance');
       let autoPopulatedRoles = _.filter(GGRC.access_control_roles, {

@@ -20,5 +20,9 @@ export default can.Component.extend({
     conflictRoles: [],
     orderOfRoles: [],
     isProposal: false,
+    includeRoles: [],
+    excludeRoles: [],
+    readOnly: false,
+    orderOfRoles: [],
   },
 });

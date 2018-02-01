@@ -77,6 +77,15 @@ permissions = {
     "read": owner_read,
     "create": [
         {
+            "type": "Audit",
+            "condition": "is_allowed_based_on",
+            "terms": {
+                "property_name": "program",
+                "action": "update",
+            }
+        },
+        "AssessmentTemplate",
+        {
             "type": "TaskGroup",
             "condition": "is_workflow_admin",
             "terms": {},

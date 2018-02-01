@@ -134,7 +134,6 @@ dashboard-js-template-files:
   - people/option_detail.mustache
   - people/popover.mustache
   - people/tree-item-attr.mustache
-  - people/tree_add_item.mustache
   - people/search_result.mustache
   - people/mapper-item-description.mustache
   - policies/info.mustache
