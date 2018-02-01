@@ -241,6 +241,8 @@ class WithLastDeprecatedDate(object):
     """Autosetup current date as last_deprecated_date
       if 'Deprecated' status will setup."""
     # pylint: disable=unused-argument; key is unused but passed in by ORM
+    if hasattr(super(WithLastDeprecatedDate, self), "validate_status"):
+      value = super(WithLastDeprecatedDate, self).validate_status(key, value)
     if value != self.status and value == self.AUTO_SETUP_STATUS:
       self.last_deprecated_date = datetime.datetime.now()
     return value
@@ -706,9 +708,6 @@ def person_relation_factory(relation_name, fulltext_attr=None, api_attr=None):
 
       _api_attrs = reflection.ApiAttributes(api_attr)
       fulltext_attr = [gen_fulltext_attr]
-
-
-
 
   return type(
       "{}_mixin".format(relation_name),
