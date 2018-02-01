@@ -13,47 +13,38 @@ GGRC.Components('richText', {
   template: template,
   viewModel: {
     define: {
-      placeholder: {
-        type: 'string',
-        value: ''
-      },
       disabled: {
-        set(newValue) {
-          this.toggle(!newValue);
-          return newValue;
+        set(disabled) {
+          let editor = this.attr('editor');
+          if (editor) {
+            editor.enable(!disabled);
+          }
+          return disabled;
         }
       },
-      text: {
-        type: 'string',
-        value: '',
-        set(text) {
-          text = text || '';
-          this.setText(text);
-          return text;
+      hidden: {
+        get(){
+          let hiddenToolbar = this.attr('hiddenToolbar');
+          let hasFocus = this.attr('editorHasFocus')
+          return hiddenToolbar && !hasFocus;
         }
       },
-      toolbarClasses: {
-        type: 'string',
-        value: '',
-        get() {
-          if (!this.attr('hiddenToolbar')) {
-            return '';
+      content: {
+        set(newContent){
+          let oldContent = this.attr('content')
+          let editor = this.attr('editor');
+          if (editor && (newContent !== oldContent)) {
+            this.setContentToEditor(editor, newContent);
           }
-
-          if (this.attr('editorHasFocus')) {
-            return '';
-          }
-
-          return 'rich-text__wrapper-hidden-toolbar';
+          return newContent;
         }
       }
     },
-    tabIndex: '-1',
+    editor: null,
+    placeholder: '',
     hiddenToolbar: false,
-    forceShow: false,
-    editor: false,
     editorHasFocus: false,
-    initEditor(container, toolbarContainer, text) {
+    initEditor(container, toolbarContainer) {
       import(/* webpackChunkName: "quill" */'quill').then((Quill)=> {
         let editor = new Quill(container, {
           theme: 'snow',
@@ -70,30 +61,31 @@ GGRC.Components('richText', {
             }
           }
         });
-        if (text) {
-          editor.clipboard.dangerouslyPasteHTML(0, text);
-        }
+        this.setContentToEditor(editor, this.attr('content'));
         editor.on('text-change', this.onChange.bind(this));
 
         if (this.attr('hiddenToolbar')) {
-          editor.on('selection-change',
-            this.onSelectionChange.bind(this));
+          editor.on('selection-change', this.onSelectionChange.bind(this));
         }
         this.attr('editor', editor);
       });
     },
+    setContentToEditor(editor, content) {
+      if (content !== editor.root.innerHTML) {
+        let delta = editor.clipboard.convert(content);
+        editor.setContents(delta);
+      }
+    },
     urlMatcher(node, delta) {
-      let matches;
-      let ops;
-      let str;
       if (typeof (node.data) !== 'string') {
         return;
       }
-      matches = node.data.match(URL_CLIPBOARD_REGEX);
+
+      let matches = node.data.match(URL_CLIPBOARD_REGEX);
 
       if (matches && matches.length > 0) {
-        ops = [];
-        str = node.data;
+        let ops = [];
+        let str = node.data;
         matches.forEach((match)=> {
           let split = str.split(match);
           let beforeLink = split.shift();
@@ -124,46 +116,32 @@ GGRC.Components('richText', {
 
       this.attr('editorHasFocus', false);
     },
-    onRemoved() {
-      let editor = this.getEditor();
+    onChange(delta, oldDelta) {
+      let editor = this.attr('editor');
+      // real length without service tags
+      let textLength = editor.getText().trim().length;
 
-      if (this.attr('hiddenToolbar') && editor) {
-        editor.off('selection-change');
-      }
-    },
-    onChange(delta) {
-      let match;
-      let url;
-      let ops;
-      let text;
-      let startIdx;
-      let endIdx;
-      let editor;
-      if (!this.getTextLength()) {
-        // Should null text value if this is no content
-        return this.attr('text', '');
-      }
-
-      if (delta.ops.length === 2 &&
+      // handle and highlight urls
+      if (textLength &&
+        delta.ops.length === 2 &&
         delta.ops[0].retain &&
         !delta.ops[1].delete &&
         !this.isWhitespace(delta.ops[1].insert)) {
-        editor = this.getEditor();
-        text = editor.getText();
-        startIdx = delta.ops[0].retain;
+
+        let text = editor.getText();
+        let startIdx = delta.ops[0].retain;
         while (!this.isWhitespace(text[startIdx - 1]) && startIdx > 0) {
           startIdx--;
         }
-        endIdx = delta.ops[0].retain + 1;
+        let endIdx = delta.ops[0].retain + 1;
         while (!this.isWhitespace(text[endIdx]) && endIdx < text.length) {
           endIdx++;
         }
 
-        match = text.substring(startIdx, endIdx).match(URL_TYPE_REGEX);
+        let match = text.substring(startIdx, endIdx).match(URL_TYPE_REGEX);
         if (match !== null) {
-          url = match[0];
-
-          ops = [];
+          let url = match[0];
+          let ops = [];
           if (startIdx !== 0) {
             ops.push({retain: startIdx});
           }
@@ -177,52 +155,25 @@ GGRC.Components('richText', {
         }
       }
 
-      return this.attr('text', this.getContent());
+      // innerHTML could containe only tags f.e. <p><br></p>
+      // we have to save empty string in this case;
+      let content = textLength ? editor.root.innerHTML : '';
+      this.attr('content', content);
     },
-    toggle(isDisabled) {
-      let editor = this.getEditor();
-      if (editor) {
-        editor.enable(isDisabled);
-      }
-    },
-    getEditor() {
-      return this.attr('editor');
-    },
-    getTextLength() {
-      return this.getText().trim().length;
-    },
-    /**
-     * Returns only text content of the Rich Text
-     * @return {String} - plain text value
-     */
-    getText() {
-      return this.getEditor().getText();
-    },
-    setText(text) {
-      let editor = this.getEditor();
-      if (editor && !text.length) {
-        setTimeout(()=> {
-          editor.setText('');
-        }, 0);
-      }
-    },
-    /**
-     * Returns the whole content of the Rich Text field with HTML content
-     * @return {String} - current HTML String
-     */
-    getContent() {
-      return this.getEditor().root.innerHTML;
-    }
   },
   events: {
     inserted() {
       let wysiwyg = this.element.find('.rich-text__content')[0];
       let toolbar = this.element.find('.rich-text__toolbar')[0];
-      let text = this.viewModel.attr('text');
-      this.viewModel.initEditor(wysiwyg, toolbar, text);
+      this.viewModel.initEditor(wysiwyg, toolbar);
     },
     removed() {
-      this.viewModel.onRemoved();
+      let editor = this.viewModel.attr('editor');
+
+      if (editor) {
+        editor.off('text-change');
+        editor.off('selection-change');
+      }
     }
   }
 });
