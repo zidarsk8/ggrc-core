@@ -3,6 +3,8 @@
 
 """Test for proposal permissions."""
 
+import json
+
 import ddt
 
 from ggrc.models import all_models
@@ -34,6 +36,13 @@ class TestPermissions(TestCase):
           "ACL_Editor": factories.AccessControlRoleFactory(
               name="ACL_Editor",
               object_type="Control"),
+          "ACL_Nobody": factories.AccessControlRoleFactory(
+              name="ACL_Nobody",
+              object_type="Control",
+              read=0,
+              update=0,
+              delete=0,
+          ),
       }
       self.program = factories.ProgramFactory()
       self.program.context.related_object = self.program
@@ -49,6 +58,7 @@ class TestPermissions(TestCase):
           "Administrator": factories.PersonFactory(),
           "ACL_Reader": factories.PersonFactory(),
           "ACL_Editor": factories.PersonFactory(),
+          "ACL_Nobody": factories.PersonFactory(),
           "Program Editors": factories.PersonFactory(),
           "Program Managers": factories.PersonFactory(),
           "Program Readers": factories.PersonFactory(),
@@ -64,7 +74,7 @@ class TestPermissions(TestCase):
         factories.AccessControlListFactory(
             ac_role=ac_roles[role_name],
             object=self.program,
-            person=self.people[role_name])
+            person=person)
       self.proposal = factories.ProposalFactory(
           instance=self.control,
           content={
@@ -75,13 +85,14 @@ class TestPermissions(TestCase):
               "mapping_list_fields": {},
           }
       )
-      for role_name in ["ACL_Reader", "ACL_Editor"]:
-        rbac_factories.UserRoleFactory(role=roles["Creator"],
-                                       person=self.people[role_name])
+      for role_name in ["ACL_Reader", "ACL_Editor", "ACL_Nobody"]:
+        person = self.people[role_name]
+        rbac_factories.UserRoleFactory(role=roles["Creator"], person=person)
         factories.AccessControlListFactory(
             ac_role=acrs[role_name],
             object=self.control,
-            person=self.people[role_name])
+            person=person)
+    with factories.single_commit():
       proposal_model.set_acl_to_all_proposals_for(self.control)
 
   @ddt.data(
@@ -90,6 +101,7 @@ class TestPermissions(TestCase):
       ("Editor", 200),
       ("ACL_Reader", 200),
       ("ACL_Editor", 200),
+      ("ACL_Nobody", 403),
       ("Administrator", 200),
       ("Program Editors", 200),
       ("Program Managers", 200),
@@ -115,6 +127,7 @@ class TestPermissions(TestCase):
       ("Administrator", 200),
       ("ACL_Reader", 403),
       ("ACL_Editor", 200),
+      ("ACL_Nobody", 403),
       ("Program Editors", 200),
       ("Program Managers", 200),
       ("Program Readers", 403)
@@ -135,6 +148,7 @@ class TestPermissions(TestCase):
       ("Editor", 200),
       ("ACL_Reader", 403),
       ("ACL_Editor", 200),
+      ("ACL_Nobody", 403),
       ("Administrator", 200),
       ("Program Editors", 200),
       ("Program Managers", 200),
@@ -156,6 +170,7 @@ class TestPermissions(TestCase):
       ("Editor", 201),
       ("ACL_Reader", 201),
       ("ACL_Editor", 201),
+      ("ACL_Nobody", 403),
       ("Administrator", 201),
       ("Program Editors", 201),
       ("Program Managers", 201),
@@ -179,3 +194,58 @@ class TestPermissions(TestCase):
     self.client.get("/login")
     resp = self.api.post(all_models.Proposal, data)
     self.assertEqual(status, resp.status_code)
+
+  @ddt.data(
+      ("Creator", 0),
+      ("Reader", 1),
+      ("Editor", 1),
+      ("ACL_Reader", 1),
+      ("ACL_Editor", 1),
+      ("ACL_Nobody", 0),
+      ("Administrator", 1),
+      ("Program Editors", 1),
+      ("Program Managers", 1),
+      ("Program Readers", 1),
+  )
+  @ddt.unpack
+  def test_query_filter(self, role_name, expected_count):
+    """Test query proposals for {0}.
+
+    Args:
+        role_name: string, unique key,
+                   shows the position of user in generated infrustructure
+        expected_count: int, number of proposals,
+                        that should be filtered by query
+    """
+    control_id = self.control.id
+    data = [{
+        "limit": [0, 5],
+        "object_name": all_models.Proposal.__name__,
+        "order_by":[
+            {"name": "status", "desc": True},
+            {"name": "created_at", "desc": True},
+        ],
+        "filters": {
+            "expression": {
+                "left": {
+                    "left": "instance_type",
+                    "op": {"name": "="},
+                    "right": self.control.type,
+                },
+                "op": {"name": "AND"},
+                "right": {
+                    "left": "instance_id",
+                    "op": {"name": "="},
+                    "right": control_id,
+                },
+            },
+        },
+    }]
+    self.api.set_user(self.people[role_name])
+    self.client.get("/login")
+    headers = {"Content-Type": "application/json", }
+    resp = self.api.client.post("/query",
+                                data=json.dumps(data),
+                                headers=headers).json
+    self.assertEqual(1, len(resp))
+    self.assertEqual(expected_count, resp[0]["Proposal"]["count"])
