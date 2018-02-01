@@ -4,7 +4,7 @@
 """Custom resource for related assessments
 
 This resource works with the following queries:
-  - /api/related_assess with get parameters:
+  - /api/related_assessments with get parameters:
     - object_type=Control
     - object_id=XXX
     - optional: limit=from,to
@@ -128,7 +128,7 @@ class RelatedAssessmentsResource(common.Resource):
 
     destination_query = db.session.query(
         models.Relationship.source_id.label("assessment_id"),
-        models.Relationship.destination_id.label("snapshot_id")
+        models.Relationship.destination_id.label("document_id")
     ).join(
         models.Document,
         and_(
