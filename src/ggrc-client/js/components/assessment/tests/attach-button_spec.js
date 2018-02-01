@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as gDriveUtils from '../../../plugins/utils/gdrive-picker-utils';
+
 describe('GGRC.Components.attachButton', function () {
   'use strict';
 
@@ -58,7 +60,7 @@ describe('GGRC.Components.attachButton', function () {
     it('set correct isFolderAttached if instance refreshes during ' +
       'request to GDrive', function () {
       let dfd = can.Deferred();
-      spyOn(CMS.Models.GDriveFolder, 'findOne').and.returnValue(dfd);
+      spyOn(gDriveUtils, 'findGDriveItemById').and.returnValue(dfd);
 
       viewModel.attr('instance.folder', 'gdrive_folder_id');
       viewModel.checkFolder(); // makes request to GDrive

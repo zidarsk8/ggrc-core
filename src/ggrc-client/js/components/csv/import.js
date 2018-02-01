@@ -284,14 +284,12 @@ export default GGRC.Components('csvImportWidget', {
 
       function pickerCallback(data) {
         let file;
-        let model;
         let PICKED = google.picker.Action.PICKED;
         let ACTION = google.picker.Response.ACTION;
         let DOCUMENTS = google.picker.Response.DOCUMENTS;
 
         if (data[ACTION] === PICKED) {
-          model = CMS.Models.GDriveFile;
-          file = model.models(data[DOCUMENTS])[0];
+          file = data[DOCUMENTS][0];
 
           if (file && _.any(allowedTypes, function (type) {
             return type === file.mimeType;

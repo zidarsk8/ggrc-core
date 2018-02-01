@@ -5,6 +5,7 @@
 
 import Permission from '../../permission';
 import template from './attach-button.mustache';
+import {findGDriveItemById} from '../../plugins/utils/gdrive-picker-utils';
 
 (function (GGRC, can) {
   'use strict';
@@ -69,14 +70,13 @@ import template from './attach-button.mustache';
         });
       },
       findFolder: function () {
-        let GFolder = CMS.Models.GDriveFolder;
         let folderId = this.attr('instance.folder');
 
         if (!folderId) {
           return can.Deferred().resolve();
         }
 
-        return GFolder.findOne({id: folderId});
+        return findGDriveItemById(folderId);
       },
     },
   });
