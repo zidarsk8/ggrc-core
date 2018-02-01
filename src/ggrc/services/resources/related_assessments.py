@@ -8,7 +8,7 @@ This resource works with the following queries:
     - object_type=Control
     - object_id=XXX
     - optional: limit=from,to
-    - optional: order_by=field_name[,asc|,desc]
+    - optional: order_by=field_name,(asc|desc),[field_name,(asc|desc)]
 """
 
 from collections import defaultdict
@@ -261,13 +261,15 @@ class RelatedAssessmentsResource(common.Resource):
     order_by = None
     if request_param:
       param_list = request_param.split(",")
-      desc = False
-      if len(param_list) == 2:
-        desc = param_list[1] == "desc"
-      order_by = [{
-          "name": param_list[0],
-          "desc": desc,
-      }]
+      if len(param_list) % 2 != 0:
+        raise BadRequest()
+
+      order_by = []
+      for index in range(0, len(param_list), 2):
+        order_by.append({
+            "name": param_list[index],
+            "desc": param_list[index + 1] == "desc"
+        })
     return order_by
 
   @classmethod
