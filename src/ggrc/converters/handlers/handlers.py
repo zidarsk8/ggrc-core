@@ -147,6 +147,10 @@ class DeleteColumnHandler(ColumnHandler):
     return ""
 
   def parse_item(self):
+    if self.raw_value:
+      self.add_error(u"Line {line}: Delete column is temporary disabled, "
+                     "please use web interface to delete current object.")
+      return None
     if self.raw_value.lower() not in self.ALLOWED_VALUES:
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
       return False
