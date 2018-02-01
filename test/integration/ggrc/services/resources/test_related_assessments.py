@@ -69,6 +69,7 @@ class TestRelatedAssessments(TestCase):
       {"object_type": "Control", "object_id": 5, "limit": "1,2,5"},
       {"object_type": "Control", "object_id": 5, "limit": "5,1"},
       {"object_type": "Control", "object_id": 5, "limit": "-5,-1"},
+      {"object_type": "Control", "object_id": 5, "order_by": "not enough"},
   )
   def test_invalid_parameters(self, query_string):
     """Test invalid query parameters {0}."""
@@ -89,9 +90,10 @@ class TestRelatedAssessments(TestCase):
     self.assertEqual(len(response), expected_count)
 
   @ddt.data(
-      ({"order_by": "title"}, ["A_1", "A_2"]),
       ({"order_by": "title,asc"}, ["A_1", "A_2"]),
       ({"order_by": "title,desc"}, ["A_2", "A_1"]),
+      ({"order_by": "description,asc,title,asc"}, ["A_1", "A_2"]),
+      ({"order_by": "description,desc,title,desc"}, ["A_2", "A_1"]),
   )
   @ddt.unpack
   def test_order_by_clause(self, order_by, titles_order):
