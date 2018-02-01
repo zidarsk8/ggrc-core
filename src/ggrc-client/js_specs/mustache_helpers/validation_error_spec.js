@@ -18,8 +18,8 @@ describe('can.mustache.helper.validation_error', function () {
       fn: jasmine.createSpy('options.fn'),
       inverse: jasmine.createSpy('options.inverse'),
       contexts: {
-        add: jasmine.createSpy('contexts.add')
-      }
+        add: jasmine.createSpy('contexts.add'),
+      },
     };
   });
 
@@ -27,7 +27,7 @@ describe('can.mustache.helper.validation_error', function () {
     'property',
     function () {
       let validationErrors = {
-        'property_name.1': ['invalid value']
+        'property_name.1': ['invalid value'],
       };
       helper(validationErrors, 'property_name.1', fakeOptions);
       expect(fakeOptions.fn).toHaveBeenCalled();
@@ -39,7 +39,7 @@ describe('can.mustache.helper.validation_error', function () {
     function () {
       let validationErrors = {
         'property_name.1': ['invalid  date format'],
-        'property_name.4': ['value is too short', 'not a number']
+        'property_name.4': ['value is too short', 'not a number'],
       };
       helper(validationErrors, 'property_name.4', fakeOptions);
       expect(fakeOptions.contexts.add).toHaveBeenCalledWith(
@@ -52,7 +52,7 @@ describe('can.mustache.helper.validation_error', function () {
     'property',
     function () {
       let validationErrors = {
-        'property_name.4': ['invalid value']
+        'property_name.4': ['invalid value'],
       };
       helper(validationErrors, 'property_name', fakeOptions);
       expect(fakeOptions.inverse).toHaveBeenCalled();

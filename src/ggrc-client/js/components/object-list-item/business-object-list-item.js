@@ -19,26 +19,26 @@ import template from './business-object-list-item.mustache';
       instance: {},
       define: {
         type: {
-          type: String
+          type: String,
         },
         isSnapshot: {
           get: function () {
             return this.attr('instance.type') === 'Snapshot';
-          }
+          },
         },
         iconCls: {
           get: function () {
             return !this.attr('isSnapshot') ?
             'fa-' + this.attr('instance.type').toLowerCase() :
             'fa-' + this.attr('instance.child_type').toLowerCase();
-          }
+          },
         },
         itemData: {
           get: function () {
             return !this.attr('isSnapshot') ?
               this.attr('instance') :
               this.attr('instance.revision.content');
-          }
+          },
         },
         itemTitle: {
           get: function () {
@@ -47,9 +47,9 @@ import template from './business-object-list-item.mustache';
               this.attr('itemData.name') ||
               this.attr('itemData.email') ||
               '<span class="empty-message">None</span>';
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   });
 })(window.can, window.GGRC);

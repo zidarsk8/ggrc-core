@@ -30,7 +30,7 @@ describe('CMS.Controllers.TreeView', function () {
         element: $element,
         widget_hidden: jasmine.createSpy('widget_hidden'),
         widget_shown: jasmine.createSpy('widget_shown'),
-        options: new can.Map(options)
+        options: new can.Map(options),
       };
 
       method = Ctrl.prototype.init.bind(ctrlInst);

@@ -18,7 +18,7 @@ describe('CMS.Models.CustomAttributeDefinition', function () {
 
     beforeEach(function () {
       instance = new can.Map({
-        attribute_type: 'Dropdown'
+        attribute_type: 'Dropdown',
       });
       validator = Model._customValidators.multiChoiceOptions.bind(instance);
     });

@@ -41,7 +41,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
           content_controller_options: {
             instance: instance,
             model: instance.constructor,
-            widget_view: widgetView || defaultInfoWidgetView
+            widget_view: widgetView || defaultInfoWidgetView,
           },
           order: 5,
           uncountable: true,
@@ -67,7 +67,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
           content_controller_options: {
             instance: instance,
             model: instance.constructor,
-            widget_view: widgetView || defaultView
+            widget_view: widgetView || defaultView,
           },
           order: 3,
           uncountable: true,
@@ -90,7 +90,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
           content_controller_options: {
             instance: instance,
             model: instance.constructor,
-            widget_view: widgetView || defaultView
+            widget_view: widgetView || defaultView,
           },
           order: 6,
           uncountable: true,
@@ -156,8 +156,8 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
           draw_children: true,
           parent_instance: instance,
           model: farModel,
-          objectVersion: objectVersionConfig.isObjectVersion
-        }
+          objectVersion: objectVersionConfig.isObjectVersion,
+        },
       };
 
       $.extend.apply($, [true, descriptor].concat(extenders || []));
@@ -190,6 +190,6 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
       $.extend(ret, opts);
       GGRC.widget_descriptors[id] = ret;
       return ret;
-    }
+    },
   }, {});
 })(window.can.$, window.CMS, window.GGRC);

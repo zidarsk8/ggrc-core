@@ -15,7 +15,7 @@ export default function (completeTransaction, timeout, sequentially) {
 
   let sequence = {
     transactionDfd: can.Deferred().resolve(),
-    callbackAdded: false
+    callbackAdded: false,
   };
 
   function runBatch(batch) {
@@ -86,7 +86,7 @@ export default function (completeTransaction, timeout, sequentially) {
     let dfd = can.Deferred();
     deferredQueue.push({
       deferred: dfd,
-      action: action
+      action: action,
     });
 
     if (sequentially) {

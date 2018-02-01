@@ -76,7 +76,7 @@
     let config = {
       attributes: true,
       childList: true,
-      characterData: true
+      characterData: true,
     };
 
     if (target) {
@@ -135,12 +135,12 @@
           html: true,
           delay: {
             show: 400,
-            hide: 200
+            hide: 200,
           },
           trigger: 'manual',
           content: function () {
             return content;
-          }
+          },
         });
         target.data('popover').tip()
           .addClass('person-tooltip')

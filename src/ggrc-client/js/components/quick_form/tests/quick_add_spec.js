@@ -24,7 +24,7 @@ describe('GGRC.Components.quickAdd', function () {
       modal_description: 'newDescription',
       modal_confirm: 'button',
       modal_title: 'title',
-      button_view: '/static/mustache/quick_form/confirm_buttons.mustache'
+      button_view: '/static/mustache/quick_form/confirm_buttons.mustache',
     };
     let verifyDfd;
 
@@ -35,15 +35,15 @@ describe('GGRC.Components.quickAdd', function () {
         modal_description: 'oldDescription',
         verify_event: false,
         modal_title: 'title',
-        modal_button: 'button'
+        modal_button: 'button',
       });
       element = {
         context: {
           attributes: {
             modal_description: {value: 'newDescription'},
-            verify_event: true
-          }
-        }
+            verify_event: true,
+          },
+        },
       };
       verifyDfd = can.Deferred();
       spyOn(can, 'Deferred')
@@ -55,7 +55,7 @@ describe('GGRC.Components.quickAdd', function () {
       spyOn(ModalsUtils, 'confirm');
       handler.call({
         viewModel: scope,
-        element: element
+        element: element,
       });
       expect(ModalsUtils.confirm)
         .toHaveBeenCalledWith(expectedParam,
@@ -66,7 +66,7 @@ describe('GGRC.Components.quickAdd', function () {
       element.context.attributes.verify_event = false;
       handler.call({
         viewModel: scope,
-        element: element
+        element: element,
       });
       expect(ModalsUtils.confirm)
         .not.toHaveBeenCalled();
@@ -77,7 +77,7 @@ describe('GGRC.Components.quickAdd', function () {
           .and.returnValue(verifyDfd.reject());
         handler.call({
           viewModel: scope,
-          element: element
+          element: element,
         });
         expect(scope.attr('disabled')).toEqual(false);
       });

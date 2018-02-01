@@ -23,8 +23,6 @@ describe('GGRC.query_parser', function () {
     it('parses an empty query', function () {
       let emptyResult = {
         expression: {},
-        keys: [],
-        order_by: {keys: [], order: '', compare: null},
       };
 
       expect(GGRC.query_parser.parse('')).toEqual(emptyResult);
@@ -52,8 +50,6 @@ describe('GGRC.query_parser', function () {
             text: text,
             op: {name: 'exclude_text_search'},
           },
-          order_by: {keys: [], order: '', compare: null},
-          keys: [],
         });
       });
     });
@@ -80,8 +76,6 @@ describe('GGRC.query_parser', function () {
             text: text,
             op: {name: 'text_search'},
           },
-          order_by: {keys: [], order: '', compare: null},
-          keys: [],
         });
       });
     });
@@ -115,8 +109,6 @@ describe('GGRC.query_parser', function () {
               op: {name: op},
               right: query[1].trim().replace(/"/g, ''),
             },
-            order_by: {keys: [], order: '', compare: null},
-            keys: [query[0].trim().replace(/"/g, '')],
           });
         });
       });
@@ -129,26 +121,7 @@ describe('GGRC.query_parser', function () {
           op: {name: 'is'},
           right: 'empty',
         },
-        order_by: {keys: [], order: '', compare: null},
-        keys: ['5words'],
       });
-    });
-    it('works with order by statement', function () {
-      expect(GGRC.query_parser
-        .parse('5words ~ just order by some,"name with spaces" desc'))
-        .toEqual({
-          expression: {
-            left: '5words',
-            op: {name: '~'},
-            right: 'just',
-          },
-          order_by: {
-            keys: ['some', 'name with spaces'],
-            order: 'desc',
-            compare: jasmine.any(Function),
-          },
-          keys: ['5words'],
-        });
     });
 
     it('parses \'or\' queries', () => {
@@ -169,8 +142,6 @@ describe('GGRC.query_parser', function () {
               op: {name: 'OR'},
               right: {left: 'n', op: {name: '='}, right: '5'},
             },
-            order_by: {keys: [], order: '', compare: null},
-            keys: ['n'],
           });
       });
     });
@@ -193,8 +164,6 @@ describe('GGRC.query_parser', function () {
               op: {name: 'AND'},
               right: {left: 'n', op: {name: '='}, right: '5'},
             },
-            order_by: {keys: [], order: '', compare: null},
-            keys: ['n'],
           });
       });
     });
@@ -207,8 +176,6 @@ describe('GGRC.query_parser', function () {
             op: {name: 'relevant'},
             ids: ['1', '2', '3', '4'],
           },
-          order_by: {keys: [], order: '', compare: null},
-          keys: [],
         });
 
       expect(GGRC.query_parser.parse('#SomeClass,1,2,3,4# or #A,1# and #B,2#'))
@@ -234,8 +201,6 @@ describe('GGRC.query_parser', function () {
               },
             },
           },
-          order_by: {keys: [], order: '', compare: null},
-          keys: [],
         });
 
       expect(GGRC.query_parser.parse('#SomeClass,1,2,3,4# or #A,1#'))
@@ -253,8 +218,6 @@ describe('GGRC.query_parser', function () {
               ids: ['1'],
             },
           },
-          order_by: {keys: [], order: '', compare: null},
-          keys: [],
         });
     });
 
@@ -271,8 +234,6 @@ describe('GGRC.query_parser', function () {
             op: {name: 'AND'},
             right: {left: 'bacon ipsum', op: {name: '!~'}, right: 'bacon'},
           },
-          order_by: {keys: [], order: '', compare: null},
-          keys: ['bacon ipsum', 'n'],
         });
 
       expect(GGRC.query_parser
@@ -287,8 +248,6 @@ describe('GGRC.query_parser', function () {
             op: {name: 'AND'},
             right: {left: 'bacon ipsum', op: {name: '!~'}, right: 'bacon'},
           },
-          order_by: {keys: [], order: '', compare: null},
-          keys: ['bacon ipsum', 'n'],
         });
 
       expect(GGRC.query_parser
@@ -303,8 +262,6 @@ describe('GGRC.query_parser', function () {
               right: {left: 'bacon ipsum', op: {name: '~'}, right: 'bacon'},
             },
           },
-          order_by: {keys: [], order: '', compare: null},
-          keys: ['bacon ipsum', 'n'],
         });
 
       expect(GGRC.query_parser
@@ -315,8 +272,6 @@ describe('GGRC.query_parser', function () {
             op: {name: 'AND'},
             right: {left: 'bacon ipsum', op: {name: '!~'}, right: 'bacon'},
           },
-          order_by: {keys: [], order: '', compare: null},
-          keys: ['bacon ipsum'],
         });
 
       expect(GGRC.query_parser
@@ -327,8 +282,6 @@ describe('GGRC.query_parser', function () {
             op: {name: 'OR'},
             right: {text: 'bacon ipsum', op: {name: 'text_search'}},
           },
-          order_by: {keys: [], order: '', compare: null},
-          keys: ['hello'],
         });
     });
 

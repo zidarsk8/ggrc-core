@@ -26,7 +26,7 @@
       context: "CMS.Models.Context.stub",
       program: "CMS.Models.Program.stub",
       modified_by: "CMS.Models.Person.stub",
-      custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
+      custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
     },
     tree_view_options: {
       attr_list: [
@@ -37,15 +37,15 @@
         {
           attr_title: 'Risk Manager',
           attr_name: 'ra_manager',
-          attr_sort_field: 'ra_manager'
+          attr_sort_field: 'ra_manager',
         },
         {
           attr_title: 'Risk Counsel',
           attr_name: 'ra_counsel',
-          attr_sort_field: 'ra_counsel'
-        }
+          attr_sort_field: 'ra_counsel',
+        },
       ],
-      add_item_view: path + '/tree_add_item.mustache'
+      add_item_view: path + '/tree_add_item.mustache',
     },
     sub_tree_view_options: {
       default_filter: ['Program'],
@@ -55,7 +55,7 @@
       this.validateNonBlank("title");
       this.validateNonBlank("start_date");
       this.validateNonBlank("end_date");
-    }
+    },
   }, {
     save: function () {
       // Make sure the context is always set to the parent program
@@ -63,7 +63,7 @@
         this.attr('context', this.program.reify().context);
       }
       return this._super.apply(this, arguments);
-    }
+    },
   });
 
 })(window.can);

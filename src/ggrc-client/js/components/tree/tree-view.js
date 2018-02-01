@@ -15,8 +15,8 @@ import template from './templates/tree-view.mustache';
         type: Boolean,
         get: function () {
           return !this.attr('loading') && !this.attr('items').length;
-        }
-      }
+        },
+      },
     },
     items: [],
     parentInstance: null,
@@ -31,7 +31,7 @@ import template from './templates/tree-view.mustache';
     _loader: null,
     makeResult: function (instance) {
       return this.attr('_loader').getResultFromMapping(instance);
-    }
+    },
   });
 
   GGRC.Components('treeView', {
@@ -46,7 +46,7 @@ import template from './templates/tree-view.mustache';
 
         this.viewModel.attr('_loader',
           new GGRC.ListLoaders.TreeBaseLoader(model, parentInstance, mapping));
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

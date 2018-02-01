@@ -22,7 +22,7 @@
           self.attr('instance.' + args.propName, oldValue);
           GGRC.Errors.notifier('error', 'Unable to save changes.');
         });
-      }
-    }
+      },
+    },
   });
 })(window.can);

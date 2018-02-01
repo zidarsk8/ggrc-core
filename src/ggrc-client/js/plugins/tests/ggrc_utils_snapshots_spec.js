@@ -12,7 +12,7 @@ describe('SnapshotUtils', function () {
     beforeEach(function () {
       instance = {
         type: 'Snapshot',
-        viewLink: '/snapshots/123'
+        viewLink: '/snapshots/123',
       };
     });
 
@@ -38,7 +38,7 @@ describe('SnapshotUtils', function () {
       function () {
         let relevantInstance = {
           type: 'Assessment',
-          viewLink: '/assessments/123'
+          viewLink: '/assessments/123',
         };
         let childId = 10;
         let childType = 'Control';
@@ -78,17 +78,17 @@ describe('SnapshotUtils', function () {
         child_type: 'Control',
         parent: {
           id: 1,
-          type: 'Audit'
+          type: 'Audit',
         },
         revision: {
           content: {
             access_control_list: [
               {ac_role_id: 10, person_id: 4},
               {ac_role_id: 17, person_id: 2},
-              {ac_role_id: 12, person_id: 4}
-            ]
-          }
-        }
+              {ac_role_id: 12, person_id: 4},
+            ],
+          },
+        },
       };
     });
 

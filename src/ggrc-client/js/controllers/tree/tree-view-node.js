@@ -37,8 +37,8 @@ import {
       expanded: false,
       subTreeLoading: false,
       draw_children: true,
-      child_options: []
-    }
+      child_options: [],
+    },
   }, {
     setup: function (el, opts) {
       let that = this;
@@ -73,7 +73,7 @@ import {
         this.options.child_options.each(function (option) {
           option.attr({
             parent: this,
-            parent_instance: this.options.instance
+            parent_instance: this.options.instance,
           });
         }.bind(this));
       }
@@ -212,7 +212,7 @@ import {
             options_property: this.options.options_property,
             single_object: false,
             parent: this,
-            parent_instance: this.options.instance
+            parent_instance: this.options.instance,
           });
           newChildList.push(options);
         }.bind(this));
@@ -441,6 +441,6 @@ import {
 
       window.location.hash = [hash,
         this.hash_fragment()].join('');
-    }
+    },
   });
 })(window.can, window.$);

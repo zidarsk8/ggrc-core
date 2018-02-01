@@ -14,26 +14,26 @@ describe('GGRC.Components.accessControlListRolesHelper', function () {
         object_type: 'Assessment',
         id: 5,
         name: 'Admin',
-        default_to_current_user: true
+        default_to_current_user: true,
       },
       {
         object_type: 'Control',
         id: 6,
         name: 'Primary Contact',
-        default_to_current_user: true
+        default_to_current_user: true,
       },
       {
         object_type: 'Assessment',
         id: 7,
         name: 'SuperAdmin',
-        default_to_current_user: true
+        default_to_current_user: true,
       },
       {
         object_type: 'Assessment',
         id: 8,
         name: 'Primary contacts',
-        default_to_current_user: false
-      }
+        default_to_current_user: false,
+      },
     ];
   });
 

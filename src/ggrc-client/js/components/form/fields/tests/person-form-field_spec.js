@@ -34,13 +34,13 @@ describe('GGRC.Components.personFormField', function () {
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 1,
-      value: viewModel.attr('_value')
+      value: viewModel.attr('_value'),
     });
     viewModel.attr('_value', 2);
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 1,
-      value: viewModel.attr('_value')
+      value: viewModel.attr('_value'),
     });
   });
 
@@ -52,7 +52,7 @@ describe('GGRC.Components.personFormField', function () {
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 1,
-      value: null
+      value: null,
     });
   });
 });

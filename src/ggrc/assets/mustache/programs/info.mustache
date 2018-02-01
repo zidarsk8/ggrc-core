@@ -22,7 +22,12 @@
               {{>'/static/mustache/base_objects/object-review.mustache'}}
               {{>'/static/mustache/base_objects/description.mustache'}}
               {{>'/static/mustache/base_objects/notes.mustache'}}
-              {{{render '/static/mustache/base_objects/contacts.mustache' is_program=true instance=instance}}}
+              <div class="row-fluid wrap-row">
+                <div data-test-id="title_manager_7a906d2e">
+                  <custom-roles {read-only}="instance.readOnlyProgramRoles" {include-roles}="instance.class.programRoles" {instance}="instance"></custom-roles>
+                  <custom-roles {exclude-roles}="instance.class.programRoles" {instance}="instance"></custom-roles>
+                </div>
+              </div>
               {{{render '/static/mustache/base_objects/urls.mustache' is_program=true instance=instance}}}
 
               <div class="custom-attr-wrap info-pane__section">

@@ -218,4 +218,23 @@ describe('CMS.Models.Assessment', function () {
       checkAcRoles(model, 12, []);
     });
   });
+
+  describe('getRelatedObjects() method', () => {
+    beforeEach(() => {
+      spyOn($, 'get').and.returnValue(can.Deferred().resolve({
+        Audit: {
+          title: 'FooBar',
+        },
+      }));
+    });
+
+    it('adds an audit title', (done) => {
+      const model = new CMS.Models.Assessment({audit: {id: 123}});
+
+      model.getRelatedObjects().then(() => {
+        expect(model.attr('audit.title')).toBe('FooBar');
+        done();
+      });
+    });
+  });
 });

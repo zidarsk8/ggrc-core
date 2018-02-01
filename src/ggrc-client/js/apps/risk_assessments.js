@@ -13,7 +13,7 @@
   // Register RA models for use with `infer_object_type`
   RiskAssessmentsExtension.object_type_decision_tree = function () {
     return {
-      risk_assessment: CMS.Models.RiskAssessment
+      risk_assessment: CMS.Models.RiskAssessment,
     };
   };
 
@@ -29,7 +29,7 @@
     let mappings = {
       Program: {
         risk_assessments: Direct('RiskAssessment',
-          'program', 'risk_assessments')
+          'program', 'risk_assessments'),
       },
       RiskAssessment: {
         related_objects_as_source: Proxy(
@@ -48,8 +48,8 @@
         destinations: Direct('Relationship', 'source', 'related_destinations'),
         sources: Direct('Relationship', 'destination', 'related_sources'),
         cycle_task_group_object_tasks: TypeFilter('related_objects',
-          'CycleTaskGroupObjectTask')
-      }
+          'CycleTaskGroupObjectTask'),
+      },
     };
     new GGRC.Mappings('ggrc_risk_assessments', mappings);
   };
@@ -81,9 +81,9 @@
             parent_instance: page_instance,
             model: CMS.Models.RiskAssessment,
             draw_children: true,
-            allow_mapping: false
-          }
-        }
+            allow_mapping: false,
+          },
+        },
       };
     }
     new GGRC.WidgetList('ggrc_risk_assessments', descriptor);

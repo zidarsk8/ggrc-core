@@ -30,16 +30,16 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
       setRefreshFlag: jasmine.createSpy('setRefreshFlag'),
       display: jasmine.createSpy('display'),
       model: {
-        model_singular: 'Control'
-      }
+        model_singular: 'Control',
+      },
     };
     _.extend(updaterViewModel, {
       instance: new can.Map({
         title: 'TITLE',
         refresh: jasmine
           .createSpy('refresh'),
-        save: jasmine.createSpy('save')
-      })
+        save: jasmine.createSpy('save'),
+      }),
     });
     spyOn($.prototype, 'viewModel').and.returnValue(containerVM);
   });
@@ -66,10 +66,10 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
           jasmine.objectContaining({
             instance: updaterViewModel.instance,
             button_view: ModalsUtils.BUTTON_VIEW_CONFIRM_CANCEL,
-            skip_refresh: true
+            skip_refresh: true,
           }),
           jasmine.any(Function),
-          jasmine.any(Function)
+          jasmine.any(Function),
         ]);
       });
     });
@@ -142,10 +142,10 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
 
       it('sets snapshots attr for the instance', function () {
         let expectedResult = {
-          operation: 'upsert'
+          operation: 'upsert',
         };
         let wrongValue = {
-          operation: 'wrongValue'
+          operation: 'wrongValue',
         };
         updaterViewModel.instance.attr('snapshots', wrongValue);
         method();

@@ -2,43 +2,47 @@
     Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-
-<related-documents {instance}="instance" document-type="EVIDENCE">
-    <h6>{{title}}</h6>
-        <ggrc-gdrive-folder-picker hide-label="true"
-                                    readonly="readonly"
-                                    instance="instance"
-                                    {(is-revision-folder-loaded)}="isRevisionFolderLoaded"
-                                    {(current_folder)}="currentFolder"
-                                    {(folder_error)}="folderError"
-        ></ggrc-gdrive-folder-picker>
-    {{^if_null instance._mandatory_attachment_msg}}
-        <div class="alert alert-info alert-dismissible" role="alert">
-            {{instance._mandatory_attachment_msg}}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">&times;</button>
+<div class="folder-attachments-list">
+    <related-documents {instance}="instance" document-type="EVIDENCE" {^is-loading}="isListLoading">
+        <div class="folder-attachments-list__heading">
+            <spinner class="folder-attachments-list__spinner" {toggle}="showSpinner"></spinner>
+            <h6>{{title}}</h6>
         </div>
-    {{/if_null}}
+            <ggrc-gdrive-folder-picker hide-label="true"
+                                        readonly="readonly"
+                                        instance="instance"
+                                        {(is-revision-folder-loaded)}="isRevisionFolderLoaded"
+                                        {(current_folder)}="currentFolder"
+                                        {(folder_error)}="folderError"
+            ></ggrc-gdrive-folder-picker>
+        {{^if_null instance._mandatory_attachment_msg}}
+            <div class="alert alert-info alert-dismissible" role="alert">
+                {{instance._mandatory_attachment_msg}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">&times;</button>
+            </div>
+        {{/if_null}}
 
-    {{#if subLabel}}
-        <span class="sub-label">
-            {{subLabel}}:
-        </span>
-    {{/if}}
+        {{#if subLabel}}
+            <span class="sub-label">
+                {{subLabel}}:
+            </span>
+        {{/if}}
 
-    <object-list {items}="documents" {empty-message}="noItemsText">
-        <editable-document-object-list-item {document}="{.}">
-        {{#unless readonly}}
-            <unmap-button
-                (unmapped)="loadDocuments()"
-                {destination}="instance"
-                {source}="document">
-                <action-toolbar-control>
-                <i class="fa fa-trash"></i>
-                </action-toolbar-control>
-            </unmap-button>
-        {{/unless}}
-        </editable-document-object-list-item>
-    </object-list>
+        <object-list {items}="documents" {empty-message}="noItemsText">
+            <editable-document-object-list-item {document}="{.}">
+            {{#unless readonly}}
+                <unmap-button
+                    (unmapped)="loadDocuments()"
+                    {destination}="instance"
+                    {source}="document"
+                    {^is-unmapping} = "../../../../isUnmapping">
+                    <action-toolbar-control>
+                    <i class="fa fa-trash"></i>
+                    </action-toolbar-control>
+                </unmap-button>
+            {{/unless}}
+            </editable-document-object-list-item>
+        </object-list>
 
     {{#unless readonly}}
         {{#is_allowed 'update' instance context='for'}}
@@ -48,7 +52,8 @@
                             instance="instance"
                             {items-uploaded-callback}="@loadDocuments"
                             click_event="trigger_upload_parent"
-                            {tooltip}=tooltip>
+                            {tooltip}="tooltip"
+                            {^is-uploading}="../isUploading">
                         Attach
                     </ggrc-gdrive-picker-launcher>
                 {{else}}
@@ -57,12 +62,14 @@
                                 instance="instance"
                                 {items-uploaded-callback}="@loadDocuments"
                                 click_event="trigger_upload"
-                                {tooltip}=tooltip>
+                                {tooltip}="tooltip"
+                                {^is-uploading}="../isUploading">
                                 Attach
                         </ggrc-gdrive-picker-launcher>
+                        {{/if}}
                     {{/if}}
-                {{/if}}
-            </span>
-        {{/is_allowed}}
-    {{/unless}}
-</related-documents>
+                </span>
+            {{/is_allowed}}
+        {{/unless}}
+    </related-documents>
+</div>

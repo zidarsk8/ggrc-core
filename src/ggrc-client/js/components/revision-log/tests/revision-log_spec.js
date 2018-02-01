@@ -62,11 +62,11 @@ describe('GGRC.Components.revisionLog', function () {
 
         let fetchedRevisions = new can.Map({
           object: new can.List([
-            {id: 10}
+            {id: 10},
           ]),
           mappings: new can.List([
-            {id: 20}
-          ])
+            {id: 20},
+          ]),
         });
 
         let mapChange = {updatedAt: new Date('2015-12-21')};
@@ -132,20 +132,20 @@ describe('GGRC.Components.revisionLog', function () {
       let result;
 
       let revisions = [
-        {id: 10}, {id: 20}, {id: 30}
+        {id: 10}, {id: 20}, {id: 30},
       ];
 
       let diff = {
         madeBy: 'John',
         changes: [
-          {fieldName: 'foo'}
-        ]
+          {fieldName: 'foo'},
+        ],
       };
       let diff2 = {
         madeBy: 'Doe',
         changes: [
-          {fieldName: 'bar'}
-        ]
+          {fieldName: 'bar'},
+        ],
       };
 
       spyOn(viewModel, '_objectChangeDiff').and.returnValues(diff, diff2);
@@ -164,11 +164,11 @@ describe('GGRC.Components.revisionLog', function () {
         let result;
 
         let revisions = [
-          {id: 10}, {id: 20}
+          {id: 10}, {id: 20},
         ];
 
         let diff = {
-          changes: []
+          changes: [],
         };
         spyOn(viewModel, '_objectChangeDiff').and.returnValue(diff);
 
@@ -201,12 +201,12 @@ describe('GGRC.Components.revisionLog', function () {
       let rev1 = {
         updated_at: '2016-01-24T10:05:42',
         modified_by: 'User 1',
-        content: {}
+        content: {},
       };
       let rev2 = {
         updated_at: '2016-01-30T08:15:11',
         modified_by: 'User 1',
-        content: {}
+        content: {},
       };
 
       let result = viewModel._objectChangeDiff(rev1, rev2);
@@ -218,12 +218,12 @@ describe('GGRC.Components.revisionLog', function () {
       let rev1 = {
         updated_at: '2016-01-24T10:05:42',
         modified_by: 'User 6',
-        content: {}
+        content: {},
       };
       let rev2 = {
         updated_at: '2016-01-30T08:15:11',
         modified_by: 'User 7',
-        content: {}
+        content: {},
       };
 
       let result = viewModel._objectChangeDiff(rev1, rev2);
@@ -236,12 +236,12 @@ describe('GGRC.Components.revisionLog', function () {
         let rev1 = {
           updated_at: '2016-01-24T10:05:42',
           modified_by: 'User 6',
-          content: {}
+          content: {},
         };
         let rev2 = {
           updated_at: '2016-01-30T08:15:11',
           modified_by: 'User 7',
-          content: {}
+          content: {},
         };
 
         let result = viewModel._objectChangeDiff(rev1, rev2);
@@ -253,12 +253,12 @@ describe('GGRC.Components.revisionLog', function () {
       let rev1 = {
         updated_at: '2016-01-24T10:05:42',
         modified_by: 'User 6',
-        content: {}
+        content: {},
       };
       let rev2 = {
         updated_at: '2016-01-30T08:15:11',
         modified_by: null,
-        content: {}
+        content: {},
       };
 
       let result = viewModel._objectChangeDiff(rev1, rev2);
@@ -273,7 +273,7 @@ describe('GGRC.Components.revisionLog', function () {
         let expectedChange = {
           fieldName: 'Object Name',
           origVal: 'Audit 1.0',
-          newVal: 'My Audit 1.0'
+          newVal: 'My Audit 1.0',
         };
 
         let rev1 = {
@@ -281,32 +281,32 @@ describe('GGRC.Components.revisionLog', function () {
           modified_by: {
             reify: function () {
               return 'User 5';
-            }
+            },
           },
           resource_type: 'Audit',
           content: {
-            title: 'Audit 1.0'
-          }
+            title: 'Audit 1.0',
+          },
         };
         let rev2 = {
           updated_at: '2016-01-30T13:22:59',
           modified_by: {
             reify: function () {
               return 'User 5';
-            }
+            },
           },
           resource_type: 'Audit',
           content: {
-            title: 'My Audit 1.0'
-          }
+            title: 'My Audit 1.0',
+          },
         };
         let result;
 
         GGRC.model_attr_defs = {
           Audit: [
             {attr_name: 'title', display_name: 'Object Name'},
-            {attr_name: 'fake_list', display_name: 'Fake List'}
-          ]
+            {attr_name: 'fake_list', display_name: 'Fake List'},
+          ],
         };
         result = viewModel._objectChangeDiff(rev1, rev2);
 
@@ -320,38 +320,38 @@ describe('GGRC.Components.revisionLog', function () {
             modified_by: {
               reify: function () {
                 return 'User 5';
-              }
+              },
             },
             resource_type: 'Audit',
             content: {
-              fake_list: 'foo,,bar,'
-            }
+              fake_list: 'foo,,bar,',
+            },
           };
           let rev2 = {
             updated_at: '2016-01-30T13:22:59',
             modified_by: {
               reify: function () {
                 return 'User 5';
-              }
+              },
             },
             resource_type: 'Audit',
             content: {
-              fake_list: ',,bar,baz'
-            }
+              fake_list: ',,bar,baz',
+            },
           };
           let result;
           GGRC.model_attr_defs = {
             Audit: [
               {attr_name: 'title', display_name: 'Object Name'},
-              {attr_name: 'fake_list', display_name: 'Fake List'}
-            ]
+              {attr_name: 'fake_list', display_name: 'Fake List'},
+            ],
           };
           result = viewModel._objectChangeDiff(rev1, rev2);
 
           expect(result.changes[0]).toEqual({
             fieldName: 'Fake List',
             origVal: 'foo, bar',
-            newVal: 'bar, baz'
+            newVal: 'bar, baz',
           });
         }
       );
@@ -364,31 +364,31 @@ describe('GGRC.Components.revisionLog', function () {
       let oldDefs = [];
       let newValues = [{
         custom_attribute_id: 1,
-        attribute_value: 'custom value'
+        attribute_value: 'custom value',
       }];
       let newDefs = [{
         id: 1,
         title: 'CA',
-        attribute_type: 'text'
+        attribute_type: 'text',
       }];
       let result = viewModel
         ._objectCADiff(oldValues, oldDefs, newValues, newDefs);
       expect(result).toEqual([{
         fieldName: 'CA',
         origVal: '—',
-        newVal: 'custom value'
+        newVal: 'custom value',
       }]);
     });
 
     it('detects unset attributes', function () {
       let oldValues = [{
         custom_attribute_id: 1,
-        attribute_value: 'custom value'
+        attribute_value: 'custom value',
       }];
       let oldDefs = [{
         id: 1,
         title: 'CA',
-        attribute_type: 'text'
+        attribute_type: 'text',
       }];
       let newValues = [];
       let newDefs = [];
@@ -397,45 +397,45 @@ describe('GGRC.Components.revisionLog', function () {
       expect(result).toEqual([{
         fieldName: 'CA',
         origVal: 'custom value',
-        newVal: '—'
+        newVal: '—',
       }]);
     });
 
     it('detects multiple changed attributes', function () {
       let oldValues = [{
         custom_attribute_id: 1,
-        attribute_value: 'v1'
+        attribute_value: 'v1',
       }, {
         custom_attribute_id: 2,
-        attribute_value: 'v2'
+        attribute_value: 'v2',
       }, {
         custom_attribute_id: 3,
-        attribute_value: 'v3'
+        attribute_value: 'v3',
       }];
 
       let oldDefs = [{
         id: 1,
         title: 'CA1',
-        attribute_type: 'text'
+        attribute_type: 'text',
       }, {
         id: 2,
         title: 'CA2',
-        attribute_type: 'text'
+        attribute_type: 'text',
       }, {
         id: 3,
         title: 'CA3',
-        attribute_type: 'text'
+        attribute_type: 'text',
       }];
 
       let newValues = [{
         custom_attribute_id: 1,
-        attribute_value: 'v3'
+        attribute_value: 'v3',
       }, {
         custom_attribute_id: 2,
-        attribute_value: 'v4'
+        attribute_value: 'v4',
       }, {
         custom_attribute_id: 3,
-        attribute_value: 'v3'
+        attribute_value: 'v3',
       }];
 
       let result = viewModel
@@ -443,12 +443,29 @@ describe('GGRC.Components.revisionLog', function () {
       expect(result).toEqual([{
         fieldName: 'CA1',
         origVal: 'v1',
-        newVal: 'v3'
+        newVal: 'v3',
       }, {
         fieldName: 'CA2',
         origVal: 'v2',
-        newVal: 'v4'
+        newVal: 'v4',
       }]);
+    });
+
+    it('should not return diffs if definitions are empty', () => {
+      const defs = [];
+      const oldValues = [{
+        custom_attribute_id: 1,
+        attribute_value: 'v1',
+      }];
+
+      const newValues = [{
+        custom_attribute_id: 1,
+        attribute_value: 'v3',
+      }];
+
+      const result = viewModel
+        ._objectCADiff(oldValues, defs, newValues, defs);
+      expect(result.length).toBe(0);
     });
   });
 
@@ -465,7 +482,7 @@ describe('GGRC.Components.revisionLog', function () {
       // instance context
       viewModel.attr('instance', {
         id: 123,
-        type: 'ObjectFoo'
+        type: 'ObjectFoo',
       });
       viewModel._fetchEmbeddedRevisionData = function () {
         return can.Deferred().resolve([]);
@@ -502,7 +519,7 @@ describe('GGRC.Components.revisionLog', function () {
       expect(Revision.findAll).toHaveBeenCalledWith({
         resource_type: 'ObjectFoo',
         resource_id: 123,
-        __sort: 'updated_at'
+        __sort: 'updated_at',
       });
     });
 
@@ -514,7 +531,7 @@ describe('GGRC.Components.revisionLog', function () {
         expect(Revision.findAll).toHaveBeenCalledWith({
           source_type: 'ObjectFoo',
           source_id: 123,
-          __sort: 'updated_at'
+          __sort: 'updated_at',
         });
       }
     );
@@ -527,7 +544,7 @@ describe('GGRC.Components.revisionLog', function () {
         expect(Revision.findAll).toHaveBeenCalledWith({
           destination_type: 'ObjectFoo',
           destination_id: 123,
-          __sort: 'updated_at'
+          __sort: 'updated_at',
         });
       }
     );
@@ -537,13 +554,13 @@ describe('GGRC.Components.revisionLog', function () {
       let successHandler;
 
       let objRevisions = new can.List([
-        {revision: 'objFoo'}, {revision: 'objBar'}
+        {revision: 'objFoo'}, {revision: 'objBar'},
       ]);
       let mappingSrcRevisions = new can.List([
-        {revision: 'mappingSrcFoo'}
+        {revision: 'mappingSrcFoo'},
       ]);
       let mappingDestRevisions = new can.List([
-        {revision: 'mappingDestFoo'}
+        {revision: 'mappingDestFoo'},
       ]);
 
       successHandler = jasmine.createSpy().and.callFake(function (revisions) {
@@ -557,10 +574,10 @@ describe('GGRC.Components.revisionLog', function () {
         mappingsRevisions = _.map(mappingsRevisions, canMapToObject);
 
         expect(objRevisions).toEqual([
-          {revision: 'objFoo'}, {revision: 'objBar'}
+          {revision: 'objFoo'}, {revision: 'objBar'},
         ]);
         expect(mappingsRevisions).toEqual([
-          {revision: 'mappingSrcFoo'}, {revision: 'mappingDestFoo'}
+          {revision: 'mappingSrcFoo'}, {revision: 'mappingDestFoo'},
         ]);
       });
 
@@ -593,7 +610,7 @@ describe('GGRC.Components.revisionLog', function () {
       let result;
       let revisions = new can.List([
         {id: 10, madeBy: 'John'},
-        {id: 20, madeBy: 'Doe'}
+        {id: 20, madeBy: 'Doe'},
       ]);
 
       viewModel._mappingChange.and.callFake(function (revision) {
@@ -613,7 +630,7 @@ describe('GGRC.Components.revisionLog', function () {
     beforeAll(function () {
       viewModel.attr('instance', {
         id: 123,
-        type: 'ObjectFoo'
+        type: 'ObjectFoo',
       });
       spyOn(viewModel, '_getRoleAtTime').and.returnValue('none');
     });
@@ -635,10 +652,10 @@ describe('GGRC.Components.revisionLog', function () {
             },
             display_name: function () {
               return 'OtherObject';
-            }
+            },
           },
           source_id: 99,
-          source_type: 'OtherObject'
+          source_type: 'OtherObject',
         };
 
         let result = viewModel._mappingChange(revision, [revision]);
@@ -650,8 +667,8 @@ describe('GGRC.Components.revisionLog', function () {
           changes: {
             origVal: '—',
             newVal: 'Created',
-            fieldName: 'Mapping to Other: OtherObject'
-          }
+            fieldName: 'Mapping to Other: OtherObject',
+          },
         });
       }
     );
@@ -669,10 +686,10 @@ describe('GGRC.Components.revisionLog', function () {
             },
             display_name: function () {
               return 'OtherObject';
-            }
+            },
           },
           destination_id: 123,
-          destination_type: 'ObjectFoo'
+          destination_type: 'ObjectFoo',
         };
 
         let result = viewModel._mappingChange(revision, [revision]);
@@ -684,8 +701,8 @@ describe('GGRC.Components.revisionLog', function () {
           changes: {
             origVal: 'Created',
             newVal: 'Deleted',
-            fieldName: 'Mapping to Other: OtherObject'
-          }
+            fieldName: 'Mapping to Other: OtherObject',
+          },
         });
       }
     );
@@ -701,10 +718,10 @@ describe('GGRC.Components.revisionLog', function () {
           },
           display_name: function () {
             return 'OtherObject';
-          }
+          },
         },
         destination_id: 123,
-        destination_type: 'ObjectFoo'
+        destination_type: 'ObjectFoo',
       };
 
       let result = viewModel._mappingChange(revision, [revision]);
@@ -718,8 +735,8 @@ describe('GGRC.Components.revisionLog', function () {
         changes: {
           origVal: '—',
           newVal: '',
-          fieldName: 'Mapping to Other: OtherObject'
-        }
+          fieldName: 'Mapping to Other: OtherObject',
+        },
       });
     });
   });
@@ -730,15 +747,15 @@ describe('GGRC.Components.revisionLog', function () {
         {
           id: 10,
           modified_by: {
-            id: 166
-          }
-        }
+            id: 166,
+          },
+        },
       ]),
       mappings: new can.List([
         {
           id: 1,
           modified_by: {
-            id: 166
+            id: 166,
           },
           action: 'created',
           source_type: 'Person',
@@ -748,25 +765,25 @@ describe('GGRC.Components.revisionLog', function () {
           updated_at: new Date(2016, 0, 1),
           type: 'Revision',
           content: {
-            attrs: {}
-          }
-        }
-      ])
+            attrs: {},
+          },
+        },
+      ]),
     });
     let revisions = new can.Map({
       object: new can.List([
         {
           id: 10,
           modified_by: {
-            id: 166
-          }
-        }
+            id: 166,
+          },
+        },
       ]),
       mappings: new can.List([
         {
           id: 1,
           modified_by: {
-            id: 166
+            id: 166,
           },
           action: 'created',
           source_type: 'Person',
@@ -777,14 +794,14 @@ describe('GGRC.Components.revisionLog', function () {
           type: 'Revision',
           content: {
             attrs: {
-              AssigneeType: 'Requester,Assignee'
-            }
-          }
+              AssigneeType: 'Requester,Assignee',
+            },
+          },
         },
         {
           id: 2,
           modified_by: {
-            id: 166
+            id: 166,
           },
           action: 'modified',
           source_type: 'Person',
@@ -795,14 +812,14 @@ describe('GGRC.Components.revisionLog', function () {
           type: 'Revision',
           content: {
             attrs: {
-              AssigneeType: 'Requester,Assignee,Verifier'
-            }
-          }
+              AssigneeType: 'Requester,Assignee,Verifier',
+            },
+          },
         },
         {
           id: 3,
           modified_by: {
-            id: 166
+            id: 166,
           },
           action: 'modified',
           source_type: 'Person',
@@ -813,14 +830,14 @@ describe('GGRC.Components.revisionLog', function () {
           type: 'Revision',
           content: {
             attrs: {
-              AssigneeType: 'Requester'
-            }
-          }
+              AssigneeType: 'Requester',
+            },
+          },
         },
         {
           id: 4,
           modified_by: {
-            id: 166
+            id: 166,
           },
           action: 'deleted',
           source_type: 'Person',
@@ -831,11 +848,11 @@ describe('GGRC.Components.revisionLog', function () {
           type: 'Revision',
           content: {
             attrs: {
-              AssigneeType: 'Requester'
-            }
-          }
-        }
-      ])
+              AssigneeType: 'Requester',
+            },
+          },
+        },
+      ]),
     });
 
     beforeAll(function () {
@@ -846,41 +863,41 @@ describe('GGRC.Components.revisionLog', function () {
         'class': {
           assignable_list: [{
             type: 'requester',
-            mapping: 'related_requesters'
+            mapping: 'related_requesters',
           }, {
             type: 'assignee',
-            mapping: 'related_assignees'
+            mapping: 'related_assignees',
           }, {
             type: 'verifier',
-            mapping: 'related_verifiers'
-          }]
+            mapping: 'related_verifiers',
+          }],
         },
         get_binding: function (mappingName) {
           let bindingData = {
             related_requesters: {
               list: [
                 {
-                  instance: {id: 166}
-                }
-              ]
+                  instance: {id: 166},
+                },
+              ],
             },
             related_assignees: {
               list: [
                 {
-                  instance: {id: 166}
-                }
-              ]
+                  instance: {id: 166},
+                },
+              ],
             },
             related_verifiers: {
               list: [
                 {
-                  instance: {id: 166}
-                }
-              ]
-            }
+                  instance: {id: 166},
+                },
+              ],
+            },
           };
           return bindingData[mappingName];
-        }
+        },
       });
     });
 
@@ -892,8 +909,8 @@ describe('GGRC.Components.revisionLog', function () {
       expect(roleHistory).toEqual({
         '166': [{
           role: 'Verifier',
-          updated_at: new Date(2016, 0, 1)
-        }]
+          updated_at: new Date(2016, 0, 1),
+        }],
       });
     });
 
@@ -903,21 +920,21 @@ describe('GGRC.Components.revisionLog', function () {
         '166': [
           {
             updated_at: new Date(2016, 0, 1),
-            role: 'Assignee'
+            role: 'Assignee',
           },
           {
             updated_at: new Date(2016, 0, 2),
-            role: 'Verifier'
+            role: 'Verifier',
           },
           {
             updated_at: new Date(2016, 0, 4),
-            role: 'Requester'
+            role: 'Requester',
           },
           {
             updated_at: new Date(2016, 0, 5),
-            role: 'none'
-          }
-        ]
+            role: 'none',
+          },
+        ],
       });
     });
 
@@ -929,21 +946,21 @@ describe('GGRC.Components.revisionLog', function () {
         '166': [
           {
             updated_at: new Date(2016, 0, 1),
-            role: 'none'
+            role: 'none',
           },
           {
             updated_at: new Date(2016, 0, 2),
-            role: 'Verifier'
+            role: 'Verifier',
           },
           {
             updated_at: new Date(2016, 0, 4),
-            role: 'Requester'
+            role: 'Requester',
           },
           {
             updated_at: new Date(2016, 0, 5),
-            role: 'none'
-          }
-        ]
+            role: 'none',
+          },
+        ],
       });
     });
 
@@ -955,9 +972,9 @@ describe('GGRC.Components.revisionLog', function () {
         '166': [
           {
             updated_at: new Date(2016, 0, 1),
-            role: 'none'
-          }
-        ]
+            role: 'none',
+          },
+        ],
       });
     });
   });
@@ -968,13 +985,13 @@ describe('GGRC.Components.revisionLog', function () {
       viewModel.attr('roleHistory')[1] =
         [{
           role: 'creator',
-          updated_at: new Date(2016, 0, 1)
+          updated_at: new Date(2016, 0, 1),
         }, {
           role: 'verifier',
-          updated_at: new Date(2016, 1, 2)
+          updated_at: new Date(2016, 1, 2),
         }, {
           role: 'assignee',
-          updated_at: new Date(2016, 2, 3)
+          updated_at: new Date(2016, 2, 3),
         }];
     });
 

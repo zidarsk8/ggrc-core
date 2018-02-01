@@ -29,17 +29,17 @@ import template from './object-state-toolbar.mustache';
         updateState: {
           get: function () {
             return this.attr('hasVerifiers') ? 'In Review' : 'Completed';
-          }
+          },
         },
         isCurrentUserVerifier: {
           get: function () {
             return checkIsCurrentUserVerifier(this.attr('verifiers'));
-          }
+          },
         },
         hasVerifiers: {
           get: function () {
             return this.attr('verifiers').length;
-          }
+          },
         },
       },
       verifiers: [],
@@ -67,9 +67,9 @@ import template from './object-state-toolbar.mustache';
         this.dispatch({
           type: 'onStateChange',
           state: newState,
-          undo: isUndo
+          undo: isUndo,
         });
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

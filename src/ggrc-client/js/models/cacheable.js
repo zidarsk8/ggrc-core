@@ -126,33 +126,33 @@ import RefreshQueue from './refresh_queue';
       {
         attr_title: 'Title',
         attr_name: 'title',
-        order: 10
+        order: 10,
       },
       {
         attr_title: 'Code',
         attr_name: 'slug',
-        order: 30
+        order: 30,
       },
       {
         attr_title: 'State',
         attr_name: 'status',
-        order: 40
+        order: 40,
       },
       {
         attr_title: 'Last Updated Date',
         attr_name: 'updated_at',
-        order: 70
+        order: 70,
       },
       {
         attr_title: 'Last Updated By',
         attr_name: 'modified_by',
-        order: 71
+        order: 71,
       },
       {
         attr_title: 'Review State',
         attr_name: 'os_state',
-        order: 80
-      }
+        order: 80,
+      },
     ],
 
     root_collection: '',
@@ -276,7 +276,7 @@ import RefreshQueue from './refresh_queue';
     // set up default attribute converters/serializers for all classes
       can.extend(this.attributes, {
         created_at: 'datetime',
-        updated_at: 'datetime'
+        updated_at: 'datetime',
       });
 
       return ret;
@@ -377,7 +377,7 @@ import RefreshQueue from './refresh_queue';
             inst = pj.what instanceof model
               ? pj.what
               : new model({
-                context: obj.context
+                context: obj.context,
               });
             dfds.push(
               $.when(pj.what !== inst && pj.what.isNew() ? pj.what.save() : null)
@@ -661,16 +661,16 @@ import RefreshQueue from './refresh_queue';
     convert: {
       date: dateConverter,
       datetime: dateConverter,
-      packaged_datetime: makeDateUnpacker(['dateTime', 'date'])
+      packaged_datetime: makeDateUnpacker(['dateTime', 'date']),
     },
     serialize: {
       datetime: makeDateSerializer('datetime'),
       date: makeDateSerializer('date'),
-      packaged_datetime: makeDateSerializer('datetime', 'dateTime')
+      packaged_datetime: makeDateSerializer('datetime', 'dateTime'),
     },
     tree_view_options: {
       display_attr_names: ['title', 'owner', 'status', 'updated_at'],
-      mandatory_attr_names: ['title']
+      mandatory_attr_names: ['title'],
     },
     sub_tree_view_options: {},
     obj_nav_options: {},
@@ -727,21 +727,21 @@ import RefreshQueue from './refresh_queue';
           },
           has_prev: function () {
             return this.prev !== null;
-          }
+          },
         };
       }
 
       function findPageFunc(url, data, params, scope) {
         let ajaxOptions = can.extend({
           url: url,
-          data: data
+          data: data,
         }, params);
 
         return can.ajax(ajaxOptions).then(function (response) {
           let collection = response[that.root_collection + '_collection'];
           let paginator = makePaginator(collection.paging, params, scope);
           let ret = {
-            paging: paginator
+            paging: paginator,
           };
           ret[scope.root_collection + '_collection'] =
             scope.models(collection[scope.root_collection]);
@@ -762,7 +762,7 @@ import RefreshQueue from './refresh_queue';
 
       baseParams = {
         type: method,
-        dataType: 'json'
+        dataType: 'json',
       };
 
       return function (params) {
@@ -784,7 +784,7 @@ import RefreshQueue from './refresh_queue';
         mapper = mappers[name];
         return mapper;
       }
-    }
+    },
   }, {
     init: function () {
       let cache = can.getObject('cache', this.constructor, true);
@@ -859,7 +859,7 @@ import RefreshQueue from './refresh_queue';
           let object;
           value = value.isStub ? value : value.reify();
           def = _.find(this.custom_attribute_definitions, {
-            id: value.custom_attribute_id
+            id: value.custom_attribute_id,
           });
           if (def) {
             if (def.attribute_type.startsWith('Map:')) {
@@ -1054,7 +1054,7 @@ import RefreshQueue from './refresh_queue';
               url: href,
               params: params,
               type: 'get',
-              dataType: 'json'
+              dataType: 'json',
             })
           .then(function (resources) {
             delete that._pending_refresh;
@@ -1068,7 +1068,7 @@ import RefreshQueue from './refresh_queue';
           .fail(function () {
             dfd.reject.apply(dfd, arguments);
           });
-          }, 1000, {trailing: false})
+          }, 1000, {trailing: false}),
         };
       }
       dfd = this._pending_refresh.dfd;
@@ -1166,7 +1166,7 @@ import RefreshQueue from './refresh_queue';
         what: obj,
         through: join_attr,
         extra: extra_attrs,
-        opts: options
+        opts: options,
       });
     },
     /*
@@ -1192,7 +1192,7 @@ import RefreshQueue from './refresh_queue';
         what: obj,
         through: joinAttr,
         extra: extraAttrs,
-        opts: options
+        opts: options,
       });
     },
 
@@ -1298,7 +1298,7 @@ import RefreshQueue from './refresh_queue';
             .replace(/ /g, '_');
 
       return [type, this.id].join('/');
-    }
+    },
   });
   /* TODO: hack on can.Observe should be removed or at least placed outside of Cacheable Model Class */
   _oldAttr = can.Observe.prototype.attr;
@@ -1342,7 +1342,7 @@ import RefreshQueue from './refresh_queue';
     return can.Stub.get_or_create({
       id: id,
       href: this.selfLink || this.href,
-      type: type
+      type: type,
     });
   };
 
@@ -1359,7 +1359,7 @@ import RefreshQueue from './refresh_queue';
         CMS.Models.stub_cache[type][id] = stub;
       }
       return CMS.Models.stub_cache[type][id];
-    }
+    },
   }, {
     init: function () {
       let that = this;
@@ -1385,7 +1385,7 @@ import RefreshQueue from './refresh_queue';
 
     getInstance: function () {
       return this._instance();
-    }
+    },
   });
 
   can.Observe.List.prototype.stubs = function () {

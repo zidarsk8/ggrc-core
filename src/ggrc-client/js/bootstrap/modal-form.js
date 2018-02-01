@@ -207,7 +207,7 @@ import {confirm} from '../plugins/utils/modals';
             modal_confirm: 'Continue Editing',
             button_view: GGRC.mustache_path +
               '/modals/discard_buttons.mustache',
-            skip_refresh: true
+            skip_refresh: true,
           }, function () {
             can.trigger(instance, 'modal:dismiss');
             can.trigger(instance, 'modal:discard');
@@ -256,7 +256,7 @@ import {confirm} from '../plugins/utils/modals';
           $first_input.get(0).focus();
         }
       }, 100);
-    }
+    },
   });
 
   $.fn.modal_form = function (option, trigger, params) {
@@ -379,7 +379,7 @@ import {confirm} from '../plugins/utils/modals';
       let flashClassMappings = {
         notice: 'success',
         Running: 'progress',
-        Pending: 'progress'
+        Pending: 'progress',
       };
       let textContainer;
       let $html;

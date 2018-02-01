@@ -82,6 +82,6 @@
         });
 
         return $.when.apply($, deferreds);
-      }
+      },
     });
 })(window.GGRC, window.can);

@@ -11,7 +11,7 @@ describe('StateUtils', function () {
     it('statusFilter() should return filter with all statuses',
       function () {
         let statuses = [
-          'Draft', 'Active', 'Deprecated'
+          'Draft', 'Active', 'Deprecated',
         ];
 
         let statesFilter = StateUtils.statusFilter(statuses, '');
@@ -28,7 +28,7 @@ describe('StateUtils', function () {
     it('statesFilter should not update Assessmnet statuses',
       function () {
         let statuses = [
-          'Not Started', 'In Progress', 'In Review'
+          'Not Started', 'In Progress', 'In Review',
         ];
 
         let statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
@@ -47,7 +47,7 @@ describe('StateUtils', function () {
     it('statesFilter should have "Completed" status and "verified=true"',
       function () {
         let statuses = [
-          'In Review', 'Completed and Verified'
+          'In Review', 'Completed and Verified',
         ];
 
         let statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
@@ -67,7 +67,7 @@ describe('StateUtils', function () {
     it('statesFilter should have "Completed" status and "verified=false"',
       function () {
         let statuses = [
-          'In Review', 'Completed (no verification)'
+          'In Review', 'Completed (no verification)',
         ];
 
         let statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
@@ -89,7 +89,7 @@ describe('StateUtils', function () {
       function () {
         let statuses = [
           'In Progress', 'Completed (no verification)',
-          'Completed and Verified'
+          'Completed and Verified',
         ];
 
         let statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');

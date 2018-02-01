@@ -12,6 +12,7 @@
     {exclude-roles}="excludeRoles"
     {updatable-group-id}="updatableGroupId"
     {is-new-instance}="isNewInstance"
+    {read-only}="readOnly"
     {instance}="instance">
       <div class="people-groups">
         {{#groups}}
@@ -26,7 +27,9 @@
             {people}="people"
             {instance}="instance"
             {is-proposal}="isProposal"
-            {updatable-group-id}="updatableGroupId">
+            {updatable-group-id}="updatableGroupId"
+            {read-only}="readOnly"
+            >
               <div>
                 <deletable-people-group
                   show-empty-message="false"

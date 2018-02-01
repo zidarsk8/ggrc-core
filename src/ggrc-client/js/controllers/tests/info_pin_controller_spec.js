@@ -4,6 +4,11 @@
 */
 
 import Ctrl from '../info_pin_controller';
+import {
+  pinContentHiddenClass,
+  pinContentMaximizedClass,
+  pinContentMinimizedClass,
+} from '../info_pin_controller';
 
 describe('CMS.Controllers.InfoPin', function () {
   let ctrlInst;
@@ -125,6 +130,74 @@ describe('CMS.Controllers.InfoPin', function () {
     it('returns false if info pane is closed', function () {
       ctrlInst.close();
       expect(ctrlInst.isPinVisible()).toBe(false);
+    });
+  });
+
+  describe('showInstance() method', () => {
+    let infoPane;
+
+    beforeEach(() => {
+      infoPane = ctrlInst.element;
+      infoPane.addClass(pinContentHiddenClass);
+    });
+
+    it('sets maximized state for info pane', () => {
+      ctrlInst.showInstance(true);
+
+      expect(infoPane.hasClass(pinContentHiddenClass)).toBe(false);
+      expect(infoPane.hasClass(pinContentMinimizedClass)).toBe(false);
+      expect(infoPane.hasClass(pinContentMaximizedClass)).toBe(true);
+    });
+
+    it('sets minimized state for info pane', () => {
+      ctrlInst.showInstance(false);
+
+      expect(infoPane.hasClass(pinContentHiddenClass)).toBe(false);
+      expect(infoPane.hasClass(pinContentMinimizedClass)).toBe(true);
+      expect(infoPane.hasClass(pinContentMaximizedClass)).toBe(false);
+    });
+
+    it('changes info pane state', () => {
+      ctrlInst.element.addClass(pinContentHiddenClass);
+
+      ctrlInst.showInstance(true);
+      ctrlInst.showInstance(false);
+
+      expect(ctrlInst.element.hasClass(pinContentHiddenClass)).toBe(false);
+      expect(ctrlInst.element.hasClass(pinContentMinimizedClass)).toBe(true);
+      expect(ctrlInst.element.hasClass(pinContentMaximizedClass)).toBe(false);
+    });
+  });
+
+  describe('unsetInstance() method', () => {
+    let infoPane;
+
+    beforeEach(() => {
+      infoPane = ctrlInst.element;
+      infoPane.removeClass(pinContentHiddenClass);
+      infoPane.html('any html');
+    });
+
+    it('hides maximized info pane', () => {
+      infoPane.addClass(pinContentMaximizedClass);
+
+      ctrlInst.unsetInstance();
+
+      expect(infoPane.hasClass(pinContentHiddenClass)).toBe(true);
+      expect(infoPane.hasClass(pinContentMinimizedClass)).toBe(false);
+      expect(infoPane.hasClass(pinContentMaximizedClass)).toBe(false);
+      expect(infoPane.html()).toBe('');
+    });
+
+    it('hides minimized info pane', () => {
+      infoPane.addClass(pinContentMinimizedClass);
+
+      ctrlInst.unsetInstance();
+
+      expect(infoPane.hasClass(pinContentHiddenClass)).toBe(true);
+      expect(infoPane.hasClass(pinContentMinimizedClass)).toBe(false);
+      expect(infoPane.hasClass(pinContentMaximizedClass)).toBe(false);
+      expect(infoPane.html()).toBe('');
     });
   });
 });

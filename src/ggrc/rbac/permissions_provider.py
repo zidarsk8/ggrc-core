@@ -154,8 +154,11 @@ def has_changed_condition(instance, property_name, prevent_if=None, **_):
 
 def is_auditor(instance, **_):
   """Check if user has auditor role on the audit field of the instance"""
+  # pylint: disable=protected-access
   return any(acl for acl in instance.audit.access_control_list
-             if acl.ac_role.name == "Auditors" and acl.person == current_user)
+             if acl.ac_role.name in "Auditors" and
+             acl.person == current_user) or \
+      find_permissions()._is_allowed_for(instance.audit, "update")
 
 
 def is_workflow_admin(instance, **_):

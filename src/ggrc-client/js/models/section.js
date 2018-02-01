@@ -39,26 +39,26 @@ can.Model.Cacheable('CMS.Models.Section', {
     directive_sections: 'CMS.Models.DirectiveSection.stubs',
     directives: 'CMS.Models.get_stubs',
     objectives: 'CMS.Models.Objective.stubs',
-    custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+    custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
   },
   tree_view_options: {
     attr_view: '/static/mustache/sections/tree-item-attr.mustache',
     attr_list: can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'Reference URL', attr_name: 'reference_url'}
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
     ]),
-    add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache'
+    add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
   },
   sub_tree_view_options: {
     default_filter: ['Objective'],
   },
   defaults: {
-    status: 'Draft'
+    status: 'Draft',
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
     this._super.apply(this, arguments);
     this.validateNonBlank('title');
-  }
+  },
 }, {});
 
 can.Model.Cacheable('CMS.Models.Clause', {
@@ -95,25 +95,25 @@ can.Model.Cacheable('CMS.Models.Clause', {
     directive_sections: 'CMS.Models.DirectiveSection.stubs',
     directives: 'CMS.Models.get_stubs',
     objectives: 'CMS.Models.Objective.stubs',
-    custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+    custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
   },
   tree_view_options: {
     attr_view: '/static/mustache/sections/tree-item-attr.mustache',
     attr_list: can.Model.Cacheable.attr_list.concat([
       {attr_title: 'Reference URL', attr_name: 'reference_url'},
-      {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
+      {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
     ]),
-    add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache'
+    add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
   },
   sub_tree_view_options: {
     default_filter: ['Contract'],
   },
   defaults: {
-    status: 'Draft'
+    status: 'Draft',
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
     this._super.apply(this, arguments);
     this.validateNonBlank('title');
-  }
+  },
 }, {});

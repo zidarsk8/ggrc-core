@@ -13,14 +13,14 @@ describe('CMS.Models.Cacheable', function () {
       return new can.Map({
         id: id,
         attribute_type: type,
-        title: title
+        title: title,
       });
     }
 
     beforeEach(function () {
       instance = new can.Model.Cacheable({
         custom_attribute_definitions: new can.List(),
-        custom_attribute_values: new can.List()
+        custom_attribute_values: new can.List(),
       });
     });
 
@@ -31,7 +31,7 @@ describe('CMS.Models.Cacheable', function () {
         customAttrFactory(5, 'Text', 'CA five'),
         customAttrFactory(2, 'Text', 'CA two'),
         customAttrFactory(4, 'Text', 'CA four'),
-        customAttrFactory(1, 'Text', 'CA one')
+        customAttrFactory(1, 'Text', 'CA one'),
       ]);
       instance.custom_attribute_definitions.replace(definitions);
 
@@ -59,7 +59,7 @@ describe('CMS.Models.Cacheable', function () {
 
     beforeEach(function () {
       instance = new can.Model.Cacheable({
-        related_sources: new can.Map()
+        related_sources: new can.Map(),
       });
       spyOn(instance, 'remove_duplicate_pending_joins');
       obj = {};
@@ -94,7 +94,7 @@ describe('CMS.Models.Cacheable', function () {
 
     beforeEach(function () {
       instance = new can.Model.Cacheable({
-        related_sources: new can.Map()
+        related_sources: new can.Map(),
       });
       obj = new can.Map({});
       extraAttrs = new can.Map({field: 'not empty'});
@@ -110,7 +110,7 @@ describe('CMS.Models.Cacheable', function () {
       'if elements fields "what" equals to parametr',
       function () {
         instance._pending_joins.push({
-          what: obj
+          what: obj,
         });
         instance.remove_duplicate_pending_joins(obj);
         expect(instance._pending_joins.length).toEqual(0);
@@ -121,7 +121,7 @@ describe('CMS.Models.Cacheable', function () {
       function () {
         instance._pending_joins.push({
           what: obj,
-          extra: extraAttrs
+          extra: extraAttrs,
         });
         obj = new can.Map({});
         instance.remove_duplicate_pending_joins(obj, extraAttrs);

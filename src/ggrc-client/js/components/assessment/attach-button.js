@@ -21,15 +21,15 @@ import template from './attach-button.mustache';
           get: function (prevValue, setValue) {
             let instance = this.attr('instance');
             if (Permission.is_allowed_for('update', instance) &&
-              !instance.archived) {
+              !instance.attr('archived')) {
               this.checkFolder().always(function () {
                 setValue(true);
               });
             } else {
               setValue(false);
             }
-          }
-        }
+          },
+        },
       },
       assessmentTypeObjects: [],
       canAttach: false,
@@ -77,7 +77,7 @@ import template from './attach-button.mustache';
         }
 
         return GFolder.findOne({id: folderId});
-      }
-    }
+      },
+    },
   });
 })(window.GGRC, window.can);

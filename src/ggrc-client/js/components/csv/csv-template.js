@@ -11,7 +11,7 @@ export default GGRC.Components('csvTemplate', {
   scope: {
     url: '/_service/export_csv',
     selected: [],
-    importable: GGRC.Bootstrap.importable
+    importable: GGRC.Bootstrap.importable,
   },
   events: {
     '#importSelect change': function (el, ev) {
@@ -25,7 +25,7 @@ export default GGRC.Components('csvTemplate', {
         }
         return selected.push({
           name: $item.attr('label'),
-          value: $item.val()
+          value: $item.val(),
         });
       });
     },
@@ -36,7 +36,7 @@ export default GGRC.Components('csvTemplate', {
       objects = _.map(this.scope.attr('selected'), function (el) {
         return {
           object_name: el.value,
-          fields: 'all'
+          fields: 'all',
         };
       });
       if (!objects.length) {
@@ -64,6 +64,6 @@ export default GGRC.Components('csvTemplate', {
           $item.prop('selected', false);
         }
       });
-    }
-  }
+    },
+  },
 });

@@ -7,7 +7,7 @@
   {{#if_instance_of parent_instance 'Audit'}}
     {{^if instance.archived}}
     {{#if allow_creating}}
-    {{#is_allowed 'create' 'Assessment' context=parent_instance.context}}
+    {{#is_allowed 'update' parent_instance}}
       <a href="javascript://"
          class="section-create action-button create-button"
          rel="tooltip"

@@ -50,7 +50,7 @@
               person_id: GGRC.current_user.id,
               notif_type: type,
               enable_flag: null,
-              context: {id: null}
+              context: {id: null},
             });
           }
           return configs[index];
@@ -72,7 +72,7 @@
           });
         }));
       });
-    }
+    },
   }, {});
 
 })(window.can);

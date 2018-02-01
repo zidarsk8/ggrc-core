@@ -10,18 +10,18 @@ let customAttributesType = {
   Date: 'date',
   Input: 'input',
   Checkbox: 'checkbox',
-  Dropdown: 'dropdown'
+  Dropdown: 'dropdown',
 };
 
 let CA_DD_REQUIRED_DEPS = Object.freeze({
   NONE: 0,
   COMMENT: 1,
   EVIDENCE: 2,
-  COMMENT_AND_EVIDENCE: 3
+  COMMENT_AND_EVIDENCE: 3,
 });
 let CUSTOM_ATTRIBUTE_TYPE = Object.freeze({
   LOCAL: 1,
-  GLOBAL: 2
+  GLOBAL: 2,
 });
 
 /**
@@ -58,7 +58,7 @@ function isEmptyCustomAttribute(value, type, cav) {
         return !cav.attribute_object;
       }
       return _.isEmpty(value);
-    }
+    },
   };
   if (value === undefined) {
     return true;
@@ -126,15 +126,15 @@ function prepareCustomAttributes(definitions, values) {
       validation: {
         empty: true,
         mandatory: def.mandatory,
-        valid: true
+        valid: true,
       },
       def: def,
       attributeType: type,
       preconditions_failed: [],
       errorsMap: {
         comment: false,
-        evidence: false
-      }
+        evidence: false,
+      },
     };
 
     values.forEach(function (value) {
@@ -147,11 +147,11 @@ function prepareCustomAttributes(definitions, values) {
           empty: errors.indexOf('value') > -1,
           mandatory: def.mandatory,
           valid: errors.indexOf('comment') < 0 &&
-          errors.indexOf('evidence') < 0
+          errors.indexOf('evidence') < 0,
         };
         value.errorsMap = {
           comment: errors.indexOf('comment') > -1,
-          evidence: errors.indexOf('evidence') > -1
+          evidence: errors.indexOf('evidence') > -1,
         };
         valueData = value;
       }
@@ -218,7 +218,7 @@ function convertToFormViewField(attr) {
     options: options &&
     typeof options === 'string' ?
       options.split(',') : [],
-    helptext: attr.def.helptext
+    helptext: attr.def.helptext,
   };
 }
 
@@ -243,7 +243,7 @@ function convertToEditableField(attr) {
     errorsMap: attr.errorsMap.attr(),
     valueId: can.compute(function () {
       return attr.attr('id');
-    })
+    }),
   };
 }
 
@@ -344,5 +344,5 @@ export {
   applyChangesToCustomAttributeValue,
   CA_DD_REQUIRED_DEPS,
   ensureGlobalCA,
-  CUSTOM_ATTRIBUTE_TYPE
+  CUSTOM_ATTRIBUTE_TYPE,
 }

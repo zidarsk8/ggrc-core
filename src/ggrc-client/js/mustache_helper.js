@@ -62,7 +62,7 @@ import _ from 'lodash';
 
         abort: function () {
           template = null;
-        }
+        },
       };
     }
   });
@@ -523,10 +523,10 @@ Mustache.registerHelper("option_select", function (object, attr_name, role, opti
           ,   selected_id == option.id ? ' selected=selected' : ''
           , '>'
           ,   option.title
-          , '</option>'
+          , '</option>',
           ].join('');
         }).join('\n')
-      , '</select>'
+      , '</select>',
     ].join('');
   }
 
@@ -565,7 +565,7 @@ Mustache.registerHelper("category_select", function (object, attr_name, category
     return [
       selectOpenTag,
       optionTags,
-      selectCloseTag
+      selectCloseTag,
     ].join('');
   };
 
@@ -614,7 +614,7 @@ Mustache.registerHelper("get_permalink_for_object", function (instance, options)
         '  target="_blank"',
         '  class="view-link">',
         linkText,
-        '</a>'
+        '</a>',
       ].join('');
       return html;
     }
@@ -690,7 +690,7 @@ Mustache.registerHelper("show_long", function () {
           }();
         }
       })
-    , ">...more</a>"
+    , ">...more</a>",
   ].join('');
 });
 
@@ -797,7 +797,7 @@ Mustache.registerHelper("person_roles", function (person, scope, options) {
             && ~GGRC.config.BOOTSTRAP_ADMIN_USERS.indexOf(person.email)) {
           roles.unshift({
             permission_summary: "Superuser",
-            name: "Superuser"
+            name: "Superuser",
           });
         }
         roles_deferred.resolve(roles);
@@ -863,7 +863,7 @@ Mustache.registerHelper("each_with_extras_as", function (name, list, options) {
       , isFirst : i === 0
       , isLast : i === length - 1
       , isSecondToLast : i === length - 2
-      , length : length
+      , length : length,
     };
     frame[name] = list[i];
     output.push(options.fn(new can.Observe(frame)));
@@ -1134,7 +1134,7 @@ function localizeDate(date, options, tmpl, allowNonISO) {
 
 can.each({
   localize_date: 'MM/DD/YYYY',
-  localize_datetime: 'MM/DD/YYYY hh:mm:ss A Z'
+  localize_datetime: 'MM/DD/YYYY hh:mm:ss A Z',
 }, function (tmpl, fn) {
   Mustache.registerHelper(fn, function (date, allowNonISO, options) {
     // allowNonIso was not passed
@@ -1202,52 +1202,6 @@ Mustache.registerHelper("visibility_delay", function (delay, options) {
     }, delay);
     return el;
   };
-});
-
-Mustache.registerHelper("with_program_roles_as", function (result, options) {
-  let dfd = $.when()
-    , frame = new can.Observe()
-    , user_roles = []
-    , mappings
-    , refresh_queue = new RefreshQueue()
-    ;
-
-  result = resolve_computed(result);
-  mappings = resolve_computed(result.get_mappings_compute());
-
-  frame.attr("roles", []);
-
-  can.each(mappings, function (mapping) {
-    if (mapping instanceof CMS.Models.UserRole) {
-      refresh_queue.enqueue(mapping.role);
-    }
-  });
-
-  dfd = refresh_queue.trigger().then(function (roles) {
-    can.each(mappings, function (mapping) {
-      if (mapping instanceof CMS.Models.UserRole) {
-        frame.attr("roles").push({
-          user_role: mapping,
-          role: mapping.role.reify()
-        });
-      } else {
-        frame.attr("roles").push({
-          role: {
-            "permission_summary": "Mapped"
-          }
-        });
-      }
-    });
-  });
-
-  function finish(list) {
-    return options.fn(options.contexts.add(frame));
-  }
-  function fail(error) {
-    return options.inverse(options.contexts.add({error : error}));
-  }
-
-  return defer_render('span', { done : finish, fail : fail }, dfd);
 });
 
 function get_observe_context(scope) {
@@ -1367,7 +1321,7 @@ Mustache.registerHelper("last_approved", function (instance, options) {
 
 Mustache.registerHelper('with_is_reviewer', function (reviewTask, options) {
   let assigneeRole = _.find(GGRC.access_control_roles, {
-    object_type: 'TaskGroupTask',
+    object_type: 'CycleTaskGroupObjectTask',
     name: 'Task Assignees',
   });
   let currentUserId = GGRC.current_user.id;
@@ -1496,7 +1450,7 @@ Mustache.registerHelper("if_helpers", function () {
     , helper_result
     , helper_options = can.extend({}, options, {
         fn: function () { helper_result = 'fn'; }
-      , inverse: function () { helper_result = 'inverse'; }
+      , inverse: function () { helper_result = 'inverse'; },
       })
     ;
 
@@ -1523,7 +1477,7 @@ Mustache.registerHelper("if_helpers", function () {
               fn_name: match[3] === '^' ? 'inverse' : 'fn'
             , helper: Mustache.getHelper(match[4], options.contexts)
             , args: []
-            , logic: match[2] === 'or' ? 'or' : 'and'
+            , logic: match[2] === 'or' ? 'or' : 'and',
           };
 
           // Add hash arguments
@@ -1572,7 +1526,7 @@ Mustache.registerHelper("if_helpers", function () {
 
         helper_result = null;
         stmt.helper.fn.apply(stmt.helper, stmt.args.concat([
-          can.extend({}, helper_options, { hash: stmt.hash || helper_options.hash })
+          can.extend({}, helper_options, { hash: stmt.hash || helper_options.hash }),
         ]));
         helper_result = helper_result === stmt.fn_name;
         return current_result && helper_result;
@@ -1595,21 +1549,6 @@ Mustache.registerHelper("with_model_as", function (var_name, model_name, options
   model_name = resolve_computed(Mustache.resolve(model_name));
   frame[var_name] = CMS.Models[model_name];
   return options.fn(options.contexts.add(frame));
-});
-
-Mustache.registerHelper("private_program_owner", function (instance, modal_title, options) {
-  let state = options.contexts.attr('__private_program_owner');
-  if (resolve_computed(modal_title).indexOf('New ') === 0) {
-    return GGRC.current_user.email;
-  }
-  else {
-    let loader = resolve_computed(instance).get_binding('authorizations');
-    return $.map(loader.list, function (binding) {
-      if (binding.instance.role && binding.instance.role.reify().attr('name') === 'ProgramOwner') {
-        return binding.instance.person.reify().attr('email');
-      }
-    }).join(', ');
-  }
 });
 
 // Verify if the Program has multiple owners
@@ -1733,8 +1672,8 @@ Mustache.registerHelper("switch", function (value, options) {
           options.context.attr ? options.context.attr("default", false) : (options.context.default = false);
           return options.fn(options.contexts);
         }
-      }
-    }
+      },
+    },
   });
 });
 
@@ -1757,7 +1696,7 @@ Mustache.registerHelper("switch", function (value, options) {
 
       finish = function (tasks) {
         return options.fn(options.contexts.add({
-          person: tasks[0].instance.contact
+          person: tasks[0].instance.contact,
         }));
       };
       progress = function () {
@@ -1765,7 +1704,7 @@ Mustache.registerHelper("switch", function (value, options) {
       };
 
       return defer_render('span', {
-        done: finish, progress: progress
+        done: finish, progress: progress,
       }, binding.refresh_instances());
     });
 
@@ -1795,7 +1734,7 @@ Mustache.registerHelper("switch", function (value, options) {
         },
         progress: function () {
           return options.inverse(options.contexts);
-        }
+        },
       },
         instance.get_list_counter(mappingName)
       );
@@ -1827,7 +1766,7 @@ Mustache.registerHelper('autocomplete_select', function (disableCreate, opt) {
       let $ctl = $(this).parents(':data(controls)');
       $(this).ggrc_autocomplete($.extend({}, options.hash, {
         controller: cls ? $ctl.control(cls) : $ctl.control(),
-        disableCreate: _disableCreate
+        disableCreate: _disableCreate,
       }));
     });
   };
@@ -1935,7 +1874,7 @@ Mustache.registerHelper("file_type", function (instance) {
     PDF: "pdf",
     OFFICE_DOC: "doc",
     OFFICE_SHEET: "xls",
-    ARCHIVE: "zip"
+    ARCHIVE: "zip",
   });
 
   FILE_EXTENSION_TYPES = Object.freeze({
@@ -1968,7 +1907,7 @@ Mustache.registerHelper("file_type", function (instance) {
     rar: FILE_TYPES.ARCHIVE,
     "7z": FILE_TYPES.ARCHIVE,
     gz: FILE_TYPES.ARCHIVE,
-    tar: FILE_TYPES.ARCHIVE
+    tar: FILE_TYPES.ARCHIVE,
   });
 
   if (instance.type !== "Document") {
@@ -2262,7 +2201,7 @@ Example:
     function (comment, parentInstance, options) {
       let END_STATES = Object.freeze({
         Verified: true,
-        Completed: true
+        Completed: true,
       });
 
       let canEdit = true;
@@ -2436,7 +2375,7 @@ Example:
     let titlesMap = {
       Cycle: 'Cycle ',
       CycleTaskGroup: 'Group ',
-      CycleTaskGroupObjectTask: 'Task '
+      CycleTaskGroupObjectTask: 'Task ',
     };
     type = Mustache.resolve(type);
 
@@ -2447,8 +2386,17 @@ Example:
     'withRoleForInstance',
     function (instance, roleName, options) {
       let userId = GGRC.current_user.id;
-      let hasRoleForContextDfd;
+      let internalRoles = GGRC.internal_access_control_roles;
+      let role;
+      let hasRole;
       instance = resolve_computed(instance);
+      roleName = resolve_computed(roleName);
+      role = internalRoles.find((a) => a.name === roleName);
+
+      if (!role) {
+        console.warn(roleName, 'is not an internal access control name');
+        return;
+      }
 
       // As a Creator user we seem to invoke this helper with a null instance.
       // In this case we simply return and wait for the helper to be invoked a
@@ -2456,18 +2404,13 @@ Example:
       if (!instance) {
         return;
       }
+      hasRole = instance.access_control_list.filter((acl) => {
+        return acl.ac_role_id === role.id && acl.person_id === userId;
+      }).length > 0;
 
-      if (!instance.contextId) {
-        instance = CMS.Models[instance.type].findInCacheById(instance.id);
-      }
-
-      hasRoleForContextDfd =
-        GGRC.Utils.hasRoleForContext(userId, instance.context_id, roleName);
-
-      return Mustache.defer_render('span',
-        function (hasRole) {
-          return options.fn(options.contexts.add({hasRole: hasRole}));
-        }, hasRoleForContextDfd);
+      return options.fn(options.contexts.add({
+        hasRole: hasRole,
+      }));
     });
 
   Mustache.registerHelper('displayWidgetTab',
@@ -2520,19 +2463,44 @@ Example:
   );
   Mustache.registerHelper('is_auditor', function (options) {
     const auditor = GGRC.access_control_roles.find(
-        (role) => role.name === 'Auditors');
+      (role) => role.name === 'Auditors' && role.object_type === 'Audit');
     const audit = GGRC.page_instance();
     if (audit.type !== 'Audit') {
       console.warn('is_auditor called on non audit page');
       return options.inverse(options.contexts);
     }
     const isAuditor = audit.access_control_list.filter(
-        (acl) => acl.ac_role_id === auditor.id &&
+      (acl) => acl.ac_role_id === auditor.id &&
                  acl.person_id === GGRC.current_user.id).length;
 
     if (isAuditor) {
       return options.fn(options.contexts);
     }
     return options.inverse(options.contexts);
+  });
+
+  Mustache.registerHelper('page_roles', function (person, options) {
+    const pageInstance = Mustache.resolve(GGRC.page_instance);
+    const allRoles = GGRC.access_control_roles.concat(
+      GGRC.internal_access_control_roles);
+    const roles = {};
+    can.each(allRoles, (role) => {
+      roles[role.id] = role;
+    });
+
+    person = Mustache.resolve(person);
+
+    const allRoleNames = _.uniq(pageInstance.access_control_list.filter(
+      (acl) => {
+        return acl.person.id === person.id && acl.ac_role_id in roles;
+      }).map((acl) => {
+      return roles[acl.ac_role_id].name;
+    }));
+
+    return options.fn({
+      'short': allRoleNames[0],
+      count: allRoleNames.length > 1 ? allRoleNames.length - 1 : 0,
+      'long': allRoleNames.join(', '),
+    });
   });
 })(jQuery, can);

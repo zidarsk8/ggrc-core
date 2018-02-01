@@ -12,7 +12,12 @@ from ggrc import db
 from ggrc import fulltext
 
 
-ReindexRule = namedtuple("ReindexRule", ["model", "rule"])
+class ReindexRule(namedtuple("ReindexRule", ["model", "rule", "fields"])):
+  """Class for keeping reindex rules"""
+  __slots__ = ()
+
+  def __new__(cls, model, rule, fields=None):
+    return super(ReindexRule, cls).__new__(cls, model, rule, fields)
 
 
 # pylint: disable=too-few-public-methods

@@ -13,7 +13,7 @@ describe('GGRC.Components.subTreeWrapper', function () {
     vm = GGRC.Components.getViewModel('cycleTaskActions');
 
     fakeEvent = {
-      stopPropagation: jasmine.createSpy()
+      stopPropagation: jasmine.createSpy(),
     };
   });
 
@@ -26,7 +26,7 @@ describe('GGRC.Components.subTreeWrapper', function () {
 
       vm.attr('oldValues', []);
       vm.attr('instance', {
-        status: 'InProgress'
+        status: 'InProgress',
       });
 
       changeStatus = vm.changeStatus.bind(vm);
@@ -34,7 +34,7 @@ describe('GGRC.Components.subTreeWrapper', function () {
 
     it('puts status and adds previous one for undo', function () {
       fakeElement = {
-        data: jasmine.createSpy().and.returnValues('Verified', null)
+        data: jasmine.createSpy().and.returnValues('Verified', null),
       };
 
       changeStatus(null, fakeElement, fakeEvent);
@@ -47,7 +47,7 @@ describe('GGRC.Components.subTreeWrapper', function () {
     it('puts status, adds previous one for undo and fires "expand" event',
       function () {
         fakeElement = {
-          data: jasmine.createSpy().and.returnValues('Verified', 'open')
+          data: jasmine.createSpy().and.returnValues('Verified', 'open'),
         };
 
         changeStatus(null, fakeElement, fakeEvent);

@@ -8,8 +8,8 @@ export default can.Map.extend({
     emptyListMessage: {
       get: function () {
         return this.attr('showEmptyMessage') ? 'None' : '';
-      }
-    }
+      },
+    },
   },
   showEmptyMessage: true,
   required: '@',
@@ -42,7 +42,7 @@ export default can.Map.extend({
     this.dispatch({
       type: 'unmap',
       person: person,
-      groupId: this.attr('groupId')
+      groupId: this.attr('groupId'),
     });
-  }
+  },
 });

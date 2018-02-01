@@ -135,7 +135,8 @@ class WithQueryApi(object):
     return cls._make_query_dict_base("Snapshot", filters=filters, *args,
                                      **kwargs)
 
-  def simple_query(self, model_name, expression=None, *args, **kwargs):
+  def simple_query(self, model_name, expression=None, field="values",
+                   *args, **kwargs):
     return self._get_first_result_set(
         self._make_query_dict(
             model_name,
@@ -143,7 +144,7 @@ class WithQueryApi(object):
             *args,
             **kwargs
         ),
-        model_name, "values"
+        model_name, field
     )
 
 

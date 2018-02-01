@@ -137,7 +137,7 @@
           return;
         }
         return parentScope.attr(fn);
-      }
+      },
     };
     if (!types[type]) {
       console.warn('Cast value for `' + type + '` is not defined');

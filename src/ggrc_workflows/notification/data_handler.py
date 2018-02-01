@@ -51,7 +51,9 @@ def get_cycle_created_task_data(notification):
 
   force = cycle.workflow.notify_on_change
 
-  task_assignees = cycle_task.get_persons_for_rolename("Task Assignees")
+  task_assignees = set().union(
+      cycle_task.get_persons_for_rolename("Task Assignees"),
+      cycle_task.get_persons_for_rolename("Task Secondary Assignees"))
   task_group_assignee = data_handlers.get_person_dict(cycle_task_group.contact)
   workflow_admins = get_workflow_admins_dict(cycle.workflow)
   task = {
@@ -116,8 +118,8 @@ def get_cycle_task_due(notification, tasks_cache=None, del_rels_cache=None):
     del_rels_cache (dict): prefetched Revision instances representing the
       relationships to Tasks that were deleted grouped by task ID as a key
   Returns:
-    Data aggregated in a dictionary, grouped by task assignee's email address,
-    which is used as a key.
+    Data aggregated in a dictionary, grouped by task
+    assignee/secondary assignee's email address, which is used as a key.
   """
   if tasks_cache is None:
     tasks_cache = {}
@@ -131,7 +133,9 @@ def get_cycle_task_due(notification, tasks_cache=None, del_rels_cache=None):
         '%s for notification %s not found.',
         notification.object_type, notification.id)
     return {}
-  task_assignees = cycle_task.get_persons_for_rolename("Task Assignees")
+  task_assignees = set().union(
+      cycle_task.get_persons_for_rolename("Task Assignees"),
+      cycle_task.get_persons_for_rolename("Task Secondary Assignees"))
   if not task_assignees:
     logger.warning(
         'Contact for cycle task %s not found.',
@@ -184,7 +188,7 @@ def get_cycle_task_overdue_data(
       relationships to Tasks that were deleted grouped by task ID as a key
   Returns:
     Dictionary containing the compiled data under the key that equals the
-    overdue task assignee's email address.
+    overdue task assignee/secondary assignee's email address.
   """
   if tasks_cache is None:
     tasks_cache = {}
@@ -198,7 +202,9 @@ def get_cycle_task_overdue_data(
         '%s for notification %s not found.',
         notification.object_type, notification.id)
     return {}
-  assignees = cycle_task.get_persons_for_rolename("Task Assignees")
+  assignees = set().union(
+      cycle_task.get_persons_for_rolename("Task Assignees"),
+      cycle_task.get_persons_for_rolename("Task Secondary Assignees"))
   if not assignees:
     logger.warning(
         'Contact for cycle task %s not found.',
@@ -299,7 +305,9 @@ def get_cycle_data(notification):
 def get_cycle_task_declined_data(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
   if cycle_task:
-    assignees = cycle_task.get_persons_for_rolename("Task Assignees")
+    assignees = set().union(
+        cycle_task.get_persons_for_rolename("Task Assignees"),
+        cycle_task.get_persons_for_rolename("Task Secondary Assignees"))
   else:
     assignees = []
   if not assignees:

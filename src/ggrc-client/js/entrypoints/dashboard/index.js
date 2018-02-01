@@ -41,6 +41,7 @@ import '../../components/unmap-button/unmap-button';
 import '../../components/related-objects/related-documents';
 import '../../components/related-objects/related-reference-urls';
 import '../../components/inline/inline';
+import '../../components/inline/base-inline-control-title';
 import '../../components/global-custom-attributes/global-custom-attributes';
 import '../../components/issue/issue-unmap-dropdown-item';
 import '../../components/external-data-autocomplete/external-data-autocomplete';

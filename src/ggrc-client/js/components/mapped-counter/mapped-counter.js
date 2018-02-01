@@ -14,16 +14,16 @@ import {
   let titlesMap = {
     Total: {
       title: 'Total',
-      icon: 'list-alt'
+      icon: 'list-alt',
     },
     CycleTaskEntry: {
       title: 'Comments',
-      icon: 'comment-o'
+      icon: 'comment-o',
     },
     CycleTaskGroupObjectTask: {
       title: 'Total',
-      icon: 'calendar-check-o'
-    }
+      icon: 'calendar-check-o',
+    },
   };
 
   let viewModel = can.Map.extend({
@@ -35,7 +35,7 @@ import {
           let icon = titlesMap[type] ? titlesMap[type].icon : type;
 
           return icon.toLowerCase();
-        }
+        },
       },
       title: {
         type: 'string',
@@ -43,8 +43,8 @@ import {
           let title = this.attr('type') ? this.attr('type') : 'Total';
 
           return titlesMap[title] ? titlesMap[title].title : title;
-        }
-      }
+        },
+      },
     },
     instance: null,
     type: '@',
@@ -54,7 +54,7 @@ import {
       let type = this.attr('type');
       let relevant = {
         id: instance.id,
-        type: instance.type
+        type: instance.type,
       };
       let types = type ? [type] : GGRC.Mappings.getMappingList(instance.type);
       let countQuery = buildCountParams(types, relevant);
@@ -69,7 +69,7 @@ import {
 
         this.attr('count', total);
       }.bind(this));
-    }
+    },
   });
 
   GGRC.Components('mappedCounter', {
@@ -84,7 +84,7 @@ import {
         if (vm.addContent) {
           vm.addContent(promise);
         }
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

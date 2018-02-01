@@ -22,7 +22,7 @@ describe('Permission', function () {
     beforeEach(function () {
       permission = {
         action: 'create',
-        context_id: '111'
+        context_id: '111',
       };
     });
     it('returns new all resource permission', function () {
@@ -40,9 +40,9 @@ describe('Permission', function () {
       permissions = {
         create: {
           Program: {
-            contexts: [1, 2, 3]
-          }
-        }
+            contexts: [1, 2, 3],
+          },
+        },
       };
     });
     it('returns true if permissions contains specified permission',
@@ -50,7 +50,7 @@ describe('Permission', function () {
         let permission = {
           action: 'create',
           resource_type: 'Program',
-          context_id: 1
+          context_id: 1,
         };
         expect(Permission._permission_match(permissions, permission))
           .toEqual(true);
@@ -60,12 +60,12 @@ describe('Permission', function () {
         let permissionCollection = _.map([
           ['create', 'Program', 111],
           ['delete', 'Program', 1],
-          ['create', 'Control', 1]
+          ['create', 'Control', 1],
         ], function (items) {
           return {
             action: items[0],
             resource_type: items[1],
-            context_id: items[2]
+            context_id: items[2],
           };
         });
 
@@ -89,12 +89,12 @@ describe('Permission', function () {
     it('returns true if there is permission for null context', function () {
       permission = {
         action: 'create',
-        resource_type: 'Audit'
+        resource_type: 'Audit',
       };
       permissions.create = {
         Audit: {
-          contexts: [null]
-        }
+          contexts: [null],
+        },
       };
       expect(Permission._is_allowed(permissions, permission)).toEqual(true);
     });
@@ -102,31 +102,31 @@ describe('Permission', function () {
       permission = {};
       permissions.__GGRC_ADMIN__ = {
         __GGRC_ALL__: {
-          contexts: [0]
-        }
+          contexts: [0],
+        },
       };
       expect(Permission._is_allowed(permissions, permission)).toEqual(true);
     });
     it('returns true if all resource permission is matched', function () {
       permission = {
         action: 'create',
-        context_id: 11
+        context_id: 11,
       };
       permissions.create = {
         __GGRC_ALL__: {
-          contexts: [11]
-        }
+          contexts: [11],
+        },
       };
       expect(Permission._is_allowed(permissions, permission)).toEqual(true);
     });
     it('returns true if admin permission for context is matched', function () {
       permission = {
-        context_id: 101
+        context_id: 101,
       };
       permissions.__GGRC_ADMIN__ = {
         __GGRC_ALL__: {
-          contexts: [101]
-        }
+          contexts: [101],
+        },
       };
       expect(Permission._is_allowed(permissions, permission)).toEqual(true);
     });
@@ -134,7 +134,7 @@ describe('Permission', function () {
       permission = {
         action: 'delete',
         resource_type: 'Audit',
-        context_id: 321
+        context_id: 321,
       };
       expect(Permission._is_allowed(permissions, permission)).toEqual(false);
     });
@@ -181,8 +181,8 @@ describe('Permission', function () {
     it('return true if it is admin permission if no conditions', function () {
       permissions.__GGRC_ADMIN__ = {
         __GGRC_ALL__: {
-          contexts: [0]
-        }
+          contexts: [0],
+        },
       };
       instance = new CMS.Models.UserRole();
       result = Permission._is_allowed_for(permissions, instance, 'create');
@@ -198,11 +198,11 @@ describe('Permission', function () {
                 condition: 'contains',
                 terms: {
                   value: {id: 0},
-                  list_property: 'list_value'
-                }
-              }]
-            }
-          }
+                  list_property: 'list_value',
+                },
+              }],
+            },
+          },
         };
         instance = new CMS.Models.UserRole();
         instance.list_value = [{id: 0}];
@@ -213,8 +213,8 @@ describe('Permission', function () {
       function () {
         permissions.create = {
           UserRole: {
-            resources: [10]
-          }
+            resources: [10],
+          },
         };
         instance = new CMS.Models.UserRole();
         instance.attr('id', 10);
@@ -225,8 +225,8 @@ describe('Permission', function () {
     'and no conditions', function () {
       permissions.create = {
         UserRole: {
-          contexts: [null]
-        }
+          contexts: [null],
+        },
       };
       instance = new CMS.Models.UserRole();
       result = Permission._is_allowed_for(permissions, instance, 'create');
@@ -236,8 +236,8 @@ describe('Permission', function () {
     'and no conditions', function () {
       permissions.create = {
         UserRole: {
-          contexts: [101]
-        }
+          contexts: [101],
+        },
       };
       instance = new CMS.Models.UserRole();
       instance.attr('context', {id: 101});
@@ -255,11 +255,11 @@ describe('Permission', function () {
                 condition: 'contains',
                 terms: {
                   value: {id: 0},
-                  list_property: 'list_value'
-                }
-              }]
-            }
-          }
+                  list_property: 'list_value',
+                },
+              }],
+            },
+          },
         };
         instance = new CMS.Models.UserRole();
         instance.attr('context', {id: 101});
@@ -276,11 +276,11 @@ describe('Permission', function () {
                 condition: 'is',
                 terms: {
                   value: 'good_value',
-                  property_name: 'mockProperty'
-                }
-              }]
-            }
-          }
+                  property_name: 'mockProperty',
+                },
+              }],
+            },
+          },
         };
 
         instance = new CMS.Models.UserRole();
@@ -299,11 +299,11 @@ describe('Permission', function () {
                 condition: 'in',
                 terms: {
                   value: [1, 2, 3],
-                  property_name: 'mockProperty'
-                }
-              }]
-            }
-          }
+                  property_name: 'mockProperty',
+                },
+              }],
+            },
+          },
         };
 
         instance = new CMS.Models.UserRole();
@@ -323,13 +323,13 @@ describe('Permission', function () {
                 terms: {
                   blacklist: {
                     create: [
-                      'bad_instance'
-                    ]
-                  }
-                }
-              }]
-            }
-          }
+                      'bad_instance',
+                    ],
+                  },
+                },
+              }],
+            },
+          },
         };
 
         instance = new CMS.Models.UserRole();
@@ -351,11 +351,11 @@ describe('Permission', function () {
                 condition: 'contains',
                 terms: {
                   value: {id: 0},
-                  list_property: 'list_value'
-                }
-              }]
-            }
-          }
+                  list_property: 'list_value',
+                },
+              }],
+            },
+          },
         };
         instance = new CMS.Models.UserRole();
         instance.attr('context', {id: 101});
@@ -372,11 +372,11 @@ describe('Permission', function () {
                 condition: 'is',
                 terms: {
                   value: 'mockValue',
-                  property_name: 'property_value'
-                }
-              }]
-            }
-          }
+                  property_name: 'property_value',
+                },
+              }],
+            },
+          },
         };
 
         instance = new CMS.Models.UserRole();
@@ -395,17 +395,17 @@ describe('Permission', function () {
                 condition: 'is',
                 terms: {
                   value: 'mockValue',
-                  property_name: 'container.property_value'
-                }
-              }]
-            }
-          }
+                  property_name: 'container.property_value',
+                },
+              }],
+            },
+          },
         };
 
         instance = new CMS.Models.UserRole();
         instance.attr('context', {id: 101});
         instance.attr('container', {
-          property_value: 'mockValue'
+          property_value: 'mockValue',
         });
 
         result = Permission._is_allowed_for(permissions, instance, 'create');
@@ -420,11 +420,11 @@ describe('Permission', function () {
                 condition: 'in',
                 terms: {
                   value: ['mockValue', 1, 2],
-                  property_name: 'property_value'
-                }
-              }]
-            }
-          }
+                  property_name: 'property_value',
+                },
+              }],
+            },
+          },
         };
 
         instance = new CMS.Models.UserRole();
@@ -444,13 +444,13 @@ describe('Permission', function () {
                 terms: {
                   blacklist: {
                     create: [
-                      'bad_instance'
-                    ]
-                  }
-                }
-              }]
-            }
-          }
+                      'bad_instance',
+                    ],
+                  },
+                },
+              }],
+            },
+          },
         };
 
         instance = new CMS.Models.UserRole();
@@ -471,11 +471,11 @@ describe('Permission', function () {
                 condition: 'contains',
                 terms: {
                   value: {id: 0},
-                  list_property: 'list_value'
-                }
-              }]
-            }
-          }
+                  list_property: 'list_value',
+                },
+              }],
+            },
+          },
         };
         instance = new CMS.Models.Audit();
         instance.attr('context', {id: 101});
@@ -492,11 +492,11 @@ describe('Permission', function () {
                 condition: 'contains',
                 terms: {
                   value: {id: 0},
-                  list_property: 'list_value'
-                }
-              }]
-            }
-          }
+                  list_property: 'list_value',
+                },
+              }],
+            },
+          },
         };
         instance = new CMS.Models.Audit();
         instance.attr('context', {id: 101});
@@ -514,7 +514,7 @@ describe('Permission', function () {
       object = {
         action: 'create',
         resource_type: 'UserRole',
-        context_id: 1
+        context_id: 1,
       };
 
       spyOn(Permission, '_is_allowed').and.returnValue(object);
@@ -552,21 +552,21 @@ describe('Permission', function () {
   describe('is_allowed_any() method', function () {
     it('returns true if it is allowed with null context', function () {
       GGRC.permissions.read.Program = {
-        contexts: [null]
+        contexts: [null],
       };
       expect(Permission.is_allowed_any('read', 'Program'))
         .toEqual(true);
     });
     it('returns true if there is at least one allowed context', function () {
       GGRC.permissions.read.Program = {
-        contexts: [1]
+        contexts: [1],
       };
       expect(Permission.is_allowed_any('read', 'Program'))
         .toEqual(true);
     });
     it('returns false if there is no allowed context', function () {
       GGRC.permissions.read.Program = {
-        contexts: []
+        contexts: [],
       };
       expect(Permission.is_allowed_any('read', 'Program'))
         .toEqual(false);
@@ -576,7 +576,7 @@ describe('Permission', function () {
   describe('page_context_id() method', function () {
     it('return page instance context id', function () {
       let context = {
-        id: 711
+        id: 711,
       };
       spyOn(GGRC, 'page_instance')
         .and.returnValue({context: context});

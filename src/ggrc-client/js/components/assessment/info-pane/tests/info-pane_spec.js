@@ -7,11 +7,13 @@ import tracker from '../../../../tracker';
 
 describe('GGRC.Components.assessmentInfoPane', function () {
   let vm;
+  let instanceSave;
 
   beforeEach(function () {
+    instanceSave = can.Deferred();
     vm = GGRC.Components.getViewModel('assessmentInfoPane');
     vm.attr('instance', {
-      save: () => can.Deferred().resolve(),
+      save: () => instanceSave,
     });
   });
 
@@ -53,7 +55,7 @@ describe('GGRC.Components.assessmentInfoPane', function () {
 
     it('returns status back on undo action', (done) => {
       vm.attr('instance.previousStatus', 'FooBar');
-      vm.attr('formState.formSavedDeferred', can.Deferred().resolve());
+      instanceSave.resolve();
 
       method({
         undo: true,
@@ -66,7 +68,7 @@ describe('GGRC.Components.assessmentInfoPane', function () {
     });
 
     it('resets isPending flag in case success the status changing', (done) => {
-      vm.attr('formState.formSavedDeferred', can.Deferred().resolve());
+      instanceSave.resolve();
 
       method({
         status: 'FooBar',
@@ -78,7 +80,7 @@ describe('GGRC.Components.assessmentInfoPane', function () {
 
     it('resets isPending flag in case unsuccessful the status changing',
       (done) => {
-        vm.attr('formState.formSavedDeferred', can.Deferred().reject());
+        instanceSave.reject();
 
         method({
           status: 'FooBar',
@@ -90,12 +92,12 @@ describe('GGRC.Components.assessmentInfoPane', function () {
 
     it('resets status after conflict', (done) => {
       vm.attr('instance.status', 'Baz');
-      vm.attr('formState.formSavedDeferred', can.Deferred().reject({}, {
+      instanceSave.reject({}, {
         status: 409,
         remoteObject: {
           status: 'Foo',
         },
-      }));
+      });
 
       method({
         status: 'Bar',

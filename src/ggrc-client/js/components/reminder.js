@@ -38,10 +38,10 @@ import {confirm} from '../plugins/utils/modals';
               modal_title: scope.attr('modal_title'),
               modal_description: scope.attr('modal_description'),
               button_view:
-                GGRC.mustache_path + '/modals/close_buttons.mustache'
+                GGRC.mustache_path + '/modals/close_buttons.mustache',
             });
           });
-      }
-    }
+      },
+    },
   });
 })(window.can, window.can.$);

@@ -11,7 +11,7 @@
     scope: {
       sorted: null,
       mapping: null,
-      next_sort_index: null
+      next_sort_index: null,
     },
 
     init: function () {
@@ -115,7 +115,7 @@
         });
 
         let targetIndex = _.findIndex(instances, {
-          id: ui.item.data('object-id')
+          id: ui.item.data('object-id'),
         });
 
         let nexts = []; // index for constant time next element lookup
@@ -150,7 +150,7 @@
             instance.save();
           });
         });
-      }
-    }
+      },
+    },
   });
 })(window.can, window.can.$);

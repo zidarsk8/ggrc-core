@@ -15,7 +15,7 @@ xdescribe('GGRC.Errors module', function () {
 
     GGRC.Errors.messages = {
       'default': 'Some error!',
-      '401': 'Mock auth invalid message'
+      '401': 'Mock auth invalid message',
     };
 
     trigger = spyOn($.prototype, 'trigger');

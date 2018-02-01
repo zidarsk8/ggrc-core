@@ -29,7 +29,7 @@ describe('GGRC component registry', function () {
     beforeEach(function () {
       componentConfig = {
         tag: 'foo-bar',
-        template: 'Hello World!'
+        template: 'Hello World!',
       };
       fakeComponent = function FooBar() {};
 
@@ -177,7 +177,7 @@ describe('GGRC component registry', function () {
         tag: 'foo-bar',
         template: 'Hello World!',
         scope: {
-        }
+        },
       };
       Components.unregister('fakeComponent');
     });
@@ -189,7 +189,7 @@ describe('GGRC component registry', function () {
 
         template = can.view.mustache('<foo-bar has-value="hasValue" />');
         frag = template({
-          hasValue: true
+          hasValue: true,
         });
 
         frag = $(frag);
@@ -200,8 +200,8 @@ describe('GGRC component registry', function () {
         componentConfig.scope.define = {
           hasValue: {
             type: 'boolean',
-            'default': false
-          }
+            'default': false,
+          },
         };
         Components('fakeComponent', componentConfig);
 
@@ -216,8 +216,8 @@ describe('GGRC component registry', function () {
         componentConfig.scope.define = {
           hasValue: {
             type: 'boolean',
-            'default': false
-          }
+            'default': false,
+          },
         };
         Components('fakeComponent', componentConfig, true);
 
@@ -232,14 +232,14 @@ describe('GGRC component registry', function () {
         componentConfig.scope.define = {
           hasValue: {
             type: 'boolean',
-            'default': false
-          }
+            'default': false,
+          },
         };
         Components('fakeComponent', componentConfig, true);
 
         template = can.view.mustache('<foo-bar has-value="hasValue" />');
         frag = template({
-          hasValue: true
+          hasValue: true,
         });
 
         frag = $(frag);
@@ -255,7 +255,7 @@ describe('GGRC component registry', function () {
 
         template = can.view.mustache('<foo-bar has-value="hasValue" />');
         frag = template({
-          hasValue: 42
+          hasValue: 42,
         });
 
         frag = $(frag);
@@ -266,8 +266,8 @@ describe('GGRC component registry', function () {
         componentConfig.scope.define = {
           hasValue: {
             type: 'number',
-            'default': 42
-          }
+            'default': 42,
+          },
         };
         Components('fakeComponent', componentConfig, true);
 
@@ -282,8 +282,8 @@ describe('GGRC component registry', function () {
         componentConfig.scope.define = {
           hasValue: {
             type: 'number',
-            'default': 42
-          }
+            'default': 42,
+          },
         };
         Components('fakeComponent', componentConfig, true);
 
@@ -298,14 +298,14 @@ describe('GGRC component registry', function () {
         componentConfig.scope.define = {
           hasValue: {
             type: 'number',
-            'default': 42
-          }
+            'default': 42,
+          },
         };
         Components('fakeComponent', componentConfig, true);
 
         template = can.view.mustache('<foo-bar has-value="hasValue" />');
         frag = template({
-          hasValue: 1
+          hasValue: 1,
         });
 
         frag = $(frag);
@@ -320,7 +320,7 @@ describe('GGRC component registry', function () {
 
         template = can.view.mustache('<foo-bar has-value="hasValue" />');
         frag = template({
-          hasValue: 'Hello'
+          hasValue: 'Hello',
         });
 
         frag = $(frag);
@@ -331,8 +331,8 @@ describe('GGRC component registry', function () {
         componentConfig.scope.define = {
           hasValue: {
             type: 'string',
-            'default': 'Hello'
-          }
+            'default': 'Hello',
+          },
         };
         Components('fakeComponent', componentConfig, true);
 
@@ -347,8 +347,8 @@ describe('GGRC component registry', function () {
         componentConfig.scope.define = {
           hasValue: {
             type: 'string',
-            'default': 'Hello'
-          }
+            'default': 'Hello',
+          },
         };
         Components('fakeComponent', componentConfig, true);
 
@@ -363,14 +363,14 @@ describe('GGRC component registry', function () {
         componentConfig.scope.define = {
           hasValue: {
             type: 'string',
-            'default': 'Hello'
-          }
+            'default': 'Hello',
+          },
         };
         Components('fakeComponent', componentConfig, true);
 
         template = can.view.mustache('<foo-bar has-value="hasValue" />');
         frag = template({
-          hasValue: 'World'
+          hasValue: 'World',
         });
 
         frag = $(frag);
@@ -382,8 +382,8 @@ describe('GGRC component registry', function () {
       it('should get function from parent scope', function () {
         componentConfig.scope.define = {
           hasValue: {
-            type: 'function'
-          }
+            type: 'function',
+          },
         };
         Components('fakeComponent', componentConfig, true);
 
@@ -391,7 +391,7 @@ describe('GGRC component registry', function () {
         frag = template({
           hasValue: function () {
             return 'Hi';
-          }
+          },
         });
 
         frag = $(frag);
@@ -404,8 +404,8 @@ describe('GGRC component registry', function () {
             type: 'function',
             'default': function () {
               return 'Hi';
-            }
-          }
+            },
+          },
         };
         Components('fakeComponent', componentConfig, true);
 
@@ -420,7 +420,7 @@ describe('GGRC component registry', function () {
     describe('for @ variables', function () {
       it('should get value from element', function () {
         componentConfig.scope = {
-          hello: '@'
+          hello: '@',
         };
         Components('fakeComponent', componentConfig);
 

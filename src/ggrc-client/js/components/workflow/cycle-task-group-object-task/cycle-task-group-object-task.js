@@ -42,14 +42,40 @@ let viewModel = can.Map.extend({
     return dfdResult;
   },
   loadWorkflow: function (cycle) {
-    let workflow = cycle.attr('workflow').reify();
+    const workflowStub = cycle.attr('workflow');
+    let workflow;
 
+    // if a user doesn't have permissions to read the workflow
+    if (!workflowStub) {
+      const workflow = this.buildTrimmedWorkflowObject();
+      this.attr('workflow', workflow);
+      return;
+    }
+
+    workflow = workflowStub.reify();
     return new RefreshQueue().enqueue(workflow)
       .trigger()
       .then(_.first)
       .then(function (loadedWorkflow) {
         this.attr('workflow', loadedWorkflow);
       }.bind(this));
+  },
+  /**
+   * Returns workflow object with trimmed data.
+   * @return {can.Map} - trimmed workflow.
+   */
+  buildTrimmedWorkflowObject() {
+    const instance = this.attr('instance');
+    const workflow = new can.Map({
+      viewLink: this.buildWorkflowLink(),
+      title: instance.attr('workflow_title'),
+    });
+    return workflow;
+  },
+  buildWorkflowLink() {
+    const instance = this.attr('instance');
+    const id = instance.attr('workflow.id');
+    return `/workflows/${id}`;
   },
   onStateChange: function (event) {
     let instance = this.attr('instance');

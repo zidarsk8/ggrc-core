@@ -9,7 +9,7 @@
   GGRC.Components('lazyOpenClose', {
     tag: 'lazy-openclose',
     scope: {
-      show: false
+      show: false,
     },
     content: '<content/>',
     init: function () {
@@ -17,6 +17,6 @@
       .bind('click', function () {
         this.scope.attr('show', true);
       }.bind(this));
-    }
+    },
   });
 })(window.can, window.can.$);

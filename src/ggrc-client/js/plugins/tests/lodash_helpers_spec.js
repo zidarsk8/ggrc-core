@@ -17,14 +17,14 @@ describe('_.splitTrim() method', function () {
 
     it('return unique values without spaces', function () {
       let result = _.splitTrim(input, splitter, {
-        unique: true
+        unique: true,
       });
       expect(result).toEqual(['a', 'b', 'c', 'd', '']);
     });
 
     it('return compact values without spaces', function () {
       let result = _.splitTrim(input, splitter, {
-        compact: true
+        compact: true,
       });
       expect(result).toEqual(['a', 'b', 'c', 'd', 'a', 'b', 'b']);
     });
@@ -32,7 +32,7 @@ describe('_.splitTrim() method', function () {
     it('return compact and uniquee values without spaces', function () {
       let result = _.splitTrim(input, splitter, {
         unique: true,
-        compact: true
+        compact: true,
       });
       expect(result).toEqual(['a', 'b', 'c', 'd']);
     });
@@ -48,14 +48,14 @@ describe('_.splitTrim() method', function () {
 
     it('return unique split values without spaces', function () {
       let result = _.splitTrim(input, {
-        unique: true
+        unique: true,
       });
       expect(result).toEqual(['a', 'b', 'c', 'd', 'a  b', '', 'f']);
     });
 
     it('return compact split values without spaces', function () {
       let result = _.splitTrim(input, {
-        compact: true
+        compact: true,
       });
       expect(result).toEqual(['a', 'b', 'c', 'd', 'c', 'a  b', 'f']);
     });
@@ -63,7 +63,7 @@ describe('_.splitTrim() method', function () {
     it('return unique and compact split values without spaces', function () {
       let result = _.splitTrim(input, {
         compact: true,
-        unique: true
+        unique: true,
       });
       expect(result).toEqual(['a', 'b', 'c', 'd', 'a  b', 'f']);
     });

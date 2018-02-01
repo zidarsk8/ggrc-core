@@ -50,7 +50,7 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
   IMPORTABLE_FIELDS = (
       'slug', 'title', 'description', 'start_date',
       'end_date', 'finished_date', 'verified_date',
-      'status', '__acl__:Task Assignees',
+      'status', '__acl__:Task Assignees', '__acl__:Task Secondary Assignees',
   )
 
   @classmethod
@@ -152,6 +152,10 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
       reflection.Attribute('verified_date', create=False, update=False),
       reflection.Attribute('allow_change_state', create=False, update=False),
       reflection.Attribute('folder', create=False, update=False),
+      reflection.Attribute('workflow', create=False, update=False),
+      reflection.Attribute('workflow_title', create=False, update=False),
+      reflection.Attribute('cycle_task_group_title', create=False,
+                           update=False),
   )
 
   default_description = "<ol>"\
@@ -198,7 +202,17 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
       "start_date": "Start Date",
   }
 
-  @property
+  @builder.simple_property
+  def cycle_task_group_title(self):
+    """Property. Returns parent CycleTaskGroup title."""
+    return self.cycle_task_group.title
+
+  @builder.simple_property
+  def workflow_title(self):
+    """Property. Returns parent Workflow's title."""
+    return self.workflow.title
+
+  @builder.simple_property
   def workflow(self):
     """Property which returns parent workflow object."""
     return self.cycle.workflow
@@ -223,10 +237,11 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
     return self.cycle.is_current and self.current_user_wfa_or_assignee()
 
   def current_user_wfa_or_assignee(self):
-    """Current user is Workflow Admin or Assignee for self."""
-    wfa_person_ids = self.cycle.workflow.get_person_ids_for_rolename("Admin")
-    assignees_ids = self.get_person_ids_for_rolename("Task Assignees")
-    return login.get_current_user_id() in set(wfa_person_ids + assignees_ids)
+    """Current user is WF Admin, Assignee or Secondary Assignee for self."""
+    wfa_ids = self.workflow.get_person_ids_for_rolename("Admin")
+    ta_ids = self.get_person_ids_for_rolename("Task Assignees")
+    tsa_ids = self.get_person_ids_for_rolename("Task Secondary Assignees")
+    return login.get_current_user_id() in set().union(wfa_ids, ta_ids, tsa_ids)
 
   @classmethod
   def _filter_by_cycle(cls, predicate):

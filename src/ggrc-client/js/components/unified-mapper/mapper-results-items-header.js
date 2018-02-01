@@ -36,7 +36,7 @@ import template from './templates/mapper-results-items-header.mustache';
         } else {
           this.attr('sortDirection', 'asc');
         }
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC, window.CMS);

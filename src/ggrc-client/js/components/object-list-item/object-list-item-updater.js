@@ -27,8 +27,8 @@ import RefreshQueue from '../../models/refresh_queue';
 
             this.attr('instance', value);
             this.attr('instanceUpdated', true);
-          }
-        }
+          },
+        },
       },
       instance: {},
       instanceUpdated: false,
@@ -38,7 +38,7 @@ import RefreshQueue from '../../models/refresh_queue';
             this.attr('instance', refreshedInstances[0]);
             this.attr('instanceUpdated', true);
           }.bind(this));
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

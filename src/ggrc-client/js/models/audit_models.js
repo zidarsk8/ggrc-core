@@ -46,7 +46,7 @@ import Permission from '../permission';
       people: 'CMS.Models.Person.stubs',
       audit_firm: 'CMS.Models.OrgGroup.stub',
       audit_objects: 'CMS.Models.AuditObject.stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     defaults: {
       status: 'Planned',
@@ -56,7 +56,7 @@ import Permission from '../permission';
     obj_nav_options: {
       show_all_tabs: false,
       force_show_list: ['In Scope Controls', 'Assessment Templates',
-        'Issues', 'Assessments']
+        'Issues', 'Assessments'],
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/audits/tree-item-attr.mustache',
@@ -144,7 +144,7 @@ import Permission from '../permission';
           }
         }
       );
-    }
+    },
   }, {
     object_model: function () {
       return CMS.Models[this.attr('object_type')];
@@ -155,7 +155,7 @@ import Permission from '../permission';
         operation: 'clone',
         cloneOptions: options.cloneOptions,
         program: this.program,
-        title: this.title + new Date()
+        title: this.title + new Date(),
       });
     },
     save: function () {
@@ -213,14 +213,14 @@ import Permission from '../permission';
     create: 'POST /api/assessment_templates',
     is_custom_attributable: false,
     attributes: {
-      context: 'CMS.Models.Context.stub'
+      context: 'CMS.Models.Context.stub',
     },
     defaults: {
       test_plan_procedure: true,
       template_object_type: 'Control',
       default_people: {
         assignees: 'Principal Assignees',
-        verifiers: 'Auditors'
+        verifiers: 'Auditors',
       },
       status: 'Draft',
       // the custom lists of assignee / verifier IDs if "other" is selected for
@@ -235,13 +235,13 @@ import Permission from '../permission';
         {value: 'Secondary Assignees', title: 'Secondary Assignees'},
         {value: 'Primary Contacts', title: 'Primary Contacts'},
         {value: 'Secondary Contacts', title: 'Secondary Contacts'},
-        {value: 'other', title: 'Others...'}
+        {value: 'other', title: 'Others...'},
       ],
       showCaptainAlert: false,
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     tree_view_options: {
-      attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache'
+      attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
     },
 
     /**
@@ -393,7 +393,7 @@ import Permission from '../permission';
     defaultAssigneesChanged: function (context, $el, ev) {
       let changedList = [
         'Auditors', 'Principal Assignees', 'Secondary Assignees',
-        'Primary Contacts', 'Secondary Contacts'
+        'Primary Contacts', 'Secondary Contacts',
       ];
       this.attr('showCaptainAlert',
         changedList.indexOf(this.default_people.assignees) >= 0);
@@ -484,6 +484,6 @@ import Permission from '../permission';
       });
     },
 
-    ignore_ca_errors: true
+    ignore_ca_errors: true,
   });
 })(window.can, window.CMS);

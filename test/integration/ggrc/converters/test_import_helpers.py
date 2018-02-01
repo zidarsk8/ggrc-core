@@ -134,9 +134,6 @@ class TestCustomAttributesDefinitions(TestCase):
         "Title",
         "Description",
         "Notes",
-        "Manager",
-        "Reader",
-        "Editor",
         "Reference URL",
         "Code",
         "Effective Date",
@@ -149,6 +146,9 @@ class TestCustomAttributesDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        "Program Managers",
+        "Program Editors",
+        "Program Readers",
         'Created Date',
         'Last Updated Date',
         'Last Updated By',
@@ -158,7 +158,6 @@ class TestCustomAttributesDefinitions(TestCase):
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.itervalues()}
     self.assertTrue(vals["Title"]["mandatory"])
-    self.assertTrue(vals["Manager"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Mandatory Attribute"]["mandatory"])
     self.assertTrue(vals["Choose"]["mandatory"])
@@ -304,9 +303,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Title",
         "Description",
         "Notes",
-        "Manager",
-        "Reader",
-        "Editor",
         "Reference URL",
         "Code",
         "Effective Date",
@@ -316,6 +312,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        "Program Managers",
+        "Program Editors",
+        "Program Readers",
         'Created Date',
         'Last Updated Date',
         'Last Updated By',
@@ -325,7 +324,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "mandatory": {
             "Code",
             "Title",
-            "Manager",
+            "Program Managers",
         },
         "unique": {
             "Code",
@@ -333,10 +332,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         },
     }
     self._test_single_object(models.Program, names, expected_fields)
-
-    definitions = get_object_column_definitions(models.Program)
-    vals = {val["display_name"]: val for val in definitions.itervalues()}
-    self.assertEqual(vals["Manager"]["type"], "user_role")
 
   def test_audit_definitions(self):
     """Test default headers for Audit."""

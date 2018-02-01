@@ -18,6 +18,7 @@
   </div>
 
   <div class="proposal-confirm__actions">
+    <spinner toggle="isLoading"></spinner>
     {{#if canDisplayApplyButton}}
       <button class="btn btn-green proposal-confirm__button"
         ($click)="confirm(true)"
@@ -37,6 +38,5 @@
       {{#if isLoading}}disabled{{/if}}>
         Cancel
     </button>
-    <spinner toggle="isLoading"></spinner>
   </div>
 </div>

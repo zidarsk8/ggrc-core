@@ -4,7 +4,7 @@
 }}
 
 {{#if button}}
-  {{#is_allowed 'create' 'Assessment' context=instance.context}}
+  {{#is_allowed 'update' parent_instance context="for"}}
     <a
       href="javascript://"
       class="generate-control-assessments btn btn-small btn-darkBlue"

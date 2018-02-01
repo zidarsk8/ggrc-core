@@ -48,16 +48,16 @@
       return {
         entities: {
           name: 'People/Groups',
-          items: []
+          items: [],
         },
         business: {
           name: 'Assets/Business',
-          items: []
+          items: [],
         },
         governance: {
           name: 'Governance',
-          items: []
-        }
+          items: [],
+        },
       };
     },
 
@@ -88,7 +88,7 @@
       return GGRC.Utils
         .getMappableTypes(type, {
           whitelist: include,
-          forbidden: exclude
+          forbidden: exclude,
         });
     },
     /**
@@ -131,7 +131,7 @@
         singular: cmsModel.model_singular,
         plural: cmsModel.title_plural.toLowerCase().replace(/\s+/, '_'),
         table_plural: cmsModel.table_plural,
-        title_singular: cmsModel.title_singular
+        title_singular: cmsModel.title_singular,
       };
     },
     /**
@@ -263,11 +263,11 @@
         option.constructor.shortName);
       let objectAttrs = {
         id: object.id,
-        type: object.constructor.shortName
+        type: object.constructor.shortName,
       };
       let optionAttrs = {
         id: option.id,
-        type: option.constructor.shortName
+        type: option.constructor.shortName,
       };
       let result;
 
@@ -282,7 +282,7 @@
         result = null;
       }
       return result;
-    }
+    },
   }, {
     /*
       On init:
@@ -377,6 +377,6 @@
           mappings[name] = this.reify_mixins(definition, definitions);
       }, this);
       return mappings;
-    }
+    },
   });
 })(window.GGRC, window.can);

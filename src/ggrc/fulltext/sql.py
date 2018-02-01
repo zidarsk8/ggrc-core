@@ -13,6 +13,7 @@ class SqlIndexer(object):
 
   def __init__(self, settings):
     self.indexer_rules = defaultdict(list)
+    self.indexer_fields = defaultdict(set)
     self.cache = defaultdict(dict)
     self.builders = {}
 

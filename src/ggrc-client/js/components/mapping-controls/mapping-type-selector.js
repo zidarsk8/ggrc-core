@@ -15,7 +15,7 @@ import template from './mapping-type-selector.mustache';
       disabled: false,
       readonly: false,
       types: [],
-      selectedType: ''
+      selectedType: '',
     },
     init: function () {
       let selectedType = this.viewModel.selectedType;
@@ -30,6 +30,6 @@ import template from './mapping-type-selector.mustache';
       if (values.indexOf(selectedType) < 0) {
         this.viewModel.attr('selectedType', values[0]);
       }
-    }
+    },
   });
 })(window.can, window.GGRC);

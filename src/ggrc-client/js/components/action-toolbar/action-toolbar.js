@@ -8,6 +8,6 @@
 
   GGRC.Components('actionToolbar', {
     tag: 'action-toolbar',
-    viewModel: {}
+    viewModel: {},
   });
 })(window.GGRC);

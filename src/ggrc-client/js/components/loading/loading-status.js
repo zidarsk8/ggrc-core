@@ -15,18 +15,18 @@ import template from './loading-status.mustache';
       define: {
         showSpinner: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         alwaysShowText: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         isLoading: {
           type: 'boolean',
-          value: false
-        }
+          value: false,
+        },
       },
-      loadingText: '@'
-    }
+      loadingText: '@',
+    },
   });
 })(window.can, window.GGRC);

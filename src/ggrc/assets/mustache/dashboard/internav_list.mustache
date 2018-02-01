@@ -3,11 +3,12 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#if_helpers '\
-  ^is_empty' counts '\
-  or #is_admin_page' }}
+
 <div class="tabs priority {{^is instance.type 'Audit'}}single-set{{/is}}">
   <ul class="internav {{#if_equals instance.type 'Audit'}}audit{{/if_equals}}">
+    {{#if_helpers '\
+      ^is_empty' counts '\
+      or #is_admin_page' }}
     {{#priorityTabs}}
       <li class="{{internav_icon}} {{widgetType}} {{#if_equals contexts.active_widget.selector selector}}active{{/if_equals}}">
         {{#displayWidgetTab . instance}}
@@ -40,10 +41,18 @@
           {add-tab-title}="'Add Tab'"></add-tab-button>
       {{/hasHiddenWidgets}}
     {{/if}}
-    {{{render_hooks 'ObjectNav.Actions'}}}
+    {{/if_helpers}}
+
+    {{#if_equals instance.type 'Workflow'}}
+      {{> '/static/mustache/dashboard/object_nav_actions.mustache'}}
+    {{/if_equals}}
   </ul>
 </div>
 
+
+{{#if_helpers '\
+  ^is_empty' counts '\
+  or #is_admin_page' }}
 {{#if_equals instance.type 'Audit'}}
 <div class="tabs not-priority">
   <div class="not-priority-hide {{#if isMenuVisible}}visible{{/if}}">

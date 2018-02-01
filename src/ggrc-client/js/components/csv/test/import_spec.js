@@ -50,7 +50,7 @@ describe('GGRC.Components.csvImportWidget', function () {
           let blockOptions = {
             name: objectType,
             rows: rowCounts.totalRows || 0,
-            block_errors: hasErrors ? new can.List({}) : new can.List()
+            block_errors: hasErrors ? new can.List({}) : new can.List(),
           };
           let combinedCount = 0;
 
@@ -91,7 +91,7 @@ describe('GGRC.Components.csvImportWidget', function () {
           let result;
           let importBlocks = [
             makeImportBlock('Assessment', {totalRows: 0}),
-            makeImportBlock('Market', {totalRows: 0})
+            makeImportBlock('Market', {totalRows: 0}),
           ];
           fakeScope.attr('import', importBlocks);
 
@@ -106,7 +106,7 @@ describe('GGRC.Components.csvImportWidget', function () {
             makeImportBlock('Assessment', {totalRows: 4, ignored: 4}, true),
             makeImportBlock('Market', {totalRows: 0, ignored: 0}),
             makeImportBlock(
-              'Contract', {totalRows: 3, created: 1, ignored: 2})
+              'Contract', {totalRows: 3, created: 1, ignored: 2}),
           ];
           fakeScope.attr('import', importBlocks);
 
@@ -119,7 +119,7 @@ describe('GGRC.Components.csvImportWidget', function () {
           function () {
             let result;
             let importBlocks = [
-              makeImportBlock('Assessment', {totalRows: 4, ignored: 4})
+              makeImportBlock('Assessment', {totalRows: 4, ignored: 4}),
             ];
             fakeScope.attr('import', importBlocks);
 
@@ -137,7 +137,7 @@ describe('GGRC.Components.csvImportWidget', function () {
               makeImportBlock('Assessment', {totalRows: 4, ignored: 4}),
               makeImportBlock('Market', {totalRows: 0, ignored: 0}),
               makeImportBlock(
-                'Contract', {totalRows: 3, created: 1, ignored: 2})
+                'Contract', {totalRows: 3, created: 1, ignored: 2}),
             ];
             fakeScope.attr('import', importBlocks);
 

@@ -22,6 +22,6 @@
         };
 
         this._super(source, filterFn);
-      }
+      },
     });
 })(window.GGRC, window.can);

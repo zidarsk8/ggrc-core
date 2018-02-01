@@ -202,16 +202,13 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user):
   workflow = cycle.workflow
   start_date = workflow.calc_next_adjusted_date(task_group_task.start_date)
   end_date = workflow.calc_next_adjusted_date(task_group_task.end_date)
-  cycle_task_role_id = {
-      v: k for (k, v) in
-      role.get_custom_roles_for("CycleTaskGroupObjectTask").iteritems()
-  }['Task Assignees']
   access_control_list = []
-  for person_id in task_group_task.get_person_ids_for_rolename(
-          "Task Assignees"):
-    access_control_list.append(
-        {"ac_role_id": cycle_task_role_id, "person": {"id": person_id}}
-    )
+  for role_id, role_name in role.get_custom_roles_for(
+          models.CycleTaskGroupObjectTask.__name__).iteritems():
+    for person_id in task_group_task.get_person_ids_for_rolename(role_name):
+      access_control_list.append(
+          {"ac_role_id": role_id, "person": {"id": person_id}}
+      )
   cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
       context=cycle.context,
       cycle=cycle,
@@ -305,12 +302,6 @@ def build_cycle(workflow, cycle=None, current_user=None):
                        destination=object_)
 
   update_cycle_dates(cycle)
-  Signals.workflow_cycle_start.send(
-      cycle.__class__,
-      obj=cycle,
-      new_status=cycle.status,
-      old_status=None
-  )
   workflow.repeat_multiplier += 1
   workflow.next_cycle_start_date = workflow.calc_next_adjusted_date(
       workflow.min_task_start_date)

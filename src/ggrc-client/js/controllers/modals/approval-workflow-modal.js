@@ -10,12 +10,12 @@ let ApprovalWorkflowErrors = function () {
   let errors = null;
   if (!this.attr('contact')) {
     errors = {
-      contact: 'Must be defined'
+      contact: 'Must be defined',
     };
   }
   if (!this.attr('end_date')) {
     errors = $.extend(errors, {
-      end_date: 'Must be defined'
+      end_date: 'Must be defined',
     });
   }
   return errors;
@@ -23,8 +23,8 @@ let ApprovalWorkflowErrors = function () {
 
 let ApprovalWorkflow = can.Observe({
   defaults: {
-    original_object: null
-  }
+    original_object: null,
+  },
 }, {
   save: function () {
     let that = this;
@@ -61,7 +61,7 @@ let ApprovalWorkflow = can.Observe({
             status: 'Active',
             title: reviewTemplate({
               type: that.original_object.constructor.title_singular,
-              title: that.original_object.title
+              title: that.original_object.title,
             }),
             object_approval: true,
             notify_on_change: true,
@@ -71,7 +71,7 @@ let ApprovalWorkflow = can.Observe({
               type: that.original_object.constructor.model_singular,
               title: that.original_object.title,
               before: moment(that.end_date).format('MM/DD/YYYY'),
-              href: window.location.href.replace(/#.*$/, '')
+              href: window.location.href.replace(/#.*$/, ''),
             }),
             context: that.original_object.context,
           }).save(createDefaultTaskGroup)
@@ -82,10 +82,10 @@ let ApprovalWorkflow = can.Observe({
               workflow : wf,
               title: reviewTemplate({
                 type: that.original_object.constructor.title_singular,
-                title: that.original_object.title
+                title: that.original_object.title,
               }),
               contact: that.contact,
-              context: wf.context
+              context: wf.context,
             }).save()
           );
         }).then(function(wf, tg) {
@@ -108,13 +108,13 @@ let ApprovalWorkflow = can.Observe({
               task_type: "text",
               title: reviewTemplate({
                 type: that.original_object.constructor.title_singular,
-                title: that.original_object.title
-              })
+                title: that.original_object.title,
+              }),
             }).save(),
             new CMS.Models.TaskGroupObject({
               task_group: tg,
               object: that.original_object,
-              context: wf.context
+              context: wf.context,
             }).save()
           );
         });
@@ -142,7 +142,7 @@ let ApprovalWorkflow = can.Observe({
                       }],
                       'end_date': that.end_date,
                       'start_date': moment().format('MM/DD/YYYY'),
-                      'task_type': tgt.task_type || 'text'
+                      'task_type': tgt.task_type || 'text',
                     }).save();
                   });
                 }));
@@ -156,7 +156,7 @@ let ApprovalWorkflow = can.Observe({
         let cycleDfd = new CMS.Models.Cycle({
           workflow: wf,
           autogenerate: true,
-          context: wf.context
+          context: wf.context,
         }).save();
         cycleDfd.then(function () {
           return that.original_object.refresh();
@@ -166,7 +166,7 @@ let ApprovalWorkflow = can.Observe({
     });
   },
   computed_errors: ApprovalWorkflowErrors,
-  computed_unsuppressed_errors: ApprovalWorkflowErrors
+  computed_unsuppressed_errors: ApprovalWorkflowErrors,
 });
 
 export default ModalsController({
@@ -181,10 +181,10 @@ export default ModalsController({
     button_view : BUTTON_VIEW_SAVE_CANCEL,
     afterFetch: function () {
       this.attr("instance", new ApprovalWorkflow({
-        original_object : this.attr('instance')
+        original_object : this.attr('instance'),
       }));
-    }
-  }
+    },
+  },
 }, {
   init : function() {
     this.options.button_view = BUTTON_VIEW_SAVE_CANCEL;
@@ -194,7 +194,7 @@ export default ModalsController({
     if(el.val() === "") {
       this.options.instance.attr(el.attr("name").split(".").slice(0, -1).join("."), null);
     }
-  }
+  },
 });
 
 export {

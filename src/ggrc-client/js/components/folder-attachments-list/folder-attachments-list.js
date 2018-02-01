@@ -22,11 +22,18 @@ import template from './folder-attachments-list.mustache';
       define: {
         denyNoFolder: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         readonly: {
           type: 'boolean',
-          value: false
+          value: false,
+        },
+        showSpinner: {
+          type: 'boolean',
+          get: function () {
+            return this.attr('isUploading') || this.attr('isUnmapping') ||
+              this.attr('isListLoading');
+          },
         },
         /**
          * Indicates whether uploading files without parent folder allowed
@@ -36,8 +43,8 @@ import template from './folder-attachments-list.mustache';
           type: 'boolean',
           get: function () {
             return !this.attr('denyNoFolder') && !this.attr('folderError');
-          }
-        }
+          },
+        },
       },
       title: null,
       subLabel: '@',
@@ -45,15 +52,17 @@ import template from './folder-attachments-list.mustache';
       instance: null,
       currentFolder: null,
       folderError: null,
-      isFilesLoaded: false,
+      isUploading: false,
+      isUnmapping: false,
+      isListLoading: false,
       itemsUploadedCallback: function () {
         if (this.instance instanceof CMS.Models.Control) {
           this.instance.dispatch('refreshInstance');
         }
-      }
+      },
     },
     events: {
-      init: function () {}
-    }
+      init: function () {},
+    },
   });
 })(window.GGRC, window.can);

@@ -27,7 +27,7 @@ function checkPreconditions(options, success) {
 
   warning({
     objectShortInfo: [instance.type, instance.title].join(' '),
-    operation: operation
+    operation: operation,
   }, success);
 }
 

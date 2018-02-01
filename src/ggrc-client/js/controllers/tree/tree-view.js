@@ -52,8 +52,8 @@ import Permission from '../../permission';
       'original_list',
       'single_object',
       'find_function',
-      'find_all_deferred'
-    ]
+      'find_all_deferred',
+    ],
   }, {
     // prototype properties
     setup: function (el, opts) {
@@ -677,7 +677,7 @@ import Permission from '../../permission';
       this._is_scrolling_up = false;
       this.find_all_deferred = false;
       this.options.list.replace([]);
-      this.draw_list(this.options.original_list, true, forceReload);
+      this.draw_list(this.options.original_list, forceReload);
       this.init_count();
     },
 
@@ -691,6 +691,6 @@ import Permission from '../../permission';
 
     clearList: function () {
       this.element.children('.tree-item, .tree-item-placeholder').remove();
-    }
+    },
   });
 })(window.can, window.$);

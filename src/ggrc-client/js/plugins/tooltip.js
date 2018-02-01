@@ -115,12 +115,12 @@
     let $currentTarget = $(e.currentTarget);
     let delay = {
       show: 500,
-      hide: 0
+      hide: 0,
     };
 
     actions = {
       isShown: false,
-      isClicked: false
+      isClicked: false,
     };
 
     $currentTarget

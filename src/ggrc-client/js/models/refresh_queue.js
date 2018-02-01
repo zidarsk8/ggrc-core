@@ -60,7 +60,7 @@ const ModelRefreshQueue = can.Construct({}, {
     }
 
     return this.deferred;
-  }
+  },
 });
 
 const RefreshQueueManager = can.Construct({
@@ -73,7 +73,7 @@ const RefreshQueueManager = can.Construct({
     // , Standard: 'Directive'
     // , System: 'SystemOrProcess'
     // , Process: 'SystemOrProcess'
-  }
+  },
 }, {
   init: function () {
     this.null_queue = new ModelRefreshQueue(null);
@@ -137,7 +137,7 @@ const RefreshQueueManager = can.Construct({
     }
 
     return foundQueue;
-  }
+  },
 });
 
 const RefreshQueue = can.Construct({
@@ -167,7 +167,7 @@ const RefreshQueue = can.Construct({
 
         if (!hasBinding) {
           dfd.reject({
-            message: prop + ' binding not found'
+            message: prop + ' binding not found',
           });
         }
         if (hasBinding && next) {
@@ -205,7 +205,7 @@ const RefreshQueue = can.Construct({
         console.warn('refresh_all failed at', prop);
       }
     }
-  }
+  },
 }, {
   init: function () {
     this.objects = [];
@@ -267,7 +267,7 @@ const RefreshQueue = can.Construct({
     }
 
     return this.deferred;
-  }
+  },
 });
 
 export default RefreshQueue;

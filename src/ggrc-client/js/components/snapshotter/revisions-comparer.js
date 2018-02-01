@@ -28,6 +28,7 @@ export default can.Component.extend({
       const rightRevision = this.attr('rightRevision');
       const newRevisionID = rightRevision.id;
       const displayDescriptions = that.attr('displayDescriptions');
+      const proposal = this.attr('proposal');
       confirm({
         modal_title: this.attr('modalTitle'),
         modal_description: 'Loading...',
@@ -40,7 +41,7 @@ export default can.Component.extend({
         instance: this.attr('instance'),
         rightRevision: rightRevision,
         displayDescriptions: displayDescriptions,
-        proposal: this.attr('proposal'),
+        proposal: proposal,
         afterFetch: function (target) {
           let confirmSelf = this;
           that.getRevisions(currentRevisionID, newRevisionID)
@@ -54,16 +55,16 @@ export default can.Component.extend({
                 [];
 
               if (displayDescriptions) {
-                confirmSelf.attr('leftRevisionData', {
-                  updatedAt: data[0].updated_at,
-                  modifiedBy: data[0].modified_by,
-                  description: that.attr('leftRevisionDescription'),
-                });
-                confirmSelf.attr('rightRevisionData', {
-                  updatedAt: data[1].updated_at,
-                  modifiedBy: data[1].modified_by,
-                  description: that.attr('rightRevisionDescription'),
-                });
+                const leftRevisionData = that.getRevisionData(
+                  data[0],
+                  that.attr('leftRevisionDescription'));
+                const rightRevisionData = that.getRevisionData(
+                  data[1],
+                  that.attr('rightRevisionDescription'),
+                  proposal);
+
+                confirmSelf.attr('leftRevisionData', leftRevisionData);
+                confirmSelf.attr('rightRevisionData', rightRevisionData);
               }
 
               // people should be preloaded before highlighting differences
@@ -87,6 +88,15 @@ export default can.Component.extend({
             });
         },
       }, this.updateRevision.bind(this));
+    },
+    getRevisionData(revision, description, proposal) {
+      const revisionData = {
+        description,
+        date: proposal ? proposal.created_at : revision.updated_at,
+        author: proposal ? proposal.proposed_by : revision.modified_by,
+      };
+
+      return revisionData;
     },
     /**
      * Loads to cache people from access control list
@@ -168,7 +178,7 @@ export default can.Component.extend({
           });
       } else {
         result = Revision.findAll({
-          id__in: notCached.join(',')
+          id__in: notCached.join(','),
         });
       }
 

@@ -28,14 +28,14 @@ describe('GGRC.Components.gDriveFolderPicker', function () {
       beforeEach(function () {
         that = {
           viewModel: viewModel,
-          element: $('<div></div>')
+          element: $('<div></div>'),
         };
         method = events.inserted.bind(that);
       });
 
       it('does nothing when folder is not attached', function () {
         viewModel.attr('instance', {
-          folder: null
+          folder: null,
         });
         viewModel.attr('readonly', true);
 
@@ -50,7 +50,7 @@ describe('GGRC.Components.gDriveFolderPicker', function () {
       it('calls setRevisionFolder() for snapshot with attached folder',
       function () {
         viewModel.attr('instance', {
-          folder: folderId
+          folder: folderId,
         });
         viewModel.attr('readonly', true);
         spyOn(viewModel, 'setRevisionFolder');
@@ -61,7 +61,7 @@ describe('GGRC.Components.gDriveFolderPicker', function () {
 
       it('calls setCurrent() when folder is attached', function () {
         viewModel.attr('instance', {
-          folder: folderId
+          folder: folderId,
         });
         viewModel.attr('readonly', false);
         spyOn(viewModel, 'setCurrent');
@@ -77,12 +77,12 @@ describe('GGRC.Components.gDriveFolderPicker', function () {
 
       beforeEach(function () {
         viewModel.attr('instance', {
-          folder: folderId
+          folder: folderId,
         });
 
         that = {
           viewModel: viewModel,
-          element: $('<div></div>')
+          element: $('<div></div>'),
         };
         method = events['a[data-toggle=gdrive-remover] click'].bind(that);
       });
@@ -157,24 +157,24 @@ describe('GGRC.Components.gDriveFolderPicker', function () {
       beforeEach(function () {
         element = $('<div></div>').data('type', 'folders');
         viewModel.attr('instance', {
-          folder: null
+          folder: null,
         });
         pickedFolders = {
           files: [{
             mimeType: 'application/vnd.google-apps.folder',
-            id: folderId
-          }]
+            id: folderId,
+          }],
         };
 
         that = {
-          viewModel: viewModel
+          viewModel: viewModel,
         };
         method = events['.entry-attachment picked'].bind(that);
       });
 
       it('notifies when selected not a folder', function () {
         let data = {
-          files: [{mimeType: 'not a folder mime type'}]
+          files: [{mimeType: 'not a folder mime type'}],
         };
         spyOn($.fn, 'trigger').and.callThrough();
 

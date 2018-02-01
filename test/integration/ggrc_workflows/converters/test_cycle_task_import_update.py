@@ -67,6 +67,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
       "Actual Verified Date",
       "State",
       "Task Assignees",
+      "Task Secondary Assignees",
   ]
 
   def setUp(self):
@@ -560,7 +561,8 @@ class TestCycleTaskImportUpdateAssignee(BaseTestCycleTaskImportUpdate):
 
   def setUp(self):
     self.instance = factories.CycleTaskFactory()
-    self.user = ggrc_factories.PersonFactory()
+    self.assignee = ggrc_factories.PersonFactory()
+    self.s_assignee = ggrc_factories.PersonFactory()
     self.query = CycleTaskGroupObjectTask.query.filter(
         CycleTaskGroupObjectTask.id == self.instance.id
     )
@@ -581,12 +583,16 @@ class TestCycleTaskImportUpdateAssignee(BaseTestCycleTaskImportUpdate):
     response = self.import_data(OrderedDict([
         ("object_type", alias),
         ("Code*", self.instance.slug),
-        ("Task Assignees*", self.user.email),
+        ("Task Assignees*", self.assignee.email),
+        ("Task Secondary Assignees", self.s_assignee.email)
     ]))
     self._check_csv_response(response, {})
     assignees = list(self.get_persons_for_role_name(
         self.query.first(), "Task Assignees"))
-    self.assertEqual([self.user.email], [u.email for u in assignees])
+    self.assertEqual([self.assignee.email], [u.email for u in assignees])
+    s_assignees = list(self.get_persons_for_role_name(
+        self.query.first(), "Task Secondary Assignees"))
+    self.assertEqual([self.s_assignee.email], [u.email for u in s_assignees])
 
   @ddt.data(
       "CycleTask",
@@ -604,11 +610,15 @@ class TestCycleTaskImportUpdateAssignee(BaseTestCycleTaskImportUpdate):
     response = self.import_data(OrderedDict([
         ("object_type", alias),
         ("Code*", self.instance.slug),
-        ("Task Assignees*", self.user.email),
+        ("Task Assignees*", self.assignee.email),
+        ("Task Secondary Assignees", self.s_assignee.email),
         ("Task Type", "some data"),
     ]))
     assignees = list(
         self.get_persons_for_role_name(self.query.first(), "Task Assignees"))
-    self.assertEqual([self.user.email], [u.email for u in assignees])
-    self._check_csv_response(response,
-                             self.generate_expected_warning('Task Assignees'))
+    self.assertEqual([self.assignee.email], [u.email for u in assignees])
+    s_assignees = list(self.get_persons_for_role_name(
+        self.query.first(), "Task Secondary Assignees"))
+    self.assertEqual([self.s_assignee.email], [u.email for u in s_assignees])
+    self._check_csv_response(response, self.generate_expected_warning(
+        'Task Assignees', 'Task Secondary Assignees'))

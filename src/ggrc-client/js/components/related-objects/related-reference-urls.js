@@ -14,24 +14,24 @@
         urls: {
           value: function () {
             return [];
-          }
+          },
         },
         value: {
           type: 'string',
-          value: ''
+          value: '',
         },
         isFormVisible: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         isDisabled: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         isNotEditable: {
           type: 'boolean',
-          value: false
-        }
+          value: false,
+        },
       },
       /**
        * @description Moves focus to the create url input element
@@ -110,7 +110,7 @@
       createReferenceUrl: function (url) {
         this.dispatch({
           type: 'createReferenceUrl',
-          payload: url
+          payload: url,
         });
       },
       /**
@@ -122,9 +122,9 @@
       removeReferenceUrl: function (url) {
         this.dispatch({
           type: 'removeReferenceUrl',
-          payload: url
+          payload: url,
         });
-      }
+      },
     },
     events: {
       /**
@@ -133,7 +133,7 @@
        */
       inserted: function () {
         this.viewModel.attr('element', this.element);
-      }
-    }
+      },
+    },
   });
 })(window.can, window.can.$);

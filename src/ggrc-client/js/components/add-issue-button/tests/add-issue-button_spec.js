@@ -30,7 +30,7 @@ describe('GGRC.Components.addIssueButton', function () {
 
     beforeEach(function () {
       that = {
-        viewModel: viewModel
+        viewModel: viewModel,
       };
       relatedInstance = viewModel.attr('relatedInstance');
       spyOn(relatedInstance, 'dispatch');
@@ -42,7 +42,7 @@ describe('GGRC.Components.addIssueButton', function () {
       let fakeIssueInstance;
       let fakePageInstance = {
         type: 'TYPE',
-        id: 'ID'
+        id: 'ID',
       };
 
       beforeEach(function () {

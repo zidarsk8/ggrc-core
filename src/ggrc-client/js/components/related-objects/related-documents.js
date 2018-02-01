@@ -30,22 +30,26 @@ import {
         // automatically refresh instance on related document create/remove
         autorefresh: {
           type: 'boolean',
-          value: true
-        }
+          value: true,
+        },
+        customLoader: {
+          type: 'boolean',
+          value: false,
+        },
       },
       getDocumentsQuery: function () {
         let relevantFilters = [{
           type: this.attr('instance.type'),
           id: this.attr('instance.id'),
-          operation: 'relevant'
+          operation: 'relevant',
         }];
         let additionalFilter = this.attr('documentType') ?
         {
           expression: {
             left: 'document_type',
             op: {name: '='},
-            right: this.attr('documentType')
-          }
+            right: this.attr('documentType'),
+          },
         } :
         [];
 
@@ -56,32 +60,34 @@ import {
         return query;
       },
       loadDocuments: function () {
-        let promise;
-        let self = this;
-        let query = this.getDocumentsQuery();
+        const query = this.getDocumentsQuery();
 
         this.attr('isLoading', true);
-        promise = batchRequests(query).then(
-          function (response) {
-            let documents = response.Document.values;
-            self.attr('documents').replace(documents);
-            self.attr('isLoading', false);
-          }
-        );
-        return promise;
+
+        return batchRequests(query).then((response) => {
+          const documents = response.Document.values;
+          this.attr('documents').replace(documents);
+          this.attr('isLoading', false);
+        });
       },
       setDocuments: function () {
-        let instance = this.attr('instance');
-        let documentType = this.attr('documentType');
-        let isSnapshot = this.attr('isSnapshot');
+        let instance;
+        let documentType;
         let documentPath;
         let documents;
 
+        // don't load documents if they are comes from outside
+        if (this.attr('customLoader')) {
+          return;
+        }
         // load documents for non-snapshots objects
-        if (!isSnapshot) {
+        if (!this.attr('isSnapshot')) {
           this.loadDocuments();
           return;
         }
+
+        instance = this.attr('instance');
+        documentType = this.attr('documentType');
 
         if (documentType) {
           documentPath = DOCUMENT_TYPES_MAP[documentType];
@@ -137,9 +143,9 @@ import {
           title: data,
           created_at: date.toISOString(),
           context: this.instance.context || new CMS.Models.Context({
-            id: null
+            id: null,
           }),
-          document_type: this.documentType
+          document_type: this.documentType,
         });
         return document;
       },
@@ -151,7 +157,7 @@ import {
           source: this.instance,
           destination: document,
           context: this.instance.context ||
-            new CMS.Models.Context({id: null})
+            new CMS.Models.Context({id: null}),
         });
         return relationship.save();
       },
@@ -189,7 +195,7 @@ import {
         if (!relationship.id) {
           console.log('Unable to find relationship');
           return can.Deferred().reject({
-            error: 'Unable to find relationship'
+            error: 'Unable to find relationship',
           });
         }
 
@@ -246,7 +252,7 @@ import {
         if (this.autorefresh) {
           this.loadDocuments();
         }
-      }
+      },
     },
     init: function () {
       let instance = this.viewModel.attr('instance');
@@ -262,7 +268,7 @@ import {
     events: {
       '{viewModel.instance} resolvePendingBindings': function () {
         this.viewModel.refreshRelatedDocuments();
-      }
-    }
+      },
+    },
   });
 })(window.can, window.can.$, window._, window.GGRC);

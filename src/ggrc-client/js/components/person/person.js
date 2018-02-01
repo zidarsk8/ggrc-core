@@ -24,12 +24,12 @@ import template from './person.mustache';
       emptyText: '@',
       define: {
         personId: {
-          type: 'number'
+          type: 'number',
         },
         editable: {
-          type: 'boolean'
-        }
-      }
+          type: 'boolean',
+        },
+      },
     },
 
     _EV_REMOVE_CLICK: 'person-remove',
@@ -103,17 +103,17 @@ import template from './person.mustache';
         // thus it needs to be triggered on it (and not on the $el)
         this.element.triggerHandler({
           type: component._EV_REMOVE_CLICK,
-          person: this.scope.personObj
+          person: this.scope.personObj,
         });
 
         // keep the legacy event emitting mechanism above, but emit the event
         // using the more modern dispatch mechanism, too
         this.viewModel.dispatch({
           type: 'personRemove',
-          person: this.scope.personObj
+          person: this.scope.personObj,
         });
-      }
-    }
+      },
+    },
   };
 
   GGRC.Components('personItem', component, true);

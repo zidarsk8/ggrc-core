@@ -21,7 +21,7 @@
     findOne: '/api/revisions/{id}',
 
     mixins: [],
-    attributes: {}
+    attributes: {},
   },
   {});
 })(window.can);

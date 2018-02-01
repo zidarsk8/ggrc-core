@@ -255,12 +255,9 @@ class TestCase(BaseTestCase, object):
       tmp.seek(0)
       return cls._import_file(os.path.basename(tmp.name), dry_run, person)
 
-  @classmethod
-  @patch("ggrc.gdrive.file_actions.get_gdrive_file",
-         new=read_imported_file)
-  def _import_file(cls, filename, dry_run=False, person=None):
-    """Function that handle sending file to import_csv service"""
-    data = {"file": (open(os.path.join(cls.CSV_DIR, filename)), filename)}
+  @staticmethod
+  def send_import_request(data, dry_run=False, person=None):
+    """Sending import post request."""
     headers = {
         "X-test-only": "true" if dry_run else "false",
         "X-requested-by": "GGRC",
@@ -270,6 +267,15 @@ class TestCase(BaseTestCase, object):
     response = api.client.post("/_service/import_csv",
                                data=data, headers=headers)
     return json.loads(response.data)
+
+  @classmethod
+  @patch("ggrc.gdrive.file_actions.get_gdrive_file",
+         new=read_imported_file)
+  def _import_file(cls, filename, dry_run=False, person=None):
+    """Function that handle sending file to import_csv service"""
+    data = {"file": (open(os.path.join(cls.CSV_DIR, filename)), filename)}
+    response = cls.send_import_request(data, dry_run=dry_run, person=person)
+    return response
 
   def import_file(self, filename, dry_run=False, person=None):
     """Import a csv file as a specific user."""

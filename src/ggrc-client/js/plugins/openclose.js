@@ -34,7 +34,7 @@
           $parentTree.removeClass('tree-open');
         }
         $content.removeClass('content-open');
-        can.trigger($peopleInfo, 'click', true);
+        can.trigger($peopleInfo, 'close');
       } else if (cmd === 'open') {
         if (useSlide) {
           $content.slideDown('fast');
@@ -45,7 +45,7 @@
         $li.addClass('item-open');
         $parentTree.addClass('tree-open');
         $content.addClass('content-open');
-        can.trigger($peopleInfo, 'click', false);
+        can.trigger($peopleInfo, 'open');
       }
     });
 

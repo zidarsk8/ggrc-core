@@ -3,13 +3,22 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-folder-attachments-list {
+.folder-attachments-list {
   display: block;
   margin-bottom: 20px;
   ggrc-gdrive-folder-picker {
     .wrap-row {
       margin-bottom: 0;
     }
+  }
+  &__heading {
+    position: relative;
+  }
+  &__spinner {
+    position: absolute;
+    top: 0;
+    right: 100%;
+    margin-right: 5px;
   }
   .small-info {
     .row-fluid & {

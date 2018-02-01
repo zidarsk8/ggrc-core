@@ -16,11 +16,11 @@
       define: {
         isDirty: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         formSaving: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         formStatusText: {
           type: 'string',
@@ -29,9 +29,9 @@
               return IS_SAVING_TEXT;
             }
             return !this.attr('isDirty') ? ALL_SAVED_TEXT : UNSAVED_TEXT;
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   });
 })(window.can, window.GGRC);

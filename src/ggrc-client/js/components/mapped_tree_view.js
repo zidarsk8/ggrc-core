@@ -26,7 +26,7 @@ import './object-list-item/editable-document-object-list-item';
           return expandable === 'true';
         }
         return expandable;
-      }
+      },
     },
     init: function (element) {
       let el = $(element);
@@ -99,7 +99,7 @@ import './object-list-item/editable-document-object-list-item';
             })
             .fail(GGRC.Errors.notifierXHR('error'));
         });
-      }
-    }
+      },
+    },
   });
 })(window.can, window.can.$);

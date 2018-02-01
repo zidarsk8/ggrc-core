@@ -22,7 +22,7 @@ describe('AdvancedSearchContainer', function () {
       viewModel.attr('items', [
         AdvancedSearch.create.attribute({field: 'first'}),
         AdvancedSearch.create.operator(),
-        AdvancedSearch.create.attribute({field: 'second'})
+        AdvancedSearch.create.attribute({field: 'second'}),
       ]);
       viewItems = viewModel.attr('items');
 
@@ -39,7 +39,7 @@ describe('AdvancedSearchContainer', function () {
       viewModel.attr('items', [
         AdvancedSearch.create.attribute({field: 'first'}),
         AdvancedSearch.create.operator(),
-        AdvancedSearch.create.attribute({field: 'second'})
+        AdvancedSearch.create.attribute({field: 'second'}),
       ]);
       viewItems = viewModel.attr('items');
 
@@ -54,7 +54,7 @@ describe('AdvancedSearchContainer', function () {
     function () {
       let viewItems;
       viewModel.attr('items', [
-        AdvancedSearch.create.attribute({field: 'single'})
+        AdvancedSearch.create.attribute({field: 'single'}),
       ]);
       viewItems = viewModel.attr('items');
       spyOn(viewModel, 'remove');
@@ -69,7 +69,7 @@ describe('AdvancedSearchContainer', function () {
     function () {
       let viewItems;
       viewModel.attr('items', [
-        AdvancedSearch.create.attribute({field: 'single'})
+        AdvancedSearch.create.attribute({field: 'single'}),
       ]);
       viewItems = viewModel.attr('items');
       spyOn(viewModel, 'remove');

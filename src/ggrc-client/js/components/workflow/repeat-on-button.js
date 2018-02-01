@@ -20,50 +20,50 @@ import '../dropdown/dropdown';
         buttonText: {
           get: function () {
             return this.getTitle(this.attr('unit'));
-          }
+          },
         },
         modalTitle: {
           get: function () {
             return this.getTitle(this.attr('repeatEnabled'));
-          }
+          },
         },
         repeatEnabled: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         repeatDisabled: {
           get: function () {
             return !this.attr('repeatEnabled');
-          }
+          },
         },
         repeatOptions: {
-          Value: can.List
+          Value: can.List,
         },
         unitOptions: {
-          Value: can.List
+          Value: can.List,
         },
         canSave: {
           type: 'boolean',
-          value: true
+          value: true,
         },
         isSaving: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         onSaveRepeat: {
           value: function () {
             return function () {
               return $.Deferred().resolve();
             };
-          }
-        }
+          },
+        },
       },
       unit: null,
       repeatEvery: null,
       state: {
         open: false,
         result: {
-        }
+        },
       },
       getTitle: function (isEnabled) {
         return 'Repeat ' + (isEnabled ?
@@ -131,7 +131,7 @@ import '../dropdown/dropdown';
             this.attr('isSaving', false);
             this.attr('state.open', false);
           }.bind(this));
-      }
+      },
     },
     events: {
       '{state.result} unit': function () {
@@ -144,7 +144,7 @@ import '../dropdown/dropdown';
             this.viewModel.setDefaultOptions();
           }
         }
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC, window.can.$);

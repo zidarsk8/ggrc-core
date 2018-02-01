@@ -8,17 +8,17 @@
     unitOptions: [
       {title: 'Weekday', value: 'day', plural: 'weekdays', singular: 'weekday'},
       {title: 'Weekly', value: 'week', plural: 'weeks', singular: 'week'},
-      {title: 'Monthly', value: 'month', plural: 'months', singular: 'month'}
+      {title: 'Monthly', value: 'month', plural: 'months', singular: 'month'},
     ],
     repeatOptions: _.range(1, 31)
       .map(function (option) {
         return {
-          value: option
+          value: option,
         };
       }),
     defaultRepeatValues: {
       unit: 'month',
-      repeatEvery: 1
-    }
+      repeatEvery: 1,
+    },
   };
 })(window.GGRC);

@@ -28,7 +28,7 @@
   .proposal-confirm__actions {
     line-height: 30px;
     display: flex;
-    flex-direction: row-reverse;
+    justify-content: flex-end;
     box-sizing: border-box;
 
     .proposal-confirm__button {

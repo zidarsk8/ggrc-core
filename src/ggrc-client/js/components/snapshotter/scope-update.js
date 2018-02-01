@@ -31,7 +31,7 @@ import {
             ' to the latest version?',
           modal_confirm: 'Update',
           button_view: BUTTON_VIEW_CONFIRM_CANCEL,
-          skip_refresh: true
+          skip_refresh: true,
         },
           this._success.bind(this),
           this._dismiss.bind(this)
@@ -61,7 +61,7 @@ import {
           .refresh()
           .then(function () {
             let data = {
-              operation: 'upsert'
+              operation: 'upsert',
             };
             instance.attr('snapshots', data);
             return instance.save();
@@ -94,7 +94,7 @@ import {
         let message = 'Audit was refreshed successfully.';
         $('alert-progress').remove();
         GGRC.Errors.notifier('success', [message]);
-      }
-    }
+      },
+    },
   });
 })(GGRC, window.can, window.can.$);

@@ -30,8 +30,8 @@ import template from './autocomplete.mustache';
         disable: {
           type: 'boolean',
           value: false,
-        }
-      }
+        },
+      },
     },
 
     _EV_ITEM_SELECTED: 'item-selected',
@@ -39,7 +39,7 @@ import template from './autocomplete.mustache';
     events: {
       inserted: function (el, ev) {
         this.element.find('.autocomplete--input').ggrc_autocomplete({
-          appendTo: this.element.find('.autocomplete--wrapper')
+          appendTo: this.element.find('.autocomplete--wrapper'),
         });
       },
 
@@ -54,22 +54,22 @@ import template from './autocomplete.mustache';
       'autocomplete:select': function ($el, ev, data) {
         $el.triggerHandler({
           type: component._EV_ITEM_SELECTED,
-          selectedItem: data.item
+          selectedItem: data.item,
         });
 
         // keep the legacy event emitting mechanism above, but emit the event
         // using the more modern dispatch mechanism, too
         this.viewModel.dispatch({
           type: 'itemSelected',
-          selectedItem: data.item
+          selectedItem: data.item,
         });
 
         // If the input still has focus after selecting an item, search results
         // do not appear unless user clicks out and back in the input (or
         // starts typing). Removing the focus spares one unnecessary click.
         $el.find('input').blur();
-      }
-    }
+      },
+    },
   };
 
   GGRC.Components('autocomplete', component);

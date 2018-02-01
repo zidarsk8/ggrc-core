@@ -28,7 +28,7 @@ let panelModel = can.Map({
   mappings: new can.List(),
 });
 let panelsModel = can.Map({
-  items: new can.List()
+  items: new can.List(),
 });
 let exportModel = can.Map({
   panels: new panelsModel(),
@@ -37,7 +37,7 @@ let exportModel = can.Map({
   type: url.model_type || 'Program',
   only_relevant: false,
   filename: 'export_objects.csv',
-  format: 'gdrive'
+  format: 'gdrive',
 });
 let exportGroup;
 let exportPanel;
@@ -47,7 +47,7 @@ GGRC.Components('csvExport', {
   template: csvExportTemplate,
   viewModel: {
     isFilterActive: false,
-    'export': new exportModel()
+    'export': new exportModel(),
   },
   events: {
     toggleIndicator: function (currentFilter) {
@@ -95,7 +95,7 @@ GGRC.Components('csvExport', {
           filters: GGRC.query_parser.join_queries(
             GGRC.query_parser.parse(relevantFilter || ''),
             GGRC.query_parser.parse(panel.filter || '')
-          )
+          ),
         };
       });
     },
@@ -119,7 +119,7 @@ GGRC.Components('csvExport', {
             modal_description: 'File is exported successfully. ' +
             'You can view the file here: ' +
             '<a href="' + link + '" target="_blank">' + link + '</a>',
-            button_view: GGRC.mustache_path + '/modals/close_buttons.mustache'
+            button_view: GGRC.mustache_path + '/modals/close_buttons.mustache',
           });
         } else {
           const contentDisposition =
@@ -137,8 +137,8 @@ GGRC.Components('csvExport', {
     '#addAnotherObjectType click': function (el, ev) {
       ev.preventDefault();
       this.viewModel.attr('export').dispatch('addPanel');
-    }
-  }
+    },
+  },
 });
 
 exportGroup = GGRC.Components('exportGroup', {
@@ -146,13 +146,13 @@ exportGroup = GGRC.Components('exportGroup', {
   template: exportGroupTemplate,
   viewModel: {
     index: 0,
-    'export': '@'
+    'export': '@',
   },
   events: {
     inserted: function () {
       this.addPanel({
         type: url.model_type || 'Program',
-        isSnapshots: url.isSnapshots
+        isSnapshots: url.isSnapshots,
       });
     },
     addPanel: function (data) {
@@ -182,8 +182,8 @@ exportGroup = GGRC.Components('exportGroup', {
     },
     '{viewModel.export} addPanel': function () {
       this.addPanel();
-    }
-  }
+    },
+  },
 });
 
 exportPanel = GGRC.Components('exportPanel', {

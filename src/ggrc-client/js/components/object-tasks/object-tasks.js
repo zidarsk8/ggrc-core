@@ -34,7 +34,7 @@ import template from './object-tasks.mustache';
         {
           type: type,
           id: id,
-          operation: 'relevant'
+          operation: 'relevant',
         },
         REQUIRED_FIELDS);
 
@@ -48,7 +48,7 @@ import template from './object-tasks.mustache';
 
           this.attr('tasks', tasks);
         }.bind(this));
-    }
+    },
   });
 
   GGRC.Components('objectTasks', {
@@ -58,7 +58,7 @@ import template from './object-tasks.mustache';
     events: {
       inserted: function () {
         this.viewModel.addContent(this.viewModel.loadTasks());
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

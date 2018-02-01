@@ -17,11 +17,11 @@ describe('CMS.Controllers.InnerNav', function () {
 
     beforeEach(function () {
       options = {
-        widget_list: new can.Observe.List([])
+        widget_list: new can.Observe.List([]),
       };
 
       ctrlInst = {
-        options: new can.Map(options)
+        options: new can.Map(options),
       };
 
       sortWidgets = Ctrl.prototype.sortWidgets.bind(ctrlInst);
@@ -34,7 +34,7 @@ describe('CMS.Controllers.InnerNav', function () {
         {internav_display: 'bbb', order: 20},
         {internav_display: 'ccc', order: 50},
         {internav_display: 'ddd', order: 10},
-        {internav_display: 'eee', order: 30}
+        {internav_display: 'eee', order: 30},
       ];
       options.widget_list.replace(widgets);
 
@@ -55,7 +55,7 @@ describe('CMS.Controllers.InnerNav', function () {
         {internav_display: 'qwerty'},
         {internav_display: 'ddd', order: 10},
         {internav_display: 'xyz'},
-        {internav_display: 'eee', order: 30}
+        {internav_display: 'eee', order: 30},
       ];
       options.widget_list.replace(widgets);
 

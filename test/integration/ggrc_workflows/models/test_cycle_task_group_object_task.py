@@ -10,6 +10,7 @@ from ggrc.models import all_models
 
 from integration.ggrc import TestCase as BaseTestCase
 from integration.ggrc import api_helper
+from integration.ggrc import query_helper
 from integration.ggrc.models import factories
 from integration.ggrc_basic_permissions.models import factories as bp_factories
 from integration.ggrc_workflows import generator as wf_generator
@@ -24,6 +25,7 @@ class TestCTGOT(BaseTestCase):
   WORKFLOW_ADMIN = "wfa@example.com"
   TASK_ASSIGNEE_1 = "assignee_1@example.com"
   TASK_ASSIGNEE_2 = "assignee_2@example.com"
+  TASK_SEC_ASSIGNEE = "sec_assignee@example.com"
 
   def setUp(self):
     super(TestCTGOT, self).setUp()
@@ -56,6 +58,14 @@ class TestCTGOT(BaseTestCase):
       factories.AccessControlListFactory(ac_role=task_role,
                                          object=task_2,
                                          person=assignee_2)
+      sec_assignee = factories.PersonFactory(email=self.TASK_SEC_ASSIGNEE)
+      task_role = all_models.AccessControlRole.query.filter(
+          all_models.AccessControlRole.name == "Task Secondary Assignees",
+          all_models.AccessControlRole.object_type == task_1.type,
+      ).one()
+      factories.AccessControlListFactory(ac_role=task_role,
+                                         object=task_1,
+                                         person=sec_assignee)
       wf_admin_role = all_models.AccessControlRole.query.filter(
           all_models.AccessControlRole.name == "Admin",
           all_models.AccessControlRole.object_type == workflow.type,
@@ -136,3 +146,131 @@ class TestCTGOT(BaseTestCase):
 
     for ctask in all_models.CycleTaskGroupObjectTask.query.all():
       self.assertEqual(ctask.context_id, ctask_context_id)
+
+  def test_comment_cascade_deletion_on_cycle_task_delete(self):  # noqa pylint: disable=invalid-name
+    """Test comment cascade deletion on CycleTask delete."""
+    ctask = all_models.CycleTaskGroupObjectTask.query.first()
+    ctask_id = ctask.id
+    wf_factories.CycleTaskEntryFactory(
+        cycle=ctask.cycle,
+        cycle_task_group_object_task=ctask,
+        description="Cycle task comment",
+    )
+    self.assertEqual(all_models.CycleTaskEntry.query.count(), 1)
+
+    user = all_models.Person.query.filter_by(email=self.WORKFLOW_ADMIN).one()
+    self.api.set_user(user)
+
+    response = self.api.delete(
+        all_models.CycleTaskGroupObjectTask.query.get(ctask_id))
+    self.assert200(response)
+
+    self.assertEqual(all_models.CycleTaskGroupObjectTask.query.filter_by(
+        id=ctask_id).count(), 0)
+    self.assertEqual(all_models.CycleTaskEntry.query.count(), 0)
+
+
+class CycleTaskQueryAPI(query_helper.WithQueryApi, TestCTGOT):
+  """CycleTask's QueryAPI related tests."""
+
+  def setUp(self):
+    super(CycleTaskQueryAPI, self).setUp()
+    self.client.get("/login")
+
+  def test_query_by_task_secondary_assignee_on_mytasks_page(self):  # noqa pylint: disable=invalid-name
+    """Test QueryAPI request for CycleTasks on MyTasks page."""
+    sec_assignee = all_models.Person.query.filter_by(
+        email=self.TASK_SEC_ASSIGNEE).one()
+    data = [
+        {
+            "object_name": "CycleTaskGroupObjectTask",
+            "filters": {
+                "expression": {
+                    "left": {
+                        "object_name": "Person",
+                        "op": {
+                            "name": "owned"
+                        },
+                        "ids": [
+                            sec_assignee.id
+                        ]
+                    },
+                    "op": {
+                        "name": "AND"
+                    },
+                    "right": {
+                        "left": "task secondary assignees",
+                        "op": {
+                            "name": "~"
+                        },
+                        "right": self.TASK_SEC_ASSIGNEE
+                    }
+                },
+                "keys": [
+                    "task secondary assignees"
+                ],
+                "order_by": {
+                    "keys": [],
+                    "order": "",
+                    "compare": None
+                }
+            },
+            "limit": [0, 10]
+        }
+    ]
+    result = self._get_first_result_set(data, "CycleTaskGroupObjectTask",
+                                        "total")
+    self.assertEqual(result, 1)
+
+  def test_query_by_task_secondary_assignee_on_active_cycles_tab(self):  # noqa pylint: disable=invalid-name
+    """Test QueryAPI request for CycleTasks on Active Cycles tab."""
+    data = [
+        {
+            "object_name": "Cycle",
+            "filters": {
+                "expression": {
+                    "left": {
+                        "object_name": "Workflow",
+                        "op": {
+                            "name": "relevant"
+                        },
+                        "ids": [all_models.Workflow.query.one().id],
+                    },
+                    "op": {
+                        "name": "AND"
+                    },
+                    "right": {
+                        "left": {
+                            "left": "is_current",
+                            "op": {
+                                "name": "="
+                            },
+                            "right": "1"
+                        },
+                        "op": {
+                            "name": "AND"
+                        },
+                        "right": {
+                            "left": "task secondary assignees",
+                            "op": {
+                                "name": "~"
+                            },
+                            "right": self.TASK_SEC_ASSIGNEE
+                        }
+                    }
+                },
+                "keys": [
+                    "is_current",
+                    "task secondary assignees"
+                ],
+                "order_by": {
+                    "keys": [],
+                    "order": "",
+                    "compare": None
+                }
+            },
+            "limit": [0, 10]
+        }
+    ]
+    result = self._get_first_result_set(data, "Cycle", "total")
+    self.assertEqual(result, 1)

@@ -20,7 +20,7 @@ import template from './collapsible-panel-header.mustache';
       expanded: null,
       toggle: function () {
         this.attr('expanded', !this.attr('expanded'));
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

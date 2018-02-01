@@ -183,7 +183,7 @@ export default GGRC.Components('csvImportWidget', {
         state: 'select',
         fileId: '',
         fileName: '',
-        'import': null
+        'import': null,
       });
       element.find('.csv-upload').val('');
     },

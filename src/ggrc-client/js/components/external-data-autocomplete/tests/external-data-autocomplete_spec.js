@@ -95,7 +95,7 @@ describe('GGRC.Components.externalDataAutocomplete', ()=> {
         setTimeout(()=> {
           expect(viewModel.attr('searchCriteria')).toBe('criteria');
           done();
-        }, 500);
+        }, 600);
       });
 
       it('dispatches "criteriaChanged" event', (done)=> {
@@ -109,7 +109,7 @@ describe('GGRC.Components.externalDataAutocomplete', ()=> {
             value: 'criteria',
           });
           done();
-        }, 500);
+        }, 600);
       });
     });
 
@@ -261,4 +261,3 @@ describe('GGRC.Components.externalDataAutocomplete', ()=> {
     });
   });
 });
-

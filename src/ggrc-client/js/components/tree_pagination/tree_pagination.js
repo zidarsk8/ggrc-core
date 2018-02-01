@@ -86,7 +86,7 @@ import template from './tree_pagination.mustache';
         }
 
         return 'Wrong value';
-      }
-    }
+      },
+    },
   });
 })(window.GGRC, window.can);

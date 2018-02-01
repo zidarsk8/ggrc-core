@@ -49,17 +49,17 @@ export default can.Component.extend({
       GGRC.Utils.getPersonInfo(proposal.proposed_by)
         .then((person) => {
           proposal.attr('proposed_by', person);
-      });
+        });
 
       GGRC.Utils.getPersonInfo(proposal.applied_by)
         .then((person) => {
           proposal.attr('applied_by', person);
-      });
+        });
 
       GGRC.Utils.getPersonInfo(proposal.declined_by)
         .then((person) => {
           proposal.attr('declined_by', person);
-      });
+        });
     },
     getStateTooltip() {
       const proposal = this.attr('proposal');

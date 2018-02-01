@@ -22,53 +22,53 @@ import RefreshQueue from '../refresh_queue';
     // Governance
     Control: {
       _mixins: [
-        'related_object', 'personable', 'assignable'
+        'related_object', 'personable', 'assignable',
       ],
       related_business_objects: Multi([
         'related_data_assets', 'related_facilities', 'related_markets',
         'related_org_groups', 'related_vendors', 'related_processes',
-        'related_products', 'related_projects', 'related_systems'
+        'related_products', 'related_projects', 'related_systems',
       ]),
       related_and_able_objects: Multi([
         'objectives', 'related_business_objects',
-        'people', 'programs', 'clauses'
+        'people', 'programs', 'clauses',
       ]),
       audits: Proxy(
         'Audit', 'audit', 'AuditObject', 'auditable', 'audit_objects'),
       orphaned_objects: Multi([
         'related_objects', 'clauses', 'controls', 'programs', 'objectives',
-        'people'
-      ])
+        'people',
+      ]),
     },
     Objective: {
       _mixins: ['related_object', 'personable'],
       related_and_able_objects: Multi([
         'controls', 'objectives', 'related_objects', 'people',
-        'sections', 'clauses'
+        'sections', 'clauses',
       ]),
       orphaned_objects: Multi([
         'related_objects', 'clauses', 'contracts', 'controls', 'objectives',
-        'people', 'policies', 'programs', 'regulations', 'sections', 'standards'
-      ])
+        'people', 'policies', 'programs', 'regulations', 'sections', 'standards',
+      ]),
     },
     Section: {
-      _mixins: ['related_object', 'personable']
+      _mixins: ['related_object', 'personable'],
     },
     Clause: {
-      _mixins: ['related_object', 'personable']
+      _mixins: ['related_object', 'personable'],
     },
     personable: {
       _canonical: {
-        people: 'Person'
+        people: 'Person',
       },
       people: Proxy(
-        'Person', 'person', 'ObjectPerson', 'personable', 'object_people')
+        'Person', 'person', 'ObjectPerson', 'personable', 'object_people'),
     },
     documentable: {
       _canonical: {
-        documents: 'Document'
+        documents: 'Document',
       },
-      documents: TypeFilter('related_objects', 'Document')
+      documents: TypeFilter('related_objects', 'Document'),
     },
     assignable: {
       urls: TypeFilter('related_objects', 'Document'),
@@ -81,7 +81,7 @@ import RefreshQueue from '../refresh_queue';
       documents_from_comments: Cross('comments', 'documents'),
       urls_from_comments: Cross('comments', 'urls'),
       all_documents: Multi(['documents', 'documents_from_comments']),
-      all_urls: Multi(['urls', 'urls_from_comments'])
+      all_urls: Multi(['urls', 'urls_from_comments']),
     },
     related_object: {
       _canonical: {
@@ -90,8 +90,8 @@ import RefreshQueue from '../refresh_queue';
           'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
           'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
           'Objective', 'Audit', 'Assessment', 'AssessmentTemplate',
-          'AccessGroup', 'Risk', 'Threat'
-        ]
+          'AccessGroup', 'Risk', 'Threat',
+        ],
       },
       related_objects_as_source: Proxy(
         null, 'destination', 'Relationship', 'source', 'related_destinations'),
@@ -128,16 +128,16 @@ import RefreshQueue from '../refresh_queue';
       clauses: TypeFilter('related_objects', 'Clause'),
       objectives: TypeFilter('related_objects', 'Objective'),
       risks: TypeFilter('related_objects', 'Risk'),
-      threats: TypeFilter('related_objects', 'Threat')
+      threats: TypeFilter('related_objects', 'Threat'),
     },
     // Program
     Program: {
       _mixins: [
-        'related_object', 'personable'
+        'related_object', 'personable',
       ],
       _canonical: {
         audits: 'Audit',
-        context: 'Context'
+        context: 'Context',
       },
       related_issues: TypeFilter('related_objects', 'Issue'),
       audits: Direct('Audit', 'program', 'audits'),
@@ -154,7 +154,7 @@ import RefreshQueue from '../refresh_queue';
       authorizations: Cross('authorization_contexts', 'user_roles'),
       authorized_people: Cross('authorization_contexts', 'authorized_people'),
       mapped_and_or_authorized_people: Multi([
-        'people', 'authorized_people'
+        'people', 'authorized_people',
       ]),
       owner_authorizations: CustomFilter('program_authorizations',
         function (authBinding) {
@@ -167,71 +167,71 @@ import RefreshQueue from '../refresh_queue';
         }),
       program_owners: Cross('owner_authorizations', 'person'),
       orphaned_objects: Multi([
-        'related_objects', 'people'
-      ])
+        'related_objects', 'people',
+      ]),
     },
     directive_object: {
       _mixins: [
-        'related_object', 'personable'
+        'related_object', 'personable',
       ],
       orphaned_objects: Multi([
-        'people', 'controls', 'objectives', 'related_objects'
-      ])
+        'people', 'controls', 'objectives', 'related_objects',
+      ]),
     },
 
     // Directives
     Regulation: {
-      _mixins: ['directive_object']
+      _mixins: ['directive_object'],
     },
     Contract: {
-      _mixins: ['directive_object']
+      _mixins: ['directive_object'],
     },
     Standard: {
-      _mixins: ['directive_object']
+      _mixins: ['directive_object'],
     },
     Policy: {
-      _mixins: ['directive_object']
+      _mixins: ['directive_object'],
     },
 
     // Business objects
     business_object: {
       _mixins: [
-        'related_object', 'personable'
+        'related_object', 'personable',
       ],
       orphaned_objects: Multi([
         'related_objects', 'people', 'controls', 'objectives', 'sections',
-        'clauses'
-      ])
+        'clauses',
+      ]),
     },
     AccessGroup: {
-      _mixins: ['business_object']
+      _mixins: ['business_object'],
     },
     DataAsset: {
-      _mixins: ['business_object']
+      _mixins: ['business_object'],
     },
     Facility: {
-      _mixins: ['business_object']
+      _mixins: ['business_object'],
     },
     Market: {
-      _mixins: ['business_object']
+      _mixins: ['business_object'],
     },
     OrgGroup: {
-      _mixins: ['business_object']
+      _mixins: ['business_object'],
     },
     Vendor: {
-      _mixins: ['business_object']
+      _mixins: ['business_object'],
     },
     Product: {
-      _mixins: ['business_object']
+      _mixins: ['business_object'],
     },
     Project: {
-      _mixins: ['business_object']
+      _mixins: ['business_object'],
     },
     System: {
-      _mixins: ['business_object']
+      _mixins: ['business_object'],
     },
     Process: {
-      _mixins: ['business_object']
+      _mixins: ['business_object'],
     },
     Person: {
       _canonical: {
@@ -240,7 +240,7 @@ import RefreshQueue from '../refresh_queue';
           'AccessGroup', 'Objective', 'Control', 'Section', 'Clause',
           'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
           'Product', 'Project', 'System', 'Issue', 'Risk', 'Threat'],
-        authorizations: 'UserRole'
+        authorizations: 'UserRole',
       },
       owned_programs: Indirect('Program', 'contact'),
       owned_regulations: Indirect('Regulation', 'contact'),
@@ -326,7 +326,7 @@ import RefreshQueue from '../refresh_queue';
             });
         }
         return GGRC.Models.Search.search_for_types('', types, {
-          contact_id: binding.instance.id
+          contact_id: binding.instance.id,
         }).pipe(function (mappings) {
           return mappings.entries;
         });
@@ -381,16 +381,16 @@ import RefreshQueue from '../refresh_queue';
       extended_related_risks_via_search:
         TypeFilter('related_objects_via_search', 'Risk'),
       extended_related_threats_via_search:
-        TypeFilter('related_objects_via_search', 'Threat')
+        TypeFilter('related_objects_via_search', 'Threat'),
     },
     Context: {
       _canonical: {
         user_roles: 'UserRole',
-        authorized_people: 'Person'
+        authorized_people: 'Person',
       },
       user_roles: Direct('UserRole', 'context', 'user_roles'),
       authorized_people: Proxy('Person', 'person', 'UserRole', 'context',
-        'user_roles')
+        'user_roles'),
     },
     UserRole: {
       // FIXME: These should not need to be `Indirect` --
@@ -398,16 +398,16 @@ import RefreshQueue from '../refresh_queue';
       program_via_context: Indirect('Program', 'context'),
       audit_via_context: Indirect('Audit', 'context'),
       person: Direct('Person', 'user_roles', 'person'),
-      role: Direct('Role', 'user_roles', 'role')
+      role: Direct('Role', 'user_roles', 'role'),
     },
     Audit: {
       _canonical: {
         _program: 'Program',
-        context: 'Context'
+        context: 'Context',
 
       },
       _mixins: [
-        'related_object'
+        'related_object',
       ],
       _program: Direct('Program', 'audits', 'program'),
       program_controls: Cross('_program', 'controls'),
@@ -431,55 +431,55 @@ import RefreshQueue from '../refresh_queue';
       }),
       auditors: Cross('auditor_authorizations', 'person'),
       related_assessment_templates: TypeFilter(
-        'related_objects', 'AssessmentTemplate')
+        'related_objects', 'AssessmentTemplate'),
     },
     Assessment: {
       _mixins: [
-        'related_object', 'personable', 'documentable', 'assignable'
+        'related_object', 'personable', 'documentable', 'assignable',
       ],
       audits: TypeFilter('related_objects', 'Audit'),
       related_controls: TypeFilter('related_objects', 'Control'),
       related_regulations: TypeFilter('related_objects', 'Regulation'),
-      people: AttrFilter('related_objects', null, 'Person')
+      people: AttrFilter('related_objects', null, 'Person'),
     },
     AssessmentTemplate: {
-      _mixins: ['related_object']
+      _mixins: ['related_object'],
     },
     Issue: {
       _mixins: [
-        'related_object', 'personable', 'documentable', 'assignable'
+        'related_object', 'personable', 'documentable', 'assignable',
       ],
-      audits: TypeFilter('related_objects', 'Audit')
+      audits: TypeFilter('related_objects', 'Audit'),
     },
     Comment: {
       _mixins: ['related_object', 'documentable'],
       urls: TypeFilter('related_objects', 'Document'),
-      documents_and_urls: Multi(['documents', 'urls'])
+      documents_and_urls: Multi(['documents', 'urls']),
     },
     MultitypeSearch: {
       _mixins: ['directive_object'],
       _canonical: {
         audits: 'Audit',
-        workflows: 'Workflow'
+        workflows: 'Workflow',
       },
       audits: Proxy(
         'Audit', 'audit', 'MultitypeSearchJoin'),
       workflows: Proxy(
         'Workflow', 'workflow', 'MultitypeSearchJoin'),
       sections: Proxy(
-        'Section', 'section', 'MultitypeSearchJoin')
+        'Section', 'section', 'MultitypeSearchJoin'),
     },
     AuditObject: {
-      _auditable: Direct(null, null, 'auditable')
+      _auditable: Direct(null, null, 'auditable'),
     },
     // Used by Custom Attributes widget
     CustomAttributable: {
       custom_attribute_definitions: Search(function (binding) {
         return CMS.Models.CustomAttributeDefinition.findAll({
           definition_type: binding.instance.root_object,
-          definition_id: null
+          definition_id: null,
         });
-      }, 'CustomAttributeDefinition')
+      }, 'CustomAttributeDefinition'),
     },
     // used by the Custom Roles admin panel tab
     Roleable: {
@@ -488,13 +488,13 @@ import RefreshQueue from '../refresh_queue';
             object_type: binding.instance.model_singular,
             internal: false,
           });
-      }, 'AccessControlRole')
+      }, 'AccessControlRole'),
     },
     Risk: {
-      _mixins: ['directive_object']
+      _mixins: ['directive_object'],
     },
     Threat: {
-      _mixins: ['directive_object']
-    }
+      _mixins: ['directive_object'],
+    },
   });
 })(window.GGRC, window.can);

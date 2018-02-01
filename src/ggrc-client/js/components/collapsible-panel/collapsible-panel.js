@@ -24,9 +24,9 @@ import template from './collapsible-panel.mustache';
        */
       expanded: {
         type: 'boolean',
-        value: false
-      }
-    }
+        value: false,
+      },
+    },
   });
   /**
    * Collapsible Panel component to add expand/collapse behavior
@@ -34,6 +34,6 @@ import template from './collapsible-panel.mustache';
   GGRC.Components('collapsiblePanel', {
     tag: tag,
     template: template,
-    viewModel: viewModel
+    viewModel: viewModel,
   });
 })(window.can, window.GGRC);

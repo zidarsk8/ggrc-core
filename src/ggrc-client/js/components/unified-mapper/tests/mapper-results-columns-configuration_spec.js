@@ -85,11 +85,11 @@ describe('GGRC.Components.mapperResultsColumnsConfiguration', function () {
 
     beforeAll(function () {
       selectedColumns = new can.makeArray([
-        new can.Map({attr_name: 'title'})
+        new can.Map({attr_name: 'title'}),
       ]);
       availableColumns = new can.makeArray([
         new can.Map({attr_name: 'title'}),
-        new can.Map({attr_name: 'date'})
+        new can.Map({attr_name: 'date'}),
       ]);
     });
 
@@ -119,7 +119,7 @@ describe('GGRC.Components.mapperResultsColumnsConfiguration', function () {
       ]);
       spyOn(TreeViewUtils, 'setColumnsForModel')
         .and.returnValue({
-          selected: 'selectedColumns'
+          selected: 'selectedColumns',
         });
     });
 
@@ -134,7 +134,7 @@ describe('GGRC.Components.mapperResultsColumnsConfiguration', function () {
 
     beforeEach(function () {
       event = {
-        stopPropagation: function () {}
+        stopPropagation: function () {},
       };
       spyOn(event, 'stopPropagation');
     });

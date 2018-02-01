@@ -19,30 +19,30 @@ import template from './show-related-assessments-button.mustache';
           get: function () {
             return !this.attr('resetStyles') ?
               'btn btn-lightBlue ' + this.attr('extraBtnCSS') : '';
-          }
+          },
         },
         resetStyles: {
           type: Boolean,
-          value: false
+          value: false,
         },
         showTitle: {
           type: Boolean,
-          value: true
+          value: true,
         },
         showIcon: {
           type: Boolean,
-          value: false
+          value: false,
         },
         title: {
           type: String,
           get: function () {
             return this.attr('text') || 'Assessments';
-          }
-        }
+          },
+        },
       },
       instance: null,
       state: {
-        open: false
+        open: false,
       },
       extraBtnCSS: '@',
       text: '@',
@@ -54,7 +54,7 @@ import template from './show-related-assessments-button.mustache';
       isAllowedToShow: function () {
         let type = this.attr('instance.type');
         return type === 'Control' || type === 'Objective';
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

@@ -13,7 +13,7 @@
     noValidation: 'fa-check-circle',
     empty: '',
     valid: 'fa-check form-validation-icon__color-valid',
-    invalid: 'fa-times form-validation-icon__color-invalid'
+    invalid: 'fa-times form-validation-icon__color-invalid',
   };
 
   /**
@@ -41,9 +41,9 @@
               ) ? icons.valid : icons.invalid;
             }
             return icon;
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   });
 })(window.can, window.GGRC);

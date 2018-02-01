@@ -45,7 +45,7 @@ describe('GGRC.Components.personItem', function () {
       'if found there',
       function () {
         let person42 = new CMS.Models.Person({
-          id: 42, name: 'John', email: 'john@doe.com'
+          id: 42, name: 'John', email: 'john@doe.com',
         });
 
         template = can.view
@@ -63,7 +63,7 @@ describe('GGRC.Components.personItem', function () {
       'if not found in cache',
       function () {
         let person123 = new can.Map({
-          id: 123, name: 'Mike', email: 'mike@mike.com'
+          id: 123, name: 'Mike', email: 'mike@mike.com',
         });
 
         template = can.view
@@ -87,7 +87,7 @@ describe('GGRC.Components.personItem', function () {
       function () {
         let person123 = new can.Map({id: 123, name: '', email: ''});
         let fetchedPerson = new can.Map({
-          id: 123, name: 'John', email: 'john@doe.com'
+          id: 123, name: 'John', email: 'john@doe.com',
         });
 
         template = can.view
@@ -121,13 +121,13 @@ describe('GGRC.Components.personItem', function () {
     );
     it('gets stub from cache and then makes a request', function () {
       let person123 = new CMS.Models.Person({
-        id: 123, name: '', type: 'Person'
+        id: 123, name: '', type: 'Person',
       });
 
       template = can.view
         .mustache('<person-info person-obj="person"></person-info>');
       frag = template({
-        person: person123
+        person: person123,
       });
       frag = $(frag);
       component = frag.find('person-info').control();
@@ -136,16 +136,16 @@ describe('GGRC.Components.personItem', function () {
     });
     it('gets person object from and doesn\'t make a request', function () {
       let personObj = new can.Map({
-        id: 123, name: '', type: 'Person'
+        id: 123, name: '', type: 'Person',
       });
       new CMS.Models.Person({
-        id: 123, name: 'Ivan', email: 'ivan@google.com', type: 'Person'
+        id: 123, name: 'Ivan', email: 'ivan@google.com', type: 'Person',
       });
 
       template = can.view
         .mustache('<person-info person-obj="person"></person-info>');
       frag = template({
-        person: personObj
+        person: personObj,
       });
       frag = $(frag);
       component = frag.find('person-info').control();
@@ -157,13 +157,13 @@ describe('GGRC.Components.personItem', function () {
     it('gets person object from context and it doesn\'t trigger ' +
        'the RefreshQueue', function () {
       let personObj = new CMS.Models.Person({
-        id: 123, name: 'Ivan', email: 'ivan@google.com', type: 'Person'
+        id: 123, name: 'Ivan', email: 'ivan@google.com', type: 'Person',
       });
 
       template = can.view
         .mustache('<person-info person-obj="person"></person-info>');
       frag = template({
-        person: personObj
+        person: personObj,
       });
       frag = $(frag);
       component = frag.find('person-info').control();
@@ -181,9 +181,9 @@ describe('GGRC.Components.personItem', function () {
     beforeEach(function () {
       componentInst = {
         element: {
-          triggerHandler: jasmine.createSpy()
+          triggerHandler: jasmine.createSpy(),
         },
-        scope: new can.Map()
+        scope: new can.Map(),
       };
       componentInst.viewModel = componentInst.scope;
 

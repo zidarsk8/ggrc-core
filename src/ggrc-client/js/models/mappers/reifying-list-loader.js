@@ -50,6 +50,6 @@ import RefreshQueue from '../refresh_queue';
     },
     _refresh_stubs: function (binding) {
       return binding.source_binding.refresh_stubs(binding);
-    }
+    },
   });
 })(window.GGRC, window.can);

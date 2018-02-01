@@ -27,6 +27,6 @@ import template from './inline-item.mustache';
       onStateChangeDfd: can.Deferred().resolve(),
       mandatory: false,
       isConfirmationNeeded: true,
-    }
+    },
   });
 })(window.can);

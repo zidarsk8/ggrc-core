@@ -34,14 +34,14 @@ describe('GGRC.Components.richTextFormField', function () {
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',
-      value: 'newValue'
+      value: 'newValue',
     });
     viewModel.attr('_value', 'newValue2');
     viewModel.onBlur();
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',
-      value: 'newValue2'
+      value: 'newValue2',
     });
   });
 });

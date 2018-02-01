@@ -9,101 +9,96 @@ import '../object-list-item/editable-document-object-list-item';
 import '../assessment/attach-button';
 import template from './ca-object-modal-content.mustache';
 
-(function (can, GGRC) {
-  'use strict';
-
-  can.Component.extend({
-    tag: 'ca-object-modal-content',
-    template: template,
-    viewModel: {
-      define: {
-        comment: {
-          get: function () {
-            return this.attr('content.fields').indexOf('comment') > -1 &&
-              this.attr('state.open');
-          }
+export default can.Component.extend({
+  tag: 'ca-object-modal-content',
+  template: template,
+  viewModel: {
+    define: {
+      comment: {
+        get() {
+          return this.attr('content.fields').indexOf('comment') > -1 &&
+            this.attr('state.open');
         },
-        evidence: {
-          get: function () {
-            return this.attr('content.fields').indexOf('evidence') > -1 &&
-              this.attr('state.open');
-          }
+      },
+      evidence: {
+        get() {
+          return this.attr('content.fields').indexOf('evidence') > -1 &&
+            this.attr('state.open');
         },
-        state: {
-          value: {
-            open: false,
-            save: false,
-            controls: false
-          }
-        }
       },
-      formSavedDeferred: can.Deferred(),
-      isUpdatingEvidences: false,
-      content: {
-        contextScope: {},
-        fields: [],
-        title: '',
-        type: 'dropdown',
-        value: null,
-        options: []
+      state: {
+        value: {
+          open: false,
+          save: false,
+          controls: false,
+        },
       },
-      afterCreation: function (comment, success) {
-        this.dispatch({
-          type: 'afterCommentCreated',
-          item: comment,
-          success: success
+    },
+    isUpdatingEvidences: false,
+    content: {
+      contextScope: {},
+      fields: [],
+      title: '',
+      type: 'dropdown',
+      value: null,
+      options: [],
+      saveDfd: null,
+    },
+    afterCreation(comment, success) {
+      this.dispatch({
+        type: 'afterCommentCreated',
+        item: comment,
+        success: success,
+      });
+    },
+    addComment(comment, data) {
+      return comment.attr(data)
+        .save()
+        .done((comment)=> {
+          this.afterCreation(comment, true);
+        })
+        .fail((comment)=> {
+          this.afterCreation(comment, false);
         });
-      },
-      onCommentCreated: function (e) {
-        let comment = e.comment;
-        let instance = this.attr('instance');
-        let context = instance.attr('context');
-        let self = this;
-        let addComment = function (data) {
-          return comment.attr(data)
-            .save()
-            .done(function (comment) {
-              self.afterCreation(comment, true);
-            })
-            .fail(function (comment) {
-              self.afterCreation(comment, false);
-            });
-        };
+    },
+    onCommentCreated(e) {
+      let comment = e.comment;
+      let instance = this.attr('instance');
+      let context = instance.attr('context');
 
-        this.dispatch({
-          type: 'beforeCommentCreated',
-          items: [can.extend(comment.attr(), {
+      this.dispatch({
+        type: 'beforeCommentCreated',
+        items: [can.extend(comment.attr(), {
+          assignee_type: GGRC.Utils.getAssigneeType(instance),
+          custom_attribute_revision: {
+            custom_attribute: {
+              title: this.attr('content.title'),
+            },
+            custom_attribute_stored_value: this.attr('content.value'),
+          },
+        })],
+      });
+      this.attr('content.contextScope.errorsMap.comment', false);
+      this.attr('content.contextScope.validation.valid',
+        !this.attr('content.contextScope.errorsMap.evidence'));
+      this.attr('state.open', false);
+      this.attr('state.save', false);
+
+      this.attr('content.saveDfd')
+        .then(()=> {
+          this.addComment(comment, {
+            context: context,
             assignee_type: GGRC.Utils.getAssigneeType(instance),
-            custom_attribute_revision: {
-              custom_attribute: {
-                title: this.attr('content.title')
+            custom_attribute_revision_upd: {
+              custom_attribute_value: {
+                id: this.attr('content.contextScope.valueId')(),
               },
-              custom_attribute_stored_value: this.attr('content.value')
-            }
-          })]
-        });
-        this.attr('content.contextScope.errorsMap.comment', false);
-        this.attr('content.contextScope.validation.valid',
-          !this.attr('content.contextScope.errorsMap.evidence'));
-        this.attr('state.open', false);
-        this.attr('state.save', false);
-
-        this.attr('formSavedDeferred')
-          .then(function () {
-            addComment({
-              context: context,
-              assignee_type: GGRC.Utils.getAssigneeType(instance),
-              custom_attribute_revision_upd: {
-                custom_attribute_value: {
-                  id: self.attr('content.contextScope.valueId')()
-                },
-                custom_attribute_definition: {
-                  id: self.attr('content.contextScope.id')
-                }
-              }
-            });
+              custom_attribute_definition: {
+                id: this.attr('content.contextScope.id'),
+              },
+            },
           });
-      }
-    }
-  });
-})(window.can, window.GGRC);
+        });
+    },
+  },
+});

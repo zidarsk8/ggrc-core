@@ -13,6 +13,8 @@ from integration.ggrc import generator
 from integration.ggrc.models import factories
 from integration.ggrc.snapshotter import SnapshotterBaseTestCase
 
+from mock import patch
+
 
 class TestClonable(SnapshotterBaseTestCase):
 
@@ -129,6 +131,40 @@ class TestClonable(SnapshotterBaseTestCase):
             models.CustomAttributeDefinition.definition_id ==
             assessment_template_1.id
         ).count(), len(assessment_template_attributes_def))
+
+  # pylint: disable=unused-argument
+  @patch('ggrc.integrations.issues.Client.update_issue')
+  def test_audit_clone_with_issue_tracker(self, mock_update_issue):
+    """Test that audit with issue tracker On gets copied without error"""
+    from ggrc.models.hooks import issue_tracker
+    iti = factories.IssueTrackerIssueFactory()
+    asmt = iti.issue_tracked_obj
+    asmt_id = asmt.id
+    audit = asmt.audit
+    audit_id = audit.id
+    self.api.modify_object(audit, {
+        "issue_tracker": {
+            "enabled": True,
+            "component_id": "11111",
+            "hotlist_id": "222222",
+        },
+    })
+    asmt = db.session.query(models.Assessment).get(asmt_id)
+    with patch.object(issue_tracker, '_is_issue_tracker_enabled',
+                      return_value=True):
+      self.api.modify_object(asmt, {
+          "issue_tracker": {
+              "enabled": True,
+              "component_id": "11111",
+              "hotlist_id": "222222",
+          },
+      })
+
+    audit = db.session.query(models.Audit).get(audit_id)
+    self.clone_object(audit)
+
+    self.assertEqual(db.session.query(models.Audit).filter(
+        models.Audit.title.like("%copy%")).count(), 1)
 
   def test_audit_clone_invalid_values(self):
     """Test that audit gets copied successfully if invalid input"""

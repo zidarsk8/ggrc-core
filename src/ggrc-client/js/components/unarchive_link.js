@@ -11,7 +11,7 @@
     scope: {
       notify: '@',
       instance: null,
-      notifyText: 'was unarchived successfully'
+      notifyText: 'was unarchived successfully',
     },
     template: ['<a href="#">',
                '<content></content>',
@@ -40,7 +40,7 @@
               }
             }.bind(this));
         }
-      }
-    }
+      },
+    },
   });
 })(window.GGRC, window.can.$);

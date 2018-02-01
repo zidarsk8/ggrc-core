@@ -199,7 +199,7 @@ def _handle_assessment_tmpl_post(sender, objects=None, sources=None):
     if not issue_tracker_info:
       continue
     all_models.IssuetrackerIssue.create_or_update_from_dict(
-        _ASSESSMENT_TMPL_MODEL_NAME, obj.id, issue_tracker_info)
+        obj, issue_tracker_info)
 
 
 def _handle_assessment_tmpl_put(sender, obj=None, src=None, service=None,
@@ -226,7 +226,7 @@ def _handle_assessment_tmpl_put(sender, obj=None, src=None, service=None,
 
   if issue_tracker_info:
     all_models.IssuetrackerIssue.create_or_update_from_dict(
-        _ASSESSMENT_TMPL_MODEL_NAME, obj.id, issue_tracker_info)
+        obj, issue_tracker_info)
 
 
 def _handle_deleted_after_commit(sender, obj=None, service=None, event=None):
@@ -251,7 +251,7 @@ def _handle_audit_post(sender, objects=None, sources=None):
       continue
     _validate_issue_tracker_info(issue_tracker_info)
     all_models.IssuetrackerIssue.create_or_update_from_dict(
-        _AUDIT_MODEL_NAME, obj.id, issue_tracker_info)
+        obj, issue_tracker_info)
 
 
 def _handle_audit_put(sender, obj=None, src=None, service=None):
@@ -261,7 +261,7 @@ def _handle_audit_put(sender, obj=None, src=None, service=None):
   if issue_tracker_info:
     _validate_issue_tracker_info(issue_tracker_info)
     all_models.IssuetrackerIssue.create_or_update_from_dict(
-        _AUDIT_MODEL_NAME, obj.id, issue_tracker_info)
+        obj, issue_tracker_info)
 
 
 def _handle_audit_put_after_commit(sender, obj=None, **kwargs):
@@ -757,7 +757,7 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
     }
 
   all_models.IssuetrackerIssue.create_or_update_from_dict(
-      _ASSESSMENT_MODEL_NAME, assessment.id, issue_tracker_info)
+      assessment, issue_tracker_info)
 
 
 def _update_issuetracker_issue(assessment, issue_tracker_info,
@@ -822,4 +822,4 @@ def _update_issuetracker_info(assessment, issue_tracker_info):
     issue_tracker_info['enabled'] = False
 
   all_models.IssuetrackerIssue.create_or_update_from_dict(
-      _ASSESSMENT_MODEL_NAME, assessment.id, issue_tracker_info)
+      assessment, issue_tracker_info)

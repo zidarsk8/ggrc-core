@@ -22,17 +22,17 @@ import template from './templates/tree-item-status-for-workflow.mustache';
             return this.attr('instance.status') === 'InProgress' ?
               'In Progress' :
               this.attr('instance.status');
-          }
+          },
         },
         statusCSSClass: {
           type: 'string',
           get: function () {
             return this.attr('instance.status') ?
             'state-' + this.attr('instance.status').toLowerCase() : '';
-          }
-        }
+          },
+        },
       },
-      instance: {}
-    }
+      instance: {},
+    },
   });
 })(window.can, window.GGRC);

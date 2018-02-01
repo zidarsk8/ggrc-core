@@ -8,7 +8,7 @@
     let adminRole;
     adminRole = _.filter(GGRC.access_control_roles, {
       object_type: 'Document',
-      name: 'Admin'
+      name: 'Admin',
     });
     if (!adminRole || adminRole.length < 1) {
       console.warn('Document Admin custom role not found.');
@@ -16,7 +16,7 @@
     }
     return [{
       ac_role_id: adminRole[0].id,
-      person: {type: 'Person', id: GGRC.current_user.id}
+      person: {type: 'Person', id: GGRC.current_user.id},
     }];
   }
   can.Model.Cacheable('CMS.Models.Document', {
@@ -47,35 +47,35 @@
                         item.document.link_url ?
                         ' (' + item.document.link_url + ')' : '') :
                      item.document.link_url,
-              value: item.document.id
+              value: item.document.id,
             });
           }));
-        }
+        },
       });
     },
     attributes: {
       context: 'CMS.Models.Context.stub',
       kind: 'CMS.Models.Option.stub',
-      year: 'CMS.Models.Option.stub'
+      year: 'CMS.Models.Option.stub',
     },
     defaults: {
       document_type: 'EVIDENCE',
-      access_control_list: getAccessControlList()
+      access_control_list: getAccessControlList(),
     },
     tree_view_options: {
       show_view: GGRC.mustache_path + '/documents/tree.mustache',
-      add_item_view: GGRC.mustache_path + '/documents/tree_add_item.mustache'
+      add_item_view: GGRC.mustache_path + '/documents/tree_add_item.mustache',
     },
     init: function () {
       this.validateNonBlank('link');
       this._super.apply(this, arguments);
-    }
+    },
   }, {
     display_type: function () {
       if (_.isEmpty(this.object_documents)) {
         return 'URL';
       }
       return 'Evidence';
-    }
+    },
   });
 })(this, can);

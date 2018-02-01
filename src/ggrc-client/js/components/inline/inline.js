@@ -52,7 +52,7 @@ import template from './inline.mustache';
       hideContentInEditMode: false,
       mandatory: false,
       context: {
-        value: null
+        value: null,
       },
       setEditModeInline: function (args) {
         this.attr('isLastOpenInline', args.isLastOpenInline);
@@ -103,7 +103,7 @@ import template from './inline.mustache';
       },
       fieldValueChanged: function (args) {
         this.attr('context.value', args.value);
-      }
+      },
     },
     events: {
       init: function () {
@@ -133,7 +133,7 @@ import template from './inline.mustache';
         if (editMode && !isInside) {
           viewModel.cancel();
         }
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

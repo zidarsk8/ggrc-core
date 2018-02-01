@@ -21,7 +21,7 @@ export default can.Map.extend({
           return newValue;
         }
         return this.current;
-      }
+      },
     },
     pageSize: {
       type: 'number',
@@ -35,18 +35,18 @@ export default can.Map.extend({
       },
     },
     pageSizeSelect: {
-      value: [5, 10, 15]
+      value: [5, 10, 15],
     },
     disabled: {
       type: 'boolean',
-      value: false
+      value: false,
     },
     /**
      * Total pages count
      */
     count: {
       type: 'number',
-      value: 0
+      value: 0,
     },
     /**
      * Array with 2 values: first and last element indexes for current page
@@ -62,7 +62,7 @@ export default can.Map.extend({
         }
 
         return [first, last];
-      }
+      },
     },
     /**
      * Total items count
@@ -73,7 +73,7 @@ export default can.Map.extend({
         let count = Math.ceil(itemsCount / this.pageSize);
         this.attr('count', count);
         return itemsCount;
-      }
-    }
-  }
+      },
+    },
+  },
 });

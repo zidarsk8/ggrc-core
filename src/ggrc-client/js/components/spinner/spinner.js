@@ -14,7 +14,7 @@ import template from './spinner.mustache';
     scope: {
       extraCssClass: '@',
       size: '@',
-      toggle: null
-    }
+      toggle: null,
+    },
   });
 })(window.can);

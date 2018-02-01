@@ -24,13 +24,13 @@ import template from './multiselect_dropdown.mustache';
             return this.attr('selected').map(function (item) {
               return item.attr('value');
             }).join(', ');
-          }
+          },
         },
         _inputSize: {
           type: Number,
           get: function () {
             return this.attr('_displayValue').length;
-          }
+          },
         },
         _selectedAll: {
           type: 'boolean',
@@ -50,11 +50,11 @@ import template from './multiselect_dropdown.mustache';
             });
 
             return value;
-          }
+          },
         },
         isOpen: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         options: {
           type: '*',
@@ -70,8 +70,8 @@ import template from './multiselect_dropdown.mustache';
             }
 
             return [];
-          }
-        }
+          },
+        },
       },
       updateSelected: function (item) {
         let selected = this.attr('selected');
@@ -137,7 +137,7 @@ import template from './multiselect_dropdown.mustache';
       },
       dropdownBodyClick: function (ev) {
         ev.stopPropagation();
-      }
+      },
     },
     events:
     {
@@ -159,7 +159,7 @@ import template from './multiselect_dropdown.mustache';
           return;
         }
         this.viewModel.changeOpenCloseState();
-      }
-    }
+      },
+    },
   });
 })(window.can, window.can.$);

@@ -9,17 +9,17 @@
     root_collection: 'risk_objects',
     join_keys: {
       risk: CMS.Models.Risk,
-      object: can.Model.Cacheable
+      object: can.Model.Cacheable,
     },
     attributes: {
       context: 'CMS.Models.Context.stub',
       modified_by: 'CMS.Models.Person.stub',
       risk: 'CMS.Models.Risk.stub',
-      object: 'CMS.Models.get_stub'
+      object: 'CMS.Models.get_stub',
     },
     findAll: 'GET /api/risk_objects',
     create: 'POST /api/risk_objects',
-    destroy: 'DELETE /api/risk_objects/{id}'
+    destroy: 'DELETE /api/risk_objects/{id}',
   }, {
   });
 })(window.can);

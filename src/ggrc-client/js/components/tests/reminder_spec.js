@@ -29,11 +29,11 @@ describe('GGRC.Components.reminder', function () {
         refresh: jasmine.createSpy('refresh')
                         .and.returnValue(pendingRefresh.promise()),
         save: jasmine.createSpy('save')
-                     .and.returnValue(pendingSave.promise())
+                     .and.returnValue(pendingSave.promise()),
       });
 
       scope = new can.Map({
-        instance: instance
+        instance: instance,
       });
       eventObj = $.Event();
       $element = $('<div></div>');

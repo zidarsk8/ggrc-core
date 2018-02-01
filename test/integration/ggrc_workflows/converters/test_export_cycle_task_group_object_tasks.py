@@ -40,12 +40,14 @@ class TestExportTasks(TestCase):
             name="user for group {}".format(idx)
         )
         task = factories.CycleTaskFactory()
-        role = all_models.AccessControlRole.query.filter(
-            all_models.AccessControlRole.name == "Task Assignees",
+        ct_roles = all_models.AccessControlRole.query.filter(
+            all_models.AccessControlRole.name.in_(
+                ("Task Assignees", "Task Secondary Assignees")),
             all_models.AccessControlRole.object_type == task.type,
-        ).one()
-        ggrc_factories.AccessControlListFactory(
-            ac_role=role, object=task, person=person)
+        )
+        for role in ct_roles:
+          ggrc_factories.AccessControlListFactory(
+              ac_role=role, object=task, person=person)
         results.append(task.id)
     return results
 
@@ -93,6 +95,27 @@ class TestExportTasks(TestCase):
       self.assertEqual(1, len(assignees))
       self.assert_slugs("task assignees", assignees[0].email, [task.slug])
       self.assert_slugs("task assignees", assignees[0].name, [task.slug])
+
+  @data(0, 1, 2,)
+  def test_filter_by_task_secondary_assignee(self, task_count):  # noqa pylint: disable=invalid-name
+    """Test filter task by secondary assignee name or email"""
+    generated = self.generate_tasks_for_cycle(task_count)
+    self.assertEqual(bool(task_count), bool(generated))
+    for task_id in generated:
+      task = all_models.CycleTaskGroupObjectTask.query.filter(
+          all_models.CycleTaskGroupObjectTask.id == task_id
+      ).one()
+      role = all_models.AccessControlRole.query.filter(
+          all_models.AccessControlRole.name == "Task Secondary Assignees",
+          all_models.AccessControlRole.object_type == task.type,
+      ).one()
+      s_assignees = [i.person for i in task.access_control_list
+                     if i.ac_role_id == role.id]
+      self.assertEqual(1, len(s_assignees))
+      self.assert_slugs("task secondary assignees",
+                        s_assignees[0].email, [task.slug])
+      self.assert_slugs("task secondary assignees",
+                        s_assignees[0].name, [task.slug])
 
   def test_filter_by_task_comment(self):
     """Test filter by comments"""

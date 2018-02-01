@@ -21,27 +21,27 @@ import childModelsMap from './child-models-map';
         type: String,
         get: function () {
           return this.attr('parent').type;
-        }
+        },
       },
       parentId: {
         type: Number,
         get: function () {
           return this.attr('parent').id;
-        }
+        },
       },
       showAllRelatedLink: {
         type: String,
         get: function () {
           return this.attr('parent') ? this.attr('parent').viewLink : '';
-        }
+        },
       },
       loading: {
         type: Boolean,
-        value: false
+        value: false,
       },
       notDirectlyExpanded: {
         type: Boolean,
-        value: false
+        value: false,
       },
       needToSplit: {
         type: Boolean,
@@ -53,18 +53,18 @@ import childModelsMap from './child-models-map';
       },
       notResult: {
         type: Boolean,
-        value: false
+        value: false,
       },
       drawRelated: {
         type: Boolean,
-        value: false
+        value: false,
       },
       /**
        *
        */
       showMore: {
         type: Boolean,
-        value: false
+        value: false,
       },
       isOpen: {
         type: Boolean,
@@ -81,7 +81,7 @@ import childModelsMap from './child-models-map';
           } else {
             setValue(newValue);
           }
-        }
+        },
       },
       childModels: {
         type: '*',
@@ -96,7 +96,7 @@ import childModelsMap from './child-models-map';
               setResult(models);
             });
           }
-        }
+        },
       },
       cssClasses: {
         type: String,
@@ -108,8 +108,8 @@ import childModelsMap from './child-models-map';
           }
 
           return classes.join(' ');
-        }
-      }
+        },
+      },
     },
     dataIsReady: false,
     limitDepthTree: 0,
@@ -210,7 +210,7 @@ import childModelsMap from './child-models-map';
       inserted() {
         let parents = this.element.parents('sub-tree-wrapper');
         this.viewModel.attr('deepLevel', parents.length);
-      }
+      },
     },
   });
 })(window.can, window.GGRC);
