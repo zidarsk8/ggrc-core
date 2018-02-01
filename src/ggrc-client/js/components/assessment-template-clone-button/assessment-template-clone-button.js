@@ -4,6 +4,7 @@
  */
 
 import template from './assessment-template-clone-button.mustache';
+import router from '../../router';
 
 export default can.Component.extend({
   tag: 'assessment-template-clone-button',
@@ -23,12 +24,21 @@ export default can.Component.extend({
             object: that.attr('parentType'),
             type: that.attr('objectType'),
             join_object_id: that.attr('parentId'),
-            refreshTreeView: that.refreshTreeView.bind(that, $el),
+            refreshTreeView: that.refreshTreeView.bind(that),
           });
         });
     },
-    refreshTreeView(el) {
-      can.trigger(el.closest('tree-widget-container'), 'refreshTree');
+    refreshTreeView() {
+      if (GGRC.page_instance().type === 'Audit') {
+        if (router.attr('widget') === 'assessment_template_widget') {
+          this.dispatch('refreshTree');
+        } else {
+          router.attr({
+            widget: 'assessment_template_widget',
+            refetch: true,
+          });
+        }
+      }
     },
   },
 });
