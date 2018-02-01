@@ -54,7 +54,7 @@ $(APPENGINE_ENV_DIR) :
 	mkdir -p `dirname $(APPENGINE_ENV_DIR)`
 	virtualenv "$(APPENGINE_ENV_DIR)"
 	source "$(APPENGINE_ENV_DIR)/bin/activate"; \
-		pip install -U pip==7.1.2; \
+		pip install -U pip==9.0.1; \
 
 appengine_virtualenv : $(APPENGINE_ENV_DIR)
 
@@ -86,7 +86,7 @@ dev_virtualenv : $(DEV_PREFIX)/opt/dev_virtualenv
 
 dev_virtualenv_packages : dev_virtualenv src/requirements-dev.txt src/requirements.txt  src/requirements-selenium.txt
 	source "$(PREFIX)/bin/init_env"; \
-		pip install -U pip==7.1.2; \
+		pip install -U pip==9.0.1; \
 		pip install --no-deps -r src/requirements.txt; \
 		pip install -r src/requirements-dev.txt; \
 		pip install -r src/requirements-selenium.txt
