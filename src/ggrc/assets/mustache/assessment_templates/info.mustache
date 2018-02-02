@@ -62,7 +62,7 @@
                   {{get_item DEFAULT_PEOPLE_LABELS default_people.assignees}}
                 {{else}}
                   {{#if default_people.assignees.length}}
-                    <ul>
+                    <ul class="person-info-list">
                       {{#each default_people.assignees}}
                         <li>
                           <person-info editable="false" person-id="{{.}}"></person-info>
@@ -85,7 +85,7 @@
                   {{get_item DEFAULT_PEOPLE_LABELS default_people.verifiers}}
                 {{else}}
                   {{#if default_people.verifiers.length}}
-                    <ul>
+                    <ul class="person-info-list">
                       {{#each default_people.verifiers}}
                         <li>
                           <person-info editable="false" person-id="{{.}}"></person-info>
