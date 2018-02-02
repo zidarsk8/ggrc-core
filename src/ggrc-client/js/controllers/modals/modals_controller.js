@@ -136,6 +136,20 @@ export default can.Control({
     }.bind(this));
   },
 
+  setupCustomAttributes(instance) {
+    let setup;
+    if (!instance) {
+      return;
+    }
+
+    setup = instance.setup_custom_attributes;
+
+    if (setup && !(instance instanceof CMS.Models.Assessment)) {
+      instance.removeAttr('custom_attributes');
+      instance.setup_custom_attributes();
+    }
+  },
+
   apply_object_params: function () {
     if (!this.options.object_params) {
       return;
@@ -330,18 +344,11 @@ export default can.Control({
       }
     });
 
-    return dfd.done(function () {
-      this.reset_form(function () {
-        if (instance) {
-          // Make sure custom attr validations/values are reset
-          if (instance.setup_custom_attributes &&
-            !(instance instanceof CMS.Models.Assessment)) {
-            instance.removeAttr('custom_attributes');
-            instance.setup_custom_attributes();
-          }
-        }
+    return dfd.done(() => {
+      this.reset_form(() => {
+        this.setupCustomAttributes(instance);
       });
-    }.bind(that));
+    });
   },
 
   reset_form: function (setFieldsCb) {
@@ -1181,26 +1188,28 @@ export default can.Control({
   '{instance} destroyed': ' hide',
 
   ' hide': function (el, ev) {
-    var cad;
+    let cad;
+    const instance = this.options.instance;
     if (this.disable_hide) {
       ev.stopImmediatePropagation();
       ev.stopPropagation();
       ev.preventDefault();
       return false;
     }
-    if (this.options.instance instanceof can.Model &&
+    if (instance instanceof can.Model &&
       // Ensure that this modal was hidden and not a child modal
       this.element && ev.target === this.element[0] &&
-      !this.options.skip_refresh && !this.options.instance.isNew()) {
-      if (this.options.instance.type === 'AssessmentTemplate') {
-        cad = this.options.instance.attr('custom_attribute_definitions');
+      !this.options.skip_refresh && !instance.isNew()) {
+      if (instance.type === 'AssessmentTemplate') {
+        cad = instance.attr('custom_attribute_definitions');
         cad = _.filter(cad, function (attr) {
           return attr.id;
         });
-        this.options.instance.attr('custom_attribute_definitions', cad);
+        instance.attr('custom_attribute_definitions', cad);
       }
-      this.options.instance.refresh();
-      this.options.instance.dispatch('refreshMapping');
+      this.setupCustomAttributes(instance);
+      instance.refresh();
+      instance.dispatch('refreshMapping');
     }
   },
 
