@@ -324,8 +324,8 @@ def load_access_control_list(user, permissions):
         continue
       permissions.setdefault(action, {})\
           .setdefault(object_type, {})\
-          .setdefault('resources', list())\
-          .append(object_id)
+          .setdefault('resources', set())\
+          .add(object_id)
 
 
 def load_backlog_workflows(permissions):
