@@ -44,6 +44,7 @@ class AutomapperGenerator(object):
     self.related_cache = RelationshipsCache()
 
   def related(self, obj):
+    """Return obj's relationship stubs"""
     if obj in self.related_cache.cache:
       return self.related_cache.cache[obj]
 
@@ -96,7 +97,7 @@ class AutomapperGenerator(object):
       if len(self.auto_mappings) <= self.COUNT_LIMIT:
         self._flush(relationship)
       else:
-        relationship._json_extras = {
+        relationship._json_extras = {  # pylint: disable=protected-access
             'automapping_limit_exceeded': True
         }
 

@@ -190,11 +190,22 @@ def do_reindex():
   start_compute_attributes("all_latest")
 
 
+class SetEncoder(json.JSONEncoder):
+  """Encoder that can handle python sets"""
+  # pylint: disable=E0202
+  def default(self, obj):
+    """If we get a set we first transform it to a list and then just use
+       the default encoder"""
+    if isinstance(obj, set):
+      return list(obj)
+    return super(SetEncoder, self).default(obj)
+
+
 def get_permissions_json():
   """Get all permissions for current user"""
   with benchmark("Get permission JSON"):
     permissions.permissions_for(permissions.get_user())
-    return json.dumps(getattr(g, '_request_permissions', None))
+    return json.dumps(getattr(g, '_request_permissions', None), cls=SetEncoder)
 
 
 def get_config_json():
