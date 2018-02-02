@@ -36,7 +36,14 @@
   function isElementVisible(el) {
     const bRect = el.getBoundingClientRect();
     const topEl = document.elementFromPoint(bRect.x, bRect.y);
-    return topEl && (el === topEl || isChildOf(topEl, el));
+    // Due to various reasons of how browser determines layering of elements on
+    // the page, topEl returned from elementFromPoint can either be element or
+    // its inner child
+    return topEl && (
+      el === topEl ||
+      isChildOf(topEl, el) ||
+      isChildOf(el, topEl)
+    );
   }
 
   /**
