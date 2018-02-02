@@ -7,6 +7,7 @@ import './comment-input';
 import './comment-add-button';
 import Permission from '../../permission';
 import template from './comment-add-form.mustache';
+import {COMMENT_CREATED} from '../../events/eventTypes';
 
 const tag = 'comment-add-form';
 
@@ -55,6 +56,12 @@ export default can.Component.extend({
         item: comment,
         success: wasSuccessful,
       });
+      if (wasSuccessful) {
+        this.attr('instance').dispatch({
+          ...COMMENT_CREATED,
+          comment: comment,
+        });
+      }
     },
     onCommentCreated: function (e) {
       let comment = e.comment;
