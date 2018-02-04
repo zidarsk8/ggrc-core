@@ -44,7 +44,10 @@ GGRC.Components('richText', {
     placeholder: '',
     hiddenToolbar: false,
     editorHasFocus: false,
-    initEditor(container, toolbarContainer) {
+    maxLength: null,
+    showAlert: false,
+    length: 0,
+    initEditor(container, toolbarContainer, countContainer) {
       import(/* webpackChunkName: "quill" */'quill').then((Quill)=> {
         let editor = new Quill(container, {
           theme: 'snow',
@@ -62,11 +65,17 @@ GGRC.Components('richText', {
           }
         });
         this.setContentToEditor(editor, this.attr('content'));
-        editor.on('text-change', this.onChange.bind(this));
+
+        if (this.attr('maxLength')) {
+          this.restrictPasteOperation(editor);
+          this.restrictMaxLength(editor);
+        }
 
         if (this.attr('hiddenToolbar')) {
           editor.on('selection-change', this.onSelectionChange.bind(this));
         }
+
+        editor.on('text-change', this.onChange.bind(this));
         this.attr('editor', editor);
       });
     },
@@ -76,24 +85,46 @@ GGRC.Components('richText', {
         editor.setContents(delta);
       }
     },
-    urlMatcher(node, delta) {
-      if (typeof (node.data) !== 'string') {
-        return;
-      }
+    restrictPasteOperation(editor) {
+      editor.root.addEventListener('paste', (e) => {
+        let text = e.clipboardData.getData('text/plain');
+        let allowedCount = this.attr('maxLength') - this.attr('length');
 
+        if (text.length > allowedCount) {
+          e.preventDefault();
+          let allowed = text.slice(0, allowedCount);
+          document.execCommand('insertText', false, allowed);
+          this.attr('showAlert', true);
+        }
+      });
+    },
+    restrictMaxLength(editor) {
+      editor.root.addEventListener('keypress', (e)=> {
+        let length = this.getLength(editor);
+        let maxLength = this.attr('maxLength')
+        if (length >= maxLength) {
+          e.preventDefault();
+        }
+      });
+    },
+    urlMatcher(node, delta) {
+      // Matcher runs only for single op.
+      // Since it's clipboard matcher operation is always insert.
+      let insertedText = delta.ops[0].insert;
       let matches = node.data.match(URL_CLIPBOARD_REGEX);
 
-      if (matches && matches.length > 0) {
+      if (matches) {
         let ops = [];
-        let str = node.data;
         matches.forEach((match)=> {
-          let split = str.split(match);
+          let split = insertedText.split(match);
           let beforeLink = split.shift();
-          ops.push({insert: beforeLink});
+          if (beforeLink.length) {
+            ops.push({insert: beforeLink});
+          }
           ops.push({insert: match, attributes: {link: match}});
-          str = split.join(match);
+          insertedText = split.join(match);
         });
-        ops.push({insert: str});
+        ops.push({insert: insertedText});
         delta.ops = ops;
       }
 
@@ -118,8 +149,8 @@ GGRC.Components('richText', {
     },
     onChange(delta, oldDelta) {
       let editor = this.attr('editor');
-      // real length without service tags
-      let textLength = editor.getText().trim().length;
+
+      let textLength = this.getLength(editor);
 
       // handle and highlight urls
       if (textLength &&
@@ -159,13 +190,25 @@ GGRC.Components('richText', {
       // we have to save empty string in this case;
       let content = textLength ? editor.root.innerHTML : '';
       this.attr('content', content);
+      this.attr('length', textLength);
+
+      let maxLength = this.attr('maxLength');
+      let showAlert = this.attr('showAlert');
+      if (showAlert && textLength < maxLength) {
+        this.attr('showAlert', false);
+      }
     },
+    getLength(editor) {
+      // Empty editor contains single service line-break symbol.
+      return editor.getLength() - 1;
+    }
   },
   events: {
     inserted() {
       let wysiwyg = this.element.find('.rich-text__content')[0];
       let toolbar = this.element.find('.rich-text__toolbar')[0];
-      this.viewModel.initEditor(wysiwyg, toolbar);
+      let count = this.element.find('.rich-text__count')[0];
+      this.viewModel.initEditor(wysiwyg, toolbar, count);
     },
     removed() {
       let editor = this.viewModel.attr('editor');
@@ -173,6 +216,7 @@ GGRC.Components('richText', {
       if (editor) {
         editor.off('text-change');
         editor.off('selection-change');
+        editor.off('keypress');
       }
     }
   }

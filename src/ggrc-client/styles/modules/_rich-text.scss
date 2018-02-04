@@ -39,6 +39,21 @@ rich-text {
       .ql-tooltip {
         z-index: 2;
       }
+
+      &--with-count {
+        .ql-editor {
+          min-height: 62px;
+        }
+      }
+    }
+
+    .rich-text__count {
+      margin: 0 4px;
+      text-align: right;
+      
+      &--alert {
+        color: red;
+      }
     }
   }
 
