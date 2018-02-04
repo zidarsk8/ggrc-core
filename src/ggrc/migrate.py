@@ -118,18 +118,17 @@ def all_extensions():
 def upgradeall(config=None, row_id=None):
   '''Upgrade all modules'''
   from ggrc.app import db
-  sess = db.session
   db_row = mig_row = None
   try:
     down_version_num = [row[0] for row in db.engine.execute(
         "select version_num from ggrc_alembic_version")][0]
-    db_row = sess.query(Maintenance).get(1)
-    mig_row = sess.query(MigrationLog).get(row_id) if row_id else None
+    db_row = db.session.query(Maintenance).get(1)
+    mig_row = db.session.query(MigrationLog).get(row_id) if row_id else None
   except sqlalchemy.exc.ProgrammingError as e:
     if not re.search(r"""\(1146, "Table '.+' doesn't exist"\)$""", e.message):
       if mig_row:
         mig_row.log = e.message
-        sess.commit()
+        db.session.commit()
       raise
 
   try:
@@ -141,7 +140,7 @@ def upgradeall(config=None, row_id=None):
   except Exception as e:
     if mig_row:
       mig_row.log = e.message
-      sess.commit()
+      db.session.commit()
     raise
 
   if mig_row:
@@ -152,7 +151,7 @@ def upgradeall(config=None, row_id=None):
     mig_row.is_migration_complete = True
     # Turn off maintenance mode after running migrations successfully
     db_row.under_maintenance = False
-    sess.commit()
+    db.session.commit()
 
 
 def migrate(row_id=None):

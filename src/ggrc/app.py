@@ -76,9 +76,8 @@ def check_if_under_maintenance():
   """Check if the site is in maintenance mode."""
   with benchmark('Check for maintenance'):
     from ggrc.models.maintenance import Maintenance
-    sess = db.session
     try:
-      db_row = sess.query(Maintenance).get(1)
+      db_row = db.session.query(Maintenance).get(1)
     except sqlalchemy.exc.ProgrammingError as e:
       if re.search(r"""\(1146, "Table '.+' doesn't exist"\)$""", e.message):
         db_row = None
