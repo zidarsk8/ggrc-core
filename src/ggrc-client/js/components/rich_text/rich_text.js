@@ -8,7 +8,7 @@ import template from './rich_text.mustache';
 const URL_CLIPBOARD_REGEX = /https?:\/\/[^\s]+/g;
 const URL_TYPE_REGEX = /https?:\/\/[^\s]+$/;
 
-GGRC.Components('richText', {
+export default can.Component.extend('richText', {
   tag: 'rich-text',
   template: template,
   viewModel: {
