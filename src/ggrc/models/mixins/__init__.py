@@ -694,20 +694,21 @@ def person_relation_factory(relation_name, fulltext_attr=None, api_attr=None):
                                                ["email", "name"]))
   api_attr = api_attr or reflection.Attribute(relation_name)
 
+  # pylint: disable=too-few-public-methods,missing-docstring
   class DecoratedClass(object):
 
-      @classmethod
-      def indexed_query(cls):
-        return super(DecoratedClass, cls).indexed_query().options(
-            orm.Load(cls).joinedload(
-                relation_name
-            ).load_only(
-                "name", "email", "id"
-            ),
-        )
+    _api_attrs = reflection.ApiAttributes(api_attr)
+    fulltext_attr = [gen_fulltext_attr]
 
-      _api_attrs = reflection.ApiAttributes(api_attr)
-      fulltext_attr = [gen_fulltext_attr]
+    @classmethod
+    def indexed_query(cls):
+      return super(DecoratedClass, cls).indexed_query().options(
+          orm.Load(cls).joinedload(
+              relation_name
+          ).load_only(
+              "name", "email", "id"
+          ),
+      )
 
   return type(
       "{}_mixin".format(relation_name),
