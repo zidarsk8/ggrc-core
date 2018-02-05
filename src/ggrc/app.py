@@ -76,9 +76,8 @@ def check_if_under_maintenance():
   """Check if the site is in maintenance mode."""
   with benchmark('Check for maintenance'):
     from ggrc.models.maintenance import Maintenance
-    sess = db.session
     try:
-      db_row = sess.query(Maintenance).get(1)
+      db_row = db.session.query(Maintenance).get(1)
     except sqlalchemy.exc.ProgrammingError as e:
       if re.search(r"""\(1146, "Table '.+' doesn't exist"\)$""", e.message):
         db_row = None
@@ -183,6 +182,49 @@ def _enable_jasmine():
         Asset("dashboard-js-templates"))
 
 
+def _set_display_queries(report_type):
+  """Set the app request handler for displaying sql queries.
+
+  Args:
+    report_type: String specifying if we should display entire queries, just
+      slow ones, just counts or none at all.
+  """
+  # pylint: disable=unused-variable
+  @app.after_request
+  def display_queries(response):
+    """Display database queries
+
+    Prints out SQL queries, EXPLAINs for queries above slow_threshold, and
+    a final count of queries after every HTTP request
+    """
+    slow_threshold = 0.5  # EXPLAIN queries that ran for more than 0.5s
+    queries = get_debug_queries()
+    logger.info("Total queries: %s", len(queries))
+    if report_type == 'count':
+      return response
+    # We have to copy the queries list below otherwise queries executed
+    # in the for loop will be appended causing an endless loop
+    for query in queries[:]:
+      if report_type == 'slow' and query.duration < slow_threshold:
+        continue
+      logger.info(
+          "%.8f %s\n%s\n%s",
+          query.duration,
+          query.context,
+          query.statement,
+          query.parameters)
+      is_select = bool(re.match('SELECT', query.statement, re.I))
+      if query.duration > slow_threshold and is_select:
+        try:
+          statement = "EXPLAIN " + query.statement
+          engine = SQLAlchemy().get_engine(app)
+          result = engine.execute(statement, query.parameters)
+          logger.info(tabulate(result.fetchall(), headers=result.keys()))
+        except:  # pylint: disable=bare-except
+          logger.warning("Statement failed: %s", statement, exc_info=True)
+    return response
+
+
 def _display_sql_queries():
   """Set up display database queries
 
@@ -196,40 +238,7 @@ def _display_sql_queries():
       raise Exception("""Invalid SQLALCHEMY_RECORD_QUERIES value specified.
         Possible options: {}""".format(', '.join(valid_types)))
 
-    # pylint: disable=unused-variable
-    @app.after_request
-    def display_queries(response):
-      """Display database queries
-
-      Prints out SQL queries, EXPLAINs for queries above slow_threshold, and
-      a final count of queries after every HTTP request
-      """
-      slow_threshold = 0.5  # EXPLAIN queries that ran for more than 0.5s
-      queries = get_debug_queries()
-      logger.info("Total queries: %s", len(queries))
-      if report_type == 'count':
-        return response
-      # We have to copy the queries list below otherwise queries executed
-      # in the for loop will be appended causing an endless loop
-      for query in queries[:]:
-        if report_type == 'slow' and query.duration < slow_threshold:
-          continue
-        logger.info(
-            "%.8f %s\n%s\n%s",
-            query.duration,
-            query.context,
-            query.statement,
-            query.parameters)
-        is_select = bool(re.match('SELECT', query.statement, re.I))
-        if query.duration > slow_threshold and is_select:
-          try:
-            statement = "EXPLAIN " + query.statement
-            engine = SQLAlchemy().get_engine(app)
-            result = engine.execute(statement, query.parameters)
-            logger.info(tabulate(result.fetchall(), headers=result.keys()))
-          except:  # pylint: disable=bare-except
-            logger.warning("Statement failed: %s", statement, exc_info=True)
-      return response
+    _set_display_queries(report_type)
 
 
 setup_error_handlers(app)

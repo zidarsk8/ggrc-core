@@ -63,22 +63,21 @@ def index():
 def trigger_migration():
   """Triggers a deferred task for migration."""
   try:
-    sess = db.session
-    maint_row = sess.query(Maintenance).get(1)
+    maint_row = db.session.query(Maintenance).get(1)
     if maint_row and maint_row.under_maintenance:
       logger.info(
           'System is under maintenance. Try running migration later.')
       return
     mig_row = MigrationLog(is_migration_complete=False)
-    sess.add(mig_row)
+    db.session.add(mig_row)
 
     # Set the db flag before running migrations
     if maint_row:
       maint_row.under_maintenance = True
     else:
       maint_row = Maintenance(under_maintenance=True)
-      sess.add(maint_row)
-    sess.commit()
+      db.session.add(maint_row)
+    db.session.commit()
   except sqlalchemy.exc.ProgrammingError as e:
     if re.search(r"""\(1146, "Table '.+' doesn't exist"\)$""", e.message):
       mig_row = None
@@ -115,12 +114,11 @@ def run_migration():
 
 def _turn_off_maintenance_mode():
   """Turn off maintenance mode."""
-  sess = db.session
-  db_row = sess.query(Maintenance).get(1)
+  db_row = db.session.query(Maintenance).get(1)
   if db_row:
     db_row.under_maintenance = False
-    sess.add(db_row)
-    sess.commit()
+    db.session.add(db_row)
+    db.session.commit()
     return "Maintenance mode turned off successfully"
 
 
@@ -149,9 +147,8 @@ def turn_off_maintenance_mode():
 def check_migration_status(row_id):
   """Checks and returns the status of migration."""
   try:
-    sess = db.session
-    maint_row = sess.query(Maintenance).get(1)
-    mig_row = sess.query(MigrationLog).get(row_id)
+    maint_row = db.session.query(Maintenance).get(1)
+    mig_row = db.session.query(MigrationLog).get(row_id)
     if not (mig_row and maint_row):
       data = {"status": "Fail",
               "message": "No migration entry in db."}
