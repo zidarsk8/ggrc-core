@@ -127,6 +127,22 @@ def get_aggregate_function(attribute):
       return source_id, value
 
     return max_
+  elif function_name == "last":
+    def last_(aggregate_values, rel_map):
+      """Get maximum value and id from which the value was taken."""
+      values = [
+          (aggregate_values[aggregate_id], aggregate_id)
+          for aggregate_id in rel_map
+          if aggregate_values.get(aggregate_id) is not None
+      ]
+      if not values:
+        return None, None
+
+      # Last value  = value with maximal id
+      value, source_id = max(values, key=lambda i: i[1])
+      return source_id, value
+
+    return last_
   raise AttributeError("Attribute aggregate_function contains invalid data.")
 
 
@@ -351,7 +367,7 @@ def _get_relationships_map(relationships):
 
 def compute_values(affected_objects, all_relationships, snapshot_map):
   """Compute new values for affected objects."""
-
+  # pylint: disable=too-many-locals
   computed_values = collections.defaultdict(dict)
 
   for attr, objects in affected_objects.iteritems():
@@ -366,21 +382,21 @@ def compute_values(affected_objects, all_relationships, snapshot_map):
       if source_id is None:
         continue
 
-      computed_values[attr][obj] = {
+      computed_value_dict = {
           "source_type": aggregate_type,
           "source_id": source_id,
-          "value_datetime": value,
+          "value_datetime": None,
           "value_integer": None,
           "value_string": "",
       }
+      field_type = attr.attribute_definition.attribute_type.field_type
+      if field_type in ("value_datetime", "value_integer", "value_string"):
+        computed_value_dict[field_type] = value
+      else:
+        computed_value_dict["value_datetime"] = value
+      computed_values[attr][obj] = computed_value_dict
       for snapshot_id in snapshot_map.get(obj, set()):
-        computed_values[attr][(u"Snapshot", snapshot_id)] = {
-            "source_type": aggregate_type,
-            "source_id": source_id,
-            "value_datetime": value,
-            "value_integer": None,
-            "value_string": "",
-        }
+        computed_values[attr][(u"Snapshot", snapshot_id)] = computed_value_dict
 
   return computed_values
 
@@ -392,10 +408,10 @@ def _get_relationships(aggregate_type, objects):
     return set()
 
   src = db.session.query(
-      models.Relationship.destination_type,
-      models.Relationship.destination_id,
       models.Relationship.source_type,
       models.Relationship.source_id,
+      models.Relationship.destination_type,
+      models.Relationship.destination_id,
   ).filter(
       sa.tuple_(
           models.Relationship.destination_type,
@@ -404,10 +420,10 @@ def _get_relationships(aggregate_type, objects):
       models.Relationship.source_type == aggregate_type,
   )
   dst = db.session.query(
-      models.Relationship.source_type,
-      models.Relationship.source_id,
       models.Relationship.destination_type,
       models.Relationship.destination_id,
+      models.Relationship.source_type,
+      models.Relationship.source_id,
   ).filter(
       sa.tuple_(
           models.Relationship.source_type,
@@ -521,7 +537,7 @@ def get_attributes_data(computed_values):
           "source_id": computed_value["source_id"],
           "source_attr": unicode(aggregate_field),
           "value_datetime": computed_value["value_datetime"],
-          "value_string": computed_value["value_string"],
+          "value_string": computed_value["value_string"] or "",
           "value_integer": computed_value["value_integer"],
           "attribute_template_id": attr.attribute_template_id,
           "attribute_definition_id": definition_id,
@@ -539,8 +555,7 @@ def get_index_data(computed_values, snapshot_tag_map):
   for attr, objects in computed_values.iteritems():
     for obj, computed_value in objects.iteritems():
       value = (computed_value["value_datetime"] or
-               computed_value["value_string"] or
-               computed_value["value_integer"])
+               computed_value["value_string"] or "")
       tags = u""
       if obj[0] == "Snapshot":
         tags = snapshot_tag_map.get(obj[1], u"")

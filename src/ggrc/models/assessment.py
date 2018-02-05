@@ -18,6 +18,7 @@ from ggrc.fulltext import mixin
 from ggrc.models.comment import Commentable
 from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
 from ggrc.models import issuetracker_issue
+from ggrc.models.mixins import with_last_comment
 from ggrc.models.mixins.audit_relationship import AuditRelationship
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import CustomAttributable
@@ -65,8 +66,9 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
                  Personable, reminderable.Reminderable, Relatable,
                  LastDeprecatedTimeboxed, WithSimilarityScore, FinishedDate,
                  VerifiedDate, ValidateOnComplete, Notifiable, WithAction,
-                 labeled.Labeled, issuetracker_issue.IssueTracked,
-                 BusinessObject, Indexed, db.Model):
+                 labeled.Labeled, with_last_comment.WithLastComment,
+                 issuetracker_issue.IssueTracked, BusinessObject,
+                 Indexed, db.Model):
   """Class representing Assessment.
 
   Assessment is an object representing an individual assessment performed on

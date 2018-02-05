@@ -13,6 +13,7 @@ class TestComputedAttributes(TestCase):
   """Integration test suite for computed attributes module."""
 
   def test_get_computed_attributes(self):
+    """Test CA definition for all models"""
     attributes = computed_attributes.get_computed_attributes()
     attribute_names = {
         (attr.object_template.name, attr.attribute_definition.name)
@@ -23,5 +24,6 @@ class TestComputedAttributes(TestCase):
         {
             ("Control", "last_assessment_date"),
             ("Objective", "last_assessment_date"),
+            ("Assessment", "last_comment"),
         }
     )
