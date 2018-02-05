@@ -103,7 +103,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
         attr_name: 'archived',
         order: 16,
       }, {
-        attr_title: 'Buganizer',
+        attr_title: 'Ticket Tracker',
         attr_name: 'issue_url',
         order: 17,
         deny: !GGRC.ISSUE_TRACKER_ENABLED,
