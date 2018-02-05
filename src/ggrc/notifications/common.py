@@ -25,7 +25,7 @@ from ggrc import settings
 from ggrc.models import Person
 from ggrc.models import Notification
 from ggrc.rbac import permissions
-from ggrc.utils import DATE_FORMAT_US, merge_dict
+from ggrc.utils import DATE_FORMAT_US, merge_dict, benchmark
 
 from ggrc_workflows.notification.data_handler import (
     cycle_tasks_cache, deleted_task_rels_cache, get_cycle_task_data
@@ -281,16 +281,22 @@ def send_daily_digest_notifications():
     str: String containing a simple list of who received the notification.
   """
   # pylint: disable=invalid-name
-  notif_list, notif_data = get_daily_notifications()
-  sent_emails = []
-  subject = "GGRC daily digest for {}".format(date.today().strftime("%b %d"))
-  for user_email, data in notif_data.iteritems():
-    data = modify_data(data)
-    email_body = settings.EMAIL_DIGEST.render(digest=data)
-    send_email(user_email, subject, email_body)
-    sent_emails.append(user_email)
-  set_notification_sent_time(notif_list)
-  return "emails sent to: <br> {}".format("<br>".join(sent_emails))
+  with benchmark("contributed cron job send_daily_digest_notifications"):
+    notif_list, notif_data = get_daily_notifications()
+    sent_emails = []
+    subject = "GGRC daily digest for {}".format(date.today().strftime("%b %d"))
+
+    with benchmark("sending daily emails"):
+      for user_email, data in notif_data.iteritems():
+        data = modify_data(data)
+        email_body = settings.EMAIL_DIGEST.render(digest=data)
+        send_email(user_email, subject, email_body)
+        sent_emails.append(user_email)
+
+    with benchmark("setting daily notifications sent time"):
+      set_notification_sent_time(notif_list)
+
+    return "emails sent to: <br> {}".format("<br>".join(sent_emails))
 
 
 def set_notification_sent_time(notif_list):

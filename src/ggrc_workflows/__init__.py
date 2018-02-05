@@ -19,6 +19,7 @@ from ggrc.models.relationship import Relationship
 from ggrc.rbac.permissions import is_allowed_update
 from ggrc.access_control import role
 from ggrc.services import signals
+from ggrc.utils import benchmark
 from ggrc.utils.log_event import log_event
 from ggrc_workflows import models, notification
 from ggrc_workflows import services
@@ -770,22 +771,27 @@ def init_extra_views(app):
 
 def start_recurring_cycles():
   """Start recurring cycles by cron job."""
-  today = date.today()
-  workflows = models.Workflow.query.filter(
-      models.Workflow.next_cycle_start_date <= today,
-      models.Workflow.recurrences == True  # noqa
-  )
-  for workflow in workflows:
-    # Follow same steps as in model_posted.connect_via(models.Cycle)
-    while workflow.next_cycle_start_date <= date.today():
-      cycle = build_cycle(workflow)
-      if not cycle:
-        break
-      db.session.add(cycle)
-      notification.handle_cycle_created(cycle, False)
-      notification.handle_workflow_modify(None, workflow)
-  log_event(db.session)
-  db.session.commit()
+  with benchmark("contributed cron job start_recurring_cycles"):
+    today = date.today()
+    workflows = models.Workflow.query.filter(
+        models.Workflow.next_cycle_start_date <= today,
+        models.Workflow.recurrences == True  # noqa
+    )
+    for workflow in workflows:
+      # Follow same steps as in model_posted.connect_via(models.Cycle)
+      while workflow.next_cycle_start_date <= date.today():
+        cycle = build_cycle(workflow)
+        if not cycle:
+          break
+        db.session.add(cycle)
+        notification.handle_cycle_created(cycle, False)
+        notification.handle_workflow_modify(None, workflow)
+      # db.session.commit was moved into cycle intentionally.
+      # 'Cycles' for each 'Workflow' should be committed separately
+      # to free memory on each iteration. Single commit exeeded
+      # maximum memory limit on AppEngine instance.
+      log_event(db.session)
+      db.session.commit()
 
 
 class WorkflowRoleContributions(RoleContributions):
