@@ -7,6 +7,7 @@ import {
   applyChangesToCustomAttributeValue,
   isEvidenceRequired,
   isCommentRequired,
+  isUrlRequired,
 }
   from '../../plugins/utils/ca-utils';
 import {VALIDATION_ERROR, RELATED_ITEMS_LOADED} from '../../events/eventTypes';
@@ -47,6 +48,9 @@ import Permission from '../../permission';
         evidenceAmount: {
           type: 'number',
         },
+        urlsAmount: {
+          type: 'number',
+        },
         isEvidenceRequired: {
           get: function () {
             let optionsWithEvidence = this.attr('fields')
@@ -57,6 +61,16 @@ import Permission from '../../permission';
                 return isEvidenceRequired(item);
               }).length;
             return optionsWithEvidence > this.attr('evidenceAmount');
+          },
+        },
+        isUrlRequired: {
+          get: function () {
+            let optionsWithURLs = this.attr('fields')
+              .filter((item) => item.attr('type') === 'dropdown')
+              .filter(function (item) {
+                return isUrlRequired(item);
+              }).length;
+            return optionsWithURLs > this.attr('urlsAmount');
           },
         },
       },
@@ -97,29 +111,38 @@ import Permission from '../../permission';
         let errorsMap = field.errorsMap || {
           evidence: false,
           comment: false,
+          url: false,
         };
 
         let requiresEvidence = isEvidenceRequired(field);
         let requiresComment = isCommentRequired(field);
+        let requiresUrl = isUrlRequired(field);
 
         let hasMissingEvidence = requiresEvidence &&
           this.attr('isEvidenceRequired');
 
+        let hasMissingUrl = requiresUrl &&
+          this.attr('isUrlRequired');
+
         let hasMissingComment = requiresComment && !!errorsMap.comment;
 
         let fieldValid = (value) ?
-          !(hasMissingEvidence || hasMissingComment) : !isMandatory;
+          !(hasMissingEvidence || hasMissingComment || hasMissingUrl) :
+          !isMandatory;
 
         field.attr({
           validation: {
             show: isMandatory || !!value,
             valid: fieldValid,
-            hasMissingInfo: (hasMissingEvidence || hasMissingComment),
-            requiresAttachment: (requiresEvidence || requiresComment),
+            hasMissingInfo: (hasMissingEvidence || hasMissingComment ||
+              hasMissingUrl),
+            requiresAttachment: (requiresEvidence || requiresComment ||
+              requiresUrl),
           },
           errorsMap: {
             evidence: hasMissingEvidence,
             comment: hasMissingComment,
+            url: hasMissingUrl,
           },
         });
       },
@@ -201,6 +224,9 @@ import Permission from '../../permission';
     },
     events: {
       '{viewModel} evidenceAmount': function () {
+        this.viewModel.validateForm();
+      },
+      '{viewModel} urlsAmount': function () {
         this.viewModel.validateForm();
       },
       [`{viewModel.instance} ${RELATED_ITEMS_LOADED.type}`]: function () {

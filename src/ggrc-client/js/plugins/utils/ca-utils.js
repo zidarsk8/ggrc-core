@@ -195,11 +195,13 @@ function prepareCustomAttributes(definitions, values) {
           empty: errors.indexOf('value') > -1,
           mandatory: def.mandatory,
           valid: errors.indexOf('comment') < 0 &&
-          errors.indexOf('evidence') < 0,
+            errors.indexOf('evidence') < 0 &&
+            errors.indexOf('url') < 0,
         };
         value.errorsMap = {
           comment: errors.indexOf('comment') > -1,
           evidence: errors.indexOf('evidence') > -1,
+          url: errors.indexOf('url') > -1,
         };
         valueData = value;
       }
@@ -240,6 +242,11 @@ function isEvidenceRequired(field) {
 function isCommentRequired(field) {
   const fieldValidationConf = field.attr(`validationConfig.${field.value}`);
   return ddValidationValueToMap(fieldValidationConf).comment;
+}
+
+function isUrlRequired(field) {
+  const fieldValidationConf = field.attr(`validationConfig.${field.value}`);
+  return ddValidationValueToMap(fieldValidationConf).url;
 }
 /**
  * @deprecated Use CustomAttributeObject API to get access to the necessary custom
@@ -442,6 +449,7 @@ export {
   getCustomAttributeType,
   isEvidenceRequired,
   isCommentRequired,
+  isUrlRequired,
   convertToFormViewField,
   applyChangesToCustomAttributeValue,
   ensureGlobalCA,
