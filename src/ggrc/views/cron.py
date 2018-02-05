@@ -1,6 +1,8 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Collects specific cton views."""
+
 from logging import getLogger
 from traceback import format_exc
 
@@ -21,6 +23,10 @@ def send_error_notification(message):
 
 
 def run_job(job):
+  """Call sent job.
+
+  Failuare on job will just logged and don't stop runner.
+  """
   try:
     job()
   except:  # pylint: disable=bare-except
@@ -31,6 +37,7 @@ def run_job(job):
 
 
 def job_runner(name):
+  """Run jobs related to sent name."""
   cron_jobs = extensions.get_module_contributions(name)
   for job in cron_jobs:
     run_job(job)
@@ -46,6 +53,7 @@ def half_hour_cron_endpoint():
 
 
 def init_cron_views(app):
+  """Init cron views."""
   app.add_url_rule(
       "/nightly_cron_endpoint",
       "nightly_cron_endpoint",
