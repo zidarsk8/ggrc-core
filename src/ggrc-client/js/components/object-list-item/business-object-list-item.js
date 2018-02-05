@@ -28,9 +28,11 @@ import template from './business-object-list-item.mustache';
         },
         iconCls: {
           get: function () {
-            return !this.attr('isSnapshot') ?
-            'fa-' + this.attr('instance.type').toLowerCase() :
-            'fa-' + this.attr('instance.child_type').toLowerCase();
+            const objectType = !this.attr('isSnapshot') ?
+              this.attr('instance.type') :
+              this.attr('instance.child_type');
+            const model = CMS.Models[objectType];
+            return `fa-${model.table_singular}`;
           },
         },
         itemData: {
