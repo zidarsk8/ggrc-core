@@ -4,16 +4,17 @@
 """Builder the prepare diff in special format between current
 instance state and proposed content."""
 
-import sqlalchemy as sa
 import collections
 
 from flask import g
+import sqlalchemy as sa
 
 from ggrc.models import reflection
 from ggrc.models import mixins
 
 
 def get_latest_revision_content(instance):
+  """Returns latest revision for instance."""
   from ggrc.models import all_models
   if not hasattr(g, "latest_revision_content"):
     g.latest_revision_content = {}
@@ -32,12 +33,14 @@ def get_latest_revision_content(instance):
 
 
 def mark_for_latest_content(type_, id_):
+  """Mark type to get lates contnent when it will be needed."""
   if not hasattr(g, "latest_revision_content_markers"):
     g.latest_revision_content_markers = collections.defaultdict(set)
   g.latest_revision_content_markers[type_].add(id_)
 
 
 def rewarm_latest_content():
+  """Rewarm cache for latest content for marked objects."""
   from ggrc.models import all_models
   if not hasattr(g, "latest_revision_content_markers"):
     return
@@ -72,6 +75,7 @@ def rewarm_latest_content():
 
 
 def get_person_email(person_id):
+  """Returns person email for sent person id."""
   if not hasattr(g, "person_email_cache"):
     from ggrc.models import all_models
     query = all_models.Person.query.values(all_models.Person.id,
@@ -81,15 +85,38 @@ def get_person_email(person_id):
 
 
 def person_obj_by_id(person_id):
+  """Generates person dict for sent person id."""
   return {"id": person_id, "email": get_person_email(person_id)}
 
 
 def generate_person_list(person_ids):
+  """Generates list of person dicts for sent person ids."""
   person_ids = sorted([int(p) for p in person_ids])
   return [person_obj_by_id(i) for i in person_ids]
 
 
 def generate_acl_diff(proposed, revisioned):
+  """Generates acl diff between peoposed and revised.
+
+  Returns dict of dict.
+     {
+        ACR_ID: {
+            u"added": [{
+                "id": person_id,
+                "email": person_email,
+            },
+            ...
+            ],
+            u"deleted": [{
+                "id": person_id,
+                "email": person_email,
+            },
+            ...
+            ],
+        },
+        ...
+     }
+  """
   proposed_acl = collections.defaultdict(set)
   revision_acl = collections.defaultdict(set)
   acl_ids = set()
@@ -112,6 +139,15 @@ def generate_acl_diff(proposed, revisioned):
 
 
 def populate_cavs(custom_attribute_values, custom_attributes, cads):
+  """Required only for oldstyle api.
+
+  FE send custom_attributes and expected workflow same as
+  custom_attribute_values.
+  If custom_attribute_values == custom_attributes. This is revision.
+  Just return custom_attribute_values.
+  if not generate new custom_attribute_values from custom_attributes.
+  This function should be removed after FE will be moved to new api.
+  """
   # custom_attributes same as custom_attribute_values in revisions
   # custom_attributes empty on new api
   # in all that cases you shoul return custom_attribute_values
@@ -141,6 +177,7 @@ def populate_cavs(custom_attribute_values, custom_attributes, cads):
 
 
 def generate_cav_diff(instance, proposed, revisioned, old_style_cavs):
+  """Build diff for custom attributes."""
   if not isinstance(instance, mixins.customattributable.CustomAttributable):
     return {}
   proposed = populate_cavs(proposed,
@@ -177,6 +214,7 @@ def __mappting_key_function(object_dict):
 
 
 def _generate_list_mappings(keys, diff_data, current_data):
+  """Generates list mappings."""
   result = {}
   for key in keys:
     if key not in diff_data:
@@ -203,6 +241,7 @@ def _generate_list_mappings(keys, diff_data, current_data):
 
 
 def _generate_single_mappings(keys, diff_data, current_data):
+  """Generates single mappings."""
   result = {}
   for key in keys:
     if key not in diff_data:
@@ -219,6 +258,7 @@ def _generate_single_mappings(keys, diff_data, current_data):
 
 
 def generate_mapping_dicts(instance, diff_data, current_data):
+  """Generate instance mappings diff."""
 
   relations = sa.inspection.inspect(instance.__class__).relationships
   relations_dict = collections.defaultdict(set)
@@ -239,6 +279,7 @@ def generate_mapping_dicts(instance, diff_data, current_data):
 
 
 def prepare(instance, content):
+  """Prepare content diff for instance and sent content."""
   api_attrs = reflection.AttributeInfo.gather_attr_dicts(instance.__class__,
                                                          "_api_attrs")
   updateable_fields = {k for k, v in api_attrs.iteritems() if v.update}
