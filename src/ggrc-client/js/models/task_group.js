@@ -70,6 +70,7 @@
       });
       this.bind('destroyed', function (ev, inst) {
         if (inst instanceof that) {
+          inst.attr('deleted', true);
           can.each(inst.task_group_tasks, function (tgt) {
             if (!tgt) {
               return;
@@ -176,8 +177,12 @@
       });
 
       this.bind('destroyed', function (ev, instance) {
+        let taskGroup;
         if (instance instanceof that) {
-          if (instance.task_group && instance.task_group.reify().selfLink) {
+          taskGroup = instance.task_group && instance.task_group.reify();
+          if (taskGroup
+            && taskGroup.selfLink
+            && !taskGroup.attr('deleted')) {
             instance.task_group.reify().refresh();
             instance._refresh_workflow_people();
           }
