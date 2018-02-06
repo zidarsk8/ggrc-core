@@ -24,11 +24,11 @@ def upgrade():
   attribute_types = table(
       "attribute_types",
       column("attribute_type_id", sa.Integer),
-      column("name", sa.Unicode),
-      column("field_type", sa.Unicode),
-      column("db_column_name", sa.Unicode),
+      column("name", sa.String),
+      column("field_type", sa.String),
+      column("db_column_name", sa.String),
       column("computed", sa.Boolean),
-      column("aggregate_function", sa.UnicodeText),
+      column("aggregate_function", sa.Text),
       column("created_at", sa.DateTime),
       column("updated_at", sa.DateTime),
   )
@@ -36,8 +36,8 @@ def upgrade():
       "attribute_definitions",
       column("attribute_definition_id", sa.Integer),
       column("attribute_type_id", sa.Integer),
-      column("name", sa.Unicode),
-      column("display_name", sa.Unicode),
+      column("name", sa.String),
+      column("display_name", sa.String),
       column("created_at", sa.DateTime),
       column("updated_at", sa.DateTime),
   )
@@ -45,8 +45,8 @@ def upgrade():
       "object_templates",
       column("object_template_id", sa.Integer),
       column("object_type_id", sa.Integer),
-      column("name", sa.Unicode),
-      column("display_name", sa.Unicode),
+      column("name", sa.String),
+      column("display_name", sa.String),
       column("created_at", sa.DateTime),
       column("updated_at", sa.DateTime),
   )
@@ -59,6 +59,9 @@ def upgrade():
       column("read_only", sa.Boolean),
       column("created_at", sa.DateTime),
       column("updated_at", sa.DateTime),
+      column("help_text", sa.String),
+      column("options", sa.String),
+      column("default_value", sa.String),
   )
 
   op.bulk_insert(
@@ -115,6 +118,9 @@ def upgrade():
           "read_only": True,
           "created_at": datetime.datetime.now(),
           "updated_at": datetime.datetime.now(),
+          "help_text": "",
+          "options": "",
+          "default_value": "",
       }]
   )
   attribute_template_id = connection.execute(
@@ -179,7 +185,7 @@ def downgrade():
       "attribute_definitions",
       column("attribute_definition_id", sa.Integer),
       column("attribute_type_id", sa.Integer),
-      column("name", sa.Unicode),
+      column("name", sa.String),
   )
 
   connection = op.get_bind()
