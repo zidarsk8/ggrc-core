@@ -8,46 +8,42 @@ import '../related-objects/related-people-access-control-group';
 import '../people/editable-people-group';
 import template from './custom-roles.mustache';
 
-(function (can, GGRC) {
-  'use strict';
+let tag = 'custom-roles';
 
-  let tag = 'custom-roles';
-
-  GGRC.Components('customRoles', {
-    tag: tag,
-    template: template,
-    viewModel: {
-      define: {
-        instance: {
-          set(newValue, setValue) {
-            const isReadonly = this.isReadOnlyForInstance(newValue);
-            this.attr('readOnly', isReadonly);
-            setValue(newValue);
-          },
+GGRC.Components('customRoles', {
+  tag: tag,
+  template: template,
+  viewModel: {
+    define: {
+      instance: {
+        set(newValue, setValue) {
+          const isReadonly = this.isReadOnlyForInstance(newValue);
+          this.attr('readOnly', isReadonly);
+          setValue(newValue);
         },
       },
-      updatableGroupId: null,
-      includeRoles: [],
-      excludeRoles: [],
-      conflictRoles: [],
-      orderOfRoles: [],
-      readOnly: false,
-      isReadOnlyForInstance(instance) {
-        if (!instance) {
-          return false;
-        }
-
-        return instance.class.isProposable;
-      },
-      save: function (args) {
-        let self = this;
-        this.attr('updatableGroupId', args.groupId);
-        this.attr('instance').save()
-          .then(function () {
-            self.attr('instance').dispatch('refreshInstance');
-            self.attr('updatableGroupId', null);
-          });
-      },
     },
-  });
-})(window.can, window.GGRC);
+    updatableGroupId: null,
+    includeRoles: [],
+    excludeRoles: [],
+    conflictRoles: [],
+    orderOfRoles: [],
+    readOnly: false,
+    isReadOnlyForInstance(instance) {
+      if (!instance) {
+        return false;
+      }
+
+      return instance.class.isProposable;
+    },
+    save: function (args) {
+      let self = this;
+      this.attr('updatableGroupId', args.groupId);
+      this.attr('instance').save()
+        .then(function () {
+          self.attr('instance').dispatch('refreshInstance');
+          self.attr('updatableGroupId', null);
+        });
+    },
+  },
+});
