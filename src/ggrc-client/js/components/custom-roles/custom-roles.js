@@ -34,11 +34,22 @@ export default can.Component.extend({
 
       return instance.class.isProposable;
     },
+    // When we delete some role this action can delete another acl role on the backend.
+    // In this case we get in response less objects then was in request.
+    // But canJs is merging array-attributes not replacing.
+    // As result it doesn't remove redundant element.
+    filterACL() {
+      let filteredACL = this.attr('instance.access_control_list')
+        .filter((role) => role.id);
+
+      this.attr('instance.access_control_list').replace(filteredACL);
+    },
     save: function (args) {
       let self = this;
       this.attr('updatableGroupId', args.groupId);
       this.attr('instance').save()
         .then(function () {
+          self.filterACL();
           self.attr('instance').dispatch('refreshInstance');
           self.attr('updatableGroupId', null);
         });
