@@ -56,12 +56,13 @@ const getCustomAttrValue = (attr, instance, options) => {
       });
 
     if (customAttrItem) {
-      value = formatValueMap[definition.attribute_type] ?
+      value = (formatValueMap[definition.attribute_type] ?
         formatValueMap[definition.attribute_type](customAttrItem, options) :
-        customAttrItem.attr('attribute_value');
-    } else {
-      value = value || defaultValueMap[definition.attribute_type];
+        customAttrItem.attr('attribute_value'));
     }
+
+    // populate with default value if needed
+    value = value || defaultValueMap[definition.attribute_type];
   }
 
   return value || '';

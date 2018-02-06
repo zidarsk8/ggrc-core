@@ -156,13 +156,13 @@ describe('helpers.getCustomAttrValue', () => {
       expect(actual).toEqual('No');
     });
 
-    it('returns empty string for CA of type checkbox without value', () => {
+    it('returns "No" for CA of type checkbox without value', () => {
       attr.attr_name = 'CheckBox';
       setCustomAttrItem(undefined, 4, 'checkbox');
 
       actual = helper(attr, fakeInstance, fakeOptions);
 
-      expect(actual).toEqual('');
+      expect(actual).toEqual('No');
     });
 
     it('returns "No" for CA of type checkbox if there are no CA values', () => {
