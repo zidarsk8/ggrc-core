@@ -19,7 +19,6 @@ from ggrc.models.track_object_state import HasObjectState
 class Section(Roleable,
               HasObjectState,
               mixins.Hierarchical,
-              db.Model,
               mixins.CustomAttributable,
               Personable,
               Relatable,
@@ -27,7 +26,8 @@ class Section(Roleable,
               Commentable,
               mixins.TestPlanned,
               PublicDocumentable,
-              mixins.BusinessObject):
+              mixins.BusinessObject,
+              db.Model):
 
   __tablename__ = 'sections'
   _table_plural = 'sections'
