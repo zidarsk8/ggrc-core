@@ -214,7 +214,6 @@ dashboard-js-template-files:
   # ggrc_risks
   - dashboard/lhn_risks.mustache
   - risks/modal_content.mustache
-  - risks/info.mustache
   - threats/modal_content.mustache
   # ggrc_workflows
   - base_objects/task_group_subtree_footer.mustache
