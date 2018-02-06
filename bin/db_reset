@@ -75,7 +75,7 @@ if [[ -f "$DUMP_FILE" ]]; then
     echo "Warning: Single USE statement in $DUMP_FILE will be ignored."
   fi
   echo "Importing: $DUMP_FILE"
-  sed "s/^USE.*//g" | mysql -h$HOST $DB_NAME
+  pv $DUMP_FILE | sed "s/^USE.*//g" | mysql -h$HOST $DB_NAME
 fi
 
 db_migrate
