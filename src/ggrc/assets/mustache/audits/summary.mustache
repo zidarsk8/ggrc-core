@@ -62,6 +62,9 @@
                         <th>
                           Percent
                         </th>
+                        <th>
+                          Evidences
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -79,6 +82,9 @@
                           <td>
                             {{percent}} %
                           </td>
+                          <td>
+                            {{documents}}
+                          </td>
                         </tr>
                       {{/each}}
                     <tbody>
@@ -91,6 +97,9 @@
                           {{charts.Assessment.total}}
                         </td>
                         <td>
+                        </td>
+                        <td>
+                          {{charts.Assessment.totalDocuments}}
                         </td>
                       </tr>
                     </tfoot>

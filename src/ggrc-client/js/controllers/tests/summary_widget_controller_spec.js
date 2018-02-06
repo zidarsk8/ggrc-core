@@ -5,6 +5,7 @@
 
 import Ctrl from '../summary_widget_controller';
 import * as CurrentPageUtils from '../../plugins/utils/current-page-utils';
+import * as StateUtils from '../../plugins/utils/state-utils';
 
 describe('SummaryWidgetController', function () {
   'use strict';
@@ -43,20 +44,19 @@ describe('SummaryWidgetController', function () {
     });
 
     it('sets true to options.forceRefresh if destination type is Document' +
-    'and source type is Assessment',
-      function () {
-        let relationship = new CMS.Models.Relationship({
-          destination: {
-            type: 'Document',
-            id: 1,
-          }, source: {
-            type: 'Assessment',
-            id: 1,
-          },
-        });
-        method({}, {}, relationship);
-        expect(ctrlInst.options.forceRefresh).toBe(true);
+    'and source type is Assessment', function () {
+      let relationship = new CMS.Models.Relationship({
+        destination: {
+          type: 'Document',
+          id: 1,
+        }, source: {
+          type: 'Assessment',
+          id: 1,
+        },
       });
+      method({}, {}, relationship);
+      expect(ctrlInst.options.forceRefresh).toBe(true);
+    });
 
     it('does not set true to options.forceRefresh' +
     ' if destination type is not Document', function () {
@@ -104,7 +104,10 @@ describe('SummaryWidgetController', function () {
           forceRefresh: false,
           context: {
             charts: {
-              Assessment: new can.Map({total: 3, isInitialized: true}),
+              Assessment: new can.Map({
+                total: {assessments: 3},
+                isInitialized: true,
+              }),
             },
           },
         },
@@ -244,6 +247,89 @@ describe('SummaryWidgetController', function () {
       ctrlInst.options.chartOptions = undefined;
       method();
       expect(chart.draw).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('parseStatuses() method', () => {
+    let method;
+    let ctrlInst;
+    let raw;
+    let result;
+    let spy;
+
+    beforeEach(() => {
+      ctrlInst = {};
+      spy = spyOn(StateUtils, 'getDefaultStatesForModel');
+      method = Ctrl.prototype.parseStatuses.bind(ctrlInst);
+    });
+
+    describe('returns object which', () => {
+      it('contains total info', () => {
+        raw = {
+          total: 'info',
+          statuses: [],
+        };
+        spy.and.returnValue([]);
+
+        result = method('Assessment', raw);
+
+        expect(result).toEqual(jasmine.objectContaining({total: raw.total}));
+      });
+
+      it('contains object statuses with default names ' +
+      'and counsts of assessments and mapped documents', () => {
+        let expecteResult;
+
+        raw = {
+          total: 'info',
+          statuses: [{
+            name: 'In Progress',
+            assessments: 5,
+            documents: 10,
+            verified: 0,
+          }, {
+            name: 'Completed',
+            assessments: 6,
+            documents: 1,
+            verified: 0,
+          }, {
+            name: 'Completed',
+            assessments: 3,
+            documents: 13,
+            verified: 1,
+          }],
+        };
+
+
+        spy.and.returnValue(['Not Started', 'In Progress',
+          'Completed (no verification)', 'Completed and Verified']);
+
+        expecteResult = jasmine.objectContaining({
+          statuses: [{
+            name: 'Not Started',
+            assessments: 0,
+            documents: 0,
+          }, {
+            name: 'In Progress',
+            assessments: 5,
+            documents: 10,
+          }, {
+            name: 'Completed (no verification)',
+            assessments: 6,
+            documents: 1,
+          }, {
+            name: 'Completed and Verified',
+            assessments: 3,
+            documents: 13,
+          }],
+        });
+
+        result = method('Assessment', raw);
+
+        expect(StateUtils.getDefaultStatesForModel)
+          .toHaveBeenCalledWith('Assessment');
+        expect(result).toEqual(expecteResult);
+      });
     });
   });
 });

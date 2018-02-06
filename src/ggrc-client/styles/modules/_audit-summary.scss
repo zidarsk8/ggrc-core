@@ -22,7 +22,8 @@
       td,
       th {
         padding-bottom: 16px;
-        padding-left: 30px;
+        padding-left: 15px;
+        padding-right: 15px;
         text-align: right;
 
         &:first-child {
@@ -43,6 +44,10 @@
           padding-top: 16px;
           font-weight: bold;
         }
+      }
+
+      tbody td:last-child, th:last-child {
+        border-left: 1px solid #ccc;
       }
     }
   }
