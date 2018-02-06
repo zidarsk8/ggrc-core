@@ -2498,9 +2498,8 @@ Example:
     }));
 
     return options.fn({
-      'short': allRoleNames[0],
-      count: allRoleNames.length > 1 ? allRoleNames.length - 1 : 0,
-      'long': allRoleNames.join(', '),
+      rolesStr: allRoleNames.join(', '),
+      rolesList: allRoleNames.join('\n'),
     });
   });
 })(jQuery, can);
