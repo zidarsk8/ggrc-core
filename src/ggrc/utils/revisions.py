@@ -57,26 +57,26 @@ def _fix_type_revisions(event, type_, obj_rev_map):
                    "skipped", type_)
     return
 
-  # chunk = 1000
-  # all_objects = model.eager_query().order_by(model.id)
-  # all_objects_count = model.query.count()
+  chunk = 1000
+  all_objects = model.eager_query().order_by(model.id)
+  all_objects_count = model.query.count()
 
-  # for i in range(all_objects_count // chunk + 1):
-    # objects_chunk = all_objects.limit(chunk).offset(i * chunk)
-    # chunk_with_revisions = [
-    #     obj for obj in objects_chunk if obj.id in obj_rev_map]
-    # chunk_without_revisions = [
-    #     obj for obj in objects_chunk if obj.id not in obj_rev_map]
+  for i in range(all_objects_count // chunk + 1):
+    objects_chunk = all_objects.limit(chunk).offset(i * chunk)
+    chunk_with_revisions = [
+        obj for obj in objects_chunk if obj.id in obj_rev_map]
+    chunk_without_revisions = [
+        obj for obj in objects_chunk if obj.id not in obj_rev_map]
 
     # 1. Update the object's latest revision using the value of the up to date
     # log_json function
-    # _update_existing_revisions(
-    #     chunk_with_revisions, revisions_table, obj_rev_map)
+    _update_existing_revisions(
+        chunk_with_revisions, revisions_table, obj_rev_map)
 
     # 2. For each unlogged object log a "created"/"modified" revision with
     # content equal to obj.log_json()
-    # _recover_create_revisions(revisions_table, event,
-    #                           type_, chunk_without_revisions)
+    _recover_create_revisions(revisions_table, event,
+                              type_, chunk_without_revisions)
 
   # 3. For each lost object log a "deleted" revision with content identical
   # to the last logged revision.
