@@ -6,7 +6,7 @@
 import '../related-objects/related-people-access-control';
 import '../related-objects/related-people-access-control-group';
 import '../people/editable-people-group';
-import template from './custom-roles.mustache';
+import template from './templates/custom-roles.mustache';
 
 export default can.Component.extend({
   tag: 'custom-roles',
