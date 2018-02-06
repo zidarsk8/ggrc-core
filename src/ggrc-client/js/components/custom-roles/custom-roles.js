@@ -8,10 +8,8 @@ import '../related-objects/related-people-access-control-group';
 import '../people/editable-people-group';
 import template from './custom-roles.mustache';
 
-let tag = 'custom-roles';
-
-GGRC.Components('customRoles', {
-  tag: tag,
+export default can.Component.extend({
+  tag: 'custom-roles',
   template: template,
   viewModel: {
     define: {
