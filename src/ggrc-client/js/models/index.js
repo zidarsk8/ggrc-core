@@ -17,7 +17,6 @@ import './mappers/direct-list-loader';
 import './mappers/indirect-list-loader';
 import './mappers/search-list-loader';
 import './mappers/reifying-list-loader';
-import './mappers/tree-base-loader';
 import './mappers/mapper-helpers';
 import './mappers/mappings';
 import './mappers/mappings-ggrc';

@@ -273,7 +273,6 @@ import {
             widget_icon: 'person',
             // NOTE: "order" not overridden
             content_controller_options: {
-              mapping: 'authorized_people',
               allow_mapping: false,
               allow_creating: false,
             },
@@ -489,7 +488,6 @@ import {
             widget_icon: 'person',
             draw_children: true,
             content_controller_options: {
-              mapping: 'authorized_people',
               allow_mapping: false,
               allow_creating: false,
             },

@@ -188,7 +188,6 @@
           draw_children: true,
           parent_instance: pageInstance,
           model: model,
-          mapping: 'related_' + model.table_plural,
         },
       };
     });
