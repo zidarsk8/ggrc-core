@@ -23,6 +23,9 @@ from ggrc.models import comment
 
 
 class JsonPolymorphicRelationship(utils.PolymorphicRelationship):
+  """Custom relation for instance.
+
+  Allow to setup instance over json serializaion."""
 
   def __call__(self, obj, json_obj):
     for field_name, prop_instance in obj.__class__.__dict__.iteritems():
@@ -34,6 +37,7 @@ class JsonPolymorphicRelationship(utils.PolymorphicRelationship):
 
 
 class FullInstanceContentFased(utils.FasadeProperty):
+  """Custom fasade property for full_instance_content property."""
 
   FIELD_NAME = "content"
 
@@ -74,11 +78,13 @@ class Proposal(mixins.person_relation_factory("applied_by"),
     EDITOR = "ProposalEditor"
 
   class STATES(object):
+    """All states for proposals."""
     PROPOSED = "proposed"
     APPLIED = "applied"
     DECLINED = "declined"
 
   class CommentTemplatesTextBuilder(object):
+    """Temapltes for comments for proposals."""
     PROPOSED_WITH_AGENDA = ("<p>Proposal has been created with comment: "
                             "{text}</p>")
     APPLIED_WITH_COMMENT = ("<p>Proposal created by {user} has been applied "
@@ -94,6 +100,7 @@ class Proposal(mixins.person_relation_factory("applied_by"),
   # pylint: enable=too-few-public-methods
 
   def build_comment_text(self, reason, text, proposed_by):
+    """Build proposal comment dependable from proposal state."""
     if reason == self.STATES.PROPOSED:
       with_tmpl = self.CommentTemplatesTextBuilder.PROPOSED_WITH_AGENDA
       without_tmpl = self.CommentTemplatesTextBuilder.PROPOSED_WITHOUT_AGENDA
@@ -166,9 +173,11 @@ class Proposal(mixins.person_relation_factory("applied_by"),
 
 
 class Proposalable(object):  # pylint: disable=too-few-public-methods
+  """Mixin to setup instance as proposable."""
+
   @sa.ext.declarative.declared_attr
   def proposals(cls):  # pylint: disable=no-self-argument
-
+    """declare proposals relationship for proposable instance."""
     def join_function():
       return sa.and_(
           sa.orm.foreign(Proposal.instance_type) == cls.__name__,
@@ -199,12 +208,12 @@ def permissions_for_proposal_setter(proposal, proposal_roles):
     if acl in parents:
       continue
     if acl.ac_role.update:
-      ac_role = proposal_roles[Proposal.ACRoles.EDITOR]
+      role = proposal_roles[Proposal.ACRoles.EDITOR]
     elif acl.ac_role.read:
-      ac_role = proposal_roles[Proposal.ACRoles.READER]
+      role = proposal_roles[Proposal.ACRoles.READER]
     else:
       continue
-    ac_list.AccessControlList(ac_role=ac_role,
+    ac_list.AccessControlList(ac_role=role,
                               object=proposal,
                               person=acl.person,
                               parent=acl)

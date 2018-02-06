@@ -3,16 +3,18 @@
 
 """Apply diff content to sent instance."""
 
-from sqlalchemy import inspect
-
 import collections
 import itertools
+
+from sqlalchemy import inspect
+
 from ggrc.access_control import roleable
 from ggrc.models import all_models
 from ggrc.models import mixins
 
 
-def apply_acl_proposal(instance, content):
+def apply_acl(instance, content):
+  """Apply ACLs."""
   if not isinstance(instance, roleable.Roleable):
     return
   instance_acl_dict = {(l.ac_role_id, l.person_id): l
@@ -43,7 +45,8 @@ def apply_acl_proposal(instance, content):
         instance.access_control_list.remove(acl)
 
 
-def apply_cav_proposal(instance, content):
+def apply_cav(instance, content):
+  """Apply CAVs."""
   if not isinstance(instance, mixins.customattributable.CustomAttributable):
     return
   cad_dict = {d.id: d for d in instance.custom_attribute_definitions}
@@ -78,11 +81,8 @@ def apply_cav_proposal(instance, content):
       instance.custom_attribute_values.append(cav)
 
 
-def apply_mapping(instance, content):
-  relations = inspect(instance.__class__).relationships
-  rel_names = [r.key for r in relations if not r.uselist]
-  mapping_fields = content.get("mapping_fields", {})
-  mapping_list_field = content.get("mapping_list_fields", {})
+def _generate_mapping_field_cache(mapping_fields, mapping_list_field):
+  """Returns field cache for sent mapings."""
   all_models_dict = {m.__name__: m for m in all_models.all_models}
   all_items = itertools.chain(*[itertools.chain(v['added'], v['deleted'])
                                 for v in mapping_list_field.values()])
@@ -91,9 +91,20 @@ def apply_mapping(instance, content):
   for value in all_items:
     if value:
       update_field[all_models_dict[value["type"]]].append(value["id"])
-  field_cache = {(i.type, i.id): i
-                 for m, ids in update_field.iteritems()
-                 for i in m.query.filter(m.id.in_(ids))}
+  return {(i.type, i.id): i
+          for m, ids in update_field.iteritems()
+          for i in m.query.filter(m.id.in_(ids))}
+
+
+def apply_mapping(instance, content):
+  """Apply mappings."""
+  rel_names = [r.key
+               for r in inspect(instance.__class__).relationships
+               if not r.uselist]
+  mapping_fields = content.get("mapping_fields", {})
+  mapping_list_field = content.get("mapping_list_fields", {})
+  field_cache = _generate_mapping_field_cache(mapping_fields,
+                                              mapping_list_field)
   for key, value in mapping_fields.iteritems():
     if key in rel_names:
       setattr(instance,
@@ -114,7 +125,8 @@ def apply_mapping(instance, content):
       attr.remove(field_cache[key])
 
 
-def apply(instance, content):
-  apply_acl_proposal(instance, content)
-  apply_cav_proposal(instance, content)
+def apply_action(instance, content):
+  """Apply content diff to instance."""
+  apply_acl(instance, content)
+  apply_cav(instance, content)
   apply_mapping(instance, content)

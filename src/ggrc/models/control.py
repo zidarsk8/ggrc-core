@@ -45,6 +45,7 @@ class ControlAssertion(CategoryBase):
 
 
 class ControlCategorized(Categorizable):
+  """Mixin for control only. Declate categorizations for controls."""
 
   @declared_attr
   def categorizations(cls):  # pylint: disable=no-self-argument
@@ -77,10 +78,11 @@ class ControlCategorized(Categorizable):
     )
 
   def log_json(self):
+    """Log categorizations too."""
     out_json = super(ControlCategorized, self).log_json()
-    # pylint: disable=not-an-iterale
-    out_json["categories"] = [c.category.log_json()
-                              for c in self.categorizations]
+    out_json["categories"] = [
+        c.category.log_json()
+        for c in self.categorizations]  # pylint:disable=not-an-iterable
     return out_json
 
   @classmethod
@@ -91,6 +93,7 @@ class ControlCategorized(Categorizable):
 
 
 class AssertionCategorized(Categorizable):
+  """Mixin for control only. Declate assertions for controls."""
 
   @declared_attr
   def categorized_assertions(cls):  # pylint: disable=no-self-argument
@@ -124,6 +127,7 @@ class AssertionCategorized(Categorizable):
     )
 
   def log_json(self):
+    """Log assertions too."""
     out_json = super(AssertionCategorized, self).log_json()
     # pylint: disable=not-an-iterable
     out_json["assertions"] = [a.category.log_json()
@@ -157,6 +161,7 @@ class Control(WithLastAssessmentDate,
               mixins.Folderable,
               proposal.Proposalable,
               db.Model):
+  """Control model definition."""
   __tablename__ = 'controls'
 
   company_control = deferred(db.Column(db.Boolean), 'Control')
