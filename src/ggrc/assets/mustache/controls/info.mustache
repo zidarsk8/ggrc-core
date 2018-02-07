@@ -171,26 +171,24 @@
                       <h6>Assertions</h6>
                       {{#if assertions}}
                         {{#if_helpers '\
-                        #if' instance.snapshot '\
-                        or #if' instance.isRevision}}
-                          <ul>
-                            <sort-by {items}="assertions" property-name="display_name">
-                              {{#sortedItems}}
-                                <li>{{display_name}}</li>
-                              {{/sortedItems}}
-                            </sort-by>
-                          </ul>
-                        {{else}}
-                          {{#using items=assertions}}
+                          #if' instance.snapshot '\
+                          or #if' instance.isRevision}}
                             <ul>
-                              <sort-by {items}="items" property-name="name">
+                              <sort-by is-snapshot="true" {items}="assertions">
                                 {{#sortedItems}}
                                   <li>{{name}}</li>
                                 {{/sortedItems}}
                               </sort-by>
                             </ul>
-                          {{/using}}
-                        {{/if_helpers}}
+                          {{else}}
+                            <ul>
+                              <sort-by {items}="assertions">
+                                {{#sortedItems}}
+                                  <li>{{name}}</li>
+                                {{/sortedItems}}
+                              </sort-by>
+                            </ul>
+                          {{/if_helpers}}
                       {{else}}
                         <span class="empty-message">None</span>
                       {{/if}}
@@ -199,26 +197,24 @@
                       <h6>Categories</h6>
                       {{#if categories}}
                         {{#if_helpers '\
-                        #if' instance.snapshot '\
-                        or #if' instance.isRevision}}
-                          <ul>
-                            <sort-by {items}="categories" property-name="display_name">
-                              {{#sortedItems}}
-                                <li>{{display_name}}</li>
-                              {{/sortedItems}}
-                            </sort-by>
-                          </ul>
-                        {{else}}
-                          {{#using items=categories}}
+                          #if' instance.snapshot '\
+                          or #if' instance.isRevision}}
                             <ul>
-                              <sort-by {items}="items" property-name="name">
+                              <sort-by is-snapshot="true" {items}="categories">
                                 {{#sortedItems}}
                                   <li>{{name}}</li>
                                 {{/sortedItems}}
                               </sort-by>
                             </ul>
-                          {{/using}}
-                        {{/if_helpers}}
+                          {{else}}
+                            <ul>
+                              <sort-by {items}="categories">
+                                {{#sortedItems}}
+                                  <li>{{name}}</li>
+                                {{/sortedItems}}
+                              </sort-by>
+                            </ul>
+                          {{/if_helpers}}
                       {{else}}
                         <span class="empty-message">None</span>
                       {{/if}}
