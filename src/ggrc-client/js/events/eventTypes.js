@@ -124,6 +124,17 @@ const RELATED_ITEMS_LOADED = {
   type: 'RELATED_ITEMS_LOADED',
 };
 
+/**
+ * Notifies that new comment created and sends its instance
+ * @event COMMENT_CREATED
+ * @type {object}
+ * @property {string} type - Event name.
+ * @property {object} comment - Created comment.
+ */
+const COMMENT_CREATED = {
+  type: 'COMMENT_CREATED',
+};
+
 
 export {
   REFRESH_RELATED,
@@ -138,4 +149,5 @@ export {
   REFRESH_PROPOSAL_DIFF,
   REFRESH_COMMENTS,
   RELATED_ITEMS_LOADED,
+  COMMENT_CREATED,
 };

@@ -2067,6 +2067,7 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
         verified: 1,
         os_state: 1,
         archived: 1,
+        last_comment: 1,
       });
 
       let res;

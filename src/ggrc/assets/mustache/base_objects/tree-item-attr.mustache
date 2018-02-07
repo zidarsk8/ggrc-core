@@ -66,6 +66,11 @@
       {{/instance}}
     </div>
   {{/case}}
+  {{#case 'last_comment'}}
+    <last-comment
+      {instance}="instance">
+    </last-comment>
+  {{/case}}
 
   {{#default}}
       {{#if_helpers '\
