@@ -344,8 +344,8 @@ class TestWorkflowsCycleGeneration(TestCase):
                                           setup_date,
                                           freeze_date,
                                           repeat_every):
-    """
-    Test for correct weekdays for daily based workflows
+    """Test for correct weekdays for daily based workflows.
+
     When calculating the dates for daily workflows - only week working days
     are taken into account. So neither start date nor end date can fall on
     a weekend. But can fall on holiday.
