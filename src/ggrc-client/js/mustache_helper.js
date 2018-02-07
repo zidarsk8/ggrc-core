@@ -16,7 +16,6 @@ import RefreshQueue from './models/refresh_queue';
 import Permission from './permission';
 import _ from 'lodash';
 
-(function ($, can) {
 // Chrome likes to cache AJAX requests for Mustaches.
   let mustache_urls = {};
   let Mustache = can.Mustache;
@@ -2503,4 +2502,3 @@ Example:
       rolesList: allRoleNames.join('\n'),
     });
   });
-})(jQuery, can);
