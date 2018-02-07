@@ -1,9 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-# pylint: disable=maybe-no-member, invalid-name
-
-"""Test request import and updates."""
+"""Test Last Deprecated Date logic with imports."""
 
 import collections
 import datetime
@@ -19,15 +17,12 @@ from integration.ggrc.models import factories
 
 
 @ddt.ddt
-class TestAuditsImport(TestCase):
-  """Basic Audits import tests with.
-
-  This test suite should test new Audits imports.
-  """
+class TestImportLastDeprecatedDate(TestCase):
+  """Test Last Deprecated Date logic with imports."""
 
   def setUp(self):
-    """Set up for Audit import test cases."""
-    super(TestAuditsImport, self).setUp()
+    """Set up for Last Deprecated Date import test cases."""
+    super(TestImportLastDeprecatedDate, self).setUp()
     self.client.get("/login")
 
   def test_import_audit_last_deprecated_date(self):
