@@ -21,7 +21,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       'ownable', 'unique_title', 'ca_update',
       'autoStatusChangeable', 'timeboxed', 'mapping-limit',
       'inScopeObjects', 'accessControlList', 'refetchHash',
-      'issueTrackerIntegratable',
+      'issueTrackerIntegratable', 'relatedAssessmentsLoader',
     ],
     is_custom_attributable: true,
     isRoleable: true,
