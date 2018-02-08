@@ -87,6 +87,14 @@ permissions = {
                 "action": "update",
             }
         },
+        {
+            "type": "Snapshot",
+            "condition": "is_allowed_based_on",
+            "terms": {
+                "property_name": "parent",
+                "action": "update",
+            }
+        },
         "AssessmentTemplate",
         "Workflow",
         {
