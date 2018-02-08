@@ -5,6 +5,8 @@
 
 import collections
 import datetime
+import itertools
+
 import ddt
 
 from ggrc import models
@@ -25,83 +27,92 @@ class TestImportLastDeprecatedDate(TestCase):
     super(TestImportLastDeprecatedDate, self).setUp()
     self.client.get("/login")
 
-  def test_import_audit_last_deprecated_date(self):
-    """Last Deprecated Date on audit should be not importing."""
+  @ddt.data("Audit")
+  def test_import_last_deprecated_date(self, model_name):
+    """Last Deprecated Date on {} should be not importable."""
     with freeze_time("2017-01-25"):
-      audit = factories.AuditFactory(status="Deprecated")
+      obj = factories.get_model_factory(model_name)(status="Deprecated")
 
     resp = self.import_data(collections.OrderedDict([
-        ("object_type", "Audit"),
-        ("code", audit.slug),
+        ("object_type", model_name),
+        ("code", obj.slug),
         ("Last Deprecated Date", "02/25/2017"),
     ]))
 
-    result_audit = models.Audit.query.get(audit.id)
+    updated_obj = models.inflector.get_model(model_name).query.get(obj.id)
     expected_error = errors.EXPORT_ONLY_WARNING.format(
         line=3, column_name="Last Deprecated Date")
     self.assertEqual(1, len(resp))
     self.assertEqual(expected_error, resp[0]["row_warnings"][0])
-    self.assertEqual(result_audit.last_deprecated_date,
+    self.assertEqual(updated_obj.last_deprecated_date,
                      datetime.date(2017, 1, 25))
 
-  def test_import_audit_status(self):
-    """If import Deprecated status, then change last deprecated date"""
-    audit = factories.AuditFactory()
+  @ddt.data("Audit")
+  def test_import_deprecated_status(self, model_name):
+    """If import {} with Deprecated status, set Last Deprecated Date to now."""
+    obj = factories.get_model_factory(model_name)()
 
     with freeze_time("2017-01-25"):
       resp = self.import_data(collections.OrderedDict([
-          ("object_type", "Audit"),
-          ("code", audit.slug),
+          ("object_type", model_name),
+          ("code", obj.slug),
           ("State", "Deprecated"),
       ]))
 
-    result_audit = models.Audit.query.get(audit.id)
+    updated_obj = models.inflector.get_model(model_name).query.get(obj.id)
 
     self.assertEqual(1, len(resp))
     self.assertEqual(1, resp[0]["updated"])
-    self.assertEqual(result_audit.last_deprecated_date,
+    self.assertEqual(updated_obj.last_deprecated_date,
                      datetime.date(2017, 1, 25))
 
-  def test_import_audit_repeat_deprecated_status(self):
-    """Last Deprecated Date on audit should be non editable."""
+  @ddt.data("Audit")
+  def test_import_deprecated_status_again(self, model_name):
+    """Last Deprecated Date on {} isn't changed when status not changed."""
     with freeze_time("2017-01-25"):
-      audit = factories.AuditFactory(status="Deprecated")
+      obj = factories.get_model_factory(model_name)(status="Deprecated")
 
     resp = self.import_data(collections.OrderedDict([
-        ("object_type", "Audit"),
-        ("code", audit.slug),
+        ("object_type", model_name),
+        ("code", obj.slug),
         ("Status", "Deprecated"),
     ]))
 
-    result_audit = models.Audit.query.get(audit.id)
+    updated_obj = models.inflector.get_model(model_name).query.get(obj.id)
 
     self.assertEqual(1, len(resp))
     self.assertEqual(1, resp[0]["updated"])
-    self.assertEqual(result_audit.last_deprecated_date,
+    self.assertEqual(updated_obj.last_deprecated_date,
                      datetime.date(2017, 1, 25))
 
-  def test_import_depr_audit_date(self):
-    """Last Deprecated Date on audit should be updated to current date."""
+  @ddt.data("Audit")
+  def test_import_deprecated_date_with_state(self, model_name):
+    """Last Deprecated Date on {} is set to now, not what user imports."""
     with freeze_time("2017-01-25"):
-      audit = factories.AuditFactory()
+      obj = factories.get_model_factory(model_name)()
 
     with freeze_time("2017-01-27"):
       resp = self.import_data(collections.OrderedDict([
-          ("object_type", "Audit"),
-          ("code", audit.slug),
+          ("object_type", model_name),
+          ("code", obj.slug),
           ("State", "Deprecated"),
           ("Last Deprecated Date", "02/25/2017"),
       ]))
 
-    result_audit = models.Audit.query.get(audit.id)
+    updated_obj = models.inflector.get_model(model_name).query.get(obj.id)
     self.assertEqual(1, len(resp))
     self.assertEqual(1, resp[0]["updated"])
-    self.assertEqual(result_audit.last_deprecated_date,
+    self.assertEqual(updated_obj.last_deprecated_date,
                      datetime.date(2017, 1, 27))
 
-  @ddt.data((True, True), (False, True), (True, False), (False, False))
-  def test_import_audit_cases(self, (empty_object, empty_import)):
-    """Check different cases of import audits.
+  @ddt.data(*itertools.product(
+      ["Audit"],
+      [(True, True), (False, True), (True, False), (False, False)],
+  ))
+  @ddt.unpack
+  def test_import_deprecated_date_warnings(self, model_name,
+                                           (empty_object, empty_import)):
+    """Check warnings on imported Last Deprecated Date for {}
 
     In this test covered next scenarios:
     1) object has empty last_deprecated_date field, user imports empty
@@ -114,24 +125,24 @@ class TestImportLastDeprecatedDate(TestCase):
        field - warning
     """
     if empty_object:
-      audit = factories.AuditFactory()
+      obj = factories.get_model_factory(model_name)()
     else:
-      audit = factories.AuditFactory(status="Deprecated")
+      obj = factories.get_model_factory(model_name)(status="Deprecated")
     if empty_import:
       resp = self.import_data(collections.OrderedDict([
-          ("object_type", "Audit"),
-          ("code", audit.slug),
+          ("object_type", model_name),
+          ("code", obj.slug),
           ("Last Deprecated Date", ""),
       ]))
     else:
       resp = self.import_data(collections.OrderedDict([
-          ("object_type", "Audit"),
-          ("code", audit.slug),
+          ("object_type", model_name),
+          ("code", obj.slug),
           ("Last Deprecated Date", "02/25/2017"),
       ]))
 
     expected_errors = {
-        "Audit": {
+        model_name: {
             "row_warnings": {
                 errors.EXPORT_ONLY_WARNING.format(
                     line=3,
@@ -146,39 +157,46 @@ class TestImportLastDeprecatedDate(TestCase):
     else:
       self._check_csv_response(resp, expected_errors)
 
-  @ddt.data("01/25/2017", "2017-01-25")
-  def test_import_same_audit(self, formatted_date):
-    """Check case of import the same last_deprecated_date field in audit.
+  @ddt.data(*itertools.product(
+      ["Audit"],
+      ["01/25/2017", "2017-01-25"],
+  ))
+  @ddt.unpack
+  def test_import_same_deprecated_date(self, model_name, formatted_date):
+    """Check case of import the same last_deprecated_date field in {0}.
 
-    If user imports the audit with the same last_deprecated_date field -
+    If user imports the {0} with the same last_deprecated_date field -
     imported without warnings.
     """
     with freeze_time("2017-01-25"):
-      audit = factories.AuditFactory(title="test", status="Deprecated")
+      obj = factories.get_model_factory(model_name)(title="test",
+                                                    status="Deprecated")
 
     resp = self.import_data(collections.OrderedDict([
-        ("object_type", "Audit"),
-        ("code", audit.slug),
+        ("object_type", model_name),
+        ("code", obj.slug),
         ("title", "New title"),
         ("Last Deprecated Date", formatted_date),
     ]))
 
     self._check_csv_response(resp, {})
 
-  def test_import_invalid_date(self):
-    """Check case of import invalid last_deprecated_date field in audit."""
+  @ddt.data("Audit")
+  def test_import_invalid_date(self, model_name):
+    """Invalid date in Last Deprecated Date is ignored in {} import."""
     with freeze_time("2017-01-25"):
-      audit = factories.AuditFactory(title="test", status="Deprecated")
+      obj = factories.get_model_factory(model_name)(title="test",
+                                                    status="Deprecated")
 
     resp = self.import_data(collections.OrderedDict([
-        ("object_type", "Audit"),
-        ("code", audit.slug),
+        ("object_type", model_name),
+        ("code", obj.slug),
         ("title", "New title"),
         ("Last Deprecated Date", "0125/2017"),
     ]))
 
     expected_errors = {
-        "Audit": {
+        model_name: {
             "row_warnings": {
                 errors.EXPORT_ONLY_WARNING.format(
                     line=3,
