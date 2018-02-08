@@ -26,6 +26,13 @@ class TestImportLastDeprecatedDate(TestCase):
     """Set up for Last Deprecated Date import test cases."""
     super(TestImportLastDeprecatedDate, self).setUp()
     self.client.get("/login")
+    self.warning_non_importable = {
+        "row_warnings": {
+            errors.EXPORT_ONLY_WARNING.format(
+                line=3, column_name="Last Deprecated Date",
+            ),
+        },
+    }
 
   @ddt.data("Audit")
   def test_import_last_deprecated_date(self, model_name):
@@ -38,12 +45,11 @@ class TestImportLastDeprecatedDate(TestCase):
         ("code", obj.slug),
         ("Last Deprecated Date", "02/25/2017"),
     ]))
+    self._check_csv_response(resp, {
+        model_name: self.warning_non_importable,
+    })
 
     updated_obj = models.inflector.get_model(model_name).query.get(obj.id)
-    expected_error = errors.EXPORT_ONLY_WARNING.format(
-        line=3, column_name="Last Deprecated Date")
-    self.assertEqual(1, len(resp))
-    self.assertEqual(expected_error, resp[0]["row_warnings"][0])
     self.assertEqual(updated_obj.last_deprecated_date,
                      datetime.date(2017, 1, 25))
 
@@ -58,11 +64,9 @@ class TestImportLastDeprecatedDate(TestCase):
           ("code", obj.slug),
           ("State", "Deprecated"),
       ]))
+      self._check_csv_response(resp, {})
 
     updated_obj = models.inflector.get_model(model_name).query.get(obj.id)
-
-    self.assertEqual(1, len(resp))
-    self.assertEqual(1, resp[0]["updated"])
     self.assertEqual(updated_obj.last_deprecated_date,
                      datetime.date(2017, 1, 25))
 
@@ -77,11 +81,9 @@ class TestImportLastDeprecatedDate(TestCase):
         ("code", obj.slug),
         ("Status", "Deprecated"),
     ]))
+    self._check_csv_response(resp, {})
 
     updated_obj = models.inflector.get_model(model_name).query.get(obj.id)
-
-    self.assertEqual(1, len(resp))
-    self.assertEqual(1, resp[0]["updated"])
     self.assertEqual(updated_obj.last_deprecated_date,
                      datetime.date(2017, 1, 25))
 
@@ -98,10 +100,11 @@ class TestImportLastDeprecatedDate(TestCase):
           ("State", "Deprecated"),
           ("Last Deprecated Date", "02/25/2017"),
       ]))
+      self._check_csv_response(resp, {
+          model_name: self.warning_non_importable,
+      })
 
     updated_obj = models.inflector.get_model(model_name).query.get(obj.id)
-    self.assertEqual(1, len(resp))
-    self.assertEqual(1, resp[0]["updated"])
     self.assertEqual(updated_obj.last_deprecated_date,
                      datetime.date(2017, 1, 27))
 
@@ -142,14 +145,7 @@ class TestImportLastDeprecatedDate(TestCase):
       ]))
 
     expected_errors = {
-        model_name: {
-            "row_warnings": {
-                errors.EXPORT_ONLY_WARNING.format(
-                    line=3,
-                    column_name=u"Last Deprecated Date"
-                )
-            }
-        }
+        model_name: self.warning_non_importable,
     }
 
     if empty_import:
@@ -196,14 +192,6 @@ class TestImportLastDeprecatedDate(TestCase):
     ]))
 
     expected_errors = {
-        model_name: {
-            "row_warnings": {
-                errors.EXPORT_ONLY_WARNING.format(
-                    line=3,
-                    column_name=u"Last Deprecated Date"
-                )
-            }
-        }
+        model_name: self.warning_non_importable,
     }
-
     self._check_csv_response(resp, expected_errors)
