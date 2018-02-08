@@ -47,7 +47,6 @@ import Pagination from '../base-objects/pagination';
       orderBy: {},
       initialOrderBy: '@',
       selectedItem: {},
-      objectSelectorEl: '.grid-data__action-column button',
       getFilters: function (id, type) {
         let predefinedFilter = this.attr('predefinedFilter');
         let filters;

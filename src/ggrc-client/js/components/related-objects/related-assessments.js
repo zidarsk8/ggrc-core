@@ -18,7 +18,9 @@ import '../reusable-objects/reusable-objects-item';
 import '../state-colors-map/state-colors-map';
 import '../spinner/spinner';
 import '../tree_pagination/tree_pagination';
+import Pagination from '../base-objects/pagination';
 import template from './templates/related-assessments.mustache';
+import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 
 let mapper = {
   mapObjects: function (source, destination) {
@@ -29,6 +31,11 @@ let mapper = {
     });
   },
 };
+
+const defaultOrderBy = [
+  {field: 'finished_date', direction: 'desc'},
+  {field: 'created_at', direction: 'desc'},
+];
 
 export default can.Component.extend({
   tag: 'related-assessments',
@@ -80,15 +87,25 @@ export default can.Component.extend({
           return `Related ${objectName}`;
         },
       },
+      paging: {
+        value: function () {
+          return new Pagination({pageSizeSelect: [5, 10, 15]});
+        },
+      },
     },
     evidences: [],
     urls: [],
     instance: {},
     documentList: [],
+    orderBy: {},
     isSaving: false,
+    loading: false,
     needReuse: '@',
     baseInstanceDocuments: [],
     relatedAssessments: [],
+    selectedItem: {},
+    objectSelectorEl: '.grid-data__action-column button',
+    noRelatedObjectsMessage: 'No Related Assessments were found',
     getMapObjects: function (source, list) {
       return list
         .filter(function (item, index) {
@@ -118,15 +135,55 @@ export default can.Component.extend({
       this.attr('instance').dispatch('refreshInstance');
     },
     loadRelatedAssessments() {
-      this.attr('instance').getRelatedAssessments()
-        .then((relatedAssessments) => {
-          this.attr('relatedAssessments').replace(
-            relatedAssessments.map((instance) => {
-              return {
-                instance,
-              };
-            }));
+      const limits = this.attr('paging.limits');
+      const orderBy = this.attr('orderBy');
+      let currentOrder = [];
+
+      if (!orderBy.attr('field')) {
+        currentOrder = defaultOrderBy;
+      } else {
+        currentOrder = [orderBy];
+      }
+
+      this.attr('loading', true);
+
+      return this.attr('instance').getRelatedAssessments(limits, currentOrder)
+        .then((response) => {
+          const assessments = response.data.map((assessment) => {
+            let values = assessment.custom_attribute_values || [];
+            let definitions = assessment.custom_attribute_definitions || [];
+
+            if (definitions.length) {
+              assessment.custom_attribute_values =
+                prepareCustomAttributes(definitions, values);
+            }
+
+            return {
+              instance: assessment,
+            };
+          });
+
+          this.attr('paging.total', response.total);
+          this.attr('relatedAssessments').replace(assessments);
+
+          this.attr('loading', false);
+        }, () => {
+          this.attr('loading', false);
         });
+    },
+  },
+  init() {
+    this.viewModel.loadRelatedAssessments();
+  },
+  events: {
+    '{viewModel.paging} current'() {
+      this.viewModel.loadRelatedAssessments();
+    },
+    '{viewModel.paging} pageSize'() {
+      this.viewModel.loadRelatedAssessments();
+    },
+    '{viewModel.orderBy} changed'() {
+      this.viewModel.loadRelatedAssessments();
     },
   },
 });

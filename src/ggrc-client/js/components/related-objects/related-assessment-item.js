@@ -13,6 +13,7 @@
     tag: 'related-assessment-item',
     viewModel: {
       loadingState: {},
+      instance: {},
       subItemsLoading: function () {
         return this.attr('loadingState.auditLoading') ||
           this.attr('loadingState.evidencesAndUrlsLoading') ||

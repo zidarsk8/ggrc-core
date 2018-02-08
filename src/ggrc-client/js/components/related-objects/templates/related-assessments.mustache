@@ -3,7 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<related-objects {base-instance}="instance" related-items-type="Assessment" initial-order-by="finished_date,created_at">
   <div class="grid-data__toolbar flex-box">
     <tree-pagination {paging}="paging" class="grid-data__toolbar-item"></tree-pagination>
     {{#if needReuse}}
@@ -49,7 +48,7 @@
     </div>
   </div>
   <div class="grid-data-body center-empty-message {{#isLoading}}loading{{/isLoading}}">
-    <related-assessment-list {assessments}="relatedObjects">
+    <related-assessment-list {assessments}="relatedAssessments">
       {{#if assessments.length}}
         <spinner {toggle}="itemsLoading" class="spinner-wrapper active"
                  extra-css-class="grid-spinner"></spinner>
@@ -57,7 +56,7 @@
       <object-list {(items)}="assessments" {is-loading}="isLoading" spinner-css="grid-spinner"
                    {(selected-item)}="selectedItem"
                    {item-selector}="objectSelectorEl" {empty-message}="noRelatedObjectsMessage" class="object-list__limited-height">
-        <related-assessment-item {^sub-items-loading}="itemLoading"
+        <related-assessment-item {^sub-items-loading}="itemLoading" {instance}="instance"
                                  class="{{#itemsLoading}}hidden{{/itemsLoading}}">
           <div class="grid-data-row flex-row flex-box">
             <div class="flex-size-3">
@@ -73,29 +72,17 @@
               {{localize_date instance.created_at}}
             </div>
             <div class="flex-size-3">
-	      <mapped-objects
-		{mapped-snapshots}="mappedSnapshots"
-		{filter}="relatedObjectsFilter"
-		{parent-instance}="instance"
-		{^is-loading}="loadingState.controlsLoading">
-		<business-object-list-item {instance}="instance"></business-object-list-item>
-	      </mapped-objects>
+	            {{#instance.snapshots}}
+		            <business-object-list-item {instance}="."></business-object-list-item>
+              {{/instance.snapshots}}
             </div>
             <div class="flex-size-3">
-              <related-audits {parent-instance}="instance">
-                <mapped-objects
-                  {parent-instance}="parentInstance"
-                  {related-types}="relatedTypes"
-                  {^is-loading}="loadingState.auditLoading">
-                  <a href="{{instance.viewLink}}" class="grid-data-item__title-cell" target="_blank">{{instance.title}}</a>
-                </mapped-objects>
-              </related-audits>
+              <a href="{{instance.audit.viewLink}}" class="grid-data-item__title-cell" target="_blank">{{instance.audit.title}}</a>
             </div>
             <div class="flex-size-3">
-              <related-evidences-and-urls {parent-instance}="instance"
-                                          {^is-loading}="loadingState.evidencesAndUrlsLoading">
+              {{#if instance.documents.length}}
                 {{#if needReuse}}
-                  <object-list items="documents" show-more="true">
+                  <object-list {items}="instance.documents" show-more="true">
                     <reusable-objects-item {instance}="{.}"
                                            {is-saving}="isSaving"
                                            {base-instance-documents}="baseInstanceDocuments"
@@ -104,11 +91,11 @@
                     </reusable-objects-item>
                   </object-list>
                 {{else}}
-                  <object-list items="documents">
+                  <object-list {items}="instance.documents">
                     <document-object-list-item {instance}="{.}"></document-object-list-item>
                   </object-list>
                 {{/if}}
-              </related-evidences-and-urls>
+              {{/if}}
             </div>
             <div class="grid-data__action-column">
               <button class="btn btn-icon btn-icon-sm" title="Show More Information"><i class="fa fa-info-circle"></i></button>
@@ -120,4 +107,3 @@
     <related-assessment-popover class="object-popover related-assessments__object-popover"
                                 {selected-assessment}="selectedItem" hide-title="true"></related-assessment-popover>
   </div>
-</related-objects>
