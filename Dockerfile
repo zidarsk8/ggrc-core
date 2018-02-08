@@ -22,6 +22,7 @@ RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - \
     vim \
     wget \
     zip \
+    pv \
   && rm -rf /var/lib/apt/lists/*
 
 COPY ./provision/docker/my.cnf /root/.my.cnf
