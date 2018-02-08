@@ -79,7 +79,7 @@ class TestImportLastDeprecatedDate(TestCase):
     resp = self.import_data(collections.OrderedDict([
         ("object_type", model_name),
         ("code", obj.slug),
-        ("Status", "Deprecated"),
+        ("State", "Deprecated"),
     ]))
     self._check_csv_response(resp, {})
 
