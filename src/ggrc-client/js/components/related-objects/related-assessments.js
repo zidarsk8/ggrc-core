@@ -88,6 +88,7 @@ export default can.Component.extend({
     isSaving: false,
     needReuse: '@',
     baseInstanceDocuments: [],
+    relatedAssessments: [],
     getMapObjects: function (source, list) {
       return list
         .filter(function (item, index) {
@@ -115,6 +116,17 @@ export default can.Component.extend({
       this.attr('isSaving', false);
       this.dispatch('afterObjectReused');
       this.attr('instance').dispatch('refreshInstance');
+    },
+    loadRelatedAssessments() {
+      this.attr('instance').getRelatedAssessments()
+        .then((relatedAssessments) => {
+          this.attr('relatedAssessments').replace(
+            relatedAssessments.map((instance) => {
+              return {
+                instance,
+              };
+            }));
+        });
     },
   },
 });
