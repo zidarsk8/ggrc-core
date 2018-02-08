@@ -9,6 +9,7 @@ import itertools
 from sqlalchemy import inspect
 
 from ggrc.access_control import roleable
+from ggrc.access_control import role as ACR
 from ggrc.models import all_models
 from ggrc.models import mixins
 
@@ -26,12 +27,11 @@ def apply_acl(instance, content):
   person_dict = {p.id: p for p in all_models.Person.query.filter(
       all_models.Person.id.in_(person_ids))
   }
-  acr_dict = {
-      i.id: i for i in all_models.AccessControlRole.query.filter(
-          all_models.AccessControlRole.object_type == instance.type)
-  }
+  acr_dict = {r.id: r for r in ACR.get_ac_roles_for(instance.type).values()}
   for role_id, data in content.get("access_control_list", {}).iteritems():
     role_id = int(role_id)
+    if role_id not in acr_dict:
+      continue
     for add in data["added"]:
       if (role_id, add["id"]) not in instance_acl_dict:
         # add ACL if it hasn't added yet
