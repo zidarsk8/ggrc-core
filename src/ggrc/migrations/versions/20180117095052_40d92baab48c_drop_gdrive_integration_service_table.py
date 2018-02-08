@@ -10,6 +10,7 @@ Create Date: 2018-01-17 09:50:52.621554
 # pylint: disable=invalid-name
 
 from alembic import op
+import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
@@ -26,17 +27,29 @@ def upgrade():
   For existing databases, this table exists but won't be used since
   the migration chain is disabled.
   """
-  op.execute("""
-      DROP TABLE IF EXISTS ggrc_gdrive_integration_alembic_version
-  """)
+  try:
+    op.drop_table("ggrc_gdrive_integration_alembic_version")
+  except sa.exc.OperationalError as e:
+    code, _ = e.orig.args
+    if code == 1051:  # doesn't exist
+      # we're in a new DB with no trace of the removed chain
+      pass
+    else:
+      raise
 
   # The following duplicates a part of a gdrive-related migration,
   # since a bunch of old migrations in ggrc refer to meetings table.
   # This part is relevant only for db_reset (new databases), so we
   # shouldn't recreate this table in downgrade.
-  op.execute("""
-      DROP TABLE IF EXISTS meetings
-  """)
+  try:
+    op.drop_table("meetings")
+  except sa.exc.OperationalError as e:
+    code, _ = e.orig.args
+    if code == 1051:  # doesn't exist
+      # we're in an old DB where meetings has been dropped in the removed chain
+      pass
+    else:
+      raise
 
 
 def downgrade():
