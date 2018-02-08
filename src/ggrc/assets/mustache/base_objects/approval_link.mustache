@@ -71,28 +71,10 @@
             </div>
           {{else}}
             <div>
-            {{#is_allowed "read" "Workflow" context="any"}}
-              {{#with_mapping_count instance 'current_approval_cycles'}}
-                {{#if_equals count 0}}
-                  {{#is_allowed "update" instance}}
-                    <a href="javascript://" class="non-transparent {{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}" data-toggle="modal-ajax-approvalform" data-object-singular="{{instance.class.model_singular}}" data-object-id="{{instance.id}}">
-                      <i class="fa fa-check-square-o gray"></i>
-                      Submit For Review
-                    </a>
-                  {{else}}
-                    <i>No review in progress</i>
-                  {{/is_allowed}}
-                {{else}}
-                  <i class="fa fa-check-square-o gray"></i>
-                  <span class="setup-link">
-                    Review in progress
-                    {{#current_cycle_assignee instance}}
-                      by <person-info class="inline-block" person-obj="person"></person-info>
-                    {{/current_cycle_assignee}}
-                  </span>
-                {{/if_equals}}
-              {{/with_mapping_count}}
-            {{/is_allowed}}
+              {{#is_allowed "read" "Workflow" context="any"}}
+                <review-link {instance}="instance">
+                </review-link>
+              {{/is_allowed}}
             </div>
           {{/if}}
         {{/with_is_reviewer}}
