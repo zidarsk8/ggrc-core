@@ -21,6 +21,7 @@ import {
   refreshCounts,
 } from '../../plugins/utils/current-page-utils';
 import RefreshQueue from '../../models/refresh_queue';
+import {REFRESH_MAPPING} from '../../events/eventTypes';
 
 (function (can, $) {
   'use strict';
@@ -295,7 +296,7 @@ import RefreshQueue from '../../models/refresh_queue';
               if (instance && instance.dispatch) {
                 instance.dispatch('refreshInstance');
                 instance.dispatch({
-                  type: 'refreshMapping',
+                  ...REFRESH_MAPPING,
                   destinationType: type,
                 });
               }

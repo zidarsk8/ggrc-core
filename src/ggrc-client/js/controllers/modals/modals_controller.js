@@ -39,6 +39,7 @@ import {
   checkPreconditions,
   becameDeprecated,
 } from '../../plugins/utils/controllers';
+import {REFRESH_MAPPING} from '../../events/eventTypes';
 
 
 export default can.Control({
@@ -1193,7 +1194,7 @@ export default can.Control({
       }
       this.setupCustomAttributes(instance);
       instance.refresh();
-      instance.dispatch('refreshMapping');
+      instance.dispatch(REFRESH_MAPPING);
     }
   },
 

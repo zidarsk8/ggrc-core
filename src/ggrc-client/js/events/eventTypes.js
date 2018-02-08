@@ -135,6 +135,16 @@ const COMMENT_CREATED = {
   type: 'COMMENT_CREATED',
 };
 
+/**
+ * Refreshes mappings of instance
+ * @event refreshMapping
+ * @type {object}
+ * @property {string} type - Event name.
+ * @property {string} destinationType - Type of mapped object.
+ */
+const REFRESH_MAPPING = {
+  type: 'refreshMapping',
+};
 
 export {
   REFRESH_RELATED,
@@ -150,4 +160,5 @@ export {
   REFRESH_COMMENTS,
   RELATED_ITEMS_LOADED,
   COMMENT_CREATED,
+  REFRESH_MAPPING,
 };

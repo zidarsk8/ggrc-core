@@ -35,7 +35,10 @@ import {
   isSnapshotModel,
   isSnapshotScope,
 } from '../../plugins/utils/snapshot-utils';
-import {REFRESH_RELATED} from '../../events/eventTypes';
+import {
+  REFRESH_RELATED,
+  REFRESH_MAPPING,
+} from '../../events/eventTypes';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
   isMyAssessments,
@@ -810,7 +813,7 @@ export default GGRC.Components('treeWidgetContainer', {
       ev.stopPropagation();
       this.reloadTree();
     },
-    '{viewModel.parent_instance} refreshMapping'(scope, ev) {
+    [`{viewModel.parent_instance} ${REFRESH_MAPPING.type}`](scope, ev) {
       const vm = this.viewModel;
       let currentModelName;
 
