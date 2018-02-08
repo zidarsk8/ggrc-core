@@ -6,6 +6,7 @@
 import {
   buildRoleACL,
   buildModifiedListField,
+  getInstanceView,
 } from '../utils/object-history-utils';
 
 describe('"buildModifiedACL" method', () => {
@@ -140,5 +141,62 @@ describe('"buildModifiedListField" method', () => {
     expect(result.length).toBe(2);
     expect(result[0].id).toBe(3);
     expect(result[1].id).toBe(4);
+  });
+});
+
+describe('"getInstanceView" method', () => {
+  let originalTemplates;
+  let originalMustachePath;
+
+  beforeAll(() => {
+    originalMustachePath = GGRC.mustache_path;
+    GGRC.mustache_path = 'superdir/dir';
+
+    originalTemplates = GGRC.Templates;
+    GGRC.Templates = {
+      'risks/info': '<h1>Hello world</h1>',
+      'controls/info': '<h1>Hello control</h1>',
+    };
+  });
+
+  afterAll(() => {
+    GGRC.Templates = originalTemplates;
+    GGRC.mustache_path = originalMustachePath;
+  });
+
+  it('should return "view" path from instance', () => {
+    const expectedPath = 'dir1/dir2/info.mustahce';
+    const instance = new CMS.Models.Risk();
+    instance.attr('view', expectedPath);
+
+    const view = getInstanceView(instance);
+    expect(view).toEqual(expectedPath);
+  });
+
+  it('should return empty string. instance is undefined', () => {
+    const expectedPath = '';
+    const view = getInstanceView();
+
+    expect(view).toEqual(expectedPath);
+  });
+
+  it('should return default "view" path', () => {
+    const expectedPath = `${GGRC.mustache_path}/base_objects/info.mustache`;
+
+    // "GGRC.Templates" const doesn't contain template for Vendor
+    const instance = new CMS.Models.Vendor();
+
+    const view = getInstanceView(instance);
+    expect(view).toEqual(expectedPath);
+  });
+
+  it('should return default "view" path', () => {
+    const expectedPath = `${GGRC.mustache_path}/risks/info.mustache`;
+
+    // "GGRC.Templates" const contains template for Risk
+    const instance = new CMS.Models.Risk();
+
+    const view = getInstanceView(instance);
+    expect(view).toEqual(expectedPath);
   });
 });
