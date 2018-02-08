@@ -70,6 +70,11 @@ import template from './templates/sub-tree-item.mustache';
       inserted: function () {
         this.viewModel.attr('$el', this.element);
       },
+      '{viewModel.instance} destroyed'() {
+        const element = $(this.element)
+          .closest('tree-widget-container');
+        can.trigger(element, 'refreshTree');
+      },
     },
   });
 })(window.can, window.GGRC);
