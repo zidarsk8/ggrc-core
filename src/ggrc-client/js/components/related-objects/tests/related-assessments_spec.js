@@ -4,6 +4,7 @@
  */
 
 import Component from '../related-assessments';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
 describe('GGRC.Components.relatedAssessments', () => {
   describe('viewModel scope', () => {
@@ -11,8 +12,7 @@ describe('GGRC.Components.relatedAssessments', () => {
     let viewModel;
 
     beforeAll(() => {
-      let vmConfig = Component.prototype.viewModel;
-      viewModel = new (can.Map.extend(vmConfig));
+      viewModel = getComponentVM(Component);
     });
 
     describe('relativeObjectsTitle get() method', () => {

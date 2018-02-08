@@ -30,7 +30,7 @@ let mapper = {
   },
 };
 
-export default GGRC.Components('relatedAssessments', {
+export default can.Component.extend({
   tag: 'related-assessments',
   template,
   viewModel: {
