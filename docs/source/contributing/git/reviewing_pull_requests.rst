@@ -179,11 +179,10 @@ migrations once again by running:
 
 .. code-block:: bash
 
-    git pr <pr_number>
     db_reset
 
 This is needed because migration chain can be out of date if another
-migration PR was merged after the last commit on the current PR has 
+migration PR was merged after the last commit on the current PR has
 been pushed.
 
 Pull requests that modify the database (marked with the ``migration``
@@ -193,10 +192,26 @@ others regular checks, namely the following:
 -  The migration works from a clean database,
 -  Downgrading and upgrading work on a clean database,
 -  Migrations work from the current database state on the main
-   ``develop`` branch,
+   ``dev`` branch,
 -  Migrations work on a populated database (using the data from the
-   ``grc-dev`` instance).
+   ``ggrc-qa`` or ``ggrc-test`` instance).
+-  Database state after downgrade is the same as before the upgrade.
+   Before applying a migration do a mysqldump
 
+   .. code-block:: bash
+
+       mysqldump db_name > backup-file.sql
+
+   Afterwards do the upgrade and downgrade to the previous state
+   and do autogenerate again:
+
+   .. code-block:: bash
+
+       alembic <module_name> upgrade <new_revision>
+       alembic <module_name> downgrade <old_revision>
+       mysqldump db_name > backup-file1.sql
+
+   Compare the two generated backup files, they should be identical.
 
 .. _acceptance-criteria:
 
@@ -256,10 +271,10 @@ A pull request can be merged only if **all** of the following is true:
    least one of the reviewers has requested changes.
 
 NOTE: After merging a PR that contains a database migration step, the reviewer
-must mark all other currently open migration PRs with the ``needs work`` label,
-and add a note containing the new ``down_revision`` value in the database
-migration chain, so that the authors of those PRs can update their migration
-scripts accordingly.
+must mark all other currently open migration PRs with the
+``check migration chain`` label, and add a note containing the new
+``down_revision`` value in the database migration chain, so that the authors
+of those PRs can update their migration scripts accordingly.
 Mind that this only applies to the PRs containing migration scripts in the same
 application module as the just merged PR.
 
@@ -316,27 +331,10 @@ sure, just run them all.*
    If you don't yet have the ``<pr_origin>`` defined, you need to add it
    (`instructions <https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes#Adding-Remote-Repositories>`_).
 
-3. Start your local development environment (Vagrant or Docker). No need
+3. Start your local development environment (Docker). No need
    if you already have it running.
 
-   **If using Vagrant**
-
-   ..  code:: bash
-
-       vagrant up
-
-       # run the following if there were any changes in the provisioning files,
-       # requirements, requirements-dev, requirements-selenium, or npm
-       requirements...
-       vagrant provision
-
-       vagrant ssh
-
-   **If using Docker**
-
-   ..  code:: bash
-
-       # TODO: write Docker commands
+   Refer to "Quick Start" paragraph of the README
 
 4. (optional) Run the database migration
 
