@@ -846,6 +846,7 @@ class TestRiskAssessmentColumnDefinitions(TestCase):
         "Title",
         "Description",
         "Notes",
+        "State",
         "Start Date",
         "End Date",
         "Risk Manager",
@@ -854,9 +855,9 @@ class TestRiskAssessmentColumnDefinitions(TestCase):
         "Program",
         "Delete",
         "Assessment Procedure",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
     }
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.itervalues()}
