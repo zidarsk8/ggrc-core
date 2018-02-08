@@ -48,16 +48,11 @@
   </div>
 </div>
 <div class="grid-data-body center-empty-message {{#isLoading}}loading{{/isLoading}}">
-  <related-assessment-list {assessments}="relatedAssessments">
-    {{#if assessments.length}}
-      <spinner {toggle}="itemsLoading" class="spinner-wrapper active"
+    <spinner {toggle}="loading" class="spinner-wrapper active"
                extra-css-class="grid-spinner"></spinner>
-    {{/if}}
-    <object-list {(items)}="assessments" {is-loading}="isLoading" spinner-css="grid-spinner"
+    <object-list {(items)}="relatedAssessments" {is-loading}="isLoading" spinner-css="grid-spinner"
                  {(selected-item)}="selectedItem"
                  {item-selector}="objectSelectorEl" {empty-message}="noRelatedObjectsMessage" class="object-list__limited-height">
-      <related-assessment-item {^sub-items-loading}="itemLoading" {instance}="instance"
-                               class="{{#itemsLoading}}hidden{{/itemsLoading}}">
         <div class="grid-data-row flex-row flex-box">
           <div class="flex-size-3">
             <a href="{{instance.viewLink}}" class="grid-data-item__title-cell" target="_blank" title="{{instance.title}}">{{instance.title}}</a>
@@ -101,9 +96,7 @@
             <button class="btn btn-icon btn-icon-sm" title="Show More Information"><i class="fa fa-info-circle"></i></button>
           </div>
         </div>
-      </related-assessment-item>
     </object-list>
-  </related-assessment-list>
   <related-assessment-popover class="object-popover related-assessments__object-popover"
                               {selected-assessment}="selectedItem" hide-title="true"></related-assessment-popover>
 </div>

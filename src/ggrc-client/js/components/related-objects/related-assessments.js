@@ -3,17 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import './related-objects';
-import './related-audits';
-import './related-assessment-list';
-import './related-assessment-item';
-import './related-evidences-and-urls';
 import '../sortable-column/sortable-column';
 import '../object-list/object-list';
 import '../object-list-item/business-object-list-item';
 import '../object-list-item/document-object-list-item';
 import '../object-popover/related-assessment-popover';
-import '../mapped-objects/mapped-objects';
 import '../reusable-objects/reusable-objects-item';
 import '../state-colors-map/state-colors-map';
 import '../spinner/spinner';

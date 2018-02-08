@@ -3,7 +3,6 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-related-assessment-list,
 object-list {
   box-sizing: border-box;
   width: 100%;
@@ -61,12 +60,6 @@ object-list {
 }
 object-list {
   flex-direction: column;
-}
-related-assessment-list > spinner.active {
-  opacity: 0.5;
-}
-related-assessment-list > object-list > .empty-message {
-  margin: auto;
 }
 
 .object-list {
