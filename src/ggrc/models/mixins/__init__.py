@@ -180,6 +180,7 @@ class WithStartDate(object):
 
   @validates('start_date')
   def validate_date(self, _, value):
+    # pylint: disable=no-self-use
     return value.date() if isinstance(value, datetime.datetime) else value
 
   @classmethod
@@ -208,6 +209,7 @@ class WithEndDate(object):
 
   @validates('end_date')
   def validate_date(self, _, value):
+    # pylint: disable=no-self-use
     return value.date() if isinstance(value, datetime.datetime) else value
 
   @classmethod

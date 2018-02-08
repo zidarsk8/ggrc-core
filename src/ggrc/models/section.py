@@ -1,6 +1,8 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Module with Section model."""
+
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
@@ -30,6 +32,7 @@ class Section(Roleable,
               PublicDocumentable,
               mixins.BusinessObject,
               db.Model):
+  """Section model."""
 
   __tablename__ = 'sections'
   _table_plural = 'sections'
@@ -54,6 +57,7 @@ class Section(Roleable,
 
   @classmethod
   def _filter_by_directive(cls, predicate):
+    """Apply predicate to the object referenced by directive field."""
     types = ["Policy", "Regulation", "Standard", "Contract"]
     dst = Relationship.query \
         .filter(

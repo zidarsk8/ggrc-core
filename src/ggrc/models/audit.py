@@ -210,7 +210,8 @@ class Audit(Snapshotable,
         obj.clone(self)
 
   @orm.validates("archived")
-  def archived_check(self, key, value):
+  def archived_check(self, _, value):
+    """Only Admins and Program Managers are allowed to (un)archive Audit."""
     user = get_current_user()
     if getattr(user, 'system_wide_role', None) in SystemWideRoles.admins:
       return value
