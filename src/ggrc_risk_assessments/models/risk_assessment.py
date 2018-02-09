@@ -6,12 +6,8 @@
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.mixins import CustomAttributable, TestPlanned
-from ggrc.models.mixins import Described
-from ggrc.models.mixins import Noted
-from ggrc.models.mixins import Slugged
-from ggrc.models.mixins import Stateful
+from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import Timeboxed
-from ggrc.models.mixins import Titled
 from ggrc.models.deferred import deferred
 from ggrc.models.object_document import Documentable
 from ggrc.models.person import Person
@@ -20,9 +16,14 @@ from ggrc.models.relationship import Relatable
 from ggrc.models import reflection
 
 
-class RiskAssessment(Stateful, Documentable, Timeboxed, Noted, Described,
-                     CustomAttributable, Titled, Relatable, Slugged,
-                     TestPlanned, Indexed, db.Model):
+class RiskAssessment(Documentable,
+                     Timeboxed,
+                     CustomAttributable,
+                     Relatable,
+                     TestPlanned,
+                     BusinessObject,
+                     Indexed,
+                     db.Model):
   """Risk Assessment model."""
   __tablename__ = 'risk_assessments'
   _title_uniqueness = False
@@ -77,11 +78,6 @@ class RiskAssessment(Stateful, Documentable, Timeboxed, Noted, Described,
           "filter_by": "_filter_by_program",
       },
   }
-
-  DRAFT = u"Draft"
-  ACTIVE = u"Active"
-  DEPRECATED = u"Deprecated"
-  VALID_STATES = [DRAFT, ACTIVE, DEPRECATED, ]
 
   @classmethod
   def _filter_by_program(cls, predicate):
