@@ -108,11 +108,11 @@ class TestRelatedAssessments(TestCase):
 
   def test_self_link(self):
     """Test that audits and assessments contain selfLink."""
-    audit_self_link = u"/api/{}/{}".format(
+    audit_self_link = u"/{}/{}".format(
         self.assessment2.audit._inflector.table_plural,
         self.assessment2.audit.id,
     )
-    assessment_self_link = u"/api/{}/{}".format(
+    assessment_self_link = u"/{}/{}".format(
         self.assessment2._inflector.table_plural,
         self.assessment2.id,
     )
