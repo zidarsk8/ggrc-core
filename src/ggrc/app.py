@@ -24,7 +24,10 @@ from ggrc import extensions
 from ggrc import notifications
 from ggrc import settings
 from ggrc.utils import benchmark
+from ggrc.utils.issue_tracker_mock import init_issue_tracker_mock
 
+if settings.ISSUE_TRACKER_MOCK and not settings.PRODUCTION:
+  init_issue_tracker_mock()
 
 setup_logging(settings.LOGGING)
 

@@ -120,6 +120,7 @@
 < src/ggrc/templates/maintenance/maintenance.html
 < src/ggrc/templates/maintenance/trigger.html
 < src/ggrc/utils/error_handlers.py
+< src/ggrc/utils/issue_tracker_mock/response.json
 < src/ggrc_workflows/migrations/__init__.py
 < src/ggrc_workflows/migrations/utils/__init__.py
 < src/ggrc_workflows/migrations/utils/task_group_task_date_calculator/__init__.py

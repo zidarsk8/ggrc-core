@@ -155,6 +155,9 @@ ISSUE_TRACKER_ENABLED = bool(os.environ.get('ISSUE_TRACKER_ENABLED'))
 # URL template for composing Issue Tracker ticker URL.
 ISSUE_TRACKER_BUG_URL_TMPL = os.environ.get('ISSUE_TRACKER_BUG_URL_TMPL')
 
+# Flag defining whether we need to mock issue tracker responses
+ISSUE_TRACKER_MOCK = bool(os.environ.get('ISSUE_TRACKER_MOCK'))
+
 # Dashboard integration
 _DEFAULT_DASHBOARD_INTEGRATION_CONFIG = {
     "ca_name_regexp": r"^Dashboard_(.*)$",
