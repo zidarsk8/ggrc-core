@@ -74,6 +74,7 @@ class Audit(Snapshotable,
   issues = db.relationship('Issue', backref='audit')
   archived = deferred(db.Column(db.Boolean,
                       nullable=False, default=False), 'Audit')
+  assessment_templates = db.relationship('AssessmentTemplate', backref='audit')
 
   _api_attrs = reflection.ApiAttributes(
       'report_start_date',
@@ -245,3 +246,19 @@ class Audit(Snapshotable,
         orm.subqueryload('object_people').joinedload('person'),
         orm.subqueryload('audit_objects'),
     )
+
+
+def build_audit_stub(obj):
+  """Returns a stub of audit model to which assessment is related to."""
+  audit_id = obj.audit_id
+  if audit_id is None:
+    return None
+  issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
+      'Audit', audit_id)
+  return {
+      'type': 'Audit',
+      'id': audit_id,
+      'context_id': obj.context_id,
+      'href': '/api/audits/%d' % audit_id,
+      'issue_tracker': issue_obj.to_dict() if issue_obj is not None else {},
+  }

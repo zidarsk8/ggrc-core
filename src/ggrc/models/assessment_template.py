@@ -3,7 +3,7 @@
 
 
 """A module containing the implementation of the assessment template entity."""
-
+from sqlalchemy import orm
 from sqlalchemy.orm import validates
 from werkzeug.exceptions import Forbidden
 
@@ -54,6 +54,9 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
   # within the releated audit
   default_people = db.Column(JsonType, nullable=False)
 
+  # parent audit
+  audit_id = db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=True)
+
   # labels to show to the user in the UI for various default people values
   DEFAULT_PEOPLE_LABELS = {
       "Admin": "Object Admins",
@@ -79,6 +82,7 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
       'test_plan_procedure',
       'procedure_description',
       'default_people',
+      'audit',
       reflection.Attribute('issue_tracker', create=False, update=False),
       reflection.Attribute('archived', create=False, update=False),
       reflection.Attribute(
@@ -88,6 +92,10 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
   _fulltext_attrs = [
       "archived"
   ]
+
+  _custom_publish = {
+      'audit': audit.build_audit_stub,
+  }
 
   _aliases = {
       "status": {
@@ -145,6 +153,20 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
           ),
       },
   }
+
+  @classmethod
+  def eager_query(cls):
+    query = super(AssessmentTemplate, cls).eager_query()
+    return query.options(
+        orm.Load(cls).joinedload("audit").undefer_group("Audit_complete")
+    )
+
+  @classmethod
+  def indexed_query(cls):
+    query = super(AssessmentTemplate, cls).indexed_query()
+    return query.options(
+        orm.Load(cls).joinedload("audit").undefer_group("Audit_complete")
+    )
 
   @classmethod
   def _nop_filter(cls, _):
