@@ -96,9 +96,11 @@ class RelatedAssessmentsResource(common.Resource):
           models.Assessment,
       )
     if limit:
-      query, _ = pagination.apply_limit(query, limit)
+      query, total = pagination.apply_limit(query, limit)
+    else:
+      total = query.count()
 
-    return query
+    return query, total
 
   @classmethod
   def _get_documents(cls, assessments):
@@ -303,7 +305,11 @@ class RelatedAssessmentsResource(common.Resource):
         obj = model.query.get(object_id)
 
         with benchmark("get related assessments"):
-          assessments = self._get_assessments(model, object_type, object_id)
+          assessments, total = self._get_assessments(
+              model,
+              object_type,
+              object_id,
+          )
 
         with benchmark("get documents of related assessments"):
           document_json_map = self._get_documents(assessments)
@@ -327,7 +333,12 @@ class RelatedAssessmentsResource(common.Resource):
             single_json["documents"] = document_json_map[assessment.id]
             assessments_json.append(single_json)
 
-          return self.json_success_response(assessments_json, )
+          response_object = {
+              "total": total,
+              "data": assessments_json,
+          }
+
+          return self.json_success_response(response_object, )
 
       except (ValueError, TypeError, AttributeError, BadQueryException):
         # Type Error and Value Error are for invalid integer values,
