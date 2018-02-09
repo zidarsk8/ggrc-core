@@ -21,6 +21,7 @@ from sqlalchemy import and_
 
 from ggrc import db
 from ggrc import models
+from ggrc import utils
 from ggrc.utils import benchmark
 from ggrc.rbac import permissions
 from ggrc.services import common
@@ -331,6 +332,8 @@ class RelatedAssessmentsResource(common.Resource):
             ]
             single_json["snapshots"] = snapshot_json_map[assessment.id]
             single_json["documents"] = document_json_map[assessment.id]
+            single_json["audit"]["selfLink"] = utils.url_for(assessment.audit)
+            single_json["selfLink"] = utils.url_for(assessment)
             assessments_json.append(single_json)
 
           response_object = {
