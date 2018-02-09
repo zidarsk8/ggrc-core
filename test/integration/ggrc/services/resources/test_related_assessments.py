@@ -105,3 +105,25 @@ class TestRelatedAssessments(TestCase):
     response = self._get_related_assessments(self.control, **order_by).json
     titles = [assessment["title"] for assessment in response["data"]]
     self.assertEqual(titles, titles_order)
+
+  def test_self_link(self):
+    """Test that audits and assessments contain selfLink."""
+    audit_self_link = u"/api/{}/{}".format(
+        self.assessment2.audit._inflector.table_plural,
+        self.assessment2.audit.id,
+    )
+    assessment_self_link = u"/api/{}/{}".format(
+        self.assessment2._inflector.table_plural,
+        self.assessment2.id,
+    )
+    response = self._get_related_assessments(self.assessment1).json
+    self.assertIn("selfLink", response["data"][0]["audit"])
+    self.assertIn("selfLink", response["data"][0])
+    self.assertEqual(
+        response["data"][0]["audit"]["selfLink"],
+        audit_self_link,
+    )
+    self.assertEqual(
+        response["data"][0]["selfLink"],
+        assessment_self_link,
+    )
