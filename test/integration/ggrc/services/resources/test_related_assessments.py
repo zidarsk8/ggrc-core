@@ -56,8 +56,11 @@ class TestRelatedAssessments(TestCase):
     """Test basic response for a valid query."""
     assessment2_title = self.assessment2.title
     response = self._get_related_assessments(self.assessment1).json
-    self.assertEqual(len(response), 1)
-    self.assertEqual(response[0]["title"], assessment2_title)
+    self.assertIn("total", response)
+    self.assertIn("data", response)
+    self.assertEqual(response["total"], 1)
+    self.assertEqual(len(response["data"]), 1)
+    self.assertEqual(response["data"][0]["title"], assessment2_title)
 
   @ddt.data(
       {},
@@ -87,7 +90,8 @@ class TestRelatedAssessments(TestCase):
   def test_limit_clause(self, limit, expected_count):
     """Test limit clause for {0}."""
     response = self._get_related_assessments(self.control, **limit).json
-    self.assertEqual(len(response), expected_count)
+    self.assertEqual(response["total"], 2)
+    self.assertEqual(len(response["data"]), expected_count)
 
   @ddt.data(
       ({"order_by": "title,asc"}, ["A_1", "A_2"]),
@@ -99,5 +103,5 @@ class TestRelatedAssessments(TestCase):
   def test_order_by_clause(self, order_by, titles_order):
     """Test order by for {0}."""
     response = self._get_related_assessments(self.control, **order_by).json
-    titles = [assessment["title"] for assessment in response]
+    titles = [assessment["title"] for assessment in response["data"]]
     self.assertEqual(titles, titles_order)
