@@ -22,11 +22,12 @@ class Representation(object):
   people_attrs_names = [
       "creators", "assignees", "verifiers", "admins", "primary_contacts",
       "secondary_contacts", "audit_captains", "auditors",
-      "principal_assignees", "secondary_assignees"]  # multiply
+      "principal_assignees", "secondary_assignees", "managers", "editors",
+      "readers"]  # multiply
 
   @property
   def attrs_names(self):
-    """Entity instance's attributes names w/o REST."""
+    """Entity instance's attributes names according to class model."""
     return self.get_attrs_names(self.__class__)
 
   @property
@@ -41,7 +42,7 @@ class Representation(object):
 
   @classmethod
   def all_attrs_names(cls):
-    """All possible entities' attributes names w/ REST."""
+    """All possible entities' attributes names include REST."""
     return list(set(cls.get_attrs_names() + [
         "access_control_list", "recipients", "people_values", "default_people",
         "modal_title", "assignee_type", "user_roles"]))
@@ -81,7 +82,7 @@ class Representation(object):
         els.STATE: "status"
     }
     ui_remap_items = {
-        els.MANAGER: "manager", els.VERIFIED: "verified",
+        els.MANAGER: "managers", els.VERIFIED: "verified",
         els.STATUS: "status", els.LAST_UPDATED: "updated_at",
         els.AUDIT_CAPTAINS: "audit_captains", els.CAS: "custom_attributes",
         els.MAPPED_OBJECTS: "mapped_objects", els.ASSIGNEES: "assignees",
@@ -155,7 +156,7 @@ class Representation(object):
         if isinstance(attr_value, dict):
           converted_attr_value = attr_value
           if attr_name in [
-              "manager", "assignees", "creators",
+              "managers", "assignees", "creators",
               "verifiers", "created_by", "modified_by"
           ]:
             converted_attr_value = unicode(attr_value.get("email"))
@@ -616,7 +617,7 @@ class Entity(Representation):
     return (
         PersonEntity, CustomAttributeDefinitionEntity, ProgramEntity,
         ControlEntity, AuditEntity, AssessmentEntity, AssessmentTemplateEntity,
-        IssueEntity, CommentEntity, ObjectiveEntity, RoleEntity)
+        IssueEntity, CommentEntity, ObjectiveEntity)
 
   def __lt__(self, other):
     return self.slug < other.slug
@@ -633,11 +634,6 @@ class CommentEntity(Representation):
 
   def __lt__(self, other):
     return self.description < other.description
-
-
-class RoleEntity(Entity):
-  """Class that represent model for Person entity."""
-  # todo: class's description, relationships w/ PesronEntity, ACLs, user_roles
 
 
 class PersonEntity(Entity):
@@ -677,7 +673,8 @@ class ProgramEntity(Entity):
     super(ProgramEntity, self).__init__()
     self.delete_attrs("admins")
     self.set_attrs(
-        "manager", "primary_contacts", "secondary_contacts", **attrs)
+        "managers", "editors", "readers", "primary_contacts",
+        "secondary_contacts", **attrs)
 
 
 class ControlEntity(Entity):
