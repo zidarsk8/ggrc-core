@@ -289,8 +289,11 @@ export default can.Control({
     } else if (this.options.model) {
       if (this.options.new_object_form) {
 
-        if ( this.options.extendNewInstance ) {
-          Object.assign(params, this.options.extendNewInstance);
+        if (this.options.extendNewInstance) {
+          let extendedInstance = this.options.extendNewInstance.attr ?
+            this.options.extendNewInstance.attr() :
+            this.options.extendNewInstance;
+          Object.assign(params, extendedInstance);
         }
 
         dfd = $.when(this.options.attr(
