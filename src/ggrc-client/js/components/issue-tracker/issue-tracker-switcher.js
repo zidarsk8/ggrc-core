@@ -15,7 +15,7 @@ export default GGRC.Components('issueTrackerSwitcher', {
           // convert to bool type. dropdown returns "true" or "false" as string
           const enabled = this.convertToBool(newValue);
           if ( enabled ) {
-            this.attr('instance').initIssueTrackerForAssessment();
+            this.attr('instance').initIssueTracker();
           }
           setValue(enabled);
         },
@@ -53,7 +53,7 @@ export default GGRC.Components('issueTrackerSwitcher', {
       args.type = 'issueTrackerSwitcherChanged';
 
       if (dropdownValue) {
-        this.attr('instance').initIssueTrackerForAssessment();
+        this.attr('instance').initIssueTracker();
       }
 
       this.dispatch(args);
