@@ -118,11 +118,9 @@
                 {instance}="instance"
                 {options}="options">
                   {{#is_allowed_to_map page_instance instance}}
-                    {{^options.is_in_selector}}
-                      {{#isNotInScopeModel instance.type}}
-                        {{> '/static/mustache/base_objects/unmap.mustache'}}
-                      {{/isNotInScopeModel}}
-                    {{/options.is_in_selector}}
+                    {{#isNotInScopeModel instance.type}}
+                      {{> '/static/mustache/base_objects/unmap.mustache'}}
+                    {{/isNotInScopeModel}}
                   {{/is_allowed_to_map}}
               </issue-unmap-dropdown-item>
               {{#if instance.viewLink}}

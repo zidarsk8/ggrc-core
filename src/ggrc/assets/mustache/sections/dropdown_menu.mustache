@@ -24,9 +24,7 @@
         {instance}="instance"
         {options}="options">
           {{#is_allowed_to_map page_instance instance}}
-            {{^options.is_in_selector}}
-              {{> /static/mustache/base_objects/unmap.mustache}}
-            {{/options}}
+            {{> /static/mustache/base_objects/unmap.mustache}}
           {{/is_allowed_to_map}}
       </issue-unmap-dropdown-item>
       {{#if instance.viewLink}}
