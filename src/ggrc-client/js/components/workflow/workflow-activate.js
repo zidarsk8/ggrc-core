@@ -13,9 +13,9 @@ export default can.Component.extend({
   tag: 'workflow-activate',
   template: '<content/>',
   init: function () {
-    this.scope._can_activate_def();
+    this.viewModel._can_activate_def();
   },
-  scope: {
+  viewModel: {
     taskGroupAmount: 0,
     instance: {},
     waiting: true,
@@ -58,10 +58,10 @@ export default can.Component.extend({
     },
     _activate: function () {
       const workflow = this.attr('instance');
-      let scope = this;
-      let restoreButton = scope._restore_button.bind(scope);
+      let viewModel = this;
+      let restoreButton = viewModel._restore_button.bind(viewModel);
 
-      scope.attr('waiting', true);
+      viewModel.attr('waiting', true);
       if (workflow.unit !== null) {
         workflow.refresh()
           .then(function () {
@@ -103,17 +103,17 @@ export default can.Component.extend({
     },
   },
   events: {
-    '{scope} taskGroupAmount'() {
-      this.scope._can_activate_def();
+    '{viewModel} taskGroupAmount'() {
+      this.viewModel._can_activate_def();
     },
     '{can.Model.Cacheable} created': function (model) {
-      this.scope._handle_refresh(model);
+      this.viewModel._handle_refresh(model);
     },
     '{can.Model.Cacheable} destroyed': function (model) {
-      this.scope._handle_refresh(model);
+      this.viewModel._handle_refresh(model);
     },
     'button click': function () {
-      this.scope._activate();
+      this.viewModel._activate();
     },
   },
 });
