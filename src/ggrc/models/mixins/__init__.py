@@ -161,40 +161,66 @@ class Hierarchical(object):
     )
 
 
-class Timeboxed(object):
-  """Mixin that defines `start_date` and `end_date` fields."""
-  @declared_attr
-  def start_date(cls):  # pylint: disable=no-self-argument
-    return deferred(db.Column(db.Date), cls.__name__)
-
-  @declared_attr
-  def end_date(cls):  # pylint: disable=no-self-argument
-    return deferred(db.Column(db.Date), cls.__name__)
-
-  # pylint: disable=unused-argument,no-self-use
-  @validates('start_date', 'end_date')
-  def validate_date(self, key, value):
-    return value.date() if isinstance(value, datetime.datetime) else value
-  # pylint: enable=unused-argument,no-self-use
-
+class WithStartDate(object):
+  """Mixin that defines `start_date`."""
   # REST properties
-  _api_attrs = reflection.ApiAttributes('start_date', 'end_date')
+  _api_attrs = reflection.ApiAttributes('start_date')
 
   _aliases = {
       "start_date": "Effective Date",
-      "end_date": "Stop Date",
   }
 
   _fulltext_attrs = [
       attributes.DateFullTextAttr('start_date', 'start_date'),
-      attributes.DateFullTextAttr('end_date', 'end_date'),
   ]
+
+  @declared_attr
+  def start_date(cls):
+    return deferred(db.Column(db.Date), cls.__name__)
+
+  @validates('start_date')
+  def validate_date(self, _, value):
+    # pylint: disable=no-self-use
+    return value.date() if isinstance(value, datetime.datetime) else value
 
   @classmethod
   def indexed_query(cls):
-    return super(Timeboxed, cls).indexed_query().options(
-        orm.Load(cls).load_only("start_date", "end_date"),
+    return super(WithStartDate, cls).indexed_query().options(
+        orm.Load(cls).load_only("start_date"),
     )
+
+
+class WithEndDate(object):
+  """Mixin that defines `end_date`."""
+  # REST properties
+  _api_attrs = reflection.ApiAttributes('end_date')
+
+  _aliases = {
+      "end_date": "Stop Date",
+  }
+
+  _fulltext_attrs = [
+      attributes.DateFullTextAttr('end_date', 'end_date'),
+  ]
+
+  @declared_attr
+  def end_date(cls):
+    return deferred(db.Column(db.Date), cls.__name__)
+
+  @validates('end_date')
+  def validate_date(self, _, value):
+    # pylint: disable=no-self-use
+    return value.date() if isinstance(value, datetime.datetime) else value
+
+  @classmethod
+  def indexed_query(cls):
+    return super(WithEndDate, cls).indexed_query().options(
+        orm.Load(cls).load_only("end_date"),
+    )
+
+
+class Timeboxed(WithStartDate, WithEndDate):
+  """Mixin that defines `start_date` and `end_date` fields."""
 
 
 class WithLastDeprecatedDate(object):
@@ -731,6 +757,8 @@ __all__ = [
     "Slugged",
     "Stateful",
     "TestPlanned",
+    "WithStartDate",
+    "WithEndDate",
     "Timeboxed",
     "Titled",
     "VerifiedDate",

@@ -45,6 +45,7 @@ class TestBasicCsvImport(TestCase):
   def test_policy_import_working_with_warnings(self):
     """Test Policy import with warnings."""
     def test_owners(policy):
+      """Assert policy has the correct Admin set."""
       self.assertNotEqual([], policy.access_control_list)
       self.assertEqual(
           "user@example.com",
@@ -79,6 +80,7 @@ class TestBasicCsvImport(TestCase):
   def test_policy_same_titles(self):
     """Test Policy imports with title collisions."""
     def test_owners(policy):
+      """Assert policy has the correct Admin set."""
       self.assertNotEqual([], policy.access_control_list)
       self.assertEqual("user@example.com",
                        policy.access_control_list[0].person.email)

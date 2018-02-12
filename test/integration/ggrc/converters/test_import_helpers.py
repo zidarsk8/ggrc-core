@@ -583,6 +583,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         'Last Updated Date',
         'Last Updated By',
         "Assessment Procedure",
+        "Last Deprecated Date",
+        "Effective Date",
     }
     self._test_single_object(models.Section, names, self.COMMON_EXPECTED)
 
