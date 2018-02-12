@@ -63,6 +63,7 @@ let ApprovalWorkflow = can.Observe({
               type: that.original_object.constructor.title_singular,
               title: that.original_object.title,
             }),
+            is_verification_needed: true,
             object_approval: true,
             notify_on_change: true,
             notify_custom_message: notifyTemplate({
