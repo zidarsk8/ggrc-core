@@ -2479,25 +2479,38 @@ Mustache.registerHelper('is_auditor', function (options) {
   return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper('page_roles', function (person, options) {
-  const pageInstance = Mustache.resolve(GGRC.page_instance);
+Mustache.registerHelper('user_roles', (person, parentInstance, options) => {
   const allRoles = GGRC.access_control_roles.concat(
     GGRC.internal_access_control_roles);
-  const roles = {};
+  let roles = {};
   let allRoleNames = [];
+
+  if (!options) {
+    // if parent instance is not defined in helper use page instance
+    options = parentInstance;
+    parentInstance = Mustache.resolve(GGRC.page_instance);
+  } else {
+    parentInstance = Mustache.resolve(parentInstance);
+  }
+
   can.each(allRoles, (role) => {
     roles[role.id] = role;
   });
 
   person = Mustache.resolve(person);
 
-  if (pageInstance.access_control_list) {
-    allRoleNames = _.uniq(pageInstance.access_control_list.filter(
+  if (parentInstance && parentInstance.access_control_list) {
+    allRoleNames = _.uniq(parentInstance.access_control_list.filter(
       (acl) => {
         return acl.person.id === person.id && acl.ac_role_id in roles;
       }).map((acl) => {
       return roles[acl.ac_role_id].name;
     }));
+  } else {
+    let globalRole = person.system_wide_role === 'No Access'
+      ? 'No Role'
+      : person.system_wide_role;
+    allRoleNames = [globalRole];
   }
 
   return options.fn({

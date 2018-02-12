@@ -63,9 +63,9 @@
           <div class="span6">
             <h6>Authorizations</h6>
             <p>
-              {{#page_roles instance}}
+              {{#user_roles instance}}
                 {{rolesStr}}
-              {{/page_roles}}
+              {{/user_roles}}
             </p>
           </div>
           {{#if_match instance.company '\\\\S'}}
