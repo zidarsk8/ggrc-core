@@ -14,37 +14,34 @@ const viewModel = can.Map.extend({
   instance: {},
   waiting: true,
   can_activate: false,
-  _can_activate_def: function () {
-    let self = this;
+  async handleWorkflowActivation() {
     const workflow = this.attr('instance');
-
-    self.attr('waiting', true);
-    $.when(
-      workflow.refresh_all('task_groups', 'task_group_objects'),
-      workflow.refresh_all('task_groups', 'task_group_tasks')
-    )
-    .always(function () {
-      self.attr('waiting', false);
-    })
-    .done(function () {
-      let taskGroups = workflow.task_groups.reify();
-      let canActivate = taskGroups.length;
-
-      taskGroups.each(function (taskGroup) {
-        if (!taskGroup.task_group_tasks.length) {
-          canActivate = false;
-        }
-      });
-      self.attr('can_activate', canActivate);
-    })
-    .fail(function (error) {
-      console.warn('Workflow activate error', error.message);
-    });
+    this.attr('waiting', true);
+    try {
+      await Promise.all([
+        workflow.refresh_all('task_groups', 'task_group_objects'),
+        workflow.refresh_all('task_groups', 'task_group_tasks'),
+      ]);
+      this.attr('can_activate', this.canActivateWorkflow(workflow));
+    } catch (error) {
+      console.warn('Workflow activate error', error.message); // eslint-disable-line
+    } finally {
+      this.attr('waiting', false);
+    }
+  },
+  canActivateWorkflow(workflow) {
+    const taskGroups = workflow.task_groups.reify();
+    const hasTaskGroups = taskGroups.length > 0;
+    const nonEmptyTaskGroupTasks = _.all(
+      taskGroups,
+      'task_group_tasks.length'
+    );
+    return hasTaskGroups && nonEmptyTaskGroupTasks;
   },
   _handle_refresh: function (model) {
     let models = ['TaskGroupTask', 'TaskGroupObject'];
     if (models.indexOf(model.shortName) > -1) {
-      this._can_activate_def();
+      this.handleWorkflowActivation();
     }
   },
   async initWorkflow(workflow) {
@@ -112,7 +109,7 @@ const viewModel = can.Map.extend({
 
 const events = {
   '{viewModel} taskGroupAmount'() {
-    this.viewModel._can_activate_def();
+    this.viewModel.handleWorkflowActivation();
   },
   '{can.Model.Cacheable} created': function (model) {
     this.viewModel._handle_refresh(model);
@@ -126,7 +123,7 @@ const events = {
 };
 
 const init = function () {
-  this.viewModel._can_activate_def();
+  this.viewModel.handleWorkflowActivation();
 };
 
 export default can.Component.extend({
