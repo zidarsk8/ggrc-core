@@ -1125,6 +1125,7 @@ Mustache.registerHelper("json_escape", function (obj, options) {
 
 Mustache.registerHelper('json_stringify', function (obj, options) {
   let fields = (options.hash && options.hash.fields || '').split(',');
+  obj = Mustache.resolve(obj);
   return JSON.stringify(_.pick(obj.serialize(), fields));
 });
 
