@@ -47,52 +47,65 @@ const viewModel = can.Map.extend({
       this._can_activate_def();
     }
   },
-  _restore_button: function () {
-    this.attr('waiting', false);
+  async initWorkflow(workflow) {
+    await workflow.refresh();
+    workflow.attr({
+      recurrences: true,
+      status: 'Active',
+    });
+    return workflow.save();
   },
-  _activate: function () {
+  async updateActiveCycleCounts(workflow) {
+    const WorkflowExtension =
+      _.find(GGRC.extensions, (extension) => extension.name === 'workflows');
+
+    return initCounts([
+      WorkflowExtension.countsMap.activeCycles,
+    ], workflow.type, workflow.id);
+  },
+  redirectToFirstCycle(workflow) {
+    const cycleStub = workflow.attr('cycles')[0];
+    workflowHelpers.redirectToCycle(cycleStub);
+  },
+  async repeatOnHandler(workflow) {
+    let result = Promise.resolve();
+    this.attr('waiting', true);
+    try {
+      await this.initWorkflow(workflow);
+      await Permission.refresh();
+      await this.updateActiveCycleCounts(workflow);
+      await workflow.refresh_all('task_groups', 'task_group_tasks');
+      this.redirectToFirstCycle(workflow);
+    } catch (err) {
+      result = Promise.reject(err);
+    } finally {
+      this.attr('waiting', false);
+    }
+
+    return result;
+  },
+  async repeatOffHandler(workflow) {
+    this.attr('waiting', true);
+    try {
+      await workflowHelpers.generateCycle(workflow);
+      await workflow.refresh();
+      await workflow.attr('status', 'Active').save();
+    } catch (err) {
+      return Promise.reject(err);
+    } finally {
+      this.attr('waiting', false);
+    }
+  },
+  async activateWorkflow() {
     const workflow = this.attr('instance');
-    let viewModel = this;
-    let restoreButton = viewModel._restore_button.bind(viewModel);
-
-    viewModel.attr('waiting', true);
-    if (workflow.unit !== null) {
-      workflow.refresh()
-        .then(function () {
-          workflow.attr('recurrences', true);
-          workflow.attr('status', 'Active');
-          return workflow.save();
-        })
-        .then(() => Permission.refresh())
-        .then(function () {
-          let WorkflowExtension =
-            _.find(GGRC.extensions, function (extension) {
-              return extension.name === 'workflows';
-            });
-
-          return initCounts([
-              WorkflowExtension.countsMap.activeCycles,
-            ],
-              workflow.type,
-              workflow.id);
-        })
-        .then(function () {
-          return workflow.refresh_all('task_groups', 'task_group_tasks');
-        })
-        .then(() => {
-          const cycleStub = workflow.attr('cycles')[0];
-          workflowHelpers.redirectToCycle(cycleStub);
-        })
-        .always(restoreButton);
-    } else {
-      workflowHelpers.generateCycle(workflow)
-        .then(function () {
-          return workflow.refresh();
-        })
-        .then(function (workflow) {
-          return workflow.attr('status', 'Active').save();
-        })
-        .always(restoreButton);
+    try {
+      if (workflow.unit !== null) {
+        await this.repeatOnHandler(workflow);
+      } else {
+        await this.repeatOffHandler(workflow);
+      }
+    } catch (err) {
+      // Do nothing
     }
   },
 });
@@ -108,7 +121,7 @@ const events = {
     this.viewModel._handle_refresh(model);
   },
   'button click': function () {
-    this.viewModel._activate();
+    this.viewModel.activateWorkflow();
   },
 };
 
