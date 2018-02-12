@@ -13,6 +13,7 @@ const {exec} = require('child_process');
 const path = require('path');
 process.title = 'eslint_error_lines';
 
+class EelError extends Error {};
 
 const processParam = (process.argv[2] || '')
   .replace(/^-+/, '')
@@ -50,8 +51,11 @@ function parseModifiedFiles(output) {
 
 function getModifiedFiles(done) {
   const shellCmd = 'git diff -U0 dev -- "*.js"';
-  exec(shellCmd, (err, stdout, stderr) => {
+  exec(shellCmd, {maxBuffer: 1024 * 1024}, (err, stdout, stderr) => {
     if (err) {
+      if ( err.toString().includes('stdout maxBuffer exceeded') ) {
+        err = new EelError(`The output of "${shellCmd}" is too big. You probably need to rebase your banch to the latest dev.`);
+      }
       return done(err);
     }
     let modifiedFiles = parseModifiedFiles(stdout);
@@ -62,7 +66,7 @@ function getModifiedFiles(done) {
 function getEslintFailedFiles(done) {
   const shellCmd =
     'git diff --name-only dev | grep ".js$" | xargs eslint --quiet -f json';
-  exec(shellCmd, {maxBuffer: 1024 * 500}, (error, stdout, stderr) => {
+  exec(shellCmd, {maxBuffer: 1024 * 1024}, (error, stdout, stderr) => {
     let eslintJSONOutput;
     if (error && !stdout) {
       console.error(`Error executing "${shellCmd}": ${error}`);
@@ -84,11 +88,17 @@ function getEslintFailedFiles(done) {
   });
 }
 
+function printError(msg, err) {
+  return ( err instanceof EelError )
+    ? console.error(err.toString())
+    : console.error(`${msg}: ${err}`);
+}
+
 function main() {
   getModifiedFiles((err, modFiles) => {
     if ( err ) {
-      return console.error(
-        `Error getting list of modified files in the branch: ${err}`);
+      return printError(
+        'Error getting list of modified files in the branch', err);
     }
     getEslintFailedFiles((err, eslintOut) => {
       if ( err ) {
