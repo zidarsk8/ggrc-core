@@ -655,6 +655,7 @@ class Builder(AttributeInfo):
 
   def publish_attr(
           self, obj, attr_name, inclusions, include, inclusion_filter):
+    """Publish obj attr."""
     value_exists, value = self._process_custom_publish(obj, attr_name)
     if value_exists:
       return value
@@ -693,6 +694,7 @@ class Builder(AttributeInfo):
   def _publish_attrs_for(
           self, obj, attrs, json_obj, inclusions=None, inclusion_filter=None,
           attribute_whitelist=None):
+    """Publis attrs for obj."""
     if inclusions is None:
       inclusions = []
     for attr in attrs:
