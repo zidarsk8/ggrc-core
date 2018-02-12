@@ -32,38 +32,42 @@ describe('can.Model.Mixin.issueTrackerIntegratable', function () {
       method = Mixin.prototype.ensureParentAudit;
     });
 
-    it('should resolve to assigned audit property', function () {
+    it('should resolve to assigned audit property', function (done) {
       method.apply(assessment).then((resolvedAudit) => {
         expect(resolvedAudit).toEqual(audit);
+        done();
       });
     });
 
-    it('should resolve to audit from page_instance', function () {
+    it('should resolve to audit from page_instance', function (done) {
       spyOn(GGRC, 'page_instance')
         .and.returnValue(audit);
 
+      assessment.isNew = () => true;
       assessment.attr('audit', null);
 
       method.apply(assessment).then((resolvedAudit) => {
         expect(resolvedAudit).toEqual(audit);
+        done();
       });
     });
 
     it('should fetch audit from server if not assigned and not in' +
-       ' page_instance', function () {
+       ' page_instance', function (done) {
       spyOn(GGRC, 'page_instance')
         .and.returnValue({ });
 
       let dfd = new can.Deferred();
       dfd.resolve(_.set({}, '[0].Audit.values[0]', audit));
-
       spyOn(queryApiUtils, 'makeRequest').and.returnValue(dfd);
 
       assessment.attr('audit', null);
+      assessment.isNew = () => false;
 
       method.apply(assessment).then((resolvedAudit) => {
         expect(queryApiUtils.makeRequest).toHaveBeenCalled();
         expect(resolvedAudit).toEqual(audit);
+        done();
       });
     });
   });

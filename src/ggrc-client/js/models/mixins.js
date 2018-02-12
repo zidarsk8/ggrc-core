@@ -279,7 +279,8 @@ const AUDIT_ISSUE_TRACKER = {
         if ( this.attr('type') === 'Audit' ) {
           this.initAuditIssueTracker();
         } else {
-          this.ensureParentAudit().then(()=>{
+          this.ensureParentAudit().then((audit) => {
+            this.attr('audit', audit);
             this.initIssueTrackerForAssessment();
           });
         }
@@ -289,13 +290,13 @@ const AUDIT_ISSUE_TRACKER = {
     ensureParentAudit() {
       const pageInstance = GGRC.page_instance();
       const dfd = new can.Deferred();
-      if ( this.audit ) {
+      if (this.audit) {
         return dfd.resolve(this.audit);
       }
 
-      if ( this.isNew() ) {
-        if ( pageInstance && pageInstance.type === 'Audit' ) {
-          this.attr('audit', pageInstance);
+      if (this.isNew()) {
+        if (pageInstance && pageInstance.type === 'Audit') {
+          dfd.resolve(pageInstance);
         }
       } else {
         // audit is not page instane if AssessmentTemplate is edited
@@ -305,7 +306,7 @@ const AUDIT_ISSUE_TRACKER = {
           id: this.id,
         }, ['id', 'title', 'type', 'context', 'issue_tracker']);
 
-        makeRequest({data: [param]}).then((response)=> {
+        makeRequest({data: [param]}).then((response) => {
           this.audit = _.get(response, '[0].Audit.values[0]');
           dfd.resolve(this.audit);
         });
