@@ -7,7 +7,6 @@ owned by Admin.
 # T0D0: write tests for create, update, delete
 
 from ggrc_workflows.models import Workflow
-from ggrc_workflows.models import WorkflowPerson
 from ggrc_workflows.models import TaskGroup
 from ggrc_workflows.models import TaskGroupObject
 from ggrc_workflows.models import TaskGroupTask
@@ -42,10 +41,6 @@ class GlobalCreatorGetTest(WorkflowRolesTestCase):
         TaskGroupTask, self.first_task_group_task.id)
     self.assert403(task_group_task_res)
 
-    workflow_person_res = self.api.get(
-        WorkflowPerson, self.first_workflow_person.id)
-    self.assert403(workflow_person_res)
-
   def test_get_active_obj(self):
     """ Get workflow objects from active workflow """
     self.workflow_res, self.workflow_obj = \
@@ -65,10 +60,6 @@ class GlobalCreatorGetTest(WorkflowRolesTestCase):
     task_group_task_res = self.api.get(
         TaskGroupTask, self.first_task_group_task.id)
     self.assert403(task_group_task_res)
-
-    workflow_person_res = self.api.get(
-        WorkflowPerson, self.first_workflow_person.id)
-    self.assert403(workflow_person_res)
 
     cycle_obj = self.session.query(Cycle)\
         .filter(Cycle.workflow_id == self.workflow_obj.id)\

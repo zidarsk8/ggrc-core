@@ -12,8 +12,6 @@ from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
 
 from integration.ggrc.models import factories
-from integration.ggrc_basic_permissions.models \
-    import factories as rbac_factories
 
 from appengine import base
 
@@ -27,16 +25,18 @@ class TestFilterByAuditor(TestCase):
     self.api = Api()
     self.generator = ObjectGenerator()
     _, self.auditor = self.generator.generate_person(user_role="Creator")
-    auditor_role = all_models.Role.query.filter_by(name="Auditor").first()
+    auditor_role = all_models.AccessControlRole.query.filter_by(
+        name="Auditors").one()
     with factories.single_commit():
       self.audit = factories.AuditFactory(status="In Progress")
       self.audit_id = self.audit.id
       audit_context = factories.ContextFactory()
       self.audit.context = audit_context
-      rbac_factories.UserRoleFactory(
-          context=audit_context,
-          role=auditor_role,
-          person=self.auditor)
+      factories.AccessControlListFactory(
+          ac_role=auditor_role,
+          object=self.audit,
+          person=self.auditor
+      )
     self.api.set_user(self.auditor)
 
   def test_query_audits_by_auditor(self):

@@ -10,6 +10,7 @@ from ggrc.models import all_models
 
 from integration.ggrc import TestCase as BaseTestCase
 from integration.ggrc import api_helper
+from integration.ggrc import query_helper
 from integration.ggrc.models import factories
 from integration.ggrc_basic_permissions.models import factories as bp_factories
 from integration.ggrc_workflows import generator as wf_generator
@@ -21,9 +22,10 @@ class TestCTGOT(BaseTestCase):
   """Test suite for CycleTaskGroupObjectTask specific logic."""
 
   NOBODY = "nobody@example.com"
-  WORKFLOW_OWNER = "wfo@example.com"
+  WORKFLOW_ADMIN = "wfa@example.com"
   TASK_ASSIGNEE_1 = "assignee_1@example.com"
   TASK_ASSIGNEE_2 = "assignee_2@example.com"
+  TASK_SEC_ASSIGNEE = "sec_assignee@example.com"
 
   def setUp(self):
     super(TestCTGOT, self).setUp()
@@ -33,13 +35,11 @@ class TestCTGOT(BaseTestCase):
     with factories.single_commit():
       assignee_1 = factories.PersonFactory(email=self.TASK_ASSIGNEE_1)
       assignee_2 = factories.PersonFactory(email=self.TASK_ASSIGNEE_2)
-      workflow_owner = factories.PersonFactory(email=self.WORKFLOW_OWNER)
+      workflow_admin = factories.PersonFactory(email=self.WORKFLOW_ADMIN)
       nobody = factories.PersonFactory(email=self.NOBODY)
 
-      workflow_owner_role = (all_models.Role.query
-                             .filter_by(name="WorkflowOwner").one())
       reader_role = all_models.Role.query.filter_by(name="Reader").one()
-      for person in [assignee_1, assignee_2, workflow_owner, nobody]:
+      for person in [assignee_1, assignee_2, workflow_admin, nobody]:
         bp_factories.UserRoleFactory(person=person,
                                      role=reader_role,
                                      context=None)
@@ -48,27 +48,38 @@ class TestCTGOT(BaseTestCase):
       taskgroup = wf_factories.TaskGroupFactory(workflow=workflow)
       task_1 = wf_factories.TaskGroupTaskFactory(task_group=taskgroup)
       task_2 = wf_factories.TaskGroupTaskFactory(task_group=taskgroup)
-      role = all_models.AccessControlRole.query.filter(
+      task_role = all_models.AccessControlRole.query.filter(
           all_models.AccessControlRole.name == "Task Assignees",
           all_models.AccessControlRole.object_type == task_1.type,
       ).one()
-      factories.AccessControlListFactory(ac_role=role,
+      factories.AccessControlListFactory(ac_role=task_role,
                                          object=task_1,
                                          person=assignee_1)
-      factories.AccessControlListFactory(ac_role=role,
+      factories.AccessControlListFactory(ac_role=task_role,
                                          object=task_2,
                                          person=assignee_2)
-
-      bp_factories.UserRoleFactory(person=workflow_owner,
-                                   role=workflow_owner_role,
-                                   context=workflow.context)
+      sec_assignee = factories.PersonFactory(email=self.TASK_SEC_ASSIGNEE)
+      task_role = all_models.AccessControlRole.query.filter(
+          all_models.AccessControlRole.name == "Task Secondary Assignees",
+          all_models.AccessControlRole.object_type == task_1.type,
+      ).one()
+      factories.AccessControlListFactory(ac_role=task_role,
+                                         object=task_1,
+                                         person=sec_assignee)
+      wf_admin_role = all_models.AccessControlRole.query.filter(
+          all_models.AccessControlRole.name == "Admin",
+          all_models.AccessControlRole.object_type == workflow.type,
+      ).one()
+      factories.AccessControlListFactory(ac_role=wf_admin_role,
+                                         object=workflow,
+                                         person=workflow_admin)
 
     generator = wf_generator.WorkflowsGenerator()
     self.cycle_id = generator.generate_cycle(workflow)[1].id
     generator.activate_workflow(workflow)
 
   @ddt.data((NOBODY, [False, False]),
-            (WORKFLOW_OWNER, [True, True]),
+            (WORKFLOW_ADMIN, [True, True]),
             (TASK_ASSIGNEE_1, [True, False]),
             (TASK_ASSIGNEE_2, [False, True]))
   @ddt.unpack
@@ -104,7 +115,7 @@ class TestCTGOT(BaseTestCase):
         all_models.Cycle.is_current: cycle_is_current,
     })
     db.session.commit()
-    user_mail = self.WORKFLOW_OWNER
+    user_mail = self.WORKFLOW_ADMIN
     user = all_models.Person.query.filter_by(email=user_mail).one()
     self.api.set_user(user)
     response = self.api.get_query(all_models.CycleTaskGroupObjectTask,
@@ -123,24 +134,143 @@ class TestCTGOT(BaseTestCase):
 
   def test_context_after_task_delete(self):
     """Test UserRoles context keeping after cycle task deletion."""
-    workflow_owner_role = all_models.Role.query.filter_by(
-        name="WorkflowOwner"
-    ).one()
     ctask = all_models.CycleTaskGroupObjectTask.query.first()
     ctask_context_id = ctask.context_id
     self.assertTrue(ctask_context_id)
 
-    user = all_models.Person.query.filter_by(email=self.WORKFLOW_OWNER).one()
+    user = all_models.Person.query.filter_by(email=self.WORKFLOW_ADMIN).one()
     self.api.set_user(user)
 
     response = self.api.delete(ctask)
     self.assert200(response)
 
-    user_role = all_models.UserRole.query.filter_by(
-        role_id=workflow_owner_role.id,
-        person_id=user.id,
-    ).one()
-    self.assertEqual(user_role.context_id, ctask_context_id)
-
     for ctask in all_models.CycleTaskGroupObjectTask.query.all():
       self.assertEqual(ctask.context_id, ctask_context_id)
+
+  def test_comment_cascade_deletion_on_cycle_task_delete(self):  # noqa pylint: disable=invalid-name
+    """Test comment cascade deletion on CycleTask delete."""
+    ctask = all_models.CycleTaskGroupObjectTask.query.first()
+    ctask_id = ctask.id
+    wf_factories.CycleTaskEntryFactory(
+        cycle=ctask.cycle,
+        cycle_task_group_object_task=ctask,
+        description="Cycle task comment",
+    )
+    self.assertEqual(all_models.CycleTaskEntry.query.count(), 1)
+
+    user = all_models.Person.query.filter_by(email=self.WORKFLOW_ADMIN).one()
+    self.api.set_user(user)
+
+    response = self.api.delete(
+        all_models.CycleTaskGroupObjectTask.query.get(ctask_id))
+    self.assert200(response)
+
+    self.assertEqual(all_models.CycleTaskGroupObjectTask.query.filter_by(
+        id=ctask_id).count(), 0)
+    self.assertEqual(all_models.CycleTaskEntry.query.count(), 0)
+
+
+class CycleTaskQueryAPI(query_helper.WithQueryApi, TestCTGOT):
+  """CycleTask's QueryAPI related tests."""
+
+  def setUp(self):
+    super(CycleTaskQueryAPI, self).setUp()
+    self.client.get("/login")
+
+  def test_query_by_task_secondary_assignee_on_mytasks_page(self):  # noqa pylint: disable=invalid-name
+    """Test QueryAPI request for CycleTasks on MyTasks page."""
+    sec_assignee = all_models.Person.query.filter_by(
+        email=self.TASK_SEC_ASSIGNEE).one()
+    data = [
+        {
+            "object_name": "CycleTaskGroupObjectTask",
+            "filters": {
+                "expression": {
+                    "left": {
+                        "object_name": "Person",
+                        "op": {
+                            "name": "owned"
+                        },
+                        "ids": [
+                            sec_assignee.id
+                        ]
+                    },
+                    "op": {
+                        "name": "AND"
+                    },
+                    "right": {
+                        "left": "task secondary assignees",
+                        "op": {
+                            "name": "~"
+                        },
+                        "right": self.TASK_SEC_ASSIGNEE
+                    }
+                },
+                "keys": [
+                    "task secondary assignees"
+                ],
+                "order_by": {
+                    "keys": [],
+                    "order": "",
+                    "compare": None
+                }
+            },
+            "limit": [0, 10]
+        }
+    ]
+    result = self._get_first_result_set(data, "CycleTaskGroupObjectTask",
+                                        "total")
+    self.assertEqual(result, 1)
+
+  def test_query_by_task_secondary_assignee_on_active_cycles_tab(self):  # noqa pylint: disable=invalid-name
+    """Test QueryAPI request for CycleTasks on Active Cycles tab."""
+    data = [
+        {
+            "object_name": "Cycle",
+            "filters": {
+                "expression": {
+                    "left": {
+                        "object_name": "Workflow",
+                        "op": {
+                            "name": "relevant"
+                        },
+                        "ids": [all_models.Workflow.query.one().id],
+                    },
+                    "op": {
+                        "name": "AND"
+                    },
+                    "right": {
+                        "left": {
+                            "left": "is_current",
+                            "op": {
+                                "name": "="
+                            },
+                            "right": "1"
+                        },
+                        "op": {
+                            "name": "AND"
+                        },
+                        "right": {
+                            "left": "task secondary assignees",
+                            "op": {
+                                "name": "~"
+                            },
+                            "right": self.TASK_SEC_ASSIGNEE
+                        }
+                    }
+                },
+                "keys": [
+                    "is_current",
+                    "task secondary assignees"
+                ],
+                "order_by": {
+                    "keys": [],
+                    "order": "",
+                    "compare": None
+                }
+            },
+            "limit": [0, 10]
+        }
+    ]
+    result = self._get_first_result_set(data, "Cycle", "total")
+    self.assertEqual(result, 1)

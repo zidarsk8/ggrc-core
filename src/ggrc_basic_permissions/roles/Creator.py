@@ -76,7 +76,48 @@ owner_update = owner_base + [
 permissions = {
     "read": owner_read,
     "create": [
-        "Workflow"
+        {
+            "type": "Audit",
+            "condition": "is_allowed_based_on",
+            "terms": {
+                "property_name": "program",
+                "action": "update",
+            }
+        },
+        {
+            "type": "Snapshot",
+            "condition": "is_allowed_based_on",
+            "terms": {
+                "property_name": "parent",
+                "action": "update",
+            }
+        },
+        "AssessmentTemplate",
+        {
+            "type": "TaskGroup",
+            "condition": "is_workflow_admin",
+            "terms": {},
+        },
+        {
+            "type": "TaskGroupTask",
+            "condition": "is_workflow_admin",
+            "terms": {},
+        },
+        {
+            "type": "Cycle",
+            "condition": "is_workflow_admin",
+            "terms": {},
+        },
+        {
+            "type": "CycleTaskEntry",
+            "condition": "is_workflow_admin",
+            "terms": {},
+        },
+        {
+            "type": "TaskGroupObject",
+            "condition": "is_workflow_admin",
+            "terms": {},
+        },
         "Categorization",
         "Category",
         "ControlCategory",

@@ -5,6 +5,7 @@
 
 
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import backref
 
 from ggrc import db
 from ggrc.models.mixins import Base, Described
@@ -30,10 +31,13 @@ class CycleTaskEntry(Relatable, Described, Base, mixin.Indexed, db.Model):
       db.ForeignKey('cycle_task_group_object_tasks.id', ondelete="CASCADE"),
       nullable=False,
   )
+  # `cascade` option must be added on parent's (CycleTask's) side relationship.
+  # Because we are using backref on child side, backref must initialize cascade
+  # option explicitly for parent's (CycleTask's) part of the relationship.
   cycle_task_group_object_task = db.relationship(
       'CycleTaskGroupObjectTask',
       foreign_keys='CycleTaskEntry.cycle_task_group_object_task_id',
-      backref='cycle_task_entries',
+      backref=backref('cycle_task_entries', cascade="delete, delete-orphan"),
   )
 
   _api_attrs = reflection.ApiAttributes(
@@ -41,6 +45,11 @@ class CycleTaskEntry(Relatable, Described, Base, mixin.Indexed, db.Model):
       'cycle_task_group_object_task',
       'is_declining_review'
   )
+
+  @property
+  def workflow(self):
+    """Property which returns parent workflow object."""
+    return self.cycle.workflow
 
   @hybrid_property
   def is_declining_review(self):

@@ -50,8 +50,8 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Title",
         "Description",
         "Custom email message",
-        "Manager",
-        "Member",
+        "Admin",
+        "Workflow Member",
         "Unit",
         "Repeat Every",
         "Force real-time email updates",
@@ -59,18 +59,18 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Delete",
         "Need Verification",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
         'Folder',
     }
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.itervalues()}
     self.assertTrue(vals["Title"]["mandatory"])
-    self.assertTrue(vals["Manager"]["mandatory"])
-    self.assertIn("type", vals["Manager"])
-    self.assertIn("type", vals["Member"])
-    self.assertEqual(vals["Manager"]["type"], "property")
-    self.assertEqual(vals["Member"]["type"], "property")
+    self.assertTrue(vals["Admin"]["mandatory"])
+    self.assertIn("type", vals["Admin"])
+    self.assertIn("type", vals["Workflow Member"])
+    self.assertEqual(vals["Admin"]["type"], "mapping")
+    self.assertEqual(vals["Workflow Member"]["type"], "mapping")
 
   def test_task_group_definitions(self):
     """ test default headers for Task Group """
@@ -85,7 +85,7 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Objects",
         "Delete",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     self.assertEqual(expected_names, display_names)
@@ -101,6 +101,7 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Summary",
         "Task Type",
         "Task Assignees",
+        "Task Secondary Assignees",
         "Task Description",
         "Start Date",
         "End Date",
@@ -108,7 +109,7 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Code",
         "Delete",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     self.assertEqual(expected_names, display_names)
@@ -131,6 +132,7 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Summary",
         "Task Type",
         "Task Assignees",
+        "Task Secondary Assignees",
         "Task Details",
         "Start Date",
         "Due Date",
@@ -140,7 +142,7 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     expected_names = element_names.union(mapping_names).union(unmapping_names)

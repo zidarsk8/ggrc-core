@@ -10,6 +10,7 @@ import json
 import logging
 
 import sqlalchemy
+from sqlalchemy import true
 from flask import flash
 from flask import g
 from flask import render_template
@@ -189,11 +190,22 @@ def do_reindex():
   start_compute_attributes("all_latest")
 
 
+class SetEncoder(json.JSONEncoder):
+  """Encoder that can handle python sets"""
+  # pylint: disable=E0202
+  def default(self, obj):
+    """If we get a set we first transform it to a list and then just use
+       the default encoder"""
+    if isinstance(obj, set):
+      return list(obj)
+    return super(SetEncoder, self).default(obj)
+
+
 def get_permissions_json():
   """Get all permissions for current user"""
   with benchmark("Get permission JSON"):
     permissions.permissions_for(permissions.get_user())
-    return json.dumps(getattr(g, '_request_permissions', None))
+    return json.dumps(getattr(g, '_request_permissions', None), cls=SetEncoder)
 
 
 def get_config_json():
@@ -268,6 +280,19 @@ def get_access_control_roles_json():
     attrs = all_models.AccessControlRole.query.options(
         sqlalchemy.orm.undefer_group("AccessControlRole_complete")
     ).filter(~all_models.AccessControlRole.internal).all()
+    published = []
+    for attr in attrs:
+      published.append(publish(attr))
+    published = publish_representation(published)
+    return as_json(published)
+
+
+def get_internal_roles_json():
+  """Get a list of all access control roles"""
+  with benchmark("Get access roles JSON"):
+    attrs = all_models.AccessControlRole.query.options(
+        sqlalchemy.orm.undefer_group("AccessControlRole_complete")
+    ).filter(all_models.AccessControlRole.internal == true()).all()
     published = []
     for attr in attrs:
       published.append(publish(attr))
@@ -357,6 +382,7 @@ def base_context():
       full_user_json=get_full_user_json,
       attributes_json=get_attributes_json,
       access_control_roles_json=get_access_control_roles_json,
+      internal_access_control_roles_json=get_internal_roles_json,
       roles_json=get_roles_json,
       all_attributes_json=get_all_attributes_json,
       import_definitions=get_import_definitions,

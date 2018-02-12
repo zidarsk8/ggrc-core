@@ -238,6 +238,45 @@ class Revision(Base, db.Model):
     return {"labels": [{"id": None,
                         "name": label}]} if label else {"labels": []}
 
+  def populate_status(self):
+    """Update status for older revisions or add it if status does not exist."""
+    pop_models = {
+        # ggrc
+        "AccessGroup",
+        "Clause",
+        "Control",
+        "DataAsset",
+        "Directive",
+        "Facility",
+        "Issue",
+        "Market",
+        "Objective",
+        "OrgGroup",
+        "Product",
+        "Program",
+        "Project",
+        "Section",
+        "System",
+        "Vendor",
+
+        # ggrc_risks
+        "Risk",
+        "Threat",
+    }
+    if self.resource_type not in pop_models:
+      return {}
+    statuses_mapping = {
+        "Active": "Active",
+        "Deprecated": "Deprecated",
+        "Effective": "Active",
+        "Final": "Active",
+        "In Scope": "Active",
+        "Ineffective": "Active",
+        "Launched": "Active",
+    }
+    return {"status": statuses_mapping.get(self._content.get("status"),
+                                           "Draft")}
+
   def _document_evidence_hack(self):
     """Update display_name on evideces
 
@@ -283,6 +322,14 @@ class Revision(Base, db.Model):
         result.append(categorization)
     return {key_name: result}
 
+  def populate_cavs(self):
+    """Populate custom_attribute_values based on custom_attributes."""
+    if "custom_attributes" not in self._content:
+      return {}
+    if "custom_attribute_values" in self._content:
+      return {}
+    return {"custom_attribute_values": self._content["custom_attributes"]}
+
   @builder.simple_property
   def content(self):
     """Property. Contains the revision content dict.
@@ -294,9 +341,11 @@ class Revision(Base, db.Model):
     populated_content.update(self.populate_reference_url())
     populated_content.update(self.populate_folder())
     populated_content.update(self.populate_labels())
+    populated_content.update(self.populate_status())
     populated_content.update(self._document_evidence_hack())
     populated_content.update(self.populate_categoies("categories"))
     populated_content.update(self.populate_categoies("assertions"))
+    populated_content.update(self.populate_cavs())
     return populated_content
 
   @content.setter

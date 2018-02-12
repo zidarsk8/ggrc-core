@@ -98,7 +98,7 @@ class TestSnapshotBlockConverter(TestCase):
         ('recipients', 'Recipients'),
         ('send_by_default', 'Send by default'),
         ('document_evidence', 'Evidence File'),
-        ('updated_at', 'Last Updated'),
+        ('updated_at', 'Last Updated Date'),
         ('modified_by', 'Last Updated By'),
         ('created_at', 'Created Date'),
         ('folder', "Folder"),

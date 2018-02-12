@@ -20,6 +20,44 @@ class TestSnapshoting(SnapshotterBaseTestCase):
   """Test cases for Snapshoter module"""
 
   # pylint: disable=invalid-name,protected-access
+  @staticmethod
+  def collect_snapshot_mappings(obj_stub):
+    """Collect Relationships between Snapshots of child objects.
+
+    Find all relationships between Snapshots where at least one Snapshot
+    has same type and id as in provided list.
+
+    Args:
+        obj_stub: List of Stubs(obj_type, obj_id).
+
+    Returns:
+        SQLAlchemy query that yield id of Relationship.
+    """
+    source_snap = sa.orm.aliased(models.Snapshot)
+    dest_snap = sa.orm.aliased(models.Snapshot)
+    return db.session.query(models.Relationship.id).join(
+        source_snap,
+        sa.and_(
+            source_snap.id == models.Relationship.source_id,
+            models.Relationship.source_type == "Snapshot",
+        )
+    ).join(
+        dest_snap,
+        sa.and_(
+            dest_snap.id == models.Relationship.destination_id,
+            models.Relationship.destination_type == "Snapshot",
+        )
+    ).filter(sa.or_(
+        sa.tuple_(
+            source_snap.child_type,
+            source_snap.child_id,
+        ).in_(obj_stub),
+        sa.tuple_(
+            dest_snap.child_type,
+            dest_snap.child_id,
+        ).in_(obj_stub)
+    ))
+
   def test_snapshot_create(self):
     """Test simple snapshot creation with a simple change"""
 
@@ -600,6 +638,56 @@ class TestSnapshoting(SnapshotterBaseTestCase):
 
     for _id, snapshot in new_snapshots.items():
       self.assertEqual(snapshot_identity(old_snapshots[_id], snapshot), True)
+
+  def test_snapshot_relations_remove(self):
+    """Test if snapshots will be unmapped if original objects are unmapped"""
+    total_reg_count = 5
+    unmapped_reg_count = 2
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      control = factories.ControlFactory()
+      factories.RelationshipFactory(source=control, destination=program)
+      for _ in xrange(total_reg_count):
+        regulation = factories.RegulationFactory()
+        factories.RelationshipFactory(source=control, destination=regulation)
+        factories.RelationshipFactory(source=regulation, destination=program)
+
+    audit = self.create_audit(program)
+
+    rels = models.Relationship.query.filter(
+        models.Relationship.source_type == "Control",
+        models.Relationship.destination_type == "Regulation",
+    ).all()
+    removed_reg_rels = []
+    keep_reg_rels = []
+    for num, rel in enumerate(rels):
+      if num < unmapped_reg_count:
+        # We know that source is the same Control
+        removed_reg_rels.append((rel.destination_type, rel.destination_id))
+        # Unmap Regulation object from Control
+        db.session.delete(rel)
+      else:
+        keep_reg_rels.append((rel.destination_type, rel.destination_id))
+    db.session.commit()
+
+    snap_mappings = self.collect_snapshot_mappings(removed_reg_rels)
+    self.assertEqual(snap_mappings.count(), unmapped_reg_count)
+
+    self.api.modify_object(audit, {
+        "snapshots": {
+            "operation": "upsert"
+        }
+    })
+    # After updating to the latest version part of Snapshots of Regulations
+    # should be unmapped from Snapshot of Control
+    snap_mappings = self.collect_snapshot_mappings(removed_reg_rels)
+    self.assertEqual(snap_mappings.count(), 0)
+    # Check that other Snapshots still have their mappings
+    snap_mappings = self.collect_snapshot_mappings(keep_reg_rels)
+    self.assertEqual(
+        snap_mappings.count(),
+        total_reg_count - unmapped_reg_count
+    )
 
   def test_audit_creation_if_nothing_in_program_scope(self):
     """Test audit creation if there's nothing in prog scope"""

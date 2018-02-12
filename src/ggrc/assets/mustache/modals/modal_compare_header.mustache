@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 <span>{{modal_title}}</span>
@@ -15,10 +15,10 @@
         <div>
           {{leftRevisionData.description}}
         </div>
-        <person-list-item with-details="false" {person}="leftRevisionData.modifiedBy">
+        <person-list-item with-details="false" {person}="leftRevisionData.author">
         </person-list-item>
         <div>
-          {{date leftRevisionData.updatedAt}}
+          {{date leftRevisionData.date}}
         </div>
       </div>
     </div>
@@ -26,10 +26,10 @@
       <div>
         {{rightRevisionData.description}}
       </div>
-      <person-list-item with-details="false" {person}="rightRevisionData.modifiedBy">
+      <person-list-item with-details="false" {person}="rightRevisionData.author">
       </person-list-item>
       <div>
-        {{date rightRevisionData.updatedAt}}
+        {{date rightRevisionData.date}}
       </div>
     </div>
   </div>

@@ -170,7 +170,7 @@ class TestEnableAndDisableNotifications(TestCase):
         "title": "quarterly wf forced notifications",
         "notify_on_change": True,
         "description": "",
-        "owners": [person_dict(self.user.id)],
+        # admin will be current user with id == 1
         "unit": "month",
         "repeat_every": 3,
         "task_groups": [{
@@ -188,7 +188,7 @@ class TestEnableAndDisableNotifications(TestCase):
     self.quarterly_wf = {
         "title": "quarterly wf 1",
         "description": "",
-        "owners": [person_dict(self.user.id)],
+        # admin will be current user with id == 1
         "unit": "month",
         "repeat_every": 3,
         "task_groups": [{

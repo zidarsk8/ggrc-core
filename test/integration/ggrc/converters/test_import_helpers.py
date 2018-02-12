@@ -99,7 +99,7 @@ class TestCustomAttributesDefinitions(TestCase):
         "Comments",
         "Assessment Procedure",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     expected_names = element_names.union(mapping_names)
@@ -134,9 +134,6 @@ class TestCustomAttributesDefinitions(TestCase):
         "Title",
         "Description",
         "Notes",
-        "Manager",
-        "Reader",
-        "Editor",
         "Reference URL",
         "Code",
         "Effective Date",
@@ -149,8 +146,11 @@ class TestCustomAttributesDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        "Program Managers",
+        "Program Editors",
+        "Program Readers",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
         'Folder',
     }
@@ -158,7 +158,6 @@ class TestCustomAttributesDefinitions(TestCase):
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.itervalues()}
     self.assertTrue(vals["Title"]["mandatory"])
-    self.assertTrue(vals["Manager"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Mandatory Attribute"]["mandatory"])
     self.assertTrue(vals["Choose"]["mandatory"])
@@ -304,9 +303,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Title",
         "Description",
         "Notes",
-        "Manager",
-        "Reader",
-        "Editor",
         "Reference URL",
         "Code",
         "Effective Date",
@@ -316,8 +312,11 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        "Program Managers",
+        "Program Editors",
+        "Program Readers",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
         'Folder',
     }
@@ -325,7 +324,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "mandatory": {
             "Code",
             "Title",
-            "Manager",
+            "Program Managers",
         },
         "unique": {
             "Code",
@@ -333,10 +332,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         },
     }
     self._test_single_object(models.Program, names, expected_fields)
-
-    definitions = get_object_column_definitions(models.Program)
-    vals = {val["display_name"]: val for val in definitions.itervalues()}
-    self.assertEqual(vals["Manager"]["type"], "user_role")
 
   def test_audit_definitions(self):
     """Test default headers for Audit."""
@@ -357,7 +352,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Evidence URL",
         "Evidence File",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
         'Folder',
         'Last Deprecated Date'
@@ -391,7 +386,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Code",
         "Archived",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
         "Delete",
         "State",
@@ -449,7 +444,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Primary Contacts",
         "Secondary Contacts",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
         "Comments",
         'Labels',
@@ -496,7 +491,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Send by default",
         "Comments",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     expected_fields = {
@@ -534,7 +529,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Comments",
         "Assessment Procedure",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     self._test_single_object(models.Policy, names, self.COMMON_EXPECTED)
@@ -559,7 +554,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Send by default",
         "Comments",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
         "Assessment Procedure",
     }
@@ -584,7 +579,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Send by default",
         "Comments",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
         "Assessment Procedure",
     }
@@ -622,7 +617,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Send by default",
         "Comments",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
         'Folder',
     }
@@ -648,7 +643,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Comments",
         "Assessment Procedure",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     self._test_single_object(models.Objective, names, self.COMMON_EXPECTED)
@@ -661,7 +656,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Company",
         "Role",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     expected_fields = {
@@ -696,7 +691,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Comments",
         "Assessment Procedure",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     self._test_single_object(models.System, names, self.COMMON_EXPECTED)
@@ -723,7 +718,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Comments",
         "Assessment Procedure",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     self._test_single_object(models.Process, names, self.COMMON_EXPECTED)
@@ -750,7 +745,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Comments",
         "Assessment Procedure",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     self._test_single_object(models.Product, names, self.COMMON_EXPECTED)
@@ -776,7 +771,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Comments",
         "Assessment Procedure",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     expected_fields = {
@@ -826,7 +821,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Comments",
         "Assessment Procedure",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     self._test_single_object(model, names, self.COMMON_EXPECTED)
@@ -859,7 +854,7 @@ class TestRiskAssessmentColumnDefinitions(TestCase):
         "Delete",
         "Assessment Procedure",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     self.assertEqual(expected_names, display_names)

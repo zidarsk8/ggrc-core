@@ -4,9 +4,11 @@
 }}
 
 
-{{#is_allowed 'update' instance context='for'}}
-  <li class="inner-nav-button">
-    <workflow-activate workflow="instance" deferredData="can_activate">
+<li class="inner-nav-button">
+  <workflow-activate
+    {instance}="instance"
+    {task-group-amount}="instance.task_groups.length">
+    {{#is_allowed 'update' instance context='for'}}
       <spinner toggle="waiting"></spinner>
 
       {{#if_equals instance.status "Draft"}}
@@ -22,13 +24,11 @@
         {{^if_equals instance.status 'Inactive'}}
         {{^if waiting}}
           {{^can_activate}}
-            {{^if_equals instance.kind "Backlog"}}
             <p class="alert tiny-help-text" style="margin-bottom:0px;"><strong>Note:</strong> At least one of the task groups is missing either a task or an object.</p>
-            {{/if_equals}}
           {{/can_activate}}
         {{/if}}
         {{/if_equals}}
       {{/if_equals}}
-    </workflow-activate>
-  </li>
-{{/is_allowed}}
+    {{/is_allowed}}
+  </workflow-activate>
+</li>

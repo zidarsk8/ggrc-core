@@ -154,8 +154,17 @@ def has_changed_condition(instance, property_name, prevent_if=None, **_):
 
 def is_auditor(instance, **_):
   """Check if user has auditor role on the audit field of the instance"""
+  # pylint: disable=protected-access
   return any(acl for acl in instance.audit.access_control_list
-             if acl.ac_role.name == "Auditors" and acl.person == current_user)
+             if acl.ac_role.name in "Auditors" and
+             acl.person == current_user) or \
+      find_permissions()._is_allowed_for(instance.audit, "update")
+
+
+def is_workflow_admin(instance, **_):
+  """Check if current user has Admin role in scope of parent Workflow object"""
+  return any(acl for acl in instance.workflow.access_control_list
+             if acl.ac_role.name == "Admin" and acl.person == current_user)
 
 
 def is_allowed_based_on(instance, property_name, action, **_):
@@ -184,6 +193,7 @@ _CONDITIONS_MAP = {
     'has_not_changed': has_not_changed_condition,
     'has_changed': has_changed_condition,
     'is_auditor': is_auditor,
+    'is_workflow_admin': is_workflow_admin,
     'is_allowed_based_on': is_allowed_based_on,
 }
 

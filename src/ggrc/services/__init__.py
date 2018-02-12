@@ -12,10 +12,10 @@ def contributed_services():
   (url, ModelClass) tuples.
   """
   import ggrc.models.all_models as models
-  from ggrc.services.relationship_resource import RelationshipResource
-  from ggrc.services.audit_resource import AuditResource
-  from ggrc.services.assessment_resource import AssessmentResource
-  from ggrc.services.person_resource import PersonResource
+  from ggrc.services.resources.relationship import RelationshipResource
+  from ggrc.services.resources.audit import AuditResource
+  from ggrc.services.resources.assessment import AssessmentResource
+  from ggrc.services.resources.person import PersonResource
   from ggrc.access_control.role import AccessControlRole
 
   return [

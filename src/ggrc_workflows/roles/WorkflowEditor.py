@@ -8,7 +8,6 @@ description = """
 permissions = {
     "read": [
         "Workflow",
-        "WorkflowPerson",
         "TaskGroup",
         "TaskGroupObject",
         "TaskGroupTask",
@@ -23,7 +22,6 @@ permissions = {
     ],
     "create": [
         "Workflow",
-        "WorkflowPerson",
         "TaskGroup",
         "TaskGroupObject",
         "TaskGroupTask",
@@ -37,7 +35,6 @@ permissions = {
     ],
     "update": [
         "Workflow",
-        "WorkflowPerson",
         "TaskGroup",
         "TaskGroupObject",
         "TaskGroupTask",
@@ -51,7 +48,6 @@ permissions = {
     ],
     "delete": [
         "Workflow",
-        "WorkflowPerson",
         "TaskGroup",
         "TaskGroupObject",
         "TaskGroupTask",

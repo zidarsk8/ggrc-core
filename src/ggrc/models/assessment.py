@@ -14,6 +14,7 @@ from sqlalchemy import orm
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.builder import simple_property
+from ggrc.fulltext import mixin
 from ggrc.models.comment import Commentable
 from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
 from ggrc.models import issuetracker_issue
@@ -64,7 +65,8 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
                  Personable, reminderable.Reminderable, Relatable,
                  LastDeprecatedTimeboxed, WithSimilarityScore, FinishedDate,
                  VerifiedDate, ValidateOnComplete, Notifiable, WithAction,
-                 labeled.Labeled, BusinessObject, Indexed, db.Model):
+                 labeled.Labeled, issuetracker_issue.IssueTracked,
+                 BusinessObject, Indexed, db.Model):
   """Class representing Assessment.
 
   Assessment is an object representing an individual assessment performed on
@@ -151,6 +153,10 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       'folder',
   ]
 
+  AUTO_REINDEX_RULES = [
+      mixin.ReindexRule("Audit", lambda x: x.assessments, ["archived"]),
+  ]
+
   _custom_publish = {
       'audit': _build_audit_stub,
   }
@@ -210,14 +216,6 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
           "mandatory": False,
           "description": "Options are:\n{}".format('\n'.join(VALID_STATES))
       },
-  }
-
-  similarity_options = {
-      "relevant_types": {
-          "Objective": {"weight": 2},
-          "Control": {"weight": 2},
-      },
-      "threshold": 1,
   }
 
   def __init__(self, *args, **kwargs):

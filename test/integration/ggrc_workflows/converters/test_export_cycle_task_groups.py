@@ -33,6 +33,7 @@ class TestExportTasks(TestCase):
 
   def generate_tasks_for_cycle(self, group_count, task_count):
     """generate number of task groups and task for current task group"""
+    role_names = ("Task Assignees", "Task Secondary Assignees")
     results = {}
     with single_commit():
       workflow = factories.WorkflowFactory()
@@ -45,20 +46,21 @@ class TestExportTasks(TestCase):
         for _ in range(task_count):
           task_group_task = factories.TaskGroupTaskFactory(
               task_group=task_group)
-          ggrc_factories.AccessControlListFactory(
-              object=task_group_task,
-              person=person,
-              ac_role_id=self.get_role_id_for_obj(task_group_task,
-                                                  "Task Assignees")
-          )
+          for r_name in role_names:
+            ggrc_factories.AccessControlListFactory(
+                object=task_group_task,
+                person=person,
+                ac_role_id=self.get_role_id_for_obj(task_group_task, r_name)
+            )
           task = factories.CycleTaskFactory(cycle=cycle,
                                             cycle_task_group=cycle_task_group,
                                             task_group_task=task_group_task)
-          ggrc_factories.AccessControlListFactory(
-              object=task,
-              person=person,
-              ac_role_id=self.get_role_id_for_obj(task, "Task Assignees")
-          )
+          for r_name in role_names:
+            ggrc_factories.AccessControlListFactory(
+                object=task,
+                person=person,
+                ac_role_id=self.get_role_id_for_obj(task, r_name)
+            )
           results[task.id] = cycle_task_group.slug
     return results
 
@@ -189,6 +191,31 @@ class TestExportTasks(TestCase):
       self.assertEqual(1, len(assignees))
       self.assert_slugs("task assignees", assignees[0].email, [slug])
       self.assert_slugs("task assignees", assignees[0].name, [slug])
+
+  @data(
+      #  (Cycle count, tasks in cycle)
+      (0, 0),
+      (1, 1),
+      (2, 1),
+      (2, 1),
+      (2, 2),
+  )
+  @unpack  # pylint: disable=invalid-name
+  def test_filter_by_task_secondary_assignee(self, group_count, task_count):
+    """Test filter cycles by task secondary assignee name or email"""
+    generated = self.generate_tasks_for_cycle(group_count, task_count)
+    self.assertEqual(bool(group_count), bool(generated))
+    for task_id, slug in generated.iteritems():
+      task = CycleTaskGroupObjectTask.query.filter(
+          CycleTaskGroupObjectTask.id == task_id
+      ).one()
+      s_assignees = list(
+          self.get_persons_for_role_name(task, "Task Secondary Assignees"))
+      self.assertEqual(1, len(s_assignees))
+      self.assert_slugs("task secondary assignees",
+                        s_assignees[0].email, [slug])
+      self.assert_slugs("task secondary assignees",
+                        s_assignees[0].name, [slug])
 
   @data(
       #  (Cycle count, tasks in cycle)

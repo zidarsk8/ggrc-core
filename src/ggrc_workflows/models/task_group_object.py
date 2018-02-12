@@ -26,6 +26,11 @@ class TaskGroupObject(Timeboxed, Base, db.Model):
   object_type = db.Column(db.String, nullable=False)
 
   @property
+  def workflow(self):
+    """Property which returns parent workflow object."""
+    return self.task_group.workflow
+
+  @property
   def object_attr(self):
     return '{0}_object'.format(self.object_type)
 

@@ -92,7 +92,7 @@ class TestRecurringCycleNotifications(TestCase):
     self.quarterly_wf_1 = {
         "title": "quarterly wf 1",
         "description": "",
-        "owners": [person_dict(self.assignee.id)],
+        # admin will be current user with id == 1
         "unit": "month",
         "repeat_every": 3,
         "notify_on_change": True,

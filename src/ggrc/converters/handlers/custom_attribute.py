@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Handlers used for custom attribute columns."""
-
+from datetime import datetime
 from dateutil.parser import parse
 
 from sqlalchemy import and_
@@ -13,6 +13,17 @@ from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
 
 _types = models.CustomAttributeDefinition.ValidTypes
+
+
+def _get_ca_date_value(value):
+  """Extract formatted value for ca with date type."""
+  try:
+    attr_val = datetime.strptime(
+        value.attribute_value, "%Y-%m-%d"
+    ).strftime("%m/%d/%Y")
+  except ValueError:
+    attr_val = u""
+  return attr_val
 
 
 class CustomAttributeColumHandler(handlers.TextColumnHandler):
@@ -88,6 +99,8 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
           except ValueError:
             attr_val = False
           return str(bool(attr_val)).upper()
+        elif value.custom_attribute.attribute_type == _types.DATE:
+          return _get_ca_date_value(value)
         else:
           return value.attribute_value
 

@@ -363,13 +363,15 @@ def compute_values(affected_objects, all_relationships, snapshot_map):
     aggregate_function = get_aggregate_function(attr)
     for obj in objects:
       source_id, value = aggregate_function(aggregate_values, rel_map[obj])
+      if source_id is None:
+        continue
 
       computed_values[attr][obj] = {
           "source_type": aggregate_type,
           "source_id": source_id,
           "value_datetime": value,
           "value_integer": None,
-          "value_string": None,
+          "value_string": "",
       }
       for snapshot_id in snapshot_map.get(obj, set()):
         computed_values[attr][(u"Snapshot", snapshot_id)] = {
@@ -377,7 +379,7 @@ def compute_values(affected_objects, all_relationships, snapshot_map):
             "source_id": source_id,
             "value_datetime": value,
             "value_integer": None,
-            "value_string": None,
+            "value_string": "",
         }
 
   return computed_values

@@ -11,9 +11,10 @@ import sqlalchemy as sa
 
 from sqlalchemy.orm import load_only
 from sqlalchemy.orm.session import Session
+from sqlalchemy.sql.expression import true
 
-from ggrc import db
 from ggrc.models import all_models
+from ggrc.models.hooks.acl.acl_manager import ACLManager
 from ggrc.models.relationship import Stub, RelationshipsCache
 from ggrc.models.hooks.relationship import related
 
@@ -29,23 +30,16 @@ def _get_cache(expr, name):
   return result
 
 
-def _get_program_editor_role():
-  """Cache captain and auditor roles"""
-  return _get_cache(lambda: db.session.query(all_models.Role).options(
-      load_only("id", "name")).filter(
-      all_models.Role.name == "ProgramEditor").first(),
-      "acl_program_editor")
-
-
-def _get_acl_audit_roles():
+def _get_acl_non_editable_roles():
   """Cache captain and auditor roles"""
   return _get_cache(lambda: {
-      role.name: role.id for role in all_models.AccessControlRole.query.filter(
-          # Using like `Audit%` because all audit roles start with `Audit`
-          # e.g. Auditors, Audit Captains, Audit Captains Mapped
-          all_models.AccessControlRole.name.like("Audit%")
-      ).options(load_only("id", "name")).all()
-  }, "acl_audit_roles")
+      role.name: role.id for role in
+      all_models.AccessControlRole.query.filter(
+          # We only load system roles and skip the ones created by users
+          all_models.AccessControlRole.non_editable == true()
+      ).options(
+          load_only("id", "name")).all()
+  }, "acl_non_editable_roles")
 
 
 def _get_acr_id(acl):
@@ -55,27 +49,6 @@ def _get_acr_id(acl):
   if acl.ac_role is not None:
     return acl.ac_role.id
   return None
-
-
-class AccessControlListCache(object):  # pylint: disable=R0903
-  """Access Control List helper"""
-  def __init__(self):
-    self.cache = set()
-
-  def add(self, obj, parent, person, role_id):
-    """Add new item if it wasn't already added"""
-    key = (obj.id, obj.type, person.id, role_id, parent.id)
-    if key in self.cache:
-      return
-    self.cache.add(key)
-    acl = all_models.AccessControlList(
-        object_id=obj.id,
-        object_type=obj.type,
-        parent=parent,
-        person=person,
-        ac_role_id=role_id)
-    if hasattr(obj, "access_control_list"):
-      obj.access_control_list.append(acl)
 
 
 class AuditRolesHandler(object):
@@ -92,7 +65,7 @@ class AuditRolesHandler(object):
 
     # Add Audit Captains Mapped role to all the objects in the audit
     snapshots_cache = self.caches["snapshots_cache"]
-    acl_cache = self.caches["access_control_list_cache"]
+    acl_manager = self.caches["access_control_list_manager"]
     relationship_cache = self.caches["relationship_cache"]
 
     if audit.id not in snapshots_cache:
@@ -102,7 +75,8 @@ class AuditRolesHandler(object):
       ).options(load_only("id")).all()
 
     for snapshot in snapshots_cache[audit.id]:
-      acl_cache.add(snapshot, acl, acl.person, role_map["Snapshot"])
+      acl_manager.get_or_create(
+          snapshot, acl, acl.person, role_map["Snapshot"])
 
     # Add Audit Captains Mapped to all related
     audit_stub = Stub(acl.object_type, acl.object_id)
@@ -112,7 +86,7 @@ class AuditRolesHandler(object):
       if stub.type not in ("Assessment", "AssessmentTemplate", "Issue",
                            "Comment", "Document"):
         continue
-      acl_cache.add(stub, acl, acl.person, role_map[stub.type])
+      acl_manager.get_or_create(stub, acl, acl.person, role_map[stub.type])
 
     # Add Audit Captains Mapped to all realted comments and documents
     mapped_stubs = related(related_stubs[audit_stub], relationship_cache)
@@ -120,7 +94,7 @@ class AuditRolesHandler(object):
       for stub in mapped_stubs[parent]:
         if stub.type not in ("Comment", "Document"):
           continue
-        acl_cache.add(stub, acl, acl.person, role_map[stub.type])
+        acl_manager.get_or_create(stub, acl, acl.person, role_map[stub.type])
 
   def _auditors_handler(self, acl, audit_roles):
     """Handle auditor role propagation"""
@@ -140,24 +114,18 @@ class AuditRolesHandler(object):
 
     # Add program editor to program
     program = audit.program
-    if not any(ur for ur in program.context.user_roles
-               if ur.person_id == acl.person_id):
-      program_editor = _get_program_editor_role()
-      db.session.add(
-          all_models.UserRole(
-              role=program_editor,
-              context=program.context,
-              person=acl.person,
-              person_id=acl.person_id
-          )
-      )
+    if not any(pacl.person == acl.person for pacl in
+               program.access_control_list):
+      acl_manager = self.caches["access_control_list_manager"]
+      acl_manager.get_or_create(
+          program, acl, acl.person, audit_roles["Program Editors"])
 
     role_map = defaultdict(lambda: audit_roles['Audit Captains Mapped'])
     self._create_mapped_acls(acl, role_map)
 
   def handle_access_control_list(self, obj):
     """Handle Access Control List creation"""
-    audit_roles = _get_acl_audit_roles()
+    audit_roles = _get_acl_non_editable_roles()
     role_handlers = {
         audit_roles["Audit Captains"]: self._audit_captains_handler,
         audit_roles["Auditors"]: self._auditors_handler,
@@ -167,7 +135,7 @@ class AuditRolesHandler(object):
 
   def handle_snapshot(self, obj):
     """Handle snapshot creation"""
-    audit_roles = _get_acl_audit_roles()
+    audit_roles = _get_acl_non_editable_roles()
     access_control_list = obj.parent.access_control_list
     role_map = {
         audit_roles["Auditors"]: audit_roles["Auditors Snapshot Mapped"],
@@ -176,8 +144,8 @@ class AuditRolesHandler(object):
     for acl in access_control_list:
       if acl.ac_role.id not in role_map:
         continue
-      acl_cache = self.caches["access_control_list_cache"]
-      acl_cache.add(obj, acl, acl.person, role_map[acl.ac_role.id])
+      acl_manager = self.caches["access_control_list_manager"]
+      acl_manager.get_or_create(obj, acl, acl.person, role_map[acl.ac_role.id])
 
   def handle_relationship(self, obj):
     """Handle relationship creation"""
@@ -209,7 +177,7 @@ class AuditRolesHandler(object):
                               all_models.Comment)):
       return
 
-    audit_roles = _get_acl_audit_roles()
+    audit_roles = _get_acl_non_editable_roles()
     auditors_mapped_dict = defaultdict(
         lambda: audit_roles["Auditors Mapped"], {
             all_models.Assessment: audit_roles["Auditors Assessment Mapped"],
@@ -231,16 +199,16 @@ class AuditRolesHandler(object):
       ac_role_id = _get_acr_id(acl)
       if ac_role_id not in role_map:
         continue
-      acl_cache = self.caches["access_control_list_cache"]
-      acl_cache.add(other, acl, acl.person,
-                    role_map[ac_role_id][type(other)])
+      acl_manager = self.caches["access_control_list_manager"]
+      acl_manager.get_or_create(other, acl, acl.person,
+                                role_map[ac_role_id][type(other)])
 
   def after_flush(self, session, _):
     """Handle legacy audit captain -> program editor role propagation"""
     self.caches = {
         "relationship_cache": RelationshipsCache(),
         "snapshots_cache": {},
-        "access_control_list_cache": AccessControlListCache()
+        "access_control_list_manager": ACLManager()
     }
     handlers = {
         all_models.AccessControlList: self.handle_access_control_list,

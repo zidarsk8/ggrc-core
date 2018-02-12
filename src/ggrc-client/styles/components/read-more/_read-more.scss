@@ -1,0 +1,45 @@
+/* Read-More Component CSS spec */
+
+read-more {
+  display: block;
+  position: relative;
+
+  @for $i from 1 through 10 {
+    .ellipsis-truncation-#{$i} {
+      display: -webkit-box !important;
+      text-overflow: ellipsis;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: $i;
+    }
+  }
+
+  .read-more {
+    &.overflowing {
+      margin-bottom: 20px;
+    }
+  }
+
+  .read-more__body {
+    display: block;
+    overflow: hidden;
+    box-sizing: border-box;
+    word-break: break-word;
+  }
+
+  .read-more__controls {
+    position: absolute;
+    right: 0;
+    line-height: 20px;
+    text-align: right;
+
+    .read-more__btn {
+      display: inline-block;
+      box-sizing: border-box;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+}

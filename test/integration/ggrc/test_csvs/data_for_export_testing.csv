@@ -1,6 +1,6 @@
 ,,,,,,,,,,,,,,,,,,,,
 Object Type,,,,,,,,,,,,,,,,,,,,
-program,Title,Description,Notes,Manager,Reference URL,Primary Contacts,Code,Effective Date,State,map:policy,map:contract,map:  regulation,map: control,,map: objective,,,,,
+program,Title,Description,Notes,Program Managers,Reference URL,Primary Contacts,Code,Effective Date,State,map:policy,map:contract,map:  regulation,map: control,,map: objective,,,,,
 ,Cat ipsum 1,Climb leg rub face on everything give attitude nap all day for under the bed. Chase mice attack feet,,smotko@example.com,http://www.google.com,sec.con@example.com,prog-1,5/9/2015,Draft,"policy-1
 policy-2
 policy-3
@@ -599,7 +599,7 @@ Weekly
 Monthly
 Quarterly
 Annually",,,,,,,,,,,,,,,
-Workflow,code*,title*,description,manager,repeat every,unit,force real-time email updates,custom email message,member,Need Verification,,,,,,,,,,
+Workflow,code*,title*,description,admin,repeat every,unit,force real-time email updates,custom email message,workflow member,Need Verification,,,,,,,,,,
 ,wf-1,wf-1,test,user1@ggrc.com,-,-,no,this is super custom,user2@ggrc.com,False,,,,,,,,,,
 ,wf-2,wf-2,test,user1@ggrc.com,1,week,yes,this is super custom,user2@ggrc.com,False,,,,,,,,,,
 ,wf-3,wf-3,test,user1@ggrc.com,1,month,no,this is super custom,user2@ggrc.com,False,,,,,,,,,,

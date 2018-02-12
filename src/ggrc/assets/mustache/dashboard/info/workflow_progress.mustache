@@ -15,11 +15,14 @@
               <div class="tree-title-area">
                 <div class="oneline">
                   <a href="{{viewLink}}#current_widget">{{ins.title}}</a>
-                  <ul class="item-util">
-                    <li>
-                      {{{render '/static/mustache/dashboard/info/wf_owner.mustache' instance=ins stacked=true}}}
-                    </li>
-                  </ul>
+                  <div class="tree-title-area__subtitle">
+                    <div class="tree-title-area__subtitle-label">
+                      Owned by:&nbsp
+                    </div>
+                    <people-with-role-inline-field
+                      {instance}="ins"
+                      {role}="ins.class.tree_view_options.adminRoleName" />
+                  </div>
                 </div>
               </div>
             </div>

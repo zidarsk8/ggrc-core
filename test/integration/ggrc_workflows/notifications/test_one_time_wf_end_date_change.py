@@ -12,6 +12,7 @@ from ggrc.models import all_models
 from ggrc.notifications import common
 from ggrc_workflows.models import Cycle, CycleTaskGroupObjectTask
 from integration.ggrc import TestCase
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc_workflows.generator import WorkflowsGenerator
@@ -73,7 +74,7 @@ class TestOneTimeWfEndDateChange(TestCase):
       _, notif_data = common.get_daily_notifications()
       self.assertEqual(notif_data, {})
 
-      # one email to owner and one to assigne
+      # one email to admin and one to assigne
       self.assertEqual(mock_mail.call_count, 2)
 
     with freeze_time("2015-05-04 03:21:34"):  # one day before due date
@@ -88,7 +89,7 @@ class TestOneTimeWfEndDateChange(TestCase):
       _, notif_data = common.get_daily_notifications()
       self.assertEqual(notif_data, {})
 
-      # one email to owner and one to assigne
+      # one email to admin and one to assigne
       self.assertEqual(mock_mail.call_count, 3)
 
     with freeze_time("2015-05-05 03:21:34"):  # due date
@@ -129,7 +130,7 @@ class TestOneTimeWfEndDateChange(TestCase):
       _, notif_data = common.get_daily_notifications()
       self.assertEqual(notif_data, {})
 
-      # one email to owner and one to assigne
+      # one email to admin and one to assigne
       self.assertEqual(mock_mail.call_count, 2)
 
     with freeze_time("2015-05-03 03:21:34"):
@@ -187,7 +188,7 @@ class TestOneTimeWfEndDateChange(TestCase):
       _, notif_data = common.get_daily_notifications()
       self.assertEqual(notif_data, {})
 
-      # one email to owner and one to assignee
+      # one email to admin and one to assignee
       self.assertEqual(mock_mail.call_count, 2)
 
     with freeze_time("2015-05-03 03:21:34"):
@@ -232,7 +233,7 @@ class TestOneTimeWfEndDateChange(TestCase):
       _, notif_data = common.get_daily_notifications()
       self.assertEqual(notif_data, {})
 
-      # one email to owner and one to assigne
+      # one email to admin and one to assigne
       self.assertEqual(mock_mail.call_count, 2)
 
     with freeze_time("2015-05-03 03:21:34"):
@@ -296,7 +297,7 @@ class TestOneTimeWfEndDateChange(TestCase):
         "title": "one time test workflow",
         "notify_on_change": True,
         "description": "some test workflow",
-        "owners": [person_dict(self.user.id)],
+        # admin will be current user with id == 1
         "task_groups": [{
             "title": "one time task group",
             "contact": person_dict(self.user.id),
@@ -305,19 +306,15 @@ class TestOneTimeWfEndDateChange(TestCase):
                 "description": "some task",
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
-                "access_control_list": [{
-                    "person": {"id": self.user.id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.user.id)],
             }, {
                 "title": "task 2",
                 "description": "some task 2",
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
-                "access_control_list": [{
-                    "person": {"id": self.user.id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.user.id)],
             }],
             "task_group_objects": self.random_objects
         }]

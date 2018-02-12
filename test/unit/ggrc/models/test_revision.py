@@ -178,6 +178,35 @@ class TestCheckPopulatedContent(unittest.TestCase):
       self.assertEqual(revision.populate_labels()["labels"],
                        expected)
 
+  @ddt.data([{"status": "Active"}, {"status": "Active"}, "AccessGroup"],
+            [{"status": "Deprecated"}, {"status": "Deprecated"}, "Clause"],
+            [{"status": "Draft"}, {"status": "Draft"}, "Control"],
+            [{"status": "Effective"}, {"status": "Active"}, "DataAsset"],
+            [{"status": "Final"}, {"status": "Active"}, "Directive"],
+            [{"status": "In Scope"}, {"status": "Active"}, "Facility"],
+            [{"status": "Ineffective"}, {"status": "Active"}, "Issue"],
+            [{"status": "Launched"}, {"status": "Active"}, "Market"],
+            [{"status": "Not in Scope"}, {"status": "Draft"}, "Objective"],
+            [{"status": "Not Launched"}, {"status": "Draft"}, "OrgGroup"],
+            [{"status": "Not Launched"}, {"status": "Draft"}, "Product"],
+            [{"status": "Not Launched"}, {"status": "Draft"}, "Program"],
+            [{"status": "Not Launched"}, {"status": "Draft"}, "Project"],
+            [{"status": "Not Launched"}, {"status": "Draft"}, "Section"],
+            [{"status": "Not Launched"}, {"status": "Draft"}, "System"],
+            [{"status": "Not Launched"}, {"status": "Draft"}, "Vendor"],
+            [{"status": "Not Launched"}, {"status": "Draft"}, "Risk"],
+            [{"status": "Not Launched"}, {"status": "Draft"}, "Threat"],
+            [{"status": "Not Launched"}, {}, "Regulation"])
+  @ddt.unpack
+  def test_populated_status(self, content, expected_content, resource_type):
+    """Test populated content with status '{0}' to '{1}' in Model '{2}'."""
+    obj = mock.Mock()
+    obj.id = self.object_id
+    obj.__class__.__name__ = resource_type
+
+    revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
+    self.assertEqual(revision.populate_status(), expected_content)
+
   @ddt.data(
       ({}, {}),
       ({"document_evidence": []}, {"document_evidence": []}),
@@ -217,3 +246,20 @@ class TestCheckPopulatedContent(unittest.TestCase):
         revision._document_evidence_hack(),
         expected_evidence,
     )
+
+  @ddt.data(
+      ({}, {}),
+      ({"custom_attribute_values": [], "custom_attributes": []}, {}),
+      ({"custom_attributes": []}, {"custom_attribute_values": []}),
+      ({"custom_attributes": [1, 2, 3]},
+       {"custom_attribute_values": [1, 2, 3]}),
+      ({"custom_attribute_values": [1, 2, 3]}, {}),
+  )
+  @ddt.unpack
+  def test_populated_content_cavs(self, content, expected_content):
+    """Test populated cavs content for revision if start content is {0}."""
+    obj = mock.Mock()
+    obj.id = self.object_id
+    obj.__class__.__name__ = self.object_type
+    revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
+    self.assertEqual(expected_content, revision.populate_cavs())

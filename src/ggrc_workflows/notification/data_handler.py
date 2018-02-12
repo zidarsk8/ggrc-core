@@ -14,14 +14,13 @@ from datetime import date
 from logging import getLogger
 from urlparse import urljoin
 
-from sqlalchemy import and_, orm
+from sqlalchemy import orm
 
 from ggrc import db
 from ggrc import utils
 from ggrc.models.revision import Revision
 from ggrc.notifications import data_handlers
 from ggrc.utils import merge_dicts, get_url_root
-from ggrc_basic_permissions.models import Role, UserRole
 from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import CycleTaskGroupObjectTask
 from ggrc_workflows.models import Workflow
@@ -52,9 +51,11 @@ def get_cycle_created_task_data(notification):
 
   force = cycle.workflow.notify_on_change
 
-  task_assignees = cycle_task.get_persons_for_rolename("Task Assignees")
+  task_assignees = set().union(
+      cycle_task.get_persons_for_rolename("Task Assignees"),
+      cycle_task.get_persons_for_rolename("Task Secondary Assignees"))
   task_group_assignee = data_handlers.get_person_dict(cycle_task_group.contact)
-  workflow_owners = get_workflow_owners_dict(cycle.context_id)
+  workflow_admins = get_workflow_admins_dict(cycle.workflow)
   task = {
       cycle_task.id: get_cycle_task_dict(cycle_task)
   }
@@ -89,10 +90,10 @@ def get_cycle_created_task_data(notification):
         }
     }
     result = merge_dicts(result, assignee_data)
-  for workflow_owner in workflow_owners.itervalues():
-    wf_owner_data = {
-        workflow_owner['email']: {
-            "user": workflow_owner,
+  for workflow_admin in workflow_admins.itervalues():
+    wf_admin_data = {
+        workflow_admin['email']: {
+            "user": workflow_admin,
             "force_notifications": {
                 notification.id: force
             },
@@ -103,7 +104,7 @@ def get_cycle_created_task_data(notification):
             }
         }
     }
-    result = merge_dicts(result, wf_owner_data)
+    result = merge_dicts(result, wf_admin_data)
   return result
 
 
@@ -117,8 +118,8 @@ def get_cycle_task_due(notification, tasks_cache=None, del_rels_cache=None):
     del_rels_cache (dict): prefetched Revision instances representing the
       relationships to Tasks that were deleted grouped by task ID as a key
   Returns:
-    Data aggregated in a dictionary, grouped by task assignee's email address,
-    which is used as a key.
+    Data aggregated in a dictionary, grouped by task
+    assignee/secondary assignee's email address, which is used as a key.
   """
   if tasks_cache is None:
     tasks_cache = {}
@@ -132,7 +133,9 @@ def get_cycle_task_due(notification, tasks_cache=None, del_rels_cache=None):
         '%s for notification %s not found.',
         notification.object_type, notification.id)
     return {}
-  task_assignees = cycle_task.get_persons_for_rolename("Task Assignees")
+  task_assignees = set().union(
+      cycle_task.get_persons_for_rolename("Task Assignees"),
+      cycle_task.get_persons_for_rolename("Task Secondary Assignees"))
   if not task_assignees:
     logger.warning(
         'Contact for cycle task %s not found.',
@@ -185,7 +188,7 @@ def get_cycle_task_overdue_data(
       relationships to Tasks that were deleted grouped by task ID as a key
   Returns:
     Dictionary containing the compiled data under the key that equals the
-    overdue task assignee's email address.
+    overdue task assignee/secondary assignee's email address.
   """
   if tasks_cache is None:
     tasks_cache = {}
@@ -199,7 +202,9 @@ def get_cycle_task_overdue_data(
         '%s for notification %s not found.',
         notification.object_type, notification.id)
     return {}
-  assignees = cycle_task.get_persons_for_rolename("Task Assignees")
+  assignees = set().union(
+      cycle_task.get_persons_for_rolename("Task Assignees"),
+      cycle_task.get_persons_for_rolename("Task Secondary Assignees"))
   if not assignees:
     logger.warning(
         'Contact for cycle task %s not found.',
@@ -238,14 +243,14 @@ def get_cycle_task_overdue_data(
 
 
 def get_all_cycle_tasks_completed_data(notification, cycle):
-  workflow_owners = get_workflow_owners_dict(cycle.context_id)
+  workflow_admins = get_workflow_admins_dict(cycle.workflow)
   force = cycle.workflow.notify_on_change
   result = {}
 
-  for workflow_owner in workflow_owners.itervalues():
+  for workflow_admin in workflow_admins.itervalues():
     wf_data = {
-        workflow_owner['email']: {
-            "user": workflow_owner,
+        workflow_admin['email']: {
+            "user": workflow_admin,
             "today": date.today(),
             "force_notifications": {
                 notification.id: force
@@ -267,9 +272,10 @@ def get_cycle_created_data(notification, cycle):
   force = cycle.workflow.notify_on_change
   result = {}
 
-  for user_role in cycle.workflow.context.user_roles:
-    person = user_role.person
-    print person.email, "wfo"
+  people_with_role = (
+      cycle.workflow.get_persons_for_rolename("Admin") +
+      cycle.workflow.get_persons_for_rolename("Workflow Member"))
+  for person in people_with_role:
     result[person.email] = {
         "user": data_handlers.get_person_dict(person),
         "force_notifications": {
@@ -299,7 +305,9 @@ def get_cycle_data(notification):
 def get_cycle_task_declined_data(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
   if cycle_task:
-    assignees = cycle_task.get_persons_for_rolename("Task Assignees")
+    assignees = set().union(
+        cycle_task.get_persons_for_rolename("Task Assignees"),
+        cycle_task.get_persons_for_rolename("Task Secondary Assignees"))
   else:
     assignees = []
   if not assignees:
@@ -430,11 +438,12 @@ def get_workflow_starts_in_data(notification, workflow):
     return {}  # this can only be if the cycle has successfully started
   result = {}
 
-  workflow_owners = get_workflow_owners_dict(workflow.context_id)
   force = workflow.notify_on_change
 
-  for user_roles in workflow.context.user_roles:
-    wf_person = user_roles.person
+  people_with_role = (
+      workflow.get_persons_for_rolename("Admin") +
+      workflow.get_persons_for_rolename("Workflow Member"))
+  for wf_person in people_with_role:
     result[wf_person.email] = {
         "user": data_handlers.get_person_dict(wf_person),
         "force_notifications": {
@@ -442,7 +451,6 @@ def get_workflow_starts_in_data(notification, workflow):
         },
         "cycle_starts_in": {
             workflow.id: {
-                "workflow_owners": workflow_owners,
                 "workflow_url": get_workflow_url(workflow),
                 "start_date": workflow.next_cycle_start_date,
                 "start_date_statement": utils.get_digest_date_statement(
@@ -463,18 +471,17 @@ def get_cycle_start_failed_data(notification, workflow):
     return {}  # this can only be if the cycle has successfully started
 
   result = {}
-  workflow_owners = get_workflow_owners_dict(workflow.context_id)
+  workflow_admins = get_workflow_admins_dict(workflow)
   force = workflow.notify_on_change
 
-  for wf_owner in workflow_owners.itervalues():
-    result[wf_owner["email"]] = {
-        "user": wf_owner,
+  for wf_admin in workflow_admins.itervalues():
+    result[wf_admin["email"]] = {
+        "user": wf_admin,
         "force_notifications": {
             notification.id: force
         },
         "cycle_start_failed": {
             workflow.id: {
-                "workflow_owners": workflow_owners,
                 "workflow_url": get_workflow_url(workflow),
                 "start_date": workflow.next_cycle_start_date,
                 "start_date_statement": utils.get_digest_date_statement(
@@ -512,12 +519,10 @@ def get_object(obj_class, obj_id):
   return None
 
 
-def get_workflow_owners_dict(context_id):
-  owners = db.session.query(UserRole).join(Role).filter(
-      and_(UserRole.context_id == context_id,
-           Role.name == "WorkflowOwner")).all()
-  return {user_role.person.id: data_handlers.get_person_dict(user_role.person)
-          for user_role in owners}
+def get_workflow_admins_dict(workflow):
+  wfa_people = workflow.get_persons_for_rolename("Admin")
+  return {person.id: data_handlers.get_person_dict(person)
+          for person in wfa_people}
 
 
 def _get_object_info_from_revision(revision, known_type):
@@ -589,13 +594,11 @@ def get_cycle_task_dict(cycle_task, del_rels_cache=None):
 
 
 def get_cycle_dict(cycle, manual=False):
-  workflow_owners = get_workflow_owners_dict(cycle.context_id)
   return {
       "manually": manual,
       "custom_message": cycle.workflow.notify_custom_message,
       "cycle_slug": cycle.slug,
       "cycle_title": cycle.title,
-      "workflow_owners": workflow_owners,
       "cycle_url": cycle.cycle_url,
       "cycle_inactive_url": cycle.cycle_inactive_url,
   }

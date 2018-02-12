@@ -5,10 +5,8 @@
 """
 
 from logging import getLogger
-import sqlalchemy as sa
 from sqlalchemy import orm
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.declarative import declared_attr
 from werkzeug.exceptions import BadRequest
 
 from ggrc import builder
@@ -52,7 +50,7 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
   IMPORTABLE_FIELDS = (
       'slug', 'title', 'description', 'start_date',
       'end_date', 'finished_date', 'verified_date',
-      'status', '__acl__:Task Assignees',
+      'status', '__acl__:Task Assignees', '__acl__:Task Secondary Assignees',
   )
 
   @classmethod
@@ -154,6 +152,10 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
       reflection.Attribute('verified_date', create=False, update=False),
       reflection.Attribute('allow_change_state', create=False, update=False),
       reflection.Attribute('folder', create=False, update=False),
+      reflection.Attribute('workflow', create=False, update=False),
+      reflection.Attribute('workflow_title', create=False, update=False),
+      reflection.Attribute('cycle_task_group_title', create=False,
+                           update=False),
   )
 
   default_description = "<ol>"\
@@ -201,6 +203,21 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
   }
 
   @builder.simple_property
+  def cycle_task_group_title(self):
+    """Property. Returns parent CycleTaskGroup title."""
+    return self.cycle_task_group.title
+
+  @builder.simple_property
+  def workflow_title(self):
+    """Property. Returns parent Workflow's title."""
+    return self.workflow.title
+
+  @builder.simple_property
+  def workflow(self):
+    """Property which returns parent workflow object."""
+    return self.cycle.workflow
+
+  @builder.simple_property
   def related_objects(self):
     """Compute and return a list of all the objects related to this cycle task.
 
@@ -215,42 +232,16 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
     destinations = [r.destination for r in self.related_destinations]
     return sources + destinations
 
-  @declared_attr
-  def wfo_roles(self):
-    """WorkflowOwner UserRoles in parent Workflow.
-
-    Relies on self.context_id = parent_workflow.context_id.
-    """
-    from ggrc_basic_permissions import models as bp_models
-
-    def primaryjoin():
-      """Join UserRoles by context_id = self.context_id and role_id = WFO."""
-      workflow_owner_role_id = db.session.query(
-          bp_models.Role.id,
-      ).filter(
-          bp_models.Role.name == "WorkflowOwner",
-      ).subquery()
-      ur_context_id = sa.orm.foreign(bp_models.UserRole.context_id)
-      ur_role_id = sa.orm.foreign(bp_models.UserRole.role_id)
-      return sa.and_(self.context_id == ur_context_id,
-                     workflow_owner_role_id == ur_role_id)
-
-    return db.relationship(
-        bp_models.UserRole,
-        primaryjoin=primaryjoin,
-        viewonly=True,
-    )
-
   @builder.simple_property
   def allow_change_state(self):
-    return self.cycle.is_current and self.current_user_wfo_or_assignee()
+    return self.cycle.is_current and self.current_user_wfa_or_assignee()
 
-  def current_user_wfo_or_assignee(self):
-    """Current user is Workflow owner or Assignee for self."""
-    wfo_person_ids = {ur.person_id for ur in self.wfo_roles}
-    assignees_ids = {p.id for p in
-                     self.get_persons_for_rolename("Task Assignees")}
-    return login.get_current_user_id() in (wfo_person_ids | assignees_ids)
+  def current_user_wfa_or_assignee(self):
+    """Current user is WF Admin, Assignee or Secondary Assignee for self."""
+    wfa_ids = self.workflow.get_person_ids_for_rolename("Admin")
+    ta_ids = self.get_person_ids_for_rolename("Task Assignees")
+    tsa_ids = self.get_person_ids_for_rolename("Task Secondary Assignees")
+    return login.get_current_user_id() in set().union(wfa_ids, ta_ids, tsa_ids)
 
   @classmethod
   def _filter_by_cycle(cls, predicate):
@@ -303,7 +294,6 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
            .joinedload('workflow')
            .undefer_group('Workflow_complete'),
         orm.joinedload('cycle_task_entries'),
-        orm.subqueryload('wfo_roles'),
     )
 
   @classmethod
@@ -395,7 +385,7 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
     # Bulk update works only on MyTasks page. Don't need to check for
     # WorkflowMembers' permissions here. User should update only his own tasks.
     updatable_objects = [obj for obj in updatable_objects
-                         if obj.current_user_wfo_or_assignee()]
+                         if obj.current_user_wfa_or_assignee()]
     # Queries count is constant because we are using eager query for objects.
     for obj in updatable_objects:
       obj.status = new_state
