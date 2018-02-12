@@ -117,9 +117,6 @@ const events = {
   '{can.Model.Cacheable} destroyed': function (model) {
     this.viewModel._handle_refresh(model);
   },
-  'button click': function () {
-    this.viewModel.activateWorkflow();
-  },
 };
 
 const init = function () {
