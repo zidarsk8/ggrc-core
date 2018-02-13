@@ -315,7 +315,7 @@ class RelatedAssessmentsResource(common.Resource):
         single_json["documents"] = document_json_map[assessment.id]
         single_json["audit"]["selfLink"] = utils.view_url_for(
             assessment.audit)
-        single_json["selfLink"] = utils.url_for(assessment)
+        single_json["selfLink"] = utils.view_url_for(assessment)
         assessments_json.append(single_json)
       return assessments_json
 
