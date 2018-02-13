@@ -103,10 +103,7 @@ import '../components/inline/people-with-role-inline-field';
           dfd = $.Deferred(),
           task_count = 0,
           finished = 0,
-          in_progress = 0,
-          declined = 0,
           verified = 0,
-          assigned = 0,
           over_due = 0,
           today = new Date(),
           first_end_date,
@@ -136,15 +133,6 @@ import '../components/inline/people-with-role-inline-field';
               case 'Finished':
                 finished++;
                 break;
-              case 'InProgress':
-                in_progress++;
-                break;
-              case 'Declined':
-                declined++;
-                break;
-              case 'Assigned':
-                assigned++;
-                break;
             }
           }
           //Update Task_data object for workflow and Calculate %
@@ -152,16 +140,9 @@ import '../components/inline/people-with-role-inline-field';
             task_data.task_count = task_count;
             task_data.finished = finished;
             task_data.finished_percentage = ((finished * 100) / task_count).toFixed(2); //precision up to 2 decimal points
-            task_data.in_progress = in_progress;
-            task_data.in_progress_percentage = ((in_progress * 100) / task_count).toFixed(2);
             task_data.verified = verified;
             task_data.verified_percentage = ((verified * 100) / task_count).toFixed(2);
-            task_data.declined = declined;
-            task_data.declined_percentage = ((declined * 100) / task_count).toFixed(2);
             task_data.over_due = over_due;
-            task_data.over_due_percentage = ((over_due * 100) / task_count).toFixed(2);
-            task_data.assigned = assigned;
-            task_data.assigned_percentage = ((assigned * 100) / task_count).toFixed(2);
             task_data.first_end_dateD = first_end_date;
             task_data.first_end_date = first_end_date.toLocaleDateString();
             //calculate days left for first_end_date
