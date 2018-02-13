@@ -36,6 +36,7 @@
     },
     defaults: {
       task_group_title: 'Task Group 1',
+      is_verification_needed: false,
     },
     obj_nav_options: {
       show_all_tabs: true,
