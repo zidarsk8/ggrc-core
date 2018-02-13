@@ -47,10 +47,11 @@
     More info
   </div>
 </div>
-<div class="grid-data-body center-empty-message {{#isLoading}}loading{{/isLoading}}">
-    <spinner {toggle}="loading" class="spinner-wrapper active"
-               extra-css-class="grid-spinner"></spinner>
-    <object-list {(items)}="relatedAssessments" {is-loading}="isLoading" spinner-css="grid-spinner"
+<div class="grid-data-body center-empty-message {{#loading}}loading{{/loading}}">
+  <div class="tree-spinner">
+    <spinner {toggle}="loading" class="spinner-wrapper active" size="large" extra-css-class="grid-spinner"></spinner>
+  </div>
+    <object-list {(items)}="relatedAssessments"
                  {(selected-item)}="selectedItem"
                  {item-selector}="objectSelectorEl" {empty-message}="noRelatedObjectsMessage" class="object-list__limited-height">
         <div class="grid-data-row flex-row flex-box">
