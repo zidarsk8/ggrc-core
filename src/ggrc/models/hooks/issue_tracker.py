@@ -686,7 +686,8 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
   test_plan = assessment.test_plan
   if test_plan:
     comment.extend([
-        'Following is the assessment Requirements/Test Plan from GGRC:',
+        'Following is the assessment Requirements/Assessment Procedure '
+        'from GGRC:',
         html2text.HTML2Text().handle(test_plan).strip('\n'),
     ])
 
