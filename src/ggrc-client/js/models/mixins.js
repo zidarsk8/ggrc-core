@@ -276,7 +276,10 @@ const AUDIT_ISSUE_TRACKER = {
       }
 
       if (GGRC.ISSUE_TRACKER_ENABLED) {
-        if ( this.attr('type') === 'Audit' ) {
+        // check "title_singular" because "new instance"
+        // doesn't have "type" property
+        if (this.attr('type') === 'Audit' ||
+          this.class.title_singular === 'Audit') {
           this.initAuditIssueTracker();
         } else {
           this.ensureParentAudit().then((audit) => {
