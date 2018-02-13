@@ -291,7 +291,35 @@ class RelatedAssessmentsResource(common.Resource):
       raise ValueError
     return limit
 
-  def dispatch_request(self, *args, **kwargs):  # noqa
+  def _get_assessments_json(self, obj, assessments):
+    """Get json representation for all assessments in result set."""
+    with benchmark("get documents of related assessments"):
+      document_json_map = self._get_documents(assessments)
+    with benchmark("get snapshots of related assessments"):
+      snapshot_json_map = self._get_snapshots(obj, assessments)
+
+    with benchmark("generate related_assessment json"):
+      assessments_json = []
+      for assessment in assessments:
+        single_json = assessment.log_json_base()
+        single_json["audit"] = assessment.audit.log_json_base()
+        single_json["custom_attribute_values"] = [
+            cav.log_json_base()
+            for cav in assessment.custom_attribute_values
+        ]
+        single_json["custom_attribute_definitions"] = [
+            cad.log_json_base()
+            for cad in assessment.custom_attribute_definitions
+        ]
+        single_json["snapshots"] = snapshot_json_map[assessment.id]
+        single_json["documents"] = document_json_map[assessment.id]
+        single_json["audit"]["selfLink"] = utils.view_url_for(
+            assessment.audit)
+        single_json["selfLink"] = utils.url_for(assessment)
+        assessments_json.append(single_json)
+      return assessments_json
+
+  def dispatch_request(self, *args, **kwargs):
     """Dispatch request for related_assessments."""
     with benchmark("dispatch related_assessments request"):
       try:
@@ -312,30 +340,7 @@ class RelatedAssessmentsResource(common.Resource):
               object_id,
           )
 
-        with benchmark("get documents of related assessments"):
-          document_json_map = self._get_documents(assessments)
-        with benchmark("get snapshots of related assessments"):
-          snapshot_json_map = self._get_snapshots(obj, assessments)
-
-        with benchmark("generate related_assessment json"):
-          assessments_json = []
-          for assessment in assessments:
-            single_json = assessment.log_json_base()
-            single_json["audit"] = assessment.audit.log_json_base()
-            single_json["custom_attribute_values"] = [
-                cav.log_json_base()
-                for cav in assessment.custom_attribute_values
-            ]
-            single_json["custom_attribute_definitions"] = [
-                cad.log_json_base()
-                for cad in assessment.custom_attribute_definitions
-            ]
-            single_json["snapshots"] = snapshot_json_map[assessment.id]
-            single_json["documents"] = document_json_map[assessment.id]
-            single_json["audit"]["selfLink"] = utils.view_url_for(
-                assessment.audit)
-            single_json["selfLink"] = utils.url_for(assessment)
-            assessments_json.append(single_json)
+          assessments_json = self._get_assessments_json(obj, assessments)
 
           response_object = {
               "total": total,
