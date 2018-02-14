@@ -101,9 +101,11 @@ export default class CustomAttributeObject {
   set value(newValue) {
     const caValue = this._caValue;
     const attributeObject = this._prepareAttributeObject(newValue);
+    const attributeObjectId = (attributeObject && attributeObject.id) || null;
     const attributeValue = this._prepareAttributeValue(newValue);
     caValue.attr('attribute_object', attributeObject);
     caValue.attr('attribute_value', attributeValue);
+    caValue.attr('attribute_object_id', attributeObjectId);
   }
 
   /**
@@ -246,6 +248,11 @@ export default class CustomAttributeObject {
    *     2) in other cases it must be null.
    * attribute_value - value for custom attribute
    *    for Map:Person - "Person" string
+   * attribute_object_id - (DEPRECATED FIELD, MUST BE REMOVED, is used for
+   * correct work with Proposals, in the future BE should extract this id from
+   * attribute_objects)
+   *   if we have "Map:Person" custom attribute then set id
+   *   of the person.
    * context - must be the same as have Object
    * custom_attribute_id - id from appopriate custom_attribute_definitions
    * Above is specified the necessary MINIMUM for the back-end.
@@ -257,13 +264,13 @@ export default class CustomAttributeObject {
     const caDefinition = this._caDefinition;
     const instance = this._instance;
     const caAttributeValue = caValue.attr('attribute_value');
-
     // setup default values for mandatory fields
     const requiredDefaultFields = {
       attribute_object: null,
       attribute_value: this._prepareAttributeValue(caAttributeValue),
       context: instance.attr('context'),
       custom_attribute_id: caDefinition.attr('id'),
+      attribute_object_id: caValue.attr('attribute_object.id') || null,
     };
     const caValueKeys = can.Map.keys(caValue);
 
