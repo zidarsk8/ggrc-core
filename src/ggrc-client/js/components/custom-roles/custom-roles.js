@@ -50,7 +50,6 @@ export default can.Component.extend({
       this.attr('instance').save()
         .then(function () {
           self.filterACL();
-          self.attr('instance').dispatch('refreshInstance');
           self.attr('updatableGroupId', null);
         });
     },

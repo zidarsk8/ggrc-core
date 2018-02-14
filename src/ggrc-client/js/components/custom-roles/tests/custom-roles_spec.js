@@ -88,12 +88,6 @@ describe('custom-roles component', () => {
         expect(vm.filterACL).toHaveBeenCalled();
       });
 
-      it('dispatches refreshInstance event on instance', () => {
-        vm.save(args);
-        expect(vm.attr('instance').dispatch)
-          .toHaveBeenCalledWith('refreshInstance');
-      });
-
       it('sets null to updatableGroupId attribute', () => {
         vm.save(args);
         expect(vm.attr('updatableGroupId')).toBe(null);
