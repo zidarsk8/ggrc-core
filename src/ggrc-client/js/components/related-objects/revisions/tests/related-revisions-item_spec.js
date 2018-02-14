@@ -1,0 +1,90 @@
+/*
+ Copyright (C) 2018 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+import Component from '../related-revisions-item';
+import * as HistoryUtils from '../../../../plugins/utils/object-history-utils';
+import {getComponentVM} from '../../../../../js_specs/spec_helpers';
+
+describe('RelatedRevisionsItem component', () => {
+  let viewModel;
+
+  beforeEach(() => {
+    viewModel = getComponentVM(Component);
+  });
+
+  describe('isCreated value getter', () => {
+    beforeEach(() => {
+      viewModel.attr('revision', new can.Map({action: null}));
+    });
+
+    it('returns true when revision.action value is "created"', () => {
+      viewModel.attr('revision.action', 'created');
+
+      expect(viewModel.attr('isCreated')).toBe(true);
+    });
+
+    it('returns false when revision.action value is not "created"', () => {
+      viewModel.attr('revision.action', null);
+
+      expect(viewModel.attr('isCreated')).toBe(false);
+    });
+  });
+
+  describe('instance value setter', () => {
+    beforeEach(() => {
+      spyOn(HistoryUtils, 'getInstanceView').and
+        .callFake((instance) =>
+          instance.view || `templates/${instance.type}.mustahce`
+        );
+    });
+
+    it('calls getInstanceView() method. instance has view', () => {
+      viewModel.attr('instance', {type: 'control', view: 'info.mustache'});
+      expect(HistoryUtils.getInstanceView).toHaveBeenCalled();
+      expect(viewModel.attr('instance.view')).toEqual('info.mustache');
+      expect(viewModel.attr('instance.type')).toEqual('control');
+    });
+
+    it('calls getInstanceView() method. instance does not have view', () => {
+      viewModel.attr('instance', {type: 'risk'});
+      expect(HistoryUtils.getInstanceView).toHaveBeenCalled();
+      expect(viewModel.attr('instance.view'))
+        .toEqual('templates/risk.mustahce');
+      expect(viewModel.attr('instance.type')).toEqual('risk');
+    });
+
+    it('do not call getInstanceView() method. instance is empty', () => {
+      viewModel.attr('instance', null);
+      expect(HistoryUtils.getInstanceView).not.toHaveBeenCalled();
+      expect(viewModel.attr('instance')).toBeUndefined();
+    });
+  });
+
+  describe('revision value setter', () => {
+    let getPersonInfoDfd;
+
+    beforeEach(() => {
+      getPersonInfoDfd = can.Deferred();
+      spyOn(GGRC.Utils, 'getPersonInfo').and.returnValue(getPersonInfoDfd);
+    });
+
+    it('sets modifiedBy attr correctly ' +
+      'after getPersonInfo() success', (done) => {
+      viewModel.attr('revision', {modified_by: 'user'});
+
+      getPersonInfoDfd.then(() => {
+        expect(viewModel.attr('modifiedBy')).toBe('person');
+        done();
+      });
+
+      getPersonInfoDfd.resolve('person');
+    });
+
+    it('do not call getPersonInfo() method when passed value is empty', () => {
+      viewModel.attr('revision', null);
+      expect(GGRC.Utils.getPersonInfo).not.toHaveBeenCalled();
+    });
+  });
+});
