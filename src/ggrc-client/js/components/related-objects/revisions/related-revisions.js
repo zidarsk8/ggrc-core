@@ -19,7 +19,7 @@ export default can.Component.extend({
         },
       },
     },
-    instance: {},
+    instance: null,
     lastRevision: {},
     visibleRevisions: [],
     revisions: [],
@@ -33,9 +33,7 @@ export default can.Component.extend({
       this.attr('paging.total', this.attr('revisions').length);
     },
     loadRevisions() {
-      const instance = this.attr('instance');
-
-      if (!instance) {
+      if (!this.attr('instance')) {
         return;
       }
 
