@@ -862,5 +862,5 @@ contributed_importables = IMPORTABLE
 contributed_exportables = EXPORTABLE
 contributed_column_handlers = COLUMN_HANDLERS
 contributed_get_ids_related_to = relationship_helper.get_ids_related_to
-CONTRIBUTED_CRON_JOBS = [start_recurring_cycles]
+NIGHTLY_CRON_JOBS = [start_recurring_cycles]
 NOTIFICATION_LISTENERS = [notification.register_listeners]
