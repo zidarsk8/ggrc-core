@@ -496,9 +496,11 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
      */
     getRelatedAssessments(limit = [0, 5], orderBy = []) {
       const type = this.attr('type');
-      const id = this.attr('id');
+      const instanceId = isSnapshot(this) ?
+        this.snapshot.child_id :
+        this.id;
       const params = {
-        object_id: id,
+        object_id: instanceId,
         object_type: type,
         limit: limit.join(','),
       };
