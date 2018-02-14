@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {getModelInstance} from '../../plugins/utils/models-utils';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 import DiffBaseVM from './diff-base-vm';
 import template from './templates/instance-diff-items.mustache';
@@ -60,7 +61,7 @@ const viewModel = DiffBaseVM.extend({
 
     id = modifiedValueStub.id;
     type = modifiedValueStub.type;
-    return await this.getObjectData(id, type, 'title');
+    return await getModelInstance(id, type, 'title');
   },
 });
 

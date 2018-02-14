@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {getModelInstance} from '../../plugins/utils/models-utils';
 import {buildModifiedListField} from '../../plugins/utils/object-history-utils';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 import DiffBaseVM from './diff-base-vm';
@@ -42,7 +43,7 @@ const viewModel = DiffBaseVM.extend({
     }
 
     const objectData = values.attr().map((item) =>
-      this.getObjectData(item.id, item.type, 'name'));
+      getModelInstance(item.id, item.type, 'name'));
 
     return Promise.all(objectData);
   },
