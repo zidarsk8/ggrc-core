@@ -21,6 +21,7 @@ from sqlalchemy import and_
 
 from ggrc import db
 from ggrc import models
+from ggrc import utils
 from ggrc.utils import benchmark
 from ggrc.rbac import permissions
 from ggrc.services import common
@@ -96,9 +97,11 @@ class RelatedAssessmentsResource(common.Resource):
           models.Assessment,
       )
     if limit:
-      query, _ = pagination.apply_limit(query, limit)
+      query, total = pagination.apply_limit(query, limit)
+    else:
+      total = query.count()
 
-    return query
+    return query, total
 
   @classmethod
   def _get_documents(cls, assessments):
@@ -288,7 +291,35 @@ class RelatedAssessmentsResource(common.Resource):
       raise ValueError
     return limit
 
-  def dispatch_request(self, *args, **kwargs):  # noqa
+  def _get_assessments_json(self, obj, assessments):
+    """Get json representation for all assessments in result set."""
+    with benchmark("get documents of related assessments"):
+      document_json_map = self._get_documents(assessments)
+    with benchmark("get snapshots of related assessments"):
+      snapshot_json_map = self._get_snapshots(obj, assessments)
+
+    with benchmark("generate related_assessment json"):
+      assessments_json = []
+      for assessment in assessments:
+        single_json = assessment.log_json_base()
+        single_json["audit"] = assessment.audit.log_json_base()
+        single_json["custom_attribute_values"] = [
+            cav.log_json_base()
+            for cav in assessment.custom_attribute_values
+        ]
+        single_json["custom_attribute_definitions"] = [
+            cad.log_json_base()
+            for cad in assessment.custom_attribute_definitions
+        ]
+        single_json["snapshots"] = snapshot_json_map[assessment.id]
+        single_json["documents"] = document_json_map[assessment.id]
+        single_json["audit"]["selfLink"] = utils.view_url_for(
+            assessment.audit)
+        single_json["selfLink"] = utils.view_url_for(assessment)
+        assessments_json.append(single_json)
+      return assessments_json
+
+  def dispatch_request(self, *args, **kwargs):
     """Dispatch request for related_assessments."""
     with benchmark("dispatch related_assessments request"):
       try:
@@ -303,31 +334,20 @@ class RelatedAssessmentsResource(common.Resource):
         obj = model.query.get(object_id)
 
         with benchmark("get related assessments"):
-          assessments = self._get_assessments(model, object_type, object_id)
+          assessments, total = self._get_assessments(
+              model,
+              object_type,
+              object_id,
+          )
 
-        with benchmark("get documents of related assessments"):
-          document_json_map = self._get_documents(assessments)
-        with benchmark("get snapshots of related assessments"):
-          snapshot_json_map = self._get_snapshots(obj, assessments)
+          assessments_json = self._get_assessments_json(obj, assessments)
 
-        with benchmark("generate related_assessment json"):
-          assessments_json = []
-          for assessment in assessments:
-            single_json = assessment.log_json_base()
-            single_json["audit"] = assessment.audit.log_json_base()
-            single_json["custom_attribute_values"] = [
-                cav.log_json_base()
-                for cav in assessment.custom_attribute_values
-            ]
-            single_json["custom_attribute_definitions"] = [
-                cad.log_json_base()
-                for cad in assessment.custom_attribute_definitions
-            ]
-            single_json["snapshots"] = snapshot_json_map[assessment.id]
-            single_json["documents"] = document_json_map[assessment.id]
-            assessments_json.append(single_json)
+          response_object = {
+              "total": total,
+              "data": assessments_json,
+          }
 
-          return self.json_success_response(assessments_json, )
+          return self.json_success_response(response_object, )
 
       except (ValueError, TypeError, AttributeError, BadQueryException):
         # Type Error and Value Error are for invalid integer values,
