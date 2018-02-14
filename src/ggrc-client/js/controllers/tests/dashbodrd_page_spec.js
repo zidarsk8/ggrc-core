@@ -3,12 +3,14 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import Component from '../dashboard_page';
+
 describe('GGRC.Components.dashboardWidgets', function () {
   let methods;
   let method;
 
   beforeEach(function () {
-    methods = GGRC.Components.get('dashboardWidgets').prototype;
+    methods = Component.prototype;
   });
 
   describe('update_tasks_for_workflow() method', function () {
