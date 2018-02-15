@@ -655,6 +655,7 @@ class Builder(AttributeInfo):
 
   def publish_attr(
           self, obj, attr_name, inclusions, include, inclusion_filter):
+    """Publish obj attr."""
     value_exists, value = self._process_custom_publish(obj, attr_name)
     if value_exists:
       return value
@@ -693,6 +694,7 @@ class Builder(AttributeInfo):
   def _publish_attrs_for(
           self, obj, attrs, json_obj, inclusions=None, inclusion_filter=None,
           attribute_whitelist=None):
+    """Publis attrs for obj."""
     if inclusions is None:
       inclusions = []
     for attr in attrs:
@@ -707,9 +709,15 @@ class Builder(AttributeInfo):
           break
       if attribute_whitelist and attr_name not in attribute_whitelist:
         continue
-      json_obj[attr_name] = self.publish_attr(
+      attr = self.publish_attr(
           obj, attr_name, local_inclusion[1:], len(local_inclusion) > 0,
           inclusion_filter)
+      if attr_name == "filtered_access_control_list":
+        # Instead of using filtered_access_control_list name in the frontend
+        # use access_control_list instead.
+        json_obj["access_control_list"] = attr
+      else:
+        json_obj[attr_name] = attr
 
   def publish_attrs(self, obj, json_obj, extra_inclusions, inclusion_filter,
                     attribute_whitelist):
