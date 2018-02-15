@@ -6,6 +6,7 @@ import ddt
 from ggrc import db
 from ggrc.models import all_models
 from integration.ggrc import TestCase
+from integration.ggrc import api_helper
 from integration.ggrc.models import factories
 
 
@@ -94,3 +95,31 @@ class TestAccessControlRoleable(TestCase):
         (person_2.id, role.id),
         (person_3.id, role.id)
     ], acls)
+
+  def test_acl_filters_internal_roles(self):
+    """Test if access_control_list property filters out internal roles
+
+       Before sending the access_control_list to the frontend, internal roles
+       need to be filtered out to help prevent performance issues"""
+    with factories.single_commit():
+      internal_role = factories.AccessControlRoleFactory(internal=1)
+      # Create an object with one external and one internal role
+      obj = all_models.Control(title="Test Control", access_control_list=[{
+          "person": self.person,
+          "ac_role": self.role,
+      }, {
+          "person": self.person,
+          "ac_role": internal_role,
+      }])
+      # Make sure that access_control_list list contains internal roles:
+      self.assertEqual(len(obj.access_control_list), 2,
+                       "acl doesn't include all the roles")
+    obj_id, role_id = obj.id, self.role.id
+    api = api_helper.Api()
+    response = api.get(all_models.Control, obj_id)
+    acl = response.json["control"]["access_control_list"]
+    # Check if the response filtered out the internal access_control_role
+    self.assertEqual(len(acl), 1,
+                     "acl didn't filter out internal roles correctly")
+    self.assertEqual(acl[0]["ac_role_id"], role_id,
+                     "acl didn't filter out internal roles correctly")
