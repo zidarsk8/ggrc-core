@@ -6,6 +6,9 @@
 When Audit-Snapshottable Relationship is POSTed, a Snapshot should be created
 instead.
 """
+from collections import defaultdict
+
+import sqlalchemy as sa
 
 from werkzeug.exceptions import Forbidden
 
@@ -43,12 +46,62 @@ class AuditResource(common.ExtendedResource):
       if not permissions.is_allowed_read_for(audit):
         raise Forbidden()
     with benchmark("Get audit summary data"):
-      data = db.session.query(
-          models.Assessment.status,
-          models.Assessment.verified,
+      assessment_docs = db.session.query(
+          models.Assessment.id.label("id"),
+          models.Assessment.status.label("status"),
+          models.Assessment.verified.label("verified"),
+          models.Relationship.destination_id.label("doc_id"),
+      ).outerjoin(
+          models.Relationship,
+          sa.and_(
+              models.Relationship.source_id == models.Assessment.id,
+              models.Relationship.source_type == "Assessment",
+              models.Relationship.destination_type == "Document",
+          )
       ).filter(
           models.Assessment.audit_id == id
-      ).all()
+      ).union_all(
+          db.session.query(
+              models.Assessment.id.label("id"),
+              models.Assessment.status.label("status"),
+              models.Assessment.verified.label("verified"),
+              models.Relationship.source_id.label("doc_id"),
+          ).outerjoin(
+              models.Relationship,
+              sa.and_(
+                  models.Relationship.source_type == "Document",
+                  models.Relationship.destination_id == models.Assessment.id,
+                  models.Relationship.destination_type == "Assessment",
+              )
+          ).filter(
+              models.Assessment.audit_id == id
+          )
+      )
+
+      statuses_data = defaultdict(lambda: defaultdict(set))
+      all_assessment_ids = set()
+      all_document_ids = set()
+      for id_, status, verified, doc_id in assessment_docs:
+        if id_:
+          statuses_data[(status, verified)]["assessments"].add(id_)
+          all_assessment_ids.add(id_)
+        if doc_id:
+          statuses_data[(status, verified)]["documents"].add(doc_id)
+          all_document_ids.add(doc_id)
+
     with benchmark("Make response"):
-      response_object = list(data)
+      statuses_json = []
+      total = {"assessments": 0, "documents": 0}
+      for (status, verified), data in statuses_data.items():
+        statuses_json.append({
+            "name": status,
+            "verified": verified,
+            "assessments": len(data["assessments"]),
+            "documents": len(data["documents"]),
+        })
+      total["assessments"] = len(all_assessment_ids)
+      total["documents"] = len(all_document_ids)
+
+      statuses_json.sort(key=lambda k: (k["name"], k["verified"]))
+      response_object = {"statuses": statuses_json, "total": total}
       return self.json_success_response(response_object, )

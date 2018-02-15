@@ -69,7 +69,7 @@ import Permission from '../permission';
         attr_name: 'slug',
         order: 3,
       }, {
-        attr_title: 'Status',
+        attr_title: 'State',
         attr_name: 'status',
         order: 4,
       }, {
@@ -323,12 +323,6 @@ import Permission from '../permission';
       this.attr('default_people', this._packPeopleData());
 
       return this._super.apply(this, arguments);
-    },
-
-    after_save: function () {
-      if (this.audit) {
-        this.audit.reify().refresh();
-      }
     },
 
     /**

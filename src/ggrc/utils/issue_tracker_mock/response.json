@@ -1,0 +1,13 @@
+{
+  "issueId": 1234,
+  "issueState": {
+    "title": "Some mocked issue",
+    "type": "PROCESS",
+    "status": "NEW",
+    "priority": "P2",
+    "severity": "S2",
+    "reporter": "example@example.com",
+    "assignee": "example@example.com",
+    "verifier": "example@example.com"
+  }
+}

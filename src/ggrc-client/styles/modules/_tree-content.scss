@@ -621,16 +621,16 @@ ul.new-tree {
       text-transform:uppercase;
       color:$green;
     }
-    .no-role,
     .role {
       font-size:11px;
       line-height: 28px;
       display: block;
       font-weight:bold;
       color:$green;
-    }
-    .no-role {
-      color:$gray;
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .event-action {
       font-size:13px;

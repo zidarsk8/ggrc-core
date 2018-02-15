@@ -232,7 +232,12 @@
       font-size: 13px;
       cursor: pointer;
       white-space: nowrap;
+      overflow: hidden;
       text-overflow: ellipsis;
+
+      a {
+        display: inline-block;
+      }
 
       i {
         color: $link;

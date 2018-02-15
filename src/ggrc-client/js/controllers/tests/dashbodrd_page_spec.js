@@ -3,12 +3,14 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import Component from '../dashboard_page';
+
 describe('GGRC.Components.dashboardWidgets', function () {
   let methods;
   let method;
 
   beforeEach(function () {
-    methods = GGRC.Components.get('dashboardWidgets').prototype;
+    methods = Component.prototype;
   });
 
   describe('update_tasks_for_workflow() method', function () {
@@ -51,19 +53,12 @@ describe('GGRC.Components.dashboardWidgets', function () {
       let isOverdue = [true, true];
       let expectedResult = {
         task_count: 6,
-        assigned: 2,
-        assigned_percentage: '33.33',
         completed_percentage: '16.67',
         days_left_for_first_task: 0,
-        declined: 1,
-        declined_percentage: '16.67',
         finished: 1,
         finished_percentage: '16.67',
-        in_progress: 1,
-        in_progress_percentage: '16.67',
         over_due: 2,
         over_due_flag: true,
-        over_due_percentage: '33.33',
         task_count: 6,
         verified: 1,
         verified_percentage: '16.67',

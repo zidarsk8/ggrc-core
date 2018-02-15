@@ -64,6 +64,10 @@ class TestAssessmentBase(ggrc.TestCase):
     if extra_data:
       assessment_dict.update(extra_data)
 
-    return self.api.post(all_models.Assessment, {
+    response = self.api.post(all_models.Assessment, {
         "assessment": assessment_dict
     })
+    if response.status_code == 201:
+      id_ = response.json['assessment']['id']
+      return self.api.get(all_models.Assessment, id_)
+    return response

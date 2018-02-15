@@ -40,38 +40,6 @@ describe('GGRC.VM.BaseTreeItemVM', function () {
       spyOn(vm, 'select');
     });
 
-    describe('if instance is Person', ()=> {
-      let dfd;
-      beforeEach(()=> {
-        vm.attr('instance', new can.Map({
-          type: 'Person',
-        }));
-        dfd = can.Deferred();
-        vm.attr('resultDfd', dfd);
-      });
-
-      it('call select() if there is result', ()=> {
-        vm.attr('result', true);
-
-        vm.onClick('element');
-
-        expect(vm.select).toHaveBeenCalledWith('element');
-      });
-
-      it(`call waiting for deferred and call select()
-          if there is no result`, (done)=> {
-        vm.attr('result', false);
-
-        vm.onClick('element');
-        expect(vm.select).not.toHaveBeenCalled();
-
-        dfd.resolve().then(()=> {
-          done();
-          expect(vm.select).toHaveBeenCalledWith('element');
-        });
-      });
-    });
-
     describe('if instance is Cycle', ()=> {
       beforeEach(()=> {
         vm.attr('instance', new can.Map({

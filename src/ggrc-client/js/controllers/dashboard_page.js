@@ -6,210 +6,196 @@
 import RefreshQueue from '../models/refresh_queue';
 import '../components/inline/people-with-role-inline-field';
 
-;(function (CMS, GGRC, can, $) {
-  GGRC.Components('dashboardWidgets', {
-    tag: "dashboard-widgets",
-    template: "<content/>",
-    scope: {
-      initial_wf_size: 5,
-      workflow_view: GGRC.mustache_path + "/dashboard/info/workflow_progress.mustache",
-      workflow_data: {},
-      workflow_count: 0,
-      workflow_show_all: false,
+export default can.Component.extend({
+  tag: 'dashboard-widgets',
+  template: '<content/>',
+  scope: {
+    initial_wf_size: 5,
+    workflow_view: GGRC.mustache_path +
+      '/dashboard/info/workflow_progress.mustache',
+    workflow_data: {},
+    workflow_count: 0,
+    workflow_show_all: false,
+  },
+  events: {
+    // Click action to show all workflows
+    'a.workflow-trigger.show-all click'(el, ev) {
+      this.scope.workflow_data.attr('list', this.scope.workflow_data.cur_wfs);
+
+      el.text('Show top 5 workflows');
+      el.removeClass('show-all');
+      el.addClass('show-5');
+
+      ev.stopPropagation();
     },
-    events: {
-      // Click action to show all workflows
-      "a.workflow-trigger.show-all click" : function(el, ev) {
-        this.scope.workflow_data.attr('list', this.scope.workflow_data.cur_wfs);
+    // Show onlt top 5 workflows
+    'a.workflow-trigger.show-5 click'(el, ev) {
+      this.scope.workflow_data.attr('list', this.scope.workflow_data.cur_wfs5);
 
-        el.text('Show top 5 workflows');
-        el.removeClass('show-all');
-        el.addClass('show-5');
+      el.text('Show all my workflows');
+      el.removeClass('show-5');
+      el.addClass('show-all');
 
-        ev.stopPropagation();
-      },
-      //Show onlt top 5 workflows
-      "a.workflow-trigger.show-5 click" : function(el, ev) {
-        this.scope.workflow_data.attr('list', this.scope.workflow_data.cur_wfs5);
-
-        el.text('Show all my workflows');
-        el.removeClass('show-5');
-        el.addClass('show-all');
-
-        ev.stopPropagation();
-      },
-
-      // Show Workflows
-      "li.workflow-tab click" : function(el, ev) {
-        el.addClass('active');
-        this.element.find('.workflow-wrap-main').show();
-        ev.stopPropagation();
-      },
+      ev.stopPropagation();
     },
-    init: function() {
-      this.init_my_workflows();
+
+    // Show Workflows
+    'li.workflow-tab click'(el, ev) {
+      el.addClass('active');
+      this.element.find('.workflow-wrap-main').show();
+      ev.stopPropagation();
     },
-    init_my_workflows: function() {
-      let self = this,
-          my_view = this.scope.workflow_view,
-          workflow_data = {},
-          wfs,              // list of all workflows
-          cur_wfs,          // list of workflows with current cycles
-          cur_wfs5;         // list of top 5 workflows with current cycle
+  },
+  init() {
+    this.init_my_workflows();
+  },
+  init_my_workflows() {
+    let self = this;
+    let workflowData = {};
+    let wfs; // list of all workflows
+    let curWfs; // list of workflows with current cycles
+    let curWfs5; // list of top 5 workflows with current cycle
 
-      if (!GGRC.current_user) {
-        return;
-      }
+    if (!GGRC.current_user) {
+      return;
+    }
 
-      GGRC.Models.Search.search_for_types('', ['Workflow'], {contact_id: GGRC.current_user.id})
-      .then(function(result_set){
-          let wf_data = result_set.getResultsForType('Workflow');
-          let refresh_queue = new RefreshQueue();
-          refresh_queue.enqueue(wf_data);
-          return refresh_queue.trigger();
-      }).then(function(options){
-          wfs = options;
+    GGRC.Models.Search
+      .search_for_types('', ['Workflow'], {contact_id: GGRC.current_user.id})
+      .then(function (resultSet) {
+        let wfData = resultSet.getResultsForType('Workflow');
+        let refreshQueue = new RefreshQueue();
+        refreshQueue.enqueue(wfData);
+        return refreshQueue.trigger();
+      }).then(function (options) {
+        wfs = options;
 
-          return $.when.apply($, can.map(options, function(wf){
-            return self.update_tasks_for_workflow(wf);
-          }));
-      }).then(function(){
-        if(wfs.length > 0){
-          //Filter workflows with a current cycle
-          cur_wfs = self.filter_current_workflows(wfs);
-          self.scope.attr('workflow_count', cur_wfs.length);
-          //Sort the workflows in ascending order by first_end_date
-          cur_wfs.sort(self.sort_by_end_date);
-          workflow_data.cur_wfs = cur_wfs;
+        return $.when(...can.map(options, function (wf) {
+          return self.update_tasks_for_workflow(wf);
+        }));
+      }).then(function () {
+        if (wfs.length > 0) {
+          // Filter workflows with a current cycle
+          curWfs = self.filter_current_workflows(wfs);
+          self.scope.attr('workflow_count', curWfs.length);
+          // Sort the workflows in ascending order by first_end_date
+          curWfs.sort(self.sort_by_end_date);
+          workflowData.cur_wfs = curWfs;
 
-          if (cur_wfs.length > self.scope.initial_wf_size) {
-            cur_wfs5 = cur_wfs.slice(0, self.scope.initial_wf_size);
+          if (curWfs.length > self.scope.initial_wf_size) {
+            curWfs5 = curWfs.slice(0, self.scope.initial_wf_size);
             self.scope.attr('workflow_show_all', true);
           } else {
-            cur_wfs5 = cur_wfs;
+            curWfs5 = curWfs;
             self.scope.attr('workflow_show_all', false);
           }
 
-          workflow_data.cur_wfs5 = cur_wfs5;
-          workflow_data.list = cur_wfs5;
-          self.scope.attr('workflow_data', workflow_data);
+          workflowData.cur_wfs5 = curWfs5;
+          workflowData.list = curWfs5;
+          self.scope.attr('workflow_data', workflowData);
         }
       });
 
-      return 0;
-    },
-    update_tasks_for_workflow: function(workflow){
-      let self = this,
-          dfd = $.Deferred(),
-          task_count = 0,
-          finished = 0,
-          in_progress = 0,
-          declined = 0,
-          verified = 0,
-          assigned = 0,
-          over_due = 0,
-          today = new Date(),
-          first_end_date,
-          task_data = {};
+    return 0;
+  },
+  update_tasks_for_workflow(workflow) {
+    let dfd = $.Deferred();
+    let taskCount = 0;
+    let finished = 0;
+    let verified = 0;
+    let overDue = 0;
+    let today = new Date();
+    let firstEndDate;
+    let taskData = {};
 
-        workflow.get_binding('current_all_tasks').refresh_instances().then(function(d){
-          let mydata = d;
-          task_count = mydata.length;
-          for(let i = 0; i < task_count; i++){
-            let data = mydata[i].instance,
-                end_date = new Date(data.end_date || null);
+    workflow.get_binding('current_all_tasks')
+      .refresh_instances()
+      .then((instData)=> {
+        let mydata = instData;
+        taskCount = mydata.length;
+        for (let i = 0; i < taskCount; i++) {
+          let data = mydata[i].instance;
+          let endDate = new Date(data.end_date || null);
 
-            //Calculate first_end_date for the workflow / earliest end for all the tasks in a workflow
-            if (i === 0)
-              first_end_date = end_date;
-            else if (end_date.getTime() < first_end_date.getTime())
-              first_end_date = end_date;
-
-            if (data.isOverdue) {
-              over_due++;
-              GGRC.Errors.notifier('error', 'Some tasks are overdue!');
-            }
-            switch (data.status) {
-              case 'Verified':
-                verified++;
-                break;
-              case 'Finished':
-                finished++;
-                break;
-              case 'InProgress':
-                in_progress++;
-                break;
-              case 'Declined':
-                declined++;
-                break;
-              case 'Assigned':
-                assigned++;
-                break;
-            }
-          }
-          //Update Task_data object for workflow and Calculate %
-          if (task_count > 0) {
-            task_data.task_count = task_count;
-            task_data.finished = finished;
-            task_data.finished_percentage = ((finished * 100) / task_count).toFixed(2); //precision up to 2 decimal points
-            task_data.in_progress = in_progress;
-            task_data.in_progress_percentage = ((in_progress * 100) / task_count).toFixed(2);
-            task_data.verified = verified;
-            task_data.verified_percentage = ((verified * 100) / task_count).toFixed(2);
-            task_data.declined = declined;
-            task_data.declined_percentage = ((declined * 100) / task_count).toFixed(2);
-            task_data.over_due = over_due;
-            task_data.over_due_percentage = ((over_due * 100) / task_count).toFixed(2);
-            task_data.assigned = assigned;
-            task_data.assigned_percentage = ((assigned * 100) / task_count).toFixed(2);
-            task_data.first_end_dateD = first_end_date;
-            task_data.first_end_date = first_end_date.toLocaleDateString();
-            //calculate days left for first_end_date
-            if(today.getTime() >= first_end_date.getTime())
-              task_data.days_left_for_first_task = 0;
-            else {
-              let time_interval = first_end_date.getTime() - today.getTime();
-              let day_in_milli_secs = 24 * 60 * 60 * 1000;
-              task_data.days_left_for_first_task = Math.floor(time_interval/day_in_milli_secs);
-            }
-            task_data.completed_percentage = workflow.is_verification_needed ?
-              task_data.verified_percentage : task_data.finished_percentage;
-
-            //set overdue flag
-            task_data.over_due_flag = over_due ? true : false;
+          // Calculate firstEndDate for the workflow / earliest end for all the tasks in a workflow
+          if (i === 0) {
+            firstEndDate = endDate;
+          } else if (endDate.getTime() < firstEndDate.getTime()) {
+            firstEndDate = endDate;
           }
 
-          workflow.attr('task_data', new can.Map(task_data));
-          dfd.resolve();
-        });
-
-        return dfd;
-    },
-    /*
-      filter_current_workflows filters the workflows with current tasks in a
-      new array and returns the new array.
-      filter_current_workflows should be called after update_tasks_for_workflow.
-      It looks at the task_data.task_count for each workflow
-      For workflow with current tasks, task_data.task_count must be > 0;
-    */
-    filter_current_workflows: function(workflows){
-      let filtered_wfs = [];
-
-      can.each(workflows, function(item){
-        if (item.task_data) {
-          if (item.task_data.task_count > 0)
-            filtered_wfs.push(item);
+          if (data.isOverdue) {
+            overDue++;
+            GGRC.Errors.notifier('error', 'Some tasks are overdue!');
+          }
+          switch (data.status) {
+            case 'Verified':
+              verified++;
+              break;
+            case 'Finished':
+              finished++;
+              break;
+          }
         }
-      });
-      return filtered_wfs;
-    },
-    /*
-      sort_by_end_date sorts workflows in assending order with respect to task_data.first_end_date
-      This should be called with workflows with current tasks.
-    */
-    sort_by_end_date: function(a, b) {
-        return (a.task_data.first_end_dateD.getTime() - b.task_data.first_end_dateD.getTime());
-    },
+        // Update taskData object for workflow and Calculate %
+        if (taskCount > 0) {
+          taskData.task_count = taskCount;
+          taskData.finished = finished;
+          taskData.finished_percentage =
+            ((finished * 100) / taskCount).toFixed(2);
+          taskData.verified = verified;
+          taskData.verified_percentage =
+            ((verified * 100) / taskCount).toFixed(2);
+          taskData.over_due = overDue;
+          taskData.first_end_dateD = firstEndDate;
+          taskData.first_end_date = firstEndDate.toLocaleDateString();
+          // calculate days left for firstEndDate
+          if (today.getTime() >= firstEndDate.getTime()) {
+            taskData.days_left_for_first_task = 0;
+          } else {
+            let timeInterval = firstEndDate.getTime() - today.getTime();
+            let dayInMillisecs = 24 * 60 * 60 * 1000;
+            taskData.days_left_for_first_task =
+              Math.floor(timeInterval/dayInMillisecs);
+          }
+          taskData.completed_percentage = workflow.is_verification_needed ?
+            taskData.verified_percentage : taskData.finished_percentage;
 
-  });
-})(window.CMS, window.GGRC, window.can, window.can.$);
+          // set overdue flag
+          taskData.over_due_flag = overDue ? true : false;
+        }
+
+        workflow.attr('task_data', new can.Map(taskData));
+        dfd.resolve();
+      });
+
+    return dfd;
+  },
+  /*
+    filter_current_workflows filters the workflows with current tasks in a
+    new array and returns the new array.
+    filter_current_workflows should be called after update_tasks_for_workflow.
+    It looks at the task_data.task_count for each workflow
+    For workflow with current tasks, task_data.task_count must be > 0;
+  */
+  filter_current_workflows(workflows) {
+    let filteredWfs = [];
+
+    can.each(workflows, function (item) {
+      if (item.task_data) {
+        if (item.task_data.task_count > 0) {
+          filteredWfs.push(item);
+        }
+      }
+    });
+    return filteredWfs;
+  },
+  /*
+    sort_by_end_date sorts workflows in assending order with respect to task_data.first_end_date
+    This should be called with workflows with current tasks.
+  */
+  sort_by_end_date(a, b) {
+    return (a.task_data.first_end_dateD.getTime() -
+      b.task_data.first_end_dateD.getTime());
+  },
+});

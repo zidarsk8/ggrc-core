@@ -26,12 +26,12 @@ class TestTotalReindex(TestCase):
   # 2 remove old records
   # 3 create new records
   INDEX_QUERY_LIMIT = {
-      'Assessment': 11,
+      'Assessment': 10,
       'AssessmentTemplate': 6,
       'Audit': 7,
       'Comment': 4,
       'Contract': 9,
-      'Control': 21,
+      'Control': 12,
       'Cycle': 5,
       'CycleTaskEntry': 3,
       'CycleTaskGroup': 4,
@@ -39,7 +39,7 @@ class TestTotalReindex(TestCase):
       'Document': 4,
       'Issue': 8,
       'Market': 8,
-      'Objective': 18,
+      'Objective': 9,
       'OrgGroup': 8,
       'Person': 5,
       'Policy': 9,

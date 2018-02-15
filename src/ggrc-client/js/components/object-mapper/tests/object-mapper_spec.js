@@ -404,6 +404,7 @@ describe('GGRC.Components.objectMapper', function () {
     let that;
     let event;
     let element;
+    let instance;
 
     beforeEach(function () {
       viewModel.attr({
@@ -413,8 +414,12 @@ describe('GGRC.Components.objectMapper', function () {
         selected: [],
       });
       viewModel.attr('deferred', false);
+
+      instance = {
+        refresh: $.noop,
+      };
       spyOn(CMS.Models.Program, 'findInCacheById')
-        .and.returnValue('instance');
+        .and.returnValue(instance);
       event = {
         preventDefault: function () {},
       };

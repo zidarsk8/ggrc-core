@@ -3,9 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div data-id="reference_url_hidden" class="span12 hidable">
+<div data-id="reference_url_hidden" class="span12">
   <related-documents instance={instance} document-type="REFERENCE_URL" autorefresh="false">
+    <!-- tabindex is necessary to work of 'Hide optional field' function -->
     <related-reference-urls class="related-reference-urls"
+      tabindex="20"
       {(urls)}="documents"
       {is-disabled}="isLoading"
       (createReferenceUrl)="markDocumentForAddition(%event.payload)"

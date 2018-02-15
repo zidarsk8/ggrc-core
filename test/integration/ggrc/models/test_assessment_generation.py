@@ -103,9 +103,7 @@ class TestAssessmentGeneration(TestAssessmentBase):
 
     self.assessment_post()
 
-    # Add objects back to session to have access to their id and type
     mapped_objects = [self.audit, self.snapshot]
-    db.session.add_all(mapped_objects)
     for obj in mapped_objects:
       self.assert_mapped_role("Verifiers Mapped", auditors[0], obj)
       self.assert_mapped_role("Verifiers Mapped", auditors[1], obj)
@@ -133,8 +131,6 @@ class TestAssessmentGeneration(TestAssessmentBase):
       self.generate_acls(captains, self.captains_role)
 
     self.assessment_post(template)
-    # Add objects back to session to have access to their id and type
-    db.session.add(self.audit, self.snapshot)
     for obj in [self.audit, self.snapshot]:
       self.assert_mapped_role("Verifiers Mapped", "user1@example.com", obj)
       self.assert_mapped_role("Verifiers Mapped", "user2@example.com", obj)
@@ -540,7 +536,7 @@ class TestAssessmentGeneration(TestAssessmentBase):
         extra_data=assessment_type
     )
     if exp_type:
-      self.assertEqual(response.status_code, 201)
+      self.assertEqual(response.status_code, 200)
       assessment = all_models.Assessment.query.first()
       self.assertEqual(assessment.assessment_type, exp_type)
     else:
@@ -552,7 +548,7 @@ class TestAssessmentGeneration(TestAssessmentBase):
     """
     test_state = "START_STATE"
     response = self.assessment_post()
-    self.assertEqual(response.status_code, 201)
+    self.assertEqual(response.status_code, 200)
     asmt = all_models.Assessment.query.one()
     self.assertEqual(asmt.status,
                      getattr(all_models.Assessment, test_state))
@@ -564,7 +560,7 @@ class TestAssessmentGeneration(TestAssessmentBase):
             "notes": ""
         }
     )
-    self.assertEqual(response.status_code, 201)
+    self.assertEqual(response.status_code, 200)
     assessment = self.refresh_object(asmt)
     self.assertEqual(assessment.status,
                      getattr(all_models.Assessment, test_state))
@@ -573,7 +569,7 @@ class TestAssessmentGeneration(TestAssessmentBase):
     """Check if generated Assessment inherit test plan of Snapshot"""
     test_plan = self.control.test_plan
     response = self.assessment_post()
-    self.assertEqual(response.status_code, 201)
+    self.assertEqual(response.status_code, 200)
     self.assertEqual(response.json["assessment"]["test_plan"], test_plan)
 
   def test_generate_empty_auditor(self):

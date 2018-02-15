@@ -239,7 +239,7 @@ class TestProposalApi(TestCase):
         role)
     self.assertEqual(1, len(control.comments))
 
-  def test_apply_acl(self):
+  def test_apply_acl(self):  # pylint: disable=too-many-locals
     """Test simple apply acl proposal."""
     with factories.single_commit():
       control = factories.ControlFactory(title="1")

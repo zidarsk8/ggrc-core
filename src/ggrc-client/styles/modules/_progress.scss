@@ -3,25 +3,6 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-.progress {
-  @include box-shadow(none);
-  @include border-radius($default-border-radius);
-  background: $lightGray;
-  height: 20px;
-  margin: 4px 0 0 0;
-  .bar {
-    height: 20px;
-    float: left;
-    margin-right: 0px;
-  }
-
-  @each $bar_color in finish, verify, progress, pending, decline {
-    .bar-#{$bar_color} {
-      @extend %bar-#{$bar_color};
-    }
-  }
-}
-
 .dashboard-tree {
   .item-data {
     .tree-title-area {
@@ -81,7 +62,7 @@ ul.new-tree {
 .item-util {
   @extend %reset-list;
   @extend %clearfix;
-  font-size: 11px;
+  font-size: 14px;
   line-height: 16px;
   color: $black;
   li {
@@ -89,6 +70,10 @@ ul.new-tree {
     float: left;
     &.overdue-text {
       color: $red;
+      line-height: 46px;
+    }
+    &.progress-text {
+      line-height: 46px;
     }
     &:last-child {
       margin-right: 0;
@@ -97,7 +82,7 @@ ul.new-tree {
   .tree-progress & {
     li {
       @extend %item-util-wide;
-      text-align: center;
+      text-align: right;
     }
   }
   .right & {

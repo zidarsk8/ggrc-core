@@ -20,8 +20,9 @@ from flask.ext.testing import TestCase as BaseTestCase
 from ggrc import db
 from ggrc.app import app
 from ggrc.converters.import_helper import read_csv_file
+from ggrc.fulltext import mysql
 from ggrc.views.converters import check_import_file
-from ggrc.models import Revision
+from ggrc.models import Revision, all_models
 from integration.ggrc.api_helper import Api
 from integration.ggrc.models import factories
 
@@ -52,6 +53,7 @@ class TestCase(BaseTestCase, object):
   # because it's required by unittests.
 
   """Base test case for all ggrc integration tests."""
+  # pylint: disable=too-many-public-methods
 
   CSV_DIR = os.path.join(THIS_ABS_PATH, "test_csvs/")
 
@@ -462,3 +464,21 @@ class TestCase(BaseTestCase, object):
           )
           assignees.append((person, role))
     return assignees
+
+  @staticmethod
+  def get_model_fulltext(model_name, property, ids):
+    """Get fulltext records for model."""
+    # pylint: disable=redefined-builtin
+    return db.session.query(mysql.MysqlRecordProperty).filter(
+        mysql.MysqlRecordProperty.type == model_name,
+        mysql.MysqlRecordProperty.property == property,
+        mysql.MysqlRecordProperty.key.in_(ids),
+    )
+
+  @staticmethod
+  def get_model_ca(model_name, ids):
+    """Get CAs for model."""
+    return db.session.query(all_models.Attributes).filter(
+        all_models.Attributes.object_type == model_name,
+        all_models.Attributes.object_id.in_(ids),
+    )

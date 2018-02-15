@@ -633,7 +633,7 @@ class Resource(ModelView):
             if cache:
               cache.clear()
 
-  def post(*args, **kwargs):
+  def post(self, *args, **kwargs):
     raise NotImplementedError()
 
   def get(self, id):

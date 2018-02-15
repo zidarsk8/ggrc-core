@@ -11,6 +11,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from ggrc import db
 from ggrc.access_control.list import AccessControlList
 from ggrc.access_control import role
+from ggrc.builder import simple_property
 from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc.models import reflection
 from ggrc.utils.referenced_objects import get
@@ -24,8 +25,10 @@ class Roleable(object):
   """
 
   _update_raw = _include_links = ['access_control_list', ]
-  _api_attrs = reflection.ApiAttributes(*_include_links)
   _fulltext_attrs = [CustomRoleAttr('access_control_list'), ]
+  _api_attrs = reflection.ApiAttributes(
+      reflection.Attribute('filtered_access_control_list', False, False, True),
+      reflection.Attribute('access_control_list', True, True, False))
 
   @declared_attr
   def _access_control_list(cls):  # pylint: disable=no-self-argument
@@ -38,6 +41,23 @@ class Roleable(object):
         foreign_keys='AccessControlList.object_id',
         backref='{0}_object'.format(cls.__name__),
         cascade='all, delete-orphan')
+
+  @simple_property
+  def filtered_access_control_list(self):
+    """Access control list returned to the frontend"""
+    return [{
+        "ac_role_id": acl.ac_role.id,
+        "context": None,
+        "id": acl.id,
+        "person": {
+            "id": acl.person.id,
+            "type": "Person"
+        },
+        "person_email": acl.person.email,
+        "person_id": acl.person.id,
+        "person_name": acl.person.name,
+    } for acl in self.access_control_list
+        if acl.ac_role and not acl.ac_role.internal]
 
   @hybrid_property
   def access_control_list(self):
@@ -68,6 +88,7 @@ class Roleable(object):
     old_values = {
         (acl.ac_role, acl.person)
         for acl in self.access_control_list
+        if acl.ac_role and not acl.ac_role.internal
     }
     self._remove_values(old_values - new_values)
     self._add_values(new_values - old_values)

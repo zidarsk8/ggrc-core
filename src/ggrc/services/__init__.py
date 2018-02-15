@@ -16,6 +16,7 @@ def contributed_services():
   from ggrc.services.resources.audit import AuditResource
   from ggrc.services.resources.assessment import AssessmentResource
   from ggrc.services.resources.person import PersonResource
+  from ggrc.services.resources import related_assessments
   from ggrc.access_control.role import AccessControlRole
 
   return [
@@ -69,6 +70,8 @@ def contributed_services():
       service('access_control_roles', AccessControlRole),
       service('labels', models.Label),
       service('proposals', models.Proposal),
+      service('related_assessments', None,
+              related_assessments.RelatedAssessmentsResource),
   ]
 
 

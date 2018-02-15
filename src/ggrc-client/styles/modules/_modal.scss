@@ -659,10 +659,13 @@
       }
     }
 
-    .people-group {
-      flex-basis: 250px;
-      margin-right: 30px;
-      max-width: 250px;
+    .custom-roles-modal {
+      outline: none;
+      .people-group {
+        flex-basis: 250px;
+        margin-right: 30px;
+        max-width: 250px;
+      }
     }
   }
   .modal-footer {

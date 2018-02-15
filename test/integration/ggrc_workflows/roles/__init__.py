@@ -86,7 +86,7 @@ class WorkflowRolesTestCase(WorkflowTestCase):
         self.generator.generate_workflow(initial_workflow_data)
 
   def activate_workflow_with_cycle(self, workflow_obj):
-    """
+    """ Activate workflow with cycle.
     Args:
         workflow_obj: Workflow model instance
     Returns:
@@ -138,7 +138,7 @@ class WorkflowRolesTestCase(WorkflowTestCase):
     return task_group_objects
 
   def person_dict(self, person_id):
-    """
+    """ Get person JSON representation.
     Args:
         person_id: Integer.
 

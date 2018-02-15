@@ -145,12 +145,9 @@ inline-edit-control {
     }
 
     &--invalid {
-      input {
-        border-color: $red;
-
-        &:focus {
-          border-color: $red;
-        }
+      .inline__content-input {
+        border: solid 1px red;
+        border-radius: 2px;
       }
     }
   }

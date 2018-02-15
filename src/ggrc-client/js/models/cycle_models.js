@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import Permission from '../permission';
 import RefreshQueue from './refresh_queue';
 import {getClosestWeekday} from '../plugins/utils/date-util';
 
@@ -18,6 +19,7 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
   function refreshAttrWrap(attr) {
     return function (ev, instance) {
       if (instance instanceof this) {
+        Permission.refresh();
         refreshAttr(instance, attr);
       }
     };
@@ -265,39 +267,44 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
       attr_view: _mustachePath + '/tree-item-attr.mustache',
       attr_list: [
         {
-          attr_title: 'Task title',
+          attr_title: 'Task Title',
           attr_name: 'title',
           attr_sort_field: 'task title',
         },
         {
-          attr_title: 'Cycle title',
+          attr_title: 'Cycle Title',
           attr_name: 'workflow',
           attr_sort_field: 'cycle title',
         },
         {
-          attr_title: 'Task state',
+          attr_title: 'Task State',
           attr_name: 'status',
           attr_sort_field: 'task state',
         },
         {
-          attr_title: 'Task start date',
+          attr_title: 'Task Start Date',
           attr_name: 'start_date',
           attr_sort_field: 'task start date',
         },
         {
-          attr_title: 'Task due date',
+          attr_title: 'Task Due Date',
           attr_name: 'end_date',
           attr_sort_field: 'task due date',
         },
         {
-          attr_title: 'Task last updated date',
+          attr_title: 'Task Last Updated Date',
           attr_name: 'updated_at',
           attr_sort_field: 'task last updated date',
         },
         {
-          attr_title: 'Task last updated by',
+          attr_title: 'Task Last Updated By',
           attr_name: 'modified_by',
           attr_sort_field: 'task last updated by',
+        },
+        {
+          attr_title: 'Task Last Deprecated Date',
+          attr_name: 'last_deprecated_date',
+          attr_sort_field: 'task last deprecated date',
         },
       ],
       display_attr_names: ['title',

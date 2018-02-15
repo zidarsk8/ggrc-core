@@ -1,15 +1,20 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from ggrc import db
+"""Module contains Categorization model and Categorizable mixin."""
+
 from sqlalchemy.ext.associationproxy import association_proxy
-from .mixins import Base
+
+from ggrc import db
 from ggrc.models import reflection
+
+from .mixins import Base
 
 BACKREF_NAME_FORMAT = '{type}_{scope}_categorizable'
 
 
 class Categorization(Base, db.Model):
+  """Categorization model."""
   __tablename__ = 'categorizations'
 
   category_id = db.Column(
@@ -56,7 +61,7 @@ class Categorization(Base, db.Model):
     return out_json
 
 
-class Categorizable(object):
+class Categorizable(object):  # pylint: disable=too-few-public-methods
   """Subclasses **MUST** provide a declared_attr method that defines the
   relationship and association_proxy. For example:
 
@@ -74,6 +79,7 @@ class Categorizable(object):
   # pylint: disable=unused-argument
   @classmethod
   def declare_categorizable(cls, category_type, single, plural, ation):
+    """Class method that declare categorizable relationship."""
     setattr(
         cls, plural,
         association_proxy(

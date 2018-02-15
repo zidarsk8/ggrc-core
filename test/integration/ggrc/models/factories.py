@@ -27,6 +27,7 @@ from ggrc.access_control.roleable import Roleable
 from ggrc.models.mixins import CustomAttributable
 
 from ggrc_risks import models as risk_models
+from ggrc_risk_assessments import models as risk_assessment_models
 
 from integration.ggrc.models.model_factory import ModelFactory
 from integration.ggrc_basic_permissions.models \
@@ -489,6 +490,21 @@ class ProposalFactory(ModelFactory):
   content = None
 
 
+class RiskAssessmentFactory(TitledFactory):
+
+  class Meta:
+    model = risk_assessment_models.RiskAssessment
+
+  status = "Draft"
+  program = factory.LazyAttribute(lambda _: ProgramFactory())
+
+
+class ProjectFactory(TitledFactory):
+
+  class Meta:
+    model = models.Project
+
+
 def get_model_factory(model_name):
   """Get object factory for provided model name"""
   from integration.ggrc_workflows.models import factories as wf_factories
@@ -522,12 +538,15 @@ def get_model_factory(model_name):
       "Policy": PolicyFactory,
       "Process": ProcessFactory,
       "Product": ProductFactory,
+      "Program": ProgramFactory,
+      "Project": ProjectFactory,
       "Regulation": RegulationFactory,
       "Section": SectionFactory,
       "Standard": StandardFactory,
       "System": SystemFactory,
       "Vendor": VendorFactory,
       "Risk": RiskFactory,
+      "RiskAssessment": RiskAssessmentFactory,
       "Threat": ThreatFactory,
       "Workflow": wf_factories.WorkflowFactory,
       "Proposal": ProposalFactory,

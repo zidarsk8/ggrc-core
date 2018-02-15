@@ -55,22 +55,27 @@ then
   exit 1
 fi
 
-echo "Resetting database: $DB_NAME"
-if [[ -f "$DUMP_FILE" ]] && grep "^USE " $DUMP_FILE
+if [[ -f "$DUMP_FILE" ]] && [[ $(grep "^USE " $DUMP_FILE | wc -l) > 1 ]]
 then
-  echo "Error: 'USE' statement found in the database dump."
+  echo "Error: More than 1 'USE' statement found in the database dump."
   echo ""
   echo "Importing into $DB_NAME will fail if there is USE block in the"
   echo "database dump file. Please fix the dump file and run this script again"
   exit 1
 fi
 
+echo "Resetting database: $DB_NAME"
+
 mysql -h$HOST -e "drop database if exists $DB_NAME"
 mysql -h$HOST -e "create database $DB_NAME character set utf8"
 
 if [[ -f "$DUMP_FILE" ]]; then
+  if grep "^USE " $DUMP_FILE
+  then
+    echo "Warning: Single USE statement in $DUMP_FILE will be ignored."
+  fi
   echo "Importing: $DUMP_FILE"
-  mysql -h$HOST $DB_NAME < $DUMP_FILE
+  pv $DUMP_FILE | sed "s/^USE.*//g" | mysql -h$HOST $DB_NAME
 fi
 
 db_migrate

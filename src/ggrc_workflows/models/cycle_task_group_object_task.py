@@ -29,6 +29,7 @@ LOGGER = getLogger(__name__)
 
 class CycleTaskGroupObjectTask(roleable.Roleable,
                                wf_mixins.CycleTaskStatusValidatedMixin,
+                               mixins.WithLastDeprecatedDate,
                                mixins.Stateful,
                                mixins.Timeboxed,
                                relationship.Relatable,

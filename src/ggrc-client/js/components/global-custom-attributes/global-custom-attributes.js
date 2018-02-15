@@ -82,6 +82,7 @@ import Permission from '../../permission';
               value: value,
               options: options,
               type: type,
+              mandatory: cad.mandatory,
             });
           }.bind(this));
 

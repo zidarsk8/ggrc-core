@@ -7,6 +7,7 @@ import workflowHelpers from './workflow-helpers';
 import {
   initCounts,
 } from '../../plugins/utils/current-page-utils';
+import Permission from '../../permission';
 
 export default can.Component.extend({
   tag: 'workflow-activate',
@@ -68,16 +69,7 @@ export default can.Component.extend({
             workflow.attr('status', 'Active');
             return workflow.save();
           })
-          .then(function (workflow) {
-            if (moment(workflow.next_cycle_start_date)
-                .isSame(moment(), 'day')) {
-              return new CMS.Models.Cycle({
-                context: workflow.context.stub(),
-                workflow: {id: workflow.id, type: 'Workflow'},
-                autogenerate: true,
-              }).save();
-            }
-          })
+          .then(() => Permission.refresh())
           .then(function () {
             let WorkflowExtension =
               _.find(GGRC.extensions, function (extension) {
@@ -92,6 +84,10 @@ export default can.Component.extend({
           })
           .then(function () {
             return workflow.refresh_all('task_groups', 'task_group_tasks');
+          })
+          .then(() => {
+            const cycleStub = workflow.attr('cycles')[0];
+            workflowHelpers.redirectToCycle(cycleStub);
           })
           .always(restoreButton);
       } else {
