@@ -602,8 +602,35 @@ def delete_all_computed_values():
 
 
 def get_revisions(revision_ids):
-  """Get revision properties needed for computed attributes."""
-  return models.Revision.query.filter(models.Revision.id.in_(revision_ids))
+  """Get revision properties needed for computed attributes.
+
+  Fetch revision properties based on resource type. This is an optimization to
+  avoid fetching a lot of content for all objects when it is only needed to get
+  snapshot resource type. In the future we might store snapshot resource type
+  into a separate revision column just fully avoid fetching content from the
+  database.
+  """
+
+  non_snapshot_revisions = db.session.query(
+      models.Revision.action,
+      models.Revision.resource_type,
+      models.Revision.resource_id,
+      models.Revision.source_type,
+      models.Revision.destination_type,
+  ).filter(
+      models.Revision.resource_type != "Snapshot",
+      models.Revision.id.in_(revision_ids)
+  ).all()
+  snapshot_revisions = db.session.query(
+      models.Revision.action,
+      models.Revision.resource_type,
+      models.Revision.resource_id,
+      models.Revision._content,
+  ).filter(
+      models.Revision.resource_type == "Snapshot",
+      models.Revision.id.in_(revision_ids)
+  ).all()
+  return non_snapshot_revisions + snapshot_revisions
 
 
 def compute_attributes(revision_ids):
