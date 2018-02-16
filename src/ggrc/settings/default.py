@@ -37,9 +37,9 @@ exports = [
 ]  # pylint: disable=invalid-name
 
 # Deployment-specific variables
-COMPANY = "Company, Inc."
+COMPANY = os.environ.get("COMPANY", "Company, Inc.")
 COMPANY_LOGO = "/static/images/ggrc-logo.svg"
-COMPANY_LOGO_TEXT = "Company GRC"
+COMPANY_LOGO_TEXT = os.environ.get("COMPANY_LOGO_TEXT", "Company")
 COPYRIGHT = u"Confidential. Copyright \u00A9"  # \u00A9 is the (c) symbol
 
 # Construct build number

@@ -34,6 +34,8 @@ APPENGINE_EMAIL=""
 AUTHORIZED_DOMAIN=""
 ACCESS_TOKEN=""
 VERSION="AUTO" # valid version string or "AUTO" - can be omitted
+COMPANY="Company, Inc."
+COMPANY_LOGO_TEXT="Company GRC"
 
 ## generated values:
 
