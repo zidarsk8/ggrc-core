@@ -642,13 +642,14 @@ def compute_attributes(revision_ids):
 
   with benchmark("Compute attributes"):
 
+    if revision_ids == "all_latest":
+      with benchmark("Get all latest revisions ids"):
+        revision_ids = get_all_latest_revisions_ids()
+
     if not revision_ids:
       return
 
     with benchmark("Get revisions."):
-      if revision_ids == "all_latest":
-        revision_ids = get_all_latest_revisions_ids()
-
       revisions = get_revisions(revision_ids)
 
     with benchmark("Get all computed attributes"):
