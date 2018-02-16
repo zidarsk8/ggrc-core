@@ -171,7 +171,7 @@ def _get_group_key(revision, aggregate_type, computed_object):
   elif revision.resource_type == computed_object:
     key = "computed_objects"
   elif (revision.resource_type == "Snapshot" and
-        revision.content["child_type"] == computed_object):
+        revision._content["child_type"] == computed_object):
     key = "destination_snapshots"
   elif (revision.resource_type == "Relationship" and
         revision.source_type in related_types and
