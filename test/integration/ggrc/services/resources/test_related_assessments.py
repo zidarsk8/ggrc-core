@@ -107,7 +107,7 @@ class TestRelatedAssessments(TestCase):
     self.assertEqual(titles, titles_order)
 
   def test_self_link(self):
-    """Test that audits and assessments contain selfLink."""
+    """Test that audits and assessments contain viewLink."""
     audit_self_link = u"/{}/{}".format(
         self.assessment2.audit._inflector.table_plural,
         self.assessment2.audit.id,
@@ -117,13 +117,13 @@ class TestRelatedAssessments(TestCase):
         self.assessment2.id,
     )
     response = self._get_related_assessments(self.assessment1).json
-    self.assertIn("selfLink", response["data"][0]["audit"])
-    self.assertIn("selfLink", response["data"][0])
+    self.assertIn("viewLink", response["data"][0]["audit"])
+    self.assertIn("viewLink", response["data"][0])
     self.assertEqual(
-        response["data"][0]["audit"]["selfLink"],
+        response["data"][0]["audit"]["viewLink"],
         audit_self_link,
     )
     self.assertEqual(
-        response["data"][0]["selfLink"],
+        response["data"][0]["viewLink"],
         assessment_self_link,
     )
