@@ -9,6 +9,7 @@ import pytest
 
 from lib import dynamic_fixtures
 from lib.page import dashboard
+from lib.service import rest_service
 from lib.utils import selenium_utils, help_utils
 from lib.utils.selenium_utils import get_full_screenshot_as_base64
 
@@ -184,6 +185,14 @@ def new_controls_rest(request):
 
 
 @pytest.fixture(scope="function")
+def new_controls_rest_snapshot(request):
+  """Return snapshots of Controls objects via REST API.
+  Return: [lib.entities.entity.ControlEntity, ...]
+  """
+  yield _common_fixtures(request.fixturename)
+
+
+@pytest.fixture(scope="function")
 def new_objective_rest(request):
   """Create new Objective object via REST API.
   Return: lib.entities.entity.ObjectiveEntity
@@ -253,6 +262,29 @@ def new_assessment_template_with_cas_rest(request):
   Return: lib.entities.entity.AssessmentTemplateEntity
   """
   yield _common_fixtures(request.fixturename)
+
+
+@pytest.fixture(scope="function")
+def new_assessments_from_template_rest(request, new_audit_rest):
+  """Create new Assessments based on Assessment Template via REST API.
+  Return: [lib.entities.entity.AssessmentEntity, ...]
+  """
+  control_snapshots = dynamic_fixtures.get_fixture_from_dict_fixtures(
+      "new_controls_rest_snapshot")
+  template = None
+  dict_executed_fixtures = dynamic_fixtures.dict_executed_fixtures
+  for fixture_name in dict_executed_fixtures:
+    if fixture_name.startswith("new_assessment_template"):
+      template = dict_executed_fixtures[fixture_name][0]
+  if not template:
+    raise ValueError("Assessment template was not created")
+  assessments_service = rest_service.AssessmentsFromTemplateService()
+  assessments = assessments_service.create_assessments(
+      audit=new_audit_rest,
+      template=template,
+      control_snapshots=control_snapshots
+  )
+  return assessments
 
 
 @pytest.fixture(scope="function")
