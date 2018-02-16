@@ -601,6 +601,11 @@ def delete_all_computed_values():
     ).delete()
 
 
+def get_revisions(revision_ids):
+  """Get revision properties needed for computed attributes."""
+  return models.Revision.query.filter(models.Revision.id.in_(revision_ids))
+
+
 def compute_attributes(revision_ids):
   """Compute new values based an changed objects.
 
@@ -617,8 +622,7 @@ def compute_attributes(revision_ids):
       if revision_ids == "all_latest":
         revision_ids = get_all_latest_revisions_ids()
 
-      revisions = models.Revision.query.filter(
-          models.Revision.id.in_(revision_ids))
+      revisions = get_revisions(revision_ids)
 
     with benchmark("Get all computed attributes"):
       attributes = get_computed_attributes()
