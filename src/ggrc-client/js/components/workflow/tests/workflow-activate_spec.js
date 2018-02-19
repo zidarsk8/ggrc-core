@@ -315,76 +315,111 @@ describe('GGRC.WorkflowActivate', function () {
       });
   });
 
-  describe('_can_activate_def() method', function () {
-    let refreshAllDfd;
-    let scopeMock;
-    let method;
+  describe('handleWorkflowActivation() method', () => {
     let workflow;
-    let taskGroups;
 
     beforeEach(function () {
-      const taskGroupModel = new can.Map();
-      taskGroups = new can.List([]);
-      scopeMock = new can.Map();
-      refreshAllDfd = can.Deferred();
-      method = viewModel._can_activate_def.bind(scopeMock);
-      workflow = {
-        type: 'Workflow',
-        refresh_all: jasmine.createSpy('refreshAll')
-          .and.returnValue(refreshAllDfd),
-        attr: jasmine.createSpy('attr'),
-        task_groups: taskGroupModel,
-      };
-      spyOn(taskGroupModel, 'reify')
-        .and.returnValue(taskGroups);
-      scopeMock.attr('instance', workflow);
-    });
-
-    it('should be in waiting state while refresh is in progress',
-      function () {
-        method();
-
-        expect(scopeMock.attr('waiting')).toBe(true);
-        expect(workflow.refresh_all)
-          .toHaveBeenCalled();
+      workflow = new can.Map({
+        refresh_all: jasmine.createSpy('refreshAll'),
       });
-
-    it('should allow activation when TGTs for all TGs exist', function () {
-      taskGroups.push({
-        task_group_tasks: [{id: 1}],
-      });
-
-      method();
-
-      refreshAllDfd.resolve();
-
-      expect(scopeMock.attr('can_activate')).toBe(1);
-      expect(scopeMock.attr('waiting')).toBe(false);
+      viewModel.attr('instance', workflow);
+      spyOn(viewModel, 'canActivateWorkflow');
     });
 
-    it('shouldn\'t allow activation when TGTs for all TGs exist', function () {
-      taskGroups.push(...[
-        {task_group_tasks: [{id: 1}]},
-        {task_group_tasks: []}
-      ]);
-
-      method();
-
-      refreshAllDfd.resolve();
-
-      expect(scopeMock.attr('can_activate')).toBe(false);
-      expect(scopeMock.attr('waiting')).toBe(false);
+    it('should be in waiting state while refresh is in progress', function () {
+      viewModel.handleWorkflowActivation();
+      expect(viewModel.attr('waiting')).toBe(true);
     });
 
-    it('should log an error when refresh fails', function () {
+    it('should refresh related objects for workflow before the check of the' +
+    'activation ability', async function () {
+      await viewModel.handleWorkflowActivation();
+      expect(workflow.refresh_all).toHaveBeenCalledWith(
+        'task_groups', 'task_group_objects'
+      );
+      expect(workflow.refresh_all).toHaveBeenCalledWith(
+        'task_groups', 'task_group_tasks'
+      );
+      expect(workflow.refresh_all).toHaveBeenCalledBefore(
+        viewModel.canActivateWorkflow
+      );
+    });
+
+    it('checks ability to activate workflow', async function () {
+      const expectedResult = true;
+      viewModel.canActivateWorkflow.and.returnValue(expectedResult);
+      await viewModel.handleWorkflowActivation();
+      expect(viewModel.canActivateWorkflow).toHaveBeenCalledWith(workflow);
+      expect(viewModel.attr('can_activate')).toBe(expectedResult);
+    });
+
+    it('should log an error when refresh fails', async function () {
+      const error = {message: 'Message'};
       spyOn(console, 'warn');
-
-      method();
-
-      refreshAllDfd.reject({message: 'error occurred'});
-
-      expect(console.warn)
-        .toHaveBeenCalledWith('Workflow activate error', 'error occurred');
+      workflow.refresh_all.and.returnValue(Promise.reject(error));
+      await viewModel.handleWorkflowActivation();
+      expect(console.warn).toHaveBeenCalledWith( // eslint-disable-line
+        'Workflow activate error',
+        error.message,
+      );
     });
+
+    it('should restore button after workflow activation', async function () {
+      await viewModel.handleWorkflowActivation();
+      expect(viewModel.attr('waiting'), false);
+    });
+
+    it('should restore button when refreshing of the related objects fails',
+      async function () {
+        workflow.refresh_all.and.returnValue(Promise.reject({}));
+        await viewModel.handleWorkflowActivation();
+        expect(viewModel.attr('waiting')).toBe(false);
+      });
+  });
+
+  describe('canActivateWorkflow() method', () => {
+    let workflow;
+    let tgs;
+
+    beforeEach(function () {
+      tgs = [];
+      workflow = {
+        task_groups: {
+          reify: jasmine.createSpy('reify').and.returnValue(tgs),
+        },
+      };
+    });
+
+    it('calls reify method for TGs', function () {
+      viewModel.canActivateWorkflow(workflow);
+      expect(workflow.task_groups.reify).toHaveBeenCalled();
+    });
+
+    it('returns false if there are no task groups', function () {
+      const result = viewModel.canActivateWorkflow(workflow);
+      expect(result).toBe(false);
+    });
+
+    it('returns false if some of task group does not have task group tasks',
+      function () {
+        let result;
+        tgs.push(...[
+          {task_group_tasks: [{}]},
+          {task_group_tasks: []},
+        ]);
+        result = viewModel.canActivateWorkflow(workflow);
+        expect(result).toBe(false);
+      });
+
+    it('returns true if each task group has at least one task group task',
+      function () {
+        let result;
+        tgs.push(...[
+          {task_group_tasks: [{}]},
+          {task_group_tasks: [{}]},
+        ]);
+        result = viewModel.canActivateWorkflow(workflow);
+        expect(result).toBe(true);
+      });
   });
 });
