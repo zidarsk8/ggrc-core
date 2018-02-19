@@ -38,7 +38,7 @@ const viewModel = can.Map.extend({
     );
     return hasTaskGroups && nonEmptyTaskGroupTasks;
   },
-  _handle_refresh: function (model) {
+  handleModelsActivation(model) {
     let models = ['TaskGroupTask', 'TaskGroupObject'];
     if (models.indexOf(model.shortName) > -1) {
       this.handleWorkflowActivation();
@@ -111,11 +111,11 @@ const events = {
   '{viewModel} taskGroupAmount'() {
     this.viewModel.handleWorkflowActivation();
   },
-  '{can.Model.Cacheable} created': function (model) {
-    this.viewModel._handle_refresh(model);
+  '{can.Model.Cacheable} created'(model) {
+    this.viewModel.handleModelsActivation(model);
   },
-  '{can.Model.Cacheable} destroyed': function (model) {
-    this.viewModel._handle_refresh(model);
+  '{can.Model.Cacheable} destroyed'(model) {
+    this.viewModel.handleModelsActivation(model);
   },
 };
 
