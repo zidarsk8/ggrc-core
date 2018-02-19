@@ -76,6 +76,8 @@ def get_gdrive_file(file_data):
   except Unauthorized as ex:
     raise Unauthorized("{} Try to reload /import page".format(ex.message))
   except HttpAccessTokenRefreshError:
+    # drive_service can rise this exception in case of invalid token, that why
+    # we need to handle it here
     del flask.session['credentials']
     raise Unauthorized('Unable to get valid credentials.'
                        ' Try to reload /import page')

@@ -8,6 +8,7 @@ import httplib2
 
 import flask
 from flask import render_template
+from logging import getLogger
 from werkzeug.exceptions import Unauthorized
 
 from ggrc import settings
@@ -21,6 +22,9 @@ _GOOGLE_AUTH_URI = "https://accounts.google.com/o/oauth2/auth"
 _GOOGLE_TOKEN_URI = "https://accounts.google.com/o/oauth2/token"
 _GOOGLE_API_GDRIVE_SCOPE = "https://www.googleapis.com/auth/drive"
 
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
+
 
 def get_http_auth():
   """Get valid user credentials from storage and create an authorized
@@ -31,6 +35,9 @@ def get_http_auth():
 
   Returns:
       http instance authorized with the credentials
+
+  Note: changes for QUICK FIX only (GGRC-4417). Will be refactored in
+  the scope of GGRC-4311
   """
   if 'credentials' not in flask.session:
     raise Unauthorized('Unable to get valid credentials')
@@ -40,7 +47,8 @@ def get_http_auth():
     http_auth = credentials.authorize(httplib2.Http())
     if credentials.access_token_expired:
       credentials.refresh(http_auth)
-  except Exception:
+  except Exception as ex:
+    logger.exception(ex.message)
     del flask.session['credentials']
     raise Unauthorized('Unable to get valid credentials.')
   flask.session['credentials'] = credentials.to_json()
@@ -50,7 +58,10 @@ def get_http_auth():
 @app.route("/is_gdrive_authorized")
 @login_required
 def is_gdrive_authorized():
-  """FE need quick check if BE authorized"""
+  """FE need quick check if BE has credentials.
+
+  Unfortunately we can not quick check if credentials are valid here.
+  """
   if 'credentials' in flask.session:
     return 'OK'
   else:
@@ -59,7 +70,14 @@ def is_gdrive_authorized():
 
 @app.route("/authorize")
 def authorize_app():
-  """Redirect to Google API auth page to authorize"""
+  """Redirect to Google API auth page to authorize.
+
+  This handler should be splitted by two according to steps:
+  - OAuth step 1
+  - OAuth step 2
+
+  Note: will be splitted in the scope of GGRC-4311
+  """
   if 'credentials' in flask.session:
     return render_template("gdrive/auth_gdrive.haml")
 
