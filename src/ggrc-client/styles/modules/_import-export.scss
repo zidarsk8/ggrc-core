@@ -107,29 +107,6 @@ form.import {
 
 }
 
-.download-template {
-  background: $lightGray;
-  border: 1px solid $darkGray;
-  padding: 20px;
-  .import-list {
-    @extend %reset-list;
-    li {
-      margin-bottom: 4px;
-    }
-  }
-  .center-block {
-    text-align: center;
-    padding: 20px 0 10px;
-    small {
-      display: block;
-    }
-    i {
-      @include opacity(1);
-      margin-top: 4px;
-    }
-  }
-}
-
 .import {
   .btn-fixed {
     float: left;

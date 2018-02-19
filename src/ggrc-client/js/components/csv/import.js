@@ -6,7 +6,6 @@
 import '../../plugins/utils/controllers';
 import {warning} from '../../plugins/utils/modals';
 import {hasWarningType} from '../../plugins/utils/controllers';
-import './csv-template';
 import '../show-more/show-more';
 import quickTips from './templates/quick-tips.mustache';
 import template from './templates/csv-import.mustache';
