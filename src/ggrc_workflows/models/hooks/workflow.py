@@ -9,8 +9,8 @@ from sqlalchemy.sql.expression import or_, and_
 
 from ggrc import db
 from ggrc import login
+from ggrc import utils
 from ggrc.models import all_models
-from ggrc.access_control.role import get_custom_roles_for
 
 
 RELATED_MODELS = (
@@ -32,19 +32,15 @@ def init_hook():
 def handle_acl_changes(session, flush_context):
   """ACL creation hook handler."""
   # pylint: disable=unused-argument
-  context = defaultdict(lambda: {
-      model: defaultdict(set) for model in RELATED_MODELS
-  })
-  wf_new_acl = defaultdict(set)
+  wf_objects = defaultdict(set)
+  wf_new_acl = set()
   for obj in session.new:
     if (isinstance(obj, all_models.AccessControlList) and
             obj.object_type == all_models.Workflow.__name__):
-      wf_new_acl[obj.object_id].add(obj)
+      wf_new_acl.add(obj.id)
     elif isinstance(obj, RELATED_MODELS):
-      context[obj.workflow.id][obj.__class__][obj.id].update(
-          obj.workflow.access_control_list)
-  _init_context(wf_new_acl, context)
-  create_related_roles(context)
+      wf_objects[obj.type].add(obj.id)
+  add_new_wf_roles_propagation(wf_new_acl)
 
   related_to_del = defaultdict(set)
   for obj in session.deleted:
@@ -116,91 +112,233 @@ def _add_parents_to_context(parent_model, wf_new_acl, context):
   return parent_wf_map
 
 
-def _init_context(wf_new_acl, context):
-  """Initialize context for newly created parent ACL records propagation.
+def _get_child_ids(parent_ids, child_class):
+  """Get all acl ids for acl entries with the given parent ids
 
   Args:
-      wf_new_acl: dictionary with mapping workflow_id to set of newly
-          created parent ACL records.
-      context: dictionary with information for future ACL propagation.
-          It consists next data.
-          {
-            workflow_id: {
-              all_models.TaskGroup: {
-                id1: set(acl1, acl2, ...),
-                ...
-              },
-              all_models.TaskGroupTask: {
-                id1: set(acl1, acl2, ...),
-                ...
-              },
-              all_models.Cycle: {
-                id1: set(acl1, acl2, ...),
-                ...
-              },
-              all_models.CycleTaskGroup: {
-                id1: set(acl1, acl2, ...),
-                ...
-              },
-              all_models.CycleTaskGroupObjectTask: {
-                id1: set(acl1, acl2, ...),
-                ...
-              },
-              all_models.CycleTaskEntry: {
-                id1: set(acl1, acl2, ...),
-                ...
-              },
-            },
-            ...
-          }
+    parent_ids: list of parent acl entries or query with parent ids.
+
+  Returns:
+    list of ACL ids for all children from the given parents.
   """
-  if not wf_new_acl:
-    return
+  acl_table = all_models.AccessControlList.__table__
 
-  tg_wf_map = _add_parents_to_context(all_models.TaskGroup, wf_new_acl,
-                                      context)
-  if tg_wf_map:
-    _add_children_to_context(all_models.TaskGroupTask, "task_group_id",
-                             tg_wf_map, wf_new_acl, context)
-
-  cycle_wf_map = _add_parents_to_context(all_models.Cycle, wf_new_acl, context)
-  if cycle_wf_map:
-    _add_children_to_context(all_models.CycleTaskGroup, "cycle_id",
-                             cycle_wf_map, wf_new_acl, context)
-
-    _add_children_to_context(all_models.CycleTaskGroupObjectTask, "cycle_id",
-                             cycle_wf_map, wf_new_acl, context)
-
-    _add_children_to_context(all_models.CycleTaskEntry, "cycle_id",
-                             cycle_wf_map, wf_new_acl, context)
+  return sa.select([acl_table.c.id]).where(
+      acl_table.c.parent_id.in_(parent_ids)
+  ).where(
+      acl_table.c.object_type == child_class.__name__
+  )
 
 
-def create_related_roles(context):
-  """Create related roles for Workflow related objects.
+def _insert_select_acls(select_statement):
+  """Insert acl records from the select statement
 
   Args:
-      context: dictionary with information for ACL propagation.
+    select_statement: sql statement that contains the following columns
+      person_id,
+      ac_role_id,
+      object_id,
+      object_type,
+      created_at,
+      modified_by_id,
+      updated_at,
+      parent_id,
   """
-  if not context:
+
+  acl_table = all_models.AccessControlList.__table__
+
+  inserter = acl_table.insert().prefix_with("IGNORE")
+
+  db.session.execute(
+      inserter.from_select(
+          [
+              acl_table.c.person_id,
+              acl_table.c.ac_role_id,
+              acl_table.c.object_id,
+              acl_table.c.object_type,
+              acl_table.c.created_at,
+              acl_table.c.modified_by_id,
+              acl_table.c.updated_at,
+              acl_table.c.parent_id,
+          ],
+          select_statement
+      )
+  )
+
+
+def _propagate_to_wf_children(new_wf_acls, child_class):
+  """Propagate newly added roles to workflow objects.
+
+  Args:
+    wf_new_acl: list of all newly created acl entries for workflows
+
+  Returns:
+    list of newly created acl entries for task groups.
+  """
+
+  child_table = child_class.__table__
+  acl_table = all_models.AccessControlList.__table__
+  acr_table = all_models.AccessControlRole.__table__.alias("parent_acr")
+  acr_mapped_table = all_models.AccessControlRole.__table__.alias("mapped")
+
+  current_user_id = login.get_current_user_id()
+
+  select_statement = sa.select([
+      acl_table.c.person_id,
+      acr_mapped_table.c.id,
+      child_table.c.id,
+      sa.literal(child_class.__name__),
+      sa.func.now(),
+      sa.literal(current_user_id),
+      sa.func.now(),
+      acl_table.c.id,
+  ]).select_from(
+      sa.join(
+          sa.join(
+              sa.join(
+                  child_table,
+                  acl_table,
+                  and_(
+                      acl_table.c.object_id == child_table.c.workflow_id,
+                      acl_table.c.object_type == all_models.Workflow.__name__,
+                  )
+              ),
+              acr_table,
+          ),
+          acr_mapped_table,
+          acr_mapped_table.c.name == sa.func.concat(
+              acr_table.c.name, " Mapped")
+      )
+  ).where(
+      acl_table.c.id.in_(new_wf_acls)
+  )
+
+  _insert_select_acls(select_statement)
+
+  return _get_child_ids(new_wf_acls, child_class)
+
+
+def _propagate_to_children(new_tg_acls, child_class, id_name, parent_class):
+  """Propagate new acls to objects related to task groups
+
+  Args:
+    new_tg_acls: list of ids of newly created acl entries for task groups
+
+  Returns:
+    list of ids for newy created task group task or task group object entries.
+  """
+
+  child_table = child_class.__table__
+  acl_table = all_models.AccessControlList.__table__
+
+  current_user_id = login.get_current_user_id()
+
+  parent_id_filed = getattr(child_table.c, id_name)
+
+  select_statement = sa.select([
+      acl_table.c.person_id,
+      acl_table.c.ac_role_id,
+      child_table.c.id,
+      sa.literal(child_class.__name__),
+      sa.func.now(),
+      sa.literal(current_user_id),
+      sa.func.now(),
+      acl_table.c.id,
+  ]).select_from(
+      sa.join(
+          child_table,
+          acl_table,
+          and_(
+              acl_table.c.object_id == parent_id_filed,
+              acl_table.c.object_type == parent_class.__name__,
+          )
+      )
+  ).where(
+      acl_table.c.id.in_(new_tg_acls)
+  )
+
+  _insert_select_acls(select_statement)
+
+  return _get_child_ids(new_tg_acls, child_class)
+
+
+def _propagate_to_tgt(new_tg_acls):
+  """Propagate ACL entries to task groups tasks."""
+  return _propagate_to_children(
+      new_tg_acls,
+      all_models.TaskGroupTask,
+      "task_group_id",
+      all_models.TaskGroup,
+  )
+
+
+def _propagate_to_tgo(new_tg_acls):
+  """Propagate ACL entries to task groups objects."""
+  return _propagate_to_children(
+      new_tg_acls,
+      all_models.TaskGroupObject,
+      "task_group_id",
+      all_models.TaskGroup,
+  )
+
+
+def _propagate_to_cycles(new_wf_acls):
+  return _propagate_to_wf_children(new_wf_acls, all_models.Cycle)
+
+
+def _propagate_to_tg(new_wf_acls):
+  return _propagate_to_wf_children(new_wf_acls, all_models.TaskGroup)
+
+
+def _propagate_to_ctg(new_cycle_acls):
+  """Propagate ACL entries to task groups objects."""
+  return _propagate_to_children(
+      new_cycle_acls,
+      all_models.CycleTaskGroup,
+      "cycle_id",
+      all_models.Cycle,
+  )
+
+
+def _propagate_to_cycle_tasks(new_ctg_acls):
+  return _propagate_to_children(
+      new_ctg_acls,
+      all_models.CycleTaskGroupObjectTask,
+      "cycle_task_group_id",
+      all_models.CycleTaskGroup,
+  )
+
+
+def _propagate_to_cycle_tasks_entries(new_ct_acls):
+  return _propagate_to_children(
+      new_ct_acls,
+      all_models.CycleTaskEntry,
+      "cycle_task_group_object_task_id",
+      all_models.CycleTaskGroupObjectTask,
+  )
+
+
+def add_new_wf_roles_propagation(new_wf_acls):
+  if not new_wf_acls:
     return
 
-  for related in context.values():
-    for rel_model, rel_acl_map in related.iteritems():
-      for rel_id, acl_set in rel_acl_map.iteritems():
-        for p_acl in acl_set:
-          rel_person_id = p_acl.person.id if p_acl.person else p_acl.person_id
-          custom_roles = get_custom_roles_for(p_acl.object_type)
-          parent_acr_id = (p_acl.ac_role.id
-                           if p_acl.ac_role else p_acl.ac_role_id)
-          parent_acr_name = custom_roles[parent_acr_id]
-          rel_acr_name = "{} Mapped".format(parent_acr_name)
-          rel_acr_id = next(ind for ind in custom_roles
-                            if custom_roles[ind] == rel_acr_name)
-          db.session.add(all_models.AccessControlList(
-              person_id=rel_person_id,
-              ac_role_id=rel_acr_id,
-              object_type=rel_model.__name__,
-              object_id=rel_id,
-              parent=p_acl,
-              modified_by_id=login.get_current_user_id(),
-          ))
+  with utils.benchmark("Propagate wf roles to task groups"):
+    new_tg_acls = _propagate_to_tg(new_wf_acls)
+
+  with utils.benchmark("Propagate tg roles to task group tasks"):
+    _propagate_to_tgt(new_tg_acls)
+
+  with utils.benchmark("Propagate tg roles to task group objects"):
+    _propagate_to_tgo(new_tg_acls)
+
+  with utils.benchmark("Propagate wf roles to cycles"):
+    new_cycle_acls = _propagate_to_cycles(new_wf_acls)
+
+  with utils.benchmark("Propagate wf roles to cycles task groups"):
+    new_ctg_acls = _propagate_to_ctg(new_cycle_acls)
+
+  with utils.benchmark("Propagate wf roles to cycles tasks"):
+    new_ct_acls = _propagate_to_cycle_tasks(new_ctg_acls)
+
+  with utils.benchmark("Propagate wf roles to cycles tasks entries"):
+    _propagate_to_cycle_tasks_entries(new_ct_acls)
