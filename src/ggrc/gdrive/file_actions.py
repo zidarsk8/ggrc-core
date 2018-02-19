@@ -22,8 +22,6 @@ from ggrc.gdrive import get_http_auth
 API_SERVICE_NAME = 'drive'
 API_VERSION = 'v3'
 
-ALLOWED_FILENAME_CHARS = "_ ()-'"
-
 
 def create_gdrive_file(csv_string, filename):
   """Post text/csv data to a gdrive file"""
