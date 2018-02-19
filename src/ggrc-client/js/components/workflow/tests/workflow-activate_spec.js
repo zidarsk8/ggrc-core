@@ -3,254 +3,316 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import component from '../workflow-activate';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../workflow-activate';
 import helpers from '../workflow-helpers';
 import Permission from '../../../permission';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 
 describe('GGRC.WorkflowActivate', function () {
-  let scope;
+  let viewModel;
 
-  beforeAll(function () {
-    scope = component.prototype.scope;
+  beforeEach(function () {
+    viewModel = getComponentVM(Component);
   });
 
-  describe('_activate() method', function () {
-    let method;
+  describe('activateWorkflow() method', () => {
+    beforeEach(function () {
+      viewModel.attr('instance', {});
+    });
+
+    describe('when workflow is "Repeat On"', () => {
+      it('calls repeatOnHandler method', function () {
+        spyOn(viewModel, 'repeatOnHandler');
+        viewModel.attr('instance.unit', 'weekly');
+        viewModel.activateWorkflow();
+        expect(viewModel.repeatOnHandler).toHaveBeenCalled();
+      });
+    });
+
+    describe('when workflow is "Repeat Off"', () => {
+      it('calls repeatOffHandler method', function () {
+        spyOn(viewModel, 'repeatOffHandler');
+        viewModel.attr('instance.unit', null);
+        viewModel.activateWorkflow();
+        expect(viewModel.repeatOffHandler).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('repeatOnHandler() method', () => {
     let workflow;
-    let scopeMock;
-    let refreshDfd;
-    let saveDfd;
-    let initCountsDfd;
-    let refreshAllDfd;
-    let generateDfd;
-    let permissionRefreshDfd;
-    let workflowExtension = {
-      countsMap: {
-        activeCycles: 'active cycles',
-      },
-    };
 
     beforeEach(function () {
-      scopeMock = new can.Map();
-      refreshDfd = can.Deferred();
-      saveDfd = can.Deferred();
-      initCountsDfd = can.Deferred();
-      refreshAllDfd = can.Deferred();
-      generateDfd = can.Deferred();
-      permissionRefreshDfd = can.Deferred();
+      workflow = new can.Map();
+      workflow.refresh_all = jasmine.createSpy('refresh_all');
+      spyOn(viewModel, 'initWorkflow');
+      spyOn(Permission, 'refresh');
+      spyOn(viewModel, 'updateActiveCycleCounts');
+      spyOn(viewModel, 'redirectToFirstCycle');
+    });
 
-      workflow = new CMS.Models.Workflow({
-        type: 'Workflow',
-        unit: 'month',
-        context: new CMS.Models.Context({id: 3}),
-        next_cycle_start_date: moment(),
+    it('should be in waiting state while refresh is in progress', function () {
+      viewModel.repeatOnHandler();
+      expect(viewModel.attr('waiting')).toBe(true);
+    });
+
+    it('should init workflow before refresh the permissions', function () {
+      viewModel.repeatOnHandler(workflow);
+      expect(viewModel.initWorkflow).toHaveBeenCalledWith(workflow);
+    });
+
+    it('should refresh permissions', async function () {
+      await viewModel.repeatOnHandler(workflow);
+      expect(Permission.refresh).toHaveBeenCalled();
+      expect(Permission.refresh).toHaveBeenCalledBefore(
+        viewModel.updateActiveCycleCounts
+      );
+    });
+
+    it('should try to update counts for active cycles tab', async function () {
+      await viewModel.repeatOnHandler(workflow);
+      expect(viewModel.updateActiveCycleCounts)
+        .toHaveBeenCalledWith(workflow);
+    });
+
+    it('should try to refresh TGT after updating counts for active cycles',
+      async function () {
+        await viewModel.repeatOnHandler(workflow);
+        expect(workflow.refresh_all)
+          .toHaveBeenCalledWith('task_groups', 'task_group_tasks');
       });
 
-      spyOn(workflow, 'refresh')
-        .and.returnValue(refreshDfd);
-      spyOn(workflow, 'refresh_all')
-        .and.returnValue(refreshAllDfd);
-      spyOn(workflow, 'save')
-        .and.returnValue(saveDfd);
-      scopeMock.attr('instance', workflow);
+    it('should redirect to WF cycle', async function () {
+      await viewModel.repeatOnHandler(workflow);
+      expect(viewModel.redirectToFirstCycle)
+        .toHaveBeenCalledWith(workflow);
+    });
 
-      spyOn(_, 'find')
-        .and.returnValue(workflowExtension);
-      spyOn(CurrentPageUtils, 'initCounts')
-        .and.returnValue(initCountsDfd);
-      spyOn(helpers, 'generateCycle')
-        .and.returnValue(generateDfd);
+    it('should restore button after TGT refresh', async function () {
+      await viewModel.repeatOnHandler(workflow);
+      expect(viewModel.attr('waiting'), false);
+    });
+
+    it('should restore button when initWorkflow fails', async function (done) {
+      viewModel.initWorkflow.and.returnValue(Promise.reject());
+      try {
+        await viewModel.repeatOnHandler(workflow);
+      } catch (err) {
+        expect(viewModel.attr('waiting')).toBe(false);
+        done();
+      }
+    });
+
+    it('should restore button when permission refresh fails',
+      async function (done) {
+        Permission.refresh.and.returnValue(Promise.reject());
+        try {
+          await viewModel.repeatOnHandler(workflow);
+        } catch (err) {
+          expect(viewModel.attr('waiting')).toBe(false);
+          done();
+        }
+      });
+
+    it('should restore button when counts update fails', async function (done) {
+      viewModel.updateActiveCycleCounts.and.returnValue(Promise.reject());
+      try {
+        await viewModel.repeatOnHandler(workflow);
+      } catch (err) {
+        expect(viewModel.attr('waiting')).toBe(false);
+        done();
+      }
+    });
+
+    it('should restore button when TG refresh fails', async function (done) {
+      workflow.refresh_all.and.returnValue(Promise.reject());
+      try {
+        await viewModel.repeatOnHandler(workflow);
+      } catch (err) {
+        expect(viewModel.attr('waiting')).toBe(false);
+        done();
+      }
+    });
+  });
+
+  describe('initWorkflow() method', () => {
+    let workflow;
+
+    beforeEach(function () {
+      workflow = new can.Map({});
+      Object.assign(workflow, {
+        refresh: jasmine.createSpy('refresh'),
+        save: jasmine.createSpy('save'),
+      });
+    });
+
+    it('refresh passed workflow', async function () {
+      await viewModel.initWorkflow(workflow);
+      expect(workflow.refresh).toHaveBeenCalled();
+      expect(workflow.refresh).toHaveBeenCalledBefore(workflow.save);
+    });
+
+    it('sets recurrences to true', async function () {
+      await viewModel.initWorkflow(workflow);
+      expect(workflow.attr('recurrences')).toBe(true);
+    });
+
+    it('sets status to "Active"', async function () {
+      await viewModel.initWorkflow(workflow);
+      expect(workflow.attr('status')).toBe('Active');
+    });
+
+    it('saves workflow', async function () {
+      await viewModel.initWorkflow(workflow);
+      expect(workflow.save).toHaveBeenCalled();
+    });
+
+    it('returns result of save workflow operation', async function () {
+      const expectedResult = {};
+      let result;
+      workflow.save.and.returnValue(expectedResult);
+      result = await viewModel.initWorkflow(workflow);
+      expect(result).toBe(expectedResult);
+    });
+  });
+
+  describe('updateActiveCycleCounts() method', () => {
+    let originalExt;
+    let extension;
+    let workflow;
+
+    beforeEach(function () {
+      originalExt = GGRC.extensions;
+      workflow = {};
+      extension = {
+        name: 'workflows',
+        countsMap: {},
+      };
+      GGRC.extensions = [extension];
+      spyOn(CurrentPageUtils, 'initCounts');
+    });
+
+    afterEach(function () {
+      GGRC.extensions = originalExt;
+    });
+
+    it('updates counts for active cycles', function () {
+      extension.countsMap.activeCycles = 1234;
+      Object.assign(workflow, {
+        type: 'Type of workflow',
+        id: 4321,
+      });
+      viewModel.updateActiveCycleCounts(workflow);
+      expect(CurrentPageUtils.initCounts).toHaveBeenCalledWith([
+        extension.countsMap.activeCycles
+      ], workflow.type, workflow.id);
+    });
+
+    it('returns result of update operation', async function () {
+      const expectedResult = {};
+      let result;
+      CurrentPageUtils.initCounts.and.returnValue(expectedResult);
+      result = await viewModel.updateActiveCycleCounts(workflow);
+      expect(result).toBe(expectedResult);
+    });
+  });
+
+  describe('redirectToFirstCycle() method', () => {
+    let workflow;
+
+    beforeEach(function () {
+      workflow = new can.Map({cycles: []});
       spyOn(helpers, 'redirectToCycle');
-      spyOn(Permission, 'refresh')
-        .and.returnValue(permissionRefreshDfd);
-
-      scopeMock.attr({
-        _restore_button: jasmine.createSpy('_restore_button')
-      });
-
-      method = scope._activate.bind(scopeMock);
     });
 
-    describe('for recurrent workflow', function () {
-      let fakeCycleStub;
-      beforeEach(function () {
-        fakeCycleStub = new can.Map({});
-        workflow.attr('cycles', []);
-        workflow.attr('cycles').push(fakeCycleStub);
-        method();
+    it('redirects to first workflow cycle', function () {
+      const cycleStub = new can.Map({
+        id: 123,
+        type: 'Cycle',
       });
+      workflow.attr('cycles').push(cycleStub);
+      viewModel.redirectToFirstCycle(workflow);
+      expect(helpers.redirectToCycle).toHaveBeenCalledWith(cycleStub);
+    });
+  });
 
-      it('should be in waiting state while refresh is in progress',
-        function () {
-          expect(scopeMock.attr('waiting')).toBe(true);
-          expect(workflow.refresh)
-            .toHaveBeenCalled();
-        });
+  describe('repeatOffHandler() method', () => {
+    let workflow;
 
-      it('should try to save Workflow as active object after refreshing',
-        function () {
-          refreshDfd.resolve();
-          expect(workflow.attr('recurrences'))
-            .toBeTruthy();
-          expect(workflow.attr('status'))
-            .toBe('Active');
-          expect(workflow.save)
-            .toHaveBeenCalled();
-        });
-
-      it('should refresh permissions after workflow saving', function () {
-        refreshDfd.resolve();
-        saveDfd.resolve(workflow);
-
-        expect(Permission.refresh)
-          .toHaveBeenCalled();
-      });
-
-      it('should try to init counts for active cycles tab after cycle saving',
-        function () {
-          refreshDfd.resolve();
-          saveDfd.resolve(workflow);
-          permissionRefreshDfd.resolve();
-
-          expect(CurrentPageUtils.initCounts)
-            .toHaveBeenCalledWith([
-              workflowExtension.countsMap.activeCycles,
-            ], workflow.type, workflow.id);
-        });
-
-      it('should try to refresh TGT after updating counts for active cycles',
-        function () {
-          refreshDfd.resolve();
-          saveDfd.resolve(workflow);
-          permissionRefreshDfd.resolve();
-          initCountsDfd.resolve();
-
-          expect(workflow.refresh_all)
-            .toHaveBeenCalledWith('task_groups', 'task_group_tasks');
-        });
-
-      it('should redirect to WF cycle', function () {
-        refreshDfd.resolve();
-        saveDfd.resolve(workflow);
-        permissionRefreshDfd.resolve();
-        initCountsDfd.resolve();
-        refreshAllDfd.resolve();
-        expect(helpers.redirectToCycle).toHaveBeenCalledWith(fakeCycleStub);
-      });
-
-      it('should restore button after TGT refresh', function () {
-        refreshDfd.resolve();
-        saveDfd.resolve(workflow);
-        permissionRefreshDfd.resolve();
-        initCountsDfd.resolve();
-        refreshAllDfd.resolve();
-
-        expect(scopeMock._restore_button)
-          .toHaveBeenCalled();
-      });
-
-      it('should restore button when workflow refresh fails', function () {
-        refreshDfd.reject();
-        expect(workflow.attr('recurrences'))
-          .toBeFalsy();
-        expect(workflow.attr('status'))
-          .not.toBe('Active');
-        expect(scopeMock._restore_button)
-          .toHaveBeenCalled();
-      });
-
-      it('should restore button when workflow saving fails', function () {
-        refreshDfd.resolve();
-        saveDfd.reject();
-
-        expect(scopeMock._restore_button)
-          .toHaveBeenCalled();
-      });
-
-      it('should restore button when counts init fails', function () {
-        refreshDfd.resolve();
-        saveDfd.resolve(workflow);
-        permissionRefreshDfd.resolve();
-        initCountsDfd.reject();
-        expect(scopeMock._restore_button)
-          .toHaveBeenCalled();
-      });
-
-      it('should restore button when counts init fails', function () {
-        refreshDfd.resolve();
-        saveDfd.resolve(workflow);
-        permissionRefreshDfd.resolve();
-        initCountsDfd.resolve();
-        refreshAllDfd.reject();
-        expect(scopeMock._restore_button)
-          .toHaveBeenCalled();
-      });
+    beforeEach(function () {
+      workflow = new can.Map();
+      workflow.refresh = jasmine.createSpy('refresh');
+      workflow.save = jasmine.createSpy('save');
+      spyOn(helpers, 'generateCycle');
     });
 
-    describe('for one-time workflow', function () {
-      beforeEach(function () {
-        workflow.attr('unit', null);
-        method();
-      });
-
-      it('should be in waiting state while cycle generation starts',
-        function () {
-          expect(scopeMock.attr('waiting')).toBe(true);
-          expect(helpers.generateCycle)
-            .toHaveBeenCalled();
-        });
-
-      it('should try to refresh workflow after cycle generation',
-        function () {
-          generateDfd.resolve();
-          expect(workflow.refresh)
-            .toHaveBeenCalled();
-        });
-
-      it('should try to save workflow as active object after refreshing',
-        function () {
-          generateDfd.resolve();
-          refreshDfd.resolve(workflow);
-
-          expect(workflow.attr('status'))
-            .toBe('Active');
-          expect(workflow.save)
-            .toHaveBeenCalled();
-        });
-
-      it('should restore button after workflow saving', function () {
-        generateDfd.resolve();
-        refreshDfd.resolve(workflow);
-        saveDfd.resolve();
-
-        expect(scopeMock._restore_button)
-          .toHaveBeenCalled();
-      });
-
-      it('should restore button when cycle generation fails', function () {
-        generateDfd.reject();
-        expect(scopeMock._restore_button)
-          .toHaveBeenCalled();
-      });
-
-      it('should restore button when workflow refresh fails', function () {
-        generateDfd.resolve(workflow);
-        refreshDfd.reject();
-
-        expect(scopeMock._restore_button)
-          .toHaveBeenCalled();
-      });
-
-      it('should restore button when saving fails', function () {
-        generateDfd.resolve(workflow);
-        refreshDfd.resolve(workflow);
-        saveDfd.reject();
-
-        expect(scopeMock._restore_button)
-          .toHaveBeenCalled();
-      });
+    it('should be in waiting state while refresh is in progress', function () {
+      viewModel.repeatOffHandler(workflow);
+      expect(viewModel.attr('waiting')).toBe(true);
     });
+
+    it('generates cycle for passed workflow before workflow refreshing',
+      async function () {
+        await viewModel.repeatOffHandler(workflow);
+        expect(helpers.generateCycle).toHaveBeenCalledWith(workflow);
+        expect(helpers.generateCycle).toHaveBeenCalledBefore(
+          workflow.refresh
+        );
+      });
+
+    it('refreshes workflow', async function () {
+      await viewModel.repeatOffHandler(workflow);
+      expect(workflow.refresh).toHaveBeenCalled();
+    });
+
+    it('sets active status for passed workflow', async function () {
+      await viewModel.repeatOffHandler(workflow);
+      expect(workflow.attr('status')).toBe('Active');
+    });
+
+    it('saves workflow', async function () {
+      await viewModel.repeatOffHandler(workflow);
+      expect(workflow.save).toHaveBeenCalled();
+    });
+
+    it('should restore button after workflow saving', async function () {
+      await viewModel.repeatOffHandler(workflow);
+      expect(viewModel.attr('waiting'), false);
+    });
+
+    it('should restore button when cycle generating fails',
+      async function (done) {
+        helpers.generateCycle.and.returnValue(Promise.reject());
+        try {
+          await viewModel.repeatOffHandler(workflow);
+        } catch (err) {
+          expect(viewModel.attr('waiting')).toBe(false);
+          done();
+        }
+      });
+
+    it('should restore button when workflow refreshing fails',
+      async function (done) {
+        workflow.refresh.and.returnValue(Promise.reject());
+        try {
+          await viewModel.repeatOffHandler(workflow);
+        } catch (err) {
+          expect(viewModel.attr('waiting')).toBe(false);
+          done();
+        }
+      });
+
+    it('should restore button when workflow saving fails',
+      async function (done) {
+        workflow.save.and.returnValue(Promise.reject());
+        try {
+          await viewModel.repeatOffHandler(workflow);
+        } catch (err) {
+          expect(viewModel.attr('waiting')).toBe(false);
+          done();
+        }
+      });
   });
 
   describe('_can_activate_def() method', function () {
@@ -265,7 +327,7 @@ describe('GGRC.WorkflowActivate', function () {
       taskGroups = new can.List([]);
       scopeMock = new can.Map();
       refreshAllDfd = can.Deferred();
-      method = scope._can_activate_def.bind(scopeMock);
+      method = viewModel._can_activate_def.bind(scopeMock);
       workflow = {
         type: 'Workflow',
         refresh_all: jasmine.createSpy('refreshAll')
