@@ -777,6 +777,7 @@ def start_recurring_cycles():
         models.Workflow.next_cycle_start_date <= today,
         models.Workflow.recurrences == True  # noqa
     )
+    event = None
     for workflow in workflows:
       # Follow same steps as in model_posted.connect_via(models.Cycle)
       while workflow.next_cycle_start_date <= date.today():
@@ -790,7 +791,7 @@ def start_recurring_cycles():
       # 'Cycles' for each 'Workflow' should be committed separately
       # to free memory on each iteration. Single commit exeeded
       # maximum memory limit on AppEngine instance.
-      log_event(db.session)
+      event = log_event(db.session, event=event)
       db.session.commit()
 
 
