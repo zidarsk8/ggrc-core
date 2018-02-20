@@ -151,6 +151,7 @@
       'ca_update',
       'accessControlList',
       'base-notifications',
+      'relatedAssessmentsLoader',
     ],
     is_custom_attributable: true,
     isRoleable: true,
