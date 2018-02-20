@@ -7,6 +7,7 @@ import collections
 
 import sqlalchemy as sa
 from sqlalchemy import inspect
+from sqlalchemy.orm import load_only
 from sqlalchemy.orm.session import Session
 import flask
 from werkzeug.exceptions import Forbidden
@@ -112,11 +113,13 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
     return value
 
 
-def invalidate_role_names_cache(mapper, content, target):
+def invalidate_acr_caches(mapper, content, target):
   # pylint: disable=unused-argument
   """Clear `global_role_names` if ACR created or update or deleted."""
   if hasattr(flask.g, "global_role_names"):
     del flask.g.global_role_names
+  if hasattr(flask.g, "global_ac_roles"):
+    del flask.g.global_ac_roles
 
 
 def acr_modified(obj, session):
@@ -142,9 +145,9 @@ def invalidate_noneditable_change(session, flush_context, instances):
       raise Forbidden()
 
 
-sa.event.listen(AccessControlRole, "after_insert", invalidate_role_names_cache)
-sa.event.listen(AccessControlRole, "after_delete", invalidate_role_names_cache)
-sa.event.listen(AccessControlRole, "after_update", invalidate_role_names_cache)
+sa.event.listen(AccessControlRole, "after_insert", invalidate_acr_caches)
+sa.event.listen(AccessControlRole, "after_delete", invalidate_acr_caches)
+sa.event.listen(AccessControlRole, "after_update", invalidate_acr_caches)
 sa.event.listen(Session, 'before_flush', invalidate_noneditable_change)
 
 
@@ -166,3 +169,20 @@ def get_custom_roles_for(object_type):
     for type_, id_, name_ in query:
       flask.g.global_role_names[type_][id_] = name_
   return flask.g.global_role_names[object_type]
+
+
+def get_ac_roles_for(object_type):
+  """Get all ACRs for the given object type.
+
+  Args:
+      object_type: Object type for which ACR records should be returned.
+  Returns:
+      Dict like {"Access Control Role Name": ACR Instance, ...}
+  """
+  if getattr(flask.g, "global_ac_roles", None) is None:
+    flask.g.global_ac_roles = collections.defaultdict(dict)
+    query = AccessControlRole.query.options(
+        load_only("id", "name", "object_type"))
+    for role in query:
+      flask.g.global_ac_roles[role.object_type][role.name] = role
+  return flask.g.global_ac_roles[object_type]
