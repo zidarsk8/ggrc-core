@@ -50,12 +50,13 @@ def apply_proposal(
   """Apply proposal procedure hook."""
   if not is_status_changed_to(obj.STATES.APPLIED, obj):
     return
-  obj.applied_by = login.get_current_user()
-  obj.apply_datetime = datetime.datetime.now()
-  for field, value in obj.content.get("fields", {}).iteritems():
-    if hasattr(obj.instance, field):
-      setattr(obj.instance, field, value)
-  applier.apply_action(obj.instance, obj.content)
+  current_user = login.get_current_user()
+  now = datetime.datetime.now()
+  obj.applied_by = current_user
+  obj.apply_datetime = now
+  if applier.apply_action(obj.instance, obj.content):
+    obj.instance.modified_by = current_user
+    obj.instance.updated_at = now
   add_comment_about(obj, obj.STATES.APPLIED, obj.apply_reason)
 
 
