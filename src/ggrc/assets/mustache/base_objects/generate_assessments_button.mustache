@@ -4,7 +4,7 @@
 }}
 
 {{#if button}}
-  {{#is_allowed 'update' parent_instance context="for"}}
+  {{#is_allowed 'update' audit context="for"}}
     <a
       href="javascript://"
       class="generate-control-assessments btn btn-small btn-darkBlue"
@@ -28,10 +28,10 @@
     {{/is_auditor}}
   {{/is_allowed}}
 {{else}}
-  {{#if_instance_of parent_instance 'Audit'}}
+  {{#if_instance_of audit 'Audit'}}
     {{#if_in model.shortName 'Assessment,Control'}}
-      {{^if instance.archived}}
-        {{#is_allowed 'update' parent_instance context="for"}}
+      {{^if audit.archived}}
+        {{#is_allowed 'update' audit context="for"}}
             <li class="generate-control-assessments">
               <a href="javascript://">
                 <i class="fa fa-fw fa-magic"></i>
