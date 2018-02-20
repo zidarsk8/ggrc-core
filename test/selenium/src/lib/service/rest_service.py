@@ -9,8 +9,9 @@ import requests
 
 from lib import environment, factory
 from lib.constants import url, objects, messages
+from lib.entities import entities_factory
 from lib.entities.entities_factory import (
-    PeopleFactory, CustomAttributeDefinitionsFactory)
+    PeopleFactory, CustomAttributeDefinitionsFactory, AssessmentsFactory)
 from lib.entities.entity import Representation
 from lib.service.rest import client, query
 from lib.utils import help_utils
@@ -247,6 +248,28 @@ class RelationshipsService(HelpRestService):
         type=objects.get_singular(self.endpoint), source=src_obj.__dict__,
         destination=dest_obj.__dict__, **attrs_for_template) for
         dest_obj in help_utils.convert_to_list(dest_objs)]
+
+
+class AssessmentsFromTemplateService(HelpRestService):
+  """Service for creating asessments from templates"""
+  def __init__(self):
+    super(AssessmentsFromTemplateService, self).__init__(url.ASSESSMENTS)
+
+  def create_assessments(self, audit, template, control_snapshots):
+    """Create assessments from template."""
+    assessments = []
+    for control_snapshot in control_snapshots:
+      assessment = entities_factory.AssessmentsFactory().create()
+      assessment.update_attrs(audit=audit, template=template,
+                              object=control_snapshot)
+      response = self.client.create_object(**assessment.__dict__)
+      attrs = BaseRestService.get_items_from_resp(response)
+      assessment = AssessmentsFactory().create()
+      assessment.__dict__.update({k: v for k, v in attrs.iteritems()
+                                  if v and k not in ["type", ]})
+      assessment.verifiers = assessment.creators
+      assessments.append(assessment)
+    return assessments
 
 
 class ObjectsOwnersService(HelpRestService):
