@@ -4,6 +4,7 @@
 """Test for proposal api."""
 
 import collections
+import contextlib
 import json
 
 import ddt
@@ -19,6 +20,25 @@ from integration.ggrc.models import factories
 @ddt.ddt
 class TestProposalApi(TestCase):
   """Test case for proposal api."""
+
+  @contextlib.contextmanager
+  def number_obj_revisions_for(self, obj, increase_on=1):
+    """Context manager,
+
+    checks the number of logged revisions after nested operations."""
+    revision_query = all_models.Revision.query.filter(
+        all_models.Revision.resource_type == obj.type,
+        all_models.Revision.resource_id == obj.id
+    )
+    start_count = revision_query.count()
+    yield
+    expected = start_count + increase_on
+    current = revision_query.count()
+    msg = ("Object change isn't logged correctly: "
+           "expected number {expected} is not equal to {current}.")
+    self.assertEqual(expected,
+                     current,
+                     msg.format(expected=expected, current=current))
 
   def setUp(self):
     super(TestProposalApi, self).setUp()
@@ -87,14 +107,15 @@ class TestProposalApi(TestCase):
     ).all()
     self.assertEqual(1, len(revisions))
     self.assertEqual(0, len(control.comments))
-    resp = self.api.put(
-        proposal,
-        {
-            "proposal": {
-                "status": proposal.STATES.APPLIED,
-                "apply_reason": "approved",
-            }
-        })
+    with self.number_obj_revisions_for(control):
+      resp = self.api.put(
+          proposal,
+          {
+              "proposal": {
+                  "status": proposal.STATES.APPLIED,
+                  "apply_reason": "approved",
+              }
+          })
     self.assert200(resp)
     control = all_models.Control.query.get(control_id)
     proposal = all_models.Proposal.query.get(proposal_id)
@@ -118,31 +139,22 @@ class TestProposalApi(TestCase):
           agenda="agenda content")
     control_id = control.id
     proposal_id = proposal.id
-    revisions = all_models.Revision.query.filter(
-        all_models.Revision.resource_type == control.type,
-        all_models.Revision.resource_id == control.id
-    ).all()
     self.assertEqual(proposal.STATES.PROPOSED, proposal.status)
-    self.assertEqual(1, len(revisions))
     self.assertEqual(0, len(control.comments))
-    resp = self.api.put(
-        proposal,
-        {
-            "proposal": {
-                "status": proposal.STATES.DECLINED,
-                "decline_reason": "declined bla",
-            }
-        })
+    with self.number_obj_revisions_for(control, increase_on=0):
+      resp = self.api.put(
+          proposal,
+          {
+              "proposal": {
+                  "status": proposal.STATES.DECLINED,
+                  "decline_reason": "declined bla",
+              }
+          })
     self.assert200(resp)
     control = all_models.Control.query.get(control_id)
     proposal = all_models.Proposal.query.get(proposal_id)
     self.assertEqual(proposal.STATES.DECLINED, proposal.status)
     self.assertEqual("1", control.title)
-    revisions = all_models.Revision.query.filter(
-        all_models.Revision.resource_type == control.type,
-        all_models.Revision.resource_id == control.id
-    ).all()
-    self.assertEqual(1, len(revisions))
     self.assertEqual(1, len(control.comments))
 
   def test_proposal_for_acl(self):
@@ -325,8 +337,9 @@ class TestProposalApi(TestCase):
         all_models.Revision.resource_id == control.id
     ).all()
     self.assertEqual(1, len(revisions))
-    resp = self.api.put(
-        proposal, {"proposal": {"status": proposal.STATES.APPLIED}})
+    with self.number_obj_revisions_for(control):
+      resp = self.api.put(
+          proposal, {"proposal": {"status": proposal.STATES.APPLIED}})
     self.assert200(resp)
     control = all_models.Control.query.get(control_id)
     result_dict = collections.defaultdict(set)
@@ -401,8 +414,9 @@ class TestProposalApi(TestCase):
         all_models.Revision.resource_id == control.id
     ).all()
     self.assertEqual(1, len(revisions))
-    resp = self.api.put(
-        proposal, {"proposal": {"status": proposal.STATES.APPLIED}})
+    with self.number_obj_revisions_for(control):
+      resp = self.api.put(
+          proposal, {"proposal": {"status": proposal.STATES.APPLIED}})
     self.assert200(resp)
     control = all_models.Control.query.get(control_id)
     revisions = all_models.Revision.query.filter(
@@ -416,7 +430,7 @@ class TestProposalApi(TestCase):
 
   @ddt.data(True, False)
   def test_apply_mapping_cad(self, remove_cav):
-    """Test apply mapping CAVs proposal."""
+    """Test apply mapping CAVs proposal with remove_cav is {0}."""
     with factories.single_commit():
       control = factories.ControlFactory(title="1")
       cad = factories.CustomAttributeDefinitionFactory(
@@ -445,8 +459,9 @@ class TestProposalApi(TestCase):
             },
         },
         agenda="agenda content")
-    resp = self.api.put(
-        proposal, {"proposal": {"status": proposal.STATES.APPLIED}})
+    with self.number_obj_revisions_for(control):
+      resp = self.api.put(
+          proposal, {"proposal": {"status": proposal.STATES.APPLIED}})
     self.assert200(resp)
     control = all_models.Control.query.get(control_id)
     if remove_cav:
@@ -551,14 +566,15 @@ class TestProposalApi(TestCase):
     ).all()
     self.assertEqual(1, len(revisions))
     self.assertEqual(0, len(control.comments))
-    resp = self.api.put(
-        proposal,
-        {
-            "proposal": {
-                "status": proposal.STATES.APPLIED,
-                "apply_reason": "approved",
-            }
-        })
+    with self.number_obj_revisions_for(control):
+      resp = self.api.put(
+          proposal,
+          {
+              "proposal": {
+                  "status": proposal.STATES.APPLIED,
+                  "apply_reason": "approved",
+              }
+          })
     self.assert200(resp)
     control = all_models.Control.query.get(control_id)
     self.assertEqual(all_models.Option.query.get(update_kind_id), control.kind)
@@ -622,14 +638,15 @@ class TestProposalApi(TestCase):
     ).all()
     self.assertEqual(1, len(revisions))
     self.assertEqual(0, len(control.comments))
-    resp = self.api.put(
-        proposal,
-        {
-            "proposal": {
-                "status": proposal.STATES.APPLIED,
-                "apply_reason": "approved",
-            }
-        })
+    with self.number_obj_revisions_for(control):
+      resp = self.api.put(
+          proposal,
+          {
+              "proposal": {
+                  "status": proposal.STATES.APPLIED,
+                  "apply_reason": "approved",
+              }
+          })
     self.assert200(resp)
     control = all_models.Control.query.get(control_id)
     self.assertIsNone(control.kind)
@@ -739,14 +756,15 @@ class TestProposalApi(TestCase):
         all_models.Revision.resource_id == control.id
     ).all()
     self.assertEqual(1, len(revisions))
-    resp = self.api.put(
-        proposal,
-        {
-            "proposal": {
-                "status": proposal.STATES.APPLIED,
-                "apply_reason": "approved",
-            }
-        })
+    with self.number_obj_revisions_for(control):
+      resp = self.api.put(
+          proposal,
+          {
+              "proposal": {
+                  "status": proposal.STATES.APPLIED,
+                  "apply_reason": "approved",
+              }
+          })
     self.assertEqual(200, resp.status_code)
     control = all_models.Control.query.get(control_id)
     proposal = all_models.Proposal.query.get(proposal_id)
@@ -787,14 +805,16 @@ class TestProposalApi(TestCase):
         all_models.Revision.resource_id == control.id
     ).all()
     self.assertEqual(1, len(revisions))
-    resp = self.api.put(
-        proposal,
-        {
-            "proposal": {
-                "status": proposal.STATES.APPLIED,
-                "apply_reason": "approved",
-            }
-        })
+
+    with self.number_obj_revisions_for(control):
+      resp = self.api.put(
+          proposal,
+          {
+              "proposal": {
+                  "status": proposal.STATES.APPLIED,
+                  "apply_reason": "approved",
+              }
+          })
     self.assertEqual(200, resp.status_code)
     control = all_models.Control.query.get(control_id)
     proposal = all_models.Proposal.query.get(proposal_id)
