@@ -242,7 +242,11 @@ def _propagate_to_children(new_tg_acls, child_class, id_name, parent_class):
 
 
 def _propagate_to_tgt(new_tg_acls):
-  """Propagate ACL entries to task groups tasks."""
+  """Propagate ACL entries to task groups tasks.
+
+  Args:
+    new_tg_acls: list of propagated ACL ids that belong to task_groups.
+  """
   with utils.benchmark("Propagate tg roles to task group tasks"):
     return _propagate_to_children(
         new_tg_acls,
@@ -253,7 +257,11 @@ def _propagate_to_tgt(new_tg_acls):
 
 
 def _propagate_to_tgo(new_tg_acls):
-  """Propagate ACL entries to task groups objects."""
+  """Propagate ACL entries to task groups objects.
+
+  Args:
+    new_tg_acls: list of propagated ACL ids that belong to task_groups.
+  """
   with utils.benchmark("Propagate tg roles to task group objects"):
     return _propagate_to_children(
         new_tg_acls,
@@ -264,7 +272,11 @@ def _propagate_to_tgo(new_tg_acls):
 
 
 def _propagate_to_ctg(new_cycle_acls):
-  """Propagate ACL entries to cycle task groups."""
+  """Propagate ACL entries to cycle task groups and its children.
+
+  Args:
+    new_ctg_acls: list of propagated ACL ids that belong to cycles.
+  """
   with utils.benchmark("Propagate wf roles to cycles task groups"):
     new_ctg_acls = _propagate_to_children(
         new_cycle_acls,
@@ -277,6 +289,11 @@ def _propagate_to_ctg(new_cycle_acls):
 
 
 def _propagate_to_cycle_tasks(new_ctg_acls):
+  """Propagate ACL roles to cycle tasks and its children.
+
+  Args:
+    new_ctg_acls: list of propagated ACL ids that belong to cycle task groups.
+  """
   with utils.benchmark("Propagate wf roles to cycles tasks"):
     new_ct_acls = _propagate_to_children(
         new_ctg_acls,
@@ -285,10 +302,15 @@ def _propagate_to_cycle_tasks(new_ctg_acls):
         all_models.CycleTaskGroup,
     )
 
-  _propagate_to_cycle_tasks_entries(new_ct_acls)
+  _propagate_to_cte(new_ct_acls)
 
 
-def _propagate_to_cycle_tasks_entries(new_ct_acls):
+def _propagate_to_cte(new_ct_acls):
+  """Propagate ACL roles from cycle tasks to cycle tasks entries.
+
+  Args:
+    new_ct_acls: list of propagated ACL ids that belong to cycle tasks.
+  """
   with utils.benchmark("Propagate wf roles to cycles tasks entries"):
     return _propagate_to_children(
         new_ct_acls,
@@ -299,6 +321,11 @@ def _propagate_to_cycle_tasks_entries(new_ct_acls):
 
 
 def _propagate_to_tg(new_wf_acls):
+  """Propagate workflow ACL roles to task groups and its children.
+
+  Args:
+    new_wf_acls: List of ACL ids on a workflow that should be propagated.
+  """
   with utils.benchmark("Propagate wf roles to task groups"):
     new_tg_acls = _propagate_to_wf_children(new_wf_acls, all_models.TaskGroup)
 
@@ -308,6 +335,11 @@ def _propagate_to_tg(new_wf_acls):
 
 
 def _propagate_to_cycles(new_wf_acls):
+  """Propagate workflow ACL roles to cycles and its children.
+
+  Args:
+    new_wf_acls: List of ACL ids on a workflow that should be propagated.
+  """
   with utils.benchmark("Propagate wf roles to cycles"):
     new_cycle_acls = _propagate_to_wf_children(new_wf_acls, all_models.Cycle)
 
@@ -315,6 +347,11 @@ def _propagate_to_cycles(new_wf_acls):
 
 
 def _propagete_new_wf_acls(new_wf_acls):
+  """Propagate ACL entries that were added to workflows.
+
+  Args:
+    new_wf_acls: List of ACL ids on a workflow that should be propagated.
+  """
   with utils.benchmark("Propagate new WF roles to all its children"):
     if not new_wf_acls:
       return
