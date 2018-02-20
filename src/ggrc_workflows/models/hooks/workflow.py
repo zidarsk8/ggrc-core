@@ -32,14 +32,18 @@ def init_hook():
 def handle_acl_changes(session, flush_context):
   """ACL creation hook handler."""
   # pylint: disable=unused-argument
-  wf_objects = defaultdict(set)
   wf_new_acl = set()
   for obj in session.new:
     if (isinstance(obj, all_models.AccessControlList) and
             obj.object_type == all_models.Workflow.__name__):
-      wf_new_acl.add(obj.id)
+      if obj.ac_role.name in WF_PROPAGATED_ROLES:
+        wf_new_acl.add(obj.id)
     elif isinstance(obj, RELATED_MODELS):
-      wf_objects[obj.type].add(obj.id)
+      # not optimized operation. Adding a new task will result in full
+      # propagation on the entire workflow.
+      for acl in obj.workflow.access_control_list:
+        if acl.ac_role.name in WF_PROPAGATED_ROLES:
+          wf_new_acl.add(acl.id)
   _propagete_new_wf_acls(wf_new_acl)
 
   related_to_del = defaultdict(set)
