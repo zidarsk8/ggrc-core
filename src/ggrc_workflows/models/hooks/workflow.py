@@ -11,6 +11,7 @@ from ggrc import db
 from ggrc import login
 from ggrc import utils
 from ggrc.models import all_models
+from ggrc.access_control import role
 
 
 RELATED_MODELS = (
@@ -22,6 +23,11 @@ RELATED_MODELS = (
     all_models.CycleTaskGroupObjectTask,
     all_models.CycleTaskEntry,
 )
+
+WF_PROPAGATED_ROLES = {
+    "Admin",
+    "Workflow Member",
+}
 
 
 def init_hook():
@@ -227,7 +233,7 @@ def _propagate_to_children(new_tg_acls, child_class, id_name, parent_class):
           )
       )
   ).where(
-      acl_table.c.id.in_(new_tg_acls)
+      acl_table.c.id.in_(new_tg_acls),
   )
 
   _insert_select_acls(select_statement)
