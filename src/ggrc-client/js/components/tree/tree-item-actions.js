@@ -13,10 +13,11 @@ import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
 
-let forbiddenEditList = ['Cycle', 'CycleTaskGroup'];
-let forbiddenMapList = ['Workflow', 'RiskAssessment'];
+const tag = 'tree-item-actions';
+const forbiddenEditList = ['Cycle', 'CycleTaskGroup'];
+const forbiddenMapList = ['Workflow', 'RiskAssessment'];
 
-let viewModel = can.Map.extend({
+const viewModel = can.Map.extend({
   define: {
     deepLimit: {
       type: 'number',
@@ -28,25 +29,25 @@ let viewModel = can.Map.extend({
     },
     expandIcon: {
       type: 'string',
-      get: function () {
+      get() {
         return this.attr('expanded') ? 'compress' : 'expand';
       },
     },
     expanderTitle: {
       type: 'string',
-      get: function () {
+      get() {
         return this.attr('expanded') ? 'Collapse tree' : 'Expand tree';
       },
     },
     isSnapshot: {
       type: 'boolean',
-      get: function () {
+      get() {
         return isSnapshot(this.attr('instance'));
       },
     },
     isAllowedToEdit: {
       type: 'boolean',
-      get: function () {
+      get() {
         let type = this.attr('instance.type');
         let isSnapshot = this.attr('isSnapshot');
         let isArchived = this.attr('instance.archived');
@@ -56,7 +57,7 @@ let viewModel = can.Map.extend({
     },
     isAllowedToMap: {
       type: 'boolean',
-      get: function () {
+      get() {
         let type = this.attr('instance.type');
         let isAllowedToEdit = this.attr('isAllowedToEdit');
         let isInForbiddenList = forbiddenMapList.indexOf(type) > -1;
@@ -65,7 +66,7 @@ let viewModel = can.Map.extend({
       },
     },
   },
-  maximizeObject: function (scope, el, ev) {
+  maximizeObject(scope, el, ev) {
     ev.preventDefault();
     ev.stopPropagation();
 
@@ -75,14 +76,14 @@ let viewModel = can.Map.extend({
     });
   },
   $el: null,
-  openObject: function (scope, el, ev) {
+  openObject(scope, el, ev) {
     ev.stopPropagation();
   },
-  expand: function (scope, el, ev) {
+  expand(scope, el, ev) {
     this.dispatch('expand');
     ev.stopPropagation();
   },
-  subTreeTypes: function () {
+  subTreeTypes() {
     can.trigger(this.attr('$el'), 'childTreeTypes');
   },
   instance: null,
@@ -93,7 +94,7 @@ let viewModel = can.Map.extend({
   childModelsList: null,
   expanded: false,
   activated: false,
-  showReducedIcon: function () {
+  showReducedIcon() {
     let pages = ['Workflow'];
     let instanceTypes = [
       'Cycle',
@@ -103,7 +104,7 @@ let viewModel = can.Map.extend({
     return _.contains(pages, getPageType()) &&
       _.contains(instanceTypes, this.attr('instance').type);
   },
-  showReducedOptions: function () {
+  showReducedOptions() {
     let pages = ['Workflow'];
     let instanceTypes = [
       'Cycle',
@@ -115,17 +116,17 @@ let viewModel = can.Map.extend({
 });
 
 export default can.Component.extend({
-  tag: 'tree-item-actions',
-  template: template,
-  viewModel: viewModel,
+  tag,
+  template,
+  viewModel,
   events: {
-    inserted: function () {
+    inserted() {
       let parents = this.element.parents('sub-tree-wrapper').length;
       let canExpand = parents < this.viewModel.attr('deepLimit');
       this.viewModel.attr('canExpand', canExpand);
       this.viewModel.attr('$el', this.element);
     },
-    '.tree-item-actions__content mouseenter': function (el, ev) {
+    '.tree-item-actions__content mouseenter'(el, ev) {
       let vm = this.viewModel;
 
       if (!vm.attr('activated')) {
