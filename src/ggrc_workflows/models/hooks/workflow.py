@@ -31,6 +31,12 @@ def init_hook():
 
 def handle_acl_changes(session, _):
   """ACL creation hook handler."""
+  _add_propagated_roles(session)
+  _remove_propagated_roles(session)
+
+
+def _add_propagated_roles(session):
+  """Add propagated roles to workflow related objects."""
   wf_new_acl = set()
   for obj in session.new:
     if (isinstance(obj, all_models.AccessControlList) and
@@ -45,6 +51,9 @@ def handle_acl_changes(session, _):
           wf_new_acl.add(acl.id)
   _propagete_new_wf_acls(wf_new_acl)
 
+
+def _remove_propagated_roles(session):
+  """Remove propagated roles to workflow related objects."""
   related_to_del = defaultdict(set)
   for obj in session.deleted:
     if isinstance(obj, RELATED_MODELS):
