@@ -73,44 +73,6 @@ def remove_related_acl(related_to_del):
       synchronize_session='fetch')
 
 
-def _add_children_to_context(child_model, foreign_key, parent_wf_map,
-                             wf_new_acl, context):
-  """Add information about related objects (children) into context.
-
-  Args:
-      child_model: related model, for which data should be added into context.
-      foreign_key: foreign key which links related and parent models.
-      parent_wf_map: contains mapping from parent_id to related workflow_id.
-      wf_new_acl: dictionary with mapping workflow_id to set of newly
-          created parent ACL records.
-      context: dictionary with information for ACL propagation.
-  """
-  related = db.session.query(
-      child_model.id, getattr(child_model, foreign_key)
-  ).filter(getattr(child_model, foreign_key).in_(parent_wf_map.keys()))
-  for child_id, parent_id in related:
-    wf_id = parent_wf_map[parent_id]
-    context[wf_id][child_model][child_id].update(wf_new_acl[wf_id])
-
-
-def _add_parents_to_context(parent_model, wf_new_acl, context):
-  """Add information about related objects (parents) into context.
-
-  Args:
-      parent_model: related model, for which data should be added into context.
-      wf_new_acl: dictionary with mapping workflow_id to set of newly
-          created parent ACL records.
-      context: dictionary with information for ACL propagation.
-  """
-  parent_wf_map = {}
-  parents = db.session.query(
-      parent_model.id, parent_model.workflow_id
-  ).filter(parent_model.workflow_id.in_(wf_new_acl.keys()))
-  for parent_id, wf_id in parents:
-    context[wf_id][parent_model][parent_id].update(wf_new_acl[wf_id])
-    parent_wf_map[parent_id] = wf_id
-  return parent_wf_map
-
 
 def _get_child_ids(parent_ids, child_class):
   """Get all acl ids for acl entries with the given parent ids
