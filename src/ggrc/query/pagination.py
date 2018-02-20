@@ -6,6 +6,7 @@
 import sqlalchemy as sa
 
 from ggrc import models
+from ggrc import db
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.query import custom_operators
 from ggrc.query.exceptions import BadQueryException
@@ -46,7 +47,11 @@ def apply_limit(query, limit):
     # offset from 0 as the offset of the initial row for sql is 0 (not 1).
     limit_query = query.limit(page_size).offset(first)
   with benchmark("Apply limit: apply_limit > query_count"):
-    total = query.count()
+    # Note: using func.count() as query.count() is generating additional
+    # subquery
+    # query.count() has a bug and it returns incorrect number of objects
+    count_q = query.statement.with_only_columns([sa.func.count()])
+    total = db.session.execute(count_q).scalar()
 
   return limit_query, total
 
