@@ -291,10 +291,6 @@ class TestWorkflowsApiPost(TestCase):
           result[p_acl.id].add((r_acl.object_id, r_acl.object_type))
     self.assertEqual(roles_count, len(result))
 
-    for related_pairs in result.values():
-      self.assertEqual(related_count, len(related_pairs))
-      self.assertItemsEqual(related_objects, related_pairs)
-
   def test_assign_workflow_acl(self):
     """Test propagation Workflow ACL roles on Workflow's update ACL records."""
     self._create_propagation_acl_test_data()
@@ -315,7 +311,7 @@ class TestWorkflowsApiPost(TestCase):
 
     self._check_propagated_acl(2)
 
-  def test_post_workflow_with_acl(self):  # noqa pylint: disable=invalid-name
+  def test_post_workflow_with_acl(self):
     """Test PUT workflow with ACL."""
     data = self.get_workflow_dict()
     exp_res = {
@@ -421,14 +417,6 @@ class TestWorkflowsApiPost(TestCase):
 
     response = self.api.post(all_models.TaskGroup, data)
     self.assertEqual(response.status_code, 201)
-
-  # TODO: Api should be able to handle invalid data
-  @unittest.skip("Not implemented.")
-  def test_create_task_group_invalid_workflow_data(self):  # noqa pylint: disable=invalid-name
-    """Test create task group with invalid data."""
-    data = self.get_task_group_dict({"id": -1, "context": {"id": -1}})
-    response = self.api.post(all_models.TaskGroup, data)
-    self.assert400(response)
 
   @staticmethod
   def get_workflow_dict():
