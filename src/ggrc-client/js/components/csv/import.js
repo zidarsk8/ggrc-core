@@ -8,6 +8,7 @@ import {warning} from '../../plugins/utils/modals';
 import {hasWarningType} from '../../plugins/utils/controllers';
 import './csv-template';
 import '../show-more/show-more';
+import quickTips from './templates/quick-tips.mustache';
 import template from './templates/csv-import.mustache';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 
@@ -17,6 +18,7 @@ export default GGRC.Components('csvImportWidget', {
   requestData: null,
   scope: {
     importUrl: '/_service/import_csv',
+    quickTips,
     'import': null,
     fileId: '',
     fileName: '',
