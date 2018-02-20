@@ -29,9 +29,8 @@ def init_hook():
   sa.event.listen(sa.orm.session.Session, "after_flush", handle_acl_changes)
 
 
-def handle_acl_changes(session, flush_context):
+def handle_acl_changes(session, _):
   """ACL creation hook handler."""
-  # pylint: disable=unused-argument
   wf_new_acl = set()
   for obj in session.new:
     if (isinstance(obj, all_models.AccessControlList) and
@@ -75,7 +74,6 @@ def remove_related_acl(related_to_del):
 
   db.session.query(all_models.AccessControlList).filter(or_(*qfilter)).delete(
       synchronize_session='fetch')
-
 
 
 def _get_child_ids(parent_ids, child_class):
