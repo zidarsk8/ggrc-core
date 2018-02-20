@@ -43,17 +43,22 @@ def handle_acl_changes(session, _):
 
 def _add_propagated_roles(session):
   """Add propagated roles to workflow related objects."""
+  wf_roles = role.get_custom_roles_for(all_models.Workflow.__name__)
+  propagated_role_ids = {
+      id_ for id_, name in wf_roles.items()
+      if name in WF_PROPAGATED_ROLES
+  }
   wf_new_acl = set()
   for obj in session.new:
     if (isinstance(obj, all_models.AccessControlList) and
             obj.object_type == all_models.Workflow.__name__):
-      if obj.ac_role.name in WF_PROPAGATED_ROLES:
+      if obj.ac_role_id in propagated_role_ids:
         wf_new_acl.add(obj.id)
     elif isinstance(obj, RELATED_MODELS):
       # not optimized operation. Adding a new task will result in full
       # propagation on the entire workflow.
       for acl in obj.workflow.access_control_list:
-        if acl.ac_role.name in WF_PROPAGATED_ROLES:
+        if acl.ac_role_id in propagated_role_ids:
           wf_new_acl.add(acl.id)
   _propagete_new_wf_acls(wf_new_acl)
 
