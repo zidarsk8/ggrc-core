@@ -40,7 +40,7 @@ def handle_acl_changes(session, flush_context):
       wf_new_acl.add(obj.id)
     elif isinstance(obj, RELATED_MODELS):
       wf_objects[obj.type].add(obj.id)
-  add_new_wf_roles_propagation(wf_new_acl)
+  _propagete_new_wf_acls(wf_new_acl)
 
   related_to_del = defaultdict(set)
   for obj in session.deleted:
@@ -264,81 +264,82 @@ def _propagate_to_children(new_tg_acls, child_class, id_name, parent_class):
 
 def _propagate_to_tgt(new_tg_acls):
   """Propagate ACL entries to task groups tasks."""
-  return _propagate_to_children(
-      new_tg_acls,
-      all_models.TaskGroupTask,
-      "task_group_id",
-      all_models.TaskGroup,
-  )
+  with utils.benchmark("Propagate tg roles to task group tasks"):
+    return _propagate_to_children(
+        new_tg_acls,
+        all_models.TaskGroupTask,
+        "task_group_id",
+        all_models.TaskGroup,
+    )
 
 
 def _propagate_to_tgo(new_tg_acls):
   """Propagate ACL entries to task groups objects."""
-  return _propagate_to_children(
-      new_tg_acls,
-      all_models.TaskGroupObject,
-      "task_group_id",
-      all_models.TaskGroup,
-  )
-
-
-def _propagate_to_cycles(new_wf_acls):
-  return _propagate_to_wf_children(new_wf_acls, all_models.Cycle)
-
-
-def _propagate_to_tg(new_wf_acls):
-  return _propagate_to_wf_children(new_wf_acls, all_models.TaskGroup)
+  with utils.benchmark("Propagate tg roles to task group objects"):
+    return _propagate_to_children(
+        new_tg_acls,
+        all_models.TaskGroupObject,
+        "task_group_id",
+        all_models.TaskGroup,
+    )
 
 
 def _propagate_to_ctg(new_cycle_acls):
-  """Propagate ACL entries to task groups objects."""
-  return _propagate_to_children(
-      new_cycle_acls,
-      all_models.CycleTaskGroup,
-      "cycle_id",
-      all_models.Cycle,
-  )
+  """Propagate ACL entries to cycle task groups."""
+  with utils.benchmark("Propagate wf roles to cycles task groups"):
+    new_ctg_acls = _propagate_to_children(
+        new_cycle_acls,
+        all_models.CycleTaskGroup,
+        "cycle_id",
+        all_models.Cycle,
+    )
+
+  _propagate_to_cycle_tasks(new_ctg_acls)
 
 
 def _propagate_to_cycle_tasks(new_ctg_acls):
-  return _propagate_to_children(
-      new_ctg_acls,
-      all_models.CycleTaskGroupObjectTask,
-      "cycle_task_group_id",
-      all_models.CycleTaskGroup,
-  )
+  with utils.benchmark("Propagate wf roles to cycles tasks"):
+    new_ct_acls = _propagate_to_children(
+        new_ctg_acls,
+        all_models.CycleTaskGroupObjectTask,
+        "cycle_task_group_id",
+        all_models.CycleTaskGroup,
+    )
+
+  _propagate_to_cycle_tasks_entries(new_ct_acls)
 
 
 def _propagate_to_cycle_tasks_entries(new_ct_acls):
-  return _propagate_to_children(
-      new_ct_acls,
-      all_models.CycleTaskEntry,
-      "cycle_task_group_object_task_id",
-      all_models.CycleTaskGroupObjectTask,
-  )
-
-
-def add_new_wf_roles_propagation(new_wf_acls):
-  if not new_wf_acls:
-    return
-
-  with utils.benchmark("Propagate wf roles to task groups"):
-    new_tg_acls = _propagate_to_tg(new_wf_acls)
-
-  with utils.benchmark("Propagate tg roles to task group tasks"):
-    _propagate_to_tgt(new_tg_acls)
-
-  with utils.benchmark("Propagate tg roles to task group objects"):
-    _propagate_to_tgo(new_tg_acls)
-
-  with utils.benchmark("Propagate wf roles to cycles"):
-    new_cycle_acls = _propagate_to_cycles(new_wf_acls)
-
-  with utils.benchmark("Propagate wf roles to cycles task groups"):
-    new_ctg_acls = _propagate_to_ctg(new_cycle_acls)
-
-  with utils.benchmark("Propagate wf roles to cycles tasks"):
-    new_ct_acls = _propagate_to_cycle_tasks(new_ctg_acls)
-
   with utils.benchmark("Propagate wf roles to cycles tasks entries"):
-    _propagate_to_cycle_tasks_entries(new_ct_acls)
+    return _propagate_to_children(
+        new_ct_acls,
+        all_models.CycleTaskEntry,
+        "cycle_task_group_object_task_id",
+        all_models.CycleTaskGroupObjectTask,
+    )
+
+
+def _propagate_to_tg(new_wf_acls):
+  with utils.benchmark("Propagate wf roles to task groups"):
+    new_tg_acls = _propagate_to_wf_children(new_wf_acls, all_models.TaskGroup)
+
+  _propagate_to_tgt(new_tg_acls)
+
+  _propagate_to_tgo(new_tg_acls)
+
+
+def _propagate_to_cycles(new_wf_acls):
+  with utils.benchmark("Propagate wf roles to cycles"):
+    new_cycle_acls = _propagate_to_wf_children(new_wf_acls, all_models.Cycle)
+
+  _propagate_to_ctg(new_cycle_acls)
+
+
+def _propagete_new_wf_acls(new_wf_acls):
+  with utils.benchmark("Propagate new WF roles to all its children"):
+    if not new_wf_acls:
+      return
+
+    _propagate_to_tg(new_wf_acls)
+
+    _propagate_to_cycles(new_wf_acls)
