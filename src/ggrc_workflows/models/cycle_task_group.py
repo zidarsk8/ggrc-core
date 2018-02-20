@@ -9,6 +9,7 @@ import itertools
 from sqlalchemy import orm, inspect
 
 from ggrc import db
+from ggrc.access_control import roleable
 from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.fulltext import mixin as index_mixin
@@ -27,7 +28,8 @@ def _query_filtered_by_contact(person):
   return []
 
 
-class CycleTaskGroup(mixins.WithContact,
+class CycleTaskGroup(roleable.Roleable,
+                     mixins.WithContact,
                      wf_mixins.CycleTaskGroupRelatedStatusValidatedMixin,
                      mixins.Slugged,
                      mixins.Timeboxed,
