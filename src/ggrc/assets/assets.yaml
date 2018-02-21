@@ -19,7 +19,6 @@ dashboard-js-template-files:
   - base_objects/notes.mustache
   - base_objects/info.mustache
   - base_objects/dropdown_menu.mustache
-  - base_objects/dropdown_menu_tier2.mustache
   - base_objects/view_link.mustache
   - base_objects/unmap.mustache
   - base_objects/mappings_detail.mustache
@@ -151,7 +150,6 @@ dashboard-js-template-files:
   - roles/object_list.mustache
   - sections/modal_content.mustache
   - sections/tree-item-attr.mustache
-  - sections/dropdown_menu.mustache
   - selectors/active_column.mustache
   - selectors/base_modal.mustache
   - selectors/option_column.mustache
