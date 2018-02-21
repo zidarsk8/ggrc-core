@@ -5,12 +5,13 @@
 
 """Tests for functions in the ggrc.utils module."""
 
-
+import os
 import unittest
 
 from mock import patch
 
 from ggrc.utils import get_url_root
+from ggrc.settings import default
 
 
 class TestGetUrlRoot(unittest.TestCase):
@@ -45,3 +46,24 @@ class TestGetUrlRoot(unittest.TestCase):
         result = get_url_root()
 
     self.assertEqual(result, "http://www.default-root.com/")
+
+
+class TestSettings(unittest.TestCase):
+  """Test loading settings from environment."""
+
+  @patch.dict(os.environ, {})
+  def test_default_values(self):
+    """Test loading default values variable."""
+    reload(default)  # Need to reload for variable reinitialization.
+    self.assertEqual(default.COMPANY, "Company, Inc.")
+    self.assertEqual(default.COMPANY_LOGO_TEXT, "Company")
+
+  @patch.dict(os.environ, {
+      "COMPANY": "TestCompany",
+      "COMPANY_LOGO_TEXT": "TestCompanyLogo",
+  })
+  def test_loading_vars_from_env(self):
+    """Test loading settings variables from environment."""
+    reload(default)  # Need to reload for variable reinitialization.
+    self.assertEqual(default.COMPANY, "TestCompany")
+    self.assertEqual(default.COMPANY_LOGO_TEXT, "TestCompanyLogo")
