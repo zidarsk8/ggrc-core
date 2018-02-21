@@ -172,6 +172,9 @@ def _get_group_key(revision, aggregate_type, computed_object):
   elif revision.resource_type == computed_object:
     key = "computed_objects"
   elif (revision.resource_type == "Snapshot" and
+        # The following protected access is used to prevent calculation of all
+        # fields in revision content, because they are not needed.
+        # pylint: disable=protected-access
         revision._content["child_type"] == computed_object):
     key = "destination_snapshots"
   elif (revision.resource_type == "Relationship" and
@@ -626,7 +629,9 @@ def get_revisions(revision_ids):
       models.Revision.action,
       models.Revision.resource_type,
       models.Revision.resource_id,
-      models.Revision._content,
+      # The following protected access is used to prevent calculation of all
+      # fields in revision content, because they are not needed.
+      models.Revision._content,  # pylint: disable=protected-access
   ).filter(
       models.Revision.resource_type == "Snapshot",
       models.Revision.id.in_(revision_ids)
