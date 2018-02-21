@@ -152,6 +152,7 @@ def snapshot_from_rel(rel_revision):
     return models.Snapshot.query.get(rel_revision.source_id)
   elif rel_revision.destination_type == "Snapshot":
     return models.Snapshot.query.get(rel_revision.destination_id)
+  return None
 
 
 def _get_group_key(revision, aggregate_type, computed_object):
@@ -181,8 +182,8 @@ def _get_group_key(revision, aggregate_type, computed_object):
         revision.source_type in related_snapshots and
         revision.destination_type in related_snapshots):
     # computed source related to a snapshot of an object
-    snap = snapshot_from_rel(revision)
-    if snap.child_type == computed_object:
+    snapshot = snapshot_from_rel(revision)
+    if snapshot and snapshot.child_type == computed_object:
       key = "related_snapshots"
   return key
 
