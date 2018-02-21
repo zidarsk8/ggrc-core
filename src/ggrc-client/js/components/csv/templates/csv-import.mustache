@@ -7,9 +7,9 @@
   <div class="row-fluid wrap-row">
     <div class="span12 import">
       <p>
-        Here you are able to import all GGRC objects.
-        Please make sure you have your CSV file ready, or
-        download one of the predefined templates.
+        Here you are able to import data in bulk into GGRC.
+        Import files must use defined templates.
+        If you don't have one, click button below to download a template.
       </p>
       {{#if_equals state "import"}}
         <div class="import-main-wrap import-main-wrap-analyze">
@@ -87,6 +87,7 @@
             {{/showSpinner}}
           {{/if_equals}}
         {{/states}}
+        <download-template></download-template>
       </div>
 
       <div class="text-top-space">
