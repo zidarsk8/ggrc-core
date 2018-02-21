@@ -591,7 +591,7 @@ def get_all_latest_revisions_ids():
     revision_ids = []
     for attribute in attributes:
       aggregate_type = get_aggregate_type(attribute)
-      revisions = revision_utils._get_revisions_by_type(aggregate_type)
+      revisions = revision_utils.get_revisions_by_type(aggregate_type)
       revision_ids.extend(revisions.values())
     return revision_ids
 
