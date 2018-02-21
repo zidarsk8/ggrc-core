@@ -677,6 +677,39 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
 
     self.assertEqual(programs_values["count"], programs_count["count"])
 
+  @ddt.data("Regulation",
+            "System",
+            "Process",
+            "Contract",
+            "Policy",
+            "Standard")
+  def test_query_total(self, model_name):
+    """Test corresponding value of 'total' field."""
+    number_of_objects = 2
+    object_factory = factories.get_model_factory(model_name)
+    object_class = models.get_model(model_name)
+    total_before_creation = object_class.query.count()
+
+    with factories.single_commit():
+      object_ids = [object_factory().id for _ in range(number_of_objects)]
+
+    # Check that objects has been created correctly.
+    created_objects_count = object_class.query.filter(
+        object_class.id.in_(object_ids)
+    ).count()
+    self.assertEqual(created_objects_count, number_of_objects)
+
+    data = [{
+        "object_name": model_name,
+        "filters": {"expression": {}},
+        "limit": [0, 10],
+        "order_by": [{"name": "updated_at", "desc": True}]
+    }]
+
+    # Check corresponding value of 'total' field.
+    result = self._get_first_result_set(data, model_name, "total")
+    self.assertEqual(number_of_objects, result - total_before_creation)
+
   def test_query_ids(self):
     """The ids are the same for "values" and "ids" queries."""
     programs_values = self._get_first_result_set(
