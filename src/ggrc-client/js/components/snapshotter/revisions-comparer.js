@@ -213,21 +213,24 @@ export default can.Component.extend({
           return {instance: new model(content), isSnapshot: true};
         }
 
+        if (index === 1) {
+          const instWithProposedValues = new can.Map(content);
+          // new model method overrides modified fields
+          can.batch.start();
+          can.Map.keys(proposalContent).forEach((key) => {
+            if (Array.isArray(proposalContent[key])) {
+              instWithProposedValues.attr(key).replace(proposalContent[key]);
+            } else {
+              instWithProposedValues.attr(key, proposalContent[key]);
+            }
+          });
+          can.batch.stop();
+          content = instWithProposedValues.attr();
+        }
+
         revision.isSnapshot = true;
         revision.instance = new model(content);
         revision.instance.isRevision = true;
-
-        // set proposal content for second revision
-        if (index === 1) {
-          // new model method overrides modified fields
-          can.Map.keys(proposalContent).forEach((key) => {
-            if (Array.isArray(proposalContent[key])) {
-              revision.instance.attr(key).replace(proposalContent[key]);
-            } else {
-              revision.instance.attr(key, proposalContent[key]);
-            }
-          });
-        }
 
         return revision;
       });
