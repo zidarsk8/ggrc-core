@@ -50,6 +50,7 @@ class TaskGroupTaskFactory(TitledFactory):
   task_type = "text"
   start_date = date.today()
   end_date = date.today()
+  context = factory.LazyAttribute(lambda tgt: tgt.task_group.context)
 
 
 class CycleFactory(TitledFactory):
