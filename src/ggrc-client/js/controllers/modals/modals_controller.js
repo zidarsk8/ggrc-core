@@ -747,7 +747,7 @@ export default can.Control({
 
   '{$content} a.field-hide click': function (el, ev) { // field hide
     var $el = $(el);
-    var $hidable = $el.closest('[class*="span"].hidable');
+    var $hidable = $el.closest('.hidable');
     var totalInner = $el.closest('.hide-wrap.hidable')
       .find('.inner-hide').length;
     var totalHidden;
