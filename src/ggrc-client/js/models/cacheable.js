@@ -883,13 +883,11 @@ import RefreshQueue from './refresh_queue';
     /*
      * 1 version:
      * Returns all custom attribute objects owned by instance.
-     * @variation 1
      * @return {CustomAttributeObject[]} - The array contained custom attribute
      *  objects.
      *
      * 2 version:
      * Returns custom attribute object with certain custom attribute id.
-     * @variation 2
      * @param {number} caId(2) - Custom attribute id.
      * @return {CustomAttributeObject|undefined} - Found custom attribute object
      *  otherwise - undefined if it wasn't found.
