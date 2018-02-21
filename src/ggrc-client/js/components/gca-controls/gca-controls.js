@@ -26,6 +26,7 @@ const errorMessages = {
     viewModel: {
       instance: {},
       items: [],
+      allowHide: false,
       validateControls: function () {
         const items = this.attr('items');
         let valid;
@@ -58,6 +59,12 @@ const errorMessages = {
       errorMessage(type) {
         type = Mustache.resolve(type);
         return errorMessages[type] || errorMessages.any;
+      },
+      isHidable(item, options) {
+        const hidable = (this.attr('allowHide') && !item.mandatory);
+        return hidable
+          ? options.fn()
+          : options.inverse();
       },
     },
     init: function () {

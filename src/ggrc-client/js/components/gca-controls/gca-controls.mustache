@@ -18,7 +18,20 @@
         {{/isHidable}}
       </div>
     </div>
+    {{#if helptext}}
+      <div class="ggrc-form-item__small-text">
+        <small>
+          <em>{{helptext}}</em>
+        </small>
+      </div>
+    {{/if}}
+    {{!
+      tabindex inside component must not be processed inside component.
+      It's needed for js. It should be removed when hide button
+      will be removed.
+    }}
     <custom-attributes-field
+      tabindex="20"
       {type}="attributeType"
       {(value)}="value"
       {field-id}="customAttributeId"

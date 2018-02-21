@@ -732,18 +732,22 @@ export default can.Control({
 
   '{$content} a.field-hide click': function (el, ev) { // field hide
     var $el = $(el);
-    var $hidable = $el.closest('.hidable');
     var totalInner = $el.closest('.hide-wrap.hidable')
-      .find('.inner-hide').length;
+    .find('.inner-hide').length;
     var totalHidden;
     var uiUnit;
     var i;
     var tabValue;
+    var $hidable = [
+      'span',
+      'ggrc-form-item'
+    ].map((className) => $el.closest(`[class*="${className}"].hidable`))
+    .find((item) => item.length > 0);
 
     $el.closest('.inner-hide').addClass('inner-hidable');
     totalHidden = $el.closest('.hide-wrap.hidable')
       .find('.inner-hidable').length;
-    // $hidable.hide();
+
     $hidable.addClass('hidden');
     this.options.attr('reset_visible', true);
     // update ui array
