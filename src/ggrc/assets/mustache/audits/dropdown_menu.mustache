@@ -34,9 +34,7 @@
               </li>
             {{/if}}
             {{> /static/mustache/base_objects/edit_object_link.mustache}}
-          {{/is_allowed}}
 
-          {{#is_allowed 'update' instance context='for'}}
             <li>
               <a href="javascript://"
                 data-toggle="modal-ajax-form"
