@@ -96,10 +96,11 @@ class RelatedAssessmentsResource(common.Resource):
           order_by,
           models.Assessment,
       )
+    total = query.count()
     if limit:
-      query, total = pagination.apply_limit(query, limit)
-    else:
-      total = query.count()
+      query = pagination.apply_limit(query, limit)
+    # note that using pagination.get_total_count here would return wrong counts
+    # due to query being an eager query.
 
     return query, total
 
