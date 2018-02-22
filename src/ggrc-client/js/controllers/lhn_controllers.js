@@ -109,12 +109,6 @@ can.Control('CMS.Controllers.LHN', {
           .removeClass('active')
           .css('left', (-width - safety) + 'px');
 
-    this.element.find('.bar-v')
-          .removeClass('active');
-
-    this.element.find('.lhs-search')
-          .removeClass('active');
-
     this.options.display_prefs.setLHNState({is_open: false});
   },
   open_lhn: function () {
@@ -126,12 +120,6 @@ can.Control('CMS.Controllers.LHN', {
 
     this.element.find('.lhs-holder')
       .css('left', '')
-      .addClass('active');
-
-    this.element.find('.bar-v')
-      .addClass('active');
-
-    this.element.find('.lhs-search')
       .addClass('active');
 
     this.options.display_prefs.setLHNState({
@@ -320,7 +308,7 @@ can.Control('CMS.Controllers.LHN', {
       return;
     }
 
-    var on_lhn = ['.lhn-trigger:visible', '.lhn-type:visible', '.lhs-holder:visible']
+    var on_lhn = ['.lhn-trigger:visible', '.lhs-holder:visible']
             .reduce(function (yes, selector) {
               var $selector = $(selector),
                 bounds;

@@ -18,9 +18,8 @@
 }
 
 .lhn-type {
-  &.active {
-    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.05), 2px -2px 4px rgba(0,0,0, 0.05));
-  }
+  @include box-shadow(2px 2px 4px rgba(0,0,0, 0.05), 2px -2px 4px rgba(0,0,0, 0.05));
+  
   a {
     float: left;
     height: 34px;
@@ -407,9 +406,6 @@ h4.search-title {
   padding: 0;
   border: none;
   cursor: ew-resize;
-  &.active {
-    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
-  }
   &:focus {
     @extend %outline-fix;
   }
