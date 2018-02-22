@@ -305,15 +305,12 @@ jQuery(function ($) {
 function resize_areas(event, target_info_pin_height) {
   var $window = $(window);
   var $bar = $('.bar-v');
-  var $lhnType = $('.lhn-type');
-  var $lhsHolder = $('.lhs-holder');
+  var $affixHolder = $('.affix-holder');
 
   var winHeight = $window.height();
   var lhsHeight = winHeight - 180; // new ui
-  var lhsWidth = $lhsHolder.width();
 
-  $lhnType.css('width', lhsWidth);
-  $lhsHolder.css('height', lhsHeight);
+  $affixHolder.css('height', lhsHeight);
   $bar.css('height', lhsHeight);
 }
 

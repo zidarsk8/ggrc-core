@@ -6,12 +6,9 @@
 .lhs-holder {
   @include transition(left, 0.8s);
   position: fixed;
-  top: 128px;
+  top: 94px;
   left: -240px;
   width: 240px;
-  height: 548px;
-  overflow-y: auto;
-  overflow-x: hidden;
   background: $white;
   &.active {
     @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
@@ -20,16 +17,8 @@
 }
 
 .lhn-type {
-  @extend %clearfix;
-  @include transition-property(left);
-  @include transition-duration(.8s);
-  min-width: 240px;
-  position: fixed;
-  top: 94px;
-  left: -246px;
   &.active {
     @include box-shadow(2px 2px 4px rgba(0,0,0, 0.05), 2px -2px 4px rgba(0,0,0, 0.05));
-    left: 0px;
   }
   a {
     float: left;
@@ -48,6 +37,11 @@
       background: $white;
     }
   }
+}
+
+.affix-holder {
+  overflow-y: auto;
+  width: 100%;
 }
 
 h4.search-title {
