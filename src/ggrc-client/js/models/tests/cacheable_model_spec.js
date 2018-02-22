@@ -4,8 +4,6 @@
 */
 
 describe('CMS.Models.Cacheable', function () {
-  'use strict';
-
   describe('setup_custom_attributes() method', function () {
     let instance;
 
@@ -107,26 +105,24 @@ describe('CMS.Models.Cacheable', function () {
     });
 
     it('removes elemnts from _pending_joins' +
-      'if elements fields "what" equals to parametr',
-      function () {
-        instance._pending_joins.push({
-          what: obj,
-        });
-        instance.remove_duplicate_pending_joins(obj);
-        expect(instance._pending_joins.length).toEqual(0);
+    'if elements fields "what" equals to parametr', function () {
+      instance._pending_joins.push({
+        what: obj,
       });
+      instance.remove_duplicate_pending_joins(obj);
+      expect(instance._pending_joins.length).toEqual(0);
+    });
 
     it('does not remove elemnts from _pending_joins ' +
-      'if elements field "what" does not equal to parametr',
-      function () {
-        instance._pending_joins.push({
-          what: obj,
-          extra: extraAttrs,
-        });
-        obj = new can.Map({});
-        instance.remove_duplicate_pending_joins(obj, extraAttrs);
-        expect(instance._pending_joins.length).toEqual(1);
+    'if elements field "what" does not equal to parametr', function () {
+      instance._pending_joins.push({
+        what: obj,
+        extra: extraAttrs,
       });
+      obj = new can.Map({});
+      instance.remove_duplicate_pending_joins(obj, extraAttrs);
+      expect(instance._pending_joins.length).toEqual(1);
+    });
   });
 
   describe('cleanupACL() method', () => {
