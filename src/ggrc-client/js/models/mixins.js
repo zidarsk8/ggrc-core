@@ -176,19 +176,6 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
         this.attr('access_control_list', []);
       }
     },
-    'before:refresh': function () {
-      // no need to rewrite access_control_list for snapshots
-      if (isSnapshot(this)) {
-        return;
-      }
-
-      // access_control_list should be set from response.
-      // if access_control_list is not empty CanJS try to merge
-      // lists from instance and response. Outcome: wrong date in ACL
-      if (this.attr('access_control_list.length') > 0) {
-        this.attr('access_control_list', []);
-      }
-    },
   });
 
   can.Model.Mixin('assertions_categories', {

@@ -376,6 +376,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
               type: 'get',
               dataType: 'json',
             })
+          .then($.proxy(that.constructor, 'cleanupACL'))
           .then(function (model) {
             delete that._pending_refresh;
             if (model) {
