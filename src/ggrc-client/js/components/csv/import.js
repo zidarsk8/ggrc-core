@@ -9,6 +9,7 @@ import {hasWarningType} from '../../plugins/utils/controllers';
 import './csv-template';
 import '../show-more/show-more';
 import template from './templates/csv-import.mustache';
+import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 
 export default GGRC.Components('csvImportWidget', {
   tag: 'csv-import',
@@ -193,7 +194,9 @@ export default GGRC.Components('csvImportWidget', {
       this.attr('fileId', file.id);
       this.attr('fileName', file.name);
 
-      GGRC.Utils.import_request({data: {id: file.id}}, true)
+      backendGdriveClient.withAuth(()=> {
+        return GGRC.Utils.import_request({data: {id: file.id}}, true);
+      }, {responseJSON: {message: 'Unable to Authorize'}})
         .then(this.prepareDataForCheck.bind(this))
         .then(function (checkObject) {
           this.beforeProcess(
@@ -284,14 +287,12 @@ export default GGRC.Components('csvImportWidget', {
 
       function pickerCallback(data) {
         let file;
-        let model;
         let PICKED = google.picker.Action.PICKED;
         let ACTION = google.picker.Response.ACTION;
         let DOCUMENTS = google.picker.Response.DOCUMENTS;
 
         if (data[ACTION] === PICKED) {
-          model = CMS.Models.GDriveFile;
-          file = model.models(data[DOCUMENTS])[0];
+          file = data[DOCUMENTS][0];
 
           if (file && _.any(allowedTypes, function (type) {
             return type === file.mimeType;

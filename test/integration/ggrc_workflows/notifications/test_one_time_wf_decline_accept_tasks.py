@@ -170,9 +170,9 @@ class TestCycleTaskStatusChange(TestCase):
 
   @patch("ggrc.notifications.common.send_email")
   def test_single_task_declined(self, mock_mail):
-    """
-    test moving the end date to the future, befor due_in and due_today
-    notifications have been sent
+    """Test moving the end date to the future on declined task.
+
+    It is done before due_in and due_today notifications have been sent.
     """
 
     with freeze_time("2015-05-01"):
@@ -211,9 +211,9 @@ class TestCycleTaskStatusChange(TestCase):
 
   @patch("ggrc.notifications.common.send_email")
   def test_single_task_accepted(self, mock_mail):
-    """
-    test moving the end date to the future, befor due_in and due_today
-    notifications have been sent
+    """Test moving the end date to the future on accepted task.
+
+    It is done before due_in and due_today notifications have been sent.
     """
 
     with freeze_time("2015-05-01"):
@@ -249,9 +249,7 @@ class TestCycleTaskStatusChange(TestCase):
 
   @patch("ggrc.notifications.common.send_email")
   def test_end_cycle(self, mock_mail):
-    """
-    manaually ending a cycle should stop all notifications for that cycle
-    """
+    """Manually ending cycle should stop all notifications for that cycle."""
 
     with freeze_time("2015-05-01"):
       _, workflow = self.wf_generator.generate_workflow(

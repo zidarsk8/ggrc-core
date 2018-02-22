@@ -398,7 +398,6 @@ import InfoWidget from '../controllers/info_widget_controller';
           widgetType: 'treeview',
           treeViewDepth: 0,
           content_controller_options: {
-            mapping: 'workflows',
             parent_instance: pageInstance,
             model: CMS.Models.Workflow,
           },
@@ -409,7 +408,6 @@ import InfoWidget from '../controllers/info_widget_controller';
           widgetType: 'treeview',
           treeViewDepth: 1,
           content_controller_options: {
-            mapping: 'object_tasks',
             parent_instance: pageInstance,
             model: CMS.Models.CycleTaskGroupObjectTask,
             add_item_view:
@@ -479,7 +477,6 @@ import InfoWidget from '../controllers/info_widget_controller';
             model: CMS.Models.TaskGroup,
             sortable: true,
             sort_property: 'sort_index',
-            mapping: 'task_groups',
             draw_children: true,
           },
         },
@@ -501,7 +498,6 @@ import InfoWidget from '../controllers/info_widget_controller';
         parent_instance: object,
         model: CMS.Models.Cycle,
         countsName: historyWidgetCountsName,
-        mapping: 'previous_cycles',
         additional_filter: historyWidgetFilter,
       },
     };
@@ -521,7 +517,6 @@ import InfoWidget from '../controllers/info_widget_controller';
         parent_instance: object,
         model: CMS.Models.Cycle,
         countsName: currentWidgetCountsName,
-        mapping: 'current_cycle',
         additional_filter: currentWidgetFilter,
         add_item_view:
           GGRC.mustache_path +
@@ -565,7 +560,6 @@ import InfoWidget from '../controllers/info_widget_controller';
           add_item_view:
             GGRC.mustache_path +
             '/cycle_task_group_object_tasks/tree_add_item.mustache',
-          mapping: 'assigned_tasks',
           sort_property: null,
           sort_function: _taskSortFunction,
           draw_children: true,
@@ -588,7 +582,6 @@ import InfoWidget from '../controllers/info_widget_controller';
         widgetType: 'treeview',
         treeViewDepth: 0,
         content_controller_options: {
-          mapping: 'workflows',
           parent_instance: pageInstance,
           model: CMS.Models.Workflow,
         },

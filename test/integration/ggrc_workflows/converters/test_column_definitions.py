@@ -144,6 +144,7 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         'Created Date',
         'Last Updated Date',
         'Last Updated By',
+        'Last Deprecated Date',
     }
     expected_names = element_names.union(mapping_names).union(unmapping_names)
     self.assertEqual(expected_names, display_names)

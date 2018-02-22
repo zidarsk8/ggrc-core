@@ -55,7 +55,7 @@ def apply_proposal(
   for field, value in obj.content.get("fields", {}).iteritems():
     if hasattr(obj.instance, field):
       setattr(obj.instance, field, value)
-  applier.apply(obj.instance, obj.content)
+  applier.apply_action(obj.instance, obj.content)
   add_comment_about(obj, obj.STATES.APPLIED, obj.apply_reason)
 
 

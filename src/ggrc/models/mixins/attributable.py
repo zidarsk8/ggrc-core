@@ -12,8 +12,8 @@ from sqlalchemy.orm import foreign
 from sqlalchemy.orm import relationship
 
 from ggrc import builder
-from ggrc.models import reflection
 
+from ggrc.data_platform import attributes
 
 # pylint: disable=invalid-name
 logger = getLogger(__name__)
@@ -22,10 +22,6 @@ logger = getLogger(__name__)
 # pylint: disable=attribute-defined-outside-init; CustomAttributable is a mixin
 class Attributable(object):
   """Custom Attributable mixin."""
-
-  _api_attrs = reflection.ApiAttributes(
-      reflection.Attribute('attributes', create=False, update=False),
-  )
 
   @declared_attr
   def _attributes(cls):  # pylint: disable=no-self-argument
@@ -47,9 +43,7 @@ class Attributable(object):
   @builder.simple_property
   def attributes(self):
     return {
-        attr.attribute_template.attribute_definition.name: {
-            "value": attr.value_datetime
-        }
+        attr.attribute_template.attribute_definition.name: attr
         for attr in self._attributes  # pylint: disable=not-an-iterable
     }
 
@@ -61,3 +55,26 @@ class Attributable(object):
         orm.subqueryload('_attributes')
     )
     return query
+
+  @classmethod
+  def indexed_query(cls):
+    return super(Attributable, cls).indexed_query().options(
+        orm.Load(cls).subqueryload(
+            "_attributes"
+        ).load_only(
+            "value_datetime",
+            "value_string",
+            "value_integer",
+        )
+    )
+
+  @classmethod
+  def get_delete_ca_query_for(cls, ids):
+    """Return delete CA record query. If ids are empty, will return None."""
+    if not ids:
+      return
+    return attributes.Attributes.__table__.delete().where(
+        attributes.Attributes.object_type == cls.__name__
+    ).where(
+        attributes.Attributes.object_id.in_(ids)
+    )

@@ -34,21 +34,11 @@ acl_table = sa.sql.table(
 
 _NOW = datetime.utcnow()
 
+INSERT_CHUNK = 1000
 
-def upgrade():
-  """Upgrade database schema and/or data, creating a new revision."""
-  conn = op.get_bind()
-  rows = conn.execute(
-      """
-      SELECT id, name
-      FROM roles
-      WHERE name IN ("WorkflowOwner", "WorkflowMember")
-      """)
-  roles = {row['name']: row['id'] for row in rows}
-  # Deprecated Workflow Role.id to new AccessControlRole.name mapping
-  role_id_to_acr = {roles['WorkflowOwner']: 'Admin',
-                    roles['WorkflowMember']: 'Workflow Member'}
 
+def _get_acrs(conn):
+  """Return dict of possible ACL."""
   rows = conn.execute(
       """
       SELECT id, name
@@ -60,7 +50,21 @@ def upgrade():
   for pacl in rows:
     acrs[pacl['name']] = pacl['id']
     acrs[pacl['id']] = pacl['name']
+  return acrs
 
+
+def _insert_parents(conn, acrs):
+  """Procedure to insert parent roles."""
+  rows = conn.execute(
+      """
+      SELECT id, name
+      FROM roles
+      WHERE name IN ("WorkflowOwner", "WorkflowMember")
+      """)
+  roles = {row['name']: row['id'] for row in rows}
+  # Deprecated Workflow Role.id to new AccessControlRole.name mapping
+  role_id_to_acr = {roles['WorkflowOwner']: 'Admin',
+                    roles['WorkflowMember']: 'Workflow Member'}
   # Create parent ACL records
   rows = conn.execute(
       """
@@ -83,8 +87,14 @@ def upgrade():
         'context_id': pacl['context_id'],
         'parent_id': None
     })
+    if len(parent_acl_data) == INSERT_CHUNK:
+      op.bulk_insert(acl_table, parent_acl_data)
+      parent_acl_data = []
   op.bulk_insert(acl_table, parent_acl_data)
 
+
+def _insert_context_based(conn, acrs):
+  """Procedure to insert context based roles."""
   # Query created parent ACL records. Need id for parent_id in related ACL.
   rows = conn.execute(
       """
@@ -145,7 +155,18 @@ def upgrade():
           'context_id': context_id,
           'parent_id': pacl['id']
       })
+      if len(related_acl_data) == INSERT_CHUNK:
+        op.bulk_insert(acl_table, related_acl_data)
+        related_acl_data = []
   op.bulk_insert(acl_table, related_acl_data)
+
+
+def upgrade():
+  """Upgrade database schema and/or data, creating a new revision."""
+  conn = op.get_bind()
+  acrs = _get_acrs(conn)
+  _insert_parents(conn, acrs)
+  _insert_context_based(conn, acrs)
 
 
 def downgrade():

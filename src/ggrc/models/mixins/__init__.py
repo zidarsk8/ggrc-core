@@ -161,40 +161,66 @@ class Hierarchical(object):
     )
 
 
-class Timeboxed(object):
-  """Mixin that defines `start_date` and `end_date` fields."""
-  @declared_attr
-  def start_date(cls):  # pylint: disable=no-self-argument
-    return deferred(db.Column(db.Date), cls.__name__)
-
-  @declared_attr
-  def end_date(cls):  # pylint: disable=no-self-argument
-    return deferred(db.Column(db.Date), cls.__name__)
-
-  # pylint: disable=unused-argument,no-self-use
-  @validates('start_date', 'end_date')
-  def validate_date(self, key, value):
-    return value.date() if isinstance(value, datetime.datetime) else value
-  # pylint: enable=unused-argument,no-self-use
-
+class WithStartDate(object):
+  """Mixin that defines `start_date`."""
   # REST properties
-  _api_attrs = reflection.ApiAttributes('start_date', 'end_date')
+  _api_attrs = reflection.ApiAttributes('start_date')
 
   _aliases = {
       "start_date": "Effective Date",
-      "end_date": "Stop Date",
   }
 
   _fulltext_attrs = [
       attributes.DateFullTextAttr('start_date', 'start_date'),
-      attributes.DateFullTextAttr('end_date', 'end_date'),
   ]
+
+  @declared_attr
+  def start_date(cls):
+    return deferred(db.Column(db.Date), cls.__name__)
+
+  @validates('start_date')
+  def validate_date(self, _, value):
+    # pylint: disable=no-self-use
+    return value.date() if isinstance(value, datetime.datetime) else value
 
   @classmethod
   def indexed_query(cls):
-    return super(Timeboxed, cls).indexed_query().options(
-        orm.Load(cls).load_only("start_date", "end_date"),
+    return super(WithStartDate, cls).indexed_query().options(
+        orm.Load(cls).load_only("start_date"),
     )
+
+
+class WithEndDate(object):
+  """Mixin that defines `end_date`."""
+  # REST properties
+  _api_attrs = reflection.ApiAttributes('end_date')
+
+  _aliases = {
+      "end_date": "Stop Date",
+  }
+
+  _fulltext_attrs = [
+      attributes.DateFullTextAttr('end_date', 'end_date'),
+  ]
+
+  @declared_attr
+  def end_date(cls):
+    return deferred(db.Column(db.Date), cls.__name__)
+
+  @validates('end_date')
+  def validate_date(self, _, value):
+    # pylint: disable=no-self-use
+    return value.date() if isinstance(value, datetime.datetime) else value
+
+  @classmethod
+  def indexed_query(cls):
+    return super(WithEndDate, cls).indexed_query().options(
+        orm.Load(cls).load_only("end_date"),
+    )
+
+
+class Timeboxed(WithStartDate, WithEndDate):
+  """Mixin that defines `start_date` and `end_date` fields."""
 
 
 class WithLastDeprecatedDate(object):
@@ -241,6 +267,8 @@ class WithLastDeprecatedDate(object):
     """Autosetup current date as last_deprecated_date
       if 'Deprecated' status will setup."""
     # pylint: disable=unused-argument; key is unused but passed in by ORM
+    if hasattr(super(WithLastDeprecatedDate, self), "validate_status"):
+      value = super(WithLastDeprecatedDate, self).validate_status(key, value)
     if value != self.status and value == self.AUTO_SETUP_STATUS:
       self.last_deprecated_date = datetime.datetime.now()
     return value
@@ -692,23 +720,21 @@ def person_relation_factory(relation_name, fulltext_attr=None, api_attr=None):
                                                ["email", "name"]))
   api_attr = api_attr or reflection.Attribute(relation_name)
 
+  # pylint: disable=too-few-public-methods,missing-docstring
   class DecoratedClass(object):
 
-      @classmethod
-      def indexed_query(cls):
-        return super(DecoratedClass, cls).indexed_query().options(
-            orm.Load(cls).joinedload(
-                relation_name
-            ).load_only(
-                "name", "email", "id"
-            ),
-        )
+    _api_attrs = reflection.ApiAttributes(api_attr)
+    fulltext_attr = [gen_fulltext_attr]
 
-      _api_attrs = reflection.ApiAttributes(api_attr)
-      fulltext_attr = [gen_fulltext_attr]
-
-
-
+    @classmethod
+    def indexed_query(cls):
+      return super(DecoratedClass, cls).indexed_query().options(
+          orm.Load(cls).joinedload(
+              relation_name
+          ).load_only(
+              "name", "email", "id"
+          ),
+      )
 
   return type(
       "{}_mixin".format(relation_name),
@@ -731,6 +757,8 @@ __all__ = [
     "Slugged",
     "Stateful",
     "TestPlanned",
+    "WithStartDate",
+    "WithEndDate",
     "Timeboxed",
     "Titled",
     "VerifiedDate",

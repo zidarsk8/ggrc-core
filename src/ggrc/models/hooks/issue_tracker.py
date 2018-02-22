@@ -331,12 +331,12 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):
         obj, issue_tracker_info, initial_assessment, initial_info, src)
   except integrations_errors.Error as error:
     logger.error(
-        'Unable to update IssueTracker issue ID=%s '
-        'while updating assessment ID=%d: %s', issue_id, obj.id, error)
+        'Unable to update a ticket ID=%s while updating assessment ID=%d: %s',
+        issue_id, obj.id, error)
     issue_tracker_info = {
         'enabled': False,
     }
-    obj.add_warning('issue_tracker', 'Unable to update IssueTracker issue.')
+    obj.add_warning('issue_tracker', 'Unable to update a ticket.')
 
   _update_issuetracker_info(obj, issue_tracker_info)
 
@@ -362,10 +362,9 @@ def _handle_assessment_deleted(sender, obj=None, service=None):
       try:
         issues.Client().update_issue(issue_obj.issue_id, issue_params)
       except integrations_errors.Error as error:
-        logger.error(
-            'Unable to update IssueTracker issue ID=%s while '
-            'deleting assessment ID=%d: %s',
-            issue_obj.issue_id, obj.id, error)
+        logger.error('Unable to update a ticket ID=%s while deleting'
+                     ' assessment ID=%d: %s',
+                     issue_obj.issue_id, obj.id, error)
     db.session.delete(issue_obj)
 
 
@@ -687,7 +686,8 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
   test_plan = assessment.test_plan
   if test_plan:
     comment.extend([
-        'Following is the assessment Requirements/Test Plan from GGRC:',
+        'Following is the assessment Requirements/Assessment Procedure '
+        'from GGRC:',
         html2text.HTML2Text().handle(test_plan).strip('\n'),
     ])
 
@@ -741,13 +741,12 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
       issue_id = _create_issuetracker_issue(assessment, issue_tracker_info)
     except integrations_errors.Error as error:
       logger.error(
-          'Unable to create IssueTracker issue '
-          'while creating assessment ID=%d: %s', assessment.id, error)
+          'Unable to create a ticket while creating assessment ID=%d: %s',
+          assessment.id, error)
       issue_tracker_info = {
           'enabled': False,
       }
-      assessment.add_warning(
-          'issue_tracker', 'Unable to create IssueTracker issue.')
+      assessment.add_warning('issue_tracker', 'Unable to create a ticket.')
     else:
       issue_tracker_info['issue_id'] = issue_id
       issue_tracker_info['issue_url'] = _ISSUE_URL_TMPL % issue_id

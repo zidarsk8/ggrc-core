@@ -26,7 +26,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
     is_custom_attributable: true,
     isRoleable: true,
     defaults: {
-      _copyAssessmentProcedure: true,
+      test_plan_procedure: true,
       assessment_type: 'Control',
       status: 'Not Started',
       send_by_default: true,  // notifications when a comment is added
@@ -103,10 +103,14 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
         attr_name: 'archived',
         order: 16,
       }, {
-        attr_title: 'Buganizer',
+        attr_title: 'Ticket Tracker',
         attr_name: 'issue_url',
         order: 17,
         deny: !GGRC.ISSUE_TRACKER_ENABLED,
+      }, {
+        attr_title: 'Last Comment',
+        attr_name: 'last_comment',
+        order: 18,
       }],
       display_attr_names: ['title', 'status', 'label', 'Assignees', 'Verifiers',
         'start_date', 'updated_at'],
@@ -257,16 +261,6 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
     },
     after_create: function () {
       this._checkIssueTrackerWarnings();
-    },
-    before_save: function () {
-      let mappedObjectsChanges = this.attr('mappedObjectsChanges');
-      if ( mappedObjectsChanges ) {
-        mappedObjectsChanges.forEach((mo)=>{
-          mo.extra = {
-            copyAssessmentProcedure: this.attr('_copyAssessmentProcedure'),
-          };
-        });
-      }
     },
     before_create: function () {
       if (!this.audit) {

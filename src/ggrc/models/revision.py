@@ -89,18 +89,20 @@ class Revision(Base, db.Model):
 
   @builder.callable_property
   def diff_with_current(self):
+    """Callable lazy property for revision."""
     referenced_objects.mark_to_cache(self.resource_type, self.resource_id)
     revisions_diff.mark_for_latest_content(self.resource_type,
                                            self.resource_id)
 
-    def foo():
+    def lazy_loader():
+      """Lazy load diff for revisions."""
       referenced_objects.rewarm_cache()
       revisions_diff.rewarm_latest_content()
       instance = referenced_objects.get(self.resource_type, self.resource_id)
       if instance:
         return revisions_diff.prepare(instance, self.content)
 
-    return foo
+    return lazy_loader
 
   @builder.simple_property
   def description(self):

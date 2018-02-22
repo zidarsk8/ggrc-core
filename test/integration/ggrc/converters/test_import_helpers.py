@@ -341,7 +341,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Title",
         "Description",
         "Audit Captains",
-        "Status",
+        "State",
         "Planned Start Date",
         "Planned End Date",
         "Planned Report Period from",
@@ -362,7 +362,7 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Code",
             "Title",
             "Program",
-            "Status",
+            "State",
             "Audit Captains",
         },
         "unique": {
@@ -448,6 +448,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         'Last Updated By',
         "Comments",
         'Labels',
+        'Last Comment',
     }
     expected_fields = {
         "mandatory": {
@@ -582,6 +583,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         'Last Updated Date',
         'Last Updated By',
         "Assessment Procedure",
+        "Last Deprecated Date",
+        "Effective Date",
     }
     self._test_single_object(models.Section, names, self.COMMON_EXPECTED)
 
@@ -845,6 +848,7 @@ class TestRiskAssessmentColumnDefinitions(TestCase):
         "Title",
         "Description",
         "Notes",
+        "State",
         "Start Date",
         "End Date",
         "Risk Manager",
@@ -853,9 +857,9 @@ class TestRiskAssessmentColumnDefinitions(TestCase):
         "Program",
         "Delete",
         "Assessment Procedure",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
     }
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.itervalues()}

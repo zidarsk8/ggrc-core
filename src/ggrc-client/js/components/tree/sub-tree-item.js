@@ -68,18 +68,12 @@ import template from './templates/sub-tree-item.mustache';
     viewModel: viewModel,
     events: {
       inserted: function () {
-        let viewModel = this.viewModel;
-        let instance = viewModel.attr('instance');
-        let resultDfd;
-        viewModel.attr('$el', this.element);
-
-        if (instance instanceof CMS.Models.Person) {
-          resultDfd = viewModel.makeResult(instance).then(function (result) {
-            viewModel.attr('result', result);
-          });
-
-          viewModel.attr('resultDfd', resultDfd);
-        }
+        this.viewModel.attr('$el', this.element);
+      },
+      '{viewModel.instance} destroyed'() {
+        const element = $(this.element)
+          .closest('tree-widget-container');
+        can.trigger(element, 'refreshTree');
       },
     },
   });

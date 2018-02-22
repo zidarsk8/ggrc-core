@@ -21,6 +21,7 @@ import {
   refreshCounts,
 } from '../../plugins/utils/current-page-utils';
 import RefreshQueue from '../../models/refresh_queue';
+import {REFRESH_MAPPING} from '../../events/eventTypes';
 
 (function (can, $) {
   'use strict';
@@ -294,10 +295,18 @@ import RefreshQueue from '../../models/refresh_queue';
             .done(function () {
               if (instance && instance.dispatch) {
                 instance.dispatch('refreshInstance');
-                instance.dispatch('refreshMapping');
+                instance.dispatch({
+                  ...REFRESH_MAPPING,
+                  destinationType: type,
+                });
               }
               // This Method should be modified to event
               refreshCounts();
+
+              // Lazy refresh instance to get all mapped relationships
+              setTimeout(() => {
+                instance.refresh();
+              }, 300);
 
               _.each($('sub-tree-wrapper'), function (wrapper) {
                 let vm = $(wrapper).viewModel();

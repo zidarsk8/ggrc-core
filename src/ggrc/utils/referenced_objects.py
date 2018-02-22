@@ -41,6 +41,7 @@ def mark_to_cache(type_, id_):
 
 
 def rewarm_cache():
+  """Rewarm cache on call."""
   if not hasattr(flask.g, "referenced_objects_markers"):
     return
   if not hasattr(flask.g, "referenced_objects"):

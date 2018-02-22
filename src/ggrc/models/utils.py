@@ -1,9 +1,13 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+"""Utils for ggrc models."""
+
 from .exceptions import ValidationError
 
 
 def validate_option(model, attribute, option, desired_role):
+  """Special validation for option model."""
   if option and option.role != desired_role:
     message = ("Invalid value for attribute {}.{}. "
                "Expected option with role {}, received role {}."
@@ -29,8 +33,7 @@ class PolymorphicRelationship(object):
     """Get the value of the backref attr."""
     if obj is None:
       return self
-    else:
-      return getattr(obj, self._make_backref_attr(obj))
+    return getattr(obj, self._make_backref_attr(obj))
 
   def __set__(self, obj, value):
     """Prepare and set the value of the backref attr."""
@@ -43,7 +46,10 @@ class PolymorphicRelationship(object):
       setattr(obj, self._make_backref_attr(obj), value)
 
 
-class FasadeProperty(object):
+class FasadeProperty(object):  # pylint: disable=too-few-public-methods
+  """Fasade property.
+
+  Allow to customize json preparation for current intance field."""
 
   FIELD_NAME = None
 
@@ -53,7 +59,7 @@ class FasadeProperty(object):
   def __call__(self, obj, json_obj):
     return self.prepare(json_obj)
 
-  def prepare(self, data):
+  def prepare(self, data):  # pylint: disable=no-self-use
     return data
 
   def __set__(self, obj, value):

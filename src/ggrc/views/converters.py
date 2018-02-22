@@ -11,16 +11,16 @@ from logging import getLogger
 
 from apiclient.errors import HttpError
 
+import flask
 from flask import current_app
 from flask import request
 from flask import json
 from flask import render_template
+from oauth2client.client import HttpAccessTokenRefreshError
 from werkzeug.exceptions import (
     BadRequest, InternalServerError, Unauthorized
 )
 
-from ggrc import settings
-from ggrc.gdrive import verify_credentials
 from ggrc.gdrive import file_actions as fa
 from ggrc.app import app
 from ggrc.converters.base import Converter
@@ -91,6 +91,12 @@ def handle_export_request():
         return current_app.make_response((csv_string, 200, headers))
   except BadQueryException as exception:
     raise BadRequest(exception.message)
+  except Unauthorized as ex:
+    raise Unauthorized("{} Try to reload /export page".format(ex.message))
+  except HttpAccessTokenRefreshError:
+    del flask.session['credentials']
+    raise Unauthorized('Unable to get valid credentials.'
+                       ' Try to reload /export page')
   except HttpError as e:
     message = json.loads(e.content).get("error").get("message")
     if e.resp.code == 401:
@@ -165,18 +171,10 @@ def init_converter_views():
   @login_required
   def import_view():
     """Get import view"""
-    if getattr(settings, "GAPI_CLIENT_ID", None):
-      authorize = verify_credentials()
-      if authorize:
-        return authorize
     return render_template("import_export/import.haml")
 
   @app.route("/export")
   @login_required
   def export_view():
     """Get export view"""
-    if getattr(settings, "GAPI_CLIENT_ID", None):
-      authorize = verify_credentials()
-      if authorize:
-        return authorize
     return render_template("import_export/export.haml")

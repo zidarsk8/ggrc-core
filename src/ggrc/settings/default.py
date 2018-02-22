@@ -55,7 +55,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "1.3.0-Strawberry" + BUILD_NUMBER
+VERSION = "1.4.0-Strawberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -154,6 +154,9 @@ ISSUE_TRACKER_ENABLED = bool(os.environ.get('ISSUE_TRACKER_ENABLED'))
 
 # URL template for composing Issue Tracker ticker URL.
 ISSUE_TRACKER_BUG_URL_TMPL = os.environ.get('ISSUE_TRACKER_BUG_URL_TMPL')
+
+# Flag defining whether we need to mock issue tracker responses
+ISSUE_TRACKER_MOCK = bool(os.environ.get('ISSUE_TRACKER_MOCK'))
 
 # Dashboard integration
 _DEFAULT_DASHBOARD_INTEGRATION_CONFIG = {

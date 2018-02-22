@@ -66,7 +66,7 @@
             <br>
             {{^if_in instance.status "Finished,Verified"}}
             <a class="section-add section-sticky btn btn-small btn-white"
-              href="javascript://" rel="tooltip"
+              href="javascript://" 
               {{data "deferred_to"}}
               data-placement="left"
               data-toggle="unified-mapper"
@@ -75,7 +75,7 @@
               data-join-mapping="info_related_objects"
               data-join-object-id="{{instance.id}}"
               data-join-object-type="{{instance.class.model_singular}}"
-              data-original-title="Map Object to this {{instance.class.title_singular}}" tabindex="6">
+              tabindex="6">
               Map Objects
             </a>
             {{/if_in}}

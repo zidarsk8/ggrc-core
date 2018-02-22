@@ -5,6 +5,7 @@
 
 import component from '../workflow-activate';
 import helpers from '../workflow-helpers';
+import Permission from '../../../permission';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 
 describe('GGRC.WorkflowActivate', function () {
@@ -20,16 +21,15 @@ describe('GGRC.WorkflowActivate', function () {
     let scopeMock;
     let refreshDfd;
     let saveDfd;
-    let saveCycleDfd;
     let initCountsDfd;
     let refreshAllDfd;
     let generateDfd;
+    let permissionRefreshDfd;
     let workflowExtension = {
       countsMap: {
         activeCycles: 'active cycles',
       },
     };
-    let cycleMock;
 
     beforeEach(function () {
       scopeMock = new can.Map();
@@ -38,11 +38,7 @@ describe('GGRC.WorkflowActivate', function () {
       initCountsDfd = can.Deferred();
       refreshAllDfd = can.Deferred();
       generateDfd = can.Deferred();
-      saveCycleDfd = can.Deferred();
-
-      cycleMock = jasmine.createSpyObj('cycle', {
-        save: saveCycleDfd,
-      });
+      permissionRefreshDfd = can.Deferred();
 
       workflow = new CMS.Models.Workflow({
         type: 'Workflow',
@@ -65,8 +61,9 @@ describe('GGRC.WorkflowActivate', function () {
         .and.returnValue(initCountsDfd);
       spyOn(helpers, 'generateCycle')
         .and.returnValue(generateDfd);
-      spyOn(CMS.Models, 'Cycle')
-        .and.returnValue(cycleMock);
+      spyOn(helpers, 'redirectToCycle');
+      spyOn(Permission, 'refresh')
+        .and.returnValue(permissionRefreshDfd);
 
       scopeMock.attr({
         _restore_button: jasmine.createSpy('_restore_button')
@@ -76,7 +73,11 @@ describe('GGRC.WorkflowActivate', function () {
     });
 
     describe('for recurrent workflow', function () {
+      let fakeCycleStub;
       beforeEach(function () {
+        fakeCycleStub = new can.Map({});
+        workflow.attr('cycles', []);
+        workflow.attr('cycles').push(fakeCycleStub);
         method();
       });
 
@@ -98,31 +99,19 @@ describe('GGRC.WorkflowActivate', function () {
             .toHaveBeenCalled();
         });
 
-      it('should try to save Cycle after updating this day Workflow',
-        function () {
-          refreshDfd.resolve();
-          saveDfd.resolve(workflow);
-
-          expect(cycleMock.save)
-            .toHaveBeenCalled();
-        });
-
-      it('shouldn\'t try to save Cycle after updating this day Workflow',
-      function () {
+      it('should refresh permissions after workflow saving', function () {
         refreshDfd.resolve();
-        workflow.attr('next_cycle_start_date',
-          moment().add(1, 'day'));
         saveDfd.resolve(workflow);
 
-        expect(cycleMock.save)
-          .not.toHaveBeenCalled();
+        expect(Permission.refresh)
+          .toHaveBeenCalled();
       });
 
       it('should try to init counts for active cycles tab after cycle saving',
         function () {
           refreshDfd.resolve();
           saveDfd.resolve(workflow);
-          saveCycleDfd.resolve();
+          permissionRefreshDfd.resolve();
 
           expect(CurrentPageUtils.initCounts)
             .toHaveBeenCalledWith([
@@ -134,17 +123,26 @@ describe('GGRC.WorkflowActivate', function () {
         function () {
           refreshDfd.resolve();
           saveDfd.resolve(workflow);
-          saveCycleDfd.resolve();
+          permissionRefreshDfd.resolve();
           initCountsDfd.resolve();
 
           expect(workflow.refresh_all)
             .toHaveBeenCalledWith('task_groups', 'task_group_tasks');
         });
 
+      it('should redirect to WF cycle', function () {
+        refreshDfd.resolve();
+        saveDfd.resolve(workflow);
+        permissionRefreshDfd.resolve();
+        initCountsDfd.resolve();
+        refreshAllDfd.resolve();
+        expect(helpers.redirectToCycle).toHaveBeenCalledWith(fakeCycleStub);
+      });
+
       it('should restore button after TGT refresh', function () {
         refreshDfd.resolve();
         saveDfd.resolve(workflow);
-        saveCycleDfd.resolve();
+        permissionRefreshDfd.resolve();
         initCountsDfd.resolve();
         refreshAllDfd.resolve();
 
@@ -165,14 +163,7 @@ describe('GGRC.WorkflowActivate', function () {
       it('should restore button when workflow saving fails', function () {
         refreshDfd.resolve();
         saveDfd.reject();
-        expect(scopeMock._restore_button)
-          .toHaveBeenCalled();
-      });
 
-      it('should restore button when cycle generation fails', function () {
-        refreshDfd.resolve();
-        saveDfd.resolve(workflow);
-        saveCycleDfd.reject();
         expect(scopeMock._restore_button)
           .toHaveBeenCalled();
       });
@@ -180,7 +171,7 @@ describe('GGRC.WorkflowActivate', function () {
       it('should restore button when counts init fails', function () {
         refreshDfd.resolve();
         saveDfd.resolve(workflow);
-        saveCycleDfd.resolve();
+        permissionRefreshDfd.resolve();
         initCountsDfd.reject();
         expect(scopeMock._restore_button)
           .toHaveBeenCalled();
@@ -189,7 +180,7 @@ describe('GGRC.WorkflowActivate', function () {
       it('should restore button when counts init fails', function () {
         refreshDfd.resolve();
         saveDfd.resolve(workflow);
-        saveCycleDfd.resolve();
+        permissionRefreshDfd.resolve();
         initCountsDfd.resolve();
         refreshAllDfd.reject();
         expect(scopeMock._restore_button)

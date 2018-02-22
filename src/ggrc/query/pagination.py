@@ -5,8 +5,8 @@
 
 import sqlalchemy as sa
 
-from ggrc import db
 from ggrc import models
+from ggrc import db
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.query import custom_operators
 from ggrc.query.exceptions import BadQueryException
@@ -45,17 +45,15 @@ def apply_limit(query, limit):
   with benchmark("Apply limit: apply_limit > query_limit"):
     # Note: limit request syntax is limit:[0,10]. We are counting
     # offset from 0 as the offset of the initial row for sql is 0 (not 1).
-    ids = [obj.id for obj in query.limit(page_size).offset(first)]
+    limit_query = query.limit(page_size).offset(first)
   with benchmark("Apply limit: apply_limit > query_count"):
-    if len(ids) < page_size:
-      total = len(ids) + first
-    else:
-      # Note: using func.count() as query.count() is generating additional
-      # subquery
-      count_q = query.statement.with_only_columns([sa.func.count()])
-      total = db.session.execute(count_q).scalar()
+    # Note: using func.count() as query.count() is generating additional
+    # subquery
+    # query.count() has a bug and it returns incorrect number of objects
+    count_q = query.statement.with_only_columns([sa.func.count()])
+    total = db.session.execute(count_q).scalar()
 
-  return ids, total
+  return limit_query, total
 
 
 def _joins_and_order(counter, clause, model, tgt_class):

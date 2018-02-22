@@ -22,7 +22,8 @@
   {{#if current_folder}}
     <action-toolbar class="action-toolbar">
       <div class="mapped-folder__folder-info">
-        <div class="mapped-folder__link">
+        <div class="mapped-folder__link" rel="tooltip"
+          data-original-title="{{current_folder.title}}">
           <a href="{{current_folder.alternateLink}}" target="_blank">
             <i class="fa fa-folder-open"></i> {{current_folder.title}}
           </a>

@@ -46,38 +46,14 @@
     <tree-field {source}="instance.verify_frequency" {show-tooltip}="false"/>
   {{/case}}
   {{#case 'assertions'}}
-    {{#if instance.snapshot}}
-      <sort-by {items}="instance.assertions" property-name="display_name">
-        {{#sortedItems}}
-          <tree-field {source}="sortedItems" {field}="'display_name'"/>
-        {{/sortedItems}}
-      </sort-by>
-    {{else}}
-      {{#using items=instance.assertions}}
-        <sort-by {items}="items" property-name="name">
-          {{#sortedItems}}
-            <tree-field {source}="sortedItems" {field}="'name'"/>
-          {{/sortedItems}}
-        </sort-by>
-      {{/using}}
-    {{/if}}
+    <sort-by {items}="instance.assertions" {is-snapshot}="instance.snapshot">
+      <tree-field {source}="sortedItems" {field}="'name'"/>
+    </sort-by>
   {{/case}}
   {{#case 'categories'}}
-    {{#if instance.snapshot}}
-      <sort-by {items}="instance.categories" property-name="display_name">
-        {{#sortedItems}}
-          <tree-field {source}="sortedItems" {field}="'display_name'"/>
-        {{/sortedItems}}
-      </sort-by>
-    {{else}}
-      {{#using items=instance.categories}}
-        <sort-by {items}="items" property-name="name">
-          {{#sortedItems}}
-            <tree-field {source}="sortedItems" {field}="'name'"/>
-          {{/sortedItems}}
-        </sort-by>
-      {{/using}}
-    {{/if}}
+    <sort-by {items}="instance.categories" {is-snapshot}="instance.snapshot">
+      <tree-field {source}="sortedItems" {field}="'name'"/>
+    </sort-by>
   {{/case}}
   {{#case 'last_assessment_date'}}
     {{localize_date instance.last_assessment_date}}

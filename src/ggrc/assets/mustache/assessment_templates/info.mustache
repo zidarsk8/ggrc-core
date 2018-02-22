@@ -40,7 +40,7 @@
             </div>
 
             <div class="span4">
-              <h6>Use control test plans as procedures</h6>
+              <h6>Copy Assessment Procedure from mapped object</h6>
               {{#if test_plan_procedure}}YES{{else}}NO{{/if}}
             </div>
 
@@ -62,10 +62,10 @@
                   {{get_item DEFAULT_PEOPLE_LABELS default_people.assignees}}
                 {{else}}
                   {{#if default_people.assignees.length}}
-                    <ul>
+                    <ul class="person-info-list">
                       {{#each default_people.assignees}}
                         <li>
-                          <person-info editable="true" person-id="{{.}}"></person-info>
+                          <person-info editable="false" person-id="{{.}}"></person-info>
                         </li>
                       {{/each}}
                     </ul>
@@ -85,10 +85,10 @@
                   {{get_item DEFAULT_PEOPLE_LABELS default_people.verifiers}}
                 {{else}}
                   {{#if default_people.verifiers.length}}
-                    <ul>
+                    <ul class="person-info-list">
                       {{#each default_people.verifiers}}
                         <li>
-                          <person-info editable="true" person-id="{{.}}"></person-info>
+                          <person-info editable="false" person-id="{{.}}"></person-info>
                         </li>
                       {{/each}}
                     </ul>
@@ -120,7 +120,7 @@
                       <i class="fa fa-caret-down"></i>
                       HIDE
                     </span>
-                    BUGANIZER INFO
+                    TICKET TRACKER INFO
                   </a>
                 </div>
                 <div class="hidden-fields-area">

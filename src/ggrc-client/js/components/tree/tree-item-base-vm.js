@@ -16,11 +16,6 @@ export default can.Map.extend({
     },
   },
   instance: null,
-  /**
-   * Result from mapping
-   */
-  result: null,
-  resultDfd: null,
   limitDepthTree: 0,
   itemSelector: '',
   $el: null,
@@ -39,14 +34,6 @@ export default can.Map.extend({
     let instance = this.attr('instance');
 
     switch (instance.attr('type')) {
-      case 'Person':
-        if (!this.attr('result')) {
-          this.attr('resultDfd').then(()=> {
-            this.select($element);
-          });
-          return;
-        }
-        break;
       case 'Cycle':
       case 'CycleTaskGroup':
         if (getPageType() === 'Workflow') {

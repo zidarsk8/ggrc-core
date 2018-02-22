@@ -167,22 +167,29 @@ const buildModifiedAttValues = (values, definitions, modifiedAttrs) => {
 
     return getModifiedValue(modifiedAttr, attr);
   })
-  .filter((value) => !!value);
+    .filter((value) => !!value);
 
   return modifiedValues;
 };
 // #endregion
 
 const getInstanceView = (instance) => {
-  let view;
-  let typeInfo;
+  let typeView;
+  const defaultPath = `${GGRC.mustache_path}/base_objects/info.mustache`;
+
+  if (!instance) {
+    return '';
+  }
+
   if (instance.view) {
     return instance.view;
   }
 
-  typeInfo = `${instance.class.table_plural}/info`;
-  view = `${GGRC.mustache_path}/${typeInfo}.mustache`;
-  return view;
+  typeView = `${instance.class.table_plural}/info`;
+
+  return typeView in GGRC.Templates ?
+    `${GGRC.mustache_path}/${typeView}.mustache` :
+    defaultPath;
 };
 
 export {

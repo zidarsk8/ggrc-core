@@ -6,7 +6,9 @@
 import sqlalchemy as sa
 
 from ggrc import db
+from ggrc.fulltext import mixin
 from ggrc.models import all_models
+from ggrc.models.mixins import attributable
 from ggrc.utils import referenced_objects
 
 
@@ -41,3 +43,23 @@ def map_objects(src, dst):
       destination=destination,
       context=src.context or destination.context,
   ))
+
+
+def _handle_obj_delete(mapper, connection, target):
+  """Clean fulltext and attributes tables from removed object data"""
+  # pylint: disable=unused-argument
+  delete_queries = []
+  if issubclass(type(target), mixin.Indexed):
+    delete_queries.append(target.get_delete_query_for([target.id]))
+  if issubclass(type(target), attributable.Attributable):
+    delete_queries.append(target.get_delete_ca_query_for([target.id]))
+
+  for query in delete_queries:
+    if query is not None:
+      db.session.execute(query)
+
+
+def init_hook():
+  """Initializes common hooks."""
+  for model in all_models.all_models:
+    sa.event.listen(model, "after_delete", _handle_obj_delete)

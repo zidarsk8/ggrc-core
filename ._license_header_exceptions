@@ -106,7 +106,6 @@
 < src/ggrc-client/styles/components/related-objects/_related-reference-urls.scss
 < src/ggrc/converters/handlers/related_person.py
 < src/ggrc_gdrive_integration/migrations/README
-< src/ggrc/integrations/__init__.py
 < src/ggrc/maintenance_views/__init__.py
 < src/ggrc/migrations/__init__.py
 < src/ggrc/migrations/utils/migrate_contacts.py
@@ -120,6 +119,7 @@
 < src/ggrc/templates/maintenance/maintenance.html
 < src/ggrc/templates/maintenance/trigger.html
 < src/ggrc/utils/error_handlers.py
+< src/ggrc/utils/issue_tracker_mock/response.json
 < src/ggrc_workflows/migrations/__init__.py
 < src/ggrc_workflows/migrations/utils/__init__.py
 < src/ggrc_workflows/migrations/utils/task_group_task_date_calculator/__init__.py
@@ -143,14 +143,17 @@
 < test/selenium/src/lib/service/rest/template/assessment.json
 < test/selenium/src/lib/service/rest/template/assessment_template.json
 < test/selenium/src/lib/service/rest/template/audit.json
+< test/selenium/src/lib/service/rest/template/comment.json
 < test/selenium/src/lib/service/rest/template/control.json
 < test/selenium/src/lib/service/rest/template/custom_attribute_definition.json
 < test/selenium/src/lib/service/rest/template/issue.json
 < test/selenium/src/lib/service/rest/template/objective.json
 < test/selenium/src/lib/service/rest/template/object_owner.json
+< test/selenium/src/lib/service/rest/template/people.json
 < test/selenium/src/lib/service/rest/template/program.json
 < test/selenium/src/lib/service/rest/template/query.json
 < test/selenium/src/lib/service/rest/template/relationship.json
+< test/selenium/src/lib/service/rest/template/user_role.json
 < test/unit/appengine/__init__.py
 < test/unit/ggrc/automapper/__init__.py
 < test/unit/ggrc/integrations/__init__.py

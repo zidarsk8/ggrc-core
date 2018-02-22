@@ -118,6 +118,7 @@ describe('ApprovalWorkflow', ()=> {
           unit: null,
           status: 'Active',
           title: jasmine.any(String),
+          is_verification_needed: true,
           object_approval: true,
           notify_on_change: true,
           notify_custom_message: jasmine.any(String),

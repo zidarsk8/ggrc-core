@@ -28,13 +28,17 @@ import '../bulk-update-button/bulk-update-button';
 import '../dropdown/multiselect-dropdown';
 import '../assessment_generator';
 import '../three-dots-menu/three-dots-menu';
+import '../last-comment/last-comment';
 import template from './templates/tree-widget-container.mustache';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {
   isSnapshotModel,
   isSnapshotScope,
 } from '../../plugins/utils/snapshot-utils';
-import {REFRESH_RELATED} from '../../events/eventTypes';
+import {
+  REFRESH_RELATED,
+  REFRESH_MAPPING,
+} from '../../events/eventTypes';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
   isMyAssessments,
@@ -471,19 +475,10 @@ viewModel = can.Map.extend({
     let self;
 
     function onCreated(ev, instance) {
-      let parentInstance = self.attr('parent_instance');
-
-      function callback() {
-        parentInstance.unbind('change', callback);
-        _refresh(true);
-      }
-
-      if (_verifyRelationship(instance, activeTabModel, parentInstance)) {
-        parentInstance.on('change', callback);
-      } else if (activeTabModel === instance.type) {
+      if (activeTabModel === instance.type) {
         _refresh(true);
       } else if (activeTabModel === 'Person' && isPerson(instance)) {
-        parentInstance.refresh().then(function () {
+        self.attr('parent_instance').refresh().then(function () {
           _refresh();
         });
       }
@@ -814,13 +809,25 @@ export default GGRC.Components('treeWidgetContainer', {
           pinControl.setLoadingIndicator(componentSelector, false);
         });
     },
-    ' refreshTree': function (el, ev) {
+    ' refreshTree'(el, ev) {
       ev.stopPropagation();
-
-      this.viewModel.closeInfoPane();
-      this.viewModel.loadItems();
+      this.reloadTree();
     },
-    inserted: function () {
+    [`{viewModel.parent_instance} ${REFRESH_MAPPING.type}`](scope, ev) {
+      const vm = this.viewModel;
+      let currentModelName;
+
+      if (!vm.attr('model')) {
+        return;
+      }
+
+      currentModelName = vm.attr('model').shortName;
+
+      if (currentModelName === ev.destinationType) {
+        this.reloadTree();
+      }
+    },
+    inserted() {
       let viewModel = this.viewModel;
       viewModel.attr('$el', this.element);
 
@@ -829,6 +836,10 @@ export default GGRC.Components('treeWidgetContainer', {
       this.element.closest('.widget')
         .on('widget_shown', viewModel._widgetShown.bind(viewModel));
       viewModel._widgetShown();
+    },
+    reloadTree() {
+      this.viewModel.closeInfoPane();
+      this.viewModel.loadItems();
     },
   },
 });

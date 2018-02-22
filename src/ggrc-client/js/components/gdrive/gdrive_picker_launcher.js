@@ -5,6 +5,7 @@
 
 import {
   uploadFiles,
+  findGDriveItemById,
   GDRIVE_PICKER_ERR_CANCEL,
 } from '../../plugins/utils/gdrive-picker-utils.js';
 import errorTpl from './templates/gdrive_picker_launcher_upload_error.mustache';
@@ -70,7 +71,7 @@ import RefreshQueue from '../../models/refresh_queue';
       createEditRequest: function (file) {
         let requestBody = {};
 
-        requestBody.name = file.attr('name');
+        requestBody.name = file.title;
 
         // updating filenames on GDrive
         return gapi.client.request({
@@ -96,7 +97,7 @@ import RefreshQueue from '../../models/refresh_queue';
           parents: [newParentId || 'root'],
         };
 
-        requestBody.name = file.attr('name');
+        requestBody.name = file.title;
 
         // updating filenames on GDrive
         return gapi.client.request({
@@ -187,12 +188,11 @@ import RefreshQueue from '../../models/refresh_queue';
           let req;
 
           // TODO: maybe pick the one format (the one that comes after refresh)?
-          let originalFileName = file.attr('title') ||
-            file.attr('originalFilename') || file.attr('name');
+          let originalFileName = file.title || file.originalFilename;
 
           let newFileName = this.addFileSuffix(originalFileName);
 
-          let parents = (file.parents && file.parents.attr()) || [];
+          let parents = file.parents || [];
 
           let originalFileExistsInDest = Boolean(
             parents.find((parent) =>
@@ -201,10 +201,9 @@ import RefreshQueue from '../../models/refresh_queue';
           let newFileExistsInDest = originalFileExistsInDest &&
             ( newFileName === originalFileName );
 
-          let sharedFile = file.attr('userPermission.role') !== 'owner';
+          let sharedFile = file.userPermission.role !== 'owner';
 
-          file.attr('title', newFileName);
-          file.attr('name', newFileName);
+          file.title = newFileName;
           originalFileNames[file.id] = originalFileName;
 
 
@@ -237,8 +236,11 @@ import RefreshQueue from '../../models/refresh_queue';
         this.runRenameBatch(requestsBatch, originalFileNames)
           .then((files) => {
             files = files.concat(untouchedFiles);
-            this.refreshFilesModel(CMS.Models.GDriveFile.models(files))
-              .then(fileRenameDfd.resolve, fileRenameDfd.reject);
+
+            let refreshDfds = files.map((file)=> findGDriveItemById(file.id));
+            can.when(...refreshDfds).then((...files)=> {
+              fileRenameDfd.resolve(files);
+            }, fileRenameDfd.reject);
           })
           .fail(fileRenameDfd.reject);
 
@@ -247,7 +249,7 @@ import RefreshQueue from '../../models/refresh_queue';
       beforeCreateHandler: function (files) {
         let tempFiles = files.map(function (file) {
           return {
-            title: this.addFileSuffix(file.name),
+            title: this.addFileSuffix(file.title),
             link: file.url,
             created_at: new Date(),
             isDraft: true,
@@ -338,17 +340,16 @@ import RefreshQueue from '../../models/refresh_queue';
         } else {
           folderId = this.instance.attr('folder');
 
-          parentFolderDfd = new CMS.Models.GDriveFolder({
-            id: folderId,
-            href: '/drive/v2/files/' + folderId,
-          }).refresh();
+          parentFolderDfd = findGDriveItemById(folderId);
         }
         can.Control.prototype.bindXHRToButton(parentFolderDfd, el);
 
         parentFolderDfd
           .done(function (parentFolder) {
             that.attr('isUploading', true);
-            parentFolder.uploadFiles()
+            uploadFiles({
+              parentId: parentFolder.id,
+            })
               .then(that.beforeCreateHandler.bind(that))
               .then(that.addFilesSuffixes.bind(that, {dest: parentFolder}))
               .then(function (files) {

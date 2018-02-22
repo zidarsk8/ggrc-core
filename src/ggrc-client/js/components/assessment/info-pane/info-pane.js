@@ -47,7 +47,10 @@ import {
 } from '../../../plugins/utils/ca-utils';
 import DeferredTransaction from '../../../plugins/utils/deferred-transaction-utils';
 import tracker from '../../../tracker';
-import {REFRESH_TAB_CONTENT, RELATED_ITEMS_LOADED} from '../../../events/eventTypes';
+import {REFRESH_TAB_CONTENT,
+  RELATED_ITEMS_LOADED,
+  REFRESH_MAPPING,
+} from '../../../events/eventTypes';
 import Permission from '../../../permission';
 import template from './info-pane.mustache';
 
@@ -523,7 +526,7 @@ import template from './info-pane.mustache';
       this.viewModel.setVerifierRoleId();
     },
     events: {
-      '{viewModel.instance} refreshMapping': function () {
+      [`{viewModel.instance} ${REFRESH_MAPPING.type}`]() {
         this.viewModel.attr('mappedSnapshots')
           .replace(this.viewModel.loadSnapshots());
       },

@@ -1,15 +1,15 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Module with Section model."""
+
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.comment import Commentable
 from ggrc.models.directive import Directive
-from ggrc.models.mixins import CustomAttributable, TestPlanned
-from ggrc.models.mixins import Hierarchical
-from ggrc.models.mixins import BusinessObject
 from ggrc.models.deferred import deferred
+from ggrc.models import mixins
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
 from ggrc.models import reflection
@@ -18,9 +18,21 @@ from ggrc.models.relationship import Relationship
 from ggrc.models.track_object_state import HasObjectState
 
 
-class Section(Roleable, HasObjectState, Hierarchical, db.Model,
-              CustomAttributable, Personable, Relatable, Indexed,
-              Commentable, TestPlanned, PublicDocumentable, BusinessObject):
+class Section(Roleable,
+              HasObjectState,
+              mixins.Hierarchical,
+              mixins.CustomAttributable,
+              mixins.WithStartDate,
+              mixins.WithLastDeprecatedDate,
+              Personable,
+              Relatable,
+              Indexed,
+              Commentable,
+              mixins.TestPlanned,
+              PublicDocumentable,
+              mixins.BusinessObject,
+              db.Model):
+  """Section model."""
 
   __tablename__ = 'sections'
   _table_plural = 'sections'
@@ -45,6 +57,7 @@ class Section(Roleable, HasObjectState, Hierarchical, db.Model,
 
   @classmethod
   def _filter_by_directive(cls, predicate):
+    """Apply predicate to the object referenced by directive field."""
     types = ["Policy", "Regulation", "Standard", "Contract"]
     dst = Relationship.query \
         .filter(
