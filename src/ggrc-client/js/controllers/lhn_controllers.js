@@ -109,10 +109,6 @@ can.Control('CMS.Controllers.LHN', {
           .removeClass('active')
           .css('left', (-width - safety) + 'px');
 
-    this.element.find('.lhn-type')
-          .removeClass('active')
-          .css('left', (-width - safety) + 'px');
-
     this.element.find('.bar-v')
           .removeClass('active');
 
@@ -129,10 +125,6 @@ can.Control('CMS.Controllers.LHN', {
     $('.lhn-trigger').removeClass('hide').addClass('active');
 
     this.element.find('.lhs-holder')
-      .css('left', '')
-      .addClass('active');
-
-    this.element.find('.lhn-type')
       .css('left', '')
       .addClass('active');
 

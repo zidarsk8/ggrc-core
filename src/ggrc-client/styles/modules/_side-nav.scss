@@ -10,6 +10,7 @@
   left: -240px;
   width: 240px;
   background: $white;
+  height: calc(100% - 146px);
   &.active {
     @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
     left: 0px;
@@ -42,6 +43,7 @@
 .affix-holder {
   overflow-y: auto;
   width: 100%;
+  height: calc(100% - 34px);
 }
 
 h4.search-title {
@@ -394,13 +396,12 @@ h4.search-title {
 }
 
 .bar-v {
-  @include transition(left, 0.8s);
   background: $white url("../images/bgnds/drag-v.png") no-repeat 2px 50%;
   @include background-size(2px 30px);
   position: absolute;
-  top: 0;
+  top: 34px;
   right: 0;
-  height:100%;
+  height: calc(100% - 34px);
   z-index: zIndex(bar-v);
   width: 6px;
   padding: 0;
