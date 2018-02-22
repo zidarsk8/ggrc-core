@@ -70,6 +70,11 @@
 
       <div class="csv-input">
         {{#states}}
+          {{^if_equals state "select"}}
+            {{#showSpinner}}
+                <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2, "zIndex": 0}' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+            {{/showSpinner}}
+          {{/if_equals}}
           <button id="import_btn"
              href="javascript://"
              {{#isDisabled}}disabled{{/isDisabled}}
@@ -79,9 +84,6 @@
             {{{text}}}
           </button>
           {{^if_equals state "select"}}
-            {{#showSpinner}}
-              <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2, "zIndex": 0}' 'display:inline-block; top: -3px; left: 30px;' }}></span>
-            {{/showSpinner}}
             {{^showSpinner}}
               <button class="btn btn-small btn-gray state-reset">Cancel</button>
             {{/showSpinner}}
