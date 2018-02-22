@@ -613,6 +613,15 @@ def get_revisions(revision_ids):
   snapshot resource type. In the future we might store snapshot resource type
   into a separate revision column just fully avoid fetching content from the
   database.
+
+  Args:
+    revision_ids: list of ids for revisions that will be used in calculating
+      new computed attribute values.
+
+  Returns:
+    list of named tuples with all needed revision data to compute the new
+    attribute values. Note that snapshot revisions also contain content field
+    that they need to specify the snapshot object type.
   """
 
   non_snapshot_revisions = db.session.query(
