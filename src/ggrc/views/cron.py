@@ -68,7 +68,7 @@ def init_cron_views(app):
   app.add_url_rule(
       "/hourly_issue_tracker_sync_endpoint",
       "hourly_issue_tracker_sync_endpoint",
-      view_func=half_hour_cron_endpoint
+      view_func=hourly_issue_tracker_sync_endpoint
   )
 
   app.add_url_rule(
