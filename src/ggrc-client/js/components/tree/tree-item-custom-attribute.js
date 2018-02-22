@@ -46,10 +46,7 @@ const getCustomAttrValue = (instance, customAttributeId, options) => {
 
   if (hasHandler) {
     const handler = formatValueMap[caObject.attributeType];
-
-    customAttrValue = (caObject.attributeType === CONTROL_TYPE.PERSON)
-      ? handler(caObject, options)
-      : handler(caObject);
+    customAttrValue = handler(caObject, options);
   }
 
   return customAttrValue || '';
