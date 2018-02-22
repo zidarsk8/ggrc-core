@@ -4,6 +4,7 @@
 */
 
 import Component from '../import';
+import * as Utils from '../import-export-utils';
 
 describe('GGRC.Components.csvImportWidget', function () {
   'use strict';
@@ -156,7 +157,7 @@ describe('GGRC.Components.csvImportWidget', function () {
     beforeEach(function () {
       method = Component.prototype.scope.requestImport.bind(fakeScope);
       importDfd = new can.Deferred();
-      spyOn(GGRC.Utils, 'import_request').and.returnValue(importDfd);
+      spyOn(Utils, 'importRequest').and.returnValue(importDfd);
       fakeScope.prepareDataForCheck = jasmine.createSpy();
       fakeScope.beforeProcess = jasmine.createSpy();
     });
@@ -188,7 +189,7 @@ describe('GGRC.Components.csvImportWidget', function () {
     it('calls import_request method from utils with data containing file id' +
     ' to check data for import', function () {
       method({id: '12343'});
-      expect(GGRC.Utils.import_request).toHaveBeenCalledWith({
+      expect(Utils.importRequest).toHaveBeenCalledWith({
         data: {id: '12343'},
       }, true);
     });

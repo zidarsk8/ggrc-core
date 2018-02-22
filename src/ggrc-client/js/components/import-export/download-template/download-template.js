@@ -5,6 +5,7 @@
 
 import '../../dropdown/multiselect-dropdown';
 import template from './download-template.mustache';
+import {exportRequest, download} from '../import-export-utils';
 
 const tag = 'download-template';
 const CSV_FILE_NAME = 'import_template.csv';
@@ -50,13 +51,13 @@ const viewModel = can.Map.extend({
       };
     });
 
-    return GGRC.Utils.export_request({
+    return exportRequest({
       data: {
         objects,
         export_to: 'csv',
       },
     }).then(function (data) {
-      GGRC.Utils.download(CSV_FILE_NAME, data);
+      download(CSV_FILE_NAME, data);
     }).always(() => {
       this.attr('modalState.open', false);
     });
