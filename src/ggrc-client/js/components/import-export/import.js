@@ -13,7 +13,7 @@ import quickTips from './templates/quick-tips.mustache';
 import template from './templates/csv-import.mustache';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 
-export default GGRC.Components('csvImportWidget', {
+export default can.Component.extend({
   tag: 'csv-import',
   template: template,
   requestData: null,
