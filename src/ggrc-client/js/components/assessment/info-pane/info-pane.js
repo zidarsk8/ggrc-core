@@ -459,14 +459,19 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
           instance.attr('previousStatus', instance.attr('status'));
         }
 
-        instance.attr('status', isUndo ? previousStatus : newStatus);
-        if (instance.attr('status') === 'In Review' && !isUndo) {
-          $(document.body).trigger('ajax:flash',
-            {hint: 'The assessment is complete. ' +
-            'The verifier may revert it if further input is needed.'});
-        }
+        return this.attr('deferredSave').push(() => {
+          if (isUndo) {
+            instance.attr('status', previousStatus);
+          } else {
+            instance.attr('status', newStatus);
+          }
 
-        return instance.save().then(() => {
+          if (instance.attr('status') === 'In Review' && !isUndo) {
+            $(document.body).trigger('ajax:flash',
+              {hint: 'The assessment is complete. ' +
+              'The verifier may revert it if further input is needed.'});
+          }
+        }).then(() => {
           this.initializeFormFields();
           this.attr('onStateChangeDfd').resolve();
           pubsub.dispatch({
