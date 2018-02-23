@@ -960,30 +960,30 @@ export default can.Control({
     });
   },
 
-  triggerSave: function (el, ev) {
-    var ajd;
-    var saveCloseBtn = this.element.find('a.btn[data-toggle=modal-submit]');
-    var saveAddmoreBtn = this.element.find(
-      'a.btn[data-toggle=modal-submit-addmore]');
-    var modalBackdrop = this.element.data('modal_form').$backdrop;
-
+  triggerSave(el, ev) {
     // Normal saving process
     if (el.is(':not(.disabled)')) {
-      let modalCloseBtn = this.element.find('.modal-dismiss > .fa-times');
-      let deleteBtn = this.element.find(
-        'a.btn[data-toggle=modal-ajax-deleteform]'
-      );
-      ajd = this.save_instance(el, ev);
+      const ajd = this.save_instance(el, ev);
 
       if (!ajd) {
         return;
       }
 
+      const saveCloseBtn = this.element.find('a.btn[data-toggle=modal-submit]');
+      const modalBackdrop = this.element.data('modal_form').$backdrop;
+      const modalCloseBtn = this.element.find('.modal-dismiss > .fa-times');
+      const deleteBtn = this.element.find(
+        'a.btn[data-toggle=modal-ajax-deleteform]'
+      );
+      const saveAddmoreBtn = this.element.find(
+        'a.btn[data-toggle=modal-submit-addmore]'
+      );
+
       this.options.attr('isSaving', true);
 
-      ajd.always(function () {
+      ajd.always(() => {
         this.options.attr('isSaving', false);
-      }.bind(this));
+      });
 
       if (this.options.add_more) {
         this.bindXHRToButton_disable(ajd, saveCloseBtn);
@@ -998,15 +998,15 @@ export default can.Control({
       this.bindXHRToDisableElement(ajd, modalCloseBtn);
     } else if (this._email_check) {
       // Queue a save if clicked after verifying the email address
-      this._email_check.done(function (data) {
+      this._email_check.done((data) => {
         if (!_.isNull(data.length) && !_.isUndefined(data.length)) {
           data = data[0];
         }
         if (data) {
-          setTimeout(function () {
+          setTimeout(() => {
             delete this._email_check;
             el.trigger('click');
-          }.bind(this), 0);
+          }, 0);
         }
       });
     }
