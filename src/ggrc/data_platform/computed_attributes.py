@@ -152,6 +152,7 @@ def snapshot_from_rel(rel_revision):
     return models.Snapshot.query.get(rel_revision.source_id)
   elif rel_revision.destination_type == "Snapshot":
     return models.Snapshot.query.get(rel_revision.destination_id)
+  return None
 
 
 def _get_group_key(revision, aggregate_type, computed_object):
@@ -171,7 +172,10 @@ def _get_group_key(revision, aggregate_type, computed_object):
   elif revision.resource_type == computed_object:
     key = "computed_objects"
   elif (revision.resource_type == "Snapshot" and
-        revision.content["child_type"] == computed_object):
+        # The following protected access is used to prevent calculation of all
+        # fields in revision content, because they are not needed.
+        # pylint: disable=protected-access
+        revision._content["child_type"] == computed_object):
     key = "destination_snapshots"
   elif (revision.resource_type == "Relationship" and
         revision.source_type in related_types and
@@ -181,8 +185,8 @@ def _get_group_key(revision, aggregate_type, computed_object):
         revision.source_type in related_snapshots and
         revision.destination_type in related_snapshots):
     # computed source related to a snapshot of an object
-    snap = snapshot_from_rel(revision)
-    if snap.child_type == computed_object:
+    snapshot = snapshot_from_rel(revision)
+    if snapshot and snapshot.child_type == computed_object:
       key = "related_snapshots"
   return key
 
@@ -587,7 +591,7 @@ def get_all_latest_revisions_ids():
     revision_ids = []
     for attribute in attributes:
       aggregate_type = get_aggregate_type(attribute)
-      revisions = revision_utils._get_revisions_by_type(aggregate_type)
+      revisions = revision_utils.get_revisions_by_type(aggregate_type)
       revision_ids.extend(revisions.values())
     return revision_ids
 
@@ -601,6 +605,49 @@ def delete_all_computed_values():
     ).delete()
 
 
+def get_revisions(revision_ids):
+  """Get revision properties needed for computed attributes.
+
+  Fetch revision properties based on resource type. This is an optimization to
+  avoid fetching a lot of content for all objects when it is only needed to get
+  snapshot resource type. In the future we might store snapshot resource type
+  into a separate revision column just fully avoid fetching content from the
+  database.
+
+  Args:
+    revision_ids: list of ids for revisions that will be used in calculating
+      new computed attribute values.
+
+  Returns:
+    list of named tuples with all needed revision data to compute the new
+    attribute values. Note that snapshot revisions also contain content field
+    that they need to specify the snapshot object type.
+  """
+
+  non_snapshot_revisions = db.session.query(
+      models.Revision.action,
+      models.Revision.resource_type,
+      models.Revision.resource_id,
+      models.Revision.source_type,
+      models.Revision.destination_type,
+  ).filter(
+      models.Revision.resource_type != "Snapshot",
+      models.Revision.id.in_(revision_ids)
+  ).all()
+  snapshot_revisions = db.session.query(
+      models.Revision.action,
+      models.Revision.resource_type,
+      models.Revision.resource_id,
+      # The following protected access is used to prevent calculation of all
+      # fields in revision content, because they are not needed.
+      models.Revision._content,  # pylint: disable=protected-access
+  ).filter(
+      models.Revision.resource_type == "Snapshot",
+      models.Revision.id.in_(revision_ids)
+  ).all()
+  return non_snapshot_revisions + snapshot_revisions
+
+
 def compute_attributes(revision_ids):
   """Compute new values based an changed objects.
 
@@ -610,15 +657,15 @@ def compute_attributes(revision_ids):
 
   with benchmark("Compute attributes"):
 
+    if revision_ids == "all_latest":
+      with benchmark("Get all latest revisions ids"):
+        revision_ids = get_all_latest_revisions_ids()
+
     if not revision_ids:
       return
 
     with benchmark("Get revisions."):
-      if revision_ids == "all_latest":
-        revision_ids = get_all_latest_revisions_ids()
-
-      revisions = models.Revision.query.filter(
-          models.Revision.id.in_(revision_ids))
+      revisions = get_revisions(revision_ids)
 
     with benchmark("Get all computed attributes"):
       attributes = get_computed_attributes()

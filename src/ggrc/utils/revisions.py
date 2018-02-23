@@ -18,7 +18,7 @@ from ggrc.snapshotter.rules import Types
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
-def _get_revisions_by_type(type_):
+def get_revisions_by_type(type_):
   """Get latest revisions for all existing objects
 
   Args:
@@ -202,4 +202,4 @@ def do_refresh_revisions():
   # snapshottable
   for type_ in sorted(Types.all | {"Assessment"}):
     logger.info("Updating revisions for: %s", type_)
-    _fix_type_revisions(event, type_, _get_revisions_by_type(type_))
+    _fix_type_revisions(event, type_, get_revisions_by_type(type_))
