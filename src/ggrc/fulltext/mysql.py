@@ -16,7 +16,6 @@ from sqlalchemy.sql.expression import select
 from sqlalchemy import event
 
 from ggrc import db
-from ggrc.login import is_creator
 from ggrc.models import all_models
 from ggrc.models.inflector import get_model
 from ggrc.query import my_objects
@@ -100,9 +99,7 @@ class MysqlIndexer(SqlIndexer):
 
     union_query = my_objects.get_myobjects_query(
         types=types,
-        contact_id=contact_id,
-        is_creator=is_creator()
-    )
+        contact_id=contact_id)
 
     return query.join(
         union_query,

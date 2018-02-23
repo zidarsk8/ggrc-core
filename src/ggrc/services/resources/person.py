@@ -175,8 +175,7 @@ class PersonResource(common.ExtendedResource):
     with benchmark("Make response"):
       aliased = my_objects.get_myobjects_query(
           types=self.MY_WORK_OBJECTS.keys(),
-          contact_id=login.get_current_user_id(),
-          is_creator=login.is_creator(),
+          contact_id=login.get_current_user_id()
       )
       all_ = db.session.query(
           aliased.c.type,

@@ -15,7 +15,6 @@ from ggrc import db
 from ggrc import models
 from ggrc.access_control.list import AccessControlList
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
-from ggrc.login import is_creator
 from ggrc.models import inflector
 from ggrc.models import relationship_helper
 from ggrc.query import autocast
@@ -178,8 +177,7 @@ def owned(exp, object_class, target_class, query):
   res = db.session.query(
       my_objects.get_myobjects_query(
           types=[object_class.__name__],
-          contact_id=exp['ids'][0],
-          is_creator=is_creator(),
+          contact_id=exp['ids'][0]
       ).alias().c.id
   )
   res = res.all()
