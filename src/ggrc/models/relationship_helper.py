@@ -67,21 +67,6 @@ def acl_obj_id(object_type, related_type, related_ids, role=None):
     return None
 
 
-def person_object(object_type, related_type, related_ids):
-  if "Person" not in [object_type, related_type]:
-    return None
-  if object_type == "Person":
-    return db.session.query(models.ObjectPerson.person_id).filter(
-        (models.ObjectPerson.personable_type == related_type) &
-        (models.ObjectPerson.personable_id.in_(related_ids))
-    )
-  else:
-    return db.session.query(models.ObjectPerson.personable_id).filter(
-        (models.ObjectPerson.personable_type == object_type) &
-        (models.ObjectPerson.person_id.in_(related_ids))
-    )
-
-
 def custom_attribute_mapping(object_type, related_type, related_ids):
   return db.session.query(models.CustomAttributeValue.attributable_id)\
       .filter(
@@ -140,7 +125,6 @@ def _audit_snapshot(object_type, related_type, related_ids):
 def get_special_mappings(object_type, related_type, related_ids):
   return [
       _audit_snapshot(object_type, related_type, related_ids),
-      person_object(object_type, related_type, related_ids),
       acl_obj_id(object_type, related_type, related_ids),
       person_withcontact(object_type, related_type, related_ids),
       program_audit(object_type, related_type, related_ids),

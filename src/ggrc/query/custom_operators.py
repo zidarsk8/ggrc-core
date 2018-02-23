@@ -127,7 +127,6 @@ def related_people(exp, object_class, target_class, query):
   """Get people related to the specified object.
 
   Returns the following people:
-    for each object type: the users mapped via PeopleObjects,
     for Program: the users that have a Program-wide role,
     for Audit: the users that have a Program-wide or Audit-wide role,
     for Workflow: the users mapped via WorkflowPeople and
@@ -145,11 +144,6 @@ def related_people(exp, object_class, target_class, query):
     return sqlalchemy.sql.false()
 
   res = []
-  res.extend(relationship_helper.person_object(
-      object_class.__name__,
-      exp['object_name'],
-      exp['ids'],
-  ))
 
   res.extend(db.session.query(AccessControlList.person_id).filter(
       sqlalchemy.and_(
