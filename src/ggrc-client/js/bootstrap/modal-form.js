@@ -131,7 +131,7 @@ import {confirm} from '../plugins/utils/modals';
             .each(function () {
               $(this).data('origText', $(this).text());
             })
-            .addClass('disabled pending-ajax')
+            .addClass('disabled')
             .attr('disabled', true);
 
         $form.data('submitpending', true)
@@ -328,7 +328,7 @@ import {confirm} from '../plugins/utils/modals';
             delete modal_form.xhr;
             $('[data-toggle=modal-submit]', modal_form.$element)
             .removeAttr('disabled')
-            .removeClass('disabled pending-ajax')
+            .removeClass('disabled')
             .each(function () {
               $(this).text($(this).data('origText'));
             });

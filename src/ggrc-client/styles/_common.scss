@@ -171,20 +171,6 @@ a {
   &:active {
     box-shadow: inset 0 0 4px rgba(0,0,0,0.4);
   }
-  &.pending-ajax {
-    box-shadow: none;
-    cursor: default;
-    background:$widgetHeaderBgnd url('../images/ajax-loader.gif') no-repeat 5px 6px;
-    border: 1px solid $ajaxBtnDisabled;
-    text-shadow: none;
-    padding-left: 28px;
-
-    &:active {
-      box-shadow: none;
-      background:$widgetHeaderBgnd url('../images/ajax-loader.gif') no-repeat 5px 5px;
-      border: 1px solid $ajaxBtnDisabled;
-    }
-  }
 }
 
 @each $btn_color in primary, success, info, warning, danger, draft {
@@ -344,11 +330,6 @@ select.input-block-level {
     color: $red;
     padding: 0;
   }
-}
-
-// AJAX loading gif
-input.disabled.pending-ajax{
-  background: $lightGray url("../images/ajax-loader.gif") no-repeat right center;
 }
 
 // Left dropdown positioning

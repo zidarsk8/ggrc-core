@@ -918,7 +918,7 @@ export default can.Control({
     if (newtext) {
       $el[0].innerHTML = newtext;
     }
-    $el.addClass('disabled pending-ajax');
+    $el.addClass('disabled');
     if (disable !== false) {
       $el.attr('disabled', true);
     }
@@ -929,8 +929,7 @@ export default can.Control({
     }).always(function () {
       // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
       if ($el.length) {
-        $el.removeAttr('disabled')
-          .removeClass('pending-ajax')[0].innerHTML = oldtext;
+        $el.removeAttr('disabled')[0].innerHTML = oldtext;
       }
     });
   },
