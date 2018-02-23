@@ -17,7 +17,7 @@ export default can.Component.extend({
   tag: 'csv-import',
   template: template,
   requestData: null,
-  scope: {
+  viewModel: {
     importUrl: '/_service/import_csv',
     quickTips,
     'import': null,
@@ -220,14 +220,14 @@ export default can.Component.extend({
   events: {
     '.state-reset click': function (el, ev) {
       ev.preventDefault();
-      this.scope.resetFile(this.element);
+      this.viewModel.resetFile(this.element);
     },
     '.state-import click': function (el, ev) {
       ev.preventDefault();
-      this.scope.attr('state', 'importing');
+      this.viewModel.attr('state', 'importing');
 
       importRequest({
-        data: {id: this.scope.attr('fileId')},
+        data: {id: this.viewModel.attr('fileId')},
       }, false)
         .done(function (data) {
           let result_count = data.reduce(function (prev, curr) {
@@ -237,15 +237,15 @@ export default can.Component.extend({
             return prev;
           }, {created: 0, updated: 0, deleted: 0, ignored: 0});
 
-          this.scope.attr('state', 'success');
-          this.scope.attr('data', [result_count]);
+          this.viewModel.attr('state', 'success');
+          this.viewModel.attr('data', [result_count]);
         }.bind(this))
         .fail(function (data) {
-          this.scope.attr('state', 'select');
+          this.viewModel.attr('state', 'select');
           GGRC.Errors.notifier('error', data.responseJSON.message);
         }.bind(this))
         .always(function () {
-          this.scope.attr('isLoading', false);
+          this.viewModel.attr('isLoading', false);
         }.bind(this));
     },
     '#import_btn.state-select click': function (el, ev) {
@@ -300,7 +300,7 @@ export default can.Component.extend({
           if (file && _.any(allowedTypes, function (type) {
             return type === file.mimeType;
           })) {
-            that.scope.requestImport(file);
+            that.viewModel.requestImport(file);
           } else {
             GGRC.Errors.notifier('error',
               'Something other than a csv-file was chosen. ' +

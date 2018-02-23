@@ -16,9 +16,9 @@ describe('GGRC.Components.csvImportWidget', function () {
     fakeScope = new can.Map({});
   });
 
-  describe('scope.states() method', function () {
+  describe('viewModel.states() method', function () {
     beforeEach(function () {
-      method = Component.prototype.scope.states.bind(fakeScope);
+      method = Component.prototype.viewModel.states.bind(fakeScope);
     });
 
     describe('the returned "import" state config\'s isDisabled() method',
@@ -155,7 +155,7 @@ describe('GGRC.Components.csvImportWidget', function () {
     let importDfd;
 
     beforeEach(function () {
-      method = Component.prototype.scope.requestImport.bind(fakeScope);
+      method = Component.prototype.viewModel.requestImport.bind(fakeScope);
       importDfd = new can.Deferred();
       spyOn(Utils, 'importRequest').and.returnValue(importDfd);
       fakeScope.prepareDataForCheck = jasmine.createSpy();
