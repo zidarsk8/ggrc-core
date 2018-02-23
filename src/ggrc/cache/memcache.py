@@ -1,23 +1,25 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Memcache implements the remote AppEngine Memcache mechanism."""
 
-from google.appengine.api import memcache
-from cache import Cache
-from cache import all_cache_entries
+import itertools
 from collections import OrderedDict
 from copy import deepcopy
 
-"""
-    Memcache implements the remote AppEngine Memcache mechanism
+from google.appengine.api import memcache
 
-"""
-class MemCache(Cache):
+from ggrc.cache import cache
+from ggrc import settings
+
+
+class MemCache(cache.Cache):
+  """MemCache class."""
   def __init__(self):
     self.name = 'memcache'
     self.client = None
 
-    for cache_entry in all_cache_entries():
+    for cache_entry in cache.all_cache_entries():
       if cache_entry.cache_type is self.name:
         self.supported_resources[cache_entry.model_plural]=cache_entry.class_name
         self.memcache_client = memcache.Client()
@@ -240,3 +242,42 @@ class MemCache(Cache):
     """ flush everything from memcache """
     return self.memcache_client.flush_all()
 
+
+
+class _Decorated(object):
+  """Decorated class."""
+
+  def __init__(self, function):
+    self.memcache_client = memcache.Client()
+    self.function = function
+
+  @property
+  def active(self):
+    return settings.MEMCACHE_MECHANISM
+
+  def get_key(self, *args, **kwargs):
+    """Return key name for sent args and kwargs"""
+    prefix = "{}.{}".format(self.function.__module__, self.function.__name__)
+    key_args = list(args)
+    for pair in kwargs.iteritems():
+      key_args.extend(pair)
+    suffix = ','.join([str(a) for a in key_args])
+    return "{}:{}".format(prefix, suffix)
+
+  def __call__(self, *args, **kwargs):
+    if not self.active:
+      return self.function(*args, **kwargs)
+    key = self.get_key(*args, **kwargs)
+    if self.memcache_client.get(key) is not None:
+      return self.memcache_client.get(key)
+    result = self.function(*args, **kwargs)
+    self.memcache_client.add(key, result)
+    return result
+
+  def invalidate_cache(self, *args, **kwargs):
+    self.memcache_client.delete(self.get_key(*args, **kwargs))
+
+
+def cached(function):
+  """Cached decorated functions that allowed to save data in memcache. """
+  return _Decorated(function)
