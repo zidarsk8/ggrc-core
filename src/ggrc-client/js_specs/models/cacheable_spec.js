@@ -457,7 +457,7 @@ describe('can.Model.Cacheable', function () {
     });
 
     describe('when count of arguments is 2', () => {
-      it('returns certain custom attribute object by ca id', function () {
+      it('sets value for caObject which has certain ca id', function () {
         const caId = 12345;
         const value = 'Value 1';
         const setCA = spyOn(instance, '_setCustomAttr');
