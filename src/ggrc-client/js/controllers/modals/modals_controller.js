@@ -944,18 +944,19 @@ export default can.Control({
       }
     });
   },
-  // make buttons non-clickable when saving
-  bindXHRToBackdrop: function (xhr, el, newtext, disable) {
-    // binding of an ajax to a click is something we do manually
-    var $el = $(el);
 
-    $el.addClass('disabled pending-ajax');
-    if (disable !== false) {
-      $el.attr('disabled', true);
+  // make element non-clickable when saving
+  bindXHRToDisableElement(xhr, el) {
+    // binding of an ajax to a click is something we do manually
+    const $el = $(el);
+
+    if (!$el.length) {
+      return;
     }
-    xhr.always(function () {
-      // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
-      $el.removeAttr('disabled').removeClass('disabled pending-ajax');// [0].innerHTML = oldtext;
+
+    $el.addClass('disabled');
+    xhr.always(() => {
+      $el.removeClass('disabled');
     });
   },
 
@@ -968,6 +969,10 @@ export default can.Control({
 
     // Normal saving process
     if (el.is(':not(.disabled)')) {
+      let modalCloseBtn = this.element.find('.modal-dismiss > .fa-times');
+      let deleteBtn = this.element.find(
+        'a.btn[data-toggle=modal-ajax-deleteform]'
+      );
       ajd = this.save_instance(el, ev);
 
       if (!ajd) {
@@ -983,11 +988,14 @@ export default can.Control({
       if (this.options.add_more) {
         this.bindXHRToButton_disable(ajd, saveCloseBtn);
         this.bindXHRToButton_disable(ajd, saveAddmoreBtn);
-        this.bindXHRToBackdrop(ajd, modalBackdrop, 'Saving, please wait...');
       } else {
         this.bindXHRToButton(ajd, saveCloseBtn, 'Saving, please wait...');
         this.bindXHRToButton(ajd, saveAddmoreBtn);
       }
+
+      this.bindXHRToDisableElement(ajd, deleteBtn);
+      this.bindXHRToDisableElement(ajd, modalBackdrop);
+      this.bindXHRToDisableElement(ajd, modalCloseBtn);
     } else if (this._email_check) {
       // Queue a save if clicked after verifying the email address
       this._email_check.done(function (data) {
