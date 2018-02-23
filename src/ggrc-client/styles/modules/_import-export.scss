@@ -3,28 +3,16 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-form.import {
-  margin: 0px;
+#csv_import {
+  display: flex;
+  margin: 0 40px;
+  background: $white;
 }
 
-.import-interface {
-  padding:16px;
-  h3 {
-    font-weight:normal;
-    padding-bottom:16px;
-  }
-  input[type="file"] {
-    width: 100%;
-  }
-}
+.csv-import {
+  padding: 25px 30px 20px;
+  @include box-shadow(0 3px 3px -3px rgba(0,0,0, 0.3));
 
-.import-buttons {
-  margin-top:16px;
-  padding-top:16px;
-  border-top:1px solid #ddd;
-}
-
-.import {
   .btn-fixed {
     float: left;
     i {
