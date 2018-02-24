@@ -35,7 +35,8 @@ class Roleable(object):
         'AccessControlList',
         primaryjoin=lambda: and_(
             remote(AccessControlList.object_id) == cls.id,
-            remote(AccessControlList.object_type) == cls.__name__),
+            remote(AccessControlList.object_type) == cls.__name__,
+            remote(AccessControlList.parent_id).is_(None)),
         foreign_keys='AccessControlList.object_id',
         backref='{0}_object'.format(cls.__name__),
         cascade='all, delete-orphan')
