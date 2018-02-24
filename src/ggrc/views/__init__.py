@@ -192,7 +192,6 @@ def do_reindex():
   with benchmark("Create records for %s" % "Snapshot"):
     reindex_snapshots()
   indexer.invalidate_cache()
-  start_compute_attributes("all_latest")
 
 
 class SetEncoder(json.JSONEncoder):
