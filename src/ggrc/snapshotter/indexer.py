@@ -23,7 +23,7 @@ from ggrc.snapshotter.datastructures import Pair
 from ggrc.fulltext.attributes import FullTextAttr
 
 
-LOGGER = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def _get_class_properties():
@@ -117,7 +117,11 @@ def reindex():
       models.Snapshot.child_type,
       models.Snapshot.child_id,
   )
+  all_count = columns.count()
+  handled = 0
   for query_chunk in generate_query_chunks(columns):
+    handled += query_chunk.count()
+    logger.info("Snapshot: %s/%s", handled, all_count)
     pairs = {Pair.from_4tuple(p) for p in query_chunk}
     reindex_pairs(pairs)
     db.session.commit()
@@ -288,7 +292,7 @@ def get_record_value(prop, val, rec):
     rec["content"] = unicode(val)
   if isinstance(rec["content"], basestring):
     return [rec]
-  LOGGER.warning(u"Unsupported value for %s #%s in %s %s: %r",
+  logger.warning(u"Unsupported value for %s #%s in %s %s: %r",
                  rec["type"], rec["key"], rec["property"],
                  rec["subproperty"], rec["content"])
   return []
