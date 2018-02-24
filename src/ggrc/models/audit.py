@@ -217,7 +217,7 @@ class Audit(Snapshotable,
       return value
 
     if self.archived is not None and self.archived != value and \
-       not any(acl for acl in self.access_control_list
+       not any(acl for acl in self.full_access_control_list
                if acl.ac_role.name == "Program Managers Mapped" and
                acl.person.id == user.id):
       raise Forbidden()

@@ -498,7 +498,7 @@ def handle_relationship_delete(relationship):
     assign_obj, other = relationship.source, relationship.destination
     if not issubclass(type(relationship.source), Assignable):
       assign_obj, other = other, assign_obj
-    parent_ids = {acl.id for acl in assign_obj.access_control_list}
+    parent_ids = {acl.id for acl in assign_obj.full_access_control_list}
     db.session.query(all_models.AccessControlList).filter(
         all_models.AccessControlList.parent_id.in_(parent_ids),
         all_models.AccessControlList.object_type == other.type,
