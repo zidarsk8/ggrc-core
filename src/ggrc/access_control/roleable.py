@@ -44,7 +44,7 @@ class Roleable(object):
         primaryjoin=lambda: and_(
             remote(AccessControlList.object_id) == cls.id,
             remote(AccessControlList.object_type) == cls.__name__,
-            remote(AccessControlList.parent_id) != None),
+            remote(AccessControlList.parent_id).isnot(None)),
         foreign_keys='AccessControlList.object_id',
         backref='{0}_full_object'.format(cls.__name__),
         cascade='all, delete-orphan')
@@ -120,6 +120,7 @@ class Roleable(object):
 
   @classmethod
   def indexed_query(cls):
+    """Query used by the indexer"""
     query = super(Roleable, cls).indexed_query()
     return query.options(
         orm.subqueryload(

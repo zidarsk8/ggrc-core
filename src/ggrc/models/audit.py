@@ -215,7 +215,7 @@ class Audit(Snapshotable,
       return value
 
     if self.archived is not None and self.archived != value and \
-       not any(acl for acl in self.full_access_control_list
+       not any(acl for acl in list(self.full_access_control_list)
                if acl.ac_role.name == "Program Managers Mapped" and
                acl.person.id == user.id):
       raise Forbidden()
@@ -223,6 +223,7 @@ class Audit(Snapshotable,
 
   @classmethod
   def _filter_by_program(cls, predicate):
+    """Helper for filtering by program"""
     return Program.query.filter(
         (Program.id == Audit.program_id) &
         (predicate(Program.slug) | predicate(Program.title))
@@ -230,6 +231,7 @@ class Audit(Snapshotable,
 
   @classmethod
   def _filter_by_auditor(cls, predicate):
+    """Helper for filtering by auditor"""
     from ggrc_basic_permissions.models import Role, UserRole
     return UserRole.query.join(Role, Person).filter(
         (Role.name == "Auditor") &
