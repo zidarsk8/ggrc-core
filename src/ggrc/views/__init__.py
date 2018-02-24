@@ -48,8 +48,8 @@ from ggrc.views import cron
 from ggrc.views import filters
 from ggrc.views import notifications
 from ggrc.views.registry import object_view
+from ggrc import utils
 from ggrc.utils import benchmark
-from ggrc.utils import generate_query_chunks
 from ggrc.utils import revisions
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -179,8 +179,13 @@ def do_reindex():
     logger.info("Updating index for: %s", model_name)
     with benchmark("Create records for %s" % model_name):
       model = indexed_models[model_name]
-      for query_chunk in generate_query_chunks(db.session.query(model.id)):
-        model.bulk_record_update_for([i.id for i in query_chunk])
+      ids = [obj.id for obj in model.query]
+      ids_count = len(ids)
+      handled_ids = 0
+      for ids_chunk in utils.list_chunks(ids):
+        handled_ids += len(ids_chunk)
+        logger.info("%s: %s / %s", model_name, handled_ids, ids_count)
+        model.bulk_record_update_for(ids_chunk)
         db.session.commit()
 
   logger.info("Updating index for: %s", "Snapshot")
