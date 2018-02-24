@@ -1,6 +1,12 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""General utils module
+
+This module should contain only the most general utility function and any
+specific utilities should be in their own module.
+"""
+
 import logging
 import datetime
 import json
@@ -280,6 +286,12 @@ def generate_query_chunks(query, chunk_size=200):
   count = query.count()
   for offset in range(0, count, chunk_size):
     yield query.order_by("id").limit(chunk_size).offset(offset)
+
+
+def list_chunks(list_, chunk_size=200):
+  """Yield successive chunk of chunk_size from list."""
+  for index in range(0, len(list_), chunk_size):
+    yield list_[index:index + chunk_size]
 
 
 def create_stub(object_, context_id=None):
