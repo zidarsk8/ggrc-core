@@ -96,30 +96,37 @@ class TestAccessControlRoleable(TestCase):
         (person_3.id, role.id)
     ], acls)
 
-  def test_acl_filters_internal_roles(self):
-    """Test if access_control_list property filters out internal roles
+  def test_full_access_control_list(self):
+    """Test if access_control_list property filters out propagated roles
 
-       Before sending the access_control_list to the frontend, internal roles
+       Before sending the access_control_list to the frontend, propagated roles
        need to be filtered out to help prevent performance issues"""
     with factories.single_commit():
-      internal_role = factories.AccessControlRoleFactory(internal=1)
-      # Create an object with one external and one internal role
-      obj = all_models.Control(title="Test Control", access_control_list=[{
-          "person": self.person,
-          "ac_role": self.role,
-      }, {
-          "person": self.person,
-          "ac_role": internal_role,
-      }])
-      # Make sure that access_control_list list contains internal roles:
-      self.assertEqual(len(obj.access_control_list), 2,
-                       "acl doesn't include all the roles")
-    obj_id, role_id = obj.id, self.role.id
+      # Create an object with one external and one propagated role
+      obj = factories.ControlFactory()
+      acl = factories.AccessControlList(
+          object=obj,
+          ac_role=self.role,
+          person=self.person
+      )
+      factories.AccessControlList(
+          object=obj,
+          ac_role=self.role,
+          person=self.person,
+          parent=acl
+      )
+    # full_access_control_list should have all rows:
+    self.assertEqual(len(obj.full_access_control_list), 2,
+                     "full_access_control_list doesn't include all roles")
+    # access_control_list should only have non propagated ones
+    self.assertEqual(len(obj.access_control_list), 1,
+                     "access_control_list doesn't include all the roles")
+    obj_id, acl_id = obj.id, acl.id
     api = api_helper.Api()
     response = api.get(all_models.Control, obj_id)
     acl = response.json["control"]["access_control_list"]
-    # Check if the response filtered out the internal access_control_role
+    # Check if the response filtered out the propagated access_control_role
     self.assertEqual(len(acl), 1,
-                     "acl didn't filter out internal roles correctly")
-    self.assertEqual(acl[0]["ac_role_id"], role_id,
-                     "acl didn't filter out internal roles correctly")
+                     "acl didn't filter out propagated roles correctly")
+    self.assertEqual(acl[0]["id"], acl_id,
+                     "acl didn't filter out propagated roles correctly")
