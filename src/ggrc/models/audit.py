@@ -177,8 +177,6 @@ class Audit(Snapshotable,
       audit: Audit instance
     """
     for acl in audit.access_control_list:
-      if acl.parent_id:
-        continue
       data = {
           "person": acl.person,
           "ac_role": acl.ac_role,
