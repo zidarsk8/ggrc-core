@@ -5,229 +5,219 @@
 
 import template from './rich_text.mustache';
 
-(function (can, GGRC) {
-  'use strict';
+const URL_CLIPBOARD_REGEX = /https?:\/\/[^\s]+/g;
+const URL_TYPE_REGEX = /https?:\/\/[^\s]+$/;
 
-  var URL_CLIPBOARD_REGEX = /https?:\/\/[^\s]+/g;
-  var URL_TYPE_REGEX = /https?:\/\/[^\s]+$/;
-
-  GGRC.Components('richText', {
-    tag: 'rich-text',
-    template: template,
-    viewModel: {
-      define: {
-        placeholder: {
-          type: 'string',
-          value: ''
-        },
-        disabled: {
-          set: function (newValue) {
-            this.toggle(!newValue);
-            return newValue;
+export default can.Component.extend('richText', {
+  tag: 'rich-text',
+  template: template,
+  viewModel: {
+    define: {
+      disabled: {
+        set(disabled) {
+          let editor = this.attr('editor');
+          if (editor) {
+            editor.enable(!disabled);
           }
-        },
-        text: {
-          type: 'string',
-          value: '',
-          set: function (text) {
-            text = text || '';
-            this.setText(text);
-            return text;
+          return disabled;
+        }
+      },
+      hidden: {
+        get(){
+          let hiddenToolbar = this.attr('hiddenToolbar');
+          let hasFocus = this.attr('editorHasFocus')
+          return hiddenToolbar && !hasFocus;
+        }
+      },
+      content: {
+        set(newContent){
+          let oldContent = this.attr('content')
+          let editor = this.attr('editor');
+          if (editor && (newContent !== oldContent)) {
+            this.setContentToEditor(editor, newContent);
           }
-        },
-        toolbarClasses: {
-          type: 'string',
-          value: '',
-          get: function () {
-            if (!this.attr('hiddenToolbar')) {
-              return '';
-            }
-
-            if (this.attr('editorHasFocus')) {
-              return '';
-            }
-
-            return 'rich-text__wrapper-hidden-toolbar';
-          }
+          return newContent;
         }
-      },
-      tabIndex: '-1',
-      hiddenToolbar: false,
-      forceShow: false,
-      editor: false,
-      editorHasFocus: false,
-      initEditor: function (container, toolbarContainer, text) {
-        var self = this;
-        import(/* webpackChunkName: "quill" */'quill').then(function (Quill) {
-          var editor = new Quill(container, {
-            theme: 'snow',
-            bounds: container,
-            placeholder: self.attr('placeholder'),
-            modules: {
-              toolbar: {
-                container: toolbarContainer
-              },
-              clipboard: {
-                matchers: [
-                  [Node.TEXT_NODE, self.urlMatcher]
-                ]
-              }
-            }
-          });
-          if (text) {
-            editor.clipboard.dangerouslyPasteHTML(0, text);
-          }
-          editor.on('text-change', self.onChange.bind(self));
-
-          if (self.attr('hiddenToolbar')) {
-            editor.on('selection-change',
-              self.onSelectionChange.bind(self));
-          }
-          self.attr('editor', editor);
-        });
-      },
-      urlMatcher: function (node, delta) {
-        var matches;
-        var ops;
-        var str;
-        if (typeof (node.data) !== 'string') {
-          return;
-        }
-        matches = node.data.match(URL_CLIPBOARD_REGEX);
-
-        if (matches && matches.length > 0) {
-          ops = [];
-          str = node.data;
-          matches.forEach(function (match) {
-            var split = str.split(match);
-            var beforeLink = split.shift();
-            ops.push({insert: beforeLink});
-            ops.push({insert: match, attributes: {link: match}});
-            str = split.join(match);
-          });
-          ops.push({insert: str});
-          delta.ops = ops;
-        }
-
-        return delta;
-      },
-      isWhitespace: function (ch) {
-        return (ch === ' ') || (ch === '\t') || (ch === '\n');
-      },
-      onSelectionChange: function () {
-        var editor = this.attr('editor');
-        var activeElement = document.activeElement;
-
-        // checks case when we click on another rich-text component
-        // or outside of component
-        if (editor.hasFocus() ||
-          $(activeElement).closest('rich-text').viewModel() === this) {
-          this.attr('editorHasFocus', true);
-          return;
-        }
-
-        this.attr('editorHasFocus', false);
-      },
-      onRemoved: function () {
-        var editor = this.getEditor();
-
-        if (this.attr('hiddenToolbar') && editor) {
-          editor.off('selection-change');
-        }
-      },
-      onChange: function (delta) {
-        var match;
-        var url;
-        var ops;
-        var text;
-        var startIdx;
-        var endIdx;
-        var editor;
-        if (!this.getTextLength()) {
-          // Should null text value if this is no content
-          return this.attr('text', '');
-        }
-
-        if (delta.ops.length === 2 &&
-          delta.ops[0].retain &&
-          !delta.ops[1].delete &&
-          !this.isWhitespace(delta.ops[1].insert)) {
-          editor = this.getEditor();
-          text = editor.getText();
-          startIdx = delta.ops[0].retain;
-          while (!this.isWhitespace(text[startIdx - 1]) && startIdx > 0) {
-            startIdx--;
-          }
-          endIdx = delta.ops[0].retain + 1;
-          while (!this.isWhitespace(text[endIdx]) && endIdx < text.length) {
-            endIdx++;
-          }
-
-          match = text.substring(startIdx, endIdx).match(URL_TYPE_REGEX);
-          if (match !== null) {
-            url = match[0];
-
-            ops = [];
-            if (startIdx !== 0) {
-              ops.push({retain: startIdx});
-            }
-            ops = ops.concat([
-              {'delete': url.length},
-              {insert: url, attributes: {link: url}}
-            ]);
-            editor.updateContents({
-              ops: ops
-            });
-          }
-        }
-
-        return this.attr('text', this.getContent());
-      },
-      toggle: function (isDisabled) {
-        var editor = this.getEditor();
-        if (editor) {
-          editor.enable(isDisabled);
-        }
-      },
-      getEditor: function () {
-        return this.attr('editor');
-      },
-      getTextLength: function () {
-        return this.getText().trim().length;
-      },
-      /**
-       * Returns only text content of the Rich Text
-       * @return {String} - plain text value
-       */
-      getText: function () {
-        return this.getEditor().getText();
-      },
-      setText: function (text) {
-        var editor = this.getEditor();
-        if (editor && !text.length) {
-          setTimeout(function () {
-            editor.setText('');
-          }, 0);
-        }
-      },
-      /**
-       * Returns the whole content of the Rich Text field with HTML content
-       * @return {String} - current HTML String
-       */
-      getContent: function () {
-        return this.getEditor().root.innerHTML;
       }
     },
-    events: {
-      inserted: function () {
-        var wysiwyg = this.element.find('.rich-text__content')[0];
-        var toolbar = this.element.find('.rich-text__toolbar')[0];
-        var text = this.viewModel.attr('text');
-        this.viewModel.initEditor(wysiwyg, toolbar, text);
-      },
-      removed: function () {
-        this.viewModel.onRemoved();
+    editor: null,
+    placeholder: '',
+    hiddenToolbar: false,
+    editorHasFocus: false,
+    maxLength: null,
+    showAlert: false,
+    length: 0,
+    initEditor(container, toolbarContainer, countContainer) {
+      import(/* webpackChunkName: "quill" */'quill').then((Quill)=> {
+        let editor = new Quill(container, {
+          theme: 'snow',
+          bounds: container,
+          placeholder: this.attr('placeholder'),
+          modules: {
+            toolbar: {
+              container: toolbarContainer
+            },
+            clipboard: {
+              matchers: [
+                [Node.TEXT_NODE, this.urlMatcher]
+              ]
+            }
+          }
+        });
+        this.setContentToEditor(editor, this.attr('content'));
+
+        if (this.attr('maxLength')) {
+          this.restrictPasteOperation(editor);
+          this.restrictMaxLength(editor);
+        }
+
+        if (this.attr('hiddenToolbar')) {
+          editor.on('selection-change', this.onSelectionChange.bind(this));
+        }
+
+        editor.on('text-change', this.onChange.bind(this));
+        this.attr('editor', editor);
+      });
+    },
+    setContentToEditor(editor, content) {
+      if (content !== editor.root.innerHTML) {
+        let delta = editor.clipboard.convert(content);
+        editor.setContents(delta);
+      }
+    },
+    restrictPasteOperation(editor) {
+      editor.root.addEventListener('paste', (e) => {
+        let text = e.clipboardData.getData('text/plain');
+        let allowedCount = this.attr('maxLength') - this.attr('length');
+
+        if (text.length > allowedCount) {
+          e.preventDefault();
+          let allowed = text.slice(0, allowedCount);
+          document.execCommand('insertText', false, allowed);
+          this.attr('showAlert', true);
+        }
+      });
+    },
+    restrictMaxLength(editor) {
+      editor.root.addEventListener('keypress', (e)=> {
+        let length = this.getLength(editor);
+        let maxLength = this.attr('maxLength')
+        if (length >= maxLength) {
+          e.preventDefault();
+        }
+      });
+    },
+    urlMatcher(node, delta) {
+      // Matcher runs only for single op.
+      // Since it's clipboard matcher operation is always insert.
+      let insertedText = delta.ops[0].insert;
+      let matches = node.data.match(URL_CLIPBOARD_REGEX);
+
+      if (matches) {
+        let ops = [];
+        matches.forEach((match)=> {
+          let split = insertedText.split(match);
+          let beforeLink = split.shift();
+          if (beforeLink.length) {
+            ops.push({insert: beforeLink});
+          }
+          ops.push({insert: match, attributes: {link: match}});
+          insertedText = split.join(match);
+        });
+        ops.push({insert: insertedText});
+        delta.ops = ops;
+      }
+
+      return delta;
+    },
+    isWhitespace(ch) {
+      return (ch === ' ') || (ch === '\t') || (ch === '\n');
+    },
+    onSelectionChange() {
+      let editor = this.attr('editor');
+      let activeElement = document.activeElement;
+
+      // checks case when we click on another rich-text component
+      // or outside of component
+      if (editor.hasFocus() ||
+        $(activeElement).closest('rich-text').viewModel() === this) {
+        this.attr('editorHasFocus', true);
+        return;
+      }
+
+      this.attr('editorHasFocus', false);
+    },
+    onChange(delta, oldDelta) {
+      let editor = this.attr('editor');
+
+      let textLength = this.getLength(editor);
+
+      // handle and highlight urls
+      if (textLength &&
+        delta.ops.length === 2 &&
+        delta.ops[0].retain &&
+        !delta.ops[1].delete &&
+        !this.isWhitespace(delta.ops[1].insert)) {
+
+        let text = editor.getText();
+        let startIdx = delta.ops[0].retain;
+        while (!this.isWhitespace(text[startIdx - 1]) && startIdx > 0) {
+          startIdx--;
+        }
+        let endIdx = delta.ops[0].retain + 1;
+        while (!this.isWhitespace(text[endIdx]) && endIdx < text.length) {
+          endIdx++;
+        }
+
+        let match = text.substring(startIdx, endIdx).match(URL_TYPE_REGEX);
+        if (match !== null) {
+          let url = match[0];
+          let ops = [];
+          if (startIdx !== 0) {
+            ops.push({retain: startIdx});
+          }
+          ops = ops.concat([
+            {'delete': url.length},
+            {insert: url, attributes: {link: url}}
+          ]);
+          editor.updateContents({
+            ops: ops
+          });
+        }
+      }
+
+      // innerHTML could containe only tags f.e. <p><br></p>
+      // we have to save empty string in this case;
+      let content = textLength ? editor.root.innerHTML : '';
+      this.attr('content', content);
+      this.attr('length', textLength);
+
+      let maxLength = this.attr('maxLength');
+      let showAlert = this.attr('showAlert');
+      if (showAlert && textLength < maxLength) {
+        this.attr('showAlert', false);
+      }
+    },
+    getLength(editor) {
+      // Empty editor contains single service line-break symbol.
+      return editor.getLength() - 1;
+    }
+  },
+  events: {
+    inserted() {
+      let wysiwyg = this.element.find('.rich-text__content')[0];
+      let toolbar = this.element.find('.rich-text__toolbar')[0];
+      let count = this.element.find('.rich-text__count')[0];
+      this.viewModel.initEditor(wysiwyg, toolbar, count);
+    },
+    removed() {
+      let editor = this.viewModel.attr('editor');
+
+      if (editor) {
+        editor.off('text-change');
+        editor.off('selection-change');
+        editor.off('keypress');
       }
     }
-  });
-})(window.can, window.GGRC);
+  }
+});

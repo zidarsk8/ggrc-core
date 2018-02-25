@@ -176,19 +176,6 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
         this.attr('access_control_list', []);
       }
     },
-    'before:refresh': function () {
-      // no need to rewrite access_control_list for snapshots
-      if (isSnapshot(this)) {
-        return;
-      }
-
-      // access_control_list should be set from response.
-      // if access_control_list is not empty CanJS try to merge
-      // lists from instance and response. Outcome: wrong date in ACL
-      if (this.attr('access_control_list.length') > 0) {
-        this.attr('access_control_list', []);
-      }
-    },
   });
 
   can.Model.Mixin('assertions_categories', {
@@ -485,5 +472,33 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
   can.Model.Mixin('base-notifications', {
     send_by_default: true,
     recipients: 'Admin,Primary Contacts,Secondary Contacts',
+  });
+
+  can.Model.Mixin('relatedAssessmentsLoader', {}, {
+    /**
+     *
+     * @param {Array} limit - Limit of loaded numbers
+     * @param {Array} orderBy - Key: property name, Value: sorting direction (asc, desc)
+     * @return {Promise}
+     */
+    getRelatedAssessments(limit = [0, 5], orderBy = []) {
+      const type = this.attr('type');
+      const instanceId = isSnapshot(this) ?
+        this.snapshot.child_id :
+        this.id;
+      const params = {
+        object_id: instanceId,
+        object_type: type,
+        limit: limit.join(','),
+      };
+      const orderAsString = orderBy
+        .map((sort) => `${sort.field},${sort.direction}`)
+        .join(',');
+
+      if (orderAsString) {
+        params.order_by = orderAsString;
+      }
+      return $.get('/api/related_assessments', params);
+    },
   });
 })(window.can, window.GGRC);

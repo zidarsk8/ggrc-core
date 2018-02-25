@@ -1564,7 +1564,15 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
       # Make a check for relationship objects that are a special case
       can_read = True
       for name in ('source', 'destination'):
-        inst = resource[name]
+        if name in resource:
+          inst = resource[name]
+        else:
+          obj_tuple = (resource[name + "_type"], resource[name + "_id"])
+          obj_inst = utils.referenced_objects.get(*obj_tuple)
+          if obj_inst:
+            inst = utils.create_stub(obj_inst, obj_inst.context_id)
+          else:
+            inst = None
         if not inst:
           # If object was deleted but relationship still exists
           continue
@@ -1585,8 +1593,9 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
       if not hasattr(ggrc.models.all_models, resource['resource_type']):
         # there are no permissions for old objects
         return None
-      res_model = getattr(ggrc.models.all_models, resource['resource_type'])
-      instance = res_model.query.get(resource['resource_id'])
+      instance = utils.referenced_objects.get(
+          resource['resource_type'], resource['resource_id']
+      )
       if instance is None or\
          not user_permissions.is_allowed_read_for(instance):
         return None

@@ -20,15 +20,15 @@ from lib.utils.string_utils import StringMethods
 dict_executed_fixtures = {}
 
 
-def _get_fixture_from_dict_fixtures(fixture):
+def get_fixture_from_dict_fixtures(fixture):
   """Get value of fixture by key (fixture name) from dictionary of
   executed fixtures."""
   global dict_executed_fixtures
   # extend executed fixtures using exist fixture in snapshot representation
   if fixture.endswith("_snapshot"):
-    origin_obj = _get_fixture_from_dict_fixtures(
+    origin_obj = get_fixture_from_dict_fixtures(
         fixture.replace("_snapshot", ""))
-    parent_obj = _get_fixture_from_dict_fixtures("new_audit_rest")[0]
+    parent_obj = get_fixture_from_dict_fixtures("new_audit_rest")[0]
     dict_executed_fixtures.update(
         {fixture: Representation.convert_repr_to_snapshot(
             objs=origin_obj, parent_obj=parent_obj)})
@@ -89,7 +89,7 @@ def _new_objs_rest(obj_name, obj_count,  # noqa: ignore=C901
           obj_name not in objects.ASSESSMENT_TEMPLATES):
     parent_obj_name = "cas_for_" + obj_name
   if parent_obj_name:
-    parent_objs = _get_fixture_from_dict_fixtures(
+    parent_objs = get_fixture_from_dict_fixtures(
         fixture="new_{}_rest".format(parent_obj_name))
     if "new_{}_rest".format(parent_obj_name) == "new_audit_rest":
       parent_objs *= obj_count
@@ -179,8 +179,8 @@ def generate_common_fixtures(*fixtures):  # noqa: ignore=C901
     """
     fixture_params = fixture.replace("map_", "")
     _src_obj, _dest_objs = fixture_params.split("_to_")
-    src_obj = _get_fixture_from_dict_fixtures(fixture=_src_obj)[0]
-    dest_objs = _get_fixture_from_dict_fixtures(fixture=_dest_objs)
+    src_obj = get_fixture_from_dict_fixtures(fixture=_src_obj)[0]
+    dest_objs = get_fixture_from_dict_fixtures(fixture=_dest_objs)
     mapped_objs = rest_service.RelationshipsService().map_objs(
         src_obj=src_obj, dest_objs=dest_objs)
     return mapped_objs
@@ -195,17 +195,17 @@ def generate_common_fixtures(*fixtures):  # noqa: ignore=C901
     _objs_to_update = "new_{}_rest".format(obj_name)
     # e.g. need if: 'new_controls_rest' and 'update_control_rest'
     try:
-      objs_to_update = _get_fixture_from_dict_fixtures(fixture=_objs_to_update)
+      objs_to_update = get_fixture_from_dict_fixtures(fixture=_objs_to_update)
     except KeyError:
       _objs_to_update = "new_{}_rest".format(objects.get_plural(obj_name))
-      objs_to_update = _get_fixture_from_dict_fixtures(
+      objs_to_update = get_fixture_from_dict_fixtures(
           fixture=_objs_to_update)[0]
     if objects.get_plural(obj_name) in objects.ALL_OBJS:
       obj_name = objects.get_plural(obj_name)
     if "_with_cas" in obj_name:
       has_cas = True
       obj_name = objects.get_plural(obj_name.replace("_with_cas", ""))
-      parent_objs = _get_fixture_from_dict_fixtures(
+      parent_objs = get_fixture_from_dict_fixtures(
           fixture="new_{}_rest".format("cas_for_" + obj_name))
     if objs_to_update:
       if has_cas and parent_objs:
@@ -228,10 +228,10 @@ def generate_common_fixtures(*fixtures):  # noqa: ignore=C901
     _objs_to_delete = "new_{}_rest".format(obj_name)
     # e.g. need if: 'new_controls_rest' and 'delete_control_rest'
     try:
-      objs_to_delete = _get_fixture_from_dict_fixtures(fixture=_objs_to_delete)
+      objs_to_delete = get_fixture_from_dict_fixtures(fixture=_objs_to_delete)
     except KeyError:
       _objs_to_delete = "new_{}_rest".format(objects.get_plural(obj_name))
-      objs_to_delete = _get_fixture_from_dict_fixtures(
+      objs_to_delete = get_fixture_from_dict_fixtures(
           fixture=_objs_to_delete)[0]
     if objects.get_plural(obj_name) in objects.ALL_OBJS:
       obj_name = objects.get_plural(obj_name)

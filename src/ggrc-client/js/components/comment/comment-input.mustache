@@ -3,8 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 <rich-text class="comment-input {{#if disabled}}is-disabled{{/if}}"
-    hidden-toolbar="true"
+    {hidden-toolbar}="true"
     {disabled}="disabled"
     {placeholder}="placeholder"
-    {(text)}="value">
+    {max-length}="2000"
+    {(content)}="value">
 </rich-text>

@@ -73,7 +73,7 @@
           widget_id: 'risk_assessments',
           widget_name: 'Risk Assessments',
           widgetType: 'treeview',
-          treeViewDepth: 3,
+          treeViewDepth: 0,
           content_controller_options: {
             add_item_view: GGRC.mustache_path +
               '/risk_assessments/tree_add_item.mustache',

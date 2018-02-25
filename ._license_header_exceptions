@@ -94,6 +94,7 @@
 < src/ggrc-client/images/ggrc-one-color.svg
 < src/ggrc-client/images/magnifying-glass.png
 < src/ggrc-client/js/bootstrap/tests/modal-form_spec.js
+< src/ggrc-client/js/components/csv/templates/quick-tips.mustache
 < src/ggrc-client/js/components/form/fields/tests/checkbox-form-field_spec.js
 < src/ggrc-client/js/components/form/fields/tests/date-form-field_spec.js
 < src/ggrc-client/js/components/form/fields/tests/dropdown-form-field_spec.js

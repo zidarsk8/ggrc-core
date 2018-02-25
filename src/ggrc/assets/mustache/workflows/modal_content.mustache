@@ -112,9 +112,9 @@
           <i class="fa fa-question-circle" rel="tooltip" title="This email will be sent to all workflow members once workflow starts"></i>
         </label>
         <rich-text tab-Index="6"
-              hidden-toolbar="true"
-              placeholder="Enter custom message here"
-              {(text)}="instance.notify_custom_message">
+              {hidden-toolbar}="true"
+              {placeholder}="'Enter custom message here'"
+              {(content)}="instance.notify_custom_message">
         </rich-text>
       </div>
     </div>

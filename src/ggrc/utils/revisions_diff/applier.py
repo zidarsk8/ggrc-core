@@ -15,8 +15,9 @@ from ggrc.models import mixins
 
 def apply_acl(instance, content):
   """Apply ACLs."""
+  any_acl_applied = False
   if not isinstance(instance, roleable.Roleable):
-    return
+    return any_acl_applied
   instance_acl_dict = {(l.ac_role_id, l.person_id): l
                        for l in instance.access_control_list}
   person_ids = set()
@@ -39,16 +40,20 @@ def apply_acl(instance, content):
             ac_role=acr_dict[int(role_id)],
             object=instance,
         )
+        any_acl_applied = True
     for delete in data["deleted"]:
       if (role_id, delete["id"]) in instance_acl_dict:
         acl = instance_acl_dict[(role_id, delete["id"])]
         instance.access_control_list.remove(acl)
+        any_acl_applied = True
+  return any_acl_applied
 
 
 def apply_cav(instance, content):
   """Apply CAVs."""
+  any_cav_applied = False
   if not isinstance(instance, mixins.customattributable.CustomAttributable):
-    return
+    return any_cav_applied
   cad_dict = {d.id: d for d in instance.custom_attribute_definitions}
   cav_dict = {i.custom_attribute_id: i
               for i in instance.custom_attribute_values}
@@ -68,9 +73,11 @@ def apply_cav(instance, content):
     cav = cav_dict.get(cad.id)
     if remove_cav and cav:
       instance.custom_attribute_values.remove(cav)
+      any_cav_applied = True
     elif not remove_cav and cav:
       cav.attribute_value = value["attribute_value"]
       cav.attribute_object_id = attribute_object_id
+      any_cav_applied = True
     elif not remove_cav:
       cav = all_models.CustomAttributeValue(
           custom_attribute=cad,
@@ -79,6 +86,8 @@ def apply_cav(instance, content):
           attribute_object_id=attribute_object_id,
       )
       instance.custom_attribute_values.append(cav)
+      any_cav_applied = True
+  return any_cav_applied
 
 
 def _generate_mapping_field_cache(mapping_fields, mapping_list_field):
@@ -98,6 +107,7 @@ def _generate_mapping_field_cache(mapping_fields, mapping_list_field):
 
 def apply_mapping(instance, content):
   """Apply mappings."""
+  any_mappings_applied = False
   rel_names = [r.key
                for r in inspect(instance.__class__).relationships
                if not r.uselist]
@@ -110,6 +120,7 @@ def apply_mapping(instance, content):
       setattr(instance,
               key,
               field_cache.get((value["type"], value["id"])) if value else None)
+      any_mappings_applied = True
   for key, value in mapping_list_field.iteritems():
     attr = getattr(instance, key)
     exist_items = {(i.type, i.id) for i in attr}
@@ -118,15 +129,30 @@ def apply_mapping(instance, content):
       if key in exist_items:
         continue
       attr.append(field_cache[key])
+      any_mappings_applied = True
     for item in value["deleted"]:
       key = (item["type"], item["id"])
       if key not in exist_items:
         continue
       attr.remove(field_cache[key])
+      any_mappings_applied = True
+  return any_mappings_applied
+
+
+def apply_fields(instance, content):
+  """Apply field diff to instance."""
+  any_fields_applied = False
+  for field, value in content.get("fields", {}).iteritems():
+    if hasattr(instance, field):
+      setattr(instance, field, value)
+      any_fields_applied = True
+  return any_fields_applied
 
 
 def apply_action(instance, content):
   """Apply content diff to instance."""
-  apply_acl(instance, content)
-  apply_cav(instance, content)
-  apply_mapping(instance, content)
+  applied_flags = [apply_fields(instance, content),
+                   apply_acl(instance, content),
+                   apply_cav(instance, content),
+                   apply_mapping(instance, content)]
+  return any(applied_flags)

@@ -42,14 +42,14 @@ from ggrc.services.common import as_json
 from ggrc.services.common import inclusion_filter
 from ggrc.query import views as query_views
 from ggrc.snapshotter import rules
-from ggrc.snapshotter.indexer import reindex as reindex_snapshots
+from ggrc.snapshotter import indexer as snapshot_indexer
 from ggrc.views import converters
 from ggrc.views import cron
 from ggrc.views import filters
 from ggrc.views import notifications
 from ggrc.views.registry import object_view
+from ggrc import utils
 from ggrc.utils import benchmark
-from ggrc.utils import generate_query_chunks
 from ggrc.utils import revisions
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -61,6 +61,16 @@ logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 def refresh_revisions(_):
   """Web hook to update revision content."""
   revisions.do_refresh_revisions()
+  return app.make_response(("success", 200, [("Content-Type", "text/html")]))
+
+
+@app.route("/_background_tasks/reindex_snapshots", methods=["POST"])
+@queued_task
+def reindex_snapshots(_):
+  """Web hook to update the full text search index."""
+  logger.info("Updating index for: %s", "Snapshot")
+  with benchmark("Create records for %s" % "Snapshot"):
+    snapshot_indexer.reindex()
   return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 
@@ -179,15 +189,16 @@ def do_reindex():
     logger.info("Updating index for: %s", model_name)
     with benchmark("Create records for %s" % model_name):
       model = indexed_models[model_name]
-      for query_chunk in generate_query_chunks(db.session.query(model.id)):
-        model.bulk_record_update_for([i.id for i in query_chunk])
+      ids = [obj.id for obj in model.query]
+      ids_count = len(ids)
+      handled_ids = 0
+      for ids_chunk in utils.list_chunks(ids):
+        handled_ids += len(ids_chunk)
+        logger.info("%s: %s / %s", model_name, handled_ids, ids_count)
+        model.bulk_record_update_for(ids_chunk)
         db.session.commit()
 
-  logger.info("Updating index for: %s", "Snapshot")
-  with benchmark("Create records for %s" % "Snapshot"):
-    reindex_snapshots()
   indexer.invalidate_cache()
-  start_compute_attributes("all_latest")
 
 
 class SetEncoder(json.JSONEncoder):
@@ -434,6 +445,22 @@ def object_browser():
       "dashboard/index.haml",
       page_type="ALL_OBJECTS",
   )
+
+
+@app.route("/admin/reindex_snapshots", methods=["POST"])
+@login_required
+@admin_required
+def admin_reindex_snapshots():
+  """Calls a webhook that reindexes indexable objects
+  """
+  task_queue = create_task(
+      name="reindex_snapshots",
+      url=url_for(reindex_snapshots.__name__),
+      queued_callback=reindex_snapshots,
+  )
+  return task_queue.make_response(
+      app.make_response(("scheduled %s" % task_queue.name, 200,
+                         [('Content-Type', 'text/html')])))
 
 
 @app.route("/admin/reindex", methods=["POST"])

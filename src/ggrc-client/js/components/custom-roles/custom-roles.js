@@ -44,15 +44,12 @@ export default can.Component.extend({
 
       this.attr('instance.access_control_list').replace(filteredACL);
     },
-    save: function (args) {
-      let self = this;
+    save(args) {
       this.attr('updatableGroupId', args.groupId);
-      this.attr('instance').save()
-        .then(function () {
-          self.filterACL();
-          self.attr('instance').dispatch('refreshInstance');
-          self.attr('updatableGroupId', null);
-        });
+      this.attr('instance').save().then(() => {
+        this.filterACL();
+        this.attr('updatableGroupId', null);
+      });
     },
   },
 });

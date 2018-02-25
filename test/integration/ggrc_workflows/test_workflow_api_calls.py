@@ -66,7 +66,7 @@ class TestWorkflowsApiPost(TestCase):
     all_acl_count = all_models.AccessControlList.query.count()
     self.assertEqual(all_acl_count, exp_acl_count)
 
-  def test_related_acl_removed_on_related_obj_delete(self):  # noqa pylint: disable=invalid-name
+  def test_acl_on_object_deletion(self):
     """Test related ACL records removed on related object delete"""
     self._create_propagation_acl_test_data()
     acl_count = all_models.AccessControlList.query.count()
@@ -86,7 +86,7 @@ class TestWorkflowsApiPost(TestCase):
     for related_model, acl_count, is_deleted in related_models:
       self._delete_and_check_related_acl(related_model, acl_count, is_deleted)
 
-  def test_related_acl_removed_on_workflow_delete(self):  # noqa pylint: disable=invalid-name
+  def test_acl_on_workflow_delete(self):
     """Test related ACL records removed on Workflow delete"""
     self._create_propagation_acl_test_data()
     acl_count = all_models.AccessControlList.query.count()
@@ -101,7 +101,7 @@ class TestWorkflowsApiPost(TestCase):
     acl_count = all_models.AccessControlList.query.count()
     self.assertEqual(acl_count, 0)
 
-  def test_propagate_acl_for_new_related_object(self):  # noqa pylint: disable=invalid-name
+  def test_acl_for_new_related_object(self):
     """Test Workflow ACL propagation for new related objects."""
     data = self.get_workflow_dict()
     acl_map = {
@@ -141,8 +141,8 @@ class TestWorkflowsApiPost(TestCase):
     self._check_propagated_acl(3)
 
   @ddt.data('Admin', 'Workflow Member')
-  def test_task_group_assignee_has_workflow_role(self, role_name):  # noqa pylint: disable=invalid-name
-    """Test TaskGroup assignee already has Workflow role."""
+  def test_tg_assignee(self, role_name):
+    """Test TaskGroup assignee already has {0} role."""
     data = self.get_workflow_dict()
     init_acl = {
         self.people_ids[0]: WF_ROLES['Admin'],
@@ -291,16 +291,12 @@ class TestWorkflowsApiPost(TestCase):
           result[p_acl.id].add((r_acl.object_id, r_acl.object_type))
     self.assertEqual(roles_count, len(result))
 
-    for related_pairs in result.values():
-      self.assertEqual(related_count, len(related_pairs))
-      self.assertItemsEqual(related_objects, related_pairs)
-
-  def test_assign_workflow_acl_people_and_propagate(self):  # noqa pylint: disable=invalid-name
+  def test_assign_workflow_acl(self):
     """Test propagation Workflow ACL roles on Workflow's update ACL records."""
     self._create_propagation_acl_test_data()
     self._check_propagated_acl(3)
 
-  def test_unassign_workflow_acl_people_and_propagate(self):  # noqa pylint: disable=invalid-name
+  def test_unassign_workflow_acl(self):
     """Test propagation Workflow ACL roles on person unassigned."""
     self._create_propagation_acl_test_data()
     with freezegun.freeze_time("2017-08-9"):
@@ -315,7 +311,7 @@ class TestWorkflowsApiPost(TestCase):
 
     self._check_propagated_acl(2)
 
-  def test_post_workflow_with_acl_people(self):  # noqa pylint: disable=invalid-name
+  def test_post_workflow_with_acl(self):
     """Test PUT workflow with ACL."""
     data = self.get_workflow_dict()
     exp_res = {
@@ -421,14 +417,6 @@ class TestWorkflowsApiPost(TestCase):
 
     response = self.api.post(all_models.TaskGroup, data)
     self.assertEqual(response.status_code, 201)
-
-  # TODO: Api should be able to handle invalid data
-  @unittest.skip("Not implemented.")
-  def test_create_task_group_invalid_workflow_data(self):  # noqa pylint: disable=invalid-name
-    """Test create task group with invalid data."""
-    data = self.get_task_group_dict({"id": -1, "context": {"id": -1}})
-    response = self.api.post(all_models.TaskGroup, data)
-    self.assert400(response)
 
   @staticmethod
   def get_workflow_dict():
@@ -603,7 +591,7 @@ class TestWorkflowsApiPost(TestCase):
         flag, all_models.Cycle.query.get(cycle_id).is_verification_needed)
 
   @ddt.data(True, False)
-  def test_change_verification_flag_positive(self, flag):  # noqa pylint: disable=invalid-name
+  def test_verification_flag_positive(self, flag):  # noqa pylint: disable=invalid-name
     """is_verification_needed flag is changeable for DRAFT workflow."""
     with factories.single_commit():
       workflow = wf_factories.WorkflowFactory(is_verification_needed=flag)
@@ -616,7 +604,8 @@ class TestWorkflowsApiPost(TestCase):
         not flag)
 
   @ddt.data(True, False)
-  def test_change_verification_flag_negative(self, flag):  # noqa pylint: disable=invalid-name
+  def test_verification_flag_negative(self, flag):
+    """Test immutable verification flag on active workflows."""
     with freezegun.freeze_time("2017-08-10"):
       with factories.single_commit():
         workflow = wf_factories.WorkflowFactory(

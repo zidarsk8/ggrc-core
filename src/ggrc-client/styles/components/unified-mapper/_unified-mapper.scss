@@ -233,7 +233,8 @@ mapper-results {
           overflow: hidden;
         }
 
-        &.description .attr-value {
+        &.description .attr-value,
+        &.notes .attr-value {
           line-height: 18px;
         }
       }

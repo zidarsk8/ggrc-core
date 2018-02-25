@@ -61,8 +61,9 @@ def _get_log_revisions(current_user_id, obj=None, force_obj=False):
   return revisions
 
 
+# pylint: disable-msg=too-many-arguments
 def log_event(session, obj=None, current_user_id=None, flush=True,
-              force_obj=False):
+              force_obj=False, event=None):
   """Logs an event on object `obj`.
 
   Args:
@@ -71,10 +72,10 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
     current_user_id: ID of the user performing operation
     flush: If set to true, flush the session at the start
     force_obj: Used in case of custom attribute changes to force revision write
+    event: event object to log
   Returns:
     Uncommitted models.Event instance
   """
-  event = None
   if flush:
     session.flush()
   if current_user_id is None:
@@ -90,13 +91,15 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
     resource_type = str(obj.__class__.__name__)
     action = request.method
     context_id = obj.context_id
-  if revisions:
+  if not revisions:
+    return event
+  if event is None:
     event = Event(
         modified_by_id=current_user_id,
         action=action,
         resource_id=resource_id,
         resource_type=resource_type,
         context_id=context_id)
-    event.revisions = revisions
     session.add(event)
+  event.revisions.extend(revisions)
   return event

@@ -723,7 +723,13 @@ class AssessmentEntity(Entity):
     self.delete_attrs("admins", "os_state")
     self.set_attrs(
         "creators", "assignees", "verifiers", "assessment_type", "verified",
-        "mapped_objects", "audit", **attrs)
+        "mapped_objects", "audit", "template", "object", **attrs)
+
+  def cads_from_template(self):
+    return [definition
+            for definition
+            in self.custom_attribute_definitions
+            if definition["definition_id"] is not None]
 
 
 class IssueEntity(Entity):

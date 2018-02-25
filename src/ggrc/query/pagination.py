@@ -46,14 +46,19 @@ def apply_limit(query, limit):
     # Note: limit request syntax is limit:[0,10]. We are counting
     # offset from 0 as the offset of the initial row for sql is 0 (not 1).
     limit_query = query.limit(page_size).offset(first)
+
+  return limit_query
+
+
+def get_total_count(query):
+  """Get count of all objects in the query."""
   with benchmark("Apply limit: apply_limit > query_count"):
     # Note: using func.count() as query.count() is generating additional
     # subquery
     # query.count() has a bug and it returns incorrect number of objects
     count_q = query.statement.with_only_columns([sa.func.count()])
     total = db.session.execute(count_q).scalar()
-
-  return limit_query, total
+  return total
 
 
 def _joins_and_order(counter, clause, model, tgt_class):
