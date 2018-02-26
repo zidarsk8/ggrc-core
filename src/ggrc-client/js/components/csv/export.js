@@ -3,7 +3,6 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import './csv-template';
 import '../relevant_filters';
 import exportPanelTemplate from './templates/export-panel.mustache';
 import exportGroupTemplate from './templates/export-group.mustache';

@@ -6,8 +6,8 @@
 import '../../plugins/utils/controllers';
 import {warning} from '../../plugins/utils/modals';
 import {hasWarningType} from '../../plugins/utils/controllers';
-import './csv-template';
 import '../show-more/show-more';
+import '../import-export/download-template/download-template';
 import quickTips from './templates/quick-tips.mustache';
 import template from './templates/csv-import.mustache';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';

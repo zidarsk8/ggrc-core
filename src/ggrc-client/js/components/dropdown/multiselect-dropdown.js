@@ -107,8 +107,14 @@ import template from './multiselect_dropdown.mustache';
           return;
         }
 
+        let selected = this.attr('selected');
+
         this.attr('_stateWasUpdated', false);
-        can.trigger(el, 'multiselect:closed', [this.attr('selected')]);
+        can.trigger(el, 'multiselect:closed', [selected]);
+        this.dispatch({
+          type: 'dropdownClose',
+          selected: selected,
+        });
       },
       changeOpenCloseState: function () {
         if (!this.attr('isOpen')) {

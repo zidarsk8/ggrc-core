@@ -107,29 +107,6 @@ form.import {
 
 }
 
-.download-template {
-  background: $lightGray;
-  border: 1px solid $darkGray;
-  padding: 20px;
-  .import-list {
-    @extend %reset-list;
-    li {
-      margin-bottom: 4px;
-    }
-  }
-  .center-block {
-    text-align: center;
-    padding: 20px 0 10px;
-    small {
-      display: block;
-    }
-    i {
-      @include opacity(1);
-      margin-top: 4px;
-    }
-  }
-}
-
 .import {
   .btn-fixed {
     float: left;
@@ -181,8 +158,19 @@ form.import {
   margin-top: 10px;
 }
 
-.csv-input > .state-reset {
-  margin-left: 10px;
+.csv-input {
+  > .state-reset {
+    margin-left: 10px;
+  }
+
+  > span {
+    position: relative;
+    left: -50px;
+  }
+
+  download-template {
+    margin-left: 10px;
+  }
 }
 
 .import-analyze {
@@ -330,5 +318,32 @@ form.import {
 
   li {
     line-height: 25px;
+  }
+}
+
+.download-template {
+  .simple-modal {
+    &__header {
+      border-bottom: none;
+      padding-bottom: 5px;
+    }
+
+    &__header-text {
+      font-size: 24px;
+    }
+
+    &__footer {
+      border-top: none;
+    }
+  }
+
+  &__content {
+    font-size: 15px;
+    padding: 5px 15px;
+    line-height: 16px;
+
+    h4 {
+      margin: 25px 0 10px;
+    }
   }
 }
