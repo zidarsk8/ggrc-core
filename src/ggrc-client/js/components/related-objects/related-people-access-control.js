@@ -10,6 +10,7 @@ export default GGRC.Components('relatedPeopleAccessControl', {
   tag: 'related-people-access-control',
   viewModel: {
     instance: {},
+    deferredSave: null,
     includeRoles: [],
     groups: [],
     updatableGroupId: null,
@@ -21,15 +22,23 @@ export default GGRC.Components('relatedPeopleAccessControl', {
     readOnly: false,
 
     updateRoles: function (args) {
+      if (this.attr('deferredSave')) {
+        this.attr('deferredSave').push(this.performUpdate.bind(this, args));
+      } else {
+        this.performUpdate(args);
+      }
+
+      this.dispatch({
+        ...SAVE_CUSTOM_ROLE,
+        groupId: args.roleId,
+      });
+    },
+    performUpdate: function (args) {
       this.updateAccessContolList(args.people, args.roleId);
 
       if (this.attr('conflictRoles').length) {
         this.checkConflicts(args.roleTitle);
       }
-      this.dispatch({
-        ...SAVE_CUSTOM_ROLE,
-        groupId: args.roleId,
-      });
     },
     updateAccessContolList: function (people, roleId) {
       let instance = this.attr('instance');
