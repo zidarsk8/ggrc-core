@@ -2286,14 +2286,14 @@ Mustache.registerHelper(
   }
 );
 
-  Mustache.registerHelper('isNotInScopeModel', function (modelName, options) {
-    let isInScope;
-    modelName = can.isFunction(modelName) ? modelName() : modelName;
-    isInScope = isInScopeModel(modelName);
-    // Temporary Modification to remove possibility to unmap Audit
-    isInScope = isInScope || isSnapshotParent(modelName);
-    return isInScope ? options.inverse(this) : options.fn(this);
-  });
+Mustache.registerHelper('isNotInScopeModel', function (modelName, options) {
+  let isInScope;
+  modelName = can.isFunction(modelName) ? modelName() : modelName;
+  isInScope = isInScopeModel(modelName);
+  // Temporary Modification to remove possibility to unmap Audit
+  isInScope = isInScope || isSnapshotParent(modelName);
+  return isInScope ? options.inverse(this) : options.fn(this);
+});
 
 /**
    * Check if a person is contained in the given authorization list and render
