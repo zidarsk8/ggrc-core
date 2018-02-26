@@ -3,22 +3,16 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.Components.addTemplateField', function () {
-  'use strict';
+import Component from '../add-template-field';
 
-  let Component;  // the component under test
-
-  beforeAll(function () {
-    Component = GGRC.Components.get('addTemplateField');
-  });
-
+describe('add-template-field component', function () {
   describe('addField() method', function () {
-    let addField;  // the method under test
+    let addField; // the method under test
     let $el;
     let ev;
-    let scope;
+    let viewModel;
     let parentScope;
-    let scope_;
+    let viewModel_;
 
     beforeEach(function () {
       parentScope = {
@@ -26,21 +20,21 @@ describe('GGRC.Components.addTemplateField', function () {
           return {};
         },
       };
-      scope_ = Component.prototype.scope({}, parentScope);
-      addField = scope_.addField;
+      viewModel_ = Component.prototype.viewModel({}, parentScope);
+      addField = viewModel_.addField;
 
       $el = $('<div></div>');
       ev = {
         preventDefault: jasmine.createSpy(),
       };
-      scope = new can.Map({
+      viewModel = new can.Map({
         fields: new can.List(),
         selected: new can.Map(),
         valueAttrs: ['Dropdown'],
         id: 123,
-        isDublicateTitle: scope_.isDublicateTitle.bind(scope),
-        isEmptyTitle: scope_.isEmptyTitle.bind(scope),
-        isInvalidValues: scope_.isInvalidValues.bind(scope),
+        isDublicateTitle: viewModel_.isDublicateTitle.bind(viewModel),
+        isEmptyTitle: viewModel_.isEmptyTitle.bind(viewModel),
+        isInvalidValues: viewModel_.isInvalidValues.bind(viewModel),
       });
     });
 
@@ -51,16 +45,16 @@ describe('GGRC.Components.addTemplateField', function () {
           type: 'Map:Person',
           values: '',
         });
-        scope.attr('selected', selectedObj);
-        addField.call(scope, scope, $el, ev);
+        viewModel.attr('selected', selectedObj);
+        addField.call(viewModel, viewModel, $el, ev);
 
         // FIXME: Because `addField` function calls `_.defer` we need to wait
-        // for scope field to get updated.
+        // for viewModel field to get updated.
         // It's necessary workaround because otherwise can.Map.validate function
         // prevents us adding new field. By using _.defer we wait for validate
         // function to get executed and only then we are adding
         setTimeout(function () {
-          expect(scope.fields.length).toEqual(1);
+          expect(viewModel.fields.length).toEqual(1);
           done();
         }, 3);
       }
@@ -72,10 +66,10 @@ describe('GGRC.Components.addTemplateField', function () {
           type: 'Dropdown',
           values: 'value0 value1',
         });
-        scope.attr('selected', selectedObj);
-        addField.call(scope, scope, $el, ev);
+        viewModel.attr('selected', selectedObj);
+        addField.call(viewModel, viewModel, $el, ev);
         setTimeout(function () {
-          expect(scope.fields.length).toEqual(1);
+          expect(viewModel.fields.length).toEqual(1);
           done();
         }, 3);
       }
@@ -87,10 +81,10 @@ describe('GGRC.Components.addTemplateField', function () {
           type: 'Dropdown',
           values: '',
         });
-        scope.attr('selected', selectedObj);
-        addField.call(scope, scope, $el, ev);
+        viewModel.attr('selected', selectedObj);
+        addField.call(viewModel, viewModel, $el, ev);
         setTimeout(function () {
-          expect(scope.fields.length).toEqual(0);
+          expect(viewModel.fields.length).toEqual(0);
           done();
         }, 3);
       }
@@ -102,10 +96,10 @@ describe('GGRC.Components.addTemplateField', function () {
           type: 'Text',
           values: '',
         });
-        scope.attr('selected', selectedObj);
-        addField.call(scope, scope, $el, ev);
+        viewModel.attr('selected', selectedObj);
+        addField.call(viewModel, viewModel, $el, ev);
         setTimeout(function () {
-          expect(scope.fields.length).toEqual(1);
+          expect(viewModel.fields.length).toEqual(1);
           done();
         }, 3);
       }
@@ -117,10 +111,10 @@ describe('GGRC.Components.addTemplateField', function () {
           type: 'Text',
           values: '',
         });
-        scope.attr('selected', selectedObj);
-        addField.call(scope, scope, $el, ev);
+        viewModel.attr('selected', selectedObj);
+        addField.call(viewModel, viewModel, $el, ev);
         setTimeout(function () {
-          expect(scope.fields.length).toEqual(0);
+          expect(viewModel.fields.length).toEqual(0);
           done();
         }, 3);
       }
@@ -128,7 +122,7 @@ describe('GGRC.Components.addTemplateField', function () {
   });
 
   describe('isEmptyTitle() method', function () {
-    let isEmptyTitle;  // the method under test
+    let isEmptyTitle; // the method under test
     let result;
     let selectedTitle;
 
@@ -138,8 +132,8 @@ describe('GGRC.Components.addTemplateField', function () {
           return {};
         },
       };
-      let scope_ = Component.prototype.scope({}, parentScope);
-      isEmptyTitle = scope_.isEmptyTitle;
+      let viewModel_ = Component.prototype.viewModel({}, parentScope);
+      isEmptyTitle = viewModel_.isEmptyTitle;
     });
 
     beforeEach(function () {
@@ -159,7 +153,7 @@ describe('GGRC.Components.addTemplateField', function () {
   });
 
   describe('isDublicateTitle() method', function () {
-    let isDublicateTitle;  // the method under test
+    let isDublicateTitle; // the method under test
     let result;
     let selectedTitle;
     let fields;
@@ -170,8 +164,8 @@ describe('GGRC.Components.addTemplateField', function () {
           return {};
         },
       };
-      let scope_ = Component.prototype.scope({}, parentScope);
-      isDublicateTitle = scope_.isDublicateTitle;
+      let viewModel_ = Component.prototype.viewModel({}, parentScope);
+      isDublicateTitle = viewModel_.isDublicateTitle;
     });
 
     beforeEach(function () {
@@ -217,11 +211,11 @@ describe('GGRC.Components.addTemplateField', function () {
   });
 
   describe('isInvalidValues() method', function () {
-    let isInvalidValues;  // the method under test
+    let isInvalidValues; // the method under test
     let valueAttrs;
     let result;
     let parentScope;
-    let scope_;
+    let viewModel_;
 
     beforeAll(function () {
       valueAttrs = ['Dropdown'];
@@ -230,8 +224,8 @@ describe('GGRC.Components.addTemplateField', function () {
           return {};
         },
       };
-      scope_ = Component.prototype.scope({}, parentScope);
-      isInvalidValues = scope_.isInvalidValues;
+      viewModel_ = Component.prototype.viewModel({}, parentScope);
+      isInvalidValues = viewModel_.isInvalidValues;
     });
 
     beforeEach(function () {
