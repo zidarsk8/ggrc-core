@@ -42,9 +42,9 @@ class PrGetter(object):  # pylint: disable=too-few-public-methods
                                 auth=self.auth)
     if response.status_code != 200:
       raise ValueError(u"Expected HTTP200 response, found "
-                       u"status_code={status_code}, body={body}"
+                       u"status_code={status_code}, text={text}"
                        .format(status_code=response.status_code,
-                               body=response.body))
+                               text=response.text))
     return response.json()
 
 
