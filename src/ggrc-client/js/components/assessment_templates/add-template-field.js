@@ -8,7 +8,7 @@ import template from './templates/add-template-field.mustache';
 export default can.Component.extend({
   tag: 'add-template-field',
   template,
-  viewModel: function (attrs, parentScope) {
+  viewModel(attrs, parentScope) {
     return new can.Map({
       selected: new can.Map(),
       fields: parentScope.attr('fields'),
@@ -25,7 +25,7 @@ export default can.Component.extend({
        * @param {jQuery.Object} el - the clicked DOM element
        * @param {Object} ev - the event object
        */
-      addField: function (viewModel, el, ev) {
+      addField(viewModel, el, ev) {
         let fields = viewModel.attr('fields');
         let selected = viewModel.attr('selected');
         let title = _.trim(selected.title);
@@ -58,7 +58,7 @@ export default can.Component.extend({
         }
         // We need to defer adding in modal since validation is preventing
         // on adding the first item
-        _.defer(function () {
+        _.defer(() => {
           fields.push({
             id: viewModel.attr('id'),
             title: title,
@@ -66,21 +66,21 @@ export default can.Component.extend({
             multi_choice_options: values,
           });
           _.each(['title', 'values', 'multi_choice_options'],
-            function (type) {
+            (type) => {
               selected.attr(type, '');
             });
         });
       },
-      isInvalidValues: function (valueAttrs, type, values) {
+      isInvalidValues(valueAttrs, type, values) {
         return _.contains(valueAttrs, type) && !values;
       },
-      isDublicateTitle: function (fields, selectedTitle) {
-        let duplicateField = _.some(fields, function (item) {
+      isDublicateTitle(fields, selectedTitle) {
+        let duplicateField = _.some(fields, (item) => {
           return item.title === selectedTitle && !item._pending_delete;
         });
         return fields.length && duplicateField;
       },
-      isEmptyTitle: function (selectedTitle) {
+      isEmptyTitle(selectedTitle) {
         return !selectedTitle;
       },
     });
@@ -89,7 +89,7 @@ export default can.Component.extend({
     /*
      * Set default dropdown type on init
      */
-    init: function () {
+    init() {
       let types = this.viewModel.attr('types');
       if (!this.viewModel.attr('selected.type')) {
         this.viewModel.attr('selected.type', _.first(types).attr('type'));
@@ -102,7 +102,7 @@ export default can.Component.extend({
      *
      * @param {Object} options - Mustache options
      */
-    placeholder: function (options) {
+    placeholder(options) {
       let types = this.attr('types');
       let item = _.findWhere(types, {
         type: this.attr('selected.type'),
