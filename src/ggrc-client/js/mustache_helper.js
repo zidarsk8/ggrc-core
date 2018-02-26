@@ -1067,6 +1067,19 @@ Mustache.registerHelper("is_allowed_to_map", function (source, target, options) 
   return options.inverse(options.contexts || this);
 });
 
+Mustache.registerHelper('is_allowed_to_map_task', (sourceType, options)=> {
+  const mappableTypes = ['Program', 'Regulation', 'Policy', 'Standard',
+    'Contract', 'Clause', 'Section', 'Request', 'Control', 'Objective',
+    'OrgGroup', 'Vendor', 'AccessGroup', 'System', 'Process', 'DataAsset',
+    'Product', 'Project', 'Facility', 'Market'];
+  sourceType = resolve_computed(sourceType);
+
+  if (mappableTypes.includes(sourceType)) {
+    return options.fn(options.contexts);
+  }
+  return options.inverse(options.contexts);
+});
+
 function resolve_computed(maybe_computed, always_resolve) {
   return (typeof maybe_computed === "function"
     && (maybe_computed.isComputed || always_resolve)) ? resolve_computed(maybe_computed(), always_resolve) : maybe_computed;
