@@ -6,6 +6,7 @@ from ggrc.models import all_models
 from ggrc_workflows import ac_roles
 from integration.ggrc.models import factories
 from integration.ggrc_basic_permissions.models import factories as bp_factories
+from integration.ggrc_workflows.helpers import workflow_api
 from integration.ggrc_workflows.helpers import workflow_test_case
 from integration.ggrc_workflows.models import factories as wf_factories
 
@@ -26,7 +27,7 @@ class TestCommentApiCalls(workflow_test_case.WorkflowTestCase):
 
     cycle_task = all_models.CycleTaskGroupObjectTask.query.one()
 
-    data = self.api_helper.get_cycle_task_entry_post_dict(cycle_task)
+    data = workflow_api.get_cycle_task_entry_post_dict(cycle_task)
     response = self.api_helper.post(all_models.CycleTaskEntry, data)
     self.assertEqual(response.status_code, 201)
 

@@ -6,6 +6,7 @@ from ggrc.models import all_models
 from ggrc_workflows import ac_roles
 from integration.ggrc.models import factories
 from integration.ggrc_basic_permissions.models import factories as bp_factories
+from integration.ggrc_workflows.helpers import workflow_api
 from integration.ggrc_workflows.helpers import workflow_test_case
 from integration.ggrc_workflows.models import factories as wf_factories
 
@@ -26,7 +27,7 @@ class TestTaskApiCalls(workflow_test_case.WorkflowTestCase):
     task_group = all_models.TaskGroup.query.one()
     people_roles = {ac_roles.task.ASSIGNEE_NAME: g_editor}
 
-    data = self.api_helper.get_task_post_dict(
+    data = workflow_api.get_task_post_dict(
         task_group, people_roles, "2018-01-01", "2018-01-02")
     response = self.api_helper.post(all_models.TaskGroupTask, data)
     self.assertEqual(response.status_code, 201)
