@@ -3,43 +3,13 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as aclUtils from '../../../plugins/utils/acl-utils';
+
+
 describe('GGRC.Components.accessControlListRolesHelper', function () {
   'use strict';
 
   let viewModel;
-
-  beforeAll(function () {
-    GGRC.access_control_roles = [
-      {
-        object_type: 'Assessment',
-        id: 5,
-        name: 'Admin',
-        default_to_current_user: true,
-      },
-      {
-        object_type: 'Control',
-        id: 6,
-        name: 'Primary Contact',
-        default_to_current_user: true,
-      },
-      {
-        object_type: 'Assessment',
-        id: 7,
-        name: 'SuperAdmin',
-        default_to_current_user: true,
-      },
-      {
-        object_type: 'Assessment',
-        id: 8,
-        name: 'Primary contacts',
-        default_to_current_user: false,
-      },
-    ];
-  });
-
-  afterAll(function () {
-    delete GGRC.access_control_roles;
-  });
 
   beforeEach(function () {
     viewModel = GGRC.Components
@@ -50,6 +20,27 @@ describe('GGRC.Components.accessControlListRolesHelper', function () {
     let instance;
 
     it('should set current user for 2 roles', function () {
+      spyOn(aclUtils, 'getRolesForType').and.returnValue([
+        {
+          object_type: 'Assessment',
+          id: 5,
+          name: 'Admin',
+          default_to_current_user: true,
+        },
+        {
+          object_type: 'Assessment',
+          id: 7,
+          name: 'SuperAdmin',
+          default_to_current_user: true,
+        },
+        {
+          object_type: 'Assessment',
+          id: 8,
+          name: 'Primary contacts',
+          default_to_current_user: false,
+        },
+      ]);
+
       instance = new CMS.Models.Assessment({id: 25});
       viewModel.attr('instance', instance);
       expect(instance.access_control_list.length).toEqual(0);
@@ -64,6 +55,15 @@ describe('GGRC.Components.accessControlListRolesHelper', function () {
     });
 
     it('should set current user for 1 role', function () {
+      spyOn(aclUtils, 'getRolesForType').and.returnValue([
+        {
+          object_type: 'Control',
+          id: 6,
+          name: 'Primary Contact',
+          default_to_current_user: true,
+        },
+      ]);
+
       instance = new CMS.Models.Control({id: 25});
       viewModel.attr('instance', instance);
       expect(instance.access_control_list.length).toEqual(0);

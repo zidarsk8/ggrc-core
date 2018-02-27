@@ -219,3 +219,5 @@ GGRC.Bootstrap = {
   }],
 };
 GGRC.custom_attr_defs = GGRC.custom_attr_defs || [];
+
+GGRC.access_control_roles = GGRC.access_control_roles || [];

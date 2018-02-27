@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as aclUtils from '../../plugins/utils/acl-utils';
+
 describe('CMS.Models.Assessment', function () {
   'use strict';
 
@@ -139,7 +141,6 @@ describe('CMS.Models.Assessment', function () {
   });
 
   describe('form_preload() method', function () {
-
     function checkAcRoles(model, roleId, peopleIds) {
       const res = can.makeArray(model.access_control_list).filter((acl) => {
         return acl.ac_role_id === roleId;
@@ -149,26 +150,18 @@ describe('CMS.Models.Assessment', function () {
       expect(res).toEqual(peopleIds);
     }
 
-    beforeAll(function () {
-      GGRC.access_control_roles = [
-        {id: 1, name: 'Admin', object_type: 'Assessment'},
-        {id: 2, name: 'Admin', object_type: 'Vendor'},
-        {id: 4, name: 'Secondary Contacts', object_type: 'Assessment'},
-        {id: 5, name: 'Principal Assignees', object_type: 'Control'},
-        {id: 7, name: 'Secondary Assignees', object_type: 'Assessment'},
-        {id: 10, name: 'Creators', object_type: 'Assessment'},
-        {id: 11, name: 'Assignees', object_type: 'Assessment'},
-        {id: 12, name: 'Verifiers', object_type: 'Assessment'},
-      ];
-    });
-
-    afterAll(function () {
-      delete GGRC.access_control_roles;
-    });
-
     it('populates access control roles based on audit roles', function () {
       let model = new CMS.Models.Assessment();
       spyOn(model, 'before_create');
+      spyOn(aclUtils, 'getRole').and.returnValues(
+        {id: 10, name: 'Creators', object_type: 'Assessment'},
+        {id: 11, name: 'Assignees', object_type: 'Assessment'},
+        {id: 11, name: 'Assignees', object_type: 'Assessment'},
+        {id: 11, name: 'Assignees', object_type: 'Assessment'},
+        {id: 11, name: 'Assignees', object_type: 'Assessment'},
+        {id: 12, name: 'Verifiers', object_type: 'Assessment'},
+        {id: 12, name: 'Verifiers', object_type: 'Assessment'},
+      );
 
       // Mock out the findRoles function
       model.attr('audit', {
@@ -196,27 +189,30 @@ describe('CMS.Models.Assessment', function () {
       checkAcRoles(model, 11, [20, 30, 40, 50]);
     });
     it('defaults correctly when auditors/audit captains are undefined',
-       function () {
-      let model = new CMS.Models.Assessment();
-      spyOn(model, 'before_create');
-
-      // Mock out the findRoles function
-      model.attr('audit', {
-        findRoles: (name) => {
-          const roles = {
-            Auditors: [],
-            'Audit Captains': [],
-          };
-          return roles[name];
-        },
+      function () {
+        let model = new CMS.Models.Assessment();
+        spyOn(model, 'before_create');
+        spyOn(aclUtils, 'getRole').and.returnValues(
+          {id: 10, name: 'Creators', object_type: 'Assessment'},
+          {id: 11, name: 'Assignees', object_type: 'Assessment'},
+        );
+        // Mock out the findRoles function
+        model.attr('audit', {
+          findRoles: (name) => {
+            const roles = {
+              Auditors: [],
+              'Audit Captains': [],
+            };
+            return roles[name];
+          },
+        });
+        model.form_preload(true);
+        // Expect 7 new access_control_roles to be created
+        expect(model.access_control_list.length).toBe(2);
+        checkAcRoles(model, 10, [1]);
+        checkAcRoles(model, 11, [1]);
+        checkAcRoles(model, 12, []);
       });
-      model.form_preload(true);
-      // Expect 7 new access_control_roles to be created
-      expect(model.access_control_list.length).toBe(2);
-      checkAcRoles(model, 10, [1]);
-      checkAcRoles(model, 11, [1]);
-      checkAcRoles(model, 12, []);
-    });
   });
 
   describe('getRelatedObjects() method', () => {
