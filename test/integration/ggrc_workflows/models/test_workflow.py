@@ -30,7 +30,7 @@ class TestWorkflow(TestCase):
     self.generator = wf_generator.WorkflowsGenerator()
 
   def test_basic_workflow_creation(self):
-    """Test basic WF"""
+    """Test basic WF creation."""
     workflow = factories.WorkflowFactory(title="This is a test WF")
     workflow = db.session.query(Workflow).get(workflow.id)
     self.assertEqual(workflow.title, "This is a test WF")
@@ -62,6 +62,7 @@ class TestWorkflow(TestCase):
                                   start_date,
                                   update_date,
                                   expected_date):
+    """Test recalculate start_date update={2} expected={3}."""
     with freezegun.freeze_time(today):
       with glob_factories.single_commit():
         workflow = factories.WorkflowFactory(
@@ -89,6 +90,7 @@ class TestWorkflow(TestCase):
   )
   @ddt.unpack  # pylint: disable=invalid-name
   def test_recalculate_start_date_on_delete(self, idxs, expected_date):
+    """Test recalculate start_date on delete expected={1}."""
     start_date_1 = datetime.date(2017, 8, 10)
     start_date_2 = datetime.date(2017, 8, 11)
     with freezegun.freeze_time("2017-08-10"):
@@ -137,6 +139,7 @@ class TestWorkflow(TestCase):
   def test_recalculate_start_date_on_create(self,
                                             new_start_date,
                                             expected_date):
+    """Test recalculate start_date on create update={} expected={}."""
     with freezegun.freeze_time("2017-08-10"):
       with glob_factories.single_commit():
         workflow = factories.WorkflowFactory(
@@ -183,6 +186,7 @@ class TestWorkflow(TestCase):
   )
   @ddt.unpack
   def test_archive_workflow(self, tgt_start_date, tgt_end_date, wf_status):
+    """Test archive workflow with status={2}"""
     with freezegun.freeze_time("2017-08-10"):
       with glob_factories.single_commit():
         workflow = factories.WorkflowFactory(
@@ -251,6 +255,7 @@ class TestWorkflow(TestCase):
   )
   @ddt.unpack  # pylint: disable=invalid-name
   def test_change_verification_flag_positive(self, title, unit, repeat_every):
+    """Test change verification_flag positive title={}."""
     with freezegun.freeze_time("2017-08-10"):
       with glob_factories.single_commit():
         workflow = factories.WorkflowFactory(title=title, unit=unit,
@@ -282,6 +287,7 @@ class TestWorkflow(TestCase):
   )
   @ddt.unpack  # pylint: disable=invalid-name
   def test_change_verification_flag_negative(self, title, unit, repeat_every):
+    """Test change verification_flag negative title={}."""
     with freezegun.freeze_time("2017-08-10"):
       with glob_factories.single_commit():
         workflow = factories.WorkflowFactory(title=title, unit=unit,
