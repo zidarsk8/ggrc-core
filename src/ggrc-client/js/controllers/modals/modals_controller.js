@@ -944,61 +944,69 @@ export default can.Control({
       }
     });
   },
-  // make buttons non-clickable when saving
-  bindXHRToBackdrop: function (xhr, el, newtext, disable) {
-    // binding of an ajax to a click is something we do manually
-    var $el = $(el);
 
-    $el.addClass('disabled pending-ajax');
-    if (disable !== false) {
-      $el.attr('disabled', true);
+  // make element non-clickable when saving
+  bindXHRToDisableElement(xhr, el) {
+    // binding of an ajax to a click is something we do manually
+    const $el = $(el);
+
+    if (!$el.length) {
+      return;
     }
-    xhr.always(function () {
-      // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
-      $el.removeAttr('disabled').removeClass('disabled pending-ajax');// [0].innerHTML = oldtext;
+
+    $el.addClass('disabled');
+    xhr.always(() => {
+      $el.removeClass('disabled');
     });
   },
 
-  triggerSave: function (el, ev) {
-    var ajd;
-    var saveCloseBtn = this.element.find('a.btn[data-toggle=modal-submit]');
-    var saveAddmoreBtn = this.element.find(
-      'a.btn[data-toggle=modal-submit-addmore]');
-    var modalBackdrop = this.element.data('modal_form').$backdrop;
-
+  triggerSave(el, ev) {
     // Normal saving process
     if (el.is(':not(.disabled)')) {
-      ajd = this.save_instance(el, ev);
+      const ajd = this.save_instance(el, ev);
 
       if (!ajd) {
         return;
       }
 
+      const saveCloseBtn = this.element.find('a.btn[data-toggle=modal-submit]');
+      const modalBackdrop = this.element.data('modal_form').$backdrop;
+      const modalCloseBtn = this.element.find('.modal-dismiss > .fa-times');
+      const deleteBtn = this.element.find(
+        'a.btn[data-toggle=modal-ajax-deleteform]'
+      );
+      const saveAddmoreBtn = this.element.find(
+        'a.btn[data-toggle=modal-submit-addmore]'
+      );
+
       this.options.attr('isSaving', true);
 
-      ajd.always(function () {
+      ajd.always(() => {
         this.options.attr('isSaving', false);
-      }.bind(this));
+      });
 
       if (this.options.add_more) {
         this.bindXHRToButton_disable(ajd, saveCloseBtn);
         this.bindXHRToButton_disable(ajd, saveAddmoreBtn);
-        this.bindXHRToBackdrop(ajd, modalBackdrop, 'Saving, please wait...');
       } else {
         this.bindXHRToButton(ajd, saveCloseBtn, 'Saving, please wait...');
         this.bindXHRToButton(ajd, saveAddmoreBtn);
       }
+
+      this.bindXHRToDisableElement(ajd, deleteBtn);
+      this.bindXHRToDisableElement(ajd, modalBackdrop);
+      this.bindXHRToDisableElement(ajd, modalCloseBtn);
     } else if (this._email_check) {
       // Queue a save if clicked after verifying the email address
-      this._email_check.done(function (data) {
+      this._email_check.done((data) => {
         if (!_.isNull(data.length) && !_.isUndefined(data.length)) {
           data = data[0];
         }
         if (data) {
-          setTimeout(function () {
+          setTimeout(() => {
             delete this._email_check;
             el.trigger('click');
-          }.bind(this), 0);
+          }, 0);
         }
       });
     }
