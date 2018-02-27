@@ -2,12 +2,12 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Package contains Workflow related helper functions for REST API calls."""
 
+from ggrc import utils
 from ggrc.access_control import role
 from ggrc.models import all_models
 
 from integration.ggrc import api_helper
 from integration.ggrc.models import factories
-from integration.ggrc_workflows.helpers import common_api
 
 
 def _get_acl_subdict(acr_name, person, model):
@@ -24,7 +24,7 @@ def _get_acl_subdict(acr_name, person, model):
   acr = role.get_ac_roles_for(model.__name__)[acr_name]
   return {
       "ac_role_id": acr.id,
-      "person": common_api.get_object_subdict(person)
+      "person": utils.create_stub(person)
   }
 
 
@@ -44,9 +44,9 @@ class WorkflowApi(api_helper.Api):
     return {
         "task_group": {
             "custom_attributes": {},
-            "contact": common_api.get_object_subdict(contact),
-            "workflow": common_api.get_object_subdict(workflow),
-            "context": common_api.get_object_subdict(workflow.context),
+            "contact": utils.create_stub(contact),
+            "workflow": utils.create_stub(workflow),
+            "context": utils.create_stub(workflow.context),
             "modal_title": "Create Task Group",
             "title": factories.random_str(prefix="tg_"),
             "description": factories.random_str(length=64),
@@ -66,9 +66,9 @@ class WorkflowApi(api_helper.Api):
     """
     return {
         "task_group_object": {
-            "context": common_api.get_object_subdict(task_group.context),
-            "task_group": common_api.get_object_subdict(task_group),
-            "object": common_api.get_object_subdict(obj_map),
+            "context": utils.create_stub(task_group.context),
+            "task_group": utils.create_stub(task_group),
+            "object": utils.create_stub(obj_map),
         }
     }
 
@@ -96,8 +96,8 @@ class WorkflowApi(api_helper.Api):
             "end_date": end_date,
             "access_control_list": access_control_list,
             "custom_attributes": {},
-            "task_group": common_api.get_object_subdict(task_group),
-            "context": common_api.get_object_subdict(task_group.context),
+            "task_group": utils.create_stub(task_group),
+            "context": utils.create_stub(task_group.context),
             "modal_title": "Create New Task",
             "title": factories.random_str(prefix="tgt_"),
             "task_type": "text",
@@ -117,8 +117,8 @@ class WorkflowApi(api_helper.Api):
     """
     return {
         "cycle": {
-            "context": common_api.get_object_subdict(workflow.context),
-            "workflow": common_api.get_object_subdict(workflow),
+            "context": utils.create_stub(workflow.context),
+            "workflow": utils.create_stub(workflow),
             "autogenerate": True,
             "isOverdue": False
         }
@@ -137,10 +137,9 @@ class WorkflowApi(api_helper.Api):
     return {
         "cycle_task_entry": {
             "custom_attributes": {},
-            "cycle_task_group_object_task":
-                common_api.get_object_subdict(cycle_task),
-            "cycle": common_api.get_object_subdict(cycle_task.cycle),
-            "context": common_api.get_object_subdict(cycle_task.context),
+            "cycle_task_group_object_task": utils.create_stub(cycle_task),
+            "cycle": utils.create_stub(cycle_task.cycle),
+            "context": utils.create_stub(cycle_task.context),
             "is_declining_review": "",
             "description": factories.random_str(length=64),
         }

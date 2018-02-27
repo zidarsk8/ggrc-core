@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Relationship related helper functions for REST API calls."""
 
-from integration.ggrc_workflows.helpers import common_api
+from ggrc import utils
 
 
 def get_relationship_post_dict(source, destination):
@@ -16,8 +16,8 @@ def get_relationship_post_dict(source, destination):
     """
   return {
       "relationship": {
-          "source": common_api.get_object_subdict(source),
-          "destination": common_api.get_object_subdict(destination),
-          "context": common_api.get_object_subdict(source.context),
+          "source": utils.create_stub(source),
+          "destination": utils.create_stub(destination),
+          "context": utils.create_stub(source.context),
       }
   }
