@@ -508,8 +508,13 @@ import template from './revision-log.mustache';
           let obj;
           switch (def.attribute_type) {
             case 'Checkbox':
-              return value.attribute_value ? '✓' : undefined;
+              return _.flow(Number, Boolean)(value.attribute_value)
+                ? '✓'
+                : undefined;
             case 'Map:Person':
+              if (!value.attribute_object) {
+                return;
+              }
               obj = CMS.Models.Person
                 .findInCacheById(value.attribute_object_id);
               if (obj === undefined) {

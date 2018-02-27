@@ -3,7 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../../apps/custom_attributes_wrap';
 import '../../components/issue-tracker/modal-issue-tracker-fields';
 import '../../components/issue-tracker/issue-tracker-switcher';
 import '../../components/access_control_list/access-control-list-roles-helper'
@@ -135,20 +134,6 @@ export default can.Control({
           this.restore_ui_status_from_storage();
         }.bind(this));
     }.bind(this));
-  },
-
-  setupCustomAttributes(instance) {
-    let setup;
-    if (!instance) {
-      return;
-    }
-
-    setup = instance.setup_custom_attributes;
-
-    if (setup && !(instance instanceof CMS.Models.Assessment)) {
-      instance.removeAttr('custom_attributes');
-      instance.setup_custom_attributes();
-    }
   },
 
   apply_object_params: function () {
@@ -345,11 +330,9 @@ export default can.Control({
       }
     });
 
-    return dfd.done(() => {
-      this.reset_form(() => {
-        this.setupCustomAttributes(instance);
-      });
-    });
+    return dfd.done(function () {
+      this.reset_form();
+    }.bind(that));
   },
 
   reset_form: function (setFieldsCb) {
@@ -661,7 +644,9 @@ export default can.Control({
       value = value || [];
       cur.splice.apply(cur, [0, cur.length].concat(value));
     } else if (name[0] === 'custom_attributes') {
-      instance.custom_attributes.attr(name[1], value[name[1]]);
+      const caId = Number(name[1]);
+      const caValue = value[name[1]];
+      instance.customAttr(caId, caValue);
     } else if (name[0] !== 'people') {
       instance.attr(name[0], value);
     }
@@ -747,18 +732,22 @@ export default can.Control({
 
   '{$content} a.field-hide click': function (el, ev) { // field hide
     var $el = $(el);
-    var $hidable = $el.closest('.hidable');
     var totalInner = $el.closest('.hide-wrap.hidable')
-      .find('.inner-hide').length;
+    .find('.inner-hide').length;
     var totalHidden;
     var uiUnit;
     var i;
     var tabValue;
+    var $hidable = [
+      'span',
+      'ggrc-form-item'
+    ].map((className) => $el.closest(`[class*="${className}"].hidable`))
+    .find((item) => item.length > 0);
 
     $el.closest('.inner-hide').addClass('inner-hidable');
     totalHidden = $el.closest('.hide-wrap.hidable')
       .find('.inner-hidable').length;
-    // $hidable.hide();
+
     $hidable.addClass('hidden');
     this.options.attr('reset_visible', true);
     // update ui array
@@ -1200,7 +1189,6 @@ export default can.Control({
         });
         instance.attr('custom_attribute_definitions', cad);
       }
-      this.setupCustomAttributes(instance);
       instance.refresh();
       instance.dispatch(REFRESH_MAPPING);
     }

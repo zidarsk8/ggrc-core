@@ -29,7 +29,6 @@
       modified_by: 'CMS.Models.Person.stub',
       objects: 'CMS.Models.get_stubs',
       risk_objects: 'CMS.Models.RiskObject.stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       add_item_view:

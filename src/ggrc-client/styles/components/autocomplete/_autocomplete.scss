@@ -1,0 +1,13 @@
+/*
+ Copyright (C) 2018 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+*/
+
+autocomplete {
+  .autocomplete_wide {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    min-height: 28px;
+  }
+}

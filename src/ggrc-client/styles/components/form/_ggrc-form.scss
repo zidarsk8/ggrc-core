@@ -18,6 +18,13 @@
     white-space: nowrap;
   }
 
+  [role="alert"] {
+    margin-top: 4px;
+    font-size: 75%;
+    font-weight: bold;
+    color: #e53935;
+  }
+
   &.ggrc-form-multiple-columns {
     display: flex;
     flex-wrap: wrap;
@@ -72,6 +79,14 @@
     margin-bottom: 20px;
     display: flex;
 
+    &.hidden {
+      display: none;
+    }
+
+    .field-hide {
+      margin-bottom: 3px;
+    }
+
     .ggrc-form-item__row {
       width: 100%;
     }
@@ -90,6 +105,15 @@
             height: 18px;
           }
         }
+      }
+    }
+
+    &__field-header {
+      display: flex;
+
+      .ggrc-form-item__controls {
+        margin-left: auto;
+        align-self: flex-end;
       }
     }
 
@@ -136,6 +160,15 @@
       color: gray;
       margin-bottom: 8px;
       line-height: 10px;
+    }
+
+    /*
+      It was made for create/edit modals. It should be removed
+      when these modals will have editable items with normal values
+      of tabindex-es.
+    */
+    custom-attributes-field {
+      outline: none;
     }
   }
 

@@ -2299,46 +2299,6 @@ Mustache.registerHelper(
   }
 );
 
-/**
-   * Check if Custom Atttribute's value did not pass validation, and render the
-   * corresponding block in the template. The error messages, if any, are
-   * available in the "error" variable within the "truthy" block.
-   *
-   * Example usage:
-   *
-   *   {{#ca_validation_error validationErrors customAttrId}}
-   *     Invalid value for the Custom Attribute {{customAttrId}}: {{errors.0}}
-   *   {{else}}
-   *     Hooray, no errors, a correct value is set!
-   *   {{/ca_validation_error}}
-   *
-   * @param {Object} validationErrors - an object containing validation results
-   *   of a can.Model instance
-   * @param {Number} customAttrId - ID of the Custom Attribute to check for
-   *   validation errors
-   * @param {Object} options - a CanJS options argument passed to every helper
-   */
-Mustache.registerHelper(
-  'ca_validation_error',
-  function (validationErrors, customAttrId, options) {
-    let errors;
-    let contextStack;
-    let property;
-
-    validationErrors = Mustache.resolve(validationErrors) || {};
-    customAttrId = Mustache.resolve(customAttrId);
-
-    property = 'custom_attributes.' + customAttrId;
-    errors = validationErrors[property] || [];
-
-    if (errors.length > 0) {
-      contextStack = options.contexts.add({errors: errors});
-      return options.fn(contextStack);
-    }
-    return options.inverse(options.contexts);
-  }
-);
-
 Mustache.registerHelper('isNotInScopeModel', function (modelName, options) {
   let isInScope;
   modelName = can.isFunction(modelName) ? modelName() : modelName;

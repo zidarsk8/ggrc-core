@@ -13,25 +13,39 @@ let customAttributesType = {
   Dropdown: 'dropdown',
 };
 
+/**
+ * @deprecated Use constants from custom-attribute-config.
+ */
 let CA_DD_REQUIRED_DEPS = Object.freeze({
   NONE: 0,
   COMMENT: 1,
   EVIDENCE: 2,
   COMMENT_AND_EVIDENCE: 3,
 });
+
+/**
+ * @deprecated Use constants from custom-attribute-config.
+ */
 let CUSTOM_ATTRIBUTE_TYPE = Object.freeze({
   LOCAL: 1,
   GLOBAL: 2,
 });
 
 /**
+ * @deprecated Use CustomAttributeObject API to get access to the necessary custom
+ * attribute field and make some manipulations with it.
  * Util methods for custom attributes.
+ * @param {*} a
+ * @param {*} b
+ * @return {*}
  */
 function sortCustomAttributes(a, b) {
   return a.custom_attribute_id - b.custom_attribute_id;
 }
 
 /**
+ * @deprecated Use CustomAttributeObject API to get access to the necessary custom
+ * attribute field and make some manipulations with it.
  * Return normalized Custom Attribute Type from Custom Attribute Definition
  * @param {String} type - String Custom Attribute Value from JSON
  * @return {String} - Normalized Custom Attribute Type
@@ -40,6 +54,14 @@ function getCustomAttributeType(type) {
   return customAttributesType[type] || 'input';
 }
 
+/**
+ * @deprecated Use CustomAttributeObject API to get access to the necessary custom
+ * attribute field and make some manipulations with it.
+ * @param {*} value
+ * @param {*} type
+ * @param {*} cav
+ * @return {*}
+ */
 function isEmptyCustomAttribute(value, type, cav) {
   let result = false;
   let types = ['Text', 'Rich Text', 'Date', 'Checkbox', 'Dropdown',
@@ -72,6 +94,8 @@ function isEmptyCustomAttribute(value, type, cav) {
 }
 
 /**
+ * @deprecated Use CustomAttributeObject API to get access to the necessary custom
+ * attribute field and make some manipulations with it.
  * Converts custom attribute value for UI controls.
  * @param {String} type - Custom attribute type
  * @param {Object} value - Custom attribute value
@@ -106,6 +130,8 @@ function convertFromCaValue(type, value, valueObj) {
 }
 
 /**
+ * @deprecated Use CustomAttributeObject API to get access to the necessary custom
+ * attribute field and make some manipulations with it.
  * Custom Attributes specific parsing logic to simplify business logic of Custom Attributes
  * @param {Array} definitions - original list of Custom Attributes Definition
  * @param {Array} values - original list of Custom Attributes Values
@@ -173,6 +199,8 @@ function prepareCustomAttributes(definitions, values) {
 }
 
 /**
+ * @deprecated Use CustomAttributeObject API to get access to the necessary custom
+ * attribute field and make some manipulations with it.
  * Converts value from UI controls back to CA value.
  * @param {String} type - Custom attribute type
  * @param {Object} value - Control value
@@ -193,6 +221,8 @@ function convertToCaValue(type, value) {
 }
 
 /**
+ * @deprecated Use CustomAttributeObject API to get access to the necessary custom
+ * attribute field and make some manipulations with it.
  * Converts CA values array to form fields.
  * @param {can.List|undefined} customAttributeValues - Custom attributes values
  * @return {Array} From fields array
@@ -202,6 +232,12 @@ function convertValuesToFormFields(customAttributeValues) {
     .map(convertToEditableField);
 }
 
+/**
+ * @deprecated Use CustomAttributeObject API to get access to the necessary custom
+ * attribute field and make some manipulations with it.
+ * @param {*} attr
+ * @return {*}
+ */
 function convertToFormViewField(attr) {
   let options = attr.def.multi_choice_options;
   return {
@@ -221,7 +257,12 @@ function convertToFormViewField(attr) {
     helptext: attr.def.helptext,
   };
 }
-
+/**
+ * @deprecated Use CustomAttributeObject API to get access to the necessary custom
+ * attribute field and make some manipulations with it.
+ * @param {*} attr
+ * @return {*}
+ */
 function convertToEditableField(attr) {
   let options = attr.def.multi_choice_options;
   return {
@@ -248,6 +289,8 @@ function convertToEditableField(attr) {
 }
 
 /**
+ * @deprecated Use CustomAttributeObject API to get access to the necessary custom
+ * attribute field and make some manipulations with it.
  * Gets local or global custom attributes from the instance
  * @param  {can.Map} instance object instance
  * @param  {Number}  type     types of custom attributes we want to get
@@ -277,6 +320,12 @@ function getCustomAttributes(instance, type) {
     .sort(sortCustomAttributes);
 }
 
+/**
+ * @deprecated Use CustomAttributeObject API to get access to the necessary custom
+ * attribute field and make some manipulations with it.
+ * @param {*} ca
+ * @param {*} value
+ */
 function updateCustomAttributeValue(ca, value) {
   let id;
   if (ca.attr('attributeType') === 'person') {
@@ -290,6 +339,12 @@ function updateCustomAttributeValue(ca, value) {
   }
 }
 
+/**
+ * @deprecated Use CustomAttributeObject API to get access to the necessary custom
+ * attribute field and make some manipulations with it.
+ * @param {*} values
+ * @param {*} changes
+ */
 function applyChangesToCustomAttributeValue(values, changes) {
   can.Map.keys(changes).forEach(function (fieldId) {
     values.each(function (item, key) {
@@ -306,6 +361,8 @@ function applyChangesToCustomAttributeValue(values, changes) {
 }
 
 /**
+ * @deprecated Use CustomAttributeObject API to get access to the necessary custom
+ * attribute field and make some manipulations with it.
  * Ensures that the Global Custom Attributes are present in the instance
  * @param  {can.Map} instance assessment instance
  * @return {Promise} Promise whichi is resolved when GCAs are present in

@@ -13,13 +13,12 @@ import template from './custom-attributes.mustache';
     tag: 'assessment-custom-attributes',
     template: template,
     viewModel: {
-      globalAttributes: [],
       items: [],
       editMode: false,
       modifiedFields: {},
       isEditDenied: false,
       updateGlobalAttribute: function (event, field) {
-        this.attr('modifiedFields').attr(field.id, event.value);
+        this.attr('modifiedFields').attr(field.customAttributeId, event.value);
         this.dispatch({
           type: 'onUpdateAttributes',
           globalAttributes: this.attr('modifiedFields'),

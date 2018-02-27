@@ -28,7 +28,6 @@ describe('ToggleArchive modal', function () {
       instance = new can.Map({
         save: jasmine.createSpy('save')
           .and.returnValue(pendingSave.promise()),
-        setup_custom_attributes: jasmine.createSpy(),
         refresh: jasmine.createSpy('save')
           .and.returnValue(pendingRefresh.promise()),
         display_name: function () {

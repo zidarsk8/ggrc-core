@@ -7,18 +7,18 @@ import {helpers} from './../tree-item-custom-attribute';
 
 describe('helpers.getCustomAttrValue', () => {
   let helper;
-  let fakeAttr;
   let fakeInstance;
   let fakeOptions;
   let fakeCustomAttrDefs;
   let origValue;
-  let setCustomAttrItem;
-  let getCustomAttrItem;
   let actual;
-  let customAttrItem;
 
   beforeAll(() => {
     helper = helpers.getCustomAttrValue;
+
+    can.Model.Cacheable.extend('CMS.Models.DummyModel', {
+      is_custom_attributable: true,
+    }, {});
 
     fakeCustomAttrDefs = [{
       definition_type: 'control',
@@ -68,331 +68,108 @@ describe('helpers.getCustomAttrValue', () => {
       attribute_type: 'Dropdown',
       id: 10,
     }];
-
+    fakeInstance = new CMS.Models.DummyModel({
+      custom_attribute_definitions: fakeCustomAttrDefs,
+    });
     origValue = GGRC.custom_attr_defs;
     GGRC.custom_attr_defs = fakeCustomAttrDefs;
-    fakeInstance = new can.Map({
-      custom_attribute_values: [],
-    });
-
-    getCustomAttrItem = (attrValue, attrId, attrType) => {
-      return new can.Map({
-        attribute_value: attrValue,
-        custom_attribute_id: attrId || 3,
-        attributeType: attrType,
-      });
-    };
-
-    setCustomAttrItem = (attrValue, attrId, attrType) => {
-      customAttrItem = getCustomAttrItem(attrValue, attrId, attrType);
-      fakeInstance.attr('custom_attribute_values.0', customAttrItem);
-
-      spyOn(customAttrItem, 'reify')
-        .and.returnValue(customAttrItem);
-    };
   });
 
   afterAll(() => {
     GGRC.custom_attr_defs = origValue;
+    delete CMS.Models.DummyModel;
   });
 
   beforeEach(() => {
-    fakeAttr = {};
     fakeOptions = {};
-    fakeInstance.class = {table_singular: 'control'};
-
-    fakeAttr.attr_name = 'Type';
   });
 
-  it('reify() is exec if instance is not an Assessment', () => {
-    setCustomAttrItem();
-    helper(fakeAttr, fakeInstance, fakeOptions);
-
-    expect(customAttrItem.reify).toHaveBeenCalled();
-  });
-
-  it('return correct value if customAttrItem is not undefined', () => {
-    setCustomAttrItem('correctValue');
-
-    actual = helper(fakeAttr, fakeInstance, fakeOptions);
-
-    expect(actual).toEqual('correctValue');
-  });
-
-  it('return an empty string if customAttrItem is undefined', () => {
-    setCustomAttrItem();
-
-    actual = helper(fakeAttr, fakeInstance, fakeOptions);
-
-    expect(actual).toEqual('');
-  });
-
-  describe('for CA of Checkbox type', () => {
-    const attr = {};
-
-    it('returns empty string when CAD wasn\'t found', () => {
-      setCustomAttrItem('10', 3, 'Checkbox');
-
-      actual = helper(attr, fakeInstance, fakeOptions);
-
-      expect(actual).toEqual('');
+  it('return correct value if there is ca value with certain caId',
+    function () {
+      const caId = 3;
+      const value = 'correctValue';
+      fakeInstance.customAttr(caId, value);
+      actual = helper(fakeInstance, caId, fakeOptions);
+      expect(actual).toBe(value);
     });
 
-    it('returns "Yes" for CA of type checkbox with value "1"', () => {
-      attr.attr_name = 'CheckBox';
-      setCustomAttrItem('1', 4, 'checkbox');
-
-      actual = helper(attr, fakeInstance, fakeOptions);
-
-      expect(actual).toEqual('Yes');
+  describe('return an empty string', () => {
+    it('if ca value is empty', function () {
+      const caId = 3;
+      fakeInstance.customAttr(caId, null);
+      actual = helper(fakeInstance, caId, fakeOptions);
+      expect(actual).toBe('');
     });
 
-    it('returns "No" for CA of type checkbox with value "0"', () => {
-      attr.attr_name = 'CheckBox';
-      setCustomAttrItem(0, 4, 'checkbox');
-
-      actual = helper(attr, fakeInstance, fakeOptions);
-
-      expect(actual).toEqual('No');
-    });
-
-    it('returns "No" for CA of type checkbox without value', () => {
-      attr.attr_name = 'CheckBox';
-      setCustomAttrItem(undefined, 4, 'checkbox');
-
-      actual = helper(attr, fakeInstance, fakeOptions);
-
-      expect(actual).toEqual('No');
-    });
-
-    it('returns "No" for CA of type checkbox if there are no CA values', () => {
-      attr.attr_name = 'CheckBox';
-      fakeInstance.attr('custom_attribute_values', []);
-
-      actual = helper(attr, fakeInstance, fakeOptions);
-
-      expect(actual).toEqual('No');
+    it('if caObject was not found', function () {
+      const caId = 10000;
+      actual = helper(fakeInstance, caId, fakeOptions);
+      expect(actual).toBe('');
     });
   });
 
-  describe('for CA of Date type', () => {
-    const attr = {
-    };
+  describe('for caObject of Checkbox type', () => {
+    it('returns "Yes" if ca value is true',
+      function () {
+        const caId = 4;
+        fakeInstance.customAttr(caId, true);
+        actual = helper(fakeInstance, caId, fakeOptions);
+        expect(actual).toEqual('Yes');
+      });
 
-    it('returns empty string when CAD wasn\'t found', () => {
-      setCustomAttrItem('10', 3, 'Date');
-
-      actual = helper(attr, fakeInstance, fakeOptions);
-
-      expect(actual).toEqual('');
+    it('returns "No" if ca value is false',
+      function () {
+        const caId = 4;
+        fakeInstance.customAttr(caId, false);
+        actual = helper(fakeInstance, caId, fakeOptions);
+        expect(actual).toEqual('No');
     });
+  });
 
-    it('returns formatted date when CAD was found', () => {
+  describe('for caObject of Date type', () => {
+    it('returns formatted date when CAD was found', function () {
+      const caId = 9;
       const expected = 'expected date';
       const attrValue = '2017-09-30';
-      attr.attr_name = 'Date';
-      setCustomAttrItem(attrValue, 9, 'Date');
       spyOn(GGRC.Utils, 'formatDate')
         .and.returnValue(expected);
 
-      actual = helper(attr, fakeInstance, fakeOptions);
+      fakeInstance.customAttr(caId, attrValue);
+      actual = helper(fakeInstance, caId, fakeOptions);
 
-      expect(actual).toEqual(expected);
+      expect(actual).toBe(expected);
       expect(GGRC.Utils.formatDate)
         .toHaveBeenCalledWith(attrValue, true);
     });
-
-    it('tries to format date for existing CAD and undefined value', () => {
-        const expected = 'expected date';
-        const attrValue = undefined;
-        attr.attr_name = 'Date';
-        setCustomAttrItem(attrValue, 9, 'Date');
-        spyOn(GGRC.Utils, 'formatDate')
-          .and.returnValue(expected);
-
-        actual = helper(attr, fakeInstance, fakeOptions);
-
-        expect(actual).toEqual(expected);
-        expect(GGRC.Utils.formatDate)
-          .toHaveBeenCalledWith(attrValue, true);
-      });
   });
 
-  describe('for CA of Dropdown type', () => {
-    const attr = {
-    };
-
-    it('returns empty string when CAD wasn\'t found', () => {
-      setCustomAttrItem('10', 3, 'Dropdown');
-
-      actual = helper(attr, fakeInstance, fakeOptions);
-
-      expect(actual).toEqual('');
-    });
-
-    it('returns attribute value when CAD was found', () => {
-      attr.attr_name = 'Dropdown';
-      setCustomAttrItem('10', 10, 'Dropdown');
-
-      actual = helper(attr, fakeInstance, fakeOptions);
-
-      expect(actual).toEqual('10');
-    });
-
-    it('returns empty string for existing CAD and undefined value', () => {
-      attr.attr_name = 'Dropdown';
-      setCustomAttrItem(undefined, 10, 'Dropdown');
-
-      actual = helper(attr, fakeInstance, fakeOptions);
-
-      expect(actual).toEqual('');
+  describe('for caObject of Dropdown type', () => {
+    it('returns caObject value', function () {
+      const caId = 10;
+      const value = 'Choice 1';
+      fakeInstance.customAttr(caId, value);
+      actual = helper(fakeInstance, caId, fakeOptions);
+      expect(actual).toBe(value);
     });
   });
 
-  describe('for CA of Text type', () => {
-    const attr = {
-    };
-
-    it('returns empty string when CAD wasn\'t found', () => {
-      setCustomAttrItem('10', 3, 'Text');
-
-      actual = helper(attr, fakeInstance, fakeOptions);
-
-      expect(actual).toEqual('');
-    });
-
-    it('returns attribute value when CAD was found', () => {
-      attr.attr_name = 'Text';
-      setCustomAttrItem('10', 6, 'Text');
-
-      actual = helper(attr, fakeInstance, fakeOptions);
-
-      expect(actual).toEqual('10');
-    });
-
-    it('returns empty string for existing CAD and undefined value', () => {
-      attr.attr_name = 'Text';
-      setCustomAttrItem(undefined, 6, 'Text');
-
-      actual = helper(attr, fakeInstance, fakeOptions);
-
-      expect(actual).toEqual('');
+  describe('for caObject of Text type', () => {
+    it('returns caObject value', function () {
+      const caId = 6;
+      const value = 'Some text';
+      fakeInstance.customAttr(caId, value);
+      actual = helper(fakeInstance, caId, fakeOptions);
+      expect(actual).toBe(value);
     });
   });
 
-  describe('for CA of Rich Text type', () => {
-    const attr = {
-    };
-
-    it('returns empty string when CAD wasn\'t found', () => {
-      setCustomAttrItem('10', 3, 'Rich Text');
-
-      actual = helper(attr, fakeInstance, fakeOptions);
-
-      expect(actual).toEqual('');
-    });
-
-    it('returns attribute value when CAD was found', () => {
-      attr.attr_name = 'Rich Text';
-      setCustomAttrItem('10', 7, 'Rich Text');
-
-      actual = helper(attr, fakeInstance, fakeOptions);
-
-      expect(actual).toEqual('10');
-    });
-
-    it('returns empty string for existing CAD and undefined value', () => {
-      attr.attr_name = 'Rich Text';
-      setCustomAttrItem(undefined, 7, 'Rich Text');
-
-      actual = helper(attr, fakeInstance, fakeOptions);
-
-      expect(actual).toEqual('');
-    });
-  });
-
-  describe('for CA of Map:Person type', () => {
-    const attr = {};
-
-    it('returns empty string when CAD wasn\'t found', () => {
-      setCustomAttrItem(null, 3, 'Map:Person');
-
-      actual = helper(attr, fakeInstance, fakeOptions);
-
-      expect(actual).toEqual('');
-    });
-
-    describe('when object was provided in attribute', () => {
-      const expected = 'expected persons';
-      const addItemResult = 'added item';
-      const actualObject = {};
-
-      beforeEach(() => {
-        setCustomAttrItem(undefined, 8, 'Map:Person');
-        customAttrItem.attr('attribute_object', {
-          reify: () => {},
-        });
-        spyOn(customAttrItem.attr('attribute_object'), 'reify')
-          .and.returnValue(actualObject);
-
-        attr.attr_name = 'Persons';
-        fakeOptions = {
-          contexts: {
-            add: jasmine.createSpy('add').and.returnValue(addItemResult),
-          },
-          fn: jasmine.createSpy('fn').and.returnValue(expected),
-        };
-
-        actual = helper(attr, fakeInstance, fakeOptions);
-      });
-
-      it('returns expected result', () => {
-        expect(actual).toEqual(expected);
-      });
-
-      it('reify object attribute', () => {
-        expect(customAttrItem.attribute_object.reify)
-          .toHaveBeenCalled();
-      });
-
-      it('adds object to contexts list', () => {
-        expect(fakeOptions.contexts.add)
-          .toHaveBeenCalledWith({object: actualObject});
-      });
-
-      it('makes mustache fn-call', () => {
-        expect(fakeOptions.fn).toHaveBeenCalled();
-      });
-    });
-
-    describe('when object wasn\'t provided in attribute', () => {
-      const expected = 'expected persons';
-      const addItemResult = 'added item';
-
-      beforeEach(() => {
-        attr.attr_name = 'Persons';
-        setCustomAttrItem(undefined, 8, 'Map:Person');
-        fakeOptions = {
-          contexts: {
-            add: jasmine.createSpy('add').and.returnValue(addItemResult),
-          },
-          fn: jasmine.createSpy('fn').and.returnValue(expected),
-        };
-
-        actual = helper(attr, fakeInstance, fakeOptions);
-      });
-
-      it('returns expected result', () => {
-        expect(actual).toEqual(expected);
-      });
-
-      it('adds object to contexts list', () => {
-        expect(fakeOptions.contexts.add).toHaveBeenCalledWith({object: null});
-      });
-
-      it('makes mustache fn-call', () => {
-        expect(fakeOptions.fn).toHaveBeenCalled();
-      });
+  describe('for caObject of Rich Text type', () => {
+    it('returns caObject value', function () {
+      const caId = 7;
+      const value = '<strong>some text</strong>';
+      fakeInstance.customAttr(caId, value);
+      actual = helper(fakeInstance, caId, fakeOptions);
+      expect(actual).toBe(value);
     });
   });
 });

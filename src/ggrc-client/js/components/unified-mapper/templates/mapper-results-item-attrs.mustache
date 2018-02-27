@@ -5,13 +5,11 @@
 
 <div class="flex-box flex-box-single">
   {{#each selectedColumns}}
-    {{#add_to_current_scope thisColumn=this}}
     <div class="attr">
       {{#switch attr_type}}
         {{#case 'custom'}}
           <tree-item-custom-attribute {instance}="instance"
-                                      {values}="instance.custom_attribute_values"
-                                      {column}="thisColumn"
+                                      {custom-attribute-id}="attr_custom_attribute_id"
           ></tree-item-custom-attribute>
         {{/case}}
 
@@ -34,6 +32,5 @@
         {{/case}}
       {{/switch}}
     </div>
-    {{/add_to_current_scope}}
   {{/each}}
 </div>

@@ -4,10 +4,6 @@
 */
 (function ($, can) {
   // a few core CanJS extensions below.
-
-  can.Model.validationMessages.must_be_checked =
-    can.Map.validationMessages.must_be_checked = 'this checkbox is required';
-
   // Core validation for fields not being "blank", i.e.
   // having no content when outside spaces are trimmed away.
   can.Model.validationMessages.non_blank =

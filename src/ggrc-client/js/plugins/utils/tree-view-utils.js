@@ -204,6 +204,7 @@ function getColumnsForModel(modelType, displayPrefs, modelName) {
       }).map(function (def) {
         return {
           attr_title: def.title,
+          attr_custom_attribute_id: def.id,
           attr_name: def.title,
           attr_sort_field: def.title,
           display_status: false,
