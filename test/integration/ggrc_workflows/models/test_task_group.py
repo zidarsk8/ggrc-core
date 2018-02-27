@@ -5,7 +5,9 @@
 from ggrc.models import all_models
 from ggrc_workflows import ac_roles
 from integration.ggrc.models import factories
+from integration.ggrc_basic_permissions.models import factories as bp_factories
 from integration.ggrc_workflows.helpers import workflow_test_case
+from integration.ggrc_workflows.models import factories as wf_factories
 
 
 class TestTaskGroupApiCalls(workflow_test_case.WorkflowTestCase):
@@ -25,3 +27,21 @@ class TestTaskGroupApiCalls(workflow_test_case.WorkflowTestCase):
     data = self.api_helper.get_task_group_post_dict(workflow, g_editor)
     response = self.api_helper.post(all_models.TaskGroup, data)
     self.assertEqual(response.status_code, 201)
+
+  def test_get_tg_g_reader_no_role(self):
+    """GET TaskGroup collection logged in as GlobalReader & No Role."""
+    with factories.single_commit():
+      wf_factories.TaskGroupFactory()
+      email = self.setup_helper.gen_email(self.rbac_helper.GR_RNAME, "No Role")
+      person = factories.PersonFactory(email=email)
+      bp_factories.UserRoleFactory(
+          person=person,
+          role=self.rbac_helper.g_roles[self.rbac_helper.GR_RNAME]
+      )
+
+    g_reader = all_models.Person.query.filter_by(email=email).one()
+    self.api_helper.set_user(g_reader)
+
+    task_group = all_models.TaskGroup.query.one()
+    response = self.api_helper.get_collection(task_group, (task_group.id, ))
+    self.assertTrue(response.json["task_groups_collection"]["task_groups"])

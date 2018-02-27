@@ -5,6 +5,7 @@
 from ggrc.models import all_models
 from ggrc_workflows import ac_roles
 from integration.ggrc.models import factories
+from integration.ggrc_basic_permissions.models import factories as bp_factories
 from integration.ggrc_workflows.helpers import workflow_test_case
 from integration.ggrc_workflows.models import factories as wf_factories
 
@@ -28,3 +29,21 @@ class TestCycleApiCalls(workflow_test_case.WorkflowTestCase):
     data = self.api_helper.get_cycle_post_dict(workflow)
     response = self.api_helper.post(all_models.Cycle, data)
     self.assertEqual(response.status_code, 201)
+
+  def test_get_cycle_g_reader_no_role(self):
+    """GET Cycle collection logged in as GlobalReader & No Role."""
+    with factories.single_commit():
+      wf_factories.CycleFactory()
+      email = self.setup_helper.gen_email(self.rbac_helper.GR_RNAME, "No Role")
+      person = factories.PersonFactory(email=email)
+      bp_factories.UserRoleFactory(
+          person=person,
+          role=self.rbac_helper.g_roles[self.rbac_helper.GR_RNAME]
+      )
+
+    g_reader = all_models.Person.query.filter_by(email=email).one()
+    self.api_helper.set_user(g_reader)
+
+    cycle = all_models.Cycle.query.one()
+    response = self.api_helper.get_collection(cycle, (cycle.id, ))
+    self.assertTrue(response.json["cycles_collection"]["cycles"])
