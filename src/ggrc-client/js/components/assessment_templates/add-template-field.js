@@ -30,30 +30,22 @@ export default can.Component.extend({
         let selected = viewModel.attr('selected');
         let title = _.trim(selected.title);
         let type = _.trim(selected.type);
-        let invalidInput = false;
         let values = _.splitTrim(selected.values, {
           unique: true,
         }).join(',');
         ev.preventDefault();
-        viewModel.attr('selected.invalidTitle', false);
-        viewModel.attr('selected.emptyTitle', false);
-        viewModel.attr('selected.dublicateTitle', false);
         viewModel.attr('selected.invalidValues', false);
+        viewModel.attr('selected.invalidTitleError', '');
 
-        if (this.isEmptyTitle(title)) {
-          this.attr('selected.invalidTitle', true);
-          this.attr('selected.emptyTitle', true);
-          invalidInput = true;
-        } else if (this.isDublicateTitle(fields, title)) {
-          this.attr('selected.invalidTitle', true);
-          this.attr('selected.dublicateTitle', true);
-          invalidInput = true;
-        }
-        if (this.isInvalidValues(viewModel.valueAttrs, type, values)) {
-          viewModel.attr('selected.invalidValues', true);
-          invalidInput = true;
-        }
-        if (invalidInput) {
+        let isInvalidTitle = this.isTitleInvalid(title, fields);
+        let isInvalidValue = this
+          .isInvalidValues(viewModel.valueAttrs, type, values);
+
+        if (isInvalidTitle || isInvalidValue) {
+          if (isInvalidValue) {
+            viewModel.attr('selected.invalidValues', true);
+          }
+
           return;
         }
         // We need to defer adding in modal since validation is preventing
@@ -82,6 +74,25 @@ export default can.Component.extend({
       },
       isEmptyTitle(selectedTitle) {
         return !selectedTitle;
+      },
+      isTitleInvalid(title, fields) {
+        if (this.isEmptyTitle(title)) {
+          this.attr(
+            'selected.invalidTitleError',
+            'A custom attribute title can not be blank'
+          );
+          return true;
+        }
+
+        if (this.isDublicateTitle(fields, title)) {
+          this.attr(
+            'selected.invalidTitleError',
+            'A custom attribute with this title already exists'
+          );
+          return true;
+        }
+
+        return false;
       },
     });
   },
