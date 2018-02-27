@@ -80,15 +80,6 @@ _DISABLED_TMPL = (
     'tracked within this bug.'
 )
 
-# Status values maps from GGRC to IssueTracker.
-_STATUSES = {
-    'Not Started': 'ASSIGNED',
-    'In Progress': 'ASSIGNED',
-    'In Review': 'FIXED',
-    'Rework Needed': 'ASSIGNED',
-    'Completed': 'VERIFIED',
-    'Deprecated': 'OBSOLETE',
-}
 
 # Status transitions map for assessment without verifier.
 _NO_VERIFIER_STATUSES = {
@@ -571,7 +562,7 @@ def _fill_current_value(issue_params, assessment, initial_info):
 
   if 'status' not in issue_params:
     # Resend status on any change.
-    status_value = _STATUSES.get(assessment.status)
+    status_value = issues.STATUSES.get(assessment.status)
     if status_value:
       issue_params['status'] = status_value
 
