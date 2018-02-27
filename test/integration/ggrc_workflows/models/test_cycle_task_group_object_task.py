@@ -14,6 +14,7 @@ from integration.ggrc import query_helper
 from integration.ggrc.models import factories
 from integration.ggrc_basic_permissions.models import factories as bp_factories
 from integration.ggrc_workflows import generator as wf_generator
+from integration.ggrc_workflows.helpers import workflow_test_case
 from integration.ggrc_workflows.models import factories as wf_factories
 
 
@@ -274,3 +275,29 @@ class CycleTaskQueryAPI(query_helper.WithQueryApi, TestCTGOT):
     ]
     result = self._get_first_result_set(data, "Cycle", "total")
     self.assertEqual(result, 1)
+
+
+class TestCycleTaskApiCalls(workflow_test_case.WorkflowTestCase):
+  """Tests related to CycleTask REST API calls."""
+
+  def test_get_ct_g_reader_no_role(self):
+    """GET CycleTask collection logged in as GlobalReader & No Role."""
+    with factories.single_commit():
+      wf_factories.CycleTaskFactory()
+      email = self.setup_helper.gen_email(self.rbac_helper.GR_RNAME, "No Role")
+      person = factories.PersonFactory(email=email)
+      bp_factories.UserRoleFactory(
+          person=person,
+          role=self.rbac_helper.g_roles[self.rbac_helper.GR_RNAME]
+      )
+
+    g_reader = all_models.Person.query.filter_by(email=email).one()
+    self.api_helper.set_user(g_reader)
+
+    cycle_task = all_models.CycleTaskGroupObjectTask.query.one()
+    response = self.api_helper.get_collection(cycle_task, (cycle_task.id, ))
+    self.assertTrue(
+        response.json["cycle_task_group_object_tasks_collection"][
+            "cycle_task_group_object_tasks"
+        ]
+    )

@@ -77,6 +77,14 @@ permissions = {
             },
             "condition": "is"
         },
+        "Workflow",
+        "TaskGroup",
+        "TaskGroupObject",
+        "TaskGroupTask",
+        "Cycle",
+        "CycleTaskGroup",
+        "CycleTaskGroupObjectTask",
+        "CycleTaskEntry",
     ],
     "create": [
         {

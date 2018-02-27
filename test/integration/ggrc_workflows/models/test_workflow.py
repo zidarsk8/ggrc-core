@@ -14,7 +14,9 @@ from integration.ggrc import TestCase
 from integration.ggrc.models import factories as glob_factories
 from integration.ggrc_workflows.models import factories
 from integration.ggrc import api_helper
+from integration.ggrc_basic_permissions.models import factories as bp_factories
 from integration.ggrc_workflows import generator as wf_generator
+from integration.ggrc_workflows.helpers import workflow_test_case
 
 
 @ddt.ddt
@@ -28,7 +30,7 @@ class TestWorkflow(TestCase):
     self.generator = wf_generator.WorkflowsGenerator()
 
   def test_basic_workflow_creation(self):
-    """Test basic WF"""
+    """Test basic WF creation."""
     workflow = factories.WorkflowFactory(title="This is a test WF")
     workflow = db.session.query(Workflow).get(workflow.id)
     self.assertEqual(workflow.title, "This is a test WF")
@@ -60,6 +62,7 @@ class TestWorkflow(TestCase):
                                   start_date,
                                   update_date,
                                   expected_date):
+    """Test recalculate start_date update={2} expected={3}."""
     with freezegun.freeze_time(today):
       with glob_factories.single_commit():
         workflow = factories.WorkflowFactory(
@@ -87,6 +90,7 @@ class TestWorkflow(TestCase):
   )
   @ddt.unpack  # pylint: disable=invalid-name
   def test_recalculate_start_date_on_delete(self, idxs, expected_date):
+    """Test recalculate start_date on delete expected={1}."""
     start_date_1 = datetime.date(2017, 8, 10)
     start_date_2 = datetime.date(2017, 8, 11)
     with freezegun.freeze_time("2017-08-10"):
@@ -135,6 +139,7 @@ class TestWorkflow(TestCase):
   def test_recalculate_start_date_on_create(self,
                                             new_start_date,
                                             expected_date):
+    """Test recalculate start_date on create update={} expected={}."""
     with freezegun.freeze_time("2017-08-10"):
       with glob_factories.single_commit():
         workflow = factories.WorkflowFactory(
@@ -181,6 +186,7 @@ class TestWorkflow(TestCase):
   )
   @ddt.unpack
   def test_archive_workflow(self, tgt_start_date, tgt_end_date, wf_status):
+    """Test archive workflow with status={2}"""
     with freezegun.freeze_time("2017-08-10"):
       with glob_factories.single_commit():
         workflow = factories.WorkflowFactory(
@@ -249,6 +255,7 @@ class TestWorkflow(TestCase):
   )
   @ddt.unpack  # pylint: disable=invalid-name
   def test_change_verification_flag_positive(self, title, unit, repeat_every):
+    """Test change verification_flag positive title={}."""
     with freezegun.freeze_time("2017-08-10"):
       with glob_factories.single_commit():
         workflow = factories.WorkflowFactory(title=title, unit=unit,
@@ -280,6 +287,7 @@ class TestWorkflow(TestCase):
   )
   @ddt.unpack  # pylint: disable=invalid-name
   def test_change_verification_flag_negative(self, title, unit, repeat_every):
+    """Test change verification_flag negative title={}."""
     with freezegun.freeze_time("2017-08-10"):
       with glob_factories.single_commit():
         workflow = factories.WorkflowFactory(title=title, unit=unit,
@@ -304,3 +312,25 @@ class TestWorkflow(TestCase):
       self.assert400(resp)
       workflow = all_models.Workflow.query.get(wf_id)
       self.assertIs(workflow.is_verification_needed, verif_default)
+
+
+class TestWorkflowApiCalls(workflow_test_case.WorkflowTestCase):
+  """Tests related to Workflow REST API calls."""
+
+  def test_get_wf_g_reader_no_role(self):
+    """GET Workflow collection logged in as GlobalReader & No Role."""
+    with glob_factories.single_commit():
+      factories.WorkflowFactory()
+      email = self.setup_helper.gen_email(self.rbac_helper.GR_RNAME, "No Role")
+      person = glob_factories.PersonFactory(email=email)
+      bp_factories.UserRoleFactory(
+          person=person,
+          role=self.rbac_helper.g_roles[self.rbac_helper.GR_RNAME]
+      )
+
+    g_reader = all_models.Person.query.filter_by(email=email).one()
+    self.api_helper.set_user(g_reader)
+
+    workflow = all_models.Workflow.query.one()
+    response = self.api_helper.get_collection(workflow, (workflow.id, ))
+    self.assertTrue(response.json["workflows_collection"]["workflows"])

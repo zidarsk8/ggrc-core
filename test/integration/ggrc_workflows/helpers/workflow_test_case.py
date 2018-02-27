@@ -3,7 +3,7 @@
 """Workflow test case base class definition."""
 
 from integration.ggrc import TestCase
-from integration.ggrc_workflows.helpers import api_helper
+from integration.ggrc import api_helper
 from integration.ggrc_workflows.helpers import rbac_helper
 from integration.ggrc_workflows.helpers import setup_helper
 
@@ -13,6 +13,6 @@ class WorkflowTestCase(TestCase):
 
   def setUp(self):
     super(WorkflowTestCase, self).setUp()
-    self.api_helper = api_helper.WorkflowApi()
+    self.api_helper = api_helper.Api()
     self.rbac_helper = rbac_helper.RBACHelper()
     self.setup_helper = setup_helper.WorkflowSetup(self.rbac_helper)

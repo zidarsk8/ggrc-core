@@ -5,6 +5,8 @@
 from ggrc.models import all_models
 from ggrc_workflows import ac_roles
 from integration.ggrc.models import factories
+from integration.ggrc_basic_permissions.models import factories as bp_factories
+from integration.ggrc_workflows.helpers import workflow_api
 from integration.ggrc_workflows.helpers import workflow_test_case
 from integration.ggrc_workflows.models import factories as wf_factories
 
@@ -25,6 +27,26 @@ class TestCommentApiCalls(workflow_test_case.WorkflowTestCase):
 
     cycle_task = all_models.CycleTaskGroupObjectTask.query.one()
 
-    data = self.api_helper.get_cycle_task_entry_post_dict(cycle_task)
+    data = workflow_api.get_cycle_task_entry_post_dict(cycle_task)
     response = self.api_helper.post(all_models.CycleTaskEntry, data)
     self.assertEqual(response.status_code, 201)
+
+  def test_get_cte_g_reader_no_role(self):
+    """GET CycleTaskEntry collection logged in as GlobalReader & No Role."""
+    with factories.single_commit():
+      wf_factories.CycleTaskEntryFactory()
+      email = self.setup_helper.gen_email(self.rbac_helper.GR_RNAME, "No Role")
+      person = factories.PersonFactory(email=email)
+      bp_factories.UserRoleFactory(
+          person=person,
+          role=self.rbac_helper.g_roles[self.rbac_helper.GR_RNAME]
+      )
+
+    g_reader = all_models.Person.query.filter_by(email=email).one()
+    self.api_helper.set_user(g_reader)
+
+    comment = all_models.CycleTaskEntry.query.one()
+    response = self.api_helper.get_collection(comment, (comment.id, ))
+    self.assertTrue(
+        response.json["cycle_task_entries_collection"]["cycle_task_entries"]
+    )
