@@ -12,7 +12,6 @@ from ggrc.models.hooks import issue
 from ggrc.models.hooks import issue_tracker
 from ggrc.models.hooks import relationship
 from ggrc.models.hooks import acl
-from ggrc.models.hooks.acl import program_roles
 from ggrc.models.hooks import proposal
 
 
@@ -24,7 +23,6 @@ ALL_HOOKS = [
     relationship,
     access_control_list,
     custom_attribute_definition,
-    program_roles,
     acl,
     common,
 
