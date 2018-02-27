@@ -5,62 +5,51 @@
 
 import Component from '../add-template-field';
 
-describe('add-template-field component', function () {
-  describe('addField() method', function () {
+describe('add-template-field component', () => {
+  describe('addField() method', () => {
     let addField; // the method under test
     let $el;
     let ev;
     let viewModel;
     let parentScope;
-    let viewModel_;
 
-    beforeEach(function () {
-      parentScope = {
-        attr: function () {
-          return {};
-        },
-      };
-      viewModel_ = Component.prototype.viewModel({}, parentScope);
-      addField = viewModel_.addField;
+    beforeEach(() => {
+      parentScope = new can.Map({
+        attr: {},
+        fields: [],
+      });
+      viewModel = Component.prototype.viewModel({}, parentScope);
+      addField = viewModel.addField.bind(viewModel);
 
       $el = $('<div></div>');
       ev = {
         preventDefault: jasmine.createSpy(),
       };
-      viewModel = new can.Map({
-        fields: new can.List(),
-        selected: new can.Map(),
-        valueAttrs: ['Dropdown'],
-        id: 123,
-        isDublicateTitle: viewModel_.isDublicateTitle.bind(viewModel),
-        isEmptyTitle: viewModel_.isEmptyTitle.bind(viewModel),
-        isInvalidValues: viewModel_.isInvalidValues.bind(viewModel),
-      });
     });
 
     it('does not require the "values" field to add a field of type Map:Person',
-      function (done) {
+      (done) => {
         let selectedObj = new can.Map({
           title: 'External Reviewer',
           type: 'Map:Person',
           values: '',
         });
         viewModel.attr('selected', selectedObj);
-        addField.call(viewModel, viewModel, $el, ev);
+        addField(viewModel, $el, ev);
 
         // FIXME: Because `addField` function calls `_.defer` we need to wait
         // for viewModel field to get updated.
         // It's necessary workaround because otherwise can.Map.validate function
         // prevents us adding new field. By using _.defer we wait for validate
         // function to get executed and only then we are adding
-        setTimeout(function () {
+        setTimeout(() => {
           expect(viewModel.fields.length).toEqual(1);
           done();
         }, 3);
       }
     );
     it('requires the "values" field to add a field of type Dropdown',
-      function (done) {
+      (done) => {
         let selectedObj = new can.Map({
           title: 'External Reviewer',
           type: 'Dropdown',
@@ -75,45 +64,45 @@ describe('add-template-field component', function () {
       }
     );
     it('requires the "values" field to add a field of type Dropdown',
-      function (done) {
+      (done) => {
         let selectedObj = new can.Map({
           title: 'External Reviewer',
           type: 'Dropdown',
           values: '',
         });
         viewModel.attr('selected', selectedObj);
-        addField.call(viewModel, viewModel, $el, ev);
-        setTimeout(function () {
+        addField(viewModel, $el, ev);
+        setTimeout(() => {
           expect(viewModel.fields.length).toEqual(0);
           done();
         }, 3);
       }
     );
     it('requires the "values" field to add a field of type Text',
-      function (done) {
+      (done) => {
         let selectedObj = new can.Map({
           title: 'External Reviewer',
           type: 'Text',
           values: '',
         });
         viewModel.attr('selected', selectedObj);
-        addField.call(viewModel, viewModel, $el, ev);
-        setTimeout(function () {
+        addField(viewModel, $el, ev);
+        setTimeout(() => {
           expect(viewModel.fields.length).toEqual(1);
           done();
         }, 3);
       }
     );
     it('requires the "title" field to add a field',
-      function (done) {
+      (done) => {
         let selectedObj = new can.Map({
           title: '',
           type: 'Text',
           values: '',
         });
         viewModel.attr('selected', selectedObj);
-        addField.call(viewModel, viewModel, $el, ev);
-        setTimeout(function () {
+        addField(viewModel, $el, ev);
+        setTimeout(() => {
           expect(viewModel.fields.length).toEqual(0);
           done();
         }, 3);
@@ -121,27 +110,26 @@ describe('add-template-field component', function () {
     );
   });
 
-  describe('isEmptyTitle() method', function () {
+  describe('isEmptyTitle() method', () => {
     let isEmptyTitle; // the method under test
     let result;
     let selectedTitle;
 
-    beforeAll(function () {
-      let parentScope = {
-        attr: function () {
-          return {};
-        },
-      };
+    beforeAll(() => {
+      let parentScope = new can.Map({
+        attr: {},
+        fields: [],
+      });
       let viewModel_ = Component.prototype.viewModel({}, parentScope);
       isEmptyTitle = viewModel_.isEmptyTitle;
     });
 
-    beforeEach(function () {
+    beforeEach(() => {
       result = undefined;
     });
 
     it('has not to allow to input empty titles',
-      function (done) {
+      (done) => {
         selectedTitle = '';
 
         result = isEmptyTitle(selectedTitle);
@@ -152,29 +140,28 @@ describe('add-template-field component', function () {
     );
   });
 
-  describe('isDublicateTitle() method', function () {
+  describe('isDublicateTitle() method', () => {
     let isDublicateTitle; // the method under test
     let result;
     let selectedTitle;
     let fields;
 
-    beforeAll(function () {
-      let parentScope = {
-        attr: function () {
-          return {};
-        },
-      };
+    beforeAll(() => {
+      let parentScope = new can.Map({
+        attr: {},
+        fields: [],
+      });
       let viewModel_ = Component.prototype.viewModel({}, parentScope);
       isDublicateTitle = viewModel_.isDublicateTitle;
     });
 
-    beforeEach(function () {
+    beforeEach(() => {
       fields = new can.List();
       result = undefined;
     });
 
     it('has to not allow to input titles that are already in "fields"',
-      function (done) {
+      (done) => {
         fields.push({
           id: 123,
           title: 'title',
@@ -192,7 +179,7 @@ describe('add-template-field component', function () {
     );
 
     it('has to allow to input titles that are not in "fields"',
-      function (done) {
+      (done) => {
         fields.push({
           id: 123,
           title: 'title',
@@ -210,30 +197,29 @@ describe('add-template-field component', function () {
     );
   });
 
-  describe('isInvalidValues() method', function () {
+  describe('isInvalidValues() method', () => {
     let isInvalidValues; // the method under test
     let valueAttrs;
     let result;
     let parentScope;
     let viewModel_;
 
-    beforeAll(function () {
+    beforeAll(() => {
       valueAttrs = ['Dropdown'];
-      parentScope = {
-        attr: function () {
-          return {};
-        },
-      };
+      parentScope = new can.Map({
+        attr: {},
+        fields: [],
+      });
       viewModel_ = Component.prototype.viewModel({}, parentScope);
       isInvalidValues = viewModel_.isInvalidValues;
     });
 
-    beforeEach(function () {
+    beforeEach(() => {
       result = undefined;
     });
 
     it('has to not allow to input type "Dropdown" with not set values',
-      function (done) {
+      (done) => {
         result = isInvalidValues(valueAttrs, 'Dropdown', '');
         expect(result).toEqual(true);
         done();
@@ -241,7 +227,7 @@ describe('add-template-field component', function () {
     );
 
     it('has to allow to input type "Dropdown" with set values',
-      function (done) {
+      (done) => {
         result = isInvalidValues(valueAttrs, 'DropDown', 'some values');
         expect(result).toEqual(false);
         done();
@@ -249,7 +235,7 @@ describe('add-template-field component', function () {
     );
 
     it('has to allow to input type "Text" with not set values',
-      function (done) {
+      (done) => {
         result = isInvalidValues(valueAttrs, 'Text', '');
         expect(result).toEqual(false);
         done();
