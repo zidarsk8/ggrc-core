@@ -242,4 +242,68 @@ describe('add-template-field component', () => {
       }
     );
   });
+
+  describe('isTitleInvalid() method', () => {
+    let viewModel;
+    let parentScope;
+    let isTitleInvalid;
+
+    beforeAll(() => {
+      parentScope = new can.Map({
+        attr: {},
+        fields: [],
+      });
+      viewModel = Component.prototype.viewModel({}, parentScope);
+      isTitleInvalid = viewModel.isTitleInvalid.bind(viewModel);
+    });
+
+    beforeEach(() => {
+      viewModel.attr('selected.invalidTitleError', '');
+    });
+
+    function setupIsEmptyTitle() {
+      spyOn(viewModel, 'isEmptyTitle').and
+        .callFake((title) => !title);
+    }
+
+    function setupIsDublicateTitle() {
+      spyOn(viewModel, 'isDublicateTitle').and
+        .callFake((fields, title) => _.contains(fields, title));
+    }
+
+    it('should return false. correct value', () => {
+      setupIsEmptyTitle();
+      setupIsDublicateTitle();
+
+      const result = isTitleInvalid('my title', []);
+      expect(result).toBeFalsy();
+      expect(viewModel.attr('selected.invalidTitleError')).toEqual('');
+      expect(viewModel.isEmptyTitle).toHaveBeenCalled();
+      expect(viewModel.isDublicateTitle).toHaveBeenCalled();
+    });
+
+    it('should return true. empty value', () => {
+      setupIsEmptyTitle();
+      setupIsDublicateTitle();
+      const result = isTitleInvalid('', []);
+
+      expect(result).toBeTruthy();
+      expect(viewModel.attr('selected.invalidTitleError'))
+        .toEqual('A custom attribute title can not be blank');
+      expect(viewModel.isEmptyTitle).toHaveBeenCalled();
+      expect(viewModel.isDublicateTitle).not.toHaveBeenCalled();
+    });
+
+    it('should return true. duplicated value', () => {
+      setupIsEmptyTitle();
+      setupIsDublicateTitle();
+      const result = isTitleInvalid('my title', ['my title']);
+
+      expect(result).toBeTruthy();
+      expect(viewModel.attr('selected.invalidTitleError'))
+        .toEqual('A custom attribute with this title already exists');
+      expect(viewModel.isEmptyTitle).toHaveBeenCalled();
+      expect(viewModel.isDublicateTitle).toHaveBeenCalled();
+    });
+  });
 });
