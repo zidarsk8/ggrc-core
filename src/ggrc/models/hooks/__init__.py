@@ -11,9 +11,9 @@ from ggrc.models.hooks import custom_attribute_definition
 from ggrc.models.hooks import issue
 from ggrc.models.hooks import issue_tracker
 from ggrc.models.hooks import relationship
+from ggrc.models.hooks import acl
 from ggrc.models.hooks.acl import audit_roles
 from ggrc.models.hooks.acl import program_roles
-from ggrc.models.hooks.acl import relationship_deletion
 from ggrc.models.hooks import proposal
 
 
@@ -27,7 +27,7 @@ ALL_HOOKS = [
     custom_attribute_definition,
     audit_roles,
     program_roles,
-    relationship_deletion,
+    acl,
     common,
 
     # Keep IssueTracker at the end of list to make sure that all other hooks
