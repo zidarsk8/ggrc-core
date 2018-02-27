@@ -8,8 +8,10 @@ There are other tests for verifying completeness of the results and that focus
 more on verifying the related SQL query.
 """
 
+import mock
 import ddt
 
+from ggrc import views
 from integration.ggrc.models import factories
 from integration.ggrc.services import TestCase
 
@@ -63,6 +65,38 @@ class TestRelatedAssessments(TestCase):
     self.assertEqual(response["data"][0]["title"], assessment2_title)
 
   @ddt.data(
+      ({}, 2),
+      ({"limit": "0,1"}, 2),
+      ({"limit": "0,2"}, 2),
+      ({"limit": "0,3"}, 2),
+  )
+  @ddt.unpack
+  def test_total_count_with_ca(self, limit, expected_count):
+    """Test total related assessments count for assessments with ca.
+
+    The left outer join in our eager query on custom attribute values breaks
+    the total count if on sa.func.count, but works if we use query.count()
+    """
+    cad = factories.CustomAttributeDefinitionFactory
+    cads = [cad(definition_type="assessment") for _ in range(3)]
+
+    for cad in cads:
+      factories.CustomAttributeValueFactory(
+          attributable=self.assessment1,
+          custom_attribute=cad,
+      )
+      factories.CustomAttributeValueFactory(
+          attributable=self.assessment2,
+          custom_attribute=cad,
+      )
+
+    with mock.patch("ggrc.views.start_compute_attributes"):
+      views.do_reindex()
+
+    response = self._get_related_assessments(self.control, **limit).json
+    self.assertEqual(response["total"], expected_count)
+
+  @ddt.data(
       {},
       {"a": 55},
       {"object_type": "invalid", "object_id": 5},
@@ -107,7 +141,7 @@ class TestRelatedAssessments(TestCase):
     self.assertEqual(titles, titles_order)
 
   def test_self_link(self):
-    """Test that audits and assessments contain selfLink."""
+    """Test that audits and assessments contain viewLink."""
     audit_self_link = u"/{}/{}".format(
         self.assessment2.audit._inflector.table_plural,
         self.assessment2.audit.id,
@@ -117,13 +151,13 @@ class TestRelatedAssessments(TestCase):
         self.assessment2.id,
     )
     response = self._get_related_assessments(self.assessment1).json
-    self.assertIn("selfLink", response["data"][0]["audit"])
-    self.assertIn("selfLink", response["data"][0])
+    self.assertIn("viewLink", response["data"][0]["audit"])
+    self.assertIn("viewLink", response["data"][0])
     self.assertEqual(
-        response["data"][0]["audit"]["selfLink"],
+        response["data"][0]["audit"]["viewLink"],
         audit_self_link,
     )
     self.assertEqual(
-        response["data"][0]["selfLink"],
+        response["data"][0]["viewLink"],
         assessment_self_link,
     )

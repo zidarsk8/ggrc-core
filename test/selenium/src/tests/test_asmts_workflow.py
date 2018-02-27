@@ -209,16 +209,14 @@ class TestAssessmentsWorkflow(base.Test):
       self, new_program_rest, new_audit_rest, new_cas_for_assessments_rest,
       new_assessments_rest, operator, selenium
   ):
-    """Test for checking filtering of Assessment by Custom Attributes in
-    audit scope.
+    """Test for checking filtering of Assessment by Global Custom Attributes
+    in audit scope.
     Preconditions:
     - Program created via REST API.
     - Audit created via REST API.
-    - Assessments created via REST API.
     - Global Custom Attributes for Assessment created via REST API.
-    - Set revers value of GCA with Checkbox type for second Assessment.
+    - Assessments created via REST API.
     """
-    # pylint: disable=too-many-locals
     custom_attr_values = (
         CustomAttributeDefinitionsFactory().generate_ca_values(
             list_ca_def_objs=new_cas_for_assessments_rest))
@@ -232,35 +230,93 @@ class TestAssessmentsWorkflow(base.Test):
     asmts_rest_service.update_obj(
         obj=new_assessments_rest[1],
         custom_attributes={checkbox_id: not custom_attr_values[checkbox_id]})
+    self._check_assessments_filtration(expected_asmt, custom_attr_values,
+                                       operator, new_audit_rest, selenium)
+
+  @pytest.mark.smoke_tests
+  @pytest.mark.parametrize("operator", [alias.EQUAL_OP])
+  def test_asmts_lcas_filtering(
+      self, new_program_rest, new_controls_rest,
+      map_new_program_rest_to_new_controls_rest,
+      new_audit_rest,
+      new_assessment_template_with_cas_rest,
+      new_assessments_from_template_rest,
+      operator, selenium
+  ):
+    """Test for checking filtering of Assessment by Local Custom Attributes
+    in audit scope.
+    Preconditions:
+    - Program created via REST API.
+    - Controls created via REST API and mapped to program.
+    - Audit created via REST API.
+    - Assessment template with LCA created via REST API.
+    - Assessments for assessment template created via REST API.
+    """
+    def set_values_for_assessment(assessment, only_checkbox, checkbox_value):
+      """Set LCA values for assessment"""
+      custom_attr_definitions = [
+          CustomAttributeDefinitionsFactory().create(**definition)
+          for definition
+          in assessment.cads_from_template()]
+      checkbox_id = Representation.filter_objs_by_attrs(
+          objs=custom_attr_definitions,
+          attribute_type=element.AdminWidgetCustomAttributes.CHECKBOX).id
+      if only_checkbox:
+        attr_values = {}
+      else:
+        attr_values = CustomAttributeDefinitionsFactory().generate_ca_values(
+            list_ca_def_objs=custom_attr_definitions)
+        attr_values[checkbox_id] = checkbox_value
+      rest_service.AssessmentsService().update_obj(
+          obj=assessment, custom_attributes=attr_values)
+      return attr_values
+
+    unchecked_asmt = new_assessments_from_template_rest[0]
+    checked_asmt = new_assessments_from_template_rest[1]
+
+    set_values_for_assessment(unchecked_asmt,
+                              only_checkbox=True,
+                              checkbox_value=False)
+    set_attr_values = set_values_for_assessment(checked_asmt,
+                                                only_checkbox=False,
+                                                checkbox_value=True)
+
+    self._check_assessments_filtration(checked_asmt,
+                                       set_attr_values,
+                                       operator, new_audit_rest, selenium)
+
+  @staticmethod
+  def _check_assessments_filtration(assessment, attr_values, operator,
+                                    audit, selenium):
+    """Check that filtration of assessments works."""
     filter_exprs = FilterUtils().get_filter_exprs_by_cas(
-        expected_asmt.custom_attribute_definitions, custom_attr_values,
-        operator)
-    # 'expected_asmt': updated_at (outdated)
-    # 'actual_asmts': created_at, updated_at, custom_attributes, audit
-    #                 assessment_type, modified_by (None)
-    expected_asmt = Representation.extract_objs_wo_excluded_attrs(
-        [expected_asmt.repr_ui()],
+        assessment.custom_attribute_definitions, attr_values, operator)
+    assessment = Representation.extract_objs_wo_excluded_attrs(
+        [assessment.repr_ui()],
         *(Representation.tree_view_attrs_to_exclude + (
-            "audit", "assessment_type", "modified_by")))[0]
-    expected_results = [{"filter": filter_expr,
-                         "objs": [expected_asmt]}
+          "audit", "assessment_type", "modified_by"))
+    )[0]
+    expected_results = [{"filter": filter_expr, "objs": [assessment]}
                         for filter_expr in filter_exprs]
-    actual_results = [
-        {"filter": filter_expr,
-         "objs": webui_service.AssessmentsService(
-             selenium).filter_and_get_list_objs_from_tree_view(
-             new_audit_rest, filter_expr)} for filter_expr in filter_exprs]
-    assert expected_results == actual_results, (
-        messages.AssertionMessages.format_err_msg_equal(
-            [{exp_res["filter"]: [exp_obj.title for exp_obj in exp_res["objs"]]
-              } for exp_res in expected_results],
-            [{act_res["filter"]: [act_obj.title for act_obj in act_res["objs"]]
-              } for act_res in actual_results]) +
-        messages.AssertionMessages.format_err_msg_equal(
-            StringMethods.convert_list_elements_to_list(
-                [exp_res["objs"] for exp_res in expected_results]),
-            StringMethods.convert_list_elements_to_list(
-                [act_res["objs"] for act_res in actual_results])))
+    actual_results = []
+    for filter_expr in filter_exprs:
+      result = {
+          "filter": filter_expr,
+          "objs": webui_service.AssessmentsService(selenium)
+          .filter_and_get_list_objs_from_tree_view(audit, filter_expr)
+      }
+      actual_results.append(result)
+    error_message = messages.AssertionMessages.format_err_msg_equal(
+        [{exp_res["filter"]: [exp_obj.title for exp_obj in exp_res["objs"]]}
+         for exp_res in expected_results],
+        [{act_res["filter"]: [act_obj.title for act_obj in act_res["objs"]]}
+         for act_res in actual_results]
+    ) + messages.AssertionMessages.format_err_msg_equal(
+        StringMethods.convert_list_elements_to_list(
+            [exp_res["objs"] for exp_res in expected_results]),
+        StringMethods.convert_list_elements_to_list(
+            [act_res["objs"] for act_res in actual_results]))
+    assert expected_results == actual_results, error_message
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(

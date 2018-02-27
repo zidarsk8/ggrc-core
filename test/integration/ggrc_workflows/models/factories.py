@@ -28,6 +28,7 @@ class TaskGroupFactory(TitledFactory):
     model = models.TaskGroup
 
   workflow = factory.SubFactory(WorkflowFactory)
+  context = factory.LazyAttribute(lambda tg: tg.workflow.context)
 
 
 class TaskGroupObjectFactory(ModelFactory):
@@ -57,6 +58,7 @@ class CycleFactory(TitledFactory):
     model = models.Cycle
 
   workflow = factory.SubFactory(WorkflowFactory)
+  context = factory.LazyAttribute(lambda cycle: cycle.workflow.context)
 
 
 class CycleTaskGroupFactory(TitledFactory):
@@ -80,6 +82,7 @@ class CycleTaskFactory(TitledFactory):
   task_type = "text"
   start_date = date(2015, 12, 4)
   end_date = date(2015, 12, 27)
+  context = factory.LazyAttribute(lambda ct: ct.cycle.context)
 
 
 class CycleTaskEntryFactory(ModelFactory):

@@ -1,0 +1,144 @@
+#!/usr/bin/env node
+/*
+ Copyright (C) 2018 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+/* eslint-env node */
+/* eslint-disable no-console */
+/**
+ * This is a tool to get the list of failed ESlint lines only in files and lines
+ * modified in this branch.
+ */
+const {exec} = require('child_process');
+const path = require('path');
+process.title = 'eslint_error_lines';
+
+class EelError extends Error {};
+
+const processParam = (process.argv[2] || '')
+  .replace(/^-+/, '')
+  .replace(/-+$/, '');
+
+function parseModifiedFiles(output) {
+  const rx = /diff\s--git\sa\/\S+\sb\/(\S+)[\s\S]*?@@.*?\+(\d+)(?:,(\d+)|)/ig;
+  let match;
+  let startLine;
+  let linesCount;
+  let fileName;
+  let modifiedLinesNumbers;
+  let modifiedFiles = {};
+  while ( match = rx.exec(output) ) {
+    fileName = path.resolve(process.cwd(), match[1]);
+    if ( !modifiedFiles[fileName] ) {
+      modifiedFiles[fileName] = {
+        lines: [],
+      };
+    }
+    modifiedLinesNumbers = modifiedFiles[fileName].lines;
+    startLine = parseInt(match[2], 10);
+    linesCount = parseInt(match[3], 10);
+
+    // @@ -41,0 +42 @@ // added one line
+    // @@ -6,2 +5,0 @@ // added no lines
+    linesCount = isNaN(linesCount) ? 1 : linesCount;
+
+    for ( let i = startLine; i <= startLine+linesCount-1; i+=1 ) {
+      modifiedLinesNumbers.push(i);
+    }
+  }
+  return modifiedFiles;
+}
+
+function getModifiedFiles(done) {
+  const shellCmd = 'git diff -U0 dev -- "*.js"';
+  exec(shellCmd, {maxBuffer: 1024 * 1024}, (err, stdout, stderr) => {
+    if (err) {
+      if ( err.toString().includes('stdout maxBuffer exceeded') ) {
+        err = new EelError(`The output of "${shellCmd}" is too big. You probably need to rebase your banch to the latest dev.`);
+      }
+      return done(err);
+    }
+    let modifiedFiles = parseModifiedFiles(stdout);
+    done(null, modifiedFiles);
+  });
+}
+
+function getEslintFailedFiles(done) {
+  const shellCmd =
+    'git diff --name-only dev | grep ".js$" | xargs eslint --quiet -f json';
+  exec(shellCmd, {maxBuffer: 1024 * 1024}, (error, stdout, stderr) => {
+    let eslintJSONOutput;
+    if (error && !stdout) {
+      console.error(`Error executing "${shellCmd}": ${error}`);
+      console.error(`stderr: ${stderr}`);
+      return;
+    }
+
+    // if empty list of files passed to the eslint
+    if ( !stdout.trim() || stdout.includes('eslint [options]') ) {
+      return done(null, []);
+    }
+
+    try {
+      eslintJSONOutput = JSON.parse(stdout);
+      done(null, eslintJSONOutput);
+    } catch (e) {
+      done(e);
+    }
+  });
+}
+
+function printError(msg, err) {
+  return ( err instanceof EelError )
+    ? console.error(err.toString())
+    : console.error(`${msg}: ${err}`);
+}
+
+function main() {
+  getModifiedFiles((err, modFiles) => {
+    if ( err ) {
+      return printError(
+        'Error getting list of modified files in the branch', err);
+    }
+    getEslintFailedFiles((err, eslintOut) => {
+      if ( err ) {
+        return console.error(`Error running eslint on changed files: ${err}`);
+      }
+      eslintOut.forEach((lintedFile) => {
+        let output = [];
+        output.push(`${lintedFile.filePath}`);
+        if ( !modFiles[lintedFile.filePath] ) {
+          return console.log(
+            `File ${lintedFile.filePath} is not included in modLines`);
+        }
+        let modLines = modFiles[lintedFile.filePath].lines;
+        let hasMatchingLines = false;
+        lintedFile.messages.forEach((msg) => {
+          if ( modLines.includes(msg.line) ) {
+            hasMatchingLines = true;
+            output.push(`\t${msg.line}:${msg.column}\t${msg.message}`);
+            output.push(`\t\t\t${msg.source}`);
+          }
+        });
+        if (hasMatchingLines) {
+          output.map((line)=>console.log(line));
+        }
+      });
+    });
+  });
+}
+
+function printUsage() {
+  console.log(
+    '\n'+
+    'This tool shows failed eslint lines in your branch comparing to dev.\n' +
+    'Only the lines changed by you.\n'+
+    'Even if you made fixes in a file with 1000+ eslint errors.\n');
+}
+
+
+if ( ['h', 'help', '?'].includes(processParam) ) {
+  printUsage();
+} else {
+  main();
+}

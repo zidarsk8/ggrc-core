@@ -96,10 +96,11 @@ class RelatedAssessmentsResource(common.Resource):
           order_by,
           models.Assessment,
       )
+    total = query.count()
     if limit:
-      query, total = pagination.apply_limit(query, limit)
-    else:
-      total = query.count()
+      query = pagination.apply_limit(query, limit)
+    # note that using pagination.get_total_count here would return wrong counts
+    # due to query being an eager query.
 
     return query, total
 
@@ -313,9 +314,9 @@ class RelatedAssessmentsResource(common.Resource):
         ]
         single_json["snapshots"] = snapshot_json_map[assessment.id]
         single_json["documents"] = document_json_map[assessment.id]
-        single_json["audit"]["selfLink"] = utils.view_url_for(
+        single_json["audit"]["viewLink"] = utils.view_url_for(
             assessment.audit)
-        single_json["selfLink"] = utils.view_url_for(assessment)
+        single_json["viewLink"] = utils.view_url_for(assessment)
         assessments_json.append(single_json)
       return assessments_json
 

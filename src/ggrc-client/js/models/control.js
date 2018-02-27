@@ -22,6 +22,7 @@
       'base-notifications',
       'proposable',
       'assertions_categories',
+      'relatedAssessmentsLoader',
     ],
     is_custom_attributable: true,
     isRoleable: true,

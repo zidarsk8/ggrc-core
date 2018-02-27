@@ -32,6 +32,7 @@
       attr_list: [
         {attr_title: 'Title', attr_name: 'title'},
         {attr_title: 'Code', attr_name: 'slug'},
+        {attr_title: 'State', attr_name: 'status'},
         {attr_title: 'Start Date', attr_name: 'start_date'},
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
         {
@@ -50,6 +51,10 @@
     sub_tree_view_options: {
       default_filter: ['Program'],
     },
+    defaults: {
+      status: 'Draft',
+    },
+    statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
       this._super && this._super.apply(this, arguments);
       this.validateNonBlank("title");

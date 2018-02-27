@@ -21,7 +21,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       'ownable', 'unique_title', 'ca_update',
       'autoStatusChangeable', 'timeboxed', 'mapping-limit',
       'inScopeObjects', 'accessControlList', 'refetchHash',
-      'issueTrackerIntegratable',
+      'issueTrackerIntegratable', 'relatedAssessmentsLoader',
     ],
     is_custom_attributable: true,
     isRoleable: true,
@@ -376,6 +376,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
               type: 'get',
               dataType: 'json',
             })
+          .then($.proxy(that.constructor, 'cleanupACL'))
           .then(function (model) {
             delete that._pending_refresh;
             if (model) {

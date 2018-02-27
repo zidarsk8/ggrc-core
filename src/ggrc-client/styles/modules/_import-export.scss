@@ -314,3 +314,21 @@ form.import {
 .remove_filter_group {
   margin: 0 0 5px 10px;
 }
+
+.quick-tips {
+  h4 {
+    margin-bottom: 20px;
+  }
+
+  ol {
+    margin-left: 15px;
+
+    > li {
+      margin-bottom: 10px;
+    }
+  }
+
+  li {
+    line-height: 25px;
+  }
+}

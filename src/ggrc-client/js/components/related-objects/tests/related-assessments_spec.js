@@ -4,15 +4,16 @@
  */
 
 import Component from '../related-assessments';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import * as caUtils from '../../../plugins/utils/ca-utils';
 
 describe('GGRC.Components.relatedAssessments', () => {
   describe('viewModel scope', () => {
     let originalModels;
     let viewModel;
 
-    beforeAll(() => {
-      let vmConfig = Component.prototype.viewModel;
-      viewModel = new (can.Map.extend(vmConfig));
+    beforeEach(() => {
+      viewModel = getComponentVM(Component);
     });
 
     describe('relativeObjectsTitle get() method', () => {
@@ -56,6 +57,67 @@ describe('GGRC.Components.relatedAssessments', () => {
         expectedTitle = `Related ${modelPlural}`;
 
         expect(viewModel.attr('relatedObjectsTitle')).toBe(expectedTitle);
+      });
+    });
+
+    describe('loadRelatedAssessments() method', () => {
+      const mockRelatedAsmtResponse = (response) => {
+        spyOn(viewModel.attr('instance'), 'getRelatedAssessments')
+          .and.returnValue(can.Deferred().resolve(response));
+      };
+
+      beforeEach(() => {
+        spyOn(caUtils, 'prepareCustomAttributes');
+
+        viewModel.attr('instance', {
+          getRelatedAssessments() {},
+        });
+      });
+
+      it('should not initialize the base array if response is empty',
+        (done) => {
+          mockRelatedAsmtResponse({
+            total: 0,
+            data: [],
+          });
+
+          viewModel.loadRelatedAssessments().then(() => {
+            expect(viewModel.attr('paging.total')).toEqual(0);
+            expect(viewModel.attr('relatedAssessments').length).toEqual(0);
+            done();
+          });
+        });
+
+      it('should initialize a base array', (done) => {
+        mockRelatedAsmtResponse({
+          total: 42,
+          data: [{}, {}, {}, {}],
+        });
+
+        viewModel.loadRelatedAssessments().then(() => {
+          let relAsmt = viewModel.attr('relatedAssessments');
+
+          expect(viewModel.attr('paging.total')).toEqual(42);
+          expect(relAsmt.length).toEqual(4);
+          expect(relAsmt.filter((el) => el.instance).length).toEqual(4);
+          done();
+        });
+      });
+
+      it('should reset the loading flag after an error', (done) => {
+        const relatedAssessments = viewModel.attr('relatedAssessments');
+
+        spyOn(viewModel.attr('instance'), 'getRelatedAssessments')
+          .and.returnValue(can.Deferred().reject());
+
+        spyOn(relatedAssessments, 'replace');
+
+        viewModel.loadRelatedAssessments().always(() => {
+          expect(relatedAssessments.replace).not.toHaveBeenCalled();
+          expect(caUtils.prepareCustomAttributes).not.toHaveBeenCalled();
+          expect(viewModel.attr('loading')).toEqual(false);
+          done();
+        });
       });
     });
   });
