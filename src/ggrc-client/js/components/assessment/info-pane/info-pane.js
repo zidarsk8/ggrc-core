@@ -94,10 +94,6 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
               this.instance.attr('issue_tracker.issue_url');
           },
         },
-        isSaving: {
-          type: 'boolean',
-          value: false,
-        },
         isLoading: {
           type: 'boolean',
           value: false,
@@ -445,7 +441,6 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
         } else {
           instance.attr('previousStatus', instance.attr('status'));
         }
-        instance.attr('isPending', true);
 
         instance.attr('status', isUndo ? previousStatus : newStatus);
         if (instance.attr('status') === 'In Review' && !isUndo) {
@@ -458,8 +453,7 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
           this.initializeFormFields();
           this.attr('onStateChangeDfd').resolve();
           stopFn();
-        }).always(() => instance.attr('isPending', false))
-          .fail(resetStatusOnConflict);
+        }).fail(resetStatusOnConflict);
       },
       saveGlobalAttributes: function (event) {
         const instance = this.attr('instance');
