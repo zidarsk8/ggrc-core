@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Component from '../add-template-field';
+import Component, * as Validations from '../add-template-field';
 
 describe('add-template-field component', () => {
   describe('addField() method', () => {
@@ -12,22 +12,6 @@ describe('add-template-field component', () => {
     let ev;
     let viewModel;
     let parentScope;
-    let originalAttrDefs;
-    let originalModelDefs;
-
-    beforeAll(() => {
-      originalAttrDefs = GGRC.custom_attr_defs;
-      originalModelDefs = GGRC.model_attr_defs;
-      GGRC.custom_attr_defs = [];
-      GGRC.model_attr_defs = {
-        Assessment: [],
-      };
-    });
-
-    afterAll(() => {
-      GGRC.custom_attr_defs = originalAttrDefs;
-      GGRC.model_attr_defs = originalModelDefs;
-    });
 
     beforeEach(() => {
       parentScope = new can.Map({
@@ -41,6 +25,8 @@ describe('add-template-field component', () => {
       ev = {
         preventDefault: jasmine.createSpy(),
       };
+
+      spyOn(viewModel, 'getValidators').and.returnValue([]);
     });
 
     it('does not require the "values" field to add a field of type Map:Person',
@@ -109,256 +95,65 @@ describe('add-template-field component', () => {
         }, 3);
       }
     );
-    it('requires the "title" field to add a field',
-      (done) => {
-        let selectedObj = new can.Map({
-          title: '',
-          type: 'Text',
-          values: '',
-        });
-        viewModel.attr('selected', selectedObj);
-        addField(viewModel, $el, ev);
-        setTimeout(() => {
-          expect(viewModel.fields.length).toEqual(0);
-          done();
-        }, 3);
-      }
-    );
   });
 
   describe('isEmptyTitle() method', () => {
     let isEmptyTitle; // the method under test
-    let result;
-    let selectedTitle;
 
     beforeAll(() => {
-      let parentScope = new can.Map({
-        attr: {},
-        fields: [],
-      });
-      let viewModel_ = Component.prototype.viewModel({}, parentScope);
-      isEmptyTitle = viewModel_.isEmptyTitle;
+      isEmptyTitle = Validations.isEmptyTitle;
     });
 
-    beforeEach(() => {
-      result = undefined;
+    it('should return error message', () => {
+      let selectedTitle = '';
+      let result = isEmptyTitle(selectedTitle);
+
+      expect(result).toEqual('A custom attribute title can not be blank');
     });
 
-    it('has not to allow to input empty titles',
-      (done) => {
-        selectedTitle = '';
+    it('should not return error message', () => {
+      let selectedTitle = 'my title';
+      let result = isEmptyTitle(selectedTitle);
 
-        result = isEmptyTitle(selectedTitle);
-
-        expect(result).toEqual(true);
-        done();
-      }
-    );
+      expect(result).toEqual('');
+    });
   });
 
   describe('isDublicateTitle() method', () => {
     let isDublicateTitle; // the method under test
-    let result;
-    let selectedTitle;
-    let fields;
 
     beforeAll(() => {
-      let parentScope = new can.Map({
-        attr: {},
-        fields: [],
-      });
-      let viewModel_ = Component.prototype.viewModel({}, parentScope);
-      isDublicateTitle = viewModel_.isDublicateTitle;
+      isDublicateTitle = Validations.isDublicateTitle;
     });
 
-    beforeEach(() => {
-      fields = new can.List();
-      result = undefined;
-    });
+    it('should return error message', () => {
+      const fields = [{
+        id: 123,
+        title: 'TiTlE',
+        attribute_type: 'Text',
+        multi_choice_options: '',
+      }];
+      const selectedTitle = 'title';
 
-    it('has to not allow to input titles that are already in "fields"',
-      (done) => {
-        fields.push({
-          id: 123,
-          title: 'title',
-          attribute_type: 'Text',
-          multi_choice_options: '',
-          opts: new can.Map(),
-        });
-        selectedTitle = 'title';
-
-        result = isDublicateTitle(fields, selectedTitle);
-
-        expect(result).toEqual(true);
-        done();
-      }
-    );
-
-    it('has to allow to input titles that are not in "fields"',
-      (done) => {
-        fields.push({
-          id: 123,
-          title: 'title',
-          attribute_type: 'Text',
-          multi_choice_options: '',
-          opts: new can.Map(),
-        });
-        selectedTitle = 'new title';
-
-        result = isDublicateTitle(fields, selectedTitle);
-
-        expect(result).toEqual(false);
-        done();
-      }
-    );
-  });
-
-  describe('isInvalidValues() method', () => {
-    let isInvalidValues; // the method under test
-    let valueAttrs;
-    let result;
-    let parentScope;
-    let viewModel_;
-
-    beforeAll(() => {
-      valueAttrs = ['Dropdown'];
-      parentScope = new can.Map({
-        attr: {},
-        fields: [],
-      });
-      viewModel_ = Component.prototype.viewModel({}, parentScope);
-      isInvalidValues = viewModel_.isInvalidValues;
-    });
-
-    beforeEach(() => {
-      result = undefined;
-    });
-
-    it('has to not allow to input type "Dropdown" with not set values',
-      (done) => {
-        result = isInvalidValues(valueAttrs, 'Dropdown', '');
-        expect(result).toEqual(true);
-        done();
-      }
-    );
-
-    it('has to allow to input type "Dropdown" with set values',
-      (done) => {
-        result = isInvalidValues(valueAttrs, 'DropDown', 'some values');
-        expect(result).toEqual(false);
-        done();
-      }
-    );
-
-    it('has to allow to input type "Text" with not set values',
-      (done) => {
-        result = isInvalidValues(valueAttrs, 'Text', '');
-        expect(result).toEqual(false);
-        done();
-      }
-    );
-  });
-
-  describe('isTitleInvalid() method', () => {
-    let viewModel;
-    let isTitleInvalid;
-
-    beforeAll(() => {
-      const parentScope = new can.Map({
-        attr: {},
-        fields: [],
-      });
-      viewModel = Component.prototype.viewModel({}, parentScope);
-      isTitleInvalid = viewModel.isTitleInvalid.bind(viewModel);
-    });
-
-    beforeEach(() => {
-      viewModel.attr('selected.invalidTitleError', '');
-    });
-
-    function setupIsEmptyTitle() {
-      spyOn(viewModel, 'isEmptyTitle').and
-        .callFake((title) => !title);
-    }
-
-    function setupIsDublicateTitle() {
-      spyOn(viewModel, 'isDublicateTitle').and
-        .callFake((fields, title) => _.contains(fields, title));
-    }
-
-    it('should return false. correct value', () => {
-      setupIsEmptyTitle();
-      setupIsDublicateTitle();
-      spyOn(viewModel, 'isReservedByCustomAttr').and.returnValue(false);
-      spyOn(viewModel, 'isReservedByModelAttr').and.returnValue(false);
-
-      const result = isTitleInvalid('my title', []);
-      expect(result).toBeFalsy();
-      expect(viewModel.attr('selected.invalidTitleError')).toEqual('');
-      expect(viewModel.isEmptyTitle).toHaveBeenCalled();
-      expect(viewModel.isDublicateTitle).toHaveBeenCalled();
-      expect(viewModel.isReservedByCustomAttr).toHaveBeenCalled();
-      expect(viewModel.isReservedByModelAttr).toHaveBeenCalled();
-    });
-
-    it('should return true. empty value', () => {
-      setupIsEmptyTitle();
-      setupIsDublicateTitle();
-      const result = isTitleInvalid('', []);
-
-      expect(result).toBeTruthy();
-      expect(viewModel.attr('selected.invalidTitleError'))
-        .toEqual('A custom attribute title can not be blank');
-      expect(viewModel.isEmptyTitle).toHaveBeenCalled();
-      expect(viewModel.isDublicateTitle).not.toHaveBeenCalled();
-    });
-
-    it('should return true. duplicated value', () => {
-      setupIsEmptyTitle();
-      setupIsDublicateTitle();
-      const result = isTitleInvalid('my title', ['my title']);
-
-      expect(result).toBeTruthy();
-      expect(viewModel.attr('selected.invalidTitleError'))
+      expect(isDublicateTitle(fields, selectedTitle))
         .toEqual('A custom attribute with this title already exists');
-      expect(viewModel.isEmptyTitle).toHaveBeenCalled();
-      expect(viewModel.isDublicateTitle).toHaveBeenCalled();
     });
 
-    it('should return true. name reserved by custom att', () => {
-      setupIsEmptyTitle();
-      setupIsDublicateTitle();
-      spyOn(viewModel, 'isReservedByCustomAttr').and.returnValue(true);
-      const result = isTitleInvalid('new_checkbox');
+    it('should not return error message', () => {
+      const fields = [{
+        id: 123,
+        title: 'title',
+        attribute_type: 'Text',
+        multi_choice_options: '',
+      }];
+      const selectedTitle = 'new title';
 
-      expect(result).toBeTruthy();
-      expect(viewModel.attr('selected.invalidTitleError'))
-        .toEqual('Custom attribute with such name already exists');
-      expect(viewModel.isEmptyTitle).toHaveBeenCalled();
-      expect(viewModel.isDublicateTitle).toHaveBeenCalled();
-      expect(viewModel.isReservedByCustomAttr).toHaveBeenCalled();
-    });
-
-    it('should return true. name reserved by model att', () => {
-      setupIsEmptyTitle();
-      setupIsDublicateTitle();
-      spyOn(viewModel, 'isReservedByCustomAttr').and.returnValue(false);
-      spyOn(viewModel, 'isReservedByModelAttr').and.returnValue(true);
-      const result = isTitleInvalid('code');
-
-      expect(result).toBeTruthy();
-      expect(viewModel.attr('selected.invalidTitleError'))
-        .toEqual('Attribute with such name already exists');
-      expect(viewModel.isEmptyTitle).toHaveBeenCalled();
-      expect(viewModel.isDublicateTitle).toHaveBeenCalled();
-      expect(viewModel.isReservedByCustomAttr).toHaveBeenCalled();
-      expect(viewModel.isReservedByModelAttr).toHaveBeenCalled();
+      expect(isDublicateTitle(fields, selectedTitle)).toEqual('');
     });
   });
 
   describe('isReservedByCustomAttr() method', () => {
     let originalAttrDefs;
-    let viewModel;
     let method;
 
     beforeAll(() => {
@@ -369,35 +164,26 @@ describe('add-template-field component', () => {
           title: 'New Checkbox',
         },
       ];
+
+      method = Validations.isReservedByCustomAttr;
     });
 
     afterAll(() => {
       GGRC.custom_attr_defs = originalAttrDefs;
     });
 
-    beforeEach(() => {
-      const parentScope = new can.Map({
-        attr: {},
-        fields: [],
-      });
-      viewModel = Component.prototype.viewModel({}, parentScope);
-      method = viewModel.isReservedByCustomAttr.bind(viewModel);
+    it('should not return error message', () => {
+      expect(method('my title')).toEqual('');
     });
 
-    it('should return false. Title is not reserved', () => {
-      const result = method('my title');
-      expect(result).toBeFalsy();
-    });
-
-    it('should return true. Reserved by custom attribute', () => {
-      const result = method('new checkbox');
-      expect(result).toBeTruthy();
+    it('should return error message', () => {
+      expect(method('new checkbox'))
+        .toEqual('Custom attribute with such name already exists');
     });
   });
 
   describe('isReservedByModelAttr() method', () => {
     let originalModelDefs;
-    let viewModel;
     let method;
 
     beforeAll(() => {
@@ -407,11 +193,27 @@ describe('add-template-field component', () => {
           {display_name: 'Code'},
         ],
       };
+
+      method = Validations.isReservedByModelAttr;
     });
 
     afterAll(() => {
       GGRC.model_attr_defs = originalModelDefs;
     });
+
+    it('should not return error message', () => {
+      expect(method('my title')).toEqual('');
+    });
+
+    it('should return error message', () => {
+      expect(method('code'))
+        .toEqual('Attribute with such name already exists');
+    });
+  });
+
+  describe('validateValues() method', () => {
+    let validateValues; // the method under test
+    let viewModel;
 
     beforeEach(() => {
       const parentScope = new can.Map({
@@ -419,17 +221,138 @@ describe('add-template-field component', () => {
         fields: [],
       });
       viewModel = Component.prototype.viewModel({}, parentScope);
-      method = viewModel.isReservedByModelAttr.bind(viewModel);
+      validateValues = viewModel.validateValues;
     });
 
-    it('should return false. Title is not reserved', () => {
-      const result = method('my title');
-      expect(result).toBeFalsy();
+    it('has to not allow to input type "Dropdown" with not set values', () => {
+      validateValues(viewModel, 'Dropdown', '');
+      expect(viewModel.attr('selected.invalidValues')).toBeTruthy();
     });
 
-    it('should return true. Reserved by model attribute', () => {
-      const result = method('code');
-      expect(result).toBeTruthy();
+    it('has to allow to input type "Dropdown" with set values', () => {
+      validateValues(viewModel, 'DropDown', 'some values');
+      expect(viewModel.attr('selected.invalidValues')).toBeFalsy();
+    });
+
+    it('has to allow to input type "Text" with not set values', () => {
+      validateValues(viewModel, 'Text', '');
+      expect(viewModel.attr('selected.invalidValues')).toBeFalsy();
+    });
+  });
+
+  describe('validateTitle() method', () => {
+    let viewModel;
+    let validateTitle;
+
+    beforeAll(() => {
+      const parentScope = new can.Map({
+        attr: {},
+        fields: [],
+      });
+      viewModel = Component.prototype.viewModel({}, parentScope);
+      validateTitle = viewModel.validateTitle.bind(viewModel);
+    });
+
+    beforeEach(() => {
+      viewModel.attr('selected.invalidTitleError', '');
+    });
+
+    function getTitleError() {
+      return viewModel.attr('selected.invalidTitleError');
+    }
+
+    function setupSpies(caErrorMsg, modelAttrErrorMsg) {
+      spyOn(Validations, 'isEmptyTitle').and
+        .callFake((title) => !title ? 'empty val message' : '');
+
+      spyOn(Validations, 'isDublicateTitle').and
+        .callFake((fields, title) => {
+          return _.contains(fields, title) ?
+            'duplicates val message' :
+            '';
+        });
+
+      spyOn(Validations, 'isReservedByCustomAttr')
+        .and.returnValue(caErrorMsg);
+      spyOn(Validations, 'isReservedByModelAttr')
+        .and.returnValue(modelAttrErrorMsg);
+
+      spyOn(viewModel, 'getValidators').and
+        .callFake((title, fields) => {
+          return [
+            Validations.isEmptyTitle.bind(null, title),
+            Validations.isDublicateTitle.bind(null, fields, title),
+            Validations.isReservedByCustomAttr.bind(null, title),
+            Validations.isReservedByModelAttr.bind(null, title),
+          ];
+        });
+    }
+
+    it('should not set error message', () => {
+      setupSpies('', '');
+
+      let validators = viewModel.getValidators('my title', []);
+      validateTitle(validators);
+
+      expect(getTitleError()).toEqual('');
+      expect(Validations.isEmptyTitle).toHaveBeenCalled();
+      expect(Validations.isDublicateTitle).toHaveBeenCalled();
+      expect(Validations.isReservedByCustomAttr).toHaveBeenCalled();
+      expect(Validations.isReservedByModelAttr).toHaveBeenCalled();
+    });
+
+    it('should set "empty value" error message', () => {
+      setupSpies('', '');
+
+      let validators = viewModel.getValidators('', []);
+      validateTitle(validators);
+
+      expect(getTitleError()).toEqual('empty val message');
+      expect(Validations.isEmptyTitle).toHaveBeenCalled();
+      expect(Validations.isDublicateTitle).not.toHaveBeenCalled();
+      expect(Validations.isReservedByCustomAttr).not.toHaveBeenCalled();
+      expect(Validations.isReservedByModelAttr).not.toHaveBeenCalled();
+    });
+
+    it('should set "duplicated value" error message', () => {
+      setupSpies('', '');
+
+      let validators = viewModel.getValidators('my title', ['my title']);
+      validateTitle(validators);
+
+      expect(getTitleError()).toEqual('duplicates val message');
+      expect(Validations.isEmptyTitle).toHaveBeenCalled();
+      expect(Validations.isDublicateTitle).toHaveBeenCalled();
+      expect(Validations.isReservedByCustomAttr).not.toHaveBeenCalled();
+      expect(Validations.isReservedByModelAttr).not.toHaveBeenCalled();
+    });
+
+    it('should set "custom attr" error message', () => {
+      const expectedMessage = 'custom attr message';
+      setupSpies(expectedMessage, '');
+
+      let validators = viewModel.getValidators('new_checkbox', []);
+      validateTitle(validators);
+
+      expect(getTitleError()).toEqual(expectedMessage);
+      expect(Validations.isEmptyTitle).toHaveBeenCalled();
+      expect(Validations.isDublicateTitle).toHaveBeenCalled();
+      expect(Validations.isReservedByCustomAttr).toHaveBeenCalled();
+      expect(Validations.isReservedByModelAttr).not.toHaveBeenCalled();
+    });
+
+    it('should set "model attr" error message', () => {
+      const expectedMessage = 'model attr message';
+      setupSpies('', expectedMessage);
+
+      let validators = viewModel.getValidators('code', []);
+      validateTitle(validators);
+
+      expect(getTitleError()).toEqual(expectedMessage);
+      expect(Validations.isEmptyTitle).toHaveBeenCalled();
+      expect(Validations.isDublicateTitle).toHaveBeenCalled();
+      expect(Validations.isReservedByCustomAttr).toHaveBeenCalled();
+      expect(Validations.isReservedByModelAttr).toHaveBeenCalled();
     });
   });
 });

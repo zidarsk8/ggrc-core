@@ -37,17 +37,17 @@ export default can.Component.extend({
         viewModel.attr('selected.invalidValues', false);
         viewModel.attr('selected.invalidTitleError', '');
 
-        let isInvalidTitle = this.isTitleInvalid(title, fields);
-        let isInvalidValue = this
-          .isInvalidValues(viewModel.valueAttrs, type, values);
+        let validators = this.getValidators(title, fields);
+        this.validateTitle(validators);
+        this.validateValues(viewModel, type, values);
 
-        if (isInvalidTitle || isInvalidValue) {
-          if (isInvalidValue) {
-            viewModel.attr('selected.invalidValues', true);
-          }
-
+        if (
+          viewModel.attr('selected.invalidValues') ||
+          viewModel.attr('selected.invalidTitleError')
+        ) {
           return;
         }
+
         // We need to defer adding in modal since validation is preventing
         // on adding the first item
         _.defer(() => {
@@ -63,72 +63,28 @@ export default can.Component.extend({
             });
         });
       },
-      isInvalidValues(valueAttrs, type, values) {
-        return _.contains(valueAttrs, type) && !values;
+      validateValues(viewModel, type, values) {
+        let invalidValues = _.contains(viewModel.valueAttrs, type) && !values;
+        viewModel.attr('selected.invalidValues', invalidValues);
       },
-      isDublicateTitle(fields, selectedTitle) {
-        let duplicateField = _.some(fields, (item) => {
-          return item.title === selectedTitle && !item._pending_delete;
-        });
-        return fields.length && duplicateField;
+      validateTitle(validators) {
+        const errorMessage = validators.reduce((prev, next) => {
+          if (prev) {
+            return prev;
+          }
+
+          return next();
+        }, '');
+
+        this.attr('selected.invalidTitleError', errorMessage);
       },
-      isEmptyTitle(selectedTitle) {
-        return !selectedTitle;
-      },
-      isEqualTitle(title, attr) {
-        return attr && attr.toLowerCase() === title.toLowerCase();
-      },
-      isReservedByCustomAttr(title) {
-        const customAttrs = GGRC.custom_attr_defs
-          .filter((attr) =>
-            attr.definition_type && attr.definition_type === 'assessment'
-          ).filter((attr) =>
-            this.isEqualTitle(title, attr.title)
-          );
-
-        return customAttrs.length;
-      },
-      isReservedByModelAttr(title) {
-        const modelAttrs = GGRC.model_attr_defs.Assessment.filter(
-          (attr) => this.isEqualTitle(title, attr.display_name)
-        );
-
-        return modelAttrs.length;
-      },
-      isTitleInvalid(title, fields) {
-        if (this.isEmptyTitle(title)) {
-          this.attr(
-            'selected.invalidTitleError',
-            'A custom attribute title can not be blank'
-          );
-          return true;
-        }
-
-        if (this.isDublicateTitle(fields, title)) {
-          this.attr(
-            'selected.invalidTitleError',
-            'A custom attribute with this title already exists'
-          );
-          return true;
-        }
-
-        if (this.isReservedByCustomAttr(title)) {
-          this.attr(
-            'selected.invalidTitleError',
-            'Custom attribute with such name already exists'
-          );
-          return true;
-        }
-
-        if (this.isReservedByModelAttr(title)) {
-          this.attr(
-            'selected.invalidTitleError',
-            'Attribute with such name already exists'
-          );
-          return true;
-        }
-
-        return false;
+      getValidators(title, fields) {
+        return [
+          isEmptyTitle.bind(null, title),
+          isDublicateTitle.bind(null, fields, title),
+          isReservedByCustomAttr.bind(null, title),
+          isReservedByModelAttr.bind(null, title),
+        ];
       },
     });
   },
@@ -160,3 +116,53 @@ export default can.Component.extend({
     },
   },
 });
+
+const isEqualTitle = (title, attr) => {
+  return attr && attr.toLowerCase() === title.toLowerCase();
+};
+
+const isDublicateTitle = (fields, selectedTitle) => {
+  let duplicateField = _.some(fields, (item) => {
+    return item.title.toLowerCase() === selectedTitle.toLowerCase() &&
+      !item._pending_delete;
+  });
+  return fields.length && duplicateField ?
+    'A custom attribute with this title already exists' :
+    '';
+};
+
+const isEmptyTitle = (selectedTitle) => {
+  return !selectedTitle ?
+    'A custom attribute title can not be blank' :
+    '';
+};
+
+const isReservedByCustomAttr = (title) => {
+  const customAttrs = GGRC.custom_attr_defs
+    .filter((attr) =>
+      attr.definition_type && attr.definition_type === 'assessment'
+    ).filter((attr) =>
+      isEqualTitle(title, attr.title)
+    );
+
+  return customAttrs.length ?
+    'Custom attribute with such name already exists' :
+    '';
+};
+
+const isReservedByModelAttr = (title) => {
+  const modelAttrs = GGRC.model_attr_defs.Assessment.filter(
+    (attr) => isEqualTitle(title, attr.display_name)
+  );
+
+  return modelAttrs.length ?
+    'Attribute with such name already exists' :
+    '';
+};
+
+export {
+  isDublicateTitle,
+  isEmptyTitle,
+  isReservedByCustomAttr,
+  isReservedByModelAttr,
+};
