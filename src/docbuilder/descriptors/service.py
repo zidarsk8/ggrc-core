@@ -53,7 +53,6 @@ MOCK_DATA = {
     'verified_date': 'null',
     'audit_firm': '{{ "id": 1, "type": "OrgGroup"}}',
     'program': '{{ "id": 1, "type": "Program"}}',
-    'snapshotted_objects': '[]',
 }
 
 
