@@ -127,6 +127,9 @@ class ProgramRolesHandler(object):
     """Handle audit propagation"""
     acl_manager = self.access_control_list_manager
     audit = acl.object
+    # When role propagation is migrated to sql steatements and the
+    # aduit.snapshotted_objects line is removed, the Snapshotable mixin can
+    # be removed as well.
     for snapshot in audit.snapshotted_objects:
       acl_manager.get_or_create(
           snapshot, acl, acl.person, acl.ac_role_id)
