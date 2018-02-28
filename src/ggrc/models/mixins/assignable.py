@@ -9,8 +9,6 @@ Creators, etc.
 
 from collections import defaultdict
 
-from ggrc.access_control.role import get_custom_roles_for
-
 
 class Assignable(object):
   """Mixin for models with assignees"""
@@ -26,20 +24,7 @@ class Assignable(object):
     """
     assignees = defaultdict(list)
     for acl in self.access_control_list:
-      if acl.ac_role.name in self.assignee_roles:
+      if acl.ac_role.name in self.ASSIGNEE_TYPES:
         assignees[acl.person].append(acl.ac_role.name)
 
     return assignees
-
-  @property
-  def assignee_roles(self):
-    """Returns assignee roles.
-
-    Returns:
-      A dictionary with assignee role name and id.
-    """
-    return {
-        role_name: role_id
-        for role_id, role_name in get_custom_roles_for(self.type).iteritems()
-        if role_name in self.ASSIGNEE_TYPES
-    }
