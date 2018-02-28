@@ -13,7 +13,7 @@ from collections import defaultdict
 class Assignable(object):
   """Mixin for models with assignees"""
 
-  ASSIGNEE_TYPES = ("Creators", "Assignees", "Verifiers")
+  ASSIGNEE_TYPES = {"Creators", "Assignees", "Verifiers"}
 
   @property
   def assignees(self):
