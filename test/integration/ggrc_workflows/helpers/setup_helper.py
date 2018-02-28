@@ -18,12 +18,13 @@ from integration.ggrc_workflows.helpers import rbac_helper
 class GlobalSetup(object):  # pylint: disable=too-few-public-methods
   """Setup helper for Global GGRC objects setup."""
 
-  def _setup_person(self, g_rname, email):
+  @classmethod
+  def setup_person(cls, g_rname, email):
     """Generate Person with Global Role using Factories.
 
     Args:
         g_rname: Global Role name for user.
-        email: future user email
+        email: Future user email.
     """
     person = factories.PersonFactory(email=email)
     bp_factories.UserRoleFactory(person=person,
@@ -71,7 +72,7 @@ class WorkflowSetup(GlobalSetup):  # pylint: disable=too-few-public-methods
         workflow: Workflow instance, in which scope person should have role.
     """
     email = self.gen_email(g_rname, wf_rname)
-    wf_person = self._setup_person(g_rname, email)
+    wf_person = self.setup_person(g_rname, email)
     wf_acr = role.get_ac_roles_for(all_models.Workflow.__name__)[wf_rname]
     factories.AccessControlListFactory(ac_role=wf_acr, object=workflow,
                                        person=wf_person)

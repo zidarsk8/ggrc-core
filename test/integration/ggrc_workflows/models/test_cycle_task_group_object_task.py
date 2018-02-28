@@ -286,10 +286,7 @@ class TestCycleTaskApiCalls(workflow_test_case.WorkflowTestCase):
     with factories.single_commit():
       wf_factories.CycleTaskFactory()
       email = self.setup_helper.gen_email(rbac_helper.GR_RNAME, "No Role")
-      person = factories.PersonFactory(email=email)
-      bp_factories.UserRoleFactory(
-          person=person, role=rbac_helper.G_ROLES[rbac_helper.GR_RNAME]
-      )
+      self.setup_helper.setup_person(rbac_helper.GR_RNAME, email)
 
     g_reader = all_models.Person.query.filter_by(email=email).one()
     self.api_helper.set_user(g_reader)

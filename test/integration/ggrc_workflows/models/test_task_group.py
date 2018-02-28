@@ -5,7 +5,6 @@
 from ggrc.models import all_models
 from ggrc_workflows import ac_roles
 from integration.ggrc.models import factories
-from integration.ggrc_basic_permissions.models import factories as bp_factories
 from integration.ggrc_workflows.helpers import rbac_helper
 from integration.ggrc_workflows.helpers import workflow_api
 from integration.ggrc_workflows.helpers import workflow_test_case
@@ -35,10 +34,7 @@ class TestTaskGroupApiCalls(workflow_test_case.WorkflowTestCase):
     with factories.single_commit():
       wf_factories.TaskGroupFactory()
       email = self.setup_helper.gen_email(rbac_helper.GR_RNAME, "No Role")
-      person = factories.PersonFactory(email=email)
-      bp_factories.UserRoleFactory(
-          person=person, role=rbac_helper.G_ROLES[rbac_helper.GR_RNAME]
-      )
+      self.setup_helper.setup_person(rbac_helper.GR_RNAME, email)
 
     g_reader = all_models.Person.query.filter_by(email=email).one()
     self.api_helper.set_user(g_reader)
