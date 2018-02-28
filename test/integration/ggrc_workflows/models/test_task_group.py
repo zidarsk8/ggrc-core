@@ -6,6 +6,7 @@ from ggrc.models import all_models
 from ggrc_workflows import ac_roles
 from integration.ggrc.models import factories
 from integration.ggrc_basic_permissions.models import factories as bp_factories
+from integration.ggrc_workflows.helpers import rbac_helper
 from integration.ggrc_workflows.helpers import workflow_api
 from integration.ggrc_workflows.helpers import workflow_test_case
 from integration.ggrc_workflows.models import factories as wf_factories
@@ -17,10 +18,10 @@ class TestTaskGroupApiCalls(workflow_test_case.WorkflowTestCase):
   def test_post_tg_g_editor_admin(self):
     """POST TaskGroup logged in as GlobalEditor & WF Admin."""
     with factories.single_commit():
-      self.setup_helper.setup_workflow((self.rbac_helper.GE_RNAME,))
+      self.setup_helper.setup_workflow((rbac_helper.GE_RNAME,))
 
     g_editor = self.setup_helper.get_workflow_person(
-        self.rbac_helper.GE_RNAME, ac_roles.workflow.ADMIN_NAME)
+        rbac_helper.GE_RNAME, ac_roles.workflow.ADMIN_NAME)
     self.api_helper.set_user(g_editor)
 
     workflow = all_models.Workflow.query.one()
@@ -33,11 +34,10 @@ class TestTaskGroupApiCalls(workflow_test_case.WorkflowTestCase):
     """GET TaskGroup collection logged in as GlobalReader & No Role."""
     with factories.single_commit():
       wf_factories.TaskGroupFactory()
-      email = self.setup_helper.gen_email(self.rbac_helper.GR_RNAME, "No Role")
+      email = self.setup_helper.gen_email(rbac_helper.GR_RNAME, "No Role")
       person = factories.PersonFactory(email=email)
       bp_factories.UserRoleFactory(
-          person=person,
-          role=self.rbac_helper.g_roles[self.rbac_helper.GR_RNAME]
+          person=person, role=rbac_helper.G_ROLES[rbac_helper.GR_RNAME]
       )
 
     g_reader = all_models.Person.query.filter_by(email=email).one()

@@ -14,6 +14,7 @@ from integration.ggrc import query_helper
 from integration.ggrc.models import factories
 from integration.ggrc_basic_permissions.models import factories as bp_factories
 from integration.ggrc_workflows import generator as wf_generator
+from integration.ggrc_workflows.helpers import rbac_helper
 from integration.ggrc_workflows.helpers import workflow_test_case
 from integration.ggrc_workflows.models import factories as wf_factories
 
@@ -284,11 +285,10 @@ class TestCycleTaskApiCalls(workflow_test_case.WorkflowTestCase):
     """GET CycleTask collection logged in as GlobalReader & No Role."""
     with factories.single_commit():
       wf_factories.CycleTaskFactory()
-      email = self.setup_helper.gen_email(self.rbac_helper.GR_RNAME, "No Role")
+      email = self.setup_helper.gen_email(rbac_helper.GR_RNAME, "No Role")
       person = factories.PersonFactory(email=email)
       bp_factories.UserRoleFactory(
-          person=person,
-          role=self.rbac_helper.g_roles[self.rbac_helper.GR_RNAME]
+          person=person, role=rbac_helper.G_ROLES[rbac_helper.GR_RNAME]
       )
 
     g_reader = all_models.Person.query.filter_by(email=email).one()

@@ -16,6 +16,7 @@ from integration.ggrc_workflows.models import factories
 from integration.ggrc import api_helper
 from integration.ggrc_basic_permissions.models import factories as bp_factories
 from integration.ggrc_workflows import generator as wf_generator
+from integration.ggrc_workflows.helpers import rbac_helper
 from integration.ggrc_workflows.helpers import workflow_test_case
 
 
@@ -321,11 +322,11 @@ class TestWorkflowApiCalls(workflow_test_case.WorkflowTestCase):
     """GET Workflow collection logged in as GlobalReader & No Role."""
     with glob_factories.single_commit():
       factories.WorkflowFactory()
-      email = self.setup_helper.gen_email(self.rbac_helper.GR_RNAME, "No Role")
+      email = self.setup_helper.gen_email(rbac_helper.GR_RNAME, "No Role")
       person = glob_factories.PersonFactory(email=email)
       bp_factories.UserRoleFactory(
           person=person,
-          role=self.rbac_helper.g_roles[self.rbac_helper.GR_RNAME]
+          role=rbac_helper.G_ROLES[rbac_helper.GR_RNAME]
       )
 
     g_reader = all_models.Person.query.filter_by(email=email).one()

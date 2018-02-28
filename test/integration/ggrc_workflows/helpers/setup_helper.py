@@ -12,17 +12,11 @@ from ggrc_workflows import ac_roles
 from integration.ggrc.models import factories
 from integration.ggrc_basic_permissions.models import factories as bp_factories
 from integration.ggrc_workflows.models import factories as wf_factories
+from integration.ggrc_workflows.helpers import rbac_helper
 
 
 class GlobalSetup(object):  # pylint: disable=too-few-public-methods
-  """Setup helper for Global GGRC objects setup.
-
-  Attributes:
-      rbac_helper: RBAC helper functions provider.
-  """
-
-  def __init__(self, rbac_helper):
-    self.rbac_helper = rbac_helper
+  """Setup helper for Global GGRC objects setup."""
 
   def _setup_person(self, g_rname, email):
     """Generate Person with Global Role using Factories.
@@ -33,7 +27,7 @@ class GlobalSetup(object):  # pylint: disable=too-few-public-methods
     """
     person = factories.PersonFactory(email=email)
     bp_factories.UserRoleFactory(person=person,
-                                 role=self.rbac_helper.g_roles[g_rname])
+                                 role=rbac_helper.G_ROLES[g_rname])
     return person
 
 
@@ -44,8 +38,7 @@ class WorkflowSetup(GlobalSetup):  # pylint: disable=too-few-public-methods
       email_template: String template to generate user with predictable email.
   """
 
-  def __init__(self, rbac_helper):
-    super(WorkflowSetup, self).__init__(rbac_helper)
+  def __init__(self):
     self.email_template = "GL_{g_rname}_WF_{wf_rname}_{rand_ascii}@google.com"
 
   def gen_email(self, g_rname, wf_rname):
