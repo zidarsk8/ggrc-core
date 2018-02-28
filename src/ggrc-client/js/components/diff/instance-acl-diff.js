@@ -4,6 +4,7 @@
  */
 
 import {buildModifiedACL} from '../../plugins/utils/object-history-utils';
+import {getRoleById} from '../../plugins/utils/acl-utils';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 import DiffBaseVM from './diff-base-vm';
 import template from './templates/instance-diff-items.mustache';
@@ -27,9 +28,7 @@ const viewModel = DiffBaseVM.extend({
       const currentRoleAcl = this.getRoleACL(currentAcl, roleId);
       const modifiedRoleAcl = this.getRoleACL(modifiedAcl, roleId);
 
-      const role = _.first(
-        GGRC.access_control_roles.filter((item) => item.id === roleId)
-      );
+      const role = getRoleById(roleId);
 
       if (!role) {
         return;

@@ -4,6 +4,7 @@
 */
 
 import {SAVE_CUSTOM_ROLE, ROLES_CONFLICT} from '../../events/eventTypes';
+import {getRolesForType} from '../../plugins/utils/acl-utils';
 
 export default GGRC.Components('relatedPeopleAccessControl', {
   tag: 'related-people-access-control',
@@ -150,22 +151,26 @@ export default GGRC.Components('relatedPeopleAccessControl', {
     },
     filterByIncludeExclude: function (includeRoles, excludeRoles) {
       const instance = this.attr('instance');
-      return GGRC.access_control_roles.filter((item) =>
-        item.object_type === instance.class.model_singular &&
-          _.indexOf(includeRoles, item.name) > -1 &&
-          _.indexOf(excludeRoles, item.name) === -1);
+      const objectRoles = getRolesForType(instance.class.model_singular);
+
+      return objectRoles.filter((item) => {
+        return _.indexOf(includeRoles, item.name) > -1 &&
+          _.indexOf(excludeRoles, item.name) === -1;
+      });
     },
     filterByInclude: function (includeRoles) {
       const instance = this.attr('instance');
-      return GGRC.access_control_roles.filter((item) =>
-        item.object_type === instance.class.model_singular &&
-          _.indexOf(includeRoles, item.name) > -1);
+      const objectRoles = getRolesForType(instance.class.model_singular);
+
+      return objectRoles.filter((item) =>
+        _.indexOf(includeRoles, item.name) > -1);
     },
     filterByExclude: function (excludeRoles) {
       const instance = this.attr('instance');
-      return GGRC.access_control_roles.filter((item) =>
-        item.object_type === instance.class.model_singular &&
-          _.indexOf(excludeRoles, item.name) === -1);
+      const objectRoles = getRolesForType(instance.class.model_singular);
+
+      return objectRoles.filter((item) =>
+        _.indexOf(excludeRoles, item.name) === -1);
     },
     getFilteredRoles: function () {
       const instance = this.attr('instance');
@@ -180,8 +185,7 @@ export default GGRC.Components('relatedPeopleAccessControl', {
       } else if (excludeRoles.length) {
         roles = this.filterByExclude(excludeRoles);
       } else {
-        roles = GGRC.access_control_roles.filter((item) =>
-          item.object_type === instance.class.model_singular);
+        roles = getRolesForType(instance.class.model_singular);
       }
 
       return roles;

@@ -3,8 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
- import {getClosestWeekday} from '../plugins/utils/date-util';
- import Permission from '../permission';
+import {getRole} from '../plugins/utils/acl-utils';
+import {getClosestWeekday} from '../plugins/utils/date-util';
+import Permission from '../permission';
 
 (function (can, GGRC) {
   'use strict';
@@ -117,10 +118,7 @@
 
     init: function () {
       let that = this;
-      let assigneeRole = _.find(GGRC.access_control_roles, {
-        object_type: 'TaskGroupTask',
-        name: 'Task Assignees',
-      });
+      let assigneeRole = getRole('TaskGroupTask', 'Task Assignees');
 
       if (this._super) {
         this._super.apply(this, arguments);

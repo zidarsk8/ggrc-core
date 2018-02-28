@@ -12,6 +12,9 @@ import {
   isMyAssessments,
   isAdmin,
 } from './plugins/utils/current-page-utils';
+import {
+  getRole,
+} from './plugins/utils/acl-utils';
 import RefreshQueue from './models/refresh_queue';
 import Permission from './permission';
 import _ from 'lodash';
@@ -1332,10 +1335,7 @@ Mustache.registerHelper("last_approved", function (instance, options) {
 });
 
 Mustache.registerHelper('with_is_reviewer', function (reviewTask, options) {
-  let assigneeRole = _.find(GGRC.access_control_roles, {
-    object_type: 'CycleTaskGroupObjectTask',
-    name: 'Task Assignees',
-  });
+  let assigneeRole = getRole('CycleTaskGroupObjectTask', 'Task Assignees');
   let currentUserId = GGRC.current_user.id;
   let isReviewer;
 
@@ -2435,8 +2435,7 @@ Mustache.registerHelper('displayAssessmentIssueTracker',
   }
 );
 Mustache.registerHelper('is_auditor', function (options) {
-  const auditor = GGRC.access_control_roles.find(
-    (role) => role.name === 'Auditors' && role.object_type === 'Audit');
+  const auditor = getRole('Audit', 'Auditors');
   const audit = GGRC.page_instance();
   if (audit.type !== 'Audit') {
     console.warn('is_auditor called on non audit page');

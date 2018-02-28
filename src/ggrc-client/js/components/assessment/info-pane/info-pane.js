@@ -43,6 +43,7 @@ import {
   CUSTOM_ATTRIBUTE_TYPE as CA_UTILS_CA_TYPE,
   convertValuesToFormFields,
 } from '../../../plugins/utils/ca-utils';
+import {getRole} from '../../../plugins/utils/acl-utils';
 import DeferredTransaction from '../../../plugins/utils/deferred-transaction-utils';
 import tracker from '../../../tracker';
 import {REFRESH_TAB_CONTENT,
@@ -504,12 +505,9 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
         this.attr('modal.state.open', true);
       },
       setVerifierRoleId: function () {
-        let verifierRoleIds = GGRC.access_control_roles
-          .filter((item) => item.object_type === 'Assessment' &&
-            item.name === 'Verifiers')
-          .map((item) => item.id);
+        let verifierRole = getRole('Assessment', 'Verifiers');
 
-        let verifierRoleId = _.head(verifierRoleIds);
+        let verifierRoleId = verifierRole ? verifierRole.id : null;
         this.attr('_verifierRoleId', verifierRoleId);
       },
     },

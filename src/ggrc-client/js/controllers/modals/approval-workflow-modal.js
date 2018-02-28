@@ -5,6 +5,7 @@
 
 import ModalsController from './modals_controller';
 import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
+import {getRole} from '../../plugins/utils/acl-utils';
 
 let ApprovalWorkflowErrors = function () {
   let errors = null;
@@ -34,14 +35,8 @@ let ApprovalWorkflow = can.Observe({
       'you to review newly created ${type} "${title}" before ${before}. ' +
       'Click <a href="${href}#workflows_widget">here</a> to perform a review.'
     );
-    let assigneeRole = _.find(GGRC.access_control_roles, {
-      object_type: 'TaskGroupTask',
-      name: 'Task Assignees',
-    });
-    var wfAdminRole = _.find(GGRC.access_control_roles, {
-      object_type: 'Workflow',
-      name: 'Admin',
-    });
+    let assigneeRole = getRole('TaskGroupTask', 'Task Assignees');
+    let wfAdminRole = getRole('Workflow', 'Admin');
 
     return aws_dfd.then(function (aws) {
       const createDefaultTaskGroup = false;

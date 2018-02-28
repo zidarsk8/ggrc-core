@@ -4,6 +4,7 @@
 */
 
 import Permission from '../../permission';
+import * as aclUtils from '../utils/acl-utils';
 
 'use strict';
 
@@ -156,12 +157,9 @@ describe('GGRC utils getAssigneeType() method', function () {
       access_control_list: [],
     };
 
-    GGRC.access_control_roles = [
+    spyOn(aclUtils, 'getRolesForType').and.returnValue([
       {
         id: 1, object_type: 'Assessment', name: 'Admin',
-      },
-      {
-        id: 2, object_type: 'Control', name: 'Verifiers',
       },
       {
         id: 3, object_type: 'Assessment', name: 'Verifiers',
@@ -172,11 +170,7 @@ describe('GGRC utils getAssigneeType() method', function () {
       {
         id: 5, object_type: 'Assessment', name: 'Assignees',
       },
-    ];
-  });
-
-  afterAll(function () {
-    delete GGRC.access_control_roles;
+    ]);
   });
 
   it('should return null. Empty ACL', function () {
