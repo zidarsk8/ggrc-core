@@ -23,6 +23,8 @@
 .object-area {
   padding-top: 20px;
   background: $contentBgnd;
+  height: calc(100% - 20px);
+
   &.import-area {
     margin-left: 0;
     .widget {
