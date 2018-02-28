@@ -4,77 +4,12 @@
 import inspect
 import sqlalchemy as sa
 
-from ggrc import db
-from ggrc import settings
 from ggrc.models import inflector
 from ggrc.models import reflection
 from ggrc.models.all_models import *  # noqa
 from ggrc.utils import html_cleaner
 
 """All GGRC model objects and associated utilities."""
-
-
-def create_db_with_create_all():
-  import ggrc.models.all_models  # noqa
-
-  db.create_all()
-
-
-def create_db_with_migrations(quiet=False):
-  from ggrc.migrate import upgradeall
-  import logging
-
-  if quiet:
-    logging.disable(logging.INFO)
-  upgradeall()
-
-  if quiet:
-    logging.disable(logging.NOTSET)
-
-
-def drop_db_with_drop_all():
-  import ggrc.models.all_models  # noqa
-
-  if 'mysql' in settings.SQLALCHEMY_DATABASE_URI:
-    db.engine.execute('SET FOREIGN_KEY_CHECKS = 0')
-
-  db.drop_all()
-
-
-def drop_db_with_migrations(quiet=False):
-  from ggrc.migrate import downgradeall
-  import ggrc.models.all_models  # noqa
-  import logging
-
-  if quiet:
-    logging.disable(logging.INFO)
-  if 'mysql' in settings.SQLALCHEMY_DATABASE_URI:
-    db.engine.execute('SET FOREIGN_KEY_CHECKS = 0')
-  downgradeall(drop_versions_table=True)
-  if quiet:
-    logging.disable(logging.NOTSET)
-  if 'mysql' in settings.SQLALCHEMY_DATABASE_URI:
-    db.engine.execute('SET FOREIGN_KEY_CHECKS = 1')
-
-
-def create_db(use_migrations=False, quiet=False):
-  if 'mysql' in settings.SQLALCHEMY_DATABASE_URI:
-    db.engine.execute('SET FOREIGN_KEY_CHECKS = 0')
-
-  if use_migrations:
-    create_db_with_migrations(quiet)
-  else:
-    create_db_with_create_all()
-
-  if 'mysql' in settings.SQLALCHEMY_DATABASE_URI:
-    db.engine.execute('SET FOREIGN_KEY_CHECKS = 1')
-
-
-def drop_db(use_migrations=False, quiet=False):
-  if use_migrations:
-    drop_db_with_migrations(quiet)
-  else:
-    drop_db_with_drop_all()
 
 
 def init_models(app):
