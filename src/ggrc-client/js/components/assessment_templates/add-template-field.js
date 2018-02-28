@@ -88,6 +88,13 @@ export default can.Component.extend({
 
         return customAttrs.length;
       },
+      isReservedByModelAttr(title) {
+        const modelAttrs = GGRC.model_attr_defs.Assessment.filter(
+          (attr) => this.isEqualTitle(title, attr.display_name)
+        );
+
+        return modelAttrs.length;
+      },
       isTitleInvalid(title, fields) {
         if (this.isEmptyTitle(title)) {
           this.attr(
@@ -109,6 +116,14 @@ export default can.Component.extend({
           this.attr(
             'selected.invalidTitleError',
             'Custom attribute with such name already exists'
+          );
+          return true;
+        }
+
+        if (this.isReservedByModelAttr(title)) {
+          this.attr(
+            'selected.invalidTitleError',
+            'Attribute with such name already exists'
           );
           return true;
         }

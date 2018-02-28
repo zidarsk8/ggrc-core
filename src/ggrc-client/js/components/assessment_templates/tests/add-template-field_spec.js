@@ -13,14 +13,20 @@ describe('add-template-field component', () => {
     let viewModel;
     let parentScope;
     let originalAttrDefs;
+    let originalModelDefs;
 
     beforeAll(() => {
       originalAttrDefs = GGRC.custom_attr_defs;
+      originalModelDefs = GGRC.model_attr_defs;
       GGRC.custom_attr_defs = [];
+      GGRC.model_attr_defs = {
+        Assessment: [],
+      };
     });
 
     afterAll(() => {
       GGRC.custom_attr_defs = originalAttrDefs;
+      GGRC.model_attr_defs = originalModelDefs;
     });
 
     beforeEach(() => {
@@ -284,6 +290,7 @@ describe('add-template-field component', () => {
       setupIsEmptyTitle();
       setupIsDublicateTitle();
       spyOn(viewModel, 'isReservedByCustomAttr').and.returnValue(false);
+      spyOn(viewModel, 'isReservedByModelAttr').and.returnValue(false);
 
       const result = isTitleInvalid('my title', []);
       expect(result).toBeFalsy();
@@ -291,6 +298,7 @@ describe('add-template-field component', () => {
       expect(viewModel.isEmptyTitle).toHaveBeenCalled();
       expect(viewModel.isDublicateTitle).toHaveBeenCalled();
       expect(viewModel.isReservedByCustomAttr).toHaveBeenCalled();
+      expect(viewModel.isReservedByModelAttr).toHaveBeenCalled();
     });
 
     it('should return true. empty value', () => {
@@ -330,6 +338,22 @@ describe('add-template-field component', () => {
       expect(viewModel.isDublicateTitle).toHaveBeenCalled();
       expect(viewModel.isReservedByCustomAttr).toHaveBeenCalled();
     });
+
+    it('should return true. name reserved by model att', () => {
+      setupIsEmptyTitle();
+      setupIsDublicateTitle();
+      spyOn(viewModel, 'isReservedByCustomAttr').and.returnValue(false);
+      spyOn(viewModel, 'isReservedByModelAttr').and.returnValue(true);
+      const result = isTitleInvalid('code');
+
+      expect(result).toBeTruthy();
+      expect(viewModel.attr('selected.invalidTitleError'))
+        .toEqual('Attribute with such name already exists');
+      expect(viewModel.isEmptyTitle).toHaveBeenCalled();
+      expect(viewModel.isDublicateTitle).toHaveBeenCalled();
+      expect(viewModel.isReservedByCustomAttr).toHaveBeenCalled();
+      expect(viewModel.isReservedByModelAttr).toHaveBeenCalled();
+    });
   });
 
   describe('isReservedByCustomAttr() method', () => {
@@ -367,6 +391,44 @@ describe('add-template-field component', () => {
 
     it('should return true. Reserved by custom attribute', () => {
       const result = method('new checkbox');
+      expect(result).toBeTruthy();
+    });
+  });
+
+  describe('isReservedByModelAttr() method', () => {
+    let originalModelDefs;
+    let viewModel;
+    let method;
+
+    beforeAll(() => {
+      originalModelDefs = GGRC.model_attr_defs;
+      GGRC.model_attr_defs = {
+        Assessment: [
+          {display_name: 'Code'},
+        ],
+      };
+    });
+
+    afterAll(() => {
+      GGRC.model_attr_defs = originalModelDefs;
+    });
+
+    beforeEach(() => {
+      const parentScope = new can.Map({
+        attr: {},
+        fields: [],
+      });
+      viewModel = Component.prototype.viewModel({}, parentScope);
+      method = viewModel.isReservedByModelAttr.bind(viewModel);
+    });
+
+    it('should return false. Title is not reserved', () => {
+      const result = method('my title');
+      expect(result).toBeFalsy();
+    });
+
+    it('should return true. Reserved by model attribute', () => {
+      const result = method('code');
       expect(result).toBeTruthy();
     });
   });
