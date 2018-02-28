@@ -6,7 +6,7 @@
 These should be used on default verifiers and default assignees.
 """
 
-from ggrc.models import AssessmentTemplate, Person
+from ggrc.models import all_models
 from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
 
@@ -22,7 +22,7 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
   PEOPLE_LABELS_MAP = {
       display_name.lower(): value
       for value, display_name
-      in AssessmentTemplate.DEFAULT_PEOPLE_LABELS.items()
+      in all_models.AssessmentTemplate.DEFAULT_PEOPLE_LABELS.items()
   }
 
   def _parse_email_values(self):
@@ -35,7 +35,7 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
     # If the feature is used actively, it should be refactored
     # and optimized.
     new_objects = self.row_converter.block_converter.converter.new_objects
-    new_people = new_objects[Person]
+    new_people = new_objects[all_models.Person]
 
     people = []
     emails = []
@@ -121,6 +121,8 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
       # field from each row that contains people list.
       # If the feature is used actively, it should be refactored
       # and optimized.
-      people = Person.query.filter(Person.id.in_(value)).all()
+      people = all_models.Person.query.filter(
+          all_models.Person.id.in_(value),
+      ).all()
       value = "\n".join(p.email for p in people)
     return value
