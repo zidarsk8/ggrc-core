@@ -12,6 +12,16 @@ describe('add-template-field component', () => {
     let ev;
     let viewModel;
     let parentScope;
+    let originalAttrDefs;
+
+    beforeAll(() => {
+      originalAttrDefs = GGRC.custom_attr_defs;
+      GGRC.custom_attr_defs = [];
+    });
+
+    afterAll(() => {
+      GGRC.custom_attr_defs = originalAttrDefs;
+    });
 
     beforeEach(() => {
       parentScope = new can.Map({
@@ -245,11 +255,10 @@ describe('add-template-field component', () => {
 
   describe('isTitleInvalid() method', () => {
     let viewModel;
-    let parentScope;
     let isTitleInvalid;
 
     beforeAll(() => {
-      parentScope = new can.Map({
+      const parentScope = new can.Map({
         attr: {},
         fields: [],
       });
@@ -274,12 +283,14 @@ describe('add-template-field component', () => {
     it('should return false. correct value', () => {
       setupIsEmptyTitle();
       setupIsDublicateTitle();
+      spyOn(viewModel, 'isReservedByCustomAttr').and.returnValue(false);
 
       const result = isTitleInvalid('my title', []);
       expect(result).toBeFalsy();
       expect(viewModel.attr('selected.invalidTitleError')).toEqual('');
       expect(viewModel.isEmptyTitle).toHaveBeenCalled();
       expect(viewModel.isDublicateTitle).toHaveBeenCalled();
+      expect(viewModel.isReservedByCustomAttr).toHaveBeenCalled();
     });
 
     it('should return true. empty value', () => {
@@ -304,6 +315,59 @@ describe('add-template-field component', () => {
         .toEqual('A custom attribute with this title already exists');
       expect(viewModel.isEmptyTitle).toHaveBeenCalled();
       expect(viewModel.isDublicateTitle).toHaveBeenCalled();
+    });
+
+    it('should return true. name reserved by custom att', () => {
+      setupIsEmptyTitle();
+      setupIsDublicateTitle();
+      spyOn(viewModel, 'isReservedByCustomAttr').and.returnValue(true);
+      const result = isTitleInvalid('new_checkbox');
+
+      expect(result).toBeTruthy();
+      expect(viewModel.attr('selected.invalidTitleError'))
+        .toEqual('Custom attribute with such name already exists');
+      expect(viewModel.isEmptyTitle).toHaveBeenCalled();
+      expect(viewModel.isDublicateTitle).toHaveBeenCalled();
+      expect(viewModel.isReservedByCustomAttr).toHaveBeenCalled();
+    });
+  });
+
+  describe('isReservedByCustomAttr() method', () => {
+    let originalAttrDefs;
+    let viewModel;
+    let method;
+
+    beforeAll(() => {
+      originalAttrDefs = GGRC.custom_attr_defs;
+      GGRC.custom_attr_defs = [
+        {
+          definition_type: 'assessment',
+          title: 'New Checkbox',
+        },
+      ];
+    });
+
+    afterAll(() => {
+      GGRC.custom_attr_defs = originalAttrDefs;
+    });
+
+    beforeEach(() => {
+      const parentScope = new can.Map({
+        attr: {},
+        fields: [],
+      });
+      viewModel = Component.prototype.viewModel({}, parentScope);
+      method = viewModel.isReservedByCustomAttr.bind(viewModel);
+    });
+
+    it('should return false. Title is not reserved', () => {
+      const result = method('my title');
+      expect(result).toBeFalsy();
+    });
+
+    it('should return true. Reserved by custom attribute', () => {
+      const result = method('new checkbox');
+      expect(result).toBeTruthy();
     });
   });
 });

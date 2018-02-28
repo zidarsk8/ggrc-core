@@ -75,6 +75,19 @@ export default can.Component.extend({
       isEmptyTitle(selectedTitle) {
         return !selectedTitle;
       },
+      isEqualTitle(title, attr) {
+        return attr && attr.toLowerCase() === title.toLowerCase();
+      },
+      isReservedByCustomAttr(title) {
+        const customAttrs = GGRC.custom_attr_defs
+          .filter((attr) =>
+            attr.definition_type && attr.definition_type === 'assessment'
+          ).filter((attr) =>
+            this.isEqualTitle(title, attr.title)
+          );
+
+        return customAttrs.length;
+      },
       isTitleInvalid(title, fields) {
         if (this.isEmptyTitle(title)) {
           this.attr(
@@ -88,6 +101,14 @@ export default can.Component.extend({
           this.attr(
             'selected.invalidTitleError',
             'A custom attribute with this title already exists'
+          );
+          return true;
+        }
+
+        if (this.isReservedByCustomAttr(title)) {
+          this.attr(
+            'selected.invalidTitleError',
+            'Custom attribute with such name already exists'
           );
           return true;
         }
