@@ -139,3 +139,26 @@ def get_cycle_task_entry_post_dict(cycle_task):
           "description": factories.random_str(length=64),
       }
   }
+
+
+def get_task_group_clone_dict(source_task_group, clone_objects=False,
+                              clone_tasks=False, clone_people=False):
+  """Get TaskGroup JSON for clone operation for POST API call.
+
+  Args:
+      source_task_group: Source TaskGroup instance.
+      clone_objects: Shows is mapped objects should be cloned.
+      clone_tasks: Shows is related tasks should be cloned.
+      clone_people: Shows is assigned people should be cloned.
+  Returns:
+      TaskGroup clone operation representation for using in POST request.
+  """
+  return {
+      "task_group": {
+          "clone": source_task_group.id,
+          "context": None,
+          "clone_objects": clone_objects,
+          "clone_tasks": clone_tasks,
+          "clone_people": clone_people,
+      }
+  }

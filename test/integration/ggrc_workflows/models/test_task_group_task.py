@@ -2,6 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """TaskGroupTask model related tests."""
 
+import ddt
+
 from ggrc.models import all_models
 from ggrc_workflows import ac_roles
 from integration.ggrc.models import factories
@@ -11,21 +13,28 @@ from integration.ggrc_workflows.helpers import workflow_test_case
 from integration.ggrc_workflows.models import factories as wf_factories
 
 
+@ddt.ddt
 class TestTaskApiCalls(workflow_test_case.WorkflowTestCase):
   """Tests related to TaskGroupTask REST API calls."""
 
-  def test_create_task_g_editor_admin(self):
-    """POST TaskGroupTask logged in as GlobalEditor & WF Admin."""
+  @ddt.data(
+      rbac_helper.GA_RNAME,
+      rbac_helper.GE_RNAME,
+      rbac_helper.GR_RNAME,
+      rbac_helper.GC_RNAME,
+  )
+  def test_post_task_g_role_admin(self, g_rname):
+    """POST TaskGroupTask logged in as {} & WF Admin."""
     with factories.single_commit():
-      workflow = self.setup_helper.setup_workflow((rbac_helper.GE_RNAME,))
+      workflow = self.setup_helper.setup_workflow((g_rname,))
       wf_factories.TaskGroupFactory(workflow=workflow)
 
-    g_editor = self.setup_helper.get_workflow_person(
-        rbac_helper.GE_RNAME, ac_roles.workflow.ADMIN_NAME)
-    self.api_helper.set_user(g_editor)
+    g_person = self.setup_helper.get_workflow_person(
+        g_rname, ac_roles.workflow.ADMIN_NAME)
+    self.api_helper.set_user(g_person)
 
     task_group = all_models.TaskGroup.query.one()
-    people_roles = {ac_roles.task.ASSIGNEE_NAME: g_editor}
+    people_roles = {ac_roles.task.ASSIGNEE_NAME: g_person}
 
     data = workflow_api.get_task_post_dict(
         task_group, people_roles, "2018-01-01", "2018-01-02")
