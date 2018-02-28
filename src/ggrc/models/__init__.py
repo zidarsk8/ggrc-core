@@ -6,6 +6,7 @@ import sqlalchemy as sa
 
 from ggrc.models import inflector
 from ggrc.models import reflection
+from ggrc.models import all_models
 from ggrc.models.all_models import *  # noqa
 from ggrc.utils import html_cleaner
 
@@ -13,8 +14,7 @@ from ggrc.utils import html_cleaner
 
 
 def init_models(app):
-  from ggrc.models.all_models import all_models  # noqa
-  for model in all_models:
+  for model in all_models.all_models:
     inflector.register_inflections(model._inflector)
 
 
@@ -53,7 +53,6 @@ def init_lazy_mixins():
   useful in cases where we need full model class, e.g. to hook up signaling
   logic.
   """
-  from ggrc.models import all_models
   for model in all_models.all_models:
     # MRO chain includes base model that we don't want to include here
     mixins = (mixin for mixin in inspect.getmro(model) if mixin != model)
