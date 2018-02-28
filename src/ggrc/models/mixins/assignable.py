@@ -9,8 +9,10 @@ Creators, etc.
 
 from collections import defaultdict
 
+from ggrc.access_control.roleable import Roleable
 
-class Assignable(object):
+
+class Assignable(Roleable):
   """Mixin for models with assignees"""
 
   ASSIGNEE_TYPES = {"Creators", "Assignees", "Verifiers"}
