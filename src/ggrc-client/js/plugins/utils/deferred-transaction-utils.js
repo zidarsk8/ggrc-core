@@ -24,16 +24,16 @@ export default function (completeTransaction, timeout, sequentially) {
     });
   }
 
-  function resolveBatch(batch, batchDfd, result) {
+  function resolveBatch(batch, batchDfd, ...result) {
     can.each(batch, function (actionItem) {
-      actionItem.deferred.resolve(result);
+      actionItem.deferred.resolve(...result);
     });
     batchDfd.resolve();
   }
 
-  function rejectBatch(batch, batchDfd, result) {
+  function rejectBatch(batch, batchDfd, ...result) {
     can.each(batch, function (actionItem) {
-      actionItem.deferred.reject(result);
+      actionItem.deferred.reject(...result);
     });
     batchDfd.resolve();
   }
