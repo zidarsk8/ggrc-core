@@ -252,6 +252,23 @@ class TestClonable(SnapshotterBaseTestCase):
     )
     self.assertEqual(response.status_code, code)
 
+  def test_collect_mapped(self):
+    """Test collecting of mapped objects"""
+    related_objs = []
+    templates = []
+    # pylint: disable=protected-access
+    with factories.single_commit():
+      for _ in range(3):
+        template = factories.AssessmentTemplateFactory()
+        templates.append(template)
+        for _ in range(3):
+          control = factories.ControlFactory()
+          factories.RelationshipFactory(source=template, destination=control)
+          related_objs.append((template, control))
+
+    result = models.AssessmentTemplate._collect_mapped(templates, ["Control"])
+    self.assertEquals(result, related_objs)
+
   def test_multiple_templates_clone(self):
     """Test multiple assessment templates cloning"""
     template_ids = []
