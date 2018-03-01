@@ -18,7 +18,7 @@ def init_hook():
     # pylint: disable=unused-argument
     for role_id, role_name in role.get_custom_roles_for(target.type).items():
       user = get_current_user()
-      if role_name == "Admin" and not user.is_anonymous():
+      if role_name == "Admin":
         AccessControlList(
             ac_role_id=role_id,
             person=user,
