@@ -14,6 +14,7 @@ from sqlalchemy.orm.session import Session
 from ggrc.models.hooks.acl import audit_roles
 from ggrc.models.hooks.acl import program_roles
 from ggrc.models.hooks.acl import relationship_deletion
+from ggrc_workflows.models.hooks import workflow
 
 
 def after_flush(session, _):
@@ -24,6 +25,7 @@ def after_flush(session, _):
   audit_role_handler = audit_roles.AuditRolesHandler()
   audit_role_handler.after_flush(session)
   relationship_deletion.after_flush(session)
+  workflow.handle_acl_changes(session)
 
 
 def init_hook():
