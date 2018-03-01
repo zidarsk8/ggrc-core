@@ -9,6 +9,7 @@ import {hasWarningType} from '../../plugins/utils/controllers';
 import {importRequest} from './import-export-utils';
 import '../show-more/show-more';
 import '../import-export/download-template/download-template';
+import '../collapsible-panel/collapsible-panel';
 import quickTips from './templates/quick-tips.mustache';
 import template from './templates/csv-import.mustache';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
@@ -25,6 +26,7 @@ export default can.Component.extend({
     fileName: '',
     isLoading: false,
     state: 'select',
+    importStatus: '',
     helpUrl: GGRC.config.external_import_help_url,
     states: function () {
       let state = this.attr('state') || 'select';
@@ -111,18 +113,26 @@ export default can.Component.extend({
       };
     },
     processLoadedInfo: function (data) {
-      this.attr('import', _.map(data, function (element) {
+      this.attr('import', _.map(data, (element) => {
         element.data = [];
-        if (element.block_errors.concat(element.row_errors).length) {
+        if (element.block_warnings.length + element.row_warnings.length) {
+          let messages = [...element.block_warnings, ...element.row_warnings];
+
+          this.attr('importStatus', 'warning');
+
           element.data.push({
-            status: 'errors',
-            messages: element.block_errors.concat(element.row_errors),
+            title: `WARNINGS (${messages.length})`,
+            messages,
           });
         }
-        if (element.block_warnings.concat(element.row_warnings).length) {
+        if (element.block_errors.length + element.row_errors.length) {
+          let messages = [...element.block_errors, ...element.row_errors];
+
+          this.attr('importStatus', 'error');
+
           element.data.push({
-            status: 'warnings',
-            messages: element.block_warnings.concat(element.row_warnings),
+            title: `ERRORS (${messages.length})`,
+            messages,
           });
         }
         return element;
@@ -187,6 +197,7 @@ export default can.Component.extend({
         state: 'select',
         fileId: '',
         fileName: '',
+        importStatus: '',
         'import': null,
       });
       element.find('.csv-upload').val('');
