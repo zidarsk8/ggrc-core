@@ -1,0 +1,14 @@
+/*
+ * Copyright (C) 2018 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+@mixin icon ($color) {
+  display: table-cell;
+  vertical-align: middle;
+  font-family: FontAwesome;
+  content: "\F071";
+  font-size: 18px;
+  color: $color;
+  padding-right: 15px;
+};
