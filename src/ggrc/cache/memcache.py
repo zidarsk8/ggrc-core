@@ -1,9 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
 """Memcache implements the remote AppEngine Memcache mechanism."""
 
-import itertools
 from collections import OrderedDict
 from copy import deepcopy
 
@@ -15,14 +13,16 @@ from ggrc import settings
 
 class MemCache(cache.Cache):
   """MemCache class."""
+
   def __init__(self):
+    super(MemCache, self).__init__()
     self.name = 'memcache'
     self.client = None
-
-    for cache_entry in cache.all_cache_entries():
-      if cache_entry.cache_type is self.name:
-        self.supported_resources[cache_entry.model_plural]=cache_entry.class_name
-        self.memcache_client = memcache.Client()
+    self.memcache_client = memcache.Client()
+    self.supported_resources.update({
+        cache_entry.model_plural: cache_entry.class_name
+        for cache_entry in cache.all_cache_entries()
+        if cache_entry.cache_type is self.name})
 
   def get_name(self):
     return self.name
@@ -48,27 +48,29 @@ class MemCache(cache.Cache):
     data = OrderedDict()
     cache_key = self.get_key(category, resource)
     if cache_key is None:
-      return  None
+      return None
     ids, attrs = self.parse_filter(filter)
     if ids is None and attrs is None:
       return None
     else:
       if ids is None:
         return None
-    for id in ids:
-      attrvalues= self.memcache_client.gets(cache_key + ":" + str(id))
+    for id_ in ids:
+      attrvalues = self.memcache_client.gets(cache_key + ":" + str(id_))
       if attrvalues is not None:
         if attrs is None:
-          data[id] = attrvalues
+          data[id_] = attrvalues
         else:
           attr_dict = OrderedDict()
           for attr in attrs:
-            if attrvalues.has_key(attr):
+            if attr in attrvalues:
               attr_dict[attr] = deepcopy(attrvalues.get(attr))
-          data[id] = attr_dict
+          data[id_] = attr_dict
       else:
-        # All or None policy is enforced, if one of the objects is not available in cache, then we return empty
-        # TODO(dan): cannot distinguish network failures vs id not found in memcache, both scenarios return empty list
+        # All or None policy is enforced, if one of the objects
+        # is not available in cache, then we return empty
+        # TODO(dan): cannot distinguish network failures vs
+        # id not found in memcache, both scenarios return empty list
         return None
     return data
 
@@ -92,21 +94,27 @@ class MemCache(cache.Cache):
       return None
     # TODO(dan): use memcache.Client.add_multi() instead of add()
     for key in data.keys():
-      id = cache_key + ":" + str(key)
-      cache_data = self.memcache_client.gets(id)
+      cache_key = cache_key + ":" + str(key)
+      cache_data = self.memcache_client.gets(cache_key)
       if cache_data is None:
-        if self.memcache_client.add(id, data.get(key), expiration_time) is False:
+        if self.memcache_client.add(cache_key,
+                                    data.get(key),
+                                    expiration_time) is False:
           # We stop processing any further
-          # TODO(ggrcdev): Should we throw exceptions and/or log critical events
+          # TODO(ggrcdev): Should we throw exceptions
+          # and/or log critical events
           return None
         else:
           entries[key] = data
       else:
         # This could occur on import scenarios
         #
-        if self.memcache_client.cas(id, data.get(key), expiration_time) is False:
+        if self.memcache_client.cas(cache_key,
+                                    data.get(key),
+                                    expiration_time) is False:
           # We stop processing any further
-          # TODO(ggrcdev): Should we throw exceptions and/or log critical events
+          # TODO(ggrcdev): Should we throw exceptions
+          # and/or log critical events
           return None
         else:
           entries[key] = data
@@ -130,11 +138,14 @@ class MemCache(cache.Cache):
     cache_key = self.get_key(category, resource)
     if cache_key is None:
       return None
-    # TODO(ggrcdev): use memcache.Client.cas_multi(), get_multi() instead of cas(), gets()
+    # TODO(ggrcdev): use memcache.Client.cas_multi(),
+    # get_multi() instead of cas(), gets()
     #
     for key in data.keys():
-      id = cache_key + ":" + str(key)
-      if self.memcache_client.cas(id, data.get(key), expiration_time) is False:
+      id_ = cache_key + ":" + str(key)
+      if self.memcache_client.cas(id_,
+                                  data.get(key),
+                                  expiration_time) is False:
         # RPC Error or value is not id is not found in cache.
         # Cannot proceed further with update (All or None) policy
         return None
@@ -160,23 +171,27 @@ class MemCache(cache.Cache):
     cache_key = self.get_key(category, resource)
     if cache_key is None:
       return None
-    # TODO(dan): use memcache.Client.delete_multi(), get_multi() instead of delete(), gets()
+    # TODO(dan): use memcache.Client.delete_multi(),
+    # get_multi() instead of delete(), gets()
     #
     for key in data.keys():
-      id = cache_key + ":" + str(key)
-      retvalue = self.memcache_client.delete(id, lockadd_seconds)
+      id_ = cache_key + ":" + str(key)
+      retvalue = self.memcache_client.delete(id_, lockadd_seconds)
       # Log the event of delete failures
-      if retvalue is 0:
-        # retvalue of 0 indicates Network failure, Cannot proceed further with delete (All or None) policy
+      if retvalue == 0:
+        # retvalue of 0 indicates Network failure,
+        # Cannot proceed further with delete (All or None) policy
         return None
-      elif retvalue is 2:
+      elif retvalue == 2:
         # retvalue of 2 indicates Success
         entries[key] = data
-      elif retvalue is 1:
-        # retvalue of 1 indicates id is not present in memcache (could be expired), proceed with next entry
+      elif retvalue == 1:
+        # retvalue of 1 indicates id_ is not present in memcache
+        # (could be expired), proceed with next entry
         continue
       else:
-        # Any other return value, Cannot proceed further with delete (All or None) policy
+        # Any other return value,
+        # Cannot proceed further with delete (All or None) policy
         #
         return None
     return entries
@@ -193,7 +208,8 @@ class MemCache(cache.Cache):
     Returns:
       memcache client API add_multi
     """
-    # TODO(dan): import scenarios, add will return non-empty list, we should invoke update_multi for those items
+    # TODO(dan): import scenarios, add will return non-empty list,
+    # we should invoke update_multi for those items
     #
     return self.memcache_client.add_multi(data, expiration_time)
 
@@ -243,7 +259,6 @@ class MemCache(cache.Cache):
     return self.memcache_client.flush_all()
 
 
-
 class _Decorated(object):
   """Decorated class."""
 
@@ -275,6 +290,9 @@ class _Decorated(object):
     return result
 
   def invalidate_cache(self, *args, **kwargs):
+    """Invalidate cached data."""
+    if not self.active:
+      return
     self.memcache_client.delete(self.get_key(*args, **kwargs))
 
 
