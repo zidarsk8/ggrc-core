@@ -140,6 +140,13 @@ Settings from ``settings.sh``
 +------------------------------------+---------------------------------------------------------------------------+
 | ACCESS_TOKEN                       | Token that is used to check authenticity of a request to run migrations   |
 +------------------------------------+---------------------------------------------------------------------------+
+| COMPANY                            | This is the company name shown in the “Copyright” footer at               |
+|                                    | the bottom of each page                                                   |
++------------------------------------+---------------------------------------------------------------------------+
+| COMPANY_LOGO_TEXT                  | If COMPANY_LOGO is not set, this (text) value is used instead of an image |
+|                                    | in the top-left corner of each page.                                      |
++------------------------------------+---------------------------------------------------------------------------+
+
 
 
 Settings from ``override.sh``
@@ -169,14 +176,8 @@ additional configuration variables, including:
 +---------------------------+---------------------------------------------------------------------------------+
 | Setting                   | Description                                                                     |
 +===========================+=================================================================================+
-| COMPANY                   | This is the company name shown in the “Copyright” footer at                     |
-|                           | the bottom of each page                                                         |
-+---------------------------+---------------------------------------------------------------------------------+
 | COMPANY_LOGO              | If specified, this is an image to be displayed in the top-left corner           |
 |                           | of each page.                                                                   |
-+---------------------------+---------------------------------------------------------------------------------+
-| COMPANY_LOGO_TEXT         | If COMPANY_LOGO is not set, this (text) value is used instead of an image in    |
-|                           | the top-left corner of each page.                                               |
 +---------------------------+---------------------------------------------------------------------------------+
 | SQLALCHEMY_RECORD_QUERIES | This setting causes queries to be reported in the App Engine logs. Possible     |
 |                           | options are: 'count' - only the number of queries is logged, 'slow' - only slow |
