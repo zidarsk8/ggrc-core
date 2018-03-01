@@ -5,23 +5,22 @@
 from sqlalchemy import event
 
 from ggrc.login import get_current_user
-from ggrc.models.all_models import Comment, AccessControlList
+from ggrc.models import all_models
 from ggrc.access_control import role
 
 
 def init_hook():
   """Initialize all hooks"""
   # pylint: disable=unused-variable
-  @event.listens_for(Comment, "after_insert")
+  @event.listens_for(all_models.Comment, "after_insert")
   def handle_comment_post(mapper, connection, target):
     """Save information on which user created the Comment object."""
     # pylint: disable=unused-argument
-    for role_id, role_name in role.get_custom_roles_for(target.type).items():
-      user = get_current_user()
-      if role_name == "Admin":
-        AccessControlList(
-            ac_role_id=role_id,
-            person=user,
-            object=target,
-        )
-        return
+    comment_roles = role.get_ac_roles_for(all_models.Comment.__name__)
+    comment_admin = comment_roles["Admin"]
+    user = get_current_user()
+    all_models.AccessControlList(
+        ac_role=comment_admin,
+        person=user,
+        object=target,
+    )
