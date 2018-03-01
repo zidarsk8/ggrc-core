@@ -16,6 +16,7 @@ import {
   backendGdriveClient,
   gapiClient,
 } from '../../plugins/ggrc-gapi-client';
+import errorTemplate from './templates/import-error.mustache';
 
 const messages = {
   VALIDATION_ERROR: `Your file could not be imported due to
@@ -251,7 +252,12 @@ export default can.Component.extend({
         }.bind(this))
         .fail(function (data) {
           this.attr('state', 'select');
-          GGRC.Errors.notifier('error', data.responseJSON.message);
+
+          if (data && data.responseJSON && data.responseJSON.message) {
+            GGRC.Errors.notifier('error', data.responseJSON.message);
+          } else {
+            GGRC.Errors.notifier('error', errorTemplate, true);
+          }
         }.bind(this))
         .always(function () {
           this.attr('isLoading', false);
