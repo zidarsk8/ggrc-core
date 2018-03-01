@@ -46,7 +46,6 @@ class Roleable(object):
             remote(AccessControlList.object_type) == cls.__name__,
             remote(AccessControlList.parent_id).isnot(None)),
         foreign_keys='AccessControlList.object_id',
-        backref='{0}_full_object'.format(cls.__name__),
         cascade='all, delete-orphan')
 
   @declared_attr
