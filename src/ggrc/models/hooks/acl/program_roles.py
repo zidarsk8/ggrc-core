@@ -187,7 +187,7 @@ class ProgramRolesHandler(object):
 
   def handle_snapshot(self, obj):
     """When a snapshot is created propagate program roles"""
-    access_control_list = obj.parent.access_control_list
+    access_control_list = obj.parent.full_access_control_list
     for acl in access_control_list:
       if acl.ac_role.name not in {
           "Program Readers Mapped",
@@ -221,7 +221,7 @@ class ProgramRolesHandler(object):
     for related_object in ("Audit", "Assessment", "Issue"):
       parent, other = related_to(obj, related_object)
       if parent:
-        for acl in parent.access_control_list:
+        for acl in parent.full_access_control_list:
           if self._get_acr_name(acl) not in {
               "Program Readers Mapped",
               "Program Editors Mapped",

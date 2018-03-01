@@ -152,18 +152,18 @@ class AuditRolesHandler(object):
     first, second = sorted([obj.source, obj.destination], key=lambda o: o.type)
     if isinstance(first, all_models.Audit):
       audit, other = first, second
-      access_control_list = audit.access_control_list
+      access_control_list = audit.full_access_control_list
     elif isinstance(first, (all_models.Assessment,
                             all_models.AssessmentTemplate)):
       if isinstance(second, all_models.Audit):
         audit, other = second, first
-        access_control_list = audit.access_control_list
+        access_control_list = audit.full_access_control_list
       else:
         assessment, other = first, second
-        access_control_list = assessment.access_control_list
+        access_control_list = assessment.full_access_control_list
     elif (isinstance(first, (all_models.Comment, all_models.Document)) and
           isinstance(second, all_models.Issue)):
-      access_control_list = second.access_control_list
+      access_control_list = second.full_access_control_list
       other = first
     else:
       return
