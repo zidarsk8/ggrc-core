@@ -8,7 +8,8 @@ import ddt
 from sqlalchemy.orm import attributes
 
 from ggrc import db
-from ggrc.models import Assessment, comment
+from ggrc.models import all_models
+from ggrc.models import comment
 from ggrc.models import mixins
 from ggrc.models import object_document
 from ggrc.models import object_person
@@ -24,7 +25,7 @@ class TestAssessmentMixins(test_mixins_base.TestMixinsBase):
   """ Tests inclusion of correct mixins and their attributes """
 
   def setUp(self):
-    self.model = Assessment
+    self.model = all_models.Assessment
     self.included_mixins = [
         assignable.Assignable,
         mixins.BusinessObject,
@@ -67,6 +68,6 @@ class TestAssessmentMixins(test_mixins_base.TestMixinsBase):
     """Test validation of empty recipients: '{}'"""
     validator = comment.Commentable.validate_recipients
     self.assertEqual(
-        validator(Assessment(), "recipients", recipients),
+        validator(all_models.Assessment(), "recipients", recipients),
         ""
     )

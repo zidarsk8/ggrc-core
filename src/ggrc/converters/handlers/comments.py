@@ -7,8 +7,7 @@ from ggrc import db
 
 from ggrc.converters import errors
 from ggrc.converters.handlers.handlers import ColumnHandler
-from ggrc.models import Comment
-from ggrc.models import Relationship
+from ggrc.models import all_models
 from ggrc.login import get_current_user_id
 
 
@@ -48,8 +47,9 @@ class CommentColumnHandler(ColumnHandler):
       return
     current_obj = self.row_converter.obj
     for description in self.value:
-      comment = Comment(description=description,
-                        modified_by_id=get_current_user_id())
+      comment = all_models.Comment(description=description,
+                                   modified_by_id=get_current_user_id())
       db.session.add(comment)
-      mapping = Relationship(source=current_obj, destination=comment)
+      mapping = all_models.Relationship(source=current_obj,
+                                        destination=comment)
       db.session.add(mapping)

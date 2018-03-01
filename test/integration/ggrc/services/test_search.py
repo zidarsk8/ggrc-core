@@ -5,7 +5,7 @@
 Test /search REST API
 """
 
-from ggrc.models import Control
+from ggrc.models import all_models
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
@@ -31,11 +31,11 @@ class TestResource(TestCase):
     |-------|-------|
     """
     self.objects = [
-        self.object_generator.generate_object(Control)[1].id
+        self.object_generator.generate_object(all_models.Control)[1].id
         for _ in xrange(5)
     ]
-    self.objects = Control.eager_query().filter(
-        Control.id.in_(self.objects)
+    self.objects = all_models.Control.eager_query().filter(
+        all_models.Control.id.in_(self.objects)
     ).all()
     for src, dst in [(0, 1), (0, 2), (2, 3), (2, 4)]:
       self.object_generator.generate_relationship(
