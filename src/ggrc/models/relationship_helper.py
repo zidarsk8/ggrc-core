@@ -28,28 +28,6 @@ def program_audit(object_type, related_type, related_ids):
         Audit.program_id.in_(related_ids))
 
 
-def person_withcontact(object_type, related_type, related_ids):
-  object_model = getattr(models, object_type, None)
-  related_model = getattr(models, related_type, None)
-  if None in [object_model, related_model]:
-    return None
-  if object_model == models.Person:
-    if issubclass(related_model, models.mixins.WithContact):
-      return db.session.query(related_model.contact_id).filter(
-          related_model.id.in_(related_ids)).union(
-          db.session.query(related_model.secondary_contact_id).filter(
-              related_model.id.in_(related_ids)))
-    else:
-      return None
-  elif related_model == models.Person:
-    if issubclass(object_model, models.mixins.WithContact):
-      return db.session.query(object_model.id).filter(
-          object_model.contact_id.in_(related_ids) |
-          object_model.secondary_contact_id.in_(related_ids))
-  else:
-    return None
-
-
 def acl_obj_id(object_type, related_type, related_ids, role=None):
   if object_type == "Person":
     return db.session.query(models.AccessControlList.person_id).filter(
@@ -65,21 +43,6 @@ def acl_obj_id(object_type, related_type, related_ids, role=None):
     )
   else:
     return None
-
-
-def person_object(object_type, related_type, related_ids):
-  if "Person" not in [object_type, related_type]:
-    return None
-  if object_type == "Person":
-    return db.session.query(models.ObjectPerson.person_id).filter(
-        (models.ObjectPerson.personable_type == related_type) &
-        (models.ObjectPerson.personable_id.in_(related_ids))
-    )
-  else:
-    return db.session.query(models.ObjectPerson.personable_id).filter(
-        (models.ObjectPerson.personable_type == object_type) &
-        (models.ObjectPerson.person_id.in_(related_ids))
-    )
 
 
 def custom_attribute_mapping(object_type, related_type, related_ids):
@@ -140,9 +103,7 @@ def _audit_snapshot(object_type, related_type, related_ids):
 def get_special_mappings(object_type, related_type, related_ids):
   return [
       _audit_snapshot(object_type, related_type, related_ids),
-      person_object(object_type, related_type, related_ids),
       acl_obj_id(object_type, related_type, related_ids),
-      person_withcontact(object_type, related_type, related_ids),
       program_audit(object_type, related_type, related_ids),
       program_risk_assessment(object_type, related_type, related_ids),
       task_group_object(object_type, related_type, related_ids),

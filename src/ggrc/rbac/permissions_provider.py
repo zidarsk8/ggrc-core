@@ -374,7 +374,7 @@ class DefaultUserPermissions(UserPermissions):
           permissions
           .get(action, {})
           .get(resource_type, {})
-          .get('resources', []))
+          .get('resources', set()))
     return ret
 
   def _get_contexts_for(self, action, resource_type):
