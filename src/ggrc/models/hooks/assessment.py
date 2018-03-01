@@ -48,7 +48,7 @@ def _load_audits(audit_ids):
   }
 
 
-def _handle_assessment(assessment, src, templates, audits):
+def _handle_assessment(assessment, src):
   """Handles auto calculated properties for Assessment model."""
   snapshot_dict = src.get('object') or {}
   common.map_objects(assessment, snapshot_dict)
@@ -58,8 +58,14 @@ def _handle_assessment(assessment, src, templates, audits):
   if not src.get('_generated') and not snapshot:
     return
 
-  template = templates.get(src.get('template', {}).get('id'))
-  audit = audits[src['audit']['id']]
+  template = referenced_objects.get(
+      src.get('template', {}).get('type'),
+      src.get('template', {}).get('id'),
+  )
+  audit = referenced_objects.get(
+      src['audit']['type'],
+      src['audit']['id'],
+  )
   relate_assignees(assessment, snapshot, template, audit)
   relate_ca(assessment, template)
   assessment.title = u'{} assessment for {}'.format(
@@ -109,7 +115,7 @@ def init_hook():
     audit_cache = _load_audits(audit_ids)
 
     for assessment, src in itertools.izip(objects, sources):
-      _handle_assessment(assessment, src, template_cache, audit_cache)
+      _handle_assessment(assessment, src)
 
     # Flush roles objects for generated assessments.
     db.session.flush()
