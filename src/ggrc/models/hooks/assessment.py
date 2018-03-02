@@ -124,8 +124,7 @@ def init_hook():
       # Handling IssueTracker info here rather than in hooks/issue_tracker
       # would avoid querying same data (such as snapshots, audits and
       # templates) twice.
-      issue_tracker.handle_assessment_create(
-          assessment, src, template_cache, audit_cache)
+      issue_tracker.handle_assessment_create(assessment, src)
 
   # pylint: disable=unused-variable
   @signals.Restful.model_put.connect_via(all_models.Assessment)
