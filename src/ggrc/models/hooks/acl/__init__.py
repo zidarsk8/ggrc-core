@@ -14,13 +14,15 @@ from sqlalchemy.orm.session import Session
 from ggrc.models.hooks.acl import audit_roles
 from ggrc.models.hooks.acl import program_roles
 from ggrc.models.hooks.acl import relationship_deletion
-from ggrc_workflows.models.hooks import workflow
 from ggrc.models.hooks import access_control_list
+from ggrc.models.hooks import relationship
+from ggrc_workflows.models.hooks import workflow
 
 
 def after_flush(session, _):
   """Handle all ACL hooks after after flush."""
 
+  relationship.handle_relationship_creation(session)
   access_control_list.handle_acl_creation(session)
   program_role_handler = program_roles.ProgramRolesHandler()
   program_role_handler.after_flush(session)
