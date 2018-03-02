@@ -3,7 +3,7 @@
 
 """Import GGRC model hooks."""
 
-from ggrc.models.hooks import access_control_list, common
+from ggrc.models.hooks import common
 from ggrc.models.hooks import assessment
 from ggrc.models.hooks import audit
 from ggrc.models.hooks import comment
@@ -21,7 +21,6 @@ ALL_HOOKS = [
     comment,
     issue,
     relationship,
-    access_control_list,
     custom_attribute_definition,
     acl,
     common,

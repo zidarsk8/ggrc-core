@@ -15,11 +15,13 @@ from ggrc.models.hooks.acl import audit_roles
 from ggrc.models.hooks.acl import program_roles
 from ggrc.models.hooks.acl import relationship_deletion
 from ggrc_workflows.models.hooks import workflow
+from ggrc.models.hooks import access_control_list
 
 
 def after_flush(session, _):
   """Handle all ACL hooks after after flush."""
 
+  access_control_list.handle_acl_creation(session)
   program_role_handler = program_roles.ProgramRolesHandler()
   program_role_handler.after_flush(session)
   audit_role_handler = audit_roles.AuditRolesHandler()
