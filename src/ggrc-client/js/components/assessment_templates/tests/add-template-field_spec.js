@@ -30,7 +30,7 @@ describe('add-template-field component', () => {
     });
 
     it('does not require the "values" field to add a field of type Map:Person',
-      (done) => {
+      () => {
         let selectedObj = new can.Map({
           title: 'External Reviewer',
           type: 'Map:Person',
@@ -38,63 +38,39 @@ describe('add-template-field component', () => {
         });
         viewModel.attr('selected', selectedObj);
         addField(viewModel, $el, ev);
-
-        // FIXME: Because `addField` function calls `_.defer` we need to wait
-        // for viewModel field to get updated.
-        // It's necessary workaround because otherwise can.Map.validate function
-        // prevents us adding new field. By using _.defer we wait for validate
-        // function to get executed and only then we are adding
-        setTimeout(() => {
-          expect(viewModel.fields.length).toEqual(1);
-          done();
-        }, 3);
+        expect(viewModel.fields.length).toEqual(1);
       }
     );
-    it('requires the "values" field to add a field of type Dropdown',
-      (done) => {
-        let selectedObj = new can.Map({
-          title: 'External Reviewer',
-          type: 'Dropdown',
-          values: 'value0 value1',
-        });
-        viewModel.attr('selected', selectedObj);
-        addField.call(viewModel, viewModel, $el, ev);
-        setTimeout(function () {
-          expect(viewModel.fields.length).toEqual(1);
-          done();
-        }, 3);
-      }
-    );
-    it('requires the "values" field to add a field of type Dropdown',
-      (done) => {
-        let selectedObj = new can.Map({
-          title: 'External Reviewer',
-          type: 'Dropdown',
-          values: '',
-        });
-        viewModel.attr('selected', selectedObj);
-        addField(viewModel, $el, ev);
-        setTimeout(() => {
-          expect(viewModel.fields.length).toEqual(0);
-          done();
-        }, 3);
-      }
-    );
-    it('requires the "values" field to add a field of type Text',
-      (done) => {
-        let selectedObj = new can.Map({
-          title: 'External Reviewer',
-          type: 'Text',
-          values: '',
-        });
-        viewModel.attr('selected', selectedObj);
-        addField(viewModel, $el, ev);
-        setTimeout(() => {
-          expect(viewModel.fields.length).toEqual(1);
-          done();
-        }, 3);
-      }
-    );
+    it('requires the "values" field to add a field of type Dropdown', () => {
+      let selectedObj = new can.Map({
+        title: 'External Reviewer',
+        type: 'Dropdown',
+        values: 'value0 value1',
+      });
+      viewModel.attr('selected', selectedObj);
+      addField.call(viewModel, viewModel, $el, ev);
+      expect(viewModel.fields.length).toEqual(1);
+    });
+    it('requires the "values" field to add a field of type Dropdown', () => {
+      let selectedObj = new can.Map({
+        title: 'External Reviewer',
+        type: 'Dropdown',
+        values: '',
+      });
+      viewModel.attr('selected', selectedObj);
+      addField(viewModel, $el, ev);
+      expect(viewModel.fields.length).toEqual(0);
+    });
+    it('requires the "values" field to add a field of type Text', () => {
+      let selectedObj = new can.Map({
+        title: 'External Reviewer',
+        type: 'Text',
+        values: '',
+      });
+      viewModel.attr('selected', selectedObj);
+      addField(viewModel, $el, ev);
+      expect(viewModel.fields.length).toEqual(1);
+    });
   });
 
   describe('isEmptyTitle() method', () => {

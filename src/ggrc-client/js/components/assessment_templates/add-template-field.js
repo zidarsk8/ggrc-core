@@ -48,20 +48,16 @@ export default can.Component.extend({
           return;
         }
 
-        // We need to defer adding in modal since validation is preventing
-        // on adding the first item
-        _.defer(() => {
-          fields.push({
-            id: viewModel.attr('id'),
-            title: title,
-            attribute_type: type,
-            multi_choice_options: values,
-          });
-          _.each(['title', 'values', 'multi_choice_options'],
-            (type) => {
-              selected.attr(type, '');
-            });
+        fields.push({
+          id: viewModel.attr('id'),
+          title: title,
+          attribute_type: type,
+          multi_choice_options: values,
         });
+        _.each(['title', 'values', 'multi_choice_options'],
+          (type) => {
+            selected.attr(type, '');
+          });
       },
       validateValues(viewModel, type, values) {
         let invalidValues = _.contains(viewModel.valueAttrs, type) && !values;
