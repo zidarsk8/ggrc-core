@@ -12,7 +12,6 @@ from sqlalchemy.orm import validates
 from sqlalchemy import orm
 
 from ggrc import db
-from ggrc.access_control.roleable import Roleable
 from ggrc.builder import simple_property
 from ggrc.fulltext import mixin
 from ggrc.models.comment import Commentable
@@ -44,8 +43,8 @@ from ggrc.models.track_object_state import HasObjectState
 from ggrc.fulltext.mixin import Indexed
 
 
-class Assessment(Roleable, statusable.Statusable, AuditRelationship,
-                 AutoStatusChangeable, Assignable, HasObjectState, TestPlanned,
+class Assessment(Assignable, statusable.Statusable, AuditRelationship,
+                 AutoStatusChangeable, HasObjectState, TestPlanned,
                  CustomAttributable, PublicDocumentable, Commentable,
                  Personable, reminderable.Reminderable, Relatable,
                  LastDeprecatedTimeboxed, WithSimilarityScore, FinishedDate,
