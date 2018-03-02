@@ -132,15 +132,11 @@ def generate_assignee_relations(assessment,
     if person_id in creator_ids:
       person_roles.append((person, "Creators"))
 
-  ac_roles = {
-      acr_name: acr_id
-      for acr_id, acr_name in access_control.role.get_custom_roles_for(
-          assessment.type).iteritems()
-  }
+  ac_roles = access_control.role.get_ac_roles_for(assessment.type)
 
   db.session.add_all(
       all_models.AccessControlList(
-          ac_role_id=ac_roles[role],
+          ac_role=ac_roles[role],
           person=person,
           object=assessment
       ) for person, role in person_roles
