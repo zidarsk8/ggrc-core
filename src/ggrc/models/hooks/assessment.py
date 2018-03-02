@@ -26,28 +26,6 @@ from ggrc.utils import referenced_objects
 logger = logging.getLogger(__name__)
 
 
-def _load_templates(template_ids):
-  """Returns assessment templates for given IDs."""
-  return {
-      t.id: t for t in all_models.AssessmentTemplate.query.options(
-          orm.undefer_group('AssessmentTemplate_complete'),
-      ).filter(
-          all_models.AssessmentTemplate.id.in_(template_ids)
-      )
-  }
-
-
-def _load_audits(audit_ids):
-  """Returns audits for given IDs."""
-  return {
-      a.id: a for a in all_models.Audit.query.options(
-          orm.undefer_group('Audit_complete'),
-      ).filter(
-          all_models.Audit.id.in_(audit_ids)
-      )
-  }
-
-
 def _handle_assessment(assessment, src):
   """Handles auto calculated properties for Assessment model."""
   snapshot_dict = src.get('object') or {}
@@ -104,15 +82,6 @@ def init_hook():
     del sender, service  # Unused
 
     db.session.flush()
-    audit_ids = set()
-    template_ids = set()
-
-    for src in sources:
-      audit_ids.add(src.get('audit', {}).get('id'))
-      template_ids.add(src.get('template', {}).get('id'))
-
-    template_cache = _load_templates(template_ids)
-    audit_cache = _load_audits(audit_ids)
 
     for assessment, src in itertools.izip(objects, sources):
       _handle_assessment(assessment, src)
