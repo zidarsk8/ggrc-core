@@ -36,15 +36,17 @@ import template from './simple-modal.mustache';
     },
     helpers: {
       modalWrapper: function (showContent) {
-        let self = this;
-        return function (el) {
-          showContent.bind('change', function (ev, val) {
+        return (el) => {
+          let showHideModal = (val) => {
             if (val) {
-              $(el).modal().on('hidden.bs.modal', self.hide.bind(self));
+              $(el).modal().on('hidden.bs.modal', this.hide.bind(this));
             } else {
               $(el).modal('hide').off('hidden.bs.modal');
             }
-          });
+          };
+
+          showContent.bind('change', (ev, val) => showHideModal(val));
+          showHideModal(showContent);
         };
       },
     },
