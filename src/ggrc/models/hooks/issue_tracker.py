@@ -509,11 +509,16 @@ def _get_roles(assessment):
 def _collect_issue_emails(assessment):
   """Returns emails related to given assessment.
 
+  The lexicographical first Assignee is used for assignee_email.
+  Every other Assignee and every other person with an Assessment-local
+  role (except Creators and Verifiers) are used in
+  related_people_emails
+
   Args:
     assessment: An instance of Assessment model.
 
   Returns:
-    A tuple of (assignee_email, [list of other email related to assessment])
+    A tuple of (assignee_email, [related_people_emails])
   """
   assignee_email = None
   cc_list = set()
@@ -524,8 +529,8 @@ def _collect_issue_emails(assessment):
       if emails:
         assignee_email = list(sorted(emails))[0]
         emails.remove(assignee_email)
-    elif role_name == 'Verifiers':
-      # skip verifiers from falling into CC list.
+    elif role_name in {'Creators', 'Verifiers'}:
+      # skip creators and verifiers from falling into CC list.
       continue
 
     cc_list.update(emails)
