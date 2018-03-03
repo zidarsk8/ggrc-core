@@ -48,6 +48,11 @@ _ISSUE_TRACKER_UPDATE_FIELDS = (
     ('component_id', 'component_id'),
 )
 
+_INITIAL_COMMENT_TMPL = (
+    'This bug was auto-generated to track a GGRC assessment (a.k.a PBC Item). '
+    'Use the following link to find the assessment - %s.'
+)
+
 _STATUS_CHANGE_COMMENT_TMPL = (
     'The status of this bug was automatically synced to reflect current GGRC '
     'assessment status. Current status of related GGRC Assessment is %s. '
@@ -698,11 +703,7 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
       person.email,
   ).first().email
 
-  comment = [
-      'This bug was auto-generated to track a GGRC assessment '
-      '(a.k.a PBC Item). Use the following link to find the '
-      'assessment - %s.' % _get_assessment_url(assessment),
-  ]
+  comment = [_INITIAL_COMMENT_TMPL % _get_assessment_url(assessment)]
   test_plan = assessment.test_plan
   if test_plan:
     comment.extend([
