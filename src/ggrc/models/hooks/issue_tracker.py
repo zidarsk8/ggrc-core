@@ -15,7 +15,6 @@ from ggrc import access_control
 from ggrc import db
 from ggrc import utils
 from ggrc import settings
-from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.integrations import issues
 from ggrc.integrations import integrations_errors
@@ -678,13 +677,26 @@ def _is_issue_tracker_enabled(audit=None):
 def _create_issuetracker_issue(assessment, issue_tracker_info):
   """Collects information and sends a request to create external issue."""
   _normalize_issue_tracker_info(issue_tracker_info)
-  reported_email = None
-  reporter_id = get_current_user_id()
-  if reporter_id:
-    reporter = all_models.Person.query.filter(
-        all_models.Person.id == reporter_id).first()
-    if reporter is not None:
-      reported_email = reporter.email
+
+  person, acl, acr = (all_models.Person, all_models.AccessControlList,
+                      all_models.AccessControlRole)
+  reporter_email = db.session.query(
+      person.email,
+  ).join(
+      acl,
+      person.id == acl.person_id,
+  ).join(
+      acr,
+      sa.and_(
+          acl.ac_role_id == acr.id,
+          acr.name == "Audit Captains",
+      ),
+  ).filter(
+      acl.object_id == assessment.audit_id,
+      acl.object_type == all_models.Audit.__name__,
+  ).order_by(
+      person.email,
+  ).first().email
 
   comment = [
       'This bug was auto-generated to track a GGRC assessment '
@@ -708,7 +720,7 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
       'type': issue_tracker_info['issue_type'],
       'priority': issue_tracker_info['issue_priority'],
       'severity': issue_tracker_info['issue_severity'],
-      'reporter': reported_email,
+      'reporter': reporter_email,
       'assignee': '',
       'verifier': '',
       'ccs': [],
