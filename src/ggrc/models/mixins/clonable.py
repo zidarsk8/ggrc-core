@@ -17,6 +17,7 @@ from ggrc import db
 from ggrc.models import relationship, inflector
 from ggrc.rbac import permissions
 from ggrc.services import signals
+from ggrc.utils.log_event import log_event
 
 
 # TODO: Clonning of Audit should be done with MultiClonable mixin and
@@ -175,6 +176,8 @@ class MultiClonable(object):
     for source, clonned in clonned_objs.items():
       cls._clone_cads(source, clonned)
 
+    if clonned_objs:
+      db.session.add(log_event(db.session, flush=False))
     db.session.commit()
 
     from ggrc.query import views
