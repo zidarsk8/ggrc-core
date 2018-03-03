@@ -127,6 +127,7 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
                                              object=self.audit)
 
   def test_new_assessment_people(self, client_mock, _):
+    """External Issue for Assessment contains correct people."""
     client_instance = client_mock.return_value
     client_instance.create_issue.return_value = {"issueId": 42}
 
@@ -162,6 +163,7 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
         self.EMAILS["Assignees"] - {min(self.EMAILS["Assignees"])}
     )
 
+    # pylint: disable=protected-access; we assert by non-exported constants
     client_instance.create_issue.assert_called_once_with({
         # common fields
         "comment": (issue_tracker._INITIAL_COMMENT_TMPL %
