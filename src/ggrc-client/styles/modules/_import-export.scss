@@ -19,7 +19,6 @@
   font-size: 13px;
 
   .import-notifications label {
-    margin-left: 15px;
     margin-bottom: 15px;
   }
 
@@ -62,11 +61,14 @@
 
       &:first-child {
         border-top: none;
+        padding-top: 0;
       }
     }
 
     .limit-button-container {
       padding-left: 15px;
+      position: relative;
+      top: -20px;
     }
   }
 
@@ -138,7 +140,7 @@
 
 .import-buttons {
   position: relative;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
 
   > .state-reset {
     margin-left: 10px;
