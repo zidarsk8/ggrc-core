@@ -6,6 +6,7 @@
 import '../../plugins/utils/controllers';
 import {warning} from '../../plugins/utils/modals';
 import {hasWarningType} from '../../plugins/utils/controllers';
+import {importRequest} from './import-export-utils';
 import '../show-more/show-more';
 import '../import-export/download-template/download-template';
 import quickTips from './templates/quick-tips.mustache';
@@ -197,7 +198,7 @@ export default GGRC.Components('csvImportWidget', {
       this.attr('fileName', file.name);
 
       backendGdriveClient.withAuth(()=> {
-        return GGRC.Utils.import_request({data: {id: file.id}}, true);
+        return importRequest({data: {id: file.id}}, true);
       }, {responseJSON: {message: 'Unable to Authorize'}})
         .then(this.prepareDataForCheck.bind(this))
         .then(function (checkObject) {
@@ -225,7 +226,7 @@ export default GGRC.Components('csvImportWidget', {
       ev.preventDefault();
       this.scope.attr('state', 'importing');
 
-      GGRC.Utils.import_request({
+      importRequest({
         data: {id: this.scope.attr('fileId')},
       }, false)
       .done(function (data) {
