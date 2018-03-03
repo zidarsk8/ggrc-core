@@ -9,6 +9,8 @@ import logging
 import urlparse
 import html2text
 
+import sqlalchemy as sa
+
 from ggrc import access_control
 from ggrc import db
 from ggrc import utils
@@ -497,7 +499,8 @@ def _get_roles(assessment):
       all_models.Person.id == ac_list.person_id
   ).filter(
       ac_list.object_type == _ASSESSMENT_MODEL_NAME,
-      ac_list.object_id == assessment.id
+      ac_list.object_id == assessment.id,
+      ac_role.internal == sa.sql.false(),
   )
   for row in query.all():
     # row = (person_id, role_name, email)
