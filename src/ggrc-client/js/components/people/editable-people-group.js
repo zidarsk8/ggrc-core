@@ -22,15 +22,20 @@ let viewModel = peopleGroupVM.extend({
     editableMode: {
       set: function (newValue, setValue) {
         this.attr('showPeopleGroupModal',
-          this.attr('people.length') > SHOW_MODAL_LIMIT);
+          this.attr('isModalLimitExceeded') && newValue);
         setValue(newValue);
+      },
+    },
+    isModalLimitExceeded: {
+      get() {
+        return this.attr('people.length') > SHOW_MODAL_LIMIT;
       },
     },
     showSeeMoreLink: {
       get: function () {
         return !this.attr('editableMode') &&
           !this.attr('isReadonly') &&
-          this.attr('people.length') > SHOW_MODAL_LIMIT;
+          this.attr('isModalLimitExceeded');
       },
     },
     /**
@@ -39,7 +44,7 @@ let viewModel = peopleGroupVM.extend({
      */
     showPeople: {
       get: function () {
-        if (this.attr('showPeopleGroupModal') && !this.attr('isReadonly')) {
+        if (this.attr('isModalLimitExceeded') && !this.attr('isReadonly')) {
           return this.attr('people').attr().slice(0, SHOW_MODAL_LIMIT);
         }
 
@@ -91,8 +96,9 @@ export default GGRC.Components('editablePeopleGroup', {
       let viewModel = this.viewModel;
       let isInside = GGRC.Utils.events.isInnerClick(this.element, ev.target);
       let editableMode = viewModel.attr('editableMode');
+      let showPeopleGroupModal = viewModel.attr('showPeopleGroupModal');
 
-      if (!isInside && editableMode) {
+      if (!showPeopleGroupModal && !isInside && editableMode) {
         viewModel.save();
       }
     },
