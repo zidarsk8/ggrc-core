@@ -204,6 +204,11 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
           "mandatory": False,
           "description": "Options are:\n{}".format('\n'.join(VALID_STATES))
       },
+      "issue_tracker": {
+          "display_name": "Ticket Tracker",
+          "mandatory": False,
+          "view_only": True,
+      }
   }
 
   def __init__(self, *args, **kwargs):
