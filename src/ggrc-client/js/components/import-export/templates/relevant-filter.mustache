@@ -38,9 +38,7 @@
       {{/menu}}
     </select>
     {{#filter}}
-      {{#if_helpers '\
-        #if' model_name '\
-        and ^if_equals' model_name '__previous__'}}
+      {{#if_helpers '\n #if' model_name '\n and ^if_equals' model_name '__previous__'}}
         {{#model_name}}
         <div class="modal-search objective-selector">
           <input
