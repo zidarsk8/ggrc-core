@@ -3,9 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {exportGroup as Component, exportPanel} from '../export';
+import {exportPanel} from '../export';
+import Component from '../export-group';
 
-describe('GGRC.Components.exportGroup', function () {
+describe('export-group', function () {
   'use strict';
 
   describe('events', function () {

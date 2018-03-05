@@ -4,8 +4,8 @@
 */
 
 import '../relevant_filters';
+import './export-group';
 import exportPanelTemplate from './templates/export-panel.mustache';
-import exportGroupTemplate from './templates/export-group.mustache';
 import csvExportTemplate from './templates/csv-export.mustache';
 import {confirm} from '../../plugins/utils/modals';
 import {
@@ -21,17 +21,6 @@ let filterModel = can.Map({
   value: '',
   filter: {},
 });
-let panelModel = can.Map({
-  models: null,
-  type: 'Program',
-  filter: '',
-  relevant: can.compute(function () {
-    return new can.List();
-  }),
-  attributes: new can.List(),
-  localAttributes: new can.List(),
-  mappings: new can.List(),
-});
 let panelsModel = can.Map({
   items: new can.List(),
 });
@@ -44,7 +33,6 @@ let exportModel = can.Map({
   filename: 'export_objects.csv',
   format: 'gdrive',
 });
-let exportGroup;
 let exportPanel;
 
 GGRC.Components('csvExport', {
@@ -142,51 +130,6 @@ GGRC.Components('csvExport', {
     '#addAnotherObjectType click': function (el, ev) {
       ev.preventDefault();
       this.viewModel.attr('export').dispatch('addPanel');
-    },
-  },
-});
-
-exportGroup = GGRC.Components('exportGroup', {
-  tag: 'export-group',
-  template: exportGroupTemplate,
-  viewModel: {
-    index: 0,
-    'export': '@',
-  },
-  events: {
-    inserted: function () {
-      this.addPanel({
-        type: url.model_type || 'Program',
-        isSnapshots: url.isSnapshots,
-      });
-    },
-    addPanel: function (data) {
-      let index = this.viewModel.attr('index') + 1;
-
-      data = data || {};
-      if (!data.type) {
-        data.type = 'Program';
-      } else if (data.isSnapshots === 'true') {
-        data.snapshot_type = data.type;
-        data.type = 'Snapshot';
-      }
-
-      this.viewModel.attr('index', index);
-      return this.viewModel.attr('panels.items')
-        .push(new panelModel(data));
-    },
-    getIndex: function (el) {
-      return Number($(el.closest('export-panel'))
-        .viewModel().attr('panel_number'));
-    },
-    '.remove_filter_group click': function (el, ev) {
-      let index = this.getIndex(el);
-
-      ev.preventDefault();
-      this.viewModel.attr('panels.items').splice(index, 1);
-    },
-    '{viewModel.export} addPanel': function () {
-      this.addPanel();
     },
   },
 });
@@ -339,4 +282,4 @@ exportPanel = GGRC.Components('exportPanel', {
   },
 });
 
-export {exportGroup, exportPanel};
+export {exportPanel};
