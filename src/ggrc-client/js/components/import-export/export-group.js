@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import './export-panel';
 import template from './templates/export-group.mustache';
 
 let url = can.route.deparam(window.location.search.substr(1));
