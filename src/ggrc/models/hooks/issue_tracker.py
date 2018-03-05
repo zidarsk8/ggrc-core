@@ -701,7 +701,10 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
       acl.object_type == all_models.Audit.__name__,
   ).order_by(
       person.email,
-  ).first().email
+  ).first()
+
+  if reporter_email:
+    reporter_email = reporter_email.email
 
   comment = [_INITIAL_COMMENT_TMPL % _get_assessment_url(assessment)]
   test_plan = assessment.test_plan
