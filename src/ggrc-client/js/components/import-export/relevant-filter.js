@@ -64,6 +64,9 @@ export default can.Component.extend({
           return item.readOnly && item.type === type;
         });
     },
+    removeFilter(el, index) {
+      this.attr('relevant').splice(index, 1);
+    },
   },
   events: {
     init: function () {
@@ -98,10 +101,6 @@ export default can.Component.extend({
 
       panel.attr('value', false);
       panel.attr('textValue', el.val());
-    },
-
-    '.remove_filter click': function (el) {
-      this.viewModel.attr('relevant').splice(el.data('index'), 1);
     },
     '{viewModel.relevant} change': function (list, item, which, type, val, old) {
       this.viewModel.attr('has_parent',
