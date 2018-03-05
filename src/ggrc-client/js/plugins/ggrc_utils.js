@@ -246,7 +246,6 @@ import {getRolesForType} from '../plugins/utils/acl-utils';
       let forbiddenList = {
         Program: ['Audit'],
         Audit: ['Assessment', 'Program'],
-        Assessment: ['Workflow', 'TaskGroup'],
         Person: ['Issue'],
       };
       options = options || {};
