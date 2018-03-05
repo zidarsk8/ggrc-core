@@ -5,14 +5,14 @@
 
 import template from './templates/relevant-filter.mustache';
 
-GGRC.Components('relevantFilter', {
+export default can.Component.extend({
   tag: 'relevant-filter',
   template,
-  scope: {
+  viewModel: {
     define: {
       disableCreate: {
         type: 'boolean',
-        'default': false,
+        value: false,
       },
     },
     relevant_menu_item: '@',
@@ -70,22 +70,22 @@ GGRC.Components('relevantFilter', {
       this.setRelevant();
     },
     setRelevant: function () {
-      this.scope.attr('relevant').replace([]);
-      can.each(this.scope.attr('relevantTo') || [], function (item) {
+      this.viewModel.attr('relevant').replace([]);
+      can.each(this.viewModel.attr('relevantTo') || [], function (item) {
         let model = new CMS.Models[item.type](item);
-        this.scope.attr('relevant').push({
+        this.viewModel.attr('relevant').push({
           readOnly: item.readOnly,
           value: true,
           filter: model,
           textValue: '',
-          menu: this.scope.attr('menu'),
+          menu: this.viewModel.attr('menu'),
           model_name: model.constructor.shortName,
         });
       }, this);
     },
     '.ui-autocomplete-input autocomplete:select': function (el, ev, data) {
       let index = el.data('index');
-      let panel = this.scope.attr('relevant')[index];
+      let panel = this.viewModel.attr('relevant')[index];
       let textValue = el.data('ggrc-autocomplete').term;
 
       panel.attr('filter', data.item.attr());
@@ -94,18 +94,18 @@ GGRC.Components('relevantFilter', {
     },
     '.ui-autocomplete-input input': function (el, ev, data) {
       let index = el.data('index');
-      let panel = this.scope.attr('relevant')[index];
+      let panel = this.viewModel.attr('relevant')[index];
 
       panel.attr('value', false);
       panel.attr('textValue', el.val());
     },
 
     '.remove_filter click': function (el) {
-      this.scope.attr('relevant').splice(el.data('index'), 1);
+      this.viewModel.attr('relevant').splice(el.data('index'), 1);
     },
-    '{scope.relevant} change': function (list, item, which, type, val, old) {
-      this.scope.attr('has_parent',
-                      _.findWhere(this.scope.attr('relevant'),
+    '{viewModel.relevant} change': function (list, item, which, type, val, old) {
+      this.viewModel.attr('has_parent',
+                      _.findWhere(this.viewModel.attr('relevant'),
                       {model_name: '__previous__'}));
       if (!/model_name/gi.test(which)) {
         return;
@@ -114,4 +114,4 @@ GGRC.Components('relevantFilter', {
       item.target.attr('value', false);
     },
   },
-}, true);
+});
