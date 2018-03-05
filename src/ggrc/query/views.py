@@ -11,6 +11,7 @@ from flask import request
 from flask import current_app
 from werkzeug.exceptions import BadRequest
 
+from ggrc.models import all_models
 from ggrc.query.exceptions import BadQueryException
 from ggrc.query.default_handler import DefaultHandler
 from ggrc.query.assessment_related_objects import AssessmentRelatedObjects
@@ -124,3 +125,21 @@ def init_query_views(app):
       return get_objects_by_query()
     except (NotImplementedError, BadQueryException) as exc:
       raise BadRequest(exc.message)
+
+
+@login_required
+def _clone_objects(model):
+  """Clone object view."""
+  try:
+    return model.handle_model_clone(request.json[0])
+  except BadQueryException as exc:
+    raise BadRequest(exc.message)
+
+
+def init_clone_views(app):
+  """Initialize clonning api endpoints."""
+  from ggrc.models.mixins import clonable
+  for model in all_models.all_models:
+    if issubclass(model, clonable.MultiClonable):
+      url = "/api/{}/clone".format(model._inflector.table_singular)
+      app.route(url, methods=['POST'])(lambda m=model: _clone_objects(m))
