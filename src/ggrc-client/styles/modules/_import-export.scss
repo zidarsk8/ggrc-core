@@ -190,8 +190,8 @@
   }
 }
 
-.new-relevant-block:nth-child(odd) {
-  background: $lightGray;
+.new-relevant-block {
+  border-bottom: 1px solid $itemBorder;;
 }
 
 .report-title {
@@ -212,9 +212,16 @@
   }
 }
 
-#export_view .info {
-  -webkit-box-shadow: none;
-  box-shadow: none;
+#export_view > header {
+  margin-left: 40px;
+}
+
+#csv_export {
+  margin: 10px 40px;
+
+  .export-panels {
+    @include box-shadow(0 3px 3px -3px rgba(0,0,0, 0.3));
+  }
 }
 
 .export-add-filter-button {
