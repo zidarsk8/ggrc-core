@@ -32,7 +32,7 @@ class GlobalSetup(object):  # pylint: disable=too-few-public-methods
     return person
 
 
-class WorkflowSetup(GlobalSetup):  # pylint: disable=too-few-public-methods
+class WorkflowSetup(GlobalSetup):
   """Setup helper for Workflow related objects setup.
 
   Attributes:
