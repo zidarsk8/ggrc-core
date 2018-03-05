@@ -5,26 +5,14 @@
 from ggrc.models import all_models
 
 
-class RBACHelper(object):  # pylint: disable=too-few-public-methods
-  """RBAC related helper.
+GA_RNAME = "Administrator"
+GE_RNAME = "Editor"
+GR_RNAME = "Reader"
+GC_RNAME = "Creator"
 
-  Attributes:
-      g_roles: Mapping like {'Global Role Name': Role instance}.
-  """
-  GR_RNAME = "Reader"
-  GE_RNAME = "Editor"
-  GA_RNAME = "Administrator"
-  GC_RNAME = "Creator"
 
-  def __init__(self):
-    global_rnames = (
-        self.GR_RNAME,
-        self.GE_RNAME,
-        self.GA_RNAME,
-        self.GC_RNAME,
-    )
-    self.g_roles = {
-        r.name: r
-        for r in all_models.Role.query.filter(
-            all_models.Role.name.in_(global_rnames))
-    }
+G_ROLES = {
+    r.name: r
+    for r in all_models.Role.query.filter(
+        all_models.Role.name.in_((GA_RNAME, GE_RNAME, GR_RNAME, GC_RNAME)))
+}
