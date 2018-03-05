@@ -3,9 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="export-panel row-fluid wrap-row">
-  <div class="span12">
-
+<div class="export-panel wrap-row">
     <div class="export-panel__group">
       <div class="export-panel__header">
         <div class="export-panel__checkbox">
@@ -34,16 +32,12 @@
       </div>
       {{#if showAttributes}}
         <div class="attribute-wrap">
-          <ul class="attr-list">
             {{#each attributes}}
-            <li>
               <label>
                 <input can-value="isSelected" type="checkbox" name="{{key}}" checked>
                 {{display_name}}
               </label>
-            </li>
             {{/each}}
-          </ul>
         </div>
       {{/if}}
     </div>
@@ -76,16 +70,12 @@
       </div>
       {{#if showMappings}}
         <div class="attribute-wrap">
-          <ul class="attr-list">
-            {{#each mappings}}
-            <li>
-              <label>
-                <input can-value="isSelected" type="checkbox" name="{{key}}" checked>
-                {{display_name}}
-              </label>
-            </li>
-            {{/each}}
-          </ul>
+          {{#each mappings}}
+            <label>
+              <input can-value="isSelected" type="checkbox" name="{{key}}" checked>
+              {{display_name}}
+            </label>
+          {{/each}}
         </div>
       {{/if}}
     </div>
@@ -119,19 +109,14 @@
         </div>
         {{#if showLocalAttributes}}
           <div class="attribute-wrap">
-            <ul class="attr-list">
-              {{#each localAttributes}}
-              <li>
-                <label>
-                  <input can-value="isSelected" type="checkbox" name="{{key}}" checked>
-                  {{display_name}}
-                </label>
-              </li>
-              {{/each}}
-            </ul>
+            {{#each localAttributes}}
+              <label>
+                <input can-value="isSelected" type="checkbox" name="{{key}}" checked>
+                {{display_name}}
+              </label>
+            {{/each}}
           </div>
         {{/if}}
       </div>
     {{/is}}
-  </div>
 </div>
