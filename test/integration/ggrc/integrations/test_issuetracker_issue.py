@@ -129,6 +129,35 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
                                              ac_role=role,
                                              object=self.audit)
 
+  def create_asmt_with_issue_tracker(self, role_name_to_people,
+                                     issue_tracker=None):
+    """Create Assessment with issue_tracker parameters and ACL."""
+    access_control_list = acl_helper.get_acl_list({
+        person.id: self.roles[role_name].id
+        for role_name, people in role_name_to_people.iteritems()
+        for person in people
+    })
+    issue_tracker_with_defaults = {
+        "enabled": True,
+        "component_id": hash("Default Component id"),
+        "hotlist_id": hash("Default Hotlist id"),
+        "issue_type": "Default Issue type",
+        "issue_priority": "Default Issue priority",
+        "issue_severity": "Default Issue severity",
+    }
+    issue_tracker_with_defaults.update(issue_tracker or {})
+
+    _, asmt = self.generator.generate_object(
+        all_models.Assessment,
+        data={
+            "audit": {"id": self.audit.id, "type": self.audit.type},
+            "issue_tracker": issue_tracker_with_defaults,
+            "access_control_list": access_control_list,
+        }
+    )
+
+    return asmt
+
   def test_new_assessment_people(self, client_mock, _):
     """External Issue for Assessment contains correct people."""
     client_instance = client_mock.return_value
@@ -139,32 +168,24 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
         if role_name in ("Audit Captains", "Auditors")
     })
 
-    access_control_list = acl_helper.get_acl_list({
-        person.id: self.roles[role_name].id
-        for role_name, people in self.people.iteritems()
-        for person in people
-        if role_name in ("Creators", "Assignees", "Verifiers")
-    })
     component_id = hash("Component id")
     hotlist_id = hash("Hotlist id")
     issue_type = "Issue type"
     issue_priority = "Issue priority"
     issue_severity = "Issue severity"
 
-    _, asmt = self.generator.generate_object(
-        all_models.Assessment,
-        data={
-            "issue_tracker": {
-                "enabled": True,
-                "component_id": component_id,
-                "hotlist_id": hotlist_id,
-                "issue_type": issue_type,
-                "issue_priority": issue_priority,
-                "issue_severity": issue_severity,
-            },
-            "audit": {"id": self.audit.id, "type": self.audit.type},
-            "access_control_list": access_control_list,
-        }
+    asmt = self.create_asmt_with_issue_tracker(
+        role_name_to_people={
+            role_name: people for role_name, people in self.people.items()
+            if role_name in ("Creators", "Assignees", "Verifiers")
+        },
+        issue_tracker={
+            "component_id": component_id,
+            "hotlist_id": hotlist_id,
+            "issue_type": issue_type,
+            "issue_priority": issue_priority,
+            "issue_severity": issue_severity,
+        },
     )
 
     expected_cc_list = list(
