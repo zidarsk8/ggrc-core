@@ -211,3 +211,24 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
         "verifier": min(self.EMAILS["Assignees"]),
         "ccs": expected_cc_list,
     })
+
+  def test_missing_audit_captains(self, client_mock, _):
+    """Reporter email is None is no Audit Captains present."""
+    client_instance = client_mock.return_value
+    client_instance.create_issue.return_value = {"issueId": 42}
+
+    self.setup_audit_people({
+        "Audit Captains": [],
+        "Auditors": self.people["Auditors"],
+    })
+
+    self.create_asmt_with_issue_tracker(
+        role_name_to_people={
+            role_name: people for role_name, people in self.people.items()
+            if role_name in ("Creators", "Assignees", "Verifiers")
+        },
+    )
+
+    client_instance.create_issue.assert_called_once()
+    self.assertIs(client_instance.create_issue.call_args[0][0]["reporter"],
+                  None)
