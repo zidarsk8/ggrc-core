@@ -28,7 +28,7 @@ let exportModel = can.Map({
   format: 'gdrive',
 });
 
-GGRC.Components('csvExport', {
+can.Component.extend({
   tag: 'csv-export',
   template: csvExportTemplate,
   viewModel: {
