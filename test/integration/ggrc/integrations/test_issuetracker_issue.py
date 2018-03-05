@@ -119,9 +119,12 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
           for role_name, emails in self.EMAILS.iteritems()
       }
 
-      for role_name in ("Audit Captains", "Auditors"):
+  def setup_audit_people(self, role_name_to_people):
+    """Assign roles to people provided."""
+    with factories.single_commit():
+      for role_name, people in role_name_to_people.iteritems():
         role = self.roles[role_name]
-        for person in self.people[role_name]:
+        for person in people:
           factories.AccessControlListFactory(person=person,
                                              ac_role=role,
                                              object=self.audit)
@@ -130,6 +133,11 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
     """External Issue for Assessment contains correct people."""
     client_instance = client_mock.return_value
     client_instance.create_issue.return_value = {"issueId": 42}
+
+    self.setup_audit_people({
+        role_name: people for role_name, people in self.people.items()
+        if role_name in ("Audit Captains", "Auditors")
+    })
 
     access_control_list = acl_helper.get_acl_list({
         person.id: self.roles[role_name].id
