@@ -65,20 +65,14 @@ def apply_cav(instance, content):
       continue
     if value["attribute_object"]:
       attribute_object_id = value["attribute_object"]["id"]
-      remove_cav = False
     else:
       attribute_object_id = None
-      remove_cav = (cad.attribute_type.startswith("Map:") and
-                    value.get("remove_cav"))
     cav = cav_dict.get(cad.id)
-    if remove_cav and cav:
-      instance.custom_attribute_values.remove(cav)
-      any_cav_applied = True
-    elif not remove_cav and cav:
+    any_cav_applied = True
+    if cav:
       cav.attribute_value = value["attribute_value"]
       cav.attribute_object_id = attribute_object_id
-      any_cav_applied = True
-    elif not remove_cav:
+    else:
       cav = all_models.CustomAttributeValue(
           custom_attribute=cad,
           attributable=instance,
@@ -86,7 +80,6 @@ def apply_cav(instance, content):
           attribute_object_id=attribute_object_id,
       )
       instance.custom_attribute_values.append(cav)
-      any_cav_applied = True
   return any_cav_applied
 
 
