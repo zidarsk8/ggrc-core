@@ -420,19 +420,9 @@ ul.model-list {
   @extend %clearfix;
   margin-top: 20px;
   margin-bottom: 10px;
-  .attribute-wrap & {
-    margin: 0;
-  }
   li {
     float: left;
     width: 16.66%;
-    .attribute-wrap & {
-      width: auto;
-      margin-right: 15px;
-      &:last-child {
-        margin-right: 0;
-      }
-    }
     input {
       margin-top: -3px;
     }

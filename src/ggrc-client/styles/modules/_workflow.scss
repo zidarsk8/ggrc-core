@@ -51,59 +51,6 @@
   }
 }
 
-.choose-object-wrap {
-  overflow-y: hidden;
-  label {
-    line-height: 28px;
-    margin-bottom: 0;
-    margin-right: 6px;
-    display: inline-block;
-  }
-  select,
-  input {
-    margin-bottom: 0;
-  }
-  .first-row {
-    margin-bottom: 10px;
-  }
-  .indent-row {
-    padding-left: 53px;
-    margin-bottom: 10px;
-    select {
-      margin-right: 4px;
-    }
-  }
-  button {
-    border: none;
-    background: none;
-    padding: 0;
-    i {
-      margin-top: 1px;
-    }
-    &:focus,
-    &:active {
-      outline: 0;
-    }
-  }
-  .choose-object-footer {
-    border-top: 1px solid $footerBorder;
-    padding: 6px 20px 0 20px;
-    .confirm-buttons {
-      text-align: right;
-    }
-  }
-  .add-rule {
-    margin-top: 6px;
-  }
-  &.parent {
-    padding: 0 20px 20px 20px;
-    border-bottom: 1px solid $lightGray;
-  }
-  &.bottom-space {
-    padding-bottom: 20px;
-  }
-}
-
 .inner-row {
   padding-left: 20px;
   padding-top: 6px;
