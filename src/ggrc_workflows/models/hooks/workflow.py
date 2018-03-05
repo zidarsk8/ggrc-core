@@ -30,12 +30,7 @@ WF_PROPAGATED_ROLES = {
 }
 
 
-def init_hook():
-  """Initialize hook handler responsible for ACL record creation."""
-  sa.event.listen(sa.orm.session.Session, "after_flush", handle_acl_changes)
-
-
-def handle_acl_changes(session, _):
+def handle_acl_changes(session):
   """ACL creation hook handler."""
   _add_propagated_roles(session)
   _remove_propagated_roles(session)

@@ -4,7 +4,6 @@
 """All hooks required by relationship unmapping"""
 
 import sqlalchemy as sa
-from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.expression import and_
 
 from ggrc import db
@@ -33,15 +32,10 @@ def delete_propagated(propagated_to, propagated_from):
     )
 
 
-def after_flush(session, _):
+def after_flush(session):
   """Delete propagated relationships when the mapping is removed"""
   for obj in session.deleted:
     if not isinstance(obj, all_models.Relationship):
       continue
     delete_propagated(obj.source, obj.destination)
     delete_propagated(obj.destination, obj.source)
-
-
-def init_hook():
-  """Initialize Relationship-related hooks."""
-  sa.event.listen(Session, "after_flush", after_flush)

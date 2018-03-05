@@ -4,9 +4,6 @@
 """AccessControlList creation hooks."""
 from collections import defaultdict
 
-import sqlalchemy as sa
-from sqlalchemy.orm.session import Session
-
 from ggrc.access_control.role import get_custom_roles_for
 from ggrc.models import all_models
 from ggrc.models.hooks.relationship import create_related_roles, related, \
@@ -32,9 +29,8 @@ def collect_snapshot_ids(related_objects):
   return snapshot_ids
 
 
-def handle_acl_creation(session, flush_context):
+def handle_acl_creation(session):
   """Create relations for mapped objects."""
-  # pylint: disable=unused-argument
   base_objects = defaultdict(set)
   for obj in session.new:
     if isinstance(obj, all_models.AccessControlList):
@@ -48,8 +44,3 @@ def handle_acl_creation(session, flush_context):
     if snapshot_ids:
       add_related_snapshots(snapshot_ids, related_objects)
     create_related_roles(base_objects, related_objects)
-
-
-def init_hook():
-  """Initialize AccessControlList-related hooks."""
-  sa.event.listen(Session, "after_flush", handle_acl_creation)

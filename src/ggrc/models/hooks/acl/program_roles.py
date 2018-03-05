@@ -16,9 +16,7 @@ Program Readers, Program Editors, Program Managers acl roles get propagated to:
 """
 
 
-import sqlalchemy as sa
 from sqlalchemy.orm import load_only
-from sqlalchemy.orm.session import Session
 
 from ggrc.models import all_models
 from ggrc.models.hooks.acl.acl_manager import ACLManager
@@ -248,7 +246,7 @@ class ProgramRolesHandler(object):
           obj, acl, acl.person,
           role_map[ROLE_PROPAGATION[self._get_acr_name(acl)]])
 
-  def after_flush(self, session, _):
+  def after_flush(self, session):
     """Handle program related acl"""
     self.access_control_list_manager = ACLManager()
     self.relationship_cache = RelationshipsCache()
@@ -266,9 +264,3 @@ class ProgramRolesHandler(object):
         if obj not in self.done:
           handler(obj)
           self.done.add(obj)
-
-
-def init_hook():
-  """Initialize AccessControlList-related hooks."""
-  handler = ProgramRolesHandler()
-  sa.event.listen(Session, "after_flush", handler.after_flush)
