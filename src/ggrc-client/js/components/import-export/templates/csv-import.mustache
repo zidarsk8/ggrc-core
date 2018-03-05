@@ -3,99 +3,88 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="info">
-  <div class="row-fluid wrap-row">
-    <div class="span12 import">
-      <p>
-        Here you are able to import data in bulk into GGRC.
-        Import files must use defined templates.
-        If you don't have one, click button below to download a template.
-      </p>
-      {{#if_equals state "import"}}
-        <div class="import-main-wrap import-main-wrap-analyze">
-          <div class="row-fluid wrap-row">
-            <div class="span12">
-              <div class="import-wrap import-analyze">
-                <h4>
-                  {{fileName}}
-                  {{#if isLoading}}
-                    <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
-                  {{/if}}
-                </h4>
-                <hr />
-                <show-more items="import" limit="1">
-                  <ul>
-                    <li><strong>Object type</strong>: {{name}}</li>
-                    <li><strong>Number of rows</strong>: {{rows}}</li>
-                    {{#if created}} <li><strong>To be created</strong>: {{created}}</li> {{/if}}
-                    {{#if updated}} <li><strong>To be updated</strong>: {{updated}}</li> {{/if}}
-                    {{#if deleted}} <li><strong>To be deleted</strong>: {{deleted}}</li> {{/if}}
-                    {{#if ignored}} <li><strong>Ignored</strong>: {{ignored}}</li> {{/if}}
-                    {{#data}}
-                      <li>
-                        <strong>{{status}}</strong>
-                        {{#if_equals status "errors"}}
-                          <i class="fa fa-exclamation-triangle red"></i>
-                        {{/if}}
-                        {{#if messages.length}}
-                          <ul>
-                            {{#messages}}
-                              <li>{{.}}</li>
-                            {{/messages}}
-                          </ul>
-                        {{/if}}
-                      </li>
-                    {{/data}}
-                  </ul>
-                  <hr />
-                </show-more>
-              </div>
-            </div>
-          </div>
-        </div>
-      {{/if_equals}}
-
-      {{#if_equals state "success"}}
-        <div class="import-wrap import-final">
-          <ul>
-            {{#data}}
-              {{#if created}} <li><strong>{{created}}</strong> records created</li>{{/if}}
-              {{#if updated}} <li><strong>{{updated}}</strong> records updated</li>{{/if}}
-              {{#if ignored}} <li><strong>{{ignored}}</strong> records ignored</li>{{/if}}
-              {{#if deleted}} <li><strong>{{deleted}}</strong> records deleted</li>{{/if}}
-            {{/data}}
-          </ul>
-        </div>
-      {{/if_equals}}
-
-      <div class="csv-input">
-        {{#states}}
-          {{^if_equals state "select"}}
-            {{#showSpinner}}
-                <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2, "zIndex": 0}' 'display:inline-block; top: -3px; left: 30px;' }}></span>
-            {{/showSpinner}}
-          {{/if_equals}}
-          <button id="import_btn"
-             href="javascript://"
-             {{#isDisabled}}disabled{{/isDisabled}}
-             class="btn btn-small state-{{state}} {{class}}"
-             data-toggle="gdrive-picker"
-             data-type="documents">
-            {{{text}}}
-          </button>
-          {{^if_equals state "select"}}
-            {{^showSpinner}}
-              <button class="btn btn-small btn-gray state-reset">Cancel</button>
-            {{/showSpinner}}
-          {{/if_equals}}
-        {{/states}}
-        <download-template></download-template>
-      </div>
-
-      <div class="text-top-space">
-        {{{quickTips}}}
-      </div>
-    </div>
+<div class="csv-import">
+  <div>
+    <p>
+      Here you are able to import data in bulk into GGRC.
+      Import files must use defined templates.
+      If you don't have one, click button below to download a template.
+    </p>
   </div>
-  <div id="results-container"></div>
+  {{#if_equals state "import"}}
+    <div class="import-wrap">
+      <h4>
+        {{fileName}}
+        {{#if isLoading}}
+          <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+        {{/if}}
+      </h4>
+      <hr />
+      <show-more items="import" limit="1">
+        <ul>
+          <li><strong>Object type</strong>: {{name}}</li>
+          <li><strong>Number of rows</strong>: {{rows}}</li>
+          {{#if created}} <li><strong>To be created</strong>: {{created}}</li> {{/if}}
+          {{#if updated}} <li><strong>To be updated</strong>: {{updated}}</li> {{/if}}
+          {{#if deleted}} <li><strong>To be deleted</strong>: {{deleted}}</li> {{/if}}
+          {{#if ignored}} <li><strong>Ignored</strong>: {{ignored}}</li> {{/if}}
+          {{#data}}
+            <li>
+              <strong>{{status}}</strong>
+              {{#if_equals status "errors"}}
+                <i class="fa fa-exclamation-triangle red"></i>
+              {{/if_equals}}
+              {{#if messages.length}}
+                <ul>
+                  {{#messages}}
+                    <li>{{.}}</li>
+                  {{/messages}}
+                </ul>
+              {{/if}}
+            </li>
+          {{/data}}
+        </ul>
+        <hr />
+      </show-more>
+    </div>
+  {{/if_equals}}
+
+  {{#if_equals state "success"}}
+    <div class="import-wrap import-final">
+      <ul>
+        {{#data}}
+          {{#if created}} <li><strong>{{created}}</strong> records created</li>{{/if}}
+          {{#if updated}} <li><strong>{{updated}}</strong> records updated</li>{{/if}}
+          {{#if ignored}} <li><strong>{{ignored}}</strong> records ignored</li>{{/if}}
+          {{#if deleted}} <li><strong>{{deleted}}</strong> records deleted</li>{{/if}}
+        {{/data}}
+      </ul>
+    </div>
+  {{/if_equals}}
+
+  <div class="import-buttons">
+    {{#states}}
+      {{^if_equals state "select"}}
+        {{#showSpinner}}
+            <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2, "zIndex": 0}' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+        {{/showSpinner}}
+      {{/if_equals}}
+      <button id="import_btn"
+         href="javascript://"
+         {{#isDisabled}}disabled{{/isDisabled}}
+         class="btn btn-small state-{{state}} {{class}}"
+         data-toggle="gdrive-picker"
+         data-type="documents">
+        {{{text}}}
+      </button>
+      {{^if_equals state "select"}}
+        {{^showSpinner}}
+          <button class="btn btn-small btn-gray state-reset">Cancel</button>
+        {{/showSpinner}}
+      {{/if_equals}}
+    {{/states}}
+    <download-template></download-template>
+  </div>
+
+  {{{quickTips}}}
 </div>
