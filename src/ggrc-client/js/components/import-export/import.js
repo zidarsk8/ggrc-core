@@ -227,39 +227,7 @@ export default can.Component.extend({
           this.attr('isLoading', false);
         }.bind(this));
     },
-  },
-  events: {
-    '.state-reset click': function (el, ev) {
-      ev.preventDefault();
-      this.viewModel.resetFile(this.element);
-    },
-    '.state-import click': function (el, ev) {
-      ev.preventDefault();
-      this.viewModel.attr('state', 'importing');
-
-      importRequest({
-        data: {id: this.viewModel.attr('fileId')},
-      }, false)
-        .done(function (data) {
-          let result_count = data.reduce(function (prev, curr) {
-            _.each(Object.keys(prev), function (key) {
-              prev[key] += curr[key] || 0;
-            });
-            return prev;
-          }, {created: 0, updated: 0, deleted: 0, ignored: 0});
-
-          this.viewModel.attr('state', 'success');
-          this.viewModel.attr('data', [result_count]);
-        }.bind(this))
-        .fail(function (data) {
-          this.viewModel.attr('state', 'select');
-          GGRC.Errors.notifier('error', data.responseJSON.message);
-        }.bind(this))
-        .always(function () {
-          this.viewModel.attr('isLoading', false);
-        }.bind(this));
-    },
-    '#import_btn.state-select click': function (el, ev) {
+    selectFile() {
       let that = this;
       let allowedTypes = ['text/csv', 'application/vnd.google-apps.document',
         'application/vnd.google-apps.spreadsheet'];
@@ -311,7 +279,7 @@ export default can.Component.extend({
           if (file && _.any(allowedTypes, function (type) {
             return type === file.mimeType;
           })) {
-            that.viewModel.requestImport(file);
+            that.requestImport(file);
           } else {
             GGRC.Errors.notifier('error',
               'Something other than a csv-file was chosen. ' +
@@ -319,6 +287,43 @@ export default can.Component.extend({
           }
         }
       }
+    },
+  },
+  events: {
+    '.state-reset click': function (el, ev) {
+      ev.preventDefault();
+      this.viewModel.selectFile();
+      this.viewModel.resetFile(this.element);
+    },
+    '.state-import click': function (el, ev) {
+      ev.preventDefault();
+      this.viewModel.attr('state', 'importing');
+
+      importRequest({
+        data: {id: this.viewModel.attr('fileId')},
+      }, false)
+        .done(function (data) {
+          let result_count = data.reduce(function (prev, curr) {
+            _.each(Object.keys(prev), function (key) {
+              prev[key] += curr[key] || 0;
+            });
+            return prev;
+          }, {created: 0, updated: 0, deleted: 0, ignored: 0});
+
+          this.viewModel.attr('state', 'success');
+          this.viewModel.attr('data', [result_count]);
+        }.bind(this))
+        .fail(function (data) {
+          this.viewModel.attr('state', 'select');
+          GGRC.Errors.notifier('error', data.responseJSON.message);
+        }.bind(this))
+        .always(function () {
+          this.viewModel.attr('isLoading', false);
+        }.bind(this));
+    },
+    '#import_btn.state-select click': function (el, ev) {
+      ev.preventDefault();
+      this.viewModel.selectFile();
     },
   },
 });

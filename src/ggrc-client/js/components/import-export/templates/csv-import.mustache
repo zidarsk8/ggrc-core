@@ -24,9 +24,7 @@
       <button id="import_btn"
          href="javascript://"
          {{#isDisabled}}disabled{{/isDisabled}}
-         class="btn btn-small state-{{state}} {{class}}"
-         data-toggle="gdrive-picker"
-         data-type="documents">
+         class="btn btn-small state-{{state}} {{class}}">
         {{{text}}}
       </button>
       {{^if_equals state "select"}}
