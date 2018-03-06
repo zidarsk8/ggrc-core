@@ -350,7 +350,7 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
 
     Args:
         src: input json with next structure:
-          [{"status": "Assigned", "id": 1}, {"status": "InProgress", "id": 2}]
+          [{"status": "Assigned", "id": 1}, {"status": "In Progress", "id": 2}]
 
     Returns:
         list of updated_instances
