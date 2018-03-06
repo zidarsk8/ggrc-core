@@ -155,8 +155,11 @@ def _get_assignable_roles(obj):
   """Get access control roles for assignable"""
   query = db.session.query(
       models.AccessControlRole.id,
-      models.AccessControlRole.name).filter_by(
-      object_type=obj.__class__.__name__)
+      models.AccessControlRole.name
+  ).filter_by(
+      object_type=obj.__class__.__name__,
+      internal=sa.sql.expression.false(),
+  )
   return {role_id: name for role_id, name in query}
 
 
