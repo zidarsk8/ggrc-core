@@ -4,7 +4,6 @@
 */
 import component from '../issue-unmap-item';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
-import RefreshQueue from '../../../models/refresh_queue';
 
 describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
   let viewModel;
@@ -12,77 +11,6 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
   beforeEach(()=> {
     viewModel = new (can.Map.extend(component.prototype.viewModel));
     events = component.prototype.events;
-  });
-
-  describe('relationship get() method', ()=> {
-    beforeEach(()=> {
-      viewModel.attr('issueInstance', {});
-      viewModel.attr('target', {});
-      spyOn(RefreshQueue.prototype, 'trigger');
-    });
-
-    describe('when there is no relationship in cache for target and issue',
-      () => {
-        beforeEach(function () {
-          spyOn(CMS.Models.Relationship, 'findInCacheById')
-            .and.returnValue(null);
-        });
-
-        it('loads relationship for issue->target direction',
-          async function (done) {
-            const relationships = [{id: 111}];
-            viewModel.attr('issueInstance.related_sources', [
-              relationships[0],
-              {id: 222},
-            ]);
-            viewModel.attr('target.related_destinations', [
-              {id: 333},
-              relationships[0],
-            ]);
-            RefreshQueue.prototype.trigger.and.returnValue(relationships);
-            expect(await viewModel.attr('relationship'))
-              .toEqual(relationships[0]);
-            done();
-          });
-
-        it('loads relationship for target->issue direction',
-          async function (done) {
-            const relationships = [{id: 111}];
-            viewModel.attr('target.related_sources', [
-              relationships[0],
-              {id: 222},
-            ]);
-            viewModel.attr('issueInstance.related_destinations', [
-              {id: 333},
-              relationships[0],
-            ]);
-            RefreshQueue.prototype.trigger.and.returnValue(relationships);
-            expect(await viewModel.attr('relationship'))
-              .toEqual(relationships[0]);
-            done();
-          });
-      });
-
-    describe('when there is relationship in cache for target and issue',
-      () => {
-        beforeEach(function () {
-          spyOn(CMS.Models.Relationship, 'findInCacheById').and
-            .callFake((id) => id);
-        });
-
-        it('sets relationship from cache', async function (done) {
-          viewModel.attr('issueInstance.related_sources', [
-            {id: 111},
-            {id: 222},
-          ]);
-          viewModel.attr('target.related_destinations', [
-            {id: 333},
-            {id: 111},
-          ]);
-          expect(await viewModel.attr('relationship')).toBe(111);
-          done();
-        });
-      });
   });
 
   describe('paging value', ()=> {
