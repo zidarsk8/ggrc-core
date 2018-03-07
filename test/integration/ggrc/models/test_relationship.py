@@ -7,12 +7,15 @@ import json
 
 import ddt
 
+from ggrc import db
 from ggrc.models import all_models
 from ggrc.models.exceptions import ValidationError
 
 from integration.ggrc import TestCase
 from integration.ggrc import api_helper
 from integration.ggrc.models import factories
+from integration.ggrc_basic_permissions.models \
+    import factories as rbac_factories
 
 
 @ddt.ddt
@@ -106,3 +109,235 @@ class TestRelationship(TestCase):
       factories.RelationshipFactory(source=snapshottable, destination=snapshot)
     with self.assertRaises(ValidationError):
       factories.RelationshipFactory(source=snapshot, destination=snapshottable)
+
+
+class TestExternalRelationship(TestCase):
+  """Integration test suite for External Relationship."""
+  # pylint: disable=invalid-name
+
+  def setUp(self):
+    """Init API helper"""
+    super(TestExternalRelationship, self).setUp()
+    self.api = api_helper.Api()
+    with factories.single_commit():
+      editor_role = all_models.Role.query.filter(
+          all_models.Role.name == "Editor").first()
+      self.person_ext = factories.PersonFactory(
+          email="external_app@example.com")
+      self.person = factories.PersonFactory(
+          email="regular_user@example.com")
+      rbac_factories.UserRoleFactory(
+          role=editor_role, person=self.person)
+
+  HEADERS = {
+      "Content-Type": "application/json",
+      "X-requested-by": "External App",
+      "X-ggrc-user": "{\"email\": \"external_app@example.com\"}",
+      "X-appengine-inbound-appid": "test_external_app",
+  }
+  REL_URL = "/api/relationships"
+
+  @staticmethod
+  def build_relationship_json(source, destination, is_external):
+    """Builds relationship create request json."""
+    return json.dumps([{
+        "relationship": {
+            "source": {"id": source.id, "type": source.type},
+            "destination": {"id": destination.id, "type": destination.type},
+            "context": {"id": None},
+            "is_external": is_external
+        }
+    }])
+
+  @staticmethod
+  def create_relationship(source, destination, is_external, user):
+    """Creates relationship in database with given params."""
+    with factories.single_commit():
+      rel = factories.RelationshipFactory(
+          source=source,
+          destination=destination,
+          is_external=is_external,
+          modified_by_id=user.id,
+      )
+      db.session.expunge_all()
+      return rel
+
+  def test_create_ext_user_ext_relationship(self):
+    """Validation external app user creates external relationship."""
+    self.api.set_user(self.person_ext)
+    with factories.single_commit():
+      product = factories.ProductFactory()
+      system = factories.SystemFactory()
+    response = self.api.client.post(
+        self.REL_URL,
+        data=self.build_relationship_json(product, system, True),
+        headers=self.HEADERS)
+    self.assert200(response)
+
+    relationship = all_models.Relationship.query.get(
+        response.json[0][-1]["relationship"]["id"])
+    self.assertEqual(relationship.source_type, "Product")
+    self.assertEqual(relationship.source_id, product.id)
+    self.assertEqual(relationship.destination_type, "System")
+    self.assertEqual(relationship.destination_id, system.id)
+    self.assertTrue(relationship.is_external)
+    self.assertEqual(relationship.modified_by_id, self.person_ext.id)
+    self.assertIsNone(relationship.parent_id)
+    self.assertIsNone(relationship.automapping_id)
+    self.assertIsNone(relationship.context_id)
+
+  def test_create_ext_user_reg_relationship(self):
+    """Validation external app user creates regular relationship."""
+    self.api.set_user(self.person_ext)
+    with factories.single_commit():
+      product = factories.ProductFactory()
+      system = factories.SystemFactory()
+    response = self.api.client.post(
+        self.REL_URL,
+        data=self.build_relationship_json(product, system, False),
+        headers=self.HEADERS)
+    self.assert400(response)
+    self.assertEqual(
+        response.json[0],
+        [400, "External application can create only external relationships."])
+
+  def test_update_ext_user_ext_relationship(self):
+    """Validation external app user updates external relationship."""
+    with factories.single_commit():
+      product = factories.ProductFactory()
+      system = factories.SystemFactory()
+
+    self.create_relationship(product, system, True, self.person)
+
+    self.api.set_user(self.person_ext)
+    response = self.api.client.post(
+        self.REL_URL,
+        data=self.build_relationship_json(product, system, True),
+        headers=self.HEADERS)
+    self.assert200(response)
+
+    relationship = all_models.Relationship.query.get(
+        response.json[0][-1]["relationship"]["id"])
+    self.assertEqual(relationship.source_type, "Product")
+    self.assertEqual(relationship.source_id, product.id)
+    self.assertEqual(relationship.destination_type, "System")
+    self.assertEqual(relationship.destination_id, system.id)
+    self.assertTrue(relationship.is_external)
+    self.assertEqual(relationship.modified_by_id, self.person_ext.id)
+    self.assertIsNone(relationship.parent_id)
+    self.assertIsNone(relationship.automapping_id)
+    self.assertIsNone(relationship.context_id)
+
+  def test_update_ext_user_reg_relationship(self):
+    """Validation external app user updates regular relationship."""
+    with factories.single_commit():
+      product = factories.ProductFactory()
+      system = factories.SystemFactory()
+
+    self.create_relationship(product, system, False, self.person)
+
+    self.api.set_user(self.person_ext)
+    response = self.api.client.post(
+        self.REL_URL,
+        data=self.build_relationship_json(product, system, True),
+        headers=self.HEADERS)
+    self.assert400(response)
+    self.assertEqual(
+        response.json[0],
+        [400, "External application can create only external relationships."])
+
+  def test_delete_ext_user_ext_relationship(self):
+    """Validation external app user deletes external relationship."""
+    with factories.single_commit():
+      product = factories.ProductFactory()
+      system = factories.SystemFactory()
+
+    rel = self.create_relationship(product, system, True, self.person)
+    self.api.set_user(self.person_ext)
+
+    get_response = self.api.client.get(
+        "%s/%d" % (self.REL_URL, rel.id),
+        headers=self.HEADERS)
+    delete_headers = {
+        "if-match": get_response.headers.get("Etag"),
+        "if-unmodified-since": get_response.headers.get("Last-Modified")
+    }
+    delete_headers.update(self.HEADERS)
+
+    response = self.api.client.delete(
+        "%s/%d" % (self.REL_URL, rel.id),
+        headers=delete_headers)
+    self.assert200(response)
+    relationship = all_models.Relationship.query.get(rel.id)
+    self.assertIsNone(relationship)
+
+  def test_delete_ext_user_reg_relationship(self):
+    """Validation external app user deletes regular relationship."""
+    with factories.single_commit():
+      product = factories.ProductFactory()
+      system = factories.SystemFactory()
+
+    rel = self.create_relationship(product, system, False, self.person)
+    self.api.set_user(self.person_ext)
+
+    get_response = self.api.client.get(
+        "%s/%d" % (self.REL_URL, rel.id),
+        headers=self.HEADERS)
+
+    delete_headers = {
+        "if-match": get_response.headers.get("Etag"),
+        "if-unmodified-since": get_response.headers.get("Last-Modified")
+    }
+    delete_headers.update(self.HEADERS)
+
+    response = self.api.client.delete(
+        "%s/%d" % (self.REL_URL, rel.id),
+        headers=delete_headers)
+    self.assert400(response)
+    self.assertEqual(
+        response.json,
+        {
+            'message': 'External application can delete only external '
+                       'relationships.',
+            'code': 400
+        })
+
+  def test_update_reg_user_ext_relationship(self):
+    """Validation regular app user updates external relationship."""
+    with factories.single_commit():
+      product = factories.ProductFactory()
+      system = factories.SystemFactory()
+
+    self.create_relationship(product, system, True, self.person)
+    self.api.set_user(self.person)
+
+    response = self.api.client.post(
+        self.REL_URL,
+        data=self.build_relationship_json(product, system, False),
+        headers=self.HEADERS)
+    self.assert200(response)
+
+  def test_delete_reg_user_ext_relationship(self):
+    """Validation regular user deletes external relationship."""
+    with factories.single_commit():
+      product = factories.ProductFactory()
+      system = factories.SystemFactory()
+
+    rel = self.create_relationship(product, system, True, self.person)
+    self.api.set_user(self.person)
+
+    get_response = self.api.client.get(
+        "%s/%d" % (self.REL_URL, rel.id),
+        headers=self.HEADERS)
+    delete_headers = {
+        "if-match": get_response.headers.get("Etag"),
+        "if-unmodified-since": get_response.headers.get("Last-Modified")
+    }
+    delete_headers.update(self.HEADERS)
+
+    response = self.api.client.delete(
+        "%s/%d" % (self.REL_URL, rel.id),
+        headers=delete_headers)
+    self.assert200(response)
+    relationship = all_models.Relationship.query.get(rel.id)
+    self.assertIsNone(relationship)
