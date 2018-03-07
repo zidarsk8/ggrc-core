@@ -20,25 +20,25 @@ export default can.Component.extend('richText', {
             editor.enable(!disabled);
           }
           return disabled;
-        }
+        },
       },
       hidden: {
-        get(){
+        get() {
           let hiddenToolbar = this.attr('hiddenToolbar');
-          let hasFocus = this.attr('editorHasFocus')
+          let hasFocus = this.attr('editorHasFocus');
           return hiddenToolbar && !hasFocus;
-        }
+        },
       },
       content: {
-        set(newContent){
-          let oldContent = this.attr('content')
+        set(newContent) {
+          let oldContent = this.attr('content');
           let editor = this.attr('editor');
           if (editor && (newContent !== oldContent)) {
             this.setContentToEditor(editor, newContent);
           }
           return newContent;
-        }
-      }
+        },
+      },
     },
     editor: null,
     placeholder: '',
@@ -55,14 +55,17 @@ export default can.Component.extend('richText', {
           placeholder: this.attr('placeholder'),
           modules: {
             toolbar: {
-              container: toolbarContainer
+              container: toolbarContainer,
+            },
+            history: {
+              delay: 0,
             },
             clipboard: {
               matchers: [
-                [Node.TEXT_NODE, this.urlMatcher]
-              ]
-            }
-          }
+                [Node.TEXT_NODE, this.urlMatcher],
+              ],
+            },
+          },
         });
         this.setContentToEditor(editor, this.attr('content'));
 
@@ -99,11 +102,11 @@ export default can.Component.extend('richText', {
       });
     },
     restrictMaxLength(editor) {
-      editor.root.addEventListener('keypress', (e)=> {
-        let length = this.getLength(editor);
-        let maxLength = this.attr('maxLength')
-        if (length >= maxLength) {
-          e.preventDefault();
+      let maxLength = this.attr('maxLength');
+      editor.on('text-change', ()=> {
+        let currentLength = this.getLength(editor);
+        if (currentLength > maxLength) {
+          editor.history.undo();
         }
       });
     },
@@ -158,7 +161,6 @@ export default can.Component.extend('richText', {
         delta.ops[0].retain &&
         !delta.ops[1].delete &&
         !this.isWhitespace(delta.ops[1].insert)) {
-
         let text = editor.getText();
         let startIdx = delta.ops[0].retain;
         while (!this.isWhitespace(text[startIdx - 1]) && startIdx > 0) {
