@@ -138,6 +138,16 @@ def generate_acl_diff(proposed, revisioned):
   return acl_dict
 
 
+def get_validated_value(cad, value, object_id):
+  """Get valid value that related to specified cad."""
+  if isinstance(value, basestring):
+    value = value.strip()
+    return value, object_id
+  if cad.attribute_type == cad.ValidTypes.CHECKBOX:
+    value = int(value)
+  return unicode(value), object_id
+
+
 def generate_cav_diff(instance, proposed, revisioned):
   """Build diff for custom attributes."""
   if not isinstance(instance, mixins.customattributable.CustomAttributable):
@@ -154,7 +164,7 @@ def generate_cav_diff(instance, proposed, revisioned):
   for cad in instance.custom_attribute_definitions:
     if cad.id not in proposed_cavs:
       continue
-    proposed_val = proposed_cavs[cad.id]
+    proposed_val = get_validated_value(cad, *proposed_cavs[cad.id])
     cad_not_setuped = cad.id not in revisioned_cavs
     if cad_not_setuped or proposed_val != revisioned_cavs[cad.id]:
       value, person_id = proposed_val
