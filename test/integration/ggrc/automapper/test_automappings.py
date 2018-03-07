@@ -254,9 +254,7 @@ class TestAutomappings(TestCase):
                    (section, objective1),
                    (objective1, objective2)],
         implied=[
-            (section, objective2),
             (regulation, objective1),
-            (regulation, objective2),
         ]
     )
 
@@ -278,7 +276,7 @@ class TestAutomappings(TestCase):
         to_create=[(objective, control_p),
                    (control_p, control1),
                    (control_p, control2)],
-        implied=[(objective, control1), (objective, control2)]
+        implied=[]
     )
 
   def test_automapping_permissions(self):
