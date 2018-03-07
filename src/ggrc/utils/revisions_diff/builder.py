@@ -165,8 +165,11 @@ def generate_cav_diff(instance, proposed, revisioned):
     if cad.id not in proposed_cavs:
       continue
     proposed_val = get_validated_value(cad, *proposed_cavs[cad.id])
-    cad_not_setuped = cad.id not in revisioned_cavs
-    if cad_not_setuped or proposed_val != revisioned_cavs[cad.id]:
+    if cad.id not in revisioned_cavs:
+      revisioned_value = (cad.default_value, None)
+    else:
+      revisioned_value = revisioned_cavs[cad.id]
+    if proposed_val != revisioned_value:
       value, person_id = proposed_val
       person = person_obj_by_id(person_id) if person_id else None
       diff[cad.id] = {
