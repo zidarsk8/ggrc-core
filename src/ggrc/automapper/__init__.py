@@ -158,7 +158,8 @@ class AutomapperGenerator(object):
           "context_id": None,
           "status": None,
           "parent_id": parent_relationship.id,
-          "automapping_id": automapping_id}
+          "automapping_id": automapping_id,
+          "is_external": False}
           for src, dst in self.auto_mappings
           if (src, dst) != original]))  # (src, dst) is sorted
 
