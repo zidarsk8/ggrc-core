@@ -192,10 +192,8 @@
     a {
       color: $textGray;
     }
-    person-info {
-      > div {
-        display: inline;
-      }
+    .person-list-item {
+      display: inline-block;
     }
   }
 }
