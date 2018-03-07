@@ -68,26 +68,26 @@ def as_user_time(utc_datetime):
   return local_time.strftime(datetime_format)
 
 
+def _group_acl_persons_by_role_id(acl_list):
+  """Group all persons from acl list by role id."""
+  acl_dict = defaultdict(set)
+  for val in acl_list:
+    role_id = val["ac_role_id"]
+    person_id = val["person_id"]
+    acl_dict[role_id].add(person_id)
+  return acl_dict
+
+
 def _get_updated_roles(new_list, old_list, roles):
   """Get difference between old and new access control lists"""
-  new_dict = defaultdict(set)
-  for new_val in new_list:
-    role_id = new_val["ac_role_id"]
-    person_id = new_val["person_id"]
-    new_dict[role_id].add(person_id)
+  new_dict = _group_acl_persons_by_role_id(new_list)
+  old_dict = _group_acl_persons_by_role_id(old_list)
 
-  old_dict = defaultdict(set)
-  for old_val in old_list:
-    role_id = old_val["ac_role_id"]
-    person_id = old_val["person_id"]
-    old_dict[role_id].add(person_id)
+  role_set = set()
+  role_ids = (set(new_dict) | set(old_dict)) & set(roles)
 
-  diff_roles = set(new_dict.keys()) ^ set(old_dict.keys())
-  role_set = {roles[role_id] for role_id in diff_roles if role_id in roles}
-
-  common_roles = set(new_dict.keys()) & set(old_dict.keys())
-  for role_id in common_roles:
-    if sorted(new_dict[role_id]) != sorted(old_dict[role_id]):
+  for role_id in role_ids:
+    if sorted(new_dict.get(role_id, [])) != sorted(old_dict.get(role_id, [])):
       role_set.add(roles[role_id])
 
   return role_set
@@ -155,8 +155,11 @@ def _get_assignable_roles(obj):
   """Get access control roles for assignable"""
   query = db.session.query(
       models.AccessControlRole.id,
-      models.AccessControlRole.name).filter_by(
-      object_type=obj.__class__.__name__)
+      models.AccessControlRole.name
+  ).filter_by(
+      object_type=obj.__class__.__name__,
+      internal=sa.sql.expression.false(),
+  )
   return {role_id: name for role_id, name in query}
 
 
