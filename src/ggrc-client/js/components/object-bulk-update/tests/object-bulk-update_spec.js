@@ -27,7 +27,7 @@ describe('GGRC.Components.objectBulkUpdate', function () {
       mappingType = {
         type: 'the same type',
       };
-      targetStates = ['Assigned', 'InProgress'];
+      targetStates = ['Assigned', 'In Progress'];
 
       spyOn(stateUtils, 'getBulkStatesForModel')
         .and.returnValue(targetStates);
@@ -120,7 +120,7 @@ describe('GGRC.Components.objectBulkUpdate', function () {
           then() {},
         });
       context.viewModel.attr('selected', [1]);
-      context.viewModel.attr('targetState', 'InProgress');
+      context.viewModel.attr('targetState', 'In Progress');
 
       event();
 
