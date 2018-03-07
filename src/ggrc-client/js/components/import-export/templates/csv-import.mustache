@@ -4,87 +4,104 @@
 }}
 
 <div class="csv-import">
-  <div>
-    <p>
-      Here you are able to import data in bulk into GGRC.
-      Import files must use defined templates.
-      If you don't have one, click button below to download a template.
-    </p>
+  <div class="import-section">
+    {{#if fileName}}
+      <div class="file-name {{importStatus}}">{{fileName}}</div>
+    {{else}}
+      <p>
+        Here you are able to import data in bulk into GGRC.
+        Import files must use defined templates.
+        If you don't have one, click button below to download a template.
+      </p>
+    {{/if}}
   </div>
-  {{#if_equals state "import"}}
-    <div class="import-wrap">
-      <h4>
-        {{fileName}}
-        {{#if isLoading}}
-          <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
-        {{/if}}
-      </h4>
-      <hr />
-      <show-more items="import" limit="1">
-        <ul>
-          <li><strong>Object type</strong>: {{name}}</li>
-          <li><strong>Number of rows</strong>: {{rows}}</li>
-          {{#if created}} <li><strong>To be created</strong>: {{created}}</li> {{/if}}
-          {{#if updated}} <li><strong>To be updated</strong>: {{updated}}</li> {{/if}}
-          {{#if deleted}} <li><strong>To be deleted</strong>: {{deleted}}</li> {{/if}}
-          {{#if ignored}} <li><strong>Ignored</strong>: {{ignored}}</li> {{/if}}
-          {{#data}}
-            <li>
-              <strong>{{status}}</strong>
-              {{#if_equals status "errors"}}
-                <i class="fa fa-exclamation-triangle red"></i>
-              {{/if_equals}}
-              {{#if messages.length}}
-                <ul>
-                  {{#messages}}
-                    <li>{{.}}</li>
-                  {{/messages}}
-                </ul>
-              {{/if}}
-            </li>
-          {{/data}}
-        </ul>
-        <hr />
-      </show-more>
-    </div>
-  {{/if_equals}}
 
-  {{#if_equals state "success"}}
-    <div class="import-wrap import-final">
-      <ul>
-        {{#data}}
-          {{#if created}} <li><strong>{{created}}</strong> records created</li>{{/if}}
-          {{#if updated}} <li><strong>{{updated}}</strong> records updated</li>{{/if}}
-          {{#if ignored}} <li><strong>{{ignored}}</strong> records ignored</li>{{/if}}
-          {{#if deleted}} <li><strong>{{deleted}}</strong> records deleted</li>{{/if}}
-        {{/data}}
-      </ul>
-    </div>
-  {{/if_equals}}
-
-  <div class="import-buttons">
+  <div class="import-section import-buttons">
     {{#states}}
       {{^if_equals state "select"}}
-        {{#showSpinner}}
-            <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2, "zIndex": 0}' 'display:inline-block; top: -3px; left: 30px;' }}></span>
-        {{/showSpinner}}
+        <spinner {toggle}="showSpinner"></spinner>
       {{/if_equals}}
       <button id="import_btn"
          href="javascript://"
          {{#isDisabled}}disabled{{/isDisabled}}
-         class="btn btn-small state-{{state}} {{class}}"
-         data-toggle="gdrive-picker"
-         data-type="documents">
+         class="btn btn-small state-{{state}} {{class}}">
         {{{text}}}
       </button>
       {{^if_equals state "select"}}
         {{^showSpinner}}
-          <button class="btn btn-small btn-gray state-reset">Cancel</button>
+          <button class="btn btn-small btn-gray state-reset">Choose new file to import</button>
         {{/showSpinner}}
       {{/if_equals}}
     {{/states}}
     <download-template></download-template>
   </div>
+
+  {{#if_equals state "import"}}
+    <show-more {items}="import" limit="1">
+      <div class="import-section border-top">
+
+        <section class="import-details__stats">
+          <div class="import-details__caption">Object type:</div>
+          <div class="import-details__value">{{name}}</div>
+          <div class="import-details__caption">Number of rows:</div>
+          <div class="import-details__value">{{rows}}</div>
+          {{#if created}}
+            <div class="import-details__caption">To be created:</div>
+            <div class="import-details__value">{{created}}</div>
+          {{/if}}
+          {{#if updated}}
+            <div class="import-details__caption">To be updated:</div>
+            <div class="import-details__value">{{updated}}</div>
+          {{/if}}
+          {{#if deleted}}
+            <div class="import-details__caption">To be deleted:</div>
+            <div class="import-details__value">{{deleted}}</div>
+          {{/if}}
+          {{#if ignored}}
+            <div class="import-details__caption">Ignored:</div>
+            <div class="import-details__value">{{ignored}}</div>
+          {{/if}}
+        </section>
+
+        {{#data}}
+          <collapsible-panel {title-text}="title">
+            {{#if messages.length}}
+              <ul>
+                {{#messages}}
+                  <li>{{.}}</li>
+                {{/messages}}
+              </ul>
+            {{/if}}
+          </collapsible-panel>
+        {{/data}}
+      </div>
+    </show-more>
+  {{/if_equals}}
+
+  {{#if_equals state "success"}}
+    <div class="import-section">
+      <section class="import-details__stats">
+        {{#data}}
+          {{#if created}}
+            <div class="import-details__caption">To be created:</div>
+            <div class="import-details__value">{{created}}</div>
+          {{/if}}
+          {{#if updated}}
+            <div class="import-details__caption">To be updated:</div>
+            <div class="import-details__value">{{updated}}</div>
+          {{/if}}
+          {{#if deleted}}
+            <div class="import-details__caption">To be deleted:</div>
+            <div class="import-details__value">{{deleted}}</div>
+          {{/if}}
+          {{#if ignored}}
+            <div class="import-details__caption">Ignored:</div>
+            <div class="import-details__value">{{ignored}}</div>
+          {{/if}}
+        {{/data}}
+      </section>
+    </div>
+  {{/if_equals}}
 
   {{{quickTips}}}
 </div>

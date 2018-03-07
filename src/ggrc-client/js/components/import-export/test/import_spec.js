@@ -271,8 +271,7 @@ describe('GGRC.Components.csvImportWidget', function () {
     let authDfd;
 
     beforeEach(function () {
-      method = Component.prototype
-        .events['#import_btn.state-select click'];
+      method = Component.prototype.viewModel.selectFile;
       authDfd = new can.Deferred();
       spyOn(GGRC.Controllers.GAPI, 'reAuthorize').and.returnValue(authDfd);
       spyOn(gapi.auth, 'getToken').and.returnValue('mockToken');

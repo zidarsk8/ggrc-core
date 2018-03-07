@@ -14,13 +14,65 @@
 
 .csv-import {
   padding-top: 25px;
-  padding-bottom: 20px;
+  padding-bottom: 40px;
   @include box-shadow(0 3px 3px -3px rgba(0,0,0, 0.3));
   font-size: 13px;
 
-  > div {
+  .file-name {
+    display: flex;
+    font-size: 16px;
+    font-weight: normal;
+    color: $subTitle;
+    margin-bottom: 20px;
+
+    &.error {
+      &:before {
+        @include icon(red);
+      }
+    }
+    &.warning {
+      &:before {
+        @include icon(orange);
+      }
+    }
+  }
+
+  .import-section {
     padding-left: 30px;
     padding-right: 30px;
+
+    &.border-bottom {
+      border-bottom: 1px solid $itemBorder;
+    }
+
+    &.border-top {
+      border-top: 1px solid $itemBorder;
+    }
+  }
+
+  show-more {
+    .import-section {
+      padding-top: 20px;
+      padding-bottom: 20px;
+
+      &:first-child {
+        border-top: none;
+      }
+    }
+
+    .limit-button-container {
+      padding-left: 15px;
+    }
+  }
+
+  collapsible-panel {
+    ul {
+      margin-left: 5px;
+    }
+
+    li {
+      line-height: 24px;
+    }
   }
 
   .quick-tips {
@@ -80,15 +132,17 @@
 }
 
 .import-buttons {
+  position: relative;
   margin-bottom: 15px;
 
   > .state-reset {
     margin-left: 10px;
   }
 
-  > span {
-    position: relative;
-    left: -50px;
+  > spinner {
+    position: absolute;
+    left: 10px;
+    top: 5px;
   }
 
   download-template {
@@ -261,5 +315,24 @@
     h4 {
       margin: 25px 0 10px;
     }
+  }
+}
+
+.import-details {
+  &__stats {
+    display: flex;
+    flex-flow: row wrap;
+    width: 400px;
+    line-height: 24px;
+    padding-bottom: 20px;
+  }
+
+  &__caption {
+    width: 120px;
+  }
+
+  &__value {
+    width: 280px;
+    color: $grayLight;
   }
 }
