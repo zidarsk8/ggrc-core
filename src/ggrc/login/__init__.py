@@ -24,6 +24,7 @@ def get_login_module():
 
 
 def user_loader(user_id):
+  # pylint: disable=cyclic-import
   from ggrc.utils.user_generator import find_user_by_id
   return find_user_by_id(user_id)
 
@@ -108,3 +109,18 @@ def is_creator():
   current_user = get_current_user()
   return (hasattr(current_user, 'system_wide_role') and
           current_user.system_wide_role == SystemWideRoles.CREATOR)
+
+
+def is_external_app_user():
+  """Checks if the current user is an external application.
+
+  Account for external application is defined in settings. External application
+  requests require special processing and validations.
+  """
+  user = get_current_user()
+  if not user or user.is_anonymous():
+    return False
+
+  # pylint: disable=cyclic-import
+  from ggrc.utils.user_generator import is_external_app_user_email
+  return is_external_app_user_email(user.email)
