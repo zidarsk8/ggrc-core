@@ -18,17 +18,24 @@ import template from './templates/tree-item-status-for-workflow.mustache';
       define: {
         statusTitle: {
           type: 'string',
-          get: function () {
-            return this.attr('instance.status') === 'InProgress' ?
-              'In Progress' :
-              this.attr('instance.status');
+          get() {
+            return this.attr('instance.status');
           },
         },
         statusCSSClass: {
           type: 'string',
-          get: function () {
-            return this.attr('instance.status') ?
-            'state-' + this.attr('instance.status').toLowerCase() : '';
+          get() {
+            const status = this.attr('instance.status');
+            let result = '';
+
+            if (status) {
+              const postfix = status
+                .replace(/[\s\t]+/g, '')
+                .toLowerCase();
+              result = `state-${postfix}`;
+            }
+
+            return result;
           },
         },
       },
