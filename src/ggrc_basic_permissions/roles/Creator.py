@@ -1,9 +1,13 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Collects all permissions for Global Creator role."""
+
+# pylint: disable=invalid-name
+
 scope = "System"
 description = """
-  Thjs role grants a user basic object creation and editing permission.
+  This role grants a user basic object creation and editing permission.
   """
 
 owner_base = [

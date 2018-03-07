@@ -6,9 +6,10 @@ Test Program Creator role
 """
 import ddt
 
-from integration.ggrc import TestCase
 from ggrc.models import get_model
 from ggrc.models import all_models
+
+from integration.ggrc import TestCase
 from integration.ggrc.access_control import acl_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import Generator
@@ -38,6 +39,7 @@ class TestCreator(TestCase):
       self.users[name] = user
 
   def test_admin_page_access(self):
+    """Permissions to admin page."""
     for role, code in (("creator", 403), ("admin", 200)):
       self.api.set_user(self.users[role])
       self.assertEqual(self.api.client.get("/admin").status_code, code)
@@ -91,7 +93,7 @@ class TestCreator(TestCase):
         response = self.api.get_collection(model, obj_id)
         collection = response.json.get(
             "{}_collection".format(table_plural)).get(table_plural)
-        if len(collection) != 0:
+        if collection:
           all_errors.append(
               "{} can retrieve object if not owner (collection)"
               .format(model_singular))
@@ -118,7 +120,7 @@ class TestCreator(TestCase):
         response = self.api.get_collection(model, obj_id)
         collection = response.json.get(
             "{}_collection".format(table_plural)).get(table_plural)
-        if len(collection) == 0:
+        if not collection:
           all_errors.append(
               "{} cannot retrieve object even if owner (collection)"
               .format(model_singular))
@@ -203,8 +205,10 @@ class TestCreator(TestCase):
     """Check if creator can access the right revision objects."""
 
     def gen(title, extra_data=None):
+      """Generates section."""
       section_content = {"title": title, "context": None}
-      section_content.update(**extra_data) if extra_data else None
+      if extra_data:
+        section_content.update(**extra_data)
       return self.generator.generate(all_models.Section, "section", {
           "section": section_content
       })[1]
