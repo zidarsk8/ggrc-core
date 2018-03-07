@@ -1,6 +1,10 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Migration script that uses Alembic."""
+
+from __future__ import print_function
+
 import os.path
 import re
 import sys
@@ -12,7 +16,7 @@ from alembic.config import Config, CommandLine
 from alembic.environment import EnvironmentContext
 from alembic.script import ScriptDirectory
 from ggrc import settings
-import ggrc.app  # noqa: Used to initialize default url handler
+from ggrc import app  # noqa: Used to initialize default url handler
 from ggrc.extensions import get_extension_module, get_extension_modules
 from ggrc.models.maintenance import Maintenance
 from ggrc.models.maintenance import MigrationLog
@@ -29,10 +33,17 @@ _old_ScriptDirectory_from_config = ScriptDirectory.from_config
 
 @classmethod
 def ScriptDirectory_from_config(cls, config):
+  """Get the directory with migrations from config.
+
+  Overrides _versions_locations in alembic.script.ScriptDirectory.
+  """
+  del cls  # unused
+
   script_directory = _old_ScriptDirectory_from_config(config)
   # Override location of `versions` directory to be independent of `env.py`
   versions_location = config.get_main_option('versions_location')
   if versions_location:
+    # pylint: disable=protected-access; we have to monkey-patch a private field
     script_directory._version_locations = [versions_location]
   return script_directory
 ScriptDirectory.from_config = ScriptDirectory_from_config
@@ -44,6 +55,7 @@ _old_EnvironmentContext___init__ = EnvironmentContext.__init__
 
 
 def EnvironmentContext___init__(self, config, script, **kw):
+  """Init EnvironmentContext with custom version_table name."""
   extension_module_name = config.get_main_option('extension_module_name')
   kw['version_table'] = extension_version_table(extension_module_name)
   return _old_EnvironmentContext___init__(self, config, script, **kw)
@@ -92,8 +104,7 @@ def make_extension_config(extension_module_name):
   return config
 
 
-def extension_version_table(module):
-  module_name = module if type(module) is str else module.__name__
+def extension_version_table(module_name):
   return '{0}_alembic_version'.format(module_name)
 
 
@@ -200,7 +211,7 @@ class MigrateCommandLine(CommandLine):
 
 def main(args):
   if len(args) < 3:
-    print 'usage: migrate module_name <alembic command string>'
+    print('usage: migrate module_name <alembic command string>')
     return -1
   extension_module_name = args[1]
 
@@ -208,6 +219,7 @@ def main(args):
   options = cmd_line.parser.parse_args(args[2:])
   cfg = make_extension_config(extension_module_name)
   cmd_line.run_cmd(cfg, options)
+  return 0
 
 
 if __name__ == '__main__':
