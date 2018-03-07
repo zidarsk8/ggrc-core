@@ -3,13 +3,14 @@
 
 scope = "System"
 description = """
-  This role grants a user basic object creation and editing permission.
+  Thjs role grants a user basic object creation and editing permission.
   """
 
 owner_base = [
     "Categorization",
     "Category",
     "ControlCategory",
+    "ControlAssertion",
     "Option",
     {
         "type": "BackgroundTask",
