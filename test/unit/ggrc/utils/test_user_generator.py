@@ -62,4 +62,5 @@ class TestUserGenerator(unittest.TestCase):
 
     self.assertEqual(usr, user_generator.find_or_create_ext_app_user())
     find_by_email_mock.assert_called_once_with('test@example.com')
-    create_user_mock.assert_called_once_with('test@example.com', name='Ext App')
+    create_user_mock.assert_called_once_with(
+        'test@example.com', name='Ext App')

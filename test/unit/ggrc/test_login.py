@@ -31,8 +31,7 @@ class TestIsExternalAppUser(unittest.TestCase):
 
   @mock.patch('ggrc.utils.user_generator.is_external_app_user_email')
   @mock.patch('ggrc.login.get_current_user')
-  def test_not_external_user(self, current_user_mock,
-                                                  is_external_email_mock):
+  def test_not_external_user(self, current_user_mock, is_external_email_mock):
     """Currently logged in user is not external app."""
     user_mock = mock.MagicMock()
     user_mock.email = 'user@example.com'
@@ -46,8 +45,7 @@ class TestIsExternalAppUser(unittest.TestCase):
 
   @mock.patch('ggrc.utils.user_generator.is_external_app_user_email')
   @mock.patch('ggrc.login.get_current_user')
-  def test_external_user(self, current_user_mock,
-                                              is_external_email_mock):
+  def test_external_user(self, current_user_mock, is_external_email_mock):
     """Currently logged in user is external app."""
     user_mock = mock.MagicMock()
     user_mock.email = 'user@example.com'
