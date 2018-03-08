@@ -25,11 +25,8 @@ from ggrc.snapshotter.datastructures import Attr
 from ggrc.snapshotter.datastructures import Pair
 from ggrc.snapshotter.datastructures import Stub
 from ggrc.snapshotter.datastructures import OperationResponse
-from ggrc.snapshotter.helpers import create_relationship_dict
-from ggrc.snapshotter.helpers import create_relationship_revision_dict
 from ggrc.snapshotter.helpers import create_snapshot_dict
 from ggrc.snapshotter.helpers import create_snapshot_revision_dict
-from ggrc.snapshotter.helpers import get_relationships
 from ggrc.snapshotter.helpers import get_revisions
 from ggrc.snapshotter.helpers import get_snapshots
 from ggrc.snapshotter.indexer import reindex_pairs
@@ -365,7 +362,6 @@ class SnapshotGenerator(object):
         missed_keys = set()
         data_payload = list()
         revision_payload = list()
-        relationship_payload = list()
         response_data = dict()
 
         if self.dry_run and event is None:
@@ -412,25 +408,6 @@ class SnapshotGenerator(object):
         self._execute(all_models.AccessControlList.__table__.insert(),
                       acl_payload)
 
-      with benchmark("Snapshot._create.create parent object -> snapshot rels"):
-        for snapshot in snapshots:
-          parent = Stub(snapshot.parent_type, snapshot.parent_id)
-          base = Stub(snapshot.child_type, snapshot.child_id)
-          relationship = create_relationship_dict(
-              parent, base, user_id, self.context_cache[parent])
-          relationship_payload += [relationship]
-
-      with benchmark("Snapshot._create.write relationships to database"):
-        self._execute(models.Relationship.__table__.insert(),
-                      relationship_payload)
-
-      with benchmark("Snapshot._create.get created relationships"):
-        created_relationships = {
-            (rel["source_type"], rel["source_id"],
-             rel["destination_type"], rel["destination_id"])
-            for rel in relationship_payload}
-        relationships = get_relationships(created_relationships)
-
       with benchmark("Snapshot._create.create revision payload"):
         with benchmark("Snapshot._create.create snapshots revision payload"):
           for snapshot in snapshots:
@@ -438,14 +415,6 @@ class SnapshotGenerator(object):
             context_id = self.context_cache[parent]
             data = create_snapshot_revision_dict("created", event_id, snapshot,
                                                  user_id, context_id)
-            revision_payload += [data]
-
-        with benchmark("Snapshot._create.create rel revision payload"):
-          for relationship in relationships:
-            parent = Stub(relationship.source_type, relationship.source_id)
-            context_id = self.context_cache[parent]
-            data = create_relationship_revision_dict(
-                "created", event_id, relationship, user_id, context_id)
             revision_payload += [data]
 
       with benchmark("Snapshot._create.write revisions to database"):
