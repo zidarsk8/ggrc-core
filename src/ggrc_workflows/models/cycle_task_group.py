@@ -181,6 +181,12 @@ class CycleTaskGroup(roleable.Roleable,
             "title",
             "end_date"
         ),
+        orm.Load(cls).subqueryload("cycle_task_group_tasks").joinedload(
+            "access_control_list"
+        ).load_only(
+            "person_id",
+            "ac_role_id"
+        ),
         orm.Load(cls).joinedload("cycle").load_only(
             "id",
             "title",

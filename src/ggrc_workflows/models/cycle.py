@@ -218,6 +218,12 @@ class Cycle(mixins.WithContact,
             "next_due_date",
         ),
         orm.Load(cls).subqueryload("cycle_task_group_object_tasks").joinedload(
+            "access_control_list"
+        ).load_only(
+            "person_id",
+            "ac_role_id"
+        ),
+        orm.Load(cls).subqueryload("cycle_task_group_object_tasks").joinedload(
             "cycle_task_entries"
         ).load_only(
             "description",
