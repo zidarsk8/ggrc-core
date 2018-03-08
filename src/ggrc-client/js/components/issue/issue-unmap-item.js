@@ -144,21 +144,25 @@ export default GGRC.Components('issueUnmapItem', {
   },
   events: {
     async click(el, ev) {
-      const relationship = await CMS.Models.Relationship.findRelationship(
-        this.attr('issueInstance'),
-        this.attr('target')
-      );
       ev.preventDefault();
-      if (!relationship) {
-        // if there is no relationship it mean that user try to unmap
-        // original object from Issue automapped to snapshot via assessment
-        this.viewModel.showNoRelationhipError();
-      } else if (this.viewModel.attr('target.type') === 'Assessment' &&
-        !this.viewModel.attr('issueInstance.allow_unmap_from_audit')) {
-        // In this case we should show modal with related objects.
-        this.viewModel.processRelatedSnapshots();
-      } else {
-        this.viewModel.dispatch('unmapIssue');
+      try {
+        const relationship = await CMS.Models.Relationship.findRelationship(
+          this.viewModel.attr('issueInstance'),
+          this.viewModel.attr('target')
+        );
+        if (!relationship) {
+          // if there is no relationship it mean that user try to unmap
+          // original object from Issue automapped to snapshot via assessment
+          this.viewModel.showNoRelationhipError();
+        } else if (this.viewModel.attr('target.type') === 'Assessment' &&
+          !this.viewModel.attr('issueInstance.allow_unmap_from_audit')) {
+          // In this case we should show modal with related objects.
+          this.viewModel.processRelatedSnapshots();
+        } else {
+          this.viewModel.dispatch('unmapIssue');
+        }
+      } catch (error) {
+        GGRC.Errors.notifier('error', 'There was a problem with unmapping.');
       }
     },
     '{viewModel.paging} current'() {
