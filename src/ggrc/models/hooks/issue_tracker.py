@@ -9,11 +9,12 @@ import logging
 import urlparse
 import html2text
 
+import sqlalchemy as sa
+
 from ggrc import access_control
 from ggrc import db
 from ggrc import utils
 from ggrc import settings
-from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.integrations import issues
 from ggrc.integrations import integrations_errors
@@ -45,6 +46,11 @@ _ISSUE_TRACKER_UPDATE_FIELDS = (
     ('issue_priority', 'priority'),
     ('issue_severity', 'severity'),
     ('component_id', 'component_id'),
+)
+
+_INITIAL_COMMENT_TMPL = (
+    'This bug was auto-generated to track a GGRC assessment (a.k.a PBC Item). '
+    'Use the following link to find the assessment - %s.'
 )
 
 _STATUS_CHANGE_COMMENT_TMPL = (
@@ -497,7 +503,8 @@ def _get_roles(assessment):
       all_models.Person.id == ac_list.person_id
   ).filter(
       ac_list.object_type == _ASSESSMENT_MODEL_NAME,
-      ac_list.object_id == assessment.id
+      ac_list.object_id == assessment.id,
+      ac_role.internal == sa.sql.false(),
   )
   for row in query.all():
     # row = (person_id, role_name, email)
@@ -509,11 +516,16 @@ def _get_roles(assessment):
 def _collect_issue_emails(assessment):
   """Returns emails related to given assessment.
 
+  The lexicographical first Assignee is used for assignee_email.
+  Every other Assignee and every other person with an Assessment-local
+  role (except Creators and Verifiers) are used in
+  related_people_emails
+
   Args:
     assessment: An instance of Assessment model.
 
   Returns:
-    A tuple of (assignee_email, [list of other email related to assessment])
+    A tuple of (assignee_email, [related_people_emails])
   """
   assignee_email = None
   cc_list = set()
@@ -524,8 +536,8 @@ def _collect_issue_emails(assessment):
       if emails:
         assignee_email = list(sorted(emails))[0]
         emails.remove(assignee_email)
-    elif role_name == 'Verifiers':
-      # skip verifiers from falling into CC list.
+    elif role_name in {'Creators', 'Verifiers'}:
+      # skip creators and verifiers from falling into CC list.
       continue
 
     cc_list.update(emails)
@@ -670,19 +682,31 @@ def _is_issue_tracker_enabled(audit=None):
 def _create_issuetracker_issue(assessment, issue_tracker_info):
   """Collects information and sends a request to create external issue."""
   _normalize_issue_tracker_info(issue_tracker_info)
-  reported_email = None
-  reporter_id = get_current_user_id()
-  if reporter_id:
-    reporter = all_models.Person.query.filter(
-        all_models.Person.id == reporter_id).first()
-    if reporter is not None:
-      reported_email = reporter.email
 
-  comment = [
-      'This bug was auto-generated to track a GGRC assessment '
-      '(a.k.a PBC Item). Use the following link to find the '
-      'assessment - %s.' % _get_assessment_url(assessment),
-  ]
+  person, acl, acr = (all_models.Person, all_models.AccessControlList,
+                      all_models.AccessControlRole)
+  reporter_email = db.session.query(
+      person.email,
+  ).join(
+      acl,
+      person.id == acl.person_id,
+  ).join(
+      acr,
+      sa.and_(
+          acl.ac_role_id == acr.id,
+          acr.name == "Audit Captains",
+      ),
+  ).filter(
+      acl.object_id == assessment.audit_id,
+      acl.object_type == all_models.Audit.__name__,
+  ).order_by(
+      person.email,
+  ).first()
+
+  if reporter_email:
+    reporter_email = reporter_email.email
+
+  comment = [_INITIAL_COMMENT_TMPL % _get_assessment_url(assessment)]
   test_plan = assessment.test_plan
   if test_plan:
     comment.extend([
@@ -700,7 +724,7 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
       'type': issue_tracker_info['issue_type'],
       'priority': issue_tracker_info['issue_priority'],
       'severity': issue_tracker_info['issue_severity'],
-      'reporter': reported_email,
+      'reporter': reporter_email,
       'assignee': '',
       'verifier': '',
       'ccs': [],

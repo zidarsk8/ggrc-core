@@ -37,9 +37,9 @@ exports = [
 ]  # pylint: disable=invalid-name
 
 # Deployment-specific variables
-COMPANY = "Company, Inc."
+COMPANY = os.environ.get("COMPANY", "Company, Inc.")
 COMPANY_LOGO = "/static/images/ggrc-logo.svg"
-COMPANY_LOGO_TEXT = "Company GRC"
+COMPANY_LOGO_TEXT = os.environ.get("COMPANY_LOGO_TEXT", "Company")
 COPYRIGHT = u"Confidential. Copyright \u00A9"  # \u00A9 is the (c) symbol
 
 # Construct build number
@@ -55,7 +55,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "1.5.0-Strawberry" + BUILD_NUMBER
+VERSION = "1.5.1-Strawberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(

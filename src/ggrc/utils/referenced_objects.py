@@ -22,7 +22,9 @@ def get(type_, id_):
 
   if not (isinstance(type_, type) and issubclass(type_, db.Model)):
     type_ = inflector.get_model(type_)
-
+  # model for type_ has been removed
+  if type_ is None:
+    return None
   result = ref_objects.get(type_, {}).get(id_, None)
 
   if not result:
@@ -37,7 +39,8 @@ def mark_to_cache(type_, id_):
     flask.g.referenced_objects_markers = collections.defaultdict(set)
   if not (isinstance(type_, type) and issubclass(type_, db.Model)):
     type_ = inflector.get_model(type_)
-  flask.g.referenced_objects_markers[type_].add(id_)
+  if type_ is not None:
+    flask.g.referenced_objects_markers[type_].add(id_)
 
 
 def rewarm_cache():
