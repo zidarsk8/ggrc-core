@@ -19,25 +19,22 @@ import {DESTINATION_UNMAPPED} from '../../events/eventTypes';
       source: {},
       isUnmapping: false,
       preventClick: false,
-      unmapInstance: function () {
+      unmapInstance: async function () {
         this.attr('isUnmapping', true);
         this.dispatch({type: 'beforeUnmap', item: this.attr('source')});
-        this.getMapping()
-          .done((item) => {
-            item.destroy()
-              .then(() => {
-                this.dispatch('unmapped');
-                this.attr('destination').dispatch('refreshInstance');
-                this.attr('destination').dispatch(DESTINATION_UNMAPPED);
-                this.dispatch('afterUnmap');
-              })
-              .always(() => {
-                this.attr('isUnmapping', false);
-              });
-          })
-          .fail(() => {
-            this.attr('isUnmapping', false);
-          });
+        try {
+          const item = await this.getMapping();
+          await item.destroy();
+          this.dispatch('unmapped');
+          this.attr('destination').dispatch('refreshInstance');
+          this.attr('destination').dispatch(DESTINATION_UNMAPPED);
+          this.dispatch('afterUnmap');
+        } catch (e) {
+          console.warn("Unmap failed", e)
+        }finally {
+          this.attr('isUnmapping', false);
+        }
+        return true
       },
       getMapping: function () {
         let type = this.attr('mappingType') || defaultType;
