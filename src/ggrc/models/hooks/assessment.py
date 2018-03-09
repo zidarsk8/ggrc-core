@@ -290,8 +290,9 @@ def relate_ca(assessment, template):
 
 def copy_snapshot_plan(assessment, snapshot):
   """Copy test plan of Snapshot into Assessment"""
-  if assessment.test_plan and snapshot.revision.content["test_plan"]:
+  snapshot_plan = snapshot.revision.content.get("test_plan", "")
+  if assessment.test_plan and snapshot_plan:
     assessment.test_plan += "<br>"
-    assessment.test_plan += snapshot.revision.content["test_plan"]
-  elif snapshot.revision.content["test_plan"]:
-    assessment.test_plan = snapshot.revision.content["test_plan"]
+    assessment.test_plan += snapshot_plan
+  elif snapshot_plan:
+    assessment.test_plan = snapshot_plan
