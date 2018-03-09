@@ -76,6 +76,7 @@ class Cycle(mixins.WithContact,
 
   @builder.simple_property
   def folder(self):
+    """Get the workflow folder."""
     if self.workflow:
       return self.workflow.folder
     return ""
@@ -177,6 +178,7 @@ class Cycle(mixins.WithContact,
 
   @classmethod
   def _filter_by_cycle_workflow(cls, predicate):
+    """Filter by cycle workflow."""
     from ggrc_workflows.models.workflow import Workflow
     return Workflow.query.filter(
         (Workflow.id == cls.workflow_id) &
@@ -216,6 +218,12 @@ class Cycle(mixins.WithContact,
             "title",
             "end_date",
             "next_due_date",
+        ),
+        orm.Load(cls).subqueryload("cycle_task_group_object_tasks").joinedload(
+            "access_control_list"
+        ).load_only(
+            "person_id",
+            "ac_role_id"
         ),
         orm.Load(cls).subqueryload("cycle_task_group_object_tasks").joinedload(
             "cycle_task_entries"
