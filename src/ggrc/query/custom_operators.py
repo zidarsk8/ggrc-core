@@ -15,7 +15,6 @@ from ggrc import db
 from ggrc import models
 from ggrc.access_control.list import AccessControlList
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
-from ggrc.login import is_creator
 from ggrc.models import inflector
 from ggrc.models import relationship_helper
 from ggrc.query import autocast
@@ -128,7 +127,6 @@ def related_people(exp, object_class, target_class, query):
   """Get people related to the specified object.
 
   Returns the following people:
-    for each object type: the users mapped via PeopleObjects,
     for Program: the users that have a Program-wide role,
     for Audit: the users that have a Program-wide or Audit-wide role,
     for Workflow: the users mapped via WorkflowPeople and
@@ -146,11 +144,6 @@ def related_people(exp, object_class, target_class, query):
     return sqlalchemy.sql.false()
 
   res = []
-  res.extend(relationship_helper.person_object(
-      object_class.__name__,
-      exp['object_name'],
-      exp['ids'],
-  ))
 
   res.extend(db.session.query(AccessControlList.person_id).filter(
       sqlalchemy.and_(
@@ -178,8 +171,7 @@ def owned(exp, object_class, target_class, query):
   res = db.session.query(
       my_objects.get_myobjects_query(
           types=[object_class.__name__],
-          contact_id=exp['ids'][0],
-          is_creator=is_creator(),
+          contact_id=exp['ids'][0]
       ).alias().c.id
   )
   res = res.all()

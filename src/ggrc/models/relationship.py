@@ -109,6 +109,9 @@ class Relationship(Base, db.Model):
                                     self.destination_type, self.destination_id)
 
   def validate_relatable_type(self, field, value):
+    if not isinstance(value, Relatable):
+      raise ValidationError(u"You are trying to create relationship with not "
+                            u"Relatable type: {}".format(value.type))
     tgt_type = self.source_type
     tgt_id = self.source_id
     if field == "source":

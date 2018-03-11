@@ -154,8 +154,6 @@ class Snapshot(Roleable, relationship.Relatable, WithLastAssessmentDate,
 class Snapshotable(object):
   """Provide `snapshotted_objects` on for parent objects."""
 
-  _api_attrs = reflection.ApiAttributes("snapshotted_objects")
-
   @declared_attr
   def snapshotted_objects(cls):  # pylint: disable=no-self-argument
     """Return all snapshotted objects"""
@@ -168,15 +166,6 @@ class Snapshotable(object):
         foreign_keys='Snapshot.parent_id,Snapshot.parent_type,',
         backref='{0}_parent'.format(cls.__name__),
         cascade='all, delete-orphan')
-
-  @classmethod
-  def eager_query(cls):
-    query = super(Snapshotable, cls).eager_query()
-    return query.options(
-        orm.subqueryload("snapshotted_objects").undefer_group(
-            "Snapshot_complete"
-        ),
-    )
 
 
 def handle_post_flush(session, flush_context, instances):

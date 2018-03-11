@@ -3,14 +3,15 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {
-  ensureGlobalCA,
-  getCustomAttributes,
-  CUSTOM_ATTRIBUTE_TYPE,
-  convertToFormViewField,
-  applyChangesToCustomAttributeValue,
-} from '../../plugins/utils/ca-utils';
 import template from './gca-controls.mustache';
+import '../custom-attributes/custom-attributes-field';
+import {CUSTOM_ATTRIBUTE_TYPE} from '../../plugins/utils/custom-attribute/custom-attribute-config';
+import {CONTROL_TYPE} from './../../plugins/utils/control-utils';
+
+const errorMessages = {
+  [CONTROL_TYPE.CHECKBOX]: 'this checkbox is required',
+  any: 'cannot be blank',
+};
 
 (function (can, GGRC) {
   'use strict';
@@ -25,53 +26,45 @@ import template from './gca-controls.mustache';
     viewModel: {
       instance: {},
       items: [],
-      modifiedFields: {},
+      allowHide: false,
       validateControls: function () {
-          // counting failed mandatory fields
-        let valid = this.attr('items')
-            .filter(function (itm) {
-              let val = itm.value ? String(itm.value) : '';
+        const items = this.attr('items');
+        let valid;
+        items.each((caObject) => caObject.validate());
 
-              let hasError = !val.trim();
-              let errorMessages = {
-                _any: can.Map.validationMessages.non_blank,
-                checkbox: can.Map.validationMessages.must_be_checked,
-              };
-              let errorMessage = errorMessages[itm.type] || errorMessages._any;
-
-              if (itm.required) {
-                itm.attr('caError', hasError ? errorMessage : '');
-              }
-              return itm.required && hasError;
-            }).length === 0;
-
+        valid = _.find(items, (caObject) =>
+          caObject.validationState.hasGCAErrors
+        ) === undefined;
         this.instance.attr('_gca_valid', valid);
       },
       initGlobalAttributes: function () {
-        let cavs;
-        ensureGlobalCA(this.attr('instance'));
-        cavs = getCustomAttributes(this.attr('instance'),
-          CUSTOM_ATTRIBUTE_TYPE.GLOBAL);
-
-        this.attr('items',
-          cavs.map(convertToFormViewField)
-        );
+        const instance = this.attr('instance');
+        const globalCaObjects = instance.customAttr({
+          type: CUSTOM_ATTRIBUTE_TYPE.GLOBAL,
+        });
+        this.attr('items', globalCaObjects);
       },
-      updateGlobalAttribute: function (event, field) {
-        this.attr('modifiedFields').attr(field.id, event.value);
-        field.attr('value', event.value);
+      updateGlobalAttribute: function (event) {
+        const instance = this.attr('instance');
+        const {
+          fieldId: caId,
+          value: caValue,
+        } = event;
 
-        applyChangesToCustomAttributeValue(
-          this.attr('instance.custom_attribute_values'),
-          this.attr('modifiedFields')
-        );
-
-        this.attr('modifiedFields', {}, true);
+        instance.customAttr(caId, caValue);
+        this.validateControls();
       },
     },
-    events: {
-      '{viewModel.items} change': function () {
-        this.viewModel.validateControls();
+    helpers: {
+      errorMessage(type) {
+        type = Mustache.resolve(type);
+        return errorMessages[type] || errorMessages.any;
+      },
+      isHidable(item, options) {
+        const hidable = (this.attr('allowHide') && !item.mandatory);
+        return hidable
+          ? options.fn()
+          : options.inverse();
       },
     },
     init: function () {

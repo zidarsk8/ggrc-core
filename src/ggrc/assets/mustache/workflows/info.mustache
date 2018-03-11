@@ -99,7 +99,9 @@
       {{#instance}}
         <div class="row-fluid wrap-row">
           <div class="span9">
-            <h6>Title</h6>
+            {{#is_info_pin}}
+              <h6>Title</h6>
+            {{/is_info_pin}}
             <h3>{{title}}</h3>
             <span class="state-value {{addclass 'state' status}}">{{status}}</span>
             {{#instance.next_cycle_start_date}}

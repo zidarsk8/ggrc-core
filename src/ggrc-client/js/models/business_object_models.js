@@ -32,7 +32,6 @@
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
@@ -101,7 +100,6 @@
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
@@ -169,7 +167,6 @@
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
@@ -239,7 +236,6 @@
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
       kind: 'CMS.Models.Option.stub',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
@@ -309,7 +305,6 @@
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
@@ -377,7 +372,6 @@
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
@@ -446,7 +440,6 @@
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
@@ -514,7 +507,6 @@
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',

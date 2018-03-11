@@ -3,8 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#getCustomAttrValue column instance}}
+{{#getCustomAttrValue instance customAttributeId}}
     {{! because the object can currently only be a
     person there is no need to switch }}
     <tree-field {source}="object" {field}="'email'"/>
-{{/get_custom_attr_value}}
+{{/getCustomAttrValue}}

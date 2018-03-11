@@ -17,7 +17,9 @@
       <div class="pane-header">
         <div class="row-fluid wrap-row">
           <div data-test-id="title_0ad9fbaf" class="span9">
-            <h6>Title</h6>
+            {{#is_info_pin}}
+              <h6>Title</h6>
+            {{/is_info_pin}}
             <h3>{{title}}</h3>
 
             {{#if status}}

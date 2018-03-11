@@ -7,10 +7,8 @@
 from collections import defaultdict
 
 import flask
-import sqlalchemy as sa
 
 from sqlalchemy.orm import load_only
-from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.expression import true
 
 from ggrc.models import all_models
@@ -152,18 +150,18 @@ class AuditRolesHandler(object):
     first, second = sorted([obj.source, obj.destination], key=lambda o: o.type)
     if isinstance(first, all_models.Audit):
       audit, other = first, second
-      access_control_list = audit.access_control_list
+      access_control_list = audit.full_access_control_list
     elif isinstance(first, (all_models.Assessment,
                             all_models.AssessmentTemplate)):
       if isinstance(second, all_models.Audit):
         audit, other = second, first
-        access_control_list = audit.access_control_list
+        access_control_list = audit.full_access_control_list
       else:
         assessment, other = first, second
-        access_control_list = assessment.access_control_list
+        access_control_list = assessment.full_access_control_list
     elif (isinstance(first, (all_models.Comment, all_models.Document)) and
           isinstance(second, all_models.Issue)):
-      access_control_list = second.access_control_list
+      access_control_list = second.full_access_control_list
       other = first
     else:
       return
@@ -203,7 +201,7 @@ class AuditRolesHandler(object):
       acl_manager.get_or_create(other, acl, acl.person,
                                 role_map[ac_role_id][type(other)])
 
-  def after_flush(self, session, _):
+  def after_flush(self, session):
     """Handle legacy audit captain -> program editor role propagation"""
     self.caches = {
         "relationship_cache": RelationshipsCache(),
@@ -219,9 +217,3 @@ class AuditRolesHandler(object):
       handler = handlers.get(type(obj))
       if callable(handler):
         handler(obj)
-
-
-def init_hook():
-  """Initialize AccessControlList-related hooks."""
-  handler = AuditRolesHandler()
-  sa.event.listen(Session, "after_flush", handler.after_flush)

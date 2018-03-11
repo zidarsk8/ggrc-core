@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import '../../components/assessment-template-clone/assessment-template-clone';
 import '../../components/object-bulk-update/object-bulk-update';
 import '../../components/object-mapper/object-mapper';
 import '../../components/object-generator/object-generator';
@@ -10,6 +11,7 @@ import '../../components/object-search/object-search';
 import {
   isInScopeModel,
 } from '../../plugins/utils/snapshot-utils';
+import assessmentTemplateCloneTemplate from './assessment-template-clone-modal.mustache';
 import objectGeneratorTemplate from './object-generator-modal.mustache';
 import objectMapperTemplate from './object-mapper-modal.mustache';
 import objectSearchTemplate from './object-search-modal.mustache';
@@ -29,8 +31,8 @@ const ObjectMapper = can.Control.extend({
       $trigger.attr('data-href') || $trigger.attr('href') :
       '';
     let modalId = 'ajax-modal-' + (href || '')
-        .replace(/[\/\?=\&#%]/g, '-')
-        .replace(/^-/, '');
+      .replace(/[\/\?=\&#%]/g, '-')
+      .replace(/^-/, '');
     let $target =
       $('<div id="' + modalId +
       '" class="modal modal-selector object-modal hide"></div>');
@@ -63,10 +65,8 @@ const ObjectMapper = can.Control.extend({
       return;
     }
 
-    if (
-        _.isUndefined(data.join_object_type) ||
-        _.isNull(data.join_object_type)
-    ) {
+    if (_.isUndefined(data.join_object_type) ||
+      _.isNull(data.join_object_type)) {
       throw new Error(OBJECT_REQUIRED_MESSAGE);
     }
 
@@ -140,7 +140,7 @@ const ObjectMapper = can.Control.extend({
 
         self.launch(btn, can.extend(config, data));
       })
-      .always(() => self.isLoading = false);
+        .always(() => self.isLoading = false);
     }
 
     function openForCommonObjects(data, isSearch) {
@@ -199,14 +199,21 @@ const ObjectGenerator = ObjectMapper.extend({
 }, {});
 
 const ObjectBulkUpdate = ObjectMapper.extend({
-    defaults: {
-      component: objectBulkUpdateTemplate,
-    },
-  }, {});
+  defaults: {
+    component: objectBulkUpdateTemplate,
+  },
+}, {});
+
+const AssessmentTemplateClone = ObjectMapper.extend({
+  defaults: {
+    component: assessmentTemplateCloneTemplate,
+  },
+}, {});
 
 export {
   ObjectMapper,
   ObjectGenerator,
   ObjectSearch,
   ObjectBulkUpdate,
+  AssessmentTemplateClone,
 };

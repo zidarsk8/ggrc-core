@@ -53,7 +53,8 @@ class TestACLPopulation(TestCase):
     self.assertEqual(200, resp.status_code)
     control = all_models.Control.query.get(control_id)
     proposal = all_models.Proposal.query.get(proposal_id)
-    self.assertEqual(int(read or update), len(proposal.access_control_list))
+    self.assertEqual(int(read or update),
+                     len(proposal.full_access_control_list))
     expected_roles = []
     if update:
       expected_roles.append(all_models.Proposal.ACRoles.EDITOR)
@@ -61,4 +62,4 @@ class TestACLPopulation(TestCase):
       expected_roles.append(all_models.Proposal.ACRoles.READER)
     self.assertEqual(
         sorted(expected_roles),
-        sorted([a.ac_role.name for a in proposal.access_control_list]))
+        sorted([a.ac_role.name for a in proposal.full_access_control_list]))

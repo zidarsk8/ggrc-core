@@ -26,7 +26,9 @@
         {title}="title"
         {is-loading}="isLoading"
         {empty-list-message}="emptyListMessage"
-        {(people)}="people">
+        {(people)}="people"
+        (save)="save()"
+        (cancel)="cancel()">
       </people-group-modal>
     {{else}}
       <div class="inline-edit inline-edit--active">

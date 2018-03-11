@@ -4,25 +4,23 @@
  */
 
 import Component from '../related-people-access-control';
+import * as aclUtils from '../../../plugins/utils/acl-utils';
 
 describe('GGRC.relatedPeopleAccessControl', function () {
   let viewModel;
 
   beforeAll(function () {
     viewModel = new (can.Map.extend(Component.prototype.viewModel));
+  });
 
-    GGRC.access_control_roles = [
+  beforeEach(() => {
+    spyOn(aclUtils, 'getRolesForType').and.returnValue([
       {id: 1, name: 'Admin', object_type: 'Control'},
-      {id: 2, name: 'Admin', object_type: 'Vendor'},
       {id: 3, name: 'Primary Contacts', object_type: 'Control'},
       {id: 4, name: 'Secondary Contacts', object_type: 'Control'},
       {id: 5, name: 'Principal Assignees', object_type: 'Control'},
       {id: 6, name: 'Secondary Assignees', object_type: 'Control'},
-    ];
-  });
-
-  afterAll(function () {
-    delete GGRC.access_control_roles;
+    ]);
   });
 
   describe('"getFilteredRoles" method', function () {

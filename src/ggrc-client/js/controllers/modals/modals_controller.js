@@ -3,7 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../../apps/custom_attributes_wrap';
 import '../../components/issue-tracker/modal-issue-tracker-fields';
 import '../../components/issue-tracker/issue-tracker-switcher';
 import '../../components/access_control_list/access-control-list-roles-helper'
@@ -135,20 +134,6 @@ export default can.Control({
           this.restore_ui_status_from_storage();
         }.bind(this));
     }.bind(this));
-  },
-
-  setupCustomAttributes(instance) {
-    let setup;
-    if (!instance) {
-      return;
-    }
-
-    setup = instance.setup_custom_attributes;
-
-    if (setup && !(instance instanceof CMS.Models.Assessment)) {
-      instance.removeAttr('custom_attributes');
-      instance.setup_custom_attributes();
-    }
   },
 
   apply_object_params: function () {
@@ -345,11 +330,9 @@ export default can.Control({
       }
     });
 
-    return dfd.done(() => {
-      this.reset_form(() => {
-        this.setupCustomAttributes(instance);
-      });
-    });
+    return dfd.done(function () {
+      this.reset_form();
+    }.bind(that));
   },
 
   reset_form: function (setFieldsCb) {
@@ -661,7 +644,9 @@ export default can.Control({
       value = value || [];
       cur.splice.apply(cur, [0, cur.length].concat(value));
     } else if (name[0] === 'custom_attributes') {
-      instance.custom_attributes.attr(name[1], value[name[1]]);
+      const caId = Number(name[1]);
+      const caValue = value[name[1]];
+      instance.customAttr(caId, caValue);
     } else if (name[0] !== 'people') {
       instance.attr(name[0], value);
     }
@@ -747,18 +732,22 @@ export default can.Control({
 
   '{$content} a.field-hide click': function (el, ev) { // field hide
     var $el = $(el);
-    var $hidable = $el.closest('.hidable');
     var totalInner = $el.closest('.hide-wrap.hidable')
-      .find('.inner-hide').length;
+    .find('.inner-hide').length;
     var totalHidden;
     var uiUnit;
     var i;
     var tabValue;
+    var $hidable = [
+      'span',
+      'ggrc-form-item'
+    ].map((className) => $el.closest(`[class*="${className}"].hidable`))
+    .find((item) => item.length > 0);
 
     $el.closest('.inner-hide').addClass('inner-hidable');
     totalHidden = $el.closest('.hide-wrap.hidable')
       .find('.inner-hidable').length;
-    // $hidable.hide();
+
     $hidable.addClass('hidden');
     this.options.attr('reset_visible', true);
     // update ui array
@@ -944,61 +933,69 @@ export default can.Control({
       }
     });
   },
-  // make buttons non-clickable when saving
-  bindXHRToBackdrop: function (xhr, el, newtext, disable) {
-    // binding of an ajax to a click is something we do manually
-    var $el = $(el);
 
-    $el.addClass('disabled pending-ajax');
-    if (disable !== false) {
-      $el.attr('disabled', true);
+  // make element non-clickable when saving
+  bindXHRToDisableElement(xhr, el) {
+    // binding of an ajax to a click is something we do manually
+    const $el = $(el);
+
+    if (!$el.length) {
+      return;
     }
-    xhr.always(function () {
-      // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
-      $el.removeAttr('disabled').removeClass('disabled pending-ajax');// [0].innerHTML = oldtext;
+
+    $el.addClass('disabled');
+    xhr.always(() => {
+      $el.removeClass('disabled');
     });
   },
 
-  triggerSave: function (el, ev) {
-    var ajd;
-    var saveCloseBtn = this.element.find('a.btn[data-toggle=modal-submit]');
-    var saveAddmoreBtn = this.element.find(
-      'a.btn[data-toggle=modal-submit-addmore]');
-    var modalBackdrop = this.element.data('modal_form').$backdrop;
-
+  triggerSave(el, ev) {
     // Normal saving process
     if (el.is(':not(.disabled)')) {
-      ajd = this.save_instance(el, ev);
+      const ajd = this.save_instance(el, ev);
 
       if (!ajd) {
         return;
       }
 
+      const saveCloseBtn = this.element.find('a.btn[data-toggle=modal-submit]');
+      const modalBackdrop = this.element.data('modal_form').$backdrop;
+      const modalCloseBtn = this.element.find('.modal-dismiss > .fa-times');
+      const deleteBtn = this.element.find(
+        'a.btn[data-toggle=modal-ajax-deleteform]'
+      );
+      const saveAddmoreBtn = this.element.find(
+        'a.btn[data-toggle=modal-submit-addmore]'
+      );
+
       this.options.attr('isSaving', true);
 
-      ajd.always(function () {
+      ajd.always(() => {
         this.options.attr('isSaving', false);
-      }.bind(this));
+      });
 
       if (this.options.add_more) {
         this.bindXHRToButton_disable(ajd, saveCloseBtn);
         this.bindXHRToButton_disable(ajd, saveAddmoreBtn);
-        this.bindXHRToBackdrop(ajd, modalBackdrop, 'Saving, please wait...');
       } else {
         this.bindXHRToButton(ajd, saveCloseBtn, 'Saving, please wait...');
         this.bindXHRToButton(ajd, saveAddmoreBtn);
       }
+
+      this.bindXHRToDisableElement(ajd, deleteBtn);
+      this.bindXHRToDisableElement(ajd, modalBackdrop);
+      this.bindXHRToDisableElement(ajd, modalCloseBtn);
     } else if (this._email_check) {
       // Queue a save if clicked after verifying the email address
-      this._email_check.done(function (data) {
+      this._email_check.done((data) => {
         if (!_.isNull(data.length) && !_.isUndefined(data.length)) {
           data = data[0];
         }
         if (data) {
-          setTimeout(function () {
+          setTimeout(() => {
             delete this._email_check;
             el.trigger('click');
-          }.bind(this), 0);
+          }, 0);
         }
       });
     }
@@ -1192,7 +1189,6 @@ export default can.Control({
         });
         instance.attr('custom_attribute_definitions', cad);
       }
-      this.setupCustomAttributes(instance);
       instance.refresh();
       instance.dispatch(REFRESH_MAPPING);
     }
@@ -1216,7 +1212,8 @@ export default can.Control({
     if (!$trigger) {
       return false;
     }
-    return !$trigger.closest('.modal, .cms_controllers_info_pin').length;
+    return $trigger.data('updateHash') ||
+      !$trigger.closest('.modal, .cms_controllers_info_pin').length;
   },
 
   update_hash_fragment: function () {

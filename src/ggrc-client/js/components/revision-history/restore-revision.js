@@ -6,9 +6,8 @@
 import {
   buildModifiedACL,
   buildModifiedListField,
-  buildModifiedAttValues,
 } from '../../plugins/utils/object-history-utils';
-
+import {caDefTypeName} from '../../plugins/utils/custom-attribute/custom-attribute-config';
 import template from './templates/restore-revision.mustache';
 const tag = 'restore-revision';
 
@@ -37,7 +36,7 @@ export default can.Component.extend({
       this.applyListFields(instance, diff.attr('mapping_list_fields'));
 
       // use legacy approach to save custom attribute
-      this.applyCustomAttributes(instance, attrValues, true);
+      this.applyCustomAttributes(instance, attrValues);
 
       this.saveInstance(instance, element);
     },
@@ -68,46 +67,20 @@ export default can.Component.extend({
         instance.attr(fieldName, modifiedField);
       });
     },
-    applyCustomAttributes(instance, modifiedAttributes, useLegacy) {
-      const values = instance
-        .attr('custom_attribute_values')
-        .map((value) => value.reify())
-        .attr();
-
-      const definitions = instance
-        .attr('custom_attribute_definitions')
-        .attr();
-
-      const modifiedValues =
-        buildModifiedAttValues(values, definitions, modifiedAttributes);
-
-      if (useLegacy) {
-        instance.attr('custom_attributes',
-          this.convertToLegacyAttributes(modifiedValues, definitions));
-      } else {
-        instance.attr('custom_attribute_values', modifiedValues);
-      }
-    },
-    convertToLegacyAttributes(values, definitions) {
-      const customAttributes = {};
-
-      values.forEach((value) => {
-        const def = definitions
-          .find((def) => value.custom_attribute_id === def.id);
-        let caValue;
-
-        if (def.attribute_type === 'Map:Person') {
-          caValue = `Person:${value.attribute_object.id}`;
-        } else if (def.attribute_type === 'Checkbox') {
-          caValue = value.attribute_value === '1' ? true : false;
-        } else {
-          caValue = value.attribute_value;
-        }
-
-        customAttributes[value.custom_attribute_id] = caValue;
+    applyCustomAttributes(instance, modifiedAttributes) {
+      modifiedAttributes.each((modifiedAttribute, caId) => {
+        const valueForPerson = _.get(
+          modifiedAttribute, 'attribute_object.id'
+        ) || null;
+        const caDef = _.find(GGRC.custom_attr_defs, (gca) => 
+          gca.id === Number(caId)
+        );
+        const isPerson = caDefTypeName.MapPerson === caDef.attribute_type;
+        const value = isPerson 
+          ? valueForPerson
+          : modifiedAttribute.attribute_value;
+        instance.customAttr(caId, value);
       });
-
-      return customAttributes;
     },
     closeDiff(element) {
       // TODO: fix

@@ -13,15 +13,12 @@
     ></tree-item-actions>
     <div class="flex-box selectable-attrs width-100" ($click)="onClick($element)">
         {{#selectedColumns}}
-          {{! add alias because "this" is changed inside the switch-case block}}
-          {{#add_to_current_scope thisColumn=this}}
           <div class="flex-box attr-cell">
             {{#switch attr_type}}
               {{#case 'custom'}}
                 <div class="custom attr-content">
                   <tree-item-custom-attribute {instance}="instance"
-                                              {values}="instance.custom_attribute_values"
-                                              {column}="thisColumn"
+                                              {custom-attribute-id}="attr_custom_attribute_id"
                   ></tree-item-custom-attribute>
                 </div>
               {{/case}}
@@ -78,7 +75,6 @@
               {{/case}}
            {{/switch}}
           </div>
-          {{/add_to_current_scope}}
         {{/selectedColumns}}
     </div>
 

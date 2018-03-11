@@ -4,6 +4,7 @@
 */
 
 import Component from '../import';
+import * as Utils from '../import-export-utils';
 
 describe('GGRC.Components.csvImportWidget', function () {
   'use strict';
@@ -15,9 +16,9 @@ describe('GGRC.Components.csvImportWidget', function () {
     fakeScope = new can.Map({});
   });
 
-  describe('scope.states() method', function () {
+  describe('viewModel.states() method', function () {
     beforeEach(function () {
-      method = Component.prototype.scope.states.bind(fakeScope);
+      method = Component.prototype.viewModel.states.bind(fakeScope);
     });
 
     describe('the returned "import" state config\'s isDisabled() method',
@@ -154,9 +155,9 @@ describe('GGRC.Components.csvImportWidget', function () {
     let importDfd;
 
     beforeEach(function () {
-      method = Component.prototype.scope.requestImport.bind(fakeScope);
+      method = Component.prototype.viewModel.requestImport.bind(fakeScope);
       importDfd = new can.Deferred();
-      spyOn(GGRC.Utils, 'import_request').and.returnValue(importDfd);
+      spyOn(Utils, 'importRequest').and.returnValue(importDfd);
       fakeScope.prepareDataForCheck = jasmine.createSpy();
       fakeScope.beforeProcess = jasmine.createSpy();
     });
@@ -188,7 +189,7 @@ describe('GGRC.Components.csvImportWidget', function () {
     it('calls import_request method from utils with data containing file id' +
     ' to check data for import', function () {
       method({id: '12343'});
-      expect(GGRC.Utils.import_request).toHaveBeenCalledWith({
+      expect(Utils.importRequest).toHaveBeenCalledWith({
         data: {id: '12343'},
       }, true);
     });
@@ -270,8 +271,7 @@ describe('GGRC.Components.csvImportWidget', function () {
     let authDfd;
 
     beforeEach(function () {
-      method = Component.prototype
-        .events['#import_btn.state-select click'];
+      method = Component.prototype.viewModel.selectFile;
       authDfd = new can.Deferred();
       spyOn(GGRC.Controllers.GAPI, 'reAuthorize').and.returnValue(authDfd);
       spyOn(gapi.auth, 'getToken').and.returnValue('mockToken');

@@ -12,6 +12,9 @@ import {
   isMyAssessments,
   isAdmin,
 } from './plugins/utils/current-page-utils';
+import {
+  getRole,
+} from './plugins/utils/acl-utils';
 import RefreshQueue from './models/refresh_queue';
 import Permission from './permission';
 import _ from 'lodash';
@@ -1067,6 +1070,19 @@ Mustache.registerHelper("is_allowed_to_map", function (source, target, options) 
   return options.inverse(options.contexts || this);
 });
 
+Mustache.registerHelper('is_allowed_to_map_task', (sourceType, options)=> {
+  const mappableTypes = ['Program', 'Regulation', 'Policy', 'Standard',
+    'Contract', 'Clause', 'Section', 'Request', 'Control', 'Objective',
+    'OrgGroup', 'Vendor', 'AccessGroup', 'System', 'Process', 'DataAsset',
+    'Product', 'Project', 'Facility', 'Market'];
+  sourceType = resolve_computed(sourceType);
+
+  if (mappableTypes.includes(sourceType)) {
+    return options.fn(options.contexts);
+  }
+  return options.inverse(options.contexts);
+});
+
 function resolve_computed(maybe_computed, always_resolve) {
   return (typeof maybe_computed === "function"
     && (maybe_computed.isComputed || always_resolve)) ? resolve_computed(maybe_computed(), always_resolve) : maybe_computed;
@@ -1319,10 +1335,7 @@ Mustache.registerHelper("last_approved", function (instance, options) {
 });
 
 Mustache.registerHelper('with_is_reviewer', function (reviewTask, options) {
-  let assigneeRole = _.find(GGRC.access_control_roles, {
-    object_type: 'CycleTaskGroupObjectTask',
-    name: 'Task Assignees',
-  });
+  let assigneeRole = getRole('CycleTaskGroupObjectTask', 'Task Assignees');
   let currentUserId = GGRC.current_user.id;
   let isReviewer;
 
@@ -2286,46 +2299,6 @@ Mustache.registerHelper(
   }
 );
 
-/**
-   * Check if Custom Atttribute's value did not pass validation, and render the
-   * corresponding block in the template. The error messages, if any, are
-   * available in the "error" variable within the "truthy" block.
-   *
-   * Example usage:
-   *
-   *   {{#ca_validation_error validationErrors customAttrId}}
-   *     Invalid value for the Custom Attribute {{customAttrId}}: {{errors.0}}
-   *   {{else}}
-   *     Hooray, no errors, a correct value is set!
-   *   {{/ca_validation_error}}
-   *
-   * @param {Object} validationErrors - an object containing validation results
-   *   of a can.Model instance
-   * @param {Number} customAttrId - ID of the Custom Attribute to check for
-   *   validation errors
-   * @param {Object} options - a CanJS options argument passed to every helper
-   */
-Mustache.registerHelper(
-  'ca_validation_error',
-  function (validationErrors, customAttrId, options) {
-    let errors;
-    let contextStack;
-    let property;
-
-    validationErrors = Mustache.resolve(validationErrors) || {};
-    customAttrId = Mustache.resolve(customAttrId);
-
-    property = 'custom_attributes.' + customAttrId;
-    errors = validationErrors[property] || [];
-
-    if (errors.length > 0) {
-      contextStack = options.contexts.add({errors: errors});
-      return options.fn(contextStack);
-    }
-    return options.inverse(options.contexts);
-  }
-);
-
 Mustache.registerHelper('isNotInScopeModel', function (modelName, options) {
   let isInScope;
   modelName = can.isFunction(modelName) ? modelName() : modelName;
@@ -2462,8 +2435,7 @@ Mustache.registerHelper('displayAssessmentIssueTracker',
   }
 );
 Mustache.registerHelper('is_auditor', function (options) {
-  const auditor = GGRC.access_control_roles.find(
-    (role) => role.name === 'Auditors' && role.object_type === 'Audit');
+  const auditor = getRole('Audit', 'Auditors');
   const audit = GGRC.page_instance();
   if (audit.type !== 'Audit') {
     console.warn('is_auditor called on non audit page');

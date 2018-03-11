@@ -26,15 +26,8 @@
 
         if (instance && instance.attr('archived')) {
           instance.attr('archived', false);
-
-          // Need to be fixed via new API:
-          // saving with filled custom_attributes
-          // will cause 403 error
-          instance.removeAttr('custom_attributes');
           instance.save()
             .then(function () {
-              let instance = this.scope.attr('instance');
-              instance.setup_custom_attributes();
               if (this.scope.attr('notify')) {
                 $('body').trigger('ajax:flash', {success: notifyText});
               }

@@ -9,12 +9,7 @@ import ddt
 import sqlalchemy as sa
 
 from ggrc import db
-from ggrc.models import AccessControlList
-from ggrc.models import AccessControlRole
-from ggrc.models import Assessment
-from ggrc.models import Control
-from ggrc.models import Person
-from ggrc_workflows.models import TaskGroup
+from ggrc.models import all_models
 
 from integration.ggrc import TestCase
 from integration.ggrc.query_helper import WithQueryApi
@@ -50,18 +45,22 @@ class TestOrder(TestCase, WithQueryApi):
   @ddt.data("Assignees", "Creators", "Verifiers")
   def test_assessment_roles(self, role):
     """Assessment assignees/verifiers/creators ordering"""
-    query = db.session.query(Assessment.title).join(
-        AccessControlList,
+    query = db.session.query(all_models.Assessment.title).join(
+        all_models.AccessControlList,
         sa.and_(
-            AccessControlList.object_type == "Assessment",
-            AccessControlList.object_id == Assessment.id,
+            all_models.AccessControlList.object_type == "Assessment",
+            all_models.AccessControlList.object_id == all_models.Assessment.id,
         )
     ).join(
-        AccessControlRole,
-        AccessControlRole.id == AccessControlList.ac_role_id
+        all_models.AccessControlRole,
+        (all_models.AccessControlRole.id ==
+         all_models.AccessControlList.ac_role_id)
     ).join(
-        Person, Person.id == AccessControlList.person_id
-    ).filter(AccessControlRole.name == role).order_by(Person.email)
+        all_models.Person,
+        all_models.Person.id == all_models.AccessControlList.person_id
+    ).filter(all_models.AccessControlRole.name == role).order_by(
+        all_models.Person.email,
+    )
 
     sorted_titles = [a[0] for a in query]
     self._check_ordering("Assessment", sorted_titles, role)
@@ -73,19 +72,24 @@ class TestOrder(TestCase, WithQueryApi):
             "Secondary Assignees")
   def test_control_roles(self, role):
     """Control roles ordering"""
-    sorted_titles = [title for title, in db.session.query(Control.title)
-                     .filter(
-                         AccessControlList.object_type == "Control",
-                         AccessControlList.object_id == Control.id,
-                         AccessControlList.ac_role_id == AccessControlRole.id,
-                         AccessControlRole.name == role,
-                         Person.id == AccessControlList.person_id)
-                     .order_by(Person.email)]
+    sorted_titles = [
+        title for title, in
+        db.session.query(all_models.Control.title).filter(
+            all_models.AccessControlList.object_type == "Control",
+            all_models.AccessControlList.object_id == all_models.Control.id,
+            (all_models.AccessControlList.ac_role_id ==
+             all_models.AccessControlRole.id),
+            all_models.AccessControlRole.name == role,
+            all_models.Person.id == all_models.AccessControlList.person_id)
+        .order_by(all_models.Person.email)]
     self._check_ordering("Control", sorted_titles, role)
 
   def test_task_group_assignee(self):
     """Task Group assignee ordering"""
-    sorted_titles = [title for title, in db.session.query(TaskGroup.title)
-                     .filter(Person.id == TaskGroup.contact_id)
-                     .order_by(Person.email)]
+    sorted_titles = [
+        title for title, in
+        db.session.query(all_models.TaskGroup.title).filter(
+            all_models.Person.id == all_models.TaskGroup.contact_id,
+        ).order_by(all_models.Person.email)
+    ]
     self._check_ordering("TaskGroup", sorted_titles, "Assignee")

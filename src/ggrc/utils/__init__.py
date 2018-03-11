@@ -295,24 +295,19 @@ def list_chunks(list_, chunk_size=200):
 
 
 def create_stub(object_, context_id=None):
-  """Create stub from model attribute
+  """Create stub from instance.
 
   Args:
-    object_: Object instance
+    object_: Object instance.
+    context_id: Object instance context_id attribute.
   Returns:
-    Dict representation of stub
+    Dict stub representation.
   """
-  import ggrc.models as models
-
-  if object_:
-    id_ = object_.id
-    type_ = object_.type
-
-    model = getattr(models.all_models, type_)
-    return {
-        'type': type_,
-        'id': id_,
-        'context_id': context_id,
-        'href': u"/api/{}/{}".format(model._inflector.table_plural, id_),
-    }
-  return None
+  if not object_:
+    return None
+  return {
+      'type': object_.type,
+      'id': object_.id,
+      'context_id': context_id,
+      'href': url_for(object_),
+  }

@@ -5,6 +5,7 @@
 
 import './revision-log-data';
 import '../paginate';
+import {getRolesForType} from '../../plugins/utils/acl-utils';
 import RefreshQueue from '../../models/refresh_queue';
 import template from './revision-log.mustache';
 
@@ -369,8 +370,7 @@ import template from './revision-log.mustache';
           return [];
         }
 
-        roles = GGRC.access_control_roles.filter((item) =>
-          item.object_type === this.attr('instance.type'));
+        roles = getRolesForType(this.attr('instance.type'));
 
         roles.forEach((role) => {
           let rev1people = this._getPeopleForRole(role, rev1content);
@@ -508,8 +508,13 @@ import template from './revision-log.mustache';
           let obj;
           switch (def.attribute_type) {
             case 'Checkbox':
-              return value.attribute_value ? '✓' : undefined;
+              return _.flow(Number, Boolean)(value.attribute_value)
+                ? '✓'
+                : undefined;
             case 'Map:Person':
+              if (!value.attribute_object) {
+                return;
+              }
               obj = CMS.Models.Person
                 .findInCacheById(value.attribute_object_id);
               if (obj === undefined) {

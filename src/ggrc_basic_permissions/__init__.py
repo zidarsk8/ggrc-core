@@ -32,7 +32,6 @@ from ggrc_basic_permissions.contributed_roles import BasicRoleDeclarations
 from ggrc_basic_permissions.contributed_roles import BasicRoleImplications
 from ggrc_basic_permissions.converters.handlers import COLUMN_HANDLERS
 from ggrc_basic_permissions.models import ContextImplication
-from ggrc_basic_permissions.models import get_ids_related_to
 from ggrc_basic_permissions.models import Role
 from ggrc_basic_permissions.models import UserRole
 
@@ -603,5 +602,3 @@ def contributed_column_handlers():
 
 ROLE_DECLARATIONS = BasicRoleDeclarations()
 ROLE_IMPLICATIONS = BasicRoleImplications()
-
-contributed_get_ids_related_to = get_ids_related_to

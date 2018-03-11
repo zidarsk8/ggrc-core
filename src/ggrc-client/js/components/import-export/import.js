@@ -6,17 +6,19 @@
 import '../../plugins/utils/controllers';
 import {warning} from '../../plugins/utils/modals';
 import {hasWarningType} from '../../plugins/utils/controllers';
-import './csv-template';
+import {importRequest} from './import-export-utils';
 import '../show-more/show-more';
+import '../import-export/download-template/download-template';
+import '../collapsible-panel/collapsible-panel';
 import quickTips from './templates/quick-tips.mustache';
 import template from './templates/csv-import.mustache';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 
-export default GGRC.Components('csvImportWidget', {
+export default can.Component.extend({
   tag: 'csv-import',
   template: template,
   requestData: null,
-  scope: {
+  viewModel: {
     importUrl: '/_service/import_csv',
     quickTips,
     'import': null,
@@ -24,59 +26,60 @@ export default GGRC.Components('csvImportWidget', {
     fileName: '',
     isLoading: false,
     state: 'select',
+    importStatus: '',
     helpUrl: GGRC.config.external_import_help_url,
     states: function () {
       let state = this.attr('state') || 'select';
       let states = {
-            select: {
-              'class': 'btn-green',
-              text: 'Choose file to import',
-            },
-            analyzing: {
-              'class': 'btn-white',
-              showSpinner: true,
-              isDisabled: true,
-              text: 'Analyzing',
-            },
-            'import': {
-              'class': 'btn-green',
-              text: 'Import',
-              isDisabled: function () {
-                // info on blocks to import
-                let toImport = this.import;
-                let nonEmptyBlockExists;
-                let hasErrors;
+        select: {
+          'class': 'btn-green',
+          text: 'Choose file to import',
+        },
+        analyzing: {
+          'class': 'btn-white',
+          showSpinner: true,
+          isDisabled: true,
+          text: 'Analyzing',
+        },
+        'import': {
+          'class': 'btn-green',
+          text: 'Import',
+          isDisabled: function () {
+            // info on blocks to import
+            let toImport = this.import;
+            let nonEmptyBlockExists;
+            let hasErrors;
 
-                if (!toImport || toImport.length < 1) {
-                  return true;
-                }
+            if (!toImport || toImport.length < 1) {
+              return true;
+            }
 
-                // A non-empty block is a block containing at least one
-                // line that is not ignored (due to errors, etc.).
-                nonEmptyBlockExists = _.any(toImport, function (block) {
-                  return block.rows > block.ignored;
-                });
+            // A non-empty block is a block containing at least one
+            // line that is not ignored (due to errors, etc.).
+            nonEmptyBlockExists = _.any(toImport, function (block) {
+              return block.rows > block.ignored;
+            });
 
-                hasErrors = _.any(toImport, function (block) {
-                  return block.block_errors.length;
-                });
+            hasErrors = _.any(toImport, function (block) {
+              return block.block_errors.length;
+            });
 
-                return hasErrors || !nonEmptyBlockExists;
-              }.bind(this),
-            },
-            importing: {
-              'class': 'btn-white',
-              showSpinner: true,
-              isDisabled: true,
-              text: 'Importing',
-            },
-            success: {
-              'class': 'btn-green',
-              isDisabled: true,
-              text: '<i class="fa fa-check-square-o white">'+
-                '</i> Import successful',
-            },
-          };
+            return hasErrors || !nonEmptyBlockExists;
+          }.bind(this),
+        },
+        importing: {
+          'class': 'btn-white',
+          showSpinner: true,
+          isDisabled: true,
+          text: 'Importing',
+        },
+        success: {
+          'class': 'btn-green',
+          isDisabled: true,
+          text: '<i class="fa fa-check-square-o white">'+
+            '</i> Import successful',
+        },
+      };
 
       return _.extend(states[state], {state: state});
     },
@@ -110,18 +113,26 @@ export default GGRC.Components('csvImportWidget', {
       };
     },
     processLoadedInfo: function (data) {
-      this.attr('import', _.map(data, function (element) {
+      this.attr('import', _.map(data, (element) => {
         element.data = [];
-        if (element.block_errors.concat(element.row_errors).length) {
+        if (element.block_warnings.length + element.row_warnings.length) {
+          let messages = [...element.block_warnings, ...element.row_warnings];
+
+          this.attr('importStatus', 'warning');
+
           element.data.push({
-            status: 'errors',
-            messages: element.block_errors.concat(element.row_errors),
+            title: `WARNINGS (${messages.length})`,
+            messages,
           });
         }
-        if (element.block_warnings.concat(element.row_warnings).length) {
+        if (element.block_errors.length + element.row_errors.length) {
+          let messages = [...element.block_errors, ...element.row_errors];
+
+          this.attr('importStatus', 'error');
+
           element.data.push({
-            status: 'warnings',
-            messages: element.block_warnings.concat(element.row_warnings),
+            title: `ERRORS (${messages.length})`,
+            messages,
           });
         }
         return element;
@@ -186,6 +197,7 @@ export default GGRC.Components('csvImportWidget', {
         state: 'select',
         fileId: '',
         fileName: '',
+        importStatus: '',
         'import': null,
       });
       element.find('.csv-upload').val('');
@@ -197,7 +209,7 @@ export default GGRC.Components('csvImportWidget', {
       this.attr('fileName', file.name);
 
       backendGdriveClient.withAuth(()=> {
-        return GGRC.Utils.import_request({data: {id: file.id}}, true);
+        return importRequest({data: {id: file.id}}, true);
       }, {responseJSON: {message: 'Unable to Authorize'}})
         .then(this.prepareDataForCheck.bind(this))
         .then(function (checkObject) {
@@ -215,39 +227,7 @@ export default GGRC.Components('csvImportWidget', {
           this.attr('isLoading', false);
         }.bind(this));
     },
-  },
-  events: {
-    '.state-reset click': function (el, ev) {
-      ev.preventDefault();
-      this.scope.resetFile(this.element);
-    },
-    '.state-import click': function (el, ev) {
-      ev.preventDefault();
-      this.scope.attr('state', 'importing');
-
-      GGRC.Utils.import_request({
-        data: {id: this.scope.attr('fileId')},
-      }, false)
-      .done(function (data) {
-        let result_count = data.reduce(function (prev, curr) {
-              _.each(Object.keys(prev), function (key) {
-                prev[key] += curr[key] || 0;
-              });
-              return prev;
-            }, {created: 0, updated: 0, deleted: 0, ignored: 0});
-
-        this.scope.attr('state', 'success');
-        this.scope.attr('data', [result_count]);
-      }.bind(this))
-      .fail(function (data) {
-        this.scope.attr('state', 'select');
-        GGRC.Errors.notifier('error', data.responseJSON.message);
-      }.bind(this))
-      .always(function () {
-        this.scope.attr('isLoading', false);
-      }.bind(this));
-    },
-    '#import_btn.state-select click': function (el, ev) {
+    selectFile() {
       let that = this;
       let allowedTypes = ['text/csv', 'application/vnd.google-apps.document',
         'application/vnd.google-apps.spreadsheet'];
@@ -264,9 +244,9 @@ export default GGRC.Components('csvImportWidget', {
           let docsUploadView;
           let docsView;
           let picker = new google.picker.PickerBuilder()
-                .setOAuthToken(gapi.auth.getToken().access_token)
-                .setDeveloperKey(GGRC.config.GAPI_KEY)
-                .setCallback(pickerCallback);
+            .setOAuthToken(gapi.auth.getToken().access_token)
+            .setDeveloperKey(GGRC.config.GAPI_KEY)
+            .setCallback(pickerCallback);
 
           docsUploadView = new google.picker.DocsUploadView();
           docsView = new google.picker.DocsView()
@@ -299,7 +279,7 @@ export default GGRC.Components('csvImportWidget', {
           if (file && _.any(allowedTypes, function (type) {
             return type === file.mimeType;
           })) {
-            that.scope.requestImport(file);
+            that.requestImport(file);
           } else {
             GGRC.Errors.notifier('error',
               'Something other than a csv-file was chosen. ' +
@@ -307,6 +287,43 @@ export default GGRC.Components('csvImportWidget', {
           }
         }
       }
+    },
+  },
+  events: {
+    '.state-reset click': function (el, ev) {
+      ev.preventDefault();
+      this.viewModel.selectFile();
+      this.viewModel.resetFile(this.element);
+    },
+    '.state-import click': function (el, ev) {
+      ev.preventDefault();
+      this.viewModel.attr('state', 'importing');
+
+      importRequest({
+        data: {id: this.viewModel.attr('fileId')},
+      }, false)
+        .done(function (data) {
+          let result_count = data.reduce(function (prev, curr) {
+            _.each(Object.keys(prev), function (key) {
+              prev[key] += curr[key] || 0;
+            });
+            return prev;
+          }, {created: 0, updated: 0, deleted: 0, ignored: 0});
+
+          this.viewModel.attr('state', 'success');
+          this.viewModel.attr('data', [result_count]);
+        }.bind(this))
+        .fail(function (data) {
+          this.viewModel.attr('state', 'select');
+          GGRC.Errors.notifier('error', data.responseJSON.message);
+        }.bind(this))
+        .always(function () {
+          this.viewModel.attr('isLoading', false);
+        }.bind(this));
+    },
+    '#import_btn.state-select click': function (el, ev) {
+      ev.preventDefault();
+      this.viewModel.selectFile();
     },
   },
 });

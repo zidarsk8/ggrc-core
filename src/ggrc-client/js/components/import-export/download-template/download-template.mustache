@@ -1,0 +1,52 @@
+{{!
+    Copyright (C) 2018 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<button class="btn btn-white btn-small" ($click)="showDialog">
+  Download Import Template
+</button>
+
+<simple-modal modal-title="modalTitle"
+              state="modalState"
+              replace-content="true"
+              extra-css-class="download-template">
+  <div class="simple-modal__header">
+    <div class="simple-modal__header-text">{{modalTitle}}</div>
+    <button class="btn btn-small btn-icon" ($click)="hide">
+      <i class="fa fa-times black"></i>
+    </button>
+  </div>
+
+  <div class="download-template__content">
+    <p>
+      Don't have an import template ready? We'll create template for you right now.
+    </p>
+    <p>
+      Select which type of objects you want to import, and we'll generate import
+      template, with all fields and instructions.
+    </p>
+    <p>
+      I'm importing/updating...
+    </p>
+
+    <h4>Choose Templates</h4>
+    <multiselect-dropdown {options}="importableModels"
+                          placeholder="Choose Templates"
+                          (dropdown-close)="selectItems(%event)">
+    </multiselect-dropdown>
+  </div>
+
+  <div class="simple-modal__footer">
+    <div class="simple-modal__toolbar">
+      <button class="btn btn-small btn-white simple-modal__toolbar-item" ($click)="hide">
+        Close
+      </button>
+      <button class="btn btn-small btn-green simple-modal__toolbar-item"
+              {{^if selected.length}}disabled="disabled"{{/if}}
+              ($click)="downloadCSV">
+        Download CSV
+      </button>
+    </div>
+  </div>
+</simple-modal>

@@ -4,31 +4,7 @@
 """ This module is used for import and export of data with csv files """
 
 from ggrc.extensions import get_extension_modules
-from ggrc.models import AccessGroup
-from ggrc.models import Assessment
-from ggrc.models import AssessmentTemplate
-from ggrc.models import Audit
-from ggrc.models import Clause
-from ggrc.models import Contract
-from ggrc.models import Control
-from ggrc.models import DataAsset
-from ggrc.models import Facility
-from ggrc.models import Issue
-from ggrc.models import Market
-from ggrc.models import Objective
-from ggrc.models import OrgGroup
-from ggrc.models import Person
-from ggrc.models import Policy
-from ggrc.models import Process
-from ggrc.models import Product
-from ggrc.models import Program
-from ggrc.models import Project
-from ggrc.models import Regulation
-from ggrc.models import Section
-from ggrc.models import Standard
-from ggrc.models import System
-from ggrc.models import Vendor
-from ggrc.models import Snapshot
+from ggrc.models import all_models
 
 
 def get_shared_unique_rules():
@@ -38,9 +14,10 @@ def get_shared_unique_rules():
   """
 
   shared_tables = [
-      (System, Process),
-      (Section, Clause),
-      (Policy, Regulation, Standard, Contract),
+      (all_models.System, all_models.Process),
+      (all_models.Section, all_models.Clause),
+      (all_models.Policy, all_models.Regulation,
+       all_models.Standard, all_models.Contract),
   ]
   rules = {}
   for tables in shared_tables:
@@ -51,42 +28,42 @@ def get_shared_unique_rules():
 
 
 GGRC_IMPORTABLE = {
-    "access group": AccessGroup,
-    "access_group": AccessGroup,
-    "accessgroup": AccessGroup,
-    "assessment template": AssessmentTemplate,
-    "assessment": Assessment,
-    "assessment_template": AssessmentTemplate,
-    "audit": Audit,
-    "clause": Clause,
-    "contract": Contract,
-    "control assessment": Assessment,
-    "control": Control,
-    "data asset": DataAsset,
-    "data_asset": DataAsset,
-    "dataasset": DataAsset,
-    "facility": Facility,
-    "issue": Issue,
-    "market": Market,
-    "objective": Objective,
-    "org group": OrgGroup,
-    "org_group": OrgGroup,
-    "orggroup": OrgGroup,
-    "person": Person,
-    "policy": Policy,
-    "process": Process,
-    "product": Product,
-    "program": Program,
-    "project": Project,
-    "regulation": Regulation,
-    "section": Section,
-    "standard": Standard,
-    "system": System,
-    "vendor": Vendor,
+    "access group": all_models.AccessGroup,
+    "access_group": all_models.AccessGroup,
+    "accessgroup": all_models.AccessGroup,
+    "assessment template": all_models.AssessmentTemplate,
+    "assessment": all_models.Assessment,
+    "assessment_template": all_models.AssessmentTemplate,
+    "audit": all_models.Audit,
+    "clause": all_models.Clause,
+    "contract": all_models.Contract,
+    "control assessment": all_models.Assessment,
+    "control": all_models.Control,
+    "data asset": all_models.DataAsset,
+    "data_asset": all_models.DataAsset,
+    "dataasset": all_models.DataAsset,
+    "facility": all_models.Facility,
+    "issue": all_models.Issue,
+    "market": all_models.Market,
+    "objective": all_models.Objective,
+    "org group": all_models.OrgGroup,
+    "org_group": all_models.OrgGroup,
+    "orggroup": all_models.OrgGroup,
+    "person": all_models.Person,
+    "policy": all_models.Policy,
+    "process": all_models.Process,
+    "product": all_models.Product,
+    "program": all_models.Program,
+    "project": all_models.Project,
+    "regulation": all_models.Regulation,
+    "section": all_models.Section,
+    "standard": all_models.Standard,
+    "system": all_models.System,
+    "vendor": all_models.Vendor,
 }
 
 GGRC_EXPORTABLE = {
-    "snapshot": Snapshot,
+    "snapshot": all_models.Snapshot,
 }
 
 

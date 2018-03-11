@@ -11,12 +11,11 @@
     word-wrap: break-word;
   }
   &.pane-header__fixed {
-    right: 52px;
-    left: 52px;
-    position: fixed;
     box-shadow: 0px 5px 5px -5px rgba(0, 0, 0, 0.5);
   }
   .sticky-info-panel & {
+    top: 0;
+    position: sticky;
     padding-top: 15px;
     margin-top: -15px;
     min-height: 52px;

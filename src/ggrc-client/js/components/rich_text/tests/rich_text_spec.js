@@ -92,48 +92,48 @@ describe('richText component', ()=> {
 
       beforeEach(()=> {
         editor = {
-          root: jasmine.createSpyObj(['addEventListener']),
+          on: jasmine.createSpy(),
+          history: {
+            undo: jasmine.createSpy(),
+          },
         };
       });
 
-      it('should subscribe "keypress" event', ()=> {
+      it('should subscribe "text-change" event', ()=> {
         viewModel.restrictMaxLength(editor);
 
-        expect(editor.root.addEventListener.calls.argsFor(0)[0])
-          .toBe('keypress');
+        expect(editor.on.calls.argsFor(0)[0]).toBe('text-change');
       });
 
-      describe('keypress callback', ()=> {
-        let event;
+      describe('text-change callback', ()=> {
         let callback;
 
         beforeEach(()=> {
-          event = jasmine.createSpyObj(['preventDefault']);
-          editor.root.addEventListener.and.callFake((eventName, cb)=> {
+          editor.on.and.callFake((eventName, cb)=> {
             callback = cb;
           });
         });
 
-        it(`should not call preventDefault if current 
+        it(`should not call history.undo() if current 
           length is less than max length`, ()=> {
             viewModel.attr('maxLength', 10);
             spyOn(viewModel, 'getLength').and.returnValue(9);
             viewModel.restrictMaxLength(editor);
 
-            callback(event);
+            callback();
 
-            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(editor.history.undo).not.toHaveBeenCalled();
           });
 
-        it(`should call preventDefault if current 
+        it(`should call history.undo() if current 
           length is greather than max length`, ()=> {
             viewModel.attr('maxLength', 9);
             spyOn(viewModel, 'getLength').and.returnValue(10);
             viewModel.restrictMaxLength(editor);
 
-            callback(event);
+            callback();
 
-            expect(event.preventDefault).toHaveBeenCalled();
+            expect(editor.history.undo).toHaveBeenCalled();
           });
       });
     });
