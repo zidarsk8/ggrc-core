@@ -17,12 +17,6 @@ export default can.Component.extend({
   template,
   viewModel: {
     define: {
-      first_panel: {
-        type: 'boolean',
-        get: function () {
-          return Number(this.attr('panel_index')) === 0;
-        },
-      },
       showAttributes: {
         set: function (newValue, setValue) {
           this.updateIsSelected(
@@ -57,6 +51,7 @@ export default can.Component.extend({
     snapshotable_objects: GGRC.config.snapshotable_objects,
     panel_index: '@',
     has_parent: false,
+    removable: false,
     fetch_relevant_data: function (id, type) {
       let dfd = CMS.Models[type].findOne({id: id});
       dfd.then(function (result) {

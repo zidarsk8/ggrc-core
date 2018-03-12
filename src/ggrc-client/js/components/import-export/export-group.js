@@ -23,6 +23,13 @@ export default can.Component.extend('exportGroup', {
   tag: 'export-group',
   template,
   viewModel: {
+    define: {
+      isRemovable: {
+        get() {
+          return this.attr('panels.items.length') > 1;
+        },
+      },
+    },
     index: 0,
     'export': '@',
     getIndex: function (el) {
