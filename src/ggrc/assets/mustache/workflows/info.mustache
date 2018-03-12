@@ -48,12 +48,12 @@
                   <workflow-activate
                     {instance}="instance"
                     {task-group-amount}="instance.task_groups.length">
-                    {{#can_activate}}
+                    {{#instance.can_start_cycle}}
                       <a href="#workflowStart" {{^taskGroupAmount}}disabled="disabled"{{/taskGroupAmount}}>
                         <i class="fa fa-sliders"></i>
                         Manually Start a Cycle
                       </a>
-                    {{/can_activate}}
+                    {{/instance.can_start_cycle}}
                   </workflow-activate>
                 </workflow-start-cycle>
               </li>
