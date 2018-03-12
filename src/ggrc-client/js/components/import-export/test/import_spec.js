@@ -11,7 +11,7 @@ import errorTemplate from '../templates/import-error.mustache';
 describe('GGRC.Components.csvImportWidget', function () {
   'use strict';
 
-  let method;  // the method under test
+  let method; // the method under test
   let fakeScope;
 
   beforeEach(function () {
@@ -25,7 +25,7 @@ describe('GGRC.Components.csvImportWidget', function () {
 
     describe('the returned "import" state config\'s isDisabled() method',
       function () {
-        let isDisabled;  // the method under test
+        let isDisabled; // the method under test
 
         /**
          * A factory function for dummy import block info objects.
@@ -133,22 +133,20 @@ describe('GGRC.Components.csvImportWidget', function () {
         );
 
         it('returns false if there are non-empty blocks containing ' +
-          'non-ignored lines',
-          function () {
-            let result;
-            let importBlocks = [
-              makeImportBlock('Assessment', {totalRows: 4, ignored: 4}),
-              makeImportBlock('Market', {totalRows: 0, ignored: 0}),
-              makeImportBlock(
-                'Contract', {totalRows: 3, created: 1, ignored: 2}),
-            ];
-            fakeScope.attr('importDetails', importBlocks);
+          'non-ignored lines', function () {
+          let result;
+          let importBlocks = [
+            makeImportBlock('Assessment', {totalRows: 4, ignored: 4}),
+            makeImportBlock('Market', {totalRows: 0, ignored: 0}),
+            makeImportBlock(
+              'Contract', {totalRows: 3, created: 1, ignored: 2}),
+          ];
+          fakeScope.attr('importDetails', importBlocks);
 
-            result = isDisabled();
+          result = isDisabled();
 
-            expect(result).toBe(false);
-          }
-        );
+          expect(result).toBe(false);
+        });
       }
     );
   });
