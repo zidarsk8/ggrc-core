@@ -57,7 +57,7 @@ class RelatedAssessmentsResource(common.Resource):
     limit = self._get_limit_parameters()
 
     if not permissions.has_system_wide_read():
-      if not permissions.is_allowed_read(object_id, object_type, None):
+      if not permissions.is_allowed_read(object_type, object_id, None):
         raise Forbidden()
       acl = models.all_models.AccessControlList
       acr = models.all_models.AccessControlRole
