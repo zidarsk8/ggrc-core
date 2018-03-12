@@ -20,7 +20,7 @@ import Permission from './permission';
 import _ from 'lodash';
 import {
   buildCountParams,
-  batchRequests
+  batchRequests,
 } from './plugins/utils/query-api-utils';
 
 // Chrome likes to cache AJAX requests for Mustaches.

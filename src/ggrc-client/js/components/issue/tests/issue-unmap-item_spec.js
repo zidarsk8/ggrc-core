@@ -103,7 +103,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
         Audit: {
           values: [{}],
           total: 1,
-      }}];
+        }}];
       reqDeferred = can.Deferred();
       spyOn(viewModel, 'buildQuery').and.returnValue(['query']);
       spyOn(QueryAPI, 'makeRequest').and.returnValue(reqDeferred);
@@ -228,40 +228,41 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
 
       it(`url consists of root_collection from appopriate model and id
         based on passed related object`, ()=> {
-        let rootCollectionType = CMS.Models[relatedObject.type].root_collection;
-        let expectedUrl;
+          let rootCollectionType =
+            CMS.Models[relatedObject.type].root_collection;
+          let expectedUrl;
 
-        viewModel.openObject(relatedObject);
-        expectedUrl = buildUrl(rootCollectionType, relatedObject.id);
+          viewModel.openObject(relatedObject);
+          expectedUrl = buildUrl(rootCollectionType, relatedObject.id);
 
-        expect(getParam(window.open, ARGS.FIRST)).toBe(expectedUrl);
-      });
+          expect(getParam(window.open, ARGS.FIRST)).toBe(expectedUrl);
+        });
 
       it(`url consists of type and id from relatet object's child_type and
         child_id props if a type of related object equals to "Snapshot"`, ()=> {
-        let relatedObjectType = 'Snapshot';
-        let rootCollectionType = CMS.Models[relatedObject.type].root_collection;
-        let oldRelatedObjectType = relatedObject.type;
-        let expectedUrl;
+          let relatedObjectType = 'Snapshot';
+          let rootCollectionType =
+            CMS.Models[relatedObject.type].root_collection;
+          let oldRelatedObjectType = relatedObject.type;
+          let expectedUrl;
 
-        _.extend(relatedObject, {
-          type: relatedObjectType,
-          child_type: oldRelatedObjectType,
-          child_id: 54321,
+          _.extend(relatedObject, {
+            type: relatedObjectType,
+            child_type: oldRelatedObjectType,
+            child_id: 54321,
+          });
+          viewModel.openObject(relatedObject);
+          expectedUrl = buildUrl(
+            rootCollectionType,
+            relatedObject.child_id
+          );
+
+          expect(getParam(window.open, ARGS.FIRST)).toBe(expectedUrl);
         });
-        viewModel.openObject(relatedObject);
-        expectedUrl = buildUrl(
-          rootCollectionType,
-          relatedObject.child_id
-        );
-
-        expect(getParam(window.open, ARGS.FIRST)).toBe(expectedUrl);
-      });
     });
   });
 
   describe('unmap() method', ()=> {
-
     beforeEach(function () {
       spyOn($.prototype, 'trigger');
       spyOn(GGRC, 'page_instance');
@@ -293,7 +294,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
       async function (done) {
         spyOn(CMS.Models.Relationship, 'findRelationship')
           .and.returnValue(Promise.resolve({
-            unmap: () => Promise.resolve()
+            unmap: () => Promise.resolve(),
           }));
         viewModel.attr('issueInstance.viewLink', 'temp url');
         GGRC.page_instance.and.returnValue(viewModel.attr('issueInstance'));
@@ -323,7 +324,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
     it('should handle server errors correctly', async function (done) {
       spyOn(CMS.Models.Relationship, 'findRelationship')
         .and.returnValue(Promise.resolve({
-          unmap: () => Promise.reject()
+          unmap: () => Promise.reject(),
         }));
       await viewModel.unmap();
       expect($.prototype.trigger).toHaveBeenCalledWith('ajax:flash', {
@@ -376,7 +377,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
     it('prevents default action of the event', async function (done) {
       spyOn(CMS.Models.Relationship, 'findRelationship')
         .and.returnValue(Promise.resolve({
-          unmap: () => Promise.resolve()
+          unmap: () => Promise.resolve(),
         }));
       await handler(null, event);
       expect(event.preventDefault).toHaveBeenCalled();

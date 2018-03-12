@@ -30,11 +30,11 @@ import {DESTINATION_UNMAPPED} from '../../events/eventTypes';
           this.attr('destination').dispatch(DESTINATION_UNMAPPED);
           this.dispatch('afterUnmap');
         } catch (e) {
-          console.warn("Unmap failed", e)
-        }finally {
+          console.warn('Unmap failed', e);
+        } finally {
           this.attr('isUnmapping', false);
         }
-        return true
+        return true;
       },
       getMapping: function () {
         let type = this.attr('mappingType') || defaultType;
