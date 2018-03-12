@@ -191,14 +191,6 @@ $controlsWidth: 400px;
   }
 }
 
-.new-relevant-block {
-  padding: 30px;
-}
-
-.new-relevant-block {
-  border-bottom: 1px solid $itemBorder;;
-}
-
 .report-title {
   margin-bottom: 20px;
   h2 {
@@ -281,6 +273,7 @@ $controlsWidth: 400px;
 
   .filter-query {
     width: $controlsWidth;
+    margin-bottom: 30px;
   }
 
   .tree-filter__inline-filtering {
@@ -330,6 +323,7 @@ $controlsWidth: 400px;
 
   .export-panel__title {
     font-weight: bold;
+    font-size: 12px;
     text-transform: uppercase;
     margin-right: 10px;
   }
