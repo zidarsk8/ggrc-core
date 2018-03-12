@@ -30,8 +30,9 @@ from werkzeug.exceptions import BadRequest, Forbidden
 
 import ggrc.builder.json
 import ggrc.models
-from ggrc import db, utils
-from ggrc.gdrive import GdriveUnauthorized
+from ggrc import db
+from ggrc import gdrive
+from ggrc import utils
 from ggrc.utils import as_json, benchmark
 from ggrc.utils.log_event import log_event
 from ggrc.fulltext import get_indexer
@@ -1284,7 +1285,7 @@ class Resource(ModelView):
         except (IntegrityError, ValidationError, ValueError) as error:
           res.append(self._make_error_from_exception(error))
           db.session.rollback()
-        except GdriveUnauthorized as error:
+        except gdrive.GdriveUnauthorized as error:
           headers["X-Expected-Error"] = True
           res.append((401, error.message))
           db.session.rollback()

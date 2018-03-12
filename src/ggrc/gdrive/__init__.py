@@ -15,7 +15,6 @@ from oauth2client.client import FlowExchangeError
 from werkzeug.exceptions import Unauthorized
 
 from ggrc import settings
-from ggrc.app import app
 from ggrc.login import login_required
 
 
@@ -62,8 +61,6 @@ def handle_token_error(message=''):
                            ' credentials. {}'.format(message))
 
 
-@app.route("/is_gdrive_authorized")
-@login_required
 def is_gdrive_authorized():
   """FE need quick check if BE has credentials.
 
@@ -75,7 +72,6 @@ def is_gdrive_authorized():
     raise GdriveUnauthorized('')
 
 
-@app.route("/auth_gdrive")
 def auth_gdrive():
   """First step of the OAuth2"""
   if 'credentials' in flask.session:
@@ -89,7 +85,6 @@ def auth_gdrive():
   return flask.redirect(auth_uri)
 
 
-@app.route("/authorize")
 def authorize_app():
   """Second step of the OAuth2"""
   if 'code' not in flask.request.args:
@@ -119,3 +114,11 @@ def init_flow():
       auth_uri=_GOOGLE_AUTH_URI,
       token_uri=_GOOGLE_TOKEN_URI,
   )
+
+
+def init_gdrive_routes(app):
+  """To get rid of cyclic references"""
+  app.add_url_rule('/authorize', view_func=authorize_app)
+  app.add_url_rule('/auth_gdrive', view_func=auth_gdrive)
+  app.add_url_rule('/is_gdrive_authorized',
+                   view_func=login_required(is_gdrive_authorized))
