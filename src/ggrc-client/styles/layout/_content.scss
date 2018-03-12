@@ -3,11 +3,28 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-.object-area {
+.area {
+  flex: 1;
+  padding-top: 47px;
+
+  .top-inner-nav {
+    margin-bottom: $baseLineHeight;
+    .nav {
+      margin-bottom: 0;
+    }
+  }
+
+  > section.content {
   overflow-y: auto;
   overflow-x: hidden;
+  }
+}
+
+.object-area {
   padding-top: 20px;
   background: $contentBgnd;
+  height: calc(100% - 20px);
+
   &.import-area {
     margin-left: 0;
     .widget {
@@ -44,7 +61,12 @@
   }
   &.widget-area,
   &.widget-area .widget,
-  &.widget-area .widget .content {
+  &.widget-area .widget .content
+  {
     height: 100%;
+  }
+
+  &.widget-area .widget .header + .content {
+    height: calc(100% - 30px);
   }
 }
