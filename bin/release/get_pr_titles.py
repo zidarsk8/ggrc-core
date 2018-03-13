@@ -24,6 +24,7 @@ import sys
 import requests
 
 
+# pylint: disable=too-few-public-methods
 class AuthEnum(object):
   """Enum-like with available authentication mechanisms."""
 
@@ -48,7 +49,7 @@ class TokenAuth(requests.auth.AuthBase):
     return r
 
 
-class PrGetter(object):  # pylint: disable=too-few-public-methods
+class PrGetter(object):
   """Github REST client to fetch PR data."""
   URL_PATTERN = "https://api.github.com/repos/google/ggrc-core/issues/{id}"
 
