@@ -9,7 +9,7 @@
   </span>
   <span class="add-rule">
     {{^readOnly}}
-      <a href="javascript://" can-click="addFilter" class="add-filter-rule">
+      <a href="javascript://" ($click)="addFilter" class="add-filter-rule">
         <i class="fa fa-fw fa-plus-circle"></i>
       </a>
     {{/readOnly}}
@@ -18,7 +18,7 @@
 {{#each relevant}}
   <div class="single-line-filter">
     {{^readOnly}}
-      <button type="submit" data-index="{{@index}}" class="remove_filter">
+      <button type="submit" ($click)="removeFilter(%element, @index)">
         <i class="fa fa-trash"></i>
       </button>
     {{/readOnly}}
@@ -38,9 +38,7 @@
       {{/menu}}
     </select>
     {{#filter}}
-      {{#if_helpers '\
-        #if' model_name '\
-        and ^if_equals' model_name '__previous__'}}
+      {{#if_helpers '\n #if' model_name '\n and ^if_equals' model_name '__previous__'}}
         {{#model_name}}
         <div class="modal-search objective-selector">
           <input
