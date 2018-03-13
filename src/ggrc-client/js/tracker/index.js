@@ -34,21 +34,23 @@ const start = (category, action, label) => {
   if (!pendingTimings[key] && trackerStrategy) {
     pendingTimings[key] = Date.now();
 
-    stopFn = () => {
-      stop(category, action, label);
+    stopFn = (skipTracking) => {
+      stop(category, action, label, skipTracking);
     };
   }
 
   return stopFn;
 };
 
-const stop = (category, action, label) => {
+const stop = (category, action, label, skipTracking = false) => {
   let key = `${category}:${action}:${label}`;
 
   if (pendingTimings[key]) {
     let time = Date.now() - pendingTimings[key];
 
-    trackerStrategy.timing(category, action, label, time);
+    if (!skipTracking) {
+      trackerStrategy.timing(category, action, label, time);
+    }
 
     delete pendingTimings[key];
   }
