@@ -111,9 +111,10 @@
       </div>
       <div class="span7">
         <div class="confirm-buttons">
-          <span>
-          {{selected.length}}
-          assessment(s) will be generated for each selection
+          <spinner toggle="is_saving"></spinner>
+          <span class="confirm-buttons__objects-count">
+            {{selected.length}}
+            assessment(s) will be generated for each selection
           </span>
 
           <button class="btn-map btn btn-small btn-green preventdoubleclick"
@@ -124,7 +125,6 @@
               Generate Assessments
             {{/if}}
           </button>
-          <spinner toggle="is_saving"></spinner>
         </div>
       </div>
     </div>
