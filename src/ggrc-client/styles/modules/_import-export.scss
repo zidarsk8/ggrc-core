@@ -316,6 +316,12 @@
       margin: 25px 0 10px;
     }
   }
+
+  .multiselect-dropdown {
+    input.multiselect-dropdown__input {
+      background-color: $paginationGray;
+    }
+  }
 }
 
 .import-details {
