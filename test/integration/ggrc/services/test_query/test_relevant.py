@@ -22,15 +22,12 @@ class TestRelevant(TestCase, WithQueryApi):
   it also includes special mappings not just the relationships table.
   """
 
-  PEOPLE = {
-      "auditor": "auditor@example.com",
-      "program_editor": "program_editor@example.com",
-      "assignee": "assignee@example.com",
-  }
-
-  ASSESSMENT_ROLES = {
-      "assignee"
-  }
+  PEOPLE = [
+      # Role name, email, expected count
+      ("auditor", "auditor@example.com", 0),
+      ("program_editor", "program_editor@example.com", 0),
+      ("assignee", "assignee@example.com", 1),
+  ]
 
   def setUp(self):
     super(TestRelevant, self).setUp()
@@ -53,29 +50,29 @@ class TestRelevant(TestCase, WithQueryApi):
           source=assessment.audit,
           destination=assessment,
       )
-      auditor = factories.PersonFactory(email=self.PEOPLE["auditor"])
-      editor = factories.PersonFactory(email=self.PEOPLE["program_editor"])
-      assignee = factories.PersonFactory(email=self.PEOPLE["assignee"])
+      people = {}
+      for person in self.PEOPLE:
+        people[person[0]] = factories.PersonFactory(email=person[1])
       # Correct roles and propagation for a given assessment
       factories.AccessControlListFactory(
           ac_role=roles["Assessment"]["Assignees"],
-          person=assignee,
+          person=people["assignee"],
           object=assessment,
       )
       factories.AccessControlListFactory(
           ac_role=roles["Audit"]["Auditors"],
-          person=auditor,
+          person=people["auditor"],
           object=assessment.audit,
       )
       factories.AccessControlListFactory(
           ac_role=roles["Program"]["Program Editors"],
-          person=editor,
+          person=people["program_editor"],
           object=assessment.audit.program,
       )
 
-  @ddt.data(*PEOPLE.items())
+  @ddt.data(*PEOPLE)
   @ddt.unpack
-  def test_person_relevant(self, role, email):
+  def test_person_relevant(self, role, email, expected_count):
     """Check that only assessment roles can see relevant assessments"""
     person = all_models.Person.query.filter(
         all_models.Person.email == email
@@ -95,7 +92,11 @@ class TestRelevant(TestCase, WithQueryApi):
         },
         "Assessment", "ids"
     )
-    if role in self.ASSESSMENT_ROLES:
-      self.assertEqual(len(ids), 1)
-    else:
-      self.assertEqual(len(ids), 0)
+    self.assertEqual(
+        len(ids), expected_count,
+        "Invalid relevant assessments count ({} instead of {}) for {}.".format(
+            len(ids),
+            expected_count,
+            role,
+        )
+    )
