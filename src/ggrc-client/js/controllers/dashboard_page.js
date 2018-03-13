@@ -59,7 +59,10 @@ export default can.Component.extend({
     }
 
     GGRC.Models.Search
-      .search_for_types('', ['Workflow'], {contact_id: GGRC.current_user.id})
+      .search_for_types('', ['Workflow'], {
+        contact_id: GGRC.current_user.id,
+        extra_params: 'Workflow:status=Active',
+      })
       .then(function (resultSet) {
         let wfData = resultSet.getResultsForType('Workflow');
         let refreshQueue = new RefreshQueue();
@@ -85,25 +88,6 @@ export default can.Component.extend({
       });
 
     return 0;
-  },
-  /*
-    filter_current_workflows filters the workflows with current tasks in a
-    new array and returns the new array.
-    filter_current_workflows should be called after update_tasks_for_workflow.
-    It looks at the task_data.task_count for each workflow
-    For workflow with current tasks, task_data.task_count must be > 0;
-  */
-  filter_current_workflows(workflows) {
-    let filteredWfs = [];
-
-    can.each(workflows, function (item) {
-      if (item.task_data) {
-        if (item.task_data.task_count > 0) {
-          filteredWfs.push(item);
-        }
-      }
-    });
-    return filteredWfs;
   },
   /*
     sort_by_end_date sorts workflows in assending order with respect to task_data.first_end_date
