@@ -46,8 +46,6 @@ import {getRole} from '../plugins/utils/acl-utils';
       modified_by: 'CMS.Models.Person.stub',
       object_people: 'CMS.Models.ObjectPerson.stubs',
       people: 'CMS.Models.Person.stubs',
-      related_sources: 'CMS.Models.Relationship.stubs',
-      related_destinations: 'CMS.Models.Relationship.stubs',
       objectives: 'CMS.Models.Objective.stubs',
       sections: 'CMS.Models.get_stubs',
       directives: 'CMS.Models.Directive.stubs',
@@ -71,7 +69,8 @@ import {getRole} from '../plugins/utils/acl-utils';
         {attr_title: 'Effective Date', attr_name: 'start_date'},
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       ]),
-      add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
+      add_item_view: GGRC.mustache_path +
+        '/base_objects/tree_add_item.mustache',
     },
     sub_tree_view_options: {
       default_filter: ['Standard'],
@@ -161,8 +160,6 @@ import {getRole} from '../plugins/utils/acl-utils';
       sections: 'CMS.Models.get_stubs',
       controls: 'CMS.Models.Control.stubs',
       object_people: 'CMS.Models.ObjectPerson.stubs',
-      related_sources: 'CMS.Models.Relationship.stubs',
-      related_destinations: 'CMS.Models.Relationship.stubs',
       objective_objects: 'CMS.Models.ObjectObjective.stubs',
     },
     tree_view_options: {
@@ -331,9 +328,9 @@ import {getRole} from '../plugins/utils/acl-utils';
       } else {
         href = paramsOrObject.selfLink || paramsOrObject.href;
         objectType = can.map(
-            window.cms_singularize(/^\/api\/(\w+)\//.exec(href)[1]).split('_'),
-            can.capitalize
-          ).join('');
+          window.cms_singularize(/^\/api\/(\w+)\//.exec(href)[1]).split('_'),
+          can.capitalize
+        ).join('');
       }
       objectId = paramsOrObject.id;
     }
