@@ -34,10 +34,18 @@
   {{/list}}
   {{/workflow_data}}
   {{#if_equals workflow_count 0}}
-    <li>
-      <div class="zero-state">
-        <h2>You don't have any workflows in progress</h2>
-      </div>
-    </li>
+    {{#loading}}
+      <li>
+        <div class="zero-state">
+          <h2>Loading...</h2>
+        </div>
+      </li>
+    {{else}}
+      <li>
+        <div class="zero-state">
+          <h2>You don't have any workflows in progress</h2>
+        </div>
+      </li>
+    {{/loading}}
   {{/if_equals}}
 </ul><!-- tree-structure end -->

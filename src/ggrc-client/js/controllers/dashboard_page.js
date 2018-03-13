@@ -16,6 +16,7 @@ export default can.Component.extend({
     workflow_data: {},
     workflow_count: 0,
     workflow_show_all: false,
+    loading: true,
   },
   events: {
     // Click action to show all workflows
@@ -80,10 +81,10 @@ export default can.Component.extend({
             curWfs5 = curWfs;
             self.scope.attr('workflow_show_all', false);
           }
-
           workflowData.cur_wfs5 = curWfs5;
           workflowData.list = curWfs5;
           self.scope.attr('workflow_data', workflowData);
+          self.scope.attr('loading', false);
         }
       });
 
