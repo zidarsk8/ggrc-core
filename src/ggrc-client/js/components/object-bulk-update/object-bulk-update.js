@@ -12,6 +12,7 @@ import './bulk-update-target-state';
 import {getBulkStatesForModel} from '../../plugins/utils/state-utils';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import template from './object-bulk-update.mustache';
+import tracker from '../../tracker';
 
 export default can.Component.extend({
   tag: 'object-bulk-update',
@@ -47,13 +48,17 @@ export default can.Component.extend({
     },
     '.btn-update click': function () {
       let callback = this.viewModel.callback;
+      const stopFn = tracker.start(
+        this.viewModel.attr('type'),
+        tracker.USER_JOURNEY_KEYS.LOADING,
+        tracker.USER_ACTIONS.CYCLE_TASK.BULK_UPDATE);
 
       callback(this, {
         selected: this.viewModel.attr('selected'),
         options: {
           state: this.viewModel.attr('targetState'),
         },
-      });
+      }).then(stopFn, stopFn.bind(null, true));
     },
   },
 });
