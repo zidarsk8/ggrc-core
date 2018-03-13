@@ -5,6 +5,7 @@
 
 import Component from '../object-bulk-update';
 import * as stateUtils from '../../../plugins/utils/state-utils';
+import tracker from '../../../tracker';
 
 describe('GGRC.Components.objectBulkUpdate', function () {
   let events;
@@ -109,10 +110,15 @@ describe('GGRC.Components.objectBulkUpdate', function () {
         viewModel: new can.Map(),
       };
       event = events['.btn-update click'].bind(context);
+
+      spyOn(tracker, 'start').and.returnValue(() => {});
     });
 
     it('invokes update callback', function () {
-      context.viewModel.callback = jasmine.createSpy();
+      context.viewModel.callback = jasmine.createSpy()
+        .and.returnValue({
+          then() {},
+        });
       context.viewModel.attr('selected', [1]);
       context.viewModel.attr('targetState', 'InProgress');
 
