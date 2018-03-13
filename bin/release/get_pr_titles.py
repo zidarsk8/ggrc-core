@@ -24,6 +24,30 @@ import sys
 import requests
 
 
+class AuthEnum(object):
+  """Enum-like with available authentication mechanisms."""
+
+  BASIC = "basic"
+  TOKEN = "token"
+
+  __members__ = (BASIC, TOKEN)
+
+
+class TokenAuth(requests.auth.AuthBase):
+  """Github Token-based authentication."""
+
+  AUTH_TEMPLATE = "token {}"
+
+  def __init__(self, token):
+    self.token = token
+
+  def __call__(self, r):
+    r.headers["Authorization"] = self.AUTH_TEMPLATE.format(
+        self.token.encode("latin1"),
+    )
+    return r
+
+
 class PrGetter(object):  # pylint: disable=too-few-public-methods
   """Github REST client to fetch PR data."""
   URL_PATTERN = "https://api.github.com/repos/google/ggrc-core/issues/{id}"
@@ -55,6 +79,7 @@ def parse_argv(argv):
     previous_release_tag (str)
     --upstream (str, default "upstream")
     --branch (str, default "release/0.10-Raspberry")
+    --auth (str, default AuthEnum.TOKEN)
   """
   parser = argparse.ArgumentParser(
       description="Get PR titles from current release",
@@ -65,6 +90,8 @@ def parse_argv(argv):
                       help="The name of the main git remote, "
                            "default 'upstream'")
   parser.add_argument("--branch", type=str, default="release/0.10-Raspberry")
+  parser.add_argument("--auth", type=str, choices=AuthEnum.__members__,
+                      default=AuthEnum.TOKEN)
 
   return parser.parse_args(argv)
 
@@ -231,10 +258,17 @@ def main():
 
   pull_request_ids = get_pr_ids(git_output.split("\n"))
 
-  username = raw_input("Username: ")
-  password = getpass.getpass("Password: ")
+  if args.auth == AuthEnum.TOKEN:
+    token = getpass.getpass("Token: ")
+    auth = TokenAuth(token)
+  elif args.auth == AuthEnum.BASIC:
+    username = raw_input("Username: ")
+    password = getpass.getpass("Password: ")
+    auth = requests.auth.HTTPBasicAuth(username, password)
+  else:
+    raise ValueError("Unexpected auth method: {}".format(args.auth))
 
-  pr_getter = PrGetter(auth=requests.auth.HTTPBasicAuth(username, password))
+  pr_getter = PrGetter(auth=auth)
 
   pull_request_details = {}
   for pull_request_id in pull_request_ids:
