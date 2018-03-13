@@ -152,15 +152,12 @@ class TestExternalRelationship(TestCase):
   @staticmethod
   def create_relationship(source, destination, is_external, user):
     """Creates relationship in database with given params."""
-    with factories.single_commit():
-      rel = factories.RelationshipFactory(
-          source=source,
-          destination=destination,
-          is_external=is_external,
-          modified_by_id=user.id,
-      )
-      db.session.expunge_all()
-      return rel
+    return factories.RelationshipFactory(
+        source=source,
+        destination=destination,
+        is_external=is_external,
+        modified_by_id=user.id,
+    )
 
   def test_create_ext_user_ext_relationship(self):
     """Validation external app user creates external relationship."""
@@ -203,13 +200,13 @@ class TestExternalRelationship(TestCase):
 
   def test_update_ext_user_ext_relationship(self):
     """Validation external app user updates external relationship."""
+    self.api.set_user(self.person_ext)
     with factories.single_commit():
       product = factories.ProductFactory()
       system = factories.SystemFactory()
 
-    self.create_relationship(product, system, True, self.person)
+    self.create_relationship(product, system, True, self.person_ext)
 
-    self.api.set_user(self.person_ext)
     response = self.api.client.post(
         self.REL_URL,
         data=self.build_relationship_json(product, system, True),
@@ -230,13 +227,13 @@ class TestExternalRelationship(TestCase):
 
   def test_update_ext_user_reg_relationship(self):
     """Validation external app user updates regular relationship."""
+    self.api.set_user(self.person_ext)
     with factories.single_commit():
       product = factories.ProductFactory()
       system = factories.SystemFactory()
 
-    self.create_relationship(product, system, False, self.person)
+    self.create_relationship(product, system, False, self.person_ext)
 
-    self.api.set_user(self.person_ext)
     response = self.api.client.post(
         self.REL_URL,
         data=self.build_relationship_json(product, system, True),
@@ -248,51 +245,28 @@ class TestExternalRelationship(TestCase):
 
   def test_delete_ext_user_ext_relationship(self):
     """Validation external app user deletes external relationship."""
+    self.api.set_user(self.person_ext)
     with factories.single_commit():
       product = factories.ProductFactory()
       system = factories.SystemFactory()
 
-    rel = self.create_relationship(product, system, True, self.person)
-    self.api.set_user(self.person_ext)
+    rel = self.create_relationship(product, system, True, self.person_ext)
 
-    get_response = self.api.client.get(
-        "%s/%d" % (self.REL_URL, rel.id),
-        headers=self.HEADERS)
-    delete_headers = {
-        "if-match": get_response.headers.get("Etag"),
-        "if-unmodified-since": get_response.headers.get("Last-Modified")
-    }
-    delete_headers.update(self.HEADERS)
-
-    response = self.api.client.delete(
-        "%s/%d" % (self.REL_URL, rel.id),
-        headers=delete_headers)
+    response = self.api.delete(rel)
     self.assert200(response)
     relationship = all_models.Relationship.query.get(rel.id)
     self.assertIsNone(relationship)
 
   def test_delete_ext_user_reg_relationship(self):
     """Validation external app user deletes regular relationship."""
+    self.api.set_user(self.person_ext)
     with factories.single_commit():
       product = factories.ProductFactory()
       system = factories.SystemFactory()
 
-    rel = self.create_relationship(product, system, False, self.person)
-    self.api.set_user(self.person_ext)
+    rel = self.create_relationship(product, system, False, self.person_ext)
 
-    get_response = self.api.client.get(
-        "%s/%d" % (self.REL_URL, rel.id),
-        headers=self.HEADERS)
-
-    delete_headers = {
-        "if-match": get_response.headers.get("Etag"),
-        "if-unmodified-since": get_response.headers.get("Last-Modified")
-    }
-    delete_headers.update(self.HEADERS)
-
-    response = self.api.client.delete(
-        "%s/%d" % (self.REL_URL, rel.id),
-        headers=delete_headers)
+    response = self.api.delete(rel)
     self.assert400(response)
     self.assertEqual(
         response.json,
@@ -304,12 +278,12 @@ class TestExternalRelationship(TestCase):
 
   def test_update_reg_user_ext_relationship(self):
     """Validation regular app user updates external relationship."""
+    self.api.set_user(self.person)
     with factories.single_commit():
       product = factories.ProductFactory()
       system = factories.SystemFactory()
 
     self.create_relationship(product, system, True, self.person)
-    self.api.set_user(self.person)
 
     response = self.api.client.post(
         self.REL_URL,
@@ -319,25 +293,14 @@ class TestExternalRelationship(TestCase):
 
   def test_delete_reg_user_ext_relationship(self):
     """Validation regular user deletes external relationship."""
+    self.api.set_user(self.person)
     with factories.single_commit():
       product = factories.ProductFactory()
       system = factories.SystemFactory()
 
     rel = self.create_relationship(product, system, True, self.person)
-    self.api.set_user(self.person)
 
-    get_response = self.api.client.get(
-        "%s/%d" % (self.REL_URL, rel.id),
-        headers=self.HEADERS)
-    delete_headers = {
-        "if-match": get_response.headers.get("Etag"),
-        "if-unmodified-since": get_response.headers.get("Last-Modified")
-    }
-    delete_headers.update(self.HEADERS)
-
-    response = self.api.client.delete(
-        "%s/%d" % (self.REL_URL, rel.id),
-        headers=delete_headers)
+    response = self.api.delete(rel)
     self.assert200(response)
     relationship = all_models.Relationship.query.get(rel.id)
     self.assertIsNone(relationship)
