@@ -239,6 +239,9 @@ import Permission from '../../permission';
       [`{viewModel.instance} ${RELATED_ITEMS_LOADED.type}`]: function () {
         this.viewModel.validateForm();
       },
+      '{viewModel} fields'() {
+        this.viewModel.validateForm();
+      },
       '{viewModel.instance} showInvalidField': function (ev) {
         let pageType = GGRC.page_instance().type;
         let $container = (pageType === 'Assessment') ?
