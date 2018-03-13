@@ -42,6 +42,7 @@ GGRC.config = {
     'Threat',
     'Policy',
     'Market'],
+  VERSION: '1.0-Test (abc)',
 };
 GGRC.Bootstrap = {
   exportable: [{

@@ -15,7 +15,7 @@ const TRACKING_ID = GOOGLE_ANALYTICS_ID;
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = GGRC.config.VERSION;
+const TRACKING_VERSION = GGRC.config.VERSION.split(' ')[0];
 
 /**
  * A default value for dimensions so unset values always are reported as
