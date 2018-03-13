@@ -12,23 +12,8 @@ import Permission from '../../permission';
 const viewModel = can.Map.extend({
   taskGroupAmount: 0,
   instance: {},
-  waiting: true,
+  waiting: false,
   can_activate: false,
-  async handleWorkflowActivation() {
-    const workflow = this.attr('instance');
-    this.attr('waiting', true);
-    try {
-      await Promise.all([
-        workflow.refresh_all('task_groups', 'task_group_objects'),
-        workflow.refresh_all('task_groups', 'task_group_tasks'),
-      ]);
-      this.attr('can_activate', this.canActivateWorkflow(workflow));
-    } catch (error) {
-      console.warn('Workflow activate error', error.message); // eslint-disable-line
-    } finally {
-      this.attr('waiting', false);
-    }
-  },
   canActivateWorkflow(workflow) {
     const taskGroups = workflow.task_groups.reify();
     const hasTaskGroups = taskGroups.length > 0;
@@ -37,12 +22,6 @@ const viewModel = can.Map.extend({
       'task_group_tasks.length'
     );
     return hasTaskGroups && nonEmptyTaskGroupTasks;
-  },
-  handleModelsActivation(model) {
-    let models = ['TaskGroupTask', 'TaskGroupObject'];
-    if (models.indexOf(model.shortName) > -1) {
-      this.handleWorkflowActivation();
-    }
   },
   async initWorkflow(workflow) {
     await workflow.refresh();
@@ -107,25 +86,7 @@ const viewModel = can.Map.extend({
   },
 });
 
-const events = {
-  '{viewModel} taskGroupAmount'() {
-    this.viewModel.handleWorkflowActivation();
-  },
-  '{can.Model.Cacheable} created'(model) {
-    this.viewModel.handleModelsActivation(model);
-  },
-  '{can.Model.Cacheable} destroyed'(model) {
-    this.viewModel.handleModelsActivation(model);
-  },
-};
-
-const init = function () {
-  this.viewModel.handleWorkflowActivation();
-};
-
 export default can.Component.extend({
   tag: 'workflow-activate',
-  init,
   viewModel,
-  events,
 });

@@ -128,6 +128,15 @@ class Workflow(roleable.Roleable,
          self.UNIT_FREQ_MAPPING[self.MONTH_UNIT]),
     ])
 
+  @builder.simple_property
+  def can_start_cycle(self):
+    """Can start cycle.
+
+    Boolean property, returns True if all task groups have at least one
+    task group task, False otherwise.
+    """
+    return not any(tg for tg in self.task_groups if not tg.task_group_tasks)
+
   @property
   def tasks(self):
     return list(itertools.chain(*[t.task_group_tasks
@@ -261,6 +270,7 @@ class Workflow(roleable.Roleable,
       'unit',
       reflection.Attribute('next_cycle_start_date',
                            create=False, update=False),
+      reflection.Attribute('can_start_cycle', create=False, update=False),
       reflection.Attribute('non_adjusted_next_cycle_start_date',
                            create=False, update=False),
       reflection.Attribute('workflow_state',
