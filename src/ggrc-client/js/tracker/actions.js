@@ -35,4 +35,7 @@ export const USER_ACTIONS = {
     CHANGE_STATUS: 'Changing status of Assessment',
     EDIT_LCA: 'Editing Local CA',
   },
+  CYCLE_TASK: {
+    CHANGE_STATUS: 'Changing status of Task',
+  },
 };
