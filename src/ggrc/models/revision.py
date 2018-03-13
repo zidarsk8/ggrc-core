@@ -242,6 +242,18 @@ class Revision(Base, db.Model):
 
   def populate_status(self):
     """Update status for older revisions or add it if status does not exist."""
+    workflow_models = {
+        "Cycle",
+        "CycleTaskGroup",
+        "CycleTaskGroupObjectTask",
+    }
+    statuses_mapping = {
+        "InProgress": "In Progress"
+    }
+    status = statuses_mapping.get(self._content.get("status"))
+    if self.resource_type in workflow_models and status:
+      return {"status": status}
+
     pop_models = {
         # ggrc
         "AccessGroup",
