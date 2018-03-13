@@ -3,17 +3,14 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="span-custom2-and-half{{#selected.invalidTitle}} field-failure{{/selected.invalidTitle}}">
+<div class="span-custom2-and-half{{#if selected.invalidTitleError}} field-failure{{/if}}">
   <input class="input-block-level"
     type="text"
     can-value="selected.title"
     placeholder="Enter title">
-    {{#selected.dublicateTitle}}
-      <label class="warning">A custom attribute with this title already exists</label>
-    {{/selected.dublicateTitle}}
-    {{#selected.emptyTitle}}
-      <label class="warning">A custom attribute title can not be blank</label>
-    {{/selected.emptyTitle}}
+    {{#if selected.invalidTitleError}}
+      <label class="warning">{{selected.invalidTitleError}}</label>
+    {{/if}}
 </div>
 <div class="span-custom1-and-half">
   <select class="input-block-level" can-value="selected.type">
