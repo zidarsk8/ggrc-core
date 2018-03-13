@@ -36,18 +36,18 @@
           </div>
         {{/if}}
       {{else}}
+        <small>
         {{#if error.errors}}
-          <small>
             You need permission to upload files to the audit folder. <a
             href="https://drive.google.com/folderview?id={{grdive_msg_to_id error.message}}&usp=sharing#">Request
             access.</a>
-          </small>
         {{else}}
-          The GDrive folder for this evidence could not be accessed.
-          {{#using request=parent_instance.request}}
-            {{{render '/static/mustache/gdrive/gapi_errors.mustache' type="file" instance=request error=error}}}
-          {{/using}}
+            <strong>Warning:</strong> GDrive folder could not be accessed without authorization. <a
+              ($click)="checkFolder()"
+              >Authorize again.
+            </a>
         {{/if}}
+        </small>
       {{/if}}
       </div>
     {{/if}}
