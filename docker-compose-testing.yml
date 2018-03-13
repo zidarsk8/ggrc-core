@@ -10,9 +10,9 @@ services:
      - ".:/vagrant"
      - ".:/vagrant_bind"
     ports:
-     - "127:0:0:1:8001:8000"
-     - "127:0:0:1:8081:8080"
-     - "127:0:0:1:9877:9876"
+     - "127.0.0.1:8001:8000"
+     - "127.0.0.1:8081:8080"
+     - "127.0.0.1:9877:9876"
     environment:
      - PYTHONDONTWRITEBYTECODE=true
      - NODE_PATH=/vagrant-dev/node_modules/

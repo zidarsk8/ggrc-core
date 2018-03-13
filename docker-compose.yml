@@ -5,10 +5,10 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-     - "127:0:0:1:8000:8000"
-     - "127:0:0:1:8080:8080"
-     - "127:0:0:1:9876:9876"
-     - "127:0:0:1:9222:9222"
+     - "127.0.0.1:8000:8000"
+     - "127.0.0.1:8080:8080"
+     - "127.0.0.1:9876:9876"
+     - "127.0.0.1:9222:9222"
     volumes:
      - ".:/vagrant"
     environment:
@@ -21,7 +21,7 @@ services:
   db:
     image: mysql:5.6
     ports:
-     - "127:0:0:1:3306:3306"
+     - "127.0.0.1:3306:3306"
     volumes:
      - "./provision/docker/mysql:/etc/mysql/conf.d"
     environment:
