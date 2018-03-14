@@ -57,3 +57,24 @@ class TestTaskApiCalls(workflow_test_case.WorkflowTestCase):
     self.assertTrue(
         response.json["task_group_tasks_collection"]["task_group_tasks"]
     )
+
+  def test_post_task_g_editor_no_role(self):
+    """POST TaskGroupTask logged in as GlobalEditor & No Role."""
+    with factories.single_commit():
+      wf_factories.TaskGroupFactory()
+      ge_email = self.setup_helper.gen_email(rbac_helper.GE_RNAME, "No Role")
+      self.setup_helper.setup_person(rbac_helper.GE_RNAME, ge_email)
+      ga_email = self.setup_helper.gen_email(rbac_helper.GA_RNAME, "No Role")
+      self.setup_helper.setup_person(rbac_helper.GA_RNAME, ga_email)
+
+    g_editor = all_models.Person.query.filter_by(email=ge_email).one()
+    self.api_helper.set_user(g_editor)
+
+    g_admin = all_models.Person.query.filter_by(email=ga_email).one()
+    people_roles = {ac_roles.task.ASSIGNEE_NAME: g_admin}
+    task_group = all_models.TaskGroup.query.one()
+    data = workflow_api.get_task_post_dict(
+        task_group, people_roles, "2018-01-01", "2018-01-02")
+
+    response = self.api_helper.post(all_models.TaskGroupTask, data)
+    self.assertEqual(response.status_code, 201)
