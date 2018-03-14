@@ -23,6 +23,7 @@ from ggrc import db
 from ggrc import extensions
 from ggrc import notifications
 from ggrc import settings
+from ggrc.gdrive import init_gdrive_routes
 from ggrc.utils import benchmark
 from ggrc.utils.issue_tracker_mock import init_issue_tracker_mock
 
@@ -252,6 +253,7 @@ configure_jinja(app)
 init_services(app)
 init_views(app)
 init_extension_blueprints(app)
+init_gdrive_routes(app)
 init_permissions_provider()
 init_extra_listeners()
 notifications.register_notification_listeners()

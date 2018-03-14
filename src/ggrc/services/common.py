@@ -30,7 +30,9 @@ from werkzeug.exceptions import BadRequest, Forbidden
 
 import ggrc.builder.json
 import ggrc.models
-from ggrc import db, utils
+from ggrc import db
+from ggrc import gdrive
+from ggrc import utils
 from ggrc.utils import as_json, benchmark
 from ggrc.utils.log_event import log_event
 from ggrc.fulltext import get_indexer
@@ -340,7 +342,8 @@ class ModelView(View):
   def modified_at(self, obj):
     return getattr(obj, self.modified_attr_name)
 
-  def _get_type_where_clause(self, model):
+  @staticmethod
+  def _get_type_where_clause(model):
     mapper = model._sa_class_manager.mapper
     if mapper.polymorphic_on is None:
       return True
@@ -352,7 +355,8 @@ class ModelView(View):
         if m in mappers)
     return mapper.polymorphic_on.in_(polymorphic_on_values)
 
-  def _get_matching_types(self, model):
+  @staticmethod
+  def _get_matching_types(model):
     mapper = model._sa_class_manager.mapper
     if len(list(mapper.self_and_descendants)) == 1:
       return mapper.class_.__name__
@@ -360,7 +364,8 @@ class ModelView(View):
     # FIXME: Actually needs to use 'self_and_descendants'
     return [m.class_.__name__ for m in mapper.self_and_descendants]
 
-  def get_match_columns(self, model):
+  @staticmethod
+  def get_match_columns(model):
     mapper = model._sa_class_manager.mapper
     columns = []
     columns.append(mapper.primary_key[0].label('id'))
@@ -860,7 +865,8 @@ class Resource(ModelView):
       result = self.json_success_response({}, datetime.datetime.now())
     return result
 
-  def has_cache(self):
+  @staticmethod
+  def has_cache():
     return getattr(settings, 'MEMCACHE_MECHANISM', False)
 
   def apply_paging(self, matches_query):
@@ -1270,6 +1276,7 @@ class Resource(ModelView):
           return self.json_success_response([(201, self.object_for_json(obj))])
 
       res = []
+      headers = {"Content-Type": "application/json"}
       with benchmark("collection post > body loop: {}".format(len(body))):
         with benchmark("Build stub query cache"):
           self._build_request_stub_cache(body)
@@ -1278,6 +1285,10 @@ class Resource(ModelView):
         except (IntegrityError, ValidationError, ValueError) as error:
           res.append(self._make_error_from_exception(error))
           db.session.rollback()
+        except gdrive.GdriveUnauthorized as error:
+          headers["X-Expected-Error"] = True
+          res.append((401, error.message))
+          db.session.rollback()
         except Exception as error:
           res.append((getattr(error, "code", 500), error.message))
           logger.warning("Collection POST commit failed", exc_info=True)
@@ -1285,7 +1296,6 @@ class Resource(ModelView):
         if hasattr(g, "referenced_objects"):
           delattr(g, "referenced_objects")
       with benchmark("collection post > calculate response statuses"):
-        headers = {"Content-Type": "application/json"}
         errors = []
         if wrap:
           status, res = res[0]
@@ -1436,7 +1446,8 @@ class Resource(ModelView):
       resource.update(extras)
     return resource
 
-  def http_timestamp(self, timestamp):
+  @staticmethod
+  def http_timestamp(timestamp):
     return format_date_time(time.mktime(timestamp.utctimetuple()))
 
   def json_success_response(self, response_object, last_modified=None,
