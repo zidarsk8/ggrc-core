@@ -18,6 +18,10 @@
   @include box-shadow(0 3px 3px -3px rgba(0,0,0, 0.3));
   font-size: 13px;
 
+  .import-notifications label {
+    margin-bottom: 15px;
+  }
+
   .file-name {
     display: flex;
     font-size: 16px;
@@ -57,11 +61,14 @@
 
       &:first-child {
         border-top: none;
+        padding-top: 0;
       }
     }
 
     .limit-button-container {
       padding-left: 15px;
+      position: relative;
+      top: -20px;
     }
   }
 
@@ -133,7 +140,7 @@
 
 .import-buttons {
   position: relative;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
 
   > .state-reset {
     margin-left: 10px;

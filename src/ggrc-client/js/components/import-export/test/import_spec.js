@@ -140,7 +140,7 @@ describe('GGRC.Components.csvImportWidget', function () {
               makeImportBlock(
                 'Contract', {totalRows: 3, created: 1, ignored: 2}),
             ];
-            fakeScope.attr('import', importBlocks);
+            fakeScope.attr('importDetails', importBlocks);
 
             result = isDisabled();
 
