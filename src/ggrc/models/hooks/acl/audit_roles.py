@@ -233,7 +233,7 @@ def _handle_relationships(parent_acl_ids):
   _insert_select_acls(select_statement)
 
   return _get_child_ids(
-      parent_acl_ids,
+      new_parent_ids,
       [
           all_models.Issue.__name__,
           all_models.Assessment.__name__,
@@ -245,5 +245,6 @@ def handle_audit_acl(acls):
   if not acls:
     return
   acl_ids = [acl.id for acl in acls]
-  _handle_relationships(acl_ids)
+  related_acl_ids = _handle_relationships(acl_ids)
+  _handle_relationships(related_acl_ids)
   _handle_snapshot_mappings(acl_ids)
