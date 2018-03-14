@@ -1,7 +1,7 @@
 version: "2"
 services:
   dev:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
       args:
@@ -10,9 +10,9 @@ services:
      - ".:/vagrant"
      - ".:/vagrant_bind"
     ports:
-     - "8001:8000"
-     - "8081:8080"
-     - "9877:9876"
+     - "127.0.0.1:8001:8000"
+     - "127.0.0.1:8081:8080"
+     - "127.0.0.1:9877:9876"
     environment:
      - PYTHONDONTWRITEBYTECODE=true
      - NODE_PATH=/vagrant-dev/node_modules/
@@ -31,7 +31,7 @@ services:
       - /var/lib/mysql/:rw,noexec,nosuid,size=1G
 
   selenium:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile-selenium
     volumes:
