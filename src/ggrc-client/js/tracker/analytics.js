@@ -87,7 +87,7 @@ export default class AnalyticsStrategy extends BaseStrategy {
    * version fields.
    */
   [createTracker]() {
-    ga('create', TRACKING_ID);
+    ga('create', TRACKING_ID, {siteSpeedSampleRate: 100});
 
     // Ensures all hits are sent via `navigator.sendBeacon()`.
     ga('set', 'transport', 'beacon');
