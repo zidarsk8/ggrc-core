@@ -3,6 +3,8 @@
 
 """Utils for ggrc models."""
 
+from ggrc.utils import referenced_objects
+
 from .exceptions import ValidationError
 
 
@@ -31,9 +33,17 @@ class PolymorphicRelationship(object):
 
   def __get__(self, obj, cls):
     """Get the value of the backref attr."""
+    from ggrc.models import get_model
     if obj is None:
       return self
-    return getattr(obj, self._make_backref_attr(obj))
+    attr_name = self._make_backref_attr(obj)
+    if not hasattr(obj, attr_name):
+      instance_type = getattr(obj, self._type_attr)
+      instance_id = getattr(obj, self._id_attr)
+      if instance_type:
+        instance = get_model(instance_type).query.get(instance_id)
+        setattr(obj, attr_name, instance)
+    return getattr(obj, attr_name, None)
 
   def __set__(self, obj, value):
     """Prepare and set the value of the backref attr."""
@@ -44,6 +54,20 @@ class PolymorphicRelationship(object):
       setattr(obj, self._id_attr, value.id)
       setattr(obj, self._type_attr, value.__class__.__name__)
       setattr(obj, self._make_backref_attr(obj), value)
+
+
+class JsonPolymorphicRelationship(PolymorphicRelationship):
+  """Custom relation for instance.
+
+  Allow to setup instance over json serializaion."""
+  # pylint: disable=too-few-public-methods
+
+  def __call__(self, obj, json_obj):
+    for field_name, prop_instance in obj.__class__.__dict__.iteritems():
+      if prop_instance is self:
+        instance = referenced_objects.get(json_obj[field_name]["type"],
+                                          json_obj[field_name]["id"])
+        return instance
 
 
 class FasadeProperty(object):  # pylint: disable=too-few-public-methods

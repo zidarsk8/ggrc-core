@@ -22,18 +22,16 @@ from ggrc.models import comment
 # pylint: disable=too-few-public-methods
 
 
-class JsonPolymorphicRelationship(utils.PolymorphicRelationship):
-  """Custom relation for instance.
+class ProposalablePolymorphicRelationship(utils.JsonPolymorphicRelationship):
+  """Custom relation for proposalable instance.
 
   Allow to setup instance over json serializaion."""
 
   def __call__(self, obj, json_obj):
-    for field_name, prop_instance in obj.__class__.__dict__.iteritems():
-      if prop_instance is self:
-        instance = referenced_objects.get(json_obj[field_name]["type"],
-                                          json_obj[field_name]["id"])
-        assert isinstance(instance, Proposalable)
-        return instance
+    instance = super(ProposalablePolymorphicRelationship,
+                     self).__call__(obj, json_obj)
+    assert isinstance(instance, Proposalable)
+    return instance
 
 
 class FullInstanceContentFased(utils.FasadeProperty):
@@ -127,9 +125,9 @@ class Proposal(mixins.person_relation_factory("applied_by"),
 
   INSTANCE_TMPL = "{}_proposalable"
 
-  instance = JsonPolymorphicRelationship("instance_id",
-                                         "instance_type",
-                                         INSTANCE_TMPL)
+  instance = ProposalablePolymorphicRelationship("instance_id",
+                                                 "instance_type",
+                                                 INSTANCE_TMPL)
 
   _fulltext_attrs = [
       "instance_id",
