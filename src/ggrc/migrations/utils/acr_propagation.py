@@ -70,6 +70,7 @@ def _add_subtree(tree, role_name, parent_id):
             parent_id=parent_id,
             created_at=datetime.datetime.now(),
             updated_at=datetime.datetime.now(),
+            internal=True,
             **permissions_dict
         )
     )

@@ -8,9 +8,12 @@ This package should have the single hook that should handle all acl propagation
 and deletion.
 """
 
+import collections
+
 import sqlalchemy as sa
 from sqlalchemy.orm.session import Session
 
+from ggrc.models import all_models
 from ggrc.models.hooks.acl import audit_roles
 from ggrc.models.hooks.acl import program_roles
 from ggrc.models.hooks.acl import relationship_deletion
@@ -26,10 +29,16 @@ def after_flush(session, _):
   access_control_list.handle_acl_creation(session)
   program_role_handler = program_roles.ProgramRolesHandler()
   program_role_handler.after_flush(session)
-  audit_role_handler = audit_roles.AuditRolesHandler()
-  audit_role_handler.after_flush(session)
   relationship_deletion.after_flush(session)
   workflow.handle_acl_changes(session)
+
+  acl_dict = collections.defaultdict(list)
+
+  for obj in session.new:
+    if isinstance(obj, all_models.AccessControlList):
+      acl_dict[obj.object_type].append(obj)
+
+  audit_roles.handle_audit_acl(acl_dict[all_models.Audit.__name__])
 
 
 def init_hook():

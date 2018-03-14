@@ -3,209 +3,247 @@
 
 """All hooks required by audit roles business cases"""
 
+import sqlalchemy as sa
 
-from collections import defaultdict
-
-import flask
-
-from sqlalchemy.orm import load_only
-from sqlalchemy.sql.expression import true
-
+from ggrc import db
+from ggrc import login
 from ggrc.models import all_models
-from ggrc.models.hooks.acl.acl_manager import ACLManager
-from ggrc.models.relationship import Stub, RelationshipsCache
-from ggrc.models.hooks.relationship import related
 
 
-def _get_cache(expr, name):
-  """Simple cache function"""
-  try:
-    result = getattr(flask.g, name)
-  except AttributeError:
-    # not cached yet
-    result = expr()
-    setattr(flask.g, name, result)
-  return result
+def _insert_select_acls(select_statement):
+  """Insert acl records from the select statement
+
+  Args:
+    select_statement: sql statement that contains the following columns
+      person_id,
+      ac_role_id,
+      object_id,
+      object_type,
+      created_at,
+      modified_by_id,
+      updated_at,
+      parent_id,
+  """
+
+  acl_table = all_models.AccessControlList.__table__
+
+  inserter = acl_table.insert().prefix_with("IGNORE")
+
+  db.session.execute(
+      inserter.from_select(
+          [
+              acl_table.c.person_id,
+              acl_table.c.ac_role_id,
+              acl_table.c.object_id,
+              acl_table.c.object_type,
+              acl_table.c.created_at,
+              acl_table.c.modified_by_id,
+              acl_table.c.updated_at,
+              acl_table.c.parent_id,
+          ],
+          select_statement
+      )
+  )
 
 
-def _get_acl_non_editable_roles():
-  """Cache captain and auditor roles"""
-  return _get_cache(lambda: {
-      role.name: role.id for role in
-      all_models.AccessControlRole.query.filter(
-          # We only load system roles and skip the ones created by users
-          all_models.AccessControlRole.non_editable == true()
-      ).options(
-          load_only("id", "name")).all()
-  }, "acl_non_editable_roles")
+def _handle_snapshot_mappings(parent_acl_ids):
+  snapshot_table = all_models.Snapshot.__table__
+  acl_table = all_models.AccessControlList.__table__
+  parent_acr = all_models.AccessControlRole.__table__.alias("parent_acr")
+  child_acr = all_models.AccessControlRole.__table__.alias("child_acr")
+
+  select_statement = sa.select([
+      acl_table.c.person_id,
+      child_acr.c.id,
+      snapshot_table.c.id,
+      sa.literal(all_models.Snapshot.__name__),
+      sa.func.now(),
+      sa.literal(login.get_current_user_id()),
+      sa.func.now(),
+      acl_table.c.id,
+  ]).select_from(
+      sa.join(
+          sa.join(
+              sa.join(
+                  snapshot_table,
+                  acl_table,
+                  sa.and_(
+                      acl_table.c.object_id == snapshot_table.c.parent_id,
+                      acl_table.c.object_type == snapshot_table.c.parent_type,
+                  )
+              ),
+              parent_acr,
+              parent_acr.c.id == acl_table.c.ac_role_id
+          ),
+          child_acr,
+          child_acr.c.parent_id == parent_acr.c.id
+      )
+  ).where(
+      sa.and_(
+          acl_table.c.id.in_(parent_acl_ids),
+          child_acr.c.object_type == all_models.Snapshot.__name__,
+      )
+  )
+  _insert_select_acls(select_statement)
 
 
-def _get_acr_id(acl):
-  """Get acr id from acl object"""
-  if acl.ac_role_id is not None:
-    return acl.ac_role_id
-  if acl.ac_role is not None:
-    return acl.ac_role.id
-  return None
+def _rel_parent(parent_acl_ids, source=True):
+  """Get left side of relationships mappings through source."""
+  rel_table = all_models.Relationship.__table__
+  acl_table = all_models.AccessControlList.__table__
+  parent_acr = all_models.AccessControlRole.__table__.alias("parent_acr")
+  child_acr = all_models.AccessControlRole.__table__.alias("child_acr")
+
+  if source:
+    acl_link = sa.and_(
+        acl_table.c.object_id == rel_table.c.source_id,
+        acl_table.c.object_type == rel_table.c.source_type,
+    )
+  else:
+    acl_link = sa.and_(
+        acl_table.c.object_id == rel_table.c.destination_id,
+        acl_table.c.object_type == rel_table.c.destination_type,
+    )
+
+  select_statement = sa.select([
+      acl_table.c.person_id,
+      child_acr.c.id,
+      rel_table.c.id,
+      sa.literal(all_models.Relationship.__name__),
+      sa.func.now(),
+      sa.literal(login.get_current_user_id()),
+      sa.func.now(),
+      acl_table.c.id,
+  ]).select_from(
+      sa.join(
+          sa.join(
+              sa.join(
+                  rel_table,
+                  acl_table,
+                  acl_link
+              ),
+              parent_acr,
+              parent_acr.c.id == acl_table.c.ac_role_id
+          ),
+          child_acr,
+          child_acr.c.parent_id == parent_acr.c.id
+      )
+  ).where(
+      sa.and_(
+          acl_table.c.id.in_(parent_acl_ids),
+          child_acr.c.object_type == all_models.Relationship.__name__
+      )
+  )
+  return select_statement
 
 
-class AuditRolesHandler(object):
-  """Handle audit role propagation"""
+def _rel_child(parent_acl_ids, source=True):
+  """Get left side of relationships mappings through source."""
+  rel_table = all_models.Relationship.__table__
+  acl_table = all_models.AccessControlList.__table__
+  parent_acr = all_models.AccessControlRole.__table__.alias("parent_acr")
+  child_acr = all_models.AccessControlRole.__table__.alias("child_acr")
 
-  def __init__(self):
-    self.caches = {}
+  if source:
+    object_id = rel_table.c.destination_id
+    object_type = rel_table.c.destination_type
+  else:
+    object_id = rel_table.c.source_id
+    object_type = rel_table.c.source_type
 
-  def _create_mapped_acls(self, acl, role_map):
-    """Helper to propagate roles for auditors and captains"""
-    audit = acl.object
-    assert isinstance(audit, all_models.Audit), \
-        "`{}` role assigned to a non Audit object.".format(acl.ac_role.name)
+  acl_link = sa.and_(
+      acl_table.c.object_id == rel_table.c.id,
+      acl_table.c.object_type == all_models.Relationship.__name__,
+  )
 
-    # Add Audit Captains Mapped role to all the objects in the audit
-    snapshots_cache = self.caches["snapshots_cache"]
-    acl_manager = self.caches["access_control_list_manager"]
-    relationship_cache = self.caches["relationship_cache"]
+  select_statement = sa.select([
+      acl_table.c.person_id,
+      child_acr.c.id,
+      object_id,
+      object_type,
+      sa.func.now(),
+      sa.literal(login.get_current_user_id()),
+      sa.func.now(),
+      acl_table.c.id,
+  ]).select_from(
+      sa.join(
+          sa.join(
+              sa.join(
+                  rel_table,
+                  acl_table,
+                  acl_link
+              ),
+              parent_acr,
+              parent_acr.c.id == acl_table.c.ac_role_id
+          ),
+          child_acr,
+          child_acr.c.parent_id == parent_acr.c.id
+      )
+  ).where(
+      sa.and_(
+          acl_table.c.id.in_(parent_acl_ids),
+          child_acr.c.object_type == object_type,
+      )
+  )
+  return select_statement
 
-    if audit.id not in snapshots_cache:
-      snapshots_cache[audit.id] = all_models.Snapshot.query.filter(
-          all_models.Snapshot.parent_id == audit.id,
-          all_models.Snapshot.parent_type == "Audit"
-      ).options(load_only("id")).all()
 
-    for snapshot in snapshots_cache[audit.id]:
-      acl_manager.get_or_create(
-          snapshot, acl, acl.person, role_map["Snapshot"])
+def _get_child_ids(parent_ids, child_names):
+  """Get all acl ids for acl entries with the given parent ids
 
-    # Add Audit Captains Mapped to all related
-    audit_stub = Stub(acl.object_type, acl.object_id)
-    related_stubs = related([audit_stub], relationship_cache)
+  Args:
+    parent_ids: list of parent acl entries or query with parent ids.
 
-    for stub in related_stubs[audit_stub]:
-      if stub.type not in ("Assessment", "AssessmentTemplate", "Issue",
-                           "Comment", "Document"):
-        continue
-      acl_manager.get_or_create(stub, acl, acl.person, role_map[stub.type])
+  Returns:
+    list of ACL ids for all children from the given parents.
+  """
+  acl_table = all_models.AccessControlList.__table__
 
-    # Add Audit Captains Mapped to all realted comments and documents
-    mapped_stubs = related(related_stubs[audit_stub], relationship_cache)
-    for parent in mapped_stubs:
-      for stub in mapped_stubs[parent]:
-        if stub.type not in ("Comment", "Document"):
-          continue
-        acl_manager.get_or_create(stub, acl, acl.person, role_map[stub.type])
+  return sa.select([acl_table.c.id]).where(
+      acl_table.c.parent_id.in_(parent_ids)
+  ).where(
+      acl_table.c.object_type.in_(child_names)
+  )
 
-  def _auditors_handler(self, acl, audit_roles):
-    """Handle auditor role propagation"""
-    role_map = defaultdict(lambda: audit_roles['Auditors Mapped'], {
-        "Snapshot": audit_roles["Auditors Snapshot Mapped"],
-        "Assessment": audit_roles["Auditors Assessment Mapped"],
-        "Issue": audit_roles["Auditors Issue Mapped"],
-        "Document": audit_roles["Auditors Document Mapped"]
-    })
-    self._create_mapped_acls(acl, role_map)
 
-  def _audit_captains_handler(self, acl, audit_roles):
-    """Handle audit captain permission added"""
-    audit = acl.object
-    assert isinstance(audit, all_models.Audit), \
-        "`Audit Captains` role assigned to a non Audit object."
+def _handle_relationships(parent_acl_ids):
+  """Handle role propagation through relationships.
 
-    role_map = defaultdict(lambda: audit_roles['Audit Captains Mapped'])
-    self._create_mapped_acls(acl, role_map)
+  For handling relationships of type:
+  Audit > Relationship > Object
 
-  def handle_access_control_list(self, obj):
-    """Handle Access Control List creation"""
-    audit_roles = _get_acl_non_editable_roles()
-    role_handlers = {
-        audit_roles["Audit Captains"]: self._audit_captains_handler,
-        audit_roles["Auditors"]: self._auditors_handler,
-    }
-    if obj.ac_role_id in role_handlers:
-      role_handlers[obj.ac_role_id](obj, audit_roles)
+  The parent part of this function refers to propagation from Audit to
+  Relationship. The child part refers to propagation from Relationship to
+  Object (either Assessment, Issue, Document, Comment)
+  """
 
-  def handle_snapshot(self, obj):
-    """Handle snapshot creation"""
-    audit_roles = _get_acl_non_editable_roles()
-    access_control_list = obj.parent.access_control_list
-    role_map = {
-        audit_roles["Auditors"]: audit_roles["Auditors Snapshot Mapped"],
-        audit_roles["Audit Captains"]: audit_roles["Audit Captains Mapped"]
-    }
-    for acl in access_control_list:
-      if acl.ac_role.id not in role_map:
-        continue
-      acl_manager = self.caches["access_control_list_manager"]
-      acl_manager.get_or_create(obj, acl, acl.person, role_map[acl.ac_role.id])
+  src_select = _rel_parent(parent_acl_ids, source=True)
+  dst_select = _rel_parent(parent_acl_ids, source=False)
+  select_statement = sa.union(src_select, dst_select)
+  _insert_select_acls(select_statement)
 
-  def handle_relationship(self, obj):
-    """Handle relationship creation"""
-    first, second = sorted([obj.source, obj.destination], key=lambda o: o.type)
-    if isinstance(first, all_models.Audit):
-      audit, other = first, second
-      access_control_list = audit.full_access_control_list
-    elif isinstance(first, (all_models.Assessment,
-                            all_models.AssessmentTemplate)):
-      if isinstance(second, all_models.Audit):
-        audit, other = second, first
-        access_control_list = audit.full_access_control_list
-      else:
-        assessment, other = first, second
-        access_control_list = assessment.full_access_control_list
-    elif (isinstance(first, (all_models.Comment, all_models.Document)) and
-          isinstance(second, all_models.Issue)):
-      access_control_list = second.full_access_control_list
-      other = first
-    else:
-      return
+  new_parent_ids = _get_child_ids(
+      parent_acl_ids,
+      [all_models.Relationship.__name__]
+  )
 
-    if not isinstance(other, (all_models.Assessment,
-                              all_models.AssessmentTemplate,
-                              all_models.Audit,
-                              all_models.Issue,
-                              all_models.Snapshot,
-                              all_models.Document,
-                              all_models.Comment)):
-      return
+  src_select = _rel_child(new_parent_ids, source=True)
+  dst_select = _rel_child(new_parent_ids, source=False)
+  select_statement = sa.union(src_select, dst_select)
+  _insert_select_acls(select_statement)
 
-    audit_roles = _get_acl_non_editable_roles()
-    auditors_mapped_dict = defaultdict(
-        lambda: audit_roles["Auditors Mapped"], {
-            all_models.Assessment: audit_roles["Auditors Assessment Mapped"],
-            all_models.AssessmentTemplate: audit_roles["Auditors Mapped"],
-            all_models.Document: audit_roles["Auditors Document Mapped"],
-            all_models.Issue: audit_roles["Auditors Issue Mapped"],
-            all_models.Comment: audit_roles["Auditors Mapped"],
-        })
-    role_map = {
-        audit_roles["Auditors"]: auditors_mapped_dict,
-        audit_roles["Audit Captains"]: defaultdict(
-            lambda: audit_roles["Audit Captains Mapped"]),
-        audit_roles["Audit Captains Mapped"]: defaultdict(
-            lambda: audit_roles["Audit Captains Mapped"]),
-        audit_roles["Auditors Assessment Mapped"]: auditors_mapped_dict,
-        audit_roles["Auditors Issue Mapped"]: auditors_mapped_dict,
-    }
-    for acl in access_control_list:
-      ac_role_id = _get_acr_id(acl)
-      if ac_role_id not in role_map:
-        continue
-      acl_manager = self.caches["access_control_list_manager"]
-      acl_manager.get_or_create(other, acl, acl.person,
-                                role_map[ac_role_id][type(other)])
+  return _get_child_ids(
+      parent_acl_ids,
+      [
+          all_models.Issue.__name__,
+          all_models.Assessment.__name__,
+      ]
+  )
 
-  def after_flush(self, session):
-    """Handle legacy audit captain -> program editor role propagation"""
-    self.caches = {
-        "relationship_cache": RelationshipsCache(),
-        "snapshots_cache": {},
-        "access_control_list_manager": ACLManager()
-    }
-    handlers = {
-        all_models.AccessControlList: self.handle_access_control_list,
-        all_models.Snapshot: self.handle_snapshot,
-        all_models.Relationship: self.handle_relationship,
-    }
-    for obj in session.new:
-      handler = handlers.get(type(obj))
-      if callable(handler):
-        handler(obj)
+
+def handle_audit_acl(acls):
+  if not acls:
+    return
+  acl_ids = [acl.id for acl in acls]
+  _handle_relationships(acl_ids)
+  _handle_snapshot_mappings(acl_ids)
