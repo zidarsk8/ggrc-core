@@ -16,6 +16,7 @@
     font-size: 12px;
     text-decoration: underline;
     margin-top: 3px;
+    cursor: pointer;
     &:hover {
       text-decoration: none;
     }
@@ -316,10 +317,7 @@
         margin-bottom: 0;
       }
     }
-    input,
-    textarea,
-    select,
-    rich-text {
+    .input-block-level {
       margin-bottom: 16px;
     }
     .single-line-filter {

@@ -26,7 +26,6 @@
       context: "CMS.Models.Context.stub",
       program: "CMS.Models.Program.stub",
       modified_by: "CMS.Models.Person.stub",
-      custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
     },
     tree_view_options: {
       attr_list: [

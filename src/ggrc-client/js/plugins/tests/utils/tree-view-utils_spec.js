@@ -4,6 +4,7 @@
 */
 
 import * as module from '../../../plugins/utils/tree-view-utils';
+import * as aclUtils from '../../../plugins/utils/acl-utils';
 
 describe('TreeViewUtils module', function () {
   'use strict';
@@ -22,23 +23,18 @@ describe('TreeViewUtils module', function () {
 
   describe('getColumnsForModel() method', function () {
     let origCustomAttrDefs;
-    let origRoleList;
     let origAttrs;
 
     beforeAll(function () {
       method = module.getColumnsForModel;
 
-      origRoleList = GGRC.access_control_roles;
+      spyOn(aclUtils, 'getRolesForType').and.returnValue([
+        {id: 9, name: 'Role 9', object_type: 'Audit'},
+        {id: 3, name: 'Role 3', object_type: 'Audit'},
+      ]);
+
       origAttrs = [].concat(CMS.Models.CycleTaskGroupObjectTask
         .tree_view_options.display_attr_names);
-      GGRC.access_control_roles = [
-        {id: 5, name: 'Role 5', object_type: 'Market'},
-        {id: 9, name: 'Role 9', object_type: 'Audit'},
-        {id: 1, name: 'Role 1', object_type: 'Market'},
-        {id: 7, name: 'Role 7', object_type: 'Policy'},
-        {id: 3, name: 'Role 3', object_type: 'Audit'},
-        {id: 2, name: 'Role 2', object_type: 'Policy'},
-      ];
 
       origCustomAttrDefs = GGRC.custom_attr_defs;
       GGRC.custom_attr_defs = [{
@@ -54,7 +50,6 @@ describe('TreeViewUtils module', function () {
     });
 
     afterAll(function () {
-      GGRC.access_control_roles = origRoleList;
       GGRC.custom_attr_defs = origCustomAttrDefs;
       CMS.Models.CycleTaskGroupObjectTask
         .tree_view_options.display_attr_names =

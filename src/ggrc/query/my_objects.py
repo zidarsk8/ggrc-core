@@ -10,11 +10,8 @@ from sqlalchemy import union
 from sqlalchemy import alias
 from ggrc import db
 from ggrc.models import all_models
-from ggrc.models.object_person import ObjectPerson
-from ggrc.models.relationship import Relationship
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc_basic_permissions import backlog_workflows
-from ggrc_basic_permissions.models import UserRole
 from ggrc_workflows.models import Cycle
 
 
@@ -35,21 +32,6 @@ def _get_people():
   return all_people
 
 
-def _get_object_people(contact_id, model_names):
-  """Objects to which the user is 'mapped'."""
-  object_people_query = db.session.query(
-      ObjectPerson.personable_id.label('id'),
-      ObjectPerson.personable_type.label('type'),
-      literal(None).label('context_id')
-  ).filter(
-      and_(
-          ObjectPerson.person_id == contact_id,
-          ObjectPerson.personable_type.in_(model_names)
-      )
-  )
-  return object_people_query
-
-
 def _get_object_mapped_ca(contact_id, model_names):
   """Objects to which the user is mapped via a custom attribute."""
   ca_mapped_objects_query = db.session.query(
@@ -64,52 +46,6 @@ def _get_object_mapped_ca(contact_id, model_names):
       )
   )
   return ca_mapped_objects_query
-
-
-def _get_objects_user_assigned(contact_id, model_names):
-  """Objects for which the user is assigned."""
-  dst_assignee_query = db.session.query(
-      Relationship.destination_id.label('id'),
-      Relationship.destination_type.label('type'),
-      literal(None).label('context_id'),
-  ).filter(
-      and_(
-          Relationship.source_type == "Person",
-          Relationship.source_id == contact_id,
-          Relationship.destination_type.in_(model_names)
-      ),
-  )
-  src_assignee_query = db.session.query(
-      Relationship.source_id.label('id'),
-      Relationship.source_type.label('type'),
-      literal(None).label('context_id'),
-  ).filter(
-      and_(
-          Relationship.destination_type == "Person",
-          Relationship.destination_id == contact_id,
-          Relationship.source_type.in_(model_names)
-      ),
-  )
-  return dst_assignee_query.union(src_assignee_query)
-
-
-def _get_results_by_context(contact_id, model):
-  """Objects based on the context of the current model.
-
-  Return the objects that are in private contexts via UserRole.
-  """
-  context_query = db.session.query(
-      model.id.label('id'),
-      literal(model.__name__).label('type'),
-      literal(None).label('context_id'),
-  ).join(
-      UserRole,
-      and_(
-          UserRole.context_id == model.context_id,
-          UserRole.person_id == contact_id,
-      )
-  )
-  return context_query
 
 
 def _get_custom_roles(contact_id, model_names):
@@ -133,7 +69,7 @@ def _get_custom_roles(contact_id, model_names):
   return custom_roles_query
 
 
-def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
+def get_myobjects_query(types=None, contact_id=None):  # noqa
   """Filters by "myview" for a given person.
 
   Finds all objects which might appear on a user's Profile or Dashboard
@@ -208,14 +144,8 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
       model_type_query = _get_tasks_in_cycle(model)
     return model_type_query
 
-  # Note: We don't return mapped objects for the Creator because being mapped
-  # does not give the Creator necessary permissions to view the object.
-  if not is_creator:
-    type_union_queries.append(_get_object_people(contact_id, model_names))
-
   type_union_queries.extend((
       _get_object_mapped_ca(contact_id, model_names),
-      _get_objects_user_assigned(contact_id, model_names),
       _get_custom_roles(contact_id, model_names),
   ))
 
@@ -228,7 +158,5 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
       type_union_queries.append(backlog_workflows())
     if model is all_models.Person:
       type_union_queries.append(_get_people())
-    if model in (all_models.Program, all_models.Audit, all_models.Workflow):
-      type_union_queries.append(_get_results_by_context(contact_id, model))
 
   return alias(union(*type_union_queries))

@@ -125,13 +125,6 @@ rules = make_rule_set(rule_list=[
         # mapping to objective
         {'Section'},
         {'Objective'},
-        {'Objective', 'Control'},
-    ),
-
-    Rule(
-        # mapping nested controls
-        {'Objective'},
-        {'Control'},
         {'Control'},
     ),
 

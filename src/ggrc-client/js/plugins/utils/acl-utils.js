@@ -3,6 +3,54 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+const ACL = GGRC.access_control_roles.reduce((aclMap, role) => {
+  if (!aclMap[role.object_type]) {
+    aclMap[role.object_type] = {};
+  }
+
+  aclMap[role.object_type][role.name] = role;
+
+  // Hash by Ids
+  aclMap.ids[role.id] = role;
+
+  return aclMap;
+}, {
+  ids: {},
+});
+
+/**
+ * Returns list of roles for specific type.
+ *
+ * @param {string} type - Type of object.
+ * @return {Array}
+ */
+const getRolesForType = (type) => {
+  let roles = ACL[type] ? ACL[type] : {};
+
+  return Object.values(roles);
+};
+
+/**
+ * Returns the role from global ACL.
+ *
+ * @param {string} type - Type of object for which is defined the role
+ * @param {string} name - Role name
+ * @return {object|null}
+ */
+const getRole = (type, name) => {
+  return ACL[type] && ACL[type][name] ? ACL[type][name] : null;
+};
+
+/**
+ * Returns the role from global ACL by ID.
+ *
+ * @param {number} id - Id of role.
+ * @return {object|null}
+ */
+const getRoleById = (id) => {
+  return ACL.ids[id];
+};
+
 /**
  * Compute a list of people IDs that have `roleName` granted on `instance`.
  *
@@ -49,4 +97,7 @@ function peopleWithRoleName(instance, roleName) {
 
 export {
   peopleWithRoleName,
+  getRolesForType,
+  getRole,
+  getRoleById,
 };

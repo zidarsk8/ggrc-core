@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {getRole} from '../plugins/utils/acl-utils';
+
 (function (can) {
   can.Model.Cacheable('CMS.Models.Context', {
     root_object: 'context',
@@ -51,7 +53,6 @@
       directives: 'CMS.Models.Directive.stubs',
       controls: 'CMS.Models.Control.stubs',
       audits: 'CMS.Models.Audit.stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     programRoles: ['Program Managers', 'Program Editors', 'Program Readers'],
     orderOfRoles: ['Program Managers', 'Program Editors', 'Program Readers'],
@@ -101,9 +102,8 @@
       if (allowedRoles.indexOf(GGRC.current_user.system_wide_role) > -1) {
         return false;
       }
-      const programManagerRole = GGRC.access_control_roles.find((acr) => {
-        return acr.name === 'Program Managers' && acr.object_type === 'Program';
-      }).id;
+      const programManagerRole = getRole('Program', 'Program Managers').id;
+
       return this.access_control_list.filter((acl) => {
         return acl.person_id === GGRC.current_user.id &&
                acl.ac_role_id === programManagerRole;
@@ -164,7 +164,6 @@
       related_sources: 'CMS.Models.Relationship.stubs',
       related_destinations: 'CMS.Models.Relationship.stubs',
       objective_objects: 'CMS.Models.ObjectObjective.stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/objectives/tree-item-attr.mustache',

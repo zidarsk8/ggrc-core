@@ -315,68 +315,6 @@ describe('GGRC.WorkflowActivate', function () {
       });
   });
 
-  describe('handleWorkflowActivation() method', () => {
-    let workflow;
-
-    beforeEach(function () {
-      workflow = new can.Map({
-        refresh_all: jasmine.createSpy('refreshAll'),
-      });
-      viewModel.attr('instance', workflow);
-      spyOn(viewModel, 'canActivateWorkflow');
-    });
-
-    it('should be in waiting state while refresh is in progress', function () {
-      viewModel.handleWorkflowActivation();
-      expect(viewModel.attr('waiting')).toBe(true);
-    });
-
-    it('should refresh related objects for workflow before the check of the' +
-    'activation ability', async function () {
-      await viewModel.handleWorkflowActivation();
-      expect(workflow.refresh_all).toHaveBeenCalledWith(
-        'task_groups', 'task_group_objects'
-      );
-      expect(workflow.refresh_all).toHaveBeenCalledWith(
-        'task_groups', 'task_group_tasks'
-      );
-      expect(workflow.refresh_all).toHaveBeenCalledBefore(
-        viewModel.canActivateWorkflow
-      );
-    });
-
-    it('checks ability to activate workflow', async function () {
-      const expectedResult = true;
-      viewModel.canActivateWorkflow.and.returnValue(expectedResult);
-      await viewModel.handleWorkflowActivation();
-      expect(viewModel.canActivateWorkflow).toHaveBeenCalledWith(workflow);
-      expect(viewModel.attr('can_activate')).toBe(expectedResult);
-    });
-
-    it('should log an error when refresh fails', async function () {
-      const error = {message: 'Message'};
-      spyOn(console, 'warn');
-      workflow.refresh_all.and.returnValue(Promise.reject(error));
-      await viewModel.handleWorkflowActivation();
-      expect(console.warn).toHaveBeenCalledWith( // eslint-disable-line
-        'Workflow activate error',
-        error.message,
-      );
-    });
-
-    it('should restore button after workflow activation', async function () {
-      await viewModel.handleWorkflowActivation();
-      expect(viewModel.attr('waiting'), false);
-    });
-
-    it('should restore button when refreshing of the related objects fails',
-      async function () {
-        workflow.refresh_all.and.returnValue(Promise.reject({}));
-        await viewModel.handleWorkflowActivation();
-        expect(viewModel.attr('waiting')).toBe(false);
-      });
-  });
-
   describe('canActivateWorkflow() method', () => {
     let workflow;
     let tgs;

@@ -3,134 +3,86 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-form.import {
-  margin: 0px;
+#import_view > header {
+  margin: 0 40px;
 }
 
-.import-interface {
-  padding:16px;
-  h3 {
-    font-weight:normal;
-    padding-bottom:16px;
-  }
-  input[type="file"] {
-    width: 100%;
-  }
+#csv_import {
+  margin: 0 40px;
+  background: $white;
 }
 
-.import-buttons {
-  margin-top:16px;
-  padding-top:16px;
-  border-top:1px solid #ddd;
-}
+.csv-import {
+  padding-top: 25px;
+  padding-bottom: 40px;
+  @include box-shadow(0 3px 3px -3px rgba(0,0,0, 0.3));
+  font-size: 13px;
 
-.results-table {
-  padding:16px;
-  h2 {
-    font-size:24px;
-    font-weight:normal;
-    margin-bottom: 16px;
-  }
-  h3 {
-    font-size:18px;
-    font-weight:normal;
-    margin-bottom:16px;
-  }
-  .import-actions {
-    margin-top:12px;
-    border-top:1px solid #ddd;
-    padding-top:20px;
-  }
-  .label-error {
-    @include border-radius($default-border-radius);
-    background: lighten($red, 35%);
-    border: 1px solid lighten($red, 10%);
-    font-weight: bold;
-    padding: 5px 10px;
-  }
-  .label-warning {
-    @include border-radius($default-border-radius);
-    background: lighten($yellow, 35%);
-    border: 1px solid lighten($yellow, 10%);
-    font-weight: bold;
-    padding: 5px 10px;
-  }
-  .ggrc-table {
-    font-size:12px;
-    th {
-      text-align: left;
-      padding: 4px;
-      border: 1px solid $gray;
-      background: $widgetHeader;
+  .file-name {
+    display: flex;
+    font-size: 16px;
+    font-weight: normal;
+    color: $subTitle;
+    margin-bottom: 20px;
+
+    &.error {
+      &:before {
+        @include icon(red);
+      }
     }
-    width: 100%;
-    margin-bottom: 10px;
-    td {
-      padding: 4px;
-      border: 1px solid $widgetHeader;
-      font-weight: normal;
-      word-break: break-all;
-      &.member-failure {
-        background: lighten($red, 35%);
-      }
-      &.member-warning {
-        background: lighten($yellow, 35%);
-      }
-      &.member-warning,
-      &.member-failure {
-        .help-inline, .help-inline-warning {
-          color: $red;
-          font-weight: bold;
-          padding: 0;
-          display: block;
-          font-size: $f-small;
-        }
-        .help-inline-warning {
-          color: $gray;
-        }
-      }
-      hr {
-        margin: 5px 0;
+    &.warning {
+      &:before {
+        @include icon(orange);
       }
     }
   }
-  label {
-    font-size: $f-small;
-    font-weight: bold;
-  }
-  .control-group {
-    margin-bottom: 0;
-    input {
-      margin-bottom: 0;
+
+  .import-section {
+    padding-left: 30px;
+    padding-right: 30px;
+
+    &.border-bottom {
+      border-bottom: 1px solid $itemBorder;
+    }
+
+    &.border-top {
+      border-top: 1px solid $itemBorder;
     }
   }
 
-}
+  show-more {
+    .import-section {
+      padding-top: 20px;
+      padding-bottom: 20px;
 
-.download-template {
-  background: $lightGray;
-  border: 1px solid $darkGray;
-  padding: 20px;
-  .import-list {
-    @extend %reset-list;
+      &:first-child {
+        border-top: none;
+      }
+    }
+
+    .limit-button-container {
+      padding-left: 15px;
+    }
+  }
+
+  collapsible-panel {
+    ul {
+      margin-left: 5px;
+    }
+
     li {
-      margin-bottom: 4px;
+      line-height: 24px;
     }
   }
-  .center-block {
-    text-align: center;
-    padding: 20px 0 10px;
-    small {
-      display: block;
-    }
-    i {
-      @include opacity(1);
-      margin-top: 4px;
-    }
-  }
-}
 
-.import {
+  .quick-tips {
+    border-top: 1px solid $itemBorder;
+    padding-top: 20px;
+    h3 {
+      margin-bottom: 10px;
+    }
+  }
+
   .btn-fixed {
     float: left;
     i {
@@ -166,7 +118,9 @@ form.import {
   }
 }
 
-.import-main-wrap {
+.import-wrap {
+  padding-top: 10px;
+
   h4 {
     font-weight: bold;
     margin-bottom: 10px;
@@ -177,12 +131,23 @@ form.import {
   }
 }
 
-.import-wrap {
-  margin-top: 10px;
-}
+.import-buttons {
+  position: relative;
+  margin-bottom: 15px;
 
-.csv-input > .state-reset {
-  margin-left: 10px;
+  > .state-reset {
+    margin-left: 10px;
+  }
+
+  > spinner {
+    position: absolute;
+    left: 10px;
+    top: 5px;
+  }
+
+  download-template {
+    margin-left: 10px;
+  }
 }
 
 .import-analyze {
@@ -227,13 +192,6 @@ form.import {
 
 .new-relevant-block:nth-child(odd) {
   background: $lightGray;
-}
-
-.text-top-space {
-  margin-top: 30px;
-  h3 {
-    margin-bottom: 10px;
-  }
 }
 
 .report-title {
@@ -330,5 +288,51 @@ form.import {
 
   li {
     line-height: 25px;
+  }
+}
+
+.download-template {
+  .simple-modal {
+    &__header {
+      border-bottom: none;
+      padding-bottom: 5px;
+    }
+
+    &__header-text {
+      font-size: 24px;
+    }
+
+    &__footer {
+      border-top: none;
+    }
+  }
+
+  &__content {
+    font-size: 15px;
+    padding: 5px 15px;
+    line-height: 16px;
+
+    h4 {
+      margin: 25px 0 10px;
+    }
+  }
+}
+
+.import-details {
+  &__stats {
+    display: flex;
+    flex-flow: row wrap;
+    width: 400px;
+    line-height: 24px;
+    padding-bottom: 20px;
+  }
+
+  &__caption {
+    width: 120px;
+  }
+
+  &__value {
+    width: 280px;
+    color: $grayLight;
   }
 }

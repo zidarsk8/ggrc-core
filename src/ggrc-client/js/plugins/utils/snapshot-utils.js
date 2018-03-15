@@ -6,6 +6,7 @@
 import {
   buildParam,
 } from './query-api-utils';
+import {getRole} from './acl-utils';
 import Permission from '../../permission';
 
 /**
@@ -100,9 +101,8 @@ function _buildACL(content) {
     secondary_assessor_id: 'Secondary Assignees',
   };
   return _.filter(_.map(mapper, function (v, k) {
-    let role = _.find(GGRC.access_control_roles, function (acr) {
-      return acr.name === v && acr.object_type === content.type;
-    });
+    let role = getRole(content.type, v);
+
     if (!role || !content[k]) {
       return;
     }

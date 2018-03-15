@@ -8,18 +8,18 @@
   {is-attributes-disabled}="isAttributesDisabled"
   class="ggrc-form ggrc-form-multiple-columns">
     {{#each items}}
-      <div class="ggrc-form-item {{#is type 'input'}}ggrc-form-item__row{{else}}ggrc-form-item__multiple-row{{/if}}">
-        <div class="{{#is type 'input'}}ggrc-form-item__row{{else}}ggrc-form-item__multiple-row{{/if}}">
+      <div class="ggrc-form-item {{#is attributeType 'input'}}ggrc-form-item__row{{else}}ggrc-form-item__multiple-row{{/if}}">
+        <div class="{{#is attributeType 'input'}}ggrc-form-item__row{{else}}ggrc-form-item__multiple-row{{/if}}">
           <inline-edit-control class="inline-edit-control"
             (inline-save)="saveCustomAttributes(%event, %context)"
             {instance}="instance"
-            {dropdown-options}="options"
+            {dropdown-options}="multiChoiceOptions"
             dropdown-no-value="true"
             {edit-mode}="editMode"
             {is-edit-icon-denied}="isEditDenied"
             {is-loading}="isSaving"
             {value}="value"
-            {type}="type"
+            {type}="attributeType"
             {mandatory}="mandatory"
             with-read-more="true">
               <base-inline-control-title

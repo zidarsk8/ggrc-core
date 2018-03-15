@@ -4,6 +4,7 @@
  */
 
 import '../custom-roles/custom-roles-modal';
+import {getRolesForType} from '../../plugins/utils/acl-utils';
 import template from './access-control-list-roles-helper.mustache';
 
 export default GGRC.Components('accessControlListRolesHelper', {
@@ -19,10 +20,10 @@ export default GGRC.Components('accessControlListRolesHelper', {
     orderOfRoles: [],
     setAutoPopulatedRoles: function () {
       let instance = this.attr('instance');
-      let autoPopulatedRoles = _.filter(GGRC.access_control_roles, {
-        object_type: instance.class.model_singular,
-        default_to_current_user: true,
-      });
+      let autoPopulatedRoles =
+        _.filter(getRolesForType(instance.class.model_singular), {
+          default_to_current_user: true,
+        });
 
       if (!autoPopulatedRoles.length) {
         return;

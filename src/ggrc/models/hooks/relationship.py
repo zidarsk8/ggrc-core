@@ -10,7 +10,6 @@ import itertools
 
 from collections import defaultdict, namedtuple
 import sqlalchemy as sa
-from sqlalchemy.orm import Session
 
 from ggrc import login, db
 from ggrc.access_control.role import get_custom_roles_for
@@ -349,9 +348,8 @@ def add_related_snapshots(snapshot_ids, related_objects):
     related_objects[snapshot_ids[base_snap]].add(rel_snap_stub)
 
 
-def handle_relationship_creation(session, flush_context):
+def handle_relationship_creation(session):
   """Create relations for mapped objects."""
-  # pylint: disable=unused-argument
   base_objects = defaultdict(set)
   related_objects = defaultdict(set)
   snapshot_ids = {}
@@ -494,11 +492,11 @@ def create_related_roles(base_objects, related_objects):
 def handle_relationship_delete(relationship):
   """Delete mapped AC roles if object unmapped from Assessment."""
   if (issubclass(type(relationship.source), Assignable) or
-     issubclass(type(relationship.destination), Assignable)):
+          issubclass(type(relationship.destination), Assignable)):
     assign_obj, other = relationship.source, relationship.destination
     if not issubclass(type(relationship.source), Assignable):
       assign_obj, other = other, assign_obj
-    parent_ids = {acl.id for acl in assign_obj.access_control_list}
+    parent_ids = {acl.id for acl in assign_obj.full_access_control_list}
     db.session.query(all_models.AccessControlList).filter(
         all_models.AccessControlList.parent_id.in_(parent_ids),
         all_models.AccessControlList.object_type == other.type,
@@ -529,7 +527,6 @@ def copy_snapshot_test_plan(objects):
 def init_hook():  # noqa
   """Initialize Relationship-related hooks."""
   # pylint: disable=unused-variable
-  sa.event.listen(Session, "after_flush", handle_relationship_creation)
 
   @signals.Restful.model_deleted.connect_via(all_models.Relationship)
   def relationship_deleted_listener(sender, obj=None, src=None, service=None):

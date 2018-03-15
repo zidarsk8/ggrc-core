@@ -5,11 +5,11 @@
 
 {{#if withReadMore}}
   <div class="inline-edit__text">
-    <read-more {text}="context.value">
+    <read-more {text}="value">
     </read-more>
   </div>
 {{else}}
   <div class="inline-edit__text">
-    {{{firstnonempty context.value '<span class="empty-message">None</span>'}}}
+    {{{firstnonempty value '<span class="empty-message">None</span>'}}}
   </div>
 {{/if}}

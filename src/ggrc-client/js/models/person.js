@@ -40,7 +40,6 @@ import RefreshQueue from './refresh_queue';
       user_roles: 'CMS.Models.UserRole.stubs',
       name: 'trimmed',
       email: 'trimmedLower',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     mixins: ['ca_update'],
     defaults: {

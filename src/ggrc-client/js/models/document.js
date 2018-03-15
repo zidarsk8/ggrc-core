@@ -3,19 +3,18 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {getRole} from '../plugins/utils/acl-utils';
+
 (function (ns, can) {
   function getAccessControlList() {
-    let adminRole;
-    adminRole = _.filter(GGRC.access_control_roles, {
-      object_type: 'Document',
-      name: 'Admin',
-    });
-    if (!adminRole || adminRole.length < 1) {
+    let adminRole = getRole('Document', 'Admin');
+
+    if (!adminRole) {
       console.warn('Document Admin custom role not found.');
       return;
     }
     return [{
-      ac_role_id: adminRole[0].id,
+      ac_role_id: adminRole.id,
       person: {type: 'Person', id: GGRC.current_user.id},
     }];
   }

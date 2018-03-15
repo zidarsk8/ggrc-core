@@ -108,6 +108,7 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
         "title": self.title,
         "definition_type": self.definition_type,
         "definition_id": target.id,
+        "context": target.context,
         "attribute_type": self.attribute_type,
         "multi_choice_options": self.multi_choice_options,
         "multi_choice_mandatory": self.multi_choice_mandatory,
@@ -117,7 +118,6 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     }
     ca_definition = CustomAttributeDefinition(**data)
     db.session.add(ca_definition)
-    db.session.flush()
     return ca_definition
 
   class ValidTypes(object):

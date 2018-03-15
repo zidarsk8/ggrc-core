@@ -4,13 +4,13 @@
 */
 
 import {ApprovalWorkflow as Model} from '../modals/approval-workflow-modal';
+import * as aclUtils from '../../plugins/utils/acl-utils';
 
 describe('ApprovalWorkflow', ()=> {
   describe('save() method', ()=> {
     let method;
     let originalObject;
     let awsDfd;
-    let acrOldValues;
     let userOldValue;
     let currentUser;
     let assigneeRole;
@@ -33,15 +33,11 @@ describe('ApprovalWorkflow', ()=> {
         id: -11,
       });
 
-      acrOldValues = GGRC.access_control_roles;
-      GGRC.access_control_roles = [assigneeRole, wfAdminRole];
-
       userOldValue = GGRC.current_user;
       GGRC.current_user = currentUser;
     });
 
     afterAll(()=> {
-      GGRC.access_control_roles = acrOldValues;
       GGRC.current_user = userOldValue;
     });
 
@@ -63,6 +59,7 @@ describe('ApprovalWorkflow', ()=> {
         contact: currentUser,
       });
       spyOn(instance.original_object, 'reify');
+      spyOn(aclUtils, 'getRole').and.returnValues(assigneeRole, wfAdminRole);
 
       method = Model.prototype.save.bind(instance);
     });

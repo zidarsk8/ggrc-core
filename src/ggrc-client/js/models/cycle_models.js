@@ -4,7 +4,7 @@
 */
 
 import Permission from '../permission';
-import RefreshQueue from './refresh_queue';
+import {getRole} from '../plugins/utils/acl-utils';
 import {getClosestWeekday} from '../plugins/utils/date-util';
 
 (function (can) {
@@ -320,10 +320,8 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
     },
     init: function () {
       let that = this;
-      let assigneeRole = _.find(GGRC.access_control_roles, {
-        object_type: 'CycleTaskGroupObjectTask',
-        name: 'Task Assignees',
-      });
+      let assigneeRole = getRole('CycleTaskGroupObjectTask', 'Task Assignees');
+
       this._super.apply(this, arguments);
       this.validateNonBlank('title');
       this.validateNonBlank('workflow');

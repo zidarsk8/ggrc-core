@@ -3,7 +3,7 @@
 
 """Basic permissions module."""
 
-from sqlalchemy import or_
+import sqlalchemy as sa
 
 
 class SystemWideRoles(object):
@@ -45,7 +45,7 @@ def context_query_filter(context_column, contexts):
 
   if contexts is None:
     # Admin context, no filter
-    return True
+    return sa.sql.true()
   else:
     filter_expr = None
     # Handle `NULL` context specially
@@ -54,13 +54,7 @@ def context_query_filter(context_column, contexts):
       # We're modifying `contexts`, so copy
       contexts = set(contexts)
       contexts.remove(None)
-    if contexts:
-      filter_in_expr = context_column.in_(contexts)
-      if filter_expr is not None:
-        filter_expr = or_(filter_expr, filter_in_expr)
-      else:
-        filter_expr = filter_in_expr
     if filter_expr is None:
       # No valid contexts
-      return False
+      return sa.sql.false()
     return filter_expr

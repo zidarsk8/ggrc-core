@@ -203,8 +203,8 @@ def get_propsal_acr_dict():
 
 def permissions_for_proposal_setter(proposal, proposal_roles):
   """Append required proposal roles ACL to proposal."""
-  parents = {a.parent for a in proposal.access_control_list}
-  for acl in proposal.instance.access_control_list:
+  parents = {a.parent for a in proposal.full_access_control_list}
+  for acl in proposal.instance.full_access_control_list:
     if acl in parents:
       continue
     if acl.ac_role.update:

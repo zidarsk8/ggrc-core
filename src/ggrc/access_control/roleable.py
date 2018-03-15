@@ -11,7 +11,6 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from ggrc import db
 from ggrc.access_control.list import AccessControlList
 from ggrc.access_control import role
-from ggrc.builder import simple_property
 from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc.models import reflection
 from ggrc.utils.referenced_objects import get
@@ -27,8 +26,27 @@ class Roleable(object):
   _update_raw = _include_links = ['access_control_list', ]
   _fulltext_attrs = [CustomRoleAttr('access_control_list'), ]
   _api_attrs = reflection.ApiAttributes(
-      reflection.Attribute('filtered_access_control_list', False, False, True),
-      reflection.Attribute('access_control_list', True, True, False))
+      reflection.Attribute('access_control_list', True, True, True))
+
+  @hybrid_property
+  def full_access_control_list(self):
+    return self._access_control_list + self._propagated_access_control_list
+
+  @declared_attr
+  def _propagated_access_control_list(cls):  # pylint: disable=no-self-argument
+    """Full access_control_list
+
+       Use with caution and load only when absolutely needed. For performance
+       reasons do not add to eager_query.
+    """
+    return db.relationship(
+        'AccessControlList',
+        primaryjoin=lambda: and_(
+            remote(AccessControlList.object_id) == cls.id,
+            remote(AccessControlList.object_type) == cls.__name__,
+            remote(AccessControlList.parent_id).isnot(None)),
+        foreign_keys='AccessControlList.object_id',
+        cascade='all, delete-orphan')
 
   @declared_attr
   def _access_control_list(cls):  # pylint: disable=no-self-argument
@@ -37,27 +55,11 @@ class Roleable(object):
         'AccessControlList',
         primaryjoin=lambda: and_(
             remote(AccessControlList.object_id) == cls.id,
-            remote(AccessControlList.object_type) == cls.__name__),
+            remote(AccessControlList.object_type) == cls.__name__,
+            remote(AccessControlList.parent_id).is_(None)),
         foreign_keys='AccessControlList.object_id',
         backref='{0}_object'.format(cls.__name__),
         cascade='all, delete-orphan')
-
-  @simple_property
-  def filtered_access_control_list(self):
-    """Access control list returned to the frontend"""
-    return [{
-        "ac_role_id": acl.ac_role.id,
-        "context": None,
-        "id": acl.id,
-        "person": {
-            "id": acl.person.id,
-            "type": "Person"
-        },
-        "person_email": acl.person.email,
-        "person_id": acl.person.id,
-        "person_name": acl.person.name,
-    } for acl in self.access_control_list
-        if acl.ac_role and not acl.ac_role.internal]
 
   @hybrid_property
   def access_control_list(self):
@@ -88,7 +90,6 @@ class Roleable(object):
     old_values = {
         (acl.ac_role, acl.person)
         for acl in self.access_control_list
-        if acl.ac_role and not acl.ac_role.internal
     }
     self._remove_values(old_values - new_values)
     self._add_values(new_values - old_values)
@@ -118,6 +119,7 @@ class Roleable(object):
 
   @classmethod
   def indexed_query(cls):
+    """Query used by the indexer"""
     query = super(Roleable, cls).indexed_query()
     return query.options(
         orm.subqueryload(

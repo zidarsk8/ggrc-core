@@ -7,6 +7,17 @@
 from ggrc.integrations import client
 
 
+# Status values maps from GGRC to IssueTracker.
+STATUSES = {
+    'Not Started': 'ASSIGNED',
+    'In Progress': 'ASSIGNED',
+    'In Review': 'FIXED',
+    'Rework Needed': 'ASSIGNED',
+    'Completed': 'VERIFIED',
+    'Deprecated': 'OBSOLETE',
+}
+
+
 class Client(client.JsonClient):
   """Issue tracker proxy Client class."""
 

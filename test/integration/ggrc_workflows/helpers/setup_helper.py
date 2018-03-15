@@ -12,43 +12,37 @@ from ggrc_workflows import ac_roles
 from integration.ggrc.models import factories
 from integration.ggrc_basic_permissions.models import factories as bp_factories
 from integration.ggrc_workflows.models import factories as wf_factories
+from integration.ggrc_workflows.helpers import rbac_helper
 
 
 class GlobalSetup(object):  # pylint: disable=too-few-public-methods
-  """Setup helper for Global GGRC objects setup.
+  """Setup helper for Global GGRC objects setup."""
 
-  Attributes:
-      rbac_helper: RBAC helper functions provider.
-  """
-
-  def __init__(self, rbac_helper):
-    self.rbac_helper = rbac_helper
-
-  def _setup_person(self, g_rname, email):
+  @classmethod
+  def setup_person(cls, g_rname, email):
     """Generate Person with Global Role using Factories.
 
     Args:
         g_rname: Global Role name for user.
-        email: future user email
+        email: Future user email.
     """
     person = factories.PersonFactory(email=email)
     bp_factories.UserRoleFactory(person=person,
-                                 role=self.rbac_helper.g_roles[g_rname])
+                                 role=rbac_helper.G_ROLES[g_rname])
     return person
 
 
-class WorkflowSetup(GlobalSetup):  # pylint: disable=too-few-public-methods
+class WorkflowSetup(GlobalSetup):
   """Setup helper for Workflow related objects setup.
 
   Attributes:
       email_template: String template to generate user with predictable email.
   """
 
-  def __init__(self, rbac_helper):
-    super(WorkflowSetup, self).__init__(rbac_helper)
+  def __init__(self):
     self.email_template = "GL_{g_rname}_WF_{wf_rname}_{rand_ascii}@google.com"
 
-  def _gen_email(self, g_rname, wf_rname):
+  def gen_email(self, g_rname, wf_rname):
     """Generate Person's email who has role in Workflow.
 
     Args:
@@ -64,6 +58,7 @@ class WorkflowSetup(GlobalSetup):  # pylint: disable=too-few-public-methods
         Generated email to return:
             prefix + body + suffix
     """
+    wf_rname = wf_rname.replace(" ", "_")
     random_ascii = factories.random_str(length=6, chars=string.ascii_letters)
     return self.email_template.format(g_rname=g_rname, wf_rname=wf_rname,
                                       rand_ascii=random_ascii)
@@ -76,8 +71,8 @@ class WorkflowSetup(GlobalSetup):  # pylint: disable=too-few-public-methods
         wf_rname: Workflow Access Control Role name.
         workflow: Workflow instance, in which scope person should have role.
     """
-    email = self._gen_email(g_rname, wf_rname)
-    wf_person = self._setup_person(g_rname, email)
+    email = self.gen_email(g_rname, wf_rname)
+    wf_person = self.setup_person(g_rname, email)
     wf_acr = role.get_ac_roles_for(all_models.Workflow.__name__)[wf_rname]
     factories.AccessControlListFactory(ac_role=wf_acr, object=workflow,
                                        person=wf_person)

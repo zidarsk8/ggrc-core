@@ -98,28 +98,29 @@ describe('GGRC.Components.inline-autocomplete-wrapper', ()=> {
     });
 
     describe('setCustomAttribute() method', ()=> {
-      let cadId;
+      let instance;
       let item;
-      beforeEach(()=> {
-        cadId = 'testId';
-        item = {
-          test: true,
-        };
-        spyOn(viewModel, 'updateTextValue');
+
+      beforeEach(function () {
+        const caDefs = [{id: 1}];
+        instance = new CMS.Models.Control({
+          custom_attribute_definitions: caDefs,
+        });
+        item = new can.Map({test: true});
+        viewModel.attr('instance', instance);
       });
 
-      it('calls instance._custom_attribute_map() method', ()=> {
-        spyOn(instance, '_custom_attribute_map');
-
+      it('sets person id for custom attribute', ()=> {
+        const cadId = 1;
+        item.attr('id', 123);
         viewModel.setCustomAttribute(item, cadId);
-
-        expect(instance._custom_attribute_map)
-          .toHaveBeenCalledWith(cadId, item);
+        expect(instance.customAttr(cadId).value).toBe(item.attr('id'));
       });
 
       it('updates text', ()=> {
+        const cadId = 1;
+        spyOn(viewModel, 'updateTextValue');
         viewModel.setCustomAttribute(item, cadId);
-
         expect(viewModel.updateTextValue).toHaveBeenCalledWith(item);
       });
     });

@@ -10,6 +10,7 @@ import {
   buildParam,
   makeRequest,
 } from '../../plugins/utils/query-api-utils';
+import RefreshQueue from '../../models/refresh_queue';
 
 export default GGRC.Components('issueUnmapItem', {
   tag: 'issue-unmap-item',
@@ -22,7 +23,7 @@ export default GGRC.Components('issueUnmapItem', {
         },
       },
       relationship: {
-        get() {
+        async get() {
           const sourceIds = _.union(
             _.pluck(this.attr('issueInstance.related_sources'), 'id'),
             _.pluck(this.attr('issueInstance.related_destinations'), 'id'));
@@ -30,10 +31,22 @@ export default GGRC.Components('issueUnmapItem', {
             _.pluck(this.attr('target.related_sources'), 'id'),
             _.pluck(this.attr('target.related_destinations'), 'id'));
 
-          let relId = _.intersection(sourceIds, destinationIds);
-          let relationship = CMS.Models.Relationship.findInCacheById(relId);
+          const [relId] = _.intersection(sourceIds, destinationIds);
 
-          return relationship;
+          if (!relId) {
+            return null;
+          }
+
+          const relationship = CMS.Models.Relationship.findInCacheById(relId);
+          if (relationship) {
+            return relationship;
+          }
+
+          const [loadedRelationship] = await new RefreshQueue()
+            .enqueue(CMS.Models.get_instance('Relationship', relId))
+            .trigger();
+
+          return loadedRelationship;
         },
       },
     },
@@ -125,30 +138,23 @@ export default GGRC.Components('issueUnmapItem', {
 
       window.open(url, '_blank');
     },
-    unmap() {
+    async unmap() {
       const currentObject = GGRC.page_instance();
-      const relationship = this.attr('relationship');
-
+      const relationship = await this.attr('relationship');
       this.attr('isLoading', true);
-
-      relationship
-       .refresh()
-       .then(()=> {
-         return relationship.unmap(true);
-       })
-       .done(()=> {
+      try {
+        await relationship.refresh();
+        await relationship.unmap(true);
         if (currentObject === this.attr('issueInstance')) {
           GGRC.navigate(this.attr('issueInstance.viewLink'));
         } else {
           this.attr('modalState.open', false);
         }
-       })
-       .fail(()=> {
-         GGRC.Errors.notifier('error', 'There was a problem with unmapping.');
-       })
-       .always(()=> {
-         this.attr('isLoading', false);
-       });
+      } catch (error) {
+        GGRC.Errors.notifier('error', 'There was a problem with unmapping.');
+      } finally {
+        this.attr('isLoading', false);
+      }
     },
     showNoRelationhipError() {
       const issueTitle = this.attr('issueInstance.title');
@@ -156,16 +162,17 @@ export default GGRC.Components('issueUnmapItem', {
       const targetType = this.attr('target').class.title_singular;
 
       GGRC.Errors.notifier('error',
-        `Unmapping cannot be performed. 
-        Please unmap Issue (${issueTitle}) 
-        from ${targetType} version (${targetTitle}), 
+        `Unmapping cannot be performed.
+        Please unmap Issue (${issueTitle})
+        from ${targetType} version (${targetTitle}),
         then mapping with original object will be automatically reverted.`);
     },
   },
   events: {
-    click(el, ev) {
+    async click(el, ev) {
+      const relationship = await this.viewModel.attr('relationship');
       ev.preventDefault();
-      if (!this.viewModel.attr('relationship')) {
+      if (!relationship) {
         // if there is no relationship it mean that user try to unmap
         // original object from Issue automapped to snapshot via assessment
         this.viewModel.showNoRelationhipError();

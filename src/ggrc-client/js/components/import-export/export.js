@@ -3,12 +3,16 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import './csv-template';
 import '../relevant_filters';
 import exportPanelTemplate from './templates/export-panel.mustache';
 import exportGroupTemplate from './templates/export-group.mustache';
 import csvExportTemplate from './templates/csv-export.mustache';
 import {confirm} from '../../plugins/utils/modals';
+import {
+  exportRequest,
+  download,
+  fileSafeCurrentDate,
+} from './import-export-utils';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 
 let url = can.route.deparam(window.location.search.substr(1));
@@ -105,11 +109,11 @@ GGRC.Components('csvExport', {
       let data = {
         objects: this.getObjectsForExport(),
         export_to: this.viewModel.attr('export.chosenFormat'),
-        current_time: GGRC.Utils.fileSafeCurrentDate(),
+        current_time: fileSafeCurrentDate(),
       };
 
       backendGdriveClient.withAuth(()=> {
-        return GGRC.Utils.export_request({data});
+        return exportRequest({data});
       }).then(function (data, status, jqXHR) {
         let link;
 
@@ -129,7 +133,7 @@ GGRC.Components('csvExport', {
           const match = contentDisposition.match(/filename\=(['"]*)(.*)\1/);
           const filename = match && match[2] || this.viewModel.attr('export.filename');
 
-          GGRC.Utils.download(filename, data);
+          download(filename, data);
         }
       }.bind(this)).always(function () {
         this.viewModel.attr('export.loading', false);

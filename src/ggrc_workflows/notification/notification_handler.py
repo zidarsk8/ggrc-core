@@ -3,7 +3,7 @@
 
 """Handlers for workflow notifications.
 
-This module contains all function needed for handling notification objects
+This module contains all functions needed for handling notification objects
 needed by workflow notifications. The exposed functions are the entry points
 for callback listeners.
 
@@ -55,11 +55,11 @@ def handle_workflow_modify(sender, obj=None, src=None, service=None):
 
 
 def done_tasks_notify(tasks):
-  """Notification handling for task that moved in done state.
+  """Notification handling for tasks that moved in done state.
 
   It will
     - delete all notifications for done tasks
-    - create notification for related cycle if all task in done state
+    - create notification for related cycle if all tasks in done state
   """
   if not tasks:
     return
@@ -118,7 +118,7 @@ def not_done_tasks_notify(tasks):
           (n_type, task.end_date)
       ].append(task)
       notification_types.add(n_type)
-  # delete all notifications for cycles about all tasks compleated and
+  # delete all notifications for cycles about all tasks completed and
   # all tasks notifications that required to be updated
   pusher.get_notification_query(
       *(list(cycles) + tasks),
@@ -139,7 +139,7 @@ def not_done_tasks_notify(tasks):
 
 
 def handle_cycle_task_status_change(*objs):
-  """Notification handling for task status change."""
+  """Notification handling for task's status change."""
   done_tasks = []
   not_done_tasks = []
   for obj in objs:
@@ -158,7 +158,7 @@ def handle_cycle_task_group_object_task_put(obj):
       pusher.push(obj, pusher.get_notification_type("cycle_task_reassigned"))
   if inspect(obj).attrs.end_date.history.has_changes() and not obj.is_done:
     # if you change end date to past than overdue
-    # notification should be send today
+    # notification should be sent today
     pusher.update_or_create_notifications(
         obj,
         obj.end_date,

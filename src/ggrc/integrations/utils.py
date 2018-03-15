@@ -6,9 +6,9 @@
 import logging
 
 from sqlalchemy.sql import expression
+
 from ggrc.integrations import issues, integrations_errors
 from ggrc.models import IssuetrackerIssue
-from ggrc.models.hooks.issue_tracker import _STATUSES as STATUSES_MAP
 
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ def sync_issue_tracker_statuses():
           "The Assessment corresponding to the Issue Tracker Issue ID=%d "
           "does not exist.", iti.issue_id)
       continue
-    status_value = STATUSES_MAP.get(asmt.status)
+    status_value = issues.STATUSES.get(asmt.status)
     if status_value:
       issue_params = {
           'status': status_value,

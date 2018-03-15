@@ -39,7 +39,6 @@ can.Model.Cacheable('CMS.Models.Section', {
     directive_sections: 'CMS.Models.DirectiveSection.stubs',
     directives: 'CMS.Models.get_stubs',
     objectives: 'CMS.Models.Objective.stubs',
-    custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
   },
   tree_view_options: {
     attr_view: '/static/mustache/sections/tree-item-attr.mustache',
@@ -95,7 +94,6 @@ can.Model.Cacheable('CMS.Models.Clause', {
     directive_sections: 'CMS.Models.DirectiveSection.stubs',
     directives: 'CMS.Models.get_stubs',
     objectives: 'CMS.Models.Objective.stubs',
-    custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
   },
   tree_view_options: {
     attr_view: '/static/mustache/sections/tree-item-attr.mustache',

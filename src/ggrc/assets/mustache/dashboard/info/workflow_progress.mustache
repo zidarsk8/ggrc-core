@@ -27,31 +27,6 @@
               </div>
             </div>
           </div>
-          <div class="span5">
-            <div class="tree-progress">
-              <ul class="item-util">
-                {{#if ins.task_data.over_due_flag}}
-                  <li class="overdue-text">
-                    {{ins.task_data.over_due}} of {{ins.task_data.task_count}} tasks are overdue / {{ins.task_data.completed_percentage}}% completed
-                  </li>
-                {{else}}
-                  <li class="progress-text">{{ins.task_data.task_count}} tasks in total / {{ins.task_data.completed_percentage}}% completed</li>
-                {{/if}}
-              </ul>
-            </div>
-          </div>
-          <div class="span2">
-            <div class="right">
-              {{#if ins.task_data.over_due_flag}}
-                <span class="overdue">Overdue</span>
-              {{else}}
-                Due in {{ins.task_data.days_left_for_first_task}} days
-              {{/if}}
-                <ul class="item-util">
-                  <li>{{{ins.task_data.first_end_date}}}</li>
-                </ul>
-            </div>
-          </div>
         </div>
       </div>
     </li>
@@ -59,10 +34,18 @@
   {{/list}}
   {{/workflow_data}}
   {{#if_equals workflow_count 0}}
-    <li>
-      <div class="zero-state">
-        <h2>You don't have any workflows in progress</h2>
-      </div>
-    </li>
+    {{#loading}}
+      <li>
+        <div class="zero-state">
+          <h2>Loading...</h2>
+        </div>
+      </li>
+    {{else}}
+      <li>
+        <div class="zero-state">
+          <h2>You don't have any workflows in progress</h2>
+        </div>
+      </li>
+    {{/loading}}
   {{/if_equals}}
 </ul><!-- tree-structure end -->

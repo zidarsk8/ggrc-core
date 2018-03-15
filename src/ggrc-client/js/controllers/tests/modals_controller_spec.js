@@ -128,39 +128,4 @@ describe('ModalsController', function () {
       expect(foo).toHaveBeenCalledWith(error);
     });
   });
-
-  describe('setupCustomAttributes method', () => {
-    let method;
-
-    beforeEach(() => {
-      method = Ctrl.prototype.setupCustomAttributes;
-    });
-
-    it('should call "setup_custom_attributes" and clean attributes', () => {
-      const instance = new CMS.Models.Control();
-      instance.attr('custom_attributes', {
-        '1': 'text val',
-      });
-
-      spyOn(instance, 'setup_custom_attributes');
-      method(instance);
-
-      expect(instance.setup_custom_attributes).toHaveBeenCalled();
-      expect(instance.attr('custom_attributes')).toBe(undefined);
-    });
-
-    it('should not call "setup_custom_attributes". Assessment type', () => {
-      const instance = new CMS.Models.Assessment();
-      const expectAttrValue = 'text val';
-      instance.attr('custom_attributes', {
-        '1': expectAttrValue,
-      });
-
-      spyOn(instance, 'setup_custom_attributes');
-      method(instance);
-
-      expect(instance.setup_custom_attributes).not.toHaveBeenCalled();
-      expect(instance.attr('custom_attributes.1')).toEqual(expectAttrValue);
-    });
-  });
 });

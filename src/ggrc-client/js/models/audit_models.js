@@ -3,9 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../components/audit/attach-folder-button'
-import RefreshQueue from './refresh_queue';
-import Permission from '../permission';
+import '../components/audit/attach-folder-button';
+import {getRole} from '../plugins/utils/acl-utils';
 
 (function (can, CMS) {
   const AUDIT_ISSUE_TRACKER = {
@@ -46,7 +45,6 @@ import Permission from '../permission';
       people: 'CMS.Models.Person.stubs',
       audit_firm: 'CMS.Models.OrgGroup.stub',
       audit_objects: 'CMS.Models.AuditObject.stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     defaults: {
       status: 'Planned',
@@ -171,9 +169,8 @@ import Permission from '../permission';
       return _super.apply(this, args);
     },
     findRoles: function (roleName) {
-      const auditRole = GGRC.access_control_roles.find((role) => {
-        return role.name === roleName && role.object_type === 'Audit';
-      });
+      const auditRole = getRole('Audit', roleName);
+
       return new can.List(this.access_control_list.filter((item) => {
         return item.ac_role_id === auditRole.id;
       }));
@@ -477,7 +474,5 @@ import Permission from '../permission';
         }
       });
     },
-
-    ignore_ca_errors: true,
   });
 })(window.can, window.CMS);

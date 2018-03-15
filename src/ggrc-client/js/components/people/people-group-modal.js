@@ -25,5 +25,13 @@ export default GGRC.Components('peopleGroupModal', {
     emptyListMessage: '',
     title: '',
     people: [],
+    cancel() {
+      this.attr('modalState.open', false);
+      this.dispatch('cancel');
+    },
+    save() {
+      this.attr('modalState.open', false);
+      this.dispatch('save');
+    },
   },
 });

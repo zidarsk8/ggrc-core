@@ -71,7 +71,8 @@ describe('GGRC.Components.editablePeopleGroup', function () {
       }
     );
 
-    it('"showPeopleGroupModal" should be TRUE',
+    it(`"showPeopleGroupModal" should be TRUE when people limit exceeded
+      and editable mode is on`,
       function () {
         viewModel.attr('people', peopleItems);
 
@@ -81,6 +82,16 @@ describe('GGRC.Components.editablePeopleGroup', function () {
         expect(viewModel.attr('showPeopleGroupModal')).toBe(true);
       }
     );
+
+    it(`"showPeopleGroupModal" should be FALSE when people limit is exceeded
+      and editable mode is off`, () => {
+        viewModel.attr('people', peopleItems);
+
+        // trigger editableMode setter
+        viewModel.attr('editableMode', false);
+
+        expect(viewModel.attr('showPeopleGroupModal')).toBe(false);
+      });
   });
 
   describe('"isReadonly" property', () => {
@@ -107,32 +118,28 @@ describe('GGRC.Components.editablePeopleGroup', function () {
   });
 
   describe('"showPeople" property', () => {
-    beforeEach(() => {
-      viewModel.attr('people', peopleItems);
-    });
-
     it('should return full list when group is not editable', () => {
+      viewModel.attr('people', peopleItems);
       viewModel.attr('canEdit', false);
       viewModel.attr('updatableGroupId', null);
 
-      viewModel.attr('showPeopleGroupModal', true);
-
       expect(viewModel.attr('showPeople').length).toBe(peopleItems.length);
     });
 
-    it('should return full list when showPeopleGroupModal is false', () => {
+    it('should return full list when limit is not exceeded', () => {
+      let people = peopleItems.slice(0, 4);
+      viewModel.attr('people', people);
       viewModel.attr('canEdit', true);
-      viewModel.attr('showPeopleGroupModal', false);
 
-      expect(viewModel.attr('showPeople').length).toBe(peopleItems.length);
+      expect(viewModel.attr('showPeople').length).toBe(people.length);
     });
 
     it(`should return shorten list
-      when showPeopleGroupModal is true and group is editable`, () => {
+      when limit is exceeded and group is editable`, () => {
         viewModel.attr('canEdit', true);
-        viewModel.attr('showPeopleGroupModal', true);
+        viewModel.attr('people', peopleItems);
 
         expect(viewModel.attr('showPeople').length).toBe(4);
-    });
+      });
   });
 });

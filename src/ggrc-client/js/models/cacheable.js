@@ -4,6 +4,8 @@
 */
 // Disabling some minor eslint rules until major refactoring
 /* eslint-disable no-console, id-length */
+
+import CustomAttributeAccess from '../plugins/utils/custom-attribute/custom-attribute-access';
 import {
   isSnapshot,
   toObjects,
@@ -350,6 +352,15 @@ import RefreshQueue from './refresh_queue';
           GGRC.custom_attributable_types = [];
         }
         GGRC.custom_attributable_types.push(can.extend({}, this));
+
+        this.validate(
+          '_gca_valid',
+          function () {
+            if (!this._gca_valid) {
+              return 'Missing required global custom attribute';
+            }
+          }
+        );
       }
 
       // register this type as Roleable if applicable
@@ -846,6 +857,10 @@ import RefreshQueue from './refresh_queue';
       if (!this._pending_joins) {
         this.attr('_pending_joins', []);
       }
+
+      if (this.isCustomAttributable()) {
+        this._customAttributeAccess = new CustomAttributeAccess(this);
+      }
     },
     load_custom_attribute_definitions: function () {
       let definitions;
@@ -865,90 +880,61 @@ import RefreshQueue from './refresh_queue';
       }.bind(this));
       this.attr('custom_attribute_definitions', definitions);
     },
-
-    /**
-     * Setup the instance's custom attribute validations, and initialize their
-     * values, if necessary.
+    /*
+     * 1 version:
+     * Returns all custom attribute objects owned by instance.
+     * @return {CustomAttributeObject[]} - The array contained custom attribute
+     *  objects.
+     *
+     * 2 version:
+     * Returns custom attribute object with certain custom attribute id.
+     * @param {number} caId(2) - Custom attribute id.
+     * @return {CustomAttributeObject|undefined} - Found custom attribute object
+     *  otherwise - undefined if it wasn't found.
+     *
+     * 3 version:
+     * Returns filtered array with help options object.
+     * @param {object} options -
+     * @param {CUSTOM_ATTRIBUTE_TYPE} options.type - Filters array by custom
+     *  attribute type.
+     * @return {CustomAttributeObject[]} - Filtered custom attriubte object
+     *  list.
+     *
+     * 4 version:
+     * Sets value for certain custom attribute object.
+     * @param {number|string} caId(4) - Custom attribute id.
+     * @param {number|string|boolean} - Value for custom attribute object.
      */
-    setup_custom_attributes: function () {
-      let self = this;
-      let key;
+    customAttr(...args) {
+      if (!this.isCustomAttributable()) {
+        throw Error('This type has not ability to set custom attribute value');
+      }
 
-      // Remove existing custom_attribute validations,
-      // some of them might have changed
-      for (key in this.class.validations) {
-        if (key.indexOf('custom_attributes.') === 0) {
-          delete this.class.validations[key];
+      switch (args.length) {
+        case 0: {
+          return this._getAllCustomAttr();
         }
-      }
-
-      // setup validators for custom attributes based on their definitions
-      can.each(this.custom_attribute_definitions, function (definition) {
-        if (definition.mandatory && !this.ignore_ca_errors) {
-          if (definition.attribute_type === 'Checkbox') {
-            self.class.validate('custom_attributes.' + definition.id,
-              function (val) {
-                return val ? '' : 'must be checked';
-              });
-          } else {
-            self.class.validateNonBlank('custom_attributes.' + definition.id);
-          }
+        case 1: {
+          return this._getCustomAttr(args[0]);
         }
-      }.bind(this));
-
-      // if necessary, initialize custom attributes' values on the instance
-      if (!this.custom_attributes) {
-        this.attr('custom_attributes', new can.Map());
-        can.each(this.custom_attribute_values, function (value) {
-          let def;
-          let attributeValue;
-          let object;
-          value = value.isStub ? value : value.reify();
-          def = _.find(this.custom_attribute_definitions, {
-            id: value.custom_attribute_id,
-          });
-          if (def) {
-            if (def.attribute_type.startsWith('Map:')) {
-              object = value.attribute_object;
-              attributeValue = object.type + ':' + object.id;
-            } else {
-              attributeValue = value.attribute_value;
-            }
-            self.custom_attributes.attr(
-              value.custom_attribute_id,
-              attributeValue);
-          }
-        }.bind(this));
-      }
-
-      // Due to the current lack on any information on sort order, just use the
-      // order the custom attributes were defined in.
-      function sortById(a, b) {
-        return a.id - b.id;
-      }
-      // Sort only if definitions were attached.
-      if (this.attr('custom_attribute_definitions')) {
-        this.attr('custom_attribute_definitions').sort(sortById);
+        case 2: {
+          this._setCustomAttr(...args);
+          break;
+        }
       }
     },
-
-    _custom_attribute_map: function (attrId, object) {
-      let definition;
-      attrId = Number(attrId); // coming from mustache this will be a string
-      definition = _.find(this.custom_attribute_definitions, {id: attrId});
-
-      if (!definition || !definition.attribute_type.startsWith('Map:')) {
-        return;
-      }
-      if (typeof object === 'string' && object.length > 0) {
-        return;
-      }
-      object = object.stub ? object.stub() : undefined;
-      if (object) {
-        this.custom_attributes.attr(attrId, object.type + ':' + object.id);
-      } else {
-        this.custom_attributes.attr(attrId, 'Person:None');
-      }
+    _getAllCustomAttr() {
+      return this._customAttributeAccess.read();
+    },
+    _getCustomAttr(arg) {
+      return this._customAttributeAccess.read(arg);
+    },
+    _setCustomAttr(caId, value) {
+      const change = {caId: Number(caId), value};
+      this._customAttributeAccess.write(change);
+    },
+    isCustomAttributable() {
+      return this.attr('class').is_custom_attributable;
     },
     computed_errors: function () {
       let errors = this.errors();

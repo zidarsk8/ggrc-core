@@ -16,9 +16,7 @@ Program Readers, Program Editors, Program Managers acl roles get propagated to:
 """
 
 
-import sqlalchemy as sa
 from sqlalchemy.orm import load_only
-from sqlalchemy.orm.session import Session
 
 from ggrc.models import all_models
 from ggrc.models.hooks.acl.acl_manager import ACLManager
@@ -127,6 +125,9 @@ class ProgramRolesHandler(object):
     """Handle audit propagation"""
     acl_manager = self.access_control_list_manager
     audit = acl.object
+    # When role propagation is migrated to sql steatements and the
+    # aduit.snapshotted_objects line is removed, the Snapshotable mixin can
+    # be removed as well.
     for snapshot in audit.snapshotted_objects:
       acl_manager.get_or_create(
           snapshot, acl, acl.person, acl.ac_role_id)
@@ -184,7 +185,7 @@ class ProgramRolesHandler(object):
 
   def handle_snapshot(self, obj):
     """When a snapshot is created propagate program roles"""
-    access_control_list = obj.parent.access_control_list
+    access_control_list = obj.parent.full_access_control_list
     for acl in access_control_list:
       if acl.ac_role.name not in {
           "Program Readers Mapped",
@@ -218,7 +219,7 @@ class ProgramRolesHandler(object):
     for related_object in ("Audit", "Assessment", "Issue"):
       parent, other = related_to(obj, related_object)
       if parent:
-        for acl in parent.access_control_list:
+        for acl in parent.full_access_control_list:
           if self._get_acr_name(acl) not in {
               "Program Readers Mapped",
               "Program Editors Mapped",
@@ -245,7 +246,7 @@ class ProgramRolesHandler(object):
           obj, acl, acl.person,
           role_map[ROLE_PROPAGATION[self._get_acr_name(acl)]])
 
-  def after_flush(self, session, _):
+  def after_flush(self, session):
     """Handle program related acl"""
     self.access_control_list_manager = ACLManager()
     self.relationship_cache = RelationshipsCache()
@@ -263,9 +264,3 @@ class ProgramRolesHandler(object):
         if obj not in self.done:
           handler(obj)
           self.done.add(obj)
-
-
-def init_hook():
-  """Initialize AccessControlList-related hooks."""
-  handler = ProgramRolesHandler()
-  sa.event.listen(Session, "after_flush", handler.after_flush)
