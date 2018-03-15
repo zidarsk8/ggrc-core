@@ -26,7 +26,6 @@ import template from './person-list-item.mustache';
           },
         },
         person: {
-          Type: CMS.Models.Person,
           set: function (newVal, setVal) {
             let actualPerson;
             if (!newVal.id) {
