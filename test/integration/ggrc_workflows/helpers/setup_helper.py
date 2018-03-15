@@ -1,67 +1,23 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Package contains Workflow related setup helpers.
+"""Package contains Workflow related setup helper.
 
 They help to setup data for Workflow related tests.
 """
 
-import string
 from ggrc.access_control import role
 from ggrc.models import all_models
 from ggrc_workflows import ac_roles
 from integration.ggrc.models import factories
-from integration.ggrc_basic_permissions.models import factories as bp_factories
 from integration.ggrc_workflows.models import factories as wf_factories
-from integration.ggrc_workflows.helpers import rbac_helper
+from integration.ggrc_workflows.helpers import person_setup
 
 
-class WorkflowSetup(object):
-  """Setup helper for Workflow related objects setup.
-
-  Attributes:
-      email_template: String template to generate user with predictable email.
-  """
+class WorkflowSetup(person_setup.PersonSetup):
+  """Setup helper for Workflow related objects setup."""
 
   def __init__(self):
-    self.email_template = "GL_{g_rname}_WF_{wf_rname}_{rand_ascii}@google.com"
-
-  def setup_person(self, g_rname, wf_rname):
-    """Generate Person with Global Role using Factories.
-
-    Args:
-        g_rname: Global Role name for user.
-        wf_rname: Workflow related ACR name. If user should not have role in
-            scope of Workflow, it can be any other string.
-
-    Returns:
-        Generated person.
-    """
-    email = self._gen_email(g_rname, wf_rname)
-    person = factories.PersonFactory(email=email)
-    bp_factories.UserRoleFactory(person=person,
-                                 role=rbac_helper.G_ROLES[g_rname])
-    return person
-
-  def _gen_email(self, g_rname, wf_rname):
-    """Generate Person's email who has role in Workflow.
-
-    Args:
-        g_rname: Global Role name.
-        wf_rname: Workflow related ACR name.
-
-    Returns:
-        String with generated predictable email.
-        It has next structure:
-            prefix: 'GL_{global role name}_WF_{workflow role name}_'
-            body: '{6 random ascii letters}'
-            suffix: '@google.com'
-        Generated email to return:
-            prefix + body + suffix
-    """
-    wf_rname = wf_rname.replace(" ", "_")
-    random_ascii = factories.random_str(length=6, chars=string.ascii_letters)
-    return self.email_template.format(g_rname=g_rname, wf_rname=wf_rname,
-                                      rand_ascii=random_ascii)
+    super(WorkflowSetup, self).__init__(all_models.Workflow.__name__)
 
   def _setup_wf_person(self, g_rname, wf_rname, workflow):
     """Generate Person with Global + Workflow Scope role.
@@ -95,33 +51,3 @@ class WorkflowSetup(object):
       self._setup_wf_person(g_rname, ac_roles.workflow.MEMBER_NAME, workflow)
 
     return workflow
-
-  def get_workflow_people(self, g_rname, wf_rname):
-    """Query all people who match Workflow email template.
-
-    Args:
-        g_rname: Global Role name.
-        wf_rname: Workflow Access Control Role name.
-    Returns:
-        List of people with predictable email template.
-    """
-    query_email_templ = self.email_template.format(g_rname=g_rname,
-                                                   wf_rname=wf_rname,
-                                                   rand_ascii="%")
-    return all_models.Person.query.filter(
-        all_models.Person.email.like(query_email_templ)).all()
-
-  def get_workflow_person(self, g_rname, wf_rname):
-    """Query person who match Workflow email template.
-
-    Args:
-        g_rname: Global Role name.
-        wf_rname: Workflow Access Control Role name.
-    Returns:
-        Person instance, if only one Person in DB with predictable email.
-        None, if list of people match template or nobody.
-    """
-    people = self.get_workflow_people(g_rname, wf_rname)
-    if len(people) == 1:
-      return people[0]
-    return None
