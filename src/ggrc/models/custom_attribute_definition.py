@@ -61,9 +61,13 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
   def value_mapping(self):
     return self.ValidTypes.DEFAULT_VALUE_MAPPING.get(self.attribute_type) or {}
 
+  @classmethod
+  def get_default_value_for(cls, attribute_type):
+    return cls.ValidTypes.DEFAULT_VALUE.get(attribute_type)
+
   @builder.simple_property
   def default_value(self):
-    return self.ValidTypes.DEFAULT_VALUE.get(self.attribute_type)
+    return self.get_default_value_for(self.attribute_type)
 
   def get_indexed_value(self, value):
     return self.value_mapping.get(value, value)
