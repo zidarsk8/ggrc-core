@@ -30,8 +30,8 @@ class TestTaskGroupObjectApiCalls(workflow_test_case.WorkflowTestCase):
       wf_factories.TaskGroupFactory(workflow=workflow)
       factories.ControlFactory(directive=None)
 
-    g_person = self.setup_helper.get_workflow_person(
-        g_rname, ac_roles.workflow.ADMIN_NAME)
+    g_person = self.setup_helper.get_person(g_rname,
+                                            ac_roles.workflow.ADMIN_NAME)
     self.api_helper.set_user(g_person)
 
     task_group = all_models.TaskGroup.query.one()
@@ -54,8 +54,8 @@ class TestTaskGroupObjectApiCalls(workflow_test_case.WorkflowTestCase):
       task_group = wf_factories.TaskGroupFactory(workflow=workflow)
       wf_factories.TaskGroupObjectFactory(task_group=task_group)
 
-    g_person = self.setup_helper.get_workflow_person(
-        g_rname, ac_roles.workflow.ADMIN_NAME)
+    g_person = self.setup_helper.get_person(g_rname,
+                                            ac_roles.workflow.ADMIN_NAME)
     self.api_helper.set_user(g_person)
 
     task_group_object = all_models.TaskGroupObject.query.one()
@@ -67,10 +67,9 @@ class TestTaskGroupObjectApiCalls(workflow_test_case.WorkflowTestCase):
     """GET TaskGroupObject collection logged in as GlobalReader & No Role."""
     with factories.single_commit():
       wf_factories.TaskGroupObjectFactory()
-      email = self.setup_helper.gen_email(rbac_helper.GR_RNAME, "No Role")
-      self.setup_helper.setup_person(rbac_helper.GR_RNAME, email)
+      self.setup_helper.setup_person(rbac_helper.GR_RNAME, "No Role")
 
-    g_reader = all_models.Person.query.filter_by(email=email).one()
+    g_reader = self.setup_helper.get_person(rbac_helper.GR_RNAME, "No Role")
     self.api_helper.set_user(g_reader)
 
     task_group_object = all_models.TaskGroupObject.query.one()
