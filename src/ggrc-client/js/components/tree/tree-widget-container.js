@@ -294,6 +294,10 @@ viewModel = can.Map.extend({
       sortDirection: sortingInfo.sortDirection,
     };
     let request = this.attr('advancedSearch.request');
+    const stopFn = tracker.start(this.attr('modelName'),
+      tracker.USER_JOURNEY_KEYS.LOADING,
+      `${tracker.USER_ACTIONS.TREE_VIEW_PAGE_LOADING}
+       with ${page.pageSize} items`);
 
     pageInfo.attr('disabled', true);
     this.attr('loading', true);
@@ -318,7 +322,8 @@ viewModel = can.Map.extend({
           total !== getCounts().attr(countsName)) {
           getCounts().attr(countsName, total);
         }
-      });
+      })
+      .then(stopFn, stopFn.bind(null, true));
   },
   display: function (needToRefresh) {
     let loadedItems;

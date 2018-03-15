@@ -24,6 +24,7 @@ export const USER_JOURNEY_KEYS = {
 // Timing Label in Google Analytics Timing API
 export const USER_ACTIONS = {
   MULTISELECT_FILTER: 'Multi-select filter',
+  TREE_VIEW_PAGE_LOADING: 'Loading of tree view page',
   OPEN_INFO_PANE: 'Open Info pane',
   ADVANCED_SEARCH_FILTER: 'Advanced search filter',
   LHN: {
