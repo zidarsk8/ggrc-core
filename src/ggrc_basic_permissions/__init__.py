@@ -323,7 +323,7 @@ def load_access_control_list(user, permissions):
   ).group_by(
       all_models.AccessControlList.object_id,
       all_models.AccessControlList.object_type
-  ).all()
+  )
 
   for object_type, object_id, read, update, delete in access_control_list:
     actions = (("read", read), ("view_object_page", read),
