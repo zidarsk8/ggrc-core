@@ -173,8 +173,10 @@
       </div>
       <div class="span7">
         <div class="confirm-buttons">
-          {{selected.length}}
-          object(s) selected
+          <spinner toggle="is_saving"></spinner>
+          <span class="confirm-buttons__objects-count">
+            {{selected.length}}
+            object(s) selected
           </span>
 
           <button class="btn-map btn btn-small btn-green preventdoubleclick"
@@ -185,7 +187,6 @@
               Map Selected
             {{/if}}
           </button>
-          <spinner toggle="is_saving"></spinner>
         </div>
       </div>
     </div>
