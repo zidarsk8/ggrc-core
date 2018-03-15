@@ -546,6 +546,8 @@ import InfoWidget from '../controllers/info_widget_controller';
     let pageInstance = GGRC.page_instance();
     const isObjectBrowser = /^\/objectBrowser\/?$/
       .test(window.location.pathname);
+    const isPeoplePage = /^\/people\/.*$/
+      .test(window.location.pathname);
 
     descriptor[pageInstance.constructor.shortName] = {
       task: {
@@ -574,8 +576,8 @@ import InfoWidget from '../controllers/info_widget_controller';
       },
     };
 
-    // add 'Workflows' tab for 'All Objects' view
-    if (isObjectBrowser) {
+    // add 'Workflows' tab for 'All Objects' and People view
+    if (isObjectBrowser || isPeoplePage) {
       descriptor[pageInstance.constructor.shortName].workflow = {
         widget_id: 'workflow',
         widget_name: 'Workflows',
