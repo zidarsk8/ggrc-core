@@ -107,5 +107,7 @@
 
   </section>
 
-  <info-pane-footer {created-at}="instance.created_at" {modified-at}="instance.updated_at" {modified-by}="instance.modified_by"></info-pane-footer>
+  {{#if is_info_widget}}
+    <info-pane-footer {created-at}="instance.created_at" {modified-at}="instance.updated_at" {modified-by}="instance.modified_by"></info-pane-footer>
+  {{/if}}
 {{/instance}}
