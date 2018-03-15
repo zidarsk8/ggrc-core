@@ -21,8 +21,8 @@ class TestCommentApiCalls(workflow_test_case.WorkflowTestCase):
       cycle = wf_factories.CycleFactory(workflow=workflow)
       wf_factories.CycleTaskFactory(cycle=cycle)
 
-    g_editor = self.setup_helper.get_workflow_person(
-        rbac_helper.GE_RNAME, ac_roles.workflow.ADMIN_NAME)
+    g_editor = self.setup_helper.get_person(rbac_helper.GE_RNAME,
+                                            ac_roles.workflow.ADMIN_NAME)
     self.api_helper.set_user(g_editor)
 
     cycle_task = all_models.CycleTaskGroupObjectTask.query.one()
@@ -35,10 +35,9 @@ class TestCommentApiCalls(workflow_test_case.WorkflowTestCase):
     """GET CycleTaskEntry collection logged in as GlobalReader & No Role."""
     with factories.single_commit():
       wf_factories.CycleTaskEntryFactory()
-      email = self.setup_helper.gen_email(rbac_helper.GR_RNAME, "No Role")
-      self.setup_helper.setup_person(rbac_helper.GR_RNAME, email)
+      self.setup_helper.setup_person(rbac_helper.GR_RNAME, "No Role")
 
-    g_reader = all_models.Person.query.filter_by(email=email).one()
+    g_reader = self.setup_helper.get_person(rbac_helper.GR_RNAME, "No Role")
     self.api_helper.set_user(g_reader)
 
     comment = all_models.CycleTaskEntry.query.one()
