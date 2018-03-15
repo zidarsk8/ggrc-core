@@ -6,6 +6,7 @@
 import Component from '../import';
 import * as Utils from '../import-export-utils';
 import {gapiClient} from '../../../plugins/ggrc-gapi-client';
+import errorTemplate from '../templates/import-error.mustache';
 
 describe('GGRC.Components.csvImportWidget', function () {
   'use strict';
@@ -249,12 +250,22 @@ describe('GGRC.Components.csvImportWidget', function () {
           done();
         });
 
-        it('calls GGRC errors notifier with error message', function (done) {
-          importDfd.reject(failData);
-          method({});
-          expect(GGRC.Errors.notifier).toHaveBeenCalledWith('error',
-            failData.responseJSON.message);
-          done();
+        describe('calls GGRC errors notifier', ()=> {
+          it('with error message if message was provided', ()=> {
+            importDfd.reject(failData);
+            method({});
+
+            expect(GGRC.Errors.notifier)
+              .toHaveBeenCalledWith('error', failData.responseJSON.message);
+          });
+
+          it('with general error if error message was not provided', ()=> {
+            importDfd.reject({});
+            method({});
+
+            expect(GGRC.Errors.notifier)
+              .toHaveBeenCalledWith('error', errorTemplate, true);
+          });
         });
 
         it('sets false to isLoading attribute', function (done) {
