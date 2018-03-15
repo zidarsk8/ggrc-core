@@ -299,6 +299,12 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
 
     return value
 
+  def log_json(self):
+    """Add extra fields to be logged in CADs."""
+    results = super(CustomAttributeDefinition, self).log_json()
+    results["default_value"] = self.default_value
+    return results
+
 
 class CustomAttributeMapable(object):
   # pylint: disable=too-few-public-methods
