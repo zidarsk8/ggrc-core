@@ -17,6 +17,7 @@ from ggrc.models.exceptions import ValidationError
 
 
 class Relationship(Base, db.Model):
+  """Relationship model."""
   __tablename__ = 'relationships'
   source_id = db.Column(db.Integer, nullable=False)
   source_type = db.Column(db.String, nullable=False)

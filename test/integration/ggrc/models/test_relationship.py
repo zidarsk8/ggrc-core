@@ -7,7 +7,6 @@ import json
 
 import ddt
 
-from ggrc import db
 from ggrc.models import all_models
 from ggrc.models.exceptions import ValidationError
 
@@ -38,7 +37,8 @@ class TestRelationship(TestCase):
   REL_URL = "/api/relationships"
 
   @staticmethod
-  def build_relationship_json(source, destination, **attrs):
+  def build_relationship_json(source, destination):
+    """Builds relationship create request json."""
     return json.dumps([{
         "relationship": {
             "source": {"id": source.id, "type": source.type},
