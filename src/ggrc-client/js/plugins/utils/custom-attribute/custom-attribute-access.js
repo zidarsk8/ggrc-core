@@ -60,15 +60,15 @@ export default class CustomAttributeAccess {
    *  Options: {@link Options} gives ability to filter custom attributes by
    *  certain rules.
    *  number: Gives ability to find the custom attriubte by passed custom attribute id.
-   * @return {CustomAttributeObject|List<CustomAttributeObject>|undefined} - Custom
+   * @return {CustomAttributeObject|can.List<CustomAttributeObject>|undefined} - Custom
    *  attriubtes or ceratain custom attriubte.
    */
   read(arg) {
     if (!arg) {
-      return this._caObjects;
+      return new can.List(this._caObjects);
     } else if (arg instanceof Object) {
       const options = arg;
-      return this._getFilteredCaObjects(options);
+      return new can.List(this._getFilteredCaObjects(options));
     } else {
       const caId = arg;
       return this._findCaObjectByCaId(caId);
@@ -76,50 +76,80 @@ export default class CustomAttributeAccess {
   }
 
   /**
-   * Builds custom attribute objects for the instance whiсh is served by
-   * {@link CustomAttributeAccess}.
-   * For each custom attribute object is set appopriate validations.
-   * If the instance doesn't have appopriate custom attribute value for
-   * custom attribute definition then is built the custom attribute
-   * object with an empty custom attribute value.
+   * Updates custom attribute objects with appropriate raw custom
+   * attribute values.
+   * @param {Object[]} [caValues=[]] - Raw custom attribute values.
+   */
+  updateCaObjects(caValues = []) {
+    this._caObjectsMap.forEach((caObject, caId) => {
+      const caValue = this._findCaValueByCaId(caId, caValues);
+      if (caValue) {
+        caObject.updateCaValue(caValue);
+      } else {
+        caObject.updateCaValue({}, true);
+      }
+    });
+  }
+
+  /**
+   * Setups custom attribute objects.
    * @private
    */
   _setupCaObjects() {
+    const caObjectsMap = this._buildCaObjects();
+    // set validate actions
+    this._setupValidations(caObjectsMap);
+    // setup init validationState for each caObject
+    caObjectsMap.forEach((caObject) => caObject.validate());
+    this._caObjectsMap = caObjectsMap;
+  }
+
+  /**
+   * Builds custom attribute objects for the instance, which is served by
+   * {@link CustomAttributeAccess}.
+   * For each custom attribute object is set appropriate validations.
+   * If the instance doesn't have appropriate custom attribute value for
+   * custom attribute definition then is built the custom attribute
+   * object with an empty custom attribute value.
+   * @private
+   * @return {Map<number, CustomAttributeObject>} - A map with custom attribute
+   * objects, where key is a custom attribute id and value is an appropriate
+   * CA object for this id.
+   */
+  _buildCaObjects() {
     const instance = this._instance;
     const caDefinitions = instance.attr('custom_attribute_definitions');
     const caValues = instance.attr('custom_attribute_values');
-    const caObjects = caDefinitions
-      .map((caDefinition) => {
-        const caId = caDefinition.attr('id');
-        let caValue = this._findCaValueByCaId(caId);
+    const caObjectsMap = _.reduce(caDefinitions, (map, caDefinition) => {
+      const caId = caDefinition.attr('id');
+      let caValue = this._findCaValueByCaId(caId, caValues);
 
-        if (!caValue) {
-          caValue = new can.Map({});
-          caValues.push(caValue);
-        }
+      if (!caValue) {
+        caValue = new can.Map({});
+        caValues.push(caValue);
+      }
 
-        return new CustomAttributeObject(
-          instance,
-          caDefinition,
-          caValue
-        );
-      });
+      const caObject = new CustomAttributeObject(
+        instance,
+        caDefinition,
+        caValue
+      );
+      map.set(caId, caObject);
+      return map;
+    }, new Map());
 
-    // set validate actions
-    this._setupValidations(caObjects);
-    // setup init validationState for each caObject
-    _.each(caObjects, (caObject) => caObject.validate());
-    this._caObjects = new can.List(caObjects);
+    return caObjectsMap;
   }
 
   /**
    * Sets for each [custom attribute object]{@link CustomAttributeObject}
-   * appopriate validation.
+   * appropriate validation.
    * @private
-   * @param {can.List<CustomAttributeObject>} caObjects - Custom attribute objects.
+   * @param {Map<number, CustomAttributeObject>} caObjectsMap - A map, where
+   * key is a custom attribute id and value is an appropriate CA object.
    */
-  _setupValidations(caObjects) {
-    caObjects.each((caObject) => {
+  _setupValidations(caObjectsMap) {
+    caObjectsMap.forEach((caObject) => {
       this._buildDefaultValidations(caObject);
     });
   }
@@ -202,15 +232,12 @@ export default class CustomAttributeAccess {
   /**
    * Returns custom attribute value object which equals to сaId.
    * @param {number} caId - The custom attribute id.
+   * @param {Object[]|can.Map[]} caValues - Custom attribute values.
    * @return {can.Map|undefined} - Custom attribute value if it was found
    * else undefined.
    */
-  _findCaValueByCaId(caId) {
-    const instance = this._instance;
-    const caValues = instance.attr('custom_attribute_values');
-    return _.find(caValues, (caValue) =>
-      caValue.attr('custom_attribute_id') === caId
-    );
+  _findCaValueByCaId(caId, caValues) {
+    return _.find(caValues, (caValue) => caValue.custom_attribute_id === caId);
   }
 
   /**
@@ -221,9 +248,16 @@ export default class CustomAttributeAccess {
    * was found else undefined.
    */
   _findCaObjectByCaId(caId) {
-    const caObjects = this._caObjects;
-    return _.find(caObjects, (caObject) =>
-      caObject.customAttributeId === caId
-    );
+    const caObjectsMap = this._caObjectsMap;
+    return caObjectsMap.get(caId);
+  }
+
+  /**
+   * Returns custom attribute objects as a plain array
+   * @private
+   * @return {CustomAttributeObjects[]} - An array of custom attribute objects.
+   */
+  get _caObjects() {
+    return [...this._caObjectsMap.values()];
   }
 }
