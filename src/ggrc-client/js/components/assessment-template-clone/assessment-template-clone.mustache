@@ -12,28 +12,25 @@
   </h2>
   <div class="create-new-object">
     Clone from existing template or <a href="javascript://"
-       class="btn btn-link create-control"
-       rel="tooltip"
-       data-placement="bottom"
-       data-toggle="modal-ajax-form"
-       data-original-title="Define Assessment template"
-       data-modal-reset="reset"
-       data-modal-class="modal-wide"
-       data-in-cloner="true"
-       data-update-hash="true"
-       data-object-singular="{{model_info 'AssessmentTemplate' 'model_singular'}}"
-       data-object-plural="{{model_info 'AssessmentTemplate' 'root_collection'}}"
-       data-object-params='{
-          "audit": {
-            "id": {{parentInstance.id}},
-            "type": "{{json_escape parentInstance.type}}"
-          },
+        class="btn btn-link create-control"
+        rel="tooltip"
+        data-placement="bottom"
+        data-toggle="modal-ajax-form"
+        data-original-title="Define Assessment template"
+        data-modal-reset="reset"
+        data-modal-class="modal-wide"
+        data-in-cloner="true"
+        data-update-hash="true"
+        data-object-singular="{{model_info 'AssessmentTemplate' 'model_singular'}}"
+        data-object-plural="{{model_info 'AssessmentTemplate' 'root_collection'}}"
+        data-extend-new-instance='{
+          "audit": {{json_stringify parentInstance fields='id,type,issue_tracker'}},
           "context": {
             "id": {{parentInstance.context.id}},
             "type": "{{json_escape parentInstance.context.type}}"
           }
         }'
-      >Create new assessment template</a>
+        >Create new assessment template</a>
   </div>
 </div>
 <div class="modal-filter modal-body">

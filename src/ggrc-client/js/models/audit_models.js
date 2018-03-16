@@ -7,14 +7,6 @@ import '../components/audit/attach-folder-button';
 import {getRole} from '../plugins/utils/acl-utils';
 
 (function (can, CMS) {
-  const AUDIT_ISSUE_TRACKER = {
-    hotlist_id: '766459',
-    component_id: '188208',
-    issue_severity: 'S2',
-    issue_priority: 'P2',
-    issue_type: 'PROCESS',
-  };
-
   can.Model.Cacheable('CMS.Models.Audit', {
     root_object: 'audit',
     root_collection: 'audits',
@@ -175,9 +167,6 @@ import {getRole} from '../plugins/utils/acl-utils';
         return item.ac_role_id === auditRole.id;
       }));
     },
-    form_preload() {
-      this.initIssueTrackerObject(AUDIT_ISSUE_TRACKER);
-    },
   });
 
   /**
@@ -289,6 +278,13 @@ import {getRole} from '../plugins/utils/acl-utils';
      */
     form_preload: function (isNewObject) {
       const pageInstance = GGRC.page_instance();
+      if (pageInstance && (!this.audit || !this.audit.id || !this.audit.type)) {
+        if (pageInstance.type === 'Audit') {
+          this.attr('audit', pageInstance);
+        }
+      }
+
+
       if (!this.custom_attribute_definitions) {
         this.attr('custom_attribute_definitions', new can.List());
       }
@@ -296,18 +292,6 @@ import {getRole} from '../plugins/utils/acl-utils';
 
       this._updateDropdownEnabled('assignees');
       this._updateDropdownEnabled('verifiers');
-
-      if (pageInstance && pageInstance.type === 'Audit' && !this.audit) {
-        this.audit = {
-          id: pageInstance.id,
-          title: pageInstance.title,
-          type: pageInstance.type,
-          context: pageInstance.context,
-          issue_tracker: pageInstance.issue_tracker,
-        };
-      }
-
-      this.initCanUseIssueTracker(this.audit.issue_tracker);
     },
 
     /**

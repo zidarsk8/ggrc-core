@@ -1123,6 +1123,12 @@ Mustache.registerHelper("json_escape", function (obj, options) {
   */
 });
 
+Mustache.registerHelper('json_stringify', function (obj, options) {
+  let fields = (options.hash && options.hash.fields || '').split(',');
+  obj = Mustache.resolve(obj);
+  return JSON.stringify(_.pick(obj.serialize(), fields));
+});
+
 function localizeDate(date, options, tmpl, allowNonISO) {
   let formats = [
     'YYYY-MM-DD',
@@ -2408,30 +2414,6 @@ Mustache.registerHelper('displayWidgetTab',
     }
 
     return options.fn(options.contexts);
-  }
-);
-
-Mustache.registerHelper('displayAssessmentIssueTracker',
-  function (canUseIssueTracker, checkParentIntegration, options) {
-    const enabled = GGRC.ISSUE_TRACKER_ENABLED;
-    canUseIssueTracker = Mustache.resolve(canUseIssueTracker);
-
-    if (!options) {
-      options = checkParentIntegration;
-      checkParentIntegration = false;
-    } else {
-      checkParentIntegration = Mustache.resolve(checkParentIntegration);
-    }
-
-    if (!checkParentIntegration) {
-      return enabled ?
-        options.fn(options.contexts) :
-        options.inverse(options.contexts);
-    }
-
-    return canUseIssueTracker && enabled ?
-      options.fn(options.contexts) :
-      options.inverse(options.contexts);
   }
 );
 Mustache.registerHelper('is_auditor', function (options) {

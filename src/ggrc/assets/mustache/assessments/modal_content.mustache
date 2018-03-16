@@ -296,7 +296,7 @@
         </div>
       </div>
 
-      {{#displayAssessmentIssueTracker instance.can_use_issue_tracker true}}
+      {{#if instance.can_use_issue_tracker}}
         <div class="additional-fields">
           <div class="expand-issue-tracker-link">
             <a class="show-hidden-fields info-show-hide active" href="javascript://">
@@ -323,7 +323,7 @@
             </issue-tracker-switcher>
           </div>
         </div>
-      {{/displayAssessmentIssueTracker}}
+      {{/if }}
 
     </form>
     {{/instance}}
