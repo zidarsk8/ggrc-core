@@ -34,5 +34,10 @@ import template from './questions-link.mustache';
       },
       instance: null,
     },
+    events: {
+      '.question-link click': function (el, ev) {
+        ev.stopPropagation();
+      },
+    },
   });
 })(window.can);
