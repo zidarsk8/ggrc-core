@@ -707,6 +707,7 @@ import RefreshQueue from './refresh_queue';
           model.attr('id', params.id);
         }
         model.attr(params);
+        model.updateCaObjects(params.custom_attribute_values);
       } else {
         model = this._super(params);
       }
@@ -860,6 +861,16 @@ import RefreshQueue from './refresh_queue';
 
       if (this.isCustomAttributable()) {
         this._customAttributeAccess = new CustomAttributeAccess(this);
+      }
+    },
+    /**
+     * Updates custom attribute objects with help custom
+     * attribute values.
+     * @param {Object[]} caValues - Custom attribute values.
+     */
+    updateCaObjects(caValues) {
+      if (this.isCustomAttributable() && caValues) {
+        this._customAttributeAccess.updateCaObjects(caValues);
       }
     },
     load_custom_attribute_definitions: function () {

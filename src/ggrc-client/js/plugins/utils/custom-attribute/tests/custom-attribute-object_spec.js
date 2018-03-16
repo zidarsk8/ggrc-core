@@ -41,7 +41,7 @@ describe('CustomAttributeObject module', () => {
       expect(caObject._caDefinition).toBe(caDef);
     });
 
-    describe('calls _setupCaValue() method', () => {
+    describe('calls _initCaValue() method', () => {
       let _setupCaValue;
 
       beforeEach(function () {
@@ -235,6 +235,36 @@ describe('CustomAttributeObject module', () => {
     });
   });
 
+  describe('updateCaValue() method', () => {
+    describe('setups CAV object', () => {
+      beforeEach(function () {
+        spyOn(caObject, '_setupCaValue');
+      });
+
+      it('though passed can.Map instance', function () {
+        const caValue = new can.Map({prop: 1});
+        caObject.updateCaValue(caValue);
+        const wrappedCaValue = caObject._setupCaValue.calls.argsFor(0)[0];
+        expect(wrappedCaValue.attr())
+          .toEqual(caValue.attr());
+      });
+
+      it('though passed plain object', function () {
+        const caValue = {prop: 1};
+        caObject.updateCaValue(caValue);
+        const wrappedCaValue = caObject._setupCaValue.calls.argsFor(0)[0];
+        expect(wrappedCaValue.attr())
+          .toEqual(caValue);
+      });
+    });
+
+    it('updates current CAV object', function () {
+      const caValue = new can.Map({attribute_value: 'Some value'});
+      caObject.updateCaValue(caValue);
+      expect(caObject.value).toBe(caValue.attr('attribute_value'));
+    });
+  });
+
   describe('validate() method', () => {
     it('updates validation state', function () {
       const {validator} = caObject;
@@ -249,7 +279,7 @@ describe('CustomAttributeObject module', () => {
   });
 
   describe('_setupCaValue() method', () => {
-    describe('when passed caValue does not have requiered', () => {
+    describe('when passed caValue does not have required', () => {
       let caValue;
 
       beforeEach(function () {
@@ -292,11 +322,20 @@ describe('CustomAttributeObject module', () => {
         expect(caValue.attr('custom_attribute_id')).toBe(caId);
       });
     });
+  });
 
-    it('sets _caValue to passed caValue object', function () {
-      const caValue = new can.Map();
-      caObject._setupCaValue(caValue);
-      expect(caObject._caValue).toBe(caValue);
+  describe('_initCaValue() method', () => {
+    it('setups passed CAV object', function () {
+      const caValue = new can.Map({prop: 1});
+      spyOn(caObject, '_setupCaValue');
+      caObject._initCaValue(caValue);
+      expect(caObject._setupCaValue).toHaveBeenCalledWith(caValue);
+    });
+
+    it('sets CAV object', function () {
+      const caValue = new can.Map({attribute_value: 'Some value'});
+      caObject.updateCaValue(caValue);
+      expect(caObject.value).toBe(caValue.attr('attribute_value'));
     });
   });
 

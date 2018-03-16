@@ -554,4 +554,30 @@ describe('can.Model.Cacheable', function () {
       expect(result).toBe(false);
     });
   });
+
+  describe('::updateCaObjects', () => {
+    let instance;
+
+    beforeEach(function () {
+      instance = new CMS.Models.DummyModel();
+    });
+
+    describe('when ca values are defined and the current model is custom' +
+    'attributable', () => {
+      let caValues;
+
+      beforeEach(function () {
+        caValues = [];
+        spyOn(instance, 'isCustomAttributable').and.returnValue(true);
+        instance.init();
+      });
+
+      it('updates ca objects with appropriate ca values', function () {
+        const update = spyOn(instance._customAttributeAccess,
+          'updateCaObjects');
+        instance.updateCaObjects(caValues);
+        expect(update).toHaveBeenCalledWith(caValues);
+      });
+    });
+  });
 });
