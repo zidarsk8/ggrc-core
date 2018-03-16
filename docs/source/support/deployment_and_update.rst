@@ -130,6 +130,9 @@ Settings from ``settings.sh``
 +------------------------------------+---------------------------------------------------------------------------+
 | INTEGRATION_SERVICE_URL            | Link to an external service providing Person info                         |
 +------------------------------------+---------------------------------------------------------------------------+
+| EXTERNAL_APP_USER                  | Name and email of the user that will be used for external applications    |
+|                                    | auth.                                                                     |
++------------------------------------+---------------------------------------------------------------------------+
 | URLFETCH_SERVICE_ID                | Value for ``X-URLFetch-Service-Id`` header for requests to Person service |
 +------------------------------------+---------------------------------------------------------------------------+
 | ISSUE_TRACKER_BUG_URL_TMPL         | Template for a link to a bug in an external bug tracker                   |

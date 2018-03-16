@@ -13,3 +13,4 @@ AUTOBUILD_ASSETS = False
 ENABLE_JASMINE = False
 
 APP_ENGINE = True
+EXTERNAL_APP_USER = 'External App <external_app@example.com>'

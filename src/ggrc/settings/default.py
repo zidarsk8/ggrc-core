@@ -145,6 +145,9 @@ GGRC_Q_INTEGRATION_URL = os.environ.get('GGRC_Q_INTEGRATION_URL', '')
 # Integration service
 INTEGRATION_SERVICE_URL = os.environ.get('INTEGRATION_SERVICE_URL')
 
+# GGRC user account to be used by external application auth
+EXTERNAL_APP_USER = os.environ.get('EXTERNAL_APP_USER', '')
+
 # Integration service mandatory header value
 URLFETCH_SERVICE_ID = os.environ.get('URLFETCH_SERVICE_ID')
 

@@ -4,6 +4,8 @@
 """Collection of utils for login and user generation.
 """
 
+from email.utils import parseaddr
+
 from sqlalchemy import orm
 
 from ggrc import db, settings
@@ -96,6 +98,8 @@ def search_user(email):
 
 def find_or_create_external_user(email, name):
   """Find or generate user after verification"""
+  if is_external_app_user_email(email):
+    return find_or_create_ext_app_user()
 
   if settings.INTEGRATION_SERVICE_URL == 'mock':
     return find_or_create_user_by_email(email, name)
@@ -105,12 +109,24 @@ def find_or_create_external_user(email, name):
   return None
 
 
+def find_or_create_ext_app_user():
+  """Find or generate external application user after verification."""
+  name, email = parseaddr(settings.EXTERNAL_APP_USER)
+  user = find_user_by_email(email)
+  if not user:
+    user = create_user(email, name=name)
+  return user
+
+
 def find_user(email):
   """Find or generate user.
 
   If Integration Server is specified not found in DB user is generated
   with Creator role.
   """
+  if is_external_app_user_email(email):
+    return find_or_create_ext_app_user()
+
   if settings.INTEGRATION_SERVICE_URL == 'mock':
     return find_user_by_email(email)
 
@@ -134,7 +150,8 @@ def find_users(emails):
 
   # Verify emails
   usernames = [email.split('@')[0] for email in emails
-               if is_authorized_domain(email)]
+               if is_authorized_domain(email) and
+               not is_external_app_user_email(email)]
 
   service = client.PersonClient()
   ldaps = service.search_persons(usernames)
@@ -166,3 +183,19 @@ def find_users(emails):
       add_creator_role(user)
 
   return users
+
+
+def is_external_app_user_email(email):
+  """Checks if given user email belongs to external application.
+
+  Args:
+    email: A string email address of the user.
+  """
+  if not settings.EXTERNAL_APP_USER:
+    return False
+
+  _, external_app_user_email = parseaddr(settings.EXTERNAL_APP_USER)
+  if not external_app_user_email:
+    return False
+
+  return external_app_user_email == email

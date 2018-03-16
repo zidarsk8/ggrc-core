@@ -17,6 +17,7 @@ class TestAppengineLogin(unittest.TestCase):
   """Unit test suite for appengine login logic."""
 
   # pylint: disable=invalid-name; test method names are too long for pylint
+  # pylint: disable=too-many-instance-attributes; required for mocks
 
   ALLOWED_APPID = "allowed"
   EMAIL = "user@example.com"
@@ -33,12 +34,23 @@ class TestAppengineLogin(unittest.TestCase):
     self.person_patcher = mock.patch("ggrc.login.appengine.all_models.Person")
     self.person_mock = self.person_patcher.start()
 
+    self.is_ext_user_email_patcher = mock.patch(
+        "ggrc.login.appengine.is_external_app_user_email")
+    self.is_ext_user_email_mock = self.is_ext_user_email_patcher.start()
+
+    self.find_or_create_ext_app_user_patcher = mock.patch(
+        "ggrc.login.appengine.find_or_create_ext_app_user")
+    self.find_or_create_ext_app_user_mock = (
+        self.find_or_create_ext_app_user_patcher.start())
+
     # valid headers by default
     self.request.headers["X-appengine-inbound-appid"] = self.ALLOWED_APPID
     self.request.headers["X-ggrc-user"] = json.dumps({"email": self.EMAIL})
 
   def tearDown(self):
     """Stop patchers."""
+    self.find_or_create_ext_app_user_patcher.stop()
+    self.is_ext_user_email_patcher.stop()
     self.person_patcher.stop()
     self.settings_patcher.stop()
 
@@ -94,16 +106,33 @@ class TestAppengineLogin(unittest.TestCase):
     """HTTP400 if user header contains json with unknown user."""
     # imitate no user found
     self.person_mock.query.filter_by.return_value.first.return_value = None
+    self.is_ext_user_email_mock.return_value = False
 
     with self.assertRaises(exceptions.BadRequest):
       login_appengine.request_loader(self.request)
+    self.is_ext_user_email_mock.assert_called_once_with(self.EMAIL)
 
   def test_request_loader_valid_auth(self):
     """User logged in if Appid and user headers are correct."""
     person = mock.MagicMock()
     self.person_mock.query.filter_by.return_value.first.return_value = person
+    self.is_ext_user_email_mock.return_value = False
 
     result = login_appengine.request_loader(self.request)
 
     self.assertIs(result, person)
     self.person_mock.query.filter_by.assert_called_with(email=self.EMAIL)
+    self.is_ext_user_email_mock.assert_called_once_with(self.EMAIL)
+
+  def test_request_loader_valid_external_app_user(self):
+    """External App User logged in if Appid and user headers are correct."""
+    person = mock.MagicMock()
+    self.is_ext_user_email_mock.return_value = True
+    self.find_or_create_ext_app_user_mock.return_value = person
+
+    result = login_appengine.request_loader(self.request)
+
+    self.assertIs(result, person)
+    self.person_mock.query.filter_by.assert_not_called()
+    self.find_or_create_ext_app_user_mock.assert_called_once_with()
+    self.is_ext_user_email_mock.assert_called_once_with(self.EMAIL)

@@ -143,6 +143,7 @@ class ObjectGenerator(Generator):
         "source": self.create_stub(source),
         "destination": self.create_stub(destination),
         "context": context,
+        "is_external": False,
     }
     data.update(kwargs)
     return self.generate_object(
