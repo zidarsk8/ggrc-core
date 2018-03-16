@@ -105,9 +105,6 @@ class TestSnapshoting(SnapshotterBaseTestCase):
         ]
     })
 
-    audit = db.session.query(models.Audit).filter(
-        models.Audit.title == "Snapshotable audit").one()
-
     snapshot = db.session.query(models.Snapshot).filter(
         models.Snapshot.child_id == control.id,
         models.Snapshot.child_type == "Control",
@@ -132,31 +129,6 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     snapshot_revision_content = snapshot_revision.first()[2]
     self.assertEqual(snapshot_revision_content["child_type"], "Control")
     self.assertEqual(snapshot_revision_content["child_id"], control.id)
-
-    relationship_columns = db.session.query(models.Relationship)
-    relationship = relationship_columns.filter(
-        models.Relationship.source_type == "Audit",
-        models.Relationship.source_id == audit.id,
-        models.Relationship.destination_type == "Control",
-        models.Relationship.destination_id == control.id
-    ).union(
-        relationship_columns.filter(
-            models.Relationship.source_type == "Control",
-            models.Relationship.source_id == control.id,
-            models.Relationship.destination_type == "Audit",
-            models.Relationship.destination_id == audit.id
-        )
-    )
-    self.assertEqual(relationship.count(), 1)
-
-    self.assertEqual(db.session.query(
-        models.Revision.resource_type,
-        models.Revision.resource_id,
-        models.Revision._content,
-    ).filter(
-        models.Revision.resource_type == "Relationship",
-        models.Revision.resource_id == relationship.first().id,
-    ).count(), 1)
 
     self.assertEqual(db.session.query(models.AccessControlList.id).filter(
         models.AccessControlList.object_id == snapshot_obj.id,

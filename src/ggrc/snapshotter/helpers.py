@@ -71,47 +71,6 @@ def get_revisions(pairs, revisions, filters=None):
     return revision_id_cache
 
 
-def get_relationships(relationships):
-  """Retrieve relationships
-
-  Args:
-    relationships:
-  """
-  with benchmark("snapshotter.helpers.get_relationships"):
-    if relationships:
-      relationship_columns = db.session.query(
-          models.Relationship.id,
-          models.Relationship.modified_by_id,
-          models.Relationship.created_at,
-          models.Relationship.updated_at,
-          models.Relationship.source_type,
-          models.Relationship.source_id,
-          models.Relationship.destination_type,
-          models.Relationship.destination_id,
-          models.Relationship.context_id,
-      )
-
-      return relationship_columns.filter(
-          tuple_(
-              models.Relationship.source_type,
-              models.Relationship.source_id,
-              models.Relationship.destination_type,
-              models.Relationship.destination_id,
-          ).in_(relationships)
-      ).union(
-          relationship_columns.filter(
-              tuple_(
-                  models.Relationship.destination_type,
-                  models.Relationship.destination_id,
-                  models.Relationship.source_type,
-                  models.Relationship.source_id
-              ).in_(relationships)
-          )
-      )
-    else:
-      return set()
-
-
 def get_snapshots(objects=None, ids=None):
   with benchmark("snapshotter.helpers.get_snapshots"):
     if objects and ids:
@@ -194,47 +153,6 @@ def create_snapshot_revision_dict(action, event_id, snapshot,
       "resource_id": snapshot[0],
       "resource_type": "Snapshot",
       "context_id": context_id
-  }
-
-
-def create_relationship_dict(source, destination, user_id, context_id):
-  """Create dictionary representation of relationship"""
-  return {
-      "source_type": source.type,
-      "source_id": source.id,
-      "destination_type": destination.type,
-      "destination_id": destination.id,
-      "modified_by_id": user_id,
-      "context_id": context_id,
-  }
-
-
-def create_relationship_revision_dict(action, event_id, relationship,  # noqa # pylint: disable=invalid-name
-                                      user_id, context_id):
-  """Create dictionary representation of relationship revision"""
-  revision_content = relationship._asdict()
-  metadata = {
-      "display_name": "{}:{} <-> {}:{}".format(
-          relationship.source_type,
-          relationship.source_id,
-          relationship.destination_type,
-          relationship.destination_id
-      ),
-      "modified_by": create_json_stub("Person", context_id, user_id),
-      "parent_id": None,
-      "attrs": {}
-  }
-  revision_content.update(metadata)
-
-  return {
-      "action": action,
-      "event_id": event_id,
-      "content": revision_content,
-      "modified_by_id": user_id,
-      "resource_id": relationship.id,
-      "resource_type": "Relationship",
-      "context_id": context_id,
-      "status": None,
   }
 
 
