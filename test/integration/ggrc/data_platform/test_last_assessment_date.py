@@ -31,6 +31,7 @@ import itertools
 import freezegun
 
 from ggrc import models
+from ggrc.data_platform import computed_attributes
 from ggrc.converters import errors
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
@@ -137,6 +138,7 @@ class TestLastAssessmentDate(TestCase):
       self.assertEqual(snapshot.last_assessment_date, None)
 
   def test_single_finished_assessment(self):
+    """Test last assessment date for single finished assessment."""
     finish_date = datetime.datetime(2017, 2, 20, 13, 40, 0)
     related_objects = {"Control_1", "Objective_0"}
 
@@ -239,3 +241,35 @@ class TestLastAssessmentDate(TestCase):
     self.assertEqual(1, len(resp))
     self.assertEqual(1, resp[0]["updated"])
     self.assertEqual(control.last_assessment_date, finish_date)
+
+  def test_handling_rel_revisions(self):
+    """Test handling of relationship revisions."""
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory(
+          finished_date=datetime.datetime(2017, 2, 20, 13, 40, 0),
+          status="Completed",
+      )
+      control = factories.ControlFactory()
+      snapshots = self._create_snapshots(assessment.audit, [control])
+      rel = factories.RelationshipFactory(
+          source=assessment,
+          destination=snapshots[0]
+      )
+
+    rel_revision = models.Revision.query.filter(
+        models.Revision.resource_type == rel.type,
+        models.Revision.resource_id == rel.id,
+    ).first()
+    assessment_revision = models.Revision.query.filter(
+        models.Revision.resource_type == assessment.type,
+        models.Revision.resource_id == assessment.id,
+    ).first()
+
+    computed_attributes.compute_attributes([
+        rel_revision.id, assessment_revision.id
+    ])
+
+    self.assertEqual(
+        models.all_models.Attributes.query.count(),
+        2,  # One entry for control and one for the control snapshot.
+    )
