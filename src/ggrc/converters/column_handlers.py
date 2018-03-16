@@ -108,6 +108,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "modified_by": handlers.DirecPersonMappingColumnHandler,
     "last_deprecated_date": handlers.DateColumnHandler,
     "last_comment": handlers.ExportOnlyColumnHandler,
+    "issue_tracker": handlers.ExportOnlyIssueTrackerColumnHandler,
 
     # Mapping column handlers
     "__mapping__:person": handlers.PersonMappingColumnHandler,
