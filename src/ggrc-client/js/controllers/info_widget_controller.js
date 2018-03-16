@@ -48,6 +48,7 @@ export default can.Control({
       object_menu: this.options.object_menu,
       error_msg: '',
       error: true,
+      is_info_widget: true,
     });
     import(/* webpackChunkName: "modalsCtrls" */'./modals')
       .then(() => {

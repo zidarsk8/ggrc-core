@@ -917,9 +917,6 @@ class ExportOnlyColumnHandler(ColumnHandler):
   def set_obj_attr(self):
     pass
 
-  def get_value(self):
-    return super(ExportOnlyColumnHandler, self).get_value()
-
   def insert_object(self):
     pass
 
@@ -941,3 +938,10 @@ class ExportOnlyDateColumnHandler(ExportOnlyColumnHandler):
     if value:
       return value.strftime("%m/%d/%Y")
     return ""
+
+
+class ExportOnlyIssueTrackerColumnHandler(ExportOnlyColumnHandler):
+
+  def get_value(self):
+    cache = self.row_converter.block_converter.get_ticket_tracker_cache()
+    return cache.get(self.row_converter.obj.id, "")

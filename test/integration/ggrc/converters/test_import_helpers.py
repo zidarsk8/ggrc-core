@@ -449,6 +449,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Comments",
         'Labels',
         'Last Comment',
+        'Ticket Tracker',
     }
     expected_fields = {
         "mandatory": {
