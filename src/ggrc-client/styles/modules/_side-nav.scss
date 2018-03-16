@@ -6,13 +6,11 @@
 .lhs-holder {
   @include transition(left, 0.8s);
   position: fixed;
-  top: 128px;
+  top: 94px;
   left: -240px;
   width: 240px;
-  height: 548px;
-  overflow-y: auto;
-  overflow-x: hidden;
   background: $white;
+  height: calc(100% - 146px);
   &.active {
     @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
     left: 0px;
@@ -20,17 +18,8 @@
 }
 
 .lhn-type {
-  @extend %clearfix;
-  @include transition-property(left);
-  @include transition-duration(.8s);
-  min-width: 240px;
-  position: fixed;
-  top: 94px;
-  left: -246px;
-  &.active {
-    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.05), 2px -2px 4px rgba(0,0,0, 0.05));
-    left: 0px;
-  }
+  @include box-shadow(2px 2px 4px rgba(0,0,0, 0.05), 2px -2px 4px rgba(0,0,0, 0.05));
+  
   a {
     float: left;
     height: 34px;
@@ -48,6 +37,12 @@
       background: $white;
     }
   }
+}
+
+.affix-holder {
+  overflow-y: auto;
+  width: 100%;
+  height: calc(100% - 34px);
 }
 
 h4.search-title {
@@ -400,21 +395,17 @@ h4.search-title {
 }
 
 .bar-v {
-  @include transition(left, 0.8s);
   background: $white url("../images/bgnds/drag-v.png") no-repeat 2px 50%;
   @include background-size(2px 30px);
   position: absolute;
-  top: 0;
+  top: 34px;
   right: 0;
-  height:100%;
+  height: calc(100% - 34px);
   z-index: zIndex(bar-v);
   width: 6px;
   padding: 0;
   border: none;
   cursor: ew-resize;
-  &.active {
-    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
-  }
   &:focus {
     @extend %outline-fix;
   }

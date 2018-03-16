@@ -302,21 +302,6 @@ jQuery(function ($) {
   });
 });
 
-function resize_areas(event, target_info_pin_height) {
-  var $window = $(window);
-  var $bar = $('.bar-v');
-  var $lhnType = $('.lhn-type');
-  var $lhsHolder = $('.lhs-holder');
-
-  var winHeight = $window.height();
-  var lhsHeight = winHeight - 180; // new ui
-  var lhsWidth = $lhsHolder.width();
-
-  $lhnType.css('width', lhsWidth);
-  $lhsHolder.css('height', lhsHeight);
-  $bar.css('height', lhsHeight);
-}
-
 jQuery(function ($) {
   // Footer expander animation helper
   function expander(toggle, direction) {
@@ -435,6 +420,3 @@ $body.on('click', ['unified-mapper', 'unified-search']
   .map(val => '[data-toggle="' + val + '"]').join(', '), (ev, disable) => {
   openMapperByElement(ev, disable);
 });
-
-jQuery(window).on('load', resize_areas);
-jQuery(window).on('resize', resize_areas);
