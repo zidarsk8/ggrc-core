@@ -80,6 +80,7 @@ ATTRIBUTE_ORDER = (
     "delete",
     "repeat_every",
     "unit",
+    "issue_tracker",
 )
 
 EXCLUDE_CUSTOM_ATTRIBUTES = set([
