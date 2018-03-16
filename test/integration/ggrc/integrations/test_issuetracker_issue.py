@@ -94,11 +94,31 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
       "Creators": {"creator_1@example.com", "creator_2@example.com"},
       "Assignees": {"assignee_1@example.com", "assignee_2@example.com"},
       "Verifiers": {"verifier_1@example.com", "verifier_2@example.com"},
+      "Primary Contacts": {"primary_contact_1@example.com",
+                           "primary_contact_2@example.com"},
+      "Secondary Contacts": {"secondary_contact_1@example.com",
+                             "secondary_contact_2@example.com"},
+      "Custom Role": {"curom_role_1@example.com"},
   }
+
+  ROLE_NAMES = (
+      "Creators",
+      "Assignees",
+      "Verifiers",
+      "Primary Contacts",
+      "Secondary Contacts",
+      "Custom Role"
+  )
 
   def setUp(self):
     super(TestIssueTrackerIntegrationPeople, self).setUp()
     self.generator = generator.ObjectGenerator()
+
+    factories.AccessControlRoleFactory(
+        name='Custom Role',
+        internal=False,
+        object_type="Assessment",
+    )
 
     # fetch all roles mentioned in self.EMAILS
     self.roles = {
@@ -177,7 +197,7 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
     asmt = self.create_asmt_with_issue_tracker(
         role_name_to_people={
             role_name: people for role_name, people in self.people.items()
-            if role_name in ("Creators", "Assignees", "Verifiers")
+            if role_name in self.ROLE_NAMES
         },
         issue_tracker={
             "component_id": component_id,
