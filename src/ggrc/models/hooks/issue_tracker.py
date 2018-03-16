@@ -508,9 +508,10 @@ def _collect_issue_emails(assessment):
   """Returns emails related to given assessment.
 
   The lexicographical first Assignee is used for assignee_email.
-  Every other Assignee and every other person with an Assessment-local
-  role (except Creators and Verifiers) are used in
-  related_people_emails
+  Every other Assignee is used in related_people_emails.
+  Creators, Verifiers, Primary Contacts, Secondary Contacts
+  and any other Assessment custom roles should NOT be used in
+  related_people_emails.
 
   Args:
     assessment: An instance of Assessment model.
