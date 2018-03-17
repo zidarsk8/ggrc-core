@@ -53,6 +53,30 @@ describe('GGRC.Components.assessmentInfoPane', function () {
       spyOn(vm, 'initializeFormFields').and.returnValue(() => {});
     });
 
+    it('prevents state change to deprecated for archived instance', (done) => {
+      vm.attr('instance.archived', true);
+      vm.attr('instance.status', 'Completed');
+
+      method({
+        state: vm.attr('deprecatedState'),
+      }).then(() => {
+        expect(vm.attr('instance.status')).toBe('Completed');
+        done();
+      });
+    });
+
+    it('prevents state change to initial for archived instance', (done) => {
+      vm.attr('instance.archived', true);
+      vm.attr('instance.status', 'Completed');
+
+      method({
+        state: vm.attr('initialState'),
+      }).then(() => {
+        expect(vm.attr('instance.status')).toBe('Completed');
+        done();
+      });
+    });
+
     it('returns status back on undo action', (done) => {
       vm.attr('instance.previousStatus', 'FooBar');
       instanceSave.resolve();
