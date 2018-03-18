@@ -25,6 +25,7 @@ acr = sa.sql.table(
     sa.sql.column('updated_at', sa.DateTime),
     sa.sql.column('context_id', sa.Integer),
     sa.sql.column('internal', sa.Integer),
+    sa.sql.column('non_editable', sa.Boolean),
     sa.sql.column('notify_about_proposal', sa.Integer),
     sa.sql.column('parent_id', sa.Integer),
 )
@@ -71,6 +72,7 @@ def _add_subtree(tree, role_name, parent_id):
             created_at=datetime.datetime.now(),
             updated_at=datetime.datetime.now(),
             internal=True,
+            non_editable=True,
             **permissions_dict
         )
     )
