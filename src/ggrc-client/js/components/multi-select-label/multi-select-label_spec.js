@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as LabelUtils from '../../plugins/utils/label-utils';
 import {getComponentVM} from '../../../js_specs/spec_helpers';
 import Component from './multi-select-label';
 
@@ -108,30 +109,23 @@ describe('multi-select-label component', () => {
       expect(vm.attr('instance.labels').length).toBe(labels.length);
     });
 
-    it('should sort and set newValue to instance.', () => {
+    it('should call "sortByName" method from label-utils.', () => {
       vm.attr('onlyEditMode', true);
       vm.attr('instance.labels', 'oldValue');
+      spyOn(LabelUtils, 'sortByName').and.returnValue(labels);
       vm.valueChanged(labels);
-
-      let instanceLabels = vm.attr('instance.labels');
-      expect(instanceLabels.length).toBe(labels.length);
-      expect(instanceLabels[0].name).toEqual('a');
-      expect(instanceLabels[1].name).toEqual('b');
-      expect(instanceLabels[2].name).toEqual('c');
+      expect(LabelUtils.sortByName).toHaveBeenCalledWith(labels);
     });
 
     it('dispatches valueChanged event if it is not only edit mode', () => {
       spyOn(vm, 'dispatch');
+      spyOn(LabelUtils, 'sortByName').and.returnValue(labels);
       vm.attr('onlyEditMode', false);
       vm.valueChanged(labels);
 
       expect(vm.dispatch).toHaveBeenCalledWith({
         type: 'valueChanged',
-        value: [
-          {name: 'a'},
-          {name: 'b'},
-          {name: 'c'},
-        ],
+        value: labels,
       });
     });
   });

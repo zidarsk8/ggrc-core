@@ -5,6 +5,7 @@
 
 import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
 import {getRole} from '../plugins/utils/acl-utils';
+import {sortByName} from '../plugins/utils/label-utils';
 
 (function (can, GGRC, CMS) {
   'use strict';
@@ -186,10 +187,7 @@ import {getRole} from '../plugins/utils/acl-utils';
       }
 
       if (attributes.labels && attributes.labels.length) {
-        attributes.labels = _.sortByOrder(
-          attributes.labels,
-          (label) => label.name.toLowerCase()
-        );
+        attributes.labels = sortByName(attributes.labels);
       }
 
       attributes.custom_attribute_values =
