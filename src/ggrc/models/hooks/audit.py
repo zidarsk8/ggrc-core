@@ -6,6 +6,7 @@
 
   The following permission hooks make sure archived audits are not editable
 """
+
 from werkzeug.exceptions import Forbidden
 
 from ggrc import db
@@ -60,7 +61,7 @@ def init_hook():
     """Make sure users can not map objects to archived audits"""
     # pylint: disable=unused-argument
     if (getattr(obj, 'source_type', None) == 'Issue' or
-       getattr(obj, 'destination_type', None) == 'Issue'):
+            getattr(obj, 'destination_type', None) == 'Issue'):
       # Issues can be mapped even if audit is archived so skip the permission
       # check here
       return
@@ -68,3 +69,22 @@ def init_hook():
         hasattr(obj.context, 'related_object') and getattr(
             obj.context.related_object, 'archived', False)):
       raise Forbidden()
+
+  @signals.Restful.collection_posted.connect_via(all_models.Audit)
+  def handle_assessment_post(sender, objects=None, sources=None, service=None):
+    """Applies custom attribute definitions and maps people roles.
+
+    Applicable when generating Assessment with template.
+
+    Args:
+      sender: A class of Resource handling the POST request.
+      objects: A list of model instances created from the POSTed JSON.
+      sources: A list of original POSTed JSON dictionaries.
+    """
+    del sender, service  # Unused
+
+    for audit in objects:
+      all_models.Relationship(
+          source=audit,
+          destination=audit.program,
+      )

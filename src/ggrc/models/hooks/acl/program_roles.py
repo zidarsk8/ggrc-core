@@ -211,6 +211,9 @@ class ProgramRolesHandler(object):
         }:
           continue
 
+        if other.type == "Audit":
+          continue
+
         acl_manager.get_or_create(
             other, acl, acl.person,
             role_map[ROLE_PROPAGATION[self._get_acr_name(acl)]])
