@@ -22,6 +22,7 @@ from sqlalchemy import and_
 from ggrc import db
 from ggrc import models
 from ggrc import utils
+from ggrc.login import get_current_user_id
 from ggrc.utils import benchmark
 from ggrc.rbac import permissions
 from ggrc.services import common
@@ -57,14 +58,15 @@ class RelatedAssessmentsResource(common.Resource):
     limit = self._get_limit_parameters()
 
     if not permissions.has_system_wide_read():
-      if not permissions.is_allowed_read(object_id, object_type, None):
+      if not permissions.is_allowed_read(object_type, object_id, None):
         raise Forbidden()
       acl = models.all_models.AccessControlList
       acr = models.all_models.AccessControlRole
       ids_query = db.session.query(acl.object_id).join(acr).filter(
-          acr.read.is_(True),
+          acr.read == 1,
           acl.object_type == "Assessment",
-          acl.object_id.in_(ids_query)
+          acl.person_id == get_current_user_id(),
+          acl.object_id.in_(ids_query),
       )
 
     query = models.Assessment.query.options(
