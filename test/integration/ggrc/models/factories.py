@@ -289,6 +289,10 @@ class CommentFactory(ModelFactory):
   class Meta:
     model = all_models.Comment
 
+  description = factory.LazyAttribute(
+      lambda _: "<p>{}</p>".format(random_str())
+  )
+
 
 class DocumentFactory(ModelFactory):
 
