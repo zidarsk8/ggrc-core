@@ -29,6 +29,10 @@
       :javascript
         GGRC.DASHBOARD_INTEGRATION='{{config.get("DASHBOARD_INTEGRATION") | safe}}';
 
+    -if config.get("GGRC_Q_INTEGRATION_URL")
+      :javascript
+        GGRC.GGRC_Q_INTEGRATION_URL='{{config.get("GGRC_Q_INTEGRATION_URL")}}';
+
     -assets "dashboard-js"
       %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
     -endassets
@@ -45,10 +49,6 @@
 
     -# Google Web Font(s)
     -#NOTE: This resource occasionally hangs and prevents page from rendering, so loaded after the fact via jquery
-
-    -if config.get("GGRC_Q_INTEGRATION_URL")
-      :javascript
-        GGRC.GGRC_Q_INTEGRATION_URL='{{config.get("GGRC_Q_INTEGRATION_URL")}}';
 
     -#%link{ 'href': "http://fonts.googleapis.com/css?family=PT+Sans", :rel => "stylesheet", :type => "text/css" }
 
