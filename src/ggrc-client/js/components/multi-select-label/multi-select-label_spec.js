@@ -91,21 +91,47 @@ describe('multi-select-label component', () => {
   });
 
   describe('valueChanged() method', () => {
+    let labels;
+
+    beforeAll(() => {
+      labels = [
+        {name: 'b'},
+        {name: 'a'},
+        {name: 'c'},
+      ];
+    });
+
     it('sets newValue to instance.labels if it is only edit mode', () => {
       vm.attr('onlyEditMode', true);
       vm.attr('instance.labels', 'oldValue');
-      vm.valueChanged('newValue');
-      expect(vm.attr('instance.labels')).toEqual('newValue');
+      vm.valueChanged(labels);
+      expect(vm.attr('instance.labels').length).toBe(labels.length);
+    });
+
+    it('should sort and set newValue to instance.', () => {
+      vm.attr('onlyEditMode', true);
+      vm.attr('instance.labels', 'oldValue');
+      vm.valueChanged(labels);
+
+      let instanceLabels = vm.attr('instance.labels');
+      expect(instanceLabels.length).toBe(labels.length);
+      expect(instanceLabels[0].name).toEqual('a');
+      expect(instanceLabels[1].name).toEqual('b');
+      expect(instanceLabels[2].name).toEqual('c');
     });
 
     it('dispatches valueChanged event if it is not only edit mode', () => {
       spyOn(vm, 'dispatch');
       vm.attr('onlyEditMode', false);
-      vm.valueChanged('newValue');
+      vm.valueChanged(labels);
 
       expect(vm.dispatch).toHaveBeenCalledWith({
         type: 'valueChanged',
-        value: 'newValue',
+        value: [
+          {name: 'a'},
+          {name: 'b'},
+          {name: 'c'},
+        ],
       });
     });
   });
