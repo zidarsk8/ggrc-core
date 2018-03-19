@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import tracker from '../../tracker';
 import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
@@ -71,15 +72,21 @@ import template from './cycle-task-actions.mustache';
     },
     setStatus: function (status) {
       let instance = this.attr('instance');
+      const stopFn = tracker.start(
+        instance.type,
+        tracker.USER_JOURNEY_KEYS.LOADING,
+        tracker.USER_ACTIONS.CYCLE_TASK.CHANGE_STATUS);
 
       this.attr('disabled', true);
-      instance.refresh().then(function (refreshed) {
-        refreshed.attr('status', status);
-
-        return refreshed.save();
-      }).then(function () {
-        this.attr('disabled', false);
-      }.bind(this));
+      return instance.refresh()
+        .then((refreshed) =>{
+          refreshed.attr('status', status);
+          return refreshed.save();
+        })
+        .then(() => {
+          this.attr('disabled', false);
+          stopFn();
+        });
     },
   });
 

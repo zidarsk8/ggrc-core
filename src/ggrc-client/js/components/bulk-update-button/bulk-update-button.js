@@ -29,7 +29,7 @@ export default can.Component.extend({
 
       context.closeModal();
       GGRC.Errors.notifier('progress', progressMessage);
-      updateService.update(model, args.selected, args.options)
+      return updateService.update(model, args.selected, args.options)
         .then(function (res) {
           var updated = _.filter(res, {status: 'updated'});
           var updatedCount = updated.length;
