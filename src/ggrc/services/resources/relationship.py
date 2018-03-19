@@ -11,6 +11,7 @@ from ggrc.builder import json as json_builder
 from ggrc import db
 import ggrc.services.common
 from ggrc.models.snapshot import Snapshot
+from ggrc.models import relationship
 from ggrc.login import get_current_user
 
 
@@ -69,5 +70,9 @@ class RelationshipResource(ggrc.services.common.Resource):
       json_builder.create(obj, snapshot_data)
       obj.modified_by = get_current_user()
       obj.context = obj.parent.context
+      relationship.Relationship(
+          source=obj.parent,
+          destination=obj,
+      )
     else:
       return super(RelationshipResource, self).json_create(obj, src)
