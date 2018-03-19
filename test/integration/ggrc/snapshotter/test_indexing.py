@@ -403,7 +403,11 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
       )
       person = factories.PersonFactory(email="test@example.com", name='test')
       control = factories.ControlFactory()
-      factories.AccessControlList(ac_role=acr, person=person, object=control)
+      factories.AccessControlListFactory(
+          ac_role=acr,
+          person=person,
+          object=control
+      )
     revision = all_models.Revision.query.filter(
         all_models.Revision.resource_id == control.id,
         all_models.Revision.resource_type == control.type,
@@ -508,7 +512,11 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
       )
       person = factories.PersonFactory(email="test@example.com", name='test')
       control = factories.ControlFactory()
-      factories.AccessControlList(ac_role=acr, person=person, object=control)
+      factories.AccessControlListFactory(
+          ac_role=acr,
+          person=person,
+          object=control
+      )
     revision = all_models.Revision.query.filter(
         all_models.Revision.resource_id == control.id,
         all_models.Revision.resource_type == control.type,
