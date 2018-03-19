@@ -185,6 +185,13 @@ import {getRole} from '../plugins/utils/acl-utils';
         return attributes;
       }
 
+      if (attributes.labels && attributes.labels.length) {
+        attributes.labels = _.sortByOrder(
+          attributes.labels,
+          (label) => label.name.toLowerCase()
+        );
+      }
+
       attributes.custom_attribute_values =
         prepareCustomAttributes(definitions, values);
       return attributes;

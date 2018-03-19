@@ -57,6 +57,7 @@ export default can.Component.extend({
       return '';
     },
     valueChanged: function (newValue) {
+      newValue = _.sortByOrder(newValue, (label) => label.name.toLowerCase());
       if (this.attr('onlyEditMode')) {
         this.attr('instance.labels', newValue);
       } else {
