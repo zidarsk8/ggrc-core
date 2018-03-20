@@ -107,7 +107,7 @@ def copy_file_request(drive_service, file_id, body):
   response = drive_service.files().copy(
       fileId=file_id,
       body=body,
-      fields='webViewLink,name'
+      fields='id,webViewLink,name'
   ).execute()
   return response
 
@@ -117,8 +117,23 @@ def rename_file_request(drive_service, file_id, body):
   return drive_service.files().update(
       fileId=file_id,
       body=body,
-      fields='webViewLink,name'
+      fields='id,webViewLink,name'
   ).execute()
+
+
+def validate_response(response):
+  missed_keys = []
+  if 'id' not in response:
+    missed_keys.append('id')
+  if 'webViewLink' not in response:
+    missed_keys.append('webViewLink')
+  if 'name' not in response:
+    missed_keys.append('name')
+
+  if missed_keys:
+    keys = ', '.join(missed_keys)
+    raise InternalServerError('Unable to validate gdrive api'
+                              ' response: missed keys {}'.format(keys))
 
 
 def process_gdrive_file(folder_id, file_id, postfix, separator,
@@ -138,6 +153,7 @@ def process_gdrive_file(folder_id, file_id, postfix, separator,
     else:
       body = _build_request_body(folder_id, new_file_name)
       response = copy_file_request(drive_service, file_id, body)
+    validate_response(response)
     return response
   except HttpAccessTokenRefreshError:
     handle_token_error()
