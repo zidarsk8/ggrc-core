@@ -14,6 +14,23 @@ from ggrc.models import all_models
 from ggrc.services import signals
 
 
+def _add_audit_relationships(audits):
+  """Add missing relationships for audit direct mappings."""
+  for audit in audits:
+    all_models.Relationship(
+        source=audit,
+        destination=audit.program,
+    )
+
+
+def _check_archived_context(obj):
+  """Check if object is allowed to be edited or raise an error."""
+  if (hasattr(obj, 'context') and
+      hasattr(obj.context, 'related_object') and getattr(
+          obj.context.related_object, 'archived', False)):
+    raise Forbidden()
+
+
 def init_hook():
   """Initializes audit permission hooks."""
   # pylint: disable=unused-variable
@@ -50,10 +67,7 @@ def init_hook():
   def handle_archived_context(sender, obj=None, src=None, service=None):
     """Make sure admins cannot delete/update archived audits"""
     # pylint: disable=unused-argument
-    if (hasattr(obj, 'context') and
-        hasattr(obj.context, 'related_object') and getattr(
-            obj.context.related_object, 'archived', False)):
-      raise Forbidden()
+    _check_archived_context(obj)
 
   @signals.Restful.model_posted.connect_via(all_models.Relationship)
   @signals.Restful.model_deleted.connect_via(all_models.Relationship)
@@ -65,26 +79,10 @@ def init_hook():
       # Issues can be mapped even if audit is archived so skip the permission
       # check here
       return
-    if (hasattr(obj, 'context') and
-        hasattr(obj.context, 'related_object') and getattr(
-            obj.context.related_object, 'archived', False)):
-      raise Forbidden()
+    _check_archived_context(obj)
 
   @signals.Restful.collection_posted.connect_via(all_models.Audit)
   def handle_assessment_post(sender, objects=None, sources=None, service=None):
-    """Applies custom attribute definitions and maps people roles.
-
-    Applicable when generating Assessment with template.
-
-    Args:
-      sender: A class of Resource handling the POST request.
-      objects: A list of model instances created from the POSTed JSON.
-      sources: A list of original POSTed JSON dictionaries.
-    """
-    del sender, service, sources  # Unused
-
-    for audit in objects:
-      all_models.Relationship(
-          source=audit,
-          destination=audit.program,
-      )
+    """Add relationships objects for direct audit mappings."""
+    # pylint: disable=unused-argument
+    _add_audit_relationships(objects)
