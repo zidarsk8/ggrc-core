@@ -57,6 +57,17 @@
                   Import {{model.model_plural}}
                 </a>
               </li>
+            {{else}}
+              {{#is_auditor}}
+                <li>
+                  <a href="/import"
+                      target="_blank"
+                      class="section-import">
+                    <i class="fa fa-fw fa-cloud-upload"></i>
+                    Import {{model.model_plural}}
+                  </a>
+                </li>
+              {{/is_auditor}}
             {{/is_allowed}}
           {{/if}}
           {{#if showedItems.length}}
