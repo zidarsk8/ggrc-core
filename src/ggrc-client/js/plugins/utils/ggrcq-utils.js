@@ -34,7 +34,7 @@ function getUrl(slug, model) {
   slug = slug.toLowerCase();
   model = model.toLowerCase();
 
-  return `${url}questionnaires/${model}/code/${slug}/answers`;
+  return `${url}questionnaires/${model}=${slug}/answers`;
 }
 
 /**
