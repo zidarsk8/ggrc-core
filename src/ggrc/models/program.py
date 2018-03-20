@@ -36,7 +36,10 @@ class Program(HasObjectState,
   audits = db.relationship(
       'Audit', backref='program', cascade='all, delete-orphan')
 
-  _api_attrs = reflection.ApiAttributes('kind', 'audits')
+  _api_attrs = reflection.ApiAttributes(
+      'kind',
+      reflection.Attribute('audits', create=False, update=False),
+  )
   _include_links = []
   _aliases = {
       "document_url": None,
