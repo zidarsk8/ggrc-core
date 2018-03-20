@@ -73,6 +73,7 @@ class SnapshotGenerator(object):
     self.context_cache[parent] = parent_object.context_id
 
   def _fetch_neighborhood(self, parent_object, objects):
+    """Fetch relationships for objects and parent."""
     with benchmark("Snapshot._fetch_object_neighborhood"):
       query_pairs = set()
 

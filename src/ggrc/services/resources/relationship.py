@@ -53,8 +53,7 @@ class RelationshipResource(ggrc.services.common.Resource):
       obj = Snapshot()
       db.session.add(obj)
       return obj
-    else:
-      return super(RelationshipResource, self)._get_model_instance(src, body)
+    return super(RelationshipResource, self)._get_model_instance(src, body)
 
   def json_create(self, obj, src):
     """For Parent and Snapshottable src and dst, fill in the Snapshot obj."""
@@ -74,5 +73,6 @@ class RelationshipResource(ggrc.services.common.Resource):
           source=obj.parent,
           destination=obj,
       )
-    else:
-      return super(RelationshipResource, self).json_create(obj, src)
+      return None
+
+    return super(RelationshipResource, self).json_create(obj, src)

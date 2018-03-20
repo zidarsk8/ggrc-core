@@ -81,7 +81,7 @@ def init_hook():
       objects: A list of model instances created from the POSTed JSON.
       sources: A list of original POSTed JSON dictionaries.
     """
-    del sender, service  # Unused
+    del sender, service, sources  # Unused
 
     for audit in objects:
       all_models.Relationship(
