@@ -46,45 +46,46 @@ def _insert_select_acls(select_statement):
   )
 
 
-def _handle_snapshot_mappings(parent_acl_ids):
-  snapshot_table = all_models.Snapshot.__table__
-  acl_table = all_models.AccessControlList.__table__
-  parent_acr = all_models.AccessControlRole.__table__.alias("parent_acr")
-  child_acr = all_models.AccessControlRole.__table__.alias("child_acr")
-
-  select_statement = sa.select([
-      acl_table.c.person_id,
-      child_acr.c.id,
-      snapshot_table.c.id,
-      sa.literal(all_models.Snapshot.__name__),
-      sa.func.now(),
-      sa.literal(login.get_current_user_id()),
-      sa.func.now(),
-      acl_table.c.id,
-  ]).select_from(
-      sa.join(
-          sa.join(
-              sa.join(
-                  snapshot_table,
-                  acl_table,
-                  sa.and_(
-                      acl_table.c.object_id == snapshot_table.c.parent_id,
-                      acl_table.c.object_type == snapshot_table.c.parent_type,
-                  )
-              ),
-              parent_acr,
-              parent_acr.c.id == acl_table.c.ac_role_id
-          ),
-          child_acr,
-          child_acr.c.parent_id == parent_acr.c.id
-      )
-  ).where(
-      sa.and_(
-          acl_table.c.id.in_(parent_acl_ids),
-          child_acr.c.object_type == all_models.Snapshot.__name__,
-      )
-  )
-  _insert_select_acls(select_statement)
+# def _handle_snapshot_mappings(parent_acl_ids):
+#   snapshot_table = all_models.Snapshot.__table__
+#   acl_table = all_models.AccessControlList.__table__
+#   parent_acr = all_models.AccessControlRole.__table__.alias("parent_acr")
+#   child_acr = all_models.AccessControlRole.__table__.alias("child_acr")
+#
+#   select_statement = sa.select([
+#       acl_table.c.person_id,
+#       child_acr.c.id,
+#       snapshot_table.c.id,
+#       sa.literal(all_models.Snapshot.__name__),
+#       sa.func.now(),
+#       sa.literal(login.get_current_user_id()),
+#       sa.func.now(),
+#       acl_table.c.id,
+#   ]).select_from(
+#       sa.join(
+#           sa.join(
+#               sa.join(
+#                   snapshot_table,
+#                   acl_table,
+#                   sa.and_(
+#                       acl_table.c.object_id == snapshot_table.c.parent_id,
+#                       acl_table.c.object_type == \
+#                           snapshot_table.c.parent_type,
+#                   )
+#               ),
+#               parent_acr,
+#               parent_acr.c.id == acl_table.c.ac_role_id
+#           ),
+#           child_acr,
+#           child_acr.c.parent_id == parent_acr.c.id
+#       )
+#   ).where(
+#       sa.and_(
+#           acl_table.c.id.in_(parent_acl_ids),
+#           child_acr.c.object_type == all_models.Snapshot.__name__,
+#       )
+#   )
+#   _insert_select_acls(select_statement)
 
 
 def _rel_parent(parent_acl_ids, source=True):
@@ -246,5 +247,7 @@ def handle_audit_acl(acls):
     return
   acl_ids = [acl.id for acl in acls]
   related_acl_ids = _handle_relationships(acl_ids)
-  _handle_relationships(related_acl_ids)
-  _handle_snapshot_mappings(acl_ids)
+  while related_acl_ids.count():
+    related_acl_ids = _handle_relationships(related_acl_ids)
+
+  # _handle_snapshot_mappings(acl_ids)
