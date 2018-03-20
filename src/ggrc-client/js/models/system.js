@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {hasQuestions} from '../plugins/utils/ggrcq-utils';
+
 can.Model.Cacheable('CMS.Models.SystemOrProcess', {
   root_object: 'system_or_process',
   root_collection: 'systems_or_processes',
@@ -120,7 +122,7 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
   init: function () {
     can.extend(this.attributes, CMS.Models.SystemOrProcess.attributes);
     this._super && this._super.apply(this, arguments);
-    this.tree_view_options = $.extend({},
+    this.tree_view_options = $.extend(true, {},
       CMS.Models.SystemOrProcess.tree_view_options, {
         // systems is a special case; can be imported to programs
         add_item_view: GGRC.mustache_path +
@@ -128,6 +130,13 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
           '/snapshots/tree_add_item.mustache' :
           '/base_objects/tree_add_item.mustache'),
       });
+
+    if (hasQuestions(this.shortName)) {
+      this.tree_view_options.attr_list.push({
+        attr_title: 'Questionnaire',
+        attr_name: 'questionnaire',
+      });
+    }
     this.validateNonBlank('title');
   },
 }, {
@@ -167,8 +176,15 @@ CMS.Models.SystemOrProcess('CMS.Models.Process', {
   init: function () {
     can.extend(this.attributes, CMS.Models.SystemOrProcess.attributes);
     this._super && this._super.apply(this, arguments);
-    this.tree_view_options = $.extend({},
+    this.tree_view_options = $.extend(true, {},
       CMS.Models.SystemOrProcess.tree_view_options);
+
+    if (hasQuestions(this.shortName)) {
+      this.tree_view_options.attr_list.push({
+        attr_title: 'Questionnaire',
+        attr_name: 'questionnaire',
+      });
+    }
     this.validateNonBlank('title');
   },
 }, {

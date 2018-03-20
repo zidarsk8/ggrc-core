@@ -71,6 +71,11 @@
       {instance}="instance">
     </last-comment>
   {{/case}}
+  {{#case 'questionnaire'}}
+      <questions-link {instance}="instance">
+        Open
+      </questions-link>
+  {{/case}}
 
   {{#default}}
       {{#if_helpers '\
