@@ -3,13 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {
-  isSnapshot,
-} from './snapshot-utils';
-
-  /**
-   * Util methods for integration with GGRCQ.
-   */
+/**
+ * Util methods for integration with GGRCQ.
+ */
 let models = ['Process', 'Product', 'System'];
 
 /**
@@ -23,11 +19,11 @@ function hasQuestions(model) {
 
 /**
  * Get url to page with questions.
- * @param {String} id - The model id
+ * @param {String} slug - The model slug
  * @param {String} model - The model name
  * @return {String} Url to questions
  */
-function getUrl(id, model) {
+function getUrl(slug, model) {
   let url = GGRC.GGRC_Q_INTEGRATION_URL;
   if (!url) {
     return '';
@@ -35,8 +31,10 @@ function getUrl(id, model) {
   if (!url.endsWith('/')) {
     url += '/';
   }
+  slug = slug.toLowerCase();
+  model = model.toLowerCase();
 
-  return url + 'Questionnaire/' + model + '/' + id;
+  return `${url}questionnaires/${model}=${slug}`;
 }
 
 /**
@@ -45,10 +43,7 @@ function getUrl(id, model) {
  * @return {String} Url to questions
  */
 function getQuestionsUrl(instance) {
-  let id = isSnapshot(instance) && instance.snapshot ?
-      instance.snapshot.child_id :
-      instance.id;
-  return getUrl(id, instance.class.title_singular);
+  return getUrl(instance.slug, instance.class.title_singular);
 }
 
 export {

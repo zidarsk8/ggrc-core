@@ -102,6 +102,7 @@ class BlockConverter(object):
     # The protected access is a false warning for inflector access.
     self.revision_ids = []
     self._mapping_cache = None
+    self._ticket_tracker_cache = None
     self._owners_cache = None
     self._roles_cache = None
     self._user_roles_cache = None
@@ -249,6 +250,27 @@ class BlockConverter(object):
     if self._mapping_cache is None:
       self._mapping_cache = self._create_mapping_cache()
     return self._mapping_cache
+
+  def _create_ticket_tracker_cache(self):
+    """Create ticket tracker cache for object in the current block."""
+    if self.object_class.__name__ != models.Assessment.__name__ or \
+       not self.object_ids:
+      return {}
+
+    query = db.session.query(
+        models.IssuetrackerIssue.object_id,
+        models.IssuetrackerIssue.issue_url
+    ).filter(
+        models.IssuetrackerIssue.object_id.in_(self.object_ids),
+        models.IssuetrackerIssue.object_type == models.Assessment.__name__
+    )
+    return dict(query)
+
+  def get_ticket_tracker_cache(self):
+    """Return ticket tracker cache attribute."""
+    if self._ticket_tracker_cache is None:
+      self._ticket_tracker_cache = self._create_ticket_tracker_cache()
+    return self._ticket_tracker_cache
 
   def get_role(self, name):
     """Get role from local cache for a given name."""

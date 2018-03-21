@@ -88,9 +88,6 @@
       margin: 0;
     }
   }
-  .info-widget-footer {
-    display: none;
-  }
   select {
     margin-bottom: 0;
   }
@@ -140,12 +137,15 @@
   show-related-assessments-button > a {
     display: inline-block;
   }
+
+  .question-link {
+    padding-top: 6px;
+    padding-right: 10px;
+  }
 }
 
 .question-link {
     display: inline-block;
-    padding-top: 6px;
-    padding-right: 10px;
     i {
       color: $blue;
       padding-left: 4px;

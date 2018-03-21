@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {hasQuestions} from '../plugins/utils/ggrcq-utils';
+
 (function (can) {
   can.Model.Cacheable('CMS.Models.OrgGroup', {
     root_object: 'org_group',
@@ -271,6 +273,13 @@
     init: function () {
       if (this._super) {
         this._super.apply(this, arguments);
+      }
+
+      if (hasQuestions(this.shortName)) {
+        this.tree_view_options.attr_list.push({
+          attr_title: 'Questionnaire',
+          attr_name: 'questionnaire',
+        });
       }
 
       this.validateNonBlank('title');
