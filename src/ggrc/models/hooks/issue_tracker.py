@@ -527,7 +527,7 @@ def _collect_issue_emails(assessment):
     A tuple of (assignee_email, [related_people_emails])
   """
   cc_list = _get_roles(assessment).get('Assignees')
-  cc_list = list(sorted(cc_list)) if cc_list else []
+  cc_list = sorted(cc_list) if cc_list else []
   assignee_email = cc_list.pop(0) if cc_list else None
   return assignee_email, cc_list
 
