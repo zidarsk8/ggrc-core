@@ -7,12 +7,6 @@ import template from './templates/tree-item-status-for-workflow.mustache';
 
 const viewModel = can.Map.extend({
   define: {
-    statusTitle: {
-      type: 'string',
-      get() {
-        return this.attr('instance.status');
-      },
-    },
     statusCSSClass: {
       type: 'string',
       get() {
