@@ -967,7 +967,6 @@ class Resource(ModelView):
       res: List that will get responses appended to it.
       no_result: Flag for suppressing results.
     """
-
     with benchmark("Generate objects"):
       objects = []
       sources = []

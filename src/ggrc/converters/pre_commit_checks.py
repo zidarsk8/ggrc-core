@@ -135,7 +135,7 @@ def check_assessment_status(row_converter):
   try:
     row_converter.obj.validate_done_state(
         row_converter.old_values.get("status"),
-        row_converter.obj.status
+        row_converter.obj
     )
   except ValueError as exp:
     status_alias = row_converter.headers.get("status", {}).get("display_name")

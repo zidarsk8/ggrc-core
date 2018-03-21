@@ -205,10 +205,10 @@ class AutoStatusChangeable(object):
         local_ca.append(value)
       else:
         global_ca.append(value)
-
-    if obj.has_custom_attr_changes(global_ca):
+    status_is_changed = inspect(obj).attrs.status.history.has_changes()
+    if obj.has_custom_attr_changes(global_ca) and not status_is_changed:
       monitor_states.extend(obj.CUSTOM_ATTRS_STATUS_MAPPING['GCA'])
-    if obj.has_custom_attr_changes(local_ca):
+    if obj.has_custom_attr_changes(local_ca) and not status_is_changed:
       monitor_states.extend(obj.CUSTOM_ATTRS_STATUS_MAPPING['LCA'])
     if obj.status in monitor_states:
       obj._need_status_reset = True
