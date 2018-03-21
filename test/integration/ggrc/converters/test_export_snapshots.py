@@ -55,6 +55,7 @@ class TestExportSnapshots(TestCase):
 
   @staticmethod
   def _create_cads(type_):
+    """Create all types of custom attribute definitions for tests."""
     with factories.single_commit():
       cad = factories.CustomAttributeDefinitionFactory
       return [
@@ -380,8 +381,9 @@ class TestExportSnapshots(TestCase):
   def test_acr_control_export(self):
     """Test exporting of a AC roles with linked users."""
     # pylint: disable=too-many-locals
-    ac_roles = models.AccessControlRole.query.filter_by(
-        object_type="Control"
+    ac_roles = models.AccessControlRole.query.filter(
+        models.AccessControlRole.object_type == "Control",
+        models.AccessControlRole.internal == 0,
     ).all()
     control_acr_people = collections.defaultdict(dict)
     with factories.single_commit():
