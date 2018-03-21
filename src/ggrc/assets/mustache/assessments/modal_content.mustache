@@ -145,31 +145,31 @@
               Mapped Objects
             </label>
             <div class="modal-mapped-objects">
-              {{#prune_context}}
-                {{#each list}}
-                  <div class="modal-mapped-objects-item">
-                    <div class="modal-mapped-objects-item__details">
-                      <object-list-item-updater {target-instance}="{.}">
-                        {{#if instanceUpdated}}
-                          <business-object-list-item {instance}="instance">
-                            <div class="description">
-                              <read-more {text}="itemData.description" max-lines-number="1"></read-more>
-                            </div>
-                          </business-object-list-item>
-                        {{/if}}
-                      </object-list-item-updater>
-                    </div>
-                    <div class="modal-mapped-objects-item__unmap">
-                      {{^if_in type 'Audit, Issue'}}
-                        <a href="javascript://" data-toggle="unmap">
-                          <span class="result" {{data 'result'}}></span>
-                          <i class="fa fa-trash"></i>
-                        </a>
-                      {{/if_in}}
-                    </div>
+              {{#each list}}
+                <div class="modal-mapped-objects-item">
+                  <div class="modal-mapped-objects-item__details">
+                    <object-list-item-updater {target-instance}="{.}">
+                      {{#if instanceUpdated}}
+                        <business-object-list-item {instance}="instance">
+                          <div class="description">
+                            <read-more {text}="itemData.description" max-lines-number="1"></read-more>
+                          </div>
+                        </business-object-list-item>
+                      {{/if}}
+                    </object-list-item-updater>
                   </div>
-                {{/each}}
-              {{/prune_context}}
+                  <div class="modal-mapped-objects-item__unmap">
+                    {{^if_in type 'Audit, Issue'}}
+                    {{#if new_object_form}}
+                      <a href="javascript://" data-toggle="unmap">
+                        <span class="result" {{data 'result'}}></span>
+                        <i class="fa fa-trash"></i>
+                      </a>
+                    {{/if}}
+                    {{/if_in}}
+                  </div>
+                </div>
+              {{/each}}
             </div>
             <div class="objective-selector">
                <map-button-using-assessment-type
@@ -233,16 +233,18 @@
                   <div class="action-toolbar">
                     <document-object-list-item {instance}="{.}">
                     </document-object-list-item>
-                    <div class="action-toolbar__controls">
-                      <a href="javascript://"
-                        class="info-action unmap"
-                        {{#if isDisabled}}disabled{{/if}}
-                        ($click)="removeReferenceUrl(%context)">
-                          <action-toolbar-control>
-                            <i class="fa fa-trash"></i>
-                          </action-toolbar-control>
-                      </a>
-                    </div>
+                    {{#if new_object_form}}
+                      <div class="action-toolbar__controls">
+                        <a href="javascript://"
+                          class="info-action unmap"
+                          {{#if isDisabled}}disabled{{/if}}
+                          ($click)="removeReferenceUrl(%context)">
+                            <action-toolbar-control>
+                              <i class="fa fa-trash"></i>
+                            </action-toolbar-control>
+                        </a>
+                      </div>
+                    {{/if}}
                   </div>
                 </object-list>
               </div>
