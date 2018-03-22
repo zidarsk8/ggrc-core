@@ -22,9 +22,7 @@ describe('tree-item-status-for-workflow component', () => {
       it('returns a class name without whitespace characters in lowercase ' +
       'if status exists', function () {
         const status = 'Some long status';
-        const expectedStatus = `state-${status
-          .replace(/[\s\t]+/g, '')
-          .toLowerCase()}`;
+        const expectedStatus = 'state-somelongstatus';
         viewModel.attr('instance.status', status);
         expect(viewModel.attr('statusCSSClass')).toBe(expectedStatus);
       });
