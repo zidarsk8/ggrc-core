@@ -160,6 +160,11 @@ class ProgramRolesHandler(object):
       if not (propagation["type"] == "any" or
               stub.type in propagation["type"].split(",")):
         continue
+      if stub.type == "Audit":
+        # Audit has special propagation code and since we added new
+        # relationships between audits and programs we must ensure that we do
+        # not propagate ACL entries through those.
+        continue
       role_id = role_map[ROLE_PROPAGATION[self._get_acr_name(acl)]]
       child = acl_manager.get_or_create(
           stub, acl, acl.person, role_id)
