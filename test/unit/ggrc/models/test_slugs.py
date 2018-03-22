@@ -29,7 +29,6 @@ class TestSlugPrefix(unittest.TestCase):
       'Directive': 'DIRECTIVE',  # unused but has slug prefix
       'Evidence': 'EVIDENCE',
       'Facility': 'FACILITY',
-      'Help': 'HELP',
       'Issue': 'ISSUE',
       'Market': 'MARKET',
       'Objective': 'OBJECTIVE',

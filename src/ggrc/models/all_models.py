@@ -41,7 +41,6 @@ from ggrc.models.document import Document
 from ggrc.models.event import Event
 from ggrc.models.evidence import Evidence
 from ggrc.models.facility import Facility
-from ggrc.models.help import Help
 from ggrc.models.import_export import ImportExport
 from ggrc.models.issue import Issue
 from ggrc.models.issuetracker_issue import IssuetrackerIssue
@@ -106,7 +105,6 @@ all_models = [  # pylint: disable=invalid-name
     Standard,
     Document,
     Facility,
-    Help,
     Label,
     Market,
     Objective,
