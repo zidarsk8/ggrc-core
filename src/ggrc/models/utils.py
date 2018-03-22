@@ -21,8 +21,7 @@ def validate_option(model, attribute, option, desired_role):
 def validate_assessment_done_state(old_value, obj):
   """Checks if it's allowed to set done state from not done."""
   new_value = obj.status
-  if not obj.skip_validation and \
-     old_value in obj.NOT_DONE_STATES and \
+  if old_value in obj.NOT_DONE_STATES and \
      new_value in obj.DONE_STATES:
     if hasattr(obj, "preconditions_failed") and obj.preconditions_failed:
       raise ValidationError("CA-introduced completion preconditions "

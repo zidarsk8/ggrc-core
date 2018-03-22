@@ -13,9 +13,6 @@ class ValidateOnComplete(object):  # pylint: disable=too-few-public-methods
   """Defines the validation routine before marking an object as complete.
 
   Requires Stateful and Statusable to be mixed in as well."""
-
-  skip_validation = False
-
   @staticmethod
   def validate_done_state(old_value, obj):
     """Check if it's allowed to set done state from not done.
