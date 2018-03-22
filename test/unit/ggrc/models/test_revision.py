@@ -263,3 +263,31 @@ class TestCheckPopulatedContent(unittest.TestCase):
     obj.__class__.__name__ = self.object_type
     revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
     self.assertEqual(expected_content, revision.populate_cavs())
+
+  @ddt.data(
+      [],
+      [{}],
+      [{"parent_id": None}],
+      [{"parent_id": 5}],
+      [{"parent_id": 0}],
+      [{"parent_id": None}, {}],
+      [{"parent_id": None}, {"parent_id": 1}, {}],
+      [{"parent_id": None}, {"parent_id": 1}, {"parent_id": 2}],
+  )
+  def test_internal_acl_filter(self, acl_entries):
+    """Test filtering of internal roles for {}."""
+    obj = mock.Mock()
+    obj.id = self.object_id
+    obj.__class__.__name__ = self.object_type
+    for acl_entry in acl_entries:
+      acl_entry.update({"person_id": 1, "ac_role_id": 1})
+
+    content = {"access_control_list": acl_entries}
+
+    role_dict = mock.MagicMock()
+    with mock.patch("ggrc.access_control.role.get_custom_roles_for",
+                    return_value=role_dict):
+      revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
+
+      for acl in revision.content["access_control_list"]:
+        self.assertIsNone(acl.get("parent_id"))
