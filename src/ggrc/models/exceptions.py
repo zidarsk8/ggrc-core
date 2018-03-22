@@ -4,7 +4,11 @@
 """Model-related exceptions and related logic."""
 
 import re
+from logging import getLogger
+
 from sqlalchemy.exc import IntegrityError
+
+logger = getLogger(__name__)
 
 
 def field_lookup(field_string):
@@ -32,6 +36,7 @@ def translate_message(exception):
       pattern = re.compile(r"Duplicate entry ('.*') for key '(.*)'")
       matches = pattern.search(message)
       if matches:
+        logger.exception(exception)
         return (u"The value {value} is already used for another {key}. "
                 u"{key} values must be unique."
                 .format(value=matches.group(1),
