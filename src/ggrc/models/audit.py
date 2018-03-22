@@ -65,8 +65,6 @@ class Audit(Snapshotable,
   program_id = deferred(
       db.Column(db.Integer, db.ForeignKey('programs.id'), nullable=False),
       'Audit')
-  audit_objects = db.relationship(
-      'AuditObject', backref='audit', cascade='all, delete-orphan')
   object_type = db.Column(
       db.String(length=250), nullable=False, default='Control')
 
@@ -85,7 +83,6 @@ class Audit(Snapshotable,
       'object_type',
       'archived',
       reflection.Attribute('issue_tracker', create=False, update=False),
-      reflection.Attribute('audit_objects', create=False, update=False),
   )
 
   _fulltext_attrs = [
@@ -255,7 +252,6 @@ class Audit(Snapshotable,
     return query.options(
         orm.joinedload('program'),
         orm.subqueryload('object_people').joinedload('person'),
-        orm.subqueryload('audit_objects'),
     )
 
 

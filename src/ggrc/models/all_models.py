@@ -19,7 +19,6 @@ from ggrc.models.access_group import AccessGroup
 from ggrc.models.assessment import Assessment
 from ggrc.models.assessment_template import AssessmentTemplate
 from ggrc.models.audit import Audit
-from ggrc.models.audit_object import AuditObject
 from ggrc.models.automapping import Automapping
 from ggrc.models.background_task import BackgroundTask
 from ggrc.models.categorization import Categorization
@@ -88,7 +87,6 @@ all_models = [  # pylint: disable=invalid-name
     Assessment,
     AssessmentTemplate,
     Audit,
-    AuditObject,
     Automapping,
     Categorization,
     CategoryBase,
