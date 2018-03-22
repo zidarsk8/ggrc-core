@@ -10,13 +10,16 @@ These tests include:
 
 """
 
+import ddt
 
 from ggrc import utils
 from ggrc import models
 from ggrc import builder
+from ggrc.models import all_models
 
 from integration.ggrc.services import TestCase
 from integration.ggrc.generator import ObjectGenerator
+from integration.ggrc.models import factories
 
 
 class ProductTestCase(TestCase):
@@ -48,6 +51,7 @@ class ProductTestCase(TestCase):
     )
 
 
+@ddt.ddt
 class TestGlobalCustomAttributes(ProductTestCase):
   """Tests for API updates for custom attribute values."""
 
@@ -222,6 +226,44 @@ class TestGlobalCustomAttributes(ProductTestCase):
     self.assertIn("custom_attribute_id", cav)
     self.assertIn("attribute_value", cav)
     self.assertIn("id", cav)
+
+  @ddt.data(
+      (all_models.CustomAttributeDefinition.ValidTypes.TEXT, ""),
+      (all_models.CustomAttributeDefinition.ValidTypes.RICH_TEXT, ""),
+      (all_models.CustomAttributeDefinition.ValidTypes.DROPDOWN, None),
+      (all_models.CustomAttributeDefinition.ValidTypes.CHECKBOX, "0"),
+      (all_models.CustomAttributeDefinition.ValidTypes.DATE, None),
+      ("Map:Person", None),
+  )
+  @ddt.unpack
+  def test_get_cad_default(self, cad_type, default_value):
+    """Check default_value for cad via object and direct cad api."""
+    with factories.single_commit():
+      control = factories.ControlFactory()
+      cad = factories.CustomAttributeDefinitionFactory(
+          definition_type="control",
+          attribute_type=cad_type,
+      )
+    cad_id = cad.id
+    control_id = control.id
+    control_resp = self.generator.api.get(control, control_id)
+    cad_resp = self.generator.api.get(cad, cad_id)
+    self.assert200(cad_resp)
+    self.assert200(control_resp)
+    self.assertIn("custom_attribute_definitions", control_resp.json["control"])
+    self.assertEqual(
+        1, len(control_resp.json["control"]["custom_attribute_definitions"])
+    )
+    cad_json = control_resp.json["control"]["custom_attribute_definitions"][0]
+    self.assertEqual(cad_id, cad_json["id"])
+    self.assertIn("default_value", cad_json)
+    self.assertEqual(default_value, cad_json["default_value"])
+    self.assertIn("custom_attribute_definition", cad_resp.json)
+    self.assertIn("default_value",
+                  cad_resp.json["custom_attribute_definition"])
+    self.assertEqual(
+        default_value,
+        cad_resp.json["custom_attribute_definition"]["default_value"])
 
 
 class TestOldApiCompatibility(ProductTestCase):

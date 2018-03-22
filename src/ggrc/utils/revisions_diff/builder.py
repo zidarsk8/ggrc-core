@@ -145,7 +145,9 @@ def get_validated_value(cad, value, object_id):
     return value, object_id
   if cad.attribute_type == cad.ValidTypes.CHECKBOX:
     value = int(value)
-  return unicode(value), object_id
+  if value is not None:
+    value = unicode(value)
+  return value, object_id
 
 
 def generate_cav_diff(instance, proposed, revisioned):

@@ -362,6 +362,22 @@ class Revision(Base, db.Model):
       return {}
     return {"custom_attribute_values": self._content["custom_attributes"]}
 
+  def populate_cad_default_values(self):
+    """Setup default_value to CADs if it's needed."""
+    from ggrc.models import all_models
+    if "custom_attribute_definitions" not in self._content:
+      return {}
+    cads = []
+    for cad in self._content["custom_attribute_definitions"]:
+      if "default_value" not in cad:
+        cad["default_value"] = (
+            all_models.CustomAttributeDefinition.get_default_value_for(
+                cad["attribute_type"]
+            )
+        )
+      cads.append(cad)
+    return {"custom_attribute_definitions": cads}
+
   @builder.simple_property
   def content(self):
     """Property. Contains the revision content dict.
@@ -378,6 +394,7 @@ class Revision(Base, db.Model):
     populated_content.update(self.populate_categoies("categories"))
     populated_content.update(self.populate_categoies("assertions"))
     populated_content.update(self.populate_cavs())
+    populated_content.update(self.populate_cad_default_values())
     return populated_content
 
   @content.setter
