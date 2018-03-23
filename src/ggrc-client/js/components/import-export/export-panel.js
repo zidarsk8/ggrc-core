@@ -144,18 +144,19 @@ export default can.Component.extend({
 
       this.viewModel.updateIsSelected(targetList, value);
     },
-    '{viewModel.item} type': function () {
-      this.viewModel.attr('item.relevant', []);
-      this.viewModel.attr('item.filter', '');
-      this.viewModel.attr('item.snapshot_type', '');
-      this.viewModel.attr('item.has_parent', false);
+    '{viewModel} type': function (viewModel, ev, type) {
+      viewModel.attr('item.relevant', []);
+      viewModel.attr('item.filter', '');
+      viewModel.attr('item.snapshot_type', '');
+      viewModel.attr('item.has_parent', false);
+      viewModel.attr('item.type', type);
 
-      if (this.viewModel.attr('item.type') === 'Snapshot') {
-        this.viewModel.attr('item.snapshot_type', 'Control');
+      if (viewModel.attr('type') === 'Snapshot') {
+        viewModel.attr('item.snapshot_type', 'Control');
       }
 
-      this.viewModel.refreshItems();
-      this.viewModel.setSelected();
+      viewModel.refreshItems();
+      viewModel.setSelected();
     },
   },
 });
