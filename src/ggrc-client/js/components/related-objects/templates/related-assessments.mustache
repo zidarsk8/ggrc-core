@@ -59,7 +59,7 @@
             <a href="{{instance.viewLink}}" class="grid-data-item__title-cell" target="_blank" title="{{instance.title}}">{{instance.title}}</a>
           </div>
           <div class="grid-data-item-index">
-            <state-colors-map {state}="instance.status"></state-colors-map>
+            <state-colors-map {state}="instance.status" {verified}="instance.verified"></state-colors-map>
           </div>
           <div class="grid-data-item-index">
             {{localize_date instance.finished_date}}
