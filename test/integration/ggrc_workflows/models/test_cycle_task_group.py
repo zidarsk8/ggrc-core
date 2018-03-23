@@ -16,10 +16,9 @@ class TestCycleTaskGroupApiCalls(workflow_test_case.WorkflowTestCase):
     """GET CycleTaskGroup collection logged in as GlobalReader & No Role."""
     with factories.single_commit():
       wf_factories.CycleTaskGroupFactory()
-      email = self.setup_helper.gen_email(rbac_helper.GR_RNAME, "No Role")
-      self.setup_helper.setup_person(rbac_helper.GR_RNAME, email)
+      self.setup_helper.setup_person(rbac_helper.GR_RNAME, "No Role")
 
-    g_reader = all_models.Person.query.filter_by(email=email).one()
+    g_reader = self.setup_helper.get_person(rbac_helper.GR_RNAME, "No Role")
     self.api_helper.set_user(g_reader)
 
     cycle_task_group = all_models.CycleTaskGroup.query.one()
