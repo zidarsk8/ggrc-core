@@ -41,8 +41,6 @@ can.Model.Cacheable('CMS.Models.SystemOrProcess', {
     modified_by: 'CMS.Models.Person.stub',
     object_people: 'CMS.Models.ObjectPerson.stubs',
     people: 'CMS.Models.Person.stubs',
-    related_sources: 'CMS.Models.Relationship.stubs',
-    related_destinations: 'CMS.Models.Relationship.stubs',
     objectives: 'CMS.Models.Objective.stubs',
     controls: 'CMS.Models.Control.stubs',
     sections: 'CMS.Models.get_stubs',

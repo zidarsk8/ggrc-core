@@ -50,8 +50,6 @@ can.Model.Cacheable("CMS.Models.Directive", {
       modified_by: 'CMS.Models.Person.stub',
       object_people: 'CMS.Models.ObjectPerson.stubs',
       people: 'CMS.Models.Person.stubs',
-      related_sources: 'CMS.Models.Relationship.stubs',
-      related_destinations: 'CMS.Models.Relationship.stubs',
       objectives: 'CMS.Models.Objective.stubs',
       programs: 'CMS.Models.Program.stubs',
       sections: 'CMS.Models.get_stubs',

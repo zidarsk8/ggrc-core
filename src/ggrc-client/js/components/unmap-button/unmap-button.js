@@ -19,26 +19,22 @@ import {DESTINATION_UNMAPPED} from '../../events/eventTypes';
       source: {},
       isUnmapping: false,
       preventClick: false,
-      unmapInstance: function () {
+      unmapInstance: async function () {
         this.attr('isUnmapping', true);
         this.dispatch({type: 'beforeUnmap', item: this.attr('source')});
-        this.getMapping()
-          .refresh()
-          .done((item) => {
-            item.destroy()
-              .then(() => {
-                this.dispatch('unmapped');
-                this.attr('destination').dispatch('refreshInstance');
-                this.attr('destination').dispatch(DESTINATION_UNMAPPED);
-                this.dispatch('afterUnmap');
-              })
-              .always(() => {
-                this.attr('isUnmapping', false);
-              });
-          })
-          .fail(() => {
-            this.attr('isUnmapping', false);
-          });
+        try {
+          const item = await this.getMapping();
+          await item.destroy();
+          this.dispatch('unmapped');
+          this.attr('destination').dispatch('refreshInstance');
+          this.attr('destination').dispatch(DESTINATION_UNMAPPED);
+          this.dispatch('afterUnmap');
+        } catch (e) {
+          console.warn('Unmap failed', e);
+        } finally {
+          this.attr('isUnmapping', false);
+        }
+        return true;
       },
       getMapping: function () {
         let type = this.attr('mappingType') || defaultType;
@@ -46,15 +42,13 @@ import {DESTINATION_UNMAPPED} from '../../events/eventTypes';
         let sources;
         let mapping;
         if (type === defaultType) {
-          destinations = this.attr('destination.related_destinations')
-          .concat(this.attr('destination.related_sources'));
-          sources = this.attr('source.related_destinations')
-          .concat(this.attr('source.related_sources'));
+          return CMS.Models.Relationship.findRelationship(
+            this.source, this.destination);
         } else {
           destinations = this.attr('destination')
-              .attr(this.attr('objectProp')) || [];
+            .attr(this.attr('objectProp')) || [];
           sources = this.attr('source')
-              .attr(this.attr('objectProp')) || [];
+            .attr(this.attr('objectProp')) || [];
         }
         sources = sources
           .map(function (item) {
@@ -64,7 +58,7 @@ import {DESTINATION_UNMAPPED} from '../../events/eventTypes';
           .filter(function (dest) {
             return sources.indexOf(dest.id) > -1;
           })[0];
-        return new CMS.Models[type](mapping || {});
+        return new CMS.Models[type](mapping || {}).refresh();
       },
     },
     events: {

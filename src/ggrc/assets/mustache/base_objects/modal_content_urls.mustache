@@ -23,16 +23,18 @@
           <div class="action-toolbar">
             <document-object-list-item {instance}="{.}">
             </document-object-list-item>
-            <div class="action-toolbar__controls">
-              <a href="javascript://"
-                class="info-action unmap"
-                {{#if isDisabled}}disabled{{/if}}
-                ($click)="removeReferenceUrl(%context)">
-                  <action-toolbar-control>
-                    <i class="fa fa-trash"></i>
-                  </action-toolbar-control>
-              </a>
-            </div>
+            {{#if new_object_form}}
+              <div class="action-toolbar__controls">
+                <a href="javascript://"
+                  class="info-action unmap"
+                  {{#if isDisabled}}disabled{{/if}}
+                  ($click)="removeReferenceUrl(%context)">
+                    <action-toolbar-control>
+                      <i class="fa fa-trash"></i>
+                    </action-toolbar-control>
+                </a>
+              </div>
+            {{/if}}
           </div>
         </object-list>
       </div>

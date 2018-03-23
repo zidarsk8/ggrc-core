@@ -4,7 +4,6 @@
 */
 import component from '../issue-unmap-item';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
-import RefreshQueue from '../../../models/refresh_queue';
 
 describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
   let viewModel;
@@ -12,77 +11,6 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
   beforeEach(()=> {
     viewModel = new (can.Map.extend(component.prototype.viewModel));
     events = component.prototype.events;
-  });
-
-  describe('relationship get() method', ()=> {
-    beforeEach(()=> {
-      viewModel.attr('issueInstance', {});
-      viewModel.attr('target', {});
-      spyOn(RefreshQueue.prototype, 'trigger');
-    });
-
-    describe('when there is no relationship in cache for target and issue',
-      () => {
-        beforeEach(function () {
-          spyOn(CMS.Models.Relationship, 'findInCacheById')
-            .and.returnValue(null);
-        });
-
-        it('loads relationship for issue->target direction',
-          async function (done) {
-            const relationships = [{id: 111}];
-            viewModel.attr('issueInstance.related_sources', [
-              relationships[0],
-              {id: 222},
-            ]);
-            viewModel.attr('target.related_destinations', [
-              {id: 333},
-              relationships[0],
-            ]);
-            RefreshQueue.prototype.trigger.and.returnValue(relationships);
-            expect(await viewModel.attr('relationship'))
-              .toEqual(relationships[0]);
-            done();
-          });
-
-        it('loads relationship for target->issue direction',
-          async function (done) {
-            const relationships = [{id: 111}];
-            viewModel.attr('target.related_sources', [
-              relationships[0],
-              {id: 222},
-            ]);
-            viewModel.attr('issueInstance.related_destinations', [
-              {id: 333},
-              relationships[0],
-            ]);
-            RefreshQueue.prototype.trigger.and.returnValue(relationships);
-            expect(await viewModel.attr('relationship'))
-              .toEqual(relationships[0]);
-            done();
-          });
-      });
-
-    describe('when there is relationship in cache for target and issue',
-      () => {
-        beforeEach(function () {
-          spyOn(CMS.Models.Relationship, 'findInCacheById').and
-            .callFake((id) => id);
-        });
-
-        it('sets relationship from cache', async function (done) {
-          viewModel.attr('issueInstance.related_sources', [
-            {id: 111},
-            {id: 222},
-          ]);
-          viewModel.attr('target.related_destinations', [
-            {id: 333},
-            {id: 111},
-          ]);
-          expect(await viewModel.attr('relationship')).toBe(111);
-          done();
-        });
-      });
   });
 
   describe('paging value', ()=> {
@@ -175,7 +103,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
         Audit: {
           values: [{}],
           total: 1,
-      }}];
+        }}];
       reqDeferred = can.Deferred();
       spyOn(viewModel, 'buildQuery').and.returnValue(['query']);
       spyOn(QueryAPI, 'makeRequest').and.returnValue(reqDeferred);
@@ -300,63 +228,51 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
 
       it(`url consists of root_collection from appopriate model and id
         based on passed related object`, ()=> {
-        let rootCollectionType = CMS.Models[relatedObject.type].root_collection;
-        let expectedUrl;
+          let rootCollectionType =
+            CMS.Models[relatedObject.type].root_collection;
+          let expectedUrl;
 
-        viewModel.openObject(relatedObject);
-        expectedUrl = buildUrl(rootCollectionType, relatedObject.id);
+          viewModel.openObject(relatedObject);
+          expectedUrl = buildUrl(rootCollectionType, relatedObject.id);
 
-        expect(getParam(window.open, ARGS.FIRST)).toBe(expectedUrl);
-      });
+          expect(getParam(window.open, ARGS.FIRST)).toBe(expectedUrl);
+        });
 
       it(`url consists of type and id from relatet object's child_type and
         child_id props if a type of related object equals to "Snapshot"`, ()=> {
-        let relatedObjectType = 'Snapshot';
-        let rootCollectionType = CMS.Models[relatedObject.type].root_collection;
-        let oldRelatedObjectType = relatedObject.type;
-        let expectedUrl;
+          let relatedObjectType = 'Snapshot';
+          let rootCollectionType =
+            CMS.Models[relatedObject.type].root_collection;
+          let oldRelatedObjectType = relatedObject.type;
+          let expectedUrl;
 
-        _.extend(relatedObject, {
-          type: relatedObjectType,
-          child_type: oldRelatedObjectType,
-          child_id: 54321,
+          _.extend(relatedObject, {
+            type: relatedObjectType,
+            child_type: oldRelatedObjectType,
+            child_id: 54321,
+          });
+          viewModel.openObject(relatedObject);
+          expectedUrl = buildUrl(
+            rootCollectionType,
+            relatedObject.child_id
+          );
+
+          expect(getParam(window.open, ARGS.FIRST)).toBe(expectedUrl);
         });
-        viewModel.openObject(relatedObject);
-        expectedUrl = buildUrl(
-          rootCollectionType,
-          relatedObject.child_id
-        );
-
-        expect(getParam(window.open, ARGS.FIRST)).toBe(expectedUrl);
-      });
     });
   });
 
   describe('unmap() method', ()=> {
-    let relationship;
-
     beforeEach(function () {
-      relationship = jasmine.createSpyObj(['refresh', 'unmap']);
-      viewModel.attr({
-        target: {related_sources: [{id: 1}]},
-        issueInstance: {related_sources: [{id: 1}]},
-      });
-      spyOn(CMS.Models.Relationship, 'findInCacheById')
-        .and.returnValue(relationship);
       spyOn($.prototype, 'trigger');
       spyOn(GGRC, 'page_instance');
       spyOn(GGRC, 'navigate');
     });
 
-    it('should refresh relationship before issue unmapping',
-      async function (done) {
-        await viewModel.unmap();
-        expect(relationship.refresh).toHaveBeenCalledBefore(relationship.unmap);
-        done();
-      });
-
     it('should change "isLoading" flag in case of success',
       async function (done) {
+        spyOn(CMS.Models.Relationship, 'findRelationship')
+          .and.returnValue(Promise.resolve());
         viewModel.attr('isLoading', true);
         await viewModel.unmap();
         expect(viewModel.attr('isLoading')).toBe(false);
@@ -365,8 +281,10 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
 
     it('should change "isLoading" flag in case of error',
       async function (done) {
+        spyOn(CMS.Models.Relationship, 'findRelationship')
+          .and.returnValue(Promise.reject());
         viewModel.attr('isLoading', true);
-        relationship.refresh.and.returnValue(Promise.reject());
+
         await viewModel.unmap();
         expect(viewModel.attr('isLoading')).toBe(false);
         done();
@@ -374,6 +292,10 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
 
     it('should refresh issue page if page instance is issue',
       async function (done) {
+        spyOn(CMS.Models.Relationship, 'findRelationship')
+          .and.returnValue(Promise.resolve({
+            unmap: () => Promise.resolve(),
+          }));
         viewModel.attr('issueInstance.viewLink', 'temp url');
         GGRC.page_instance.and.returnValue(viewModel.attr('issueInstance'));
         await viewModel.unmap();
@@ -391,13 +313,19 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
       });
 
     it('should unmap issue correctly', async function (done) {
+      const relationship = jasmine.createSpyObj(['unmap']);
+      spyOn(CMS.Models.Relationship, 'findRelationship')
+        .and.returnValue(Promise.resolve(relationship));
       await viewModel.unmap();
       expect(relationship.unmap).toHaveBeenCalledWith(true);
       done();
     });
 
     it('should handle server errors correctly', async function (done) {
-      relationship.refresh.and.returnValue(Promise.reject());
+      spyOn(CMS.Models.Relationship, 'findRelationship')
+        .and.returnValue(Promise.resolve({
+          unmap: () => Promise.reject(),
+        }));
       await viewModel.unmap();
       expect($.prototype.trigger).toHaveBeenCalledWith('ajax:flash', {
         error: 'There was a problem with unmapping.',
@@ -447,12 +375,18 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
     });
 
     it('prevents default action of the event', async function (done) {
+      spyOn(CMS.Models.Relationship, 'findRelationship')
+        .and.returnValue(Promise.resolve({
+          unmap: () => Promise.resolve(),
+        }));
       await handler(null, event);
       expect(event.preventDefault).toHaveBeenCalled();
       done();
     });
 
     it('shows error if there is no relationship', async function (done) {
+      spyOn(CMS.Models.Relationship, 'findRelationship')
+        .and.returnValue(Promise.resolve(false));
       await handler(null, event);
       expect(viewModel.showNoRelationhipError).toHaveBeenCalled();
       done();
@@ -465,19 +399,19 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
           target: {related_sources: [{id: 1}]},
           issueInstance: {related_sources: [{id: 1}]},
         });
-        spyOn(CMS.Models.Relationship, 'findInCacheById')
-          .and.returnValue(rel);
+        spyOn(CMS.Models.Relationship, 'findRelationship')
+          .and.returnValue(Promise.resolve(rel));
       });
 
       it(`calls processRelatedSnapshots() if target is assessment and
       not allowed to unmap issue from audit`, async function (done) {
-        viewModel.attr('target.type', 'Assessment');
-        viewModel.attr('issueInstance.allow_unmap_from_audit', false);
-        await handler(null, event);
-        expect(viewModel.processRelatedSnapshots).toHaveBeenCalled();
-        expect(viewModel.dispatch).not.toHaveBeenCalled();
-        done();
-      });
+          viewModel.attr('target.type', 'Assessment');
+          viewModel.attr('issueInstance.allow_unmap_from_audit', false);
+          await handler(null, event);
+          expect(viewModel.processRelatedSnapshots).toHaveBeenCalled();
+          expect(viewModel.dispatch).not.toHaveBeenCalled();
+          done();
+        });
 
       it('dispatches "unmapIssue" event if target', async function (done) {
         viewModel.attr('relationship', {test: 'true'});
