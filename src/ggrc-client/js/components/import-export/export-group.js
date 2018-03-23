@@ -23,8 +23,24 @@ export default can.Component.extend('exportGroup', {
   tag: 'export-group',
   template,
   viewModel: {
+    define: {
+      isRemovable: {
+        get() {
+          return this.attr('panels.items.length') > 1;
+        },
+      },
+    },
     index: 0,
     'export': '@',
+    getIndex: function (el) {
+      return Number($(el.closest('export-panel'))
+        .viewModel().attr('panel_index'));
+    },
+    removeFilterGroup(el) {
+      let index = this.getIndex(el);
+
+      this.attr('panels.items').splice(index, 1);
+    },
   },
   events: {
     inserted: function () {
@@ -47,16 +63,6 @@ export default can.Component.extend('exportGroup', {
       this.viewModel.attr('index', index);
       return this.viewModel.attr('panels.items')
         .push(new panelModel(data));
-    },
-    getIndex: function (el) {
-      return Number($(el.closest('export-panel'))
-        .viewModel().attr('panel_number'));
-    },
-    '.remove_filter_group click': function (el, ev) {
-      let index = this.getIndex(el);
-
-      ev.preventDefault();
-      this.viewModel.attr('panels.items').splice(index, 1);
     },
     '{viewModel.export} addPanel': function () {
       this.addPanel();

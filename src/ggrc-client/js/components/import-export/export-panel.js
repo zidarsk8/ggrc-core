@@ -17,12 +17,6 @@ export default can.Component.extend({
   template,
   viewModel: {
     define: {
-      first_panel: {
-        type: 'boolean',
-        get: function () {
-          return Number(this.attr('panel_number')) === 0;
-        },
-      },
       showAttributes: {
         set: function (newValue, setValue) {
           this.updateIsSelected(
@@ -47,11 +41,17 @@ export default can.Component.extend({
           setValue(newValue);
         },
       },
+      panelNumber: {
+        get() {
+          return Number(this.attr('panel_index')) + 1;
+        },
+      },
     },
     exportable: GGRC.Bootstrap.exportable,
     snapshotable_objects: GGRC.config.snapshotable_objects,
-    panel_number: '@',
+    panel_index: '@',
     has_parent: false,
+    removable: false,
     fetch_relevant_data: function (id, type) {
       let dfd = CMS.Models[type].findOne({id: id});
       dfd.then(function (result) {
@@ -115,9 +115,9 @@ export default can.Component.extend({
   },
   events: {
     inserted: function () {
-      let panelNumber = Number(this.viewModel.attr('panel_number'));
+      let panelNumber = this.viewModel.attr('panelNumber');
 
-      if (!panelNumber && url.relevant_id && url.relevant_type) {
+      if (panelNumber === 1 && url.relevant_id && url.relevant_type) {
         this.viewModel.fetch_relevant_data(url.relevant_id, url.relevant_type);
       }
       this.viewModel.refreshItems();
@@ -144,18 +144,19 @@ export default can.Component.extend({
 
       this.viewModel.updateIsSelected(targetList, value);
     },
-    '{viewModel.item} type': function () {
-      this.viewModel.attr('item.relevant', []);
-      this.viewModel.attr('item.filter', '');
-      this.viewModel.attr('item.snapshot_type', '');
-      this.viewModel.attr('item.has_parent', false);
+    '{viewModel} type': function (viewModel, ev, type) {
+      viewModel.attr('item.relevant', []);
+      viewModel.attr('item.filter', '');
+      viewModel.attr('item.snapshot_type', '');
+      viewModel.attr('item.has_parent', false);
+      viewModel.attr('item.type', type);
 
-      if (this.viewModel.attr('item.type') === 'Snapshot') {
-        this.viewModel.attr('item.snapshot_type', 'Control');
+      if (viewModel.attr('type') === 'Snapshot') {
+        viewModel.attr('item.snapshot_type', 'Control');
       }
 
-      this.viewModel.refreshItems();
-      this.viewModel.setSelected();
+      viewModel.refreshItems();
+      viewModel.setSelected();
     },
   },
 });
