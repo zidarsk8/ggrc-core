@@ -185,7 +185,7 @@ def get_ac_roles_for(object_type):
     query = AccessControlRole.query.filter(
         AccessControlRole.internal == sa.sql.expression.false(),
     ).options(
-        load_only("id", "name", "object_type")
+        load_only("id", "name", "object_type", "mandatory")
     )
     for role in query:
       flask.g.global_ac_roles[role.object_type][role.name] = role
