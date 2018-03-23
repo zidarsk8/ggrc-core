@@ -74,7 +74,7 @@
             </div>
           {{else}}
             <div>
-              {{#is_allowed "read" "Workflow" context="any"}}
+              {{#is_allowed "create" "Workflow" context="any"}}
                 <review-link {instance}="instance">
                 </review-link>
               {{/is_allowed}}
