@@ -33,7 +33,7 @@
       {{#if showAttributes}}
         <div class="attribute-wrap">
             {{#each attributes}}
-              <label>
+              <label title="{{display_name}}">
                 <input can-value="isSelected" type="checkbox" name="{{key}}" checked>
                 {{display_name}}
               </label>
@@ -71,7 +71,7 @@
       {{#if showMappings}}
         <div class="attribute-wrap">
           {{#each mappings}}
-            <label>
+            <label title="{{display_name}}">
               <input can-value="isSelected" type="checkbox" name="{{key}}" checked>
               {{display_name}}
             </label>
@@ -110,7 +110,7 @@
         {{#if showLocalAttributes}}
           <div class="attribute-wrap">
             {{#each localAttributes}}
-              <label>
+              <label title="{{display_name}}">
                 <input can-value="isSelected" type="checkbox" name="{{key}}" checked>
                 {{display_name}}
               </label>
