@@ -18,6 +18,10 @@ import {
 import RefreshQueue from './models/refresh_queue';
 import Permission from './permission';
 import _ from 'lodash';
+import {
+  buildCountParams,
+  batchRequests,
+} from './plugins/utils/query-api-utils';
 
 // Chrome likes to cache AJAX requests for Mustaches.
 let mustache_urls = {};
@@ -1123,6 +1127,12 @@ Mustache.registerHelper("json_escape", function (obj, options) {
   */
 });
 
+Mustache.registerHelper('json_stringify', function (obj, options) {
+  let fields = (options.hash && options.hash.fields || '').split(',');
+  obj = Mustache.resolve(obj);
+  return JSON.stringify(_.pick(obj.serialize(), fields));
+});
+
 function localizeDate(date, options, tmpl, allowNonISO) {
   let formats = [
     'YYYY-MM-DD',
@@ -1721,35 +1731,28 @@ Mustache.registerHelper('current_cycle_assignee',
   });
 
 Mustache.registerHelper('with_mapping_count',
-  function (instance, mappingNames, options) {
-    let args = can.makeArray(arguments);
-    let mappingName;
-    let i;
+  function (instance, mappingName, options) {
+    let relevant;
+    let dfd;
 
-    options = args[args.length - 1];  // FIXME duplicate declaration
-
-    mappingNames = args.slice(1, args.length - 1);
-
+    mappingName = Mustache.resolve(mappingName);
     instance = Mustache.resolve(instance);
 
-    // Find the most appropriate mapping
-    for (i = 0; i < mappingNames.length; i++) {
-      mappingName = Mustache.resolve(mappingNames[i]);
-      if (instance.has_binding(mappingName)) {
-        break;
-      }
-    }
-
+    relevant = {
+      id: instance.id,
+      type: instance.type,
+    };
+    dfd = batchRequests(buildCountParams([mappingName], relevant)[0]);
     return defer_render('span', {
       done: function (count) {
-        return options.fn(options.contexts.add({count: count}));
+        return options.fn(options.contexts.add({
+          count: count[mappingName].count}));
       },
       progress: function () {
         return options.inverse(options.contexts);
       },
     },
-    instance.get_list_counter(mappingName)
-    );
+    dfd);
   });
 
 Mustache.registerHelper("log", function () {
@@ -2408,30 +2411,6 @@ Mustache.registerHelper('displayWidgetTab',
     }
 
     return options.fn(options.contexts);
-  }
-);
-
-Mustache.registerHelper('displayAssessmentIssueTracker',
-  function (canUseIssueTracker, checkParentIntegration, options) {
-    const enabled = GGRC.ISSUE_TRACKER_ENABLED;
-    canUseIssueTracker = Mustache.resolve(canUseIssueTracker);
-
-    if (!options) {
-      options = checkParentIntegration;
-      checkParentIntegration = false;
-    } else {
-      checkParentIntegration = Mustache.resolve(checkParentIntegration);
-    }
-
-    if (!checkParentIntegration) {
-      return enabled ?
-        options.fn(options.contexts) :
-        options.inverse(options.contexts);
-    }
-
-    return canUseIssueTracker && enabled ?
-      options.fn(options.contexts) :
-      options.inverse(options.contexts);
   }
 );
 Mustache.registerHelper('is_auditor', function (options) {

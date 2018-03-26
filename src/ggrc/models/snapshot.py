@@ -288,7 +288,8 @@ def _insert_program_relationships(relationship_stubs):
               "destination_id": relationship_stub.destination_id,
               "context_id": None,
               "status": None,
-              "parent_id": None
+              "parent_id": None,
+              "is_external": False,
           }
           for relationship_stub in relationship_stubs
       ])

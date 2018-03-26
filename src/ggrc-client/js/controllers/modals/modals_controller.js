@@ -9,6 +9,7 @@ import '../../components/access_control_list/access-control-list-roles-helper'
 import '../../components/assessment/assessment-people';
 import '../../components/assessment/assessment-object-type-dropdown';
 import '../../components/assessment_attributes';
+import '../../components/assessment_templates/add-template-field';
 import '../../components/textarea-array/textarea-array';
 import '../../components/object-list-item/object-list-item-updater';
 import '../../components/related-objects/related-documents';
@@ -288,6 +289,14 @@ export default can.Control({
       dfd = instance.refresh();
     } else if (this.options.model) {
       if (this.options.new_object_form) {
+
+        if (this.options.extendNewInstance) {
+          let extendedInstance = this.options.extendNewInstance.attr ?
+            this.options.extendNewInstance.attr() :
+            this.options.extendNewInstance;
+          Object.assign(params, extendedInstance);
+        }
+
         dfd = $.when(this.options.attr(
           'instance',
           new this.options.model(params).attr('_suppress_errors', true)
@@ -917,7 +926,7 @@ export default can.Control({
     if (newtext) {
       $el[0].innerHTML = newtext;
     }
-    $el.addClass('disabled pending-ajax');
+    $el.addClass('disabled');
     if (disable !== false) {
       $el.attr('disabled', true);
     }
@@ -928,8 +937,7 @@ export default can.Control({
     }).always(function () {
       // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
       if ($el.length) {
-        $el.removeAttr('disabled')
-          .removeClass('pending-ajax')[0].innerHTML = oldtext;
+        $el.removeAttr('disabled')[0].innerHTML = oldtext;
       }
     });
   },

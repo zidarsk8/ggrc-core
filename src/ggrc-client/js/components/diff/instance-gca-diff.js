@@ -13,8 +13,7 @@ const viewModel = DiffBaseVM.extend({
   _customAttributesValues: [],
 
   prepareAttributes() {
-    const values = this.attr('currentInstance.custom_attribute_values')
-      .map((value) => value.reify());
+    const values = this.attr('currentInstance.custom_attribute_values');
 
     this.attr('_customAttributesValues', values);
   },

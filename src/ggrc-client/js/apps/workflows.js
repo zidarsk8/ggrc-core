@@ -15,7 +15,7 @@ import InfoWidget from '../controllers/info_widget_controller';
     'Program Regulation Policy Standard Contract Clause Section'.split(' '),
     'Request Control Objective OrgGroup Vendor AccessGroup'.split(' '),
     'System Process DataAsset Product Project Facility Market'.split(' '),
-    'Issue Assessment Risk Threat'.split(' ')
+    'Issue Risk Threat'.split(' ')
   );
   let _taskSortFunction = function (a, b) {
     let dateA = Number(new Date(a.end_date));
@@ -164,7 +164,7 @@ import InfoWidget from '../controllers/info_widget_controller';
             'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
             'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
             'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
-            'Objective', 'Audit', 'Assessment', 'AccessGroup',
+            'Objective', 'Audit', 'AccessGroup',
             'Document', 'Risk', 'Threat',
           ],
         },
@@ -198,7 +198,6 @@ import InfoWidget from '../controllers/info_widget_controller';
         related_audits: TypeFilter('related_objects', 'Audit'),
         related_controls: TypeFilter('related_objects', 'Control'),
         related_documents: TypeFilter('related_objects', 'Document'),
-        related_assessments: TypeFilter('related_objects', 'Assessment'),
         regulations: TypeFilter('related_objects', 'Regulation'),
         contracts: TypeFilter('related_objects', 'Contract'),
         policies: TypeFilter('related_objects', 'Policy'),
@@ -546,6 +545,8 @@ import InfoWidget from '../controllers/info_widget_controller';
     let pageInstance = GGRC.page_instance();
     const isObjectBrowser = /^\/objectBrowser\/?$/
       .test(window.location.pathname);
+    const isPeoplePage = /^\/people\/.*$/
+      .test(window.location.pathname);
 
     descriptor[pageInstance.constructor.shortName] = {
       task: {
@@ -574,8 +575,8 @@ import InfoWidget from '../controllers/info_widget_controller';
       },
     };
 
-    // add 'Workflows' tab for 'All Objects' view
-    if (isObjectBrowser) {
+    // add 'Workflows' tab for 'All Objects' and People view
+    if (isObjectBrowser || isPeoplePage) {
       descriptor[pageInstance.constructor.shortName].workflow = {
         widget_id: 'workflow',
         widget_name: 'Workflows',

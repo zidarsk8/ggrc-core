@@ -18,6 +18,7 @@ from flask import g
 from ggrc import db
 from ggrc import settings
 from ggrc.app import app
+from ggrc.login import is_external_app_user
 from ggrc.login import get_current_user
 from ggrc.models import all_models
 from ggrc.models.audit import Audit
@@ -261,6 +262,27 @@ def load_bootstrap_admin(user, permissions):
         permissions)
 
 
+def load_external_app_permissions(permissions):
+  """Adds external application permissions if user is EXTERNAL_APP_USER.
+
+  Args:
+      permissions (dict): dict where the permissions will be stored
+  Returns:
+      None
+  """
+  # Add `ADMIN_PERMISSION` for "external application" users
+  if is_external_app_user():
+    admin_permissions = {
+        DefaultUserPermissions.ADMIN_PERMISSION.action: [
+            DefaultUserPermissions.ADMIN_PERMISSION.resource_type
+        ]
+    }
+    collect_permissions(
+        admin_permissions,
+        DefaultUserPermissions.ADMIN_PERMISSION.context_id,
+        permissions)
+
+
 def load_user_roles(user, permissions):
   """Load all user roles for user
 
@@ -415,6 +437,9 @@ def load_permissions_for(user):
 
   with benchmark("load_permissions > load bootstrap admins"):
     load_bootstrap_admin(user, permissions)
+
+  with benchmark("load_permissions > load external app permissions"):
+    load_external_app_permissions(permissions)
 
   with benchmark("load_permissions > load user roles"):
     load_user_roles(user, permissions)

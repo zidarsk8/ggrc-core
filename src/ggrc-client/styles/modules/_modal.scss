@@ -268,10 +268,6 @@
     max-height:none;
     padding: 20px 15px 20px 20px;
     overflow: visible;
-    &.choose-object-wrap {
-      padding: 20px;
-      overflow: visible;
-    }
     .add-button {
       margin-bottom: 20px;
     }
@@ -313,20 +309,9 @@
       @include box-shadow(none);
       @include border-radius(0);
       border: 1px solid $status-draft;
-      .choose-object-wrap & {
-        margin-bottom: 0;
-      }
     }
     .input-block-level {
       margin-bottom: 16px;
-    }
-    .single-line-filter {
-      margin-bottom:6px;
-      input,
-      textarea,
-      select {
-        margin-bottom: 0;
-      }
     }
     input[type="checkbox"] {
       margin-bottom: 9px;

@@ -101,6 +101,7 @@ class Revision(Base, db.Model):
       instance = referenced_objects.get(self.resource_type, self.resource_id)
       if instance:
         return revisions_diff.prepare(instance, self.content)
+      return None
 
     return lazy_loader
 
@@ -176,6 +177,35 @@ class Revision(Base, db.Model):
       })
     return {'reference_url': reference_url_list}
 
+  @classmethod
+  def _filter_internal_acls(cls, access_control_list):
+    """Remove internal access control list entries.
+
+    This is needed due to bugs in older code that in some cases the revisions
+    stored internal ACL entries.
+    Due to possible role removal, the parent_id is the only true flag that we
+    can use for filtering
+
+    Args:
+      access_control_list: list of dicts containing ACL entries.
+
+    Returns:
+      access_control_list but without any ACL entry that was generated from
+        some other ACL entry.
+    """
+    return [
+        acl for acl in access_control_list
+        if acl.get("parent_id") is None
+    ]
+
+  @classmethod
+  def _populate_acl_with_people(cls, access_control_list):
+    """Add person property with person stub on access control list."""
+    for acl in access_control_list:
+      if "person" not in acl:
+        acl["person"] = {"id": acl.get("person_id"), "type": "Person"}
+    return access_control_list
+
   def populate_acl(self):
     """Add access_control_list info for older revisions."""
     roles_dict = role.get_custom_roles_for(self.resource_type)
@@ -220,10 +250,10 @@ class Revision(Base, db.Model):
             "modified_by": None,
             "id": None,
         })
-    for acl in access_control_list:
-      if "person" not in acl:
-        acl["person"] = {"id": acl.get("person_id"), "type": "Person"}
-    return {"access_control_list": access_control_list}
+    access_control_list = self._populate_acl_with_people(access_control_list)
+    return {
+        "access_control_list": self._filter_internal_acls(access_control_list)
+    }
 
   def populate_folder(self):
     """Add folder info for older revisions."""
@@ -332,6 +362,22 @@ class Revision(Base, db.Model):
       return {}
     return {"custom_attribute_values": self._content["custom_attributes"]}
 
+  def populate_cad_default_values(self):
+    """Setup default_value to CADs if it's needed."""
+    from ggrc.models import all_models
+    if "custom_attribute_definitions" not in self._content:
+      return {}
+    cads = []
+    for cad in self._content["custom_attribute_definitions"]:
+      if "default_value" not in cad:
+        cad["default_value"] = (
+            all_models.CustomAttributeDefinition.get_default_value_for(
+                cad["attribute_type"]
+            )
+        )
+      cads.append(cad)
+    return {"custom_attribute_definitions": cads}
+
   @builder.simple_property
   def content(self):
     """Property. Contains the revision content dict.
@@ -348,6 +394,7 @@ class Revision(Base, db.Model):
     populated_content.update(self.populate_categoies("categories"))
     populated_content.update(self.populate_categoies("assertions"))
     populated_content.update(self.populate_cavs())
+    populated_content.update(self.populate_cad_default_values())
     return populated_content
 
   @content.setter

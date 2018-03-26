@@ -12,7 +12,7 @@ from integration.ggrc.models import factories
 
 @ddt.ddt
 class TestAccessControlRoleable(TestCase):
-  """TestAccessControlList"""
+  """Test AccessControlList"""
 
   def setUp(self):
     super(TestAccessControlRoleable, self).setUp()
@@ -104,12 +104,12 @@ class TestAccessControlRoleable(TestCase):
     with factories.single_commit():
       # Create an object with one external and one propagated role
       obj = factories.ControlFactory()
-      acl = factories.AccessControlList(
+      acl = factories.AccessControlListFactory(
           object=obj,
           ac_role=self.role,
           person=self.person
       )
-      factories.AccessControlList(
+      factories.AccessControlListFactory(
           object=obj,
           ac_role=self.role,
           person=self.person,

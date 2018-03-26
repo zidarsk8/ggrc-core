@@ -92,7 +92,6 @@
 < src/ggrc-client/images/ggrc-logo.svg
 < src/ggrc-client/images/ggrc-one-color.svg
 < src/ggrc-client/images/magnifying-glass.png
-< src/ggrc_gdrive_integration/migrations/README
 < src/ggrc/migrations/versions/ggrcdev_ggrc.sql
 < src/ggrc/templates/maintenance/maintenance.html
 < src/ggrc/templates/maintenance/trigger.html

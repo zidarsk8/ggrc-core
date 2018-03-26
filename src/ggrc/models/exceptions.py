@@ -4,7 +4,11 @@
 """Model-related exceptions and related logic."""
 
 import re
+from logging import getLogger
+
 from sqlalchemy.exc import IntegrityError
+
+logger = getLogger(__name__)
 
 
 def field_lookup(field_string):
@@ -27,11 +31,12 @@ def translate_message(exception):
 
   if isinstance(exception, IntegrityError):
     # TODO: Handle not null, foreign key, uniqueness errors with compound keys
-    code, exc_message = exception.orig.args
+    code, _ = exception.orig.args
     if code == 1062:  # duplicate entry ... for key ...
       pattern = re.compile(r"Duplicate entry ('.*') for key '(.*)'")
       matches = pattern.search(message)
       if matches:
+        logger.exception(exception)
         return (u"The value {value} is already used for another {key}. "
                 u"{key} values must be unique."
                 .format(value=matches.group(1),
@@ -43,10 +48,10 @@ def translate_message(exception):
       )
       matches = pattern.search(message)
       if matches:
-        from_, to = matches.groups()
+        from_, to_ = matches.groups()
         return (u"This request will break a mandatory relationship "
-                u"from {from_} to {to}."
-                .format(from_=from_, to=to))
+                u"from {from_} to {to_}."
+                .format(from_=from_, to_=to_))
 
   return message
 

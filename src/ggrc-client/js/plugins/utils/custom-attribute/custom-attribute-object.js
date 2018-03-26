@@ -60,7 +60,7 @@ export default class CustomAttributeObject {
     this._instance = instance;
     this._caDefinition = caDefinition;
 
-    this._setupCaValue(caValue);
+    this._initCaValue(caValue);
     this._buildStateValidator();
   }
 
@@ -206,6 +206,20 @@ export default class CustomAttributeObject {
   }
 
   /**
+   * Updates CAV object entirely through passed CAV
+   * object. Use it only in situation, when you want to update
+   * each property CAV object.
+   * @param {can.Map|Object} cav - Custom attribute value.
+   * @param {boolean} removeOtherFields - Remove other fields from the current
+   * CAV object.
+   */
+  updateCaValue(cav, removeOtherFields) {
+    const caValue = new can.Map(cav);
+    this._setupCaValue(caValue);
+    this._caValue.attr(caValue.attr(), removeOtherFields);
+  }
+
+  /**
    * Updates validationState.
    */
   validate() {
@@ -264,7 +278,14 @@ export default class CustomAttributeObject {
       }
     });
     can.batch.stop();
+  }
 
+  /**
+   * Initializes caValue property.
+   * @param {can.Map} caValue - Custom attribute value object.
+   */
+  _initCaValue(caValue) {
+    this._setupCaValue(caValue);
     this._caValue = caValue;
   }
 

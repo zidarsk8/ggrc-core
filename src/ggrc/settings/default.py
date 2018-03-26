@@ -23,7 +23,6 @@ USER_PERMISSIONS_PROVIDER = \
     'ggrc_basic_permissions.CompletePermissionsProvider'
 EXTENSIONS = [
     'ggrc_basic_permissions',
-    'ggrc_gdrive_integration',
     'ggrc_risk_assessments',
     'ggrc_risks',
     'ggrc_workflows',
@@ -55,7 +54,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "1.6.1-Strawberry" + BUILD_NUMBER
+VERSION = "1.7.0-Strawberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -145,6 +144,9 @@ GGRC_Q_INTEGRATION_URL = os.environ.get('GGRC_Q_INTEGRATION_URL', '')
 
 # Integration service
 INTEGRATION_SERVICE_URL = os.environ.get('INTEGRATION_SERVICE_URL')
+
+# GGRC user account to be used by external application auth
+EXTERNAL_APP_USER = os.environ.get('EXTERNAL_APP_USER', '')
 
 # Integration service mandatory header value
 URLFETCH_SERVICE_ID = os.environ.get('URLFETCH_SERVICE_ID')

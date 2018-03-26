@@ -350,7 +350,7 @@ describe('GGRC.Components.revisionLog', function () {
 
           expect(result.changes[0]).toEqual({
             fieldName: 'Fake List',
-            origVal: 'foo, bar',
+            origVal: 'bar, foo',
             newVal: 'bar, baz',
           });
         }

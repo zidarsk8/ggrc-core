@@ -4,9 +4,10 @@
 }}
 
 <div class="csv-import">
-  <div class="import-section">
+  <div class="import-section import-notifications">
     {{#if fileName}}
       <div class="file-name {{importStatus}}">{{fileName}}</div>
+      <label>{{{message}}}</label>
     {{else}}
       <p>
         Here you are able to import data in bulk into GGRC.
@@ -37,7 +38,7 @@
   </div>
 
   {{#if_equals state "import"}}
-    <show-more {items}="import" limit="1">
+    <show-more {items}="importDetails" limit="1">
       <div class="import-section border-top">
 
         <section class="import-details__stats">

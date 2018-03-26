@@ -3,63 +3,11 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-.simple-modal {
-  .attachment-modal__controls {
-    ggrc-gdrive-picker-launcher {
-      margin: 4px 0;
-      display: inline-block;
-
-      a.btn {
-        background: rgba(0, 0,0, 0.15);
-        &:hover {
-          background: rgba(0, 0,0, 0.175);
-        }
-      }
-    }
-  }
-
-  .attachment-modal__btn-close {
-    font-size: 12px;
-    margin-right: 16px;
-  }
-
-  .attachment-modal__field {
-    .attachment-modal__field-title {
-      max-width: 100%;
-      text-overflow: ellipsis;
-      padding: 0 12px 0 0;
-      margin: 0;
-      line-height: 24px;
-    }
-
-    .attachment-modal__field-value {
-      min-height: 32px;
-      line-height: 16px;
-      padding: 4px 0;
-      margin-bottom: 5px;
-      box-sizing: border-box;
-    }
-  }
-
-  .modal-body {
-    textarea {
-      max-width: 500px;
-      max-height: 360px;
-      line-height: 18px;
-      width: 500px;
-      box-sizing: border-box;
-      margin: 0;
-      background-color: #fff;
-      border: 1px solid $border-color;
-      border-radius: 3px;
-      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-      transition: border linear .2s, box-shadow linear .2s;
-
-      &:focus {
-        border-color: rgba(82, 168, 236, 0.8);
-        outline: 0;
-        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
-      }
+ca-object-modal-content {
+  .ca-object-modal-content {
+    &__body {
+      height: calc(100% - 54px - 45px);
+      overflow-y: auto;
     }
   }
 }

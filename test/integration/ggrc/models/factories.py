@@ -19,15 +19,9 @@ from contextlib import contextmanager
 import factory
 
 from ggrc import db
-from ggrc import models
+from ggrc.models import all_models
 
-from ggrc.access_control.role import AccessControlRole
-from ggrc.access_control.list import AccessControlList
-from ggrc.access_control.roleable import Roleable
-from ggrc.models.mixins import CustomAttributable
-
-from ggrc_risks import models as risk_models
-from ggrc_risk_assessments import models as risk_assessment_models
+from ggrc.access_control import roleable
 
 from integration.ggrc.models.model_factory import ModelFactory
 from integration.ggrc_basic_permissions.models \
@@ -59,6 +53,7 @@ class TitledFactory(ModelFactory):
 
 class WithACLandCAFactory(ModelFactory):
   """Factory class to create object with ACL and CA in one step"""
+
   @classmethod
   def _create(cls, target_class, *args, **kwargs):
     """Create instance of model"""
@@ -73,23 +68,23 @@ class WithACLandCAFactory(ModelFactory):
     db.session.add(instance)
     db.session.flush()
 
-    if acls and isinstance(instance, Roleable):
+    if acls and isinstance(instance, roleable.Roleable):
       for acl in acls:
-        db.session.add(models.AccessControlList(
+        db.session.add(all_models.AccessControlList(
             object=instance,
             ac_role_id=acl.get("ac_role_id"),
             person_id=acl.get("person_id"),
         ))
-    if cavs and isinstance(instance, CustomAttributable):
+    if cavs and isinstance(instance, all_models.mixins.CustomAttributable):
       for cav in cavs:
-        db.session.add(models.CustomAttributeValue(
+        db.session.add(all_models.CustomAttributeValue(
             attributable=instance,
             attribute_value=cav.get("attribute_value"),
             attribute_object_id=cav.get("attribute_object_id"),
             custom_attribute_id=cav.get("custom_attribute_id"),
         ))
 
-    if isinstance(instance, models.CustomAttributeValue):
+    if isinstance(instance, all_models.CustomAttributeValue):
       cls._log_event(instance.attributable)
     if hasattr(instance, "log_json"):
       cls._log_event(instance)
@@ -101,7 +96,7 @@ class WithACLandCAFactory(ModelFactory):
 class CustomAttributeDefinitionFactory(TitledFactory):
 
   class Meta:
-    model = models.CustomAttributeDefinition
+    model = all_models.CustomAttributeDefinition
 
   definition_type = None
   definition_id = None
@@ -112,7 +107,7 @@ class CustomAttributeDefinitionFactory(TitledFactory):
 class CustomAttributeValueFactory(ModelFactory):
 
   class Meta:
-    model = models.CustomAttributeValue
+    model = all_models.CustomAttributeValue
 
   custom_attribute = None
   attributable_id = None
@@ -124,13 +119,13 @@ class CustomAttributeValueFactory(ModelFactory):
 class DirectiveFactory(TitledFactory):
 
   class Meta:
-    model = models.Directive
+    model = all_models.Directive
 
 
 class ControlFactory(TitledFactory):
 
   class Meta:
-    model = models.Control
+    model = all_models.Control
 
   directive = factory.LazyAttribute(lambda m: RegulationFactory())
   recipients = ""
@@ -139,13 +134,13 @@ class ControlFactory(TitledFactory):
 class IssueFactory(TitledFactory):
 
   class Meta:
-    model = models.Issue
+    model = all_models.Issue
 
 
 class IssueTrackerIssueFactory(TitledFactory):
 
   class Meta:
-    model = models.IssuetrackerIssue
+    model = all_models.IssuetrackerIssue
 
   issue_tracked_obj = factory.LazyAttribute(lambda m: AssessmentFactory())
   issue_id = factory.LazyAttribute(lambda _: random_str(length=5))
@@ -154,7 +149,7 @@ class IssueTrackerIssueFactory(TitledFactory):
 class AssessmentFactory(TitledFactory):
 
   class Meta:
-    model = models.Assessment
+    model = all_models.Assessment
 
   audit = factory.LazyAttribute(lambda m: AuditFactory())
 
@@ -162,7 +157,7 @@ class AssessmentFactory(TitledFactory):
 class ControlCategoryFactory(ModelFactory):
 
   class Meta:
-    model = models.ControlCategory
+    model = all_models.ControlCategory
 
   name = factory.LazyAttribute(lambda m: random_str(prefix='name'))
   lft = None
@@ -175,7 +170,7 @@ class ControlCategoryFactory(ModelFactory):
 class CategorizationFactory(ModelFactory):
 
   class Meta:
-    model = models.Categorization
+    model = all_models.Categorization
 
   category = None
   categorizable = None
@@ -187,7 +182,7 @@ class CategorizationFactory(ModelFactory):
 class ContextFactory(ModelFactory):
 
   class Meta:
-    model = models.Context
+    model = all_models.Context
 
   name = factory.LazyAttribute(
       lambda obj: random_str(prefix="SomeObjectType Context"))
@@ -197,7 +192,7 @@ class ContextFactory(ModelFactory):
 class ProgramFactory(TitledFactory):
 
   class Meta:
-    model = models.Program
+    model = all_models.Program
 
   context = factory.LazyAttribute(lambda _: ContextFactory())
 
@@ -205,7 +200,7 @@ class ProgramFactory(TitledFactory):
 class AuditFactory(TitledFactory):
 
   class Meta:
-    model = models.Audit
+    model = all_models.Audit
 
   status = "Planned"
   program = factory.LazyAttribute(lambda _: ProgramFactory())
@@ -231,7 +226,7 @@ class AuditFactory(TitledFactory):
 class SnapshotFactory(ModelFactory):
 
   class Meta:
-    model = models.Snapshot
+    model = all_models.Snapshot
 
   parent = factory.LazyAttribute(lambda _: AuditFactory())
   child_id = 0
@@ -242,7 +237,7 @@ class SnapshotFactory(ModelFactory):
 class AssessmentTemplateFactory(TitledFactory):
 
   class Meta:
-    model = models.AssessmentTemplate
+    model = all_models.AssessmentTemplate
 
   template_object_type = None
   test_plan_procedure = False
@@ -255,20 +250,20 @@ class AssessmentTemplateFactory(TitledFactory):
 class ContractFactory(TitledFactory):
 
   class Meta:
-    model = models.Contract
+    model = all_models.Contract
 
 
 class EventFactory(ModelFactory):
 
   class Meta:
-    model = models.Event
+    model = all_models.Event
   revisions = []
 
 
 class RelationshipFactory(ModelFactory):
 
   class Meta:
-    model = models.Relationship
+    model = all_models.Relationship
   source = None
   destination = None
 
@@ -282,7 +277,7 @@ class RelationshipFactory(ModelFactory):
 class PersonFactory(ModelFactory):
 
   class Meta:
-    model = models.Person
+    model = all_models.Person
 
   email = factory.LazyAttribute(
       lambda _: random_str(chars=string.ascii_letters) + "@example.com"
@@ -292,84 +287,84 @@ class PersonFactory(ModelFactory):
 class CommentFactory(ModelFactory):
 
   class Meta:
-    model = models.Comment
+    model = all_models.Comment
 
 
 class DocumentFactory(ModelFactory):
 
   class Meta:
-    model = models.Document
+    model = all_models.Document
 
   title = "some link"
   link = "some link"
 
 
 class UrlFactory(DocumentFactory):
-  document_type = models.Document.URL
+  document_type = all_models.Document.URL
 
 
 class EvidenceFactory(DocumentFactory):
-  document_type = models.Document.ATTACHMENT
+  document_type = all_models.Document.ATTACHMENT
 
 
 class ReferenceUrlFactory(DocumentFactory):
-  document_type = models.Document.REFERENCE_URL
+  document_type = all_models.Document.REFERENCE_URL
 
 
 class ObjectiveFactory(TitledFactory):
 
   class Meta:
-    model = models.Objective
+    model = all_models.Objective
 
 
 class RegulationFactory(TitledFactory):
 
   class Meta:
-    model = models.Regulation
+    model = all_models.Regulation
 
 
 class OrgGroupFactory(TitledFactory):
 
   class Meta:
-    model = models.OrgGroup
+    model = all_models.OrgGroup
 
 
 class SystemFactory(TitledFactory):
 
   class Meta:
-    model = models.System
+    model = all_models.System
 
 
 class ProcessFactory(TitledFactory):
 
   class Meta:
-    model = models.Process
+    model = all_models.Process
 
 
 class PolicyFactory(TitledFactory):
 
   class Meta:
-    model = models.Policy
+    model = all_models.Policy
 
 
 class MarketFactory(TitledFactory):
 
   class Meta:
-    model = models.Market
+    model = all_models.Market
 
 
 class AccessControlListFactory(ModelFactory):
   """Access Control List factory class"""
 
   class Meta:
-    model = AccessControlList
+    model = all_models.AccessControlList
 
 
 class AccessControlRoleFactory(ModelFactory):
   """Access Control Role factory class"""
 
   class Meta:
-    model = AccessControlRole
+    model = all_models.AccessControlRole
 
   name = factory.LazyAttribute(
       lambda _: random_str(prefix="Access Control Role - ")
@@ -387,56 +382,56 @@ class AccessGroupFactory(TitledFactory):
   """Access Group factory class"""
 
   class Meta:
-    model = models.AccessGroup
+    model = all_models.AccessGroup
 
 
 class ClauseFactory(TitledFactory):
   """Clause factory class"""
 
   class Meta:
-    model = models.Clause
+    model = all_models.Clause
 
 
 class DataAssetFactory(TitledFactory):
   """DataAsset factory class"""
 
   class Meta:
-    model = models.DataAsset
+    model = all_models.DataAsset
 
 
 class FacilityFactory(TitledFactory):
   """Facility factory class"""
 
   class Meta:
-    model = models.Facility
+    model = all_models.Facility
 
 
 class ObjectPersonFactory(ModelFactory):
   """ObjectPerson factory class"""
 
   class Meta:
-    model = models.ObjectPerson
+    model = all_models.ObjectPerson
 
 
 class ProductFactory(TitledFactory):
   """Product factory class"""
 
   class Meta:
-    model = models.Product
+    model = all_models.Product
 
 
 class SectionFactory(TitledFactory):
   """Section factory class"""
 
   class Meta:
-    model = models.Section
+    model = all_models.Section
 
 
 class StandardFactory(TitledFactory):
   """Standard factory class"""
 
   class Meta:
-    model = models.Standard
+    model = all_models.Standard
 
   description = factory.LazyAttribute(lambda _: random_str(length=100))
 
@@ -445,14 +440,14 @@ class VendorFactory(TitledFactory):
   """Vendor factory class"""
 
   class Meta:
-    model = models.Vendor
+    model = all_models.Vendor
 
 
 class RiskFactory(TitledFactory):
   """Risk factory class"""
 
   class Meta:
-    model = risk_models.Risk
+    model = all_models.Risk
 
   description = factory.LazyAttribute(lambda _: random_str(length=100))
 
@@ -461,14 +456,14 @@ class ThreatFactory(TitledFactory):
   """Threat factory class"""
 
   class Meta:
-    model = risk_models.Threat
+    model = all_models.Threat
 
 
 class LabelFactory(ModelFactory):
   """Label factory class"""
 
   class Meta:
-    model = models.Label
+    model = all_models.Label
 
   name = factory.LazyAttribute(lambda m: random_str(prefix='name'))
   object_type = factory.LazyAttribute('Assessment')
@@ -478,13 +473,13 @@ class ObjectLabelFactory(ModelFactory):
   """ObjectLabel factory class"""
 
   class Meta:
-    model = models.ObjectLabel
+    model = all_models.ObjectLabel
 
 
 class ProposalFactory(ModelFactory):
 
   class Meta:
-    model = models.Proposal
+    model = all_models.Proposal
 
   proposed_by = factory.LazyAttribute(lambda _: PersonFactory())
   content = None
@@ -493,7 +488,7 @@ class ProposalFactory(ModelFactory):
 class RiskAssessmentFactory(TitledFactory):
 
   class Meta:
-    model = risk_assessment_models.RiskAssessment
+    model = all_models.RiskAssessment
 
   status = "Draft"
   program = factory.LazyAttribute(lambda _: ProgramFactory())
@@ -502,7 +497,7 @@ class RiskAssessmentFactory(TitledFactory):
 class ProjectFactory(TitledFactory):
 
   class Meta:
-    model = models.Project
+    model = all_models.Project
 
 
 def get_model_factory(model_name):

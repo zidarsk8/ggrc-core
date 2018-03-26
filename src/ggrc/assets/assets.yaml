@@ -58,7 +58,6 @@ dashboard-js-template-files:
   - assessments/header.mustache
   - assessments/dates_list.mustache
   - assessment_templates/attribute_field.mustache
-  - assessment_templates/attribute_add_field.mustache
   - assessment_templates/modal_content.mustache
   - assessment_templates/info.mustache
   - assessment_templates/tree_add_item.mustache
@@ -176,8 +175,6 @@ dashboard-js-template-files:
   - base_objects/edit_object_link.mustache
   - programs/search_result.mustache
   - import_export/export/attribute_selector.mustache
-  - import_export/export/filter_query.mustache
-  - mapper/relevant_filter.mustache
   - quick_form/confirm_buttons.mustache
   - snapshots/dropdown_menu.mustache
   - snapshots/tree_add_item.mustache
@@ -198,9 +195,6 @@ dashboard-js-template-files:
   - gdrive/gdrive_folder.mustache
   - gdrive/gdrive_file.mustache
   - gdrive/confirm_buttons.mustache
-  - roles/gdrive_option_detail.mustache
-  - audits/gdrive_folder_picker.mustache
-  - workflows/gdrive_folder_picker.mustache
   # ggrc_risk_assessments
   - dashboard/lhn_risk_assessments.mustache
   - dashboard/lhn_search_result_risk_assessments.mustache

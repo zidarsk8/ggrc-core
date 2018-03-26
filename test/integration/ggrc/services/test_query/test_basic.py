@@ -553,8 +553,7 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
         "Person",
     )
     user_list = [p['email'] for p in people["values"]]
-    ref_list = [u'smotko@example.com', u'urbon.s@example.com',
-                u'zidar@example.com', u'sec.con@example.com']
+    ref_list = [u'smotko@example.com', u'sec.con@example.com']
     self.assertItemsEqual(user_list, ref_list)
 
   def test_filter_control_by_key_control(self):

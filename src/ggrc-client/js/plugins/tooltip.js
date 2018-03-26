@@ -35,7 +35,11 @@
    */
   function isElementVisible(el) {
     const bRect = el.getBoundingClientRect();
-    const topEl = document.elementFromPoint(bRect.x, bRect.y);
+    const preparedCoords = {
+      x: bRect.left + bRect.width/2,
+      y: bRect.top + bRect.height/2,
+    };
+    const topEl = document.elementFromPoint(preparedCoords.x, preparedCoords.y);
     // Due to various reasons of how browser determines layering of elements on
     // the page, topEl returned from elementFromPoint can either be element or
     // its inner child

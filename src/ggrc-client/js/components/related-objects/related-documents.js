@@ -112,30 +112,6 @@ import {
         return this.attr('documents').unshift
           .apply(this.attr('documents'), items);
       },
-      getRelationship: function (document, instance) {
-        let instanceRelatedObjects = instance.attr('related_destinations')
-          .concat(instance.attr('related_sources'));
-        let documentRelatedObjects = document.attr('related_destinations')
-          .concat(document.attr('related_sources'));
-        let targetRelatedObject = _.find(instanceRelatedObjects,
-          function (instanceRelatedObject) {
-            let instanceRelatedObjectId = _.get(
-              instanceRelatedObject,
-              'id'
-            );
-            return _.some(documentRelatedObjects,
-              function (documentRelatedObject) {
-                let documentRelatedObjectId = _.get(
-                  documentRelatedObject,
-                  'id'
-                );
-                return instanceRelatedObjectId === documentRelatedObjectId;
-              }
-            );
-          }
-        );
-        return new CMS.Models.Relationship(targetRelatedObject);
-      },
       createDocument: function (data) {
         let date = new Date();
         let document = new CMS.Models.Document({
@@ -187,11 +163,11 @@ import {
             return refreshedRelationship.destroy();
           });
       },
-      removeRelatedDocument: function (document) {
+      removeRelatedDocument: async function (document) {
         let self = this;
         let documents;
-        let relationship = this.getRelationship(document, this.instance);
-
+        let relationship = await CMS.Models.Relationship.findRelationship(
+          document, this.instance);
         if (!relationship.id) {
           console.log('Unable to find relationship');
           return can.Deferred().reject({

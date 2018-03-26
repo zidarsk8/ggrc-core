@@ -9,6 +9,7 @@ import collections
 from flask import g
 import sqlalchemy as sa
 
+from ggrc.access_control import role as ACR
 from ggrc.models import reflection
 from ggrc.models import mixins
 
@@ -95,7 +96,7 @@ def generate_person_list(person_ids):
   return [person_obj_by_id(i) for i in person_ids]
 
 
-def generate_acl_diff(proposed, revisioned):
+def generate_acl_diff(proposed, revisioned, instance):
   """Generates acl diff between peoposed and revised.
 
   Returns dict of dict.
@@ -120,6 +121,7 @@ def generate_acl_diff(proposed, revisioned):
   proposed_acl = collections.defaultdict(set)
   revision_acl = collections.defaultdict(set)
   acl_ids = set()
+  valid_role_ids = {r.id for r in ACR.get_ac_roles_for(instance.type).values()}
   for acl in proposed:
     proposed_acl[acl["ac_role_id"]].add(acl["person"]["id"])
     acl_ids.add(acl["ac_role_id"])
@@ -128,6 +130,8 @@ def generate_acl_diff(proposed, revisioned):
     acl_ids.add(acl["ac_role_id"])
   acl_dict = {}
   for role_id in acl_ids:
+    if int(role_id) not in valid_role_ids:
+      continue
     deleted_person_ids = revision_acl[role_id] - proposed_acl[role_id]
     added_person_ids = proposed_acl[role_id] - revision_acl[role_id]
     if added_person_ids or deleted_person_ids:
@@ -136,6 +140,18 @@ def generate_acl_diff(proposed, revisioned):
           u"deleted": generate_person_list(deleted_person_ids),
       }
   return acl_dict
+
+
+def get_validated_value(cad, value, object_id):
+  """Get valid value that related to specified cad."""
+  if isinstance(value, basestring):
+    value = value.strip()
+    return value, object_id
+  if cad.attribute_type == cad.ValidTypes.CHECKBOX:
+    value = int(value)
+  if value is not None:
+    value = unicode(value)
+  return value, object_id
 
 
 def generate_cav_diff(instance, proposed, revisioned):
@@ -154,9 +170,12 @@ def generate_cav_diff(instance, proposed, revisioned):
   for cad in instance.custom_attribute_definitions:
     if cad.id not in proposed_cavs:
       continue
-    proposed_val = proposed_cavs[cad.id]
-    cad_not_setuped = cad.id not in revisioned_cavs
-    if cad_not_setuped or proposed_val != revisioned_cavs[cad.id]:
+    proposed_val = get_validated_value(cad, *proposed_cavs[cad.id])
+    if cad.id not in revisioned_cavs:
+      revisioned_value = (cad.default_value, None)
+    else:
+      revisioned_value = revisioned_cavs[cad.id]
+    if proposed_val != revisioned_value:
       value, person_id = proposed_val
       person = person_obj_by_id(person_id) if person_id else None
       diff[cad.id] = {
@@ -246,10 +265,10 @@ def prepare(instance, content):
                if (f in current_data and
                    f in content and
                    current_data[f] != content[f])}
-
   if "access_control_list" in diff_data:
     acl = generate_acl_diff(diff_data.pop("access_control_list"),
-                            current_data.get("access_control_list", []))
+                            current_data.get("access_control_list", []),
+                            instance)
   else:
     acl = {}
   if (

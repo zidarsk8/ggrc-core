@@ -554,6 +554,12 @@ def init_hook():  # noqa
   sa.event.listen(sa.orm.session.Session, "before_flush",
                   handle_del_audit_issue_mapping)
 
+  # Event listener for relationship delete operation validate.
+  sa.event.listen(
+      all_models.Relationship,
+      'before_delete',
+      all_models.Relationship.validate_delete)
+
   @signals.Restful.model_deleted.connect_via(all_models.Relationship)
   def handle_cascade_delete(sender, obj, service):
     """Process cascade removing of relationship."""

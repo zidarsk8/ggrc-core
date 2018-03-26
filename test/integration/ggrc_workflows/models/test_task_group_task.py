@@ -29,8 +29,8 @@ class TestTaskApiCalls(workflow_test_case.WorkflowTestCase):
       workflow = self.setup_helper.setup_workflow((g_rname,))
       wf_factories.TaskGroupFactory(workflow=workflow)
 
-    g_person = self.setup_helper.get_workflow_person(
-        g_rname, ac_roles.workflow.ADMIN_NAME)
+    g_person = self.setup_helper.get_person(g_rname,
+                                            ac_roles.workflow.ADMIN_NAME)
     self.api_helper.set_user(g_person)
 
     task_group = all_models.TaskGroup.query.one()
@@ -45,10 +45,9 @@ class TestTaskApiCalls(workflow_test_case.WorkflowTestCase):
     """GET TaskGroupTask collection logged in as GlobalReader & No Role."""
     with factories.single_commit():
       wf_factories.TaskGroupTaskFactory()
-      email = self.setup_helper.gen_email(rbac_helper.GR_RNAME, "No Role")
-      self.setup_helper.setup_person(rbac_helper.GR_RNAME, email)
+      self.setup_helper.setup_person(rbac_helper.GR_RNAME, "No Role")
 
-    g_reader = all_models.Person.query.filter_by(email=email).one()
+    g_reader = self.setup_helper.get_person(rbac_helper.GR_RNAME, "No Role")
     self.api_helper.set_user(g_reader)
 
     task_group_task = all_models.TaskGroupTask.query.one()
@@ -57,3 +56,22 @@ class TestTaskApiCalls(workflow_test_case.WorkflowTestCase):
     self.assertTrue(
         response.json["task_group_tasks_collection"]["task_group_tasks"]
     )
+
+  def test_post_task_g_editor_no_role(self):
+    """POST TaskGroupTask logged in as GlobalEditor & No Role."""
+    with factories.single_commit():
+      wf_factories.TaskGroupFactory()
+      self.setup_helper.setup_person(rbac_helper.GE_RNAME, "No Role")
+      self.setup_helper.setup_person(rbac_helper.GA_RNAME, "No Role")
+
+    g_editor = self.setup_helper.get_person(rbac_helper.GE_RNAME, "No Role")
+    self.api_helper.set_user(g_editor)
+
+    g_admin = self.setup_helper.get_person(rbac_helper.GA_RNAME, "No Role")
+    people_roles = {ac_roles.task.ASSIGNEE_NAME: g_admin}
+    task_group = all_models.TaskGroup.query.one()
+    data = workflow_api.get_task_post_dict(
+        task_group, people_roles, "2018-01-01", "2018-01-02")
+
+    response = self.api_helper.post(all_models.TaskGroupTask, data)
+    self.assertEqual(response.status_code, 201)

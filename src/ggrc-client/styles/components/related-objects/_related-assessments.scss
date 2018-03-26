@@ -4,16 +4,13 @@
  */
 
 related-assessments {
-  .tree-spinner {
-    display: none;
+  object-list {
+    .spinner {
+      justify-content: center;
 
-    spinner {
-      margin: auto;
-    }
-  }
-  .loading {
-    .tree-spinner {
-      display: flex;
+      .fa {
+        font-size: 26px;
+      }
     }
   }
 }

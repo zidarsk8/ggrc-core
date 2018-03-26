@@ -11,6 +11,7 @@ from sqlalchemy.sql.schema import UniqueConstraint
 
 from ggrc import db
 from ggrc.models.mixins import attributevalidator
+from ggrc import builder
 from ggrc.models import mixins
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.access_control import role as acr
@@ -60,9 +61,13 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
   def value_mapping(self):
     return self.ValidTypes.DEFAULT_VALUE_MAPPING.get(self.attribute_type) or {}
 
-  @property
+  @classmethod
+  def get_default_value_for(cls, attribute_type):
+    return cls.ValidTypes.DEFAULT_VALUE.get(attribute_type)
+
+  @builder.simple_property
   def default_value(self):
-    return self.ValidTypes.DEFAULT_VALUE.get(self.attribute_type)
+    return self.get_default_value_for(self.attribute_type)
 
   def get_indexed_value(self, value):
     return self.value_mapping.get(value, value)
@@ -92,7 +97,12 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
       'placeholder',
   ]
 
-  _api_attrs = reflection.ApiAttributes(*_include_links)
+  _api_attrs = reflection.ApiAttributes(
+      reflection.Attribute("default_value",
+                           read=True,
+                           create=False,
+                           update=False),
+      *_include_links)
 
   _sanitize_html = [
       "multi_choice_options",
@@ -134,7 +144,7 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     MAP = "Map"
 
     DEFAULT_VALUE = {
-        CHECKBOX: 0,
+        CHECKBOX: "0",
         RICH_TEXT: "",
         TEXT: "",
     }
@@ -292,6 +302,12 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
       self.validate_assessment_title(name)
 
     return value
+
+  def log_json(self):
+    """Add extra fields to be logged in CADs."""
+    results = super(CustomAttributeDefinition, self).log_json()
+    results["default_value"] = self.default_value
+    return results
 
 
 class CustomAttributeMapable(object):

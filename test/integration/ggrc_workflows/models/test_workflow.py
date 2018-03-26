@@ -321,10 +321,9 @@ class TestWorkflowApiCalls(workflow_test_case.WorkflowTestCase):
     """GET Workflow collection logged in as GlobalReader & No Role."""
     with glob_factories.single_commit():
       factories.WorkflowFactory()
-      email = self.setup_helper.gen_email(rbac_helper.GR_RNAME, "No Role")
-      self.setup_helper.setup_person(rbac_helper.GR_RNAME, email)
+      self.setup_helper.setup_person(rbac_helper.GR_RNAME, "No Role")
 
-    g_reader = all_models.Person.query.filter_by(email=email).one()
+    g_reader = self.setup_helper.get_person(rbac_helper.GR_RNAME, "No Role")
     self.api_helper.set_user(g_reader)
 
     workflow = all_models.Workflow.query.one()

@@ -3,14 +3,15 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {exportGroup as Component, exportPanel} from '../export';
+import exportPanel from '../export-panel';
+import Component from '../export-group';
 
-describe('GGRC.Components.exportGroup', function () {
+describe('export-group', function () {
   'use strict';
 
   describe('events', function () {
     describe('inserted() method', function () {
-      let method;  // the method under test
+      let method; // the method under test
       let that;
 
       beforeEach(function () {
@@ -28,7 +29,7 @@ describe('GGRC.Components.exportGroup', function () {
       });
     });
     describe('addPanel() method', function () {
-      let method;  // the method under test
+      let method; // the method under test
       let data;
       let viewModel;
 

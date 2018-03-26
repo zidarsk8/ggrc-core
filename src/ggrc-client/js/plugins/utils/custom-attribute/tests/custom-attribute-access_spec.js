@@ -100,24 +100,37 @@ describe('CustomAttributeAccess module', () => {
   describe('read() method', () => {
     describe('when was specified 0 params', () => {
       it('returns all custom attribute objects', function () {
-        const expectedResult = caAccess._caObjects;
-        const result = caAccess.read();
-        expect(result).toBe(expectedResult);
+        const caDefs = [{id: 1}, {id: 2}];
+        instance.attr('custom_attribute_definitions', caDefs);
+        caAccess._setupCaObjects();
+        const caObjects = caAccess.read();
+        caObjects.each((caObject, i) => {
+          expect(caObject.customAttributeId).toEqual(caDefs[i].id);
+        });
       });
     });
 
     describe('when was specified 1 param', () => {
-      describe('if param is object', () => {
+      describe('if param is an object', () => {
         it('returns filtered custom attribute objects', function () {
-          const expectedResult = [];
           const options = {type: CUSTOM_ATTRIBUTE_TYPE.GLOBAL};
-          let result;
-          spyOn(caAccess, '_getFilteredCaObjects').and.returnValue(
-            expectedResult
-          );
-          result = caAccess.read(options);
-          expect(caAccess._getFilteredCaObjects).toHaveBeenCalledWith(options);
-          expect(result).toBe(expectedResult);
+          const gcas = [
+            {id: 1, definition_id: null},
+            {id: 3, definition_id: null},
+          ];
+          const caDefs = [
+            {id: 2, definition_id: 109},
+            ...gcas,
+          ];
+          instance.attr('custom_attribute_definitions', caDefs);
+          caAccess._setupCaObjects();
+          const caObjects = caAccess.read(options);
+          expect(caObjects.length).toBe(gcas.length);
+          gcas.forEach((gca) => {
+            const caObject = _.find(caObjects,
+              (caObject) => caObject.customAttributeId === gca.id);
+            expect(caObject).not.toBeUndefined();
+          });
         });
 
         it('returns an empty can.List if there are no custom attribute objects',
@@ -145,8 +158,80 @@ describe('CustomAttributeAccess module', () => {
     });
   });
 
+  describe('updateCaObjects() method', () => {
+    describe('when there are custom attribute objects for passed CA values',
+      () => {
+        let newCaValues;
+
+        beforeEach(function () {
+          const caDefs = [{id: 1}, {id: 2}];
+          newCaValues = caDefs.map((caDef) => ({
+            custom_attribute_id: caDef.id,
+            attribute_value: `Some value ${caDef.id}`,
+          }));
+          instance.attr('custom_attribute_definitions', caDefs);
+          caAccess._setupCaObjects();
+        });
+
+        it('updates them with help CA values', function () {
+          const update = spyOn(CustomAttributeObject.prototype,
+            'updateCaValue');
+          caAccess.updateCaObjects(newCaValues);
+          newCaValues.forEach((newCaValue) => {
+            expect(update).toHaveBeenCalledWith(newCaValue);
+          });
+        });
+      });
+
+    it('recalculates the custom attribute value for CA object if passed CA ' +
+    'values are not appropriate for them', () => {
+      const newCaValues = [
+        {custom_attribute_id: 3, attribute_value: 'V3'},
+        {custom_attribute_id: 4, attribute_value: 'V4'},
+      ];
+      const caDefs = [
+        {id: 1},
+        {id: 2},
+        {id: 5},
+      ];
+      const update = spyOn(CustomAttributeObject.prototype, 'updateCaValue');
+      instance.attr('custom_attribute_definitions', caDefs);
+      caAccess._setupCaObjects();
+      caAccess.updateCaObjects(newCaValues);
+      expect(update.calls.count()).toBe(caDefs.length);
+      expect(update).toHaveBeenCalledWith({}, true);
+    });
+  });
+
   describe('_setupCaObjects() method', () => {
-    it('binds ca definitions and values together forming caObjects',
+    describe('for the built CA objects', () => {
+      beforeEach(function () {
+        spyOn(caAccess, '_buildCaObjects');
+      });
+
+      it('setups validations for CA objects', function () {
+        const builtCaObjects = new Map();
+        caAccess._buildCaObjects.and.returnValue(builtCaObjects);
+        spyOn(caAccess, '_setupValidations');
+        caAccess._setupCaObjects();
+        expect(caAccess._setupValidations).toHaveBeenCalledWith(builtCaObjects);
+      });
+
+      it('validates each CA object', function () {
+        const caDefs = [1, 3, 5].map((id) => new can.Map({id}));
+        const builtCaObjects = new Map(caDefs.map((caDef) =>
+          [caDef.attr('id'), new CustomAttributeObject(new can.Map(), caDef)]
+        ));
+        caAccess._buildCaObjects.and.returnValue(builtCaObjects);
+        const validate = spyOn(CustomAttributeObject.prototype, 'validate');
+        caAccess._setupCaObjects();
+        expect(validate.calls.count()).toBe(caDefs.length);
+      });
+    });
+  });
+
+  describe('_buildCaObjects() method', () => {
+    it('built ca objects from appropriate ca definitions and values',
       function () {
         const caDefs = [
           {
@@ -176,21 +261,20 @@ describe('CustomAttributeAccess module', () => {
             attribute_value: 'Some text 1...',
           },
         ];
-        let caObjects;
         instance.attr({
           custom_attribute_definitions: caDefs,
           custom_attribute_values: caValues,
         });
-        caAccess._setupCaObjects();
-        caObjects = caAccess.read();
-        caObjects.forEach((caObject, index) => {
-          const caDef = caDefs[index];
-          const title = caDef.title;
-          const value = caValues
-            .find((caValue) => caValue.custom_attribute_id === caDef.id)
-            .attribute_value;
-          expect(caObject.value).toBe(value);
-          expect(caObject.title).toBe(title);
+        const caObjects = caAccess._buildCaObjects();
+        expect(caObjects.size).toBe(caDefs.length);
+        caObjects.forEach((caObject) => {
+          const caId = caObject.customAttributeId;
+          const caDef = caDefs.find((caDef) => caDef.id === caId);
+          const caValue = caValues.find((caValue) =>
+            caValue.custom_attribute_id === caId
+          );
+          expect(caObject.title).toBe(caDef.title);
+          expect(caObject.value).toBe(caValue.attribute_value);
         });
       });
 
@@ -202,30 +286,10 @@ describe('CustomAttributeAccess module', () => {
         {id: 2},
         {id: 3},
       ]);
-      caAccess._setupCaObjects();
-      caObjects = caAccess.read();
+      caObjects = caAccess._buildCaObjects();
       caObjects.forEach((caObject) => {
         expect(caObject.value).toBe('');
       });
-    });
-
-    it('setups validations for each custom attribute object', function () {
-      const setup = spyOn(caAccess, '_setupValidations');
-      caAccess._setupCaObjects();
-      expect(setup).toHaveBeenCalled();
-    });
-
-    it('validates each custom attribute object after setuping the validation' +
-    'actions', function () {
-      const caDefs = [
-        {id: 1},
-        {id: 2},
-        {id: 3},
-      ];
-      const validate = spyOn(CustomAttributeObject.prototype, 'validate');
-      instance.attr('custom_attribute_definitions', caDefs);
-      caAccess._setupCaObjects();
-      expect(validate.calls.count()).toBe(caDefs.length);
     });
   });
 
@@ -289,10 +353,10 @@ describe('CustomAttributeAccess module', () => {
       options = {};
     });
 
-    it('returns an empty list if tehere are no custom atttribute objects',
+    it('returns an empty list if there are no custom attribute objects',
       function () {
         const result = caAccess._getFilteredCaObjects(options);
-        expect(result.attr()).toEqual([]);
+        expect(result).toEqual([]);
       });
 
     it('returns a list with the filtered custom attribute objects by type',
@@ -421,26 +485,46 @@ describe('CustomAttributeAccess module', () => {
       expect(caValue).toBeUndefined();
     });
 
-    it('returns found caValue with passed custom attribute id', function () {
-      const caId = 2;
-      const value = 234;
-      let caValue;
-      instance.attr('custom_attribute_values', [
-        {
-          custom_attribute_id: 1,
-          attribute_value: 123,
-        },
-        {
+    describe('returns found caValue with passed custom attribute id', () => {
+      let caValues;
+
+      beforeEach(function () {
+        caValues = [
+          {
+            custom_attribute_id: 1,
+            attribute_value: 123,
+          },
+          {
+            custom_attribute_id: 3,
+            attribute_value: 345,
+          },
+        ];
+      });
+
+      it('when a plain array was passed', function () {
+        const caId = 2;
+        const value = 234;
+        caValues.push({
           custom_attribute_id: caId,
           attribute_value: value,
-        },
-        {
-          custom_attribute_id: 3,
-          attribute_value: 345,
-        },
-      ]);
-      caValue = caAccess._findCaValueByCaId(caId);
-      expect(caValue.attr('attribute_value')).toBe(value);
+        });
+        const caValue = caAccess._findCaValueByCaId(caId, caValues);
+        expect(caValue.attribute_value).toBe(value);
+      });
+
+      it('when a can.List instance was passed', function () {
+        const caId = 2;
+        const value = 234;
+        caValues.push({
+          custom_attribute_id: caId,
+          attribute_value: value,
+        });
+        const caValue = caAccess._findCaValueByCaId(
+          caId,
+          new can.List(caValues)
+        );
+        expect(caValue.attr('attribute_value')).toBe(value);
+      });
     });
   });
 
@@ -471,6 +555,26 @@ describe('CustomAttributeAccess module', () => {
       caAccess._setupCaObjects();
       caObject = caAccess._findCaObjectByCaId(caId);
       expect(caObject.title).toBe(title);
+    });
+  });
+
+  describe('_caObjects getter', () => {
+    it('returns an array of ca objects', function () {
+      const caDefs = [
+        {id: 123},
+        {id: 43},
+      ];
+      instance.attr('custom_attribute_definitions', caDefs);
+      caAccess._setupCaObjects();
+
+      const caObjects = caAccess._caObjects;
+      expect(caObjects.length).toBe(caDefs.length);
+      caDefs.forEach((caDef) => {
+        const result = _.find(caObjects, (caObject) =>
+          caObject.customAttributeId === caDef.id
+        );
+        expect(result).toBeDefined();
+      });
     });
   });
 });
