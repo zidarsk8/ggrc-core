@@ -23,7 +23,6 @@ from ggrc_workflows.models.hooks import workflow
 
 def after_flush(session, _):
   """Handle all ACL hooks after after flush."""
-
   relationship.handle_relationship_creation(session)
   access_control_list.handle_acl_creation(session)
   program_role_handler = program_roles.ProgramRolesHandler()
@@ -35,12 +34,17 @@ def after_flush(session, _):
   flask.g.new_wf_acls = workflow.get_new_wf_acls(session)
   flask.g.deleted_wf_objects = workflow.get_deleted_wf_objects(session)
 
-  workflow.handle_acl_changes(
-      getattr(flask.g, "new_wf_acls", []),
-      getattr(flask.g, "deleted_wf_objects", []),
-  )
+
+def after_transaction_end(session, _):
+  """Handle acl propagation outside the original session."""
+  if not hasattr(flask.g, "new_wf_acls") or \
+          not hasattr(flask.g, "deleted_wf_objects"):
+    return
+
+  workflow.handle_acl_changes(flask.g.new_wf_acls, flask.g.deleted_wf_objects)
 
 
 def init_hook():
   """Initialize Relationship-related hooks."""
   sa.event.listen(Session, "after_flush", after_flush)
+  sa.event.listen(Session, "after_transaction_end", after_transaction_end)
