@@ -55,6 +55,7 @@ src/**/_*.css
 
 # pythest cache folder
 .cache
+.pytest_cache
 
 # test reports:
 test/*.xml
