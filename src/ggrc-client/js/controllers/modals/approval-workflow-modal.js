@@ -75,7 +75,7 @@ let ApprovalWorkflow = can.Observe({
           return $.when(
             wf,
             new CMS.Models.TaskGroup({
-              workflow : wf,
+              workflow: wf,
               title: reviewTemplate({
                 type: that.original_object.constructor.title_singular,
                 title: that.original_object.title,
@@ -84,7 +84,7 @@ let ApprovalWorkflow = can.Observe({
               context: wf.context,
             }).save()
           );
-        }).then(function(wf, tg) {
+        }).then(function (wf, tg) {
           return $.when(
             wf,
             tg,
@@ -102,7 +102,7 @@ let ApprovalWorkflow = can.Observe({
                 },
               }],
               context: wf.context,
-              task_type: "text",
+              task_type: 'text',
               title: reviewTemplate({
                 type: that.original_object.constructor.title_singular,
                 title: that.original_object.title,
