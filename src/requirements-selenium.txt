@@ -11,7 +11,6 @@ pytest-xdist==1.22.2
 pytest==3.5.0
 requests==2.18.4
 selenium==3.11.0
-sniffer==0.4.0
 inflection==0.3.1
 timeout-decorator==0.4.0
 pytest-timeout==1.2.1
