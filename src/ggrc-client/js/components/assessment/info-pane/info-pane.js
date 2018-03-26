@@ -193,6 +193,7 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
       formState: {},
       noItemsText: '',
       initialState: 'Not Started',
+      deprecatedState: 'Deprecated',
       assessmentMainRoles: ['Creators', 'Assignees', 'Verifiers'],
       setUrlEditMode: function (value, type) {
         this.attr(type + 'EditMode', value);
@@ -428,6 +429,9 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
         let isUndo = event.undo;
         let newStatus = event.state;
         let instance = this.attr('instance');
+        let initialState = this.attr('initialState');
+        let deprecatedState = this.attr('deprecatedState');
+        let isArchived = instance.attr('archived');
         let previousStatus = instance.attr('previousStatus') || 'In Progress';
         let stopFn = tracker.start(instance.type,
           tracker.USER_JOURNEY_KEYS.NAVIGATION,
@@ -437,6 +441,10 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
             instance.attr('status', xhr.remoteObject.status);
           }
         };
+
+        if (isArchived && [initialState, deprecatedState].includes(newStatus)) {
+          return can.Deferred().resolve();
+        }
 
         this.attr('onStateChangeDfd', can.Deferred());
 
