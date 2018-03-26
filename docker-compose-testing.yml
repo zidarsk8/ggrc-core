@@ -1,6 +1,6 @@
 version: "2"
 services:
-  dev:
+  cleandev:
     build:
       context: .
       dockerfile: Dockerfile
@@ -38,7 +38,7 @@ services:
      - "./test/selenium:/selenium"
      - "/dev/shm:/dev/shm"
     links:
-     - dev
+     - cleandev
     environment:
      - "TZ=America/Los_Angeles"
      - PYTHONDONTWRITEBYTECODE=true
