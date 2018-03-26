@@ -30,10 +30,10 @@ WF_PROPAGATED_ROLES = {
 }
 
 
-def handle_acl_changes(session):
+def handle_acl_changes(new_wf_acls, deleted_wf_objects):
   """ACL creation hook handler."""
-  _add_propagated_roles(session)
-  _remove_propagated_roles(session)
+  _propagete_new_wf_acls(new_wf_acls)
+  remove_related_acl(deleted_wf_objects)
 
 
 def get_wf_propagated_role_ids():
@@ -45,10 +45,10 @@ def get_wf_propagated_role_ids():
   }
 
 
-def _add_propagated_roles(session):
+def get_new_wf_acls(session):
   """Add propagated roles to workflow related objects."""
   propagated_role_ids = None
-  wf_new_acl = set()
+  new_wf_acls = set()
   for obj in session.new:
     acls = []
     if (isinstance(obj, all_models.AccessControlList) and
@@ -62,17 +62,17 @@ def _add_propagated_roles(session):
       propagated_role_ids = get_wf_propagated_role_ids()
     for acl in acls:
       if acl.ac_role_id in propagated_role_ids:
-        wf_new_acl.add(acl.id)
-  _propagete_new_wf_acls(wf_new_acl)
+        new_wf_acls.add(acl.id)
+  return new_wf_acls
 
 
-def _remove_propagated_roles(session):
+def get_deleted_wf_objects(session):
   """Remove propagated roles to workflow related objects."""
   related_to_del = defaultdict(set)
   for obj in session.deleted:
     if isinstance(obj, RELATED_MODELS):
       related_to_del[obj.type].add(obj.id)
-  remove_related_acl(related_to_del)
+  return related_to_del
 
 
 def remove_related_acl(related_to_del):
