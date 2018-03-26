@@ -190,6 +190,7 @@ Copyright (C) 2018 Google Inc.
                 <object-state-toolbar {{#if is_info_pin}}class="pane-header__toolbar-item"{{/if}}
                                     {verifiers}="verifiers"
                                     {instance}="instance"
+                                    {disabled}="isPending"
                                     (on-state-change)="onStateChange(%event)">
                 </object-state-toolbar>
         {{/unless}}

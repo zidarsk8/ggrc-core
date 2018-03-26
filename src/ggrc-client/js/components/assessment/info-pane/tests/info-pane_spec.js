@@ -45,6 +45,38 @@ describe('GGRC.Components.assessmentInfoPane', function () {
     });
   });
 
+  describe('isPending() getter', () => {
+    it('returns true if isUpdatingEvidences and isUpdatingUrls are true',
+      () => {
+        vm.attr('isUpdatingEvidences', true);
+        vm.attr('isUpdatingUrls', false);
+
+        expect(vm.attr('isPending')).toBe(true);
+      });
+
+    it('returns false if isUpdatingUrls and isUpdatingEvidences are false',
+      () => {
+        vm.attr('isUpdatingEvidences', false);
+        vm.attr('isUpdatingUrls', false);
+
+        expect(vm.attr('isPending')).toBe(false);
+      });
+
+    it('returns true if only isUpdatingEvidences is true', () => {
+      vm.attr('isUpdatingEvidences', true);
+      vm.attr('isUpdatingUrls', false);
+
+      expect(vm.attr('isPending')).toBe(true);
+    });
+
+    it('returns true if only isUpdatingUrls is true', () => {
+      vm.attr('isUpdatingEvidences', false);
+      vm.attr('isUpdatingUrls', true);
+
+      expect(vm.attr('isPending')).toBe(true);
+    });
+  });
+
   describe('onStateChange() method', () => {
     let method;
     beforeEach(() => {

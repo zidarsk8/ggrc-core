@@ -178,6 +178,13 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
               this.attr('isAssessmentSaving');
           },
         },
+        // flag which indicates that changing of assessment state is blocked
+        isPending: {
+          get() {
+            return this.attr('isUpdatingEvidences') ||
+              this.attr('isUpdatingUrls');
+          },
+        },
       },
       modal: {
         open: false,
