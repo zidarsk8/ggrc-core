@@ -188,16 +188,18 @@ class GGRCGapiClient {
    */
   authorizeGapi(requiredScopes = []) {
     let needToRequestForNewScopes = this.addNewScopes(requiredScopes);
-    let token = gapi.auth.getToken();
+    return this.client.then((gapi)=> {
+      let token = gapi.auth.getToken();
 
-    if (needToRequestForNewScopes || !token) {
-      this.oauthResult.reject();
-      this.oauthResult = can.Deferred();
-      this.oauthResult.then(()=>this.checkLoggedUser());
-      this.runAuthorization(true);
-    }
+      if (needToRequestForNewScopes || !token) {
+        this.oauthResult.reject();
+        this.oauthResult = can.Deferred();
+        this.oauthResult.then(()=>this.checkLoggedUser());
+        this.runAuthorization(true);
+      }
 
-    return this.oauthResult;
+      return this.oauthResult;
+    });
   }
 
   /**
@@ -205,27 +207,24 @@ class GGRCGapiClient {
    * @param {Boolean} immediate - Try to suppress auth modal window.
    */
   runAuthorization(immediate) {
-    let oauthResult = this.oauthResult;
-    this.client.done(()=> {
-      // make auth request
-      this.makeGapiAuthRequest(immediate)
-        .then(oauthResult.resolve, ()=> {
-          if (immediate) {
-            this.showGapiModal({
-              scopes: this.currentScopes,
-              onAccept: ()=> {
-                this.runAuthorization();
-                return this.oauthResult;
-              },
-              onDecline: ()=> {
-                this.oauthResult.reject('User canceled operation');
-              },
-            });
-          } else {
-            oauthResult.reject();
-          }
-        });
-    });
+    // make auth request
+    this.makeGapiAuthRequest(immediate)
+      .then(this.oauthResult.resolve, ()=> {
+        if (immediate) {
+          this.showGapiModal({
+            scopes: this.currentScopes,
+            onAccept: ()=> {
+              this.runAuthorization();
+              return this.oauthResult;
+            },
+            onDecline: ()=> {
+              this.oauthResult.reject('User canceled operation');
+            },
+          });
+        } else {
+          this.oauthResult.reject();
+        }
+      });
   }
 
   /**

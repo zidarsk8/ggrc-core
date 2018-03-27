@@ -255,12 +255,14 @@ describe('gapiClient', ()=> {
   });
 
   describe('authorizeGapi() method', ()=> {
+    let gapi;
     beforeEach(()=> {
-      window.gapi = {
+      gapi = {
         auth: {
           getToken: jasmine.createSpy().and.returnValue('token'),
         },
       };
+      gapiClient.client = can.Deferred().resolve(gapi);
       gapiClient.oauthResult = can.Deferred();
       spyOn(gapiClient, 'addNewScopes');
       spyOn(gapiClient, 'runAuthorization');
@@ -309,7 +311,9 @@ describe('gapiClient', ()=> {
       gapiClient.oauthResult = can.Deferred();
       gapiClient.addNewScopes.and.returnValue(true);
 
-      gapiClient.authorizeGapi().resolve().then(()=> {
+      gapiClient.authorizeGapi();
+
+      gapiClient.oauthResult.resolve().then(()=> {
         expect(gapiClient.checkLoggedUser).toHaveBeenCalled();
         done();
       });
@@ -320,7 +324,6 @@ describe('gapiClient', ()=> {
     let authDfd;
     beforeEach(()=> {
       authDfd = can.Deferred();
-      gapiClient.client = can.Deferred().resolve();
       spyOn(gapiClient, 'makeGapiAuthRequest').and.returnValue(authDfd);
       spyOn(gapiClient, 'showGapiModal');
     });
