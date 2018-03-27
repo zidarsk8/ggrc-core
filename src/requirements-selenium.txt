@@ -19,3 +19,4 @@ pytest-cov==2.5.1
 pytest-xvfb==1.1.0
 pytest-repeat==0.4.1
 python-dateutil==2.7.1
+waiting==1.4.1
