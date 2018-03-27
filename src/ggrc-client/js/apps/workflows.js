@@ -269,7 +269,7 @@ import InfoWidget from '../controllers/info_widget_controller';
           return CMS.Models.CycleTaskGroupObjectTask.findAll({
             contact_id: binding.instance.id,
             'cycle.is_current': true,
-            status__in: 'Assigned,InProgress,Finished,Declined,Deprecated',
+            status__in: 'Assigned,In Progress,Finished,Declined,Deprecated',
           });
         }, 'Cycle'),
         assigned_tasks_with_history: Search(function (binding) {

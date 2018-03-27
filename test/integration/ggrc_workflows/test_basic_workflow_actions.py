@@ -450,7 +450,7 @@ class TestBasicWorkflowActions(TestCase):
     with freeze_time("2015-6-9 13:00:00"):
       today = dtm.datetime.now()
       transitions = [
-          ("InProgress", None, None),
+          ("In Progress", None, None),
           ("Finished", today, None),
           ("Declined", None, None),
           ("Finished", today, None),

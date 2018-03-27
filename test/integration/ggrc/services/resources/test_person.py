@@ -49,7 +49,7 @@ class TestPersonResource(TestCase, WithQueryApi):
       ]),
       (False, [
           ("task 1", "Finished", 2, True),
-          ("task 2", "InProgress", 2, True),
+          ("task 2", "In Progress", 2, True),
           ("task 2", "Finished", 1, False),
           ("task 3", "Finished", 0, False),
       ]),

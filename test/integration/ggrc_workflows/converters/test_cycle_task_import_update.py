@@ -264,7 +264,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
             "end_date": "2016-07-18",
             "finished_date": "None",
             "verified_date": "None",
-            "status": "InProgress"
+            "status": "In Progress"
         },
         "CYCLETASK-4": {
             "title": self.task_group_tasks_active[3]["title"],
@@ -360,7 +360,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
             "end_date": "2014-05-16",
             "finished_date": "None",
             "verified_date": "None",
-            "status": "InProgress"
+            "status": "In Progress"
         },
         "CYCLETASK-9": {
             "title": self.task_group_tasks_historical[3]["title"],
@@ -413,7 +413,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
             "end_date": "2016-06-18",
             "finished_date": "None",
             "verified_date": "None",
-            "status": "InProgress"
+            "status": "In Progress"
         },
         "CYCLETASK-4": {
             "title": self.task_group_tasks_active[3]["title"] + " four",
@@ -463,7 +463,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
             "end_date": "2014-04-18",
             "finished_date": "None",
             "verified_date": "None",
-            "status": "InProgress"
+            "status": "In Progress"
         },
         "CYCLETASK-9": {
             "title": self.task_group_tasks_historical[3]["title"] + " four",

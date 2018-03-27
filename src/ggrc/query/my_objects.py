@@ -85,7 +85,7 @@ def get_myobjects_query(types=None, contact_id=None):  # noqa
   def _get_tasks_in_cycle(model):
     """Filter tasks with particular statuses and cycle.
 
-    Filtering tasks with statuses "Assigned", "InProgress" and "Finished".
+    Filtering tasks with statuses "Assigned", "In Progress" and "Finished".
     Where the task is in current users cycle.
     """
     task_query = db.session.query(

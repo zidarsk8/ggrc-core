@@ -82,7 +82,7 @@ class TestStatusApiPost(TestCase):
     db.session.commit()
 
   @ddt.data(u"Assigned",
-            u"InProgress",
+            u"In Progress",
             u"Finished",
             u"Verified",
             u"Declined")
@@ -96,7 +96,7 @@ class TestStatusApiPost(TestCase):
     self.assertEqual(state, task.status)
 
   @ddt.data((u"Assigned", True),
-            (u"InProgress", True),
+            (u"In Progress", True),
             (u"Finished", True),
             (u"Verified", False),
             (u"Declined", False))
@@ -114,7 +114,7 @@ class TestStatusApiPost(TestCase):
       self.assert400(resp)
 
   @ddt.data(u"Assigned",
-            u"InProgress",
+            u"In Progress",
             u"Finished",
             u"Verified")
   def test_state_verified_group(self, state):
@@ -127,7 +127,7 @@ class TestStatusApiPost(TestCase):
     self.assertEqual(state, group.status)
 
   @ddt.data((u"Assigned", True),
-            (u"InProgress", True),
+            (u"In Progress", True),
             (u"Finished", True),
             (u"Verified", False))
   @ddt.unpack
@@ -144,7 +144,7 @@ class TestStatusApiPost(TestCase):
       self.assert400(resp)
 
   @ddt.data(u"Assigned",
-            u"InProgress",
+            u"In Progress",
             u"Finished",
             u"Verified")
   def test_state_verified_cycle(self, state):
@@ -155,7 +155,7 @@ class TestStatusApiPost(TestCase):
     self.assertEqual(state, cycle.status)
 
   @ddt.data((u"Assigned", True),
-            (u"InProgress", True),
+            (u"In Progress", True),
             (u"Finished", True),
             (u"Verified", False))
   @ddt.unpack
@@ -212,8 +212,8 @@ class TestStatusApiPost(TestCase):
     workflow = all_models.Workflow.query.get(resp.json["workflow"]["id"])
     self.assertEqual(flag, workflow.is_verification_needed)
 
-  @ddt.data((u"InProgress", True, True),
-            (u"InProgress", False, True),
+  @ddt.data((u"In Progress", True, True),
+            (u"In Progress", False, True),
             (u"Declined", True, True),
             (u"Verified", True, False),
             (u"Finished", True, True),
