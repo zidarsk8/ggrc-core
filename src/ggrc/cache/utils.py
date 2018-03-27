@@ -209,6 +209,7 @@ def build_cache_status(data, key, expiry_timeout, status):
 
 
 def clear_permission_cache():
+  """Drop cached permissions for all users."""
   if not getattr(settings, 'MEMCACHE_MECHANISM', False):
     return
   client = get_cache_manager().cache_object.memcache_client
