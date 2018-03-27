@@ -295,10 +295,15 @@ import InfoWidget from '../controllers/info_widget_controller';
             'task_group_objects',
             null
           ),
-        object_tasks: TypeFilter('related_objects', 'CycleTaskGroupObjectTask'),
-        approval_tasks: CustomFilter('object_tasks', function (object) {
-          return object.instance.attr('object_approval');
-        }),
+        approval_tasks: Search(function (binding) {
+          return CMS.Models.CycleTaskGroupObjectTask.findAll({
+            object_approval: true,
+            // We only need to check destination_id/type because cycle tasks
+            // are allways mapped through destination
+            'related_destinations.destination_id': binding.instance.id,
+            'related_destinations.destination_type': binding.instance.type,
+          });
+        }, 'CycleTaskGroupObjectTask'),
         workflows: Cross('task_groups', 'workflow'),
         approval_workflows: CustomFilter('workflows', function (binding) {
           return binding.instance.attr('object_approval');

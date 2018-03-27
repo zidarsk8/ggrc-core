@@ -60,7 +60,7 @@
               </a>
               <small><em>Approval applies only to this object and not to mapped objects.</em></small>
               {{#current_user_is_admin}}
-                {{#with_mapping 'object_tasks' instance}}
+                {{#with_mapping 'approval_tasks' instance}}
                 <p>
                   If you wish to change the current reviewer, please click
                   <a href="{{instance.viewLink}}#task_widget/cycle_task_group_object_task/{{object_tasks.0.instance.id}}"
