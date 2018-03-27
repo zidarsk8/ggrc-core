@@ -1275,8 +1275,6 @@ class Resource(ModelView):
     json_obj = ggrc.builder.json.publish(
         obj, properties_to_include or [], inclusion_filter)
     ggrc.builder.json.publish_representation(json_obj)
-    if hasattr(obj, "_json_extras"):
-      json_obj["extras"] = obj._json_extras
     return {model_name: json_obj}
 
   def build_resource_representation(self, obj, extras=None):
