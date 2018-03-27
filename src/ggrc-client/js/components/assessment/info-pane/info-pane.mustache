@@ -298,8 +298,11 @@
                      {cache-content}="true"
                      {pre-render-content}="true"
                      title-text="Related Issues">
-              <related-issues {base-instance}="instance"
-                                    {all-related-snapshots}="mappedSnapshots"></related-issues>
+                {{#instance}}
+                    <related-issues {base-instance}="instance"
+                        {all-related-snapshots}="mappedSnapshots">
+                    </related-issues>
+                {{/instance}}
           </tab-panel>
           <tab-panel {(panels)}="panels"
                      title-text="Other Attributes"
