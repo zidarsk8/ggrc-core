@@ -4,6 +4,7 @@
  */
 
 import tracker from '../../tracker';
+import WorkflowHelpers from '../workflow/workflow-helpers';
 
 describe('GGRC.Components.subTreeWrapper', function () {
   'use strict';
@@ -79,6 +80,34 @@ describe('GGRC.Components.subTreeWrapper', function () {
       undo(null, null, fakeEvent);
 
       expect(vm.setStatus).toHaveBeenCalledWith('test');
+    });
+  });
+
+  describe('setStatus() method', () => {
+    beforeEach(function () {
+      vm.attr('instance', {});
+      spyOn(WorkflowHelpers, 'updateStatus');
+    });
+
+    it('disables component before status updating', function () {
+      vm.setStatus(status);
+      expect(vm.attr('disabled')).toBe(true);
+    });
+
+    it('enables component after status updating', async function (done) {
+      await vm.setStatus(status);
+      expect(vm.attr('disabled')).toBe(false);
+      done();
+    });
+
+    it('updates status for cycle task', async function (done) {
+      const status = 'New State';
+      await vm.setStatus(status);
+      expect(WorkflowHelpers.updateStatus).toHaveBeenCalledWith(
+        vm.attr('instance'),
+        status
+      );
+      done();
     });
   });
 });

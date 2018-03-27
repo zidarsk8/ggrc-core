@@ -51,10 +51,14 @@ import template from './templates/sub-tree-item.mustache';
       },
       title: {
         type: String,
-        get: function () {
-          let instance = this.attr('instance');
-          return instance.title || instance.description_inline ||
-            instance.name || instance.email || '';
+        get() {
+          const instance = this.attr('instance');
+          return (
+            instance.attr('title') ||
+            instance.attr('description_inline') ||
+            instance.attr('name') ||
+            instance.attr('email') || ''
+          );
         },
       },
     },

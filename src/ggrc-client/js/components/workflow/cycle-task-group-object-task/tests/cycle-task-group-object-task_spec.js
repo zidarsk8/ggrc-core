@@ -5,6 +5,7 @@
 
 import Component from '../cycle-task-group-object-task';
 import RefreshQueue from '../../../../models/refresh_queue';
+import WorkflowHelpers from '../../workflow-helpers';
 
 describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
   let viewModel;
@@ -209,48 +210,21 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
     });
 
     describe('onStateChange() method', function () {
-      let refreshDfd;
       let event;
 
       beforeEach(function () {
         event = {};
-        refreshDfd = can.Deferred();
-        viewModel.attr('instance', {
-          refresh: jasmine.createSpy('refresh').and.returnValue(refreshDfd),
-        });
+        viewModel.attr('instance', {});
+        spyOn(WorkflowHelpers, 'updateStatus');
       });
 
-      it('refreshes instance', function () {
+      it('updates status for cycle task', function () {
+        event.state = 'New State';
         viewModel.onStateChange(event);
-        expect(viewModel.attr('instance').refresh).toHaveBeenCalled();
-      });
-
-      describe('when refresh operation was resolved', function () {
-        let refreshed;
-
-        beforeEach(function () {
-          refreshed = new can.Map({
-            save: jasmine.createSpy('save'),
-          });
-          refreshDfd.resolve(refreshed);
-        });
-
-        it('sets status for refreshed instance', function (done) {
-          event.state = 'state';
-          viewModel.onStateChange(event);
-          refreshDfd.then(function () {
-            expect(refreshed.attr('status')).toBe(event.state);
-            done();
-          });
-        });
-
-        it('saves refreshed instance', function (done) {
-          viewModel.onStateChange(event);
-          refreshDfd.then(function () {
-            expect(refreshed.save).toHaveBeenCalled();
-            done();
-          });
-        });
+        expect(WorkflowHelpers.updateStatus).toHaveBeenCalledWith(
+          viewModel.attr('instance'),
+          event.state
+        );
       });
     });
 
