@@ -31,6 +31,7 @@ class Events(Widget):
 class People(Widget):
   """People widget on Admin Dashboard."""
 
+
 class Roles(Widget):
   """Admin roles widget on Admin Dashboard."""
 

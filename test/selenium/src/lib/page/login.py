@@ -7,7 +7,7 @@ from lib.constants import locator
 from lib.page import dashboard
 
 
-class LoginPage(base.Page):
+class LoginPage(base.AbstractPage):
   """Login page model."""
 
   def __init__(self, driver):

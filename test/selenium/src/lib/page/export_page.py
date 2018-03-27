@@ -16,7 +16,7 @@ class ExportPanel(base.Component):
     super(ExportPanel, self).__init__(driver)
 
 
-class ExportPage(base.Page):
+class ExportPage(base.AbstractPage):
   """Export Page."""
   _locators = locator.ExportPage
   _elements = element.ExportPage
