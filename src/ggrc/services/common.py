@@ -55,31 +55,6 @@ logger = getLogger(__name__)
 CACHE_EXPIRY_COLLECTION = 60
 
 
-def get_cache_key(obj, type=None, id=None):
-  """Returns a string identifier for the specified object or stub.
-
-  `obj` can be:
-    <db.Model> -- declarative model instance
-    (type, id) -- tuple
-    { 'type': type, 'id': id } -- dict
-  """
-  if isinstance(obj, tuple):
-    type, id = obj
-  elif isinstance(obj, dict):
-    type = obj.get('type', None)
-    id = obj.get('id', None)
-  if isinstance(type, (str, unicode)):
-    model = ggrc.models.get_model(type)
-    assert model is not None, "Invalid model name: {}".format(type)
-    type = ggrc.models.get_model(type)._inflector.table_plural
-  if not isinstance(obj, (tuple, dict)):
-    if type is None:
-      type = obj._inflector.table_plural
-    if id is None:
-      id = obj.id
-  return 'collection:{type}:{id}'.format(type=type, id=id)
-
-
 def get_cache_class(obj):
   """Returns string name of object's class."""
   return obj.__class__.__name__
@@ -93,7 +68,7 @@ def get_related_keys_for_expiration(context, o):
   if mappings:
     for (cls, attr, polymorph) in mappings:
       if polymorph:
-        key = get_cache_key(
+        key = cache_utils.get_cache_key(
             None,
             type=getattr(o, '{0}_type'.format(attr)),
             id=getattr(o, '{0}_id'.format(attr)))
@@ -103,10 +78,10 @@ def get_related_keys_for_expiration(context, o):
         if obj:
           if isinstance(obj, list):
             for inner_o in obj:
-              key = get_cache_key(inner_o)
+              key = cache_utils.get_cache_key(inner_o)
               keys.append(key)
           else:
-            key = get_cache_key(obj)
+            key = cache_utils.get_cache_key(obj)
             keys.append(key)
   return keys
 
@@ -146,7 +121,7 @@ def memcache_mark_for_deletion(context, objects_to_mark):
   for o, _ in objects_to_mark:
     cls = get_cache_class(o)
     if cls in context.cache_manager.supported_classes:
-      key = get_cache_key(o)
+      key = cache_utils.get_cache_key(o)
       context.cache_manager.marked_for_delete.append(key)
       context.cache_manager.marked_for_delete.extend(
           get_related_keys_for_expiration(context, o))
@@ -986,7 +961,7 @@ class Resource(ModelView):
     # Skip right to memcache
     memcache_client = self.request.cache_manager.cache_object.memcache_client
     for match in matches:
-      key = get_cache_key(None, id=match[0], type=match[1])
+      key = cache_utils.get_cache_key(None, id=match[0], type=match[1])
       val = memcache_client.get(key)
       if val:
         val = json.loads(val)
@@ -1004,13 +979,15 @@ class Resource(ModelView):
     for match, obj in match_obj_pairs.items():
       if obj.__class__.__name__ in cache_manager.supported_classes:
         memcache_client.add(
-            get_cache_key(None, id=match[0], type=match[1]),
+            cache_utils.get_cache_key(None, id=match[0], type=match[1]),
             as_json(obj))
 
   def invalidate_cache_to(self, obj):
     """Invalidate api cache for sent object."""
     memcache_client = self.request.cache_manager.cache_object.memcache_client
-    memcache_client.delete(get_cache_key(None, id=obj.id, type=obj.type))
+    memcache_client.delete(
+        cache_utils.get_cache_key(None, id=obj.id, type=obj.type),
+    )
 
   def json_create(self, obj, src):
     ggrc.builder.json.create(obj, src)
