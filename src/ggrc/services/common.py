@@ -45,6 +45,7 @@ from ggrc.services import signals
 from ggrc.models.background_task import BackgroundTask, create_task
 from ggrc.query import utils as query_utils
 from ggrc import settings
+from ggrc.cache import utils as cache_utils
 
 
 # pylint: disable=invalid-name
@@ -52,14 +53,6 @@ logger = getLogger(__name__)
 
 
 CACHE_EXPIRY_COLLECTION = 60
-
-
-def _get_cache_manager():
-  """Returns an instance of CacheManager."""
-  from ggrc.cache import CacheManager, MemCache
-  cache_manager = CacheManager()
-  cache_manager.initialize(MemCache())
-  return cache_manager
 
 
 def get_cache_key(obj, type=None, id=None):
@@ -177,7 +170,7 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
   if getattr(settings, 'MEMCACHE_MECHANISM', False) is False:
     return
 
-  context.cache_manager = _get_cache_manager()
+  context.cache_manager = cache_utils.get_cache_manager()
 
   if modified_objects is not None:
     if modified_objects.new:
@@ -300,7 +293,7 @@ def update_snapshot_index(session, cache):
 def clear_permission_cache():
   if not getattr(settings, 'MEMCACHE_MECHANISM', False):
     return
-  cache = _get_cache_manager().cache_object.memcache_client
+  cache = cache_utils.get_cache_manager().cache_object.memcache_client
   cached_keys_set = cache.get('permissions:list') or set()
   cached_keys_set.add('permissions:list')
   # We delete all the cached user permissions as well as
@@ -897,7 +890,7 @@ class Resource(ModelView):
   def get_matched_resources(self, matches):
     cache_objs = {}
     if self.has_cache():
-      self.request.cache_manager = _get_cache_manager()
+      self.request.cache_manager = cache_utils.get_cache_manager()
       with benchmark("Query cache for resources"):
         cache_objs = self.get_resources_from_cache(matches)
       database_matches = [m for m in matches if m not in cache_objs]
