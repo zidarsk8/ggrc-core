@@ -135,7 +135,10 @@ class TestDocument(TestCase):
             'type': 'Control'
         })
     self.assertEqual(len(control.documents), 1)
+
+    # data from dummy_gdrive_response
     self.assertEqual(control.document_evidence[0].title, 'test_name')
+    self.assertEqual(control.document_evidence[0].gdrive_id, '1234567')
 
   def test_rename_document(self):
     """Test rename document."""
