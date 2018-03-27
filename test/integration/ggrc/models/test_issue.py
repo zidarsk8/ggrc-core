@@ -304,7 +304,7 @@ class TestIssueUnmap(TestCase):
   def test_issue_cascade_unmap(self):
     """Test cascade unmapping Issue from Assessment"""
     unmap_rel1 = all_models.Relationship.query.get(self.unmap_rel_id1)
-    response = self.generator.api.delete(unmap_rel1, {"cascade": "true"})
+    response = self.generator.api.delete(unmap_rel1, args={"cascade": "true"})
     self.assert200(response)
 
     snap0_issue_rel = self.get_relationships(
@@ -318,7 +318,7 @@ class TestIssueUnmap(TestCase):
     self.assertEqual(all_models.Relationship.query.count(), 8)
 
     unmap_rel2 = all_models.Relationship.query.get(self.unmap_rel_id2)
-    response = self.generator.api.delete(unmap_rel2, {"cascade": "true"})
+    response = self.generator.api.delete(unmap_rel2, args={"cascade": "true"})
     self.assert200(response)
 
     issue = all_models.Issue.query.get(self.issue_id)
@@ -345,11 +345,11 @@ class TestIssueUnmap(TestCase):
     db.session.commit()
 
     unmap_rel1 = all_models.Relationship.query.get(self.unmap_rel_id1)
-    response = self.generator.api.delete(unmap_rel1, {"cascade": "true"})
+    response = self.generator.api.delete(unmap_rel1, args={"cascade": "true"})
     self.assert200(response)
 
     unmap_rel2 = all_models.Relationship.query.get(self.unmap_rel_id2)
-    response = self.generator.api.delete(unmap_rel2, {"cascade": "true"})
+    response = self.generator.api.delete(unmap_rel2, args={"cascade": "true"})
     self.assert200(response)
 
     # No Issue-Snapshot, no Issue-Audit relationships should be removed
@@ -380,13 +380,13 @@ class TestIssueUnmap(TestCase):
     db.session.commit()
 
     unmap_rel1 = all_models.Relationship.query.get(self.unmap_rel_id1)
-    response = self.generator.api.delete(unmap_rel1, {"cascade": "true"})
+    response = self.generator.api.delete(unmap_rel1, args={"cascade": "true"})
     self.assert200(response)
     # Snapshot is unmapped in cascade as it's automapped
     self.assertEqual(all_models.Relationship.query.count(), 8)
 
     unmap_rel2 = all_models.Relationship.query.get(self.unmap_rel_id2)
-    response = self.generator.api.delete(unmap_rel2, {"cascade": "true"})
+    response = self.generator.api.delete(unmap_rel2, args={"cascade": "true"})
     self.assert200(response)
 
     snap1_issue_rel = self.get_relationships(
