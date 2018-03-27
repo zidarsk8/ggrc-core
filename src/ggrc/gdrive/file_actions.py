@@ -38,7 +38,9 @@ def hande_http_error(ex):
   if ex.resp.status == 401:
     raise Unauthorized(message)
   if ex.resp.status == 400:
-    raise BadRequest(message + " Probably the file is of a wrong type.")
+    logger.warning(message)
+    raise BadRequest("The file is not in a recognized format. " +
+                     "Please import a Google sheet or a file in .csv format.")
   raise InternalServerError(message)
 
 

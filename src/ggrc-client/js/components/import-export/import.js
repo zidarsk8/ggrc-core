@@ -179,7 +179,7 @@ export default can.Component.extend({
           checkObj.hasDeprecations
         );
     },
-    beforeProcess: function (check, data, element) {
+    beforeProcess: function (check, data) {
       let operation;
       let needWarning = this.needWarning(check, data);
 
@@ -199,7 +199,7 @@ export default can.Component.extend({
           }.bind(this),
           function () {
             this.attr('state', 'import');
-            this.resetFile(element);
+            this.resetFile();
           }.bind(this)
         );
         return;
@@ -222,7 +222,7 @@ export default can.Component.extend({
         past: pastForm,
       };
     },
-    resetFile: function (element) {
+    resetFile: function () {
       this.attr({
         state: 'select',
         fileId: '',
@@ -231,7 +231,6 @@ export default can.Component.extend({
         message: '',
         'import': null,
       });
-      element.find('.csv-upload').val('');
     },
     requestImport: function (file) {
       this.attr('state', 'analyzing');
@@ -252,6 +251,7 @@ export default can.Component.extend({
         }.bind(this))
         .fail(function (data) {
           this.attr('state', 'select');
+          this.attr('importStatus', 'error');
 
           if (data && data.responseJSON && data.responseJSON.message) {
             GGRC.Errors.notifier('error', data.responseJSON.message);
@@ -268,8 +268,10 @@ export default can.Component.extend({
       let allowedTypes = ['text/csv', 'application/vnd.google-apps.document',
         'application/vnd.google-apps.spreadsheet'];
 
+      this.resetFile();
+
       return gapiClient.authorizeGapi(['https://www.googleapis.com/auth/drive'])
-        .then(()=> {
+        .then(() => {
           gapi.load('picker', {callback: createPicker});
         });
 
@@ -314,9 +316,11 @@ export default can.Component.extend({
           })) {
             that.requestImport(file);
           } else {
+            that.attr('fileName', file.name);
+            that.attr('importStatus', 'error');
             GGRC.Errors.notifier('error',
-              'Something other than a csv-file was chosen. ' +
-              'Please choose a csv-file.');
+              'The file is not in a recognized format. ' +
+              'Please import a Google sheet or a file in .csv format.');
           }
         }
       }
@@ -325,8 +329,7 @@ export default can.Component.extend({
   events: {
     '.state-reset click': function (el, ev) {
       ev.preventDefault();
-      this.viewModel.selectFile();
-      this.viewModel.resetFile(this.element);
+      this.viewModel.selectFile(this.element);
     },
     '.state-import click': function (el, ev) {
       ev.preventDefault();
@@ -356,7 +359,7 @@ export default can.Component.extend({
     },
     '#import_btn.state-select click': function (el, ev) {
       ev.preventDefault();
-      this.viewModel.selectFile();
+      this.viewModel.selectFile(this.element);
     },
   },
 });
