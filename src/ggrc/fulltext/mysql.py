@@ -61,6 +61,12 @@ class MysqlIndexer(SqlIndexer):
     """Prepare the query based on the allowed contexts and resources for
      each of the required objects(models).
     """
+    if not model_names:
+      # If there are no model names set, the result of the permissions query
+      # will always be false, so we can just return false instead of having an
+      # empty in statement combined with an empty list joined by or statement.
+      return sa.false()
+
     type_queries = []
     for model_name in model_names:
       contexts, resources = permissions.get_context_resource(
@@ -80,7 +86,8 @@ class MysqlIndexer(SqlIndexer):
 
     return sa.and_(
         MysqlRecordProperty.type.in_(model_names),
-        sa.or_(*type_queries))
+        sa.or_(*type_queries)
+    )
 
   @staticmethod
   def search_get_owner_query(query, types=None, contact_id=None):
