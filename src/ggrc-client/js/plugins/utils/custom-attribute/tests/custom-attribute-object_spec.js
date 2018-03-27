@@ -373,30 +373,75 @@ describe('CustomAttributeObject module', () => {
       });
 
     it('returns passed value by default if custom attribute type is ' +
-    'not recognizable', function () {
+    'not caDefTypeName.MapPerson or caDefTypeName.CheckBox', () => {
+      const attrTypes = [
+        caDefTypeName.Text, caDefTypeName.RichText, caDefTypeName.Input,
+        caDefTypeName.Dropdown, caDefTypeName.Date,
+      ];
       const value = {};
-      const result = caObject._prepareAttributeValue(value);
-      expect(result).toBe(value);
+      attrTypes.forEach((attrType) => {
+        caDef.attr('attribute_type', attrType);
+        const result = caObject._prepareAttributeValue(value);
+        expect(result).toBe(value);
+      });
+    });
+
+    it('returns default value for custom attribute type from ' +
+    'attribute definitions if no value was passed', () => {
+      const attrDefs = [
+        {type: caDefTypeName.Text, value: 'text'},
+        {type: caDefTypeName.RichText, value: 'rich text'},
+        {type: caDefTypeName.Input, value: 'input'},
+        {type: caDefTypeName.Dropdown, value: 'dropdown'},
+        {type: caDefTypeName.Date, value: 'date'},
+      ];
+      attrDefs.forEach((attrDef) => {
+        caDef.attr('attribute_type', attrDef.type);
+        caDef.attr('default_value', attrDef.value);
+        const result = caObject._prepareAttributeValue();
+        expect(result).toBe(attrDef.value);
+      });
     });
   });
 
   describe('_prepareAttributeObject() method', () => {
     it('returns a stub for the person if custom attribute has ' +
     'caDefTypeName.MapPerson type', function () {
-      let result;
       const stub = {
         id: 12345,
         type: 'Person',
       };
       caDef.attr('attribute_type', caDefTypeName.MapPerson);
-      result = caObject._prepareAttributeObject(stub.id);
+      const result = caObject._prepareAttributeObject(stub.id);
       expect(result).toEqual(stub);
+    });
+
+    it('returns default value if custom attribute has ' +
+    'caDefTypeName.MapPerson type but value is not recognized', () => {
+      const defValue = 'default value';
+      caDef.attr('attribute_type', caDefTypeName.MapPerson);
+      caDef.attr('default_value', defValue);
+      const result = caObject._prepareAttributeObject();
+      expect(result).toEqual(defValue);
     });
 
     it('returns null by default if custom attribute type is ' +
     'not recognizable', function () {
       const result = caObject._prepareAttributeObject();
       expect(result).toBeNull();
+    });
+
+    it('returns null by default if custom attribute type is ' +
+      'not caDefTypeName.MapPerson', function () {
+      const attrTypes = [
+        caDefTypeName.Text, caDefTypeName.RichText, caDefTypeName.Input,
+        caDefTypeName.Dropdown, caDefTypeName.Date, caDefTypeName.Checkbox,
+      ];
+      attrTypes.forEach((attrType) => {
+        caDef.attr('attribute_type', attrType);
+        const result = caObject._prepareAttributeObject();
+        expect(result).toBeNull();
+      });
     });
   });
 

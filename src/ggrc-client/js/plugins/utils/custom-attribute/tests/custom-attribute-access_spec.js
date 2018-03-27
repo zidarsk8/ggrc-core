@@ -279,16 +279,19 @@ describe('CustomAttributeAccess module', () => {
       });
 
     it('builds an empty custom attribute value objects for ca definitions' +
-    'if these values do not exist', function () {
-      let caObjects;
-      instance.attr('custom_attribute_definitions', [
-        {id: 1},
-        {id: 2},
-        {id: 3},
-      ]);
-      caObjects = caAccess._buildCaObjects();
+    'if these values do not exist', () => {
+      const caDefs = [
+        {id: 1, default_value: ''},
+        {id: 2, default_value: '0'},
+        {id: 3, default_value: null},
+      ];
+      instance.attr('custom_attribute_definitions', caDefs);
+      const caObjects = caAccess._buildCaObjects();
+      expect(caObjects.size).toBe(caDefs.length);
       caObjects.forEach((caObject) => {
-        expect(caObject.value).toBe('');
+        const caId = caObject.customAttributeId;
+        const caDef = caDefs.find((caDef) => caDef.id === caId);
+        expect(caObject.value).toBe(caDef.default_value);
       });
     });
   });
