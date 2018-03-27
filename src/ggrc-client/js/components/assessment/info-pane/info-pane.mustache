@@ -286,11 +286,13 @@
                      {parent-instance}="instance"
                      {pre-render-content}="true"
                      title-text="Related Assessments">
-            <related-assessments {instance}="instance"
-                                 {evidences}="evidences"
-                                 {urls}="urls"
-                                 (after-object-reused)="updateItems('evidences', 'urls')">
-            </related-assessments>
+            {{#instance}}
+                <related-assessments {instance}="instance"
+                                    {evidences}="evidences"
+                                    {urls}="urls"
+                                    (after-object-reused)="updateItems('evidences', 'urls')">
+                </related-assessments>
+            {{/instance}}
           </tab-panel>
           <tab-panel {(panels)}="panels"
                      {cache-content}="true"
