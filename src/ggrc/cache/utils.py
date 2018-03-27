@@ -211,9 +211,9 @@ def build_cache_status(data, key, expiry_timeout, status):
 def clear_permission_cache():
   if not getattr(settings, 'MEMCACHE_MECHANISM', False):
     return
-  cache = get_cache_manager().cache_object.memcache_client
-  cached_keys_set = cache.get('permissions:list') or set()
+  client = get_cache_manager().cache_object.memcache_client
+  cached_keys_set = client.get('permissions:list') or set()
   cached_keys_set.add('permissions:list')
   # We delete all the cached user permissions as well as
   # the permissions:list value itself
-  cache.delete_multi(cached_keys_set)
+  client.delete_multi(cached_keys_set)
