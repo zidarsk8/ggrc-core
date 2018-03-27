@@ -22,7 +22,7 @@ def get_cache_manager():
   return cache_manager
 
 
-def get_cache_key(obj, type=None, id=None):
+def get_cache_key(obj, type_=None, id_=None):
   """Returns a string identifier for the specified object or stub.
 
   `obj` can be:
@@ -31,20 +31,20 @@ def get_cache_key(obj, type=None, id=None):
     { 'type': type, 'id': id } -- dict
   """
   if isinstance(obj, tuple):
-    type, id = obj
+    type_, id_ = obj
   elif isinstance(obj, dict):
-    type = obj.get('type', None)
-    id = obj.get('id', None)
-  if isinstance(type, (str, unicode)):
-    model = ggrc.models.get_model(type)
-    assert model is not None, "Invalid model name: {}".format(type)
-    type = ggrc.models.get_model(type)._inflector.table_plural
+    type_ = obj.get('type', None)
+    id_ = obj.get('id', None)
+  if isinstance(type_, (str, unicode)):
+    model = ggrc.models.get_model(type_)
+    assert model is not None, "Invalid model name: {}".format(type_)
+    type_ = ggrc.models.get_model(type_)._inflector.table_plural
   if not isinstance(obj, (tuple, dict)):
-    if type is None:
-      type = obj._inflector.table_plural
-    if id is None:
-      id = obj.id
-  return 'collection:{type}:{id}'.format(type=type, id=id)
+    if type_ is None:
+      type_ = obj._inflector.table_plural
+    if id_ is None:
+      id_ = obj.id
+  return 'collection:{type_}:{id_}'.format(type_=type_, id_=id_)
 
 
 def get_cache_class(obj):
@@ -62,8 +62,8 @@ def get_related_keys_for_expiration(context, o):
       if polymorph:
         key = get_cache_key(
             None,
-            type=getattr(o, '{0}_type'.format(attr)),
-            id=getattr(o, '{0}_id'.format(attr)))
+            type_=getattr(o, '{0}_type'.format(attr)),
+            id_=getattr(o, '{0}_id'.format(attr)))
         keys.append(key)
       else:
         obj = getattr(o, attr, None)

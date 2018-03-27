@@ -789,7 +789,7 @@ class Resource(ModelView):
     # Skip right to memcache
     memcache_client = self.request.cache_manager.cache_object.memcache_client
     for match in matches:
-      key = cache_utils.get_cache_key(None, id=match[0], type=match[1])
+      key = cache_utils.get_cache_key(None, id_=match[0], type_=match[1])
       val = memcache_client.get(key)
       if val:
         val = json.loads(val)
@@ -807,14 +807,14 @@ class Resource(ModelView):
     for match, obj in match_obj_pairs.items():
       if obj.__class__.__name__ in cache_manager.supported_classes:
         memcache_client.add(
-            cache_utils.get_cache_key(None, id=match[0], type=match[1]),
+            cache_utils.get_cache_key(None, id_=match[0], type_=match[1]),
             as_json(obj))
 
   def invalidate_cache_to(self, obj):
     """Invalidate api cache for sent object."""
     memcache_client = self.request.cache_manager.cache_object.memcache_client
     memcache_client.delete(
-        cache_utils.get_cache_key(None, id=obj.id, type=obj.type),
+        cache_utils.get_cache_key(None, id_=obj.id, type_=obj.type),
     )
 
   def json_create(self, obj, src):
