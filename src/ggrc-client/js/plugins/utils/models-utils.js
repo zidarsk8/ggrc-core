@@ -5,6 +5,8 @@
 
 import RefreshQueue from '../../models/refresh_queue';
 
+const relatedAssessmentsTypes = Object.freeze(['Control', 'Objective']);
+
 const getModelInstance = (id, type, requiredAttr) => {
   const promise = new Promise((resolve, reject) => {
     let modelInstance;
@@ -37,6 +39,17 @@ const getModelInstance = (id, type, requiredAttr) => {
   return promise;
 };
 
+/**
+ * Check the model has Related Assessments
+ * @param {String} type - model type
+ * @return {Boolean}
+ */
+const hasRelatedAssessments = (type) => {
+  return _.contains(relatedAssessmentsTypes, type);
+};
+
 export {
   getModelInstance,
+  hasRelatedAssessments,
+  relatedAssessmentsTypes,
 };
