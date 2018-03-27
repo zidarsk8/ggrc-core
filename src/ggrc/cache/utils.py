@@ -57,24 +57,24 @@ def get_related_keys_for_expiration(context, o):
   cls = get_cache_class(o)
   keys = []
   mappings = context.cache_manager.supported_mappings.get(cls, [])
-  if mappings:
-    for (cls, attr, polymorph) in mappings:
-      if polymorph:
-        key = get_cache_key(
-            None,
-            type_=getattr(o, '{0}_type'.format(attr)),
-            id_=getattr(o, '{0}_id'.format(attr)))
-        keys.append(key)
-      else:
-        obj = getattr(o, attr, None)
-        if obj:
-          if isinstance(obj, list):
-            for inner_o in obj:
-              key = get_cache_key(inner_o)
-              keys.append(key)
-          else:
-            key = get_cache_key(obj)
+
+  for (cls, attr, polymorph) in mappings:
+    if polymorph:
+      key = get_cache_key(
+          None,
+          type_=getattr(o, '{0}_type'.format(attr)),
+          id_=getattr(o, '{0}_id'.format(attr)))
+      keys.append(key)
+    else:
+      obj = getattr(o, attr, None)
+      if obj:
+        if isinstance(obj, list):
+          for inner_o in obj:
+            key = get_cache_key(inner_o)
             keys.append(key)
+        else:
+          key = get_cache_key(obj)
+          keys.append(key)
   return keys
 
 
