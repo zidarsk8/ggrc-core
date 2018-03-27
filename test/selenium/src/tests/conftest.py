@@ -7,7 +7,7 @@
 
 import pytest
 
-from lib import dynamic_fixtures
+from lib import dynamic_fixtures, url
 from lib.page import dashboard
 from lib.service import rest_service
 from lib.utils import selenium_utils, help_utils
@@ -116,7 +116,7 @@ def base_url(base_url):
 def my_work_dashboard(selenium):
   """Open My Work Dashboard URL and
   return My Work Dashboard page objects model."""
-  selenium_utils.open_url(selenium, dashboard.Dashboard.URL)
+  selenium_utils.open_url(selenium, url.Urls().dashboard)
   return dashboard.Dashboard(selenium)
 
 
@@ -124,7 +124,7 @@ def my_work_dashboard(selenium):
 def header_dashboard(selenium):
   """Open My Work Dashboard URL and
   return Header Dashboard page objects model."""
-  selenium_utils.open_url(selenium, dashboard.Dashboard.URL)
+  selenium_utils.open_url(selenium, url.Urls().dashboard)
   return dashboard.Header(selenium)
 
 

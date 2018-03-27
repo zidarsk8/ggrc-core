@@ -8,8 +8,8 @@
 
 import pytest  # pylint: disable=import-error
 
-from lib import base
-from lib.constants import objects, url
+from lib import base, url
+from lib.constants import objects
 from lib.page import dashboard, lhn
 from lib.page.widget import generic_widget
 from lib.utils import selenium_utils
@@ -42,7 +42,7 @@ class TestMyWorkPage(base.Test):
     """Tests if user is redirected to My Work page after clicking on
     the my work button in user dropdown."""
     header_dashboard.select_my_work()
-    expected_url = dashboard.Dashboard.URL + url.Widget.INFO
+    expected_url = url.Urls().dashboard + url.Widget.INFO
     actual_url = selenium.current_url
     assert expected_url == actual_url
 
@@ -67,7 +67,7 @@ class TestMyWorkPage(base.Test):
     lhn_menu.select_my_objects()
     header_dashboard.close_lhn_menu()
     header_dashboard.open_user_list()
-    selenium.get(dashboard.Dashboard.URL)
+    selenium.get(url.Urls().dashboard)
     new_lhn_menu = dashboard.Header(selenium).open_lhn_menu()
     assert selenium_utils.is_value_in_attr(
         new_lhn_menu.my_objects.element) is True

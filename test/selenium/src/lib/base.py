@@ -11,8 +11,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote import webelement
 from selenium.common import exceptions
 
-from lib import constants, exception, mixin
-from lib.constants import messages, objects, url
+from lib import constants, exception, mixin, url
+from lib.constants import messages, objects
 from lib.constants.element import MappingStatusAttrs
 from lib.constants.locator import CommonDropdownMenu
 from lib.decorator import lazy_property
@@ -449,7 +449,6 @@ class AbstractPage(Component):
 class Page(AbstractPage):
   """Page class represents components with special properties i.e. they
  have *static* URL-s, can be navigated to etc."""
-  URL = None
 
   def __init__(self, driver):
     """

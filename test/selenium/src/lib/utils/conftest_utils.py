@@ -2,14 +2,14 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """PyTest fixture utils."""
 
-from lib import cache, constants, factory
+from lib import cache, constants, factory, url
 from lib.page import dashboard
 from lib.utils import selenium_utils
 
 
 def get_lhn_accordion(driver, object_name):
   """Select relevant section in LHN and return relevant section accordion."""
-  selenium_utils.open_url(driver, dashboard.Dashboard.URL)
+  selenium_utils.open_url(driver, url.Urls().dashboard)
   lhn_menu = dashboard.Header(driver).open_lhn_menu()
   # if object button not visible, open this section first
   if object_name in cache.LHN_SECTION_MEMBERS:
