@@ -7,6 +7,7 @@ description = """
   """
 permissions = {
     "read": [
+        "AccessControlRole",
         "Workflow",
         "TaskGroup",
         "TaskGroupObject",
