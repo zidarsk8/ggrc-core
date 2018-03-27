@@ -552,7 +552,9 @@
           </tab-panel>
 
           <tab-panel {(panels)}="panels" title-text="Change Log">
-              <revision-log {instance}="instance"></revision-log>
+              {{#instance}}
+                <revision-log {instance}="instance"></revision-log>
+              {{/instance}}
           </tab-panel>
       </tab-container>
     </div><!-- tier-content end -->
