@@ -303,7 +303,7 @@ import InfoWidget from '../controllers/info_widget_controller';
             'related_destinations.destination_id': binding.instance.id,
             'related_destinations.destination_type': binding.instance.type,
           });
-        }, 'CycleTaskGroupObjectTask'),
+        }),
         workflows: Cross('task_groups', 'workflow'),
         approval_workflows: CustomFilter('workflows', function (binding) {
           return binding.instance.attr('object_approval');
