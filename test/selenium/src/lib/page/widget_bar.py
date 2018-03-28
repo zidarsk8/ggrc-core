@@ -146,13 +146,6 @@ class AdminDashboard(_WidgetBar):
     self.tab_custom_roles = widget_bar.Tab(
         self._driver, locator.WidgetBar.ADMIN_CUSTOM_ATTRIBUTE)
 
-  def select_people(self):
-    """
-    Return: lib.page.widget.admin_widget.People
-    """
-    self.tab_people.click()
-    return admin_widget.People(self._driver)
-
   def select_roles(self):
     """
     Return: lib.page.widget.admin_widget.Roles

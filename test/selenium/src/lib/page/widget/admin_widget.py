@@ -28,10 +28,6 @@ class Events(Widget):
     return self._driver.find_elements(*self._locators.TREE_VIEW_ITEMS)
 
 
-class People(Widget):
-  """People widget on Admin Dashboard."""
-
-
 class Roles(Widget):
   """Admin roles widget on Admin Dashboard."""
 
