@@ -15,6 +15,7 @@ describe('ApprovalWorkflow', ()=> {
     let currentUser;
     let assigneeRole;
     let wfAdminRole;
+    let awBinding;
 
     beforeAll(()=> {
       assigneeRole = {
@@ -42,12 +43,14 @@ describe('ApprovalWorkflow', ()=> {
     });
 
     beforeEach(()=> {
-      let awBinding;
       let instance;
 
       awsDfd = new can.Deferred();
       awBinding = {
         refresh_list: jasmine.createSpy().and.returnValue(awsDfd),
+        loader: {
+          refresh_list: jasmine.createSpy(),
+        },
       };
       originalObject = {
         get_binding: jasmine.createSpy().and.returnValue(awBinding),
@@ -196,7 +199,7 @@ describe('ApprovalWorkflow', ()=> {
         });
       });
 
-      it('reloads original object', ()=> {
+      it('reloads approval mapping binding object', ()=> {
         const tg = {};
         const wf = {
           context: {},
@@ -208,7 +211,8 @@ describe('ApprovalWorkflow', ()=> {
         saveTgoDfd.resolve();
         saveCycleDfd.resolve();
 
-        expect(originalObject.refresh).toHaveBeenCalled();
+        expect(originalObject.get_binding).toHaveBeenCalled();
+        expect(awBinding.loader.refresh_list).toHaveBeenCalled();
       });
     });
 
@@ -310,13 +314,16 @@ describe('ApprovalWorkflow', ()=> {
         });
       });
 
-      it('reloads original object', ()=> {
+      it('reloads approval_tasks mapping binding object', ()=> {
+        let binding = originalObject.get_binding;
+
         saveTgDfd.resolve(tg);
         refreshTgtDfd.resolve(tgt);
         saveTgtDfd.resolve();
         saveCycleDfd.resolve();
 
-        expect(originalObject.refresh).toHaveBeenCalled();
+        expect(binding).toHaveBeenCalledWith('approval_tasks');
+        expect(awBinding.loader.refresh_list).toHaveBeenCalled();
       });
     });
   });
