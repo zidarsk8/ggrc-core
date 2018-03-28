@@ -3,7 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {DESTINATION_UNMAPPED} from '../../events/eventTypes';
+import {
+  DESTINATION_UNMAPPED,
+  REFRESH_SUB_TREE,
+} from '../../events/eventTypes';
 import template from './templates/sub-tree-wrapper.mustache';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
@@ -179,6 +182,15 @@ import childModelsMap from './child-models-map';
           });
         }.bind(this));
     },
+    refreshItems() {
+      if (this.attr('isOpen')) {
+        this.loadItems();
+      } else {
+        // mark the sub tree items should be refreshed,
+        // when sub tree will be open
+        this.attr('dataIsReady', false);
+      }
+    },
     collapseAfterUnmap: function () {
       // unbind 'destinationUnmapped' event
       this.attr('directlyItems').forEach((item) => {
@@ -209,6 +221,9 @@ import childModelsMap from './child-models-map';
       inserted() {
         let parents = this.element.parents('sub-tree-wrapper');
         this.viewModel.attr('deepLevel', parents.length);
+      },
+      [`{viewModel.parent} ${REFRESH_SUB_TREE.type}`]() {
+        this.viewModel.refreshItems();
       },
     },
   });
