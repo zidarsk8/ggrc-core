@@ -4,8 +4,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        CHROME_DRIVER_VERSION: "2.33"
     volumes:
      - ".:/vagrant"
     ports:
