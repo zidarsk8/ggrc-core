@@ -4,6 +4,7 @@
 # pylint: disable=invalid-name
 # pylint: disable=global-variable-not-assigned
 # pylint: disable=unused-argument
+# pylint: disable=redefined-outer-name
 
 import pytest
 
