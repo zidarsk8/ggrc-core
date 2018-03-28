@@ -11,6 +11,7 @@ from ggrc.models import all_models
 from ggrc.models.hooks import issue_tracker
 from ggrc.integrations import issues as issues_module
 from ggrc.integrations import utils
+from ggrc.access_control.role import AccessControlRole
 
 from integration.ggrc.models import factories
 from integration.ggrc import generator
@@ -79,6 +80,40 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                                              'priority': u'P4',
                                              'type': None,
                                              'severity': u'S3'})
+
+  # pylint: disable=unused-argument
+  @patch('ggrc.integrations.issues.Client.update_issue')
+  def test_update_issuetracker_assignee(self, mocked_update_issue):
+    """Test assignee sync in case it has been updated."""
+    email1 = "email1@example.com"
+    email2 = "email2@example.com"
+    assignee_role_id = AccessControlRole.query.filter_by(
+        object_type="Assessment",
+        name="Assignees"
+    ).first().id
+    assignees = [factories.PersonFactory(email=email2),
+                 factories.PersonFactory(email=email1)]
+    iti_issue_id = []
+    iti = factories.IssueTrackerIssueFactory(enabled=True)
+    iti_issue_id.append(iti.issue_id)
+    asmt = iti.issue_tracked_obj
+    with patch.object(issue_tracker, '_is_issue_tracker_enabled',
+                      return_value=True):
+      acl = [acl_helper.get_acl_json(assignee_role_id, assignee.id)
+             for assignee in assignees]
+      self.api.put(asmt, {
+          "access_control_list": acl
+      })
+      kwargs = {'status': 'ASSIGNED',
+                'component_id': None,
+                'severity': None,
+                'title': iti.title,
+                'hotlist_ids': [],
+                'priority': None,
+                'assignee': email1,
+                'verifier': email1,
+                'cc_list': [email2]}
+      mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
 
 
 @patch("ggrc.models.hooks.issue_tracker._is_issue_tracker_enabled",
