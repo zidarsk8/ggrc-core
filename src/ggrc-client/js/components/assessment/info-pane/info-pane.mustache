@@ -286,18 +286,23 @@
                      {parent-instance}="instance"
                      {pre-render-content}="true"
                      title-text="Related Assessments">
-            <related-assessments {instance}="instance"
-                                 {evidences}="evidences"
-                                 {urls}="urls"
-                                 (after-object-reused)="updateItems('evidences', 'urls')">
-            </related-assessments>
+            {{#instance}}
+                <related-assessments {instance}="instance"
+                                    {evidences}="evidences"
+                                    {urls}="urls"
+                                    (after-object-reused)="updateItems('evidences', 'urls')">
+                </related-assessments>
+            {{/instance}}
           </tab-panel>
           <tab-panel {(panels)}="panels"
                      {cache-content}="true"
                      {pre-render-content}="true"
                      title-text="Related Issues">
-              <related-issues {base-instance}="instance"
-                                    {all-related-snapshots}="mappedSnapshots"></related-issues>
+                {{#instance}}
+                    <related-issues {base-instance}="instance"
+                        {all-related-snapshots}="mappedSnapshots">
+                    </related-issues>
+                {{/instance}}
           </tab-panel>
           <tab-panel {(panels)}="panels"
                      title-text="Other Attributes"
@@ -552,7 +557,9 @@
           </tab-panel>
 
           <tab-panel {(panels)}="panels" title-text="Change Log">
-              <revision-log {instance}="instance"></revision-log>
+              {{#instance}}
+                <revision-log {instance}="instance"></revision-log>
+              {{/instance}}
           </tab-panel>
       </tab-container>
     </div><!-- tier-content end -->
