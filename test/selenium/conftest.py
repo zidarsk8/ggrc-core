@@ -68,12 +68,19 @@ def pytest_runtest_makereport(item, call):
   report.extra = extra
 
 
+def pytest_addoption(parser):
+  """Add support for headless option to pytest-selenium."""
+  parser.addoption('--headless',
+                   action='store',
+                   help='enable headless mode for supported browsers.')
+
+
 @pytest.fixture(scope="function")
-def selenium(selenium):
-  """Create Web Driver instance and setup test resources for running test
-  in headless mode.
-  """
-  selenium.set_window_size(1440, 900)
+def selenium(selenium, pytestconfig):
+  """Create Web Driver instance."""
+  if not selenium_utils.is_headless_chrome(pytestconfig):
+    selenium.set_window_size(
+        os.environ["SCREEN_WIDTH"], os.environ["SCREEN_HEIGHT"])
   dynamic_fixtures.dict_executed_fixtures.update({"selenium": selenium})
   yield selenium
 
@@ -97,12 +104,12 @@ def create_tmp_dir(tmpdir_factory, request):
 
 
 @pytest.fixture
-def chrome_options(chrome_options, create_tmp_dir):
+def chrome_options(chrome_options, pytestconfig):
   """Set configuration to run Chrome with specific options."""
-  prefs = {"download.default_directory": create_tmp_dir,
-           "download.prompt_for_download": False}
-  chrome_options.add_experimental_option("prefs", prefs)
-  chrome_options.add_argument("--start-maximized")
+  if selenium_utils.is_headless_chrome(pytestconfig):
+    chrome_options.set_headless(True)
+    chrome_options.add_argument("window-size={},{}".format(
+        os.environ["SCREEN_WIDTH"], os.environ["SCREEN_HEIGHT"]))
   return chrome_options
 
 

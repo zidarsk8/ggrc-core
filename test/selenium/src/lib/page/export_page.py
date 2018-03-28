@@ -50,6 +50,8 @@ class ExportPage(base.AbstractPage):
     to the downloaded file.
     """
     downloads_before = os.listdir(path_to_export_dir)
+    selenium_utils.set_chrome_download_location(
+        self._driver, path_to_export_dir)
     self.export_objs_btn.click()
     selenium_utils.get_when_invisible(
         self.export_page, locator.Common.SPINNER_CSS)
