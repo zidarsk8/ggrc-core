@@ -1,32 +1,24 @@
 version: "2"
 services:
   cleandev:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-     - ".:/vagrant"
+    extends:
+      service: cleandev
+      file: common-services.yml
     ports:
      - "127.0.0.1:8001:8000"
      - "127.0.0.1:8081:8080"
      - "127.0.0.1:9877:9876"
-    environment:
-     - PYTHONDONTWRITEBYTECODE=true
-     - NODE_PATH=/vagrant-dev/node_modules/
-     - GGRC_DATABASE_URI=mysql+mysqldb://root:root@db/ggrcdev?charset=utf8
-     - GGRC_DATABASE_HOST=db
-    links:
-     - db
-
+    depends_on:
+      - db
+    networks:
+      - network_cleandev
+      - selenium
   db:
-    image: mysql:5.6
-    volumes:
-     - "./provision/docker/mysql:/etc/mysql/conf.d"
-    environment:
-     - MYSQL_ROOT_PASSWORD=root
-    tmpfs:
-      - /var/lib/mysql/:rw,noexec,nosuid,size=1G
-
+    extends:
+      service: db
+      file: common-services.yml
+    networks:
+      - network_cleandev
   selenium:
     build:
       context: .
@@ -34,11 +26,16 @@ services:
     volumes:
      - "./test/selenium:/selenium"
      - "/dev/shm:/dev/shm"
-    links:
-     - cleandev
+    depends_on:
+      - cleandev
+    networks:
+      - selenium
     environment:
      - "TZ=America/Los_Angeles"
      - PYTHONDONTWRITEBYTECODE=true
      - PYTHONPATH=/selenium/src
      - SCREEN_WIDTH=1440
      - SCREEN_HEIGHT=900
+networks:
+  network_cleandev:
+  selenium:
