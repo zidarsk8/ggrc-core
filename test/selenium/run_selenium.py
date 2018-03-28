@@ -34,7 +34,7 @@ def wait_for_server():
   sys.stdout.write("Wating on server: ")
   for _ in xrange(environment.SERVER_WAIT_TIME):
     try:
-      if (requests.head(environment.APP_URL).status_code ==
+      if (requests.head(environment.app_url).status_code ==
               client.RestClient.STATUS_CODES["OK"]):
         print "[Done]"
         return True

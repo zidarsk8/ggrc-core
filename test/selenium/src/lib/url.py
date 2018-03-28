@@ -49,9 +49,9 @@ class Widget(object):
 
 class Urls(object):
   def __init__(self):
-    self.admin_dashboard = environment.APP_URL + ADMIN_DASHBOARD
-    self.dashboard = environment.APP_URL + DASHBOARD
-    self.login = environment.APP_URL
+    self.admin_dashboard = environment.app_url + ADMIN_DASHBOARD
+    self.dashboard = environment.app_url + DASHBOARD
+    self.login = environment.app_url
 
 
 class Utils(object):

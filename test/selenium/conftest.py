@@ -6,9 +6,12 @@
 # pylint: disable=unused-argument
 # pylint: disable=redefined-outer-name
 
+import os
+import urlparse
+
 import pytest
 
-from lib import dynamic_fixtures, url
+from lib import dynamic_fixtures, environment, url
 from lib.page import dashboard
 from lib.service import rest_service
 from lib.utils import selenium_utils, help_utils
@@ -103,10 +106,12 @@ def chrome_options(chrome_options, create_tmp_dir):
   return chrome_options
 
 
-@pytest.fixture(scope="session")
-def base_url(base_url):
-  """Add '/' if base_url not end by '/'."""
-  yield base_url if base_url[-1] == "/" else base_url + "/"
+@pytest.fixture(scope="function", autouse=True)
+def dev_url():
+  """Set environment.app_url to be used as a base url"""
+  environment.app_url = os.environ["DEV_URL"]
+  environment.app_url = urlparse.urljoin(environment.app_url, "/")
+  return environment.app_url
 
 
 @pytest.fixture(scope="function")

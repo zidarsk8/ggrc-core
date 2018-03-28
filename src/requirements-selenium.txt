@@ -1,7 +1,6 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-pytest-base-url==1.4.1
 pytest-flask==0.10.0
 pytest-html==1.16.1
 pytest-pep8==1.0.6
@@ -18,5 +17,6 @@ pytest-rerunfailures==4.0
 pytest-cov==2.5.1
 pytest-xvfb==1.1.0
 pytest-repeat==0.4.1
+pytest-env==0.6.2
 python-dateutil==2.7.1
 waiting==1.4.1
