@@ -124,6 +124,7 @@ describe('multi-select-label component', () => {
       expect(vm.attr('labels')[0].serialize()).toEqual({
         name: event.newValue,
         id: null,
+        type: 'Label',
       });
     });
 
