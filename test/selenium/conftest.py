@@ -13,10 +13,6 @@ from lib.service import rest_service
 from lib.utils import selenium_utils, help_utils
 from lib.utils.selenium_utils import get_full_screenshot_as_base64
 
-# pylint: disable=redefined-outer-name
-pytest_plugins = "selenium", "xdist", "xvfb", "timeout", "flask", \
-                 "rerunfailures", "timeout", "repeat", "pycharm"
-
 
 def _common_fixtures(fixture):
   """Generate common fixtures and return global dictionary of executed
