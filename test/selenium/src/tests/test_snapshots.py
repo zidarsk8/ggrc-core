@@ -9,7 +9,7 @@
 
 import pytest
 
-from lib import base
+from lib import base, url
 from lib.constants import messages, objects, element
 from lib.constants.element import AssessmentStates, ObjectStates
 from lib.constants.element import Lhn, MappingStatusAttrs
@@ -53,7 +53,7 @@ class TestSnapshots(base.Test):
   @pytest.fixture(scope="function")
   def lhn_menu(self, selenium):
     """Open LHN menu and return LHN page objects model."""
-    selenium_utils.open_url(selenium, dashboard.Dashboard.URL)
+    selenium_utils.open_url(selenium, url.Urls().dashboard)
     return dashboard.Dashboard(selenium).open_lhn_menu()
 
   @pytest.fixture(scope="function")

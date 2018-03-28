@@ -11,7 +11,7 @@ import re
 
 import pytest
 
-from lib import base, constants
+from lib import base, constants, url
 from lib.constants import objects, messages
 from lib.constants.element import AdminWidgetCustomAttributes
 from lib.entities import entities_factory
@@ -28,7 +28,7 @@ class TestAdminDashboardPage(base.Test):
   def admin_dashboard(self, selenium):
     """Open Admin Dashboard URL and
     return AdminDashboard page objects model."""
-    selenium_utils.open_url(selenium, dashboard.AdminDashboard.URL)
+    selenium_utils.open_url(selenium, url.Urls().admin_dashboard)
     return dashboard.AdminDashboard(selenium)
 
   @pytest.mark.smoke_tests

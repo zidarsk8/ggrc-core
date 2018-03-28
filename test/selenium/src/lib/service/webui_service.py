@@ -7,8 +7,8 @@ import re
 
 from dateutil import parser, tz
 
-from lib import factory
-from lib.constants import objects, url, messages, element, regex
+from lib import factory, url
+from lib.constants import objects, messages, element, regex
 from lib.element.tab_containers import DashboardWidget
 from lib.entities.entity import Representation
 from lib.page import dashboard
