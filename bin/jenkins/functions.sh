@@ -44,7 +44,7 @@ setup () {
     PROJECT="${1}"
   fi
 
-  MACHINE_ID="${2:-dev selenium}"
+  MACHINE_ID="${2:-cleandev selenium}"
 
   git submodule update --init
 
@@ -55,8 +55,8 @@ setup () {
     --project-name ${PROJECT} \
     up --force-recreate -d ${MACHINE_ID}
 
-  echo "Provisioning ${PROJECT}_dev_1"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  echo "Provisioning ${PROJECT}_cleandev_1"
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     ln -s /vagrant-dev/node_modules /vagrant/node_modules
     build_assets
@@ -86,7 +86,7 @@ integration_tests () {
   print_line
 
   echo "Running ${PROJECT}"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/bin/run_integration
   " && rc=$? || rc=$?
@@ -101,14 +101,14 @@ selenium_tests () {
   print_line
 
   echo "Resetting the DB"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     source /vagrant/bin/init_test_env
     db_reset -d ggrcdevtest
   "
 
   echo "Running Test server"
-  docker exec -id ${PROJECT}_dev_1 su -c "
+  docker exec -id ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     source /vagrant/bin/init_test_env
     export DASHBOARD_INTEGRATION='on'
@@ -131,7 +131,7 @@ unittests_tests () {
   print_line
 
   echo "Running python unit tests"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/bin/run_unit
   " && unit_rc=$? || unit_rc=$?
@@ -142,7 +142,7 @@ unittests_tests () {
 
   echo "Running karma tests"
 
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/node_modules/karma/bin/karma start \\
       /vagrant/karma.conf.js --single-run --reporters dots,junit
@@ -160,7 +160,7 @@ code_style_tests () {
   print_line
 
   echo "Running pylint"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/bin/check_pylint_diff
   " && pylint_rc=$? || pylint_rc=$?
@@ -176,7 +176,7 @@ code_style_tests () {
   print_line
 
   echo "Running flake8"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/bin/check_flake8_diff
   " && flake_rc=$? || flake_rc=$?
@@ -192,7 +192,7 @@ code_style_tests () {
   print_line
 
   echo "Running eslint"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     export PATH=\$PATH:/vagrant-dev/node_modules/.bin
     /vagrant/bin/check_eslint_diff
   " && eslint_rc=$? || eslint_rc=$?
@@ -208,7 +208,7 @@ code_style_tests () {
   print_line
 
   echo "Running misspell"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     make misspell
   " && misspell_rc=$? || misspell_rc=$?
 
@@ -223,7 +223,7 @@ code_style_tests () {
   print_line
 
   echo "Running license header check"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     /vagrant/bin/check_license_headers
   " && license_rc=$? || license_rc=$?
 
@@ -258,7 +258,7 @@ checkstyle_tests () {
   print_line
 
   echo "Running pylint"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     pylint -f parseable src/ggrc\
                         src/ggrc_basic_permissions\
@@ -275,7 +275,7 @@ checkstyle_tests () {
   print_line
 
   echo "Running eslint"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     eslint -f checkstyle src -o test/eslint.xml
   " || true
@@ -283,7 +283,7 @@ checkstyle_tests () {
   print_line
 
   echo "Running flake8"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     flake8 --config setup.cfg src/ test/ > test/flake8.out
   " || true
@@ -291,7 +291,7 @@ checkstyle_tests () {
   print_line
 
   echo "Running misspell"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     make misspell
   " || true
