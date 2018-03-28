@@ -2,11 +2,11 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Export page with Export Panels."""
 
-from datetime import datetime
+import os
 
 from lib import base
 from lib.constants import locator, element
-from lib.utils import selenium_utils
+from lib.utils import selenium_utils, test_utils
 
 
 class ExportPanel(base.Component):
@@ -44,25 +44,28 @@ class ExportPage(base.Page):
     return [ExportPanel(self._driver, exp_panel_el) for exp_panel_el in
             self.export_page.find_elements(*self._locators.EXPORT_PANEL_CSS)]
 
-  def click_export_objs_and_get_datetime(self):
+  def download_export_file(self, path_to_export_dir):
     """Click to 'Export Objects' button to confirm export objects according to
-    selected before export format (Google Sheet or CSV) and get datetime of
-    the clicking's moment.
+    selected before export format (Google Sheet or CSV) and return path
+    to the downloaded file.
     """
-    # pylint: disable=invalid-name
-    # reason: to make method's name informative
+    downloads_before = os.listdir(path_to_export_dir)
     self.export_objs_btn.click()
-    datetime_of_export_clicking = datetime.now()
     selenium_utils.get_when_invisible(
         self.export_page, locator.Common.SPINNER_CSS)
     selenium_utils.wait_for_js_to_load(self._driver)
-    return datetime_of_export_clicking
 
-  def export_objs_to_csv_and_return_datetime(self):
-    """Export objects choosing CSV as exporting format and return datetime of
-    export clicking.
+    def path_to_downloaded_file():
+      """Path to a file that has appeared."""
+      difference = set(os.listdir(path_to_export_dir)) - set(downloads_before)
+      if len(difference) == 1:
+        filename = list(difference)[0]
+        return os.path.join(path_to_export_dir, filename)
+    return test_utils.wait_for(path_to_downloaded_file)
+
+  def export_objs_to_csv(self, path_to_export_dir):
+    """Export objects choosing CSV as exporting format and return path to
+    exported file.
     """
-    # pylint: disable=invalid-name
-    # reason: to make method's name informative
     self.export_format_dd.select_by_label(self._elements.CSV)
-    return self.click_export_objs_and_get_datetime()
+    return self.download_export_file(path_to_export_dir)

@@ -579,12 +579,10 @@ class TestSnapshots(base.Test):
     expected_control = audit_with_one_control["new_control_rest"][0].repr_ui()
     controls_ui_service = webui_service.ControlsService(
         selenium, is_versions_widget=is_issue_flow)
-    exported_file_name = (
-        controls_ui_service.
-        export_objs_via_tree_view_and_get_file_name(src_obj=dynamic_objects))
+    path_to_exported_file = controls_ui_service.export_objs_via_tree_view(
+        path_to_export_dir=create_tmp_dir, src_obj=dynamic_objects)
     actual_controls = controls_ui_service.get_list_objs_from_csv(
-        path_to_export_dir=create_tmp_dir,
-        exported_file_name=exported_file_name)
+        path_to_exported_file=path_to_exported_file)
     # 'actual_controls': created_at, updated_at,
     #                    custom_attributes (GGRC-2344) (None)
     self.general_equal_assert(
