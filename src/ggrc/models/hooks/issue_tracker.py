@@ -588,21 +588,6 @@ def _fill_current_value(issue_params, assessment, initial_info):
   return issue_params
 
 
-def _build_cc_list(issue_tracker_info, initial_info):
-  """Returns a list of email to update issue with."""
-  cc_list = issue_tracker_info.get('cc_list')
-
-  if cc_list is not None:
-    current_cc_list = initial_info.get('cc_list')
-    current_cc_list = set(current_cc_list) if (
-        current_cc_list is not None) else set()
-    updated_cc_list = set(cc_list)
-    if updated_cc_list - current_cc_list:
-      return list(updated_cc_list | current_cc_list)
-
-  return None
-
-
 def _get_added_comment_id(src):
   """Returns comment ID from given request."""
   if not src:
@@ -666,6 +651,15 @@ def _is_issue_tracker_enabled(audit=None):
   return True
 
 
+def _update_issue_params_assignee(issue_params, issue_tracker_info):
+  """Change issue_params if assignee has been provided."""
+  assignee = issue_tracker_info.get('assignee')
+  if assignee:
+    issue_params['status'] = 'ASSIGNED'
+    issue_params['assignee'] = assignee
+    issue_params['verifier'] = assignee
+
+
 def _create_issuetracker_issue(assessment, issue_tracker_info):
   """Collects information and sends a request to create external issue."""
   _normalize_issue_tracker_info(issue_tracker_info)
@@ -718,11 +712,7 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
       'comment': '\n'.join(comment),
   }
 
-  assignee = issue_tracker_info.get('assignee')
-  if assignee:
-    issue_params['status'] = 'ASSIGNED'
-    issue_params['assignee'] = assignee
-    issue_params['verifier'] = assignee
+  _update_issue_params_assignee(issue_params, issue_tracker_info)
 
   cc_list = issue_tracker_info.get('cc_list')
   if cc_list is not None:
@@ -773,7 +763,7 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
 def _update_issuetracker_issue(assessment, issue_tracker_info,
                                initial_assessment, initial_info, request):
   """Collects information and sends a request to update external issue."""
-
+  # pylint: disable=too-many-locals
   issue_id = issue_tracker_info.get('issue_id')
   if not issue_id:
     return
@@ -815,9 +805,12 @@ def _update_issuetracker_issue(assessment, issue_tracker_info,
   if hotlist_id is not None and hotlist_id != initial_info.get('hotlist_id'):
     issue_params['hotlist_ids'] = [hotlist_id] if hotlist_id else []
 
-  # Handle cc_list update.
-  cc_list = _build_cc_list(issue_tracker_info, initial_info)
-  if cc_list is not None:
+  # handle assignee and cc_list update
+  assignee_email, cc_list = _collect_issue_emails(assessment)
+  if assignee_email is not None:
+    issue_tracker_info['assignee'] = assignee_email
+    _update_issue_params_assignee(issue_params, issue_tracker_info)
+
     issue_params['ccs'] = cc_list
 
   if issue_params:
