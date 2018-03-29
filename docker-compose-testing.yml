@@ -13,12 +13,29 @@ services:
     networks:
       - network_cleandev
       - selenium
+  cleandev_destructive:
+    extends:
+      service: cleandev
+      file: common-services.yml
+    depends_on:
+      - db_destructive
+    networks:
+      - network_cleandev_destructive
+      - selenium
   db:
     extends:
       service: db
       file: common-services.yml
     networks:
       - network_cleandev
+  db_destructive:
+    extends:
+      service: db
+      file: common-services.yml
+    networks:
+      network_cleandev_destructive:
+        aliases:
+          - db
   selenium:
     build:
       context: .
@@ -28,6 +45,7 @@ services:
      - "/dev/shm:/dev/shm"
     depends_on:
       - cleandev
+      - cleandev_destructive
     networks:
       - selenium
     environment:
@@ -38,4 +56,5 @@ services:
      - SCREEN_HEIGHT=900
 networks:
   network_cleandev:
+  network_cleandev_destructive:
   selenium:
