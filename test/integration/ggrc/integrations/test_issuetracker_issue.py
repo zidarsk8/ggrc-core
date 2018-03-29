@@ -112,7 +112,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                 'priority': None,
                 'assignee': email1,
                 'verifier': email1,
-                'cc_list': [email2]}
+                'ccs': [email2]}
       mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
 
 
