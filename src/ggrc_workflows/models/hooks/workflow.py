@@ -99,7 +99,7 @@ def remove_related_acl(related_to_del):
       synchronize_session='fetch')
 
 
-def _get_child_ids(parent_ids, child_class):
+def _get_child_ids(parent_ids, child_class, alias):
   """Get all acl ids for acl entries with the given parent ids
 
   Args:
@@ -108,7 +108,7 @@ def _get_child_ids(parent_ids, child_class):
   Returns:
     list of ACL ids for all children from the given parents.
   """
-  acl_table = all_models.AccessControlList.__table__
+  acl_table = all_models.AccessControlList.__table__.alias(alias)
 
   return sa.select([acl_table.c.id]).where(
       acl_table.c.parent_id.in_(parent_ids)
@@ -137,6 +137,26 @@ def _insert_select_acls(select_statement):
   inserter = acl_table.insert().prefix_with("IGNORE")
 
   db.session.execute(
+      """
+      lock tables
+          access_control_list write,
+          access_control_list as acl_read read,
+          access_control_list as workflow_acl read,
+          access_control_list as CycleTaskGroup_acl read,
+          access_control_list as CycleTaskGroupObjectTask_acl read,
+          access_control_roles as parent_acr read,
+          access_control_roles read,
+          task_groups read,
+          task_group_tasks read,
+          task_group_objects read,
+          cycles read,
+          cycle_task_groups read,
+          cycle_task_group_object_tasks read,
+          cycle_task_entries read
+      """
+  )
+
+  db.session.execute(
       inserter.from_select(
           [
               acl_table.c.person_id,
@@ -151,6 +171,7 @@ def _insert_select_acls(select_statement):
           select_statement
       )
   )
+  db.session.execute("unlock tables")
 
 
 def _propagate_to_wf_children(new_wf_acls, child_class):
@@ -164,9 +185,9 @@ def _propagate_to_wf_children(new_wf_acls, child_class):
   """
 
   child_table = child_class.__table__
-  acl_table = all_models.AccessControlList.__table__
+  acl_table = all_models.AccessControlList.__table__.alias("acl_read")
   acr_table = all_models.AccessControlRole.__table__.alias("parent_acr")
-  acr_mapped_table = all_models.AccessControlRole.__table__.alias("mapped")
+  acr_mapped_table = all_models.AccessControlRole.__table__
 
   current_user_id = login.get_current_user_id()
 
@@ -202,7 +223,7 @@ def _propagate_to_wf_children(new_wf_acls, child_class):
 
   _insert_select_acls(select_statement)
 
-  return _get_child_ids(new_wf_acls, child_class)
+  return _get_child_ids(new_wf_acls, child_class, "workflow_acl")
 
 
 def _propagate_to_children(new_tg_acls, child_class, id_name, parent_class):
@@ -216,7 +237,7 @@ def _propagate_to_children(new_tg_acls, child_class, id_name, parent_class):
   """
 
   child_table = child_class.__table__
-  acl_table = all_models.AccessControlList.__table__
+  acl_table = all_models.AccessControlList.__table__.alias("acl_read")
 
   current_user_id = login.get_current_user_id()
 
@@ -246,7 +267,7 @@ def _propagate_to_children(new_tg_acls, child_class, id_name, parent_class):
 
   _insert_select_acls(select_statement)
 
-  return _get_child_ids(new_tg_acls, child_class)
+  return _get_child_ids(new_tg_acls, child_class, child_class.__name__+"_acl")
 
 
 def _propagate_to_tgt(new_tg_acls):
