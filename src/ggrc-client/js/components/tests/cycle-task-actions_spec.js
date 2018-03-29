@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import tracker from '../../tracker';
+
 describe('GGRC.Components.subTreeWrapper', function () {
   'use strict';
 
@@ -22,7 +24,11 @@ describe('GGRC.Components.subTreeWrapper', function () {
     let fakeElement;
 
     beforeEach(function () {
-      spyOn(vm, 'setStatus');
+      spyOn(vm, 'setStatus').and.returnValue({
+        then() {},
+      });
+
+      spyOn(tracker, 'start').and.returnValue(() => {});
 
       vm.attr('oldValues', []);
       vm.attr('instance', {

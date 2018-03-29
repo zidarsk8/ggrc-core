@@ -233,6 +233,12 @@ class SnapshotBlockConverter(object):
     for snap in self.snapshots:
       _access_control_map[snap.content["id"]] = defaultdict(list)
       for acl in snap.content.get("access_control_list", []):
+        if acl["ac_role_id"] not in acr:
+          # This is a bug in our snapshot handling where we still refer to live
+          # data in our database. The proper thing would be to have all
+          # snapshot related data stored in the revision content and so deleted
+          # roles would not affect older snapshots
+          continue
         role_name = acr[acl["ac_role_id"]]
         email = people.get(acl["person_id"], "")
         _access_control_map[snap.content["id"]][role_name].append(email)

@@ -5,6 +5,8 @@
 
 import Component from '../import';
 import * as Utils from '../import-export-utils';
+import {gapiClient} from '../../../plugins/ggrc-gapi-client';
+import errorTemplate from '../templates/import-error.mustache';
 
 describe('GGRC.Components.csvImportWidget', function () {
   'use strict';
@@ -140,7 +142,7 @@ describe('GGRC.Components.csvImportWidget', function () {
               makeImportBlock(
                 'Contract', {totalRows: 3, created: 1, ignored: 2}),
             ];
-            fakeScope.attr('import', importBlocks);
+            fakeScope.attr('importDetails', importBlocks);
 
             result = isDisabled();
 
@@ -248,12 +250,22 @@ describe('GGRC.Components.csvImportWidget', function () {
           done();
         });
 
-        it('calls GGRC errors notifier with error message', function (done) {
-          importDfd.reject(failData);
-          method({});
-          expect(GGRC.Errors.notifier).toHaveBeenCalledWith('error',
-            failData.responseJSON.message);
-          done();
+        describe('calls GGRC errors notifier', ()=> {
+          it('with error message if message was provided', ()=> {
+            importDfd.reject(failData);
+            method({});
+
+            expect(GGRC.Errors.notifier)
+              .toHaveBeenCalledWith('error', failData.responseJSON.message);
+          });
+
+          it('with general error if error message was not provided', ()=> {
+            importDfd.reject({});
+            method({});
+
+            expect(GGRC.Errors.notifier)
+              .toHaveBeenCalledWith('error', errorTemplate, true);
+          });
         });
 
         it('sets false to isLoading attribute', function (done) {
@@ -266,23 +278,21 @@ describe('GGRC.Components.csvImportWidget', function () {
     });
   });
 
-  describe('"#import_btn.state-select click" handler',
-  function () {
+  describe('"#import_btn.state-select click" handler', function () {
     let authDfd;
 
     beforeEach(function () {
       method = Component.prototype.viewModel.selectFile;
       authDfd = new can.Deferred();
-      spyOn(GGRC.Controllers.GAPI, 'reAuthorize').and.returnValue(authDfd);
+      spyOn(gapiClient, 'authorizeGapi').and.returnValue(authDfd);
       spyOn(gapi.auth, 'getToken').and.returnValue('mockToken');
       spyOn(gapi, 'load');
-      spyOn(GGRC.Controllers.GAPI, 'oauth_dfd');
     });
 
     it('calls gdrive authorization', function () {
       method();
-      expect(GGRC.Controllers.GAPI.reAuthorize)
-        .toHaveBeenCalledWith('mockToken');
+      expect(gapiClient.authorizeGapi)
+        .toHaveBeenCalledWith(['https://www.googleapis.com/auth/drive']);
     });
 
     it('loads gdrive picker after authorization', function () {

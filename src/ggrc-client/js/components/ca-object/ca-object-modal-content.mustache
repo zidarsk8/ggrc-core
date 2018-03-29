@@ -2,61 +2,65 @@
     Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-<form class="simple-modal__body">
-    <div class="simple-modal__section">
-        <div class="field__title form-field__title">
-          <label class="field__title-text">{{content.title}}</label>
-        </div>
-	  <custom-attributes-field
-            {type}="content.type"
-            {value}="content.value"
-            {options}="content.options"
-            {disabled}="true"
-	  ></custom-attributes-field>
-    </div>
-      {{#if comment}}
-          <div class="simple-modal__section">
-            <div class="simple-modal__section-title">Comment</div>
-            <comment-input
-                      {(value)}="*commentValue"
-                      {disabled}="*isSaving"
-            ></comment-input>
-          </div>
-      {{/if}}
-      {{#if evidence}}
+
+<div class="ca-object-modal-content__body">
+    <form class="simple-modal__body">
         <div class="simple-modal__section">
-            <div class="simple-modal__section-title">Evidence file
-              <spinner class="simple-modal__section-title-icon" {toggle}="isUpdatingEvidences"></spinner>
+            <div class="field__title form-field__title">
+                <label class="field__title-text">{{content.title}}</label>
             </div>
-            <object-list {items}="evidences" {empty-message}="noItemsText">
-                <editable-document-object-list-item {document}="{.}">
-                    <a ($click)="removeRelatedItem(document, 'evidences')">
-                        <action-toolbar-control>
-                            <i class="fa fa-trash"></i>
-                        </action-toolbar-control>
-                    </a>
-                </editable-document-object-list-item>
-            </object-list>
-            <attach-button
-		    {assessment-type-objects}="assessmentTypeObjects"
+            <custom-attributes-field
+                {type}="content.type"
+                {value}="content.value"
+                {options}="content.options"
+                {disabled}="true">
+            </custom-attributes-field>
+        </div>
+        {{#if comment}}
+            <div class="simple-modal__section">
+                <div class="simple-modal__section-title">Comment</div>
+                <comment-input
+                    {(value)}="*commentValue"
+                    {disabled}="*isSaving">
+                </comment-input>
+            </div>
+        {{/if}}
+        {{#if evidence}}
+            <div class="simple-modal__section">
+                <div class="simple-modal__section-title">Evidence file
+                    <spinner class="simple-modal__section-title-icon" {toggle}="isUpdatingEvidences"></spinner>
+                </div>
+                <object-list {items}="evidences" {empty-message}="noItemsText">
+                    <editable-document-object-list-item {document}="{.}">
+                        <a ($click)="removeRelatedItem(document, 'evidences')">
+                            <action-toolbar-control>
+                                <i class="fa fa-trash"></i>
+                            </action-toolbar-control>
+                        </a>
+                    </editable-document-object-list-item>
+                </object-list>
+                <attach-button
                     (before-create)="addItems(%event, 'evidences')"
                     (refresh-evidences)="updateItems('evidences')"
                     {is-attach-action-disabled}="isUpdatingEvidences"
-                    {instance}="instance"></attach-button>
+                    {instance}="instance">
+                </attach-button>
+            </div>
+        {{/if}}
+    </form>
+</div>
+<div class="ca-object-modal-content__footer">
+    <div class="simple-modal__footer">
+        <div class="simple-modal__toolbar">
+        {{#if comment}}
+            <comment-add-button class="simple-modal__toolbar-item"
+                                {(value)}="*commentValue"
+                                {^is-saving}="*isSaving"
+                                (comment-created)="onCommentCreated(%event)"
+                                {is-disabled}="isUpdatingEvidences"
+            >Save</comment-add-button>
+        {{/if}}
+            <button class="btn btn-small btn-white simple-modal__toolbar-item" ($click)="hide" {{#if isUpdatingEvidences}}disabled{{/if}}>Close</button>
         </div>
-      {{/if}}
-    </div>
-</form>
-<div class="simple-modal__footer">
-    <div class="simple-modal__toolbar">
-      {{#if comment}}
-         <comment-add-button class="simple-modal__toolbar-item"
-                             {(value)}="*commentValue"
-                             {^is-saving}="*isSaving"
-                             (comment-created)="onCommentCreated(%event)"
-                             {is-disabled}="isUpdatingEvidences"
-         >Save</comment-add-button>
-      {{/if}}
-        <button class="btn btn-small btn-white simple-modal__toolbar-item" ($click)="hide" {{#if isUpdatingEvidences}}disabled{{/if}}>Close</button>
     </div>
 </div>

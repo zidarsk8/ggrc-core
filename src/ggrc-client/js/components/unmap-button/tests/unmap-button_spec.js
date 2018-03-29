@@ -45,9 +45,8 @@ describe('GGRC.Components.unmapButton', function () {
     let refreshDfd;
     beforeEach(function () {
       refreshDfd = can.Deferred();
-      spyOn(viewModel, 'getMapping').and.returnValue({
-        refresh: jasmine.createSpy().and.returnValue(refreshDfd),
-      });
+      spyOn(viewModel, 'getMapping').and.returnValue(refreshDfd);
+      spyOn(console, 'warn');
     });
 
     it('sets "isUnmapping" flag to true', function () {
@@ -63,34 +62,33 @@ describe('GGRC.Components.unmapButton', function () {
         viewModel.attr('isUnmapping', true);
       });
 
-      it('when refresh() was failed', function () {
-        refreshDfd.reject();
-
-        viewModel.unmapInstance();
-
+      it('when refresh() was failed', async function (done) {
+        refreshDfd.reject('Server Error');
+        await viewModel.unmapInstance();
         expect(viewModel.attr('isUnmapping')).toBe(false);
+        expect(console.warn).toHaveBeenCalledWith(
+          'Unmap failed', 'Server Error');
+        done();
       });
 
-      it('after destroy() success', function () {
+      it('after destroy() success', async function (done) {
         refreshDfd.resolve({
           destroy: jasmine.createSpy()
             .and.returnValue(can.Deferred().resolve()),
         });
-
-        viewModel.unmapInstance();
-
+        await viewModel.unmapInstance();
         expect(viewModel.attr('isUnmapping')).toBe(false);
+        done();
       });
 
-      it('when destroy() was failed', function () {
+      it('when destroy() was failed', async function (done) {
         refreshDfd.resolve({
           destroy: jasmine.createSpy()
             .and.returnValue(can.Deferred().reject()),
         });
-
-        viewModel.unmapInstance();
-
+        await viewModel.unmapInstance();
         expect(viewModel.attr('isUnmapping')).toBe(false);
+        done();
       });
     });
   });

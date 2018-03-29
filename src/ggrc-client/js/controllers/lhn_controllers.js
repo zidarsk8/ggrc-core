@@ -109,16 +109,6 @@ can.Control('CMS.Controllers.LHN', {
           .removeClass('active')
           .css('left', (-width - safety) + 'px');
 
-    this.element.find('.lhn-type')
-          .removeClass('active')
-          .css('left', (-width - safety) + 'px');
-
-    this.element.find('.bar-v')
-          .removeClass('active');
-
-    this.element.find('.lhs-search')
-          .removeClass('active');
-
     this.options.display_prefs.setLHNState({is_open: false});
   },
   open_lhn: function () {
@@ -130,16 +120,6 @@ can.Control('CMS.Controllers.LHN', {
 
     this.element.find('.lhs-holder')
       .css('left', '')
-      .addClass('active');
-
-    this.element.find('.lhn-type')
-      .css('left', '')
-      .addClass('active');
-
-    this.element.find('.bar-v')
-      .addClass('active');
-
-    this.element.find('.lhs-search')
       .addClass('active');
 
     this.options.display_prefs.setLHNState({
@@ -328,7 +308,7 @@ can.Control('CMS.Controllers.LHN', {
       return;
     }
 
-    var on_lhn = ['.lhn-trigger:visible', '.lhn-type:visible', '.lhs-holder:visible']
+    var on_lhn = ['.lhn-trigger:visible', '.lhs-holder:visible']
             .reduce(function (yes, selector) {
               var $selector = $(selector),
                 bounds;
@@ -631,7 +611,11 @@ can.Control('CMS.Controllers.LHN_Search', {
         , model_name = this.get_list_model($list)
         , that = this
         ;
-    let stopFn = tracker.start('LHN', 'show_list', model_name);
+    let stopFn = tracker.start(
+      `LHN: ${model_name}`,
+      tracker.USER_JOURNEY_KEYS.LOADING,
+      tracker.USER_ACTIONS.LHN.SHOW_LIST
+    );
 
     setTimeout(function () {
       that.refresh_visible_lists().done(stopFn);
@@ -656,7 +640,11 @@ can.Control('CMS.Controllers.LHN_Search', {
         , refresh_queue
         , new_visible_list
         ;
-    let stopFn = tracker.start('LHN', 'show_more', model_name);
+    let stopFn = tracker.start(
+      `LHN: ${model_name}`,
+      tracker.USER_JOURNEY_KEYS.LOADING,
+      tracker.USER_ACTIONS.LHN.SHOW_MORE
+    );
 
     if (visible_list.length >= results_list.length)
       return;
@@ -933,8 +921,12 @@ can.Control('CMS.Controllers.LHN_Search', {
   },
   run_search: function (term, extra_params) {
     let filter_list = [];
-    let stopFn = tracker.start('LHN', 'run_search',
-      extra_params && extra_params.contact_id ? 'MyWork' : 'Normal');
+    const contactId = extra_params && extra_params.contact_id;
+    let stopFn = tracker.start(
+      tracker.FOCUS_AREAS.LHN,
+      tracker.USER_JOURNEY_KEYS.LOADING,
+      `LHN search in ${contactId ? 'My Objects' : 'All Objects'})`
+      );
 
     if (term !== this.current_term || extra_params !== this.current_params) {
         // Clear current result lists

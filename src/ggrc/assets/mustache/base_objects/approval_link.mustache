@@ -42,9 +42,9 @@
                 data-toggle="modal-ajax-form"
                 data-object-singular="CycleTaskEntry"
                 data-object-params='{
-                  "cycle" : {{review_task.cycle.id}}, 
-                  "cycle_task_group_object_task" : {{review_task.id}}, 
-                  "is_declining_review" : 1, 
+                  "cycle" : {{review_task.cycle.id}},
+                  "cycle_task_group_object_task" : {{review_task.id}},
+                  "is_declining_review" : 1,
                   "context": {{firstnonempty review_task.context.id "null"}} }'
                 data-object-plural="cycle_task_entries"
                 data-object-id=""
@@ -60,10 +60,13 @@
               </a>
               <small><em>Approval applies only to this object and not to mapped objects.</em></small>
               {{#current_user_is_admin}}
-                {{#with_mapping 'object_tasks' instance}}
+                {{#with_mapping 'approval_tasks' instance}}
                 <p>
                   If you wish to change the current reviewer, please click
-                  <a href="#task_widget/cycle_task_group_object_task/{{object_tasks.0.instance.id}}" class="{{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}">here</a>
+                  <a href="{{instance.viewLink}}#task_widget/cycle_task_group_object_task/{{object_tasks.0.instance.id}}"
+                    class="{{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}">
+                      here
+                  </a>
                   and change the assignee.
                 </p>
                 {{/with_mapping}}
@@ -71,7 +74,7 @@
             </div>
           {{else}}
             <div>
-              {{#is_allowed "read" "Workflow" context="any"}}
+              {{#is_allowed "create" "Workflow" context="any"}}
                 <review-link {instance}="instance">
                 </review-link>
               {{/is_allowed}}

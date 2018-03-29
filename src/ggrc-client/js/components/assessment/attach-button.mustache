@@ -9,24 +9,22 @@
       {{#if canAttach}}
         {{#if isFolderAttached}}
           <ggrc-gdrive-picker-launcher class="attachment-upload-control__button"
-				       {assessment-type-objects}="assessmentTypeObjects"
                                        instance="instance"
                                        click_event="trigger_upload_parent"
                                        {tooltip}="'A new copy of the file will be stored at the destination Audit folder if exists or main gDrive folder of user.'"
                                        {disabled}="isAttachActionDisabled"
                                        {confirmation-callback}="@confirmationCallback"
-                                       {items-uploaded-callback}="@itemsUploadedCallback"
+                                       (finish)="refresh"
                                        (on-before-attach)="onBeforeCreate(%event)">Attach
           </ggrc-gdrive-picker-launcher>
         {{else}}
          <ggrc-gdrive-picker-launcher class="attachment-upload-control__button"
-				       {assessment-type-objects}="assessmentTypeObjects"
                                        instance="instance"
                                        click_event="trigger_upload"
                                        {tooltip}="'A new copy of the file will be stored at the destination Audit folder if exists or main gDrive folder of user.'"
                                        {disabled}="isAttachActionDisabled"
                                        {confirmation-callback}="@confirmationCallback"
-                                       {items-uploaded-callback}="@itemsUploadedCallback"
+                                       (finish)="refresh"
                                        (on-before-attach)="onBeforeCreate(%event)">Attach
           </ggrc-gdrive-picker-launcher>
           <div class="attachment-upload-control__icon attachment-upload-control__icon__error">

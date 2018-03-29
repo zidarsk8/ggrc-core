@@ -8,6 +8,7 @@ import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 import * as ObjectVersions from '../../../plugins/utils/object-versions-utils';
+import tracker from '../../../tracker';
 
 describe('GGRC.Components.treeWidgetContainer', function () {
   'use strict';
@@ -233,6 +234,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
         },
       });
       loadItems = vm.loadItems.bind(vm);
+      spyOn(tracker, 'start').and.returnValue(() => {});
     });
 
     it('', function (done) {

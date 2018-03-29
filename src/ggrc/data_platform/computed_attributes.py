@@ -146,15 +146,6 @@ def get_aggregate_function(attribute):
   raise AttributeError("Attribute aggregate_function contains invalid data.")
 
 
-def snapshot_from_rel(rel_revision):
-  """Get snapshot objects from relationship revisions."""
-  if rel_revision.source_type == "Snapshot":
-    return models.Snapshot.query.get(rel_revision.source_id)
-  elif rel_revision.destination_type == "Snapshot":
-    return models.Snapshot.query.get(rel_revision.destination_id)
-  return None
-
-
 def _get_group_key(revision, aggregate_type, computed_object):
   """Get key for aggregate objects group.
 
@@ -162,7 +153,6 @@ def _get_group_key(revision, aggregate_type, computed_object):
   calculation of computed attributes.
   """
   related_types = {computed_object, aggregate_type}
-  related_snapshots = {"Snapshot", aggregate_type}
   key = None
   if revision.resource_type == aggregate_type:
     if revision.action == "deleted":
@@ -181,13 +171,6 @@ def _get_group_key(revision, aggregate_type, computed_object):
         revision.source_type in related_types and
         revision.destination_type in related_types):
     key = "related_objects"
-  elif (revision.resource_type == "Relationship" and
-        revision.source_type in related_snapshots and
-        revision.destination_type in related_snapshots):
-    # computed source related to a snapshot of an object
-    snapshot = snapshot_from_rel(revision)
-    if snapshot and snapshot.child_type == computed_object:
-      key = "related_snapshots"
   return key
 
 

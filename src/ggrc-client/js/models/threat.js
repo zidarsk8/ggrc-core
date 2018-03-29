@@ -28,8 +28,6 @@
       modified_by: 'CMS.Models.Person.stub',
       object_people: 'CMS.Models.ObjectPerson.stubs',
       people: 'CMS.Models.Person.stubs',
-      related_sources: 'CMS.Models.Relationship.stubs',
-      related_destinations: 'CMS.Models.Relationship.stubs',
       object_objectives: 'CMS.Models.ObjectObjective.stubs',
       objectives: 'CMS.Models.Objective.stubs',
       object_controls: 'CMS.Models.ObjectControl.stubs',

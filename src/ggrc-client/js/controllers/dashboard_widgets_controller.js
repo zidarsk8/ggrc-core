@@ -10,7 +10,6 @@ import {
 import {
   getWidgetConfig,
 } from '../plugins/utils/object-versions-utils';
-import tracker from '../tracker';
 
 export default Filterable({
   pluginName: 'dashboard_widgets',
@@ -128,8 +127,6 @@ export default Filterable({
   },
   display: function (refetch) {
     const that = this;
-    const stopFn = tracker.start(
-      'DashboardWidget', 'display', this.options.model.shortName);
 
     this._display_deferred = this.prepare().then(function () {
       let dfd;
@@ -149,7 +146,7 @@ export default Filterable({
       }
 
       return dfd;
-    }).then(stopFn);
+    });
 
     return this._display_deferred;
   },

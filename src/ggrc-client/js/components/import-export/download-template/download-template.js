@@ -24,6 +24,13 @@ const viewModel = can.Map.extend({
   },
   selected: [],
   importableModels: importOptions,
+  close() {
+    this.attr('modalState.open', false);
+    this.attr('selected').replace([]);
+    this.attr('importableModels').forEach((element) => {
+      element.attr('checked', false);
+    });
+  },
   showDialog() {
     this.attr('modalState.open', true);
   },
@@ -59,7 +66,7 @@ const viewModel = can.Map.extend({
     }).then(function (data) {
       download(CSV_FILE_NAME, data);
     }).always(() => {
-      this.attr('modalState.open', false);
+      this.close();
     });
   },
 });

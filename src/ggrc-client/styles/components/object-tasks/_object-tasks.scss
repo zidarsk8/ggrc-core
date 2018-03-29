@@ -46,6 +46,9 @@ object-tasks {
         &.state-declined {
           color: $status-declined;
         }
+        &.state-deprecated {
+          color: $status-deprecated;
+        }
       }
     }
 

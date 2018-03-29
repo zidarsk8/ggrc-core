@@ -471,16 +471,23 @@ import template from './revision-log.mustache';
             }
             if (this.attr('_LIST_FIELDS')[fieldName]) {
               if (value) {
-                value = _(value).splitTrim(',').compact().join(', ');
+                value = _(value).splitTrim(',').sort().compact().join(', ');
               }
               if (origVal) {
-                origVal = _(origVal).splitTrim(',').compact().join(', ');
+                origVal = _(origVal).splitTrim(',').sort().compact().join(', ');
               }
             }
             if (origVal || value) {
               origVal = unifyValue(origVal);
               value = unifyValue(value);
-              if (origVal !== value) {
+              let isDifferent = false;
+              if (_.isObject(origVal) && _.isObject(value)) {
+                isDifferent = !_.isEqual(_.sortBy(origVal), _.sortBy(value));
+              } else {
+                isDifferent = origVal !== value;
+              }
+
+              if (isDifferent) {
                 diff.changes.push({
                   fieldName: displayName,
                   origVal: origVal,

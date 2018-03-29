@@ -7,6 +7,11 @@
   .proposal__save-button {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+  }
+
+  .proposal__spinner {
+    margin-right: 4px;
   }
 
   .proposal__open-modal-button {

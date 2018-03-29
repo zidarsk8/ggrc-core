@@ -110,14 +110,6 @@ class AuditRolesHandler(object):
     assert isinstance(audit, all_models.Audit), \
         "`Audit Captains` role assigned to a non Audit object."
 
-    # Add program editor to program
-    program = audit.program
-    if not any(pacl.person == acl.person for pacl in
-               program.access_control_list):
-      acl_manager = self.caches["access_control_list_manager"]
-      acl_manager.get_or_create(
-          program, acl, acl.person, audit_roles["Program Editors"])
-
     role_map = defaultdict(lambda: audit_roles['Audit Captains Mapped'])
     self._create_mapped_acls(acl, role_map)
 

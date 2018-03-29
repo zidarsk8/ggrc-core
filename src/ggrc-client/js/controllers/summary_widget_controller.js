@@ -24,7 +24,7 @@ export default can.Control({
     colorsMap: {
       'Completed and Verified': '#009925',
       'Completed (no verification)': '#405f77',
-      Deprecated: '#fbc02d',
+      Deprecated: '#704c70',
       'In Progress': '#3369e8',
       'Not Started': '#9e9e9e',
       'In Review': '#f57c00',

@@ -26,29 +26,7 @@ from ggrc.utils import referenced_objects
 logger = logging.getLogger(__name__)
 
 
-def _load_templates(template_ids):
-  """Returns assessment templates for given IDs."""
-  return {
-      t.id: t for t in all_models.AssessmentTemplate.query.options(
-          orm.undefer_group('AssessmentTemplate_complete'),
-      ).filter(
-          all_models.AssessmentTemplate.id.in_(template_ids)
-      )
-  }
-
-
-def _load_audits(audit_ids):
-  """Returns audits for given IDs."""
-  return {
-      a.id: a for a in all_models.Audit.query.options(
-          orm.undefer_group('Audit_complete'),
-      ).filter(
-          all_models.Audit.id.in_(audit_ids)
-      )
-  }
-
-
-def _handle_assessment(assessment, src, templates, audits):
+def _handle_assessment(assessment, src):
   """Handles auto calculated properties for Assessment model."""
   snapshot_dict = src.get('object') or {}
   common.map_objects(assessment, snapshot_dict)
@@ -58,8 +36,14 @@ def _handle_assessment(assessment, src, templates, audits):
   if not src.get('_generated') and not snapshot:
     return
 
-  template = templates.get(src.get('template', {}).get('id'))
-  audit = audits[src['audit']['id']]
+  template = referenced_objects.get(
+      src.get('template', {}).get('type'),
+      src.get('template', {}).get('id'),
+  )
+  audit = referenced_objects.get(
+      src['audit']['type'],
+      src['audit']['id'],
+  )
   relate_assignees(assessment, snapshot, template, audit)
   relate_ca(assessment, template)
   assessment.title = u'{} assessment for {}'.format(
@@ -98,18 +82,9 @@ def init_hook():
     del sender, service  # Unused
 
     db.session.flush()
-    audit_ids = set()
-    template_ids = set()
-
-    for src in sources:
-      audit_ids.add(src.get('audit', {}).get('id'))
-      template_ids.add(src.get('template', {}).get('id'))
-
-    template_cache = _load_templates(template_ids)
-    audit_cache = _load_audits(audit_ids)
 
     for assessment, src in itertools.izip(objects, sources):
-      _handle_assessment(assessment, src, template_cache, audit_cache)
+      _handle_assessment(assessment, src)
 
     # Flush roles objects for generated assessments.
     db.session.flush()
@@ -118,8 +93,7 @@ def init_hook():
       # Handling IssueTracker info here rather than in hooks/issue_tracker
       # would avoid querying same data (such as snapshots, audits and
       # templates) twice.
-      issue_tracker.handle_assessment_create(
-          assessment, src, template_cache, audit_cache)
+      issue_tracker.handle_assessment_create(assessment, src)
 
   # pylint: disable=unused-variable
   @signals.Restful.model_put.connect_via(all_models.Assessment)
@@ -158,15 +132,11 @@ def generate_assignee_relations(assessment,
     if person_id in creator_ids:
       person_roles.append((person, "Creators"))
 
-  ac_roles = {
-      acr_name: acr_id
-      for acr_id, acr_name in access_control.role.get_custom_roles_for(
-          assessment.type).iteritems()
-  }
+  ac_roles = access_control.role.get_ac_roles_for(assessment.type)
 
   db.session.add_all(
       all_models.AccessControlList(
-          ac_role_id=ac_roles[role],
+          ac_role=ac_roles[role],
           person=person,
           object=assessment
       ) for person, role in person_roles

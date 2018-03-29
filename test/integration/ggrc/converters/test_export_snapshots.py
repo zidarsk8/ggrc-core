@@ -55,6 +55,7 @@ class TestExportSnapshots(TestCase):
 
   @staticmethod
   def _create_cads(type_):
+    """Create all types of custom attribute definitions for tests."""
     with factories.single_commit():
       cad = factories.CustomAttributeDefinitionFactory
       return [
@@ -380,8 +381,9 @@ class TestExportSnapshots(TestCase):
   def test_acr_control_export(self):
     """Test exporting of a AC roles with linked users."""
     # pylint: disable=too-many-locals
-    ac_roles = models.AccessControlRole.query.filter_by(
-        object_type="Control"
+    ac_roles = models.AccessControlRole.query.filter(
+        models.AccessControlRole.object_type == "Control",
+        models.AccessControlRole.internal == 0,
     ).all()
     control_acr_people = collections.defaultdict(dict)
     with factories.single_commit():
@@ -467,3 +469,44 @@ class TestExportSnapshots(TestCase):
           parsed_dict["*Control {}".format(i)],
           control_dicts["Control {}".format(i)],
       )
+
+  def test_export_deleted_acr(self):
+    """Test exporting snapshots with ACL entries for deleted ACRs."""
+    # pylint: disable=too-many-locals
+    with factories.single_commit():
+      # Create one more custom role
+      ac_role = factories.AccessControlRoleFactory(
+          object_type="Control",
+          name="Custom Role",
+      )
+      control = factories.ControlFactory(slug="Control 1")
+      person = factories.PersonFactory()
+      factories.AccessControlListFactory(
+          ac_role=ac_role,
+          person=person,
+          object=control,
+      )
+      audit = factories.AuditFactory()
+
+    # pylint: disable=protected-access
+    # This is used to update control revision data with the new ACL entry
+    # without making a put request to that control.
+    factories.ModelFactory._log_event(control)
+    self._create_snapshots(audit, [control])
+
+    db.session.delete(ac_role)
+    db.session.commit()
+
+    search_request = [{
+        "object_name": "Snapshot",
+        "filters": {
+            "expression": {
+                "left": "child_type",
+                "op": {"name": "="},
+                "right": "Control",
+            },
+        },
+    }]
+    parsed_data = self.export_parsed_csv(search_request)["Control Snapshot"][0]
+
+    self.assertNotIn("Custom Role", parsed_data)

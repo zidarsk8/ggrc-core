@@ -211,6 +211,11 @@ function getStatusFieldName(modelName) {
  * @return {String} statuses filter
  */
 function buildAssessmentFilter(statuses, builder) {
+  // sort array to put all Completed states to the end
+  statuses.sort((a) => {
+    return a.toLowerCase().indexOf('completed') > -1 ? 1 : -1;
+  });
+
   let verifiedIndex = statuses.indexOf('Completed and Verified');
   let completedIndex = statuses.indexOf('Completed (no verification)');
   let isVerified = false;

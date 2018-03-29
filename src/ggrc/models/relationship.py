@@ -7,14 +7,17 @@ import collections
 import sqlalchemy as sa
 from sqlalchemy import or_, and_
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import validates
 
 from ggrc import db
+from ggrc.login import is_external_app_user
 from ggrc.models.mixins import Base
 from ggrc.models import reflection
 from ggrc.models.exceptions import ValidationError
 
 
 class Relationship(Base, db.Model):
+  """Relationship model."""
   __tablename__ = 'relationships'
   source_id = db.Column(db.Integer, nullable=False)
   source_type = db.Column(db.String, nullable=False)
@@ -34,6 +37,7 @@ class Relationship(Base, db.Model):
       db.ForeignKey('automappings.id', ondelete='CASCADE'),
       nullable=True,
   )
+  is_external = db.Column(db.Boolean, nullable=False, default=False)
 
   def get_related_for(self, object_type):
     """Return related object for sent type."""
@@ -102,7 +106,12 @@ class Relationship(Base, db.Model):
             'destination_type', 'destination_id'),
     )
 
-  _api_attrs = reflection.ApiAttributes('source', 'destination')
+  _api_attrs = reflection.ApiAttributes(
+      'source',
+      'destination',
+      reflection.Attribute(
+          'is_external', create=True, update=False, read=True),
+  )
 
   def _display_name(self):
     return "{}:{} <-> {}:{}".format(self.source_type, self.source_id,
@@ -136,6 +145,23 @@ class Relationship(Base, db.Model):
             u"source_type={!r}, destination_type={!r}"
             .format(self.type, self.source_type, self.destination_type)
         )
+
+  # pylint:disable=unused-argument
+  @validates("is_external")
+  def validate_is_external(self, key, value):
+    """Validates is change of is_external column value allowed."""
+    if is_external_app_user() and (not value or self.is_external is False):
+      raise ValidationError(
+          'External application can create only external relationships.')
+    return value
+
+  # pylint:disable=unused-argument
+  @staticmethod
+  def validate_delete(mapper, connection, target):
+    """Validates is delete of Relationship is allowed."""
+    if is_external_app_user() and not target.is_external:
+      raise ValidationError(
+          'External application can delete only external relationships.')
 
 
 class Relatable(object):
@@ -183,11 +209,6 @@ class Relatable(object):
     if _types:
       return {obj for obj in related if obj.type in _types}
     return set(related)
-
-  _api_attrs = reflection.ApiAttributes(
-      'related_sources',
-      'related_destinations'
-  )
 
   _include_links = []
 

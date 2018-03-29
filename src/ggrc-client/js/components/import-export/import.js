@@ -12,7 +12,20 @@ import '../import-export/download-template/download-template';
 import '../collapsible-panel/collapsible-panel';
 import quickTips from './templates/quick-tips.mustache';
 import template from './templates/csv-import.mustache';
-import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
+import {
+  backendGdriveClient,
+  gapiClient,
+} from '../../plugins/ggrc-gapi-client';
+import errorTemplate from './templates/import-error.mustache';
+
+const messages = {
+  VALIDATION_ERROR: `Your file could not be imported due to
+  the following errors that were found.`,
+  IMPORT_IN_PROGRESS: `Your import request has been submitted. You may close 
+  this page or continue your work. We will send you an email notification when 
+  it completes or if there are errors or warnings.`,
+  EMPTY_FILE: 'You are going to import: <span class="gray">0 rows</span>',
+};
 
 export default can.Component.extend({
   tag: 'csv-import',
@@ -21,12 +34,13 @@ export default can.Component.extend({
   viewModel: {
     importUrl: '/_service/import_csv',
     quickTips,
-    'import': null,
+    importDetails: null,
     fileId: '',
     fileName: '',
     isLoading: false,
     state: 'select',
     importStatus: '',
+    message: '',
     helpUrl: GGRC.config.external_import_help_url,
     states: function () {
       let state = this.attr('state') || 'select';
@@ -46,7 +60,7 @@ export default can.Component.extend({
           text: 'Import',
           isDisabled: function () {
             // info on blocks to import
-            let toImport = this.import;
+            let toImport = this.attr('importDetails');
             let nonEmptyBlockExists;
             let hasErrors;
 
@@ -113,12 +127,18 @@ export default can.Component.extend({
       };
     },
     processLoadedInfo: function (data) {
-      this.attr('import', _.map(data, (element) => {
+      let rows = 0;
+      let errorLevel = '';
+      this.attr('importDetails', _.map(data, (element) => {
         element.data = [];
+
+        rows += element.rows;
         if (element.block_warnings.length + element.row_warnings.length) {
           let messages = [...element.block_warnings, ...element.row_warnings];
 
-          this.attr('importStatus', 'warning');
+          if (!errorLevel) {
+            errorLevel = 'warning';
+          }
 
           element.data.push({
             title: `WARNINGS (${messages.length})`,
@@ -128,7 +148,9 @@ export default can.Component.extend({
         if (element.block_errors.length + element.row_errors.length) {
           let messages = [...element.block_errors, ...element.row_errors];
 
-          this.attr('importStatus', 'error');
+          errorLevel = 'error';
+
+          this.attr('message', messages.VALIDATION_ERROR);
 
           element.data.push({
             title: `ERRORS (${messages.length})`,
@@ -137,6 +159,14 @@ export default can.Component.extend({
         }
         return element;
       }));
+
+      if (!rows) {
+        this.attr('importStatus', 'error');
+        this.attr('message', messages.EMPTY_FILE);
+      } else {
+        this.attr('importStatus', errorLevel);
+      }
+
       this.attr('state', 'import');
     },
     needWarning: function (checkObj, data) {
@@ -198,6 +228,7 @@ export default can.Component.extend({
         fileId: '',
         fileName: '',
         importStatus: '',
+        message: '',
         'import': null,
       });
       element.find('.csv-upload').val('');
@@ -221,7 +252,12 @@ export default can.Component.extend({
         }.bind(this))
         .fail(function (data) {
           this.attr('state', 'select');
-          GGRC.Errors.notifier('error', data.responseJSON.message);
+
+          if (data && data.responseJSON && data.responseJSON.message) {
+            GGRC.Errors.notifier('error', data.responseJSON.message);
+          } else {
+            GGRC.Errors.notifier('error', errorTemplate, true);
+          }
         }.bind(this))
         .always(function () {
           this.attr('isLoading', false);
@@ -232,39 +268,36 @@ export default can.Component.extend({
       let allowedTypes = ['text/csv', 'application/vnd.google-apps.document',
         'application/vnd.google-apps.spreadsheet'];
 
-      GGRC.Controllers.GAPI
-        .reAuthorize(gapi.auth.getToken())
-        .done(()=>{
+      return gapiClient.authorizeGapi(['https://www.googleapis.com/auth/drive'])
+        .then(()=> {
           gapi.load('picker', {callback: createPicker});
         });
 
       function createPicker() {
-        GGRC.Controllers.GAPI.oauth_dfd.done(function (token, oauth_user) {
-          let dialog;
-          let docsUploadView;
-          let docsView;
-          let picker = new google.picker.PickerBuilder()
-            .setOAuthToken(gapi.auth.getToken().access_token)
-            .setDeveloperKey(GGRC.config.GAPI_KEY)
-            .setCallback(pickerCallback);
+        let dialog;
+        let docsUploadView;
+        let docsView;
+        let picker = new google.picker.PickerBuilder()
+          .setOAuthToken(gapi.auth.getToken().access_token)
+          .setDeveloperKey(GGRC.config.GAPI_KEY)
+          .setCallback(pickerCallback);
 
-          docsUploadView = new google.picker.DocsUploadView();
-          docsView = new google.picker.DocsView()
-            .setMimeTypes(allowedTypes);
+        docsUploadView = new google.picker.DocsUploadView();
+        docsView = new google.picker.DocsView()
+          .setMimeTypes(allowedTypes);
 
-          picker.addView(docsUploadView)
-            .addView(docsView);
+        picker.addView(docsUploadView)
+          .addView(docsView);
 
-          picker = picker.build();
-          picker.setVisible(true);
+        picker = picker.build();
+        picker.setVisible(true);
 
-          $('div.picker-dialog-bg').css('zIndex', 4000);
+        $('div.picker-dialog-bg').css('zIndex', 4000);
 
-          dialog = GGRC.Utils.getPickerElement(picker);
-          if (dialog) {
-            dialog.style.zIndex = 4001;
-          }
-        });
+        dialog = GGRC.Utils.getPickerElement(picker);
+        if (dialog) {
+          dialog.style.zIndex = 4001;
+        }
       }
 
       function pickerCallback(data) {

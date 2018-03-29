@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+# Copyright (C) 2018 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+usage () {
+  cat <<EOF
+Usage: $(basename ${0}) --from user:feature_branch_name [-h] [-b BRANCH_NAME]
+
+Arguments:
+  -h : print help
+  -f|--from BRANCH_NAME : tested feature branch
+  -t|--to BRANCH_NAME: where you want to merge your feature branch
+  -s|--stop BRANCH_NAME: stop review branch name (!important: it will be removed)
+
+Example usage:
+  $(basename $0) --from user:feature_branch_name
+  $(basename $0) --from user:feature_branch_name --to upstream/dev
+EOF
+  exit 0
+}
+
+
+BASE_NAME="upstream/dev"
+FROM_NAME=""
+STOP_REVIEW=0
+
+while [[ $# -gt 0 ]]
+do
+key="$1"
+
+case $key in
+    -t|--to)
+    BASE_NAME="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -f|--from)
+    FROM_NAME="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -s|--stop)
+    STOP_REVIEW=1
+    shift # past argument
+    ;;
+    -h|--help)
+    usage
+    shift # past value
+    ;;
+esac
+done
+
+if [ "$FROM_NAME" == "" ]
+then
+    echo "From name required"
+    exit 1
+fi
+
+ARRAY=($(echo $FROM_NAME | tr ':' "\n"))
+USER=${ARRAY[0]}
+BRANCH=${ARRAY[1]}
+ARRAY=($(echo $BASE_NAME | tr '/' "\n"))
+REMOTE=${ARRAY[0]}
+REMOTE_BRANCH=${ARRAY[1]}
+
+if [ $STOP_REVIEW == 0 ]
+then
+  git fetch $REMOTE $REMOTE_BRANCH
+  git checkout -b $USER-$BRANCH $REMOTE/$REMOTE_BRANCH
+  git pull https://github.com/$USER/ggrc-core.git $BRANCH
+else
+  git checkout $BASE_NAME
+  git branch -D $USER-$BRANCH
+fi

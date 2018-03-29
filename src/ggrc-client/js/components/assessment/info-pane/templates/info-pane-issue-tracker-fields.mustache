@@ -4,7 +4,7 @@
 }}
 
 {{#if instance.issue_tracker.issue_url}}
-  {{#displayAssessmentIssueTracker instance.can_use_issue_tracker}}
+  {{#if instance.can_use_issue_tracker}}
     <div class="ggrc-form-item">
         <div class="ggrc-form-item__row">
             <div class="issue-tracker-url">
@@ -14,7 +14,7 @@
             </div>
         </div>
     </div>
-  {{/displayAssessmentIssueTracker}}
+  {{/if }}
 {{/if}}
 
 <div class="ggrc-form-item">
@@ -36,6 +36,7 @@
               (set-edit-mode)="setEditModeInline(%event)"
               (set-in-progress)="setInProgressState()"
               {is-edit-icon-denied}="isEditIconDenied"
+              is-confirmation-needed="false"
               {instance}="instance"
               {on-state-change-dfd}="onStateChangeDfd"
               {edit-mode}="editMode">
@@ -65,6 +66,7 @@
     <assessment-inline-item
       type="number"
       prop-name="issue_tracker.hotlist_id"
+      is-confirmation-needed="false"
       {set-in-progress}="@setInProgressState"
       {on-state-change-dfd}="onStateChangeDfd"
       {is-edit-icon-denied}="isEditDenied"
@@ -78,6 +80,7 @@
       type="number"
       prop-name="issue_tracker.component_id"
       mandatory="true"
+      is-confirmation-needed="false"
       {set-in-progress}="@setInProgressState"
       {on-state-change-dfd}="onStateChangeDfd"
       {is-edit-icon-denied}="isEditDenied"
@@ -108,6 +111,7 @@
     <assessment-inline-item
       type="dropdown"
       prop-name="issue_tracker.issue_priority"
+      is-confirmation-needed="false"
       {set-in-progress}="@setInProgressState"
       {on-state-change-dfd}="onStateChangeDfd"
       {dropdown-options}="instance.class.issue_tracker_priorities"
@@ -121,6 +125,7 @@
     <assessment-inline-item
       type="dropdown"
       prop-name="issue_tracker.issue_severity"
+      is-confirmation-needed="false"
       {set-in-progress}="@setInProgressState"
       {on-state-change-dfd}="onStateChangeDfd"
       {dropdown-options}="instance.class.issue_tracker_severities"
@@ -136,6 +141,7 @@
       prop-name="issue_tracker.title"
       mandatory="true"
       with-read-more="true"
+      is-confirmation-needed="false"
       {set-in-progress}="@setInProgressState"
       {on-state-change-dfd}="onStateChangeDfd"
       {is-edit-icon-denied}="isEditDenied"

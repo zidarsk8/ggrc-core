@@ -9,6 +9,7 @@ import sqlalchemy as sa
 from sqlalchemy import inspect
 from sqlalchemy.orm import load_only
 from sqlalchemy.orm.session import Session
+
 import flask
 from werkzeug.exceptions import Forbidden
 
@@ -181,8 +182,11 @@ def get_ac_roles_for(object_type):
   """
   if getattr(flask.g, "global_ac_roles", None) is None:
     flask.g.global_ac_roles = collections.defaultdict(dict)
-    query = AccessControlRole.query.options(
-        load_only("id", "name", "object_type"))
+    query = AccessControlRole.query.filter(
+        AccessControlRole.internal == sa.sql.expression.false(),
+    ).options(
+        load_only("id", "name", "object_type")
+    )
     for role in query:
       flask.g.global_ac_roles[role.object_type][role.name] = role
   return flask.g.global_ac_roles[object_type]

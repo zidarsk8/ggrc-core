@@ -2,29 +2,30 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """
-Fix tracking columns (SLOW!)
+add is external column to relationships table
 
-Create Date: 2016-08-04 09:56:42.330812
+Create Date: 2018-02-13 10:38:10.322322
 """
 # disable Invalid constant name pylint warning for mandatory Alembic variables.
 # pylint: disable=invalid-name
 
-from ggrc.migrations.utils.fix_tracking_columns import (
-    upgrade_tables,
-    downgrade_tables,
-)
+import sqlalchemy as sa
+
+from alembic import op
 
 
 # revision identifiers, used by Alembic.
-revision = '395186a2d8'
-down_revision = '50b3f0b2a002'
+revision = 'd1671a8dac7'
+down_revision = '40d92baab48c'
 
 
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
-  upgrade_tables("ggrc_gdrive_integration")
+  op.add_column(
+      'relationships',
+      sa.Column('is_external', sa.Boolean(), nullable=False, default=False))
 
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
-  downgrade_tables("ggrc_gdrive_integration")
+  op.drop_column('relationships', 'is_external')

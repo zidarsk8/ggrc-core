@@ -20,6 +20,7 @@ from ggrc.integrations import issues
 from ggrc.integrations import integrations_errors
 from ggrc.models import exceptions
 from ggrc.services import signals
+from ggrc.utils import referenced_objects
 
 
 logger = logging.getLogger(__name__)
@@ -401,20 +402,26 @@ def start_update_issue_job(audit_id, message):
   views.start_update_audit_issues(audit_id, message)
 
 
-def handle_assessment_create(assessment, src, templates, audits):
+def handle_assessment_create(assessment, src):
   """Handles issue tracker related data."""
   # Get issue tracker data from request.
   info = src.get('issue_tracker') or {}
 
   if not info:
     # Check assessment template for issue tracker data.
-    template = templates.get(src.get('template', {}).get('id'))
+    template = referenced_objects.get(
+        src.get('template', {}).get('type'),
+        src.get('template', {}).get('id'),
+    )
     if template:
       info = template.issue_tracker
 
   if not info:
     # Check audit for issue tracker data.
-    audit = audits.get(src.get('audit', {}).get('id'))
+    audit = referenced_objects.get(
+        src.get('audit', {}).get('type'),
+        src.get('audit', {}).get('id'),
+    )
     if audit:
       info = audit.issue_tracker
 
@@ -520,7 +527,7 @@ def _collect_issue_emails(assessment):
     A tuple of (assignee_email, [related_people_emails])
   """
   cc_list = _get_roles(assessment).get('Assignees')
-  cc_list = list(sorted(cc_list)) if cc_list else []
+  cc_list = sorted(cc_list) if cc_list else []
   assignee_email = cc_list.pop(0) if cc_list else None
   return assignee_email, cc_list
 
