@@ -35,7 +35,7 @@ def after_flush(session, _):
   flask.g.deleted_wf_objects = workflow.get_deleted_wf_objects(session)
 
 
-def after_transaction_end(session, _):
+def after_commit():
   """Handle acl propagation outside the original session."""
   if not hasattr(flask.g, "new_wf_acls") or \
           not hasattr(flask.g, "deleted_wf_objects"):
@@ -47,4 +47,3 @@ def after_transaction_end(session, _):
 def init_hook():
   """Initialize Relationship-related hooks."""
   sa.event.listen(Session, "after_flush", after_flush)
-  sa.event.listen(Session, "after_transaction_end", after_transaction_end)

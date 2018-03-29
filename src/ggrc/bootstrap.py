@@ -19,4 +19,15 @@ def get_db():
         length = 250
       return super(String, self).__init__(length, *args, **kwargs)
   db.String = String
+
+  original_commit = db.session.commit
+
+  def new_commit(*args, **kwargs):
+    original_commit(*args, **kwargs)
+    from ggrc.models.hooks import acl
+    acl.after_commit()
+    print "hello world"
+    original_commit(*args, **kwargs)
+
+  db.session.commit = new_commit
   return db
