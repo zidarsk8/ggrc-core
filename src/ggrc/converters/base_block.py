@@ -632,6 +632,8 @@ class BlockConverter(object):
       import_event = log_event(db.session, None)
       cache_utils.update_memcache_before_commit(
           self, modified_objects, CACHE_EXPIRY_IMPORT)
+      for row_converter in self.row_converters:
+        row_converter.send_before_commit_signals(import_event)
       db.session.commit()
       self._store_revision_ids(import_event)
       cache_utils.update_memcache_after_commit(self)

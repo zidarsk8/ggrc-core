@@ -553,7 +553,7 @@ def handle_cycle_task_group_object_task_put(
 
 @signals.Restful.model_posted_after_commit.connect_via(
     models.CycleTaskGroupObjectTask)
-@signals.Restful.model_put_after_commit.connect_via(
+@signals.Restful.model_put_before_commit.connect_via(
     models.CycleTaskGroupObjectTask)
 @signals.Restful.model_deleted_after_commit.connect_via(
     models.CycleTaskGroupObjectTask)

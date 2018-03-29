@@ -222,6 +222,23 @@ class RowConverter(object):
           self.object_class, obj=self.obj, src={}, service=service_class,
           event=event)
 
+  def send_before_commit_signals(self, event=None):
+    """Send before commit signals for all objects.
+
+    Currently we have only one before commit signal type:
+    model_put_before_commit. It should be sent for all changed objects via
+    import.
+    Note: signals are only sent for the row objects. Secondary objects such as
+    Relationships do not get any signals triggered.
+    """
+    if self.ignore or self.is_new or self.is_delete:
+      return
+    service_class = getattr(ggrc.services, self.object_class.__name__)
+    service_class.model = self.object_class
+    signals.Restful.model_put_before_commit.send(
+        self.object_class, obj=self.obj, src={}, service=service_class,
+        event=event)
+
   def send_pre_commit_signals(self):
     """Send before commit signals for all objects.
 
