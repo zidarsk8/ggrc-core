@@ -155,7 +155,8 @@ let ApprovalWorkflow = can.Observe({
           context: wf.context,
         }).save();
         cycleDfd.then(function () {
-          return that.original_object.refresh();
+          const binding = that.original_object.get_binding('approval_tasks');
+          return binding.loader.refresh_list(binding);
         });
         return cycleDfd;
       });
