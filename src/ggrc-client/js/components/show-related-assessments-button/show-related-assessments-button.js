@@ -5,6 +5,7 @@
 
 import '../related-objects/related-assessments';
 import template from './show-related-assessments-button.mustache';
+import {hasRelatedAssessments} from '../../plugins/utils/models-utils';
 
 (function (can, GGRC) {
   'use strict';
@@ -52,8 +53,7 @@ import template from './show-related-assessments-button.mustache';
       },
       // Temporary put this logic on the level of Component itself
       isAllowedToShow: function () {
-        let type = this.attr('instance.type');
-        return type === 'Control' || type === 'Objective';
+        return hasRelatedAssessments(this.attr('instance.type'));
       },
     },
   });
