@@ -114,6 +114,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     iti = factories.IssueTrackerIssueFactory(enabled=True)
     iti_issue_id.append(iti.issue_id)
     asmt = iti.issue_tracked_obj
+    asmt_title = asmt.title
     with mock.patch.object(issue_tracker, '_is_issue_tracker_enabled',
                            return_value=True):
       acl = [acl_helper.get_acl_json(assignee_role_id, assignee.id)
@@ -124,7 +125,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       kwargs = {'status': 'ASSIGNED',
                 'component_id': None,
                 'severity': None,
-                'title': iti.title,
+                'title': asmt_title,
                 'hotlist_ids': [],
                 'priority': None,
                 'assignee': email1,
@@ -132,7 +133,30 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                 'ccs': [email2]}
       mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
 
+  @mock.patch('ggrc.integrations.issues.Client.update_issue')
+  def test_update_issuetracker_title(self, mocked_update_issue):
+    """Test title sync in case it has been updated."""
+    with mock.patch.object(issue_tracker, '_is_issue_tracker_enabled',
+                           return_value=True):
+      iti_issue_id = []
+      iti = factories.IssueTrackerIssueFactory(enabled=True)
+      iti_issue_id.append(iti.issue_id)
+      asmt = iti.issue_tracked_obj
+      new_title = "New Title"
+      self.api.put(asmt, {"title": new_title})
+      kwargs = {'status': 'ASSIGNED',
+                'component_id': None,
+                'severity': None,
+                'title': new_title,
+                'hotlist_ids': [],
+                'priority': None}
+      mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
+
+      issue = db.session.query(models.IssuetrackerIssue).get(iti.id)
+      self.assertEqual(issue.title, new_title)
+
   # pylint: disable=protected-access
+  # pylint: disable=too-many-locals
   @ddt.data(
       ('Not Started', {'status': 'ASSIGNED'}),
       ('In Progress', {'status': 'ASSIGNED'}),
@@ -160,6 +184,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     iti = factories.IssueTrackerIssueFactory(enabled=True)
     iti_issue_id.append(iti.issue_id)
     asmt = iti.issue_tracked_obj
+    asmt_title = asmt.title
     with mock.patch.object(issue_tracker, '_is_issue_tracker_enabled',
                            return_value=True):
       acl = [acl_helper.get_acl_json(assignee_role_id, assignee.id)
@@ -170,7 +195,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       })
       kwargs = {'component_id': None,
                 'severity': None,
-                'title': iti.title,
+                'title': asmt_title,
                 'hotlist_ids': [],
                 'priority': None,
                 'assignee': email1,
