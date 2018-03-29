@@ -10,6 +10,7 @@ from ggrc import db
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Timeboxed
 from ggrc.models import reflection
+from ggrc.models import utils
 
 
 class TaskGroupObject(Timeboxed, Base, db.Model):
@@ -25,25 +26,13 @@ class TaskGroupObject(Timeboxed, Base, db.Model):
   object_id = db.Column(db.Integer, nullable=False)
   object_type = db.Column(db.String, nullable=False)
 
+  object = utils.JsonPolymorphicRelationship("object_id", "object_type",
+                                             "{}_object")
+
   @property
   def workflow(self):
     """Property which returns parent workflow object."""
     return self.task_group.workflow
-
-  @property
-  def object_attr(self):
-    return '{0}_object'.format(self.object_type)
-
-  @property
-  def object(self):
-    return getattr(self, self.object_attr)
-
-  @object.setter
-  def object(self, value):
-    self.object_id = value.id if value is not None else None
-    self.object_type = value.__class__.__name__ if value is not None \
-        else None
-    return setattr(self, self.object_attr, value)
 
   @staticmethod
   def _extra_table_args(klass):
