@@ -19,4 +19,18 @@ def get_db():
         length = 250
       return super(String, self).__init__(length, *args, **kwargs)
   db.String = String
+
+  db.session.plain_commit = db.session.commit
+
+  def hooked_commit(*args, **kwargs):
+    """Commit override function.
+
+    This function is meant for a single after commit hook that should only be
+    used for ACL propagation.
+    """
+    db.session.plain_commit(*args, **kwargs)
+    from ggrc.models.hooks import acl
+    acl.after_commit()
+
+  db.session.commit = hooked_commit
   return db

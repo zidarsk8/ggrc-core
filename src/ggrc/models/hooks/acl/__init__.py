@@ -47,6 +47,10 @@ def after_flush(session, _):
   workflow.handle_acl_changes()
 
 
+def after_commit():
+  pass
+
+
 def init_hook():
   """Initialize Relationship-related hooks."""
   sa.event.listen(Session, "after_flush", after_flush)
