@@ -6,7 +6,12 @@
 import json
 from mock import patch
 
+import ddt
+
+from ggrc.models import all_models
+from integration.ggrc import api_helper
 from integration.ggrc.services import TestCase
+from integration.ggrc.models import factories
 
 
 class TestCollectionPost(TestCase):
@@ -85,3 +90,48 @@ class TestCollectionPost(TestCase):
     )
     response = self._post(data)
     self.assertStatus(response, 403)
+
+
+@ddt.ddt
+class TestMapDeletedObject(TestCase):
+  """Test mapping operations for deleted objects."""
+
+  def setUp(self):
+    self.api = api_helper.Api()
+    with factories.single_commit():
+      source_id = factories.ControlFactory().id
+      destination_id = factories.ControlFactory().id
+      del_source_id = factories.ControlFactory().id
+      del_destination_id = factories.ControlFactory().id
+
+    self.objects = {
+        "source": {"type": "Control", "id": source_id},
+        "destination": {"type": "Control", "id": destination_id},
+        "deleted_source": {"type": "Control", "id": del_source_id},
+        "deleted_destination": {"type": "Control", "id": del_destination_id},
+    }
+
+    self.api.delete(all_models.Control, id_=del_source_id)
+    self.api.delete(all_models.Control, id_=del_destination_id)
+
+  @ddt.data(
+      ("source", "destination", 201),
+      ("source", "deleted_destination", 400),
+      ("deleted_source", "destination", 400),
+      ("deleted_source", "deleted_destination", 400),
+  )
+  @ddt.unpack
+  def test_map_deleted_object(self, source_key, destination_key, status_code):
+    """Status code is {2} when {0} is mapped to {1}."""
+    response = self.api.post(
+        all_models.Relationship,
+        {
+            "relationship": {
+                "source": self.objects[source_key],
+                "destination": self.objects[destination_key],
+                "context": None,
+            },
+        },
+    )
+
+    self.assertStatus(response, status_code)

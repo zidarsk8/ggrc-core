@@ -118,6 +118,9 @@ class Relationship(Base, db.Model):
                                     self.destination_type, self.destination_id)
 
   def validate_relatable_type(self, field, value):
+    if value is None:
+      raise ValidationError(u"{}.{} can't be None."
+                            .format(self.__class__.__name__, field))
     if not isinstance(value, Relatable):
       raise ValidationError(u"You are trying to create relationship with not "
                             u"Relatable type: {}".format(value.type))
