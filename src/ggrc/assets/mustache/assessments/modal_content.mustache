@@ -159,14 +159,12 @@
                     </object-list-item-updater>
                   </div>
                   <div class="modal-mapped-objects-item__unmap">
-                    {{^if_in type 'Audit, Issue'}}
                     {{#if new_object_form}}
                       <a href="javascript://" data-toggle="unmap">
                         <span class="result" {{data 'result'}}></span>
                         <i class="fa fa-trash"></i>
                       </a>
                     {{/if}}
-                    {{/if_in}}
                   </div>
                 </div>
               {{/each}}
