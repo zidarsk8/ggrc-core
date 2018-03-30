@@ -16,6 +16,7 @@ from ggrc import utils
 from ggrc import models
 from ggrc import builder
 from ggrc.models import all_models
+from ggrc.models.mixins import customattributable
 
 from integration.ggrc.services import TestCase
 from integration.ggrc.generator import ObjectGenerator
@@ -264,6 +265,60 @@ class TestGlobalCustomAttributes(ProductTestCase):
     self.assertEqual(
         default_value,
         cad_resp.json["custom_attribute_definition"]["default_value"])
+
+  @ddt.data((True, "1"),
+            (True, "true"),
+            (True, "TRUE"),
+            (False, "0"),
+            (False, "false"),
+            (False, "FALSE"))
+  @ddt.unpack
+  def test_filter_by_mandatory(self, flag_value, filter_value):
+    """Filter CADs by mandatory flag if it's {0} and filter_value is {1}."""
+    with factories.single_commit():
+      cads = {
+          f: factories.CustomAttributeDefinitionFactory(
+              mandatory=f, definition_type="control")
+          for f in [True, False]
+      }
+    resp = self.generator.api.get_query(
+        all_models.CustomAttributeDefinition,
+        "ids={}&mandatory={}".format(
+            ",".join([str(c.id) for c in cads.values()]),
+            filter_value),
+    )
+    self.assert200(resp)
+    cad_collection = resp.json["custom_attribute_definitions_collection"]
+    resp_cad_ids = [
+        i["id"] for i in cad_collection["custom_attribute_definitions"]
+    ]
+    self.assertEqual([cads[flag_value].id], resp_cad_ids)
+
+  CAD_MODELS = [m for m in all_models.all_models
+                if issubclass(m, customattributable.CustomAttributable)]
+
+  @ddt.data(*CAD_MODELS)
+  def test_filter_by_definition_type(self, definition_model):
+    """Filter {0.__name__} CADs by definition_type."""
+
+    with factories.single_commit():
+      cads = {
+          model: factories.CustomAttributeDefinitionFactory(
+              definition_type=model._inflector.table_singular)
+          for model in self.CAD_MODELS
+      }
+    filter_params = "ids={}&definition_type={}".format(
+        ",".join([str(c.id) for c in cads.values()]),
+        definition_model._inflector.table_singular,
+    )
+    resp = self.generator.api.get_query(all_models.CustomAttributeDefinition,
+                                        filter_params)
+    self.assert200(resp)
+    cad_collection = resp.json["custom_attribute_definitions_collection"]
+    resp_cad_ids = [
+        i["id"] for i in cad_collection["custom_attribute_definitions"]
+    ]
+    self.assertEqual([cads[definition_model].id], resp_cad_ids)
 
 
 class TestOldApiCompatibility(ProductTestCase):
