@@ -3,6 +3,7 @@
 
 """SQLAlchemy hooks for Workflow model."""
 
+import flask
 import sqlalchemy as sa
 
 from ggrc import db
@@ -28,10 +29,23 @@ WF_PROPAGATED_ROLES = {
 }
 
 
-def handle_acl_changes(new_wf_acls, deleted_wf_objects):
-  """ACL creation hook handler."""
-  _propagete_new_wf_acls(new_wf_acls)
-  remove_related_acl(deleted_wf_objects)
+def handle_acl_changes():
+  """ACL creation hook handler.
+
+  The global variables for this function are set in the after_flush hook, so
+  this function must be called after that hook in order for propagation to
+  work.
+  """
+
+  if not (hasattr(flask.g, "new_wf_acls") and
+          hasattr(flask.g, "deleted_wf_objects")):
+    return
+
+  _propagete_new_wf_acls(flask.g.new_wf_acls)
+  remove_related_acl(flask.g.deleted_wf_objects)
+
+  del flask.g.new_wf_acls,
+  del flask.g.deleted_wf_objects,
 
 
 def get_wf_propagated_role_ids():

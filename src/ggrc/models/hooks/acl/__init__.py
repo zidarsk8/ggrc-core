@@ -32,13 +32,17 @@ def after_flush(session, _):
   audit_role_handler.after_flush(session)
   relationship_deletion.after_flush(session)
 
-  flask.g.new_wf_acls = workflow.get_new_wf_acls(session)
-  flask.g.deleted_wf_objects = workflow.get_deleted_wf_objects(session)
+  if hasattr(flask.g, "new_wf_acls"):
+    flask.g.new_wf_acls.update(workflow.get_new_wf_acls(session))
+  else:
+    flask.g.new_wf_acls = workflow.get_new_wf_acls(session)
 
-  workflow.handle_acl_changes(
-      getattr(flask.g, "new_wf_acls", []),
-      getattr(flask.g, "deleted_wf_objects", []),
-  )
+  if hasattr(flask.g, "deleted_wf_objects"):
+    flask.g.deleted_wf_objects.update(workflow.get_deleted_wf_objects(session))
+  else:
+    flask.g.deleted_wf_objects = workflow.get_deleted_wf_objects(session)
+
+  workflow.handle_acl_changes()
 
 
 def init_hook():
