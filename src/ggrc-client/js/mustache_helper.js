@@ -73,17 +73,6 @@ $.ajaxTransport('text', function (options, _originalOptions, _jqXHR) {
   }
 });
 
-let quickHash = function (str, seed) {
-  let bitval = seed || 1;
-  str = str || '';
-  for (let i = 0; i < str.length; i++) {
-    bitval *= str.charCodeAt(i);
-    bitval = Math.pow(bitval, 7);
-    bitval %= Math.pow(7, 37);
-  }
-  return bitval;
-};
-
 /**
  * Builds class name of two segments - prefix and computed value
  * @param  {String|computed} prefix class prefix
@@ -108,7 +97,7 @@ Mustache.registerHelper('addclass', function (prefix, compute, options = {}) {
 });
 
 Mustache.registerHelper('if_equals', function (val1, val2, options) {
-  let that = this, _val1, _val2;
+  let _val1, _val2;
   function exec() {
     if (_val1 && val2 && options.hash && options.hash.insensitive) {
       _val1 = _val1.toLowerCase();
@@ -119,7 +108,7 @@ Mustache.registerHelper('if_equals', function (val1, val2, options) {
   }
   if (typeof val1 === 'function') {
     if (val1.isComputed) {
-      val1.bind('change', function (ev, newVal, oldVal) {
+      val1.bind('change', function (ev, newVal) {
         _val1 = newVal;
         return exec();
       });
@@ -130,7 +119,7 @@ Mustache.registerHelper('if_equals', function (val1, val2, options) {
   }
   if (typeof val2 === 'function') {
     if (val2.isComputed) {
-      val2.bind('change', function (ev, newVal, oldVal) {
+      val2.bind('change', function (ev, newVal) {
         _val2 = newVal;
         exec();
       });
@@ -144,8 +133,7 @@ Mustache.registerHelper('if_equals', function (val1, val2, options) {
 });
 
 Mustache.registerHelper('if_match', function (val1, val2, options) {
-  let that = this,
-    _val1 = resolveComputed(val1),
+  let _val1 = resolveComputed(val1),
     _val2 = resolveComputed(val2);
   function exec() {
     let re = new RegExp(_val2);
@@ -170,7 +158,7 @@ Mustache.registerHelper('if_null', function (val1, options) {
   }
   if (typeof val1 === 'function') {
     if (val1.isComputed) {
-      val1.bind('change', function (ev, newVal, oldVal) {
+      val1.bind('change', function (ev, newVal) {
         _val1 = newVal;
         return exec();
       });
@@ -397,7 +385,6 @@ let deferRender = Mustache.defer_render = function (tagPrefix, funcs, deferred) 
       f = function () {
         let g = deferred && deferred.state() === 'rejected' ? funcs.fail : funcs.done,
           args = arguments,
-          term = element.nextSibling,
           compute = can.compute(function () {
             return g.apply(this, args) || '';
           }, this)
@@ -434,7 +421,6 @@ let deferRender = Mustache.defer_render = function (tagPrefix, funcs, deferred) 
 };
 
 Mustache.registerHelper('defer', function (prop, deferred, options) {
-  let context = this;
   let tagName;
   let allowFail;
   if (!options) {
@@ -706,13 +692,11 @@ Mustache.registerHelper('show_long', function () {
 
 Mustache.registerHelper('using', function (options) {
   let refreshQueue = new RefreshQueue(),
-    context,
     frame = new can.Observe(),
     args = can.makeArray(arguments),
     i, arg;
 
   options = args.pop();
-  context = options.contexts || this;
 
   if (options.hash) {
     for (i in options.hash) {
@@ -739,8 +723,7 @@ Mustache.registerHelper('using', function (options) {
 Mustache.registerHelper('with_mapping', function (binding, options) {
   let context = arguments.length > 2 ? resolveComputed(options) : this,
     frame = new can.Observe(),
-    loader,
-    stack;
+    loader;
 
   if (!context) // can't find an object to map to.  Do nothing;
   {
@@ -825,78 +808,8 @@ Mustache.registerHelper('person_roles', function (person, scope, options) {
   return deferRender('span', finish, rolesDeferred);
 });
 
-Mustache.registerHelper('if_result_has_extended_mappings', function (
-  bindings, parent_instance, options) {
-  //  Render the `true` / `fn` block if the `result` exists (in this list)
-  //  due to mappings other than directly to the `parent_instance`.  Otherwise
-  //  Render the `false` / `inverse` block.
-  bindings = Mustache.resolve(bindings);
-  bindings = resolveComputed(bindings);
-  parent_instance = Mustache.resolve(parent_instance);
-  let has_extended_mappings = false,
-    i
-    ;
-
-  if (bindings && bindings.length > 0) {
-    for (i=0; i<bindings.length; i++) {
-      if (bindings[i].instance && parent_instance
-          && bindings[i].instance.reify() !== parent_instance.reify()) {
-        has_extended_mappings = true;
-      }
-    }
-  }
-
-  if (has_extended_mappings) {
-    return options.fn(options.contexts);
-  } else {
-    return options.inverse(options.contexts);
-  }
-});
-
-Mustache.registerHelper('each_with_extras_as', function (name, list, options) {
-  //  Iterate over `list` and render the provided block with additional
-  //  variables available in the context, specifically to enable joining with
-  //  commas and using "and" in the right place.
-  //
-  //  * `<name>`: Instead of rendering with the item as the current context,
-  //      make the item available at the specified `name`
-  //  * index
-  //  * length
-  //  * isFirst
-  //  * isLast
-  name = Mustache.resolve(name);
-  list = Mustache.resolve(list);
-  list = resolveComputed(list);
-  let i,
-    output = [],
-    frame,
-    length = list.length
-    ;
-  for (i=0; i<length; i++) {
-    frame = {
-      index: i,
-      isFirst: i === 0,
-      isLast: i === length - 1,
-      isSecondToLast: i === length - 2,
-      length: length,
-    };
-    frame[name] = list[i];
-    output.push(options.fn(new can.Observe(frame)));
-
-    //  FIXME: Is this legit?  It seems necessary in some cases.
-    // context = $.extend([], options.contexts, options.contexts.concat([frame]));
-    // output.push(options.fn(context));
-    // ...or...
-    // contexts = options.contexts.concat([frame]);
-    // contexts.___st4ck3d = true;
-    // output.push(options.fn(contexts));
-  }
-  return output.join('');
-});
-
 Mustache.registerHelper('link_to_tree', function () {
   let args = [].slice.apply(arguments),
-    options = args.pop(),
     link = []
     ;
 
@@ -1278,37 +1191,6 @@ Mustache.registerHelper('is_admin_page', (options) => {
   return isAdmin() ?
     options.fn(options.contexts) :
     options.inverse(options.contexts);
-});
-
-Mustache.registerHelper('is_profile', function (parent_instance, options) {
-  let instance;
-  if (options) {
-    instance = resolveComputed(parent_instance);
-  } else {
-    options = parent_instance;
-  }
-
-  if (GGRC.page_instance() instanceof CMS.Models.Person) {
-    return options.fn(options.contexts);
-  } else {
-    return options.inverse(options.contexts);
-  }
-});
-
-Mustache.registerHelper('is_parent_of_type', function (type_options, options) {
-  /*
-  Determines if parent instance is of specified type.
-  Input:   type_options = 'TypeA,TypeB,TypeC'
-  Returns: Boolean
-  */
-  let types = type_options.split(','),
-    parent = GGRC.page_instance(),
-    parentType = parent.type;
-
-  if ($.inArray(parentType, types) !== -1) {
-    return options.fn(options.contexts);
-  }
-  return options.inverse(options.contexts);
 });
 
 Mustache.registerHelper('current_user_is_admin', function (options) {
