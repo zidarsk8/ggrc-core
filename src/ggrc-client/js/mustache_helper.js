@@ -389,7 +389,7 @@ let defer_render = Mustache.defer_render = function defer_render(tag_prefix, fun
   tag_name = tag_name || 'span';
 
   if (typeof funcs === 'function') {
-    funcs = { done : funcs };
+    funcs = {done : funcs};
   }
 
   function hookup(element, parent, view_id) {
@@ -453,7 +453,7 @@ Mustache.registerHelper('defer', function (prop, deferred, options) {
     return options.inverse(options.contexts);
   }
 
-  return defer_render(tag_name, { done: finish, fail: allow_fail ? finish : null, progress: progress }, deferred);
+  return defer_render(tag_name, {done: finish, fail: allow_fail ? finish : null, progress: progress}, deferred);
 });
 
 Mustache.registerHelper('allow_help_edit', function () {
@@ -755,7 +755,7 @@ Mustache.registerHelper('with_mapping', function (binding, options) {
     return options.inverse(options.contexts.add({error : error}));
   }
 
-  return defer_render('span', { done : finish, fail : fail }, loader.refresh_instances());
+  return defer_render('span', {done : finish, fail : fail}, loader.refresh_instances());
 });
 
 Mustache.registerHelper('person_roles', function (person, scope, options) {
@@ -812,7 +812,7 @@ Mustache.registerHelper('person_roles', function (person, scope, options) {
   });
 
   function finish(roles) {
-    return options.fn({ roles: roles });
+    return options.fn({roles: roles});
   }
 
   return defer_render('span', finish, roles_deferred);
@@ -1548,7 +1548,7 @@ Mustache.registerHelper('if_helpers', function () {
 
         helper_result = null;
         stmt.helper.fn.apply(stmt.helper, stmt.args.concat([
-          can.extend({}, helper_options, { hash: stmt.hash || helper_options.hash }),
+          can.extend({}, helper_options, {hash: stmt.hash || helper_options.hash}),
         ]));
         helper_result = helper_result === stmt.fn_name;
         return current_result && helper_result;
@@ -1841,10 +1841,10 @@ Mustache.registerHelper('toggle', function (compute, options) {
 
   if (compute()) {
     return options.fn(
-      options.contexts, { helpers: { toggle_button: toggle }});
+      options.contexts, {helpers: {toggle_button: toggle}});
   } else {
     return options.inverse(
-      options.contexts, { helpers: { toggle_button: toggle }});
+      options.contexts, {helpers: {toggle_button: toggle}});
   }
 });
 
