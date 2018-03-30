@@ -83,20 +83,22 @@ provision_dev() {
 }
 
 
-reset_db_and_launch_dev() {
+provision_dev_for_selenium() {
   local dev_server=$1
-  echo "Resetting the DB for $dev_server"
-  docker exec -i ${PROJECT}_${dev_server} su -c "
+  docker exec -i ${PROJECT}_${dev_server} bash -c "
     source /vagrant/bin/init_vagrant_env
     source /vagrant/bin/init_test_env
+    ln -s /vagrant-dev/node_modules /vagrant/node_modules
+    echo ""Set env vars and rebuild asset files for $dev_server""
+    deploy_appengine extras/deploy_settings_local.sh \
+      extras/deploy_settings_selenium.override.sh
+    echo ""Resetting the DB for $dev_server""
     db_reset -d ggrcdevtest
   "
   echo "Running dev server $dev_server"
-  docker exec -id ${PROJECT}_${dev_server} su -c "
+  docker exec -id ${PROJECT}_${dev_server} bash -c "
     source /vagrant/bin/init_vagrant_env
-    source /vagrant/bin/init_test_env
-    export DASHBOARD_INTEGRATION='on'
-    launch_ggrc
+    launch_gae_ggrc
   "
 }
 
@@ -122,7 +124,7 @@ selenium_tests () {
   PROJECT=$1
   print_line
 
-  provision_dev "cleandev_1" && reset_db_and_launch_dev "cleandev_1"
+  provision_dev_for_selenium "cleandev_1"
 
   echo "Running Selenium tests"
   docker exec -i ${PROJECT}_selenium_1 sh -c "

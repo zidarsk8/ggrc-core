@@ -968,6 +968,10 @@ class AssessmentsDropdown3bbsTreeView(CommonDropdown3bbsTreeView):
       CommonDropdown3bbsTreeView.TREE_VIEW_3BBS_DD + " .fa-magic")
 
 
+class Assessments(object):
+  SHOW_GENERATED_ASSESSMENTS = (By.CSS_SELECTOR, ".reload-link")
+
+
 class TreeView(object):
   """Locators for Tree View components."""
   # common

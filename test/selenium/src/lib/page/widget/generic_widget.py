@@ -228,6 +228,14 @@ class AssessmentTemplates(Widget):
 
 class Assessments(Widget):
   """Model for Assessments generic widgets."""
+  _locators = locator.Assessments
+
+  def show_generated_results(self):
+    """Wait for Assessments generated successfully message.
+    Click on link to show them.
+    """
+    base.Element(self._driver,
+                 self._locators.SHOW_GENERATED_ASSESSMENTS).click()
 
 
 class Controls(Widget):
