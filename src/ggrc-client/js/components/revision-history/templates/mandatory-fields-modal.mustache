@@ -1,0 +1,48 @@
+{{!
+  Copyright (C) 2018 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<simple-modal {state}="state"
+              {instance}="instance"
+              {replace-content}="true">
+  <div class="simple-modal__header">
+      <div class="simple-modal__header-text">Global custom attribute validation</div>
+      <button class="btn btn-small btn-icon" {{#if loading}}disabled{{/if}} ($click)="cancel()">
+          <i class="fa fa-times black"></i>
+      </button>
+  </div>
+  <div class="simple-modal__body">
+    <div class="simple-modal__section">
+      <p>
+        Please fill in the field(s) below to apply this version -
+        <person-list-item with-details="false" {person}="revisionModifiedBy">
+        </person-list-item>
+        <div>
+          {{localize_datetime revisionUpdatedAt}}
+        </div>
+      </p>
+    </div>
+    <div class="simple-modal__section">
+      {{#if showCAs}}
+        <gca-controls
+          {instance}="instance"
+          {items}="caFields">
+        </gca-controls>
+      {{/if}}
+    </div>
+  </div>
+  <div class="simple-modal__footer">
+    <div class="simple-modal__toolbar">
+      <button class="btn btn-small btn-green preventdoubleclick"
+        {{disable_if_errors instance}}
+        {{#if loading}}disabled{{/if}}
+        ($click)="save()">
+          Apply
+      </button>
+      <button class="btn btn-small btn-white simple-modal__toolbar-item" ($click)="cancel()">Cancel</button>
+      <spinner toggle="loading"></spinner>
+    </div>
+  </div>
+
+</simple-modal>
