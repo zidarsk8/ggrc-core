@@ -654,7 +654,7 @@ Mustache.registerHelper('schemed_url', function (url) {
   }
 
   domain = url_split[2];
-  max_label = _.max(domain.split('.').map(function(u) { return u.length; }));
+  max_label = _.max(domain.split('.').map(function (u) { return u.length; }));
   if (max_label > 63 || domain.length > 253) {
     // The url is invalid and might crash user's chrome tab
     return 'javascript://';
@@ -1583,7 +1583,7 @@ Mustache.registerHelper('if_multi_owner', function (instance, modal_title, optio
   }
 
   let loader = resolve_computed(instance).get_binding('authorizations');
-  can.each(loader.list, function(binding){
+  can.each(loader.list, function (binding){
     if (binding.instance.role && binding.instance.role.reify().attr('name') === 'ProgramOwner') {
       owner_count += 1;
     }
@@ -1951,7 +1951,7 @@ Mustache.registerHelper('debugger', function () {
   return options.fn(options.contexts);
 });
 
-Mustache.registerHelper('update_link', function(instance, options) {
+Mustache.registerHelper('update_link', function (instance, options) {
 
   instance = Mustache.resolve(instance);
   if (instance.viewLink) {
@@ -1995,14 +1995,14 @@ Mustache.registerHelper('if_less', function (a, b, options) {
   }
 });
 
-Mustache.registerHelper('add_index', function(index, increment, options) {
+Mustache.registerHelper('add_index', function (index, increment, options) {
   index = Mustache.resolve(index);
   increment = Mustache.resolve(increment);
 
   return (index + increment);
 });
 
-function get_proper_url (url) {
+function get_proper_url(url) {
   let domain, max_label, url_split;
 
   if (!url) {
@@ -2020,7 +2020,7 @@ function get_proper_url (url) {
   }
 
   domain = url_split[2];
-  max_label = _.max(domain.split('.').map(function(u) { return u.length; }));
+  max_label = _.max(domain.split('.').map(function (u) { return u.length; }));
   if (max_label > 63 || domain.length > 253) {
     // The url is invalid and might crash user's chrome tab
     return 'javascript://';
