@@ -24,19 +24,19 @@ import {
 } from './plugins/utils/query-api-utils';
 
 // Chrome likes to cache AJAX requests for Mustaches.
-let mustache_urls = {};
+let mustacheUrls = {};
 let Mustache = can.Mustache;
 $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
   if (/\.mustache$/.test(options.url)) {
-    if (mustache_urls[options.url]) {
-      options.url = mustache_urls[options.url];
+    if (mustacheUrls[options.url]) {
+      options.url = mustacheUrls[options.url];
     } else {
-      mustache_urls[options.url] = options.url += '?r=' + Math.random();
+      mustacheUrls[options.url] = options.url += '?r=' + Math.random();
     }
   }
 });
 
-function get_template_path(url) {
+function getTemplatePath(url) {
   let match;
   match = url.match(/\/static\/(mustache|mockups)\/(.*)\.mustache/);
   return match && match[2];
@@ -46,8 +46,8 @@ function get_template_path(url) {
 //   short-circuit the request.
 
 $.ajaxTransport('text', function (options, _originalOptions, _jqXHR) {
-  let template_path = get_template_path(options.url);
-  let template = template_path && GGRC.Templates[template_path];
+  let templatePath = getTemplatePath(options.url);
+  let template = templatePath && GGRC.Templates[templatePath];
   if (template) {
     return {
       send: function (headers, completeCallback) {
@@ -94,8 +94,8 @@ let quickHash = function (str, seed) {
  * @return {String} computed class string
  */
 Mustache.registerHelper('addclass', function (prefix, compute, options = {}) {
-  prefix = resolve_computed(prefix);
-  let computeVal = resolve_computed(compute);
+  prefix = resolveComputed(prefix);
+  let computeVal = resolveComputed(compute);
   let opts = options.hash || {};
   let separator = _.isString(opts.separator) ? opts.separator : '-';
   let computeSeparator = _.isString(opts.computeSeparator)
@@ -145,8 +145,8 @@ Mustache.registerHelper('if_equals', function (val1, val2, options) {
 
 Mustache.registerHelper('if_match', function (val1, val2, options) {
   let that = this,
-    _val1 = resolve_computed(val1),
-    _val2 = resolve_computed(val2);
+    _val1 = resolveComputed(val1),
+    _val2 = resolveComputed(val2);
   function exec() {
     let re = new RegExp(_val2);
     if (re.test(_val1)) return options.fn(options.contexts);
@@ -156,8 +156,8 @@ Mustache.registerHelper('if_match', function (val1, val2, options) {
 });
 
 Mustache.registerHelper('in_array', function (needle, haystack, options) {
-  needle = resolve_computed(needle);
-  haystack = resolve_computed(haystack);
+  needle = resolveComputed(needle);
+  haystack = resolveComputed(haystack);
 
   return options[~can.inArray(needle, haystack) ? 'fn' : 'inverse'](options.contexts);
 });
@@ -250,7 +250,7 @@ Mustache.registerHelper('get_item', function (object, key, options) {
 Mustache.registerHelper('firstexist', function () {
   let args = can.makeArray(arguments).slice(0, arguments.length - 1); // ignore the last argument (some Can object)
   for (let i = 0; i < args.length; i++) {
-    let v = resolve_computed(args[i]);
+    let v = resolveComputed(args[i]);
     if (v && v.length) {
       return v.toString();
     }
@@ -262,14 +262,14 @@ Mustache.registerHelper('firstexist', function () {
 Mustache.registerHelper('firstnonempty', function () {
   let args = can.makeArray(arguments).slice(0, arguments.length - 1); // ignore the last argument (some Can object)
   for (let i = 0; i < args.length; i++) {
-    let v = resolve_computed(args[i]);
+    let v = resolveComputed(args[i]);
     if (v != null && !!v.toString().trim().replace(/&nbsp;|\s|<br *\/?>/g, '')) return v.toString();
   }
   return '';
 });
 
 Mustache.registerHelper('is_empty', (data, options) => {
-  data = resolve_computed(data);
+  data = resolveComputed(data);
   const result = can.isEmptyObject(
     can.isPlainObject(data) ? data : data.attr()
   );
@@ -376,23 +376,23 @@ Mustache.registerHelper('render_hooks', function () {
     options = args.splice(args.length - 1, 1)[0],
     hook = can.map(args, Mustache.resolve).join('.');
 
-  return can.map(can.getObject(hook, GGRC.hooks) || [], function (hook_tmpl) {
-    return can.Mustache.getHelper('renderLive', options.contexts).fn(hook_tmpl, options.contexts, options);
+  return can.map(can.getObject(hook, GGRC.hooks) || [], function (hookTmpl) {
+    return can.Mustache.getHelper('renderLive', options.contexts).fn(hookTmpl, options.contexts, options);
   }).join('\n');
 });
 
-let defer_render = Mustache.defer_render = function defer_render(tag_prefix, funcs, deferred) {
+let deferRender = Mustache.defer_render = function (tagPrefix, funcs, deferred) {
   let hook,
-    tag_name = tag_prefix.split(' ')[0]
+    tagName = tagPrefix.split(' ')[0]
     ;
 
-  tag_name = tag_name || 'span';
+  tagName = tagName || 'span';
 
   if (typeof funcs === 'function') {
     funcs = {done: funcs};
   }
 
-  function hookup(element, parent, view_id) {
+  function hookup(element, parent) {
     let $element = $(element),
       f = function () {
         let g = deferred && deferred.state() === 'rejected' ? funcs.fail : funcs.done,
@@ -430,21 +430,22 @@ let defer_render = Mustache.defer_render = function defer_render(tag_prefix, fun
   }
 
   hook = can.view.hook(hookup);
-  return ['<', tag_prefix, ' ', hook, '>', '</', tag_name, '>'].join('');
+  return ['<', tagPrefix, ' ', hook, '>', '</', tagName, '>'].join('');
 };
 
 Mustache.registerHelper('defer', function (prop, deferred, options) {
   let context = this;
-  let tag_name;
+  let tagName;
+  let allowFail;
   if (!options) {
     options = prop;
     prop = 'result';
   }
 
-  tag_name = (options.hash || {}).tag_name || 'span';
-  allow_fail = (options.hash || {}).allow_fail || false;
+  tagName = (options.hash || {}).tag_name || 'span';
+  allowFail = (options.hash || {}).allow_fail || false;
 
-  deferred = resolve_computed(deferred);
+  deferred = resolveComputed(deferred);
   if (typeof deferred === 'function') deferred = deferred();
   function finish(items) {
     let ctx = {};
@@ -455,7 +456,7 @@ Mustache.registerHelper('defer', function (prop, deferred, options) {
     return options.inverse(options.contexts);
   }
 
-  return defer_render(tag_name, {done: finish, fail: allow_fail ? finish : null, progress: progress}, deferred);
+  return deferRender(tagName, {done: finish, fail: allowFail ? finish : null, progress: progress}, deferred);
 });
 
 Mustache.registerHelper('allow_help_edit', function () {
@@ -478,14 +479,14 @@ can.each(['with_page_object_as', 'with_current_user_as'], function (fname) {
       options = name;
       name = fname.replace(/with_(.*)_as/, '$1');
     }
-    let page_object = (fname === 'with_current_user_as'
+    let pageObject = (fname === 'with_current_user_as'
       ? (CMS.Models.Person.findInCacheById(GGRC.current_user.id)
                           || CMS.Models.Person.model(GGRC.current_user))
       : GGRC.page_instance()
     );
-    if (page_object) {
+    if (pageObject) {
       let p = {};
-      p[name] = page_object;
+      p[name] = pageObject;
       options.contexts = options.contexts.add(p);
       return options.fn(options.contexts);
     } else {
@@ -509,26 +510,26 @@ Mustache.registerHelper('iterate_string', function (str, separator, options) {
   return ret.join('');
 });
 
-Mustache.registerHelper('option_select', function (object, attr_name, role, options) {
-  let selected_option = object.attr(attr_name),
-    selected_id = selected_option ? selected_option.id : null,
-    options_dfd = CMS.Models.Option.for_role(role),
+Mustache.registerHelper('option_select', function (object, attrName, role, options) {
+  let selectedOption = object.attr(attrName),
+    selectedId = selectedOption ? selectedOption.id : null,
+    optionsDfd = CMS.Models.Option.for_role(role),
     tabindex = options.hash && options.hash.tabindex,
-    tag_prefix = 'select class="span12"'
+    tagPrefix = 'select class="span12"'
     ;
 
-  function get_select_html(options) {
+  function getSelectHtml(options) {
     return [
-      '<select class="span12" model="Option" name="' + attr_name + '"',
+      '<select class="span12" model="Option" name="' + attrName + '"',
       tabindex ? ' tabindex=' + tabindex : '',
       '>',
       '<option value=""',
-      !selected_id ? ' selected=selected' : '',
+      !selectedId ? ' selected=selected' : '',
       '>---</option>',
       can.map(options, function (option) {
         return [
           '<option value="', option.id, '"',
-          selected_id == option.id ? ' selected=selected' : '',
+          selectedId == option.id ? ' selected=selected' : '',
           '>',
           option.title,
           '</option>',
@@ -538,35 +539,35 @@ Mustache.registerHelper('option_select', function (object, attr_name, role, opti
     ].join('');
   }
 
-  return defer_render(tag_prefix, get_select_html, options_dfd);
+  return deferRender(tagPrefix, getSelectHtml, optionsDfd);
 });
 
-Mustache.registerHelper('category_select', function (object, attr_name, category_type, options) {
-  const selected_options = object[attr_name] || [];
-  const selected_ids = can.map(selected_options, function (selected_option) {
-    return selected_option.id;
+Mustache.registerHelper('category_select', function (object, attrName, categoryType, options) {
+  const selectedOptions = object[attrName] || [];
+  const selectedIds = can.map(selectedOptions, function (selectedOption) {
+    return selectedOption.id;
   });
-  const options_dfd = CMS.Models[category_type].findAll();
-  let tab_index = options.hash && options.hash.tabindex;
-  const tag_prefix = 'select class="span12" multiple="multiple"';
+  const optionsDfd = CMS.Models[categoryType].findAll();
+  let tabIndex = options.hash && options.hash.tabindex;
+  const tagPrefix = 'select class="span12" multiple="multiple"';
 
-  tab_index = typeof tab_index !== 'undefined' ?
-    ` tabindex="${tab_index}"` :
+  tabIndex = typeof tabIndex !== 'undefined' ?
+    ` tabindex="${tabIndex}"` :
     '';
 
-  function get_select_html(options) {
+  function getSelectHtml(options) {
     const sortedOptions = _.sortBy(options, 'name');
     const selectOpenTag = `
       <select class="span12" multiple="multiple"
-        model="${category_type}"
-        name="${attr_name}"
-        ${tab_index}
+        model="${categoryType}"
+        name="${attrName}"
+        ${tabIndex}
       >`;
     const selectCloseTag = '</select>';
     const optionTags = can.map(sortedOptions, function (option) {
       return `
         <option value="${option.id}"
-          ${selected_ids.indexOf(option.id) > -1 ? ' selected=selected' : ''}
+          ${selectedIds.indexOf(option.id) > -1 ? ' selected=selected' : ''}
         >${option.name}</option>`;
     }).join('\n');
 
@@ -577,7 +578,7 @@ Mustache.registerHelper('category_select', function (object, attr_name, category
     ].join('');
   }
 
-  return defer_render(tag_prefix, get_select_html, options_dfd);
+  return deferRender(tagPrefix, getSelectHtml, optionsDfd);
 });
 
 Mustache.registerHelper('get_permalink_url', function () {
@@ -585,7 +586,7 @@ Mustache.registerHelper('get_permalink_url', function () {
 });
 
 Mustache.registerHelper('get_permalink_for_object', function (instance, options) {
-  instance = resolve_computed(instance);
+  instance = resolveComputed(instance);
   if (!instance.viewLink) {
     return '';
   }
@@ -627,18 +628,18 @@ Mustache.registerHelper('view_object_link', function (instance, options) {
     return html;
   }
 
-  instance = resolve_computed(instance);
+  instance = resolveComputed(instance);
   if (!instance.viewLink && !instance.get_permalink) {
     return '';
   }
 
   linkText = options.fn(options.contexts);
 
-  return defer_render('a', onRenderComplete, instance.get_permalink());
+  return deferRender('a', onRenderComplete, instance.get_permalink());
 });
 
 Mustache.registerHelper('schemed_url', function (url) {
-  let domain, max_label, url_split;
+  let domain, maxLabel, urlSplit;
 
   url = Mustache.resolve(url);
   if (!url) {
@@ -650,16 +651,16 @@ Mustache.registerHelper('schemed_url', function (url) {
   }
 
   // Make sure we can find the domain part of the url:
-  url_split = url.split('/');
-  if (url_split.length < 3) {
+  urlSplit = url.split('/');
+  if (urlSplit.length < 3) {
     return 'javascript://';
   }
 
-  domain = url_split[2];
-  max_label = _.max(domain.split('.').map(function (u) {
+  domain = urlSplit[2];
+  maxLabel = _.max(domain.split('.').map(function (u) {
     return u.length;
   }));
-  if (max_label > 63 || domain.length > 253) {
+  if (maxLabel > 63 || domain.length > 253) {
     // The url is invalid and might crash user's chrome tab
     return 'javascript://';
   }
@@ -669,7 +670,7 @@ Mustache.registerHelper('schemed_url', function (url) {
 Mustache.registerHelper('show_long', function () {
   return [
     '<a href="javascript://" class="show-long"',
-    can.view.hook(function (el, parent, view_id) {
+    can.view.hook(function (el, parent) {
       el = $(el);
 
       let content = el.prevAll('.short');
@@ -704,7 +705,7 @@ Mustache.registerHelper('show_long', function () {
 });
 
 Mustache.registerHelper('using', function (options) {
-  let refresh_queue = new RefreshQueue(),
+  let refreshQueue = new RefreshQueue(),
     context,
     frame = new can.Observe(),
     args = can.makeArray(arguments),
@@ -719,7 +720,7 @@ Mustache.registerHelper('using', function (options) {
         arg = options.hash[i];
         arg = Mustache.resolve(arg);
         if (arg && arg.reify) {
-          refresh_queue.enqueue(arg.reify());
+          refreshQueue.enqueue(arg.reify());
           frame.attr(i, arg.reify());
         } else {
           frame.attr(i, arg);
@@ -732,11 +733,11 @@ Mustache.registerHelper('using', function (options) {
     return options.fn(options.contexts.add(frame));
   }
 
-  return defer_render('span', finish, refresh_queue.trigger());
+  return deferRender('span', finish, refreshQueue.trigger());
 });
 
 Mustache.registerHelper('with_mapping', function (binding, options) {
-  let context = arguments.length > 2 ? resolve_computed(options) : this,
+  let context = arguments.length > 2 ? resolveComputed(options) : this,
     frame = new can.Observe(),
     loader,
     stack;
@@ -761,12 +762,12 @@ Mustache.registerHelper('with_mapping', function (binding, options) {
     return options.inverse(options.contexts.add({error: error}));
   }
 
-  return defer_render('span', {done: finish, fail: fail}, loader.refresh_instances());
+  return deferRender('span', {done: finish, fail: fail}, loader.refresh_instances());
 });
 
 Mustache.registerHelper('person_roles', function (person, scope, options) {
-  let roles_deferred = new $.Deferred(),
-    refresh_queue = new RefreshQueue()
+  let rolesDeferred = new $.Deferred(),
+    refreshQueue = new RefreshQueue()
     ;
 
   if (!options) {
@@ -776,26 +777,26 @@ Mustache.registerHelper('person_roles', function (person, scope, options) {
 
   person = Mustache.resolve(person);
   person = person.reify();
-  refresh_queue.enqueue(person);
+  refreshQueue.enqueue(person);
   // Force monitoring of changes to `person.user_roles`
   person.attr('user_roles');
-  refresh_queue.trigger().then(function () {
-    let user_roles = person.user_roles.reify(),
-      user_roles_refresh_queue = new RefreshQueue()
+  refreshQueue.trigger().then(function () {
+    let userRoles = person.user_roles.reify(),
+      userRolesRefreshQueue = new RefreshQueue()
       ;
-    user_roles_refresh_queue.enqueue(user_roles);
-    user_roles_refresh_queue.trigger().then(function () {
+    userRolesRefreshQueue.enqueue(userRoles);
+    userRolesRefreshQueue.trigger().then(function () {
       let roles = can.map(
-          can.makeArray(user_roles),
-          function (user_role) {
-            if (user_role.role) {
-              return user_role.role.reify();
+          can.makeArray(userRoles),
+          function (userRole) {
+            if (userRole.role) {
+              return userRole.role.reify();
             }
           }),
-        roles_refresh_queue = new RefreshQueue()
+        rolesRefreshQueue = new RefreshQueue()
         ;
-      roles_refresh_queue.enqueue(roles.splice());
-      roles_refresh_queue.trigger().then(function () {
+      rolesRefreshQueue.enqueue(roles.splice());
+      rolesRefreshQueue.trigger().then(function () {
         roles = can.map(can.makeArray(roles), function (role) {
           if (!scope || new RegExp(scope).test(role.scope)) {
             return role;
@@ -812,7 +813,7 @@ Mustache.registerHelper('person_roles', function (person, scope, options) {
             name: 'Superuser',
           });
         }
-        roles_deferred.resolve(roles);
+        rolesDeferred.resolve(roles);
       });
     });
   });
@@ -821,7 +822,7 @@ Mustache.registerHelper('person_roles', function (person, scope, options) {
     return options.fn({roles: roles});
   }
 
-  return defer_render('span', finish, roles_deferred);
+  return deferRender('span', finish, rolesDeferred);
 });
 
 Mustache.registerHelper('if_result_has_extended_mappings', function (
@@ -830,7 +831,7 @@ Mustache.registerHelper('if_result_has_extended_mappings', function (
   //  due to mappings other than directly to the `parent_instance`.  Otherwise
   //  Render the `false` / `inverse` block.
   bindings = Mustache.resolve(bindings);
-  bindings = resolve_computed(bindings);
+  bindings = resolveComputed(bindings);
   parent_instance = Mustache.resolve(parent_instance);
   let has_extended_mappings = false,
     i
@@ -865,7 +866,7 @@ Mustache.registerHelper('each_with_extras_as', function (name, list, options) {
   //  * isLast
   name = Mustache.resolve(name);
   list = Mustache.resolve(list);
-  list = resolve_computed(list);
+  list = resolveComputed(list);
   let i,
     output = [],
     frame,
@@ -1012,7 +1013,7 @@ Mustache.registerHelper('is_allowed', function () {
 Mustache.registerHelper('any_allowed', function (action, data, options) {
   let passed = [],
     hasPassed;
-  data = resolve_computed(data);
+  data = resolveComputed(data);
 
   data.forEach(function (item) {
     passed.push(Permission.is_allowed_any(action, item.model_name));
@@ -1026,8 +1027,8 @@ Mustache.registerHelper('any_allowed', function (action, data, options) {
 Mustache.registerHelper('system_role', function (role, options) {
   role = role.toLowerCase();
   // If there is no user, it's same as No Role
-  let user_role = (GGRC.current_user ? GGRC.current_user.system_wide_role : 'no access').toLowerCase();
-  let isValid = role === user_role;
+  let userRole = (GGRC.current_user ? GGRC.current_user.system_wide_role : 'no access').toLowerCase();
+  let isValid = role === userRole;
 
   return options[isValid ? 'fn' : 'inverse'](options.contexts || this);
 });
@@ -1035,13 +1036,13 @@ Mustache.registerHelper('system_role', function (role, options) {
 Mustache.registerHelper('is_allowed_all', function (action, instances, options) {
   let passed = true;
 
-  action = resolve_computed(action);
-  instances = resolve_computed(instances);
+  action = resolveComputed(action);
+  instances = resolveComputed(instances);
 
   can.each(instances, function (instance) {
-    let resource_type,
-      context_id,
-      base_mappings = []
+    let resourceType,
+      contextId,
+      baseMappings = []
       ;
 
     if (instance instanceof GGRC.ListLoaders.MappingResult) {
@@ -1049,17 +1050,17 @@ Mustache.registerHelper('is_allowed_all', function (action, instances, options) 
         if (can.reduce(mapping.mappings, function (a, b) {
           return a || (b.instance === true);
         }, false)) {
-          base_mappings.push(inst);
+          baseMappings.push(inst);
         }
       });
     } else {
-      base_mappings.push(instance);
+      baseMappings.push(instance);
     }
 
-    can.each(base_mappings, function (instance) {
-      resource_type = instance.constructor.shortName;
-      context_id = instance.context ? instance.context.id : null;
-      passed = passed && Permission.is_allowed(action, resource_type, context_id);
+    can.each(baseMappings, function (instance) {
+      resourceType = instance.constructor.shortName;
+      contextId = instance.context ? instance.context.id : null;
+      passed = passed && Permission.is_allowed(action, resourceType, contextId);
     });
   });
 
@@ -1075,13 +1076,13 @@ Mustache.registerHelper('is_allowed_to_map', function (source, target, options) 
   //  source and/or target.
   //  - `source` must be a model instance
   //  - `target` can be the name of the target model or the target instance
-  let target_type, resource_type, context_id, can_map;
+  let canMap;
 
-  source = resolve_computed(source);
-  target = resolve_computed(target);
-  can_map = GGRC.Utils.allowed_to_map(source, target, options);
+  source = resolveComputed(source);
+  target = resolveComputed(target);
+  canMap = GGRC.Utils.allowed_to_map(source, target, options);
 
-  if (can_map) {
+  if (canMap) {
     return options.fn(options.contexts || this);
   }
   return options.inverse(options.contexts || this);
@@ -1092,7 +1093,7 @@ Mustache.registerHelper('is_allowed_to_map_task', (sourceType, options)=> {
     'Contract', 'Clause', 'Section', 'Request', 'Control', 'Objective',
     'OrgGroup', 'Vendor', 'AccessGroup', 'System', 'Process', 'DataAsset',
     'Product', 'Project', 'Facility', 'Market'];
-  sourceType = resolve_computed(sourceType);
+  sourceType = resolveComputed(sourceType);
 
   if (mappableTypes.includes(sourceType)) {
     return options.fn(options.contexts);
@@ -1100,24 +1101,24 @@ Mustache.registerHelper('is_allowed_to_map_task', (sourceType, options)=> {
   return options.inverse(options.contexts);
 });
 
-function resolve_computed(maybe_computed, always_resolve) {
-  return (typeof maybe_computed === 'function'
-    && (maybe_computed.isComputed || always_resolve)) ? resolve_computed(maybe_computed(), always_resolve) : maybe_computed;
+function resolveComputed(maybeComputed, alwaysResolve) {
+  return (typeof maybeComputed === 'function'
+    && (maybeComputed.isComputed || alwaysResolve)) ? resolveComputed(maybeComputed(), alwaysResolve) : maybeComputed;
 }
 
-Mustache.registerHelper('attach_spinner', function (spin_opts, styles) {
-  spin_opts = Mustache.resolve(spin_opts);
+Mustache.registerHelper('attach_spinner', function (spinOpts, styles) {
+  spinOpts = Mustache.resolve(spinOpts);
   styles = Mustache.resolve(styles);
-  spin_opts = typeof spin_opts === 'string' ? JSON.parse(spin_opts) : {};
+  spinOpts = typeof spinOpts === 'string' ? JSON.parse(spinOpts) : {};
   styles = typeof styles === 'string' ? styles : '';
   return function (el) {
-    let spinner = new Spinner(spin_opts).spin();
+    let spinner = new Spinner(spinOpts).spin();
     $(el).append($(spinner.el).attr('style', $(spinner.el).attr('style') + ';' + styles)).data('spinner', spinner);
   };
 });
 
 Mustache.registerHelper('json_escape', function (obj, options) {
-  let s = JSON.stringify(String(resolve_computed(obj) || ''));
+  let s = JSON.stringify(String(resolveComputed(obj) || ''));
   return s.substr(1, s.length - 2);
   /* return (""+(resolve_computed(obj) || ""))
     .replace(/\\/g, '\\')
@@ -1158,7 +1159,7 @@ function localizeDate(date, options, tmpl, allowNonISO) {
   if (!options) {
     return moment().format(tmpl);
   }
-  date = resolve_computed(date);
+  date = resolveComputed(date);
   if (date) {
     if (typeof date === 'string') {
       // string dates are assumed to be in ISO format
@@ -1191,7 +1192,7 @@ can.each({
  *  @return {String} - 'Today' or date string in the following format: MM/DD/YYYY
  */
 Mustache.registerHelper('localize_date_today', function (value) {
-  let date = resolve_computed(value);
+  let date = resolveComputed(value);
   let today = moment().startOf('day');
   let startOfDate = moment(date).startOf('day');
   // TODO: [Overdue] Move this logic to helper.
@@ -1202,12 +1203,12 @@ Mustache.registerHelper('localize_date_today', function (value) {
 });
 
 Mustache.registerHelper('capitalize', function (value, options) {
-  value = resolve_computed(value) || '';
+  value = resolveComputed(value) || '';
   return can.capitalize(value);
 });
 
 Mustache.registerHelper('lowercase', function (value, options) {
-  value = resolve_computed(value) || '';
+  value = resolveComputed(value) || '';
   return value.toLowerCase();
 });
 
@@ -1215,7 +1216,7 @@ Mustache.registerHelper('assignee_types', function (value, options) {
   function capitalizeFirst(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
-  value = resolve_computed(value) || '';
+  value = resolveComputed(value) || '';
   value = _.first(_.map(value.split(','), function (type) {
     let lowercaseType = _.trim(type).toLowerCase();
 
@@ -1229,7 +1230,7 @@ Mustache.registerHelper('assignee_types', function (value, options) {
 });
 
 Mustache.registerHelper('visibility_delay', function (delay, options) {
-  delay = resolve_computed(delay);
+  delay = resolveComputed(delay);
 
   return function (el) {
     setTimeout(function () {
@@ -1282,7 +1283,7 @@ Mustache.registerHelper('is_admin_page', (options) => {
 Mustache.registerHelper('is_profile', function (parent_instance, options) {
   let instance;
   if (options) {
-    instance = resolve_computed(parent_instance);
+    instance = resolveComputed(parent_instance);
   } else {
     options = parent_instance;
   }
@@ -1302,9 +1303,9 @@ Mustache.registerHelper('is_parent_of_type', function (type_options, options) {
   */
   let types = type_options.split(','),
     parent = GGRC.page_instance(),
-    parent_type = parent.type;
+    parentType = parent.type;
 
-  if ($.inArray(parent_type, types) !== -1) {
+  if ($.inArray(parentType, types) !== -1) {
     return options.fn(options.contexts);
   }
   return options.inverse(options.contexts);
@@ -1318,13 +1319,13 @@ Mustache.registerHelper('current_user_is_admin', function (options) {
 });
 
 Mustache.registerHelper('owned_by_current_user', function (instance, options) {
-  let current_user_id = GGRC.current_user.id;
+  let currentUserId = GGRC.current_user.id;
   let owners;
   instance = Mustache.resolve(instance);
   owners = instance.attr('owners');
   if (owners) {
     for (let i = 0; i < owners.length; i++) {
-      if (current_user_id == owners[i].id) {
+      if (currentUserId == owners[i].id) {
         return options.fn(options.contexts);
       }
     }
@@ -1356,7 +1357,7 @@ Mustache.registerHelper('last_approved', function (instance, options) {
     return options.inverse(options.contexts.add({error: error}));
   }
 
-  return defer_render('span', {done: finish, fail: fail}, loader.refresh_instances());
+  return deferRender('span', {done: finish, fail: fail}, loader.refresh_instances());
 });
 
 Mustache.registerHelper('with_is_reviewer', function (reviewTask, options) {
@@ -1436,7 +1437,7 @@ Mustache.registerHelper('urlPath', function () {
 Mustache.registerHelper('sum', function () {
   let sum = 0;
   for (let i = 0; i < arguments.length - 1; i++) {
-    sum += parseInt(resolve_computed(arguments[i]), 10);
+    sum += parseInt(resolveComputed(arguments[i]), 10);
   }
   return String(sum);
 });
@@ -1484,13 +1485,13 @@ Mustache.registerHelper('sum', function () {
 Mustache.registerHelper('if_helpers', function () {
   let args = arguments,
     options = arguments[arguments.length - 1],
-    helper_result,
-    helper_options = can.extend({}, options, {
+    helperResult,
+    helperOptions = can.extend({}, options, {
       fn: function () {
-        helper_result = 'fn';
+        helperResult = 'fn';
       },
       inverse: function () {
-        helper_result = 'inverse';
+        helperResult = 'inverse';
       },
     })
     ;
@@ -1556,24 +1557,24 @@ Mustache.registerHelper('if_helpers', function () {
 
   if (disjunctions.length) {
     // Evaluate statements
-    let result = can.reduce(disjunctions, function (disjunctive_result, conjunctions) {
-      if (disjunctive_result) {
+    let result = can.reduce(disjunctions, function (disjunctiveResult, conjunctions) {
+      if (disjunctiveResult) {
         return true;
       }
 
-      let conjunctive_result = can.reduce(conjunctions, function (current_result, stmt) {
-        if (!current_result) {
+      let conjunctiveResult = can.reduce(conjunctions, function (currentResult, stmt) {
+        if (!currentResult) {
           return false;
         } // short circuit
 
-        helper_result = null;
+        helperResult = null;
         stmt.helper.fn.apply(stmt.helper, stmt.args.concat([
-          can.extend({}, helper_options, {hash: stmt.hash || helper_options.hash}),
+          can.extend({}, helperOptions, {hash: stmt.hash || helperOptions.hash}),
         ]));
-        helper_result = helper_result === stmt.fn_name;
-        return current_result && helper_result;
+        helperResult = helperResult === stmt.fn_name;
+        return currentResult && helperResult;
       }, true);
-      return disjunctive_result || conjunctive_result;
+      return disjunctiveResult || conjunctiveResult;
     }, false);
 
     // Execute based on the result
@@ -1585,30 +1586,30 @@ Mustache.registerHelper('if_helpers', function () {
   }
 });
 
-Mustache.registerHelper('with_model_as', function (var_name, model_name, options) {
+Mustache.registerHelper('with_model_as', function (varName, modelName, options) {
   let frame = {};
-  model_name = resolve_computed(Mustache.resolve(model_name));
-  frame[var_name] = CMS.Models[model_name];
+  modelName = resolveComputed(Mustache.resolve(modelName));
+  frame[varName] = CMS.Models[modelName];
   return options.fn(options.contexts.add(frame));
 });
 
 // Verify if the Program has multiple owners
 // Usage: {{#if_multi_owner instance modal_title}}
-Mustache.registerHelper('if_multi_owner', function (instance, modal_title, options) {
-  let owner_count = 0;
+Mustache.registerHelper('if_multi_owner', function (instance, modalTitle, options) {
+  let ownerCount = 0;
 
-  if (resolve_computed(modal_title).indexOf('New ') === 0) {
+  if (resolveComputed(modalTitle).indexOf('New ') === 0) {
     return options.inverse(options.contexts);
   }
 
-  let loader = resolve_computed(instance).get_binding('authorizations');
+  let loader = resolveComputed(instance).get_binding('authorizations');
   can.each(loader.list, function (binding) {
     if (binding.instance.role && binding.instance.role.reify().attr('name') === 'ProgramOwner') {
-      owner_count += 1;
+      ownerCount += 1;
     }
   });
 
-  if (owner_count > 1) {
+  if (ownerCount > 1) {
     return options.fn(options.contexts);
   } else {
     return options.inverse(options.contexts);
@@ -1618,7 +1619,7 @@ Mustache.registerHelper('if_multi_owner', function (instance, modal_title, optio
 // Determines whether the value matches one in the $.map'd list
 // {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
 Mustache.registerHelper('if_in_map', function (list, path, value, options) {
-  list = resolve_computed(list);
+  list = resolveComputed(list);
 
   if (!list.attr || list.attr('length')) {
     path = path.split('.');
@@ -1637,8 +1638,8 @@ Mustache.registerHelper('if_in_map', function (list, path, value, options) {
 });
 
 Mustache.registerHelper('if_in', function (needle, haystack, options) {
-  needle = resolve_computed(needle);
-  haystack = resolve_computed(haystack).split(',');
+  needle = resolveComputed(needle);
+  haystack = resolveComputed(haystack).split(',');
 
   let found = haystack.some(function (h) {
     return h.trim() === needle;
@@ -1648,8 +1649,8 @@ Mustache.registerHelper('if_in', function (needle, haystack, options) {
 
 Mustache.registerHelper('if_instance_of', function (inst, cls, options) {
   let result;
-  cls = resolve_computed(cls);
-  inst = resolve_computed(inst);
+  cls = resolveComputed(cls);
+  inst = resolveComputed(inst);
 
   if (typeof cls === 'string') {
     cls = cls.split('|').map(function (c) {
@@ -1682,18 +1683,18 @@ Mustache.registerHelper('mixed_content_check', function (url, options) {
 });
 
 Mustache.registerHelper('ggrc_config_value', function (key, default_, options) {
-  key = resolve_computed(key);
+  key = resolveComputed(key);
   if (!options) {
     options = default_;
     default_ = null;
   }
-  default_ = resolve_computed(default_);
+  default_ = resolveComputed(default_);
   default_ = default_ || '';
   return can.getObject(key, [GGRC.config]) || default_;
 });
 
 Mustache.registerHelper('if_config_exist', function (key, options) {
-  key = resolve_computed(key);
+  key = resolveComputed(key);
   let configValue = can.getObject(key, [GGRC.config]);
 
   return configValue ?
@@ -1703,13 +1704,13 @@ Mustache.registerHelper('if_config_exist', function (key, options) {
 
 Mustache.registerHelper('switch', function (value, options) {
   let frame = new can.Observe({});
-  value = resolve_computed(value);
+  value = resolveComputed(value);
   frame.attr(value || 'default', true);
   frame.attr('default', true);
   return options.fn(options.contexts.add(frame), {
     helpers: {
       'case': function (val, options) {
-        val = resolve_computed(val);
+        val = resolveComputed(val);
         if (options.context[val]) {
           options.context.attr ? options.context.attr('default', false) : (options.context.default = false);
           return options.fn(options.contexts);
@@ -1745,7 +1746,7 @@ Mustache.registerHelper('current_cycle_assignee',
       return options.inverse(options.contexts);
     };
 
-    return defer_render('span', {
+    return deferRender('span', {
       done: finish, progress: progress,
     }, binding.refresh_instances());
   });
@@ -1763,7 +1764,7 @@ Mustache.registerHelper('with_mapping_count',
       type: instance.type,
     };
     dfd = batchRequests(buildCountParams([mappingName], relevant)[0]);
-    return defer_render('span', {
+    return deferRender('span', {
       done: function (count) {
         return options.fn(options.contexts.add({
           count: count[mappingName].count}));
@@ -1778,7 +1779,7 @@ Mustache.registerHelper('with_mapping_count',
 Mustache.registerHelper('log', function () {
   let args = can.makeArray(arguments).slice(0, arguments.length - 1);
   console.log(...['Mustache log'].concat(_.map(args, function (arg) {
-    return resolve_computed(arg);
+    return resolveComputed(arg);
   })));
 });
 
@@ -1979,25 +1980,25 @@ Mustache.registerHelper('update_link', function (instance, options) {
   return options.fn(options.contexts);
 });
 
-Mustache.registerHelper('with_most_recent_declining_task_entry', function (review_task, options) {
-  let entries = review_task.get_mapping('declining_cycle_task_entries');
-  let most_recent_entry;
+Mustache.registerHelper('with_most_recent_declining_task_entry', function (reviewTask, options) {
+  let entries = reviewTask.get_mapping('declining_cycle_task_entries');
+  let mostRecentEntry;
 
   if (entries) {
     for (let i = entries.length - 1; i >= 0; i--) {
       let entry = entries[i];
-      if ('undefined' !== typeof most_recent_entry) {
-        if (moment(most_recent_entry.created_at).isBefore(moment(entry.created_at))) {
-          most_recent_entry = entry;
+      if ('undefined' !== typeof mostRecentEntry) {
+        if (moment(mostRecentEntry.created_at).isBefore(moment(entry.created_at))) {
+          mostRecentEntry = entry;
         }
       } else {
-        most_recent_entry = entry;
+        mostRecentEntry = entry;
       }
     }
   }
 
-  if (most_recent_entry) {
-    return options.fn(options.contexts.add({most_recent_declining_task_entry: most_recent_entry}));
+  if (mostRecentEntry) {
+    return options.fn(options.contexts.add({most_recent_declining_task_entry: mostRecentEntry}));
   }
   return options.fn(options.contexts.add({most_recent_declining_task_entry: {}}));
 });
@@ -2020,8 +2021,8 @@ Mustache.registerHelper('add_index', function (index, increment, options) {
   return (index + increment);
 });
 
-function get_proper_url(url) {
-  let domain, max_label, url_split;
+function getProperUrl(url) {
+  let domain, maxLabel, urlSplit;
 
   if (!url) {
     return '';
@@ -2032,29 +2033,29 @@ function get_proper_url(url) {
   }
 
   // Make sure we can find the domain part of the url:
-  url_split = url.split('/');
-  if (url_split.length < 3) {
+  urlSplit = url.split('/');
+  if (urlSplit.length < 3) {
     return 'javascript://';
   }
 
-  domain = url_split[2];
-  max_label = _.max(domain.split('.').map(function (u) {
+  domain = urlSplit[2];
+  maxLabel = _.max(domain.split('.').map(function (u) {
     return u.length;
   }));
-  if (max_label > 63 || domain.length > 253) {
+  if (maxLabel > 63 || domain.length > 253) {
     // The url is invalid and might crash user's chrome tab
     return 'javascript://';
   }
   return url;
 }
 
-Mustache.registerHelper('get_url_value', function (attr_name, instance) {
+Mustache.registerHelper('get_url_value', function (attrName, instance) {
   instance = Mustache.resolve(instance);
-  attr_name = Mustache.resolve(attr_name);
+  attrName = Mustache.resolve(attrName);
 
-  if (instance[attr_name]) {
-    if (['url', 'reference_url'].indexOf(attr_name) !== -1) {
-      return get_proper_url(instance[attr_name]);
+  if (instance[attrName]) {
+    if (['url', 'reference_url'].indexOf(attrName) !== -1) {
+      return getProperUrl(instance[attrName]);
     }
   }
   return '';
@@ -2385,8 +2386,8 @@ Mustache.registerHelper(
     let internalRoles = GGRC.internal_access_control_roles;
     let role;
     let hasRole;
-    instance = resolve_computed(instance);
-    roleName = resolve_computed(roleName);
+    instance = resolveComputed(instance);
+    roleName = resolveComputed(roleName);
     role = internalRoles.find((a) => a.name === roleName);
 
     if (!role) {
