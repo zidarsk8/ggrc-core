@@ -44,6 +44,8 @@ can.Model.Cacheable('CMS.Models.Section', {
     attr_view: '/static/mustache/sections/tree-item-attr.mustache',
     attr_list: can.Model.Cacheable.attr_list.concat([
       {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Last Deprecated Date', attr_name: 'last_deprecated_date'},
     ]),
     add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
   },
