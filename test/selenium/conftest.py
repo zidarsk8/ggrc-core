@@ -4,6 +4,7 @@
 # pylint: disable=invalid-name
 # pylint: disable=global-variable-not-assigned
 # pylint: disable=unused-argument
+# pylint: disable=redefined-outer-name
 
 import pytest
 
@@ -12,10 +13,6 @@ from lib.page import dashboard
 from lib.service import rest_service
 from lib.utils import selenium_utils, help_utils
 from lib.utils.selenium_utils import get_full_screenshot_as_base64
-
-# pylint: disable=redefined-outer-name
-pytest_plugins = "selenium", "xdist", "xvfb", "timeout", "flask", \
-                 "rerunfailures", "timeout", "repeat", "pycharm"
 
 
 def _common_fixtures(fixture):
