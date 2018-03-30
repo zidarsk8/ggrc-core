@@ -145,9 +145,9 @@ Mustache.registerHelper('if_equals', function (val1, val2, options) {
 });
 
 Mustache.registerHelper('if_match', function (val1, val2, options) {
-  let that = this
-    , _val1 = resolve_computed(val1)
-    , _val2 = resolve_computed(val2);
+  let that = this,
+     _val1 = resolve_computed(val1),
+     _val2 = resolve_computed(val2);
   function exec() {
     let re = new RegExp(_val2);
     if (re.test(_val1)) return options.fn(options.contexts);
@@ -382,8 +382,8 @@ Mustache.registerHelper('render_hooks', function () {
 });
 
 let defer_render = Mustache.defer_render = function defer_render(tag_prefix, funcs, deferred) {
-  let hook
-    , tag_name = tag_prefix.split(' ')[0]
+  let hook,
+     tag_name = tag_prefix.split(' ')[0]
     ;
 
   tag_name = tag_name || 'span';
@@ -393,12 +393,12 @@ let defer_render = Mustache.defer_render = function defer_render(tag_prefix, fun
   }
 
   function hookup(element, parent, view_id) {
-    let $element = $(element)
-      , f = function () {
-        let g = deferred && deferred.state() === 'rejected' ? funcs.fail : funcs.done
-          , args = arguments
-          , term = element.nextSibling
-          , compute = can.compute(function () { return g.apply(this, args) || ''; }, this)
+    let $element = $(element),
+       f = function () {
+        let g = deferred && deferred.state() === 'rejected' ? funcs.fail : funcs.done,
+           args = arguments,
+           term = element.nextSibling,
+           compute = can.compute(function () { return g.apply(this, args) || ''; }, this)
         ;
 
         if (element.parentNode) {
@@ -508,31 +508,31 @@ Mustache.registerHelper('iterate_string', function (str, separator, options) {
 });
 
 Mustache.registerHelper('option_select', function (object, attr_name, role, options) {
-  let selected_option = object.attr(attr_name)
-    , selected_id = selected_option ? selected_option.id : null
-    , options_dfd = CMS.Models.Option.for_role(role)
-    , tabindex = options.hash && options.hash.tabindex
-    , tag_prefix = 'select class="span12"'
+  let selected_option = object.attr(attr_name),
+     selected_id = selected_option ? selected_option.id : null,
+     options_dfd = CMS.Models.Option.for_role(role),
+     tabindex = options.hash && options.hash.tabindex,
+     tag_prefix = 'select class="span12"'
     ;
 
   function get_select_html(options) {
     return [
-      '<select class="span12" model="Option" name="' + attr_name + '"'
-      ,   tabindex ? ' tabindex=' + tabindex : ''
-      , '>'
-      , '<option value=""'
-      ,   !selected_id ? ' selected=selected' : ''
-      , '>---</option>'
-      , can.map(options, function (option) {
+      '<select class="span12" model="Option" name="' + attr_name + '"',
+         tabindex ? ' tabindex=' + tabindex : '',
+       '>',
+       '<option value=""',
+         !selected_id ? ' selected=selected' : '',
+       '>---</option>',
+       can.map(options, function (option) {
         return [
-          '<option value="', option.id, '"'
-          ,   selected_id == option.id ? ' selected=selected' : ''
-          , '>'
-          ,   option.title
-          , '</option>',
+          '<option value="', option.id, '"',
+             selected_id == option.id ? ' selected=selected' : '',
+           '>',
+             option.title,
+           '</option>',
         ].join('');
-      }).join('\n')
-      , '</select>',
+      }).join('\n'),
+       '</select>',
     ].join('');
   }
 
@@ -664,8 +664,8 @@ Mustache.registerHelper('schemed_url', function (url) {
 
 Mustache.registerHelper('show_long', function () {
   return  [
-    '<a href="javascript://" class="show-long"'
-    , can.view.hook(function (el, parent, view_id) {
+    '<a href="javascript://" class="show-long"',
+     can.view.hook(function (el, parent, view_id) {
       el = $(el);
 
       let content = el.prevAll('.short');
@@ -679,8 +679,8 @@ Mustache.registerHelper('show_long', function () {
           }
           else {
             // If there is an open/close toggle, wait until "that" is triggered
-            let root = el.closest('.tree-item')
-              , toggle;
+            let root = el.closest('.tree-item'),
+               toggle;
             if (root.length && !root.hasClass('item-open') && (toggle = root.find('.openclose')) && toggle.length) {
               // Listen for the toggle instead of timeouts
               toggle.one('click', function () {
@@ -695,17 +695,17 @@ Mustache.registerHelper('show_long', function () {
           }
         }();
       }
-    })
-    , '>...more</a>',
+    }),
+     '>...more</a>',
   ].join('');
 });
 
 Mustache.registerHelper('using', function (options) {
-  let refresh_queue = new RefreshQueue()
-    , context
-    , frame = new can.Observe()
-    , args = can.makeArray(arguments)
-    , i, arg;
+  let refresh_queue = new RefreshQueue(),
+     context,
+     frame = new can.Observe(),
+     args = can.makeArray(arguments),
+     i, arg;
 
   options = args.pop();
   context = options.contexts || this;
@@ -733,10 +733,10 @@ Mustache.registerHelper('using', function (options) {
 });
 
 Mustache.registerHelper('with_mapping', function (binding, options) {
-  let context = arguments.length > 2 ? resolve_computed(options) : this
-    , frame = new can.Observe()
-    , loader
-    , stack;
+  let context = arguments.length > 2 ? resolve_computed(options) : this,
+     frame = new can.Observe(),
+     loader,
+     stack;
 
   if (!context) // can't find an object to map to.  Do nothing;
     return;
@@ -759,8 +759,8 @@ Mustache.registerHelper('with_mapping', function (binding, options) {
 });
 
 Mustache.registerHelper('person_roles', function (person, scope, options) {
-  let roles_deferred = new $.Deferred()
-    , refresh_queue = new RefreshQueue()
+  let roles_deferred = new $.Deferred(),
+     refresh_queue = new RefreshQueue()
     ;
 
   if (!options) {
@@ -774,8 +774,8 @@ Mustache.registerHelper('person_roles', function (person, scope, options) {
   // Force monitoring of changes to `person.user_roles`
   person.attr('user_roles');
   refresh_queue.trigger().then(function () {
-    let user_roles = person.user_roles.reify()
-      , user_roles_refresh_queue = new RefreshQueue()
+    let user_roles = person.user_roles.reify(),
+       user_roles_refresh_queue = new RefreshQueue()
       ;
     user_roles_refresh_queue.enqueue(user_roles);
     user_roles_refresh_queue.trigger().then(function () {
@@ -785,8 +785,8 @@ Mustache.registerHelper('person_roles', function (person, scope, options) {
             if (user_role.role) {
               return user_role.role.reify();
             }
-          })
-        , roles_refresh_queue = new RefreshQueue()
+          }),
+         roles_refresh_queue = new RefreshQueue()
         ;
       roles_refresh_queue.enqueue(roles.splice());
       roles_refresh_queue.trigger().then(function () {
@@ -826,8 +826,8 @@ Mustache.registerHelper('if_result_has_extended_mappings', function (
   bindings = Mustache.resolve(bindings);
   bindings = resolve_computed(bindings);
   parent_instance = Mustache.resolve(parent_instance);
-  let has_extended_mappings = false
-    , i
+  let has_extended_mappings = false,
+     i
     ;
 
   if (bindings && bindings.length > 0) {
@@ -858,18 +858,18 @@ Mustache.registerHelper('each_with_extras_as', function (name, list, options) {
   name = Mustache.resolve(name);
   list = Mustache.resolve(list);
   list = resolve_computed(list);
-  let i
-    , output = []
-    , frame
-    , length = list.length
+  let i,
+     output = [],
+     frame,
+     length = list.length
     ;
   for (i=0; i<length; i++) {
     frame = {
-      index : i
-      , isFirst : i === 0
-      , isLast : i === length - 1
-      , isSecondToLast : i === length - 2
-      , length : length,
+      index : i,
+       isFirst : i === 0,
+       isLast : i === length - 1,
+       isSecondToLast : i === length - 2,
+       length : length,
     };
     frame[name] = list[i];
     output.push(options.fn(new can.Observe(frame)));
@@ -886,9 +886,9 @@ Mustache.registerHelper('each_with_extras_as', function (name, list, options) {
 });
 
 Mustache.registerHelper('link_to_tree', function () {
-  let args = [].slice.apply(arguments)
-    , options = args.pop()
-    , link = []
+  let args = [].slice.apply(arguments),
+     options = args.pop(),
+     link = []
     ;
 
   args = can.map(args, Mustache.resolve);
@@ -1029,9 +1029,9 @@ Mustache.registerHelper('is_allowed_all', function (action, instances, options) 
   instances = resolve_computed(instances);
 
   can.each(instances, function (instance) {
-    let resource_type
-      , context_id
-      , base_mappings = []
+    let resource_type,
+       context_id,
+       base_mappings = []
       ;
 
     if (instance instanceof GGRC.ListLoaders.MappingResult) {
@@ -1467,21 +1467,21 @@ Mustache.registerHelper('sum', function () {
     pattern instead of can.reduce(Array, function (Boolean, item) {}, Boolean) pattern. --BM 8/29/2014
 */
 Mustache.registerHelper('if_helpers', function () {
-  let args = arguments
-    , options = arguments[arguments.length - 1]
-    , helper_result
-    , helper_options = can.extend({}, options, {
-      fn: function () { helper_result = 'fn'; }
-      , inverse: function () { helper_result = 'inverse'; },
+  let args = arguments,
+     options = arguments[arguments.length - 1],
+     helper_result,
+     helper_options = can.extend({}, options, {
+      fn: function () { helper_result = 'fn'; },
+       inverse: function () { helper_result = 'inverse'; },
     })
     ;
 
   // Parse statements
-  let statements = []
-    , statement
-    , match
-    , disjunctions = []
-    , index = 0
+  let statements = [],
+     statement,
+     match,
+     disjunctions = [],
+     index = 0
     ;
   can.each(args, function (arg, i) {
     if (i < args.length - 1) {
@@ -1496,17 +1496,17 @@ Mustache.registerHelper('if_helpers', function () {
         }
         if (match = arg.match(/^\n\s*((and|or) )?([#^])?(\S+?)$/)) {
           statement = {
-            fn_name: match[3] === '^' ? 'inverse' : 'fn'
-            , helper: Mustache.getHelper(match[4], options.contexts)
-            , args: []
-            , logic: match[2] === 'or' ? 'or' : 'and',
+            fn_name: match[3] === '^' ? 'inverse' : 'fn',
+             helper: Mustache.getHelper(match[4], options.contexts),
+             args: [],
+             logic: match[2] === 'or' ? 'or' : 'and',
           };
 
           // Add hash arguments
           if (options.hash) {
-            let hash = {}
-              , prefix = '_' + index + '_'
-              , prop
+            let hash = {},
+               prefix = '_' + index + '_',
+               prop
               ;
             for (prop in options.hash) {
               if (prop.indexOf(prefix) === 0) {
