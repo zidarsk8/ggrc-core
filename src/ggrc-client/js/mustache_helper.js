@@ -1688,7 +1688,7 @@ Mustache.registerHelper('switch', function (value, options) {
   frame.attr('default', true);
   return options.fn(options.contexts.add(frame), {
     helpers : {
-      case : function (val, options) {
+      'case' : function (val, options) {
         val = resolve_computed(val);
         if (options.context[val]) {
           options.context.attr ? options.context.attr('default', false) : (options.context.default = false);
@@ -1979,9 +1979,9 @@ Mustache.registerHelper('with_most_recent_declining_task_entry', function (revie
   }
 
   if(most_recent_entry) {
-    return options.fn(options.contexts.add({'most_recent_declining_task_entry': most_recent_entry}));
+    return options.fn(options.contexts.add({most_recent_declining_task_entry: most_recent_entry}));
   }
-  return options.fn(options.contexts.add({'most_recent_declining_task_entry': {}}));
+  return options.fn(options.contexts.add({most_recent_declining_task_entry: {}}));
 });
 
 Mustache.registerHelper('if_less', function (a, b, options) {
@@ -2112,13 +2112,13 @@ Mustache.registerHelper('get_default_attr_value',
 Mustache.registerHelper('pretty_role_name', function (name) {
   name = Mustache.resolve(name);
   let ROLE_LIST = {
-    'ProgramOwner': 'Program Manager',
-    'ProgramEditor': 'Program Editor',
-    'ProgramReader': 'Program Reader',
-    'WorkflowOwner': 'Workflow Manager',
-    'WorkflowMember': 'Workflow Member',
-    'Mapped': 'No Role',
-    'Owner': 'Manager',
+    ProgramOwner: 'Program Manager',
+    ProgramEditor: 'Program Editor',
+    ProgramReader: 'Program Reader',
+    WorkflowOwner: 'Workflow Manager',
+    WorkflowMember: 'Workflow Member',
+    Mapped: 'No Role',
+    Owner: 'Manager',
   };
   if (ROLE_LIST[name]) {
     return ROLE_LIST[name];
