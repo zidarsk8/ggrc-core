@@ -3,9 +3,8 @@
 
 """SQLAlchemy hooks for Workflow model."""
 
-from collections import defaultdict
+import flask
 import sqlalchemy as sa
-from sqlalchemy.sql.expression import or_, and_
 
 from ggrc import db
 from ggrc import login
@@ -30,10 +29,23 @@ WF_PROPAGATED_ROLES = {
 }
 
 
-def handle_acl_changes(session):
-  """ACL creation hook handler."""
-  _add_propagated_roles(session)
-  _remove_propagated_roles(session)
+def handle_acl_changes():
+  """ACL creation hook handler.
+
+  The global variables for this function are set in the after_flush hook, so
+  this function must be called after that hook in order for propagation to
+  work.
+  """
+
+  if not (hasattr(flask.g, "new_wf_acls") and
+          hasattr(flask.g, "deleted_wf_objects")):
+    return
+
+  _propagete_new_wf_acls(flask.g.new_wf_acls)
+  remove_related_acl(flask.g.deleted_wf_objects)
+
+  del flask.g.new_wf_acls,
+  del flask.g.deleted_wf_objects,
 
 
 def get_wf_propagated_role_ids():
@@ -45,10 +57,10 @@ def get_wf_propagated_role_ids():
   }
 
 
-def _add_propagated_roles(session):
+def get_new_wf_acls(session):
   """Add propagated roles to workflow related objects."""
   propagated_role_ids = None
-  wf_new_acl = set()
+  new_wf_acls = set()
   for obj in session.new:
     acls = []
     if (isinstance(obj, all_models.AccessControlList) and
@@ -62,17 +74,17 @@ def _add_propagated_roles(session):
       propagated_role_ids = get_wf_propagated_role_ids()
     for acl in acls:
       if acl.ac_role_id in propagated_role_ids:
-        wf_new_acl.add(acl.id)
-  _propagete_new_wf_acls(wf_new_acl)
+        new_wf_acls.add(acl.id)
+  return new_wf_acls
 
 
-def _remove_propagated_roles(session):
+def get_deleted_wf_objects(session):
   """Remove propagated roles to workflow related objects."""
-  related_to_del = defaultdict(set)
+  related_to_del = set()
   for obj in session.deleted:
     if isinstance(obj, RELATED_MODELS):
-      related_to_del[obj.type].add(obj.id)
-  remove_related_acl(related_to_del)
+      related_to_del.add((obj.type, obj.id))
+  return related_to_del
 
 
 def remove_related_acl(related_to_del):
@@ -89,14 +101,12 @@ def remove_related_acl(related_to_del):
   if not related_to_del:
     return
 
-  qfilter = []
-  for rtype, ids in related_to_del.iteritems():
-    qfilter.append(and_(
-        all_models.AccessControlList.object_type == rtype,
-        all_models.AccessControlList.object_id.in_(ids)))
-
-  db.session.query(all_models.AccessControlList).filter(or_(*qfilter)).delete(
-      synchronize_session='fetch')
+  db.session.query(all_models.AccessControlList).filter(
+      sa.tuple_(
+          all_models.AccessControlList.object_type,
+          all_models.AccessControlList.object_id,
+      ).in_(related_to_del)
+  ).delete(synchronize_session='fetch')
 
 
 def _get_child_ids(parent_ids, child_class):
@@ -185,7 +195,7 @@ def _propagate_to_wf_children(new_wf_acls, child_class):
               sa.join(
                   child_table,
                   acl_table,
-                  and_(
+                  sa.and_(
                       acl_table.c.object_id == child_table.c.workflow_id,
                       acl_table.c.object_type == all_models.Workflow.__name__,
                   )
@@ -235,7 +245,7 @@ def _propagate_to_children(new_tg_acls, child_class, id_name, parent_class):
       sa.join(
           child_table,
           acl_table,
-          and_(
+          sa.and_(
               acl_table.c.object_id == parent_id_filed,
               acl_table.c.object_type == parent_class.__name__,
           )

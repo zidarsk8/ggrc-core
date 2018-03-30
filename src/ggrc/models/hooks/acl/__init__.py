@@ -8,8 +8,10 @@ This package should have the single hook that should handle all acl propagation
 and deletion.
 """
 
+import flask
 import sqlalchemy as sa
 from sqlalchemy.orm.session import Session
+
 
 from ggrc.models.hooks.acl import audit_roles
 from ggrc.models.hooks.acl import program_roles
@@ -29,7 +31,18 @@ def after_flush(session, _):
   audit_role_handler = audit_roles.AuditRolesHandler()
   audit_role_handler.after_flush(session)
   relationship_deletion.after_flush(session)
-  workflow.handle_acl_changes(session)
+
+  if hasattr(flask.g, "new_wf_acls"):
+    flask.g.new_wf_acls.update(workflow.get_new_wf_acls(session))
+  else:
+    flask.g.new_wf_acls = workflow.get_new_wf_acls(session)
+
+  if hasattr(flask.g, "deleted_wf_objects"):
+    flask.g.deleted_wf_objects.update(workflow.get_deleted_wf_objects(session))
+  else:
+    flask.g.deleted_wf_objects = workflow.get_deleted_wf_objects(session)
+
+  workflow.handle_acl_changes()
 
 
 def init_hook():
