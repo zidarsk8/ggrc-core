@@ -14,3 +14,43 @@
     margin-right: 4px;
   }
 }
+
+.mandatory-fields {
+  width: 750px;
+
+  .simple-modal {
+    &__header {
+      border-bottom: none;
+      padding-bottom: 5px;
+    }
+
+    &__header-text {
+      font-size: 24px;
+    }
+
+    &__footer {
+      border-top: none;
+    }
+
+    &__body {
+      font-size: 15px;
+      padding: 5px 15px;
+      line-height: 16px;
+      overflow: inherit;
+    }
+
+    &__footer {
+      border-top: none;
+      padding: 16px;
+      line-height: 30px;
+    }
+  }
+
+  person-list-item {
+    display: inline-block;
+
+    .person-without-details {
+      font-style: normal;
+    }
+  }
+}

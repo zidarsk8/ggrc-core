@@ -5,7 +5,8 @@
 
 <simple-modal {state}="state"
               {instance}="instance"
-              {replace-content}="true">
+              {replace-content}="true"
+              {extra-css-class}="'mandatory-fields'">
   <div class="simple-modal__header">
       <div class="simple-modal__header-text">Global custom attribute validation</div>
       <button class="btn btn-small btn-icon" {{#if loading}}disabled{{/if}} ($click)="cancel()">
@@ -17,24 +18,24 @@
       <p>
         Please fill in the field(s) below to apply this version -
         <person-list-item with-details="false" {person}="revisionModifiedBy">
-        </person-list-item>
-        <div>
-          {{localize_datetime revisionUpdatedAt}}
-        </div>
+        </person-list-item>,
+        {{localize_datetime revisionUpdatedAt}}.
       </p>
     </div>
     <div class="simple-modal__section">
       {{#if showCAs}}
-        <gca-controls
-          {instance}="instance"
-          {items}="caFields">
-        </gca-controls>
+        <div class="ggrc-form">
+          <gca-controls
+            {instance}="instance"
+            {items}="caFields">
+          </gca-controls>
+        </div>
       {{/if}}
     </div>
   </div>
   <div class="simple-modal__footer">
     <div class="simple-modal__toolbar">
-      <button class="btn btn-small btn-green preventdoubleclick"
+      <button class="btn btn-small btn-green preventdoubleclick simple-modal__toolbar-item"
         {{disable_if_errors instance}}
         {{#if loading}}disabled{{/if}}
         ($click)="save()">
