@@ -21,7 +21,10 @@ import {
   refreshCounts,
 } from '../../plugins/utils/current-page-utils';
 import RefreshQueue from '../../models/refresh_queue';
-import {REFRESH_MAPPING} from '../../events/eventTypes';
+import {
+  REFRESH_MAPPING,
+  REFRESH_SUB_TREE,
+} from '../../events/eventTypes';
 
 (function (can, $) {
   'use strict';
@@ -308,21 +311,7 @@ import {REFRESH_MAPPING} from '../../events/eventTypes';
                 instance.refresh();
               }, 300);
 
-              _.each($('sub-tree-wrapper'), function (wrapper) {
-                let vm = $(wrapper).viewModel();
-
-                if (vm.attr('parent') === instance) {
-                  if (vm.attr('isOpen') && vm.attr('dataIsReady')) {
-                    vm.loadItems();
-                  } else {
-                    // remove old data
-                    // new data will be loaded after sub-tree is expanded
-                    vm.attr('dataIsReady', null);
-                  }
-
-                  return false;
-                }
-              });
+              instance.dispatch(REFRESH_SUB_TREE);
             });
         }.bind(this));
       },
