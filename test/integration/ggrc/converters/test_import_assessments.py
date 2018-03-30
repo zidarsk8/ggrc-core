@@ -167,12 +167,7 @@ class TestAssessmentImport(TestCase):
     self.assertEqual({u'evidence title 1'},
                      {i.title for i in asmt1.document_evidence})
 
-  @ddt.data(
-      (True, True),
-      (False, False),
-  )
-  @ddt.unpack
-  def test_error_ca_import_states(self, dry_run, has_error):
+  def test_error_ca_import_states(self):
     """Test changing state of Assessment with unfilled mandatory CA"""
     with factories.single_commit():
       audit = factories.AuditFactory()
@@ -181,7 +176,7 @@ class TestAssessmentImport(TestCase):
           title="def1",
           definition_type="assessment",
           definition_id=asmnt.id,
-          attribute_type="Date",
+          attribute_type="Text",
           mandatory=True,
       )
     response = self.import_data(OrderedDict([
@@ -190,9 +185,8 @@ class TestAssessmentImport(TestCase):
         ("Audit", audit.slug),
         ("Assignees", "user@example.com"),
         ("Creators", "user@example.com"),
-        ("Title", "Test title"),
         ("State", "Completed"),
-    ]), dry_run=dry_run)
+    ]), dry_run=False)
     expected_errors = {
         "Assessment": {
             "row_errors": {
@@ -206,7 +200,7 @@ class TestAssessmentImport(TestCase):
             }
         }
     }
-    self._check_csv_response(response, expected_errors if has_error else {})
+    self._check_csv_response(response, expected_errors)
 
   def test_assessment_warnings_errors(self):
     """ Test full assessment import with warnings and errors

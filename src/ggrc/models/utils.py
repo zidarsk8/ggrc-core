@@ -5,7 +5,7 @@
 
 from ggrc.utils import referenced_objects
 
-from .exceptions import ValidationError
+from .exceptions import ValidationError, StatusValidationError
 
 
 def validate_option(model, attribute, option, desired_role):
@@ -24,9 +24,10 @@ def validate_assessment_done_state(old_value, obj):
   if old_value in obj.NOT_DONE_STATES and \
      new_value in obj.DONE_STATES:
     if hasattr(obj, "preconditions_failed") and obj.preconditions_failed:
-      raise ValidationError("CA-introduced completion preconditions "
-                            "are not satisfied. Check preconditions_failed "
-                            "of items of self.custom_attribute_values")
+      raise StatusValidationError("CA-introduced completion "
+                                  "preconditions are not satisfied. "
+                                  "Check preconditions_failed "
+                                  "of items of self.custom_attribute_values")
 
 
 class PolymorphicRelationship(object):

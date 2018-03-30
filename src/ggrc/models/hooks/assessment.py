@@ -19,7 +19,7 @@ from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.models.hooks import common
 from ggrc.models.hooks import issue_tracker
-from ggrc.models.exceptions import ValidationError
+from ggrc.models.exceptions import StatusValidationError
 from ggrc.services import signals
 from ggrc.utils import referenced_objects
 
@@ -113,7 +113,7 @@ def init_hook():
     old_value = initial_state.status
     try:
       validate_assessment_done_state(old_value, obj)
-    except ValidationError as error:
+    except StatusValidationError as error:
       obj.status = old_value
       raise error
 
