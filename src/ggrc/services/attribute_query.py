@@ -32,9 +32,9 @@ class AttributeQueryBuilder(object):
     attr_type = type(attr.type)
     if attr_type is Boolean:
       value = value.lower()
-      if value == 'true':
+      if value in ['true', '1']:
         value = True
-      elif value == 'false':
+      elif value in ['false', '0']:
         value = False
       else:
         raise BadRequest('{0} must be "true" or "false", not {1}.'.format(
