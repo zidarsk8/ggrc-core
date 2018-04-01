@@ -6,8 +6,8 @@
 (function (can, $) {
   'use strict';
 
-  GGRC.Components('relatedReferenceUrls', {
-    tag: 'related-reference-urls',
+  GGRC.Components('relatedUrls', {
+    tag: 'related-urls',
     viewModel: {
       element: null,
       define: {
@@ -75,7 +75,7 @@
        * @param  {String} url - url to create
        * @return {Boolean} - it returns false to prevent page refresh
        */
-      submitCreateReferenceUrlForm: function (url) {
+      submitCreateUrlForm: function (url) {
         let existingUrls;
         let trimmedUrl = url.trim();
         let isValid = this.validateUserInput(trimmedUrl);
@@ -96,32 +96,32 @@
           return false;
         }
 
-        this.createReferenceUrl(trimmedUrl);
+        this.createUrl(trimmedUrl);
 
         this.toggleFormVisibility(false);
         return false;
       },
       /**
-       * @description Dispatches 'createReferenceUrl' event with appropriate
+       * @description Dispatches 'createUrl' event with appropriate
        * data payload
        *
        * @param  {String} url - url to create
        */
-      createReferenceUrl: function (url) {
+      createUrl: function (url) {
         this.dispatch({
-          type: 'createReferenceUrl',
+          type: 'createUrl',
           payload: url,
         });
       },
       /**
-       * @description Dispatches 'removeReferenceUrl' event with appropriate
+       * @description Dispatches 'removeUrl' event with appropriate
        * data payload
        *
        * @param  {string} url - url to delete
        */
-      removeReferenceUrl: function (url) {
+      removeUrl: function (url) {
         this.dispatch({
-          type: 'removeReferenceUrl',
+          type: 'removeUrl',
           payload: url,
         });
       },

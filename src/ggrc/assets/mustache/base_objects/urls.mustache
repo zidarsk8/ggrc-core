@@ -7,17 +7,17 @@
   <div class="row-fluid wrap-row">
     <div data-test-id="title_reference_url_aa7d1a65" class="span6">
       <related-documents instance={instance} document-type="REFERENCE_URL">
-        <related-reference-urls class="related-reference-urls"
+        <related-urls class="related-urls"
           {(urls)}="documents"
           {is-disabled}="isLoading"
           {is-not-editable}="isSnapshot"
-          (createReferenceUrl)="createRelatedDocument(%event.payload)"
-          (removeReferenceUrl)="removeRelatedDocument(%event.payload)">
-          <div class="related-reference-urls__heading">
-            <spinner class="related-reference-urls__spinner" {toggle}="isLoading"></spinner>
-            <h6 class="related-reference-urls__title">Reference URL</h6>
+          (createUrl)="createRelatedDocument(%event.payload)"
+          (removeUrl)="removeRelatedDocument(%event.payload)">
+          <div class="related-urls__heading">
+            <spinner class="related-urls__spinner" {toggle}="isLoading"></spinner>
+            <h6 class="related-urls__title">Reference URL</h6>
           </div>
-          <div class="related-reference-urls__list">
+          <div class="related-urls__list">
             <object-list {(items)}="urls" {empty-message}="''">
               <div class="action-toolbar">
                 <document-object-list-item {instance}="{.}">
@@ -27,7 +27,7 @@
                     <a href="javascript://"
                       class="info-action unmap"
                       {{#if isDisabled}}disabled{{/if}}
-                      ($click)="removeReferenceUrl(%context)">
+                      ($click)="removeUrl(%context)">
                         <action-toolbar-control>
                           <i class="fa fa-trash"></i>
                         </action-toolbar-control>
@@ -39,7 +39,7 @@
           </div>
           {{#unless isNotEditable}}
             {{#if isFormVisible}}
-              <form class="related-reference-urls__create create-form">
+              <form class="related-urls__create create-form">
                 <fieldset class="create-form__layout"
                   {{#if isDisabled}}disabled{{/if}}>
                   <input {($value)}="value"
@@ -49,7 +49,7 @@
                   spellcheck="false"
                   autocomplete="false">
                   <div class="create-form__controls">
-                    <button type="submit" class="create-form__confirm" ($click)="submitCreateReferenceUrlForm(value)">
+                    <button type="submit" class="create-form__confirm" ($click)="submitCreateUrlForm(value)">
                       <i class="fa fa-check"></i>
                     </button>
                     <button type="button" class="create-form__cancel" ($click)="toggleFormVisibility(false)">
@@ -60,13 +60,13 @@
               </form>
             {{else}}
               <button type="button"
-                class="related-reference-urls__toggle btn btn-small btn-gray"
+                class="related-urls__toggle btn btn-small btn-gray"
                 ($click)="toggleFormVisibility(true)">
                 Add
               </button>
             {{/if}}
           {{/unless}}
-        </related-reference-urls>
+        </related-urls>
       </related-documents>
     </div>
   </div>

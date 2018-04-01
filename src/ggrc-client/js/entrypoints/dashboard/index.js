@@ -38,7 +38,7 @@ import '../../components/page-header/page-header';
 import '../../components/action-toolbar-control/action-toolbar-control';
 import '../../components/unmap-button/unmap-button';
 import '../../components/related-objects/related-documents';
-import '../../components/related-objects/related-reference-urls';
+import '../../components/related-objects/related-urls';
 import '../../components/inline/inline';
 import '../../components/inline/base-inline-control-title';
 import '../../components/global-custom-attributes/global-custom-attributes';
