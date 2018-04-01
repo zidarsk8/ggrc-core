@@ -162,6 +162,8 @@ def _insert_select_acls(select_statement):
       )
   )
 
+  db.session.plain_commit()
+
 
 def _propagate_to_wf_children(new_wf_acls, child_class):
   """Propagate newly added roles to workflow objects.

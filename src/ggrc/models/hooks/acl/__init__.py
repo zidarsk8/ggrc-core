@@ -44,11 +44,9 @@ def after_flush(session, _):
   else:
     flask.g.deleted_wf_objects = workflow.get_deleted_wf_objects(session)
 
-  workflow.handle_acl_changes()
-
 
 def after_commit():
-  pass
+  workflow.handle_acl_changes()
 
 
 def init_hook():
