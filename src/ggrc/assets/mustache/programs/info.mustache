@@ -28,7 +28,7 @@
                   <custom-roles {exclude-roles}="instance.class.programRoles" {instance}="instance"></custom-roles>
                 </div>
               </div>
-              {{{render '/static/mustache/base_objects/urls.mustache' is_program=true instance=instance}}}
+              {{>'/static/mustache/base_objects/reference-urls.mustache'}}
 
               <div class="custom-attr-wrap info-pane__section">
                 <div class="row-fluid">
