@@ -18,9 +18,11 @@ from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc import TestCase
 from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc.models import factories
+from appengine import base
 
 
 @ddt.ddt
+@base.with_memcache
 class TestComprehensiveSheets(TestCase):
 
   """
@@ -62,8 +64,8 @@ class TestComprehensiveSheets(TestCase):
 
   LIMIT_DICT = {
       "LIST": {
-          all_models.Revision: 74,
-          all_models.Event: 73,
+          all_models.Revision: 67,
+          all_models.Event: 66,
       },
       "SINGLE": {}
   }
