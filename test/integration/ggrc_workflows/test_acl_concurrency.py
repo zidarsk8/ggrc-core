@@ -45,7 +45,7 @@ class TestWorkflowCycleStatePropagation(TestCase):
     context_id = wf.context.id
 
     tg_id = all_models.TaskGroup.query.first().id
-    obj_count = 5
+    obj_count = 10  # actual thread count is 20, 10 tgt + 10 tgo
 
     with factories.single_commit():
       person_id = factories.PersonFactory().id
