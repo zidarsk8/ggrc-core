@@ -128,4 +128,26 @@ describe('GGRC.Components.objectBulkUpdate', function () {
         .toHaveBeenCalled();
     });
   });
+
+  describe('"inserted" event handler', function () {
+    let event;
+    let context;
+
+    beforeEach(function () {
+      context = {
+        viewModel: new can.Map({
+          submitCbs: {
+            fire: jasmine.createSpy(),
+          },
+        }),
+      };
+      event = events.inserted.bind(context);
+    });
+
+    it('calls fire() of submitCbs attribute', function () {
+      event();
+
+      expect(context.viewModel.submitCbs.fire).toHaveBeenCalled();
+    });
+  });
 });

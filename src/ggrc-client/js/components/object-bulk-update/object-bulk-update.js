@@ -38,6 +38,9 @@ export default can.Component.extend({
     });
   },
   events: {
+    inserted: function () {
+      this.viewModel.attr('submitCbs').fire();
+    },
     closeModal: function () {
       if (this.element) {
         this.element.find('.modal-dismiss').trigger('click');
