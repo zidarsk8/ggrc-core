@@ -53,6 +53,8 @@ import {REFRESH_TAB_CONTENT,
 import Permission from '../../../permission';
 import template from './info-pane.mustache';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/custom-attribute-config';
+import pubsub from '../../../pub-sub';
+import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
 
 (function (can, GGRC, CMS) {
   'use strict';
@@ -467,6 +469,10 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
         return instance.save().then(() => {
           this.initializeFormFields();
           this.attr('onStateChangeDfd').resolve();
+          pubsub.dispatch({
+            type: 'refetchOnce',
+            modelNames: relatedAssessmentsTypes,
+          });
           stopFn();
         }).fail(resetStatusOnConflict);
       },

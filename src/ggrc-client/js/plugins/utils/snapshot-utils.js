@@ -8,6 +8,7 @@ import {
 } from './query-api-utils';
 import {getRole} from './acl-utils';
 import Permission from '../../permission';
+import {hasRelatedAssessments} from './models-utils';
 
 /**
  * Util methods for work with Snapshots.
@@ -155,8 +156,7 @@ function toObject(instance) {
     });
   }
 
-  if (instance.child_type === 'Control' ||
-    instance.child_type === 'Objective') {
+  if (hasRelatedAssessments(instance.child_type)) {
     content.last_assessment_date = instance.last_assessment_date;
   }
 
