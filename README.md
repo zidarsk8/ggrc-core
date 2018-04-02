@@ -118,6 +118,12 @@ by default and can be monitored with:
 docker exec ggrccore_db_1 tail -f /tmp/mysql.log
 ```
 
+Error logs, with all deadlock information: 
+
+```
+docker exec ggrccore_db_1 tail -f /tmp/mysql_error.log
+```
+
 Or slow queries, that take more than 0.5s, with:
 
 ```

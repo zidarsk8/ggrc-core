@@ -73,7 +73,6 @@
 < node_modules
 < package.json
 < package-lock.json
-< provision/docker/01_start_mysql.sh
 < provision/docker/inventory
 < provision/docker/my.cnf
 < provision/docker/mysql/default_utf8.cnf
