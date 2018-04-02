@@ -4,6 +4,7 @@
 """Custom attribute definition module"""
 
 import flask
+from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 from sqlalchemy.sql.schema import UniqueConstraint
@@ -317,21 +318,42 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
 
 
 @memcache.cached
+def get_cads_counts():
+  return {
+      (t, f): c
+      for t, f, c in db.session.query(
+          CustomAttributeDefinition.definition_type,
+          CustomAttributeDefinition.definition_id.is_(None),
+          func.count(),
+      ).group_by(
+          CustomAttributeDefinition.definition_type,
+          CustomAttributeDefinition.definition_id.is_(None),
+      )
+  }
+
+
+def _get_query_for(definition_type, instance_id=None):
+  """Returns query for sent args if """
+  if not get_cads_counts().get((definition_type, instance_id is None)):
+    return []
+  query = CustomAttributeDefinition.query.filter(
+      CustomAttributeDefinition.definition_type == definition_type,
+  )
+  if instance_id is None:
+    return query.filter(CustomAttributeDefinition.definition_id.is_(None))
+  return query.filter(CustomAttributeDefinition.definition_id == instance_id)
+
+
+@memcache.cached
 def get_global_cads(definition_type):
   """Returns global cad jsons list for sent definition_type."""
-  return [i.log_json() for i in
-          CustomAttributeDefinition.query.filter(
-              CustomAttributeDefinition.definition_type == definition_type,
-              CustomAttributeDefinition.definition_id.is_(None))]
+  return [i.log_json() for i in _get_query_for(definition_type)]
 
 
 @memcache.cached
 def get_local_cads(definition_type, instance_id):
   """Returns local cad jsons list for sent definition_type and instance_id."""
-  return [i.log_json() for i in
-          CustomAttributeDefinition.query.filter(
-              CustomAttributeDefinition.definition_type == definition_type,
-              CustomAttributeDefinition.definition_id == instance_id)]
+  return [i.log_json() for i in _get_query_for(definition_type, instance_id)]
 
 
 def get_model_name_inflector_dict():

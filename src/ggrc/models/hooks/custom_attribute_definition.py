@@ -14,6 +14,7 @@ from ggrc.models import custom_attribute_definition
 def invalidate_cache(sender, obj, src=None, service=None):
   """Invalidate cache related to cads."""
   # pylint: disable=unused-argument
+  custom_attribute_definition.get_cads_counts.invalidate_cache()
   if obj.definition_id:
     custom_attribute_definition.get_local_cads.invalidate_cache(
         obj.definition_type,
