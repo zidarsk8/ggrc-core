@@ -1,9 +1,10 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+from collections import namedtuple
 import datetime
 import iso8601
-from collections import namedtuple
+
 from sqlalchemy import and_, cast
 from sqlalchemy.ext.associationproxy import AssociationProxy
 from sqlalchemy.orm import joinedload_all
@@ -60,8 +61,7 @@ class AttributeQueryBuilder(object):
     return value
 
   def check_valid_property(self, attr, attrname):
-    if not hasattr(attr, 'type') or \
-            not isinstance(attr.type, TypeEngine):
+    if not hasattr(attr, 'type') or not isinstance(attr.type, TypeEngine):
       raise self.bad_query_parameter(attrname)
 
   def process_property_path(self, arg, value):  # Noqa
@@ -94,7 +94,7 @@ class AttributeQueryBuilder(object):
       value = [self.coerce_value_for_query_param(attr, arg, v) for v in value]
       filters.append(attr.in_(value))
     elif arg.endswith('__null'):
-      if(value in [0, 'false', 'False', 'FALSE', False]):
+      if value in [0, 'false', 'False', 'FALSE', False]:
         filters.append(attr.isnot(None))
       else:
         filters.append(attr.is_(None))
