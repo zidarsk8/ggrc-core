@@ -13,6 +13,7 @@ from functools import wraps
 from werkzeug.exceptions import Forbidden
 
 import flask_login
+from flask import g
 from flask import request
 from flask import redirect
 from ggrc.extensions import get_extension_module_for
@@ -67,6 +68,11 @@ def init_app(app):
 
 
 def get_current_user():
+  # used for a deferred function
+  # that might contain usage of get_current_user
+  if hasattr(g, '_current_user'):
+    return getattr(g, '_current_user')
+
   if get_login_module():
     return flask_login.current_user
   else:
