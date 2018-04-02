@@ -292,10 +292,10 @@ export default class CustomAttributeObject {
   /**
    * Returns prepared value depending on attribute_type.
    * @private
-   * @param {(string|number|boolean)} [value=''] - A value for the processing.
+   * @param {(string|number|boolean)} value - A value for the processing.
    * @return {(string|number)} - A prepared value.
    */
-  _prepareAttributeValue(value = '') {
+  _prepareAttributeValue(value) {
     const caDef = this._caDefinition;
     const attributeType = caDef.attr('attribute_type');
 
@@ -307,7 +307,7 @@ export default class CustomAttributeObject {
           ? '1'
           : '0';
       default:
-        return value;
+        return value || caDef.attr('default_value');
     }
   }
 
@@ -320,17 +320,17 @@ export default class CustomAttributeObject {
   _prepareAttributeObject(value) {
     const caDef = this._caDefinition;
     const attributeType = caDef.attr('attribute_type');
-    const stubPerson = {
+
+    if (attributeType !== caDefTypeName.MapPerson) {
+      return null;
+    }
+
+    const personStub = {
       id: value,
       type: 'Person',
     };
-    const resultForPerson = value ? stubPerson : null;
 
-    if (attributeType === caDefTypeName.MapPerson) {
-      return resultForPerson;
-    }
-
-    return null;
+    return value ? personStub : caDef.attr('default_value');
   }
 
   /**

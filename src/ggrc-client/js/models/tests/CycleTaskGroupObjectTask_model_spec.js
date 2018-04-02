@@ -42,7 +42,7 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
       'a non-finished task',
       function () {
         let isEditable;
-        instance.attr('status', 'InProgress');
+        instance.attr('status', 'In Progress');
         instance.cycle.attr('is_current', false);
 
         isEditable = method();
@@ -68,7 +68,7 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
       function () {
         let isEditable;
         instance.cycle.attr('is_current', true);
-        instance.attr('status', 'InProgress');
+        instance.attr('status', 'In Progress');
 
         isEditable = method();
 

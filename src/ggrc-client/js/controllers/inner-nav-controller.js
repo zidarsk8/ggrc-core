@@ -11,6 +11,7 @@ import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
 import {isObjectVersion} from '../plugins/utils/object-versions-utils';
 import router, {buildUrl} from '../router';
 import '../components/add-tab-button/add-tab-button';
+import pubSub from '../pub-sub';
 
 export default can.Control({
   defaults: {
@@ -26,6 +27,15 @@ export default can.Control({
     counts: null,
     hasHiddenWidgets: false,
     showAddTabButton: true,
+    /*
+      The widget should refetch items when opening
+      if "refetchOnce" has the model name of the widget.
+
+      For example: "refetchOnce" contains "Control" item.
+      The items of "Control" widget should be reloaded.
+    */
+    refetchOnce: new Set(),
+    pubSub,
   },
 }, {
   init: function (options) {
@@ -62,6 +72,15 @@ export default can.Control({
     }.bind(this));
   },
 
+  addRefetchOnceItems(modelNames) {
+    modelNames = typeof modelNames === 'string' ? [modelNames] : modelNames;
+    const refetchOnce = this.options.attr('refetchOnce');
+
+    modelNames.forEach((modelName) => {
+      refetchOnce.add(modelName);
+    });
+  },
+
   route: function (path) {
     let widgetList = this.options.widget_list;
 
@@ -80,12 +99,32 @@ export default can.Control({
     return new $.Deferred().resolve();
   },
 
+  tryToRefetchOnce(widgetSelector) {
+    const refetchOnce = this.options.attr('refetchOnce');
+
+    if (!refetchOnce.size) {
+      return false;
+    }
+
+    const widget = _.find(
+      this.options.widget_list,
+      (widget) => widget.selector === widgetSelector && widget.model
+    );
+
+    if (!widget) {
+      return false;
+    }
+
+    return refetchOnce.delete(widget.model.model_singular);
+  },
+
   display_widget: function (refetch) {
     let activeWidgetSelector = this.options.contexts.active_widget.selector;
     let $activeWidget = $(activeWidgetSelector);
     let widgetController = $activeWidget.control();
 
     if (widgetController && widgetController.display) {
+      refetch = this.tryToRefetchOnce(activeWidgetSelector) || refetch;
       return widgetController.display(refetch);
     }
     return new $.Deferred().resolve();
@@ -302,5 +341,8 @@ export default can.Control({
   },
   '{counts} change': function () {
     this.update_add_more_link();
+  },
+  '{pubSub} refetchOnce'(scope, event) {
+    this.addRefetchOnceItems(event.modelNames);
   },
 });

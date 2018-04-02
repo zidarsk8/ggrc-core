@@ -105,7 +105,9 @@ export default can.Control({
     }
 
     userFetch.then(function () {
-      this.after_preload();
+      if (this.element) {
+        this.after_preload();
+      }
     }.bind(this));
   },
   after_preload: function (content) {

@@ -45,12 +45,68 @@ describe('GGRC.Components.assessmentInfoPane', function () {
     });
   });
 
+  describe('isPending() getter', () => {
+    it('returns true if isUpdatingEvidences and isUpdatingUrls are true',
+      () => {
+        vm.attr('isUpdatingEvidences', true);
+        vm.attr('isUpdatingUrls', false);
+
+        expect(vm.attr('isPending')).toBe(true);
+      });
+
+    it('returns false if isUpdatingUrls and isUpdatingEvidences are false',
+      () => {
+        vm.attr('isUpdatingEvidences', false);
+        vm.attr('isUpdatingUrls', false);
+
+        expect(vm.attr('isPending')).toBe(false);
+      });
+
+    it('returns true if only isUpdatingEvidences is true', () => {
+      vm.attr('isUpdatingEvidences', true);
+      vm.attr('isUpdatingUrls', false);
+
+      expect(vm.attr('isPending')).toBe(true);
+    });
+
+    it('returns true if only isUpdatingUrls is true', () => {
+      vm.attr('isUpdatingEvidences', false);
+      vm.attr('isUpdatingUrls', true);
+
+      expect(vm.attr('isPending')).toBe(true);
+    });
+  });
+
   describe('onStateChange() method', () => {
     let method;
     beforeEach(() => {
       method = vm.onStateChange.bind(vm);
       spyOn(tracker, 'start').and.returnValue(() => {});
       spyOn(vm, 'initializeFormFields').and.returnValue(() => {});
+    });
+
+    it('prevents state change to deprecated for archived instance', (done) => {
+      vm.attr('instance.archived', true);
+      vm.attr('instance.status', 'Completed');
+
+      method({
+        state: vm.attr('deprecatedState'),
+      }).then(() => {
+        expect(vm.attr('instance.status')).toBe('Completed');
+        done();
+      });
+    });
+
+    it('prevents state change to initial for archived instance', (done) => {
+      vm.attr('instance.archived', true);
+      vm.attr('instance.status', 'Completed');
+
+      method({
+        state: vm.attr('initialState'),
+      }).then(() => {
+        expect(vm.attr('instance.status')).toBe('Completed');
+        done();
+      });
     });
 
     it('returns status back on undo action', (done) => {
@@ -62,33 +118,9 @@ describe('GGRC.Components.assessmentInfoPane', function () {
         status: 'newStatus',
       }).then(() => {
         expect(vm.attr('instance.status')).toBe('FooBar');
-        expect(vm.attr('isPending')).toBeFalsy();
         done();
       });
     });
-
-    it('resets isPending flag in case success the status changing', (done) => {
-      instanceSave.resolve();
-
-      method({
-        status: 'FooBar',
-      }).then(() => {
-        expect(vm.attr('isPending')).toBeFalsy();
-        done();
-      });
-    });
-
-    it('resets isPending flag in case unsuccessful the status changing',
-      (done) => {
-        instanceSave.reject();
-
-        method({
-          status: 'FooBar',
-        }).fail(() => {
-          expect(vm.attr('isPending')).toBeFalsy();
-          done();
-        });
-      });
 
     it('resets status after conflict', (done) => {
       vm.attr('instance.status', 'Baz');

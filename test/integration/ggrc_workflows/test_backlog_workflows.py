@@ -89,7 +89,7 @@ class TestBacklogWorkflow(TestCase):
     backlog_cycle_task_group = db.session.query(CycleTaskGroup).filter(
         CycleTaskGroup.cycle_id == backlog_cycle.id).one()
     # Check that changes were not propagated to backlog's CycleTaskGroup
-    self.assertEqual(backlog_cycle_task_group.status, "InProgress")
+    self.assertEqual(backlog_cycle_task_group.status, "In Progress")
     self.assertEqual(backlog_cycle_task_group.start_date, None)
     self.assertEqual(backlog_cycle_task_group.end_date, None)
 

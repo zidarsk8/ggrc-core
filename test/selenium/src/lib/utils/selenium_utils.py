@@ -326,3 +326,24 @@ def get_full_screenshot_as_base64(driver):
   if panel_origin_style:
     set_element_attribute(panel_elem, "style", panel_origin_style)
   return screenshot_base64
+
+
+def set_chrome_download_location(driver, download_dir):
+  """Headless Chrome doesn't support download.default_directory preference.
+  Downloads are disallowed by default.
+  In order to allow a download we should send a command that will allow them.
+  Language bindings currently don't have this possibility.
+  """
+  # pylint: disable=protected-access
+  driver.command_executor._commands["send_command"] = (
+      "POST", "/session/{}/chromium/send_command".format(driver.session_id))
+  params = {
+      "cmd": "Page.setDownloadBehavior",
+      "params": {"behavior": "allow", "downloadPath": download_dir}
+  }
+  driver.execute("send_command", params)
+
+
+def is_headless_chrome(pytestconfig):
+  """Return whether `--headless = True` is specified in pytest config."""
+  return pytestconfig.getoption("headless") == "True"

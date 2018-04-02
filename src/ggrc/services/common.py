@@ -45,6 +45,7 @@ from ggrc.services import signals
 from ggrc.models.background_task import BackgroundTask, create_task
 from ggrc.query import utils as query_utils
 from ggrc import settings
+from ggrc.cache import utils as cache_utils
 
 
 # pylint: disable=invalid-name
@@ -52,70 +53,6 @@ logger = getLogger(__name__)
 
 
 CACHE_EXPIRY_COLLECTION = 60
-
-
-def _get_cache_manager():
-  """Returns an instance of CacheManager."""
-  from ggrc.cache import CacheManager, MemCache
-  cache_manager = CacheManager()
-  cache_manager.initialize(MemCache())
-  return cache_manager
-
-
-def get_cache_key(obj, type=None, id=None):
-  """Returns a string identifier for the specified object or stub.
-
-  `obj` can be:
-    <db.Model> -- declarative model instance
-    (type, id) -- tuple
-    { 'type': type, 'id': id } -- dict
-  """
-  if isinstance(obj, tuple):
-    type, id = obj
-  elif isinstance(obj, dict):
-    type = obj.get('type', None)
-    id = obj.get('id', None)
-  if isinstance(type, (str, unicode)):
-    model = ggrc.models.get_model(type)
-    assert model is not None, "Invalid model name: {}".format(type)
-    type = ggrc.models.get_model(type)._inflector.table_plural
-  if not isinstance(obj, (tuple, dict)):
-    if type is None:
-      type = obj._inflector.table_plural
-    if id is None:
-      id = obj.id
-  return 'collection:{type}:{id}'.format(type=type, id=id)
-
-
-def get_cache_class(obj):
-  """Returns string name of object's class."""
-  return obj.__class__.__name__
-
-
-def get_related_keys_for_expiration(context, o):
-  """Returns a list for expiration."""
-  cls = get_cache_class(o)
-  keys = []
-  mappings = context.cache_manager.supported_mappings.get(cls, [])
-  if mappings:
-    for (cls, attr, polymorph) in mappings:
-      if polymorph:
-        key = get_cache_key(
-            None,
-            type=getattr(o, '{0}_type'.format(attr)),
-            id=getattr(o, '{0}_id'.format(attr)))
-        keys.append(key)
-      else:
-        obj = getattr(o, attr, None)
-        if obj:
-          if isinstance(obj, list):
-            for inner_o in obj:
-              key = get_cache_key(inner_o)
-              keys.append(key)
-          else:
-            key = get_cache_key(obj)
-            keys.append(key)
-  return keys
 
 
 def set_ids_for_new_custom_attributes(parent_obj):
@@ -137,136 +74,6 @@ def set_ids_for_new_custom_attributes(parent_obj):
       obj.attributable = parent_obj
     elif obj.type == "CustomAttributeDefinition":
       obj.definition = parent_obj
-
-
-def memcache_mark_for_deletion(context, objects_to_mark):
-  """
-  Mark objects for deletion from memcache
-
-  Args:
-    context: application context
-    objects_to_mark: A list of objects to be deleted from memcache
-
-  Returns:
-    None
-  """
-  for o, _ in objects_to_mark:
-    cls = get_cache_class(o)
-    if cls in context.cache_manager.supported_classes:
-      key = get_cache_key(o)
-      context.cache_manager.marked_for_delete.append(key)
-      context.cache_manager.marked_for_delete.extend(
-          get_related_keys_for_expiration(context, o))
-
-
-def update_memcache_before_commit(context, modified_objects, expiry_time):
-  """
-  Preparing the memccache entries to be updated before DB commit
-  Also update the memcache to indicate the status cache operation
-  'InProgress' waiting for DB commit
-  Raises Exception on failures, cannot proceed with DB commit
-
-  Args:
-    context: POST/PUT/DELETE HTTP request or import Converter contextual object
-    modified_objects:  objects in cache maintained prior to committing to DB
-    expiry_time: Expiry time specified for memcache ADD and DELETE
-  Returns:
-    None
-
-  """
-  if getattr(settings, 'MEMCACHE_MECHANISM', False) is False:
-    return
-
-  context.cache_manager = _get_cache_manager()
-
-  if modified_objects is not None:
-    if modified_objects.new:
-      memcache_mark_for_deletion(context, modified_objects.new.items())
-
-    if modified_objects.dirty:
-      memcache_mark_for_deletion(context, modified_objects.dirty.items())
-
-    if modified_objects.deleted:
-      memcache_mark_for_deletion(context, modified_objects.deleted.items())
-
-  status_entries = {}
-  for key in context.cache_manager.marked_for_delete:
-    build_cache_status(status_entries, 'DeleteOp:' + key,
-                       expiry_time, 'InProgress')
-  if status_entries:
-    logger.info("CACHE: status entries: %s", status_entries)
-    ret = context.cache_manager.bulk_add(status_entries, expiry_time)
-    if ret is not None and not ret:
-      pass
-    else:
-      logger.error('CACHE: Unable to add status for newly created entries %s',
-                   ret)
-
-
-def update_memcache_after_commit(context):
-  """
-  The memccache entries is updated after DB commit
-  Logs error if there are errors in updating entries in cache
-
-  Args:
-    context: POST/PUT/DELETE HTTP request or import Converter contextual object
-    modified_objects:  objects in cache maintained prior to committing to DB
-  Returns:
-    None
-
-  """
-  if getattr(settings, 'MEMCACHE_MECHANISM', False) is False:
-    return
-
-  if context.cache_manager is None:
-    logger.error("CACHE: Error in initiaizing cache manager")
-    return
-
-  cache_manager = context.cache_manager
-
-  related_objs = list()
-  for val in getattr(g, "referenced_objects", {}).itervalues():
-    obj_list = val.values()
-    if obj_list:
-      related_objs.append((obj_list[0], None))
-  memcache_mark_for_deletion(context, related_objs)
-
-  # TODO(dan): check for duplicates in marked_for_delete
-  if cache_manager.marked_for_delete:
-    delete_result = cache_manager.bulk_delete(
-        cache_manager.marked_for_delete, 0)
-    # TODO(dan): handling failure including network errors,
-    #            currently we log errors
-    if delete_result is not True:
-      logger.error("CACHE: Failed to remove collection from cache")
-
-  status_entries = []
-  for key in cache_manager.marked_for_delete:
-    status_entries.append('DeleteOp:' + str(key))
-  if status_entries:
-    delete_result = cache_manager.bulk_delete(status_entries, 0)
-    # TODO(dan): handling failure including network errors,
-    #            currently we log errors
-    if delete_result is not True:
-      logger.error("CACHE: Failed to remove status entries from cache")
-
-  clear_permission_cache()
-  cache_manager.clear_cache()
-
-
-def build_cache_status(data, key, expiry_timeout, status):
-  """
-  Build the dictionary for storing operational status of cache
-
-  Args:
-    data: dictionary to update
-    key: key to dictionary
-    expiry_timeout: timeout for expiry cache
-    status: Update status entry, e.g.InProgress
-  Returns:
-    None
-  """
-  data[key] = {'expiry': expiry_timeout, 'status': status}
 
 
 def inclusion_filter(obj):
@@ -295,17 +102,6 @@ def update_snapshot_index(session, cache):
                                       reindex_snapshots_ids,
                                       commit=False)
   reindex_snapshots(reindex_snapshots_ids)
-
-
-def clear_permission_cache():
-  if not getattr(settings, 'MEMCACHE_MECHANISM', False):
-    return
-  cache = _get_cache_manager().cache_object.memcache_client
-  cached_keys_set = cache.get('permissions:list') or set()
-  cached_keys_set.add('permissions:list')
-  # We delete all the cached user permissions as well as
-  # the permissions:list value itself
-  cache.delete_multi(cached_keys_set)
 
 
 class ModelView(View):
@@ -785,7 +581,7 @@ class Resource(ModelView):
     with benchmark("Log event"):
       event = log_event(db.session, obj, force_obj=True)
     with benchmark("Update memcache before commit for collection PUT"):
-      update_memcache_before_commit(
+      cache_utils.update_memcache_before_commit(
           self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
     with benchmark("Send PUT - before commit event"):
       signals.Restful.model_put_before_commit.send(
@@ -800,7 +596,7 @@ class Resource(ModelView):
     with benchmark("Update index"):
       update_snapshot_index(db.session, modified_objects)
     with benchmark("Update memcache after commit for collection PUT"):
-      update_memcache_after_commit(self.request)
+      cache_utils.update_memcache_after_commit(self.request)
     with benchmark("Send PUT - after commit event"):
       signals.Restful.model_put_after_commit.send(
           obj.__class__, obj=obj, src=src, service=self, event=event,
@@ -810,11 +606,11 @@ class Resource(ModelView):
       with benchmark("Get modified objects"):
         modified_objects = get_modified_objects(db.session)
       with benchmark("Update memcache before commit"):
-        update_memcache_before_commit(
+        cache_utils.update_memcache_before_commit(
             self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
       db.session.commit()
       with benchmark("Update memcache after commit"):
-        update_memcache_after_commit(self.request)
+        cache_utils.update_memcache_after_commit(self.request)
       if self.has_cache():
         self.invalidate_cache_to(obj)
     with benchmark("Send event job"):
@@ -848,14 +644,14 @@ class Resource(ModelView):
     with benchmark("Log event"):
       event = log_event(db.session, obj)
     with benchmark("Update memcache before commit for collection DELETE"):
-      update_memcache_before_commit(
+      cache_utils.update_memcache_before_commit(
           self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
     with benchmark("Commit"):
       db.session.commit()
     with benchmark("Update index"):
       update_snapshot_index(db.session, modified_objects)
     with benchmark("Update memcache after commit for collection DELETE"):
-      update_memcache_after_commit(self.request)
+      cache_utils.update_memcache_after_commit(self.request)
     with benchmark("Send DELETEd - after commit event"):
       signals.Restful.model_deleted_after_commit.send(
           obj.__class__, obj=obj, service=self, event=event)
@@ -897,7 +693,7 @@ class Resource(ModelView):
   def get_matched_resources(self, matches):
     cache_objs = {}
     if self.has_cache():
-      self.request.cache_manager = _get_cache_manager()
+      self.request.cache_manager = cache_utils.get_cache_manager()
       with benchmark("Query cache for resources"):
         cache_objs = self.get_resources_from_cache(matches)
       database_matches = [m for m in matches if m not in cache_objs]
@@ -993,7 +789,7 @@ class Resource(ModelView):
     # Skip right to memcache
     memcache_client = self.request.cache_manager.cache_object.memcache_client
     for match in matches:
-      key = get_cache_key(None, id=match[0], type=match[1])
+      key = cache_utils.get_cache_key(None, id_=match[0], type_=match[1])
       val = memcache_client.get(key)
       if val:
         val = json.loads(val)
@@ -1011,13 +807,15 @@ class Resource(ModelView):
     for match, obj in match_obj_pairs.items():
       if obj.__class__.__name__ in cache_manager.supported_classes:
         memcache_client.add(
-            get_cache_key(None, id=match[0], type=match[1]),
+            cache_utils.get_cache_key(None, id_=match[0], type_=match[1]),
             as_json(obj))
 
   def invalidate_cache_to(self, obj):
     """Invalidate api cache for sent object."""
     memcache_client = self.request.cache_manager.cache_object.memcache_client
-    memcache_client.delete(get_cache_key(None, id=obj.id, type=obj.type))
+    memcache_client.delete(
+        cache_utils.get_cache_key(None, id_=obj.id, type_=obj.type),
+    )
 
   def json_create(self, obj, src):
     ggrc.builder.json.create(obj, src)
@@ -1204,7 +1002,7 @@ class Resource(ModelView):
     with benchmark("Log event for all objects"):
       event = log_event(db.session, obj, flush=False)
     with benchmark("Update memcache before commit for collection POST"):
-      update_memcache_before_commit(
+      cache_utils.update_memcache_before_commit(
           self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
     with benchmark("Serialize objects"):
       for obj in objects:
@@ -1215,7 +1013,7 @@ class Resource(ModelView):
     with benchmark("Update index"):
       update_snapshot_index(db.session, modified_objects)
     with benchmark("Update memcache after commit for collection POST"):
-      update_memcache_after_commit(self.request)
+      cache_utils.update_memcache_after_commit(self.request)
 
     with benchmark("Send model POSTed - after commit event"):
       for obj, src in itertools.izip(objects, sources):

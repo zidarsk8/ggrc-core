@@ -9,8 +9,7 @@ import urlparse
 
 import requests
 
-from lib import environment
-from lib.constants import url
+from lib import environment, url
 from lib.service.rest.template_provider import TemplateProvider
 
 
@@ -26,14 +25,14 @@ class RestClient(object):
   def __init__(self, endpoint):
     self.is_api = "" if endpoint == url.QUERY else url.API
     self.endpoint_url = urlparse.urljoin(
-        environment.APP_URL, "/".join([self.is_api, endpoint]))
+        environment.app_url, "/".join([self.is_api, endpoint]))
     self.session_cookie = None
 
   def get_session_cookie(self):
     """Send GET request to login URL, get response and return session
     cookie from response headers for further usage.
     """
-    resp = requests.get(urlparse.urljoin(environment.APP_URL, "/login"))
+    resp = requests.get(urlparse.urljoin(environment.app_url, "/login"))
     cookies = Cookie.SimpleCookie()
     cookies.load(resp.headers["Set-Cookie"])
     self.session_cookie = cookies["session"].value
@@ -66,7 +65,7 @@ class RestClient(object):
 
   def update_object(self, href, **kwargs):
     """Update object used GET, POST requests and return raw response."""
-    href_url = urlparse.urljoin(environment.APP_URL, href)
+    href_url = urlparse.urljoin(environment.app_url, href)
     obj_resp = self.get_object(href_url)
     obj_resp_headers = obj_resp.headers
     obj_resp_body = obj_resp.text
@@ -79,7 +78,7 @@ class RestClient(object):
 
   def delete_object(self, href):
     """Delete object used GET, POST requests and return raw response."""
-    href_url = urlparse.urljoin(environment.APP_URL, href)
+    href_url = urlparse.urljoin(environment.app_url, href)
     obj_resp_headers = self.get_object(href_url).headers
     del_obj_req_headers = self.generate_req_headers(
         resp_headers=obj_resp_headers)
@@ -88,7 +87,7 @@ class RestClient(object):
 
   def get_object(self, href):
     """Get object used GET request and return raw response."""
-    href_url = urlparse.urljoin(environment.APP_URL, href)
+    href_url = urlparse.urljoin(environment.app_url, href)
     req_headers = self.generate_req_headers()
     get_obj_resp = requests.get(url=href_url, headers=req_headers)
     return get_obj_resp

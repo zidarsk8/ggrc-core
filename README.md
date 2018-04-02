@@ -118,6 +118,12 @@ by default and can be monitored with:
 docker exec ggrccore_db_1 tail -f /tmp/mysql.log
 ```
 
+Error logs, with all deadlock information: 
+
+```
+docker exec ggrccore_db_1 tail -f /tmp/mysql_error.log
+```
+
 Or slow queries, that take more than 0.5s, with:
 
 ```
@@ -172,16 +178,16 @@ On the host machine in the root of the repository run:
 
 ##### Manually running selenium tests
 
-For Selenium tests, you must use the docker environment. There are two containers needed for running selenium tests `ggrccore_dev_1` and `ggrccore_selenium_1`. Due to a bug in the selenium container, you must start the containers with:
+For Selenium tests, you must use the docker environment. There are two containers needed for running selenium tests `ggrccore_cleandev_1` and `ggrccore_selenium_1`. Due to a bug in the selenium container, you must start the containers with:
 
 ```
 docker-compose  up -d --force-recreate
 ```
 After that, you can make sure that both containers are running with `docker ps -a`.
 
-To run the Selenium tests, you must login into your dev container, and run the server:
+To run the Selenium tests, you must login into your cleandev container, and run the server:
 ```
-docker exec -it ggrccore_dev_1 su vagrant
+docker exec -it ggrccore_cleandev_1 su vagrant
 build_assets
 db_reset
 launch_ggrc
@@ -235,7 +241,7 @@ Because Docker provisioning is done with Dockerfile which can not modify content
 
 ```
 docker-compose up -d --force-recreate
-docker exec -it ggrccore_dev_1 su vagrant
+docker exec -it ggrccore_cleandev_1 su vagrant
 ```
 
 

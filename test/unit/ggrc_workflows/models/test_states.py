@@ -15,11 +15,11 @@ class TestStates(unittest.TestCase):
     """Test task states"""
     self.assertEqual(
         all_models.CycleTaskGroupObjectTask.NO_VALIDATION_STATES,
-        ["Assigned", "InProgress", "Finished", "Deprecated"]
+        ["Assigned", "In Progress", "Finished", "Deprecated"]
     )
 
     self.assertEqual(
         all_models.CycleTaskGroupObjectTask.VALID_STATES,
-        ["Assigned", "InProgress", "Finished", "Deprecated", "Verified",
+        ["Assigned", "In Progress", "Finished", "Deprecated", "Verified",
          "Declined"]
     )

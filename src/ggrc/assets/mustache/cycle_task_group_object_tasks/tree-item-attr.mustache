@@ -24,7 +24,7 @@
   {{#case 'status'}}
     {{#using status=instance.status}}
       <span class="state-value-dot {{addclass 'state' status}}">
-        {{un_camel_case status}}
+        {{status}}
       </span>
     {{/using}}
   {{/case}}

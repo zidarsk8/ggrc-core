@@ -24,5 +24,5 @@ APPENGINE_EMAIL = "user@example.com"
 
 LOGGING_FORMATTER = {
     "()": "colorlog.ColoredFormatter",
-    "format": "%(log_color)s%(levelname)-8s %(asctime)s %(name)s %(message)s",
+    "format": "%(log_color)s%(name)s %(message)s",
 }

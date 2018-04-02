@@ -646,9 +646,11 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Send by default",
         "Comments",
         "Assessment Procedure",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Last Deprecated Date",
+        "Effective Date",
     }
     self._test_single_object(models.Objective, names, self.COMMON_EXPECTED)
 

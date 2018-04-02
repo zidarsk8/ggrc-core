@@ -25,7 +25,7 @@ from ggrc.models.audit import Audit
 from ggrc.models.program import Program
 from ggrc.rbac import permissions as rbac_permissions
 from ggrc.rbac.permissions_provider import DefaultUserPermissions
-from ggrc.services.common import _get_cache_manager
+from ggrc.cache import utils as cache_utils
 from ggrc.services import signals
 from ggrc.services.registry import service
 from ggrc.utils import benchmark
@@ -169,7 +169,7 @@ def query_memcache(key):
   if not getattr(settings, 'MEMCACHE_MECHANISM', False):
     return None, None
 
-  cache = _get_cache_manager().cache_object.memcache_client
+  cache = cache_utils.get_cache_manager().cache_object.memcache_client
   cached_keys_set = cache.get('permissions:list') or set()
   if key not in cached_keys_set:
     # We set the permissions:list variable so that we are able to batch

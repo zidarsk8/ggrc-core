@@ -11,6 +11,7 @@ from ggrc.access_control import role
 from ggrc.models.types import LongJsonType
 from ggrc.utils.revisions_diff import builder as revisions_diff
 from ggrc.utils import referenced_objects
+from ggrc.utils.revisions_diff import meta_info
 
 
 class Revision(Base, db.Model):
@@ -53,6 +54,7 @@ class Revision(Base, db.Model):
       'content',
       'description',
       reflection.Attribute('diff_with_current', create=False, update=False),
+      reflection.Attribute('meta', create=False, update=False),
   )
 
   @classmethod
@@ -101,7 +103,25 @@ class Revision(Base, db.Model):
       instance = referenced_objects.get(self.resource_type, self.resource_id)
       if instance:
         return revisions_diff.prepare(instance, self.content)
-      return None
+      # return empty diff object has already been removed
+      return {}
+
+    return lazy_loader
+
+  @builder.callable_property
+  def meta(self):
+    """Callable lazy property for revision."""
+    referenced_objects.mark_to_cache(self.resource_type, self.resource_id)
+
+    def lazy_loader():
+      """Lazy load diff for revisions."""
+      referenced_objects.rewarm_cache()
+      instance = referenced_objects.get(self.resource_type, self.resource_id)
+      meta_dict = {}
+      if instance:
+        instance_meta_info = meta_info.MetaInfo(instance)
+        meta_dict["mandatory"] = instance_meta_info.mandatory
+      return meta_dict
 
     return lazy_loader
 
@@ -272,6 +292,18 @@ class Revision(Base, db.Model):
 
   def populate_status(self):
     """Update status for older revisions or add it if status does not exist."""
+    workflow_models = {
+        "Cycle",
+        "CycleTaskGroup",
+        "CycleTaskGroupObjectTask",
+    }
+    statuses_mapping = {
+        "InProgress": "In Progress"
+    }
+    status = statuses_mapping.get(self._content.get("status"))
+    if self.resource_type in workflow_models and status:
+      return {"status": status}
+
     pop_models = {
         # ggrc
         "AccessGroup",
@@ -354,13 +386,43 @@ class Revision(Base, db.Model):
         result.append(categorization)
     return {key_name: result}
 
-  def populate_cavs(self):
-    """Populate custom_attribute_values based on custom_attributes."""
-    if "custom_attributes" not in self._content:
-      return {}
+  def _get_cavs(self):
+    """Return cavs values from content."""
     if "custom_attribute_values" in self._content:
-      return {}
-    return {"custom_attribute_values": self._content["custom_attributes"]}
+      return self._content["custom_attribute_values"]
+    if "custom_attributes" in self._content:
+      return self._content["custom_attributes"]
+    return []
+
+  def populate_cavs(self):
+    """Setup cads in cav list if they are not presented in content
+
+    but now they are associated to instance."""
+    from ggrc.models import custom_attribute_definition
+    cads = custom_attribute_definition.get_custom_attributes_for(
+        self.resource_type, self.resource_id)
+    cavs = {int(i["custom_attribute_id"]): i for i in self._get_cavs()}
+    for cad in cads:
+      custom_attribute_id = int(cad["id"])
+      if custom_attribute_id in cavs:
+        continue
+      if cad["attribute_type"] == "Map:Person":
+        value = "Person"
+      else:
+        value = cad["default_value"]
+      cavs[custom_attribute_id] = {
+          "attribute_value": value,
+          "attribute_object_id": None,
+          "custom_attribute_id": custom_attribute_id,
+          "attributable_id": self.resource_id,
+          "attributable_type": self.resource_type,
+          "display_name": "",
+          "attribute_object": None,
+          "type": "CustomAttributeValue",
+          "context_id": None,
+      }
+    return {"custom_attribute_values": cavs.values(),
+            "custom_attribute_definitions": cads}
 
   def populate_cad_default_values(self):
     """Setup default_value to CADs if it's needed."""
@@ -393,8 +455,13 @@ class Revision(Base, db.Model):
     populated_content.update(self._document_evidence_hack())
     populated_content.update(self.populate_categoies("categories"))
     populated_content.update(self.populate_categoies("assertions"))
-    populated_content.update(self.populate_cavs())
     populated_content.update(self.populate_cad_default_values())
+    populated_content.update(self.populate_cavs())
+
+    # remove custom_attributes,
+    # it's old style interface and now it's not needed
+    populated_content.pop("custom_attributes", None)
+
     return populated_content
 
   @content.setter

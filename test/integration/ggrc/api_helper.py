@@ -157,7 +157,7 @@ class Api(object):
     data = {obj._inflector.table_singular: obj_dict}
     return self.put(obj, data)
 
-  def delete(self, obj, args=None):
+  def delete(self, obj, id_=None, args=None):
     """Delete api call helper.
 
     This function helps creating delete calls for a specific object by fetching
@@ -169,13 +169,14 @@ class Api(object):
     Returns:
       Server response.
     """
-    response = self.get(obj, obj.id)
+    id_ = id_ or obj.id
+    response = self.get(obj, id_)
     headers = {
         "If-Match": response.headers.get("Etag"),
         "If-Unmodified-Since": response.headers.get("Last-Modified")
     }
     headers.update(self.headers)
-    api_link = self.api_link(obj, obj.id)
+    api_link = self.api_link(obj, id_)
     if args:
       args_str = ",".join("{}={}".format(k, v) for k, v in args.items())
       api_link = "{}?{}".format(api_link, args_str)

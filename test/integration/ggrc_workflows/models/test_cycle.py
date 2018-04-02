@@ -52,3 +52,25 @@ class TestCycleApiCalls(workflow_test_case.WorkflowTestCase):
     cycle = all_models.Cycle.query.one()
     response = self.api_helper.get_collection(cycle, (cycle.id, ))
     self.assertTrue(response.json["cycles_collection"]["cycles"])
+
+  @ddt.data("Risk",
+            "Control")
+  def test_create_with_mapped_object(self, model_name):
+    """Test cycle creation with mapped {0}."""
+    with factories.single_commit():
+      mapped_object = factories.get_model_factory(model_name)()
+      task_group = wf_factories.TaskGroupFactory()
+      wf_factories.TaskGroupTaskFactory(task_group=task_group)
+      wf_factories.TaskGroupObjectFactory(task_group=task_group,
+                                          object=mapped_object)
+    mapped_object_id = mapped_object.id
+
+    data = workflow_api.get_cycle_post_dict(task_group.workflow)
+
+    response = self.api_helper.post(all_models.Cycle, data)
+    self.assertEquals(response.status_code, 201)
+
+    cycle_id = response.json.get("cycle", {}).get("id")
+    cycle = all_models.Cycle.query.filter_by(id=cycle_id).first()
+    obj = cycle.cycle_task_groups[0].task_group.task_group_objects[0].object
+    self.assertEquals(obj.id, mapped_object_id)

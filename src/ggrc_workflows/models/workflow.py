@@ -426,7 +426,7 @@ class Workflow(roleable.Roleable,
         .CycleTaskGroup(description="Backlog workflow taskgroup",
                         title="Backlog TaskGroup",
                         cycle=backlog_cycle,
-                        status="InProgress",
+                        status=cycle_task_group.CycleTaskGroup.IN_PROGRESS,
                         start_date=None,
                         end_date=None,
                         context=backlog_workflow
@@ -456,7 +456,7 @@ class WorkflowState(object):
   VERIFIED = "Verified"
   FINISHED = "Finished"
   ASSIGNED = "Assigned"
-  IN_PROGRESS = "InProgress"
+  IN_PROGRESS = "In Progress"
   UNKNOWN_STATE = None
 
   @classmethod
@@ -493,7 +493,7 @@ class WorkflowState(object):
     """Get lowest state of an object
 
     Get the lowest possible state of the tasks relevant to one object. States
-    are scanned in order: Overdue, InProgress, Finished, Assigned, Verified.
+    are scanned in order: Overdue, In Progress, Finished, Assigned, Verified.
 
     Args:
       objs: A list of cycle group object tasks, which should all be mapped to
@@ -517,7 +517,7 @@ class WorkflowState(object):
     """Get lowest state of a workflow
 
     Get the lowest possible state of the tasks relevant to a given workflow.
-    States are scanned in order: Overdue, InProgress, Finished, Assigned,
+    States are scanned in order: Overdue, In Progress, Finished, Assigned,
     Verified.
 
     Args:

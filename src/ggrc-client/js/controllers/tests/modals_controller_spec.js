@@ -96,6 +96,28 @@ describe('ModalsController', function () {
         expect(ctrlInst.after_preload).toHaveBeenCalled();
       }
     );
+
+    it('does not call after_preload if there is no element for modal', () => {
+      let userId = GGRC.current_user.id;
+      let dfdRefresh = new can.Deferred();
+      let fetchedUser = new can.Map({id: userId, email: 'john@doe.com'});
+
+      let partialUser = new can.Map({
+        id: userId,
+        email: '',
+        refresh: jasmine.createSpy().and.returnValue(dfdRefresh.promise()),
+      });
+
+      spyOn(partialUser, 'reify').and.returnValue(partialUser);
+      CMS.Models.Person.store[userId] = partialUser;
+
+      init();
+
+      expect(ctrlInst.after_preload).not.toHaveBeenCalled();
+      ctrlInst.element = null;
+      dfdRefresh.resolve(fetchedUser);
+      expect(ctrlInst.after_preload).not.toHaveBeenCalled();
+    });
   });
 
   describe('save_error method', function () {

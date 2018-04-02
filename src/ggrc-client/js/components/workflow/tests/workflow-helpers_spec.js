@@ -49,4 +49,45 @@ describe('Workflow helpers', () => {
       });
     });
   });
+
+  describe('updateStatus() method', () => {
+    let instance;
+    let refreshedInstance;
+
+    beforeEach(function () {
+      refreshedInstance = new can.Map({
+        save: jasmine.createSpy('save'),
+      });
+      instance = new can.Map({
+        refresh: jasmine.createSpy('refresh')
+          .and.returnValue(refreshedInstance),
+      });
+    });
+
+    it('refreshes passed instance', async function (done) {
+      await workflowHelpers.updateStatus(instance);
+      expect(instance.refresh).toHaveBeenCalled();
+      done();
+    });
+
+    it('sets passed status for refreshed instance before saving',
+      async function (done) {
+        const status = 'New Status';
+        spyOn(refreshedInstance, 'attr');
+        await workflowHelpers.updateStatus(instance, status);
+        expect(refreshedInstance.attr).toHaveBeenCalledWith('status', status);
+        expect(refreshedInstance.attr).toHaveBeenCalledBefore(
+          refreshedInstance.save
+        );
+        done();
+      });
+
+    it('returns saved instance', async function (done) {
+      const saved = {};
+      refreshedInstance.save.and.returnValue(saved);
+      const result = await workflowHelpers.updateStatus(instance);
+      expect(result).toBe(saved);
+      done();
+    });
+  });
 });

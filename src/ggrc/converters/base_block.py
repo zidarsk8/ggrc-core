@@ -31,8 +31,7 @@ from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.services.common import get_modified_objects
 from ggrc.services.common import update_snapshot_index
-from ggrc.services.common import update_memcache_after_commit
-from ggrc.services.common import update_memcache_before_commit
+from ggrc.cache import utils as cache_utils
 from ggrc.utils.log_event import log_event
 from ggrc.services import signals
 from ggrc_workflows.models.cycle_task_group_object_task import \
@@ -631,11 +630,13 @@ class BlockConverter(object):
     try:
       modified_objects = get_modified_objects(db.session)
       import_event = log_event(db.session, None)
-      update_memcache_before_commit(
+      cache_utils.update_memcache_before_commit(
           self, modified_objects, CACHE_EXPIRY_IMPORT)
+      for row_converter in self.row_converters:
+        row_converter.send_before_commit_signals(import_event)
       db.session.commit()
       self._store_revision_ids(import_event)
-      update_memcache_after_commit(self)
+      cache_utils.update_memcache_after_commit(self)
       update_snapshot_index(db.session, modified_objects)
       return import_event
     except exc.SQLAlchemyError as err:

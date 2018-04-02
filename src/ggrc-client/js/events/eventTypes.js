@@ -146,7 +146,18 @@ const REFRESH_MAPPING = {
   type: 'refreshMapping',
 };
 
+/**
+ * Refreshes sub tree for instance
+ * @event refreshSubTree
+ * @type {object}
+ * @property {string} type - Event name.
+ */
+const REFRESH_SUB_TREE = {
+  type: 'refreshSubTree',
+};
+
 export {
+  REFRESH_SUB_TREE,
   REFRESH_RELATED,
   SAVE_CUSTOM_ROLE,
   ROLES_CONFLICT,

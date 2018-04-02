@@ -316,7 +316,7 @@ def update_cycle_task_child_state(obj):
   Args:
     obj: Cycle task instance
   """
-  status_order = (None, 'Assigned', 'InProgress',
+  status_order = (None, 'Assigned', obj.IN_PROGRESS,
                   'Declined', 'Finished', 'Verified')
   status = obj.status
   children_attrs = _cycle_task_children_attr.get(type(obj), [])
@@ -356,9 +356,9 @@ def _update_parent_status(parent, child_statuses):
   elif len(child_statuses) == 1:
     new_status = child_statuses.pop()
     if new_status == "Declined":
-      new_status = "InProgress"
-  elif {"InProgress", "Declined", "Assigned"} & child_statuses:
-    new_status = "InProgress"
+      new_status = parent.IN_PROGRESS
+  elif {parent.IN_PROGRESS, "Declined", "Assigned"} & child_statuses:
+    new_status = parent.IN_PROGRESS
   else:
     new_status = "Finished"
   if old_status == new_status:
@@ -553,7 +553,7 @@ def handle_cycle_task_group_object_task_put(
 
 @signals.Restful.model_posted_after_commit.connect_via(
     models.CycleTaskGroupObjectTask)
-@signals.Restful.model_put_after_commit.connect_via(
+@signals.Restful.model_put_before_commit.connect_via(
     models.CycleTaskGroupObjectTask)
 @signals.Restful.model_deleted_after_commit.connect_via(
     models.CycleTaskGroupObjectTask)

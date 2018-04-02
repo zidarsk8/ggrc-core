@@ -6,6 +6,8 @@
 import Permission from '../permission';
 import {getRole} from '../plugins/utils/acl-utils';
 import {getClosestWeekday} from '../plugins/utils/date-util';
+import {getPageType} from '../plugins/utils/current-page-utils';
+import {REFRESH_SUB_TREE} from '../events/eventTypes';
 
 (function (can) {
   let _mustachePath;
@@ -319,7 +321,6 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
       default_filter: ['Control'],
     },
     init: function () {
-      let that = this;
       let assigneeRole = getRole('CycleTaskGroupObjectTask', 'Task Assignees');
 
       this._super.apply(this, arguments);
@@ -344,12 +345,27 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
         }
       });
 
-      this.bind('updated', function (ev, instance) {
-        if (instance instanceof that) {
-          instance.refresh_all_force('related_objects').then(function (object) {
-            return instance.refresh_all_force(
-              'cycle_task_group', 'cycle', 'workflow');
-          });
+      this.bind('created', (ev, instance) => {
+        if (instance instanceof this) {
+          const ctgId = instance.attr('cycle_task_group.id');
+          const ctg = CMS.Models.CycleTaskGroup.findInCacheById(ctgId);
+
+          if (!ctg) {
+            return;
+          }
+
+          ctg.dispatch(REFRESH_SUB_TREE);
+          instance.refresh_all_force('cycle_task_group', 'cycle', 'workflow');
+        }
+      });
+
+      this.bind('updated', (ev, instance) => {
+        // update related objects, if current page is Workflow
+        if (
+          instance instanceof this &&
+          getPageType() === 'Workflow'
+        ) {
+          instance.refresh_all_force('cycle_task_group', 'cycle', 'workflow');
         }
       });
     },

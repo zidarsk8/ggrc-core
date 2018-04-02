@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {sortByName} from '../../plugins/utils/label-utils';
 import template from './templates/multi-select-label.mustache';
 import './../custom-autocomplete/autocomplete-input';
 import './label-autocomplete-results';
@@ -57,6 +58,7 @@ export default can.Component.extend({
       return '';
     },
     valueChanged: function (newValue) {
+      newValue = sortByName(newValue);
       if (this.attr('onlyEditMode')) {
         this.attr('instance.labels', newValue);
       } else {

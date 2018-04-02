@@ -113,7 +113,6 @@
 
       .ggrc-form-item__controls {
         margin-left: auto;
-        align-self: flex-end;
       }
     }
 
@@ -143,6 +142,8 @@
       font-size: 12px;
       font-weight: bold;
       margin-bottom: 5px;
+      flex: 1;
+      overflow: hidden;
     }
 
     &__label-text {
@@ -160,6 +161,7 @@
       color: gray;
       margin-bottom: 8px;
       line-height: 10px;
+      word-wrap: break-word;
     }
 
     /*
