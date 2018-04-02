@@ -15,7 +15,6 @@ pytest-timeout==1.2.1
 pytest-pycharm==0.5.0
 pytest-rerunfailures==4.0
 pytest-cov==2.5.1
-pytest-xvfb==1.1.0
 pytest-repeat==0.4.1
 pytest-env==0.6.2
 python-dateutil==2.7.1
