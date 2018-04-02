@@ -23,6 +23,8 @@ from ggrc_workflows.models.hooks import workflow
 
 def after_flush(session, _):
   """Handle all ACL hooks after after flush."""
+  if not flask.has_app_context():
+    return
 
   relationship.handle_relationship_creation(session)
   access_control_list.handle_acl_creation(session)
