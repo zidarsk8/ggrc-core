@@ -26,7 +26,7 @@ import template from './detailed-business-object-list-item.mustache';
     viewModel: {
       instance: {},
       customAttributes: null,
-      adminRole: ['Admin'],
+      visibleRoles: ['Admin', 'Primary Contacts', 'Secondary Contacts'],
       deletableAdmin: false,
       define: {
         isSnapshot: {
