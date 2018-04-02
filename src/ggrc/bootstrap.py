@@ -19,7 +19,7 @@ def get_db():
       # TODO: Check for MySQL and only apply when needed
       if length is None:
         length = 250
-      return super(String, self).__init__(length, *args, **kwargs)
+      super(String, self).__init__(length, *args, **kwargs)
   database.String = String
 
   database.session.plain_commit = database.session.commit
