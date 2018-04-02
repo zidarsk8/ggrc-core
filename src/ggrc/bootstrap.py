@@ -14,6 +14,9 @@ def get_db():
     """Simple subclass of sqlalchemy.orm.String which provides a default
     length for `String` types to satisfy MySQL
     """
+    # pylint: disable=too-few-public-methods
+    # this class is just to set the default string length and is not meant to
+    # do anything else, so it does not need any other public methods.
 
     def __init__(self, length=None, *args, **kwargs):
       # TODO: Check for MySQL and only apply when needed
