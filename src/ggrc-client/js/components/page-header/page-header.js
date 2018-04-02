@@ -5,6 +5,7 @@
 
 import '../assessment/people/lhn-popup-people';
 import '../tasks-counter/tasks-counter';
+import '../feedback-link/feedback-link';
 import logo from '../../../images/ggrc-logo.svg';
 import oneColorLogo from '../../../images/ggrc-one-color.svg';
 import {
