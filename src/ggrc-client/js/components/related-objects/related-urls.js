@@ -31,6 +31,13 @@ GGRC.Components('relatedUrls', {
           return canEditInstance && !isNotEditable && allowToRemove;
         },
       },
+      emptyMessage: {
+        get() {
+          let canAddUrl = this.attr('canAddUrl');
+
+          return canAddUrl ? '' : 'None';
+        },
+      },
     },
     instance: null,
     element: null,
