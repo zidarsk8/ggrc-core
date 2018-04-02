@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import Permission from '../../../permission';
+
 describe('GGRC.Components.relatedUrls', function () {
   'use strict';
 
@@ -13,6 +15,85 @@ describe('GGRC.Components.relatedUrls', function () {
     viewModel = GGRC.Components.getViewModel('relatedUrls');
     instance = {};
     viewModel.attr('instance', instance);
+  });
+
+  describe('canAddUrl get() method', ()=> {
+    beforeEach(()=> {
+      spyOn(Permission, 'is_allowed_for');
+    });
+
+    it('returns false if user can not update instance', ()=> {
+      Permission.is_allowed_for.and.returnValue(false);
+
+      let result = viewModel.attr('canAddUrl');
+
+      expect(result).toBe(false);
+    });
+
+    it(`returns false if user can update instance 
+        but edit is disabled in the component`, ()=> {
+        Permission.is_allowed_for.and.returnValue(true);
+        viewModel.attr('isNotEditable', true);
+
+        let result = viewModel.attr('canAddUrl');
+
+        expect(result).toBe(false);
+      });
+
+    it('returns true if user can update instance and edit is not denied', ()=> {
+      Permission.is_allowed_for.and.returnValue(true);
+      viewModel.attr('isNotEditable', false);
+
+      let result = viewModel.attr('canAddUrl');
+
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('canRemoveUrl get() method', ()=> {
+    beforeEach(()=> {
+      spyOn(Permission, 'is_allowed_for');
+    });
+
+    it('returns false if user can not update instance', ()=> {
+      Permission.is_allowed_for.and.returnValue(false);
+
+      let result = viewModel.attr('canRemoveUrl');
+
+      expect(result).toBe(false);
+    });
+
+    it(`returns false if user can update instance 
+        but edit is disabled in the component`, ()=> {
+        Permission.is_allowed_for.and.returnValue(true);
+        viewModel.attr('isNotEditable', true);
+
+        let result = viewModel.attr('canRemoveUrl');
+
+        expect(result).toBe(false);
+      });
+
+    it(`returns false if user can update instance, edit is is not denied,
+        but removal is disabled by flag`, ()=> {
+        Permission.is_allowed_for.and.returnValue(true);
+        viewModel.attr('isNotEditable', false);
+        viewModel.attr('allowToRemove', false);
+
+        let result = viewModel.attr('canRemoveUrl');
+
+        expect(result).toBe(false);
+      });
+
+    it(`returns true if user can update instance, edit is not denied,
+        and removal is not disabled`, ()=> {
+        Permission.is_allowed_for.and.returnValue(true);
+        viewModel.attr('isNotEditable', false);
+        viewModel.attr('allowToRemove', true);
+
+        let result = viewModel.attr('canRemoveUrl');
+
+        expect(result).toBe(true);
+      });
   });
 
   describe('createUrl() method', function () {
