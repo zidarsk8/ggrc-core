@@ -3,12 +3,36 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+
+import Permission from '../../permission';
 import template from './templates/related-urls.mustache';
 
 GGRC.Components('relatedUrls', {
   tag: 'related-urls',
   template: template,
   viewModel: {
+    define: {
+      canAddUrl: {
+        get() {
+          let canEditInstance = Permission
+            .is_allowed_for('update', this.attr('instance'));
+          let isNotEditable = this.attr('isNotEditable');
+
+          return canEditInstance && !isNotEditable;
+        },
+      },
+      canRemoveUrl: {
+        get() {
+          let canEditInstance = Permission
+            .is_allowed_for('update', this.attr('instance'));
+          let isNotEditable = this.attr('isNotEditable');
+          let allowToRemove = this.attr('allowToRemove');
+
+          return canEditInstance && !isNotEditable && allowToRemove;
+        },
+      },
+    },
+    instance: null,
     element: null,
     urls: [],
     value: '',
