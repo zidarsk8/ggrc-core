@@ -1,14 +1,16 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Bootstrap for ggrc db."""
+
 from flask.ext.sqlalchemy import SQLAlchemy
 
 
 def get_db():
   """Get modified db object."""
-  db = SQLAlchemy()
+  database = SQLAlchemy()
 
-  class String(db.String):
+  class String(database.String):
     """Simple subclass of sqlalchemy.orm.String which provides a default
     length for `String` types to satisfy MySQL
     """
@@ -18,9 +20,9 @@ def get_db():
       if length is None:
         length = 250
       return super(String, self).__init__(length, *args, **kwargs)
-  db.String = String
+  database.String = String
 
-  db.session.plain_commit = db.session.commit
+  database.session.plain_commit = database.session.commit
 
   def hooked_commit(*args, **kwargs):
     """Commit override function.
@@ -28,9 +30,9 @@ def get_db():
     This function is meant for a single after commit hook that should only be
     used for ACL propagation.
     """
-    db.session.plain_commit(*args, **kwargs)
+    database.session.plain_commit(*args, **kwargs)
     from ggrc.models.hooks import acl
     acl.after_commit()
 
-  db.session.commit = hooked_commit
-  return db
+  database.session.commit = hooked_commit
+  return database
