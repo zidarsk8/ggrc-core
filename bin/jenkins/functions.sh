@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
@@ -44,24 +45,13 @@ setup () {
     PROJECT="${1}"
   fi
 
-  MACHINE_ID="${2:-cleandev selenium}"
+  SERVICE=$2
 
   git submodule update --init
 
-  docker-compose --file docker-compose-testing.yml --project-name ${PROJECT} \
-    build ${MACHINE_ID}
-
   docker-compose --file docker-compose-testing.yml \
     --project-name ${PROJECT} \
-    up --force-recreate -d ${MACHINE_ID}
-
-  echo "Provisioning ${PROJECT}_cleandev_1"
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
-    source /vagrant/bin/init_vagrant_env
-    ln -s /vagrant-dev/node_modules /vagrant/node_modules
-    build_assets
-    make appengine_packages
-  "
+    up --build --force-recreate -d ${SERVICE}
 }
 
 teardown () {
@@ -81,9 +71,41 @@ echo "
 "
 }
 
+provision_dev() {
+  local dev_server=$1
+  echo "Provisioning ${PROJECT}_$dev_server"
+  docker exec -i ${PROJECT}_${dev_server} su -c "
+    source /vagrant/bin/init_vagrant_env
+    ln -s /vagrant-dev/node_modules /vagrant/node_modules
+    build_assets
+    make appengine_packages
+  "
+}
+
+
+reset_db_and_launch_dev() {
+  local dev_server=$1
+  echo "Resetting the DB for $dev_server"
+  docker exec -i ${PROJECT}_${dev_server} su -c "
+    source /vagrant/bin/init_vagrant_env
+    source /vagrant/bin/init_test_env
+    db_reset -d ggrcdevtest
+  "
+  echo "Running dev server $dev_server"
+  docker exec -id ${PROJECT}_${dev_server} su -c "
+    source /vagrant/bin/init_vagrant_env
+    source /vagrant/bin/init_test_env
+    export DASHBOARD_INTEGRATION='on'
+    launch_ggrc
+  "
+}
+
+
 integration_tests () {
   PROJECT=$1
   print_line
+
+  provision_dev "cleandev_1"
 
   echo "Running ${PROJECT}"
   docker exec -i ${PROJECT}_cleandev_1 su -c "
@@ -100,20 +122,7 @@ selenium_tests () {
   PROJECT=$1
   print_line
 
-  echo "Resetting the DB"
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
-    source /vagrant/bin/init_vagrant_env
-    source /vagrant/bin/init_test_env
-    db_reset -d ggrcdevtest
-  "
-
-  echo "Running Test server"
-  docker exec -id ${PROJECT}_cleandev_1 su -c "
-    source /vagrant/bin/init_vagrant_env
-    source /vagrant/bin/init_test_env
-    export DASHBOARD_INTEGRATION='on'
-    launch_ggrc
-  "
+  provision_dev "cleandev_1" && reset_db_and_launch_dev "cleandev_1"
 
   echo "Running Selenium tests"
   docker exec -i ${PROJECT}_selenium_1 sh -c "
@@ -129,6 +138,8 @@ selenium_tests () {
 unittests_tests () {
   PROJECT=$1
   print_line
+
+  provision_dev "cleandev_1"
 
   echo "Running python unit tests"
   docker exec -i ${PROJECT}_cleandev_1 su -c "
