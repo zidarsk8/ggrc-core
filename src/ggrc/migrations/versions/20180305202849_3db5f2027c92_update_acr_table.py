@@ -14,6 +14,7 @@ import sqlalchemy as sa
 from alembic import op
 
 from ggrc.migrations.utils import acr_propagation
+from ggrc.migrations.utils import acr_propagation_constants
 
 
 # revision identifiers, used by Alembic.
@@ -37,7 +38,7 @@ _ASSESSMENT_PROPAGATION = {
             },
             "Document RU": {},
             "Comment R": {},
-            "Issue R": acr_propagation.COMMENT_DOCUMENT_R,
+            "Issue R": acr_propagation_constants.COMMENT_DOCUMENT_R,
         },
     },
 }
@@ -51,7 +52,7 @@ _CONTROL_ROLES = (
 )
 
 _CONTROL_PROPAGATION = {
-    _CONTROL_ROLES: acr_propagation.PROPOSAL_RU,
+    _CONTROL_ROLES: acr_propagation_constants.PROPOSAL_RU,
 }
 
 
@@ -60,25 +61,25 @@ PROPAGATION = {
 
     "Control": _CONTROL_PROPAGATION,
 
-    "AccessGroup": acr_propagation.BASIC_PROPAGATION,
-    "Clause": acr_propagation.BASIC_PROPAGATION,
-    "Contract": acr_propagation.BASIC_PROPAGATION,
-    "DataAsset": acr_propagation.BASIC_PROPAGATION,
-    "Facility": acr_propagation.BASIC_PROPAGATION,
-    "Issue": acr_propagation.BASIC_PROPAGATION,
-    "Market": acr_propagation.BASIC_PROPAGATION,
-    "Objective": acr_propagation.BASIC_PROPAGATION,
-    "OrgGroup": acr_propagation.BASIC_PROPAGATION,
-    "Policy": acr_propagation.BASIC_PROPAGATION,
-    "Process": acr_propagation.BASIC_PROPAGATION,
-    "Product": acr_propagation.BASIC_PROPAGATION,
-    "Project": acr_propagation.BASIC_PROPAGATION,
-    "Regulation": acr_propagation.BASIC_PROPAGATION,
-    "Section": acr_propagation.BASIC_PROPAGATION,
-    "Standard": acr_propagation.BASIC_PROPAGATION,
-    "System": acr_propagation.BASIC_PROPAGATION,
-    "Threat": acr_propagation.BASIC_PROPAGATION,
-    "Vendor": acr_propagation.BASIC_PROPAGATION,
+    "AccessGroup": acr_propagation_constants.BASIC_PROPAGATION,
+    "Clause": acr_propagation_constants.BASIC_PROPAGATION,
+    "Contract": acr_propagation_constants.BASIC_PROPAGATION,
+    "DataAsset": acr_propagation_constants.BASIC_PROPAGATION,
+    "Facility": acr_propagation_constants.BASIC_PROPAGATION,
+    "Issue": acr_propagation_constants.BASIC_PROPAGATION,
+    "Market": acr_propagation_constants.BASIC_PROPAGATION,
+    "Objective": acr_propagation_constants.BASIC_PROPAGATION,
+    "OrgGroup": acr_propagation_constants.BASIC_PROPAGATION,
+    "Policy": acr_propagation_constants.BASIC_PROPAGATION,
+    "Process": acr_propagation_constants.BASIC_PROPAGATION,
+    "Product": acr_propagation_constants.BASIC_PROPAGATION,
+    "Project": acr_propagation_constants.BASIC_PROPAGATION,
+    "Regulation": acr_propagation_constants.BASIC_PROPAGATION,
+    "Section": acr_propagation_constants.BASIC_PROPAGATION,
+    "Standard": acr_propagation_constants.BASIC_PROPAGATION,
+    "System": acr_propagation_constants.BASIC_PROPAGATION,
+    "Threat": acr_propagation_constants.BASIC_PROPAGATION,
+    "Vendor": acr_propagation_constants.BASIC_PROPAGATION,
 
     # "RiskAssessment": does not have ACL roles
 }
