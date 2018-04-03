@@ -37,7 +37,6 @@ import Permission from '../permission';
     },
 
     tree_view_options: {
-      sort_property: 'sort_index',
       attr_view: GGRC.mustache_path + '/task_groups/tree-item-attr.mustache',
       add_item_view: GGRC.mustache_path + '/task_groups/tree_add_item.mustache',
       mapper_attr_list: [

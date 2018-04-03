@@ -90,7 +90,4 @@
       <input data-id="code_txtbx" tabindex="8" class="input-block-level" name="slug" placeholder="TASKGROUP-XXX" type="text" value="{{instance.slug}}">
     </div>
   </div>
-  {{#with_page_object_as 'workflow'}}
-    <input type="hidden" name="sort_index" value="{{sort_index_at_end workflow.task_groups}}" />
-  {{/with_page_object_as}}
 </form>

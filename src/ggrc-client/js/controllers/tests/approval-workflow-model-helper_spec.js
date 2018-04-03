@@ -148,7 +148,6 @@ describe('ApprovalWorkflow', ()=> {
           start_date: jasmine.any(String),
           end_date: undefined,
           object_approval: true,
-          sort_index: jasmine.any(String),
           access_control_list: [{
             ac_role_id: assigneeRole.id,
             person: {

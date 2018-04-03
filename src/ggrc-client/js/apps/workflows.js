@@ -17,23 +17,6 @@ import InfoWidget from '../controllers/info_widget_controller';
     'System Process DataAsset Product Project Facility Market'.split(' '),
     'Issue Risk Threat'.split(' ')
   );
-  let _taskSortFunction = function (a, b) {
-    let dateA = Number(new Date(a.end_date));
-    let dateB = Number(new Date(b.end_date));
-
-    if (dateA === dateB) {
-      if (a.id < b.id) {
-        return -1;
-      } else if (a.id > b.id) {
-        return 1;
-      }
-      return 0;
-    }
-    if (dateA < dateB) {
-      return -1;
-    }
-    return 1;
-  };
 
   let draftOnUpdateMixin;
 
@@ -412,8 +395,6 @@ import InfoWidget from '../controllers/info_widget_controller';
             add_item_view:
               GGRC.mustache_path +
               '/cycle_task_group_object_tasks/tree_add_item.mustache',
-            sort_property: null,
-            sort_function: _taskSortFunction,
             draw_children: true,
             events: {
               'show-history': function (el, ev) {
@@ -475,7 +456,6 @@ import InfoWidget from '../controllers/info_widget_controller';
             parent_instance: object,
             model: CMS.Models.TaskGroup,
             sortable: true,
-            sort_property: 'sort_index',
             draw_children: true,
           },
         },
@@ -561,8 +541,6 @@ import InfoWidget from '../controllers/info_widget_controller';
           add_item_view:
             GGRC.mustache_path +
             '/cycle_task_group_object_tasks/tree_add_item.mustache',
-          sort_property: null,
-          sort_function: _taskSortFunction,
           draw_children: true,
           showBulkUpdate: !isObjectBrowser,
           events: {

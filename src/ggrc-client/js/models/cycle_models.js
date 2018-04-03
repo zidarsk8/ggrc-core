@@ -184,7 +184,6 @@ import {getPageType} from '../plugins/utils/current-page-utils';
     },
 
     tree_view_options: {
-      sort_property: 'sort_index',
       draw_children: true,
     },
 
@@ -264,7 +263,6 @@ import {getPageType} from '../plugins/utils/current-page-utils';
       },
     },
     tree_view_options: {
-      sort_property: 'sort_index',
       attr_view: _mustachePath + '/tree-item-attr.mustache',
       attr_list: [
         {
