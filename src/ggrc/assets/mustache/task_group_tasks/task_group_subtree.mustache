@@ -5,15 +5,6 @@
 
 <li class="task_group_tasks__list-item">
   <div class="objective-selector field-wrap task-wrap" data-model="true" {{data "model"}}>
-    <div class="task_group_tasks__list-item-column-drag">
-      {{#is_allowed 'update' .}}
-        {{^if_equals workflow.status 'Inactive'}}
-          <a class="drag" href="javascript://">
-            <i class="fa fa-th"></i>
-          </a>
-        {{/if_equals}}
-      {{/is_allowed}}
-    </div>
     <div class="task_group_tasks__list-item-column">
       <span class="inline-data-content">{{title}}</span>
     </div>
