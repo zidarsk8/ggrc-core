@@ -4,304 +4,311 @@
 */
 
 import Component from '../import';
-import * as Utils from '../import-export-utils';
-import {gapiClient} from '../../../plugins/ggrc-gapi-client';
-import errorTemplate from '../templates/import-error.mustache';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import * as ieUtils from '../import-export-utils';
+import {
+  jobStatuses,
+} from '../import-export-utils';
+import {backendGdriveClient} from '../../../plugins/ggrc-gapi-client';
 
-describe('GGRC.Components.csvImportWidget', function () {
-  'use strict';
-
-  let method; // the method under test
-  let fakeScope;
-
-  beforeEach(function () {
-    fakeScope = new can.Map({});
+describe('csv-import component', () => {
+  let vm;
+  beforeEach(() => {
+    vm = getComponentVM(Component);
   });
 
-  describe('viewModel.states() method', function () {
-    beforeEach(function () {
-      method = Component.prototype.viewModel.states.bind(fakeScope);
+  describe('isDownloadTemplateAvailable getter', () => {
+    it('should be true for analysis state', () => {
+      vm.attr('state', jobStatuses.ANALYSIS);
+      expect(vm.attr('isDownloadTemplateAvailable')).toEqual(false);
     });
 
-    describe('the returned "import" state config\'s isDisabled() method',
-      function () {
-        let isDisabled; // the method under test
+    it('should be true for in progress state', () => {
+      vm.attr('state', jobStatuses.IN_PROGRESS);
+      expect(vm.attr('isDownloadTemplateAvailable')).toEqual(false);
+    });
 
-        /**
-         * A factory function for dummy import block info objects.
-         *
-         * @param {String} objectType - the name of the block, usually the object
-         *   type that is represented by it, e.g. "Assessment"
-         * @param {Object} rowCounts - the object containing the counts for
-         *   different groups of of rows
-         *   @param {Number} [rowCounts.totalRows=0] - the number of all rows
-         *     in the block, must equal (created + updated + deleted + ignored)
-         *   @param {Number} [rowCounts.created=0] - total rows to create
-         *   @param {Number} [rowCounts.updated=0] - total rows to update
-         *   @param {Number} [rowCounts.deleted=0] - total rows to delete
-         *   @param {Number} [rowCounts.ignored=0] - total rows to ignore
-         * @param {Boolean} hasErrors - if true then add non empty array "block_errors"
-         *    to block, if false then add empty array
-         *
-         * @return {can.Map} - a new dummy import block info instance
-         */
-        function makeImportBlock(objectType, rowCounts, hasErrors) {
-          let COUNT_FIELD_NAMES = ['created', 'updated', 'deleted', 'ignored'];
-          let COUNT_ERR = 'Invalid row counts, the sum of created, updated, ' +
-              'deleted, and ignored must equal the total row count.';
+    it('should be false for default state of component', () => {
+      expect(vm.attr('isDownloadTemplateAvailable')).toEqual(true);
+    });
 
-          let blockOptions = {
-            name: objectType,
-            rows: rowCounts.totalRows || 0,
-            block_errors: hasErrors ? new can.List({}) : new can.List(),
-          };
-          let combinedCount = 0;
+    it('should be true for "analysis failed" state', () => {
+      vm.attr('state', jobStatuses.ANALYSIS_FAILED);
+      expect(vm.attr('isDownloadTemplateAvailable')).toEqual(true);
+    });
 
-          COUNT_FIELD_NAMES.forEach(function (field) {
-            blockOptions[field] = rowCounts[field] || 0;
-            combinedCount += blockOptions[field];
-          });
+    it('should be true for "stopped" state', () => {
+      vm.attr('state', jobStatuses.STOPPED);
+      expect(vm.attr('isDownloadTemplateAvailable')).toEqual(true);
+    });
 
-          if (combinedCount !== blockOptions.rows) {
-            throw new Error(COUNT_ERR);
-          }
-
-          return new can.Map(blockOptions);
-        }
-
-        beforeEach(function () {
-          let importStateConfig;
-          fakeScope.attr('state', 'import');
-          importStateConfig = method();
-          isDisabled = importStateConfig.isDisabled;
-        });
-
-        it('returns true when import blocks list not available', function () {
-          let result;
-          fakeScope.attr('import', null);
-          result = isDisabled();
-          expect(result).toBe(true);
-        });
-
-        it('returns true when import blocks list is empty', function () {
-          let result;
-          fakeScope.attr('import', []);
-          result = isDisabled();
-          expect(result).toBe(true);
-        });
-
-        it('returns true if all blocks in the list empty', function () {
-          let result;
-          let importBlocks = [
-            makeImportBlock('Assessment', {totalRows: 0}),
-            makeImportBlock('Market', {totalRows: 0}),
-          ];
-          fakeScope.attr('import', importBlocks);
-
-          result = isDisabled();
-
-          expect(result).toBe(true);
-        });
-
-        it('returns true if blocks has errors', function () {
-          let result;
-          let importBlocks = [
-            makeImportBlock('Assessment', {totalRows: 4, ignored: 4}, true),
-            makeImportBlock('Market', {totalRows: 0, ignored: 0}),
-            makeImportBlock(
-              'Contract', {totalRows: 3, created: 1, ignored: 2}),
-          ];
-          fakeScope.attr('import', importBlocks);
-
-          result = isDisabled();
-
-          expect(result).toBe(true);
-        });
-
-        it('returns true for non-empty block that have all rows ignored',
-          function () {
-            let result;
-            let importBlocks = [
-              makeImportBlock('Assessment', {totalRows: 4, ignored: 4}),
-            ];
-            fakeScope.attr('import', importBlocks);
-
-            result = isDisabled();
-
-            expect(result).toBe(true);
-          }
-        );
-
-        it('returns false if there are non-empty blocks containing ' +
-          'non-ignored lines', function () {
-          let result;
-          let importBlocks = [
-            makeImportBlock('Assessment', {totalRows: 4, ignored: 4}),
-            makeImportBlock('Market', {totalRows: 0, ignored: 0}),
-            makeImportBlock(
-              'Contract', {totalRows: 3, created: 1, ignored: 2}),
-          ];
-          fakeScope.attr('importDetails', importBlocks);
-
-          result = isDisabled();
-
-          expect(result).toBe(false);
-        });
-      }
-    );
+    it('should be true for "failed" state', () => {
+      vm.attr('state', jobStatuses.FAILED);
+      expect(vm.attr('isDownloadTemplateAvailable')).toEqual(true);
+    });
   });
 
-  describe('requestImport() method', function () {
-    let importDfd;
-
-    beforeEach(function () {
-      method = Component.prototype.viewModel.requestImport.bind(fakeScope);
-      importDfd = new can.Deferred();
-      spyOn(Utils, 'importRequest').and.returnValue(importDfd);
-      fakeScope.prepareDataForCheck = jasmine.createSpy();
-      fakeScope.beforeProcess = jasmine.createSpy();
-    });
-
-    it('sets "analyzing" value to "state" attribute', function () {
-      fakeScope.attr('state', null);
-      method({});
-      expect(fakeScope.attr('state')).toEqual('analyzing');
-    });
-
-    it('sets true to "isLoading" attribute', function () {
-      fakeScope.attr('isLoading', null);
-      method({});
-      expect(fakeScope.attr('isLoading')).toEqual(true);
-    });
-
-    it('sets file id to "fileId" attribute', function () {
-      fakeScope.attr('fileId', null);
-      method({id: '12343'});
-      expect(fakeScope.attr('fileId')).toEqual('12343');
-    });
-
-    it('sets file name to "fileName" attribute', function () {
-      fakeScope.attr('fileName', null);
-      method({name: 'import_objects'});
-      expect(fakeScope.attr('fileName')).toEqual('import_objects');
-    });
-
-    it('calls import_request method from utils with data containing file id' +
-    ' to check data for import', function () {
-      method({id: '12343'});
-      expect(Utils.importRequest).toHaveBeenCalledWith({
-        data: {id: '12343'},
-      }, true);
-    });
-
-    describe('after getting response', function () {
-      let checkObject;
-
-      beforeEach(function () {
-        fakeScope.element = 'element';
-        checkObject = {
-          check: 'check',
-          data: 'data',
-        };
-        fakeScope.prepareDataForCheck.and.returnValue(checkObject);
+  describe('resetFile() method', () => {
+    it('should reset file\'s info', () => {
+      vm.attr({
+        state: jobStatuses.IN_PROGRESS,
+        fileId: 'Foo',
+        fileName: 'Bar.csv',
+        importStatus: 'error',
+        message: 'Warning!',
       });
+      vm.resetFile();
+      expect(vm.attr('state')).toEqual(jobStatuses.SELECT);
+      expect(vm.attr('fileId')).toEqual('');
+      expect(vm.attr('fileName')).toEqual('');
+      expect(vm.attr('importStatus')).toEqual('');
+      expect(vm.attr('message')).toEqual('');
+    });
+  });
 
-      describe('in case of success', function () {
-        it('calls prepareDataForCheck method', function (done) {
-          let mockData = {data: 'data'};
-          importDfd.resolve(mockData);
-          method({});
-          expect(fakeScope.prepareDataForCheck).toHaveBeenCalledWith(mockData);
-          done();
-        });
+  describe('analyseSelectedFile() method', () => {
+    it('should reset state to "Select" for empty files', (done) => {
+      spyOn(backendGdriveClient, 'withAuth')
+        .and.returnValue(can.Deferred().resolve({
+          objects: {
+            Foo: 0,
+            Bar: 0,
+            Baz: 0,
+          },
+        }));
 
-        it('calls beforeProcess method', function (done) {
-          importDfd.resolve();
-          method({});
-          expect(fakeScope.beforeProcess).toHaveBeenCalledWith(
-            checkObject.check, checkObject.data, fakeScope.element);
-          done();
-        });
+      vm.analyseSelectedFile({
+        id: 42,
+        name: 'file.csv',
+      }).then(() => {
+        expect(vm.attr('fileId')).toEqual(42);
+        expect(vm.attr('fileName')).toEqual('file.csv');
+        expect(vm.attr('state')).toEqual(jobStatuses.SELECT);
+        expect(vm.attr('importStatus')).toEqual('error');
+        expect(vm.attr('message')).toBeTruthy();
 
-        it('sets false to isLoading attribute', function (done) {
-          importDfd.resolve();
-          method({});
-          expect(fakeScope.attr('isLoading')).toBe(false);
-          done();
-        });
+        done();
       });
+    });
 
-      describe('in case of fail', function () {
-        let failData;
+    it('should reset state to "Select" after error on GDrive side', (done) => {
+      spyOn(backendGdriveClient, 'withAuth')
+        .and.returnValue(can.Deferred().reject({
+          responseJSON: {
+            message: 'GDrive error message',
+          },
+        }));
 
-        beforeEach(function () {
-          failData = {
-            responseJSON: {message: 'message'},
-          };
-          spyOn(GGRC.Errors, 'notifier');
-        });
+      spyOn(GGRC.Errors, 'notifier');
 
-        it('sets "select" value to state attribute', function (done) {
-          importDfd.reject(failData);
-          method({});
-          expect(fakeScope.attr('state')).toEqual('select');
+      vm.analyseSelectedFile({
+        id: 42,
+        name: 'file.csv',
+      }).fail(() => {
+        expect(vm.attr('fileId')).toEqual(42);
+        expect(vm.attr('fileName')).toEqual('file.csv');
+        expect(vm.attr('state')).toEqual(jobStatuses.SELECT);
+        expect(vm.attr('importStatus')).toEqual('error');
+        expect(GGRC.Errors.notifier)
+          .toHaveBeenCalledWith('error', 'GDrive error message');
+
+        done();
+      });
+    });
+
+    it('should set the correct status about import job', (done) => {
+      spyOn(backendGdriveClient, 'withAuth')
+        .and.returnValue(can.Deferred().resolve({
+          objects: {
+            Foo: 15,
+            Bar: 5,
+            Baz: 19,
+          },
+          import_export: {
+            id: 13,
+            status: 'New Status',
+          },
+        }));
+
+      vm.analyseSelectedFile({
+        id: 42,
+        name: 'file.csv',
+      }).then(() => {
+        expect(vm.attr('fileId')).toEqual(42);
+        expect(vm.attr('fileName')).toEqual('file.csv');
+        expect(vm.attr('state')).toEqual('New Status');
+        expect(vm.attr('jobId')).toEqual(13);
+
+        expect(vm.attr('message')).toBeTruthy();
+
+        done();
+      });
+    });
+  });
+
+  describe('startImport() method', () => {
+    beforeEach(() => {
+      spyOn(ieUtils, 'startImport')
+        .and.returnValue(can.Deferred().resolve({id: 1}));
+
+      spyOn(vm, 'trackStatusOfImport');
+    });
+
+    it('should set correct status and launch the tracking of job', (done) => {
+      vm.attr('jobId', 10);
+
+      vm.startImport('State')
+        .then(() => {
+          expect(vm.attr('state')).toEqual('State');
+          expect(vm.attr('message')).toBeTruthy();
+
+          expect(ieUtils.startImport).toHaveBeenCalledWith(10);
+          expect(vm.trackStatusOfImport).toHaveBeenCalledWith(1);
+
           done();
         });
+    });
+  });
 
-        describe('calls GGRC errors notifier', ()=> {
-          it('with error message if message was provided', ()=> {
-            importDfd.reject(failData);
-            method({});
+  describe('trackStatusOfImport() method', () => {
+    const statuses = Object.values(jobStatuses);
 
-            expect(GGRC.Errors.notifier)
-              .toHaveBeenCalledWith('error', failData.responseJSON.message);
-          });
+    beforeEach(() => {
+      statuses.forEach((state) => {
+        spyOn(vm.attr('statusStrategies'), state);
+      });
+    });
 
-          it('with general error if error message was not provided', ()=> {
-            importDfd.reject({});
-            method({});
+    describe('should call correct status strategy', () => {
+      statuses.forEach((status) => {
+        it(`for the ${status} status`, (done) => {
+          spyOn(ieUtils, 'getImportJobInfo')
+            .and.returnValue(can.Deferred().resolve({status}));
 
-            expect(GGRC.Errors.notifier)
-              .toHaveBeenCalledWith('error', errorTemplate, true);
-          });
-        });
+          vm.trackStatusOfImport(1, 0);
 
-        it('sets false to isLoading attribute', function (done) {
-          importDfd.reject(failData);
-          method({});
-          expect(fakeScope.attr('isLoading')).toBe(false);
-          done();
+          setTimeout(() => {
+            expect(ieUtils.getImportJobInfo).toHaveBeenCalledWith(1);
+            expect(vm.attr('statusStrategies')[status]).toHaveBeenCalled();
+
+            expect(vm.attr('state')).toEqual(status);
+            done();
+          }, 10);
         });
       });
     });
   });
 
-  describe('"#import_btn.state-select click" handler', function () {
-    let authDfd;
+  describe('getImportHistory() method', () => {
+    beforeEach(() => {
+      spyOn(vm, 'trackStatusOfImport');
+    });
 
-    beforeEach(function () {
-      method = Component.prototype.viewModel.selectFile
-        .bind({
-          resetFile() {},
+    describe('with empty history', () => {
+      beforeEach(() => {
+        spyOn(ieUtils, 'getImportHistory')
+          .and.returnValue(can.Deferred().resolve([]));
+
+        spyOn(ieUtils, 'isInProgressJob');
+      });
+
+      it('should not define a history list', (done) => {
+        vm.getImportHistory()
+          .then(() => {
+            expect(ieUtils.isInProgressJob).not.toHaveBeenCalled();
+            expect(vm.trackStatusOfImport).not.toHaveBeenCalled();
+
+            expect(vm.attr('history').length).toEqual(0);
+            done();
+          });
+      });
+    });
+
+    describe('with existing jobs in the history', () => {
+      describe('and last job with "In Progress" state', () => {
+        beforeEach(() => {
+          spyOn(ieUtils, 'getImportHistory')
+            .and.returnValue(can.Deferred().resolve([
+              {
+                id: 1,
+                status: jobStatuses.FINISHED,
+                title: 'import_1.csv',
+              }, {
+                id: 2,
+                status: jobStatuses.FINISHED,
+                title: 'import_2.csv',
+              }, {
+                id: 3,
+                status: jobStatuses.FAILED,
+                title: 'import_3.csv',
+              }, {
+                id: 4,
+                status: jobStatuses.FINISHED,
+                title: 'import_4.csv',
+              }, {
+                id: 5,
+                status: jobStatuses.IN_PROGRESS,
+                title: 'import_5.csv',
+              },
+            ]));
         });
-      authDfd = new can.Deferred();
-      spyOn(gapiClient, 'authorizeGapi').and.returnValue(authDfd);
-      spyOn(gapi.auth, 'getToken').and.returnValue('mockToken');
-      spyOn(gapi, 'load');
-    });
 
-    it('calls gdrive authorization', function () {
-      method();
-      expect(gapiClient.authorizeGapi)
-        .toHaveBeenCalledWith(['https://www.googleapis.com/auth/drive']);
-    });
+        it('should define correct history and state of "In Progress job"',
+          (done) => {
+            vm.getImportHistory()
+              .then(() => {
+                expect(vm.trackStatusOfImport).toHaveBeenCalled();
 
-    it('loads gdrive picker after authorization', function () {
-      authDfd.resolve();
+                expect(vm.attr('history').length).toEqual(3);
+                expect(vm.attr('history')[0].id).toEqual(4);
+                expect(vm.attr('history')[1].id).toEqual(2);
+                expect(vm.attr('history')[2].id).toEqual(1);
+                done();
+              });
+          });
+      });
 
-      method();
-      expect(gapi.load).toHaveBeenCalledWith('picker',
-        {callback: jasmine.any(Function)});
+      describe('and last job is completed', () => {
+        beforeEach(() => {
+          spyOn(ieUtils, 'getImportHistory')
+            .and.returnValue(can.Deferred().resolve([
+              {
+                id: 1,
+                status: jobStatuses.FAILED,
+                title: 'import_1.csv',
+              }, {
+                id: 2,
+                status: jobStatuses.FINISHED,
+                title: 'import_2.csv',
+              }, {
+                id: 3,
+                status: jobStatuses.FAILED,
+                title: 'import_3.csv',
+              }, {
+                id: 4,
+                status: jobStatuses.FINISHED,
+                title: 'import_4.csv',
+              }, {
+                id: 5,
+                status: jobStatuses.FINISHED,
+                title: 'import_5.csv',
+              },
+            ]));
+        });
+
+        it('should not define file state', (done) => {
+          vm.getImportHistory()
+            .then(() => {
+              expect(vm.trackStatusOfImport).not.toHaveBeenCalled();
+
+              expect(vm.attr('history').length).toEqual(3);
+              expect(vm.attr('history')[0].id).toEqual(5);
+              expect(vm.attr('history')[1].id).toEqual(4);
+              expect(vm.attr('history')[2].id).toEqual(2);
+              done();
+            });
+        });
+      });
     });
   });
 });

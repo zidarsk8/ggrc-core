@@ -5,6 +5,11 @@
 
 $controlsWidth: 400px;
 
+@mixin outside-margin() {
+  padding-top: 25px;
+  padding-bottom: 40px;
+}
+
 #import_view > header {
   margin: 0 40px;
 }
@@ -15,10 +20,22 @@ $controlsWidth: 400px;
 }
 
 .csv-import {
-  padding-top: 25px;
-  padding-bottom: 40px;
   @include box-shadow(0 3px 3px -3px rgba(0,0,0, 0.3));
   font-size: 13px;
+  display: flex;
+
+  &__main {
+    @include outside-margin();
+    max-width: calc(100% - 350px);
+  }
+
+  &__import-history {
+    @include outside-margin();
+    padding-left: 20px;
+    padding-right: 20px;
+    width: 350px;
+    border-left: 1px solid $itemBorder;
+  }
 
   .import-notifications label {
     margin-bottom: 15px;
@@ -30,6 +47,12 @@ $controlsWidth: 400px;
     font-weight: normal;
     color: $subTitle;
     margin-bottom: 20px;
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
     &.error {
       &:before {
@@ -90,6 +113,10 @@ $controlsWidth: 400px;
     h3 {
       margin-bottom: 10px;
     }
+  }
+
+  .margin-top-20 {
+    margin-top: 20px;
   }
 
   .btn-fixed {
