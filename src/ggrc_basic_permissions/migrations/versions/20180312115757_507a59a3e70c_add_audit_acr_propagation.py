@@ -12,6 +12,7 @@ Create Date: 2018-03-05 20:28:49.737209
 
 
 from ggrc.migrations.utils import acr_propagation
+from ggrc.migrations.utils import acr_propagation_constants as const
 
 # revision identifiers, used by Alembic.
 revision = '3db5f2027c92'
@@ -19,20 +20,20 @@ down_revision = '242b8dc8493b'
 
 _AUDIT_FULL_ACCESS = {
     "Relationship R": {
-        "Assessment RUD": acr_propagation.COMMENT_DOCUMENT_RU,
+        "Assessment RUD": const.COMMENT_DOCUMENT_RU,
         "AssessmentTemplate RUD": {},
         "Document RU": {},
-        "Issue RUD": acr_propagation.COMMENT_DOCUMENT_RU,
+        "Issue RUD": const.COMMENT_DOCUMENT_RU,
     },
     "Snapshot RU": {},
 }
 
 _AUDIT_READ_ACCESS = {
     "Relationship R": {
-        "Assessment R": acr_propagation.COMMENT_DOCUMENT_R,
+        "Assessment R": const.COMMENT_DOCUMENT_R,
         "AssessmentTemplate R": {},
         "Document R": {},
-        "Issue R": acr_propagation.COMMENT_DOCUMENT_R,
+        "Issue R": const.COMMENT_DOCUMENT_R,
     },
     "Snapshot R": {},
 }
@@ -69,8 +70,8 @@ AUTID_PROGRAM_PROPAGATION = {
             "Relationship R": {
                 "Comment R": {},
                 "Document RU": {},
-                _PROGRAM_OBJECTS: acr_propagation.COMMENT_DOCUMENT_RU,
-                ("Control", "Risk"): acr_propagation.PROPOSAL_RU,
+                _PROGRAM_OBJECTS: const.COMMENT_DOCUMENT_RU,
+                ("Control", "Risk"): const.PROPOSAL_RU,
             }
         },
         "Program Readers": {
@@ -78,8 +79,8 @@ AUTID_PROGRAM_PROPAGATION = {
             "Relationship R": {
                 "Comment R": {},
                 "Document R": {},
-                _PROGRAM_OBJECTS: acr_propagation.COMMENT_DOCUMENT_R,
-                ("Control", "Risk"): acr_propagation.PROPOSAL_R,
+                _PROGRAM_OBJECTS: const.COMMENT_DOCUMENT_R,
+                ("Control", "Risk"): const.PROPOSAL_R,
             }
         },
     },
