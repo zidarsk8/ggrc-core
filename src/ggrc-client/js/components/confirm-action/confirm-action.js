@@ -24,7 +24,8 @@ export default can.Component.extend({
   events: {
     'input keyup'(el, ev) {
       let vm = this.viewModel;
-      let isValid = el.val() === vm.attr('confirmPhrase');
+      let isValid = el.val().toLowerCase() ===
+        vm.attr('confirmPhrase').toLowerCase();
       vm.attr('isValid', isValid);
 
       if (isValid && ev.keyCode === 13) {
