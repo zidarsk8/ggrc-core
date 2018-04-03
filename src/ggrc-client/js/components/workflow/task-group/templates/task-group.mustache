@@ -64,45 +64,7 @@
         {{/with_mapping}}
     </div>
     <div class="info-pane__section">
-        {{#with_mapping 'task_group_tasks' instance}}
-        <div class="info-pane__section-title">
-            Tasks (<span>{{task_group_tasks.length}}</span>)
-            <span class="inline-explanation">Define tasks</span>
-        </div>
-            <div class="task-list">
-
-          <tasks-sort-list mapping="task_group_tasks">
-            <div class="task_group_tasks__header">
-                <div class="task_group_tasks__header-item">
-                    Title
-                </div>
-                <div class="task_group_tasks__header-item">
-                    Task Assignees
-                </div>
-                <div class="task_group_tasks__header-item">
-                    Task Secondary Assignees
-                </div>
-                <div class="task_group_tasks__header-item">
-                    Initial Setup
-                </div>
-                <div class="task_group_tasks__header-item">
-                    Next Cycle
-                </div>
-                <div class="task_group_tasks__header-item-edit">
-                </div>
-            </div>
-            <div class="task_group_tasks__list">
-              <ul class="tree-structure new-tree"
-                  {{sortable_if instance.lock_task_order '{ "items": "div.task_group_tasks__list-item", "handle": ".drag" }' inverse=true}}>
-                  {{#each sorted}}
-                      {{>'/static/mustache/task_group_tasks/task_group_subtree.mustache'}}
-                  {{/each}}
-                  {{>'/static/mustache/task_group_tasks/task_group_subtree_footer.mustache'}}
-              </ul>
-            </div>
-          </tasks-sort-list>
-        {{/with_mapping}}
-      </div>
+      <task-list {items}="taskGroupTasks"></task-list>
     </div>
     {{/options}}
     </div>

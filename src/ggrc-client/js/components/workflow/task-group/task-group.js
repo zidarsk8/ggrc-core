@@ -5,17 +5,42 @@
 
 import '../../info-pin-buttons/info-pin-buttons';
 import '../taskgroup_clone';
-import '../../sort_by_sort_index/sort_by_sort_index';
+import '../task-list/task-list';
 
 import template from './templates/task-group.mustache';
 
 const viewModel = can.Map.extend({
   instance: null,
+  workflow: null,
   options: null,
+  taskGroupTasks: [],
+  async loadTaskGroupTasks() {
+    const instance = this.attr('instance');
+    const taskGroupTasks = await instance.refresh_all('task_group_tasks');
+    this.attr('taskGroupTasks').replace(taskGroupTasks);
+  },
+  async loadWorkflow() {
+    const instance = this.attr('instance');
+    const workflow = await instance.refresh_all('workflow');
+    this.attr('workflow', workflow);
+  },
 });
+
+const events = {
+  '{CMS.Models.TaskGroupTask} created'() {
+    this.viewModel.loadTaskGroupTasks();
+  },
+};
+
+const init = function () {
+  this.viewModel.loadTaskGroupTasks();
+  this.viewModel.loadWorkflow();
+};
 
 export default can.Component.extend({
   tag: 'task-group',
   template,
   viewModel,
+  events,
+  init,
 });
