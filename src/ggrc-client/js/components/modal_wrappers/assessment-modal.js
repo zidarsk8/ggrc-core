@@ -30,7 +30,7 @@ export default can.Component.extend({
           });
 
           this.attr('referenceUrls', data['Document:REFERENCE_URL']);
-          this.attr('mappedObjects', [data.Audit, ...data.Issue, ...snapshots]);
+          this.attr('mappedObjects', snapshots);
         });
     },
   },
