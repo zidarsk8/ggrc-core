@@ -10,13 +10,14 @@ Create Date: 2018-03-19 12:26:58.016090
 # pylint: disable=invalid-name
 
 from ggrc.migrations.utils import acr_propagation
+from ggrc.migrations.utils import acr_propagation_constants as const
 
 # revision identifiers, used by Alembic.
 revision = '679480cbd712'
 down_revision = '3e667570f21f'
 
 _RISK_PROPAGATION = {
-    acr_propagation.BASIC_ROLES: acr_propagation.PROPOSAL_RU,
+    const.BASIC_ROLES: const.PROPOSAL_RU,
 }
 
 PROPAGATION = {

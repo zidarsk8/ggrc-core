@@ -14,7 +14,7 @@ import sqlalchemy as sa
 from alembic import op
 
 from ggrc.migrations.utils import acr_propagation
-from ggrc.migrations.utils import acr_propagation_constants
+from ggrc.migrations.utils import acr_propagation_constants as const
 
 
 # revision identifiers, used by Alembic.
@@ -38,7 +38,7 @@ _ASSESSMENT_PROPAGATION = {
             },
             "Document RU": {},
             "Comment R": {},
-            "Issue R": acr_propagation_constants.COMMENT_DOCUMENT_R,
+            "Issue R": const.COMMENT_DOCUMENT_R,
         },
     },
 }
@@ -52,7 +52,7 @@ _CONTROL_ROLES = (
 )
 
 _CONTROL_PROPAGATION = {
-    _CONTROL_ROLES: acr_propagation_constants.PROPOSAL_RU,
+    _CONTROL_ROLES: const.PROPOSAL_RU,
 }
 
 
@@ -61,25 +61,25 @@ PROPAGATION = {
 
     "Control": _CONTROL_PROPAGATION,
 
-    "AccessGroup": acr_propagation_constants.BASIC_PROPAGATION,
-    "Clause": acr_propagation_constants.BASIC_PROPAGATION,
-    "Contract": acr_propagation_constants.BASIC_PROPAGATION,
-    "DataAsset": acr_propagation_constants.BASIC_PROPAGATION,
-    "Facility": acr_propagation_constants.BASIC_PROPAGATION,
-    "Issue": acr_propagation_constants.BASIC_PROPAGATION,
-    "Market": acr_propagation_constants.BASIC_PROPAGATION,
-    "Objective": acr_propagation_constants.BASIC_PROPAGATION,
-    "OrgGroup": acr_propagation_constants.BASIC_PROPAGATION,
-    "Policy": acr_propagation_constants.BASIC_PROPAGATION,
-    "Process": acr_propagation_constants.BASIC_PROPAGATION,
-    "Product": acr_propagation_constants.BASIC_PROPAGATION,
-    "Project": acr_propagation_constants.BASIC_PROPAGATION,
-    "Regulation": acr_propagation_constants.BASIC_PROPAGATION,
-    "Section": acr_propagation_constants.BASIC_PROPAGATION,
-    "Standard": acr_propagation_constants.BASIC_PROPAGATION,
-    "System": acr_propagation_constants.BASIC_PROPAGATION,
-    "Threat": acr_propagation_constants.BASIC_PROPAGATION,
-    "Vendor": acr_propagation_constants.BASIC_PROPAGATION,
+    "AccessGroup": const.BASIC_PROPAGATION,
+    "Clause": const.BASIC_PROPAGATION,
+    "Contract": const.BASIC_PROPAGATION,
+    "DataAsset": const.BASIC_PROPAGATION,
+    "Facility": const.BASIC_PROPAGATION,
+    "Issue": const.BASIC_PROPAGATION,
+    "Market": const.BASIC_PROPAGATION,
+    "Objective": const.BASIC_PROPAGATION,
+    "OrgGroup": const.BASIC_PROPAGATION,
+    "Policy": const.BASIC_PROPAGATION,
+    "Process": const.BASIC_PROPAGATION,
+    "Product": const.BASIC_PROPAGATION,
+    "Project": const.BASIC_PROPAGATION,
+    "Regulation": const.BASIC_PROPAGATION,
+    "Section": const.BASIC_PROPAGATION,
+    "Standard": const.BASIC_PROPAGATION,
+    "System": const.BASIC_PROPAGATION,
+    "Threat": const.BASIC_PROPAGATION,
+    "Vendor": const.BASIC_PROPAGATION,
 
     # "RiskAssessment": does not have ACL roles
 }
