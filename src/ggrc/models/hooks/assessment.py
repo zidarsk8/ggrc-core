@@ -114,7 +114,7 @@ def init_hook():
     try:
       validate_assessment_done_state(old_value, obj)
     except StatusValidationError as error:
-      obj.status = old_value
+      db.session.rollback()
       raise error
 
 

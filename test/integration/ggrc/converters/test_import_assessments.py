@@ -185,6 +185,7 @@ class TestAssessmentImport(TestCase):
         ("Audit", audit.slug),
         ("Assignees", "user@example.com"),
         ("Creators", "user@example.com"),
+        ("Title", asmnt.title),
         ("State", "Completed"),
     ]), dry_run=False)
     expected_errors = {
@@ -201,6 +202,10 @@ class TestAssessmentImport(TestCase):
         }
     }
     self._check_csv_response(response, expected_errors)
+    asmnt = models.Assessment.query.filter(
+        models.Assessment.slug == asmnt.slug
+    ).first()
+    self.assertEqual(asmnt.status, "Not Started")
 
   def test_assessment_warnings_errors(self):
     """ Test full assessment import with warnings and errors

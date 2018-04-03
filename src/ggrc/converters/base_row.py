@@ -14,7 +14,6 @@ from ggrc.login import get_current_user_id
 from ggrc.models.reflection import AttributeInfo
 from ggrc.rbac import permissions
 from ggrc.services import signals
-
 from ggrc.utils import dump_attrs
 
 

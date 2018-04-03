@@ -70,4 +70,4 @@ class TestAssessmentComplete(ggrc.TestCase):
 
     asmt = all_models.Assessment.query.get(asmt_id)
     self.assertEqual(asmt.status, "In Progress")
-    self.assertEqual(asmt.custom_attribute_values[0].attribute_value, "")
+    self.assertEqual(len(asmt.custom_attribute_values), 0)
