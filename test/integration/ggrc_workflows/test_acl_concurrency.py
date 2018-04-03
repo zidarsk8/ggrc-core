@@ -37,11 +37,13 @@ class TestWorkflowCycleStatePropagation(TestCase):
 
   def test_async_request_state_transitions(self):
     """Test asynchronous transitions"""
+    # Due to complexity of the test and the actual need for all variables
+    # pylint: disable=too-many-locals
 
     tgt_roles = role.get_ac_roles_for("TaskGroupTask")
 
     queue = Queue.Queue()
-    _, wf = self.generator.generate_workflow(self.weekly_wf)
+    wf = self.generator.generate_workflow(self.weekly_wf)[1]
     context_id = wf.context.id
 
     tg_id = all_models.TaskGroup.query.first().id
@@ -49,7 +51,7 @@ class TestWorkflowCycleStatePropagation(TestCase):
 
     with factories.single_commit():
       person_id = factories.PersonFactory().id
-      controls = [factories.ControlFactory().id for i in range(obj_count)]
+      controls = [factories.ControlFactory().id for _ in range(obj_count)]
 
     def create_tgo(context_id, tg_id, control_id):
       queue.put(self.api.post(
@@ -72,7 +74,7 @@ class TestWorkflowCycleStatePropagation(TestCase):
           }]
       ))
 
-    def create_tgt(context_id, tg_id):
+    def create_tgt(context_id, tg_id, tgt_roles, person_id):
       queue.put(self.api.post(
           all_models.TaskGroupTask,
           [{
@@ -107,7 +109,7 @@ class TestWorkflowCycleStatePropagation(TestCase):
       ))
       threads.append(Thread(
           target=create_tgt,
-          args=(context_id, tg_id)
+          args=(context_id, tg_id, tgt_roles, person_id)
       ))
 
     for t in threads:

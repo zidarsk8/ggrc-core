@@ -186,7 +186,9 @@ def _insert_select_acls(select_statement):
         PROPAGATION_RETRIES,
         select_statement,
     )
-    raise last_error
+    # The following error if exists will only be sa.exc.OperationalError so the
+    # pylint warning is invalid.
+    raise last_error  # pylint: disable=raising-bad-type
 
 
 def _propagate_to_wf_children(new_wf_acls, child_class):
