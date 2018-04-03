@@ -192,8 +192,8 @@ def run_export(objects, ie_id, user_id, url_root):
         ie.end_date = datetime.now()
         db.session.commit()
         job_emails.send_email(job_emails.EXPORT_FAILED, user.email, url_root)
-      except Exception:  # pylint: disable=broad-except
-        pass
+      except Exception as e:  # pylint: disable=broad-except
+        logger.exception("Failed to set job status: %s", e.message)
 
 
 def run_import_phases(ie_id, user_id, url_root):  # noqa: ignore=C901
@@ -251,8 +251,8 @@ def run_import_phases(ie_id, user_id, url_root):  # noqa: ignore=C901
         db.session.commit()
         job_emails.send_email(job_emails.IMPORT_FAILED, user.email,
                               url_root, ie_job.title)
-      except Exception:  # pylint: disable=broad-except
-        pass
+      except Exception as e:  # pylint: disable=broad-except
+        logger.exception("Failed to set job status: %s", e.message)
 
 
 def init_converter_views():
