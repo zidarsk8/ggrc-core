@@ -144,16 +144,22 @@ def remove_propagated_roles(object_type, role_names):
     role_names: list of role names for the given object type whose propagations
       we wish to delete.
   """
+  names = set()
+  for names_ in role_names:
+    if isinstance(names_, basestring):
+      names.add(names_)
+    else:
+      names.update(set(names_))
   connection = op.get_bind()
   parent_ids = connection.execute(
-      ACR_TABLE.select([ACR_TABLE.parent_id]).where(
+      sa.select([ACR_TABLE.c.id]).where(
           sa.and_(
-              ACR_TABLE.c.name.in_(role_names),
+              ACR_TABLE.c.name.in_(names),
               ACR_TABLE.c.object_type == object_type,
           )
       )
   ).fetchall()
-  ids = [row.parent_id for row in parent_ids]
+  ids = [row.id for row in parent_ids]
   op.execute(
       ACR_TABLE.delete().where(
           ACR_TABLE.c.parent_id.in_(ids)
