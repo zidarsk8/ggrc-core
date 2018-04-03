@@ -19,7 +19,7 @@ from ggrc.migrations.utils import acr_propagation_constants as const
 
 # revision identifiers, used by Alembic.
 revision = '3db5f2027c92'
-down_revision = 'd1671a8dac7'
+down_revision = '9b75e604c326'
 
 _ASSESSMENT_ROLES = ("Creators", "Assignees", "Verifiers")
 

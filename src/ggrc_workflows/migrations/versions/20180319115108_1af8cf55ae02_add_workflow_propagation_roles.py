@@ -13,7 +13,7 @@ from ggrc.migrations.utils import acr_propagation
 
 # revision identifiers, used by Alembic.
 revision = '1af8cf55ae02'
-down_revision = '4489d0ec0076'
+down_revision = '4d9b06fb660f'
 
 
 WORKFLOW_PROPAGATION = {
