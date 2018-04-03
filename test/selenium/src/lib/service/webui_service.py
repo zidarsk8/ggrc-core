@@ -508,6 +508,7 @@ class AssessmentsService(BaseWebUiService):
     (objs_widget.tree_view.open_3bbs().select_generate().
      generate_asmts(asmt_tmpl_title=asmt_tmpl_title,
                     objs_under_asmt_titles=objs_under_asmt_titles))
+    objs_widget.show_generated_results()
 
   def edit_obj_via_edit_modal_from_info_page(self, src_obj):
     """Open generic widget of object, open edit modal from drop down menu.

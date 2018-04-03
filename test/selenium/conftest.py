@@ -82,6 +82,7 @@ def selenium(selenium, pytestconfig):
     selenium.set_window_size(
         os.environ["SCREEN_WIDTH"], os.environ["SCREEN_HEIGHT"])
   dynamic_fixtures.dict_executed_fixtures.update({"selenium": selenium})
+  selenium_utils.open_url(selenium, url.Urls().gae_login)
   yield selenium
 
 
