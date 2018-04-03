@@ -24,9 +24,8 @@ export default GGRC.Components('relatedPeopleAccessControl', {
     updateRoles: function (args) {
       if (this.attr('deferredSave')) {
         this.attr('deferredSave').push(this.performUpdate.bind(this, args));
-      } else {
-        this.performUpdate(args);
       }
+      this.performUpdate(args);
 
       this.dispatch({
         ...SAVE_CUSTOM_ROLE,
