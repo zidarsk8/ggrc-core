@@ -120,9 +120,9 @@ describe('csv-import component', () => {
       spyOn(backendGdriveClient, 'withAuth')
         .and.returnValue(can.Deferred().resolve({
           objects: {
-            Foo: 15,
-            Bar: 5,
-            Baz: 19,
+            Control: 15,
+            Assessment: 5,
+            Program: 19,
           },
           import_export: {
             id: 13,

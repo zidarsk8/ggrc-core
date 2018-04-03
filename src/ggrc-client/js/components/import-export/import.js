@@ -46,7 +46,8 @@ const messages = {
   FAILED: 'Import failed due to server error',
   FILE_STATS: (objects) => {
     const stats = Object.keys(objects).map((model) => {
-      return `${objects[model]} ${model}`;
+      return `${objects[model]} 
+      ${objects[model] === 1 ? model : CMS.Models[model].model_plural}`;
     }).join(', ');
     return `You are going to import: <span class="gray">${stats}</span>
       <div class="margin-top-20">${messages.PLEASE_CONFIRM}</div>`;
@@ -92,18 +93,6 @@ export default can.Component.extend({
         element.data = [];
 
         rows += element.rows;
-        if (element.block_warnings.length + element.row_warnings.length) {
-          let warnings = [...element.block_warnings, ...element.row_warnings];
-
-          if (!errorLevel) {
-            errorLevel = 'warning';
-          }
-
-          element.data.push({
-            title: `WARNINGS (${warnings.length})`,
-            messages: warnings,
-          });
-        }
         if (element.block_errors.length + element.row_errors.length) {
           let errors = [...element.block_errors, ...element.row_errors];
 
@@ -116,6 +105,20 @@ export default can.Component.extend({
             messages: errors,
           });
         }
+
+        if (element.block_warnings.length + element.row_warnings.length) {
+          let warnings = [...element.block_warnings, ...element.row_warnings];
+
+          if (!errorLevel) {
+            errorLevel = 'warning';
+          }
+
+          element.data.push({
+            title: `WARNINGS (${warnings.length})`,
+            messages: warnings,
+          });
+        }
+
         return element;
       }));
 
