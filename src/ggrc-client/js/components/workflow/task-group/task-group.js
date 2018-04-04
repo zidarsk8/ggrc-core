@@ -27,7 +27,10 @@ const viewModel = can.Map.extend({
 });
 
 const events = {
-  '{CMS.Models.TaskGroupTask} created'() {
+  async '{CMS.Models.TaskGroupTask} created'() {
+    // After TGT creation, TG will have an updated
+    // list with TGTs. Because of that, TG should be refreshed.
+    await this.viewModel.instance.refresh();
     this.viewModel.loadTaskGroupTasks();
   },
 };
