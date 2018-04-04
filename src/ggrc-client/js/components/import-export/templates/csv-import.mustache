@@ -36,9 +36,15 @@
         {{/case}}
 
         {{#case 'Not Started'}}
-          <confirm-action {button-title}="'Proceed'"
-                          (on-confirm)="onImportSubmit()"
-          ></confirm-action>
+          <label class="confirm-action">
+            <input type="checkbox" {($checked)}="isConfirm">
+            I confirm, that data being imported is complete and accurate.
+          </label>
+          <button class="btn btn-small btn-green"
+                  ($click)="proceed()"
+                  {{^if isConfirm}}disabled{{/if}}>
+            Proceed
+          </button>
           <button ($click)="selectFile()"
                   class="btn btn-small btn-white">
             Choose new file to import
@@ -46,7 +52,7 @@
         {{/case}}
 
         {{#case 'Analysis'}}
-          <div class="">Analyzing file in Progress: <spinner {toggle}="true"></spinner></div>
+          <div>Analyzing file in Progress: <spinner {toggle}="true"></spinner></div>
           <button class="btn btn-small btn-white margin-top-20"
                   ($click)="stopImport(jobId)">
             Cancel

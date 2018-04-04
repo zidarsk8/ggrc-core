@@ -34,9 +34,8 @@ const messages = {
   INCORRECT_FORMAT: `The file is not in a recognized format. 
   Please import a Google sheet or a file in .csv format.`,
   EMPTY_FILE: 'You are going to import: <span class="gray">0 rows</span>',
-  PLEASE_CONFIRM: `Please type "I confirm" below to confirm that 
-  data being imported is complete and accurate. Please note importing 
-  incomplete or accurate data can result in data corruption.`,
+  PLEASE_CONFIRM: `Please note that importing incomplete or accurate data can 
+  result in data corruption.`,
   IN_PROGRESS: `Your import request has been submitted. 
   You may close this page or continue your work. We will send you an email 
   notification when it completes or if there are errors or warnings.`,
@@ -79,6 +78,7 @@ export default can.Component.extend({
     fileId: '',
     fileName: '',
     isLoading: false,
+    isConfirm: false,
     state: jobStatuses.SELECT,
     jobId: null,
     trackId: null,
@@ -202,7 +202,7 @@ export default can.Component.extend({
           this.attr('isLoading', false);
         });
     },
-    onImportSubmit() {
+    proceed() {
       this.startImport(jobStatuses.ANALYSIS);
     },
     startImport(state) {
