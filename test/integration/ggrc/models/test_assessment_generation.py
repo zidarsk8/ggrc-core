@@ -471,7 +471,8 @@ class TestAssessmentGeneration(TestAssessmentBase):
   def test_remap_doc_from_assessment(self, test_asmt_num):
     """Test mappings saving for assessment"""
     urls = ["url1", "url2"]
-    evidences = ["evidence1", "evidence2"]
+    evidences = ["https://d.google.com/drawings/d/666/edit",
+                 "https://d.google.com/drawings/d/555/edit"]
 
     with factories.single_commit():
       asmts = {i: factories.AssessmentFactory() for i in range(1, 4)}

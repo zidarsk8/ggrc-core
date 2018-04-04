@@ -20,7 +20,7 @@ Control,Code*,Title*,Description,Notes,Assessment Procedure,Admin*,Effective Dat
 ,Control code,Control title,Control description,Control notes,Control test plan,"user@example.com
 user1@example.com",20/2/2020,Draft,http://url.example.zzz,"Privacy
 Integrity","Sites
-Data Centers",yes,non-key,corrective,physical,daily,http://url.example.zzz Evidence name,,,,22/2/2022,one,Control ca text,"control<br><br>
+Data Centers",yes,non-key,corrective,physical,daily,https://docs.google.com/drawings/d/1_J2anxP8_SLMFf1SXyVNriVh25MVgH_LfhFN1wdP1d8/edit Evidence name,,,,22/2/2022,one,Control ca text,"control<br><br>
 rich text",yes,user4@example.com
 ,,,,,,,,,,,,,,,,,,,,,,,,,,
 Object type,,,,,,,,,,,,,,,,,,,,,,,,,,
