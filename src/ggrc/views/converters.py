@@ -233,7 +233,7 @@ def run_import_phases(ie_id, user_id, url_root):  # noqa: ignore=C901
         ie_job.results = json.dumps(info)
         for block_info in info:
           if block_info["block_errors"] or block_info["row_errors"]:
-            ie_job.status = "Failed"
+            ie_job.status = "Analysis Failed"
             job_emails.send_email(job_emails.IMPORT_FAILED, user.email,
                                   url_root, ie_job.title)
             db.session.commit()
@@ -245,8 +245,7 @@ def run_import_phases(ie_id, user_id, url_root):  # noqa: ignore=C901
     except Exception as e:  # pylint: disable=broad-except
       logger.exception("Import failed: %s", e.message)
       try:
-        ie_job.status = \
-            "Analysis Failed" if ie_job.status == "Analysis" else "Failed"
+        ie_job.status = "Failed"
         ie_job.end_date = datetime.now()
         db.session.commit()
         job_emails.send_email(job_emails.IMPORT_FAILED, user.email,
@@ -377,13 +376,16 @@ def handle_import_post(**kwargs):
   file_meta = request.json
   csv_data, csv_content, filename = fa.get_gdrive_file_data(file_meta)
   try:
-    counts = count_objects(csv_data)
+    objects, results, failed = count_objects(csv_data)
     ie = import_export.create_import_export_entry(
         content=csv_content,
         gdrive_metadata=file_meta,
-        title=filename)
-    return make_import_export_response({"objects": counts,
-                                        "import_export": ie.log_json()})
+        title=filename,
+        status="Not Started" if not failed else "Analysis Failed",
+        results=results)
+    return make_import_export_response({
+        "objects": objects if not failed else [],
+        "import_export": ie.log_json()})
   except Unauthorized:
     raise
   except Exception as e:

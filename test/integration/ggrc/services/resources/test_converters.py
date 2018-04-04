@@ -50,6 +50,43 @@ class TestImportExports(TestCase):
 
   @mock.patch("ggrc.gdrive.file_actions.get_gdrive_file_data",
               new=lambda x: (x, None, None))
+  def test_failed_imports_post(self):
+    """Test imports post"""
+    user = all_models.Person.query.first()
+    data = [
+        ['Object type'],
+        ['invalid control', 'Title'],
+        ['', 'Title'],
+        [],
+        [],
+        ['Object type'],
+        ['Control', 'Title'],
+        ['', 'Title'],
+        [],
+        ['Object type'],
+        ['Assessment', 'Title'],
+        ['', 'Title'],
+        [],
+    ]
+    response = self.client.post(
+        "/api/people/{}/imports".format(user.id),
+        data=json.dumps(data),
+        headers=self.headers)
+    self.assert200(response)
+    self.assertFalse(response.json["objects"])
+    self.assertEqual(response.json["import_export"]["status"],
+                     "Analysis Failed")
+    self.assertEqual(len(response.json["import_export"]["results"]), 3)
+    for block in response.json["import_export"]["results"]:
+      if block["name"] == "":
+        self.assertEqual(block["rows"], 1)
+        self.assertIn(u"Line 2", block["block_errors"][0])
+      else:
+        self.assertEqual(block["rows"], 1)
+        self.assertFalse(block["block_errors"])
+
+  @mock.patch("ggrc.gdrive.file_actions.get_gdrive_file_data",
+              new=lambda x: (x, None, None))
   def test_imports_post(self):
     """Test imports post"""
     user = all_models.Person.query.first()
@@ -58,11 +95,6 @@ class TestImportExports(TestCase):
         ['CONTROL', 'Title'],
         ['', 'Title1'],
         ['', 'Title2'],
-        [],
-        ['Object type'],
-        ['invalid control', 'Title'],
-        ['', 'Title3'],
-        [],
         [],
         ['Object type'],
         ['Control', 'Title'],
@@ -81,6 +113,7 @@ class TestImportExports(TestCase):
         data=json.dumps(data),
         headers=self.headers)
     self.assert200(response)
+    self.assertEqual(response.json["import_export"]["status"], "Not Started")
     self.assertEqual(response.json["objects"]["Assessment"], 1)
     self.assertEqual(response.json["objects"]["Control"], 3)
 
