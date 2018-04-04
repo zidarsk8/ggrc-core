@@ -12,6 +12,12 @@ import template from './advanced-search-filter-attribute.mustache';
  */
 let viewModel = can.Map.extend({
   define: {
+    isUnary: {
+      get() {
+        let operator = this.attr('attribute.operator');
+        return operator === 'is';
+      },
+    },
     /**
      * Contains available attributes for specific model.
      * Initializes component with first attribute in the list.
@@ -83,6 +89,16 @@ export default can.Component.extend({
     '{viewModel} availableAttributes': function (ev, desc, attributes) {
       if (attributes[0] && attributes[0].attr_title) {
         this.viewModel.attr('attribute.field', attributes[0].attr_title);
+      }
+    },
+    '{viewModel.attribute} operator'(attribute, ev, newValue, oldValue) {
+      if (newValue === 'is') {
+        attribute.attr('value', 'empty');
+        return;
+      }
+      if (oldValue === 'is') {
+        attribute.attr('value', '');
+        return;
       }
     },
   },
