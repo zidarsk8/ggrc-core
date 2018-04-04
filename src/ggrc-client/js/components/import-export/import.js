@@ -21,7 +21,6 @@ import '../show-more/show-more';
 import './download-template/download-template';
 import './import-history/import-history';
 import '../collapsible-panel/collapsible-panel';
-import '../confirm-action/confirm-action';
 import quickTips from './templates/quick-tips.mustache';
 import template from './templates/csv-import.mustache';
 import {
@@ -34,7 +33,7 @@ const messages = {
   INCORRECT_FORMAT: `The file is not in a recognized format. 
   Please import a Google sheet or a file in .csv format.`,
   EMPTY_FILE: 'You are going to import: <span class="gray">0 rows</span>',
-  PLEASE_CONFIRM: `Please note that importing incomplete or accurate data can 
+  PLEASE_CONFIRM: `Please note that importing incomplete or inaccurate data can 
   result in data corruption.`,
   IN_PROGRESS: `Your import request has been submitted. 
   You may close this page or continue your work. We will send you an email 
@@ -136,6 +135,7 @@ export default can.Component.extend({
         fileName: '',
         importStatus: '',
         message: '',
+        isConfirm: false,
       });
     },
     statusStrategies: {
