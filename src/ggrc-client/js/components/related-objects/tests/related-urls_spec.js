@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import Component from '../related-urls';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Permission from '../../../permission';
 
 describe('GGRC.Components.relatedUrls', function () {
@@ -12,7 +14,7 @@ describe('GGRC.Components.relatedUrls', function () {
   let instance;
 
   beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('relatedUrls');
+    viewModel = getComponentVM(Component);
     instance = {};
     viewModel.attr('instance', instance);
   });

@@ -7,7 +7,7 @@
 import Permission from '../../permission';
 import template from './templates/related-urls.mustache';
 
-GGRC.Components('relatedUrls', {
+export default can.Component.extend({
   tag: 'related-urls',
   template: template,
   viewModel: {
