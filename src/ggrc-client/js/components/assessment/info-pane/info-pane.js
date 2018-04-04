@@ -472,7 +472,6 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
               'The verifier may revert it if further input is needed.'});
           }
         }).then(() => {
-          this.initializeFormFields();
           this.attr('onStateChangeDfd').resolve();
           pubsub.dispatch({
             type: 'refetchOnce',

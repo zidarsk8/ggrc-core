@@ -84,7 +84,6 @@ describe('GGRC.Components.assessmentInfoPane', function () {
     beforeEach(() => {
       method = vm.onStateChange.bind(vm);
       spyOn(tracker, 'start').and.returnValue(() => {});
-      spyOn(vm, 'initializeFormFields').and.returnValue(() => {});
 
       vm.attr('deferredSave', new DeferredTransaction((resolve, reject) => {
         vm.attr('instance').save().done(resolve).fail(reject);
