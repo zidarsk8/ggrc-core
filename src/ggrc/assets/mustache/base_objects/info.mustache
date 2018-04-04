@@ -64,13 +64,19 @@
                     </div>
                     <div class="span4">
                       <h6>Last Deprecated Date</h6>
-                      {{#if end_date}}
-                        <p>
-                          {{localize_date end_date}}
-                        </p>
-                      {{else}}
-                        <span class="empty-message">None</span>
-                      {{/if}}
+                        {{#if last_deprecated_date}}
+                          <p>
+                            {{localize_date last_deprecated_date}}
+                          </p>
+                        {{else}}
+                          {{#if end_date}}
+                            <p>
+                              {{localize_date end_date}}
+                            </p>
+                          {{else}}
+                            <span class="empty-message">None</span>
+                          {{/if}}
+                        {{/if}}
                     </div>
                   </div><!-- row-fluid end -->
                 </div><!-- hidden-fields-area end -->
