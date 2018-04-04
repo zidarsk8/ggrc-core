@@ -30,10 +30,11 @@ from ggrc.converters.base import Converter
 from ggrc.converters.import_helper import generate_csv_string, \
     count_objects, read_csv_file, get_export_filename
 from ggrc.models import import_export, person
+from ggrc.notifications import job_emails
 from ggrc.query.exceptions import BadQueryException
 from ggrc.query.builder import QueryHelper
 from ggrc.login import login_required, get_current_user
-from ggrc.utils import benchmark
+from ggrc.utils import benchmark, get_url_root
 
 
 # pylint: disable=invalid-name
@@ -168,7 +169,7 @@ def make_import(csv_data, dry_run):
     raise BadRequest("Import failed due to server error: %s" % e.message)
 
 
-def run_export(objects, ie_id, user_id):
+def run_export(objects, ie_id, user_id, url_root):
   """Run export"""
   with app.app_context():
     try:
@@ -182,17 +183,20 @@ def run_export(objects, ie_id, user_id):
       ie.status = "Finished"
       ie.content = content
       db.session.commit()
+      job_emails.send_email(job_emails.EXPORT_COMPLETED, user.email, url_root,
+                            ie.title)
     except Exception as e:  # pylint: disable=broad-except
       logger.exception("Export failed: %s", e.message)
       try:
         ie.status = "Failed"
         ie.end_date = datetime.now()
         db.session.commit()
-      except Exception:  # pylint: disable=broad-except
-        pass
+        job_emails.send_email(job_emails.EXPORT_FAILED, user.email, url_root)
+      except Exception as e:  # pylint: disable=broad-except
+        logger.exception("Failed to set job status: %s", e.message)
 
 
-def run_import_phases(ie_id, user_id):  # noqa: ignore=C901
+def run_import_phases(ie_id, user_id, url_root):  # noqa: ignore=C901
   """Execute import phases"""
   with app.app_context():
     try:
@@ -211,11 +215,15 @@ def run_import_phases(ie_id, user_id):  # noqa: ignore=C901
           if block_info["block_errors"] or block_info["row_errors"]:
             ie_job.status = "Analysis Failed"
             db.session.commit()
+            job_emails.send_email(job_emails.IMPORT_FAILED, user.email,
+                                  url_root, ie_job.title)
             return
         for block_info in info:
           if block_info["block_warnings"] or block_info["row_warnings"]:
             ie_job.status = "Blocked"
             db.session.commit()
+            job_emails.send_email(job_emails.IMPORT_BLOCKED, user.email,
+                                  url_root, ie_job.title)
             return
         ie_job.status = "In Progress"
         db.session.commit()
@@ -226,10 +234,14 @@ def run_import_phases(ie_id, user_id):  # noqa: ignore=C901
         for block_info in info:
           if block_info["block_errors"] or block_info["row_errors"]:
             ie_job.status = "Failed"
+            job_emails.send_email(job_emails.IMPORT_FAILED, user.email,
+                                  url_root, ie_job.title)
             db.session.commit()
             return
         ie_job.status = "Finished"
         db.session.commit()
+        job_emails.send_email(job_emails.IMPORT_COMPLETED, user.email,
+                              url_root, ie_job.title)
     except Exception as e:  # pylint: disable=broad-except
       logger.exception("Import failed: %s", e.message)
       try:
@@ -237,8 +249,10 @@ def run_import_phases(ie_id, user_id):  # noqa: ignore=C901
             "Analysis Failed" if ie_job.status == "Analysis" else "Failed"
         ie_job.end_date = datetime.now()
         db.session.commit()
-      except Exception:  # pylint: disable=broad-except
-        pass
+        job_emails.send_email(job_emails.IMPORT_FAILED, user.email,
+                              url_root, ie_job.title)
+      except Exception as e:  # pylint: disable=broad-except
+        logger.exception("Failed to set job status: %s", e.message)
 
 
 def init_converter_views():
@@ -298,7 +312,7 @@ def handle_start(ie_job, user_id):
     raise BadRequest("Wrong status")
   try:
     db.session.commit()
-    deferred.defer(run_import_phases, ie_job.id, user_id)
+    deferred.defer(run_import_phases, ie_job.id, user_id, get_url_root())
     return make_import_export_response(ie_job.log_json())
   except Exception as e:
     logger.exception("Import failed: %s", e.message)
@@ -422,7 +436,7 @@ def handle_export_post(**kwargs):
         job_type="Export",
         status="In Progress",
         title=filename)
-    deferred.defer(run_export, objects, ie.id, user.id)
+    deferred.defer(run_export, objects, ie.id, user.id, get_url_root())
     return make_import_export_response(ie.log_json())
   except Exception as e:
     logger.exception("Export failed due incorrect request data: %s",
