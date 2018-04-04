@@ -15,7 +15,7 @@ dashboard-js-template-files:
   - base_objects/description.mustache
   - base_objects/test_plan.mustache
   - base_objects/extended_info.mustache
-  - base_objects/urls.mustache
+  - base_objects/reference-urls.mustache
   - base_objects/notes.mustache
   - base_objects/info.mustache
   - base_objects/dropdown_menu.mustache
@@ -32,7 +32,7 @@ dashboard-js-template-files:
   - base_objects/generate_assessments_button.mustache
   - base_objects/form_restore.mustache
   - base_objects/info-pane-utility.mustache
-  - base_objects/modal_content_urls.mustache
+  - base_objects/modal-content-reference-urls.mustache
   - base_objects/open_close.mustache
   - base_objects/mapper-item-description.mustache
   - base_objects/dashboard_widget.mustache

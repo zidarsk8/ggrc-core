@@ -117,6 +117,9 @@
           />
         <label>
       </div>
+    </div>
+
+    <div class="row-fluid">
       <div data-id="planned_report_period_from_hidden" class="span6 hidable">
         <label>
           Report Period:
@@ -135,15 +138,30 @@
               set-min-date="report_start_date"
               date="report_end_date"
               />
+          </div>
         </div>
       </div>
-    </div>
-
-    <input data-id="audit_firm_2_txtbx" type="hidden" name="slug" value="{{slug}}">
-
-    <div class="row-fluid">
-      <div data-id="folder_hidden" class="span6 hidable">
+      <div data-id="folder_hidden" class="span3 hidable">
         <ggrc-gdrive-folder-picker instance="instance" deferred="true" tabindex="13"></ggrc-gdrive-folder-picker>
+      </div>
+      <div class="span3 hidable">
+        <related-documents instance={instance} document-type="URL" autorefresh="false">
+          <related-urls
+            tabindex="20"
+            {instance}="instance"
+            {allow-to-remove}="new_object_form"
+            {(urls)}="documents"
+            {is-disabled}="isLoading"
+            (createUrl)="markDocumentForAddition(%event.payload)"
+            (removeUrl)="markDocumentForDeletion(%event.payload)">
+            <label>
+              Evidence URL
+              <i class="fa fa-question-circle" rel="tooltip" title="Web links to other references."></i>
+              <a data-id="hide_url_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+              <spinner {toggle}="isDisabled"></spinner>
+            </label>
+          </related-urls>
+        </related-documents>
       </div>
     </div>
 
