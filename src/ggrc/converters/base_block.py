@@ -23,6 +23,7 @@ from ggrc import models
 from ggrc.rbac import permissions
 from ggrc.utils import benchmark
 from ggrc.utils import structures
+from ggrc.utils import list_chunks
 from ggrc.converters import errors
 from ggrc.converters import get_shared_unique_rules
 from ggrc.converters import pre_commit_checks
@@ -79,6 +80,7 @@ class BlockConverter(object):
 
   """
 
+  ROW_CHUNK_SIZE = 100
   BLOCK_OFFSET = 3
 
   def get_unique_counts_dict(self, object_class):
@@ -460,12 +462,16 @@ class BlockConverter(object):
     if self.ignore or not self.object_ids:
       return
     self.row_converters = []
-    objects = self.object_class.eager_query().filter(
-        self.object_class.id.in_(self.object_ids))
-    for i, obj in enumerate(objects):
-      row = RowConverter(self, self.object_class, obj=obj,
-                         headers=self.headers, index=i)
-      yield row
+
+    index = 0
+    for ids_pool in list_chunks(self.object_ids, self.ROW_CHUNK_SIZE):
+      objects = self.object_class.eager_query().filter(
+          self.object_class.id.in_(ids_pool))
+
+      for obj in objects:
+        yield RowConverter(self, self.object_class, obj=obj,
+                           headers=self.headers, index=index)
+        index += 1
 
   def row_data_to_array(self):
     """Get row data from all row converters while exporting.
