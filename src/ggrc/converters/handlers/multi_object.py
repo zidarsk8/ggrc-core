@@ -10,6 +10,7 @@ from ggrc.converters.handlers import handlers
 
 
 class ObjectsColumnHandler(handlers.ColumnHandler):
+  MAPABLE_OBJECTS = ()
 
   def __init__(self, row_converter, key, **options):
     self.mappable = get_importables()
@@ -28,6 +29,10 @@ class ObjectsColumnHandler(handlers.ColumnHandler):
       class_ = self.mappable.get(object_class.strip().lower())
       if class_ is None:
         self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+        continue
+      if class_.__name__ not in self.MAPABLE_OBJECTS:
+        self.add_warning(errors.INVALID_TASKGROUP_MAPPING_WARNING,
+                         object_class=class_.__name__)
         continue
       new_object_slugs = self.new_slugs[class_]
       obj = class_.query.filter(class_.slug == slug).first()
