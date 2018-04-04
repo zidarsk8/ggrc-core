@@ -55,8 +55,9 @@ $controlsWidth: 400px;
     }
 
     &.error {
+      color: $red;
       &:before {
-        @include icon(red);
+        @include icon($red);
       }
     }
     &.warning {
