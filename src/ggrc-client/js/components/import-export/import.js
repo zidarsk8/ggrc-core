@@ -165,6 +165,7 @@ export default can.Component.extend({
         this.attr('message', messages.FAILED);
       },
       [jobStatuses.FINISHED]() {
+        GGRC.Errors.notifier('info', 'Import was completed successfully.');
         this.resetFile();
         this.getImportHistory();
       },
