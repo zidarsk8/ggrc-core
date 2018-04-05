@@ -497,7 +497,7 @@ class TestSnapshots(base.Test):
            "Via Tree View item (map snapshoted Control to Issue using "
            "Assessment with mapped snapshoted Control)"],
       indirect=["dynamic_objects", "dynamic_relationships"])
-  def test_mapping_of_objects_to_snapshots(
+  def test_destructive_mapping_of_objects_to_snapshots(
       self, create_audit_with_control_and_update_control,
       is_via_tw_map_btn_not_item, expected_snapshoted_control, dynamic_objects,
       dynamic_relationships, selenium
