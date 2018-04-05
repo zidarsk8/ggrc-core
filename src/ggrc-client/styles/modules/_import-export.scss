@@ -37,6 +37,16 @@ $controlsWidth: 400px;
     border-left: 1px solid $itemBorder;
   }
 
+
+  .confirm-action {
+    display: flex;
+    margin-bottom: 10px;
+
+    input[type="checkbox"] {
+      margin-right: 5px;
+    }
+  }
+
   .import-notifications label {
     margin-bottom: 15px;
   }
@@ -182,8 +192,8 @@ $controlsWidth: 400px;
     top: 5px;
   }
 
-  download-template {
-    margin-left: 10px;
+  > button {
+    margin-right: 10px;
   }
 }
 
