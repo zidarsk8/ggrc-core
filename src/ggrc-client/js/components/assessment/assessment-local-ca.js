@@ -4,8 +4,9 @@
  */
 
 import {
-  CA_DD_REQUIRED_DEPS,
   applyChangesToCustomAttributeValue,
+  isEvidenceRequired,
+  isCommentRequired,
 }
   from '../../plugins/utils/ca-utils';
 import {VALIDATION_ERROR, RELATED_ITEMS_LOADED} from '../../events/eventTypes';
@@ -53,11 +54,7 @@ import Permission from '../../permission';
                 return item.attr('type') === 'dropdown';
               })
               .filter(function (item) {
-                let requiredOption =
-                  item.attr('validationConfig')[item.attr('value')];
-                return requiredOption === CA_DD_REQUIRED_DEPS.EVIDENCE ||
-                   requiredOption ===
-                    CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+                return isEvidenceRequired(item);
               }).length;
             return optionsWithEvidence > this.attr('evidenceAmount');
           },
@@ -95,33 +92,8 @@ import Permission from '../../permission';
         }
       },
       performValidation: function (field) {
-        let fieldValid;
-        let hasMissingEvidence;
-        let hasMissingComment;
-        let hasMissingValue;
-        let requiresEvidence;
-        let requiresComment;
         let value = field.value;
-        let valCfg = field.validationConfig;
-        let fieldValidationConf = valCfg && valCfg[value];
         let isMandatory = field.validation.mandatory;
-        let errorsMap = field.errorsMap || {
-          evidence: false,
-          comment: false,
-        };
-
-        requiresEvidence =
-          fieldValidationConf === CA_DD_REQUIRED_DEPS.EVIDENCE ||
-          fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
-
-        requiresComment =
-          fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT ||
-          fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
-
-        hasMissingEvidence = requiresEvidence &&
-          !!this.attr('isEvidenceRequired');
-
-        hasMissingComment = requiresComment && !!errorsMap.comment;
 
         if (field.type === 'checkbox') {
           if (value === '1') {
@@ -133,14 +105,26 @@ import Permission from '../../permission';
           field.attr({
             validation: {
               show: isMandatory,
-              valid: isMandatory ? !hasMissingValue && !!(value) : true,
+              valid: isMandatory ? !!(value) : true,
               hasMissingInfo: false,
             },
           });
         } else if (field.type === 'dropdown') {
-          fieldValid = (value) ?
-            !(hasMissingEvidence || hasMissingComment || hasMissingValue) :
-            !isMandatory && !hasMissingValue;
+          let errorsMap = field.errorsMap || {
+            evidence: false,
+            comment: false,
+          };
+
+          let requiresEvidence = isEvidenceRequired(field);
+          let requiresComment = isCommentRequired(field);
+
+          let hasMissingEvidence = requiresEvidence &&
+            this.attr('isEvidenceRequired');
+
+          let hasMissingComment = requiresComment && !!errorsMap.comment;
+
+          let fieldValid = (value) ?
+            !(hasMissingEvidence || hasMissingComment) : !isMandatory;
 
           field.attr({
             validation: {
@@ -159,28 +143,11 @@ import Permission from '../../permission';
           field.attr({
             validation: {
               show: isMandatory,
-              valid: isMandatory ? !hasMissingValue && !!(value) : true,
+              valid: isMandatory ? !!(value) : true,
               hasMissingInfo: false,
             },
           });
         }
-      },
-      updateEvidenceValidation: function () {
-        let isEvidenceRequired = this.attr('isEvidenceRequired');
-        this.attr('fields')
-          .filter(function (item) {
-            return item.attr('type') === 'dropdown';
-          })
-          .each(function (item) {
-            let isCommentRequired;
-            if ((item.attr('validationConfig')[item.attr('value')] === 2 ||
-                item.attr('validationConfig')[item.attr('value')] === 3)) {
-              isCommentRequired = item.attr('errorsMap.comment');
-              item.attr('errorsMap.evidence', isEvidenceRequired);
-              item.attr('validation.valid',
-                !isEvidenceRequired && !isCommentRequired);
-            }
-          });
       },
       save: function (fieldId, fieldValue) {
         const self = this;
@@ -202,16 +169,11 @@ import Permission from '../../permission';
           self.attr('saving', true);
         })
         // todo: error handling
-        .always(() => {
-          this.attr('saving', false);
-          this.attr('isDirty', false);
-          stopFn();
-        });
-      },
-      fieldRequiresComment: function (field) {
-        let fieldValidationConf = field.validationConfig[field.value];
-          return fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT ||
-            fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+          .always(() => {
+            this.attr('saving', false);
+            this.attr('isDirty', false);
+            stopFn();
+          });
       },
       attributeChanged: function (e) {
         e.field.attr('value', e.value);
@@ -219,7 +181,7 @@ import Permission from '../../permission';
         // Removes "link" with the comment for DD field and
         // makes it require a new one
         if ( e.field.attr('type') === 'dropdown' &&
-            this.fieldRequiresComment(e.field) ) {
+          isCommentRequired(e.field) ) {
           e.field.attr('errorsMap.comment', true);
         }
 
