@@ -141,6 +141,11 @@ class BlockConverter(object):
     else:
       self.name = ""
 
+  @property
+  def block_width(self):
+    """Returns width of block (header length)."""
+    return len(self.fields)
+
   def check_block_restrictions(self):
     """Check some block related restrictions"""
     if not self.object_class:
@@ -466,24 +471,21 @@ class BlockConverter(object):
     index = 0
     for ids_pool in list_chunks(self.object_ids, self.ROW_CHUNK_SIZE):
       objects = self.object_class.eager_query().filter(
-          self.object_class.id.in_(ids_pool))
+          self.object_class.id.in_(ids_pool)
+      ).execution_options(stream_results=True)
 
       for obj in objects:
         yield RowConverter(self, self.object_class, obj=obj,
                            headers=self.headers, index=index)
         index += 1
 
-  def row_data_to_array(self):
-    """Get row data from all row converters while exporting.
-    """
+  def generate_row_data(self):
+    """Get row data from all row converters while exporting."""
     if self.ignore:
       return
-    csv_body = []
-    csv_header = self.generate_csv_header()
     for row_converter in self.row_converters_from_ids():
       row_converter.handle_obj_row_data()
-      csv_body.append(row_converter.to_array(self.fields))
-    return csv_header, csv_body
+      yield row_converter.to_array(self.fields)
 
   def handle_row_data(self, field_list=None):
     """Handle row data for all row converters on import.

@@ -18,6 +18,7 @@ from ggrc.converters.base_block import BlockConverter
 from ggrc.converters.snapshot_block import SnapshotBlockConverter
 from ggrc.converters.import_helper import extract_relevant_data
 from ggrc.converters.import_helper import split_array
+from ggrc.converters.import_helper import CsvStringBuilder
 from ggrc.fulltext import get_indexer
 
 
@@ -182,23 +183,29 @@ class ExportConverter(BaseConverter):
     """Export csv data."""
     with benchmark("Initialize block converters."):
       self.initialize_block_converters()
-    with benchmark("Handle block converters"):
-      return self.to_block_array()
+    with benchmark("Build csv data."):
+      return self.build_csv_from_row_data()
 
-  def to_block_array(self):
-    """Export each block separated by empty lines
+  def build_csv_from_row_data(self):
+    """Export each block separated by empty lines."""
+    table_width = max([converter.block_width
+                       for converter in self.block_converters])
+    table_width += 1  # One line for 'Object line' column
 
-    Generate 2d array where each cell represents a cell in a csv file
-    """
-    csv_data = []
+    csv_string_builder = CsvStringBuilder(table_width)
     for block_converter in self.block_converters:
-      csv_header, csv_body = block_converter.row_data_to_array()
-      # multi block csv must have first column empty
-      two_empty_lines = [[], []]
-      block_data = csv_header + csv_body + two_empty_lines
-      for line in block_data:
+      csv_header = block_converter.generate_csv_header()
+      csv_header[0].insert(0, "Object type")
+      csv_header[1].insert(0, block_converter.name)
+
+      csv_string_builder.append_line(csv_header[0])
+      csv_string_builder.append_line(csv_header[1])
+
+      for line in block_converter.generate_row_data():
         line.insert(0, "")
-      block_data[0][0] = "Object type"
-      block_data[1][0] = block_converter.name
-      csv_data.extend(block_data)
-    return csv_data
+        csv_string_builder.append_line(line)
+
+      csv_string_builder.append_line([])
+      csv_string_builder.append_line([])
+
+    return csv_string_builder.get_csv_string()

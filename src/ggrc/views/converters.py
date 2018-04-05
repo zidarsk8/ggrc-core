@@ -27,8 +27,8 @@ from ggrc import db
 from ggrc.gdrive import file_actions as fa
 from ggrc.app import app
 from ggrc.converters.base import ImportConverter, ExportConverter
-from ggrc.converters.import_helper import generate_csv_string, \
-    count_objects, read_csv_file, get_export_filename
+from ggrc.converters.import_helper import count_objects, \
+    read_csv_file, get_export_filename
 from ggrc.models import import_export, person
 from ggrc.notifications import job_emails
 from ggrc.query.exceptions import BadQueryException
@@ -116,7 +116,7 @@ def make_export(objects):
   converter = ExportConverter(ids_by_type=ids_by_type)
   csv_data = converter.export_csv_data()
   object_names = "_".join(converter.get_object_names())
-  return generate_csv_string(csv_data), object_names
+  return csv_data, object_names
 
 
 def check_import_file():
