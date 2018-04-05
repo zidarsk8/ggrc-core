@@ -286,8 +286,10 @@ export default can.Component.extend({
       const emptySelector = '.empty-message';
       const highlightClass = 'diff-highlighted';
       const listSelector = 'ul li, .object-list-item';
-      const attributesSelector = '.row-fluid h6 + *, .row-fluid .state-value' +
-        ', related-documents';
+      const attributesSelector = `.row-fluid h6 + *,
+        .row-fluid .state-value,
+        .row-fluid h3,
+        related-documents`;
       let infoPanes = $target.find('.info .tier-content');
       let valuesOld = infoPanes.eq(0).find(attributesSelector);
       let valuesNew = infoPanes.eq(1).find(attributesSelector);
