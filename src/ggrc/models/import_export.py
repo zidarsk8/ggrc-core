@@ -62,13 +62,15 @@ def create_import_export_entry(**kwargs):
   """Create ImportExport entry"""
   meta = json.dumps(kwargs['gdrive_metadata']) if 'gride_metadata' in kwargs \
       else None
+  results = json.dumps(kwargs['results']) if 'results' in kwargs else None
   ie_job = ImportExport(job_type=kwargs.get('job_type', 'Import'),
                         status=kwargs.get('status', 'Not Started'),
                         created_at=datetime.now(),
                         created_by=get_current_user(),
                         title=kwargs.get('title'),
                         content=kwargs.get('content'),
-                        gdrive_metadata=meta)
+                        gdrive_metadata=meta,
+                        results=results)
 
   db.session.add(ie_job)
   db.session.commit()
