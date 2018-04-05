@@ -130,6 +130,42 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                 'ccs': [email2]}
       mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
 
+  @patch('ggrc.integrations.issues.Client.update_issue')
+  def test_change_assessment_status(self, mocked_update_issue):
+    """Issue status should be changed."""
+    email1 = "email1@example.com"
+    assignee_role_id = AccessControlRole.query.filter_by(
+        object_type="Assessment",
+        name="Assignees"
+    ).first().id
+    assignees = [factories.PersonFactory(email=email1)]
+    iti_issue_id = []
+    iti = factories.IssueTrackerIssueFactory(enabled=True)
+    iti_issue_id.append(iti.issue_id)
+    asmt = iti.issue_tracked_obj
+    with patch.object(issue_tracker, '_is_issue_tracker_enabled',
+                      return_value=True):
+      acl = [acl_helper.get_acl_json(assignee_role_id, assignee.id)
+             for assignee in assignees]
+      self.api.put(asmt, {
+          "access_control_list": acl,
+          "status": "In Review"
+      })
+      kwargs = {'status': 'FIXED',
+                'component_id': None,
+                'severity': None,
+                'title': iti.title,
+                'hotlist_ids': [],
+                'priority': None,
+                'assignee': email1,
+                'verifier': email1,
+                'ccs': []}
+      mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
+
+      issue = db.session.query(models.IssuetrackerIssue).get(iti.id)
+      self.assertEqual(issue.assignee, email1)
+      self.assertEqual(issue.cc_list, "")
+
 
 @mock.patch('ggrc.models.hooks.issue_tracker._is_issue_tracker_enabled',
             return_value=True)
