@@ -5,3 +5,4 @@
 UPDATE_VENV = "update_env"
 TEST_METHOD_PREFIX = "test_"
 TEST_METHOD_POSTFIX = "_test"
+DESTRUCTIVE_TEST_METHOD_PREFIX = "test_destructive_"

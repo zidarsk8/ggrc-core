@@ -124,7 +124,10 @@ selenium_tests () {
   PROJECT=$1
   print_line
 
-  provision_dev_for_selenium "cleandev_1"
+  for dev_server in cleandev_1 cleandev_destructive_1; do
+    provision_dev_for_selenium $dev_server &
+  done
+  wait
 
   echo "Running Selenium tests"
   docker exec -i ${PROJECT}_selenium_1 sh -c "

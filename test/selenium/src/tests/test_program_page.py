@@ -18,7 +18,8 @@ class TestProgramPage(base.Test):
   """A part of smoke tests, section 4."""
 
   @pytest.mark.smoke_tests
-  def test_object_count_updates(self, new_program_ui, header_dashboard):
+  def test_destructive_object_count_updates(self, new_program_ui,
+                                            header_dashboard):
     """Checks if count updates in LHN after creating new program
     object."""
     _, program_info_page = new_program_ui

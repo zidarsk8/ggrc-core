@@ -16,7 +16,7 @@ class TestProgramPage(base.Test):
   """Tests of unified mapper."""
 
   @pytest.mark.smoke_tests
-  def test_mapping_controls_to_program_via_unified_mapper(
+  def test_destructive_mapping_controls_to_program_via_unified_mapper(
       self, new_program_rest, new_controls_rest, selenium
   ):
     """Check if Controls can be mapped to Program from Controls widget under

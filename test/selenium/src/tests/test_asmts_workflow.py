@@ -205,7 +205,7 @@ class TestAssessmentsWorkflow(base.Test):
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize("operator", [alias.EQUAL_OP, alias.CONTAINS_OP])
-  def test_asmts_gcas_filtering(
+  def test_destructive_asmts_gcas_filtering(
       self, new_program_rest, new_audit_rest, new_cas_for_assessments_rest,
       new_assessments_rest, operator, selenium
   ):
@@ -235,7 +235,7 @@ class TestAssessmentsWorkflow(base.Test):
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize("operator", [alias.EQUAL_OP])
-  def test_asmts_lcas_filtering(
+  def test_destructive_asmts_lcas_filtering(
       self, new_program_rest, new_controls_rest,
       map_new_program_rest_to_new_controls_rest,
       new_audit_rest,
