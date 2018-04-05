@@ -122,6 +122,7 @@ export default can.Component.extend({
       }));
 
       if (!rows) {
+        this.attr('state', jobStatuses.SELECT);
         this.attr('importStatus', 'error');
         this.attr('message', messages.EMPTY_FILE);
       } else {
@@ -141,8 +142,9 @@ export default can.Component.extend({
     statusStrategies: {
       [jobStatuses.SELECT]() {},
       [jobStatuses.STOPPED]() {},
-      [jobStatuses.NOT_STARTED]() {
+      [jobStatuses.NOT_STARTED](jobInfo) {
         this.attr('message', messages.PLEASE_CONFIRM);
+        this.processLoadedInfo(jobInfo.results);
       },
       [jobStatuses.ANALYSIS](jobInfo, timeout) {
         this.attr('message', messages.IN_PROGRESS);
@@ -180,15 +182,15 @@ export default can.Component.extend({
       }, {responseJSON: {message: 'Unable to Authorize'}})
         .then((response) => {
           const counts = Object.values(response.objects);
+          const jobInfo = response.import_export;
+
+          this.attr('state', jobInfo.status);
+          this.attr('jobId', jobInfo.id);
 
           if (counts.some((number) => number > 0)) {
-            this.attr('state', response.import_export.status);
             this.attr('message', messages.FILE_STATS(response.objects));
-            this.attr('jobId', response.import_export.id);
           } else {
-            this.attr('state', jobStatuses.SELECT);
-            this.attr('importStatus', 'error');
-            this.attr('message', messages.EMPTY_FILE);
+            this.processLoadedInfo(jobInfo.results);
           }
         }, (error) => {
           this.attr('state', jobStatuses.SELECT);
