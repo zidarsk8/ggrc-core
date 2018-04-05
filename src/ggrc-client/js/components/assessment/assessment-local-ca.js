@@ -91,6 +91,38 @@ import Permission from '../../permission';
           this.dispatch(VALIDATION_ERROR);
         }
       },
+      performDropdownValidation(field) {
+        let value = field.value;
+        let isMandatory = field.validation.mandatory;
+        let errorsMap = field.errorsMap || {
+          evidence: false,
+          comment: false,
+        };
+
+        let requiresEvidence = isEvidenceRequired(field);
+        let requiresComment = isCommentRequired(field);
+
+        let hasMissingEvidence = requiresEvidence &&
+          this.attr('isEvidenceRequired');
+
+        let hasMissingComment = requiresComment && !!errorsMap.comment;
+
+        let fieldValid = (value) ?
+          !(hasMissingEvidence || hasMissingComment) : !isMandatory;
+
+        field.attr({
+          validation: {
+            show: isMandatory || !!value,
+            valid: fieldValid,
+            hasMissingInfo: (hasMissingEvidence || hasMissingComment),
+            requiresAttachment: (requiresEvidence || requiresComment),
+          },
+          errorsMap: {
+            evidence: hasMissingEvidence,
+            comment: hasMissingComment,
+          },
+        });
+      },
       performValidation: function (field) {
         let value = field.value;
         let isMandatory = field.validation.mandatory;
@@ -110,34 +142,7 @@ import Permission from '../../permission';
             },
           });
         } else if (field.type === 'dropdown') {
-          let errorsMap = field.errorsMap || {
-            evidence: false,
-            comment: false,
-          };
-
-          let requiresEvidence = isEvidenceRequired(field);
-          let requiresComment = isCommentRequired(field);
-
-          let hasMissingEvidence = requiresEvidence &&
-            this.attr('isEvidenceRequired');
-
-          let hasMissingComment = requiresComment && !!errorsMap.comment;
-
-          let fieldValid = (value) ?
-            !(hasMissingEvidence || hasMissingComment) : !isMandatory;
-
-          field.attr({
-            validation: {
-              show: isMandatory || !!value,
-              valid: fieldValid,
-              hasMissingInfo: (hasMissingEvidence || hasMissingComment),
-              requiresAttachment: (requiresEvidence || requiresComment),
-            },
-            errorsMap: {
-              evidence: hasMissingEvidence,
-              comment: hasMissingComment,
-            },
-          });
+          this.performDropdownValidation(field);
         } else {
           // validation for all other fields
           field.attr({
