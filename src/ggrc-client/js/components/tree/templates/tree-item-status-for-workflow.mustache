@@ -6,7 +6,7 @@
 {{#if_instance_of instance "Cycle|CycleTaskGroup|CycleTaskGroupObjectTask"}}
     <div class="tree-item__icon-wrapper">
        <span class="state-value-dot {{statusCSSClass}}">
-            {{statusTitle}}
+            {{instance.status}}
           </span>
     </div>
 {{/if_instance_of}}

@@ -47,11 +47,11 @@ let statesModels = [
       'CycleTaskGroupObjectTask',
     ],
     states: [
-      'Assigned', 'InProgress', 'Finished',
+      'Assigned', 'In Progress', 'Finished',
       'Declined', 'Deprecated', 'Verified',
     ],
     bulkStates: [
-      'InProgress', 'Finished',
+      'In Progress', 'Finished',
       'Declined', 'Deprecated', 'Verified',
     ],
   },

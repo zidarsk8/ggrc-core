@@ -11,7 +11,7 @@ import re
 
 import pytest
 
-from lib import base, constants
+from lib import base, constants, url
 from lib.constants import objects, messages
 from lib.constants.element import AdminWidgetCustomAttributes
 from lib.entities import entities_factory
@@ -28,7 +28,7 @@ class TestAdminDashboardPage(base.Test):
   def admin_dashboard(self, selenium):
     """Open Admin Dashboard URL and
     return AdminDashboard page objects model."""
-    selenium_utils.open_url(selenium, dashboard.AdminDashboard.URL)
+    selenium_utils.open_url(selenium, url.Urls().admin_dashboard)
     return dashboard.AdminDashboard(selenium)
 
   @pytest.mark.smoke_tests
@@ -71,13 +71,12 @@ class TestAdminDashboardPage(base.Test):
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
-      "ca_type, def_type",
-      [(ca_type_item,
-        objects.get_normal_form(random.choice(objects.ALL_CA_OBJS))) for
-       ca_type_item in AdminWidgetCustomAttributes.ALL_CA_TYPES]
+      "ca_type",
+      AdminWidgetCustomAttributes.ALL_CA_TYPES
   )
-  def test_add_global_ca(self, admin_dashboard, ca_type, def_type):
+  def test_add_global_ca(self, admin_dashboard, ca_type):
     """Create different types of Custom Attribute on Admin Dashboard."""
+    def_type = objects.get_normal_form(random.choice(objects.ALL_CA_OBJS))
     expected_ca = entities_factory.CustomAttributeDefinitionsFactory().create(
         attribute_type=ca_type, definition_type=def_type)
     ca_tab = admin_dashboard.select_custom_attributes()

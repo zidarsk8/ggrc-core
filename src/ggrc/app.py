@@ -5,11 +5,13 @@
 
 
 import re
+import time
 
 from logging import getLogger
 from logging.config import dictConfig as setup_logging
 import sqlalchemy
 
+import flask
 from flask import Flask
 from flask import redirect
 from flask import render_template
@@ -201,11 +203,12 @@ def _set_display_queries(report_type):
     Prints out SQL queries, EXPLAINs for queries above slow_threshold, and
     a final count of queries after every HTTP request
     """
+    if report_type not in ('slow', 'all'):
+      return response
+
     slow_threshold = 0.5  # EXPLAIN queries that ran for more than 0.5s
     queries = get_debug_queries()
-    logger.info("Total queries: %s", len(queries))
-    if report_type == 'count':
-      return response
+
     # We have to copy the queries list below otherwise queries executed
     # in the for loop will be appended causing an endless loop
     for query in queries[:]:
@@ -245,6 +248,40 @@ def _display_sql_queries():
     _set_display_queries(report_type)
 
 
+def _display_request_time():
+  """Request time logger
+
+  Logs request time for every request, highlighting the ones that were slow"""
+
+  # pylint: disable=unused-variable
+  @app.before_request
+  def before_request():
+    """Mesure time when before the request starts"""
+    flask.g.request_start = (time.time(), time.clock())
+
+  @app.after_request
+  def after_request(response):
+    """Print out requst time"""
+    queries = get_debug_queries()
+    query_time = sum(query.duration for query in queries)
+    start_time, start_clock = flask.g.request_start
+    total = time.time() - start_time
+    total_cpu = time.clock() - start_clock
+    str_ = u"%.2fs (%.2fs CPU and %.2fs for %-2s db queries) '%s %s' %s"
+    payload = (total, total_cpu, query_time, len(queries),
+               request.method, request.path, response.status)
+
+    performance_logger = getLogger("ggrc.performance")
+    if getattr(settings, "PRODUCTION", True):
+      # Always use INFO level in production
+      performance_logger.info(str_, *payload)
+      return response
+    if total > 1:
+      performance_logger.warning(str_, *payload)
+    else:
+      performance_logger.info(str_, *payload)
+    return response
+
 setup_error_handlers(app)
 init_models(app)
 configure_flask_login(app)
@@ -261,3 +298,4 @@ notifications.register_notification_listeners()
 _enable_debug_toolbar()
 _enable_jasmine()
 _display_sql_queries()
+_display_request_time()

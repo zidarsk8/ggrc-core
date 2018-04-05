@@ -29,14 +29,14 @@ describe('GGRC.Utils.BulkUpdateService', function () {
         id: 1,
       }];
 
-      method(model, data, {state: 'InProgress'});
+      method(model, data, {state: 'In Progress'});
 
       expect($.ajax)
         .toHaveBeenCalledWith({
           url: '/api/some_model',
           method: 'PATCH',
           contentType: 'application/json',
-          data: '[{"id":1,"state":"InProgress"}]',
+          data: '[{"id":1,"state":"In Progress"}]',
         });
     });
   });

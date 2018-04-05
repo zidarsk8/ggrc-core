@@ -7,8 +7,8 @@ import json
 
 import requests
 
-from lib import environment, factory
-from lib.constants import url, objects, messages
+from lib import environment, factory, url
+from lib.constants import objects, messages
 from lib.entities import entities_factory
 from lib.entities.entities_factory import (
     PeopleFactory, CustomAttributeDefinitionsFactory, AssessmentsFactory)
@@ -83,7 +83,7 @@ class BaseRestService(object):
         extra.update({"href": resp_dict.get("selfLink")})
       if resp_dict.get("viewLink"):
         extra.update(
-            {"url": environment.APP_URL + resp_dict.get("viewLink")[1:]})
+            {"url": environment.app_url + resp_dict.get("viewLink")[1:]})
       return extra
     if isinstance(resp, requests.models.Response):
       try:

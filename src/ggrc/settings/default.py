@@ -54,7 +54,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "1.7.0-Strawberry" + BUILD_NUMBER
+VERSION = "1.8.0-Strawberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -122,13 +122,16 @@ LOGGING_FORMATTER = {
 LOGGING_ROOT = "WARNING"
 LOGGING_LOGGERS = {
     "ggrc": "INFO",
+    "ggrc.performance": "INFO",
+    # INFO    - logs performance stats for requests
+    # WARNING - logs performance for requests that took longer than 1s
 
     "sqlalchemy": "WARNING",
     # WARNING - logs warnings and errors only
     # INFO    - logs SQL-queries
     # DEBUG   - logs SQL-queries + result sets
 
-    "werkzeug": "INFO",
+    "werkzeug": "WARNING",
     # WARNING - logs warnings and errors only
     # INFO    - logs HTTP-queries
 

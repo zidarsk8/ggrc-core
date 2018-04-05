@@ -8,6 +8,7 @@ import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
 import template from './cycle-task-actions.mustache';
+import WorkflowHelpers from '../workflow/workflow-helpers';
 
 (function (can, GGRC) {
   'use strict';
@@ -70,23 +71,16 @@ import template from './cycle-task-actions.mustache';
 
       this.setStatus(newValue.status);
     },
-    setStatus: function (status) {
-      let instance = this.attr('instance');
+    async setStatus(status) {
+      const instance = this.attr('instance');
       const stopFn = tracker.start(
         instance.type,
         tracker.USER_JOURNEY_KEYS.LOADING,
         tracker.USER_ACTIONS.CYCLE_TASK.CHANGE_STATUS);
-
       this.attr('disabled', true);
-      return instance.refresh()
-        .then((refreshed) =>{
-          refreshed.attr('status', status);
-          return refreshed.save();
-        })
-        .then(() => {
-          this.attr('disabled', false);
-          stopFn();
-        });
+      await WorkflowHelpers.updateStatus(instance, status);
+      this.attr('disabled', false);
+      stopFn();
     },
   });
 

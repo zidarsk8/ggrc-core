@@ -17,7 +17,7 @@ class StatusValidatedMixin(mixins.Stateful):
   """Mixin setup statuses for Cycle and CycleTaskGroup."""
 
   ASSIGNED = u"Assigned"
-  IN_PROGRESS = u"InProgress"
+  IN_PROGRESS = u"In Progress"
   FINISHED = u"Finished"
   VERIFIED = u"Verified"
   DEPRECATED = u"Deprecated"

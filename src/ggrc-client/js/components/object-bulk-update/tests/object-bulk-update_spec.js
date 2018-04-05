@@ -27,7 +27,7 @@ describe('GGRC.Components.objectBulkUpdate', function () {
       mappingType = {
         type: 'the same type',
       };
-      targetStates = ['Assigned', 'InProgress'];
+      targetStates = ['Assigned', 'In Progress'];
 
       spyOn(stateUtils, 'getBulkStatesForModel')
         .and.returnValue(targetStates);
@@ -120,12 +120,34 @@ describe('GGRC.Components.objectBulkUpdate', function () {
           then() {},
         });
       context.viewModel.attr('selected', [1]);
-      context.viewModel.attr('targetState', 'InProgress');
+      context.viewModel.attr('targetState', 'In Progress');
 
       event();
 
       expect(context.viewModel.callback)
         .toHaveBeenCalled();
+    });
+  });
+
+  describe('"inserted" event handler', function () {
+    let event;
+    let context;
+
+    beforeEach(function () {
+      context = {
+        viewModel: new can.Map({
+          submitCbs: {
+            fire: jasmine.createSpy(),
+          },
+        }),
+      };
+      event = events.inserted.bind(context);
+    });
+
+    it('calls fire() of submitCbs attribute', function () {
+      event();
+
+      expect(context.viewModel.submitCbs.fire).toHaveBeenCalled();
     });
   });
 });

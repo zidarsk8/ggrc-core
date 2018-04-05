@@ -3,8 +3,8 @@
 
 """Custom attribute definition module"""
 
-from cached_property import cached_property
 import flask
+from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 from sqlalchemy.sql.schema import UniqueConstraint
@@ -17,6 +17,19 @@ from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.access_control import role as acr
 from ggrc.models.exceptions import ValidationError
 from ggrc.models import reflection
+from ggrc.cache import memcache
+
+
+@memcache.cached
+def get_inflector_model_name_pairs():
+  """Returns pairs with asociation between definition_type and model_name"""
+  from ggrc.models import all_models
+  return [(m._inflector.table_singular, m.__name__)
+          for m in all_models.all_models]
+
+
+def get_inflector_model_name_dict():
+  return dict(get_inflector_model_name_pairs())
 
 
 class CustomAttributeDefinition(attributevalidator.AttributeValidator,
@@ -42,12 +55,6 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
   attribute_values = db.relationship('CustomAttributeValue',
                                      backref='custom_attribute',
                                      cascade='all, delete-orphan')
-
-  @cached_property
-  def inflector_model_name_dict(self):  # pylint: disable=no-self-use
-    from ggrc.models import all_models
-    return {m._inflector.table_singular: m.__name__
-            for m in all_models.all_models}
 
   @property
   def definition_attr(self):
@@ -291,7 +298,7 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
       raise ValueError(u"Global custom attribute '{}' "
                        u"already exists for this object type"
                        .format(name))
-    model_name = self.inflector_model_name_dict[definition_type]
+    model_name = get_inflector_model_name_dict()[definition_type]
     acrs = {i.lower() for i in acr.get_custom_roles_for(model_name).values()}
     if name in acrs:
       raise ValueError(u"Custom Role with a name of '{}' "
@@ -310,9 +317,64 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     return results
 
 
+@memcache.cached
+def get_cads_counts():
+  return {
+      (t, f): c
+      for t, f, c in db.session.query(
+          CustomAttributeDefinition.definition_type,
+          CustomAttributeDefinition.definition_id.is_(None),
+          func.count(),
+      ).group_by(
+          CustomAttributeDefinition.definition_type,
+          CustomAttributeDefinition.definition_id.is_(None),
+      )
+  }
+
+
+def _get_query_for(definition_type, instance_id=None):
+  """Returns query for sent args if """
+  if not get_cads_counts().get((definition_type, instance_id is None)):
+    return []
+  query = CustomAttributeDefinition.query.filter(
+      CustomAttributeDefinition.definition_type == definition_type,
+  )
+  if instance_id is None:
+    return query.filter(CustomAttributeDefinition.definition_id.is_(None))
+  return query.filter(CustomAttributeDefinition.definition_id == instance_id)
+
+
+@memcache.cached
+def get_global_cads(definition_type):
+  """Returns global cad jsons list for sent definition_type."""
+  return [i.log_json() for i in _get_query_for(definition_type)]
+
+
+@memcache.cached
+def get_local_cads(definition_type, instance_id):
+  """Returns local cad jsons list for sent definition_type and instance_id."""
+  return [i.log_json() for i in _get_query_for(definition_type, instance_id)]
+
+
+def get_model_name_inflector_dict():
+  return {m: i for i, m in get_inflector_model_name_pairs()}
+
+
+def get_custom_attributes_for(model_name, instance_id=None):
+  """Returns custom attributes jsons for sent model_name and instance_id."""
+  definition_type = get_model_name_inflector_dict()[model_name]
+  if not definition_type:
+    return []
+  cads = get_global_cads(definition_type)
+  if instance_id is not None:
+    cads.extend(get_local_cads(definition_type, instance_id))
+  return cads
+
+
 class CustomAttributeMapable(object):
   # pylint: disable=too-few-public-methods
   # because this is a mixin
+  """Mixin. Setup for models that can be mapped as CAV value."""
 
   @declared_attr
   def related_custom_attributes(cls):  # pylint: disable=no-self-argument

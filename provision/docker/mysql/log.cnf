@@ -2,6 +2,10 @@
 general_log         = 1
 general_log_file    = /tmp/mysql.log
 
+log_error           = /tmp/mysql_error.log
+
 slow_query_log      = 1
 long_query_time     = 0.5 
 slow_query_log_file = /tmp/slow_query.log
+
+innodb_print_all_deadlocks = 1

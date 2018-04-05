@@ -4,6 +4,7 @@
 < bin/deploy
 < bin/init_vagrant_env
 < .codeclimate.yml
+< common-services.yml
 < DEPLOYMENT.md
 < docker-compose-deploy.yml
 < docker-compose.override.yml.example
@@ -73,7 +74,6 @@
 < node_modules
 < package.json
 < package-lock.json
-< provision/docker/01_start_mysql.sh
 < provision/docker/inventory
 < provision/docker/my.cnf
 < provision/docker/mysql/default_utf8.cnf

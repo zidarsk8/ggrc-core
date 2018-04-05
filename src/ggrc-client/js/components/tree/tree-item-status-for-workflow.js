@@ -5,34 +5,30 @@
 
 import template from './templates/tree-item-status-for-workflow.mustache';
 
-(function (can, GGRC) {
-  'use strict';
+const viewModel = can.Map.extend({
+  define: {
+    statusCSSClass: {
+      type: 'string',
+      get() {
+        const status = this.attr('instance.status');
+        let result = '';
 
-  /**
-   *
-   */
-  GGRC.Components('treeItemStatusForWorkflow', {
-    tag: 'tree-item-status-for-workflow',
-    template: template,
-    viewModel: {
-      define: {
-        statusTitle: {
-          type: 'string',
-          get: function () {
-            return this.attr('instance.status') === 'InProgress' ?
-              'In Progress' :
-              this.attr('instance.status');
-          },
-        },
-        statusCSSClass: {
-          type: 'string',
-          get: function () {
-            return this.attr('instance.status') ?
-            'state-' + this.attr('instance.status').toLowerCase() : '';
-          },
-        },
+        if (status) {
+          const postfix = status
+            .replace(/[\s\t]+/g, '')
+            .toLowerCase();
+          result = `state-${postfix}`;
+        }
+
+        return result;
       },
-      instance: {},
     },
-  });
-})(window.can, window.GGRC);
+  },
+  instance: {},
+});
+
+export default can.Component({
+  tag: 'tree-item-status-for-workflow',
+  template,
+  viewModel,
+});

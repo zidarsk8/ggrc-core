@@ -21,16 +21,16 @@ class TestWorkflowState(unittest.TestCase):
   @ddt.data(
       (["Assigned", "Assigned", "Assigned"], "Assigned"),
       ([None, None, None], "Assigned"),
-      (["InProgress", "Assigned", "Assigned"], "InProgress"),
-      (["Finished", "Assigned", "Assigned"], "InProgress"),
-      (["Verified", "Assigned", "Assigned"], "InProgress"),
-      (["InProgress", "InProgress", "InProgress"], "InProgress"),
-      (["Finished", "InProgress", "Assigned"], "InProgress"),
-      (["Finished", "Declined", "Assigned"], "InProgress"),
+      (["In Progress", "Assigned", "Assigned"], "In Progress"),
+      (["Finished", "Assigned", "Assigned"], "In Progress"),
+      (["Verified", "Assigned", "Assigned"], "In Progress"),
+      (["In Progress", "In Progress", "In Progress"], "In Progress"),
+      (["Finished", "In Progress", "Assigned"], "In Progress"),
+      (["Finished", "Declined", "Assigned"], "In Progress"),
       (["Finished", "Finished", "Finished"], "Finished"),
       (["Verified", "Finished", "Finished"], "Finished"),
       (["Verified", "Verified", "Verified"], "Verified"),
-      (["Declined", "Declined", "Declined"], "InProgress"),
+      (["Declined", "Declined", "Declined"], "In Progress"),
       ([], None),
   )
   @ddt.unpack

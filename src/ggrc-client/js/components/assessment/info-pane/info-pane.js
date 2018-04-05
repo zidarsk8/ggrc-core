@@ -53,6 +53,8 @@ import {REFRESH_TAB_CONTENT,
 import Permission from '../../../permission';
 import template from './info-pane.mustache';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/custom-attribute-config';
+import pubsub from '../../../pub-sub';
+import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
 
 (function (can, GGRC, CMS) {
   'use strict';
@@ -93,10 +95,6 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
             return this.instance.attr('test_plan') ||
               this.instance.attr('issue_tracker.issue_url');
           },
-        },
-        isSaving: {
-          type: 'boolean',
-          value: false,
         },
         isLoading: {
           type: 'boolean',
@@ -182,6 +180,13 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
               this.attr('isAssessmentSaving');
           },
         },
+        // flag which indicates that changing of assessment state is blocked
+        isPending: {
+          get() {
+            return this.attr('isUpdatingEvidences') ||
+              this.attr('isUpdatingUrls');
+          },
+        },
       },
       modal: {
         open: false,
@@ -193,6 +198,7 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
       formState: {},
       noItemsText: '',
       initialState: 'Not Started',
+      deprecatedState: 'Deprecated',
       assessmentMainRoles: ['Creators', 'Assignees', 'Verifiers'],
       setUrlEditMode: function (value, type) {
         this.attr(type + 'EditMode', value);
@@ -428,6 +434,9 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
         let isUndo = event.undo;
         let newStatus = event.state;
         let instance = this.attr('instance');
+        let initialState = this.attr('initialState');
+        let deprecatedState = this.attr('deprecatedState');
+        let isArchived = instance.attr('archived');
         let previousStatus = instance.attr('previousStatus') || 'In Progress';
         let stopFn = tracker.start(instance.type,
           tracker.USER_JOURNEY_KEYS.NAVIGATION,
@@ -438,6 +447,10 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
           }
         };
 
+        if (isArchived && [initialState, deprecatedState].includes(newStatus)) {
+          return can.Deferred().resolve();
+        }
+
         this.attr('onStateChangeDfd', can.Deferred());
 
         if (isUndo) {
@@ -445,7 +458,6 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
         } else {
           instance.attr('previousStatus', instance.attr('status'));
         }
-        instance.attr('isPending', true);
 
         instance.attr('status', isUndo ? previousStatus : newStatus);
         if (instance.attr('status') === 'In Review' && !isUndo) {
@@ -457,9 +469,12 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
         return instance.save().then(() => {
           this.initializeFormFields();
           this.attr('onStateChangeDfd').resolve();
+          pubsub.dispatch({
+            type: 'refetchOnce',
+            modelNames: relatedAssessmentsTypes,
+          });
           stopFn();
-        }).always(() => instance.attr('isPending', false))
-          .fail(resetStatusOnConflict);
+        }).fail(resetStatusOnConflict);
       },
       saveGlobalAttributes: function (event) {
         const instance = this.attr('instance');

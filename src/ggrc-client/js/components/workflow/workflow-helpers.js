@@ -74,4 +74,11 @@ export default {
     });
     return dfd;
   },
+  async updateStatus(instance, status) {
+    // we refresh the instance, because without this
+    // the server will return us 409 error
+    const refreshed = await instance.refresh();
+    refreshed.attr('status', status);
+    return refreshed.save();
+  },
 };

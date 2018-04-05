@@ -7,7 +7,7 @@ import template from './bulk-update-target-state.mustache';
 
 let objectStateToWarningMap = {
   CycleTaskGroupObjectTask: {
-    InProgress: 'Please be aware that Finished, Declined and Verified ' +
+    'In Progress': 'Please be aware that Finished, Declined and Verified ' +
       'tasks cannot be moved to In Progress state.',
     Finished: 'Please be aware that Assigned and Verified ' +
       'tasks cannot be moved to Finished state.',

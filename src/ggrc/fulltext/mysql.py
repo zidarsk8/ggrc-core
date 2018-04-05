@@ -3,13 +3,7 @@
 """Full text index engine for Mysql DB backend"""
 from collections import defaultdict
 
-from sqlalchemy import and_
-from sqlalchemy import case
-from sqlalchemy import distinct
-from sqlalchemy import func
-from sqlalchemy import literal
-from sqlalchemy import or_
-from sqlalchemy import union
+import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import select
@@ -59,7 +53,7 @@ class MysqlIndexer(SqlIndexer):
     if not terms:
       return whitelist
     elif terms:
-      return and_(whitelist, MysqlRecordProperty.content.contains(terms))
+      return sa.and_(whitelist, MysqlRecordProperty.content.contains(terms))
 
   @staticmethod
   def get_permissions_query(model_names, permission_type='read',
@@ -67,6 +61,12 @@ class MysqlIndexer(SqlIndexer):
     """Prepare the query based on the allowed contexts and resources for
      each of the required objects(models).
     """
+    if not model_names:
+      # If there are no model names set, the result of the permissions query
+      # will always be false, so we can just return false instead of having an
+      # empty in statement combined with an empty list joined by or statement.
+      return sa.false()
+
     type_queries = []
     for model_name in model_names:
       contexts, resources = permissions.get_context_resource(
@@ -74,19 +74,20 @@ class MysqlIndexer(SqlIndexer):
           permission_type=permission_type,
           permission_model=permission_model
       )
-      statement = and_(
+      statement = sa.and_(
           MysqlRecordProperty.type == model_name,
           context_query_filter(MysqlRecordProperty.context_id, contexts)
       )
       if resources:
-        statement = or_(and_(MysqlRecordProperty.type == model_name,
-                             MysqlRecordProperty.key.in_(resources)),
-                        statement)
+        statement = sa.or_(sa.and_(MysqlRecordProperty.type == model_name,
+                                   MysqlRecordProperty.key.in_(resources)),
+                           statement)
       type_queries.append(statement)
 
-    return and_(
+    return sa.and_(
         MysqlRecordProperty.type.in_(model_names),
-        or_(*type_queries))
+        sa.or_(*type_queries)
+    )
 
   @staticmethod
   def search_get_owner_query(query, types=None, contact_id=None):
@@ -103,7 +104,7 @@ class MysqlIndexer(SqlIndexer):
 
     return query.join(
         union_query,
-        and_(
+        sa.and_(
             union_query.c.id == MysqlRecordProperty.key,
             union_query.c.type == MysqlRecordProperty.type),
     )
@@ -151,9 +152,9 @@ class MysqlIndexer(SqlIndexer):
         self.record_type.type.label('type'),
         self.record_type.property.label('property'),
         self.record_type.content.label('content'),
-        case(
-            [(self.record_type.property == 'title', literal(0))],
-            else_=literal(1)).label('sort_key'))
+        sa.case(
+            [(self.record_type.property == 'title', sa.literal(0))],
+            else_=sa.literal(1)).label('sort_key'))
 
     query = db.session.query(*columns)
     query = query.filter(self.get_permissions_query(
@@ -175,7 +176,7 @@ class MysqlIndexer(SqlIndexer):
       extra_q = self.search_get_owner_query(extra_q, [key], contact_id)
       extra_q = self._add_extra_params_query(extra_q, key, value)
       unions.append(extra_q)
-    all_queries = union(*unions)
+    all_queries = sa.union(*unions)
     all_queries = aliased(all_queries.order_by(
         all_queries.c.sort_key, all_queries.c.content))
     return db.session.execute(
@@ -189,8 +190,8 @@ class MysqlIndexer(SqlIndexer):
     extra_columns = extra_columns or {}
     model_names = self._get_grouped_types(types, extra_params)
     query = db.session.query(
-        self.record_type.type, func.count(distinct(
-            self.record_type.key)), literal(""))
+        self.record_type.type, sa.func.count(sa.distinct(
+            self.record_type.key)), sa.literal(""))
     query = query.filter(self.get_permissions_query(model_names))
     query = query.filter(self._get_filter_query(terms))
     query = self.search_get_owner_query(query, types, contact_id)
@@ -203,9 +204,11 @@ class MysqlIndexer(SqlIndexer):
 
     # Add extra_params and extra_colums:
     for key, value in all_extra_columns.iteritems():
-      extra_q = db.session.query(self.record_type.type,
-                                 func.count(distinct(self.record_type.key)),
-                                 literal(key))
+      extra_q = db.session.query(
+          self.record_type.type,
+          sa.func.count(sa.distinct(self.record_type.key)),
+          sa.literal(key)
+      )
       extra_q = extra_q.filter(self.get_permissions_query([value]))
       extra_q = extra_q.filter(self._get_filter_query(terms))
       extra_q = self.search_get_owner_query(extra_q, [value], contact_id)

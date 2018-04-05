@@ -42,6 +42,7 @@ import template from './object-state-toolbar.mustache';
           },
         },
       },
+      disabled: false,
       verifiers: [],
       instance: {},
       isActiveState: function () {

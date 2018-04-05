@@ -61,7 +61,12 @@ def get_user_task_count():
         )
     ).filter(
         CycleTaskGroupObjectTask.status.in_(
-            ["Assigned", "InProgress", "Finished", "Declined"]),
+            [
+                CycleTaskGroupObjectTask.ASSIGNED,
+                CycleTaskGroupObjectTask.IN_PROGRESS,
+                CycleTaskGroupObjectTask.FINISHED,
+                CycleTaskGroupObjectTask.DECLINED,
+            ]),
         Cycle.is_current == True  # noqa # pylint: disable=singleton-comparison
     ).all()
 

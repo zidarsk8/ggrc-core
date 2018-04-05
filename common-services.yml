@@ -1,0 +1,21 @@
+version: "2"
+services:
+  cleandev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+     - ".:/vagrant"
+    environment:
+     - PYTHONDONTWRITEBYTECODE=true
+     - NODE_PATH=/vagrant-dev/node_modules/
+     - GGRC_DATABASE_URI=mysql+mysqldb://root:root@db/ggrcdev?charset=utf8
+     - GGRC_DATABASE_HOST=db
+  db:
+    image: mysql:5.6
+    volumes:
+     - "./provision/docker/mysql:/etc/mysql/conf.d"
+    environment:
+     - MYSQL_ROOT_PASSWORD=root
+    tmpfs:
+      - /var/lib/mysql/:rw,noexec,nosuid,size=1G

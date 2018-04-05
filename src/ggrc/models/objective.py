@@ -7,7 +7,7 @@ from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.comment import Commentable
-from .mixins import BusinessObject, CustomAttributable, TestPlanned
+from ggrc.models import mixins
 from .object_document import PublicDocumentable
 from .object_person import Personable
 from .audit_object import Auditable
@@ -17,10 +17,22 @@ from .mixins.with_last_assessment_date import WithLastAssessmentDate
 from .mixins.with_similarity_score import WithSimilarityScore
 
 
-class Objective(WithLastAssessmentDate, Roleable, HasObjectState,
-                CustomAttributable, Auditable, Relatable, Personable,
-                PublicDocumentable, Commentable, TestPlanned,
-                WithSimilarityScore, BusinessObject, Indexed, db.Model):
+class Objective(WithLastAssessmentDate,
+                Roleable,
+                HasObjectState,
+                mixins.CustomAttributable,
+                mixins.WithStartDate,
+                mixins.WithLastDeprecatedDate,
+                Auditable,
+                Relatable,
+                Personable,
+                PublicDocumentable,
+                Commentable,
+                mixins.TestPlanned,
+                WithSimilarityScore,
+                mixins.BusinessObject,
+                Indexed,
+                db.Model):
   """Class representing Objective."""
 
   __tablename__ = 'objectives'

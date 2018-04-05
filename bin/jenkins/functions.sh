@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
@@ -44,24 +45,13 @@ setup () {
     PROJECT="${1}"
   fi
 
-  MACHINE_ID="${2:-dev selenium}"
+  SERVICE=$2
 
   git submodule update --init
 
-  docker-compose --file docker-compose-testing.yml --project-name ${PROJECT} \
-    build ${MACHINE_ID}
-
   docker-compose --file docker-compose-testing.yml \
     --project-name ${PROJECT} \
-    up --force-recreate -d ${MACHINE_ID}
-
-  echo "Provisioning ${PROJECT}_dev_1"
-  docker exec -i ${PROJECT}_dev_1 su -c "
-    source /vagrant/bin/init_vagrant_env
-    ln -s /vagrant-dev/node_modules /vagrant/node_modules
-    build_assets
-    make appengine_packages
-  "
+    up --build --force-recreate -d ${SERVICE}
 }
 
 teardown () {
@@ -81,12 +71,44 @@ echo "
 "
 }
 
+provision_dev() {
+  local dev_server=$1
+  echo "Provisioning ${PROJECT}_$dev_server"
+  docker exec -i ${PROJECT}_${dev_server} su -c "
+    source /vagrant/bin/init_vagrant_env
+    ln -s /vagrant-dev/node_modules /vagrant/node_modules
+    build_assets
+    make appengine_packages
+  "
+}
+
+
+reset_db_and_launch_dev() {
+  local dev_server=$1
+  echo "Resetting the DB for $dev_server"
+  docker exec -i ${PROJECT}_${dev_server} su -c "
+    source /vagrant/bin/init_vagrant_env
+    source /vagrant/bin/init_test_env
+    db_reset -d ggrcdevtest
+  "
+  echo "Running dev server $dev_server"
+  docker exec -id ${PROJECT}_${dev_server} su -c "
+    source /vagrant/bin/init_vagrant_env
+    source /vagrant/bin/init_test_env
+    export DASHBOARD_INTEGRATION='on'
+    launch_ggrc
+  "
+}
+
+
 integration_tests () {
   PROJECT=$1
   print_line
 
+  provision_dev "cleandev_1"
+
   echo "Running ${PROJECT}"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/bin/run_integration
   " && rc=$? || rc=$?
@@ -100,24 +122,11 @@ selenium_tests () {
   PROJECT=$1
   print_line
 
-  echo "Resetting the DB"
-  docker exec -i ${PROJECT}_dev_1 su -c "
-    source /vagrant/bin/init_vagrant_env
-    source /vagrant/bin/init_test_env
-    db_reset -d ggrcdevtest
-  "
-
-  echo "Running Test server"
-  docker exec -id ${PROJECT}_dev_1 su -c "
-    source /vagrant/bin/init_vagrant_env
-    source /vagrant/bin/init_test_env
-    export DASHBOARD_INTEGRATION='on'
-    launch_ggrc
-  "
+  provision_dev "cleandev_1" && reset_db_and_launch_dev "cleandev_1"
 
   echo "Running Selenium tests"
   docker exec -i ${PROJECT}_selenium_1 sh -c "
-    python /selenium/bin/run_selenium.py" && rc=$? || rc=$?
+    python /selenium/run_selenium.py" && rc=$? || rc=$?
 
   mv ./test/selenium/logs/results.xml ./test/selenium.xml || true
 
@@ -130,8 +139,10 @@ unittests_tests () {
   PROJECT=$1
   print_line
 
+  provision_dev "cleandev_1"
+
   echo "Running python unit tests"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/bin/run_unit
   " && unit_rc=$? || unit_rc=$?
@@ -142,7 +153,7 @@ unittests_tests () {
 
   echo "Running karma tests"
 
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/node_modules/karma/bin/karma start \\
       /vagrant/karma.conf.js --single-run --reporters dots,junit
@@ -160,7 +171,7 @@ code_style_tests () {
   print_line
 
   echo "Running pylint"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/bin/check_pylint_diff
   " && pylint_rc=$? || pylint_rc=$?
@@ -176,7 +187,7 @@ code_style_tests () {
   print_line
 
   echo "Running flake8"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/bin/check_flake8_diff
   " && flake_rc=$? || flake_rc=$?
@@ -192,7 +203,7 @@ code_style_tests () {
   print_line
 
   echo "Running eslint"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     export PATH=\$PATH:/vagrant-dev/node_modules/.bin
     /vagrant/bin/check_eslint_diff
   " && eslint_rc=$? || eslint_rc=$?
@@ -208,7 +219,7 @@ code_style_tests () {
   print_line
 
   echo "Running misspell"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     make misspell
   " && misspell_rc=$? || misspell_rc=$?
 
@@ -223,7 +234,7 @@ code_style_tests () {
   print_line
 
   echo "Running license header check"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     /vagrant/bin/check_license_headers
   " && license_rc=$? || license_rc=$?
 
@@ -258,7 +269,7 @@ checkstyle_tests () {
   print_line
 
   echo "Running pylint"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     pylint -f parseable src/ggrc\
                         src/ggrc_basic_permissions\
@@ -275,7 +286,7 @@ checkstyle_tests () {
   print_line
 
   echo "Running eslint"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     eslint -f checkstyle src -o test/eslint.xml
   " || true
@@ -283,7 +294,7 @@ checkstyle_tests () {
   print_line
 
   echo "Running flake8"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     flake8 --config setup.cfg src/ test/ > test/flake8.out
   " || true
@@ -291,7 +302,7 @@ checkstyle_tests () {
   print_line
 
   echo "Running misspell"
-  docker exec -i ${PROJECT}_dev_1 su -c "
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     make misspell
   " || true

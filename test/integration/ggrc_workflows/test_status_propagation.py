@@ -67,13 +67,13 @@ class TestWorkflowCycleStatePropagation(TestCase):
       for cycle_task in cycle_tasks:
         self.assertEqual(cycle_task.status, "Assigned")
 
-      # Move one task to InProgress
+      # Move one task to In Progress
       _, first_ct = self.generator.modify_object(
-          first_ct, {"status": "InProgress"})
+          first_ct, {"status": "In Progress"})
 
-      self.assertEqual(first_ct.status, "InProgress")
+      self.assertEqual(first_ct.status, "In Progress")
       ctg = db.session.query(CycleTaskGroup).get(ctg.id)
-      self.assertEqual(ctg.status, "InProgress")
+      self.assertEqual(ctg.status, "In Progress")
 
       # Undo operation
       _, first_ct = self.generator.modify_object(
@@ -86,10 +86,10 @@ class TestWorkflowCycleStatePropagation(TestCase):
       # Move both to in progress
       for cycle_task in cycle_tasks:
         self.generator.modify_object(
-            cycle_task, {"status": "InProgress"})
+            cycle_task, {"status": "In Progress"})
 
       ctg = db.session.query(CycleTaskGroup).get(ctg.id)
-      self.assertEqual(ctg.status, "InProgress")
+      self.assertEqual(ctg.status, "In Progress")
 
       # Undo one cycle task
       _, first_ct = self.generator.modify_object(
@@ -98,8 +98,8 @@ class TestWorkflowCycleStatePropagation(TestCase):
       ctg = db.session.query(CycleTaskGroup).get(ctg.id)
 
       self.assertEqual(first_ct.status, "Assigned")
-      self.assertEqual(second_ct.status, "InProgress")
-      self.assertEqual(ctg.status, "InProgress")
+      self.assertEqual(second_ct.status, "In Progress")
+      self.assertEqual(ctg.status, "In Progress")
 
       # Undo second cycle task
       _, second_ct = self.generator.modify_object(
@@ -125,10 +125,10 @@ class TestWorkflowCycleStatePropagation(TestCase):
           Cycle).join(Workflow).filter(Workflow.id == wf.id).all()
       first_ct, second_ct = cycle_tasks
 
-      # Move both tasks to InProgress
+      # Move both tasks to In Progress
       for cycle_task in cycle_tasks:
         self.generator.modify_object(
-            cycle_task, {"status": "InProgress"})
+            cycle_task, {"status": "In Progress"})
 
       # Test that moving one task to finished doesn't finish entire cycle
       _, first_ct = self.generator.modify_object(
@@ -137,8 +137,8 @@ class TestWorkflowCycleStatePropagation(TestCase):
       ctg = db.session.query(CycleTaskGroup).get(ctg.id)
 
       self.assertEqual(first_ct.status, "Finished")
-      self.assertEqual(second_ct.status, "InProgress")
-      self.assertEqual(ctg.status, "InProgress")
+      self.assertEqual(second_ct.status, "In Progress")
+      self.assertEqual(ctg.status, "In Progress")
 
       # Test moving second task to Finished - entire cycle should be finished
       _, second_ct = self.generator.modify_object(
@@ -150,15 +150,15 @@ class TestWorkflowCycleStatePropagation(TestCase):
       self.assertEqual(first_ct.status, "Finished")
       self.assertEqual(ctg.status, "Finished")
 
-      # Undo one task, cycle should be InProgress
+      # Undo one task, cycle should be In Progress
       _, first_ct = self.generator.modify_object(
-          first_ct, {"status": "InProgress"})
+          first_ct, {"status": "In Progress"})
       second_ct = db.session.query(CycleTaskGroupObjectTask).get(second_ct.id)
       ctg = db.session.query(CycleTaskGroup).get(ctg.id)
 
-      self.assertEqual(first_ct.status, "InProgress")
+      self.assertEqual(first_ct.status, "In Progress")
       self.assertEqual(second_ct.status, "Finished")
-      self.assertEqual(ctg.status, "InProgress")
+      self.assertEqual(ctg.status, "In Progress")
 
   def test_weekly_state_transitions_finished_verified(self):
     """Test Finished to Verified transitions"""
@@ -174,10 +174,10 @@ class TestWorkflowCycleStatePropagation(TestCase):
           Cycle).join(Workflow).filter(Workflow.id == wf.id).all()
       first_ct, second_ct = cycle_tasks
 
-      # Move both tasks to InProgress
+      # Move both tasks to In Progress
       for cycle_task in cycle_tasks:
         self.generator.modify_object(
-            cycle_task, {"status": "InProgress"})
+            cycle_task, {"status": "In Progress"})
         self.generator.modify_object(
             cycle_task, {"status": "Finished"})
 
@@ -225,10 +225,10 @@ class TestWorkflowCycleStatePropagation(TestCase):
           Cycle).join(Workflow).filter(Workflow.id == wf.id).all()
       first_ct, second_ct = cycle_tasks
 
-      # Move both tasks to InProgress
+      # Move both tasks to In Progress
       for cycle_task in cycle_tasks:
         self.generator.modify_object(
-            cycle_task, {"status": "InProgress"})
+            cycle_task, {"status": "In Progress"})
         self.generator.modify_object(
             cycle_task, {"status": "Finished"})
 
@@ -244,10 +244,10 @@ class TestWorkflowCycleStatePropagation(TestCase):
 
       self.assertEqual(first_ct.status, "Declined")
       self.assertEqual(second_ct.status, "Finished")
-      self.assertEqual(ctg.status, "InProgress")
+      self.assertEqual(ctg.status, "In Progress")
 
   def test_deleted_task_state_transitions(self):
-    """Test InProgress to Finished transition after task is deleted"""
+    """Test In Progress to Finished transition after task is deleted"""
 
     with freeze_time("2016-6-10 13:00:00"):  # Friday, 6/10/2016
       _, wf = self.generator.generate_workflow(self.weekly_wf)
@@ -258,8 +258,8 @@ class TestWorkflowCycleStatePropagation(TestCase):
       first_ct, second_ct = db.session.query(CycleTaskGroupObjectTask).join(
           Cycle).join(Workflow).filter(Workflow.id == wf.id).all()
 
-      # Move first task to InProgress
-      self.generator.modify_object(first_ct, {"status": "InProgress"})
+      # Move first task to In Progress
+      self.generator.modify_object(first_ct, {"status": "In Progress"})
       self.generator.modify_object(first_ct, {"status": "Finished"})
       # Delete second task
       response = self.generator.api.delete(second_ct)
@@ -269,7 +269,7 @@ class TestWorkflowCycleStatePropagation(TestCase):
       self.assertEqual(ctg.status, "Finished")
 
   def test_cycle_change_on_ct_status_transition(self):
-    """Test cycle is_current change on task Finished to InProgress transition
+    """Test cycle is_current change on task Finished to In Progress transition
     """
     with freeze_time("2016-6-10 13:00:00"):  # Friday, 6/10/2016
       _, wf = self.generator.generate_workflow(self.weekly_wf)
@@ -294,8 +294,8 @@ class TestWorkflowCycleStatePropagation(TestCase):
 
     self.assertEqual(cycle.is_current, False)
 
-    # Move second task back to InProgress
-    self.api.put(second_ct, {"status": "InProgress"})
+    # Move second task back to In Progress
+    self.api.put(second_ct, {"status": "In Progress"})
     # cycle now should have is_current == True
 
     cycle = db.session.query(Cycle).get(ctg.cycle.id)
@@ -320,10 +320,10 @@ class TestWorkflowCycleStatePropagation(TestCase):
       cycle_tasks = db.session.query(CycleTaskGroupObjectTask).join(
           Cycle).join(Workflow).filter(Workflow.id == wf.id).all()
 
-      # Move all tasks to InProgress
+      # Move all tasks to In Progress
       threads = []
       for cycle_task in cycle_tasks:
-        change_state(cycle_task, "InProgress")
+        change_state(cycle_task, "In Progress")
         threads.append(Thread(target=change_state,
                               args=(cycle_task, "Finished")))
 
@@ -372,7 +372,7 @@ class TestWorkflowCycleStatePropagation(TestCase):
 
       # move task1 to Verified
       task1 = self._get_obj(CycleTaskGroupObjectTask, "task1")
-      self.api.put(task1, {"status": "InProgress"})
+      self.api.put(task1, {"status": "In Progress"})
       self.api.put(task1, {"status": "Finished"})
       self.api.put(task1, {"status": "Verified"})
 
@@ -380,11 +380,11 @@ class TestWorkflowCycleStatePropagation(TestCase):
       tg = self._get_obj(CycleTaskGroup, "test group")
       self.assertEqual(tg.end_date, dtm.date(2016, 6, 15))
       self.assertEqual(tg.next_due_date, dtm.date(2016, 6, 15))
-      self.assertEqual(tg.status, "InProgress")
+      self.assertEqual(tg.status, "In Progress")
 
       # move task2 to Verified
       task2 = self._get_obj(CycleTaskGroupObjectTask, "task2")
-      self.api.put(task2, {"status": "InProgress"})
+      self.api.put(task2, {"status": "In Progress"})
       self.api.put(task2, {"status": "Finished"})
       self.api.put(task2, {"status": "Verified"})
 
@@ -429,13 +429,13 @@ class TestWorkflowCycleStatePropagation(TestCase):
 
       # move task2 to Verified
       task2 = self._get_obj(CycleTaskGroupObjectTask, "task2")
-      self.api.put(task2, {"status": "InProgress"})
+      self.api.put(task2, {"status": "In Progress"})
       self.api.put(task2, {"status": "Finished"})
       self.api.put(task2, {"status": "Verified"})
 
       # check task group status
       cycle = self._get_obj(Cycle, "test workflow")
-      self.assertEqual(cycle.status, "InProgress")
+      self.assertEqual(cycle.status, "In Progress")
 
       # delete task1
       task = self._get_obj(CycleTaskGroupObjectTask, "task1")

@@ -472,10 +472,10 @@ class CustomAttributable(object):
       res["custom_attribute_definitions"] = []
       res["custom_attribute_values"] = []
 
-    res["custom_attributes"] = res["custom_attribute_values"]
     return res
 
   def validate_custom_attributes(self):
+    """Set CADs and validate CAVs one by one."""
     # pylint: disable=not-an-iterable; we can iterate over relationships
     map_ = {d.id: d for d in self.custom_attribute_definitions}
     for value in self._custom_attribute_values:

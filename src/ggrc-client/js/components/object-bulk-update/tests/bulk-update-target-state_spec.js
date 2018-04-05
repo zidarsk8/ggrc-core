@@ -7,7 +7,7 @@ import Component from '../bulk-update-target-state.js';
 
 let objectStateToWarningMap = {
   CycleTaskGroupObjectTask: {
-    InProgress: 'Please be aware that Finished, Declined and Verified ' +
+    'In Progress': 'Please be aware that Finished, Declined and Verified ' +
       'tasks cannot be moved to In Progress state.',
     Finished: 'Please be aware that Assigned and Verified ' +
       'tasks cannot be moved to Finished state.',
@@ -26,7 +26,7 @@ describe('GGRC.Components.bulkUpdateTargetState', function () {
   describe('warningMessage property', function () {
     it('should return appropriate warnings for objects', function () {
       let objectStatesMap = {
-        CycleTaskGroupObjectTask: ['Assigned', 'InProgress', 'Finished',
+        CycleTaskGroupObjectTask: ['Assigned', 'In Progress', 'Finished',
           'Declined', 'Deprecated', 'Verified'],
       };
 

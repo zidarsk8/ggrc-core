@@ -122,4 +122,112 @@ describe('CMS.Controllers.InnerNav', function () {
       expect(options.notPriorityTabs).toEqual(null);
     });
   });
+
+  describe('tryToRefetchOnce method', () => {
+    let ctrlInst; // fake controller instance
+    let tryToRefetchOnce;
+    let options;
+
+    beforeEach(() => {
+      options = {
+        widget_list: new can.Observe.List([
+          {selector: '#control_widget', model: CMS.Models.Control},
+          {selector: '#section_widget', model: CMS.Models.Section},
+          {selector: '#assessment_widget', model: CMS.Models.Assessment},
+          {selector: '#super_widget'},
+          {selector: '#objective_widget', model: CMS.Models.Objective},
+        ]),
+        refetchOnce: new Set(),
+      };
+
+      ctrlInst = {
+        options: new can.Map(options),
+      };
+
+      tryToRefetchOnce = Ctrl.prototype.tryToRefetchOnce.bind(ctrlInst);
+    });
+
+    it('should return "fasle". "refetchOnce" is empty', () => {
+      let result = tryToRefetchOnce('#control_widget');
+      expect(result).toBeFalsy();
+    });
+
+    it('should return "false". control does not have "Vendor" widget', () => {
+      ctrlInst.options.attr('refetchOnce').add('Vendor');
+      let result = tryToRefetchOnce('#vendor_widget');
+      expect(result).toBeFalsy();
+    });
+
+    it('should return "false". "refetchOnce" does not have "Control"', () => {
+      ctrlInst.options.attr('refetchOnce').add('Vendor');
+      let result = tryToRefetchOnce('#control_widget');
+      expect(result).toBeFalsy();
+    });
+
+    it('should return "false". "super_widget" does not have model', () => {
+      ctrlInst.options.attr('refetchOnce').add('Super');
+      let result = tryToRefetchOnce('#super_widget');
+      expect(result).toBeFalsy();
+    });
+
+    it('should return "true" and remove "Control" from "refetchOnce"', () => {
+      const refetchOnce = ctrlInst.options.attr('refetchOnce');
+      refetchOnce.add('Control');
+      refetchOnce.add('Vendor');
+
+      expect(refetchOnce.size).toBe(2);
+      let result = tryToRefetchOnce('#control_widget');
+      expect(result).toBeTruthy();
+      expect(refetchOnce.size).toBe(1);
+      expect(refetchOnce.has('Vendor')).toBeTruthy();
+    });
+  });
+
+  describe('addRefetchOnceItems method', () => {
+    let ctrlInst; // fake controller instance
+    let addRefetchOnceItems;
+    let options;
+
+    beforeEach(() => {
+      options = {
+        refetchOnce: new Set(),
+      };
+
+      ctrlInst = {
+        options: new can.Map(options),
+      };
+
+      addRefetchOnceItems = Ctrl.prototype.addRefetchOnceItems.bind(ctrlInst);
+    });
+
+    it('should add item to set. "modelNames" is string', () => {
+      addRefetchOnceItems('Control');
+
+      const refetchOnce = ctrlInst.options.attr('refetchOnce');
+      expect(refetchOnce.size).toBe(1);
+      expect(refetchOnce.has('Control')).toBeTruthy();
+    });
+
+    it('should add items to set. "modelNames" is array', () => {
+      addRefetchOnceItems(['Control', 'Vendor']);
+
+      const refetchOnce = ctrlInst.options.attr('refetchOnce');
+      expect(refetchOnce.size).toBe(2);
+      expect(refetchOnce.has('Control')).toBeTruthy();
+      expect(refetchOnce.has('Vendor')).toBeTruthy();
+    });
+
+    it('should corrent merge sets', () => {
+      ctrlInst.options.attr('refetchOnce').add('Objective');
+      expect(ctrlInst.options.attr('refetchOnce').size).toBe(1);
+
+      addRefetchOnceItems(['Control', 'Vendor', 'Objective']);
+
+      const refetchOnce = ctrlInst.options.attr('refetchOnce');
+      expect(refetchOnce.size).toBe(3);
+      expect(refetchOnce.has('Control')).toBeTruthy();
+      expect(refetchOnce.has('Vendor')).toBeTruthy();
+      expect(refetchOnce.has('Objective')).toBeTruthy();
+    });
+  });
 });

@@ -415,9 +415,9 @@ describe('GGRC.Components.objectMapper', function () {
       });
       viewModel.attr('deferred', false);
 
-      instance = {
+      instance = new can.Map({
         refresh: $.noop,
-      };
+      });
       spyOn(CMS.Models.Program, 'findInCacheById')
         .and.returnValue(instance);
       event = {

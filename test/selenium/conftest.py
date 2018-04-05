@@ -4,18 +4,18 @@
 # pylint: disable=invalid-name
 # pylint: disable=global-variable-not-assigned
 # pylint: disable=unused-argument
+# pylint: disable=redefined-outer-name
+
+import os
+import urlparse
 
 import pytest
 
-from lib import dynamic_fixtures
+from lib import dynamic_fixtures, environment, url
 from lib.page import dashboard
 from lib.service import rest_service
 from lib.utils import selenium_utils, help_utils
 from lib.utils.selenium_utils import get_full_screenshot_as_base64
-
-# pylint: disable=redefined-outer-name
-pytest_plugins = "selenium", "xdist", "xvfb", "timeout", "flask", \
-                 "rerunfailures", "timeout", "repeat", "pycharm"
 
 
 def _common_fixtures(fixture):
@@ -68,12 +68,19 @@ def pytest_runtest_makereport(item, call):
   report.extra = extra
 
 
+def pytest_addoption(parser):
+  """Add support for headless option to pytest-selenium."""
+  parser.addoption('--headless',
+                   action='store',
+                   help='enable headless mode for supported browsers.')
+
+
 @pytest.fixture(scope="function")
-def selenium(selenium):
-  """Create Web Driver instance and setup test resources for running test
-  in headless mode.
-  """
-  selenium.set_window_size(1440, 900)
+def selenium(selenium, pytestconfig):
+  """Create Web Driver instance."""
+  if not selenium_utils.is_headless_chrome(pytestconfig):
+    selenium.set_window_size(
+        os.environ["SCREEN_WIDTH"], os.environ["SCREEN_HEIGHT"])
   dynamic_fixtures.dict_executed_fixtures.update({"selenium": selenium})
   yield selenium
 
@@ -97,26 +104,28 @@ def create_tmp_dir(tmpdir_factory, request):
 
 
 @pytest.fixture
-def chrome_options(chrome_options, create_tmp_dir):
+def chrome_options(chrome_options, pytestconfig):
   """Set configuration to run Chrome with specific options."""
-  prefs = {"download.default_directory": create_tmp_dir,
-           "download.prompt_for_download": False}
-  chrome_options.add_experimental_option("prefs", prefs)
-  chrome_options.add_argument("--start-maximized")
+  if selenium_utils.is_headless_chrome(pytestconfig):
+    chrome_options.set_headless(True)
+    chrome_options.add_argument("window-size={},{}".format(
+        os.environ["SCREEN_WIDTH"], os.environ["SCREEN_HEIGHT"]))
   return chrome_options
 
 
-@pytest.fixture(scope="session")
-def base_url(base_url):
-  """Add '/' if base_url not end by '/'."""
-  yield base_url if base_url[-1] == "/" else base_url + "/"
+@pytest.fixture(scope="function", autouse=True)
+def dev_url():
+  """Set environment.app_url to be used as a base url"""
+  environment.app_url = os.environ["DEV_URL"]
+  environment.app_url = urlparse.urljoin(environment.app_url, "/")
+  return environment.app_url
 
 
 @pytest.fixture(scope="function")
 def my_work_dashboard(selenium):
   """Open My Work Dashboard URL and
   return My Work Dashboard page objects model."""
-  selenium_utils.open_url(selenium, dashboard.Dashboard.URL)
+  selenium_utils.open_url(selenium, url.Urls().dashboard)
   return dashboard.Dashboard(selenium)
 
 
@@ -124,7 +133,7 @@ def my_work_dashboard(selenium):
 def header_dashboard(selenium):
   """Open My Work Dashboard URL and
   return Header Dashboard page objects model."""
-  selenium_utils.open_url(selenium, dashboard.Dashboard.URL)
+  selenium_utils.open_url(selenium, url.Urls().dashboard)
   return dashboard.Header(selenium)
 
 

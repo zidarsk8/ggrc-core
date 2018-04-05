@@ -174,7 +174,7 @@ describe('StateUtils', function () {
 
   describe('getBulkStatesForModel() method', function () {
     it('returns expected states for CycleTaskGroupObjectTask', function () {
-      let expected = ['InProgress', 'Finished',
+      let expected = ['In Progress', 'Finished',
         'Declined', 'Deprecated', 'Verified'];
 
       let actual = StateUtils
