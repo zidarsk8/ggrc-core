@@ -5,6 +5,9 @@
 
 import {confirm} from '../../plugins/utils/modals';
 import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
+import {
+  getInstanceView,
+} from '../../plugins/utils/object-history-utils';
 import RefreshQueue from '../../models/refresh_queue';
 
 export default can.Component.extend({
@@ -22,7 +25,8 @@ export default can.Component.extend({
     leftRevisionDescription: '',
     rightRevisionDescription: '',
     compareIt: function () {
-      const view = this.attr('instance.view');
+      const instance = this.attr('instance');
+      const view = this.attr('instance.view') || getInstanceView(instance);
       const that = this;
       const currentRevisionID = this.attr('leftRevisionId');
       const rightRevision = this.attr('rightRevision');

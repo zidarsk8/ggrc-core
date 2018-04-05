@@ -7,7 +7,6 @@ import {
   buildModifiedACL,
   buildModifiedListField,
   buildModifiedAttValues,
-  getInstanceView,
 } from '../../plugins/utils/object-history-utils';
 
 import template from './templates/review-proposal.mustache';
@@ -42,9 +41,6 @@ export default can.Component.extend({
       let query;
 
       this.attr('isLoading', true);
-
-      // build isntance view
-      instance.attr('view', getInstanceView(instance));
 
       if (leftRevisionId && rightRevision) {
         this.attr('isLoading', false);
