@@ -248,7 +248,8 @@ def build_cycle(workflow, cycle=None, current_user=None):
 
   if not workflow.tasks:
     logger.error("Starting a cycle has failed on Workflow with "
-                 "slug == '%s' and id == '%s'", workflow.slug, workflow.id)
+                 "slug == '%s' and id == '%s', due to empty setup",
+                 workflow.slug, workflow.id)
     build_failed = True
 
   # Use Admin role when this is called via the cron job.
