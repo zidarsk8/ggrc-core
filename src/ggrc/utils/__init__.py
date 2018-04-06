@@ -9,6 +9,7 @@ specific utilities should be in their own module.
 import collections
 import logging
 import datetime
+import functools
 import json
 import re
 import sys
@@ -329,3 +330,19 @@ def dump_attrs(obj):
   attrs_cls = collections.namedtuple('Dumped%s' % obj_cls.__name__, attrs)
   values = tuple(getattr(obj, k, None) for k in attrs)
   return attrs_cls(*values)
+
+
+def validate_mimetype(accepted_mimetype):
+  """Check flask request mimetype to match the one provided."""
+  def mimetype_decorator(function):
+    """Decorates passed function with mimetype check."""
+    @functools.wraps(function)
+    def inner(*args, **kwargs):
+      """Check mimetype and return an error if it's wrong."""
+      if flask.request.mimetype != accepted_mimetype:
+        return flask.current_app.make_response(
+            ("Content-Type must be {}".format(accepted_mimetype), 415, []),
+        )
+      return function(*args, **kwargs)
+    return inner
+  return mimetype_decorator

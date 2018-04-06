@@ -8,8 +8,10 @@
 import os
 import unittest
 
+import mock
 from mock import patch
 
+from ggrc import utils
 from ggrc.utils import get_url_root
 from ggrc.settings import default
 
@@ -73,3 +75,52 @@ class TestSettings(unittest.TestCase):
     self.assertEqual(default.COMPANY_LOGO_TEXT, "TestCompanyLogo")
     self.assertEqual(default.CREATE_ISSUE_URL, "TestRMCCreateIssueURL")
     self.assertEqual(default.CREATE_ISSUE_BUTTON_NAME, "TestCreateButtonName")
+
+
+@mock.patch("ggrc.utils.flask")
+class TestValidateMimetype(unittest.TestCase):
+  """Test mimetype validation decorator."""
+
+  SUCCESS = "Successfully called"
+  VALID_MIMETYPE = "my-custom-mimetype"
+
+  @utils.validate_mimetype(VALID_MIMETYPE)
+  def decorated_target(self):
+    """Dummy response builder."""
+    # utils.flask should be mocked already
+    return utils.flask.current_app.make_response(
+        (self.SUCCESS, 200, []),
+    )
+
+  def test_validate_mimetype_valid(self, flask_mock):
+    """Mimetype validator calls the decorated function if mimetype matches."""
+    flask_mock.request.mimetype = self.VALID_MIMETYPE
+
+    response = self.decorated_target()
+
+    flask_mock.current_app.make_response.assert_called_once_with(
+        (self.SUCCESS, 200, []),
+    )
+    self.assertIs(response, flask_mock.current_app.make_response.return_value)
+
+  def test_validate_mimetype_empty(self, flask_mock):
+    """Mimetype validator returns HTTP415 if mimetype is not set."""
+    flask_mock.request.mimetype = None
+
+    response = self.decorated_target()
+
+    flask_mock.current_app.make_response.assert_called_once_with(
+        ("Content-Type must be {}".format(self.VALID_MIMETYPE), 415, []),
+    )
+    self.assertIs(response, flask_mock.current_app.make_response.return_value)
+
+  def test_validate_mimetype_invalid(self, flask_mock):
+    """Mimetype validator returns HTTP415 if mimetype doesn't match."""
+    flask_mock.request.mimetype = "invalid"
+
+    response = self.decorated_target()
+
+    flask_mock.current_app.make_response.assert_called_once_with(
+        ("Content-Type must be {}".format(self.VALID_MIMETYPE), 415, []),
+    )
+    self.assertIs(response, flask_mock.current_app.make_response.return_value)

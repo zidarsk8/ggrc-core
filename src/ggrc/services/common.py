@@ -533,6 +533,7 @@ class Resource(ModelView):
             not permissions.has_conditions('update', self.model.__name__)):
       raise Forbidden()
 
+  @utils.validate_mimetype("application/json")
   def put(self, id):
     with benchmark("Query for object"):
       obj = self.get_object(id)
@@ -542,9 +543,6 @@ class Resource(ModelView):
     initial_state = dump_attrs(obj)
 
     src = self.request.json
-    if self.request.mimetype != 'application/json':
-      return current_app.make_response(
-          ('Content-Type must be application/json', 415, []))
     header_error = self.validate_headers_for_put_or_delete(obj)
     if header_error:
       return header_error
@@ -1031,12 +1029,9 @@ class Resource(ModelView):
     logger.warning(message)
     return (400, message)
 
-  def collection_post(self):  # noqa
+  @utils.validate_mimetype("application/json")  # noqa
+  def collection_post(self):
     with benchmark("collection post"):
-      if self.request.mimetype != 'application/json':
-        return current_app.make_response((
-            'Content-Type must be application/json', 415, []))
-
       if 'X-GGRC-BackgroundTask' in request.headers:
         if 'X-Appengine-Taskname' not in request.headers:
           task = create_task(request.method, request.full_path,
