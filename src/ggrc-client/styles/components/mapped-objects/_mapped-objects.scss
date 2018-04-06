@@ -221,6 +221,7 @@
 .mapped-folder {
   display: flex;
   line-height: 26px;
+  max-width: 440px;
 
   .mapped-folder__folder-info {
     display: flex;
@@ -259,6 +260,12 @@
     display: flex;
     align-self: center;
     margin-right: 5px;
+  }
+}
+
+.modal {
+  .mapped-folder {
+    max-width: 530px;
   }
 }
 
