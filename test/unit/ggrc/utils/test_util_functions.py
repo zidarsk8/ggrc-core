@@ -22,7 +22,7 @@ class TestGetUrlRoot(unittest.TestCase):
   def test_using_request_url_when_custom_url_root_setting_undefined(self):
     """Url root should be read from request if not set in environment."""
     with patch("ggrc.utils.CUSTOM_URL_ROOT", None):
-      with patch("ggrc.utils.request") as fake_request:
+      with patch("ggrc.utils.flask.request") as fake_request:
         fake_request.url_root = "http://www.foo.com/"
         result = get_url_root()
 
@@ -32,7 +32,7 @@ class TestGetUrlRoot(unittest.TestCase):
     """Url root should be read from request if set to empty string in environ.
     """
     with patch("ggrc.utils.CUSTOM_URL_ROOT", ""):
-      with patch("ggrc.utils.request") as fake_request:
+      with patch("ggrc.utils.flask.request") as fake_request:
         fake_request.url_root = "http://www.foo.com/"
         result = get_url_root()
 
@@ -41,7 +41,7 @@ class TestGetUrlRoot(unittest.TestCase):
   def test_using_custom_url_root_setting_if_defined(self):
     """Url root should be read from environment if defined there."""
     with patch("ggrc.utils.CUSTOM_URL_ROOT", "http://www.default-root.com/"):
-      with patch("ggrc.utils.request") as fake_request:
+      with patch("ggrc.utils.flask.request") as fake_request:
         fake_request.url_root = "http://www.foo.com/"
         result = get_url_root()
 

@@ -16,7 +16,7 @@ import sys
 import sqlalchemy
 from sqlalchemy.orm import class_mapper
 
-from flask import request
+import flask
 from ggrc.settings import CUSTOM_URL_ROOT
 from ggrc.utils import benchmarks
 
@@ -163,7 +163,7 @@ def merge_dicts(*args):
 def get_url_root():
   if CUSTOM_URL_ROOT:
     return CUSTOM_URL_ROOT
-  return request.url_root
+  return flask.request.url_root
 
 
 def _prefix_camelcase(name, prefix):
