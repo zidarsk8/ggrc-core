@@ -185,7 +185,6 @@ import {REFRESH_SUB_TREE} from '../events/eventTypes';
     },
 
     tree_view_options: {
-      sort_property: 'sort_index',
       draw_children: true,
     },
 
@@ -265,7 +264,6 @@ import {REFRESH_SUB_TREE} from '../events/eventTypes';
       },
     },
     tree_view_options: {
-      sort_property: 'sort_index',
       attr_view: _mustachePath + '/tree-item-attr.mustache',
       attr_list: [
         {

@@ -30,7 +30,6 @@ import '../../components/quick_form/quick_update';
 import '../../components/reminder';
 import '../../components/rich_text/rich_text';
 import '../../components/object_cloner/object_cloner';
-import '../../components/sort_by_sort_index/sort_by_sort_index';
 import '../../components/tree_pagination/tree_pagination';
 import '../../components/tree/tree-widget-container';
 import '../../components/snapshotter/scope-update';

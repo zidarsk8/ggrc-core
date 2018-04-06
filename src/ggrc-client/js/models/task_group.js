@@ -37,7 +37,6 @@ import Permission from '../permission';
     },
 
     tree_view_options: {
-      sort_property: 'sort_index',
       attr_view: GGRC.mustache_path + '/task_groups/tree-item-attr.mustache',
       add_item_view: GGRC.mustache_path + '/task_groups/tree_add_item.mustache',
       mapper_attr_list: [
@@ -162,7 +161,6 @@ import Permission from '../permission';
       this.bind('created', function (ev, instance) {
         if (instance instanceof that) {
           if (instance.task_group.reify().selfLink) {
-            instance.task_group.reify().refresh();
             instance._refresh_workflow_people();
           }
         }
@@ -204,40 +202,6 @@ import Permission from '../permission';
       this.attr('start_date', startDate);
       this.attr('end_date', endDate);
       this.attr('minStartDate', new Date());
-
-      this.bind('task_group', function (ev, newTask) {
-        let task;
-        let taskGroup;
-        let props = [
-          'relative_start_day',
-          'relative_start_month',
-          'relative_end_day',
-          'relative_end_month',
-          'start_date',
-          'end_date',
-        ];
-        if (!newTask) {
-          return;
-        }
-        newTask = newTask.reify();
-        taskGroup = newTask.get_mapping('task_group_tasks').slice(0);
-
-        do {
-          task = taskGroup.splice(-1)[0];
-          task = task && task.instance;
-        } while (task === this);
-
-        if (!task) {
-          return;
-        }
-        can.each(props, function (prop) {
-          if (task[prop] && !this[prop]) {
-            this.attr(prop, task.attr(prop) instanceof Date ?
-              new Date(task[prop]) :
-              task[prop]);
-          }
-        }, this);
-      });
     },
     _refresh_workflow_people: function () {
       //  TaskGroupTask assignment may add mappings and role assignments in

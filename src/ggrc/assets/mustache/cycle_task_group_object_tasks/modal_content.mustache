@@ -66,7 +66,7 @@
             <br>
             {{^if_in instance.status "Finished,Verified"}}
             <a class="section-add section-sticky btn btn-small btn-white"
-              href="javascript://" 
+              href="javascript://"
               {{data "deferred_to"}}
               data-placement="left"
               data-toggle="unified-mapper"
@@ -186,7 +186,6 @@
   </div>
   <div class="row-fluid hidden">
     <input type="hidden" name="task_group" model="TaskGroup" value="{{firstnonempty object_params.task_group instance.task_group.id}}" />
-    <input type="hidden" name="sort_index" value="{{firstnonempty object_params.sort_index instance.sort_index}}" />
     <input type="hidden" name="cycle" model="Cycle" value="{{instance.cycle.id}}" data-populated-in-callback />
     <input type="hidden" name="context" model="Context" value="{{firstnonempty object_params.context instance.context.id}}" data-populated-in-callback />
     <input type="hidden" name="status" value="{{firstnonempty instance.status 'Assigned'}}" />
