@@ -132,9 +132,23 @@ import RefreshQueue from './refresh_queue';
       this.content = revision.content;
     },
     display_name: function () {
+      if (!this.revision) {
+        // temp solution till the bug GGRC-4839 is fixed
+        console.error(
+          `Revision is not defined for snapshot with ID: ${this.id}!`
+        );
+        return;
+      }
       return this._super.call(this.revision.content);
     },
     display_type: function () {
+      if (!this.revision) {
+        // temp solution till the bug GGRC-4839 is fixed
+        console.error(
+          `Revision is not defined for snapshot with ID: ${this.id}!`
+        );
+        return;
+      }
       return this._super.call(this.revision.content);
     },
   });

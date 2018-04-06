@@ -24,10 +24,9 @@
               {{>'/static/mustache/base_objects/test_plan.mustache'}}
               {{>'/static/mustache/base_objects/notes.mustache'}}
               {{>'/static/mustache/controls/contacts.mustache'}}
-              {{>'/static/mustache/base_objects/urls.mustache'}}
+              {{>'/static/mustache/base_objects/reference-urls.mustache'}}
 
               <div class="row-fluid wrap-row">
-                <div class="span6">
                   {{#if_helpers '\
                     #if' isSnapshot '\
                     or ^is_allowed' "update" instance context="for"}}
@@ -44,7 +43,6 @@
                                           {tooltip}="'A new copy of the file will be stored at the destination Control folder if exists or main gDrive folder of user.''">
                     </folder-attachments-list>
                   {{/if_helpers}}
-                </div>
               </div>
 
               <div class="custom-attr-wrap info-pane__section">

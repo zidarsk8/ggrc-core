@@ -93,7 +93,6 @@ let ApprovalWorkflow = can.Observe({
               start_date: moment().format('MM/DD/YYYY'),
               end_date: that.end_date,
               object_approval: true,
-              sort_index: (Number.MAX_SAFE_INTEGER / 2).toString(10),
               access_control_list: [{
                 ac_role_id: assigneeRole.id,
                 person: {

@@ -159,14 +159,12 @@
                     </object-list-item-updater>
                   </div>
                   <div class="modal-mapped-objects-item__unmap">
-                    {{^if_in type 'Audit, Issue'}}
                     {{#if new_object_form}}
                       <a href="javascript://" data-toggle="unmap">
                         <span class="result" {{data 'result'}}></span>
                         <i class="fa fa-trash"></i>
                       </a>
                     {{/if}}
-                    {{/if_in}}
                   </div>
                 </div>
               {{/each}}
@@ -211,7 +209,7 @@
       </div>
 
       <div class="ggrc-form-item">
-        <div class="ggrc-form-item__multiple-row">
+        <div class="ggrc-form-item__row">
           <related-documents
             instance={instance}
             document-type="REFERENCE_URL"
@@ -219,62 +217,18 @@
             custom-loader="true"
             {documents}="referenceUrls"
             {^pending-items-changed}="referenceUrlChanged">
-            <related-reference-urls class="related-reference-urls"
+            <related-urls
+              {instance}="instance"
+              {allow-to-remove}="new_object_form"
               {(urls)}="documents"
               {is-disabled}="isLoading"
-              (createReferenceUrl)="markDocumentForAddition(%event.payload)"
-              (removeReferenceUrl)="markDocumentForDeletion(%event.payload)">
+              (createUrl)="markDocumentForAddition(%event.payload)"
+              (removeUrl)="markDocumentForDeletion(%event.payload)">
               <label class="ggrc-form-item__label">
                 Reference URL
                 <spinner {toggle}="isDisabled"></spinner>
               </label>
-              <div class="related-reference-urls__list">
-                <object-list {(items)}="urls" {empty-message}="''">
-                  <div class="action-toolbar">
-                    <document-object-list-item {instance}="{.}">
-                    </document-object-list-item>
-                    {{#if new_object_form}}
-                      <div class="action-toolbar__controls">
-                        <a href="javascript://"
-                          class="info-action unmap"
-                          {{#if isDisabled}}disabled{{/if}}
-                          ($click)="removeReferenceUrl(%context)">
-                            <action-toolbar-control>
-                              <i class="fa fa-trash"></i>
-                            </action-toolbar-control>
-                        </a>
-                      </div>
-                    {{/if}}
-                  </div>
-                </object-list>
-              </div>
-              {{#if isFormVisible}}
-                <form class="related-reference-urls__create create-form">
-                  <fieldset class="create-form__layout"
-                    {{#if isDisabled}}disabled{{/if}}>
-                    <input {($value)}="value"
-                      class="create-form__input"
-                      type="text"
-                      placeholder="Add URL"
-                      spellcheck="false"
-                      autocomplete="false">
-                    <div class="create-form__controls">
-                      <button type="submit" class="create-form__confirm" ($click)="submitCreateReferenceUrlForm(value)">
-                        <i class="fa fa-check"></i>
-                      </button>
-                      <button type="button" class="create-form__cancel" ($click)="toggleFormVisibility(false)">
-                        <i class="fa fa-times"></i>
-                      </button>
-                    </div>
-                  </fieldset>
-              </form>
-              {{else}}
-                <button class="related-reference-urls__toggle btn btn-small btn-gray {{#if isFormVisible}}related-reference-urls__toggle--hidden{{/if}}"
-                  ($click)="toggleFormVisibility(true)">
-                  Add
-                </button>
-              {{/if}}
-            </related-reference-urls>
+            </related-urls>
           </related-documents>
         </div>
       </div>

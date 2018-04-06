@@ -3,53 +3,136 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('GGRC.Components.relatedReferenceUrls', function () {
+import Component from '../related-urls';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Permission from '../../../permission';
+
+describe('GGRC.Components.relatedUrls', function () {
   'use strict';
 
   let viewModel;
   let instance;
 
   beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('relatedReferenceUrls');
+    viewModel = getComponentVM(Component);
     instance = {};
     viewModel.attr('instance', instance);
   });
 
-  describe('createReferenceUrl() method', function () {
+  describe('canAddUrl get() method', ()=> {
+    beforeEach(()=> {
+      spyOn(Permission, 'is_allowed_for');
+    });
+
+    it('returns false if user can not update instance', ()=> {
+      Permission.is_allowed_for.and.returnValue(false);
+
+      let result = viewModel.attr('canAddUrl');
+
+      expect(result).toBe(false);
+    });
+
+    it(`returns false if user can update instance 
+        but edit is disabled in the component`, ()=> {
+        Permission.is_allowed_for.and.returnValue(true);
+        viewModel.attr('isNotEditable', true);
+
+        let result = viewModel.attr('canAddUrl');
+
+        expect(result).toBe(false);
+      });
+
+    it('returns true if user can update instance and edit is not denied', ()=> {
+      Permission.is_allowed_for.and.returnValue(true);
+      viewModel.attr('isNotEditable', false);
+
+      let result = viewModel.attr('canAddUrl');
+
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('canRemoveUrl get() method', ()=> {
+    beforeEach(()=> {
+      spyOn(Permission, 'is_allowed_for');
+    });
+
+    it('returns false if user can not update instance', ()=> {
+      Permission.is_allowed_for.and.returnValue(false);
+
+      let result = viewModel.attr('canRemoveUrl');
+
+      expect(result).toBe(false);
+    });
+
+    it(`returns false if user can update instance 
+        but edit is disabled in the component`, ()=> {
+        Permission.is_allowed_for.and.returnValue(true);
+        viewModel.attr('isNotEditable', true);
+
+        let result = viewModel.attr('canRemoveUrl');
+
+        expect(result).toBe(false);
+      });
+
+    it(`returns false if user can update instance, edit is is not denied,
+        but removal is disabled by flag`, ()=> {
+        Permission.is_allowed_for.and.returnValue(true);
+        viewModel.attr('isNotEditable', false);
+        viewModel.attr('allowToRemove', false);
+
+        let result = viewModel.attr('canRemoveUrl');
+
+        expect(result).toBe(false);
+      });
+
+    it(`returns true if user can update instance, edit is not denied,
+        and removal is not disabled`, ()=> {
+        Permission.is_allowed_for.and.returnValue(true);
+        viewModel.attr('isNotEditable', false);
+        viewModel.attr('allowToRemove', true);
+
+        let result = viewModel.attr('canRemoveUrl');
+
+        expect(result).toBe(true);
+      });
+  });
+
+  describe('createUrl() method', function () {
     let method;
     let url;
 
     beforeEach(function () {
-      method = viewModel.createReferenceUrl.bind(viewModel);
+      method = viewModel.createUrl.bind(viewModel);
       url = 'test.url';
     });
 
-    it('should dispatch createReferenceUrl event', function () {
+    it('should dispatch createUrl event', function () {
       spyOn(viewModel, 'dispatch');
       method(url);
       expect(viewModel.dispatch)
         .toHaveBeenCalledWith({
-          type: 'createReferenceUrl',
+          type: 'createUrl',
           payload: url,
         });
     });
   });
 
-  describe('removeReferenceUrl() method', function () {
+  describe('removeUrl() method', function () {
     let method;
     let url;
 
     beforeEach(function () {
-      method = viewModel.removeReferenceUrl.bind(viewModel);
+      method = viewModel.removeUrl.bind(viewModel);
       url = 'test.url';
       spyOn(viewModel, 'dispatch');
     });
 
-    it('should dispatch removeReferenceUrl event', function () {
+    it('should dispatch removeUrl event', function () {
       method(url);
       expect(viewModel.dispatch)
         .toHaveBeenCalledWith({
-          type: 'removeReferenceUrl',
+          type: 'removeUrl',
           payload: url,
         });
     });
@@ -88,12 +171,12 @@ describe('GGRC.Components.relatedReferenceUrls', function () {
     });
   });
 
-  describe('submitCreateReferenceUrlForm() method', function () {
+  describe('submitCreateUrlForm() method', function () {
     let method;
 
     beforeEach(function () {
-      method = viewModel.submitCreateReferenceUrlForm.bind(viewModel);
-      spyOn(viewModel, 'createReferenceUrl');
+      method = viewModel.submitCreateUrlForm.bind(viewModel);
+      spyOn(viewModel, 'createUrl');
       spyOn(viewModel, 'toggleFormVisibility');
       spyOn(GGRC.Errors, 'notifier');
     });
@@ -126,7 +209,7 @@ describe('GGRC.Components.relatedReferenceUrls', function () {
 
         matches = _.filter(viewModel.attr('urls'), {link: url});
         expect(matches.length).toEqual(1);  // still only 1
-        expect(viewModel.createReferenceUrl).not.toHaveBeenCalled();
+        expect(viewModel.createUrl).not.toHaveBeenCalled();
       });
 
       it('issues error notification when adding duplicate URLs', function () {
@@ -142,9 +225,9 @@ describe('GGRC.Components.relatedReferenceUrls', function () {
             'error', 'URL already exists.');
       });
 
-      it('should create reference url', function () {
+      it('should create url', function () {
         method(url);
-        expect(viewModel.createReferenceUrl)
+        expect(viewModel.createUrl)
           .toHaveBeenCalledWith(url);
       });
 

@@ -299,15 +299,15 @@ class DocumentFactory(ModelFactory):
   link = "some link"
 
 
-class UrlFactory(DocumentFactory):
+class UrlTypeDocumentFactory(DocumentFactory):
   document_type = all_models.Document.URL
 
 
-class EvidenceFactory(DocumentFactory):
+class EvidenceTypeDocumentFactory(DocumentFactory):
   document_type = all_models.Document.ATTACHMENT
 
 
-class ReferenceUrlFactory(DocumentFactory):
+class ReferenceUrlTypeDocumentFactory(DocumentFactory):
   document_type = all_models.Document.REFERENCE_URL
 
 
@@ -500,6 +500,16 @@ class ProjectFactory(TitledFactory):
     model = all_models.Project
 
 
+class ImportExportFactory(ModelFactory):
+
+  class Meta:
+    model = all_models.ImportExport
+
+  @classmethod
+  def _log_event(cls, instance, action="POST"):
+    """Stub to disable parent method"""
+
+
 def get_model_factory(model_name):
   """Get object factory for provided model name"""
   from integration.ggrc_workflows.models import factories as wf_factories
@@ -545,5 +555,6 @@ def get_model_factory(model_name):
       "Threat": ThreatFactory,
       "Workflow": wf_factories.WorkflowFactory,
       "Proposal": ProposalFactory,
+      "ImportExport": ImportExportFactory,
   }
   return model_factories[model_name]

@@ -28,7 +28,6 @@
         task_group: this.task_group,
         title: this.title,
         description: this.description,
-        sort_index: Number.MAX_SAFE_INTEGER / 2,
         contact: this.contact,
         context: this.context,
       });
@@ -40,7 +39,6 @@
             start_date: this.cycle.reify().start_date,
             end_date: this.cycle.reify().end_date,
             task_group_task: taskGroupTask,
-            sort_index: this.sort_index,
             title: this.title,
             description: this.description,
             status: 'Assigned',

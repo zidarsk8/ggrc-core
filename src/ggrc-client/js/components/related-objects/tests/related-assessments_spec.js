@@ -16,7 +16,7 @@ describe('GGRC.Components.relatedAssessments', () => {
       viewModel = getComponentVM(Component);
     });
 
-    describe('relativeObjectsTitle get() method', () => {
+    describe('relatedObjectsTitle get() method', () => {
       beforeAll(() => {
         originalModels = CMS.Models;
       });
@@ -118,6 +118,302 @@ describe('GGRC.Components.relatedAssessments', () => {
           expect(viewModel.attr('loading')).toEqual(false);
           done();
         });
+      });
+    });
+
+    describe('unableToReuse get() method', ()=> {
+      it(`returns false if there are selected evidences 
+        and it is not saving`, ()=> {
+          viewModel.attr('isSaving', false);
+          viewModel.attr('selectedEvidences', ['item']);
+
+          let result = viewModel.attr('unableToReuse');
+
+          expect(result).toBe(false);
+        });
+
+      describe('returns true', ()=> {
+        it('if there are no selected items and it is not saving', ()=> {
+          viewModel.attr('isSaving', false);
+          viewModel.attr('selectedEvidences', []);
+
+          let result = viewModel.attr('unableToReuse');
+
+          expect(result).toBe(true);
+        });
+
+        it('if there are selected items and it is saving', ()=> {
+          viewModel.attr('isSaving', true);
+          viewModel.attr('selectedEvidences', ['item']);
+
+          let result = viewModel.attr('unableToReuse');
+
+          expect(result).toBe(true);
+        });
+
+        it('if there are no selected items and it is saving', ()=> {
+          viewModel.attr('isSaving', true);
+          viewModel.attr('selectedEvidences', []);
+
+          let result = viewModel.attr('unableToReuse');
+
+          expect(result).toBe(true);
+        });
+      });
+    });
+
+    describe('buildEvidenceModel() method', ()=> {
+      beforeEach(()=> {
+        viewModel.attr({
+          instance: {
+            context: {id: 'contextId'},
+            id: 'instanceId',
+            type: 'instanceType',
+          },
+        });
+      });
+
+      it('builds EVIDENCE model correctly', ()=> {
+        let evidence = new can.Map({
+          document_type: 'EVIDENCE',
+          title: 'title',
+          gdrive_id: 'gdrive_id',
+        });
+
+        let result = viewModel.buildEvidenceModel(evidence);
+
+        expect(result.serialize()).toEqual({
+          context: {
+            id: 'contextId',
+            type: 'Context',
+          },
+          documentable_obj: {
+            id: 'instanceId',
+            type: 'instanceType',
+          },
+          document_type: 'EVIDENCE',
+          title: 'title',
+          source_gdrive_id: 'gdrive_id',
+        });
+      });
+
+      it('builds URL model correctly', ()=> {
+        let evidence = new can.Map({
+          document_type: 'URL',
+          title: 'title',
+          link: 'link',
+        });
+
+        let result = viewModel.buildEvidenceModel(evidence);
+
+        expect(result.serialize()).toEqual({
+          context: {
+            id: 'contextId',
+            type: 'Context',
+          },
+          documentable_obj: {
+            id: 'instanceId',
+            type: 'instanceType',
+          },
+          document_type: 'URL',
+          title: 'title',
+          link: 'link',
+        });
+      });
+    });
+
+    describe('reuseSelected() method', ()=> {
+      let saveDfd;
+      let saveSpy;
+      beforeEach(()=> {
+        viewModel.attr('selectedEvidences', [{
+          id: 'id',
+          title: 'evidence1',
+        }]);
+
+        saveDfd = can.Deferred();
+        saveSpy = jasmine.createSpy().and.returnValue(saveDfd);
+        spyOn(viewModel, 'buildEvidenceModel').and.returnValue({
+          save: saveSpy,
+        });
+      });
+
+      it('turning on "isSaving" flag', ()=> {
+        viewModel.attr('isSaving', false);
+
+        viewModel.reuseSelected();
+
+        expect(viewModel.attr('isSaving')).toBe(true);
+      });
+
+      it('builds evidence model', ()=> {
+        viewModel.reuseSelected();
+
+        expect(viewModel.buildEvidenceModel).toHaveBeenCalled();
+      });
+
+      it('saves builded model', ()=> {
+        viewModel.reuseSelected();
+
+        expect(saveSpy).toHaveBeenCalled();
+      });
+
+      describe('after saving', ()=> {
+        it('cleans selectedEvidences', (done)=> {
+          viewModel.reuseSelected();
+
+          saveDfd.resolve().then(()=> {
+            expect(viewModel.attr('selectedEvidences.length')).toBe(0);
+            done();
+          });
+        });
+
+        it('turns off isSaving flag', (done)=> {
+          viewModel.reuseSelected();
+
+          viewModel.attr('isSaving', true);
+
+          saveDfd.resolve().then(()=> {
+            expect(viewModel.attr('isSaving')).toBe(false);
+            done();
+          });
+        });
+
+        it('dispatches "afterObjectReused" event', (done)=> {
+          spyOn(viewModel, 'dispatch');
+
+          viewModel.reuseSelected();
+
+          saveDfd.resolve().then(()=> {
+            expect(viewModel.dispatch)
+              .toHaveBeenCalledWith('afterObjectReused');
+            done();
+          });
+        });
+
+        it('dispatches "refreshInstance" event on instance', (done)=> {
+          spyOn(viewModel.attr('instance'), 'dispatch');
+
+          viewModel.reuseSelected();
+
+          saveDfd.resolve().then(()=> {
+            expect(viewModel.attr('instance').dispatch)
+              .toHaveBeenCalledWith('refreshInstance');
+            done();
+          });
+        });
+      });
+    });
+
+    describe('checkReuseAbility() method', ()=> {
+      it('returns true if evidence is not a file', ()=> {
+        let evidence = new can.Map({
+          document_type: 'URL',
+        });
+
+        let result = viewModel.checkReuseAbility(evidence);
+
+        expect(result).toBe(true);
+      });
+
+      it('returns true if evidence is a file with gdrive_id', ()=> {
+        let evidence = new can.Map({
+          document_type: 'EVIDENCE',
+          gdrive_id: 'gdrive_id',
+        });
+
+        let result = viewModel.checkReuseAbility(evidence);
+
+        expect(result).toBe(true);
+      });
+
+      it('returns false if evidence is a file without gdrive_id', ()=> {
+        let evidence = new can.Map({
+          document_type: 'EVIDENCE',
+          gdrive_id: '',
+        });
+
+        let result = viewModel.checkReuseAbility(evidence);
+
+        expect(result).toBe(false);
+      });
+    });
+  });
+
+  describe('helpers', ()=> {
+    let viewModel;
+    beforeEach(()=> {
+      viewModel = getComponentVM(Component);
+    });
+
+    describe('isAllowedToReuse helper', ()=> {
+      let isAllowedToReuse;
+      let evidence;
+      beforeEach(()=> {
+        isAllowedToReuse = Component.prototype.helpers
+          .isAllowedToReuse.bind(viewModel);
+        spyOn(viewModel, 'checkReuseAbility');
+        evidence = jasmine.createSpy();
+      });
+
+      it('calls checkReuseAbility()', ()=>{
+        isAllowedToReuse(evidence);
+
+        expect(viewModel.checkReuseAbility).toHaveBeenCalled();
+      });
+
+      it('returns checkReuseAbility result', ()=> {
+        let abilityResult = {test: true};
+        viewModel.checkReuseAbility.and.returnValue(abilityResult);
+
+        let result = isAllowedToReuse(evidence);
+
+        expect(result).toBe(abilityResult);
+      });
+
+      it('resolves compute argument', ()=> {
+        isAllowedToReuse(evidence);
+
+        expect(evidence).toHaveBeenCalled();
+      });
+    });
+
+    describe('ifAllowedToReuse helper', ()=> {
+      let ifAllowedToReuse;
+      let evidence;
+      let options;
+      beforeEach(()=> {
+        ifAllowedToReuse = Component.prototype.helpers
+          .ifAllowedToReuse.bind(viewModel);
+        spyOn(viewModel, 'checkReuseAbility');
+        evidence = {test: true};
+        options = {
+          fn: jasmine.createSpy(),
+          inverse: jasmine.createSpy(),
+        };
+        spyOn(Mustache, 'resolve');
+      });
+
+      it('resolves compute argument', ()=> {
+        ifAllowedToReuse(evidence, options);
+
+        expect(Mustache.resolve).toHaveBeenCalledWith(evidence);
+      });
+
+      it('calls fn if able to reuse', ()=> {
+        viewModel.checkReuseAbility.and.returnValue(true);
+
+        ifAllowedToReuse(evidence, options);
+
+        expect(options.fn).toHaveBeenCalled();
+      });
+
+      it('calls inverse if not able to reuse', ()=> {
+        viewModel.checkReuseAbility.and.returnValue(false);
+
+        ifAllowedToReuse(evidence, options);
+
+        expect(options.inverse).toHaveBeenCalled();
       });
     });
   });

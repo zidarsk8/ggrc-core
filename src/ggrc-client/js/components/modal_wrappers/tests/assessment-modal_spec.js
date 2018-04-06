@@ -27,9 +27,7 @@ describe('<assessment-modal/> component', () => {
 
       spyOn(model, 'getRelatedObjects').and
         .returnValue(can.Deferred().resolve({
-          Audit: {},
           'Document:REFERENCE_URL': [{}],
-          Issue: [{}, {}],
           Snapshot: [{}, {}, {}],
         }));
 
@@ -37,7 +35,7 @@ describe('<assessment-modal/> component', () => {
 
       vm.loadData().then(() => {
         expect(vm.attr('referenceUrls').length).toBe(1);
-        expect(vm.attr('mappedObjects').length).toBe(6);
+        expect(vm.attr('mappedObjects').length).toBe(3);
 
         done();
       });

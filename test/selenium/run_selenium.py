@@ -14,11 +14,12 @@ import os
 import subprocess
 import sys
 import time
+import urlparse
 
 import _pytest
 import requests
 
-from lib import file_ops, environment, decorator  # noqa
+from lib import file_ops, environment, decorator, url as url_module
 from lib.service.rest_service import client
 
 
@@ -32,16 +33,38 @@ def wait_for_server(url):
   """Wait for the server to return '200' status code in response during
   predefined time in 'pytest.ini'.
   """
-  print "Wating on server: {}".format(url)
+  print "Waiting on server: {}".format(url)
   for _ in xrange(environment.SERVER_WAIT_TIME):
     try:
       if (requests.head(url).status_code ==
               client.RestClient.STATUS_CODES["OK"]):
         return
     except IOError:
+      pass
+    finally:
       time.sleep(1)
   print "Failed waiting for server {}".format(url)
   sys.exit(3)
+
+
+def add_user(url_origin):
+  """If two processes log in as a new user at the same time,
+  the second login may fail because of a race condition in dev code
+  (user_generator.py).
+  We workaround this issue by creating a user not in parallel as this issue
+  is considered not worth to fix by developers.
+  """
+  environment.app_url = url_origin
+  environment.app_url = urlparse.urljoin(environment.app_url, "/")
+  session = requests.Session()
+  session.get(url_module.Urls().gae_login)
+  session.get(url_module.Urls().login)
+
+
+def prepare_dev_server(url_origin):
+  """Wait for dev server and prepare it for running Selenium tests"""
+  wait_for_server(url_origin)
+  add_user(url_origin)
 
 
 def parse_pytest_ini():
@@ -61,7 +84,8 @@ def run_tests():
 
 if __name__ == "__main__":
   parse_pytest_ini()
-  wait_for_server(os.environ["DEV_URL"])
+  prepare_dev_server(os.environ["DEV_URL"])
+  prepare_dev_server(os.environ["DEV_DESTRUCTIVE_URL"])
   file_ops.create_directory(environment.LOG_PATH)
   file_ops.delete_directory_contents(environment.LOG_PATH)
   sys.exit(run_tests())

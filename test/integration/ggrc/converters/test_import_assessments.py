@@ -49,6 +49,36 @@ class TestAssessmentImport(TestCase):
     self.assertIn("abc", values)
     self.assertIn("2015-07-15", values)
 
+  def test_import_assessment_with_evidence_proper_url1(self):
+    """Test import document with proper gdrive url pattern '/d/'"""
+    self.import_file("assessment_with_evidence_proper_url_pattern1.csv")
+    documents = models.Document.query.filter(
+        models.Document.document_type == models.Document.ATTACHMENT).all()
+    self.assertEquals(len(documents), 1)
+    self.assertEquals(documents[0].gdrive_id,
+                      "1_J2anxP8_SLMFf1SXyVNriVh25MVgH_LfhFN1wdP1d8")
+
+  def test_import_assessment_with_evidence_proper_url2(self):
+    """Test import document with proper gdrive url pattern '?id='"""
+    self.import_file("assessment_with_evidence_proper_url_pattern2.csv")
+    documents = models.Document.query.filter(
+        models.Document.document_type == models.Document.ATTACHMENT).all()
+    self.assertEquals(len(documents), 1)
+    self.assertEquals(documents[0].gdrive_id,
+                      "0B_oNZ3Jm01MJLWVsVWZJWm")
+
+  def test_import_assessment_with_evidence_invalid_url(self):
+    """Test import document with invalid gdrive url"""
+    response = self.import_file("assessment_with_evidence_invalid_url.csv")
+    documents = models.Document.query.filter(
+        models.Document.document_type == models.Document.ATTACHMENT).all()
+    expected_warning = u"Line 3: Unable to extract gdrive_id from" \
+                       u" https://xxx.com/img1.jpg. This document can't" \
+                       u" be reused after import"
+
+    self.assertEquals(len(documents), 1)
+    self.assertEquals([expected_warning], response[2]['row_warnings'])
+
   def _test_assessment_users(self, asmt, users):
     """ Test that all users have correct roles on specified Assessment"""
     verification_errors = ""

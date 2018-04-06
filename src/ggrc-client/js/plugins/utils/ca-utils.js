@@ -201,6 +201,29 @@ function prepareCustomAttributes(definitions, values) {
 /**
  * @deprecated Use CustomAttributeObject API to get access to the necessary custom
  * attribute field and make some manipulations with it.
+ * @param {*} field
+ * @return {*}
+ */
+function isEvidenceRequired(field) {
+  const fieldValidationConf = field.attr(`validationConfig.${field.value}`);
+  return fieldValidationConf === CA_DD_REQUIRED_DEPS.EVIDENCE ||
+    fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+}
+
+/**
+ * @deprecated Use CustomAttributeObject API to get access to the necessary custom
+ * attribute field and make some manipulations with it.
+ * @param {*} field
+ * @return {*}
+ */
+function isCommentRequired(field) {
+  const fieldValidationConf = field.attr(`validationConfig.${field.value}`);
+  return fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT ||
+    fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+}
+/**
+ * @deprecated Use CustomAttributeObject API to get access to the necessary custom
+ * attribute field and make some manipulations with it.
  * Converts value from UI controls back to CA value.
  * @param {String} type - Custom attribute type
  * @param {Object} value - Control value
@@ -397,9 +420,11 @@ export {
   isEmptyCustomAttribute,
   getCustomAttributes,
   getCustomAttributeType,
+  isEvidenceRequired,
+  isCommentRequired,
   convertToFormViewField,
   applyChangesToCustomAttributeValue,
   CA_DD_REQUIRED_DEPS,
   ensureGlobalCA,
   CUSTOM_ATTRIBUTE_TYPE,
-}
+};

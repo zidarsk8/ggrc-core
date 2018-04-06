@@ -30,6 +30,36 @@ class DocumentLinkHandler(handlers.ColumnHandler):
   def get_value(self):
     raise NotImplemented()
 
+  @staticmethod
+  def get_gdrive_id_from_url(url):
+    """Extract gdrive_id from URL
+
+    based on url slicing:
+                                   |                            |
+    https://drive.google.com/file/d/0B7PUdT4q_eqpeXRLb25tU3VfNzQ/view?usp=drivesdk
+    or                              |                            |
+    https://drive.google.com/open?id=0Bx9jGVp6d-sfN1pOZlZzbHF2QVU/view
+    """
+    result = ''
+    try:
+      if '?id=' in url:
+        result = url.split('?id=')[1].split('&')[0]
+      elif '/d/' in url:
+        result = url.split('/d/')[1].split('/')[0]
+    except IndexError:
+      pass
+    return result
+
+  def get_gdrive_id(self, link):
+    """Handle gdrive_id extraction"""
+    gdrive_id = ''
+    if self.DOCUMENT_TYPE == models.Document.ATTACHMENT:
+      gdrive_id = self.get_gdrive_id_from_url(link)
+      if not gdrive_id:
+        self.add_warning(errors.UNABLE_TO_EXTRACT_GDRIVE_ID,
+                         link=link)
+    return gdrive_id
+
   def parse_item(self, has_title=False):
     """Parse document link lines.
 
@@ -57,6 +87,7 @@ class DocumentLinkHandler(handlers.ColumnHandler):
             modified_by_id=user_id,
             context=self.row_converter.obj.context,
             document_type=self.DOCUMENT_TYPE,
+            gdrive_id=self.get_gdrive_id(link)
         ))
 
     if duplicate_new_links:

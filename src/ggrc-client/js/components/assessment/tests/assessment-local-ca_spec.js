@@ -47,7 +47,6 @@ describe('assessmentLocalCa component', () => {
 
   describe('check performValidation', function () {
     let inputField;
-    let dropdownField;
     let checkboxField;
     let performValidation;
 
@@ -61,24 +60,6 @@ describe('assessmentLocalCa component', () => {
         preconditions_failed: null,
         validation: {
           mandatory: false,
-        },
-      });
-
-      dropdownField = new can.Map({
-        type: 'dropdown',
-        validationConfig: {
-          'nothing required': CA_DD_REQUIRED_DEPS.NONE,
-          'comment required': CA_DD_REQUIRED_DEPS.COMMENT,
-          'evidence required': CA_DD_REQUIRED_DEPS.EVIDENCE,
-          'com+ev required': CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
-        },
-        preconditions_failed: [],
-        validation: {
-          mandatory: false,
-        },
-        errorsMap: {
-          comment: false,
-          evidence: false,
         },
       });
 
@@ -104,8 +85,6 @@ describe('assessmentLocalCa component', () => {
 
     it('should validate non-mandatory checkbox', function () {
       viewModel.attr('fields', [checkboxField]);
-      dropdownField.attr('value', null);
-
       performValidation(checkboxField);
 
       expect(checkboxField.attr().validation).toEqual({
@@ -211,13 +190,42 @@ describe('assessmentLocalCa component', () => {
         hasMissingInfo: false,
       });
     });
+  });
+
+  describe('check performDropdownValidation', () => {
+    let dropdownField;
+    let performDropdownValidation;
+
+    beforeEach(function () {
+      viewModel.attr('evidenceAmount', 0);
+      performDropdownValidation = viewModel.performDropdownValidation
+        .bind(viewModel);
+
+      dropdownField = new can.Map({
+        type: 'dropdown',
+        validationConfig: {
+          'nothing required': CA_DD_REQUIRED_DEPS.NONE,
+          'comment required': CA_DD_REQUIRED_DEPS.COMMENT,
+          'evidence required': CA_DD_REQUIRED_DEPS.EVIDENCE,
+          'com+ev required': CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
+        },
+        preconditions_failed: [],
+        validation: {
+          mandatory: false,
+        },
+        errorsMap: {
+          comment: false,
+          evidence: false,
+        },
+      });
+    });
 
     it('should validate dropdown with not selected value', function () {
       // Nothing selected. i.e. None
       viewModel.attr('fields', [dropdownField]);
       dropdownField.attr('value', '');
 
-      performValidation(dropdownField);
+      performDropdownValidation(dropdownField);
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
         show: false,
@@ -235,7 +243,7 @@ describe('assessmentLocalCa component', () => {
       viewModel.attr('fields', [dropdownField]);
       dropdownField.attr('value', 'nothing required');
 
-      performValidation(dropdownField);
+      performDropdownValidation(dropdownField);
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
         show: true,
@@ -255,7 +263,7 @@ describe('assessmentLocalCa component', () => {
       dropdownField.attr('value', 'comment required');
 
       dropdownField.attr('errorsMap.comment', true);
-      performValidation(dropdownField);
+      performDropdownValidation(dropdownField);
 
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
@@ -275,7 +283,7 @@ describe('assessmentLocalCa component', () => {
       viewModel.attr('fields', [dropdownField]);
       dropdownField.attr('value', 'comment required');
 
-      performValidation(dropdownField);
+      performDropdownValidation(dropdownField);
 
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
@@ -296,7 +304,7 @@ describe('assessmentLocalCa component', () => {
       dropdownField.attr('value', 'evidence required');
 
       dropdownField.attr('errorsMap.evidence', true);
-      performValidation(dropdownField);
+      performDropdownValidation(dropdownField);
 
       expect(viewModel.attr('evidenceAmount')).toBe(0);
       expect(dropdownField.attr().validation).toEqual({
@@ -318,7 +326,7 @@ describe('assessmentLocalCa component', () => {
       viewModel.attr('evidenceAmount', 1);
       dropdownField.attr('value', 'evidence required');
 
-      performValidation(dropdownField);
+      performDropdownValidation(dropdownField);
 
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
@@ -341,7 +349,7 @@ describe('assessmentLocalCa component', () => {
       dropdownField.attr('errorsMap.comment', true);
       dropdownField.attr('errorsMap.evidence', true);
 
-      performValidation(dropdownField);
+      performDropdownValidation(dropdownField);
 
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
@@ -362,7 +370,7 @@ describe('assessmentLocalCa component', () => {
       dropdownField.attr('value', 'com+ev required');
 
       dropdownField.attr('errorsMap.evidence', true);
-      performValidation(dropdownField);
+      performDropdownValidation(dropdownField);
 
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
@@ -385,7 +393,7 @@ describe('assessmentLocalCa component', () => {
       dropdownField.attr('value', 'com+ev required');
       dropdownField.attr('errorsMap.comment', true);
 
-      performValidation(dropdownField);
+      performDropdownValidation(dropdownField);
 
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
@@ -406,7 +414,7 @@ describe('assessmentLocalCa component', () => {
       viewModel.attr('evidenceAmount', 1);
 
       dropdownField.attr('value', 'com+ev required');
-      performValidation(dropdownField);
+      performDropdownValidation(dropdownField);
 
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
@@ -506,53 +514,5 @@ describe('assessmentLocalCa component', () => {
         expect(dropdownField.attr('value')).toEqual(fieldChangeEvent.value);
         expect(dropdownField.attr('errorsMap.comment')).toEqual(true);
       });
-  });
-
-  describe('check fieldRequiresComment', function () {
-    let dropdownField;
-    let fieldRequiresComment;
-
-    beforeEach(function () {
-      fieldRequiresComment = viewModel.fieldRequiresComment.bind(viewModel);
-
-      dropdownField = new can.Map({
-        id: 2,
-        type: 'dropdown',
-        validationConfig: {
-          'nothing required': CA_DD_REQUIRED_DEPS.NONE,
-          'comment required': CA_DD_REQUIRED_DEPS.COMMENT,
-          'evidence required': CA_DD_REQUIRED_DEPS.EVIDENCE,
-          'com+ev required': CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
-        },
-        preconditions_failed: [],
-        validation: {
-          mandatory: false,
-        },
-        errorsMap: {
-          comment: false,
-          evidence: false,
-        },
-      });
-    });
-
-    it('should test values which require comment', function () {
-      [
-        'comment required',
-        'com+ev required',
-      ].forEach((value) => {
-        dropdownField.attr('value', value);
-        expect(fieldRequiresComment(dropdownField)).toEqual(true);
-      });
-    });
-
-    it('should test values which do not require comment', function () {
-      [
-        'nothing required',
-        'evidence required',
-      ].forEach((value) => {
-        dropdownField.attr('value', value);
-        expect(fieldRequiresComment(dropdownField)).toEqual(false);
-      });
-    });
   });
 });
