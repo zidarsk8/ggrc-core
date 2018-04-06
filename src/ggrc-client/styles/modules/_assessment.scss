@@ -180,23 +180,29 @@
       }
     }
 
-    .object-list__item {
-      line-height: 18px;
-    }
-
-    .object-list__item:not(:first-child) {
-      padding-top: 24px;
-      border-top: 1px solid #e0e0e0;
-    }
-
-    .object-list__item-empty {
-      margin: 0 0 20px 0;
+    .people-groups {
+      .people-group {
+        margin-right: 0;
+      }
     }
   }
 
   &__related-objects {
     .mapped-related-objects {
       border-top: 1px solid #e0e0e0;
+
+      .object-list__item {
+        line-height: 18px;
+      }
+
+      .object-list__item:not(:first-child) {
+        padding-top: 24px;
+        border-top: 1px solid #e0e0e0;
+      }
+
+      .object-list__item-empty {
+        margin: 0 0 20px 0;
+      }
     }
   }
 }
