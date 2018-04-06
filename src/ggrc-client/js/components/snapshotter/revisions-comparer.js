@@ -529,12 +529,28 @@ export default can.Component.extend({
         let $oldGrantees = $blockOld.find('person-list-item');
         let $newGrantees = $blockNew.find('person-list-item');
 
-        oldUserIds = extractPeopleIds($oldGrantees);
-        newUserIds = extractPeopleIds($newGrantees);
+        if ($oldGrantees.length && !$newGrantees.length ||
+          $newGrantees.length && !$oldGrantees.length) {
+          highlightBlock($blockOld);
+          highlightBlock($blockNew);
+        } else {
+          oldUserIds = extractPeopleIds($oldGrantees);
+          newUserIds = extractPeopleIds($newGrantees);
 
-        // now we have a list of old and new person IDs
-        highlightChanges($oldGrantees, newUserIds);
-        highlightChanges($newGrantees, oldUserIds);
+          // now we have a list of old and new person IDs
+          highlightPersons($oldGrantees, newUserIds);
+          highlightPersons($newGrantees, oldUserIds);
+        }
+      }
+
+      /**
+       * Highlight block of grants of a particular custom role.
+       *
+       * @param {jQuery} $block - a DOM element containing a list of
+       *   people that have a particular custom role.
+       */
+      function highlightBlock($block) {
+        $block.find('object-list').addClass(HIGHLIGHT_CLASS);
       }
 
       /**
@@ -564,7 +580,7 @@ export default can.Component.extend({
        *   referential list of grants of a particular custom role. The changes
        *   in role assignments are calculated against this list.
        */
-      function highlightChanges($grantees, comparisonIds) {
+      function highlightPersons($grantees, comparisonIds) {
         $grantees.each(function (i, grantee) {
           let $grantee = $(grantee);
           let personId = $grantee.viewModel().attr('person.id');
