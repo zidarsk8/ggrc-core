@@ -75,6 +75,10 @@ describe('csv-import component', () => {
             Bar: 0,
             Baz: 0,
           },
+          import_export: {
+            id: 13,
+            status: 'New Status',
+          },
         }));
 
       vm.analyseSelectedFile({

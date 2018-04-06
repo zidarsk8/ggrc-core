@@ -28,6 +28,7 @@ export const isInProgressJob = (jobStatus) => {
     jobStatuses.IN_PROGRESS,
     jobStatuses.BLOCKED,
     jobStatuses.ANALYSIS_FAILED,
+    jobStatuses.FAILED,
   ].includes(jobStatus);
 };
 

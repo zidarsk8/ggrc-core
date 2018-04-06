@@ -4,6 +4,7 @@
  */
 
 $controlsWidth: 400px;
+$historyBlockWidth: 350px;
 
 @mixin outside-margin() {
   padding-top: 25px;
@@ -26,14 +27,15 @@ $controlsWidth: 400px;
 
   &__main {
     @include outside-margin();
-    max-width: calc(100% - 350px);
+    max-width: calc(100% - #{$historyBlockWidth});
+    flex-grow: 1;
   }
 
   &__import-history {
     @include outside-margin();
     padding-left: 20px;
     padding-right: 20px;
-    width: 350px;
+    width: $historyBlockWidth;
     border-left: 1px solid $itemBorder;
   }
 
@@ -180,7 +182,7 @@ $controlsWidth: 400px;
 
 .import-buttons {
   position: relative;
-  margin-bottom: 25px;
+  margin-bottom: 15px;
 
   > .state-reset {
     margin-left: 10px;
@@ -192,8 +194,9 @@ $controlsWidth: 400px;
     top: 5px;
   }
 
-  > button {
+  button {
     margin-right: 10px;
+    margin-bottom: 10px;
   }
 }
 

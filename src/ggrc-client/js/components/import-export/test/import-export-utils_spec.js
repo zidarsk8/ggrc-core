@@ -102,7 +102,7 @@ describe('Import/Export utils', () => {
     });
 
     it('should return false for "Failed" job', () => {
-      expect(importExportUtils.isInProgressJob('Failed')).toEqual(false);
+      expect(importExportUtils.isInProgressJob('Failed')).toEqual(true);
     });
 
     it('should return false for "Finished" job', () => {

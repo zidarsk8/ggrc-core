@@ -85,6 +85,17 @@
           </button>
         {{/case}}
 
+        {{#case 'Failed'}}
+          <button ($click)="downloadImportContent(jobId, fileName)"
+                  class="btn btn-small btn-green">
+            Download import file for edit
+          </button>
+          <button ($click)="selectFile()"
+                  class="btn btn-small btn-white">
+            Choose new file to import
+          </button>
+        {{/case}}
+
         {{#case 'In Progress'}}
           <div class="">Import in Progress: <spinner {toggle}="true"></spinner></div>
         {{/case}}
@@ -99,8 +110,10 @@
         <div class="import-section border-top">
 
           <section class="import-details__stats">
-            <div class="import-details__caption">Object type:</div>
-            <div class="import-details__value">{{name}}</div>
+            {{#if name}}
+              <div class="import-details__caption">Object type:</div>
+              <div class="import-details__value">{{name}}</div>
+            {{/if}}
             <div class="import-details__caption">Number of rows:</div>
             <div class="import-details__value">{{rows}}</div>
             {{#if created}}
