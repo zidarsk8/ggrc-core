@@ -24,7 +24,6 @@ from flask.ext.sqlalchemy import Pagination
 import sqlalchemy.orm.exc
 from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import class_mapper
 from sqlalchemy.sql.expression import tuple_
 from werkzeug.exceptions import BadRequest, Forbidden
 
@@ -33,7 +32,7 @@ import ggrc.models
 from ggrc import db
 from ggrc import gdrive
 from ggrc import utils
-from ggrc.utils import as_json, benchmark
+from ggrc.utils import as_json, benchmark, dump_attrs
 from ggrc.utils.log_event import log_event
 from ggrc.fulltext import get_indexer
 from ggrc.login import get_current_user_id, get_current_user
@@ -523,26 +522,13 @@ class Resource(ModelView):
             not permissions.has_conditions('update', self.model.__name__)):
       raise Forbidden()
 
-  def dump_attrs(self, obj):
-    obj_cls = type(obj)
-    mapper = class_mapper(obj_cls)
-    rel_keys = {c.key for c in mapper.relationships}
-    attrs = tuple(
-        p.key
-        for p in mapper.iterate_properties
-        if p.key not in rel_keys)
-    # TODO(anushovan): consider caching class definitions.
-    attrs_cls = collections.namedtuple('Dumped%s' % obj_cls.__name__, attrs)
-    values = tuple(getattr(obj, k, None) for k in attrs)
-    return attrs_cls(*values)
-
   def put(self, id):
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
       return self.not_found_response()
 
-    initial_state = self.dump_attrs(obj)
+    initial_state = dump_attrs(obj)
 
     src = self.request.json
     if self.request.mimetype != 'application/json':
@@ -967,7 +953,6 @@ class Resource(ModelView):
       res: List that will get responses appended to it.
       no_result: Flag for suppressing results.
     """
-
     with benchmark("Generate objects"):
       objects = []
       sources = []

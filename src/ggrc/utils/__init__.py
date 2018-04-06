@@ -6,13 +6,15 @@
 This module should contain only the most general utility function and any
 specific utilities should be in their own module.
 """
-
+import collections
 import logging
 import datetime
 import json
 import re
 import sys
+
 import sqlalchemy
+from sqlalchemy.orm import class_mapper
 
 from flask import request
 from ggrc.settings import CUSTOM_URL_ROOT
@@ -311,3 +313,18 @@ def create_stub(object_, context_id=None):
       'context_id': context_id,
       'href': url_for(object_),
   }
+
+
+def dump_attrs(obj):
+  """Getting initial state of obj."""
+  obj_cls = type(obj)
+  mapper = class_mapper(obj_cls)
+  rel_keys = {c.key for c in mapper.relationships}
+  attrs = tuple(
+      p.key
+      for p in mapper.iterate_properties
+      if p.key not in rel_keys)
+  # TODO(anushovan): consider caching class definitions.
+  attrs_cls = collections.namedtuple('Dumped%s' % obj_cls.__name__, attrs)
+  values = tuple(getattr(obj, k, None) for k in attrs)
+  return attrs_cls(*values)

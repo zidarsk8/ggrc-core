@@ -14,6 +14,7 @@ from ggrc.login import get_current_user_id
 from ggrc.models.reflection import AttributeInfo
 from ggrc.rbac import permissions
 from ggrc.services import signals
+from ggrc.utils import dump_attrs
 
 
 class RowConverter(object):
@@ -39,6 +40,7 @@ class RowConverter(object):
         self.block_converter.BLOCK_OFFSET
     self.headers = options.get("headers", [])
     self.old_values = {}
+    self.initial_state = None
 
   def add_error(self, template, **kwargs):
     """Add error for current row.
@@ -169,6 +171,7 @@ class RowConverter(object):
     elif not permissions.is_allowed_update_for(obj):
       self.ignore = True
       self.add_error(errors.PERMISSION_ERROR)
+    self.initial_state = dump_attrs(obj)
     return obj
 
   def setup_secondary_objects(self):
@@ -237,7 +240,7 @@ class RowConverter(object):
     service_class.model = self.object_class
     signals.Restful.model_put_before_commit.send(
         self.object_class, obj=self.obj, src={}, service=service_class,
-        event=event)
+        event=event, initial_state=self.initial_state)
 
   def send_pre_commit_signals(self):
     """Send before commit signals for all objects.

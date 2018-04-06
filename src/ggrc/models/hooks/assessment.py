@@ -19,9 +19,11 @@ from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.models.hooks import common
 from ggrc.models.hooks import issue_tracker
+from ggrc.models.exceptions import StatusValidationError
 from ggrc.services import signals
 from ggrc.utils import referenced_objects
 
+from ggrc.models.utils import validate_assessment_done_state
 
 logger = logging.getLogger(__name__)
 
@@ -101,6 +103,19 @@ def init_hook():
     """Handles assessment update event."""
     del sender, src, service  # Unused
     common.ensure_field_not_changed(obj, 'audit')
+
+  @signals.Restful.model_put_before_commit.connect_via(all_models.Assessment)
+  def handle_assessment_done_state(sender, **kwargs):
+    """Checks if it's allowed to set done state from not done."""
+    del sender  # Unused arg
+    obj = kwargs['obj']
+    initial_state = kwargs['initial_state']
+    old_value = initial_state.status
+    try:
+      validate_assessment_done_state(old_value, obj)
+    except StatusValidationError as error:
+      db.session.rollback()
+      raise error
 
 
 def generate_assignee_relations(assessment,
