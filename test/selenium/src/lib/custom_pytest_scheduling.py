@@ -14,9 +14,14 @@ class CustomPytestScheduling(LoadScheduling):
   running in parallel.
   A test is marked as destructive by starting its name with "test_destructive".
   """
+  NUMBER_TO_PREVENT_UNEQUAL_LOAD = 3
 
   def _send_tests(self, node, num):
     idxs_to_send = []
+    if len(self.node2pending[node]) >= self.NUMBER_TO_PREVENT_UNEQUAL_LOAD:
+      # There are already enough tests. Do not schedule more to prevent
+      # unequal load on nodes.
+      return
     for idx, test_name in enumerate(self.collection):
       if self._is_destructive_test(test_name) and idx in self.pending:
         idxs_to_send.append(idx)
