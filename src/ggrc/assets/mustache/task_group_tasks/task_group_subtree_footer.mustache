@@ -3,22 +3,25 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#is_allowed 'update' instance context='for'}}
-{{^if_equals instance.status 'Inactive'}}
-<div class="tree-item-add">
-  <a
-    class="btn btn-small btn-darkBlue"
-    rel="tooltip"
-    data-placement="right"
-    data-original-title="Create Task"
-    data-object-plural="task_group_tasks"
-    data-modal-class="modal-wide" href="javascript://"
-    data-object-singular="TaskGroupTask"
-    data-toggle="modal-ajax-form"
-    data-modal-reset="reset"
-    data-object-params='{ "task_group": {{instance.id}}, "context": {{instance.context.id}}, "modal_title": "Create New Task" }'>
-    Create Task
-  </a>
+<div class="grid-data__toolbar_lhs-items">
+  {{#is_allowed 'update' instance context='for'}}
+    {{^if_equals instance.status 'Inactive'}}
+      <div class="grid-data__toolbar-item">
+        <a
+          class="btn btn-small btn-darkBlue"
+          rel="tooltip"
+          data-placement="right"
+          data-original-title="Create Task"
+          data-object-plural="task_group_tasks"
+          data-modal-class="modal-wide" href="javascript://"
+          data-object-singular="TaskGroupTask"
+          data-toggle="modal-ajax-form"
+          data-modal-reset="reset"
+          data-object-params='{ "task_group": {{instance.id}}, "context": {{instance.context.id}}, "modal_title": "Create New Task" }'>
+          Create Task
+        </a>
+      </div>
+    {{/if_equals}}
+  {{/is_allowed}}
 </div>
-{{/if_equals}}
-{{/is_allowed}}
+

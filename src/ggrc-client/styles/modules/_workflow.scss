@@ -235,7 +235,7 @@ ul.add-task-comment {
   &__header {
     border-bottom: 1px solid $lightGray;
     display: flex;
-    padding: 10px 0 10px 40px;
+    padding: 10px 0;
 
     &-item {
       flex: 1 1 25%;
@@ -276,12 +276,6 @@ ul.add-task-comment {
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
       }
-    }
-  }
-
-  &__list {
-    .tree-item-add {
-      padding-top: 30px;
     }
   }
 }

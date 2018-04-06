@@ -13,12 +13,6 @@ const viewModel = can.Map.extend({
   instance: null,
   workflow: null,
   options: null,
-  taskGroupTasks: [],
-  async loadTaskGroupTasks() {
-    const instance = this.attr('instance');
-    const taskGroupTasks = await instance.refresh_all('task_group_tasks');
-    this.attr('taskGroupTasks').replace(taskGroupTasks);
-  },
   async loadWorkflow() {
     const instance = this.attr('instance');
     const workflow = await instance.refresh_all('workflow');
@@ -26,17 +20,8 @@ const viewModel = can.Map.extend({
   },
 });
 
-const events = {
-  async '{CMS.Models.TaskGroupTask} created'() {
-    // After TGT creation, TG will have an updated
-    // list with TGTs. Because of that, TG should be refreshed.
-    await this.viewModel.instance.refresh();
-    this.viewModel.loadTaskGroupTasks();
-  },
-};
 
 const init = function () {
-  this.viewModel.loadTaskGroupTasks();
   this.viewModel.loadWorkflow();
 };
 
@@ -44,6 +29,5 @@ export default can.Component.extend({
   tag: 'task-group',
   template,
   viewModel,
-  events,
   init,
 });

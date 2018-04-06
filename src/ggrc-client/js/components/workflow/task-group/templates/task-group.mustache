@@ -64,7 +64,12 @@
         {{/with_mapping}}
     </div>
     <div class="info-pane__section">
-      <task-list {items}="taskGroupTasks"></task-list>
+      <h5 class="info-pane__section-title">
+        Tasks
+      </h5>
+      <task-list
+        {base-instance}="instance"
+      ></task-list>
     </div>
     {{/options}}
     </div>
