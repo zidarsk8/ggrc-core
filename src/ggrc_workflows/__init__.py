@@ -244,10 +244,25 @@ def create_old_style_cycle(cycle, task_group, cycle_task_group, current_user):
 
 def build_cycle(workflow, cycle=None, current_user=None):
   """Build a cycle with it's child objects"""
+  build_failed = False
 
   if not workflow.tasks:
     logger.error("Starting a cycle has failed on Workflow with "
                  "slug == '%s' and id == '%s'", workflow.slug, workflow.id)
+    build_failed = True
+
+  # Use Admin role when this is called via the cron job.
+  if not current_user:
+    admins = workflow.get_persons_for_rolename("Admin")
+    if admins:
+      current_user = admins[0]
+    else:
+      logger.error("Cannot start cycle on Workflow with slug == '%s' and "
+                   "id == '%s', cause it doesn't have Admins",
+                   workflow.slug, workflow.id)
+      build_failed = True
+
+  if build_failed:
     pusher.update_or_create_notifications(workflow, date.today(),
                                           "cycle_start_failed")
     return
@@ -255,9 +270,6 @@ def build_cycle(workflow, cycle=None, current_user=None):
   # Determine the relevant Workflow
   cycle = cycle or models.Cycle()
 
-  # Use Admin role when this is called via the cron job.
-  if not current_user:
-    current_user = workflow.get_persons_for_rolename("Admin")[0]
   # Populate the top-level Cycle object
   cycle.workflow = workflow
   cycle.is_current = True
