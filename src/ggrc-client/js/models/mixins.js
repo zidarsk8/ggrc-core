@@ -283,8 +283,10 @@ const AUDIT_ISSUE_TRACKER = {
           this.initAuditIssueTracker();
         } else {
           this.ensureParentAudit().then((audit) => {
-            this.attr('audit', audit);
-            this.initIssueTrackerForAssessment();
+            if (audit) {
+              this.attr('audit', audit);
+              this.initIssueTrackerForAssessment();
+            }
           });
         }
       }
