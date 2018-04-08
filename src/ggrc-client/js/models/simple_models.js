@@ -361,6 +361,7 @@ import {getRole} from '../plugins/utils/acl-utils';
       } else {
         instance = new model({
           id: objectId,
+          type: objectType,
           href: (paramsOrObject || {}).href,
         });
       }
