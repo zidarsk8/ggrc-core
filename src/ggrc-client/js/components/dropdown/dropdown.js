@@ -72,6 +72,7 @@ import template from './dropdown.mustache';
       noValueLabel: '@',
       controlId: '@',
       isGroupedDropdown: false,
+      tabIndex: 0,
       /*
         Options list should be an `array` of object containing `title` and `value`
         [{
