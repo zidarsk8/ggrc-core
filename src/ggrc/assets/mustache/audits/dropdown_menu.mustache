@@ -125,10 +125,11 @@
         {{/is_info_pin}}
 
         {{^if instance.archived}}
+          {{#using program=instance.program}}
             {{#if_helpers '\
-               #system_role' 'Administrator' '\
-               or #system_role' 'Superuser' '\
-               or #if' hasRole}}
+              #system_role' 'Administrator' '\
+              or #system_role' 'Superuser' '\
+              or #has_role' 'Program Managers' program}}
                <li>
                   <a data-toggle="modal-ajax-archiveform"
                      data-object-plural="{{model.table_plural}}"
@@ -140,6 +141,7 @@
                   </a>
                </li>
             {{/if_helpers}}
+          {{/using}}
             {{#is_allowed 'delete' instance}}
                 <li>
                   <a data-test-id="dropdown_settings_delete_6a62eaaf"
