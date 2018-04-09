@@ -170,6 +170,8 @@ import {getRole} from '../plugins/utils/acl-utils';
           attr_name: 'last_assessment_date',
           order: 45, // between State and Primary Contact
         },
+        {attr_title: 'Effective Date', attr_name: 'start_date'},
+        {attr_title: 'Last Deprecated Date', attr_name: 'last_deprecated_date'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
       ]),
       display_attr_names: ['title', 'owner', 'status', 'last_assessment_date',
