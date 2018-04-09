@@ -2332,6 +2332,26 @@ Mustache.registerHelper('is_auditor', function (options) {
   return options.inverse(options.contexts);
 });
 
+Mustache.registerHelper('has_role', function (role, instance, options) {
+  instance = Mustache.resolve(instance);
+  const acr = getRole(instance.type, role);
+
+  if (!acr || !instance) {
+    return options.inverse(options.contexts);
+  }
+
+  const hasRole = !!_.find(instance.access_control_list, (item) => {
+    return item.ac_role_id === acr.id &&
+      item.person_id === GGRC.current_user.id;
+  });
+
+  if (hasRole) {
+    return options.fn(options.contexts);
+  } else {
+    return options.inverse(options.contexts);
+  }
+});
+
 Mustache.registerHelper('user_roles', (person, parentInstance, options) => {
   const allRoles = GGRC.access_control_roles.concat(
     GGRC.internal_access_control_roles);
