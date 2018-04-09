@@ -33,6 +33,7 @@ exports = [
     "GAPI_ADMIN_GROUP",
     "VERSION",
     "MAX_INSTANCES",
+    "CREATE_ISSUE_URL",
 ]  # pylint: disable=invalid-name
 
 # Deployment-specific variables
@@ -197,3 +198,6 @@ RISK_ASSESSMENT_URL = os.environ.get(
     'GGRC_RISK_ASSESSMENT_URL',
     'http://localhost:8080'
 )
+
+# Link for creation buganizer issue
+CREATE_ISSUE_URL = os.environ.get('CREATE_ISSUE_URL', "")
