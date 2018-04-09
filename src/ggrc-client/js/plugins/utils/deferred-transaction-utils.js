@@ -7,9 +7,8 @@
  * The util allows to perform batch of actions with some delay in a single transaction.
  * @param {function} completeTransaction - The function that allows to submit result of transaction.
  * @param {number} timeout - The execution delay in milliseconds.
- * @param {boolean} sequentially - The flag indicates that transactions must be completed sequentially.
  */
-export default function (completeTransaction, timeout, sequentially) {
+export default function (completeTransaction, timeout) {
   let deferredQueue = [];
   let timeoutId = null;
 
@@ -50,11 +49,6 @@ export default function (completeTransaction, timeout, sequentially) {
     return batchDfd.promise();
   }
 
-  function run() {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(processQueue, timeout);
-  }
-
   function runSequence() {
     if (sequence.transactionDfd.state() !== 'pending') {
       clearTimeout(timeoutId);
@@ -89,11 +83,7 @@ export default function (completeTransaction, timeout, sequentially) {
       action: action,
     });
 
-    if (sequentially) {
-      runSequence();
-    } else {
-      run();
-    }
+    runSequence();
 
     return dfd.promise();
   };

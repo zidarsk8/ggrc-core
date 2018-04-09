@@ -428,7 +428,7 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
         this.attr('deferredSave', new DeferredTransaction(
           function (resolve, reject) {
             this.attr('instance').save().done(resolve).fail(reject);
-          }.bind(this), 1000, true));
+          }.bind(this), 1000));
       },
       onStateChange: function (event) {
         let isUndo = event.undo;
