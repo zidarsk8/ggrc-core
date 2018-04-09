@@ -3,15 +3,18 @@
 
 """Tests for /api/<model> endpoints."""
 
-import mock
-
 import json
 import time
 from urlparse import urlparse
 from wsgiref.handlers import format_date_time
+
+import mock
+import ddt
 from sqlalchemy import and_
 
+from integration.ggrc.models import factories
 from integration.ggrc.services import TestCase
+from integration.ggrc import api_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
 from ggrc.models import all_models
@@ -323,6 +326,116 @@ class TestServices(TestCase):
     )
     self.assertStatus(response, 304)
     self.assertIn("Etag", response.headers)
+
+
+@mock.patch('ggrc.utils.user_generator.find_or_create_external_user')
+@ddt.ddt
+class TestUserCreation(TestCase):
+  """Test cases for user creation via REST API"""
+
+  def setUp(self):
+    super(TestUserCreation, self).setUp()
+    self.client.get("/login")
+    self.api = api_helper.Api()
+
+  @staticmethod
+  def make_person_json(email, external):
+    result = {
+        "person": {
+            "name": email,
+            "email": email,
+            "context": None,
+        },
+    }
+    if external is not None:
+      result["person"]["external"] = external
+    return result
+
+  def test_external_users_all_succeed(self, create_external_user_mock):
+    """When all external users are created, HTTP200 is returned."""
+
+    def just_create_user(email, name):
+      return factories.PersonFactory(email=email, name=name)
+
+    create_external_user_mock.side_effect = just_create_user
+
+    payload = [self.make_person_json("user1@example.com", True),
+               self.make_person_json("user2@example.com", True)]
+
+    response = self.api.post(all_models.Person, payload)
+
+    self.assert200(response)
+    create_external_user_mock.assert_has_calls(
+        [mock.call("user1@example.com", "user1@example.com"),
+         mock.call("user2@example.com", "user2@example.com")],
+        any_order=True,
+    )
+    self.assertItemsEqual([status_code
+                           for (status_code, _) in response.json],
+                          [201, 201])
+
+  def test_external_users_some_succeed(self, create_external_user_mock):
+    """When some external users are not created, HTTP200 is returned."""
+
+    def create_only_valid_user(email, name):
+      if email == "invalid@example.com":
+        return None
+      return factories.PersonFactory(email=email, name=name)
+
+    create_external_user_mock.side_effect = create_only_valid_user
+
+    payload = [self.make_person_json("invalid@example.com", True),
+               self.make_person_json("valid@example.com", True)]
+
+    response = self.api.post(all_models.Person, payload)
+
+    self.assert200(response)
+    create_external_user_mock.assert_has_calls(
+        [mock.call("invalid@example.com", "invalid@example.com"),
+         mock.call("valid@example.com", "valid@example.com")],
+        any_order=True,
+    )
+    self.assertItemsEqual([status_code
+                           for (status_code, _) in response.json],
+                          [201, 400])
+
+  def test_external_users_none_succeed(self, create_external_user_mock):
+    """When no external users are created, HTTP400 is returned."""
+    create_external_user_mock.return_value = None
+
+    payload = [self.make_person_json("user1@example.com", True),
+               self.make_person_json("user2@example.com", True)]
+
+    response = self.api.post(all_models.Person, payload)
+
+    self.assertStatus(response, 400)
+    create_external_user_mock.assert_has_calls(
+        [mock.call("user1@example.com", "user1@example.com"),
+         mock.call("user2@example.com", "user2@example.com")],
+        any_order=True,
+    )
+    self.assertItemsEqual([status_code
+                           for (status_code, _) in response.json],
+                          [400, 400])
+
+  def test_disallow_mixed_external_flags(self, create_external_user_mock):
+    """When both True and False external flag passed, HTTP400 is returned."""
+
+    payload = [self.make_person_json("user1@example.com", True),
+               self.make_person_json("user2@example.com", False)]
+
+    response = self.api.post(all_models.Person, payload)
+
+    self.assert400(response)
+    create_external_user_mock.assert_not_called()
+
+    payload = [self.make_person_json("user1@example.com", None),
+               self.make_person_json("user2@example.com", True)]
+
+    response = self.api.post(all_models.Person, payload)
+
+    self.assert400(response)
+    create_external_user_mock.assert_not_called()
 
 
 class TestFilteringByRequest(TestCase):
