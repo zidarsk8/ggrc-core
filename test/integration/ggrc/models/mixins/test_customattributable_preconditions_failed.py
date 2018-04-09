@@ -71,7 +71,7 @@ class TestPreconditionsFailed(TestCase):
     """No preconditions failed with no CA restrictions."""
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(preconditions_failed)
 
   def test_preconditions_failed_with_no_mandatory_ca(self):
     """No preconditions failed with no CA-introduced restrictions."""
@@ -82,7 +82,7 @@ class TestPreconditionsFailed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(preconditions_failed)
     self.assertFalse(ca_text.value.preconditions_failed)
     self.assertFalse(ca_cbox.value.preconditions_failed)
 
@@ -92,7 +92,7 @@ class TestPreconditionsFailed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, True)
+    self.assertTrue(preconditions_failed)
     self.assertEqual(ca.value.preconditions_failed,
                      ["value"])
 
@@ -102,7 +102,7 @@ class TestPreconditionsFailed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(preconditions_failed)
     self.assertFalse(ca.value.preconditions_failed)
 
   def test_preconditions_failed_with_mandatory_empty_global_ca(self):
@@ -112,7 +112,7 @@ class TestPreconditionsFailed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, True)
+    self.assertTrue(preconditions_failed)
     self.assertEqual(ca.value.preconditions_failed, ["value"])
 
   def test_preconditions_failed_with_mandatory_filled_global_ca(self):
@@ -122,7 +122,7 @@ class TestPreconditionsFailed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(preconditions_failed)
     self.assertFalse(ca.value.preconditions_failed)
 
   def test_preconditions_failed_with_missing_mandatory_comment(self):
@@ -136,7 +136,7 @@ class TestPreconditionsFailed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, True)
+    self.assertTrue(preconditions_failed)
     self.assertEqual(ca.value.preconditions_failed, ["comment"])
 
   def test_preconditions_failed_with_missing_mandatory_evidence(self):
@@ -150,7 +150,7 @@ class TestPreconditionsFailed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, True)
+    self.assertTrue(preconditions_failed)
     self.assertEqual(ca.value.preconditions_failed, ["evidence"])
 
   def test_preconditions_failed_with_missing_mandatory_url(self):
@@ -164,7 +164,7 @@ class TestPreconditionsFailed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, True)
+    self.assertTrue(preconditions_failed)
     self.assertEqual(ca.value.preconditions_failed, ["url"])
 
   def test_preconditions_failed_with_mandatory_comment_and_evidence(self):
@@ -178,7 +178,7 @@ class TestPreconditionsFailed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, True)
+    self.assertTrue(preconditions_failed)
     self.assertEqual(set(ca.value.preconditions_failed),
                      {"comment", "evidence"})
 
@@ -193,7 +193,7 @@ class TestPreconditionsFailed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, True)
+    self.assertTrue(preconditions_failed)
     self.assertEqual(set(ca.value.preconditions_failed),
                      {"url", "evidence"})
 
@@ -208,7 +208,7 @@ class TestPreconditionsFailed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, True)
+    self.assertTrue(preconditions_failed)
     self.assertEqual(set(ca.value.preconditions_failed),
                      {"url", "comment"})
 
@@ -223,7 +223,7 @@ class TestPreconditionsFailed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, True)
+    self.assertTrue(preconditions_failed)
     self.assertEqual(set(ca.value.preconditions_failed),
                      {"url", "comment", "evidence"})
 
@@ -273,7 +273,7 @@ class TestPreconditionsFailed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, True)
+    self.assertTrue(preconditions_failed)
 
   def test_preconditions_failed_with_missing_several_mandatory_evidences(self):
     """Preconditions failed if count(evidences) < count(evidences_required)."""
@@ -300,7 +300,7 @@ class TestPreconditionsFailed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, True)
+    self.assertTrue(preconditions_failed)
     self.assertEqual(ca1.value.preconditions_failed, ["evidence"])
     self.assertEqual(ca2.value.preconditions_failed, ["evidence"])
 
@@ -321,7 +321,7 @@ class TestPreconditionsPassed(TestCase):
     """No preconditions failed with no CA restrictions."""
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(preconditions_failed)
 
   def test_preconditions_failed_with_no_mandatory_ca(self):
     """No preconditions failed with no CA-introduced restrictions."""
@@ -332,7 +332,7 @@ class TestPreconditionsPassed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(preconditions_failed)
     self.assertFalse(ca_text.value.preconditions_failed)
     self.assertFalse(ca_cbox.value.preconditions_failed)
 
@@ -342,7 +342,7 @@ class TestPreconditionsPassed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(preconditions_failed)
     self.assertFalse(ca.value.preconditions_failed)
 
   def test_preconditions_failed_with_mandatory_filled_global_ca(self):
@@ -352,7 +352,7 @@ class TestPreconditionsPassed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(preconditions_failed)
     self.assertFalse(ca.value.preconditions_failed)
 
   def test_preconditions_failed_with_present_mandatory_comment(self):
@@ -386,7 +386,7 @@ class TestPreconditionsPassed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(preconditions_failed)
     self.assertFalse(ca.value.preconditions_failed)
 
   def test_preconditions_failed_with_present_mandatory_evidence(self):
@@ -407,7 +407,7 @@ class TestPreconditionsPassed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(preconditions_failed)
     self.assertFalse(ca.value.preconditions_failed)
 
   def test_preconditions_failed_with_several_mandatory_evidences(self):
@@ -444,7 +444,7 @@ class TestPreconditionsPassed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(preconditions_failed)
     self.assertFalse(ca1.value.preconditions_failed)
     self.assertFalse(ca2.value.preconditions_failed)
 
@@ -456,7 +456,7 @@ class TestPreconditionsPassed(TestCase):
         dropdown_parameters=("foo,url_required", "0,4"),
         value="url_required",
     )
-    url = factories.UrlFactory(
+    url = factories.UrlTypeDocumentFactory(
         title="Mandatory url",
     )
     factories.RelationshipFactory(
@@ -466,7 +466,7 @@ class TestPreconditionsPassed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(preconditions_failed)
     self.assertFalse(ca.value.preconditions_failed)
 
   def test_preconditions_failed_with_several_mandatory_urls(self):
@@ -484,7 +484,7 @@ class TestPreconditionsPassed(TestCase):
         value="url_required"
     )
     # only one URL provided yet
-    url = factories.UrlFactory(
+    url = factories.UrlTypeDocumentFactory(
         title="Mandatory URL",
     )
     factories.RelationshipFactory(
@@ -493,7 +493,7 @@ class TestPreconditionsPassed(TestCase):
     )
 
     # the second URL
-    url = factories.UrlFactory(
+    url = factories.UrlTypeDocumentFactory(
         title="Second mandatory URL",
     )
     factories.RelationshipFactory(
@@ -503,6 +503,6 @@ class TestPreconditionsPassed(TestCase):
 
     preconditions_failed = self.assessment.preconditions_failed
 
-    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(preconditions_failed)
     self.assertFalse(ca1.value.preconditions_failed)
     self.assertFalse(ca2.value.preconditions_failed)
