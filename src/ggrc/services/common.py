@@ -1081,13 +1081,15 @@ class Resource(ModelView):
               response_part = (201, self.object_for_json(person))
               any_created = True
             else:
-              response_part = (406, {"Failed": True})
+              response_part = (400, {"Failed": True})
             created_people.append(response_part)
 
           if any_created:
             return self.json_success_response(created_people)
           return current_app.make_response(
-              ("application/json", 406, [("Content-type", "text/plain")]),
+              (self.as_json(created_people),
+               400,
+               [("Content-type", "text/plain")]),
           )
 
       res = []
