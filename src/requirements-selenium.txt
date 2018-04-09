@@ -1,7 +1,6 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-pytest-flask==0.10.0
 pytest-html==1.16.1
 pytest-pep8==1.0.6
 pytest-selenium==1.12.0
