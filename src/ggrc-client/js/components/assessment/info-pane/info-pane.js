@@ -459,7 +459,7 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
           instance.attr('previousStatus', instance.attr('status'));
         }
 
-        return this.attr('deferredSave').push(() => {
+        return this.attr('deferredSave').execute(() => {
           if (isUndo) {
             instance.attr('status', previousStatus);
           } else {
