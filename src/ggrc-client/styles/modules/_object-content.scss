@@ -33,6 +33,10 @@
       }
     }
   }
+  .person-info-list {
+    list-style-type: none;
+    margin: 0;
+  }
   .person-tooltip-trigger {
     &:hover {
       text-decoration: underline;
