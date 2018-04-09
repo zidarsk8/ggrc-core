@@ -49,7 +49,7 @@ export default function (completeTransaction, timeout) {
     return batchDfd.promise();
   }
 
-  function runSequence() {
+  function runSequence(timeout) {
     if (sequence.transactionDfd.state() !== 'pending') {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(processSequentially, timeout);
@@ -83,7 +83,24 @@ export default function (completeTransaction, timeout) {
       action: action,
     });
 
-    runSequence();
+    runSequence(timeout);
+
+    return dfd.promise();
+  };
+
+  /**
+   * Adds new action to execution queue and execute all queue without delay.
+   * @param {function} action - The action that should be executed.
+   * @return {object} - The canJS promise indicates result of the transaction.
+   */
+  this.execute = function (action) {
+    let dfd = can.Deferred();
+    deferredQueue.push({
+      deferred: dfd,
+      action: action,
+    });
+
+    runSequence(0);
 
     return dfd.promise();
   };

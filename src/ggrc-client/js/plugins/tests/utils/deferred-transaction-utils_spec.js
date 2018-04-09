@@ -52,4 +52,15 @@ describe('DeferredTransaction module', function () {
       });
     }, 50);
   });
+
+  it('execute queue of actions with 0 timeout if "execute" method was called',
+    (done) => {
+      deferredTransaction.push(action);
+      deferredTransaction.execute(action);
+      setTimeout(() => {
+        expect(completeTransactionCount).toBe(1);
+        expect(completeActionsCount).toBe(2);
+        done();
+      }, 0);
+    });
 });
