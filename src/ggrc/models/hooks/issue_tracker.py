@@ -793,10 +793,11 @@ def _update_issuetracker_issue(assessment, issue_tracker_info,
 
   # handle assignee and cc_list update
   assignee_email, cc_list = _collect_issue_emails(assessment)
-  issue_tracker_info['assignee'] = assignee_email
-  issue_params['assignee'] = assignee_email
-  issue_params['verifier'] = assignee_email
-  issue_params['ccs'] = cc_list
+  if assignee_email is not None:
+    issue_tracker_info['assignee'] = assignee_email
+    issue_params['assignee'] = assignee_email
+    issue_params['verifier'] = assignee_email
+    issue_params['ccs'] = cc_list
 
   if issue_params:
     # Resend all properties upon any change.
