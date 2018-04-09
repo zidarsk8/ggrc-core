@@ -428,7 +428,7 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
         this.attr('deferredSave', new DeferredTransaction(
           function (resolve, reject) {
             this.attr('instance').save().done(resolve).fail(reject);
-          }.bind(this), 1000, true));
+          }.bind(this), 1000));
       },
       onStateChange: function (event) {
         let isUndo = event.undo;
@@ -459,15 +459,19 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
           instance.attr('previousStatus', instance.attr('status'));
         }
 
-        instance.attr('status', isUndo ? previousStatus : newStatus);
-        if (instance.attr('status') === 'In Review' && !isUndo) {
-          $(document.body).trigger('ajax:flash',
-            {hint: 'The assessment is complete. ' +
-            'The verifier may revert it if further input is needed.'});
-        }
+        return this.attr('deferredSave').execute(() => {
+          if (isUndo) {
+            instance.attr('status', previousStatus);
+          } else {
+            instance.attr('status', newStatus);
+          }
 
-        return instance.save().then(() => {
-          this.initializeFormFields();
+          if (instance.attr('status') === 'In Review' && !isUndo) {
+            $(document.body).trigger('ajax:flash',
+              {hint: 'The assessment is complete. ' +
+              'The verifier may revert it if further input is needed.'});
+          }
+        }).then(() => {
           this.attr('onStateChangeDfd').resolve();
           pubsub.dispatch({
             type: 'refetchOnce',

@@ -4,6 +4,7 @@
 */
 
 import tracker from '../../../../tracker';
+import DeferredTransaction from '../../../../plugins/utils/deferred-transaction-utils';
 
 describe('GGRC.Components.assessmentInfoPane', function () {
   let vm;
@@ -79,10 +80,14 @@ describe('GGRC.Components.assessmentInfoPane', function () {
 
   describe('onStateChange() method', () => {
     let method;
+
     beforeEach(() => {
       method = vm.onStateChange.bind(vm);
       spyOn(tracker, 'start').and.returnValue(() => {});
-      spyOn(vm, 'initializeFormFields').and.returnValue(() => {});
+
+      vm.attr('deferredSave', new DeferredTransaction((resolve, reject) => {
+        vm.attr('instance').save().done(resolve).fail(reject);
+      }, 0, true));
     });
 
     it('prevents state change to deprecated for archived instance', (done) => {
