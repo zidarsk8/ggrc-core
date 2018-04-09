@@ -95,8 +95,8 @@ class TestServices(TestCase):
 
   def _prepare_model_for_put(self, foo_param="buzz"):
     """Common object initializing sequence."""
-    mock = self.mock_model(foo=foo_param)
-    response = self.client.get(self.mock_url(mock.id),
+    mock_obj = self.mock_model(foo=foo_param)
+    response = self.client.get(self.mock_url(mock_obj.id),
                                headers=self.get_headers())
     self.assert200(response)
     self.assert_required_headers(response)
@@ -283,9 +283,12 @@ class TestServices(TestCase):
     check_response_409(response_date_invalid)
 
   def test_options(self):
-    mock = self.mock_model()
+    mock_obj = self.mock_model()
     response = self.client.open(
-        self.mock_url(mock.id), method="OPTIONS", headers=self.get_headers())
+        self.mock_url(mock_obj.id),
+        method="OPTIONS",
+        headers=self.get_headers(),
+    )
     self.assert_options(response, RESOURCE_ALLOWED)
 
   def test_collection_options(self):
