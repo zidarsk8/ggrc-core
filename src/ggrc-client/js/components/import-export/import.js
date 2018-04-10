@@ -137,6 +137,7 @@ export default can.Component.extend({
         importStatus: '',
         message: '',
         isConfirm: false,
+        jobId: null,
       });
     },
     statusStrategies: {
@@ -321,8 +322,7 @@ export default can.Component.extend({
           if (file && _.any(allowedTypes, function (type) {
             return type === file.mimeType;
           })) {
-            if (that.attr('state') !== jobStatuses.SELECT &&
-              that.attr('jobId')) {
+            if (that.attr('jobId')) {
               deleteImportJob(that.attr('jobId'));
             }
             that.resetFile();
