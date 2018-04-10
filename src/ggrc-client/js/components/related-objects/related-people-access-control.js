@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {SAVE_CUSTOM_ROLE, ROLES_CONFLICT} from '../../events/eventTypes';
+import {ROLES_CONFLICT} from '../../events/eventTypes';
 import {getRolesForType} from '../../plugins/utils/acl-utils';
 
 export default GGRC.Components('relatedPeopleAccessControl', {
@@ -28,7 +28,7 @@ export default GGRC.Components('relatedPeopleAccessControl', {
       this.performUpdate(args);
 
       this.dispatch({
-        ...SAVE_CUSTOM_ROLE,
+        type: 'saveCustomRole',
         groupId: args.roleId,
       });
     },
