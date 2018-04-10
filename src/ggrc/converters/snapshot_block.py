@@ -113,7 +113,8 @@ class SnapshotBlockConverter(object):
     content["slug"] = u"*{}".format(content["slug"])
     content["revision_date"] = unicode(snapshot.revision.created_at)
     if snapshot.last_assessment_date:
-      content["last_assessment_date"] = snapshot.last_assessment_date.isoformat()
+      content["last_assessment_date"] = \
+          snapshot.last_assessment_date.isoformat()
     if self.MAPPINGS_KEY in self.fields:
       content.update(self._generate_mapping_content(snapshot))
     return content
