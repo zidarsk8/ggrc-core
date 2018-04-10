@@ -1,6 +1,5 @@
 < .babelrc
 < DEPLOYMENT.md
-< Dockerfile
 < docs/source/backend/access_control.rst
 < docs/source/backend/adding_new_object.rst
 < docs/source/backend/advanced_query_api.rst
