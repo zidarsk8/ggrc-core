@@ -20,6 +20,9 @@ git ls-files | \
   grep -v ".csv$" | \
   grep -v ".png$" | \
   grep -v ".json$" | \
+  grep -v ".ico$" | \
+  grep -v ".gif$" | \
+  grep -v ".svg$" | \
   sort > /tmp/all_files
 
 diff /tmp/all_files /tmp/with_copyright | grep "^<" > /tmp/license_header_diff
