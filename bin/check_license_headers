@@ -9,7 +9,9 @@ SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
 cd "${SCRIPTPATH}/../"
 
-git grep "Copyright (C) 2018 Google Inc." . | \
+YEAR=2018
+
+git grep "Copyright (C) $YEAR Google Inc." . | \
   grep -o "^[^:]*" | \
   sort -u > /tmp/with_copyright
 
