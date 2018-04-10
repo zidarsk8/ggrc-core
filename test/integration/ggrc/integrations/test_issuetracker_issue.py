@@ -3,13 +3,12 @@
 
 """Integration test for Clonable mixin"""
 
-from mock import patch
+import mock
 
 from ggrc import db
 from ggrc import models
 from ggrc.models import all_models
 from ggrc.models.hooks import issue_tracker
-from ggrc.integrations import issues as issues_module
 from ggrc.integrations import utils
 from ggrc.access_control.role import AccessControlRole
 
@@ -20,8 +19,7 @@ from integration.ggrc.snapshotter import SnapshotterBaseTestCase
 
 
 class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
-
-  """Test set for IssueTracker integration functionality"""
+  """Test set for IssueTracker integration functionality."""
 
   # pylint: disable=invalid-name
 
@@ -31,58 +29,75 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     # <type 'object'> as last entry.
     super(TestIssueTrackerIntegration, self).setUp()
 
-    self.client.get("/login")
+    self.client.get('/login')
 
-  # pylint: disable=unused-argument
-  @patch('ggrc.integrations.issues.Client.update_issue')
-  def test_update_issuetracker_info(self, mock_update_issue):
-    """Test that issuetracker issues are updated by the utility"""
-    with patch.object(issue_tracker, '_is_issue_tracker_enabled',
-                      return_value=True):
+  def test_update_issuetracker_info(self):
+    """Test that Issue Tracker issues are updated by the utility."""
+    cli_patch = mock.patch.object(utils.issues, 'Client')
+    hook_patch = mock.patch.object(issue_tracker, '_is_issue_tracker_enabled',
+                                   return_value=True)
+    with cli_patch, hook_patch:
       iti_issue_id = []
-      for _ in range(2):
+      for _ in xrange(2):
         iti = factories.IssueTrackerIssueFactory()
         iti_issue_id.append(iti.issue_id)
         asmt = iti.issue_tracked_obj
         asmt_id = asmt.id
         audit = asmt.audit
         self.api.modify_object(audit, {
-            "issue_tracker": {
-                "enabled": True,
-                "component_id": "11111",
-                "hotlist_id": "222222",
+            'issue_tracker': {
+                'enabled': True,
+                'component_id': '11111',
+                'hotlist_id': '222222',
             },
         })
         asmt = db.session.query(models.Assessment).get(asmt_id)
         self.api.modify_object(asmt, {
-            "issue_tracker": {
-                "enabled": True,
-                "component_id": "11111",
-                "hotlist_id": "222222",
+            'issue_tracker': {
+                'enabled': True,
+                'component_id': '11111',
+                'hotlist_id': '222222',
             },
         })
         asmt = db.session.query(models.Assessment).get(asmt_id)
         self.api.modify_object(asmt, {
-            "issue_tracker": {
-                "enabled": True,
-                "component_id": "11111",
-                "hotlist_id": "222222",
-                "issue_priority": "P4",
-                "issue_severity": "S3",
+            'issue_tracker': {
+                'enabled': True,
+                'component_id': '11111',
+                'hotlist_id': '222222',
+                'issue_priority': 'P4',
+                'issue_severity': 'S3',
             },
         })
       self.api.delete(asmt)
-      with patch.object(issues_module.Client, 'update_issue',
-                        return_value=None) as mock_method:
-        utils.sync_issue_tracker_statuses()
-        mock_method.assert_called_once_with(iti_issue_id[0],
-                                            {'status': 'ASSIGNED',
-                                             'priority': u'P4',
-                                             'type': None,
-                                             'severity': u'S3'})
+
+    cli_mock = mock.MagicMock()
+    cli_mock.update_issue.return_value = None
+    cli_mock.search.return_value = {
+        'issues': [
+            {
+                'issueId': iti_issue_id[0],
+                'issueState': {
+                    'status': 'FIXED', 'type': 'bug2',
+                    'priority': 'P2', 'severity': 'S2',
+                },
+            },
+        ],
+        'next_page_token': None,
+    }
+
+    with mock.patch.object(utils.issues, 'Client', return_value=cli_mock):
+      utils.sync_issue_tracker_statuses()
+      cli_mock.update_issue.assert_called_once_with(
+          iti_issue_id[0], {
+              'status': 'ASSIGNED',
+              'priority': u'P4',
+              'type': None,
+              'severity': u'S3',
+          })
 
   # pylint: disable=unused-argument
-  @patch('ggrc.integrations.issues.Client.update_issue')
+  @mock.patch('ggrc.integrations.issues.Client.update_issue')
   def test_update_issuetracker_assignee(self, mocked_update_issue):
     """Test assignee sync in case it has been updated."""
     email1 = "email1@example.com"
@@ -97,8 +112,8 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     iti = factories.IssueTrackerIssueFactory(enabled=True)
     iti_issue_id.append(iti.issue_id)
     asmt = iti.issue_tracked_obj
-    with patch.object(issue_tracker, '_is_issue_tracker_enabled',
-                      return_value=True):
+    with mock.patch.object(issue_tracker, '_is_issue_tracker_enabled',
+                           return_value=True):
       acl = [acl_helper.get_acl_json(assignee_role_id, assignee.id)
              for assignee in assignees]
       self.api.put(asmt, {
@@ -116,33 +131,33 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
 
 
-@patch("ggrc.models.hooks.issue_tracker._is_issue_tracker_enabled",
-       return_value=True)
-@patch("ggrc.integrations.issues.Client")
+@mock.patch('ggrc.models.hooks.issue_tracker._is_issue_tracker_enabled',
+            return_value=True)
+@mock.patch('ggrc.integrations.issues.Client')
 class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
   """Test people used in IssueTracker Issues."""
 
   EMAILS = {
-      "Audit Captains": {"audit_captain_1@example.com",
-                         "audit_captain_2@example.com"},
-      "Auditors": {"auditor_1@example.com", "auditor_2@example.com"},
-      "Creators": {"creator_1@example.com", "creator_2@example.com"},
-      "Assignees": {"assignee_1@example.com", "assignee_2@example.com"},
-      "Verifiers": {"verifier_1@example.com", "verifier_2@example.com"},
-      "Primary Contacts": {"primary_contact_1@example.com",
-                           "primary_contact_2@example.com"},
-      "Secondary Contacts": {"secondary_contact_1@example.com",
-                             "secondary_contact_2@example.com"},
-      "Custom Role": {"curom_role_1@example.com"},
+      'Audit Captains': {'audit_captain_1@example.com',
+                         'audit_captain_2@example.com'},
+      'Auditors': {'auditor_1@example.com', 'auditor_2@example.com'},
+      'Creators': {'creator_1@example.com', 'creator_2@example.com'},
+      'Assignees': {'assignee_1@example.com', 'assignee_2@example.com'},
+      'Verifiers': {'verifier_1@example.com', 'verifier_2@example.com'},
+      'Primary Contacts': {'primary_contact_1@example.com',
+                           'primary_contact_2@example.com'},
+      'Secondary Contacts': {'secondary_contact_1@example.com',
+                             'secondary_contact_2@example.com'},
+      'Custom Role': {'curom_role_1@example.com'},
   }
 
   ROLE_NAMES = (
-      "Creators",
-      "Assignees",
-      "Verifiers",
-      "Primary Contacts",
-      "Secondary Contacts",
-      "Custom Role"
+      'Creators',
+      'Assignees',
+      'Verifiers',
+      'Primary Contacts',
+      'Secondary Contacts',
+      'Custom Role'
   )
 
   def setUp(self):
@@ -152,7 +167,7 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
     factories.AccessControlRoleFactory(
         name='Custom Role',
         internal=False,
-        object_type="Assessment",
+        object_type='Assessment',
     )
 
     # fetch all roles mentioned in self.EMAILS
@@ -193,21 +208,21 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
         for person in people
     })
     issue_tracker_with_defaults = {
-        "enabled": True,
-        "component_id": hash("Default Component id"),
-        "hotlist_id": hash("Default Hotlist id"),
-        "issue_type": "Default Issue type",
-        "issue_priority": "Default Issue priority",
-        "issue_severity": "Default Issue severity",
+        'enabled': True,
+        'component_id': hash('Default Component id'),
+        'hotlist_id': hash('Default Hotlist id'),
+        'issue_type': 'Default Issue type',
+        'issue_priority': 'Default Issue priority',
+        'issue_severity': 'Default Issue severity',
     }
     issue_tracker_with_defaults.update(issue_tracker or {})
 
     _, asmt = self.generator.generate_object(
         all_models.Assessment,
         data={
-            "audit": {"id": self.audit.id, "type": self.audit.type},
-            "issue_tracker": issue_tracker_with_defaults,
-            "access_control_list": access_control_list,
+            'audit': {'id': self.audit.id, 'type': self.audit.type},
+            'issue_tracker': issue_tracker_with_defaults,
+            'access_control_list': access_control_list,
         }
     )
 
@@ -216,18 +231,18 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
   def test_new_assessment_people(self, client_mock, _):
     """External Issue for Assessment contains correct people."""
     client_instance = client_mock.return_value
-    client_instance.create_issue.return_value = {"issueId": 42}
+    client_instance.create_issue.return_value = {'issueId': 42}
 
     self.setup_audit_people({
         role_name: people for role_name, people in self.people.items()
-        if role_name in ("Audit Captains", "Auditors")
+        if role_name in ('Audit Captains', 'Auditors')
     })
 
-    component_id = hash("Component id")
-    hotlist_id = hash("Hotlist id")
-    issue_type = "Issue type"
-    issue_priority = "Issue priority"
-    issue_severity = "Issue severity"
+    component_id = hash('Component id')
+    hotlist_id = hash('Hotlist id')
+    issue_type = 'Issue type'
+    issue_priority = 'Issue priority'
+    issue_severity = 'Issue severity'
 
     asmt = self.create_asmt_with_issue_tracker(
         role_name_to_people={
@@ -235,55 +250,55 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
             if role_name in self.ROLE_NAMES
         },
         issue_tracker={
-            "component_id": component_id,
-            "hotlist_id": hotlist_id,
-            "issue_type": issue_type,
-            "issue_priority": issue_priority,
-            "issue_severity": issue_severity,
+            'component_id': component_id,
+            'hotlist_id': hotlist_id,
+            'issue_type': issue_type,
+            'issue_priority': issue_priority,
+            'issue_severity': issue_severity,
         },
     )
 
     expected_cc_list = list(
-        self.EMAILS["Assignees"] - {min(self.EMAILS["Assignees"])}
+        self.EMAILS['Assignees'] - {min(self.EMAILS['Assignees'])}
     )
 
     # pylint: disable=protected-access; we assert by non-exported constants
     client_instance.create_issue.assert_called_once_with({
         # common fields
-        "comment": (issue_tracker._INITIAL_COMMENT_TMPL %
+        'comment': (issue_tracker._INITIAL_COMMENT_TMPL %
                     issue_tracker._get_assessment_url(asmt)),
-        "component_id": component_id,
-        "hotlist_ids": [hotlist_id],
-        "priority": issue_priority,
-        "severity": issue_severity,
-        "status": "ASSIGNED",
-        "title": asmt.title,
-        "type": issue_type,
+        'component_id': component_id,
+        'hotlist_ids': [hotlist_id],
+        'priority': issue_priority,
+        'severity': issue_severity,
+        'status': 'ASSIGNED',
+        'title': asmt.title,
+        'type': issue_type,
 
         # person-related fields
-        "reporter": min(self.EMAILS["Audit Captains"]),
-        "assignee": min(self.EMAILS["Assignees"]),
-        "verifier": min(self.EMAILS["Assignees"]),
-        "ccs": expected_cc_list,
+        'reporter': min(self.EMAILS['Audit Captains']),
+        'assignee': min(self.EMAILS['Assignees']),
+        'verifier': min(self.EMAILS['Assignees']),
+        'ccs': expected_cc_list,
     })
 
   def test_missing_audit_captains(self, client_mock, _):
     """Reporter email is None is no Audit Captains present."""
     client_instance = client_mock.return_value
-    client_instance.create_issue.return_value = {"issueId": 42}
+    client_instance.create_issue.return_value = {'issueId': 42}
 
     self.setup_audit_people({
-        "Audit Captains": [],
-        "Auditors": self.people["Auditors"],
+        'Audit Captains': [],
+        'Auditors': self.people['Auditors'],
     })
 
     self.create_asmt_with_issue_tracker(
         role_name_to_people={
             role_name: people for role_name, people in self.people.items()
-            if role_name in ("Creators", "Assignees", "Verifiers")
+            if role_name in ('Creators', 'Assignees', 'Verifiers')
         },
     )
 
     client_instance.create_issue.assert_called_once()
-    self.assertIs(client_instance.create_issue.call_args[0][0]["reporter"],
+    self.assertIs(client_instance.create_issue.call_args[0][0]['reporter'],
                   None)
