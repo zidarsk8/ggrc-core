@@ -178,7 +178,7 @@ class TestSnapshots(base.Test):
            "Update snapshotable Control to latest ver "
            "after deleting CAs for Controls"],
       indirect=["dynamic_create_audit_with_control"])
-  def test_update_snapshotable_control_to_latest_ver(
+  def test_destructive_update_snapshotable_control_to_latest_ver(
       self, new_cas_for_controls_rest, dynamic_create_audit_with_control,
       control, expected_control, selenium
   ):
