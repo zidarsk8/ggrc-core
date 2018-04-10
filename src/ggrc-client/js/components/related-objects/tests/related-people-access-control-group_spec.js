@@ -8,89 +8,89 @@ import Component from '../related-people-access-control-group';
 import Permission from '../../../permission';
 
 describe('GGRC.Components.relatedPeopleAccessControlGroup', () => {
-  let vm;
+  let viewModel;
 
   beforeEach(() => {
-    vm = new (can.Map.extend(Component.prototype.viewModel));
-    vm.attr('instance', {});
+    viewModel = new (can.Map.extend(Component.prototype.viewModel));
+    viewModel.attr('instance', {});
   });
 
   describe('canEdit prop', () => {
     it('returns "false" when instance is snapshot', () => {
       spyOn(Permission, 'is_allowed_for').and.returnValue(true);
-      vm.instance.attr('archived', false);
-      vm.attr('updatableGroupId', null);
-      vm.attr('isNewInstance', false);
+      viewModel.instance.attr('archived', false);
+      viewModel.attr('updatableGroupId', null);
+      viewModel.attr('isNewInstance', false);
 
       spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(true);
 
-      expect(vm.attr('canEdit')).toEqual(false);
+      expect(viewModel.attr('canEdit')).toEqual(false);
     });
 
     it('returns "false" when instance is archived', () => {
       spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
       spyOn(Permission, 'is_allowed_for').and.returnValue(true);
-      vm.attr('updatableGroupId', null);
-      vm.attr('isNewInstance', false);
+      viewModel.attr('updatableGroupId', null);
+      viewModel.attr('isNewInstance', false);
 
-      vm.instance.attr('archived', true);
+      viewModel.instance.attr('archived', true);
 
-      expect(vm.attr('canEdit')).toEqual(false);
+      expect(viewModel.attr('canEdit')).toEqual(false);
     });
 
     it('returns "false" when there is updatableGroupId', () => {
       spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
-      vm.instance.attr('archived', false);
-      vm.attr('isNewInstance', false);
+      viewModel.instance.attr('archived', false);
+      viewModel.attr('isNewInstance', false);
       spyOn(Permission, 'is_allowed_for').and.returnValue(true);
 
-      vm.attr('updatableGroupId', 'groupId');
+      viewModel.attr('updatableGroupId', 'groupId');
 
-      expect(vm.attr('canEdit')).toEqual(false);
+      expect(viewModel.attr('canEdit')).toEqual(false);
     });
 
     it('returns "false" when user has no update permissions', () => {
       spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
-      vm.instance.attr('archived', false);
-      vm.attr('updatableGroupId', null);
-      vm.attr('isNewInstance', false);
+      viewModel.instance.attr('archived', false);
+      viewModel.attr('updatableGroupId', null);
+      viewModel.attr('isNewInstance', false);
 
       spyOn(Permission, 'is_allowed_for').and.returnValue(false);
 
-      expect(vm.attr('canEdit')).toEqual(false);
+      expect(viewModel.attr('canEdit')).toEqual(false);
     });
 
     it('returns "false" when is readonly', () => {
       spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
       spyOn(Permission, 'is_allowed_for').and.returnValue(false);
-      vm.instance.attr('archived', false);
-      vm.attr('updatableGroupId', null);
-      vm.attr('isNewInstance', true);
-      vm.attr('isReadonly', true);
+      viewModel.instance.attr('archived', false);
+      viewModel.attr('updatableGroupId', null);
+      viewModel.attr('isNewInstance', true);
+      viewModel.attr('isReadonly', true);
 
-      expect(vm.attr('canEdit')).toEqual(false);
+      expect(viewModel.attr('canEdit')).toEqual(false);
     });
 
     it('returns "true" when new instance', () => {
       spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
       spyOn(Permission, 'is_allowed_for').and.returnValue(false);
-      vm.instance.attr('archived', false);
-      vm.attr('updatableGroupId', null);
+      viewModel.instance.attr('archived', false);
+      viewModel.attr('updatableGroupId', null);
 
-      vm.attr('isNewInstance', true);
+      viewModel.attr('isNewInstance', true);
 
-      expect(vm.attr('canEdit')).toEqual(true);
+      expect(viewModel.attr('canEdit')).toEqual(true);
     });
 
     it('returns "true" when user has update permissions', () => {
       spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
-      vm.instance.attr('archived', false);
-      vm.attr('updatableGroupId', null);
-      vm.attr('isNewInstance', false);
+      viewModel.instance.attr('archived', false);
+      viewModel.attr('updatableGroupId', null);
+      viewModel.attr('isNewInstance', false);
 
       spyOn(Permission, 'is_allowed_for').and.returnValue(true);
 
-      expect(vm.attr('canEdit')).toEqual(true);
+      expect(viewModel.attr('canEdit')).toEqual(true);
     });
   });
 });
