@@ -108,7 +108,6 @@ import {
         audits: path + '/audits/info.mustache',
         people: path + '/people/info.mustache',
         policies: path + '/policies/info.mustache',
-        objectives: path + '/objectives/info.mustache',
         controls: path + '/controls/info.mustache',
         systems: path + '/systems/info.mustache',
         processes: path + '/processes/info.mustache',
