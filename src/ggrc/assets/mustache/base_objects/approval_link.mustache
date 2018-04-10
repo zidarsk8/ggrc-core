@@ -63,10 +63,10 @@
                 {{#with_mapping 'approval_tasks' instance}}
                 <p>
                   If you wish to change the current reviewer, please click
-                  <a href="{{instance.viewLink}}#task_widget/cycle_task_group_object_task/{{object_tasks.0.instance.id}}"
-                    class="{{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}">
-                      here
-                  </a>
+                  <a href="{{instance.viewLink}}#!task_widget"
+                     class="{{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}">
+                        here
+                   </a>
                   and change the assignee.
                 </p>
                 {{/with_mapping}}
