@@ -3,13 +3,7 @@
 < bin/db_downgrade
 < bin/deploy
 < bin/init_vagrant_env
-< .codeclimate.yml
-< common-services.yml
 < DEPLOYMENT.md
-< docker-compose-deploy.yml
-< docker-compose.override.yml.example
-< docker-compose-testing.yml
-< docker-compose.yml
 < Dockerfile
 < docs/source/backend/access_control.rst
 < docs/source/backend/adding_new_object.rst
