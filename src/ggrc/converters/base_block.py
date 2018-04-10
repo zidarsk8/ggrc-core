@@ -386,7 +386,7 @@ class BlockConverter(object):
     self.fields = get_column_order(fields)
 
   def generate_csv_header(self):
-    """ Generate 2D array with csv headre description """
+    """ Generate 2D array with csv header description """
     headers = []
     for field in self.fields:
       description = self.object_headers[field]["description"]
