@@ -48,7 +48,8 @@ def send_email(template, user_email, url_root, filename=""):
   subject = template["title"].format(filename=filename)
   data = {
       "body": template["body"],
-      "url": urljoin(url_root, template["url"])
+      "url": urljoin(url_root, template["url"]),
+      "title": subject
   }
   body = settings.EMAIL_IMPORT_EXPORT.render(import_export=data)
   common.send_email(user_email, subject, body)
