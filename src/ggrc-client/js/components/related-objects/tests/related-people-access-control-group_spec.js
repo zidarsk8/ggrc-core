@@ -93,4 +93,42 @@ describe('GGRC.Components.relatedPeopleAccessControlGroup', () => {
       expect(viewModel.attr('canEdit')).toEqual(true);
     });
   });
+
+  describe('check methods for updating "people" property', () => {
+    let peopleList = [
+      {id: 1, desc: 'Existent Person'},
+      {id: 2, desc: 'Non-Existent Person'},
+    ];
+
+    beforeEach(() => {
+      viewModel.attr('people', [peopleList[0]]);
+      viewModel.attr('groupId', 1);
+      viewModel.attr('title', peopleList[0].desc);
+    });
+
+    describe('"addPerson" method', () => {
+      it('should add person to "people" list if not present', () => {
+        viewModel.addPerson(peopleList[1], viewModel.attr('groupId'));
+        expect(viewModel.attr('people').length).toBe(2);
+      });
+
+      it('should not add person to "people" list if present', () => {
+        viewModel.addPerson(peopleList[0], viewModel.attr('groupId'));
+        expect(viewModel.attr('people').length).toBe(1);
+      });
+    });
+
+    describe('"removePerson" method', () => {
+      it('should remove person from "people" list if present', () => {
+        viewModel.removePerson({person: peopleList[0]});
+        expect(viewModel.attr('people').length).toBe(0);
+      });
+
+      it('should not remove person from "people" list if not present', () => {
+        let count = viewModel.attr('people').length;
+        viewModel.removePerson({person: peopleList[1]});
+        expect(viewModel.attr('people').length).toBe(count);
+      });
+    });
+  });
 });
