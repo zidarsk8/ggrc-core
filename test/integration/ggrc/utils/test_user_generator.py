@@ -108,7 +108,7 @@ class TestUserGenerator(TestCase):
           'external': True
       }}])
       response = self._post(data)
-      self.assertStatus(response, 406)
+      self.assertStatus(response, 400)
 
       user = Person.query.filter_by(email='aturing@example.com').first()
       self.assertIsNone(user)
