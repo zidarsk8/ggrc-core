@@ -214,6 +214,35 @@ class TestLastAssessmentDate(TestCase):
         f_date = ""
       self.assertEqual(control["Last Assessment Date"], f_date)
 
+  def test_export_lad_snapshot(self):
+    """Check export Last Assessment Date."""
+    finish_date = datetime.datetime(2017, 2, 20, 13, 40, 0)
+    finish_date_str = finish_date.isoformat().replace("T", " ")
+    related_objects = {"*Control_1", "*Control_2"}
+
+    with freezegun.freeze_time(finish_date):
+      asmt = models.Assessment.query.filter_by(title="Assessment_1").first()
+      self.api.put(asmt, {"status": "Completed"})
+
+    search_request = [{
+        "object_name": "Snapshot",
+        "filters": {
+            "expression": {
+                "left": "child_type",
+                "op": {"name": "="},
+                "right": "Control",
+            },
+        },
+    }]
+    query = self.export_parsed_csv(search_request)["Control Snapshot"]
+
+    for control in query:
+      if control['Code'] in related_objects:
+        f_date = finish_date_str
+      else:
+        f_date = ""
+      self.assertEqual(control["Last Assessment Date"], f_date)
+
   def test_import_lad_field(self):
     """Test Last Assessment Date field read only on import."""
     finish_date = datetime.datetime(2017, 2, 20, 13, 40, 0)
