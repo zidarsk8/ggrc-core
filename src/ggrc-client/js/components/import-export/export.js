@@ -15,6 +15,7 @@ import {
   deleteExportJob,
   jobStatuses,
 } from './import-export-utils';
+import {confirm} from '../../plugins/utils/modals';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 import './current-exports/current-exports';
 
@@ -94,9 +95,17 @@ can.Component.extend({
           .then((data) => {
             let link = `https://docs.google.com/spreadsheets/d/${data.id}`;
 
-            window.open(link, '_blank');
-
-            this.deleteJob(id);
+            confirm({
+              modal_title: 'File Generated',
+              modal_description: `GDrive file is generated successfully.
+               Click button below to view the file.`,
+              gDriveLink: link,
+              button_view: `${GGRC.mustache_path}/modals/open_sheet.mustache`,
+            }, () => {
+              this.deleteJob(id);
+            }, () => {
+              this.attr(`disabledItems.${id}`, false);
+            });
           })
           .fail(() => {
             this.attr(`disabledItems.${id}`, false);
