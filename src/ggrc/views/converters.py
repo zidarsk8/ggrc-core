@@ -169,6 +169,13 @@ def make_import(csv_data, dry_run):
     raise BadRequest("Import failed due to server error: %s" % e.message)
 
 
+def check_for_previous_run():
+  """Check whether previous run is failed"""
+  import webapp2  # pylint: disable=import-error
+  if int(webapp2.get_request().headers["X-Appengine-Taskexecutioncount"]):
+    raise InternalServerError("previous run is failed")
+
+
 def run_export(objects, ie_id, user_id, url_root):
   """Run export"""
   with app.app_context():
@@ -176,6 +183,8 @@ def run_export(objects, ie_id, user_id, url_root):
       user = person.Person.query.get(user_id)
       setattr(g, '_current_user', user)
       ie = import_export.get(ie_id)
+      check_for_previous_run()
+
       content, _ = make_export(objects)
       db.session.refresh(ie)
       if ie.status == "Stopped":
@@ -203,6 +212,8 @@ def run_import_phases(ie_id, user_id, url_root):  # noqa: ignore=C901
       user = person.Person.query.get(user_id)
       setattr(g, '_current_user', user)
       ie_job = import_export.get(ie_id)
+      check_for_previous_run()
+
       csv_data = read_csv_file(StringIO(ie_job.content.encode("utf-8")))
 
       if ie_job.status == "Analysis":
@@ -305,7 +316,7 @@ def handle_start(ie_job, user_id):
   """Handle import start command"""
   if ie_job.status == "Not Started":
     ie_job.status = "Analysis"
-  elif ie_job.status in ("Analysis", "Blocked"):
+  elif ie_job.status == "Blocked":
     ie_job.status = "In Progress"
   else:
     raise BadRequest("Wrong status")
