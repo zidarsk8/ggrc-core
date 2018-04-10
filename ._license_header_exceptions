@@ -1,8 +1,4 @@
 < .babelrc
-< bin/alembic
-< bin/db_downgrade
-< bin/deploy
-< bin/init_vagrant_env
 < DEPLOYMENT.md
 < Dockerfile
 < docs/source/backend/access_control.rst
