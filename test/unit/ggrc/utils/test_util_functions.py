@@ -57,13 +57,16 @@ class TestSettings(unittest.TestCase):
     reload(default)  # Need to reload for variable reinitialization.
     self.assertEqual(default.COMPANY, "Company, Inc.")
     self.assertEqual(default.COMPANY_LOGO_TEXT, "Company")
+    self.assertEqual(default.CREATE_ISSUE_URL, "")
 
   @patch.dict(os.environ, {
       "COMPANY": "TestCompany",
       "COMPANY_LOGO_TEXT": "TestCompanyLogo",
+      "CREATE_ISSUE_URL": "TestRMCCreateIssueURL"
   })
   def test_loading_vars_from_env(self):
     """Test loading settings variables from environment."""
     reload(default)  # Need to reload for variable reinitialization.
     self.assertEqual(default.COMPANY, "TestCompany")
     self.assertEqual(default.COMPANY_LOGO_TEXT, "TestCompanyLogo")
+    self.assertEqual(default.CREATE_ISSUE_URL, "TestRMCCreateIssueURL")
