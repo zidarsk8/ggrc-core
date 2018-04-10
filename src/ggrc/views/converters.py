@@ -207,6 +207,7 @@ def run_import_phases(ie_id, user_id, url_root):  # noqa: ignore=C901
 
       if ie_job.status == "Analysis":
         info = make_import(csv_data, True)
+        db.session.rollback()
         db.session.refresh(ie_job)
         if ie_job.status == "Stopped":
           return
