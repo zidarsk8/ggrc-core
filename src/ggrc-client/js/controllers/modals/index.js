@@ -5,7 +5,6 @@
 
 import './modals_controller';
 import './archive_modal_controller';
-import './help_controller';
 import './delete_modal_controller';
 import './unmap_modal_controller';
 import './quick_form_controller';

@@ -303,12 +303,6 @@ import Permission from '../permission';
       });
     },
 
-    helpform: function ($target, $trigger, option) {
-      $target
-        .modal_form(option, $trigger)
-        .ggrc_controllers_help({slug: $trigger.attr('data-help-slug')});
-    },
-
     archiveform: function ($target, $trigger, option) {
       var model = CMS.Models[$trigger.attr('data-object-singular')];
       var instance;
@@ -674,7 +668,6 @@ import Permission from '../permission';
     can.each({
       '': handlers.modal,
       form: handlers.form,
-      helpform: handlers.helpform,
       deleteform: handlers.deleteform,
       unmapform: handlers.unmapform,
       archiveform: handlers.archiveform
