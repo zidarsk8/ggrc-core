@@ -43,14 +43,6 @@
 < git_hooks/README.txt
 < .gitignore
 < .gitmodules
-< kokoro/deploy_ggrc_dev.sh
-< kokoro/deploy_ggrc_pilot.sh
-< kokoro/deploy_ggrc_prod.sh
-< kokoro/deploy_ggrc_qa.sh
-< kokoro/deploy_ggrc_rmc.sh
-< kokoro/deploy_ggrc_sandbox.sh
-< kokoro/deploy_ggrc_uat.sh
-< kokoro/ggrc_release.sh
 < LICENSE
 < ._license_header_exceptions
 < node_modules
