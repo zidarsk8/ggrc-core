@@ -232,9 +232,13 @@ export default can.Component.extend({
             const strategy = this.attr('statusStrategies')[info.status]
               .bind(this);
 
+            this.attr('fileName', info.title);
             this.attr('state', info.status);
 
             strategy(info, timeout * 2);
+          })
+          .always(() => {
+            this.attr('isLoading', false);
           });
       }, timeout);
 
@@ -249,8 +253,7 @@ export default can.Component.extend({
           }).sort((a, b) => a.id < b.id ? 1 : -1);
 
           if (lastJob && isInProgressJob(lastJob.status)) {
-            this.attr('fileName', lastJob.title || 'import_file.csv');
-            this.attr('state', lastJob.status);
+            this.attr('isLoading', true);
             this.attr('jobId', lastJob.id);
             this.trackStatusOfImport(lastJob.id);
           }
