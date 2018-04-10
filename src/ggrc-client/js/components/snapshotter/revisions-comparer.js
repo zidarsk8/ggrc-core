@@ -26,7 +26,7 @@ export default can.Component.extend({
     rightRevisionDescription: '',
     compareIt: function () {
       const instance = this.attr('instance');
-      const view = this.attr('instance.view') || getInstanceView(instance);
+      const view = getInstanceView(instance);
       const that = this;
       const currentRevisionID = this.attr('leftRevisionId');
       const rightRevision = this.attr('rightRevision');

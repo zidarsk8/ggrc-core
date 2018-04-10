@@ -27,6 +27,9 @@ import '../components/unarchive_link';
 import '../components/sort/sort-by';
 import * as TreeViewUtils from '../plugins/utils/tree-view-utils';
 import {confirm} from '../plugins/utils/modals';
+import {
+  getInstanceView
+} from '../plugins/utils/object-history-utils';
 
 export const pinContentHiddenClass = 'pin-content--hidden';
 export const pinContentMaximizedClass = 'pin-content--maximized';
@@ -43,19 +46,6 @@ export default can.Control({
   },
   isPinVisible() {
     return !this.element.hasClass(pinContentHiddenClass);
-  },
-  findView: function (instance) {
-    var view = instance.class.table_plural + '/info';
-
-    if (instance instanceof CMS.Models.Person) {
-      view = GGRC.mustache_path +
-        '/people_roles/info.mustache';
-    } else if (view in GGRC.Templates) {
-      view = GGRC.mustache_path + '/' + view + '.mustache';
-    } else {
-      view = this.options.view;
-    }
-    return view;
   },
   findOptions: function (el) {
     var options;
@@ -109,8 +99,7 @@ export default can.Control({
     var options = this.findOptions(el);
     var populatedOpts = opts.attr('options');
     var confirmEdit = instance.class.confirmEditModal || {};
-    var view = this.findView(instance);
-    instance.attr('view', view);
+    var view = getInstanceView(instance);
 
     if (populatedOpts && !options.attr('result')) {
       options = populatedOpts;
