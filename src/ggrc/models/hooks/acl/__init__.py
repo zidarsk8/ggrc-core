@@ -44,6 +44,8 @@ def after_flush(session, _):
   else:
     flask.g.deleted_wf_objects = workflow.get_deleted_wf_objects(session)
 
+
+def after_commit():
   workflow.handle_acl_changes()
 
 
