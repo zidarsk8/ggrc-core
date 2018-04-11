@@ -26,7 +26,8 @@
           <spinner {toggle}="isLoading"></spinner>
 
           <button ($click)="selectFile()"
-                  class="btn btn-small btn-green">
+                  class="btn btn-small btn-green"
+                  {{#if isLoading}}disabled{{/if}}>
             {{#if importStatus}}
               Choose new file to import
             {{else}}
