@@ -223,7 +223,7 @@ class BaseClientTest(unittest.TestCase):
   def test_sync_issue_tracker_statuses(self):  # pylint: disable=invalid-name
     """Tests issue synchronization flow."""
     assessment_issues = {
-        't1': {
+        '1': {
             'assessment_id': 1,
             'state': {
                 'status': 'FIXED',
@@ -232,7 +232,7 @@ class BaseClientTest(unittest.TestCase):
                 'severity': 'S1',
             },
         },
-        't2': {
+        '2': {
             'assessment_id': 2,
             'state': {
                 'status': 'ASSIGNED',
@@ -244,7 +244,7 @@ class BaseClientTest(unittest.TestCase):
     }
     batches = [
         {
-            't1': {
+            1: {
                 'status': 'FIXED',
                 'type': 'BUG1',
                 'priority': 'P1',
@@ -252,13 +252,13 @@ class BaseClientTest(unittest.TestCase):
             },
         },
         {
-            't2': {
+            2: {
                 'status': 'FIXED',
                 'type': 'BUG2',
                 'priority': 'P2',
                 'severity': 'S2',
             },
-            'unexpected_issue': {
+            3: {
                 'status': 'FIXED',
                 'type': 'BUG2',
                 'priority': 'P2',
@@ -282,8 +282,8 @@ class BaseClientTest(unittest.TestCase):
       utils.sync_issue_tracker_statuses()
       iter_calls = utils._iter_issue_batches.call_args_list
       self.assertEqual(len(iter_calls), 1)
-      self.assertItemsEqual(iter_calls[0][0][0], ['t1', 't2'])
-      utils._update_issue.assert_called_once_with(cli_mock, 't2', {
+      self.assertItemsEqual(iter_calls[0][0][0], ['1', '2'])
+      utils._update_issue.assert_called_once_with(cli_mock, '2', {
           'status': 'ASSIGNED',
           'type': 'BUG2',
           'priority': 'P2',
