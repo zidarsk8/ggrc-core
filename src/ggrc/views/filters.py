@@ -7,6 +7,7 @@ import ggrc.views
 """Filters for GRC specific Jinja processing
 """
 
+
 def init_filter_views():
   @app.template_filter("with_static_subdomain")
   def with_static_subdomain_filter(path):
@@ -14,7 +15,7 @@ def init_filter_views():
     from flask import request
     from ggrc import settings
     if not getattr(settings, 'APP_ENGINE', False) \
-        or not getattr(settings, 'USE_APP_ENGINE_ASSETS_SUBDOMAIN', True):
+            or not getattr(settings, 'USE_APP_ENGINE_ASSETS_SUBDOMAIN', True):
       return path
     scheme, netloc, _, _, _ = urlparse.urlsplit(request.url_root)
     if not netloc.startswith('static-dot-'):
@@ -53,11 +54,11 @@ def init_filter_views():
     elif obj in ('Objective',):
       return 'objectives'
     elif obj in (
-        'Directive', 'Contract', 'Policy', 'Regulation', 'Standard'):
+            'Directive', 'Contract', 'Policy', 'Regulation', 'Standard'):
       return 'governance'
     elif obj in (
         'Project', 'Facility', 'Product', 'DataAsset', 'Market',
-        'System', 'Process'):
+            'System', 'Process'):
       return 'business'
     elif obj in ('OrgGroup', 'Person', 'AccessGroup'):
       return 'entities'
@@ -65,7 +66,6 @@ def init_filter_views():
       return 'risk'
     else:
       return ''
-
 
   # Additional generic filters
   #

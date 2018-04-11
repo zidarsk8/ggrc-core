@@ -12,7 +12,9 @@ from werkzeug.exceptions import BadRequest
 
 AttributeQuery = namedtuple('AttributeQuery', 'filter joinlist options')
 
+
 class AttributeQueryBuilder(object):
+
   def __init__(self, model):
     self.model = model
 
@@ -36,15 +38,15 @@ class AttributeQueryBuilder(object):
         value = False
       else:
         raise BadRequest('{0} must be "true" or "false", not {1}.'.format(
-          arg, value))
+            arg, value))
     elif attr_type is DateTime:
       try:
-       value = iso8601.parse_date(value)
+        value = iso8601.parse_date(value)
       except iso8601.ParseError as e:
         raise BadRequest(
             'Malformed DateTime {0} for parameter {0}. '
             'Error message was: {1}'.format(value, arg, e.message)
-            )
+        )
     elif attr_type is Date:
       try:
         value = datetime.datetime.strptime(value, '%Y-%m-%d')
@@ -52,14 +54,14 @@ class AttributeQueryBuilder(object):
         raise BadRequest(
             'Malformed Date {0} for parameter {1}. '
             'Error message was: {2}'.format(value, arg, e.message)
-            )
+        )
     elif attr_type is Integer and value == '':
       return None
     return value
 
   def check_valid_property(self, attr, attrname):
     if not hasattr(attr, 'type') or \
-        not isinstance(attr.type, TypeEngine):
+            not isinstance(attr.type, TypeEngine):
       raise self.bad_query_parameter(attrname)
 
   def process_property_path(self, arg, value):
@@ -126,7 +128,7 @@ class AttributeQueryBuilder(object):
       current_model = self.model
       for segment in segments:
         real_segment, current_model = self.resolve_path_segment(
-          segment, current_model)
+            segment, current_model)
         if current_model is not None:
           real_segments.append(real_segment)
       realized_path = '.'.join(real_segments)
