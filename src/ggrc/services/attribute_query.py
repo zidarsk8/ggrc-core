@@ -28,7 +28,7 @@ class AttributeQueryBuilder(object):
     attr = getattr(model, attrname)
     return attr
 
-  def coerce_value_for_query_param(self, attr, arg, value):
+  def coerce_value_for_query_param(self, attr, arg, value):  # Noqa
     attr_type = type(attr.type)
     if attr_type is Boolean:
       value = value.lower()
@@ -64,7 +64,7 @@ class AttributeQueryBuilder(object):
             not isinstance(attr.type, TypeEngine):
       raise self.bad_query_parameter(attrname)
 
-  def process_property_path(self, arg, value):
+  def process_property_path(self, arg, value):  # Noqa
     joinlist = []
     filters = []
     options = []
@@ -95,9 +95,9 @@ class AttributeQueryBuilder(object):
       filters.append(attr.in_(value))
     elif arg.endswith('__null'):
       if(value in [0, 'false', 'False', 'FALSE', False]):
-        filters.append(attr != None)
+        filters.append(attr.isnot(None))
       else:
-        filters.append(attr == None)
+        filters.append(attr.is_(None))
     elif clean_arg == '__include':
       options.extend(self.process_eager_loading(value))
     else:
@@ -105,7 +105,7 @@ class AttributeQueryBuilder(object):
       if value is not None:
         filters.append(attr == cast(value, attr.type))
       else:
-        filters.append(attr == None)
+        filters.append(attr.is_(None))
     return joinlist, filters, options
 
   def resolve_path_segment(self, segment, model):
