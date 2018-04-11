@@ -16,7 +16,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '082306b17b07'
-down_revision = '48a49f384b2e'
+down_revision = '7c9d15c78b0f'
 
 
 def _cleanup_relationships(meta):
