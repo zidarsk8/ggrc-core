@@ -3,13 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#withRoleForInstance instance 'Program Managers Mapped'}}
     {{#if_helpers '\
        #if' is_info_pin '\
        and #is_allowed_to_map' page_instance instance '\
        or #if' is_info_pin '\
        and #if' instance.viewLink '\
-       or #if' hasRole '\
        and ^if' instance.archived '\
        or #system_role' 'Administrator' '\
        or #system_role' 'Superuser' '\
@@ -50,9 +48,7 @@
         {{#using program=instance.program}}
         {{#is_allowed 'update' program context='for'}}
           {{#if instance.class.is_clonable}}
-            {{#if_helpers '\
-              #if' hasRole '\
-              or #is_allowed' 'update' instance context='for'}}
+              {{#is_allowed 'update' instance context='for'}}
                 <li>
                     <object-cloner
                           instance="instance"
@@ -63,15 +59,14 @@
                           Clone {{ instance.type }}</a>
                     </object-cloner>
                 </li>
-            {{/if_helpers}}
+            {{/is_allowed}}
           {{/if}}
         {{/is_allowed}}
         {{/using}}
 
         <li>
           {{#if_helpers '\
-            #if' hasRole '\
-            or #is_allowed' 'create' 'CycleTaskGroupObjectTask' context=null '\
+            #is_allowed' 'create' 'CycleTaskGroupObjectTask' context=null '\
             and #is_allowed' 'update' instance context='for'}}
               <a
                 rel="tooltip"
@@ -170,4 +165,3 @@
       </ul>
     </div>
     {{/if_helpers}}
-{{/withRoleForInstance}}
