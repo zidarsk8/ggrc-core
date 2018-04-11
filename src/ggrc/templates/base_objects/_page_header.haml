@@ -2,6 +2,7 @@
 -# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 -set user_role = current_user.system_wide_role.lower()
+-set create_issue_url = config.get("CREATE_ISSUE_URL")
 
 .header-content
   -if user_role != 'no access'
@@ -25,6 +26,14 @@
         %i.fa.fa-search
         %span
           Global Search
+    -if create_issue_url
+      %li
+        %a{
+          'href': '={ create_issue_url }',
+          'target': '_blank',
+          'class': 'btn btn-small btn-gray'
+        }
+          Feedback
     %li
       %a{ 'href': "/dashboard#!task_widget" }
         %span
