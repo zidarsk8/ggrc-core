@@ -68,7 +68,10 @@ const errorMessages = {
       },
     },
     init: function () {
-      this.viewModel.initGlobalAttributes();
+      if (!this.viewModel.attr('items').length) {
+        this.viewModel.initGlobalAttributes();
+      }
+
       this.viewModel.validateControls();
     },
   });

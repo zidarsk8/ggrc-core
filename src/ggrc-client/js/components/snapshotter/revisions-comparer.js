@@ -5,6 +5,9 @@
 
 import {confirm} from '../../plugins/utils/modals';
 import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
+import {
+  getInstanceView,
+} from '../../plugins/utils/object-history-utils';
 import RefreshQueue from '../../models/refresh_queue';
 
 export default can.Component.extend({
@@ -22,7 +25,8 @@ export default can.Component.extend({
     leftRevisionDescription: '',
     rightRevisionDescription: '',
     compareIt: function () {
-      const view = this.attr('instance.view');
+      const instance = this.attr('instance');
+      const view = getInstanceView(instance);
       const that = this;
       const currentRevisionID = this.attr('leftRevisionId');
       const rightRevision = this.attr('rightRevision');
@@ -282,8 +286,10 @@ export default can.Component.extend({
       const emptySelector = '.empty-message';
       const highlightClass = 'diff-highlighted';
       const listSelector = 'ul li, .object-list-item';
-      const attributesSelector = '.row-fluid h6 + *, .row-fluid .state-value' +
-        ', related-documents';
+      const attributesSelector = `.row-fluid h6 + *,
+        .row-fluid .state-value,
+        .row-fluid h3,
+        related-documents`;
       let infoPanes = $target.find('.info .tier-content');
       let valuesOld = infoPanes.eq(0).find(attributesSelector);
       let valuesNew = infoPanes.eq(1).find(attributesSelector);

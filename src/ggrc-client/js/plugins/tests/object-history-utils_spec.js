@@ -164,15 +164,6 @@ describe('"getInstanceView" method', () => {
     GGRC.mustache_path = originalMustachePath;
   });
 
-  it('should return "view" path from instance', () => {
-    const expectedPath = 'dir1/dir2/info.mustahce';
-    const instance = new CMS.Models.Risk();
-    instance.attr('view', expectedPath);
-
-    const view = getInstanceView(instance);
-    expect(view).toEqual(expectedPath);
-  });
-
   it('should return empty string. instance is undefined', () => {
     const expectedPath = '';
     const view = getInstanceView();
@@ -190,11 +181,20 @@ describe('"getInstanceView" method', () => {
     expect(view).toEqual(expectedPath);
   });
 
-  it('should return default "view" path', () => {
+  it('should return object "view" path', () => {
     const expectedPath = `${GGRC.mustache_path}/risks/info.mustache`;
 
     // "GGRC.Templates" const contains template for Risk
     const instance = new CMS.Models.Risk();
+
+    const view = getInstanceView(instance);
+    expect(view).toEqual(expectedPath);
+  });
+
+  it('should return "view" path for Person object', () => {
+    const expectedPath = `${GGRC.mustache_path}/people_roles/info.mustache`;
+
+    const instance = new CMS.Models.Person();
 
     const view = getInstanceView(instance);
     expect(view).toEqual(expectedPath);
