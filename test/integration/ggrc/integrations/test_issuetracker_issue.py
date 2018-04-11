@@ -3,6 +3,7 @@
 
 """Integration test for Clonable mixin"""
 
+import ddt
 import mock
 
 from ggrc import db
@@ -18,6 +19,7 @@ from integration.ggrc.access_control import acl_helper
 from integration.ggrc.snapshotter import SnapshotterBaseTestCase
 
 
+@ddt.ddt
 class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
   """Test set for IssueTracker integration functionality."""
 
@@ -129,6 +131,61 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                 'verifier': email1,
                 'ccs': [email2]}
       mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
+
+  # pylint: disable=protected-access
+  @ddt.data(
+      ('Not Started', {'status': 'ASSIGNED'}),
+      ('In Progress', {'status': 'ASSIGNED'}),
+      ('In Review', {'status': 'FIXED'}),
+      ('Rework Needed', {'status': 'ASSIGNED'}),
+      ('Completed', {'status': 'VERIFIED',
+                     'comment': issue_tracker._STATUS_CHANGE_COMMENT_TMPL}),
+      ('Deprecated', {'status': 'OBSOLETE',
+                      'comment': issue_tracker._STATUS_CHANGE_COMMENT_TMPL}),
+  )
+  @ddt.unpack
+  @mock.patch('ggrc.integrations.issues.Client.update_issue')
+  def test_change_assessment_status(self, status,
+                                    additional_kwargs,
+                                    mocked_update_issue):
+    """Issue status should be changed for assessment
+    with {status} status."""
+    email1 = "email1@example.com"
+    assignee_role_id = AccessControlRole.query.filter_by(
+        object_type="Assessment",
+        name="Assignees"
+    ).first().id
+    assignees = [factories.PersonFactory(email=email1)]
+    iti_issue_id = []
+    iti = factories.IssueTrackerIssueFactory(enabled=True)
+    iti_issue_id.append(iti.issue_id)
+    asmt = iti.issue_tracked_obj
+    with mock.patch.object(issue_tracker, '_is_issue_tracker_enabled',
+                           return_value=True):
+      acl = [acl_helper.get_acl_json(assignee_role_id, assignee.id)
+             for assignee in assignees]
+      self.api.put(asmt, {
+          "access_control_list": acl,
+          "status": status,
+      })
+      kwargs = {'component_id': None,
+                'severity': None,
+                'title': iti.title,
+                'hotlist_ids': [],
+                'priority': None,
+                'assignee': email1,
+                'verifier': email1,
+                'ccs': []}
+      asmt_link = issue_tracker._get_assessment_url(asmt)
+      if 'comment' in additional_kwargs:
+        additional_kwargs['comment'] = \
+            additional_kwargs['comment'] % (status, asmt_link)
+      kwargs.update(additional_kwargs)
+      mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
+
+      issue = db.session.query(models.IssuetrackerIssue).get(iti.id)
+      self.assertEqual(issue.assignee, email1)
+      self.assertEqual(issue.cc_list, "")
 
 
 @mock.patch('ggrc.models.hooks.issue_tracker._is_issue_tracker_enabled',
