@@ -72,6 +72,10 @@ sub-tree-item {
 
     .item-actions.disabled {
       @include disabled();
+      .request-control,
+      .undo {
+        display: none;
+      }
     }
   }
 

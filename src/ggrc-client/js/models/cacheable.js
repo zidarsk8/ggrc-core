@@ -1103,10 +1103,6 @@ import RefreshQueue from './refresh_queue';
               type: 'get',
               dataType: 'json',
             })
-              .then(function (resources) {
-                delete that._pending_refresh;
-                return resources;
-              })
               .then($.proxy(that.constructor, 'cleanupACL'))
               .then($.proxy(that.constructor, 'model'))
               .done(function (response) {
@@ -1115,6 +1111,9 @@ import RefreshQueue from './refresh_queue';
               })
               .fail(function () {
                 dfd.reject(...arguments);
+              })
+              .always(function () {
+                delete that._pending_refresh;
               });
           }, 1000, {trailing: false}),
         };
