@@ -220,10 +220,19 @@ export default can.Component.extend({
     },
     stopImport(jobId) {
       clearTimeout(this.attr('trackId'));
+      const deleteJob = () => {
+        this.resetFile();
+        deleteImportJob(jobId);
+      };
       stopImportJob(jobId)
-        .then(() => {
-          this.resetFile();
-          deleteImportJob(jobId);
+        .then(deleteJob)
+        .fail((xhr) => {
+          // Need to implement a better solution in order to identify specific
+          // errors like here
+          if (xhr && xhr.responseJSON && xhr.responseJSON.message &&
+            xhr.responseJSON.message === 'Wrong status') {
+            deleteJob();
+          }
         });
     },
     trackStatusOfImport(jobId, timeout = 2000) {
