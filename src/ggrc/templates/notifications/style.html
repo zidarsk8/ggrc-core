@@ -247,7 +247,7 @@ style=" width: 90%;
 {% macro proposal_btn() -%}
 style=" width: 40px;
         display: block;
-        padding: 5px 10px 5px 10px;
+        padding: 5px 10px;
         border: 2px solid #f1f1f1;
         text-align: center;
         color: #000;
@@ -268,4 +268,59 @@ style="
         font-weight: 800;
         line-height: 4em;
     "
+{%- endmacro %}
+
+{% macro import_export_container() -%}
+  style=" display: block !important;
+  max-width: 600px !important;
+  margin: 20px auto !important;
+  clear: both !important;
+  "
+{%- endmacro %}
+
+{% macro import_export_block() -%}
+  style="
+  padding: 20px;
+  background-color: #ffffff;
+  "
+{%- endmacro %}
+
+{% macro import_export_title() -%}
+style="
+  border-bottom: 1px solid #a5a5a5;
+  padding-bottom: 20px;
+  margin: 10px 0;
+  "
+{%- endmacro %}
+
+{% macro import_export_body() -%}
+style="
+  font-size: 13px;
+  color: #a5a5a5;
+  margin: 20px 0 20px;
+"
+{%- endmacro %}
+
+{% macro import_export_btn() -%}
+  style="
+  width: 40px;
+  display: block;
+  padding: 5px 10px;
+  border: 1px solid #f1f1f1;
+  text-align: center;
+  color: #000;
+  text-decoration: none;
+  font-weight: 400;
+  font-size: 12px;
+  "
+{%- endmacro %}
+
+{% macro import_export_footer() -%}
+  style="
+  text-align: right;
+  font-weight: 800;
+  font-size: 16px;
+  color: #555;
+  margin: 20px;
+"
 {%- endmacro %}

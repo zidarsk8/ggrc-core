@@ -70,6 +70,12 @@ def create_gdrive_file(csv_string, filename):
 
 def get_gdrive_file(file_data):
   """Get text/csv data from gdrive file"""
+  csv_data, _, _ = get_gdrive_file_data(file_data)
+  return csv_data
+
+
+def get_gdrive_file_data(file_data):
+  """Get text/csv data from gdrive file"""
   http_auth = get_http_auth()
   try:
     drive_service = discovery.build(API_SERVICE_NAME, API_VERSION,
@@ -93,7 +99,7 @@ def get_gdrive_file(file_data):
   except Exception as ex:
     logger.error(ex.message)
     raise InternalServerError('Import failed due to internal server error.')
-  return csv_data
+  return csv_data, file_data, file_meta.get('name')
 
 
 def copy_file_request(drive_service, file_id, body):
@@ -101,7 +107,7 @@ def copy_file_request(drive_service, file_id, body):
   response = drive_service.files().copy(
       fileId=file_id,
       body=body,
-      fields='webViewLink,name'
+      fields='id,webViewLink,name'
   ).execute()
   return response
 
@@ -111,8 +117,23 @@ def rename_file_request(drive_service, file_id, body):
   return drive_service.files().update(
       fileId=file_id,
       body=body,
-      fields='webViewLink,name'
+      fields='id,webViewLink,name'
   ).execute()
+
+
+def validate_response(response):
+  missed_keys = []
+  if 'id' not in response:
+    missed_keys.append('id')
+  if 'webViewLink' not in response:
+    missed_keys.append('webViewLink')
+  if 'name' not in response:
+    missed_keys.append('name')
+
+  if missed_keys:
+    keys = ', '.join(missed_keys)
+    raise InternalServerError('Unable to validate gdrive api'
+                              ' response: missed keys {}'.format(keys))
 
 
 def process_gdrive_file(folder_id, file_id, postfix, separator,
@@ -132,6 +153,7 @@ def process_gdrive_file(folder_id, file_id, postfix, separator,
     else:
       body = _build_request_body(folder_id, new_file_name)
       response = copy_file_request(drive_service, file_id, body)
+    validate_response(response)
     return response
   except HttpAccessTokenRefreshError:
     handle_token_error()

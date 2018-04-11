@@ -17,7 +17,7 @@ import '../../pbc/workflow_controller';
 import '../../apps/business_objects';
 
 // Components
-import '../../components/related-objects/related-reference-urls';
+import '../../components/related-objects/related-urls';
 import '../../components/people/people-list-info';
 import '../../components/action-toolbar-control/action-toolbar-control';
 import '../../components/read-more/read-more';

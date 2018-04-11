@@ -27,29 +27,27 @@
             <clipboard-link title="Get permalink" notify="true" text="{{get_permalink_url}}" />
           </li>
 
-          {{#if instance.allow_change_state}}
-            <li>
-              {{#if_equals instance.status 'Deprecated'}}
-                <object-change-state
-                  {to-state}="initialState"
-                  (on-state-change)="onStateChange(%event)"
-                >
-                  <a href="#">
-                    <i class="fa fa-reply"></i> Restore
-                  </a>
-                </object-change-state>
-              {{else}}
-                <object-change-state
-                  to-state="Deprecated"
-                  (on-state-change)="onStateChange(%event)"
-                >
-                  <a href="#">
-                    <i class="fa fa-times-circle"></i> Deprecate
-                  </a>
-                </object-change-state>
-              {{/if_equals}}
-            </li>
-          {{/if}}
+          <li>
+            {{#if_equals instance.status 'Deprecated'}}
+              <object-change-state
+                {to-state}="initialState"
+                (on-state-change)="onStateChange(%event)"
+              >
+                <a href="#">
+                  <i class="fa fa-reply"></i> Restore
+                </a>
+              </object-change-state>
+            {{else}}
+              <object-change-state
+                to-state="Deprecated"
+                (on-state-change)="onStateChange(%event)"
+              >
+                <a href="#">
+                  <i class="fa fa-times-circle"></i> Deprecate
+                </a>
+              </object-change-state>
+            {{/if_equals}}
+          </li>
 
           {{#is_allowed 'delete' instance context='for'}}
             <li>

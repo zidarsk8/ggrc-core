@@ -3,61 +3,57 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div data-object-id="{{instance.id}}"
-    data-object-type="{{instance.class.table_singular}}"
-    class="task_group_tasks__list-item">
-  <div class="objective-selector field-wrap task-wrap" data-model="true" {{#instance}}{{data "model"}}{{/instance}}>
+<li class="task_group_tasks__list-item">
+  <div class="objective-selector field-wrap task-wrap" data-model="true" {{data "model"}}>
     <div class="task_group_tasks__list-item-column-drag">
-      {{#is_allowed 'update' instance}}
-        {{^if_equals instanceworkflow.reify.status 'Inactive'}}
-          <a class="drag {{#parent_instance.lock_task_order}}disabled{{/parent_instance.lock_task_order}}" href="javascript://">
+      {{#is_allowed 'update' .}}
+        {{^if_equals workflow.status 'Inactive'}}
+          <a class="drag" href="javascript://">
             <i class="fa fa-th"></i>
           </a>
         {{/if_equals}}
       {{/is_allowed}}
     </div>
     <div class="task_group_tasks__list-item-column">
-      <span class="inline-data-content">{{instance.title}}</span>
+      <span class="inline-data-content">{{title}}</span>
     </div>
 
     <div class="task_group_tasks__list-item-column">
         <div class="people-list roles attr-content">
-          <tree-people-with-role-list-field {instance}="instance" {role}="instance.class.tree_view_options.assigneeRoleName"/>
+          <tree-people-with-role-list-field {instance}="." {role}="class.tree_view_options.assigneeRoleName"/>
         </div>
     </div>
 
     <div class="task_group_tasks__list-item-column">
         <div class="people-list roles attr-content">
-          <tree-people-with-role-list-field {instance}="instance" {role}="instance.class.tree_view_options.secondaryAssigneeRoleName"/>
+          <tree-people-with-role-list-field {instance}="." {role}="class.tree_view_options.secondaryAssigneeRoleName"/>
         </div>
     </div>
 
     <div class="task_group_tasks__list-item-column">
       <span class="inline-data-content">
-        {{localize_date instance.start_date}} - {{localize_date instance.end_date}}
+        {{localize_date start_date}} - {{localize_date end_date}}
       </span>
     </div>
 
     <div class="task_group_tasks__list-item-column">
       <span class="inline-data-content">
-        {{localize_date instance.view_start_date}} - {{localize_date instance.view_end_date}}
+        {{localize_date view_start_date}} - {{localize_date view_end_date}}
       </span>
     </div>
 
-      <div class="task_group_tasks__list-item-column-action">
-    {{#is_allowed 'update' instance context='for'}}
-    {{#using workflow=parent_instance.workflow}}
-      {{^if_equals workflow.status 'Inactive'}}
-      <a class="btn btn-small btn-white" href="javascript://"
-         data-toggle="modal-ajax-form" data-modal-reset="reset"
-         data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}"
-         data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}"
-         data-object-params='{ "modal_title": "Edit Task" }'>
-        Edit
-      </a>
-      {{/if_equals}}
-      {{/using}}
-    {{/is_allowed}}
-      </div>
+    <div class="task_group_tasks__list-item-column-action">
+      {{#is_allowed 'update' . context='for'}}
+        {{^if_equals workflow.status 'Inactive'}}
+        <a class="btn btn-small btn-white" href="javascript://"
+          data-toggle="modal-ajax-form" data-modal-reset="reset"
+          data-modal-class="modal-wide" data-object-singular="{{class.model_singular}}"
+          data-object-plural="{{class.table_plural}}" data-object-id="{{id}}"
+          data-object-params='{ "modal_title": "Edit Task" }'>
+          Edit
+        </a>
+        {{/if_equals}}
+      {{/is_allowed}}
+    </div>
   </div>
-</div>
+</li>

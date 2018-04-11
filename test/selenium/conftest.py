@@ -12,6 +12,8 @@ import urlparse
 import pytest
 
 from lib import dynamic_fixtures, environment, url
+from lib.constants.test_runner import DESTRUCTIVE_TEST_METHOD_PREFIX
+from lib.custom_pytest_scheduling import CustomPytestScheduling
 from lib.page import dashboard
 from lib.service import rest_service
 from lib.utils import selenium_utils, help_utils
@@ -35,6 +37,11 @@ def _snapshots_fixtures(fixturename):
   dictionary of executed common fixtures in scope of snapshot fixtures.
   """
   return dynamic_fixtures.generate_snapshots_fixtures(fixturename)
+
+
+def pytest_xdist_make_scheduler(config, log):
+  """Set the test scheduler for Pytest-xdist to a custom scheduler"""
+  return CustomPytestScheduling(config, log)
 
 
 @pytest.mark.hookwrapper
@@ -82,6 +89,7 @@ def selenium(selenium, pytestconfig):
     selenium.set_window_size(
         os.environ["SCREEN_WIDTH"], os.environ["SCREEN_HEIGHT"])
   dynamic_fixtures.dict_executed_fixtures.update({"selenium": selenium})
+  selenium_utils.open_url(selenium, url.Urls().gae_login)
   yield selenium
 
 
@@ -114,9 +122,12 @@ def chrome_options(chrome_options, pytestconfig):
 
 
 @pytest.fixture(scope="function", autouse=True)
-def dev_url():
+def dev_url(request):
   """Set environment.app_url to be used as a base url"""
-  environment.app_url = os.environ["DEV_URL"]
+  if DESTRUCTIVE_TEST_METHOD_PREFIX in request.node.name:
+    environment.app_url = os.environ["DEV_URL"]
+  else:
+    environment.app_url = os.environ["DEV_DESTRUCTIVE_URL"]
   environment.app_url = urlparse.urljoin(environment.app_url, "/")
   return environment.app_url
 

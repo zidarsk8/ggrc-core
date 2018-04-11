@@ -5,10 +5,11 @@
 
 'use strict';
 
-import { isEmptyCustomAttribute as isEmptyCA } from '../../plugins/utils/ca-utils';
+import {isEmptyCustomAttribute as isEmptyCA} from '../utils/ca-utils';
+import {CA_DD_REQUIRED_DEPS, isCommentRequired, isEvidenceRequired,
+} from '../utils/ca-utils';
 
 describe('GGRC utils isEmptyCustomAttribute() method', function () {
-
   describe('check undefined value', function () {
     it('returns true for undefined', function () {
       let result = isEmptyCA(undefined);
@@ -123,6 +124,75 @@ describe('GGRC utils isEmptyCustomAttribute() method', function () {
     it('returns false for invalid type', function () {
       let result = isEmptyCA('some value', 'Invalid');
       expect(result).toBe(false);
+    });
+  });
+});
+
+describe('GGRC util methods to validate requirements', function () {
+  let dropdownField;
+
+  beforeEach(function () {
+    dropdownField = new can.Map({
+      id: 2,
+      type: 'dropdown',
+      validationConfig: {
+        'nothing required': CA_DD_REQUIRED_DEPS.NONE,
+        'comment required': CA_DD_REQUIRED_DEPS.COMMENT,
+        'evidence required': CA_DD_REQUIRED_DEPS.EVIDENCE,
+        'comment & evidence required': CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
+        one: CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
+        two: CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
+      },
+      preconditions_failed: [],
+      validation: {
+        mandatory: false,
+      },
+      errorsMap: {
+        comment: false,
+        evidence: false,
+      },
+    });
+  });
+
+  describe('check isCommentRequired() method', function () {
+    it('should return TRUE if comments required', function () {
+      ['one', 'two',
+        'comment required',
+        'comment & evidence required',
+      ].forEach((value) => {
+        dropdownField.attr('value', value);
+        expect(isCommentRequired(dropdownField)).toEqual(true);
+      });
+    });
+
+    it('should return FALSE if comments NOT required', function () {
+      ['nothing required',
+        'evidence required',
+      ].forEach((value) => {
+        dropdownField.attr('value', value);
+        expect(isCommentRequired(dropdownField)).toEqual(false);
+      });
+    });
+  });
+
+  describe('check isEvidenceRequired() method', function () {
+    it('should return TRUE if evidence required', function () {
+      ['one', 'two',
+        'evidence required',
+        'comment & evidence required',
+      ].forEach((value) => {
+        dropdownField.attr('value', value);
+        expect(isEvidenceRequired(dropdownField)).toEqual(true);
+      });
+    });
+
+    it('should return FALSE if evidence NOT required', function () {
+      ['nothing required',
+        'comment required',
+      ].forEach((value) => {
+        dropdownField.attr('value', value);
+        expect(isEvidenceRequired(dropdownField)).toEqual(false);
+      });
     });
   });
 });

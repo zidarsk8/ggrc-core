@@ -305,12 +305,6 @@ import {
               }
               // This Method should be modified to event
               refreshCounts();
-
-              // Lazy refresh instance to get all mapped relationships
-              setTimeout(() => {
-                instance.refresh();
-              }, 300);
-
               instance.dispatch(REFRESH_SUB_TREE);
             });
         }.bind(this));

@@ -285,7 +285,7 @@ class TestSnapshots(base.Test):
       [("new_control_rest", False), ("update_control_rest", True)],
       ids=["Snapshoted version is not found",
            "Actual snapshotable control is presented"])
-  def test_search_snapshots_in_lhn(
+  def test_destructive_search_snapshots_in_lhn(
       self, create_audit_with_control_and_update_control, version_of_ctrl,
       is_found, tab_name, lhn_menu
   ):
@@ -365,7 +365,7 @@ class TestSnapshots(base.Test):
            "which mapped to Audit; "
            "Tree View: Issue doesn't contain Controls."],
       indirect=["dynamic_objects", "dynamic_relationships"])
-  def test_search_unified_mapper_and_check_mapping(
+  def test_destructive_search_unified_mapper_and_check_mapping(
       self, create_audit_with_control_and_update_control, control_for_mapper,
       control_for_tree_view, dynamic_objects, dynamic_relationships,
       expected_map_statuses, expected_is_found, selenium
@@ -422,7 +422,7 @@ class TestSnapshots(base.Test):
                 actual_controls_from_tree_view)))
 
   @pytest.mark.smoke_tests
-  def test_mapping_control_to_existing_audit(
+  def test_destructive_mapping_control_to_existing_audit(
       self, new_program_rest, new_audit_rest, new_control_rest, selenium
   ):
     """Check if Control can be mapped to existing Audit and mapping
@@ -497,7 +497,7 @@ class TestSnapshots(base.Test):
            "Via Tree View item (map snapshoted Control to Issue using "
            "Assessment with mapped snapshoted Control)"],
       indirect=["dynamic_objects", "dynamic_relationships"])
-  def test_mapping_of_objects_to_snapshots(
+  def test_destructive_mapping_of_objects_to_snapshots(
       self, create_audit_with_control_and_update_control,
       is_via_tw_map_btn_not_item, expected_snapshoted_control, dynamic_objects,
       dynamic_relationships, selenium
@@ -602,7 +602,7 @@ class TestSnapshots(base.Test):
       ids=["Mapping snapshot of Control to Assessment",
            "Mapping Assessment with mapped snapshot of Control to Issue"],
       indirect=["dynamic_objects", "dynamic_relationships"])
-  def test_asmt_and_issue_mapped_to_origin_control(
+  def test_destructive_asmt_and_issue_mapped_to_origin_control(
       self, create_audit_with_control_and_update_control,
       dynamic_objects, dynamic_relationships, expected_state, selenium
   ):
@@ -649,7 +649,7 @@ class TestSnapshots(base.Test):
        pytest.mark.xfail(reason="Issue GGRC-2817", strict=True)
           (("new_issue_rest", ObjectStates.DRAFT))],
       indirect=["dynamic_objects"])
-  def test_snapshot_can_be_unmapped_from_assessment_or_issue(
+  def test_destructive_snapshot_can_be_unmapped_from_assessment_or_issue(
       self, create_audit_with_control_and_update_control, dynamic_objects,
       selenium, dynamic_object_state
   ):

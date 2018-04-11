@@ -18,7 +18,8 @@ class TestProgramPage(base.Test):
   """A part of smoke tests, section 4."""
 
   @pytest.mark.smoke_tests
-  def test_object_count_updates(self, new_program_ui, header_dashboard):
+  def test_destructive_object_count_updates(self, new_program_ui,
+                                            header_dashboard):
     """Checks if count updates in LHN after creating new program
     object."""
     _, program_info_page = new_program_ui
@@ -62,7 +63,7 @@ class TestProgramPage(base.Test):
     modal, program_info_page = new_program_ui
     expected_list_texts = [
         test_utils.HtmlParser.parse_text(modal.ui_title.text),
-        modal.ui_description.text, modal.ui_notes.text, modal.ui_code.text,
+        modal.ui_description.text, modal.ui_notes.text, modal.code.text,
         modal.ref_url.values,
         modal.ui_effective_date.text
     ]
