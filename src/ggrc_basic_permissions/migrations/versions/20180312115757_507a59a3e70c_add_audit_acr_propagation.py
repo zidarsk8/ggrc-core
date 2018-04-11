@@ -24,8 +24,8 @@ _AUDIT_FULL_ACCESS = {
         "AssessmentTemplate RUD": {},
         "Document RU": {},
         "Issue RUD": const.COMMENT_DOCUMENT_RU,
+        "Snapshot RU": {},
     },
-    "Snapshot RU": {},
 }
 
 _AUDIT_READ_ACCESS = {
@@ -34,8 +34,8 @@ _AUDIT_READ_ACCESS = {
         "AssessmentTemplate R": {},
         "Document R": {},
         "Issue R": const.COMMENT_DOCUMENT_R,
+        "Snapshot R": {},
     },
-    "Snapshot R": {},
 }
 
 _PROGRAM_OBJECTS = (
@@ -66,8 +66,8 @@ _PROGRAM_OBJECTS = (
 AUTID_PROGRAM_PROPAGATION = {
     "Program": {
         ("Program Managers", "Program Editors"): {
-            "Audit RUD": _AUDIT_FULL_ACCESS,
             "Relationship R": {
+                "Audit RUD": _AUDIT_FULL_ACCESS,
                 "Comment R": {},
                 "Document RU": {},
                 _PROGRAM_OBJECTS: const.COMMENT_DOCUMENT_RU,
@@ -75,8 +75,8 @@ AUTID_PROGRAM_PROPAGATION = {
             }
         },
         "Program Readers": {
-            "Audit R": _AUDIT_READ_ACCESS,
             "Relationship R": {
+                "Audit R": _AUDIT_READ_ACCESS,
                 "Comment R": {},
                 "Document R": {},
                 _PROGRAM_OBJECTS: const.COMMENT_DOCUMENT_R,
