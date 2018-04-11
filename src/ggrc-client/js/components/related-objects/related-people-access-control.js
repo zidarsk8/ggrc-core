@@ -3,13 +3,14 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {SAVE_CUSTOM_ROLE, ROLES_CONFLICT} from '../../events/eventTypes';
+import {ROLES_CONFLICT} from '../../events/eventTypes';
 import {getRolesForType} from '../../plugins/utils/acl-utils';
 
 export default GGRC.Components('relatedPeopleAccessControl', {
   tag: 'related-people-access-control',
   viewModel: {
     instance: {},
+    deferredSave: null,
     includeRoles: [],
     groups: [],
     updatableGroupId: null,
@@ -21,15 +22,22 @@ export default GGRC.Components('relatedPeopleAccessControl', {
     readOnly: false,
 
     updateRoles: function (args) {
+      if (this.attr('deferredSave')) {
+        this.attr('deferredSave').push(this.performUpdate.bind(this, args));
+      }
+      this.performUpdate(args);
+
+      this.dispatch({
+        type: 'saveCustomRole',
+        groupId: args.roleId,
+      });
+    },
+    performUpdate: function (args) {
       this.updateAccessContolList(args.people, args.roleId);
 
       if (this.attr('conflictRoles').length) {
         this.checkConflicts(args.roleTitle);
       }
-      this.dispatch({
-        ...SAVE_CUSTOM_ROLE,
-        groupId: args.roleId,
-      });
     },
     updateAccessContolList: function (people, roleId) {
       let instance = this.attr('instance');

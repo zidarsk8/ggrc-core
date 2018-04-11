@@ -21,6 +21,7 @@ export default can.Component.extend({
         },
       },
     },
+    deferredSave: null,
     updatableGroupId: null,
     includeRoles: [],
     excludeRoles: [],
@@ -45,9 +46,21 @@ export default can.Component.extend({
       this.attr('instance.access_control_list').replace(filteredACL);
     },
     save(args) {
-      this.attr('updatableGroupId', args.groupId);
-      this.attr('instance').save().then(() => {
+      let saveDfd;
+
+      if (this.attr('deferredSave')) {
+        saveDfd = this.attr('deferredSave').push(() => {
+          this.attr('updatableGroupId', args.groupId);
+        });
+      } else {
+        this.attr('updatableGroupId', args.groupId);
+
+        saveDfd = this.attr('instance').save();
+      }
+
+      saveDfd.then(() => {
         this.filterACL();
+      }).always(() => {
         this.attr('updatableGroupId', null);
       });
     },

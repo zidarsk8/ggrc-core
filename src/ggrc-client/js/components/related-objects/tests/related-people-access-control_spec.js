@@ -13,6 +13,83 @@ describe('GGRC.relatedPeopleAccessControl', function () {
     viewModel = new (can.Map.extend(Component.prototype.viewModel));
   });
 
+  describe('"updateRoles" method', () => {
+    let args;
+
+    beforeEach(() => {
+      args = {};
+      spyOn(viewModel, 'performUpdate');
+      spyOn(viewModel, 'dispatch');
+    });
+
+    it('calls "performUpdate" method', () => {
+      viewModel.updateRoles(args);
+
+      expect(viewModel.performUpdate).toHaveBeenCalledWith(args);
+    });
+
+    it('dispatches "saveCustomRole" event with groupId', () => {
+      args.roleId = 711;
+      viewModel.updateRoles(args);
+
+      expect(viewModel.dispatch).toHaveBeenCalledWith({
+        type: 'saveCustomRole',
+        groupId: args.roleId,
+      });
+    });
+
+    it('pushes action into deferredSave if it is defined', () => {
+      viewModel.attr('deferredSave', {
+        push: jasmine.createSpy(),
+      });
+
+      viewModel.updateRoles(args);
+      expect(viewModel.performUpdate.calls.count()).toBe(1);
+
+      viewModel.attr('deferredSave').push.calls.allArgs()[0][0]();
+      expect(viewModel.performUpdate.calls.count()).toBe(2);
+    });
+  });
+
+  describe('"performUpdate" method', () => {
+    beforeEach(() => {
+      spyOn(viewModel, 'updateAccessContolList');
+      spyOn(viewModel, 'checkConflicts');
+    });
+
+    it('calls "updateAccessContolList" method', () => {
+      const args = {
+        people: 'mockPeople',
+        roleId: 'mockRoleId',
+      };
+
+      viewModel.performUpdate(args);
+
+      expect(viewModel.updateAccessContolList)
+        .toHaveBeenCalledWith(args.people, args.roleId);
+    });
+
+    it('calls "checkConflicts" method if conflictRoles is not empty', () => {
+      const args = {
+        roleTitle: 'mockRoleTitle',
+      };
+      viewModel.attr('conflictRoles', [1, 2]);
+
+      viewModel.performUpdate(args);
+
+      expect(viewModel.checkConflicts).toHaveBeenCalledWith(args.roleTitle);
+    });
+
+    it('does not call "checkConflicts" method if conflictRoles is empty',
+      () => {
+        viewModel.attr('conflictRoles', []);
+
+        viewModel.performUpdate({});
+
+        expect(viewModel.checkConflicts).not.toHaveBeenCalled();
+      });
+  });
+
   beforeEach(() => {
     spyOn(aclUtils, 'getRolesForType').and.returnValue([
       {id: 1, name: 'Admin', object_type: 'Control'},
