@@ -288,6 +288,9 @@ def _propagate_relationships(relationship_ids, new_acl_ids):
 
 
 def _delete_orphan_acl_entries(deleted_objects):
+  if not deleted_objects:
+    return
+
   acl_table = all_models.AccessControlList.__table__
   db.session.execute(
       acl_table.delete().where(
