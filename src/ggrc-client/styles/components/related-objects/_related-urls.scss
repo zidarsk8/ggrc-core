@@ -112,3 +112,9 @@
     border-left: none;
   }
 }
+
+ca-object-modal-content {
+  .create-form__layout, .create-form__input {
+    width: 100%;
+  }
+}
