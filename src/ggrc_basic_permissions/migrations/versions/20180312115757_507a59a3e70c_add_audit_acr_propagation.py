@@ -38,29 +38,54 @@ _AUDIT_READ_ACCESS = {
     "Snapshot R": {},
 }
 
-_PROGRAM_OBJECTS = (
-    "AccessGroup",
-    "Clause",
-    "Contract",
-    # "Control",  # control is separate due to proposals
-    "DataAsset",
-    "Facility",
-    "Issue",
-    "Market",
-    "Objective",
-    "OrgGroup",
-    "Policy",
-    "Process",
-    "Product",
-    "Project",
-    "Regulation",
-    # "Risk",  # excluded due to proposals
-    "RiskAssessment",
-    "Section",
-    "Standard",
-    "System",
-    "Threat",
-    "Vendor",
+_PROGRAM_OBJECTS_R = (
+    "AccessGroup R",
+    "Clause R",
+    "Contract R",
+    # "Control R",  # control is separate due to proposals
+    "DataAsset R",
+    "Facility R",
+    "Issue R",
+    "Market R",
+    "Objective R",
+    "OrgGroup R",
+    "Policy R",
+    "Process R",
+    "Product R",
+    "Project R",
+    "Regulation R",
+    # "Risk R",  # excluded due to proposals
+    "RiskAssessment R",
+    "Section R",
+    "Standard R",
+    "System R",
+    "Threat R",
+    "Vendor R",
+)
+
+_PROGRAM_OBJECTS_RUD = (
+    "AccessGroup RUD",
+    "Clause RUD",
+    "Contract RUD",
+    # "Control RUD",  # control is separate due to proposals
+    "DataAsset RUD",
+    "Facility RUD",
+    "Issue RUD",
+    "Market RUD",
+    "Objective RUD",
+    "OrgGroup RUD",
+    "Policy RUD",
+    "Process RUD",
+    "Product RUD",
+    "Project RUD",
+    "Regulation RUD",
+    # "Risk RUD",  # excluded due to proposals
+    "RiskAssessment RUD",
+    "Section RUD",
+    "Standard RUD",
+    "System RUD",
+    "Threat RUD",
+    "Vendor RUD",
 )
 
 AUTID_PROGRAM_PROPAGATION = {
@@ -70,8 +95,8 @@ AUTID_PROGRAM_PROPAGATION = {
             "Relationship R": {
                 "Comment R": {},
                 "Document RU": {},
-                _PROGRAM_OBJECTS: const.COMMENT_DOCUMENT_RU,
-                ("Control", "Risk"): const.PROPOSAL_RU,
+                _PROGRAM_OBJECTS_RUD: const.COMMENT_DOCUMENT_RU,
+                ("Control RUD", "Risk RUD"): const.PROPOSAL_RU,
             }
         },
         "Program Readers": {
@@ -79,8 +104,8 @@ AUTID_PROGRAM_PROPAGATION = {
             "Relationship R": {
                 "Comment R": {},
                 "Document R": {},
-                _PROGRAM_OBJECTS: const.COMMENT_DOCUMENT_R,
-                ("Control", "Risk"): const.PROPOSAL_R,
+                _PROGRAM_OBJECTS_R: const.COMMENT_DOCUMENT_R,
+                ("Control R", "Risk R"): const.PROPOSAL_R,
             }
         },
     },
