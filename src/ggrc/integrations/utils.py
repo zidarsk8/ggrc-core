@@ -128,6 +128,7 @@ def sync_issue_tracker_statuses():
   processed_ids = set()
   for batch in _iter_issue_batches(list(assessment_issues)):
     for issue_id, issuetracker_state in batch.iteritems():
+      issue_id = str(issue_id)
       issue_info = assessment_issues.get(issue_id)
       if not issue_info:
         logger.warning(
