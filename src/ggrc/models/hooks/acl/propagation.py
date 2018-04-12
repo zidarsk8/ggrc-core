@@ -65,7 +65,8 @@ def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
   ]
   if relationship_ids is not None:
     where_conditions.append(rel_table.c.id.in_(relationship_ids))
-    where_conditions.append(~acl_table.c.id.in_(parent_acl_ids))
+    if parent_acl_ids:
+      where_conditions.append(~acl_table.c.id.in_(parent_acl_ids))
   elif parent_acl_ids is not None:
     where_conditions.append(acl_table.c.id.in_(parent_acl_ids))
 
@@ -280,6 +281,8 @@ def _propagate(parent_acl_ids):
 
 
 def _propagate_relationships(relationship_ids, new_acl_ids):
+  if not relationship_ids:
+    return
   child_ids = _handle_relationship_step(relationship_ids, new_acl_ids)
   _propagate(child_ids)
 
@@ -297,8 +300,10 @@ def propagate():
 
   # The order of propagation of relationships and other ACLs is important
   # because relationship code excludes other ACLs from propagating.
-  _propagate_relationships(flask.g.new_relationship_ids, flask.g.new_acl_ids)
-  _propagate(flask.g.new_acl_ids)
+  if flask.g.new_relationship_ids:
+    _propagate_relationships(flask.g.new_relationship_ids, flask.g.new_acl_ids)
+  if flask.g.new_acl_ids:
+    _propagate(flask.g.new_acl_ids)
 
   del flask.g.new_acl_ids
   del flask.g.new_relationship_ids
