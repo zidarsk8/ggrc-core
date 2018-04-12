@@ -36,9 +36,6 @@ class UrlHTMLParser(HTMLParser, object):
 
   def handle_data(self, data):
     if not self.tags_stack or self.tags_stack[-1] != self.LINK_TAG:
-      occurencies = self.pattern.findall(data)
-      if not occurencies:
-        return
       filtered_data = []
       prev_end_index = 0
       for occur in self.pattern.finditer(data):
@@ -46,8 +43,9 @@ class UrlHTMLParser(HTMLParser, object):
         filtered_data.append(data[prev_end_index:occur.start()])
         filtered_data.append(self.HTML_LINK_FORMAT.format(link=url, text=url))
         prev_end_index = occur.start() + len(url)
-      filtered_data.append(data[prev_end_index:])
-      self.raw_data = self.raw_data.replace(data, ''.join(filtered_data))
+      if filtered_data:
+        filtered_data.append(data[prev_end_index:])
+        self.raw_data = self.raw_data.replace(data, ''.join(filtered_data))
 
 def parse(data):
   """Parses and wraps urls in the data provided."""
