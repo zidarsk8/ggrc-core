@@ -39,6 +39,11 @@ $historyBlockWidth: 350px;
     border-left: 1px solid $itemBorder;
   }
 
+  &.download-template-unavailable {
+    download-template {
+      display: none;
+    }
+  }
 
   .confirm-action {
     display: flex;
