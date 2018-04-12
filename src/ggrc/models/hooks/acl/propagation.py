@@ -287,6 +287,22 @@ def _propagate_relationships(relationship_ids, new_acl_ids):
   _propagate(child_ids)
 
 
+def _delete_orphan_acl_entries(deleted_objects):
+  acl_table = all_models.AccessControlList.__table__
+  db.session.execute(
+      acl_table.delete().where(
+          sa.tuple_(
+              acl_table.c.object_type,
+              acl_table.c.object_id
+          ).in_(
+              deleted_objects
+          )
+
+      )
+  )
+  db.session.plain_commit()
+
+
 def propagate():
   """Propagate all ACLs caused by objects in new_objects list.
 
@@ -295,8 +311,12 @@ def propagate():
     new_relationship_ids: list of newly created relationship ids,
   """
   if not (hasattr(flask.g, "new_acl_ids") and
-          hasattr(flask.g, "new_relationship_ids")):
+          hasattr(flask.g, "new_relationship_ids") and
+          hasattr(flask.g, "deleted_objects")):
     return
+
+  if flask.g.deleted_objects:
+    _delete_orphan_acl_entries(flask.g.deleted_objects)
 
   # The order of propagation of relationships and other ACLs is important
   # because relationship code excludes other ACLs from propagating.
@@ -307,3 +327,4 @@ def propagate():
 
   del flask.g.new_acl_ids
   del flask.g.new_relationship_ids
+  del flask.g.deleted_objects

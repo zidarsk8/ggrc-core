@@ -23,6 +23,13 @@ from ggrc.models.hooks.acl import propagation
 from ggrc_workflows.models.hooks import workflow
 
 
+def _add_or_update(name, value):
+  """Add or update flask.g attribute."""
+  if hasattr(flask.g, name):
+    getattr(flask.g, name).update(value)
+  else:
+    setattr(flask.g, name, value)
+
 def _get_propagation_entries(session):
   acl_ids = set()
   relationship_ids = set()
@@ -32,7 +39,9 @@ def _get_propagation_entries(session):
     if isinstance(obj, all_models.Relationship):
       relationship_ids.add(obj.id)
 
-  return acl_ids, relationship_ids
+  deleted = {(obj.type, obj.id) for obj in session.deleted}
+
+  return acl_ids, relationship_ids, deleted
 
 
 def after_flush(session, _):
@@ -40,17 +49,11 @@ def after_flush(session, _):
   if not flask.has_app_context():
     return
 
-  acl_ids, relationship_ids = _get_propagation_entries(session)
+  acl_ids, relationship_ids, deleted = _get_propagation_entries(session)
 
-  if hasattr(flask.g, "new_acl_ids"):
-    flask.g.new_acl_ids.update(acl_ids)
-  else:
-    flask.g.new_acl_ids = acl_ids
-
-  if hasattr(flask.g, "new_relationship_ids"):
-    flask.g.new_relationship_ids.update(relationship_ids)
-  else:
-    flask.g.new_relationship_ids = relationship_ids
+  _add_or_update("new_acl_ids", acl_ids)
+  _add_or_update("new_relationship_ids", relationship_ids)
+  _add_or_update("deleted_objects", deleted)
 
   relationship.handle_relationship_creation(session)
   access_control_list.handle_acl_creation(session)
