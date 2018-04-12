@@ -309,7 +309,7 @@ import InfoWidget from '../controllers/info_widget_controller';
       GGRC.register_hook(
         type + '.info_widget_actions',
         GGRC.mustache_path + '/base_objects/approval_link.mustache'
-        );
+      );
     });
     new GGRC.Mappings('ggrc_workflows', mappings);
   };

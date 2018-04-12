@@ -4,6 +4,7 @@
  */
 
 import ModalsController from './modals_controller';
+import {isNull, isUndefined} from 'lodash';
 
 export default ModalsController({
   pluginName: 'ggrc_controllers_quick_form',
@@ -88,6 +89,7 @@ export default ModalsController({
     let action;
     let openclose;
     let isOpened;
+    const instance = self.options.instance;
 
     if (el.data('openclose')) {
       action = el.data('openclose');
@@ -104,34 +106,44 @@ export default ModalsController({
       }
     }
 
-    oldValue[name] = this.options.instance.attr(name);
+    oldValue[name] = instance.attr(name);
     if (el.data('also-undo')) {
       can.each(el.data('also-undo').split(','), function (attrname) {
         attrname = attrname.trim();
-        oldValue[attrname] = self.options.instance.attr(attrname);
+        oldValue[attrname] = instance.attr(attrname);
       });
     }
 
     // Check if the undo button was clicked:
-    self.options.instance.attr('_undo') || self.options.instance.attr('_undo', []);
+    instance.attr('_undo') || instance.attr('_undo', []);
 
     if (el.is('[data-toggle*=modal')) {
       setTimeout(function () {
         $('.modal:visible').one('modal:success', function () {
-          self.options.instance.attr('_undo').unshift(oldValue);
+          instance.attr('_undo').unshift(oldValue);
         });
       }, 100);
     } else {
       ev.stopPropagation();
-      self.options.instance.attr('_undo').unshift(oldValue);
+      instance.attr('_undo').unshift(oldValue);
 
-      self.options.instance.attr('_disabled', 'disabled');
-      self.options.instance.refresh().then(function (instance) {
-        self.set_value({name: el.data('name'), value: el.data('value')});
-        return instance.save();
-      }).then(function () {
-        self.options.instance.attr('_disabled', '');
-      });
+      instance.attr('_disabled', 'disabled');
+      instance
+        .refresh()
+        .then(function (instance) {
+          self.set_value({name: el.data('name'), value: el.data('value')});
+          return instance.save();
+        })
+        .then(function () {
+          const modelType = el.data('objectType');
+          const id = el.data('objectId');
+          if (modelType && !isNull(id) && !isUndefined(id)) {
+            return CMS.Models[modelType].findOne({id});
+          }
+        })
+        .then(function () {
+          instance.attr('_disabled', '');
+        });
     }
   },
   'a.undo click': function (el, ev) {
