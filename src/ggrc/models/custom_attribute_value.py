@@ -21,6 +21,7 @@ from ggrc.fulltext.mixin import Indexed
 from ggrc.fulltext import get_indexer
 from ggrc.utils import url_parser
 
+
 class CustomAttributeValue(Base, Indexed, db.Model):
   """Custom attribute value model"""
 
