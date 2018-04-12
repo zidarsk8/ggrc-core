@@ -1,16 +1,16 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""This module contains url parser class"""
+"""This module contains url parser class."""
 import re
 
 from HTMLParser import HTMLParser
 
 
 class UrlHTMLParser(HTMLParser, object):
-  """Class for parsing and wrapping urls"""
+  """Class for parsing and wrapping urls."""
   LINK_TAG = "a"
-  URL_REGEX = r"https?:\/\/[^\s]+/"
+  URL_REGEX = r"https?:\/\/[^\s]+"
   HTML_LINK_FORMAT = '<a href="{link}">{text}</a>'
 
   def __init__(self):
@@ -48,5 +48,5 @@ class UrlHTMLParser(HTMLParser, object):
       self.raw_data = self.raw_data.replace(data, ''.join(filtered_data))
                      
 def parse(data):
-  """Parses and wraps urls in the data provided"""
+  """Parses and wraps urls in the data provided."""
   return UrlHTMLParser().feed(data)
