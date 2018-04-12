@@ -4,60 +4,65 @@
 """Unit test suite for util url_parser."""
 
 import unittest
+import ddt
+
 from ggrc.utils import url_parser
 
 
+@ddt.ddt
 class TestUrlParser(unittest.TestCase):
   """Unittests for user generator module."""
 
-  def test_wrap_raw_url(self):
+  @ddt.data([
+         "https://www.google.com/",
+         '<a href="https://www.google.com/">https://www.google.com/</a>'
+      ],
+      [
+          "http://www.google.com/",
+          '<a href="http://www.google.com/">http://www.google.com/</a>'
+      ],
+      [
+          "http://www.google.com",
+          '<a href="http://www.google.com">http://www.google.com</a>'
+      ]
+  )
+  @ddt.unpack
+  def test_wrap_raw_url(self, test_data, expected_result):
     """Url parser should wrap urls (http or hhtps)."""
-    test_cases = [
-        "https://www.google.com/",
-        "http://www.google.com/",
-        "http://www.google.com"
-    ]
-    expected_results = [
-        '<a href="https://www.google.com/">https://www.google.com/</a>',
-        '<a href="http://www.google.com/">http://www.google.com/</a>',
-        '<a href="http://www.google.com">http://www.google.com</a>'
-        ]
-    self._assert_results(test_cases, expected_results)
+    self.assertEqual(url_parser.parse(test_data), expected_result)
 
-  def test_not_wraps_links(self):
+  @ddt.data('<a href="https://www.google.com/">https://www.google.com/</a>',
+            '<a href="http://www.google.com/">http://www.google.com/</a>')
+  def test_not_wraps_links(self, data):
     """Url parser should not change wrapped urls."""
-    test_cases = [
-        '<a href="https://www.google.com/">https://www.google.com/</a>',
-        '<a href="http://www.google.com/">http://www.google.com/</a>'
-        ]
-    self._assert_results(test_cases, test_cases)
+    self.assertEqual(url_parser.parse(data), data)
 
-  def test_parse_mixed_urls(self):
+  @ddt.data([
+      'test <a href="https://www.google.com/">' \
+      'https://www.google.com/</a> link http://www.google.com/',
+      'test <a href="https://www.google.com/">' \
+      'https://www.google.com/</a> link ' \
+      '<a href="http://www.google.com/">http://www.google.com/</a>'
+  ])
+  @ddt.unpack
+  def test_parse_mixed_urls(self, test_data, expected_result):
     """ Url parser should parse a string with both
         wrapped and not wrapped urls.
     """
-    test_case = 'test <a href="https://www.google.com/">' \
-                'https://www.google.com/</a> link http://www.google.com/'
-    expected_result = 'test <a href="https://www.google.com/">' \
-        'https://www.google.com/</a> link ' \
-        '<a href="http://www.google.com/">http://www.google.com/</a>'
-    self._assert_results([test_case], [expected_result])
+    self.assertEqual(url_parser.parse(test_data), expected_result)
 
-  def test_parse_broken_tags(self):
+  @ddt.data(["<a>https://www.google.com/", "<a>https://www.google.com/"],
+      [
+          "http://www.google.com/</a>",
+          '<a href="http://www.google.com/">http://www.google.com/</a></a>'
+      ]
+  )
+  @ddt.unpack
+  def test_parse_broken_tags(self, test_data, expected_result):
     """Url parser should work with invalid tags."""
-    test_cases = ["<a>https://www.google.com/", "http://www.google.com/</a>"]
-    expected_result = [
-        "<a>https://www.google.com/",
-        '<a href="http://www.google.com/">http://www.google.com/</a></a>'
-        ]
-    self._assert_results(test_cases, expected_result)
+    self.assertEqual(url_parser.parse(test_data), expected_result)
 
-  def test_parse_empty_values(self):
+  @ddt.data(None, "")
+  def test_parse_empty_values(self, test_data):
     """Url parser should ignore None values and empty strings."""
-    test_cases = [None, ""]
-    expected_results = [None, ""]
-    self._assert_results(test_cases, expected_results)
-
-  def _assert_results(self, test_cases, expected_results):
-    for test, expected_result in zip(test_cases, expected_results):
-      self.assertEqual(url_parser.parse(test), expected_result)
+    self.assertEqual(url_parser.parse(test_data), test_data)
