@@ -959,6 +959,9 @@ export default can.Control({
   },
 
   triggerSave(el, ev) {
+    // disable ui while the form is being processed (loading)
+    this.disableEnableContentUI(true);
+
     // Normal saving process
     if (el.is(':not(.disabled)')) {
       const ajd = this.save_instance(el, ev);
@@ -1106,6 +1109,8 @@ export default can.Control({
     ajd.fail(this.save_error.bind(this))
       .done(function (obj) {
         function finish() {
+          // enable ui after clicking on save & other
+          that.disableEnableContentUI(false);
           delete that.disable_hide;
           if (that.options.add_more) {
             if (that.options.$trigger && that.options.$trigger.length) {
@@ -1166,6 +1171,9 @@ export default can.Control({
         GGRC.Errors.notifierXHR('warning')(error);
       }
     }
+    // enable ui after a fail
+    this.disableEnableContentUI(false);
+
     $('html, body').animate({
       scrollTop: '0px'
     }, {
@@ -1262,5 +1270,23 @@ export default can.Control({
     return replacement && hash.indexOf(summary) > 0 ?
       hash.replace(summary, replacement) :
       hash;
+  },
+
+/**
+ * disable/enable ui to disallow/allow user to edit input elements
+ * after clicking on the save button
+ */
+  disableEnableContentUI(isDisabled = false) {
+    const content = this.options.attr('$content');
+
+    if (!content) {
+      return;
+    }
+
+    if (isDisabled) {
+      content.addClass('ui-disabled');
+    } else {
+      content.removeClass('ui-disabled');
+    }
   }
 });
