@@ -8,6 +8,7 @@ This package should have the single hook that should handle all acl propagation
 and deletion.
 """
 
+import flask
 import sqlalchemy as sa
 
 from ggrc import db
@@ -274,12 +275,19 @@ def _propagate_relationships(relationship_ids):
   _propagate(child_ids)
 
 
-def propagate(new_acl_ids, relationships_ids):
+def propagate():
   """Propagate all ACLs caused by objects in new_objects list.
 
   Args:
     new_acl_ids: list of newly created ACL ids,
     new_relationship_ids: list of newly created relationship ids,
   """
+  if not (hasattr(flask.g, "new_acl_ids") and
+          hasattr(flask.g, "new_relationship_ids")):
+    return
 
-  _propagate(new_acl_ids)
+  _propagate(flask.g.new_acl_ids)
+  _propagate_relationships(flask.g.relationship_ids)
+
+  del flask.g.new_wf_acls
+  del flask.g.deleted_wf_objects
