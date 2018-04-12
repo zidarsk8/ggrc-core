@@ -19,6 +19,8 @@ class UrlHTMLParser(HTMLParser, object):
     self.raw_data = ""
 
   def feed(self, data):
+    if not data:
+      return data
     self.tags_stack = []
     self.raw_data = data
     super(UrlHTMLParser, self).feed(data)

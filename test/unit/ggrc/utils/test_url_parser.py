@@ -54,6 +54,12 @@ class TestUrlParser(unittest.TestCase):
         ]
     self._assert_results(test_cases, expected_result)
 
+  def test_url_parser_should_not_generate_exception(self):
+    """Url parser should ignore None values and empty strings."""
+    test_cases = [None, ""]
+    expected_results = [None, ""]
+    self._assert_results(test_cases, expected_results)
+
   def _assert_results(self, test_cases, expected_results):
     for test, expected_result in zip(test_cases, expected_results):
       self.assertEqual(url_parser.parse(test), expected_result)
