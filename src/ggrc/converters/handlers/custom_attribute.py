@@ -26,7 +26,7 @@ def _get_ca_date_value(value):
   return attr_val
 
 
-class CustomAttributeColumHandler(handlers.TextColumnHandler):
+class CustomAttributeColumnHandler(handlers.TextColumnHandler):
 
   """Custom attribute column handler
 
