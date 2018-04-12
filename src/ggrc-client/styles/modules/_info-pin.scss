@@ -63,8 +63,7 @@
       }
 
       .tier-content {
-        opacity: 0.5;
-        pointer-events: none;
+        @include disabled(0.5);
       }
     }
   }
