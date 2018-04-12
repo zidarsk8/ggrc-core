@@ -19,7 +19,7 @@ from ggrc.models import reflection
 from ggrc import utils
 from ggrc.fulltext.mixin import Indexed
 from ggrc.fulltext import get_indexer
-
+from ggrc.utils import url_parser
 
 class CustomAttributeValue(Base, Indexed, db.Model):
   """Custom attribute value model"""
@@ -62,6 +62,7 @@ class CustomAttributeValue(Base, Indexed, db.Model):
   # warning is a false positive
   _validator_map = {
       "Text": lambda self: self._validate_text(),
+      "Rich Text" : lambda self: self._validate_rich_text(),
       "Date": lambda self: self._validate_date(),
       "Dropdown": lambda self: self._validate_dropdown(),
       "Map:Person": lambda self: self._validate_map_person(),
@@ -277,6 +278,10 @@ class CustomAttributeValue(Base, Indexed, db.Model):
     """Trim whitespaces."""
     if self.attribute_value:
       self.attribute_value = self.attribute_value.strip()
+
+  def _validate_rich_text(self):
+    """Add tags for links"""
+    self.attribute_value = url_parser.parse(self.raw_value)
 
   def validate(self):
     """Validate custom attribute value."""

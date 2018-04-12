@@ -11,6 +11,7 @@ from ggrc import models
 from ggrc import utils
 from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
+from ggrc.utils import url_parser
 
 _types = models.CustomAttributeDefinition.ValidTypes
 
@@ -170,6 +171,7 @@ class CustomAttributeColumnHandler(handlers.TextColumnHandler):
     return value
 
   def get_text_value(self):
+    """Get cleaned text value."""
     if not self.mandatory and self.raw_value == "":
       return None  # ignore empty fields
     value = self.clean_whitespaces(self.raw_value)
@@ -178,11 +180,13 @@ class CustomAttributeColumnHandler(handlers.TextColumnHandler):
     return value
 
   def get_rich_text_value(self):
+    """Get parsed rich text value."""
     if not self.mandatory and self.raw_value == "":
       return None  # ignore empty fields
-    if self.mandatory and not self.raw_value:
+    value = url_parser.parse(self.raw_value)
+    if self.mandatory and not value:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
-    return self.raw_value
+    return value
 
   def get_person_value(self):
     """Fetch a person based on the email text in column.
@@ -206,7 +210,7 @@ class CustomAttributeColumnHandler(handlers.TextColumnHandler):
     return cache.get((None, self.display_name))
 
 
-class ObjectCaColumnHandler(CustomAttributeColumHandler):
+class ObjectCaColumnHandler(CustomAttributeColumnHandler):
 
   """Handler for object level custom attributes."""
 
