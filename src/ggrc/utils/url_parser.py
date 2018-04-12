@@ -47,6 +47,7 @@ class UrlHTMLParser(HTMLParser, object):
         filtered_data.append(data[prev_end_index:])
         self.raw_data = self.raw_data.replace(data, ''.join(filtered_data))
 
+
 def parse(data):
   """Parses and wraps urls in the data provided."""
   return UrlHTMLParser().feed(data)

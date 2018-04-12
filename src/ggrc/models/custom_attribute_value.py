@@ -63,7 +63,7 @@ class CustomAttributeValue(Base, Indexed, db.Model):
   # warning is a false positive
   _validator_map = {
       "Text": lambda self: self._validate_text(),
-      "Rich Text" : lambda self: self._validate_rich_text(),
+      "Rich Text": lambda self: self._validate_rich_text(),
       "Date": lambda self: self._validate_date(),
       "Dropdown": lambda self: self._validate_dropdown(),
       "Map:Person": lambda self: self._validate_map_person(),

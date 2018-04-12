@@ -140,8 +140,8 @@ class TestCustomAttributeImportExport(TestCase):
     prod_0_expected = {
         u"normal text": u"edited normal text",
         u"man text": u"edited man text",
-        u"normal RT": u'some <br> edited rich <br> text ' \
-            '<a href="https://www.google.com">https://www.google.com</a>',
+        u"normal RT": u'some <br> edited rich <br> text '
+        '<a href="https://www.google.com">https://www.google.com</a>',
         u"man RT": u"other edited <br> rich text <a>http://www.google.com</a>",
         u"normal Date": u"2017-09-14",
         u"man Date": u"2018-01-17",

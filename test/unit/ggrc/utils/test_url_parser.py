@@ -13,9 +13,10 @@ from ggrc.utils import url_parser
 class TestUrlParser(unittest.TestCase):
   """Unittests for user generator module."""
 
-  @ddt.data([
-         "https://www.google.com/",
-         '<a href="https://www.google.com/">https://www.google.com/</a>'
+  @ddt.data(
+      [
+          "https://www.google.com/",
+          '<a href="https://www.google.com/">https://www.google.com/</a>'
       ],
       [
           "http://www.google.com/",
@@ -38,10 +39,10 @@ class TestUrlParser(unittest.TestCase):
     self.assertEqual(url_parser.parse(data), data)
 
   @ddt.data([
-      'test <a href="https://www.google.com/">' \
+      'test <a href="https://www.google.com/">'
       'https://www.google.com/</a> link http://www.google.com/',
-      'test <a href="https://www.google.com/">' \
-      'https://www.google.com/</a> link ' \
+      'test <a href="https://www.google.com/">'
+      'https://www.google.com/</a> link '
       '<a href="http://www.google.com/">http://www.google.com/</a>'
   ])
   @ddt.unpack
@@ -52,11 +53,9 @@ class TestUrlParser(unittest.TestCase):
     self.assertEqual(url_parser.parse(test_data), expected_result)
 
   @ddt.data(["<a>https://www.google.com/", "<a>https://www.google.com/"],
-      [
-          "http://www.google.com/</a>",
-          '<a href="http://www.google.com/">http://www.google.com/</a></a>'
-      ]
-  )
+            ["http://www.google.com/</a>",
+             '<a href="http://www.google.com/">http://www.google.com/</a></a>'
+             ])
   @ddt.unpack
   def test_parse_broken_tags(self, test_data, expected_result):
     """Url parser should work with invalid tags."""
