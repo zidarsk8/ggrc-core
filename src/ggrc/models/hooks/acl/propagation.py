@@ -63,10 +63,11 @@ def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
   where_conditions = [
       child_acr.c.object_type == all_models.Relationship.__name__,
   ]
-  if parent_acl_ids is not None:
-    where_conditions.append(acl_table.c.id.in_(parent_acl_ids))
   if relationship_ids is not None:
     where_conditions.append(rel_table.c.id.in_(relationship_ids))
+    where_conditions.append(~acl_table.c.id.in_(parent_acl_ids))
+  elif parent_acl_ids is not None:
+    where_conditions.append(acl_table.c.id.in_(parent_acl_ids))
 
   if source:
     acl_link = sa.and_(
@@ -215,9 +216,17 @@ def _handle_propagation_children(new_parent_ids):
   _insert_select_acls(select_statement)
 
 
-def _handle_propagation_relationships(relationship_ids):
-  src_select = _rel_parent(relationship_ids=relationship_ids, source=True)
-  dst_select = _rel_parent(relationship_ids=relationship_ids, source=False)
+def _handle_propagation_relationships(relationship_ids, new_acl_ids):
+  src_select = _rel_parent(
+      parent_acl_ids=new_acl_ids,
+      relationship_ids=relationship_ids,
+      source=True
+  )
+  dst_select = _rel_parent(
+      parent_acl_ids=new_acl_ids,
+      relationship_ids=relationship_ids,
+      source=False
+  )
   select_statement = sa.union(src_select, dst_select)
   _insert_select_acls(select_statement)
 
@@ -239,10 +248,10 @@ def _handle_acl_step(parent_acl_ids):
   return _get_child_ids(new_parent_ids)
 
 
-def _handle_relationship_step(relationship_ids):
+def _handle_relationship_step(relationship_ids, new_acl_ids):
   """Propagate first level or ACLs caused by new relationships."""
 
-  _handle_propagation_relationships(relationship_ids)
+  _handle_propagation_relationships(relationship_ids, new_acl_ids)
   new_parent_ids = _get_relationship_acl_ids(relationship_ids)
   _handle_propagation_children(new_parent_ids)
 
@@ -270,8 +279,8 @@ def _propagate(parent_acl_ids):
       break
 
 
-def _propagate_relationships(relationship_ids):
-  child_ids = _handle_relationship_step(relationship_ids)
+def _propagate_relationships(relationship_ids, new_acl_ids):
+  child_ids = _handle_relationship_step(relationship_ids, new_acl_ids)
   _propagate(child_ids)
 
 
@@ -286,8 +295,10 @@ def propagate():
           hasattr(flask.g, "new_relationship_ids")):
     return
 
+  # The order of propagation of relationships and other ACLs is important
+  # because relationship code excludes other ACLs from propagating.
+  _propagate_relationships(flask.g.new_relationship_ids, flask.g.new_acl_ids)
   _propagate(flask.g.new_acl_ids)
-  _propagate_relationships(flask.g.relationship_ids)
 
-  del flask.g.new_wf_acls
-  del flask.g.deleted_wf_objects
+  del flask.g.new_acl_ids
+  del flask.g.new_relationship_ids
