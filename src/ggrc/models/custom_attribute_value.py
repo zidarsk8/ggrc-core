@@ -281,7 +281,7 @@ class CustomAttributeValue(Base, Indexed, db.Model):
 
   def _validate_rich_text(self):
     """Add tags for links."""
-    self.attribute_value = url_parser.parse(self.raw_value)
+    self.attribute_value = url_parser.parse(self.attribute_value)
 
   def validate(self):
     """Validate custom attribute value."""

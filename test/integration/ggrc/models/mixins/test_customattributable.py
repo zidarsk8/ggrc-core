@@ -114,6 +114,41 @@ class TestCustomAttributableMixin(TestCase):
     self.assertEqual(prog.custom_attribute_values[0].attribute_value,
                      "http://www.some.url")
 
+  def test_validate_rich_text_ca_value(self):
+    """Test validator for Rich Text CA value."""
+    generator = ObjectGenerator()
+    prog = factories.ProgramFactory()
+    cad1 = factories.CustomAttributeDefinitionFactory(
+        definition_type="program",
+        definition_id=prog.id,
+        attribute_type="Rich Text",
+        title="CA 1",
+    )
+    val1 = factories.CustomAttributeValueFactory(
+        attributable=prog,
+        attribute_value=" http://www.some.url",
+        custom_attribute=cad1,
+    )
+    cad2 = factories.CustomAttributeDefinitionFactory(
+        definition_type="program",
+        definition_id=prog.id,
+        attribute_type="Rich Text",
+        title="CA 2",
+    )
+    val1 = factories.CustomAttributeValueFactory(
+        attributable=prog,
+        attribute_value=" <a>http://www.some.url</a>",
+        custom_attribute=cad2,
+    )
+    prog.custom_attribute_values = [val1]
+    generator.api.modify_object(prog, {})
+
+    prog = prog.__class__.query.get(prog.id)
+    self.assertEqual(prog.custom_attribute_values[0].attribute_value,
+                     ' <a href="http://www.some.url">http://www.some.url</a>')
+    self.assertEqual(prog.custom_attribute_values[1].attribute_value,
+                     ' <a>http://www.some.url</a>')
+
   def test_ca_setattr(self):
     """Test setting custom attribute values with setattr."""
     with factories.single_commit():
