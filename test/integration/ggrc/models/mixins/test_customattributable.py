@@ -114,7 +114,7 @@ class TestCustomAttributableMixin(TestCase):
     self.assertEqual(prog.custom_attribute_values[0].attribute_value,
                      "http://www.some.url")
 
-  def test_validate_rich_text_ca_value(self):
+  def test_validate_rich_text_ca(self):
     """Test validator for Rich Text CA value."""
     generator = ObjectGenerator()
     prog = factories.ProgramFactory()

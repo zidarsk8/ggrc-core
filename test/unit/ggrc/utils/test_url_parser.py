@@ -10,9 +10,7 @@ from ggrc.utils import url_parser
 class TestUrlParser(unittest.TestCase):
   """Unittests for user generator module."""
 
-  # pylint: disable=invalid-name
-
-  def test_url_parser_should_wrap_raw_url(self):
+  def test_wrap_raw_url(self):
     """Url parser should wrap urls (http or hhtps)."""
     test_cases = [
         "https://www.google.com/",
@@ -20,13 +18,13 @@ class TestUrlParser(unittest.TestCase):
         "http://www.google.com"
     ]
     expected_results = [
-       '<a href="https://www.google.com/">https://www.google.com/</a>',
-       '<a href="http://www.google.com/">http://www.google.com/</a>',
-       '<a href="http://www.google.com">http://www.google.com</a>'
+        '<a href="https://www.google.com/">https://www.google.com/</a>',
+        '<a href="http://www.google.com/">http://www.google.com/</a>',
+        '<a href="http://www.google.com">http://www.google.com</a>'
         ]
     self._assert_results(test_cases, expected_results)
 
-  def test_url_parser_should_not_wrap_links(self):
+  def test_not_wraps_links(self):
     """Url parser should not change wrapped urls."""
     test_cases = [
         '<a href="https://www.google.com/">https://www.google.com/</a>',
@@ -34,7 +32,7 @@ class TestUrlParser(unittest.TestCase):
         ]
     self._assert_results(test_cases, test_cases)
 
-  def test_url_parser_should_parse_mixed_urls(self):
+  def test_parse_mixed_urls(self):
     """ Url parser should parse a string with both
         wrapped and not wrapped urls.
     """
@@ -45,7 +43,7 @@ class TestUrlParser(unittest.TestCase):
         '<a href="http://www.google.com/">http://www.google.com/</a>'
     self._assert_results([test_case], [expected_result])
 
-  def test_url_parser_should_parse_broken_tags(self):
+  def test_parse_broken_tags(self):
     """Url parser should work with invalid tags."""
     test_cases = ["<a>https://www.google.com/", "http://www.google.com/</a>"]
     expected_result = [
@@ -54,7 +52,7 @@ class TestUrlParser(unittest.TestCase):
         ]
     self._assert_results(test_cases, expected_result)
 
-  def test_url_parser_should_not_generate_exception(self):
+  def test_parse_empty_values(self):
     """Url parser should ignore None values and empty strings."""
     test_cases = [None, ""]
     expected_results = [None, ""]
