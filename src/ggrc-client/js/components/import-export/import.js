@@ -137,6 +137,7 @@ export default can.Component.extend({
         importStatus: '',
         message: '',
         isConfirm: false,
+        jobId: null,
       });
     },
     statusStrategies: {
@@ -219,10 +220,19 @@ export default can.Component.extend({
     },
     stopImport(jobId) {
       clearTimeout(this.attr('trackId'));
+      const deleteJob = () => {
+        this.resetFile();
+        deleteImportJob(jobId);
+      };
       stopImportJob(jobId)
-        .then(() => {
-          this.resetFile();
-          deleteImportJob(jobId);
+        .then(deleteJob)
+        .fail((xhr) => {
+          // Need to implement a better solution in order to identify specific
+          // errors like here
+          if (xhr && xhr.responseJSON && xhr.responseJSON.message &&
+            xhr.responseJSON.message === 'Wrong status') {
+            deleteJob();
+          }
         });
     },
     trackStatusOfImport(jobId, timeout = 2000) {
@@ -321,8 +331,7 @@ export default can.Component.extend({
           if (file && _.any(allowedTypes, function (type) {
             return type === file.mimeType;
           })) {
-            if (that.attr('state') !== jobStatuses.SELECT &&
-              that.attr('jobId')) {
+            if (that.attr('jobId')) {
               deleteImportJob(that.attr('jobId'));
             }
             that.resetFile();
