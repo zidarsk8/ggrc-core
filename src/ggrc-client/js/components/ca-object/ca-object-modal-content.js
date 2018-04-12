@@ -26,6 +26,12 @@ export default can.Component.extend({
             this.attr('state.open');
         },
       },
+      url: {
+        get() {
+          return this.attr('content.fields').indexOf('url') > -1 &&
+            this.attr('state.open');
+        },
+      },
       state: {
         value: {
           open: false,
