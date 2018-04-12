@@ -266,7 +266,4 @@ class TestAuditRoleProgation(TestCase):
                    ((self.objects['issue_comment'].id, "Comment"),
                     (self.objects['issue_document'].id, "Document")))
     ).count()
-    # NOTE: The result should actually be 2 here, but because the Admin role
-    # does not propagate permissions to comment/document it's those permission
-    # are missing.
-    self.assertEqual(acl_count, 0)
+    self.assertEqual(acl_count, 2)
