@@ -271,7 +271,7 @@ class TestPropagation(TestCase):
           person=person,
       )
 
-    child_ids = propagation._handle_relationship_step(relationship_ids)
+    child_ids = propagation._handle_relationship_step(relationship_ids, [])
 
     self.assertEqual(
         all_models.AccessControlList.query.count(),
