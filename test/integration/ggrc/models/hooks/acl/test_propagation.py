@@ -242,7 +242,7 @@ class TestPropagation(TestCase):
       factories.RelationshipFactory(
           source=assessment3,
           destination=audit,
-      ).id,
+      ).id
 
       relationship_ids = [
           factories.RelationshipFactory(
@@ -319,3 +319,26 @@ class TestPropagation(TestCase):
       # the same relationship. This optimally the assertion should count 3 acl
       # entries but currently that is to much work to implement
       self.assertEqual(all_models.AccessControlList.query.count(), 4)
+
+  def test_propagate_all(self):
+    with factories.single_commit():
+      person = factories.PersonFactory()
+      audit = factories.AuditFactory()
+      factories.RelationshipFactory(
+          source=audit,
+          destination=audit.program,
+      )
+      acl_ids = [
+          factories.AccessControlListFactory(
+              ac_role=self.roles["Program"]["Program Editors"],
+              object=audit.program,
+              person=person,
+          ).id
+      ]
+
+    propagation._propagate(acl_ids)
+    self.assertEqual(all_models.AccessControlList.query.count(), 4)
+    propagation._delete_all_propagated_acls()
+    self.assertEqual(all_models.AccessControlList.query.count(), 1)
+    propagation.propagate_all()
+    self.assertEqual(all_models.AccessControlList.query.count(), 4)
