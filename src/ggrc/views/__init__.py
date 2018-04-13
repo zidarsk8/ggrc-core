@@ -200,7 +200,7 @@ def do_reindex():
       ids = [obj.id for obj in model.query]
       ids_count = len(ids)
       handled_ids = 0
-      for ids_chunk in utils.list_chunks(ids):
+      for ids_chunk in utils.list_chunks(ids, chunk_size=100):
         handled_ids += len(ids_chunk)
         logger.info("%s: %s / %s", model_name, handled_ids, ids_count)
         model.bulk_record_update_for(ids_chunk)
