@@ -28,6 +28,16 @@ _AUDIT_FULL_ACCESS = {
     },
 }
 
+_AUDITOR_ACCESS = {
+    "Relationship R": {
+        "Assessment R": const.COMMENT_DOCUMENT_R,
+        "AssessmentTemplate R": {},
+        "Document R": {},
+        "Issue RU": const.COMMENT_DOCUMENT_R,
+        "Snapshot RU": {},
+    },
+}
+
 _AUDIT_READ_ACCESS = {
     "Relationship R": {
         "Assessment R": const.COMMENT_DOCUMENT_R,
@@ -114,7 +124,7 @@ AUTID_PROGRAM_PROPAGATION = {
         # and all program related objects, so that they could clone audits and
         # update all audit snapshots.
         "Audit Captains": _AUDIT_FULL_ACCESS,
-        "Auditors": _AUDIT_READ_ACCESS,
+        "Auditors": _AUDITOR_ACCESS,
     },
 }
 
