@@ -12,12 +12,6 @@ import flask
 import sqlalchemy as sa
 from sqlalchemy.orm.session import Session
 
-from ggrc.models.hooks.acl import audit_roles
-from ggrc.models.hooks.acl import program_roles
-from ggrc.models.hooks.acl import relationship_deletion
-from ggrc.models.hooks import access_control_list
-from ggrc.models.hooks import relationship
-
 from ggrc.models import all_models
 from ggrc.models.hooks.acl import propagation
 from ggrc_workflows.models.hooks import workflow
@@ -55,14 +49,6 @@ def after_flush(session, _):
   _add_or_update("new_acl_ids", acl_ids)
   _add_or_update("new_relationship_ids", relationship_ids)
   _add_or_update("deleted_objects", deleted)
-
-  relationship.handle_relationship_creation(session)
-  access_control_list.handle_acl_creation(session)
-  program_role_handler = program_roles.ProgramRolesHandler()
-  program_role_handler.after_flush(session)
-  audit_role_handler = audit_roles.AuditRolesHandler()
-  audit_role_handler.after_flush(session)
-  relationship_deletion.after_flush(session)
 
   # Legacy propagation for workflows that will have to be refactored to use
   # relationships and the code above
