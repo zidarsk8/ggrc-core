@@ -350,20 +350,21 @@ def propagate():
 
 
 def propagate_all():
+  logger.info("ACL propagation started")
+  logger.info("Deleting existing propagated roles")
   _delete_all_propagated_acls()
 
   chunks = utils.generate_query_chunks(
       db.session.query(all_models.AccessControlList.id),
-      chunk_size=1000
   )
   count = all_models.AccessControlList.query.count()
+  propagated_count = 0
   for chunk in chunks:
-    flask.g.new_acl_ids = {row.id for row in chunk}
-    logger.info(
-        "Propagating ACL entries: %s/%s",
-        len(flask.g.new_acl_ids),
-        count,
-    )
+    acl_ids = {row.id for row in chunk}
+    propagated_count += len(acl_ids)
+    logger.info( "Propagating ACL entries: %s/%s", propagated_count, count)
+
+    flask.g.new_acl_ids = acl_ids
     flask.g.new_relationship_ids = set()
     flask.g.deleted_objects = set()
     propagate()
