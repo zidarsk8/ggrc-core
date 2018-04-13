@@ -16,7 +16,7 @@ from ggrc.integrations import issues
 logger = logging.getLogger(__name__)
 
 
-_SEARCH_PAGE_SIZE = 100
+_BATCH_SIZE = 100
 
 # A list of field to watch for changes in.
 _FIELDS_TO_CHECK = ('status', 'type', 'priority', 'severity')
@@ -61,14 +61,14 @@ def _collect_assessment_issues():
 def _iter_issue_batches(ids):
   """Generates a sequence of batches of issues from Issue Tracker by IDs."""
   cli = issues.Client()
-  next_page_token = None
 
-  while True:
+  for i in xrange(0, len(ids), _BATCH_SIZE):
+    chunk = ids[i:i + _BATCH_SIZE]
+    logger.debug('Issue ids to process: %s', chunk)
     try:
       response = cli.search({
-          'issue_ids': ids,
-          'page_size': _SEARCH_PAGE_SIZE,
-          'page_token': next_page_token,
+          'issue_ids': chunk,
+          'page_size': _BATCH_SIZE,
       })
     except integrations_errors.HttpError as error:
       logger.error(
@@ -87,10 +87,6 @@ def _iter_issue_batches(ids):
       }
     if issue_infos:
       yield issue_infos
-
-    next_page_token = response.get('next_page_token')
-    if not next_page_token:
-      break
 
 
 def _update_issue(cli, issue_id, params, max_attempts=5, interval=1):
