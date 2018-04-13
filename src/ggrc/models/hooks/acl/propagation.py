@@ -8,12 +8,17 @@ This package should have the single hook that should handle all acl propagation
 and deletion.
 """
 
+import logging
+
 import flask
 import sqlalchemy as sa
 
 from ggrc import db
 from ggrc import login
+from ggrc import utils
 from ggrc.models import all_models
+
+logger = logging.getLogger(__name__)
 
 
 def _insert_select_acls(select_statement):
@@ -306,6 +311,17 @@ def _delete_orphan_acl_entries(deleted_objects):
   db.session.plain_commit()
 
 
+def _delete_all_propagated_acls():
+
+  acl_table = all_models.AccessControlList.__table__
+  db.session.execute(
+      acl_table.delete().where(
+          acl_table.c.parent_id.isnot(None),
+      )
+  )
+  db.session.plain_commit()
+
+
 def propagate():
   """Propagate all ACLs caused by objects in new_objects list.
 
@@ -331,3 +347,23 @@ def propagate():
   del flask.g.new_acl_ids
   del flask.g.new_relationship_ids
   del flask.g.deleted_objects
+
+
+def propagate_all():
+  _delete_all_propagated_acls()
+
+  chunks = utils.generate_query_chunks(
+      db.session.query(all_models.AccessControlList.id),
+      chunk_size=1000
+  )
+  count = all_models.AccessControlList.query.count()
+  for chunk in chunks:
+    flask.g.new_acl_ids = {row.id for row in chunk}
+    logger.info(
+        "Propagating ACL entries: %s/%s",
+        len(flask.g.new_acl_ids),
+        count,
+    )
+    flask.g.new_relationship_ids = set()
+    flask.g.deleted_objects = set()
+    propagate()
