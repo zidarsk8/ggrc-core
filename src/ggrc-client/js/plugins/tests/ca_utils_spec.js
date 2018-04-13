@@ -6,7 +6,7 @@
 'use strict';
 
 import {isEmptyCustomAttribute as isEmptyCA} from '../utils/ca-utils';
-import {CA_DD_REQUIRED_DEPS, isCommentRequired, isEvidenceRequired,
+import {ddValidationMapToValue, isCommentRequired, isEvidenceRequired,
 } from '../utils/ca-utils';
 
 describe('GGRC utils isEmptyCustomAttribute() method', function () {
@@ -136,12 +136,25 @@ describe('GGRC util methods to validate requirements', function () {
       id: 2,
       type: 'dropdown',
       validationConfig: {
-        'nothing required': CA_DD_REQUIRED_DEPS.NONE,
-        'comment required': CA_DD_REQUIRED_DEPS.COMMENT,
-        'evidence required': CA_DD_REQUIRED_DEPS.EVIDENCE,
-        'comment & evidence required': CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
-        one: CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
-        two: CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
+        'nothing required': ddValidationMapToValue(),
+        'comment required': ddValidationMapToValue({
+          comment: true,
+        }),
+        'evidence required': ddValidationMapToValue({
+          attachment: true,
+        }),
+        'comment & evidence required': ddValidationMapToValue({
+          comment: true,
+          attachment: true,
+        }),
+        one: ddValidationMapToValue({
+          comment: true,
+          attachment: true,
+        }),
+        two: ddValidationMapToValue({
+          comment: true,
+          attachment: true,
+        }),
       },
       preconditions_failed: [],
       validation: {
@@ -150,6 +163,7 @@ describe('GGRC util methods to validate requirements', function () {
       errorsMap: {
         comment: false,
         evidence: false,
+        url: false,
       },
     });
   });

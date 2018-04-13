@@ -211,11 +211,11 @@ describe('assessmentLocalCa component', () => {
             comment: true,
           }),
           'evidence required': ddValidationMapToValue({
-            evidence: true,
+            attachment: true,
           }),
           'com+ev required': ddValidationMapToValue({
             comment: true,
-            evidence: true,
+            attachment: true,
           }),
         },
         preconditions_failed: [],
@@ -225,6 +225,7 @@ describe('assessmentLocalCa component', () => {
         errorsMap: {
           comment: false,
           evidence: false,
+          url: false,
         },
       });
     });
@@ -245,6 +246,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
         evidence: false,
+        url: false,
       });
     });
 
@@ -263,6 +265,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
         evidence: false,
+        url: false,
       });
     });
 
@@ -284,6 +287,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: true,
         evidence: false,
+        url: false,
       });
     });
 
@@ -304,6 +308,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
         evidence: false,
+        url: false,
       });
     });
 
@@ -326,6 +331,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
         evidence: true,
+        url: false,
       });
     });
 
@@ -347,6 +353,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
         evidence: false,
+        url: false,
       });
     });
 
@@ -370,6 +377,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: true,
         evidence: true,
+        url: false,
       });
     });
 
@@ -391,6 +399,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
         evidence: true,
+        url: false,
       });
     });
 
@@ -414,6 +423,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: true,
         evidence: false,
+        url: false,
       });
     });
 
@@ -435,6 +445,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
         evidence: false,
+        url: false,
       });
     });
   });
@@ -472,11 +483,11 @@ describe('assessmentLocalCa component', () => {
             comment: true,
           }),
           'evidence required': ddValidationMapToValue({
-            evidence: true,
+            attachment: true,
           }),
           'com+ev required': ddValidationMapToValue({
             comment: true,
-            evidence: true,
+            attachment: true,
           }),
         },
         preconditions_failed: [],
@@ -486,6 +497,7 @@ describe('assessmentLocalCa component', () => {
         errorsMap: {
           comment: false,
           evidence: false,
+          url: false,
         },
       });
     });
