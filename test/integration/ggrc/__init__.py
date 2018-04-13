@@ -20,7 +20,6 @@ from flask.ext.testing import TestCase as BaseTestCase
 from ggrc import db
 from ggrc.app import app
 from ggrc.converters.import_helper import read_csv_file
-from ggrc.fulltext import mysql
 from ggrc.views.converters import check_import_file
 from ggrc.models import Revision, all_models
 from integration.ggrc.api_helper import Api
@@ -471,16 +470,6 @@ class TestCase(BaseTestCase, object):
           )
           assignees.append((person, role))
     return assignees
-
-  @staticmethod
-  def get_model_fulltext(model_name, property, ids):
-    """Get fulltext records for model."""
-    # pylint: disable=redefined-builtin
-    return db.session.query(mysql.MysqlRecordProperty).filter(
-        mysql.MysqlRecordProperty.type == model_name,
-        mysql.MysqlRecordProperty.property == property,
-        mysql.MysqlRecordProperty.key.in_(ids),
-    )
 
   @staticmethod
   def get_model_ca(model_name, ids):
