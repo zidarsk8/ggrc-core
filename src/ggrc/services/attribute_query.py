@@ -12,7 +12,9 @@ from werkzeug.exceptions import BadRequest
 
 AttributeQuery = namedtuple('AttributeQuery', 'filter joinlist options')
 
+
 class AttributeQueryBuilder(object):
+
   def __init__(self, model):
     self.model = model
 
@@ -26,7 +28,7 @@ class AttributeQueryBuilder(object):
     attr = getattr(model, attrname)
     return attr
 
-  def coerce_value_for_query_param(self, attr, arg, value):
+  def coerce_value_for_query_param(self, attr, arg, value):  # Noqa
     attr_type = type(attr.type)
     if attr_type is Boolean:
       value = value.lower()
@@ -36,15 +38,15 @@ class AttributeQueryBuilder(object):
         value = False
       else:
         raise BadRequest('{0} must be "true" or "false", not {1}.'.format(
-          arg, value))
+            arg, value))
     elif attr_type is DateTime:
       try:
-       value = iso8601.parse_date(value)
+        value = iso8601.parse_date(value)
       except iso8601.ParseError as e:
         raise BadRequest(
             'Malformed DateTime {0} for parameter {0}. '
             'Error message was: {1}'.format(value, arg, e.message)
-            )
+        )
     elif attr_type is Date:
       try:
         value = datetime.datetime.strptime(value, '%Y-%m-%d')
@@ -52,17 +54,17 @@ class AttributeQueryBuilder(object):
         raise BadRequest(
             'Malformed Date {0} for parameter {1}. '
             'Error message was: {2}'.format(value, arg, e.message)
-            )
+        )
     elif attr_type is Integer and value == '':
       return None
     return value
 
   def check_valid_property(self, attr, attrname):
     if not hasattr(attr, 'type') or \
-        not isinstance(attr.type, TypeEngine):
+            not isinstance(attr.type, TypeEngine):
       raise self.bad_query_parameter(attrname)
 
-  def process_property_path(self, arg, value):
+  def process_property_path(self, arg, value):  # Noqa
     joinlist = []
     filters = []
     options = []
@@ -93,9 +95,9 @@ class AttributeQueryBuilder(object):
       filters.append(attr.in_(value))
     elif arg.endswith('__null'):
       if(value in [0, 'false', 'False', 'FALSE', False]):
-        filters.append(attr != None)
+        filters.append(attr.isnot(None))
       else:
-        filters.append(attr == None)
+        filters.append(attr.is_(None))
     elif clean_arg == '__include':
       options.extend(self.process_eager_loading(value))
     else:
@@ -103,7 +105,7 @@ class AttributeQueryBuilder(object):
       if value is not None:
         filters.append(attr == cast(value, attr.type))
       else:
-        filters.append(attr == None)
+        filters.append(attr.is_(None))
     return joinlist, filters, options
 
   def resolve_path_segment(self, segment, model):
@@ -126,7 +128,7 @@ class AttributeQueryBuilder(object):
       current_model = self.model
       for segment in segments:
         real_segment, current_model = self.resolve_path_segment(
-          segment, current_model)
+            segment, current_model)
         if current_model is not None:
           real_segments.append(real_segment)
       realized_path = '.'.join(real_segments)

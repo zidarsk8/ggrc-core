@@ -194,7 +194,8 @@ code_style_tests () {
   echo "Running flake8"
   docker exec -i ${PROJECT}_cleandev_1 su -c "
     source /vagrant/bin/init_vagrant_env
-    /vagrant/bin/check_flake8_diff
+    cd /vagrant
+    flake8 .
   " && flake_rc=$? || flake_rc=$?
 
   if [[ flake_rc -eq 0 ]]; then
