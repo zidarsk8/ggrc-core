@@ -7,13 +7,13 @@
 
     <div class="tier-content">
       <div class="pane-header">
-        <div class="row-fluid wrap-row">
-          <div class="span6">
+        <div class="pane-header__container">
+          <div class="pane-header__title">
             <h6>Title</h6>
             <h3>{{instance.title}}</h3>
           </div>
 
-          <div class="span6 pane-header__toolbar">
+          <div class="pane-header__toolbar">
             {{#is_info_pin}}
               <info-pin-buttons maximized="maximized" on-change-maximized-state="@onChangeMaximizedState" on-close="@onClose"></info-pin-buttons>
             {{/is_info_pin}}
@@ -47,34 +47,35 @@
           </div>
         </div>
       </div>
-      {{> /static/mustache/task_groups/tier2_content.mustache}}
-    </div>
 
-    {{#options}}
-    <div class="info-pane__section">
-        {{#with_mapping 'objects' instance}}
-        <div class="info-pane__section-title info-pane__section-title--underlined">
-            Objects (<span>{{objects.length}}</span>)
-            <span class="inline-explanation">Choose objects that tasks will apply to</span>
+      <div class="pane-content">
+        {{> /static/mustache/task_groups/tier2_content.mustache}}
+        {{#options}}
+        <div class="info-pane__section">
+            {{#with_mapping 'objects' instance}}
+            <div class="info-pane__section-title info-pane__section-title--underlined">
+                Objects (<span>{{objects.length}}</span>)
+                <span class="inline-explanation">Choose objects that tasks will apply to</span>
+            </div>
+            <ul class="tree-structure new-tree">
+                {{#each objects}}
+                    {{>'/static/mustache/base_objects/task_group_subtree.mustache'}}
+                {{/each}}
+                {{>'/static/mustache/base_objects/task_group_subtree_footer.mustache'}}
+            </ul>
+            {{/with_mapping}}
         </div>
-        <ul class="tree-structure new-tree">
-            {{#each objects}}
-                {{>'/static/mustache/base_objects/task_group_subtree.mustache'}}
-            {{/each}}
-            {{>'/static/mustache/base_objects/task_group_subtree_footer.mustache'}}
-        </ul>
-        {{/with_mapping}}
+        <div class="info-pane__section">
+          <h5 class="info-pane__section-title">
+            Tasks
+          </h5>
+          <task-list
+            {base-instance}="instance"
+            {workflow}="workflow"
+          ></task-list>
+        </div>
+        {{/options}}
+      </div>
     </div>
-    <div class="info-pane__section">
-      <h5 class="info-pane__section-title">
-        Tasks
-      </h5>
-      <task-list
-        {base-instance}="instance"
-        {workflow}="workflow"
-      ></task-list>
-    </div>
-    {{/options}}
-    </div>
+  </div>
   </section>
-

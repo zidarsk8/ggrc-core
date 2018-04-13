@@ -85,6 +85,10 @@
   select {
     margin-bottom: 0;
   }
+
+  .pane-content {
+    padding: 0 25px;
+  }
 }
 
 .side-content {
@@ -99,10 +103,6 @@
   display: flex;
   justify-content: flex-end;
 
-  .assignable & {
-    position: static;
-    margin-top: 0;
-  }
   show-related-assessments-button > a {
     display: inline-block;
   }

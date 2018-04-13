@@ -6,33 +6,26 @@
 <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
   <div class="tier-content">
     {{#instance}}
-      <div class="pane-header {{#if snapshot}}snapshot{{/if}}" >
-        <div class="row-fluid wrap-row">
-          <div data-test-id="title_0ad9fbaf" class="span6">
+      <div class="pane-header" >
+        <div class="pane-header__container">
+          <div class="pane-header__title" data-test-id="title_0ad9fbaf">
             {{#is_info_pin}}
               <h6>{{modifyFieldTitle instance.type 'Title'}}</h6>
             {{/is_info_pin}}
-            <h3>{{title}}</h3>
-            {{#if snapshot}}
-              <span class="state-value snapshot">{{instance.class.title_singular}} version as at {{date instance.updated_at}}</span>
-            {{/if}}
-            {{#if status}}
-              <span class="state-value {{addclass 'state' status}}">{{un_camel_case status}}</span>
-            {{/if}}
-            {{#if snapshot.archived}}
-              <span class="state-value state-archived">Archived</span>
-            {{/if}}
-            {{^if isSnapshot}}
-              <span class="proposal">
-                <create-proposal-button {instance}="instance">
-                </create-proposal-button>
-              </span>
-            {{/if}}
-            {{#if type}}
-            <p>
-              {{type.title}}
-            </p>
-            {{/if}}
+            <div class="pane-header__title-details">
+              <h3>{{title}}</h3>
+              {{#if status}}
+                <span>
+                  <span class="state-value {{addclass 'state' status}}">{{un_camel_case status}}</span>
+                </span>
+              {{/if}}
+              {{^if isSnapshot}}
+                <span class="proposal">
+                  <create-proposal-button {instance}="instance">
+                  </create-proposal-button>
+                </span>
+              {{/if}}
+            </div>
           </div>
 
           <div class="pane-header__toolbar">
@@ -68,45 +61,10 @@
               {{/using}}
             </div>
           </div>
-
-          {{#if snapshot}}
-            {{! We need to use `using` to ensure that snapshot is actually
-                reified by the time is_allowed helper uses it }}
-          {{#using reified_snapshot=snapshot}}
-          {{#canUpdate}}
-
-          {{^if instance.originalObjectDeleted}}
-            {{^isLatestRevision}}
-              {{^if instance.snapshot.archived}}
-              <div class="span12 snapshot">
-                <hr class="snapshot">
-                <p>
-                  <snapshot-comparer-config
-                    {instance}="instance"
-                    {left-revision-id}="instance.snapshot.revision_id"
-                    {right-revisions}="instance.snapshot.revisions">
-                      <revisions-comparer
-                        {modal-title}="modalTitle"
-                        {modal-confirm}="modalConfirm"
-                        {button-view}="buttonView"
-                        {instance}="instance"
-                        {left-revision-id}="leftRevisionId"
-                        {right-revision}="rightRevision">
-                          <a href="javascript://" can-click="compareIt">Get the latest version</a>
-                      </revisions-comparer>
-                  </snapshot-comparer-config>
-                </p>
-              </div>
-              {{/if}}
-            {{/isLatestRevision}}
-          {{/if}}
-
-          {{/canUpdate}}
-          {{/using}}
-          {{/if}}
         </div>
       </div>
     {{/instance}}
+    <div class="pane-content">
     {{>'/static/mustache/base_objects/object-review.mustache'}}
 
     <div class="row-fluid wrap-row">
@@ -141,5 +99,6 @@
           </div>
       </div>
     {{/using}}
+  </div>
   </div>
 </section>

@@ -8,33 +8,34 @@
 
   <div class="tier-content">
     <div class="pane-header">
+      <div class="pane-header__container">
       {{#instance}}
-        <div class="row-fluid wrap-row">
-          <div class="span6">
+          <div class="pane-header__title">
             {{#is_info_pin}}
               <h6>Title</h6>
             {{/is_info_pin}}
-            <h3>{{title}}</h3>
-            <span class="state-value {{addclass 'state' status}}">{{status}}</span>
-            {{#instance.next_cycle_start_date}}
-              {{#if instance.unit}}
-                {{^if instance.recurrences}}
-                  <span class="state-value state-archived">Archived</span>
+            <div class="pane-header__title-details">
+              <h3>{{title}}</h3>
+              <span>
+                <span class="state-value {{addclass 'state' status}}">{{status}}</span>
+              </span>
+              {{#instance.next_cycle_start_date}}
+                {{#if instance.unit}}
+                  {{^if instance.recurrences}}
+                    <span>
+                      <span class="state-value state-archived">Archived</span>
+                    </span>
+                  {{/if}}
                 {{/if}}
-              {{/if}}
-            {{/instance.next_cycle_start_date}}
-            {{#if type}}
-            <p>
-              {{type.title}}
-            </p>
-            {{/if}}
+              {{/instance.next_cycle_start_date}}
+            </div>
           </div>
 
-          <div class="span6 pane-header__toolbar">
+          <div class="pane-header__toolbar">
             {{#is_info_pin}}
               <info-pin-buttons maximized="maximized" on-change-maximized-state="@onChangeMaximizedState" on-close="@onClose"></info-pin-buttons>
             {{/is_info_pin}}
-        
+
             <div class="info-pane-utility">
               {{#is_allowed 'update' instance context='for'}}
                 <div class="details-wrap">
@@ -53,11 +54,11 @@
                           </a>
                         </li>
                     {{/is_info_pin}}
-          
+
                     <li>
                       <clipboard-link title="Get permalink" notify="true" text="{{get_permalink_url}}" />
                     </li>
-          
+
                     {{^is_info_pin}}
                       <li>
                         <workflow-clone workflow="instance">
@@ -96,7 +97,7 @@
                           </li>
                         {{/is_allowed}}
                     {{/is_info_pin}}
-          
+
                     {{#is_info_pin}}
                       {{#if instance.viewLink}}
                         {{#is_allowed "view_object_page" instance}}
@@ -109,14 +110,14 @@
                         {{/is_allowed}}
                       {{/if}}
                     {{/is_info_pin}}
-          
+
                   </ul>
                 </div>
               {{/is_allowed}}
             </div>
           </div>
-        </div>
       {{/instance}}
+    </div>
     </div>
 
     <tab-container>
