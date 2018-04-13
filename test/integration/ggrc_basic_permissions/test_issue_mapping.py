@@ -113,6 +113,7 @@ class TestIssueMapping(TestCase):
 
   def setUp(self):
     """Prepare data needed to run the tests"""
+    super(TestIssueMapping, self).setUp()
     self.api = Api()
     self.setup_roles()
     self.setup_users()
@@ -128,7 +129,7 @@ class TestIssueMapping(TestCase):
   )
   @unpack
   def test_mapping_to_issue(self, user_name, is_archived):
-    """Test mapping snapshots to issue"""
+    """Test mapping snapshots to issue for {0} ({1})"""
     user = self.users[user_name]
     payload = _get_map_dict(
         self.snapshots[is_archived],
