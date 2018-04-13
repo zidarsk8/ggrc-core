@@ -42,7 +42,7 @@ class TestAuditRoleProgation(TestCase):
     """Sets up all the objects needed by the tests"""
     objects = self.objects
     # Program
-    objects['program'] = factories.ProgramFactory(title="A Program")
+    objects['program'] = program = factories.ProgramFactory(title="A Program")
     # Controls
     objects['controls'] = controls = [
         factories.ControlFactory(title="My First Control"),
@@ -60,6 +60,7 @@ class TestAuditRoleProgation(TestCase):
             "person": self.people['created_captain']
         }]
     )
+    factories.RelationshipFactory(source=program, destination=audit)
     # Assessment template
     objects['assessment_template'] = factories.AssessmentTemplateFactory()
 
@@ -68,6 +69,8 @@ class TestAuditRoleProgation(TestCase):
 
     # Snapshot
     objects['snapshots'] = self._create_snapshots(audit, controls)
+    for snapshot in objects['snapshots']:
+      factories.RelationshipFactory(source=audit, destination=snapshot)
 
     # Issues
     objects['issue'] = factories.IssueFactory(
