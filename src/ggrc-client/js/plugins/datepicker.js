@@ -27,13 +27,19 @@
   });
 
   // On-demand creation of datepicker() objects, initial date today or later
-  $body.on('focus', '[data-toggle="datepicker_today_or_later"]', function (ev) {
-    let $this = $(this);
+  $body.on('focus', '[data-toggle="datepicker_future_without_weekends"]',
+    function (ev) {
+      let $this = $(this);
 
-    if ($this.data('datepicker')) {
-      return;
+      let noWeekendsFormat = Object.assign({
+        beforeShowDay: $.datepicker.noWeekends,
+      }, format);
+
+      if ($this.data('datepicker')) {
+        return;
+      }
+      $this.datepicker(noWeekendsFormat)
+        .datepicker('option', 'minDate', new Date());
     }
-    $this.datepicker(format)
-      .datepicker('option', 'minDate', new Date());
-  });
+  );
 })(jQuery, moment);
