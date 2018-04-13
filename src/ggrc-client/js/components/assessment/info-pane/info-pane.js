@@ -167,6 +167,12 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
               this.attr('instance.archived');
           },
         },
+        isAllowedToMap: {
+          get: function () {
+            let audit = this.attr('instance.audit');
+            return !!audit && Permission.is_allowed_for('read', audit);
+          },
+        },
         instance: {},
         isInfoPaneSaving: {
           get: function () {
