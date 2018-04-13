@@ -420,6 +420,7 @@ class TestCase(BaseTestCase, object):
             child_type=revision.resource_type,
             revision=revision,
             parent=audit,
+            context=audit.context,
         )
         for revision in revisions
     ]
