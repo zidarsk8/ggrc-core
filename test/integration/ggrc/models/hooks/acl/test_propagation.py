@@ -8,8 +8,10 @@ from collections import defaultdict
 
 import ddt
 import sqlalchemy as sa
+import flask
 from sqlalchemy.orm.session import Session
 
+from ggrc import app
 from ggrc import db
 from ggrc.models import all_models
 from ggrc.models.hooks import acl
@@ -283,3 +285,37 @@ class TestPropagation(TestCase):
         db.session.execute(child_ids.alias("counts").count()).scalar(),
         4,  # audit captain to both assessments and both assignees to audit
     )
+
+  def test_propagation_conflict(self):
+    """Test propagation conflicts
+
+    When we create a new acl entry and a new relationship in the same commit
+    some roles would be propagated twice and would cause unique constraint
+    errors. This test checks for the most basic such scenario.
+    """
+    with factories.single_commit():
+      person = factories.PersonFactory()
+      audit = factories.AuditFactory()
+      relationship = factories.RelationshipFactory(
+          source=audit,
+          destination=audit.program,
+      )
+      acl_entry = factories.AccessControlListFactory(
+          ac_role=self.roles["Program"]["Program Editors"],
+          object=audit.program,
+          person=person,
+      )
+
+    with app.app.app_context():
+      flask.g.new_acl_ids = {acl_entry.id}
+      flask.g.new_relationship_ids = {relationship.id}
+      flask.g.deleted_objects = set()
+
+      propagation.propagate()
+
+      db.session.commit()
+
+      # This sets 4 propagation entries because it backtracks from the audit to
+      # the same relationship. This optimally the assertion should count 3 acl
+      # entries but currently that is to much work to implement
+      self.assertEqual(all_models.AccessControlList.query.count(), 4)
