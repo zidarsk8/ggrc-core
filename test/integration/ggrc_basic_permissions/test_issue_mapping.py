@@ -44,7 +44,7 @@ class TestIssueMapping(TestCase):
         'creator': query.filter_by(name="Creator").first(),
         'auditors': acr_query.filter_by(name="Auditors").first(),
         'program_editors': acr_query.filter_by(
-            name="Program Editors Mapped").first()
+            name="Program Editors").first()
     }
 
   def setup_users(self):
@@ -73,14 +73,15 @@ class TestIssueMapping(TestCase):
         all_models.Revision.resource_type == self.control.type).first()
     for is_archived in (False, True):
       audit = self.audits[is_archived]
-      # Create a snapshot
-      self.snapshots[is_archived] = factories.SnapshotFactory(
-          child_id=revision.resource_id,
-          child_type=revision.resource_type,
-          revision=revision,
-          parent=audit,
-          context=audit.context,
+      self.snapshots[is_archived] = self._create_snapshots(
+          audit,
+          [self.control],
+      )[0]
+      factories.RelationshipFactory(
+        source=audit,
+        destination=self.snapshots[is_archived],
       )
+
       # Create an issue
       issue = factories.IssueFactory()
       self.issues[is_archived] = issue
@@ -93,10 +94,11 @@ class TestIssueMapping(TestCase):
 
   def create_audit(self, archived=False):
     """Create an audit object and fix the it's context"""
-    audit = factories.AuditFactory(
-        archived=archived
+    audit = factories.AuditFactory(archived=archived)
+    factories.RelationshipFactory(
+        source=audit,
+        destination=audit.program,
     )
-
     # Add auditor & program editor roles
     factories.AccessControlListFactory(
         ac_role=self.roles['auditors'],
@@ -105,7 +107,7 @@ class TestIssueMapping(TestCase):
     )
     factories.AccessControlListFactory(
         ac_role=self.roles['program_editors'],
-        object=audit,
+        object=audit.program,
         person=self.users['programeditor']
     )
 
@@ -144,3 +146,4 @@ class TestIssueMapping(TestCase):
     relationship = all_models.Relationship.query.filter_by(id=rel_id).first()
     response = self.api.delete(relationship)
     self.assertStatus(response, 200)
+
