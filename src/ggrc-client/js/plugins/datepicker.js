@@ -2,16 +2,16 @@
     Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
-(function($, moment) {
+(function ($, moment) {
   // On-demand creation of datepicker() objects
-  let $body = $('body'),
-    format = {
-      changeMonth: true,
-      changeYear: true,
-      prevText: '',
-      nextText: '',
-      dateFormat: 'mm/dd/yy',
-    };
+  let $body = $('body');
+  let format = {
+    changeMonth: true,
+    changeYear: true,
+    prevText: '',
+    nextText: '',
+    dateFormat: 'mm/dd/yy',
+  };
 
   $body.on('focus', '[data-toggle="datepicker"]', function (ev) {
     let $this = $(this);
