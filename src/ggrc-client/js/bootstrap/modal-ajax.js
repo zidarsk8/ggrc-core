@@ -295,12 +295,6 @@ import Permission from '../permission';
           });
         }
       });
-
-      $target.on('modal:discard', () => {
-        if ( instance ) {
-          instance.restore(true);
-        }
-      });
     },
 
     helpform: function ($target, $trigger, option) {
