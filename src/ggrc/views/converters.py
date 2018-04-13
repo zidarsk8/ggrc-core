@@ -385,6 +385,7 @@ def handle_get(id2, command, job_type):
 def handle_import_post(**kwargs):
   """ Handle import post """
   check_import_export_headers()
+  import_export.delete_previous_imports()
   file_meta = request.json
   csv_data, csv_content, filename = fa.get_gdrive_file_data(file_meta)
   try:

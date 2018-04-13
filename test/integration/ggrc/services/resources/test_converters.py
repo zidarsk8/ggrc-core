@@ -252,6 +252,47 @@ class TestImportExports(TestCase):
     self.assert200(response)
     self.assertEqual(json.loads(response.data)["status"], "Stopped")
 
+  @mock.patch("ggrc.gdrive.file_actions.get_gdrive_file_data",
+              new=lambda x: (x, None, None))
+  def test_delete_previous_imports(self):
+    """Test deletion of previous imports"""
+    user = all_models.Person.query.first()
+    ie1_id = factories.ImportExportFactory(
+        job_type="Import",
+        status="Not Started",
+        created_at=datetime.now(),
+        created_by=user).id
+    ie2_id = factories.ImportExportFactory(
+        job_type="Import",
+        status="Blocked",
+        created_at=datetime.now(),
+        created_by=user).id
+    ie3_id = factories.ImportExportFactory(
+        job_type="Import",
+        status="Finished",
+        created_at=datetime.now(),
+        created_by=user).id
+    response = self.client.post(
+        "/api/people/{}/imports".format(user.id),
+        data=json.dumps([]),
+        headers=self.headers)
+    self.assert200(response)
+    self.assertIsNone(all_models.ImportExport.query.get(ie1_id))
+    self.assertIsNone(all_models.ImportExport.query.get(ie2_id))
+    self.assertIsNotNone(all_models.ImportExport.query.get(ie3_id))
+
+    ie4_id = factories.ImportExportFactory(
+        job_type="Import",
+        status="In Progress",
+        created_at=datetime.now(),
+        created_by=user).id
+    response = self.client.post(
+        "/api/people/{}/imports".format(user.id),
+        data=json.dumps([]),
+        headers=self.headers)
+    self.assert400(response)
+    self.assertIsNotNone(all_models.ImportExport.query.get(ie4_id))
+
   @mock.patch(
       "ggrc.gdrive.file_actions.get_gdrive_file_data",
       new=lambda x: (x, None, None)

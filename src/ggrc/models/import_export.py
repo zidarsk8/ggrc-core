@@ -11,7 +11,7 @@ from sqlalchemy.dialects import mysql
 from ggrc import db
 from ggrc.models.mixins.base import Identifiable
 from ggrc.login import get_current_user
-from werkzeug.exceptions import Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 
 class ImportExport(Identifiable, db.Model):
@@ -85,6 +85,23 @@ def get_jobs(job_type, ids=None):
     conditions.append(ImportExport.id.in_(ids))
   return [ie.log_json() for ie in ImportExport.query.filter(
       *conditions)]
+
+
+def delete_previous_imports():
+  """Delete not finished imports"""
+  active_jobs = ImportExport.query.filter(
+      ImportExport.created_by == get_current_user(),
+      ImportExport.job_type == "Import",
+      ImportExport.status.in_(["Analysis", "In Progress"])).count()
+  if active_jobs:
+    raise BadRequest("Import in progress")
+
+  ImportExport.query.filter(
+      ImportExport.created_by == get_current_user(),
+      ImportExport.job_type == "Import",
+      ImportExport.status.in_(["Not Started", "Blocked"])).delete(
+      synchronize_session=False)
+  db.session.commit()
 
 
 def get(ie_id):
