@@ -24,6 +24,16 @@ const CA_DD_FLAGS = {
   URL: 0b100, // 4
 };
 
+const LCA_DROPDOWN_TITLES_MAP = {
+  '1': 'Comment',
+  '2': 'Evidence File',
+  '3': 'Comment and Evidence File',
+  '4': 'Evidence Url',
+  '5': 'Comment and Evidence Url',
+  '6': 'Evidence File and Url',
+  '7': 'Comment, Evidence File and Url',
+};
+
 
 /**
  * Convert DD validation value to validation map
@@ -439,6 +449,16 @@ function ensureGlobalCA(instance) {
   instance.attr('custom_attribute_values', values);
 }
 
+function getLCAPopupTitle(validationMap) {
+  let fixedValidationMap = Object.assign({}, validationMap);
+
+  if (validationMap.evidence) {
+    fixedValidationMap.attachment = true;
+  }
+
+  return LCA_DROPDOWN_TITLES_MAP[ddValidationMapToValue(fixedValidationMap)];
+}
+
 export {
   convertFromCaValue,
   convertToCaValue,
@@ -457,4 +477,5 @@ export {
   CA_DD_FLAGS,
   ddValidationValueToMap,
   ddValidationMapToValue,
+  getLCAPopupTitle,
 };

@@ -40,6 +40,7 @@ import {
 } from '../../../plugins/utils/query-api-utils';
 import {
   getCustomAttributes,
+  getLCAPopupTitle,
   CUSTOM_ATTRIBUTE_TYPE as CA_UTILS_CA_TYPE,
   convertValuesToFormFields,
 } from '../../../plugins/utils/ca-utils';
@@ -509,10 +510,8 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
           type: scope.attr('type'),
           saveDfd: e.saveDfd || can.Deferred().resolve(),
         };
-        let title = 'Required ' +
-          data.fields.map(function (field) {
-            return can.capitalize(field);
-          }).join(' and ');
+
+        let title = 'Required ' + getLCAPopupTitle(errors);
 
         can.batch.start();
         this.attr('modal', {
