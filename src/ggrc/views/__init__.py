@@ -63,6 +63,7 @@ def propagate_acl(_):
   models.hooks.acl.propagation.propagate_all()
   return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
+
 @app.route("/_background_tasks/refresh_revisions", methods=["POST"])
 @queued_task
 def refresh_revisions(_):
@@ -211,6 +212,7 @@ def do_reindex():
 class SetEncoder(json.JSONEncoder):
   """Encoder that can handle python sets"""
   # pylint: disable=E0202
+
   def default(self, obj):
     """If we get a set we first transform it to a list and then just use
        the default encoder"""

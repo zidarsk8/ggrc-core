@@ -362,7 +362,7 @@ def propagate_all():
   for chunk in chunks:
     acl_ids = {row.id for row in chunk}
     propagated_count += len(acl_ids)
-    logger.info( "Propagating ACL entries: %s/%s", propagated_count, count)
+    logger.info("Propagating ACL entries: %s/%s", propagated_count, count)
 
     flask.g.new_acl_ids = acl_ids
     flask.g.new_relationship_ids = set()

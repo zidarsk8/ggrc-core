@@ -30,6 +30,7 @@ def _add_or_update(name, value):
   else:
     setattr(flask.g, name, value)
 
+
 def _get_propagation_entries(session):
   acl_ids = set()
   relationship_ids = set()
