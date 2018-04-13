@@ -66,8 +66,5 @@ $area.cms_controllers_page_object(can.extend({
   page_title: function (controller) {
     return controller.options.instance.title;
   },
-  page_help: function (controller) {
-    return controller.options.instance.constructor.table_singular;
-  },
   current_user: GGRC.current_user,
 }, extraPageOptions[modelName]));
