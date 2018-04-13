@@ -867,7 +867,7 @@ Mustache.registerHelper('is_allowed', function () {
       actions.push(arg);
     } else if (typeof arg === 'string') {
       resourceType = arg;
-    } else if (typeof arg === 'object' && arg instanceof can.Model) {
+    } else if (typeof arg === 'object' && arg instanceof can.Map) {
       resource = arg;
     }
   });

@@ -455,7 +455,7 @@ describe('Permission', function () {
 
         instance = new CMS.Models.UserRole();
         instance.attr('context', {id: 101});
-        instance.attr('type', 'good_instance');
+        instance.attr('type', 'UserRole');
 
         result = Permission._is_allowed_for(permissions, instance, 'create');
         expect(result).toEqual(true);
