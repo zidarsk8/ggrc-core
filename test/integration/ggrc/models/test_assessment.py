@@ -163,19 +163,6 @@ class TestAssessment(TestAssessmentBase):
       )
       factories.RelationshipFactory(source=audit, destination=assessment)
 
-    verifiers = all_models.AccessControlList.query.join(
-        all_models.AccessControlRole,
-        all_models.AccessControlList.ac_role_id ==
-        all_models.AccessControlRole.id
-    ).filter(
-        all_models.AccessControlRole.name == "Verifiers Mapped",
-        all_models.AccessControlList.person == person,
-        all_models.AccessControlList.object_id == assessment.id,
-        all_models.AccessControlList.object_type == assessment.type,
-    )
-    # Check there is no Verified Mapped roles in db
-    self.assertEqual(verifiers.count(), 0)
-
     # Add verifier to Assessment
     response = self.api.put(assessment, {
         "access_control_list": [
