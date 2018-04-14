@@ -83,6 +83,19 @@ def pytest_addoption(parser):
 SELENIUM_LOGGER.setLevel(logging.INFO)
 
 
+@pytest.fixture(scope="session")
+def session_capabilities(session_capabilities):
+  """Log browser (console log) and performance (request / response headers)
+  data.
+  They will appear in `Links` section of pytest-html's html report.
+  """
+  session_capabilities["loggingPrefs"] = {
+      "browser": "ALL",
+      "performance": "ALL"
+  }
+  return session_capabilities
+
+
 @pytest.fixture(scope="function")
 def selenium(selenium, pytestconfig):
   """Create Web Driver instance."""
