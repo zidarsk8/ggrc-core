@@ -96,8 +96,6 @@ dashboard-js-template-files:
   - directives/tree-item-attr.mustache
   - events/object_list.mustache
   - facilities/modal_content.mustache
-  - help/help_modal_content.mustache
-  - help/help_modal_header.mustache
   - help/filters_helper_content.mustache
   - markets/modal_content.mustache
   - modals/archive_cancel_buttons.mustache

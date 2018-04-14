@@ -171,15 +171,6 @@ jQuery(function ($) {
 });
 
 jQuery(function ($) {
-  $body.on('ajax:success', '#helpedit form', function (e, data, status, xhr) {
-    var $modal = $(this).closest('.modal');
-    $modal.find('.modal-header h1').html(data.help.title);
-    $modal.find('.modal-body .help-content').html(data.help.content);
-    $modal.find('.modal-body #helpedit').collapse('hide');
-  });
-});
-
-jQuery(function ($) {
   // Used in object_list sidebars (References, People, Categories)
   $body.on('modal:success', '.js-list-container-title a', function (e, data) {
     var $this = $(this);

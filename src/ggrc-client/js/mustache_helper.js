@@ -454,21 +454,6 @@ Mustache.registerHelper('defer', function (prop, deferred, options) {
     finish : null, progress: progress}, deferred);
 });
 
-Mustache.registerHelper('allow_help_edit', function () {
-  let options = arguments[arguments.length - 1];
-  let instance = this && this.instance ?
-    this.instance : options.context.instance;
-  if (instance) {
-    let action = instance.isNew() ? 'create' : 'update';
-    if (Permission.is_allowed(action, 'Help', null)) {
-      return options.fn(this);
-    } else {
-      return options.inverse(this);
-    }
-  }
-  return options.inverse(this);
-});
-
 can.each(['with_page_object_as', 'with_current_user_as'], function (fname) {
   Mustache.registerHelper(fname, function (name, options) {
     if (!options) {

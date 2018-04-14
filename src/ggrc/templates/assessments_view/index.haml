@@ -19,9 +19,6 @@
   %script{ type:'text/javascript', src:'{{config.get("COMMON_JS_PATH")}}' }
   %script{ type:'text/javascript', src:'{{config.get("DASHBOARD_JS_PATH")}}' }
 
--block page_help scoped
-  dashboard
-
 -block body
   .area.flex-box.flex-col.area--distraction-free{ 'class': '={ model_display_class }' }
     .header-content
