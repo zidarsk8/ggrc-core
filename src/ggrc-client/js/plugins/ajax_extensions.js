@@ -123,7 +123,15 @@
     let isExpectedError = jqxhr.getResponseHeader('X-Expected-Error');
 
     if (!jqxhr.hasFailCallback && !isExpectedError) {
-      let response = jqxhr.responseJSON || JSON.parse(jqxhr.responseText);
+      let response = jqxhr.responseJSON;
+
+      if (!response) {
+        try {
+          response = JSON.parse(jqxhr.responseText);
+        } catch (e) {
+          console.warn('Response not in JSON format');
+        }
+      }
 
       let message = jqxhr.getResponseHeader('X-Flash-Error') ||
         GGRC.Errors.messages[jqxhr.status] ||
