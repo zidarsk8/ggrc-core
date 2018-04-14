@@ -20,7 +20,7 @@ $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
   let data = originalOptions.data;
   let resourceUrl = originalOptions.url.split('?')[0];
 
-  function attach_provisional_id(prop) {
+  function attachProvisionalId(prop) {
     jqXHR.done(function (obj) {
       obj[prop].provisional_id = data[prop].provisional_id;
     });
@@ -34,7 +34,7 @@ $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
     options.data = options.type.toUpperCase() === 'DELETE' ? '' : JSON.stringify(data);
     for (let i in data) {
       if (data.hasOwnProperty(i) && data[i] && data[i].provisional_id) {
-        attach_provisional_id(i);
+        attachProvisionalId(i);
       }
     }
   }
@@ -68,7 +68,7 @@ $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
 });
 
 // Set up default failure callbacks if nonesuch exist.
-let _old_ajax = $.ajax;
+let _oldAjax = $.ajax;
 
 // Here we break the deferred pattern a bit by piping back to original AJAX deferreds when we
 // set up a failure handler on a later transformation of that deferred.  Why?  The reason is that
@@ -76,35 +76,35 @@ let _old_ajax = $.ajax;
 //  unless it's also explicitly asked for.  If it's registered in a transformed one, though (after
 //  then() or pipe()), then the original one won't normally be notified of failure.
 can.ajax = $.ajax = function (options) {
-  let _ajax = _old_ajax.apply($, arguments);
+  let _ajax = _oldAjax.apply($, arguments);
 
-  function setup(_new_ajax, _old_ajax) {
-    let _old_then = _new_ajax.then;
-    let _old_fail = _new_ajax.fail;
-    let _old_pipe = _new_ajax.pipe;
-    _old_ajax && (_new_ajax.hasFailCallback = _old_ajax.hasFailCallback);
-    _new_ajax.then = function () {
-      let _new_ajax = _old_then.apply(this, arguments);
+  function setup(newAjax, oldAjax) {
+    let oldThen = newAjax.then;
+    let oldFail = newAjax.fail;
+    let oldPipe = newAjax.pipe;
+    oldAjax && (newAjax.hasFailCallback = oldAjax.hasFailCallback);
+    newAjax.then = function () {
+      let _newAjax = oldThen.apply(this, arguments);
       if (arguments.length > 1) {
         this.hasFailCallback = true;
-        if (_old_ajax) {
-          _old_ajax.fail(function () {});
+        if (oldAjax) {
+          oldAjax.fail(function () {});
         }
       }
-      setup(_new_ajax, this);
-      return _new_ajax;
+      setup(_newAjax, this);
+      return _newAjax;
     };
-    _new_ajax.fail = function () {
+    newAjax.fail = function () {
       this.hasFailCallback = true;
-      if (_old_ajax) {
-        _old_ajax.fail(function () {});
+      if (oldAjax) {
+        oldAjax.fail(function () {});
       }
-      return _old_fail.apply(this, arguments);
+      return oldFail.apply(this, arguments);
     };
-    _new_ajax.pipe = function () {
-      let _new_ajax = _old_pipe.apply(this, arguments);
-      setup(_new_ajax, this);
-      return _new_ajax;
+    newAjax.pipe = function () {
+      let _newAjax = oldPipe.apply(this, arguments);
+      setup(_newAjax, this);
+      return _newAjax;
     };
   }
 
