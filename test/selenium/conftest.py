@@ -5,12 +5,14 @@
 # pylint: disable=global-variable-not-assigned
 # pylint: disable=unused-argument
 # pylint: disable=redefined-outer-name
-
+import logging
 import os
 import urlparse
 
 import pytest
 from pytest_selenium import pytest_selenium
+from selenium.webdriver.remote.remote_connection import (
+    LOGGER as SELENIUM_LOGGER)
 
 from lib import dynamic_fixtures, environment, url
 from lib.constants.test_runner import DESTRUCTIVE_TEST_METHOD_PREFIX
@@ -73,6 +75,12 @@ def pytest_addoption(parser):
   parser.addoption('--headless',
                    action='store',
                    help='enable headless mode for supported browsers.')
+
+
+# Disable selenium's remote_connection.py DEBUG statements that pollute
+# test stdout.
+# They aren't needed as driver logs are included into links of HTML report.
+SELENIUM_LOGGER.setLevel(logging.INFO)
 
 
 @pytest.fixture(scope="function")
