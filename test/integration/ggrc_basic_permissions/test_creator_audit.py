@@ -139,6 +139,10 @@ class TestCreatorAudit(TestCase):
     """
     # Create a program
     dummy_audit = factories.AuditFactory()
+    factories.RelationshipFactory(
+        source=dummy_audit.program,
+        destination=dummy_audit
+    )
     unrelated_audit = {
         "type": "Audit",
         "context_id": dummy_audit.context.id,
@@ -157,7 +161,7 @@ class TestCreatorAudit(TestCase):
     response = self.api.post(all_models.Audit, {
         "audit": {
             "title": random_title + " audit",
-            'program': {'id': program_id},
+            'program': {'id': program_id, "type": "Program"},
             "status": "Planned",
             "context": None,
             "access_control_list": [{

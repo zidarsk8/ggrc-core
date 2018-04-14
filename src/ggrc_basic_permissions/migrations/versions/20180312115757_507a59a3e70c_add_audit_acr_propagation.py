@@ -30,7 +30,7 @@ _AUDIT_FULL_ACCESS = {
 
 _AUDITOR_ACCESS = {
     "Relationship R": {
-        "Assessment R": const.COMMENT_DOCUMENT_R,
+        "Assessment RU": const.COMMENT_DOCUMENT_R,
         "AssessmentTemplate R": {},
         "Document R": {},
         "Issue RU": const.COMMENT_DOCUMENT_R,
