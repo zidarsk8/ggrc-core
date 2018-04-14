@@ -38,6 +38,7 @@ VERSION="AUTO" # valid version string or "AUTO" - can be omitted
 COMPANY="Company, Inc."
 COMPANY_LOGO_TEXT="Company GRC"
 CREATE_ISSUE_URL=""
+CREATE_ISSUE_BUTTON_NAME=""
 
 ## generated values:
 

@@ -34,6 +34,7 @@ exports = [
     "VERSION",
     "MAX_INSTANCES",
     "CREATE_ISSUE_URL",
+    "CREATE_ISSUE_BUTTON_NAME",
 ]  # pylint: disable=invalid-name
 
 # Deployment-specific variables
@@ -201,3 +202,4 @@ RISK_ASSESSMENT_URL = os.environ.get(
 
 # Link for creation buganizer issue
 CREATE_ISSUE_URL = os.environ.get('CREATE_ISSUE_URL', "")
+CREATE_ISSUE_BUTTON_NAME = os.environ.get('CREATE_ISSUE_BUTTON_NAME', "")
