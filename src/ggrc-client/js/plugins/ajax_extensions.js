@@ -26,12 +26,17 @@ $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
     });
   }
 
-  if (/^\/api\//.test(options.url) && /PUT|POST|DELETE/.test(options.type.toUpperCase())) {
+  if (/^\/api\//.test(options.url)
+    && /PUT|POST|DELETE/.test(options.type.toUpperCase())) {
     options.dataType = 'json';
     options.contentType = 'application/json';
     jqXHR.setRequestHeader('If-Match', (etags[resourceUrl] || [])[0]);
-    jqXHR.setRequestHeader('If-Unmodified-Since', (etags[resourceUrl] || [])[1]);
-    options.data = options.type.toUpperCase() === 'DELETE' ? '' : JSON.stringify(data);
+    jqXHR.setRequestHeader('If-Unmodified-Since',
+      (etags[resourceUrl] || [])[1]);
+
+    options.data = options.type.toUpperCase() === 'DELETE' ? ''
+      : JSON.stringify(data);
+
     for (let i in data) {
       if (data.hasOwnProperty(i) && data[i] && data[i].provisional_id) {
         attachProvisionalId(i);
@@ -44,18 +49,26 @@ $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
   if (/^\/api\/\w+/.test(options.url)) {
     jqXHR.setRequestHeader('X-Requested-By', 'GGRC');
     jqXHR.done(function (data, status, xhr) {
-      if (!/^\/api\/\w+\/\d+/.test(options.url) && options.type.toUpperCase() === 'GET') {
+      if (!/^\/api\/\w+\/\d+/.test(options.url)
+        && options.type.toUpperCase() === 'GET') {
         return;
       }
       switch (options.type.toUpperCase()) {
         case 'GET':
         case 'PUT':
-          etags[originalOptions.url] = [xhr.getResponseHeader('ETag'), xhr.getResponseHeader('Last-Modified')];
+          etags[originalOptions.url] = [
+            xhr.getResponseHeader('ETag'),
+            xhr.getResponseHeader('Last-Modified'),
+          ];
           break;
         case 'POST':
-          for (let d in data) {
-            if (data.hasOwnProperty(d) && data[d] && data[d].selfLink) {
-              etags[data[d].selfLink] = [xhr.getResponseHeader('ETag'), xhr.getResponseHeader('Last-Modified')];
+          for (let field in data) {
+            if (data.hasOwnProperty(field) && data[field]
+              && data[field].selfLink) {
+              etags[data[field].selfLink] = [
+                xhr.getResponseHeader('ETag'),
+                xhr.getResponseHeader('Last-Modified'),
+              ];
             }
           }
           break;
