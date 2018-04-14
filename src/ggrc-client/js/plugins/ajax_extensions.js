@@ -14,12 +14,7 @@ $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
 
 // Set up all PUT requests to the server to respect ETags, to ensure that
 // we are not overwriting more recent data than was viewed by the user.
-let etags = {},
-  doc = root.document,
-  body = doc.body,
-  $win = $(root),
-  $doc = $(doc),
-  $body = $(body);
+const etags = {};
 
 $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
   let data = originalOptions.data;
@@ -117,7 +112,7 @@ can.ajax = $.ajax = function (options) {
   return _ajax;
 };
 
-$doc.ajaxError(function (event, jqxhr, settings, exception) {
+$(document).ajaxError(function (event, jqxhr, settings, exception) {
   let isExpectedError = jqxhr.getResponseHeader('X-Expected-Error');
 
   if (!jqxhr.hasFailCallback && !isExpectedError) {
