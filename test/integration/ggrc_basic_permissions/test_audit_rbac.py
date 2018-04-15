@@ -245,10 +245,3 @@ class TestPermissionsOnAssessmentRelatedAssignables(TestCase):
     self.assert200(resp)
     self.assertFalse(all_models.Document.query.filter(
         all_models.Document.id == self.document.id).all())
-
-  def test_unmap_action(self):
-    """Test permissions for unmap action on Document"""
-    resp = self.api.delete(self.doc_relationship)
-    self.assert200(resp)
-    self.assertFalse(all_models.Relationship.query.filter(
-        all_models.Relationship.id == self.doc_relationship.id).all())

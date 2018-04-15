@@ -17,7 +17,7 @@ revision = '679480cbd712'
 down_revision = '3e667570f21f'
 
 _RISK_PROPAGATION = {
-    const.BASIC_ROLES: const.PROPOSAL_RU,
+    const.BASIC_ROLES: const.PROPOSAL_RUD,
 }
 
 PROPAGATION = {

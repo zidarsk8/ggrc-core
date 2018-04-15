@@ -20,10 +20,10 @@ down_revision = '242b8dc8493b'
 
 _AUDIT_FULL_ACCESS = {
     "Relationship R": {
-        "Assessment RUD": const.COMMENT_DOCUMENT_RU,
+        "Assessment RUD": const.COMMENT_DOCUMENT_RUD,
         "AssessmentTemplate RUD": {},
-        "Document RU": {},
-        "Issue RUD": const.COMMENT_DOCUMENT_RU,
+        "Document RUD": {},
+        "Issue RUD": const.COMMENT_DOCUMENT_RUD,
         "Snapshot RU": {},
     },
 }
@@ -104,9 +104,9 @@ AUTID_PROGRAM_PROPAGATION = {
             "Relationship R": {
                 "Audit RUD": _AUDIT_FULL_ACCESS,
                 "Comment R": {},
-                "Document RU": {},
-                _PROGRAM_OBJECTS_RUD: const.COMMENT_DOCUMENT_RU,
-                ("Control RUD", "Risk RUD"): const.PROPOSAL_RU,
+                "Document RUD": {},
+                _PROGRAM_OBJECTS_RUD: const.COMMENT_DOCUMENT_RUD,
+                ("Control RUD", "Risk RUD"): const.PROPOSAL_RUD,
             }
         },
         "Program Readers": {

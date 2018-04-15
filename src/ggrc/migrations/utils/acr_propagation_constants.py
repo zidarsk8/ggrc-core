@@ -26,17 +26,17 @@ COMMENT_DOCUMENT_R = {
     },
 }
 
-COMMENT_DOCUMENT_RU = {
+COMMENT_DOCUMENT_RUD = {
     "Relationship R": {
         "Comment R": {},
-        "Document RU": {},
+        "Document RUD": {},
     },
 }
 
-PROPOSAL_RU = {
+PROPOSAL_RUD = {
     "Relationship R": {
         "Comment R": {},
-        "Document RU": {},
+        "Document RUD": {},
         "Proposal RU": {},
     },
 }
@@ -44,11 +44,11 @@ PROPOSAL_RU = {
 PROPOSAL_R = {
     "Relationship R": {
         "Comment R": {},
-        "Document RU": {},
-        "Proposal RU": {},
+        "Document R": {},
+        "Proposal R": {},
     },
 }
 
 BASIC_PROPAGATION = {
-    "Admin": COMMENT_DOCUMENT_RU,
+    "Admin": COMMENT_DOCUMENT_RUD,
 }

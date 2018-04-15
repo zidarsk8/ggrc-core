@@ -36,7 +36,7 @@ _ASSESSMENT_PROPAGATION = {
                     "Snapshot R": {},
                 },
             },
-            "Document RU": {},
+            "Document RUD": {},
             "Comment R": {},
             "Issue R": const.COMMENT_DOCUMENT_R,
         },
@@ -52,7 +52,7 @@ _CONTROL_ROLES = (
 )
 
 _CONTROL_PROPAGATION = {
-    _CONTROL_ROLES: const.PROPOSAL_RU,
+    _CONTROL_ROLES: const.PROPOSAL_RUD,
 }
 
 
