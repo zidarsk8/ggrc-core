@@ -118,13 +118,15 @@ class TestAuditArchivingBase(TestCase):
       # Create snapshot objects:
       for audit, name in ((cls.audit, 'snapshot'),
                           (cls.archived_audit, 'archived_snapshot')):
-        setattr(cls, name, factories.SnapshotFactory(
+        snapshot = factories.SnapshotFactory(
             child_id=revision.resource_id,
             child_type=revision.resource_type,
             revision=revision,
             parent=audit,
             context=audit.context,
-        ))
+        )
+        factories.RelationshipFactory(source=audit, destination=snapshot)
+        setattr(cls, name, snapshot)
 
       # Create asessment template objects:
       for audit, name in ((cls.audit, 'template'),
