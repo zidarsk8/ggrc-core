@@ -16,6 +16,7 @@ from sqlalchemy.sql.expression import bindparam
 
 from ggrc import db
 from ggrc import models
+from ggrc.models.hooks import acl
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.utils import benchmark
@@ -399,7 +400,8 @@ class SnapshotGenerator(object):
       with benchmark("Snapshot._create.write to database"):
         self._execute(
             models.Snapshot.__table__.insert(),
-            data_payload)
+            data_payload
+        )
 
       with benchmark("Snapshot._create.retrieve inserted snapshots"):
         snapshots = get_snapshots(for_create)
@@ -461,6 +463,37 @@ class SnapshotGenerator(object):
           "parent_id": parent.id
       })
 
+  @classmethod
+  def _get_audit_relationships(cls, audit_ids):
+    """Get all relationship ids for the give audits.
+    Args:
+      audit_ids: list or set of audit ids.
+
+    Returns:
+      set of relationship ids for the given audits.
+    """
+    relationships_table = all_models.Relationship.__table__
+    select_statement = sa.select([
+        relationships_table.c.id
+    ]).where(
+        sa.and_(
+            relationships_table.c.destination_id.in_(audit_ids),
+            relationships_table.c.destination_type == all_models.Audit.__name__
+        )
+    ).union(
+        sa.select([
+            relationships_table.c.id
+        ]).where(
+            sa.and_(
+                relationships_table.c.source_id.in_(audit_ids),
+                relationships_table.c.source_type == all_models.Audit.__name__
+            )
+        )
+    )
+    id_rows = db.session.execute(select_statement).fetchall()
+
+    return {row.id for row in id_rows}
+
   def _create_audit_relationships(self):
     """Create relationships between snapshot objects and audits.
 
@@ -475,6 +508,8 @@ class SnapshotGenerator(object):
     audit_ids = {parent.id for parent in self.parents}
     if not audit_ids:
       return
+
+    old_ids = self._get_audit_relationships(audit_ids)
 
     select_statement = sa.select([
         sa.literal(get_current_user_id()),
@@ -504,6 +539,10 @@ class SnapshotGenerator(object):
             select_statement
         )
     )
+
+    new_ids = self._get_audit_relationships(audit_ids)
+    created_ids = new_ids.difference(old_ids)
+    acl.add_relationships(created_ids)
 
   def _remove_lost_snapshot_mappings(self):
     """Remove mappings between snapshots if base objects were unmapped."""
