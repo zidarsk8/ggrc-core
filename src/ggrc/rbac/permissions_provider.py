@@ -249,8 +249,7 @@ class DefaultUserPermissions(object):
 
   def _is_allowed(self, permission):
     permissions = self._permissions()
-    if permission.resource_type != '/admin' \
-       and permission.context_id \
+    if permission.context_id \
        and self._is_allowed(permission._replace(context_id=None)):
       return True
     if self._permission_match(permission, permissions):
