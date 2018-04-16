@@ -20,7 +20,6 @@ from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.utils import benchmark
 
-from ggrc.snapshotter.acl import get_acl_payload
 from ggrc.snapshotter.datastructures import Attr
 from ggrc.snapshotter.datastructures import Pair
 from ggrc.snapshotter.datastructures import Stub
@@ -404,13 +403,6 @@ class SnapshotGenerator(object):
 
       with benchmark("Snapshot._create.retrieve inserted snapshots"):
         snapshots = get_snapshots(for_create)
-
-      with benchmark("Snapshot._create.access control list"):
-        acl_payload = get_acl_payload(snapshots)
-
-      with benchmark("Snapshot._create.write acls to database"):
-        self._execute(all_models.AccessControlList.__table__.insert(),
-                      acl_payload)
 
       with benchmark("Snapshot._create.create revision payload"):
         with benchmark("Snapshot._create.create snapshots revision payload"):
