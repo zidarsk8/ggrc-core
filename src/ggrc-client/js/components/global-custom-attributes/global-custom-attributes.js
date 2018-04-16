@@ -85,7 +85,7 @@ import Permission from '../../permission';
     },
     events: {
       '{viewModel.instance} readyForRender': function () {
-          this.viewModel.initCustomAttributes();
+        this.viewModel.initCustomAttributes();
       },
     },
   });

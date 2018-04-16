@@ -65,15 +65,15 @@ describe('showMore', function () {
     });
 
     it('should return expandable text when part of items are shown',
-    function () {
-      let result;
+      function () {
+        let result;
 
-      viewModel.attr('shouldShowAllItems', false);
-      viewModel.attr('limit', 1);
-      result = viewModel.attr('showAllButtonText');
+        viewModel.attr('shouldShowAllItems', false);
+        viewModel.attr('limit', 1);
+        result = viewModel.attr('showAllButtonText');
 
-      expect(result).toBe('Show more (1)');
-    });
+        expect(result).toBe('Show more (1)');
+      });
   });
 
   describe('visibleItems property', function () {

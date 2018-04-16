@@ -610,9 +610,9 @@ describe("mappers", function() {
 
       it("returns promise based on existing deferred, returning binding list, if it exists", function() {
         let binding = { list : [] },
-            source_dfd = binding._refresh_stubs_deferred = new $.Deferred(),
-            ret = ll.refresh_stubs(binding),
-            sanity = false;
+          source_dfd = binding._refresh_stubs_deferred = new $.Deferred(),
+          ret = ll.refresh_stubs(binding),
+          sanity = false;
         source_dfd.resolve();
         ret.done(function(data) {
           expect(data).toBe(binding.list);
@@ -625,8 +625,8 @@ describe("mappers", function() {
 
       it("makes new refresh stubs deferred, returning binding list, if it does not already exist", function() {
         let ret,
-            binding = { list : [] },
-            sanity = false;
+          binding = { list : [] },
+          sanity = false;
         ll._refresh_stubs = jasmine.createSpy().and.returnValue($.when());
         ret = ll.refresh_stubs(binding);
         ret.done(function(data) {
@@ -644,9 +644,9 @@ describe("mappers", function() {
 
       it("returns promise based on existing deferred, returning binding list, if it exists", function() {
         let binding = { list : [] },
-            source_dfd = binding._refresh_instances_deferred = new $.Deferred(),
-            ret = ll.refresh_instances(binding),
-            sanity = false;
+          source_dfd = binding._refresh_instances_deferred = new $.Deferred(),
+          ret = ll.refresh_instances(binding),
+          sanity = false;
         source_dfd.resolve();
         ret.done(function(data) {
           expect(data).toBe(binding.list);
@@ -659,8 +659,8 @@ describe("mappers", function() {
 
       it("makes new refresh instances deferred, returning binding list, if it does not already exist", function() {
         let ret,
-            binding = { list : [] },
-            sanity = false;
+          binding = { list : [] },
+          sanity = false;
         ll._refresh_instances = jasmine.createSpy().and.returnValue($.when());
         ret = ll.refresh_instances(binding);
         ret.done(function(data) {
@@ -678,8 +678,8 @@ describe("mappers", function() {
 
       it("returns promise based on binding list", function() {
         let ret,
-            binding = { list : [{instance : 'a'}] },
-            sanity = false;
+          binding = { list : [{instance : 'a'}] },
+          sanity = false;
         spyOn(ll, "refresh_stubs").and.returnValue($.when());
         spyOn(RefreshQueue.prototype, "trigger").and.callFake(function() {
           return $.when(this.objects);
@@ -708,14 +708,14 @@ describe("mappers", function() {
 
       it("sets source_binding property if binding is a ListBinding", function() {
         let binding = new LL.ListBinding(),
-            rll = new LL.ReifyingListLoader(binding);
+          rll = new LL.ReifyingListLoader(binding);
         expect(rll.source_binding).toBe(binding);
         expect(rll.binding).not.toBeDefined();
       });
 
       it("sets source property if binding is not a ListBinding", function() {
         let binding = {},
-            rll = new LL.ReifyingListLoader(binding);
+          rll = new LL.ReifyingListLoader(binding);
         expect(rll.source).toBe(binding);
         expect(rll.source_binding).not.toBeDefined();
       });

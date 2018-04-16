@@ -59,14 +59,14 @@ describe('GGRC.Components.autocomplete', function () {
 
     it('triggers the item-selected event with the selected item object as ' +
       'the event argument',
-      function () {
-        handler($element, eventObj, eventData);
+    function () {
+      handler($element, eventObj, eventData);
 
-        expect($element.triggerHandler).toHaveBeenCalledWith({
-          type: Component.prototype._EV_ITEM_SELECTED,
-          selectedItem: {id: 123, type: 'Foo'},
-        });
-      }
+      expect($element.triggerHandler).toHaveBeenCalledWith({
+        type: Component.prototype._EV_ITEM_SELECTED,
+        selectedItem: {id: 123, type: 'Foo'},
+      });
+    }
     );
 
     it('emits the item-selected event using the dispatch mechanism',

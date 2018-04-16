@@ -213,10 +213,10 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
           operation: 'relevant',
         }];
         return buildParam(type,
-            sortObj || {},
-            relevantFilters,
-            [],
-            additionalFilter || []);
+          sortObj || {},
+          relevantFilters,
+          [],
+          additionalFilter || []);
       },
       getCommentQuery: function () {
         return this.getQuery('Comment',
@@ -380,14 +380,14 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
         this.attr('deferredSave').push(function () {
           self.addAction('remove_related', related);
         })
-        .fail(function () {
-          GGRC.Errors.notifier('error', 'Unable to remove URL.');
-          items.splice(index, 0, item);
-        })
-        .always(function (assessment) {
-          assessment.removeAttr('actions');
-          self.attr('isUpdating' + can.capitalize(type), false);
-        });
+          .fail(function () {
+            GGRC.Errors.notifier('error', 'Unable to remove URL.');
+            items.splice(index, 0, item);
+          })
+          .always(function (assessment) {
+            assessment.removeAttr('actions');
+            self.attr('isUpdating' + can.capitalize(type), false);
+          });
       },
       updateRelatedItems: function () {
         this.attr('isUpdatingRelatedItems', true);

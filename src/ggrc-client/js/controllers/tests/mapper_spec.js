@@ -71,81 +71,81 @@ describe('ObjectMapper', function () {
     });
 
     it('throws Error with message if data.join_object_type does not exist',
-    function () {
-      let closure = function () {
-        method({});
-      };
-
-      expect(closure).toThrowError();
-    });
-
-    describe('shows mapper for snapshots', function () {
-      it('calls launch method with params',
-      function (done) {
-        let btn = {};
-        method(fakeData, false, btn);
-
-        updateScopeObject.resolve().then(function () {
-          expect(fakeCtrlInst.launch).toHaveBeenCalledWith(
-            btn,
-            jasmine.objectContaining({
-              general: jasmine.any(Object),
-              special: jasmine.any(Array),
-            })
-          );
-
-          done();
-        });
-      });
-
-      it(`extends generalConfig with "object", "type" "isNew" and "relevantTo"
-      'if data has is_new`,
-      function (done) {
-        let args;
-        method(_.extend(fakeData, {
-          is_new: true,
-        }), false);
-
-        args = fakeCtrlInst.launch.calls.argsFor(0);
-
-        // so hard:(
-        updateScopeObject.resolve().then(function () {
-          expect(args[1]).toEqual(
-            jasmine.objectContaining({
-              general: jasmine.objectContaining({
-                object: fakeData.join_object_type,
-                type: fakeData.join_option_type,
-                isNew: true,
-                relevantTo: jasmine.any(Array),
-              }),
-            })
-          );
-          expect(args[1].general['join-object-id']).toBeNull();
-          done();
-        });
-      });
-
-      it('throws Error with message if data.join_object_id does not exist',
       function () {
         let closure = function () {
-          method(_.omit(fakeData, 'join_object_id'));
+          method({});
         };
 
         expect(closure).toThrowError();
       });
 
-      it('updates "isLoading" flag before and after updating scope object',
-      (done) => {
-        fakeCtrlInst.isLoading = false;
+    describe('shows mapper for snapshots', function () {
+      it('calls launch method with params',
+        function (done) {
+          let btn = {};
+          method(fakeData, false, btn);
 
-        method(fakeData, false);
-        expect(fakeCtrlInst.isLoading).toBe(true);
+          updateScopeObject.resolve().then(function () {
+            expect(fakeCtrlInst.launch).toHaveBeenCalledWith(
+              btn,
+              jasmine.objectContaining({
+                general: jasmine.any(Object),
+                special: jasmine.any(Array),
+              })
+            );
 
-        updateScopeObject.resolve().then(() => {
-          expect(fakeCtrlInst.isLoading).toBe(false);
-          done();
+            done();
+          });
         });
-      });
+
+      it(`extends generalConfig with "object", "type" "isNew" and "relevantTo"
+      'if data has is_new`,
+        function (done) {
+          let args;
+          method(_.extend(fakeData, {
+            is_new: true,
+          }), false);
+
+          args = fakeCtrlInst.launch.calls.argsFor(0);
+
+          // so hard:(
+          updateScopeObject.resolve().then(function () {
+            expect(args[1]).toEqual(
+              jasmine.objectContaining({
+                general: jasmine.objectContaining({
+                  object: fakeData.join_object_type,
+                  type: fakeData.join_option_type,
+                  isNew: true,
+                  relevantTo: jasmine.any(Array),
+                }),
+              })
+            );
+            expect(args[1].general['join-object-id']).toBeNull();
+            done();
+          });
+        });
+
+      it('throws Error with message if data.join_object_id does not exist',
+        function () {
+          let closure = function () {
+            method(_.omit(fakeData, 'join_object_id'));
+          };
+
+          expect(closure).toThrowError();
+        });
+
+      it('updates "isLoading" flag before and after updating scope object',
+        (done) => {
+          fakeCtrlInst.isLoading = false;
+
+          method(fakeData, false);
+          expect(fakeCtrlInst.isLoading).toBe(true);
+
+          updateScopeObject.resolve().then(() => {
+            expect(fakeCtrlInst.isLoading).toBe(false);
+            done();
+          });
+        });
     });
 
     describe('shows mapper for common objects', function () {

@@ -123,7 +123,7 @@ describe('helpers.getCustomAttrValue', () => {
         fakeInstance.customAttr(caId, false);
         actual = helper(fakeInstance, caId, fakeOptions);
         expect(actual).toEqual('No');
-    });
+      });
   });
 
   describe('for caObject of Date type', () => {

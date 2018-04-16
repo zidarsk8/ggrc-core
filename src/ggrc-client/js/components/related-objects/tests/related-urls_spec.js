@@ -222,7 +222,7 @@ describe('GGRC.Components.relatedUrls', function () {
         method('www.bar.com');
 
         expect(GGRC.Errors.notifier).toHaveBeenCalledWith(
-            'error', 'URL already exists.');
+          'error', 'URL already exists.');
       });
 
       it('should create url', function () {
@@ -261,7 +261,7 @@ describe('GGRC.Components.relatedUrls', function () {
       it('should show notification with error message', function () {
         method(url);
         expect(GGRC.Errors.notifier).toHaveBeenCalledWith(
-            'error', 'Please enter a URL.');
+          'error', 'Please enter a URL.');
       });
     });
   });

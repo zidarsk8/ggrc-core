@@ -25,12 +25,12 @@ describe('CMS.Models.CustomAttributeDefinition', function () {
 
     it('returns an empty message for properties other ' +
       'than multi_choice_options',
-      function () {
-        ['foo', 'bar', 'baz'].forEach(function (propName) {
-          let msg = validator(',,,', propName);
-          expect(msg).toEqual('');
-        });
-      }
+    function () {
+      ['foo', 'bar', 'baz'].forEach(function (propName) {
+        let msg = validator(',,,', propName);
+        expect(msg).toEqual('');
+      });
+    }
     );
 
     it('returns an empty message for non-dropdown types', function () {

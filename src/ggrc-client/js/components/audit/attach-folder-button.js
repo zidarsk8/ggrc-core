@@ -7,19 +7,19 @@ import Permission from '../../permission';
 import template from './attach-folder-button.mustache';
 
 GGRC.Components('attachFolderButton', {
- tag: 'attach-folder-button',
- template: template,
- viewModel: {
-   define: {
-     isEditDenied: {
-       type: 'boolean',
-       get: function () {
-         return !Permission
-           .is_allowed_for('update', this.attr('instance')) ||
+  tag: 'attach-folder-button',
+  template: template,
+  viewModel: {
+    define: {
+      isEditDenied: {
+        type: 'boolean',
+        get: function () {
+          return !Permission
+            .is_allowed_for('update', this.attr('instance')) ||
            this.attr('instance.archived');
-       },
-     },
-   },
-   instance: null,
- },
+        },
+      },
+    },
+    instance: null,
+  },
 });

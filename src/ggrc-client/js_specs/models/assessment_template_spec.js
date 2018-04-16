@@ -36,48 +36,48 @@ describe('can.Model.AssessmentTemplate', function () {
 
     it('uses the list of chosen assignee IDs if default assignees are set ' +
       'to "other"',
-      function () {
-        let assessorIds;
-        let result;
+    function () {
+      let assessorIds;
+      let result;
 
-        instance.attr('default_people', {
-          assignees: 'other',
-          verifiers: 'Whatever',
-        });
+      instance.attr('default_people', {
+        assignees: 'other',
+        verifiers: 'Whatever',
+      });
 
-        assessorIds = new can.Map({'17': true, '2': true, '9': true});
-        instance.attr('assigneesList', assessorIds);
+      assessorIds = new can.Map({'17': true, '2': true, '9': true});
+      instance.attr('assigneesList', assessorIds);
 
-        result = instance._packPeopleData();
+      result = instance._packPeopleData();
 
-        expect(result).toEqual({
-          assignees: [2, 9, 17],
-          verifiers: 'Whatever',
-        });
-      }
+      expect(result).toEqual({
+        assignees: [2, 9, 17],
+        verifiers: 'Whatever',
+      });
+    }
     );
 
     it('uses the list of chosen verifier IDs if default verifiers are set ' +
       'to "other"',
-      function () {
-        let verifierIds;
-        let result;
+    function () {
+      let verifierIds;
+      let result;
 
-        instance.attr('default_people', {
-          assignees: 'Whatever',
-          verifiers: 'other',
-        });
+      instance.attr('default_people', {
+        assignees: 'Whatever',
+        verifiers: 'other',
+      });
 
-        verifierIds = new can.Map({'12': true, '6': true, '11': true});
-        instance.attr('verifiersList', verifierIds);
+      verifierIds = new can.Map({'12': true, '6': true, '11': true});
+      instance.attr('verifiersList', verifierIds);
 
-        result = instance._packPeopleData();
+      result = instance._packPeopleData();
 
-        expect(result).toEqual({
-          assignees: 'Whatever',
-          verifiers: [6, 11, 12],
-        });
-      }
+      expect(result).toEqual({
+        assignees: 'Whatever',
+        verifiers: [6, 11, 12],
+      });
+    }
     );
   });
 
@@ -310,50 +310,50 @@ describe('can.Model.AssessmentTemplate', function () {
 
     it('sets the assigneesListDisable flag if the corresponding ' +
       'selected option is different from "other"',
-      function () {
-        instance.attr('assigneesListDisable', false);
-        instance.attr('default_people.assignees', 'Object Admins');
+    function () {
+      instance.attr('assigneesListDisable', false);
+      instance.attr('default_people.assignees', 'Object Admins');
 
-        instance.defaultAssigneesChanged(context, $element, eventObj);
+      instance.defaultAssigneesChanged(context, $element, eventObj);
 
-        expect(instance.attr('assigneesListDisable')).toBe(true);
-      }
+      expect(instance.attr('assigneesListDisable')).toBe(true);
+    }
     );
 
     it('clears the assigneesListDisable flag if the corresponding ' +
       'selected option is "other"',
-      function () {
-        instance.attr('assigneesListDisable', true);
-        instance.attr('default_people.assignees', 'other');
+    function () {
+      instance.attr('assigneesListDisable', true);
+      instance.attr('default_people.assignees', 'other');
 
-        instance.defaultAssigneesChanged(context, $element, eventObj);
+      instance.defaultAssigneesChanged(context, $element, eventObj);
 
-        expect(instance.attr('assigneesListDisable')).toBe(false);
-      }
+      expect(instance.attr('assigneesListDisable')).toBe(false);
+    }
     );
 
     it('showCaptainAlert value is "true" if default assignee ' +
       'is one of changedList',
-      function () {
-        greenList.map(function (item) {
-          instance.attr('default_people.assignees', item);
-          instance.defaultAssigneesChanged(context, $element, eventObj);
+    function () {
+      greenList.map(function (item) {
+        instance.attr('default_people.assignees', item);
+        instance.defaultAssigneesChanged(context, $element, eventObj);
 
-          expect(instance.attr('showCaptainAlert')).toBe(true);
-        });
-      }
+        expect(instance.attr('showCaptainAlert')).toBe(true);
+      });
+    }
     );
 
     it('showCaptainAlert value is "false" if default assignee ' +
       'is NOT one of changedList',
-      function () {
-        redList.map(function (item) {
-          instance.attr('default_people.assignees', item);
-          instance.defaultAssigneesChanged(context, $element, eventObj);
+    function () {
+      redList.map(function (item) {
+        instance.attr('default_people.assignees', item);
+        instance.defaultAssigneesChanged(context, $element, eventObj);
 
-          expect(instance.attr('showCaptainAlert')).toBe(false);
-        });
-      }
+        expect(instance.attr('showCaptainAlert')).toBe(false);
+      });
+    }
     );
   });
 
@@ -370,26 +370,26 @@ describe('can.Model.AssessmentTemplate', function () {
 
     it('sets the verifiersListDisable flag if the corresponding ' +
       'selected option is different from "other"',
-      function () {
-        instance.attr('verifiersListDisable', false);
-        instance.attr('default_people.verifiers', 'Object Admins');
+    function () {
+      instance.attr('verifiersListDisable', false);
+      instance.attr('default_people.verifiers', 'Object Admins');
 
-        instance.defaultVerifiersChanged(context, $element, eventObj);
+      instance.defaultVerifiersChanged(context, $element, eventObj);
 
-        expect(instance.attr('verifiersListDisable')).toBe(true);
-      }
+      expect(instance.attr('verifiersListDisable')).toBe(true);
+    }
     );
 
     it('clears the verifiersListDisable flag if the corresponding ' +
       'selected option is "other"',
-      function () {
-        instance.attr('verifiersListDisable', true);
-        instance.attr('default_people.verifiers', 'other');
+    function () {
+      instance.attr('verifiersListDisable', true);
+      instance.attr('default_people.verifiers', 'other');
 
-        instance.defaultVerifiersChanged(context, $element, eventObj);
+      instance.defaultVerifiersChanged(context, $element, eventObj);
 
-        expect(instance.attr('verifiersListDisable')).toBe(false);
-      }
+      expect(instance.attr('verifiersListDisable')).toBe(false);
+    }
     );
   });
 });

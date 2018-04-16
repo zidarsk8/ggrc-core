@@ -10,12 +10,12 @@
     optionModelName, joinOptionAttr, joinModelName, joinObjectAttr,
     instanceJoinAttr) {
     return new GGRC.ListLoaders.ProxyListLoader(
-        joinModelName, joinObjectAttr, joinOptionAttr,
-        instanceJoinAttr, optionModelName);
+      joinModelName, joinObjectAttr, joinOptionAttr,
+      instanceJoinAttr, optionModelName);
   };
 
   GGRC.MapperHelpers.Direct = function Direct(
-      optionModelName, instanceJoinAttr, remoteJoinAttr) {
+    optionModelName, instanceJoinAttr, remoteJoinAttr) {
     return new GGRC.ListLoaders.DirectListLoader(
       optionModelName, instanceJoinAttr, remoteJoinAttr);
   };
@@ -37,7 +37,7 @@
   };
 
   GGRC.MapperHelpers.AttrFilter = function AttrFilter(source, filterName,
-                                                      keyword, type) {
+    keyword, type) {
     return new GGRC.ListLoaders.AttrFilteredListLoader(source, filterName,
       keyword, type);
   };

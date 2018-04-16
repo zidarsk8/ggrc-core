@@ -47,17 +47,17 @@ describe('can.mustache.helper.get_item', function () {
   // the actual argument values, and thus must work with them, too.
   it('returns the value of the correct model attribute if given ' +
     'function arguments',
-    function () {
-      let obj = function () {
-        return {foo: 'foo123', bar: 'bar456'};
-      };
-      let key = function () {
-        return 'bar';
-      };
+  function () {
+    let obj = function () {
+      return {foo: 'foo123', bar: 'bar456'};
+    };
+    let key = function () {
+      return 'bar';
+    };
 
-      let result = helper(obj, key, fakeOptions);
+    let result = helper(obj, key, fakeOptions);
 
-      expect(result).toEqual('bar456');
-    }
+    expect(result).toEqual('bar456');
+  }
   );
 });

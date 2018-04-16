@@ -27,9 +27,9 @@ describe('GGRC.Components.reminder', function () {
 
       instance = new can.Map({
         refresh: jasmine.createSpy('refresh')
-                        .and.returnValue(pendingRefresh.promise()),
+          .and.returnValue(pendingRefresh.promise()),
         save: jasmine.createSpy('save')
-                     .and.returnValue(pendingSave.promise()),
+          .and.returnValue(pendingSave.promise()),
       });
 
       scope = new can.Map({

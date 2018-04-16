@@ -119,8 +119,8 @@ can.Control('CMS.Controllers.LHN_Tooltips', {
   ensure_tooltip_visibility: function () {
     let offset = this.options.$extended.offset().top;
     let height = this.options.$extended.height();
-      // "- 24" compensates for the Chrome URL display when hovering a link
-      // "348" should be the widht of the Chrome URL display when displaying javascript://
+    // "- 24" compensates for the Chrome URL display when hovering a link
+    // "348" should be the widht of the Chrome URL display when displaying javascript://
     let windowHeight = $(window).height() + $(window).scrollTop() -
         (this.options.$extended.offset().left > 348 ? 0 : 24);
     let newOffset;

@@ -72,15 +72,15 @@
             this.scope.instance.attr(el.attr("name"), new can.List());
           }
           this.scope.instance
-          .attr(el.attr("name"))
-          .replace(
-            can.map(
-              this.element.find("input[name='" + el.attr("name") + "']:checked"),
-              function(el) {
-                return $(el).val();
-              }
-            )
-          );
+            .attr(el.attr("name"))
+            .replace(
+              can.map(
+                this.element.find("input[name='" + el.attr("name") + "']:checked"),
+                function(el) {
+                  return $(el).val();
+                }
+              )
+            );
           this.element.find("input:checkbox").prop("disabled", true);
         } else {
           this.scope.instance.attr(el.attr("name"), el.val());

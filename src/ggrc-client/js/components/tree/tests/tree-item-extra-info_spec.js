@@ -81,15 +81,15 @@ describe('GGRC.Components.treeItemExtraInfo', function () {
     });
 
     it('returns false if instance is "CycleTasks" and not overdue',
-    function () {
-      let result;
-      let instance = new CMS.Models.CycleTaskGroupObjectTask();
-      instance.attr('end_date', moment().add(5, 'd'));
-      viewModel.attr('instance', instance);
+      function () {
+        let result;
+        let instance = new CMS.Models.CycleTaskGroupObjectTask();
+        instance.attr('end_date', moment().add(5, 'd'));
+        viewModel.attr('instance', instance);
 
-      result = viewModel.attr('isOverdue');
+        result = viewModel.attr('isOverdue');
 
-      expect(result).toBe(false);
-    });
+        expect(result).toBe(false);
+      });
   });
 });

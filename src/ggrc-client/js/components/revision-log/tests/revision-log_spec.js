@@ -56,56 +56,56 @@ describe('GGRC.Components.revisionLog', function () {
 
     it('on successfully fetching the data it sets the correctly sorted ' +
       'change history in the scope',
-      function () {
-        let actual;
-        let expected;
+    function () {
+      let actual;
+      let expected;
 
-        let fetchedRevisions = new can.Map({
-          object: new can.List([
-            {id: 10},
-          ]),
-          mappings: new can.List([
-            {id: 20},
-          ]),
-        });
+      let fetchedRevisions = new can.Map({
+        object: new can.List([
+          {id: 10},
+        ]),
+        mappings: new can.List([
+          {id: 20},
+        ]),
+      });
 
-        let mapChange = {updatedAt: new Date('2015-12-21')};
-        let mapChange2 = {updatedAt: new Date('2016-03-17')};
+      let mapChange = {updatedAt: new Date('2015-12-21')};
+      let mapChange2 = {updatedAt: new Date('2016-03-17')};
 
-        let objChange = {updatedAt: new Date('2016-04-14')};
-        let objChange2 = {updatedAt: new Date('2014-11-18')};
-        let objChange3 = {updatedAt: new Date('2016-01-09')};
+      let objChange = {updatedAt: new Date('2016-04-14')};
+      let objChange2 = {updatedAt: new Date('2014-11-18')};
+      let objChange3 = {updatedAt: new Date('2016-01-09')};
 
-        viewModel.attr('changeHistory', []);
+      viewModel.attr('changeHistory', []);
 
-        spyOn(viewModel, '_computeMappingChanges').and.returnValue(
-          new can.List([mapChange, mapChange2])
-        );
-        spyOn(viewModel, '_computeRoleChanges');
-        spyOn(viewModel, '_computeObjectChanges').and.returnValue(
-          new can.List([objChange, objChange2, objChange3])
-        );
-        // end fixture
+      spyOn(viewModel, '_computeMappingChanges').and.returnValue(
+        new can.List([mapChange, mapChange2])
+      );
+      spyOn(viewModel, '_computeRoleChanges');
+      spyOn(viewModel, '_computeObjectChanges').and.returnValue(
+        new can.List([objChange, objChange2, objChange3])
+      );
+      // end fixture
 
-        viewModel.fetchItems();
-        dfdFetchData.resolve(fetchedRevisions);
+      viewModel.fetchItems();
+      dfdFetchData.resolve(fetchedRevisions);
 
-        // check that correct data has been used to calculate the history
-        expect(viewModel._computeObjectChanges)
-          .toHaveBeenCalledWith(fetchedRevisions.object);
-        expect(viewModel._computeMappingChanges)
-          .toHaveBeenCalledWith(fetchedRevisions.mappings);
+      // check that correct data has been used to calculate the history
+      expect(viewModel._computeObjectChanges)
+        .toHaveBeenCalledWith(fetchedRevisions.object);
+      expect(viewModel._computeMappingChanges)
+        .toHaveBeenCalledWith(fetchedRevisions.mappings);
 
-        // check the actual outcome
-        actual = can.makeArray(viewModel.attr('changeHistory'));
-        actual = _.map(actual, function (item) {
-          return item.attr();
-        });
-        // sorted by newest to oldest
-        expected = [objChange, mapChange2, objChange3, mapChange, objChange2];
+      // check the actual outcome
+      actual = can.makeArray(viewModel.attr('changeHistory'));
+      actual = _.map(actual, function (item) {
+        return item.attr();
+      });
+      // sorted by newest to oldest
+      expected = [objChange, mapChange2, objChange3, mapChange, objChange2];
 
-        expect(actual).toEqual(expected);
-      }
+      expect(actual).toEqual(expected);
+    }
     );
   });
 
@@ -525,28 +525,28 @@ describe('GGRC.Components.revisionLog', function () {
 
     it('fetches the Revision history of the correct object ' +
       'as a mapping source',
-      function () {
-        viewModel._fetchRevisionsData();
+    function () {
+      viewModel._fetchRevisionsData();
 
-        expect(Revision.findAll).toHaveBeenCalledWith({
-          source_type: 'ObjectFoo',
-          source_id: 123,
-          __sort: 'updated_at',
-        });
-      }
+      expect(Revision.findAll).toHaveBeenCalledWith({
+        source_type: 'ObjectFoo',
+        source_id: 123,
+        __sort: 'updated_at',
+      });
+    }
     );
 
     it('fetches the Revision history of the correct object ' +
       'as a mapping destination',
-      function () {
-        viewModel._fetchRevisionsData();
+    function () {
+      viewModel._fetchRevisionsData();
 
-        expect(Revision.findAll).toHaveBeenCalledWith({
-          destination_type: 'ObjectFoo',
-          destination_id: 123,
-          __sort: 'updated_at',
-        });
-      }
+      expect(Revision.findAll).toHaveBeenCalledWith({
+        destination_type: 'ObjectFoo',
+        destination_id: 123,
+        __sort: 'updated_at',
+      });
+    }
     );
 
     it('resolves the returned Deferred with the fetched data', function () {
@@ -641,70 +641,70 @@ describe('GGRC.Components.revisionLog', function () {
 
     it('returns correct change information when the instance is at the ' +
       '"source" end of the mapping',
-      function () {
-        let revision = {
-          modified_by: 'User 17',
-          updated_at: new Date('2015-05-17T17:24:01'),
-          action: 'created',
-          destination: {
-            display_type: function () {
-              return 'Other';
-            },
-            display_name: function () {
-              return 'OtherObject';
-            },
+    function () {
+      let revision = {
+        modified_by: 'User 17',
+        updated_at: new Date('2015-05-17T17:24:01'),
+        action: 'created',
+        destination: {
+          display_type: function () {
+            return 'Other';
           },
-          source_id: 99,
-          source_type: 'OtherObject',
-        };
-
-        let result = viewModel._mappingChange(revision, [revision]);
-
-        expect(result).toEqual({
-          madeBy: 'User 17',
-          role: 'none',
-          updatedAt: new Date('2015-05-17T17:24:01'),
-          changes: {
-            origVal: '—',
-            newVal: 'Created',
-            fieldName: 'Mapping to Other: OtherObject',
+          display_name: function () {
+            return 'OtherObject';
           },
-        });
-      }
+        },
+        source_id: 99,
+        source_type: 'OtherObject',
+      };
+
+      let result = viewModel._mappingChange(revision, [revision]);
+
+      expect(result).toEqual({
+        madeBy: 'User 17',
+        role: 'none',
+        updatedAt: new Date('2015-05-17T17:24:01'),
+        changes: {
+          origVal: '—',
+          newVal: 'Created',
+          fieldName: 'Mapping to Other: OtherObject',
+        },
+      });
+    }
     );
 
     it('returns correct change information when the instance is at the ' +
       '"destination" end of the mapping',
-      function () {
-        let revision = {
-          modified_by: 'User 17',
-          updated_at: new Date('2015-05-17T17:24:01'),
-          action: 'deleted',
-          source: {
-            display_type: function () {
-              return 'Other';
-            },
-            display_name: function () {
-              return 'OtherObject';
-            },
+    function () {
+      let revision = {
+        modified_by: 'User 17',
+        updated_at: new Date('2015-05-17T17:24:01'),
+        action: 'deleted',
+        source: {
+          display_type: function () {
+            return 'Other';
           },
-          destination_id: 123,
-          destination_type: 'ObjectFoo',
-        };
-
-        let result = viewModel._mappingChange(revision, [revision]);
-
-        expect(result).toEqual({
-          madeBy: 'User 17',
-          role: 'none',
-          updatedAt: new Date('2015-05-17T17:24:01'),
-          changes: {
-            origVal: 'Created',
-            newVal: 'Deleted',
-            fieldName: 'Mapping to Other: OtherObject',
+          display_name: function () {
+            return 'OtherObject';
           },
-        });
-      }
+        },
+        destination_id: 123,
+        destination_type: 'ObjectFoo',
+      };
+
+      let result = viewModel._mappingChange(revision, [revision]);
+
+      expect(result).toEqual({
+        madeBy: 'User 17',
+        role: 'none',
+        updatedAt: new Date('2015-05-17T17:24:01'),
+        changes: {
+          origVal: 'Created',
+          newVal: 'Deleted',
+          fieldName: 'Mapping to Other: OtherObject',
+        },
+      });
+    }
     );
 
     it('returns correct change information ' +
@@ -1079,10 +1079,10 @@ describe('GGRC.Components.revisionLog', function () {
       });
     it('returns "none" if there is no known role and no user history ' +
        'exists on specific dates',
-        function () {
-          expect(viewModel
-            ._getRoleAtTime(0, new Date(2016, 1, 2))).toEqual('none');
-        });
+    function () {
+      expect(viewModel
+        ._getRoleAtTime(0, new Date(2016, 1, 2))).toEqual('none');
+    });
     it('returns "none" if user does not exist', function () {
       expect(viewModel
         ._getRoleAtTime(null, new Date(2016, 1, 2))).toEqual('none');

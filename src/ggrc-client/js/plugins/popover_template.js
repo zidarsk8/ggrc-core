@@ -35,10 +35,10 @@
   };
   Popover.prototype.inElement = function (target, elements) {
     return $.map(elements, function (element) {
-        return target.closest(element).length || target.is(element);
-      }).some(function (val) {
-        return val;
-      });
+      return target.closest(element).length || target.is(element);
+    }).some(function (val) {
+      return val;
+    });
   };
   Popover.prototype.clickOutside = function (evnt) {
     let $target = $(evnt.target);
@@ -77,7 +77,7 @@
   function Plugin(option) {
     return this.each(function () {
       let $this = $(this),
-          data = $this.data('popover-template');
+        data = $this.data('popover-template');
 
       if (!data) {
         $this.data('popover-template', new Popover(this));

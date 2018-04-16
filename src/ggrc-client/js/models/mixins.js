@@ -49,7 +49,7 @@ const AUDIT_ISSUE_TRACKER = {
       }
       mixinName = 'CMS.Models.Mixins' + (parts.length ?
         '.' + parts.join('.') :
-          '');
+        '');
       can.getObject(mixinName, window, true)[shortName] = Constructor;
       return Constructor;
     },
@@ -528,14 +528,14 @@ const AUDIT_ISSUE_TRACKER = {
     getHashFragment: function () {
       let widgetName = this.constructor.table_singular;
       if (window.location.hash
-          .startsWith(['#', widgetName, '_widget'].join(''))) {
+        .startsWith(['#', widgetName, '_widget'].join(''))) {
         return;
       }
 
       return [widgetName,
-              '_widget/',
-              this.hash_fragment(),
-              '&refetch=true'].join('');
+        '_widget/',
+        this.hash_fragment(),
+        '&refetch=true'].join('');
     },
   });
 

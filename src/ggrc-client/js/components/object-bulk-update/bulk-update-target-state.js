@@ -38,4 +38,4 @@ export default can.Component.extend({
     targetStates: [],
     enabled: false,
   },
- });
+});

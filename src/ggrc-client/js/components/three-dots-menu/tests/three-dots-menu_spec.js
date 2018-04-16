@@ -23,17 +23,17 @@ describe('three-dots-menu component', function () {
     });
 
     it('sets disabled field to true if the menu node does not have childrens',
-    function () {
-      vm.manageEmptyList(menuNode);
-      expect(vm.attr('disabled')).toBe(true);
-    });
+      function () {
+        vm.manageEmptyList(menuNode);
+        expect(vm.attr('disabled')).toBe(true);
+      });
 
     it('sets disabled field to false if the menu node has childrens',
-    function () {
-      menuNode.children = [1, 2, 3];
-      vm.manageEmptyList(menuNode);
-      expect(vm.attr('disabled')).toBe(false);
-    });
+      function () {
+        menuNode.children = [1, 2, 3];
+        vm.manageEmptyList(menuNode);
+        expect(vm.attr('disabled')).toBe(false);
+      });
   });
 
   describe('mutationCallback() method', function () {
@@ -44,20 +44,20 @@ describe('three-dots-menu component', function () {
     });
 
     it('calls manageEmptyList method for each mutation with passed menu node',
-    function () {
-      spyOn(vm, 'manageEmptyList');
+      function () {
+        spyOn(vm, 'manageEmptyList');
 
-      mutationList.push(
-        {target: {}},
-        {target: {}}
-      );
-      vm.mutationCallback(mutationList);
+        mutationList.push(
+          {target: {}},
+          {target: {}}
+        );
+        vm.mutationCallback(mutationList);
 
-      mutationList.forEach((mutation) => {
-        const menuNode = mutation.target;
-        expect(vm.manageEmptyList).toHaveBeenCalledWith(menuNode);
+        mutationList.forEach((mutation) => {
+          const menuNode = mutation.target;
+          expect(vm.manageEmptyList).toHaveBeenCalledWith(menuNode);
+        });
       });
-    });
   });
 
   describe('initObserver() method', function () {
@@ -68,10 +68,10 @@ describe('three-dots-menu component', function () {
     });
 
     it('sets observer field to the new instance of MutationObserver object',
-    function () {
-      vm.initObserver(element);
-      expect(vm.attr('observer')).toEqual(jasmine.any(MutationObserver));
-    });
+      function () {
+        vm.initObserver(element);
+        expect(vm.attr('observer')).toEqual(jasmine.any(MutationObserver));
+      });
 
     describe('calls observe method which', function () {
       let observer;
@@ -128,20 +128,20 @@ describe('three-dots-menu component', function () {
       });
 
       it('calls viewModel.initObserver() method with passed menu node',
-      function () {
-        const [menuNode] = $element.find('[role=menu]');
-        spyOn(vm, 'initObserver');
-        method($element);
-        expect(vm.initObserver).toHaveBeenCalledWith(menuNode);
-      });
+        function () {
+          const [menuNode] = $element.find('[role=menu]');
+          spyOn(vm, 'initObserver');
+          method($element);
+          expect(vm.initObserver).toHaveBeenCalledWith(menuNode);
+        });
 
       it('calls viewModel.manageEmptyList() method with passed menu node',
-      function () {
-        const [menuNode] = $element.find('[role=menu]');
-        spyOn(vm, 'manageEmptyList');
-        method($element);
-        expect(vm.manageEmptyList).toHaveBeenCalledWith(menuNode);
-      });
+        function () {
+          const [menuNode] = $element.find('[role=menu]');
+          spyOn(vm, 'manageEmptyList');
+          method($element);
+          expect(vm.manageEmptyList).toHaveBeenCalledWith(menuNode);
+        });
     });
 
     describe('removed() event', function () {

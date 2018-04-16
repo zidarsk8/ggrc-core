@@ -81,7 +81,7 @@ import wysihtml5 from 'wysihtml5/wysihtml5-0.4.0pre';
     };
   wysihtml5.views.Composer.prototype.observe = function () {
     let element = this.element,
-        focusBlurElement = browser.supportsEventsInIframeCorrectly() ? element : this.sandbox.getWindow();
+      focusBlurElement = browser.supportsEventsInIframeCorrectly() ? element : this.sandbox.getWindow();
 
     addListeners(focusBlurElement, ["focus", "keyup"], handleUserInteraction.bind(this));
     return originalObserve.apply(this, arguments);

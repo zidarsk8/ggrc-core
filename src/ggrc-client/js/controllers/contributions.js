@@ -489,10 +489,10 @@
         can.each($this.data(), function (v, k) {
           //  This is just a mapping of keys to underscored keys
           let newKey = k.replace(
-              /[A-Z]/g,
-              function (str) {
-                return '_' + str.toLowerCase();
-              }
+            /[A-Z]/g,
+            function (str) {
+              return '_' + str.toLowerCase();
+            }
           );
 
           dataSet[newKey] = v;

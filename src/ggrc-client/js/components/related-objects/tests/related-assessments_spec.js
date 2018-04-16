@@ -43,21 +43,21 @@ describe('GGRC.Components.relatedAssessments', () => {
 
       it(`returns title based on instance.type if is gotten related
           assessments not from assessment info pane`, () => {
-        let modelType = 'Model1';
-        let modelPlural = 'Awesome_models1';
-        let expectedTitle;
+          let modelType = 'Model1';
+          let modelPlural = 'Awesome_models1';
+          let expectedTitle;
 
-        CMS.Models = {
-          [modelType]: {
-            model_plural: modelPlural,
-          },
-        };
-        viewModel.attr('instance.assessment_type', null);
-        viewModel.attr('instance.type', modelType);
-        expectedTitle = `Related ${modelPlural}`;
+          CMS.Models = {
+            [modelType]: {
+              model_plural: modelPlural,
+            },
+          };
+          viewModel.attr('instance.assessment_type', null);
+          viewModel.attr('instance.type', modelType);
+          expectedTitle = `Related ${modelPlural}`;
 
-        expect(viewModel.attr('relatedObjectsTitle')).toBe(expectedTitle);
-      });
+          expect(viewModel.attr('relatedObjectsTitle')).toBe(expectedTitle);
+        });
     });
 
     describe('loadRelatedAssessments() method', () => {

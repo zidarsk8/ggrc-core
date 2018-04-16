@@ -111,7 +111,7 @@ describe('GGRC.Mappings', function () {
     Product: filtered,
     Program: _.difference(allTypes,
       ['Program', 'Audit', 'RiskAssessment'].concat(modules.core.notMappable,
-      modules.workflows.notMappable)),
+        modules.workflows.notMappable)),
     Project: filtered,
     Regulation: _.difference(filtered, directives),
     Risk: filtered,

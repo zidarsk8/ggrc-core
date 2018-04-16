@@ -77,61 +77,61 @@ describe('GGRC.Components.repeatOnButton', function () {
     });
 
     it('should not update options when unit was not selected',
-    function () {
-      let actualTitles;
-      let expectedTitles = repeatOptions.map(getTitle);
+      function () {
+        let actualTitles;
+        let expectedTitles = repeatOptions.map(getTitle);
 
-      viewModel.updateRepeatEveryOptions();
+        viewModel.updateRepeatEveryOptions();
 
-      actualTitles = can.makeArray(viewModel.attr('repeatOptions'))
-        .map(getTitle);
-      expect(actualTitles).toEqual(expectedTitles);
-    });
+        actualTitles = can.makeArray(viewModel.attr('repeatOptions'))
+          .map(getTitle);
+        expect(actualTitles).toEqual(expectedTitles);
+      });
 
     it('should update options when unit was not selected',
-    function () {
-      let actualTitles;
-      let expectedTitles = ['1 week', '2 weeks'];
-      viewModel.attr('state.result.unit', 'week');
+      function () {
+        let actualTitles;
+        let expectedTitles = ['1 week', '2 weeks'];
+        viewModel.attr('state.result.unit', 'week');
 
-      viewModel.updateRepeatEveryOptions();
+        viewModel.updateRepeatEveryOptions();
 
-      actualTitles = can.makeArray(viewModel.attr('repeatOptions'))
-        .map(getTitle);
-      expect(actualTitles).toEqual(expectedTitles);
-    });
+        actualTitles = can.makeArray(viewModel.attr('repeatOptions'))
+          .map(getTitle);
+        expect(actualTitles).toEqual(expectedTitles);
+      });
   });
 
   describe('initSelectedOptions method', function () {
     it('should initialize values from injected properties',
-    function () {
-      let unit = 'day';
-      let repeatEvery = '2';
-      viewModel.attr('unit', unit);
-      viewModel.attr('repeatEvery', repeatEvery);
+      function () {
+        let unit = 'day';
+        let repeatEvery = '2';
+        viewModel.attr('unit', unit);
+        viewModel.attr('repeatEvery', repeatEvery);
 
-      viewModel.initSelectedOptions();
+        viewModel.initSelectedOptions();
 
-      expect(viewModel.attr('state.result.unit')).toEqual(unit);
-      expect(viewModel.attr('state.result.repeatEvery')).toEqual(repeatEvery);
-      expect(viewModel.attr('repeatEnabled')).toBeTruthy();
-    });
+        expect(viewModel.attr('state.result.unit')).toEqual(unit);
+        expect(viewModel.attr('state.result.repeatEvery')).toEqual(repeatEvery);
+        expect(viewModel.attr('repeatEnabled')).toBeTruthy();
+      });
   });
 
   describe('init method', function () {
     it('should initialize values from injected properties',
-    function () {
-      let unit = 'day';
-      let repeatEvery = '2';
-      viewModel.attr('unit', unit);
-      viewModel.attr('repeatEvery', repeatEvery);
+      function () {
+        let unit = 'day';
+        let repeatEvery = '2';
+        viewModel.attr('unit', unit);
+        viewModel.attr('repeatEvery', repeatEvery);
 
-      viewModel.init();
+        viewModel.init();
 
-      expect(viewModel.attr('state.result.unit')).toEqual(unit);
-      expect(viewModel.attr('state.result.repeatEvery')).toEqual(repeatEvery);
-      expect(viewModel.attr('repeatEnabled')).toBeTruthy();
-    });
+        expect(viewModel.attr('state.result.unit')).toEqual(unit);
+        expect(viewModel.attr('state.result.repeatEvery')).toEqual(repeatEvery);
+        expect(viewModel.attr('repeatEnabled')).toBeTruthy();
+      });
   });
 
   describe('save method', function () {
@@ -144,32 +144,32 @@ describe('GGRC.Components.repeatOnButton', function () {
     });
 
     it('should notify with selected values when repeat is enabled',
-    function () {
-      let unit = 'day';
-      let repeatEvery = '2';
-      viewModel.attr('state.result.unit', unit);
-      viewModel.attr('state.result.repeatEvery', repeatEvery);
-      viewModel.attr('repeatEnabled', true);
+      function () {
+        let unit = 'day';
+        let repeatEvery = '2';
+        viewModel.attr('state.result.unit', unit);
+        viewModel.attr('state.result.repeatEvery', repeatEvery);
+        viewModel.attr('repeatEnabled', true);
 
-      viewModel.save();
+        viewModel.save();
 
-      expect(viewModel.attr('isSaving')).toBeTruthy();
+        expect(viewModel.attr('isSaving')).toBeTruthy();
 
-      saveDfd.resolve();
-      expect(viewModel.attr('isSaving')).toBeFalsy();
-      expect(viewModel.attr('state.open')).toBeFalsy();
-    });
+        saveDfd.resolve();
+        expect(viewModel.attr('isSaving')).toBeFalsy();
+        expect(viewModel.attr('state.open')).toBeFalsy();
+      });
 
     it('should notify with empty values when repeat is disabled',
-    function () {
-      viewModel.save();
+      function () {
+        viewModel.save();
 
-      expect(viewModel.attr('isSaving')).toBeTruthy();
+        expect(viewModel.attr('isSaving')).toBeTruthy();
 
-      saveDfd.resolve();
-      expect(viewModel.attr('isSaving')).toBeFalsy();
-      expect(viewModel.attr('state.open')).toBeFalsy();
-    });
+        saveDfd.resolve();
+        expect(viewModel.attr('isSaving')).toBeFalsy();
+        expect(viewModel.attr('state.open')).toBeFalsy();
+      });
   });
 
   describe('unit update event', function () {
@@ -194,17 +194,17 @@ describe('GGRC.Components.repeatOnButton', function () {
     });
 
     it('should update repeat options when unit changed',
-    function () {
-      let actualTitles;
-      let expectedTitles = ['1 weekday', '2 weekdays'];
-      context.viewModel.attr('state.result.unit', 'day');
+      function () {
+        let actualTitles;
+        let expectedTitles = ['1 weekday', '2 weekdays'];
+        context.viewModel.attr('state.result.unit', 'day');
 
-      unitChanged.apply(context);
+        unitChanged.apply(context);
 
-      actualTitles = can.makeArray(context.viewModel.attr('repeatOptions'))
-        .map(getTitle);
-      expect(actualTitles).toEqual(expectedTitles);
-    });
+        actualTitles = can.makeArray(context.viewModel.attr('repeatOptions'))
+          .map(getTitle);
+        expect(actualTitles).toEqual(expectedTitles);
+      });
   });
 
   describe('open update event', function () {
@@ -219,32 +219,32 @@ describe('GGRC.Components.repeatOnButton', function () {
     });
 
     it('should set saved values for options when modal with unit opens',
-    function () {
-      let unit = 'day';
-      let repeatEvery = '2';
-      context.viewModel.attr('state.open', true);
-      context.viewModel.attr('unit', unit);
-      context.viewModel.attr('repeatEvery', repeatEvery);
-      openChanged.apply(context);
+      function () {
+        let unit = 'day';
+        let repeatEvery = '2';
+        context.viewModel.attr('state.open', true);
+        context.viewModel.attr('unit', unit);
+        context.viewModel.attr('repeatEvery', repeatEvery);
+        openChanged.apply(context);
 
-      expect(context.viewModel.attr('state.result.unit'))
-        .toEqual(unit);
-      expect(context.viewModel.attr('state.result.repeatEvery'))
-        .toEqual(repeatEvery);
-      expect(context.viewModel.attr('repeatEnabled'))
-        .toBeTruthy();
-    });
+        expect(context.viewModel.attr('state.result.unit'))
+          .toEqual(unit);
+        expect(context.viewModel.attr('state.result.repeatEvery'))
+          .toEqual(repeatEvery);
+        expect(context.viewModel.attr('repeatEnabled'))
+          .toBeTruthy();
+      });
 
     it('should set default values for options when modal without unit opens',
-    function () {
-      context.viewModel.attr('state.open', true);
-      context.viewModel.attr('unit', null);
-      context.viewModel.attr('repeatEvery', 0);
+      function () {
+        context.viewModel.attr('state.open', true);
+        context.viewModel.attr('unit', null);
+        context.viewModel.attr('repeatEvery', 0);
 
-      openChanged.apply(context);
+        openChanged.apply(context);
 
-      expect(context.viewModel.attr('state.result.unit')).toEqual('month');
-      expect(context.viewModel.attr('state.result.repeatEvery')).toEqual(1);
-    });
+        expect(context.viewModel.attr('state.result.unit')).toEqual('month');
+        expect(context.viewModel.attr('state.result.repeatEvery')).toEqual(1);
+      });
   });
 });

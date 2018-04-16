@@ -116,7 +116,7 @@ import RefreshQueue from './refresh_queue';
     },
     autocomplete_label: function () {
       return this.name ?
-      this.name + '<span class="url-link">' + this.email + '</span>' :
+        this.name + '<span class="url-link">' + this.email + '</span>' :
         this.email;
     },
     getWidgetCountForMyWorkPage: function () {

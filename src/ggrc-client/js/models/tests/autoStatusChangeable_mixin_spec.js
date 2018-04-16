@@ -106,30 +106,30 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
 
     it('returns a resolved promise if in "In Progress" state without ' +
       'opening the modal',
-      function () {
-        let promise;
-        let spy = ModalsUtils.confirm;
+    function () {
+      let promise;
+      let spy = ModalsUtils.confirm;
 
-        instance.attr('status', 'In Progress');
-        promise = method();
+      instance.attr('status', 'In Progress');
+      promise = method();
 
-        expect(promise.state()).toEqual('resolved');
-        expect(spy).not.toHaveBeenCalled();
-      }
+      expect(promise.state()).toEqual('resolved');
+      expect(spy).not.toHaveBeenCalled();
+    }
     );
 
     it('returns a resolved promise if in "Not Started" state without ' +
       'opening the modal',
-      function () {
-        let promise;
-        let spy = ModalsUtils.confirm;
+    function () {
+      let promise;
+      let spy = ModalsUtils.confirm;
 
-        instance.attr('status', 'Not Started');
-        promise = method();
+      instance.attr('status', 'Not Started');
+      promise = method();
 
-        expect(promise.state()).toEqual('resolved');
-        expect(spy).not.toHaveBeenCalled();
-      }
+      expect(promise.state()).toEqual('resolved');
+      expect(spy).not.toHaveBeenCalled();
+    }
     );
   });
 });

@@ -66,13 +66,13 @@ describe('GGRC.Components.TasksCounter', function () {
       beforeEach(() => {
         spyOn(CMS.Models.Person, 'findInCacheById')
           .and.callFake(() => {
-          return {
-            getTasksCount: () => can.Deferred().resolve({
-              open_task_count: 5,
-              has_overdue: true,
-            }),
-          };
-        });
+            return {
+              getTasksCount: () => can.Deferred().resolve({
+                open_task_count: 5,
+                has_overdue: true,
+              }),
+            };
+          });
       });
 
       it('update hasOverdue and tasksAmount properties', function () {

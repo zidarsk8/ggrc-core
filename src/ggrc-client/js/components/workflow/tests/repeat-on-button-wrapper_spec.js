@@ -75,29 +75,29 @@ describe('GGRC.Components.repeatOnButtonWrapper', function () {
     });
 
     it('should update instance values when auto-save disabled',
-    function () {
-      let unit = 'Week';
-      let repeatEvery = '22';
-      viewModel.onSetRepeat(unit, repeatEvery);
-      expect(instance.save.calls.count()).toEqual(0);
-      expect(viewModel.attr('instance.unit'))
-        .toEqual(unit);
-      expect(viewModel.attr('instance.repeat_every'))
-        .toEqual(repeatEvery);
-    });
+      function () {
+        let unit = 'Week';
+        let repeatEvery = '22';
+        viewModel.onSetRepeat(unit, repeatEvery);
+        expect(instance.save.calls.count()).toEqual(0);
+        expect(viewModel.attr('instance.unit'))
+          .toEqual(unit);
+        expect(viewModel.attr('instance.repeat_every'))
+          .toEqual(repeatEvery);
+      });
 
     it('should save instance when auto-save enabled',
-    function () {
-      let unit = 'Week';
-      let repeatEvery = '22';
-      viewModel.attr('autoSave', true);
-      viewModel.onSetRepeat(unit, repeatEvery);
-      saveDfd.resolve();
-      expect(viewModel.attr('instance.unit'))
-        .toEqual(unit);
-      expect(viewModel.attr('instance.repeat_every'))
-        .toEqual(repeatEvery);
-      expect(instance.save.calls.count()).toEqual(1);
-    });
+      function () {
+        let unit = 'Week';
+        let repeatEvery = '22';
+        viewModel.attr('autoSave', true);
+        viewModel.onSetRepeat(unit, repeatEvery);
+        saveDfd.resolve();
+        expect(viewModel.attr('instance.unit'))
+          .toEqual(unit);
+        expect(viewModel.attr('instance.repeat_every'))
+          .toEqual(repeatEvery);
+        expect(instance.save.calls.count()).toEqual(1);
+      });
   });
 });

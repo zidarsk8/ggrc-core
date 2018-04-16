@@ -3,10 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
- import {
-   buildParam,
-   batchRequests,
- } from '../../plugins/utils/query-api-utils';
+import {
+  buildParam,
+  batchRequests,
+} from '../../plugins/utils/query-api-utils';
 import '../object-list/object-list';
 import template from './mapped-objects.mustache';
 
@@ -59,7 +59,7 @@ import template from './mapped-objects.mustache';
         showAllButtonText: {
           get: function () {
             return !this.attr('showAll') ?
-            'Show All (' + this.attr('mappedItems.length') + ')' :
+              'Show All (' + this.attr('mappedItems.length') + ')' :
               'Show Less';
           },
         },

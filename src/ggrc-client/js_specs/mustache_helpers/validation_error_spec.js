@@ -25,37 +25,37 @@ describe('can.mustache.helper.validation_error', function () {
 
   it('renders the "truthy" block if there are validation errors for the ' +
     'property',
-    function () {
-      let validationErrors = {
-        'property_name.1': ['invalid value'],
-      };
-      helper(validationErrors, 'property_name.1', fakeOptions);
-      expect(fakeOptions.fn).toHaveBeenCalled();
-    }
+  function () {
+    let validationErrors = {
+      'property_name.1': ['invalid value'],
+    };
+    helper(validationErrors, 'property_name.1', fakeOptions);
+    expect(fakeOptions.fn).toHaveBeenCalled();
+  }
   );
 
   it('adds the errors list to the scope if there are validation errors for ' +
     'the property',
-    function () {
-      let validationErrors = {
-        'property_name.1': ['invalid  date format'],
-        'property_name.4': ['value is too short', 'not a number'],
-      };
-      helper(validationErrors, 'property_name.4', fakeOptions);
-      expect(fakeOptions.contexts.add).toHaveBeenCalledWith(
-        {errors: ['value is too short', 'not a number']}
-      );
-    }
+  function () {
+    let validationErrors = {
+      'property_name.1': ['invalid  date format'],
+      'property_name.4': ['value is too short', 'not a number'],
+    };
+    helper(validationErrors, 'property_name.4', fakeOptions);
+    expect(fakeOptions.contexts.add).toHaveBeenCalledWith(
+      {errors: ['value is too short', 'not a number']}
+    );
+  }
   );
 
   it('renders the "falsy" block if there are no validation errors for the ' +
     'property',
-    function () {
-      let validationErrors = {
-        'property_name.4': ['invalid value'],
-      };
-      helper(validationErrors, 'property_name', fakeOptions);
-      expect(fakeOptions.inverse).toHaveBeenCalled();
-    }
+  function () {
+    let validationErrors = {
+      'property_name.4': ['invalid value'],
+    };
+    helper(validationErrors, 'property_name', fakeOptions);
+    expect(fakeOptions.inverse).toHaveBeenCalled();
+  }
   );
 });

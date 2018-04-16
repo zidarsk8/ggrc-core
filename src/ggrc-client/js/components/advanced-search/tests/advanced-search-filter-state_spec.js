@@ -17,20 +17,20 @@ describe('GGRC.Components.advancedSearchFilterState', function () {
 
   describe('stateModel set() method', function () {
     it('initializes all "filterStates" checked if "stateModel" is empty',
-    function () {
-      let states = ['state1', 'state2', 'state3'];
-      spyOn(StateUtils, 'getDefaultStatesForModel')
-        .and.returnValue(states);
-      spyOn(StateUtils, 'getStatesForModel')
-        .and.returnValue(states);
-      viewModel.attr('modelName', 'Section');
+      function () {
+        let states = ['state1', 'state2', 'state3'];
+        spyOn(StateUtils, 'getDefaultStatesForModel')
+          .and.returnValue(states);
+        spyOn(StateUtils, 'getStatesForModel')
+          .and.returnValue(states);
+        viewModel.attr('modelName', 'Section');
 
-      viewModel.attr('stateModel', {});
+        viewModel.attr('stateModel', {});
 
-      viewModel.attr('filterStates').each(function (item) {
-        expect(item.checked).toBeTruthy();
+        viewModel.attr('filterStates').each(function (item) {
+          expect(item.checked).toBeTruthy();
+        });
       });
-    });
 
     it('initializes all "filterStates" unchecked ' +
        'if "stateModel.items" is empty',
@@ -47,19 +47,19 @@ describe('GGRC.Components.advancedSearchFilterState', function () {
     });
 
     it('initializes "filterStates" checked with items from "stateModel"',
-    function () {
-      let selectedItems;
-      viewModel.attr('modelName', 'Section');
-      viewModel.attr('stateModel', {
-        items: ['Active'],
-      });
+      function () {
+        let selectedItems;
+        viewModel.attr('modelName', 'Section');
+        viewModel.attr('stateModel', {
+          items: ['Active'],
+        });
 
-      selectedItems = _.filter(viewModel.attr('filterStates'), function (it) {
-        return it.checked;
+        selectedItems = _.filter(viewModel.attr('filterStates'), function (it) {
+          return it.checked;
+        });
+        expect(selectedItems.length).toBe(1);
+        expect(selectedItems[0].value).toBe('Active');
       });
-      expect(selectedItems.length).toBe(1);
-      expect(selectedItems[0].value).toBe('Active');
-    });
   });
 
   describe('saveTreeStates() method', function () {

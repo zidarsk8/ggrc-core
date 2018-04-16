@@ -4,7 +4,7 @@
  */
 
 import Component,
-  {FLOAT_NUMBER_PATTERN, INT_NUMBER_PATTERN, NEGATIVE_NUMBER_PATTERN}
+{FLOAT_NUMBER_PATTERN, INT_NUMBER_PATTERN, NEGATIVE_NUMBER_PATTERN}
   from '../numberbox';
 
 describe('GGRC.Components.numberbox', () => {

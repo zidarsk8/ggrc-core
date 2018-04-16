@@ -1,4 +1,4 @@
-  /*
+/*
   Copyright (C) 2018 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
@@ -59,10 +59,10 @@ import {
             can.trigger(el, 'refreshTree');
 
             return initCounts([
-                WorkflowExtension.countsMap.history,
-              ],
-                pageInstance.type,
-                pageInstance.id);
+              WorkflowExtension.countsMap.history,
+            ],
+            pageInstance.type,
+            pageInstance.id);
           }.bind(this));
       },
     },

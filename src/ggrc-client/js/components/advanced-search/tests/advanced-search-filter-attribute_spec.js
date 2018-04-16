@@ -18,23 +18,23 @@ describe('GGRC.Components.advancedSearchFilterAttribute', function () {
 
   describe('availableAttributes set() method', function () {
     it('initializes "attribute.field" property with first available attribute',
-    function () {
-      viewModel.attr('availableAttributes', [{
-        attr_title: 'FirstAttr',
-      }]);
+      function () {
+        viewModel.attr('availableAttributes', [{
+          attr_title: 'FirstAttr',
+        }]);
 
-      expect(viewModel.attr('attribute').field).toBe('FirstAttr');
-    });
+        expect(viewModel.attr('attribute').field).toBe('FirstAttr');
+      });
 
     it('does not intialize "attribute.field" when it is already initialized',
-    function () {
-      viewModel.attr('attribute.field', 'Field');
-      viewModel.attr('availableAttributes', [{
-        attr_title: 'FirstAttr',
-      }]);
+      function () {
+        viewModel.attr('attribute.field', 'Field');
+        viewModel.attr('availableAttributes', [{
+          attr_title: 'FirstAttr',
+        }]);
 
-      expect(viewModel.attr('attribute').field).toBe('Field');
-    });
+        expect(viewModel.attr('attribute').field).toBe('Field');
+      });
   });
 
   describe('remove() method', function () {

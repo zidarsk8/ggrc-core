@@ -21,17 +21,17 @@ describe('GGRC.Components.lazyRender', function () {
 
   it('should re-render content when the trigger is truthy and '+
      'forceClearContent is set',
-    function () {
-      viewModel.attr('trigger', true);
-      // content is rendered
-      expect(viewModel.attr('activatedOrForceRender')).toBe(true);
+  function () {
+    viewModel.attr('trigger', true);
+    // content is rendered
+    expect(viewModel.attr('activatedOrForceRender')).toBe(true);
 
-      viewModel.attr('forceClearContent', true);
-      // content cleared
-      expect(viewModel.attr('activatedOrForceRender')).toBe(false);
+    viewModel.attr('forceClearContent', true);
+    // content cleared
+    expect(viewModel.attr('activatedOrForceRender')).toBe(false);
 
-      viewModel.attr('forceClearContent', false);
-      // content rendered again
-      expect(viewModel.attr('activatedOrForceRender')).toBe(true);
-    });
+    viewModel.attr('forceClearContent', false);
+    // content rendered again
+    expect(viewModel.attr('activatedOrForceRender')).toBe(true);
+  });
 });
