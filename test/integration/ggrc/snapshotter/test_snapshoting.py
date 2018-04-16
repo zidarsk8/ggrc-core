@@ -72,8 +72,6 @@ class TestSnapshoting(SnapshotterBaseTestCase):
       roles_map[parent.name] = role
     return roles_map
 
-
-
   def test_snapshot_create(self):
     """Test simple snapshot creation with a simple change"""
 

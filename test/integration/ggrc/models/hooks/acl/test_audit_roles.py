@@ -4,7 +4,6 @@
 """Test Access Control Propagation for Audit Roles like
    Auditor & Audit Captains"""
 
-from collections import defaultdict
 from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db

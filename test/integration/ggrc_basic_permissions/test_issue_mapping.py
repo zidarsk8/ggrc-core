@@ -69,8 +69,6 @@ class TestIssueMapping(TestCase):
     self.snapshots = {}
     self.issues = {}
     self.control = factories.ControlFactory()
-    revision = all_models.Revision.query.filter(
-        all_models.Revision.resource_type == self.control.type).first()
     for is_archived in (False, True):
       audit = self.audits[is_archived]
       self.snapshots[is_archived] = self._create_snapshots(
@@ -78,8 +76,8 @@ class TestIssueMapping(TestCase):
           [self.control],
       )[0]
       factories.RelationshipFactory(
-        source=audit,
-        destination=self.snapshots[is_archived],
+          source=audit,
+          destination=self.snapshots[is_archived],
       )
 
       # Create an issue
@@ -146,4 +144,3 @@ class TestIssueMapping(TestCase):
     relationship = all_models.Relationship.query.filter_by(id=rel_id).first()
     response = self.api.delete(relationship)
     self.assertStatus(response, 200)
-
