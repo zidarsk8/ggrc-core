@@ -121,8 +121,8 @@ class TestAuditArchivingBase(TestCase):
         snapshot = factories.SnapshotFactory(
             child_id=revision.resource_id,
             child_type=revision.resource_type,
-            revision=revision,
             parent=audit,
+            revision=revision,
             context=audit.context,
         )
         factories.RelationshipFactory(source=audit, destination=snapshot)

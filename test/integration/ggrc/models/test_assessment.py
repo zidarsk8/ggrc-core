@@ -433,7 +433,7 @@ class TestAssessmentUpdates(ggrc.TestCase):
     _, audit = self.generator.generate_object(
         all_models.Audit,
         {
-            "title": "Audit",
+            "title": "Assessment Updates Audit",
             "program": {"id": program_id},
             "status": "Planned"
         },
@@ -444,12 +444,12 @@ class TestAssessmentUpdates(ggrc.TestCase):
           all_models.Assessment,
           {
               "title": "Assessment-Comment",
-              "audit": {"id": audit.id},
+              "audit": {"id": audit.id, "type": "Audit"},
               "audit_title": audit.title,
               "people_value": [],
               "default_people": {
-                  "assignees": "Admin",
                   "verifiers": "Admin",
+                  "assignees": "Admin",
               },
               "context": {"id": audit.context.id},
           }
