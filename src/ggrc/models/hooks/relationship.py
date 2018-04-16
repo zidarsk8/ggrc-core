@@ -12,7 +12,6 @@ from collections import defaultdict, namedtuple
 import sqlalchemy as sa
 
 from ggrc import login, db
-from ggrc.access_control.role import get_custom_roles_for
 from ggrc.models.mixins.assignable import Assignable
 from ggrc.models.hooks import assessment
 from ggrc.models.relationship import Stub
@@ -282,26 +281,6 @@ def related(base_objects, rel_cache):
 
   return {o: (rel_cache.cache[o] if o in rel_cache.cache else set())
           for o in base_objects}
-
-
-def get_mapped_role(object_type, acr_name, mapped_obj_type):
-  """Get AC role that is mapped to provided one.
-
-  Args:
-    object_type(str): Type of object
-    acr_name(str): Name of AC role
-    mapped_obj_type(str): Type of mapped object
-
-  Returns:
-    Id of AC role with name '<Assignee type> Mapped' or
-    '<Assignee type> Document Mapped' will be returned
-  """
-  obj_roles = {
-      role_name: role_id
-      for role_id, role_name in get_custom_roles_for(object_type).items()
-  }
-  doc_part = " Document" if mapped_obj_type == "Document" else ""
-  return obj_roles.get("{}{} Mapped".format(acr_name, doc_part))
 
 
 def copy_snapshot_test_plan(objects):
