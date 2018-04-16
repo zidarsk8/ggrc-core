@@ -25,6 +25,21 @@ def _add_or_update(name, value):
     setattr(flask.g, name, value)
 
 
+def add_relationships(relationship_ids):
+  """Add extra relationships to propagation queue.
+
+  This function is needed to allow propagation of manually created
+  relationships from raw SQL statements. The most common examples for this are
+  snapshot relationships and automappings.
+
+  Args:
+    relationship_ids: set of ids that might have to propagate permissions.
+  """
+  _add_or_update("new_acl_ids", set())
+  _add_or_update("new_relationship_ids", relationship_ids)
+  _add_or_update("deleted_objects", set())
+
+
 def _get_propagation_entries(session):
   acl_ids = set()
   relationship_ids = set()
