@@ -187,7 +187,6 @@ permissions = {
             "condition": "is"
         },
     ],
-    "view_object_page": owner_read,
     "update": owner_update,
     "delete": owner_update,
 }

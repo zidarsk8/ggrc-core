@@ -177,9 +177,6 @@ permissions = {
         "Context",
         "BackgroundTask",
     ],
-    "view_object_page": [
-        "__GGRC_ALL__"
-    ],
     "update": owner_update,
     "delete": owner_update,
 }

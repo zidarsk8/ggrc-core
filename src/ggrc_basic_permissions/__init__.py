@@ -348,8 +348,7 @@ def load_access_control_list(user, permissions):
   )
 
   for object_type, object_id, read, update, delete in access_control_list:
-    actions = (("read", read), ("view_object_page", read),
-               ("update", update), ("delete", delete))
+    actions = (("read", read), ("update", update), ("delete", delete))
     for action, allowed in actions:
       if not allowed:
         continue
