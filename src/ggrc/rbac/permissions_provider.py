@@ -438,10 +438,6 @@ class DefaultUserPermissions(object):
     """All resources in which the user has delete permission."""
     return self._get_resources_for('delete', resource_type)
 
-  def is_allowed_view_object_page_for(self, instance):
-    """All resources in which the user can access object page."""
-    return self._is_allowed_for(instance, 'read')
-
   def is_admin(self):
     """Whether the user has ADMIN permissions."""
     return self._is_allowed(self.ADMIN_PERMISSION)
