@@ -79,18 +79,6 @@ class CompletePermissionsProvider(object):
     pass
 
 
-class BasicUserPermissions(DefaultUserPermissions):
-  """User permissions that aren't kept in session."""
-
-  def __init__(self, user):
-    self.user = user
-    with benchmark('BasicUserPermissions > load permissions for user'):
-      self.permissions = load_permissions_for(user)
-
-  def _permissions(self):
-    return self.permissions
-
-
 class UserPermissions(DefaultUserPermissions):
   """User permissions cached in the global session object"""
 
