@@ -2,9 +2,10 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from collections import namedtuple
+
 from flask import g
 from flask.ext.login import current_user
-from .user_permissions import UserPermissions
+
 from ggrc.app import db
 from ggrc.rbac.permissions import permissions_for as find_permissions
 from ggrc.rbac.permissions import is_allowed_create
@@ -198,7 +199,8 @@ _CONDITIONS_MAP = {
 }
 
 
-class DefaultUserPermissions(UserPermissions):
+class DefaultUserPermissions(object):
+  """Common logic for user permissions."""
   # super user, context_id 0 indicates all contexts
   ADMIN_PERMISSION = Permission(
       '__GGRC_ADMIN__',
