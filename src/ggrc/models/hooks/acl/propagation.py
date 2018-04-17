@@ -222,7 +222,8 @@ def _handle_propagation_children(new_parent_ids):
   _insert_select_acls(select_statement)
 
 
-def _handle_propagation_relationships(relationship_ids, new_acl_ids):
+def _handle_propagation_rel(relationship_ids, new_acl_ids):
+  """Handle propagation for relationship object."""
   src_select = _rel_parent(
       parent_acl_ids=new_acl_ids,
       relationship_ids=relationship_ids,
@@ -257,7 +258,7 @@ def _handle_acl_step(parent_acl_ids):
 def _handle_relationship_step(relationship_ids, new_acl_ids):
   """Propagate first level or ACLs caused by new relationships."""
 
-  _handle_propagation_relationships(relationship_ids, new_acl_ids)
+  _handle_propagation_rel(relationship_ids, new_acl_ids)
   new_parent_ids = _get_relationship_acl_ids(relationship_ids)
   _handle_propagation_children(new_parent_ids)
 
@@ -286,6 +287,11 @@ def _propagate(parent_acl_ids):
 
 
 def _propagate_relationships(relationship_ids, new_acl_ids):
+  """Start ACL propagation for newly created relationships.
+
+  Note this function will only propagate old ACL entries. All newly created
+  ones will be propagated after relationship propagation finishes.
+  """
   if not relationship_ids:
     return
   child_ids = _handle_relationship_step(relationship_ids, new_acl_ids)
@@ -293,6 +299,13 @@ def _propagate_relationships(relationship_ids, new_acl_ids):
 
 
 def _delete_orphan_acl_entries(deleted_objects):
+  """Delete ACL entries for deleted objects.
+
+  This is a quicker way to ensure all ACL entries are removed when our ORM
+  object is deleted. The default way with using ORM mapper would require all
+  internal roles to be loaded before they can be deleted. But since we can do
+  that with a simple filter, using this method is more efficient.
+  """
   if not deleted_objects:
     return
 
@@ -312,7 +325,11 @@ def _delete_orphan_acl_entries(deleted_objects):
 
 
 def _delete_all_propagated_acls():
+  """Delete all propagater acl entries.
 
+  This function is used as cleanup before we re-evaluate propagation for all
+  objects.
+  """
   acl_table = all_models.AccessControlList.__table__
   db.session.execute(
       acl_table.delete().where(
@@ -350,6 +367,7 @@ def propagate():
 
 
 def propagate_all():
+  """Re-evaluate propagation for all objects."""
   logger.info("ACL propagation started")
   logger.info("Deleting existing propagated roles")
   _delete_all_propagated_acls()

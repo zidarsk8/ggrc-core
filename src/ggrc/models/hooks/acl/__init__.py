@@ -41,6 +41,14 @@ def add_relationships(relationship_ids):
 
 
 def _get_propagation_entries(session):
+  """Get object ids for objects that affect propagation.
+
+  Args:
+    session: db session with all objects
+
+  Returns:
+    lists of ids of new ACL, relationship, and delete objects
+  """
   acl_ids = set()
   relationship_ids = set()
   for obj in session.new:

@@ -17,7 +17,7 @@ from integration.ggrc.models.test_assessment_base import TestAssessmentBase
 @ddt.ddt
 class TestAssessmentGeneration(TestAssessmentBase):
   """Test assessment generation"""
-  # pylint: disable=invalid-name
+  # pylint: disable=invalid-name,too-many-public-methods
 
   def setUp(self):
     super(TestAssessmentGeneration, self).setUp()

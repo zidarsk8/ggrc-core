@@ -87,9 +87,9 @@ class TestAuditArchivingBase(TestCase):
   def setUpClass(cls):
     """Prepare data needed to run the tests."""
     TestCase.clear_data()
-    cls.response = cls._import_file("audit_rbac.csv")
 
     with app.app_context():
+      cls.response = cls._import_file("audit_rbac.csv")
       cls.people = {
           person.name: person
           for person in all_models.Person.eager_query().all()

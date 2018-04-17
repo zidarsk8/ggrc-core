@@ -211,9 +211,10 @@ def do_reindex():
 
 class SetEncoder(json.JSONEncoder):
   """Encoder that can handle python sets"""
-  # pylint: disable=E0202
+  # pylint: disable=method-hidden
+  # false positive: https://github.com/PyCQA/pylint/issues/414
 
-  def default(self, obj):
+  def default(self, obj):  # pylint: disable=arguments-differ
     """If we get a set we first transform it to a list and then just use
        the default encoder"""
     if isinstance(obj, set):
@@ -508,6 +509,7 @@ def admin_refresh_revisions():
 @login_required
 @admin_required
 def send_event_job():
+  """Trigger background task on every event for computed attributes."""
   with benchmark("POST /admin/compute_attributes"):
     if request.data:
       revision_ids = request.get_json().get("revision_ids", [])

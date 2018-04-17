@@ -39,6 +39,7 @@ def read_imported_file(file_data):  # pylint: disable=unused-argument
 
 
 class SetEncoder(json.JSONEncoder):
+  """Custom json encoder that supports sets."""
   # pylint: disable=method-hidden
   # false positive: https://github.com/PyCQA/pylint/issues/414
 
@@ -82,6 +83,7 @@ class TestCase(BaseTestCase, object):
     for role_id, name in ac_role.get_custom_roles_for(obj.type).iteritems():
       if name == role_name:
         return role_id
+    return None
 
   def get_persons_for_role_name(self, obj, role_name):
     """Generator. Return persons releated to sent instance and role_name."""
@@ -91,6 +93,7 @@ class TestCase(BaseTestCase, object):
         yield acl.person
 
   def _full_reindex(self):
+    """Run reindex for all objects and attributes."""
     self.client.get("/login")
     self.client.post("/admin/reindex")
     self.client.post("/admin/reindex_snapshots")

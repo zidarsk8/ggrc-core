@@ -60,6 +60,7 @@ class TestSnapshoting(SnapshotterBaseTestCase):
 
   @classmethod
   def _get_propagated_base_roles(cls, object_type):
+    """Get base roles map for propagated roles."""
     roles = models.AccessControlRole.query.filter(
         models.AccessControlRole.object_type == object_type,
         models.AccessControlRole.parent_id.isnot(None),

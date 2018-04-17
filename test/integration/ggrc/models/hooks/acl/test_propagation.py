@@ -4,11 +4,15 @@
 """Test Access Control Propagation for Audit Roles like
    Auditor & Audit Captains"""
 
+# pylint: disable=protected-access
+# Disable protected access since this test suite tests internal function for
+# ACL propagation.
+
 from collections import defaultdict
 
 import ddt
-import sqlalchemy as sa
 import flask
+import sqlalchemy as sa
 from sqlalchemy.orm.session import Session
 
 from ggrc import app
@@ -211,9 +215,9 @@ class TestPropagation(TestCase):
 
     propagation._propagate(acl_ids)
 
-    acl = all_models.AccessControlList
-    assessment_acls = acl.query.filter(
-        acl.object_type == all_models.Assessment.__name__
+    assessment_acls = all_models.AccessControlList.query.filter(
+        all_models.AccessControlList.object_type ==
+        all_models.Assessment.__name__
     ).all()
 
     self.assertEqual(
@@ -239,10 +243,7 @@ class TestPropagation(TestCase):
 
       # This is excluded from propagation to test for proper filtering
       assessment3 = factories.AssessmentFactory(audit=audit)
-      factories.RelationshipFactory(
-          source=assessment3,
-          destination=audit,
-      ).id
+      factories.RelationshipFactory(source=assessment3, destination=audit)
 
       relationship_ids = [
           factories.RelationshipFactory(
@@ -321,6 +322,7 @@ class TestPropagation(TestCase):
       self.assertEqual(all_models.AccessControlList.query.count(), 4)
 
   def test_propagate_all(self):
+    """Test clean propagation of all ACL entries."""
     with factories.single_commit():
       person = factories.PersonFactory()
       audit = factories.AuditFactory()

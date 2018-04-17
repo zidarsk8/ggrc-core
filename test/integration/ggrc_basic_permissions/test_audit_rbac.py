@@ -1,24 +1,22 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Test audit RBAC"""
-from ggrc import app  # noqa  # pylint: disable=unused-import
+"""Test audit RBAC."""
 import copy
-
 from os.path import abspath
 from os.path import dirname
 from os.path import join
 from collections import defaultdict
 
-from ggrc.models import all_models
+from appengine import base
 
+from ggrc import app  # noqa  # pylint: disable=unused-import
+from ggrc.models import all_models
 from integration.ggrc import TestCase
 from integration.ggrc.access_control import acl_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc.models import factories
-
-from appengine import base
 
 
 class TestAuditRBAC(TestCase):
@@ -28,6 +26,7 @@ class TestAuditRBAC(TestCase):
 
   @classmethod
   def setUpClass(cls):
+    """Base setup for entire test suite."""
     TestCase.clear_data()
     cls.response = cls._import_file("audit_rbac.csv")
     cls.people = all_models.Person.eager_query().all()
@@ -108,7 +107,7 @@ class TestPermissionsOnAssessmentTemplate(TestCase):
   @classmethod
   def _get_assessment_template_base(cls, title, audit):
     return {
-        "title": "123",
+        "title": title,
         "_NON_RELEVANT_OBJ_TYPES": {},
         "_objectTypes": {},
         "audit": {"id": audit.id},

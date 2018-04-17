@@ -68,30 +68,32 @@ def init_app(app):
 
 
 def get_current_user():
-  # used for a deferred function
-  # that might contain usage of get_current_user
+  """Get user.
+
+  used for a deferred function
+  that might contain usage of get_current_user
+  """
   if hasattr(g, '_current_user'):
     return getattr(g, '_current_user')
 
   if get_login_module():
     return flask_login.current_user
-  else:
-    return None
+  return None
 
 
 def get_current_user_id():
+  """Get currently logged in user id."""
   user = get_current_user()
   if bool(user) and not user.is_anonymous():
     return user.id
-  else:
-    return None
+  return None
 
 
 def login_required(func):
+  """Decorator for functions that require users to be logged in."""
   if get_login_module():
     return flask_login.login_required(func)
-  else:
-    return func
+  return func
 
 
 def admin_required(func):

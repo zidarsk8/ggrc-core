@@ -109,8 +109,7 @@ class TestCreatorAudit(TestCase):
     response = self.api.get(obj.__class__, obj.id)
     if response.status_code == 200:
       return self.api.put(obj, response.json).status_code
-    else:
-      return response.status_code
+    return response.status_code
 
   def map(self, dest):
     """Map audit to dest.
