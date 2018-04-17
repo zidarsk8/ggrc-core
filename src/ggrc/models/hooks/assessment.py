@@ -27,7 +27,7 @@ from ggrc.utils import referenced_objects
 logger = logging.getLogger(__name__)
 
 
-def validate_assessment_done_state(old_value, obj):
+def _validate_assessment_done_state(old_value, obj):
   """Checks if it's allowed to set done state from not done."""
   new_value = obj.status
   if old_value in obj.NOT_DONE_STATES and \
@@ -123,7 +123,7 @@ def init_hook():
     initial_state = kwargs['initial_state']
     old_value = initial_state.status
     try:
-      validate_assessment_done_state(old_value, obj)
+      _validate_assessment_done_state(old_value, obj)
     except StatusValidationError as error:
       db.session.rollback()
       raise error
