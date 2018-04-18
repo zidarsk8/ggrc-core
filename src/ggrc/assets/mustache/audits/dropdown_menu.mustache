@@ -3,16 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-    {{#if_helpers '\
-       #if' is_info_pin '\
-       and #is_allowed_to_map' page_instance instance '\
-       or #if' is_info_pin '\
-       and #if' instance.viewLink '\
-       and ^if' instance.archived '\
-       or #system_role' 'Administrator' '\
-       or #system_role' 'Superuser' '\
-       or #is_allowed' 'update' instance '\
-       ' _4_context='for'}}
     <div class="details-wrap">
       <a class="btn btn-3bbps dropdown-toggle" href="#" data-toggle="dropdown">
         <span class="bubble"></span>
@@ -164,4 +154,3 @@
         {{/if}}
       </ul>
     </div>
-    {{/if_helpers}}
