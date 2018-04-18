@@ -5,6 +5,7 @@
 
 import template from './templates/task-list.mustache';
 import Pagination from '../../base-objects/pagination';
+import Permission from '../../../permission';
 
 const viewModel = can.Map.extend({
   define: {
@@ -13,12 +14,22 @@ const viewModel = can.Map.extend({
         return new Pagination({pageSizeSelect: [5, 10, 15]});
       },
     },
+    showCreateTaskButton: {
+      get() {
+        const workflow = this.attr('workflow');
+        return (
+          Permission.is_allowed_for('update', this.attr('baseInstance')) &&
+          workflow && workflow.attr('status') !== 'Inactive'
+        );
+      },
+    },
   },
   relatedItemsType: 'TaskGroupTask',
   initialOrderBy: 'created_at',
   gridSpinner: 'grid-spinner',
   items: [],
   baseInstance: null,
+  workflow: null,
   updatePagingAfterCreate() {
     if (this.attr('paging.current') !== 1) {
       // items will be reloaded, because the current
