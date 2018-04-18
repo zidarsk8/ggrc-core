@@ -2,14 +2,7 @@
     Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-
-    <div class="details-wrap">
-      <a class="btn btn-3bbps dropdown-toggle" href="#" data-toggle="dropdown">
-        <span class="bubble"></span>
-        <span class="bubble"></span>
-        <span class="bubble"></span>
-      </a>
-      <ul class="dropdown-menu three-dots-list" aria-labelledby="drop1" role="menu">
+      <three-dots-menu>
         {{^if instance.archived}}
           {{#is_allowed 'update' instance context='for'}}
             {{#if instance.is_snapshotable}}
@@ -152,5 +145,4 @@
                 </li>
             {{/if_helpers}}
         {{/if}}
-      </ul>
-    </div>
+      </three-dots-menu>
