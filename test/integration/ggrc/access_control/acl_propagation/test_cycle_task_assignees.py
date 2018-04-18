@@ -226,5 +226,5 @@ class TestCycleTaskAssigneesPropagation(base.TestACLPropagation):
 
   @helpers.unwrap(PERMISSIONS)
   def test_access(self, role, model, action_name, expected_result):
-    """Test {2} for {1} under Cycle Task Assignees {0}"""
+    """Cycle Task Assignees {0:<7}: On {1:<21}test {2:<19}- Expected {3:<3}"""
     self.runtest(role, model, action_name, expected_result)
