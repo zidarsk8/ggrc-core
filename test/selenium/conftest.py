@@ -5,11 +5,14 @@
 # pylint: disable=global-variable-not-assigned
 # pylint: disable=unused-argument
 # pylint: disable=redefined-outer-name
-
+import logging
 import os
 import urlparse
 
 import pytest
+from pytest_selenium import pytest_selenium
+from selenium.webdriver.remote.remote_connection import (
+    LOGGER as SELENIUM_LOGGER)
 
 from lib import dynamic_fixtures, environment, url
 from lib.constants.test_runner import DESTRUCTIVE_TEST_METHOD_PREFIX
@@ -44,35 +47,27 @@ def pytest_xdist_make_scheduler(config, log):
   return CustomPytestScheduling(config, log)
 
 
-@pytest.mark.hookwrapper
-def pytest_runtest_makereport(item, call):
-  """Replace common screenshot from html-report by full size screenshot."""
-  # pylint: disable=too-many-locals
-  outcome = yield
-  report = outcome.get_result()
-  summary = []
-  extra = getattr(report, "extra", [])
-  driver = getattr(item, "_driver", None)
-  xfail = hasattr(report, "wasxfail")
-  failure = (report.skipped and xfail) or (report.failed and not xfail)
-  when = item.config.getini("selenium_capture_debug").lower()
-  capture_debug = when == "always" or (when == "failure" and failure)
-  pytest_html = item.config.pluginmanager.getplugin("html")
-  if driver is not None and capture_debug and pytest_html is not None:
-    exclude = item.config.getini("selenium_exclude_debug").lower()
-    if "screenshot" not in exclude:
-      try:
-        screenshot = get_full_screenshot_as_base64(driver)
-        for ex in extra:
-          if ex["name"] == "Screenshot":
-            extra.remove(ex)
-        # add screenshot to the html report
-        extra.append(pytest_html.extras.image(screenshot, "Screenshot"))
-      except Exception as e:
-        summary.append("WARNING: Failed to gather screenshot: {0}".format(e))
-  if summary:
-    report.sections.append(("pytest-selenium", "\n".join(summary)))
-  report.extra = extra
+def patch_pytest_selenium_screenshot():
+  """Patch pytest-selenium's _gather_screenshot function to make screenshot
+  of the full page."""
+  # pylint: disable=protected-access
+
+  def gather_screenshot(item, report, driver, summary, extra):
+    """Add link to the screenshot of the full page to HTML report"""
+    try:
+      # Only below line is changed
+      screenshot = get_full_screenshot_as_base64(driver)
+    except Exception as e:
+      summary.append('WARNING: Failed to gather screenshot: {0}'.format(e))
+      return
+    pytest_html = item.config.pluginmanager.getplugin('html')
+    if pytest_html is not None:
+      extra.append(pytest_html.extras.image(screenshot, 'Screenshot'))
+
+  pytest_selenium._gather_screenshot = gather_screenshot
+
+
+patch_pytest_selenium_screenshot()
 
 
 def pytest_addoption(parser):
@@ -80,6 +75,25 @@ def pytest_addoption(parser):
   parser.addoption('--headless',
                    action='store',
                    help='enable headless mode for supported browsers.')
+
+
+# Disable selenium's remote_connection.py DEBUG statements that pollute
+# test stdout.
+# They aren't needed as driver logs are included into links of HTML report.
+SELENIUM_LOGGER.setLevel(logging.INFO)
+
+
+@pytest.fixture(scope="session")
+def session_capabilities(session_capabilities):
+  """Log browser (console log) and performance (request / response headers)
+  data.
+  They will appear in `Links` section of pytest-html's html report.
+  """
+  session_capabilities["loggingPrefs"] = {
+      "browser": "ALL",
+      "performance": "ALL"
+  }
+  return session_capabilities
 
 
 @pytest.fixture(scope="function")

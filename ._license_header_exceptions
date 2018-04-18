@@ -66,4 +66,3 @@
 < test/selenium/LICENSE
 < test/selenium/pytest.ini
 < test/selenium/README.md
-< test/selenium/src/examples/pytest.ini
