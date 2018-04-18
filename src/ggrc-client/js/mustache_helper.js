@@ -2322,8 +2322,7 @@ Mustache.registerHelper('has_role', function (role, instance, options) {
 });
 
 Mustache.registerHelper('user_roles', (person, parentInstance, options) => {
-  const allRoles = GGRC.access_control_roles.concat(
-    GGRC.internal_access_control_roles);
+  const allRoles = GGRC.access_control_roles;
   let roles = {};
   let allRoleNames = [];
 
