@@ -98,7 +98,7 @@ provision_dev_for_selenium() {
   echo "Running dev server $dev_server"
   docker exec -id ${PROJECT}_${dev_server} bash -c "
     source /vagrant/bin/init_vagrant_env
-    launch_gae_ggrc
+    launch_gae_ggrc &> test/selenium/logs/${dev_server}.txt
   "
 }
 
@@ -123,6 +123,9 @@ integration_tests () {
 selenium_tests () {
   PROJECT=$1
   print_line
+
+  mkdir -p test/selenium/logs
+  rm -rf test/selenium/logs/*
 
   for dev_server in cleandev_1 cleandev_destructive_1; do
     provision_dev_for_selenium $dev_server &

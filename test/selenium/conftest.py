@@ -19,7 +19,7 @@ from lib.constants.test_runner import DESTRUCTIVE_TEST_METHOD_PREFIX
 from lib.custom_pytest_scheduling import CustomPytestScheduling
 from lib.page import dashboard
 from lib.service import rest_service
-from lib.utils import selenium_utils, help_utils
+from lib.utils import conftest_utils, help_utils, selenium_utils
 from lib.utils.selenium_utils import get_full_screenshot_as_base64
 
 
@@ -45,6 +45,38 @@ def _snapshots_fixtures(fixturename):
 def pytest_xdist_make_scheduler(config, log):
   """Set the test scheduler for Pytest-xdist to a custom scheduler"""
   return CustomPytestScheduling(config, log)
+
+
+def pytest_runtest_setup(item):
+  """Set test variables that depend on dev server used
+  (`dev` or `dev_destructive`):
+  * environment.app_url
+  * dev_log_retriever
+  """
+  if DESTRUCTIVE_TEST_METHOD_PREFIX in item.name:
+    environment.app_url = os.environ["DEV_DESTRUCTIVE_URL"]
+    filename = os.environ["DEV_DESTRUCTIVE_LOG"]
+  else:
+    environment.app_url = os.environ["DEV_URL"]
+    filename = os.environ["DEV_LOG"]
+  environment.app_url = urlparse.urljoin(environment.app_url, "/")
+  item.dev_log_retriever = conftest_utils.DevLogRetriever(filename)
+
+
+@pytest.mark.hookwrapper
+def pytest_runtest_makereport(item, call):
+  """Add dev server log as an extra link to HTML report"""
+  outcome = yield
+  report = outcome.get_result()
+  extra = getattr(report, "extra", [])
+  xfail = hasattr(report, "wasxfail")
+  failure = (report.skipped and xfail) or (report.failed and not xfail)
+  pytest_html = item.config.pluginmanager.getplugin("html")
+  has_dev_log_retriever = hasattr(item, "dev_log_retriever")
+  if failure and pytest_html is not None and has_dev_log_retriever:
+    dev_logs = item.dev_log_retriever.get_added_logs()
+    extra.append(pytest_html.extras.text(dev_logs, "Dev Server Log"))
+  report.extra = extra
 
 
 def patch_pytest_selenium_screenshot():
@@ -141,17 +173,6 @@ def chrome_options(chrome_options, pytestconfig):
 # `environment.app_url` should be already set.
 environment.app_url = os.environ["DEV_URL"]
 environment.app_url = urlparse.urljoin(environment.app_url, "/")
-
-
-@pytest.fixture(scope="function", autouse=True)
-def dev_url(request):
-  """Set environment.app_url to be used as a base url"""
-  if DESTRUCTIVE_TEST_METHOD_PREFIX in request.node.name:
-    environment.app_url = os.environ["DEV_DESTRUCTIVE_URL"]
-  else:
-    environment.app_url = os.environ["DEV_URL"]
-  environment.app_url = urlparse.urljoin(environment.app_url, "/")
-  return environment.app_url
 
 
 @pytest.fixture(scope="function")
