@@ -85,25 +85,6 @@ class BaseClientTest(unittest.TestCase):
                     },
                 },
             ],
-            'next_page_token': 'token1',
-        },
-        {
-            'issues': [],
-            'next_page_token': 'token2',
-        },
-        {
-            'issues': [
-                {
-                    'issueId': 't3',
-                    'issueState': {
-                        'status': 'FIXED',
-                        'type': 'bug3',
-                        'priority': 'P3',
-                        'severity': 'S3',
-                    },
-                },
-            ],
-            'next_page_token': None,
         },
     ])
     with mock.patch.object(utils.issues, 'Client', return_value=cli_mock):
@@ -123,30 +104,11 @@ class BaseClientTest(unittest.TestCase):
                   'severity': 'S2',
               },
           },
-          {
-              't3': {
-                  'status': 'FIXED',
-                  'type': 'bug3',
-                  'priority': 'P3',
-                  'severity': 'S3',
-              },
-          },
       ])
       self.assertEqual(cli_mock.search.call_args_list, [
           mock.call({
               'issue_ids': [1, 2, 3],
               'page_size': 100,
-              'page_token': None,
-          }),
-          mock.call({
-              'issue_ids': [1, 2, 3],
-              'page_size': 100,
-              'page_token': 'token1',
-          }),
-          mock.call({
-              'issue_ids': [1, 2, 3],
-              'page_size': 100,
-              'page_token': 'token2',
           }),
       ])
 
