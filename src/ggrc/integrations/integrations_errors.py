@@ -25,6 +25,11 @@ class HttpError(Error):
   def __str__(self):
     return '%s %s' % (self.status, self.data)
 
+  def __repr__(self):
+    """Return representation of an HttpError."""
+    return '%s(status=%s, data=%s)' % (
+        self.__class__.__name__, self.status, self.data)
+
 
 class BadResponseError(Error):
   """Wrong formatted response error."""

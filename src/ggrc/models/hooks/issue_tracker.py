@@ -293,18 +293,10 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):
   issue_obj = all_models.IssuetrackerIssue.get_issue(
       _ASSESSMENT_MODEL_NAME, obj.id)
 
-  logger.info(
-      '--> _handle_issuetracker: issue_obj=%s',
-      issue_obj)
-
   initial_info = issue_obj.to_dict(
       include_issue=True,
       include_private=True) if issue_obj is not None else {}
   issue_tracker_info = dict(initial_info, **(src.get('issue_tracker') or {}))
-
-  logger.info(
-      '--> _handle_issuetracker: initial_info=%s',
-      initial_info)
 
   if issue_tracker_info.get('enabled'):
 
@@ -321,19 +313,21 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):
     issue_tracker_info['enabled'] = False
 
   initial_assessment = kwargs.pop('initial_state', None)
-  logger.info(
-      '--> _handle_issuetracker: issue_tracker_info=%s',
-      issue_tracker_info)
   try:
     _update_issuetracker_issue(
         obj, issue_tracker_info, initial_assessment, initial_info, src)
   except integrations_errors.Error as error:
-    logger.error(
-        'Unable to update a ticket ID=%s while updating assessment ID=%d: %s',
-        issue_id, obj.id, error)
-    issue_tracker_info = {
-        'enabled': False,
-    }
+    if error.status == 429:
+      logger.error(
+          'The request updating ticket ID=%s for assessment ID=%d was '
+          'rate limited: %s', issue_id, obj.id, error)
+    else:
+      logger.error(
+          'Unable to update a ticket ID=%s while updating '
+          'assessment ID=%d: %s', issue_id, obj.id, error)
+      issue_tracker_info = {
+          'enabled': False,
+      }
     obj.add_warning('issue_tracker', 'Unable to update a ticket.')
 
   _update_issuetracker_info(obj, issue_tracker_info)
@@ -651,15 +645,6 @@ def _is_issue_tracker_enabled(audit=None):
   return True
 
 
-def _update_issue_params_assignee(issue_params, issue_tracker_info):
-  """Change issue_params if assignee has been provided."""
-  assignee = issue_tracker_info.get('assignee')
-  if assignee:
-    issue_params['status'] = 'ASSIGNED'
-    issue_params['assignee'] = assignee
-    issue_params['verifier'] = assignee
-
-
 def _create_issuetracker_issue(assessment, issue_tracker_info):
   """Collects information and sends a request to create external issue."""
   _normalize_issue_tracker_info(issue_tracker_info)
@@ -712,7 +697,11 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
       'comment': '\n'.join(comment),
   }
 
-  _update_issue_params_assignee(issue_params, issue_tracker_info)
+  assignee = issue_tracker_info.get('assignee')
+  if assignee:
+    issue_params['status'] = 'ASSIGNED'
+    issue_params['assignee'] = assignee
+    issue_params['verifier'] = assignee
 
   cc_list = issue_tracker_info.get('cc_list')
   if cc_list is not None:
@@ -731,9 +720,6 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
           _is_issue_tracker_enabled(audit=assessment.audit)):
 
     assignee_email, cc_list = _collect_issue_emails(assessment)
-    logger.info(
-        '--> _create_issuetracker_info: assignee_email=%s, cc_list=%s',
-        assignee_email, cc_list)
     if assignee_email is not None:
       issue_tracker_info['assignee'] = assignee_email
       issue_tracker_info['cc_list'] = cc_list
@@ -809,8 +795,8 @@ def _update_issuetracker_issue(assessment, issue_tracker_info,
   assignee_email, cc_list = _collect_issue_emails(assessment)
   if assignee_email is not None:
     issue_tracker_info['assignee'] = assignee_email
-    _update_issue_params_assignee(issue_params, issue_tracker_info)
-
+    issue_params['assignee'] = assignee_email
+    issue_params['verifier'] = assignee_email
     issue_params['ccs'] = cc_list
 
   if issue_params:

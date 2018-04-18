@@ -488,6 +488,8 @@ def handle_import_stop(**kwargs):
     logger.exception("Import stop failed due incorrect request data: %s",
                      e.message)
     raise BadRequest("Import stop failed due incorrect request data")
+  # Need to implement a better solution in order to identify specific
+  # errors like here
   raise BadRequest("Wrong status")
 
 

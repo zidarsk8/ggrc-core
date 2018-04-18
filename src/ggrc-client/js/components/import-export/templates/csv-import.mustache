@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="csv-import">
+<div class="csv-import {{^if isDownloadTemplateAvailable}}download-template-unavailable{{/if}}">
   <div class="csv-import__main">
     <div class="import-section import-notifications">
       {{#if fileName}}
@@ -26,7 +26,8 @@
           <spinner {toggle}="isLoading"></spinner>
 
           <button ($click)="selectFile()"
-                  class="btn btn-small btn-green">
+                  class="btn btn-small btn-green"
+                  {{#if isLoading}}disabled{{/if}}>
             {{#if importStatus}}
               Choose new file to import
             {{else}}
@@ -100,9 +101,8 @@
           <div class="">Import in Progress: <spinner {toggle}="true"></spinner></div>
         {{/case}}
       {{/switch}}
-      {{#isDownloadTemplateAvailable}}
-          <download-template></download-template>
-      {{/isDownloadTemplateAvailable}}
+
+      <download-template></download-template>
     </div>
 
     {{#isImportStopped}}

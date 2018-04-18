@@ -24,4 +24,10 @@ export default can.Component.extend({
       });
     },
   },
+  helpers: {
+    createdAt(date) {
+      let md = moment.utc(date());
+      return GGRC.Utils.formatDate(md.toDate());
+    },
+  },
 });
