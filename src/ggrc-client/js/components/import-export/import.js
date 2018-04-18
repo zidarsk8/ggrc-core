@@ -137,6 +137,7 @@ export default can.Component.extend({
         importStatus: '',
         message: '',
         isConfirm: false,
+        jobId: null,
       });
     },
     statusStrategies: {
@@ -219,10 +220,19 @@ export default can.Component.extend({
     },
     stopImport(jobId) {
       clearTimeout(this.attr('trackId'));
+      const deleteJob = () => {
+        this.resetFile();
+        deleteImportJob(jobId);
+      };
       stopImportJob(jobId)
-        .then(() => {
-          this.resetFile();
-          deleteImportJob(jobId);
+        .then(deleteJob)
+        .fail((xhr) => {
+          // Need to implement a better solution in order to identify specific
+          // errors like here
+          if (xhr && xhr.responseJSON && xhr.responseJSON.message &&
+            xhr.responseJSON.message === 'Wrong status') {
+            deleteJob();
+          }
         });
     },
     trackStatusOfImport(jobId, timeout = 2000) {
@@ -232,9 +242,13 @@ export default can.Component.extend({
             const strategy = this.attr('statusStrategies')[info.status]
               .bind(this);
 
+            this.attr('fileName', info.title);
             this.attr('state', info.status);
 
             strategy(info, timeout * 2);
+          })
+          .always(() => {
+            this.attr('isLoading', false);
           });
       }, timeout);
 
@@ -249,8 +263,7 @@ export default can.Component.extend({
           }).sort((a, b) => a.id < b.id ? 1 : -1);
 
           if (lastJob && isInProgressJob(lastJob.status)) {
-            this.attr('fileName', lastJob.title || 'import_file.csv');
-            this.attr('state', lastJob.status);
+            this.attr('isLoading', true);
             this.attr('jobId', lastJob.id);
             this.trackStatusOfImport(lastJob.id);
           }
@@ -318,8 +331,7 @@ export default can.Component.extend({
           if (file && _.any(allowedTypes, function (type) {
             return type === file.mimeType;
           })) {
-            if (that.attr('state') !== jobStatuses.SELECT &&
-              that.attr('jobId')) {
+            if (that.attr('jobId')) {
               deleteImportJob(that.attr('jobId'));
             }
             that.resetFile();

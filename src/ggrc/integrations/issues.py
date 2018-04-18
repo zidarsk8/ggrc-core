@@ -57,3 +57,14 @@ class Client(client.JsonClient):
       A dict representing an issue.
     """
     return self._post(self._BASE_PATH, payload=params)
+
+  def search(self, params):
+    """Searches for issues by given parameters.
+
+    Args:
+      params: A dict representing search parameters.
+
+    Returns:
+      A dict representing search response.
+    """
+    return self._post('%s/search' % self._BASE_PATH, payload=params)
