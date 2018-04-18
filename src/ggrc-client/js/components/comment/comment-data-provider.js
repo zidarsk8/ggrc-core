@@ -71,10 +71,10 @@ export default can.Component.extend('commentDataProvider', {
         source: this.attr('instance'),
         destination: comment,
       }))
-      .save()
-      .fail(()=> {
-        this.removeComment(comment);
-      });
+        .save()
+        .fail(()=> {
+          this.removeComment(comment);
+        });
     },
   },
   init() {

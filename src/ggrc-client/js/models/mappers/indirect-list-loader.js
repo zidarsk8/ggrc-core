@@ -121,7 +121,7 @@
 
       params[objectAttr] =
         this.object_attr === 'context' ?
-        binding.instance.context && binding.instance.context.id :
+          binding.instance.context && binding.instance.context.id :
           binding.instance.id;
 
       if (mappings || !params[objectAttr]) {

@@ -40,7 +40,7 @@ export default ModalsController({
         }
 
         return new $.Deferred(); // on success, just let the modal be destroyed or navigation happen.
-                                 // Do not re-enable the form elements.
+        // Do not re-enable the form elements.
       }).fail(function (xhr, status) {
         let message = xhr.responseJSON;
 

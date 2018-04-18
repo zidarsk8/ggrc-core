@@ -215,7 +215,7 @@ import {sortByName} from '../plugins/utils/label-utils';
 
       model = oldModel && can.isFunction(oldModel.attr) ?
         oldModel.attr(attributes) :
-          new this(attributes);
+        new this(attributes);
 
       // Sometimes we are updating model partially and asynchronous
       // for example when we load relationships.
@@ -375,21 +375,21 @@ import {sortByName} from '../plugins/utils/label-utils';
               type: 'get',
               dataType: 'json',
             })
-          .then($.proxy(that.constructor, 'cleanupACL'))
-          .then(function (model) {
-            delete that._pending_refresh;
-            if (model) {
-              model = CMS.Models.Assessment.model(model, that);
-              model.backup();
-              return model;
-            }
-          })
-          .done(function () {
-            dfd.resolve.apply(dfd, arguments);
-          })
-          .fail(function () {
-            dfd.reject.apply(dfd, arguments);
-          });
+              .then($.proxy(that.constructor, 'cleanupACL'))
+              .then(function (model) {
+                delete that._pending_refresh;
+                if (model) {
+                  model = CMS.Models.Assessment.model(model, that);
+                  model.backup();
+                  return model;
+                }
+              })
+              .done(function () {
+                dfd.resolve.apply(dfd, arguments);
+              })
+              .fail(function () {
+                dfd.reject.apply(dfd, arguments);
+              });
           }, 300, {trailing: false}),
         };
       }

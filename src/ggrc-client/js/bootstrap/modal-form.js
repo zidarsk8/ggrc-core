@@ -66,7 +66,7 @@ import {confirm} from '../plugins/utils/modals';
       e.preventDefault();
     },
     delete_object: function (e, data, xhr) {
-        // If this modal is contained within another modal, pass the event onward
+      // If this modal is contained within another modal, pass the event onward
       let $trigger_modal = this.$trigger.closest('.modal');
       let delete_target;
 
@@ -75,13 +75,13 @@ import {confirm} from '../plugins/utils/modals';
       } else {
         delete_target = this.$trigger.data('delete-target');
         if (delete_target === 'refresh') {
-            // Refresh the page
+          // Refresh the page
           GGRC.navigate(window.location.href.replace(/#.*/, ''));
         } else if (xhr && xhr.getResponseHeader('location')) {
-            // Otherwise redirect if possible
+          // Otherwise redirect if possible
           GGRC.navigate(xhr.getResponseHeader('location'));
         } else {
-            // Otherwise refresh the page
+          // Otherwise refresh the page
           GGRC.navigate(window.location.href.replace(/#.*/, ''));
         }
       }
@@ -128,11 +128,11 @@ import {confirm} from '../plugins/utils/modals';
 
       if (!$form.data('submitpending')) {
         $('[data-toggle=modal-submit]', $form)
-            .each(function () {
-              $(this).data('origText', $(this).text());
-            })
-            .addClass('disabled')
-            .attr('disabled', true);
+          .each(function () {
+            $(this).data('origText', $(this).text());
+          })
+          .addClass('disabled')
+          .attr('disabled', true);
 
         $form.data('submitpending', true)
           .one('ajax:beforeSend', function (ev, _xhr) {
@@ -249,9 +249,9 @@ import {confirm} from '../plugins/utils/modals';
         $first_input = that.$element.find('*[autofocus]');
         if (!$first_input.length) {
           $first_input = that.$element
-              .find('input[type="text"], input[type="checkbox"], select, textarea')
-              .not('[placeholder*=autofill], label:contains(autofill) + *, [disabled]')
-              .first();
+            .find('input[type="text"], input[type="checkbox"], select, textarea')
+            .not('[placeholder*=autofill], label:contains(autofill) + *, [disabled]')
+            .first();
         }
         if ($first_input.length && (!ev || that.$element.is(ev.target))) {
           $first_input.get(0).focus();
@@ -327,11 +327,11 @@ import {confirm} from '../plugins/utils/modals';
           if (modal_form && xhr === modal_form.xhr) {
             delete modal_form.xhr;
             $('[data-toggle=modal-submit]', modal_form.$element)
-            .removeAttr('disabled')
-            .removeClass('disabled')
-            .each(function () {
-              $(this).text($(this).data('origText'));
-            });
+              .removeAttr('disabled')
+              .removeClass('disabled')
+              .each(function () {
+                $(this).text($(this).data('origText'));
+              });
             $('form', modal_form.$element).data('submitpending', false);
           }
         }

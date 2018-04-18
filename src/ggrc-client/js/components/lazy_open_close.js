@@ -14,9 +14,9 @@
     content: '<content/>',
     init: function () {
       this._control.element.closest('.tree-item').find('.openclose')
-      .bind('click', function () {
-        this.scope.attr('show', true);
-      }.bind(this));
+        .bind('click', function () {
+          this.scope.attr('show', true);
+        }.bind(this));
     },
   });
 })(window.can, window.can.$);

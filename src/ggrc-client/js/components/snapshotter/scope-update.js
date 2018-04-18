@@ -33,8 +33,8 @@ import {
           button_view: BUTTON_VIEW_CONFIRM_CANCEL,
           skip_refresh: true,
         },
-          this._success.bind(this),
-          this._dismiss.bind(this)
+        this._success.bind(this),
+        this._dismiss.bind(this)
         );
       },
       _refreshContainers: function () {

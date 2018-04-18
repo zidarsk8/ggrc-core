@@ -240,17 +240,17 @@ export default GGRC.Components('relatedPeopleAccessControl', {
       groups = _.map(roles, function (role) {
         return this.buildGroups(role, roleAssignments);
       }.bind(this))
-      .filter(function (group) {
-        return typeof group !== 'undefined';
-      })
-      // sort by required
-      .sort(function (a, b) {
-        if (a.required === b.required) {
-          return 0;
-        }
+        .filter(function (group) {
+          return typeof group !== 'undefined';
+        })
+        // sort by required
+        .sort(function (a, b) {
+          if (a.required === b.required) {
+            return 0;
+          }
 
-        return a.required ? -1 : 1;
-      });
+          return a.required ? -1 : 1;
+        });
 
       if (this.attr('orderOfRoles.length')) {
         groups = this.setGroupOrder(groups, this.attr('orderOfRoles').attr());

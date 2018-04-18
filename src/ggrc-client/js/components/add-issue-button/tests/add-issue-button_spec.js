@@ -54,19 +54,19 @@ describe('GGRC.Components.addIssueButton', function () {
 
       it('should dispatch refreshInstance event ' +
         'and update Issues tab counts',
-        function () {
-          handler({}, {}, fakeIssueInstance);
-          expect(CurrentPageUtils.initCounts).toHaveBeenCalledWith(
-            [issueWidgetName],
-            fakePageInstance.type,
-            fakePageInstance.id
-          );
-          expect(relatedInstance.dispatch)
-            .toHaveBeenCalledWith({
-              ...REFRESH_RELATED,
-              model: issueWidgetName,
-            });
-        }
+      function () {
+        handler({}, {}, fakeIssueInstance);
+        expect(CurrentPageUtils.initCounts).toHaveBeenCalledWith(
+          [issueWidgetName],
+          fakePageInstance.type,
+          fakePageInstance.id
+        );
+        expect(relatedInstance.dispatch)
+          .toHaveBeenCalledWith({
+            ...REFRESH_RELATED,
+            model: issueWidgetName,
+          });
+      }
       );
     });
   });

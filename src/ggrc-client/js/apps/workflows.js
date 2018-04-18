@@ -272,12 +272,12 @@ import InfoWidget from '../controllers/info_widget_controller';
       mappings[type] = {
         task_groups:
           new GGRC.ListLoaders.ProxyListLoader(
-            'TaskGroupObject',
-            'object',
-            'task_group',
-            'task_group_objects',
-            null
-          ),
+          'TaskGroupObject',
+          'object',
+          'task_group',
+          'task_group_objects',
+          null
+        ),
         approval_tasks: Search(function (binding) {
           return CMS.Models.CycleTaskGroupObjectTask.findAll({
             object_approval: true,
@@ -309,7 +309,7 @@ import InfoWidget from '../controllers/info_widget_controller';
       GGRC.register_hook(
         type + '.info_widget_actions',
         GGRC.mustache_path + '/base_objects/approval_link.mustache'
-        );
+      );
     });
     new GGRC.Mappings('ggrc_workflows', mappings);
   };
@@ -512,12 +512,12 @@ import InfoWidget from '../controllers/info_widget_controller';
     newWidgetDescriptors.current = currentWidgetDescriptor;
 
     initCounts([
-        WorkflowExtension.countsMap.history,
-        WorkflowExtension.countsMap.activeCycles,
-        WorkflowExtension.countsMap.taskGroup,
-      ],
-        object.type,
-        object.id);
+      WorkflowExtension.countsMap.history,
+      WorkflowExtension.countsMap.activeCycles,
+      WorkflowExtension.countsMap.taskGroup,
+    ],
+    object.type,
+    object.id);
 
     new GGRC.WidgetList(
       'ggrc_workflows',
@@ -578,7 +578,7 @@ import InfoWidget from '../controllers/info_widget_controller';
   };
 
   GGRC.register_hook(
-      'Dashboard.Widgets', GGRC.mustache_path + '/dashboard/widgets');
+    'Dashboard.Widgets', GGRC.mustache_path + '/dashboard/widgets');
 
   WorkflowExtension.init_mappings();
 

@@ -209,8 +209,8 @@ import {
         farModels = baseWidgetsByType[object.constructor.shortName];
       }
 
-        // here we are going to define extra descriptor options, meaning that
-        //  these will be used as extra options to create widgets on top of
+      // here we are going to define extra descriptor options, meaning that
+      //  these will be used as extra options to create widgets on top of
 
       extraDescriptorOptions = {
         all: (function () {

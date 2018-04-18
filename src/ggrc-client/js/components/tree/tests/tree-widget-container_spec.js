@@ -93,11 +93,11 @@ describe('GGRC.Components.treeWidgetContainer', function () {
     });
 
     it('sets refreshLoaded flag in false after resolve loaded field',
-    function () {
-      display(true);
-      dfd.resolve();
-      expect(vm.attr('refreshLoaded')).toBe(false);
-    });
+      function () {
+        display(true);
+        dfd.resolve();
+        expect(vm.attr('refreshLoaded')).toBe(false);
+      });
 
     it('returns value of loaded field', function () {
       let result;
@@ -130,16 +130,16 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       });
 
       it('returns model.tree_view_options.add_item_view by default',
-      function () {
-        let expectedData = new can.Map({});
-        vm.attr('options.add_item_view', null);
-        vm.attr('model', {
-          tree_view_options: {
-            add_item_view: expectedData,
-          },
+        function () {
+          let expectedData = new can.Map({});
+          vm.attr('options.add_item_view', null);
+          vm.attr('model', {
+            tree_view_options: {
+              add_item_view: expectedData,
+            },
+          });
+          expect(vm.attr('addItem')).toBe(expectedData);
         });
-        expect(vm.attr('addItem')).toBe(expectedData);
-      });
     });
   });
 
@@ -191,10 +191,10 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       });
 
       it('returns false value if there is no options.objectVersion',
-      function () {
-        vm.attr('options.objectVersion', null);
-        expect(vm.attr('isSnapshots')).toBeFalsy();
-      });
+        function () {
+          vm.attr('options.objectVersion', null);
+          expect(vm.attr('isSnapshots')).toBeFalsy();
+        });
     });
   });
 
@@ -261,16 +261,16 @@ describe('GGRC.Components.treeWidgetContainer', function () {
     });
 
     it('sets refreshLoaded state in true if refresh param is true',
-    function () {
-      setRefreshFlag(true);
-      expect(vm.attr('refreshLoaded')).toBe(true);
-    });
+      function () {
+        setRefreshFlag(true);
+        expect(vm.attr('refreshLoaded')).toBe(true);
+      });
 
     it('sets refreshLoaded state in false if refresh param is false',
-    function () {
-      setRefreshFlag(false);
-      expect(vm.attr('refreshLoaded')).toBe(false);
-    });
+      function () {
+        setRefreshFlag(false);
+        expect(vm.attr('refreshLoaded')).toBe(false);
+      });
   });
 
   describe('needToRefresh() method', function () {
@@ -284,22 +284,22 @@ describe('GGRC.Components.treeWidgetContainer', function () {
     });
 
     it('returns true if refreshLoaded field is true',
-    function () {
-      let result;
-      setRefreshFlag(true);
-      result = needToRefresh();
+      function () {
+        let result;
+        setRefreshFlag(true);
+        result = needToRefresh();
 
-      expect(result).toBe(true);
-    });
+        expect(result).toBe(true);
+      });
 
     it('returns false if refreshLoaded field is false',
-    function () {
-      let result;
-      setRefreshFlag(false);
-      result = needToRefresh();
+      function () {
+        let result;
+        setRefreshFlag(false);
+        result = needToRefresh();
 
-      expect(result).toBe(false);
-    });
+        expect(result).toBe(false);
+      });
   });
 
   describe('on widget appearing', function () {
@@ -365,61 +365,61 @@ describe('GGRC.Components.treeWidgetContainer', function () {
     describe('for Issue viewModel that was loaded before' +
       'in case of equality between counts on tab ' +
       'and total counts in viewModel',
-      function () {
-        let modelName = 'Issue';
+    function () {
+      let modelName = 'Issue';
 
-        beforeEach(function () {
-          vm.attr({
-            model: {
-              shortName: modelName,
-            },
-            modelName: modelName,
-          });
-          vm.attr('loaded', {});
-          vm.attr('pageInfo', {
-            total: 123,
-          });
-          spyOn(CurrentPageUtils, 'getCounts').and.returnValue(
-            _.set({}, modelName, 123)
-          );
+      beforeEach(function () {
+        vm.attr({
+          model: {
+            shortName: modelName,
+          },
+          modelName: modelName,
         });
+        vm.attr('loaded', {});
+        vm.attr('pageInfo', {
+          total: 123,
+        });
+        spyOn(CurrentPageUtils, 'getCounts').and.returnValue(
+          _.set({}, modelName, 123)
+        );
+      });
 
-        it('should only add listeners', function () {
-          _widgetShown();
-          expect(vm._triggerListeners).toHaveBeenCalled();
-          expect(vm.loadItems).not.toHaveBeenCalled();
-        });
-      }
+      it('should only add listeners', function () {
+        _widgetShown();
+        expect(vm._triggerListeners).toHaveBeenCalled();
+        expect(vm.loadItems).not.toHaveBeenCalled();
+      });
+    }
     );
 
     describe('for Issue viewModel that was loaded before' +
       'in case of inequality between counts on tab ' +
       'and total counts in viewModel',
-      function () {
-        let modelName = 'Issue';
+    function () {
+      let modelName = 'Issue';
 
-        beforeEach(function () {
-          vm.attr({
-            model: {
-              shortName: modelName,
-            },
-            modelName: modelName,
-          });
-          vm.attr('loaded', {});
-          vm.attr('pageInfo', {
-            total: 123,
-          });
-          spyOn(CurrentPageUtils, 'getCounts').and.returnValue(
-            _.set({}, modelName, 124)
-          );
+      beforeEach(function () {
+        vm.attr({
+          model: {
+            shortName: modelName,
+          },
+          modelName: modelName,
         });
+        vm.attr('loaded', {});
+        vm.attr('pageInfo', {
+          total: 123,
+        });
+        spyOn(CurrentPageUtils, 'getCounts').and.returnValue(
+          _.set({}, modelName, 124)
+        );
+      });
 
-        it('should add listeners and update viewModel', function () {
-          _widgetShown();
-          expect(vm._triggerListeners).toHaveBeenCalled();
-          expect(vm.loadItems).toHaveBeenCalled();
-        });
-      }
+      it('should add listeners and update viewModel', function () {
+        _widgetShown();
+        expect(vm._triggerListeners).toHaveBeenCalled();
+        expect(vm.loadItems).toHaveBeenCalled();
+      });
+    }
     );
   });
 
@@ -616,13 +616,13 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       });
 
     it('should return "-1" when item is not on page',
-       function () {
-         let result;
+      function () {
+        let result;
 
-         result = vm.getAbsoluteItemNumber({id: 4, type: 'object'});
+        result = vm.getAbsoluteItemNumber({id: 4, type: 'object'});
 
-         expect(result).toEqual(-1);
-       });
+        expect(result).toEqual(-1);
+      });
     it('should return "-1" when item is of different type',
       function () {
         let result;
@@ -632,13 +632,13 @@ describe('GGRC.Components.treeWidgetContainer', function () {
         expect(result).toEqual(-1);
       });
     it('should return correct item number for first item on non first page',
-       function () {
-         let result;
+      function () {
+        let result;
 
-         result = vm.getAbsoluteItemNumber({id: 1, type: 'object'});
+        result = vm.getAbsoluteItemNumber({id: 1, type: 'object'});
 
-         expect(result).toEqual(20);
-       });
+        expect(result).toEqual(20);
+      });
   });
 
   describe('getRelativeItemNumber() method', function () {

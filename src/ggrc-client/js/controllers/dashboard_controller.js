@@ -44,7 +44,7 @@ const Dashboard = can.Control({
     }
 
     validModels = can.Map.keys(GGRC.tree_view.base_widgets_by_type);
-  // only change the display list
+    // only change the display list
     can.each(validModels, function (mName) {
       savedChildTreeDisplayList = this.display_prefs
         .getChildTreeDisplayList(mName);

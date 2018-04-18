@@ -84,16 +84,16 @@ describe('tree-field component', () => {
     });
 
     it('doesn\'t trigger \'loadItems\' for items with required data',
-    (done) => {
-      let source = [{email: 'foo'}, {email: 'bar'}, {email: 'baz'}];
-      vm.attr('field', 'email');
-      vm.attr('source', source);
-      spyOn(vm, 'loadItems').and.returnValue(can.Deferred().resolve(source));
-      vm.getItems().then((result) => {
-        expect(result.length).toBe(source.length);
-        expect(vm.loadItems).not.toHaveBeenCalled();
-        done();
+      (done) => {
+        let source = [{email: 'foo'}, {email: 'bar'}, {email: 'baz'}];
+        vm.attr('field', 'email');
+        vm.attr('source', source);
+        spyOn(vm, 'loadItems').and.returnValue(can.Deferred().resolve(source));
+        vm.getItems().then((result) => {
+          expect(result.length).toBe(source.length);
+          expect(vm.loadItems).not.toHaveBeenCalled();
+          done();
+        });
       });
-    });
   });
 });

@@ -335,12 +335,12 @@ describe('GGRC.Components.revisionsComparer', function () {
         let index = 0;
         spyOn(caUtils, 'prepareCustomAttributes').and
           .callFake((defs, values) => {
-          if (index === 0) {
-            index++;
-            return ca0s;
-          }
-          return ca1s;
-        });
+            if (index === 0) {
+              index++;
+              return ca0s;
+            }
+            return ca1s;
+          });
 
         $target = $(`<div>
                     <section class="info">
@@ -419,12 +419,12 @@ describe('GGRC.Components.revisionsComparer', function () {
         let index = 0;
         spyOn(caUtils, 'prepareCustomAttributes').and
           .callFake((defs, values) => {
-          if (index === 0) {
-            index++;
-            return ca0s;
-          }
-          return ca1s;
-        });
+            if (index === 0) {
+              index++;
+              return ca0s;
+            }
+            return ca1s;
+          });
 
         $target = $(`<div>
                     <section class="info">
@@ -499,12 +499,12 @@ describe('GGRC.Components.revisionsComparer', function () {
         let index = 0;
         spyOn(caUtils, 'prepareCustomAttributes').and
           .callFake((defs, values) => {
-          if (index === 0) {
-            index++;
-            return ca0s;
-          }
-          return ca1s;
-        });
+            if (index === 0) {
+              index++;
+              return ca0s;
+            }
+            return ca1s;
+          });
 
         $target = $(`<div>
                     <section class="info">
@@ -581,12 +581,12 @@ describe('GGRC.Components.revisionsComparer', function () {
         let index = 0;
         spyOn(caUtils, 'prepareCustomAttributes').and
           .callFake((defs, values) => {
-          if (index === 0) {
-            index++;
-            return ca0s;
-          }
-          return ca1s;
-        });
+            if (index === 0) {
+              index++;
+              return ca0s;
+            }
+            return ca1s;
+          });
 
         $target = $(`<div>
                     <section class="info">

@@ -191,8 +191,8 @@ import {confirm} from '../../plugins/utils/modals';
                 $.extend({
                   context: this.scope.parent_instance.context
                             || new CMS.Models.Context({id : null}),
-                          },
-                          this.scope.attributes.serialize())
+                },
+                this.scope.attributes.serialize())
               );
             }
             this.bindXHRToButton(
@@ -217,13 +217,13 @@ import {confirm} from '../../plugins/utils/modals';
                   });
                 }));
           }.bind(this))
-          .always(function () {
+            .always(function () {
+              scope.attr('disabled', false);
+            });
+        }.bind(this))
+          .fail(function () {
             scope.attr('disabled', false);
           });
-        }.bind(this))
-        .fail(function () {
-          scope.attr('disabled', false);
-        });
       },
       // this works like autocomplete_select on all modal forms and
       //  descendant class objects.
@@ -249,7 +249,7 @@ import {confirm} from '../../plugins/utils/modals';
 
         if(multi_map){
           let length = data.arr.length,
-              my_data;
+            my_data;
 
           if (length == 1){
             my_data = data.arr[0];
@@ -260,8 +260,8 @@ import {confirm} from '../../plugins/utils/modals';
               $.extend({
                 context : this.scope.parent_instance.context
                         || new CMS.Models.Context({id : null}),
-                        },
-                        this.scope.attributes.serialize())
+              },
+              this.scope.attributes.serialize())
             ).save().done(function() {
               that.element.find("a[data-toggle=submit]").trigger("modal:success");
             });
@@ -277,8 +277,8 @@ import {confirm} from '../../plugins/utils/modals';
                 $.extend({
                   context : this.scope.parent_instance.context
                           || new CMS.Models.Context({id : null}),
-                          },
-                          this.scope.attributes.serialize())
+                },
+                this.scope.attributes.serialize())
               ).save().done(function(){});
             }
             my_data = data.arr[length-1];
@@ -288,8 +288,8 @@ import {confirm} from '../../plugins/utils/modals';
               $.extend({
                 context : this.scope.parent_instance.context
                         || new CMS.Models.Context({id : null}),
-                        },
-                        this.scope.attributes.serialize())
+              },
+              this.scope.attributes.serialize())
             ).save().done(function() {
               that.element.find("a[data-toggle=submit]").trigger("modal:success");
             });
@@ -307,12 +307,12 @@ import {confirm} from '../../plugins/utils/modals';
               $.extend({
                 context : this.scope.parent_instance.context
                           || new CMS.Models.Context({id : null}),
-                        },
-                        this.scope.attributes.serialize())
+              },
+              this.scope.attributes.serialize())
             );
           }
           join_object.save().done(function() {
-             that.element.find("a[data-toggle=submit]").trigger("modal:success");
+            that.element.find("a[data-toggle=submit]").trigger("modal:success");
           });
         }
       },

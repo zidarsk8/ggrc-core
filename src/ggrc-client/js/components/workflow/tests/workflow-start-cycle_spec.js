@@ -34,7 +34,7 @@ describe('GGRC.WorkflowStartCycle', function () {
 
       expect(helpers.generateCycle).toHaveBeenCalled();
       expect(workflowMock.refresh_all)
-                .toHaveBeenCalledWith('task_groups', 'task_group_tasks');
+        .toHaveBeenCalledWith('task_groups', 'task_group_tasks');
     });
 
     it('shouldn\'t update TaskGroups when cycle wasn\'t generated',
@@ -45,6 +45,6 @@ describe('GGRC.WorkflowStartCycle', function () {
         expect(helpers.generateCycle).toHaveBeenCalled();
         expect(workflowMock.refresh_all)
           .not.toHaveBeenCalled();
-    });
+      });
   });
 });

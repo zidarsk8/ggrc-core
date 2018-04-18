@@ -11,7 +11,7 @@ function checkValues(baseAttrs, attrs, remoteAttrs, obj) {
       return;
     }
 
-        // The object attribute was changed on the server
+    // The object attribute was changed on the server
     if (!can.Object.same(val, remoteAttrs[key]) &&
         // The object attribute was also changed on the client
         !can.Object.same(val, attrs[key]) &&
@@ -22,9 +22,9 @@ function checkValues(baseAttrs, attrs, remoteAttrs, obj) {
       obj.attr(key, attrs[key]);
       console.warn('Conflict', key, 'User wrote:', attrs[key],
         'Server has:', remoteAttrs[key], 'User saw', baseAttrs[key]);
-               // The attribute hasn't changed on the server
+      // The attribute hasn't changed on the server
     } else if (can.Object.same(val, remoteAttrs[key]) &&
-              // The attribute was changed on the client
+    // The attribute was changed on the client
                !can.Object.same(val, attrs[key])) {
       obj.attr(key, attrs[key]);
     }

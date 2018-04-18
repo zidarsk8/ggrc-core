@@ -35,13 +35,13 @@ describe('GGRC.Components.assessmentInfoPane', function () {
 
       describe('if instance is not archived', function () {
         it('returns true if instance status is editable otherwise false',
-        function () {
-          allStatuses.forEach((status) => {
-            vm.attr('instance.status', status);
-            expect(vm.attr('editMode'))
-              .toBe(editableStatuses.includes(status));
+          function () {
+            allStatuses.forEach((status) => {
+              vm.attr('instance.status', status);
+              expect(vm.attr('editMode'))
+                .toBe(editableStatuses.includes(status));
+            });
           });
-        });
       });
     });
   });

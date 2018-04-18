@@ -800,7 +800,7 @@ export default GGRC.Components('treeWidgetContainer', {
             .updateInstance(componentSelector, newInstance);
           newInstance.dispatch('refreshRelatedDocuments');
           newInstance.dispatch({
-              ...REFRESH_RELATED,
+            ...REFRESH_RELATED,
             model: 'Assessment',
           });
 

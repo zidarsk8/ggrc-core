@@ -78,9 +78,9 @@
         // It's not nice way to rely on DOM for sorting,
         // but it was easiest for implementation
         this.scope.fields.replace(_.map(sortables,
-           function (item) {
-             return $(item).data('field');
-           }
+          function (item) {
+            return $(item).data('field');
+          }
         ));
       },
     },

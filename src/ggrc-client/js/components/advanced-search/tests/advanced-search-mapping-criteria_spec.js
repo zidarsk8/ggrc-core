@@ -18,22 +18,22 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
 
   describe('criteria set() method', function () {
     it('initializes "criteria.filter" property with new attribute model',
-    function () {
-      viewModel.attr('criteria', can.Map());
+      function () {
+        viewModel.attr('criteria', can.Map());
 
-      expect(viewModel.attr('criteria.filter').type).toBe('attribute');
-    });
+        expect(viewModel.attr('criteria.filter').type).toBe('attribute');
+      });
 
     it('does not intialize "criteria.filter" when it is already initialized',
-    function () {
-      viewModel.attr('criteria', new can.Map({
-        filter: {
-          type: 'test',
-        },
-      }));
+      function () {
+        viewModel.attr('criteria', new can.Map({
+          filter: {
+            type: 'test',
+          },
+        }));
 
-      expect(viewModel.attr('criteria.filter').type).toBe('test');
-    });
+        expect(viewModel.attr('criteria.filter').type).toBe('test');
+      });
   });
 
   describe('remove() method', function () {
@@ -80,20 +80,20 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
 
   describe('relevantToGroup() method', function () {
     it('transforms criteria to group with 2 criteria and operator inside',
-    function () {
-      let relevant;
-      viewModel.attr('criteria.mappedTo',
-        AdvancedSearch.create.mappingCriteria()
-      );
+      function () {
+        let relevant;
+        viewModel.attr('criteria.mappedTo',
+          AdvancedSearch.create.mappingCriteria()
+        );
 
-      viewModel.relevantToGroup();
+        viewModel.relevantToGroup();
 
-      relevant = viewModel.attr('criteria.mappedTo');
-      expect(relevant.type).toBe('group');
-      expect(relevant.value[0].type).toBe('mappingCriteria');
-      expect(relevant.value[1].type).toBe('operator');
-      expect(relevant.value[2].type).toBe('mappingCriteria');
-    });
+        relevant = viewModel.attr('criteria.mappedTo');
+        expect(relevant.type).toBe('group');
+        expect(relevant.value[0].type).toBe('mappingCriteria');
+        expect(relevant.value[1].type).toBe('operator');
+        expect(relevant.value[2].type).toBe('mappingCriteria');
+      });
   });
 
   describe('mappingTypes() method', function () {
@@ -190,13 +190,13 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
     });
 
     it('does not set criteria.objectName if objectName is defined',
-    function () {
-      viewModel.attr('criteria.objectName', 'test');
+      function () {
+        viewModel.attr('criteria.objectName', 'test');
 
-      viewModel.mappingTypes();
+        viewModel.mappingTypes();
 
-      expect(viewModel.attr('criteria.objectName')).toBe('test');
-    });
+        expect(viewModel.attr('criteria.objectName')).toBe('test');
+      });
   });
 
   describe('availableAttributes() method', function () {

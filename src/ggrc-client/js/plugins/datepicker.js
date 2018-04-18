@@ -5,13 +5,13 @@
 (function($, moment) {
   // On-demand creation of datepicker() objects
   let $body = $("body"),
-      format = {
-        changeMonth: true,
-        changeYear: true,
-        prevText: "",
-        nextText: "",
-        dateFormat: "mm/dd/yy",
-      };
+    format = {
+      changeMonth: true,
+      changeYear: true,
+      prevText: "",
+      nextText: "",
+      dateFormat: "mm/dd/yy",
+    };
 
   $body.on("focus", "[data-toggle=\"datepicker\"]", function (ev) {
     let $this = $(this);
@@ -34,6 +34,6 @@
       return;
     }
     $this.datepicker(format)
-         .datepicker("option", "minDate", new Date());
+      .datepicker("option", "minDate", new Date());
   });
 })(jQuery, moment);

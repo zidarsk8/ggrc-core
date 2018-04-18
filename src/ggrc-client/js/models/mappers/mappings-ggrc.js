@@ -291,7 +291,7 @@ import RefreshQueue from '../refresh_queue';
       programs_via_authorizations:
         Cross('authorizations', 'program_via_context'),
       extended_related_programs: Multi(['related_programs', 'owned_programs',
-          'programs_via_authorizations']),
+        'programs_via_authorizations']),
       extended_related_regulations:
         Multi(['related_regulations', 'owned_regulations']),
       extended_related_contracts:
@@ -484,10 +484,10 @@ import RefreshQueue from '../refresh_queue';
     // used by the Custom Roles admin panel tab
     Roleable: {
       access_control_roles: Search(function (binding) {
-          return CMS.Models.AccessControlRole.findAll({
-            object_type: binding.instance.model_singular,
-            internal: false,
-          });
+        return CMS.Models.AccessControlRole.findAll({
+          object_type: binding.instance.model_singular,
+          internal: false,
+        });
       }, 'AccessControlRole'),
     },
     Risk: {

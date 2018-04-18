@@ -19,8 +19,8 @@ import Clipboard from 'clipboard';
       notifyText: 'Link has been copied to your clipboard.',
     },
     template: ['<a data-clipboard-text="{{text}}" {{#isActive}}class="active"{{/isActive}} href="#">',
-               '<i class="fa fa-link"></i> {{title}}',
-               '</a>'].join(''),
+      '<i class="fa fa-link"></i> {{title}}',
+      '</a>'].join(''),
     events: {
       'a click': function (el, evnt) {
         evnt.preventDefault();

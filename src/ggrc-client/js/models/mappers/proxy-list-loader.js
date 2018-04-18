@@ -18,7 +18,7 @@ import RefreshQueue from '../refresh_queue';
    */
   GGRC.ListLoaders.BaseListLoader('GGRC.ListLoaders.ProxyListLoader', {}, {
     init: function (modelName, objectAttr, optionAttr, objectJoinAttr,
-                    optionModelName) {
+      optionModelName) {
       this._super();
 
       this.model_name = modelName;

@@ -55,8 +55,8 @@ export default can.Component.extend({
               let fragRight = can.view(view, revisions[1]);
               let attachmentsDfds =
                 that.isContainsAttachments(that.instance) ?
-                that.getAttachmentsDfds(revisions) :
-                [];
+                  that.getAttachmentsDfds(revisions) :
+                  [];
 
               if (displayDescriptions) {
                 const leftRevisionData = that.getRevisionData(
@@ -248,23 +248,23 @@ export default can.Component.extend({
         .trigger('click');
 
       instance.refresh()
-      .then(function () {
-        instance.attr('update_revision', 'latest');
-        return instance.save();
-      })
-      .then(function () {
-        let forceRefresh = true;
+        .then(function () {
+          instance.attr('update_revision', 'latest');
+          return instance.save();
+        })
+        .then(function () {
+          let forceRefresh = true;
 
-        return $('tree-widget-container:visible')
-          .first()
-          .viewModel()
-          .display(forceRefresh);
-      })
-      .then(function () {
-        let message = instance.child_type +
+          return $('tree-widget-container:visible')
+            .first()
+            .viewModel()
+            .display(forceRefresh);
+        })
+        .then(function () {
+          let message = instance.child_type +
         ' was refreshed successfully.';
-        GGRC.Errors.notifier('success', [message]);
-      });
+          GGRC.Errors.notifier('success', [message]);
+        });
     },
 
     /**

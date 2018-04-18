@@ -15,10 +15,10 @@ describe('GGRC.Components.issueUnmapDropdownItem', function () {
 
     describe('issueUnmap get() method', function () {
       it('returns true if page_instance.type equals to "Issue" string',
-      function () {
-        viewModel.attr('page_instance.type', 'Issue');
-        expect(viewModel.attr('issueUnmap')).toBe(true);
-      });
+        function () {
+          viewModel.attr('page_instance.type', 'Issue');
+          expect(viewModel.attr('issueUnmap')).toBe(true);
+        });
 
       it('returns true if instance.type equals to "Issue" string', function () {
         viewModel.attr('instance.type', 'Issue');
@@ -26,11 +26,11 @@ describe('GGRC.Components.issueUnmapDropdownItem', function () {
       });
 
       it('returns false if there are no instance.type and page_instance.type',
-      function () {
-        viewModel.attr('page_instance.type', null);
-        viewModel.attr('instance.type', null);
-        expect(viewModel.attr('issueUnmap')).toBe(false);
-      });
+        function () {
+          viewModel.attr('page_instance.type', null);
+          viewModel.attr('instance.type', null);
+          expect(viewModel.attr('issueUnmap')).toBe(false);
+        });
     });
 
     describe('visibleIssueUnmap get() method', function () {
@@ -41,10 +41,10 @@ describe('GGRC.Components.issueUnmapDropdownItem', function () {
       });
 
       it('returns false if page_instance.type equals to "Person" string',
-      function () {
-        viewModel.attr('page_instance.type', 'Person');
-        expect(viewModel.attr('visibleIssueUnmap')).toBe(false);
-      });
+        function () {
+          viewModel.attr('page_instance.type', 'Person');
+          expect(viewModel.attr('visibleIssueUnmap')).toBe(false);
+        });
     });
 
     describe('denyUnmap get() method', function () {

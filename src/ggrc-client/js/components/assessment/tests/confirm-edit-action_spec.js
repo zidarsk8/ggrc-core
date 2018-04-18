@@ -20,14 +20,14 @@ describe('GGRC.Components.confirmEditAction', function () {
       });
 
       it('dispatches setEditMode event if instance is in editable state',
-      function () {
-        spyOn(viewModel, 'isInEditableState').and.returnValue(true);
-        spyOn(viewModel, 'dispatch');
+        function () {
+          spyOn(viewModel, 'isInEditableState').and.returnValue(true);
+          spyOn(viewModel, 'dispatch');
 
-        viewModel.openEditMode();
+          viewModel.openEditMode();
 
-        expect(viewModel.dispatch).toHaveBeenCalledWith('setEditMode');
-      });
+          expect(viewModel.dispatch).toHaveBeenCalledWith('setEditMode');
+        });
     });
   });
 
@@ -43,13 +43,13 @@ describe('GGRC.Components.confirmEditAction', function () {
     });
 
     it('returns false if instance state is not "In Progress" or "Not Started"',
-    function () {
-      ['In Review', 'Completed'].forEach(function (state) {
-        viewModel.attr('instance.status', state);
+      function () {
+        ['In Review', 'Completed'].forEach(function (state) {
+          viewModel.attr('instance.status', state);
 
-        expect(viewModel.isInEditableState()).toBe(false);
+          expect(viewModel.isInEditableState()).toBe(false);
+        });
       });
-    });
   });
 
   describe('showConfirm() method', function () {
@@ -120,21 +120,21 @@ describe('GGRC.Components.confirmEditAction', function () {
     });
 
     it('returns result of showConfirm() if instance is not in editable state',
-    function () {
-      spyOn(viewModel, 'isInEditableState').and.returnValue(false);
+      function () {
+        spyOn(viewModel, 'isInEditableState').and.returnValue(false);
 
-      expect(viewModel.confirmEdit()).toBe('mock');
-    });
+        expect(viewModel.confirmEdit()).toBe('mock');
+      });
 
     it('dispatches setEditMode event if instance is in editable state',
-    function () {
-      spyOn(viewModel, 'isInEditableState').and.returnValue(true);
-      viewModel.confirmEdit();
+      function () {
+        spyOn(viewModel, 'isInEditableState').and.returnValue(true);
+        viewModel.confirmEdit();
 
-      expect(viewModel.dispatch).toHaveBeenCalledWith({
-        type: 'setEditMode',
-        isLastOpenInline: true,
+        expect(viewModel.dispatch).toHaveBeenCalledWith({
+          type: 'setEditMode',
+          isLastOpenInline: true,
+        });
       });
-    });
   });
 });

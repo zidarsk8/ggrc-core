@@ -311,7 +311,7 @@ describe('can.Model.Cacheable', function () {
     it('only pushes instances into the list for 100ms before yielding', function (done) {
       let list = new CMS.Models.DummyModel.List();
       let dummy_models = [
-          {id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}, {id: 7},
+        {id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}, {id: 7},
       ];
       // Have our modelized instances ready for when
       let dummy_insts = CMS.Models.DummyModel.models(dummy_models);
@@ -361,7 +361,7 @@ describe('can.Model.Cacheable', function () {
       expect(can.Model.Cacheable.findPage)
         .toThrow(
           new Error('No default findPage() exists for subclasses of Cacheable')
-      );
+        );
     });
   });
 
