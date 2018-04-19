@@ -48,7 +48,9 @@ class AssessmentRBACFactory(base.BaseRBACFactory):
       template_id = factories.AssessmentTemplateFactory().id
     audit = all_models.Audit.query.get(self.audit_id)
     # pylint: disable=protected-access
-    snapshot_id = TestCase._create_snapshots(audit, [control])[0].id
+    snapshot = TestCase._create_snapshots(audit, [control])[0]
+    snapshot_id = snapshot.id
+    factories.RelationshipFactory(source=snapshot, destination=audit)
 
     responses = []
     asmnt_data = {
@@ -111,6 +113,7 @@ class AssessmentRBACFactory(base.BaseRBACFactory):
     control = factories.ControlFactory()
     # pylint: disable=protected-access
     snapshot = TestCase._create_snapshots(audit, [control])[0]
+    factories.RelationshipFactory(source=snapshot, destination=audit)
 
     return self.objgen.generate_relationship(
         source=assessment,
@@ -185,6 +188,7 @@ class AssessmentRBACFactory(base.BaseRBACFactory):
       control = factories.ControlFactory()
       # pylint: disable=protected-access
       snapshot = TestCase._create_snapshots(audit, [control])[0]
+      factories.RelationshipFactory(source=audit, destination=snapshot)
       factories.RelationshipFactory(source=assessment, destination=snapshot)
       assessment2 = factories.AssessmentFactory(
           assessment_type=assessment.assessment_type

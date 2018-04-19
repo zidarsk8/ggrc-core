@@ -117,6 +117,8 @@ class TestAssigneeRBAC(TestRBAC):
       snapshots = self._create_snapshots(
           audit, [control, objective, regulation]
       )
+      for snapshot in snapshots:
+        factories.RelationshipFactory(source=audit, destination=snapshot)
       factories.RelationshipFactory(
           source=snapshots[0], destination=snapshots[1]
       )

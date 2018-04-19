@@ -30,6 +30,10 @@ class BaseRBACFactory(object):
       if parent == "Program":
         return
       self.audit = factories.AuditFactory(program=self.program)
+      factories.RelationshipFactory(
+          source=self.audit,
+          destination=self.program,
+      )
       self.audit_id = self.audit.id
       self.assign_person(self.audit, acr, user_id)
       if parent == "Audit":

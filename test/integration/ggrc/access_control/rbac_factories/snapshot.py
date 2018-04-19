@@ -29,6 +29,7 @@ class SnapshotRBACFactory(base.BaseRBACFactory):
     control = factories.ControlFactory()
     # pylint: disable=protected-access
     snapshot = TestCase._create_snapshots(self.audit, [control])[0]
+    factories.RelationshipFactory(source=snapshot, destination=self.audit)
     factories.RelationshipFactory(source=control, destination=self.program)
     if parent == "Assessment":
       factories.RelationshipFactory(
