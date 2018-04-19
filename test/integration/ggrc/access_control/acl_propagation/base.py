@@ -55,11 +55,27 @@ class TestACLPropagation(TestCase):
     self.assertStatus(response, self.SUCCESS)
     table_plural = get_model(model)._inflector.table_plural
     response_data = response.json.get("{}_collection".format(table_plural), {})
+    assert_raises = False
+    if isinstance(expected_res, tuple):
+      expected_res, assert_raises = expected_res
     if expected_res:
       err = self.CAN_NOT_READ_ERROR.format(model)
     else:
       err = self.CAN_READ_ERROR.format(model)
-    self.assertEqual(bool(response_data.get(table_plural)), expected_res, err)
+
+    if assert_raises == "unimplemented":
+      with self.assertRaises(AssertionError):
+        self.assertEqual(
+            bool(response_data.get(table_plural)),
+            expected_res,
+            err,
+        )
+    else:
+      self.assertEqual(
+          bool(response_data.get(table_plural)),
+          expected_res,
+          err,
+      )
 
   def assert_status(self, response, expected_res):
     """Check correctness of response status.
@@ -69,13 +85,25 @@ class TestACLPropagation(TestCase):
         expected_res: Boolean flag. If True 200/201 status expected, if False
           403 status expected.
     """
+    assert_raises = False
+    if isinstance(expected_res, tuple):
+      expected_res, assert_raises = expected_res
+
     success_statuses = [self.SUCCESS, self.SUCCESS_CREATED]
     exp_statuses = success_statuses if expected_res else [self.FORBIDDEN]
-    self.assertIn(
-        response.status_code,
-        exp_statuses,
-        self.ACCESS_ERROR.format(exp_statuses[0], response.status_code)
-    )
+    if assert_raises:
+      with self.assertRaises(AssertionError):
+        self.assertIn(
+            response.status_code,
+            exp_statuses,
+            self.ACCESS_ERROR.format(exp_statuses[0], response.status_code)
+        )
+    else:
+      self.assertIn(
+          response.status_code,
+          exp_statuses,
+          self.ACCESS_ERROR.format(exp_statuses[0], response.status_code)
+      )
 
   def assert_result(self, response, expected_res, operation, model):
     """Check correctness of response result.
