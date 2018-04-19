@@ -28,6 +28,16 @@ _AUDIT_FULL_ACCESS = {
     },
 }
 
+_PE_AUDIT_ACCESS = {
+    "Relationship R": {
+        "Assessment RU": const.COMMENT_DOCUMENT_RUD,
+        "AssessmentTemplate RUD": {},
+        "Issue RUD": const.COMMENT_DOCUMENT_RUD,
+        "Document RUD": {},
+        "Snapshot RU": {},
+    },
+}
+
 _AUDITOR_ACCESS = {
     "Relationship R": {
         "Assessment RU": const.COMMENT_DOCUMENT_R,
@@ -100,13 +110,22 @@ _PROGRAM_OBJECTS_RUD = (
 
 AUTID_PROGRAM_PROPAGATION = {
     "Program": {
-        ("Program Managers", "Program Editors"): {
+        "Program Managers": {
             "Relationship R": {
                 "Audit RUD": _AUDIT_FULL_ACCESS,
                 "Comment R": {},
                 "Document RUD": {},
                 _PROGRAM_OBJECTS_RUD: const.COMMENT_DOCUMENT_RUD,
                 ("Control RUD", "Risk RUD"): const.PROPOSAL_RUD,
+            }
+        },
+        "Program Editors": {
+            "Relationship R": {
+                "Audit RUD": _PE_AUDIT_ACCESS,
+                "Comment R": {},
+                "Document RUD": {},
+                ("Control RUD", "Risk RUD"): const.PROPOSAL_RUD,
+                _PROGRAM_OBJECTS_RUD: const.COMMENT_DOCUMENT_RUD,
             }
         },
         "Program Readers": {
