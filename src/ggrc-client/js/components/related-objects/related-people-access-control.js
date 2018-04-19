@@ -33,16 +33,16 @@ export default GGRC.Components('relatedPeopleAccessControl', {
       });
     },
     performUpdate: function (args) {
-      this.updateAccessContolList(args.people, args.roleId);
+      this.updateAccessControlList(args.people, args.roleId);
 
       if (this.attr('conflictRoles').length) {
         this.checkConflicts(args.roleTitle);
       }
     },
-    updateAccessContolList: function (people, roleId) {
+    updateAccessControlList: function (people, roleId) {
       let instance = this.attr('instance');
 
-      // remove all people with current role
+      // get people without current role
       let listWithoutRole = instance
         .attr('access_control_list').filter(function (item) {
           return item.ac_role_id !== roleId;
