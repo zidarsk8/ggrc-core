@@ -19,7 +19,7 @@ import urlparse
 import _pytest
 import requests
 
-from lib import file_ops, environment, decorator, url as url_module
+from lib import environment, decorator, url as url_module
 from lib.service.rest_service import client
 
 
@@ -86,6 +86,4 @@ if __name__ == "__main__":
   parse_pytest_ini()
   prepare_dev_server(os.environ["DEV_URL"])
   prepare_dev_server(os.environ["DEV_DESTRUCTIVE_URL"])
-  file_ops.create_directory(environment.LOG_PATH)
-  file_ops.delete_directory_contents(environment.LOG_PATH)
   sys.exit(run_tests())
