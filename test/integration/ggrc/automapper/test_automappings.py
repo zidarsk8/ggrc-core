@@ -34,6 +34,7 @@ def automapping_count_limit(new_limit):
 
 class TestAutomappings(TestCase):
   """Test automappings"""
+
   def setUp(self):
     super(TestAutomappings, self).setUp()
     self.gen = generator.ObjectGenerator()
@@ -336,19 +337,15 @@ class TestAutomappings(TestCase):
         "Program Editors",
         "Program Readers"
     }
-    propagated_roles = {
-        "Program Managers Mapped",
-        "Program Editors Mapped",
-        "Program Readers Mapped"
-    }
     users = {}
     for role in roles:
       _, users[role] = self.gen.generate_person(user_role="Creator")
 
     db_roles = all_models.AccessControlRole.query.filter(
-        all_models.AccessControlRole.name.in_(roles | propagated_roles)
+        all_models.AccessControlRole.name.in_(roles)
     ).options(
-        load_only("id", "name")).all()
+        load_only("id", "name")
+    ).all()
 
     role_map = {
         role.name: role.id for role in db_roles
@@ -387,11 +384,12 @@ class TestAutomappings(TestCase):
       acls = all_models.AccessControlList.query.filter(
           all_models.AccessControlList.object_id == obj.id,
           all_models.AccessControlList.object_type == obj.type,
-          all_models.AccessControlList.ac_role_id.in_([
-              role_map[role] for role in propagated_roles])).all()
+      ).all()
       self.assertEqual(len(acls), 3)
-      self.assertItemsEqual(propagated_roles, [
-          acl.ac_role.name for acl in acls])
+      self.assertItemsEqual(
+          roles,
+          [acl.parent.parent.ac_role.name for acl in acls]
+      )
 
   def test_automapping_deletion(self):
     """Test if automapping data is preserved even when the parent relationship
