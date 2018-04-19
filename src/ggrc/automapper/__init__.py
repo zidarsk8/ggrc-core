@@ -16,7 +16,6 @@ from ggrc.models.automapping import Automapping
 from ggrc.models.relationship import Relationship, RelationshipsCache, Stub
 from ggrc.models.issue import Issue
 from ggrc.models import exceptions
-from ggrc.models.hooks import acl
 from ggrc.rbac.permissions import is_allowed_update
 from ggrc.models.cache import Cache
 from ggrc.utils import benchmark
@@ -181,7 +180,7 @@ class AutomapperGenerator(object):
 
     if not self.automapping_ids:
       return
-
+    from ggrc.models.hooks import acl
     ids_query = db.session.query(
         Relationship.id
     ).filter(
