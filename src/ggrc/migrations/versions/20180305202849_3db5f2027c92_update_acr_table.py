@@ -21,10 +21,9 @@ from ggrc.migrations.utils import acr_propagation_constants as const
 revision = '3db5f2027c92'
 down_revision = '082306b17b07'
 
-_ASSESSMENT_ROLES = ("Creators", "Assignees", "Verifiers")
 
 _ASSESSMENT_PROPAGATION = {
-    _ASSESSMENT_ROLES: {
+    ("Creators", "Verifiers"): {
         "Relationship R": {
             "Audit R": {
                 "Relationship R": {
@@ -39,6 +38,23 @@ _ASSESSMENT_PROPAGATION = {
             "Document RUD": {},
             "Comment R": {},
             "Issue R": const.COMMENT_DOCUMENT_R,
+        },
+    },
+    "Assignees": {
+        "Relationship R": {
+            "Snapshot R": {
+                "Relationship R": {
+                    "Snapshot R": {},
+                },
+            },
+            "Audit R": {
+                "Relationship R": {
+                    "Document R": {},
+                },
+            },
+            "Document RUD": {},
+            "Comment R": {},
+            "Issue RUD": const.COMMENT_DOCUMENT_RUD,
         },
     },
 }
