@@ -85,7 +85,7 @@ class TestProgramReadersPropagation(base.TestACLPropagation):
               "read_revisions": True,
               "map": False,
               "create_and_map": False,
-              "raise_issue": False,
+              "raise_issue": (False, "unimplemented"),
               "unmap": False,
           },
           "Issue Audit": {
@@ -167,7 +167,7 @@ class TestProgramReadersPropagation(base.TestACLPropagation):
               "read_revisions": True,
               "map": False,
               "create_and_map": False,
-              "raise_issue": False,
+              "raise_issue": (False, "unimplemented"),
               "unmap": False,
           },
           "Issue Audit": {
@@ -202,7 +202,7 @@ class TestProgramReadersPropagation(base.TestACLPropagation):
               "map_control": True,
               "deprecate": True,
               "archive": False,
-              "unarchive": False,
+              "unarchive": (False, "unimplemented"),
               "summary": True,
           },
           "Assessment": {
@@ -221,8 +221,8 @@ class TestProgramReadersPropagation(base.TestACLPropagation):
               "complete": True,
               "in_progress": True,
               "not_started": True,
-              "decline": False,
-              "verify": False,
+              "decline": (False, "unimplemented"),
+              "verify": (False, "unimplemented"),
           },
           "AssessmentTemplate": {
               "create": True,

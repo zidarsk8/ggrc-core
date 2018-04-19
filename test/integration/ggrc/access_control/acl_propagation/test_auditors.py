@@ -46,8 +46,8 @@ class TestAuditorsPropagation(base.TestACLPropagation):
               "complete": True,
               "in_progress": True,
               "not_started": True,
-              "decline": False,
-              "verify": False,
+              "decline": (False, "unimplemented"),
+              "verify": (False, "unimplemented"),
           },
           "AssessmentTemplate": {
               "create": False,
@@ -59,13 +59,13 @@ class TestAuditorsPropagation(base.TestACLPropagation):
           "Snapshot Assessment": {
               "read": True,
               "read_original": False,
-              "update": False,
+              "update": (False, "unimplemented"),
               "get_latest_version": False,
           },
           "Snapshot Audit": {
               "read": True,
               "read_original": False,
-              "update": False,
+              "update": (False, "unimplemented"),
               "get_latest_version": False,
           },
           "Issue Assessment": {
@@ -103,8 +103,8 @@ class TestAuditorsPropagation(base.TestACLPropagation):
               "summary": True,
           },
           "Assessment": {
-              "create": True,
-              "generate": True,
+              "create": (True, "unimplemented"),
+              "generate": (True, "unimplemented"),
               "read": True,
               "update": True,
               "delete": False,
@@ -118,8 +118,8 @@ class TestAuditorsPropagation(base.TestACLPropagation):
               "complete": True,
               "in_progress": True,
               "not_started": True,
-              "decline": False,
-              "verify": False,
+              "decline": (False, "unimplemented"),
+              "verify": (False, "unimplemented"),
           },
           "AssessmentTemplate": {
               "create": False,
@@ -131,13 +131,13 @@ class TestAuditorsPropagation(base.TestACLPropagation):
           "Snapshot Assessment": {
               "read": True,
               "read_original": True,
-              "update": False,
+              "update": (False, "unimplemented"),
               "get_latest_version": True,
           },
           "Snapshot Audit": {
               "read": True,
               "read_original": True,
-              "update": False,
+              "update": (False, "unimplemented"),
               "get_latest_version": True,
           },
           "Issue Assessment": {
@@ -171,7 +171,7 @@ class TestAuditorsPropagation(base.TestACLPropagation):
               "map_external_control": True,
               "deprecate": True,
               "archive": False,
-              "unarchive": False,
+              "unarchive": (False, "unimplemented"),
               "summary": True,
           },
           "Assessment": {
@@ -190,8 +190,8 @@ class TestAuditorsPropagation(base.TestACLPropagation):
               "complete": True,
               "in_progress": True,
               "not_started": True,
-              "decline": False,
-              "verify": False,
+              "decline": (False, "unimplemented"),
+              "verify": (False, "unimplemented"),
           },
           "AssessmentTemplate": {
               "create": True,
