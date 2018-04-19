@@ -4,9 +4,9 @@
 */
 ;(function(can) {
 
-  can.Model.LocalStorage("CMS.Models.LocalListCache", {
+  can.Model.LocalStorage('CMS.Models.LocalListCache', {
     attributes : {
-      objects : "modelize",
+      objects : 'modelize',
     }
     , convert : {
       modelize : function(serial) {
@@ -63,7 +63,7 @@
           let obj = {
             id : d.id
             , type : that.type
-            , href : d.href || d.selfLink || ("/api/" + that.type + "/" + d.id),
+            , href : d.href || d.selfLink || ('/api/' + that.type + '/' + d.id),
           };
           can.each(that.keys, function(key) {
             obj[key] = (d[key] && d[key].serialize) ? d[key].serialize() : d[key];

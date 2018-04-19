@@ -31,12 +31,12 @@ import {confirm} from '../../plugins/utils/modals';
       join_model: '@',
       model: null,
       delay: '@',
-      quick_create: "@",
+      quick_create: '@',
       type: '@',
-      verify_event: "@",
-      modal_description: "@",
-      modal_title: "@",
-      modal_button: "@",
+      verify_event: '@',
+      modal_description: '@',
+      modal_title: '@',
+      modal_button: '@',
       attributes: {},
       define: {
         deferred: {
@@ -106,19 +106,19 @@ import {confirm} from '../../plugins/utils/modals';
             this.element.context.attributes.modal_description.value);
         }
 
-        if (scope.attr("verify_event")) {
+        if (scope.attr('verify_event')) {
           confirm({
-            modal_description: scope.attr("modal_description"),
-            modal_confirm: scope.attr("modal_button"),
-            modal_title: scope.attr("modal_title"),
-            button_view: GGRC.mustache_path + "/quick_form/confirm_buttons.mustache",
+            modal_description: scope.attr('modal_description'),
+            modal_confirm: scope.attr('modal_button'),
+            modal_title: scope.attr('modal_title'),
+            button_view: GGRC.mustache_path + '/quick_form/confirm_buttons.mustache',
           }, verify_dfd.resolve, verify_dfd.reject);
         } else {
           verify_dfd.resolve();
         }
 
         verify_dfd.done(function () {
-          if (this.scope.quick_create && this.scope.quick_create !== "@") {
+          if (this.scope.quick_create && this.scope.quick_create !== '@') {
             quick_create = this.scope[this.scope.quick_create].bind(this);
             if (quick_create) {
               created_dfd = quick_create();
@@ -167,12 +167,12 @@ import {confirm} from '../../plugins/utils/modals';
           }
 
           created_dfd.then(function() {
-            if (this.scope.join_model && this.scope.join_model !== "@") {
+            if (this.scope.join_model && this.scope.join_model !== '@') {
               join_model_class = CMS.Models[this.scope.join_model] || CMS.ModelHelpers[this.scope.join_model];
               join_object = {};
-              if (this.scope.join_model === "Relationship") {
-                join_object["source"] = this.scope.parent_instance;
-                join_object["destination"] = this.scope.instance;
+              if (this.scope.join_model === 'Relationship') {
+                join_object['source'] = this.scope.parent_instance;
+                join_object['destination'] = this.scope.instance;
               } else {
                 join_object[this.scope.instance.constructor.table_singular] = this.scope.instance;
               }
@@ -233,15 +233,15 @@ import {confirm} from '../../plugins/utils/modals';
           that.scope.attr('instance', ui.item);
         });
       },
-      "input[null-if-empty] change" : function(el) {
+      'input[null-if-empty] change' : function(el) {
         if (!el.val()) {
-          this.scope.attributes.attr(el.attr("name"), null);
+          this.scope.attributes.attr(el.attr('name'), null);
         }
       },
-      "input:not([data-mapping], [data-lookup]) change" : function(el) {
-        this.scope.attributes.attr(el.attr("name"), el.val());
+      'input:not([data-mapping], [data-lookup]) change' : function(el) {
+        this.scope.attributes.attr(el.attr('name'), el.val());
       },
-      ".ui-autocomplete-input modal:success" : function(el, ev, data, options) {
+      '.ui-autocomplete-input modal:success' : function(el, ev, data, options) {
         let that = this,
           multi_map = data.multi_map,
           join_model_class,
@@ -263,7 +263,7 @@ import {confirm} from '../../plugins/utils/modals';
               },
               this.scope.attributes.serialize())
             ).save().done(function() {
-              that.element.find("a[data-toggle=submit]").trigger("modal:success");
+              that.element.find('a[data-toggle=submit]').trigger('modal:success');
             });
           }
 
@@ -291,13 +291,13 @@ import {confirm} from '../../plugins/utils/modals';
               },
               this.scope.attributes.serialize())
             ).save().done(function() {
-              that.element.find("a[data-toggle=submit]").trigger("modal:success");
+              that.element.find('a[data-toggle=submit]').trigger('modal:success');
             });
           }
           //end multi-map
         } else {
 
-          if (this.scope.join_model && this.scope.join_model !== "@") {
+          if (this.scope.join_model && this.scope.join_model !== '@') {
             join_model_class = CMS.Models[this.scope.join_model] || CMS.ModelHelpers[this.scope.join_model];
             join_object = new join_model_class(this.scope.attributes.serialize());
           } else {
@@ -312,7 +312,7 @@ import {confirm} from '../../plugins/utils/modals';
             );
           }
           join_object.save().done(function() {
-            that.element.find("a[data-toggle=submit]").trigger("modal:success");
+            that.element.find('a[data-toggle=submit]').trigger('modal:success');
           });
         }
       },

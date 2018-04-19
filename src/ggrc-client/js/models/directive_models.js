@@ -5,14 +5,14 @@
 
 (function(can) {
 
-  can.Model.Cacheable("CMS.Models.Directive", {
-    root_object : "directive"
-    , root_collection : "directives"
-    , category : "governance"
+  can.Model.Cacheable('CMS.Models.Directive', {
+    root_object : 'directive'
+    , root_collection : 'directives'
+    , category : 'governance'
     // `rootModel` overrides `model.shortName` when determining polymorphic types
-    , root_model : "Directive"
-    , findAll : "/api/directives"
-    , findOne : "/api/directives/{id}"
+    , root_model : 'Directive'
+    , findAll : '/api/directives'
+    , findOne : '/api/directives/{id}'
     , mixins : ['unique_title', 'timeboxed', 'ca_update', 'base-notifications']
     , tree_view_options : {
       attr_view: GGRC.mustache_path + '/directives/tree-item-attr.mustache'
@@ -21,7 +21,7 @@
         {attr_title: 'Effective Date', attr_name: 'start_date'},
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       ])
-      , add_item_view : GGRC.mustache_path + "/snapshots/tree_add_item.mustache",
+      , add_item_view : GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
     }
 
     , model : function(params) {
@@ -43,7 +43,7 @@
         else if (CMS.Models.Standard.meta_kinds.indexOf(params.kind) > -1)
           return CMS.Models.Standard.model(params);
       }
-      console.debug("Invalid Directive:", params);
+      console.debug('Invalid Directive:', params);
     },
     attributes : {
       context: 'CMS.Models.Context.stub',
@@ -58,7 +58,7 @@
     , defaults : {
     }
     , init : function() {
-      this.validateNonBlank("title");
+      this.validateNonBlank('title');
       //this.validateInclusionOf("kind", this.meta_kinds);
       this._super.apply(this, arguments);
     }
@@ -71,26 +71,26 @@
     , lowercase_kind : function() { return this.kind ? this.kind.toLowerCase() : undefined; },
   });
 
-  CMS.Models.Directive("CMS.Models.Standard", {
-    root_object : "standard"
-    , root_collection : "standards"
-    , model_plural : "Standards"
-    , table_plural : "standards"
-    , title_plural : "Standards"
-    , model_singular : "Standard"
-    , title_singular : "Standard"
-    , table_singular : "standard"
-    , findAll : "GET /api/standards"
-    , findOne : "GET /api/standards/{id}"
-    , create : "POST /api/standards"
-    , update : "PUT /api/standards/{id}"
-    , destroy : "DELETE /api/standards/{id}"
+  CMS.Models.Directive('CMS.Models.Standard', {
+    root_object : 'standard'
+    , root_collection : 'standards'
+    , model_plural : 'Standards'
+    , table_plural : 'standards'
+    , title_plural : 'Standards'
+    , model_singular : 'Standard'
+    , title_singular : 'Standard'
+    , table_singular : 'standard'
+    , findAll : 'GET /api/standards'
+    , findOne : 'GET /api/standards/{id}'
+    , create : 'POST /api/standards'
+    , update : 'PUT /api/standards/{id}'
+    , destroy : 'DELETE /api/standards/{id}'
     , is_custom_attributable: true
     , isRoleable: true
     , attributes : {}
-    , meta_kinds : [ "Standard" ],
+    , meta_kinds : [ 'Standard' ],
     mixins: ['accessControlList']
-    , cache : can.getObject("cache", CMS.Models.Directive, true),
+    , cache : can.getObject('cache', CMS.Models.Directive, true),
     sub_tree_view_options: {
       default_filter: ['Section'],
     },
@@ -105,26 +105,26 @@
     },
   }, {});
 
-  CMS.Models.Directive("CMS.Models.Regulation", {
-    root_object : "regulation"
-    , root_collection : "regulations"
-    , model_plural : "Regulations"
-    , table_plural : "regulations"
-    , title_plural : "Regulations"
-    , model_singular : "Regulation"
-    , title_singular : "Regulation"
-    , table_singular : "regulation"
-    , findAll : "GET /api/regulations"
-    , findOne : "GET /api/regulations/{id}"
-    , create : "POST /api/regulations"
-    , update : "PUT /api/regulations/{id}"
-    , destroy : "DELETE /api/regulations/{id}"
+  CMS.Models.Directive('CMS.Models.Regulation', {
+    root_object : 'regulation'
+    , root_collection : 'regulations'
+    , model_plural : 'Regulations'
+    , table_plural : 'regulations'
+    , title_plural : 'Regulations'
+    , model_singular : 'Regulation'
+    , title_singular : 'Regulation'
+    , table_singular : 'regulation'
+    , findAll : 'GET /api/regulations'
+    , findOne : 'GET /api/regulations/{id}'
+    , create : 'POST /api/regulations'
+    , update : 'PUT /api/regulations/{id}'
+    , destroy : 'DELETE /api/regulations/{id}'
     , is_custom_attributable: true
     , isRoleable: true
     , attributes : {},
     mixins: ['accessControlList']
-    , meta_kinds : [ "Regulation" ]
-    , cache : can.getObject("cache", CMS.Models.Directive, true),
+    , meta_kinds : [ 'Regulation' ]
+    , cache : can.getObject('cache', CMS.Models.Directive, true),
     sub_tree_view_options: {
       default_filter: ['Section'],
     },
@@ -139,27 +139,27 @@
     },
   }, {});
 
-  CMS.Models.Directive("CMS.Models.Policy", {
-    root_object : "policy"
-    , root_collection : "policies"
-    , model_plural : "Policies"
-    , table_plural : "policies"
-    , title_plural : "Policies"
-    , model_singular : "Policy"
-    , title_singular : "Policy"
-    , table_singular : "policy"
-    , findAll : "GET /api/policies"
-    , findOne : "GET /api/policies/{id}"
-    , create : "POST /api/policies"
-    , update : "PUT /api/policies/{id}"
-    , destroy : "DELETE /api/policies/{id}"
+  CMS.Models.Directive('CMS.Models.Policy', {
+    root_object : 'policy'
+    , root_collection : 'policies'
+    , model_plural : 'Policies'
+    , table_plural : 'policies'
+    , title_plural : 'Policies'
+    , model_singular : 'Policy'
+    , title_singular : 'Policy'
+    , table_singular : 'policy'
+    , findAll : 'GET /api/policies'
+    , findOne : 'GET /api/policies/{id}'
+    , create : 'POST /api/policies'
+    , update : 'PUT /api/policies/{id}'
+    , destroy : 'DELETE /api/policies/{id}'
     , tree_view_options : {}
     , is_custom_attributable: true
     , isRoleable: true
     , attributes : {},
     mixins: ['accessControlList']
-    , meta_kinds : [  "Company Policy", "Org Group Policy", "Data Asset Policy", "Product Policy", "Contract-Related Policy", "Company Controls Policy" ]
-    , cache : can.getObject("cache", CMS.Models.Directive, true),
+    , meta_kinds : [  'Company Policy', 'Org Group Policy', 'Data Asset Policy', 'Product Policy', 'Contract-Related Policy', 'Company Controls Policy' ]
+    , cache : can.getObject('cache', CMS.Models.Directive, true),
     sub_tree_view_options: {
       default_filter: ['DataAsset'],
     },
@@ -185,27 +185,27 @@
     },
   }, {});
 
-  CMS.Models.Directive("CMS.Models.Contract", {
-    root_object : "contract"
-    , root_collection : "contracts"
-    , model_plural : "Contracts"
-    , table_plural : "contracts"
-    , title_plural : "Contracts"
-    , model_singular : "Contract"
-    , title_singular : "Contract"
-    , table_singular : "contract"
-    , findAll : "GET /api/contracts"
-    , findOne : "GET /api/contracts/{id}"
-    , create : "POST /api/contracts"
-    , update : "PUT /api/contracts/{id}"
-    , destroy : "DELETE /api/contracts/{id}",
+  CMS.Models.Directive('CMS.Models.Contract', {
+    root_object : 'contract'
+    , root_collection : 'contracts'
+    , model_plural : 'Contracts'
+    , table_plural : 'contracts'
+    , title_plural : 'Contracts'
+    , model_singular : 'Contract'
+    , title_singular : 'Contract'
+    , table_singular : 'contract'
+    , findAll : 'GET /api/contracts'
+    , findOne : 'GET /api/contracts/{id}'
+    , create : 'POST /api/contracts'
+    , update : 'PUT /api/contracts/{id}'
+    , destroy : 'DELETE /api/contracts/{id}',
     mixins: ['accessControlList']
     , is_custom_attributable: true
     , isRoleable: true
     , attributes : {
     }
-    , meta_kinds : [ "Contract" ]
-    , cache : can.getObject("cache", CMS.Models.Directive, true),
+    , meta_kinds : [ 'Contract' ]
+    , cache : can.getObject('cache', CMS.Models.Directive, true),
     sub_tree_view_options: {
       default_filter: ['Clause'],
     },

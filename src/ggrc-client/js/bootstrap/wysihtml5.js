@@ -6,13 +6,13 @@
 import wysihtml5 from 'wysihtml5/wysihtml5-0.4.0pre';
 
 !function($) {
-  "use strict"; // jshint ;_;
+  'use strict'; // jshint ;_;
 
   // Insert http:// before links
   let createLink = wysihtml5.commands.createLink
     , old_exec = createLink.exec;
   createLink.exec = function(composer, command, value) {
-    let url = typeof(value) === "object" ? value.href : value;
+    let url = typeof(value) === 'object' ? value.href : value;
 
     // Inject the http:// if no prefix was included
     url = url.indexOf('//') > -1 ? url : 'http://' + url;
@@ -22,7 +22,7 @@ import wysihtml5 from 'wysihtml5/wysihtml5-0.4.0pre';
     if (url.match(/^http:\/\/.+?\/\//))
       url = url.replace(/^http:\/\//, '');
 
-    if (typeof(value) === "object")
+    if (typeof(value) === 'object')
       value.href = url;
     else
       value = url;
@@ -43,7 +43,7 @@ import wysihtml5 from 'wysihtml5/wysihtml5-0.4.0pre';
           rangy.dom.getBody(document).appendChild(iframeEl);
           return rangy.dom.getIframeDocument(iframeEl, true);
         } else {
-          throw new Error("getIframeWindow: No Document object found for iframe element");
+          throw new Error('getIframeWindow: No Document object found for iframe element');
         }
       };
 
@@ -57,7 +57,7 @@ import wysihtml5 from 'wysihtml5/wysihtml5-0.4.0pre';
           rangy.dom.getBody(document).appendChild(iframeEl);
           return rangy.dom.getIframeWindow(iframeEl, true);
         } else {
-          throw new Error("getIframeWindow: No Window object found for iframe element");
+          throw new Error('getIframeWindow: No Window object found for iframe element');
         }
       };
     });
@@ -69,9 +69,9 @@ import wysihtml5 from 'wysihtml5/wysihtml5-0.4.0pre';
     dom = wysihtml5.dom,
     browser = wysihtml5.browser,
     handleUserInteraction = function (event) {
-      this.parent.fire("beforeinteraction").fire("beforeinteraction:composer");
+      this.parent.fire('beforeinteraction').fire('beforeinteraction:composer');
       setTimeout((function() {
-        this.parent.fire("interaction").fire("interaction:composer");
+        this.parent.fire('interaction').fire('interaction:composer');
       }).bind(this), 0);
     },
     addListeners = function (target, events, callback) {
@@ -83,7 +83,7 @@ import wysihtml5 from 'wysihtml5/wysihtml5-0.4.0pre';
     let element = this.element,
       focusBlurElement = browser.supportsEventsInIframeCorrectly() ? element : this.sandbox.getWindow();
 
-    addListeners(focusBlurElement, ["focus", "keyup"], handleUserInteraction.bind(this));
+    addListeners(focusBlurElement, ['focus', 'keyup'], handleUserInteraction.bind(this));
     return originalObserve.apply(this, arguments);
   };
 

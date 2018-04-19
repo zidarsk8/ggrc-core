@@ -123,7 +123,7 @@ let ApprovalWorkflow = can.Observe({
             })
           ).then(function() {
             return $.when.apply($, can.map(can.makeArray(arguments), function(tg) {
-              return tg.attr("contact", that.contact).save().then(function(tg) {
+              return tg.attr('contact', that.contact).save().then(function(tg) {
                 return $.when.apply($, can.map(tg.task_group_tasks.reify(), function(tgt) {
                   return tgt.refresh().then(function(tgt) {
 
@@ -171,12 +171,12 @@ export default ModalsController({
     original_object : null,
     new_object_form: true,
     model: ApprovalWorkflow,
-    modal_title: "Submit for review",
-    custom_save_button_text: "Submit",
-    content_view: GGRC.mustache_path + "/wf_objects/approval_modal_content.mustache",
+    modal_title: 'Submit for review',
+    custom_save_button_text: 'Submit',
+    content_view: GGRC.mustache_path + '/wf_objects/approval_modal_content.mustache',
     button_view : BUTTON_VIEW_SAVE_CANCEL,
     afterFetch: function () {
-      this.attr("instance", new ApprovalWorkflow({
+      this.attr('instance', new ApprovalWorkflow({
         original_object : this.attr('instance'),
       }));
     },
@@ -186,9 +186,9 @@ export default ModalsController({
     this.options.button_view = BUTTON_VIEW_SAVE_CANCEL;
     this._super.apply(this, arguments);
   },
-  "input[null-if-empty] change" : function(el, ev) {
-    if(el.val() === "") {
-      this.options.instance.attr(el.attr("name").split(".").slice(0, -1).join("."), null);
+  'input[null-if-empty] change' : function(el, ev) {
+    if(el.val() === '') {
+      this.options.instance.attr(el.attr('name').split('.').slice(0, -1).join('.'), null);
     }
   },
 });

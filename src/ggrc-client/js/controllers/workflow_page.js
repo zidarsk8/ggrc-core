@@ -4,14 +4,14 @@
 */
 
 ;(function(CMS, GGRC, can, $) {
-  can.Control("GGRC.Controllers.WorkflowPage", {
+  can.Control('GGRC.Controllers.WorkflowPage', {
     defaults: {
     },
   }, {
     //  FIXME: This should trigger expansion of the TreeNode, without using
     //    global event listeners or routes or timeouts, but currently object
     //    creation and tree insertion is disconnected.
-    "{CMS.Models.TaskGroup} created": function(model, ev, instance) {
+    '{CMS.Models.TaskGroup} created': function(model, ev, instance) {
       if (instance instanceof CMS.Models.TaskGroup) {
         setTimeout(function() {
           // If the TaskGroup was created as part of a Workflow, we don't want to

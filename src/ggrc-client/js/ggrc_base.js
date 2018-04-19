@@ -19,9 +19,9 @@ import PersistentNotifier from './plugins/persistent_notifier';
 
   GGRC.register_hook = function(path, hook) {
     let h, parent_path, last;
-    parent_path = path.split(".");
+    parent_path = path.split('.');
     last = parent_path.pop();
-    parent_path = can.getObject(parent_path.join("."), GGRC.hooks, true);
+    parent_path = can.getObject(parent_path.join('.'), GGRC.hooks, true);
     if (!(h = parent_path[last])) {
       h = new can.Observe.List();
       parent_path[last] = h;
@@ -73,7 +73,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
         let kind = data[subtree._key];
         let model;
         can.each(subtree, function(v, k) {
-          if (k != "_key" && v.meta_kinds.indexOf(kind) >= 0) {
+          if (k != '_key' && v.meta_kinds.indexOf(kind) >= 0) {
             model = v;
           }
         });
@@ -81,7 +81,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
       }
 
       function resolve(subtree, data) {
-        if (typeof subtree === "undefined")
+        if (typeof subtree === 'undefined')
           return null;
         return can.isPlainObject(subtree) ?
           subtree._discriminator(data) :
@@ -128,7 +128,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
     },
 
     queue_event: function(events) {
-      if (typeof (events) === "function")
+      if (typeof (events) === 'function')
         events = [events];
       GGRC.eventqueue.push.apply(GGRC.eventqueue, events);
       if (!GGRC.eventqueueTimeout)
@@ -146,7 +146,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
       notifier.on_empty(go);
     },
 
-    delay_leaving_page_until: $.proxy(notifier, "queue"),
+    delay_leaving_page_until: $.proxy(notifier, 'queue'),
   });
 
   GGRC.Errors = (function () {
@@ -223,33 +223,33 @@ import PersistentNotifier from './plugins/persistent_notifier';
       let _a, _b, i,
         _c = 0,
         ret = [],
-        adi = a.indexOf("."),
-        bdi = b.indexOf(".");
+        adi = a.indexOf('.'),
+        bdi = b.indexOf('.');
 
       if (adi < 0) {
-        a = a + ".";
+        a = a + '.';
         adi = a.length - 1;
       }
       if (bdi < 0) {
-        b = b + ".";
+        b = b + '.';
         bdi = b.length - 1;
       }
       while (adi < bdi) {
-        a = "0" + a;
+        a = '0' + a;
         adi++;
       }
       while (bdi < adi) {
-        b = "0" + b;
+        b = '0' + b;
         bdi++;
       }
 
       for (i = Math.max(a.length, b.length) - 1; i >= 0; i--) {
         _a = a[i] || 0;
         _b = b[i] || 0;
-        if (_a === "." || _b === ".") {
-          if (_a !== "." || _b !== ".")
-            throw "Decimal alignment error";
-          ret.unshift(".");
+        if (_a === '.' || _b === '.') {
+          if (_a !== '.' || _b !== '.')
+            throw 'Decimal alignment error';
+          ret.unshift('.');
         } else {
           ret.unshift((+_a) + (+_b) + _c);
           _c = Math.floor(ret[0] / 10);
@@ -259,10 +259,10 @@ import PersistentNotifier from './plugins/persistent_notifier';
       if (_c > 0) {
         ret.unshift(_c.toString(10));
       }
-      if (ret[ret.length - 1] === ".") {
+      if (ret[ret.length - 1] === '.') {
         ret.pop();
       }
-      return ret.join("");
+      return ret.join('');
     },
 
     /*
@@ -275,13 +275,13 @@ import PersistentNotifier from './plugins/persistent_notifier';
         _c = 0,
         ret = [];
 
-      if (!~a.indexOf(".")) {
-        a = a + ".";
+      if (!~a.indexOf('.')) {
+        a = a + '.';
       }
       for (i = 0; i < a.length; i++) {
         _a = a[i];
-        if (_a === ".") {
-          ret.push(".");
+        if (_a === '.') {
+          ret.push('.');
         } else {
           _a = Math.floor((+_a + _c) / 2);
           if (+a[i] % 2) {
@@ -293,15 +293,15 @@ import PersistentNotifier from './plugins/persistent_notifier';
         }
       }
       if (_c > 0) {
-        ret.push("5");
+        ret.push('5');
       }
-      if (ret[ret.length - 1] === ".") {
+      if (ret[ret.length - 1] === '.') {
         ret.pop();
       }
-      while (ret[0] === "0" && ret.length > 1) {
+      while (ret[0] === '0' && ret.length > 1) {
         ret.shift();
       }
-      return ret.join("");
+      return ret.join('');
     },
 
     /*
@@ -322,17 +322,17 @@ import PersistentNotifier from './plugins/persistent_notifier';
     */
     string_less_than: function(a, b) {
       let i,
-        _a = ("" + a).replace(/^0*/, ""),
-        _b = ("" + b).replace(/^0*/, ""),
-        adi = _a.indexOf("."),
-        bdi = _b.indexOf(".");
+        _a = ('' + a).replace(/^0*/, ''),
+        _b = ('' + b).replace(/^0*/, ''),
+        adi = _a.indexOf('.'),
+        bdi = _b.indexOf('.');
 
       if (adi < 0) {
-        _a = _a + ".";
+        _a = _a + '.';
         adi = _a.length - 1;
       }
       if (bdi < 0) {
-        _b = _b + ".";
+        _b = _b + '.';
         bdi = _b.length - 1;
       }
       if (adi < bdi) {
@@ -342,7 +342,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
         return false;
       }
       for (i = 0; i < _a.length - 1; i++) {
-        if (_a[i] === ".") {
+        if (_a[i] === '.') {
         // continue
         } else {
           if ((+_a[i] || 0) < (+_b[i] || 0)) {

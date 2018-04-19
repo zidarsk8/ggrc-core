@@ -87,7 +87,7 @@ export default Filterable({
     let content = this.element
       , controller_content = null;
 
-    if (prefs.getCollapsed(window.getPageToken(), this.element.attr("id"))) {
+    if (prefs.getCollapsed(window.getPageToken(), this.element.attr('id'))) {
 
       this.element
         .find('.widget-showhide > a')
