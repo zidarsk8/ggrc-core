@@ -15,8 +15,8 @@
     from the quick-add component above, in that it is not waiting for a submit trigger.
   */
   can.Component.extend({
-    tag: "ggrc-quick-update",
-    template: "<content/>",
+    tag: 'ggrc-quick-update',
+    template: '<content/>',
     scope: {
       instance: null,
       source_mapping: null,
@@ -25,8 +25,8 @@
     },
     events: {
       init: function() {
-        this.scope.attr("controller", this);
-        this.scope.attr("model", this.scope.model || this.scope.instance.constructor);
+        this.scope.attr('controller', this);
+        this.scope.attr('model', this.scope.model || this.scope.instance.constructor);
         if(!this.scope.instance._transient) {
           //only refresh if there's not currently an edit modal spawned.
           this.scope.instance.refresh();
@@ -39,16 +39,16 @@
         let that = this;
         setTimeout(function() {
           let serial = that.scope.instance.serialize();
-          delete serial[el.attr("name")];
-          delete serial[el.attr("name") + "_id"];
-          delete serial[el.attr("name") + "_type"];
+          delete serial[el.attr('name')];
+          delete serial[el.attr('name') + '_id'];
+          delete serial[el.attr('name') + '_type'];
           delete serial.id;
           delete serial.href;
           delete serial.selfLink;
           delete serial.created_at;
           delete serial.updated_at;
           delete serial.provisional_id;
-          serial[el.attr("name")] = ui.item.stub();
+          serial[el.attr('name')] = ui.item.stub();
           that.scope.instance.destroy().then(function() {
             new that.scope.model(serial).save();
           });
@@ -56,41 +56,41 @@
       },
       // null-if-empty attributes are a pattern carried over from GGRC.Controllers.Modals
       //  Useful for connected objects.
-      "input[null-if-empty] change" : function(el) {
+      'input[null-if-empty] change' : function(el) {
         if (!el.val()) {
-          this.scope.instance.attr(el.attr("name"), null);
+          this.scope.instance.attr(el.attr('name'), null);
         }
       },
       // data-mapping is the element decoration that triggers an autocomplete based on a
       //  mapping to a parent instance.  The mapping_autocomplete helper defined below is
       //  generally for these.
-      "input:not([data-mapping]), select change" : function(el) {
-        let isCheckbox = el.is("[type=checkbox][multiple]");
+      'input:not([data-mapping]), select change' : function(el) {
+        let isCheckbox = el.is('[type=checkbox][multiple]');
         let isDropdown = el.is('select');
         if (isCheckbox) {
-          if(!this.scope.instance[el.attr("name")]) {
-            this.scope.instance.attr(el.attr("name"), new can.List());
+          if(!this.scope.instance[el.attr('name')]) {
+            this.scope.instance.attr(el.attr('name'), new can.List());
           }
           this.scope.instance
-            .attr(el.attr("name"))
+            .attr(el.attr('name'))
             .replace(
               can.map(
-                this.element.find("input[name='" + el.attr("name") + "']:checked"),
+                this.element.find("input[name='" + el.attr('name') + "']:checked"),
                 function(el) {
                   return $(el).val();
                 }
               )
             );
-          this.element.find("input:checkbox").prop("disabled", true);
+          this.element.find('input:checkbox').prop('disabled', true);
         } else {
-          this.scope.instance.attr(el.attr("name"), el.val());
+          this.scope.instance.attr(el.attr('name'), el.val());
           if (isDropdown) {
             el.closest('dropdown').attr('is-disabled', true);
           }
         }
         this.scope.instance.save().then(function () {
           if (isCheckbox) {
-            this.element.find("input:checkbox").prop("disabled", false);
+            this.element.find('input:checkbox').prop('disabled', false);
           } else if (isDropdown) {
             el.closest('dropdown').attr('is-disabled', false);
           }

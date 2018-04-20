@@ -65,7 +65,7 @@
       if (!type || !tree_widgets[type]) {
         return;
       }
-      tree_widgets[type] = tree_widgets[type].concat(["RiskAssessment"]);
+      tree_widgets[type] = tree_widgets[type].concat(['RiskAssessment']);
     });
     if (page_instance && ~can.inArray(page_instance.constructor.shortName, _risk_assessments_object_types)) {
       descriptor[page_instance.constructor.shortName] = {

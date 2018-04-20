@@ -8,8 +8,8 @@
   'use strict';
 
   can.Component.extend({
-    tag: "workflow-deactivate",
-    template: "<content/>",
+    tag: 'workflow-deactivate',
+    template: '<content/>',
     events: {
       click: function() {
         let workflow = GGRC.page_instance();

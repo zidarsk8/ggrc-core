@@ -5,7 +5,7 @@
 
 !function ($) {
 
-  "use strict"; // jshint ;_;
+  'use strict'; // jshint ;_;
 
 
   /* STICKY_POPOVER PUBLIC CLASS DEFINITION
@@ -72,7 +72,7 @@
         this.displayState = 'show';
         this.trigger_load();
         $.fn.popover.Constructor.prototype.show.apply(this);
-        this.tip().css({opacity : ""});
+        this.tip().css({opacity : ''});
         if (this.options.sticky_hover) {
           this.tip().
             on('mouseenter', $.proxy(this.tip_enter, this)).
@@ -96,8 +96,8 @@
       if (!loaded) {
         $.ajax({
           url : href
-          , type : "get"
-          , dataType : "html"
+          , type : 'get'
+          , dataType : 'html'
           , success : function(data) {
             let $data = $(data.trim());
             self.$element.attr('data-original-title', $data.filter('.popover-title').html());
