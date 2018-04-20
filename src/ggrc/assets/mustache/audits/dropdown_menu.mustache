@@ -104,8 +104,8 @@
     {{/if}}
   {{/is_info_pin}}
 
+  {{#using program=instance.program}}
   {{^if instance.archived}}
-    {{#using program=instance.program}}
     {{#if_helpers '\
       #system_role' 'Administrator' '\
       or #system_role' 'Superuser' '\
@@ -121,8 +121,10 @@
           </a>
        </li>
     {{/if_helpers}}
-    {{/using}}
+  {{/if}}
+  {{/using}}
 
+  {{^if instance.archived}}
     {{#is_allowed 'delete' instance}}
         <li>
           <a data-test-id="dropdown_settings_delete_6a62eaaf"
@@ -136,8 +138,9 @@
           </a>
         </li>
     {{/is_allowed}}
+  {{/if}}
 
-  {{else}}
+  {{#if instance.archived}}
     {{#if_helpers '\
       #system_role' 'Administrator' '\
       or #system_role' 'Superuser'}}
