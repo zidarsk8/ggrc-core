@@ -18,142 +18,14 @@ from ggrc.migrations.utils import acr_propagation_constants as const
 revision = '3db5f2027c92'
 down_revision = '242b8dc8493b'
 
-_AUDIT_FULL_ACCESS = {
-    "Relationship R": {
-        "Assessment RUD": const.COMMENT_DOCUMENT_RUD,
-        "AssessmentTemplate RUD": {},
-        "Document RUD": {},
-        "Issue RUD": const.COMMENT_DOCUMENT_RUD,
-        "Snapshot RU": {},
-    },
-}
-
-_PE_AUDIT_ACCESS = {
-    "Relationship R": {
-        "Assessment RU": const.COMMENT_DOCUMENT_RUD,
-        "AssessmentTemplate RUD": {},
-        "Issue RUD": const.COMMENT_DOCUMENT_RUD,
-        "Document RUD": {},
-        "Snapshot RU": {},
-    },
-}
-
-_AUDITOR_ACCESS = {
-    "Relationship R": {
-        "Assessment RU": const.COMMENT_DOCUMENT_R,
-        "AssessmentTemplate R": {},
-        "Document R": {},
-        "Issue RU": const.COMMENT_DOCUMENT_R,
-        "Snapshot RU": {},
-    },
-}
-
-_AUDIT_READ_ACCESS = {
-    "Relationship R": {
-        "Assessment R": const.COMMENT_DOCUMENT_R,
-        "AssessmentTemplate R": {},
-        "Document R": {},
-        "Issue R": const.COMMENT_DOCUMENT_R,
-        "Snapshot R": {},
-    },
-}
-
-_PROGRAM_OBJECTS_R = (
-    "AccessGroup R",
-    "Clause R",
-    "Contract R",
-    # "Control R",  # control is separate due to proposals
-    "DataAsset R",
-    "Facility R",
-    "Issue R",
-    "Market R",
-    "Objective R",
-    "OrgGroup R",
-    "Policy R",
-    "Process R",
-    "Product R",
-    "Project R",
-    "Regulation R",
-    # "Risk R",  # excluded due to proposals
-    "RiskAssessment R",
-    "Section R",
-    "Standard R",
-    "System R",
-    "Threat R",
-    "Vendor R",
-)
-
-_PROGRAM_OBJECTS_RUD = (
-    "AccessGroup RUD",
-    "Clause RUD",
-    "Contract RUD",
-    # "Control RUD",  # control is separate due to proposals
-    "DataAsset RUD",
-    "Facility RUD",
-    "Issue RUD",
-    "Market RUD",
-    "Objective RUD",
-    "OrgGroup RUD",
-    "Policy RUD",
-    "Process RUD",
-    "Product RUD",
-    "Project RUD",
-    "Regulation RUD",
-    # "Risk RUD",  # excluded due to proposals
-    "RiskAssessment RUD",
-    "Section RUD",
-    "Standard RUD",
-    "System RUD",
-    "Threat RUD",
-    "Vendor RUD",
-)
-
-AUTID_PROGRAM_PROPAGATION = {
-    "Program": {
-        "Program Managers": {
-            "Relationship R": {
-                "Audit RUD": _AUDIT_FULL_ACCESS,
-                "Comment R": {},
-                "Document RUD": {},
-                _PROGRAM_OBJECTS_RUD: const.COMMENT_DOCUMENT_RUD,
-                ("Control RUD", "Risk RUD"): const.PROPOSAL_RUD,
-            }
-        },
-        "Program Editors": {
-            "Relationship R": {
-                "Audit RUD": _PE_AUDIT_ACCESS,
-                "Comment R": {},
-                "Document RUD": {},
-                ("Control RUD", "Risk RUD"): const.PROPOSAL_RUD,
-                _PROGRAM_OBJECTS_RUD: const.COMMENT_DOCUMENT_RUD,
-            }
-        },
-        "Program Readers": {
-            "Relationship R": {
-                "Audit R": _AUDIT_READ_ACCESS,
-                "Comment R": {},
-                "Document R": {},
-                _PROGRAM_OBJECTS_R: const.COMMENT_DOCUMENT_R,
-                ("Control R", "Risk R"): const.PROPOSAL_R,
-            }
-        },
-    },
-    "Audit": {
-        # Audit captains might also need to get propagated access to program
-        # and all program related objects, so that they could clone audits and
-        # update all audit snapshots.
-        "Audit Captains": _AUDIT_FULL_ACCESS,
-        "Auditors": _AUDITOR_ACCESS,
-    },
-}
-
 
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
-  acr_propagation.propagate_roles(AUTID_PROGRAM_PROPAGATION)
+  acr_propagation.propagate_roles(const.GGRC_BASIC_PERMISSIONS_PROPAGATION)
 
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
-  for object_type, roles_tree in AUTID_PROGRAM_PROPAGATION.items():
+  propagation = const.GGRC_BASIC_PERMISSIONS_PROPAGATION
+  for object_type, roles_tree in propagation.items():
     acr_propagation.remove_propagated_roles(object_type, roles_tree.keys())

@@ -16,21 +16,13 @@ from ggrc.migrations.utils import acr_propagation_constants as const
 revision = '679480cbd712'
 down_revision = '3e667570f21f'
 
-_RISK_PROPAGATION = {
-    const.BASIC_ROLES: const.PROPOSAL_RUD,
-}
-
-PROPAGATION = {
-    "Risk": _RISK_PROPAGATION,
-}
-
 
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
-  acr_propagation.propagate_roles(PROPAGATION)
+  acr_propagation.propagate_roles(const.GGRC_RISKS_PROPAGATION)
 
 
 def downgrade():
   """Remove Risk propagated roles"""
-  for object_type, roles_tree in PROPAGATION.items():
+  for object_type, roles_tree in const.GGRC_RISKS_PROPAGATION.items():
     acr_propagation.remove_propagated_roles(object_type, roles_tree.keys())

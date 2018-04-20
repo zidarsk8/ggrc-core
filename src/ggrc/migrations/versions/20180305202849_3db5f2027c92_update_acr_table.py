@@ -22,85 +22,6 @@ revision = '3db5f2027c92'
 down_revision = '082306b17b07'
 
 
-_ASSESSMENT_PROPAGATION = {
-    ("Creators", "Verifiers"): {
-        "Relationship R": {
-            "Audit R": {
-                "Relationship R": {
-                    "Document R": {},
-                },
-            },
-            "Snapshot R": {
-                "Relationship R": {
-                    "Snapshot R": {},
-                },
-            },
-            "Document RUD": {},
-            "Comment R": {},
-            "Issue R": const.COMMENT_DOCUMENT_R,
-        },
-    },
-    "Assignees": {
-        "Relationship R": {
-            "Snapshot R": {
-                "Relationship R": {
-                    "Snapshot R": {},
-                },
-            },
-            "Audit R": {
-                "Relationship R": {
-                    "Document R": {},
-                },
-            },
-            "Document RUD": {},
-            "Comment R": {},
-            "Issue RUD": const.COMMENT_DOCUMENT_RUD,
-        },
-    },
-}
-
-_CONTROL_ROLES = (
-    "Admin",
-    "Primary Contacts",
-    "Secondary Contacts",
-    "Principal Assignees",
-    "Secondary Assignees",
-)
-
-_CONTROL_PROPAGATION = {
-    _CONTROL_ROLES: const.PROPOSAL_RUD,
-}
-
-
-PROPAGATION = {
-    "Assessment": _ASSESSMENT_PROPAGATION,
-
-    "Control": _CONTROL_PROPAGATION,
-
-    "AccessGroup": const.BASIC_PROPAGATION,
-    "Clause": const.BASIC_PROPAGATION,
-    "Contract": const.BASIC_PROPAGATION,
-    "DataAsset": const.BASIC_PROPAGATION,
-    "Facility": const.BASIC_PROPAGATION,
-    "Issue": const.BASIC_PROPAGATION,
-    "Market": const.BASIC_PROPAGATION,
-    "Objective": const.BASIC_PROPAGATION,
-    "OrgGroup": const.BASIC_PROPAGATION,
-    "Policy": const.BASIC_PROPAGATION,
-    "Process": const.BASIC_PROPAGATION,
-    "Product": const.BASIC_PROPAGATION,
-    "Project": const.BASIC_PROPAGATION,
-    "Regulation": const.BASIC_PROPAGATION,
-    "Section": const.BASIC_PROPAGATION,
-    "Standard": const.BASIC_PROPAGATION,
-    "System": const.BASIC_PROPAGATION,
-    "Threat": const.BASIC_PROPAGATION,
-    "Vendor": const.BASIC_PROPAGATION,
-
-    # "RiskAssessment": does not have ACL roles
-}
-
-
 def _add_parent_id_column():
   """Add parent id column to access control roles table."""
   op.add_column('access_control_roles', sa.Column(
@@ -124,7 +45,7 @@ def _remove_parent_id_column():
 
 
 def _add_assessment_roles_tree():
-  acr_propagation.propagate_roles(PROPAGATION)
+  acr_propagation.propagate_roles(const.GGRC_PROPAGATION)
 
 
 def upgrade():
@@ -135,6 +56,6 @@ def upgrade():
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
-  for object_type, roles_tree in PROPAGATION.items():
+  for object_type, roles_tree in const.GGRC_PROPAGATION.items():
     acr_propagation.remove_propagated_roles(object_type, roles_tree.keys())
   _remove_parent_id_column()
