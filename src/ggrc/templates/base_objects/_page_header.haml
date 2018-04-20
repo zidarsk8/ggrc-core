@@ -3,6 +3,7 @@
 
 -set user_role = current_user.system_wide_role.lower()
 -set create_issue_url = config.get("CREATE_ISSUE_URL")
+-set create_issue_name_button = config.get("CREATE_ISSUE_BUTTON_NAME")
 
 .header-content
   -if user_role != 'no access'
@@ -33,7 +34,10 @@
           'target': '_blank',
           'class': 'btn btn-small btn-gray'
         }
-          Feedback
+          -if create_issue_name_button
+            ={ create_issue_name_button }
+          -else
+            Feedback
     %li
       %a{ 'href': "/dashboard#!task_widget" }
         %span
