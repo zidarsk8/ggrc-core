@@ -20,6 +20,11 @@ from ggrc.models import all_models
 
 logger = logging.getLogger(__name__)
 
+# Safety cutoff limit for maximum propagation depth. If this depth is exceeded
+# it suggests invalid propagation tree entries, or the propagation tree could
+# contain cycles.
+PROPAGATION_DEPTH_LIMIT = 50
+
 
 def _insert_select_acls(select_statement):
   """Insert acl records from the select statement
@@ -268,11 +273,9 @@ def _handle_relationship_step(relationship_ids, new_acl_ids):
 def _propagate(parent_acl_ids):
   """Propagate ACL entries through the entire propagation tree."""
 
-  propagation_depth_limit = 50
-
   # The following for statement is a replacement for `while True` statement
   # with a safety cutoff limit.
-  for _ in range(propagation_depth_limit):
+  for _ in range(PROPAGATION_DEPTH_LIMIT):
 
     child_ids = _handle_acl_step(parent_acl_ids)
 
@@ -283,7 +286,12 @@ def _propagate(parent_acl_ids):
       parent_acl_ids = child_ids
     else:
       # Exit the loop when there are no more ACL entries to propagate
-      break
+      return
+
+  # We should only be able to get here if the propagation failed to finish in
+  # PROPAGATION_DEPTH_LIMIT iterations.
+  raise Exception("Propagation depth limit exceeded. Check the propagation "
+                  "tree for cycles, invalid entries or too deep entries.")
 
 
 def _propagate_relationships(relationship_ids, new_acl_ids):
