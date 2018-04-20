@@ -17,6 +17,7 @@ from sqlalchemy import exc
 from sqlalchemy import or_
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import UnmappedInstanceError
+from flask import _app_ctx_stack
 
 from ggrc import db
 from ggrc import models
@@ -470,6 +471,10 @@ class BlockConverter(object):
 
     index = 0
     for ids_pool in list_chunks(self.object_ids, self.ROW_CHUNK_SIZE):
+      # sqlalchemy caches all queries and it takes a lot of memory.
+      # This line clears query cache.
+      _app_ctx_stack.top.sqlalchemy_queries = []
+
       objects = self.object_class.eager_query().filter(
           self.object_class.id.in_(ids_pool)
       ).execution_options(stream_results=True)
@@ -478,6 +483,10 @@ class BlockConverter(object):
         yield RowConverter(self, self.object_class, obj=obj,
                            headers=self.headers, index=index)
         index += 1
+
+      # Clear all objects from session (it helps to avoid memory leak)
+      for obj in db.session:
+        del obj
 
   def generate_row_data(self):
     """Get row data from all row converters while exporting."""
