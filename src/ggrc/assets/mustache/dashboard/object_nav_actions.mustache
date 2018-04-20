@@ -5,9 +5,7 @@
 
 
 <li class="inner-nav-button">
-  <workflow-activate
-    {instance}="instance"
-    {task-group-amount}="instance.task_groups.length">
+  <workflow-activate {instance}="instance">
     {{#is_allowed 'update' instance context='for'}}
       <spinner toggle="waiting"></spinner>
 

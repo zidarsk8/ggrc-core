@@ -10,19 +10,8 @@ import {
 import Permission from '../../permission';
 
 const viewModel = can.Map.extend({
-  taskGroupAmount: 0,
   instance: {},
   waiting: false,
-  can_activate: false,
-  canActivateWorkflow(workflow) {
-    const taskGroups = workflow.task_groups.reify();
-    const hasTaskGroups = taskGroups.length > 0;
-    const nonEmptyTaskGroupTasks = _.all(
-      taskGroups,
-      'task_group_tasks.length'
-    );
-    return hasTaskGroups && nonEmptyTaskGroupTasks;
-  },
   async initWorkflow(workflow) {
     await workflow.refresh();
     workflow.attr({
