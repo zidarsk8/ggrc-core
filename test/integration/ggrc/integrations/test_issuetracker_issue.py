@@ -34,6 +34,11 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     super(TestIssueTrackerIntegration, self).setUp()
 
     self.client.get('/login')
+    self.headers = {
+        'Content-Type': 'application/json',
+        'X-Requested-By': 'GGRC',
+        'X-export-view': 'blocks',
+    }
 
   def test_update_issuetracker_info(self):
     """Test that Issue Tracker issues are updated by the utility."""
@@ -218,7 +223,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       self._check_csv_response(response, {})
 
   @mock.patch('ggrc.integrations.issues.Client.update_issue')
-  def test_update_issuetracker_info_on_asmt_import(self, mock_update_issue):
+  def test_update_issuetracker_comment_on_asmt_import(self, mock_update_issue):
     """Test issuetracker issue updated when comment for assessment imported"""
     with mock.patch.object(issue_tracker, '_is_issue_tracker_enabled',
                            return_value=True):
@@ -226,27 +231,79 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       asmt = iti.issue_tracked_obj
       asmt_id = asmt.id
       audit = asmt.audit
-      comment1 = "Comment 1"
-      comment2 = "Comment 2"
+      comment1 = 'Comment 1'
+      comment2 = 'Comment 2'
       self.import_data(OrderedDict([
-          ("object_type", "Assessment"),
-          ("Code*", asmt.slug),
-          ("Audit", audit.slug),
-          ("Comments", comment1 + ";;" + comment2),
+          ('object_type', 'Assessment'),
+          ('Code*', asmt.slug),
+          ('Audit', audit.slug),
+          ('Comments', comment1 + ';;' + comment2),
       ]), dry_run=False)
       asmt = models.Assessment.query.get(asmt_id)
       asmt_link = issue_tracker._get_assessment_url(asmt)
       last_comment = asmt.comments[-1].description
       comment = issue_tracker._COMMENT_TMPL % (asmt.modified_by.name,
                                                last_comment, asmt_link)
-      mock_update_issue.assert_called_with(iti.issue_id,
-                                                {'status': 'ASSIGNED',
-                                                 'priority': None,
-                                                 'component_id': None,
-                                                 "title": iti.title,
-                                                 'hotlist_ids': [],
-                                                 'severity': None,
-                                                 'comment': comment})
+      expected_kwargs = {'status': 'ASSIGNED',
+                         'priority': None,
+                         'component_id': None,
+                         'title': iti.title,
+                         'hotlist_ids': [],
+                         'severity': None,
+                         'comment': comment}
+      mock_update_issue.assert_called_with(iti.issue_id, expected_kwargs)
+
+  @ddt.data(
+      ('Not Started', {'status': 'ASSIGNED'}),
+      ('In Progress', {'status': 'ASSIGNED'}),
+      ('In Review', {'status': 'FIXED'}),
+      ('Rework Needed', {'status': 'ASSIGNED'}),
+      ('Completed', {'status': 'VERIFIED',
+                     'comment': issue_tracker._STATUS_CHANGE_COMMENT_TMPL}),
+      ('Deprecated', {'status': 'OBSOLETE',
+                      'comment': issue_tracker._STATUS_CHANGE_COMMENT_TMPL}),
+  )
+  @ddt.unpack
+  @mock.patch('ggrc.integrations.issues.Client.update_issue')
+  def test_update_issuetracker_status_on_asmt_import(self, status,
+                                                     additional_kwargs,
+                                                     mock_update_issue):
+    """Test issuetracker issue updated when status for assessment
+    is imported."""
+    email1 = 'email1@example.com'
+    factories.PersonFactory(email=email1)
+    iti_issue_id = []
+    iti = factories.IssueTrackerIssueFactory(enabled=True)
+    iti_issue_id.append(iti.issue_id)
+    with mock.patch.object(issue_tracker, '_is_issue_tracker_enabled',
+                           return_value=True):
+      iti = factories.IssueTrackerIssueFactory(enabled=True)
+      asmt = iti.issue_tracked_obj
+      asmt_id = asmt.id
+      audit = asmt.audit
+      self.import_data(OrderedDict([
+          ('object_type', 'Assessment'),
+          ('Code*', asmt.slug),
+          ('Audit', audit.slug),
+          ('State', status),
+          ('Assignees*', email1)
+      ]), dry_run=False)
+      asmt = models.Assessment.query.get(asmt_id)
+      expected_kwargs = {'component_id': None,
+                         'severity': None,
+                         'title': iti.title,
+                         'hotlist_ids': [],
+                         'priority': None,
+                         'assignee': email1,
+                         'verifier': email1,
+                         'ccs': []}
+      asmt_link = issue_tracker._get_assessment_url(asmt)
+      if 'comment' in additional_kwargs:
+        additional_kwargs['comment'] = \
+            additional_kwargs['comment'] % (status, asmt_link)
+      expected_kwargs.update(additional_kwargs)
+      mock_update_issue.assert_called_with(iti.issue_id, expected_kwargs)
+
 
 @mock.patch('ggrc.models.hooks.issue_tracker._is_issue_tracker_enabled',
             return_value=True)
@@ -316,7 +373,6 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
                                              ac_role=role,
                                              object=self.audit)
 
-  # pylint: disable=redefined-outer-name
   def create_asmt_with_issue_tracker(self, role_name_to_people,
                                      issue_tracker=None):
     """Create Assessment with issue_tracker parameters and ACL."""
