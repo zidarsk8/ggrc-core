@@ -1,7 +1,8 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Integration test for Clonable mixin"""
+"""Integration tests for IssueTracker integration"""
+
 from collections import OrderedDict
 
 import ddt
@@ -216,6 +217,36 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       ]), dry_run=False)
       self._check_csv_response(response, {})
 
+  @mock.patch('ggrc.integrations.issues.Client.update_issue')
+  def test_update_issuetracker_info_on_asmt_import(self, mock_update_issue):
+    """Test issuetracker issue updated when comment for assessment imported"""
+    with mock.patch.object(issue_tracker, '_is_issue_tracker_enabled',
+                           return_value=True):
+      iti = factories.IssueTrackerIssueFactory(enabled=True)
+      asmt = iti.issue_tracked_obj
+      asmt_id = asmt.id
+      audit = asmt.audit
+      comment1 = "Comment 1"
+      comment2 = "Comment 2"
+      self.import_data(OrderedDict([
+          ("object_type", "Assessment"),
+          ("Code*", asmt.slug),
+          ("Audit", audit.slug),
+          ("Comments", comment1 + ";;" + comment2),
+      ]), dry_run=False)
+      asmt = models.Assessment.query.get(asmt_id)
+      asmt_link = issue_tracker._get_assessment_url(asmt)
+      last_comment = asmt.comments[-1].description
+      comment = issue_tracker._COMMENT_TMPL % (asmt.modified_by.name,
+                                               last_comment, asmt_link)
+      mock_update_issue.assert_called_with(iti.issue_id,
+                                                {'status': 'ASSIGNED',
+                                                 'priority': None,
+                                                 'component_id': None,
+                                                 "title": iti.title,
+                                                 'hotlist_ids': [],
+                                                 'severity': None,
+                                                 'comment': comment})
 
 @mock.patch('ggrc.models.hooks.issue_tracker._is_issue_tracker_enabled',
             return_value=True)
@@ -285,6 +316,7 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
                                              ac_role=role,
                                              object=self.audit)
 
+  # pylint: disable=redefined-outer-name
   def create_asmt_with_issue_tracker(self, role_name_to_people,
                                      issue_tracker=None):
     """Create Assessment with issue_tracker parameters and ACL."""
