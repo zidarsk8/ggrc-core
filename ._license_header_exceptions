@@ -63,6 +63,4 @@
 < test/api_search/db_dump/api_search.sql
 < test/integration/ggrc/test_csvs/not_a_csv.txt
 < test/selenium/.gitignore
-< test/selenium/LICENSE
 < test/selenium/pytest.ini
-< test/selenium/README.md
