@@ -9,7 +9,10 @@
         <em>
           Created date {{date createdAt}}
           &nbsp;&nbsp;&nbsp;&nbsp;
-          Last updated by <person-list-item {person}="modifiedBy"></person-list-item>
+          Last updated
+          {{#if modifiedBy}}
+            by <person-list-item {person}="modifiedBy"></person-list-item>
+          {{/if}}
           on {{date modifiedAt}}
         </em>
       </small>

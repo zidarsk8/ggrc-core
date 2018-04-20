@@ -28,10 +28,11 @@ import template from './person-list-item.mustache';
         person: {
           set: function (newVal, setVal) {
             let actualPerson;
-            if (!newVal.id) {
+            if (!newVal || !newVal.id) {
               setVal({});
               return;
             }
+
             actualPerson = CMS.Models.Person.store[newVal.id] || {};
             if (actualPerson.email) {
               setVal(actualPerson);
