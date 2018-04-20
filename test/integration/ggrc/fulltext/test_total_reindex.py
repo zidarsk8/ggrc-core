@@ -94,7 +94,7 @@ class TestTotalReindex(TestCase):
     count = indexer.record_type.query.count()
     count = indexer.record_type.query.delete()
     self.client.get("/login")
-    self.client.post("/admin/reindex")
+    self.client.post("/admin/full_reindex")
 
     # ACR roles are created in migration and aren't removed in setup
     # Index for them will be created only after reindexing

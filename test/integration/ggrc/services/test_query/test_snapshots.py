@@ -61,7 +61,7 @@ class TestAuditSnapshotQueries(TestCase, WithQueryApi):
   def setUp(self):
     """Log in before performing queries."""
     self.client.get("/login")
-    self.client.post("/admin/reindex")
+    self.client.post("/admin/full_reindex")
 
   @classmethod
   def setUpClass(cls):
