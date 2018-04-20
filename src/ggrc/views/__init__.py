@@ -53,6 +53,7 @@ from ggrc.utils import benchmark
 from ggrc.utils import revisions
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+REINDEX_CHUNK_SIZE = 100
 
 
 # Needs to be secured as we are removing @login_required
@@ -87,6 +88,14 @@ def reindex_snapshots(_):
 def reindex(_):
   """Web hook to update the full text search index."""
   do_reindex()
+  return app.make_response(("success", 200, [("Content-Type", "text/html")]))
+
+
+@app.route("/_background_tasks/full_reindex", methods=["POST"])
+@queued_task
+def full_reindex(_):
+  """Web hook to update the full text search index for all models."""
+  do_full_reindex()
   return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 
@@ -200,11 +209,36 @@ def do_reindex():
       ids = [obj.id for obj in model.query]
       ids_count = len(ids)
       handled_ids = 0
-      for ids_chunk in utils.list_chunks(ids, chunk_size=100):
+      for ids_chunk in utils.list_chunks(ids, chunk_size=REINDEX_CHUNK_SIZE):
         handled_ids += len(ids_chunk)
-        logger.info("%s: %s / %s", model_name, handled_ids, ids_count)
+        logger.info("%s: %s / %s", model.__name__, handled_ids, ids_count)
         model.bulk_record_update_for(ids_chunk)
         db.session.commit()
+
+  indexer.invalidate_cache()
+
+
+def do_full_reindex():
+  """Update the full text search index for all models."""
+
+  indexer = get_indexer()
+  indexed_models = {
+      m.__name__: m for m in all_models.all_models
+      if issubclass(m, mixin.Indexed) and m.REQUIRED_GLOBAL_REINDEX
+  }
+  people_query = db.session.query(all_models.Person.id,
+                                  all_models.Person.name,
+                                  all_models.Person.email)
+  indexer.cache["people_map"] = {p.id: (p.name, p.email) for p in people_query}
+  indexer.cache["ac_role_map"] = dict(db.session.query(
+      all_models.AccessControlRole.id,
+      all_models.AccessControlRole.name,
+  ))
+  for model_name in sorted(indexed_models.keys()):
+    logger.info("Updating index for: %s", model_name)
+    with benchmark("Create records for %s" % model_name):
+      model = indexed_models[model_name]
+      reindex_model(model)
 
   logger.info("Updating index for: %s", "Snapshot")
   with benchmark("Create records for %s" % "Snapshot"):
@@ -489,6 +523,22 @@ def admin_reindex():
       name="reindex",
       url=url_for(reindex.__name__),
       queued_callback=reindex
+  )
+  return task_queue.make_response(
+      app.make_response(("scheduled %s" % task_queue.name, 200,
+                         [('Content-Type', 'text/html')])))
+
+
+@app.route("/admin/full_reindex", methods=["POST"])
+@login_required
+@admin_required
+def admin_full_reindex():
+  """Calls a webhook that reindexes all indexable objects
+  """
+  task_queue = create_task(
+      name="full_reindex",
+      url=url_for(full_reindex.__name__),
+      queued_callback=full_reindex
   )
   return task_queue.make_response(
       app.make_response(("scheduled %s" % task_queue.name, 200,

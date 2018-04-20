@@ -85,6 +85,7 @@ INDEX_REPLACE_STATEMENT = """
       :subproperty
   )
 """
+CA_CHUNK_SIZE = 500
 
 logger = logging.getLogger(__name__)
 
@@ -653,7 +654,7 @@ def compute_attributes(revision_ids):
 
     ids_count = len(revision_ids)
     handled_ids = 0
-    for ids_chunk in utils.list_chunks(revision_ids, chunk_size=500):
+    for ids_chunk in utils.list_chunks(revision_ids, chunk_size=CA_CHUNK_SIZE):
       handled_ids += len(ids_chunk)
       logger.info("Revision: %s/%s", handled_ids, ids_count)
 
