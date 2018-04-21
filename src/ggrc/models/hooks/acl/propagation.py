@@ -380,13 +380,11 @@ def propagate_all():
   logger.info("Deleting existing propagated roles")
   _delete_all_propagated_acls()
 
-  chunks = utils.generate_query_chunks(
-      db.session.query(all_models.AccessControlList.id),
-  )
-  count = all_models.AccessControlList.query.count()
+  ids = [row.id for row in db.session.query(all_models.AccessControlList.id)]
+  count = len(ids)
   propagated_count = 0
-  for chunk in chunks:
-    acl_ids = {row.id for row in chunk}
+  chunks = utils.list_chunks(ids)
+  for acl_ids in chunks:
     propagated_count += len(acl_ids)
     logger.info("Propagating ACL entries: %s/%s", propagated_count, count)
 
