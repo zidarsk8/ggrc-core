@@ -81,7 +81,7 @@ class BlockConverter(object):
 
   """
 
-  ROW_CHUNK_SIZE = 100
+  ROW_CHUNK_SIZE = 50
   BLOCK_OFFSET = 3
 
   def get_unique_counts_dict(self, object_class):
