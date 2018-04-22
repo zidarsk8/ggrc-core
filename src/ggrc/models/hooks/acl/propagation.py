@@ -70,6 +70,12 @@ def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
   child_acr = all_models.AccessControlRole.__table__.alias(
       "child_acr_{}".format(source)
   )
+  # The grandchild is only used to check the child part of the relationship. We
+  # might want to check if it would be more efficient to store grandchild info
+  # in the child ACR entry instead of making an extra join on our tables.
+  grandchild_acr = all_models.AccessControlRole.__table__.alias(
+      "grandchild_acr_{}".format(source)
+  )
   where_conditions = [
       child_acr.c.object_type == all_models.Relationship.__name__,
   ]
@@ -85,10 +91,16 @@ def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
         acl_table.c.object_id == rel_table.c.source_id,
         acl_table.c.object_type == rel_table.c.source_type,
     )
+    where_conditions.append(
+        grandchild_acr.c.object_type == rel_table.c.destination_type
+    )
   else:
     acl_link = sa.and_(
         acl_table.c.object_id == rel_table.c.destination_id,
         acl_table.c.object_type == rel_table.c.destination_type,
+    )
+    where_conditions.append(
+        grandchild_acr.c.object_type == rel_table.c.source_type
     )
 
   select_statement = sa.select([
@@ -104,15 +116,19 @@ def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
       sa.join(
           sa.join(
               sa.join(
-                  rel_table,
-                  acl_table,
-                  acl_link
+                  sa.join(
+                      rel_table,
+                      acl_table,
+                      acl_link
+                  ),
+                  parent_acr,
+                  parent_acr.c.id == acl_table.c.ac_role_id
               ),
-              parent_acr,
-              parent_acr.c.id == acl_table.c.ac_role_id
+              child_acr,
+              child_acr.c.parent_id == parent_acr.c.id
           ),
-          child_acr,
-          child_acr.c.parent_id == parent_acr.c.id
+          grandchild_acr,
+          grandchild_acr.c.parent_id == child_acr.c.id
       )
   ).where(
       sa.and_(*where_conditions)
