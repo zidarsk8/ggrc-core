@@ -317,10 +317,7 @@ class TestPropagation(TestCase):
 
       db.session.commit()
 
-      # This sets 4 propagation entries because it backtracks from the audit to
-      # the same relationship. This optimally the assertion should count 3 acl
-      # entries but currently that is to much work to implement
-      self.assertEqual(all_models.AccessControlList.query.count(), 4)
+      self.assertEqual(all_models.AccessControlList.query.count(), 3)
 
   def test_propagate_all(self):
     """Test clean propagation of all ACL entries."""
@@ -340,11 +337,11 @@ class TestPropagation(TestCase):
       ]
 
     propagation._propagate(acl_ids)
-    self.assertEqual(all_models.AccessControlList.query.count(), 4)
+    self.assertEqual(all_models.AccessControlList.query.count(), 3)
     propagation._delete_all_propagated_acls()
     self.assertEqual(all_models.AccessControlList.query.count(), 1)
     propagation.propagate_all()
-    self.assertEqual(all_models.AccessControlList.query.count(), 4)
+    self.assertEqual(all_models.AccessControlList.query.count(), 3)
 
   def test_complex_propagation_count(self):
     """Test multiple object ACL propagation.
