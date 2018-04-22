@@ -8,6 +8,7 @@
 # Disable protected access since this test suite tests internal function for
 # ACL propagation.
 
+import itertools
 from collections import defaultdict
 
 import ddt
@@ -344,3 +345,117 @@ class TestPropagation(TestCase):
     self.assertEqual(all_models.AccessControlList.query.count(), 1)
     propagation.propagate_all()
     self.assertEqual(all_models.AccessControlList.query.count(), 4)
+
+  def test_complex_propagation_count(self):
+    """Test multiple object ACL propagation.
+
+    This test is meant to catch invalid ACL entries for propagation that can
+    not happen.
+    Example for this is propagation control -> relationships -> document. In
+    that propagation rule we should only propagate control acl entries to
+    relationships to documents. But what can happen is; when a control has
+    multiple relationships, some to objects and only one to document, all of
+    those relationships would get an ACL entry even though in some cases that
+    is a propagation dead end.
+
+    Setup for this test is:
+
+    Objects:
+      control
+      regulation
+      objective
+      program
+      audit
+      assessment, assessment_2
+
+    Relationships:
+      control - regulation
+      control - objective
+      objective - regulations
+      program - control, regulation, objective, audit
+      audit - assessment, assessment_2,
+      audit - control-snapshot, regulation-snapshot, objective-snapshot
+      control_snapshot - regulation_snapshot
+      control_snapshot - objective_snapshot
+      objective_snapshot - regulations_snapshot
+      document - regulation, objective, control, assessment
+    """
+    with factories.single_commit():
+      person = factories.PersonFactory()
+      control = factories.ControlFactory()
+      regulation = factories.RegulationFactory()
+      objective = factories.ObjectiveFactory()
+      normal_objects = [control, regulation, objective]
+
+      for obj1, obj2 in itertools.combinations(normal_objects, 2):
+        factories.RelationshipFactory(source=obj1, destination=obj2)
+
+      assessment = factories.AssessmentFactory()
+      assessment_2 = factories.AssessmentFactory(audit=assessment.audit)
+      factories.RelationshipFactory(
+          source=assessment,
+          destination=assessment.audit,
+      )
+      factories.RelationshipFactory(
+          source=assessment_2,
+          destination=assessment.audit,
+      )
+      factories.RelationshipFactory(
+          source=assessment.audit,
+          destination=assessment.audit.program,
+      )
+      for obj in normal_objects:
+        factories.RelationshipFactory(
+            source=assessment.audit.program,
+            destination=obj,
+        )
+
+      snapshots = self._create_snapshots(assessment.audit, normal_objects)
+      for snapshot in snapshots:
+        factories.RelationshipFactory(
+            source=assessment.audit,
+            destination=snapshot,
+        )
+
+      for obj1, obj2 in itertools.combinations(snapshots, 2):
+        factories.RelationshipFactory(source=obj1, destination=obj2)
+
+      for obj in normal_objects:
+        document = factories.DocumentFactory()
+        factories.RelationshipFactory(source=obj, destination=document)
+
+      document = factories.DocumentFactory()
+      factories.RelationshipFactory(source=document, destination=assessment)
+
+    acl_entry = factories.AccessControlListFactory(
+        person=person,
+        ac_role=self.roles["Control"]["Admin"],
+        object=control,
+    )
+
+    propagation._propagate([acl_entry.id])
+
+    self.assertEqual(
+        all_models.AccessControlList.query.count(),
+        3,  # 1 for control, 1 for relationship to document and 1 for document.
+    )
+
+    acl_entry = factories.AccessControlListFactory(
+        person=person,
+        ac_role=self.roles["Program"]["Program Editors"],
+        object=assessment.audit.program,
+    )
+    propagation._propagate([acl_entry.id])
+
+    self.assertEqual(
+        all_models.AccessControlList.query.count(),
+        3 + 1 + 2 + 4 + 6 + 2 + 6 + 6
+        # 3 previous entries for control
+        # 1 original program ACL entry
+        # 2 for audit (relationship + audit propagation)
+        # 4 for assessments (2 assessments and 2 relationships for them)
+        # 6 for snapshots (3 snapshots with relationships)
+        # 2 assessment document with relationships
+        # 6 for normal objects
+        # 6 for normal object documents
+    )
