@@ -42,9 +42,27 @@ const viewModel = can.Map.extend({
       this.attr('baseInstance').dispatch('refreshInstance');
     }
   },
+  updatePagingAfterDestroy() {
+    const current = this.attr('paging.current');
+    const isEmptyPage = (
+      current > 1 &&
+      this.attr('items').length === 1
+    );
+
+    if (isEmptyPage) {
+      // go to previous page
+      this.attr('paging.current', current - 1);
+    } else {
+      // update current page
+      this.attr('baseInstance').dispatch('refreshInstance');
+    }
+  },
 });
 
 const events = {
+  '{CMS.Models.TaskGroupTask} destroyed'() {
+    this.viewModel.updatePagingAfterDestroy();
+  },
   '{CMS.Models.TaskGroupTask} created'() {
     this.viewModel.updatePagingAfterCreate();
   },
