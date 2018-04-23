@@ -43,7 +43,7 @@ describe('task-list component', () => {
   describe('updatePagingAfterCreate()', () => {
     beforeEach(function () {
       viewModel.attr('baseInstance', {});
-      viewModel.attr('paging.count', 100);
+      viewModel.attr('paging.count', 10);
     });
 
     describe('when page is not first', () => {
@@ -71,6 +71,34 @@ describe('task-list component', () => {
     });
   });
 
+  describe('updatePagingAfterDestroy() method', () => {
+    beforeEach(function () {
+      viewModel.attr('baseInstance', {});
+    });
+
+    describe('if current page is not first and has only one item', () => {
+      beforeEach(function () {
+        viewModel.attr('paging.count', 10);
+        viewModel.attr('paging.current', 10);
+        viewModel.attr('items', [{}]);
+      });
+
+      it('sets previous page', function () {
+        const expected = viewModel.attr('paging.current') - 1;
+        viewModel.updatePagingAfterDestroy();
+        expect(viewModel.attr('paging.current')).toBe(expected);
+      });
+    });
+
+    describe('if current page is first', () => {
+      it('dispatches "refreshInstance" event for baseInstance', function () {
+        const dispatch = spyOn(viewModel.baseInstance, 'dispatch');
+        viewModel.updatePagingAfterDestroy();
+        expect(dispatch).toHaveBeenCalledWith('refreshInstance');
+      });
+    });
+  });
+
   describe('events', () => {
     let events;
 
@@ -90,6 +118,23 @@ describe('task-list component', () => {
 
       it('updates page items', function () {
         const update = spyOn(viewModel, 'updatePagingAfterCreate');
+        handler();
+        expect(update).toHaveBeenCalled();
+      });
+    });
+
+    describe('"{CMS.Models.TaskGroupTask} destroyed"() event', () => {
+      let handler;
+      let eventsScope;
+
+      beforeEach(function () {
+        eventsScope = {viewModel};
+        handler = events['{CMS.Models.TaskGroupTask} destroyed']
+          .bind(eventsScope);
+      });
+
+      it('updates page items', function () {
+        const update = spyOn(viewModel, 'updatePagingAfterDestroy');
         handler();
         expect(update).toHaveBeenCalled();
       });
