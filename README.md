@@ -170,40 +170,25 @@ run_pytests --ipdb-failures
 
 #### For Selenium tests:
 
-On the host machine in the root of the repository run:
+Up docker containers, prepare and launch dev server:
+```sh
+./bin/selenium_containers
+```
+
+Then you can run Selenium tests on your machine:
 
 ```sh
-./bin/jenkins/run_selenium
+cd test/selenium
+PYTHONPATH=src DEV_URL=http://localhost:8080 DEV_DESTRUCTIVE_URL=http://localhost:8080 pytest -n=0 --headless=False
 ```
+(you can set these env variables and cmd options in IDE)
 
-##### Manually running selenium tests
+To run Selenium tests inside docker container you can do:
 
-For Selenium tests, you must use the docker environment. There are two containers needed for running selenium tests `ggrccore_cleandev_1` and `ggrccore_selenium_1`. Due to a bug in the selenium container, you must start the containers with:
-
+```sh
+docker container exec -it selenium_selenium_1 bash
+pytest -n=0
 ```
-docker-compose  up -d --force-recreate
-```
-After that, you can make sure that both containers are running with `docker ps -a`.
-
-To run the Selenium tests, you must login into your cleandev container, and run the server:
-```
-docker exec -it ggrccore_cleandev_1 su vagrant
-build_assets
-db_reset
-launch_ggrc
-```
-
-Then you can login into the selenium container and run the tests:
-
-```
-docker exec -it ggrccore_selenium_1 bash
-python /selenium/src/run_selenium.py
-```
-
-You should also feel free to check how the `./bin/jenkins/run_selenium` script works.
-
-_NOTE: that the "ggrccore" part of the name is due to the repository parent folder name. If you have your repo in a different folder, change the first part accordingly._
-
 
 ## Quickstart Breakdown
 

@@ -103,6 +103,17 @@ provision_dev_for_selenium() {
 }
 
 
+setup_for_selenium () {
+  mkdir -p test/selenium/logs
+  rm -rf test/selenium/logs/*
+
+  for dev_server in cleandev_1 cleandev_destructive_1; do
+    provision_dev_for_selenium $dev_server &
+  done
+  wait
+}
+
+
 integration_tests () {
   PROJECT=$1
   print_line
@@ -123,14 +134,6 @@ integration_tests () {
 selenium_tests () {
   PROJECT=$1
   print_line
-
-  mkdir -p test/selenium/logs
-  rm -rf test/selenium/logs/*
-
-  for dev_server in cleandev_1 cleandev_destructive_1; do
-    provision_dev_for_selenium $dev_server &
-  done
-  wait
 
   echo "Running Selenium tests"
   docker exec -i ${PROJECT}_selenium_1 sh -c "
