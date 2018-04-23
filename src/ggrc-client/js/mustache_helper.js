@@ -2260,37 +2260,6 @@ Mustache.registerHelper('modifyFieldTitle', function (type, field, options) {
   return titlesMap[type] ? titlesMap[type] + field : field;
 });
 
-Mustache.registerHelper(
-  'withRoleForInstance',
-  function (instance, roleName, options) {
-    let userId = GGRC.current_user.id;
-    let internalRoles = GGRC.internal_access_control_roles;
-    let role;
-    let hasRole;
-    instance = resolveComputed(instance);
-    roleName = resolveComputed(roleName);
-    role = internalRoles.find((a) => a.name === roleName);
-
-    if (!role) {
-      console.warn(roleName, 'is not an internal access control name');
-      return;
-    }
-
-    // As a Creator user we seem to invoke this helper with a null instance.
-    // In this case we simply return and wait for the helper to be invoked a
-    // second time with the proper instance object.
-    if (!instance) {
-      return;
-    }
-    hasRole = instance.access_control_list.filter((acl) => {
-      return acl.ac_role_id === role.id && acl.person_id === userId;
-    }).length > 0;
-
-    return options.fn(options.contexts.add({
-      hasRole: hasRole,
-    }));
-  });
-
 Mustache.registerHelper('displayWidgetTab',
   function (widget, instance, options) {
     let displayTab;
@@ -2332,9 +2301,28 @@ Mustache.registerHelper('is_auditor', function (options) {
   return options.inverse(options.contexts);
 });
 
+Mustache.registerHelper('has_role', function (role, instance, options) {
+  instance = Mustache.resolve(instance);
+  const acr = getRole(instance.type, role);
+
+  if (!acr || !instance) {
+    return options.inverse(options.contexts);
+  }
+
+  const hasRole = !!_.find(instance.access_control_list, (item) => {
+    return item.ac_role_id === acr.id &&
+      item.person_id === GGRC.current_user.id;
+  });
+
+  if (hasRole) {
+    return options.fn(options.contexts);
+  } else {
+    return options.inverse(options.contexts);
+  }
+});
+
 Mustache.registerHelper('user_roles', (person, parentInstance, options) => {
-  const allRoles = GGRC.access_control_roles.concat(
-    GGRC.internal_access_control_roles);
+  const allRoles = GGRC.access_control_roles;
   let roles = {};
   let allRoleNames = [];
 
