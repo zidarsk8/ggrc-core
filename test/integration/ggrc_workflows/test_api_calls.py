@@ -5,6 +5,7 @@
 
 import datetime
 import collections
+import string
 from mock import MagicMock
 
 import ddt
@@ -19,6 +20,7 @@ from integration.ggrc.api_helper import Api
 from integration.ggrc import generator
 from integration.ggrc.models import factories
 from integration.ggrc_workflows import WorkflowTestCase
+from integration.ggrc_workflows.helpers import workflow_api
 from integration.ggrc_workflows.models import factories as wf_factories
 
 
@@ -265,8 +267,7 @@ class TestStatusApiPatch(TestCase):
   VERIFIED = all_models.CycleTaskGroupObjectTask.VERIFIED
   DECLINED = all_models.CycleTaskGroupObjectTask.DECLINED
 
-  @staticmethod
-  def _create_cycle_structure():
+  def _create_cycle_structure(self):
     """Create cycle structure.
 
     It will create workflow, cycle, group and 3 tasks in that group.
@@ -274,23 +275,25 @@ class TestStatusApiPatch(TestCase):
     Retruns tuple:
         workflow, cycle, group and list of tasks.
     """
-    workflow = wf_factories.WorkflowFactory(
-        status=all_models.Workflow.ACTIVE)
-    cycle = wf_factories.CycleFactory(workflow=workflow)
-    group = wf_factories.CycleTaskGroupFactory(
-        cycle=cycle,
-        context=cycle.workflow.context
-    )
-    tasks = []
-    for ind in xrange(3):
-      tasks.append(wf_factories.CycleTaskFactory(
-          title='task{}'.format(ind),
-          cycle=cycle,
-          cycle_task_group=group,
-          context=cycle.workflow.context,
-          start_date=datetime.datetime.now(),
-          end_date=datetime.datetime.now() + datetime.timedelta(7)
-      ))
+    wf_slug = "WF-SLUG-{}".format(factories.random_str(
+        length=6, chars=string.ascii_letters))
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory(slug=wf_slug)
+      task_group = wf_factories.TaskGroupFactory(workflow=workflow)
+      for ind in xrange(3):
+        wf_factories.TaskGroupTaskFactory(
+            task_group=task_group,
+            title='task{}'.format(ind),
+            start_date=datetime.datetime.now(),
+            end_date=datetime.datetime.now() + datetime.timedelta(7)
+        )
+    data = workflow_api.get_cycle_post_dict(workflow)
+    self.api.post(all_models.Cycle, data)
+    workflow = all_models.Workflow.query.filter_by(slug=wf_slug).one()
+    cycle = all_models.Cycle.query.filter_by(workflow_id=workflow.id).one()
+    group = all_models.CycleTaskGroup.query.filter_by(cycle_id=cycle.id).one()
+    tasks = all_models.CycleTaskGroupObjectTask.query.filter_by(
+        cycle_id=cycle.id).all()
     return workflow, cycle, group, tasks
 
   def setUp(self):
@@ -506,9 +509,10 @@ class TestStatusApiPatch(TestCase):
       self.assert_notifications_for_object(task,
                                            u'cycle_task_due_in',
                                            u'cycle_task_due_today',
-                                           u'cycle_task_overdue')
+                                           u'cycle_task_overdue',
+                                           u'manual_cycle_created')
     self.cycle = self.tasks[0].cycle
-    self.assert_notifications_for_object(self.cycle)
+    self.assert_notifications_for_object(self.cycle, u'manual_cycle_created')
     # all tasks moved to verified
     self.assert_status_over_bulk_update([self.VERIFIED] * 3,
                                         [self.VERIFIED] * 3)
@@ -519,7 +523,8 @@ class TestStatusApiPatch(TestCase):
       self.assert_notifications_for_object(task)
     self.cycle = self.tasks[0].cycle
     self.assert_notifications_for_object(self.cycle,
-                                         "all_cycle_tasks_completed")
+                                         u"all_cycle_tasks_completed",
+                                         u'manual_cycle_created')
 
   def test_propagation_status_short(self):
     """Task status propagation for not required verification workflow."""
@@ -552,9 +557,10 @@ class TestStatusApiPatch(TestCase):
       self.assert_notifications_for_object(task,
                                            u'cycle_task_due_in',
                                            u'cycle_task_due_today',
-                                           u'cycle_task_overdue')
+                                           u'cycle_task_overdue',
+                                           u'manual_cycle_created')
     self.cycle = self.tasks[0].cycle
-    self.assert_notifications_for_object(self.cycle)
+    self.assert_notifications_for_object(self.cycle, u'manual_cycle_created')
     # all tasks moved to finished
     self.assert_status_over_bulk_update([self.FINISHED] * 3,
                                         [self.FINISHED] * 3)
@@ -565,7 +571,8 @@ class TestStatusApiPatch(TestCase):
       self.assert_notifications_for_object(task)
     self.cycle = self.tasks[0].cycle
     self.assert_notifications_for_object(self.cycle,
-                                         "all_cycle_tasks_completed")
+                                         u"all_cycle_tasks_completed",
+                                         u'manual_cycle_created')
 
   def test_deprecated_final(self):
     """Test task status propagation for deprecated workflow."""
@@ -656,9 +663,12 @@ class TestStatusApiPatch(TestCase):
       self.assert_notifications_for_object(task,
                                            u'cycle_task_due_in',
                                            u'cycle_task_due_today',
-                                           u'cycle_task_overdue')
-    self.assert_notifications_for_object(self.group.cycle)
-    self.assert_notifications_for_object(group.cycle)
+                                           u'cycle_task_overdue',
+                                           u'manual_cycle_created')
+    self.assert_notifications_for_object(self.group.cycle,
+                                         u'manual_cycle_created')
+    self.assert_notifications_for_object(group.cycle,
+                                         u'manual_cycle_created')
     # all tasks moved to finished
     self.assert_status_over_bulk_update([self.FINISHED] * 6,
                                         [self.FINISHED] * 6)
@@ -672,6 +682,8 @@ class TestStatusApiPatch(TestCase):
     for task in self.tasks:
       self.assert_notifications_for_object(task)
     self.assert_notifications_for_object(self.cycle,
-                                         "all_cycle_tasks_completed")
+                                         u"all_cycle_tasks_completed",
+                                         u'manual_cycle_created')
     self.assert_notifications_for_object(group.cycle,
-                                         "all_cycle_tasks_completed")
+                                         u"all_cycle_tasks_completed",
+                                         u'manual_cycle_created')
