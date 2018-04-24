@@ -30,6 +30,12 @@ ACR_TABLE = sa.sql.table(
     sa.sql.column('parent_id', sa.Integer),
 )
 
+ACL_TABLE = sa.sql.table(
+    "access_control_list",
+    sa.sql.column('id', sa.Integer),
+    sa.sql.column('ac_role_id', sa.String),
+)
+
 
 def _parse_object_data(object_data):
   """Parse object data for role propagation.
@@ -171,5 +177,31 @@ def remove_propagated_roles(object_type, role_names):
   op.execute(
       ACR_TABLE.delete().where(
           ACR_TABLE.c.parent_id.in_(ids)
+      )
+  )
+
+
+def remove_deprecated_roles(role_names):
+  """Remove old propagation roles.
+
+  This should be used for previous propagation roles ending with keyword
+  Mapped.
+  """
+  op.execute(
+      ACL_TABLE.delete().where(
+          ACL_TABLE.c.ac_role_id.in_(
+              sa.select([ACR_TABLE.c.id]).where(
+                  sa.and_(
+                      ACR_TABLE.c.name.in_(role_names),
+                      ACR_TABLE.c.internal == 1,
+                  )
+              )
+          )
+      )
+  )
+  ACR_TABLE.delete().where(
+      sa.and_(
+          ACR_TABLE.c.name.in_(role_names),
+          ACR_TABLE.c.internal == 1,
       )
   )

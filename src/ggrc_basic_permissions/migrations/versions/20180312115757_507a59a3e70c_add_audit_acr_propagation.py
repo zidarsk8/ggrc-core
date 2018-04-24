@@ -22,6 +22,17 @@ down_revision = '242b8dc8493b'
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   acr_propagation.propagate_roles(const.GGRC_BASIC_PERMISSIONS_PROPAGATION)
+  acr_propagation.remove_deprecated_roles([
+      "Audit Captains Mapped",
+      "Auditors Assessment Mapped",
+      "Auditors Document Mapped",
+      "Auditors Issue Mapped",
+      "Auditors Mapped",
+      "Auditors Snapshot Mapped",
+      "Program Editors Mapped",
+      "Program Managers Mapped",
+      "Program Readers Mapped",
+  ])
 
 
 def downgrade():

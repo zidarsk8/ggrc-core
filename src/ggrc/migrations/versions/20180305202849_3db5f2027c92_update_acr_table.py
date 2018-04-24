@@ -52,6 +52,14 @@ def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   _add_parent_id_column()
   _add_assessment_roles_tree()
+  acr_propagation.remove_deprecated_roles([
+      "Assignees Document Mapped",
+      "Assignees Mapped",
+      "Creators Document Mapped",
+      "Creators Mapped",
+      "Verifiers Document Mapped",
+      "Verifiers Mapped",
+  ])
 
 
 def downgrade():
