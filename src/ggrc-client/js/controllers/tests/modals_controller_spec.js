@@ -120,6 +120,67 @@ describe('ModalsController', function () {
     });
   });
 
+  describe('fetch_data method', function () {
+    let dfd;
+    let controllerInstance;
+    let method;
+    let instance;
+
+    beforeEach(function () {
+      dfd = new can.Deferred();
+      instance = {};
+      controllerInstance = {
+        options: new can.Observe({
+          instance: {
+            refresh: jasmine.createSpy().and.returnValue(dfd.resolve(instance)),
+          },
+          model: can.Model.Cacheable,
+        }),
+        find_params: () => {},
+        getExtendedInstance: () => instance,
+        prepareInstance: () => {},
+        reset_form: () => {},
+      };
+      method = Ctrl.prototype.fetch_data.bind(controllerInstance);
+    });
+
+    it('creates own instance after refresh', function (done) {
+      method().then(() => {
+        expect(controllerInstance.instance).toEqual(instance);
+        done();
+      });
+    });
+
+    it('creates own instance in case of skipping refresh', function (done) {
+      controllerInstance.options.skip_refresh = true;
+
+      method().then(() => {
+        expect(controllerInstance.instance).toEqual(instance);
+        done();
+      });
+    });
+
+    it('creates own instance based on model', function () {
+      let instance;
+
+      controllerInstance.options.new_object_form = true;
+      method();
+      instance = controllerInstance.instance;
+
+      expect(instance).toEqual(jasmine.any(Object));
+    });
+
+    it('creates own instance in case options instance and model are not passed',
+      function () {
+        delete controllerInstance.options.instance;
+
+        method();
+
+        expect(controllerInstance.instance).toEqual(jasmine.any(Object));
+      }
+    );
+  });
+
   describe('save_error method', function () {
     let method;
     let foo;
@@ -148,6 +209,71 @@ describe('ModalsController', function () {
       expect(GGRC.Errors.notifierXHR)
         .toHaveBeenCalledWith('warning');
       expect(foo).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe('prepareInstance method', function () {
+    let controllerInstance;
+    let method;
+
+    beforeEach(function () {
+      controllerInstance = {
+        options: {instance: {}},
+        find_params: () => {},
+      };
+      method = Ctrl.prototype.prepareInstance.bind(controllerInstance);
+    });
+
+    it('creates instance in case of no model', function () {
+      let instance = method();
+
+      expect(instance instanceof can.Observe).toBeTruthy();
+    });
+  });
+
+  describe('getExtendedInstance method', function () {
+    let controllerInstance;
+    let method;
+    let targetInstance;
+    let originalInstance;
+    let model;
+    let serializedInstance;
+
+    beforeEach(function () {
+      controllerInstance = {
+        setOriginalInstanceToStore: jasmine.createSpy(),
+      };
+      method = Ctrl.prototype.getExtendedInstance.bind(controllerInstance);
+      model = can.Model.Cacheable;
+      targetInstance = new model();
+      originalInstance = new model();
+      serializedInstance = {
+        id: 1,
+        title: 'Modal title',
+      };
+      spyOn(originalInstance, 'serialize')
+        .and.returnValue(serializedInstance);
+    });
+
+    it('serializes instance', function () {
+      method({targetInstance, originalInstance});
+
+      expect(originalInstance.serialize).toHaveBeenCalled();
+    });
+
+    it('copies fields of instance to target', function () {
+      let extendedInstance = method({targetInstance, originalInstance});
+
+      Object.keys(serializedInstance).forEach((key) => {
+        expect(extendedInstance.hasOwnProperty(key)).toBeTruthy();
+        expect(extendedInstance[key]).toBe(serializedInstance[key]);
+      });
+    });
+
+    it('sets original instance to store', function () {
+      method({targetInstance, originalInstance, model, updateStore: true});
+
+      expect(controllerInstance.setOriginalInstanceToStore).toHaveBeenCalled();
     });
   });
 });

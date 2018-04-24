@@ -132,13 +132,13 @@
         <div class="ggrc-form-item__row">
           <ggrc-modal-connector
                   class="width-100"
-                  parent_instance="instance"
-                  instance="instance"
+                  parent_instance="optionsInstance"
+                  instance="optionsInstance"
                   mapping="related_objects_as_source"
                   custom-related-loader="true"
                   {list}="mappedObjects"
-                  {type}="instance.assessment_type"
-                  {new-instance}="instance.isNew"
+                  {type}="optionsInstance.assessment_type"
+                  {new-instance}="optionsInstance.isNew"
                   deferred="true"
                   {^changes}="mappedObjectsChanges">
             <label class="ggrc-form-item__label">

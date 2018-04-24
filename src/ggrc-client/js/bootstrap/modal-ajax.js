@@ -246,12 +246,6 @@ import Permission from '../permission';
           });
         }
       });
-
-      $target.on('modal:discard', () => {
-        if ( instance ) {
-          instance.restore(true);
-        }
-      });
     },
 
     archiveform: function ($target, $trigger, option) {
