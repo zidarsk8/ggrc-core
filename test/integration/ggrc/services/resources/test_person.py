@@ -39,19 +39,19 @@ class TestPersonResource(TestCase, WithQueryApi):
 
   @ddt.data(
       (True, [
-          ("task 1", "Finished", 3, True),
-          ("task 1", "Verified", 2, True),
-          ("task 2", "Declined", 2, True),
-          ("task 2", "Verified", 1, False),
-          ("task 2", "Finished", 2, True),
-          ("task 3", "Verified", 1, True),
-          ("task 2", "Verified", 0, False),
+          ("task 1", "Finished", 3, True, 3),
+          ("task 1", "Verified", 2, True, 3),
+          ("task 2", "Declined", 2, True, 3),
+          ("task 2", "Verified", 1, False, 3),
+          ("task 2", "Finished", 2, True, 3),
+          ("task 3", "Verified", 1, True, 3),
+          ("task 2", "Verified", 0, False, 3),
       ]),
       (False, [
-          ("task 1", "Finished", 2, True),
-          ("task 2", "In Progress", 2, True),
-          ("task 2", "Finished", 1, False),
-          ("task 3", "Finished", 0, False),
+          ("task 1", "Finished", 2, True, 3),
+          ("task 2", "In Progress", 2, True, 3),
+          ("task 2", "Finished", 1, False, 3),
+          ("task 3", "Finished", 0, False, 3),
       ]),
   )
   @ddt.unpack
@@ -179,12 +179,21 @@ class TestPersonResource(TestCase, WithQueryApi):
           {"open_task_count": 3, "has_overdue": True}
       )
 
-      for task, status, count, overdue in transitions:
+      for task, status, count, overdue, my_work_count in transitions:
         self.generator.modify_object(tasks[task], data={"status": status})
-        response = self.client.get("/api/people/{}/task_count".format(user_id))
+        task_count_response = \
+            self.client.get("/api/people/{}/task_count".format(user_id))
+        my_work_count_response = \
+            self.client.get("/api/people/{}/my_work_count".format(user_id))
+
         self.assertEqual(
-            response.json,
+            task_count_response.json,
             {"open_task_count": count, "has_overdue": overdue}
+        )
+
+        self.assertEqual(
+            my_work_count_response.json["CycleTaskGroupObjectTask"],
+            my_work_count
         )
 
   def test_task_count_multiple_wfs(self):

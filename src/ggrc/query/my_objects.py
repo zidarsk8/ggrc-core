@@ -5,7 +5,7 @@
 import sqlalchemy as sa
 from sqlalchemy import and_
 from sqlalchemy import literal
-from sqlalchemy import true, false
+from sqlalchemy import true
 from sqlalchemy import union
 from sqlalchemy import alias
 from ggrc import db
@@ -117,25 +117,7 @@ def get_myobjects_query(types=None, contact_id=None):  # noqa
     ).filter(
         Cycle.is_current == true(),
     )
-    return task_query.filter(
-        Cycle.is_verification_needed == true(),
-        model.status.in_([
-            all_models.CycleTaskGroupObjectTask.ASSIGNED,
-            all_models.CycleTaskGroupObjectTask.IN_PROGRESS,
-            all_models.CycleTaskGroupObjectTask.FINISHED,
-            all_models.CycleTaskGroupObjectTask.DECLINED,
-            all_models.CycleTaskGroupObjectTask.DEPRECATED,
-        ])
-    ).union_all(
-        task_query.filter(
-            Cycle.is_verification_needed == false(),
-            model.status.in_([
-                all_models.CycleTaskGroupObjectTask.ASSIGNED,
-                all_models.CycleTaskGroupObjectTask.IN_PROGRESS,
-                all_models.CycleTaskGroupObjectTask.DEPRECATED,
-            ])
-        )
-    )
+    return task_query
 
   def _get_model_specific_query(model):
     """Prepare query specific for a particular model."""
