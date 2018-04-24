@@ -102,6 +102,25 @@
         }
       }
     }
+    .menu-item {
+      text-transform: capitalize;
+      &:not(:first-child) {
+        border-top: 1px solid $headerBgnd;
+      }
+
+      &__icon {
+        display: inline-block;
+        width: 26px;
+      }
+
+      &__title {
+        display: inline-block;
+      }
+
+      &__subtitle {
+        margin-left: 30px;
+      }
+    }
     a {
       display:block;
       line-height:30px;
