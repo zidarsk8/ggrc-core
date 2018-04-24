@@ -657,29 +657,33 @@ def compute_attributes(revision_ids):
     for ids_chunk in utils.list_chunks(revision_ids, chunk_size=CA_CHUNK_SIZE):
       handled_ids += len(ids_chunk)
       logger.info("Revision: %s/%s", handled_ids, ids_count)
+      reindex_chunk(ids_chunk)
 
-      with benchmark("Get revisions."):
-        revisions = get_revisions(ids_chunk)
 
-      with benchmark("Get all computed attributes"):
-        attributes = get_computed_attributes()
+def reindex_chunk(ids_chunk):
+  """Reindex chunk of CAs."""
+  with benchmark("Get revisions."):
+    revisions = get_revisions(ids_chunk)
 
-      with benchmark("Group revisions by computed attributes"):
-        attribute_groups = group_revisions(attributes, revisions)
-      with benchmark("get all objects affected by computed attributes"):
-        affected_objects = get_affected_objects(attribute_groups)
-      with benchmark("Get all relationships for these computed objects"):
-        relationships = get_relationships(affected_objects)
-      with benchmark("Get snapshot data"):
-        snapshot_map, snapshot_tag_map = get_snapshot_data(affected_objects)
+  with benchmark("Get all computed attributes"):
+    attributes = get_computed_attributes()
 
-      with benchmark("Compute values"):
-        computed_values = compute_values(affected_objects, relationships,
-                                         snapshot_map)
+  with benchmark("Group revisions by computed attributes"):
+    attribute_groups = group_revisions(attributes, revisions)
+  with benchmark("get all objects affected by computed attributes"):
+    affected_objects = get_affected_objects(attribute_groups)
+  with benchmark("Get all relationships for these computed objects"):
+    relationships = get_relationships(affected_objects)
+  with benchmark("Get snapshot data"):
+    snapshot_map, snapshot_tag_map = get_snapshot_data(affected_objects)
 
-      with benchmark("Get computed attributes data"):
-        attributes_data = get_attributes_data(computed_values)
-      with benchmark("Get computed attribute full-text index data"):
-        index_data = get_index_data(computed_values, snapshot_tag_map)
-      with benchmark("Store attribute data and full-text index data"):
-        store_data(attributes_data, index_data)
+  with benchmark("Compute values"):
+    computed_values = compute_values(affected_objects, relationships,
+                                     snapshot_map)
+
+  with benchmark("Get computed attributes data"):
+    attributes_data = get_attributes_data(computed_values)
+  with benchmark("Get computed attribute full-text index data"):
+    index_data = get_index_data(computed_values, snapshot_tag_map)
+  with benchmark("Store attribute data and full-text index data"):
+    store_data(attributes_data, index_data)

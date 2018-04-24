@@ -186,7 +186,7 @@ def start_update_audit_issues(audit_id, message):
   task.start()
 
 
-def do_reindex():
+def do_reindex(with_reindex_snapshots=False):
   """Update the full text search index."""
 
   indexer = get_indexer()
@@ -215,37 +215,18 @@ def do_reindex():
         model.bulk_record_update_for(ids_chunk)
         db.session.commit()
 
+  if with_reindex_snapshots:
+    logger.info("Updating index for: %s", "Snapshot")
+    with benchmark("Create records for %s" % "Snapshot"):
+      snapshot_indexer.reindex()
+
   indexer.invalidate_cache()
 
 
 def do_full_reindex():
   """Update the full text search index for all models."""
 
-  indexer = get_indexer()
-  indexed_models = {
-      m.__name__: m for m in all_models.all_models
-      if issubclass(m, mixin.Indexed) and m.REQUIRED_GLOBAL_REINDEX
-  }
-  people_query = db.session.query(all_models.Person.id,
-                                  all_models.Person.name,
-                                  all_models.Person.email)
-  indexer.cache["people_map"] = {p.id: (p.name, p.email) for p in people_query}
-  indexer.cache["ac_role_map"] = dict(db.session.query(
-      all_models.AccessControlRole.id,
-      all_models.AccessControlRole.name,
-  ))
-  for model_name in sorted(indexed_models.keys()):
-    logger.info("Updating index for: %s", model_name)
-    with benchmark("Create records for %s" % model_name):
-      model = indexed_models[model_name]
-      reindex_model(model)
-
-  logger.info("Updating index for: %s", "Snapshot")
-  with benchmark("Create records for %s" % "Snapshot"):
-    snapshot_indexer.reindex()
-
-  indexer.invalidate_cache()
-
+  do_reindex(with_reindex_snapshots=True)
   start_compute_attributes("all_latest")
 
 
