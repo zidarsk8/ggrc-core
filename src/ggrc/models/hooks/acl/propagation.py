@@ -392,6 +392,7 @@ def propagate():
 
 def propagate_all():
   """Re-evaluate propagation for all objects."""
+  from ggrc_workflows.models.hooks import workflow
   logger.info("ACL propagation started")
   logger.info("Deleting existing propagated roles")
   _delete_all_propagated_acls()
@@ -407,4 +408,7 @@ def propagate_all():
     flask.g.new_acl_ids = acl_ids
     flask.g.new_relationship_ids = set()
     flask.g.deleted_objects = set()
+    flask.g.new_wf_acls = acl_ids
+    flask.g.deleted_wf_objects = set()
     propagate()
+    workflow.handle_acl_changes()
