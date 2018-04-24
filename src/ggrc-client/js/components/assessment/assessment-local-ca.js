@@ -53,26 +53,25 @@ import Permission from '../../permission';
         },
         isEvidenceRequired: {
           get: function () {
-            let optionsWithEvidence = this.attr('fields')
-              .filter(function (item) {
-                return item.attr('type') === 'dropdown';
-              })
-              .filter(function (item) {
-                return isEvidenceRequired(item);
-              }).length;
-            return optionsWithEvidence > this.attr('evidenceAmount');
+            let optionsWithEvidence =
+              this.getDropdownOptions(isEvidenceRequired);
+
+            return optionsWithEvidence.length > this.attr('evidenceAmount');
           },
         },
         isUrlRequired: {
           get: function () {
-            let optionsWithURLs = this.attr('fields')
-              .filter((item) => item.attr('type') === 'dropdown')
-              .filter(function (item) {
-                return isUrlRequired(item);
-              }).length;
-            return optionsWithURLs > this.attr('urlsAmount');
+            let optionsWithURLs =
+              this.getDropdownOptions(isUrlRequired);
+
+            return optionsWithURLs.length > this.attr('urlsAmount');
           },
         },
+      },
+      getDropdownOptions(predicate = () => true) {
+        return this.attr('fields')
+          .filter((item) => item.attr('type') === 'dropdown')
+          .filter(predicate);
       },
       validateForm: function ({
         triggerField = null,
