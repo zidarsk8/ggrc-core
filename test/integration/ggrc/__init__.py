@@ -161,7 +161,7 @@ class TestCase(BaseTestCase, object):
     db.engine.execute(people.delete(people.c.email != "user@example.com"))
     acr = db.metadata.tables["access_control_roles"]
     db.engine.execute(acr.delete(~acr.c.non_editable))
-    db.session.reindex_set = set()
+    db.session.reindex_set.invalidate()
     db.session.commit()
 
   def setUp(self):
