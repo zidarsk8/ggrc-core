@@ -8,10 +8,22 @@
     margin: 0 0 16px 0;
     align-items: center;
     justify-content: flex-end;
+
+    &_bottom {
+      margin: 16px 0 0;
+    }
+
+    &_lhs-items {
+      margin-right: auto;
+    }
   }
+
   &__toolbar-item {
     display: inline-flex;
-    margin: 0 0 0 16px;
+
+    &:not(:first-child) {
+      margin: 0 0 0 16px;
+    }
   }
 }
 

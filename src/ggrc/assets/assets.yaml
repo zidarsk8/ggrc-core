@@ -230,7 +230,6 @@ dashboard-js-template-files:
   - task_groups/tree_add_item.mustache
   - task_group_tasks/modal_content.mustache
   - task_group_tasks/tree-item-attr.mustache
-  - task_group_tasks/task_group_subtree_footer.mustache
   - task_group_tasks/task_group_subtree_add_item.mustache
   - task_group_tasks/task_group_subtree.mustache
   - workflows/confirm_start.mustache
