@@ -50,6 +50,10 @@ PROPOSAL_R = {
 }
 
 BASIC_PROPAGATION = {
+    BASIC_ROLES: COMMENT_DOCUMENT_RUD,
+}
+
+THREAT_PROPAGATION = {
     "Admin": COMMENT_DOCUMENT_RUD,
 }
 
@@ -217,8 +221,9 @@ GGRC_PROPAGATION = {
     "Section": BASIC_PROPAGATION,
     "Standard": BASIC_PROPAGATION,
     "System": BASIC_PROPAGATION,
-    "Threat": BASIC_PROPAGATION,
     "Vendor": BASIC_PROPAGATION,
+
+    "Threat": THREAT_PROPAGATION,
 
     # "RiskAssessment": does not have ACL roles
 }
