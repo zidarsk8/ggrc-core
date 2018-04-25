@@ -77,7 +77,6 @@ def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
       "grandchild_acr_{}".format(source)
   )
   where_conditions = [
-      child_acr.c.object_type == all_models.Relationship.__name__,
   ]
   if relationship_ids is not None:
     where_conditions.append(rel_table.c.id.in_(relationship_ids))
@@ -87,21 +86,13 @@ def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
     where_conditions.append(acl_table.c.id.in_(parent_acl_ids))
 
   if source:
-    acl_link = sa.and_(
-        acl_table.c.object_id == rel_table.c.source_id,
-        acl_table.c.object_type == rel_table.c.source_type,
-    )
-    where_conditions.append(
-        grandchild_acr.c.object_type == rel_table.c.destination_type
-    )
+    parent_object_id = rel_table.c.source_id
+    parent_object_type = rel_table.c.source_type
+    grandchild_object_type = rel_table.c.destination_type
   else:
-    acl_link = sa.and_(
-        acl_table.c.object_id == rel_table.c.destination_id,
-        acl_table.c.object_type == rel_table.c.destination_type,
-    )
-    where_conditions.append(
-        grandchild_acr.c.object_type == rel_table.c.source_type
-    )
+    parent_object_id = rel_table.c.destination_id
+    parent_object_type = rel_table.c.destination_type
+    grandchild_object_type = rel_table.c.source_type
 
   select_statement = sa.select([
       acl_table.c.person_id.label("person_id"),
@@ -119,16 +110,25 @@ def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
                   sa.join(
                       rel_table,
                       acl_table,
-                      acl_link
+                      sa.and_(
+                          acl_table.c.object_id == parent_object_id,
+                          acl_table.c.object_type == parent_object_type,
+                      )
                   ),
                   parent_acr,
                   parent_acr.c.id == acl_table.c.ac_role_id
               ),
               child_acr,
-              child_acr.c.parent_id == parent_acr.c.id
+              sa.and_(
+                  child_acr.c.parent_id == parent_acr.c.id,
+                  child_acr.c.object_type == all_models.Relationship.__name__,
+              ),
           ),
           grandchild_acr,
-          grandchild_acr.c.parent_id == child_acr.c.id
+          sa.and_(
+              grandchild_acr.c.parent_id == child_acr.c.id,
+              grandchild_acr.c.object_type == grandchild_object_type,
+          )
       )
   ).where(
       sa.and_(*where_conditions)
