@@ -24,7 +24,7 @@
               {{>'/static/mustache/base_objects/test_plan.mustache'}}
               {{>'/static/mustache/base_objects/notes.mustache'}}
               {{>'/static/mustache/base_objects/contacts.mustache'}}
-              {{>'/static/mustache/base_objects/urls.mustache'}}
+              {{>'/static/mustache/base_objects/reference-urls.mustache'}}
 
               <div class="custom-attr-wrap info-pane__section">
                 <div class="row-fluid">
@@ -64,13 +64,19 @@
                     </div>
                     <div class="span4">
                       <h6>Last Deprecated Date</h6>
-                      {{#if end_date}}
-                        <p>
-                          {{localize_date end_date}}
-                        </p>
-                      {{else}}
-                        <span class="empty-message">None</span>
-                      {{/if}}
+                        {{#if last_deprecated_date}}
+                          <p>
+                            {{localize_date last_deprecated_date}}
+                          </p>
+                        {{else}}
+                          {{#if end_date}}
+                            <p>
+                              {{localize_date end_date}}
+                            </p>
+                          {{else}}
+                            <span class="empty-message">None</span>
+                          {{/if}}
+                        {{/if}}
                     </div>
                   </div><!-- row-fluid end -->
                 </div><!-- hidden-fields-area end -->

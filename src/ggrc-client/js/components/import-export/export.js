@@ -6,55 +6,149 @@
 import './relevant-filter';
 import './export-group';
 import csvExportTemplate from './templates/csv-export.mustache';
-import {confirm} from '../../plugins/utils/modals';
 import {
-  exportRequest,
   download,
   fileSafeCurrentDate,
+  runExport,
+  getExportsHistory,
+  downloadExportContent,
+  deleteExportJob,
+  jobStatuses,
 } from './import-export-utils';
+import {confirm} from '../../plugins/utils/modals';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
+import './current-exports/current-exports';
 
-let url = can.route.deparam(window.location.search.substr(1));
-let panelsModel = can.Map({
-  items: new can.List(),
-});
-let exportModel = can.Map({
-  panels: new panelsModel(),
-  loading: false,
-  url: '/_service/export_csv',
-  type: url.model_type || 'Program',
-  only_relevant: false,
-  filename: 'export_objects.csv',
-  format: 'gdrive',
-});
+const DEFAULT_TIMEOUT = 2000;
 
 can.Component.extend({
   tag: 'csv-export',
   template: csvExportTemplate,
   viewModel: {
+    isInProgress: false,
+    loading: false,
+    fileName: 'export_objects.csv',
+    panels: [],
     isFilterActive: false,
-    'export': new exportModel(),
-    addObjectType() {
-      this.attr('export').dispatch('addPanel');
+    currentExports: [],
+    disabledItems: {},
+    timeout: DEFAULT_TIMEOUT,
+    getInProgressJobs() {
+      return this.attr('currentExports').filter((el) => {
+        return el.status === jobStatuses.IN_PROGRESS;
+      });
     },
-  },
-  events: {
-    toggleIndicator: function (currentFilter) {
-      let isExpression =
-          !!currentFilter &&
-          !!currentFilter.expression.op &&
-          currentFilter.expression.op.name !== 'text_search' &&
-          currentFilter.expression.op.name !== 'exclude_text_search';
-      this.viewModel.attr('isFilterActive', isExpression);
+    getExports(ids) {
+      getExportsHistory(ids)
+        .then((exports) => {
+          const timeout = this.attr('timeout');
+          if (ids) {
+            let exportsMap = exports
+              .reduce((map, job) => {
+                map[job.id] = job.status;
+                return map;
+              }, {});
+
+            this.attr('currentExports').forEach((job) => {
+              if (exportsMap[job.id]) {
+                job.attr('status', exportsMap[job.id]);
+              }
+            });
+          } else {
+            this.attr('currentExports').replace(exports);
+          }
+          if (this.getInProgressJobs().length) {
+            this.attr('timeout', timeout * 2);
+            this.attr('isInProgress', true);
+            this.trackExportsStatus();
+          } else {
+            this.attr('isInProgress', false);
+            this.attr('timeout', DEFAULT_TIMEOUT);
+          }
+        });
     },
-    '.tree-filter__expression-holder input keyup': function (el, ev) {
-      this.toggleIndicator(GGRC.query_parser.parse(el.val()));
+    trackExportsStatus() {
+      setTimeout(() => {
+        let ids = this.getInProgressJobs().map((job) => job.id);
+        this.getExports(ids);
+      }, this.attr('timeout'));
     },
-    '.option-type-selector change': function (el, ev) {
-      this.viewModel.attr('isFilterActive', false);
+    onViewContent({id, format, fileName}) {
+      if (this.attr(`disabledItems.${id}`)) {
+        return;
+      }
+      this.attr(`disabledItems.${id}`, true);
+
+      if (format === 'csv') {
+        downloadExportContent(id, format)
+          .then((data) => {
+            download(fileName, data);
+            this.deleteJob(id);
+          })
+          .fail(() => {
+            this.attr(`disabledItems.${id}`, false);
+          });
+      } else if (format === 'gdrive') {
+        backendGdriveClient.withAuth(() => {
+          return downloadExportContent(id, format);
+        })
+          .then((data) => {
+            let link = `https://docs.google.com/spreadsheets/d/${data.id}`;
+
+            confirm({
+              modal_title: 'File Generated',
+              modal_description: `GDrive file is generated successfully.
+               Click button below to view the file.`,
+              gDriveLink: link,
+              button_view: `${GGRC.mustache_path}/modals/open_sheet.mustache`,
+            }, () => {
+              this.deleteJob(id);
+            }, () => {
+              this.attr(`disabledItems.${id}`, false);
+            });
+          })
+          .fail(() => {
+            this.attr(`disabledItems.${id}`, false);
+          });
+      }
+    },
+    onRemove({id}) {
+      if (this.attr(`disabledItems.${id}`)) {
+        return;
+      }
+      this.attr(`disabledItems.${id}`, true);
+      this.deleteJob(id);
+    },
+    deleteJob(id) {
+      deleteExportJob(id)
+        .then(() => {
+          let index = _.findIndex(this.attr('currentExports'), {id});
+          this.attr('currentExports').splice(index, 1);
+        }, () => {
+          this.attr(`disabledItems.${id}`, false);
+        });
+    },
+    exportObjects() {
+      let data = {
+        objects: this.getObjectsForExport(),
+        current_time: fileSafeCurrentDate(),
+      };
+
+      $('.area > section.content').animate({scrollTop: 0}, 'slow');
+
+      runExport(data)
+        .then((jobInfo) => {
+          const isInProgress = this.getInProgressJobs().length;
+          this.attr('currentExports').push(jobInfo);
+          this.attr('isInProgress', !!isInProgress);
+
+          if (!isInProgress) {
+            this.getExports([jobInfo.id]);
+          }
+        });
     },
     getObjectsForExport: function () {
-      let panels = this.viewModel.attr('export.panels.items');
+      let panels = this.attr('panels');
 
       return _.map(panels, function (panel, index) {
         let relevantFilter;
@@ -88,45 +182,24 @@ can.Component.extend({
         };
       });
     },
-    '#export-csv-button click': function (el, ev) {
-      this.viewModel.attr('export.loading', true);
-      let data = {
-        objects: this.getObjectsForExport(),
-        export_to: this.viewModel.attr('export.chosenFormat'),
-        current_time: fileSafeCurrentDate(),
-      };
-
-      backendGdriveClient.withAuth(()=> {
-        return exportRequest({data});
-      }).then((data, status, jqXHR)=> {
-        let link;
-
-        if (this.viewModel.attr('export.chosenFormat') === 'gdrive') {
-          link = 'https://docs.google.com/spreadsheets/d/' + data.id;
-
-          confirm({
-            modal_title: 'Export Completed',
-            modal_description: 'File is exported successfully. ' +
-            'You can view the file here: ' +
-            '<a href="' + link + '" target="_blank">' + link + '</a>',
-            button_view: GGRC.mustache_path + '/modals/close_buttons.mustache',
-          });
-        } else {
-          const contentDisposition =
-            jqXHR.getResponseHeader('Content-Disposition');
-          const match = contentDisposition.match(/filename\=(['"]*)(.*)\1/);
-          const filename = match && match[2] || this.viewModel.attr('export.filename');
-
-          download(filename, data);
-        }
-      }, (xhr)=> {
-        let message = (xhr.responseJSON && xhr.responseJSON.message) ?
-          xhr.responseJSON.message :
-          xhr.responseText;
-        GGRC.Errors.notifier('error', message);
-      }).always(()=> {
-        this.viewModel.attr('export.loading', false);
-      });
+  },
+  events: {
+    inserted() {
+      this.viewModel.getExports();
+    },
+    toggleIndicator: function (currentFilter) {
+      let isExpression =
+          !!currentFilter &&
+          !!currentFilter.expression.op &&
+          currentFilter.expression.op.name !== 'text_search' &&
+          currentFilter.expression.op.name !== 'exclude_text_search';
+      this.viewModel.attr('isFilterActive', isExpression);
+    },
+    '.tree-filter__expression-holder input keyup': function (el, ev) {
+      this.toggleIndicator(GGRC.query_parser.parse(el.val()));
+    },
+    '.option-type-selector change': function (el, ev) {
+      this.viewModel.attr('isFilterActive', false);
     },
   },
 });

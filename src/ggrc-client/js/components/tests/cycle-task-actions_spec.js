@@ -25,10 +25,6 @@ describe('GGRC.Components.subTreeWrapper', function () {
     let fakeElement;
 
     beforeEach(function () {
-      spyOn(vm, 'setStatus').and.returnValue({
-        then() {},
-      });
-
       spyOn(tracker, 'start').and.returnValue(() => {});
 
       vm.attr('oldValues', []);
@@ -39,29 +35,45 @@ describe('GGRC.Components.subTreeWrapper', function () {
       changeStatus = vm.changeStatus.bind(vm);
     });
 
-    it('puts status and adds previous one for undo', function () {
+    it('puts status and adds previous one for undo', async function (done) {
+      spyOn(vm, 'setStatus').and.returnValue(Promise.resolve(true));
       fakeElement = {
         data: jasmine.createSpy().and.returnValues('Verified', null),
       };
 
-      changeStatus(null, fakeElement, fakeEvent);
-
+      await changeStatus(null, fakeElement, fakeEvent);
       expect(vm.attr('oldValues').length).toEqual(1);
       expect(vm.attr('oldValues')[0].status).toEqual('In Progress');
       expect(vm.setStatus).toHaveBeenCalledWith('Verified');
+      done();
     });
 
     it('puts status, adds previous one for undo and fires "expand" event',
-      function () {
+      async function (done) {
+        spyOn(vm, 'setStatus').and.returnValue(Promise.resolve(true));
         fakeElement = {
           data: jasmine.createSpy().and.returnValues('Verified', 'open'),
         };
 
-        changeStatus(null, fakeElement, fakeEvent);
-
+        await changeStatus(null, fakeElement, fakeEvent);
         expect(vm.attr('oldValues').length).toEqual(1);
         expect(vm.attr('oldValues')[0].status).toEqual('In Progress');
         expect(vm.setStatus).toHaveBeenCalledWith('Verified');
+        done();
+      }
+    );
+
+    it('doesn\'t change previous status if setStatus returned false',
+      async function (done) {
+        spyOn(vm, 'setStatus').and.returnValue(Promise.resolve(false));
+        fakeElement = {
+          data: jasmine.createSpy().and.returnValues('Verified'),
+        };
+
+        await changeStatus(null, fakeElement, fakeEvent);
+        expect(vm.attr('oldValues').length).toEqual(0);
+        expect(vm.setStatus).toHaveBeenCalledWith('Verified');
+        done();
       });
   });
 

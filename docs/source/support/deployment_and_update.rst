@@ -149,7 +149,8 @@ Settings from ``settings.sh``
 | COMPANY_LOGO_TEXT                  | If COMPANY_LOGO is not set, this (text) value is used instead of an image |
 |                                    | in the top-left corner of each page.                                      |
 +------------------------------------+---------------------------------------------------------------------------+
-
+| CREATE_ISSUE_URL                   | Link for creation buganizer issue                                         |
++------------------------------------+---------------------------------------------------------------------------+
 
 
 Settings from ``override.sh``

@@ -3,7 +3,9 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-.related-reference-urls {
+.related-urls {
+  max-width: 440px;
+  display: block;
   outline: none;
 
   &__heading {
@@ -19,13 +21,6 @@
 
   document-object-list-item {
     min-width: 0;
-  }
-
-  & .document-object-item__body {
-    padding-right: 8px;
-    .link {
-      max-width: 200px;
-    }
   }
 
   & .link {

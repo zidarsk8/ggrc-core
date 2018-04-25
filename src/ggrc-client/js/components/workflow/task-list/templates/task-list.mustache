@@ -1,0 +1,38 @@
+{{!
+    Copyright (C) 2018 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="info-pane__section-title">
+    Tasks (<span>{{items.length}}</span>)
+    <span class="inline-explanation">Define tasks</span>
+</div>
+<div class="task-list">
+  <div class="task_group_tasks__header">
+      <div class="task_group_tasks__header-item">
+          Title
+      </div>
+      <div class="task_group_tasks__header-item">
+          Task Assignees
+      </div>
+      <div class="task_group_tasks__header-item">
+          Task Secondary Assignees
+      </div>
+      <div class="task_group_tasks__header-item">
+          Initial Setup
+      </div>
+      <div class="task_group_tasks__header-item">
+          Next Cycle
+      </div>
+      <div class="task_group_tasks__header-item-edit">
+      </div>
+  </div>
+  <div class="task_group_tasks__list">
+    <ul class="tree-structure new-tree">
+      {{#each items}}
+          {{>'/static/mustache/task_group_tasks/task_group_subtree.mustache'}}
+      {{/each}}
+      {{>'/static/mustache/task_group_tasks/task_group_subtree_footer.mustache'}}
+    </ul>
+  </div>
+</div>

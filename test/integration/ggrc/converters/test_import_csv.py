@@ -239,3 +239,21 @@ class TestBasicCsvImport(TestCase):
     audit = models.Audit.query.first()
     program = models.Program.query.first()
     self.assertNotEqual(audit.context_id, program.context_id)
+
+  def test_import_with_code_column(self):
+    """Test import csv with 'Code' column."""
+    file_name = "import_with_code_column.csv"
+    response = self.import_file(file_name)
+
+    self.assertEqual(response[0]["created"], 1)
+    self.assertEqual(response[0]["block_errors"], [])
+
+  def test_import_without_code_column(self):
+    """Test error message when trying to import csv without 'Code' column."""
+    file_name = "import_without_code_column.csv"
+    response = self.import_file(file_name)
+
+    self.assertEqual(response[0]["created"], 0)
+    self.assertEqual(response[0]["block_errors"], [
+        errors.MISSING_COLUMN.format(column_names="Code", line=2, s="")
+    ])

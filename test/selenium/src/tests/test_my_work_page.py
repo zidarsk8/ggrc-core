@@ -19,8 +19,8 @@ class TestMyWorkPage(base.Test):
   """Tests My Work page, part of smoke tests, section 2."""
 
   @pytest.mark.smoke_tests
-  def test_horizontal_nav_bar_tabs(self, new_controls_rest, my_work_dashboard,
-                                   selenium):
+  def test_destructive_horizontal_nav_bar_tabs(self, new_controls_rest,
+                                               my_work_dashboard, selenium):
     """Tests that several objects in widget can be deleted sequentially.
     Preconditions:
     - Controls created via REST API.

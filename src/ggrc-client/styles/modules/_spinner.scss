@@ -23,6 +23,9 @@
 }
 
 .spinner-size {
+  &__medium {
+    font-size: 1.5em;
+  }
   &__large {
     font-size: 2em;
   }

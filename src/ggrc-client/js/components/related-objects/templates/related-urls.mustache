@@ -1,0 +1,58 @@
+{{!
+    Copyright (C) 2018 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="related-urls">
+  <content/>
+  <div class="related-urls__list">
+    <object-list {(items)}="urls" {empty-message}="emptyMessage">
+      <div class="action-toolbar">
+        <document-object-list-item
+          {instance}="{.}">
+        </document-object-list-item>
+        {{#if canRemoveUrl}}
+          <div class="action-toolbar__controls">
+            <a href="javascript://"
+              class="info-action unmap"
+              {{#if isDisabled}}disabled{{/if}}
+              ($click)="removeUrl(%context)">
+                <action-toolbar-control>
+                  <i class="fa fa-trash"></i>
+                </action-toolbar-control>
+            </a>
+          </div>
+        {{/if}}
+      </div>
+    </object-list>
+  </div>
+  {{#if canAddUrl}}
+    {{#if isFormVisible}}
+      <form class="related-urls__create create-form">
+        <fieldset class="create-form__layout"
+          {{#if isDisabled}}disabled{{/if}}>
+          <input {($value)}="value"
+          class="create-form__input"
+          type="text"
+          placeholder="Add URL"
+          spellcheck="false"
+          autocomplete="false">
+          <div class="create-form__controls">
+            <button type="submit" class="create-form__confirm" ($click)="submitCreateUrlForm(value)">
+              <i class="fa fa-check"></i>
+            </button>
+            <button type="button" class="create-form__cancel" ($click)="toggleFormVisibility(false)">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+        </fieldset>
+      </form>
+    {{else}}
+      <button type="button"
+        class="related-urls__toggle btn btn-small btn-gray"
+        ($click)="toggleFormVisibility(true)">
+        Add
+      </button>
+    {{/if}}
+  {{/if}}
+</div>

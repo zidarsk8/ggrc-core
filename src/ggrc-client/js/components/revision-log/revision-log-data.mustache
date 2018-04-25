@@ -8,9 +8,9 @@
 {{else}}
     {{#if isObject}}
         {{#each data}}
-            <div>{{.}}</div>
+            <div>{{{.}}}</div>
         {{/each}}
     {{else}}
-        <div>{{data}}</div>
+        <div>{{{data}}}</div>
     {{/if}}
 {{/if}}

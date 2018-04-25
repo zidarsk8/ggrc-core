@@ -216,23 +216,21 @@ class LhnMenu(object):
       By.CSS_SELECTOR, '[data-for="Workflow"]>[data-value="Inactive"]')
 
 
+class ExportItem(object):
+  """Locators for Export items on Export page."""
+  DOWNLOAD_CSV_XPATH = (
+      By.XPATH, ".//button[normalize-space()='Download CSV']")
+
+
 class ExportPage(object):
-  """Locators for Export Page and Export Panels."""
+  """Locators for Export page."""
   _CONTENT = Common.CONTENT
   _EXPORT_PAGE = _CONTENT + " #csv_export"
-  _EXPORT_PANEL = ".new-relevant-block"
-  # general
   EXPORT_PAGE_CSS = (By.CSS_SELECTOR, _EXPORT_PAGE)
-  EXPORT_PANEL_CSS = (By.CSS_SELECTOR, ".export-groups " + _EXPORT_PANEL)
-  EXPORT_ACTIONS_PANEL_CSS = (By.CSS_SELECTOR, ".export-group__actions-wrap")
-  # labels
-  TITLE_LBL_CSS = (By.CSS_SELECTOR, Common.TITLE)
-  # user input elements
-  EXPORT_FORMAT_DD_CSS = (
-      By.CSS_SELECTOR, ".export-format")
   ADD_OBJECT_TYPE_BTN_XPATH = (
       By.XPATH, "//button[normalize-space()='Add Object Type']")
   EXPORT_OBJECTS_BTN_CSS = (By.CSS_SELECTOR, "#export-csv-button")
+  EXPORT_ITEM_CSS = (By.CSS_SELECTOR, ".current-exports__item")
 
 
 class ExtendedInfo(object):
@@ -321,7 +319,7 @@ class ModalCreateNewObject(BaseModalCreateNew):
   MODAL = Common.MODAL_CREATE
   # user input elements
   UI_TITLE = (By.CSS_SELECTOR, MODAL + ' [placeholder="Enter Title"]')
-  UI_CODE = (By.CSS_SELECTOR, MODAL + ' [name="slug"]')
+  CODE = (By.CSS_SELECTOR, MODAL + ' [name="slug"]')
   BUTTON_SAVE_AND_CLOSE = (By.CSS_SELECTOR,
                            MODAL + ' [data-toggle="modal-submit"]')
   BUTTON_SAVE_AND_ADD_ANOTHER = (
@@ -337,8 +335,6 @@ class ModalCreateNewProgram(BaseModalCreateNew):
   UI_NOTES = (By.CSS_SELECTOR,
               '[data-test-id="new_program_field_notes_75b8bc05"]'
               '>iframe.wysihtml5-sandbox')
-  UI_CODE = (By.CSS_SELECTOR,
-             '[data-test-id="new_program_field_code_334276e2"]')
   UI_STATE = (By.CSS_SELECTOR,
               '[data-test-id="new_program_dropdown_state_036a1fa6"]')
   BUTTON_HIDE_OPTIONAL_FIELDS = (By.ID, "formHide")
@@ -415,9 +411,6 @@ class ModalCreateNewControl(BaseModalCreateNew):
   UI_TEST_PLAN = (
       By.CSS_SELECTOR, '[data-test-id="control_test_plan_d8b5a2f4"] iframe')
   NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] label')
-  CODE = (By.CSS_SELECTOR, '[data-test-id="control_code_f8abbcc9"] label')
-  UI_CODE = (
-      By.CSS_SELECTOR, '[data-test-id="control_code_f8abbcc9"] input')
   KIND_OR_NATURE = (
       By.CSS_SELECTOR, '[data-test-id="control_kind_nature_dadc232f"] label')
   DROPDOWN_KIND_OR_NATURE = (
@@ -789,6 +782,7 @@ class WidgetInfoAssessment(WidgetInfoPanel, CommonAssessment):
   # pylint: disable=invalid-name
   WIDGET = Common.INFO
   TOGGLE = ' [class*="fa-caret"]'
+  HEADERS_AND_VALUES = (By.CSS_SELECTOR, ".ggrc-form-item__multiple-row")
   # Base
   LCAS_HEADERS_AND_VALUES = (
       By.CSS_SELECTOR,
@@ -798,11 +792,6 @@ class WidgetInfoAssessment(WidgetInfoPanel, CommonAssessment):
       WIDGET + " assessment-custom-attributes inline-edit-control")
   CAS_CHECKBOXES = (By.CSS_SELECTOR, '[class*="wrapper"] [type="checkbox"]')
   # Assessment Attributes tab
-  # Code section
-  _CODE = "assessment-inline-item[prop-name='slug'] "
-  CODE_CSS = (By.CSS_SELECTOR, _CODE)
-  CODE_HEADER_CSS = (By.CSS_SELECTOR, _CODE + ".ggrc-form__title")
-  CODE_VALUE_CSS = (By.CSS_SELECTOR, _CODE + ".read-more__body")
   # comments section
   COMMENTS_CSS = (By.CSS_SELECTOR, ".assessment-comments")
   # asmt tab container
@@ -966,6 +955,10 @@ class AssessmentsDropdown3bbsTreeView(CommonDropdown3bbsTreeView):
   BTN_3BBS_GENERATE_CSS = (
       By.CSS_SELECTOR,
       CommonDropdown3bbsTreeView.TREE_VIEW_3BBS_DD + " .fa-magic")
+
+
+class Assessments(object):
+  SHOW_GENERATED_ASSESSMENTS = (By.CSS_SELECTOR, ".reload-link")
 
 
 class TreeView(object):

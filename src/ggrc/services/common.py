@@ -24,7 +24,6 @@ from flask.ext.sqlalchemy import Pagination
 import sqlalchemy.orm.exc
 from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import class_mapper
 from sqlalchemy.sql.expression import tuple_
 from werkzeug.exceptions import BadRequest, Forbidden
 
@@ -49,6 +48,8 @@ from ggrc.cache import utils as cache_utils
 
 
 # pylint: disable=invalid-name
+from ggrc.utils import dump_attrs
+
 logger = getLogger(__name__)
 
 
@@ -523,26 +524,13 @@ class Resource(ModelView):
             not permissions.has_conditions('update', self.model.__name__)):
       raise Forbidden()
 
-  def dump_attrs(self, obj):
-    obj_cls = type(obj)
-    mapper = class_mapper(obj_cls)
-    rel_keys = {c.key for c in mapper.relationships}
-    attrs = tuple(
-        p.key
-        for p in mapper.iterate_properties
-        if p.key not in rel_keys)
-    # TODO(anushovan): consider caching class definitions.
-    attrs_cls = collections.namedtuple('Dumped%s' % obj_cls.__name__, attrs)
-    values = tuple(getattr(obj, k, None) for k in attrs)
-    return attrs_cls(*values)
-
   def put(self, id):
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
       return self.not_found_response()
 
-    initial_state = self.dump_attrs(obj)
+    initial_state = dump_attrs(obj)
 
     src = self.request.json
     if self.request.mimetype != 'application/json':
@@ -1062,16 +1050,35 @@ class Resource(ModelView):
 
       # auto generation of user with Creator role if external flag is set
       if body and 'person' in body[0]:
-        person = body[0]['person']
-        if person.get('external'):
+        ext_flags_passed = {p.get("person", {}).get("external", False)
+                            for p in body}
+        if ext_flags_passed == {True, False}:
+          raise ValueError("Both external and non-external People POSTed.")
+
+        if ext_flags_passed == {True}:
           from ggrc.utils import user_generator
-          obj = user_generator.find_or_create_external_user(person['email'],
-                                                            person['name'])
-          if not obj:
-            return current_app.make_response(('application/json', 406,
-                                              [('Content-Type',
-                                                'text/plain')]))
-          return self.json_success_response([(201, self.object_for_json(obj))])
+          created_people = []
+          any_created = False
+          for obj in body:
+            person_json = obj.get("person")
+            person = user_generator.find_or_create_external_user(
+                person_json["email"],
+                person_json["name"],
+            )
+            if person:
+              response_part = (201, self.object_for_json(person))
+              any_created = True
+            else:
+              response_part = (400, {"Failed": True})
+            created_people.append(response_part)
+
+          if any_created:
+            return self.json_success_response(created_people)
+          return current_app.make_response(
+              (self.as_json(created_people),
+               400,
+               [("Content-type", "text/plain")]),
+          )
 
       res = []
       headers = {"Content-Type": "application/json"}

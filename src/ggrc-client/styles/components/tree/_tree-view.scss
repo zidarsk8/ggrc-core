@@ -221,6 +221,10 @@ tree-item {
     cycle-task-actions {
       .item-actions.disabled {
         @include disabled();
+        .request-control,
+        .undo {
+          display: none;
+        }
       }
     }
   }

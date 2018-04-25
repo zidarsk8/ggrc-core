@@ -15,13 +15,12 @@ dashboard-js-template-files:
   - base_objects/description.mustache
   - base_objects/test_plan.mustache
   - base_objects/extended_info.mustache
-  - base_objects/urls.mustache
+  - base_objects/reference-urls.mustache
   - base_objects/notes.mustache
   - base_objects/info.mustache
   - base_objects/dropdown_menu.mustache
   - base_objects/view_link.mustache
   - base_objects/unmap.mustache
-  - base_objects/mappings_detail.mustache
   - base_objects/page_header.mustache
   - base_objects/paginate.mustache
   - base_objects/search_actions.mustache
@@ -32,7 +31,7 @@ dashboard-js-template-files:
   - base_objects/generate_assessments_button.mustache
   - base_objects/form_restore.mustache
   - base_objects/info-pane-utility.mustache
-  - base_objects/modal_content_urls.mustache
+  - base_objects/modal-content-reference-urls.mustache
   - base_objects/open_close.mustache
   - base_objects/mapper-item-description.mustache
   - base_objects/dashboard_widget.mustache
@@ -115,6 +114,7 @@ dashboard-js-template-files:
   - modals/save_cancel_buttons.mustache
   - modals/save_cancel_delete_buttons.mustache
   - modals/unmap_cancel_buttons.mustache
+  - modals/open_sheet.mustache
   - objectives/info.mustache
   - objectives/modal_content.mustache
   - objectives/tree-item-attr.mustache

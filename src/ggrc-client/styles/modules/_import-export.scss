@@ -4,6 +4,12 @@
  */
 
 $controlsWidth: 400px;
+$historyBlockWidth: 350px;
+
+@mixin outside-margin() {
+  padding-top: 25px;
+  padding-bottom: 40px;
+}
 
 #import_view > header {
   margin: 0 40px;
@@ -15,10 +21,38 @@ $controlsWidth: 400px;
 }
 
 .csv-import {
-  padding-top: 25px;
-  padding-bottom: 40px;
   @include box-shadow(0 3px 3px -3px rgba(0,0,0, 0.3));
   font-size: 13px;
+  display: flex;
+
+  &__main {
+    @include outside-margin();
+    max-width: calc(100% - #{$historyBlockWidth});
+    flex-grow: 1;
+  }
+
+  &__import-history {
+    @include outside-margin();
+    padding-left: 20px;
+    padding-right: 20px;
+    width: $historyBlockWidth;
+    border-left: 1px solid $itemBorder;
+  }
+
+  &.download-template-unavailable {
+    download-template {
+      display: none;
+    }
+  }
+
+  .confirm-action {
+    display: flex;
+    margin-bottom: 10px;
+
+    input[type="checkbox"] {
+      margin-right: 5px;
+    }
+  }
 
   .import-notifications label {
     margin-bottom: 15px;
@@ -31,9 +65,16 @@ $controlsWidth: 400px;
     color: $subTitle;
     margin-bottom: 20px;
 
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     &.error {
+      color: $red;
       &:before {
-        @include icon(red);
+        @include icon($red);
       }
     }
     &.warning {
@@ -92,6 +133,10 @@ $controlsWidth: 400px;
     }
   }
 
+  .margin-top-20 {
+    margin-top: 20px;
+  }
+
   .btn-fixed {
     float: left;
     i {
@@ -142,7 +187,7 @@ $controlsWidth: 400px;
 
 .import-buttons {
   position: relative;
-  margin-bottom: 25px;
+  margin-bottom: 15px;
 
   > .state-reset {
     margin-left: 10px;
@@ -154,8 +199,9 @@ $controlsWidth: 400px;
     top: 5px;
   }
 
-  download-template {
-    margin-left: 10px;
+  button {
+    margin-right: 10px;
+    margin-bottom: 10px;
   }
 }
 
@@ -235,6 +281,52 @@ $controlsWidth: 400px;
 
   .export-panels {
     @include box-shadow(0 3px 3px -3px rgba(0,0,0, 0.3));
+  }
+
+  .current-exports {
+    background: $white;
+    margin-bottom: 20px;
+
+    &__item {
+      padding: 20px 30px;
+      border-bottom: 1px solid $itemBorder;
+
+      &.disabled {
+        @include opacity(0.5);
+      }
+
+      .status-failed {
+        display: flex;
+        margin-bottom: 10px;
+        &:before {
+          @include icon(red);
+        }
+      }
+    }
+
+    &__in-progress {
+      padding: 20px 30px 10px;
+    }
+
+    &__actions {
+      align-items: center;
+
+      spinner {
+        margin-left: 10px;
+      }
+    }
+
+    button {
+      margin-right: 10px;
+    }
+  }
+
+  h2 {
+    font-size: 18px;
+    line-height: 27px;
+    color: $black;
+    margin-bottom: 15px;
+    font-weight: normal;
   }
 
   h4 {

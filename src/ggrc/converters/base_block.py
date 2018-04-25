@@ -162,6 +162,15 @@ class BlockConverter(object):
                        line=self.offset + 2,
                        columns=", ".join(importable_column_names))
 
+    # Check mandatory column "code" for slugged objects.
+    if(self.operation == "import" and
+       issubclass(self.object_class, models.mixins.Slugged) and
+       "slug" not in self.headers):
+      self.add_errors(errors.MISSING_COLUMN,
+                      column_names="Code",
+                      line=self.offset + 2,
+                      s="")
+
   def _create_ca_definitions_cache(self):
     """Create dict cache for custom attribute definitions.
 

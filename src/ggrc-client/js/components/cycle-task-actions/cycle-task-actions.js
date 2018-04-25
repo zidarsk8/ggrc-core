@@ -4,6 +4,7 @@
  */
 
 import tracker from '../../tracker';
+import '../spinner/spinner';
 import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
@@ -53,7 +54,7 @@ import WorkflowHelpers from '../workflow/workflow-helpers';
     instance: null,
     disabled: false,
     oldValues: [],
-    changeStatus: function (ctx, el, ev) {
+    async changeStatus(ctx, el, ev) {
       let status = el.data('value');
       let instance = this.attr('instance');
       let oldValue = {
@@ -61,26 +62,40 @@ import WorkflowHelpers from '../workflow/workflow-helpers';
       };
 
       ev.stopPropagation();
-      this.attr('oldValues').unshift(oldValue);
-
-      this.setStatus(status);
+      const result = await this.setStatus(status);
+      if (result) {
+        this.attr('oldValues').unshift(oldValue);
+      }
     },
-    undo: function (ctx, el, ev) {
-      let newValue = this.attr('oldValues').shift();
+    async undo(ctx, el, ev) {
       ev.stopPropagation();
-
-      this.setStatus(newValue.status);
+      let previousValue = this.attr('oldValues.0');
+      const result = await this.setStatus(previousValue.status);
+      if (result) {
+        this.attr('oldValues').shift();
+      }
     },
     async setStatus(status) {
       const instance = this.attr('instance');
       const stopFn = tracker.start(
         instance.type,
         tracker.USER_JOURNEY_KEYS.LOADING,
-        tracker.USER_ACTIONS.CYCLE_TASK.CHANGE_STATUS);
+        tracker.USER_ACTIONS.CYCLE_TASK.CHANGE_STATUS
+      );
       this.attr('disabled', true);
-      await WorkflowHelpers.updateStatus(instance, status);
-      this.attr('disabled', false);
-      stopFn();
+      try {
+        await WorkflowHelpers.updateStatus(instance, status);
+        return true;
+      } catch (e) {
+        GGRC.Errors.notifier(
+          'error',
+          "Task state wasn't updated due to server error. Please try again."
+        );
+        return false;
+      } finally {
+        this.attr('disabled', false);
+        stopFn();
+      }
     },
   });
 

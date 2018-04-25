@@ -4,6 +4,7 @@
 # pylint: disable=too-few-public-methods
 
 import json
+import time
 
 import requests
 
@@ -27,22 +28,36 @@ class BaseRestService(object):
 
   def create_list_objs(self, entity_factory, count, attrs_to_factory=None,
                        **attrs_for_template):
+    # pylint: disable=fixme
     """Create and return list of objects used entities factories,
     REST API service and attributes to make JSON template to request.
     As default entity factory is generating random objects,
     if 'attrs_for_factory' is not None then factory is generating objects
     according to 'attrs_for_factory' (dictionary of attributes).
     """
-    list_factory_objs = [entity_factory().create(
-        is_add_rest_attrs=True,
-        **(attrs_to_factory if attrs_to_factory else {}))
-        for _ in xrange(count)]
-    list_attrs = [self.get_items_from_resp(self.client.create_object(
-        **dict(factory_obj.__dict__.items() + attrs_for_template.items())))
-        for factory_obj in list_factory_objs]
+    list_factory_objs = []
+    list_attrs = []
+    for num in xrange(count):
+      if num > 0:
+        # FIXME: GGRC-4849
+        # A record is created in
+        # "fulltext_record_properties" table after object creation.
+        # This table is used for indexing.
+        # If two objects are created without delay, the record for second
+        # object in "fulltext_record_properties" is not created.
+        # We filed an issue GGRC-4849 to fix back-end.
+        # Absence of this "sleep" causes a failure in test
+        # "test_mapping_controls_to_program_via_unified_mapper".
+        time.sleep(0.5)
+      factory_obj = entity_factory().create(
+          is_add_rest_attrs=True,
+          **(attrs_to_factory if attrs_to_factory else {}))
+      list_factory_objs.append(factory_obj)
+      list_attrs.append(self.get_items_from_resp(self.client.create_object(
+          **dict(factory_obj.__dict__.items() + attrs_for_template.items()))))
     return [
-        self.set_obj_attrs(obj=factory_obj, attrs=attrs, **attrs_for_template)
-        for attrs, factory_obj in zip(list_attrs, list_factory_objs)]
+        self.set_obj_attrs(obj=obj, attrs=attrs, **attrs_for_template)
+        for attrs, obj in zip(list_attrs, list_factory_objs)]
 
   def update_list_objs(self, entity_factory, list_objs_to_update,
                        attrs_to_factory=None, **attrs_for_template):
