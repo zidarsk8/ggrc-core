@@ -166,7 +166,7 @@ export default can.Control({
     }
 
     name = el.attr('name').split('.');
-    instance = this.instance;
+    instance = this.options.instance;
     value = el.val();
 
     name.pop(); // set the owner to null, not the email
@@ -200,7 +200,7 @@ export default can.Control({
     $('#extended-info').trigger('mouseleave'); // Make sure the extra info tooltip closes
 
     path = el.attr('name').split('.');
-    instance = this.instance;
+    instance = this.options.instance;
     index = 0;
     path.pop(); // remove the prop
     cb = el.data('lookup-cb');
@@ -266,16 +266,8 @@ export default can.Control({
   fetch_templates: function (dfd) {
     var that = this;
     dfd = dfd ? dfd.then(function () {
-      return {
-        ...that.options,
-        optionsInstance: that.options.instance,
-        instance: that.instance
-      };
-    }) : $.when({
-      ...this.options,
-      optionsInstance: this.options.instance,
-      instance: this.instance
-    });
+      return that.options;
+    }) : $.when(this.options);
     return $.when(
       can.view(this.options.content_view, dfd),
       can.view(this.options.header_view, dfd),
@@ -285,41 +277,18 @@ export default can.Control({
   },
 
   fetch_data: function (params) {
-    let that = this;
-    let optionsInstance = this.options.attr('instance');
-    let optionsModel = this.options.attr('model');
-    let dfd;
+    var that = this;
+    var dfd;
+    var instance = this.options.attr('instance');
 
     params = params || this.find_params();
     params = params && params.serialize ? params.serialize() : params;
 
-    if (optionsInstance) {
-      dfd = new $.Deferred();
-
-      if (this.options.skip_refresh) {
-        this.instance = !optionsInstance.includeObjects ?
-          this.getExtendedInstance({
-            targetInstance: this.prepareInstance(),
-            originalInstance: optionsInstance,
-            model: optionsModel,
-            updateStore: true
-          }) : optionsInstance;
-
-        return dfd.resolve(this.instance);
-      }
-
-      optionsInstance.refresh()
-        .then(instance => {
-          this.instance = this.getExtendedInstance({
-            targetInstance: this.prepareInstance(),
-            originalInstance: instance,
-            model: optionsModel,
-            updateStore: true
-          });
-
-          return dfd.resolve(this.instance);
-        });
-    } else if (optionsModel) {
+    if (this.options.skip_refresh && instance) {
+      return new $.Deferred().resolve(instance);
+    } else if (instance) {
+      dfd = instance.refresh();
+    } else if (this.options.model) {
       if (this.options.new_object_form) {
 
         if (this.options.extendNewInstance) {
@@ -329,17 +298,21 @@ export default can.Control({
           Object.assign(params, extendedInstance);
         }
 
-        this.instance = this.options.instance = new optionsModel(params).attr('_suppress_errors', true);
-        dfd = $.when(this.instance);
+        dfd = $.when(this.options.attr(
+          'instance',
+          new this.options.model(params).attr('_suppress_errors', true)
+        )).then(function () {
+          instance = this.options.attr('instance');
+        }.bind(this));
       } else {
-        dfd = optionsModel.findAll(params).then(function (data) {
+        dfd = this.options.model.findAll(params).then(function (data) {
           if (data.length) {
-            that.instance = data[0];
+            that.options.attr('instance', data[0]);
             return data[0].refresh(); // have to refresh (get ETag) to be editable.
           }
           that.options.attr('new_object_form', true);
-          that.instance = new optionsModel(params);
-          return that.instance;
+          that.options.attr('instance', new that.options.model(params));
+          return instance;
         }).done(function () {
           // Check if modal was closed
           if (that.element !== null) {
@@ -348,14 +321,12 @@ export default can.Control({
         });
       }
     } else {
-      this.instance = new can.Observe(params);
-      this.on();
-      dfd = new $.Deferred().resolve(this.instance);
+      this.options.attr('instance', new can.Observe(params));
+      that.on();
+      dfd = new $.Deferred().resolve(instance);
     }
 
     dfd.then(function () {
-      let instance = that.instance;
-
       if (instance &&
         _.exists(instance, 'class.is_custom_attributable') &&
         !(instance instanceof CMS.Models.Assessment)) {
@@ -386,16 +357,16 @@ export default can.Control({
       // This is to trigger `focus_first_element` in modal_ajax handling
       this.element.trigger('loaded');
     }
-    if (!this.instance._transient) {
-      this.instance.attr('_transient', new can.Observe({}));
+    if (!this.options.instance._transient) {
+      this.options.instance.attr('_transient', new can.Observe({}));
     }
-    if (this.instance.form_preload) {
-      preloadDfd = this.instance.form_preload(
+    if (this.options.instance.form_preload) {
+      preloadDfd = this.options.instance.form_preload(
         this.options.new_object_form,
         this.options.object_params);
       if (preloadDfd) {
         preloadDfd.then(function () {
-          this.instance.backup();
+          this.options.instance.backup();
         }.bind(this))
       }
     }
@@ -482,7 +453,7 @@ export default can.Control({
 
   'input:not(isolate-form input), textarea:not(isolate-form textarea), select:not(isolate-form select) change':
     function (el, ev) {
-      this.instance.removeAttr('_suppress_errors');
+      this.options.instance.removeAttr('_suppress_errors');
       // Set the value if it isn't a search field
       if (!el.hasClass('search-icon') ||
         el.is('[null-if-empty]') &&
@@ -513,7 +484,7 @@ export default can.Control({
    * @param {$.Event} ev - the event object
    */
   'dropdown[data-purpose="ca-type"] change': function ($el, ev) {
-    let instance = this.instance;
+    var instance = this.options.instance;
 
     if (instance.attribute_type !== 'Dropdown') {
       instance.attr('multi_choice_options', undefined);
@@ -528,10 +499,10 @@ export default can.Control({
     can.each($elements.toArray(), this.proxy('set_value_from_element'));
   },
   set_value_from_element: function (el) {
-    let instance = this.instance;
-    let name;
-    let value;
-    let cb;
+    var name;
+    var value;
+    var cb;
+    var instance = this.options.instance;
     el = el instanceof jQuery ? el : $(el);
     name = el.attr('name');
     value = el.val();
@@ -568,14 +539,14 @@ export default can.Control({
     }
   },
   set_value: function (item) {
-    let instance = this.instance;
-    let name = item.name.split('.');
-    let $elem;
-    let value;
-    let model;
-    let $other;
-    let listPath;
-    let cur;
+    var instance = this.options.instance;
+    var name = item.name.split('.');
+    var $elem;
+    var value;
+    var model;
+    var $other;
+    var listPath;
+    var cur;
 
     // Don't set `_wysihtml5_mode` on the instances
     if (item.name === '_wysihtml5_mode') {
@@ -583,7 +554,7 @@ export default can.Control({
     }
 
     if (!(instance instanceof this.options.model)) {
-      instance = this.instance =
+      instance = this.options.instance =
         new this.options.model(instance && instance.serialize ?
           instance.serialize() : instance);
     }
@@ -665,7 +636,7 @@ export default can.Control({
         }
       } else if (name[name.length - 1] === 'time') {
         name.pop(); // time is a pseudoproperty of datetime objects
-        value = moment(this.instance.attr(name.join('.')))
+        value = moment(this.options.instance.attr(name.join('.')))
           .startOf('day').add(parseInt(value, 10)).toDate();
       } else {
         value = new can.Observe({}).attr(name.slice(1).join('.'), value);
@@ -1044,9 +1015,7 @@ export default can.Control({
 
     this.resetCAFields(newInstance.attr('custom_attribute_definitions'));
 
-    this.instance = newInstance;
-
-    $.when(this.instance)
+    $.when(this.options.attr('instance', newInstance))
       .done(function () {
         this.reset_form(function () {
           var $form = $(this.element).find('form');
@@ -1091,10 +1060,9 @@ export default can.Control({
   },
 
   prepareInstance: function () {
-    let params = this.find_params();
-    let optionsModel = this.options.model;
-    let instance = optionsModel ? new optionsModel(params) : new can.Observe();
-    let saveContactModels = ['TaskGroup', 'TaskGroupTask'];
+    var params = this.find_params();
+    var instance = new this.options.model(params);
+    var saveContactModels = ['TaskGroup', 'TaskGroupTask'];
 
     instance.attr('_suppress_errors', true)
       .attr('custom_attribute_definitions',
@@ -1109,42 +1077,14 @@ export default can.Control({
     return instance;
   },
 
-  getExtendedInstance: function ({targetInstance, originalInstance, model, updateStore = false}) {
-    let serializedInstance = originalInstance.serialize ?
-      originalInstance.serialize() : originalInstance;
-
-    const extendedInstance = Object.keys(serializedInstance).reduce((accumulator, key) => {
-      accumulator.attr(key, serializedInstance[key]);
-
-      return accumulator;
-    }, targetInstance);
-
-    if (model && updateStore) {
-      this.setOriginalInstanceToStore(model, originalInstance)
-    }
-
-    return extendedInstance;
-  },
-
-  setOriginalInstanceToStore: function (model, originalInstance) {
-    let id = originalInstance.id;
-
-    if (!model || !model.store || !id) {
-      return;
-    }
-
-    model.store[id] = originalInstance;
-  },
-
   save_instance: function (el, ev) {
-    let that = this;
-    let instance = this.instance;
-    let instanceId = instance.id;
-    let optionsInstance = this.options.instance;
-    let ajd;
-    let params;
-    let type;
-    let name;
+    var that = this;
+    var instance = this.options.instance;
+    var ajd;
+    var instanceId = instance.id;
+    var params;
+    var type;
+    var name;
 
     if (instance.errors()) {
       instance.removeAttr('_suppress_errors');
@@ -1162,14 +1102,7 @@ export default can.Control({
 
     this.disable_hide = true;
 
-    if (!this.options.new_object_form) {
-      optionsInstance = this.getExtendedInstance({
-        targetInstance: optionsInstance,
-        originalInstance: instance
-      });
-    }
-
-    ajd = optionsInstance.save();
+    ajd = instance.save();
     ajd.fail(this.save_error.bind(this))
       .done(function (obj) {
         function finish() {
@@ -1271,20 +1204,14 @@ export default can.Control({
   },
 
   destroy: function () {
-    let instance = this.instance;
-    let optionsInstance = this.options.instance;
-
     if (this.options.model && this.options.model.cache) {
       delete this.options.model.cache[undefined];
     }
     if (this._super) {
       this._super.apply(this, arguments);
     }
-    if (instance && instance._transient) {
-      instance.removeAttr('_transient');
-    }
-    if (optionsInstance && optionsInstance._transient) {
-      optionsInstance.removeAttr('_transient');
+    if (this.options.instance && this.options.instance._transient) {
+      this.options.instance.removeAttr('_transient');
     }
   },
 
@@ -1305,8 +1232,8 @@ export default can.Control({
       return;
     }
 
-    if (this.instance.getHashFragment) {
-      hash = this.instance.getHashFragment();
+    if (this.options.instance.getHashFragment) {
+      hash = this.options.instance.getHashFragment();
       if (hash) {
         window.location.hash = hash;
         return;
@@ -1320,9 +1247,9 @@ export default can.Control({
       .control();
 
     hash += [treeController ? treeController.hash_fragment() : '',
-      this.instance.hash_fragment()].join('/');
+      this.options.instance.hash_fragment()].join('/');
 
-    hash = this.updateSummaryHash(hash, this.instance.type);
+    hash = this.updateSummaryHash(hash, this.options.instance.type);
     window.location.hash = hash;
   },
 
