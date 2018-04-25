@@ -3,7 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {CA_DD_REQUIRED_DEPS} from '../../../plugins/utils/ca-utils';
+import {
+  ddValidationMapToValue,
+} from '../../../plugins/utils/ca-utils';
 import Permission from '../../../permission';
 
 describe('assessmentLocalCa component', () => {
@@ -198,16 +200,37 @@ describe('assessmentLocalCa component', () => {
 
     beforeEach(function () {
       viewModel.attr('evidenceAmount', 0);
+      viewModel.attr('urlsAmount', 0);
       performDropdownValidation = viewModel.performDropdownValidation
         .bind(viewModel);
 
       dropdownField = new can.Map({
         type: 'dropdown',
         validationConfig: {
-          'nothing required': CA_DD_REQUIRED_DEPS.NONE,
-          'comment required': CA_DD_REQUIRED_DEPS.COMMENT,
-          'evidence required': CA_DD_REQUIRED_DEPS.EVIDENCE,
-          'com+ev required': CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
+          'nothing required': ddValidationMapToValue(),
+          'comment required': ddValidationMapToValue({
+            comment: true,
+          }),
+          'evidence required': ddValidationMapToValue({
+            attachment: true,
+          }),
+          'com+ev required': ddValidationMapToValue({
+            comment: true,
+            attachment: true,
+          }),
+          'ev+url required': ddValidationMapToValue({
+            url: true,
+            attachment: true,
+          }),
+          'com+url required': ddValidationMapToValue({
+            comment: true,
+            url: true,
+          }),
+          'ev+com+url required': ddValidationMapToValue({
+            attachment: true,
+            comment: true,
+            url: true,
+          }),
         },
         preconditions_failed: [],
         validation: {
@@ -216,6 +239,7 @@ describe('assessmentLocalCa component', () => {
         errorsMap: {
           comment: false,
           evidence: false,
+          url: false,
         },
       });
     });
@@ -236,6 +260,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
         evidence: false,
+        url: false,
       });
     });
 
@@ -254,6 +279,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
         evidence: false,
+        url: false,
       });
     });
 
@@ -275,6 +301,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: true,
         evidence: false,
+        url: false,
       });
     });
 
@@ -295,6 +322,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
         evidence: false,
+        url: false,
       });
     });
 
@@ -317,6 +345,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
         evidence: true,
+        url: false,
       });
     });
 
@@ -338,6 +367,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
         evidence: false,
+        url: false,
       });
     });
 
@@ -361,6 +391,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: true,
         evidence: true,
+        url: false,
       });
     });
 
@@ -382,6 +413,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
         evidence: true,
+        url: false,
       });
     });
 
@@ -405,6 +437,7 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: true,
         evidence: false,
+        url: false,
       });
     });
 
@@ -426,6 +459,332 @@ describe('assessmentLocalCa component', () => {
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
         evidence: false,
+        url: false,
+      });
+    });
+
+    describe('should validate dropdown with evidence and ' +
+    'url required values', () => {
+      beforeEach(() => {
+        viewModel.attr('fields', [dropdownField]);
+        dropdownField.attr('value', 'ev+url required');
+      });
+
+      it('if both of them present', () => {
+        viewModel.attr('evidenceAmount', 1);
+        viewModel.attr('urlsAmount', 1);
+
+        performDropdownValidation(dropdownField);
+
+        expect(dropdownField.attr().validation).toEqual({
+          mandatory: false,
+          show: true,
+          valid: true,
+          hasMissingInfo: false,
+          requiresAttachment: true,
+        });
+        expect(dropdownField.attr().errorsMap).toEqual({
+          comment: false,
+          evidence: false,
+          url: false,
+        });
+      });
+
+      it('if evidence is missing', () => {
+        viewModel.attr('urlsAmount', 1);
+        dropdownField.attr('errorsMap.evidence', true);
+
+        performDropdownValidation(dropdownField);
+
+        expect(dropdownField.attr().validation).toEqual({
+          mandatory: false,
+          show: true,
+          valid: false,
+          hasMissingInfo: true,
+          requiresAttachment: true,
+        });
+        expect(dropdownField.attr().errorsMap).toEqual({
+          comment: false,
+          evidence: true,
+          url: false,
+        });
+      });
+
+      it('if url is missing', () => {
+        viewModel.attr('evidenceAmount', 1);
+        dropdownField.attr('errorsMap.url', true);
+
+        performDropdownValidation(dropdownField);
+
+        expect(dropdownField.attr().validation).toEqual({
+          mandatory: false,
+          show: true,
+          valid: false,
+          hasMissingInfo: true,
+          requiresAttachment: true,
+        });
+        expect(dropdownField.attr().errorsMap).toEqual({
+          comment: false,
+          evidence: false,
+          url: true,
+        });
+      });
+
+      it('if both of them missing', () => {
+        dropdownField.attr('errorsMap.url', true);
+        dropdownField.attr('errorsMap.evidence', true);
+
+        performDropdownValidation(dropdownField);
+
+        expect(dropdownField.attr().validation).toEqual({
+          mandatory: false,
+          show: true,
+          valid: false,
+          hasMissingInfo: true,
+          requiresAttachment: true,
+        });
+        expect(dropdownField.attr().errorsMap).toEqual({
+          comment: false,
+          evidence: true,
+          url: true,
+        });
+      });
+    });
+
+    describe('should validate dropdown with comment and ' +
+    'url required values', () => {
+      beforeEach(() => {
+        viewModel.attr('fields', [dropdownField]);
+        dropdownField.attr('value', 'com+url required');
+      });
+
+      it('if both of them present', () => {
+        viewModel.attr('urlsAmount', 1);
+
+        performDropdownValidation(dropdownField);
+
+        expect(dropdownField.attr().validation).toEqual({
+          mandatory: false,
+          show: true,
+          valid: true,
+          hasMissingInfo: false,
+          requiresAttachment: true,
+        });
+        expect(dropdownField.attr().errorsMap).toEqual({
+          comment: false,
+          evidence: false,
+          url: false,
+        });
+      });
+
+      it('if comment is missing', () => {
+        viewModel.attr('urlsAmount', 1);
+        dropdownField.attr('errorsMap.comment', true);
+
+        performDropdownValidation(dropdownField);
+
+        expect(dropdownField.attr().validation).toEqual({
+          mandatory: false,
+          show: true,
+          valid: false,
+          hasMissingInfo: true,
+          requiresAttachment: true,
+        });
+        expect(dropdownField.attr().errorsMap).toEqual({
+          comment: true,
+          evidence: false,
+          url: false,
+        });
+      });
+
+      it('if url is missing', () => {
+        dropdownField.attr('errorsMap.url', true);
+
+        performDropdownValidation(dropdownField);
+
+        expect(dropdownField.attr().validation).toEqual({
+          mandatory: false,
+          show: true,
+          valid: false,
+          hasMissingInfo: true,
+          requiresAttachment: true,
+        });
+        expect(dropdownField.attr().errorsMap).toEqual({
+          comment: false,
+          evidence: false,
+          url: true,
+        });
+      });
+
+      it('if both of them missing', () => {
+        dropdownField.attr('errorsMap.url', true);
+        dropdownField.attr('errorsMap.comment', true);
+
+        performDropdownValidation(dropdownField);
+
+        expect(dropdownField.attr().validation).toEqual({
+          mandatory: false,
+          show: true,
+          valid: false,
+          hasMissingInfo: true,
+          requiresAttachment: true,
+        });
+        expect(dropdownField.attr().errorsMap).toEqual({
+          comment: true,
+          evidence: false,
+          url: true,
+        });
+      });
+    });
+
+    describe('should validate dropdown with evidence, comment and ' +
+    'url required values', () => {
+      beforeEach(() => {
+        viewModel.attr('fields', [dropdownField]);
+        dropdownField.attr('value', 'ev+com+url required');
+      });
+
+      it('if all of them present', () => {
+        viewModel.attr('evidenceAmount', 1);
+        viewModel.attr('urlsAmount', 1);
+
+        performDropdownValidation(dropdownField);
+
+        expect(dropdownField.attr().validation).toEqual({
+          mandatory: false,
+          show: true,
+          valid: true,
+          hasMissingInfo: false,
+          requiresAttachment: true,
+        });
+        expect(dropdownField.attr().errorsMap).toEqual({
+          comment: false,
+          evidence: false,
+          url: false,
+        });
+      });
+
+      it('if evidence is missing', () => {
+        viewModel.attr('urlsAmount', 1);
+        dropdownField.attr('errorsMap.evidence', true);
+
+        performDropdownValidation(dropdownField);
+
+        expect(dropdownField.attr().validation).toEqual({
+          mandatory: false,
+          show: true,
+          valid: false,
+          hasMissingInfo: true,
+          requiresAttachment: true,
+        });
+        expect(dropdownField.attr().errorsMap).toEqual({
+          comment: false,
+          evidence: true,
+          url: false,
+        });
+      });
+
+      it('if url is missing', () => {
+        viewModel.attr('evidenceAmount', 1);
+        dropdownField.attr('errorsMap.url', true);
+
+        performDropdownValidation(dropdownField);
+
+        expect(dropdownField.attr().validation).toEqual({
+          mandatory: false,
+          show: true,
+          valid: false,
+          hasMissingInfo: true,
+          requiresAttachment: true,
+        });
+        expect(dropdownField.attr().errorsMap).toEqual({
+          comment: false,
+          evidence: false,
+          url: true,
+        });
+      });
+
+      it('if evidence and url is missing', () => {
+        dropdownField.attr('errorsMap.evidence', true);
+        dropdownField.attr('errorsMap.url', true);
+
+        performDropdownValidation(dropdownField);
+
+        expect(dropdownField.attr().validation).toEqual({
+          mandatory: false,
+          show: true,
+          valid: false,
+          hasMissingInfo: true,
+          requiresAttachment: true,
+        });
+        expect(dropdownField.attr().errorsMap).toEqual({
+          comment: false,
+          evidence: true,
+          url: true,
+        });
+      });
+
+      it('if comment and url is missing', () => {
+        viewModel.attr('evidenceAmount', 1);
+        dropdownField.attr('errorsMap.comment', true);
+        dropdownField.attr('errorsMap.url', true);
+
+        performDropdownValidation(dropdownField);
+
+        expect(dropdownField.attr().validation).toEqual({
+          mandatory: false,
+          show: true,
+          valid: false,
+          hasMissingInfo: true,
+          requiresAttachment: true,
+        });
+        expect(dropdownField.attr().errorsMap).toEqual({
+          comment: true,
+          evidence: false,
+          url: true,
+        });
+      });
+
+      it('if comment and evidence is missing', () => {
+        viewModel.attr('urlsAmount', 1);
+        dropdownField.attr('errorsMap.comment', true);
+        dropdownField.attr('errorsMap.evidence', true);
+
+        performDropdownValidation(dropdownField);
+
+        expect(dropdownField.attr().validation).toEqual({
+          mandatory: false,
+          show: true,
+          valid: false,
+          hasMissingInfo: true,
+          requiresAttachment: true,
+        });
+        expect(dropdownField.attr().errorsMap).toEqual({
+          comment: true,
+          evidence: true,
+          url: false,
+        });
+      });
+
+      it('if all of them missing', () => {
+        dropdownField.attr('errorsMap.url', true);
+        dropdownField.attr('errorsMap.evidence', true);
+        dropdownField.attr('errorsMap.comment', true);
+
+        performDropdownValidation(dropdownField);
+
+        expect(dropdownField.attr().validation).toEqual({
+          mandatory: false,
+          show: true,
+          valid: false,
+          hasMissingInfo: true,
+          requiresAttachment: true,
+        });
+        expect(dropdownField.attr().errorsMap).toEqual({
+          comment: true,
+          evidence: true,
+          url: true,
+        });
       });
     });
   });
@@ -458,10 +817,17 @@ describe('assessmentLocalCa component', () => {
         id: 2,
         type: 'dropdown',
         validationConfig: {
-          'nothing required': CA_DD_REQUIRED_DEPS.NONE,
-          'comment required': CA_DD_REQUIRED_DEPS.COMMENT,
-          'evidence required': CA_DD_REQUIRED_DEPS.EVIDENCE,
-          'com+ev required': CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
+          'nothing required': ddValidationMapToValue(),
+          'comment required': ddValidationMapToValue({
+            comment: true,
+          }),
+          'evidence required': ddValidationMapToValue({
+            attachment: true,
+          }),
+          'com+ev required': ddValidationMapToValue({
+            comment: true,
+            attachment: true,
+          }),
         },
         preconditions_failed: [],
         validation: {
@@ -470,6 +836,7 @@ describe('assessmentLocalCa component', () => {
         errorsMap: {
           comment: false,
           evidence: false,
+          url: false,
         },
       });
     });

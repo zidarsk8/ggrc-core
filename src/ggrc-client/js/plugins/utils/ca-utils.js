@@ -13,23 +13,54 @@ let customAttributesType = {
   Dropdown: 'dropdown',
 };
 
-/**
- * @deprecated Use constants from custom-attribute-config.
- */
-let CA_DD_REQUIRED_DEPS = Object.freeze({
-  NONE: 0,
-  COMMENT: 1,
-  EVIDENCE: 2,
-  COMMENT_AND_EVIDENCE: 3,
-});
-
-/**
- * @deprecated Use constants from custom-attribute-config.
- */
 let CUSTOM_ATTRIBUTE_TYPE = Object.freeze({
   LOCAL: 1,
   GLOBAL: 2,
 });
+
+const CA_DD_FLAGS = {
+  COMMENT: 0b001, // 1
+  ATTACHMENT: 0b10, // 2
+  URL: 0b100, // 4
+};
+
+const LCA_DROPDOWN_TITLES_MAP = {
+  '1': 'Comment',
+  '2': 'Evidence File',
+  '3': 'Comment and Evidence File',
+  '4': 'Evidence Url',
+  '5': 'Comment and Evidence Url',
+  '6': 'Evidence File and Url',
+  '7': 'Comment, Evidence File and Url',
+};
+
+
+/**
+ * Convert DD validation value to validation map
+ * @param  {Number} value validation value
+ * @return {Object}       validation map
+ */
+function ddValidationValueToMap(value) {
+  return {
+    attachment: !!(value & CA_DD_FLAGS.ATTACHMENT),
+    comment: !!(value & CA_DD_FLAGS.COMMENT),
+    url: !!(value & CA_DD_FLAGS.URL),
+  };
+}
+
+/**
+ * Converts DD validation map to a bitmask number
+ * @param  {Object} map A map of values which must be encoded into the bitmask
+ * @return {Number}     Bitmask representing the flags map
+ */
+function ddValidationMapToValue(map = {}) {
+  let attach = map.attachment ? CA_DD_FLAGS.ATTACHMENT : 0;
+  let comment = map.comment ? CA_DD_FLAGS.COMMENT : 0;
+  let url = map.url ? CA_DD_FLAGS.URL : 0;
+
+  return attach | comment | url;
+}
+
 
 /**
  * @deprecated Use CustomAttributeObject API to get access to the necessary custom
@@ -160,6 +191,7 @@ function prepareCustomAttributes(definitions, values) {
       errorsMap: {
         comment: false,
         evidence: false,
+        url: false,
       },
     };
 
@@ -173,11 +205,13 @@ function prepareCustomAttributes(definitions, values) {
           empty: errors.indexOf('value') > -1,
           mandatory: def.mandatory,
           valid: errors.indexOf('comment') < 0 &&
-          errors.indexOf('evidence') < 0,
+            errors.indexOf('evidence') < 0 &&
+            errors.indexOf('url') < 0,
         };
         value.errorsMap = {
           comment: errors.indexOf('comment') > -1,
           evidence: errors.indexOf('evidence') > -1,
+          url: errors.indexOf('url') > -1,
         };
         valueData = value;
       }
@@ -206,8 +240,7 @@ function prepareCustomAttributes(definitions, values) {
  */
 function isEvidenceRequired(field) {
   const fieldValidationConf = field.attr(`validationConfig.${field.value}`);
-  return fieldValidationConf === CA_DD_REQUIRED_DEPS.EVIDENCE ||
-    fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+  return ddValidationValueToMap(fieldValidationConf).attachment;
 }
 
 /**
@@ -218,8 +251,12 @@ function isEvidenceRequired(field) {
  */
 function isCommentRequired(field) {
   const fieldValidationConf = field.attr(`validationConfig.${field.value}`);
-  return fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT ||
-    fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+  return ddValidationValueToMap(fieldValidationConf).comment;
+}
+
+function isUrlRequired(field) {
+  const fieldValidationConf = field.attr(`validationConfig.${field.value}`);
+  return ddValidationValueToMap(fieldValidationConf).url;
 }
 /**
  * @deprecated Use CustomAttributeObject API to get access to the necessary custom
@@ -412,6 +449,16 @@ function ensureGlobalCA(instance) {
   instance.attr('custom_attribute_values', values);
 }
 
+function getLCAPopupTitle(validationMap) {
+  let fixedValidationMap = Object.assign({}, validationMap);
+
+  if (validationMap.evidence) {
+    fixedValidationMap.attachment = true;
+  }
+
+  return LCA_DROPDOWN_TITLES_MAP[ddValidationMapToValue(fixedValidationMap)];
+}
+
 export {
   convertFromCaValue,
   convertToCaValue,
@@ -422,9 +469,13 @@ export {
   getCustomAttributeType,
   isEvidenceRequired,
   isCommentRequired,
+  isUrlRequired,
   convertToFormViewField,
   applyChangesToCustomAttributeValue,
-  CA_DD_REQUIRED_DEPS,
   ensureGlobalCA,
   CUSTOM_ATTRIBUTE_TYPE,
+  CA_DD_FLAGS,
+  ddValidationValueToMap,
+  ddValidationMapToValue,
+  getLCAPopupTitle,
 };
