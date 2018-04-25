@@ -12,12 +12,6 @@
 
   $.migrateMute = true; // turn off console warnings for jQuery-migrate
 
-  function ModelError(message, data) {
-    this.name = 'ModelError';
-    this.message = message || 'Invalid Model encountered';
-    this.data = data;
-  }
-  ModelError.prototype = Error.prototype;
   root.cms_singularize = function (type) {
     let _type = type.trim().toLowerCase();
     switch (_type) {
@@ -85,34 +79,9 @@
   });
 
   $win.load(function () {
-    $body.on('click', 'ul.tree-structure .item-main .grcobject,' +
-      ' ul.tree-structure .item-main .openclose', function (ev) {
+    $body.on('click', 'ul.tree-structure .item-main .openclose', function (ev) {
       ev.stopPropagation();
       $(this).openclose();
-    });
-    // Google Circle CTA Button
-    $body.on('mouseenter', '.square-trigger', function () {
-      let $this = $(this),
-        $popover = $this.closest('.circle-holder').find('.square-popover');
-
-      $popover.slideDown('fast');
-      $this.addClass('active');
-      return false;
-    });
-    $body.on('mouseleave', '.square-popover', function () {
-      let $this = $(this),
-        $trigger = $this.closest('.circle-holder').find('.square-trigger');
-
-      $this.slideUp('fast');
-      $trigger.removeClass('active');
-      $this.removeClass('active');
-      return false;
-    });
-    // References popup preview
-    $body.on('mouseenter', '.new-tree .tree-info a.reference', function () {
-      if ($(this).width() > $('.new-tree .tree-info').width()) {
-        $(this).addClass('shrink-it');
-      }
     });
 
     // Tab indexing form fields in modal

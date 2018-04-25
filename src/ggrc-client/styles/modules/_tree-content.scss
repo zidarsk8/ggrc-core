@@ -329,18 +329,6 @@ ul.new-tree {
   .tree-info {
     @extend %oneline;
     vertical-align: middle;
-    a {
-      &.reference {
-        display: inline;
-      }
-      &.shrink-it {
-        @extend %oneline;
-        display: inline-block;
-        line-height: 12px;
-        width: 80% !important;
-        margin-bottom: -2px;
-      }
-    }
     font-size:13px;
     .tree-info-list {
       @extend %reset-list;
