@@ -1018,10 +1018,6 @@ class AbstractTabContainer(Component):
     """Abstract method. Should return locators class."""
     raise NotImplementedError
 
-  def _get_active_tab_element(self):
-    """Return element of active tab"""
-    return self.container_element.find_element(*self._locators.TAB_CONTENT_CSS)
-
   def _tabs(self):
     """Abstract method. Should return dict. {'tab_name': tab_object, ...}"""
     raise NotImplementedError
@@ -1031,6 +1027,12 @@ class AbstractTabContainer(Component):
     """Lazy property for dashboard controller."""
     from lib.element.elements_list import TabController
     return TabController(self._driver, self._locators.TAB_CONTROLLER_CSS)
+
+  @property
+  def active_tab_elem(self):
+    """Return active tab element."""
+    return self.container_element.find_element(
+        *self._locators.TAB_CONTENT_CSS)
 
 
 class AbstractTable(Component):
