@@ -79,6 +79,17 @@ def make_proposal(
   add_comment_about(obj, obj.STATES.PROPOSED, obj.agenda)
 
 
+def create_relationship(
+    sender, obj=None, src=None, service=None,
+    event=None, initial_state=None):  # noqa
+  """Create relationship between proposal and parent instance."""
+  if isinstance(obj, all_models.Proposal):
+    all_models.Relationship(
+        source=obj.instance,
+        destination=obj
+    )
+
+
 def set_permissions(sender, obj=None, src=None, service=None,
                     event=None, initial_state=None):  # noqa
   """Set permissions to proposals based on instance ACL model."""
@@ -94,6 +105,9 @@ def set_permissions(sender, obj=None, src=None, service=None,
 def init_hook():
   """Init proposal signal handlers."""
   signals.Restful.model_posted.connect(make_proposal,
+                                       all_models.Proposal,
+                                       weak=False)
+  signals.Restful.model_posted.connect(create_relationship,
                                        all_models.Proposal,
                                        weak=False)
   signals.Restful.model_put.connect(apply_proposal,
