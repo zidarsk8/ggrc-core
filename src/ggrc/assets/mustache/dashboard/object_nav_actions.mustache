@@ -11,6 +11,11 @@
         You need to setup task group(s) before activating workflow.
       </p>
     {{/if}}
+    {{#if showAdminRequirement}}
+      <p class="tiny-help-text">
+        You need to add admin(s) to autogenerate upcoming cycles.
+      </p>
+    {{/if}}
     {{#if showMissingObjectsMessage}}
       <p class="alert tiny-help-text">
         <strong>Note:</strong> At least one of the task groups is missing either a task or an object.

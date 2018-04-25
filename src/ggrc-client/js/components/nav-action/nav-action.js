@@ -4,6 +4,7 @@
 */
 
 import Permission from '../../permission';
+import {peopleWithRoleName} from '../../plugins/utils/acl-utils';
 
 const viewModel = can.Map.extend({
   define: {
@@ -30,6 +31,19 @@ const viewModel = can.Map.extend({
           this.attr('canEdit') &&
           !statuses.includes(instance.attr('status')) &&
           !instance.attr('can_start_cycle')
+        );
+      },
+    },
+    showAdminRequirement: {
+      get() {
+        const instance = this.attr('instance');
+        const isRecurrentWorkflow = instance.attr('unit') !== null;
+        const hasAdmins = peopleWithRoleName(instance, 'Admin').length > 0;
+        const isExceptionalCase = this.attr('showMissingObjectsMessage');
+        return (
+          isRecurrentWorkflow &&
+          !hasAdmins &&
+          !isExceptionalCase
         );
       },
     },
