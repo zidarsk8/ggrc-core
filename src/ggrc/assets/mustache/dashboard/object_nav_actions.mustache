@@ -4,34 +4,35 @@
 }}
 
 
-<li class="inner-nav-button">
-  <workflow-activate {instance}="instance">
-    {{#is_allowed 'update' instance context='for'}}
-      <spinner toggle="waiting"></spinner>
+<li class="inner-nav__actions">
+  <nav-actions {instance}="instance">
+    {{#if showSetupRequirement}}
+      <p class="tiny-help-text">
+        You need to setup task group(s) before activating workflow.
+      </p>
+    {{/if}}
+    {{#if showMissingObjectsMessage}}
+      <p class="alert tiny-help-text">
+        <strong>Note:</strong> At least one of the task groups is missing either a task or an object.
+      </p>
+    {{/if}}
+    {{#if canEdit}}
+      <workflow-activate {instance}="instance">
+        <spinner toggle="waiting"></spinner>
 
-      {{#if_equals instance.status "Draft"}}
         {{^if waiting}}
-          {{^instance.can_start_cycle}}
-            <p class="tiny-help-text">You need to setup task group(s) before activating workflow</p>
-          {{/instance.can_start_cycle}}
-          <button
-            type="submit"
-            href="#workflowActivate"
-            class="btn btn-lightBlue btn-small"
-            ($click)="activateWorkflow"
-            {{^instance.can_start_cycle}}disabled="disabled"{{/instance.can_start_cycle}}>
-            Activate Workflow
-          </button>
-        {{/waiting}}
-      {{else}}
-        {{^if_equals instance.status 'Inactive'}}
-        {{^if waiting}}
-          {{^instance.can_start_cycle}}
-            <p class="alert tiny-help-text" style="margin-bottom:0px;"><strong>Note:</strong> At least one of the task groups is missing either a task or an object.</p>
-          {{/instance.can_start_cycle}}
+          {{#if_equals instance.status "Draft"}}
+            <button
+              type="submit"
+              href="#workflowActivate"
+              class="btn btn-lightBlue btn-small"
+              ($click)="activateWorkflow"
+              {{^if instance.can_start_cycle}}disabled="disabled"{{/if}}>
+              Activate Workflow
+            </button>
+          {{/if_equals}}
         {{/if}}
-        {{/if_equals}}
-      {{/if_equals}}
-    {{/is_allowed}}
-  </workflow-activate>
+      </workflow-activate>
+    {{/if}}
+  </nav-actions>
 </li>
