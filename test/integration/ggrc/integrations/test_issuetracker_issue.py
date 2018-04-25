@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Integration test for Clonable mixin"""
+from collections import OrderedDict
 
 import ddt
 import mock
@@ -186,6 +187,34 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       issue = db.session.query(models.IssuetrackerIssue).get(iti.id)
       self.assertEqual(issue.assignee, email1)
       self.assertEqual(issue.cc_list, "")
+
+  @mock.patch('ggrc.integrations.issues.Client.create_issue')
+  @mock.patch('ggrc.integrations.issues.Client.update_issue')
+  def test_basic_import(self, mock_create_issue, mock_update_issue):
+    """Test basic import functionality."""
+    with mock.patch.object(issue_tracker, '_is_issue_tracker_enabled',
+                           return_value=True):
+      # update existing object
+      iti = factories.IssueTrackerIssueFactory(enabled=True)
+      asmt = iti.issue_tracked_obj
+      audit = asmt.audit
+      response = self.import_data(OrderedDict([
+          ('object_type', 'Assessment'),
+          ('Code*', asmt.slug),
+          ('Audit', audit.slug),
+      ]), dry_run=False)
+      self._check_csv_response(response, {})
+
+      # import new object
+      response = self.import_data(OrderedDict([
+          ('object_type', 'Assessment'),
+          ('Code*', 'Test Code'),
+          ('Audit', audit.slug),
+          ('Creators', 'user@example.com'),
+          ('Assignees*', 'user@example.com'),
+          ('Title', 'Some Title'),
+      ]), dry_run=False)
+      self._check_csv_response(response, {})
 
 
 @mock.patch('ggrc.models.hooks.issue_tracker._is_issue_tracker_enabled',
