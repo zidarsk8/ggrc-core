@@ -87,22 +87,6 @@ jQuery(function ($) {
     return 0;
   };
 
-  // Turn the arrow when tree node content is shown
-  $body.on('click', '[data-toggle="collapse"]', function (e) {
-    let $this = $(this);
-    let $expander_container = $this.closest(':has(.expander, .enddot)');
-    let $expander = $expander_container.find('.expander').eq(0);
-    let $target = $($this.data('target'));
-
-    setTimeout(function () {
-      if ($target.hasClass('in')) {
-        $expander.addClass('in');
-      } else {
-        $expander.removeClass('in');
-      }
-    }, 100);
-  });
-
   // After the modal template has loaded from the server, but before the
   //  data has loaded to populate into the body, show a spinner
   $body.on('loaded', '.modal.modal-slim, .modal.modal-wide', function (e) {
@@ -120,73 +104,6 @@ jQuery(function ($) {
     };
 
     $(e.target).find('.modal-body .source').each(spin);
-  });
-
-  $body.on('click', '[data-toggle="list-remove"]', function (e) {
-    e.preventDefault();
-    $(this).closest('li').remove();
-  });
-
-  $body.on('click', '[data-toggle="list-select"]', function (e) {
-    let $this;
-    let $li;
-    let target;
-    let data;
-
-    e.preventDefault();
-
-    $this = $(this);
-    $li = $this.closest('li');
-    target = $li.closest('ul').data('list-target');
-
-    if (target) {
-      data = $.extend({}, $this.data('context') || {}, $this.data());
-      $(target).tmpl_mergeitems([data]);
-    }
-  });
-
-  $body.on('click', '[data-toggle="nested-dropdown"]', function (e) {
-    let $parent = $(this).parent();
-    let isActive = $parent.hasClass('open');
-    if (!isActive) {
-      $parent.toggleClass('open');
-    }
-    e.stopPropagation();
-    e.preventDefault();
-  });
-
-  $('html').on('click.dropdown.data-api', function (e) {
-    $('[data-toggle="nested-dropdown"]').parent().removeClass('open');
-  });
-});
-
-jQuery(function ($) {
-  function refresh_page() {
-    setTimeout(can.proxy(window.location.reload, window.location), 10);
-  }
-
-  $body.on('ajax:complete', '[data-ajax-complete="refresh"]', refresh_page);
-});
-
-jQuery(function ($) {
-  // Used in object_list sidebars (References, People, Categories)
-  $body.on('modal:success', '.js-list-container-title a', function (e, data) {
-    let $this = $(this);
-    let $title = $this.closest('.js-list-container-title');
-    let $span = $title.find('span');
-    let $expander = $title.find('.expander').eq(0);
-
-    $span.text('(' + (data.length || 0) + ')');
-
-    if (data.length > 0) {
-      $span.removeClass('no-object');
-    } else {
-      $span.addClass('no-object');
-    }
-
-    if (!$expander.hasClass('in')) {
-      $expander.click();
-    }
   });
 });
 
@@ -248,35 +165,6 @@ jQuery(function ($) {
       }
     });
   });
-
-  $body.on('click', '.clear-display-settings', function (e) {
-    CMS.Models.DisplayPrefs.findAll().done(function (data) {
-      let destroys = [];
-      can.each(data, function (d) {
-        d.unbind('change'); // forget about listening to changes.  we're going to refresh the page
-        destroys.push(d.resetPagePrefs());
-      });
-      $.when.apply($, destroys).done(function () {
-        GGRC.navigate();
-      });
-    });
-  })
-  .on('click', '.set-display-settings-default', function (e) {
-    let page_token = getPageToken();
-    CMS.Models.DisplayPrefs.findAll().done(function (data) {
-      let destroys = [];
-      can.each(data, function (d) {
-        d.unbind('change'); // forget about listening to changes.  we're going to refresh the page
-        destroys.push(d.setPageAsDefault(page_token));
-      });
-      $.when.apply($, destroys).done(function () {
-        $body.trigger(
-          'ajax:flash',
-          {success: 'Saved page layout as default for ' + (page_token === 'dashboard' ? 'dashboard' : page_token)}
-        );
-      });
-    });
-  });
 });
 
 // Make all external links open in new window.
@@ -292,91 +180,11 @@ jQuery(function ($) {
 });
 
 jQuery(function ($) {
-  // Footer expander animation helper
-  function expander(toggle, direction) {
-    let $this = $(toggle);
-    let $expander = $this.closest('div').find('.section-expander');
-    let out = direction === 'out';
-    let height = $expander.outerHeight();
-    let width = $expander.outerWidth();
-    let start = out ? 0 : width;
-    let end = out ? width : 0;
-    let duration = 500;
-    let clip;
-
-    if (out) {
-      $this.filter(':not(.section-sticky)').fadeOut(200);
-    }
-
-    // Check for intermediate animation
-    // Update the starting point and duration as appropriate
-    if ($expander.is(':animated')) {
-      $expander.stop();
-      clip = $expander.css('clip').match(/^rect\(([0-9.-]+)px,?\s+([0-9.-]+)px,?\s+([0-9.-]+)px,?\s+([0-9.-]+)px\)$/);
-      if (clip) {
-        // Start or end is always zero, so we can use some shortcuts
-        start = parseFloat(clip[2]);
-        duration = ~~((end ? end - start : start) / width * duration);
-      }
-    }
-
-    // Process animation
-    $expander.css({
-      display: 'inline-block',
-      marginRight: end + 'px',
-      clip: 'rect(0px, ' + start + 'px, ' + height + 'px, 0px)',
-      left: $this.is('.section-sticky') ? $this.outerWidth() : 0
-    }).animate({
-      marginRight: start + 'px'
-    }, {
-      duration: duration,
-      easing: 'easeInOutExpo',
-      step: function (now, fx) {
-        $(this).css('clip', 'rect(0px, ' + (width - now + (out ? start : end)) + 'px, ' + height + 'px, 0px)');
-      },
-      complete: function () {
-        if (!out) {
-          $this.filter(':not(.section-sticky)').fadeIn();
-          $(this).hide();
-        }
-        $(this).css({
-          marginRight: '0px',
-          clip: 'auto'
-        });
-      }
-    });
-
-    // Queue the reverse on mouseout
-    if (out) {
-      $this.closest('li').one('mouseleave', function () {
-        expander($this, 'in');
-      });
-    }
-  }
-
-  // Footer expander animations (verify that an expander exists)
-  $body.on('mouseenter', '.section-add:has(+ .section-expander), .section-expander:visible:animated', function (e) {
-    let $this = $(this);
-    expander($this.hasClass('section-add') ? $this : $this.prev('.section-add'), 'out');
-  });
-
   $body.on('click', '.show-long', function (e) {
     let $this = $(this);
     let $descField = $this.closest('.span12').find('.tree-description');
     $this.hide();
     $descField.removeClass('short');
-  });
-
-  // show/hide audit lead and firm
-  $body.on('mouseover', '.ui-autocomplete li a', function (e) {
-    let $this = $(this);
-    $this.addClass('active');
-    $this.closest('li').addClass('active');
-  });
-  $body.on('mouseleave', '.ui-autocomplete li a', function (e) {
-    let $this = $(this);
-    $this.removeClass('active');
-    $this.closest('li').removeClass('active');
   });
 });
 
