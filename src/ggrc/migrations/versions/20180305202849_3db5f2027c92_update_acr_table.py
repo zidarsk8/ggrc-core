@@ -19,7 +19,7 @@ from ggrc.migrations.utils import acr_propagation_constants as const
 
 # revision identifiers, used by Alembic.
 revision = '3db5f2027c92'
-down_revision = '082306b17b07'
+down_revision = 'fcd5e64ff664'
 
 
 def _add_parent_id_column():
