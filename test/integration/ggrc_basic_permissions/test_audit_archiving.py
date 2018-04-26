@@ -1,7 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Test Archived Audit"""
+"""Test Archived Audit."""
 
 from os.path import abspath
 from os.path import dirname
@@ -22,7 +22,7 @@ ARCHIVED_CONTEXT_OBJECTS = (
 
 
 def _create_obj_dict(obj, audit_id, context_id, assessment_id=None):
-  """Create POST dicts for various object types"""
+  """Create POST dicts for various object types."""
   table_singular = obj._inflector.table_singular
   dicts = {
       "issue": {
@@ -80,16 +80,16 @@ def _create_obj_dict(obj, audit_id, context_id, assessment_id=None):
 
 
 class TestAuditArchivingBase(TestCase):
-  """Base class for testing archived audits"""
+  """Base class for testing archived audits."""
   CSV_DIR = join(abspath(dirname(__file__)), "test_csvs")
 
   @classmethod
   def setUpClass(cls):
-    """Prepare data needed to run the tests"""
+    """Prepare data needed to run the tests."""
     TestCase.clear_data()
-    cls.response = cls._import_file("audit_rbac.csv")
 
     with app.app_context():
+      cls.response = cls._import_file("audit_rbac.csv")
       cls.people = {
           person.name: person
           for person in all_models.Person.eager_query().all()
@@ -118,13 +118,15 @@ class TestAuditArchivingBase(TestCase):
       # Create snapshot objects:
       for audit, name in ((cls.audit, 'snapshot'),
                           (cls.archived_audit, 'archived_snapshot')):
-        setattr(cls, name, factories.SnapshotFactory(
+        snapshot = factories.SnapshotFactory(
             child_id=revision.resource_id,
             child_type=revision.resource_type,
-            revision=revision,
             parent=audit,
+            revision=revision,
             context=audit.context,
-        ))
+        )
+        factories.RelationshipFactory(source=audit, destination=snapshot)
+        setattr(cls, name, snapshot)
 
       # Create asessment template objects:
       for audit, name in ((cls.audit, 'template'),
@@ -198,7 +200,7 @@ class TestAuditArchiving(TestAuditArchivingBase):
   )
   @unpack
   def test_setting_archived_state(self, person, status):
-    """Test if users can archive an audit"""
+    """Test if {0} can archive an audit: expected {1}."""
     self.api.set_user(self.people[person])
     audit_json = {
         "archived": True
@@ -226,7 +228,7 @@ class TestAuditArchiving(TestAuditArchivingBase):
   )
   @unpack
   def test_unsetting_archived_state(self, person, status):
-    """Test if users can unarchive an audit"""
+    """Test if {0} can unarchive an audit: expected {1}."""
 
     self.api.set_user(self.people[person])
     audit_json = {
@@ -276,7 +278,7 @@ class TestArchivedAudit(TestAuditArchivingBase):
   )
   @unpack
   def test_audit_editing(self, person, status, audit_type):
-    """Test if users can edit an audit"""
+    """Test if {0} can edit an {2}: expected {1}"""
     audit = getattr(self, audit_type)
 
     self.api.set_user(self.people[person])
@@ -313,7 +315,7 @@ class TestArchivedAudit(TestAuditArchivingBase):
   )
   @unpack
   def test_audit_context_editing(self, person, status, objects):
-    """Test if users can edit objects in the audit context"""
+    """Test if {0} can edit objects in the audit context: {1} - {2}"""
     self.api.set_user(self.people[person])
     for obj in objects:
       obj_instance = getattr(self, obj)
@@ -353,7 +355,7 @@ class TestArchivedAudit(TestAuditArchivingBase):
   )
   @unpack
   def test_audit_snapshot_editing(self, person, status, obj):
-    """Test if users can edit objects in the audit context"""
+    """Test if {0} can edit objects in the audit context: {1} - {2}"""
     self.api.set_user(self.people[person])
     obj_instance = getattr(self, obj)
     json = {

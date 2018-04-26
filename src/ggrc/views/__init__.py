@@ -56,6 +56,14 @@ logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 # Needs to be secured as we are removing @login_required
+@app.route("/_background_tasks/propagate_acl", methods=["POST"])
+@queued_task
+def propagate_acl(_):
+  """Web hook to update revision content."""
+  models.hooks.acl.propagation.propagate_all()
+  return app.make_response(("success", 200, [("Content-Type", "text/html")]))
+
+
 @app.route("/_background_tasks/refresh_revisions", methods=["POST"])
 @queued_task
 def refresh_revisions(_):
@@ -203,8 +211,10 @@ def do_reindex():
 
 class SetEncoder(json.JSONEncoder):
   """Encoder that can handle python sets"""
-  # pylint: disable=E0202
-  def default(self, obj):
+  # pylint: disable=method-hidden
+  # false positive: https://github.com/PyCQA/pylint/issues/414
+
+  def default(self, obj):  # pylint: disable=arguments-differ
     """If we get a set we first transform it to a list and then just use
        the default encoder"""
     if isinstance(obj, set):
@@ -499,6 +509,7 @@ def admin_refresh_revisions():
 @login_required
 @admin_required
 def send_event_job():
+  """Trigger background task on every event for computed attributes."""
   with benchmark("POST /admin/compute_attributes"):
     if request.data:
       revision_ids = request.get_json().get("revision_ids", [])
@@ -506,6 +517,22 @@ def send_event_job():
       revision_ids = "all_latest"
     start_compute_attributes(revision_ids)
     return app.make_response(("success", 200, [("Content-Type", "text/html")]))
+
+
+@app.route("/admin/propagate_acl", methods=["POST"])
+@login_required
+@admin_required
+def admin_propagate_acl():
+  """Propagates all ACL entries"""
+  admins = getattr(settings, "BOOTSTRAP_ADMIN_USERS", [])
+  if get_current_user().email not in admins:
+    raise Forbidden()
+
+  task_queue = create_task("propagate_acl", url_for(
+      propagate_acl.__name__), propagate_acl)
+  return task_queue.make_response(
+      app.make_response(("scheduled %s" % task_queue.name, 200,
+                         [('Content-Type', 'text/html')])))
 
 
 @app.route("/admin")

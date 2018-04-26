@@ -16,6 +16,13 @@ from integration.ggrc.generator import ObjectGenerator
 
 class TestRBAC(TestCase):
   """TestRBAC base class with batch of helper methods"""
+
+  def __init__(self, *args, **kwargs):
+    super(TestRBAC, self).__init__(*args, **kwargs)
+    self.people = None
+    self.control = None
+    self.all_acr = None
+
   def set_up_people(self):
     """Set up people with different roles needed by the tests"""
     self.people = {}
@@ -110,6 +117,8 @@ class TestAssigneeRBAC(TestRBAC):
       snapshots = self._create_snapshots(
           audit, [control, objective, regulation]
       )
+      for snapshot in snapshots:
+        factories.RelationshipFactory(source=audit, destination=snapshot)
       factories.RelationshipFactory(
           source=snapshots[0], destination=snapshots[1]
       )
