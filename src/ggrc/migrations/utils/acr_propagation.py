@@ -173,8 +173,8 @@ def remove_propagated_roles(object_type, role_names):
   )
   child_role_ids = connection.execute(
       sa.select([ACR_TABLE.c.id]).where(
-        ACR_TABLE.c.parent_id.in_(parent_role_ids),
-    )
+          ACR_TABLE.c.parent_id.in_(parent_role_ids),
+      )
   ).fetchall()
   child_ids = [row.id for row in child_role_ids]
   if not child_ids:

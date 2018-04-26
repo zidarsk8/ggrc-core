@@ -55,9 +55,44 @@ def _copy_current_acl_table():
   downgrade the release to previous version.
   """
   op.execute("DROP TABLE IF EXISTS acl_copy")
-  op.execute("CREATE TABLE acl_copy AS SELECT * FROM access_control_list")
+  op.execute("""
+      CREATE TABLE `acl_copy` (
+          `id` int(11) NOT NULL DEFAULT '0',
+          `person_id` int(11) NOT NULL,
+          `ac_role_id` int(11) NOT NULL,
+          `object_id` int(11) NOT NULL,
+          `object_type` varchar(250) NOT NULL,
+          `created_at` datetime NOT NULL,
+          `modified_by_id` int(11) DEFAULT NULL,
+          `updated_at` datetime NOT NULL,
+          `context_id` int(11) DEFAULT NULL,
+          `parent_id` int(11) DEFAULT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+  """)
   op.execute("DROP TABLE IF EXISTS acr_copy")
-  op.execute("CREATE TABLE acr_copy AS SELECT * FROM access_control_roles")
+  op.execute("""
+      CREATE TABLE `acr_copy` (
+          `id` int(11) NOT NULL DEFAULT '0',
+          `name` varchar(250) NOT NULL,
+          `object_type` varchar(250) DEFAULT NULL,
+          `tooltip` varchar(250) DEFAULT NULL,
+          `read` tinyint(1) NOT NULL DEFAULT '1',
+          `update` tinyint(1) NOT NULL DEFAULT '1',
+          `delete` tinyint(1) NOT NULL DEFAULT '1',
+          `my_work` tinyint(1) NOT NULL DEFAULT '1',
+          `created_at` datetime NOT NULL,
+          `modified_by_id` int(11) DEFAULT NULL,
+          `updated_at` datetime NOT NULL,
+          `context_id` int(11) DEFAULT NULL,
+          `mandatory` tinyint(1) NOT NULL DEFAULT '0',
+          `default_to_current_user` tinyint(1) NOT NULL DEFAULT '0',
+          `non_editable` tinyint(1) NOT NULL DEFAULT '0',
+          `internal` tinyint(1) NOT NULL DEFAULT '0',
+          `notify_about_proposal` tinyint(1) NOT NULL DEFAULT '0'
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+  """)
+  op.execute("INSERT INTO acr_copy SELECT * FROM access_control_roles")
+  op.execute("INSERT INTO acl_copy SELECT * FROM access_control_list")
 
 
 def upgrade():
