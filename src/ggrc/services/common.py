@@ -48,6 +48,8 @@ from ggrc.cache import utils as cache_utils
 
 
 # pylint: disable=invalid-name
+from ggrc.utils import dump_attrs
+
 logger = getLogger(__name__)
 
 

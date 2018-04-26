@@ -41,7 +41,9 @@ const messages = {
   ANALYSIS_FAILED: `Your file could not be imported due to the following errors 
   that were found. You can download your file, fix the errors 
   and try importing again.`,
-  FAILED: 'Import failed due to server error',
+  FAILED: `The volume of import is too big. Please split your import in smaller 
+  portion of 200 or less rows and import one after another. 
+  Sorry for inconvenience.`,
   FILE_STATS: (objects) => {
     const stats = Object.keys(objects).map((model) => {
       return `${objects[model]} 
