@@ -16,8 +16,6 @@ from ggrc.rbac import permissions
 from ggrc.services import signals
 from ggrc.utils import dump_attrs
 
-from ggrc.utils import dump_attrs
-
 
 class RowConverter(object):
   """Base class for handling row data."""
