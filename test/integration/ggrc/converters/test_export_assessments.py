@@ -16,7 +16,8 @@ COPIED_TITLE = 'test_name'
 COPIED_LINK = 'http://mega.doc'
 
 
-def dummy_gdrive_response(*args, **kwargs):  # noqa
+# pylint: disable=unused-argument
+def dummy_gdrive_response(*args, **kwargs):
   return {'webViewLink': COPIED_LINK,
           'name': COPIED_TITLE,
           'id': '12345'}
