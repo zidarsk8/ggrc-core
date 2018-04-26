@@ -24,35 +24,35 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   findAll: function () {
     let that = this;
     let objsDfd = this._super.apply(this, arguments)
-    .then(function (objs) {
-      let i;
-      for (i = objs.length; i--;) {
-        if (!objs[i].version || objs[i].version < that.version) {
-          objs[i].destroy();
-          objs.splice(i, 1);
+      .then(function (objs) {
+        let i;
+        for (i = objs.length; i--;) {
+          if (!objs[i].version || objs[i].version < that.version) {
+            objs[i].destroy();
+            objs.splice(i, 1);
+          }
         }
-      }
-      return objs;
-    });
+        return objs;
+      });
     return objsDfd;
   },
 
   findOne: function () {
     let that = this;
     let objDfd = this._super.apply(this, arguments)
-    .then(function (obj) {
-      let dfd;
-      let p;
-      if (!obj.version || obj.version < that.version) {
-        obj.destroy();
-        dfd = new $.Deferred();
-        p = dfd.promise();
-        p.status = 404;
-        return dfd.reject(p, 'error', 'Object expired');
-      } else {
-        return obj;
-      }
-    });
+      .then(function (obj) {
+        let dfd;
+        let p;
+        if (!obj.version || obj.version < that.version) {
+          obj.destroy();
+          dfd = new $.Deferred();
+          p = dfd.promise();
+          p.status = 404;
+          return dfd.reject(p, 'error', 'Object expired');
+        } else {
+          return obj;
+        }
+      });
     return objDfd;
   },
 
@@ -288,7 +288,7 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
     can.each([COLLAPSE, LHN_SIZE, OBJ_SIZE, SORTS],
       function (key) {
         that.makeObject(key)
-        .attr(pageId, new can.Observe(that.makeObject(path, key).serialize()));
+          .attr(pageId, new can.Observe(that.makeObject(path, key).serialize()));
       });
     this.save();
     return this;

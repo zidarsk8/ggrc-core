@@ -4,7 +4,7 @@
  */
 
 
-  /**
+/**
    * Util methods for integration with Dashboards.
    */
 let DASHBOARD_CA_TYPES = ['text'];

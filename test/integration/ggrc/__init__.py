@@ -20,7 +20,6 @@ from flask.ext.testing import TestCase as BaseTestCase
 from ggrc import db
 from ggrc.app import app
 from ggrc.converters.import_helper import read_csv_file
-from ggrc.fulltext import mysql
 from ggrc.views.converters import check_import_file
 from ggrc.models import Revision, all_models
 from integration.ggrc.api_helper import Api
@@ -40,6 +39,7 @@ def read_imported_file(file_data):  # pylint: disable=unused-argument
 
 
 class SetEncoder(json.JSONEncoder):
+  """Custom json encoder that supports sets."""
   # pylint: disable=method-hidden
   # false positive: https://github.com/PyCQA/pylint/issues/414
 
@@ -83,6 +83,7 @@ class TestCase(BaseTestCase, object):
     for role_id, name in ac_role.get_custom_roles_for(obj.type).iteritems():
       if name == role_name:
         return role_id
+    return None
 
   def get_persons_for_role_name(self, obj, role_name):
     """Generator. Return persons releated to sent instance and role_name."""
@@ -92,6 +93,7 @@ class TestCase(BaseTestCase, object):
         yield acl.person
 
   def _full_reindex(self):
+    """Run reindex for all objects and attributes."""
     self.client.get("/login")
     self.client.post("/admin/reindex")
     self.client.post("/admin/reindex_snapshots")
@@ -161,7 +163,9 @@ class TestCase(BaseTestCase, object):
     db.engine.execute(people.delete(people.c.email != "user@example.com"))
     acr = db.metadata.tables["access_control_roles"]
     db.engine.execute(acr.delete(~acr.c.non_editable))
-    db.session.reindex_set = set()
+    if hasattr(db.session, "reindex_set"):
+      db.session.reindex_set.invalidate()
+      delattr(db.session, "reindex_set")
     db.session.commit()
 
   def setUp(self):
@@ -420,6 +424,7 @@ class TestCase(BaseTestCase, object):
             child_type=revision.resource_type,
             revision=revision,
             parent=audit,
+            context=audit.context,
         )
         for revision in revisions
     ]
@@ -470,16 +475,6 @@ class TestCase(BaseTestCase, object):
           )
           assignees.append((person, role))
     return assignees
-
-  @staticmethod
-  def get_model_fulltext(model_name, property, ids):
-    """Get fulltext records for model."""
-    # pylint: disable=redefined-builtin
-    return db.session.query(mysql.MysqlRecordProperty).filter(
-        mysql.MysqlRecordProperty.type == model_name,
-        mysql.MysqlRecordProperty.property == property,
-        mysql.MysqlRecordProperty.key.in_(ids),
-    )
 
   @staticmethod
   def get_model_ca(model_name, ids):

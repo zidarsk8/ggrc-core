@@ -862,31 +862,41 @@ class ListCheckboxes(Component):
     self.locator_titles = titles_locator
     self.locator_checkboxes = checkboxes_locator
 
-  @staticmethod
-  def _unselect_unnecessary(objs, list_titles):
-    """Unselect unnecessary elements according objs (titles and checkboxes
-    elements) and list of titles."""
-    unselect = [obj[1].click() for obj in objs
-                if obj[0].text not in list_titles if obj[1].is_selected()]
-    return unselect
-
-  @staticmethod
-  def _select_necessary(objs, list_titles):
-    """Select necessary elements according objs (titles and checkboxes
-    elements) and list of titles."""
-    select = [obj[1].click() for obj in objs
-              if obj[0].text in list_titles if not obj[1].is_selected()]
-    return select
+  def _select_necessary(self, checkboxes, title_els, list_titles):
+    """Select necessary and deselect unnecessary checkboxes.
+    Search for elements is optimized using JS as getting checked-ness
+    and text of elements in a long list takes a lot of time."""
+    checkboxes_to_click = self._driver.execute_script("""
+    var checkboxes = arguments[0];
+    var title_els = arguments[1];
+    var titles = arguments[2];
+    var list_to_click = [];
+    for (let i = 0; i < checkboxes.length; i++) {
+      let checkbox = checkboxes[i];
+      let title = title_els[i].textContent.trim();
+      if (checkbox.checked && !titles.includes(title)) {
+        list_to_click.push(checkbox);
+      }
+    }
+    for (let i = 0; i < checkboxes.length; i++) {
+      let checkbox = checkboxes[i];
+      let title = title_els[i].textContent.trim();
+      if (!checkbox.checked && titles.includes(title)) {
+        list_to_click.push(checkbox);
+      }
+    }
+    return list_to_click;
+    """, checkboxes, title_els, list_titles)
+    for checkbox in checkboxes_to_click:
+      checkbox.click()
 
   def select_by_titles(self, list_titles):
     """Select checkboxes according titles."""
     selenium_utils.wait_for_js_to_load(self._driver)
-    selenium_utils.get_when_all_visible(self._driver, self.locator_titles)
-    objs_titles = self._driver.find_elements(*self.locator_titles)
-    objs_checkboxes = self._driver.find_elements(*self.locator_checkboxes)
-    objs = zip(objs_titles, objs_checkboxes)
-    self._unselect_unnecessary(objs, list_titles)
-    self._select_necessary(objs, list_titles)
+    selenium_utils.get_when_visible(self._driver, self.locator_titles)
+    checkboxes = self._driver.find_elements(*self.locator_checkboxes)
+    title_els = self._driver.find_elements(*self.locator_titles)
+    self._select_necessary(checkboxes, title_els, list_titles)
 
   def get_mapping_statuses(self):
     """Get list of mapping statuses by given titles"""
@@ -1008,10 +1018,6 @@ class AbstractTabContainer(Component):
     """Abstract method. Should return locators class."""
     raise NotImplementedError
 
-  def _get_active_tab_element(self):
-    """Return element of active tab"""
-    return self.container_element.find_element(*self._locators.TAB_CONTENT_CSS)
-
   def _tabs(self):
     """Abstract method. Should return dict. {'tab_name': tab_object, ...}"""
     raise NotImplementedError
@@ -1021,6 +1027,12 @@ class AbstractTabContainer(Component):
     """Lazy property for dashboard controller."""
     from lib.element.elements_list import TabController
     return TabController(self._driver, self._locators.TAB_CONTROLLER_CSS)
+
+  @property
+  def active_tab_elem(self):
+    """Return active tab element."""
+    return self.container_element.find_element(
+        *self._locators.TAB_CONTENT_CSS)
 
 
 class AbstractTable(Component):

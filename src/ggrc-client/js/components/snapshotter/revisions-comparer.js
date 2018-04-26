@@ -5,6 +5,9 @@
 
 import {confirm} from '../../plugins/utils/modals';
 import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
+import {
+  getInstanceView,
+} from '../../plugins/utils/object-history-utils';
 import RefreshQueue from '../../models/refresh_queue';
 
 export default can.Component.extend({
@@ -22,7 +25,8 @@ export default can.Component.extend({
     leftRevisionDescription: '',
     rightRevisionDescription: '',
     compareIt: function () {
-      const view = this.attr('instance.view');
+      const instance = this.attr('instance');
+      const view = getInstanceView(instance);
       const that = this;
       const currentRevisionID = this.attr('leftRevisionId');
       const rightRevision = this.attr('rightRevision');
@@ -51,8 +55,8 @@ export default can.Component.extend({
               let fragRight = can.view(view, revisions[1]);
               let attachmentsDfds =
                 that.isContainsAttachments(that.instance) ?
-                that.getAttachmentsDfds(revisions) :
-                [];
+                  that.getAttachmentsDfds(revisions) :
+                  [];
 
               if (displayDescriptions) {
                 const leftRevisionData = that.getRevisionData(
@@ -244,23 +248,23 @@ export default can.Component.extend({
         .trigger('click');
 
       instance.refresh()
-      .then(function () {
-        instance.attr('update_revision', 'latest');
-        return instance.save();
-      })
-      .then(function () {
-        let forceRefresh = true;
+        .then(function () {
+          instance.attr('update_revision', 'latest');
+          return instance.save();
+        })
+        .then(function () {
+          let forceRefresh = true;
 
-        return $('tree-widget-container:visible')
-          .first()
-          .viewModel()
-          .display(forceRefresh);
-      })
-      .then(function () {
-        let message = instance.child_type +
+          return $('tree-widget-container:visible')
+            .first()
+            .viewModel()
+            .display(forceRefresh);
+        })
+        .then(function () {
+          let message = instance.child_type +
         ' was refreshed successfully.';
-        GGRC.Errors.notifier('success', [message]);
-      });
+          GGRC.Errors.notifier('success', [message]);
+        });
     },
 
     /**
@@ -282,8 +286,10 @@ export default can.Component.extend({
       const emptySelector = '.empty-message';
       const highlightClass = 'diff-highlighted';
       const listSelector = 'ul li, .object-list-item';
-      const attributesSelector = '.row-fluid h6 + *, .row-fluid .state-value' +
-        ', related-documents';
+      const attributesSelector = `.row-fluid h6 + *,
+        .row-fluid .state-value,
+        .row-fluid h3,
+        related-documents`;
       let infoPanes = $target.find('.info .tier-content');
       let valuesOld = infoPanes.eq(0).find(attributesSelector);
       let valuesNew = infoPanes.eq(1).find(attributesSelector);
@@ -529,12 +535,28 @@ export default can.Component.extend({
         let $oldGrantees = $blockOld.find('person-list-item');
         let $newGrantees = $blockNew.find('person-list-item');
 
-        oldUserIds = extractPeopleIds($oldGrantees);
-        newUserIds = extractPeopleIds($newGrantees);
+        if ($oldGrantees.length && !$newGrantees.length ||
+          $newGrantees.length && !$oldGrantees.length) {
+          highlightBlock($blockOld);
+          highlightBlock($blockNew);
+        } else {
+          oldUserIds = extractPeopleIds($oldGrantees);
+          newUserIds = extractPeopleIds($newGrantees);
 
-        // now we have a list of old and new person IDs
-        highlightChanges($oldGrantees, newUserIds);
-        highlightChanges($newGrantees, oldUserIds);
+          // now we have a list of old and new person IDs
+          highlightPersons($oldGrantees, newUserIds);
+          highlightPersons($newGrantees, oldUserIds);
+        }
+      }
+
+      /**
+       * Highlight block of grants of a particular custom role.
+       *
+       * @param {jQuery} $block - a DOM element containing a list of
+       *   people that have a particular custom role.
+       */
+      function highlightBlock($block) {
+        $block.find('object-list').addClass(HIGHLIGHT_CLASS);
       }
 
       /**
@@ -564,7 +586,7 @@ export default can.Component.extend({
        *   referential list of grants of a particular custom role. The changes
        *   in role assignments are calculated against this list.
        */
-      function highlightChanges($grantees, comparisonIds) {
+      function highlightPersons($grantees, comparisonIds) {
         $grantees.each(function (i, grantee) {
           let $grantee = $(grantee);
           let personId = $grantee.viewModel().attr('person.id');

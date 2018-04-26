@@ -8,16 +8,16 @@
 
 (function(can) {
 
-  can.Model.Cacheable("CMS.Models.NotificationConfig", {
-    root_object: "notification_config",
-    root_collection: "notification_configs",
-    category: "person",
-    findAll: "GET /api/notification_configs",
-    findOne: "GET /api/notification_configs/{id}",
-    create: "POST /api/notification_configs",
-    update: "PUT /api/notification_configs/{id}",
-    destroy: "DELETE /api/notification_configs/{id}",
-    active: "POST /api/set_active_notifications",
+  can.Model.Cacheable('CMS.Models.NotificationConfig', {
+    root_object: 'notification_config',
+    root_collection: 'notification_configs',
+    category: 'person',
+    findAll: 'GET /api/notification_configs',
+    findOne: 'GET /api/notification_configs/{id}',
+    create: 'POST /api/notification_configs',
+    update: 'PUT /api/notification_configs/{id}',
+    destroy: 'DELETE /api/notification_configs/{id}',
+    active: 'POST /api/set_active_notifications',
 
     findActive: function(){
       if(GGRC.current_user === null || GGRC.current_user === undefined){

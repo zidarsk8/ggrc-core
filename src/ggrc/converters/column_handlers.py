@@ -121,7 +121,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     # group many handler keys for the same handler into a more concise list.
     "__mapping__": handlers.MappingColumnHandler,
     "__unmapping__": handlers.MappingColumnHandler,
-    "__custom__": custom_attribute.CustomAttributeColumHandler,
+    "__custom__": custom_attribute.CustomAttributeColumnHandler,
     "__object_custom__": custom_attribute.ObjectCaColumnHandler,
     "__snapshot_mapping__": SnapshotInstanceColumnHandler,
     "__acl__": acl.AccessControlRoleColumnHandler,

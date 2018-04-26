@@ -142,7 +142,7 @@ class TestAssessment(TestAssessmentBase):
     )
     for role in self.assignee_roles:
       self.assert_mapped_role(role, person_email, assessment)
-      self.assert_mapped_role("{} Mapped".format(role), person_email, audit)
+      self.assert_propagated_role("{}".format(role), person_email, audit)
 
   def test_put_mapped_roles(self):
     """Test mapped roles creation when assessment updated"""
@@ -163,19 +163,6 @@ class TestAssessment(TestAssessmentBase):
       )
       factories.RelationshipFactory(source=audit, destination=assessment)
 
-    verifiers = all_models.AccessControlList.query.join(
-        all_models.AccessControlRole,
-        all_models.AccessControlList.ac_role_id ==
-        all_models.AccessControlRole.id
-    ).filter(
-        all_models.AccessControlRole.name == "Verifiers Mapped",
-        all_models.AccessControlList.person == person,
-        all_models.AccessControlList.object_id == assessment.id,
-        all_models.AccessControlList.object_type == assessment.type,
-    )
-    # Check there is no Verified Mapped roles in db
-    self.assertEqual(verifiers.count(), 0)
-
     # Add verifier to Assessment
     response = self.api.put(assessment, {
         "access_control_list": [
@@ -187,7 +174,7 @@ class TestAssessment(TestAssessmentBase):
 
     db.session.add_all([audit, assessment])
     self.assert_mapped_role("Verifiers", person_email, assessment)
-    self.assert_mapped_role("Verifiers Mapped", person_email, audit)
+    self.assert_propagated_role("Verifiers", person_email, audit)
 
   def test_import_mapped_roles(self):
     """Test creation of mapped roles in assessment import."""
@@ -216,10 +203,10 @@ class TestAssessment(TestAssessmentBase):
 
     # Add objects back to session to have access to their id and type
     db.session.add_all([audit, snapshot])
-    for role in ["Assignees Mapped", "Creators Mapped", "Verifiers Mapped"]:
+    for role in ["Assignees", "Creators", "Verifiers"]:
       for user in users:
-        self.assert_mapped_role(role, user, audit)
-        self.assert_mapped_role(role, user, snapshot)
+        self.assert_propagated_role(role, user, audit)
+        self.assert_propagated_role(role, user, snapshot)
 
   def test_document_mapped_roles(self):
     """Test creation of mapped document roles."""
@@ -239,10 +226,10 @@ class TestAssessment(TestAssessmentBase):
       factories.RelationshipFactory(source=assessment, destination=document)
 
     db.session.add(document)
-    for role in ["Assignees Document Mapped",
-                 "Creators Document Mapped",
-                 "Verifiers Document Mapped"]:
-      self.assert_mapped_role(role, person_email, document)
+    for role in ["Assignees",
+                 "Creators",
+                 "Verifiers"]:
+      self.assert_propagated_role(role, person_email, document)
 
   def test_deletion_mapped_roles(self):
     """Test deletion of mapped roles."""
@@ -268,7 +255,7 @@ class TestAssessment(TestAssessmentBase):
     self.assertEqual(response.status_code, 200)
     db.session.add(audit)
     self.assert_mapped_role("Creators", person_email, assessment)
-    self.assert_mapped_role("Creators Mapped", person_email, audit)
+    self.assert_propagated_role("Creators", person_email, audit)
 
   def test_deletion_multiple_assignee(self):
     """Test deletion of multiple mapped roles."""
@@ -303,8 +290,8 @@ class TestAssessment(TestAssessmentBase):
     db.session.add(audit)
     for ac_role in self.assignee_roles.keys():
       self.assert_mapped_role(ac_role, person_email, assessment)
-      self.assert_mapped_role(
-          "{} Mapped".format(ac_role), person_email, audit
+      self.assert_propagated_role(
+          "{}".format(ac_role), person_email, audit
       )
 
   def test_assignee_deletion_unmap(self):
@@ -326,8 +313,8 @@ class TestAssessment(TestAssessmentBase):
           source=assessment, destination=snapshot
       )
     for ac_role in self.assignee_roles.keys():
-      self.assert_mapped_role(
-          "{} Mapped".format(ac_role), person_email, snapshot
+      self.assert_propagated_role(
+          "{}".format(ac_role), person_email, snapshot
       )
     response = self.api.delete(rel)
     self.assertEqual(response.status_code, 200)
@@ -365,8 +352,8 @@ class TestAssessment(TestAssessmentBase):
 
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     for ac_role in self.assignee_roles.keys():
-      self.assert_mapped_role(
-          "{} Mapped".format(ac_role), person_email, snapshot
+      self.assert_propagated_role(
+          "{}".format(ac_role), person_email, snapshot
       )
 
   def test_audit_roles_saving(self):
@@ -393,8 +380,8 @@ class TestAssessment(TestAssessmentBase):
 
     db.session.add(audit)
     for ac_role in self.assignee_roles.keys():
-      self.assert_mapped_role(
-          "{} Mapped".format(ac_role), person_email, audit
+      self.assert_propagated_role(
+          "{}".format(ac_role), person_email, audit
       )
 
   def test_mapped_regulations_acl(self):
@@ -425,11 +412,11 @@ class TestAssessment(TestAssessmentBase):
           source=assessment, destination=snapshots[0]
       )
 
-    for role in ["Assignees Mapped", "Creators Mapped", "Verifiers Mapped"]:
+    for role in ["Assignees", "Creators", "Verifiers"]:
       for snapshot in snapshots:
         # Mapped Assignee roles should be created for all snapshots, not only
         # for control that related to assessment
-        self.assert_mapped_role(role, person_email, snapshot)
+        self.assert_propagated_role(role, person_email, snapshot)
 
 
 @ddt.ddt
@@ -446,7 +433,7 @@ class TestAssessmentUpdates(ggrc.TestCase):
     _, audit = self.generator.generate_object(
         all_models.Audit,
         {
-            "title": "Audit",
+            "title": "Assessment Updates Audit",
             "program": {"id": program_id},
             "status": "Planned"
         },
@@ -457,12 +444,12 @@ class TestAssessmentUpdates(ggrc.TestCase):
           all_models.Assessment,
           {
               "title": "Assessment-Comment",
-              "audit": {"id": audit.id},
+              "audit": {"id": audit.id, "type": "Audit"},
               "audit_title": audit.title,
               "people_value": [],
               "default_people": {
-                  "assignees": "Admin",
                   "verifiers": "Admin",
+                  "assignees": "Admin",
               },
               "context": {"id": audit.context.id},
           }

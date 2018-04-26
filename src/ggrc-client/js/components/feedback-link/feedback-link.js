@@ -12,6 +12,12 @@ const viewModel = can.Map.extend({
         return GGRC.config.CREATE_ISSUE_URL;
       },
     },
+    title: {
+      get() {
+        return can.capitalize(GGRC.config.CREATE_ISSUE_BUTTON_NAME) ||
+          'Feedback';
+      },
+    },
   },
 });
 

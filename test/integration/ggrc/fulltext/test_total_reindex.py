@@ -113,11 +113,13 @@ class TestTotalReindex(TestCase):
     with ggrc_factories.single_commit():
       obj_to_index = {factory() for _ in range(obj_count)}
     db.session.expire_all()
-    db.session.reindex_set = model.query.filter(
+    query = model.query.filter(
         model.id.in_([i.id for i in obj_to_index]),
     ).options(
         orm.Load(model).load_only("id")
-    ).all()
+    )
+    for instance in query:
+      db.session.reindex_set.add(instance)
     with QueryCounter() as counter:
       mysql.update_indexer(db.session)
       self.assertLessEqual(

@@ -52,26 +52,26 @@ describe('GGRC.Components.multiselectDropdown', function () {
       });
 
       it('calls changeOpenCloseState if component is not disabled',
-      function () {
-        viewModel.changeOpenCloseState =
+        function () {
+          viewModel.changeOpenCloseState =
           jasmine.createSpy('changeOpenCloseState');
-        viewModel.attr('disabled', false);
+          viewModel.attr('disabled', false);
 
-        method();
+          method();
 
-        expect(viewModel.changeOpenCloseState).toHaveBeenCalled();
-      });
+          expect(viewModel.changeOpenCloseState).toHaveBeenCalled();
+        });
 
       it('does not call changeOpenCloseState if component is disabled',
-      function () {
-        viewModel.changeOpenCloseState =
+        function () {
+          viewModel.changeOpenCloseState =
           jasmine.createSpy('changeOpenCloseState');
-        viewModel.attr('disabled', true);
+          viewModel.attr('disabled', true);
 
-        method();
+          method();
 
-        expect(viewModel.changeOpenCloseState).not.toHaveBeenCalled();
-      });
+          expect(viewModel.changeOpenCloseState).not.toHaveBeenCalled();
+        });
     });
   });
 });

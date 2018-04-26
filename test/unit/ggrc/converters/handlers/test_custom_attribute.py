@@ -13,7 +13,7 @@ from mock import MagicMock, patch
 
 from ggrc import app  # noqa  # pylint: disable=unused-import
 from ggrc.converters.handlers.custom_attribute import (
-    CustomAttributeColumHandler
+    CustomAttributeColumnHandler
 )
 from ggrc.models import CustomAttributeDefinition
 
@@ -26,11 +26,11 @@ class CustomAttributeColumHandlerTestCase(unittest.TestCase):
   def setUp(self):
     row_converter = MagicMock(name=u"row_converter")
     key = u"a_checkbox_field"
-    self.handler = CustomAttributeColumHandler(row_converter, key)
+    self.handler = CustomAttributeColumnHandler(row_converter, key)
 
 
 @ddt.ddt
-@patch.object(CustomAttributeColumHandler, u"get_ca_definition")
+@patch.object(CustomAttributeColumnHandler, u"get_ca_definition")
 class GetValueTestCase(CustomAttributeColumHandlerTestCase):
   """Tests for the get_value() method"""
   # pylint: disable=invalid-name

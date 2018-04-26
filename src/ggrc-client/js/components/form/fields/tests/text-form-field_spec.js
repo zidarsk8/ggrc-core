@@ -16,8 +16,8 @@ describe('GGRC.Components.textFormField', () => {
   });
 
   it('does not fire valueChanged event on first value assignation', () => {
-      viewModel.attr('value', '');
-      expect(viewModel.dispatch).not.toHaveBeenCalled();
+    viewModel.attr('value', '');
+    expect(viewModel.dispatch).not.toHaveBeenCalled();
   });
 
   it('sets the value of the input', () => {

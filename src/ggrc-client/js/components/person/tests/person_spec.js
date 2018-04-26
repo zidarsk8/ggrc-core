@@ -43,67 +43,67 @@ describe('GGRC.Components.personItem', function () {
 
     it('sets the personObj in scope to the cached Person object ' +
       'if found there',
-      function () {
-        let person42 = new CMS.Models.Person({
-          id: 42, name: 'John', email: 'john@doe.com',
-        });
+    function () {
+      let person42 = new CMS.Models.Person({
+        id: 42, name: 'John', email: 'john@doe.com',
+      });
 
-        template = can.view
-          .mustache('<person-info person-id="42"></person-info>');
-        frag = template();
-        frag = $(frag);
-        component = frag.find('person-info').control();
+      template = can.view
+        .mustache('<person-info person-id="42"></person-info>');
+      frag = template();
+      frag = $(frag);
+      component = frag.find('person-info').control();
 
-        expect(component.scope.attr('personObj'))
-          .toBe(person42);
-      }
+      expect(component.scope.attr('personObj'))
+        .toBe(person42);
+    }
     );
 
     it('sets the personObj in scope to the fetched Person object ' +
       'if not found in cache',
-      function () {
-        let person123 = new can.Map({
-          id: 123, name: 'Mike', email: 'mike@mike.com',
-        });
+    function () {
+      let person123 = new can.Map({
+        id: 123, name: 'Mike', email: 'mike@mike.com',
+      });
 
-        template = can.view
-          .mustache('<person-info person-id="123"></person-info>');
-        frag = template();
+      template = can.view
+        .mustache('<person-info person-id="123"></person-info>');
+      frag = template();
 
-        frag = $(frag);
-        component = frag.find('person-info').control();
+      frag = $(frag);
+      component = frag.find('person-info').control();
 
-        delete CMS.Models.Person.cache[123];
+      delete CMS.Models.Person.cache[123];
 
-        dfdFindOne.resolve(person123);
+      dfdFindOne.resolve(person123);
 
-        expect(RefreshQueue.prototype.trigger).toHaveBeenCalled();
-        expect(component.scope.attr('personObj')).toBe(person123);
-      }
+      expect(RefreshQueue.prototype.trigger).toHaveBeenCalled();
+      expect(component.scope.attr('personObj')).toBe(person123);
+    }
     );
 
     it('sets the personObj in scope to the fetched Person object ' +
       'for partially loaded objects in cache',
-      function () {
-        let person123 = new can.Map({id: 123, name: '', email: ''});
-        let fetchedPerson = new can.Map({
-          id: 123, name: 'John', email: 'john@doe.com',
-        });
+    function () {
+      let person123 = new can.Map({id: 123, name: '', email: ''});
+      let fetchedPerson = new can.Map({
+        id: 123, name: 'John', email: 'john@doe.com',
+      });
 
-        template = can.view
-          .mustache('<person-info person-id="123"></person-info>');
-        frag = template();
+      template = can.view
+        .mustache('<person-info person-id="123"></person-info>');
+      frag = template();
 
-        CMS.Models.Person.cache[123] = person123;
+      CMS.Models.Person.cache[123] = person123;
 
-        frag = $(frag);
-        component = frag.find('person-info').control();
+      frag = $(frag);
+      component = frag.find('person-info').control();
 
-        dfdFindOne.resolve(fetchedPerson);
+      dfdFindOne.resolve(fetchedPerson);
 
-        expect(RefreshQueue.prototype.trigger).toHaveBeenCalled();
-        expect(component.scope.attr('personObj')).toBe(fetchedPerson);
-      }
+      expect(RefreshQueue.prototype.trigger).toHaveBeenCalled();
+      expect(component.scope.attr('personObj')).toBe(fetchedPerson);
+    }
     );
     it('does not make a get request when person-id is undefined',
       function () {
@@ -151,7 +151,7 @@ describe('GGRC.Components.personItem', function () {
       component = frag.find('person-info').control();
 
       expect(component.scope.attr('personObj'))
-          .toBe(CMS.Models.Person.cache['123']);
+        .toBe(CMS.Models.Person.cache['123']);
       expect(RefreshQueue.prototype.trigger).not.toHaveBeenCalled();
     });
     it('gets person object from context and it doesn\'t trigger ' +
@@ -169,7 +169,7 @@ describe('GGRC.Components.personItem', function () {
       component = frag.find('person-info').control();
 
       expect(component.scope.attr('personObj'))
-          .toBe(CMS.Models.Person.cache['123']);
+        .toBe(CMS.Models.Person.cache['123']);
       expect(RefreshQueue.prototype.trigger).not.toHaveBeenCalled();
     });
   });
@@ -192,18 +192,18 @@ describe('GGRC.Components.personItem', function () {
 
     it('triggers the person-remove event with the person object as the ' +
       'event argument',
-      function () {
-        let call;
-        componentInst.scope.attr('personObj', {id: 123, name: 'John'});
+    function () {
+      let call;
+      componentInst.scope.attr('personObj', {id: 123, name: 'John'});
 
-        handler();
+      handler();
 
-        expect(componentInst.element.triggerHandler).toHaveBeenCalled();
-        call = componentInst.element.triggerHandler.calls.mostRecent();
-        expect(call.args[0].type).toEqual(
-          Component.prototype._EV_REMOVE_CLICK);
-        expect(call.args[0].person.attr()).toEqual({id: 123, name: 'John'});
-      }
+      expect(componentInst.element.triggerHandler).toHaveBeenCalled();
+      call = componentInst.element.triggerHandler.calls.mostRecent();
+      expect(call.args[0].type).toEqual(
+        Component.prototype._EV_REMOVE_CLICK);
+      expect(call.args[0].person.attr()).toEqual({id: 123, name: 'John'});
+    }
     );
 
     it('emits the person-remove event using the dispatch mechanism',

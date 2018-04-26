@@ -79,11 +79,11 @@
 
       if (can.isFunction(baseModel.getAllowedMappings)) {
         return baseModel
-            .getAllowedMappings()
-            .filter(function (model) {
-              return exclude.indexOf(model) < 0;
-            })
-            .concat(include);
+          .getAllowedMappings()
+          .filter(function (model) {
+            return exclude.indexOf(model) < 0;
+          })
+          .concat(include);
       }
       return GGRC.Utils
         .getMappableTypes(type, {

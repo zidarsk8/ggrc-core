@@ -109,7 +109,7 @@ function getStatesModelsPair(model) {
   return pairs.length > 0 ? pairs[0] : null;
 }
 
- /**
+/**
  * Get states for model.
  * @param {String} model - The model name
  * @return {Array} array of strings

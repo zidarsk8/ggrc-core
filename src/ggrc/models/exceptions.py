@@ -58,3 +58,7 @@ def translate_message(exception):
 
 class ValidationError(ValueError):
   pass
+
+
+class StatusValidationError(ValidationError):
+  pass

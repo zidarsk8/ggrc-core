@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Copyright (C) 2018 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+PROJECT="selenium"
+
+cd "$(dirname $0)/.."
+source bin/containers_functions.sh
+
+# If containers take lots of CPU, stopping them frees up CPU for building
+# containers.
+teardown $PROJECT
+
+setup $PROJECT selenium
+
+setup_for_selenium $PROJECT

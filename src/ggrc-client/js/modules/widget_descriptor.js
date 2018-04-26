@@ -145,7 +145,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
           }
           return (
             farModel.title_plural === 'References' ?
-                                         'Linked ' : 'Mapped '
+              'Linked ' : 'Mapped '
           ) + farModelName;
         },
         widget_icon: farModel.table_singular,

@@ -89,7 +89,7 @@ describe('GGRC.Components.bulkUpdateButton', function () {
       expect(viewModel.getResultNotification)
         .toHaveBeenCalledWith(viewModel.attr('model'), 1);
       expect(GGRC.Errors.notifier)
-       .toHaveBeenCalledWith('info', resMessage);
+        .toHaveBeenCalledWith('info', resMessage);
     });
 
     it('triggers TreeView refresh when some items updated', function () {

@@ -88,9 +88,9 @@
     let lastPopover;
     $body.on('click', 'ul.tree-structure .item-main .grcobject,' +
       ' ul.tree-structure .item-main .openclose', function (ev) {
-        ev.stopPropagation();
-        $(this).openclose();
-      });
+      ev.stopPropagation();
+      $(this).openclose();
+    });
     // Google Circle CTA Button
     $body.on('mouseenter', '.square-trigger', function () {
       let $this = $(this),
@@ -122,9 +122,9 @@
       let popover;
       let target = $(ev.currentTarget);
       let content = target
-          .closest('.person-holder')
-          .find('.custom-popover-content')
-          .html();
+        .closest('.person-holder')
+        .find('.custom-popover-content')
+        .html();
 
       if (!content) {
         // Don't show tooltip if there is no content
@@ -175,8 +175,8 @@
     $body.on('mouseleave', '.person-holder,' +
       ' .person-tooltip-trigger, .popover,' +
       ' .popover .square-popover', function (ev) {
-        let target = $(ev.currentTarget);
-        let popover;
+      let target = $(ev.currentTarget);
+      let popover;
 
       if (target.is('.person-tooltip-trigger')) {
         target = target.closest('.person-holder');

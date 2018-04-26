@@ -109,8 +109,7 @@ class TestCreatorAudit(TestCase):
     response = self.api.get(obj.__class__, obj.id)
     if response.status_code == 200:
       return self.api.put(obj, response.json).status_code
-    else:
-      return response.status_code
+    return response.status_code
 
   def map(self, dest):
     """Map audit to dest.
@@ -139,6 +138,10 @@ class TestCreatorAudit(TestCase):
     """
     # Create a program
     dummy_audit = factories.AuditFactory()
+    factories.RelationshipFactory(
+        source=dummy_audit.program,
+        destination=dummy_audit
+    )
     unrelated_audit = {
         "type": "Audit",
         "context_id": dummy_audit.context.id,
@@ -157,7 +160,7 @@ class TestCreatorAudit(TestCase):
     response = self.api.post(all_models.Audit, {
         "audit": {
             "title": random_title + " audit",
-            'program': {'id': program_id},
+            'program': {'id': program_id, "type": "Program"},
             "status": "Planned",
             "context": None,
             "access_control_list": [{

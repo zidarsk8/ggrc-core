@@ -66,11 +66,11 @@ describe('GGRC.Components.subTreeModels', function () {
     });
 
     it('subscribes for changes of childModelsMap.container for its type',
-    function () {
-      vm.originalInit();
-      expect(childModelsMap.attr('container').bind)
-        .toHaveBeenCalledWith(vm.attr('type'), jasmine.any(Function));
-    });
+      function () {
+        vm.originalInit();
+        expect(childModelsMap.attr('container').bind)
+          .toHaveBeenCalledWith(vm.attr('type'), jasmine.any(Function));
+      });
   });
 
   describe('get() of uniqueModelsList', function () {
@@ -153,12 +153,12 @@ describe('GGRC.Components.subTreeModels', function () {
     });
 
     it('returns generated displayList using savedModels if it is defined',
-    function () {
-      savedModels = ['Objective', 'Market'];
-      spy.and.returnValue(savedModels);
-      expectedResult = generateResult(defaultModels.available, savedModels);
-      expect(vm.getDisplayModels()).toEqual(expectedResult);
-    });
+      function () {
+        savedModels = ['Objective', 'Market'];
+        spy.and.returnValue(savedModels);
+        expectedResult = generateResult(defaultModels.available, savedModels);
+        expect(vm.getDisplayModels()).toEqual(expectedResult);
+      });
 
     it('returns generated displayList using defaultModels' +
     ' if savedModels is undefined', function () {

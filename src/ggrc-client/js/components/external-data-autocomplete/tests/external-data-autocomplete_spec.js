@@ -23,7 +23,7 @@ describe('GGRC.Components.externalDataAutocomplete', ()=> {
             let result = viewModel.attr('renderResults');
 
             expect(result).toBe(true);
-        });
+          });
       });
 
       describe('returns false', ()=> {
@@ -36,7 +36,7 @@ describe('GGRC.Components.externalDataAutocomplete', ()=> {
             let result = viewModel.attr('renderResults');
 
             expect(result).toBe(false);
-        });
+          });
 
         it(`when "showResults" flag is turned on
             and "searchCriteria" length is less than "minLength"`, ()=> {
@@ -47,7 +47,7 @@ describe('GGRC.Components.externalDataAutocomplete', ()=> {
             let result = viewModel.attr('renderResults');
 
             expect(result).toBe(false);
-        });
+          });
 
         it(`when "showResults" flag is turned off
             and "searchCriteria" length is less than "minLength"`, ()=> {
@@ -58,7 +58,7 @@ describe('GGRC.Components.externalDataAutocomplete', ()=> {
             let result = viewModel.attr('renderResults');
 
             expect(result).toBe(false);
-        });
+          });
       });
     });
 

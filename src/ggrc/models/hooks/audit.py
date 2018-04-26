@@ -6,11 +6,29 @@
 
   The following permission hooks make sure archived audits are not editable
 """
+
 from werkzeug.exceptions import Forbidden
 
 from ggrc import db
 from ggrc.models import all_models
 from ggrc.services import signals
+
+
+def _add_audit_relationships(audits):
+  """Add missing relationships for audit direct mappings."""
+  for audit in audits:
+    all_models.Relationship(
+        source=audit,
+        destination=audit.program,
+    )
+
+
+def _check_archived_context(obj):
+  """Check if object is allowed to be edited or raise an error."""
+  if (hasattr(obj, 'context') and
+      hasattr(obj.context, 'related_object') and getattr(
+          obj.context.related_object, 'archived', False)):
+    raise Forbidden()
 
 
 def init_hook():
@@ -49,10 +67,7 @@ def init_hook():
   def handle_archived_context(sender, obj=None, src=None, service=None):
     """Make sure admins cannot delete/update archived audits"""
     # pylint: disable=unused-argument
-    if (hasattr(obj, 'context') and
-        hasattr(obj.context, 'related_object') and getattr(
-            obj.context.related_object, 'archived', False)):
-      raise Forbidden()
+    _check_archived_context(obj)
 
   @signals.Restful.model_posted.connect_via(all_models.Relationship)
   @signals.Restful.model_deleted.connect_via(all_models.Relationship)
@@ -60,11 +75,14 @@ def init_hook():
     """Make sure users can not map objects to archived audits"""
     # pylint: disable=unused-argument
     if (getattr(obj, 'source_type', None) == 'Issue' or
-       getattr(obj, 'destination_type', None) == 'Issue'):
+            getattr(obj, 'destination_type', None) == 'Issue'):
       # Issues can be mapped even if audit is archived so skip the permission
       # check here
       return
-    if (hasattr(obj, 'context') and
-        hasattr(obj.context, 'related_object') and getattr(
-            obj.context.related_object, 'archived', False)):
-      raise Forbidden()
+    _check_archived_context(obj)
+
+  @signals.Restful.collection_posted.connect_via(all_models.Audit)
+  def handle_assessment_post(sender, objects=None, sources=None, service=None):
+    """Add relationships objects for direct audit mappings."""
+    # pylint: disable=unused-argument
+    _add_audit_relationships(objects)

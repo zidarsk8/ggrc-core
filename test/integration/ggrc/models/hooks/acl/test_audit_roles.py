@@ -4,7 +4,6 @@
 """Test Access Control Propagation for Audit Roles like
    Auditor & Audit Captains"""
 
-from collections import defaultdict
 from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
@@ -42,7 +41,7 @@ class TestAuditRoleProgation(TestCase):
     """Sets up all the objects needed by the tests"""
     objects = self.objects
     # Program
-    objects['program'] = factories.ProgramFactory(title="A Program")
+    objects['program'] = program = factories.ProgramFactory(title="A Program")
     # Controls
     objects['controls'] = controls = [
         factories.ControlFactory(title="My First Control"),
@@ -60,6 +59,7 @@ class TestAuditRoleProgation(TestCase):
             "person": self.people['created_captain']
         }]
     )
+    factories.RelationshipFactory(source=program, destination=audit)
     # Assessment template
     objects['assessment_template'] = factories.AssessmentTemplateFactory()
 
@@ -68,6 +68,8 @@ class TestAuditRoleProgation(TestCase):
 
     # Snapshot
     objects['snapshots'] = self._create_snapshots(audit, controls)
+    for snapshot in objects['snapshots']:
+      factories.RelationshipFactory(source=audit, destination=snapshot)
 
     # Issues
     objects['issue'] = factories.IssueFactory(
@@ -162,23 +164,6 @@ class TestAuditRoleProgation(TestCase):
     db.session.add(audit)
     db.session.commit()
 
-    roles_type_map = {
-        self.audit_roles['Audit Captains']: defaultdict(
-            lambda: self.audit_roles['Audit Captains Mapped']),
-        self.audit_roles['Auditors']: defaultdict(
-            lambda: self.audit_roles['Auditors Mapped'], {
-                "Assessment": self.audit_roles['Auditors Assessment Mapped'],
-                "Document": self.audit_roles['Auditors Document Mapped'],
-                "Snapshot": self.audit_roles['Auditors Snapshot Mapped'],
-                "Issue": self.audit_roles['Auditors Issue Mapped'],
-            }),
-        self.audit_roles['Program Readers Mapped']: defaultdict(
-            lambda: self.audit_roles['Program Readers Mapped']),
-        self.audit_roles['Program Editors Mapped']: defaultdict(
-            lambda: self.audit_roles['Program Editors Mapped']),
-        self.audit_roles['Program Managers Mapped']: defaultdict(
-            lambda: self.audit_roles['Program Managers Mapped']),
-    }
     all_acls = all_models.AccessControlList.query.filter().all()
     acl_map = {(acl.object_id, acl.object_type, acl.person): [
                aacl.ac_role.name for aacl in all_acls]
@@ -198,31 +183,12 @@ class TestAuditRoleProgation(TestCase):
       ]:
         key = (obj.id, obj.type, acl.person)
         self.assertIn(key, acl_map)
-        self.assertIn(roles_type_map[acl.ac_role][obj.type].name,
-                      acl_map[key])
 
   def test_object_created(self):
     """Test if audit mapped roles are created for newly created objects"""
     objects = self.objects
     audit = objects['audit']
 
-    roles_type_map = {
-        self.audit_roles['Audit Captains']: defaultdict(
-            lambda: self.audit_roles['Audit Captains Mapped']),
-        self.audit_roles['Auditors']: defaultdict(
-            lambda: self.audit_roles['Auditors Mapped'], {
-                "Assessment": self.audit_roles['Auditors Assessment Mapped'],
-                "Document": self.audit_roles['Auditors Document Mapped'],
-                "Snapshot": self.audit_roles['Auditors Snapshot Mapped'],
-                "Issue": self.audit_roles['Auditors Issue Mapped'],
-            }),
-        self.audit_roles['Program Readers Mapped']: defaultdict(
-            lambda: self.audit_roles['Program Readers Mapped']),
-        self.audit_roles['Program Editors Mapped']: defaultdict(
-            lambda: self.audit_roles['Program Editors Mapped']),
-        self.audit_roles['Program Managers Mapped']: defaultdict(
-            lambda: self.audit_roles['Program Managers Mapped']),
-    }
     all_acls = all_models.AccessControlList.query.filter().all()
     acl_map = {(acl.object_id, acl.object_type, acl.person): [
                aacl.ac_role.name for aacl in all_acls]
@@ -243,8 +209,6 @@ class TestAuditRoleProgation(TestCase):
       ]:
         key = (obj.id, obj.type, acl.person)
         self.assertIn(key, acl_map)
-        self.assertIn(roles_type_map[acl.ac_role][obj.type].name,
-                      acl_map[key])
 
   def test_acl_propagation_on_unmap(self):
     """Test if acls are deleted correctly when the object is unmapped"""
@@ -266,7 +230,4 @@ class TestAuditRoleProgation(TestCase):
                    ((self.objects['issue_comment'].id, "Comment"),
                     (self.objects['issue_document'].id, "Document")))
     ).count()
-    # NOTE: The result should actually be 2 here, but because the Admin role
-    # does not propagate permissions to comment/document it's those permission
-    # are missing.
-    self.assertEqual(acl_count, 0)
+    self.assertEqual(acl_count, 2)

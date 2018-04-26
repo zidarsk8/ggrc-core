@@ -8,7 +8,7 @@ set -o errexit
 PROJECT="selenium"
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 cd "${SCRIPTPATH}/../.."
-source bin/jenkins/functions.sh
+source bin/containers_functions.sh
 
 PROJECT=$( project_name "$@" -d "$PROJECT" )
 
@@ -17,6 +17,8 @@ PROJECT=$( project_name "$@" -d "$PROJECT" )
 teardown $PROJECT
 
 setup $PROJECT selenium
+
+setup_for_selenium $PROJECT
 
 selenium_tests $PROJECT && rc=$? || rc=$?
 

@@ -135,14 +135,14 @@ describe('GGRC Utils Query API', function () {
       var flattenOps = function (expression) {
         if (expression && expression.op) {
           return [expression.op.name].concat(flattenOps(expression.left))
-                                     .concat(flattenOps(expression.right));
+            .concat(flattenOps(expression.right));
         }
         return [];
       };
 
       let checkOps = function (expression, expectedOps) {
         return _.isEqual(flattenOps(expression).sort(),
-                         expectedOps.sort());
+          expectedOps.sort());
       };
 
       it('returns empty expression for no filtering parameters', function () {
@@ -153,66 +153,66 @@ describe('GGRC Utils Query API', function () {
       });
 
       it('returns correct filters for just text filter',
-         function () {
-           result = method(requestedType, pageWithFilter, undefined,
-                           undefined)[0];
+        function () {
+          result = method(requestedType, pageWithFilter, undefined,
+            undefined)[0];
 
-           expect(checkOps(result.filters.expression, ['='])).toBe(true);
-         });
+          expect(checkOps(result.filters.expression, ['='])).toBe(true);
+        });
 
       it('returns correct filters for just relevant object',
-         function () {
-           result = method(requestedType, pageNoFilter, relevant,
-                           undefined)[0];
+        function () {
+          result = method(requestedType, pageNoFilter, relevant,
+            undefined)[0];
 
-           expect(checkOps(result.filters.expression, ['relevant'])).toBe(true);
-         });
+          expect(checkOps(result.filters.expression, ['relevant'])).toBe(true);
+        });
 
       it('returns correct filters for just additionalFilter',
-         function () {
-           result = method(requestedType, pageNoFilter, undefined,
-                           additionalFilter)[0];
+        function () {
+          result = method(requestedType, pageNoFilter, undefined,
+            additionalFilter)[0];
 
-           expect(checkOps(result.filters.expression, ['~'])).toBe(true);
-         });
+          expect(checkOps(result.filters.expression, ['~'])).toBe(true);
+        });
 
       it('returns correct filters for just text filter and relevant object',
-         function () {
-           result = method(requestedType, pageWithFilter, relevant,
-                           undefined)[0];
+        function () {
+          result = method(requestedType, pageWithFilter, relevant,
+            undefined)[0];
 
-           expect(checkOps(result.filters.expression,
-                           ['=', 'AND', 'relevant'])).toBe(true);
-         });
+          expect(checkOps(result.filters.expression,
+            ['=', 'AND', 'relevant'])).toBe(true);
+        });
 
       it('returns correct filters for just text filter and additionalFilter',
-         function () {
-           result = method(requestedType, pageWithFilter, undefined,
-                           additionalFilter)[0];
+        function () {
+          result = method(requestedType, pageWithFilter, undefined,
+            additionalFilter)[0];
 
-           expect(checkOps(result.filters.expression,
-                           ['=', 'AND', '~'])).toBe(true);
-         });
+          expect(checkOps(result.filters.expression,
+            ['=', 'AND', '~'])).toBe(true);
+        });
 
       it('returns correct filters for just relevant object and ' +
          'additionalFilter',
-         function () {
-           result = method(requestedType, pageNoFilter, relevant,
-                           additionalFilter)[0];
+      function () {
+        result = method(requestedType, pageNoFilter, relevant,
+          additionalFilter)[0];
 
-           expect(checkOps(result.filters.expression,
-                           ['relevant', 'AND', '~'])).toBe(true);
-         });
+        expect(checkOps(result.filters.expression,
+          ['relevant', 'AND', '~'])).toBe(true);
+      });
 
       it('returns correct filters for text filter, relevant object and ' +
          'additionalFilter',
-         function () {
-           result = method(requestedType, pageWithFilter, relevant,
-                           additionalFilter)[0];
+      function () {
+        result = method(requestedType, pageWithFilter, relevant,
+          additionalFilter)[0];
 
-           expect(checkOps(result.filters.expression,
-                           ['=', 'AND', 'relevant', 'AND', '~'])).toBe(true);
-         });
+        expect(checkOps(result.filters.expression,
+          ['=', 'AND', 'relevant', 'AND', '~'])).toBe(true);
+      });
     });
   });
 
@@ -235,9 +235,9 @@ describe('GGRC Utils Query API', function () {
           batchRequests(2),
           batchRequests(3),
           batchRequests(4)).then(function () {
-            expect(can.ajax.calls.count()).toEqual(1);
-            done();
-          });
+          expect(can.ajax.calls.count()).toEqual(1);
+          done();
+        });
       });
 
     it('does several ajax calls for delays cals', function (done) {

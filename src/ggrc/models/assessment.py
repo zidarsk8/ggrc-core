@@ -31,7 +31,6 @@ from ggrc.models.mixins import statusable
 from ggrc.models.mixins import labeled
 from ggrc.models.mixins.assignable import Assignable
 from ggrc.models.mixins.autostatuschangeable import AutoStatusChangeable
-from ggrc.models.mixins.validate_on_complete import ValidateOnComplete
 from ggrc.models.mixins.with_action import WithAction
 from ggrc.models.mixins.with_similarity_score import WithSimilarityScore
 from ggrc.models.deferred import deferred
@@ -48,7 +47,7 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
                  CustomAttributable, PublicDocumentable, Commentable,
                  Personable, reminderable.Reminderable, Relatable,
                  LastDeprecatedTimeboxed, WithSimilarityScore, FinishedDate,
-                 VerifiedDate, ValidateOnComplete, Notifiable, WithAction,
+                 VerifiedDate, Notifiable, WithAction,
                  labeled.Labeled, with_last_comment.WithLastComment,
                  issuetracker_issue.IssueTracked, BusinessObject,
                  Indexed, db.Model):

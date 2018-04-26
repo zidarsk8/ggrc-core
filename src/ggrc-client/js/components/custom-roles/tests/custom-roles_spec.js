@@ -5,6 +5,7 @@
 
 import Component from '../custom-roles';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import DeferredTransaction from '../../../plugins/utils/deferred-transaction-utils';
 
 describe('custom-roles component', () => {
   let vm;
@@ -91,6 +92,45 @@ describe('custom-roles component', () => {
       it('sets null to updatableGroupId attribute', () => {
         vm.save(args);
         expect(vm.attr('updatableGroupId')).toBe(null);
+      });
+    });
+
+    describe('if deferredSave is defined', () => {
+      let instanceSave;
+
+      beforeEach(() => {
+        instanceSave = can.Deferred();
+        vm.attr('instance', {
+          save: () => instanceSave,
+        });
+        vm.attr('deferredSave', new DeferredTransaction((resolve, reject) => {
+          vm.attr('instance').save().done(resolve).fail(reject);
+        }, 0));
+        spyOn(vm, 'filterACL');
+      });
+
+      it('pushes callback into deferredSave which sets updatableGroupId',
+        (done) => {
+          let pushSpy = spyOn(vm.attr('deferredSave'), 'push')
+            .and.returnValue(instanceSave);
+          args.groupId = 711;
+
+          vm.save(args);
+          pushSpy.calls.allArgs()[0][0]();
+          expect(vm.attr('updatableGroupId')).toBe(args.groupId);
+          done();
+        });
+
+      it('calls filterACL after save', (done) => {
+        spyOn(vm.attr('deferredSave'), 'push')
+          .and.returnValue(instanceSave.resolve());
+
+        vm.save(args);
+
+        instanceSave.then(() => {
+          expect(vm.filterACL).toHaveBeenCalled();
+          done();
+        });
       });
     });
   });

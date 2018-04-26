@@ -16,27 +16,29 @@
         <h6>Code</h6>
         <span>{{itemData.slug}}</span>
     </div>
-    <div class="mapped-object-info__item">
+    <div class="width-100">
         <related-people-access-control
-            {include-roles}="adminRole"
+            {include-roles}="visibleRoles"
             {instance}="instance">
             <div class="people-groups">
                 {{#groups}}
-                    <related-people-access-control-group
-                        {group-id}="groupId"
-                        {title}="title"
-                        {people}="people"
-                        {instance}="instance"
-                        class="people-group">
-                            <deletable-people-group
-                                {can-unmap}="deletableAdmin"
-                                {is-loading}="isUpdating"
-                                {group-id}="groupId"
-                                {instance}="instance"
-                                {people}="people">
-                                    <h6>Admin</h6>
-                            </deletable-people-group>
-                    </related-people-access-control-group>
+                    <div class="mapped-object-info__item">
+                        <related-people-access-control-group
+                            {group-id}="groupId"
+                            {title}="title"
+                            {people}="people"
+                            {instance}="instance"
+                            class="people-group">
+                                <deletable-people-group
+                                    {can-unmap}="deletableAdmin"
+                                    {is-loading}="isUpdating"
+                                    {group-id}="groupId"
+                                    {instance}="instance"
+                                    {people}="people">
+                                    <h6>{{title}}</h6>
+                                </deletable-people-group>
+                        </related-people-access-control-group>
+                    </div>
                 {{/groups}}
             </div>
         </related-people-access-control>

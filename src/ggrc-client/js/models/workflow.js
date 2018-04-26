@@ -6,24 +6,24 @@
 
 (function(can) {
 
-  can.Model.Cacheable("CMS.Models.Workflow", {
-    root_object: "workflow",
-    root_collection: "workflows",
-    category: "workflow",
+  can.Model.Cacheable('CMS.Models.Workflow', {
+    root_object: 'workflow',
+    root_collection: 'workflows',
+    category: 'workflow',
     mixins: ['ca_update', 'timeboxed', 'accessControlList'],
-    findAll: "GET /api/workflows",
-    findOne: "GET /api/workflows/{id}",
-    create: "POST /api/workflows",
-    update: "PUT /api/workflows/{id}",
-    destroy: "DELETE /api/workflows/{id}",
+    findAll: 'GET /api/workflows',
+    findOne: 'GET /api/workflows/{id}',
+    create: 'POST /api/workflows',
+    update: 'PUT /api/workflows/{id}',
+    destroy: 'DELETE /api/workflows/{id}',
     is_custom_attributable: true,
 
     attributes: {
-      task_groups: "CMS.Models.TaskGroup.stubs",
-      cycles: "CMS.Models.Cycle.stubs",
+      task_groups: 'CMS.Models.TaskGroup.stubs',
+      cycles: 'CMS.Models.Cycle.stubs',
       //workflow_task_groups: "CMS.Models.WorkflowTaskGroup.stubs"
-      modified_by: "CMS.Models.Person.stub",
-      context: "CMS.Models.Context.stub",
+      modified_by: 'CMS.Models.Person.stub',
+      context: 'CMS.Models.Context.stub',
       repeat_every: 'number',
       default_lhn_filters: {
         Workflow: {status: 'Active'},
@@ -56,7 +56,7 @@
 
     init: function() {
       this._super && this._super.apply(this, arguments);
-      this.validateNonBlank("title");
+      this.validateNonBlank('title');
     },
   }, {
     /**

@@ -68,10 +68,10 @@ import RefreshQueue from './refresh_queue';
 
       if (objectId && objectType && typeof objectType === 'string') {
         this.attr(attr, CMS.Models.get_instance(
-              objectType
-            , objectId
-            , this[attr]
-            ) || this[attr]);
+          objectType
+          , objectId
+          , this[attr]
+        ) || this[attr]);
       } else if (objectId) {
         this.attr(attr, CMS.Models.get_instance(this[attr]));
       }
@@ -82,10 +82,10 @@ import RefreshQueue from './refresh_queue';
 
       if (objectId) {
         this.attr(
-            attr,
-            CMS.Models.get_instance(
-              modelName, objectId, this[attr]
-            ).stub() || this[attr]
+          attr,
+          CMS.Models.get_instance(
+            modelName, objectId, this[attr]
+          ).stub() || this[attr]
         );
       }
     },
@@ -210,8 +210,8 @@ import RefreshQueue from './refresh_queue';
             (this.source.constructor &&
               this.source.constructor.shortName ||
               (!this.source.selfLink && this.source.type))),
-          this.source_id || (this.source && this.source.id),
-          this.source) || this.source);
+        this.source_id || (this.source && this.source.id),
+        this.source) || this.source);
       this.attr('destination', CMS.Models.get_instance(
         this.destination_type ||
           (this.destination &&
@@ -227,9 +227,9 @@ import RefreshQueue from './refresh_queue';
         url: '/api/relationships/' + this.attr('id') +
           '?cascade=' + cascade,
       })
-      .done(function () {
-        can.trigger(this.constructor, 'destroyed', this);
-      }.bind(this));
+        .done(function () {
+          can.trigger(this.constructor, 'destroyed', this);
+        }.bind(this));
     },
   });
 

@@ -21,6 +21,27 @@ class TestAssessmentBase(ggrc.TestCase):
         if role_name in ["Assignees", "Creators", "Verifiers"]
     }
 
+  def assert_propagated_role(self, base_role_name, person_email, mapped_obj):
+    """Check that a person has a role that is propagated from base role.
+
+    Args:
+      base_role_name: role name of the base ACL that should be propagated to
+        the current object.
+      person_email: email of the person that should be propagated.
+      mapped_obj: object which should contain a child ACL entry.
+    """
+    query = all_models.AccessControlList.query.join(
+        all_models.AccessControlRole,
+    ).join(
+        all_models.Person,
+    ).filter(
+        all_models.AccessControlList.object_id == mapped_obj.id,
+        all_models.AccessControlList.object_type == mapped_obj.type,
+        all_models.Person.email == person_email,
+        all_models.AccessControlRole.name.like("{}*%".format(base_role_name)),
+    )
+    self.assertNotEqual(query.count(), 0)
+
   def assert_mapped_role(self, role, person_email, mapped_obj):
     """Check if required role was created for mapped object"""
     query = all_models.AccessControlList.query.join(

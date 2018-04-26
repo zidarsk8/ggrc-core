@@ -335,12 +335,12 @@ describe('GGRC.Components.revisionsComparer', function () {
         let index = 0;
         spyOn(caUtils, 'prepareCustomAttributes').and
           .callFake((defs, values) => {
-          if (index === 0) {
-            index++;
-            return ca0s;
-          }
-          return ca1s;
-        });
+            if (index === 0) {
+              index++;
+              return ca0s;
+            }
+            return ca1s;
+          });
 
         $target = $(`<div>
                     <section class="info">
@@ -419,12 +419,12 @@ describe('GGRC.Components.revisionsComparer', function () {
         let index = 0;
         spyOn(caUtils, 'prepareCustomAttributes').and
           .callFake((defs, values) => {
-          if (index === 0) {
-            index++;
-            return ca0s;
-          }
-          return ca1s;
-        });
+            if (index === 0) {
+              index++;
+              return ca0s;
+            }
+            return ca1s;
+          });
 
         $target = $(`<div>
                     <section class="info">
@@ -499,12 +499,12 @@ describe('GGRC.Components.revisionsComparer', function () {
         let index = 0;
         spyOn(caUtils, 'prepareCustomAttributes').and
           .callFake((defs, values) => {
-          if (index === 0) {
-            index++;
-            return ca0s;
-          }
-          return ca1s;
-        });
+            if (index === 0) {
+              index++;
+              return ca0s;
+            }
+            return ca1s;
+          });
 
         $target = $(`<div>
                     <section class="info">
@@ -581,12 +581,12 @@ describe('GGRC.Components.revisionsComparer', function () {
         let index = 0;
         spyOn(caUtils, 'prepareCustomAttributes').and
           .callFake((defs, values) => {
-          if (index === 0) {
-            index++;
-            return ca0s;
-          }
-          return ca1s;
-        });
+            if (index === 0) {
+              index++;
+              return ca0s;
+            }
+            return ca1s;
+          });
 
         $target = $(`<div>
                     <section class="info">
@@ -635,6 +635,61 @@ describe('GGRC.Components.revisionsComparer', function () {
         method($target, revisions);
         expect(viewModel.equalizeHeights.calls.count()).toEqual(2);
       });
+    });
+  });
+
+  describe('"highlightCustomRoles" method', () => {
+    const highlightSelector = '.diff-highlighted';
+    const blockSelector = 'object-list';
+
+    describe('compareRoleBlocks() method', () => {
+      let $blockEmpty;
+      let $blockNotEmpty;
+      let $target;
+      let $rolesPanes;
+
+      beforeEach(() => {
+        $blockEmpty = $(`<div>
+                          <related-people-access-control-group>
+                              <object-list>
+                                <div class="object-list__item-empty">
+                                  None
+                                </div>
+                              </object-list>
+                          </related-people-access-control-group>
+                        </div>`);
+        $blockNotEmpty = $(`<div>
+                            <related-people-access-control-group>
+                              <object-list>
+                                  <person-list-item>
+                                  </person-list-item>
+                              </object-list>
+                            </related-people-access-control-group>
+                          </div>`);
+        $target = {find: () => {}};
+      });
+
+      it(`highlights blocks of grants if list of people was empty
+        in the old revision`, () => {
+          $rolesPanes = $blockEmpty.add($blockNotEmpty);
+          spyOn($target, 'find').and.returnValue($rolesPanes);
+
+          viewModel.highlightCustomRoles($target);
+
+          expect($rolesPanes.find(`${blockSelector}${highlightSelector}`)
+            .length).toEqual(2);
+        });
+
+      it(`highlights blocks of grants if list of people is empty
+        in the new revision`, () => {
+          $rolesPanes = $blockNotEmpty.add($blockEmpty);
+          spyOn($target, 'find').and.returnValue($rolesPanes);
+
+          viewModel.highlightCustomRoles($target);
+
+          expect($rolesPanes.find(`${blockSelector}${highlightSelector}`)
+            .length).toEqual(2);
+        });
     });
   });
 });

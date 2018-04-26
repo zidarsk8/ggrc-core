@@ -486,35 +486,35 @@ describe('GGRC Utils CurrentPage', function () {
               },
             },
           },
-        Assessment: {
-          widgetType: 'treeview',
-          content_controller_options: {
-            model: {
-              shortName: 'Assessment',
+          Assessment: {
+            widgetType: 'treeview',
+            content_controller_options: {
+              model: {
+                shortName: 'Assessment',
+              },
             },
           },
-        },
-        Audit: {
-          widgetType: 'treeview',
-          content_controller_options: {
-            model: {
-              shortName: 'Audit',
+          Audit: {
+            widgetType: 'treeview',
+            content_controller_options: {
+              model: {
+                shortName: 'Audit',
+              },
             },
           },
-        },
-      };
+        };
 
       spyOn(GGRC.WidgetList, 'get_widget_list_for')
         .and.returnValue(widgets);
 
       spyOn(can, 'ajax')
         .and.returnValues(
-        can.Deferred().resolve(
-          [
-            {Program: {count: 0, total: 0}, selfLink: null},
-            {Assessment: {count: 0, total: 0}, selfLink: null},
-            {Audit: {count: 3, total: 4}, selfLink: null},
-          ]));
+          can.Deferred().resolve(
+            [
+              {Program: {count: 0, total: 0}, selfLink: null},
+              {Assessment: {count: 0, total: 0}, selfLink: null},
+              {Audit: {count: 3, total: 4}, selfLink: null},
+            ]));
     });
 
     it('should reinit counts', function (done) {
@@ -526,9 +526,9 @@ describe('GGRC Utils CurrentPage', function () {
           expect(can.ajax.calls.count()).toEqual(1);
           reqParams = JSON.parse(can.ajax.calls.argsFor(0)[0].data);
           reqParamNames = _.map(reqParams,
-          function (param) {
-            return param.object_name;
-          });
+            function (param) {
+              return param.object_name;
+            });
           expect(reqParams.length).toEqual(3);
           expect(reqParamNames).toContain('Program');
           expect(reqParamNames).toContain('Assessment');

@@ -190,6 +190,7 @@
                         {instance}="instance"
                         {deferred-save}="deferredSave"
                         {evidence-amount}="evidences.length"
+                        {urls-amount}="urls.length"
                         {fields}="formFields"
                         {edit-mode}="editMode"
                         {^saving}="formState.saving"
@@ -521,26 +522,30 @@
                     </div>
                 </div>
                 {{#if instance.can_use_issue_tracker}}
-                    <div class="expanded-area">
-                        <div class="info-expand">
-                            <a class="show-hidden-fields info-show-hide active" href="javascript://">
-                                <span class="out">
-                                    <i class="fa fa-caret-right"></i>
-                                    SHOW
-                                </span>
-                                <span class="in">
-                                    <i class="fa fa-caret-down"></i>
-                                    HIDE
-                                </span>
-                                TICKET TRACKER INFO
-                            </a>
-                        </div>
-                        <div class="hidden-fields-area">
-                            <info-pane-issue-tracker-fields {instance}="instance">
-                            </info-pane-issue-tracker-fields>
-                        </div>
+                  <div class="ggrc-form-item">
+                    <div class="ggrc-form-item__row">
+                      <div class="expanded-area">
+                          <div class="info-expand">
+                              <a class="show-hidden-fields info-show-hide active" href="javascript://">
+                                  <span class="out">
+                                      <i class="fa fa-caret-right"></i>
+                                      SHOW
+                                  </span>
+                                  <span class="in">
+                                      <i class="fa fa-caret-down"></i>
+                                      HIDE
+                                  </span>
+                                  TICKET TRACKER INFO
+                              </a>
+                          </div>
+                          <div class="hidden-fields-area">
+                              <info-pane-issue-tracker-fields {instance}="instance">
+                              </info-pane-issue-tracker-fields>
+                          </div>
+                      </div>
                     </div>
-                {{/if }}
+                  </div>
+                {{/if}}
             </div>
             </div>
           </tab-panel>

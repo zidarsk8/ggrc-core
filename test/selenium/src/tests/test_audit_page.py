@@ -8,7 +8,7 @@
 
 import pytest
 
-from lib import base
+from lib import base, environment
 from lib.constants import value_aliases as aliases
 from lib.constants.element import ObjectStates, AuditStates, objects
 from lib.entities import entities_factory
@@ -324,7 +324,7 @@ class TestAuditPage(base.Test):
         *Representation.tree_view_attrs_to_exclude)
 
   @pytest.mark.smoke_tests
-  def test_dashboard_gca(self, new_control_rest, selenium, dev_url):
+  def test_dashboard_gca(self, new_control_rest, selenium):
     # pylint: disable=anomalous-backslash-in-string
     """Check Dashboard Tab is exist if 'Dashboard' GCA filled
     with right value. Possible values match to regexp r"^https?://[^\s]+$".
@@ -336,7 +336,8 @@ class TestAuditPage(base.Test):
       - Check only GCAs filled with right values displayed on the tab.
     """
     urls = ["https://gmail.by/", "https://www.google.com/",
-            dev_url, StringMethods.random_string(), "ftp://something.com/"]
+            environment.app_url, StringMethods.random_string(),
+            "ftp://something.com/"]
     cads_rest_service = rest_service.CustomAttributeDefinitionsService()
     gca_defs = (cads_rest_service.create_dashboard_gcas(
         new_control_rest.type, count=len(urls)))

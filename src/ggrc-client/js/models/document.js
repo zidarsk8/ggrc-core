@@ -42,10 +42,10 @@ import {getRole} from '../plugins/utils/acl-utils';
           response($.map(data, function (item) {
             return can.extend({}, item.document, {
               label: item.document.title ?
-                     item.document.title + (
-                        item.document.link_url ?
-                        ' (' + item.document.link_url + ')' : '') :
-                     item.document.link_url,
+                item.document.title + (
+                  item.document.link_url ?
+                    ' (' + item.document.link_url + ')' : '') :
+                item.document.link_url,
               value: item.document.id,
             });
           }));

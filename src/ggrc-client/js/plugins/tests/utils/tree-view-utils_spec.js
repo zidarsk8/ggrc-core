@@ -116,17 +116,17 @@ describe('TreeViewUtils module', function () {
     });
 
     it('gets selected models from model\'s default_filter when available',
-    function () {
-      let result;
+      function () {
+        let result;
 
-      CMS.Models.CycleTaskGroupObjectTask
-        .sub_tree_view_options.default_filter = ['Audit'];
+        CMS.Models.CycleTaskGroupObjectTask
+          .sub_tree_view_options.default_filter = ['Audit'];
 
-      result = module.getModelsForSubTier('CycleTaskGroupObjectTask');
-      expect(result.available.length).toEqual(2);
-      expect(result.selected.length).toEqual(1);
-      expect(result.selected[0]).toEqual('Audit');
-    });
+        result = module.getModelsForSubTier('CycleTaskGroupObjectTask');
+        expect(result.available.length).toEqual(2);
+        expect(result.selected.length).toEqual(1);
+        expect(result.selected[0]).toEqual('Audit');
+      });
 
     it('returns all available models as selected when ' +
       'model\'s default_filter is not available', function () {

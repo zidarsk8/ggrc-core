@@ -43,26 +43,26 @@ describe('GGRC.Components.advancedSearchMappingContainer', function () {
 
   describe('createGroup() method', function () {
     it('transforms criteria to group with 2 criteria and operator inside',
-    function () {
-      let viewItems;
-      viewModel.attr('items', new can.List([
-        AdvancedSearch.create.mappingCriteria({field: 'first'}),
-        AdvancedSearch.create.operator(),
-        AdvancedSearch.create.mappingCriteria({field: 'second'}),
-      ]));
-      viewItems = viewModel.attr('items');
+      function () {
+        let viewItems;
+        viewModel.attr('items', new can.List([
+          AdvancedSearch.create.mappingCriteria({field: 'first'}),
+          AdvancedSearch.create.operator(),
+          AdvancedSearch.create.mappingCriteria({field: 'second'}),
+        ]));
+        viewItems = viewModel.attr('items');
 
-      viewModel.createGroup(viewItems[0]);
+        viewModel.createGroup(viewItems[0]);
 
-      expect(viewItems.length).toBe(3);
-      expect(viewItems[0].type).toBe('group');
-      expect(viewItems[1].type).toBe('operator');
-      expect(viewItems[2].type).toBe('mappingCriteria');
-      expect(viewItems[0].value.length).toBe(3);
-      expect(viewItems[0].value[0].type).toBe('mappingCriteria');
-      expect(viewItems[0].value[0].value.field).toBe('first');
-      expect(viewItems[0].value[1].type).toBe('operator');
-      expect(viewItems[0].value[2].type).toBe('mappingCriteria');
-    });
+        expect(viewItems.length).toBe(3);
+        expect(viewItems[0].type).toBe('group');
+        expect(viewItems[1].type).toBe('operator');
+        expect(viewItems[2].type).toBe('mappingCriteria');
+        expect(viewItems[0].value.length).toBe(3);
+        expect(viewItems[0].value[0].type).toBe('mappingCriteria');
+        expect(viewItems[0].value[0].value.field).toBe('first');
+        expect(viewItems[0].value[1].type).toBe('operator');
+        expect(viewItems[0].value[2].type).toBe('mappingCriteria');
+      });
   });
 });

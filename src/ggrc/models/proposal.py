@@ -8,6 +8,7 @@ import sqlalchemy as sa
 from ggrc import db
 from ggrc.models import mixins
 from ggrc.models import reflection
+from ggrc.models import relationship
 from ggrc.models import types
 from ggrc.models import utils
 from ggrc.fulltext import mixin as ft_mixin
@@ -56,6 +57,7 @@ class Proposal(mixins.person_relation_factory("applied_by"),
                comment.CommentInitiator,
                mixins.Stateful,
                roleable.Roleable,
+               relationship.Relatable,
                mixins.Base,
                ft_mixin.Indexed,
                db.Model):

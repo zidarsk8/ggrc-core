@@ -6,7 +6,8 @@
 
 from logging import getLogger
 from sqlalchemy import orm
-from sqlalchemy.ext.associationproxy import association_proxy
+import sqlalchemy as sa
+from sqlalchemy.ext import hybrid
 from werkzeug.exceptions import BadRequest
 
 from ggrc import builder
@@ -20,6 +21,7 @@ from ggrc.models import reflection
 from ggrc.models import relationship
 from ggrc.models import types
 from ggrc_workflows.models.cycle import Cycle
+from ggrc_workflows.models.workflow import Workflow
 from ggrc_workflows.models.cycle_task_group import CycleTaskGroup
 from ggrc_workflows.models import mixins as wf_mixins
 
@@ -122,8 +124,19 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
   finished_date = db.Column(db.DateTime)
   verified_date = db.Column(db.DateTime)
 
-  object_approval = association_proxy('cycle', 'workflow.object_approval')
-  object_approval.publish_raw = True
+  @hybrid.hybrid_property
+  def object_approval(self):
+    return self.cycle.workflow.object_approval
+
+  @object_approval.expression
+  def object_approval(cls):  # pylint: disable=no-self-argument
+    return sa.select([
+        Workflow.object_approval,
+    ]).where(
+        sa.and_((Cycle.id == cls.cycle_id), (Cycle.workflow_id == Workflow.id))
+    ).label(
+        'object_approval'
+    )
 
   @builder.simple_property
   def folder(self):

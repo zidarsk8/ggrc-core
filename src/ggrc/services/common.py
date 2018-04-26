@@ -32,7 +32,7 @@ import ggrc.models
 from ggrc import db
 from ggrc import gdrive
 from ggrc import utils
-from ggrc.utils import as_json, benchmark
+from ggrc.utils import as_json, benchmark, dump_attrs
 from ggrc.utils.log_event import log_event
 from ggrc.fulltext import get_indexer
 from ggrc.login import get_current_user_id, get_current_user
@@ -48,8 +48,6 @@ from ggrc.cache import utils as cache_utils
 
 
 # pylint: disable=invalid-name
-from ggrc.utils import dump_attrs
-
 logger = getLogger(__name__)
 
 
@@ -955,7 +953,6 @@ class Resource(ModelView):
       res: List that will get responses appended to it.
       no_result: Flag for suppressing results.
     """
-
     with benchmark("Generate objects"):
       objects = []
       sources = []

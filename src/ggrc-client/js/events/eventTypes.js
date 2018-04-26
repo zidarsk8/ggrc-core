@@ -16,17 +16,6 @@ const REFRESH_RELATED = {
 
 /**
  *
- * @event saveCustomRole
- * @type {object}
- * @property {string} type - Event name.
- * @property {string} groupId - Role ID.
- */
-const SAVE_CUSTOM_ROLE = {
-  type: 'saveCustomRole',
-};
-
-/**
- *
  * @event rolesConflict
  * @type {object}
  * @property {string} type - Event name.
@@ -159,7 +148,6 @@ const REFRESH_SUB_TREE = {
 export {
   REFRESH_SUB_TREE,
   REFRESH_RELATED,
-  SAVE_CUSTOM_ROLE,
   ROLES_CONFLICT,
   SWITCH_TO_ERROR_PANEL,
   SHOW_INVALID_FIELD,

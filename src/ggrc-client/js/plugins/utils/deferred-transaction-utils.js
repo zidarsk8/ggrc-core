@@ -7,9 +7,8 @@
  * The util allows to perform batch of actions with some delay in a single transaction.
  * @param {function} completeTransaction - The function that allows to submit result of transaction.
  * @param {number} timeout - The execution delay in milliseconds.
- * @param {boolean} sequentially - The flag indicates that transactions must be completed sequentially.
  */
-export default function (completeTransaction, timeout, sequentially) {
+export default function (completeTransaction, timeout) {
   let deferredQueue = [];
   let timeoutId = null;
 
@@ -24,16 +23,16 @@ export default function (completeTransaction, timeout, sequentially) {
     });
   }
 
-  function resolveBatch(batch, batchDfd, result) {
+  function resolveBatch(batch, batchDfd, ...result) {
     can.each(batch, function (actionItem) {
-      actionItem.deferred.resolve(result);
+      actionItem.deferred.resolve(...result);
     });
     batchDfd.resolve();
   }
 
-  function rejectBatch(batch, batchDfd, result) {
+  function rejectBatch(batch, batchDfd, ...result) {
     can.each(batch, function (actionItem) {
-      actionItem.deferred.reject(result);
+      actionItem.deferred.reject(...result);
     });
     batchDfd.resolve();
   }
@@ -50,12 +49,7 @@ export default function (completeTransaction, timeout, sequentially) {
     return batchDfd.promise();
   }
 
-  function run() {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(processQueue, timeout);
-  }
-
-  function runSequence() {
+  function runSequence(timeout) {
     if (sequence.transactionDfd.state() !== 'pending') {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(processSequentially, timeout);
@@ -89,11 +83,24 @@ export default function (completeTransaction, timeout, sequentially) {
       action: action,
     });
 
-    if (sequentially) {
-      runSequence();
-    } else {
-      run();
-    }
+    runSequence(timeout);
+
+    return dfd.promise();
+  };
+
+  /**
+   * Adds new action to execution queue and execute all queue without delay.
+   * @param {function} action - The action that should be executed.
+   * @return {object} - The canJS promise indicates result of the transaction.
+   */
+  this.execute = function (action) {
+    let dfd = can.Deferred();
+    deferredQueue.push({
+      deferred: dfd,
+      action: action,
+    });
+
+    runSequence(0);
 
     return dfd.promise();
   };

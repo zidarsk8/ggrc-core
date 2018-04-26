@@ -13,13 +13,95 @@ describe('GGRC.relatedPeopleAccessControl', function () {
     viewModel = new (can.Map.extend(Component.prototype.viewModel));
   });
 
+  describe('"updateRoles" method', () => {
+    let args;
+
+    beforeEach(() => {
+      args = {};
+      spyOn(viewModel, 'performUpdate');
+      spyOn(viewModel, 'dispatch');
+    });
+
+    it('calls "performUpdate" method', () => {
+      viewModel.updateRoles(args);
+
+      expect(viewModel.performUpdate).toHaveBeenCalledWith(args);
+    });
+
+    it('dispatches "saveCustomRole" event with groupId', () => {
+      args.roleId = 711;
+      viewModel.updateRoles(args);
+
+      expect(viewModel.dispatch).toHaveBeenCalledWith({
+        type: 'saveCustomRole',
+        groupId: args.roleId,
+      });
+    });
+
+    it('pushes action into deferredSave if it is defined', () => {
+      viewModel.attr('deferredSave', {
+        push: jasmine.createSpy(),
+      });
+
+      viewModel.updateRoles(args);
+      expect(viewModel.performUpdate.calls.count()).toBe(1);
+
+      viewModel.attr('deferredSave').push.calls.allArgs()[0][0]();
+      expect(viewModel.performUpdate.calls.count()).toBe(2);
+    });
+  });
+
+  describe('"performUpdate" method', () => {
+    beforeEach(() => {
+      spyOn(viewModel, 'updateAccessControlList');
+      spyOn(viewModel, 'checkConflicts');
+    });
+
+    it('calls "updateAccessControlList" method', () => {
+      const args = {
+        people: 'mockPeople',
+        roleId: 'mockRoleId',
+      };
+
+      viewModel.performUpdate(args);
+
+      expect(viewModel.updateAccessControlList)
+        .toHaveBeenCalledWith(args.people, args.roleId);
+    });
+
+    it('calls "checkConflicts" method if conflictRoles is not empty', () => {
+      const args = {
+        roleTitle: 'mockRoleTitle',
+      };
+      viewModel.attr('conflictRoles', [1, 2]);
+
+      viewModel.performUpdate(args);
+
+      expect(viewModel.checkConflicts).toHaveBeenCalledWith(args.roleTitle);
+    });
+
+    it('does not call "checkConflicts" method if conflictRoles is empty',
+      () => {
+        viewModel.attr('conflictRoles', []);
+
+        viewModel.performUpdate({});
+
+        expect(viewModel.checkConflicts).not.toHaveBeenCalled();
+      });
+  });
+
   beforeEach(() => {
     spyOn(aclUtils, 'getRolesForType').and.returnValue([
-      {id: 1, name: 'Admin', object_type: 'Control'},
-      {id: 3, name: 'Primary Contacts', object_type: 'Control'},
-      {id: 4, name: 'Secondary Contacts', object_type: 'Control'},
-      {id: 5, name: 'Principal Assignees', object_type: 'Control'},
-      {id: 6, name: 'Secondary Assignees', object_type: 'Control'},
+      {id: 1, name: 'Admin', mandatory: true,
+        object_type: 'Control'},
+      {id: 3, name: 'Primary Contacts', mandatory: false,
+        object_type: 'Control'},
+      {id: 4, name: 'Secondary Contacts', mandatory: true,
+        object_type: 'Control'},
+      {id: 5, name: 'Principal Assignees', mandatory: false,
+        object_type: 'Control'},
+      {id: 6, name: 'Secondary Assignees', mandatory: true,
+        object_type: 'Control'},
     ]);
   });
 
@@ -309,6 +391,181 @@ describe('GGRC.relatedPeopleAccessControl', function () {
       expect(result[0].title).toEqual('Creator');
       expect(result[1].title).toEqual('Assessor');
       expect(result[2].title).toEqual('Verifier');
+    });
+  });
+
+  describe('"updateAccessControlList" method', function () {
+    let instance;
+    let acl = [
+      {ac_role_id: 1, person: {id: 1, type: 'Person'}},
+      {ac_role_id: 1, person: {id: 2, type: 'Person'}},
+      {ac_role_id: 2, person: {id: 3, type: 'Person'}},
+      {ac_role_id: 3, person: {id: 4, type: 'Person'}},
+    ];
+
+    beforeAll(function () {
+      instance = new can.Map({
+        'class': {
+          model_singular: 'Control',
+        },
+      });
+    });
+
+    beforeEach(function () {
+      instance.attr('access_control_list', acl);
+      viewModel.attr('instance', instance);
+    });
+
+    it('add people w/o current role', () => {
+      const peopleList = [{id: 1}, {id: 2}];
+      viewModel.updateAccessControlList(peopleList, 1);
+
+      const result = instance.attr('access_control_list');
+      expect(result.length).toBe(acl.length);
+    });
+
+    it('update people w current role', () => {
+      const peopleList = [{id: 1}, {id: 2}];
+      viewModel.updateAccessControlList(peopleList, 2);
+
+      const result = instance.attr('access_control_list');
+      expect(result.length).toBe(acl.length + 1);
+    });
+
+    it('remove people w current role', () => {
+      viewModel.updateAccessControlList([], 3);
+
+      const result = instance.attr('access_control_list');
+      expect(result.length).toBe(acl.length - 1);
+    });
+  });
+
+  describe('"buildGroups" method', function () {
+    let roles = [
+      {id: 0, name: 'Role Name1', mandatory: false},
+      {id: 1, name: 'Role Name2', mandatory: true},
+    ];
+
+    let assignment = {
+      person: {id: 1},
+      person_email: 'example@email.com',
+      person_name: 'Person Name',
+      type: 'Person',
+    };
+
+    beforeEach(function () {
+      viewModel.attr('includeRoles', [roles[1].name]);
+    });
+
+    it('should not create group if role is not present in IncludeRoles list',
+      () => {
+        const result = viewModel.buildGroups(roles[0], [[], [assignment]]);
+        expect(result).not.toBeDefined();
+      });
+
+    it('should generate group w/ non empty people list if role is found in acl',
+      () => {
+        const result = viewModel.buildGroups(roles[1], [[], [assignment]]);
+        const group = {
+          title: roles[1].name,
+          groupId: roles[1].id,
+          people: [{
+            id: assignment.person.id,
+            email: assignment.person_email,
+            name: assignment.person_name,
+            type: assignment.type,
+          }],
+          required: roles[1].mandatory,
+        };
+        expect(result).toEqual(group);
+      }
+    );
+
+    it('should generate group w/ empty people list if role is not found in acl',
+      () => {
+        const result = viewModel.buildGroups(roles[1], [{person: {id: 4}}]);
+        const group = {
+          title: roles[1].name,
+          groupId: roles[1].id,
+          people: [],
+          required: roles[1].mandatory,
+        };
+        expect(result).toEqual(group);
+      }
+    );
+  });
+
+  describe('"getRoleList" method', function () {
+    let instance;
+    let acl = [
+      {ac_role_id: 1, person: {id: 1, type: 'Person'}},
+      {ac_role_id: 2, person: {id: 2, type: 'Person'}},
+      {ac_role_id: 3, person: {id: 3, type: 'Person'}},
+    ];
+
+    beforeAll(function () {
+      instance = new can.Map({
+        'class': {
+          model_singular: 'Control',
+        },
+      });
+    });
+
+    beforeEach(function () {
+      instance.attr('access_control_list', acl);
+      viewModel.attr('instance', instance);
+      viewModel.attr('includeRoles', []);
+      viewModel.attr('excludeRoles', []);
+    });
+
+    it('should return empty rolesInfo list if "instance" not defined', () => {
+      viewModel.attr('instance', undefined);
+      viewModel.getRoleList();
+      expect(viewModel.attr('rolesInfo').length).toBe(0);
+    });
+
+    it('should return groups build based on all roles ' +
+      'related to instance type', () => {
+      const groups = viewModel.getRoleList();
+      expect(groups.length).toBe(5);
+    });
+
+    it('should return groups build based on roles from IncludeRoles list',
+      () => {
+        let include = ['Admin', 'Secondary Contacts', 'Principal Assignees'];
+        viewModel.attr('includeRoles', include);
+
+        const groups = viewModel.getRoleList();
+        expect(groups.length).toBe(include.length);
+        groups.forEach((group) => {
+          expect(include).toContain(group.title);
+        });
+      });
+
+    it('should return all groups build based on roles except roles from ' +
+      'ExcludeRoles list', () => {
+      let exclude = ['Admin', 'Secondary Assignees', 'Principal Assignees'];
+      viewModel.attr('excludeRoles', exclude);
+
+      const groups = viewModel.getRoleList();
+      expect(groups.length).toBe(2);
+      expect(groups[0].title).toEqual('Secondary Contacts');
+      expect(groups[0].required).toBe(true);
+      expect(groups[1].title).toEqual('Primary Contacts');
+      expect(groups[1].required).toBe(false);
+    });
+
+    it('should return groups build based on roles from IncludeRoles ' +
+      'w/o roles from ExcludeRoles list', () => {
+      let include = ['Admin', 'Principal Assignees', 'Principal Assignees'];
+      let exclude = ['Admin', 'Primary Contacts', 'Secondary Contacts'];
+      viewModel.attr('includeRoles', include);
+      viewModel.attr('excludeRoles', exclude);
+
+      const groups = viewModel.getRoleList();
+      expect(groups.length).toBe(1);
+      expect(groups[0].title).toEqual('Principal Assignees');
+      expect(groups[0].required).toBe(false);
     });
   });
 });

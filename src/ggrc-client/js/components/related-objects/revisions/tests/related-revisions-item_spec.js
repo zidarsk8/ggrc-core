@@ -4,7 +4,6 @@
  */
 
 import Component from '../related-revisions-item';
-import * as HistoryUtils from '../../../../plugins/utils/object-history-utils';
 import {getComponentVM} from '../../../../../js_specs/spec_helpers';
 
 describe('RelatedRevisionsItem component', () => {
@@ -29,36 +28,6 @@ describe('RelatedRevisionsItem component', () => {
       viewModel.attr('revision.action', null);
 
       expect(viewModel.attr('isCreated')).toBe(false);
-    });
-  });
-
-  describe('instance value setter', () => {
-    beforeEach(() => {
-      spyOn(HistoryUtils, 'getInstanceView').and
-        .callFake((instance) =>
-          instance.view || `templates/${instance.type}.mustahce`
-        );
-    });
-
-    it('calls getInstanceView() method. instance has view', () => {
-      viewModel.attr('instance', {type: 'control', view: 'info.mustache'});
-      expect(HistoryUtils.getInstanceView).toHaveBeenCalled();
-      expect(viewModel.attr('instance.view')).toEqual('info.mustache');
-      expect(viewModel.attr('instance.type')).toEqual('control');
-    });
-
-    it('calls getInstanceView() method. instance does not have view', () => {
-      viewModel.attr('instance', {type: 'risk'});
-      expect(HistoryUtils.getInstanceView).toHaveBeenCalled();
-      expect(viewModel.attr('instance.view'))
-        .toEqual('templates/risk.mustahce');
-      expect(viewModel.attr('instance.type')).toEqual('risk');
-    });
-
-    it('do not call getInstanceView() method. instance is empty', () => {
-      viewModel.attr('instance', null);
-      expect(HistoryUtils.getInstanceView).not.toHaveBeenCalled();
-      expect(viewModel.attr('instance')).toBeUndefined();
     });
   });
 

@@ -123,34 +123,9 @@ def check_assessment(row_converter):
     row_converter.add_error(errors.ARCHIVED_IMPORT_ERROR)
 
 
-def check_assessment_status(row_converter):
-  """Verify Assessment status.
-
-  This function should make sure if an assessment can set-up new status.
-
-  Args:
-      row_converter: RowConverter object with row data for an assessment
-        import.
-  """
-  try:
-    row_converter.obj.validate_done_state(
-        row_converter.old_values.get("status"),
-        row_converter.obj.status
-    )
-  except ValueError as exp:
-    status_alias = row_converter.headers.get("status", {}).get("display_name")
-    row_converter.add_error(
-        errors.VALIDATION_ERROR, column_name=status_alias, message=exp.message
-    )
-
-
 CHECKS = {
     "TaskGroupTask": check_tasks,
     "CycleTaskGroupObjectTask": check_cycle_tasks,
     "Workflow": check_workflows,
     "Assessment": check_assessment
-}
-
-SECONDARY_CHECKS = {
-    "Assessment": check_assessment_status
 }

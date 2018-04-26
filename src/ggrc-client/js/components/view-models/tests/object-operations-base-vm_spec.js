@@ -81,11 +81,11 @@ describe('ObjectOperationsBaseVM', function () {
     });
 
     it('calls update method if type is set for the first time',
-    function () {
-      let type = 'Type1';
-      method(type);
-      expect(vm.update).toHaveBeenCalled();
-    });
+      function () {
+        let type = 'Type1';
+        method(type);
+        expect(vm.update).toHaveBeenCalled();
+      });
 
     it('removes "type" property from config passed in appopriate ' +
     'config handler', function () {
@@ -99,11 +99,11 @@ describe('ObjectOperationsBaseVM', function () {
     });
 
     it('calls prepareConfig method if type is defined',
-    function () {
-      vm.attr('type', 'Type1');
-      method('Type1');
-      expect(vm.prepareConfig).toHaveBeenCalled();
-    });
+      function () {
+        vm.attr('type', 'Type1');
+        method('Type1');
+        expect(vm.prepareConfig).toHaveBeenCalled();
+      });
   });
 
   describe('modelFromType() method', function () {
@@ -221,15 +221,15 @@ describe('ObjectOperationsBaseVM', function () {
     });
 
     it('extracts general config if there is no special config for type',
-    function () {
-      let result = method('T0', config);
-      expect(result).toBe(config.general);
-    });
+      function () {
+        let result = method('T0', config);
+        expect(result).toBe(config.general);
+      });
 
     it('extracts special config if there is special config for type',
-    function () {
-      let result = method('T2', config);
-      expect(result).toEqual(config.special[0].config);
-    });
+      function () {
+        let result = method('T2', config);
+        expect(result).toEqual(config.special[0].config);
+      });
   });
 });

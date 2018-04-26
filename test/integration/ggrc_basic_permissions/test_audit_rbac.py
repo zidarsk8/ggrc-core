@@ -1,24 +1,22 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Test audit RBAC"""
-from ggrc import app  # noqa  # pylint: disable=unused-import
+"""Test audit RBAC."""
 import copy
-
 from os.path import abspath
 from os.path import dirname
 from os.path import join
 from collections import defaultdict
 
-from ggrc.models import all_models
+from appengine import base
 
+from ggrc import app  # noqa  # pylint: disable=unused-import
+from ggrc.models import all_models
 from integration.ggrc import TestCase
 from integration.ggrc.access_control import acl_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc.models import factories
-
-from appengine import base
 
 
 class TestAuditRBAC(TestCase):
@@ -28,6 +26,7 @@ class TestAuditRBAC(TestCase):
 
   @classmethod
   def setUpClass(cls):
+    """Base setup for entire test suite."""
     TestCase.clear_data()
     cls.response = cls._import_file("audit_rbac.csv")
     cls.people = all_models.Person.eager_query().all()
@@ -105,6 +104,22 @@ class TestPermissionsOnAssessmentTemplate(TestCase):
 
   get and post assessment_temaplte action"""
 
+  @classmethod
+  def _get_assessment_template_base(cls, title, audit):
+    return {
+        "title": title,
+        "_NON_RELEVANT_OBJ_TYPES": {},
+        "_objectTypes": {},
+        "audit": {"id": audit.id},
+        "audit_title": audit.title,
+        "people_value": [],
+        "default_people": {
+            "assignees": "Admin",
+            "verifiers": "Admin",
+        },
+        "context": {"id": audit.context.id},
+    }
+
   def setUp(self):
     super(TestPermissionsOnAssessmentTemplate, self).setUp()
     self.api = Api()
@@ -125,7 +140,7 @@ class TestPermissionsOnAssessmentTemplate(TestCase):
     _, audit = self.generator.generate_object(
         all_models.Audit,
         {
-            "title": "Audit",
+            "title": "Assessment Template test Audit",
             "program": {"id": program_id},
             "status": "Planned"
         },
@@ -134,19 +149,7 @@ class TestPermissionsOnAssessmentTemplate(TestCase):
 
     generated_at = self.generator.generate_object(
         all_models.AssessmentTemplate,
-        {
-            "title": "Template",
-            "_NON_RELEVANT_OBJ_TYPES": {},
-            "_objectTypes": {},
-            "audit": {"id": audit.id},
-            "audit_title": audit.title,
-            "people_value": [],
-            "default_people": {
-                "assignees": "Admin",
-                "verifiers": "Admin",
-            },
-            "context": {"id": audit.context.id},
-        }
+        self._get_assessment_template_base("Template", audit)
     )
     self.assessment_template_resp, assessment_template = generated_at
     assessment_template_id = assessment_template.id
@@ -159,19 +162,10 @@ class TestPermissionsOnAssessmentTemplate(TestCase):
   def test_post_action(self):
     """Test create action on AssessmentTemplate created by api"""
     data = [{
-        "assessment_template": {
-            "_NON_RELEVANT_OBJ_TYPES": {},
-            "_objectTypes": {},
-            "audit": {"id": self.audit.id},
-            "audit_title": self.audit.title,
-            "people_value": [],
-            "default_people": {
-                "assignees": "Admin",
-                "verifiers": "Admin",
-            },
-            "context": {"id": self.audit.context.id},
-            "title": "123",
-        }
+        "assessment_template": self._get_assessment_template_base(
+            "123",
+            self.audit
+        )
     }]
     self.api.set_user(self.editor)
     resp = self.api.post(all_models.AssessmentTemplate, data)
@@ -210,6 +204,7 @@ class TestPermissionsOnAssessmentRelatedAssignables(TestCase):
   Global Reader once assigned to Assessment as Assignee, should have
   permissions to read/update/delete URLs(Documents) related to this Assessment
   """
+
   def setUp(self):
     super(TestPermissionsOnAssessmentRelatedAssignables, self).setUp()
     self.api = Api()
@@ -245,10 +240,3 @@ class TestPermissionsOnAssessmentRelatedAssignables(TestCase):
     self.assert200(resp)
     self.assertFalse(all_models.Document.query.filter(
         all_models.Document.id == self.document.id).all())
-
-  def test_unmap_action(self):
-    """Test permissions for unmap action on Document"""
-    resp = self.api.delete(self.doc_relationship)
-    self.assert200(resp)
-    self.assertFalse(all_models.Relationship.query.filter(
-        all_models.Relationship.id == self.doc_relationship.id).all())

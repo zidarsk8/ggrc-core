@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-  /**
+/**
    * Util methods for work with Object versions.
    */
 let cachedObjects = {};

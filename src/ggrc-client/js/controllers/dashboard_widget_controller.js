@@ -40,7 +40,7 @@ export default can.Control({
     });
 
     frag = can.view(this.options.widget_view,
-                    this.options.context);
+      this.options.context);
     this.element.html(frag);
     return 0;
   },

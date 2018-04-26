@@ -22,7 +22,6 @@ const Dashboard = can.Control({
 
       this.init_tree_view_settings();
       this.init_page_title();
-      this.init_page_help();
       this.init_page_header();
       this.init_widget_descriptors();
       if (!this.inner_nav_controller) {
@@ -45,7 +44,7 @@ const Dashboard = can.Control({
     }
 
     validModels = can.Map.keys(GGRC.tree_view.base_widgets_by_type);
-  // only change the display list
+    // only change the display list
     can.each(validModels, function (mName) {
       savedChildTreeDisplayList = this.display_prefs
         .getChildTreeDisplayList(mName);
@@ -65,18 +64,6 @@ const Dashboard = can.Control({
     }
     if (pageTitle) {
       $('head > title').text(pageTitle);
-    }
-  },
-
-  init_page_help: function () {
-    let pageHelp = null;
-    if (typeof (this.options.page_help) === 'function') {
-      pageHelp = this.options.page_help(this);
-    } else if (this.options.page_help) {
-      pageHelp = this.options.page_help;
-    }
-    if (pageHelp) {
-      this.element.find('#page-help').attr('data-help-slug', pageHelp);
     }
   },
 

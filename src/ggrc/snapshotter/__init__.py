@@ -16,11 +16,11 @@ from sqlalchemy.sql.expression import bindparam
 
 from ggrc import db
 from ggrc import models
+from ggrc.models.hooks import acl
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.utils import benchmark
 
-from ggrc.snapshotter.acl import get_acl_payload
 from ggrc.snapshotter.datastructures import Attr
 from ggrc.snapshotter.datastructures import Pair
 from ggrc.snapshotter.datastructures import Stub
@@ -73,6 +73,7 @@ class SnapshotGenerator(object):
     self.context_cache[parent] = parent_object.context_id
 
   def _fetch_neighborhood(self, parent_object, objects):
+    """Fetch relationships for objects and parent."""
     with benchmark("Snapshot._fetch_object_neighborhood"):
       query_pairs = set()
 
@@ -146,6 +147,7 @@ class SnapshotGenerator(object):
     if not self.dry_run:
       reindex_pairs(updated)
       self._copy_snapshot_relationships()
+      self._create_audit_relationships()
     return result
 
   def _update(self, for_update, event, revisions, _filter):
@@ -308,6 +310,7 @@ class SnapshotGenerator(object):
       reindex_pairs(to_reindex)
       self._remove_lost_snapshot_mappings()
       self._copy_snapshot_relationships()
+      self._create_audit_relationships()
     return OperationResponse("upsert", True, {
         "create": create,
         "update": update
@@ -341,6 +344,7 @@ class SnapshotGenerator(object):
     if not self.dry_run:
       reindex_pairs(created)
       self._copy_snapshot_relationships()
+      self._create_audit_relationships()
     return result
 
   def _create(self, for_create, event, revisions, _filter):
@@ -396,17 +400,11 @@ class SnapshotGenerator(object):
       with benchmark("Snapshot._create.write to database"):
         self._execute(
             models.Snapshot.__table__.insert(),
-            data_payload)
+            data_payload
+        )
 
       with benchmark("Snapshot._create.retrieve inserted snapshots"):
         snapshots = get_snapshots(for_create)
-
-      with benchmark("Snapshot._create.access control list"):
-        acl_payload = get_acl_payload(snapshots)
-
-      with benchmark("Snapshot._create.write acls to database"):
-        self._execute(all_models.AccessControlList.__table__.insert(),
-                      acl_payload)
 
       with benchmark("Snapshot._create.create revision payload"):
         with benchmark("Snapshot._create.create snapshots revision payload"):
@@ -464,6 +462,87 @@ class SnapshotGenerator(object):
           "user_id": get_current_user_id(),
           "parent_id": parent.id
       })
+
+  @classmethod
+  def _get_audit_relationships(cls, audit_ids):
+    """Get all relationship ids for the give audits.
+    Args:
+      audit_ids: list or set of audit ids.
+
+    Returns:
+      set of relationship ids for the given audits.
+    """
+    relationships_table = all_models.Relationship.__table__
+    select_statement = sa.select([
+        relationships_table.c.id
+    ]).where(
+        sa.and_(
+            relationships_table.c.destination_id.in_(audit_ids),
+            relationships_table.c.destination_type == all_models.Audit.__name__
+        )
+    ).union(
+        sa.select([
+            relationships_table.c.id
+        ]).where(
+            sa.and_(
+                relationships_table.c.source_id.in_(audit_ids),
+                relationships_table.c.source_type == all_models.Audit.__name__
+            )
+        )
+    )
+    id_rows = db.session.execute(select_statement).fetchall()
+
+    return {row.id for row in id_rows}
+
+  def _create_audit_relationships(self):
+    """Create relationships between snapshot objects and audits.
+
+    Generally snapshots are related to audits by default, but we also duplicate
+    this data in relationships table for ACL propagation.
+    """
+
+    relationships_table = all_models.Relationship.__table__
+    snapshot_table = all_models.Snapshot.__table__
+    inserter = relationships_table.insert().prefix_with("IGNORE")
+
+    audit_ids = {parent.id for parent in self.parents}
+    if not audit_ids:
+      return
+
+    old_ids = self._get_audit_relationships(audit_ids)
+
+    select_statement = sa.select([
+        sa.literal(get_current_user_id()),
+        sa.func.now(),
+        sa.func.now(),
+        snapshot_table.c.parent_id,
+        snapshot_table.c.parent_type,
+        snapshot_table.c.id,
+        sa.literal(all_models.Snapshot.__name__),
+    ]).select_from(
+        snapshot_table
+    ).where(
+        snapshot_table.c.parent_id.in_(audit_ids)
+    )
+
+    db.session.execute(
+        inserter.from_select(
+            [
+                relationships_table.c.modified_by_id,
+                relationships_table.c.created_at,
+                relationships_table.c.updated_at,
+                relationships_table.c.source_id,
+                relationships_table.c.source_type,
+                relationships_table.c.destination_id,
+                relationships_table.c.destination_type,
+            ],
+            select_statement
+        )
+    )
+
+    new_ids = self._get_audit_relationships(audit_ids)
+    created_ids = new_ids.difference(old_ids)
+    acl.add_relationships(created_ids)
 
   def _remove_lost_snapshot_mappings(self):
     """Remove mappings between snapshots if base objects were unmapped."""

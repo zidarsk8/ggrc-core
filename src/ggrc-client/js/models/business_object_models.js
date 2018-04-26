@@ -129,12 +129,12 @@ import {hasQuestions} from '../plugins/utils/ggrcq-utils';
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
-        if (this._super) {
-          this._super.apply(this, arguments);
-        }
+      if (this._super) {
+        this._super.apply(this, arguments);
+      }
 
-        this.validateNonBlank('title');
-      },
+      this.validateNonBlank('title');
+    },
   }, {});
 
   can.Model.Cacheable('CMS.Models.Facility', {

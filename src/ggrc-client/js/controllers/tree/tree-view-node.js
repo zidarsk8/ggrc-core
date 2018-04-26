@@ -108,8 +108,8 @@ import {
       let instance = this.options.instance;
       let relatedInstances = related.attr(instance.type);
       let instanceId = isSnapshot(instance) ?
-                        instance.snapshot.child_id :
-                        instance.id;
+        instance.snapshot.child_id :
+        instance.id;
       if (!relatedInstances || relatedInstances &&
         !relatedInstances[instanceId]) {
         this.element.addClass('not-directly-related');

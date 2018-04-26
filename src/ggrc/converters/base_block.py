@@ -37,6 +37,8 @@ from ggrc.services import signals
 from ggrc_workflows.models.cycle_task_group_object_task import \
     CycleTaskGroupObjectTask
 
+from ggrc.models.exceptions import StatusValidationError
+
 
 # pylint: disable=invalid-name
 logger = getLogger(__name__)
@@ -386,7 +388,7 @@ class BlockConverter(object):
     self.fields = get_column_order(fields)
 
   def generate_csv_header(self):
-    """ Generate 2D array with csv headre description """
+    """ Generate 2D array with csv header description """
     headers = []
     for field in self.fields:
       description = self.object_headers[field]["description"]
@@ -544,9 +546,6 @@ class BlockConverter(object):
     for row_converter in self.row_converters:
       row_converter.setup_secondary_objects()
 
-    for row_converter in self.row_converters:
-      self._check_secondary_object(row_converter)
-
     if not self.converter.dry_run:
       for row_converter in self.row_converters:
         try:
@@ -642,7 +641,16 @@ class BlockConverter(object):
       cache_utils.update_memcache_before_commit(
           self, modified_objects, CACHE_EXPIRY_IMPORT)
       for row_converter in self.row_converters:
-        row_converter.send_before_commit_signals(import_event)
+        try:
+          row_converter.send_before_commit_signals(import_event)
+        except StatusValidationError as exp:
+          status_alias = row_converter.headers.get("status",
+                                                   {}).get("display_name")
+          row_converter.add_error(
+              errors.VALIDATION_ERROR,
+              column_name=status_alias,
+              message=exp.message
+          )
       db.session.commit()
       self._store_revision_ids(import_event)
       cache_utils.update_memcache_after_commit(self)
@@ -754,21 +762,5 @@ class BlockConverter(object):
         row_converter: Row converter for the row we want to check.
     """
     checker = pre_commit_checks.CHECKS.get(type(row_converter.obj).__name__)
-    if checker and callable(checker):
-      checker(row_converter)
-
-  @staticmethod
-  def _check_secondary_object(row_converter):
-    """Check secondary object if it has any pre commit checks.
-
-    The check functions can mutate the row_converter object and mark it
-    to be ignored if there are any errors detected.
-
-    Args:
-        row_converter: Row converter for the row we want to check.
-    """
-    checker = pre_commit_checks.SECONDARY_CHECKS.get(
-        type(row_converter.obj).__name__
-    )
     if checker and callable(checker):
       checker(row_converter)

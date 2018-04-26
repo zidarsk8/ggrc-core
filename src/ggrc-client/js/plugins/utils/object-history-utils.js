@@ -175,21 +175,24 @@ const buildModifiedAttValues = (values, definitions, modifiedAttrs) => {
 
 const getInstanceView = (instance) => {
   let typeView;
+  let view;
   const defaultPath = `${GGRC.mustache_path}/base_objects/info.mustache`;
 
   if (!instance) {
     return '';
   }
 
-  if (instance.view) {
-    return instance.view;
-  }
-
   typeView = `${instance.class.table_plural}/info`;
 
-  return typeView in GGRC.Templates ?
-    `${GGRC.mustache_path}/${typeView}.mustache` :
-    defaultPath;
+  if (instance instanceof CMS.Models.Person) {
+    view = `${GGRC.mustache_path}/people_roles/info.mustache`;
+  } else if (typeView in GGRC.Templates) {
+    view = `${GGRC.mustache_path}/${typeView}.mustache`;
+  } else {
+    view = defaultPath;
+  }
+
+  return view;
 };
 
 export {

@@ -4,17 +4,67 @@
 */
 
 import template from './templates/task-list.mustache';
+import Pagination from '../../base-objects/pagination';
+import Permission from '../../../permission';
 
 const viewModel = can.Map.extend({
+  define: {
+    paging: {
+      value() {
+        return new Pagination({pageSizeSelect: [5, 10, 15]});
+      },
+    },
+    showCreateTaskButton: {
+      get() {
+        const workflow = this.attr('workflow');
+        return (
+          Permission.is_allowed_for('update', this.attr('baseInstance')) &&
+          workflow && workflow.attr('status') !== 'Inactive'
+        );
+      },
+    },
+  },
+  relatedItemsType: 'TaskGroupTask',
+  initialOrderBy: 'created_at',
+  gridSpinner: 'grid-spinner',
   items: [],
+  baseInstance: null,
+  workflow: null,
+  updatePagingAfterCreate() {
+    if (this.attr('paging.current') !== 1) {
+      // items will be reloaded, because the current
+      // value will be changed to first page
+      this.attr('paging.current', 1);
+    } else {
+      // reload items manually, because CanJs does not
+      // trigger "change" event, when we try to set first page
+      // (we are already on first page)
+      this.attr('baseInstance').dispatch('refreshInstance');
+    }
+  },
+  updatePagingAfterDestroy() {
+    const current = this.attr('paging.current');
+    const isEmptyPage = (
+      current > 1 &&
+      this.attr('items').length === 1
+    );
+
+    if (isEmptyPage) {
+      // go to previous page
+      this.attr('paging.current', current - 1);
+    } else {
+      // update current page
+      this.attr('baseInstance').dispatch('refreshInstance');
+    }
+  },
 });
 
 const events = {
-  inserted(el) {
-    $(el).sortable({
-      items: '.task_group_tasks__list-item',
-      handle: '.drag',
-    });
+  '{CMS.Models.TaskGroupTask} destroyed'() {
+    this.viewModel.updatePagingAfterDestroy();
+  },
+  '{CMS.Models.TaskGroupTask} created'() {
+    this.viewModel.updatePagingAfterCreate();
   },
 };
 

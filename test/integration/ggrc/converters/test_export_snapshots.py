@@ -511,5 +511,4 @@ class TestExportSnapshots(TestCase):
         },
     }]
     parsed_data = self.export_parsed_csv(search_request)["Control Snapshot"][0]
-
     self.assertNotIn("Custom Role", parsed_data)

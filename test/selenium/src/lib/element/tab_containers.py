@@ -3,7 +3,7 @@
 """Module of classes inherited from AbstractTabContainer control."""
 
 from lib import base
-from lib.constants import element, locator, roles, value_aliases
+from lib.constants import element, locator, value_aliases, users
 from lib.element.tables import (AssessmentRelatedAsmtsTable,
                                 AssessmentRelatedIssuesTable)
 from lib.utils import selenium_utils
@@ -27,7 +27,7 @@ class TabContainer(base.AbstractTabContainer):
     '_tabs' method (Page Object or any).
     """
     self.tab_controller.active_tab = tab_name
-    return self.tabs[tab_name](self._driver, self._get_active_tab_element())
+    return self.tabs[tab_name](self._driver, self.active_tab_elem)
 
   @staticmethod
   def _log_tab_validate(_driver, log_panel_element):
@@ -68,7 +68,7 @@ class TabContainer(base.AbstractTabContainer):
               "orignal_value_is_valid": orignal_value_is_valid,
               "new_value_is_valid": new_value_is_valid,
               "person_is_valid": (
-                  person_element.text == roles.DEFAULT_USER_EMAIL)
+                  person_element.text == users.DEFAULT_USER_EMAIL)
               }
     selenium_utils.wait_until_not_present(
         _driver, locator.Common.SPINNER_CSS)
@@ -100,10 +100,10 @@ class DashboardWidget(base.AbstractTabContainer):
     """
     if selenium_utils.is_element_exist(self._driver,
                                        self._locators.TAB_CONTROLLER_CSS):
-      tabs = {tab_el.text: self._get_active_tab_element()
+      tabs = {tab_el.text: self.active_tab_elem
               for tab_el in self.tab_controller.get_items()}
     else:
-      tabs = {value_aliases.DEFAULT: self._get_active_tab_element()}
+      tabs = {value_aliases.DEFAULT: self.active_tab_elem}
     return tabs
 
   def _get_locators(self):

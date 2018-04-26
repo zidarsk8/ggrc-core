@@ -29,6 +29,7 @@ class SnapshotBlockConverter(object):
   DATE_FIELDS = {
       "start_date",
       "end_date",
+      "last_assessment_date",
   }
 
   CUSTOM_SNAPSHOT_ALIASES = {
@@ -111,6 +112,9 @@ class SnapshotBlockConverter(object):
     content["audit"] = {"type": "Audit", "id": snapshot.parent_id}
     content["slug"] = u"*{}".format(content["slug"])
     content["revision_date"] = unicode(snapshot.revision.created_at)
+    if snapshot.last_assessment_date:
+      content["last_assessment_date"] = \
+          snapshot.last_assessment_date.isoformat()
     if self.MAPPINGS_KEY in self.fields:
       content.update(self._generate_mapping_content(snapshot))
     return content

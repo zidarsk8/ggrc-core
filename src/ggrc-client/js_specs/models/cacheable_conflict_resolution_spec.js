@@ -54,19 +54,19 @@ describe('can.Model.Cacheable conflict resolution', function () {
         return _resovleDfd(obj);
       });
       spyOn(can, 'ajax')// .and.returnValue(new $.Deferred().reject({status: 409}, 409, "CONFLICT"));
-      .and.callFake(function () {
-        return _resovleDfd({status: 409}, true);
-      });
+        .and.callFake(function () {
+          return _resovleDfd({status: 409}, true);
+        });
       CMS.Models.DummyModel.update(obj.id.toString(), obj.serialize()).then(
         function () {
           fail("The update handler isn't supposed to resolve here.");
           done();
         }, function () {
-        expect($.fn.trigger).toHaveBeenCalledWith('ajax:flash', {
-          warning: [jasmine.any(String)],
+          expect($.fn.trigger).toHaveBeenCalledWith('ajax:flash', {
+            warning: [jasmine.any(String)],
+          });
+          done();
         });
-        done();
-      });
     });
 
   it('does not refresh model', function (done) {

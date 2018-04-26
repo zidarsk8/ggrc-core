@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import './mandatory-fields-modal';
 import {
   buildModifiedACL,
   buildModifiedListField,
@@ -18,6 +19,7 @@ export default can.Component.extend({
     instance: {},
     restoredRevision: {},
     loading: false,
+    modalState: {open: false},
     restore(element) {
       const instance = this.attr('instance');
       const diff = this.attr('restoredRevision.diff_with_current');
@@ -38,12 +40,28 @@ export default can.Component.extend({
       // use legacy approach to save custom attribute
       this.applyCustomAttributes(instance, attrValues);
 
-      this.saveInstance(instance, element);
-    },
-    saveInstance(instance, element) {
-      instance.save().then(() => {
-        this.attr('loading', false);
+      if (this.isInstanceValid(instance)) {
+        this.saveInstance(element);
+      } else {
+        // fill in mandatory fields
+        this.attr('modalState.open', true);
         this.closeDiff(element);
+      }
+    },
+    isInstanceValid(instance) {
+      let gcas = instance.customAttr().each((caObject) => caObject.validate());
+      let gcaValid = _.find(gcas, (caObject) =>
+        caObject.validationState.hasGCAErrors
+      ) === undefined;
+
+      return gcaValid;
+    },
+    saveInstance(element) {
+      this.attr('instance').save().then(() => {
+        this.attr('loading', false);
+
+        this.closeDiff(element);
+        this.attr('modalState.open', false);
       });
     },
     applyFields(instance, modifiedFields) {
@@ -72,11 +90,11 @@ export default can.Component.extend({
         const valueForPerson = _.get(
           modifiedAttribute, 'attribute_object.id'
         ) || null;
-        const caDef = _.find(GGRC.custom_attr_defs, (gca) => 
+        const caDef = _.find(GGRC.custom_attr_defs, (gca) =>
           gca.id === Number(caId)
         );
         const isPerson = caDefTypeName.MapPerson === caDef.attribute_type;
-        const value = isPerson 
+        const value = isPerson
           ? valueForPerson
           : modifiedAttribute.attribute_value;
         instance.customAttr(caId, value);
@@ -85,6 +103,9 @@ export default can.Component.extend({
     closeDiff(element) {
       // TODO: fix
       $(element).closest('.modal').find('.modal-dismiss').trigger('click');
+    },
+    revertChanges() {
+      this.attr('instance').restore(true);
     },
   },
 });

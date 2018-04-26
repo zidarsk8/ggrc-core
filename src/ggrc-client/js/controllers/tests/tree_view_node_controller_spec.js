@@ -77,31 +77,31 @@ describe('CMS.Controllers.TreeViewNode', function () {
 
     it('renders the DOM element without the "active" CSS class if ' +
       'node not active',
-      function () {
-        let callArgs;
-        let callback;
+    function () {
+      let callArgs;
+      let callback;
 
-        ctrlInst.options.attr('isActive', false);
-        ctrlInst.options.attr('disable_lazy_loading', true);
-        $element.removeClass('active');  // make sure it is indeed inactive
+      ctrlInst.options.attr('isActive', false);
+      ctrlInst.options.attr('disable_lazy_loading', true);
+      $element.removeClass('active');  // make sure it is indeed inactive
 
-        method();
+      method();
 
-        expect(can.view).toHaveBeenCalledWith(
-          '/foo/bar.mustache',
-          ctrlInst.options,
-          ifNotRemovedResult
-        );
+      expect(can.view).toHaveBeenCalledWith(
+        '/foo/bar.mustache',
+        ctrlInst.options,
+        ifNotRemovedResult
+      );
 
-        expect(ctrlInst._ifNotRemoved).toHaveBeenCalled();
-        callArgs = ctrlInst._ifNotRemoved.calls.mostRecent().args;
-        callback = callArgs[0];
+      expect(ctrlInst._ifNotRemoved).toHaveBeenCalled();
+      callArgs = ctrlInst._ifNotRemoved.calls.mostRecent().args;
+      callback = callArgs[0];
 
-        // simulate invoking the callback and observe the effect
-        callback();
+      // simulate invoking the callback and observe the effect
+      callback();
 
-        expect(ctrlInst.element.hasClass('active')).toBe(false);
-      }
+      expect(ctrlInst.element.hasClass('active')).toBe(false);
+    }
     );
   });
 

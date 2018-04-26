@@ -3,7 +3,7 @@
 
 """Utilties to deal with introspecting GGRC models for publishing, creation,
 and update from resource format representations, such as JSON."""
-
+import bisect
 from collections import defaultdict
 
 import flask
@@ -13,75 +13,6 @@ from ggrc.utils import rules
 from ggrc.utils import title_from_camelcase
 from ggrc.utils import underscore_from_camelcase
 
-
-ATTRIBUTE_ORDER = (
-    "slug",
-    "assessment_template",
-    "audit",
-    "revision_date",
-    "control",
-    "program",
-    "task_group",
-    "workflow",
-    "title",
-    "description",
-    "notes",
-    "test_plan",
-    "owners",
-    "program_owner",
-    "program_editor",
-    "program_reader",
-    "task_type",
-    "due_on",
-    "start_date",
-    "end_date",
-    "last_deprecated_date",
-    "archived",
-    "report_start_date",
-    "report_end_date",
-    "finished_date",
-    "verified_date",
-    "status",
-    "labels",
-    'os_state',
-    "assertions",
-    "categories",
-    "contact",
-    "design",
-    "directive",
-    "fraud_related",
-    "key_control",
-    "kind",
-    "link",
-    "means",
-    "network_zone",
-    "operationally",
-    "secondary_contact",
-    "assessment_type",
-    "reference_url",
-    "verify_frequency",
-    "name",
-    "email",
-    "is_enabled",
-    "company",
-    "user_role",
-    "recipients",
-    "send_by_default",
-    "document_url",
-    "document_evidence",
-    "notify_custom_message",
-    "frequency",
-    "notify_on_change",
-    "is_verification_needed",
-    "updated_at",
-    "modified_by",
-    "created_at",
-    "folder",
-    "delete",
-    "repeat_every",
-    "unit",
-    "issue_tracker",
-)
 
 EXCLUDE_CUSTOM_ATTRIBUTES = set([
     "AssessmentTemplate",
@@ -152,6 +83,79 @@ class AttributeInfo(object):
   OBJECT_CUSTOM_ATTR_PREFIX = "__object_custom__:"
   SNAPSHOT_MAPPING_PREFIX = "__snapshot_mapping__:"
   ALIASES_PREFIX = "__acl__"
+
+  ATTRIBUTE_ORDER = (
+      "slug",
+      "assessment_template",
+      "audit",
+      "revision_date",
+      "control",
+      "program",
+      "task_group",
+      "workflow",
+      "title",
+      "description",
+      "notes",
+      "test_plan",
+      "owners",
+      "program_owner",
+      "program_editor",
+      "program_reader",
+      "task_type",
+      "due_on",
+      "start_date",
+      "end_date",
+      "last_deprecated_date",
+      "archived",
+      "report_start_date",
+      "report_end_date",
+      "finished_date",
+      "verified_date",
+      "status",
+      "labels",
+      'os_state',
+      "assertions",
+      "categories",
+      "contact",
+      "design",
+      "directive",
+      "fraud_related",
+      "key_control",
+      "kind",
+      "link",
+      "means",
+      "network_zone",
+      "operationally",
+      "secondary_contact",
+      "assessment_type",
+      "reference_url",
+      "verify_frequency",
+      "name",
+      "email",
+      "is_enabled",
+      "company",
+      "user_role",
+      "recipients",
+      "send_by_default",
+      "document_url",
+      "document_evidence",
+      "notify_custom_message",
+      "frequency",
+      "notify_on_change",
+      "is_verification_needed",
+      "updated_at",
+      "modified_by",
+      "created_at",
+      "folder",
+      "delete",
+      "repeat_every",
+      "unit",
+      "issue_tracker",
+      ALIASES_PREFIX,
+      "comments",
+      "last_comment",
+      CUSTOM_ATTR_PREFIX,
+  )
 
   class Type(object):
     """Types of model attributes."""
@@ -444,21 +448,39 @@ class AttributeInfo(object):
     return result
 
   @classmethod
+  def _prefixed_attr_key(cls, attr):
+    """Construct key for attr started with
+    special prefix."""
+    return '__%s__' % attr.split('__')[1]
+
+  @classmethod
   def get_column_order(cls, attr_list):
     """ Sort attribute list
 
     Attribute list should be sorted with 3 rules:
-      - attributes in ATTRIBUTE_ORDER variable must be fist and in the same
+      - attributes in ATTRIBUTE_ORDER variable must be first and in the same
         order as defined in that variable.
-      - Custom Attributes are sorted alphabetically after default attributes
+      - other attributes except mapping attributes
+        are sorted alphabetically after attributes defined in
+        ATTRIBUTE ORDER
       - mapping attributes are sorted alphabetically and placed last
     """
+    prefixed_attrs = defaultdict(list)
+    for attr in attr_list:
+      if attr.startswith('__'):
+        bisect.insort(prefixed_attrs[cls._prefixed_attr_key(attr)], attr)
     attr_set = set(attr_list)
-    default_attrs = [v for v in ATTRIBUTE_ORDER if v in attr_set]
-    default_set = set(default_attrs)
-    other_attrs = [v for v in attr_list if v not in default_set]
-    custom_attrs = [v for v in other_attrs if not v.lower().startswith("map:")]
+    ordered_attrs = []
+    for attr in cls.ATTRIBUTE_ORDER:
+      if attr in attr_set:
+        ordered_attrs.append(attr)
+      elif attr.startswith("__"):
+        ordered_attrs.extend(prefixed_attrs[cls._prefixed_attr_key(attr)])
+    ordered_set = set(ordered_attrs)
+    other_attrs = [v for v in attr_list if v not in ordered_set]
+    other_custom_attrs = [v for v in other_attrs
+                          if not v.lower().startswith("map:")]
     mapping_attrs = [v for v in other_attrs if v.lower().startswith("map:")]
-    custom_attrs.sort(key=lambda x: x.lower())
+    other_custom_attrs.sort(key=lambda x: x.lower())
     mapping_attrs.sort(key=lambda x: x.lower())
-    return default_attrs + custom_attrs + mapping_attrs
+    return ordered_attrs + other_custom_attrs + mapping_attrs

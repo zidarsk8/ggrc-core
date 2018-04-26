@@ -7,6 +7,8 @@ from collections import defaultdict
 
 import collections
 
+from ggrc import db
+from ggrc.fulltext import mysql
 from ggrc.models import all_models
 
 from integration.ggrc import TestCase, generator
@@ -149,6 +151,16 @@ class TestWithLastAssessmentDate(TestCase, WithQueryApi):
     self._check_csv_response(response, {})
     asmnt = all_models.Assessment.query.filter_by(slug=asmnt_slug).first()
     self.assertEqual(asmnt.last_comment, "new comment3")
+
+  @staticmethod
+  def get_model_fulltext(model_name, property, ids):
+    """Get fulltext records for model."""
+    # pylint: disable=redefined-builtin
+    return db.session.query(mysql.MysqlRecordProperty).filter(
+        mysql.MysqlRecordProperty.type == model_name,
+        mysql.MysqlRecordProperty.property == property,
+        mysql.MysqlRecordProperty.key.in_(ids),
+    )
 
   def test_ca_cleanup_on_obj_delete(self):
     """Test cleaning of fulltext and attributes tables on obj delete"""

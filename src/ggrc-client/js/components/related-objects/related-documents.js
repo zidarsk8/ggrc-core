@@ -44,14 +44,14 @@ import {
           operation: 'relevant',
         }];
         let additionalFilter = this.attr('documentType') ?
-        {
-          expression: {
-            left: 'document_type',
-            op: {name: '='},
-            right: this.attr('documentType'),
-          },
-        } :
-        [];
+          {
+            expression: {
+              left: 'document_type',
+              op: {name: '='},
+              right: this.attr('documentType'),
+            },
+          } :
+          [];
 
         let query =
           buildParam('Document', {}, relevantFilters, [], additionalFilter);
