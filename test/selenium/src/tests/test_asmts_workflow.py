@@ -453,8 +453,9 @@ class TestRelatedAssessments(base.Test):
     """Objects structure:
     Program
     -> Objective
-    -> Audit-1 -> Asmt-1 mapped to Objective but asmt type=Control
-    -> Audit-2 -> Asmt-2 mapped to Objective but asmt type=Control
+    -> Audit
+      -> Asmt-1 mapped to Objective but asmt type=Control
+      -> Asmt-2 mapped to Objective but asmt type=Control
     As a result, assessments are not related."""
     assessments = [self._create_mapped_asmt(
         audit=audit, assessment_type="Control",
