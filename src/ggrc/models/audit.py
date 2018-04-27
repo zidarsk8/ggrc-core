@@ -24,7 +24,6 @@ from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.mixins import WithLastDeprecatedDate
 from ggrc.models.object_person import Personable
 from ggrc.models.program import Program
-from ggrc.models.person import Person
 from ggrc.models.relationship import Relatable
 from ggrc.models.snapshot import Snapshotable
 
@@ -227,16 +226,6 @@ class Audit(Snapshotable,
     return Program.query.filter(
         (Program.id == Audit.program_id) &
         (predicate(Program.slug) | predicate(Program.title))
-    ).exists()
-
-  @classmethod
-  def _filter_by_auditor(cls, predicate):
-    """Helper for filtering by auditor"""
-    from ggrc_basic_permissions.models import Role, UserRole
-    return UserRole.query.join(Role, Person).filter(
-        (Role.name == "Auditor") &
-        (UserRole.context_id == cls.context_id) &
-        (predicate(Person.name) | predicate(Person.email))
     ).exists()
 
   @classmethod
