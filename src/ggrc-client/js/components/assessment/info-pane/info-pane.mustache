@@ -310,7 +310,9 @@
                      class="assessment-attributes-panel"
                      (update-active-tab)="initGlobalAttributes">
               <div class="assessment-attributes-panel">
-                <custom-roles {exclude-roles}="assessmentMainRoles" {instance}="instance">
+                <custom-roles {exclude-roles}="assessmentMainRoles"
+                    {instance}="instance"
+                    {deferred-save}="deferredSave">
                 </custom-roles>
                 <assessment-custom-attributes (on-update-attributes)="saveGlobalAttributes(%event)"
                                                   {items}="globalAttributes"
