@@ -542,6 +542,11 @@ class ModalSetVisibleFieldsMapper(ModalSetVisibleFields):
   BUTTON_SET_FIELDS = MODAL + " .set-tree-attrs"
 
 
+class ModalRelatedAssessments(object):
+  """Locators for related assessments modal on Control and Objective pages"""
+  MODAL = (By.CSS_SELECTOR, ".related-assessments")
+
+
 class WidgetBar(object):
   """Locators for bar containing widgets/tabs."""
 
@@ -683,6 +688,9 @@ class CommonWidgetInfo(object):
       By.CSS_SELECTOR, "{} .object-approved".format(WIDGET))
   LINK_SUBMIT_FOR_REVIEW = (By.CSS_SELECTOR,
                             "{} .non-transparent".format(WIDGET))
+  # buttons
+  SHOW_RELATED_ASSESSMENTS = (
+      By.XPATH, _INFO_WIDGET_XPATH + "//a[@title='Show Related Assessments']")
   # people section
   _PEOPLE_ITEM = ".editable-people-group"
   PEOPLE_HEADERS_AND_VALUES_CSS = (By.CSS_SELECTOR, _PEOPLE_ITEM)

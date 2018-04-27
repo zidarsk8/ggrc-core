@@ -9,8 +9,8 @@
 
 import pytest
 
-from lib import base
-from lib.constants import messages, element, value_aliases as alias
+from lib import base, factory
+from lib.constants import messages, element, value_aliases as alias, objects
 from lib.constants.element import AssessmentStates
 from lib.entities import entities_factory
 from lib.entities.entities_factory import (
@@ -365,6 +365,13 @@ class TestRelatedAssessments(base.Test):
   def audits(self, program):
     return [rest_facade.create_audit(program) for _ in xrange(2)]
 
+  @pytest.fixture()
+  def obj(self, request):
+    """A fixture that calls any other fixture when parametrization
+    with indirect is used.
+    """
+    return request.getfixturevalue(request.param)
+
   @staticmethod
   def _create_mapped_asmt(audit, assessment_type, objs_to_map):
     """Create assessment with assessment type=`assessment_type` and
@@ -389,8 +396,14 @@ class TestRelatedAssessments(base.Test):
         checked_asmt.repr_ui(), actual_asmt,
         "audit",  # not shown in UI
         "custom_attributes")  # not returned on POST /api/assessments)
-    assert asmts_ui_service.get_related_asmts_titles(checked_asmt) == \
+    assert asmts_ui_service.get_asmt_related_asmts_titles(checked_asmt) == \
         related_asmts_titles
+
+  @staticmethod
+  def _related_asmts_of_obj(obj, selenium):
+    """Return related assessments of obj (Control or Objective)"""
+    return factory.get_cls_webui_service(objects.get_plural(
+        obj.type))(selenium).get_obj_related_asmts_titles(obj)
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
@@ -453,8 +466,9 @@ class TestRelatedAssessments(base.Test):
     """Objects structure:
     Program
     -> Objective
-    -> Audit-1 -> Asmt-1 mapped to Objective but asmt type=Control
-    -> Audit-2 -> Asmt-2 mapped to Objective but asmt type=Control
+    -> Audit
+      -> Asmt-1 mapped to Objective but asmt type=Control
+      -> Asmt-2 mapped to Objective but asmt type=Control
     As a result, assessments are not related."""
     assessments = [self._create_mapped_asmt(
         audit=audit, assessment_type="Control",
@@ -530,3 +544,28 @@ class TestRelatedAssessments(base.Test):
         checked_asmt=assessments[0],
         related_asmts_titles=related_asmts_titles,
         selenium=selenium)
+
+  @pytest.mark.smoke_tests
+  @pytest.mark.parametrize(
+      "obj",
+      ["control_mapped_to_program", "objective_mapped_to_program"],
+      indirect=True
+  )
+  def test_related_asmts_on_obj_page(
+      self, obj, audit, selenium
+  ):
+    """Objects structure:
+    Program
+    -> Obj (Control or Objective)
+    -> Audit
+      -> Asmt-1 mapped to Obj, asmt type="obj_type"
+      -> Asmt-2 mapped to Obj, asmt type="obj_type"
+    Check Related Assessments on Obj's page"""
+    assessments = [self._create_mapped_asmt(
+        audit=audit, assessment_type=obj.type, objs_to_map=[obj])
+        for _ in xrange(2)]
+    related_asmts_titles = [
+        (assessment.title, obj.title, audit.title)
+        for assessment in assessments]
+    assert self._related_asmts_of_obj(obj, selenium) ==\
+        related_asmts_titles[::-1]

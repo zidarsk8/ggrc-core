@@ -9,7 +9,7 @@ from lib import base
 from lib.constants import (
     locator, objects, element, roles, regex, messages, users)
 from lib.constants.locator import WidgetInfoAssessment
-from lib.element import widget_info, tab_containers
+from lib.element import widget_info, tab_containers, tables
 from lib.page.modal import update_object
 from lib.utils import selenium_utils, string_utils, help_utils
 
@@ -107,6 +107,16 @@ class InfoWidget(base.Widget):
     return (element.ReviewStates.REVIEWED if selenium_utils.is_element_exist(
         self.info_widget_elem, self._locators.TXT_OBJECT_REVIEWED) else
         element.ReviewStates.UNREVIEWED)
+
+  def show_related_assessments(self):
+    """Click `Assessments` button on control or objective page and return
+    related asmts table.
+    """
+    base.Button(self.info_widget_elem,
+                self._locators.SHOW_RELATED_ASSESSMENTS).click()
+    table_element = self._driver.find_element(
+        *locator.ModalRelatedAssessments.MODAL)
+    return tables.AssessmentRelatedAsmtsTable(self._driver, table_element)
 
   def open_info_3bbs(self):
     """Click to 3BBS button on Info page or Info panel to open info 3BBS modal.
