@@ -8,7 +8,6 @@ import json
 import ddt
 
 from ggrc.models import all_models
-from ggrc.models import proposal as proposal_model
 
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
@@ -74,7 +73,8 @@ class TestPermissions(TestCase):
         factories.AccessControlListFactory(
             ac_role=ac_roles[role_name],
             object=self.program,
-            person=person)
+            person=person,
+        )
       self.proposal = factories.ProposalFactory(
           instance=self.control,
           content={
@@ -85,15 +85,19 @@ class TestPermissions(TestCase):
               "mapping_list_fields": {},
           }
       )
+      factories.RelationshipFactory(
+          source=self.control,
+          destination=self.proposal,
+      )
+
       for role_name in ["ACL_Reader", "ACL_Editor", "ACL_Nobody"]:
         person = self.people[role_name]
         rbac_factories.UserRoleFactory(role=roles["Creator"], person=person)
         factories.AccessControlListFactory(
             ac_role=acrs[role_name],
             object=self.control,
-            person=person)
-    with factories.single_commit():
-      proposal_model.set_acl_to_all_proposals_for(self.control)
+            person=person,
+        )
 
   @ddt.data(
       ("Creator", 403),
