@@ -23,8 +23,20 @@ const viewModel = can.Map.extend({
   },
 });
 
+const events = {
+  inserted(el) {
+    const savedVersion = localStorage.getItem('GGRC.RELEASE_NOTES_DATE');
+
+    if (RELEASE_NOTES_DATE !== savedVersion) {
+      localStorage.setItem('GGRC.RELEASE_NOTES_DATE', RELEASE_NOTES_DATE);
+      this.viewModel.open();
+    }
+  },
+};
+
 export default can.Component.extend({
   tag: 'release-notes-menu-item',
   template,
   viewModel,
+  events,
 });

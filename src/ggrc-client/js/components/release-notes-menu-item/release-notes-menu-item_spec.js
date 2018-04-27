@@ -22,4 +22,63 @@ describe('"release-notes-menu-item" component', () => {
       expect(vm.attr('state.open')).toBe(true);
     });
   });
+
+  describe('events', () => {
+    let events;
+    let handler;
+
+    beforeEach(() => {
+      events = Component.prototype.events;
+    });
+
+    describe('"inserted" handler', () => {
+      beforeEach(() => {
+        handler = events.inserted.bind({viewModel: vm});
+      });
+
+      describe('if RELEASE_NOTES_DATE not equal to saved date', () => {
+        beforeEach(() => {
+          spyOn(localStorage, 'getItem')
+            .and.returnValue(new Date());
+          spyOn(localStorage, 'setItem');
+          spyOn(vm, 'open');
+        });
+
+        it('sets RELEASE_NOTES_DATE into localStorage as GGRC.RELEASE_NOTES_DATE', () => {
+          handler();
+
+          expect(localStorage.setItem)
+            .toHaveBeenCalledWith('GGRC.RELEASE_NOTES_DATE', RELEASE_NOTES_DATE);
+        });
+
+        it('calls open() method', () => {
+          handler();
+
+          expect(vm.open).toHaveBeenCalled();
+        });
+      });
+
+      describe('if RELEASE_NOTES_DATE equal to saved date', () => {
+        beforeEach(() => {
+          spyOn(localStorage, 'getItem')
+            .and.returnValue(RELEASE_NOTES_DATE);
+          spyOn(localStorage, 'setItem');
+          spyOn(vm, 'open');
+        });
+
+        it('does not change date in localStorage', () => {
+          handler();
+
+          expect(localStorage.setItem).not.toHaveBeenCalledWith(
+            'GGRC.RELEASE_NOTES_DATE', RELEASE_NOTES_DATE);
+        });
+
+        it('does not call open() method', () => {
+          handler();
+
+          expect(vm.open).not.toHaveBeenCalled();
+        });
+      });
+    });
+  });
 });
