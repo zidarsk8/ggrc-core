@@ -73,7 +73,7 @@ class Audit(Snapshotable,
   assessments = db.relationship('Assessment', backref='audit')
   issues = db.relationship('Issue', backref='audit')
   archived = deferred(db.Column(db.Boolean,
-                      nullable=False, default=False), 'Audit')
+                                nullable=False, default=False), 'Audit')
   assessment_templates = db.relationship('AssessmentTemplate', backref='audit')
 
   _api_attrs = reflection.ApiAttributes(
@@ -215,18 +215,9 @@ class Audit(Snapshotable,
       return value
 
     if self.archived is not None and self.archived != value and \
-       not any(acl for acl in list(self.full_access_control_list)
-               if acl.ac_role.name.startswith("Program Managers*") and
+       not any(acl for acl in list(self.program.access_control_list)
+               if acl.ac_role.name == "Program Managers" and
                acl.person.id == user.id):
-      # NOTE: the check above should not use full_access_control_list and check
-      # for the role should be done as:
-      # acl.ac_role.parent.parent.name == "Program Managers"
-      # or:
-      # acl.parent.parent.ac_role.name == "Program Managers"
-      # to ensure the current acl entry was propagated from program managers
-      # this check is done with startswith as an optimization to prevent too
-      # many queries until we create a link to base propagated role or acl
-      # entry.
       raise Forbidden()
     return value
 
