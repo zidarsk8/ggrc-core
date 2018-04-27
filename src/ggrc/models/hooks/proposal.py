@@ -12,7 +12,6 @@ from ggrc.models import all_models
 from ggrc.models import comment
 from ggrc import login
 from ggrc.utils.revisions_diff import applier
-from ggrc.models import proposal as proposal_model
 
 
 def is_status_changed_to(required_status, obj):
@@ -90,14 +89,6 @@ def create_relationship(
     )
 
 
-def set_permissions(sender, obj=None, src=None, service=None,
-                    event=None, initial_state=None):  # noqa
-  """Set permissions to proposals based on instance ACL model."""
-  if sender == all_models.Proposal:
-    proposal_model.set_acl_to(obj)
-  else:
-    proposal_model.set_acl_to_all_proposals_for(obj)
-
 # pylint: enable=unused-argument
 # pylint: enable=too-many-arguments
 
@@ -116,10 +107,3 @@ def init_hook():
   signals.Restful.model_put.connect(decline_proposal,
                                     all_models.Proposal,
                                     weak=False)
-  for model in all_models.all_models:
-    signals.Restful.model_posted.connect(set_permissions,
-                                         model,
-                                         weak=False)
-    signals.Restful.model_put.connect(set_permissions,
-                                      model,
-                                      weak=False)
