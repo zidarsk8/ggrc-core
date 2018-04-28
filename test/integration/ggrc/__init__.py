@@ -307,6 +307,7 @@ class TestCase(BaseTestCase, object):
 
   def import_file(self, filename, dry_run=False, person=None):
     """Import a csv file as a specific user."""
+    self.init_taskqueue()
     if dry_run:
       return self._import_file(filename, dry_run=True, person=person)
 
