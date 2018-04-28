@@ -71,6 +71,7 @@ def build_op_shortcut(predicate):
         db.session.query(Record.key).filter(
             Record.type == object_class.__name__,
             Record.property == key,
+            Record.subproperty != '__sort__',
             predicate(Record.content, exp['right'])
         )
     )
@@ -105,6 +106,7 @@ def is_filter(exp, object_class, target_class, query):
   subquery = db.session.query(Record.key).filter(
       Record.type == object_class.__name__,
       Record.property == left,
+      Record.subproperty != '__sort__',
       sqlalchemy.not_(
           sqlalchemy.or_(Record.content == u"", Record.content.is_(None))
       ),
@@ -196,6 +198,7 @@ def text_search(exp, object_class, target_class, query):
   return object_class.id.in_(
       db.session.query(Record.key).filter(
           Record.type == object_class.__name__,
+          Record.subproperty != '__sort__',
           Record.content.ilike(u"%{}%".format(exp['text'])),
       ),
   )
@@ -323,6 +326,7 @@ def in_operation(exp, object_class, target_class, query):
       db.session.query(Record.key).filter(
           Record.type == object_class.__name__,
           Record.property == exp["left"],
+          Record.subproperty != '__sort__',
           Record.content.in_(exp["right"])
       )
   )
