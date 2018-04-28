@@ -201,7 +201,7 @@ class PersonResource(common.ExtendedResource):
           FROM (
               SELECT
                   ct.end_date < :today AS overdue,
-                  count(ct.id) AS task_count
+                  count(DISTINCT ct.id) AS task_count
               FROM cycle_task_group_object_tasks AS ct
               JOIN cycles AS c ON
                   c.id = ct.cycle_id
@@ -222,7 +222,7 @@ class PersonResource(common.ExtendedResource):
 
               SELECT
                   ct.end_date < :today AS overdue,
-                  count(ct.id) AS task_count
+                  count(DISTINCT ct.id) AS task_count
               FROM cycle_task_group_object_tasks AS ct
               JOIN cycles AS c ON
                   c.id = ct.cycle_id

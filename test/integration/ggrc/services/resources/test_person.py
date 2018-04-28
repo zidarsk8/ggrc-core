@@ -81,6 +81,10 @@ class TestPersonResource(TestCase, WithQueryApi):
         all_models.AccessControlRole.name == "Task Assignees",
         all_models.AccessControlRole.object_type == "TaskGroupTask",
     ).one().id
+    secondary_role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Task Secondary Assignees",
+        all_models.AccessControlRole.object_type == "TaskGroupTask",
+    ).one().id
 
     one_time_workflow = {
         "title": "Person resource test workflow",
@@ -95,14 +99,19 @@ class TestPersonResource(TestCase, WithQueryApi):
                 "title": "task 1",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, user.id)],
+                    acl_helper.get_acl_json(role_id, user.id),
+                    acl_helper.get_acl_json(secondary_role_id, user.id)
+                ],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 15),
             }, {
                 "title": "task 2",
                 "description": "some task 3",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, user.id)],
+                    acl_helper.get_acl_json(role_id, user.id),
+                    acl_helper.get_acl_json(secondary_role_id, user.id),
+                    acl_helper.get_acl_json(secondary_role_id, dummy_user.id)
+                ],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 9, 16),
             }, {
