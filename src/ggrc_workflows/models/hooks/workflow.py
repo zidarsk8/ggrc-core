@@ -149,6 +149,7 @@ def _insert_select_acls(select_statement):
       modified_by_id,
       updated_at,
       parent_id,
+      parent_id_nn,
   """
 
   acl_table = all_models.AccessControlList.__table__
@@ -170,6 +171,7 @@ def _insert_select_acls(select_statement):
                   acl_table.c.modified_by_id,
                   acl_table.c.updated_at,
                   acl_table.c.parent_id,
+                  acl_table.c.parent_id_nn,
               ],
               select_statement
           )
@@ -216,7 +218,8 @@ def _propagate_to_wf_children(new_wf_acls, child_class):
       sa.func.now(),
       sa.literal(current_user_id),
       sa.func.now(),
-      acl_table.c.id,
+      acl_table.c.id.label("parent_id"),
+      acl_table.c.id.label("parent_id_nn"),
   ]).select_from(
       sa.join(
           sa.join(
@@ -268,7 +271,8 @@ def _propagate_to_children(new_tg_acls, child_class, id_name, parent_class):
       sa.func.now(),
       sa.literal(current_user_id),
       sa.func.now(),
-      acl_table.c.id,
+      acl_table.c.id.label("parent_id"),
+      acl_table.c.id.label("parent_id_nn"),
   ]).select_from(
       sa.join(
           child_table,

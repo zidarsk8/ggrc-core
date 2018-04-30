@@ -38,6 +38,7 @@ def _insert_select_acls(select_statement):
       modified_by_id,
       updated_at,
       parent_id,
+      parent_id_nn,
   """
 
   acl_table = all_models.AccessControlList.__table__
@@ -53,6 +54,7 @@ def _insert_select_acls(select_statement):
               acl_table.c.modified_by_id,
               acl_table.c.updated_at,
               acl_table.c.parent_id,
+              acl_table.c.parent_id_nn,
           ],
           select_statement
       )
@@ -103,6 +105,7 @@ def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
       sa.literal(login.get_current_user_id()).label("modified_by_id"),
       sa.func.now().label("updated_at"),
       acl_table.c.id.label("parent_id"),
+      acl_table.c.id.label("parent_id_nn"),
   ]).select_from(
       sa.join(
           sa.join(
@@ -168,6 +171,7 @@ def _rel_child(parent_acl_ids, source=True):
       sa.literal(login.get_current_user_id()).label("modified_by_id"),
       sa.func.now().label("updated_at"),
       acl_table.c.id.label("parent_id"),
+      acl_table.c.id.label("parent_id_nn"),
   ]).select_from(
       sa.join(
           sa.join(
