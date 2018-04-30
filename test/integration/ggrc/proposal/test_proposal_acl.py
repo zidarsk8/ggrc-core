@@ -3,6 +3,8 @@
 
 """Test for proposal api."""
 
+import unittest
+
 import ddt
 
 from ggrc.models import all_models
@@ -13,6 +15,7 @@ from integration.ggrc.models import factories
 
 
 @ddt.ddt
+@unittest.skip("Deprecated functionality: will be fixed in scope of GGRC-4991")
 class TestACLPopulation(TestCase):
   """Test population permissions for controlproposals."""
 
@@ -53,8 +56,12 @@ class TestACLPopulation(TestCase):
     self.assertEqual(200, resp.status_code)
     control = all_models.Control.query.get(control_id)
     proposal = all_models.Proposal.query.get(proposal_id)
+    full_proposal_acls = all_models.AccessControlList.query.filter(
+        all_models.AccessControlList.object_type == proposal.type,
+        all_models.AccessControlList.object_id == proposal.id,
+    ).all()
     self.assertEqual(int(read or update),
-                     len(proposal.full_access_control_list))
+                     len(full_proposal_acls))
     expected_roles = []
     if update:
       expected_roles.append(all_models.Proposal.ACRoles.EDITOR)
@@ -62,4 +69,4 @@ class TestACLPopulation(TestCase):
       expected_roles.append(all_models.Proposal.ACRoles.READER)
     self.assertEqual(
         sorted(expected_roles),
-        sorted([a.ac_role.name for a in proposal.full_access_control_list]))
+        sorted([a.ac_role.name for a in full_proposal_acls]))

@@ -203,8 +203,11 @@ class TestPermissions(TestCase):
       ("Creator", 0),
       ("Reader", 1),
       ("Editor", 1),
-      ("ACL_Reader", 1),
-      ("ACL_Editor", 1),
+      # Following two tests have been commented out as the functionality for
+      # custom role propagation has been temporarily removed This test should
+      # be enabled back in scope of ticket GGRC-4991
+      # ("ACL_Reader", 1),
+      # ("ACL_Editor", 1),
       ("ACL_Nobody", 0),
       ("Administrator", 1),
       ("Program Editors", 1),
