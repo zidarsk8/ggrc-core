@@ -30,6 +30,11 @@ class AccessControlList(mixins.Base, db.Model):
   object_id = db.Column(db.Integer, nullable=False)
   object_type = db.Column(db.String, nullable=False)
 
+  parent_id_nn = db.Column(
+      db.Integer,
+      nullable=False,
+      default="0",
+  )
   parent_id = db.Column(
       db.Integer,
       db.ForeignKey('access_control_list.id', ondelete='CASCADE'),
@@ -66,8 +71,18 @@ class AccessControlList(mixins.Base, db.Model):
   def _extra_table_args(_):
     return (
         db.UniqueConstraint(
-            'person_id', 'ac_role_id', 'object_id', 'object_type', 'parent_id'
+            'person_id',
+            'ac_role_id',
+            'object_id',
+            'object_type',
+            'parent_id_nn',
         ),
         db.Index('idx_object_type_object_idx', 'object_type', 'object_id'),
         db.Index('ix_person_object', 'person_id', 'object_type', 'object_id'),
+        db.Index(
+            'idx_object_type_object_id_parent_id_nn',
+            'object_type',
+            'object_id',
+            'parent_id_nn',
+        ),
     )
