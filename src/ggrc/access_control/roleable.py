@@ -28,26 +28,6 @@ class Roleable(object):
   _api_attrs = reflection.ApiAttributes(
       reflection.Attribute('access_control_list', True, True, True))
 
-  @hybrid_property
-  def full_access_control_list(self):
-    return self._access_control_list + self._propagated_access_control_list
-
-  @declared_attr
-  def _propagated_access_control_list(cls):  # pylint: disable=no-self-argument
-    """Full access_control_list
-
-       Use with caution and load only when absolutely needed. For performance
-       reasons do not add to eager_query.
-    """
-    return db.relationship(
-        'AccessControlList',
-        primaryjoin=lambda: and_(
-            remote(AccessControlList.object_id) == cls.id,
-            remote(AccessControlList.object_type) == cls.__name__,
-            remote(AccessControlList.parent_id).isnot(None)),
-        foreign_keys='AccessControlList.object_id',
-        cascade='all, delete-orphan')
-
   @declared_attr
   def _access_control_list(cls):  # pylint: disable=no-self-argument
     """access_control_list"""
