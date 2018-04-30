@@ -358,6 +358,7 @@ def _delete_all_propagated_acls():
   This function is used as cleanup before we re-evaluate propagation for all
   objects.
   """
+  logger.info("Deleting all propagated acl entries")
   acl_table = all_models.AccessControlList.__table__
   db.session.execute(
       acl_table.delete().where(
