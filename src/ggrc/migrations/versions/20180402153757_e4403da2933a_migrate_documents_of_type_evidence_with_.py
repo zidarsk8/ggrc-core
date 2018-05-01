@@ -13,9 +13,12 @@ Create Date: 2018-04-02 15:37:57.922876
 
 from sqlalchemy.sql import text
 from alembic import op
+from ggrc.migrations import utils
+from ggrc.migrations.utils import migrator
 
 
 # revision identifiers, used by Alembic.
+
 revision = 'e4403da2933a'
 down_revision = '3db5f2027c92'
 
@@ -48,7 +51,7 @@ def get_audit_docs_ids(connection):
   return [i.id for i in res]
 
 
-def migrate_docs(connection):
+def migrate_docs(connection, migration_user_id):
   """Migrate documents.FILE to documents.URL"""
   audit_doc_ids = get_audit_docs_ids(connection)
   assessment_doc_ids = get_assessment_docs_ids(connection)
@@ -57,10 +60,16 @@ def migrate_docs(connection):
 
   if doc_ids:
     sql = """
-      UPDATE documents SET document_type = 'URL'
-      WHERE id IN :doc_ids
+        UPDATE documents SET
+          document_type = 'URL',
+          modified_by_id = :modified_by_id
+        WHERE id IN :doc_ids
     """
-    connection.execute(text(sql), doc_ids=doc_ids)
+    connection.execute(text(sql), modified_by_id=migration_user_id,
+                       doc_ids=doc_ids)
+
+  utils.add_to_objects_without_revisions_bulk(connection, doc_ids,
+                                              "Document", "modified")
 
 
 def get_assessment_docs_ids(connection):
@@ -142,9 +151,27 @@ def rename_doc_fields():
   """)
 
 
+def create_new_revisions_table(connection):
+  """We need to create "Created" revision for all new Objects
+
+  Table objects_without_revisions is used as container for new objects
+  """
+  sql = """
+      CREATE TABLE objects_without_revisions (
+        obj_id INT NOT NULL,
+        obj_type VARCHAR(45) NOT NULL,
+        action VARCHAR(15) NOT NULL DEFAULT 'created',
+      UNIQUE INDEX uq_new_rev (obj_id, obj_type)
+      )
+  """
+  connection.execute(text(sql))
+
+
 def run_migration(connection):
   """Run migration"""
-  migrate_docs(connection)
+  migration_user_id = migrator.get_migration_user_id(connection)
+  create_new_revisions_table(connection)
+  migrate_docs(connection, migration_user_id)
   rename_doc_fields()
 
 
@@ -169,3 +196,5 @@ def downgrade():
          document_type enum('URL','EVIDENCE','REFERENCE_URL') NOT NULL
          DEFAULT 'URL';
   """)
+
+  op.execute("DROP TABLE objects_without_revisions")

@@ -20,6 +20,7 @@ down_revision = '7b9aae5d448a'
 
 
 def remove_old_rule_tree():
+  """Remove old ACL propagation rules"""
   propagation = prev_rules.GGRC_PROPAGATION
   for object_type, roles_tree in propagation.items():
     acr_propagation.remove_propagated_roles(object_type, roles_tree.keys())
