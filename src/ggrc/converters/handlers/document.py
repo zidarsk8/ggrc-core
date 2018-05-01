@@ -5,7 +5,7 @@
 
 from logging import getLogger
 
-from ggrc import models
+from ggrc.models import all_models
 from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
 from ggrc.login import get_current_user_id
@@ -32,7 +32,7 @@ class DocumentLinkHandler(handlers.ColumnHandler):
 
   def build_document(self, link, title, user_id):
     """Build document object"""
-    document = models.Document(
+    document = all_models.Document(
         link=link,
         title=title,
         modified_by_id=user_id,
@@ -95,7 +95,8 @@ class DocumentLinkHandler(handlers.ColumnHandler):
       if new_link in old_link_map:
         old_link_map[new_link].title = new_doc.title
       else:
-        models.Relationship(source=self.row_converter.obj, destination=new_doc)
+        all_models.Relationship(source=self.row_converter.obj,
+                                destination=new_doc)
 
     for old_link, old_doc in old_link_map.iteritems():
       if old_link in new_link_map:
@@ -111,7 +112,7 @@ class DocumentLinkHandler(handlers.ColumnHandler):
 class DocumentFileHandler(DocumentLinkHandler):
   """Handler for evidence field on document imports."""
 
-  KIND = models.Document.FILE
+  KIND = all_models.Document.FILE
 
   @staticmethod
   def get_gdrive_id_from_url(url):
@@ -136,7 +137,7 @@ class DocumentFileHandler(DocumentLinkHandler):
   def get_gdrive_id(self, link):
     """Handle gdrive_id extraction"""
     gdrive_id = ''
-    if self.KIND == models.Document.FILE:
+    if self.KIND == all_models.Document.FILE:
       gdrive_id = self.get_gdrive_id_from_url(link)
       if not gdrive_id:
         self.add_warning(errors.UNABLE_TO_EXTRACT_GDRIVE_ID,
@@ -144,7 +145,7 @@ class DocumentFileHandler(DocumentLinkHandler):
     return gdrive_id
 
   def build_document(self, link, title, user_id):
-    document = models.Document(
+    document = all_models.Document(
         link=link,
         title=title,
         modified_by_id=user_id,
@@ -184,7 +185,7 @@ class DocumentFileHandler(DocumentLinkHandler):
 class DocumentUrlHandler(DocumentLinkHandler):
   """Handler for URL field on document imports."""
 
-  KIND = models.Document.URL
+  KIND = all_models.Document.URL
 
   @staticmethod
   def _parse_line(line):
@@ -213,7 +214,7 @@ class DocumentUrlHandler(DocumentLinkHandler):
 class DocumentReferenceUrlHandler(DocumentLinkHandler):
   """Handler for REFERENCE URL field on document imports."""
 
-  KIND = models.Document.REFERENCE_URL
+  KIND = all_models.Document.REFERENCE_URL
 
   @staticmethod
   def _parse_line(line):
