@@ -4,8 +4,6 @@
 """Module for cycle task group model.
 """
 
-import itertools
-
 from sqlalchemy import orm, inspect
 
 from ggrc import db

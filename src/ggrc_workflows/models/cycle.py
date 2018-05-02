@@ -4,7 +4,6 @@
 """Module contains a workflow Cycle model
 """
 
-import itertools
 from urlparse import urljoin
 
 from sqlalchemy import orm, inspect
