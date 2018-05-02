@@ -7,7 +7,6 @@ import json
 from datetime import datetime
 
 from sqlalchemy.dialects import mysql
-from sqlalchemy import exists, and_
 
 from ggrc import db
 from ggrc.models.mixins.base import Identifiable
@@ -100,18 +99,18 @@ def get_jobs(job_type, ids=None):
 def delete_previous_imports():
   """Delete not finished imports"""
 
-  active_jobs = db.session.query(exists().where(
-      and_(ImportExport.created_by == get_current_user(),
-           and_(ImportExport.job_type == ImportExport.IMPORT_JOB_TYPE,
-                ImportExport.status.in_([ImportExport.ANALYSIS_STATUS,
-                                         ImportExport.IN_PROGRESS_STATUS])))
-      )).scalar()
+  imported_jobs = ImportExport.query.filter(
+      ImportExport.created_by == get_current_user(),
+      ImportExport.job_type == ImportExport.IMPORT_JOB_TYPE)
+
+  active_jobs = db.session.query(imported_jobs.filter(
+      ImportExport.status.in_([ImportExport.ANALYSIS_STATUS,
+                               ImportExport.IN_PROGRESS_STATUS])
+      ).exists()).scalar()
   if active_jobs:
     raise BadRequest('Import in progress')
 
-  ImportExport.query.filter(
-      ImportExport.created_by == get_current_user(),
-      ImportExport.job_type == ImportExport.IMPORT_JOB_TYPE,
+  imported_jobs.filter(
       ImportExport.status.in_([ImportExport.NOT_STARTED_STATUS,
                                ImportExport.BLOCKED_STATUS])
       ).delete(synchronize_session=False)
