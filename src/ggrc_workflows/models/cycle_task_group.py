@@ -4,8 +4,6 @@
 """Module for cycle task group model.
 """
 
-import itertools
-
 from sqlalchemy import orm, inspect
 
 from ggrc import db
@@ -81,24 +79,6 @@ class CycleTaskGroup(roleable.Roleable,
   PROPERTY_TEMPLATE = u"group {}"
 
   _fulltext_attrs = [
-      attributes.MultipleSubpropertyFullTextAttr(
-          "task title", 'cycle_task_group_tasks', ["title"], False
-      ),
-      attributes.MultipleSubpropertyFullTextAttr(
-          "task assignees",
-          "_task_assignees",
-          ["email", "name"],
-          False
-      ),
-      attributes.MultipleSubpropertyFullTextAttr(
-          "task secondary assignees",
-          "_task_secondary_assignees",
-          ["email", "name"],
-          False,
-      ),
-      attributes.DateMultipleSubpropertyFullTextAttr(
-          "task due date", "cycle_task_group_tasks", ["end_date"], False
-      ),
       attributes.DateFullTextAttr("due date", 'next_due_date',),
       attributes.FullTextAttr("assignee", "contact", ['email', 'name']),
       attributes.FullTextAttr("cycle title", 'cycle', ['title'], False),
@@ -109,14 +89,6 @@ class CycleTaskGroup(roleable.Roleable,
       attributes.DateFullTextAttr("cycle due date",
                                   lambda x: x.cycle.next_due_date,
                                   with_template=False),
-      attributes.MultipleSubpropertyFullTextAttr(
-          "task comments",
-          lambda instance: itertools.chain(*[
-              t.cycle_task_entries for t in instance.cycle_task_group_tasks
-          ]),
-          ["description"],
-          False
-      ),
   ]
 
   @property
@@ -142,10 +114,8 @@ class CycleTaskGroup(roleable.Roleable,
 
   AUTO_REINDEX_RULES = [
       index_mixin.ReindexRule(
-          "CycleTaskGroupObjectTask", lambda x: x.cycle_task_group
-      ),
-      index_mixin.ReindexRule(
-          "Person", _query_filtered_by_contact
+          "Person",
+          _query_filtered_by_contact
       ),
       index_mixin.ReindexRule(
           "Person",
@@ -176,27 +146,10 @@ class CycleTaskGroup(roleable.Roleable,
         orm.Load(cls).load_only(
             "next_due_date",
         ),
-        orm.Load(cls).subqueryload("cycle_task_group_tasks").load_only(
-            "id",
-            "title",
-            "end_date"
-        ),
-        orm.Load(cls).subqueryload("cycle_task_group_tasks").joinedload(
-            "access_control_list"
-        ).load_only(
-            "person_id",
-            "ac_role_id"
-        ),
         orm.Load(cls).joinedload("cycle").load_only(
             "id",
             "title",
             "next_due_date"
-        ),
-        orm.Load(cls).subqueryload("cycle_task_group_tasks").joinedload(
-            "cycle_task_entries"
-        ).load_only(
-            "description",
-            "id"
         ),
         orm.Load(cls).joinedload("cycle").joinedload(
             "contact"
