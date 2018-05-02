@@ -10,6 +10,7 @@ const ManifestPlugin = require('webpack-manifest-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const WebpackShellPlugin = require('webpack-shell-plugin');
 const path = require('path');
+const getReleaseNotesDate = require('./getReleaseNotesDate.js');
 const ENV = process.env;
 const isProd = ENV.NODE_ENV === 'production';
 
@@ -153,6 +154,9 @@ module.exports = function (env) {
       new webpack.DefinePlugin({
         GOOGLE_ANALYTICS_ID: JSON.stringify(ENV.GOOGLE_ANALYTICS_ID),
         DEV_MODE: JSON.stringify(!isProd),
+        RELEASE_NOTES_DATE: JSON.stringify(
+          getReleaseNotesDate(`${contextDir}/js/components/release-notes-list/release-notes.md`)
+        ),
       }),
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
       new ManifestPlugin({
