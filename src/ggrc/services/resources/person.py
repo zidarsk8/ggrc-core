@@ -5,6 +5,7 @@
 
 import datetime
 import collections
+import functools
 
 from werkzeug.exceptions import Forbidden
 
@@ -113,59 +114,75 @@ class PersonResource(common.ExtendedResource):
         view_func=view_func,
         methods=['PUT', 'GET'])
 
+  @staticmethod
+  def verify_is_current(procedure):
+    """Check that the process user is the same as current user.
+
+    This function ensures that the user specified in the API call
+    is the same as the current user.
+    The wrapper should be used on API functions that are user specific such as
+    task_counts.
+
+    Raises Forbidden() when accessed user is not the same as current user.
+    """
+    @functools.wraps(procedure)
+    def wrapper(*args, **kwargs):
+      """Wrapper procedure."""
+      process_user_id = kwargs.get("id")
+      curent_user_id = login.get_current_user_id()
+      if curent_user_id != process_user_id:
+        raise Forbidden()
+      return procedure(*args, **kwargs)
+
+    return wrapper
+
   def get(self, *args, **kwargs):  # pylint: disable=arguments-differ
     # This is to extend the get request for additional data.
     command_map = {
         None: super(PersonResource, self).get,
-        "task_count": self._task_count,
-        "my_work_count": self._my_work_count,
-        "all_objects_count": self._all_objects_count,
-        "imports": converters.handle_import_get,
-        "exports": converters.handle_export_get,
+        "task_count": self.verify_is_current(self._task_count),
+        "my_work_count": self.verify_is_current(self._my_work_count),
+        "all_objects_count": self.verify_is_current(self._all_objects_count),
+        "imports": self.verify_is_current(converters.handle_import_get),
+        "exports": self.verify_is_current(converters.handle_export_get),
     }
     return self._process_request(command_map, *args, **kwargs)
 
   def post(self, *args, **kwargs):
     """This is to extend the post request for additional data."""
     command_map = {
+        None: super(PersonResource, self).post,
         # create import entry
-        "imports": converters.handle_import_post,
+        "imports": self.verify_is_current(converters.handle_import_post),
         # create export entry and start export background task
-        "exports": converters.handle_export_post,
+        "exports": self.verify_is_current(converters.handle_export_post),
     }
     return self._process_request(command_map, *args, **kwargs)
 
   def put(self, *args, **kwargs):  # pylint: disable=arguments-differ
     """This is to extend the put request for additional data."""
     command_map = {
-        "imports": converters.handle_import_put,
-        "exports": converters.handle_export_put,
+        None: super(PersonResource, self).put,
+        "imports": self.verify_is_current(converters.handle_import_put),
+        "exports": self.verify_is_current(converters.handle_export_put),
     }
     return self._process_request(command_map, *args, **kwargs)
 
   def delete(self, *args, **kwargs):  # pylint: disable=arguments-differ
     """This is to extend the delete request for additional data."""
     command_map = {
-        "imports": converters.handle_delete,
-        "exports": converters.handle_delete,
+        None: super(PersonResource, self).delete,
+        "imports": self.verify_is_current(converters.handle_delete),
+        "exports": self.verify_is_current(converters.handle_delete),
     }
     return self._process_request(command_map, *args, **kwargs)
 
   def _process_request(self, command_map, *args, **kwargs):
     """Process request"""
-    self._verify_current_user(**kwargs)
     command = kwargs.pop("command", None)
     if command not in command_map:
       self.not_found_response()
     return command_map[command](*args, **kwargs)
-
-  @staticmethod
-  def _verify_current_user(**kwargs):
-    """Verify user"""
-    id_ = kwargs.get("id")
-    user = login.get_current_user()
-    if id_ != user.id:
-      raise Forbidden()
 
   def _task_count(self, id):
     """Return open task count and overdue flag for a given user."""
