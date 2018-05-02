@@ -6,6 +6,7 @@
 from collections import OrderedDict
 
 import json
+import ddt
 import mock
 
 from ggrc.converters import errors
@@ -20,6 +21,7 @@ from integration.ggrc.services import TestCase
 from integration.ggrc.models import factories
 
 
+@ddt.ddt
 class TestUserGenerator(TestCase):
   """Test user generation."""
 
@@ -214,8 +216,62 @@ class TestUserGenerator(TestCase):
               "row_warnings": {errors.UNKNOWN_USER_WARNING.format(
                   line=3, email="cbabbage@example.com")}}})
 
-  @mock.patch("ggrc.settings.INTEGRATION_SERVICE_URL", new="endpoint")
-  @mock.patch("ggrc.utils.user_generator.search_user", return_value="user")
+  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
+  @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
+  @ddt.data(('aturing@example.com', 'aturing@example.com'),
+            ('', 'aturing@example.com'),
+            ('aturing@example.com', ''))
+  @ddt.unpack
+  def test_verifier_import(self, assignee_email, verifier_email):
+    """Test for verifiers import"""
+    with mock.patch.multiple(
+        PersonClient,
+        _post=mock.MagicMock(return_value={'persons': [{
+            'firstName': 'Alan',
+            'lastName': 'Turing',
+            'username': 'aturing'}]})
+    ):
+      audit = factories.AuditFactory()
+      slug = 'AssessmentTemplate1'
+      response = self.import_data(OrderedDict([
+          ('object_type', 'Assessment_Template'),
+          ('Code*', slug),
+          ('Audit*', audit.slug),
+          ('Default Assignees', assignee_email),
+          ('Default Verifiers', verifier_email),
+          ('Title', 'Title'),
+          ('Object Under Assessment', 'Control'),
+      ]))
+      assessment_template = AssessmentTemplate.query.filter(
+          AssessmentTemplate.slug == slug).first()
+
+      if assignee_email and verifier_email:
+        self._check_csv_response(response, {})
+        self.assertEqual(
+            len(assessment_template.default_people['assignees']), 1)
+        self.assertEqual(
+            len(assessment_template.default_people['verifiers']), 1)
+      elif assignee_email:
+        self._check_csv_response(response, {})
+        self.assertEqual(
+            len(assessment_template.default_people['assignees']), 1)
+        self.assertEqual(
+            assessment_template.default_people['verifiers'], None)
+      else:
+        self._check_csv_response(
+            response, {
+                'Assessment Template': {
+                    'row_errors': {
+                        errors.WRONG_REQUIRED_VALUE.format(
+                            line=3, value=assignee_email,
+                            column_name='Default Assignees')
+                    }
+                }
+            }
+        )
+
+  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
+  @mock.patch('ggrc.utils.user_generator.search_user', return_value='user')
   def test_invalid_email_import(self, _):
     """Test import of invalid email."""
     wrong_email = "some wrong email"

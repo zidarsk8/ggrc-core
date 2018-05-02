@@ -61,7 +61,8 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
           self.add_warning(errors.UNKNOWN_USER_WARNING,
                            column_name=self.display_name,
                            email=email)
-    if not people:
+
+    if not people and self.mandatory:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
     return people
 
@@ -71,7 +72,7 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
     These values are the normal selection in the default assignees dropdown.
     """
     value = self.PEOPLE_LABELS_MAP.get(self.raw_value.strip().lower())
-    if not value:
+    if not value and self.mandatory:
       self.add_error(errors.WRONG_REQUIRED_VALUE,
                      column_name=self.display_name,
                      value=self.raw_value.strip().lower())
@@ -96,7 +97,7 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
     code is merged into the develop branch. The joining of default_assignees
     and default_verifiers should be done by pre_commit_checks for imports.
     """
-    if not self.value or self.row_converter.ignore:
+    if not self.value and self.mandatory or self.row_converter.ignore:
       return
 
     default_people = self.row_converter.obj.default_people or {}

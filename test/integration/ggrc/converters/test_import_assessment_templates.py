@@ -62,11 +62,7 @@ class TestAssessmentTemplatesImport(TestCase):
         "Assessment Template": {
             "rows": 4,
             "updated": 0,
-            "created": 3,
-            "row_errors": {
-                errors.MISSING_VALUE_ERROR.format(
-                    line=5, column_name="Default Verifiers")
-            },
+            "created": 4,
             "row_warnings": {
                 errors.UNKNOWN_USER_WARNING.format(
                     line=5,
