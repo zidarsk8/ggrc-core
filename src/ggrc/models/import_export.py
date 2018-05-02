@@ -7,6 +7,7 @@ import json
 from datetime import datetime
 
 from sqlalchemy.dialects import mysql
+from sqlalchemy import exists, and_
 
 from ggrc import db
 from ggrc.models.mixins.base import Identifiable
@@ -19,20 +20,29 @@ class ImportExport(Identifiable, db.Model):
 
   __tablename__ = 'import_exports'
 
+  IMPORT_JOB_TYPE = 'Import'
+  EXPORT_JOB_TYPE = 'Export'
+
+  ANALYSIS_STATUS = 'Analysis'
+  BLOCKED_STATUS = 'Blocked'
+  IN_PROGRESS_STATUS = 'In Progress'
+  NOT_STARTED_STATUS = 'Not Started'
+
+
   IMPORT_EXPORT_STATUSES = [
-      'Not Started',
-      'Analysis',
-      'In Progress',
-      'Blocked',
+      NOT_STARTED_STATUS,
+      ANALYSIS_STATUS,
+      IN_PROGRESS_STATUS,
+      BLOCKED_STATUS,
       'Analysis Failed',
       'Stopped',
       'Failed',
       'Finished',
   ]
 
-  job_type = db.Column(db.Enum('Import', 'Export'), nullable=False)
+  job_type = db.Column(db.Enum(IMPORT_JOB_TYPE, EXPORT_JOB_TYPE), nullable=False)
   status = db.Column(db.Enum(*IMPORT_EXPORT_STATUSES), nullable=False,
-                     default='Not Started')
+                     default=NOT_STARTED_STATUS)
   description = db.Column(db.Text)
   created_at = db.Column(db.DateTime, nullable=False)
   start_at = db.Column(db.DateTime)
@@ -89,18 +99,22 @@ def get_jobs(job_type, ids=None):
 
 def delete_previous_imports():
   """Delete not finished imports"""
-  active_jobs = ImportExport.query.filter(
-      ImportExport.created_by == get_current_user(),
-      ImportExport.job_type == "Import",
-      ImportExport.status.in_(["Analysis", "In Progress"])).count()
+
+  active_jobs = db.session.query(exists().where(
+      and_(ImportExport.created_by == get_current_user(),
+           and_(ImportExport.job_type == ImportExport.IMPORT_JOB_TYPE,
+                ImportExport.status.in_([ImportExport.ANALYSIS_STATUS,
+                                         ImportExport.IN_PROGRESS_STATUS])))
+      )).scalar()
   if active_jobs:
-    raise BadRequest("Import in progress")
+    raise BadRequest('Import in progress')
 
   ImportExport.query.filter(
       ImportExport.created_by == get_current_user(),
-      ImportExport.job_type == "Import",
-      ImportExport.status.in_(["Not Started", "Blocked"])).delete(
-      synchronize_session=False)
+      ImportExport.job_type == ImportExport.IMPORT_JOB_TYPE,
+      ImportExport.status.in_([ImportExport.NOT_STARTED_STATUS,
+                               ImportExport.BLOCKED_STATUS])
+      ).delete(synchronize_session=False)
   db.session.commit()
 
 
