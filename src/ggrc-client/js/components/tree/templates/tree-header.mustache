@@ -28,14 +28,22 @@
   </tree-header-selector>
   <div class="flex-box tree-header-titles">
     {{#selectedColumns}}
-      <sortable-column
-        class="tree-header-titles__item"
-        {(sort)}="orderBy"
-        sort-field="{{attr_sort_field}}">
-        <span class="tree-header-titles__text">
-          {{attr_title}}
-        </span>
-      </sortable-column>
+      {{#if disable_sorting}}
+        <div class="tree-header-titles__item">
+          <span class="tree-header-titles__text">
+            {{attr_title}}
+          </span>
+        </div>
+      {{else}}
+        <sortable-column
+          class="tree-header-titles__item"
+          {(sort)}="orderBy"
+          sort-field="{{attr_sort_field}}">
+          <span class="tree-header-titles__text">
+            {{attr_title}}
+          </span>
+        </sortable-column>
+      {{/if}}
     {{/selectedColumns}}
     </div>
 </header>

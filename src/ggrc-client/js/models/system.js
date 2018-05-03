@@ -133,6 +133,7 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
       this.tree_view_options.attr_list.push({
         attr_title: 'Questionnaire',
         attr_name: 'questionnaire',
+        disable_sorting: true,
       });
     }
     this.validateNonBlank('title');
@@ -181,6 +182,7 @@ CMS.Models.SystemOrProcess('CMS.Models.Process', {
       this.tree_view_options.attr_list.push({
         attr_title: 'Questionnaire',
         attr_name: 'questionnaire',
+        disable_sorting: true,
       });
     }
     this.validateNonBlank('title');
