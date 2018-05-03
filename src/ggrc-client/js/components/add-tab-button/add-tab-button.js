@@ -4,8 +4,21 @@
 */
 
 import template from './add-tab-button.mustache';
+import Permission from '../../permission';
 
 const viewModel = can.Map.extend({
+  define: {
+    isAuditInaccessibleAssessment: {
+      get() {
+        let audit = this.attr('instance.audit');
+        let type = this.attr('instance.type');
+        let result = (type === 'Assessment') &&
+          !!audit &&
+          !Permission.is_allowed_for('read', audit);
+        return result;
+      },
+    },
+  },
   instance: null,
   widgetList: null,
   urlPath: '',

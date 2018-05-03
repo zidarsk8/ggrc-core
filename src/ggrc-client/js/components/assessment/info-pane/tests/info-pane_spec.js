@@ -5,6 +5,7 @@
 
 import tracker from '../../../../tracker';
 import DeferredTransaction from '../../../../plugins/utils/deferred-transaction-utils';
+import Permission from '../../../../permission';
 
 describe('GGRC.Components.assessmentInfoPane', function () {
   let vm;
@@ -43,6 +44,37 @@ describe('GGRC.Components.assessmentInfoPane', function () {
             });
           });
       });
+    });
+  });
+
+  describe('isAllowedToMap attribute', ()=> {
+    describe('get() method', ()=> {
+      it(`returns true if there is audit
+        and it is allowed to read instance.audit`, ()=> {
+          vm.attr('instance.audit', {});
+          spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+
+          let result = vm.attr('isAllowedToMap');
+
+          expect(result).toBe(true);
+        });
+      it('returns false if there is no audit', ()=> {
+        vm.attr('instance.audit', null);
+
+        let result = vm.attr('isAllowedToMap');
+
+        expect(result).toBe(false);
+      });
+
+      it(`returns false if there is audit
+        but it is not allowed to read instance.audit`, ()=> {
+          vm.attr('instance.audit', {});
+          spyOn(Permission, 'is_allowed_for').and.returnValue(false);
+
+          let result = vm.attr('isAllowedToMap');
+
+          expect(result).toBe(false);
+        });
     });
   });
 
