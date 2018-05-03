@@ -551,11 +551,11 @@ def handle_cycle_task_group_object_task_put(
     db.session.flush()
 
 
-@signals.Restful.model_posted_after_commit.connect_via(
+@signals.Restful.model_posted.connect_via(
     models.CycleTaskGroupObjectTask)
-@signals.Restful.model_put_before_commit.connect_via(
+@signals.Restful.model_put.connect_via(
     models.CycleTaskGroupObjectTask)
-@signals.Restful.model_deleted_after_commit.connect_via(
+@signals.Restful.model_deleted.connect_via(
     models.CycleTaskGroupObjectTask)
 # noqa pylint: disable=unused-argument
 def handle_cycle_object_status(
@@ -563,7 +563,7 @@ def handle_cycle_object_status(
         initial_state=None):
   """Calculate status of cycle and cycle task group"""
   update_cycle_task_tree([obj])
-  db.session.commit()
+  # db.session.commit()
 
 
 @signals.Restful.model_posted.connect_via(models.CycleTaskGroupObjectTask)

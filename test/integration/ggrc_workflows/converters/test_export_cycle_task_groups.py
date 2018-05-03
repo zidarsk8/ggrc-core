@@ -3,7 +3,7 @@
 
 
 """Tests for task group task specific export."""
-
+import unittest
 from collections import defaultdict
 
 from ddt import data, unpack, ddt
@@ -16,6 +16,7 @@ from integration.ggrc import TestCase
 from ggrc.models.all_models import CycleTaskGroupObjectTask, CycleTaskGroup
 
 
+@unittest.skip("Skip cause feature cut.")
 @ddt
 class TestExportTasks(TestCase):
   """Test imports for basic workflow objects."""
