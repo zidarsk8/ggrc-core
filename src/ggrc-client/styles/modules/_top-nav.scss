@@ -86,7 +86,7 @@ ul.internav {
   @extend %clearfix;
   margin-left: 28px;
   li {
-    &.inner-nav-button {
+    &.inner-nav__actions {
       margin-left: auto;
       align-self: center;
       padding-right: 40px;
