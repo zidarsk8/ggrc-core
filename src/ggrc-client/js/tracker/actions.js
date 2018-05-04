@@ -19,10 +19,14 @@ export const USER_JOURNEY_KEYS = {
   NAVIGATION: 'Navigation',
   ADD_ATTACHMENT: 'Add attachment',
   MAPPING_TO_OBJECT: 'Mapping to object',
+  API: 'API Methods',
 };
 
 // Timing Label in Google Analytics Timing API
 export const USER_ACTIONS = {
+  CREATE_OBJECT: 'Creating new object',
+  UPDATE_OBJECT: 'Updating object',
+  LOAD_OBJECT: 'Loading object',
   MULTISELECT_FILTER: 'Multi-select filter',
   TREE_VIEW_PAGE_LOADING: 'Loading of tree view page',
   OPEN_INFO_PANE: 'Open Info pane',
