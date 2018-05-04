@@ -8,6 +8,12 @@ import Pagination from '../../base-objects/pagination';
 import Permission from '../../../permission';
 
 const viewModel = can.Map.extend({
+  /**
+   * A model name. Each item within the task list
+   * will have this model name.
+   */
+  relatedItemsType: 'TaskGroupTask',
+}, {
   define: {
     paging: {
       value() {
@@ -23,8 +29,12 @@ const viewModel = can.Map.extend({
         );
       },
     },
+    relatedItemsType: {
+      get() {
+        return this.constructor.relatedItemsType;
+      },
+    },
   },
-  relatedItemsType: 'TaskGroupTask',
   initialOrderBy: 'created_at',
   gridSpinner: 'grid-spinner',
   items: [],
@@ -60,11 +70,19 @@ const viewModel = can.Map.extend({
 });
 
 const events = {
-  '{CMS.Models.TaskGroupTask} destroyed'() {
-    this.viewModel.updatePagingAfterDestroy();
+  [`{CMS.Models.${viewModel.relatedItemsType}} destroyed`](
+    model, event, instance
+  ) {
+    if (instance instanceof CMS.Models[viewModel.relatedItemsType]) {
+      this.viewModel.updatePagingAfterDestroy();
+    }
   },
-  '{CMS.Models.TaskGroupTask} created'() {
-    this.viewModel.updatePagingAfterCreate();
+  [`{CMS.Models.${viewModel.relatedItemsType}} created`](
+    model, event, instance
+  ) {
+    if (instance instanceof CMS.Models[viewModel.relatedItemsType]) {
+      this.viewModel.updatePagingAfterCreate();
+    }
   },
 };
 
