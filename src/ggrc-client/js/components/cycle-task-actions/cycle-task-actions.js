@@ -10,6 +10,7 @@ import {
 } from '../../plugins/utils/current-page-utils';
 import template from './cycle-task-actions.mustache';
 import WorkflowHelpers from '../workflow/workflow-helpers';
+import Permission from '../../permission';
 
 (function (can, GGRC) {
   'use strict';
@@ -40,14 +41,16 @@ import WorkflowHelpers from '../workflow/workflow-helpers';
       },
       isShowActionButtons: {
         get: function () {
-          let pageType = getPageType();
-          let allowChangeState = this.attr('instance.allow_change_state');
+          const pageType = getPageType();
+          const instance = this.attr('instance');
+
+          let showButtons = Permission.is_allowed_for('update', instance);
 
           if (pageType === 'Workflow') {
-            return this.attr('cycle').reify().attr('is_current');
+            return showButtons && this.attr('cycle').reify().attr('is_current');
           }
 
-          return allowChangeState;
+          return showButtons;
         },
       },
     },
