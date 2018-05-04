@@ -658,10 +658,10 @@ def compute_attributes(revision_ids):
     for ids_chunk in utils.list_chunks(revision_ids, chunk_size=CA_CHUNK_SIZE):
       handled_ids += len(ids_chunk)
       logger.info("Revision: %s/%s", handled_ids, ids_count)
-      reindex_chunk(ids_chunk)
+      recompute_attrs_for_revisions(ids_chunk)
 
 
-def reindex_chunk(ids_chunk):
+def recompute_attrs_for_revisions(ids_chunk):
   """Reindex chunk of CAs."""
   with benchmark("Get revisions."):
     revisions = get_revisions(ids_chunk)
