@@ -49,7 +49,7 @@ from ggrc.views import filters
 from ggrc.views import notifications
 from ggrc.views.registry import object_view
 from ggrc import utils
-from ggrc.utils import benchmark
+from ggrc.utils import benchmark, helpers
 from ggrc.utils import revisions
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -186,6 +186,7 @@ def start_update_audit_issues(audit_id, message):
   task.start()
 
 
+@helpers.without_sqlalchemy_cache
 def do_reindex(with_reindex_snapshots=False):
   """Update the full text search index."""
 
@@ -223,6 +224,7 @@ def do_reindex(with_reindex_snapshots=False):
   indexer.invalidate_cache()
 
 
+@helpers.without_sqlalchemy_cache
 def do_full_reindex():
   """Update the full text search index for all models."""
 

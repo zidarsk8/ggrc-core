@@ -25,7 +25,7 @@ import sqlalchemy as sa
 from ggrc import db
 from ggrc import login
 from ggrc import utils
-from ggrc.utils import revisions as revision_utils
+from ggrc.utils import revisions as revision_utils, helpers
 from ggrc.utils import benchmark
 from ggrc.models import all_models as models
 
@@ -636,6 +636,7 @@ def get_revisions(revision_ids):
   return non_snapshot_revisions + snapshot_revisions
 
 
+@helpers.without_sqlalchemy_cache
 def compute_attributes(revision_ids):
   """Compute new values based an changed objects.
 
