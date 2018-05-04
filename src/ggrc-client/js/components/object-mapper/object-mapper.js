@@ -25,6 +25,7 @@ import {
   REFRESH_MAPPING,
   REFRESH_SUB_TREE,
 } from '../../events/eventTypes';
+import tracker from '../../tracker';
 
 (function (can, $) {
   'use strict';
@@ -250,6 +251,9 @@ import {
         let data = {};
         let defer = [];
         let que = new RefreshQueue();
+        let stopFn = tracker.start(tracker.FOCUS_AREAS.MAPPINGS(instance.type),
+          tracker.USER_JOURNEY_KEYS.MAP_OBJECTS(type),
+          tracker.USER_ACTIONS.MAPPING_OBJECTS(objects.length));
 
         que.enqueue(instance).trigger().done((inst) => {
           data.context = instance.context || null;
@@ -293,6 +297,7 @@ import {
 
           $.when.apply($, defer)
             .fail((response, message) => {
+              stopFn(true);
               $('body').trigger('ajax:flash', {error: message});
             })
             .always(() => {
@@ -307,6 +312,8 @@ import {
                   destinationType: type,
                 });
               }
+
+              stopFn();
 
               if (this.viewModel.attr('refreshCounts')) {
                 // This Method should be modified to event

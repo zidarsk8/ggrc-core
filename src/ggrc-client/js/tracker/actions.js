@@ -11,6 +11,7 @@ export const FOCUS_AREAS = {
   SNAPSHOTS: 'Snapshots',
   IMPORT_AND_EXPORT: 'Import/Export',
   LHN: 'LHN',
+  MAPPINGS: (type) => `Mappings to ${type}`,
 };
 
 // Timing Variable in Google Analytics Timing API
@@ -18,7 +19,7 @@ export const USER_JOURNEY_KEYS = {
   LOADING: 'Loading',
   NAVIGATION: 'Navigation',
   ADD_ATTACHMENT: 'Add attachment',
-  MAPPING_TO_OBJECT: 'Mapping to object',
+  MAP_OBJECTS: (type) => `Mapped type: ${type}`,
   API: 'API Methods',
 };
 
@@ -27,6 +28,7 @@ export const USER_ACTIONS = {
   CREATE_OBJECT: 'Creating new object',
   UPDATE_OBJECT: 'Updating object',
   LOAD_OBJECT: 'Loading object',
+  MAPPING_OBJECTS: (count) => `Mapping objects: ${count}`,
   MULTISELECT_FILTER: 'Multi-select filter',
   TREE_VIEW_PAGE_LOADING: 'Loading of tree view page',
   OPEN_INFO_PANE: 'Open Info pane',
