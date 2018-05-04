@@ -10,5 +10,4 @@ permissions = {
     "create": [],
     "update": [],
     "delete": [],
-    "view_object_page": [],
 }
