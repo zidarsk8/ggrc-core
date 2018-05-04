@@ -121,9 +121,19 @@ module.exports = function (env) {
         query: {
           cacheDirectory: true,
         },
+      }, {
+        test: /\.md/,
+        use: [
+          {loader: 'raw-loader'},
+          {loader: 'parse-inner-links'},
+          {loader: 'md-to-html'},
+        ],
       }],
     },
     devtool: isProd ? 'source-map' : 'cheap-module-eval-source-map',
+    resolveLoader: {
+      modules: [nodeModulesDir, path.resolve(__dirname, 'loaders')],
+    },
     resolve: {
       modules: [nodeModulesDir, vendorDir],
       alias: {
