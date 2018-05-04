@@ -71,10 +71,6 @@ class Proposal(mixins.person_relation_factory("applied_by"),
     DIGEST_TMPL = settings.JINJA2.get_template(
         "notifications/proposal_digest.html")
 
-  class ACRoles(object):
-    READER = "ProposalReader"
-    EDITOR = "ProposalEditor"
-
   class STATES(object):
     """All states for proposals."""
     PROPOSED = "proposed"

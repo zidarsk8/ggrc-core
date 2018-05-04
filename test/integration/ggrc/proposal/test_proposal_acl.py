@@ -62,11 +62,3 @@ class TestACLPopulation(TestCase):
     ).all()
     self.assertEqual(int(read or update),
                      len(full_proposal_acls))
-    expected_roles = []
-    if update:
-      expected_roles.append(all_models.Proposal.ACRoles.EDITOR)
-    elif read:
-      expected_roles.append(all_models.Proposal.ACRoles.READER)
-    self.assertEqual(
-        sorted(expected_roles),
-        sorted([a.ac_role.name for a in full_proposal_acls]))
