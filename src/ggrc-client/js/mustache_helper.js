@@ -2303,9 +2303,9 @@ Mustache.registerHelper('is_auditor', function (options) {
 
 Mustache.registerHelper('has_role', function (role, instance, options) {
   instance = Mustache.resolve(instance);
-  const acr = getRole(instance.type, role);
+  const acr = instance ? getRole(instance.type, role) : null;
 
-  if (!acr || !instance) {
+  if (!acr) {
     return options.inverse(options.contexts);
   }
 
