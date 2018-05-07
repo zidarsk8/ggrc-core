@@ -106,6 +106,10 @@ import template from './page-header.mustache';
         type: 'string',
         value: GGRC.config.external_help_url,
       },
+      showReleaseNotes: {
+        type: Boolean,
+        value: GGRC.config.enable_release_notes,
+      },
     },
     showHideTitles: function (element) {
       let elWidth = element.width();
