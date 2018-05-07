@@ -49,10 +49,11 @@ from ggrc.views import filters
 from ggrc.views import notifications
 from ggrc.views.registry import object_view
 from ggrc import utils
-from ggrc.utils import benchmark
+from ggrc.utils import benchmark, helpers
 from ggrc.utils import revisions
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+REINDEX_CHUNK_SIZE = 100
 
 
 # Needs to be secured as we are removing @login_required
@@ -87,6 +88,14 @@ def reindex_snapshots(_):
 def reindex(_):
   """Web hook to update the full text search index."""
   do_reindex()
+  return app.make_response(("success", 200, [("Content-Type", "text/html")]))
+
+
+@app.route("/_background_tasks/full_reindex", methods=["POST"])
+@queued_task
+def full_reindex(_):
+  """Web hook to update the full text search index for all models."""
+  do_full_reindex()
   return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 
@@ -177,7 +186,8 @@ def start_update_audit_issues(audit_id, message):
   task.start()
 
 
-def do_reindex():
+@helpers.without_sqlalchemy_cache
+def do_reindex(with_reindex_snapshots=False):
   """Update the full text search index."""
 
   indexer = get_indexer()
@@ -200,13 +210,26 @@ def do_reindex():
       ids = [obj.id for obj in model.query]
       ids_count = len(ids)
       handled_ids = 0
-      for ids_chunk in utils.list_chunks(ids):
+      for ids_chunk in utils.list_chunks(ids, chunk_size=REINDEX_CHUNK_SIZE):
         handled_ids += len(ids_chunk)
-        logger.info("%s: %s / %s", model_name, handled_ids, ids_count)
+        logger.info("%s: %s / %s", model.__name__, handled_ids, ids_count)
         model.bulk_record_update_for(ids_chunk)
         db.session.commit()
 
+  if with_reindex_snapshots:
+    logger.info("Updating index for: %s", "Snapshot")
+    with benchmark("Create records for %s" % "Snapshot"):
+      snapshot_indexer.reindex()
+
   indexer.invalidate_cache()
+
+
+@helpers.without_sqlalchemy_cache
+def do_full_reindex():
+  """Update the full text search index for all models."""
+
+  do_reindex(with_reindex_snapshots=True)
+  start_compute_attributes("all_latest")
 
 
 class SetEncoder(json.JSONEncoder):
@@ -483,6 +506,22 @@ def admin_reindex():
       name="reindex",
       url=url_for(reindex.__name__),
       queued_callback=reindex
+  )
+  return task_queue.make_response(
+      app.make_response(("scheduled %s" % task_queue.name, 200,
+                         [('Content-Type', 'text/html')])))
+
+
+@app.route("/admin/full_reindex", methods=["POST"])
+@login_required
+@admin_required
+def admin_full_reindex():
+  """Calls a webhook that reindexes all indexable objects
+  """
+  task_queue = create_task(
+      name="full_reindex",
+      url=url_for(full_reindex.__name__),
+      queued_callback=full_reindex
   )
   return task_queue.make_response(
       app.make_response(("scheduled %s" % task_queue.name, 200,

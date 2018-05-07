@@ -92,13 +92,6 @@ class TestCase(BaseTestCase, object):
       if acl.ac_role_id == role_id:
         yield acl.person
 
-  def _full_reindex(self):
-    """Run reindex for all objects and attributes."""
-    self.client.get("/login")
-    self.client.post("/admin/reindex")
-    self.client.post("/admin/reindex_snapshots")
-    self.client.post("/admin/compute_attributes")
-
   @contextlib.contextmanager
   def custom_headers(self, headers=None):
     """Context manager that allowed to add some custom headers in request."""
