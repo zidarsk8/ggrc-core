@@ -19,6 +19,7 @@ export const USER_JOURNEY_KEYS = {
   LOADING: 'Loading',
   NAVIGATION: 'Navigation',
   ATTACHMENTS: 'Attachments',
+  TREEVIEW: 'TreeView',
   MAP_OBJECTS: (type) => `Mapped type: ${type}`,
   API: 'API Methods',
 };
@@ -32,10 +33,13 @@ export const USER_ACTIONS = {
   ADD_ATTACHMENT: (count) => `Attachment of ${count} file(s)`,
   ADD_ATTACHMENT_TO_FOLDER: (count) =>
     `Attachment to folder of ${count} file(s)`,
-  MULTISELECT_FILTER: 'Multi-select filter',
-  TREE_VIEW_PAGE_LOADING: 'Loading of tree view page',
-  OPEN_INFO_PANE: 'Open Info pane',
   ADVANCED_SEARCH_FILTER: 'Advanced search filter',
+  TREEVIEW: {
+    FILTER: 'Tree view filter',
+    OPEN_INFO_PANE: 'Open Info pane',
+    TREE_VIEW_PAGE_LOADING: 'Loading of tree view page',
+    SUB_TREE_LOADING: 'Loading sub-level of tree view',
+  },
   LHN: {
     SHOW_LIST: 'LHN: Show list of items',
     SHOW_MORE: 'LHN: Show more items for the list',

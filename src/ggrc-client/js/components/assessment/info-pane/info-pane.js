@@ -255,8 +255,8 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
             this.attr('isUpdating' + can.capitalize(type), false);
 
             tracker.stop(this.attr('instance.type'),
-              tracker.USER_JOURNEY_KEYS.NAVIGATION,
-              tracker.USER_ACTIONS.OPEN_INFO_PANE);
+              tracker.USER_JOURNEY_KEYS.TREEVIEW,
+              tracker.USER_ACTIONS.TREEVIEW.OPEN_INFO_PANE);
           }.bind(this));
         return dfd;
       },
@@ -410,8 +410,8 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
             this.attr('instance').dispatch(RELATED_ITEMS_LOADED);
 
             tracker.stop(this.attr('instance.type'),
-              tracker.USER_JOURNEY_KEYS.NAVIGATION,
-              tracker.USER_ACTIONS.OPEN_INFO_PANE);
+              tracker.USER_JOURNEY_KEYS.TREEVIEW,
+              tracker.USER_ACTIONS.TREEVIEW.OPEN_INFO_PANE);
           });
       },
       initializeFormFields: function () {
