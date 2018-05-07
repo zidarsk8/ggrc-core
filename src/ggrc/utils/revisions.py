@@ -255,8 +255,8 @@ def do_missing_revisions():
         continue
       obj = model.query.get(obj_id)
       if not obj:
-        logger.warning("Object '%s' with id '%s' does't exists,"
-                       " revision generation skipped", model, obj_id)
+        logger.info("Object '%s' with id '%s' does't exists,"
+                    " revision generation skipped", obj_type, obj_id)
         continue
 
       obj_content = obj.log_json()
