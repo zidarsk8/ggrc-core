@@ -122,7 +122,6 @@ class Audit(Snapshotable,
       "report_start_date": "Planned Report Period from",
       "report_end_date": "Planned Report Period to",
       "notes": None,
-      "documents_reference_url": None,
       "archived": {
           "display_name": "Archived",
           "mandatory": False
