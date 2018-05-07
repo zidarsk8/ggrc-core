@@ -80,24 +80,25 @@ import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
         uploadFiles({
           parentId: el.data('folder-id'),
           pickFolder: el.data('type') === 'folders',
-        }).then((files) => {
-          scope.attr('pickerActive', false);
-          this.beforeCreateHandler(files);
+        })
+          .then((files) => {
+            scope.attr('pickerActive', false);
+            this.beforeCreateHandler(files);
 
-          this.createDocumentModel(files)
-            .then((docs) => {
-              el.trigger('modal:success', {arr: docs});
-            })
-            .always(() => {
-              this.attr('isUploading', false);
-              this.dispatch('finish');
-            });
-        }).fail((err)=>{
-          if ( err && err.type === GDRIVE_PICKER_ERR_CANCEL ) {
-            el.trigger('rejected');
-          }
-          this.attr('isUploading', false);
-        });
+            return this.createDocumentModel(files);
+          })
+          .then((docs) => {
+            el.trigger('modal:success', {arr: docs});
+          })
+          .always(() => {
+            this.attr('isUploading', false);
+            this.dispatch('finish');
+          })
+          .fail((err)=>{
+            if ( err && err.type === GDRIVE_PICKER_ERR_CANCEL ) {
+              el.trigger('rejected');
+            }
+          });
       },
 
       trigger_upload_parent: function (scope, el) {
