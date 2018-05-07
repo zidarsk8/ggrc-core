@@ -18,7 +18,7 @@ export const FOCUS_AREAS = {
 export const USER_JOURNEY_KEYS = {
   LOADING: 'Loading',
   NAVIGATION: 'Navigation',
-  ADD_ATTACHMENT: 'Add attachment',
+  ATTACHMENTS: 'Attachments',
   MAP_OBJECTS: (type) => `Mapped type: ${type}`,
   API: 'API Methods',
 };
@@ -29,6 +29,9 @@ export const USER_ACTIONS = {
   UPDATE_OBJECT: 'Updating object',
   LOAD_OBJECT: 'Loading object',
   MAPPING_OBJECTS: (count) => `Mapping objects: ${count}`,
+  ADD_ATTACHMENT: (count) => `Attachment of ${count} file(s)`,
+  ADD_ATTACHMENT_TO_FOLDER: (count) =>
+    `Attachment to folder of ${count} file(s)`,
   MULTISELECT_FILTER: 'Multi-select filter',
   TREE_VIEW_PAGE_LOADING: 'Loading of tree view page',
   OPEN_INFO_PANE: 'Open Info pane',

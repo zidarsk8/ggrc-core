@@ -9,6 +9,7 @@ import {
   GDRIVE_PICKER_ERR_CANCEL,
 } from '../../plugins/utils/gdrive-picker-utils.js';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
+import tracker from '../../tracker';
 
 (function (can, $, GGRC, CMS) {
   'use strict';
@@ -74,7 +75,7 @@ import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
         });
       },
       trigger_upload: function (scope, el) {
-        // upload files without a parent folder (risk assesment)
+        let stopFn = () => {};
 
         this.attr('isUploading', true);
         uploadFiles({
@@ -82,19 +83,29 @@ import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
           pickFolder: el.data('type') === 'folders',
         })
           .then((files) => {
+            let filesCount = files && files.length ? files.length : 0;
+
+            stopFn = tracker.start(scope.instance.type,
+              tracker.USER_JOURNEY_KEYS.ATTACHMENTS,
+              tracker.USER_ACTIONS.ADD_ATTACHMENT(filesCount));
+            return files;
+          })
+          .then((files) => {
             scope.attr('pickerActive', false);
             this.beforeCreateHandler(files);
 
             return this.createDocumentModel(files);
           })
           .then((docs) => {
+            stopFn();
             el.trigger('modal:success', {arr: docs});
           })
           .always(() => {
             this.attr('isUploading', false);
             this.dispatch('finish');
           })
-          .fail((err)=>{
+          .fail((err) => {
+            stopFn(true);
             if ( err && err.type === GDRIVE_PICKER_ERR_CANCEL ) {
               el.trigger('rejected');
             }
@@ -106,6 +117,7 @@ import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
         let that = this;
         let parentFolderDfd;
         let folderId;
+        let stopFn = () => {};
 
         if (that.instance.attr('_transient.folder')) {
           parentFolderDfd = can.when(
@@ -124,11 +136,19 @@ import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
             uploadFiles({
               parentId: parentFolder.id,
             })
+              .then((files) => {
+                let filesCount = files && files.length ? files.length : 0;
+                stopFn = tracker.start(scope.instance.type,
+                  tracker.USER_JOURNEY_KEYS.ATTACHMENTS,
+                  tracker.USER_ACTIONS.ADD_ATTACHMENT_TO_FOLDER(filesCount));
+                return files;
+              })
               .then(function (files) {
                 that.beforeCreateHandler(files);
 
                 that.createDocumentModel(files)
                   .then((docs)=> {
+                    stopFn();
                     el.trigger('modal:success', {arr: docs});
                   })
                   .always(()=> {
@@ -139,6 +159,8 @@ import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
               .fail(function () {
                 // This case happens when user have no access to write in audit folder
                 let error = _.last(arguments);
+
+                stopFn(true);
                 if (error && error.code === 403) {
                   GGRC.Errors.notifier('error', GGRC.Errors.messages[403]);
                   el.trigger('modal:success');
