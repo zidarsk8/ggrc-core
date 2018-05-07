@@ -6,6 +6,7 @@
 import template from './templates/task-list.mustache';
 import Pagination from '../../base-objects/pagination';
 import Permission from '../../../permission';
+import {REFRESH_RELATED} from '../../../events/eventTypes';
 
 const viewModel = can.Map.extend({
   /**
@@ -49,7 +50,10 @@ const viewModel = can.Map.extend({
       // reload items manually, because CanJs does not
       // trigger "change" event, when we try to set first page
       // (we are already on first page)
-      this.attr('baseInstance').dispatch('refreshInstance');
+      this.attr('baseInstance').dispatch({
+        ...REFRESH_RELATED,
+        model: this.attr('relatedItemsType'),
+      });
     }
   },
   updatePagingAfterDestroy() {
@@ -64,7 +68,10 @@ const viewModel = can.Map.extend({
       this.attr('paging.current', current - 1);
     } else {
       // update current page
-      this.attr('baseInstance').dispatch('refreshInstance');
+      this.attr('baseInstance').dispatch({
+        ...REFRESH_RELATED,
+        model: this.attr('relatedItemsType'),
+      });
     }
   },
 });

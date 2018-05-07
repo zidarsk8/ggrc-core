@@ -50,6 +50,7 @@ import tracker from '../../../tracker';
 import {REFRESH_TAB_CONTENT,
   RELATED_ITEMS_LOADED,
   REFRESH_MAPPING,
+  REFRESH_RELATED,
 } from '../../../events/eventTypes';
 import Permission from '../../../permission';
 import {initCounts} from '../../../plugins/utils/current-page-utils';
@@ -545,9 +546,14 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
       this.viewModel.setVerifierRoleId();
     },
     events: {
-      [`{viewModel.instance} ${REFRESH_MAPPING.type}`]() {
-        this.viewModel.attr('mappedSnapshots')
+      [`{viewModel.instance} ${REFRESH_MAPPING.type}`](scope, event) {
+        const viewModel = this.viewModel;
+        viewModel.attr('mappedSnapshots')
           .replace(this.viewModel.loadSnapshots());
+        viewModel.attr('instance').dispatch({
+          ...REFRESH_RELATED,
+          model: event.destinationType,
+        });
       },
       '{viewModel.instance} modelBeforeSave': function () {
         this.viewModel.attr('isAssessmentSaving', true);
