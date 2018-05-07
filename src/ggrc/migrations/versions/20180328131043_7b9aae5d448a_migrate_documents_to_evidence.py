@@ -270,9 +270,10 @@ def delete_migrated_document(connection, document_id):
                      document_id=document_id)
 
 
-def process_doc(connection, doc, migration_user_id):
+def process_doc(connection, doc, migration_user_id,
+                doc_admin_role_id, evid_admin_role_id):
   """Process transformation from document to evidence"""
-  doc_admin_role_id, evid_admin_role_id = build_acr_mapping(connection)
+
   evidence_id = create_evidence(connection, doc, migration_user_id)
   copy_admin_acls(connection, doc.doc_id, evidence_id, doc_admin_role_id,
                   evid_admin_role_id, migration_user_id)
@@ -288,9 +289,11 @@ def run_migration():
   migration_user_id = migrator.get_migration_user_id(connection)
   count = get_docs_to_migrate_count(connection)
   docs_to_migrate = get_docs_to_migrate(connection)
+  doc_admin_role_id, evid_admin_role_id = build_acr_mapping(connection)
   for i, doc in enumerate(docs_to_migrate):
     print "Processing document {} of {}".format(i, count)
-    process_doc(connection, doc, migration_user_id)
+    process_doc(connection, doc, migration_user_id,
+                doc_admin_role_id, evid_admin_role_id)
 
 
 def upgrade():
