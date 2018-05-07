@@ -25,9 +25,9 @@ from ggrc.models.mixins import before_flush_handleable as bfh
 
 
 class Evidence(Roleable, Relatable, mixins.Titled,
-               bfh.BeforeFlushHandleable, Slugged, mixin.Indexed, Statusable,
+               bfh.BeforeFlushHandleable, Slugged, Statusable,
                WithLastDeprecatedDate, comment.Commentable,
-               WithAutoDeprecation, Identifiable, db.Model):
+               WithAutoDeprecation, mixin.Indexed, Identifiable, db.Model):
   """Evidence (Audit-scope URLs, FILE's) model."""
   __tablename__ = "evidence"
 
