@@ -123,14 +123,16 @@ describe('ModalsController', function () {
   describe('save_error method', function () {
     let method;
     let foo;
+    let ctrlInst;
 
     beforeEach(function () {
+      ctrlInst = jasmine.createSpyObj(['disableEnableContentUI']);
       foo = jasmine.createSpy();
       spyOn(GGRC.Errors, 'notifier');
       spyOn(GGRC.Errors, 'notifierXHR')
         .and.returnValue(foo);
       spyOn(window, 'clearTimeout');
-      method = Ctrl.prototype.save_error.bind({});
+      method = Ctrl.prototype.save_error.bind(ctrlInst);
     });
     it('calls GGRC.Errors.notifier with responseText' +
     ' if error status is not 409', function () {
@@ -148,6 +150,11 @@ describe('ModalsController', function () {
       expect(GGRC.Errors.notifierXHR)
         .toHaveBeenCalledWith('warning');
       expect(foo).toHaveBeenCalledWith(error);
+    });
+
+    it('calls "disableEnableContentUI" method', () => {
+      method();
+      expect(ctrlInst.disableEnableContentUI).toHaveBeenCalledWith(false);
     });
   });
 });

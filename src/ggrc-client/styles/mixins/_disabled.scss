@@ -3,7 +3,7 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-@mixin disabled() {
+@mixin disabled($opacity: 0.25) {
   pointer-events: none;
-  opacity: 0.25;
+  opacity: $opacity;
 }
