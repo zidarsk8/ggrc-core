@@ -14,11 +14,13 @@ import json
 
 from datetime import datetime
 
+import threading
 import ddt
 import mock
 
-from google.appengine.ext import testbed
+from google.appengine.ext import deferred
 
+from ggrc import db
 from ggrc.models import all_models
 
 from integration.ggrc import api_helper
@@ -38,15 +40,36 @@ class TestImportExports(TestCase):
         "X-Requested-By": ["GGRC"],
     }
     self.api = api_helper.Api()
-    self.testbed = testbed.Testbed()
-    self.testbed.activate()
+    self.init_taskqueue()
 
-    # root_path must be set the the location of queue.yaml.
+  def run_full_import(self, user, imp_exp_obj):
+    """Emulate full cycle of data importing.
 
-    # Otherwise, only the 'default' queue will be available.
-    self.testbed.init_taskqueue_stub()
-    self.taskqueue_stub = self.testbed.get_stub(
-        testbed.TASKQUEUE_SERVICE_NAME)
+    Args:
+        user: User object under which import should be run.
+        imp_exp_obj: Instance of ImportExport containing data
+          should be imported.
+    """
+    response = self.client.put(
+        "/api/people/{}/imports/{}/start".format(user.id, imp_exp_obj.id),
+        headers=self.headers,
+    )
+    self.assert200(response)
+
+    tasks = self.taskqueue_stub.get_filtered_tasks()
+    self.assertEqual(len(tasks), 1)
+
+    def run_task():
+      """Run deferred import job."""
+      # check_for_previous_run is mocked as we don't use webapp2
+      # in test environment
+      with mock.patch("ggrc.views.converters.check_for_previous_run"):
+        deferred.run(tasks[0].payload)
+
+    # Run import job in separate thread to emulate work of appengine queue
+    task_thread = threading.Thread(target=run_task, args=())
+    task_thread.start()
+    task_thread.join()
 
   @mock.patch("ggrc.gdrive.file_actions.get_gdrive_file_data",
               new=lambda x: (x, None, None))
@@ -228,3 +251,68 @@ class TestImportExports(TestCase):
         headers=self.headers)
     self.assert200(response)
     self.assertEqual(json.loads(response.data)["status"], "Stopped")
+
+  @mock.patch(
+      "ggrc.gdrive.file_actions.get_gdrive_file_data",
+      new=lambda x: (x, None, None)
+  )
+  def test_import_control_revisions(self):
+    """Test if new revisions created during import."""
+    data = "Object type,,,\n" \
+           "Control,Code*,Title*,Admin*\n" \
+           ",,Test control,user@example.com"
+
+    user = all_models.Person.query.first()
+    imp_exp = factories.ImportExportFactory(
+        job_type="Import",
+        status="Blocked",
+        created_by=user,
+        created_at=datetime.now(),
+        content=data,
+    )
+
+    self.run_full_import(user, imp_exp)
+    # We need to reopen session to grab newly created data
+    db.session.close()
+
+    control = all_models.Control.query.filter_by(title="Test control").first()
+    self.assertIsNotNone(control)
+    revision_actions = db.session.query(all_models.Revision.action).filter(
+        all_models.Revision.resource_type == "Control",
+        all_models.Revision.resource_id == control.id
+    )
+    self.assertEqual({"created", "modified"}, {a[0] for a in revision_actions})
+
+  @mock.patch(
+      "ggrc.gdrive.file_actions.get_gdrive_file_data",
+      new=lambda x: (x, None, None)
+  )
+  def test_import_snapshot(self):
+    """Test if snapshots can be created from imported objects."""
+    data = "Object type,,,\n" \
+           "Control,Code*,Title*,Admin*\n" \
+           ",,Control1,user@example.com\n" \
+           ",,Control2,user@example.com\n" \
+           ",,Control3,user@example.com"
+
+    user = all_models.Person.query.first()
+    with factories.single_commit():
+      imp_exp = factories.ImportExportFactory(
+          job_type="Import",
+          status="Blocked",
+          created_at=datetime.now(),
+          created_by=user,
+          content=data,
+      )
+      audit_id = factories.AuditFactory().id
+
+    self.run_full_import(user, imp_exp)
+    # We need to reopen session to grab newly created data
+    db.session.close()
+
+    controls = all_models.Control.query
+    self.assertEqual(3, controls.count())
+
+    audit = all_models.Audit.query.get(audit_id)
+    snapshots = self._create_snapshots(audit, controls.all())
+    self.assertEqual(3, len(snapshots))

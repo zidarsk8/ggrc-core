@@ -348,6 +348,17 @@ class SnapshotBlockConverter(object):
         for snapshot in self.snapshots
     ] or [[]]
 
-  def row_data_to_array(self):
+  def generate_csv_header(self):
+    return self._header_list
+
+  def generate_row_data(self):
     """Get 2D list representing the CSV file."""
-    return self._header_list, self._body_list
+    if not self.snapshots:
+      yield []
+    for snapshot in self.snapshots:
+      yield self._content_line_list(snapshot)
+
+  @property
+  def block_width(self):
+    """Returns width of block (header length)."""
+    return len(self._attribute_name_map.values() + self._cad_name_map.values())

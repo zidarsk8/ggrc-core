@@ -4,6 +4,8 @@
 """Tests for snapshot export."""
 import collections
 
+from google.appengine.ext import testbed
+
 from ggrc import models, db
 from ggrc.utils import QueryCounter
 from integration.ggrc import TestCase
@@ -76,6 +78,9 @@ class TestExportSnapshots(TestCase):
 
   def test_full_control_export(self):
     """Test exporting of a single full control snapshot."""
+    testbed_ = testbed.Testbed()
+    testbed_.activate()
+    testbed_.init_memcache_stub()
     self._create_cads("control")
     self.import_file("control_snapshot_data_single.csv")
     # Duplicate import because we have a bug in logging revisions and this
