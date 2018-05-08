@@ -1234,8 +1234,7 @@ export default can.Control({
   },
 
   update_hash_fragment: function () {
-    var hash;
-    var treeController;
+    let hash;
     if (!this.should_update_hash_fragment()) {
       return;
     }
@@ -1248,16 +1247,14 @@ export default can.Control({
       }
     }
 
-    hash = window.location.hash.split('/')[0];
-    treeController = this.options
-      .$trigger
-      .closest('.cms_controllers_tree_view_node')
-      .control();
+    let locationHash = window.location.hash.split('/')[0];
+    let instanceHashFragment = this.options.instance.hash_fragment();
 
-    hash += [treeController ? treeController.hash_fragment() : '',
-      this.options.instance.hash_fragment()].join('/');
+    hash = this.updateSummaryHash(
+      `${locationHash}/${instanceHashFragment}`,
+      this.options.instance.type
+    );
 
-    hash = this.updateSummaryHash(hash, this.options.instance.type);
     window.location.hash = hash;
   },
 
