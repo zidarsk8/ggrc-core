@@ -945,7 +945,7 @@ import RefreshQueue from './refresh_queue';
       this._customAttributeAccess.write(change);
     },
     isCustomAttributable() {
-      return this.attr('class').is_custom_attributable;
+      return this.constructor.is_custom_attributable;
     },
     computed_errors: function () {
       let errors = this.errors();
