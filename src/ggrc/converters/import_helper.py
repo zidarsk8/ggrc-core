@@ -222,3 +222,35 @@ def calculate_computed_attributes(revision_ids, user_id):
       logger.exception(
           "Calculation of computed attributes failed: %s", e.message
       )
+
+
+class CsvStringBuilder(object):
+  """CSV string builder."""
+
+  def __init__(self, table_width):
+    """Basic initialization."""
+    self.table_width = table_width
+
+    self.output_buffer = StringIO()
+    self.csv_writer = csv.writer(self.output_buffer)
+
+  @staticmethod
+  def _utf_8_encode_line(line):
+    """Encode line to utf8."""
+    return [val.encode("utf-8") for val in line]
+
+  def append_line(self, line):
+    """Append line to CSV buffer."""
+    if len(line) > self.table_width:
+      raise Exception("Can't append csv line to buffer. "
+                      "Line length greater than table width. ({} > {})".
+                      format(len(line), self.table_width))
+
+    line = self._utf_8_encode_line(line)
+    diff = self.table_width - len(line)
+    line.extend([""] * diff)
+    self.csv_writer.writerow(line)
+
+  def get_csv_string(self):
+    """Returns CSV string from buffer."""
+    return self.output_buffer.getvalue()
