@@ -11,11 +11,10 @@
     viewModel: {
       value: null,
       context: null,
-      type: null,
       create: function () {
         let value = this.attr('value');
         let self = this;
-        let document;
+        let evidence;
         let attrs;
 
         if (!value || !value.length) {
@@ -27,15 +26,15 @@
           link: value,
           title: value,
           context: this.attr('context') || new CMS.Models.Context({id: null}),
-          document_type: this.attr('type'),
+          kind: 'URL',
           created_at: new Date(),
           isDraft: true,
           _stamp: Date.now(),
         };
 
-        document = new CMS.Models.Document(attrs);
-        this.dispatch({type: 'beforeCreate', items: [document]});
-        document.save()
+        evidence = new CMS.Models.Evidence(attrs);
+        this.dispatch({type: 'beforeCreate', items: [evidence]});
+        evidence.save()
           .fail(function () {
             GGRC.Errors.notifier('error', 'Unable to create URL.');
           })

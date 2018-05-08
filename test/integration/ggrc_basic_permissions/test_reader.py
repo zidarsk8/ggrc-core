@@ -63,7 +63,7 @@ class TestReader(TestCase):
             table_singular: {
                 "title": model_singular,
                 "context": None,
-                "reference_url": "ref",
+                "documents_reference_url": "ref",
                 "link": "https://example.com",  # ignored except for Document
                 "contact": {
                     "type": "Person",
@@ -89,7 +89,7 @@ class TestReader(TestCase):
         response = self.api.get_collection(model, obj_id)
         collection = response.json.get(
             "{}_collection".format(table_plural)).get(table_plural)
-        if len(collection) == 0:
+        if not collection:
           all_errors.append(
               "{} cannot retrieve object even if owner (collection)".format(
                   model_singular))

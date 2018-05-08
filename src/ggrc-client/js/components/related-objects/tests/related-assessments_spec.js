@@ -173,9 +173,9 @@ describe('GGRC.Components.relatedAssessments', () => {
         });
       });
 
-      it('builds EVIDENCE model correctly', ()=> {
+      it('builds FILE model correctly', ()=> {
         let evidence = new can.Map({
-          document_type: 'EVIDENCE',
+          kind: 'FILE',
           title: 'title',
           gdrive_id: 'gdrive_id',
         });
@@ -187,11 +187,13 @@ describe('GGRC.Components.relatedAssessments', () => {
             id: 'contextId',
             type: 'Context',
           },
-          documentable_obj: {
+          parent_obj: {
             id: 'instanceId',
             type: 'instanceType',
           },
-          document_type: 'EVIDENCE',
+          status: 'Active',
+          access_control_list: [],
+          kind: 'FILE',
           title: 'title',
           source_gdrive_id: 'gdrive_id',
         });
@@ -199,7 +201,7 @@ describe('GGRC.Components.relatedAssessments', () => {
 
       it('builds URL model correctly', ()=> {
         let evidence = new can.Map({
-          document_type: 'URL',
+          kind: 'URL',
           title: 'title',
           link: 'link',
         });
@@ -211,11 +213,13 @@ describe('GGRC.Components.relatedAssessments', () => {
             id: 'contextId',
             type: 'Context',
           },
-          documentable_obj: {
+          parent_obj: {
             id: 'instanceId',
             type: 'instanceType',
           },
-          document_type: 'URL',
+          status: 'Active',
+          access_control_list: [],
+          kind: 'URL',
           title: 'title',
           link: 'link',
         });
@@ -308,7 +312,7 @@ describe('GGRC.Components.relatedAssessments', () => {
     describe('checkReuseAbility() method', ()=> {
       it('returns true if evidence is not a file', ()=> {
         let evidence = new can.Map({
-          document_type: 'URL',
+          kind: 'URL',
         });
 
         let result = viewModel.checkReuseAbility(evidence);
@@ -318,7 +322,7 @@ describe('GGRC.Components.relatedAssessments', () => {
 
       it('returns true if evidence is a file with gdrive_id', ()=> {
         let evidence = new can.Map({
-          document_type: 'EVIDENCE',
+          kind: 'FILE',
           gdrive_id: 'gdrive_id',
         });
 
@@ -329,7 +333,7 @@ describe('GGRC.Components.relatedAssessments', () => {
 
       it('returns false if evidence is a file without gdrive_id', ()=> {
         let evidence = new can.Map({
-          document_type: 'EVIDENCE',
+          kind: 'FILE',
           gdrive_id: '',
         });
 

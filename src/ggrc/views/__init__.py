@@ -65,6 +65,14 @@ def propagate_acl(_):
   return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 
+@app.route("/_background_tasks/create_missing_revisions", methods=["POST"])
+@queued_task
+def create_missing_revisions(_):
+  """Web hook to create revisions for new objects."""
+  revisions.do_missing_revisions()
+  return app.make_response(("success", 200, [("Content-Type", "text/html")]))
+
+
 @app.route("/_background_tasks/refresh_revisions", methods=["POST"])
 @queued_task
 def refresh_revisions(_):
@@ -574,6 +582,22 @@ def admin_propagate_acl():
                          [('Content-Type', 'text/html')])))
 
 
+@app.route("/admin/create_missing_revisions", methods=["POST"])
+@login_required
+@admin_required
+def admin_create_missing_revisions():
+  """Create revisions for new objects"""
+  admins = getattr(settings, "BOOTSTRAP_ADMIN_USERS", [])
+  if get_current_user().email not in admins:
+    raise Forbidden()
+
+  task_queue = create_task("create_missing_revisions", url_for(
+      create_missing_revisions.__name__), create_missing_revisions)
+  return task_queue.make_response(
+      app.make_response(("scheduled %s" % task_queue.name, 200,
+                        [('Content-Type', 'text/html')])))
+
+
 @app.route("/admin")
 @login_required
 @admin_required
@@ -609,6 +633,7 @@ def contributed_object_views():
       object_view(models.Control),
       object_view(models.DataAsset),
       object_view(models.Document),
+      object_view(models.Evidence),
       object_view(models.Facility),
       object_view(models.Issue),
       object_view(models.Market),

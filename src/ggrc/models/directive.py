@@ -112,8 +112,8 @@ class Directive(HasObjectState, LastDeprecatedTimeboxed,
 
   _aliases = {
       'kind': "Kind/Type",
-      "document_url": None,
-      "document_evidence": None,
+      "documents_url": None,
+      "documents_file": None,
   }
 
   @validates('kind')
@@ -160,10 +160,11 @@ class Policy(Roleable, CustomAttributable, Relatable,
   ])
 
   _aliases = {
-      "document_url": None,
-      "document_evidence": None,
+      "documents_url": None,
+      "documents_file": None,
   }
 
+  # pylint: disable=unused-argument
   @validates('meta_kind')
   def validates_meta_kind(self, key, value):
     return 'Policy'
@@ -181,10 +182,11 @@ class Regulation(Roleable, CustomAttributable, Relatable,
 
   _aliases = {
       "kind": None,
-      "document_url": None,
-      "document_evidence": None,
+      "documents_url": None,
+      "documents_file": None,
   }
 
+  # pylint: disable=unused-argument
   @validates('meta_kind')
   def validates_meta_kind(self, key, value):
     return 'Regulation'
@@ -202,10 +204,11 @@ class Standard(Roleable, CustomAttributable, Relatable,
 
   _aliases = {
       "kind": None,
-      "document_url": None,
-      "document_evidence": None,
+      "documents_url": None,
+      "documents_file": None,
   }
 
+  # pylint: disable=unused-argument
   @validates('meta_kind')
   def validates_meta_kind(self, key, value):
     return 'Standard'
@@ -223,10 +226,11 @@ class Contract(Roleable, CustomAttributable, Relatable,
 
   _aliases = {
       "kind": None,
-      "document_url": None,
-      "document_evidence": None,
+      "documents_url": None,
+      "documents_file": None,
   }
 
+  # pylint: disable=unused-argument
   @validates('meta_kind')
   def validates_meta_kind(self, key, value):
     return 'Contract'

@@ -1,6 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Module for DataAsset object"""
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
@@ -17,9 +18,11 @@ class DataAsset(Roleable, HasObjectState, PublicDocumentable,
                 CustomAttributable, Personable, Relatable, Commentable,
                 TestPlanned, LastDeprecatedTimeboxed, BusinessObject, Indexed,
                 db.Model):
+  """Class representing DataAsset."""
+
   __tablename__ = 'data_assets'
 
   _aliases = {
-      "document_url": None,
-      "document_evidence": None,
+      "documents_url": None,
+      "documents_file": None,
   }

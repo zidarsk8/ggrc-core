@@ -72,6 +72,7 @@ class ControlCategorized(Categorizable):
 
   @classmethod
   def eager_query(cls):
+    """Eager Query"""
     query = super(ControlCategorized, cls).eager_query()
     return query.options(
         orm.subqueryload('categorizations').joinedload('category'),
@@ -121,6 +122,7 @@ class AssertionCategorized(Categorizable):
 
   @classmethod
   def eager_query(cls):
+    """Eager Query"""
     query = super(AssertionCategorized, cls).eager_query()
     return query.options(
         orm.subqueryload('categorized_assertions').joinedload('category'),
@@ -266,12 +268,13 @@ class Control(WithLastAssessmentDate,
           "description": "Allowed values are:\nkey\nnon-key\n---",
       },
       # overrides values from PublicDocumentable mixin
-      "document_url": None,
+      "documents_url": None,
       "test_plan": "Assessment Procedure",
   }
 
   @validates('kind', 'means', 'verify_frequency')
   def validate_control_options(self, key, option):
+    """Validate control 'kind', 'means', 'verify_frequency'"""
     desired_role = key if key == 'verify_frequency' else 'control_' + key
     return validate_option(self.__class__.__name__, key, option, desired_role)
 
