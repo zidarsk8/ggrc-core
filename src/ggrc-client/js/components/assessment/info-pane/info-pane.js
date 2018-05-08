@@ -182,13 +182,6 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
               this.attr('isAssessmentSaving');
           },
         },
-        // flag which indicates that changing of assessment state is blocked
-        isPending: {
-          get() {
-            return this.attr('isUpdatingEvidences') ||
-              this.attr('isUpdatingUrls');
-          },
-        },
       },
       modal: {
         open: false,
