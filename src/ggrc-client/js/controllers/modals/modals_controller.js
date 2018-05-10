@@ -1250,23 +1250,8 @@ export default can.Control({
     let locationHash = window.location.hash.split('/')[0];
     let instanceHashFragment = this.options.instance.hash_fragment();
 
-    hash = this.updateSummaryHash(
-      `${locationHash}/${instanceHashFragment}`,
-      this.options.instance.type
-    );
-
+    hash = `${locationHash}/${instanceHashFragment}`;
     window.location.hash = hash;
-  },
-
-  updateSummaryHash: function (hash, type) {
-    var summary = 'Summary';
-    var replacements = {
-      Assessment: 'assessment'
-    };
-    var replacement = replacements[type];
-    return replacement && hash.indexOf(summary) > 0 ?
-      hash.replace(summary, replacement) :
-      hash;
   },
 
 /**
