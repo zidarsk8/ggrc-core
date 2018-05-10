@@ -269,8 +269,7 @@ export default GGRC.Components('relatedPeopleAccessControl', {
       this.viewModel.checkConflicts();
     },
     inserted: 'setupGroups',
-    '{viewModel.instance} update': 'setupGroups',
+    '{viewModel.instance} updated': 'setupGroups',
     '{viewModel} instance': 'refreshGroups',
-    '{viewModel.instance.access_control_list} change': 'refreshGroups',
   },
 });
