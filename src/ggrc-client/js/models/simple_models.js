@@ -137,7 +137,6 @@ import {getRole} from '../plugins/utils/acl-utils';
     update: 'PUT /api/objectives/{id}',
     destroy: 'DELETE /api/objectives/{id}',
     mixins: [
-      'ownable',
       'unique_title',
       'ca_update',
       'accessControlList',
