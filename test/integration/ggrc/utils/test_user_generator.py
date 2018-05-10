@@ -271,6 +271,33 @@ class TestUserGenerator(TestCase):
         )
 
   @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
+  @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
+  def test_assignee_import(self):
+    """Test for verifiers import"""
+    with mock.patch.multiple(
+        PersonClient,
+        _post=mock.MagicMock(return_value={'persons': [{
+            'firstName': 'Alan',
+            'lastName': 'Turing',
+            'username': 'aturing'}]})
+    ):
+      audit = factories.AuditFactory()
+      slug = 'AssessmentTemplate1'
+      response = self.import_data(OrderedDict([
+          ('object_type', 'Assessment_Template'),
+          ('Code*', slug),
+          ('Audit*', audit.slug),
+          ('Default Assignees', 'aturing@example.com'),
+          ('Title', 'Title'),
+          ('Object Under Assessment', 'Control'),
+      ]))
+      assessment_template = AssessmentTemplate.query.filter(
+          AssessmentTemplate.slug == slug).first()
+
+      self._check_csv_response(response, {})
+      self.assertEqual(len(assessment_template.default_people['assignees']), 1)
+
+  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
   @mock.patch('ggrc.utils.user_generator.search_user', return_value='user')
   def test_invalid_email_import(self, _):
     """Test import of invalid email."""

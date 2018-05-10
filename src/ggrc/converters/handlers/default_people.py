@@ -97,7 +97,7 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
     code is merged into the develop branch. The joining of default_assignees
     and default_verifiers should be done by pre_commit_checks for imports.
     """
-    if not self.value and self.mandatory or self.row_converter.ignore:
+    if self.row_converter.ignore:
       return
 
     default_people = self.row_converter.obj.default_people or {}

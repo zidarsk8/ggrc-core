@@ -58,6 +58,25 @@ class TestAssessmentTemplatesImport(TestCase):
     self._check_csv_response(response, {})
     self.assertTrue(len(template.default_people['verifiers']) > 0)
 
+  def test_modify_persons_over_import(self):
+    """Test import modifies Assessment Template and does not fail."""
+    self.import_file("assessment_template_no_warnings.csv")
+    slug = "T-1"
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment_Template"),
+        ("Code*", slug),
+        ("Audit*", "Audit"),
+        ("Title", "Title"),
+        ("Object Under Assessment", 'Control'),
+        ("Default Verifiers", "Secondary Contacts")
+    ]))
+    template = models.AssessmentTemplate.query \
+        .filter(models.AssessmentTemplate.slug == slug) \
+        .first()
+    self._check_csv_response(response, {})
+    self.assertEqual(template.default_people['verifiers'],
+                     "Secondary Contacts")
+
   def test_invalid_import(self):
     """Test invalid import."""
     data = "assessment_template_with_warnings_and_errors.csv"
