@@ -7,26 +7,26 @@
 
   <div class="tier-content">
     <div class="pane-header">
-      <div class="row-fluid wrap-row">
+      <div class="pane-header__container">
         {{#if_match instance.name '\\\\S'}}
           {{#instance.name}}
-            <div class="span6">
+            <span>
               <h6>Name</h6>
               <h3>{{instance.name}}</h3>
-            </div>
+            </span>
           {{/instance.name}}
         {{/if_match}}
 
         {{#if_match instance.email '\\\\S'}}
           {{#instance.email}}
-            <div class="span3">
+            <span>
               <h6>Email</h6>
               <p>
                 <a href='mailto:{{instance.email}}' target="_blank">
                   {{instance.email}}
                 </a>
               </p>
-            </div>
+            </span>
           {{/instance.email}}
         {{/if_match}}
 
