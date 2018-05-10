@@ -1,6 +1,8 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+from sqlalchemy import orm
+
 import datetime
 from sqlalchemy.ext.declarative import declared_attr
 from ggrc import db
@@ -107,3 +109,13 @@ class HasOwnContext(object):
         (Role.name == role) &
         (predicate(Person.name) | predicate(Person.email))
     ).exists()
+
+  @classmethod
+  def eager_query(cls):
+    return super(HasOwnContext, cls).eager_query().options(
+        orm.Load(cls).subqueryload(
+            "contexts"
+        ).undefer_group(
+            "Context_complete"
+        ),
+    )
