@@ -44,14 +44,19 @@ class TestAssessmentTemplatesImport(TestCase):
   def test_modify_over_import(self):
     """Test import modifies Assessment Template and does not fail."""
     self.import_file("assessment_template_no_warnings.csv")
+    slug = "T-1"
     response = self.import_data(OrderedDict([
         ("object_type", "Assessment_Template"),
-        ("Code*", "T-1"),
+        ("Code*", slug),
         ("Audit*", "Audit"),
         ("Title", "Title"),
         ("Object Under Assessment", 'Control'),
     ]))
+    template = models.AssessmentTemplate.query \
+        .filter(models.AssessmentTemplate.slug == slug) \
+        .first()
     self._check_csv_response(response, {})
+    self.assertTrue(len(template.default_people['verifiers']) > 0)
 
   def test_invalid_import(self):
     """Test invalid import."""
