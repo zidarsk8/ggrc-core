@@ -3,9 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-'use strict';
-
-xdescribe('GGRC.Errors module', function () {
+describe('GGRC.Errors module', function () {
   let notifier;
   let trigger;
   let _originalMessages;
@@ -23,12 +21,6 @@ xdescribe('GGRC.Errors module', function () {
 
   afterAll(function () {
     GGRC.Errors.messages = _originalMessages;
-  });
-
-  afterEach(function () {
-    expect(window.$).toHaveBeenCalledWith('body');
-    expect(trigger.calls.count()).toEqual(1);
-    trigger.calls.reset();
   });
 
   describe('notifier method', function () {
