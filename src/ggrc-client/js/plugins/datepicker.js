@@ -4,36 +4,36 @@
 */
 (function($, moment) {
   // On-demand creation of datepicker() objects
-  let $body = $("body"),
-      format = {
-        changeMonth: true,
-        changeYear: true,
-        prevText: "",
-        nextText: "",
-        dateFormat: "mm/dd/yy",
-      };
+  let $body = $('body'),
+    format = {
+      changeMonth: true,
+      changeYear: true,
+      prevText: '',
+      nextText: '',
+      dateFormat: 'mm/dd/yy',
+    };
 
-  $body.on("focus", "[data-toggle=\"datepicker\"]", function (ev) {
+  $body.on('focus', '[data-toggle="datepicker"]', function (ev) {
     let $this = $(this);
 
-    if ($this.data("datepicker")) {
+    if ($this.data('datepicker')) {
       return;
     }
     $this.datepicker(format);
 
-    if ($this.is("[data-before], [data-after]")) {
-      $this.trigger("change");
+    if ($this.is('[data-before], [data-after]')) {
+      $this.trigger('change');
     }
   });
 
   // On-demand creation of datepicker() objects, initial date today or later
-  $body.on("focus", "[data-toggle=\"datepicker_today_or_later\"]", function (ev) {
+  $body.on('focus', '[data-toggle="datepicker_today_or_later"]', function (ev) {
     let $this = $(this);
 
-    if ($this.data("datepicker")) {
+    if ($this.data('datepicker')) {
       return;
     }
     $this.datepicker(format)
-         .datepicker("option", "minDate", new Date());
+      .datepicker('option', 'minDate', new Date());
   });
 })(jQuery, moment);

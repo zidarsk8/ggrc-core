@@ -34,6 +34,7 @@ exports = [
     "VERSION",
     "MAX_INSTANCES",
     "CREATE_ISSUE_URL",
+    "CREATE_ISSUE_BUTTON_NAME",
 ]  # pylint: disable=invalid-name
 
 # Deployment-specific variables
@@ -55,7 +56,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "1.9.1-Strawberry" + BUILD_NUMBER
+VERSION = "1.10.0-Strawberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -201,3 +202,4 @@ RISK_ASSESSMENT_URL = os.environ.get(
 
 # Link for creation buganizer issue
 CREATE_ISSUE_URL = os.environ.get('CREATE_ISSUE_URL', "")
+CREATE_ISSUE_BUTTON_NAME = os.environ.get('CREATE_ISSUE_BUTTON_NAME', "")

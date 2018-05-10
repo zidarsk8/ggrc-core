@@ -57,7 +57,7 @@ describe('GGRC component registry', function () {
       expect(function () {
         Components('foo', componentConfig);
       })
-      .toThrow(new Error('Component already exists: foo'));
+        .toThrow(new Error('Component already exists: foo'));
     });
 
     it('throws an error if registering a component under a blank name',
@@ -67,7 +67,7 @@ describe('GGRC component registry', function () {
         expect(function () {
           Components('', componentConfig);
         })
-        .toThrow(new Error('Component name must be a nonempty string.'));
+          .toThrow(new Error('Component name must be a nonempty string.'));
       }
     );
 
@@ -77,7 +77,7 @@ describe('GGRC component registry', function () {
       expect(function () {
         Components(123, componentConfig);
       })
-      .toThrow(new Error('Component name must be a nonempty string.'));
+        .toThrow(new Error('Component name must be a nonempty string.'));
     });
   });
 
@@ -124,7 +124,7 @@ describe('GGRC component registry', function () {
       expect(function () {
         Components.get('foo');
       })
-      .toThrow(new Error('Component not found: foo'));
+        .toThrow(new Error('Component not found: foo'));
     });
   });
 
@@ -159,7 +159,7 @@ describe('GGRC component registry', function () {
       expect(function () {
         Components.getViewModel('foo');
       })
-      .toThrow(new Error('Component not found: foo'));
+        .toThrow(new Error('Component not found: foo'));
     });
   });
 

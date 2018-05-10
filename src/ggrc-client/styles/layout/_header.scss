@@ -64,6 +64,11 @@
               }
             }
           }
+
+          .feedback {
+            border: none;
+            color: nth($header-colors, $i);
+          }
         }
       }
     }

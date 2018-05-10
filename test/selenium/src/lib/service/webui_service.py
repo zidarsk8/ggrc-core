@@ -542,7 +542,7 @@ class AssessmentsService(BaseWebUiService):
     asmt_page = self.open_info_page_of_obj(obj=obj)
     related_asmts_tab = asmt_page.tab_container.get_tab_object(
         element.AssessmentTabContainer.RELATED_ASMTS_TAB)
-    return related_asmts_tab.get_related_titles()
+    return related_asmts_tab.get_related_titles(asmt_type=obj.assessment_type)
 
   def get_related_issues_titles(self, obj):
     """Open assessment Info Page. Open Open Related Issues Tab on Assessment

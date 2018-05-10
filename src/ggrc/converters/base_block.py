@@ -17,12 +17,14 @@ from sqlalchemy import exc
 from sqlalchemy import or_
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import UnmappedInstanceError
+from flask import _app_ctx_stack
 
 from ggrc import db
 from ggrc import models
 from ggrc.rbac import permissions
 from ggrc.utils import benchmark
 from ggrc.utils import structures
+from ggrc.utils import list_chunks
 from ggrc.converters import errors
 from ggrc.converters import get_shared_unique_rules
 from ggrc.converters import pre_commit_checks
@@ -36,6 +38,8 @@ from ggrc.utils.log_event import log_event
 from ggrc.services import signals
 from ggrc_workflows.models.cycle_task_group_object_task import \
     CycleTaskGroupObjectTask
+
+from ggrc.models.exceptions import StatusValidationError
 
 
 # pylint: disable=invalid-name
@@ -77,6 +81,7 @@ class BlockConverter(object):
 
   """
 
+  ROW_CHUNK_SIZE = 50
   BLOCK_OFFSET = 3
 
   def get_unique_counts_dict(self, object_class):
@@ -136,6 +141,11 @@ class BlockConverter(object):
       self.organize_fields(options.get("fields", []))
     else:
       self.name = ""
+
+  @property
+  def block_width(self):
+    """Returns width of block (header length)."""
+    return len(self.fields)
 
   def check_block_restrictions(self):
     """Check some block related restrictions"""
@@ -386,7 +396,7 @@ class BlockConverter(object):
     self.fields = get_column_order(fields)
 
   def generate_csv_header(self):
-    """ Generate 2D array with csv headre description """
+    """ Generate 2D array with csv header description """
     headers = []
     for field in self.fields:
       description = self.object_headers[field]["description"]
@@ -458,24 +468,33 @@ class BlockConverter(object):
     if self.ignore or not self.object_ids:
       return
     self.row_converters = []
-    objects = self.object_class.eager_query().filter(
-        self.object_class.id.in_(self.object_ids))
-    for i, obj in enumerate(objects):
-      row = RowConverter(self, self.object_class, obj=obj,
-                         headers=self.headers, index=i)
-      yield row
 
-  def row_data_to_array(self):
-    """Get row data from all row converters while exporting.
-    """
+    index = 0
+    for ids_pool in list_chunks(self.object_ids, self.ROW_CHUNK_SIZE):
+      # sqlalchemy caches all queries and it takes a lot of memory.
+      # This line clears query cache.
+      _app_ctx_stack.top.sqlalchemy_queries = []
+
+      objects = self.object_class.eager_query().filter(
+          self.object_class.id.in_(ids_pool)
+      ).execution_options(stream_results=True)
+
+      for obj in objects:
+        yield RowConverter(self, self.object_class, obj=obj,
+                           headers=self.headers, index=index)
+        index += 1
+
+      # Clear all objects from session (it helps to avoid memory leak)
+      for obj in db.session:
+        del obj
+
+  def generate_row_data(self):
+    """Get row data from all row converters while exporting."""
     if self.ignore:
       return
-    csv_body = []
-    csv_header = self.generate_csv_header()
     for row_converter in self.row_converters_from_ids():
       row_converter.handle_obj_row_data()
-      csv_body.append(row_converter.to_array(self.fields))
-    return csv_header, csv_body
+      yield row_converter.to_array(self.fields)
 
   def handle_row_data(self, field_list=None):
     """Handle row data for all row converters on import.
@@ -543,9 +562,6 @@ class BlockConverter(object):
     """Import secondary objects procedure."""
     for row_converter in self.row_converters:
       row_converter.setup_secondary_objects()
-
-    for row_converter in self.row_converters:
-      self._check_secondary_object(row_converter)
 
     if not self.converter.dry_run:
       for row_converter in self.row_converters:
@@ -642,7 +658,16 @@ class BlockConverter(object):
       cache_utils.update_memcache_before_commit(
           self, modified_objects, CACHE_EXPIRY_IMPORT)
       for row_converter in self.row_converters:
-        row_converter.send_before_commit_signals(import_event)
+        try:
+          row_converter.send_before_commit_signals(import_event)
+        except StatusValidationError as exp:
+          status_alias = row_converter.headers.get("status",
+                                                   {}).get("display_name")
+          row_converter.add_error(
+              errors.VALIDATION_ERROR,
+              column_name=status_alias,
+              message=exp.message
+          )
       db.session.commit()
       self._store_revision_ids(import_event)
       cache_utils.update_memcache_after_commit(self)
@@ -754,21 +779,5 @@ class BlockConverter(object):
         row_converter: Row converter for the row we want to check.
     """
     checker = pre_commit_checks.CHECKS.get(type(row_converter.obj).__name__)
-    if checker and callable(checker):
-      checker(row_converter)
-
-  @staticmethod
-  def _check_secondary_object(row_converter):
-    """Check secondary object if it has any pre commit checks.
-
-    The check functions can mutate the row_converter object and mark it
-    to be ignored if there are any errors detected.
-
-    Args:
-        row_converter: Row converter for the row we want to check.
-    """
-    checker = pre_commit_checks.SECONDARY_CHECKS.get(
-        type(row_converter.obj).__name__
-    )
     if checker and callable(checker):
       checker(row_converter)

@@ -4,6 +4,7 @@
 */
 
 import tracker from '../../../../tracker';
+import DeferredTransaction from '../../../../plugins/utils/deferred-transaction-utils';
 
 describe('GGRC.Components.assessmentInfoPane', function () {
   let vm;
@@ -34,55 +35,27 @@ describe('GGRC.Components.assessmentInfoPane', function () {
 
       describe('if instance is not archived', function () {
         it('returns true if instance status is editable otherwise false',
-        function () {
-          allStatuses.forEach((status) => {
-            vm.attr('instance.status', status);
-            expect(vm.attr('editMode'))
-              .toBe(editableStatuses.includes(status));
+          function () {
+            allStatuses.forEach((status) => {
+              vm.attr('instance.status', status);
+              expect(vm.attr('editMode'))
+                .toBe(editableStatuses.includes(status));
+            });
           });
-        });
       });
-    });
-  });
-
-  describe('isPending() getter', () => {
-    it('returns true if isUpdatingEvidences and isUpdatingUrls are true',
-      () => {
-        vm.attr('isUpdatingEvidences', true);
-        vm.attr('isUpdatingUrls', false);
-
-        expect(vm.attr('isPending')).toBe(true);
-      });
-
-    it('returns false if isUpdatingUrls and isUpdatingEvidences are false',
-      () => {
-        vm.attr('isUpdatingEvidences', false);
-        vm.attr('isUpdatingUrls', false);
-
-        expect(vm.attr('isPending')).toBe(false);
-      });
-
-    it('returns true if only isUpdatingEvidences is true', () => {
-      vm.attr('isUpdatingEvidences', true);
-      vm.attr('isUpdatingUrls', false);
-
-      expect(vm.attr('isPending')).toBe(true);
-    });
-
-    it('returns true if only isUpdatingUrls is true', () => {
-      vm.attr('isUpdatingEvidences', false);
-      vm.attr('isUpdatingUrls', true);
-
-      expect(vm.attr('isPending')).toBe(true);
     });
   });
 
   describe('onStateChange() method', () => {
     let method;
+
     beforeEach(() => {
       method = vm.onStateChange.bind(vm);
       spyOn(tracker, 'start').and.returnValue(() => {});
-      spyOn(vm, 'initializeFormFields').and.returnValue(() => {});
+
+      vm.attr('deferredSave', new DeferredTransaction((resolve, reject) => {
+        vm.attr('instance').save().done(resolve).fail(reject);
+      }, 0, true));
     });
 
     it('prevents state change to deprecated for archived instance', (done) => {

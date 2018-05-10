@@ -52,12 +52,12 @@ let permissions_compute = can.compute(GGRC.permissions);
 const Permission = can.Construct({
   _admin_permission_for_context: function (context_id) {
     return new Permission(
-    ADMIN_PERMISSION.action, ADMIN_PERMISSION.resource_type, context_id);
+      ADMIN_PERMISSION.action, ADMIN_PERMISSION.resource_type, context_id);
   },
 
   _all_resource_permission: function (permission) {
     return new Permission(
-    permission.action, ADMIN_PERMISSION.resource_type, permission.context_id);
+      permission.action, ADMIN_PERMISSION.resource_type, permission.context_id);
   },
 
   _permission_match: function (permissions, permission) {
@@ -73,29 +73,29 @@ const Permission = can.Construct({
       return false; // ?
     }
     if (this._permission_match(
-          permissions,
-          new Permission(
-            permission.action,
-            permission.resource_type, null))) {
+      permissions,
+      new Permission(
+        permission.action,
+        permission.resource_type, null))) {
       return true;
     }
     if (this._permission_match(permissions, permission)) {
       return true;
     }
     if (this._permission_match(permissions,
-        this._all_resource_permission(permission))) {
+      this._all_resource_permission(permission))) {
       return true;
     }
     if (this._permission_match(permissions, ADMIN_PERMISSION)) {
       return true;
     }
     if (this._permission_match(permissions,
-        this._admin_permission_for_context(permission.context_id))) {
+      this._admin_permission_for_context(permission.context_id))) {
       return true;
     }
     // Check for System Admin permission
     if (this._permission_match(permissions,
-        this._admin_permission_for_context(0))) {
+      this._admin_permission_for_context(0))) {
       return true;
     }
     return false;
@@ -132,7 +132,7 @@ const Permission = can.Construct({
         for (i = 0; i < conditions.length; i++) {
           condition = conditions[i];
           if (_CONDITIONS_MAP[condition.condition](
-              instance, condition.terms, action)) {
+            instance, condition.terms, action)) {
             return true;
           }
         }
@@ -161,7 +161,7 @@ const Permission = can.Construct({
       return true;
     }
     if (conditions.length === 0 && (this._is_allowed(permissions,
-        new Permission(action, instance_type, null)) ||
+      new Permission(action, instance_type, null)) ||
       this._is_allowed(permissions,
         new Permission(action, instance_type, context.id)))) {
       return true;
@@ -175,7 +175,7 @@ const Permission = can.Construct({
     for (i = 0; i < conditions.length; i++) {
       condition = conditions[i];
       if (_CONDITIONS_MAP[condition.condition](
-          instance, condition.terms, action)) {
+        instance, condition.terms, action)) {
         return true;
       }
     }

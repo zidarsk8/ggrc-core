@@ -34,7 +34,7 @@ const viewModel = DiffBaseVM.extend({
           });
 
           this.attr('diff').push(diffItem);
-      });
+        });
     });
   },
   fetchData(values) {

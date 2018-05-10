@@ -12,3 +12,12 @@
     </a>
   </div>
 </div>
+
+<mandatory-fields-modal
+    {state}="modalState"
+    {instance}="instance"
+    {revision-modified-by}="restoredRevision.modified_by"
+    {revision-updated-at}="restoredRevision.updated_at"
+    (save)="saveInstance"
+    (cancel)="revertChanges">
+</mandatory-fields-modal>

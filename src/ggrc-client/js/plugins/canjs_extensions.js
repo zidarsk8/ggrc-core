@@ -52,7 +52,7 @@
    */
   can.Model.validateListNonBlank =
     can.Map.validateListNonBlank = function (listFieldName, condition,
-                                             options) {
+      options) {
       this.validate(listFieldName, options, function (newVal, prop) {
         if (_.isUndefined(condition) || condition.call(this)) {
           if (!newVal ||

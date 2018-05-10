@@ -7,13 +7,10 @@ from datetime import datetime
 from logging import getLogger
 
 import sqlalchemy as sa
-from sqlalchemy.orm import load_only
-from sqlalchemy.sql.expression import literal_column
 
 from ggrc import db
 from ggrc.automapper import rules
 from ggrc import login
-from ggrc.models import all_models
 from ggrc.models.audit import Audit
 from ggrc.models.automapping import Automapping
 from ggrc.models.relationship import Relationship, RelationshipsCache, Stub
@@ -65,6 +62,7 @@ class AutomapperGenerator(object):
     return (src, dst) if src < dst else (dst, src)
 
   def generate_automappings(self, relationship):
+    """Generate Automappings for a given relationship"""
     # pylint: disable=protected-access
     self.auto_mappings = set()
     with benchmark("Automapping generate_automappings"):
@@ -182,61 +180,14 @@ class AutomapperGenerator(object):
 
     if not self.automapping_ids:
       return
-
-    rel = Relationship.__table__
-    acl = all_models.AccessControlList.__table__
-    acr = all_models.AccessControlRole.__table__
-    propagate_roles = {
-        "Program Managers": "Program Managers Mapped",
-        "Program Editors": "Program Editors Mapped",
-        "Program Readers": "Program Readers Mapped"
-    }
-    roles = all_models.AccessControlRole.query.filter(
-        all_models.AccessControlRole.name.in_(
-            propagate_roles.values() + list(propagate_roles))
-    ).options(
-        load_only("id", "name")).all()
-    role_map = {
-        role.name: role.id for role in roles
-    }
-    source = {
-        "id": rel.c.source_id,
-        "type": rel.c.source_type
-    }
-    destination = {
-        "id": rel.c.destination_id,
-        "type": rel.c.destination_type
-    }
-
-    for role in propagate_roles:
-      prop_role_id = role_map[propagate_roles[role]]
-      for (first, second) in ((source, destination), (destination, source)):
-        sql = sa.sql.expression.select([
-            acl.c.person_id,
-            literal_column(str(prop_role_id)),
-            first["id"],
-            first["type"],
-            acl.c.created_at,
-            acl.c.updated_at,
-            acl.c.id
-        ]).select_from(
-            rel.join(acl, sa.and_(
-                second["id"] == acl.c.object_id,
-                second["type"] == acl.c.object_type,
-            )).join(acr, acl.c.ac_role_id == acr.c.id)
-        ).where(sa.and_(
-            rel.c.automapping_id.in_(self.automapping_ids),
-            acr.c.name == role
-        ))
-        db.session.execute(acl.insert().from_select([
-            acl.c.person_id,
-            acl.c.ac_role_id,
-            acl.c.object_id,
-            acl.c.object_type,
-            acl.c.created_at,
-            acl.c.updated_at,
-            acl.c.parent_id], sql
-        ))
+    from ggrc.models.hooks import acl
+    ids_query = db.session.query(
+        Relationship.id
+    ).filter(
+        Relationship.automapping_id.in_(self.automapping_ids)
+    )
+    relationship_ids = {rel.id for rel in ids_query}
+    acl.add_relationships(relationship_ids)
 
   @staticmethod
   def _set_audit_id_for_issues(automapping_id):
@@ -260,6 +211,7 @@ class AutomapperGenerator(object):
     )
 
   def _step(self, src, dst):
+    """Step through the automapping rules tree."""
     mappings = rules.rules[src.type, dst.type]
     if mappings:
       dst_related = (o for o in self.related(dst)

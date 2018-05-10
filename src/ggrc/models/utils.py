@@ -5,7 +5,7 @@
 
 from ggrc.utils import referenced_objects
 
-from .exceptions import ValidationError
+from ggrc.models.exceptions import ValidationError
 
 
 def validate_option(model, attribute, option, desired_role):
@@ -68,6 +68,7 @@ class JsonPolymorphicRelationship(PolymorphicRelationship):
         instance = referenced_objects.get(json_obj[field_name]["type"],
                                           json_obj[field_name]["id"])
         return instance
+    return None
 
 
 class FasadeProperty(object):  # pylint: disable=too-few-public-methods

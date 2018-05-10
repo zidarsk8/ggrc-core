@@ -6,8 +6,6 @@
 import DeferredTransaction from '../../utils/deferred-transaction-utils';
 
 describe('DeferredTransaction module', function () {
-  'use strict';
-
   let deferredTransaction;
   let completeTransactionCount;
   let completeActionsCount;
@@ -16,83 +14,53 @@ describe('DeferredTransaction module', function () {
     completeActionsCount++;
   }
 
-  describe('DeferredTransaction in not sequentially mode', function () {
-    beforeAll(function () {
-      deferredTransaction = new DeferredTransaction(
-        function (resolve, reject) {
-          completeTransactionCount++;
-          resolve();
-        }, 100);
-    });
-
-    beforeEach(function () {
-      completeTransactionCount = 0;
-      completeActionsCount = 0;
-    });
-
-    it('make several transactions when actions were added with delay ' +
-      'greater than configured', function (done) {
-      deferredTransaction.push(action);
-      setTimeout(function () {
-        deferredTransaction.push(action).then(function () {
-          done();
-          expect(completeTransactionCount).toBe(2);
-          expect(completeActionsCount).toBe(2);
-        });
-      }, 150);
-    });
-
-    it('make one transaction when actions were added with delay ' +
-      'less than configured', function (done) {
-      deferredTransaction.push(action);
-      setTimeout(function () {
-        deferredTransaction.push(action).then(function () {
-          done();
-          expect(completeTransactionCount).toBe(1);
-          expect(completeActionsCount).toBe(2);
-        });
-      }, 50);
-    });
+  beforeAll(function () {
+    deferredTransaction = new DeferredTransaction(
+      function (resolve, reject) {
+        completeTransactionCount++;
+        resolve();
+      }, 100);
   });
 
-  describe('DeferredTransaction in sequentially mode', function () {
-    beforeAll(function () {
-      deferredTransaction = new DeferredTransaction(
-        function (resolve, reject) {
-          completeTransactionCount++;
-          resolve();
-        }, 100);
-    });
+  beforeEach(function () {
+    completeTransactionCount = 0;
+    completeActionsCount = 0;
+  });
 
-    beforeEach(function () {
+  it('make several sequence transactions when actions ' +
+    'were added with delay greater than configured', function (done) {
+    deferredTransaction.push(action).then(function () {
       completeTransactionCount = 0;
-      completeActionsCount = 0;
     });
-
-    it('make several sequence transactions when actions ' +
-      'were added with delay greater than configured', function (done) {
+    setTimeout(function () {
       deferredTransaction.push(action).then(function () {
-        completeTransactionCount = 0;
+        done();
+        expect(completeTransactionCount).toBe(1);
+        expect(completeActionsCount).toBe(2);
       });
-      setTimeout(function () {
-        deferredTransaction.push(action).then(function () {
-          done();
-          expect(completeTransactionCount).toBe(1);
-          expect(completeActionsCount).toBe(2);
-        });
-      }, 150);
-    });
-
-    it('make one transaction when actions were added with delay ' +
-      'less than configured', function (done) {
-      deferredTransaction.push(action);
-      setTimeout(function () {
-        deferredTransaction.push(action).then(function () {
-          done();
-          expect(completeTransactionCount).toBe(1);
-          expect(completeActionsCount).toBe(2);
-        });
-      }, 50);
-    });
+    }, 150);
   });
+
+  it('make one transaction when actions were added with delay ' +
+    'less than configured', function (done) {
+    deferredTransaction.push(action);
+    setTimeout(function () {
+      deferredTransaction.push(action).then(function () {
+        done();
+        expect(completeTransactionCount).toBe(1);
+        expect(completeActionsCount).toBe(2);
+      });
+    }, 50);
+  });
+
+  it('execute queue of actions with 0 timeout if "execute" method was called',
+    (done) => {
+      deferredTransaction.push(action);
+      deferredTransaction.execute(action);
+      setTimeout(() => {
+        expect(completeTransactionCount).toBe(1);
+        expect(completeActionsCount).toBe(2);
+        done();
+      }, 0);
+    });
 });

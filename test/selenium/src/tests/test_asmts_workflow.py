@@ -16,7 +16,7 @@ from lib.entities import entities_factory
 from lib.entities.entities_factory import (
     CustomAttributeDefinitionsFactory, PeopleFactory)
 from lib.entities.entity import Representation
-from lib.service import rest_service, webui_service
+from lib.service import rest_facade, rest_service, webui_service
 from lib.utils.filter_utils import FilterUtils
 from lib.utils.string_utils import StringMethods
 
@@ -77,28 +77,6 @@ class TestAssessmentsWorkflow(base.Test):
     assert ([True] * 2) == log_validation_results, str(log_items_validation)
 
   @pytest.mark.smoke_tests
-  def test_asmt_related_asmts(
-      self, new_program_rest, new_control_rest,
-      map_new_program_rest_to_new_control_rest, new_audit_rest,
-      new_assessments_rest, selenium
-  ):
-    """Test for checking Related Assessments. Map two Assessments to one
-    snapshot of control. And check second Assessment contains in "Related
-    Assessments" Tab of first Assessment. 3 Titles will be compared:
-    Assessment, Audit of Assessment, generic Control.
-    """
-    expected_titles = [(new_assessments_rest[1].title,
-                        new_control_rest.title,
-                        new_audit_rest.title)]
-    asmts_ui_service = webui_service.AssessmentsService(selenium)
-    asmts_ui_service.map_objs_via_tree_view_item(
-        src_obj=new_audit_rest, dest_objs=[new_control_rest])
-    related_asmts_objs_titles = (
-        asmts_ui_service.get_related_asmts_titles(
-            obj=new_assessments_rest[0]))
-    assert expected_titles == related_asmts_objs_titles
-
-  @pytest.mark.smoke_tests
   def test_raise_issue(
       self, new_program_rest, new_audit_rest, new_assessment_rest, selenium
   ):
@@ -123,43 +101,43 @@ class TestAssessmentsWorkflow(base.Test):
         "edit_obj_via_edit_modal_from_info_page",
         AssessmentStates.NOT_STARTED, False),
        (("new_assessment_rest", {"status": AssessmentStates.NOT_STARTED,
-                                 "verifiers": [PeopleFactory().default_user]}),
+                                 "verifiers": [PeopleFactory.default_user]}),
         "edit_obj_via_edit_modal_from_info_page",
         AssessmentStates.NOT_STARTED, False),
        (("new_assessment_rest", {"status": AssessmentStates.IN_PROGRESS}),
         "edit_obj_via_edit_modal_from_info_page",
         AssessmentStates.IN_PROGRESS, False),
        (("new_assessment_rest", {"status": AssessmentStates.IN_PROGRESS,
-                                 "verifiers": [PeopleFactory().default_user]}),
+                                 "verifiers": [PeopleFactory.default_user]}),
         "edit_obj_via_edit_modal_from_info_page",
         AssessmentStates.IN_PROGRESS, False),
        (("new_assessment_rest", {"status": AssessmentStates.COMPLETED}),
         "edit_obj_via_edit_modal_from_info_page",
         AssessmentStates.IN_PROGRESS, False),
        (("new_assessment_rest", {"status": AssessmentStates.COMPLETED,
-                                 "verifiers": [PeopleFactory().default_user]}),
+                                 "verifiers": [PeopleFactory.default_user]}),
         "edit_obj_via_edit_modal_from_info_page",
         AssessmentStates.IN_PROGRESS, False),
        (("new_assessment_rest", {"status": AssessmentStates.NOT_STARTED}),
         "complete_assessment",
         AssessmentStates.COMPLETED, False),
        (("new_assessment_rest", {"status": AssessmentStates.NOT_STARTED,
-                                 "verifiers": [PeopleFactory().default_user]}),
+                                 "verifiers": [PeopleFactory.default_user]}),
         "complete_assessment",
         AssessmentStates.READY_FOR_REVIEW, False),
        (("new_assessment_rest", {"status": AssessmentStates.IN_PROGRESS}),
         "complete_assessment",
         AssessmentStates.COMPLETED, False),
        (("new_assessment_rest", {"status": AssessmentStates.IN_PROGRESS,
-                                 "verifiers": [PeopleFactory().default_user]}),
+                                 "verifiers": [PeopleFactory.default_user]}),
         "complete_assessment",
         AssessmentStates.READY_FOR_REVIEW, False),
        (("new_assessment_rest", {"status": AssessmentStates.NOT_STARTED,
-                                 "verifiers": [PeopleFactory().default_user]}),
+                                 "verifiers": [PeopleFactory.default_user]}),
         "verify_assessment",
         AssessmentStates.COMPLETED, True),
        (("new_assessment_rest", {"status": AssessmentStates.NOT_STARTED,
-                                 "verifiers": [PeopleFactory().default_user]}),
+                                 "verifiers": [PeopleFactory.default_user]}),
         "reject_assessment",
         AssessmentStates.REWORK_NEEDED, False)],
       ids=["Edit asmt's title w'o verifier 'Not Started' - 'Not Started'",
@@ -354,3 +332,201 @@ class TestAssessmentsWorkflow(base.Test):
     actual_asmt = asmts_ui_service.get_obj_from_info_page(expected_asmt)
     # 'actual_asmts': audit (None)
     self.general_equal_assert(expected_asmt, actual_asmt, "audit")
+
+
+class TestRelatedAssessments(base.Test):
+  """Tests for related assessments"""
+
+  @pytest.fixture()
+  def program(self):
+    return rest_facade.create_program()
+
+  @pytest.fixture()
+  def control_mapped_to_program(self, program):
+    return rest_facade.create_control(program)
+
+  @pytest.fixture()
+  def controls_mapped_to_program(self, program):
+    return [rest_facade.create_control(program) for _ in xrange(2)]
+
+  @pytest.fixture()
+  def objective_mapped_to_program(self, program):
+    return rest_facade.create_objective(program)
+
+  @pytest.fixture()
+  def objectives_mapped_to_program(self, program):
+    return [rest_facade.create_objective(program) for _ in xrange(2)]
+
+  @pytest.fixture()
+  def audit(self, program):
+    return rest_facade.create_audit(program)
+
+  @pytest.fixture()
+  def audits(self, program):
+    return [rest_facade.create_audit(program) for _ in xrange(2)]
+
+  @staticmethod
+  def _create_mapped_asmt(audit, assessment_type, objs_to_map):
+    """Create assessment with assessment type=`assessment_type` and
+    map it to snapshots of `objs_to_map`"""
+    assessment = rest_facade.create_assessment(
+        audit, assessment_type=assessment_type)
+    for obj in objs_to_map:
+      rest_facade.map_to_snapshot(assessment, obj=obj, parent_obj=audit)
+    assessment.update_attrs(mapped_objects=objs_to_map)
+    return assessment
+
+  def _assert_asmt_with_related_asmts(
+      self, checked_asmt, related_asmts_titles, selenium
+  ):
+    """Assert that assessment `checked_asmt` on UI is the same as in
+    `checked_asmt`.
+    Also assert that `Asessment title`, `Related objects`, `Audit title` on
+    "Related Assessments" tab are the same as in `related_asmts_titles`."""
+    asmts_ui_service = webui_service.AssessmentsService(selenium)
+    actual_asmt = asmts_ui_service.get_obj_from_info_page(checked_asmt)
+    self.general_equal_assert(
+        checked_asmt.repr_ui(), actual_asmt,
+        "audit",  # not shown in UI
+        "custom_attributes")  # not returned on POST /api/assessments)
+    assert asmts_ui_service.get_related_asmts_titles(checked_asmt) == \
+        related_asmts_titles
+
+  @pytest.mark.smoke_tests
+  @pytest.mark.parametrize(
+      "assessment_type",
+      ["Control", "Objective"]
+  )
+  def test_related_asmts(
+      self, control_mapped_to_program, objective_mapped_to_program,
+      audit, assessment_type, selenium
+  ):
+    """Objects structure:
+    Program
+    -> Control
+    -> Objective
+    -> Audit
+      -> Asmt-1 mapped to Control and Objective, asmt type="assessment_type"
+      -> Asmt-2 mapped to Control and Objective, asmt type="assessment_type"
+    As a result, assessments are related."""
+    if assessment_type == "Control":
+      related_objs = [control_mapped_to_program, objective_mapped_to_program]
+    else:
+      related_objs = [objective_mapped_to_program, control_mapped_to_program]
+    assessments = [self._create_mapped_asmt(
+        audit=audit, assessment_type=assessment_type,
+        objs_to_map=related_objs)
+        for _ in xrange(2)]
+    related_asmts_titles = [
+        (assessments[1].title, related_objs[0].title, audit.title)]
+    self._assert_asmt_with_related_asmts(
+        checked_asmt=assessments[0],
+        related_asmts_titles=related_asmts_titles,
+        selenium=selenium)
+
+  @pytest.mark.smoke_tests
+  def test_not_related_asmts_different_types(
+      self, control_mapped_to_program, objective_mapped_to_program,
+      audit, selenium
+  ):
+    """Objects structure:
+    Program
+    -> Control
+    -> Objective
+    -> Audit
+      -> Asmt-1 mapped to Control and Objective, asmt type=Control
+      -> Asmt-2 mapped to Control and Objective, asmt type=Objective
+    As a result, assessments are not related."""
+    assessments = [self._create_mapped_asmt(
+        audit=audit, assessment_type=assessment_type,
+        objs_to_map=[control_mapped_to_program, objective_mapped_to_program])
+        for assessment_type in ("Control", "Objective")]
+    self._assert_asmt_with_related_asmts(
+        checked_asmt=assessments[0],
+        related_asmts_titles=[],
+        selenium=selenium)
+
+  @pytest.mark.smoke_tests
+  def test_not_related_asmts_mapped_not_to_type(
+      self, objective_mapped_to_program, audit, selenium
+  ):
+    """Objects structure:
+    Program
+    -> Objective
+    -> Audit-1 -> Asmt-1 mapped to Objective but asmt type=Control
+    -> Audit-2 -> Asmt-2 mapped to Objective but asmt type=Control
+    As a result, assessments are not related."""
+    assessments = [self._create_mapped_asmt(
+        audit=audit, assessment_type="Control",
+        objs_to_map=[objective_mapped_to_program])
+        for _ in xrange(2)]
+    self._assert_asmt_with_related_asmts(
+        checked_asmt=assessments[0],
+        related_asmts_titles=[],
+        selenium=selenium)
+
+  @pytest.mark.smoke_tests
+  def test_related_asmts_in_different_audits_mapped_to_same_control(
+      self, control_mapped_to_program, audits, selenium
+  ):
+    """Objects structure:
+    Program
+    -> Control
+    -> Audit-1 -> Asmt-1 mapped to Control
+    -> Audit-2 -> Asmt-2 mapped to Control
+    As a result, assessments are related."""
+    assessments = [self._create_mapped_asmt(
+        audit=audit, assessment_type="Control",
+        objs_to_map=[control_mapped_to_program])
+        for audit in audits]
+    related_asmts_titles = [
+        (assessments[1].title, control_mapped_to_program.title,
+         audits[1].title)]
+    self._assert_asmt_with_related_asmts(
+        checked_asmt=assessments[0],
+        related_asmts_titles=related_asmts_titles,
+        selenium=selenium)
+
+  @pytest.mark.smoke_tests
+  def test_not_related_asmts_mapped_to_different_controls(
+      self, controls_mapped_to_program, audits, selenium
+  ):
+    """Objects structure:
+    Program
+    -> Control-1
+    -> Control-2
+    -> Audit-1 -> Asmt-1 mapped to Control-1
+    -> Audit-2 -> Asmt-2 mapped to Control-2
+    As a result, assessments are not related."""
+    assessments = [self._create_mapped_asmt(
+        audit=audit, assessment_type="Control", objs_to_map=[control])
+        for control, audit in zip(controls_mapped_to_program, audits)]
+    self._assert_asmt_with_related_asmts(
+        checked_asmt=assessments[0],
+        related_asmts_titles=[],
+        selenium=selenium)
+
+  @pytest.mark.smoke_tests
+  def test_related_asmts_in_different_audits_mapped_to_mapped_controls(
+      self, program, selenium
+  ):
+    """Objects structure:
+    Program
+    -> Control-1
+    -> Control-2
+    Control-1 and Control-2 are mapped.
+    -> Audit-1 -> Asmt-1 mapped to Control-1
+    -> Audit-2 -> Asmt-2 mapped to Control-2
+    As a result, assessments are related."""
+    controls = [rest_facade.create_control(program) for _ in xrange(2)]
+    rest_facade.map_objs(controls[0], controls[1])
+    audits = [rest_facade.create_audit(program) for _ in xrange(2)]
+    assessments = [self._create_mapped_asmt(
+        audit=audit, assessment_type="Control", objs_to_map=[control])
+        for control, audit in zip(controls, audits)]
+    related_asmts_titles = [
+        (assessments[1].title, controls[1].title, audits[1].title)]
+    self._assert_asmt_with_related_asmts(
+        checked_asmt=assessments[0],
+        related_asmts_titles=related_asmts_titles,
+        selenium=selenium)

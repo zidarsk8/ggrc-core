@@ -4,6 +4,7 @@
 """Fulltext event listeners"""
 
 from collections import Iterable
+import threading
 
 import sqlalchemy as sa
 from sqlalchemy import event
@@ -13,13 +14,33 @@ from ggrc import fulltext
 from ggrc.models import all_models
 from ggrc.fulltext import mixin
 
+
 ACTIONS = ['after_insert', 'after_delete', 'after_update']
+
+
+class ReindexSet(threading.local):
+  """Special thread safety object.
+
+   That will collect pool of objects that required to be reindexed."""
+
+  def __init__(self, *args, **kwargs):
+    super(ReindexSet, self).__init__(*args, **kwargs)
+    self._pool = set()
+
+  def add(self, item):
+    self._pool.add(item)
+
+  def __iter__(self):
+    return iter(self._pool)
+
+  def invalidate(self):
+    self._pool = set()
 
 
 def _runner(mapper, content, target):  # pylint:disable=unused-argument
   """Collect all reindex models in session"""
   ggrc_indexer = fulltext.get_indexer()
-  db.session.reindex_set = getattr(db.session, "reindex_set", set())
+  db.session.reindex_set = getattr(db.session, "reindex_set", ReindexSet())
   getters = ggrc_indexer.indexer_rules.get(target.__class__.__name__) or []
   fields = ggrc_indexer.indexer_fields.get(target.__class__.__name__)
   for getter in getters:

@@ -19,11 +19,24 @@ from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.models.hooks import common
 from ggrc.models.hooks import issue_tracker
+from ggrc.models.exceptions import StatusValidationError
 from ggrc.services import signals
 from ggrc.utils import referenced_objects
 
 
 logger = logging.getLogger(__name__)
+
+
+def _validate_assessment_done_state(old_value, obj):
+  """Checks if it's allowed to set done state from not done."""
+  new_value = obj.status
+  if old_value in obj.NOT_DONE_STATES and \
+     new_value in obj.DONE_STATES:
+    if hasattr(obj, "preconditions_failed") and obj.preconditions_failed:
+      raise StatusValidationError("CA-introduced completion "
+                                  "preconditions are not satisfied. "
+                                  "Check preconditions_failed "
+                                  "of items of self.custom_attribute_values")
 
 
 def _handle_assessment(assessment, src):
@@ -101,6 +114,19 @@ def init_hook():
     """Handles assessment update event."""
     del sender, src, service  # Unused
     common.ensure_field_not_changed(obj, 'audit')
+
+  @signals.Restful.model_put_before_commit.connect_via(all_models.Assessment)
+  def handle_assessment_done_state(sender, **kwargs):
+    """Checks if it's allowed to set done state from not done."""
+    del sender  # Unused arg
+    obj = kwargs['obj']
+    initial_state = kwargs['initial_state']
+    old_value = initial_state.status
+    try:
+      _validate_assessment_done_state(old_value, obj)
+    except StatusValidationError as error:
+      db.session.rollback()
+      raise error
 
 
 def generate_assignee_relations(assessment,

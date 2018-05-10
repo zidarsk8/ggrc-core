@@ -65,10 +65,10 @@
           contains = _.contains(value.split(','), this.keyword);
           if (!contains && activeInList) {
             binding.list.splice(
-                _.map(binding.list, function (e) {
-                  return e.instance.id;
-                }).indexOf(active.instance.id),
-                1
+              _.map(binding.list, function (e) {
+                return e.instance.id;
+              }).indexOf(active.instance.id),
+              1
             );
           }
           if (contains && !activeInList) {

@@ -5,10 +5,10 @@
 
 !function ($) {
 
-  "use strict"; // jshint ;_;
+  'use strict'; // jshint ;_;
 
 
- /* STICKY_POPOVER PUBLIC CLASS DEFINITION
+  /* STICKY_POPOVER PUBLIC CLASS DEFINITION
 * =============================== */
 
   let StickyPopover = function ( element, options ) {
@@ -23,7 +23,7 @@
 
     constructor: StickyPopover
 
-  , init: function(type, element, options) {
+    , init: function(type, element, options) {
       if (options.trigger == 'sticky-hover') {
         options.sticky_hover = true;
         options.trigger = 'hover';
@@ -43,11 +43,11 @@
         this.$element.on('click', $.proxy(this.click_toggle, this));
       }
     }
-  , click_toggle: function(e) {
+    , click_toggle: function(e) {
       e && e.preventDefault();
       this.toggle();
     }
-  , show: function(force) {
+    , show: function(force) {
       // Overload `show` to listen for mouseovers on the popover div
       if (force || this.displayState !== 'show') {
         if (this.displayState !== 'show') {
@@ -59,20 +59,20 @@
 
         if (this.$element.children('.popover-data-title').length > 0) {
           this.$element.attr(
-              'data-original-title',
-              this.$element.children('.popover-data-title').html());
+            'data-original-title',
+            this.$element.children('.popover-data-title').html());
         }
 
         if (this.$element.children('.popover-data-content').length > 0) {
           this.$element.attr(
-              'data-content',
-              this.$element.children('.popover-data-content').html());
+            'data-content',
+            this.$element.children('.popover-data-content').html());
         }
 
         this.displayState = 'show';
         this.trigger_load();
         $.fn.popover.Constructor.prototype.show.apply(this);
-        this.tip().css({opacity : ""});
+        this.tip().css({opacity : ''});
         if (this.options.sticky_hover) {
           this.tip().
             on('mouseenter', $.proxy(this.tip_enter, this)).
@@ -80,24 +80,24 @@
         }
       }
     }
-  , hide: function() {
+    , hide: function() {
       if (this.displayState === 'show') {
         this.displayState = 'hide';
         $.fn.popover.Constructor.prototype.hide.apply(this);
       }
     }
-  , trigger_load: function() {
+    , trigger_load: function() {
       let self = this,
-          href = this.$element.data('popover-href'),
-          loaded = this.$element.data('popover-loaded');
+        href = this.$element.data('popover-href'),
+        loaded = this.$element.data('popover-loaded');
 
       if (!href) return;
 
       if (!loaded) {
         $.ajax({
           url : href
-          , type : "get"
-          , dataType : "html"
+          , type : 'get'
+          , dataType : 'html'
           , success : function(data) {
             let $data = $(data.trim());
             self.$element.attr('data-original-title', $data.filter('.popover-title').html());
@@ -109,14 +109,14 @@
         });
       }
     }
-  , tip_enter: function(e) {
+    , tip_enter: function(e) {
       // Handle `mouseenter` on the popover element
       // Must set 'e.currentTarget' or it looks for `data.sticky_popover`
       //   in the wrong place
       e.currentTarget = this.$element[0];
       $.fn.popover.Constructor.prototype.enter.apply(this, arguments);
     }
-  , tip_leave: function(e) {
+    , tip_leave: function(e) {
       // Handle `mouseenter` on the popover element
       // Must set 'e.currentTarget' or it looks for `data.sticky_popover`
       //   in the wrong place
@@ -126,7 +126,7 @@
   })
 
 
- /* STICKY_POPOVER PLUGIN DEFINITION
+  /* STICKY_POPOVER PLUGIN DEFINITION
 * ======================= */
 
   $.fn.sticky_popover = function (option) {

@@ -17,7 +17,7 @@ from integration.ggrc.models.test_assessment_base import TestAssessmentBase
 @ddt.ddt
 class TestAssessmentGeneration(TestAssessmentBase):
   """Test assessment generation"""
-  # pylint: disable=invalid-name
+  # pylint: disable=invalid-name,too-many-public-methods
 
   def setUp(self):
     super(TestAssessmentGeneration, self).setUp()
@@ -105,10 +105,10 @@ class TestAssessmentGeneration(TestAssessmentBase):
 
     mapped_objects = [self.audit, self.snapshot]
     for obj in mapped_objects:
-      self.assert_mapped_role("Verifiers Mapped", auditors[0], obj)
-      self.assert_mapped_role("Verifiers Mapped", auditors[1], obj)
-      self.assert_mapped_role("Assignees Mapped", captains[0], obj)
-      self.assert_mapped_role("Creators Mapped", "user@example.com", obj)
+      self.assert_propagated_role("Verifiers", auditors[0], obj)
+      self.assert_propagated_role("Verifiers", auditors[1], obj)
+      self.assert_propagated_role("Assignees", captains[0], obj)
+      self.assert_propagated_role("Creators", "user@example.com", obj)
 
   def test_template_test_plan(self):
     """Test if generating assessments from template sets default test plan"""
@@ -132,11 +132,11 @@ class TestAssessmentGeneration(TestAssessmentBase):
 
     self.assessment_post(template)
     for obj in [self.audit, self.snapshot]:
-      self.assert_mapped_role("Verifiers Mapped", "user1@example.com", obj)
-      self.assert_mapped_role("Verifiers Mapped", "user2@example.com", obj)
-      self.assert_mapped_role("Assignees Mapped", "user3@example.com", obj)
-      self.assert_mapped_role("Assignees Mapped", "user4@example.com", obj)
-      self.assert_mapped_role("Creators Mapped", "user@example.com", obj)
+      self.assert_propagated_role("Verifiers", "user1@example.com", obj)
+      self.assert_propagated_role("Verifiers", "user2@example.com", obj)
+      self.assert_propagated_role("Assignees", "user3@example.com", obj)
+      self.assert_propagated_role("Assignees", "user4@example.com", obj)
+      self.assert_propagated_role("Creators", "user@example.com", obj)
 
   def test_control_test_plan(self):
     """Test test_plan from control"""

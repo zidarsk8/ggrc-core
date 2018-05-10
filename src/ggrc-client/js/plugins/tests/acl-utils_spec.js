@@ -47,10 +47,10 @@ describe('ACL utils peopleWithRoleName() method', () => {
   });
 
   it('returns users that have a role granted on a particular instance', () => {
-      const result = peopleWithRoleName(instance, 'Role B');
-      expect(can.makeArray(result.map((person) => person.id).sort()))
-        .toEqual([2, 5]);
-    }
+    const result = peopleWithRoleName(instance, 'Role B');
+    expect(can.makeArray(result.map((person) => person.id).sort()))
+      .toEqual([2, 5]);
+  }
   );
 
   it('returns empty array if role name not found', () => {
@@ -59,14 +59,14 @@ describe('ACL utils peopleWithRoleName() method', () => {
   });
 
   it('returns empty array if no users are granted a particular role', () => {
-      let result;
+    let result;
 
-      instance.attr('type', 'Policy');
-      instance.attr('class.model_singular', 'Policy');
+    instance.attr('type', 'Policy');
+    instance.attr('class.model_singular', 'Policy');
 
-      result = peopleWithRoleName(instance, 'Role A');
+    result = peopleWithRoleName(instance, 'Role A');
 
-      expect(can.makeArray(result)).toEqual([]);
-    }
+    expect(can.makeArray(result)).toEqual([]);
+  }
   );
 });

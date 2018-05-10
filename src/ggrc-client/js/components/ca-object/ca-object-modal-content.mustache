@@ -47,6 +47,44 @@
                 </attach-button>
             </div>
         {{/if}}
+        {{#if url}}
+            <div class="simple-modal__section">
+                <div class="simple-modal__section-title">Evidence url</div>
+                <object-list {items}="urls" {empty-message}="noItemsText">
+                    <editable-document-object-list-item {document}="{.}">
+                        <a ($click)="removeRelatedItem(document, 'urls')">
+                            <action-toolbar-control>
+                                <i class="fa fa-trash"></i>
+                            </action-toolbar-control>
+                        </a>
+                    </editable-document-object-list-item>
+                </object-list>
+                {{#if urlsEditMode}}
+                    <create-url
+                        {type}="documentTypes.urls"
+                        {context}="instance.context"
+                        (before-create)="addItems(%event, 'urls')"
+                        (created)="addRelatedItem(%event, 'urls')">
+                        <form class="create-form">
+                            <fieldset class="create-form__layout">
+                                <input {($value)}="value" class="create-form__input" type="text" placeholder="Add URL" spellcheck="false" autocomplete="false">
+                                <div class="create-form__controls">
+                                    <button type="button" class="create-form__confirm" ($click)="create; setUrlEditMode(false, 'urls')">
+                                        <i class="fa fa-check"></i>
+                                    </button>
+                                    <button type="button" class="create-form__cancel" ($click)="clear; setUrlEditMode(false, 'urls')">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </create-url>
+                {{else}}
+                    <button class="btn btn-small btn-gray"
+                        ($click)="setUrlEditMode(true, 'urls')">Add</button>
+                {{/if}}
+            </div>
+        {{/if}}
     </form>
 </div>
 <div class="ca-object-modal-content__footer">
@@ -60,7 +98,7 @@
                                 {is-disabled}="isUpdatingEvidences"
             >Save</comment-add-button>
         {{/if}}
-            <button class="btn btn-small btn-white simple-modal__toolbar-item" ($click)="hide" {{#if isUpdatingEvidences}}disabled{{/if}}>Close</button>
+            <button class="btn btn-small btn-white simple-modal__toolbar-item" ($click)="hide; setUrlEditMode(false, 'urls')">Close</button>
         </div>
     </div>
 </div>

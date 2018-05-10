@@ -18,7 +18,7 @@ from exceptions import TypeError
 from wsgiref.handlers import format_date_time
 from urllib import urlencode
 
-from flask import url_for, request, current_app, g
+from flask import url_for, request, current_app, g, has_request_context
 from flask.views import View
 from flask.ext.sqlalchemy import Pagination
 import sqlalchemy.orm.exc
@@ -32,7 +32,7 @@ import ggrc.models
 from ggrc import db
 from ggrc import gdrive
 from ggrc import utils
-from ggrc.utils import as_json, benchmark
+from ggrc.utils import as_json, benchmark, dump_attrs
 from ggrc.utils.log_event import log_event
 from ggrc.fulltext import get_indexer
 from ggrc.login import get_current_user_id, get_current_user
@@ -48,8 +48,6 @@ from ggrc.cache import utils as cache_utils
 
 
 # pylint: disable=invalid-name
-from ggrc.utils import dump_attrs
-
 logger = getLogger(__name__)
 
 
@@ -350,8 +348,18 @@ class ModelView(View):
   @classmethod
   def base_url_for(cls, _memoized_base_url={}):
     if cls not in _memoized_base_url:
-      _memoized_base_url[cls] = url_for(cls.endpoint_name())
+      if has_request_context():
+        _memoized_base_url[cls] = url_for(cls.endpoint_name())
+      else:
+        _memoized_base_url[cls] = cls.generate_url()
     return _memoized_base_url[cls]
+
+  @classmethod
+  def generate_url(cls):
+    """Generate relative endpoint url."""
+    model = ggrc.models.get_model(cls.endpoint_name())
+    plural_name = model._inflector.table_plural
+    return "/api/{}".format(plural_name)
 
   @classmethod
   def url_for(cls, *args, **kwargs):
@@ -955,7 +963,6 @@ class Resource(ModelView):
       res: List that will get responses appended to it.
       no_result: Flag for suppressing results.
     """
-
     with benchmark("Generate objects"):
       objects = []
       sources = []

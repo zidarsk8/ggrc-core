@@ -155,7 +155,7 @@ class TestReader(TestCase):
     # Creator should now have read access on the mapped object
     self.api.set_user(self.users["creator"])
     response = self.api.get(all_models.System, system_id)
-    self.assertEqual(response.status_code, 200)
+    self.assertEqual(response.status_code, 403)
 
     # But he should still not be allowed to update
     response = self.api.put(system, response.json)

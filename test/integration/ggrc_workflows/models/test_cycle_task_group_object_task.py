@@ -280,6 +280,7 @@ class CycleTaskQueryAPI(query_helper.WithQueryApi, TestCTGOT):
     self.assertEqual(result, 1)
 
 
+@ddt.ddt
 class TestCycleTaskApiCalls(workflow_test_case.WorkflowTestCase):
   """Tests related to CycleTask REST API calls."""
 
@@ -299,3 +300,28 @@ class TestCycleTaskApiCalls(workflow_test_case.WorkflowTestCase):
             "cycle_task_group_object_tasks"
         ]
     )
+
+  @ddt.data(True, False)
+  def test_filter_by_object_approval(self, filter_flag):
+    """Test filter CTGOT by object_approval flag if value is {0}."""
+    with factories.single_commit():
+      ctgts = {}
+      for flag in [True, False]:
+        workflow = wf_factories.WorkflowFactory(object_approval=flag)
+        task_group = wf_factories.TaskGroupFactory(workflow=workflow)
+        tgt = wf_factories.TaskGroupTaskFactory(task_group=task_group)
+        cycle = wf_factories.CycleFactory(workflow=workflow)
+        ctgts[flag] = wf_factories.CycleTaskFactory(cycle=cycle,
+                                                    task_group_task=tgt)
+
+    filter_params = "ids={}&object_approval={}".format(
+        ",".join([str(c.id) for c in ctgts.values()]),
+        "true" if filter_flag else "false"
+    )
+    response = self.api_helper.get_query(all_models.CycleTaskGroupObjectTask,
+                                         filter_params)
+    self.assert200(response)
+    colections = response.json["cycle_task_group_object_tasks_collection"]
+    items = colections["cycle_task_group_object_tasks"]
+    self.assertEqual(1, len(items))
+    self.assertEqual(ctgts[filter_flag].id, items[0]["id"])

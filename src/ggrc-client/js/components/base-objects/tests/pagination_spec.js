@@ -72,14 +72,14 @@ describe('Pagination', function () {
       expect(result).toEqual(1);
     });
     it('does not update current page when pageSize does not changed',
-    function () {
-      let result;
-      paginationViewModel.attr('count', 3);
-      paginationViewModel.attr('current', 2);
-      paginationViewModel.attr('pageSize', 5); // set the same pageSize value
-      result = paginationViewModel.attr('current');
-      expect(result).toEqual(2);
-    });
+      function () {
+        let result;
+        paginationViewModel.attr('count', 3);
+        paginationViewModel.attr('current', 2);
+        paginationViewModel.attr('pageSize', 5); // set the same pageSize value
+        result = paginationViewModel.attr('current');
+        expect(result).toEqual(2);
+      });
   });
   describe('limits property', function () {
     beforeEach(function () {
@@ -113,14 +113,14 @@ describe('Pagination', function () {
       expect(result).not.toBeDefined();
     });
     it('returns correct items count and updates pages count when initialized',
-    function () {
-      let itemsCount;
-      let pagesCount;
-      paginationViewModel.attr('total', 10);
-      itemsCount = paginationViewModel.attr('total');
-      pagesCount = paginationViewModel.attr('count');
-      expect(itemsCount).toEqual(10);
-      expect(pagesCount).toEqual(2);
-    });
+      function () {
+        let itemsCount;
+        let pagesCount;
+        paginationViewModel.attr('total', 10);
+        itemsCount = paginationViewModel.attr('total');
+        pagesCount = paginationViewModel.attr('count');
+        expect(itemsCount).toEqual(10);
+        expect(pagesCount).toEqual(2);
+      });
   });
 });

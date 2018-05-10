@@ -58,11 +58,13 @@ class TestSettings(unittest.TestCase):
     self.assertEqual(default.COMPANY, "Company, Inc.")
     self.assertEqual(default.COMPANY_LOGO_TEXT, "Company")
     self.assertEqual(default.CREATE_ISSUE_URL, "")
+    self.assertEqual(default.CREATE_ISSUE_BUTTON_NAME, "")
 
   @patch.dict(os.environ, {
       "COMPANY": "TestCompany",
       "COMPANY_LOGO_TEXT": "TestCompanyLogo",
-      "CREATE_ISSUE_URL": "TestRMCCreateIssueURL"
+      "CREATE_ISSUE_URL": "TestRMCCreateIssueURL",
+      "CREATE_ISSUE_BUTTON_NAME": "TestCreateButtonName",
   })
   def test_loading_vars_from_env(self):
     """Test loading settings variables from environment."""
@@ -70,3 +72,4 @@ class TestSettings(unittest.TestCase):
     self.assertEqual(default.COMPANY, "TestCompany")
     self.assertEqual(default.COMPANY_LOGO_TEXT, "TestCompanyLogo")
     self.assertEqual(default.CREATE_ISSUE_URL, "TestRMCCreateIssueURL")
+    self.assertEqual(default.CREATE_ISSUE_BUTTON_NAME, "TestCreateButtonName")

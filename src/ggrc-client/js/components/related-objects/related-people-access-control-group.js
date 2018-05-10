@@ -79,8 +79,8 @@ export default can.Component.extend({
       let exist = _.find(this.attr('people'), {id: person.id});
 
       if (exist) {
-        console.warn('User ', person.id,
-          'already has role', groupId, 'assigned');
+        console // eslint-disable-line
+          .warn(`User "${person.id}" already has role "${groupId}" assigned`);
         return;
       }
 
@@ -96,6 +96,12 @@ export default can.Component.extend({
       let idx = _.findIndex(
         this.attr('people'),
         {id: person.id});
+
+      if (idx === -1) {
+        console // eslint-disable-line
+          .warn(`User "${person.id}" does not present in "people" list`);
+        return;
+      }
 
       this.attr('isDirty', true);
       this.attr('people').splice(idx, 1);

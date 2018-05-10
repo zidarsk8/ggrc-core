@@ -213,7 +213,7 @@ function _initWidgetCounts(widgets, type, id) {
         widgetObject.additionalFilter ?
           GGRC.query_parser.parse(widgetObject.additionalFilter) :
           null
-        );
+      );
     }
 
     param.type = 'count';

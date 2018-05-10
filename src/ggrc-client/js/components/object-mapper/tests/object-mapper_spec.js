@@ -34,26 +34,26 @@ describe('GGRC.Components.objectMapper', function () {
 
     it(`initializes join_object_id with "join-object-id"
     if isNew flag is not passed`,
-    function () {
-      parentViewModel.attr('general.join-object-id', 'testId');
-      let result = Component.prototype.viewModel({}, parentViewModel)();
-      expect(result.join_object_id).toBe('testId');
-    });
+      function () {
+        parentViewModel.attr('general.join-object-id', 'testId');
+        let result = Component.prototype.viewModel({}, parentViewModel)();
+        expect(result.join_object_id).toBe('testId');
+      });
 
     it(`initializes join_object_id with page instance id if
     "join-object-id" and "isNew" are not passed`,
-    function () {
-      spyOn(GGRC, 'page_instance').and.returnValue({id: 'testId'});
-      let result = Component.prototype.viewModel({}, parentViewModel)();
-      expect(result.join_object_id).toBe('testId');
-    });
+      function () {
+        spyOn(GGRC, 'page_instance').and.returnValue({id: 'testId'});
+        let result = Component.prototype.viewModel({}, parentViewModel)();
+        expect(result.join_object_id).toBe('testId');
+      });
 
     it('initializes join_object_id with null if isNew flag is passed',
-    function () {
-      parentViewModel.attr('general.isNew', true);
-      let result = Component.prototype.viewModel({}, parentViewModel)();
-      expect(result.join_object_id).toBe(null);
-    });
+      function () {
+        parentViewModel.attr('general.isNew', true);
+        let result = Component.prototype.viewModel({}, parentViewModel)();
+        expect(result.join_object_id).toBe(null);
+      });
 
     it('returns object with function "isLoadingOrSaving"', function () {
       let result = Component.prototype.viewModel({}, parentViewModel)();
@@ -131,13 +131,13 @@ describe('GGRC.Components.objectMapper', function () {
       });
 
       it('sets freezedConfigTillSubmit to currConfig',
-      function () {
-        vm.onSubmit();
+        function () {
+          vm.onSubmit();
 
-        expect(vm.attr('freezedConfigTillSubmit')).toEqual(
-          vm.attr('currConfig')
-        );
-      });
+          expect(vm.attr('freezedConfigTillSubmit')).toEqual(
+            vm.attr('currConfig')
+          );
+        });
     });
   });
 
@@ -538,22 +538,22 @@ describe('GGRC.Components.objectMapper', function () {
 
     it('returns true if it is an in-scope model but mapped type is not ' +
     'snapshotable',
-      function () {
-        let result;
-        spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(true);
-        result = viewModel.allowedToCreate();
-        expect(result).toEqual(true);
-      });
+    function () {
+      let result;
+      spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(true);
+      result = viewModel.allowedToCreate();
+      expect(result).toEqual(true);
+    });
 
     it('returns false if it is an in-scope model and mapped type is ' +
     'snapshotable',
-      function () {
-        let result;
-        viewModel.attr('type', 'Control');
-        spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(true);
-        result = viewModel.allowedToCreate();
-        expect(result).toEqual(false);
-      });
+    function () {
+      let result;
+      viewModel.attr('type', 'Control');
+      spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(true);
+      result = viewModel.allowedToCreate();
+      expect(result).toEqual(false);
+    });
   });
 
   describe('showWarning() method', function () {

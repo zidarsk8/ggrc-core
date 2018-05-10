@@ -263,16 +263,16 @@ import {
       '.ui-autocomplete-input modal:success': function (el, ev, data, options) {
         let that = this;
         let extraAttrs = can.reduce(this.element
-            .find('input:not([data-mapping], [data-lookup])').get(),
-          function (attrs, el) {
-            if ($(el).attr('model')) {
-              attrs[$(el).attr('name')] = CMS.Models[$(el).attr('model')]
-                .findInCacheById($(el).val());
-            } else {
-              attrs[$(el).attr('name')] = $(el).val();
-            }
-            return attrs;
-          }, {});
+          .find('input:not([data-mapping], [data-lookup])').get(),
+        function (attrs, el) {
+          if ($(el).attr('model')) {
+            attrs[$(el).attr('name')] = CMS.Models[$(el).attr('model')]
+              .findInCacheById($(el).val());
+          } else {
+            attrs[$(el).attr('name')] = $(el).val();
+          }
+          return attrs;
+        }, {});
 
         can.each(data.arr || [data], function (obj) {
           let mapping;

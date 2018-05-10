@@ -145,10 +145,10 @@ describe('GGRC.Components.mapperResults', function () {
       viewModel.attr('columns', {});
       spyOn(TreeViewUtils, 'getSortingForModel')
         .and.returnValue(
-        {
-          key: 'key',
-          direction: 'direction',
-        });
+          {
+            key: 'key',
+            direction: 'direction',
+          });
       spyOn(viewModel, 'getDisplayModel')
         .and.returnValue({
           model_singular: '',
@@ -359,11 +359,11 @@ describe('GGRC.Components.mapperResults', function () {
     });
 
     it('does not build advanced status if sttatus items are not provided',
-    function () {
-      viewModel.attr('statusItem', {});
-      viewModel.getQuery('values', true);
-      expect(AdvancedSearch.buildFilter.calls.count()).toBe(2);
-    });
+      function () {
+        viewModel.attr('statusItem', {});
+        viewModel.getQuery('values', true);
+        expect(AdvancedSearch.buildFilter.calls.count()).toBe(2);
+      });
 
     it('adds paging to query if addPaging is true', function () {
       viewModel.removeAttr('sort.key');

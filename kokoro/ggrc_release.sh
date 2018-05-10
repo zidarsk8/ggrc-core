@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copyright (C) 2018 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
 set -o nounset
 set -o errexit
 
@@ -78,6 +81,7 @@ KOKORO=true
 COMPANY="$COMPANY"
 COMPANY_LOGO_TEXT="$COMPANY_LOGO_TEXT"
 CREATE_ISSUE_URL="$CREATE_ISSUE_URL"
+CREATE_ISSUE_BUTTON_NAME="$CREATE_ISSUE_BUTTON_NAME"
 EOL
 
 ./bin/deploy $APPENGINE_INSTANCE

@@ -27,7 +27,7 @@ describe('GGRC.Components.UnarchiveLink', function () {
 
       instance = new can.Map({
         save: jasmine.createSpy('save')
-                     .and.returnValue(pendingSave.promise()),
+          .and.returnValue(pendingSave.promise()),
         display_name: function () {
           return displayName;
         },

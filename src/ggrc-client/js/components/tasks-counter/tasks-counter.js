@@ -11,7 +11,7 @@ let baseCmpName = 'tasks-counter';
  */
 export default GGRC.Components('tasksCounter', {
   tag: baseCmpName,
-  template: `<div class="tasks-counter {{stateCss}}">{{tasksAmount}}</div>`,
+  template: '<div class="tasks-counter {{stateCss}}">{{tasksAmount}}</div>',
   viewModel: {
     define: {
       tasksAmount: {

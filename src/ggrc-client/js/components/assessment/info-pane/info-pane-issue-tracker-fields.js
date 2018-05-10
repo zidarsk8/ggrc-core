@@ -5,13 +5,22 @@
 
 import '../../assessment/info-pane/confirm-edit-action';
 import template from './templates/info-pane-issue-tracker-fields.mustache';
+import {showTrackerNotification} from
+  '../../issue-tracker/temporary-issue-tracker-notification.js';
 
 const tag = 'info-pane-issue-tracker-fields';
 
 export default GGRC.Components('infoPaneIssueTrackerFields', {
   tag: tag,
   template: template,
-  viewModle: {
+  viewModel: {
     instance: {},
+  },
+  events: {
+    '{viewModel.instance.issue_tracker} hotlist_id'() {
+      if (this.viewModel.instance.attr('type') === 'Assessment') {
+        showTrackerNotification();
+      }
+    },
   },
 });

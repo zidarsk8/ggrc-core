@@ -48,16 +48,16 @@ describe('GGRC.Components.gDriveFolderPicker', function () {
       });
 
       it('calls setRevisionFolder() for snapshot with attached folder',
-      function () {
-        viewModel.attr('instance', {
-          folder: folderId,
-        });
-        viewModel.attr('readonly', true);
-        spyOn(viewModel, 'setRevisionFolder');
+        function () {
+          viewModel.attr('instance', {
+            folder: folderId,
+          });
+          viewModel.attr('readonly', true);
+          spyOn(viewModel, 'setRevisionFolder');
 
-        method();
-        expect(viewModel.setRevisionFolder).toHaveBeenCalled();
-      });
+          method();
+          expect(viewModel.setRevisionFolder).toHaveBeenCalled();
+        });
 
       it('calls setCurrent() when folder is attached', function () {
         viewModel.attr('instance', {

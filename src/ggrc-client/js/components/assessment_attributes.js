@@ -3,6 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {
+  ddValidationValueToMap,
+  ddValidationMapToValue,
+} from '../plugins/utils/ca-utils';
+
 (function (can, $) {
   /*
    * Assessment template main component
@@ -78,9 +83,9 @@
         // It's not nice way to rely on DOM for sorting,
         // but it was easiest for implementation
         this.scope.fields.replace(_.map(sortables,
-           function (item) {
-             return $(item).data('field');
-           }
+          function (item) {
+            return $(item).data('field');
+          }
         ));
       },
     },
@@ -97,10 +102,6 @@
     scope: function (attrs, parentScope, element) {
       return {
         types: parentScope.attr('types'),
-        pads: {
-          COMMENT: 0,
-          ATTACHMENT: 1,
-        },
 
         _EV_FIELD_REMOVED: 'on-remove',
 
@@ -128,7 +129,7 @@
          * {value: 2, attachment: true, comment: false},
          * ]
          */
-        denormalize_mandatory: function (field, pads) {
+        denormalize_mandatory: function (field, flags) {
           let options = _.splitTrim(field.attr('multi_choice_options'));
           let vals = _.splitTrim(field.attr('multi_choice_mandatory'));
           let isEqualLength = options.length === vals.length;
@@ -146,12 +147,9 @@
 
           return _.zip(options, vals).map(function (zip) {
             let attr = new can.Map();
-            let val = zip[1];
-            let attachment = !!(val & 1 << pads.ATTACHMENT);
-            let comment = !!(val & 1 << pads.COMMENT);
+            let val = parseInt(zip[1], 10);
             attr.attr('value', zip[0]);
-            attr.attr('attachment', attachment);
-            attr.attr('comment', comment);
+            attr.attr(ddValidationValueToMap(val));
             return attr;
           });
         },
@@ -163,12 +161,8 @@
          * ]
          * is normalized into "2, 3" (10b, 11b).
          */
-        normalize_mandatory: function (attrs, pads) {
-          return can.map(attrs, function (attr) {
-            let attach = attr.attr('attachment') << pads.ATTACHMENT;
-            let comment = attr.attr('comment') << pads.COMMENT;
-            return attach | comment;
-          }).join(',');
+        normalize_mandatory: function (attrs) {
+          return can.map(attrs, ddValidationMapToValue).join(',');
         },
       };
     },
@@ -181,11 +175,10 @@
        * @param {Object} options - the component instantiation options
        */
       init: function (element, options) {
-        let field = this.scope.attr('field');
-        let pads = this.scope.attr('pads');
-        let denormalized = this.scope.denormalize_mandatory(field, pads);
-        let types = this.scope.attr('types');
-        let item = _.find(types, function (obj) {
+        const field = this.scope.attr('field');
+        const denormalized = this.scope.denormalize_mandatory(field);
+        const types = this.scope.attr('types');
+        const item = _.find(types, function (obj) {
           return obj.type === field.attr('attribute_type');
         });
         this.scope.field.attr('attribute_name', item.name);
@@ -194,9 +187,8 @@
         this.scope.attr('$rootEl', $(element));
       },
       '{attrs} change': function () {
-        let attrs = this.scope.attr('attrs');
-        let pads = this.scope.attr('pads');
-        let normalized = this.scope.normalize_mandatory(attrs, pads);
+        const attrs = this.scope.attr('attrs');
+        const normalized = this.scope.normalize_mandatory(attrs);
         this.scope.field.attr('multi_choice_mandatory', normalized);
       },
     },

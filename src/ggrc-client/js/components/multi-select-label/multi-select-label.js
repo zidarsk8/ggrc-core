@@ -69,7 +69,11 @@ export default can.Component.extend({
       }
     },
     createLabel: function (event) {
-      this.attr('labels').push({name: event.newValue, id: null});
+      this.attr('labels').push({
+        name: event.newValue,
+        id: null,
+        type: 'Label',
+      });
       this.valueChanged(this.attr('labels'));
     },
     labelSelected: function (event) {

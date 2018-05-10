@@ -40,15 +40,15 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
 
     it('returns false if the Task\'s Cycle is not current for ' +
       'a non-finished task',
-      function () {
-        let isEditable;
-        instance.attr('status', 'In Progress');
-        instance.cycle.attr('is_current', false);
+    function () {
+      let isEditable;
+      instance.attr('status', 'In Progress');
+      instance.cycle.attr('is_current', false);
 
-        isEditable = method();
+      isEditable = method();
 
-        expect(isEditable).toBe(false);
-      }
+      expect(isEditable).toBe(false);
+    }
     );
 
     it('returns false if a Task in a current cycle is completed', function () {

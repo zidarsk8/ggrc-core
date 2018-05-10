@@ -170,6 +170,8 @@ import {getRole} from '../plugins/utils/acl-utils';
           attr_name: 'last_assessment_date',
           order: 45, // between State and Primary Contact
         },
+        {attr_title: 'Effective Date', attr_name: 'start_date'},
+        {attr_title: 'Last Deprecated Date', attr_name: 'last_deprecated_date'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
       ]),
       display_attr_names: ['title', 'owner', 'status', 'last_assessment_date',
@@ -191,16 +193,6 @@ import {getRole} from '../plugins/utils/acl-utils';
       this.validateNonBlank('title');
       this._super.apply(this, arguments);
     },
-  }, {});
-
-  can.Model.Cacheable('CMS.Models.Help', {
-    root_object: 'help',
-    root_collection: 'helps',
-    findAll: 'GET /api/help',
-    findOne: 'GET /api/help/{id}',
-    update: 'PUT /api/help/{id}',
-    destroy: 'DELETE /api/help/{id}',
-    create: 'POST /api/help',
   }, {});
 
   can.Model.Cacheable('CMS.Models.Label', {
@@ -361,6 +353,7 @@ import {getRole} from '../plugins/utils/acl-utils';
       } else {
         instance = new model({
           id: objectId,
+          type: objectType,
           href: (paramsOrObject || {}).href,
         });
       }

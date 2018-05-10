@@ -156,10 +156,10 @@ export default GGRC.Components('mapperResults', {
       }
 
       return buildRelevantIdsQuery(this.attr('type'), {}, {
-          type: this.attr('baseInstance.type'),
-          id: this.attr('baseInstance.id'),
-          operation: 'relevant',
-        }, filter);
+        type: this.attr('baseInstance.type'),
+        id: this.attr('baseInstance.id'),
+        operation: 'relevant',
+      }, filter);
     },
     prepareUnlockedFilter: function () {
       let filterString = StateUtils.unlockedFilter();
@@ -195,17 +195,17 @@ export default GGRC.Components('mapperResults', {
       let status;
       let filters = GGRC.query_parser.parse(
         AdvancedSearch.buildFilter(this.attr('filterItems'),
-        request));
+          request));
       let mappings = GGRC.query_parser.parse(
         AdvancedSearch.buildFilter(this.attr('mappingItems'),
-        request));
+          request));
       let advancedFilters = GGRC.query_parser.join_queries(filters, mappings);
 
       // the edge case caused by stateless objects
       if (this.attr('statusItem.value.items')) {
         status = GGRC.query_parser.parse(
           AdvancedSearch.buildFilter([this.attr('statusItem')],
-          request));
+            request));
         advancedFilters = GGRC.query_parser
           .join_queries(advancedFilters, status);
       }

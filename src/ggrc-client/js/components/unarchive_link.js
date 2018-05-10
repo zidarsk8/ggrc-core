@@ -14,8 +14,8 @@
       notifyText: 'was unarchived successfully',
     },
     template: ['<a href="#">',
-               '<content></content>',
-               '</a>'].join(''),
+      '<content></content>',
+      '</a>'].join(''),
     events: {
       'a click': function (el, event) {
         let instance = this.scope.attr('instance');

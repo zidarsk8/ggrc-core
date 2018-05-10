@@ -3,13 +3,14 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {SAVE_CUSTOM_ROLE, ROLES_CONFLICT} from '../../events/eventTypes';
+import {ROLES_CONFLICT} from '../../events/eventTypes';
 import {getRolesForType} from '../../plugins/utils/acl-utils';
 
 export default GGRC.Components('relatedPeopleAccessControl', {
   tag: 'related-people-access-control',
   viewModel: {
     instance: {},
+    deferredSave: null,
     includeRoles: [],
     groups: [],
     updatableGroupId: null,
@@ -21,20 +22,27 @@ export default GGRC.Components('relatedPeopleAccessControl', {
     readOnly: false,
 
     updateRoles: function (args) {
-      this.updateAccessContolList(args.people, args.roleId);
+      if (this.attr('deferredSave')) {
+        this.attr('deferredSave').push(this.performUpdate.bind(this, args));
+      }
+      this.performUpdate(args);
+
+      this.dispatch({
+        type: 'saveCustomRole',
+        groupId: args.roleId,
+      });
+    },
+    performUpdate: function (args) {
+      this.updateAccessControlList(args.people, args.roleId);
 
       if (this.attr('conflictRoles').length) {
         this.checkConflicts(args.roleTitle);
       }
-      this.dispatch({
-        ...SAVE_CUSTOM_ROLE,
-        groupId: args.roleId,
-      });
     },
-    updateAccessContolList: function (people, roleId) {
+    updateAccessControlList: function (people, roleId) {
       let instance = this.attr('instance');
 
-      // remove all people with current role
+      // get people without current role
       let listWithoutRole = instance
         .attr('access_control_list').filter(function (item) {
           return item.ac_role_id !== roleId;
@@ -232,17 +240,17 @@ export default GGRC.Components('relatedPeopleAccessControl', {
       groups = _.map(roles, function (role) {
         return this.buildGroups(role, roleAssignments);
       }.bind(this))
-      .filter(function (group) {
-        return typeof group !== 'undefined';
-      })
-      // sort by required
-      .sort(function (a, b) {
-        if (a.required === b.required) {
-          return 0;
-        }
+        .filter(function (group) {
+          return typeof group !== 'undefined';
+        })
+        // sort by required
+        .sort(function (a, b) {
+          if (a.required === b.required) {
+            return 0;
+          }
 
-        return a.required ? -1 : 1;
-      });
+          return a.required ? -1 : 1;
+        });
 
       if (this.attr('orderOfRoles.length')) {
         groups = this.setGroupOrder(groups, this.attr('orderOfRoles').attr());

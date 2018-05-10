@@ -108,7 +108,6 @@ import {
         audits: path + '/audits/info.mustache',
         people: path + '/people/info.mustache',
         policies: path + '/policies/info.mustache',
-        objectives: path + '/objectives/info.mustache',
         controls: path + '/controls/info.mustache',
         systems: path + '/systems/info.mustache',
         processes: path + '/processes/info.mustache',
@@ -210,8 +209,8 @@ import {
         farModels = baseWidgetsByType[object.constructor.shortName];
       }
 
-        // here we are going to define extra descriptor options, meaning that
-        //  these will be used as extra options to create widgets on top of
+      // here we are going to define extra descriptor options, meaning that
+      //  these will be used as extra options to create widgets on top of
 
       extraDescriptorOptions = {
         all: (function () {

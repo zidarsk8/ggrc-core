@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
- import Component from '../inline-autocomplete-wrapper';
+import Component from '../inline-autocomplete-wrapper';
 
 describe('GGRC.Components.inline-autocomplete-wrapper', ()=> {
   let viewModel;

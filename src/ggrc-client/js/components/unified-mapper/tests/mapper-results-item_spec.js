@@ -14,16 +14,16 @@ describe('GGRC.Components.mapperResultsItem', function () {
 
   describe('displayItem() method', function () {
     it('returns content of revesion if itemData.revesion defined',
-     function () {
-       let result;
-       viewModel.attr('itemData', {
-         revision: {
-           content: 'mockData',
-         },
-       });
-       result = viewModel.displayItem();
-       expect(result).toEqual('mockData');
-     });
+      function () {
+        let result;
+        viewModel.attr('itemData', {
+          revision: {
+            content: 'mockData',
+          },
+        });
+        result = viewModel.displayItem();
+        expect(result).toEqual('mockData');
+      });
 
     it('returns itemData if itemData.revesion undefined',
       function () {

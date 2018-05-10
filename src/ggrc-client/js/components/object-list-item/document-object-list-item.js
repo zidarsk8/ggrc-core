@@ -25,8 +25,8 @@ import template from './document-object-list-item.mustache';
         iconCls: {
           get: function () {
             return this.attr('showIcon') ?
-            'fa-' + this.attr('itemData.title').toLowerCase() :
-            '';
+              'fa-' + this.attr('itemData.title').toLowerCase() :
+              '';
           },
         },
         itemData: {

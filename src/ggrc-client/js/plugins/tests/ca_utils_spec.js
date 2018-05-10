@@ -6,7 +6,11 @@
 'use strict';
 
 import {isEmptyCustomAttribute as isEmptyCA} from '../utils/ca-utils';
-import {CA_DD_REQUIRED_DEPS, isCommentRequired, isEvidenceRequired,
+import {
+  ddValidationMapToValue,
+  isCommentRequired,
+  isEvidenceRequired,
+  isUrlRequired,
 } from '../utils/ca-utils';
 
 describe('GGRC utils isEmptyCustomAttribute() method', function () {
@@ -136,12 +140,41 @@ describe('GGRC util methods to validate requirements', function () {
       id: 2,
       type: 'dropdown',
       validationConfig: {
-        'nothing required': CA_DD_REQUIRED_DEPS.NONE,
-        'comment required': CA_DD_REQUIRED_DEPS.COMMENT,
-        'evidence required': CA_DD_REQUIRED_DEPS.EVIDENCE,
-        'comment & evidence required': CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
-        one: CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
-        two: CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
+        'nothing required': ddValidationMapToValue(),
+        'comment required': ddValidationMapToValue({
+          comment: true,
+        }),
+        'evidence required': ddValidationMapToValue({
+          attachment: true,
+        }),
+        'url required': ddValidationMapToValue({
+          url: true,
+        }),
+        'comment & evidence required': ddValidationMapToValue({
+          comment: true,
+          attachment: true,
+        }),
+        'comment & url required': ddValidationMapToValue({
+          comment: true,
+          url: true,
+        }),
+        'url & evidence required': ddValidationMapToValue({
+          url: true,
+          attachment: true,
+        }),
+        'comment, evidence, url required': ddValidationMapToValue({
+          comment: true,
+          attachment: true,
+          url: true,
+        }),
+        one: ddValidationMapToValue({
+          comment: true,
+          attachment: true,
+        }),
+        two: ddValidationMapToValue({
+          comment: true,
+          attachment: true,
+        }),
       },
       preconditions_failed: [],
       validation: {
@@ -150,6 +183,7 @@ describe('GGRC util methods to validate requirements', function () {
       errorsMap: {
         comment: false,
         evidence: false,
+        url: false,
       },
     });
   });
@@ -159,6 +193,8 @@ describe('GGRC util methods to validate requirements', function () {
       ['one', 'two',
         'comment required',
         'comment & evidence required',
+        'comment & url required',
+        'comment, evidence, url required',
       ].forEach((value) => {
         dropdownField.attr('value', value);
         expect(isCommentRequired(dropdownField)).toEqual(true);
@@ -168,6 +204,8 @@ describe('GGRC util methods to validate requirements', function () {
     it('should return FALSE if comments NOT required', function () {
       ['nothing required',
         'evidence required',
+        'url required',
+        'url & evidence required',
       ].forEach((value) => {
         dropdownField.attr('value', value);
         expect(isCommentRequired(dropdownField)).toEqual(false);
@@ -179,7 +217,9 @@ describe('GGRC util methods to validate requirements', function () {
     it('should return TRUE if evidence required', function () {
       ['one', 'two',
         'evidence required',
+        'url & evidence required',
         'comment & evidence required',
+        'comment, evidence, url required',
       ].forEach((value) => {
         dropdownField.attr('value', value);
         expect(isEvidenceRequired(dropdownField)).toEqual(true);
@@ -189,9 +229,34 @@ describe('GGRC util methods to validate requirements', function () {
     it('should return FALSE if evidence NOT required', function () {
       ['nothing required',
         'comment required',
+        'url required',
+        'comment & url required',
       ].forEach((value) => {
         dropdownField.attr('value', value);
         expect(isEvidenceRequired(dropdownField)).toEqual(false);
+      });
+    });
+  });
+
+  describe('check isURLRequired() method', function () {
+    it('should return TRUE if url required', function () {
+      ['url required',
+        'comment & url required',
+        'comment, evidence, url required',
+      ].forEach((value) => {
+        dropdownField.attr('value', value);
+        expect(isUrlRequired(dropdownField)).toEqual(true);
+      });
+    });
+
+    it('should return FALSE if url NOT required', function () {
+      ['nothing required',
+        'comment required',
+        'evidence required',
+        'comment & evidence required',
+      ].forEach((value) => {
+        dropdownField.attr('value', value);
+        expect(isUrlRequired(dropdownField)).toEqual(false);
       });
     });
   });

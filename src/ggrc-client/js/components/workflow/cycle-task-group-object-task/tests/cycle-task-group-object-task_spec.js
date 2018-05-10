@@ -165,15 +165,15 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
 
         describe('after workflow loading', function () {
           it('sets first value of loaded data to workflow field',
-          function (done) {
-            let data = {data: 'Data'};
-            triggerDfd.resolve([data]);
-            viewModel.loadWorkflow(cycle)
-              .then(function () {
-                expect(viewModel.attr('workflow').serialize()).toEqual(data);
-                done();
-              });
-          });
+            function (done) {
+              let data = {data: 'Data'};
+              triggerDfd.resolve([data]);
+              viewModel.loadWorkflow(cycle)
+                .then(function () {
+                  expect(viewModel.attr('workflow').serialize()).toEqual(data);
+                  done();
+                });
+            });
         });
       });
     });

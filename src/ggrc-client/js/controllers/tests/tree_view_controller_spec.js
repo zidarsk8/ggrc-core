@@ -111,15 +111,15 @@ describe('CMS.Controllers.TreeView', function () {
       });
 
     it('should remove first item from filteredList', function () {
-        let filteredListIds;
+      let filteredListIds;
 
-        method(ctrlInst.options.attr('filteredList'), [1]);
+      method(ctrlInst.options.attr('filteredList'), [1]);
 
-        expect(ctrlInst.options.attr('filteredList').length).toBe(4);
-        filteredListIds = ctrlInst.options.attr('filteredList')
-          .map((item)=>item.options.attr('instance.id')).serialize();
-        expect(filteredListIds).toEqual([2, 3, 4, 5]);
-      });
+      expect(ctrlInst.options.attr('filteredList').length).toBe(4);
+      filteredListIds = ctrlInst.options.attr('filteredList')
+        .map((item)=>item.options.attr('instance.id')).serialize();
+      expect(filteredListIds).toEqual([2, 3, 4, 5]);
+    });
 
     it('should remove fist item from list', function () {
       let listIds;

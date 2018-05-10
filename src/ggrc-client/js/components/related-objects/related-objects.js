@@ -152,12 +152,12 @@ import Pagination from '../base-objects/pagination';
       },
       [`{viewModel.baseInstance} ${REFRESH_RELATED.type}`]:
         function (scope, event) {
-        let vm = this.viewModel;
+          let vm = this.viewModel;
 
-        if (vm.attr('relatedItemsType') === event.model) {
-          vm.setRelatedItems();
-        }
-      },
+          if (vm.attr('relatedItemsType') === event.model) {
+            vm.setRelatedItems();
+          }
+        },
       '{viewModel.orderBy} changed': function () {
         this.viewModel.setRelatedItems();
       },

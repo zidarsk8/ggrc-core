@@ -9,17 +9,25 @@ SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
 cd "${SCRIPTPATH}/../"
 
-git grep "Copyright (C) 2018 Google Inc." . | \
+YEAR=2018
+
+git grep "Copyright (C) $YEAR Google Inc." . | \
   grep -o "^[^:]*" | \
+  sort -u > /tmp/with_copyright
+
+git ls-files | \
   grep -v "^src/ggrc-client/vendor" | \
   grep -v ".csv$" | \
-  sort -u > with_copyright
+  grep -v ".png$" | \
+  grep -v ".json$" | \
+  grep -v ".ico$" | \
+  grep -v ".gif$" | \
+  grep -v ".svg$" | \
+  sort > /tmp/all_files
 
-git ls-files | grep -v "^src/ggrc-client/vendor" | grep -v ".csv$" | sort > all_files
-
-diff all_files with_copyright | grep "^<" > license_header_diff
+diff /tmp/all_files /tmp/with_copyright | grep "^<" > /tmp/license_header_diff
 
 # Diff will return with exist status 1 if there is a diff.
-diff ._license_header_exceptions license_header_diff
+diff ._license_header_exceptions /tmp/license_header_diff
 
 echo "License headers: PASS"

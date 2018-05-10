@@ -21,29 +21,29 @@ describe('GGRC.Components.editablePeopleGroup', function () {
   describe('"showSeeMoreLink" property', function () {
     it(`"showSeeMoreLink" should be FALSE.
         edit mode is true, can edit is true`,
-    function () {
-      viewModel.attr('people', peopleItems);
-      viewModel.attr('canEdit', true);
-      viewModel.attr('editableMode', true);
-      expect(viewModel.attr('showSeeMoreLink')).toBe(false);
-    });
+      function () {
+        viewModel.attr('people', peopleItems);
+        viewModel.attr('canEdit', true);
+        viewModel.attr('editableMode', true);
+        expect(viewModel.attr('showSeeMoreLink')).toBe(false);
+      });
 
     it(`"showSeeMoreLink" should be TRUE.
         edit mode is false, can edit is true`,
-    function () {
-      viewModel.attr('people', peopleItems);
-      viewModel.attr('canEdit', true);
-      expect(viewModel.attr('showSeeMoreLink')).toBe(true);
-    });
+      function () {
+        viewModel.attr('people', peopleItems);
+        viewModel.attr('canEdit', true);
+        expect(viewModel.attr('showSeeMoreLink')).toBe(true);
+      });
 
     it(`"showSeeMoreLink" should be FALSE.
         edit mode is false, can edit is false, saving is not in progress`,
-    function () {
-      viewModel.attr('people', peopleItems);
-      viewModel.attr('canEdit', false);
-      viewModel.attr('updatableGroupId', null);
-      expect(viewModel.attr('showSeeMoreLink')).toBe(false);
-    });
+      function () {
+        viewModel.attr('people', peopleItems);
+        viewModel.attr('canEdit', false);
+        viewModel.attr('updatableGroupId', null);
+        expect(viewModel.attr('showSeeMoreLink')).toBe(false);
+      });
 
     it('"showSeeMoreLink" should be FALSE. People length less than 5',
       function () {

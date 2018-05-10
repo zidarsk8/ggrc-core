@@ -396,10 +396,10 @@ function getModelsForSubTier(modelName) {
  * @return {Promise} Deferred Object
  */
 function loadFirstTierItems(modelName,
-                            parent,
-                            filterInfo,
-                            filter,
-                            request) {
+  parent,
+  filterInfo,
+  filter,
+  request) {
   let modelConfig = getWidgetConfig(modelName);
 
   let params = buildParam(
@@ -541,9 +541,9 @@ function loadItemsForSubTier(models, type, id, filter) {
  * @return {object} Returns expression for load items for 1st level of tree view.
  */
 function makeRelevantExpression(requestedType,
-                                relevantToType,
-                                relevantToId,
-                                operation) {
+  relevantToType,
+  relevantToId,
+  operation) {
   let isObjectBrowser = /^\/objectBrowser\/?$/
     .test(window.location.pathname);
   let expression;
@@ -636,8 +636,8 @@ function _buildSubTreeCountMap(models, relevant, filter) {
       countQuery = buildCountParams(models, relevant, filter)
         .map(function (param) {
           if (isSnapshotRelated(
-              relevant.type,
-              param.object_name)) {
+            relevant.type,
+            param.object_name)) {
             param = transformQuery(param);
           }
           return param;
