@@ -128,6 +128,15 @@ class Roleable(object):
         orm.subqueryload(
             '_access_control_list'
         ).joinedload(
+            "person"
+        ).subqueryload(
+            "contexts"
+        ).undefer_group(
+            'Context_complete'
+        ),
+        orm.subqueryload(
+            '_access_control_list'
+        ).joinedload(
             "ac_role"
         ).undefer_group(
             'AccessControlRole_complete'
