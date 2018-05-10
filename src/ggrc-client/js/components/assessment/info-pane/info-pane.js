@@ -174,16 +174,11 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
             }
 
             return this.attr('isUpdatingFiles') ||
+              this.attr('isUpdatingState') ||
+              this.attr('isUpdatingEvidences') ||
               this.attr('isUpdatingUrls') ||
               this.attr('isUpdatingComments') ||
               this.attr('isAssessmentSaving');
-          },
-        },
-        // flag which indicates that changing of assessment state is blocked
-        isPending: {
-          get() {
-            return this.attr('isUpdatingEvidences') ||
-              this.attr('isUpdatingUrls');
           },
         },
       },
@@ -193,6 +188,7 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
       pubsub,
       _verifierRoleId: undefined,
       isUpdatingRelatedItems: false,
+      isUpdatingState: false,
       isAssessmentSaving: false,
       onStateChangeDfd: {},
       formState: {},
@@ -467,6 +463,7 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
         } else {
           instance.attr('previousStatus', instance.attr('status'));
         }
+        this.attr('isUpdatingState', true);
 
         return this.attr('deferredSave').execute(() => {
           if (isUndo) {
@@ -487,7 +484,9 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
             modelNames: relatedAssessmentsTypes,
           });
           stopFn();
-        }).fail(resetStatusOnConflict);
+        }).fail(resetStatusOnConflict).always(() => {
+          this.attr('isUpdatingState', false);
+        });
       },
       saveGlobalAttributes: function (event) {
         const instance = this.attr('instance');
