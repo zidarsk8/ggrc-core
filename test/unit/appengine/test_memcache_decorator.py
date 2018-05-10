@@ -7,6 +7,8 @@ from unittest import TestCase
 
 from ddt import data, ddt, unpack
 from appengine import base
+import mock
+from ggrc.cache.memcache import cached
 
 
 @ddt
@@ -29,3 +31,11 @@ class TestMemcacheDecorator(TestCase):
       val = key * 10
       self.memcache_client.add(key, val)
       self.assertEqual(val, self.memcache_client.get(key))
+
+  def test_expire(self):
+    def test_func():
+      pass
+    cached_test_func = cached(test_func)
+    cached_test_func.memcache_client.get = mock.Mock(side_effect=['1', None])
+    self.assertEqual(cached_test_func(), '1')
+    self.assertEqual(cached_test_func(), None)
