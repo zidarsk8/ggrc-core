@@ -8,10 +8,7 @@ import itertools
 
 import flask
 import sqlalchemy as sa
-import sqlalchemy.orm
-from sqlalchemy import and_
-from sqlalchemy import func
-from sqlalchemy import or_
+from sqlalchemy import orm
 
 
 from ggrc import db
@@ -294,9 +291,9 @@ def load_user_roles(user, permissions):
   # Add permissions from all DB-managed roles
   user_roles = db.session.query(UserRole)\
       .options(
-          sqlalchemy.orm.undefer_group('UserRole_complete'),
-          sqlalchemy.orm.undefer_group('Role_complete'),
-          sqlalchemy.orm.joinedload('role'))\
+          orm.undefer_group('UserRole_complete'),
+          orm.undefer_group('Role_complete'),
+          orm.joinedload('role'))\
       .filter(UserRole.person_id == user.id)\
       .order_by(UserRole.updated_at.desc())\
       .all()
@@ -364,11 +361,11 @@ def load_access_control_list(user, permissions):
   access_control_list = db.session.query(
       acl.object_type,
       acl.object_id,
-      func.max(acr.read),
-      func.max(acr.update),
-      func.max(acr.delete)
+      sa.func.max(acr.read),
+      sa.func.max(acr.update),
+      sa.func.max(acr.delete)
   ).filter(
-      and_(
+      sa.and_(
           all_models.AccessControlList.person_id == user.id,
           all_models.AccessControlList.ac_role_id == acr.id,
           *additional_filters
@@ -525,8 +522,8 @@ def handle_program_post(sender, obj=None, src=None, service=None):
 def add_public_program_context_implication(context, check_exists=False):
   if check_exists and db.session.query(ContextImplication)\
       .filter(
-          and_(ContextImplication.context_id == context.id,
-               ContextImplication.source_context_id.is_(None))).count() > 0:
+          sa.and_(ContextImplication.context_id == context.id,
+                  ContextImplication.source_context_id.is_(None))).count() > 0:
     return
   db.session.add(ContextImplication(
       source_context=None,
@@ -593,8 +590,8 @@ def handle_resource_deleted(sender, obj=None, service=None):
         .delete()
     db.session.query(ContextImplication) \
         .filter(
-            or_(ContextImplication.context_id == obj.context_id,
-                ContextImplication.source_context_id == obj.context_id))\
+            sa.or_(ContextImplication.context_id == obj.context_id,
+                   ContextImplication.source_context_id == obj.context_id))\
         .delete()
     # Deleting the context itself is problematic, because unattached objects
     #   may still exist and cause a database error.  Instead of implicitly
