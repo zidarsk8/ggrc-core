@@ -10,9 +10,7 @@ import flask
 import sqlalchemy.orm
 from sqlalchemy import and_
 from sqlalchemy import func
-from sqlalchemy import literal
 from sqlalchemy import or_
-from sqlalchemy.orm import aliased
 
 
 from ggrc import db
@@ -363,31 +361,6 @@ def load_access_control_list(user, permissions):
           .add(object_id)
 
 
-def load_backlog_workflows(permissions):
-  """Load permissions for backlog workflows
-
-  Args:
-      permissions (dict): dict where the permissions will be stored
-  Returns:
-      None
-  """
-  # add permissions for backlog workflows to everyone
-  actions = ["read", "edit", "update"]
-  _types = ["Workflow", "Cycle", "CycleTaskGroup",
-            "CycleTaskGroupObjectTask", "TaskGroup", "CycleTaskEntry"]
-  for _, _, wf_context_id in backlog_workflows().all():
-    for _type in _types:
-      if _type == "CycleTaskGroupObjectTask":
-        actions += ["delete"]
-      if _type == "CycleTaskEntry":
-        actions += ["create"]
-      for action in actions:
-        permissions.setdefault(action, {})\
-            .setdefault(_type, {})\
-            .setdefault('contexts', list())\
-            .append(wf_context_id)
-
-
 def store_results_into_memcache(permissions, cache, key):
   """Load personal context for user
 
@@ -454,28 +427,10 @@ def load_permissions_for(user):
   with benchmark("load_permissions > load access control list"):
     load_access_control_list(user, permissions)
 
-  with benchmark("load_permissions > load backlog workflows"):
-    load_backlog_workflows(permissions)
-
   with benchmark("load_permissions > store results into memcache"):
     store_results_into_memcache(permissions, cache, key)
 
   return permissions
-
-
-def backlog_workflows():
-  """Creates a query that returns all backlog workflows which
-  all users can access.
-
-    Returns:
-        db.session.query object that selects the following columns:
-            | id | type | context_id |
-  """
-  _workflow = aliased(all_models.Workflow, name="wf")
-  return db.session.query(_workflow.id,
-                          literal("Workflow").label("type"),
-                          _workflow.context_id)\
-      .filter(_workflow.kind == "Backlog")
 
 
 def _get_or_create_personal_context(user):
