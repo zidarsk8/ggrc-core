@@ -340,6 +340,7 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
       },
       addRelatedItem: function (event, type) {
         let self = this;
+        let assessment = this.attr('instance');
         let relatedItemType = event.item.attr('type');
         let related = {
           id: event.item.attr('id'),
@@ -350,12 +351,32 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
           self.addAction('add_related', related);
         })
           .done(function () {
+            if (type === 'comments') {
+              tracker.stop(assessment.type,
+                tracker.USER_JOURNEY_KEYS.INFO_PANE,
+                tracker.USER_ACTIONS.INFO_PANE.ADD_COMMENT_TO_LCA);
+              tracker.stop(assessment.type,
+                tracker.USER_JOURNEY_KEYS.INFO_PANE,
+                tracker.USER_ACTIONS.INFO_PANE.ADD_COMMENT);
+            }
+
             self.afterCreate({
               items: [event.item],
               success: true,
             }, type);
           })
           .fail(function () {
+            if (type === 'comments') {
+              tracker.stop(assessment.type,
+                tracker.USER_JOURNEY_KEYS.INFO_PANE,
+                tracker.USER_ACTIONS.INFO_PANE.ADD_COMMENT_TO_LCA,
+                false);
+              tracker.stop(assessment.type,
+                tracker.USER_JOURNEY_KEYS.INFO_PANE,
+                tracker.USER_ACTIONS.INFO_PANE.ADD_COMMENT,
+                false);
+            }
+
             self.afterCreate({
               items: [event.item],
               success: false,

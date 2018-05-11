@@ -42,6 +42,8 @@ export const USER_ACTIONS = {
   },
   INFO_PANE: {
     OPEN_INFO_PANE: 'Open Info pane',
+    ADD_COMMENT_TO_LCA: 'Adding a comment to LCA value',
+    ADD_COMMENT: 'Adding a comment',
   },
   LHN: {
     SHOW_LIST: 'LHN: Show list of items',
