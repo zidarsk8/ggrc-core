@@ -7,6 +7,7 @@ import datetime
 import itertools
 
 import flask
+import sqlalchemy as sa
 import sqlalchemy.orm
 from sqlalchemy import and_
 from sqlalchemy import func
@@ -326,19 +327,52 @@ def load_personal_context(user, permissions):
       .append(personal_context.id)
 
 
+def _get_acl_filter():
+  """Get filter for acl entries.
+
+  This creates a filter to select only acl entries for objects that were
+  specified in the request json.
+
+  If this filter is used we must not store the results of the permissions dict
+  into memcache.
+
+  Returns:
+    list of filter statements.
+  """
+  referenced_object_tuples = []
+  stubs = getattr(flask.g, "referenced_object_stubs", {})
+  additional_filters = []
+  if stubs:
+    for type_, ids in stubs.items():
+      referenced_object_tuples.extend((type_, id_) for id_ in ids)
+    additional_filters.append(
+        sa.tuple_(
+            all_models.AccessControlList.object_type,
+            all_models.AccessControlList.object_id,
+        ).in_(
+            referenced_object_tuples,
+        )
+    )
+  return referenced_object_tuples
+
+
 def load_access_control_list(user, permissions):
   """Load permissions from access_control_list"""
   acl = all_models.AccessControlList
   acr = all_models.AccessControlRole
+  additional_filters = _get_acl_filter()
   access_control_list = db.session.query(
       acl.object_type,
       acl.object_id,
       func.max(acr.read),
       func.max(acr.update),
       func.max(acr.delete)
-  ).filter(and_(
-      all_models.AccessControlList.person_id == user.id,
-      all_models.AccessControlList.ac_role_id == acr.id)
+  ).filter(
+      and_(
+          all_models.AccessControlList.person_id == user.id,
+          all_models.AccessControlList.ac_role_id == acr.id,
+          *additional_filters
+      )
   ).group_by(
       all_models.AccessControlList.object_id,
       all_models.AccessControlList.object_type
@@ -422,8 +456,12 @@ def load_permissions_for(user):
   with benchmark("load_permissions > load access control list"):
     load_access_control_list(user, permissions)
 
-  with benchmark("load_permissions > store results into memcache"):
-    store_results_into_memcache(permissions, cache, key)
+  if not hasattr(flask.g, "referenced_object_stubs"):
+    # In some cases for optimization we only load a small chunk of permissions
+    # and in that case we can not cache the value because it might not contain
+    # the permissions information for any subsequent request.
+    with benchmark("load_permissions > store results into memcache"):
+      store_results_into_memcache(permissions, cache, key)
 
   return permissions
 
