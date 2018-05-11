@@ -309,7 +309,6 @@ def load_user_roles(user, permissions):
     if isinstance(user_role.role.permissions, dict):
       collect_permissions(
           user_role.role.permissions, user_role.context_id, permissions)
-  return source_contexts_to_rolenames
 
 
 def load_personal_context(user, permissions):
