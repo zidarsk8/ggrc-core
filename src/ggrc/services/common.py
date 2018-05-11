@@ -555,6 +555,9 @@ class Resource(ModelView):
       raise BadRequest('Required attribute "{0}" not found'.format(
           root_attribute))
 
+    with benchmark("Set referenced_stubs"):
+      flask.g.referenced_stubs = self._gather_referenced_objects(src)
+
     with benchmark("Deserialize object"):
       self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
