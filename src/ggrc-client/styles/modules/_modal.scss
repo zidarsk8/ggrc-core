@@ -927,23 +927,6 @@
   }
 }
 
-.person {
-  display: flex;
-  .trash-control {
-    padding-left: 16px;
-    display: none;
-  }
-
-  &:hover {
-    .trash-control {
-      display: inherit;
-    }
-  }
-  a.unmap {
-    margin-left: 0.4em;
-  }
-}
-
 // Mockups Assessment Page V1.0
 .note {
   font-size: $f-medium;

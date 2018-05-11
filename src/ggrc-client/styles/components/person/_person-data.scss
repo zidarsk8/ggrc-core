@@ -14,4 +14,10 @@
     display: flex;
     flex-wrap: wrap;
   }
+
+  .choose-from-select & {
+    .unmap {
+      margin-left: 0.4em;
+    }
+  }
 }
