@@ -255,8 +255,8 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
             this.attr('isUpdating' + can.capitalize(type), false);
 
             tracker.stop(this.attr('instance.type'),
-              tracker.USER_JOURNEY_KEYS.TREEVIEW,
-              tracker.USER_ACTIONS.TREEVIEW.OPEN_INFO_PANE);
+              tracker.USER_JOURNEY_KEYS.INFO_PANE,
+              tracker.USER_ACTIONS.INFO_PANE.OPEN_INFO_PANE);
           }.bind(this));
         return dfd;
       },
@@ -410,8 +410,8 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
             this.attr('instance').dispatch(RELATED_ITEMS_LOADED);
 
             tracker.stop(this.attr('instance.type'),
-              tracker.USER_JOURNEY_KEYS.TREEVIEW,
-              tracker.USER_ACTIONS.TREEVIEW.OPEN_INFO_PANE);
+              tracker.USER_JOURNEY_KEYS.INFO_PANE,
+              tracker.USER_ACTIONS.INFO_PANE.OPEN_INFO_PANE);
           });
       },
       initializeFormFields: function () {
@@ -445,7 +445,7 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
         let isArchived = instance.attr('archived');
         let previousStatus = instance.attr('previousStatus') || 'In Progress';
         let stopFn = tracker.start(instance.type,
-          tracker.USER_JOURNEY_KEYS.NAVIGATION,
+          tracker.USER_JOURNEY_KEYS.INFO_PANE,
           tracker.USER_ACTIONS.ASSESSMENT.CHANGE_STATUS);
         const resetStatusOnConflict = (object, xhr) => {
           if (xhr && xhr.status === 409 && xhr.remoteObject) {

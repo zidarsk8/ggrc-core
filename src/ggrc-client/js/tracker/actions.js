@@ -22,6 +22,7 @@ export const USER_JOURNEY_KEYS = {
   TREEVIEW: 'TreeView',
   MAP_OBJECTS: (type) => `Mapped type: ${type}`,
   API: 'API Methods',
+  INFO_PANE: 'Info Pane',
 };
 
 // Timing Label in Google Analytics Timing API
@@ -36,9 +37,11 @@ export const USER_ACTIONS = {
   ADVANCED_SEARCH_FILTER: 'Advanced search filter',
   TREEVIEW: {
     FILTER: 'Tree view filter',
-    OPEN_INFO_PANE: 'Open Info pane',
     TREE_VIEW_PAGE_LOADING: 'Loading of tree view page',
     SUB_TREE_LOADING: 'Loading sub-level of tree view',
+  },
+  INFO_PANE: {
+    OPEN_INFO_PANE: 'Open Info pane',
   },
   LHN: {
     SHOW_LIST: 'LHN: Show list of items',

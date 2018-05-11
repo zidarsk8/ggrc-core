@@ -68,8 +68,8 @@ export default can.Map.extend({
 
     if (instance.type === 'Assessment') {
       tracker.start(instance.type,
-        tracker.USER_JOURNEY_KEYS.TREEVIEW,
-        tracker.USER_ACTIONS.TREEVIEW.OPEN_INFO_PANE);
+        tracker.USER_JOURNEY_KEYS.INFO_PANE,
+        tracker.USER_ACTIONS.INFO_PANE.OPEN_INFO_PANE);
     }
 
     $element = $element.closest(itemSelector);
