@@ -474,6 +474,39 @@ viewModel = can.Map.extend({
 
     this._triggerListeners();
   },
+  _needToRefreshAfterRelRemove(instance) {
+    const srcType = _.get(instance, 'source.type');
+    const destType = _.get(instance, 'destination.type');
+    const {
+      Person: {model_singular: person},
+      Document: {model_singular: document},
+    } = CMS.Models;
+
+    // if unmapping e.g. an URL (a "Document"), refreshing the latter
+    // is not needed
+    const needToRefresh = (
+      ![person, document].includes(srcType) &&
+      ![person, document].includes(destType)
+    );
+
+    return needToRefresh;
+  },
+  _refreshAfterUserRoleRemove(instance, activeTabModel) {
+    return activeTabModel !== 'Audit';
+  },
+  _isRefreshNeeded(instance, activeTabModel) {
+    let needToRefresh = true;
+
+    if (instance instanceof CMS.Models.Relationship) {
+      needToRefresh = this._needToRefreshAfterRelRemove(instance);
+    } else if (instance instanceof CMS.Models.UserRole) {
+      needToRefresh = this._refreshAfterUserRoleRemove(
+        instance, activeTabModel
+      );
+    }
+
+    return needToRefresh;
+  },
   _triggerListeners: (function () {
     let activeTabModel;
     let self;
@@ -490,8 +523,6 @@ viewModel = can.Map.extend({
 
     function onDestroyed(ev, instance) {
       let current;
-      let destType;
-      let srcType;
 
       if (_verifyRelationship(instance, activeTabModel) ||
         instance instanceof CMS.Models[activeTabModel] ||
@@ -502,19 +533,7 @@ viewModel = can.Map.extend({
             current > 1 ? current - 1 : 1);
         }
 
-        // if unmapping e.g. an URL (a "Document") or an assignee from
-        // the info pin, refreshing the latter is not needed
-        if (instance instanceof CMS.Models.Relationship) {
-          srcType = instance.source ?
-            instance.source.type : null;
-          destType = instance.destination ?
-            instance.destination.type : null;
-          if (srcType === 'Person' || destType === 'Person' ||
-            srcType === 'Document' || destType === 'Document') {
-            return;
-          }
-        } else if (instance instanceof CMS.Models.UserRole &&
-          activeTabModel === 'Audit') {
+        if (!self._isRefreshNeeded(instance)) {
           return;
         }
 
