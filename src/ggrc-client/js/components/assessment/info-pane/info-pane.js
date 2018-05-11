@@ -489,14 +489,14 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
         });
       },
       saveGlobalAttributes: function (event) {
-        const instance = this.attr('instance');
-        const globalAttributes = event.globalAttributes;
+        this.attr('deferredSave').push(() => {
+          const instance = this.attr('instance');
+          const globalAttributes = event.globalAttributes;
 
-        globalAttributes.each((value, caId) => {
-          instance.customAttr(caId, value);
+          globalAttributes.each((value, caId) => {
+            instance.customAttr(caId, value);
+          });
         });
-
-        return instance.save();
       },
       showRequiredInfoModal: function (e, field) {
         let scope = field || e.field;

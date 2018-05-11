@@ -144,4 +144,32 @@ describe('GGRC.Components.assessmentInfoPane', function () {
       });
     });
   });
+
+  describe('saveGlobalAttributes() method', () => {
+    let method;
+    let event;
+
+    beforeEach(() => {
+      method = vm.saveGlobalAttributes.bind(vm);
+      vm.attr('deferredSave', {
+        push: jasmine.createSpy(),
+      });
+      vm.attr('instance', {
+        customAttr: jasmine.createSpy(),
+      });
+    });
+
+    it('pushes callback into deferredSave which calls customAttr method',
+      () => {
+        event = {
+          globalAttributes: new can.Map({'1': true}),
+        };
+
+        method(event);
+
+        let callback = vm.attr('deferredSave').push.calls.allArgs()[0][0];
+        callback();
+        expect(vm.attr('instance').customAttr).toHaveBeenCalledWith('1', true);
+      });
+  });
 });
