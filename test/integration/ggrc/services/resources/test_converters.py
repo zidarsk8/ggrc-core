@@ -288,7 +288,8 @@ class TestImportExports(TestCase):
         data=json.dumps([]),
         headers=self.headers)
     self.assert400(response)
-    self.assertIsNotNone(all_models.ImportExport.query.get(ie_item_in_progress))
+    self.assertIsNotNone(all_models.ImportExport.query.get(
+        ie_item_in_progress))
 
   @mock.patch(
       "ggrc.gdrive.file_actions.get_gdrive_file_data",

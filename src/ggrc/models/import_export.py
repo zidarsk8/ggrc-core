@@ -27,7 +27,6 @@ class ImportExport(Identifiable, db.Model):
   IN_PROGRESS_STATUS = 'In Progress'
   NOT_STARTED_STATUS = 'Not Started'
 
-
   IMPORT_EXPORT_STATUSES = [
       NOT_STARTED_STATUS,
       ANALYSIS_STATUS,
@@ -39,7 +38,8 @@ class ImportExport(Identifiable, db.Model):
       'Finished',
   ]
 
-  job_type = db.Column(db.Enum(IMPORT_JOB_TYPE, EXPORT_JOB_TYPE), nullable=False)
+  job_type = db.Column(db.Enum(IMPORT_JOB_TYPE, EXPORT_JOB_TYPE),
+                       nullable=False)
   status = db.Column(db.Enum(*IMPORT_EXPORT_STATUSES), nullable=False,
                      default=NOT_STARTED_STATUS)
   description = db.Column(db.Text)
@@ -106,14 +106,14 @@ def delete_previous_imports():
   active_jobs = db.session.query(imported_jobs.filter(
       ImportExport.status.in_([ImportExport.ANALYSIS_STATUS,
                                ImportExport.IN_PROGRESS_STATUS])
-      ).exists()).scalar()
+  ).exists()).scalar()
   if active_jobs:
     raise BadRequest('Import in progress')
 
   imported_jobs.filter(
       ImportExport.status.in_([ImportExport.NOT_STARTED_STATUS,
                                ImportExport.BLOCKED_STATUS])
-      ).delete(synchronize_session=False)
+  ).delete(synchronize_session=False)
   db.session.commit()
 
 
