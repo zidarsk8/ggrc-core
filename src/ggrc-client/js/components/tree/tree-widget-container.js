@@ -474,35 +474,30 @@ viewModel = can.Map.extend({
 
     this._triggerListeners();
   },
-  _needToRefreshAfterRelRemove(instance) {
-    const srcType = _.get(instance, 'source.type');
-    const destType = _.get(instance, 'destination.type');
+  _needToRefreshAfterRelRemove(relationship) {
+    const parentInstance = this.attr('parent_instance');
     const {
-      Person: {model_singular: person},
-      Document: {model_singular: document},
-    } = CMS.Models;
+      source,
+      destination,
+    } = relationship;
 
-    // if unmapping e.g. an URL (a "Document"), refreshing the latter
-    // is not needed
-    const needToRefresh = (
-      ![person, document].includes(srcType) &&
-      ![person, document].includes(destType)
+    const isRelForCurrentInstance = (
+      (
+        source.type === parentInstance.attr('type') &&
+        source.id === parentInstance.attr('id')
+      ) || (
+        destination.type === parentInstance.attr('type') &&
+        destination.id === parentInstance.attr('id')
+      )
     );
 
-    return needToRefresh;
+    return isRelForCurrentInstance;
   },
-  _refreshAfterUserRoleRemove(instance, activeTabModel) {
-    return activeTabModel !== 'Audit';
-  },
-  _isRefreshNeeded(instance, activeTabModel) {
+  _isRefreshNeeded(instance) {
     let needToRefresh = true;
 
     if (instance instanceof CMS.Models.Relationship) {
       needToRefresh = this._needToRefreshAfterRelRemove(instance);
-    } else if (instance instanceof CMS.Models.UserRole) {
-      needToRefresh = this._refreshAfterUserRoleRemove(
-        instance, activeTabModel
-      );
     }
 
     return needToRefresh;
@@ -514,7 +509,7 @@ viewModel = can.Map.extend({
     function onCreated(ev, instance) {
       if (activeTabModel === instance.type) {
         _refresh(true);
-      } else if (activeTabModel === 'Person' && isPerson(instance)) {
+      } else if (isPerson(instance)) {
         self.attr('parent_instance').refresh().then(function () {
           _refresh();
         });
