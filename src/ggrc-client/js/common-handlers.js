@@ -382,6 +382,59 @@ jQuery(function ($) {
   });
 });
 
+
+$(function () {
+  $('body').on(
+    'click',
+    '[data-toggle="user-roles-modal-selector"]',
+    async function (ev) {
+      let $this = $(this);
+      let options = $this.data('modal-selector-options');
+      let dataSet = can.extend({}, $this.data());
+      let objectParams = $this.attr('data-object-params');
+      const {
+        getOptionSet,
+        'default': userRolesModalSelector,
+      } = await import(
+        /* webpackChunkName: "userRoleModalSelector" */
+        './controllers/contributions'
+      );
+      dataSet.params = objectParams && JSON.parse(
+        objectParams.replace(/\\n/g, '\\n')
+      );
+
+
+      can.each($this.data(), function (v, k) {
+        //  This is just a mapping of keys to underscored keys
+        let newKey = k.replace(
+          /[A-Z]/g,
+          function (str) {
+            return '_' + str.toLowerCase();
+          }
+        );
+
+        dataSet[newKey] = v;
+        //  If we changed the key at all, delete the original
+        if (newKey !== k) {
+          delete dataSet[k];
+        }
+      });
+
+      if (typeof options === 'string') {
+        options = getOptionSet(options, dataSet);
+      }
+
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      // Trigger the controller
+      userRolesModalSelector.launch($this, options)
+        .on('relationshipcreated relationshipdestroyed', function (ev, data) {
+          // $this.trigger("modal:" + ev.type, data);
+        });
+    });
+});
+
 function openMapperByElement(ev, disableMapper) {
   var btn = $(ev.currentTarget);
   var data = {};
