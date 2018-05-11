@@ -6,14 +6,14 @@
 import datetime
 import itertools
 
+import flask
 import sqlalchemy.orm
 from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import literal
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased
-from flask import Blueprint
-from flask import g
+
 
 from ggrc import db
 from ggrc import settings
@@ -38,7 +38,7 @@ from ggrc_basic_permissions.models import Role
 from ggrc_basic_permissions.models import UserRole
 
 
-blueprint = Blueprint(
+blueprint = flask.Blueprint(
     'permissions',
     __name__,
     template_folder='templates',
@@ -96,11 +96,11 @@ class UserPermissions(DefaultUserPermissions):
 
   @property
   def _request_permissions(self):
-    return getattr(g, '_request_permissions', None)
+    return getattr(flask.g, '_request_permissions', None)
 
   @_request_permissions.setter
   def _request_permissions(self, value):
-    setattr(g, '_request_permissions', value)
+    setattr(flask.g, '_request_permissions', value)
 
   def _permissions(self):
     self.check_permissions()
