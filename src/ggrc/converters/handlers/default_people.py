@@ -86,30 +86,8 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
       return self._parse_label_values()
 
   def set_obj_attr(self):
-    """Set default_people attribute.
-
-    This is a joint function for default assignees and verifiers. The first
-    column that gets handled will save the value to "_default_people" and the
-    second column that gets handled will take that value, include it with its
-    own and store it into the correct "default_people" field.
-
-    NOTE: This is a temporary hack that that should be refactored once this
-    code is merged into the develop branch. The joining of default_assignees
-    and default_verifiers should be done by pre_commit_checks for imports.
-    """
-    if self.row_converter.ignore:
-      return
-
-    default_people = self.row_converter.obj.default_people or {}
-    default_people[self.KEY_MAP[self.key]] = self.value
-
-    _default_people = getattr(self.row_converter.obj, "_default_people", {})
-
-    if _default_people:
-      default_people.update(_default_people)
-      setattr(self.row_converter.obj, "default_people", default_people)
-    else:
-      setattr(self.row_converter.obj, "_default_people", default_people)
+    """Set default_assignees and default_verifiers attributes."""
+    setattr(self.row_converter.obj, self.key, self.value)
 
   def get_value(self):
     """Get value from default_people attribute."""

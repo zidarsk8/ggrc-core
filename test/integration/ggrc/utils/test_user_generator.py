@@ -245,18 +245,16 @@ class TestUserGenerator(TestCase):
       assessment_template = AssessmentTemplate.query.filter(
           AssessmentTemplate.slug == slug).first()
 
-      if assignee_email and verifier_email:
+      if assignee_email:
         self._check_csv_response(response, {})
         self.assertEqual(
             len(assessment_template.default_people['assignees']), 1)
-        self.assertEqual(
-            len(assessment_template.default_people['verifiers']), 1)
-      elif assignee_email:
-        self._check_csv_response(response, {})
-        self.assertEqual(
-            len(assessment_template.default_people['assignees']), 1)
-        self.assertEqual(
-            assessment_template.default_people['verifiers'], None)
+        if verifier_email:
+          self.assertEqual(
+              len(assessment_template.default_people['verifiers']), 1)
+        else:
+          self.assertEqual(
+              assessment_template.default_people['verifiers'], None)
       else:
         self._check_csv_response(
             response, {

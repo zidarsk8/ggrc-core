@@ -56,7 +56,8 @@ class TestAssessmentTemplatesImport(TestCase):
         .filter(models.AssessmentTemplate.slug == slug) \
         .first()
     self._check_csv_response(response, {})
-    self.assertTrue(len(template.default_people['verifiers']) > 0)
+    self.assertEqual(template.default_people['verifiers'], 'Auditors')
+    self.assertEqual(template.default_people['assignees'], 'Admin')
 
   def test_modify_persons_over_import(self):
     """Test import modifies Assessment Template and does not fail."""
