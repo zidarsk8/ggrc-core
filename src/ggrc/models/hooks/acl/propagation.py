@@ -376,14 +376,20 @@ def propagate():
     return
 
   if flask.g.deleted_objects:
-    _delete_orphan_acl_entries(flask.g.deleted_objects)
+    with utils.benchmark("Delete internal ACL entries for deleted objects"):
+      _delete_orphan_acl_entries(flask.g.deleted_objects)
 
   # The order of propagation of relationships and other ACLs is important
   # because relationship code excludes other ACLs from propagating.
   if flask.g.new_relationship_ids:
-    _propagate_relationships(flask.g.new_relationship_ids, flask.g.new_acl_ids)
+    with utils.benchmark("Propagate ACLs for new relationships"):
+      _propagate_relationships(
+          flask.g.new_relationship_ids,
+          flask.g.new_acl_ids,
+      )
   if flask.g.new_acl_ids:
-    _propagate(flask.g.new_acl_ids)
+    with utils.benchmark("Propagate new ACL entries"):
+      _propagate(flask.g.new_acl_ids)
 
   del flask.g.new_acl_ids
   del flask.g.new_relationship_ids
