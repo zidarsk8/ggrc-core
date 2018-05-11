@@ -259,12 +259,12 @@ class AttributeInfo(object):
         flask.g.acl_role_names[object_type].add((name, mandatory))
 
     return {
-        "{}:{}".format(cls.ALIASES_PREFIX, name): {
+        u"{}:{}".format(cls.ALIASES_PREFIX, name): {
             "display_name": name,
             "attr_name": name,
             "mandatory": mandatory,
             "unique": False,
-            "description": "List of people with '{}' role".format(name),
+            "description": u"List of people with '{}' role".format(name),
             "type": cls.Type.AC_ROLE,
         }
         for name, mandatory in flask.g.acl_role_names[object_class.__name__]
