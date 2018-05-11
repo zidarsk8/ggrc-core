@@ -546,6 +546,26 @@ class TestRelatedAssessments(base.Test):
         selenium=selenium)
 
   @pytest.mark.smoke_tests
+  def test_related_asmts_on_control_page(
+      self, control_mapped_to_program, audits, selenium
+  ):
+    """Objects structure:
+    Program
+    -> Control
+    -> Audit-1 -> Asmt-1 mapped to Control
+    -> Audit-2 -> Asmt-2 mapped to Control
+    Check Related Assessments on Control's page"""
+    assessments = [self._create_mapped_asmt(
+        audit=audit, assessment_type="Control",
+        objs_to_map=[control_mapped_to_program])
+        for audit in audits]
+    related_asmts_titles = [
+        (assessment.title, control_mapped_to_program.title,
+         assessment.audit['title']) for assessment in assessments]
+    assert self._related_asmts_of_obj(control_mapped_to_program, selenium) ==\
+        related_asmts_titles[::-1]
+
+  @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
       "obj",
       ["control_mapped_to_program", "objective_mapped_to_program"],
