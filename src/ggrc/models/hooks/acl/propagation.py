@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 PROPAGATION_DEPTH_LIMIT = 50
 
 
-def _insert_select_acls(select_statement):
+def insert_select_acls(inserter, select_statement):
   """Insert acl records from the select statement
   Args:
     select_statement: sql statement that contains the following columns
@@ -44,7 +44,7 @@ def _insert_select_acls(select_statement):
   acl_table = all_models.AccessControlList.__table__
 
   db.session.execute(
-      acl_table.insert().from_select(
+      inserter.from_select(
           [
               acl_table.c.person_id,
               acl_table.c.ac_role_id,
@@ -60,6 +60,12 @@ def _insert_select_acls(select_statement):
       )
   )
   db.session.plain_commit()
+
+
+def _insert_select_acls(select_statement):
+  """Run insert from select with default acl inserter."""
+  inserter = all_models.AccessControlList.__table__.insert()
+  insert_select_acls(inserter, select_statement)
 
 
 def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
