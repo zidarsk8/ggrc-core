@@ -11,7 +11,6 @@ from sqlalchemy import alias
 from ggrc import db
 from ggrc.models import all_models
 from ggrc.models.custom_attribute_value import CustomAttributeValue
-from ggrc_basic_permissions import backlog_workflows
 from ggrc_workflows.models import Cycle
 
 
@@ -154,8 +153,6 @@ def get_myobjects_query(types=None, contact_id=None):  # noqa
     if query:
       type_union_queries.append(query)
 
-    if model is all_models.Workflow:
-      type_union_queries.append(backlog_workflows())
     if model is all_models.Person:
       type_union_queries.append(_get_people())
 
