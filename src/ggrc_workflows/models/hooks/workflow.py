@@ -9,8 +9,8 @@ import sqlalchemy as sa
 from ggrc import db
 from ggrc import login
 from ggrc import utils
+from ggrc.access_control import utils as acl_utils
 from ggrc.models import all_models
-from ggrc.models.hooks.acl import propagation
 from ggrc.access_control import role
 
 
@@ -132,7 +132,7 @@ def _insert_select_acls(select_statement):
   """Run insert from select with ignore acl inserter."""
   acl_table = all_models.AccessControlList.__table__
   inserter = acl_table.insert().prefix_with("IGNORE")
-  propagation.insert_select_acls(inserter, select_statement)
+  acl_utils.insert_select_acls(inserter, select_statement)
 
 
 def _propagate_to_wf_children(new_wf_acls, child_class):
