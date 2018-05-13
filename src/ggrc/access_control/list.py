@@ -41,7 +41,7 @@ class AccessControlList(mixins.Base, db.Model):
       nullable=True,
   )
   parent = db.relationship(
-      lambda: AccessControlList,
+      lambda: AccessControlList,  # pylint: disable=undefined-variable
       remote_side=lambda: AccessControlList.id
   )
 
