@@ -23,6 +23,9 @@
   {{#if isAllObjectsPage}}
     All Objects
   {{/if}}
+  {{#if isAdminPage}}
+    Admin Dashboard
+  {{/if}}
   {{#if isObjectPage}}
     {{#if isPersonPage}}
       <span class="entity-type">{{model.title_singular}}:</span>

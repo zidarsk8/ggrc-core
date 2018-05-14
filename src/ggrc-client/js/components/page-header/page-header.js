@@ -11,6 +11,7 @@ import oneColorLogo from '../../../images/ggrc-one-color.svg';
 import {
   isMyWork,
   isAllObjects,
+  isAdmin,
   getPageType,
   isObjectContextPage,
 } from '../../plugins/utils/current-page-utils';
@@ -56,6 +57,11 @@ import template from './page-header.mustache';
       isAllObjectsPage: {
         get() {
           return isAllObjects();
+        },
+      },
+      isAdminPage: {
+        get() {
+          return isAdmin();
         },
       },
       isPersonPage: {
