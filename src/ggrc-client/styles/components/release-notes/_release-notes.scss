@@ -10,6 +10,7 @@
   }
 
   &__body {
+    display: block;
     overflow: scroll;
     max-height: calc(100% - 54px - 45px);
 
