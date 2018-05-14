@@ -556,7 +556,7 @@ class Resource(ModelView):
           root_attribute))
 
     with benchmark("Set referenced_stubs"):
-      flask.g.referenced_stubs = self._gather_referenced_objects(src)
+      flask.g.referenced_object_stubs = self._gather_referenced_objects(src)
 
     with benchmark("Deserialize object"):
       self.json_update(obj, src)

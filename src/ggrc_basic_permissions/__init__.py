@@ -350,7 +350,7 @@ def _get_acl_filter():
             referenced_object_tuples,
         )
     )
-  return referenced_object_tuples
+  return additional_filters
 
 
 def load_access_control_list(user, permissions):
