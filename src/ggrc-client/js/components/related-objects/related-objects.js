@@ -147,9 +147,6 @@ import Pagination from '../base-objects/pagination';
       '{viewModel.paging} pageSize': function () {
         this.viewModel.setRelatedItems();
       },
-      '{viewModel.baseInstance} refreshInstance': function () {
-        this.viewModel.setRelatedItems();
-      },
       [`{viewModel.baseInstance} ${REFRESH_RELATED.type}`]:
         function (scope, event) {
           let vm = this.viewModel;

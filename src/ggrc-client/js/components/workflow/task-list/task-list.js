@@ -6,8 +6,15 @@
 import template from './templates/task-list.mustache';
 import Pagination from '../../base-objects/pagination';
 import Permission from '../../../permission';
+import {REFRESH_RELATED} from '../../../events/eventTypes';
 
 const viewModel = can.Map.extend({
+  /**
+   * A model name. Each item within the task list
+   * will have this model name.
+   */
+  relatedItemsType: 'TaskGroupTask',
+}, {
   define: {
     paging: {
       value() {
@@ -23,8 +30,12 @@ const viewModel = can.Map.extend({
         );
       },
     },
+    relatedItemsType: {
+      get() {
+        return this.constructor.relatedItemsType;
+      },
+    },
   },
-  relatedItemsType: 'TaskGroupTask',
   initialOrderBy: 'created_at',
   gridSpinner: 'grid-spinner',
   items: [],
@@ -39,7 +50,10 @@ const viewModel = can.Map.extend({
       // reload items manually, because CanJs does not
       // trigger "change" event, when we try to set first page
       // (we are already on first page)
-      this.attr('baseInstance').dispatch('refreshInstance');
+      this.attr('baseInstance').dispatch({
+        ...REFRESH_RELATED,
+        model: this.attr('relatedItemsType'),
+      });
     }
   },
   updatePagingAfterDestroy() {
@@ -54,17 +68,28 @@ const viewModel = can.Map.extend({
       this.attr('paging.current', current - 1);
     } else {
       // update current page
-      this.attr('baseInstance').dispatch('refreshInstance');
+      this.attr('baseInstance').dispatch({
+        ...REFRESH_RELATED,
+        model: this.attr('relatedItemsType'),
+      });
     }
   },
 });
 
 const events = {
-  '{CMS.Models.TaskGroupTask} destroyed'() {
-    this.viewModel.updatePagingAfterDestroy();
+  [`{CMS.Models.${viewModel.relatedItemsType}} destroyed`](
+    model, event, instance
+  ) {
+    if (instance instanceof CMS.Models[viewModel.relatedItemsType]) {
+      this.viewModel.updatePagingAfterDestroy();
+    }
   },
-  '{CMS.Models.TaskGroupTask} created'() {
-    this.viewModel.updatePagingAfterCreate();
+  [`{CMS.Models.${viewModel.relatedItemsType}} created`](
+    model, event, instance
+  ) {
+    if (instance instanceof CMS.Models[viewModel.relatedItemsType]) {
+      this.viewModel.updatePagingAfterCreate();
+    }
   },
 };
 
