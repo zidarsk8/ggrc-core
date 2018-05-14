@@ -1,10 +1,13 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from sqlalchemy import orm
+"""Context model definition."""
 
 import datetime
+
+from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
+
 from ggrc import db
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Base
@@ -12,6 +15,7 @@ from ggrc.models import reflection
 
 
 class Context(Base, db.Model):
+  """Context class. Sign permissions object for specific user."""
   __tablename__ = 'contexts'
 
   # This block and the 'description' attrs are taken from the Described mixin
@@ -44,7 +48,7 @@ class Context(Base, db.Model):
     return setattr(self, self.related_object_attr, value)
 
   @staticmethod
-  def _extra_table_args(cls):
+  def _extra_table_args(_):
     return (
         db.Index(
             'ix_context_related_object',
@@ -65,6 +69,7 @@ class HasOwnContext(object):
 
   @declared_attr
   def contexts(cls):  # pylint: disable=no-self-argument
+    """Context relation declaration."""
     joinstr = 'and_(foreign(Context.related_object_id) == {type}.id, '\
               'foreign(Context.related_object_type) == "{type}")'
     joinstr = joinstr.format(type=cls.__name__)
@@ -78,6 +83,7 @@ class HasOwnContext(object):
         post_update=True)
 
   def build_object_context(self, context, name=None, description=None):
+    """Build object content."""
     if name is None:
       name = '{object_type} Context {timestamp}'.format(
           object_type=self.__class__.__name__,
@@ -95,6 +101,7 @@ class HasOwnContext(object):
     return new_context
 
   def get_or_create_object_context(self, *args, **kwargs):
+    """Get or create object context instance."""
     if len(self.contexts) == 0:
       new_context = self.build_object_context(*args, **kwargs)
       self.contexts.append(new_context)
