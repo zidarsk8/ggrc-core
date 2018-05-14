@@ -24,11 +24,13 @@ const viewModel = can.Map.extend({
 });
 
 const events = {
-  inserted(el) {
-    const savedVersion = localStorage.getItem('GGRC.RELEASE_NOTES_DATE');
+  async inserted(el) {
+    const displayPrefs = await CMS.Models.DisplayPrefs.getSingleton();
+
+    const savedVersion = displayPrefs.getReleaseNotesDate();
 
     if (RELEASE_NOTES_DATE !== savedVersion) {
-      localStorage.setItem('GGRC.RELEASE_NOTES_DATE', RELEASE_NOTES_DATE);
+      displayPrefs.setReleaseNotesDate(RELEASE_NOTES_DATE);
       this.viewModel.open();
     }
   },

@@ -32,51 +32,60 @@ describe('"release-notes-menu-item" component', () => {
     });
 
     describe('"inserted" handler', () => {
+      let displayPrefs;
+
       beforeEach(() => {
         handler = events.inserted.bind({viewModel: vm});
+        displayPrefs = {
+          getReleaseNotesDate: jasmine.createSpy(),
+          setReleaseNotesDate: jasmine.createSpy(),
+        };
+        spyOn(CMS.Models.DisplayPrefs, 'getSingleton')
+          .and.returnValue(displayPrefs);
+        spyOn(vm, 'open');
       });
 
       describe('if RELEASE_NOTES_DATE not equal to saved date', () => {
         beforeEach(() => {
-          spyOn(localStorage, 'getItem')
+          displayPrefs.getReleaseNotesDate = jasmine.createSpy()
             .and.returnValue(new Date());
-          spyOn(localStorage, 'setItem');
-          spyOn(vm, 'open');
         });
 
-        it('sets RELEASE_NOTES_DATE into localStorage as GGRC.RELEASE_NOTES_DATE', () => {
-          handler();
+        it('saves RELEASE_NOTES_DATE with display_prefs', async (done) => {
+          await handler();
 
-          expect(localStorage.setItem)
-            .toHaveBeenCalledWith('GGRC.RELEASE_NOTES_DATE', RELEASE_NOTES_DATE);
+          expect(displayPrefs.setReleaseNotesDate)
+            .toHaveBeenCalledWith(RELEASE_NOTES_DATE);
+          done();
         });
 
-        it('calls open() method', () => {
-          handler();
+        it('calls open() method', async (done) => {
+          await handler();
 
           expect(vm.open).toHaveBeenCalled();
+          done();
         });
       });
 
       describe('if RELEASE_NOTES_DATE equal to saved date', () => {
         beforeEach(() => {
-          spyOn(localStorage, 'getItem')
+          displayPrefs.getReleaseNotesDate = jasmine.createSpy()
             .and.returnValue(RELEASE_NOTES_DATE);
-          spyOn(localStorage, 'setItem');
-          spyOn(vm, 'open');
         });
 
-        it('does not change date in localStorage', () => {
-          handler();
+        it('does not change date in display_prefs', async (done) => {
+          await handler();
 
-          expect(localStorage.setItem).not.toHaveBeenCalledWith(
-            'GGRC.RELEASE_NOTES_DATE', RELEASE_NOTES_DATE);
+          expect(displayPrefs.setReleaseNotesDate)
+            .not.toHaveBeenCalledWith(RELEASE_NOTES_DATE);
+          done();
         });
 
-        it('does not call open() method', () => {
-          handler();
+        it('does not call open() method', async (done) => {
+          await handler();
 
           expect(vm.open).not.toHaveBeenCalled();
+          done();
         });
       });
     });
