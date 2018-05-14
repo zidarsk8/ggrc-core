@@ -215,3 +215,10 @@ def remove_deprecated_roles(role_names):
           ACR_TABLE.c.internal == 1,
       )
   )
+
+
+def update_acr_propagation_tree(old_tree, new_tree):
+  """Remove old tree and create new based on rules"""
+  for object_type, roles_tree in old_tree.items():
+    remove_propagated_roles(object_type, roles_tree.keys())
+  propagate_roles(new_tree)
