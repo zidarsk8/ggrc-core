@@ -4,6 +4,8 @@
  */
 
 .release-notes {
+  position: relative;
+
   .simple-modal__header-text {
     font-size: 18px;
     font-weight: bold;
@@ -34,5 +36,39 @@
   &__date {
     padding:  0 20px;
     color: $gray;
+  }
+
+  .on-top-button {
+    position: absolute;
+    bottom: 70px;
+    left: calc(50% - 42px);
+    border-radius: 15px;
+    border-style: solid;
+    line-height: 22px;
+    transform: translateY(0px);
+    transition: transform 0.2s 0.1s, opacity 0.2s 0.1s;
+    opacity: 1;
+    outline: none;
+    color: $white;
+    background-color: $status-completed;
+
+    .fa-arrow-up {
+      font-size: 13px;
+    }
+
+    &.delayed-hidden {
+      display: block;
+      transform: translateY(30px);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    &.instantly-hidden {
+      display: none;
+    }
+
+    &:hover {
+      background-color: lighten($status-completed, 10%);
+    }
   }
 }
