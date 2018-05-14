@@ -10,6 +10,7 @@ import '../../components/spinner/spinner';
 import '../../components/import-export/import';
 import '../../components/object-list/object-list';
 import '../../components/tree_pagination/tree_pagination';
+import '../../components/page-header/page-header';
 
 import '../../common-handlers';
 
