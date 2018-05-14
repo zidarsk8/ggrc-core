@@ -4,11 +4,6 @@
 }}
 
 {{#switch attr_name}}
-  {{#case 'owner'}}
-    {{#with_mapping 'program_authorizations' instance}}
-      <get-owner-people-list data="program_authorizations" role="'ProgramOwner'"/>
-    {{/with_mapping}}
-  {{/case}}
   {{#case 'contact'}}
       <tree-field {source}="instance.contact" {field}="'email'"/>
   {{/case}}
