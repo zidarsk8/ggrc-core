@@ -91,7 +91,7 @@ class TestRelatedAssessments(TestCase):
       )
 
     with mock.patch("ggrc.views.start_compute_attributes"):
-      views.do_reindex()
+      views.do_full_reindex()
 
     response = self._get_related_assessments(self.control, **limit).json
     self.assertEqual(response["total"], expected_count)

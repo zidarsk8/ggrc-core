@@ -2,9 +2,10 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from collections import namedtuple
+
 from flask import g
 from flask.ext.login import current_user
-from .user_permissions import UserPermissions
+
 from ggrc.app import db
 from ggrc.rbac.permissions import permissions_for as find_permissions
 from ggrc.rbac.permissions import is_allowed_create
@@ -198,7 +199,8 @@ _CONDITIONS_MAP = {
 }
 
 
-class DefaultUserPermissions(UserPermissions):
+class DefaultUserPermissions(object):
+  """Common logic for user permissions."""
   # super user, context_id 0 indicates all contexts
   ADMIN_PERMISSION = Permission(
       '__GGRC_ADMIN__',
@@ -247,8 +249,7 @@ class DefaultUserPermissions(UserPermissions):
 
   def _is_allowed(self, permission):
     permissions = self._permissions()
-    if permission.resource_type != '/admin' \
-       and permission.context_id \
+    if permission.context_id \
        and self._is_allowed(permission._replace(context_id=None)):
       return True
     if self._permission_match(permission, permissions):
@@ -436,10 +437,6 @@ class DefaultUserPermissions(UserPermissions):
   def delete_resources_for(self, resource_type):
     """All resources in which the user has delete permission."""
     return self._get_resources_for('delete', resource_type)
-
-  def is_allowed_view_object_page_for(self, instance):
-    """All resources in which the user can access object page."""
-    return self._is_allowed_for(instance, 'read')
 
   def is_admin(self):
     """Whether the user has ADMIN permissions."""

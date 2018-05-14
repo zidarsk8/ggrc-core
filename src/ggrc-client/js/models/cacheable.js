@@ -945,7 +945,7 @@ import RefreshQueue from './refresh_queue';
       this._customAttributeAccess.write(change);
     },
     isCustomAttributable() {
-      return this.attr('class').is_custom_attributable;
+      return this.constructor.is_custom_attributable;
     },
     computed_errors: function () {
       let errors = this.errors();
@@ -987,11 +987,7 @@ import RefreshQueue from './refresh_queue';
       if (!this.get_binding('orphaned_objects')) {
         return can.Deferred().reject();
       }
-      return this.get_list_loader('orphaned_objects').then(function (list) {
-        let objects = [];
-        let mappings = [];
-        let result = [];
-
+      return this.get_list_loader('orphaned_objects').then((list) => {
         function isJoin(mapping) {
           if (mapping.mappings.length > 0) {
             for (let i = 0, child; child = mapping.mappings[i]; i++) {
@@ -1004,18 +1000,15 @@ import RefreshQueue from './refresh_queue';
             mapping.instance instanceof can.Model.Join &&
             mapping.instance;
         }
-        can.each(list, function (mapping) {
-          let inst;
-          if (inst = isJoin(mapping)) {
+
+        const mappings = [];
+        can.each(list, (mapping) => {
+          const inst = isJoin(mapping);
+
+          if (inst) {
             mappings.push(inst);
-          } else {
-            objects.push(mapping.instance);
           }
         });
-
-        if (mappings.length) {
-          result.push(mappings.length);
-        }
 
         return mappings.length;
       });

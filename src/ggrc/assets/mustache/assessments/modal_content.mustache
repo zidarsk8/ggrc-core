@@ -169,67 +169,44 @@
                 </div>
               {{/each}}
             </div>
-            <div class="objective-selector">
-               <map-button-using-assessment-type
-                {{data "deferred_to"}}
-                {instance}="instance">
-                  {{#if instance.audit}}
-                    <a class="section-add section-sticky btn btn-small btn-white assessment-map-btn"
-                      href="javascript://"
-                      data-placement="left"
-                      data-deferred="true"
-                      data-object-source="true"
-                      data-is-new="{{instance.isNew}}"
-                      data-join-object-id="{{instance.id}}"
-                      data-join-object-type="{{instance.class.model_singular}}"
-                      tabindex="8"
-                      data-snapshot-scope-id="{{instance.audit.id}}"
-                      data-snapshot-scope-type="{{instance.audit.type}}"
-                    >
-                      Map Objects
-                    </a>
-                  {{else}}
-                    <a class="section-add section-sticky btn btn-small btn-white assessment-map-btn"
-                      href="javascript://"
-                      data-placement="left"
-                      data-deferred="true"
-                      data-object-source="true"
-                      data-is-new="{{instance.isNew}}"
-                      data-join-object-id="{{instance.id}}"
-                      data-join-object-type="{{instance.class.model_singular}}"
-                      tabindex="8"
-                    >
-                      Map Objects
-                    </a>
-                  {{/if}}
-              </map-button-using-assessment-type>
-            </div>
+            {{#is_allowed "read" instance.audit context="for"}}
+              <div class="objective-selector">
+                <map-button-using-assessment-type
+                  {{data "deferred_to"}}
+                  {instance}="instance">
+                    {{#if instance.audit}}
+                      <a class="section-add section-sticky btn btn-small btn-white assessment-map-btn"
+                        href="javascript://"
+                        data-placement="left"
+                        data-deferred="true"
+                        data-object-source="true"
+                        data-is-new="{{instance.isNew}}"
+                        data-join-object-id="{{instance.id}}"
+                        data-join-object-type="{{instance.class.model_singular}}"
+                        tabindex="8"
+                        data-snapshot-scope-id="{{instance.audit.id}}"
+                        data-snapshot-scope-type="{{instance.audit.type}}"
+                      >
+                        Map Objects
+                      </a>
+                    {{else}}
+                      <a class="section-add section-sticky btn btn-small btn-white assessment-map-btn"
+                        href="javascript://"
+                        data-placement="left"
+                        data-deferred="true"
+                        data-object-source="true"
+                        data-is-new="{{instance.isNew}}"
+                        data-join-object-id="{{instance.id}}"
+                        data-join-object-type="{{instance.class.model_singular}}"
+                        tabindex="8"
+                      >
+                        Map Objects
+                      </a>
+                    {{/if}}
+                </map-button-using-assessment-type>
+              </div>
+            {{/is_allowed}}
           </ggrc-modal-connector>
-        </div>
-      </div>
-
-      <div class="ggrc-form-item">
-        <div class="ggrc-form-item__row">
-          <related-documents
-            instance={instance}
-            document-type="REFERENCE_URL"
-            autorefresh="false"
-            custom-loader="true"
-            {documents}="referenceUrls"
-            {^pending-items-changed}="referenceUrlChanged">
-            <related-urls
-              {instance}="instance"
-              {allow-to-remove}="new_object_form"
-              {(urls)}="documents"
-              {is-disabled}="isLoading"
-              (createUrl)="markDocumentForAddition(%event.payload)"
-              (removeUrl)="markDocumentForDeletion(%event.payload)">
-              <label class="ggrc-form-item__label">
-                Reference URL
-                <spinner {toggle}="isDisabled"></spinner>
-              </label>
-            </related-urls>
-          </related-documents>
         </div>
       </div>
 

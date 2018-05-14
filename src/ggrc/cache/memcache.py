@@ -283,8 +283,9 @@ class _Decorated(object):
     if not self.active:
       return self.function(*args, **kwargs)
     key = self.get_key(*args, **kwargs)
-    if self.memcache_client.get(key) is not None:
-      return self.memcache_client.get(key)
+    value = self.memcache_client.get(key)
+    if value is not None:
+      return value
     result = self.function(*args, **kwargs)
     self.memcache_client.add(key, result)
     return result

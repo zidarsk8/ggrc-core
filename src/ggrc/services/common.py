@@ -18,7 +18,7 @@ from exceptions import TypeError
 from wsgiref.handlers import format_date_time
 from urllib import urlencode
 
-from flask import url_for, request, current_app, g
+from flask import url_for, request, current_app, g, has_request_context
 from flask.views import View
 from flask.ext.sqlalchemy import Pagination
 import sqlalchemy.orm.exc
@@ -348,8 +348,18 @@ class ModelView(View):
   @classmethod
   def base_url_for(cls, _memoized_base_url={}):
     if cls not in _memoized_base_url:
-      _memoized_base_url[cls] = url_for(cls.endpoint_name())
+      if has_request_context():
+        _memoized_base_url[cls] = url_for(cls.endpoint_name())
+      else:
+        _memoized_base_url[cls] = cls.generate_url()
     return _memoized_base_url[cls]
+
+  @classmethod
+  def generate_url(cls):
+    """Generate relative endpoint url."""
+    model = ggrc.models.get_model(cls.endpoint_name())
+    plural_name = model._inflector.table_plural
+    return "/api/{}".format(plural_name)
 
   @classmethod
   def url_for(cls, *args, **kwargs):

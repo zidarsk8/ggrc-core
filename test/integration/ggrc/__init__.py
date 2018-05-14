@@ -16,6 +16,7 @@ from sqlalchemy import exc
 from sqlalchemy import func
 from sqlalchemy.sql.expression import tuple_
 from flask.ext.testing import TestCase as BaseTestCase
+from google.appengine.ext import testbed
 
 from ggrc import db
 from ggrc.app import app
@@ -91,13 +92,6 @@ class TestCase(BaseTestCase, object):
     for acl in obj.access_control_list:
       if acl.ac_role_id == role_id:
         yield acl.person
-
-  def _full_reindex(self):
-    """Run reindex for all objects and attributes."""
-    self.client.get("/login")
-    self.client.post("/admin/reindex")
-    self.client.post("/admin/reindex_snapshots")
-    self.client.post("/admin/compute_attributes")
 
   @contextlib.contextmanager
   def custom_headers(self, headers=None):
@@ -265,7 +259,22 @@ class TestCase(BaseTestCase, object):
           writer.writerow([data_object_type] + keys)
         writer.writerow([""] + [data[k] for k in keys])
       tmp.seek(0)
+      cls.init_taskqueue()
       return cls._import_file(os.path.basename(tmp.name), dry_run, person)
+
+  @classmethod
+  def init_taskqueue(cls):
+    """Init test environment for working with appengine."""
+    cls.testbed = testbed.Testbed()
+    cls.testbed.activate()
+
+    # root_path must be set the the location of queue.yaml.
+
+    # Otherwise, only the 'default' queue will be available.
+    cls.testbed.init_taskqueue_stub()
+    cls.taskqueue_stub = cls.testbed.get_stub(
+        testbed.TASKQUEUE_SERVICE_NAME
+    )
 
   @staticmethod
   def send_import_request(data, dry_run=False, person=None):
@@ -291,6 +300,7 @@ class TestCase(BaseTestCase, object):
 
   def import_file(self, filename, dry_run=False, person=None):
     """Import a csv file as a specific user."""
+    self.init_taskqueue()
     if dry_run:
       return self._import_file(filename, dry_run=True, person=person)
 

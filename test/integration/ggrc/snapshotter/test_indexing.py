@@ -338,7 +338,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     records = get_records(audit, snapshots)
     self.assertEqual(records.count(), 0)
 
-    self._full_reindex()
+    self.client.post("/admin/full_reindex")
 
     records = get_records(audit, snapshots)
 
@@ -384,7 +384,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
       db.session.add(revision)
     person_id = person.id
     snapshot_id = snapshot.id
-    self._full_reindex()
+    self.client.post("/admin/full_reindex")
     person = all_models.Person.query.get(person_id)
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, role_name, {
@@ -422,7 +422,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     db.session.expire_all()
     person_id = person.id
     snapshot_id = snapshot.id
-    self._full_reindex()
+    self.client.post("/admin/full_reindex")
     person = all_models.Person.query.get(person_id)
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, role_name, {
@@ -469,7 +469,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
           revision=revision)
     db.session.expire_all()
     snapshot_id = snapshot.id
-    self._full_reindex()
+    self.client.post("/admin/full_reindex")
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, cad_title, {"": search_value})
 
@@ -498,7 +498,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
           revision=revision)
     db.session.expire_all()
     snapshot_id = snapshot.id
-    self._full_reindex()
+    self.client.post("/admin/full_reindex")
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, cad_title, {"": search_value})
 
@@ -532,7 +532,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     db.session.delete(acr)
     db.session.commit()
     snapshot_id = snapshot.id
-    self._full_reindex()
+    self.client.post("/admin/full_reindex")
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     all_found_records = dict(Record.query.filter(
         Record.key == snapshot.id,

@@ -7,6 +7,8 @@ from collections import defaultdict
 
 import collections
 
+from google.appengine.ext import deferred
+
 from ggrc import db
 from ggrc.fulltext import mysql
 from ggrc.models import all_models
@@ -135,6 +137,8 @@ class TestWithLastAssessmentDate(TestCase, WithQueryApi):
         ("Title", "Test title"),
         ("Comments", "new comment1;;new comment2;;new comment3"),
     ]))
+    tasks = self.taskqueue_stub.get_filtered_tasks()
+    deferred.run(tasks[0].payload)
     self._check_csv_response(response, {})
     asmnt = all_models.Assessment.query.filter_by(slug="Asmnt-code").first()
     self.assertEqual(asmnt.last_comment, "new comment3")
@@ -148,6 +152,8 @@ class TestWithLastAssessmentDate(TestCase, WithQueryApi):
         ("Code*", asmnt_slug),
         ("Comments", "new comment1;;new comment2;;new comment3"),
     ]))
+    tasks = self.taskqueue_stub.get_filtered_tasks()
+    deferred.run(tasks[0].payload)
     self._check_csv_response(response, {})
     asmnt = all_models.Assessment.query.filter_by(slug=asmnt_slug).first()
     self.assertEqual(asmnt.last_comment, "new comment3")

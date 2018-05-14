@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
+{{^if isAuditInaccessibleAssessment}}
 {{#is_allowed 'update' instance}}
 {{^if instance.archived}}
   <li data-test-id="button_widget_add_2c925d94" class="hidden-widgets-list">
@@ -79,3 +80,4 @@
   </li>
 {{/if}}
 {{/is_allowed}}
+{{/if}}

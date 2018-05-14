@@ -867,7 +867,7 @@ Mustache.registerHelper('is_allowed', function () {
       actions.push(arg);
     } else if (typeof arg === 'string') {
       resourceType = arg;
-    } else if (typeof arg === 'object' && arg instanceof can.Model) {
+    } else if (typeof arg === 'object' && arg instanceof can.Map) {
       resource = arg;
     }
   });
@@ -2303,9 +2303,9 @@ Mustache.registerHelper('is_auditor', function (options) {
 
 Mustache.registerHelper('has_role', function (role, instance, options) {
   instance = Mustache.resolve(instance);
-  const acr = getRole(instance.type, role);
+  const acr = instance ? getRole(instance.type, role) : null;
 
-  if (!acr || !instance) {
+  if (!acr) {
     return options.inverse(options.contexts);
   }
 

@@ -11,7 +11,6 @@ description = """
 permissions = {
     "read": [],
     "create": [],
-    "view_object_page": [],
     "update": [],
     "delete": []
 }

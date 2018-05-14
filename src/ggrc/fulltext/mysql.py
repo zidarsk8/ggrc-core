@@ -42,6 +42,7 @@ class MysqlRecordProperty(db.Model):
 
 
 class MysqlIndexer(SqlIndexer):
+  """MysqlIndexer class"""
   record_type = MysqlRecordProperty
 
   @staticmethod
@@ -52,8 +53,7 @@ class MysqlIndexer(SqlIndexer):
 
     if not terms:
       return whitelist
-    elif terms:
-      return sa.and_(whitelist, MysqlRecordProperty.content.contains(terms))
+    return sa.and_(whitelist, MysqlRecordProperty.content.contains(terms))
 
   @staticmethod
   def get_permissions_query(model_names, permission_type='read',
@@ -116,7 +116,7 @@ class MysqlIndexer(SqlIndexer):
 
     models = [m for m in all_models.all_models if m.__name__ == type_name]
 
-    if len(models) == 0:
+    if not models:
       return query
     model_klass = models[0]
 
@@ -250,11 +250,27 @@ def update_indexer(session):  # pylint:disable=unused-argument
 @event.listens_for(all_models.Relationship, "after_insert")
 @event.listens_for(all_models.Relationship, "after_delete")
 def refresh_documents(mapper, connection, target):
-  """Refreshes related Documents to Documentable"""
+  """Refreshes related Documents"""
   if target.source_type == 'Document':
     for_refresh = target.destination
   elif target.destination_type == 'Document':
     for_refresh = target.source
   else:
     return
-  db.session.expire(for_refresh, ['documents'])
+  if hasattr(for_refresh, 'documents'):
+    db.session.expire(for_refresh, ['documents'])
+
+
+# pylint:disable=unused-argument
+@event.listens_for(all_models.Relationship, "after_insert")
+@event.listens_for(all_models.Relationship, "after_delete")
+def refresh_evidences(mapper, connection, target):
+  """Refreshes related Evidences"""
+  if target.source_type == 'Evidence':
+    for_refresh = target.destination
+  elif target.destination_type == 'Evidence':
+    for_refresh = target.source
+  else:
+    return
+  if hasattr(for_refresh, 'evidences'):
+    db.session.expire(for_refresh, ['evidences'])

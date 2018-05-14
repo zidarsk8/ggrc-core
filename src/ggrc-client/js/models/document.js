@@ -29,7 +29,7 @@ import {getRole} from '../plugins/utils/acl-utils';
     create: 'POST /api/documents',
     update: 'PUT /api/documents/{id}',
     destroy: 'DELETE /api/documents/{id}',
-    EVIDENCE: 'EVIDENCE',
+    FILE: 'FILE',
     URL: 'URL',
     REFERENCE_URL: 'REFERENCE_URL',
     search: function (request, response) {
@@ -54,11 +54,10 @@ import {getRole} from '../plugins/utils/acl-utils';
     },
     attributes: {
       context: 'CMS.Models.Context.stub',
-      kind: 'CMS.Models.Option.stub',
       year: 'CMS.Models.Option.stub',
     },
     defaults: {
-      document_type: 'EVIDENCE',
+      kind: 'FILE',
       access_control_list: getAccessControlList(),
     },
     tree_view_options: {

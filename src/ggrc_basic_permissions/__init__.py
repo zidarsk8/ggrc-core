@@ -79,18 +79,6 @@ class CompletePermissionsProvider(object):
     pass
 
 
-class BasicUserPermissions(DefaultUserPermissions):
-  """User permissions that aren't kept in session."""
-
-  def __init__(self, user):
-    self.user = user
-    with benchmark('BasicUserPermissions > load permissions for user'):
-      self.permissions = load_permissions_for(user)
-
-  def _permissions(self):
-    return self.permissions
-
-
 class UserPermissions(DefaultUserPermissions):
   """User permissions cached in the global session object"""
 
@@ -348,8 +336,7 @@ def load_access_control_list(user, permissions):
   )
 
   for object_type, object_id, read, update, delete in access_control_list:
-    actions = (("read", read), ("view_object_page", read),
-               ("update", update), ("delete", delete))
+    actions = (("read", read), ("update", update), ("delete", delete))
     for action, allowed in actions:
       if not allowed:
         continue

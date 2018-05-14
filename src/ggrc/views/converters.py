@@ -26,9 +26,9 @@ from werkzeug.exceptions import (
 from ggrc import db
 from ggrc.gdrive import file_actions as fa
 from ggrc.app import app
-from ggrc.converters.base import Converter
-from ggrc.converters.import_helper import generate_csv_string, \
-    count_objects, read_csv_file, get_export_filename
+from ggrc.converters.base import ImportConverter, ExportConverter
+from ggrc.converters.import_helper import count_objects, \
+    read_csv_file, get_export_filename
 from ggrc.models import import_export, person
 from ggrc.notifications import job_emails
 from ggrc.query.exceptions import BadQueryException
@@ -113,10 +113,10 @@ def make_export(objects):
   """Make export"""
   query_helper = QueryHelper(objects)
   ids_by_type = query_helper.get_ids()
-  converter = Converter(ids_by_type=ids_by_type)
-  csv_data = converter.to_array()
+  converter = ExportConverter(ids_by_type=ids_by_type)
+  csv_data = converter.export_csv_data()
   object_names = "_".join(converter.get_object_names())
-  return generate_csv_string(csv_data), object_names
+  return csv_data, object_names
 
 
 def check_import_file():
@@ -161,8 +161,8 @@ def make_response(data):
 def make_import(csv_data, dry_run):
   """Make import"""
   try:
-    converter = Converter(dry_run=dry_run, csv_data=csv_data)
-    converter.import_csv()
+    converter = ImportConverter(dry_run=dry_run, csv_data=csv_data)
+    converter.import_csv_data()
     return converter.get_info()
   except Exception as e:  # pylint: disable=broad-except
     logger.exception("Import failed: %s", e.message)

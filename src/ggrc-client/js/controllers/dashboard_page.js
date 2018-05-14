@@ -84,8 +84,8 @@ export default can.Component.extend({
           workflowData.cur_wfs5 = curWfs5;
           workflowData.list = curWfs5;
           self.scope.attr('workflow_data', workflowData);
-          self.scope.attr('loading', false);
         }
+        self.scope.attr('loading', false);
       });
 
     return 0;

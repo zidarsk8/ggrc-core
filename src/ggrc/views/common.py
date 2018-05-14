@@ -71,8 +71,6 @@ class BaseObjectView(ModelView):
     if not permissions.is_allowed_read(self.model.__name__, obj.id,
                                        obj.context_id):
       raise Forbidden()
-    if not permissions.is_allowed_view_object_page_for(obj):
-      raise Forbidden()
 
     with benchmark("Render"):
       rendered_template = self.render_template_for_object(obj)

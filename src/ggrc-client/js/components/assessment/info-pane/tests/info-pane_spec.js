@@ -5,6 +5,7 @@
 
 import tracker from '../../../../tracker';
 import DeferredTransaction from '../../../../plugins/utils/deferred-transaction-utils';
+import Permission from '../../../../permission';
 
 describe('GGRC.Components.assessmentInfoPane', function () {
   let vm;
@@ -46,35 +47,34 @@ describe('GGRC.Components.assessmentInfoPane', function () {
     });
   });
 
-  describe('isPending() getter', () => {
-    it('returns true if isUpdatingEvidences and isUpdatingUrls are true',
-      () => {
-        vm.attr('isUpdatingEvidences', true);
-        vm.attr('isUpdatingUrls', false);
+  describe('isAllowedToMap attribute', ()=> {
+    describe('get() method', ()=> {
+      it(`returns true if there is audit
+        and it is allowed to read instance.audit`, ()=> {
+          vm.attr('instance.audit', {});
+          spyOn(Permission, 'is_allowed_for').and.returnValue(true);
 
-        expect(vm.attr('isPending')).toBe(true);
+          let result = vm.attr('isAllowedToMap');
+
+          expect(result).toBe(true);
+        });
+      it('returns false if there is no audit', ()=> {
+        vm.attr('instance.audit', null);
+
+        let result = vm.attr('isAllowedToMap');
+
+        expect(result).toBe(false);
       });
 
-    it('returns false if isUpdatingUrls and isUpdatingEvidences are false',
-      () => {
-        vm.attr('isUpdatingEvidences', false);
-        vm.attr('isUpdatingUrls', false);
+      it(`returns false if there is audit
+        but it is not allowed to read instance.audit`, ()=> {
+          vm.attr('instance.audit', {});
+          spyOn(Permission, 'is_allowed_for').and.returnValue(false);
 
-        expect(vm.attr('isPending')).toBe(false);
-      });
+          let result = vm.attr('isAllowedToMap');
 
-    it('returns true if only isUpdatingEvidences is true', () => {
-      vm.attr('isUpdatingEvidences', true);
-      vm.attr('isUpdatingUrls', false);
-
-      expect(vm.attr('isPending')).toBe(true);
-    });
-
-    it('returns true if only isUpdatingUrls is true', () => {
-      vm.attr('isUpdatingEvidences', false);
-      vm.attr('isUpdatingUrls', true);
-
-      expect(vm.attr('isPending')).toBe(true);
+          expect(result).toBe(false);
+        });
     });
   });
 
@@ -143,5 +143,33 @@ describe('GGRC.Components.assessmentInfoPane', function () {
         done();
       });
     });
+  });
+
+  describe('saveGlobalAttributes() method', () => {
+    let method;
+    let event;
+
+    beforeEach(() => {
+      method = vm.saveGlobalAttributes.bind(vm);
+      vm.attr('deferredSave', {
+        push: jasmine.createSpy(),
+      });
+      vm.attr('instance', {
+        customAttr: jasmine.createSpy(),
+      });
+    });
+
+    it('pushes callback into deferredSave which calls customAttr method',
+      () => {
+        event = {
+          globalAttributes: new can.Map({'1': true}),
+        };
+
+        method(event);
+
+        let callback = vm.attr('deferredSave').push.calls.allArgs()[0][0];
+        callback();
+        expect(vm.attr('instance').customAttr).toHaveBeenCalledWith('1', true);
+      });
   });
 });

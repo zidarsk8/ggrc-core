@@ -16,7 +16,7 @@ from ggrc.models import all_models
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.fulltext import get_indexer
 from ggrc.models.reflection import AttributeInfo
-from ggrc.utils import generate_query_chunks
+from ggrc.utils import generate_query_chunks, helpers
 
 from ggrc.snapshotter.rules import Types
 from ggrc.snapshotter.datastructures import Pair
@@ -109,6 +109,7 @@ def get_searchable_attributes(attributes, cads, content):
   return searchable_values
 
 
+@helpers.without_sqlalchemy_cache
 def reindex():
   """Reindex all snapshots."""
   columns = db.session.query(

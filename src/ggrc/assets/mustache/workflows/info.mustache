@@ -45,21 +45,17 @@
             {{#if instance.recurrences}}
               <li>
                 <workflow-start-cycle workflow="instance">
-                  <workflow-activate
-                    {instance}="instance"
-                    {task-group-amount}="instance.task_groups.length">
-                    {{#instance.can_start_cycle}}
-                      <a href="#workflowStart" {{^taskGroupAmount}}disabled="disabled"{{/taskGroupAmount}}>
-                        <i class="fa fa-sliders"></i>
-                        Manually Start a Cycle
-                      </a>
-                    {{/instance.can_start_cycle}}
-                  </workflow-activate>
+                  {{#instance.can_start_cycle}}
+                    <a href="#workflowStart">
+                      <i class="fa fa-sliders"></i>
+                      Manually Start a Cycle
+                    </a>
+                  {{/instance.can_start_cycle}}
                 </workflow-start-cycle>
               </li>
               <li>
                 <workflow-deactivate workflow="instance">
-                  <a href="#workflowStart" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
+                  <a href="#workflowStart">
                     <i class="fa fa-archive"></i>
                     Archive workflow
                   </a>

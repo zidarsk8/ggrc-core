@@ -52,7 +52,7 @@ export default can.Control({
         this.options.attr('contexts', new can.Observe(this.options.contexts));
       }
       this.options.attr('showAddTabButton',
-        !['Audit', 'Person'].includes(getPageType()));
+        !['Audit', 'Person', 'Evidence'].includes(getPageType()));
 
       router.bind('widget', (ev, newVal)=>{
         this.route(newVal);
@@ -298,7 +298,7 @@ export default can.Control({
     let instance = this.options.attr('instance');
 
     if (pageType === 'Audit') {
-      let priorityTabsNum = 4 + isDashboardEnabled(instance);
+      let priorityTabsNum = 5 + isDashboardEnabled(instance);
       this.options.attr('priorityTabs', widgets.slice(0, priorityTabsNum));
       this.options.attr('notPriorityTabs', widgets.slice(priorityTabsNum));
     } else {

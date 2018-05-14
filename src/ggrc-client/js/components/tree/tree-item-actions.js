@@ -12,10 +12,11 @@ import {
 import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
+import Permission from '../../permission';
 
 const tag = 'tree-item-actions';
 const forbiddenEditList = ['Cycle', 'CycleTaskGroup'];
-const forbiddenMapList = ['Workflow', 'RiskAssessment'];
+const forbiddenMapList = ['Workflow', 'RiskAssessment', 'Evidence'];
 
 const viewModel = can.Map.extend({
   define: {
@@ -59,6 +60,12 @@ const viewModel = can.Map.extend({
       type: 'boolean',
       get() {
         let type = this.attr('instance.type');
+        let audit = this.attr('instance.audit');
+        if ((type === 'Assessment') &&
+          (!audit ||
+          !Permission.is_allowed_for('read', audit))) {
+          return false;
+        }
         let isAllowedToEdit = this.attr('isAllowedToEdit');
         let isInForbiddenList = forbiddenMapList.indexOf(type) > -1;
 

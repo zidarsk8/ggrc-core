@@ -26,7 +26,4 @@ permissions = {
     ],
     "delete": [
     ],
-    "view_object_page": [
-        "Workflow",
-    ],
 }

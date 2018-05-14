@@ -17,12 +17,14 @@ from sqlalchemy import exc
 from sqlalchemy import or_
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import UnmappedInstanceError
+from flask import _app_ctx_stack
 
 from ggrc import db
 from ggrc import models
 from ggrc.rbac import permissions
 from ggrc.utils import benchmark
 from ggrc.utils import structures
+from ggrc.utils import list_chunks
 from ggrc.converters import errors
 from ggrc.converters import get_shared_unique_rules
 from ggrc.converters import pre_commit_checks
@@ -79,6 +81,7 @@ class BlockConverter(object):
 
   """
 
+  ROW_CHUNK_SIZE = 50
   BLOCK_OFFSET = 3
 
   def get_unique_counts_dict(self, object_class):
@@ -138,6 +141,11 @@ class BlockConverter(object):
       self.organize_fields(options.get("fields", []))
     else:
       self.name = ""
+
+  @property
+  def block_width(self):
+    """Returns width of block (header length)."""
+    return len(self.fields)
 
   def check_block_restrictions(self):
     """Check some block related restrictions"""
@@ -460,24 +468,33 @@ class BlockConverter(object):
     if self.ignore or not self.object_ids:
       return
     self.row_converters = []
-    objects = self.object_class.eager_query().filter(
-        self.object_class.id.in_(self.object_ids))
-    for i, obj in enumerate(objects):
-      row = RowConverter(self, self.object_class, obj=obj,
-                         headers=self.headers, index=i)
-      yield row
 
-  def row_data_to_array(self):
-    """Get row data from all row converters while exporting.
-    """
+    index = 0
+    for ids_pool in list_chunks(self.object_ids, self.ROW_CHUNK_SIZE):
+      # sqlalchemy caches all queries and it takes a lot of memory.
+      # This line clears query cache.
+      _app_ctx_stack.top.sqlalchemy_queries = []
+
+      objects = self.object_class.eager_query().filter(
+          self.object_class.id.in_(ids_pool)
+      ).execution_options(stream_results=True)
+
+      for obj in objects:
+        yield RowConverter(self, self.object_class, obj=obj,
+                           headers=self.headers, index=index)
+        index += 1
+
+      # Clear all objects from session (it helps to avoid memory leak)
+      for obj in db.session:
+        del obj
+
+  def generate_row_data(self):
+    """Get row data from all row converters while exporting."""
     if self.ignore:
       return
-    csv_body = []
-    csv_header = self.generate_csv_header()
     for row_converter in self.row_converters_from_ids():
       row_converter.handle_obj_row_data()
-      csv_body.append(row_converter.to_array(self.fields))
-    return csv_header, csv_body
+      yield row_converter.to_array(self.fields)
 
   def handle_row_data(self, field_list=None):
     """Handle row data for all row converters on import.

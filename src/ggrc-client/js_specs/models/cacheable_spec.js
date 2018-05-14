@@ -549,7 +549,7 @@ describe('can.Model.Cacheable', function () {
 
     it('returns false if the instance is not custom attributable', function () {
       let result;
-      instance.attr('class').is_custom_attributable = false;
+      instance.constructor.is_custom_attributable = false;
       result = instance.isCustomAttributable();
       expect(result).toBe(false);
     });
