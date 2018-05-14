@@ -25,6 +25,8 @@ logger = logging.getLogger()
 
 DATE_FORMAT_ISO = "%Y-%m-%d"
 DATE_FORMAT_US = "%m/%d/%Y"
+DATE_FORMAT_ISO_FULL = "%Y-%m-%d %H:%M:%S"
+DATE_FORMAT_OFFSET = "%m/%d/%Y %H:%M:%S %p %z"
 CHUNK_SIZE = 200
 
 
