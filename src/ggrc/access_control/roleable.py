@@ -94,8 +94,34 @@ class Roleable(object):
   def eager_query(cls):
     """Eager Query"""
     query = super(Roleable, cls).eager_query()
-    return cls.eager_inclusions(query, Roleable._include_links).options(
-        orm.subqueryload('access_control_list'))
+    return cls.eager_inclusions(
+        query,
+        Roleable._include_links
+    ).options(
+        orm.subqueryload(
+            '_access_control_list'
+        ).joinedload(
+            "person"
+        ).undefer_group(
+            'Person_complete'
+        ),
+        orm.subqueryload(
+            '_access_control_list'
+        ).joinedload(
+            "person"
+        ).subqueryload(
+            "contexts"
+        ).undefer_group(
+            'Context_complete'
+        ),
+        orm.subqueryload(
+            '_access_control_list'
+        ).joinedload(
+            "ac_role"
+        ).undefer_group(
+            'AccessControlRole_complete'
+        ),
+    )
 
   @classmethod
   def indexed_query(cls):
@@ -103,14 +129,19 @@ class Roleable(object):
     query = super(Roleable, cls).indexed_query()
     return query.options(
         orm.subqueryload(
-            'access_control_list'
-        ).subqueryload(
+            '_access_control_list'
+        ).joinedload(
             "person"
-        ).load_only(
-            "id",
-            "name",
-            "email",
-        )
+        ).undefer_group(
+            'Person_complete'
+        ),
+        orm.subqueryload(
+            '_access_control_list'
+        ).joinedload(
+            "ac_role"
+        ).undefer_group(
+            'AccessControlRole_complete'
+        ),
     )
 
   def log_json(self):
