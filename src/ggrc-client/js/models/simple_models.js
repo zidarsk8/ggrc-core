@@ -63,6 +63,7 @@ import {getRole} from '../plugins/utils/acl-utils';
       ]),
       add_item_view: GGRC.mustache_path +
         '/base_objects/tree_add_item.mustache',
+      display_attr_names: ['title', 'status', 'updated_at', 'Program Managers'],
     },
     sub_tree_view_options: {
       default_filter: ['Standard'],
