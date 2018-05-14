@@ -339,14 +339,16 @@ def load_access_control_list(user, permissions):
       func.max(acr.read),
       func.max(acr.update),
       func.max(acr.delete),
+  ).with_hint(
+      acl, "USE INDEX (ix_person_object)"
   ).filter(
       and_(
           acl.person_id == user.id,
           acl.ac_role_id == acr.id,
       )
   ).group_by(
-      acl.object_id,
       acl.object_type,
+      acl.object_id,
   )
 
   for object_type, object_id, read, update, delete in access_control_list:
