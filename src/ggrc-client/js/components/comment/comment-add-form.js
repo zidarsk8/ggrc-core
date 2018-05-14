@@ -8,6 +8,7 @@ import './comment-add-button';
 import Permission from '../../permission';
 import template from './comment-add-form.mustache';
 import {COMMENT_CREATED} from '../../events/eventTypes';
+import tracker from '../../tracker';
 
 const tag = 'comment-add-form';
 
@@ -66,6 +67,10 @@ export default can.Component.extend({
     onCommentCreated: function (e) {
       let comment = e.comment;
       let self = this;
+
+      tracker.start(self.attr('instance.type'),
+        tracker.USER_JOURNEY_KEYS.INFO_PANE,
+        tracker.USER_ACTIONS.INFO_PANE.ADD_COMMENT);
 
       self.attr('isSaving', true);
       comment = self.updateComment(comment);

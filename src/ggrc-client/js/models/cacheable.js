@@ -17,6 +17,7 @@ import {
 import resolveConflict from './cacheable_conflict_resolution.js';
 import PersistentNotifier from '../plugins/persistent_notifier';
 import RefreshQueue from './refresh_queue';
+import tracker from '../tracker';
 
 (function (can, GGRC, CMS) {
   let _oldAttr;
@@ -1090,6 +1091,9 @@ import RefreshQueue from './refresh_queue';
           dfd: can.Deferred(),
           fn: _.throttle(function () {
             let dfd = that._pending_refresh.dfd;
+            let stopFn = tracker.start(that.type,
+              tracker.USER_JOURNEY_KEYS.API,
+              tracker.USER_ACTIONS.LOAD_OBJECT);
             can.ajax({
               url: href,
               params: params,
@@ -1100,9 +1104,11 @@ import RefreshQueue from './refresh_queue';
               .then($.proxy(that.constructor, 'model'))
               .done(function (response) {
                 response.backup();
+                stopFn();
                 dfd.resolve(...arguments);
               })
               .fail(function () {
+                stopFn(true);
                 dfd.reject(...arguments);
               })
               .always(function () {

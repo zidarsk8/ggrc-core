@@ -4,6 +4,8 @@
 */
 
 import * as pickerUtils from '../../../plugins/utils/gdrive-picker-utils';
+import tracker from '../../../tracker';
+
 
 describe('GGRC.Components.gDrivePickerLauncher', function () {
   'use strict';
@@ -15,6 +17,7 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
 
   beforeEach(function () {
     viewModel = GGRC.Components.getViewModel('gDrivePickerLauncher');
+    spyOn(tracker, 'start').and.returnValue(() => {});
   });
 
   describe('onClickHandler() method', function () {

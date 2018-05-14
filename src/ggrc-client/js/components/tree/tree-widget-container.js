@@ -296,7 +296,7 @@ viewModel = can.Map.extend({
     let request = this.attr('advancedSearch.request');
     const stopFn = tracker.start(this.attr('modelName'),
       tracker.USER_JOURNEY_KEYS.LOADING,
-      `${tracker.USER_ACTIONS.TREE_VIEW_PAGE_LOADING}
+      `${tracker.USER_ACTIONS.TREEVIEW.TREE_VIEW_PAGE_LOADING}
        with ${page.pageSize} items`);
 
     pageInfo.attr('disabled', true);
@@ -377,8 +377,8 @@ viewModel = can.Map.extend({
   },
   onFilter: function () {
     const stopFn = tracker.start(this.attr('modelName'),
-      tracker.USER_JOURNEY_KEYS.LOADING,
-      tracker.USER_ACTIONS.MULTISELECT_FILTER);
+      tracker.USER_JOURNEY_KEYS.TREEVIEW,
+      tracker.USER_ACTIONS.TREEVIEW.FILTER);
     this.attr('pageInfo.current', 1);
     this.loadItems().then(stopFn);
     this.closeInfoPane();
