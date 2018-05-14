@@ -7,6 +7,7 @@ from selenium.common import exceptions
 from lib import base, decorator
 from lib.constants import locator
 from lib.page import widget_bar, lhn
+from lib.utils import selenium_utils
 
 
 class UserList(base.Component):
@@ -98,10 +99,11 @@ class GenericHeader(base.Component):
 
   def close_lhn_menu(self):
     """Closes LHN on Dashboard.
-    Return: LhnMenu
     """
     try:
       self.toggle_lhn_menu.toggle(on_el=False)
+      selenium_utils.wait_until_element_invisible(
+          self._driver, locator.LhnMenu.HOLDER)
     except exceptions.WebDriverException:
       self._refresh_elements()
       self.close_lhn_menu()

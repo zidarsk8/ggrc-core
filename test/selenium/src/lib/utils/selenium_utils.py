@@ -98,6 +98,11 @@ def wait_until_element_visible(driver, locator):
   wait_until_condition(driver, EC.visibility_of_element_located(locator))
 
 
+def wait_until_element_invisible(driver, locator):
+  """Wait until element for given locator are present in DOM and visible."""
+  wait_until_condition(driver, EC.invisibility_of_element_located(locator))
+
+
 def wait_until_not_present(driver, locator):
   """Wait until no element(-s) for locator given are present in DOM."""
   wait_until_condition(driver, lambda d: len(d.find_elements(*locator)) == 0)
