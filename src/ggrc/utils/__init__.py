@@ -66,7 +66,7 @@ def as_json(obj, **kwargs):
 
 def service_for(obj):
   module = sys.modules['ggrc.services']
-  if type(obj) is str or type(obj) is unicode:  # noqa
+  if isinstance(obj, str) or isinstance(obj, unicode):  # noqa
     model_type = obj
   else:
     model_type = obj.__class__.__name__
@@ -86,7 +86,7 @@ def url_for(obj, id=None):
 
 def view_service_for(obj):
   module = sys.modules['ggrc.views']
-  if type(obj) is str or type(obj) is unicode:  # noqa
+  if isinstance(obj, str) or isinstance(obj, unicode):  # noqa
     model_type = obj
   else:
     model_type = obj.__class__.__name__
@@ -107,13 +107,13 @@ def view_url_for(obj, id=None):
 def encoded_dict(in_dict):
   # http://stackoverflow.com/questions/6480723/urllib-urlencode-doesn't-like-unicode-values-how-about-this-workaround
   out_dict = {}
-  for k, v in in_dict.iteritems():
-    if isinstance(v, unicode):  # noqa
-      v = v.encode('utf8')
-    elif isinstance(v, str):
+  for key, value in in_dict.iteritems():
+    if isinstance(value, unicode):  # noqa
+      value = value.encode('utf8')
+    elif isinstance(value, str):
       # Must be encoded in UTF-8
-      v.decode('utf8')
-    out_dict[k] = v
+      value.decode('utf8')
+    out_dict[key] = value
   return out_dict
 
 
