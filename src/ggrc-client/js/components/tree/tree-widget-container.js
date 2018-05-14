@@ -295,9 +295,8 @@ viewModel = can.Map.extend({
     };
     let request = this.attr('advancedSearch.request');
     const stopFn = tracker.start(this.attr('modelName'),
-      tracker.USER_JOURNEY_KEYS.LOADING,
-      `${tracker.USER_ACTIONS.TREEVIEW.TREE_VIEW_PAGE_LOADING}
-       with ${page.pageSize} items`);
+      tracker.USER_JOURNEY_KEYS.TREEVIEW,
+      tracker.USER_ACTIONS.TREEVIEW.TREE_VIEW_PAGE_LOADING(page.pageSize));
 
     pageInfo.attr('disabled', true);
     this.attr('loading', true);
