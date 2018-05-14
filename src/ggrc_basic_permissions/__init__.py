@@ -345,6 +345,7 @@ def load_access_control_list(user, permissions):
       and_(
           acl.person_id == user.id,
           acl.ac_role_id == acr.id,
+          acl.object_type != all_models.Relationship.__name__,
       )
   ).group_by(
       acl.object_type,
