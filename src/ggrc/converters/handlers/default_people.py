@@ -86,7 +86,13 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
       return self._parse_label_values()
 
   def set_obj_attr(self):
-    """Set default_assignees and default_verifiers attributes."""
+    """Set default_assignees and default_verifiers attributes.
+
+    Note that default_assignees and default_verifiers are not actual
+    properties on the object that get stored. These are used as temporary
+    placeholders and the property default_people, gets set using these
+    two values, in check_assessment_template pre commit hook.
+    """
     setattr(self.row_converter.obj, self.key, self.value)
 
   def get_value(self):
