@@ -7,7 +7,7 @@ import collections
 from google.appengine.ext import testbed
 
 from ggrc import models, db
-from ggrc.utils import QueryCounter
+from ggrc.utils import QueryCounter, DATE_FORMAT_US
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
@@ -99,7 +99,7 @@ class TestExportSnapshots(TestCase):
             "Code": u"*" + control.slug,
             "Revision Date": unicode(snapshot.revision.created_at),
             "Description": control.description,
-            "Effective Date": control.start_date.strftime("%m/%d/%Y"),
+            "Effective Date": control.start_date.strftime(DATE_FORMAT_US),
             "Fraud Related": u"yes" if control.fraud_related else u"no",
             "Frequency": control.verify_frequency.display_name,
             "Kind/Nature": control.kind.display_name,
@@ -137,9 +137,8 @@ class TestExportSnapshots(TestCase):
             "Secondary Contacts": u"creator@example.com",
             "Principal Assignees": u"creator@example.com",
             "Secondary Assignees": u"creator@example.com",
-            'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
-            'Last Updated Date':
-                control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
+            'Created Date': control.created_at.strftime(DATE_FORMAT_US),
+            'Last Updated Date': control.updated_at.strftime(DATE_FORMAT_US),
             'Last Updated By': control.modified_by.email,
         }
         for snapshot, control in zip(snapshots, controls)
@@ -257,9 +256,8 @@ class TestExportSnapshots(TestCase):
             "Secondary Contacts": u"",
             "Principal Assignees": u"",
             "Secondary Assignees": u"",
-            'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
-            'Last Updated Date':
-                control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
+            'Created Date': control.created_at.strftime(DATE_FORMAT_US),
+            'Last Updated Date': control.updated_at.strftime(DATE_FORMAT_US),
             'Last Updated By': "",
             "Folder": u"",
         }
@@ -452,9 +450,8 @@ class TestExportSnapshots(TestCase):
           "Assertions": u"",
           "Categories": u"",
           "Document File": u"",
-          'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
-          'Last Updated Date':
-              control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
+          'Created Date': control.created_at.strftime(DATE_FORMAT_US),
+          'Last Updated Date': control.updated_at.strftime(DATE_FORMAT_US),
           'Last Updated By': "",
           "Folder": u"",
       }

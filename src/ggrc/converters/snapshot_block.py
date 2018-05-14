@@ -29,6 +29,8 @@ class SnapshotBlockConverter(object):
   DATE_FIELDS = {
       "start_date",
       "end_date",
+      "updated_at",
+      "created_at",
       "last_assessment_date",
   }
 
@@ -286,7 +288,8 @@ class SnapshotBlockConverter(object):
         return u""
       if "T" in val or " " in val:
         # values in format of "YYYY-MM-DDThh:mm:ss" and "YYYY-MM-DD hh:mm:ss"
-        return val.replace("T", " ")
+        # since we only need date we will leave the time part behind
+        val, _ = val.replace("T", " ").split(" ")
       return utils.iso_to_us_date(val)
     elif AttributeInfo.ALIASES_PREFIX in name:
       _, role_name = name.split(":")
