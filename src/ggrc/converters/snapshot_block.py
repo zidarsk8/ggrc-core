@@ -32,6 +32,7 @@ class SnapshotBlockConverter(object):
       "updated_at",
       "created_at",
       "last_assessment_date",
+      "revision_date"
   }
 
   CUSTOM_SNAPSHOT_ALIASES = {
