@@ -118,14 +118,14 @@ let ApprovalWorkflow = can.Observe({
           aws[0].instance.refresh(),
           $.when.apply(
             $,
-            can.map(aws[0].instance.task_groups.reify(), function(tg) {
+            can.map(aws[0].instance.task_groups.reify(), function (tg) {
               return tg.refresh();
             })
-          ).then(function() {
-            return $.when.apply($, can.map(can.makeArray(arguments), function(tg) {
-              return tg.attr('contact', that.contact).save().then(function(tg) {
-                return $.when.apply($, can.map(tg.task_group_tasks.reify(), function(tgt) {
-                  return tgt.refresh().then(function(tgt) {
+          ).then(function () {
+            return $.when.apply($, can.map(can.makeArray(arguments), function (tg) {
+              return tg.attr('contact', that.contact).save().then(function (tg) {
+                return $.when.apply($, can.map(tg.task_group_tasks.reify(), function (tgt) {
+                  return tgt.refresh().then(function (tgt) {
 
                     return tgt.attr({
                       'access_control_list': [{
@@ -182,11 +182,11 @@ export default ModalsController({
     },
   },
 }, {
-  init : function() {
+  init : function () {
     this.options.button_view = BUTTON_VIEW_SAVE_CANCEL;
     this._super.apply(this, arguments);
   },
-  'input[null-if-empty] change' : function(el, ev) {
+  'input[null-if-empty] change' : function (el, ev) {
     if(el.val() === '') {
       this.options.instance.attr(el.attr('name').split('.').slice(0, -1).join('.'), null);
     }

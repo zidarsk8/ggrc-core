@@ -6,7 +6,7 @@
 //= require can.jquery-all
 //= require models/cacheable
 
-(function(can) {
+(function (can) {
 
   can.Model.Cacheable('CMS.Models.NotificationConfig', {
     root_object: 'notification_config',
@@ -19,13 +19,13 @@
     destroy: 'DELETE /api/notification_configs/{id}',
     active: 'POST /api/set_active_notifications',
 
-    findActive: function(){
+    findActive: function (){
       if(GGRC.current_user === null || GGRC.current_user === undefined){
         return $.when([]);
       }
       return this.findAll({person_id: GGRC.current_user.id});
     },
-    setActive: function(active){
+    setActive: function (active){
       let existing_types, all_types, valid_types;
 
       if(!GGRC.current_user){
@@ -33,16 +33,16 @@
         return $.when();
       }
 
-      valid_types = $.map($('input[name=notifications]'), function(input){
+      valid_types = $.map($('input[name=notifications]'), function (input){
         return input.value;
       });
 
-      return this.findActive().then(function(configs){
+      return this.findActive().then(function (configs){
 
-        existing_types = $.map(configs, function(config){
+        existing_types = $.map(configs, function (config){
           return config.notif_type;
         });
-        all_types = $.map(valid_types, function(type){
+        all_types = $.map(valid_types, function (type){
           let index = existing_types.indexOf(type);
           if(index == -1){
             // Create a new notificationConfig if it doesn't exist yet
@@ -55,7 +55,7 @@
           }
           return configs[index];
         });
-        return $.when.apply($, $.map(all_types, function(config){
+        return $.when.apply($, $.map(all_types, function (config){
           let enabled = active.indexOf(config.notif_type) != -1;
           if(config.attr('enable_flag') === enabled){
             // There was no change to this config object
@@ -66,7 +66,7 @@
             config.attr('enable_flag', enabled);
             return config.save();
           }
-          return config.refresh().then(function(refreshed_config){
+          return config.refresh().then(function (refreshed_config){
             refreshed_config.attr('enable_flag', enabled);
             return refreshed_config.save();
           });

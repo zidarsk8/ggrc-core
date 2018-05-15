@@ -5,7 +5,7 @@
 
 import PersistentNotifier from './plugins/persistent_notifier';
 
-(function(GGRC, moment) {
+(function (GGRC, moment) {
   GGRC.mustache_path = '/static/mustache';
 
   GGRC.hooks = GGRC.hooks || {};
@@ -17,7 +17,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
     GGRC.default_widgets = [];
   }
 
-  GGRC.register_hook = function(path, hook) {
+  GGRC.register_hook = function (path, hook) {
     let h, parent_path, last;
     parent_path = path.split('.');
     last = parent_path.pop();
@@ -38,22 +38,22 @@ import PersistentNotifier from './plugins/persistent_notifier';
       return message;
     },
     notifier = new PersistentNotifier({
-      while_queue_has_elements: function() {
+      while_queue_has_elements: function () {
         window.onbeforeunload = onbeforeunload;
       },
-      when_queue_empties: function() {
+      when_queue_empties: function () {
         window.onbeforeunload = $.noop;
       },
       name: 'GGRC/window',
     });
 
   $.extend(GGRC, {
-    get_object_type_decision_tree: function() {
+    get_object_type_decision_tree: function () {
       let tree = {},
         extensions = GGRC.extensions || []
       ;
 
-      can.each(extensions, function(extension) {
+      can.each(extensions, function (extension) {
         if (extension.object_type_decision_tree) {
           if (can.isFunction(extension.object_type_decision_tree)) {
             $.extend(tree, extension.object_type_decision_tree());
@@ -66,13 +66,13 @@ import PersistentNotifier from './plugins/persistent_notifier';
       return tree;
     },
 
-    infer_object_type: function(data) {
+    infer_object_type: function (data) {
       let decision_tree = GGRC.get_object_type_decision_tree();
 
       function resolve_by_key(subtree, data) {
         let kind = data[subtree._key];
         let model;
-        can.each(subtree, function(v, k) {
+        can.each(subtree, function (v, k) {
           if (k != '_key' && v.meta_kinds.indexOf(kind) >= 0) {
             model = v;
           }
@@ -96,7 +96,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
         }, null);
       }
     },
-    make_model_instance: function(data) {
+    make_model_instance: function (data) {
       if (!data) {
         return null;
       } else if (!!GGRC.page_model && GGRC.page_object === data) {
@@ -106,7 +106,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
       }
     },
 
-    page_instance: function() {
+    page_instance: function () {
       if (!GGRC._page_instance && GGRC.page_object) {
         GGRC._page_instance = GGRC.make_model_instance(GGRC.page_object);
       }
@@ -117,7 +117,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
     eventqueueTimeout: null,
     eventqueueTimegap: 20, //ms
 
-    queue_exec_next: function() {
+    queue_exec_next: function () {
       let fn = GGRC.eventqueue.shift();
       if (fn)
         fn();
@@ -127,7 +127,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
         GGRC.eventqueueTimeout = null;
     },
 
-    queue_event: function(events) {
+    queue_event: function (events) {
       if (typeof (events) === 'function')
         events = [events];
       GGRC.eventqueue.push.apply(GGRC.eventqueue, events);
@@ -135,7 +135,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
         GGRC.eventqueueTimeout = setTimeout(GGRC.queue_exec_next, GGRC.eventqueueTimegap);
     },
 
-    navigate: function(url) {
+    navigate: function (url) {
       function go() {
         if (!url) {
           window.location.reload();
@@ -219,7 +219,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
 
       @return the sum of the numbers represented in a and b, as a decimal notation string.
     */
-    string_add: function(a, b) {
+    string_add: function (a, b) {
       let _a, _b, i,
         _c = 0,
         ret = [],
@@ -270,7 +270,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
 
       @return one half of the number represented in a, as a decimal notation string.
     */
-    string_half: function(a) {
+    string_half: function (a) {
       let i, _a,
         _c = 0,
         ret = [];
@@ -310,7 +310,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
 
       @return the maximum of the numbers represented in a and b, as a decimal notation string.
     */
-    string_max: function(a, b) {
+    string_max: function (a, b) {
       return this.string_less_than(a, b) ? b : a;
     },
 
@@ -320,7 +320,7 @@ import PersistentNotifier from './plugins/persistent_notifier';
 
       @return true if the number represented in a is less than that in b, false otherwise
     */
-    string_less_than: function(a, b) {
+    string_less_than: function (a, b) {
       let i,
         _a = ('' + a).replace(/^0*/, ''),
         _b = ('' + b).replace(/^0*/, ''),

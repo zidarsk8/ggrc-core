@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function(can) {
+(function (can) {
 
   can.Model.Cacheable('CMS.Models.Directive', {
     root_object : 'directive'
@@ -24,7 +24,7 @@
       , add_item_view : GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
     }
 
-    , model : function(params) {
+    , model : function (params) {
       if (this.shortName !== 'Directive')
         return this._super(params);
       if (!params)
@@ -57,18 +57,18 @@
     }
     , defaults : {
     }
-    , init : function() {
+    , init : function () {
       this.validateNonBlank('title');
       //this.validateInclusionOf("kind", this.meta_kinds);
       this._super.apply(this, arguments);
     }
     , meta_kinds : [],
   }, {
-    init : function() {
+    init : function () {
       this._super && this._super.apply(this, arguments);
       let that = this;
     }
-    , lowercase_kind : function() { return this.kind ? this.kind.toLowerCase() : undefined; },
+    , lowercase_kind : function () { return this.kind ? this.kind.toLowerCase() : undefined; },
   });
 
   CMS.Models.Directive('CMS.Models.Standard', {

@@ -3,8 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-;(function(can, $, GGRC, CMS) {
-  GGRC.register_modal_hook('approvalform', function($target, $trigger, option) {
+;(function (can, $, GGRC, CMS) {
+  GGRC.register_modal_hook('approvalform', function ($target, $trigger, option) {
     let instance,
       object_params = JSON.parse($trigger.attr('data-object-params') || '{}');
 
@@ -31,8 +31,8 @@
 
 //Calendar authentication
 
-jQuery(function($){
-  $('body').on('click', '.calendar-auth', function(e) {
+jQuery(function ($){
+  $('body').on('click', '.calendar-auth', function (e) {
     let calenderAuthWin = null,
       href = window.location.origin + '/calendar_oauth_request', //"https://ggrc-dev.googleplex.com/calendar_oauth_request"
       name = 'Calendar Authentication';

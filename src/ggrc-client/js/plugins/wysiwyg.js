@@ -8,8 +8,8 @@ import 'wysihtml5/bootstrap-wysihtml5-0.0.2';
 import '../bootstrap/wysihtml5.js';
 import wysihtml5ParserRules from 'wysihtml5/advanced';
 
-(function($) {
-  $.fn.cms_wysihtml5 = function() {
+(function ($) {
+  $.fn.cms_wysihtml5 = function () {
     if ($(this).data('_wysihtml5_initialized')) {
       return;
     }
@@ -24,7 +24,7 @@ import wysihtml5ParserRules from 'wysihtml5/advanced';
       'font-styles': false,
       parserRules: wysihtml5ParserRules,
     });
-    this.each(function() {
+    this.each(function () {
       let $that = $(this),
         editor = $that.data('wysihtml5').editor,
         $textarea = $(editor.textarea.element);
@@ -32,7 +32,7 @@ import wysihtml5ParserRules from 'wysihtml5/advanced';
       if ($that.data('cms_events_bound')) {
         return;
       }
-      editor.on('beforeinteraction:composer', function() {
+      editor.on('beforeinteraction:composer', function () {
         $that.val(this.getValue()).trigger('change');
       });
 
@@ -41,7 +41,7 @@ import wysihtml5ParserRules from 'wysihtml5/advanced';
         minHeight: 100,
         alsoResize: '#' + $that.uniqueId().attr('id') + ', #' + $that.closest('.wysiwyg-area').uniqueId().attr('id') + ' iframe',
         autoHide: false,
-      }).bind('resizestop', function(ev) {
+      }).bind('resizestop', function (ev) {
         ev.stopPropagation();
         $that.css({
           'display': 'block',
@@ -54,7 +54,7 @@ import wysihtml5ParserRules from 'wysihtml5/advanced';
       let $sandbox = $wysiarea.find('.wysihtml5-sandbox');
 
       $($sandbox.prop('contentWindow'))
-        .bind('mouseover mousemove mouseup', function(ev) {
+        .bind('mouseover mousemove mouseup', function (ev) {
           let e = new $.Event(ev.type === 'mouseup' ? 'mouseup' : 'mousemove'); //jQUI resize listens on this.
           e.pageX = $sandbox.offset().left + ev.pageX;
           e.pageY = $sandbox.offset().top + ev.pageY;

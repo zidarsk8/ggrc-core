@@ -4,7 +4,7 @@
 */
 
 
-(function(can) {
+(function (can) {
 
   can.Model.Cacheable('CMS.Models.Workflow', {
     root_object: 'workflow',
@@ -54,7 +54,7 @@
       adminRoleName: 'Admin',
     },
 
-    init: function() {
+    init: function () {
       this._super && this._super.apply(this, arguments);
       this.validateNonBlank('title');
     },
