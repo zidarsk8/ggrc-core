@@ -24,7 +24,6 @@ from ggrc.models.mixins import clonable
 from ggrc.models.mixins import WithLastDeprecatedDate
 from ggrc.models.object_person import Personable
 from ggrc.models.program import Program
-from ggrc.models.person import Person
 from ggrc.models.relationship import Relatable
 from ggrc.models.snapshot import Snapshotable
 
@@ -73,7 +72,7 @@ class Audit(Snapshotable,
   assessments = db.relationship('Assessment', backref='audit')
   issues = db.relationship('Issue', backref='audit')
   archived = deferred(db.Column(db.Boolean,
-                      nullable=False, default=False), 'Audit')
+                                nullable=False, default=False), 'Audit')
   assessment_templates = db.relationship('AssessmentTemplate', backref='audit')
 
   _api_attrs = reflection.ApiAttributes(
@@ -216,18 +215,9 @@ class Audit(Snapshotable,
       return value
 
     if self.archived is not None and self.archived != value and \
-       not any(acl for acl in list(self.full_access_control_list)
-               if acl.ac_role.name.startswith("Program Managers*") and
+       not any(acl for acl in list(self.program.access_control_list)
+               if acl.ac_role.name == "Program Managers" and
                acl.person.id == user.id):
-      # NOTE: the check above should not use full_access_control_list and check
-      # for the role should be done as:
-      # acl.ac_role.parent.parent.name == "Program Managers"
-      # or:
-      # acl.parent.parent.ac_role.name == "Program Managers"
-      # to ensure the current acl entry was propagated from program managers
-      # this check is done with startswith as an optimization to prevent too
-      # many queries until we create a link to base propagated role or acl
-      # entry.
       raise Forbidden()
     return value
 
@@ -237,16 +227,6 @@ class Audit(Snapshotable,
     return Program.query.filter(
         (Program.id == Audit.program_id) &
         (predicate(Program.slug) | predicate(Program.title))
-    ).exists()
-
-  @classmethod
-  def _filter_by_auditor(cls, predicate):
-    """Helper for filtering by auditor"""
-    from ggrc_basic_permissions.models import Role, UserRole
-    return UserRole.query.join(Role, Person).filter(
-        (Role.name == "Auditor") &
-        (UserRole.context_id == cls.context_id) &
-        (predicate(Person.name) | predicate(Person.email))
     ).exists()
 
   @classmethod

@@ -18,7 +18,8 @@ from exceptions import TypeError
 from wsgiref.handlers import format_date_time
 from urllib import urlencode
 
-from flask import url_for, request, current_app, g, has_request_context
+import flask
+from flask import url_for, request, current_app, has_request_context
 from flask.views import View
 from flask.ext.sqlalchemy import Pagination
 import sqlalchemy.orm.exc
@@ -554,6 +555,9 @@ class Resource(ModelView):
       raise BadRequest('Required attribute "{0}" not found'.format(
           root_attribute))
 
+    with benchmark("Set referenced_stubs"):
+      flask.g.referenced_object_stubs = self._gather_referenced_objects(src)
+
     with benchmark("Deserialize object"):
       self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
@@ -947,11 +951,11 @@ class Resource(ModelView):
 
   def _build_request_stub_cache(self, data):
     objects = self._gather_referenced_objects(data)
-    g.referenced_objects = {}
+    flask.g.referenced_objects = {}
     for class_name, ids in objects.items():
       class_ = getattr(ggrc.models, class_name, None)
       if hasattr(class_, "query"):
-        g.referenced_objects[class_] = {
+        flask.g.referenced_objects[class_] = {
             obj.id: obj for obj in class_.query.filter(class_.id.in_(ids))
         }
 
@@ -1105,8 +1109,8 @@ class Resource(ModelView):
           res.append((getattr(error, "code", 500), error.message))
           logger.warning("Collection POST commit failed", exc_info=True)
           db.session.rollback()
-        if hasattr(g, "referenced_objects"):
-          delattr(g, "referenced_objects")
+        if hasattr(flask.g, "referenced_objects"):
+          delattr(flask.g, "referenced_objects")
       with benchmark("collection post > calculate response statuses"):
         errors = []
         if wrap:

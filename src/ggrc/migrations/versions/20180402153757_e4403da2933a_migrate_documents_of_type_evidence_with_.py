@@ -20,7 +20,7 @@ from ggrc.migrations.utils import migrator
 # revision identifiers, used by Alembic.
 
 revision = 'e4403da2933a'
-down_revision = '3db5f2027c92'
+down_revision = 'e5f737f2a428'
 
 
 def get_audit_docs_ids(connection):
