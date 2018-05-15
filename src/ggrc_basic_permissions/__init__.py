@@ -338,13 +338,18 @@ def load_access_control_list(user, permissions):
       acl.object_id,
       func.max(acr.read),
       func.max(acr.update),
-      func.max(acr.delete)
-  ).filter(and_(
-      all_models.AccessControlList.person_id == user.id,
-      all_models.AccessControlList.ac_role_id == acr.id)
+      func.max(acr.delete),
+  ).with_hint(
+      acl, "USE INDEX (ix_person_object)"
+  ).filter(
+      and_(
+          acl.person_id == user.id,
+          acl.ac_role_id == acr.id,
+          acl.object_type != all_models.Relationship.__name__,
+      )
   ).group_by(
-      all_models.AccessControlList.object_id,
-      all_models.AccessControlList.object_type
+      acl.object_type,
+      acl.object_id,
   )
 
   for object_type, object_id, read, update, delete in access_control_list:

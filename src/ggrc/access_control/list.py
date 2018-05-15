@@ -69,4 +69,5 @@ class AccessControlList(mixins.Base, db.Model):
             'person_id', 'ac_role_id', 'object_id', 'object_type', 'parent_id'
         ),
         db.Index('idx_object_type_object_idx', 'object_type', 'object_id'),
+        db.Index('ix_person_object', 'person_id', 'object_type', 'object_id'),
     )
