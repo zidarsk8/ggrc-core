@@ -121,6 +121,7 @@ class TestAssessmentImport(TestCase):
     self.assertEqual(verification_errors, "", verification_errors)
 
   def _test_assigned_user(self, assessment, user_id, role):
+    """Check if user has role on assessment"""
     acls = all_models.AccessControlList.query.filter_by(
         person_id=user_id,
         object_id=assessment.id,
