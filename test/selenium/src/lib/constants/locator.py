@@ -188,6 +188,7 @@ class LhnMenu(object):
   LHN_MENU = (By.ID, "lhn")
   MODAL = (By.CSS_SELECTOR, '[id="ajax-lhn_modal-javascript:--"]')
   EXTENDED_INFO = (By.CSS_SELECTOR, ".extended-info.in .info .fa")
+  HOLDER = (By.CSS_SELECTOR, '.lhs-holder')
   FILTER = (By.CSS_SELECTOR, ".lhs-search")
   FILTER_TEXT_BOX = (By.CSS_SELECTOR, ".lhs-search>.widgetsearch")
   FILTER_SUBMIT_BUTTON = (By.CSS_SELECTOR, ".lhs-search>.widgetsearch-submit")
