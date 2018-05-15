@@ -166,7 +166,7 @@ import {getRole} from '../plugins/utils/acl-utils';
         {attr_title: 'Last Deprecated Date', attr_name: 'last_deprecated_date'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
       ]),
-      display_attr_names: ['title', 'owner', 'status', 'last_assessment_date',
+      display_attr_names: ['title', 'status', 'last_assessment_date',
         'updated_at'],
       add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
       create_link: true,
