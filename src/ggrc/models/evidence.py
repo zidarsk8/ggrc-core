@@ -6,28 +6,26 @@
 from sqlalchemy import orm
 
 from ggrc import db
+from ggrc import login
 from ggrc.access_control.roleable import Roleable
 from ggrc.builder import simple_property
 from ggrc.fulltext import mixin
-from ggrc import login
 from ggrc.models.deferred import deferred
-from ggrc.models.mixins import Slugged
-from ggrc.models.mixins import WithLastDeprecatedDate
+from ggrc.models import comment
+from ggrc.models import exceptions
+from ggrc.models import mixins
+from ggrc.models import reflection
+from ggrc.models.mixins import before_flush_handleable as bfh
 from ggrc.models.mixins.base import Identifiable
 from ggrc.models.mixins.statusable import Statusable
 from ggrc.models.mixins.with_auto_deprecation import WithAutoDeprecation
 from ggrc.models.relationship import Relatable
-from ggrc.models import comment
-from ggrc.models import exceptions
-from ggrc.models import reflection
-from ggrc.models import mixins
 from ggrc.utils import referenced_objects
-from ggrc.models.mixins import before_flush_handleable as bfh
 
 
 class Evidence(Roleable, Relatable, mixins.Titled,
-               bfh.BeforeFlushHandleable, Slugged, Statusable,
-               WithLastDeprecatedDate, comment.Commentable,
+               bfh.BeforeFlushHandleable, mixins.Slugged, Statusable,
+               mixins.WithLastDeprecatedDate, comment.Commentable,
                WithAutoDeprecation, mixin.Indexed, Identifiable, db.Model):
   """Evidence (Audit-scope URLs, FILE's) model."""
   __tablename__ = "evidence"
