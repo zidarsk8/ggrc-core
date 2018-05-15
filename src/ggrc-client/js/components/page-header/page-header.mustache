@@ -17,22 +17,24 @@
   </h2>
 
 <h1 class="entities">
-  {{#if_equals model.table_singular 'person'}}
-    {{#is_dashboard_or_all}}
-      {{#is_dashboard}}
-        My Work
-      {{else}}
-        All Objects
-      {{/is_dashboard}}
+  {{#if isMyWorkPage}}
+    My Work
+  {{/if}}
+  {{#if isAllObjectsPage}}
+    All Objects
+  {{/if}}
+  {{#if isAdminPage}}
+    Admin Dashboard
+  {{/if}}
+  {{#if isObjectPage}}
+    {{#if isPersonPage}}
+      <span class="entity-type">{{model.title_singular}}:</span>
+      <span class="entity-name">{{firstnonempty instance.name instance.email}}</span>
     {{else}}
-        <span class="entity-type">{{model.title_singular}}:</span>
-        <span class="entity-name">{{firstnonempty instance.name instance.email}}</span>
-    {{/is_dashboard_or_all}}
-  {{/if_equals}}
-  {{^if_equals model.table_singular 'person'}}
-    <span class="entity-type">{{model.title_singular}}:</span>
-    <span class="entity-name">{{instance.title}}</span>
-  {{/if_equals}}
+      <span class="entity-type">{{model.title_singular}}:</span>
+      <span class="entity-name">{{instance.title}}</span>
+    {{/if}}
+  {{/if}}
 </h1>
 
 <ul class="menu">
@@ -67,15 +69,13 @@
         ></tasks-counter>
       </div></a>
   </li>
-  {{!^isMyAssessments}}
-    <li>
-      <a href="/assessments_view">
-        <div class="oneline">
-          {{#if showTitles}}My Assessments{{/if}}
-        </div>
-      </a>
-    </li>
-  {{!/isMyAssessments}}
+  <li>
+    <a href="/assessments_view">
+      <div class="oneline">
+        {{#if showTitles}}My Assessments{{/if}}
+      </div>
+    </a>
+  </li>
   {{!^is_allobjectview}}
     <li>
       <a id="allObjectView" href="/objectBrowser#!regulation_widget">
