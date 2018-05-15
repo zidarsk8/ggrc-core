@@ -27,7 +27,7 @@ export const USER_JOURNEY_KEYS = {
 
 // Timing Label in Google Analytics Timing API
 export const USER_ACTIONS = {
-  CREATE_OBJECT: 'Creating new object',
+  CREATE_OBJECT: (count) => `Creating new object(s): ${count}`,
   UPDATE_OBJECT: 'Updating object',
   LOAD_OBJECT: 'Loading object',
   MAPPING_OBJECTS: (count) => `Mapping objects: ${count}`,
@@ -37,7 +37,8 @@ export const USER_ACTIONS = {
   ADVANCED_SEARCH_FILTER: 'Advanced search filter',
   TREEVIEW: {
     FILTER: 'Tree view filter',
-    TREE_VIEW_PAGE_LOADING: 'Loading of tree view page',
+    TREE_VIEW_PAGE_LOADING:
+      (pageSize) => `Loading of tree view page with ${pageSize} items`,
     SUB_TREE_LOADING: 'Loading sub-level of tree view',
   },
   INFO_PANE: {
@@ -48,6 +49,7 @@ export const USER_ACTIONS = {
   LHN: {
     SHOW_LIST: 'LHN: Show list of items',
     SHOW_MORE: 'LHN: Show more items for the list',
+    SEARCH: (area) => `LHN search in ${area}`,
   },
   ASSESSMENT: {
     OPEN_ASMT_GEN_MODAL: 'Open Assessment Generation modal',

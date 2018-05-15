@@ -42,7 +42,7 @@ import tracker from '../tracker';
         let modelType = objs[0].constructor.model_singular;
         let stopFn = tracker.start(modelType,
           tracker.USER_JOURNEY_KEYS.API,
-          `${tracker.USER_ACTIONS.CREATE_OBJECT} : ${objs.length}}`);
+          tracker.USER_ACTIONS.CREATE_OBJECT(objs.length));
         let dfd = $.ajax({
           type: 'POST',
           url: '/api/' + bucket.plural,
