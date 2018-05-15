@@ -7,8 +7,7 @@ import collections
 from google.appengine.ext import testbed
 
 from ggrc import models, db
-from ggrc.utils import QueryCounter, DATE_FORMAT_US, \
-    DATE_FORMAT_OFFSET
+from ggrc.utils import QueryCounter, DATE_FORMAT_US
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
@@ -98,8 +97,7 @@ class TestExportSnapshots(TestCase):
         control.slug: {
             # normal fields
             "Code": u"*" + control.slug,
-            "Revision Date":
-                snapshot.revision.created_at.strftime(DATE_FORMAT_OFFSET),
+            "Revision Date": unicode(snapshot.revision.created_at),
             "Description": control.description,
             "Effective Date": control.start_date.strftime(DATE_FORMAT_US),
             "Fraud Related": u"yes" if control.fraud_related else u"no",
@@ -219,8 +217,7 @@ class TestExportSnapshots(TestCase):
         control.slug: {
             # normal fields
             "Code": "*" + control.slug,
-            "Revision Date":
-                snapshot.revision.created_at.strftime(DATE_FORMAT_OFFSET),
+            "Revision Date": unicode(snapshot.revision.created_at),
             "Description": u"",
             "Effective Date": u"",
             "Fraud Related": u"",
@@ -430,8 +427,7 @@ class TestExportSnapshots(TestCase):
 
       control_dicts[control.slug] = {
           "Code": "*" + control.slug,
-          "Revision Date":
-              snapshot.revision.created_at.strftime(DATE_FORMAT_OFFSET),
+          "Revision Date": unicode(snapshot.revision.created_at),
           "Description": u"",
           "Effective Date": u"",
           "Fraud Related": u"",

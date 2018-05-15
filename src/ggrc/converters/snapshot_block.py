@@ -32,11 +32,6 @@ class SnapshotBlockConverter(object):
       "updated_at",
       "created_at",
       "last_assessment_date",
-      "revision_date"
-  }
-
-  DATE_FIELDS_ISO = {
-      "revision_date"
   }
 
   CUSTOM_SNAPSHOT_ALIASES = {
@@ -291,9 +286,6 @@ class SnapshotBlockConverter(object):
       val = content.get(name)
       if not val:
         return u""
-      if name in self.DATE_FIELDS_ISO:
-        return utils.convert_date_format(val, utils.DATE_FORMAT_ISO_FULL,
-                                         utils.DATE_FORMAT_OFFSET)
       if "T" in val or " " in val:
         # values in format of "YYYY-MM-DDThh:mm:ss" and "YYYY-MM-DD hh:mm:ss"
         # since we only need date we will leave the time part behind
