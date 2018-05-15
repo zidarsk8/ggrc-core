@@ -9,3 +9,5 @@ long_query_time     = 0.5
 slow_query_log_file = /tmp/slow_query.log
 
 innodb_print_all_deadlocks = 1
+
+innodb_lock_wait_timeout=1000
