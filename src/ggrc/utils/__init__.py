@@ -64,7 +64,7 @@ def as_json(obj, **kwargs):
 
 def service_for(obj):
   module = sys.modules['ggrc.services']
-  if isinstance(obj, str) or isinstance(obj, unicode):  # noqa
+  if isinstance(obj, (str, uncode)):  # noqa
     model_type = obj
   else:
     model_type = obj.__class__.__name__
@@ -84,7 +84,7 @@ def url_for(obj, id=None):
 
 def view_service_for(obj):
   module = sys.modules['ggrc.views']
-  if isinstance(obj, str) or isinstance(obj, unicode):  # noqa
+  if isinstance(obj, (str, uncode)):  # noqa
     model_type = obj
   else:
     model_type = obj.__class__.__name__
