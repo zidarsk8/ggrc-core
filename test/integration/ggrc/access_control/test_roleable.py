@@ -6,7 +6,6 @@ import ddt
 from ggrc import db
 from ggrc.models import all_models
 from integration.ggrc import TestCase
-from integration.ggrc import api_helper
 from integration.ggrc.models import factories
 
 
@@ -95,38 +94,3 @@ class TestAccessControlRoleable(TestCase):
         (person_2.id, role.id),
         (person_3.id, role.id)
     ], acls)
-
-  def test_full_access_control_list(self):
-    """Test if access_control_list property filters out propagated roles
-
-       Before sending the access_control_list to the frontend, propagated roles
-       need to be filtered out to help prevent performance issues"""
-    with factories.single_commit():
-      # Create an object with one external and one propagated role
-      obj = factories.ControlFactory()
-      acl = factories.AccessControlListFactory(
-          object=obj,
-          ac_role=self.role,
-          person=self.person
-      )
-      factories.AccessControlListFactory(
-          object=obj,
-          ac_role=self.role,
-          person=self.person,
-          parent=acl
-      )
-    # full_access_control_list should have all rows:
-    self.assertEqual(len(obj.full_access_control_list), 2,
-                     "full_access_control_list doesn't include all roles")
-    # access_control_list should only have non propagated ones
-    self.assertEqual(len(obj.access_control_list), 1,
-                     "access_control_list doesn't include all the roles")
-    obj_id, acl_id = obj.id, acl.id
-    api = api_helper.Api()
-    response = api.get(all_models.Control, obj_id)
-    acl = response.json["control"]["access_control_list"]
-    # Check if the response filtered out the propagated access_control_role
-    self.assertEqual(len(acl), 1,
-                     "acl didn't filter out propagated roles correctly")
-    self.assertEqual(acl[0]["id"], acl_id,
-                     "acl didn't filter out propagated roles correctly")

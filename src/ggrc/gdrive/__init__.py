@@ -45,7 +45,7 @@ def get_http_auth():
   try:
     credentials = client.OAuth2Credentials.from_json(
         flask.session['credentials'])
-    http_auth = credentials.authorize(httplib2.Http())
+    http_auth = credentials.authorize(httplib2.Http(timeout=45))
   except Exception as ex:
     logger.exception(ex.message)
     del flask.session['credentials']

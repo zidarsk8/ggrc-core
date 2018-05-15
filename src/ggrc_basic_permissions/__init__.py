@@ -6,14 +6,10 @@
 import datetime
 import itertools
 
-import sqlalchemy.orm
-from sqlalchemy import and_
-from sqlalchemy import func
-from sqlalchemy import literal
-from sqlalchemy import or_
-from sqlalchemy.orm import aliased
-from flask import Blueprint
-from flask import g
+import flask
+import sqlalchemy as sa
+from sqlalchemy import orm
+
 
 from ggrc import db
 from ggrc import settings
@@ -38,7 +34,7 @@ from ggrc_basic_permissions.models import Role
 from ggrc_basic_permissions.models import UserRole
 
 
-blueprint = Blueprint(
+blueprint = flask.Blueprint(
     'permissions',
     __name__,
     template_folder='templates',
@@ -84,11 +80,11 @@ class UserPermissions(DefaultUserPermissions):
 
   @property
   def _request_permissions(self):
-    return getattr(g, '_request_permissions', None)
+    return getattr(flask.g, '_request_permissions', None)
 
   @_request_permissions.setter
   def _request_permissions(self, value):
-    setattr(g, '_request_permissions', value)
+    setattr(flask.g, '_request_permissions', value)
 
   def _permissions(self):
     self.check_permissions()
@@ -283,9 +279,9 @@ def load_user_roles(user, permissions):
   # Add permissions from all DB-managed roles
   user_roles = db.session.query(UserRole)\
       .options(
-          sqlalchemy.orm.undefer_group('UserRole_complete'),
-          sqlalchemy.orm.undefer_group('Role_complete'),
-          sqlalchemy.orm.joinedload('role'))\
+          orm.undefer_group('UserRole_complete'),
+          orm.undefer_group('Role_complete'),
+          orm.joinedload('role'))\
       .filter(UserRole.person_id == user.id)\
       .order_by(UserRole.updated_at.desc())\
       .all()
@@ -297,7 +293,6 @@ def load_user_roles(user, permissions):
     if isinstance(user_role.role.permissions, dict):
       collect_permissions(
           user_role.role.permissions, user_role.context_id, permissions)
-  return source_contexts_to_rolenames
 
 
 def load_personal_context(user, permissions):
@@ -317,22 +312,58 @@ def load_personal_context(user, permissions):
       .append(personal_context.id)
 
 
+def _get_acl_filter():
+  """Get filter for acl entries.
+
+  This creates a filter to select only acl entries for objects that were
+  specified in the request json.
+
+  If this filter is used we must not store the results of the permissions dict
+  into memcache.
+
+  Returns:
+    list of filter statements.
+  """
+  referenced_object_tuples = []
+  stubs = getattr(flask.g, "referenced_object_stubs", {})
+  additional_filters = []
+  if stubs:
+    for type_, ids in stubs.items():
+      referenced_object_tuples.extend((type_, id_) for id_ in ids)
+    additional_filters.append(
+        sa.tuple_(
+            all_models.AccessControlList.object_type,
+            all_models.AccessControlList.object_id,
+        ).in_(
+            referenced_object_tuples,
+        )
+    )
+  return additional_filters
+
+
 def load_access_control_list(user, permissions):
   """Load permissions from access_control_list"""
   acl = all_models.AccessControlList
   acr = all_models.AccessControlRole
+  additional_filters = _get_acl_filter()
   access_control_list = db.session.query(
       acl.object_type,
       acl.object_id,
-      func.max(acr.read),
-      func.max(acr.update),
-      func.max(acr.delete)
-  ).filter(and_(
-      all_models.AccessControlList.person_id == user.id,
-      all_models.AccessControlList.ac_role_id == acr.id)
+      sa.func.max(acr.read),
+      sa.func.max(acr.update),
+      sa.func.max(acr.delete),
+  ).with_hint(
+      acl, "USE INDEX (ix_person_object)"
+  ).filter(
+      sa.and_(
+          acl.person_id == user.id,
+          acl.ac_role_id == acr.id,
+          acl.object_type != all_models.Relationship.__name__,
+          *additional_filters
+      )
   ).group_by(
-      all_models.AccessControlList.object_id,
-      all_models.AccessControlList.object_type
+      acl.object_type,
+      acl.object_id,
   )
 
   for object_type, object_id, read, update, delete in access_control_list:
@@ -344,31 +375,6 @@ def load_access_control_list(user, permissions):
           .setdefault(object_type, {})\
           .setdefault('resources', set())\
           .add(object_id)
-
-
-def load_backlog_workflows(permissions):
-  """Load permissions for backlog workflows
-
-  Args:
-      permissions (dict): dict where the permissions will be stored
-  Returns:
-      None
-  """
-  # add permissions for backlog workflows to everyone
-  actions = ["read", "edit", "update"]
-  _types = ["Workflow", "Cycle", "CycleTaskGroup",
-            "CycleTaskGroupObjectTask", "TaskGroup", "CycleTaskEntry"]
-  for _, _, wf_context_id in backlog_workflows().all():
-    for _type in _types:
-      if _type == "CycleTaskGroupObjectTask":
-        actions += ["delete"]
-      if _type == "CycleTaskEntry":
-        actions += ["create"]
-      for action in actions:
-        permissions.setdefault(action, {})\
-            .setdefault(_type, {})\
-            .setdefault('contexts', list())\
-            .append(wf_context_id)
 
 
 def store_results_into_memcache(permissions, cache, key):
@@ -437,28 +443,14 @@ def load_permissions_for(user):
   with benchmark("load_permissions > load access control list"):
     load_access_control_list(user, permissions)
 
-  with benchmark("load_permissions > load backlog workflows"):
-    load_backlog_workflows(permissions)
-
-  with benchmark("load_permissions > store results into memcache"):
-    store_results_into_memcache(permissions, cache, key)
+  if not hasattr(flask.g, "referenced_object_stubs"):
+    # In some cases for optimization we only load a small chunk of permissions
+    # and in that case we can not cache the value because it might not contain
+    # the permissions information for any subsequent request.
+    with benchmark("load_permissions > store results into memcache"):
+      store_results_into_memcache(permissions, cache, key)
 
   return permissions
-
-
-def backlog_workflows():
-  """Creates a query that returns all backlog workflows which
-  all users can access.
-
-    Returns:
-        db.session.query object that selects the following columns:
-            | id | type | context_id |
-  """
-  _workflow = aliased(all_models.Workflow, name="wf")
-  return db.session.query(_workflow.id,
-                          literal("Workflow").label("type"),
-                          _workflow.context_id)\
-      .filter(_workflow.kind == "Backlog")
 
 
 def _get_or_create_personal_context(user):
@@ -520,8 +512,8 @@ def handle_program_post(sender, obj=None, src=None, service=None):
 def add_public_program_context_implication(context, check_exists=False):
   if check_exists and db.session.query(ContextImplication)\
       .filter(
-          and_(ContextImplication.context_id == context.id,
-               ContextImplication.source_context_id.is_(None))).count() > 0:
+          sa.and_(ContextImplication.context_id == context.id,
+                  ContextImplication.source_context_id.is_(None))).count() > 0:
     return
   db.session.add(ContextImplication(
       source_context=None,
@@ -588,8 +580,8 @@ def handle_resource_deleted(sender, obj=None, service=None):
         .delete()
     db.session.query(ContextImplication) \
         .filter(
-            or_(ContextImplication.context_id == obj.context_id,
-                ContextImplication.source_context_id == obj.context_id))\
+            sa.or_(ContextImplication.context_id == obj.context_id,
+                   ContextImplication.source_context_id == obj.context_id))\
         .delete()
     # Deleting the context itself is problematic, because unattached objects
     #   may still exist and cause a database error.  Instead of implicitly

@@ -93,6 +93,10 @@ class Api(object):
     if response.status_code == 401:
       self.set_user()
       response = request(api_link, data=json_data, headers=headers.items())
+
+    if hasattr(flask.g, "referenced_object_stubs"):
+      del flask.g.referenced_object_stubs
+
     return self.data_to_json(response)
 
   def put(self, obj, data=None, not_send_fields=None):
