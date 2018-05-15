@@ -169,24 +169,7 @@ import tracker from '../tracker';
     findOne: 'GET {href}',
 
     makeDestroy: function (destroy) {
-      return function (id, instance) {
-        return destroy(id).then(function (result) {
-          if ('background_task' in result) {
-            return CMS.Models.BackgroundTask.findOne({
-              id: result.background_task.id,
-            }).then(function (task) {
-              if (!task) {
-                return;
-              }
-              return task.poll();
-            }).then(function () {
-              return instance;
-            });
-          } else {
-            return instance;
-          }
-        });
-      };
+      return (id) => destroy(id);
     },
 
     makeFindAll: function (finder) {
