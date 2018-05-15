@@ -43,7 +43,7 @@ class TestAssessmentImport(TestCase):
     self._check_csv_response(response, {})
 
     assessment = all_models.Assessment.query.filter(
-      all_models.Assessment.slug == "A 4").first()
+        all_models.Assessment.slug == "A 4").first()
 
     values = set(v.attribute_value for v in assessment.custom_attribute_values)
     self.assertIn("abc", values)
@@ -57,6 +57,20 @@ class TestAssessmentImport(TestCase):
     self.assertEquals(len(evidences), 1)
     self.assertEquals(evidences[0].gdrive_id,
                       "1_J2anxP8_SLMFf1SXyVNriVh25MVgH_LfhFN1wdP1d8")
+
+  def test_add_admin_to_evidence(self):
+    """Test evidence should have current user as admin"""
+    self.import_file("assessment_with_evidence_url.csv")
+    evidences = all_models.Evidence.query.filter(
+        all_models.Evidence.kind == all_models.Evidence.URL).all()
+    self.assertEquals(len(evidences), 1)
+    admin_role = db.session.query(all_models.AccessControlRole).filter_by(
+        name="Admin", object_type="Evidence").one()
+    current_user = db.session.query(all_models.Person).filter_by(
+        email="user@example.com").one()
+    acr = evidences[0].access_control_list[0]
+    self.assertEquals(acr.ac_role_id, admin_role.id)
+    self.assertEquals(acr.person_id, current_user.id)
 
   def test_import_assessment_with_evidence_proper_url2(self):
     """Test import evidence with proper gdrive url pattern '?id='"""
@@ -150,7 +164,8 @@ class TestAssessmentImport(TestCase):
     audit = [obj for obj in asmt_1.related_objects() if obj.type == "Audit"][0]
     self.assertEqual(audit.context, asmt_1.context)
 
-    evidence = all_models.Evidence.query.filter_by(title="some title 2").first()
+    evidence = all_models.Evidence.query.filter_by(
+        title="some title 2").first()
     self.assertEqual(audit.context, evidence.context)
 
   def test_assessment_import_states(self):

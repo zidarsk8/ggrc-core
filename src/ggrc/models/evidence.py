@@ -9,6 +9,7 @@ from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.builder import simple_property
 from ggrc.fulltext import mixin
+from ggrc import login
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import WithLastDeprecatedDate
@@ -201,9 +202,9 @@ class Evidence(Roleable, Relatable, mixins.Titled,
 
   def _build_relationship(self, parent_obj):
     """Build relationship between evidence and parent object"""
-    from ggrc.models import relationship
+    from ggrc.models import all_models
     from ggrc.models.mixins.autostatuschangeable import AutoStatusChangeable
-    rel = relationship.Relationship(
+    rel = all_models.Relationship(
         source=parent_obj,
         destination=self
     )
@@ -251,6 +252,16 @@ class Evidence(Roleable, Relatable, mixins.Titled,
 
   def is_with_parent_obj(self):
     return bool(hasattr(self, '_parent_obj') and self._parent_obj)
+
+  def add_admin_role(self):
+    """Add current user as Evidence admin"""
+    from ggrc.models import all_models
+    admin_role = db.session.query(all_models.AccessControlRole).filter_by(
+        name="Admin", object_type=self.type).one()
+    self.extend_access_control_list([{
+        "ac_role": admin_role,
+        "person": login.get_current_user()
+    }])
 
   def handle_before_flush(self):
     """Handler that called  before SQLAlchemy flush event"""

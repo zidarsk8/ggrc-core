@@ -39,6 +39,7 @@ class EvidenceLinkHandler(handlers.ColumnHandler):
         context=self.row_converter.obj.context,
         kind=self.KIND,
     )
+    evidence.add_admin_role()
     return evidence
 
   def parse_item(self):
