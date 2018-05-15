@@ -102,9 +102,8 @@ class GenericHeader(base.Component):
     """
     try:
       self.toggle_lhn_menu.toggle(on_el=False)
-      selenium_utils.wait_until_element_invisible(
-          self._driver, locator.LhnMenu.HOLDER)
-    except exceptions.WebDriverException:
+      selenium_utils.get_when_invisible(self._driver, locator.LhnMenu.HOLDER)
+    except exceptions.StaleElementReferenceException:
       self._refresh_elements()
       self.close_lhn_menu()
 
