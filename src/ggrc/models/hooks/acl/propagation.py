@@ -16,6 +16,7 @@ import sqlalchemy as sa
 from ggrc import db
 from ggrc import login
 from ggrc import utils
+from ggrc.access_control import utils as acl_utils
 from ggrc.models import all_models
 
 logger = logging.getLogger(__name__)
@@ -27,37 +28,9 @@ PROPAGATION_DEPTH_LIMIT = 50
 
 
 def _insert_select_acls(select_statement):
-  """Insert acl records from the select statement
-  Args:
-    select_statement: sql statement that contains the following columns
-      person_id,
-      ac_role_id,
-      object_id,
-      object_type,
-      created_at,
-      modified_by_id,
-      updated_at,
-      parent_id,
-  """
-
-  acl_table = all_models.AccessControlList.__table__
-
-  db.session.execute(
-      acl_table.insert().from_select(
-          [
-              acl_table.c.person_id,
-              acl_table.c.ac_role_id,
-              acl_table.c.object_id,
-              acl_table.c.object_type,
-              acl_table.c.created_at,
-              acl_table.c.modified_by_id,
-              acl_table.c.updated_at,
-              acl_table.c.parent_id,
-          ],
-          select_statement
-      )
-  )
-  db.session.plain_commit()
+  """Run insert from select with default acl inserter."""
+  inserter = all_models.AccessControlList.__table__.insert()
+  acl_utils.insert_select_acls(inserter, select_statement)
 
 
 def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
@@ -103,6 +76,7 @@ def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
       sa.literal(login.get_current_user_id()).label("modified_by_id"),
       sa.func.now().label("updated_at"),
       acl_table.c.id.label("parent_id"),
+      acl_table.c.id.label("parent_id_nn"),
   ]).select_from(
       sa.join(
           sa.join(
@@ -168,6 +142,7 @@ def _rel_child(parent_acl_ids, source=True):
       sa.literal(login.get_current_user_id()).label("modified_by_id"),
       sa.func.now().label("updated_at"),
       acl_table.c.id.label("parent_id"),
+      acl_table.c.id.label("parent_id_nn"),
   ]).select_from(
       sa.join(
           sa.join(
@@ -354,6 +329,7 @@ def _delete_all_propagated_acls():
   This function is used as cleanup before we re-evaluate propagation for all
   objects.
   """
+  logger.info("Deleting all propagated acl entries")
   acl_table = all_models.AccessControlList.__table__
   db.session.execute(
       acl_table.delete().where(
