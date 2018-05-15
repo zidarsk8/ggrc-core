@@ -12,7 +12,7 @@ import ddt
 import freezegun
 
 from ggrc import db
-from ggrc import models
+from ggrc.models import all_models
 from ggrc.access_control.role import get_custom_roles_for
 from ggrc.converters import errors
 
@@ -42,8 +42,8 @@ class TestAssessmentImport(TestCase):
     response = self.import_file("assessment_with_templates.csv")
     self._check_csv_response(response, {})
 
-    assessment = models.Assessment.query.filter(
-        models.Assessment.slug == "A 4").first()
+    assessment = all_models.Assessment.query.filter(
+      all_models.Assessment.slug == "A 4").first()
 
     values = set(v.attribute_value for v in assessment.custom_attribute_values)
     self.assertIn("abc", values)
@@ -52,8 +52,8 @@ class TestAssessmentImport(TestCase):
   def test_import_assessment_with_evidence_proper_url1(self):
     """Test import evidence with proper gdrive url pattern '/d/'"""
     self.import_file("assessment_with_evidence_proper_url_pattern1.csv")
-    evidences = models.Evidence.query.filter(
-        models.Evidence.kind == models.Evidence.FILE).all()
+    evidences = all_models.Evidence.query.filter(
+        all_models.Evidence.kind == all_models.Evidence.FILE).all()
     self.assertEquals(len(evidences), 1)
     self.assertEquals(evidences[0].gdrive_id,
                       "1_J2anxP8_SLMFf1SXyVNriVh25MVgH_LfhFN1wdP1d8")
@@ -61,8 +61,8 @@ class TestAssessmentImport(TestCase):
   def test_import_assessment_with_evidence_proper_url2(self):
     """Test import evidence with proper gdrive url pattern '?id='"""
     self.import_file("assessment_with_evidence_proper_url_pattern2.csv")
-    evidences = models.Evidence.query.filter(
-        models.Evidence.kind == models.Evidence.FILE).all()
+    evidences = all_models.Evidence.query.filter(
+        all_models.Evidence.kind == all_models.Evidence.FILE).all()
     self.assertEquals(len(evidences), 1)
     self.assertEquals(evidences[0].gdrive_id,
                       "0B_oNZ3Jm01MJLWVsVWZJWm")
@@ -70,8 +70,8 @@ class TestAssessmentImport(TestCase):
   def test_import_assessment_with_evidence_invalid_url(self):
     """Test import evidence with invalid gdrive url"""
     response = self.import_file("assessment_with_evidence_invalid_url.csv")
-    evidences = models.Evidence.query.filter(
-        models.Evidence.kind == models.Evidence.FILE).all()
+    evidences = all_models.Evidence.query.filter(
+        all_models.Evidence.kind == all_models.Evidence.FILE).all()
     expected_warning = u"Line 3: Unable to extract gdrive_id from" \
                        u" https://xxx.com/img1.jpg. This evidence can't" \
                        u" be reused after import"
@@ -89,8 +89,8 @@ class TestAssessmentImport(TestCase):
     for user_name, expected_types in users.items():
       for role in expected_types:
         try:
-          user = models.Person.query.filter_by(name=user_name).first()
-          acl_len = models.AccessControlList.query.filter_by(
+          user = all_models.Person.query.filter_by(name=user_name).first()
+          acl_len = all_models.AccessControlList.query.filter_by(
               ac_role_id=ac_roles[role],
               person_id=user.id,
               object_id=asmt.id,
@@ -107,7 +107,7 @@ class TestAssessmentImport(TestCase):
     self.assertEqual(verification_errors, "", verification_errors)
 
   def _test_assigned_user(self, assessment, user_id, role):
-    acls = models.AccessControlList.query.filter_by(
+    acls = all_models.AccessControlList.query.filter_by(
         person_id=user_id,
         object_id=assessment.id,
         object_type=assessment.type,
@@ -127,16 +127,16 @@ class TestAssessmentImport(TestCase):
     self._check_csv_response(response, {})
 
     # Test first Assessment line in the CSV file
-    asmt_1 = models.Assessment.query.filter_by(slug="Assessment 1").first()
+    asmt_1 = all_models.Assessment.query.filter_by(slug="Assessment 1").first()
     users = {
         "user 1": {"Assignees"},
         "user 2": {"Assignees", "Creators"}
     }
     self._test_assessment_users(asmt_1, users)
-    self.assertEqual(asmt_1.status, models.Assessment.START_STATE)
+    self.assertEqual(asmt_1.status, all_models.Assessment.START_STATE)
 
     # Test second Assessment line in the CSV file
-    asmt_2 = models.Assessment.query.filter_by(slug="Assessment 2").first()
+    asmt_2 = all_models.Assessment.query.filter_by(slug="Assessment 2").first()
     users = {
         "user 1": {"Assignees"},
         "user 2": {"Creators"},
@@ -145,12 +145,12 @@ class TestAssessmentImport(TestCase):
         "user 5": {},
     }
     self._test_assessment_users(asmt_2, users)
-    self.assertEqual(asmt_2.status, models.Assessment.PROGRESS_STATE)
+    self.assertEqual(asmt_2.status, all_models.Assessment.PROGRESS_STATE)
 
     audit = [obj for obj in asmt_1.related_objects() if obj.type == "Audit"][0]
     self.assertEqual(audit.context, asmt_1.context)
 
-    evidence = models.Evidence.query.filter_by(title="some title 2").first()
+    evidence = all_models.Evidence.query.filter_by(title="some title 2").first()
     self.assertEqual(audit.context, evidence.context)
 
   def test_assessment_import_states(self):
@@ -174,21 +174,21 @@ class TestAssessmentImport(TestCase):
     }
     self._check_csv_response(response, expected_errors)
 
-    assessments = {r.slug: r for r in models.Assessment.query.all()}
+    assessments = {r.slug: r for r in all_models.Assessment.query.all()}
     self.assertEqual(assessments["Assessment 60"].status,
-                     models.Assessment.START_STATE)
+                     all_models.Assessment.START_STATE)
     self.assertEqual(assessments["Assessment 61"].status,
-                     models.Assessment.PROGRESS_STATE)
+                     all_models.Assessment.PROGRESS_STATE)
     self.assertEqual(assessments["Assessment 62"].status,
-                     models.Assessment.DONE_STATE)
+                     all_models.Assessment.DONE_STATE)
     self.assertEqual(assessments["Assessment 63"].status,
-                     models.Assessment.FINAL_STATE)
+                     all_models.Assessment.FINAL_STATE)
     self.assertEqual(assessments["Assessment 64"].status,
-                     models.Assessment.FINAL_STATE)
+                     all_models.Assessment.FINAL_STATE)
     self.assertEqual(assessments["Assessment 3"].status,
-                     models.Assessment.FINAL_STATE)
+                     all_models.Assessment.FINAL_STATE)
     self.assertEqual(assessments["Assessment 4"].status,
-                     models.Assessment.FINAL_STATE)
+                     all_models.Assessment.FINAL_STATE)
 
     # Check that there is only one attachment left
     asmt1 = assessments["Assessment 1"]
@@ -232,8 +232,8 @@ class TestAssessmentImport(TestCase):
         }
     }
     self._check_csv_response(response, expected_errors)
-    asmnt = models.Assessment.query.filter(
-        models.Assessment.slug == asmnt.slug
+    asmnt = all_models.Assessment.query.filter(
+        all_models.Assessment.slug == asmnt.slug
     ).first()
     self.assertEqual(asmnt.status, "Not Started")
 
@@ -300,11 +300,11 @@ class TestAssessmentImport(TestCase):
       assessment = factories.AssessmentFactory(audit=audit)
       factories.RelationshipFactory(source=audit, destination=assessment)
       control = factories.ControlFactory()
-    revision = models.Revision.query.filter(
-        models.Revision.resource_id == control.id,
-        models.Revision.resource_type == control.__class__.__name__
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == control.id,
+        all_models.Revision.resource_type == control.__class__.__name__
     ).order_by(
-        models.Revision.id.desc()
+        all_models.Revision.id.desc()
     ).first()
     factories.SnapshotFactory(
         parent=audit,
@@ -314,8 +314,8 @@ class TestAssessmentImport(TestCase):
     )
     db.session.commit()
     self.assertFalse(db.session.query(
-        models.Relationship.get_related_query(
-            assessment, models.Snapshot()
+        all_models.Relationship.get_related_query(
+            assessment, all_models.Snapshot()
         ).exists()).first()[0])
     self.import_data(OrderedDict([
         ("object_type", "Assessment"),
@@ -323,8 +323,8 @@ class TestAssessmentImport(TestCase):
         ("map:Control versions", control.slug),
     ]))
     self.assertTrue(db.session.query(
-        models.Relationship.get_related_query(
-            assessment, models.Snapshot()
+        all_models.Relationship.get_related_query(
+            assessment, all_models.Snapshot()
         ).exists()).first()[0])
 
   @ddt.data(
@@ -401,11 +401,11 @@ class TestAssessmentImport(TestCase):
     with factories.single_commit():
       audit = factories.AuditFactory()
       control = factories.ControlFactory()
-    revision = models.Revision.query.filter(
-        models.Revision.resource_id == control.id,
-        models.Revision.resource_type == control.__class__.__name__
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == control.id,
+        all_models.Revision.resource_type == control.__class__.__name__
     ).order_by(
-        models.Revision.id.desc()
+        all_models.Revision.id.desc()
     ).first()
     factories.SnapshotFactory(
         parent=audit,
@@ -415,25 +415,25 @@ class TestAssessmentImport(TestCase):
     )
     db.session.commit()
     self.assertFalse(db.session.query(
-        models.Relationship.get_related_query(
-            models.Assessment(), models.Snapshot()
+        all_models.Relationship.get_related_query(
+            all_models.Assessment(), all_models.Snapshot()
         ).exists()).first()[0])
     slug = "TestAssessment"
     response = self.import_data(OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", slug),
         ("Audit*", audit.slug),
-        ("Assignees*", models.Person.query.all()[0].email),
-        ("Creators", models.Person.query.all()[0].email),
+        ("Assignees*", all_models.Person.query.all()[0].email),
+        ("Creators", all_models.Person.query.all()[0].email),
         ("Title", "Strange title"),
         ("map:Control versions", control.slug),
     ]))
     self._check_csv_response(response, {})
-    assessment = models.Assessment.query.filter(
-        models.Assessment.slug == slug
+    assessment = all_models.Assessment.query.filter(
+        all_models.Assessment.slug == slug
     ).first()
-    self.assertTrue(db.session.query(models.Relationship.get_related_query(
-        assessment, models.Snapshot()).exists()).first()[0]
+    self.assertTrue(db.session.query(all_models.Relationship.get_related_query(
+        assessment, all_models.Snapshot()).exists()).first()[0]
     )
 
   def test_create_import_assignee(self):
@@ -449,11 +449,11 @@ class TestAssessmentImport(TestCase):
         ("Code*", slug),
         ("Audit*", audit.slug),
         ("Assignees*", email),
-        ("Creators", models.Person.query.all()[0].email),
+        ("Creators", all_models.Person.query.all()[0].email),
         ("Title", "Strange title"),
     ]))
-    assessment = models.Assessment.query.filter(
-        models.Assessment.slug == slug
+    assessment = all_models.Assessment.query.filter(
+        all_models.Assessment.slug == slug
     ).first()
     self._test_assigned_user(assessment, assignee_id, "Assignees")
 
@@ -469,12 +469,12 @@ class TestAssessmentImport(TestCase):
         ("object_type", "Assessment"),
         ("Code*", slug),
         ("Audit*", audit.slug),
-        ("Assignees*", models.Person.query.all()[0].email),
+        ("Assignees*", all_models.Person.query.all()[0].email),
         ("Creators", email),
         ("Title", "Strange title"),
     ]))
-    assessment = models.Assessment.query.filter(
-        models.Assessment.slug == slug
+    assessment = all_models.Assessment.query.filter(
+        all_models.Assessment.slug == slug
     ).first()
     self._test_assigned_user(assessment, creator_id, "Creators")
 
@@ -492,8 +492,8 @@ class TestAssessmentImport(TestCase):
         ("Code*", slug),
         ("Creators", email),
     ]))
-    assessment = models.Assessment.query.filter(
-        models.Assessment.slug == slug
+    assessment = all_models.Assessment.query.filter(
+        all_models.Assessment.slug == slug
     ).first()
     self._test_assigned_user(assessment, creator_id, "Creators")
 
@@ -511,8 +511,8 @@ class TestAssessmentImport(TestCase):
         ("Code*", slug),
         ("Assignees", email),
     ]))
-    assessment = models.Assessment.query.filter(
-        models.Assessment.slug == slug
+    assessment = all_models.Assessment.query.filter(
+        all_models.Assessment.slug == slug
     ).first()
     self._test_assigned_user(assessment, assignee_id, "Assignees")
 
@@ -531,8 +531,8 @@ class TestAssessmentImport(TestCase):
         ("Code*", slug),
         ("Verifiers", email),
     ]))
-    assessment = models.Assessment.query.filter(
-        models.Assessment.slug == slug
+    assessment = all_models.Assessment.query.filter(
+        all_models.Assessment.slug == slug
     ).first()
     self._test_assigned_user(assessment, verifier_id, "Verifiers")
     self.import_data(OrderedDict([
@@ -540,8 +540,8 @@ class TestAssessmentImport(TestCase):
         ("Code*", slug),
         ("Verifiers", ""),
     ]))
-    assessment = models.Assessment.query.filter(
-        models.Assessment.slug == slug
+    assessment = all_models.Assessment.query.filter(
+        all_models.Assessment.slug == slug
     ).first()
     self._test_assigned_user(assessment, verifier_id, "Verifiers")
 
@@ -630,13 +630,13 @@ class TestAssessmentImport(TestCase):
         ("Last Deprecated Date", "02/02/2017"),
     ]))
 
-    result = models.Assessment.query.get(assessment.id)
+    result = all_models.Assessment.query.get(assessment.id)
 
     self.assertEqual(1, len(resp))
     self.assertEqual(1, resp[0]["updated"])
     self.assertEqual(result.end_date, datetime.date(2017, 1, 1))
 
-  @ddt.data(*models.Assessment.VALID_STATES)
+  @ddt.data(*all_models.Assessment.VALID_STATES)
   def test_import_set_up_deprecated(self, start_state):
     """Update assessment from {0} to Deprecated."""
     with factories.single_commit():
@@ -645,14 +645,14 @@ class TestAssessmentImport(TestCase):
         OrderedDict([
             ("object_type", "Assessment"),
             ("code", assessment.slug),
-            ("State", models.Assessment.DEPRECATED),
+            ("State", all_models.Assessment.DEPRECATED),
         ]))
     self.assertEqual(1, len(resp))
 
     self.assertEqual(1, resp[0]["updated"])
     self.assertEqual(
-        models.Assessment.query.get(assessment.id).status,
-        models.Assessment.DEPRECATED)
+        all_models.Assessment.query.get(assessment.id).status,
+        all_models.Assessment.DEPRECATED)
 
   def test_asmnt_cads_update_completed(self):
     """Test update of assessment without cads."""
@@ -732,11 +732,11 @@ class TestAssessmentExport(TestCase):
     assessment = factories.AssessmentFactory(audit=audit)
     factories.RelationshipFactory(source=audit, destination=assessment)
     control = factories.ControlFactory()
-    revision = models.Revision.query.filter(
-        models.Revision.resource_id == control.id,
-        models.Revision.resource_type == control.__class__.__name__
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == control.id,
+        all_models.Revision.resource_type == control.__class__.__name__
     ).order_by(
-        models.Revision.id.desc()
+        all_models.Revision.id.desc()
     ).first()
     factories.SnapshotFactory(
         parent=audit,
@@ -756,11 +756,11 @@ class TestAssessmentExport(TestCase):
       assessment = factories.AssessmentFactory(audit=audit)
       factories.RelationshipFactory(source=audit, destination=assessment)
       control = factories.ControlFactory()
-    revision = models.Revision.query.filter(
-        models.Revision.resource_id == control.id,
-        models.Revision.resource_type == control.__class__.__name__
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == control.id,
+        all_models.Revision.resource_type == control.__class__.__name__
     ).order_by(
-        models.Revision.id.desc()
+        all_models.Revision.id.desc()
     ).first()
     with factories.single_commit():
       snapshot = factories.SnapshotFactory(
@@ -788,11 +788,11 @@ class TestAssessmentExport(TestCase):
       assessment = factories.AssessmentFactory(audit=audit)
       factories.RelationshipFactory(source=audit, destination=assessment)
       control = factories.ControlFactory()
-    revision = models.Revision.query.filter(
-        models.Revision.resource_id == control.id,
-        models.Revision.resource_type == control.__class__.__name__
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == control.id,
+        all_models.Revision.resource_type == control.__class__.__name__
     ).order_by(
-        models.Revision.id.desc()
+        all_models.Revision.id.desc()
     ).first()
     snapshot = factories.SnapshotFactory(
         parent=audit,
@@ -812,9 +812,9 @@ class TestAssessmentExport(TestCase):
 
     # also create an object level custom attribute with a name that clashes
     # with a name of a "regular" attribute
-    assessment = models.Assessment.query.filter(
-        models.Assessment.slug == u"A 2").first()
-    cad = models.CustomAttributeDefinition(
+    assessment = all_models.Assessment.query.filter(
+        all_models.Assessment.slug == u"A 2").first()
+    cad = all_models.CustomAttributeDefinition(
         attribute_type=u"Text",
         title=u"ca title",
         definition_type=u"assessment",
