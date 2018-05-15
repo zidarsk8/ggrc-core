@@ -66,7 +66,7 @@ def insert_select_acls(inserter, select_statement):
 
   if last_error:
     logger.critical(
-        "Workflow ACL propagation failed with %d retries on statement: \n %s",
+        "ACL propagation failed with %d retries on statement: \n %s",
         PROPAGATION_RETRIES,
         select_statement,
     )
