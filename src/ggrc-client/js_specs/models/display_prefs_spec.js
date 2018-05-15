@@ -59,7 +59,7 @@ describe('display prefs model', function () {
       it('returns a set value whether or not the value is an Observe', function () {
         expect(display_prefs.getObject('foo')).toBe('bar');
         display_prefs.makeObject('baz', 'quux');
-        expect(display_prefs.getObject('baz').serialize()).toEqual({ 'quux' : {}});
+        expect(display_prefs.getObject('baz').serialize()).toEqual({ 'quux': {}});
       });
 
       it('returns undefined when the key is not found', function (){
@@ -157,7 +157,7 @@ describe('display prefs model', function () {
       });
 
       it('sets all values as a collection', function () {
-        display_prefs[func]('this arg is ignored', {'foo' : fooValue, 'bar' : barValue});
+        display_prefs[func]('this arg is ignored', {'foo': fooValue, 'bar': barValue});
         let fooActual = display_prefs.attr([exp.path, exp_token, 'foo'].join('.'));
         let barActual = display_prefs.attr([exp.path, exp_token, 'bar'].join('.'));
         expect(fooActual.serialize ? fooActual.serialize() : fooActual).toEqual(fooValue);
@@ -233,8 +233,8 @@ describe('display prefs model', function () {
     let dp_noversion, dp2_outdated, dp3_current;
     beforeEach(function () {
       dp_noversion = new CMS.Models.DisplayPrefs({});
-      dp2_outdated = new CMS.Models.DisplayPrefs({ version : 1});
-      dp3_current = new CMS.Models.DisplayPrefs({ version : CMS.Models.DisplayPrefs.version });
+      dp2_outdated = new CMS.Models.DisplayPrefs({ version: 1});
+      dp3_current = new CMS.Models.DisplayPrefs({ version: CMS.Models.DisplayPrefs.version });
 
       spyOn(can.Model.LocalStorage, 'findAll').and.returnValue(new $.Deferred().resolve([dp_noversion, dp2_outdated, dp3_current]));
       spyOn(dp_noversion, 'destroy');
@@ -269,8 +269,8 @@ describe('display prefs model', function () {
     let dp_noversion, dp2_outdated, dp3_current;
     beforeEach(function () {
       dp_noversion = new CMS.Models.DisplayPrefs({});
-      dp2_outdated = new CMS.Models.DisplayPrefs({ version : 1});
-      dp3_current = new CMS.Models.DisplayPrefs({ version : CMS.Models.DisplayPrefs.version });
+      dp2_outdated = new CMS.Models.DisplayPrefs({ version: 1});
+      dp3_current = new CMS.Models.DisplayPrefs({ version: CMS.Models.DisplayPrefs.version });
     });
     it('404s if the display pref does not have a version set', function (done) {
       spyOn(can.Model.LocalStorage, 'findOne').and.returnValue(new $.Deferred().resolve(dp_noversion));

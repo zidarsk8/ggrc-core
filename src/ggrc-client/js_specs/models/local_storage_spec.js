@@ -14,8 +14,8 @@ describe('can.Model.LocalStorage', function () {
     can.Model.LocalStorage('SpecModel');
   });
 
-  let model1 = { 'id' : 1, 'foo' : 'bar' };
-  let model2 = { 'id' : 2, 'foo' : 'baz' };
+  let model1 = { 'id': 1, 'foo': 'bar' };
+  let model2 = { 'id': 2, 'foo': 'baz' };
 
   beforeEach(function () {
     window.localStorage.setItem('spec_model:ids', '[1, 2]');
@@ -46,7 +46,7 @@ describe('can.Model.LocalStorage', function () {
 
     it('filters by id parameter', function () {
       let success = false;
-      SpecModel.findAll({id : 1}).done(function (list) {
+      SpecModel.findAll({id: 1}).done(function (list) {
         expect(list.length).toBe(1);
         expect(list[0].serialize()).toEqual(model1);
         success = true;
@@ -56,7 +56,7 @@ describe('can.Model.LocalStorage', function () {
 
     it('filters by other parameters', function () {
       let success = false;
-      SpecModel.findAll({foo : 'bar'}).done(function (list) {
+      SpecModel.findAll({foo: 'bar'}).done(function (list) {
         expect(list.length).toBe(1);
         expect(list[0].serialize()).toEqual(model1);
         success = true;
@@ -66,7 +66,7 @@ describe('can.Model.LocalStorage', function () {
 
     it('returns an empty list with no matches', function () {
       let success = false;
-      SpecModel.findAll({quux : 'thud'}).done(function (list) {
+      SpecModel.findAll({quux: 'thud'}).done(function (list) {
         expect(list instanceof can.Model.List).toBeTruthy();
         expect(list.length).toBe(0);
         success = true;
@@ -80,7 +80,7 @@ describe('can.Model.LocalStorage', function () {
 
     it('returns a single model instance by id', function () {
       let success = false;
-      SpecModel.findOne({id : 1}).done(function (item) {
+      SpecModel.findOne({id: 1}).done(function (item) {
         expect(item instanceof SpecModel).toBeTruthy();
         expect(item.serialize()).toEqual(model1);
         success = true;
@@ -90,7 +90,7 @@ describe('can.Model.LocalStorage', function () {
 
     it('fails with status 404 when the id is not found', function (done) {
       let failure = false;
-      SpecModel.findOne({id : 3}).fail(function (xhr) {
+      SpecModel.findOne({id: 3}).fail(function (xhr) {
         expect(xhr.status).toBe(404);
         failure = true;
       });
@@ -109,7 +109,7 @@ describe('can.Model.LocalStorage', function () {
 
     it('creates and registers a model', function () {
       let success = false;
-      new SpecModel({ foo : model1.foo }).save().done(function (item) {
+      new SpecModel({ foo: model1.foo }).save().done(function (item) {
         expect(item.id).toBeDefined();
         expect(item.foo).toEqual(model1.foo);
 
@@ -124,7 +124,7 @@ describe('can.Model.LocalStorage', function () {
     it('creates a model with an appropriate ID when the array of IDs is empty', function () {
       let success = false;
       window.localStorage.setItem('spec_model:ids', '[]');
-      new SpecModel({ foo : model1.foo }).save().done(function (item) {
+      new SpecModel({ foo: model1.foo }).save().done(function (item) {
         expect(item.id + 1).not.toBe(item.id); //not infinity, not NaN
         expect(item.foo).toEqual(model1.foo);
 
@@ -146,7 +146,7 @@ describe('can.Model.LocalStorage', function () {
       let m = new SpecModel(model1);
       m.attr('quux', 'thud').save().done(function (item) {
         expect(item instanceof SpecModel).toBeTruthy();
-        expect(JSON.parse(window.localStorage.getItem('spec_model:1'))).toEqual(can.extend({quux : 'thud'}, model1));
+        expect(JSON.parse(window.localStorage.getItem('spec_model:1'))).toEqual(can.extend({quux: 'thud'}, model1));
         success = true;
       });
       expect(success).toBe(true);
@@ -154,7 +154,7 @@ describe('can.Model.LocalStorage', function () {
 
     it('fails with status 404 when the id is not found', function (done) {
       let failure = false;
-      new SpecModel().attr({id : 3}).save().fail(function (xhr) {
+      new SpecModel().attr({id: 3}).save().fail(function (xhr) {
         expect(xhr.status).toBe(404);
         failure = true;
       });
@@ -182,7 +182,7 @@ describe('can.Model.LocalStorage', function () {
 
     it('fails with status 404 when the id is not found', function (done) {
       let failure = false;
-      new SpecModel().attr({id : 3}).destroy().fail(function (xhr) {
+      new SpecModel().attr({id: 3}).destroy().fail(function (xhr) {
         expect(xhr.status).toBe(404);
         failure = true;
       });

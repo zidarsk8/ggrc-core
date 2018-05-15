@@ -54,7 +54,7 @@
           this.$element.trigger($.Event('show'));
         } else {
           //fix the opacity value as it currently stands to prevent show-hide-show after loading.
-          this.tip().css({opacity : window.getComputedStyle(this.tip()[0]).opacity});
+          this.tip().css({opacity: window.getComputedStyle(this.tip()[0]).opacity});
         }
 
         if (this.$element.children('.popover-data-title').length > 0) {
@@ -72,7 +72,7 @@
         this.displayState = 'show';
         this.trigger_load();
         $.fn.popover.Constructor.prototype.show.apply(this);
-        this.tip().css({opacity : ''});
+        this.tip().css({opacity: ''});
         if (this.options.sticky_hover) {
           this.tip().
             on('mouseenter', $.proxy(this.tip_enter, this)).
@@ -95,10 +95,10 @@
 
       if (!loaded) {
         $.ajax({
-          url : href
-          , type : 'get'
-          , dataType : 'html'
-          , success : function (data) {
+          url: href
+          , type: 'get'
+          , dataType: 'html'
+          , success: function (data) {
             let $data = $(data.trim());
             self.$element.attr('data-original-title', $data.filter('.popover-title').html());
             self.$element.attr('data-content', $data.filter('.popover-content').html());

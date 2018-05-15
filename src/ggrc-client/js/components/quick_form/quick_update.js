@@ -35,7 +35,7 @@
       //currently we don't support proxy object updates in mappings, so for now a change
       //  to a connected object (assuming we are operating on a proxy object) will trigger
       //  a deletion of the proxy object and creation of a new one.
-      autocomplete_select : function (el, event, ui) {
+      autocomplete_select: function (el, event, ui) {
         let that = this;
         setTimeout(function () {
           let serial = that.scope.instance.serialize();
@@ -56,7 +56,7 @@
       },
       // null-if-empty attributes are a pattern carried over from GGRC.Controllers.Modals
       //  Useful for connected objects.
-      'input[null-if-empty] change' : function (el) {
+      'input[null-if-empty] change': function (el) {
         if (!el.val()) {
           this.scope.instance.attr(el.attr('name'), null);
         }
@@ -64,7 +64,7 @@
       // data-mapping is the element decoration that triggers an autocomplete based on a
       //  mapping to a parent instance.  The mapping_autocomplete helper defined below is
       //  generally for these.
-      'input:not([data-mapping]), select change' : function (el) {
+      'input:not([data-mapping]), select change': function (el) {
         let isCheckbox = el.is('[type=checkbox][multiple]');
         let isDropdown = el.is('select');
         if (isCheckbox) {

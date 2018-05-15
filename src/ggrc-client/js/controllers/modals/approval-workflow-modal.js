@@ -167,26 +167,26 @@ let ApprovalWorkflow = can.Observe({
 
 export default ModalsController({
   pluginName: 'ggrc_controllers_approval_workflow',
-  defaults : {
-    original_object : null,
+  defaults: {
+    original_object: null,
     new_object_form: true,
     model: ApprovalWorkflow,
     modal_title: 'Submit for review',
     custom_save_button_text: 'Submit',
     content_view: GGRC.mustache_path + '/wf_objects/approval_modal_content.mustache',
-    button_view : BUTTON_VIEW_SAVE_CANCEL,
+    button_view: BUTTON_VIEW_SAVE_CANCEL,
     afterFetch: function () {
       this.attr('instance', new ApprovalWorkflow({
-        original_object : this.attr('instance'),
+        original_object: this.attr('instance'),
       }));
     },
   },
 }, {
-  init : function () {
+  init: function () {
     this.options.button_view = BUTTON_VIEW_SAVE_CANCEL;
     this._super.apply(this, arguments);
   },
-  'input[null-if-empty] change' : function (el, ev) {
+  'input[null-if-empty] change': function (el, ev) {
     if(el.val() === '') {
       this.options.instance.attr(el.attr('name').split('.').slice(0, -1).join('.'), null);
     }

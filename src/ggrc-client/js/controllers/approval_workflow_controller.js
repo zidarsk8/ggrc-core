@@ -20,9 +20,9 @@
     $target
       .modal_form(option, $trigger)
       .ggrc_controllers_approval_workflow({
-        object_params : object_params,
-        current_user : GGRC.current_user,
-        instance : instance,
+        object_params: object_params,
+        current_user: GGRC.current_user,
+        instance: instance,
       });
   });
 
