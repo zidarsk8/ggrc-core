@@ -140,17 +140,6 @@ class AssessmentResource(common.ExtendedResource):
              if evd.kind == evd.FILE]
     return urls, files
 
-  def _get_issue_data(self, relationships):
-    """Get related issue data."""
-    relationship_ids = self._filter_rels(relationships, "Issue")
-    if not relationship_ids:
-      return []
-    with benchmark("Get related issue data"):
-      issues = models.Issue.eager_query().filter(
-          models.Issue.id.in_(relationship_ids)
-      ).all()
-    return [issue.log_json() for issue in issues]
-
   def _get_comment_data(self, relationships):
     """Get assessment comment data."""
     relationship_ids = self._filter_rels(relationships, "Comment")
@@ -179,7 +168,6 @@ class AssessmentResource(common.ExtendedResource):
         "Audit": self._get_audit_data(assessment),
         "Snapshot": self._get_snapshot_data(assessment, relationships),
         "Comment": self._get_comment_data(relationships),
-        "Issue": self._get_issue_data(relationships),
         urls_key: urls,
         attachments_key: files,
     }
