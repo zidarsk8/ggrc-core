@@ -271,8 +271,8 @@ const AUDIT_ISSUE_TRACKER = {
     },
 
     initIssueTracker() {
-      if (!this.issue_tracker) {
-        this.issue_tracker = new can.Map({});
+      if (!this.attr('issue_tracker')) {
+        this.attr('issue_tracker', new can.Map({}));
       }
 
       if (GGRC.ISSUE_TRACKER_ENABLED) {
@@ -331,8 +331,8 @@ const AUDIT_ISSUE_TRACKER = {
      * Initializes Issue Tracker for Assessment and Assessment Template
      */
     initIssueTrackerForAssessment() {
-      let auditItr = this.audit.issue_tracker || {};
-      let itr = this.issue_tracker || {};
+      let auditItr = this.attr('audit.issue_tracker') || {};
+      let itr = this.attr('issue_tracker') || {};
       let itrEnabled = this.isNew()
         // turned ON for Assessment & Assessment Template by default
         // for newly created instances
@@ -376,13 +376,13 @@ const AUDIT_ISSUE_TRACKER = {
     },
     issueTrackerEnabled: function () {
       // 'issue_tracker' has already created if component_id is filled;
-      return !!(this.issue_tracker && this.issue_tracker.component_id);
+      return !!(this.attr('issue_tracker.component_id'));
     },
     'before:refresh': function () {
       // clear warnings because CanJS save prev value of warning after merge
       // current instance and response
-      if (this.issue_tracker && this.issue_tracker._warnings) {
-        this.issue_tracker._warnings = [];
+      if (this.attr('issue_tracker._warnings')) {
+        this.attr('issue_tracker._warnings', []);
       }
     },
     'after:refresh': function () {
