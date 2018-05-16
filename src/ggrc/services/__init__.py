@@ -23,7 +23,6 @@ def contributed_services():
       service('background_tasks', models.BackgroundTask),
       service('access_groups', models.AccessGroup),
       service('audits', models.Audit, AuditResource),
-      service('audit_objects', models.AuditObject),
       service('categorizations', models.Categorization),
       service('category_bases', models.CategoryBase),
       service('control_categories', models.ControlCategory),

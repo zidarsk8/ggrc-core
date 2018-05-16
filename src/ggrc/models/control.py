@@ -12,7 +12,6 @@ from ggrc.models.comment import Commentable
 from ggrc.models.mixins.with_similarity_score import WithSimilarityScore
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.access_control.roleable import Roleable
-from ggrc.models.audit_object import Auditable
 from ggrc.models.categorization import Categorizable
 from ggrc.models.category import CategoryBase
 from ggrc.models import mixins
@@ -154,7 +153,6 @@ class Control(WithLastAssessmentDate,
               AssertionCategorized,
               mixins.Hierarchical,
               mixins.LastDeprecatedTimeboxed,
-              Auditable,
               mixins.TestPlanned,
               Commentable,
               WithSimilarityScore,

@@ -58,7 +58,6 @@ class TestSnapshot(TestCase):
 
 
       # relationships and mappings
-      "audit_objects",
       "audits",
       "controls",
       "object_people",
