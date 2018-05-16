@@ -140,14 +140,6 @@ const AUDIT_ISSUE_TRACKER = {
     },
   });
 
-  can.Model.Mixin('ownable', {
-    'after:init': function () {
-      if (!this.owners) {
-        this.attr('owners', []);
-      }
-    },
-  });
-
   can.Model.Mixin('contactable', {
     // NB : Because the attributes object
     //  isn't automatically cloned into subclasses by CanJS (this is an intentional
