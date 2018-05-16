@@ -132,6 +132,8 @@ export default GGRC.Components('externalDataAutocomplete', {
         let data = response[0];
         let model = data[1][ModelClass.root_object];
 
+        model = model.reify ? model.reify() : model;
+
         let result = ModelClass.cache[model.id] || new ModelClass(model);
 
         return result;
