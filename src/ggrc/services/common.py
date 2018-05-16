@@ -1475,6 +1475,6 @@ def send_event_job(event):
   rows = db.session.query(Revision.id).filter_by(
       event_id=event.id,
   ).all()
-  revision_ids = [id for id, in rows]
+  revision_ids = [revision_id for revision_id, in rows]
   from ggrc import views
   views.start_compute_attributes(revision_ids)
