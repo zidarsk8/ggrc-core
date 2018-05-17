@@ -13,9 +13,7 @@ from ggrc.models import types
 from ggrc.models import utils
 from ggrc.fulltext import mixin as ft_mixin
 from ggrc.utils import referenced_objects
-from ggrc.access_control import list as ac_list
 from ggrc.access_control import roleable
-from ggrc.access_control import role as ac_role
 from ggrc.utils.revisions_diff import builder
 from ggrc import settings
 from ggrc.models import comment
@@ -72,10 +70,6 @@ class Proposal(mixins.person_relation_factory("applied_by"),
     DIGEST_TITLE = "Proposal Digest"
     DIGEST_TMPL = settings.JINJA2.get_template(
         "notifications/proposal_digest.html")
-
-  class ACRoles(object):
-    READER = "ProposalReader"
-    EDITOR = "ProposalEditor"
 
   class STATES(object):
     """All states for proposals."""
@@ -189,45 +183,3 @@ class Proposalable(object):  # pylint: disable=too-few-public-methods
         primaryjoin=join_function,
         backref=Proposal.INSTANCE_TMPL.format(cls.__name__),
     )
-
-
-def get_propsal_acr_dict():
-  return {
-      r.name: r for r in
-      ac_role.AccessControlRole.query.filter(
-          ac_role.AccessControlRole.object_type == Proposal.__name__,
-          ac_role.AccessControlRole.name.in_([Proposal.ACRoles.EDITOR,
-                                              Proposal.ACRoles.READER]))
-  }
-
-
-def permissions_for_proposal_setter(proposal, proposal_roles):
-  """Append required proposal roles ACL to proposal."""
-  parents = {a.parent for a in proposal.full_access_control_list}
-  for acl in proposal.instance.full_access_control_list:
-    if acl in parents:
-      continue
-    if acl.ac_role.update:
-      role = proposal_roles[Proposal.ACRoles.EDITOR]
-    elif acl.ac_role.read:
-      role = proposal_roles[Proposal.ACRoles.READER]
-    else:
-      continue
-    ac_list.AccessControlList(ac_role=role,
-                              object=proposal,
-                              person=acl.person,
-                              parent=acl)
-
-
-def set_acl_to_all_proposals_for(instance):
-  if isinstance(instance, Proposalable):
-    if isinstance(instance, roleable.Roleable):
-      proposal_roles = get_propsal_acr_dict()
-      for proposal in instance.proposals:
-        permissions_for_proposal_setter(proposal, proposal_roles)
-
-
-def set_acl_to(proposal):
-  if isinstance(proposal, Proposal):
-    if isinstance(proposal.instance, roleable.Roleable):
-      permissions_for_proposal_setter(proposal, get_propsal_acr_dict())

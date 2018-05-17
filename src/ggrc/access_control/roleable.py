@@ -28,26 +28,6 @@ class Roleable(object):
   _api_attrs = reflection.ApiAttributes(
       reflection.Attribute('access_control_list', True, True, True))
 
-  @hybrid_property
-  def full_access_control_list(self):
-    return self._access_control_list + self._propagated_access_control_list
-
-  @declared_attr
-  def _propagated_access_control_list(cls):  # pylint: disable=no-self-argument
-    """Full access_control_list
-
-       Use with caution and load only when absolutely needed. For performance
-       reasons do not add to eager_query.
-    """
-    return db.relationship(
-        'AccessControlList',
-        primaryjoin=lambda: and_(
-            remote(AccessControlList.object_id) == cls.id,
-            remote(AccessControlList.object_type) == cls.__name__,
-            remote(AccessControlList.parent_id).isnot(None)),
-        foreign_keys='AccessControlList.object_id',
-        cascade='all, delete-orphan')
-
   @declared_attr
   def _access_control_list(cls):  # pylint: disable=no-self-argument
     """access_control_list"""
@@ -56,7 +36,8 @@ class Roleable(object):
         primaryjoin=lambda: and_(
             remote(AccessControlList.object_id) == cls.id,
             remote(AccessControlList.object_type) == cls.__name__,
-            remote(AccessControlList.parent_id).is_(None)),
+            remote(AccessControlList.parent_id_nn) == 0
+        ),
         foreign_keys='AccessControlList.object_id',
         backref='{0}_object'.format(cls.__name__),
         cascade='all, delete-orphan')
@@ -114,8 +95,34 @@ class Roleable(object):
   def eager_query(cls):
     """Eager Query"""
     query = super(Roleable, cls).eager_query()
-    return cls.eager_inclusions(query, Roleable._include_links).options(
-        orm.subqueryload('access_control_list'))
+    return cls.eager_inclusions(
+        query,
+        Roleable._include_links
+    ).options(
+        orm.subqueryload(
+            '_access_control_list'
+        ).joinedload(
+            "person"
+        ).undefer_group(
+            'Person_complete'
+        ),
+        orm.subqueryload(
+            '_access_control_list'
+        ).joinedload(
+            "person"
+        ).subqueryload(
+            "contexts"
+        ).undefer_group(
+            'Context_complete'
+        ),
+        orm.subqueryload(
+            '_access_control_list'
+        ).joinedload(
+            "ac_role"
+        ).undefer_group(
+            'AccessControlRole_complete'
+        ),
+    )
 
   @classmethod
   def indexed_query(cls):
@@ -123,14 +130,19 @@ class Roleable(object):
     query = super(Roleable, cls).indexed_query()
     return query.options(
         orm.subqueryload(
-            'access_control_list'
-        ).subqueryload(
+            '_access_control_list'
+        ).joinedload(
             "person"
-        ).load_only(
-            "id",
-            "name",
-            "email",
-        )
+        ).undefer_group(
+            'Person_complete'
+        ),
+        orm.subqueryload(
+            '_access_control_list'
+        ).joinedload(
+            "ac_role"
+        ).undefer_group(
+            'AccessControlRole_complete'
+        ),
     )
 
   def log_json(self):
