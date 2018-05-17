@@ -5,8 +5,8 @@
 
 import Spinner from 'spin.js';
 
-var $body = $('body');
-var $window = $(window);
+let $body = $('body');
+let $window = $(window);
 
 // We remove loading class
 $window.on('load', function () {
@@ -23,17 +23,15 @@ $body.on("click", ".lhn-no-init", function() {
 });
 
 $body.on("click", "a[data-toggle=unmap]", function(ev) {
-  var $el = $(this)
+  let $el = $(this)
   ;
   //  Prevent toggling `openclose` state in trees
   ev.stopPropagation();
   $el.fadeTo('fast', 0.25);
   $el.children(".result").each(function(i, result_el) {
-    var $result_el = $(result_el)
+    let $result_el = $(result_el)
       , result = $result_el.data('result')
-      , mappings = result && result.get_mappings()
-      , i
-    ;
+      , mappings = result && result.get_mappings();
 
     function notify(instance){
       $(document.body).trigger(
@@ -59,7 +57,7 @@ $body.on("click", "a[data-toggle=unmap]", function(ev) {
 // Initialize delegated event handlers
 jQuery(function ($) {
   window.natural_comparator = function (a, b) {
-    var i;
+    let i;
     a = a.slug.toString();
     b = b.slug.toString();
     if (a === b) {
@@ -91,10 +89,10 @@ jQuery(function ($) {
 
   // Turn the arrow when tree node content is shown
   $body.on('click', '[data-toggle="collapse"]', function (e) {
-    var $this = $(this);
-    var $expander_container = $this.closest(':has(.expander, .enddot)');
-    var $expander = $expander_container.find('.expander').eq(0);
-    var $target = $($this.data('target'));
+    let $this = $(this);
+    let $expander_container = $this.closest(':has(.expander, .enddot)');
+    let $expander = $expander_container.find('.expander').eq(0);
+    let $target = $($this.data('target'));
 
     setTimeout(function () {
       if ($target.hasClass('in')) {
@@ -108,7 +106,7 @@ jQuery(function ($) {
   // After the modal template has loaded from the server, but before the
   //  data has loaded to populate into the body, show a spinner
   $body.on('loaded', '.modal.modal-slim, .modal.modal-wide', function (e) {
-    var spin = function () {
+    let spin = function () {
       $(this).html(
         $(new Spinner().spin().el)
           .css({
@@ -130,10 +128,10 @@ jQuery(function ($) {
   });
 
   $body.on('click', '[data-toggle="list-select"]', function (e) {
-    var $this;
-    var $li;
-    var target;
-    var data;
+    let $this;
+    let $li;
+    let target;
+    let data;
 
     e.preventDefault();
 
@@ -148,8 +146,8 @@ jQuery(function ($) {
   });
 
   $body.on('click', '[data-toggle="nested-dropdown"]', function (e) {
-    var $parent = $(this).parent();
-    var isActive = $parent.hasClass('open');
+    let $parent = $(this).parent();
+    let isActive = $parent.hasClass('open');
     if (!isActive) {
       $parent.toggleClass('open');
     }
@@ -173,10 +171,10 @@ jQuery(function ($) {
 jQuery(function ($) {
   // Used in object_list sidebars (References, People, Categories)
   $body.on('modal:success', '.js-list-container-title a', function (e, data) {
-    var $this = $(this);
-    var $title = $this.closest('.js-list-container-title');
-    var $span = $title.find('span');
-    var $expander = $title.find('.expander').eq(0);
+    let $this = $(this);
+    let $title = $this.closest('.js-list-container-title');
+    let $span = $title.find('span');
+    let $expander = $title.find('.expander').eq(0);
 
     $span.text('(' + (data.length || 0) + ')');
 
@@ -194,8 +192,8 @@ jQuery(function ($) {
 
 jQuery(function ($) {
   function checkActive(notification_configs) {
-    var inputs = $('.notify-wrap').find('input');
-    var active_notifications = $.map(notification_configs, function (a) {
+    let inputs = $('.notify-wrap').find('input');
+    let active_notifications = $.map(notification_configs, function (a) {
       if (a.enable_flag) {
         return a.notif_type;
       }
@@ -222,12 +220,12 @@ jQuery(function ($) {
   });
 
   $body.on('click', 'input[name=notifications]', function (ev, el) {
-    var li = $(ev.target).closest('.notify-wrap');
-    var inputs = li.find('input');
-    var active = [];
-    var email_now = li.find('input[value="Email_Now"]');
-    var email_now_label = email_now.closest('label');
-    var email_digest = li.find('input[value="Email_Digest"]');
+    let li = $(ev.target).closest('.notify-wrap');
+    let inputs = li.find('input');
+    let active = [];
+    let email_now = li.find('input[value="Email_Now"]');
+    let email_now_label = email_now.closest('label');
+    let email_digest = li.find('input[value="Email_Digest"]');
 
     if (email_digest[0].checked) {
       email_now_label.removeClass('disabled');
@@ -253,7 +251,7 @@ jQuery(function ($) {
 
   $body.on('click', '.clear-display-settings', function (e) {
     CMS.Models.DisplayPrefs.findAll().done(function (data) {
-      var destroys = [];
+      let destroys = [];
       can.each(data, function (d) {
         d.unbind('change'); // forget about listening to changes.  we're going to refresh the page
         destroys.push(d.resetPagePrefs());
@@ -264,9 +262,9 @@ jQuery(function ($) {
     });
   })
   .on('click', '.set-display-settings-default', function (e) {
-    var page_token = getPageToken();
+    let page_token = getPageToken();
     CMS.Models.DisplayPrefs.findAll().done(function (data) {
-      var destroys = [];
+      let destroys = [];
       can.each(data, function (d) {
         d.unbind('change'); // forget about listening to changes.  we're going to refresh the page
         destroys.push(d.setPageAsDefault(page_token));
@@ -296,15 +294,15 @@ jQuery(function ($) {
 jQuery(function ($) {
   // Footer expander animation helper
   function expander(toggle, direction) {
-    var $this = $(toggle);
-    var $expander = $this.closest('div').find('.section-expander');
-    var out = direction === 'out';
-    var height = $expander.outerHeight();
-    var width = $expander.outerWidth();
-    var start = out ? 0 : width;
-    var end = out ? width : 0;
-    var duration = 500;
-    var clip;
+    let $this = $(toggle);
+    let $expander = $this.closest('div').find('.section-expander');
+    let out = direction === 'out';
+    let height = $expander.outerHeight();
+    let width = $expander.outerWidth();
+    let start = out ? 0 : width;
+    let end = out ? width : 0;
+    let duration = 500;
+    let clip;
 
     if (out) {
       $this.filter(':not(.section-sticky)').fadeOut(200);
@@ -358,25 +356,25 @@ jQuery(function ($) {
 
   // Footer expander animations (verify that an expander exists)
   $body.on('mouseenter', '.section-add:has(+ .section-expander), .section-expander:visible:animated', function (e) {
-    var $this = $(this);
+    let $this = $(this);
     expander($this.hasClass('section-add') ? $this : $this.prev('.section-add'), 'out');
   });
 
   $body.on('click', '.show-long', function (e) {
-    var $this = $(this);
-    var $descField = $this.closest('.span12').find('.tree-description');
+    let $this = $(this);
+    let $descField = $this.closest('.span12').find('.tree-description');
     $this.hide();
     $descField.removeClass('short');
   });
 
   // show/hide audit lead and firm
   $body.on('mouseover', '.ui-autocomplete li a', function (e) {
-    var $this = $(this);
+    let $this = $(this);
     $this.addClass('active');
     $this.closest('li').addClass('active');
   });
   $body.on('mouseleave', '.ui-autocomplete li a', function (e) {
-    var $this = $(this);
+    let $this = $(this);
     $this.removeClass('active');
     $this.closest('li').removeClass('active');
   });
@@ -436,8 +434,8 @@ $(function () {
 });
 
 function openMapperByElement(ev, disableMapper) {
-  var btn = $(ev.currentTarget);
-  var data = {};
+  let btn = $(ev.currentTarget);
+  let data = {};
 
   can.each(btn.data(), function (val, key) {
     data[can.camelCaseToUnderscore(key)] = val;
