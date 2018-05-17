@@ -158,8 +158,8 @@
       }
     },
     makeDestroy: function (destroy) {
-      if (typeof findAll === 'function' && this !== can.Model.LocalStorage) {
-        return findAll;
+      if (typeof destroy === 'function' && this !== can.Model.LocalStorage) {
+        return destroy;
       } else {
         return function (id) {
           let def = new can.Deferred();

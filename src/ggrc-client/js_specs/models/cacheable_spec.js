@@ -116,47 +116,6 @@ describe('can.Model.Cacheable', function () {
     });
   });
 
-  describe('::makeDestroy', function () {
-    let destroy_spy;
-    beforeEach(function () {
-      destroy_spy = jasmine.createSpy('destroy');
-      spyOn(CMS.Models.BackgroundTask, 'findOne').and.returnValue($.when());
-    });
-
-    it('finds background task if specified in return object', function (done) {
-      let destroy = CMS.Models.DummyModel.makeDestroy(destroy_spy);
-      destroy_spy.and.returnValue($.when({background_task: {id: 1}}));
-
-      destroy(2).then(function () {
-        expect(CMS.Models.BackgroundTask.findOne).toHaveBeenCalledWith({id: 1});
-        done();
-      }, failAll(done));
-    });
-
-    it('polls background task if found', function (done) {
-      let destroy = CMS.Models.DummyModel.makeDestroy(destroy_spy);
-      let poll_spy = jasmine.createSpyObj('poll_spy', ['poll']);
-      destroy_spy.and.returnValue($.when({background_task: {id: 1}}));
-      CMS.Models.BackgroundTask.findOne.and.returnValue($.when(poll_spy));
-
-      destroy(2).then(function () {
-        expect(CMS.Models.BackgroundTask.findOne).toHaveBeenCalledWith({id: 1});
-        expect(poll_spy.poll).toHaveBeenCalled();
-        done();
-      }, failAll(done));
-    });
-
-    it('continues normally if no background task specified', function (done) {
-      let destroy = CMS.Models.DummyModel.makeDestroy(destroy_spy);
-      destroy_spy.and.returnValue($.when({dummy: {id: 1}}));
-
-      destroy(2).then(function () {
-        expect(CMS.Models.BackgroundTask.findOne).not.toHaveBeenCalled();
-        done();
-      }, failAll(done));
-    });
-  });
-
   describe('::update', function () {
     let _obj;
     let id = 0;
