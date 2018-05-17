@@ -258,6 +258,19 @@ describe('GGRC.Components.externalDataAutocomplete', ()=> {
           done();
         });
       });
+
+      it('calls model reify', (done)=> {
+        model.reify = jasmine.createSpy('reify').and.returnValue(model);
+
+        let resultDfd = viewModel.createOrGet(item);
+
+        createDfd.resolve(response);
+
+        resultDfd.then((resultModel)=> {
+          expect(model.reify).toHaveBeenCalled();
+          done();
+        });
+      });
     });
   });
 });
