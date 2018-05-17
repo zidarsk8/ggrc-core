@@ -324,7 +324,6 @@ const AUDIT_ISSUE_TRACKER = {
      */
     initIssueTrackerForAssessment() {
       let auditItr = this.attr('audit.issue_tracker') || {};
-      let itr = this.attr('issue_tracker') || {};
       let itrEnabled = this.isNew()
         // turned ON for Assessment & Assessment Template by default
         // for newly created instances
@@ -332,20 +331,13 @@ const AUDIT_ISSUE_TRACKER = {
         // for existing instance, the value from the server will be used
         : null;
 
-      let showIssureTrackerControls = this.isNew()
-        // for new instance show controls if Issure Tracker enabled for Audit
-        ? auditItr.enabled
-        // for existing instance show controls if Issue Tracker enabled for
-        // this instance or enabled for Audit
-        : itr.enabled || auditItr.enabled;
-
       let issueTitle = this.title || '';
 
       this.initIssueTrackerObject(
         new can.Map(auditItr).attr({
           title: issueTitle,
           enabled: itrEnabled,
-        }), showIssureTrackerControls);
+        }), auditItr.enabled);
     },
     /**
      * Initializes issue tracker data from predefined defaults if tracker

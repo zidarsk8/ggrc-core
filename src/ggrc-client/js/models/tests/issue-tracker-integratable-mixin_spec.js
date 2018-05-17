@@ -235,27 +235,7 @@ describe('can.Model.Mixin.issueTrackerIntegratable', function () {
         });
       });
 
-      it('should show ITR if if enabled on instance regardless of audit\'s ' +
-        'ITR config', () => {
-        let itrShowControls;
-        fakeAssessment.attr('issue_tracker.enabled', true);
-
-        // enabled in Audit
-        fakeAssessment.attr('audit.issue_tracker.enabled', true);
-        method.apply(fakeAssessment);
-        itrShowControls = fakeAssessment.initIssueTrackerObject
-          .calls.mostRecent().args[1];
-        expect(itrShowControls).toEqual(true);
-
-        // disabled in Audit
-        fakeAssessment.attr('audit.issue_tracker.enabled', false);
-        method.apply(fakeAssessment);
-        itrShowControls = fakeAssessment.initIssueTrackerObject
-          .calls.mostRecent().args[1];
-        expect(itrShowControls).toEqual(true);
-      });
-
-      it('should show ITR if enabled on instance and disabled in audit',
+      it('should hide ITR if disabled in audit and enabled on instance',
         () => {
           let itrShowControls;
           fakeAssessment.attr('issue_tracker.enabled', true);
@@ -265,22 +245,49 @@ describe('can.Model.Mixin.issueTrackerIntegratable', function () {
           method.apply(fakeAssessment);
           itrShowControls = fakeAssessment.initIssueTrackerObject
             .calls.mostRecent().args[1];
-          expect(itrShowControls).toEqual(true);
-        });
+          expect(itrShowControls).toEqual(false);
+        }
+      );
 
-      it('should hide ITR if disabled on instance and in audit',
+      it('should hide ITR if disabled on instance and in audit', () => {
+        let itrShowControls;
+        fakeAssessment.attr('issue_tracker.enabled', false);
+
+        // disabled in Audit
+        fakeAssessment.attr('audit.issue_tracker.enabled', false);
+        method.apply(fakeAssessment);
+        itrShowControls = fakeAssessment.initIssueTrackerObject
+          .calls.mostRecent().args[1];
+        expect(itrShowControls).toEqual(false);
+      });
+
+      it('should show ITR if enabled on instance and in audit', () => {
+        let itrShowControls;
+        fakeAssessment.attr('issue_tracker.enabled', true);
+
+        // enabled in Audit
+        fakeAssessment.attr('audit.issue_tracker.enabled', true);
+        method.apply(fakeAssessment);
+        itrShowControls = fakeAssessment.initIssueTrackerObject
+          .calls.mostRecent().args[1];
+        expect(itrShowControls).toEqual(true);
+      });
+
+      it('should show ITR if disabled on instance and enabled in audit',
         () => {
           let itrShowControls;
           fakeAssessment.attr('issue_tracker.enabled', false);
 
-          // disabled in Audit
-          fakeAssessment.attr('audit.issue_tracker.enabled', false);
+          // enabled in Audit
+          fakeAssessment.attr('audit.issue_tracker.enabled', true);
           method.apply(fakeAssessment);
           itrShowControls = fakeAssessment.initIssueTrackerObject
             .calls.mostRecent().args[1];
-          expect(itrShowControls).toEqual(false);
-        });
-    });
+          expect(itrShowControls).toEqual(true);
+        }
+      );
+    }
+  );
 
   describe('initIssueTrackerObject() method',
     () => {
