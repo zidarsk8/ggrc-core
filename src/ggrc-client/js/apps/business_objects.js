@@ -290,6 +290,9 @@ import {
       // or to prevent creating People widget on Objective page:
       //     { Objective: { Person: false } }
       overriddenModels = {
+        Audit: {
+          Evidence: false,
+        },
         Program: {
         },
         all: {
