@@ -19,6 +19,10 @@ export default can.Component.extend({
         get: function () {
           let instance = this.attr('instance');
 
+          if (instance.attr('status') === 'Deprecated') {
+            return false;
+          }
+
           return hasQuestions(instance.class.title_singular);
         },
       },
