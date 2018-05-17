@@ -9,7 +9,7 @@ import {
 } from '../../plugins/utils/ggrcq-utils';
 import template from './questions-link.mustache';
 
-GGRC.Components('questionsLink', {
+export default can.Component.extend({
   tag: 'questions-link',
   template: template,
   viewModel: {
