@@ -225,7 +225,7 @@ Dashboard({
     this.info_pin = new InfoPin(this.element.find('.pin-content'));
   },
 
-  hideInfoPin () {
+  hideInfoPin() {
     const infopinCtr = this.info_pin.element.control();
 
     if (infopinCtr) {

@@ -1,4 +1,5 @@
 src/ggrc/static/**/*.js
+src/ggrc/assets/vendor/**/*.js
 src/ggrc-client/vendor/*
 src/ggrc-client/styles/*.js
 src/ggrc-client/js/generated/*.js
