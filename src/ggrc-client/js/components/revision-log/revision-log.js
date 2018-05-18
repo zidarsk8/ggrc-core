@@ -8,6 +8,7 @@ import '../paginate';
 import {getRolesForType} from '../../plugins/utils/acl-utils';
 import RefreshQueue from '../../models/refresh_queue';
 import template from './revision-log.mustache';
+import tracker from '../../tracker';
 
 (function (GGRC, can) {
   'use strict';
@@ -54,6 +55,11 @@ import template from './revision-log.mustache';
       personLoadingDfd: can.Deferred,
 
       fetchItems: function () {
+        const stopFn = tracker.start(
+          this.attr('instance.type'),
+          tracker.USER_JOURNEY_KEYS.LOADING,
+          tracker.USER_ACTIONS.CHANGE_LOG);
+
         this._fetchRevisionsData()
           .done(function (revisions) {
             let changeHistory;
@@ -72,8 +78,10 @@ import template from './revision-log.mustache';
               .reverse()
               .value();
             this.attr('changeHistory', changeHistory);
+            stopFn();
           }.bind(this))
           .fail(function () {
+            stopFn(true);
             $('body').trigger(
               'ajax:flash',
               {error: 'Failed to fetch revision history data.'});
