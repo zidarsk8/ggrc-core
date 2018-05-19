@@ -27,7 +27,6 @@ from ggrc.services.registry import service
 from ggrc.utils import benchmark
 from ggrc_basic_permissions import basic_roles
 from ggrc_basic_permissions.contributed_roles import BasicRoleDeclarations
-from ggrc_basic_permissions.contributed_roles import BasicRoleImplications
 from ggrc_basic_permissions.converters.handlers import COLUMN_HANDLERS
 from ggrc_basic_permissions.models import ContextImplication
 from ggrc_basic_permissions.models import Role
@@ -615,4 +614,3 @@ def contributed_column_handlers():
 
 
 ROLE_DECLARATIONS = BasicRoleDeclarations()
-ROLE_IMPLICATIONS = BasicRoleImplications()
