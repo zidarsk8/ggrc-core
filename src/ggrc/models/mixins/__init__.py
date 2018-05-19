@@ -296,7 +296,7 @@ class LastDeprecatedTimeboxed(Timeboxed):
     if hasattr(superinstance, "validate_status"):
       value = superinstance.validate_status(key, value)
     if value != self.status and value == self.AUTO_SETUP_STATUS:
-      self.end_date = datetime.datetime.now()
+      self.end_date = datetime.date.today()
     return value
 
 
