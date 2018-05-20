@@ -3,6 +3,4 @@
 """Module contains Access Control Role names related to Workflow model."""
 
 ADMIN_NAME = "Admin"
-ADMIN_MAPPED_NAME = "{} Mapped".format(ADMIN_NAME)
 MEMBER_NAME = "Workflow Member"
-MEMBER_MAPPED_NAME = "{} Mapped".format(MEMBER_NAME)
