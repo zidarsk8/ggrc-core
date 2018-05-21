@@ -113,6 +113,11 @@ export default can.Component.extend('richText', {
     urlMatcher(node, delta) {
       // Matcher runs only for single op.
       // Since it's clipboard matcher operation is always insert.
+
+      if (!delta.ops.length) {
+        return delta;
+      }
+
       let insertedText = delta.ops[0].insert;
       let matches = node.data.match(URL_CLIPBOARD_REGEX);
 
