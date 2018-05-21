@@ -6,6 +6,7 @@
 import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
 import {getRole} from '../plugins/utils/acl-utils';
 import {sortByName} from '../plugins/utils/label-utils';
+import tracker from '../tracker';
 
 (function (can, GGRC, CMS) {
   'use strict';
@@ -398,16 +399,23 @@ import {sortByName} from '../plugins/utils/label-utils';
       return dfd;
     },
     getRelatedObjects() {
+      const stopFn = tracker.start(
+        this.type,
+        tracker.USER_JOURNEY_KEYS.API,
+        tracker.USER_ACTIONS.ASSESSMENT.RELATED_OBJECTS);
+
       return $.get(`/api/assessments/${this.attr('id')}/related_objects`)
         .then((response) => {
           let auditTitle = response.Audit.title;
+
+          stopFn();
 
           if (this.attr('audit')) {
             this.attr('audit.title', auditTitle);
           }
 
           return response;
-        });
+        }, stopFn.bind(null, true));
     },
   });
 })(window.can, window.GGRC, window.CMS);
