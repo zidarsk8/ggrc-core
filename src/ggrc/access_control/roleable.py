@@ -51,29 +51,65 @@ class Roleable(object):
     """Setter function for access control list.
 
     Args:
-      value: List of access control roles or dicts containing json
+        values: List of access control roles or dicts containing json
         representation of custom attribute values.
     """
     if values is None:
       return
 
-    new_values = {
-        (get("AccessControlRole", value['ac_role_id']),
-         get("Person", value['person']['id']))
-        for value in values
-        if value.get('ac_role_id') is not None
-    } | {
-        (value['ac_role'], value['person'])
-        for value in values
-        if value.get('ac_role') is not None and
-        value.get('person') is not None
-    }
-    old_values = {
-        (acl.ac_role, acl.person)
-        for acl in self.access_control_list
-    }
+    new_values = self._parse_values(values)
+    old_values = self._get_old_values()
     self._remove_values(old_values - new_values)
     self._add_values(new_values - old_values)
+
+  def extend_access_control_list(self, values):
+    """Extend access control list.
+
+    Args:
+        values: List of access control roles or dicts containing json
+        representation of custom attribute values.
+    """
+    if values is None:
+      return
+
+    new_values = self._parse_values(values)
+    old_values = self._get_old_values()
+    self._add_values(new_values - old_values)
+
+  def _get_old_values(self):
+    """Return Set of tuples (Role, Person)"""
+    return {(acl.ac_role, acl.person) for acl in self.access_control_list}
+
+  @staticmethod
+  def _parse_values(values):
+    """ Parse list of (ac_role, user) in form of:
+    e.g
+    [{
+        "ac_role_id": admin_role_id,
+        "person": {
+            "id": user_id
+        }
+    }]
+    or
+    [{
+        "ac_role": AccessControlRole(),
+        "person": Person()
+    }]
+
+    Return set of tuples(AccessControlRole, Person)"""
+
+    result = set()
+    for value in values:
+      if ("ac_role_id" in value and
+              "person" in value and "id" in value["person"]):
+        result.add((get("AccessControlRole", value["ac_role_id"]),
+                    get("Person", value["person"]["id"])))
+      elif "ac_role" in value and "person" in value:
+        result.add((value["ac_role"], value["person"]))
+      else:
+        raise ValueError("Unknown values format")
+
+    return result
 
   def _add_values(self, values):
     """Attach new custom role values to current object."""
