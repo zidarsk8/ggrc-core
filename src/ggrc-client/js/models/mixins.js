@@ -259,29 +259,58 @@ const AUDIT_ISSUE_TRACKER = {
     issue_tracker_severities: ['S0', 'S1', 'S2', 'S3', 'S4'],
   }, {
     'after:init': function () {
-      this.initIssueTracker();
+      this.initIssueTracker().then(() => {
+        // check "title_singular" because "new instance"
+        // doesn't have "type" property
+        if (this.type !== 'Audit' &&
+          this.class.title_singular !== 'Audit') {
+          this.trackAuditUpdates();
+        }
+      });
+    },
+
+    trackAuditUpdates() {
+      const audit = this.attr('audit');
+      if (!audit || !audit.reify) {
+        return;
+      }
+
+      audit.reify().bind('updated', (event) => {
+        this.attr('audit', event.target);
+        this.initIssueTrackerForAssessment();
+      });
     },
 
     initIssueTracker() {
+      if (!GGRC.ISSUE_TRACKER_ENABLED) {
+        return can.Deferred().reject();
+      }
+
       if (!this.attr('issue_tracker')) {
         this.attr('issue_tracker', new can.Map({}));
       }
 
-      if (GGRC.ISSUE_TRACKER_ENABLED) {
-        // check "title_singular" because "new instance"
-        // doesn't have "type" property
-        if (this.attr('type') === 'Audit' ||
-          this.class.title_singular === 'Audit') {
-          this.initAuditIssueTracker();
-        } else {
-          this.ensureParentAudit().then((audit) => {
-            if (audit) {
-              this.attr('audit', audit);
-              this.initIssueTrackerForAssessment();
-            }
-          });
-        }
+      let dfd = can.Deferred();
+
+      // check "title_singular" because "new instance"
+      // doesn't have "type" property
+      if (this.attr('type') === 'Audit' ||
+        this.class.title_singular === 'Audit') {
+        this.initAuditIssueTracker();
+        dfd.resolve();
+      } else {
+        this.ensureParentAudit().then((audit) => {
+          if (audit) {
+            this.attr('audit', audit);
+            this.initIssueTrackerForAssessment();
+            dfd.resolve();
+          } else {
+            dfd.reject();
+          }
+        });
       }
+
+      return dfd;
     },
 
     ensureParentAudit() {

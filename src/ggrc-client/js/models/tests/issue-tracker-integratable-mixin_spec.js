@@ -90,6 +90,32 @@ describe('can.Model.Mixin.issueTrackerIntegratable', function () {
       new CMS.Models.Assessment({type: 'Assessment'});
       expect(asmtProto.initIssueTrackerForAssessment).toHaveBeenCalled();
     });
+
+    it('should not call "trackAuditUpdates" method for Audit', (done) => {
+      let dfd = can.Deferred();
+      spyOn(auditProto, 'initIssueTracker').and.returnValue(dfd);
+      spyOn(auditProto, 'trackAuditUpdates');
+      new CMS.Models.Audit({type: 'Audit'});
+      dfd.then(() => {
+        expect(auditProto.trackAuditUpdates).not.toHaveBeenCalled();
+        done();
+      });
+
+      dfd.resolve();
+    });
+
+    it('should call "trackAuditUpdates" method for Assessment', (done) => {
+      let dfd = can.Deferred();
+      spyOn(asmtProto, 'initIssueTracker').and.returnValue(dfd);
+      spyOn(asmtProto, 'trackAuditUpdates');
+      new CMS.Models.Assessment({type: 'Assessment'});
+      dfd.then(() => {
+        expect(asmtProto.trackAuditUpdates).toHaveBeenCalled();
+        done();
+      });
+
+      dfd.resolve();
+    });
   });
 
   describe('initAuditIssueTracker() method', () => {
