@@ -6,6 +6,9 @@
 import {
   isSnapshotType,
 } from '../plugins/utils/snapshot-utils';
+import {
+  resolveDeferredBindings,
+} from '../plugins/utils/models-utils';
 
 (function (can, $) {
   /*
@@ -88,8 +91,9 @@ import {
         if (!changes.length) {
           if (instance && instance._pending_joins &&
             instance._pending_joins.length) {
-            instance.delay_resolving_save_until(instance.constructor
-              .resolve_deferred_bindings(instance));
+            instance.delay_resolving_save_until(resolveDeferredBindings(
+              instance
+            ));
           }
           return;
         }
@@ -108,9 +112,9 @@ import {
         }.bind(this)
         );
         this.viewModel.instance
-          .delay_resolving_save_until(
-            this.viewModel.instance.constructor
-              .resolve_deferred_bindings(this.viewModel.instance));
+          .delay_resolving_save_until(resolveDeferredBindings(
+            this.viewModel.instance)
+          );
       },
       '{instance} updated': 'deferred_update',
       '{instance} created': 'deferred_update',

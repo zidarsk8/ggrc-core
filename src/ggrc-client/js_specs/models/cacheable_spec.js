@@ -8,6 +8,7 @@ import {
   makeFakeModel,
 } from '../spec_helpers';
 import CustomAttributeObject from '../../js/plugins/utils/custom-attribute/custom-attribute-object';
+import * as modelUtils from '../../js/plugins/utils/models-utils';
 
 describe('can.Model.Cacheable', function () {
   let origGcaDefs;
@@ -128,103 +129,19 @@ describe('can.Model.Cacheable', function () {
       });
     });
 
-    it('calls resolve_deferred_bindings after send success', function (done) {
+    it('calls resolveDeferredBindings after send success', function (done) {
       let obj = _obj;
-      spyOn(DummyModel, 'resolve_deferred_bindings')
+      spyOn(modelUtils, 'resolveDeferredBindings')
         .and
         .returnValue(obj);
       spyOn(can, 'ajax').and.returnValue($.when({dummy_model: {id: obj.id}}));
       DummyModel
         .update(obj.id, obj.serialize())
         .then(function () {
-          expect(DummyModel.resolve_deferred_bindings)
+          expect(modelUtils.resolveDeferredBindings)
             .toHaveBeenCalledWith(obj);
           setTimeout(done, 10);
         }, failAll(done));
-    });
-  });
-
-  describe('::resolve_deferred_bindings', function () {
-    beforeEach(function () {
-      can.Model.Cacheable.extend('CMS.Models.DummyJoin', {}, {});
-    });
-
-    afterEach(function () {
-      delete CMS.Models.DummyJoin;
-    });
-
-    it('iterates _pending_joins, calling refresh_stubs on each binding', function () {
-      let instance = jasmine.createSpyObj('instance', ['get_binding']);
-      let binding = jasmine.createSpyObj('binding', ['refresh_stubs']);
-      instance._pending_joins = [{what: {}, how: 'add', through: 'foo'}];
-      instance.get_binding.and.returnValue(binding);
-      spyOn($.when, 'apply').and.returnValue(new $.Deferred().reject());
-
-      can.Model.Cacheable.resolve_deferred_bindings(instance);
-      expect(binding.refresh_stubs).toHaveBeenCalled();
-    });
-
-    describe('add case', function () {
-      let instance;
-      let binding;
-      let dummy;
-      beforeEach(function () {
-        dummy = new DummyModel({id: 1});
-        instance = jasmine.createSpyObj('instance',
-          ['get_binding', 'isNew', 'refresh', 'attr', 'dispatch']);
-        binding = jasmine.createSpyObj('binding', ['refresh_stubs']);
-        instance._pending_joins = [{what: dummy, how: 'add', through: 'foo'}];
-        instance.isNew.and.returnValue(false);
-        instance.get_binding.and.returnValue(binding);
-        binding.loader = {model_name: 'DummyJoin'};
-        binding.list = [];
-        spyOn(CMS.Models.DummyJoin, 'newInstance');
-        spyOn(CMS.Models.DummyJoin.prototype, 'save');
-      });
-
-      it('creates a proxy object when it does not exist', function () {
-        can.Model.Cacheable.resolve_deferred_bindings(instance);
-        expect(CMS.Models.DummyJoin.newInstance).toHaveBeenCalled();
-        expect(CMS.Models.DummyJoin.prototype.save).toHaveBeenCalled();
-      });
-
-      it('does not create proxy object when it already exists', function () {
-        binding.list.push({instance: dummy});
-        can.Model.Cacheable.resolve_deferred_bindings(instance);
-        expect(CMS.Models.DummyJoin.newInstance).not.toHaveBeenCalled();
-        expect(CMS.Models.DummyJoin.prototype.save).not.toHaveBeenCalled();
-      });
-    });
-
-    describe('remove case', function () {
-      let instance;
-      let binding;
-      let dummy;
-      let dummy_join;
-      beforeEach(function () {
-        dummy = new DummyModel({id: 1});
-        dummy_join = new CMS.Models.DummyJoin({id: 1});
-        instance = jasmine.createSpyObj('instance',
-          ['get_binding', 'isNew', 'refresh', 'attr', 'dispatch']);
-        binding = jasmine.createSpyObj('binding', ['refresh_stubs']);
-        instance._pending_joins = [{what: dummy, how: 'remove', through: 'foo'}];
-        instance.isNew.and.returnValue(false);
-        instance.get_binding.and.returnValue(binding);
-        binding.loader = {model_name: 'DummyJoin'};
-        binding.list = [];
-        spyOn(CMS.Models.DummyJoin, 'newInstance');
-        spyOn(CMS.Models.DummyJoin.prototype, 'save');
-      });
-
-      it('removes proxy object if it exists', function () {
-        binding.list.push({instance: dummy, get_mappings: function () {
-          return [dummy_join];
-        }});
-        spyOn(dummy_join, 'refresh').and.returnValue($.when());
-        spyOn(dummy_join, 'destroy');
-        can.Model.Cacheable.resolve_deferred_bindings(instance);
-        expect(dummy_join.destroy).toHaveBeenCalled();
-      });
     });
   });
 
