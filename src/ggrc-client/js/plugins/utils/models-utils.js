@@ -48,14 +48,25 @@ const hasRelatedAssessments = (type) => {
   return _.contains(relatedAssessmentsTypes, type);
 };
 
+const handlePendingJoins = (obj) => {
+  const hasPendingJoins = _.get(obj, '_pending_joins.length') > 0;
+
+  if (!hasPendingJoins) {
+    return can.Deferred().resolve(obj);
+  }
+
+  return _resolveDeferredBindings(obj);
+};
+
 const resolveDeferredBindings = (obj) => {
   const hasPendingJoins = _.get(obj, '_pending_joins.length') > 0;
 
   if (!hasPendingJoins) {
-    return obj;
+    return can.Deferred().resolve(obj);
   }
 
-  return _resolveDeferredBindings(obj);
+  return _resolveDeferredBindings(obj)
+    .then(() => obj.refresh());
 };
 
 function _resolveDeferredBindings(obj) {
@@ -96,7 +107,7 @@ function _resolveDeferredBindings(obj) {
 
       return dfdsApply.then(() => {
         obj.dispatch('resolvePendingBindings');
-        return obj.refresh();
+        return obj;
       });
     });
 }
@@ -181,4 +192,5 @@ export {
   hasRelatedAssessments,
   relatedAssessmentsTypes,
   resolveDeferredBindings,
+  handlePendingJoins,
 };

@@ -7,7 +7,7 @@ import {
   isSnapshotType,
 } from '../plugins/utils/snapshot-utils';
 import {
-  resolveDeferredBindings,
+  handlePendingJoins,
 } from '../plugins/utils/models-utils';
 
 (function (can, $) {
@@ -38,8 +38,14 @@ import {
       default_mappings: [], // expects array of objects
       mapping: '@',
       list: [],
+      needToInstanceRefresh: true,
       // the following are just for the case when we have no object to start with,
       changes: [],
+      makeDelayedResolving() {
+        const instance = this.attr('instance');
+        const dfd = handlePendingJoins(instance);
+        instance.delay_resolving_save_until(dfd);
+      },
     },
     events: {
       init: function () {
@@ -92,9 +98,7 @@ import {
         if (!changes.length) {
           const hasPendingJoins = _.get(instance, '_pending_joins.length') > 0;
           if (hasPendingJoins) {
-            instance.delay_resolving_save_until(resolveDeferredBindings(
-              instance
-            ));
+            viewModel.makeDelayedResolving();
           }
           return;
         }
@@ -112,9 +116,7 @@ import {
           }
         });
 
-        viewModel.instance
-          .delay_resolving_save_until(
-            resolveDeferredBindings(viewModel.instance));
+        viewModel.makeDelayedResolving();
       },
       '{instance} updated': 'deferred_update',
       '{instance} created': 'deferred_update',
