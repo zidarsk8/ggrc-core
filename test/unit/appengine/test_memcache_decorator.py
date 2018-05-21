@@ -4,15 +4,16 @@
 """Test with_memcache util decorator"""
 
 from unittest import TestCase
-
+import mock
 from ddt import data, ddt, unpack
 from appengine import base
+from ggrc.cache.memcache import cached
 
 
 @ddt
 @base.with_memcache
 class TestMemcacheDecorator(TestCase):
-  """Test docorator to emulate memcache in test"""
+  """Test decorator to emulate memcache in test"""
 
   TESTKEYS = ('1', '2', '3')
 
@@ -29,3 +30,12 @@ class TestMemcacheDecorator(TestCase):
       val = key * 10
       self.memcache_client.add(key, val)
       self.assertEqual(val, self.memcache_client.get(key))
+
+  def test_expire(self):
+    """Test decorator to emulate cache expire"""
+    def test_func():
+      pass
+    cached_test_func = cached(test_func)
+    cached_test_func.memcache_client.get = mock.Mock(side_effect=['1', None])
+    self.assertEqual(cached_test_func(), '1')
+    self.assertEqual(cached_test_func(), None)

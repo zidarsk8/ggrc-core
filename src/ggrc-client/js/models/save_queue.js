@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import tracker from '../tracker';
+
 (function (can, $) {
   /*  GGRC.SaveQueue
    *
@@ -37,6 +39,10 @@
           list[bucket.type] = obj.serialize();
           return list;
         });
+        let modelType = objs[0].constructor.model_singular;
+        let stopFn = tracker.start(modelType,
+          tracker.USER_JOURNEY_KEYS.API,
+          tracker.USER_ACTIONS.CREATE_OBJECT(objs.length));
         let dfd = $.ajax({
           type: 'POST',
           url: '/api/' + bucket.plural,
@@ -49,11 +55,13 @@
         }).promise();
         dfd.always(function (data, type) {
           if (type === 'error') {
+            stopFn(true);
             can.each(objs, function (obj) {
               obj._dfd.reject(data);
             });
           }
           if ('background_task' in data) {
+            stopFn(true);
             return CMS.Models.BackgroundTask.findOne({
               id: data.background_task.id,
             }).then(function (task) {
@@ -63,6 +71,8 @@
               });
             });
           }
+
+          stopFn();
 
           // Push the response to a queue for later processing.
           bucket.save_responses.push([objs, data]);
@@ -122,7 +132,14 @@
       let bucketName;
       let plural;
       let elem = function () {
-        return obj._save.apply(obj, args);
+        let stopFn = tracker
+          .start(obj.constructor.model_singular,
+            tracker.USER_JOURNEY_KEYS.API,
+            tracker.USER_ACTIONS.UPDATE_OBJECT);
+        return obj._save(...args).then((objects) => {
+          stopFn();
+          return objects;
+        }, stopFn.bind(null, true));
       };
       if (obj.isNew()) {
         type = obj.constructor.table_singular;
@@ -163,9 +180,10 @@
         return;
       }
       objs = this._queue.splice(0, this.constructor.BATCH);
-      $.when.apply($, objs.map(function (fn) {
-        return fn.apply(this);
-      }.bind(this.constructor))).always(this._resolve.bind(this)); // Move on to the next one
+      $.when(...objs.map((fn) => {
+        return fn.apply(this.constructor);
+      }))
+        .always(this._resolve.bind(this)); // Move on to the next one
     },
   });
 })(window.can, window.can.$);

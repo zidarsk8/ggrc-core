@@ -217,7 +217,7 @@ class TestLastAssessmentDate(TestCase):
   def test_export_lad_snapshot(self):
     """Check export Last Assessment Date."""
     finish_date = datetime.datetime(2017, 2, 20, 13, 40, 0)
-    finish_date_str = finish_date.isoformat().replace("T", " ")
+    finish_date_str = "02/20/2017"
     related_objects = {"*Control_1", "*Control_2"}
 
     with freezegun.freeze_time(finish_date):

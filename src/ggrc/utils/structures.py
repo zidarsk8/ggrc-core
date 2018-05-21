@@ -102,3 +102,11 @@ class CaseInsensitiveDefaultDict(CaseInsensitiveDict):
 
   def copy(self):
     return CaseInsensitiveDefaultDict(self._default, data=self._store.values())
+
+
+class EmptyList(list):
+  """List class that can't be filled by append method."""
+
+  def append(self, item):
+    """Append new item to list."""
+    pass

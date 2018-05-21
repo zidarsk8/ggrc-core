@@ -9,7 +9,11 @@ import '../feedback-link/feedback-link';
 import logo from '../../../images/ggrc-logo.svg';
 import oneColorLogo from '../../../images/ggrc-one-color.svg';
 import {
-  isMyAssessments,
+  isMyWork,
+  isAllObjects,
+  isAdmin,
+  getPageType,
+  isObjectContextPage,
 } from '../../plugins/utils/current-page-utils';
 import template from './page-header.mustache';
 
@@ -41,18 +45,37 @@ import template from './page-header.mustache';
 
   let viewModel = can.Map.extend({
     define: {
-      isMyAssessments: {
-        type: Boolean,
-        get: function () {
-          return isMyAssessments();
-        },
-      },
       showTitles: {
         type: Boolean,
         value: true,
       },
+      isMyWorkPage: {
+        get() {
+          return isMyWork();
+        },
+      },
+      isAllObjectsPage: {
+        get() {
+          return isAllObjects();
+        },
+      },
+      isAdminPage: {
+        get() {
+          return isAdmin();
+        },
+      },
+      isPersonPage: {
+        get() {
+          return getPageType() === 'Person';
+        },
+      },
+      isObjectPage: {
+        get() {
+          return isObjectContextPage();
+        },
+      },
       model: {
-        get: function () {
+        get() {
           return this.attr('instance').class;
         },
       },

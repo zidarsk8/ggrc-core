@@ -31,6 +31,7 @@ import {
         facility: CMS.Models.Facility,
         product: CMS.Models.Product,
         data_asset: CMS.Models.DataAsset,
+        evidence: CMS.Models.Evidence,
         access_group: CMS.Models.AccessGroup,
         market: CMS.Models.Market,
         system_or_process: {
@@ -116,6 +117,7 @@ import {
         assessment_templates:
           path + '/assessment_templates/info.mustache',
         issues: path + '/issues/info.mustache',
+        evidence: path + '/evidence/info.mustache',
       };
       widgetList.add_widget(object.constructor.shortName, 'info', {
         widget_id: 'info',
@@ -214,19 +216,23 @@ import {
 
       extraDescriptorOptions = {
         all: (function () {
+          let all = {
+            Evidence: {
+              treeViewDepth: 0,
+            },
+            Person: {
+              widget_icon: 'person',
+            },
+          };
+
           let defOrder = GGRC.tree_view.attr('defaultOrderTypes');
-          let all = {};
           Object.keys(defOrder).forEach(function (type) {
-            all[type] = {
-              order: defOrder[type],
-            };
+            if (!all[type]) {
+              all[type] = {};
+            }
+            all[type].order = defOrder[type];
           });
 
-          all.Document = {
-            widget_icon: 'fa fa-link!',
-            order: 150,
-          };
-          all.Person.widget_icon = 'person';
           return all;
         })(),
         Contract: {
@@ -258,7 +264,7 @@ import {
           Issue: {
             order: 8,
           },
-          Program: {
+          Evidence: {
             order: 9,
           },
           program: {
@@ -284,6 +290,9 @@ import {
       // or to prevent creating People widget on Objective page:
       //     { Objective: { Person: false } }
       overriddenModels = {
+        Audit: {
+          Evidence: false,
+        },
         Program: {
         },
         all: {

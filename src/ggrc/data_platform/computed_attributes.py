@@ -18,12 +18,14 @@ computed object = object which will get the new computed value
 
 import datetime
 import collections
+import logging
 
 import sqlalchemy as sa
 
 from ggrc import db
 from ggrc import login
-from ggrc.utils import revisions as revision_utils
+from ggrc import utils
+from ggrc.utils import revisions as revision_utils, helpers
 from ggrc.utils import benchmark
 from ggrc.models import all_models as models
 
@@ -83,6 +85,9 @@ INDEX_REPLACE_STATEMENT = """
       :subproperty
   )
 """
+CA_CHUNK_SIZE = 500
+
+logger = logging.getLogger(__name__)
 
 
 def get_computed_attributes():
@@ -631,6 +636,7 @@ def get_revisions(revision_ids):
   return non_snapshot_revisions + snapshot_revisions
 
 
+@helpers.without_sqlalchemy_cache
 def compute_attributes(revision_ids):
   """Compute new values based an changed objects.
 
@@ -647,28 +653,38 @@ def compute_attributes(revision_ids):
     if not revision_ids:
       return
 
-    with benchmark("Get revisions."):
-      revisions = get_revisions(revision_ids)
+    ids_count = len(revision_ids)
+    handled_ids = 0
+    for ids_chunk in utils.list_chunks(revision_ids, chunk_size=CA_CHUNK_SIZE):
+      handled_ids += len(ids_chunk)
+      logger.info("Revision: %s/%s", handled_ids, ids_count)
+      recompute_attrs_for_revisions(ids_chunk)
 
-    with benchmark("Get all computed attributes"):
-      attributes = get_computed_attributes()
 
-    with benchmark("Group revisions by computed attributes"):
-      attribute_groups = group_revisions(attributes, revisions)
-    with benchmark("get all objects affected by computed attributes"):
-      affected_objects = get_affected_objects(attribute_groups)
-    with benchmark("Get all relationships for these computed objects"):
-      relationships = get_relationships(affected_objects)
-    with benchmark("Get snapshot data"):
-      snapshot_map, snapshot_tag_map = get_snapshot_data(affected_objects)
+def recompute_attrs_for_revisions(ids_chunk):
+  """Reindex chunk of CAs."""
+  with benchmark("Get revisions."):
+    revisions = get_revisions(ids_chunk)
 
-    with benchmark("Compute values"):
-      computed_values = compute_values(affected_objects, relationships,
-                                       snapshot_map)
+  with benchmark("Get all computed attributes"):
+    attributes = get_computed_attributes()
 
-    with benchmark("Get computed attributes data"):
-      attributes_data = get_attributes_data(computed_values)
-    with benchmark("Get computed attribute full-text index data"):
-      index_data = get_index_data(computed_values, snapshot_tag_map)
-    with benchmark("Store attribute data and full-text index data"):
-      store_data(attributes_data, index_data)
+  with benchmark("Group revisions by computed attributes"):
+    attribute_groups = group_revisions(attributes, revisions)
+  with benchmark("get all objects affected by computed attributes"):
+    affected_objects = get_affected_objects(attribute_groups)
+  with benchmark("Get all relationships for these computed objects"):
+    relationships = get_relationships(affected_objects)
+  with benchmark("Get snapshot data"):
+    snapshot_map, snapshot_tag_map = get_snapshot_data(affected_objects)
+
+  with benchmark("Compute values"):
+    computed_values = compute_values(affected_objects, relationships,
+                                     snapshot_map)
+
+  with benchmark("Get computed attributes data"):
+    attributes_data = get_attributes_data(computed_values)
+  with benchmark("Get computed attribute full-text index data"):
+    index_data = get_index_data(computed_values, snapshot_tag_map)
+  with benchmark("Store attribute data and full-text index data"):
+    store_data(attributes_data, index_data)

@@ -5,11 +5,12 @@
 
 """Tests for /query api endpoint."""
 
-from sqlalchemy import func
 
 from ddt import data
 from ddt import ddt
 from ddt import unpack
+
+from sqlalchemy import func
 
 from ggrc import app
 from ggrc import models
@@ -61,7 +62,7 @@ class TestAuditSnapshotQueries(TestCase, WithQueryApi):
   def setUp(self):
     """Log in before performing queries."""
     self.client.get("/login")
-    self._full_reindex()
+    self.client.post("/admin/full_reindex")
 
   @classmethod
   def setUpClass(cls):

@@ -56,21 +56,14 @@ import {getRole} from '../plugins/utils/acl-utils';
     orderOfRoles: ['Program Managers', 'Program Editors', 'Program Readers'],
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/programs/tree-item-attr.mustache',
-      attr_list: [
-        {
-          attr_title: 'Manager',
-          attr_name: 'owner',
-          attr_sort_field: 'authorizations.0.person.name|email',
-        },
-      ].concat(can.Model.Cacheable.attr_list.filter(function (attr) {
-        return attr.attr_name !== 'owner';
-      })).concat([
+      attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       ]),
       add_item_view: GGRC.mustache_path +
         '/base_objects/tree_add_item.mustache',
+      display_attr_names: ['title', 'status', 'updated_at', 'Program Managers'],
     },
     sub_tree_view_options: {
       default_filter: ['Standard'],
@@ -145,7 +138,6 @@ import {getRole} from '../plugins/utils/acl-utils';
     update: 'PUT /api/objectives/{id}',
     destroy: 'DELETE /api/objectives/{id}',
     mixins: [
-      'ownable',
       'unique_title',
       'ca_update',
       'accessControlList',
@@ -174,7 +166,7 @@ import {getRole} from '../plugins/utils/acl-utils';
         {attr_title: 'Last Deprecated Date', attr_name: 'last_deprecated_date'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
       ]),
-      display_attr_names: ['title', 'owner', 'status', 'last_assessment_date',
+      display_attr_names: ['title', 'status', 'last_assessment_date',
         'updated_at'],
       add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
       create_link: true,

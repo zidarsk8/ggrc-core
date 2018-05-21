@@ -174,8 +174,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
       ({"dummy_date": ""}, "dummy_date", ""),
       ({"random_item": "Random value", }, "random_item", "Random value"),
       ({"dummy_date": "2022-02-22", }, "dummy_date", "02/22/2022"),
-      ({"dummy_date": "2017-04-08T17:57:09", }, "dummy_date",
-          "2017-04-08 17:57:09"),
+      ({"dummy_date": "2017-04-08T17:57:09", }, "dummy_date", "04/08/2017"),
   )
   @ddt.unpack
   def test_get_content_string_date(self, content, attr_name, expected_value):

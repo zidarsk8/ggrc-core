@@ -109,13 +109,6 @@ import InfoWidget from '../controllers/info_widget_controller';
         ),
         context: Direct(
           'Context', 'related_object', 'context'),
-        orphaned_objects: Multi([
-          'cycles',
-          'task_groups',
-          'tasks',
-          'current_task_groups',
-          'current_tasks',
-        ]),
       },
 
       Cycle: {

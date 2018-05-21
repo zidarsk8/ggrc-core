@@ -4,7 +4,7 @@
 */
 
 
-(function(can) {
+(function (can) {
 
   can.Model.Cacheable('CMS.Models.Workflow', {
     root_object: 'workflow',
@@ -42,7 +42,7 @@
     },
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/workflows/tree-item-attr.mustache',
-      attr_list : [
+      attr_list: [
         {attr_title: 'Title', attr_name: 'title'},
         {attr_title: 'Code', attr_name: 'slug'},
         {attr_title: 'State', attr_name: 'status'},
@@ -54,7 +54,7 @@
       adminRoleName: 'Admin',
     },
 
-    init: function() {
+    init: function () {
       this._super && this._super.apply(this, arguments);
       this.validateNonBlank('title');
     },

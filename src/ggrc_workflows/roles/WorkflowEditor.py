@@ -58,7 +58,4 @@ permissions = {
         "UserRole",
         "Document",
     ],
-    "view_object_page": [
-        "Workflow",
-    ],
 }

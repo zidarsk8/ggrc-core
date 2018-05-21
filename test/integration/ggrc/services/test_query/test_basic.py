@@ -11,10 +11,8 @@ import unittest
 
 from datetime import datetime
 from operator import itemgetter
-from flask import json
-
 import ddt
-
+from flask import json
 from ggrc import app
 from ggrc import db
 from ggrc import models
@@ -1157,7 +1155,7 @@ class TestQueryAssessmentByEvidenceURL(TestCase, WithQueryApi):
     assessments_by_url = self._get_first_result_set(
         self._make_query_dict(
             "Assessment",
-            expression=["Reference URL", "~", "i.imgur.com"],
+            expression=["Evidence URL", "~", "i.imgur.com"],
         ),
         "Assessment", "values",
     )

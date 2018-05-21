@@ -11,9 +11,9 @@
     tag: 'workflow-deactivate',
     template: '<content/>',
     events: {
-      click: function() {
+      click: function () {
         let workflow = GGRC.page_instance();
-        workflow.refresh().then(function(workflow) {
+        workflow.refresh().then(function (workflow) {
           workflow.attr('recurrences', false).save();
         });
       },

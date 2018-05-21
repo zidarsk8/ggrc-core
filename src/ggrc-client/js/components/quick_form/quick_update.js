@@ -24,7 +24,7 @@
       attributes: {},
     },
     events: {
-      init: function() {
+      init: function () {
         this.scope.attr('controller', this);
         this.scope.attr('model', this.scope.model || this.scope.instance.constructor);
         if(!this.scope.instance._transient) {
@@ -35,9 +35,9 @@
       //currently we don't support proxy object updates in mappings, so for now a change
       //  to a connected object (assuming we are operating on a proxy object) will trigger
       //  a deletion of the proxy object and creation of a new one.
-      autocomplete_select : function(el, event, ui) {
+      autocomplete_select: function (el, event, ui) {
         let that = this;
-        setTimeout(function() {
+        setTimeout(function () {
           let serial = that.scope.instance.serialize();
           delete serial[el.attr('name')];
           delete serial[el.attr('name') + '_id'];
@@ -49,14 +49,14 @@
           delete serial.updated_at;
           delete serial.provisional_id;
           serial[el.attr('name')] = ui.item.stub();
-          that.scope.instance.destroy().then(function() {
+          that.scope.instance.destroy().then(function () {
             new that.scope.model(serial).save();
           });
         });
       },
       // null-if-empty attributes are a pattern carried over from GGRC.Controllers.Modals
       //  Useful for connected objects.
-      'input[null-if-empty] change' : function(el) {
+      'input[null-if-empty] change': function (el) {
         if (!el.val()) {
           this.scope.instance.attr(el.attr('name'), null);
         }
@@ -64,7 +64,7 @@
       // data-mapping is the element decoration that triggers an autocomplete based on a
       //  mapping to a parent instance.  The mapping_autocomplete helper defined below is
       //  generally for these.
-      'input:not([data-mapping]), select change' : function(el) {
+      'input:not([data-mapping]), select change': function (el) {
         let isCheckbox = el.is('[type=checkbox][multiple]');
         let isDropdown = el.is('select');
         if (isCheckbox) {
@@ -76,7 +76,7 @@
             .replace(
               can.map(
                 this.element.find("input[name='" + el.attr('name') + "']:checked"),
-                function(el) {
+                function (el) {
                   return $(el).val();
                 }
               )

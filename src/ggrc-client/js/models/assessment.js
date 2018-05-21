@@ -20,7 +20,7 @@ import {sortByName} from '../plugins/utils/label-utils';
     destroy: 'DELETE /api/assessments/{id}',
     create: 'POST /api/assessments',
     mixins: [
-      'ownable', 'unique_title', 'ca_update',
+      'unique_title', 'ca_update',
       'autoStatusChangeable', 'timeboxed', 'mapping-limit',
       'inScopeObjects', 'accessControlList', 'refetchHash',
       'issueTrackerIntegratable', 'relatedAssessmentsLoader',

@@ -4,7 +4,7 @@
 */
 
 
-(function(can) {
+(function (can) {
 
   can.Model.Join('CMS.Models.TaskGroupObject', {
     root_object: 'task_group_object',

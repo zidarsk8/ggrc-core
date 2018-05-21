@@ -12,7 +12,6 @@ from ggrc.models.comment import Commentable
 from ggrc.models.mixins.with_similarity_score import WithSimilarityScore
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.access_control.roleable import Roleable
-from ggrc.models.audit_object import Auditable
 from ggrc.models.categorization import Categorizable
 from ggrc.models.category import CategoryBase
 from ggrc.models import mixins
@@ -72,6 +71,7 @@ class ControlCategorized(Categorizable):
 
   @classmethod
   def eager_query(cls):
+    """Eager Query"""
     query = super(ControlCategorized, cls).eager_query()
     return query.options(
         orm.subqueryload('categorizations').joinedload('category'),
@@ -121,6 +121,7 @@ class AssertionCategorized(Categorizable):
 
   @classmethod
   def eager_query(cls):
+    """Eager Query"""
     query = super(AssertionCategorized, cls).eager_query()
     return query.options(
         orm.subqueryload('categorized_assertions').joinedload('category'),
@@ -152,7 +153,6 @@ class Control(WithLastAssessmentDate,
               AssertionCategorized,
               mixins.Hierarchical,
               mixins.LastDeprecatedTimeboxed,
-              Auditable,
               mixins.TestPlanned,
               Commentable,
               WithSimilarityScore,
@@ -266,12 +266,13 @@ class Control(WithLastAssessmentDate,
           "description": "Allowed values are:\nkey\nnon-key\n---",
       },
       # overrides values from PublicDocumentable mixin
-      "document_url": None,
+      "documents_url": None,
       "test_plan": "Assessment Procedure",
   }
 
   @validates('kind', 'means', 'verify_frequency')
   def validate_control_options(self, key, option):
+    """Validate control 'kind', 'means', 'verify_frequency'"""
     desired_role = key if key == 'verify_frequency' else 'control_' + key
     return validate_option(self.__class__.__name__, key, option, desired_role)
 

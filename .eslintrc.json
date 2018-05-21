@@ -30,13 +30,17 @@
     "calculate_spinner_z_index": false,
     "resolve_computed": false,
     "rangy": false,
+    "ga": false,
     "gapi": false,
     "oauth_dfd": false,
     "getPageToken": false,
     "google": false,
     "st": false,
     "wysihtml5ParserRules": false,
-    "wysihtml5": false
+    "wysihtml5": false,
+    // Webpack variables
+    "DEV_MODE": false,
+    "GOOGLE_ANALYTICS_ID": false
   },
 
   "rules": {

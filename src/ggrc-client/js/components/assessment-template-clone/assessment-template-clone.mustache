@@ -20,7 +20,7 @@
         data-modal-reset="reset"
         data-modal-class="modal-wide"
         data-in-cloner="true"
-        data-update-hash="true"
+        {{#isAuditPage}}data-update-hash="true"{{/isAuditPage}}
         data-object-singular="{{model_info 'AssessmentTemplate' 'model_singular'}}"
         data-object-plural="{{model_info 'AssessmentTemplate' 'root_collection'}}"
         data-extend-new-instance='{
@@ -36,8 +36,8 @@
 <div class="modal-filter modal-body">
   <collapsible-panel {soft-mode}="true" {title-text}="'filter'" {(expanded)}="showSearch">
     <advanced-search-wrapper
-      {model-name}="object"
-      {model-display-name}="object"
+      {model-name}="type"
+      {model-display-name}="type"
       {^mapping-items}="*mappingItems"
       {^filter-items}="*filterItems"
       {^status-item}="*statusItem"

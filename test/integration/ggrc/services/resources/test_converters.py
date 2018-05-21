@@ -217,7 +217,7 @@ class TestImportExports(TestCase):
     user = all_models.Person.query.first()
     ie1 = factories.ImportExportFactory(
         job_type=job_type,
-        status='Finished',
+        status="Finished",
         created_at=datetime.now(),
         created_by=user,
         title="test.csv",
@@ -251,6 +251,45 @@ class TestImportExports(TestCase):
         headers=self.headers)
     self.assert200(response)
     self.assertEqual(json.loads(response.data)["status"], "Stopped")
+
+  @ddt.data(("Not Started", True),
+            ("Blocked", True),
+            ("Finished", False))
+  @ddt.unpack
+  @mock.patch("ggrc.gdrive.file_actions.get_gdrive_file_data",
+              new=lambda x: (x, None, None))
+  def test_delete_previous_imports(self, status, should_be_none):
+    """Test deletion of previous imports"""
+    user = all_models.Person.query.first()
+    ie_item = factories.ImportExportFactory(
+        job_type="Import",
+        status=status,
+        created_at=datetime.now(),
+        created_by=user).id
+
+    response = self.client.post(
+        "/api/people/{}/imports".format(user.id),
+        data=json.dumps([]),
+        headers=self.headers)
+
+    self.assert200(response)
+    if should_be_none:
+      self.assertIsNone(all_models.ImportExport.query.get(ie_item))
+    else:
+      self.assertIsNotNone(all_models.ImportExport.query.get(ie_item))
+
+    ie_item_in_progress = factories.ImportExportFactory(
+        job_type="Import",
+        status="In Progress",
+        created_at=datetime.now(),
+        created_by=user).id
+    response = self.client.post(
+        "/api/people/{}/imports".format(user.id),
+        data=json.dumps([]),
+        headers=self.headers)
+    self.assert400(response)
+    self.assertIsNotNone(all_models.ImportExport.query.get(
+        ie_item_in_progress))
 
   @mock.patch(
       "ggrc.gdrive.file_actions.get_gdrive_file_data",

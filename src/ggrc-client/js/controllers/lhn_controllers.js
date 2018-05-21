@@ -925,8 +925,8 @@ can.Control('CMS.Controllers.LHN_Search', {
     let stopFn = tracker.start(
       tracker.FOCUS_AREAS.LHN,
       tracker.USER_JOURNEY_KEYS.LOADING,
-      `LHN search in ${contactId ? 'My Objects' : 'All Objects'})`
-      );
+      tracker.USER_ACTIONS.LHN.SEARCH(contactId ? 'My Objects' : 'All Objects'),
+    );
 
     if (term !== this.current_term || extra_params !== this.current_params) {
         // Clear current result lists

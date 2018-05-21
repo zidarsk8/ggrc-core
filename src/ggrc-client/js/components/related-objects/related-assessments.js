@@ -70,20 +70,20 @@ export default can.Component.extend({
     buildEvidenceModel: function (evidence) {
       const baseData = {
         context: {id: this.attr('instance.context.id') || null},
-        documentable_obj: {
+        parent_obj: {
           id: this.attr('instance.id'),
           type: this.attr('instance.type'),
         },
-        document_type: evidence.attr('document_type'),
+        kind: evidence.attr('kind'),
         title: evidence.attr('title'),
       };
-      const specificData = evidence.attr('document_type') === 'EVIDENCE' ?
+      const specificData = evidence.attr('kind') === 'FILE' ?
         {source_gdrive_id: evidence.attr('gdrive_id')} :
         {link: evidence.attr('link')};
 
       let data = Object.assign({}, baseData, specificData);
 
-      return new CMS.Models.Document(data);
+      return new CMS.Models.Evidence(data);
     },
     reuseSelected: function () {
       let reusedObjectList = this.attr('selectedEvidences').map((evidence)=> {
@@ -141,7 +141,7 @@ export default can.Component.extend({
         });
     },
     checkReuseAbility(evidence) {
-      let isFile = evidence.attr('document_type') === 'EVIDENCE';
+      let isFile = evidence.attr('kind') === 'FILE';
       let isGdriveIdProvided = !!evidence.attr('gdrive_id');
 
       let isAble = !isFile || isGdriveIdProvided;

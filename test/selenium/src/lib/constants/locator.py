@@ -188,6 +188,7 @@ class LhnMenu(object):
   LHN_MENU = (By.ID, "lhn")
   MODAL = (By.CSS_SELECTOR, '[id="ajax-lhn_modal-javascript:--"]')
   EXTENDED_INFO = (By.CSS_SELECTOR, ".extended-info.in .info .fa")
+  HOLDER = (By.CSS_SELECTOR, '.lhs-holder')
   FILTER = (By.CSS_SELECTOR, ".lhs-search")
   FILTER_TEXT_BOX = (By.CSS_SELECTOR, ".lhs-search>.widgetsearch")
   FILTER_SUBMIT_BUTTON = (By.CSS_SELECTOR, ".lhs-search>.widgetsearch-submit")
@@ -265,7 +266,8 @@ class CommonModalUnifiedMapper(object):
   # user input elements
   OBJ_TYPE_DROPDOWN = (By.CSS_SELECTOR, MODAL + " .input-block-level")
   BUTTON_SEARCH = (By.CSS_SELECTOR, MODAL + " button[type='submit']")
-  FOUND_OBJECTS_TITLES = (By.CSS_SELECTOR, MODAL + " .flex-box .title-attr")
+  FOUND_OBJECTS_TITLES = (
+      By.CSS_SELECTOR, MODAL + " .flex-box .attr:first-child")
   FOUND_OBJECTS_CHECKBOXES = (By.CSS_SELECTOR,
                               MODAL + ' .flex-box [type="checkbox"]')
   BUTTON_MAP_SELECTED = (By.CSS_SELECTOR, MODAL + Common.MODAL_FOOTER +
@@ -542,6 +544,11 @@ class ModalSetVisibleFieldsMapper(ModalSetVisibleFields):
   BUTTON_SET_FIELDS = MODAL + " .set-tree-attrs"
 
 
+class ModalRelatedAssessments(object):
+  """Locators for related assessments modal on Control and Objective pages"""
+  MODAL = (By.CSS_SELECTOR, ".related-assessments")
+
+
 class WidgetBar(object):
   """Locators for bar containing widgets/tabs."""
 
@@ -683,6 +690,9 @@ class CommonWidgetInfo(object):
       By.CSS_SELECTOR, "{} .object-approved".format(WIDGET))
   LINK_SUBMIT_FOR_REVIEW = (By.CSS_SELECTOR,
                             "{} .non-transparent".format(WIDGET))
+  # buttons
+  SHOW_RELATED_ASSESSMENTS = (
+      By.XPATH, _INFO_WIDGET_XPATH + "//a[@title='Show Related Assessments']")
   # people section
   _PEOPLE_ITEM = ".editable-people-group"
   PEOPLE_HEADERS_AND_VALUES_CSS = (By.CSS_SELECTOR, _PEOPLE_ITEM)

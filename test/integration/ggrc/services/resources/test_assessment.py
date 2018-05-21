@@ -22,31 +22,10 @@ class TestAssessmentResource(TestCase):
     url = "/api/assessments/{}/related_objects".format(assessment.id)
     return self.client.get(url).json
 
-  @ddt.data(0, 1, 4)
-  def test_related_issues(self, related_issues_count):
-    """Test that {0} related issues are returned in related_objects."""
-    expected_titles = set()
-    with factories.single_commit():
-      assessment = factories.AssessmentFactory()
-      factories.IssueFactory()  # unrelated issue
-      for _ in range(related_issues_count):
-        issue = factories.IssueFactory()
-        expected_titles.add(issue.title)
-        factories.RelationshipFactory.randomize(assessment, issue)
-
-    related_objects = self._get_related_objects(assessment)
-    self.assertIn("Issue", related_objects)
-
-    related_issue_titles = {
-        issue["title"]
-        for issue in related_objects["Issue"]
-    }
-    self.assertEqual(related_issue_titles, expected_titles)
-
   def test_object_fields(self):
     """Test that objects contain mandatory fields.
 
-    Front-end relies on audits and issues containing id, type, title, and
+    Front-end relies on audits containing id, type, title, and
     description. This tests ensures that those fields are returned in the
     related_objects response.
     """
@@ -56,7 +35,6 @@ class TestAssessmentResource(TestCase):
       for _ in range(2):
         issue = factories.IssueFactory()
         factories.RelationshipFactory.randomize(assessment, issue)
-
     related_objects = self._get_related_objects(assessment)
 
     expected_keys = {"id", "type", "title", "description"}
@@ -64,8 +42,18 @@ class TestAssessmentResource(TestCase):
         expected_keys,
         set(related_objects["Audit"].keys())
     )
-    for issue in related_objects["Issue"]:
-      self.assertLessEqual(
-          expected_keys,
-          set(issue.keys())
-      )
+
+  def test_fields_in_response(self):
+    """Test that objects contain only expected field."""
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory()
+      factories.IssueFactory()  # unrelated issue
+      for _ in range(2):
+        issue = factories.IssueFactory()
+        factories.RelationshipFactory.randomize(assessment, issue)
+
+    expected_fields = {"Audit", "Comment", "Snapshot",
+                       "Evidence:URL", "Evidence:FILE"}
+    related_objects = self._get_related_objects(assessment)
+
+    self.assertEqual(expected_fields, set(related_objects.keys()))

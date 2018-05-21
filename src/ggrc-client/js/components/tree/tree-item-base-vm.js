@@ -30,7 +30,12 @@ export default can.Map.extend({
       this.attr('expanded', !isExpanded);
     }
   },
-  onClick: function ($element) {
+  onClick: function ($element, event) {
+    if ($(event.target).is('.link')) {
+      event.stopPropagation();
+      return;
+    }
+
     let instance = this.attr('instance');
 
     switch (instance.attr('type')) {
@@ -63,8 +68,8 @@ export default can.Map.extend({
 
     if (instance.type === 'Assessment') {
       tracker.start(instance.type,
-        tracker.USER_JOURNEY_KEYS.NAVIGATION,
-        tracker.USER_ACTIONS.OPEN_INFO_PANE);
+        tracker.USER_JOURNEY_KEYS.INFO_PANE,
+        tracker.USER_ACTIONS.INFO_PANE.OPEN_INFO_PANE);
     }
 
     $element = $element.closest(itemSelector);

@@ -9,7 +9,6 @@ import {
   isSnapshotParent,
 } from './plugins/utils/snapshot-utils';
 import {
-  isMyAssessments,
   isAdmin,
 } from './plugins/utils/current-page-utils';
 import {
@@ -428,32 +427,6 @@ function deferRender(tagPrefix, funcs, deferred) {
   return ['<', tagPrefix, ' ', hook, '>', '</', tagName, '>'].join('');
 };
 
-Mustache.registerHelper('defer', function (prop, deferred, options) {
-  let tagName;
-  let allowFail;
-  if (!options) {
-    options = prop;
-    prop = 'result';
-  }
-
-  tagName = (options.hash || {}).tag_name || 'span';
-  allowFail = (options.hash || {}).allow_fail || false;
-
-  deferred = resolveComputed(deferred);
-  if (typeof deferred === 'function') deferred = deferred();
-  function finish(items) {
-    let ctx = {};
-    ctx[prop] = items;
-    return options.fn(options.contexts.add(ctx));
-  }
-  function progress() {
-    return options.inverse(options.contexts);
-  }
-
-  return deferRender(tagName, {done: finish, fail: allowFail ?
-    finish : null, progress: progress}, deferred);
-});
-
 can.each(['with_page_object_as', 'with_current_user_as'], function (fname) {
   Mustache.registerHelper(fname, function (name, options) {
     if (!options) {
@@ -474,24 +447,6 @@ can.each(['with_page_object_as', 'with_current_user_as'], function (fname) {
       return options.inverse(options.contexts);
     }
   });
-});
-
-// Iterate over a string by spliting it by a separator
-Mustache.registerHelper('iterate_string', function (str, separator, options) {
-  let i = 0;
-  let args;
-  let ctx = {};
-  let ret = [];
-
-  str = Mustache.resolve(str);
-  separator = Mustache.resolve(separator);
-  args = str.split(separator);
-  for (; i < args.length; i += 1) {
-    ctx.iterator = typeof args[i] === 'string' ? String(args[i]) : args[i];
-    ret.push(options.fn(options.contexts.add(ctx)));
-  }
-
-  return ret.join('');
 });
 
 Mustache.registerHelper('option_select',
@@ -810,21 +765,6 @@ Mustache.registerHelper('person_roles', function (person, scope, options) {
   return deferRender('span', finish, rolesDeferred);
 });
 
-Mustache.registerHelper('link_to_tree', function () {
-  let args = [].slice.apply(arguments);
-  let link = [];
-
-  args = can.map(args, Mustache.resolve);
-  args = can.map(args, function (stub) {
-    return stub.reify();
-  });
-  link.push('#' + args[0].constructor.table_singular + '_widget');
-  //  FIXME: Add this back when extended-tree-routing is enabled
-  // for (i=0; i<args.length; i++)
-  //  link.push(args[i].constructor.table_singular + "-" + args[i].id);
-  return link.join('/');
-});
-
 /**
  *  Helper for rendering date or datetime values in current local time
  *
@@ -867,7 +807,7 @@ Mustache.registerHelper('is_allowed', function () {
       actions.push(arg);
     } else if (typeof arg === 'string') {
       resourceType = arg;
-    } else if (typeof arg === 'object' && arg instanceof can.Model) {
+    } else if (typeof arg === 'object' && arg instanceof can.Map) {
       resource = arg;
     }
   });
@@ -1149,21 +1089,9 @@ Mustache.registerHelper('is_dashboard', function (options) {
     options.inverse(options.contexts);
 });
 
-Mustache.registerHelper('is_allobjectview', function (options) {
-  return /objectBrowser/.test(window.location) ?
-    options.fn(options.contexts) :
-    options.inverse(options.contexts);
-});
-
 Mustache.registerHelper('is_dashboard_or_all', function (options) {
   return (/dashboard/.test(window.location) ||
     /objectBrowser/.test(window.location)) ?
-    options.fn(options.contexts) :
-    options.inverse(options.contexts);
-});
-
-Mustache.registerHelper('isMyAssessments', function (options) {
-  return isMyAssessments() ?
     options.fn(options.contexts) :
     options.inverse(options.contexts);
 });
@@ -1297,14 +1225,6 @@ Mustache.registerHelper('default_audit_title', function (instance, options) {
 
 Mustache.registerHelper('urlPath', function () {
   return window.location.pathname;
-});
-
-Mustache.registerHelper('sum', function () {
-  let sum = 0;
-  for (let i = 0; i < arguments.length - 1; i++) {
-    sum += parseInt(resolveComputed(arguments[i]), 10);
-  }
-  return String(sum);
 });
 
 /*
@@ -1459,52 +1379,6 @@ Mustache.registerHelper('with_model_as',
     frame[varName] = CMS.Models[modelName];
     return options.fn(options.contexts.add(frame));
   });
-
-// Verify if the Program has multiple owners
-// Usage: {{#if_multi_owner instance modal_title}}
-Mustache.registerHelper('if_multi_owner',
-  function (instance, modalTitle, options) {
-    let ownerCount = 0;
-
-    if (resolveComputed(modalTitle).indexOf('New ') === 0) {
-      return options.inverse(options.contexts);
-    }
-
-    let loader = resolveComputed(instance).get_binding('authorizations');
-    can.each(loader.list, function (binding) {
-      if (binding.instance.role && binding.instance.role.reify()
-        .attr('name') === 'ProgramOwner') {
-        ownerCount += 1;
-      }
-    });
-
-    if (ownerCount > 1) {
-      return options.fn(options.contexts);
-    } else {
-      return options.inverse(options.contexts);
-    }
-  });
-
-// Determines whether the value matches one in the $.map'd list
-// {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
-Mustache.registerHelper('if_in_map', function (list, path, value, options) {
-  list = resolveComputed(list);
-
-  if (!list.attr || list.attr('length')) {
-    path = path.split('.');
-    let map = $.map(list, function (obj) {
-      can.each(path, function (prop) {
-        obj = (obj && obj[prop]) || null;
-      });
-      return obj;
-    });
-
-    if (map.indexOf(value) > -1) {
-      return options.fn(options.contexts);
-    }
-  }
-  return options.inverse(options.contexts);
-});
 
 Mustache.registerHelper('if_in', function (needle, haystack, options) {
   needle = resolveComputed(needle);
@@ -1702,61 +1576,6 @@ Mustache.registerHelper('disable_if_errors', function (instance) {
   }
 });
 
-/*
-  toggle mustache helper
-
-  An extended "if" that sets up a "toggle_button" trigger, which can
-  be applied to any button rendered within the section bounded by the
-  toggle call.  toggle_buttons set the value of the toggle value to its
-  boolean opposite.  Note that external forces can also set this value
-  and thereby flip the toggle -- this helper is friendly to those cases.
-
-  @helper_type section -- use outside of element tags.
-
-  @param compute some computed value to flip between true and false
-*/
-Mustache.registerHelper('toggle', function (compute, options) {
-  function toggle(trigger) {
-    if (typeof trigger === 'function') {
-      trigger = Mustache.resolve(trigger);
-    }
-    if (typeof trigger !== 'string') {
-      trigger = 'click';
-    }
-    return function (el) {
-      $(el).bind(trigger, function () {
-        compute(compute() ? false : true);
-      });
-    };
-  }
-
-  if (compute()) {
-    return options.fn(
-      options.contexts, {helpers: {toggle_button: toggle}});
-  } else {
-    return options.inverse(
-      options.contexts, {helpers: {toggle_button: toggle}});
-  }
-});
-
-Mustache.registerHelper('iterate_by_two', function (list, options) {
-  let i;
-  let arr;
-  let output = [];
-  list = Mustache.resolve(list);
-
-  for (i = 0; i < list.length; i+=2) {
-    if ((i + 1) === list.length) {
-      arr = [list[i]];
-    } else {
-      arr = [list[i], list[i+1]];
-    }
-    output.push(options.fn(
-      options.contexts.add({list: arr})));
-  }
-  return output.join('');
-});
-
 /**
  * Helper method for determining the file type of a Document object from its
  * file name extension.
@@ -1879,24 +1698,6 @@ Mustache.registerHelper('with_most_recent_declining_task_entry',
     return options.fn(options.contexts
       .add({most_recent_declining_task_entry: {}}));
   });
-
-Mustache.registerHelper('if_less', function (a, b, options) {
-  a = Mustache.resolve(a);
-  b = Mustache.resolve(b);
-
-  if (a < b) {
-    return options.fn(options.contexts);
-  } else {
-    return options.inverse(options.contexts);
-  }
-});
-
-Mustache.registerHelper('add_index', function (index, increment, options) {
-  index = Mustache.resolve(index);
-  increment = Mustache.resolve(increment);
-
-  return (index + increment);
-});
 
 function getProperUrl(url) {
   let domain;
@@ -2098,53 +1899,6 @@ Mustache.registerHelper('un_camel_case', function (str, toLowerCase) {
 });
 
 /**
-   * Check if the current user is allowed to edit a comment, and render the
-   * corresponding block in the template.
-   *
-   * Example usage:
-   *
-   *   {{#canEditComment commentInstance parentIntance}}
-   *     ... (display e.g. an edit button) ...
-   *   {{else}}
-   *     ... (no edit button) ...
-   *   {{/canEditComment}}
-   *
-   * @param {can.Model} comment - the Comment instance to check
-   * @param {can.Model} parentInstance - the object the comment was posted
-   *    under, e.g. an Assessment or a Request instance
-   * @param {Object} options - a CanJS options argument passed to every helper
-   *
-   */
-Mustache.registerHelper('canEditComment',
-  function (comment, parentInstance, options) {
-    let END_STATES = Object.freeze({
-      Verified: true,
-      Completed: true,
-    });
-
-    let canEdit = true;
-    let isAdmin = Permission.is_allowed('__GGRC_ADMIN__');
-
-    comment = Mustache.resolve(comment);
-    parentInstance = Mustache.resolve(parentInstance);
-
-    if (!Permission.is_allowed_for('update', comment)) {
-      canEdit = false;
-    } else if (!isAdmin && parentInstance.status in END_STATES) {
-      // non-administrators cannot edit comments if the underlying object is
-      // in final or verfiied state
-      canEdit = false;
-    }
-
-    if (canEdit) {
-      return options.fn(options.context);
-    }
-
-    return options.inverse(options.context);
-  }
-);
-
-/**
    * Checks if two object types are mappable
    *
    * @param {String} source - Source type
@@ -2212,42 +1966,6 @@ Mustache.registerHelper('isNotInScopeModel', function (modelName, options) {
   isInScope = isInScope || isSnapshotParent(modelName);
   return isInScope ? options.inverse(this) : options.fn(this);
 });
-
-/**
-   * Check if a person is contained in the given authorization list and render
-   * the corresponding Mustache block.
-   *
-   * Example usage:
-   *
-   *   {{#isInAuthList assignee approvedEditors}}
-   *     <Edit button here...>
-   *   {{else}}
-   *     Editing not allowed.
-   *   {{/isInAuthList}}
-   *
-   * @param {CMS.Models.Person} person - the user to check for an authorization
-   * @param {Array} authList - the list of authorization grants
-   * @param {Object} options - a CanJS options argument passed to every helper
-   */
-Mustache.registerHelper(
-  'isInAuthList',
-  function (person, authList, options) {
-    let emails;
-
-    person = Mustache.resolve(person) || {};
-    authList = Mustache.resolve(authList) || [];
-
-    emails = _.map(authList, function (item) {
-      let person = item.instance.person.reify();
-      return person.email;
-    });
-
-    if (_.includes(emails, person.email)) {
-      return options.fn(options.contexts);
-    }
-    return options.inverse(options.contexts);
-  }
-);
 
 Mustache.registerHelper('modifyFieldTitle', function (type, field, options) {
   let titlesMap = {

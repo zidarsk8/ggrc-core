@@ -8,6 +8,7 @@ import '../comment/comment-add-button';
 import '../object-list-item/editable-document-object-list-item';
 import '../assessment/attach-button';
 import template from './ca-object-modal-content.mustache';
+import tracker from '../../tracker';
 
 export default can.Component.extend({
   tag: 'ca-object-modal-content',
@@ -71,6 +72,10 @@ export default can.Component.extend({
       let comment = e.comment;
       let instance = this.attr('instance');
       let context = instance.attr('context');
+
+      tracker.start(instance.type,
+        tracker.USER_JOURNEY_KEYS.INFO_PANE,
+        tracker.USER_ACTIONS.INFO_PANE.ADD_COMMENT_TO_LCA);
 
       this.dispatch({
         type: 'beforeCommentCreated',

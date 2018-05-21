@@ -21,6 +21,7 @@ describe('GGRC.Mappings', function () {
         'Contract',
         'Control',
         'DataAsset',
+        'Evidence',
         'Facility',
         'Issue',
         'Market',
@@ -40,7 +41,7 @@ describe('GGRC.Mappings', function () {
         'Risk',
         'Threat',
       ],
-      notMappable: ['Assessment', 'AssessmentTemplate'],
+      notMappable: ['AssessmentTemplate', 'Evidence'],
     },
     risk_assessments: {
       models: ['RiskAssessment'],
@@ -88,19 +89,21 @@ describe('GGRC.Mappings', function () {
   mappingRules = {
     AccessGroup: _.difference(filtered, ['AccessGroup']),
     Assessment: _.difference(filtered, ['Audit', 'Person', 'Program', 'Project',
-      'TaskGroup', 'Workflow']),
+      'TaskGroup', 'Workflow', 'Assessment']),
     AssessmentTemplate: _.difference(filtered, ['Audit', 'Person', 'Program',
-      'Project', 'TaskGroup', 'Workflow']),
+      'Project', 'TaskGroup', 'Workflow', 'Assessment']),
     Audit: _.difference(filtered, ['Audit', 'Person', 'Program', 'Project',
-      'TaskGroup', 'Workflow']),
+      'TaskGroup', 'Workflow', 'Assessment']),
     Clause: _.difference(filtered, ['Clause']),
     Contract: _.difference(filtered, directives),
     Control: filtered,
     CycleTaskGroupObjectTask: _.difference(filtered, ['Person',
-      'TaskGroup', 'Workflow']),
+      'TaskGroup', 'Workflow', 'Assessment']),
     DataAsset: filtered,
+    Evidence: ['Assessment', 'Audit'],
     Facility: filtered,
-    Issue: _.difference(filtered, ['Audit', 'Person', 'Workflow']),
+    Issue: _.difference(filtered, [
+      'Audit', 'Person', 'Workflow', 'Assessment']),
     Market: filtered,
     Objective: filtered,
     OrgGroup: filtered,
@@ -110,8 +113,8 @@ describe('GGRC.Mappings', function () {
     Process: filtered,
     Product: filtered,
     Program: _.difference(allTypes,
-      ['Program', 'Audit', 'RiskAssessment'].concat(modules.core.notMappable,
-        modules.workflows.notMappable)),
+      ['Program', 'Audit', 'RiskAssessment', 'Assessment']
+        .concat(modules.core.notMappable, modules.workflows.notMappable)),
     Project: filtered,
     Regulation: _.difference(filtered, directives),
     Risk: filtered,
@@ -120,7 +123,7 @@ describe('GGRC.Mappings', function () {
     Standard: _.difference(filtered, directives),
     System: filtered,
     TaskGroup: _.difference(filtered, ['Audit', 'Person',
-      'TaskGroup', 'Workflow']),
+      'TaskGroup', 'Workflow', 'Assessment']),
     Threat: filtered,
     Vendor: filtered,
   };
@@ -146,7 +149,7 @@ describe('GGRC.Mappings', function () {
     modelsForTests.forEach(function (type) {
       it('returns mappable types for ' + type, function () {
         let expectedModels = mappingRules[type];
-        let result = GGRC.Mappings.getMappingTypes(type, [], getInScopeModels());
+        let result = GGRC.Mappings.getMappingTypes(type, [], []);
         let resultGroups = Object.keys(result);
         let resultModels = getModelsFromGroups(result, EXPECTED_GROUPS);
 

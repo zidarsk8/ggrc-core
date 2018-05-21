@@ -11,6 +11,8 @@ from ggrc.converters import errors
 from ggrc.converters.handlers import boolean
 from ggrc.converters.handlers import handlers
 from ggrc.converters.handlers import multi_object
+from ggrc.models import all_models
+from ggrc_risks.models import risk, threat
 from ggrc_workflows import models as wf_models
 
 
@@ -163,6 +165,30 @@ class TaskTypeColumnHandler(handlers.ColumnHandler):
 
 
 class ObjectsColumnHandler(multi_object.ObjectsColumnHandler):
+  MAPABLE_OBJECTS = (
+      all_models.OrgGroup.__name__,
+      all_models.Vendor.__name__,
+      all_models.AccessGroup.__name__,
+      all_models.System.__name__,
+      all_models.Process.__name__,
+      all_models.DataAsset.__name__,
+      all_models.Product.__name__,
+      all_models.Project.__name__,
+      all_models.Facility.__name__,
+      all_models.Market.__name__,
+      all_models.Program.__name__,
+      all_models.Regulation.__name__,
+      all_models.Policy.__name__,
+      all_models.Standard.__name__,
+      all_models.Contract.__name__,
+      all_models.Clause.__name__,
+      all_models.Section.__name__,
+      all_models.Control.__name__,
+      all_models.Objective.__name__,
+      all_models.Issue.__name__,
+      risk.Risk.__name__,
+      threat.Threat.__name__,
+  )
 
   def get_value(self):
     task_group_objects = wf_models.TaskGroupObject.query.filter_by(

@@ -38,6 +38,7 @@ permissions = {
         "Regulation",
         "Standard",
         "Document",
+        "Evidence",
         "Facility",
         "Help",
         "Market",
@@ -100,6 +101,7 @@ permissions = {
         "Regulation",
         "Standard",
         "Document",
+        "Evidence",
         "Facility",
         "Help",
         "Market",
@@ -130,9 +132,6 @@ permissions = {
             },
             "condition": "is"
         },
-    ],
-    "view_object_page": [
-        "__GGRC_ALL__"
     ],
     "update": [
         {
@@ -167,6 +166,7 @@ permissions = {
         "Regulation",
         "Standard",
         "Document",
+        "Evidence",
         "Facility",
         "Help",
         "Market",
