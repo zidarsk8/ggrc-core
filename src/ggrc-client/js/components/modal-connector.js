@@ -85,12 +85,13 @@ import {
           })));
       },
       deferred_update: function () {
-        let changes = this.viewModel.changes;
-        let instance = this.viewModel.instance;
+        const viewModel = this.viewModel;
+        let changes = viewModel.changes;
+        let instance = viewModel.instance;
 
         if (!changes.length) {
-          if (instance && instance._pending_joins &&
-            instance._pending_joins.length) {
+          const hasPendingJoins = _.get(instance, '_pending_joins.length') > 0;
+          if (hasPendingJoins) {
             instance.delay_resolving_save_until(resolveDeferredBindings(
               instance
             ));
@@ -98,23 +99,22 @@ import {
           return;
         }
         // Add pending operations
-        can.each(changes, function (item) {
-          let mapping = this.viewModel.mapping ||
+        can.each(changes, (item) => {
+          let mapping = viewModel.mapping ||
               GGRC.Mappings.get_canonical_mapping_name(
-                this.viewModel.instance.constructor.shortName,
+                viewModel.instance.constructor.shortName,
                 item.what.constructor.shortName);
           if (item.how === 'add') {
-            this.viewModel.instance
+            viewModel.instance
               .mark_for_addition(mapping, item.what, item.extra);
           } else {
-            this.viewModel.instance.mark_for_deletion(mapping, item.what);
+            viewModel.instance.mark_for_deletion(mapping, item.what);
           }
-        }.bind(this)
-        );
-        this.viewModel.instance
-          .delay_resolving_save_until(resolveDeferredBindings(
-            this.viewModel.instance)
-          );
+        });
+
+        viewModel.instance
+          .delay_resolving_save_until(
+            resolveDeferredBindings(viewModel.instance));
       },
       '{instance} updated': 'deferred_update',
       '{instance} created': 'deferred_update',
