@@ -185,10 +185,10 @@ export default can.Component.extend('richText', {
           }
           ops = ops.concat([
             {'delete': url.length},
-            {insert: url, attributes: {link: url}}
+            {insert: url, attributes: {link: url}},
           ]);
           editor.updateContents({
-            ops: ops
+            ops: ops,
           });
         }
       }
@@ -208,7 +208,7 @@ export default can.Component.extend('richText', {
     getLength(editor) {
       // Empty editor contains single service line-break symbol.
       return editor.getLength() - 1;
-    }
+    },
   },
   events: {
     inserted() {
@@ -225,6 +225,6 @@ export default can.Component.extend('richText', {
         editor.off('selection-change');
         editor.off('keypress');
       }
-    }
-  }
+    },
+  },
 });
