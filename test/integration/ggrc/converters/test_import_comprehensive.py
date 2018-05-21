@@ -166,6 +166,13 @@ class TestComprehensiveSheets(TestCase):
             "row_errors": 1,
             "row_warnings": 0,
             "rows": 14,
+        },
+        "Metric": {
+            "created": 14,
+            "ignored": 2,
+            "row_errors": 3,
+            "row_warnings": 4,
+            "rows": 16,
         }
     }
 

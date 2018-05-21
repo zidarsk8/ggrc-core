@@ -31,6 +31,7 @@ class Types(object):
       "Vendor",
       "Risk",
       "Threat",
+      "Metric"
   }
 
   parents = {

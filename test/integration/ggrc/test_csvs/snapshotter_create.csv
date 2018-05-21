@@ -284,3 +284,24 @@ Threat,code*,title*,description,notes,Admin*,Effective date,map:program,,,,,,
 ,threat-1,threat-1,test,this is a note,user@example.com,7/1/2015,Prog-13211,,,,,,
 ,Threat-2,Threat-2,test,this is a note,user@example.com,7/1/2015,Prog-13211,,,,,,
 ,Threat-3,Threat-3,test,this is a note,user@example.com,7/1/2015,Prog-13211,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+Object type,"Must be unique.  Can be left empty for autogeneration.  If updating or deleting, code is required",,,"if owner is not provided, current user will be reated as owner of the object","Default value 'draft' is selected
+Other values are:
+Final
+Effective
+Ineffective
+Launched
+Not Launched
+In Scope
+Not in Scope
+Deprecated",,,,,,"Options are:
+Prod
+Corp
+Service
+Core
+3rd Party",,
+Metric,code*,title*,description,admin,state,notes,primary contacts,secondary contacts,reference url,effective date,map:program,,
+,metric-1,metric-1,test,user@example.com,Draft,this is a note,user@example.com,user@example.com,google.com,7/1/2015,Prog-13211,,
+,metric-2,metric-2,test,user@example.com,Active,this is a note,user@example.com,user@example.com,google.com,7/1/2015,Prog-13211,,
+,metric-3,metric-3,test,user@example.com,Active,this is a note,user@example.com,user@example.com,google.com,7/1/2015,Prog-13211,,
