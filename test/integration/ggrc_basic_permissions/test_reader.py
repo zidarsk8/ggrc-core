@@ -39,6 +39,7 @@ class TestReader(TestCase):
       self.users[name] = user
 
   def test_admin_page_access(self):
+    """Only admin can use admin section"""
     for role, code in (("reader", 403), ("admin", 200)):
       self.api.set_user(self.users[role])
       self.assertEqual(self.api.client.get("/admin").status_code, code)
@@ -197,3 +198,17 @@ class TestReader(TestCase):
     db.session.add(mapped_person)
     response = self.api.delete(mapped_person)
     self.assertEqual(response.status_code, 403)
+
+  def test_read_evidence_revision(self):
+    """Global Read can read Evidence revision content"""
+    user = self.users["reader"]
+    link = "google.com"
+    evidence = factories.EvidenceUrlFactory(link=link)
+    evidence_id = evidence.id
+    self.api.set_user(user)
+    resp = self.api.client.get(
+        "/api/revisions?resource_type={}&resource_id={}".format(evidence.type,
+                                                                evidence_id))
+    rev_content = resp.json["revisions_collection"]["revisions"][0]["content"]
+    self.assertTrue(rev_content)
+    self.assertEquals(link, rev_content["link"])
