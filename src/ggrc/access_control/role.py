@@ -145,7 +145,7 @@ def acr_modified(obj, session):
   return changed or obj in session.deleted
 
 
-def invalidate_noneditable_change(session, flush_context, instances):
+def invalidate_noneditable_change(session, _, instances):
   """Handle snapshot objects on api post requests."""
   # pylint: disable=unused-argument
   acrs = [o for o in session if isinstance(o, AccessControlRole)]
