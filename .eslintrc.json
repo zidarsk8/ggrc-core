@@ -40,7 +40,8 @@
     "wysihtml5": false,
     // Webpack variables
     "DEV_MODE": false,
-    "GOOGLE_ANALYTICS_ID": false
+    "GOOGLE_ANALYTICS_ID": false,
+    "RELEASE_NOTES_DATE": false
   },
 
   "rules": {

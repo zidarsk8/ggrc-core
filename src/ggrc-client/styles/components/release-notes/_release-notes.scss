@@ -1,0 +1,74 @@
+/*
+ * Copyright (C) 2018 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+.release-notes {
+  position: relative;
+
+  .simple-modal__header-text {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  &__body {
+    display: block;
+    overflow: scroll;
+    max-height: calc(100% - 54px - 45px);
+
+    p {
+      margin: 13px 0;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      margin: 24px 0 0 0;
+      font-size: 110%;
+    }
+  }
+
+  &__version-block {
+    display: flex;
+    flex: 1;
+    justify-content: flex-end;
+    font-size: 80%;
+  }
+
+  &__date {
+    padding:  0 20px;
+    color: $gray;
+  }
+
+  .on-top-button {
+    position: absolute;
+    bottom: 70px;
+    left: calc(50% - 42px);
+    border-radius: 15px;
+    border-style: solid;
+    line-height: 22px;
+    transform: translateY(0px);
+    transition: transform 0.2s 0.1s, opacity 0.2s 0.1s;
+    opacity: 1;
+    outline: none;
+    color: $white;
+    background-color: $status-completed;
+
+    .fa-arrow-up {
+      font-size: 13px;
+    }
+
+    &.delayed-hidden {
+      display: block;
+      transform: translateY(30px);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    &.instantly-hidden {
+      display: none;
+    }
+
+    &:hover {
+      background-color: lighten($status-completed, 10%);
+    }
+  }
+}

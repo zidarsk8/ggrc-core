@@ -6,6 +6,7 @@
 import '../assessment/people/lhn-popup-people';
 import '../tasks-counter/tasks-counter';
 import '../feedback-link/feedback-link';
+import '../release-notes-menu-item/release-notes-menu-item';
 import logo from '../../../images/ggrc-logo.svg';
 import oneColorLogo from '../../../images/ggrc-one-color.svg';
 import {
@@ -104,6 +105,10 @@ import template from './page-header.mustache';
       helpUrl: {
         type: 'string',
         value: GGRC.config.external_help_url,
+      },
+      showReleaseNotes: {
+        type: Boolean,
+        value: GGRC.config.enable_release_notes,
       },
     },
     showHideTitles: function (element) {

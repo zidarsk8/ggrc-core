@@ -183,6 +183,9 @@ ALLOWED_QUERYAPI_APP_IDS = os.environ.get(
     "",
 ).split()
 
+# Flag to enable or disable What's New pop-up
+ENABLE_RELEASE_NOTES = True
+
 # ggrc_basic_permissions specific module settings
 BOOTSTRAP_ADMIN_USERS = \
     os.environ.get('GGRC_BOOTSTRAP_ADMIN_USERS', '').split(' ')

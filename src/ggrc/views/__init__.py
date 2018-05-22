@@ -288,6 +288,7 @@ def get_public_config():
       "snapshotable_ignored": list(rules.Types.ignore),
       "snapshotable_parents": list(rules.Types.parents),
       "external_services": {"Person": external_service},
+      "enable_release_notes": settings.ENABLE_RELEASE_NOTES,
   }
 
 
