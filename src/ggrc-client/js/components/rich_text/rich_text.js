@@ -113,6 +113,11 @@ export default can.Component.extend('richText', {
     urlMatcher(node, delta) {
       // Matcher runs only for single op.
       // Since it's clipboard matcher operation is always insert.
+
+      if (!delta.ops.length) {
+        return delta;
+      }
+
       let insertedText = delta.ops[0].insert;
       let matches = node.data.match(URL_CLIPBOARD_REGEX);
 
@@ -180,10 +185,10 @@ export default can.Component.extend('richText', {
           }
           ops = ops.concat([
             {'delete': url.length},
-            {insert: url, attributes: {link: url}}
+            {insert: url, attributes: {link: url}},
           ]);
           editor.updateContents({
-            ops: ops
+            ops: ops,
           });
         }
       }
@@ -203,7 +208,7 @@ export default can.Component.extend('richText', {
     getLength(editor) {
       // Empty editor contains single service line-break symbol.
       return editor.getLength() - 1;
-    }
+    },
   },
   events: {
     inserted() {
@@ -220,6 +225,6 @@ export default can.Component.extend('richText', {
         editor.off('selection-change');
         editor.off('keypress');
       }
-    }
-  }
+    },
+  },
 });
