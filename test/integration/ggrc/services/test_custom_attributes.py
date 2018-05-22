@@ -1,6 +1,5 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
 """Tests for PUT and POST requests for objects with custom attributes
 
 These tests include:
@@ -16,6 +15,7 @@ from ggrc import utils
 from ggrc import models
 from ggrc import builder
 from ggrc.models import all_models
+from ggrc.models.mixins import customattributable
 
 from integration.ggrc.services import TestCase
 from integration.ggrc.generator import ObjectGenerator
@@ -61,31 +61,29 @@ class TestGlobalCustomAttributes(ProductTestCase):
     _, cad = gen("product", attribute_type="Text", title="normal text")
     pid = models.Person.query.first().id
 
-    product_data = [
-        {
-            "product": {
-                "kind": None,
-                "owners": [],
-                "custom_attribute_values": [{
-                    "attribute_value": "my custom attribute value",
-                    "custom_attribute_id": cad.id,
-                }],
-                "contact": {
-                    "id": pid,
-                    "href": "/api/people/{}".format(pid),
-                    "type": "Person"
-                },
-                "title": "simple product",
-                "description": "",
-                "secondary_contact": None,
-                "notes": "",
-                "url": "",
-                "documents_reference_url": "",
-                "slug": "",
-                "context": None
-            }
-        }
-    ]
+    product_data = [{
+        "product": {
+            "kind": None,
+            "owners": [],
+            "custom_attribute_values": [{
+                "attribute_value": "my custom attribute value",
+                "custom_attribute_id": cad.id,
+            }],
+            "contact": {
+                "id": pid,
+                "href": "/api/people/{}".format(pid),
+                "type": "Person"
+            },
+            "title": "simple product",
+            "description": "",
+            "secondary_contact": None,
+            "notes": "",
+            "url": "",
+            "documents_reference_url": "",
+            "slug": "",
+            "context": None,
+        },
+    }]
 
     response = self._post(product_data)
     ca_json = response.json[0][1]["product"]["custom_attribute_values"][0]
@@ -93,15 +91,12 @@ class TestGlobalCustomAttributes(ProductTestCase):
     self.assertIn("attributable_type", ca_json)
     self.assertIn("attribute_value", ca_json)
     self.assertIn("id", ca_json)
-    self.assertEqual(ca_json["attribute_value"],
-                     "my custom attribute value")
+    self.assertEqual(ca_json["attribute_value"], "my custom attribute value")
 
     product = models.Product.eager_query().first()
     self.assertEqual(len(product.custom_attribute_values), 1)
-    self.assertEqual(
-        product.custom_attribute_values[0].attribute_value,
-        "my custom attribute value"
-    )
+    self.assertEqual(product.custom_attribute_values[0].attribute_value,
+                     "my custom attribute value")
 
   def test_custom_attribute_put_add(self):
     """Test edits with adding new CA values."""
@@ -109,41 +104,44 @@ class TestGlobalCustomAttributes(ProductTestCase):
     _, cad = gen("product", attribute_type="Text", title="normal text")
     pid = models.Person.query.first().id
 
-    product_data = [
-        {
-            "product": {
-                "kind": None,
-                "owners": [],
-                "contact": {
-                    "id": pid,
-                    "href": "/api/people/{}".format(pid),
-                    "type": "Person"
-                },
-                "title": "simple product",
-                "description": "",
-                "secondary_contact": None,
-                "notes": "",
-                "url": "",
-                "documents_reference_url": "",
-                "slug": "",
-                "context": None
-            }
-        }
-    ]
+    product_data = [{
+        "product": {
+            "kind": None,
+            "owners": [],
+            "contact": {
+                "id": pid,
+                "href": "/api/people/{}".format(pid),
+                "type": "Person"
+            },
+            "title": "simple product",
+            "description": "",
+            "secondary_contact": None,
+            "notes": "",
+            "url": "",
+            "documents_reference_url": "",
+            "slug": "",
+            "context": None,
+        },
+    }]
 
     response = self._post(product_data)
     product_url = response.json[0][1]["product"]["selfLink"]
     headers = self.client.get(product_url).headers
 
     product_data[0]["product"]["custom_attribute_values"] = [{
-        "attribute_value": "added value",
-        "custom_attribute_id": cad.id,
+        "attribute_value":
+        "added value",
+        "custom_attribute_id":
+        cad.id,
     }]
 
-    response = self._put(product_url, product_data[0], extra_headers={
-        'If-Unmodified-Since': headers["Last-Modified"],
-        'If-Match': headers["Etag"],
-    })
+    response = self._put(
+        product_url,
+        product_data[0],
+        extra_headers={
+            'If-Unmodified-Since': headers["Last-Modified"],
+            'If-Match': headers["Etag"],
+        })
 
     product = response.json["product"]
 
@@ -153,27 +151,29 @@ class TestGlobalCustomAttributes(ProductTestCase):
     self.assertIn("attributable_type", ca_json)
     self.assertIn("attribute_value", ca_json)
     self.assertIn("id", ca_json)
-    self.assertEqual(ca_json["attribute_value"],
-                     "added value")
+    self.assertEqual(ca_json["attribute_value"], "added value")
 
     product = models.Product.eager_query().first()
     self.assertEqual(len(product.custom_attribute_values), 1)
-    self.assertEqual(
-        product.custom_attribute_values[0].attribute_value,
-        "added value"
-    )
+    self.assertEqual(product.custom_attribute_values[0].attribute_value,
+                     "added value")
 
     headers = self.client.get(product_url).headers
 
     product_data[0]["product"]["custom_attribute_values"] = [{
-        "attribute_value": "edited value",
-        "custom_attribute_id": cad.id,
+        "attribute_value":
+        "edited value",
+        "custom_attribute_id":
+        cad.id,
     }]
 
-    response = self._put(product_url, product_data[0], extra_headers={
-        'If-Unmodified-Since': headers["Last-Modified"],
-        'If-Match': headers["Etag"],
-    })
+    response = self._put(
+        product_url,
+        product_data[0],
+        extra_headers={
+            'If-Unmodified-Since': headers["Last-Modified"],
+            'If-Match': headers["Etag"],
+        })
 
     product = response.json["product"]
     ca_json = product["custom_attribute_values"][0]
@@ -181,8 +181,7 @@ class TestGlobalCustomAttributes(ProductTestCase):
     self.assertIn("attributable_type", ca_json)
     self.assertIn("attribute_value", ca_json)
     self.assertIn("id", ca_json)
-    self.assertEqual(ca_json["attribute_value"],
-                     "edited value")
+    self.assertEqual(ca_json["attribute_value"], "edited value")
 
   def test_custom_attribute_get(self):
     """Check if get returns the whole CA value and not just the stub."""
@@ -190,31 +189,29 @@ class TestGlobalCustomAttributes(ProductTestCase):
     _, cad = gen("product", attribute_type="Text", title="normal text")
     pid = models.Person.query.first().id
 
-    product_data = [
-        {
-            "product": {
-                "kind": None,
-                "owners": [],
-                "custom_attribute_values": [{
-                    "attribute_value": "my custom attribute value",
-                    "custom_attribute_id": cad.id,
-                }],
-                "contact": {
-                    "id": pid,
-                    "href": "/api/people/{}".format(pid),
-                    "type": "Person"
-                },
-                "title": "simple product",
-                "description": "",
-                "secondary_contact": None,
-                "notes": "",
-                "url": "",
-                "documents_reference_url": "",
-                "slug": "",
-                "context": None
-            }
-        }
-    ]
+    product_data = [{
+        "product": {
+            "kind": None,
+            "owners": [],
+            "custom_attribute_values": [{
+                "attribute_value": "my custom attribute value",
+                "custom_attribute_id": cad.id,
+            }],
+            "contact": {
+                "id": pid,
+                "href": "/api/people/{}".format(pid),
+                "type": "Person",
+            },
+            "title": "simple product",
+            "description": "",
+            "secondary_contact": None,
+            "notes": "",
+            "url": "",
+            "documents_reference_url": "",
+            "slug": "",
+            "context": None,
+        },
+    }]
 
     response = self._post(product_data)
     product_url = response.json[0][1]["product"]["selfLink"]
@@ -252,8 +249,7 @@ class TestGlobalCustomAttributes(ProductTestCase):
     self.assert200(control_resp)
     self.assertIn("custom_attribute_definitions", control_resp.json["control"])
     self.assertEqual(
-        1, len(control_resp.json["control"]["custom_attribute_definitions"])
-    )
+        1, len(control_resp.json["control"]["custom_attribute_definitions"]))
     cad_json = control_resp.json["control"]["custom_attribute_definitions"][0]
     self.assertEqual(cad_id, cad_json["id"])
     self.assertIn("default_value", cad_json)
@@ -264,6 +260,57 @@ class TestGlobalCustomAttributes(ProductTestCase):
     self.assertEqual(
         default_value,
         cad_resp.json["custom_attribute_definition"]["default_value"])
+
+  @ddt.data((True, "1"), (True, "true"), (True, "TRUE"), (False, "0"),
+            (False, "false"), (False, "FALSE"))
+  @ddt.unpack
+  def test_filter_by_mandatory(self, flag_value, filter_value):
+    """Filter CADs by mandatory flag if it's {0} and filter_value is {1}."""
+    with factories.single_commit():
+      cads = {
+          f: factories.CustomAttributeDefinitionFactory(
+              mandatory=f, definition_type="control")
+          for f in [True, False]
+      }
+    resp = self.generator.api.get_query(
+        all_models.CustomAttributeDefinition,
+        "ids={}&mandatory={}".format(",".join(
+            [str(c.id) for c in cads.values()]), filter_value),
+    )
+    self.assert200(resp)
+    cad_collection = resp.json["custom_attribute_definitions_collection"]
+    resp_cad_ids = [
+        i["id"] for i in cad_collection["custom_attribute_definitions"]
+    ]
+    self.assertEqual([cads[flag_value].id], resp_cad_ids)
+
+  CAD_MODELS = [
+      m for m in all_models.all_models
+      if issubclass(m, customattributable.CustomAttributable)
+  ]
+
+  @ddt.data(*CAD_MODELS)
+  def test_filter_by_definition_type(self, definition_model):
+    """Filter {0.__name__} CADs by definition_type."""
+
+    with factories.single_commit():
+      cads = {
+          model: factories.CustomAttributeDefinitionFactory(
+              definition_type=model._inflector.table_singular)
+          for model in self.CAD_MODELS
+      }
+    filter_params = "ids={}&definition_type={}".format(
+        ",".join([str(c.id) for c in cads.values()]),
+        definition_model._inflector.table_singular,
+    )
+    resp = self.generator.api.get_query(all_models.CustomAttributeDefinition,
+                                        filter_params)
+    self.assert200(resp)
+    cad_collection = resp.json["custom_attribute_definitions_collection"]
+    resp_cad_ids = [
+        i["id"] for i in cad_collection["custom_attribute_definitions"]
+    ]
+    self.assertEqual([cads[definition_model].id], resp_cad_ids)
 
 
 class TestOldApiCompatibility(ProductTestCase):
@@ -285,37 +332,35 @@ class TestOldApiCompatibility(ProductTestCase):
     cad_json = builder.json.publish_representation(cad_json)
     pid = models.Person.query.first().id
 
-    product_data = [
-        {
-            "product": {
-                "kind": None,
-                "owners": [],
-                "custom_attribute_definitions":[
-                    cad_json,
-                ],
-                "custom_attribute_values": [{
-                    "attribute_value": "new value",
-                    "custom_attribute_id": cad.id,
-                }],
-                "custom_attributes": {
-                    cad.id: "old value",
-                },
-                "contact": {
-                    "id": pid,
-                    "href": "/api/people/{}".format(pid),
-                    "type": "Person"
-                },
-                "title": "simple product",
-                "description": "",
-                "secondary_contact": None,
-                "notes": "",
-                "url": "",
-                "documents_reference_url": "",
-                "slug": "",
-                "context": None
-            }
-        }
-    ]
+    product_data = [{
+        "product": {
+            "kind": None,
+            "owners": [],
+            "custom_attribute_definitions":[
+                cad_json,
+            ],
+            "custom_attribute_values": [{
+                "attribute_value": "new value",
+                "custom_attribute_id": cad.id,
+            }],
+            "custom_attributes": {
+                cad.id: "old value",
+            },
+            "contact": {
+                "id": pid,
+                "href": "/api/people/{}".format(pid),
+                "type": "Person"
+            },
+            "title": "simple product",
+            "description": "",
+            "secondary_contact": None,
+            "notes": "",
+            "url": "",
+            "documents_reference_url": "",
+            "slug": "",
+            "context": None
+        },
+    }]
 
     response = self._post(product_data)
     ca_json = response.json[0][1]["product"]["custom_attribute_values"][0]
@@ -323,10 +368,8 @@ class TestOldApiCompatibility(ProductTestCase):
 
     product = models.Product.eager_query().first()
     self.assertEqual(len(product.custom_attribute_values), 1)
-    self.assertEqual(
-        product.custom_attribute_values[0].attribute_value,
-        "new value"
-    )
+    self.assertEqual(product.custom_attribute_values[0].attribute_value,
+                     "new value")
 
   def test_custom_attribute_post_old(self):
     """Test post with old style custom attribute values.
@@ -340,38 +383,36 @@ class TestOldApiCompatibility(ProductTestCase):
     cad_json = builder.json.publish_representation(cad_json)
     pid = models.Person.query.first().id
 
-    product_data = [
-        {
-            "product": {
-                "kind": None,
-                "owners": [],
-                "custom_attribute_definitions":[
-                    cad_json,
-                ],
-                "custom_attribute_values": [{
-                    "id": 1,
-                    "href": "/api/custom_attribute_values/1",
-                    "type": "CustomAttributeValues"
-                }],
-                "custom_attributes": {
-                    cad.id: "old value",
-                },
-                "contact": {
-                    "id": pid,
-                    "href": "/api/people/{}".format(pid),
-                    "type": "Person"
-                },
-                "title": "simple product",
-                "description": "",
-                "secondary_contact": None,
-                "notes": "",
-                "url": "",
-                "documents_reference_url": "",
-                "slug": "",
-                "context": None
-            }
-        }
-    ]
+    product_data = [{
+        "product": {
+            "kind": None,
+            "owners": [],
+            "custom_attribute_definitions":[
+                cad_json,
+            ],
+            "custom_attribute_values": [{
+                "id": 1,
+                "href": "/api/custom_attribute_values/1",
+                "type": "CustomAttributeValues",
+            }],
+            "custom_attributes": {
+                cad.id: "old value",
+            },
+            "contact": {
+                "id": pid,
+                "href": "/api/people/{}".format(pid),
+                "type": "Person",
+            },
+            "title": "simple product",
+            "description": "",
+            "secondary_contact": None,
+            "notes": "",
+            "url": "",
+            "documents_reference_url": "",
+            "slug": "",
+            "context": None,
+        },
+    }]
 
     response = self._post(product_data)
     self.assert200(response)
@@ -380,7 +421,5 @@ class TestOldApiCompatibility(ProductTestCase):
 
     product = models.Product.eager_query().first()
     self.assertEqual(len(product.custom_attribute_values), 1)
-    self.assertEqual(
-        product.custom_attribute_values[0].attribute_value,
-        "old value"
-    )
+    self.assertEqual(product.custom_attribute_values[0].attribute_value,
+                     "old value")
