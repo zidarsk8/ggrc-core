@@ -711,12 +711,6 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
     source_workflow.copy(obj, clone_people=src.get('clone_people', False))
     obj.title = source_workflow.title + ' (copy ' + str(obj.id) + ')'
 
-  # get the personal context for this logged in user
-  user = get_current_user()
-  personal_context = user.get_or_create_object_context(context=1)
-  workflow_context = obj.get_or_create_object_context(personal_context)
-  obj.context = workflow_context
-
   if src.get('clone'):
     source_workflow.copy_task_groups(
         obj,

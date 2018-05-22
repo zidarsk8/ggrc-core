@@ -4,7 +4,6 @@
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
 from ggrc.access_control.roleable import Roleable
-from ggrc.models.context import HasOwnContext
 from ggrc.models import mixins
 from ggrc.models.deferred import deferred
 from ggrc.models import object_document
@@ -20,7 +19,6 @@ class Program(HasObjectState,
               Roleable,
               Personable,
               Relatable,
-              HasOwnContext,
               mixins.LastDeprecatedTimeboxed,
               mixins.BusinessObject,
               mixins.Folderable,

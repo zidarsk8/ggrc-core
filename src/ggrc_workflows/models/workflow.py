@@ -24,7 +24,6 @@ from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
 from ggrc.models import mixins
 from ggrc.models import reflection
-from ggrc.models.context import HasOwnContext
 from ggrc.models.deferred import deferred
 from ggrc_workflows.models import cycle
 from ggrc_workflows.models import cycle_task_group
@@ -33,7 +32,6 @@ from ggrc_workflows.services import google_holidays
 
 class Workflow(roleable.Roleable,
                mixins.CustomAttributable,
-               HasOwnContext,
                mixins.Timeboxed,
                mixins.Described,
                mixins.Titled,
@@ -407,8 +405,6 @@ class Workflow(roleable.Roleable,
                                 kind="Backlog")
 
     # create wf context
-    wf_ctx = backlog_workflow.get_or_create_object_context(context=1)
-    backlog_workflow.context = wf_ctx
     db.session.flush(backlog_workflow)
     # create a cycle
     backlog_cycle = cycle.Cycle(description="Backlog workflow",
@@ -417,8 +413,6 @@ class Workflow(roleable.Roleable,
                                 status="Assigned",
                                 start_date=None,
                                 end_date=None,
-                                context=backlog_workflow
-                                .get_or_create_object_context(),
                                 workflow=backlog_workflow)
 
     # create a cycletaskgroup
@@ -428,9 +422,7 @@ class Workflow(roleable.Roleable,
                         cycle=backlog_cycle,
                         status=cycle_task_group.CycleTaskGroup.IN_PROGRESS,
                         start_date=None,
-                        end_date=None,
-                        context=backlog_workflow
-                        .get_or_create_object_context())
+                        end_date=None)
 
     db.session.add_all([backlog_workflow, backlog_cycle, backlog_ctg])
     db.session.flush()
