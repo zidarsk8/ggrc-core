@@ -15,6 +15,7 @@ let TREE_VIEW_STATES = 'tree_view_states';
 let TREE_VIEW = 'tree_view';
 let CHILD_TREE_DISPLAY_LIST = 'child_tree_display_list';
 let MODAL_STATE = 'modal_state';
+const RELEASE_NOTES_DATE = 'RELEASE_NOTES_DATE';
 let path = window.location.pathname.replace(/\./g, '/');
 
 can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
@@ -206,6 +207,30 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
     }
 
     return modalState[modelName].display_state;
+  },
+
+  setReleaseNotesDate: function (date) {
+    let path = null;
+    let savedDate = this.getObject(path, RELEASE_NOTES_DATE);
+
+    if (!savedDate) {
+      savedDate = this.makeObject(path, RELEASE_NOTES_DATE);
+    }
+
+    savedDate.attr('date', date);
+
+    this.autoupdate && this.save();
+    return this;
+  },
+
+  getReleaseNotesDate: function () {
+    let dateObject = this.getObject(null, RELEASE_NOTES_DATE);
+
+    if (!dateObject) {
+      return null;
+    }
+
+    return dateObject.date;
   },
 
   setChildTreeDisplayList: function (modelName, displayList) {

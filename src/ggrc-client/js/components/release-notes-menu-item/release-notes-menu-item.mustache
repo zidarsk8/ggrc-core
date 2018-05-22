@@ -1,0 +1,21 @@
+{{!
+    Copyright (C) 2018 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<a ($click)="open(%event)">
+  <span class="menu-item__icon">
+    <i class="fa fa-bullhorn" aria-hidden="true"></i>
+  </span>
+  <span class="menu-item__title">What's new in GGRC</span>
+  <div class="menu-item__subtitle">
+    Version {{version}}
+  </div>
+
+  <simple-modal {modal-title}="modalTitle"
+                {replace-content}="true"
+                {state}="state"
+                {extra-css-class}="extraCssClass">
+    <release-notes-modal></release-notes-modal>
+  </simple-modal>
+</a>
