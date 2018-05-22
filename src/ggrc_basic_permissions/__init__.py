@@ -3,9 +3,6 @@
 
 """RBAC module"""
 
-import datetime
-import itertools
-
 import flask
 import sqlalchemy as sa
 from sqlalchemy import orm
@@ -17,12 +14,9 @@ from ggrc.app import app
 from ggrc.login import is_external_app_user
 from ggrc.login import get_current_user
 from ggrc.models import all_models
-from ggrc.models.audit import Audit
-from ggrc.models.program import Program
 from ggrc.rbac import permissions as rbac_permissions
 from ggrc.rbac.permissions_provider import DefaultUserPermissions
 from ggrc.cache import utils as cache_utils
-from ggrc.services import signals
 from ggrc.services.registry import service
 from ggrc.utils import benchmark
 from ggrc_basic_permissions.contributed_roles import BasicRoleDeclarations
@@ -292,23 +286,6 @@ def load_user_roles(user, permissions):
           user_role.role.permissions, user_role.context_id, permissions)
 
 
-def load_personal_context(user, permissions):
-  """Load personal context for user
-
-  Args:
-      user (Person): Person object
-      permissions (dict): dict where the permissions will be stored
-  Returns:
-      None
-  """
-  personal_context = _get_or_create_personal_context(user)
-
-  permissions.setdefault('__GGRC_ADMIN__', {})\
-      .setdefault('__GGRC_ALL__', dict())\
-      .setdefault('contexts', list())\
-      .append(personal_context.id)
-
-
 def _get_acl_filter():
   """Get filter for acl entries.
 
@@ -434,9 +411,6 @@ def load_permissions_for(user):
   with benchmark("load_permissions > load user roles"):
     load_user_roles(user, permissions)
 
-  with benchmark("load_permissions > load personal context"):
-    load_personal_context(user, permissions)
-
   with benchmark("load_permissions > load access control list"):
     load_access_control_list(user, permissions)
 
@@ -448,77 +422,6 @@ def load_permissions_for(user):
       store_results_into_memcache(permissions, cache, key)
 
   return permissions
-
-
-def _get_or_create_personal_context(user):
-  personal_context = user.get_or_create_object_context(
-      context=1,
-      name='Personal Context for {0}'.format(user.id),
-      description='')
-  return personal_context
-
-
-@signals.Restful.model_posted.connect_via(Program)
-def handle_program_post(sender, obj=None, src=None, service=None):
-  db.session.flush()
-  # get the personal context for this logged in user
-  user = get_current_user()
-  personal_context = _get_or_create_personal_context(user)
-  context = obj.build_object_context(
-      context=personal_context,
-      name='{object_type} Context {timestamp}'.format(
-          object_type=service.model.__name__,
-          timestamp=datetime.datetime.now()),
-      description='',
-  )
-  context.modified_by = get_current_user()
-
-  db.session.add(obj)
-  db.session.flush()
-  db.session.add(context)
-  db.session.flush()
-  obj.contexts.append(context)
-  obj.context = context
-  db.session.flush()
-
-
-def create_audit_context(audit):
-  # Create an audit context
-  context = audit.build_object_context(
-      context=audit.context,
-      name='Audit Context {timestamp}'.format(
-          timestamp=datetime.datetime.now()),
-      description='',
-  )
-  context.modified_by = get_current_user()
-  db.session.add(context)
-
-  db.session.flush()
-
-  db.session.add(audit)
-
-  db.session.flush()
-
-  audit.context = context
-
-
-@signals.Restful.collection_posted.connect_via(Audit)
-def handle_audit_post(sender, objects=None, sources=None):
-  for obj, src in itertools.izip(objects, sources):
-    if not src.get("operation", None):
-      db.session.flush()
-      create_audit_context(obj)
-
-
-@signals.Restful.model_deleted.connect
-def handle_resource_deleted(sender, obj=None, service=None):
-  if obj.context \
-     and obj.context.related_object_id \
-     and obj.id == obj.context.related_object_id \
-     and obj.__class__.__name__ == obj.context.related_object_type:
-    db.session.query(UserRole) \
-        .filter(UserRole.context_id == obj.context_id) \
-        .delete()
 
 
 @app.context_processor

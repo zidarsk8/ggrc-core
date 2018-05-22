@@ -143,7 +143,6 @@ class Audit(Snapshotable,
     to audit itself (auditors, audit firm, context setting,
     custom attribute values, etc.)
     """
-    from ggrc_basic_permissions import create_audit_context
 
     data = {
         "title": source_object.generate_attribute("title"),
@@ -161,7 +160,6 @@ class Audit(Snapshotable,
     self.update_attrs(data)
     db.session.flush()
 
-    create_audit_context(self)
     self.clone_acls(source_object)
     self.clone_custom_attribute_values(source_object)
 
