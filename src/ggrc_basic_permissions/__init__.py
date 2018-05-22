@@ -13,7 +13,6 @@ from sqlalchemy import orm
 
 from ggrc import db
 from ggrc import settings
-from ggrc.app import app
 from ggrc.login import is_external_app_user
 from ggrc.login import get_current_user
 from ggrc.models import all_models
@@ -588,11 +587,6 @@ def handle_resource_deleted(sender, obj=None, service=None):
     #   cascading to delete those, just leave the `Context` object in place.
     #   It and its objects will be visible *only* to Admin users.
     # db.session.delete(obj.context)
-
-
-@app.context_processor
-def authorized_users_for():
-  return {'authorized_users_for': UserRole.role_assignments_for}
 
 
 def contributed_services():
