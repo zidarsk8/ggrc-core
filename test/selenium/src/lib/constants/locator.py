@@ -681,8 +681,7 @@ class CommonWidgetInfo(object):
   STATE = (By.XPATH, _MAIN_HEADER_XPATH +
            "//*[contains(normalize-space(./@class), 'state-value state')]")
   TXT_FOOTER_CSS = (By.CSS_SELECTOR, _FOOTER)
-  TXT_MODIFIED_BY_CSS = (By.CSS_SELECTOR,
-                         _FOOTER + ' [data-test-id="text_manager_7a906d2e"]')
+  TXT_MODIFIED_BY_CSS = (By.CSS_SELECTOR, _FOOTER + " .person-name")
   TXT_OBJECT_REVIEW = (
       By.CSS_SELECTOR,
       '{} [data-test-id="title_review_0ad9fbaf"] h6'.format(WIDGET))
@@ -1158,7 +1157,7 @@ class CommentItem(object):
 class AssessmentLogTab(object):
   """Locators for Log Tab elements on Assessment InfoWidget."""
   CELLS_CSS = (By.CSS_SELECTOR, '.third-col')
-  COMMENT_PERSON_CSS = (By.CSS_SELECTOR, '.person-tooltip-trigger')
+  COMMENT_PERSON_CSS = (By.CSS_SELECTOR, '.person-holder')
   PERSON_LABEL = (By.CSS_SELECTOR, '.person-label')
   LOG_LIST_CSS = (By.CSS_SELECTOR, ' .w-status')
 

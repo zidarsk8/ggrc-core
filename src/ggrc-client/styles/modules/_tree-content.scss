@@ -452,6 +452,10 @@ ul.new-tree {
     .task-comments & {
       max-height: none;
       overflow-y: visible;
+
+      .person-data {
+        display: inline-block;
+      }
     }
     & .tier-2-info {
       padding: 14px 10px 0 10px;
@@ -639,6 +643,10 @@ ul.new-tree {
     .event-owner {
       font-size:13px;
       color:#777;
+
+      .person-data {
+        display: inline-block;
+      }
     }
     .not-mapped {
       font-size:13px;
@@ -678,10 +686,6 @@ ul.new-tree {
   &:hover {
     @include opacity(1);
     text-decoration:none;
-  }
-  &.person-tooltip-trigger {
-    @include opacity(1);
-    font-weight: normal;
   }
   &.relevant-action {
     @include opacity(0.5);
