@@ -266,6 +266,12 @@ class Comment(Roleable, Relatable, Described, Notifiable,
            .undefer_group('CustomAttributeDefinition_complete'),
     )
 
+  def log_json(self):
+    """Log custom attribute revisions."""
+    res = super(Comment, self).log_json()
+    res["custom_attribute_revision"] = self.custom_attribute_revision
+    return res
+
   @builder.simple_property
   def custom_attribute_revision(self):
     """Get the historical value of the relevant CA value."""
