@@ -103,16 +103,13 @@
   }
 
   .pane-header {
-    .pane-header__title {
+    &__title {
       padding-right: 24px;
       max-width: calc(100% - 525px);
       overflow: inherit;
 
-      .pane-header__title-name {
-        max-width: calc(100% - 165px);
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+      .inline__header {
+        width: 100%;
       }
 
       .state-value {
@@ -130,7 +127,14 @@
       }
     }
 
-    .pane-header__toolbar {
+    &__title-name {
+      max-width: calc(100% - 165px);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    &__toolbar {
       .info-pane-utility {
         flex-direction: row-reverse;
       }
