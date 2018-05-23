@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """
-Fill objects_without_revisions table.
+Fill objects_without_revisions table. Delete invalid objects.
 
 Create Date: 2018-05-18 10:25:12.111617
 """
@@ -53,10 +53,57 @@ def _fill_objects_without_revisions_table(connection):
     _add_model_inst_to_obj_without_rev(connection, model_name, table_name)
 
 
+def _delete_invalid_objects(connection):
+  """Delete invalid objects.
+
+  Invalid objects are:
+      Comments that are not mapped to any other object - orphans.
+      Revisions for orphan comments.
+      Notifications for orphan comments.
+  """
+  sql = """
+      CREATE TEMPORARY TABLE orphan_comments AS
+          SELECT DISTINCT c.id FROM comments AS c
+              WHERE c.id NOT IN (
+                  SELECT r.source_id
+                  FROM relationships AS r
+                  WHERE r.source_type="Comment"
+              ) AND c.id NOT IN (
+                  SELECT r.destination_id
+                  FROM relationships AS r
+                  WHERE r.destination_type="Comment"
+              )
+  """
+  connection.execute(sa.text(sql))
+
+  sql = """
+      DELETE FROM revisions
+      WHERE resource_type="Comment" AND resource_id IN (
+          SELECT oc.id FROM orphan_comments AS oc)
+  """
+  connection.execute(sa.text(sql))
+
+  sql = """
+      DELETE FROM notifications
+      WHERE object_type="Comment" AND object_id IN (
+          SELECT oc.id FROM orphan_comments AS oc)
+  """
+  connection.execute(sa.text(sql))
+
+  sql = """
+      DELETE FROM comments
+      WHERE id IN (SELECT oc.id FROM orphan_comments AS oc)
+  """
+  connection.execute(sa.text(sql))
+
+  connection.execute(sa.text("DROP TEMPORARY TABLE orphan_comments"))
+
+
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   connection = op.get_bind()
   _fill_objects_without_revisions_table(connection)
+  _delete_invalid_objects(connection)
 
 
 def downgrade():
