@@ -9,7 +9,7 @@ from flask.ext.login import current_user
 from ggrc.app import db
 from ggrc.rbac.permissions import permissions_for as find_permissions
 from ggrc.rbac.permissions import is_allowed_create
-from ggrc.models import get_model
+from ggrc.models import get_model, all_models
 from ggrc.models import Person
 
 Permission = namedtuple(
@@ -156,10 +156,21 @@ def has_changed_condition(instance, property_name, prevent_if=None, **_):
 def is_auditor(instance, **_):
   """Check if user has auditor role on the audit field of the instance"""
   # pylint: disable=protected-access
-  return any(acl for acl in instance.audit.access_control_list
-             if acl.ac_role.name in "Auditors" and
-             acl.person == current_user) or \
-      find_permissions()._is_allowed_for(instance.audit, "update")
+  if not hasattr(instance, "audit"):
+    return False
+  if find_permissions()._is_allowed_for(instance.audit, "update"):
+    return True
+  exists_query = db.session.query(
+      all_models.AccessControlList
+  ).join(
+      all_models.AccessControlRole
+  ).filter(
+      all_models.AccessControlList.person_id == current_user.id,
+      all_models.AccessControlList.object_type == instance.audit.type,
+      all_models.AccessControlList.object_id == instance.audit.id,
+      all_models.AccessControlRole.name == "Auditors",
+  ).exists()
+  return db.session.query(exists_query).scalar()
 
 
 def is_workflow_admin(instance, **_):
