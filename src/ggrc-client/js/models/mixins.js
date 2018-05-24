@@ -120,26 +120,6 @@ const AUDIT_ISSUE_TRACKER = {
       }
     },
   }, {});
-  can.Model.Mixin('requestorable', {
-    before_create: function () {
-      if (!this.requestor) {
-        this.attr('requestor', {
-          id: GGRC.current_user.id,
-          type: 'Person',
-        });
-      }
-    },
-    form_preload: function (new_object_form) {
-      if (new_object_form) {
-        if (!this.requestor) {
-          this.attr('requestor', {
-            id: GGRC.current_user.id,
-            type: 'Person',
-          });
-        }
-      }
-    },
-  });
 
   can.Model.Mixin('contactable', {
     // NB : Because the attributes object
