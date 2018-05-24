@@ -179,7 +179,6 @@ def load_default_permissions(permissions):
   """
   default_permissions = {
       "read": [
-          "Help",
           "CustomAttributeDefinition",
           {
               "type": "CustomAttributeValue",
