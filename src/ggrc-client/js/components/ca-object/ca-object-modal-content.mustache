@@ -32,7 +32,7 @@
                 </div>
                 <object-list {items}="evidences" {empty-message}="noItemsText">
                     <editable-document-object-list-item {document}="{.}">
-                        <a ($click)="removeRelatedItem(document, 'evidences')">
+                        <a ($click)="removeRelatedItem(document, 'files')">
                             <action-toolbar-control>
                                 <i class="fa fa-trash"></i>
                             </action-toolbar-control>
@@ -40,8 +40,8 @@
                     </editable-document-object-list-item>
                 </object-list>
                 <attach-button
-                    (before-create)="addItems(%event, 'evidences')"
-                    (refresh-evidences)="updateItems('evidences')"
+                    (before-create)="addItems(%event, 'files')"
+                    (refresh-evidences)="updateItems('files')"
                     {is-attach-action-disabled}="isUpdatingEvidences"
                     {instance}="instance">
                 </attach-button>
