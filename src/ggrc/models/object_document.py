@@ -2,8 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """ Module for docuumentable mixins."""
-
-from sqlalchemy import orm, case, and_, literal
+import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import db
@@ -29,60 +28,33 @@ class Documentable(object):
   ]
 
   @declared_attr
-  def documents(self):
+  def documents(cls):  # pylint: disable=no-self-argument
     """Return documents related for that instance."""
-    document_id = case(
-        [
-            (
-                Relationship.destination_type == "Document",
-                Relationship.destination_id,
-            ),
-            (
-                Relationship.source_type == "Document",
-                Relationship.source_id,
-            ),
-        ],
-        else_=literal(False)
-    )
-    documentable_id = case(
-        [
-            (
-                Relationship.destination_type == "Document",
-                Relationship.source_id
-            ),
-            (
-                Relationship.source_type == "Document",
-                Relationship.destination_id,
-            ),
-        ],
-        else_=literal(False)
-    )
-    documentable_type = case(
-        [
-            (
-                Relationship.destination_type == "Document",
-                Relationship.source_type
-            ),
-            (
-                Relationship.source_type == "Document",
-                Relationship.destination_type,
-            ),
-        ],
-    )
     return db.relationship(
         Document,
-        # at first we check is documentable_id not False (it return id in fact)
-        # after that we can compare values.
-        # this is required for saving logic consistancy
-        # case return 2 types of values BOOL(false) and INT(id) not Null
-        primaryjoin=lambda: and_(documentable_id, self.id == documentable_id),
+        primaryjoin=lambda: sa.or_(
+            sa.and_(
+                cls.id == Relationship.source_id,
+                Relationship.source_type == cls.__name__,
+                Relationship.destination_type == "Document",
+            ),
+            sa.and_(
+                cls.id == Relationship.destination_id,
+                Relationship.destination_type == cls.__name__,
+                Relationship.source_type == "Document",
+            )
+        ),
         secondary=Relationship.__table__,
-        # at first we check is document_id not False (it return id in fact)
-        # after that we can compare values.
-        # this is required for saving logic consistancy
-        # case return 2 types of values BOOL(false) and INT(id) not Null
-        secondaryjoin=lambda: and_(document_id, Document.id == document_id,
-                                   documentable_type == self.__name__),
+        secondaryjoin=lambda: sa.or_(
+            sa.and_(
+                Document.id == Relationship.source_id,
+                Relationship.source_type == "Document",
+            ),
+            sa.and_(
+                Document.id == Relationship.destination_id,
+                Relationship.destination_type == "Document",
+            )
+        ),
         viewonly=True,
     )
 
@@ -112,7 +84,7 @@ class Documentable(object):
         super(Documentable, cls).eager_query(),
         Documentable._include_links,
     ).options(
-        orm.subqueryload(
+        sa.orm.subqueryload(
             'documents',
         ).undefer_group(
             'Document_complete',
@@ -139,7 +111,7 @@ class Documentable(object):
   @classmethod
   def indexed_query(cls):
     return super(Documentable, cls).indexed_query().options(
-        orm.subqueryload("documents").undefer_group("Document_complete"),
+        sa.orm.subqueryload("documents").undefer_group("Document_complete"),
     )
 
 
