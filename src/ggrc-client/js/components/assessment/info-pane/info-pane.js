@@ -80,8 +80,9 @@ export default can.Component.extend({
           }
 
           verifiers = acl
-            .filter((item) => item.ac_role_id == verifierRoleId)
-            .map((item) => item.person);
+            .filter((item) =>
+              String(item.ac_role_id) === String(verifierRoleId)
+            ).map((item) => item.person);
 
           return verifiers;
         },
@@ -309,8 +310,7 @@ export default can.Component.extend({
     addItems: function (event, type) {
       let items = event.items;
       this.attr('isUpdating' + can.capitalize(type), true);
-      return this.attr(type).unshift.apply(this.attr(type),
-        can.makeArray(items));
+      return this.attr(type).unshift(...can.makeArray(items));
     },
     getEvidenceAdditionFilter: function (kind) {
       return kind ?
@@ -405,15 +405,15 @@ export default can.Component.extend({
         self.addAction('remove_related', related);
       })
         .fail(function () {
-        GGRC.Errors.notifier('error', 'Unable to remove URL.');
-        items.splice(index, 0, item);
-      })
-      .always(function (assessment) {
-        assessment.removeAttr('actions');
-        self.attr('isUpdating' + can.capitalize(type), false);
+          GGRC.Errors.notifier('error', 'Unable to remove URL.');
+          items.splice(index, 0, item);
+        })
+        .always(function (assessment) {
+          assessment.removeAttr('actions');
+          self.attr('isUpdating' + can.capitalize(type), false);
 
-        self.refreshCounts(['Evidence']);
-      });
+          self.refreshCounts(['Evidence']);
+        });
     },
     updateRelatedItems: function () {
       this.attr('isUpdatingRelatedItems', true);
