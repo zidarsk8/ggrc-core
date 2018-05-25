@@ -23,7 +23,7 @@ TABLE = "documents"
 
 
 def get_gdrive_id_to_migrate(connection):
-  """Returns list gdrive ids to process."""
+  """Find documents with the same gdrive_id"""
   sql = """
       SELECT
           d.gdrive_id
@@ -245,7 +245,7 @@ def get_acls_to_merge(connection, document_ids):
 def create_acl(connection, old_acl, new_doc_id):
   """Create new acl"""
   sql = """
-      INSERT INTO access_control_list(
+      INSERT IGNORE INTO access_control_list(
         person_id,
         ac_role_id,
         object_id,
@@ -301,7 +301,17 @@ def delete_revisions(connection, resource_type, resource_ids):
 
 
 def process_document(connection, document_data):
-  """Process documents with the same gdive_id"""
+  """Process documents with the same gdive_id
+
+  Algorithm:
+  1) Get 1st doc data and copy to new doc
+  2) Get all document admin roles from old documents and copy to new
+  3) Create relationships for new doc
+  4) Clean old data
+    - documents
+    - revisions
+    - relationships
+  """
   first_document_data = document_data[0]
   doc_id = copy_document(connection, first_document_data)
   document_ids = [d.id for d in document_data]
