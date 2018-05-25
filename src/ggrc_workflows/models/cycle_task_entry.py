@@ -14,10 +14,11 @@ from ggrc.models import reflection
 from ggrc.access_control import roleable
 from ggrc.models.relationship import Relatable
 from ggrc.fulltext import mixin
+from ggrc.models.mixins import base
 
 
-class CycleTaskEntry(roleable.Roleable,
-                     Relatable, Described, Base, mixin.Indexed, db.Model):
+class CycleTaskEntry(roleable.Roleable, Relatable, Described, 
+                     base.ContextRBAC, Base, mixin.Indexed, db.Model):
   """Workflow CycleTaskEntry model."""
 
   __tablename__ = 'cycle_task_entries'

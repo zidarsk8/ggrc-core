@@ -17,6 +17,7 @@ from ggrc import builder
 from ggrc import db
 from ggrc.models.deferred import deferred
 from ggrc.models.revision import Revision
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Described
 from ggrc.models.mixins import Notifiable
@@ -156,7 +157,7 @@ def reindex_by_relationship(relationship):
 
 
 class Comment(Roleable, Relatable, Described, Notifiable,
-              Base, Indexed, db.Model):
+              base.ContextRBAC, Base, Indexed, db.Model):
   """Basic comment model."""
   __tablename__ = "comments"
 

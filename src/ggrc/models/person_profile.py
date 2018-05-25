@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import relationship
 
 from ggrc import db
-from ggrc.models.mixins.base import Base
+from ggrc.models.mixins import base
 
 # Offset for default last seen what's new date in days
 DEFAULT_LAST_SEEN_OFFSET = 60
@@ -21,7 +21,7 @@ def default_last_seen_date():
 
 
 # pylint: disable=too-few-public-methods
-class PersonProfile(Base, db.Model):
+class PersonProfile(base.ContextRBAC, base.Base, db.Model):
   """Class represents person's profile.
 
   Profile keeps user's preferences and local user settings such as

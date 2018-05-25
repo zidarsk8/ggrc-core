@@ -9,10 +9,11 @@ from sqlalchemy.orm import validates
 from ggrc import db
 from ggrc.models import mixins
 from ggrc.models import reflection
+from ggrc.models.mixins import base
 from ggrc.fulltext.mixin import Indexed
 
 
-class Label(mixins.Base, db.Model, Indexed):
+class Label(base.ContextRBAC, mixins.Base, db.Model, Indexed):
   """Represent object labels"""
   __tablename__ = 'labels'
   _fulltext_attrs = [

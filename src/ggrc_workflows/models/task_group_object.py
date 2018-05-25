@@ -8,6 +8,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from ggrc import db
 from ggrc.models.mixins import Base
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Timeboxed
 from ggrc.models import reflection
 from ggrc.models import utils
@@ -15,7 +16,8 @@ from ggrc.models import utils
 from ggrc.access_control import roleable
 
 
-class TaskGroupObject(roleable.Roleable, Timeboxed, Base, db.Model):
+class TaskGroupObject(roleable.Roleable, Timeboxed, base.ContextRBAC, Base, 
+                      db.Model):
   """Workflow TaskGroupObject model."""
 
   __tablename__ = 'task_group_objects'

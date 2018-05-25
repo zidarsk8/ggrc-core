@@ -11,6 +11,7 @@ from sqlalchemy.orm import foreign
 
 from ggrc import builder
 from ggrc import db
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models.revision import Revision
 from ggrc.models import reflection
@@ -20,7 +21,7 @@ from ggrc.fulltext import get_indexer
 from ggrc.utils import url_parser
 
 
-class CustomAttributeValue(Base, Indexed, db.Model):
+class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
   """Custom attribute value model"""
 
   __tablename__ = 'custom_attribute_values'

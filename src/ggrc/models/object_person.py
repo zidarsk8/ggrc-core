@@ -7,12 +7,13 @@ from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.models.deferred import deferred
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Timeboxed
 from ggrc.models import reflection
 
 
-class ObjectPerson(Timeboxed, Base, db.Model):
+class ObjectPerson(Timeboxed, base.ContextRBAC, Base, db.Model):
   __tablename__ = 'object_people'
 
   role = deferred(db.Column(db.String), 'ObjectPerson')

@@ -11,12 +11,13 @@ from sqlalchemy.orm import validates
 
 from ggrc import db
 from ggrc.login import is_external_app_user
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models import reflection
 from ggrc.models.exceptions import ValidationError
 
 
-class Relationship(Base, db.Model):
+class Relationship(base.ContextRBAC, Base, db.Model):
   """Relationship model."""
   __tablename__ = 'relationships'
   source_id = db.Column(db.Integer, nullable=False)

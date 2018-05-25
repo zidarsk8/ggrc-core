@@ -5,6 +5,7 @@
 from ggrc import db
 from sqlalchemy.orm import validates
 from ggrc.models.deferred import deferred
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base, Hierarchical
 from ggrc.models import reflection
 
@@ -24,7 +25,7 @@ class CategorizedPublishable(object):
     return updater.query_for(self.rel_class, json_obj, self.attr_name, True)
 
 
-class CategoryBase(Hierarchical, Base, db.Model):
+class CategoryBase(Hierarchical, base.ContextRBAC, Base, db.Model):
   """Base class for Categories"""
   _table_plural = 'category_bases'
   __tablename__ = 'categories'

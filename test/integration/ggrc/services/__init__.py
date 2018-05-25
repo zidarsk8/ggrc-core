@@ -10,6 +10,7 @@ import ggrc.builder
 import ggrc.services
 from ggrc import db
 from ggrc.models import all_models
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models import reflection
 from ggrc.models.exceptions import ValidationError
@@ -29,7 +30,7 @@ def reset_first_request_flag():
   ggrc.app.app._got_first_request = False
 
 
-class ServicesTestMockModel(Base, db.Model):
+class ServicesTestMockModel(base.ContextRBAC, Base, db.Model):
   __tablename__ = 'test_model'
   foo = db.Column(db.String)
   code = db.Column(db.String, unique=True)

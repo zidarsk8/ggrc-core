@@ -14,6 +14,7 @@ from ggrc.fulltext.mixin import Indexed
 from ggrc.models.context import HasOwnContext
 from ggrc.models.exceptions import ValidationError
 from ggrc.models.deferred import deferred
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base, CustomAttributable
 from ggrc.models.custom_attribute_definition import CustomAttributeMapable
 from ggrc.models import reflection
@@ -24,7 +25,7 @@ from ggrc.models.person_profile import PersonProfile
 
 
 class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
-             Relatable, Base, Indexed, db.Model):
+             Relatable, base.ContextRBAC, Base, Indexed, db.Model):
 
   def __init__(self, *args, **kwargs):
     """Initialize profile relationship while creating Person instance"""

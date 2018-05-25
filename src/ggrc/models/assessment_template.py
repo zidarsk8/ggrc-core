@@ -16,6 +16,7 @@ from ggrc.models import audit
 from ggrc.models import issuetracker_issue
 from ggrc.models import mixins
 from ggrc.models import relationship
+from ggrc.models.mixins import base
 from ggrc.models.mixins import clonable
 from ggrc.models.exceptions import ValidationError
 from ggrc.models.reflection import AttributeInfo
@@ -28,8 +29,9 @@ from ggrc.rbac.permissions import permissions_for
 
 class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
                          mixins.Titled, mixins.CustomAttributable,
-                         Roleable, mixins.Slugged, mixins.Stateful,
-                         clonable.MultiClonable, Indexed, db.Model):
+                         Roleable, base.ContextRBAC, mixins.Slugged,
+                         mixins.Stateful, clonable.MultiClonable, Indexed,
+                         db.Model):
   """A class representing the assessment template entity.
 
   An Assessment Template is a template that allows users for easier creation of
