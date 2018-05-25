@@ -5,9 +5,7 @@
 from ggrc.models.all_models import register_model
 
 from ggrc_risks.models.risk import Risk
-from ggrc_risks.models.risk_object import RiskObject
 from ggrc_risks.models.threat import Threat
 
 register_model(Risk)
-register_model(RiskObject)
 register_model(Threat)
