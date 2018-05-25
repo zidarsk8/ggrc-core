@@ -139,6 +139,7 @@ class TestColumnOrder(unittest.TestCase):
         "email",
         "is_enabled",
         "company",
+        "documents_file",
         "documents_reference_url",
         "A Capital custom attribute",
         "a simple custom attribute",
