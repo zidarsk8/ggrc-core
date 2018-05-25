@@ -22,7 +22,7 @@ import {getRole} from '../plugins/utils/acl-utils';
       'ca_update',
       'timeboxed',
       'mapping-limit',
-      'issueTrackerIntegratable',
+      'auditIssueTracker',
     ],
     is_custom_attributable: true,
     is_clonable: true,
