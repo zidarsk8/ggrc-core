@@ -39,13 +39,16 @@ def handle_acl_changes():
   """
 
   if not (hasattr(flask.g, "new_wf_acls") and
+          hasattr(flask.g, "new_wf_comment_ct_ids") and
           hasattr(flask.g, "deleted_wf_objects")):
     return
 
+  _propagate_new_wf_comments(flask.g.new_wf_comment_ct_ids)
   _propagete_new_wf_acls(flask.g.new_wf_acls)
   remove_related_acl(flask.g.deleted_wf_objects)
 
   del flask.g.new_wf_acls,
+  del flask.g.new_wf_comment_ct_ids,
   del flask.g.deleted_wf_objects,
 
 
@@ -62,11 +65,14 @@ def get_new_wf_acls(session):
   """Add propagated roles to workflow related objects."""
   propagated_role_ids = None
   new_wf_acls = set()
+  new_wf_comment_ct_ids = set()
   for obj in session.new:
     acls = []
     if (isinstance(obj, all_models.AccessControlList) and
             obj.object_type == all_models.Workflow.__name__):
       acls.append(obj)
+    elif isinstance(obj, all_models.CycleTaskEntry):
+      new_wf_comment_ct_ids.add(obj.cycle_task_group_object_task_id)
     elif isinstance(obj, RELATED_MODELS):
       # not optimized operation. Adding a new task will result in full
       # propagation on the entire workflow.
@@ -76,7 +82,7 @@ def get_new_wf_acls(session):
     for acl in acls:
       if acl.ac_role_id in propagated_role_ids:
         new_wf_acls.add(acl.id)
-  return new_wf_acls
+  return new_wf_acls, new_wf_comment_ct_ids
 
 
 def get_deleted_wf_objects(session):
@@ -351,3 +357,32 @@ def _propagete_new_wf_acls(new_wf_acls):
     _propagate_to_tg(new_wf_acls)
 
     _propagate_to_cycles(new_wf_acls)
+
+
+def _propagate_new_wf_comments(cycle_task_ids):
+  """Special handler for comment propagation."""
+  if not cycle_task_ids:
+    return
+  acl_table = all_models.AccessControlList.__table__.alias("original_acl")
+  acr_table = all_models.AccessControlRole.__table__.alias("original_acr")
+
+  ct_propagated_roles = {
+      "Admin Mapped",
+      "Workflow Member Mapped",
+  }
+
+  propagation_acr_ids = sa.select([acr_table.c.id]).where(
+      acr_table.c.name.in_(ct_propagated_roles)
+  )
+
+  cycle_task_type = all_models.CycleTaskGroupObjectTask.__name__
+
+  cycle_task_acl_ids = sa.select([acl_table.c.id]).where(
+      sa.and_(
+          acl_table.c.object_id.in_(cycle_task_ids),
+          acl_table.c.object_type == cycle_task_type,
+          acl_table.c.ac_role_id.in_(propagation_acr_ids),
+      )
+  )
+
+  _propagate_to_cte(cycle_task_acl_ids)
