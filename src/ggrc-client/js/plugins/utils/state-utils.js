@@ -138,24 +138,15 @@ function getBulkStatesForModel(model) {
 /**
  * Transform query for objects into query which filter them by state.
  * @param {Array} statuses - array of active statuses
- * @param {String} filterString - original query string
  * @param {String} modelName - model name
  * @return {String} The transformed query
  */
-function statusFilter(statuses, filterString, modelName) {
+function buildStatusFilter(statuses, modelName) {
   let filter = modelName === 'Assessment' ?
-    buildAssessmentFilter(statuses, buildStatusesFilterString) :
-    buildStatusesFilterString(statuses, modelName);
+    buildAssessmentFilter(statuses, buildFilterExpression) :
+    buildFilterExpression(statuses, modelName);
 
-  filterString = filterString || '';
-  if (filter !== '') {
-    if (filterString !== '') {
-      return filterString + ' And ' + filter;
-    }
-    return filter;
-  }
-
-  return filterString;
+  return filter;
 }
 
 /**
@@ -166,33 +157,18 @@ function unlockedFilter() {
   return '"Archived"="False"';
 }
 
-/**
- * Transform query for objects into query which filter them by state.
- * @param {Array} statuses - array of active statuses
- * @param {function} builder - function building a query
- * @param {String} modelName - model name
- * @return {String} The transformed query
- */
-function buildStatusFilter(statuses, builder, modelName) {
-  let filter = modelName === 'Assessment' ?
-    buildAssessmentFilter(statuses, builder) :
-    builder(statuses, modelName);
+function buildFilterExpression(statuses, modelName) {
+  let statusFieldName = getStatusFieldName(modelName);
+
+  let filter = {
+    expression: {
+      left: statusFieldName,
+      op: {name: 'IN'},
+      right: statuses,
+    },
+  };
+
   return filter;
-}
-
-/**
- * Build statuses filter string
- * @param {Array} statuses - array of active statuses
- * @param {String} modelName - model name
- * @return {String} statuses filter
- */
-function buildStatusesFilterString(statuses, modelName) {
-  let fieldName = getStatusFieldName(modelName);
-
-  return statuses.map(function (item) {
-    // wrap in quotes
-    return '"' + fieldName + '"="' + item + '"';
-  }).join(' Or ');
 }
 
 /**
@@ -216,18 +192,11 @@ function getStatusFieldName(modelName) {
  * @return {String} statuses filter
  */
 function buildAssessmentFilter(statuses, builder) {
-  // sort array to put all Completed states to the end
-  statuses.sort((a) => {
-    return a.toLowerCase().indexOf('completed') > -1 ? 1 : -1;
-  });
+  // copy array. Do not change original
+  statuses = statuses.slice();
 
   let verifiedIndex = statuses.indexOf('Completed and Verified');
   let completedIndex = statuses.indexOf('Completed (no verification)');
-  let isVerified = false;
-  let filter;
-
-  // copy array. Do not change original
-  statuses = statuses.slice();
 
   // do not update statuses
   if (verifiedIndex === -1 && completedIndex === -1) {
@@ -246,16 +215,36 @@ function buildAssessmentFilter(statuses, builder) {
     return builder(statuses, 'Assessment');
   }
 
+  let isVerified;
   if (completedIndex > -1 && verifiedIndex === -1) {
-    statuses.splice(completedIndex, 1, 'Completed');
+    isVerified = false;
+    statuses.splice(completedIndex, 1);
   } else if (verifiedIndex > -1 && completedIndex === -1) {
     isVerified = true;
     statuses.splice(verifiedIndex, 1);
-    statuses.push('Completed');
   }
 
-  filter = builder(statuses, 'Assessment');
-  return filter + ' AND verified=' + isVerified;
+  let completedStateExpression = {
+    expression: {
+      left: {
+        left: 'Status',
+        op: {name: '='},
+        right: 'Completed',
+      },
+      op: {name: 'AND'},
+      right: {
+        left: 'verified',
+        op: {name: '='},
+        right: isVerified.toString(),
+      },
+    },
+  };
+
+  let result = statuses.length ? GGRC.query_parser.join_queries(
+    builder(statuses, 'Assessment'), completedStateExpression, 'OR')
+    : completedStateExpression;
+
+  return result;
 }
 
 /**
@@ -273,7 +262,6 @@ export {
   hasState,
   hasFilter,
   hasFilterTooltip,
-  statusFilter,
   unlockedFilter,
   getStatesForModel,
   getBulkStatesForModel,
