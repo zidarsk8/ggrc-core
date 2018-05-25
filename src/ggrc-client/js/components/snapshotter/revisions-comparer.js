@@ -287,8 +287,8 @@ export default can.Component.extend({
       const highlightClass = 'diff-highlighted';
       const listSelector = 'ul li, .object-list-item';
       const attributesSelector = `.row-fluid h6 + *,
-        .row-fluid .state-value,
-        .row-fluid h3,
+        .pane-header__title-details .state-value,
+        .pane-header__title-details h3,
         related-documents`;
       let infoPanes = $target.find('.info .tier-content');
       let valuesOld = infoPanes.eq(0).find(attributesSelector);

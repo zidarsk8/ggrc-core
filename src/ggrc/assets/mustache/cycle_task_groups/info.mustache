@@ -6,19 +6,16 @@
 
 {{#instance}}
   <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
-
-    {{#is_info_pin}}
-      <info-pin-buttons class="details-wrap" maximized="maximized" on-change-maximized-state="@onChangeMaximizedState" on-close="@onClose"></info-pin-buttons>
-    {{/is_info_pin}}
-
     <div class="tier-content">
       {{>'/static/mustache/base_objects/general-page-header.mustache'}}
-      {{>'/static/mustache/base_objects/object-review.mustache'}}
-      <div class="row-fluid wrap-row">
-        <div class="span12">
-          <h6>{{instance.class.title_singular}} description</h6>
-          <div class="rtf-block">
-            <read-more {text}="instance.description"></read-more>
+      <div class="pane-content">
+        {{>'/static/mustache/base_objects/object-review.mustache'}}
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>{{instance.class.title_singular}} description</h6>
+            <div class="rtf-block">
+              <read-more {text}="instance.description"></read-more>
+            </div>
           </div>
         </div>
       </div>

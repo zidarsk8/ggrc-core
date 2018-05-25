@@ -727,8 +727,7 @@
       display: flex;
       .info{
         border: 1px solid $warmGray;
-        padding: 20px 15px;
-        width: calc(50% - 30px);
+        width: 50%;
         box-shadow: none;
         &:first-child{
           border-right: none;
@@ -759,17 +758,18 @@
           }
         }
        & ~ .info{
-         width: calc(50% - 30px);
-
          .diff-highlighted{
            background-color: $pastelGreen;
          }
        }
+       .pane-header__title {
+         max-width: 100%;
+       }
+       .pane-header__title-details {
+         display: block;
+       }
        .info-pane-utility{
          display: none;
-       }
-       .pane-header h3{
-         float: none;
        }
        .tier-content{
          display: block;
