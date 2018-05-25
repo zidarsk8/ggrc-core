@@ -190,7 +190,7 @@ import {getRole} from '../plugins/utils/acl-utils';
       'inScopeObjects',
       'inScopeObjectsPreload',
       'refetchHash',
-      'issueTrackerIntegratable',
+      'assessmentIssueTracker',
     ],
     findOne: 'GET /api/assessment_templates/{id}',
     findAll: 'GET /api/assessment_templates',
