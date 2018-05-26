@@ -579,22 +579,6 @@ def handle_cycle_object_status(
   # db.session.commit()
 
 
-@signals.Restful.model_posted.connect_via(models.CycleTaskGroupObjectTask)
-def handle_cycle_task_group_object_task_post(
-        sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
-  Signals.status_change.send(
-      obj.__class__,
-      objs=[
-          Signals.StatusChangeSignalObjectContext(
-              instance=obj,
-              new_status=obj.status,
-              old_status=None,
-          )
-      ]
-  )
-  db.session.flush()
-
-
 @signals.Restful.model_put.connect_via(models.CycleTaskGroup)
 def handle_cycle_task_group_put(
         sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
