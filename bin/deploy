@@ -40,7 +40,7 @@ Note: the script expects several prerequisites:
     extras/deploy/ggrc-dev/test-account@ggrc-dev.iam.gserviceaccount.com.key
 
 Example usage:
-  $(basename ${0}) 0.10.23-Raspberry ggrc-dev
+  $(basename ${0}) ggrc-dev 0.10.23-Raspberry
 EOF
 }
 
