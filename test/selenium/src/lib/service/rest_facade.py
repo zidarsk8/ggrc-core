@@ -43,6 +43,14 @@ def create_assessment(audit, **attrs):
       count=1, **attrs)[0]
 
 
+def create_issue(program=None):
+  """Create a issue (optionally map to a `program`)"""
+  issue = rest_service.IssuesService().create_objs(count=1)[0]
+  if program:
+    map_objs(program, issue)
+  return issue
+
+
 def map_objs(src_obj, dest_obj):
   """Map two objects to each other"""
   rest_service.RelationshipsService().map_objs(

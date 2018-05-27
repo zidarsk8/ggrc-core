@@ -342,6 +342,10 @@ class TestRelatedAssessments(base.Test):
     return rest_facade.create_program()
 
   @pytest.fixture()
+  def issue_mapped_to_program(self, program):
+    return rest_facade.create_issue(program)
+
+  @pytest.fixture()
   def control_mapped_to_program(self, program):
     return rest_facade.create_control(program)
 
@@ -383,6 +387,15 @@ class TestRelatedAssessments(base.Test):
     assessment.update_attrs(mapped_objects=objs_to_map)
     return assessment
 
+  def _assert_asmt(self, asmts_ui_service, exp_asmt):
+    """Assert that assessment `exp_asmt` on UI is the same as in
+    `exp_asmt`."""
+    actual_asmt = asmts_ui_service.get_obj_from_info_page(exp_asmt)
+    self.general_equal_assert(
+        exp_asmt.repr_ui(), actual_asmt,
+        "audit",  # not shown in UI
+        "custom_attributes")  # not returned on POST /api/assessments)
+
   def _assert_asmt_with_related_asmts(
       self, checked_asmt, related_asmts_titles, selenium
   ):
@@ -391,13 +404,21 @@ class TestRelatedAssessments(base.Test):
     Also assert that `Asessment title`, `Related objects`, `Audit title` on
     "Related Assessments" tab are the same as in `related_asmts_titles`."""
     asmts_ui_service = webui_service.AssessmentsService(selenium)
-    actual_asmt = asmts_ui_service.get_obj_from_info_page(checked_asmt)
-    self.general_equal_assert(
-        checked_asmt.repr_ui(), actual_asmt,
-        "audit",  # not shown in UI
-        "custom_attributes")  # not returned on POST /api/assessments)
+    self._assert_asmt(asmts_ui_service, checked_asmt)
     assert asmts_ui_service.get_asmt_related_asmts_titles(checked_asmt) == \
         related_asmts_titles
+
+  def _assert_asmt_with_related_issues(
+      self, checked_asmt, related_issues_titles, selenium
+  ):
+    """Assert that assessment `checked_asmt` on UI is the same as in
+    `checked_asmt`.
+    Also assert that `Issues title` on "Related Issues" tab are
+    the same as in `related_issues_titles`."""
+    asmts_ui_service = webui_service.AssessmentsService(selenium)
+    self._assert_asmt(asmts_ui_service, checked_asmt)
+    assert asmts_ui_service.get_related_issues_titles(
+        checked_asmt) == related_issues_titles
 
   @staticmethod
   def _related_asmts_of_obj(obj, selenium):
@@ -589,3 +610,28 @@ class TestRelatedAssessments(base.Test):
         for assessment in assessments]
     assert self._related_asmts_of_obj(obj, selenium) ==\
         related_asmts_titles[::-1]
+
+  def test_asmts_different_types_mapped_to_same_control_w_issue(
+      self, control_mapped_to_program, issue_mapped_to_program, audit, selenium
+  ):
+    """Objects structure:
+    Program
+    -> Control. Map it to issue
+    -> Audit
+      -> Asmt-1 with type Control. Map to Control.
+      -> Asmt-2 with type Objective. Map to Control.
+    As a result, Asmt-1 has related issue
+      and Asmt-2 doesn't have related issue."""
+    rest_facade.map_objs(control_mapped_to_program, issue_mapped_to_program)
+    assessments = [self._create_mapped_asmt(
+        audit=audit, assessment_type=assessment_type,
+        objs_to_map=[control_mapped_to_program])
+        for assessment_type in ["Control", "Objective"]]
+    self._assert_asmt_with_related_issues(
+        checked_asmt=assessments[0],
+        related_issues_titles=[issue_mapped_to_program.title],
+        selenium=selenium)
+    self._assert_asmt_with_related_issues(
+        checked_asmt=assessments[1],
+        related_issues_titles=[],
+        selenium=selenium)
