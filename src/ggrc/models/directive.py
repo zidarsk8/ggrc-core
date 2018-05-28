@@ -112,7 +112,6 @@ class Directive(HasObjectState, LastDeprecatedTimeboxed,
 
   _aliases = {
       'kind': "Kind/Type",
-      "documents_reference_url": None,
       "documents_file": None,
   }
 
@@ -160,7 +159,6 @@ class Policy(Roleable, CustomAttributable, Relatable,
   ])
 
   _aliases = {
-      "documents_reference_url": None,
       "documents_file": None,
   }
 
@@ -182,7 +180,6 @@ class Regulation(Roleable, CustomAttributable, Relatable,
 
   _aliases = {
       "kind": None,
-      "documents_reference_url": None,
       "documents_file": None,
   }
 
@@ -204,7 +201,6 @@ class Standard(Roleable, CustomAttributable, Relatable,
 
   _aliases = {
       "kind": None,
-      "documents_reference_url": None,
       "documents_file": None,
   }
 
@@ -226,7 +222,6 @@ class Contract(Roleable, CustomAttributable, Relatable,
 
   _aliases = {
       "kind": None,
-      "documents_reference_url": None,
       "documents_file": None,
   }
 

@@ -62,7 +62,6 @@ class SystemOrProcess(track_object_state.HasObjectState,
   ]
   _sanitize_html = ['version']
   _aliases = {
-      "documents_reference_url": None,
       "documents_file": None,
       "network_zone": {
           "display_name": "Network Zone",
@@ -111,7 +110,6 @@ class System(CustomAttributable, Personable, Roleable,
   _table_plural = 'systems'
 
   _aliases = {
-      "documents_reference_url": None,
       "documents_file": None,
   }
 
@@ -128,7 +126,6 @@ class Process(CustomAttributable, Personable, Roleable,
   _table_plural = 'processes'
 
   _aliases = {
-      "documents_reference_url": None,
       "documents_file": None,
   }
 

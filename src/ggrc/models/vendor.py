@@ -19,6 +19,5 @@ class Vendor(Roleable, HasObjectState, CustomAttributable, Personable,
   __tablename__ = 'vendors'
 
   _aliases = {
-      "documents_reference_url": None,
       "documents_file": None,
   }
