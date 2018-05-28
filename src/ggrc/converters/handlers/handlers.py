@@ -429,21 +429,6 @@ class TextColumnHandler(ColumnHandler):
     return re.sub(r'\s+', " ", value)
 
 
-class TextareaColumnHandler(ColumnHandler):
-
-  """ Multi line text field handler """
-
-  def parse_item(self):
-    """ Remove multiple spaces and new lines from text """
-    if not self.raw_value:
-      if self.mandatory:
-        self.add_error(errors.MISSING_VALUE_ERROR,
-                       column_name=self.display_name)
-      return ""
-
-    return re.sub(r'\s+', " ", self.raw_value).strip()
-
-
 class MappingColumnHandler(ColumnHandler):
 
   """ Handler for mapped objects """
