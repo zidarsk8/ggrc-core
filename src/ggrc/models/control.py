@@ -266,7 +266,7 @@ class Control(WithLastAssessmentDate,
           "description": "Allowed values are:\nkey\nnon-key\n---",
       },
       # overrides values from PublicDocumentable mixin
-      "documents_url": None,
+      "documents_reference_url": None,
       "test_plan": "Assessment Procedure",
   }
 

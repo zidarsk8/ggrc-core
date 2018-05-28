@@ -30,7 +30,7 @@ class Clause(Roleable, HasObjectState, Hierarchical, CustomAttributable,
   _aliases = {
       "description": "Text of Clause",
       "directive": None,
-      "documents_url": None,
+      "documents_reference_url": None,
       "documents_file": None,
   }
 

@@ -37,7 +37,7 @@ class Section(Roleable,
   __tablename__ = 'sections'
   _table_plural = 'sections'
   _aliases = {
-      "documents_url": None,
+      "documents_reference_url": None,
       "documents_file": None,
       "description": "Text of Section",
       "directive": {

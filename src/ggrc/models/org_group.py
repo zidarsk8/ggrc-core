@@ -20,7 +20,7 @@ class OrgGroup(Roleable, HasObjectState, CustomAttributable,
   """Class representing OrgGroup."""
   __tablename__ = 'org_groups'
   _aliases = {
-      "documents_url": None,
+      "documents_reference_url": None,
       "documents_file": None,
   }
 

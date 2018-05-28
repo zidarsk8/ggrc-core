@@ -18,6 +18,6 @@ class Market(Roleable, HasObjectState, CustomAttributable, Personable,
              Commentable, TestPlanned, BusinessObject, Indexed, db.Model):
   __tablename__ = 'markets'
   _aliases = {
-      "documents_url": None,
+      "documents_reference_url": None,
       "documents_file": None,
   }

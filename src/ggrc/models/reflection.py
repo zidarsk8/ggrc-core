@@ -138,7 +138,7 @@ class AttributeInfo(object):
       "user_role",
       "recipients",
       "send_by_default",
-      "documents_url",
+      "documents_reference_url",
       "documents_file",
       "notify_custom_message",
       "frequency",

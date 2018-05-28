@@ -23,6 +23,6 @@ class AccessGroup(Roleable, HasObjectState, PublicDocumentable, Commentable,
   __tablename__ = 'access_groups'
 
   _aliases = {
-      "documents_url": None,
+      "documents_reference_url": None,
       "documents_file": None,
   }
