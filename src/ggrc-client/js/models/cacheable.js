@@ -681,6 +681,11 @@ import tracker from '../tracker';
           model.constructor.cache[params.id] = model;
           model.attr('id', params.id);
         }
+        if (model.cleanupAcl && params.access_control_list) {
+          // Clear ACL to avoid "merge" of arrays.
+          // "params" has valid ACL array.
+          model.cleanupAcl();
+        }
         model.attr(params);
         model.updateCaObjects(params.custom_attribute_values);
       } else {
