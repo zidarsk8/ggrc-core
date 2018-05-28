@@ -38,7 +38,6 @@ import {
       default_mappings: [], // expects array of objects
       mapping: '@',
       deferred: '@',
-      attributes: {},
       newInstance: false,
       list: [],
       // the following are just for the case when we have no object to start with,
@@ -174,66 +173,6 @@ import {
           }
         }.bind(this));
       },
-      'input[null-if-empty] change': function (el) {
-        if (!el.val()) {
-          this.viewModel.attributes.attr(el.attr('name'), null);
-        }
-      },
-      'input keyup': function (el, ev) {
-        ev.stopPropagation();
-      },
-      'input, textarea, select change': function (el, ev) {
-        this.viewModel.attributes.attr(el.attr('name'), el.val());
-      },
-
-      'input:not([data-lookup], [data-mapping]), textarea keyup':
-        function (el, ev) {
-          if (el.prop('value').length === 0 ||
-            (typeof el.attr('value') !== 'undefined' &&
-            el.attr('value').length === 0)) {
-            this.viewModel.attributes.attr(el.attr('name'), el.val());
-          }
-        },
-      'a[data-toggle=submit]:not(.disabled) click': function (el, ev) {
-        let obj;
-        let mapping;
-        let that = this;
-        let binding = this.viewModel.instance
-          .get_binding(this.viewModel.mapping);
-        let extraAttrs = can.reduce(
-          this.element.find('input:not([data-mapping], [data-lookup])').get(),
-          function (attrs, el) {
-            if ($(el).attr('model')) {
-              attrs[$(el).attr('name')] =
-                CMS.Models[$(el).attr('model')].findInCacheById($(el).val());
-            } else {
-              attrs[$(el).attr('name')] = $(el).val();
-            }
-            return attrs;
-          }, {});
-
-        ev.stopPropagation();
-
-        extraAttrs[binding.loader.object_attr] = this.viewModel.instance;
-        if (binding.loader instanceof GGRC.ListLoaders.DirectListLoader) {
-          obj = new CMS.Models[binding.loader.model_name](extraAttrs);
-        } else {
-          obj = new CMS.Models[binding.loader.option_model_name](extraAttrs);
-        }
-
-        if (that.viewModel.attr('deferred')) {
-          that.viewModel.changes
-            .push({what: obj, how: 'add', extra: extraAttrs});
-        } else {
-          mapping = that.viewModel.mapping ||
-            GGRC.Mappings.get_canonical_mapping_name(
-              that.viewModel.instance.constructor.shortName,
-              obj.constructor.shortName);
-          that.viewModel.instance.mark_for_addition(mapping, obj, extraAttrs);
-        }
-        that.addListItem(obj);
-        that.viewModel.attr('attributes', {});
-      },
       'a[data-object-source] modal:success': 'addMapings',
       'defer:add': 'addMapings',
       addMapings: function (el, ev, data) {
@@ -252,36 +191,6 @@ import {
           }
           this.addListItem(obj);
         }, this);
-      },
-      '.ui-autocomplete-input modal:success': function (el, ev, data, options) {
-        let that = this;
-        let extraAttrs = can.reduce(this.element
-          .find('input:not([data-mapping], [data-lookup])').get(),
-        function (attrs, el) {
-          if ($(el).attr('model')) {
-            attrs[$(el).attr('name')] = CMS.Models[$(el).attr('model')]
-              .findInCacheById($(el).val());
-          } else {
-            attrs[$(el).attr('name')] = $(el).val();
-          }
-          return attrs;
-        }, {});
-
-        can.each(data.arr || [data], function (obj) {
-          let mapping;
-          if (that.viewModel.attr('deferred')) {
-            that.viewModel.changes
-              .push({what: obj, how: 'add', extra: extraAttrs});
-          } else {
-            mapping = that.viewModel.mapping ||
-              GGRC.Mappings.get_canonical_mapping_name(
-                that.viewModel.instance.constructor.shortName,
-                obj.constructor.shortName);
-            that.viewModel.instance.mark_for_addition(mapping, obj, extraAttrs);
-          }
-          that.addListItem(obj);
-          that.viewModel.attr('attributes', {});
-        });
       },
       addListItem: function (item) {
         let snapshotObject;
