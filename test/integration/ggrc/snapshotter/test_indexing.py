@@ -5,6 +5,7 @@
 
 import ddt
 
+from mock import patch
 from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
@@ -541,7 +542,8 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     ).values("subproperty", "content"))
     self.assertFalse(all_found_records)
 
-  def test_no_reindex_acr_for_diff_obj(self):
+  @patch("ggrc.fulltext.attributes.logger")
+  def test_no_reindex_acr_for_diff_obj(self, logger):
     """Test that no reindex records appear if
     acl is populated with other's obj role."""
     product_admin = all_models.AccessControlRole.query.filter_by(
@@ -572,6 +574,10 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
         Record.property == "Admin",
     ).all()
     self.assertEqual(len(fulltext_records), 0)
+    logger.warning.assert_called_once_with(
+        "Reindex: role %s, id %s is skipped for %s, id %s, "
+        "because it relates to %s", product_admin.name, product_admin.id,
+        system.__class__.__name__, system.id, product_admin.object_type)
 
   def test_no_reindex_acr_for_same_obj(self):
     """Test that reindex records appear if
@@ -607,8 +613,8 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
         "__sort__": person_email,
     })
 
-  def test_acl_no_reindex(self):
-    """Test that reindex is not happened for
+  def test_acl_no_reindex_snapshots(self):
+    """Test that snapshot reindex is not happened for
     acl where person has the same role for
     different kind of objects."""
     product_admin = all_models.AccessControlRole.query.filter_by(
