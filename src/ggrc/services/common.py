@@ -45,7 +45,6 @@ from ggrc.models.background_task import BackgroundTask, create_task
 from ggrc.query import utils as query_utils
 from ggrc import settings
 from ggrc.cache import utils as cache_utils
-from ggrc.models.revision import Revision
 
 
 # pylint: disable=invalid-name
@@ -1472,9 +1471,5 @@ def etag(last_modified, info=''):
 
 def send_event_job(event):
   """Create background job for handling new revisions."""
-  rows = db.session.query(Revision.id).filter_by(
-      event_id=event.id,
-  ).all()
-  revision_ids = [revision_id for revision_id, in rows]
   from ggrc import views
-  views.start_compute_attributes(revision_ids)
+  views.start_compute_attributes(event_id=event.id)

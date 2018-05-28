@@ -37,6 +37,7 @@ from ggrc.models.background_task import create_task
 from ggrc.models.background_task import make_task_response
 from ggrc.models.background_task import queued_task
 from ggrc.models.reflection import AttributeInfo
+from ggrc.models.revision import Revision
 from ggrc.rbac import permissions
 from ggrc.services.common import as_json
 from ggrc.services.common import inclusion_filter
@@ -113,10 +114,16 @@ def compute_attributes(args):
   """Web hook to update the full text search index."""
   with benchmark("Run compute_attributes background task"):
     from ggrc.data_platform import computed_attributes
-    if str(args.parameters["revision_ids"]) == "all_latest":
-      revision_ids = "all_latest"
+    if args.parameters["event_id"] and not args.parameters["revision_ids"]:
+      rows = db.session.query(Revision.id).filter_by(
+          event_id=args.parameters["event_id"],).all()
+      revision_ids = [revision_id for revision_id, in rows]
     else:
-      revision_ids = [id_ for id_ in args.parameters["revision_ids"]]
+      if str(args.parameters["revision_ids"]) == "all_latest":
+        revision_ids = "all_latest"
+      else:
+        revision_ids = [id_ for id_ in args.parameters["revision_ids"]]
+
     computed_attributes.compute_attributes(revision_ids)
     return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
@@ -167,12 +174,12 @@ def update_audit_issues(args):
   return app.make_response(('success', 200, [('Content-Type', 'text/html')]))
 
 
-def start_compute_attributes(revision_ids):
+def start_compute_attributes(revision_ids=None, event_id=None):
   """Start a background task for computed attributes."""
   task = create_task(
       name="compute_attributes",
       url=url_for(compute_attributes.__name__),
-      parameters={"revision_ids": revision_ids},
+      parameters={"revision_ids": revision_ids, "event_id": event_id},
       method=u"POST",
       queued_callback=compute_attributes
   )
@@ -237,7 +244,7 @@ def do_full_reindex():
   """Update the full text search index for all models."""
 
   do_reindex(with_reindex_snapshots=True)
-  start_compute_attributes("all_latest")
+  start_compute_attributes(revision_ids="all_latest")
 
 
 class SetEncoder(json.JSONEncoder):
@@ -562,7 +569,7 @@ def send_event_job():
       revision_ids = request.get_json().get("revision_ids", [])
     else:
       revision_ids = "all_latest"
-    start_compute_attributes(revision_ids)
+    start_compute_attributes(revision_ids=revision_ids)
     return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 
