@@ -33,7 +33,6 @@ import {
       },
       parent_instance: null,
       instance: null,
-      instance_attr: '@',
       source_mapping: '@',
       default_mappings: [], // expects array of objects
       mapping: '@',
@@ -110,8 +109,6 @@ import {
           }
           return;
         }
-        this.viewModel.attr('instance', this.viewModel.attr('parent_instance')
-          .attr(this.viewModel.instance_attr).reify());
         // Add pending operations
         can.each(changes, function (item) {
           let mapping = this.viewModel.mapping ||

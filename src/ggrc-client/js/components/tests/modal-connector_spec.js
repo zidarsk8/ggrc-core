@@ -41,7 +41,6 @@ describe('GGRC.Components.modalConnector', function () {
         }],
         mapping: 'mockSource',
         setListItems: jasmine.createSpy(),
-        instance_attr: '',
       });
       viewModel.instance = {
         mark_for_addition: jasmine.createSpy(),
