@@ -25,6 +25,7 @@ import {
   REFRESH_MAPPING,
   REFRESH_SUB_TREE,
 } from '../../events/eventTypes';
+import tracker from '../../tracker';
 
 (function (can, $) {
   'use strict';
@@ -77,6 +78,9 @@ import {
     template: can.view(GGRC.mustache_path +
       '/components/object-mapper/object-mapper.mustache'),
     viewModel: function (attrs, parentViewModel) {
+      const refreshCounts = parentViewModel.attr('refresh_counts') !== undefined
+        ? parentViewModel.attr('refresh_counts')
+        : true;
       let config = {
         general: parentViewModel.attr('general'),
         special: parentViewModel.attr('special'),
@@ -94,6 +98,7 @@ import {
         object: resolvedConfig.object,
         type: getDefaultType(resolvedConfig.type, resolvedConfig.object),
         config: config,
+        refreshCounts,
         useSnapshots: resolvedConfig.useSnapshots,
         isLoadingOrSaving: function () {
           return this.attr('is_saving') ||
@@ -246,10 +251,13 @@ import {
         let data = {};
         let defer = [];
         let que = new RefreshQueue();
+        let stopFn = tracker.start(tracker.FOCUS_AREAS.MAPPINGS(instance.type),
+          tracker.USER_JOURNEY_KEYS.MAP_OBJECTS(type),
+          tracker.USER_ACTIONS.MAPPING_OBJECTS(objects.length));
 
-        que.enqueue(instance).trigger().done(function (inst) {
+        que.enqueue(instance).trigger().done((inst) => {
           data.context = instance.context || null;
-          objects.forEach(function (destination) {
+          objects.forEach((destination) => {
             let modelInstance;
             let isMapped;
             let isAllowed;
@@ -285,17 +293,18 @@ import {
             data[mapping.option_attr] = destination;
             modelInstance = new Model(data);
             defer.push(modelInstance.save());
-          }.bind(this));
+          });
 
           $.when.apply($, defer)
-            .fail(function (response, message) {
+            .fail((response, message) => {
+              stopFn(true);
               $('body').trigger('ajax:flash', {error: message});
             })
-            .always(function () {
+            .always(() => {
               this.viewModel.attr('is_saving', false);
               this.closeModal();
-            }.bind(this))
-            .done(function () {
+            })
+            .done(() => {
               if (instance && instance.dispatch) {
                 instance.dispatch('refreshInstance');
                 instance.dispatch({
@@ -303,11 +312,17 @@ import {
                   destinationType: type,
                 });
               }
-              // This Method should be modified to event
-              refreshCounts();
+
+              stopFn();
+
+              if (this.viewModel.attr('refreshCounts')) {
+                // This Method should be modified to event
+                refreshCounts();
+              }
+
               instance.dispatch(REFRESH_SUB_TREE);
             });
-        }.bind(this));
+        });
       },
     },
 

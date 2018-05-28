@@ -14,7 +14,13 @@ import template from './assessment-template-clone.mustache';
 export default can.Component.extend({
   tag: 'assessment-template-clone',
   template,
-  viewModel: ObjectOperationsBaseVM,
+  viewModel: function () {
+    return ObjectOperationsBaseVM.extend({
+      isAuditPage() {
+        return GGRC.page_instance().type === 'Audit';
+      },
+    });
+  },
   events: {
     inserted() {
       this.viewModel.attr('submitCbs').fire();

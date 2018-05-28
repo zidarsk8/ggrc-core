@@ -13,7 +13,6 @@
     <spinner {toggle}="disabled" size="medium"></spinner>
     {{#with_review_task}}
       {{#if isShowActionButtons}}
-        {{#is_allowed 'update' instance}}
           <div class="request-control">
             {{#if_equals instance.status 'Assigned'}}
               <button class="btn btn-mini btn-lightBlue"
@@ -47,7 +46,6 @@
               {{/if}}
             {{/if_equals}}
           </div>
-        {{/is_allowed}}
       {{/if}}
       {{#if oldValues.length}}
         <a href="javascript://" data-name="status"

@@ -10,7 +10,6 @@ from ggrc.models.comment import Commentable
 from ggrc.models import mixins
 from .object_document import PublicDocumentable
 from .object_person import Personable
-from .audit_object import Auditable
 from .track_object_state import HasObjectState
 from .relationship import Relatable
 from .mixins.with_last_assessment_date import WithLastAssessmentDate
@@ -23,7 +22,6 @@ class Objective(WithLastAssessmentDate,
                 mixins.CustomAttributable,
                 mixins.WithStartDate,
                 mixins.WithLastDeprecatedDate,
-                Auditable,
                 Relatable,
                 Personable,
                 PublicDocumentable,
@@ -38,6 +36,6 @@ class Objective(WithLastAssessmentDate,
   __tablename__ = 'objectives'
   _include_links = []
   _aliases = {
-      "document_url": None,
-      "document_evidence": None,
+      "documents_url": None,
+      "documents_file": None,
   }

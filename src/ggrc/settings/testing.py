@@ -16,3 +16,4 @@ LOGIN_MANAGER = 'ggrc.login.noop'
 # SQLALCHEMY_ECHO = True
 MEMCACHE_MECHANISM = False
 EXTERNAL_APP_USER = 'External App <external_app@example.com>'
+ENABLE_RELEASE_NOTES = False

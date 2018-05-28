@@ -7,5 +7,5 @@ import {initWidgets} from '../../plugins/utils/current-page-utils';
 
 $('#csv_export')
   .html(can.view.mustache('<csv-export filename="Export Objects"/>'));
-
+$('#page-header').html(can.view.mustache('<page-header/>'));
 initWidgets();

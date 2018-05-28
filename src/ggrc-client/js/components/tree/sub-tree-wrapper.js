@@ -14,6 +14,7 @@ import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
 import childModelsMap from './child-models-map';
+import tracker from '../../tracker';
 
 const viewModel = can.Map.extend({
   define: {
@@ -155,11 +156,16 @@ const viewModel = can.Map.extend({
       return can.Deferred().resolve();
     }
 
+    const stopFn = tracker.start(parentType,
+      tracker.USER_JOURNEY_KEYS.TREEVIEW,
+      tracker.USER_ACTIONS.TREEVIEW.SUB_TREE_LOADING);
+
     this.attr('loading', true);
 
     return TreeViewUtils
       .loadItemsForSubTier(models, parentType, parentId, filter)
-      .then(function (result) {
+      .then((result) => {
+        stopFn();
         this.attr('loading', false);
         this.attr('directlyItems', result.directlyItems);
         this.attr('notDirectlyItems', result.notDirectlyItems);
@@ -177,7 +183,7 @@ const viewModel = can.Map.extend({
               this.attr('_collapseAfterUnmapCallBack'));
           }
         });
-      }.bind(this));
+      }, stopFn.bind(null, true));
   },
   refreshItems() {
     if (this.attr('isOpen')) {

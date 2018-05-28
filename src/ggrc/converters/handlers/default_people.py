@@ -116,6 +116,14 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
         self.KEY_MAP[self.key],
         "ERROR",
     )
+
+    assessment_template = self.row_converter.obj
+    default_people_labels = assessment_template.DEFAULT_PEOPLE_LABELS
+    if isinstance(value, list):
+      value = [default_people_labels.get(label, label) for label in value]
+    else:
+      value = default_people_labels.get(value, value)
+
     if isinstance(value, list):
       # This is not good and fast, because it executes query for each
       # field from each row that contains people list.

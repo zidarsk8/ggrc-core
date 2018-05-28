@@ -24,6 +24,7 @@ import '../../components/read-more/read-more';
 import '../../components/global-custom-attributes/global-custom-attributes';
 import '../../components/inline/inline';
 import '../../components/inline/base-inline-control-title';
+import '../../components/page-header/page-header';
 
 import '../../common-handlers';
 

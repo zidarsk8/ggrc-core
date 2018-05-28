@@ -20,7 +20,6 @@ import './tree-item-status-for-workflow';
 import './tree-no-results';
 import './tree-assignee-field';
 import './tree-field';
-import './get-owner-people-list';
 import './tree-people-with-role-list-field';
 import '../advanced-search/advanced-search-filter-container';
 import '../advanced-search/advanced-search-mapping-container';
@@ -295,9 +294,8 @@ viewModel = can.Map.extend({
     };
     let request = this.attr('advancedSearch.request');
     const stopFn = tracker.start(this.attr('modelName'),
-      tracker.USER_JOURNEY_KEYS.LOADING,
-      `${tracker.USER_ACTIONS.TREE_VIEW_PAGE_LOADING}
-       with ${page.pageSize} items`);
+      tracker.USER_JOURNEY_KEYS.TREEVIEW,
+      tracker.USER_ACTIONS.TREEVIEW.TREE_VIEW_PAGE_LOADING(page.pageSize));
 
     pageInfo.attr('disabled', true);
     this.attr('loading', true);
@@ -377,8 +375,8 @@ viewModel = can.Map.extend({
   },
   onFilter: function () {
     const stopFn = tracker.start(this.attr('modelName'),
-      tracker.USER_JOURNEY_KEYS.LOADING,
-      tracker.USER_ACTIONS.MULTISELECT_FILTER);
+      tracker.USER_JOURNEY_KEYS.TREEVIEW,
+      tracker.USER_ACTIONS.TREEVIEW.FILTER);
     this.attr('pageInfo.current', 1);
     this.loadItems().then(stopFn);
     this.closeInfoPane();
@@ -470,7 +468,7 @@ viewModel = can.Map.extend({
     let total = this.attr('pageInfo.total');
     let counts = _.get(getCounts(), modelName);
 
-    if ((modelName === 'Issue') && !_.isNull(loaded) && (total !== counts)) {
+    if (!_.isNull(loaded) && (total !== counts)) {
       this.loadItems();
     }
 

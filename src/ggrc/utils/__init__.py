@@ -25,6 +25,7 @@ logger = logging.getLogger()
 
 DATE_FORMAT_ISO = "%Y-%m-%d"
 DATE_FORMAT_US = "%m/%d/%Y"
+CHUNK_SIZE = 200
 
 
 class GrcEncoder(json.JSONEncoder):
@@ -63,7 +64,7 @@ def as_json(obj, **kwargs):
 
 def service_for(obj):
   module = sys.modules['ggrc.services']
-  if type(obj) is str or type(obj) is unicode:  # noqa
+  if isinstance(obj, (str, unicode)):  # noqa
     model_type = obj
   else:
     model_type = obj.__class__.__name__
@@ -83,7 +84,7 @@ def url_for(obj, id=None):
 
 def view_service_for(obj):
   module = sys.modules['ggrc.views']
-  if type(obj) is str or type(obj) is unicode:  # noqa
+  if isinstance(obj, (str, unicode)):  # noqa
     model_type = obj
   else:
     model_type = obj.__class__.__name__
@@ -104,13 +105,13 @@ def view_url_for(obj, id=None):
 def encoded_dict(in_dict):
   # http://stackoverflow.com/questions/6480723/urllib-urlencode-doesn't-like-unicode-values-how-about-this-workaround
   out_dict = {}
-  for k, v in in_dict.iteritems():
-    if isinstance(v, unicode):  # noqa
-      v = v.encode('utf8')
-    elif isinstance(v, str):
+  for key, value in in_dict.iteritems():
+    if isinstance(value, unicode):  # noqa
+      value = value.encode('utf8')
+    elif isinstance(value, str):
       # Must be encoded in UTF-8
-      v.decode('utf8')
-    out_dict[k] = v
+      value.decode('utf8')
+    out_dict[key] = value
   return out_dict
 
 
@@ -283,14 +284,14 @@ def iso_to_us_date(date_string):
   return convert_date_format(date_string, DATE_FORMAT_ISO, DATE_FORMAT_US)
 
 
-def generate_query_chunks(query, chunk_size=200):
+def generate_query_chunks(query, chunk_size=CHUNK_SIZE):
   """Make a generator splitting `query` into chunks of size `chunk_size`."""
   count = query.count()
   for offset in range(0, count, chunk_size):
     yield query.order_by("id").limit(chunk_size).offset(offset)
 
 
-def list_chunks(list_, chunk_size=200):
+def list_chunks(list_, chunk_size=CHUNK_SIZE):
   """Yield successive chunk of chunk_size from list."""
   for index in range(0, len(list_), chunk_size):
     yield list_[index:index + chunk_size]

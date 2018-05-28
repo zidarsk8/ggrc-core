@@ -11,7 +11,8 @@ Place here your migration helpers that is shared among number of migrations.
 from collections import namedtuple
 from logging import getLogger
 
-from sqlalchemy.sql import and_
+from sqlalchemy import text, Integer, String
+from sqlalchemy.sql import and_, table, column
 from sqlalchemy.sql import func
 from sqlalchemy.sql import select
 from sqlalchemy.sql import tuple_
@@ -166,3 +167,40 @@ def insert_payloads(connection, snapshots=None, relationships=None):
               "now())")
     sql += ','.join(value_.format(**rel) for rel in relationships)
     connection.execute(sql)
+
+
+def last_insert_id(connection):
+  """Returns last inserted id"""
+  return connection.execute(text('select LAST_INSERT_ID()')).fetchone()[0]
+
+
+# pylint: disable=invalid-name
+def add_to_objects_without_revisions(connection, obj_id,
+                                     obj_type, action='created'):
+  """Add object to objects_without_revisions table"""
+  sql = """
+      INSERT INTO objects_without_revisions (obj_id, obj_type, action)
+      VALUES (:obj_id, :obj_type, :action)
+  """
+  connection.execute(text(sql), obj_id=obj_id,
+                     obj_type=obj_type, action=action)
+
+
+# pylint: disable=invalid-name
+def add_to_objects_without_revisions_bulk(connection, obj_ids,
+                                          obj_type, action='created'):
+  """Add object to objects_without_revisions table bulk"""
+
+  rev_table = table('objects_without_revisions',
+                    column('obj_id', Integer),
+                    column('obj_type', String),
+                    column('action', String))
+
+  data = [{'obj_id': obj_id, 'obj_type': obj_type,
+           'action': action} for obj_id in obj_ids]
+  connection.execute(rev_table.insert(), data)
+
+
+def clean_new_revisions(connection):
+  """Clean objects_without_revisions table"""
+  connection.execute(text("truncate objects_without_revisions"))

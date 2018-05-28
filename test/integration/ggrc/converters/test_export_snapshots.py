@@ -7,7 +7,7 @@ import collections
 from google.appengine.ext import testbed
 
 from ggrc import models, db
-from ggrc.utils import QueryCounter
+from ggrc.utils import QueryCounter, DATE_FORMAT_US
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
@@ -97,9 +97,10 @@ class TestExportSnapshots(TestCase):
         control.slug: {
             # normal fields
             "Code": u"*" + control.slug,
-            "Revision Date": unicode(snapshot.revision.created_at),
+            "Revision Date":
+                snapshot.revision.created_at.strftime(DATE_FORMAT_US),
             "Description": control.description,
-            "Effective Date": control.start_date.strftime("%m/%d/%Y"),
+            "Effective Date": control.start_date.strftime(DATE_FORMAT_US),
             "Fraud Related": u"yes" if control.fraud_related else u"no",
             "Frequency": control.verify_frequency.display_name,
             "Kind/Nature": control.kind.display_name,
@@ -122,9 +123,10 @@ class TestExportSnapshots(TestCase):
             "person": self._get_cav(control, "person"),
             # Special snapshot export fields
             "Audit": audit.slug,
-            "Evidence File": u"\n".join(c.slug for c in
-                                        control.document_evidence),
-            "Reference URL": u"\n".join(c.slug for c in control.reference_url),
+            "Document File": u"\n".join(c.slug for c in
+                                        control.documents_file),
+            "Reference URL": u"\n".join(c.slug for c in
+                                        control.documents_reference_url),
             "Assertions": u"\n".join(c.name for c in control.assertions),
             "Categories": u"\n".join(c.name for c in control.categories),
             "Folder": u"",
@@ -136,9 +138,8 @@ class TestExportSnapshots(TestCase):
             "Secondary Contacts": u"creator@example.com",
             "Principal Assignees": u"creator@example.com",
             "Secondary Assignees": u"creator@example.com",
-            'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
-            'Last Updated Date':
-                control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
+            'Created Date': control.created_at.strftime(DATE_FORMAT_US),
+            'Last Updated Date': control.updated_at.strftime(DATE_FORMAT_US),
             'Last Updated By': control.modified_by.email,
         }
         for snapshot, control in zip(snapshots, controls)
@@ -217,7 +218,8 @@ class TestExportSnapshots(TestCase):
         control.slug: {
             # normal fields
             "Code": "*" + control.slug,
-            "Revision Date": unicode(snapshot.revision.created_at),
+            "Revision Date":
+                snapshot.revision.created_at.strftime(DATE_FORMAT_US),
             "Description": u"",
             "Effective Date": u"",
             "Fraud Related": u"",
@@ -250,15 +252,14 @@ class TestExportSnapshots(TestCase):
             # Fields that are not included in snapshots - Known bugs.
             "Assertions": u"",
             "Categories": u"",
-            "Evidence File": u"",
+            "Document File": u"",
             "Admin": u"",
             "Primary Contacts": u"",
             "Secondary Contacts": u"",
             "Principal Assignees": u"",
             "Secondary Assignees": u"",
-            'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
-            'Last Updated Date':
-                control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
+            'Created Date': control.created_at.strftime(DATE_FORMAT_US),
+            'Last Updated Date': control.updated_at.strftime(DATE_FORMAT_US),
             'Last Updated By': "",
             "Folder": u"",
         }
@@ -428,7 +429,8 @@ class TestExportSnapshots(TestCase):
 
       control_dicts[control.slug] = {
           "Code": "*" + control.slug,
-          "Revision Date": unicode(snapshot.revision.created_at),
+          "Revision Date":
+              snapshot.revision.created_at.strftime(DATE_FORMAT_US),
           "Description": u"",
           "Effective Date": u"",
           "Fraud Related": u"",
@@ -450,10 +452,9 @@ class TestExportSnapshots(TestCase):
           "Audit": audit.slug,
           "Assertions": u"",
           "Categories": u"",
-          "Evidence File": u"",
-          'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
-          'Last Updated Date':
-              control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
+          "Document File": u"",
+          'Created Date': control.created_at.strftime(DATE_FORMAT_US),
+          'Last Updated Date': control.updated_at.strftime(DATE_FORMAT_US),
           'Last Updated By': "",
           "Folder": u"",
       }

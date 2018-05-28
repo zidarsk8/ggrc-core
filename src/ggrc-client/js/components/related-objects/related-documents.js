@@ -7,24 +7,28 @@ import {
   buildParam,
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
+import {initCounts} from '../../plugins/utils/current-page-utils';
+import pubsub from '../../pub-sub';
 
 (function (can, $, _, GGRC) {
   'use strict';
 
-  let DOCUMENT_TYPES_MAP = {};
+  let DOCUMENT_KIND_MAP = {};
 
-  DOCUMENT_TYPES_MAP[CMS.Models.Document.EVIDENCE] = 'document_evidence';
-  DOCUMENT_TYPES_MAP[CMS.Models.Document.URL] = 'document_url';
-  DOCUMENT_TYPES_MAP[CMS.Models.Document.REFERENCE_URL] = 'reference_url';
+  DOCUMENT_KIND_MAP[CMS.Models.Document.FILE] = 'documents_file';
+  DOCUMENT_KIND_MAP[CMS.Models.Document.URL] = 'documents_url';
+  DOCUMENT_KIND_MAP[CMS.Models.Document.REFERENCE_URL] = 'documents_reference_url';
 
   GGRC.Components('relatedDocuments', {
     tag: 'related-documents',
     viewModel: {
       instance: {},
-      documentType: '@',
+      modelType: 'Document',
+      kind: '@',
       documents: [],
       isLoading: false,
       pendingItemsChanged: false,
+      pubsub,
       define: {
 
         // automatically refresh instance on related document create/remove
@@ -43,18 +47,19 @@ import {
           id: this.attr('instance.id'),
           operation: 'relevant',
         }];
-        let additionalFilter = this.attr('documentType') ?
+        let additionalFilter = this.attr('kind') ?
           {
             expression: {
-              left: 'document_type',
+              left: 'kind',
               op: {name: '='},
-              right: this.attr('documentType'),
+              right: this.attr('kind'),
             },
           } :
           [];
 
+        let modelType = this.attr('modelType');
         let query =
-          buildParam('Document', {}, relevantFilters, [], additionalFilter);
+          buildParam(modelType, {}, relevantFilters, [], additionalFilter);
         query.order_by = [{name: 'created_at', desc: true}];
 
         return query;
@@ -63,16 +68,18 @@ import {
         const query = this.getDocumentsQuery();
 
         this.attr('isLoading', true);
+        this.refreshTabCounts();
 
+        let modelType = this.attr('modelType');
         return batchRequests(query).then((response) => {
-          const documents = response.Document.values;
+          const documents = response[modelType].values;
           this.attr('documents').replace(documents);
           this.attr('isLoading', false);
         });
       },
       setDocuments: function () {
         let instance;
-        let documentType;
+        let kind;
         let documentPath;
         let documents;
 
@@ -87,10 +94,10 @@ import {
         }
 
         instance = this.attr('instance');
-        documentType = this.attr('documentType');
+        kind = this.attr('kind');
 
-        if (documentType) {
-          documentPath = DOCUMENT_TYPES_MAP[documentType];
+        if (kind) {
+          documentPath = DOCUMENT_KIND_MAP[kind];
           documents = instance[documentPath];
         } else {
           // We need to display URL and Evidences together ("Related
@@ -114,14 +121,15 @@ import {
       },
       createDocument: function (data) {
         let date = new Date();
-        let document = new CMS.Models.Document({
+        let modelType = this.attr('modelType');
+        let document = new CMS.Models[modelType]({
           link: data,
           title: data,
           created_at: date.toISOString(),
           context: this.instance.context || new CMS.Models.Context({
             id: null,
           }),
-          document_type: this.documentType,
+          kind: this.kind,
         });
         return document;
       },
@@ -229,6 +237,15 @@ import {
           this.loadDocuments();
         }
       },
+      refreshTabCounts: function () {
+        let pageInstance = GGRC.page_instance();
+        let modelType = this.attr('modelType');
+        initCounts(
+          [modelType],
+          pageInstance.type,
+          pageInstance.id
+        );
+      },
     },
     init: function () {
       let instance = this.viewModel.attr('instance');
@@ -244,6 +261,12 @@ import {
     events: {
       '{viewModel.instance} resolvePendingBindings': function () {
         this.viewModel.refreshRelatedDocuments();
+      },
+      '{pubsub} objectDeleted'(pubsub, event) {
+        let instance = event.instance;
+        if (instance instanceof CMS.Models.Evidence) {
+          this.viewModel.refreshRelatedDocuments();
+        }
       },
     },
   });

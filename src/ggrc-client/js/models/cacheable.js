@@ -17,6 +17,7 @@ import {
 import resolveConflict from './cacheable_conflict_resolution.js';
 import PersistentNotifier from '../plugins/persistent_notifier';
 import RefreshQueue from './refresh_queue';
+import tracker from '../tracker';
 
 (function (can, GGRC, CMS) {
   let _oldAttr;
@@ -168,24 +169,7 @@ import RefreshQueue from './refresh_queue';
     findOne: 'GET {href}',
 
     makeDestroy: function (destroy) {
-      return function (id, instance) {
-        return destroy(id).then(function (result) {
-          if ('background_task' in result) {
-            return CMS.Models.BackgroundTask.findOne({
-              id: result.background_task.id,
-            }).then(function (task) {
-              if (!task) {
-                return;
-              }
-              return task.poll();
-            }).then(function () {
-              return instance;
-            });
-          } else {
-            return instance;
-          }
-        });
-      };
+      return (id) => destroy(id);
     },
 
     makeFindAll: function (finder) {
@@ -725,7 +709,7 @@ import RefreshQueue from './refresh_queue';
       packaged_datetime: makeDateSerializer('datetime', 'dateTime'),
     },
     tree_view_options: {
-      display_attr_names: ['title', 'owner', 'status', 'updated_at'],
+      display_attr_names: ['title', 'status', 'updated_at'],
       mandatory_attr_names: ['title'],
     },
     sub_tree_view_options: {},
@@ -945,7 +929,7 @@ import RefreshQueue from './refresh_queue';
       this._customAttributeAccess.write(change);
     },
     isCustomAttributable() {
-      return this.attr('class').is_custom_attributable;
+      return this.constructor.is_custom_attributable;
     },
     computed_errors: function () {
       let errors = this.errors();
@@ -987,11 +971,7 @@ import RefreshQueue from './refresh_queue';
       if (!this.get_binding('orphaned_objects')) {
         return can.Deferred().reject();
       }
-      return this.get_list_loader('orphaned_objects').then(function (list) {
-        let objects = [];
-        let mappings = [];
-        let result = [];
-
+      return this.get_list_loader('orphaned_objects').then((list) => {
         function isJoin(mapping) {
           if (mapping.mappings.length > 0) {
             for (let i = 0, child; child = mapping.mappings[i]; i++) {
@@ -1004,18 +984,15 @@ import RefreshQueue from './refresh_queue';
             mapping.instance instanceof can.Model.Join &&
             mapping.instance;
         }
-        can.each(list, function (mapping) {
-          let inst;
-          if (inst = isJoin(mapping)) {
+
+        const mappings = [];
+        can.each(list, (mapping) => {
+          const inst = isJoin(mapping);
+
+          if (inst) {
             mappings.push(inst);
-          } else {
-            objects.push(mapping.instance);
           }
         });
-
-        if (mappings.length) {
-          result.push(mappings.length);
-        }
 
         return mappings.length;
       });
@@ -1097,6 +1074,9 @@ import RefreshQueue from './refresh_queue';
           dfd: can.Deferred(),
           fn: _.throttle(function () {
             let dfd = that._pending_refresh.dfd;
+            let stopFn = tracker.start(that.type,
+              tracker.USER_JOURNEY_KEYS.API,
+              tracker.USER_ACTIONS.LOAD_OBJECT);
             can.ajax({
               url: href,
               params: params,
@@ -1107,9 +1087,11 @@ import RefreshQueue from './refresh_queue';
               .then($.proxy(that.constructor, 'model'))
               .done(function (response) {
                 response.backup();
+                stopFn();
                 dfd.resolve(...arguments);
               })
               .fail(function () {
+                stopFn(true);
                 dfd.reject(...arguments);
               })
               .always(function () {

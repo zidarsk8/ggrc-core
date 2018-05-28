@@ -2,8 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """ Module for docuumentable mixins."""
-
-from sqlalchemy import orm, case, and_, literal
+import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import db
@@ -19,92 +18,64 @@ class Documentable(object):
   _include_links = []
 
   _fulltext_attrs = [
-      MultipleSubpropertyFullTextAttr('document_evidence', 'document_evidence',
+      MultipleSubpropertyFullTextAttr('documents_file', 'documents_file',
                                       ['title', 'link']),
-      MultipleSubpropertyFullTextAttr('document_url', 'document_url',
+      MultipleSubpropertyFullTextAttr('documents_url', 'documents_url',
                                       ['link']),
-      MultipleSubpropertyFullTextAttr('reference_url', 'reference_url',
+      MultipleSubpropertyFullTextAttr('documents_reference_url',
+                                      'documents_reference_url',
                                       ['link']),
   ]
 
   @declared_attr
-  def documents(cls):
-    """Return documents releated for that instance."""
-    document_id = case(
-        [
-            (
-                Relationship.destination_type == "Document",
-                Relationship.destination_id,
-            ),
-            (
-                Relationship.source_type == "Document",
-                Relationship.source_id,
-            ),
-        ],
-        else_=literal(False)
-    )
-    documentable_id = case(
-        [
-            (
-                Relationship.destination_type == "Document",
-                Relationship.source_id
-            ),
-            (
-                Relationship.source_type == "Document",
-                Relationship.destination_id,
-            ),
-        ],
-        else_=literal(False)
-    )
-    documentable_type = case(
-        [
-            (
-                Relationship.destination_type == "Document",
-                Relationship.source_type
-            ),
-            (
-                Relationship.source_type == "Document",
-                Relationship.destination_type,
-            ),
-        ],
-    )
+  def documents(cls):  # pylint: disable=no-self-argument
+    """Return documents related for that instance."""
     return db.relationship(
         Document,
-        # at first we check is documentable_id not False (it return id in fact)
-        # after that we can compare values.
-        # this is required for saving logic consistancy
-        # case return 2 types of values BOOL(false) and INT(id) not Null
-        primaryjoin=lambda: and_(documentable_id, cls.id == documentable_id),
+        primaryjoin=lambda: sa.or_(
+            sa.and_(
+                cls.id == Relationship.source_id,
+                Relationship.source_type == cls.__name__,
+                Relationship.destination_type == "Document",
+            ),
+            sa.and_(
+                cls.id == Relationship.destination_id,
+                Relationship.destination_type == cls.__name__,
+                Relationship.source_type == "Document",
+            )
+        ),
         secondary=Relationship.__table__,
-        # at first we check is document_id not False (it return id in fact)
-        # after that we can compare values.
-        # this is required for saving logic consistancy
-        # case return 2 types of values BOOL(false) and INT(id) not Null
-        secondaryjoin=lambda: and_(document_id, Document.id == document_id,
-                                   documentable_type == cls.__name__),
+        secondaryjoin=lambda: sa.or_(
+            sa.and_(
+                Document.id == Relationship.source_id,
+                Relationship.source_type == "Document",
+            ),
+            sa.and_(
+                Document.id == Relationship.destination_id,
+                Relationship.destination_type == "Document",
+            )
+        ),
         viewonly=True,
     )
 
+  def get_documents_by_kind(self, kind):
+    return [e for e in self.documents
+            if e.kind == kind]
+
   @property
-  def document_url(self):
+  def documents_url(self):
     """List of documents URL type"""
-    # pylint: disable=not-an-iterable
-    return [d for d in self.documents
-            if Document.URL == d.document_type]
+    return self.get_documents_by_kind(Document.URL)
 
   @property
-  def document_evidence(self):
-    """List of documents EVIDENCE type"""
-    # pylint: disable=not-an-iterable
-    return [d for d in self.documents
-            if Document.ATTACHMENT == d.document_type]
+  def documents_file(self):
+    """List of documents FILE type"""
+    return self.get_documents_by_kind(Document.FILE)
 
   @property
-  def reference_url(self):
+  def documents_reference_url(self):
     """List of documents REFERENCE_URL type"""
-    # pylint: disable=not-an-iterable
-    return [d for d in self.documents
-            if Document.REFERENCE_URL == d.document_type]
+    return self.get_documents_by_kind(Document.REFERENCE_URL)
 
   @classmethod
   def eager_query(cls):
@@ -113,7 +84,7 @@ class Documentable(object):
         super(Documentable, cls).eager_query(),
         Documentable._include_links,
     ).options(
-        orm.subqueryload(
+        sa.orm.subqueryload(
             'documents',
         ).undefer_group(
             'Document_complete',
@@ -131,28 +102,29 @@ class Documentable(object):
     # they were mapped to an object. Otherwise python uses cached value,
     # which might not contain newly created documents.
     out_json = super(Documentable, self).log_json()
-    out_json["document_url"] = self._log_docs(self.document_url)
-    out_json["document_evidence"] = self._log_docs(self.document_evidence)
-    out_json["reference_url"] = self._log_docs(self.reference_url)
+    out_json["documents_url"] = self._log_docs(self.documents_url)
+    out_json["documents_file"] = self._log_docs(self.documents_file)
+    out_json["documents_reference_url"] = self._log_docs(
+        self.documents_reference_url)
     return out_json
 
   @classmethod
   def indexed_query(cls):
     return super(Documentable, cls).indexed_query().options(
-        orm.subqueryload("documents").undefer_group("Document_complete"),
+        sa.orm.subqueryload("documents").undefer_group("Document_complete"),
     )
 
 
 class PublicDocumentable(Documentable):
   _aliases = {
-      "document_url": {
-          "display_name": "Evidence URL",
+      "documents_url": {
+          "display_name": "Document URL",
           "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
           "description": "New line separated list of URLs.",
       },
 
-      "document_evidence": {
-          "display_name": "Evidence File",
+      "documents_file": {
+          "display_name": "Document File",
           "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
           "description": (
               "New line separated list of evidence links and "
@@ -160,7 +132,7 @@ class PublicDocumentable(Documentable):
               "Title of the evidence link"
           ),
       },
-      "reference_url": {
+      "documents_reference_url": {
           "display_name": "Reference URL",
           "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
           "description": "New line separated list of Reference URLs.",

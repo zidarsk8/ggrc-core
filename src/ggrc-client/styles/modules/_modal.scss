@@ -262,6 +262,9 @@
     max-height:none;
     padding: 20px 15px 20px 20px;
     overflow: visible;
+    &.ui-disabled {
+      @include disabled(0.5);
+    }
     .add-button {
       margin-bottom: 20px;
     }

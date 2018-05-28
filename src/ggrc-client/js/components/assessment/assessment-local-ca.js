@@ -182,7 +182,7 @@ import Permission from '../../permission';
           [fieldId]: fieldValue,
         };
         const stopFn = tracker.start(this.attr('instance.type'),
-          tracker.USER_JOURNEY_KEYS.NAVIGATION,
+          tracker.USER_JOURNEY_KEYS.INFO_PANE,
           tracker.USER_ACTIONS.ASSESSMENT.EDIT_LCA);
 
         this.attr('isDirty', true);

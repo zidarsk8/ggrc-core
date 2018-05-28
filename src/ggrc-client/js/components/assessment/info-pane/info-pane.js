@@ -50,8 +50,10 @@ import tracker from '../../../tracker';
 import {REFRESH_TAB_CONTENT,
   RELATED_ITEMS_LOADED,
   REFRESH_MAPPING,
+  REFRESH_RELATED,
 } from '../../../events/eventTypes';
 import Permission from '../../../permission';
+import {initCounts} from '../../../plugins/utils/current-page-utils';
 import template from './info-pane.mustache';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/custom-attribute-config';
 import pubsub from '../../../pub-sub';
@@ -68,11 +70,6 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
     tag: 'assessment-info-pane',
     template: template,
     viewModel: {
-      documentTypes: {
-        evidences: CMS.Models.Document.EVIDENCE,
-        urls: CMS.Models.Document.URL,
-        referenceUrls: CMS.Models.Document.REFERENCE_URL,
-      },
       define: {
         verifiers: {
           get: function () {
@@ -142,10 +139,7 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
         urls: {
           Value: can.List,
         },
-        referenceUrls: {
-          Value: can.List,
-        },
-        evidences: {
+        files: {
           Value: can.List,
         },
         editMode: {
@@ -167,6 +161,12 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
               this.attr('instance.archived');
           },
         },
+        isAllowedToMap: {
+          get: function () {
+            let audit = this.attr('instance.audit');
+            return !!audit && Permission.is_allowed_for('read', audit);
+          },
+        },
         instance: {},
         isInfoPaneSaving: {
           get: function () {
@@ -174,11 +174,11 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
               return false;
             }
 
-            return this.attr('isUpdatingState') ||
+            return this.attr('isUpdatingFiles') ||
+              this.attr('isUpdatingState') ||
               this.attr('isUpdatingEvidences') ||
               this.attr('isUpdatingUrls') ||
               this.attr('isUpdatingComments') ||
-              this.attr('isUpdatingReferenceUrls') ||
               this.attr('isAssessmentSaving');
           },
         },
@@ -186,6 +186,7 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
       modal: {
         open: false,
       },
+      pubsub,
       _verifierRoleId: undefined,
       isUpdatingRelatedItems: false,
       isUpdatingState: false,
@@ -196,6 +197,14 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
       initialState: 'Not Started',
       deprecatedState: 'Deprecated',
       assessmentMainRoles: ['Creators', 'Assignees', 'Verifiers'],
+      refreshCounts: function (types) {
+        let pageInstance = GGRC.page_instance();
+        initCounts(
+          types,
+          pageInstance.attr('type'),
+          pageInstance.attr('id')
+        );
+      },
       setUrlEditMode: function (value, type) {
         this.attr(type + 'EditMode', value);
       },
@@ -221,11 +230,11 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
       getSnapshotQuery: function () {
         return this.getQuery('Snapshot');
       },
-      getDocumentQuery: function (documentType) {
+      getEvidenceQuery: function (kind) {
         let query = this.getQuery(
-          'Document',
+          'Evidence',
           {sortBy: 'created_at', sortDirection: 'desc'},
-          this.getDocumentAdditionFilter(documentType));
+          this.getEvidenceAdditionFilter(kind));
         return query;
       },
       requestQuery: function (query, type) {
@@ -246,8 +255,8 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
             this.attr('isUpdating' + can.capitalize(type), false);
 
             tracker.stop(this.attr('instance.type'),
-              tracker.USER_JOURNEY_KEYS.NAVIGATION,
-              tracker.USER_ACTIONS.OPEN_INFO_PANE);
+              tracker.USER_JOURNEY_KEYS.INFO_PANE,
+              tracker.USER_ACTIONS.INFO_PANE.OPEN_INFO_PANE);
           }.bind(this));
         return dfd;
       },
@@ -259,25 +268,20 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
         let query = this.getCommentQuery();
         return this.requestQuery(query, 'comments');
       },
-      loadEvidences: function () {
-        let query = this.getDocumentQuery(
-          this.attr('documentTypes.evidences'));
-        return this.requestQuery(query, 'evidences');
+      loadFiles: function () {
+        let query = this.getEvidenceQuery('FILE');
+        return this.requestQuery(query, 'files');
       },
       loadUrls: function () {
-        let query = this.getDocumentQuery(
-          this.attr('documentTypes.urls'));
+        let query = this.getEvidenceQuery('URL');
         return this.requestQuery(query, 'urls');
-      },
-      loadReferenceUrls: function () {
-        let query = this.getDocumentQuery(
-          this.attr('documentTypes.referenceUrls'));
-        return this.requestQuery(query, 'referenceUrls');
       },
       updateItems: function () {
         can.makeArray(arguments).forEach(function (type) {
           this.attr(type).replace(this['load' + can.capitalize(type)]());
         }.bind(this));
+
+        this.refreshCounts(['Evidence']);
       },
       afterCreate: function (event, type) {
         let createdItems = event.items;
@@ -310,13 +314,13 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
         return this.attr(type).unshift.apply(this.attr(type),
           can.makeArray(items));
       },
-      getDocumentAdditionFilter: function (documentType) {
-        return documentType ?
+      getEvidenceAdditionFilter: function (kind) {
+        return kind ?
           {
             expression: {
-              left: 'document_type',
+              left: 'kind',
               op: {name: '='},
-              right: documentType,
+              right: kind,
             },
           } :
           [];
@@ -336,21 +340,43 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
       },
       addRelatedItem: function (event, type) {
         let self = this;
+        let assessment = this.attr('instance');
+        let relatedItemType = event.item.attr('type');
         let related = {
           id: event.item.attr('id'),
-          type: event.item.attr('type'),
+          type: relatedItemType,
         };
 
         this.attr('deferredSave').push(function () {
           self.addAction('add_related', related);
         })
           .done(function () {
+            if (type === 'comments') {
+              tracker.stop(assessment.type,
+                tracker.USER_JOURNEY_KEYS.INFO_PANE,
+                tracker.USER_ACTIONS.INFO_PANE.ADD_COMMENT_TO_LCA);
+              tracker.stop(assessment.type,
+                tracker.USER_JOURNEY_KEYS.INFO_PANE,
+                tracker.USER_ACTIONS.INFO_PANE.ADD_COMMENT);
+            }
+
             self.afterCreate({
               items: [event.item],
               success: true,
             }, type);
           })
           .fail(function () {
+            if (type === 'comments') {
+              tracker.stop(assessment.type,
+                tracker.USER_JOURNEY_KEYS.INFO_PANE,
+                tracker.USER_ACTIONS.INFO_PANE.ADD_COMMENT_TO_LCA,
+                false);
+              tracker.stop(assessment.type,
+                tracker.USER_JOURNEY_KEYS.INFO_PANE,
+                tracker.USER_ACTIONS.INFO_PANE.ADD_COMMENT,
+                false);
+            }
+
             self.afterCreate({
               items: [event.item],
               success: false,
@@ -360,6 +386,10 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
             assessment.removeAttr('actions');
             // dispatching event on instance to pass to the auto-save-form
             self.attr('instance').dispatch(RELATED_ITEMS_LOADED);
+
+            if (relatedItemType === 'Evidence') {
+              self.refreshCounts(['Evidence']);
+            }
           });
       },
       removeRelatedItem: function (item, type) {
@@ -377,13 +407,15 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
           self.addAction('remove_related', related);
         })
           .fail(function () {
-            GGRC.Errors.notifier('error', 'Unable to remove URL.');
-            items.splice(index, 0, item);
-          })
-          .always(function (assessment) {
-            assessment.removeAttr('actions');
-            self.attr('isUpdating' + can.capitalize(type), false);
-          });
+          GGRC.Errors.notifier('error', 'Unable to remove URL.');
+          items.splice(index, 0, item);
+        })
+        .always(function (assessment) {
+          assessment.removeAttr('actions');
+          self.attr('isUpdating' + can.capitalize(type), false);
+
+          self.refreshCounts(['Evidence']);
+        });
       },
       updateRelatedItems: function () {
         this.attr('isUpdatingRelatedItems', true);
@@ -392,16 +424,15 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
           .then((data) => {
             this.attr('mappedSnapshots').replace(data.Snapshot);
             this.attr('comments').replace(data.Comment);
-            this.attr('evidences').replace(data['Document:EVIDENCE']);
-            this.attr('urls').replace(data['Document:URL']);
-            this.attr('referenceUrls').replace(data['Document:REFERENCE_URL']);
+            this.attr('files').replace(data['Evidence:FILE']);
+            this.attr('urls').replace(data['Evidence:URL']);
 
             this.attr('isUpdatingRelatedItems', false);
             this.attr('instance').dispatch(RELATED_ITEMS_LOADED);
 
             tracker.stop(this.attr('instance.type'),
-              tracker.USER_JOURNEY_KEYS.NAVIGATION,
-              tracker.USER_ACTIONS.OPEN_INFO_PANE);
+              tracker.USER_JOURNEY_KEYS.INFO_PANE,
+              tracker.USER_ACTIONS.INFO_PANE.OPEN_INFO_PANE);
           });
       },
       initializeFormFields: function () {
@@ -435,7 +466,7 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
         let isArchived = instance.attr('archived');
         let previousStatus = instance.attr('previousStatus') || 'In Progress';
         let stopFn = tracker.start(instance.type,
-          tracker.USER_JOURNEY_KEYS.NAVIGATION,
+          tracker.USER_JOURNEY_KEYS.INFO_PANE,
           tracker.USER_ACTIONS.ASSESSMENT.CHANGE_STATUS);
         const resetStatusOnConflict = (object, xhr) => {
           if (xhr && xhr.status === 409 && xhr.remoteObject) {
@@ -480,14 +511,14 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
         });
       },
       saveGlobalAttributes: function (event) {
-        const instance = this.attr('instance');
-        const globalAttributes = event.globalAttributes;
+        this.attr('deferredSave').push(() => {
+          const instance = this.attr('instance');
+          const globalAttributes = event.globalAttributes;
 
-        globalAttributes.each((value, caId) => {
-          instance.customAttr(caId, value);
+          globalAttributes.each((value, caId) => {
+            instance.customAttr(caId, value);
+          });
         });
-
-        return instance.save();
       },
       showRequiredInfoModal: function (e, field) {
         let scope = field || e.field;
@@ -536,9 +567,14 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
       this.viewModel.setVerifierRoleId();
     },
     events: {
-      [`{viewModel.instance} ${REFRESH_MAPPING.type}`]() {
-        this.viewModel.attr('mappedSnapshots')
+      [`{viewModel.instance} ${REFRESH_MAPPING.type}`](scope, event) {
+        const viewModel = this.viewModel;
+        viewModel.attr('mappedSnapshots')
           .replace(this.viewModel.loadSnapshots());
+        viewModel.attr('instance').dispatch({
+          ...REFRESH_RELATED,
+          model: event.destinationType,
+        });
       },
       '{viewModel.instance} modelBeforeSave': function () {
         this.viewModel.attr('isAssessmentSaving', true);
@@ -561,8 +597,13 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
         this.viewModel.initGlobalAttributes();
         this.viewModel.updateRelatedItems();
       },
-      '{viewModel.instance} resolvePendingBindings': function () {
-        this.viewModel.updateItems('referenceUrls');
+      '{pubsub} objectDeleted'(pubsub, event) {
+        let instance = event.instance;
+        // handle removing evidence on Evidence tab
+        // evidence on Assessment tab should be updated
+        if (instance instanceof CMS.Models.Evidence) {
+          this.viewModel.updateItems('files', 'urls');
+        }
       },
     },
     helpers: {

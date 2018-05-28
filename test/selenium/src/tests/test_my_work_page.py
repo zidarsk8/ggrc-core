@@ -63,21 +63,17 @@ class TestMyWorkPage(base.Test):
     """Tests if LHN remembers which tab is selected (my or all objects) after
     closing it."""
     lhn_menu = header_dashboard.open_lhn_menu()
-    # check if my objects tab saves state
-    lhn_menu.select_my_objects()
-    header_dashboard.close_lhn_menu()
-    header_dashboard.open_user_list()
-    selenium.get(url.Urls().dashboard)
-    new_lhn_menu = dashboard.Header(selenium).open_lhn_menu()
+    # check if all objects tab is selected by default
     assert selenium_utils.is_value_in_attr(
-        new_lhn_menu.my_objects.element) is True
-    # check if all objects tab saves state
-    lhn_menu = header_dashboard.open_lhn_menu()
-    lhn_menu.select_all_objects()
-    header_dashboard.close_lhn_menu()
-    header_dashboard.open_user_list()
-    assert selenium_utils.is_value_in_attr(
-        new_lhn_menu.all_objects.element) is True
+        lhn_menu.all_objects.element) is True
+    for tab in ['my_objects', 'all_objects']:
+      getattr(header_dashboard.open_lhn_menu(), 'select_{0}'.format(tab))()
+      header_dashboard.close_lhn_menu()
+      selenium.refresh()
+      new_lhn_menu = dashboard.Header(selenium).open_lhn_menu()
+      # check if selected tab saves state
+      assert selenium_utils.is_value_in_attr(
+          getattr(new_lhn_menu, tab).element) is True
 
   @pytest.mark.smoke_tests
   def test_lhn_pin(self, header_dashboard):

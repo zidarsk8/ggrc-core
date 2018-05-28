@@ -8,7 +8,6 @@ import itertools
 from collections import defaultdict
 
 import sqlalchemy as sa
-from sqlalchemy import case
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
@@ -114,38 +113,31 @@ class Commentable(object):
   @declared_attr
   def comments(cls):  # pylint: disable=no-self-argument
     """Comments related to self via Relationship table."""
-    comment_id = case([
-        (
-            Relationship.destination_type == "Comment",
-            Relationship.destination_id
-        ),
-        (
-            Relationship.source_type == "Comment",
-            Relationship.source_id
-        )
-    ])
-    commentable_id = case([
-        (
+    return db.relationship(
+        Comment,
+        primaryjoin=lambda: sa.or_(
             sa.and_(
+                cls.id == Relationship.source_id,
                 Relationship.source_type == cls.__name__,
                 Relationship.destination_type == "Comment",
             ),
-            Relationship.source_id
-        ),
-        (
             sa.and_(
-                Relationship.source_type == "Comment",
+                cls.id == Relationship.destination_id,
                 Relationship.destination_type == cls.__name__,
-            ),
-            Relationship.destination_id
+                Relationship.source_type == "Comment",
+            )
         ),
-    ])
-
-    return db.relationship(
-        Comment,
-        primaryjoin=lambda: cls.id == commentable_id,
         secondary=Relationship.__table__,
-        secondaryjoin=lambda: Comment.id == comment_id,
+        secondaryjoin=lambda: sa.or_(
+            sa.and_(
+                Comment.id == Relationship.source_id,
+                Relationship.source_type == "Comment",
+            ),
+            sa.and_(
+                Comment.id == Relationship.destination_id,
+                Relationship.destination_type == "Comment",
+            )
+        ),
         viewonly=True,
     )
 

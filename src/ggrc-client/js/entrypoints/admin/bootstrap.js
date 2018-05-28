@@ -10,6 +10,9 @@ import '../../controllers/dashboard_controller';
 import {RouterConfig} from '../../router';
 import routes from './routes';
 
+const path = GGRC.mustache_path || '/static/mustache';
+const HEADER_VIEW = `${path}/base_objects/page_header.mustache`;
+
 const $area = $('.area').first();
 const sortByNameEmail = list => {
   return new list.constructor(can.makeArray(list).sort(function (a, b) {
@@ -188,6 +191,7 @@ new GGRC.WidgetList('ggrc_admin', {
 $area.cms_controllers_dashboard({
   widget_descriptors: GGRC.WidgetList.get_widget_list_for('admin'),
   menu_tree_spec: GGRC.admin_menu_spec,
+  header_view: HEADER_VIEW,
   default_widgets: [
     'people', 'roles', 'events', 'custom_attributes', 'custom_roles',
   ],

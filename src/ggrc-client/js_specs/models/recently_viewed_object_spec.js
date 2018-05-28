@@ -5,16 +5,16 @@
 
 import '../../js/models/recently_viewed_object';
 
-describe('can.Model.RecentlyViewedObjects', function() {
+describe('can.Model.RecentlyViewedObjects', function () {
 
-  describe('::newInstance', function() {
-    it('creates a new recently viewed object given non-Model instance', function() {
+  describe('::newInstance', function () {
+    it('creates a new recently viewed object given non-Model instance', function () {
       let obj = GGRC.Models.RecentlyViewedObject.newInstance({'foo': 'bar'});
       expect(obj.foo).toBe('bar');
       expect(obj instanceof GGRC.Models.RecentlyViewedObject).toBeTruthy();
     });
 
-    it('references original Model type when passed in as argument', function() {
+    it('references original Model type when passed in as argument', function () {
       spyOn(GGRC.Models.RecentlyViewedObject.prototype, 'init');
       can.Model('RVO');
       let obj = new RVO({
@@ -29,8 +29,8 @@ describe('can.Model.RecentlyViewedObjects', function() {
     });
   });
 
-  describe('#stub', function() {
-    it('include title and view link', function() {
+  describe('#stub', function () {
+    it('include title and view link', function () {
       let obj = {
         viewLink: '/'
         , title: 'blah',

@@ -1,6 +1,6 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
+"""Module for OrgGroup object"""
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
@@ -17,10 +17,11 @@ class OrgGroup(Roleable, HasObjectState, CustomAttributable,
                Personable, Relatable, LastDeprecatedTimeboxed, Commentable,
                TestPlanned, PublicDocumentable, BusinessObject,
                Indexed, db.Model):
+  """Class representing OrgGroup."""
   __tablename__ = 'org_groups'
   _aliases = {
-      "document_url": None,
-      "document_evidence": None,
+      "documents_url": None,
+      "documents_file": None,
   }
 
   def __str__(self):

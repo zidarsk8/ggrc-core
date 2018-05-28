@@ -148,5 +148,9 @@ UNMAP_AUDIT_RESTRICTION = (u"Line {line}: You can not unmap {mapped_type} "
                            u"mapped to an {mapped_type}-scope object.")
 
 UNABLE_TO_EXTRACT_GDRIVE_ID = (u"Line {line}: Unable to extract gdrive_id "
-                               u"from {link}. This document can't be "
+                               u"from {link}. This evidence can't be "
                                u"reused after import")
+
+INVALID_TASKGROUP_MAPPING_WARNING = (u"Line {line}: You can not map "
+                                     u"{object_class} to TaskGroup. The value "
+                                     u"will be ignored.")

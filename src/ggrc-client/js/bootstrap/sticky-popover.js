@@ -23,7 +23,7 @@
 
     constructor: StickyPopover
 
-    , init: function(type, element, options) {
+    , init: function (type, element, options) {
       if (options.trigger == 'sticky-hover') {
         options.sticky_hover = true;
         options.trigger = 'hover';
@@ -43,18 +43,18 @@
         this.$element.on('click', $.proxy(this.click_toggle, this));
       }
     }
-    , click_toggle: function(e) {
+    , click_toggle: function (e) {
       e && e.preventDefault();
       this.toggle();
     }
-    , show: function(force) {
+    , show: function (force) {
       // Overload `show` to listen for mouseovers on the popover div
       if (force || this.displayState !== 'show') {
         if (this.displayState !== 'show') {
           this.$element.trigger($.Event('show'));
         } else {
           //fix the opacity value as it currently stands to prevent show-hide-show after loading.
-          this.tip().css({opacity : window.getComputedStyle(this.tip()[0]).opacity});
+          this.tip().css({opacity: window.getComputedStyle(this.tip()[0]).opacity});
         }
 
         if (this.$element.children('.popover-data-title').length > 0) {
@@ -72,7 +72,7 @@
         this.displayState = 'show';
         this.trigger_load();
         $.fn.popover.Constructor.prototype.show.apply(this);
-        this.tip().css({opacity : ''});
+        this.tip().css({opacity: ''});
         if (this.options.sticky_hover) {
           this.tip().
             on('mouseenter', $.proxy(this.tip_enter, this)).
@@ -80,13 +80,13 @@
         }
       }
     }
-    , hide: function() {
+    , hide: function () {
       if (this.displayState === 'show') {
         this.displayState = 'hide';
         $.fn.popover.Constructor.prototype.hide.apply(this);
       }
     }
-    , trigger_load: function() {
+    , trigger_load: function () {
       let self = this,
         href = this.$element.data('popover-href'),
         loaded = this.$element.data('popover-loaded');
@@ -95,10 +95,10 @@
 
       if (!loaded) {
         $.ajax({
-          url : href
-          , type : 'get'
-          , dataType : 'html'
-          , success : function(data) {
+          url: href
+          , type: 'get'
+          , dataType: 'html'
+          , success: function (data) {
             let $data = $(data.trim());
             self.$element.attr('data-original-title', $data.filter('.popover-title').html());
             self.$element.attr('data-content', $data.filter('.popover-content').html());
@@ -109,14 +109,14 @@
         });
       }
     }
-    , tip_enter: function(e) {
+    , tip_enter: function (e) {
       // Handle `mouseenter` on the popover element
       // Must set 'e.currentTarget' or it looks for `data.sticky_popover`
       //   in the wrong place
       e.currentTarget = this.$element[0];
       $.fn.popover.Constructor.prototype.enter.apply(this, arguments);
     }
-    , tip_leave: function(e) {
+    , tip_leave: function (e) {
       // Handle `mouseenter` on the popover element
       // Must set 'e.currentTarget' or it looks for `data.sticky_popover`
       //   in the wrong place

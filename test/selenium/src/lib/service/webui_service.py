@@ -410,6 +410,14 @@ class BaseWebUiService(object):
     return DashboardWidget(
         self.driver, dashboard_widget_elem).get_all_tab_names_and_urls()
 
+  def get_obj_related_asmts_titles(self, obj):
+    """Open obj Info Page. Click Assessments button to open
+    Related Assessments modal. Return list of Related Assessments Titles.
+    """
+    obj_page = self.open_info_page_of_obj(obj)
+    related_asmts_table = obj_page.show_related_assessments()
+    return related_asmts_table.get_related_titles(asmt_type=obj.type)
+
 
 class SnapshotsWebUiService(BaseWebUiService):
   """Class for snapshots business layer's services objects."""
@@ -535,14 +543,15 @@ class AssessmentsService(BaseWebUiService):
     return asmt_page.tab_container.get_tab_object(
         element.AssessmentTabContainer.CHANGE_LOG_TAB)
 
-  def get_related_asmts_titles(self, obj):
+  def get_asmt_related_asmts_titles(self, asmt):
     """Open assessment Info Page. Open Related Assessments Tab on Assessment
     Info Page. And return list of related Assessments Titles.
     """
-    asmt_page = self.open_info_page_of_obj(obj=obj)
+    asmt_page = self.open_info_page_of_obj(obj=asmt)
     related_asmts_tab = asmt_page.tab_container.get_tab_object(
         element.AssessmentTabContainer.RELATED_ASMTS_TAB)
-    return related_asmts_tab.get_related_titles(asmt_type=obj.assessment_type)
+    return related_asmts_tab.get_related_titles(
+        asmt_type=asmt.assessment_type)
 
   def get_related_issues_titles(self, obj):
     """Open assessment Info Page. Open Open Related Issues Tab on Assessment
