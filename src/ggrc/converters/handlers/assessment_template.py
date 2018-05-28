@@ -48,6 +48,11 @@ class AssessmentTemplateColumnHandler(handlers.MappingColumnHandler):
       attribute_definition.definition_type = table_singular
       attribute_definition.definition_id = self.row_converter.obj.id
       db.session.add(attribute_definition)
+      if self.row_converter.block_converter._ca_definitions_cache:
+        key = (attribute_definition.definition_id, attribute_definition.title)
+        self.row_converter.block_converter._ca_definitions_cache[key] = (
+          attribute_definition
+        )
     db.session.commit()
 
   def get_value(self):
