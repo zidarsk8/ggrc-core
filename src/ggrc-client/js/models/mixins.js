@@ -214,6 +214,9 @@ const AUDIT_ISSUE_TRACKER = {
         this.attr('access_control_list', []);
       }
     },
+    'before:restore'() {
+      this.cleanupAcl();
+    },
   });
 
   can.Model.Mixin('assertions_categories', {
