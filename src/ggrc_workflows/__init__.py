@@ -33,9 +33,8 @@ from ggrc_workflows.roles import (
     WorkflowOwner, WorkflowMember, BasicWorkflowReader, WorkflowBasicReader,
     WorkflowEditor
 )
-from ggrc_basic_permissions.models import ContextImplication
 from ggrc_basic_permissions.contributed_roles import (
-    RoleContributions, RoleDeclarations, DeclarativeRoleImplications
+    RoleContributions, RoleDeclarations
 )
 
 
@@ -722,30 +721,6 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
   workflow_context = obj.get_or_create_object_context(personal_context)
   obj.context = workflow_context
 
-  # ContextImplications linked only with `workflow_context` object, which
-  # was created but not added to DB yet. ContextImlications should be added to
-  # session explicitly due to SQLAlchemy Garbage collector deletes such
-  # objects, and it will not be added to session. On the other hand
-  # `workflow_context` was added to session automatically, because it is linked
-  # to `personal_context` that is already in DB.
-  # Create context implication for Workflow roles to default context.
-  db.session.add(ContextImplication(
-      source_context=workflow_context,
-      context=None,
-      source_context_scope='Workflow',
-      context_scope=None,
-      modified_by=get_current_user(),
-  ))
-  # Add role implication - global users can perform defined actions on workflow
-  # and its related objects.
-  db.session.add(ContextImplication(
-      source_context=None,
-      context=workflow_context,
-      source_context_scope=None,
-      context_scope='Workflow',
-      modified_by=get_current_user(),
-  ))
-
   if src.get('clone'):
     source_workflow.copy_task_groups(
         obj,
@@ -829,25 +804,8 @@ class WorkflowRoleDeclarations(RoleDeclarations):
     }
 
 
-class WorkflowRoleImplications(DeclarativeRoleImplications):
-  # (Source Context Type, Context Type)
-  #   -> Source Role -> Implied Role for Context
-  implications = {
-      (None, 'Workflow'): {
-          'ProgramCreator': ['BasicWorkflowReader'],
-          'Editor': ['WorkflowEditor'],
-          'Reader': ['BasicWorkflowReader'],
-          'Creator': ['WorkflowBasicReader'],
-      },
-      ('Workflow', None): {
-          'WorkflowEditor': ['WorkflowBasicReader'],
-      },
-  }
-
-
 ROLE_CONTRIBUTIONS = WorkflowRoleContributions()
 ROLE_DECLARATIONS = WorkflowRoleDeclarations()
-ROLE_IMPLICATIONS = WorkflowRoleImplications()
 
 contributed_notifications = notification.contributed_notifications
 contributed_importables = IMPORTABLE
