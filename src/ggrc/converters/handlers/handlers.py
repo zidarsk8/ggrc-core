@@ -417,7 +417,7 @@ class TextColumnHandler(ColumnHandler):
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
     value = self.raw_value or ""
-    value = self.clean_whitespaces(value)
+    value = self.clean_whitespaces(value).strip()
 
     if self.mandatory and not value:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
