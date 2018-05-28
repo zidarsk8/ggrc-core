@@ -232,10 +232,4 @@ class ObjectCaColumnHandler(CustomAttributeColumnHandler):
       return None
     cad = models.CustomAttributeDefinition
     cache = self.row_converter.block_converter.get_ca_definitions_cache()
-    definition = cache.get((self.row_converter.obj.id, self.display_name))
-    if not definition:
-      definition = cad.query.filter(and_(
-          cad.definition_id == self.row_converter.obj.id,
-          cad.title == self.display_name
-      )).first()
-    return definition
+    return cache.get((self.row_converter.obj.id, self.display_name))
