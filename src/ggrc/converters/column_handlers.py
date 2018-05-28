@@ -103,7 +103,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "template_object_type": template.TemplateObjectColumnHandler,
     "test_plan": handlers.TextareaColumnHandler,
     "test_plan_procedure": boolean.CheckboxColumnHandler,
-    "title": handlers.RequiredTextColumnHandler,
+    "title": handlers.TextColumnHandler,
     "verify_frequency": handlers.OptionColumnHandler,
     "updated_at": handlers.ExportOnlyDateColumnHandler,
     "created_at": handlers.ExportOnlyDateColumnHandler,

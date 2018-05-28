@@ -416,24 +416,17 @@ class TextColumnHandler(ColumnHandler):
 
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
-    if not self.raw_value:
-      return ""
+    value = self.raw_value or ""
+    value = self.clean_whitespaces(value)
 
-    return self.clean_whitespaces(self.raw_value)
+    if self.mandatory and not value:
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+
+    return value
 
   @staticmethod
   def clean_whitespaces(value):
     return re.sub(r'\s+', " ", value)
-
-
-class RequiredTextColumnHandler(TextColumnHandler):
-
-  def parse_item(self):
-    value = self.raw_value or ""
-    clean_value = self.clean_whitespaces(value)
-    if not clean_value:
-      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
-    return clean_value
 
 
 class TextareaColumnHandler(ColumnHandler):
