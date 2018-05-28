@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """ Module for WithEvidence mixin."""
-from sqlalchemy import orm, case, and_, literal
+import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import db
@@ -43,63 +43,33 @@ class WithEvidence(object):
   }
 
   @declared_attr
-  def evidences(self):
+  def evidences(cls):  # pylint: disable=no-self-argument
     """Return evidences related for that instance."""
-    evidence_id = case(
-        [
-            (
-                Relationship.destination_type == "Evidence",
-                Relationship.destination_id,
-            ),
-            (
-                Relationship.source_type == "Evidence",
-                Relationship.source_id,
-            ),
-        ],
-        else_=literal(False)
-    )
-    with_evidence_obj_id = case(
-        [
-            (
-                Relationship.destination_type == "Evidence",
-                Relationship.source_id
-            ),
-            (
-                Relationship.source_type == "Evidence",
-                Relationship.destination_id,
-            ),
-        ],
-        else_=literal(False)
-    )
-    with_evidence_obj_type = case(
-        [
-            (
-                Relationship.destination_type == "Evidence",
-                Relationship.source_type
-            ),
-            (
-                Relationship.source_type == "Evidence",
-                Relationship.destination_type,
-            ),
-        ],
-    )
     return db.relationship(
         Evidence,
-        # at first we check is with_evidence_obj_id
-        # not False (it return id in fact)
-        # after that we can compare values.
-        # this is required for saving logic consistancy
-        # case return 2 types of values BOOL(false) and INT(id) not Null
-        primaryjoin=lambda: and_(with_evidence_obj_id,
-                                 self.id == with_evidence_obj_id),
+        primaryjoin=lambda: sa.or_(
+            sa.and_(
+                cls.id == Relationship.source_id,
+                Relationship.source_type == cls.__name__,
+                Relationship.destination_type == "Evidence",
+            ),
+            sa.and_(
+                cls.id == Relationship.destination_id,
+                Relationship.destination_type == cls.__name__,
+                Relationship.source_type == "Evidence",
+            )
+        ),
         secondary=Relationship.__table__,
-        # at first we check is with_evidence_obj_id
-        # not False (it return id in fact)
-        # after that we can compare values.
-        # this is required for saving logic consistancy
-        # case return 2 types of values BOOL(false) and INT(id) not Null
-        secondaryjoin=lambda: and_(evidence_id, Evidence.id == evidence_id,
-                                   with_evidence_obj_type == self.__name__),
+        secondaryjoin=lambda: sa.or_(
+            sa.and_(
+                Evidence.id == Relationship.source_id,
+                Relationship.source_type == "Evidence",
+            ),
+            sa.and_(
+                Evidence.id == Relationship.destination_id,
+                Relationship.destination_type == "Evidence",
+            )
+        ),
         viewonly=True,
     )
 
@@ -122,7 +92,7 @@ class WithEvidence(object):
         super(WithEvidence, cls).eager_query(),
         WithEvidence._include_links,
     ).options(
-        orm.subqueryload(
+        sa.orm.subqueryload(
             'evidences',
         ).undefer_group(
             'Evidence_complete',
@@ -147,5 +117,5 @@ class WithEvidence(object):
   @classmethod
   def indexed_query(cls):
     return super(WithEvidence, cls).indexed_query().options(
-        orm.subqueryload("evidences").undefer_group("Evidence_complete"),
+        sa.orm.subqueryload("evidences").undefer_group("Evidence_complete"),
     )
