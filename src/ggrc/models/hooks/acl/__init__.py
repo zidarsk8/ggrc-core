@@ -75,7 +75,9 @@ def after_flush(session, _):
 
   # Legacy propagation for workflows that will have to be refactored to use
   # relationships and the code above
-  _add_or_update("new_wf_acls", workflow.get_new_wf_acls(session))
+  wf_acls, wf_comments = workflow.get_new_wf_acls(session)
+  _add_or_update("new_wf_acls", wf_acls)
+  _add_or_update("new_wf_comment_ct_ids", wf_comments)
   _add_or_update(
       "deleted_wf_objects",
       workflow.get_deleted_wf_objects(session)
