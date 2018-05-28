@@ -182,7 +182,7 @@ class CustomRoleAttr(FullTextAttr):
       if acl.ac_role.internal:
         # Don't index internal roles they are not presented to user.
         continue
-      if instance.__class__.__name__ != acl.ac_role.object_type:
+      if instance.type != acl.ac_role.object_type:
         logger.warning("Reindex: role %s, id %s is skipped for %s, id %s, "
                        "because it relates to %s", acl.ac_role.name,
                        acl.ac_role.id, instance.__class__.__name__,
