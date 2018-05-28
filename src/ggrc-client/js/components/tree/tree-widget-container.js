@@ -612,10 +612,8 @@ viewModel = can.Map.extend({
     this.attr('advancedSearch.appliedMappingItems', mappings);
 
     advancedFilters = GGRC.query_parser.join_queries(
-      GGRC.query_parser
-        .parse(AdvancedSearch.buildFilter(filters, request)),
-      GGRC.query_parser
-        .parse(AdvancedSearch.buildFilter(mappings, request))
+      AdvancedSearch.buildFilter(filters, request),
+      AdvancedSearch.buildFilter(mappings, request)
     );
     this.attr('advancedSearch.request', request);
 

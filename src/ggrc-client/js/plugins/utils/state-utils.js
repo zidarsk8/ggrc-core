@@ -139,9 +139,15 @@ function getBulkStatesForModel(model) {
  * Transform query for objects into query which filter them by state.
  * @param {Array} statuses - array of active statuses
  * @param {String} modelName - model name
+ * @param {Boolean} inverse - the flag indicathes whether filter should be inversed
  * @return {String} The transformed query
  */
-function buildStatusFilter(statuses, modelName) {
+function buildStatusFilter(statuses, modelName, inverse) {
+  if (inverse) {
+    let allStatuses = getStatesForModel(modelName);
+    statuses = _.difference(allStatuses, statuses);
+  }
+
   let filter = modelName === 'Assessment' ?
     buildAssessmentFilter(statuses, buildFilterExpression) :
     buildFilterExpression(statuses, modelName);
