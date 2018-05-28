@@ -52,7 +52,6 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
       "PersonProfile",
       uselist=False,
       back_populates="person",
-      cascade='all, delete-orphan'
   )
 
   @staticmethod

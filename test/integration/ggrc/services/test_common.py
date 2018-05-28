@@ -11,7 +11,6 @@ from wsgiref.handlers import format_date_time
 import mock
 import ddt
 from freezegun import freeze_time
-from sqlalchemy import and_
 
 from integration.ggrc.models import factories
 from integration.ggrc.services import TestCase
@@ -19,8 +18,6 @@ from integration.ggrc import api_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
 from ggrc.models import all_models
-
-from ggrc import db
 
 
 COLLECTION_ALLOWED = ["HEAD", "GET", "POST", "OPTIONS", "PATCH"]
