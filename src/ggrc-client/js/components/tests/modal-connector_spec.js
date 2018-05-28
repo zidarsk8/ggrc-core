@@ -23,7 +23,6 @@ describe('GGRC.Components.modalConnector', function () {
   describe('init() method', function () {
     let handler;
     let that;
-    let reifiedInstance;
     let binding;
     beforeEach(function () {
       binding = {
@@ -45,11 +44,11 @@ describe('GGRC.Components.modalConnector', function () {
         instance_attr: '',
       });
       viewModel.instance = {
-        reify: jasmine.createSpy().and.returnValue(reifiedInstance),
         mark_for_addition: jasmine.createSpy(),
         get_binding: jasmine.createSpy().and.returnValue(binding),
       };
-      reifiedInstance = new can.Map(viewModel.instance);
+      viewModel.instance.reify = jasmine.createSpy()
+        .and.returnValue(new can.Map(viewModel.instance));
       that = {
         viewModel: viewModel,
         addListItem: jasmine.createSpy(),
@@ -66,13 +65,7 @@ describe('GGRC.Components.modalConnector', function () {
       expect(viewModel.attr('controller').viewModel)
         .toEqual(that.viewModel);
     });
-    it('sets true to viewModel.deferred if viewModel.instance is undefined',
-      function () {
-        viewModel.instance = undefined;
-        viewModel.default_mappings = [];
-        handler();
-        expect(viewModel.attr('deferred')).toEqual(true);
-      });
+
     it('sets reified instance to viewModel if it is defined',
       function () {
         handler();

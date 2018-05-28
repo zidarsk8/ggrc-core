@@ -37,7 +37,6 @@ import {
       source_mapping: '@',
       default_mappings: [], // expects array of objects
       mapping: '@',
-      deferred: '@',
       newInstance: false,
       list: [],
       // the following are just for the case when we have no object to start with,
@@ -50,9 +49,7 @@ import {
         let instance;
         let vm = this.viewModel;
         vm.attr('controller', this);
-        if (!vm.instance) {
-          vm.attr('deferred', true);
-        } else if (vm.instance.reify) {
+        if (vm.instance.reify) {
           vm.attr('instance', vm.instance.reify());
         }
 
@@ -155,17 +152,8 @@ import {
         can.map(el.find('.result'), function (resultEl) {
           let obj = $(resultEl).data('result');
           let len = this.viewModel.list.length;
-          let mapping;
 
-          if (this.viewModel.attr('deferred')) {
-            this.viewModel.changes.push({what: obj, how: 'remove'});
-          } else {
-            mapping = this.viewModel.mapping ||
-              GGRC.Mappings.get_canonical_mapping_name(
-                this.viewModel.instance.constructor.shortName,
-                obj.constructor.shortName);
-            this.viewModel.instance.mark_for_deletion(mapping, obj);
-          }
+          this.viewModel.changes.push({what: obj, how: 'remove'});
           for (; len >= 0; len--) {
             if (this.viewModel.list[len] === obj) {
               this.viewModel.list.splice(len, 1);
@@ -176,19 +164,10 @@ import {
       'a[data-object-source] modal:success': 'addMapings',
       'defer:add': 'addMapings',
       addMapings: function (el, ev, data) {
-        let mapping;
         ev.stopPropagation();
 
         can.each(data.arr || [data], function (obj) {
-          if (this.viewModel.attr('deferred')) {
-            this.viewModel.changes.push({what: obj, how: 'add'});
-          } else {
-            mapping = this.viewModel.mapping ||
-              GGRC.Mappings.get_canonical_mapping_name(
-                this.viewModel.instance.constructor.shortName,
-                obj.constructor.shortName);
-            this.viewModel.instance.mark_for_addition(mapping, obj);
-          }
+          this.viewModel.changes.push({what: obj, how: 'add'});
           this.addListItem(obj);
         }, this);
       },
