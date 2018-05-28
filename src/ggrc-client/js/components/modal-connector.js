@@ -97,9 +97,6 @@ import {
         this.options.instance = vm.instance;
         this.on();
       },
-      destroy: function () {
-        this.viewModel.parent_instance.removeAttr('_changes');
-      },
       setListItems: function (list) {
         let currentList = this.viewModel.attr('list');
         this.viewModel.attr('list', currentList.concat(can.map(list,
@@ -163,8 +160,6 @@ import {
 
           if (this.viewModel.attr('deferred')) {
             this.viewModel.changes.push({what: obj, how: 'remove'});
-            this.viewModel.parent_instance.attr('_changes',
-              this.viewModel.changes);
           } else {
             mapping = this.viewModel.mapping ||
               GGRC.Mappings.get_canonical_mapping_name(
@@ -248,8 +243,6 @@ import {
         can.each(data.arr || [data], function (obj) {
           if (this.viewModel.attr('deferred')) {
             this.viewModel.changes.push({what: obj, how: 'add'});
-            this.viewModel.parent_instance.attr('_changes',
-              this.viewModel.changes);
           } else {
             mapping = this.viewModel.mapping ||
               GGRC.Mappings.get_canonical_mapping_name(

@@ -119,23 +119,7 @@ describe('GGRC.Components.modalConnector', function () {
       expect(that.on).toHaveBeenCalled();
     });
   });
-  describe('destroy() method', function () {
-    let handler;
-    let that;
-    beforeEach(function () {
-      that = {
-        viewModel: {
-          parent_instance: new can.Map(),
-        },
-      };
-      handler = events.destroy.bind(that);
-    });
-    it('removes changes from parent_instance', function () {
-      that.viewModel.parent_instance.attr('changes', [1, 2]);
-      handler();
-      expect(that.viewModel.parent_instance._changes).toEqual(undefined);
-    });
-  });
+
   describe('setListItems() method', function () {
     let handler;
     let that;
@@ -194,11 +178,6 @@ describe('GGRC.Components.modalConnector', function () {
         expect(that.viewModel.changes[1])
           .toEqual(jasmine.objectContaining({what: 'mock', how: 'remove'}));
       });
-    it('adds all changes to parent_instance if it is deferred', function () {
-      that.viewModel.parent_instance._changes = [];
-      handler(element, event);
-      expect(that.viewModel.parent_instance._changes.length).toEqual(2);
-    });
   });
   describe('addMapings() method', function () {
     let handler;
@@ -229,10 +208,5 @@ describe('GGRC.Components.modalConnector', function () {
         expect(that.viewModel.changes[1])
           .toEqual(jasmine.objectContaining({how: 'add'}));
       });
-    it('adds all changes to parent_instance if it is deferred', function () {
-      that.viewModel.parent_instance._changes = [];
-      handler({}, event, {data: [1, 2]});
-      expect(that.viewModel.parent_instance._changes.length).toEqual(2);
-    });
   });
 });
