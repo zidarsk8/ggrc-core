@@ -7,19 +7,11 @@ import * as StateUtils from '../../plugins/utils/state-utils';
 import router from '../../router';
 
 let viewModel = can.Map.extend({
-  define: {
-    operation: {
-      type: String,
-      value: 'AND',
-    },
-    depth: {
-      type: Boolean,
-      value: false,
-    },
-  },
   disabled: false,
-  options: {},
-  filters: null,
+  options: {
+    name: 'status',
+    query: null,
+  },
   filterStates: [],
   widgetId: null,
   modelName: null,
@@ -57,16 +49,16 @@ let viewModel = can.Map.extend({
   },
   setFilter(selected) {
     let statuses = this.attr('filterStates');
-    let filter = '';
+    let query = null;
 
     if (selected.length && statuses.length !== selected.length) {
-      filter = StateUtils.statusFilter(selected, '', this.attr('modelName'));
+      query = StateUtils.buildStatusFilter(selected, this.attr('modelName'));
       router.attr('state', selected);
     } else {
       router.removeAttr('state');
     }
 
-    this.attr('options.filter', filter);
+    this.attr('options.query', query);
   },
 });
 
@@ -76,10 +68,6 @@ export default can.Component.extend({
   events: {
     inserted() {
       let vm = this.viewModel;
-      let options = vm.attr('options');
-      let filter = vm.attr('filter');
-      let operation = vm.attr('operation');
-      let depth = vm.attr('depth');
 
       let filterStates = StateUtils.getStatesForModel(vm.attr('modelName'))
         .map((state) => {
@@ -88,12 +76,8 @@ export default can.Component.extend({
           };
         });
 
-      options.attr('filter', filter);
-      options.attr('operation', operation);
-      options.attr('depth', depth);
-      options.attr('name', 'status');
-
       if (vm.registerFilter) {
+        let options = vm.attr('options');
         vm.registerFilter(options);
       }
 

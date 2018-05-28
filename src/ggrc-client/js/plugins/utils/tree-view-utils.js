@@ -384,12 +384,11 @@ function getModelsForSubTier(modelName) {
  * @param {Object} parent - Information about parent object.
  * @param {String} parent.type - Type of parent object.
  * @param {Number} parent.id - ID of parent object.
- * @param {Object} filterInfo - Information about pagination, sorting and filtering
- * @param {Number} filterInfo.current -
- * @param {Number} filterInfo.pageSize -
- * @param {Number} filterInfo.sortBy -
- * @param {Number} filterInfo.sortDirection -
- * @param {Number} filterInfo.filter -
+ * @param {Object} pageInfo - Information about pagination, sorting and filtering
+ * @param {Number} pageInfo.current -
+ * @param {Number} pageInfo.pageSize -
+ * @param {Number} pageInfo.sortBy -
+ * @param {Number} pageInfo.sortDirection -
  * @param {Object} filter -
  * @param {Object} request - Collection of QueryAPI sub-requests
  * @param {Boolean} transforToSnapshot - Transform query to Snapshot
@@ -397,14 +396,14 @@ function getModelsForSubTier(modelName) {
  */
 function loadFirstTierItems(modelName,
   parent,
-  filterInfo,
+  pageInfo,
   filter,
   request) {
   let modelConfig = getWidgetConfig(modelName);
 
   let params = buildParam(
     modelConfig.responseType,
-    filterInfo,
+    pageInfo,
     makeRelevantExpression(modelConfig.name, parent.type, parent.id),
     null,
     filter
@@ -459,9 +458,7 @@ function loadItemsForSubTier(models, type, id, filter) {
 
       dfds = loadedModelObjects.map(function (modelObject) {
         let subTreeFields = getSubTreeFields(type, modelObject.name);
-        let pageInfo = {
-          filter: filter,
-        };
+        let pageInfo = {};
         let params;
 
         if (countMap[modelObject.name]) {
@@ -469,14 +466,18 @@ function loadItemsForSubTier(models, type, id, filter) {
           pageInfo.pageSize = countMap[modelObject.name];
         }
 
+        if (modelObject.additionalFilter) {
+          let additionalQuery =
+            GGRC.query_parser.parse(modelObject.additionalFilter);
+          filter = GGRC.query_parser.join_queries(filter, additionalQuery);
+        }
+
         params = buildParam(
           modelObject.responseType,
           pageInfo,
           relevant,
           subTreeFields,
-          modelObject.additionalFilter ?
-            GGRC.query_parser.parse(modelObject.additionalFilter) :
-            null
+          filter
         );
 
         if (isSnapshotRelated(relevant.type, params.object_name)) {

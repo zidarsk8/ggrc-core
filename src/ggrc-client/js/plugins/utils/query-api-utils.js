@@ -101,16 +101,15 @@ function buildRelevantIdsQuery(objName, page, relevant, additionalFilter) {
  * @param {Number} page.pageSize - Page size
  * @param {String} page.sortBy - sortBy
  * @param {String} page.sortDirection - sortDirection
- * @param {String} page.filter - Filter string
  * @param {Object|Object[]} relevant - Information about relevant object
  * @param {Object} relevant.type - Type of relevant object
  * @param {Object} relevant.id - Id of relevant object
  * @param {Object} relevant.operation - Type of operation.
  * @param {Array} fields - Array of requested fields.
- * @param {Object|Array} additionalFilter - Additional filters to be applied
+ * @param {Object|Array} filters - Filters to be applied
  * @return {Object} Object of QueryAPIRequest
  */
-function buildParam(objName, page, relevant, fields, additionalFilter) {
+function buildParam(objName, page, relevant, fields, filters) {
   let first;
   let last;
   let params = {};
@@ -120,8 +119,7 @@ function buildParam(objName, page, relevant, fields, additionalFilter) {
   }
 
   params.object_name = objName;
-  params.filters =
-    _makeFilter(page.filter, relevant, additionalFilter);
+  params.filters = _makeFilter(filters, relevant);
 
   if (page.current && page.pageSize) {
     first = (page.current - 1) * page.pageSize;
@@ -210,7 +208,7 @@ function _makeRelevantFilter(filter) {
   return relevantFilter;
 }
 
-function _makeFilter(filter, relevant, additionalFilter) {
+function _makeFilter(filter, relevant) {
   let relevantFilters;
   let filterList = [];
 
@@ -225,14 +223,10 @@ function _makeFilter(filter, relevant, additionalFilter) {
   }
 
   if (filter) {
-    filterList.push(GGRC.query_parser.parse(filter));
-  }
-
-  if (additionalFilter) {
-    additionalFilter = Array.isArray(additionalFilter) ?
-      additionalFilter :
-      can.makeArray(additionalFilter);
-    filterList = filterList.concat(additionalFilter);
+    filter = Array.isArray(filter) ?
+      filter :
+      can.makeArray(filter);
+    filterList = filterList.concat(filter);
   }
   if (filterList.length) {
     return filterList.reduce(function (left, right) {
