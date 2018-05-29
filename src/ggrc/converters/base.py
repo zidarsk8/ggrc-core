@@ -32,9 +32,7 @@ class BaseConverter(object):
     self.exportable = get_exportables()
 
   def get_info(self):
-    for converter in self.block_converters:
-      self.response_data.append(converter.get_info())
-    return self.response_data
+    raise NotImplementedError()
 
   @classmethod
   def drop_cache(cls):
@@ -85,6 +83,9 @@ class ImportConverter(BaseConverter):
     self.indexer = get_indexer()
     super(ImportConverter, self).__init__()
 
+  def get_info(self):
+    return self.response_data
+
   def initialize_block_converters(self):
     """ Initialize block converters.
 
@@ -122,6 +123,7 @@ class ImportConverter(BaseConverter):
       converter.import_objects()
       converter.import_secondary_objects()
 
+      self.response_data.append(converter.get_info())
       revision_ids.extend(converter.revision_ids)
 
     self._start_compute_attributes_job(revision_ids)
@@ -151,6 +153,11 @@ class ExportConverter(BaseConverter):
 
   def get_object_names(self):
     return [c.name for c in self.block_converters]
+
+  def get_info(self):
+    for converter in self.block_converters:
+      self.response_data.append(converter.get_info())
+    return self.response_data
 
   def initialize_block_converters(self):
     """Generate block converters.
