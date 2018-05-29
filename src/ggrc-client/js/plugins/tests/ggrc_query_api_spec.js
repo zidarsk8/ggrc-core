@@ -4,7 +4,6 @@
  */
 
 import * as QueryAPI from '../utils/query-api-utils';
-import * as CurrentPageUtils from '../utils/current-page-utils';
 
 describe('GGRC Utils Query API', function () {
   describe('buildParams() method', function () {
@@ -18,7 +17,6 @@ describe('GGRC Utils Query API', function () {
         current: 1,
         total: null,
         pageSize: 10,
-        filter: '',
         count: 6,
       };
 
@@ -68,11 +66,16 @@ describe('GGRC Utils Query API', function () {
       });
 
       it('return expression for filter', function () {
-        let filterResult;
-        paging.filter = 'status="in progress"';
+        let filter = {
+          expression: {
+            left: 'status',
+            op: {name: '='},
+            right: 'in progress',
+          },
+        };
 
-        filterResult =
-          method(objectName, paging, relevant)[0].filters.expression.right;
+        let filterResult = method(objectName, paging, relevant, filter)[0].
+          filters.expression.right;
 
         expect(filterResult.left).toEqual('status');
         expect(filterResult.right).toEqual('in progress');
@@ -120,10 +123,8 @@ describe('GGRC Utils Query API', function () {
     describe('filter builder', function () {
       let relevantType = 'dummyType1';
       let requestedType = 'dummyType2';
-      let pageWithFilter = {filter: 'field = value'};
-      let pageNoFilter = {filter: undefined};
       let relevant = {id: 1, type: relevantType};
-      let additionalFilter = {
+      let filter = {
         expression: {
           op: {name: '~'},
           left: 'foo',
@@ -132,7 +133,7 @@ describe('GGRC Utils Query API', function () {
       };
       let result;
 
-      var flattenOps = function (expression) {
+      let flattenOps = function (expression) {
         if (expression && expression.op) {
           return [expression.op.name].concat(flattenOps(expression.left))
             .concat(flattenOps(expression.right));
@@ -146,72 +147,29 @@ describe('GGRC Utils Query API', function () {
       };
 
       it('returns empty expression for no filtering parameters', function () {
-        result = method(requestedType, pageNoFilter, undefined, undefined)[0];
+        result = method(requestedType, {}, undefined, undefined)[0];
 
         expect(_.isObject(result.filters.expression)).toBe(true);
         expect(_.isEmpty(result.filters.expression)).toBe(true);
       });
 
-      it('returns correct filters for just text filter',
-        function () {
-          result = method(requestedType, pageWithFilter, undefined,
-            undefined)[0];
+      it('returns correct filters for just relevant object', function () {
+        result = method(requestedType, {}, relevant, undefined)[0];
 
-          expect(checkOps(result.filters.expression, ['='])).toBe(true);
-        });
+        expect(checkOps(result.filters.expression, ['relevant'])).toBe(true);
+      });
 
-      it('returns correct filters for just relevant object',
-        function () {
-          result = method(requestedType, pageNoFilter, relevant,
-            undefined)[0];
+      it('returns correct filters for just filter', function () {
+        result = method(requestedType, {}, undefined, filter)[0];
 
-          expect(checkOps(result.filters.expression, ['relevant'])).toBe(true);
-        });
+        expect(checkOps(result.filters.expression, ['~'])).toBe(true);
+      });
 
-      it('returns correct filters for just additionalFilter',
-        function () {
-          result = method(requestedType, pageNoFilter, undefined,
-            additionalFilter)[0];
-
-          expect(checkOps(result.filters.expression, ['~'])).toBe(true);
-        });
-
-      it('returns correct filters for just text filter and relevant object',
-        function () {
-          result = method(requestedType, pageWithFilter, relevant,
-            undefined)[0];
-
-          expect(checkOps(result.filters.expression,
-            ['=', 'AND', 'relevant'])).toBe(true);
-        });
-
-      it('returns correct filters for just text filter and additionalFilter',
-        function () {
-          result = method(requestedType, pageWithFilter, undefined,
-            additionalFilter)[0];
-
-          expect(checkOps(result.filters.expression,
-            ['=', 'AND', '~'])).toBe(true);
-        });
-
-      it('returns correct filters for just relevant object and ' +
-         'additionalFilter',
-      function () {
-        result = method(requestedType, pageNoFilter, relevant,
-          additionalFilter)[0];
+      it('returns correct filters for relevant object and filter', function () {
+        result = method(requestedType, {}, relevant, filter)[0];
 
         expect(checkOps(result.filters.expression,
           ['relevant', 'AND', '~'])).toBe(true);
-      });
-
-      it('returns correct filters for text filter, relevant object and ' +
-         'additionalFilter',
-      function () {
-        result = method(requestedType, pageWithFilter, relevant,
-          additionalFilter)[0];
-
-        expect(checkOps(result.filters.expression,
-          ['=', 'AND', 'relevant', 'AND', '~'])).toBe(true);
       });
     });
   });
