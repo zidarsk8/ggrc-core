@@ -25,7 +25,6 @@ from ggrc.fulltext import get_indexer
 class BaseConverter(object):
   """Base class for csv converters."""
   def __init__(self):
-    self.block_converters = []
     self.new_objects = defaultdict(structures.CaseInsensitiveDict)
     self.shared_state = {}
     self.response_data = []
@@ -82,12 +81,12 @@ class ImportConverter(BaseConverter):
           class_name=class_name,
       )
       block_converter.check_block_restrictions()
-      self.block_converters.append(block_converter)
+      yield block_converter
 
   def import_csv_data(self):
     revision_ids = []
-    self.initialize_block_converters()
-    for converter in self.block_converters:
+
+    for converter in self.initialize_block_converters():
       converter.row_converters_from_csv()
       for attr_name in self.priority_columns:
         converter.handle_row_data(attr_name)
@@ -121,6 +120,7 @@ class ExportConverter(BaseConverter):
   def __init__(self, ids_by_type):
     super(ExportConverter, self).__init__()
     self.dry_run = True  # TODO: fix ColumnHandler to not use it for exports
+    self.block_converters = []
     self.ids_by_type = ids_by_type
 
   def get_object_names(self):
