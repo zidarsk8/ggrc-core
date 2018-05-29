@@ -24,24 +24,17 @@ from ggrc.fulltext import get_indexer
 
 class BaseConverter(object):
   """Base class for csv converters."""
-  def __init__(self, **kwargs):
-    self.dry_run = kwargs.get("dry_run", True)
-    self.csv_data = kwargs.get("csv_data", [])
-    self.ids_by_type = kwargs.get("ids_by_type", [])
+  def __init__(self):
     self.block_converters = []
     self.new_objects = defaultdict(structures.CaseInsensitiveDict)
     self.shared_state = {}
     self.response_data = []
     self.exportable = get_exportables()
-    self.indexer = get_indexer()
 
   def get_info(self):
     for converter in self.block_converters:
       self.response_data.append(converter.get_info())
     return self.response_data
-
-  def get_object_names(self):
-    return [c.name for c in self.block_converters]
 
   @classmethod
   def drop_cache(cls):
@@ -85,6 +78,12 @@ class ImportConverter(BaseConverter):
       "task_type",
       "audit",
   ]
+
+  def __init__(self, dry_run=True, csv_data=None):
+    self.dry_run = dry_run
+    self.csv_data = csv_data or []
+    self.indexer = get_indexer()
+    super(ImportConverter, self).__init__()
 
   def initialize_block_converters(self):
     """ Initialize block converters.
@@ -155,6 +154,13 @@ class ExportConverter(BaseConverter):
   This class contains and handles all block converters and makes sure that
   blocks and columns are handled in the correct order.
   """
+
+  def __init__(self, ids_by_type):
+    super(ExportConverter, self).__init__()
+    self.ids_by_type = ids_by_type
+
+  def get_object_names(self):
+    return [c.name for c in self.block_converters]
 
   def initialize_block_converters(self):
     """Generate block converters.
