@@ -384,6 +384,15 @@ def migrate_url_to_reference_url(connection):
   """))
 
 
+def add_document_recipients(connection):
+  """Add document admin to comment notification recipient list"""
+  op.execute("SET SESSION SQL_SAFE_UPDATES = 0")
+  sql = """
+      UPDATE documents d SET d.recipients="Admin" WHERE d.recipients IS NULL
+  """
+  connection.execute(text(sql))
+
+
 def run_migration():
   """Run main migration flow"""
   connection = op.get_bind()
@@ -393,6 +402,7 @@ def run_migration():
       process_document(connection, data)
   migrate_url_to_reference_url(connection)
   add_missing_slugs(connection)
+  add_document_recipients(connection)
   add_indexes()
 
 

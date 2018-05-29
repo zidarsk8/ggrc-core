@@ -33,6 +33,9 @@ class Document(Roleable, Relatable, mixins.Titled,
 
   _title_uniqueness = False
 
+  # Override from Commentable mixin (can be removed after GGRC-5192)
+  send_by_default = db.Column(db.Boolean, nullable=False, default=True)
+
   link = deferred(db.Column(db.String, nullable=False), 'Document')
   description = deferred(db.Column(db.Text, nullable=False, default=u""),
                          'Document')
@@ -67,6 +70,7 @@ class Document(Roleable, Relatable, mixins.Titled,
       reflection.Attribute('gdrive_id', create=False, update=False),
       reflection.Attribute('parent_obj', read=False, update=False),
       reflection.Attribute('is_uploaded', read=False, update=False),
+      reflection.Attribute('send_by_default', create=False, update=False),
   )
 
   _fulltext_attrs = [

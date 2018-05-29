@@ -32,7 +32,8 @@ def upgrade():
                 sa.Column("recipients", sa.String(length=250),
                           nullable=True))
   op.add_column(TABLE,
-                sa.Column("send_by_default", sa.Boolean(), nullable=True))
+                sa.Column("send_by_default", sa.Boolean(), nullable=False,
+                          server_default=sa.true()))
   op.add_column(TABLE,
                 sa.Column("last_deprecated_date", sa.Date))
 
