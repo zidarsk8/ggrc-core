@@ -44,14 +44,39 @@ class TestAssessmentTemplatesImport(TestCase):
   def test_modify_over_import(self):
     """Test import modifies Assessment Template and does not fail."""
     self.import_file("assessment_template_no_warnings.csv")
+    slug = "T-1"
     response = self.import_data(OrderedDict([
         ("object_type", "Assessment_Template"),
-        ("Code*", "T-1"),
+        ("Code*", slug),
         ("Audit*", "Audit"),
         ("Title", "Title"),
         ("Object Under Assessment", 'Control'),
     ]))
+    template = models.AssessmentTemplate.query \
+        .filter(models.AssessmentTemplate.slug == slug) \
+        .first()
     self._check_csv_response(response, {})
+    self.assertEqual(template.default_people['verifiers'], 'Auditors')
+    self.assertEqual(template.default_people['assignees'], 'Admin')
+
+  def test_modify_persons_over_import(self):
+    """Test import modifies Assessment Template and does not fail."""
+    self.import_file("assessment_template_no_warnings.csv")
+    slug = "T-1"
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment_Template"),
+        ("Code*", slug),
+        ("Audit*", "Audit"),
+        ("Title", "Title"),
+        ("Object Under Assessment", 'Control'),
+        ("Default Verifiers", "Secondary Contacts")
+    ]))
+    template = models.AssessmentTemplate.query \
+        .filter(models.AssessmentTemplate.slug == slug) \
+        .first()
+    self._check_csv_response(response, {})
+    self.assertEqual(template.default_people['verifiers'],
+                     "Secondary Contacts")
 
   def test_invalid_import(self):
     """Test invalid import."""
@@ -62,11 +87,7 @@ class TestAssessmentTemplatesImport(TestCase):
         "Assessment Template": {
             "rows": 4,
             "updated": 0,
-            "created": 3,
-            "row_errors": {
-                errors.MISSING_VALUE_ERROR.format(
-                    line=5, column_name="Default Verifiers")
-            },
+            "created": 4,
             "row_warnings": {
                 errors.UNKNOWN_USER_WARNING.format(
                     line=5,
