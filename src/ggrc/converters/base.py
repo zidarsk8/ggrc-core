@@ -135,8 +135,8 @@ class ImportConverter(BaseConverter):
       converter.import_objects()
 
   def import_secondary_objects(self):
-    for block_converter in self.block_converters:
-      block_converter.import_secondary_objects()
+    for converter in self.block_converters:
+      converter.import_secondary_objects()
 
   def _start_compute_attributes_job(self):
     revision_ids = []
