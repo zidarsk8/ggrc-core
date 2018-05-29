@@ -5,8 +5,6 @@
 from datetime import datetime
 from dateutil.parser import parse
 
-from sqlalchemy import and_
-
 from ggrc import models
 from ggrc import utils
 from ggrc.converters import errors
@@ -65,14 +63,14 @@ class CustomAttributeColumnHandler(handlers.TextColumnHandler):
     Returns:
       CustomAttributeValue with the correct definition type and value.
     """
-    self.definition = self.get_ca_definition()
-    if self.definition is None:
+    definition = self.get_ca_definition()
+    if definition is None:
       # In dry run mode CADs is not created for new objects.
       if not self.dry_run:
         self.add_warning(errors.INVALID_ATTRIBUTE_WARNING,
                          column_name=self.display_name)
       return None
-    type_ = self.definition.attribute_type.split(":")[0]
+    type_ = definition.attribute_type.split(":")[0]
     value_handler = self._type_handlers[type_]
     return value_handler(self)
 
@@ -160,7 +158,8 @@ class CustomAttributeColumnHandler(handlers.TextColumnHandler):
 
   def get_dropdown_value(self):
     """Get valid value of the dropdown field."""
-    choices_list = self.definition.multi_choice_options.split(",")
+    definition = self.get_ca_definition()
+    choices_list = definition.multi_choice_options.split(",")
     valid_choices = [val.strip() for val in choices_list]
     choice_map = {choice.lower(): choice for choice in valid_choices}
     value = choice_map.get(self.raw_value.lower())
@@ -198,7 +197,7 @@ class CustomAttributeColumnHandler(handlers.TextColumnHandler):
       return None  # ignore empty fields
     if self.mandatory and not self.raw_value:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
-      return
+      return None
     value = models.Person.query.filter_by(email=self.raw_value).first()
     if self.mandatory and not value:
       self.add_error(errors.WRONG_VALUE, column_name=self.display_name)
@@ -230,6 +229,5 @@ class ObjectCaColumnHandler(CustomAttributeColumnHandler):
     """Get custom attribute definition for a specific object."""
     if self.row_converter.obj.id is None:
       return None
-    cad = models.CustomAttributeDefinition
     cache = self.row_converter.block_converter.get_ca_definitions_cache()
     return cache.get((self.row_converter.obj.id, self.display_name))
