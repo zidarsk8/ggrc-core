@@ -125,9 +125,9 @@ class ImportConverter(BaseConverter):
       converter.row_converters_from_csv()
 
   def handle_priority_columns(self):
-    for attr_name in self.priority_columns:
-      for block_converter in self.block_converters:
-        block_converter.handle_row_data(attr_name)
+    for converter in self.block_converters:
+      for attr_name in self.priority_columns:
+        converter.handle_row_data(attr_name)
 
   def import_objects(self):
     for converter in self.block_converters:
