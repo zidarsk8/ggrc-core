@@ -190,6 +190,57 @@ class TestUserGenerator(TestCase):
 
   @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
   @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
+  def test_import_no_assignees(self):
+    """Test for import assessment template without default assignees"""
+    with mock.patch.multiple(
+        PersonClient,
+        _post=self._mock_post
+    ):
+      audit = factories.AuditFactory()
+
+      slug = "AssessmentTemplate1"
+      response = self.import_data(OrderedDict([
+          ("object_type", "Assessment_Template"),
+          ("Code*", slug),
+          ("Audit*", audit.slug),
+          ("Default Verifiers", "aturing@example.com"),
+          ("Title", "Title"),
+          ("Object Under Assessment", 'Control'),
+      ]))
+      self._check_csv_response(
+          response,
+          {"Assessment Template": {
+              "row_errors": {errors.MISSING_COLUMN.format(
+                  line=3, column_names="Default Assignees", s="")}}})
+
+  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
+  @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
+  def test_import_empty_assignees(self):
+    """Test for import assessment template with empty default assignees"""
+    with mock.patch.multiple(
+        PersonClient,
+        _post=self._mock_post
+    ):
+      audit = factories.AuditFactory()
+
+      slug = "AssessmentTemplate1"
+      response = self.import_data(OrderedDict([
+          ("object_type", "Assessment_Template"),
+          ("Code*", slug),
+          ("Audit*", audit.slug),
+          ("Default Assignees", ""),
+          ("Default Verifiers", "aturing@example.com"),
+          ("Title", "Title"),
+          ("Object Under Assessment", 'Control'),
+      ]))
+      self._check_csv_response(
+          response,
+          {"Assessment Template": {
+              "row_errors": {errors.WRONG_REQUIRED_VALUE.format(
+                  line=3, value="", column_name="Default Assignees")}}})
+
+  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
+  @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
   def test_wrong_person_import(self):
     """Test for wrong person import"""
     with mock.patch.multiple(
