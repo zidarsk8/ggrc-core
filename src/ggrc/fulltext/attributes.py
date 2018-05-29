@@ -3,6 +3,7 @@
 
 """ This module collect all custom full text attributes classes"""
 
+from logging import getLogger
 from collections import defaultdict
 
 import datetime
@@ -11,6 +12,9 @@ from flask import g
 
 from ggrc.utils import date_parsers
 from ggrc.fulltext.mixin import Indexed
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 EMPTY_SUBPROPERTY_KEY = ''
 
@@ -177,6 +181,12 @@ class CustomRoleAttr(FullTextAttr):
         continue
       if acl.ac_role.internal:
         # Don't index internal roles they are not presented to user.
+        continue
+      if instance.type != acl.ac_role.object_type:
+        logger.warning("Reindex: role %s, id %s is skipped for %s, id %s, "
+                       "because it relates to %s", acl.ac_role.name,
+                       acl.ac_role.id, instance.__class__.__name__,
+                       instance.id, acl.ac_role.object_type)
         continue
       ac_role = acl.ac_role.name
       person_id = acl.person.id
