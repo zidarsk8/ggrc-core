@@ -13,40 +13,38 @@ $window.on('load', function () {
   $('html').removeClass('no-js');
 });
 
-$body.on("click", ".lhn-no-init", function() {
+$body.on('click', '.lhn-no-init', function () {
   $(this).removeClass('lhn-no-init');
   import(/* webpackChunkName: "lhn" */'./controllers/lhn_controllers')
     .then(function () {
-      $("#lhn").cms_controllers_lhn();
+      $('#lhn').cms_controllers_lhn();
       $(document.body).ggrc_controllers_recently_viewed();
     });
 });
 
-$body.on("click", "a[data-toggle=unmap]", function(ev) {
-  let $el = $(this)
-  ;
+$body.on('click', 'a[data-toggle=unmap]', function (ev) {
+  let $el = $(this);
   //  Prevent toggling `openclose` state in trees
   ev.stopPropagation();
   $el.fadeTo('fast', 0.25);
-  $el.children(".result").each(function(i, result_el) {
-    let $result_el = $(result_el)
-      , result = $result_el.data('result')
-      , mappings = result && result.get_mappings();
+  $el.children('.result').each(function (i, resultEl) {
+    let $resultEl = $(resultEl);
+    let result = $resultEl.data('result');
+    let mappings = result && result.get_mappings();
 
-    function notify(instance){
+    function notify(instance) {
       $(document.body).trigger(
-        "ajax:flash"
-        , {"success" : "Unmap successful."}
+        'ajax:flash',
+        {success: 'Unmap successful.'}
       );
     }
 
-    can.each(mappings, function(mapping) {
-      mapping.refresh().done(function() {
+    can.each(mappings, function (mapping) {
+      mapping.refresh().done(function () {
         if (mapping instanceof CMS.Models.Control) {
           mapping.removeAttr('directive');
           mapping.save().then(notify);
-        }
-        else {
+        } else {
           mapping.destroy().then(notify);
         }
       });
@@ -96,7 +94,7 @@ jQuery(function ($) {
           .css({
             width: '100px', height: '100px',
             left: '50%', top: '50%',
-            zIndex: calculate_spinner_z_index
+            zIndex: calculate_spinner_z_index,
           })
       ).one('loaded', function () {
         $(this).find('.source').each(spin);
@@ -108,19 +106,19 @@ jQuery(function ($) {
 });
 
 jQuery(function ($) {
-  function checkActive(notification_configs) {
+  function checkActive(notificationConfigs) {
     let inputs = $('.notify-wrap').find('input');
-    let active_notifications = $.map(notification_configs, function (a) {
+    let activeNotifications = $.map(notificationConfigs, function (a) {
       if (a.enable_flag) {
         return a.notif_type;
       }
     });
     $.map(inputs, function (input) {
       // Handle the default case, in case notification objects are not set:
-      if (notification_configs.length === 0) {
+      if (notificationConfigs.length === 0) {
         input.checked = input.value === 'Email_Digest';
       } else {
-        input.checked = active_notifications.indexOf(input.value) > -1;
+        input.checked = activeNotifications.indexOf(input.value) > -1;
       }
     });
   }
@@ -140,16 +138,16 @@ jQuery(function ($) {
     let li = $(ev.target).closest('.notify-wrap');
     let inputs = li.find('input');
     let active = [];
-    let email_now = li.find('input[value="Email_Now"]');
-    let email_now_label = email_now.closest('label');
-    let email_digest = li.find('input[value="Email_Digest"]');
+    let emailNow = li.find('input[value="Email_Now"]');
+    let emailNowLabel = emailNow.closest('label');
+    let emailDigest = li.find('input[value="Email_Digest"]');
 
-    if (email_digest[0].checked) {
-      email_now_label.removeClass('disabled');
-      email_now.prop('disabled', false);
-    } else if (!email_digest[0].checked) {// uncheck email_now
-      email_now.prop('checked', false);
-      email_now_label.addClass('disabled');
+    if (emailDigest[0].checked) {
+      emailNowLabel.removeClass('disabled');
+      emailNow.prop('disabled', false);
+    } else if (!emailDigest[0].checked) {// uncheck email_now
+      emailNow.prop('checked', false);
+      emailNowLabel.addClass('disabled');
     }
 
     inputs.prop('disabled', true);
@@ -159,9 +157,9 @@ jQuery(function ($) {
       }
     });
     CMS.Models.NotificationConfig.setActive(active).always(function (response) {
-      email_digest.prop('disabled', false);
-      if (email_digest[0].checked) {
-        email_now.prop('disabled', false);
+      emailDigest.prop('disabled', false);
+      if (emailDigest[0].checked) {
+        emailNow.prop('disabled', false);
       }
     });
   });
@@ -171,7 +169,8 @@ jQuery(function ($) {
 jQuery(function ($) {
   $body.on('click', 'a[href]:not([target])', function (e) {
     if (!e.isDefaultPrevented()) {
-      if (/^http/.test(this.protocol) && this.hostname !== window.location.hostname) {
+      if (/^http/.test(this.protocol)
+        && this.hostname !== window.location.hostname) {
         e.preventDefault();
         window.open(this.href);
       }
@@ -208,7 +207,6 @@ $(function () {
       dataSet.params = objectParams && JSON.parse(
         objectParams.replace(/\\n/g, '\\n')
       );
-
 
       can.each($this.data(), function (v, k) {
         //  This is just a mapping of keys to underscored keys
@@ -257,9 +255,10 @@ function openMapperByElement(ev, disableMapper) {
     ev.preventDefault();
   }
 
-  import(/*webpackChunkName: "mapper"*/ './controllers/mapper/mapper').then(mapper => {
-    mapper.ObjectMapper.openMapper(data, disableMapper, btn);
-  });
+  import(/*webpackChunkName: "mapper"*/ './controllers/mapper/mapper')
+    .then((mapper) => {
+      mapper.ObjectMapper.openMapper(data, disableMapper, btn);
+    });
 }
 
 $body.on('openMapper', (el, ev, disableMapper) => {
@@ -267,6 +266,6 @@ $body.on('openMapper', (el, ev, disableMapper) => {
 });
 
 $body.on('click', ['unified-mapper', 'unified-search']
-  .map(val => '[data-toggle="' + val + '"]').join(', '), (ev, disable) => {
+  .map((val) => `[data-toggle="${val}"]`).join(', '), (ev, disable) => {
   openMapperByElement(ev, disable);
 });
