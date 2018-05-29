@@ -113,30 +113,16 @@ class ImportConverter(BaseConverter):
 
   def import_csv_data(self):
     self.initialize_block_converters()
-    self.row_converters_from_csv()
-    self.handle_priority_columns()
-    self.import_objects()
-    self.import_secondary_objects()
-    self._start_compute_attributes_job()
-    self.drop_cache()
-
-  def row_converters_from_csv(self):
     for converter in self.block_converters:
       converter.row_converters_from_csv()
-
-  def handle_priority_columns(self):
-    for converter in self.block_converters:
       for attr_name in self.priority_columns:
         converter.handle_row_data(attr_name)
-
-  def import_objects(self):
-    for converter in self.block_converters:
       converter.handle_row_data()
       converter.import_objects()
-
-  def import_secondary_objects(self):
-    for converter in self.block_converters:
       converter.import_secondary_objects()
+
+    self._start_compute_attributes_job()
+    self.drop_cache()
 
   def _start_compute_attributes_job(self):
     revision_ids = []
