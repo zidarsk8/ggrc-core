@@ -112,6 +112,7 @@ class ImportConverter(BaseConverter):
     self.block_converters.sort(key=lambda x: order[x.name])
 
   def import_csv_data(self):
+    revision_ids = []
     self.initialize_block_converters()
     for converter in self.block_converters:
       converter.row_converters_from_csv()
@@ -121,13 +122,12 @@ class ImportConverter(BaseConverter):
       converter.import_objects()
       converter.import_secondary_objects()
 
-    self._start_compute_attributes_job()
+      revision_ids.extend(converter.revision_ids)
+
+    self._start_compute_attributes_job(revision_ids)
     self.drop_cache()
 
-  def _start_compute_attributes_job(self):
-    revision_ids = []
-    for block_converter in self.block_converters:
-      revision_ids.extend(block_converter.revision_ids)
+  def _start_compute_attributes_job(self, revision_ids):
     if revision_ids:
       cur_user = login.get_current_user()
       deferred.defer(
