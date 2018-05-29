@@ -24,7 +24,7 @@ import tracker from '../tracker';
       'unique_title', 'ca_update',
       'autoStatusChangeable', 'timeboxed', 'mapping-limit',
       'inScopeObjects', 'accessControlList', 'refetchHash',
-      'issueTrackerIntegratable', 'relatedAssessmentsLoader',
+      'assessmentIssueTracker', 'relatedAssessmentsLoader',
     ],
     is_custom_attributable: true,
     isRoleable: true,
