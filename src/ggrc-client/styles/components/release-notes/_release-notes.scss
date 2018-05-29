@@ -7,22 +7,29 @@
   position: relative;
 
   .simple-modal__header-text {
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 24px;
   }
 
   &__body {
     display: block;
     overflow: scroll;
     max-height: calc(100% - 54px - 45px);
+    font-size: 13px;
+    color: transparentize($black, 0.13);
 
     p {
       margin: 13px 0;
+
+      &:first-child {
+        margin-bottom: 32px;
+      }
     }
 
     h1, h2, h3, h4, h5, h6 {
-      margin: 24px 0 0 0;
-      font-size: 110%;
+      margin: 32px 0 0 0;
+      font-size: 16px;
+      font-weight: normal;
+      color: $black;
     }
   }
 
@@ -30,12 +37,12 @@
     display: flex;
     flex: 1;
     justify-content: flex-end;
-    font-size: 80%;
+    font-size: 13px;
   }
 
   &__date {
     padding:  0 20px;
-    color: $gray;
+    color: transparentize($black, 0.5);
   }
 
   .on-top-button {
