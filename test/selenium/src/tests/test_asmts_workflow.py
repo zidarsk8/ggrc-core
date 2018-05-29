@@ -25,6 +25,71 @@ class TestAssessmentsWorkflow(base.Test):
   """Tests for Assessments Workflow functionality."""
   info_service = rest_service.ObjectsInfoService
 
+  @pytest.fixture()
+  def program(self):
+    return rest_facade.create_program()
+
+  @pytest.fixture()
+  def issue_mapped_to_program(self, program):
+    return rest_facade.create_issue(program)
+
+  @pytest.fixture()
+  def control_mapped_to_program(self, program):
+    return rest_facade.create_control(program)
+
+  @pytest.fixture()
+  def controls_mapped_to_program(self, program):
+    return [rest_facade.create_control(program) for _ in xrange(2)]
+
+  @pytest.fixture()
+  def objective_mapped_to_program(self, program):
+    return rest_facade.create_objective(program)
+
+  @pytest.fixture()
+  def objectives_mapped_to_program(self, program):
+    return [rest_facade.create_objective(program) for _ in xrange(2)]
+
+  @pytest.fixture()
+  def audit(self, program):
+    return rest_facade.create_audit(program)
+
+  @pytest.fixture()
+  def audits(self, program):
+    return [rest_facade.create_audit(program) for _ in xrange(2)]
+
+  @pytest.fixture()
+  def obj(self, request):
+    """A fixture that calls any other fixture when parametrization
+    with indirect is used.
+    """
+    return request.getfixturevalue(request.param)
+
+  @staticmethod
+  def _create_mapped_asmt(audit, assessment_type, objs_to_map):
+    """Create assessment with assessment type=`assessment_type` and
+    map it to snapshots of `objs_to_map`"""
+    assessment = rest_facade.create_assessment(
+        audit, assessment_type=assessment_type)
+    for obj in objs_to_map:
+      rest_facade.map_to_snapshot(assessment, obj=obj, parent_obj=audit)
+    assessment.update_attrs(mapped_objects=objs_to_map)
+    return assessment
+
+  def _assert_asmt(self, asmts_ui_service, exp_asmt):
+    """Assert that assessment `exp_asmt` on UI is the same as in
+    `exp_asmt`."""
+    actual_asmt = asmts_ui_service.get_obj_from_info_page(exp_asmt)
+    self.general_equal_assert(
+        exp_asmt.repr_ui(), actual_asmt,
+        "audit",  # not shown in UI
+        "custom_attributes")  # not returned on POST /api/assessments)
+
+  @staticmethod
+  def _related_asmts_of_obj(obj, selenium):
+    """Return related assessments of obj (Control or Objective)"""
+    return factory.get_cls_webui_service(objects.get_plural(
+        obj.type))(selenium).get_obj_related_asmts_titles(obj)
+
   @pytest.mark.smoke_tests
   def test_add_comment_to_asmt_via_info_panel(
       self, new_program_rest, new_audit_rest, new_assessment_rest, selenium
@@ -334,67 +399,8 @@ class TestAssessmentsWorkflow(base.Test):
     self.general_equal_assert(expected_asmt, actual_asmt, "audit")
 
 
-class TestRelatedAssessments(base.Test):
+class TestRelatedAssessments(TestAssessmentsWorkflow):
   """Tests for related assessments"""
-
-  @pytest.fixture()
-  def program(self):
-    return rest_facade.create_program()
-
-  @pytest.fixture()
-  def issue_mapped_to_program(self, program):
-    return rest_facade.create_issue(program)
-
-  @pytest.fixture()
-  def control_mapped_to_program(self, program):
-    return rest_facade.create_control(program)
-
-  @pytest.fixture()
-  def controls_mapped_to_program(self, program):
-    return [rest_facade.create_control(program) for _ in xrange(2)]
-
-  @pytest.fixture()
-  def objective_mapped_to_program(self, program):
-    return rest_facade.create_objective(program)
-
-  @pytest.fixture()
-  def objectives_mapped_to_program(self, program):
-    return [rest_facade.create_objective(program) for _ in xrange(2)]
-
-  @pytest.fixture()
-  def audit(self, program):
-    return rest_facade.create_audit(program)
-
-  @pytest.fixture()
-  def audits(self, program):
-    return [rest_facade.create_audit(program) for _ in xrange(2)]
-
-  @pytest.fixture()
-  def obj(self, request):
-    """A fixture that calls any other fixture when parametrization
-    with indirect is used.
-    """
-    return request.getfixturevalue(request.param)
-
-  @staticmethod
-  def _create_mapped_asmt(audit, assessment_type, objs_to_map):
-    """Create assessment with assessment type=`assessment_type` and
-    map it to snapshots of `objs_to_map`"""
-    assessment = rest_facade.create_assessment(
-        audit, assessment_type=assessment_type)
-    for obj in objs_to_map:
-      rest_facade.map_to_snapshot(assessment, obj=obj, parent_obj=audit)
-    assessment.update_attrs(mapped_objects=objs_to_map)
-    return assessment
-
-  def _assert_asmt(self, asmts_ui_service, exp_asmt):
-    """Assert that assessment `exp_asmt` on UI is the same as in
-    `exp_asmt`."""
-    actual_asmt = asmts_ui_service.get_obj_from_info_page(exp_asmt)
-    self.general_equal_assert(
-        exp_asmt.repr_ui(), actual_asmt,
-        "audit",  # not shown in UI
-        "custom_attributes")  # not returned on POST /api/assessments)
 
   def _assert_asmt_with_related_asmts(
       self, checked_asmt, related_asmts_titles, selenium
@@ -407,24 +413,6 @@ class TestRelatedAssessments(base.Test):
     self._assert_asmt(asmts_ui_service, checked_asmt)
     assert asmts_ui_service.get_asmt_related_asmts_titles(checked_asmt) == \
         related_asmts_titles
-
-  def _assert_asmt_with_related_issues(
-      self, checked_asmt, related_issues_titles, selenium
-  ):
-    """Assert that assessment `checked_asmt` on UI is the same as in
-    `checked_asmt`.
-    Also assert that `Issues title` on "Related Issues" tab are
-    the same as in `related_issues_titles`."""
-    asmts_ui_service = webui_service.AssessmentsService(selenium)
-    self._assert_asmt(asmts_ui_service, checked_asmt)
-    assert asmts_ui_service.get_related_issues_titles(
-        checked_asmt) == related_issues_titles
-
-  @staticmethod
-  def _related_asmts_of_obj(obj, selenium):
-    """Return related assessments of obj (Control or Objective)"""
-    return factory.get_cls_webui_service(objects.get_plural(
-        obj.type))(selenium).get_obj_related_asmts_titles(obj)
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
@@ -611,8 +599,39 @@ class TestRelatedAssessments(base.Test):
     assert self._related_asmts_of_obj(obj, selenium) ==\
         related_asmts_titles[::-1]
 
-  def test_asmts_different_types_mapped_to_same_control_w_issue(
-      self, control_mapped_to_program, issue_mapped_to_program, audit, selenium
+
+class TestRelatedIssues(TestAssessmentsWorkflow):
+  """Tests for related issues"""
+
+  def _assert_asmt_with_related_issues(
+      self, checked_asmt, related_issues_titles, selenium
+  ):
+    """Assert that assessment `checked_asmt` on UI is the same as in
+    `checked_asmt`.
+    Also assert that `Issues title` on "Related Issues" tab are
+    the same as in `related_issues_titles`."""
+    asmts_ui_service = webui_service.AssessmentsService(selenium)
+    self._assert_asmt(asmts_ui_service, checked_asmt)
+    assert asmts_ui_service.get_related_issues_titles(
+        checked_asmt) == related_issues_titles
+
+  def _create_asmt_mapped_to_control_mapped_to_issue(
+      self, asmt_type, audit, control, issue
+  ):
+    """Map 'control' to 'issue'.
+    Return create assessment with 'asmt_type' and map to 'control'."""
+    rest_facade.map_objs(control, issue)
+    return self._create_mapped_asmt(
+        audit=audit, assessment_type=asmt_type,
+        objs_to_map=[control])
+
+  @pytest.mark.parametrize(
+      "assessment_type",
+      ["Control", "Objective"]
+  )
+  def test_related_issues_on_different_asmt_types(
+      self, assessment_type, control_mapped_to_program,
+      issue_mapped_to_program, audit, selenium
   ):
     """Objects structure:
     Program
@@ -622,16 +641,13 @@ class TestRelatedAssessments(base.Test):
       -> Asmt-2 with type Objective. Map to Control.
     As a result, Asmt-1 has related issue
       and Asmt-2 doesn't have related issue."""
-    rest_facade.map_objs(control_mapped_to_program, issue_mapped_to_program)
-    assessments = [self._create_mapped_asmt(
-        audit=audit, assessment_type=assessment_type,
-        objs_to_map=[control_mapped_to_program])
-        for assessment_type in ["Control", "Objective"]]
+    assessment = self._create_asmt_mapped_to_control_mapped_to_issue(
+        assessment_type, audit, control_mapped_to_program,
+        issue_mapped_to_program)
+    exp_related_issues_titles = []
+    if assessment_type == "Control":
+      exp_related_issues_titles = [issue_mapped_to_program.title]
     self._assert_asmt_with_related_issues(
-        checked_asmt=assessments[0],
-        related_issues_titles=[issue_mapped_to_program.title],
-        selenium=selenium)
-    self._assert_asmt_with_related_issues(
-        checked_asmt=assessments[1],
-        related_issues_titles=[],
+        checked_asmt=assessment,
+        related_issues_titles=exp_related_issues_titles,
         selenium=selenium)
