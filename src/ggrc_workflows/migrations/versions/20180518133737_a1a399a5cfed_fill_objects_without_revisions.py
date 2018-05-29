@@ -16,7 +16,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'a1a399a5cfed'
-down_revision = '5206dc9f95f0'
+down_revision = 'fd8706aad739'
 
 
 def _add_model_inst_to_obj_without_rev(connection, model_name, table_name):
