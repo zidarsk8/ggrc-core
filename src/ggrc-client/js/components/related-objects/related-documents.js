@@ -8,16 +8,19 @@ import {
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import {initCounts} from '../../plugins/utils/current-page-utils';
+import {
+  REFRESH_MAPPING,
+  DESTINATION_UNMAPPED,
+} from '../../events/eventTypes';
 import pubsub from '../../pub-sub';
 
 (function (can, $, _, GGRC) {
   'use strict';
 
-  let DOCUMENT_KIND_MAP = {};
-
-  DOCUMENT_KIND_MAP[CMS.Models.Document.FILE] = 'documents_file';
-  DOCUMENT_KIND_MAP[CMS.Models.Document.URL] = 'documents_url';
-  DOCUMENT_KIND_MAP[CMS.Models.Document.REFERENCE_URL] = 'documents_reference_url';
+  let DOCUMENT_KIND_MAP = {
+    FILE: 'documents_file',
+    REFERENCE_URL: 'documents_reference_url',
+  };
 
   GGRC.Components('relatedDocuments', {
     tag: 'related-documents',
@@ -154,8 +157,7 @@ import pubsub from '../../pub-sub';
 
         return this.saveDocument(document)
           .then(this.createRelationship.bind(this))
-          .then(function (result) {
-            self.fetchAndUpdate(self.instance);
+          .then(function () {
             self.refreshRelatedDocuments();
           })
           .fail(function (err) {
@@ -163,12 +165,6 @@ import pubsub from '../../pub-sub';
           })
           .done(function () {
             self.attr('isLoading', false);
-          });
-      },
-      removeRelationship: function (relationship) {
-        return relationship.refresh()
-          .then(function (refreshedRelationship) {
-            return refreshedRelationship.destroy();
           });
       },
       removeRelatedDocument: async function (document) {
@@ -190,9 +186,8 @@ import pubsub from '../../pub-sub';
         this.attr('isLoading', true);
         this.attr('documents', documents);
 
-        return this.removeRelationship(relationship)
+        return relationship.destroy()
           .then(function () {
-            self.fetchAndUpdate(self.instance);
             self.refreshRelatedDocuments();
           })
           .fail(function (err) {
@@ -227,11 +222,6 @@ import pubsub from '../../pub-sub';
           self.attr('isLoading', false);
         });
       },
-      fetchAndUpdate: function (instance) {
-        instance.refresh().then(function (refreshed) {
-          refreshed.save();
-        });
-      },
       refreshRelatedDocuments: function () {
         if (this.autorefresh) {
           this.loadDocuments();
@@ -262,9 +252,24 @@ import pubsub from '../../pub-sub';
       '{viewModel.instance} resolvePendingBindings': function () {
         this.viewModel.refreshRelatedDocuments();
       },
+      [`{viewModel.instance} ${REFRESH_MAPPING.type}`](instance, event) {
+        if (this.viewModel.attr('modelType') === event.destinationType) {
+          this.viewModel.refreshRelatedDocuments();
+        }
+      },
+      [`{viewModel.instance} ${DESTINATION_UNMAPPED.type}`](instance, event) {
+        let item = event.item;
+        let viewModel = this.viewModel;
+
+        if (item.attr('type') === viewModel.attr('modelType')
+          && item.attr('kind') === viewModel.attr('kind')) {
+          viewModel.loadDocuments();
+        }
+      },
       '{pubsub} objectDeleted'(pubsub, event) {
         let instance = event.instance;
-        if (instance instanceof CMS.Models.Evidence) {
+        if (instance instanceof CMS.Models.Evidence ||
+          instance instanceof CMS.Models.Document) {
           this.viewModel.refreshRelatedDocuments();
         }
       },

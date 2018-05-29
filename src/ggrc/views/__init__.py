@@ -12,11 +12,12 @@ import logging
 import sqlalchemy
 from sqlalchemy import true
 from flask import flash
+from flask import Response
 from flask import g
 from flask import render_template
 from flask import url_for
 from flask import request
-from werkzeug.exceptions import Forbidden
+from werkzeug import exceptions
 
 from ggrc import models
 from ggrc import settings
@@ -47,6 +48,7 @@ from ggrc.views import converters
 from ggrc.views import cron
 from ggrc.views import filters
 from ggrc.views import notifications
+from ggrc.views.utils import DocumentEndpoint
 from ggrc.views.registry import object_view
 from ggrc import utils
 from ggrc.utils import benchmark, helpers
@@ -544,7 +546,7 @@ def admin_refresh_revisions():
   """Calls a webhook that refreshes revision content."""
   admins = getattr(settings, "BOOTSTRAP_ADMIN_USERS", [])
   if get_current_user().email not in admins:
-    raise Forbidden()
+    raise exceptions.Forbidden()
 
   task_queue = create_task("refresh_revisions", url_for(
       refresh_revisions.__name__), refresh_revisions)
@@ -574,7 +576,7 @@ def admin_propagate_acl():
   """Propagates all ACL entries"""
   admins = getattr(settings, "BOOTSTRAP_ADMIN_USERS", [])
   if get_current_user().email not in admins:
-    raise Forbidden()
+    raise exceptions.Forbidden()
 
   task_queue = create_task("propagate_acl", url_for(
       propagate_acl.__name__), propagate_acl)
@@ -590,7 +592,7 @@ def admin_create_missing_revisions():
   """Create revisions for new objects"""
   admins = getattr(settings, "BOOTSTRAP_ADMIN_USERS", [])
   if get_current_user().email not in admins:
-    raise Forbidden()
+    raise exceptions.Forbidden()
 
   task_queue = create_task("create_missing_revisions", url_for(
       create_missing_revisions.__name__), create_missing_revisions)
@@ -706,3 +708,32 @@ def user_permissions():
      logged in user
   '''
   return get_permissions_json()
+
+
+@app.route("/api/document/documents_exist", methods=["POST"])
+@login_required
+def is_document_exists():
+  """Check if documents with gdrive_ids are exists"""
+  DocumentEndpoint.validate_doc_request(request.json)
+  ids = request.json["gdrive_ids"]
+  result_set = db.session.query(all_models.Document.id,
+                                all_models.Document.gdrive_id).filter(
+      all_models.Document.gdrive_id.in_(ids))
+  response = DocumentEndpoint.build_doc_exists_response(request.json,
+                                                        result_set)
+  return Response(json.dumps(response), mimetype='application/json')
+
+
+@app.route("/api/document/make_admin", methods=["POST"])
+@login_required
+def make_document_admin():
+  """Add current user as document admin"""
+  DocumentEndpoint.validate_doc_request(request.json)
+  ids = request.json["gdrive_ids"]
+  docs = all_models.Document.query.filter(
+      all_models.Document.gdrive_id.in_(ids))
+  for doc in docs:
+    doc.add_admin_role()
+  db.session.commit()
+  response = DocumentEndpoint.build_make_admin_response(request.json, docs)
+  return Response(json.dumps(response), mimetype='application/json')
