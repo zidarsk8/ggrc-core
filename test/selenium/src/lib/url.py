@@ -16,6 +16,7 @@ API = "api"
 LOGIN = "login"
 DASHBOARD = "dashboard"
 ADMIN_DASHBOARD = "admin"
+PEOPLE_TAB = "#!people_list_widget"
 AUDIT = AUDITS + "/{0}"
 RELATIONSHIPS = "relationships"
 OBJECT_OWNERS = "object_owners"
@@ -53,6 +54,7 @@ class Urls(object):
 
   def __init__(self):
     self.admin_dashboard = environment.app_url + ADMIN_DASHBOARD
+    self.admin_people_tab = self.admin_dashboard + PEOPLE_TAB
     self.dashboard = environment.app_url + DASHBOARD
     self.login = environment.app_url + LOGIN
     self.gae_login = environment.app_url + GAE_LOGIN

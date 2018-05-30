@@ -316,6 +316,16 @@ class BaseModalCreateNew(object):
               MODAL + " .modal-body form>div:nth-child(2) .span6>input")
 
 
+class ModalCreateNewPerson(BaseModalCreateNew):
+  """Locators for Create new person modal."""
+  MODAL = Common.MODAL_CREATE
+  # user input elements
+  NAME = (By.CSS_SELECTOR, MODAL + ' #person_name')
+  EMAIL = (By.CSS_SELECTOR, MODAL + ' #person_email')
+  BUTTON_SAVE_AND_CLOSE = (By.CSS_SELECTOR,
+                           MODAL + ' [data-toggle="modal-submit"]')
+
+
 class ModalCreateNewObject(BaseModalCreateNew):
   """Locators for Create new object modals."""
   MODAL = Common.MODAL_CREATE
@@ -919,6 +929,14 @@ class WidgetAdminEvents(object):
   FIRST_TREE_VIEW_ITEM = (
       By.CSS_SELECTOR,
       "{0} {1}:first-child".format(_BASE_CSS_SELECTOR, _TREE_ITEMS_SELECTOR))
+
+
+class WidgetAdminPeople(object):
+  """Locators for People widget on Admin Dashboard."""
+  FILTER_BY_NAME_EMAIL_COM_FIELD_SELECTOR = (
+      By.CSS_SELECTOR, "[name=search]")
+  CREATE_PERSON_BUTTON_SELECTOR = (
+      By.CSS_SELECTOR, '.create-button')
 
 
 class CommonDropdownMenu(object):

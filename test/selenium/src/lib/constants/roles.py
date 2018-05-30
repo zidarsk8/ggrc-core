@@ -7,7 +7,7 @@ from lib.service.rest.client import RestClient
 
 
 # global roles
-NO_ROLE = "No role"
+NO_ROLE = "No Role"
 NO_ROLE_UI = "(Inactive user)"
 ADMIN = "Admin"
 CREATOR = "Creator"
