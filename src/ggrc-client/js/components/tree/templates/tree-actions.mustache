@@ -9,30 +9,17 @@
   {{/if}}
   {{#if show3bbs}}
     <three-dots-menu>
-      {{^if isSnapshots}}
-        {{#is_allowed 'update' model.shortName context=parentInstance.context}}
-          <li>
-            <a href="/import"
-                target="_blank"
-                class="section-import">
-              <i class="fa fa-fw fa-cloud-upload"></i>
-              Import {{model.title_plural}}
-            </a>
-          </li>
-        {{else}}
-          {{#is_auditor}}
-            <li>
-              <a href="/import"
-                  target="_blank"
-                  class="section-import">
-                <i class="fa fa-fw fa-cloud-upload"></i>
-                Import {{model.model_plural}}
-              </a>
-            </li>
-          {{/is_auditor}}
-        {{/is_allowed}}
+      {{#if showImport}}
+        <li>
+          <a href="/import"
+              target="_blank"
+              class="section-import">
+            <i class="fa fa-fw fa-cloud-upload"></i>
+            Import {{model.title_plural}}
+          </a>
+        </li>
       {{/if}}
-      {{#if showedItems.length}}
+      {{#if showExport}}
         <li>
           <a href="/export?model_type={{model.model_singular}}&relevant_type={{parentInstance.type}}&relevant_id={{parentInstance.id}}{{#if isSnapshots}}&isSnapshots=true{{/if}}"
               target="_blank"

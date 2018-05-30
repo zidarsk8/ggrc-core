@@ -5,6 +5,8 @@
 
 import Component from '../tree-actions';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
+import * as AclUtils from '../../../plugins/utils/acl-utils';
+import Permission from '../../../permission';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
 describe('tree-actions component', () => {
@@ -103,5 +105,50 @@ describe('tree-actions component', () => {
           expect(vm.attr('isSnapshots')).toBeFalsy();
         });
     });
+  });
+
+  describe('showImport get() method', () => {
+    beforeEach(() => {
+      vm.attr('model', {shortName: 'shortName'});
+      vm.attr('parentInstance', {context: {}});
+    });
+
+    it('returns true when objects are not snapshots and user has permissions',
+      () => {
+        spyOn(Permission, 'is_allowed').and.returnValue(true);
+
+        expect(vm.attr('showImport')).toBeTruthy();
+      });
+
+    it('returns false for snapshots', () => {
+      vm.attr('options', {objectVersion: {data: 'Data'}});
+      spyOn(Permission, 'is_allowed').and.returnValue(true);
+
+      expect(vm.attr('showImport')).toBeFalsy();
+    });
+
+    it(`returns false when user does not have update permissions
+      and is not auditor`, () => {
+        spyOn(Permission, 'is_allowed').and.returnValue(false);
+        spyOn(AclUtils, 'isAuditor').and.returnValue(false);
+
+        expect(vm.attr('showImport')).toBeFalsy();
+      });
+
+    it('returns true when user has update permissions but is not auditor',
+      () => {
+        spyOn(Permission, 'is_allowed').and.returnValue(true);
+        spyOn(AclUtils, 'isAuditor').and.returnValue(false);
+
+        expect(vm.attr('showImport')).toBeTruthy();
+      });
+
+    it(`returns true when user has auditor rights
+      but does not have update permissions`, () => {
+        spyOn(Permission, 'is_allowed').and.returnValue(false);
+        spyOn(AclUtils, 'isAuditor').and.returnValue(true);
+
+        expect(vm.attr('showImport')).toBeTruthy();
+      });
   });
 });

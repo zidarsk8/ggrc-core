@@ -8,9 +8,13 @@ import {
   isMyAssessments,
 } from '../../plugins/utils/current-page-utils';
 import {
+  isAuditor,
+} from '../../plugins/utils/acl-utils';
+import {
   isSnapshotModel,
   isSnapshotScope,
 } from '../../plugins/utils/snapshot-utils';
+import Permission from '../../permission';
 import template from './templates/tree-actions.mustache';
 
 export default can.Component.extend({
@@ -58,6 +62,22 @@ export default can.Component.extend({
         type: 'boolean',
         get: function () {
           return this.attr('options.showBulkUpdate');
+        },
+      },
+      showImport: {
+        type: 'boolean',
+        get() {
+          let instance = this.attr('parentInstance');
+          let model = this.attr('model');
+          return !this.attr('isSnapshots') &&
+            (Permission.is_allowed('update', model.shortName, instance.context)
+              || isAuditor(instance, GGRC.current_user));
+        },
+      },
+      showExport: {
+        type: 'boolean',
+        get() {
+          return this.attr('showedItems').length;
         },
       },
     },
