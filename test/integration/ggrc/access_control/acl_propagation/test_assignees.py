@@ -133,7 +133,6 @@ class TestAssigneesPropagation(base.TestACLPropagation):
               "unmap": False,
           },
           "Evidence Audit": {
-              "create": False,
               "create_and_map": False,
               "read": True,
               "update": False,
@@ -142,7 +141,7 @@ class TestAssigneesPropagation(base.TestACLPropagation):
               "read_comments": True
           },
           "Evidence Assessment": {
-              "create": (True, "unimplemented"),
+              "create_and_map": True,
               "read": True,
               "update": True,
               "delete": False,
@@ -208,7 +207,6 @@ class TestAssigneesPropagation(base.TestACLPropagation):
               "add_comment": True,
           },
           "Evidence Assessment": {
-              "create": True,
               "create_and_map": True,
               "read": True,
               "update": True,
