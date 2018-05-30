@@ -81,7 +81,7 @@ class MetaInfo(object):
     """Return fields Field structures for sent instance."""
     return [
         Field(c.name,
-              not c.nullable and c.name not in self._mandatory_attributes)
+              not c.nullable or c.name in self._mandatory_attributes)
         for c in sa.inspection.inspect(self.instance.__class__).columns
         if not c.foreign_keys and c.name in self._updateable_attributes]
 
