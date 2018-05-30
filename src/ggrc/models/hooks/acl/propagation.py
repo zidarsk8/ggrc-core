@@ -414,6 +414,7 @@ def propagate_all():
             propagated_count,
             count
         )
-        flask.g.new_wf_acls = acl_ids
+        flask.g.new_wf_acls = set(acl_ids)
+        flask.g.new_wf_comment_ct_ids = set()
         flask.g.deleted_wf_objects = set()
         workflow.handle_acl_changes()
