@@ -83,17 +83,6 @@ import {
             return binding.instance || binding;
           })));
       },
-      '{viewModel} list': function () {
-        let person;
-        // Workaround so we render pre-defined users.
-        if (~['owners'].indexOf(this.viewModel.mapping) &&
-          this.viewModel.list && !this.viewModel.list.length) {
-          person = CMS.Models.Person.findInCacheById(GGRC.current_user.id);
-          this.viewModel.instance
-            .mark_for_addition(this.viewModel.mapping, person, {});
-          this.addListItem(person);
-        }
-      },
       deferred_update: function () {
         let changes = this.viewModel.changes;
         let instance = this.viewModel.instance;
