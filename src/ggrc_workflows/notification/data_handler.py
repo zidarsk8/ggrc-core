@@ -579,17 +579,13 @@ def get_cycle_task_dict(cycle_task, del_rels_cache=None):
         u"{} [removed from task]".format(object_data.content["display_name"])
     )
 
-  # the filter expression to be included in the cycle task's URL and
-  # automatically applied when user visits it
-  filter_exp = u"id=" + unicode(cycle_task.cycle_id)
-
   return {
       "title": cycle_task.title,
       "related_objects": object_titles,
       "end_date": cycle_task.end_date.strftime("%m/%d/%Y"),
       "due_date_statement": utils.get_digest_date_statement(
           cycle_task.end_date, "due"),
-      "cycle_task_url": get_cycle_task_url(cycle_task, filter_exp=filter_exp),
+      "cycle_task_url": get_cycle_task_url(),
   }
 
 
@@ -609,22 +605,9 @@ def get_workflow_url(workflow):
   return urljoin(get_url_root(), url)
 
 
-def get_cycle_task_url(cycle_task, filter_exp=u""):
-  if filter_exp:
-    filter_exp = u"?filter=" + urllib.quote(filter_exp)
-
-  url = (u"/workflows/{workflow_id}"
-         u"{filter_exp}"
-         u"#current_widget/cycle/{cycle_id}"
-         u"/cycle_task_group/{cycle_task_group_id}"
-         u"/cycle_task_group_object_task/{cycle_task_id}").format(
-      workflow_id=cycle_task.cycle_task_group.cycle.workflow.id,
-      filter_exp=filter_exp,
-      cycle_id=cycle_task.cycle_task_group.cycle.id,
-      cycle_task_group_id=cycle_task.cycle_task_group.id,
-      cycle_task_id=cycle_task.id,
-  )
-  return urljoin(get_url_root(), url)
+def get_cycle_task_url():
+  """Get CycleTask notification url."""
+  return urljoin(get_url_root(), u"dashboard#!task_widget")
 
 
 def cycle_task_group_url(cycle_task, filter_exp=u""):
