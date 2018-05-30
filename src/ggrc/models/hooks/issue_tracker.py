@@ -149,6 +149,17 @@ _VERIFIER_STATUSES = {
     ('Completed', 'Deprecated', True): 'OBSOLETE',
 }
 
+# status transition map for issue
+_VERIFIER_STATUSES = {
+    'Not Started': 'Assigned',
+    'In Progress': 'Assigned',
+    'In Review': 'Fixed',
+    'Rework Needed': 'Assigned',
+    'Completed': 'Fixed',
+    'Verified': 'Fixed',
+    'Deprecated': "Won't Fix (Obsolete)*"
+}
+
 
 def _handle_assessment_tmpl_post(sender, objects=None, sources=None):
   """Handles create event to AssessmentTemplate model."""
@@ -801,6 +812,7 @@ def _update_issuetracker_issue(assessment, issue_tracker_info,
     issue_params['assignee'] = assignee_email
     issue_params['verifier'] = assignee_email
     issue_params['ccs'] = cc_list
+    issue_tracker_info['issue_type'] = _update_issue_type(assessment.status)
 
   if issue_params:
     # Resend all properties upon any change.
@@ -815,3 +827,7 @@ def _update_issuetracker_info(assessment, issue_tracker_info):
 
   all_models.IssuetrackerIssue.create_or_update_from_dict(
       assessment, issue_tracker_info)
+
+
+def _update_issue_type(assessment_status):
+  return _VERIFIER_STATUSES[assessment_status]
