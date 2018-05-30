@@ -781,3 +781,11 @@ class BlockConverter(object):
     checker = pre_commit_checks.CHECKS.get(type(row_converter.obj).__name__)
     if checker and callable(checker):
       checker(row_converter)
+
+
+class ImportBlockConverter(BlockConverter):
+  pass
+
+
+class ExportBlockConverter(BlockConverter):
+  pass
