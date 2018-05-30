@@ -102,6 +102,14 @@ def equalize_array(array):
   return array
 
 
+def split_blocks(csv_data):
+  """Split array by empty lines and skip blocks shorter than 2 lines."""
+
+  return ((offset, data_block)
+          for offset, data_block in split_array(csv_data)
+          if len(data_block) >= 2)
+
+
 def split_array(csv_data):
   """Split array by empty lines.
 
@@ -202,13 +210,11 @@ def count_objects(csv_data):
     return info
 
   exportables = get_exportables()
-  offsets_and_data_blocks = split_array(csv_data)
+  offsets_and_data_blocks = split_blocks(csv_data)
   blocks_info = []
   failed = False
   counts = {}
   for offset, data in offsets_and_data_blocks:
-    if len(data) < 2:
-      continue  # empty block
     class_name = data[1][0].strip().lower()
     object_class = exportables.get(class_name, "")
     rows = len(data) - 2

@@ -17,7 +17,7 @@ from ggrc.converters import import_helper
 from ggrc.converters.base_block import BlockConverter
 from ggrc.converters.snapshot_block import SnapshotBlockConverter
 from ggrc.converters.import_helper import extract_relevant_data
-from ggrc.converters.import_helper import split_array
+from ggrc.converters.import_helper import split_blocks
 from ggrc.converters.import_helper import CsvStringBuilder
 from ggrc.fulltext import get_indexer
 
@@ -90,10 +90,8 @@ class ImportConverter(BaseConverter):
 
     Prepare BlockConverters and order them like specified in self.CLASS_ORDER.
     """
-    offsets_and_data_blocks = split_array(self.csv_data)
+    offsets_and_data_blocks = split_blocks(self.csv_data)
     for offset, data in offsets_and_data_blocks:
-      if len(data) < 2:
-        continue  # empty block
       class_name = data[1][0].strip().lower()
       object_class = self.exportable.get(class_name)
       raw_headers, rows = extract_relevant_data(data)
