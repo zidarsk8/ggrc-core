@@ -658,10 +658,9 @@ can.Control('CMS.Controllers.LHN_Search', {
     can.each(new_visible_list, function (item) {
       refresh_queue.enqueue(item);
     });
-    refresh_queue.trigger().then(function () {
-      visible_list.push.apply(visible_list, new_visible_list);
+    refresh_queue.trigger().then(function (newItems) {
+      visible_list.push.apply(visible_list, newItems);
       visible_list.attr('is_loading', false);
-        // visible_list.replace(new_visible_list);
       delete that._show_more_pending;
     }).done(stopFn);
     visible_list.attr('is_loading', true);
@@ -792,14 +791,14 @@ can.Control('CMS.Controllers.LHN_Search', {
       initial_visible_list =
           self.options.results_lists[model_name].slice(0, self.options.limit);
 
-      can.each(initial_visible_list, function (obj) {
-        refresh_queue.enqueue(obj);
-      });
+        can.each(initial_visible_list, function (obj) {
+          refresh_queue.enqueue(obj);
+        });
 
-      function finish_display(_) {
+      function finish_display(results) {
         can.Map.startBatch();
         self.options.visible_lists[model_name].attr('is_loading', false);
-        self.options.visible_lists[model_name].replace(initial_visible_list);
+        self.options.visible_lists[model_name].replace(results);
         can.Map.stopBatch();
         setTimeout(function () {
           $list.trigger('list_displayed', model_name);
@@ -813,12 +812,12 @@ can.Control('CMS.Controllers.LHN_Search', {
             , my_work: my_work
             , extra_params: extra_params
             , type: model_name
-            , keys: ['title', 'contact', 'private', 'viewLink']
+            , keys: ['title', 'contact', 'private', 'viewLink', 'audit', 'selfLink']
         }).save();
         return d;
       });
       if (display_now) {
-        finish_display();
+        finish_display(initial_visible_list);
       } else {
         dfd = dfd.then(finish_display);
       }
