@@ -47,6 +47,7 @@ import {
     Contract: 'Clause',
     Control: 'Objective',
     System: 'Product',
+    Metric: 'Product',
     Process: 'Risk',
     AccessGroup: 'System',
     Clause: 'Contract',
