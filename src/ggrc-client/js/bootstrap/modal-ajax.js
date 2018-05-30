@@ -104,8 +104,7 @@ import Permission from '../permission';
       var objectParams = $trigger.attr('data-object-params');
       var extendNewInstance = $trigger.attr('data-extend-new-instance');
       var triggerParent = $trigger.closest('.add-button');
-      var model = CMS.Models[$trigger.attr('data-object-singular')] ||
-        CMS.ModelHelpers[$trigger.attr('data-object-singular')];
+      var model = CMS.Models[$trigger.attr('data-object-singular')];
       var mapping = $trigger.data('mapping');
       var isProposal = $trigger.data('is-proposal');
       var instance;

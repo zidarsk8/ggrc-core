@@ -53,5 +53,4 @@ import './cycle_models';
 import './task_group';
 import './workflow';
 import './workflow_join_models';
-import './helpers';
 import './proposal';
