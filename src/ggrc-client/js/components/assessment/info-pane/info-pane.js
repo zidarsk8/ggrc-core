@@ -460,6 +460,24 @@ export default can.Component.extend({
         convertValuesToFormFields(cavs)
       );
     },
+    reinitFormFields() {
+      const cavs = getCustomAttributes(
+        this.attr('instance'),
+        CA_UTILS_CA_TYPE.LOCAL
+      );
+
+      let updatedFormFields = convertValuesToFormFields(cavs);
+      let updatedFieldsIds = _.indexBy(updatedFormFields, 'id');
+
+      this.attr('formFields').forEach((field) => {
+        let updatedField = updatedFieldsIds[field.attr('id')];
+
+        if (updatedField &&
+          field.attr('value') !== updatedField.attr('value')) {
+          field.attr('value', updatedField.attr('value'));
+        }
+      });
+    },
     initGlobalAttributes: function () {
       const instance = this.attr('instance');
       const caObjects = instance
@@ -590,6 +608,15 @@ export default can.Component.extend({
         ...REFRESH_RELATED,
         model: event.destinationType,
       });
+    },
+    '{viewModel.instance} updated'() {
+      const vm = this.viewModel;
+      const isPending = vm.attr('deferredSave').isPending();
+      if (!isPending) {
+        // reinit LCA when queue is empty
+        // to avoid rewriting of changed values
+        vm.reinitFormFields();
+      }
     },
     '{viewModel.instance} modelBeforeSave': function () {
       this.viewModel.attr('isAssessmentSaving', true);
