@@ -83,11 +83,7 @@ def get_myobjects_query(types=None, contact_id=None):  # noqa
   type_union_queries = []
 
   def _get_tasks_in_cycle(model):
-    """Filter tasks with particular statuses and cycle.
-
-    Filtering tasks with statuses "Assigned", "In Progress" and "Finished".
-    Where the task is in current users cycle.
-    """
+    """Filter tasks with current user cycle."""
     task_query = db.session.query(
         model.id.label('id'),
         literal(model.__name__).label('type'),
@@ -115,7 +111,10 @@ def get_myobjects_query(types=None, contact_id=None):  # noqa
                 ("Task Assignees", "Task Secondary Assignees")),
         )
     ).filter(
-        Cycle.is_current == true(),
+        and_(
+            Cycle.is_current == true(),
+            all_models.AccessControlRole.read == true()
+        )
     )
     return task_query
 
