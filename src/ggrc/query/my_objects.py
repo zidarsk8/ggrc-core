@@ -5,8 +5,6 @@
 import sqlalchemy as sa
 from sqlalchemy import and_
 from sqlalchemy import literal
-from sqlalchemy import true
-from sqlalchemy import union
 from sqlalchemy import alias
 from ggrc import db
 from ggrc.models import all_models
@@ -62,8 +60,8 @@ def _get_custom_roles(contact_id, model_names):
       and_(
           all_models.AccessControlList.person_id == contact_id,
           all_models.AccessControlList.object_type.in_(model_names),
-          all_models.AccessControlRole.my_work == true(),
-          all_models.AccessControlRole.read == true()
+          all_models.AccessControlRole.my_work == sa.true(),
+          all_models.AccessControlRole.read == sa.true()
       )
   )
   return custom_roles_query
@@ -112,8 +110,9 @@ def get_myobjects_query(types=None, contact_id=None):  # noqa
         )
     ).filter(
         and_(
-            Cycle.is_current == true(),
-            all_models.AccessControlRole.read == true()
+            Cycle.is_current == sa.true(),
+            all_models.AccessControlRole.read == sa.true(),
+            all_models.AccessControlRole.internal == sa.false(),
         )
     )
     return task_query
@@ -140,4 +139,4 @@ def get_myobjects_query(types=None, contact_id=None):  # noqa
     if model is all_models.Person:
       type_union_queries.append(_get_people())
 
-  return alias(union(*type_union_queries))
+  return alias(sa.union(*type_union_queries))
