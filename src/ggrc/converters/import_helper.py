@@ -108,7 +108,7 @@ def split_array(csv_data):
   Args:
     csv_data - list of lists of strings (parsed CSV)
 
-  Returns:
+  Yields:
 
     [(offset, data_block)] - offset is the index of the starting line
                              in the block, data_block is a slice of
@@ -117,7 +117,6 @@ def split_array(csv_data):
   def line_is_empty(list_of_strs):
     return not any(cell for cell in list_of_strs)
 
-  result = []
   current_offset = current_block = None
 
   for offset, line in enumerate(csv_data):
@@ -126,7 +125,7 @@ def split_array(csv_data):
         # starting or repeating empty lines, just skip
         continue
       # empty line after non-empty line, end of block
-      result.append(current_offset, current_block)
+      yield current_offset, current_block
       current_offset = current_block = None
     else:
       if current_block is None:
@@ -138,9 +137,7 @@ def split_array(csv_data):
         current_block.append(line)
 
   if current_block is not None:
-    result.append(current_offset, current_block)
-
-  return result
+    yield current_offset, current_block
 
 
 def generate_2d_array(width, height, value=None):
