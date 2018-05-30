@@ -110,15 +110,14 @@ def split_array(csv_data):
 
   Returns:
 
-    ([offsets], [data_blocks]) - offset is the index of the starting line
+    [(offset, data_block)] - offset is the index of the starting line
                              in the block, data_block is a slice of
                              csv_data
   """
   def line_is_empty(list_of_strs):
     return not any(cell for cell in list_of_strs)
 
-  offsets = []
-  data_blocks = []
+  result = []
   current_offset = current_block = None
 
   for offset, line in enumerate(csv_data):
@@ -127,8 +126,7 @@ def split_array(csv_data):
         # starting or repeating empty lines, just skip
         continue
       # empty line after non-empty line, end of block
-      offsets.append(current_offset)
-      data_blocks.append(current_block)
+      result.append(current_offset, current_block)
       current_offset = current_block = None
     else:
       if current_block is None:
@@ -140,10 +138,9 @@ def split_array(csv_data):
         current_block.append(line)
 
   if current_block is not None:
-    offsets.append(current_offset)
-    data_blocks.append(current_block)
+    result.append(current_offset, current_block)
 
-  return offsets, data_blocks
+  return result
 
 
 def generate_2d_array(width, height, value=None):
@@ -208,11 +205,11 @@ def count_objects(csv_data):
     return info
 
   exportables = get_exportables()
-  offsets, data_blocks = split_array(csv_data)
+  offsets_and_data_blocks = split_array(csv_data)
   blocks_info = []
   failed = False
   counts = {}
-  for offset, data in zip(offsets, data_blocks):
+  for offset, data in offsets_and_data_blocks:
     if len(data) < 2:
       continue  # empty block
     class_name = data[1][0].strip().lower()

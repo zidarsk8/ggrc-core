@@ -90,8 +90,8 @@ class ImportConverter(BaseConverter):
 
     Prepare BlockConverters and order them like specified in self.CLASS_ORDER.
     """
-    offsets, data_blocks = split_array(self.csv_data)
-    for offset, data in zip(offsets, data_blocks):
+    offsets_and_data_blocks = split_array(self.csv_data)
+    for offset, data in offsets_and_data_blocks:
       if len(data) < 2:
         continue  # empty block
       class_name = data[1][0].strip().lower()
