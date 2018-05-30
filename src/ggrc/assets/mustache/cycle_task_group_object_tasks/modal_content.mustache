@@ -35,7 +35,6 @@
         <option value="checkbox" {{#if_equals instance.task_type 'checkbox'}}selected="selected"{{/if_equals}}>Checkbox</option>
       </select>
       <ggrc-modal-connector
-          parent_instance="instance"
           instance="instance"
           mapping="related_objects_as_source"
           source_mapping="info_related_objects"

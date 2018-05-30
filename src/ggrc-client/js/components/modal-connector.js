@@ -31,7 +31,6 @@ import {
           value: false,
         },
       },
-      parent_instance: null,
       instance: null,
       source_mapping: '@',
       default_mappings: [], // expects array of objects
@@ -126,8 +125,8 @@ import {
             this.viewModel.instance.constructor
               .resolve_deferred_bindings(this.viewModel.instance));
       },
-      '{parent_instance} updated': 'deferred_update',
-      '{parent_instance} created': 'deferred_update',
+      '{instance} updated': 'deferred_update',
+      '{instance} created': 'deferred_update',
       '[data-toggle=unmap] click': function (el, ev) {
         ev.stopPropagation();
 
