@@ -103,19 +103,45 @@ def equalize_array(array):
 
 
 def split_array(csv_data):
-  """ Split array by empty lines """
-  data_blocks = []
+  """Split array by empty lines.
+
+  Args:
+    csv_data - list of lists of strings (parsed CSV)
+
+  Returns:
+
+    ([offsets], [data_blocks]) - offset is the index of the starting line
+                             in the block, data_block is a slice of
+                             csv_data
+  """
+  def line_is_empty(list_of_strs):
+    return not any(cell for cell in list_of_strs)
+
   offsets = []
-  current_block = None
+  data_blocks = []
+  current_offset = current_block = None
+
   for offset, line in enumerate(csv_data):
-    if sum([len(l) for l in line]) > 0:
+    if line_is_empty(line):
       if current_block is None:
-        offsets.append(offset)
-        data_blocks.append([])
-        current_block = len(data_blocks) - 1
-      data_blocks[current_block].append(line)
+        # starting or repeating empty lines, just skip
+        continue
+      # empty line after non-empty line, end of block
+      offsets.append(current_offset)
+      data_blocks.append(current_block)
+      current_offset = current_block = None
     else:
-      current_block = None
+      if current_block is None:
+        # non-empty line after empty line, start of block
+        current_offset = offset
+        current_block = [line]
+      else:
+        # non-empty line after non-empty line, block continues
+        current_block.append(line)
+
+  if current_block is not None:
+    offsets.append(current_offset)
+    data_blocks.append(current_block)
 
   return offsets, data_blocks
 
