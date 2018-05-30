@@ -4,20 +4,14 @@
 */
 
 (function (root, GGRC, $, can) {
-  let doc = root.document,
-    body = doc.body,
-    $win = $(root),
-    $doc = $(doc),
-    $body = $(body);
+  let doc = root.document;
+  let body = doc.body;
+  let $win = $(root);
+  let $doc = $(doc);
+  let $body = $(body);
 
   $.migrateMute = true; // turn off console warnings for jQuery-migrate
 
-  function ModelError(message, data) {
-    this.name = 'ModelError';
-    this.message = message || 'Invalid Model encountered';
-    this.data = data;
-  }
-  ModelError.prototype = Error.prototype;
   root.cms_singularize = function (type) {
     let _type = type.trim().toLowerCase();
     switch (_type) {
@@ -85,42 +79,17 @@
   });
 
   $win.load(function () {
-    $body.on('click', 'ul.tree-structure .item-main .grcobject,' +
-      ' ul.tree-structure .item-main .openclose', function (ev) {
+    $body.on('click', 'ul.tree-structure .item-main .openclose', function (ev) {
       ev.stopPropagation();
       $(this).openclose();
-    });
-    // Google Circle CTA Button
-    $body.on('mouseenter', '.square-trigger', function () {
-      let $this = $(this),
-        $popover = $this.closest('.circle-holder').find('.square-popover');
-
-      $popover.slideDown('fast');
-      $this.addClass('active');
-      return false;
-    });
-    $body.on('mouseleave', '.square-popover', function () {
-      let $this = $(this),
-        $trigger = $this.closest('.circle-holder').find('.square-trigger');
-
-      $this.slideUp('fast');
-      $trigger.removeClass('active');
-      $this.removeClass('active');
-      return false;
-    });
-    // References popup preview
-    $body.on('mouseenter', '.new-tree .tree-info a.reference', function () {
-      if ($(this).width() > $('.new-tree .tree-info').width()) {
-        $(this).addClass('shrink-it');
-      }
     });
 
     // Tab indexing form fields in modal
     $body.on('focus', '.modal', function () {
       $('.wysiwyg-area').each(function () {
-        let $this = $(this),
-          $textarea = $this.find('textarea.wysihtml5').attr('tabindex'),
-          $descriptionField = $this.find('iframe.wysihtml5-sandbox');
+        let $this = $(this);
+        let $textarea = $this.find('textarea.wysihtml5').attr('tabindex');
+        let $descriptionField = $this.find('iframe.wysihtml5-sandbox');
 
         function addingTabindex() {
           $descriptionField.attr('tabindex', $textarea);
@@ -130,29 +99,32 @@
     });
 
     // Prevent link popup in code mode
-    $body.on('click', 'a[data-wysihtml5-command=popupCreateLink]', function (e) {
-      let $this = $(this);
-      if ($this.hasClass('disabled')) {
-        // The button is disabled, close the modal immediately
-        $('body').find('.bootstrap-wysihtml5-insert-link-modal').modal('hide');
-        $this.closest('.wysiwyg-area').find('textarea').focus();
-      }
-    });
+    $body.on('click', 'a[data-wysihtml5-command=popupCreateLink]',
+      function (e) {
+        let $this = $(this);
+        if ($this.hasClass('disabled')) {
+          // The button is disabled, close the modal immediately
+          $('body').find('.bootstrap-wysihtml5-insert-link-modal')
+            .modal('hide');
+          $this.closest('.wysiwyg-area').find('textarea').focus();
+        }
+      });
     // top nav dropdown position
     function dropdownPosition() {
-      let $this = $(this),
-        $dropdown = $this.closest('.hidden-widgets-list').find('.dropdown-menu'),
-        $menu_item = $dropdown.find('.inner-nav-item').find('a'),
-        offset = $this.offset(),
-        win = $(window),
-        win_width = win.width();
+      let $this = $(this);
+      let $dropdown = $this.closest('.hidden-widgets-list')
+        .find('.dropdown-menu');
+      let $menuItem = $dropdown.find('.inner-nav-item').find('a');
+      let offset = $this.offset();
+      let win = $(window);
+      let winWidth = win.width();
 
-      if (win_width - offset.left < 322) {
+      if (winWidth - offset.left < 322) {
         $dropdown.addClass('right-pos');
       } else {
         $dropdown.removeClass('right-pos');
       }
-      if ($menu_item.length === 1) {
+      if ($menuItem.length === 1) {
         $dropdown.addClass('one-item');
       } else {
         $dropdown.removeClass('one-item');

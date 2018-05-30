@@ -896,24 +896,6 @@
         background: $lightGray;
       }
     }
-    &.active {
-      position: relative;
-      z-index: zIndex(ui-autocomplete-active-list);
-      .extended-content {
-        position:absolute;
-        top:-1px;
-        right:-301px;
-        width:278px;
-        padding:2px 10px;
-        background:#fff;
-        border:1px solid #ddd;
-        display: block;
-        z-index: zIndex(extended-content);
-      }
-    }
-    .extended-content {
-      display: none;
-    }
     &:last-child {
       border-bottom: none;
     }

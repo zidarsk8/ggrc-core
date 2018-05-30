@@ -329,18 +329,6 @@ ul.new-tree {
   .tree-info {
     @extend %oneline;
     vertical-align: middle;
-    a {
-      &.reference {
-        display: inline;
-      }
-      &.shrink-it {
-        @extend %oneline;
-        display: inline-block;
-        line-height: 12px;
-        width: 80% !important;
-        margin-bottom: -2px;
-      }
-    }
     font-size:13px;
     .tree-info-list {
       @extend %reset-list;
@@ -529,48 +517,6 @@ ul.new-tree {
   .tree-info {
     line-height: 18px;
   }
-
-  .edit-auditor a {
-    @include opacity(0.4);
-    @include transition(opacity 0.2s);
-    font-size:11px;
-    font-weight:bold;
-    color:#111;
-    text-transform:uppercase;
-    &:hover {
-      @include opacity(1);
-      text-decoration:none;
-    }
-    [class^="grcicon-"] {
-      margin-top: 2px;
-    }
-  }
-
-  .info-audit {
-    @extend %reset-list;
-    @extend %clearfix;
-    margin: 10px 0 0;
-    li {
-      float: left;
-      margin-right: 20px;
-      margin-bottom: 10px;
-      a {
-        @include opacity(0.4);
-        @include transition(opacity 0.2s);
-        font-size:11px;
-        font-weight:bold;
-        color:#111;
-        text-transform:uppercase;
-        &:hover {
-          @include opacity(1);
-          text-decoration:none;
-        }
-      }
-    }
-    [class^="grcicon-"] {
-      margin-top: 2px;
-    }
-  }
 }
 
 .item-data {
@@ -695,49 +641,5 @@ ul.new-tree {
       @include opacity(1);
       color: $subTitle;
     }
-  }
-}
-
-.section-expandable {
-  position:relative;
-  min-height: 40px !important;
-  .section-expander {
-    display:none;
-    position:absolute;
-    left:0;
-    top:0;
-    &:hover {
-      text-decoration:none;
-    }
-    a {
-      display: inline-block;
-      line-height: 20px;
-      i {
-        @include opacity(0.3);
-        margin-top: 2px;
-      }
-      &:hover {
-        i {
-          @include opacity(0.6);
-        }
-      }
-    }
-  }
-}
-
-.show-in-tree {
-  font-size: 11px;
-  span {
-    @extend %oneline;
-    display: block;
-  }
-  .red {
-    color: $red;
-  }
-  .green {
-    color: $green;
-  }
-  .dark-gray {
-    color: $textGray;
   }
 }
