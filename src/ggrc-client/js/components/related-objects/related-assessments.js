@@ -16,6 +16,7 @@ import Pagination from '../base-objects/pagination';
 import template from './templates/related-assessments.mustache';
 import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
+import tracker from '../../tracker';
 
 const defaultOrderBy = [
   {field: 'finished_date', direction: 'desc'},
@@ -107,6 +108,10 @@ export default can.Component.extend({
       const limits = this.attr('paging.limits');
       const orderBy = this.attr('orderBy');
       let currentOrder = [];
+      const stopFn = tracker.start(
+        this.attr('instance.type'),
+        tracker.USER_JOURNEY_KEYS.API,
+        tracker.USER_ACTIONS.ASSESSMENT.RELATED_ASSESSMENTS);
 
       if (!orderBy.attr('field')) {
         currentOrder = defaultOrderBy;
@@ -135,8 +140,10 @@ export default can.Component.extend({
           this.attr('paging.total', response.total);
           this.attr('relatedAssessments').replace(assessments);
 
+          stopFn();
           this.attr('loading', false);
         }, () => {
+          stopFn(true);
           this.attr('loading', false);
         });
     },

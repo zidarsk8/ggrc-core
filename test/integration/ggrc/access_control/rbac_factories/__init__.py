@@ -3,9 +3,17 @@
 
 """RBAC Factories for ggrc models."""
 
-from integration.ggrc.access_control.rbac_factories import audit, assessment, \
-    assessment_template, snapshot, issue, program, workflow, task_group, \
-    task_group_task, cycle, cycle_task_group, cycle_task, cycle_task_entry
+from integration.ggrc.access_control.rbac_factories import (audit, assessment,
+                                                            assessment_template,  # noqa: E501
+                                                            snapshot, issue,
+                                                            program, workflow,
+                                                            task_group,
+                                                            task_group_task,
+                                                            cycle,
+                                                            cycle_task_group,
+                                                            cycle_task,
+                                                            cycle_task_entry,
+                                                            evidence)
 
 
 def get_factory(model):
@@ -23,6 +31,7 @@ def get_factory(model):
       "AssessmentTemplate": assessment_template.AssessmentTemplateRBACFactory,
       "Snapshot": snapshot.SnapshotRBACFactory,
       "Issue": issue.IssueRBACFactory,
+      "Evidence": evidence.EvidenceRBACFactory,
       "Program": program.ProgramRBACFactory,
       "Workflow": workflow.WorkflowRBACFactory,
       "TaskGroup": task_group.TaskGroupRBACFactory,

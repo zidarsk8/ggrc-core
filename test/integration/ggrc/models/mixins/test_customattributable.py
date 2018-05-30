@@ -386,6 +386,29 @@ class TestCADUpdate(TestCase):
     )
     self.assertEqual(cads_query.count(), 0)
 
+  def test_gcad_remove_and_status(self):
+    """Test removing of GCADs for assessment and change
+    assessment status after that."""
+    assessment = factories.AssessmentFactory(status="In Review")
+    assessment_id = assessment.id
+    cad = factories.CustomAttributeDefinitionFactory(
+        title="global cad",
+        definition_type="assessment",
+        attribute_type="Text",
+    )
+    factories.CustomAttributeValueFactory(
+        custom_attribute=cad,
+        attributable=assessment,
+        attribute_value="test"
+    )
+    self.api.delete(cad)
+    assessment = models.Assessment.query.get(assessment_id)
+    response = self.api.put(assessment, {"status": "In Progress"})
+
+    self.assert200(response)
+    self.assertEqual(response.json['assessment']['status'],
+                     "In Progress")
+
   def test_lcads_import_update(self):
     """Test saving of LCADs for Assessment Template after import"""
     cads_count = 2

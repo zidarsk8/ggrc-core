@@ -45,7 +45,6 @@ def contributed_services():
       service('documents', models.Document),
       service('events', models.Event, ReadOnlyResource),
       service('facilities', models.Facility),
-      service('help', models.Help),
       service('markets', models.Market),
       service('object_people', models.ObjectPerson),
       service('objectives', models.Objective),

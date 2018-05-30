@@ -21,6 +21,7 @@ from ggrc_workflows.notification.notification_handler import (
     handle_cycle_created,
     handle_cycle_modify,
     handle_cycle_task_status_change,
+    handle_cycle_task_created,
 )
 
 
@@ -65,6 +66,11 @@ def register_listeners():
   @signals.Restful.model_posted.connect_via(Cycle)
   def cycle_post_listener(sender, obj=None, src=None, service=None):
     handle_cycle_created(obj, True)
+
+  @signals.Restful.model_posted.connect_via(CycleTaskGroupObjectTask)
+  def cycle_task_post_listener(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+    """CycleTask POST event listener."""
+    handle_cycle_task_created(obj)
 
   @Signals.status_change.connect_via(CycleTaskGroupObjectTask)
   def cycle_task_status_change_listener(sender, objs=None):

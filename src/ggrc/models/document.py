@@ -4,39 +4,52 @@
 """Module containing Document model."""
 
 from sqlalchemy import orm
-from sqlalchemy import func, case
-from sqlalchemy.ext.hybrid import hybrid_property
 
 from ggrc import db
+from ggrc import login
 from ggrc.access_control.roleable import Roleable
 from ggrc.builder import simple_property
 from ggrc.fulltext.mixin import Indexed
+from ggrc.models import comment
 from ggrc.models import exceptions
 from ggrc.models import reflection
 from ggrc.models import mixins
 from ggrc.models.deferred import deferred
-from ggrc.models.mixins import Base
 from ggrc.models.mixins import before_flush_handleable as bfh
+from ggrc.models.mixins.base import Identifiable
+from ggrc.models.mixins.statusable import Statusable
+from ggrc.models.mixins import with_relationship_created_handler as wrch
 from ggrc.models.relationship import Relatable
 from ggrc.utils import referenced_objects
 
 
-class Document(Roleable, Relatable, Base, mixins.Titled, Indexed,
-               bfh.BeforeFlushHandleable, db.Model):
+class Document(Roleable, Relatable, mixins.Titled,
+               bfh.BeforeFlushHandleable, mixins.Slugged, Statusable,
+               mixins.WithLastDeprecatedDate, comment.Commentable,
+               wrch.WithRelationshipCreatedHandler,
+               Indexed, Identifiable, db.Model):
   """Document model."""
   __tablename__ = 'documents'
 
   _title_uniqueness = False
 
+  # Override from Commentable mixin (can be removed after GGRC-5192)
+  send_by_default = db.Column(db.Boolean, nullable=False, default=True)
+
   link = deferred(db.Column(db.String, nullable=False), 'Document')
   description = deferred(db.Column(db.Text, nullable=False, default=u""),
                          'Document')
-  URL = "URL"
   FILE = "FILE"
   REFERENCE_URL = "REFERENCE_URL"
-  VALID_DOCUMENT_KINDS = [URL, FILE, REFERENCE_URL]
+  VALID_DOCUMENT_KINDS = [FILE, REFERENCE_URL]
+
+  START_STATE = 'Active'
+  DEPRECATED = 'Deprecated'
+
+  VALID_STATES = (START_STATE, DEPRECATED, )
+
   kind = deferred(db.Column(db.Enum(*VALID_DOCUMENT_KINDS),
-                            default=URL,
+                            default=REFERENCE_URL,
                             nullable=False),
                   "Document")
   source_gdrive_id = deferred(db.Column(db.String, nullable=False,
@@ -50,12 +63,14 @@ class Document(Roleable, Relatable, Base, mixins.Titled, Indexed,
   _api_attrs = reflection.ApiAttributes(
       'title',
       'description',
+      'status',
       reflection.Attribute('link', update=False),
       reflection.Attribute('kind', update=False),
       reflection.Attribute('source_gdrive_id', update=False),
       reflection.Attribute('gdrive_id', create=False, update=False),
       reflection.Attribute('parent_obj', read=False, update=False),
       reflection.Attribute('is_uploaded', read=False, update=False),
+      reflection.Attribute('send_by_default', create=False, update=False),
   )
 
   _fulltext_attrs = [
@@ -63,6 +78,7 @@ class Document(Roleable, Relatable, Base, mixins.Titled, Indexed,
       'link',
       'description',
       'kind',
+      'status'
   ]
 
   _sanitize_html = [
@@ -74,25 +90,23 @@ class Document(Roleable, Relatable, Base, mixins.Titled, Indexed,
       'title': 'Title',
       'link': 'Link',
       'description': 'description',
+      'kind': 'type',
   }
 
   ALLOWED_PARENTS = {'Control', 'Issue', 'RiskAssessment'}
-
-  FILE_NAME_SEPARATOR = '_ggrc'
 
   @orm.validates('kind')
   def validate_kind(self, key, kind):
     """Returns correct option, otherwise rises an error"""
     if kind is None:
-      kind = self.URL
+      kind = self.REFERENCE_URL
     if kind not in self.VALID_DOCUMENT_KINDS:
       raise exceptions.ValidationError(
           "Invalid value for attribute {attr}. "
-          "Expected options are `{url}`, `{kind}`, `{reference_url}`".
+          "Expected options are `{file}`, `{reference_url}`".
           format(
               attr=key,
-              url=self.URL,
-              kind=self.FILE,
+              file=self.FILE,
               reference_url=self.REFERENCE_URL
           )
       )
@@ -105,20 +119,6 @@ class Document(Roleable, Relatable, Base, mixins.Titled, Indexed,
             "Document_complete",
         ),
     )
-
-  @hybrid_property
-  def slug(self):
-    """Slug property"""
-    if self.kind in (self.URL, self.REFERENCE_URL):
-      return self.link
-    return u"{} {}".format(self.link, self.title)
-
-  # pylint: disable=no-self-argument
-  @slug.expression
-  def slug(cls):
-    return case([(cls.kind == cls.FILE,
-                  func.concat(cls.link, ' ', cls.title))],
-                else_=cls.link)
 
   def _display_name(self):
     result = self.title
@@ -174,22 +174,6 @@ class Document(Roleable, Relatable, Base, mixins.Titled, Indexed,
                                                         id=parent_id))
     return obj
 
-  @staticmethod
-  def _build_file_name_postfix(parent_obj):
-    """Build postfix for given parent object"""
-    postfix_parts = [Document.FILE_NAME_SEPARATOR, parent_obj.slug]
-
-    related_snapshots = parent_obj.related_objects(_types=['Snapshot'])
-    related_snapshots = sorted(related_snapshots, key=lambda it: it.id)
-
-    slugs = (sn.revision.content['slug'] for sn in related_snapshots if
-             sn.child_type == parent_obj.assessment_type)
-
-    postfix_parts.extend(slugs)
-    postfix_sting = '_'.join(postfix_parts).lower()
-
-    return postfix_sting
-
   def _build_relationship(self, parent_obj):
     """Build relationship between document and documentable object"""
     from ggrc.models import relationship
@@ -199,47 +183,66 @@ class Document(Roleable, Relatable, Base, mixins.Titled, Indexed,
     )
     db.session.add(rel)
 
-  def _update_fields(self, response):
+  def _update_fields(self, link):
     """Update fields of document with values of the copied file"""
-    self.gdrive_id = response['id']
-    self.link = response['webViewLink']
-    self.title = response['name']
+    self.gdrive_id = self.source_gdrive_id
+    self.link = link
     self.kind = Document.FILE
 
   @staticmethod
   def _get_folder(parent):
     return parent.folder if hasattr(parent, 'folder') else ''
 
-  def _map_parent(self):
-    """Maps document to documentable object
+  def _process_gdrive_business_logic(self):
+    """Handles gdrive business logic
 
-    If Document.FILE and source_gdrive_id => copy file
+    If parent_obj specified => add file to parent folder
+    If parent_obj not specified => get file link
     """
     if self.is_with_parent_obj():
       parent = self._get_parent_obj()
       if self.kind == Document.FILE and self.source_gdrive_id:
-        self.exec_gdrive_file_copy_flow(parent)
+        parent_folder_id = self._get_folder(parent)
+        self.add_gdrive_file_folder(parent_folder_id)
       self._build_relationship(parent)
       self._parent_obj = None
+    elif (self.kind == Document.FILE and
+          self.source_gdrive_id and not self.link):
+      self.gdrive_id = self.source_gdrive_id
+      from ggrc.gdrive.file_actions import get_gdrive_file_link
+      self.link = get_gdrive_file_link(self.source_gdrive_id)
 
-  def exec_gdrive_file_copy_flow(self, documentable_obj):
-    """Execute google gdrive file copy flow
+  def add_gdrive_file_folder(self, folder_id):
+    """Add file to parent folder if exists"""
 
-    Build file name, destination folder and copy file to that folder.
-    After coping fills document object fields with new gdrive URL
-    """
-    postfix = self._build_file_name_postfix(documentable_obj)
-    folder_id = self._get_folder(documentable_obj)
     file_id = self.source_gdrive_id
-    from ggrc.gdrive.file_actions import process_gdrive_file
-    response = process_gdrive_file(folder_id, file_id, postfix,
-                                   separator=Document.FILE_NAME_SEPARATOR,
-                                   is_uploaded=self.is_uploaded)
-    self._update_fields(response)
+    from ggrc.gdrive import file_actions
+    if folder_id:
+      file_link = file_actions.add_gdrive_file_folder(file_id, folder_id)
+    else:
+      file_link = file_actions.get_gdrive_file_link(file_id)
+    self._update_fields(file_link)
 
   def is_with_parent_obj(self):
     return bool(hasattr(self, '_parent_obj') and self._parent_obj)
 
+  def add_admin_role(self):
+    """Add current user to Document Admins"""
+    from ggrc.models import all_models
+    admin_role = db.session.query(all_models.AccessControlRole).filter_by(
+        name="Admin", object_type=self.type).one()
+    self.extend_access_control_list([{
+        "ac_role": admin_role,
+        "person": login.get_current_user()
+    }])
+
+  def handle_relationship_created(self, target):
+    """Add document to parent folder if specified"""
+    if (target.type in self.ALLOWED_PARENTS and self.kind == Document.FILE and
+            self.source_gdrive_id):
+      parent_folder_id = self._get_folder(target)
+      self.add_gdrive_file_folder(parent_folder_id)
+
   def handle_before_flush(self):
     """Handler that called  before SQLAlchemy flush event"""
-    self._map_parent()
+    self._process_gdrive_business_logic()

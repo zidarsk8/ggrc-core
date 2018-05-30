@@ -23,6 +23,7 @@ from ggrc.models.hooks import acl
 from ggrc.models.hooks.acl import propagation
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
+from integration.ggrc_workflows.models import factories as wf_factories
 
 
 @ddt.ddt
@@ -323,6 +324,7 @@ class TestPropagation(TestCase):
     """Test clean propagation of all ACL entries."""
     with factories.single_commit():
       person = factories.PersonFactory()
+      task = wf_factories.TaskGroupTaskFactory()
       audit = factories.AuditFactory()
       factories.RelationshipFactory(
           source=audit,
@@ -335,13 +337,20 @@ class TestPropagation(TestCase):
               person=person,
           ).id
       ]
+      factories.AccessControlListFactory(
+          ac_role=self.roles["Workflow"]["Workflow Member"],
+          object=task.workflow,
+          person=person,
+      )
 
+    # propagate all non WF entries
     propagation._propagate(acl_ids)
-    self.assertEqual(all_models.AccessControlList.query.count(), 3)
+    self.assertEqual(all_models.AccessControlList.query.count(), 4)
     propagation._delete_all_propagated_acls()
-    self.assertEqual(all_models.AccessControlList.query.count(), 1)
+    self.assertEqual(all_models.AccessControlList.query.count(), 2)
+    # propagate all including WF entries
     propagation.propagate_all()
-    self.assertEqual(all_models.AccessControlList.query.count(), 3)
+    self.assertEqual(all_models.AccessControlList.query.count(), 6)
 
   def test_complex_propagation_count(self):
     """Test multiple object ACL propagation.

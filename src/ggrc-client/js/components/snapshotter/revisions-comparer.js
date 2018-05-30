@@ -287,9 +287,10 @@ export default can.Component.extend({
       const highlightClass = 'diff-highlighted';
       const listSelector = 'ul li, .object-list-item';
       const attributesSelector = `.row-fluid h6 + *,
-        .row-fluid .state-value,
-        .row-fluid h3,
-        related-documents`;
+        .pane-header__title-details .state-value,
+        .pane-header__title-details h3,
+        related-documents,
+        folder-attachments-list`;
       let infoPanes = $target.find('.info .tier-content');
       let valuesOld = infoPanes.eq(0).find(attributesSelector);
       let valuesNew = infoPanes.eq(1).find(attributesSelector);
@@ -532,8 +533,8 @@ export default can.Component.extend({
         let oldUserIds = {};
         let newUserIds = {};
 
-        let $oldGrantees = $blockOld.find('person-list-item');
-        let $newGrantees = $blockNew.find('person-list-item');
+        let $oldGrantees = $blockOld.find('person-data');
+        let $newGrantees = $blockNew.find('person-data');
 
         if ($oldGrantees.length && !$newGrantees.length ||
           $newGrantees.length && !$oldGrantees.length) {

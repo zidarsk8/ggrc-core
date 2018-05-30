@@ -17,7 +17,7 @@
   opacity: 1;
 
   &--maximized {
-    height: 75%;
+    height: calc(100% - 40px);
   }
 
   &--minimized {
@@ -70,7 +70,8 @@
 
   .info {
     box-shadow: none;
-    padding: 15px 25px 20px;
+    padding: 15px 0 20px 0;
+    
     .small-info {
       i {
         opacity: .25;
@@ -85,6 +86,10 @@
   select {
     margin-bottom: 0;
   }
+
+  .pane-content {
+    padding: 0 25px;
+  }
 }
 
 .side-content {
@@ -94,40 +99,11 @@
   }
 }
 
-.sticky-info-panel {
-  .pane-header {
-    .details-wrap {
-      margin-top: 30px !important;
-    }
-  }
-  info-pin-buttons {
-    position: fixed;
-    right: 47px;
-    width: 100px;
-    z-index: zIndex(info-pin-buttons);
-
-    &.details-wrap {
-      margin-top: -8px;
-    }
-  }
-}
-
 .info-pane-utility {
   @extend %clearfix;
-  position: relative;
-  float: right;
-  z-index: zIndex(info-page-dropdown);
+  display: flex;
+  justify-content: flex-end;
 
-  .sticky-info-panel & {
-    position: fixed;
-    right: 47px;
-    z-index: zIndex(info-pane-utility);
-    margin-top: 24px;
-  }
-  .assignable & {
-    position: static;
-    margin-top: 0;
-  }
   show-related-assessments-button > a {
     display: inline-block;
   }

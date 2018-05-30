@@ -6,40 +6,48 @@
 {{! transcluded via renderLive in, for example, assets/mustache/sections/tier2_content.mustache }}
 {{#instance}}
   <div class="pane-header {{#if snapshot}}snapshot{{/if}}" >
-    <div class="row-fluid wrap-row">
-      <div data-test-id="title_0ad9fbaf" class="span9">
+    <div class="pane-header__container">
+      <div class="pane-header__title" data-test-id="title_0ad9fbaf">
         {{#is_info_pin}}
           <h6>{{modifyFieldTitle instance.type 'Title'}}</h6>
         {{/is_info_pin}}
-        <h3>{{title}}</h3>
-        {{#if snapshot}}
-          <span class="state-value snapshot">{{instance.class.title_singular}} version as at {{date instance.updated_at}}</span>
-        {{/if}}
-        {{#if status}}
-          <span class="state-value {{addclass 'state' status}}">{{un_camel_case status}}</span>
-        {{/if}}
-        {{#if_helpers '\
-          #if' instance.archived '\
-          or #if' snapshot.archived}}
-          <span class="state-value state-archived">Archived</span>
-        {{/if_helpers}}
-        {{^if isSnapshot}}
-          <span class="proposal">
-            <create-proposal-button {instance}="instance">
-            </create-proposal-button>
-          </span>
-        {{/if}}
-        {{#if type}}
-        <p>
-          {{type.title}}
-        </p>
-        {{/if}}
+        <div class="pane-header__title-details">
+          <h3>{{title}}</h3>
+
+          {{#if snapshot}}
+            <span class="state-value snapshot">{{instance.class.title_singular}} version as at {{date instance.updated_at}}</span>
+          {{/if}}
+          {{#if status}}
+            <span>
+              <span class="state-value {{addclass 'state' status}}">{{un_camel_case status}}</span>
+            </span>
+          {{/if}}
+          {{#if_helpers '\
+            #if' instance.archived '\
+            or #if' snapshot.archived}}
+            <span class="state-value state-archived">Archived</span> 
+          {{/if_helpers}}
+          {{^if isSnapshot}}
+            <span class="proposal">
+              <create-proposal-button {instance}="instance">
+              </create-proposal-button>
+            </span>
+          {{/if}}
+        </div>
       </div>
+
+      <div class="pane-header__toolbar">
+        {{#is_info_pin}}
+          <info-pin-buttons maximized="maximized" on-change-maximized-state="@onChangeMaximizedState" on-close="@onClose"></info-pin-buttons>
+        {{/is_info_pin}}
+
+        {{> /static/mustache/base_objects/info-pane-utility.mustache}}
+      </div>
+    </div>
       {{#if snapshot}}
       {{#if canGetLatestRevision}}
-          <div class="span12 snapshot">
+          <div class="pane-header__snapshot-info">
             <hr class="snapshot">
-            <p>
               <snapshot-comparer-config
                 {instance}="instance"
                 {left-revision-id}="instance.snapshot.revision_id"
@@ -54,10 +62,8 @@
                       <a href="javascript://" can-click="compareIt">Get the latest version</a>
                   </revisions-comparer>
               </snapshot-comparer-config>
-            </p>
           </div>
       {{/if}}
       {{/if}}
-    </div>
   </div>
 {{/instance}}

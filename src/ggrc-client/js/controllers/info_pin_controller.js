@@ -8,7 +8,6 @@ import '../components/questions-link/questions-link';
 import '../components/info-pane/info-pane-footer';
 import '../components/assessment/info-pane/info-pane';
 import '../components/folder-attachments-list/folder-attachments-list';
-import '../components/unmap-button/unmap-person-button';
 import '../components/issue-tracker/info-issue-tracker-fields';
 import '../components/comment/comment-data-provider';
 import '../components/comment/comment-add-form';
@@ -230,10 +229,38 @@ export default can.Control({
     );
   },
   ' scroll': function (el, ev) {
-    var header = this.element.find('.pane-header');
-    var isFixed = el.scrollTop() > 0;
+    const header = this.element.find('.pane-header');
+    const scrollTop = el.scrollTop();
+    const prevScrollTop = el.data('scrollTop') || 0;
+    const headerOuterHeight = header.outerHeight();
 
-    header.toggleClass('pane-header__fixed', isFixed);
+    if (!prevScrollTop) {
+      header.css({top: -headerOuterHeight});
+    }
+
+    if (scrollTop === 0) {
+      header.removeClass('pane-header_visible');
+    } else
+    if (scrollTop > header.outerHeight()) {
+      if (scrollTop > prevScrollTop) {
+        //scroll down
+        if (header.hasClass('pane-header_visible')) {
+          header.removeClass('pane-header_visible');
+          header.addClass('pane-header_hidden');
+        }
+
+        //hide menu when scrolling down
+        let dropdownMenu = header.find('.details-wrap');
+        dropdownMenu.removeClass('open');
+        
+      } else if (scrollTop < prevScrollTop) {
+        //scroll top
+        header.removeClass('pane-header_hidden');
+        header.addClass('pane-header_visible');
+      }
+    }
+
+    el.data('scrollTop', scrollTop);
   },
   '{window} keyup'(el, event) {
     const ESCAPE_KEY_CODE = 27;

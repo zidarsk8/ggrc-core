@@ -101,31 +101,15 @@
       }
     }
   }
-  .inline__header {
-    width: 100%;
-  }
 
   .pane-header {
-    display: flex;
-    height: 70px;
-    justify-content: space-between;
-    border-bottom: 1px solid #eee;
-
-    .pane-header__container {
-      width: 100%;
-    }
-
-    .pane-header__title {
+    &__title {
       padding-right: 24px;
       max-width: calc(100% - 525px);
-      flex: 1;
+      overflow: inherit;
 
-      .pane-header__title-name {
-        max-width: calc(100% - 165px);
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        margin-right: 8px;
+      .inline__header {
+        width: 100%;
       }
 
       .state-value {
@@ -143,24 +127,23 @@
       }
     }
 
-    .pane-header__toolbar {
-      display: flex;
-      flex-direction: row-reverse;
+    &__title-name {
+      max-width: calc(100% - 165px);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    &__toolbar {
+      .info-pane-utility {
+        flex-direction: row-reverse;
+      }
 
       .form-status {
         line-height: 28px;
 
         .loading-status {
           margin-right: 5px;
-        }
-      }
-
-      .pane-header__toolbar-item {
-        margin-top: 30px;
-
-        /* override "sticky-info-panel" margin */
-        .details-wrap {
-          margin-top: 0px !important;
         }
       }
     }

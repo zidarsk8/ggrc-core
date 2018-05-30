@@ -128,8 +128,6 @@ class AttributeInfo(object):
       "operationally",
       "secondary_contact",
       "assessment_type",
-      "documents_reference_url",
-      "reference_url",
       "verify_frequency",
       "name",
       "email",
@@ -138,8 +136,11 @@ class AttributeInfo(object):
       "user_role",
       "recipients",
       "send_by_default",
-      "documents_url",
+      "evidences_file",
+      "evidences_url",
       "documents_file",
+      "documents_url",
+      "documents_reference_url",
       "notify_custom_message",
       "frequency",
       "notify_on_change",
@@ -259,12 +260,12 @@ class AttributeInfo(object):
         flask.g.acl_role_names[object_type].add((name, mandatory))
 
     return {
-        "{}:{}".format(cls.ALIASES_PREFIX, name): {
+        u"{}:{}".format(cls.ALIASES_PREFIX, name): {
             "display_name": name,
             "attr_name": name,
             "mandatory": mandatory,
             "unique": False,
-            "description": "List of people with '{}' role".format(name),
+            "description": u"List of people with '{}' role".format(name),
             "type": cls.Type.AC_ROLE,
         }
         for name, mandatory in flask.g.acl_role_names[object_class.__name__]

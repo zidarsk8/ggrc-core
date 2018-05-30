@@ -125,6 +125,17 @@ const COMMENT_CREATED = {
 };
 
 /**
+ * Notifies that new objects are about to map to the instance
+ * @event beforeMapping
+ * @type {object}
+ * @property {string} type - Event name.
+ * @property {string} destinationType - Type of mapped object.
+ */
+const BEFORE_MAPPING = {
+  type: 'beforeMapping',
+};
+
+/**
  * Refreshes mappings of instance
  * @event refreshMapping
  * @type {object}
@@ -145,6 +156,38 @@ const REFRESH_SUB_TREE = {
   type: 'refreshSubTree',
 };
 
+/**
+ * Notifies that new document will be created
+ * @event beforeDocumentCreate
+ * @type {object}
+ * @property {string} type - Event name.
+ * @property {string} destinationType - Type of mapped object.
+ */
+const BEFORE_DOCUMENT_CREATE = {
+  type: 'beforeDocumentCreate',
+};
+
+/**
+ * Notifies that new document creating failed
+ * @event documentCreateFailed
+ * @type {object}
+ * @property {string} type - Event name.
+ * @property {string} destinationType - Type of mapped object.
+ */
+const DOCUMENT_CREATE_FAILED = {
+  type: 'documentCreateFailed',
+};
+
+/**
+ * Maps objects to instance
+ * @event mapObjects
+ * @type {object}
+ * @property {string} type - Event name.
+ */
+const MAP_OBJECTS = {
+  type: 'mapObjects',
+}
+
 export {
   REFRESH_SUB_TREE,
   REFRESH_RELATED,
@@ -159,5 +202,9 @@ export {
   REFRESH_COMMENTS,
   RELATED_ITEMS_LOADED,
   COMMENT_CREATED,
+  BEFORE_MAPPING,
   REFRESH_MAPPING,
+  BEFORE_DOCUMENT_CREATE,
+  DOCUMENT_CREATE_FAILED,
+  MAP_OBJECTS,
 };

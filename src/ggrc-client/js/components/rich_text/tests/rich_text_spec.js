@@ -38,6 +38,19 @@ describe('richText component', ()=> {
     });
 
     describe('urlMatcher() method', ()=> {
+      it('should return empty delta if there is no changes', ()=> {
+        let node = {
+          data: 'someEmptyText',
+        };
+        let delta = {
+          ops: [],
+        };
+
+        let result = viewModel.urlMatcher(node, delta);
+
+        expect(result).toEqual(delta);
+      });
+
       it('should return delta if there are no matches', ()=> {
         let node = {
           data: 'sometext',
@@ -114,7 +127,7 @@ describe('richText component', ()=> {
           });
         });
 
-        it(`should not call history.undo() if current 
+        it(`should not call history.undo() if current
           length is less than max length`, ()=> {
             viewModel.attr('maxLength', 10);
             spyOn(viewModel, 'getLength').and.returnValue(9);
@@ -125,7 +138,7 @@ describe('richText component', ()=> {
             expect(editor.history.undo).not.toHaveBeenCalled();
           });
 
-        it(`should call history.undo() if current 
+        it(`should call history.undo() if current
           length is greather than max length`, ()=> {
             viewModel.attr('maxLength', 9);
             spyOn(viewModel, 'getLength').and.returnValue(10);

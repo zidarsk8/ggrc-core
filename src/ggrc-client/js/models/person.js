@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import RefreshQueue from './refresh_queue';
+import tracker from '../tracker';
 
 (function (ns, can) {
   can.Model.Cacheable('CMS.Models.Person', {
@@ -121,16 +121,46 @@ import RefreshQueue from './refresh_queue';
     },
     getWidgetCountForMyWorkPage: function () {
       let url = `/api/people/${this.attr('id')}/my_work_count`;
-      return $.get(url);
+      const stopFn = tracker.start(
+        tracker.FOCUS_AREAS.COUNTS,
+        tracker.USER_JOURNEY_KEYS.API,
+        tracker.USER_ACTIONS.API.COUNTS_MY_WORK);
+
+      return $.get(url)
+        .then((counts) => {
+          stopFn();
+          return counts;
+        }, stopFn.bind(null, true));
     },
     getWidgetCountForAllObjectPage: function () {
       let url = `/api/people/${this.attr('id')}/all_objects_count`;
-      return $.get(url);
+      const stopFn = tracker.start(
+        tracker.FOCUS_AREAS.COUNTS,
+        tracker.USER_JOURNEY_KEYS.API,
+        tracker.USER_ACTIONS.API.COUNTS_ALL_OBJECTS);
+
+      return $.get(url)
+        .then((counts) => {
+          stopFn();
+          return counts;
+        }, stopFn.bind(null, true));
     },
     getTasksCount: function () {
       let url = `/api/people/${this.attr('id')}/task_count`;
+      const stopFn = tracker.start(
+        tracker.FOCUS_AREAS.COUNTS,
+        tracker.USER_JOURNEY_KEYS.API,
+        tracker.USER_ACTIONS.API.TASKS_COUNT);
+
       return $.get(url)
-        .fail(() => console.warn(`Request on '${url}' failed!`));
+        .then((counts) => {
+          stopFn();
+          return counts;
+        })
+        .fail(() => {
+          stopFn(true);
+          console.warn(`Request on '${url}' failed!`);
+        });
     },
   });
 })(window, can);

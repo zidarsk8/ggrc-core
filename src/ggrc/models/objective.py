@@ -36,6 +36,5 @@ class Objective(WithLastAssessmentDate,
   __tablename__ = 'objectives'
   _include_links = []
   _aliases = {
-      "documents_url": None,
       "documents_file": None,
   }

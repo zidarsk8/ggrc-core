@@ -52,13 +52,18 @@
   </li>
   <li>
     <feedback-link>
-      <div class="oneline">
-        <a href="{{link}}"
-          target="_blank"
-          class="btn btn-small btn-gray feedback">
-          {{title}}
-        </a>
-      </div>
+      <tooltip-content
+        placement="'bottom'"
+        {content}="title">
+        <div class="oneline">
+          <a href="{{link}}"
+            target="_blank"
+            data-trim-target="true"
+            class="btn btn-small btn-gray feedback feedback_trimmed">
+              {{content}}
+          </a>
+        </div>
+      </tooltip-content>
     </feedback-link>
   </li>
   <li>

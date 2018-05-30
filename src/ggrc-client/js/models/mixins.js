@@ -11,6 +11,7 @@ import {
 import {confirm} from '../plugins/utils/modals';
 import {isSnapshot} from '../plugins/utils/snapshot-utils';
 import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
+import * as issueTrackerUtils from '../plugins/utils/issue-tracker-utils';
 
 const AUDIT_ISSUE_TRACKER = {
   hotlist_id: '766459',
@@ -247,140 +248,150 @@ const AUDIT_ISSUE_TRACKER = {
   }, {});
 
   can.Model.Mixin('mapping-limit-issue', {
-    getAllowedMappings: _.partial(getAllowedMappings, ['Program', 'Project', 'TaskGroup']),
+    getAllowedMappings: _.partial(getAllowedMappings,
+      ['Program', 'Project', 'TaskGroup', 'Document']),
   }, {});
 
-  can.Model.Mixin('issueTrackerIntegratable', {
-    issue_tracker_enable_options: [
-      {value: true, title: 'On'},
-      {value: false, title: 'Off'},
-    ],
-    issue_tracker_priorities: ['P0', 'P1', 'P2', 'P3', 'P4'],
-    issue_tracker_severities: ['S0', 'S1', 'S2', 'S3', 'S4'],
-  }, {
-    'after:init': function () {
-      this.initIssueTracker();
+  can.Model.Mixin('auditIssueTracker',
+    issueTrackerUtils.issueTrackerStaticFields,
+    {
+      'after:init'() {
+        this.initIssueTracker();
+      },
+      'before:refresh'() {
+        issueTrackerUtils.cleanUpWarnings(this);
+      },
+      'after:refresh'() {
+        this.initIssueTracker();
+      },
+      initIssueTracker() {
+        if (!GGRC.ISSUE_TRACKER_ENABLED) {
+          return;
+        }
+
+        if (!this.issue_tracker) {
+          this.attr('issue_tracker', new can.Map({}));
+        }
+
+        let auditIssueTracker = new can.Map(AUDIT_ISSUE_TRACKER).attr({
+          enabled: false, // turned OFF by default for AUDIT
+        });
+        issueTrackerUtils.initIssueTrackerObject(
+          this,
+          auditIssueTracker,
+          true
+        );
+      },
+      issueTrackerEnabled() {
+        return issueTrackerUtils.isIssueTrackerEnabled(this);
+      },
     },
+  );
 
-    initIssueTracker() {
-      if (!this.issue_tracker) {
-        this.issue_tracker = new can.Map({});
-      }
+  can.Model.Mixin('assessmentIssueTracker',
+    issueTrackerUtils.issueTrackerStaticFields,
+    {
+      'after:init': function () {
+        this.initIssueTracker().then(() => {
+          this.trackAuditUpdates();
+        });
+      },
+      'before:refresh'() {
+        issueTrackerUtils.cleanUpWarnings(this);
+      },
+      'after:refresh'() {
+        this.initIssueTracker();
+      },
+      trackAuditUpdates() {
+        let audit = this.attr('audit') && this.attr('audit').reify();
+        if (!audit) {
+          return;
+        }
 
-      if (GGRC.ISSUE_TRACKER_ENABLED) {
-        // check "title_singular" because "new instance"
-        // doesn't have "type" property
-        if (this.attr('type') === 'Audit' ||
-          this.class.title_singular === 'Audit') {
-          this.initAuditIssueTracker();
+        audit.reify().bind('updated', (event) => {
+          this.attr('audit', event.target);
+          this.initIssueTrackerForAssessment();
+        });
+      },
+      initIssueTracker() {
+        if (!GGRC.ISSUE_TRACKER_ENABLED) {
+          return can.Deferred().reject();
+        }
+
+        if (!this.attr('issue_tracker')) {
+          this.attr('issue_tracker', new can.Map({}));
+        }
+
+        let dfd = can.Deferred();
+
+        this.ensureParentAudit().then((audit) => {
+          if (audit) {
+            this.attr('audit', audit);
+            this.initIssueTrackerForAssessment();
+            dfd.resolve();
+          } else {
+            dfd.reject();
+          }
+        });
+        return dfd;
+      },
+      ensureParentAudit() {
+        const pageInstance = GGRC.page_instance();
+        const dfd = new can.Deferred();
+        if (this.audit) {
+          return dfd.resolve(this.audit);
+        }
+
+        if (this.isNew()) {
+          if (pageInstance && pageInstance.type === 'Audit') {
+            dfd.resolve(pageInstance);
+          }
         } else {
-          this.ensureParentAudit().then((audit) => {
-            if (audit) {
-              this.attr('audit', audit);
-              this.initIssueTrackerForAssessment();
-            }
+          // audit is not page instane if AssessmentTemplate is edited
+          // from Global Search results
+          const param = buildParam('Audit', {}, {
+            type: this.type,
+            id: this.id,
+          }, ['id', 'title', 'type', 'context', 'issue_tracker']);
+
+          makeRequest({data: [param]}).then((response) => {
+            this.audit = _.get(response, '[0].Audit.values[0]');
+            dfd.resolve(this.audit);
           });
         }
-      }
-    },
 
-    ensureParentAudit() {
-      const pageInstance = GGRC.page_instance();
-      const dfd = new can.Deferred();
-      if (this.audit) {
-        return dfd.resolve(this.audit);
-      }
+        return dfd;
+      },
+      /**
+       * Initializes Issue Tracker for Assessment and Assessment Template
+       */
+      initIssueTrackerForAssessment() {
+        let auditItr = this.attr('audit.issue_tracker') || {};
+        let itrEnabled = this.isNew()
+          // turned ON for Assessment & Assessment Template by default
+          // for newly created instances
+          ? (auditItr && auditItr.enabled)
+          // for existing instance, the value from the server will be used
+          : false;
 
-      if (this.isNew()) {
-        if (pageInstance && pageInstance.type === 'Audit') {
-          dfd.resolve(pageInstance);
-        }
-      } else {
-        // audit is not page instane if AssessmentTemplate is edited
-        // from Global Search results
-        const param = buildParam('Audit', {}, {
-          type: this.type,
-          id: this.id,
-        }, ['id', 'title', 'type', 'context', 'issue_tracker']);
+        let issueTitle = this.title || '';
 
-        makeRequest({data: [param]}).then((response) => {
-          this.audit = _.get(response, '[0].Audit.values[0]');
-          dfd.resolve(this.audit);
-        });
-      }
-
-      return dfd;
-    },
-
-    initAuditIssueTracker() {
-      this.initIssueTrackerObject(
-        new can.Map(AUDIT_ISSUE_TRACKER).attr({
-          enabled: false, // turned OFF by default for AUDIT
-        }), GGRC.ISSUE_TRACKER_ENABLED);
-    },
-
-    /**
-     * Initializes Issue Tracker for Assessment and Assessment Template
-     */
-    initIssueTrackerForAssessment() {
-      let auditItr = this.audit.issue_tracker || {};
-      let itr = this.issue_tracker || {};
-      let itrEnabled = this.isNew()
-        // turned ON for Assessment & Assessment Template by default
-        // for newly created instances
-        ? (auditItr && auditItr.enabled)
-        // for existing instance, the value from the server will be used
-        : null;
-
-      let showIssureTrackerControls = this.isNew()
-        // for new instance show controls if Issure Tracker enabled for Audit
-        ? auditItr.enabled
-        // for existing instance show controls if Issue Tracker enabled for
-        // this instance or enabled for Audit
-        : itr.enabled || auditItr.enabled;
-
-      let issueTitle = this.title || '';
-
-      this.initIssueTrackerObject(
-        new can.Map(auditItr).attr({
+        let issueTracker = new can.Map(auditItr).attr({
           title: issueTitle,
           enabled: itrEnabled,
-        }), showIssureTrackerControls);
-    },
-    /**
-     * Initializes issue tracker data from predefined defaults if tracker
-     * data is not available from server ( new/old instance with empty issue_tracker )
-     * @param  {Object} [defaultValues={}] issue tracker properties
-     * @param  {Boolean} [canUseIssueTracker=false] should IssueTracker controls be shown
-     */
-    initIssueTrackerObject: function (
-      defaultValues = {},
-      canUseIssueTracker = false
-    ) {
-      if (!GGRC.ISSUE_TRACKER_ENABLED) {
-        return;
-      }
+        });
 
-      if ( !this.issueTrackerEnabled() ) {
-        this.attr('issue_tracker', defaultValues);
-      }
-      this.attr('can_use_issue_tracker', canUseIssueTracker);
+        issueTrackerUtils.initIssueTrackerObject(
+          this,
+          issueTracker,
+          auditItr.enabled
+        );
+      },
+      issueTrackerEnabled() {
+        return issueTrackerUtils.isIssueTrackerEnabled(this);
+      },
     },
-    issueTrackerEnabled: function () {
-      // 'issue_tracker' has already created if component_id is filled;
-      return !!(this.issue_tracker && this.issue_tracker.component_id);
-    },
-    'before:refresh': function () {
-      // clear warnings because CanJS save prev value of warning after merge
-      // current instance and response
-      if (this.issue_tracker && this.issue_tracker._warnings) {
-        this.issue_tracker._warnings = [];
-      }
-    },
-    'after:refresh': function () {
-      this.initIssueTracker();
-    },
-  });
+  );
 
   /**
    * A mixin to use for objects that can have their status automatically

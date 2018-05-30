@@ -759,4 +759,73 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       expect(result).toBe('"task assignees" = "user@example.com"');
     });
   });
+
+  describe('_needToRefreshAfterRelRemove() method', () => {
+    let relationship;
+
+    beforeEach(function () {
+      relationship = {
+        source: {},
+        destination: {},
+      };
+      vm.attr('options.parent_instance', {
+        type: 'Type',
+        id: 1,
+      });
+    });
+
+    describe('returns true', () => {
+      it('if source of passed relationship is current instance', function () {
+        const source = {
+          type: 'SomeType',
+          id: 12345,
+        };
+        vm.attr('parent_instance').attr(source);
+        Object.assign(relationship.source, source);
+        const result = vm._needToRefreshAfterRelRemove(relationship);
+        expect(result).toBe(true);
+      });
+
+      it('if source of passed relationship is current instance', function () {
+        const destination = {
+          type: 'SomeType',
+          id: 12345,
+        };
+        vm.attr('parent_instance').attr(destination);
+        Object.assign(relationship.destination, destination);
+        const result = vm._needToRefreshAfterRelRemove(relationship);
+        expect(result).toBe(true);
+      });
+    });
+
+    it('returns false when there are no need to refresh', function () {
+      const result = vm._needToRefreshAfterRelRemove(relationship);
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('_isRefreshNeeded() method', () => {
+    describe('if instance is relationship then', () => {
+      let instance;
+
+      beforeEach(function () {
+        instance = new CMS.Models.Relationship();
+      });
+
+      it('returns result of the relationship check', function () {
+        const expectedResult = true;
+        spyOn(vm, '_needToRefreshAfterRelRemove')
+          .and.returnValue(expectedResult);
+        const result = vm._isRefreshNeeded(instance);
+        expect(result).toBe(expectedResult);
+        expect(vm._needToRefreshAfterRelRemove)
+          .toHaveBeenCalledWith(instance);
+      });
+    });
+
+    it('returns true by default', function () {
+      const result = vm._isRefreshNeeded();
+      expect(result).toBe(true);
+    });
+  });
 });

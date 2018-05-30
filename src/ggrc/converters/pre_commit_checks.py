@@ -123,9 +123,43 @@ def check_assessment(row_converter):
     row_converter.add_error(errors.ARCHIVED_IMPORT_ERROR)
 
 
+def check_assessment_template(row_converter):
+  """Checker for AssessmentTemplate model objects.
+
+  This checker sets default_people attribute from values of default_assignees
+  and default_verifier.
+
+  Args:
+     row_converter: RowConverter object with row data for a cycle-task
+     import.
+  """
+  if row_converter.ignore:
+    return
+
+  key_map = {
+      "default_assignees": "assignees",
+      "default_verifier": "verifiers",
+  }
+  default_people = {}
+  for key, value in key_map.iteritems():
+    default_people[value] = getattr(row_converter.obj, key, '')
+
+  if not row_converter.obj.default_people:
+    row_converter.obj.default_people = default_people
+    return
+
+  for key, value in default_people.iteritems():
+    previous_value = row_converter.obj.default_people.get(key, '')
+    if previous_value and not value:
+      default_people[key] = previous_value
+
+  row_converter.obj.default_people = default_people
+
+
 CHECKS = {
     "TaskGroupTask": check_tasks,
     "CycleTaskGroupObjectTask": check_cycle_tasks,
     "Workflow": check_workflows,
-    "Assessment": check_assessment
+    "Assessment": check_assessment,
+    "AssessmentTemplate": check_assessment_template,
 }

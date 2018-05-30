@@ -17,6 +17,9 @@ from integration.ggrc.models import factories
 from integration.ggrc.services import TestCase
 from integration.ggrc.query_helper import WithQueryApi
 from integration.ggrc_workflows.generator import WorkflowsGenerator
+from integration.ggrc.api_helper import Api
+from integration.ggrc_basic_permissions.models \
+    import factories as rbac_factories
 
 
 @ddt.ddt
@@ -26,6 +29,7 @@ class TestPersonResource(TestCase, WithQueryApi):
   def setUp(self):
     super(TestPersonResource, self).setUp()
     self.client.get("/login")
+    self.api = Api()
     self.generator = WorkflowsGenerator()
 
   def test_task_count_empty(self):
@@ -304,6 +308,33 @@ class TestPersonResource(TestCase, WithQueryApi):
           {"open_task_count": 2, "has_overdue": False}
       )
 
+  @ddt.data(("Creator", 403),
+            ("Reader", 403),
+            ("Editor", 200),
+            ("Administrator", 200))
+  @ddt.unpack
+  def test_person_editing(self, role_name, status):
+    """{0} should receive {1} status code on edit Person."""
+    role = all_models.Role.query.filter(
+        all_models.Role.name == role_name
+    ).one()
+    with factories.single_commit():
+      client_user = factories.PersonFactory()
+      rbac_factories.UserRoleFactory(role=role, person=client_user)
+    self.api.set_user(client_user)
+    self.client.get("/login")
+    base_email = "test@example.com"
+    person = factories.PersonFactory(email=base_email)
+    person_id = person.id
+    new_email = "new_{}".format(base_email)
+    resp = self.api.put(person, {"email": new_email})
+    self.assertEqual(status, resp.status_code)
+    person = all_models.Person.query.get(person_id)
+    if status == 200:
+      self.assertEqual(new_email, person.email)
+    else:
+      self.assertEqual(base_email, person.email)
+
 
 @ddt.ddt
 class TestPersonResourcePopulated(TestCase, WithQueryApi):
@@ -319,6 +350,7 @@ class TestPersonResourcePopulated(TestCase, WithQueryApi):
       "Contract",
       "Control",
       "DataAsset",
+      "Document",
       "Facility",
       "Evidence",
       "Market",
@@ -348,6 +380,7 @@ class TestPersonResourcePopulated(TestCase, WithQueryApi):
       "Contract",
       "Control",
       "DataAsset",
+      "Document",
       "Facility",
       "Evidence",
       "Market",
