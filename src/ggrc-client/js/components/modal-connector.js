@@ -35,7 +35,6 @@ import {
       source_mapping: '@',
       default_mappings: [], // expects array of objects
       mapping: '@',
-      newInstance: false,
       list: [],
       // the following are just for the case when we have no object to start with,
       changes: [],
