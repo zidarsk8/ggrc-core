@@ -45,21 +45,20 @@ import {
     events: {
       init: function () {
         let that = this;
-        let key;
-        let instance;
         let vm = this.viewModel;
         vm.attr('controller', this);
         if (vm.instance.reify) {
           vm.attr('instance', vm.instance.reify());
         }
 
+        const instance = vm.attr('instance');
         vm.default_mappings.forEach(function (defaultMapping) {
           let model;
           let objectToAdd;
           if (defaultMapping.id && defaultMapping.type) {
             model = CMS.Models[defaultMapping.type];
             objectToAdd = model.findInCacheById(defaultMapping.id);
-            that.viewModel.instance
+            instance
               .mark_for_addition('related_objects_as_source', objectToAdd, {});
             that.addListItem(objectToAdd);
           }
@@ -69,28 +68,16 @@ import {
           vm.attr('source_mapping', vm.mapping);
         }
 
-        instance = vm.attr('instance');
-
-        if (instance) {
-          if (!vm.attr('customRelatedLoader')) {
-            instance.get_binding(vm.source_mapping)
-              .refresh_instances()
-              .then(function (list) {
-                this.setListItems(list);
-              }.bind(this));
-          }
-        } else {
-          key = vm.instance_attr + '_' + (vm.mapping || vm.source_mapping);
-          if (!vm.parent_instance._transient[key]) {
-            vm.attr('list', []);
-            vm.parent_instance.attr('_transient.' + key, vm.list);
-          } else {
-            vm.attr('list', vm.parent_instance._transient[key]);
-          }
+        if (!vm.attr('customRelatedLoader')) {
+          instance.get_binding(vm.source_mapping)
+            .refresh_instances()
+            .then(function (list) {
+              this.setListItems(list);
+            }.bind(this));
         }
 
         this.options.parent_instance = vm.parent_instance;
-        this.options.instance = vm.instance;
+        this.options.instance = instance;
         this.on();
       },
       setListItems: function (list) {
