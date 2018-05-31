@@ -77,8 +77,16 @@ def _delete_invalid_objects(connection):
   connection.execute(sa.text(sql))
 
   sql = """
-      DELETE FROM revisions
+      UPDATE revisions
+      SET action = "deleted"
       WHERE resource_type="Comment" AND resource_id IN (
+          SELECT oc.id FROM orphan_comments AS oc)
+  """
+  connection.execute(sa.text(sql))
+
+  sql = """
+      DELETE FROM access_control_list
+      WHERE object_type="Comment" AND object_id IN (
           SELECT oc.id FROM orphan_comments AS oc)
   """
   connection.execute(sa.text(sql))
