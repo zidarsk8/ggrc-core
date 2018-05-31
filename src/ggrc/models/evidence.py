@@ -16,7 +16,6 @@ from ggrc.models import exceptions
 from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.models.mixins import before_flush_handleable as bfh
-from ggrc.models.mixins.base import Identifiable
 from ggrc.models.mixins.statusable import Statusable
 from ggrc.models.mixins.with_auto_deprecation import WithAutoDeprecation
 from ggrc.models.relationship import Relatable
@@ -24,9 +23,9 @@ from ggrc.utils import referenced_objects
 
 
 class Evidence(Roleable, Relatable, mixins.Titled,
-               bfh.BeforeFlushHandleable, mixins.Slugged, Statusable,
+               bfh.BeforeFlushHandleable, Statusable,
                mixins.WithLastDeprecatedDate, comment.Commentable,
-               WithAutoDeprecation, mixin.Indexed, Identifiable, db.Model):
+               WithAutoDeprecation, mixin.Indexed, mixins.Slugged, db.Model):
   """Evidence (Audit-scope URLs, FILE's) model."""
   __tablename__ = "evidence"
 
