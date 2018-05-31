@@ -769,13 +769,10 @@ can.Control('CMS.Controllers.LHN_Search', {
       }
     });
   },
-  display_lists: function (search_result, display_now) {
+  display_lists: function (search_result) {
     var self = this
         , lists = this.get_visible_lists()
         , dfds = []
-        , search_text = this.current_term
-        , my_work = self.current_params && self.current_params.contact_id
-        , extra_params = self.current_params && self.current_params.extra_params
         ;
 
     can.each(lists, function (list) {
@@ -804,23 +801,8 @@ can.Control('CMS.Controllers.LHN_Search', {
           $list.trigger('list_displayed', model_name);
         }, 1);
       }
-      dfd = refresh_queue.trigger().then(function (d) {
-        new CMS.Models.LocalListCache({
-          name: 'search_' + model_name
-            , objects: d
-            , search_text: search_text
-            , my_work: my_work
-            , extra_params: extra_params
-            , type: model_name
-            , keys: ['title', 'contact', 'private', 'viewLink', 'audit', 'selfLink']
-        }).save();
-        return d;
-      });
-      if (display_now) {
-        finish_display(initial_visible_list);
-      } else {
-        dfd = dfd.then(finish_display);
-      }
+      dfd = refresh_queue.trigger().then(finish_display);
+
       dfds.push(dfd);
     });
 
@@ -873,38 +855,6 @@ can.Control('CMS.Controllers.LHN_Search', {
       // Register that the lists are loaded
       can.each(models, function (model_name) {
         self.options.loaded_lists.push(model_name);
-      });
-
-      $.when.apply(
-        $
-        , models.map(function (model_name) {
-          return CMS.Models.LocalListCache.findAll({'name': 'search_' + model_name});
-        })
-      ).then(function () {
-        var types = {}, fake_search_result;
-        can.each(can.makeArray(arguments), function (a) {
-          var a = a[0];
-          if (a
-              && a.search_text == self.current_term
-              && a.my_work == (self.current_params && self.current_params.contact_id)
-              && a.extra_params == (self.current_params && self.current_params.extra_params)) {
-            types[a.name] = a.objects;
-          }
-        });
-
-        if (Object.keys(types).length > 0) {
-          fake_search_result = {
-            getResultsForType: function (type) {
-              if (types['search_' + type]) {
-                return types['search_' + type];
-              }
-            }
-          };
-          return fake_search_result;
-        }
-      }).done(function (fake_search_result) {
-        if (fake_search_result)
-          self.display_lists(fake_search_result, true);
       });
 
       return GGRC.Models.Search.search_for_types(
