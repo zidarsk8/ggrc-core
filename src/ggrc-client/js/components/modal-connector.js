@@ -75,8 +75,6 @@ import {
             }.bind(this));
         }
 
-        this.options.parent_instance = vm.parent_instance;
-        this.options.instance = instance;
         this.on();
       },
       setListItems: function (list) {

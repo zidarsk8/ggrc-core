@@ -3,12 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import * as SnapshotUtils from '../../plugins/utils/snapshot-utils';
-import * as QueryAPI from '../../plugins/utils/query-api-utils';
-
 describe('GGRC.Components.modalConnector', function () {
-  'use strict';
-
   let Component;
   let viewModel;
   let events;
@@ -97,14 +92,6 @@ describe('GGRC.Components.modalConnector', function () {
     ' if mapper getter is undefined', function () {
       handler();
       expect(that.setListItems).toHaveBeenCalledWith('mockList');
-    });
-    it('sets parent_instance form viewModel to options', function () {
-      handler();
-      expect(that.options.parent_instance).toEqual(viewModel.parent_instance);
-    });
-    it('sets instance form viewModel to options', function () {
-      handler();
-      expect(that.options.instance).toEqual(viewModel.instance);
     });
     it('calls on() method', function () {
       handler();
