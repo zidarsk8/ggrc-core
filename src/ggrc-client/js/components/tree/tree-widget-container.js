@@ -37,7 +37,6 @@ import {
 } from '../../events/eventTypes';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
-  isMyAssessments,
   getCounts,
   initCounts,
   initMappedInstances,
@@ -141,10 +140,6 @@ viewModel = can.Map.extend({
 
         if (this.attr('loading')) {
           classes.push('loading');
-        }
-
-        if (isMyAssessments()) {
-          classes.push('my-assessments');
         }
 
         return classes.join(' ');

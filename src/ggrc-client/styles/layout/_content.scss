@@ -15,15 +15,15 @@
   }
 
   > section.content {
-  overflow-y: auto;
-  overflow-x: hidden;
+    margin-top: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 }
 
 .object-area {
-  padding-top: 20px;
   background: $contentBgnd;
-  height: calc(100% - 20px);
+  height: 100%;
 
   &.import-area {
     margin-left: 0;
