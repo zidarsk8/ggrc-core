@@ -14,6 +14,7 @@ from sqlalchemy.orm.session import Session
 
 from ggrc.models import all_models
 from ggrc.models.hooks.acl import propagation
+from ggrc.utils import benchmark
 from ggrc_workflows.models.hooks import workflow
 
 
@@ -85,8 +86,11 @@ def after_flush(session, _):
 
 
 def after_commit():
-  propagation.propagate()
-  workflow.handle_acl_changes()
+  """ACL propagation after commit action."""
+  with benchmark("General acl propagation"):
+    propagation.propagate()
+  with benchmark("Workflow acl propagation"):
+    workflow.handle_acl_changes()
 
 
 def init_hook():
