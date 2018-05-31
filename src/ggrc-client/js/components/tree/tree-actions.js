@@ -34,7 +34,10 @@ export default can.Component.extend({
       show3bbs: {
         type: Boolean,
         get: function () {
-          return !isMyAssessments();
+          let modelName = this.attr('model').shortName;
+          return !isMyAssessments()
+            && modelName !== 'Document'
+            && modelName !== 'Evidence';
         },
       },
       isSnapshots: {

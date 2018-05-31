@@ -6,6 +6,7 @@
 import Component from '../tree-actions';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import * as AclUtils from '../../../plugins/utils/acl-utils';
+import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import Permission from '../../../permission';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
@@ -149,6 +150,37 @@ describe('tree-actions component', () => {
         spyOn(AclUtils, 'isAuditor').and.returnValue(true);
 
         expect(vm.attr('showImport')).toBeTruthy();
+      });
+  });
+
+  describe('show3bbs get() method', () => {
+    it('returns false for MyAssessments page', () => {
+      vm.attr('model', {shortName: 'any page'});
+      spyOn(CurrentPageUtils, 'isMyAssessments').and.returnValue(true);
+
+      expect(vm.attr('show3bbs')).toBeFalsy();
+    });
+
+    it('returns false for Documents page', () => {
+      vm.attr('model', {shortName: 'Document'});
+      spyOn(CurrentPageUtils, 'isMyAssessments').and.returnValue(false);
+
+      expect(vm.attr('show3bbs')).toBeFalsy();
+    });
+
+    it('returns false for Evidence page', () => {
+      vm.attr('model', {shortName: 'Evidence'});
+      spyOn(CurrentPageUtils, 'isMyAssessments').and.returnValue(false);
+
+      expect(vm.attr('show3bbs')).toBeFalsy();
+    });
+
+    it('returns true for any page except My assessments, Document, Evidence',
+      () => {
+        vm.attr('model', {shortName: 'any page'});
+        spyOn(CurrentPageUtils, 'isMyAssessments').and.returnValue(false);
+
+        expect(vm.attr('show3bbs')).toBeTruthy();
       });
   });
 });
