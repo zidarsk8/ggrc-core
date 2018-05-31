@@ -4,7 +4,6 @@
  */
 
 import {
-  toObject,
   isSnapshotType,
 } from '../plugins/utils/snapshot-utils';
 
