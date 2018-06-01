@@ -33,7 +33,7 @@ class TestTotalReindex(TestCase):
       'Contract': 9,
       'Control': 12,
       'Cycle': 5,
-      'CycleTaskEntry': 3,
+      'CycleTaskEntry': 4,
       'CycleTaskGroup': 5,
       'CycleTaskGroupObjectTask': 5,
       'Evidence': 25,   # TODO improve
@@ -47,7 +47,7 @@ class TestTotalReindex(TestCase):
       'Process': 8,
       'Program': 7,
       'Regulation': 9,
-      'TaskGroup': 3,
+      'TaskGroup': 4,
       'TaskGroupObject': 5,
       'TaskGroupTask': 4,
       'Workflow': 6,
