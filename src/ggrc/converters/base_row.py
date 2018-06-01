@@ -159,8 +159,10 @@ class RowConverter(object):
     """ Get object if the slug is in the system or return a new object """
     value = self.get_value(key)
     self.is_new = False
-    obj = self.find_by_key(key, value)
-    if not obj:
+
+    if value:
+      obj = self.find_by_key(key, value)
+    if not value or not obj:
       # We assume that 'get_importables()' returned value contains
       # names of the objects that cannot be created via import but
       # can be updated.
