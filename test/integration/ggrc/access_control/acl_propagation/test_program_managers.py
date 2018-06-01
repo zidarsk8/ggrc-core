@@ -356,7 +356,7 @@ class TestProgramManagersPropagation(base.TestACLPropagation):
         object_type="Program",
     ).first()
 
-    rbac_factory = rbac_factories.get_factory(model)
+    rbac_factory = rbac_factories.TEST_FACTORIES_MAPPING[model]
     return rbac_factory(self.people[role].id, program_manager_acr, parent)
 
   @helpers.unwrap(PERMISSIONS)

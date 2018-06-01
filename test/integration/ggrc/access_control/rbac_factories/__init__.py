@@ -17,30 +17,20 @@ from integration.ggrc.access_control.rbac_factories import (audit, assessment,
                                                             evidence)
 
 
-def get_factory(model):
-  """Get RBAC factory by model name.
-
-  Args:
-      model: Model name.
-
-  Returns:
-      RBAC factory.
-  """
-  factories = {
-      "Audit": audit.AuditRBACFactory,
-      "Assessment": assessment.AssessmentRBACFactory,
-      "AssessmentTemplate": assessment_template.AssessmentTemplateRBACFactory,
-      "Snapshot": snapshot.SnapshotRBACFactory,
-      "Issue": issue.IssueRBACFactory,
-      "Evidence": evidence.EvidenceRBACFactory,
-      "Document": document.DocumentReferenceUrlRBACFactory,
-      "Program": program.ProgramRBACFactory,
-      "Workflow": workflow.WorkflowRBACFactory,
-      "TaskGroup": task_group.TaskGroupRBACFactory,
-      "TaskGroupTask": task_group_task.TaskGroupTaskRBACFactory,
-      "Cycle": cycle.CycleRBACFactory,
-      "CycleTaskGroup": cycle_task_group.CycleTaskGroupRBACFactory,
-      "CycleTask": cycle_task.CycleTaskRBACFactory,
-      "CycleTaskEntry": cycle_task_entry.CycleTaskEntryRBACFactory,
-  }
-  return factories[model]
+TEST_FACTORIES_MAPPING = {
+    "Audit": audit.AuditRBACFactory,
+    "Assessment": assessment.AssessmentRBACFactory,
+    "AssessmentTemplate": assessment_template.AssessmentTemplateRBACFactory,
+    "Snapshot": snapshot.SnapshotRBACFactory,
+    "Issue": issue.IssueRBACFactory,
+    "Evidence": evidence.EvidenceRBACFactory,
+    "Document": document.DocumentReferenceUrlRBACFactory,
+    "Program": program.ProgramRBACFactory,
+    "Workflow": workflow.WorkflowRBACFactory,
+    "TaskGroup": task_group.TaskGroupRBACFactory,
+    "TaskGroupTask": task_group_task.TaskGroupTaskRBACFactory,
+    "Cycle": cycle.CycleRBACFactory,
+    "CycleTaskGroup": cycle_task_group.CycleTaskGroupRBACFactory,
+    "CycleTask": cycle_task.CycleTaskRBACFactory,
+    "CycleTaskEntry": cycle_task_entry.CycleTaskEntryRBACFactory,
+}
