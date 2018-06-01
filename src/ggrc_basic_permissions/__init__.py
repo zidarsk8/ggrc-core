@@ -16,6 +16,8 @@ from ggrc import settings
 from ggrc.login import is_external_app_user
 from ggrc.login import get_current_user
 from ggrc.models import all_models
+
+from ggrc.access_control.roleable import Roleable
 from ggrc.models.audit import Audit
 from ggrc.models.program import Program
 from ggrc.rbac import permissions as rbac_permissions
@@ -319,21 +321,25 @@ def _get_acl_filter():
   Returns:
     list of filter statements.
   """
-  referenced_object_tuples = []
   stubs = getattr(flask.g, "referenced_object_stubs", {})
-  additional_filters = []
-  if stubs:
-    for type_, ids in stubs.items():
-      referenced_object_tuples.extend((type_, id_) for id_ in ids)
-    additional_filters.append(
-        sa.tuple_(
-            all_models.AccessControlList.object_type,
-            all_models.AccessControlList.object_id,
-        ).in_(
-            referenced_object_tuples,
-        )
-    )
-  return additional_filters
+  if not stubs:
+    return []
+  roleable_models = {m.__name__ for m in all_models.all_models
+                     if issubclass(m, Roleable)}
+  keys = [(type_, id_)
+          for type_, ids in stubs.iteritems()
+          for id_ in ids
+          if type_ in roleable_models]
+  if not keys:
+    return []
+  return [
+      sa.tuple_(
+          all_models.AccessControlList.object_type,
+          all_models.AccessControlList.object_id,
+      ).in_(
+          keys,
+      )
+  ]
 
 
 def load_access_control_list(user, permissions):

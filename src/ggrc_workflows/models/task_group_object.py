@@ -12,8 +12,10 @@ from ggrc.models.mixins import Timeboxed
 from ggrc.models import reflection
 from ggrc.models import utils
 
+from ggrc.access_control import roleable
 
-class TaskGroupObject(Timeboxed, Base, db.Model):
+
+class TaskGroupObject(roleable.Roleable, Timeboxed, Base, db.Model):
   """Workflow TaskGroupObject model."""
 
   __tablename__ = 'task_group_objects'
