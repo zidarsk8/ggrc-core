@@ -219,7 +219,8 @@ class TestRevisionHistory(TestCase):
        "fields": ['test_plan', 'status', 'notes',
                   'description', 'title', 'slug', 'folder']},
       {"factory": factories.RiskFactory,
-       "fields": ['test_plan', 'status', 'notes', 'title', 'slug']},
+       "fields": ['test_plan', 'status', 'description',
+                  'notes', 'title', 'slug']},
   )
   @ddt.unpack
   def test_get_mandatory_fields(self, factory, fields):
@@ -235,7 +236,7 @@ class TestRevisionHistory(TestCase):
     self.assertIn("mandatory", collection[0]["meta"])
     mandatory_meta = collection[0]["meta"]["mandatory"]
     self.assertIn("fields", mandatory_meta)
-    self.assertEqual(fields, mandatory_meta["fields"])
+    self.assertItemsEqual(fields, mandatory_meta["fields"])
 
   @ddt.data(
       {"factory": factories.ControlFactory, "fields": []},
