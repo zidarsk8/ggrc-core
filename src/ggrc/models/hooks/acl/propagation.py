@@ -16,6 +16,7 @@ import sqlalchemy as sa
 from ggrc import db
 from ggrc import login
 from ggrc import utils
+from ggrc.utils import helpers
 from ggrc.access_control import utils as acl_utils
 from ggrc.models import all_models
 
@@ -323,17 +324,18 @@ def _delete_orphan_acl_entries(deleted_objects):
   db.session.plain_commit()
 
 
-def _delete_all_propagated_acls():
-  """Delete all propagater acl entries.
+def _delete_propagated_acls(acl_ids):
+  """Delete propagated acl entries for the given parents.
 
-  This function is used as cleanup before we re-evaluate propagation for all
-  objects.
+  Args:
+    acl_ids: List of parent acl ids for which the propagated acl entries will
+      be deleted.
   """
-  logger.info("Deleting all propagated acl entries")
   acl_table = all_models.AccessControlList.__table__
+
   db.session.execute(
       acl_table.delete().where(
-          acl_table.c.parent_id.isnot(None),
+          acl_table.c.parent_id.in_(acl_ids),
       )
   )
   db.session.plain_commit()
@@ -372,17 +374,18 @@ def propagate():
   del flask.g.deleted_objects
 
 
+@helpers.without_sqlalchemy_cache
 def propagate_all():
   """Re-evaluate propagation for all objects."""
   with utils.benchmark("Run propagate_all"):
     from ggrc_workflows.models.hooks import workflow
-    with utils.benchmark("Delete existing propagated roles"):
-      _delete_all_propagated_acls()
 
     with utils.benchmark("Get non propagated acl ids"):
       query = db.session.query(
           all_models.AccessControlList.object_type,
           all_models.AccessControlList.id,
+      ).filter(
+          all_models.AccessControlList.parent_id.is_(None),
       )
       non_wf_acl_ids = []
       wf_acl_ids = []
@@ -398,6 +401,7 @@ def propagate_all():
       for acl_ids in utils.list_chunks(non_wf_acl_ids):
         propagated_count += len(acl_ids)
         logger.info("Propagating ACL entries: %s/%s", propagated_count, count)
+        _delete_propagated_acls(acl_ids)
 
         flask.g.new_acl_ids = acl_ids
         flask.g.new_relationship_ids = set()
@@ -414,6 +418,8 @@ def propagate_all():
             propagated_count,
             count
         )
+        _delete_propagated_acls(acl_ids)
+
         flask.g.new_wf_acls = set(acl_ids)
         flask.g.new_wf_comment_ct_ids = set()
         flask.g.deleted_wf_objects = set()
