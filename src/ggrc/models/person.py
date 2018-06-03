@@ -56,7 +56,7 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
   )
 
   @staticmethod
-  def _extra_table_args(cls):
+  def _extra_table_args(_):
     return (
         db.Index('ix_people_name_email', 'name', 'email'),
         db.Index('uq_people_email', 'email', unique=True),

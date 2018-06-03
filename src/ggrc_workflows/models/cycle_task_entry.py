@@ -17,7 +17,7 @@ from ggrc.fulltext import mixin
 from ggrc.models.mixins import base
 
 
-class CycleTaskEntry(roleable.Roleable, Relatable, Described, 
+class CycleTaskEntry(roleable.Roleable, Relatable, Described,
                      base.ContextRBAC, Base, mixin.Indexed, db.Model):
   """Workflow CycleTaskEntry model."""
 

@@ -57,8 +57,6 @@ class ObjectPerson(Timeboxed, base.ContextRBAC, Base, db.Model):
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(ObjectPerson, cls).eager_query()
     return query.options(
         orm.subqueryload('person'))

@@ -365,8 +365,7 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
       comment_found = False
     if not comment_found:
       return ["comment"]
-    else:
-      return []
+    return []
 
   @staticmethod
   def multi_choice_options_to_flags(cad):
@@ -398,9 +397,8 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
 
     if not cad.multi_choice_options or not cad.multi_choice_mandatory:
       return {}
-    else:
-      return dict(zip(
-          cad.multi_choice_options.split(","),
-          (make_flags(mask)
-           for mask in cad.multi_choice_mandatory.split(",")),
-      ))
+    return dict(zip(
+        cad.multi_choice_options.split(","),
+        (make_flags(mask)
+         for mask in cad.multi_choice_mandatory.split(",")),
+    ))

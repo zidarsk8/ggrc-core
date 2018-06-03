@@ -16,7 +16,7 @@ from ggrc.models import utils
 from ggrc.access_control import roleable
 
 
-class TaskGroupObject(roleable.Roleable, Timeboxed, base.ContextRBAC, Base, 
+class TaskGroupObject(roleable.Roleable, Timeboxed, base.ContextRBAC, Base,
                       db.Model):
   """Workflow TaskGroupObject model."""
 
