@@ -28,12 +28,6 @@ logger = logging.getLogger(__name__)
 PROPAGATION_DEPTH_LIMIT = 50
 
 
-def _insert_select_acls(select_statement):
-  """Run insert from select with default acl inserter."""
-  inserter = all_models.AccessControlList.__table__.insert()
-  acl_utils.insert_select_acls(inserter, select_statement)
-
-
 def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
   """Get left side of relationships mappings through source."""
   rel_table = all_models.Relationship.__table__
@@ -208,7 +202,7 @@ def _handle_propagation_parents(parent_acl_ids):
   src_select = _rel_parent(parent_acl_ids, source=True)
   dst_select = _rel_parent(parent_acl_ids, source=False)
   select_statement = sa.union(src_select, dst_select)
-  _insert_select_acls(select_statement)
+  acl_utils.insert_select_acls(select_statement)
 
 
 def _handle_propagation_children(new_parent_ids):
@@ -216,7 +210,7 @@ def _handle_propagation_children(new_parent_ids):
   src_select = _rel_child(new_parent_ids, source=True)
   dst_select = _rel_child(new_parent_ids, source=False)
   select_statement = sa.union(src_select, dst_select)
-  _insert_select_acls(select_statement)
+  acl_utils.insert_select_acls(select_statement)
 
 
 def _handle_propagation_rel(relationship_ids, new_acl_ids):
@@ -232,7 +226,7 @@ def _handle_propagation_rel(relationship_ids, new_acl_ids):
       source=False
   )
   select_statement = sa.union(src_select, dst_select)
-  _insert_select_acls(select_statement)
+  acl_utils.insert_select_acls(select_statement)
 
 
 def _handle_acl_step(parent_acl_ids):
