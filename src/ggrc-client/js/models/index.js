@@ -24,7 +24,6 @@ import './mixins';
 import './cacheable';
 import './local_storage';
 import './display_prefs';
-import './local_list_cache';
 import './document';
 import './evidence';
 import './person';
