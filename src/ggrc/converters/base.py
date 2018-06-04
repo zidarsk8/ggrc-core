@@ -155,6 +155,7 @@ class ExportConverter(BaseConverter):
 
   def __init__(self, ids_by_type):
     super(ExportConverter, self).__init__()
+    self.dry_run = True  # TODO: fix ColumnHandler to not use it for exports
     self.ids_by_type = ids_by_type
 
   def get_object_names(self):
