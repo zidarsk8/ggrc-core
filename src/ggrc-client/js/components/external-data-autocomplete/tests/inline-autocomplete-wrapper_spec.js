@@ -4,13 +4,14 @@
  */
 
 import Component from '../inline-autocomplete-wrapper';
+import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 
 describe('GGRC.Components.inline-autocomplete-wrapper', ()=> {
   let viewModel;
   let instance;
   let path;
   beforeEach(()=> {
-    instance = new can.Model.Cacheable();
+    instance = makeFakeInstance({model: can.Model.Cacheable})({id: 25});
     path = 'testPath';
 
     viewModel = new (can.Map.extend(Component.prototype.viewModel))({
@@ -103,7 +104,7 @@ describe('GGRC.Components.inline-autocomplete-wrapper', ()=> {
 
       beforeEach(function () {
         const caDefs = [{id: 1}];
-        instance = new CMS.Models.Control({
+        instance = makeFakeInstance({model: CMS.Models.Control})({
           custom_attribute_definitions: caDefs,
         });
         item = new can.Map({test: true});

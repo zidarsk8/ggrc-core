@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {makeFakeInstance} from '../../../js_specs/spec_helpers';
+
 describe('CMS.Models.Comment', function () {
   'use strict';
 
@@ -16,7 +18,7 @@ describe('CMS.Models.Comment', function () {
 
     beforeEach(function () {
       $element = $('<div />');
-      comment = new CMS.Models.Comment();
+      comment = makeFakeInstance({model: CMS.Models.Comment})();
       method = comment.updateDescription.bind(comment);
 
       trigger = spyOn($.prototype, 'trigger');

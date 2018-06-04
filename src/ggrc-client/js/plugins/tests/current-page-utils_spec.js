@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 import * as TreeViewUtils from '../utils/tree-view-utils';
 import * as SnapshotUtils from '../utils/snapshot-utils';
 import * as CurrentPageUtils from '../utils/current-page-utils';
@@ -20,7 +21,7 @@ describe('GGRC Utils CurrentPage', function () {
   });
 
   beforeEach(function () {
-    let instance = new CMS.Models.Audit({
+    let instance = makeFakeInstance({model: CMS.Models.Audit})({
       id: 1,
       type: 'Audit',
     });

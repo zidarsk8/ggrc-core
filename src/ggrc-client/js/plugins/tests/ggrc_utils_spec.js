@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 import Permission from '../../permission';
 import * as aclUtils from '../utils/acl-utils';
 
@@ -24,8 +25,12 @@ describe('GGRC utils allowed_to_map() method', function () {
 
   describe('given an Audit and Program pair', function () {
     beforeEach(function () {
-      fakeProgram = new CMS.Models.Program({type: 'Program'});
-      fakeAudit = new CMS.Models.Audit({type: 'Audit'});
+      fakeProgram = makeFakeInstance({model: CMS.Models.Program})({
+        type: 'Program',
+      });
+      fakeAudit = makeFakeInstance({model: CMS.Models.Audit})({
+        type: 'Program',
+      });
 
       spyOn(GGRC.Mappings, 'get_canonical_mapping_name')
         .and.returnValue('audits');
@@ -59,7 +64,7 @@ describe('GGRC utils allowed_to_map() method', function () {
     });
 
     beforeEach(function () {
-      person = new CMS.Models.Person({type: 'Person'});
+      person = makeFakeInstance({model: CMS.Models.Person})({type: 'Person'});
       otherInstance = new can.Model({type: 'Foo'});
     });
 

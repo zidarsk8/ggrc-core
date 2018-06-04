@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
 
 
@@ -41,7 +42,7 @@ describe('GGRC.Components.accessControlListRolesHelper', function () {
         },
       ]);
 
-      instance = new CMS.Models.Assessment({id: 25});
+      instance = makeFakeInstance({model: CMS.Models.Assessment})({id: 25});
       viewModel.attr('instance', instance);
       expect(instance.access_control_list.length).toEqual(0);
       viewModel.setAutoPopulatedRoles();
@@ -64,7 +65,7 @@ describe('GGRC.Components.accessControlListRolesHelper', function () {
         },
       ]);
 
-      instance = new CMS.Models.Control({id: 25});
+      instance = makeFakeInstance({model: CMS.Models.Control})({id: 25});
       viewModel.attr('instance', instance);
       expect(instance.access_control_list.length).toEqual(0);
       viewModel.setAutoPopulatedRoles();
