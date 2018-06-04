@@ -62,46 +62,48 @@ class TestComprehensiveSheets(TestCase):
   }
   DEFAULT_LIMIT = 39
 
-  @ddt.data(*MODELS)
-  def test_queries_per_api_call(self, model):
+  def test_queries_per_api_call(self):
     """Import comprehensive_sheet1 and count db requests per {0.__name__}
 
     collection get
     Query count should be <LIMIT for all model types.
     """
-    limit = self.LIMIT_DICT["LIST"].get(model, self.DEFAULT_LIMIT)
-    with QueryCounter() as counter:
-      counter.queries = []
-      self.generator.api.get_query(model, "")
-      if counter.get > limit:
-        print collections.Counter(counter.queries).most_common(1)
-      self.assertLess(counter.get, limit,
-                      "Query count for object {} exceeded: {}/{}".format(
-                          model.__name__, counter.get, limit)
-                      )
+    for model in self.MODELS:
+      limit = self.LIMIT_DICT["LIST"].get(model, self.DEFAULT_LIMIT)
+      with QueryCounter() as counter:
+        counter.queries = []
+        self.generator.api.get_query(model, "")
+        if counter.get > limit:
+          print collections.Counter(counter.queries).most_common(1)
+        self.assertLess(
+            counter.get,
+            limit,
+            "Query count for object {} exceeded: {}/{}".format(
+                model.__name__, counter.get, limit)
+        )
 
-  @ddt.data(*all_object_views())
-  def test_queries_per_object_page(self, view):
+  def test_queries_per_object_page(self):
     """Import comprehensive_sheet1 and count db requests per collection get.
 
     Query count should be <LIMIT for all model types.
     """
-    with QueryCounter() as counter:
-      model = view.model_class
-      if model not in self.MODELS:
-        return
-      instance = model.query.first()
-      if instance is None or getattr(instance, "id", None) is None:
-        return
-      limit = self.LIMIT_DICT["SINGLE"].get(model, self.DEFAULT_LIMIT)
-      counter.queries = []
-      res = self.client.get("/{}/{}".format(view.url, instance.id))
-      self.assertEqual(res.status_code, 200)
-      self.assertLessEqual(
-          counter.get, limit,
-          "Query count for object {} exceeded: {}/{}".format(
-              model.__name__, counter.get, limit)
-      )
+    for view in all_object_views():
+      with QueryCounter() as counter:
+        model = view.model_class
+        if model not in self.MODELS:
+          return
+        instance = model.query.first()
+        if instance is None or getattr(instance, "id", None) is None:
+          return
+        limit = self.LIMIT_DICT["SINGLE"].get(model, self.DEFAULT_LIMIT)
+        counter.queries = []
+        res = self.client.get("/{}/{}".format(view.url, instance.id))
+        self.assertEqual(res.status_code, 200)
+        self.assertLessEqual(
+            counter.get, limit,
+            "Query count for object {} exceeded: {}/{}".format(
+                model.__name__, counter.get, limit)
+        )
 
   def test_queries_for_dashboard(self):
     with QueryCounter() as counter:
