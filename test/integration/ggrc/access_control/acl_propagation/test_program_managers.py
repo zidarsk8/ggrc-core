@@ -198,7 +198,7 @@ class TestProgramManagersPropagation(base.TestACLPropagation):
               "unmap": True,
           },
           "Evidence Audit": {
-              "create": (True, "unimplemented"),
+              "create_and_map": True,
               "read": True,
               "update": True,
               "delete": False,
@@ -206,7 +206,7 @@ class TestProgramManagersPropagation(base.TestACLPropagation):
               "read_comments": True
           },
           "Evidence Assessment": {
-              "create": (True, "unimplemented"),
+              "create_and_map": True,
               "read": True,
               "update": True,
               "delete": False,

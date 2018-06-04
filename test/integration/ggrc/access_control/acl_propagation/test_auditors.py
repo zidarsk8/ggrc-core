@@ -184,7 +184,7 @@ class TestAuditorsPropagation(base.TestACLPropagation):
               "read_comments": True
           },
           "Evidence Assessment": {
-              "create": (True, "unimplemented"),
+              "create_and_map": True,
               "read": True,
               "update": True,
               "delete": False,

@@ -87,10 +87,14 @@ class EvidenceRBACFactory(base.BaseRBACFactory):
       parent = all_models.Assessment.query.get(self.assessment_id)
     map_evidence = evidence if evidence else factories.EvidenceUrlFactory()
 
-    return self.objgen.generate_relationship(
-        source=parent,
-        destination=map_evidence
-    )[0]
+    return self.api.put(parent, {
+        "actions": {
+            "add_related": [{
+                "id": map_evidence.id,
+                "type": "Evidence",
+            }]
+        }
+    })
 
   def create_and_map(self):
     """Create new Evidence and map it to parent."""
