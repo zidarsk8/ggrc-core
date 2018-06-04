@@ -30,9 +30,6 @@ from sqlalchemy.orm.session import Session
 from ggrc import db
 from ggrc.models import reflection
 from ggrc.models.deferred import deferred
-from ggrc.models.mixins.customattributable import CustomAttributable
-from ggrc.models.mixins.notifiable import Notifiable
-from ggrc.models.exceptions import ValidationError
 from ggrc.models.mixins.base import Base
 from ggrc.fulltext import attributes
 
@@ -481,16 +478,6 @@ class Slugged(Base):
   @declared_attr
   def slug(cls):  # pylint: disable=no-self-argument
     return deferred(db.Column(db.String, nullable=False), cls.__name__)
-
-  @validates('slug')
-  def validate_slug(self, key, value):
-    """Validates slug for models."""
-    # pylint: disable=unused-argument
-    # pylint: disable=no-self-use
-    if not value:
-      message = "Slug '{}' is invalid. Slug must be provided"
-      raise ValidationError(message.format(value))
-    return value
 
   @staticmethod
   def _extra_table_args(model):
