@@ -107,7 +107,7 @@ describe('GGRC.Components.treeHeader', function () {
       let event;
 
       beforeEach(function () {
-        event = events['{viewModel.orderBy} change'].bind({
+        event = events['{viewModel.orderBy} changed'].bind({
           viewModel: vm,
         });
       });

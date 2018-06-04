@@ -90,7 +90,7 @@ export default GGRC.Components('mapperResults', {
 
       this.attr('items').replace([]);
       return this.load()
-        .then(items => {
+        .then((items) => {
           this.attr('items', items);
           this.attr('entries', items.map(function (item) {
             return item.data;
@@ -212,9 +212,14 @@ export default GGRC.Components('mapperResults', {
       if (addPaging) {
         paging.current = this.attr('paging.current');
         paging.pageSize = this.attr('paging.pageSize');
-        if (this.attr('sort.key')) {
-          paging.sortBy = this.attr('sort.key');
-          paging.sortDirection = this.attr('sort.direction');
+
+        let sort = this.attr('sort');
+        let defaultSort = this.attr('defaultSort');
+
+        if (sort && sort.key) {
+          paging.sort = [sort];
+        } else if (defaultSort && defaultSort.length) {
+          paging.sort = defaultSort;
         }
       }
       if (this.shouldApplyUnlockedFilter(modelName)) {

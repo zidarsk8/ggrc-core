@@ -239,8 +239,10 @@ viewModel = can.Map.extend({
     let page = {
       current: pageInfo.current,
       pageSize: pageInfo.pageSize,
-      sortBy: sortingInfo.sortBy,
-      sortDirection: sortingInfo.sortDirection,
+      sort: [{
+        key: sortingInfo.sortBy,
+        direction: sortingInfo.sortDirection,
+      }],
     };
     let request = this.attr('advancedSearch.request');
     const stopFn = tracker.start(this.attr('modelName'),
@@ -250,7 +252,7 @@ viewModel = can.Map.extend({
     pageInfo.attr('disabled', true);
     this.attr('loading', true);
 
-    if (!!this._getFilterByName('status')) {
+    if (this._getFilterByName('status')) {
       initCounts([widgetId], parent.type, parent.id);
     }
 

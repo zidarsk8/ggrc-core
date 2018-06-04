@@ -55,8 +55,7 @@ function batchRequests(params) {
  * @param {Object} page - Information about page state.
  * @param {Number} page.current - Current page
  * @param {Number} page.pageSize - Page size
- * @param {String} page.sortBy - sortBy
- * @param {String} page.sortDirection - sortDirection
+ * @param {Array} page.sort - Array of sorting criteria
  * @param {String} page.filter - Filter string
  * @param {Object} relevant - Information about relevant object
  * @param {Object} relevant.type - Type of relevant object
@@ -76,8 +75,7 @@ function buildParams(objName, page, relevant, additionalFilter) {
  * @param {Object} page - Information about page state.
  * @param {Number} page.current - Current page
  * @param {Number} page.pageSize - Page size
- * @param {String} page.sortBy - sortBy
- * @param {String} page.sortDirection - sortDirection
+ * @param {Array} page.sort - Array of sorting criteria
  * @param {String} page.filter - Filter string
  * @param {Object} relevant - Information about relevant object
  * @param {Object} relevant.type - Type of relevant object
@@ -99,8 +97,7 @@ function buildRelevantIdsQuery(objName, page, relevant, additionalFilter) {
  * @param {Object} page - Information about page state.
  * @param {Number} page.current - Current page
  * @param {Number} page.pageSize - Page size
- * @param {String} page.sortBy - sortBy
- * @param {String} page.sortDirection - sortDirection
+ * @param {Array} page.sort - Array of sorting criteria
  * @param {Object|Object[]} relevant - Information about relevant object
  * @param {Object} relevant.type - Type of relevant object
  * @param {Object} relevant.id - Id of relevant object
@@ -126,12 +123,24 @@ function buildParam(objName, page, relevant, fields, filters) {
     last = page.current * page.pageSize;
     params.limit = [first, last];
   }
-  if (page.sortBy) {
-    params.order_by = [{
-      name: page.sortBy,
-      desc: page.sortDirection === 'desc',
-    }];
+
+  if (page.sort) {
+    params.order_by = _
+      .chain(page.sort)
+      .map((el)=> {
+        if (el.key) {
+          return {
+            name: el.key,
+            desc: el.direction === 'desc',
+          };
+        }
+      })
+      .compact()
+      .value();
+
+    params.order_by = params.order_by.length ? params.order_by : undefined;
   }
+
   if (fields) {
     params.fields = fields;
   }

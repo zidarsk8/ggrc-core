@@ -404,10 +404,10 @@ describe('assessment-info-pane component', () => {
 
     it('sets "Comment" type and sortObj for getQuery method', function () {
       const type = 'Comment';
-      const sortObj = {
-        sortBy: 'created_at',
-        sortDirection: 'desc',
-      };
+      const sortObj = {sort: [{
+        key: 'created_at',
+        direction: 'desc',
+      }]};
       vm.getCommentQuery();
       expect(vm.getQuery).toHaveBeenCalledWith(type, sortObj);
     });

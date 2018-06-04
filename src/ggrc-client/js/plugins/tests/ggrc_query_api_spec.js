@@ -101,6 +101,33 @@ describe('GGRC Utils Query API', function () {
       });
     });
 
+    describe('Correct sorting', function () {
+      beforeEach(function () {
+        paging = {
+          current: 1,
+          pageSize: 10,
+          sort: [{
+            key: 'test title',
+            direction: 'desc',
+          }],
+        };
+      });
+
+      it('return correct order_by key', function () {
+        let result = method(objectName, paging)[0];
+        expect(result.order_by[0].name).toEqual('test title');
+      });
+
+      it('return correct order_by direction', function () {
+        let result = method(objectName, paging)[0];
+        expect(result.order_by[0].desc).toBeTruthy();
+
+        paging.sort[0].direction = 'asc';
+        result = method(objectName, paging)[0];
+        expect(result.order_by[0].desc).toBeFalsy();
+      });
+    });
+
     describe('Assessments owned by the Person', function () {
       beforeEach(function () {
         relevant = {

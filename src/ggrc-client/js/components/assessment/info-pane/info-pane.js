@@ -224,7 +224,7 @@ export default can.Component.extend({
     },
     getCommentQuery: function () {
       return this.getQuery('Comment',
-        {sortBy: 'created_at', sortDirection: 'desc'});
+        {sort: [{key: 'created_at', direction: 'desc'}]});
     },
     getSnapshotQuery: function () {
       return this.getQuery('Snapshot');
@@ -232,7 +232,7 @@ export default can.Component.extend({
     getEvidenceQuery: function (kind) {
       let query = this.getQuery(
         'Evidence',
-        {sortBy: 'created_at', sortDirection: 'desc'},
+        {sort: [{key: 'created_at', direction: 'desc'}]},
         this.getEvidenceAdditionFilter(kind));
       return query;
     },

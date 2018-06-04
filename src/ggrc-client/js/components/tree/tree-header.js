@@ -113,7 +113,7 @@ export default GGRC.Components('treeHeader', {
     '{viewModel} selectedColumns': function () {
       this.viewModel.initializeColumns();
     },
-    '{viewModel.orderBy} change'() {
+    '{viewModel.orderBy} changed'() {
       this.viewModel.onOrderChange();
     },
   },
