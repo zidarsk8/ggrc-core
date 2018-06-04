@@ -268,7 +268,7 @@ class TestCase(BaseTestCase, object):
   def init_taskqueue(cls):
     """Init test environment for working with appengine."""
     cls.testbed = cls.testbed or testbed.Testbed()
-    if not cls.testbed._activated:
+    if not cls.testbed._activated:  # pylint: disable=protected-access
       cls.testbed.activate()
 
     # root_path must be set the the location of queue.yaml.
@@ -278,6 +278,8 @@ class TestCase(BaseTestCase, object):
 
   @classmethod
   def del_taskueue(cls):
+    """Remove current testbed."""
+    # pylint: disable=protected-access
     if cls.testbed and cls.testbed._activated:
       cls.testbed.deactivate()
 
