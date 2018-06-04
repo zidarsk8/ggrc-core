@@ -46,11 +46,9 @@ class Section(Roleable,
       }
   }
 
-  na = deferred(db.Column(db.Boolean, default=False, nullable=False),
-                'Section')
   notes = deferred(db.Column(db.Text, nullable=False, default=u""), 'Section')
 
-  _api_attrs = reflection.ApiAttributes('na', 'notes')
+  _api_attrs = reflection.ApiAttributes('notes')
   _sanitize_html = ['notes']
   _include_links = []
 
