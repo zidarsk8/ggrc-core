@@ -102,7 +102,8 @@ describe('GGRC.Mappings', function () {
       'TaskGroup', 'Workflow', 'Assessment']),
     DataAsset: filtered,
     Evidence: ['Assessment', 'Audit'],
-    Document: _.difference(filtered, ['Audit', 'Assessment']),
+    Document: _.difference(filtered,
+      ['Audit', 'Assessment', 'Document', 'Person']),
     Facility: filtered,
     Issue: _.difference(filtered, [
       'Audit', 'Person', 'Workflow', 'Assessment']),
