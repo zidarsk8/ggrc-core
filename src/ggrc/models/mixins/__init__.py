@@ -30,6 +30,8 @@ from sqlalchemy.orm.session import Session
 from ggrc import db
 from ggrc.models import reflection
 from ggrc.models.deferred import deferred
+from ggrc.models.mixins.customattributable import CustomAttributable
+from ggrc.models.mixins.notifiable import Notifiable
 from ggrc.models.mixins.base import Base
 from ggrc.fulltext import attributes
 
