@@ -281,9 +281,10 @@ class TestCase(BaseTestCase, object):
     if cls.testbed and cls.testbed._activated:
       cls.testbed.deactivate()
 
-  @staticmethod
-  def send_import_request(data, dry_run=False, person=None):
+  @classmethod
+  def send_import_request(cls, data, dry_run=False, person=None):
     """Sending import post request."""
+    cls.init_taskqueue()
     headers = {
         "X-test-only": "true" if dry_run else "false",
         "X-requested-by": "GGRC",
@@ -299,7 +300,6 @@ class TestCase(BaseTestCase, object):
          new=read_imported_file)
   def _import_file(cls, filename, dry_run=False, person=None):
     """Function that handle sending file to import_csv service"""
-    cls.init_taskqueue()
     data = {"file": (open(os.path.join(cls.CSV_DIR, filename)), filename)}
     response = cls.send_import_request(data, dry_run=dry_run, person=person)
     return response
