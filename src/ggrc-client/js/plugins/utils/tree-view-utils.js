@@ -31,6 +31,7 @@ import {
 } from './object-versions-utils';
 import {getRolesForType} from './acl-utils';
 import {getMappableTypes} from '../ggrc_utils';
+import {caDefTypeName} from './custom-attribute/custom-attribute-config';
 
 
 /**
@@ -205,6 +206,8 @@ function getColumnsForModel(modelType, displayPrefs, modelName) {
 
         return include;
       }).map(function (def) {
+        let disableSorting = def.attribute_type === caDefTypeName.RichText;
+
         return {
           attr_title: def.title,
           attr_custom_attribute_id: def.id,
@@ -212,6 +215,7 @@ function getColumnsForModel(modelType, displayPrefs, modelName) {
           attr_sort_field: def.title,
           display_status: false,
           attr_type: 'custom',
+          disable_sorting: disableSorting,
         };
       });
   allAttrs = attrs.concat(customAttrs);
