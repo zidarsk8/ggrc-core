@@ -110,6 +110,21 @@ import tracker from '../tracker';
         attr_title: 'Last Comment',
         attr_name: 'last_comment',
         order: 17,
+      }, {
+        attr_title: 'Description',
+        attr_name: 'description',
+        disable_sorting: true,
+        order: 18,
+      }, {
+        attr_title: 'Notes',
+        attr_name: 'notes',
+        disable_sorting: true,
+        order: 19,
+      }, {
+        attr_title: 'Assessment Procedure',
+        attr_name: 'test_plan',
+        disable_sorting: true,
+        order: 20,
       }],
       display_attr_names: ['title', 'status', 'label', 'Assignees', 'Verifiers',
         'start_date', 'updated_at'],
