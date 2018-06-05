@@ -6,11 +6,14 @@
 import itertools
 
 from flask import request
+from logging import getLogger
 
 from ggrc.models.cache import Cache
 from ggrc.models.event import Event
 from ggrc.models.revision import Revision
 from ggrc.login import get_current_user_id
+
+logger = getLogger(__name__)
 
 
 def _revision_generator(user_id, action, objects):
@@ -89,7 +92,12 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
   else:
     resource_id = obj.id
     resource_type = str(obj.__class__.__name__)
-    action = request.method
+    try:
+      action = request.method
+    except Exception as exp:
+      action = "Undefined"
+      logger.warning("Request retrieval has failed: %s", exp.message)
+
     context_id = obj.context_id
   if not revisions:
     return event
