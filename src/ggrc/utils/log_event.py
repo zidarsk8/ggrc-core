@@ -5,8 +5,8 @@
 
 import itertools
 
-from flask import request
 from logging import getLogger
+from flask import request
 
 from ggrc.models.cache import Cache
 from ggrc.models.event import Event
@@ -94,7 +94,8 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
     resource_type = str(obj.__class__.__name__)
     try:
       action = request.method
-    except Exception as exp:
+    except Exception as exp:  # pylint: disable=broad-except
+      # No exception should affect the import request.
       action = "Undefined"
       logger.warning("Request retrieval has failed: %s", exp.message)
 
