@@ -30,7 +30,19 @@
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
-      ]),
+        {
+          attr_title: 'Description',
+          attr_name: 'description',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Notes',
+          attr_name: 'notes',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Remediation Plan',
+          attr_name: 'test_plan',
+          disable_sorting: true,
+        }]),
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
       add_item_view: GGRC.mustache_path + '/issues/tree_add_item.mustache',
       display_attr_names: ['title', 'Admin', 'status', 'updated_at'],
