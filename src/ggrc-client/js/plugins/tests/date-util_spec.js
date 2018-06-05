@@ -5,7 +5,7 @@
 
 import {getClosestWeekday} from '../utils/date-util';
 
-describe('GGRC.Utils.DateUtil', ()=> {
+describe('GGRC DateUtil', ()=> {
   describe('adjustToClosestWeekday() method', ()=> {
     it('adjusts to Friday when weekend provided', ()=> {
       let date = new Date(2017, 11, 24);

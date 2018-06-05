@@ -4,6 +4,7 @@
 */
 
 import template from './import-history.mustache';
+import {formatDate} from '../../../plugins/ggrc_utils';
 
 export default can.Component.extend({
   tag: 'import-history',
@@ -27,7 +28,7 @@ export default can.Component.extend({
   helpers: {
     createdAt(date) {
       let md = moment.utc(date());
-      return GGRC.Utils.formatDate(md.toDate());
+      return formatDate(md.toDate());
     },
   },
 });

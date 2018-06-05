@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as Utils from '../../plugins/ggrc_utils';
+
 describe('GGRC.Components.datepicker', function () {
   'use strict';
 
@@ -36,14 +38,14 @@ describe('GGRC.Components.datepicker', function () {
 
     describe('onFocus() method', function () {
       it('sets false to showTop attribute', function () {
-        spyOn(GGRC.Utils, 'inViewport')
+        spyOn(Utils, 'inViewport')
           .and.returnValue(true);
         viewModel.attr('showtop', true);
         viewModel.onFocus();
         expect(viewModel.attr('showTop')).toEqual(false);
       });
       it('sets true to isShown attribute', function () {
-        spyOn(GGRC.Utils, 'inViewport')
+        spyOn(Utils, 'inViewport')
           .and.returnValue(true);
         viewModel.attr('isShown', false);
         viewModel.onFocus();
@@ -51,14 +53,14 @@ describe('GGRC.Components.datepicker', function () {
       });
       it('does not set true to showTop attribute if picker is in viewport',
         function () {
-          spyOn(GGRC.Utils, 'inViewport')
+          spyOn(Utils, 'inViewport')
             .and.returnValue(true);
           viewModel.onFocus();
           expect(viewModel.attr('showTop')).toEqual(false);
         });
       it('sets true to showTop attribute if picker is not in viewport',
         function () {
-          spyOn(GGRC.Utils, 'inViewport')
+          spyOn(Utils, 'inViewport')
             .and.returnValue(false);
           viewModel.onFocus();
           expect(viewModel.attr('showTop')).toEqual(true);
@@ -345,7 +347,7 @@ describe('GGRC.Components.datepicker', function () {
       it('sets isShown to false if datepicker is shown' +
       ' and click was outside the datepicker', function () {
         viewModel.attr('isShown', true);
-        spyOn(GGRC.Utils.events, 'isInnerClick')
+        spyOn(Utils, 'isInnerClick')
           .and.returnValue(false);
         method({}, {});
         expect(viewModel.attr('isShown')).toEqual(false);
@@ -359,7 +361,7 @@ describe('GGRC.Components.datepicker', function () {
       it('does nothing if click was inside the datepicker', function () {
         viewModel.attr('persistent', false);
         viewModel.attr('isShown', true);
-        spyOn(GGRC.Utils.events, 'isInnerClick')
+        spyOn(Utils, 'isInnerClick')
           .and.returnValue(true);
         method({}, {});
         expect(viewModel.attr('isShown')).toEqual(true);

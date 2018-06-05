@@ -4,6 +4,7 @@
 */
 
 import {confirm} from '../plugins/utils/modals';
+import {hasPending as hasPendingUtil} from '../plugins/ggrc_utils';
 
 (function ($) {
   'use strict';
@@ -195,7 +196,7 @@ import {confirm} from '../plugins/utils/modals';
           if (!instance.id) {
             hasPending = false;
           } else {
-            hasPending = GGRC.Utils.hasPending(instance);
+            hasPending = hasPendingUtil(instance);
           }
         }
         if (this.is_form_dirty() || changedInstance || hasPending) {

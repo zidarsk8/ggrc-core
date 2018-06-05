@@ -5,7 +5,7 @@
 
 import service from '../../utils/bulk-update-service';
 
-describe('GGRC.Utils.BulkUpdateService', function () {
+describe('GGRC BulkUpdateService', function () {
   describe('update() method', function () {
     let method;
     let ajaxRes;

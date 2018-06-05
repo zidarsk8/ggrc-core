@@ -29,6 +29,10 @@ import {
 } from '../../events/eventTypes';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 import tracker from '../../tracker';
+import {
+  isMapped as isMappedUtil,
+  allowedToMap,
+} from '../../plugins/ggrc_utils';
 
 (function (can, $) {
   'use strict';
@@ -228,7 +232,7 @@ import tracker from '../../tracker';
           arr: _.compact(_.map(
             this.viewModel.attr('selected'),
             function (desination) {
-              if (GGRC.Utils.allowed_to_map(source, desination)) {
+              if (allowedToMap(source, desination)) {
                 desination.isNeedRefresh = true;
                 return desination;
               }
@@ -295,8 +299,8 @@ import tracker from '../../tracker';
               return defer.push(modelInstance.save());
             }
 
-            isMapped = GGRC.Utils.is_mapped(instance, destination);
-            isAllowed = GGRC.Utils.allowed_to_map(instance, destination);
+            isMapped = isMappedUtil(instance, destination);
+            isAllowed = allowedToMap(instance, destination);
 
             if ((!isPersonMapping && isMapped) || !isAllowed) {
               return;

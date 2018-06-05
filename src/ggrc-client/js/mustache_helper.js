@@ -22,6 +22,11 @@ import {
   buildCountParams,
   batchRequests,
 } from './plugins/utils/query-api-utils';
+import {
+  formatDate,
+  isMappableType,
+  allowedToMap,
+} from './plugins/ggrc_utils';
 
 // Chrome likes to cache AJAX requests for Mustaches.
 let mustacheUrls = {};
@@ -776,7 +781,7 @@ Mustache.registerHelper('person_roles', function (person, scope, options) {
  */
 Mustache.registerHelper('date', function (date, hideTime) {
   date = Mustache.resolve(date);
-  return GGRC.Utils.formatDate(date, hideTime);
+  return formatDate(date, hideTime);
 });
 
 /**
@@ -938,7 +943,7 @@ Mustache.registerHelper('is_allowed_to_map',
 
     source = resolveComputed(source);
     target = resolveComputed(target);
-    canMap = GGRC.Utils.allowed_to_map(source, target, options);
+    canMap = allowedToMap(source, target, options);
 
     if (canMap) {
       return options.fn(options.contexts || this);
@@ -1910,7 +1915,7 @@ Mustache.registerHelper('is_mappable_type',
   function (source, target, options) {
     target = Mustache.resolve(target);
     source = Mustache.resolve(source);
-    if (GGRC.Utils.isMappableType(source, target)) {
+    if (isMappableType(source, target)) {
       return options.fn(options.contexts);
     }
     return options.inverse(options.contexts);

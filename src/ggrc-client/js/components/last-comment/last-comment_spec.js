@@ -8,6 +8,7 @@ import {getComponentVM} from '../../../js_specs/spec_helpers';
 import * as Utils from '../../plugins/utils/acl-utils.js';
 import RefreshQueue from '../../models/refresh_queue';
 import {COMMENT_CREATED} from '../../events/eventTypes';
+import {formatDate} from '../../plugins/ggrc_utils';
 
 describe('last-comment component', () => {
   let vm;
@@ -72,7 +73,7 @@ describe('last-comment component', () => {
 
       vm.attr('comment', {created_at: date});
       vm.attr('author', {email: authorEmail});
-      date = GGRC.Utils.formatDate(date, true);
+      date = formatDate(date, true);
 
 
       expect(vm.tooltip()).toEqual(`${date}, ${authorEmail}`);

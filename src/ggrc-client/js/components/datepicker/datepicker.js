@@ -3,6 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {
+  inViewport,
+  isInnerClick,
+} from '../../plugins/ggrc_utils';
+
 (function (can, GGRC, moment) {
   'use strict';
 
@@ -58,7 +63,7 @@
         this.attr('showTop', false);
         this.attr('isShown', true);
 
-        if (!GGRC.Utils.inViewport(this.picker)) {
+        if (!inViewport(this.picker)) {
           this.attr('showTop', true);
         }
       },
@@ -231,7 +236,7 @@
         if (this.viewModel.attr('persistent')) {
           return;
         }
-        isInside = GGRC.Utils.events.isInnerClick(this.element, ev.target);
+        isInside = isInnerClick(this.element, ev.target);
 
         if (this.viewModel.isShown && !isInside) {
           this.viewModel.attr('isShown', false);
