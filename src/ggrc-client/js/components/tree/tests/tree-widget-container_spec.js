@@ -474,6 +474,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
         .and.callFake(function (items, request) {
           request.push({name: 'item'});
         });
+      spyOn(GGRC.query_parser, 'join_queries');
     });
 
     it('copies filter and mapping items to applied', function () {
@@ -486,7 +487,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
     });
 
     it('initializes advancedSearch.filter property', function () {
-      spyOn(GGRC.query_parser, 'join_queries').and.returnValue({
+      GGRC.query_parser.join_queries.and.returnValue({
         name: 'test',
       });
       vm.attr('advancedSearch.filter', null);
@@ -498,7 +499,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
     it('initializes advancedSearch.request property', function () {
       vm.attr('advancedSearch.request', can.List());
-      spyOn(GGRC.query_parser, 'join_queries');
+
 
       vm.applyAdvancedFilters();
 
@@ -723,32 +724,52 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       let result;
       spyOn(vm, 'attr')
         .and.returnValue([{
-          filter: '"task assignees" = "user@example.com"',
-          operation: 'AND',
+          query: {
+            expression: {
+              left: 'task assignees',
+              op: {name: '='},
+              right: 'user@example.com',
+            },
+          },
           name: 'custom',
         }, {
-          filter: '"state" = "Assigned"',
-          operation: 'AND',
+          query: {
+            expression: {
+              left: 'state',
+              op: {name: '='},
+              right: 'Assigned',
+            },
+          },
           name: 'custom',
         }]);
 
       result = vm.getDepthFilter();
 
-      expect(result).toBe('');
+      expect(result).toBe(null);
     });
 
     it('returns filter that applied for depth', function () {
       let result;
       spyOn(vm, 'attr')
         .and.returnValue([{
-          filter: '"task assignees" = "user@example.com"',
-          operation: 'AND',
+          query: {
+            expression: {
+              left: 'task assignees',
+              op: {name: '='},
+              right: 'user@example.com',
+            },
+          },
           name: 'custom',
           depth: true,
           filterDeepLimit: 2,
         }, {
-          filter: '"state" = "Assigned"',
-          operation: 'AND',
+          query: {
+            expression: {
+              left: 'state',
+              op: {name: '='},
+              right: 'Assigned',
+            },
+          },
           name: 'custom',
           depth: true,
           filterDeepLimit: 1,
@@ -756,7 +777,13 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
       result = vm.getDepthFilter(1);
 
-      expect(result).toBe('"task assignees" = "user@example.com"');
+      expect(result).toEqual({
+        expression: {
+          left: 'task assignees',
+          op: {name: '='},
+          right: 'user@example.com',
+        },
+      });
     });
   });
 

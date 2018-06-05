@@ -101,7 +101,7 @@ viewModel = can.Map.extend({
         }
 
         return filters.filter(function (options) {
-          return options.filter;
+          return options.query;
         }).reduce(this._concatFilters, additionalFilter);
       },
     },
@@ -385,10 +385,10 @@ viewModel = can.Map.extend({
     let filters = can.makeArray(this.attr('filters'));
 
     return filters.filter(function (options) {
-      return options.filter &&
+      return options.query &&
         options.depth &&
         options.filterDeepLimit > deepLevel;
-    }).reduce(this._combineFilters, '');
+    }).reduce(this._concatFilters, null);
   },
   setRefreshFlag: function (refresh) {
     this.attr('refreshLoaded', refresh);
@@ -422,34 +422,13 @@ viewModel = can.Map.extend({
    * @private
    */
   _concatFilters: function (filter, options) {
-    let operation = options.operation || 'AND';
-
     if (filter) {
       filter = GGRC.query_parser.join_queries(
         filter,
-        GGRC.query_parser.parse(options.filter),
-        operation);
-    } else if (options.filter) {
-      filter = GGRC.query_parser.parse(options.filter);
-    }
-
-    return filter;
-  },
-  /**
-   * Concatenation active filters into one string.
-   *
-   * @param {String} filter - Filter string
-   * @param {Object} options - Filter parameters
-   * @return {string} - Result of concatenation filters.
-   * @private
-   */
-  _combineFilters(filter, options) {
-    let operation = options.operation || 'AND';
-
-    if (filter) {
-      filter += ' ' + operation + ' ' + options.filter;
-    } else if (options.filter) {
-      filter = options.filter;
+        options.query.attr(),
+        'AND');
+    } else if (options.query) {
+      filter = options.query;
     }
 
     return filter;
@@ -457,7 +436,7 @@ viewModel = can.Map.extend({
   _getFilterByName: function (name) {
     let filter = _.findWhere(this.attr('filters'), {name: name});
 
-    return filter && filter.filter ? filter.filter : null;
+    return filter && filter.query ? filter.query : null;
   },
   _widgetHidden: function () {
     this._triggerListeners(true);
@@ -633,10 +612,8 @@ viewModel = can.Map.extend({
     this.attr('advancedSearch.appliedMappingItems', mappings);
 
     advancedFilters = GGRC.query_parser.join_queries(
-      GGRC.query_parser
-        .parse(AdvancedSearch.buildFilter(filters, request)),
-      GGRC.query_parser
-        .parse(AdvancedSearch.buildFilter(mappings, request))
+      AdvancedSearch.buildFilter(filters, request),
+      AdvancedSearch.buildFilter(mappings, request)
     );
     this.attr('advancedSearch.request', request);
 

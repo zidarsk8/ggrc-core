@@ -16,32 +16,34 @@ describe('treeStatusFilter', () => {
   });
 
   describe('setFilter() method', () => {
-    const FILTER_STRING = 'Foo Bar Baz';
+    const FILTER = {
+      expression: 'test',
+    };
     beforeEach(() => {
       viewModel.attr('filterStates', [
         {value: 'A'},
         {value: 'B'},
         {value: 'C'},
       ]);
-      spyOn(StateUtils, 'statusFilter').and.returnValue(FILTER_STRING);
+      spyOn(StateUtils, 'buildStatusFilter').and.returnValue(FILTER);
     });
 
     it('set empty when all statuses selected', () => {
       viewModel.setFilter(['A', 'B', 'C']);
 
-      expect(viewModel.attr('options.filter')).toEqual('');
+      expect(viewModel.attr('options.query')).toEqual(null);
     });
 
     it('set empty when no status selected', () => {
       viewModel.setFilter([]);
 
-      expect(viewModel.attr('options.filter')).toEqual('');
+      expect(viewModel.attr('options.query')).toEqual(null);
     });
 
     it('set not empty when some status selected', () => {
       viewModel.setFilter(['A']);
 
-      expect(viewModel.attr('options.filter')).toEqual(FILTER_STRING);
+      expect(viewModel.attr('options.query').attr()).toEqual(FILTER);
     });
 
     it('write states to query string property', () => {
