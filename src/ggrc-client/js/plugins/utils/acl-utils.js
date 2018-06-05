@@ -104,10 +104,30 @@ function peopleWithRoleId(instance, roleId) {
     });
 }
 
+/**
+ * Checks whether user is auditor in audit
+ *
+ * @param {CMS.Models.Cacheable} audit - an audit instance
+ * @param {CMS.Models.Cacheable} user - a user instance
+ *
+ * @return {boolean}
+ */
+function isAuditor(audit, user) {
+  if (audit.type !== 'Audit') {
+    return false;
+  }
+
+  const auditor = getRole('Audit', 'Auditors');
+  return audit.access_control_list.filter(
+    (acl) => acl.ac_role_id === auditor.id &&
+                 acl.person_id === user.id).length > 0;
+}
+
 export {
   peopleWithRoleName,
   peopleWithRoleId,
   getRolesForType,
   getRole,
   getRoleById,
+  isAuditor,
 };

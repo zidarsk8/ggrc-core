@@ -13,6 +13,7 @@ import './tree-item-actions';
 import './tree-item-map';
 import './tree-view';
 import './tree-item';
+import './tree-actions';
 import './tree-header';
 import './tree-filter-input';
 import './tree-status-filter';
@@ -27,21 +28,15 @@ import '../bulk-update-button/bulk-update-button';
 import '../assessment-template-clone-button/assessment-template-clone-button';
 import '../dropdown/multiselect-dropdown';
 import '../assessment_generator';
-import '../three-dots-menu/three-dots-menu';
 import '../last-comment/last-comment';
 import template from './templates/tree-widget-container.mustache';
 import * as StateUtils from '../../plugins/utils/state-utils';
-import {
-  isSnapshotModel,
-  isSnapshotScope,
-} from '../../plugins/utils/snapshot-utils';
 import {
   REFRESH_RELATED,
   REFRESH_MAPPING,
 } from '../../events/eventTypes';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
-  isMyAssessments,
   getCounts,
   initCounts,
   initMappedInstances,
@@ -147,10 +142,6 @@ viewModel = can.Map.extend({
           classes.push('loading');
         }
 
-        if (isMyAssessments()) {
-          classes.push('my-assessments');
-        }
-
         return classes.join(' ');
       },
     },
@@ -184,48 +175,6 @@ viewModel = can.Map.extend({
         }
 
         return allowCreating;
-      },
-    },
-    addItem: {
-      type: String,
-      get: function () {
-        return this.attr('options.objectVersion') ?
-          false :
-          this.attr('options').add_item_view ||
-          this.attr('model').tree_view_options.add_item_view;
-      },
-    },
-    isSnapshots: {
-      type: Boolean,
-      get: function () {
-        let parentInstance = this.attr('parent_instance');
-        let model = this.attr('model');
-
-        return (isSnapshotScope(parentInstance) &&
-          isSnapshotModel(model.model_singular)) ||
-          this.attr('options.objectVersion');
-      },
-    },
-    showGenerateAssessments: {
-      type: Boolean,
-      get: function () {
-        let parentInstance = this.attr('parent_instance');
-        let model = this.attr('model');
-
-        return parentInstance.type === 'Audit' &&
-          model.shortName === 'Assessment';
-      },
-    },
-    showBulkUpdate: {
-      type: 'boolean',
-      get: function () {
-        return this.attr('options.showBulkUpdate');
-      },
-    },
-    show3bbs: {
-      type: Boolean,
-      get: function () {
-        return !isMyAssessments();
       },
     },
     noResults: {
