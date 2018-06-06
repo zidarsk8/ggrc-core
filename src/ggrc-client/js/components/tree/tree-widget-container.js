@@ -711,8 +711,6 @@ export default GGRC.Components('treeWidgetContainer', {
       let componentSelector = 'assessment-info-pane';
       let itemIndex = this.viewModel.attr('selectedItem');
       let pageInfo = this.viewModel.attr('pageInfo');
-      let newInstance;
-      let items;
 
       let relativeIndex = this.viewModel
         .getRelativeItemNumber(itemIndex, pageInfo.pageSize);
@@ -728,13 +726,23 @@ export default GGRC.Components('treeWidgetContainer', {
 
       pageLoadDfd
         .then(function () {
-          items = this.viewModel.attr('showedItems');
-          newInstance = items[relativeIndex];
+          const items = this.viewModel.attr('showedItems');
+          const newInstance = items[relativeIndex];
+
+          if (!newInstance) {
+            this.viewModel.closeInfoPane();
+
+            return can.Deferred().resolve();
+          }
 
           return newInstance
             .refresh();
         }.bind(this))
-        .then(function () {
+        .then(function (newInstance) {
+          if (!newInstance) {
+            return;
+          }
+
           pinControl
             .updateInstance(componentSelector, newInstance);
           newInstance.dispatch('refreshRelatedDocuments');
