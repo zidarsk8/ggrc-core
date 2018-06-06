@@ -38,7 +38,7 @@
       {placeholder}="placeholder"
       {options}="multiChoiceOptions"
       (value-changed)="updateGlobalAttribute(%event, %context)"
-      class="form-field__content {{extraClass attributeType}}"
+      class="form-field__content custom-attribute-{{attributeType}}"
     ></custom-attributes-field>
     {{#if validationState.hasGCAErrors}}
       <div role="alert">{{errorMessage attributeType}}</div>
