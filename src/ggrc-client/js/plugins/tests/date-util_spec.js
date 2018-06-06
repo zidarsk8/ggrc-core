@@ -9,7 +9,7 @@ import {
 } from '../utils/date-util';
 
 describe('GGRC DateUtil', ()=> {
-  describe('adjustToClosestWeekday() method', ()=> {
+  describe('getClosestWeekday() method', ()=> {
     it('adjusts to Friday when weekend provided', ()=> {
       let date = new Date(2017, 11, 24);
       let actual;
