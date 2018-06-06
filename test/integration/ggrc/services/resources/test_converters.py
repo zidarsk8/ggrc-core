@@ -183,6 +183,43 @@ class TestImportExports(TestCase):
     self.assertEqual(response.json["id"], ie1.id)
     self.assertEqual(response.json["status"], "Analysis")
 
+  def test_imports_get_all(self):
+    """Test imports get all items"""
+    user = all_models.Person.query.first()
+    factories.ImportExportFactory(job_type="Import",
+                                  status="Finished",
+                                  created_by=user,
+                                  created_at=datetime.now())
+    response = self.api.client.get(
+        "/api/people/{}/imports".format(user.id),
+        headers=self.headers
+    )
+    result = json.loads(response.data)
+    self.assertEqual(len(result), 1)
+    self.assertEqual(set(all_models.ImportExport.DEFAULT_COLUMNS),
+                     set(result[0].keys()))
+
+  def test_imports_get_by_id(self):
+    """Test imports get item by id"""
+    user = all_models.Person.query.first()
+    import_job = factories.ImportExportFactory(
+        job_type="Import",
+        status="Finished",
+        created_by=user,
+        created_at=datetime.now()
+    )
+    response = self.api.client.get(
+        "/api/people/{}/imports/{}".format(user.id, import_job.id),
+        headers=self.headers
+    )
+    result = json.loads(response.data)
+    observed_columns = set(result.keys())
+    expected_columns = set(
+        column.name for column in all_models.ImportExport.__table__.columns
+        if column.name not in ('content', 'gdrive_metadata')
+    )
+    self.assertEqual(observed_columns, expected_columns)
+
   @ddt.data("Import", "Export")
   def test_delete(self, job_type):
     """Test imports/exports delete"""
