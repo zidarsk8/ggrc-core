@@ -49,26 +49,6 @@ class ImportConverter(BaseConverter):
   blocks and columns are handled in the correct order.
   """
 
-  CLASS_ORDER = [
-      "Person",
-      "Program",
-      "Risk Assessment",
-      "Audit",
-      "Issue",
-      "Assessment",
-      "Policy",
-      "Regulation",
-      "Standard",
-      "Section",
-      "Control",
-      "Assessment Template",
-      "Custom Attribute Definition",
-      "Assessment",
-      "Workflow",
-      "Task Group",
-      "Task Group Task",
-  ]
-
   priority_columns = [
       "email",
       "slug",
@@ -87,10 +67,7 @@ class ImportConverter(BaseConverter):
     return self.response_data
 
   def initialize_block_converters(self):
-    """ Initialize block converters.
-
-    Prepare BlockConverters and order them like specified in self.CLASS_ORDER.
-    """
+    """Initialize block converters."""
     offsets_and_data_blocks = split_blocks(self.csv_data)
     for offset, data in offsets_and_data_blocks:
       class_name = data[1][0].strip().lower()
@@ -106,11 +83,6 @@ class ImportConverter(BaseConverter):
       )
       block_converter.check_block_restrictions()
       self.block_converters.append(block_converter)
-
-    order = defaultdict(int)
-    order.update({c: i for i, c in enumerate(self.CLASS_ORDER)})
-    order["Person"] = -1
-    self.block_converters.sort(key=lambda x: order[x.name])
 
   def import_csv_data(self):
     revision_ids = []
