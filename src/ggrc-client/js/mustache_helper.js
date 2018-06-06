@@ -1700,49 +1700,6 @@ Mustache.registerHelper('with_most_recent_declining_task_entry',
       .add({most_recent_declining_task_entry: {}}));
   });
 
-function getProperUrl(url) {
-  let domain;
-  let maxLabel;
-  let urlSplit;
-
-  if (!url) {
-    return '';
-  }
-
-  if (!url.match(/^[a-zA-Z]+:/)) {
-    url = (window.location.protocol === 'https:' ?
-      'https://' : 'http://') + url;
-  }
-
-  // Make sure we can find the domain part of the url:
-  urlSplit = url.split('/');
-  if (urlSplit.length < 3) {
-    return 'javascript://';
-  }
-
-  domain = urlSplit[2];
-  maxLabel = _.max(domain.split('.').map(function (label) {
-    return label.length;
-  }));
-  if (maxLabel > 63 || domain.length > 253) {
-    // The url is invalid and might crash user's chrome tab
-    return 'javascript://';
-  }
-  return url;
-}
-
-Mustache.registerHelper('get_url_value', function (attrName, instance) {
-  instance = Mustache.resolve(instance);
-  attrName = Mustache.resolve(attrName);
-
-  if (instance[attrName]) {
-    if (['url', 'reference_url'].indexOf(attrName) !== -1) {
-      return getProperUrl(instance[attrName]);
-    }
-  }
-  return '';
-});
-
 /**
    * Retrieve the string value of an attribute of the given instance.
    *
