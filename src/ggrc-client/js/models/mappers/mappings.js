@@ -51,7 +51,7 @@
           items: [],
         },
         business: {
-          name: 'Assets/Business',
+          name: 'Scope',
           items: [],
         },
         governance: {
