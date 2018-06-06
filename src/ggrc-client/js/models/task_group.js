@@ -4,7 +4,10 @@
  */
 
 import {getRole} from '../plugins/utils/acl-utils';
-import {getClosestWeekday} from '../plugins/utils/date-util';
+import {
+  getClosestWeekday,
+  getDate,
+} from '../plugins/utils/date-util';
 import Permission from '../permission';
 
 (function (can, GGRC) {
@@ -142,8 +145,8 @@ import Permission from '../permission';
         let that = this;
         let workflow = GGRC.page_instance();
         let datesAreValid = true;
-        let startDate = GGRC.Date.getDate(that.attr('start_date'));
-        let endDate = GGRC.Date.getDate(that.attr('end_date'));
+        let startDate = getDate(that.attr('start_date'));
+        let endDate = getDate(that.attr('end_date'));
 
         if (!(workflow instanceof CMS.Models.Workflow)) {
           return;

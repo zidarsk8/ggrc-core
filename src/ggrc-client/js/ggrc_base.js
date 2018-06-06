@@ -356,42 +356,4 @@ import PersistentNotifier from './plugins/persistent_notifier';
     },
 
   });
-
-  /*
-    The GGRC Date library provides basic methods for Date-to-string conversion.
-  */
-  GGRC.Date = GGRC.Date || {};
-  $.extend(GGRC.Date, {
-    // Date formats for the actual selected value, and for the date as
-    // displayed to the user. The Moment.js library and the jQuery datepicker
-    // use different format notation, thus separate settings for each.
-    // IMPORTANT: The pair of settings for each "type" of value (i.e. actual
-    // value / display value) must be consistent across both libraries!
-    MOMENT_ISO_DATE: 'YYYY-MM-DD',
-    MOMENT_DISPLAY_FMT: 'MM/DD/YYYY',
-    PICKER_ISO_DATE: 'yy-mm-dd',
-    PICKER_DISPLAY_FMT: 'mm/dd/yy',
-
-    /**
-    * Convert given Date, string or null to an Date object.
-    *
-    * @param {Date|string|null} date - Date, string in ISO date format or null
-    * @param {string} format - date format string ('YYYY-MM-DD' default value)
-    * @return {string|null} - Date object or null if string is not in ISO format or null
-    */
-    getDate(date, format = GGRC.Date.MOMENT_ISO_DATE) {
-      let momDate;
-
-      if (date instanceof Date) {
-        return date;
-      }
-
-      momDate = moment(date, format, true);
-      if (momDate.isValid()) {
-        return momDate.toDate();
-      }
-
-      return null;
-    },
-  });
 })(window.GGRC = window.GGRC || {}, moment);
