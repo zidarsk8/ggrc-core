@@ -196,8 +196,15 @@ describe('task-list component', () => {
           let instance;
           let origRelatedItemsType;
 
-          beforeEach(function () {
+          beforeAll(function () {
             origRelatedItemsType = staticVmProps.relatedItemsType;
+          });
+
+          afterAll(function () {
+            staticVmProps.relatedItemsType = origRelatedItemsType;
+          });
+
+          beforeEach(function () {
             staticVmProps.relatedItemsType = 'TestType';
             can.Model.Cacheable.extend(
               `CMS.Models.${staticVmProps.relatedItemsType}`, {}
@@ -206,7 +213,7 @@ describe('task-list component', () => {
           });
 
           afterEach(function () {
-            staticVmProps.relatedItemsType = origRelatedItemsType;
+            delete CMS.Models[staticVmProps.relatedItemsType];
           });
 
           it('updates items of the page', function () {

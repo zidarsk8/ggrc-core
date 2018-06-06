@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {makeFakeInstance} from '../../../js_specs/spec_helpers';
+
 const ENDPOINT = '/api/related_assessments';
 
 describe('relatedAssessmentsLoader mixin', () => {
@@ -12,7 +14,7 @@ describe('relatedAssessmentsLoader mixin', () => {
 
   describe('for Assessment model', () => {
     it('should contain getRelatedAssessments method', () => {
-      const model = new CMS.Models.Assessment({});
+      const model = makeFakeInstance({model: CMS.Models.Assessment})({});
 
       expect(model.getRelatedAssessments).toBeTruthy();
     });
@@ -20,7 +22,7 @@ describe('relatedAssessmentsLoader mixin', () => {
 
   describe('for Control model', () => {
     it('should contain getRelatedAssessments method', () => {
-      const model = new CMS.Models.Control({});
+      const model = makeFakeInstance({model: CMS.Models.Control})({});
 
       expect(model.getRelatedAssessments).toBeTruthy();
     });
@@ -28,7 +30,7 @@ describe('relatedAssessmentsLoader mixin', () => {
 
   describe('for Objective model', () => {
     it('should contain getRelatedAssessments method', () => {
-      const model = new CMS.Models.Objective({});
+      const model = makeFakeInstance({model: CMS.Models.Objective})({});
 
       expect(model.getRelatedAssessments).toBeTruthy();
     });
@@ -36,7 +38,7 @@ describe('relatedAssessmentsLoader mixin', () => {
 
   describe('for Snapshot model', () => {
     it('should build correct response', () => {
-      const model = new CMS.Models.Control({
+      const model = makeFakeInstance({model: CMS.Models.Control})({
         id: 1,
         type: 'Control',
         snapshot: {
@@ -58,12 +60,12 @@ describe('relatedAssessmentsLoader mixin', () => {
 
   describe('for other models', () => {
     it('should not contain getRelatedAssessments method', () => {
-      const audit = new CMS.Models.Audit({});
-      const program = new CMS.Models.Program({});
-      const reg = new CMS.Models.Regulation({});
-      const system = new CMS.Models.System({});
-      const issue = new CMS.Models.Issue({});
-      const section = new CMS.Models.Section({});
+      const audit = makeFakeInstance({model: CMS.Models.Audit})({});
+      const program = makeFakeInstance({model: CMS.Models.Program})({});
+      const reg = makeFakeInstance({model: CMS.Models.Regulation})({});
+      const system = makeFakeInstance({model: CMS.Models.System})({});
+      const issue = makeFakeInstance({model: CMS.Models.Issue})({});
+      const section = makeFakeInstance({model: CMS.Models.Section})({});
 
       expect(audit.getRelatedAssessments).toBeFalsy();
       expect(program.getRelatedAssessments).toBeFalsy();
@@ -74,56 +76,65 @@ describe('relatedAssessmentsLoader mixin', () => {
     });
   });
 
-  it('should send default limit as "0,5"', () => {
-    const model = new CMS.Models.Assessment({id: 1, type: 'Assessment'});
+  describe('when model is Assessment', () => {
+    let fakeAssessmentCreator;
 
-    model.getRelatedAssessments();
-
-    expect($.get).toHaveBeenCalledWith(ENDPOINT, {
-      object_id: 1,
-      object_type: 'Assessment',
-      limit: '0,5',
+    beforeEach(function () {
+      fakeAssessmentCreator = makeFakeInstance({model: CMS.Models.Assessment});
     });
-  });
 
-  it('should send correct limit values', () => {
-    const model = new CMS.Models.Assessment({id: 1, type: 'Assessment'});
 
-    model.getRelatedAssessments([0, 10]);
+    it('should send default limit as "0,5"', () => {
+      const model = fakeAssessmentCreator({id: 1, type: 'Assessment'});
 
-    expect($.get).toHaveBeenCalledWith(ENDPOINT, {
-      object_id: 1,
-      object_type: 'Assessment',
-      limit: '0,10',
+      model.getRelatedAssessments();
+
+      expect($.get).toHaveBeenCalledWith(ENDPOINT, {
+        object_id: 1,
+        object_type: 'Assessment',
+        limit: '0,5',
+      });
     });
-  });
 
-  it('should send correct order_by value', () => {
-    const model = new CMS.Models.Assessment({id: 1, type: 'Assessment'});
+    it('should send correct limit values', () => {
+      const model = fakeAssessmentCreator({id: 1, type: 'Assessment'});
 
-    model.getRelatedAssessments([0, 10], [{field: 'foo', direction: 'asc'}]);
+      model.getRelatedAssessments([0, 10]);
 
-    expect($.get).toHaveBeenCalledWith(ENDPOINT, {
-      object_id: 1,
-      object_type: 'Assessment',
-      limit: '0,10',
-      order_by: 'foo,asc',
+      expect($.get).toHaveBeenCalledWith(ENDPOINT, {
+        object_id: 1,
+        object_type: 'Assessment',
+        limit: '0,10',
+      });
     });
-  });
 
-  it('should send correct order_by value for multiple fields', () => {
-    const model = new CMS.Models.Assessment({id: 1, type: 'Assessment'});
+    it('should send correct order_by value', () => {
+      const model = fakeAssessmentCreator({id: 1, type: 'Assessment'});
 
-    model.getRelatedAssessments([0, 10], [
-      {field: 'foo', direction: 'asc'},
-      {field: 'bar', direction: 'desc'},
-    ]);
+      model.getRelatedAssessments([0, 10], [{field: 'foo', direction: 'asc'}]);
 
-    expect($.get).toHaveBeenCalledWith(ENDPOINT, {
-      object_id: 1,
-      object_type: 'Assessment',
-      limit: '0,10',
-      order_by: 'foo,asc,bar,desc',
+      expect($.get).toHaveBeenCalledWith(ENDPOINT, {
+        object_id: 1,
+        object_type: 'Assessment',
+        limit: '0,10',
+        order_by: 'foo,asc',
+      });
+    });
+
+    it('should send correct order_by value for multiple fields', () => {
+      const model = fakeAssessmentCreator({id: 1, type: 'Assessment'});
+
+      model.getRelatedAssessments([0, 10], [
+        {field: 'foo', direction: 'asc'},
+        {field: 'bar', direction: 'desc'},
+      ]);
+
+      expect($.get).toHaveBeenCalledWith(ENDPOINT, {
+        object_id: 1,
+        object_type: 'Assessment',
+        limit: '0,10',
+        order_by: 'foo,asc,bar,desc',
+      });
     });
   });
 });

@@ -4,23 +4,28 @@
 */
 
 import {helpers} from './../tree-item-custom-attribute';
+import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 
 describe('helpers.getCustomAttrValue', () => {
   let helper;
   let fakeInstance;
   let fakeOptions;
-  let fakeCustomAttrDefs;
   let origValue;
   let actual;
 
   beforeAll(() => {
     helper = helpers.getCustomAttrValue;
+    origValue = GGRC.custom_attr_defs;
+  });
 
-    can.Model.Cacheable.extend('CMS.Models.DummyModel', {
-      is_custom_attributable: true,
-    }, {});
+  afterAll(() => {
+    GGRC.custom_attr_defs = origValue;
+  });
 
-    fakeCustomAttrDefs = [{
+  beforeEach(() => {
+    fakeOptions = {};
+
+    const fakeCustomAttrDefs = [{
       definition_type: 'control',
       id: 3,
       attribute_type: '',
@@ -68,20 +73,15 @@ describe('helpers.getCustomAttrValue', () => {
       attribute_type: 'Dropdown',
       id: 10,
     }];
-    fakeInstance = new CMS.Models.DummyModel({
+    fakeInstance = makeFakeInstance({
+      model: can.Model.Cacheable,
+      staticProps: {
+        is_custom_attributable: true,
+      },
+    })({
       custom_attribute_definitions: fakeCustomAttrDefs,
     });
-    origValue = GGRC.custom_attr_defs;
     GGRC.custom_attr_defs = fakeCustomAttrDefs;
-  });
-
-  afterAll(() => {
-    GGRC.custom_attr_defs = origValue;
-    delete CMS.Models.DummyModel;
-  });
-
-  beforeEach(() => {
-    fakeOptions = {};
   });
 
   it('return correct value if there is ca value with certain caId',

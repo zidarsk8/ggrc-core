@@ -62,36 +62,42 @@ describe('GGRC.WorkflowActivate', function () {
       expect(viewModel.initWorkflow).toHaveBeenCalledWith(workflow);
     });
 
-    it('should refresh permissions', async function () {
+    it('should refresh permissions', async function (done) {
       await viewModel.repeatOnHandler(workflow);
       expect(Permission.refresh).toHaveBeenCalled();
       expect(Permission.refresh).toHaveBeenCalledBefore(
         viewModel.updateActiveCycleCounts
       );
+      done();
     });
 
-    it('should try to update counts for active cycles tab', async function () {
-      await viewModel.repeatOnHandler(workflow);
-      expect(viewModel.updateActiveCycleCounts)
-        .toHaveBeenCalledWith(workflow);
-    });
+    it('should try to update counts for active cycles tab',
+      async function (done) {
+        await viewModel.repeatOnHandler(workflow);
+        expect(viewModel.updateActiveCycleCounts)
+          .toHaveBeenCalledWith(workflow);
+        done();
+      });
 
     it('should try to refresh TGT after updating counts for active cycles',
-      async function () {
+      async function (done) {
         await viewModel.repeatOnHandler(workflow);
         expect(workflow.refresh_all)
           .toHaveBeenCalledWith('task_groups', 'task_group_tasks');
+        done();
       });
 
-    it('should redirect to WF cycle', async function () {
+    it('should redirect to WF cycle', async function (done) {
       await viewModel.repeatOnHandler(workflow);
       expect(viewModel.redirectToFirstCycle)
         .toHaveBeenCalledWith(workflow);
+      done();
     });
 
-    it('should restore button after TGT refresh', async function () {
+    it('should restore button after TGT refresh', async function (done) {
       await viewModel.repeatOnHandler(workflow);
       expect(viewModel.attr('waiting'), false);
+      done();
     });
 
     it('should restore button when initWorkflow fails', async function (done) {
@@ -147,33 +153,38 @@ describe('GGRC.WorkflowActivate', function () {
       });
     });
 
-    it('refresh passed workflow', async function () {
+    it('refresh passed workflow', async function (done) {
       await viewModel.initWorkflow(workflow);
       expect(workflow.refresh).toHaveBeenCalled();
       expect(workflow.refresh).toHaveBeenCalledBefore(workflow.save);
+      done();
     });
 
-    it('sets recurrences to true', async function () {
+    it('sets recurrences to true', async function (done) {
       await viewModel.initWorkflow(workflow);
       expect(workflow.attr('recurrences')).toBe(true);
+      done();
     });
 
-    it('sets status to "Active"', async function () {
+    it('sets status to "Active"', async function (done) {
       await viewModel.initWorkflow(workflow);
       expect(workflow.attr('status')).toBe('Active');
+      done();
     });
 
-    it('saves workflow', async function () {
+    it('saves workflow', async function (done) {
       await viewModel.initWorkflow(workflow);
       expect(workflow.save).toHaveBeenCalled();
+      done();
     });
 
-    it('returns result of save workflow operation', async function () {
+    it('returns result of save workflow operation', async function (done) {
       const expectedResult = {};
       let result;
       workflow.save.and.returnValue(expectedResult);
       result = await viewModel.initWorkflow(workflow);
       expect(result).toBe(expectedResult);
+      done();
     });
   });
 
@@ -209,12 +220,13 @@ describe('GGRC.WorkflowActivate', function () {
       ], workflow.type, workflow.id);
     });
 
-    it('returns result of update operation', async function () {
+    it('returns result of update operation', async function (done) {
       const expectedResult = {};
       let result;
       CurrentPageUtils.initCounts.and.returnValue(expectedResult);
       result = await viewModel.updateActiveCycleCounts(workflow);
       expect(result).toBe(expectedResult);
+      done();
     });
   });
 
@@ -253,32 +265,37 @@ describe('GGRC.WorkflowActivate', function () {
     });
 
     it('generates cycle for passed workflow before workflow refreshing',
-      async function () {
+      async function (done) {
         await viewModel.repeatOffHandler(workflow);
         expect(helpers.generateCycle).toHaveBeenCalledWith(workflow);
         expect(helpers.generateCycle).toHaveBeenCalledBefore(
           workflow.refresh
         );
+        done();
       });
 
-    it('refreshes workflow', async function () {
+    it('refreshes workflow', async function (done) {
       await viewModel.repeatOffHandler(workflow);
       expect(workflow.refresh).toHaveBeenCalled();
+      done();
     });
 
-    it('sets active status for passed workflow', async function () {
+    it('sets active status for passed workflow', async function (done) {
       await viewModel.repeatOffHandler(workflow);
       expect(workflow.attr('status')).toBe('Active');
+      done();
     });
 
-    it('saves workflow', async function () {
+    it('saves workflow', async function (done) {
       await viewModel.repeatOffHandler(workflow);
       expect(workflow.save).toHaveBeenCalled();
+      done();
     });
 
-    it('should restore button after workflow saving', async function () {
+    it('should restore button after workflow saving', async function (done) {
       await viewModel.repeatOffHandler(workflow);
       expect(viewModel.attr('waiting'), false);
+      done();
     });
 
     it('should restore button when cycle generating fails',

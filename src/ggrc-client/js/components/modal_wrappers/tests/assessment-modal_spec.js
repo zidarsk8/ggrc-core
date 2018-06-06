@@ -3,7 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import {
+  getComponentVM,
+  makeFakeInstance,
+} from '../../../../js_specs/spec_helpers';
 import Component from '../assessment-modal';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 
@@ -23,7 +26,7 @@ describe('<assessment-modal/> component', () => {
 
   describe('loadData() method', () => {
     it('sets the correct data', (done) => {
-      let model = new CMS.Models.Assessment();
+      let model = makeFakeInstance({model: CMS.Models.Assessment})();
 
       spyOn(model, 'getRelatedObjects').and
         .returnValue(can.Deferred().resolve({

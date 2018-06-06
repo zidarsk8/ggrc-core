@@ -3,8 +3,16 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {makeFakeInstance} from '../../../js_specs/spec_helpers';
+
 describe('CMS.Models.CycleTaskGroupObjectTask', function () {
-  'use strict';
+  let fakeCTModelCreator;
+
+  beforeEach(function () {
+    fakeCTModelCreator = makeFakeInstance({
+      model: CMS.Models.CycleTaskGroupObjectTask,
+    });
+  });
 
   describe('responseOptionsEditable method', function () {
     let instance;
@@ -26,7 +34,7 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
     });
 
     beforeEach(function () {
-      instance = new CMS.Models.CycleTaskGroupObjectTask({
+      instance = fakeCTModelCreator({
         status: 'Assigned',
         cycle: {
           is_current: false,
@@ -81,7 +89,7 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
     let instance;
 
     beforeEach(function () {
-      instance = new CMS.Models.CycleTaskGroupObjectTask({
+      instance = fakeCTModelCreator({
         status: 'Assigned',
         cycle: {
           is_current: false,
@@ -96,7 +104,7 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
         id: 'cycle id',
         is_current: true}];
 
-      let workflow = new CMS.Models.Workflow({
+      let workflow = makeFakeInstance({model: CMS.Models.Workflow})({
         id: 'workflow id',
         context: {
           id: 'context id',

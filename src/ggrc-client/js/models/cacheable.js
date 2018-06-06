@@ -199,7 +199,15 @@ import tracker from '../tracker';
     },
 
     setup: function (construct, name, statics, prototypes) {
+      let staticProps = statics;
+      let protoProps = prototypes; // eslint-disable-line
       let overrideFindAll = false;
+
+      // if name for model was not set
+      if (typeof name !== 'string') {
+        protoProps = statics; // name will be equal to statics
+        staticProps = name;
+      }
 
       if (this.fullName === 'can.Model.Cacheable') {
         this.findAll = function () {
@@ -210,7 +218,7 @@ import tracker from '../tracker';
           throw new Error(
             'No default findPage() exists for subclasses of Cacheable');
         };
-      } else if ((!statics || !statics.findAll) &&
+      } else if ((!staticProps || !staticProps.findAll) &&
         this.findAll === can.Model.Cacheable.findAll) {
         if (this.root_collection) {
           this.findAll = 'GET /api/' + this.root_collection;
@@ -219,27 +227,27 @@ import tracker from '../tracker';
         }
       }
       if (this.root_collection) {
-        this.model_plural = statics.model_plural || this.root_collection
+        this.model_plural = staticProps.model_plural || this.root_collection
           .replace(/(?:^|_)([a-z])/g, function (s, l) {
             return l.toUpperCase();
           });
 
-        this.title_plural = statics.title_plural || this.root_collection
+        this.title_plural = staticProps.title_plural || this.root_collection
           .replace(/(^|_)([a-z])/g, function (s, u, l) {
             return (u ? ' ' : '') + l.toUpperCase();
           });
-        this.table_plural = statics.table_plural || this.root_collection;
+        this.table_plural = staticProps.table_plural || this.root_collection;
       }
       if (this.root_object) {
-        this.model_singular = statics.model_singular || this.root_object
+        this.model_singular = staticProps.model_singular || this.root_object
           .replace(/(?:^|_)([a-z])/g, function (s, l) {
             return l.toUpperCase();
           });
-        this.title_singular = statics.title_singular || this.root_object
+        this.title_singular = staticProps.title_singular || this.root_object
           .replace(/(^|_)([a-z])/g, function (s, u, l) {
             return (u ? ' ' : '') + l.toUpperCase();
           });
-        this.table_singular = statics.table_singular || this.root_object;
+        this.table_singular = staticProps.table_singular || this.root_object;
       }
 
       if (!can.isFunction(this.findAll)) {
@@ -254,8 +262,9 @@ import tracker from '../tracker';
       // this.__bindEvents = {};
 
       let that = this;
-      if (statics.mixins) {
-        can.each(statics.mixins, function (mixin) {
+
+      if (staticProps.mixins) {
+        can.each(staticProps.mixins, function (mixin) {
           let _mixin = mixin;
           if (typeof _mixin === 'string') {
             _mixin = can.getObject(_mixin, CMS.Models.Mixins);

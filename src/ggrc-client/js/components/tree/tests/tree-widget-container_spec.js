@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
@@ -744,7 +745,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       let instance;
 
       beforeEach(function () {
-        instance = new CMS.Models.Relationship();
+        instance = makeFakeInstance({model: CMS.Models.Relationship})();
       });
 
       it('returns result of the relationship check', function () {

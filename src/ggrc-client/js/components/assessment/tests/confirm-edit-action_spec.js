@@ -4,13 +4,15 @@
 */
 
 import * as ModalsUtils from '../../../plugins/utils/modals';
+import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 
 describe('GGRC.Components.confirmEditAction', function () {
   let viewModel;
 
   beforeEach(function () {
+    const instance = makeFakeInstance({model: CMS.Models.Assessment})();
     viewModel = GGRC.Components.getViewModel('confirmEditAction');
-    viewModel.attr('instance', new CMS.Models.Assessment());
+    viewModel.attr('instance', instance);
   });
 
   describe('openEditMode() method', function () {

@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {makeFakeInstance} from '../../../js_specs/spec_helpers';
+
 describe('CMS.Models.Cacheable', function () {
   describe('mark_for_addition() method', function () {
     let instance;
@@ -12,7 +14,7 @@ describe('CMS.Models.Cacheable', function () {
     let joinAttr;
 
     beforeEach(function () {
-      instance = new can.Model.Cacheable({
+      instance = makeFakeInstance({model: can.Model.Cacheable})({
         related_sources: new can.Map(),
       });
       spyOn(instance, 'remove_duplicate_pending_joins');
@@ -20,6 +22,10 @@ describe('CMS.Models.Cacheable', function () {
       extraAttrs = {field: 'not empty'};
       options = 'options';
       joinAttr = 'related_sources';
+    });
+
+    afterEach(function () {
+      delete can.Model.Cacheable.cache;
     });
 
     it('calls remove_duplicate_pending_joins() method', function () {
@@ -52,6 +58,10 @@ describe('CMS.Models.Cacheable', function () {
       });
       obj = new can.Map({});
       extraAttrs = new can.Map({field: 'not empty'});
+    });
+
+    afterEach(function () {
+      delete can.Model.Cacheable.cache;
     });
 
     it('sets empty array to _pending_joins if it is undefined', function () {
@@ -94,8 +104,8 @@ describe('CMS.Models.Cacheable', function () {
       model = new can.Model.Cacheable({id: id});
     });
 
-    afterEach(() => {
-      delete can.Model.Cacheable.cache[id];
+    afterEach(function () {
+      delete can.Model.Cacheable.cache;
     });
 
     it('returns resource if there is no object', () => {

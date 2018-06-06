@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 import * as SnapshotUtils from '../utils/snapshot-utils';
 
 describe('SnapshotUtils', function () {
@@ -70,7 +71,7 @@ describe('SnapshotUtils', function () {
     });
 
     beforeEach(function () {
-      new CMS.Models.Audit({id: 1});
+      makeFakeInstance({model: CMS.Models.Audit})({id: 1});
       snapshot = {
         id: 12345,
         type: 'Snapshot',

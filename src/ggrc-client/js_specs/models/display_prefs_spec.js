@@ -3,13 +3,16 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {waitsFor} from '../spec_helpers';
+import {
+  waitsFor,
+  makeFakeInstance,
+} from '../spec_helpers';
 
 describe('display prefs model', function () {
 
   let display_prefs, exp;
   beforeAll(function () {
-    display_prefs = new CMS.Models.DisplayPrefs();
+    display_prefs = makeFakeInstance({model: CMS.Models.DisplayPrefs})();
     exp = CMS.Models.DisplayPrefs.exports;
   });
 
@@ -232,9 +235,12 @@ describe('display prefs model', function () {
   describe('#findAll', function () {
     let dp_noversion, dp2_outdated, dp3_current;
     beforeEach(function () {
-      dp_noversion = new CMS.Models.DisplayPrefs({});
-      dp2_outdated = new CMS.Models.DisplayPrefs({ version: 1});
-      dp3_current = new CMS.Models.DisplayPrefs({ version: CMS.Models.DisplayPrefs.version });
+      const instanceCreator = makeFakeInstance({
+        model: CMS.Models.DisplayPrefs
+      });
+      dp_noversion = instanceCreator();
+      dp2_outdated = instanceCreator({version: 1});
+      dp3_current = instanceCreator({version: CMS.Models.DisplayPrefs.version});
 
       spyOn(can.Model.LocalStorage, 'findAll').and.returnValue(new $.Deferred().resolve([dp_noversion, dp2_outdated, dp3_current]));
       spyOn(dp_noversion, 'destroy');
