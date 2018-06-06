@@ -34,6 +34,40 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
 
     self.client.get('/login')
 
+  @mock.patch('ggrc.integrations.issues.Client.create_issue')
+  def test_complete_assessment_create_issue(self, mock_create_issue):
+    """Test the creation of issue for completed assessment."""
+    audit = factories.AuditFactory()
+
+    self.api.post(all_models.Assessment, {
+        'assessment': {
+            'title': 'Assessment1',
+            'context': None,
+            'audit': {
+                'id': audit.id,
+                'type': audit.type,
+            },
+            'status': 'Completed',
+        }
+    })
+    asmt = all_models.Assessment.query.filter_by(title='Assessment1').one()
+
+    with mock.patch.object(issue_tracker, '_is_issue_tracker_enabled',
+                           return_value=True):
+      issue_params = {
+          'enabled': True,
+          'component_id': hash('Default Component id'),
+          'hotlist_id': hash('Default Hotlist id'),
+          'issue_type': 'Default Issue type',
+          'issue_priority': 'Default Issue priority',
+          'issue_severity': 'Default Issue severity',
+      }
+      self.api.put(asmt, {'issue_tracker': issue_params})
+      mock_create_issue.assert_called_once()
+      # pylint: disable=W0212
+      self.assertEqual(mock_create_issue._mock_call_args[0][0]['status'],
+                       'VERIFIED')
+
   def test_update_issuetracker_info(self):
     """Test that Issue Tracker issues are updated by the utility."""
     cli_patch = mock.patch.object(utils.issues, 'Client')
