@@ -176,7 +176,7 @@ class TestAuditorsPropagation(base.TestACLPropagation):
               "unmap": True,
           },
           "Evidence Audit": {
-              "create": (True, "unimplemented"),
+              "create_and_map": True,
               "read": True,
               "update": True,
               "delete": False,
@@ -184,7 +184,7 @@ class TestAuditorsPropagation(base.TestACLPropagation):
               "add_comment": True
           },
           "Evidence Assessment": {
-              "create": (True, "unimplemented"),
+              "create_and_map": True,
               "read": True,
               "update": True,
               "delete": False,
