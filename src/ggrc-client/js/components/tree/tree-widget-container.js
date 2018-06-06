@@ -746,9 +746,7 @@ export default GGRC.Components('treeWidgetContainer', {
           this.viewModel.updateActiveItemIndicator(relativeIndex);
         }.bind(this))
         .fail(function () {
-          $('body').trigger('ajax:flash', {
-            error: 'Failed to fetch an object.',
-          });
+          GGRC.Errors.notifier('error', 'Failed to fetch an object.');
         })
         .always(function () {
           pinControl.setLoadingIndicator(componentSelector, false);
