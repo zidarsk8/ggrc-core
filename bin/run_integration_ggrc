@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Copyright (C) 2018 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+cd "${SCRIPTPATH}/../test"
+
+source "${SCRIPTPATH}/init_test_env"
+
+db_reset -d "ggrcdevtest"
+
+echo -e "\nRunning integration ggrc tests"
+nosetests integration \
+  -e "^access_control$" \
+  -e "^ggrc_basic_permissions$" \
+  -e "^ggrc_gdrive_integration$" \
+  -e "^ggrc_workflows$" \
+  --with-xunit \
+  --logging-clear-handlers \
+  -v ${@:1}
