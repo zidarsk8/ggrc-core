@@ -13,6 +13,7 @@ from sqlalchemy.orm import load_only
 
 from ggrc import db
 from ggrc import models
+from ggrc.models import all_models
 from ggrc.access_control.list import AccessControlList
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.models import inflector
@@ -284,6 +285,44 @@ def relevant(exp, object_class, target_class, query):
   return object_class.id.in_(result)
 
 
+@validate("object_name", "ids")
+def related_evidence(exp, object_class, target_class, query):
+  """Special Filter by relevant object used to display audit scope evidence
+
+  returns list of evidence ids mapped to assessments for given audit.
+  Evidence mapped to audit itself are ignored.
+  """
+  if not exp["object_name"] == "Audit":
+    raise BadQueryException("relevant_evidence operation "
+                            "works with object Audit only")
+  ids = exp["ids"]
+  evid_dest = db.session.query(
+      all_models.Relationship.destination_id.label("id")
+  ).join(
+      all_models.Assessment,
+      all_models.Assessment.id == all_models.Relationship.source_id
+  ).filter(
+      all_models.Relationship.destination_type == target_class.__name__,
+      all_models.Relationship.source_type == all_models.Assessment.__name__,
+      all_models.Assessment.audit_id.in_(ids)
+  )
+
+  evid_source = db.session.query(
+      all_models.Relationship.source_id.label("id")
+  ).join(
+      all_models.Assessment,
+      all_models.Assessment.id == all_models.Relationship.destination_id
+  ).filter(
+      all_models.Relationship.source_type == target_class.__name__,
+      all_models.Relationship.destination_type ==
+      all_models.Assessment.__name__,
+      all_models.Assessment.audit_id.in_(ids)
+  )
+
+  result = evid_dest.union(evid_source)
+  return object_class.id.in_(result)
+
+
 def build_expression(exp, object_class, target_class, query):
   """Make an SQLAlchemy filtering expression from exp expression tree."""
   if not exp:
@@ -459,6 +498,7 @@ OPS = {
     "<=": LE_OPERATOR,
     ">=": GE_OPERATOR,
     "relevant": relevant,
+    "related_evidence": related_evidence,
     "similar": similar,
     "owned": owned,
     "related_people": related_people,
