@@ -30,6 +30,7 @@ import {
   getWidgetConfig,
 } from './object-versions-utils';
 import {getRolesForType} from './acl-utils';
+import {getMappableTypes} from '../ggrc_utils';
 
 
 /**
@@ -361,7 +362,7 @@ function getModelsForSubTier(modelName) {
   if (modelName === 'CycleTaskGroupObjectTask' &&
   !orderedModelsForSubTier[modelName].length) {
     orderedModelsForSubTier[modelName] =
-    GGRC.Utils.getMappableTypes('CycleTaskGroupObjectTask');
+    getMappableTypes('CycleTaskGroupObjectTask');
   }
 
   availableModels = orderedModelsForSubTier[modelName] || [];

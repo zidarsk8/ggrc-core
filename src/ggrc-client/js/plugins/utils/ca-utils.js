@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {getPlainText} from '../ggrc_utils';
+
 let customAttributesType = {
   Text: 'input',
   'Rich Text': 'text',
@@ -102,7 +104,7 @@ function isEmptyCustomAttribute(value, type, cav) {
       return !value || value === '0';
     },
     'Rich Text': function (value) {
-      value = GGRC.Utils.getPlainText(value);
+      value = getPlainText(value);
       return _.isEmpty(value);
     },
     'Map:Person': function (value, cav) {

@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {commentSort} from '../plugins/ggrc_utils';
+
 (function (namespace, $) {
   can.Model.Cacheable('CMS.Models.Control', {
   // static properties
@@ -97,7 +99,7 @@
         model: CMS.Models.Document,
         mapping: 'all_documents',
         show_view: GGRC.mustache_path + '/base_templates/attachment.mustache',
-        sort_function: GGRC.Utils.sortingHelpers.commentSort,
+        sort_function: commentSort,
       },
     },
     statuses: ['Draft', 'Deprecated', 'Active'],

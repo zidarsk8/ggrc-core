@@ -9,6 +9,7 @@ import Permission from '../../permission';
 import template from './comment-add-form.mustache';
 import {COMMENT_CREATED} from '../../events/eventTypes';
 import tracker from '../../tracker';
+import {getAssigneeType} from '../../plugins/ggrc_utils';
 
 const tag = 'comment-add-form';
 
@@ -40,7 +41,7 @@ export default can.Component.extend({
         comment: source.attr('context'),
         send_notification: this.attr('sendNotifications'),
         context: source.context,
-        assignee_type: GGRC.Utils.getAssigneeType(source),
+        assignee_type: getAssigneeType(source),
         created_at: new Date(),
         modified_by: {type: 'Person', id: GGRC.current_user.id},
         _stamp: Date.now(),

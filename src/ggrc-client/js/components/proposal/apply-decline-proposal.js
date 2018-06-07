@@ -5,6 +5,7 @@
 
 import template from './templates/apply-decline-proposal.mustache';
 import {REFRESH_TAB_CONTENT} from '../../events/eventTypes';
+import {formatDate} from '../../plugins/ggrc_utils';
 const tag = 'apply-decline-proposal';
 
 export default can.Component.extend({
@@ -32,7 +33,7 @@ export default can.Component.extend({
     isLoading: false,
     actionComment: '',
     getModalDescriptionText(isDecline) {
-      const date = GGRC.Utils.formatDate(this.attr('proposal.created_at'));
+      const date = formatDate(this.attr('proposal.created_at'));
       const email = this.attr('proposal.proposed_by.email');
       const action = isDecline ? 'declining' : 'applying';
 

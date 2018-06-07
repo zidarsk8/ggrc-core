@@ -9,6 +9,7 @@ import '../autocomplete/autocomplete';
 import '../external-data-autocomplete/external-data-autocomplete';
 import '../person/person-data';
 import peopleGroupVM from '../view-models/people-group-vm';
+import {isInnerClick} from '../../plugins/ggrc_utils';
 import template from './editable-people-group.mustache';
 
 const SHOW_MODAL_LIMIT = 4;
@@ -94,7 +95,7 @@ export default GGRC.Components('editablePeopleGroup', {
   events: {
     '{window} mousedown': function (el, ev) {
       let viewModel = this.viewModel;
-      let isInside = GGRC.Utils.events.isInnerClick(this.element, ev.target);
+      let isInside = isInnerClick(this.element, ev.target);
       let editableMode = viewModel.attr('editableMode');
       let showPeopleGroupModal = viewModel.attr('showPeopleGroupModal');
 

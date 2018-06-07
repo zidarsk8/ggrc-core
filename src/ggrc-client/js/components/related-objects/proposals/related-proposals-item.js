@@ -11,6 +11,10 @@ import '../../diff/instance-gca-diff';
 import '../../diff/instance-mapping-fields-diff';
 import '../../diff/instance-list-fields-diff';
 import template from './templates/related-proposals-item.mustache';
+import {
+  formatDate,
+  getPersonInfo,
+} from '../../../plugins/ggrc_utils';
 const tag = 'related-proposals-item';
 
 export default can.Component.extend({
@@ -46,17 +50,17 @@ export default can.Component.extend({
     },
     instance: {},
     setPeople(proposal) {
-      GGRC.Utils.getPersonInfo(proposal.proposed_by)
+      getPersonInfo(proposal.proposed_by)
         .then((person) => {
           proposal.attr('proposed_by', person);
         });
 
-      GGRC.Utils.getPersonInfo(proposal.applied_by)
+      getPersonInfo(proposal.applied_by)
         .then((person) => {
           proposal.attr('applied_by', person);
         });
 
-      GGRC.Utils.getPersonInfo(proposal.declined_by)
+      getPersonInfo(proposal.declined_by)
         .then((person) => {
           proposal.attr('declined_by', person);
         });
@@ -68,14 +72,14 @@ export default can.Component.extend({
       let date;
 
       if (status === 'declined') {
-        date = GGRC.Utils.formatDate(proposal.attr('decline_datetime'));
+        date = formatDate(proposal.attr('decline_datetime'));
         text = this.buildTooltipMessage(
           'Declined',
           this.getPersonEmail(proposal.attr('declined_by')),
           date,
           proposal.attr('decline_reason'));
       } else if (status === 'applied') {
-        date = GGRC.Utils.formatDate(proposal.attr('apply_datetime'));
+        date = formatDate(proposal.attr('apply_datetime'));
         text = this.buildTooltipMessage(
           'Applied',
           this.getPersonEmail(proposal.attr('applied_by')),

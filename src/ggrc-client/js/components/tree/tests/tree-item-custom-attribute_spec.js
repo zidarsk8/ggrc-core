@@ -5,6 +5,7 @@
 
 import {helpers} from './../tree-item-custom-attribute';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
+import * as Utils from '../../../plugins/ggrc_utils';
 
 describe('helpers.getCustomAttrValue', () => {
   let helper;
@@ -131,14 +132,14 @@ describe('helpers.getCustomAttrValue', () => {
       const caId = 9;
       const expected = 'expected date';
       const attrValue = '2017-09-30';
-      spyOn(GGRC.Utils, 'formatDate')
+      spyOn(Utils, 'formatDate')
         .and.returnValue(expected);
 
       fakeInstance.customAttr(caId, attrValue);
       actual = helper(fakeInstance, caId, fakeOptions);
 
       expect(actual).toBe(expected);
-      expect(GGRC.Utils.formatDate)
+      expect(Utils.formatDate)
         .toHaveBeenCalledWith(attrValue, true);
     });
   });
