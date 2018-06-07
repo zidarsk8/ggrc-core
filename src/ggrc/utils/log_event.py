@@ -94,8 +94,8 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
     resource_type = str(obj.__class__.__name__)
     try:
       action = request.method
-    except Exception as exp:  # pylint: disable=broad-except
-      # No exception should affect the import request.
+    except RuntimeError as exp:
+      # Exception should affect the import request.
       action = "BULK"
       logger.warning("Request retrieval has failed: %s", exp.message)
 
