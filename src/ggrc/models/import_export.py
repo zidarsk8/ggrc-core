@@ -38,6 +38,8 @@ class ImportExport(Identifiable, db.Model):
       'Finished',
   ]
 
+  DEFAULT_COLUMNS = ['id', 'title', 'created_at', 'status']
+
   job_type = db.Column(db.Enum(IMPORT_JOB_TYPE, EXPORT_JOB_TYPE),
                        nullable=False)
   status = db.Column(db.Enum(*IMPORT_EXPORT_STATUSES), nullable=False,
@@ -56,14 +58,24 @@ class ImportExport(Identifiable, db.Model):
   content = db.Column(mysql.LONGTEXT)
   gdrive_metadata = db.Column('gdrive_metadata', db.Text)
 
-  def log_json(self):
+  def log_json(self, is_default=False):
     """JSON representation"""
-    res = {column.name: getattr(self, column.name)
-           for column in self.__table__.columns
-           if column.name not in ('content', 'gdrive_metadata')}
-    if self.results:
-      res['results'] = json.loads(self.results)
-    res['created_at'] = self.created_at.isoformat()
+    if is_default:
+      columns = self.DEFAULT_COLUMNS
+    else:
+      columns = (column.name for column in self.__table__.columns
+                 if column.name not in ('content', 'gdrive_metadata'))
+
+    res = {}
+    for column in columns:
+      if column == "results":
+        res[column] = json.loads(self.results) if self.results \
+            else self.results
+      elif column == "created_at":
+        res[column] = self.created_at.isoformat()
+      else:
+        res[column] = getattr(self, column)
+
     return res
 
 
@@ -92,8 +104,8 @@ def get_jobs(job_type, ids=None):
                 ImportExport.job_type == job_type]
   if ids:
     conditions.append(ImportExport.id.in_(ids))
-  return [ie.log_json() for ie in ImportExport.query.filter(
-      *conditions)]
+  return [ie.log_json(is_default=True)
+          for ie in ImportExport.query.filter(*conditions)]
 
 
 def delete_previous_imports():
