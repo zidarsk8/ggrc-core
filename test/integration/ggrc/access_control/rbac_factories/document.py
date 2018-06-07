@@ -8,52 +8,71 @@ from integration.ggrc import Api, generator
 from integration.ggrc.access_control.rbac_factories import base
 from integration.ggrc.models import factories
 
+FACTORIES_MAPPING = {
+    "Control": factories.ControlFactory,
+    "Standard": factories.StandardFactory,
+    "Program": factories.ProgramFactory
+}
+
 
 class DocumentReferenceUrlRBACFactory(base.BaseRBACFactory):
   """Document Reference Url RBAC factory class."""
 
   def __init__(self, user_id, acr, parent=None):
-    """Set up objects for Docuv permission tests.
+    """Set up objects for Document permission tests.
 
     Args:
         user_id: Id of user under which all operations will be run.
         acr: Instance of ACR that should be assigned for tested user.
         parent: Model name in scope of which objects should be set up.
     """
-    self.setup_program_scope(user_id, acr)
+    self.api = Api()
+    self.objgen = generator.ObjectGenerator()
+    self.objgen.api = self.api
 
-    with factories.single_commit():
-      document = factories.DocumentReferenceUrlFactory()
-      if parent == "Control":
-        control = factories.ControlFactory()
-        self.assign_person(control, self.acr, self.user_id)
-        self.mapping_id = factories.RelationshipFactory(
-            source=control, destination=document
-        ).id
-      elif parent == "Standard":
-        standard = factories.StandardFactory()
-        self.assign_person(standard, self.acr, self.user_id)
-        self.mapping_id = factories.RelationshipFactory(
-            source=standard, destination=document
-        ).id
-    self.document_id = document.id
-    self.parent = parent
+    self.acr = acr
+    self.user_id = user_id
+    self.parent_name = parent
+    self.document_id = None
+    self.parent = None
+    self.parent_id = None
     self.admin_acr_id = all_models.AccessControlRole.query.filter_by(
         name="Admin",
         object_type="Document",
     ).one().id
-    self.user_id = user_id
-    self.api = Api()
-    self.objgen = generator.ObjectGenerator()
-    self.objgen.api = self.api
-    if user_id:
+
+    self.setup_models(self.parent_name)
+    self.set_user(user_id)
+
+  def set_user(self, user_id):
+    """Set user to send requests"""
+    if self.user_id:
       user = all_models.Person.query.get(user_id)
       self.api.set_user(user)
+
+  def setup_models(self, parent_name):
+    """Setup document, parent, relationship"""
+    with factories.single_commit():
+      document = factories.DocumentReferenceUrlFactory()
+      self.document_id = document.id
+      self.parent = self.build_parent(parent_name)
+      self.parent_id = self.parent.id
+      factories.RelationshipFactory(source=self.parent, destination=document)
+      self.assign_person(self.parent, self.acr, self.user_id)
+
+  @staticmethod
+  def build_parent(parent_name):
+    """Create parent based on Name"""
+    try:
+      parent = FACTORIES_MAPPING[parent_name]()
+    except KeyError():
+      raise ValueError("Unknown parent {}".format(parent_name))
+    return parent
 
   def create(self):
     """Create new Document object."""
     result = self.api.post(all_models.Document, {
-        "Document": {
+        "document": {
             "access_control_list": [{
                 "ac_role_id": self.admin_acr_id,
                 "person": {
@@ -85,11 +104,9 @@ class DocumentReferenceUrlRBACFactory(base.BaseRBACFactory):
 
   def map(self, document=None):
     """Map Document to parent object."""
-    if self.parent == "Audit":
-      parent = all_models.Audit.query.get(self.audit_id)
-    else:
-      parent = all_models.Assessment.query.get(self.assessment_id)
-    map_document = document if document else factories.DocumentReferenceUrlFactory()
+    parent = self.parent.__class__.query.get(self.parent_id)
+    map_document = document if document \
+        else factories.DocumentReferenceUrlFactory()
 
     return self.objgen.generate_relationship(
         source=parent,

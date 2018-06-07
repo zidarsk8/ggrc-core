@@ -113,7 +113,15 @@ class TestProgramManagersPropagation(base.TestACLPropagation):
               "delete": False,
               "add_comment": True,
               "read_comments": True
-          }
+          },
+          "Document Program": {
+              "read": True,
+              "create_and_map": True,
+              "update": True,
+              "delete": False,
+              "read_comments": True,
+              "add_comment": True
+          },
       },
       "Reader": {
           "Program": {
@@ -212,8 +220,15 @@ class TestProgramManagersPropagation(base.TestACLPropagation):
               "delete": False,
               "add_comment": True,
               "read_comments": True
-          }
-
+          },
+          "Document Program": {
+              "read": True,
+              "create_and_map": True,
+              "update": True,
+              "delete": False,
+              "read_comments": True,
+              "add_comment": True
+          },
       },
       "Editor": {
           "Program": {
@@ -312,7 +327,15 @@ class TestProgramManagersPropagation(base.TestACLPropagation):
               "delete": False,
               "add_comment": True,
               "read_comments": True
-          }
+          },
+          "Document Program": {
+              "read": True,
+              "create_and_map": True,
+              "update": True,
+              "delete": False,
+              "read_comments": True,
+              "add_comment": True
+          },
       },
   }
 

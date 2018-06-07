@@ -4,6 +4,7 @@
 """RBAC Factories for ggrc models."""
 
 from integration.ggrc.access_control.rbac_factories import (audit, assessment,
+                                                            document,
                                                             assessment_template,  # noqa: E501
                                                             snapshot, issue,
                                                             program, workflow,
@@ -32,6 +33,7 @@ def get_factory(model):
       "Snapshot": snapshot.SnapshotRBACFactory,
       "Issue": issue.IssueRBACFactory,
       "Evidence": evidence.EvidenceRBACFactory,
+      "Document": document.DocumentReferenceUrlRBACFactory,
       "Program": program.ProgramRBACFactory,
       "Workflow": workflow.WorkflowRBACFactory,
       "TaskGroup": task_group.TaskGroupRBACFactory,
