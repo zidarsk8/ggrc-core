@@ -6,8 +6,6 @@
 import * as Utils from '../../../plugins/ggrc_utils';
 
 describe('GGRC.Mappings', function () {
-  'use strict';
-
   let allTypes = [];
   let notMappableModels = [];
   let modules = {
@@ -99,10 +97,11 @@ describe('GGRC.Mappings', function () {
     Contract: _.difference(filtered, directives),
     Control: filtered,
     CycleTaskGroupObjectTask: _.difference(filtered, ['Person',
-      'TaskGroup', 'Workflow', 'Assessment']),
+      'TaskGroup', 'Workflow', 'Assessment', 'Document']),
     DataAsset: filtered,
     Evidence: ['Assessment', 'Audit'],
-    Document: _.difference(filtered, ['Audit', 'Assessment']),
+    Document: _.difference(filtered,
+      ['Audit', 'Assessment', 'Document', 'Person', 'Workflow', 'TaskGroup']),
     Facility: filtered,
     Issue: _.difference(filtered, [
       'Audit', 'Person', 'Workflow', 'Assessment']),
@@ -125,7 +124,7 @@ describe('GGRC.Mappings', function () {
     Standard: _.difference(filtered, directives),
     System: filtered,
     TaskGroup: _.difference(filtered, ['Audit', 'Person',
-      'TaskGroup', 'Workflow', 'Assessment']),
+      'TaskGroup', 'Workflow', 'Assessment', 'Document']),
     Threat: filtered,
     Vendor: filtered,
   };
