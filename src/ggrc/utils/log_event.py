@@ -87,7 +87,7 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
   if obj is None:
     resource_id = 0
     resource_type = None
-    action = 'BULK'
+    action = "BULK"
     context_id = 0
   else:
     resource_id = obj.id
@@ -96,7 +96,7 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
       action = request.method
     except Exception as exp:  # pylint: disable=broad-except
       # No exception should affect the import request.
-      action = "Undefined"
+      action = "BULK"
       logger.warning("Request retrieval has failed: %s", exp.message)
 
     context_id = obj.context_id
