@@ -118,11 +118,10 @@ def compute_attributes(args):
       rows = db.session.query(Revision.id).filter_by(
           event_id=args.parameters["event_id"],).all()
       revision_ids = [revision_id for revision_id, in rows]
+    elif str(args.parameters["revision_ids"]) == "all_latest":
+      revision_ids = "all_latest"
     else:
-      if str(args.parameters["revision_ids"]) == "all_latest":
-        revision_ids = "all_latest"
-      else:
-        revision_ids = [id_ for id_ in args.parameters["revision_ids"]]
+      revision_ids = [id_ for id_ in args.parameters["revision_ids"]]
 
     computed_attributes.compute_attributes(revision_ids)
     return app.make_response(("success", 200, [("Content-Type", "text/html")]))
