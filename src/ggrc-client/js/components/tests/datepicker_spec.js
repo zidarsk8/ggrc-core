@@ -4,6 +4,7 @@
  */
 
 import * as Utils from '../../plugins/ggrc_utils';
+import {DATE_FORMAT} from '../../plugins/utils/date-util';
 
 describe('GGRC.Components.datepicker', function () {
   'use strict';
@@ -101,11 +102,11 @@ describe('GGRC.Components.datepicker', function () {
       it('create datepicker in specified format', function () {
         method();
         expect(element.datepicker('option', 'dateFormat'))
-          .toEqual(GGRC.Date.PICKER_ISO_DATE);
+          .toEqual(DATE_FORMAT.PICKER_ISO_DATE);
         expect(element.datepicker('option', 'altField')[0])
           .toEqual(altField[0]);
         expect(element.datepicker('option', 'altFormat'))
-          .toEqual(GGRC.Date.PICKER_DISPLAY_FMT);
+          .toEqual(DATE_FORMAT.PICKER_DISPLAY_FMT);
       });
       it('sets new datepicker to picker of viewModel', function () {
         method();
