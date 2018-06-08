@@ -12,6 +12,7 @@ from ggrc import db
 from ggrc.fulltext import attributes as ft_attributes
 from ggrc.fulltext import mixin as ft_mixin
 from ggrc.models import mixins
+from ggrc.models.mixins import base
 from ggrc.models import reflection
 from ggrc.utils import get_url_root
 from ggrc import builder
@@ -35,6 +36,7 @@ class Cycle(roleable.Roleable,
             mixins.Timeboxed,
             mixins.Described,
             mixins.Titled,
+            base.ContextRBAC,
             mixins.Slugged,
             mixins.Notifiable,
             ft_mixin.Indexed,

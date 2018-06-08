@@ -20,6 +20,7 @@ from ggrc.fulltext.mixin import Indexed
 from ggrc.models import issuetracker_issue
 from ggrc.models import reflection
 from ggrc.models.context import HasOwnContext
+from ggrc.models.mixins import base
 from ggrc.models.mixins import clonable
 from ggrc.models.mixins import WithLastDeprecatedDate
 from ggrc.models.object_person import Personable
@@ -39,6 +40,7 @@ class Audit(Snapshotable,
             issuetracker_issue.IssueTracked,
             WithLastDeprecatedDate,
             mixins.Timeboxed,
+            base.ContextRBAC,
             mixins.BusinessObject,
             mixins.Folderable,
             Indexed,

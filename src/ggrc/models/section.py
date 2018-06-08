@@ -13,6 +13,7 @@ from ggrc.models import mixins
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
 from ggrc.models import reflection
+from ggrc.models.mixins import base
 from ggrc.models.relationship import Relatable
 from ggrc.models.relationship import Relationship
 from ggrc.models.track_object_state import HasObjectState
@@ -30,6 +31,7 @@ class Section(Roleable,
               Commentable,
               mixins.TestPlanned,
               PublicDocumentable,
+              base.ContextRBAC,
               mixins.BusinessObject,
               db.Model):
   """Section model."""

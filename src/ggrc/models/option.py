@@ -3,11 +3,12 @@
 
 from ggrc import db
 from ggrc.models.deferred import deferred
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base, Described
 from ggrc.models import reflection
 
 
-class Option(Described, Base, db.Model):
+class Option(Described, base.ContextRBAC, Base, db.Model):
   __tablename__ = 'options'
 
   role = db.Column(db.String)

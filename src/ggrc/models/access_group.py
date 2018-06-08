@@ -6,6 +6,7 @@
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.models.comment import Commentable
+from ggrc.models.mixins import base
 from ggrc.models.mixins import (BusinessObject, LastDeprecatedTimeboxed,
                                 CustomAttributable, TestPlanned)
 from ggrc.models.object_document import PublicDocumentable
@@ -17,7 +18,8 @@ from ggrc.fulltext.mixin import Indexed
 
 class AccessGroup(Roleable, HasObjectState, PublicDocumentable, Commentable,
                   CustomAttributable, Personable, Relatable, TestPlanned,
-                  LastDeprecatedTimeboxed, BusinessObject, Indexed, db.Model):
+                  LastDeprecatedTimeboxed, base.ContextRBAC, BusinessObject,
+                  Indexed, db.Model):
   """Class representing AccessGroup."""
 
   __tablename__ = 'access_groups'

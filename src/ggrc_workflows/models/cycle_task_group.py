@@ -10,6 +10,7 @@ from ggrc import db
 from ggrc.access_control import roleable
 from ggrc.models import mixins
 from ggrc.models import reflection
+from ggrc.models.mixins import base
 from ggrc.fulltext import mixin as index_mixin
 from ggrc.fulltext import attributes
 
@@ -33,6 +34,7 @@ class CycleTaskGroup(roleable.Roleable,
                      mixins.Timeboxed,
                      mixins.Described,
                      mixins.Titled,
+                     base.ContextRBAC,
                      mixins.Base,
                      index_mixin.Indexed,
                      db.Model):

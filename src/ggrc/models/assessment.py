@@ -19,6 +19,7 @@ from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
 from ggrc.models import issuetracker_issue, audit
 from ggrc.models.mixins import with_last_comment
 from ggrc.models.mixins.audit_relationship import AuditRelationship
+from ggrc.models.mixins import base
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import FinishedDate
@@ -49,8 +50,8 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
                  LastDeprecatedTimeboxed, WithSimilarityScore, FinishedDate,
                  VerifiedDate, Notifiable, WithAction,
                  labeled.Labeled, with_last_comment.WithLastComment,
-                 issuetracker_issue.IssueTracked, BusinessObject,
-                 Indexed, db.Model):
+                 issuetracker_issue.IssueTracked, base.ContextRBAC,
+                 BusinessObject, Indexed, db.Model):
   """Class representing Assessment.
 
   Assessment is an object representing an individual assessment performed on

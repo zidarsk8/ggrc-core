@@ -18,11 +18,13 @@ from ggrc.models import mixins
 from ggrc.models.types import JsonType
 from ggrc.models import reflection
 from ggrc_workflows.models.task_group import TaskGroup
+from ggrc.models.mixins import base
 
 
 class TaskGroupTask(roleable.Roleable,
                     mixins.Titled,
                     mixins.Described,
+                    base.ContextRBAC,
                     mixins.Slugged,
                     mixins.Timeboxed,
                     Indexed,

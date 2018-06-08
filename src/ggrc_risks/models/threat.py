@@ -7,6 +7,7 @@ from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.comment import Commentable
+from ggrc.models.mixins import base
 from ggrc.models.mixins import (CustomAttributable, BusinessObject,
                                 LastDeprecatedTimeboxed, TestPlanned)
 from ggrc.models.object_document import PublicDocumentable
@@ -17,7 +18,8 @@ from ggrc.models.track_object_state import HasObjectState
 
 class Threat(Roleable, HasObjectState, CustomAttributable, Personable,
              Relatable, LastDeprecatedTimeboxed, PublicDocumentable,
-             Commentable, TestPlanned, BusinessObject, Indexed, db.Model):
+             Commentable, TestPlanned, base.ContextRBAC, BusinessObject,
+             Indexed, db.Model):
   __tablename__ = 'threats'
 
   _aliases = {

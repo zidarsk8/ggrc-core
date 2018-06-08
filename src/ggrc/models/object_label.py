@@ -6,10 +6,11 @@
 from ggrc import db
 from ggrc.models import utils
 from ggrc.models.label import Label
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 
 
-class ObjectLabel(Base, db.Model):
+class ObjectLabel(base.ContextRBAC, Base, db.Model):
   """ObjectLabel Model."""
   __tablename__ = 'object_labels'
 

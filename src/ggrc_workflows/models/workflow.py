@@ -23,6 +23,7 @@ from ggrc.fulltext import get_indexer
 from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
 from ggrc.models import mixins
+from ggrc.models.mixins import base
 from ggrc.models import reflection
 from ggrc.models.context import HasOwnContext
 from ggrc.models.deferred import deferred
@@ -39,6 +40,7 @@ class Workflow(roleable.Roleable,
                mixins.Titled,
                mixins.Notifiable,
                mixins.Stateful,
+               base.ContextRBAC,
                mixins.Slugged,
                mixins.Folderable,
                Indexed,
