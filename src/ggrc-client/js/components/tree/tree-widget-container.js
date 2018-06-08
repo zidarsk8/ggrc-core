@@ -26,6 +26,7 @@ import '../advanced-search/advanced-search-filter-container';
 import '../advanced-search/advanced-search-mapping-container';
 import '../bulk-update-button/bulk-update-button';
 import '../assessment-template-clone-button/assessment-template-clone-button';
+import '../create-document-button/create-document-button';
 import '../dropdown/multiselect-dropdown';
 import '../assessment_generator';
 import '../last-comment/last-comment';
