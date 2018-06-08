@@ -7,7 +7,10 @@
   'use strict';
   /* Default Sate for Assessment should be 'Not Started' */
   let defaultState = 'Not Started';
-  let tpl = '<span class="state-value-dot state-{{suffix}}">{{state}}</span>';
+  let tpl =
+    `<span class="state-value-dot state-{{suffix}} {{verified}}">
+      {{state}}
+    </span>`;
 
   /**
    * can.Map(ViewModel) presenting behavior of State Colors Map Component
@@ -23,6 +26,11 @@
         get: function () {
           let state = this.attr('state') || defaultState;
           return state.toLowerCase().replace(/[\s\t]+/g, '');
+        },
+      },
+      verified: {
+        get: function (value) {
+          return value ? 'verified' : '';
         },
       },
     },
