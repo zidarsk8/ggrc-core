@@ -111,23 +111,8 @@ rules = make_rule_set(rule_list=[
         # mapping directive to a program
         {'Program'},
         Types.directives,
-        Types.all - {'Program'} - Types.directives,
+        {'Section', 'Clause'}
     ),
-
-    Rule(
-        # mapping to sections and clauses
-        Types.directives,
-        {'Section', 'Clause'},
-        {'Objective', 'Control'},
-    ),
-
-    Rule(
-        # mapping to objective
-        {'Section'},
-        {'Objective'},
-        {'Control'},
-    ),
-
     Rule(
         # mappings for 'raise an issue' on assessment page
         {"Issue"},
