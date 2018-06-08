@@ -12,7 +12,6 @@ from sqlalchemy.orm import aliased
 from sqlalchemy.orm import load_only
 
 from ggrc import db
-from ggrc import models
 from ggrc.models import all_models
 from ggrc.access_control.list import AccessControlList
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
@@ -256,25 +255,28 @@ def relevant(exp, object_class, target_class, query):
     ))
 
   if check_snapshots:
-    snapshot_qs = models.Snapshot.query.filter(
-        models.Snapshot.parent_type == models.Audit.__name__,
-        models.Snapshot.child_type == object_name,
-        models.Snapshot.child_id.in_(ids),
+    snapshot_qs = all_models.Snapshot.query.filter(
+        all_models.Snapshot.parent_type == all_models.Audit.__name__,
+        all_models.Snapshot.child_type == object_name,
+        all_models.Snapshot.child_id.in_(ids),
     ).options(
-        load_only(models.Snapshot.id),
+        load_only(all_models.Snapshot.id),
     ).distinct(
     ).subquery(
         "snapshot"
     )
-    dest_qs = db.session.query(models.Relationship.source_id).filter(
-        models.Relationship.destination_id == snapshot_qs.c.id,
-        models.Relationship.destination_type == models.Snapshot.__name__,
-        models.Relationship.source_type == object_class.__name__,
+    dest_qs = db.session.query(all_models.Relationship.source_id).filter(
+        all_models.Relationship.destination_id == snapshot_qs.c.id,
+        all_models.Relationship.destination_type ==
+        all_models.Snapshot.__name__,
+        all_models.Relationship.source_type == object_class.__name__,
     )
-    source_qs = db.session.query(models.Relationship.destination_id).filter(
-        models.Relationship.source_id == snapshot_qs.c.id,
-        models.Relationship.source_type == models.Snapshot.__name__,
-        models.Relationship.destination_type == object_class.__name__,
+    source_qs = db.session.query(
+        all_models.Relationship.destination_id
+    ).filter(
+        all_models.Relationship.source_id == snapshot_qs.c.id,
+        all_models.Relationship.source_type == all_models.Snapshot.__name__,
+        all_models.Relationship.destination_type == object_class.__name__,
     )
     ids_qs = dest_qs.union(source_qs)
     result.update(*ids_qs.all())
@@ -386,72 +388,72 @@ def cascade_unmappable(exp, object_class, target_class, query):
 
   mapped_to_issue = aliased(sqlalchemy.union_all(
       db.session.query(
-          models.Relationship.destination_id.label("target_id"),
+          all_models.Relationship.destination_id.label("target_id"),
       ).filter(
-          models.Relationship.source_id == issue_id,
-          models.Relationship.source_type == "Issue",
-          models.Relationship.destination_type == object_class.__name__,
-          ~models.Relationship.automapping_id.is_(None),
+          all_models.Relationship.source_id == issue_id,
+          all_models.Relationship.source_type == "Issue",
+          all_models.Relationship.destination_type == object_class.__name__,
+          ~all_models.Relationship.automapping_id.is_(None),
       ),
       db.session.query(
-          models.Relationship.source_id.label("target_id"),
+          all_models.Relationship.source_id.label("target_id"),
       ).filter(
-          models.Relationship.destination_id == issue_id,
-          models.Relationship.destination_type == "Issue",
-          models.Relationship.source_type == object_class.__name__,
+          all_models.Relationship.destination_id == issue_id,
+          all_models.Relationship.destination_type == "Issue",
+          all_models.Relationship.source_type == object_class.__name__,
       ),
   ), name="mapped_to_issue")
 
   mapped_to_assessment = aliased(sqlalchemy.union_all(
       db.session.query(
-          models.Relationship.destination_id.label("target_id"),
+          all_models.Relationship.destination_id.label("target_id"),
       ).filter(
-          models.Relationship.source_id == assessment_id,
-          models.Relationship.source_type == "Assessment",
-          models.Relationship.destination_type == object_class.__name__,
+          all_models.Relationship.source_id == assessment_id,
+          all_models.Relationship.source_type == "Assessment",
+          all_models.Relationship.destination_type == object_class.__name__,
       ),
       db.session.query(
-          models.Relationship.source_id.label("target_id"),
+          all_models.Relationship.source_id.label("target_id"),
       ).filter(
-          models.Relationship.destination_id == assessment_id,
-          models.Relationship.destination_type == "Assessment",
-          models.Relationship.source_type == object_class.__name__,
+          all_models.Relationship.destination_id == assessment_id,
+          all_models.Relationship.destination_type == "Assessment",
+          all_models.Relationship.source_type == object_class.__name__,
       ),
   ), "mapped_to_assessment")
 
   other_assessments = aliased(sqlalchemy.union_all(
       db.session.query(
-          models.Relationship.destination_id.label("assessment_id"),
+          all_models.Relationship.destination_id.label("assessment_id"),
       ).filter(
-          models.Relationship.source_id == issue_id,
-          models.Relationship.source_type == "Issue",
-          models.Relationship.destination_id != assessment_id,
-          models.Relationship.destination_type == "Assessment",
+          all_models.Relationship.source_id == issue_id,
+          all_models.Relationship.source_type == "Issue",
+          all_models.Relationship.destination_id != assessment_id,
+          all_models.Relationship.destination_type == "Assessment",
       ),
       db.session.query(
-          models.Relationship.source_id.label("assessment_id"),
+          all_models.Relationship.source_id.label("assessment_id"),
       ).filter(
-          models.Relationship.destination_id == issue_id,
-          models.Relationship.destination_type == "Issue",
-          models.Relationship.source_id != assessment_id,
-          models.Relationship.source_type == "Assessment",
+          all_models.Relationship.destination_id == issue_id,
+          all_models.Relationship.destination_type == "Issue",
+          all_models.Relationship.source_id != assessment_id,
+          all_models.Relationship.source_type == "Assessment",
       ),
   ), "other_assessments")
 
   mapped_to_other_assessments = aliased(sqlalchemy.union_all(
       db.session.query(
-          models.Relationship.destination_id.label("target_id"),
+          all_models.Relationship.destination_id.label("target_id"),
       ).filter(
-          models.Relationship.source_id.in_(other_assessments),
-          models.Relationship.source_type == "Assessment",
-          models.Relationship.destination_type == object_class.__name__,
+          all_models.Relationship.source_id.in_(other_assessments),
+          all_models.Relationship.source_type == "Assessment",
+          all_models.Relationship.destination_type == object_class.__name__,
       ),
       db.session.query(
-          models.Relationship.source_id.label("target_id"),
+          all_models.Relationship.source_id.label("target_id"),
       ).filter(
-          models.Relationship.destination_id != assessment_id,
-          models.Relationship.destination_type == "Assessment",
-          models.Relationship.source_type == object_class.__name__,
+          all_models.Relationship.destination_id != assessment_id,
+          all_models.Relationship.destination_type == "Assessment",
+          all_models.Relationship.source_type == object_class.__name__,
       ),
   ), "mapped_to_other_assessments")
 
