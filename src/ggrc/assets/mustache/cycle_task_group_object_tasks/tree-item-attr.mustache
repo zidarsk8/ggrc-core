@@ -29,14 +29,6 @@
     {{/using}}
   {{/case}}
   {{#default}}
-    {{#if_helpers '\
-      #if_equals' attr_name 'url' '\
-      or #if_equals' attr_name 'reference_url'}}
-        <a class="url" href="{{get_url_value attr_name instance}}" target="_blank">
-          {{get_default_attr_value attr_name instance}}
-        </a>
-    {{else}}
-      {{get_default_attr_value attr_name instance}}
-    {{/if_helpers}}
+    {{get_default_attr_value attr_name instance}}
   {{/default}}
 {{/switch}}

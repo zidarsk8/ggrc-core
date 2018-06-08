@@ -46,7 +46,6 @@ dashboard-js-template-files:
   - controls/categories_tree.mustache
   - controls/info.mustache
   - controls/contacts.mustache
-  - controls/urls.mustache
   - controls/modal_content.mustache
   - controls/tree-item-attr.mustache
   - assessments/modal_content.mustache
