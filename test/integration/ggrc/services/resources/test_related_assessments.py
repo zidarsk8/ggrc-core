@@ -11,6 +11,7 @@ more on verifying the related SQL query.
 import mock
 import ddt
 
+from ggrc import db
 from ggrc import views
 from integration.ggrc.models import factories
 from integration.ggrc.services import TestCase
@@ -53,6 +54,14 @@ class TestRelatedAssessments(TestCase):
     kwargs["object_type"] = obj.type
     kwargs["object_id"] = obj.id
     return self.client.get(self.URL_BASE, query_string=kwargs)
+
+  @ddt.data("2018-06-06 16:38:17", None)
+  def test_verified_status(self, verified_date):
+    """Test verified flag defines correctly"""
+    self.assessment2.verified_date = verified_date
+    db.session.commit()
+    response = self._get_related_assessments(self.assessment1).json
+    self.assertEqual(bool(verified_date), response["data"][0]["verified"])
 
   def test_basic_response(self):
     """Test basic response for a valid query."""
