@@ -34,20 +34,6 @@ GGRC has 6 global roles:
 - **Administrator** users can do all of the above plus they are granted access to the admin dashboard where they can grant System wide roles to other users. They can also add global custom attributes to GGRC objects.
 - **Superuser** that is set in the app config (GGRC_BOOTSTRAP_ADMIN_USERS). It behaves completely the same as the Administrator role, but it can’t be unassigned through the application interface (a change in the config is required).
 
-Program and Workflow roles
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Program & Workflow roles grant access only in the context of the Program/Workflow.
-
-- **No access** will not grant any permissions in the program/workflow context, however, if the user has access to the object (e.g. has system wide Editor role) this role WILL NOT prevent access to the object even though the name/description implies it.
-- **Workflow Member** have access to update/delete some workflow objects (cycle tasks, attachments, comments), but they only have READ access to objects on workflow setup tab (task groups, task group tasks) and the workflow object itself.
-- **Workflow Manager** have complete access to all objects in the workflow scope. They can also have permission to assign workflow/program level roles to users.
-- **Program Reader** have READ access to the program and all the objects related to the program. This includes all objects mapped to the program (e.g. Regulations, Controls, Sections, Systems, etc.) as well as Audits and all objects mapped to the audit (Assessments, Issues, Requests, …)
-- **Program Editor** have EDIT access to the program and all the objects related to the program.
-- **Program Manager** have EDIT access and can assign program roles to users.
-- **Auditor** is a special role on the audit object that grants the user READ access to the audit and program as well as read access to all the mapped objects
-
-
 RBAC Implementation
 -------------------
 
