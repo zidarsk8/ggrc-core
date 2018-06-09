@@ -502,14 +502,14 @@ class TestExportMultipleObjects(TestCase):
 
     # controls
     for i in range(115, 140):
-      if i in (117, 118, 119) + (121, 122):
+      if i in (117, 118, 119):
         self.assertIn(",Startupsum {},".format(i), response.data)
       else:
         self.assertNotIn(",Startupsum {},".format(i), response.data)
 
     # policies
     for i in range(5, 25):
-      if i in (7, 8, 9, 10, 19, 20) + (11, 12, 13, 14, 15, 16, 17, 18, 19):
+      if i in (7, 8, 9, 10, 19, 20):
         self.assertIn(",Cheese ipsum ch {},".format(i), response.data)
       else:
         self.assertNotIn(",Cheese ipsum ch {},".format(i), response.data)
