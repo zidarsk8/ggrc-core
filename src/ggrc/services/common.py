@@ -1364,16 +1364,6 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
         filtered.append(filtered_sub_resource)
     return filtered
   elif isinstance(resource, dict) and 'type' in resource:
-    # First check current level
-    context_id = False
-    if 'context' in resource:
-      if resource['context'] is None:
-        context_id = None
-      else:
-        context_id = resource['context']['id']
-    elif 'context_id' in resource:
-      context_id = resource['context_id']
-    assert context_id is not False, "No context found for object"
 
     # In order to avoid loading full instances and using is_allowed_read_for,
     # we are making a special test for the Creator here. Creator can only
@@ -1390,20 +1380,14 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
           obj_tuple = (resource[name + "_type"], resource[name + "_id"])
           obj_inst = utils.referenced_objects.get(*obj_tuple)
           if obj_inst:
-            inst = utils.create_stub(obj_inst, obj_inst.context_id)
+            inst = utils.create_stub(obj_inst)
           else:
             inst = None
         if not inst:
           # If object was deleted but relationship still exists
           continue
-        contexts = permissions.read_contexts_for(inst['type'])
-        if contexts is None:
-          # read_contexts_for returns None if the user has access to all the
-          # objects of this type. If the user doesn't have access to any object
-          # an empty list ([]) will be returned
-          continue
         resources = permissions.read_resources_for(inst['type']) or []
-        if inst['context_id'] in contexts or inst['id'] in resources:
+        if inst['id'] in resources:
           continue
         can_read = False
       if not can_read:
@@ -1421,7 +1405,7 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
         return None
     else:
       if not user_permissions.is_allowed_read(resource['type'],
-                                              resource['id'], context_id):
+                                              resource['id'], None):
         return None
     # Then, filter any typed keys
     for key, value in resource.items():
