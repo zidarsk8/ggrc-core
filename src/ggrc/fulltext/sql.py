@@ -47,7 +47,6 @@ class SqlIndexer(object):
           yield self.record_type(
               key=record.key,
               type=record.type,
-              context_id=record.context_id,
               tags=record.tags,
               property=prop,
               subproperty=unicode(subproperty),
