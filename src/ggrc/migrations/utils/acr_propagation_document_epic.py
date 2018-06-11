@@ -380,7 +380,7 @@ GGRC_BASIC_PERMISSIONS_PROPAGATION = {
                 "Comment R": {},
                 "Document R": {
                     "Relationship R": {
-                      "Comment R": {},
+                        "Comment R": {},
                     },
                 },
             }
