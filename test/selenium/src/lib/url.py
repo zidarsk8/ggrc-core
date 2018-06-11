@@ -39,7 +39,7 @@ class Widget(object):
   # widgets
   INFO = "#!info"
   AUDITS = "#!audit"
-  SUMMARY = "#!Summary"  # audits
+  SUMMARY = "#!summary"  # audits
   ASSESSMENTS = "#!assessment"
   ASSESSMENT_TEMPLATES = "#!assessment_template"
   CONTROLS = "#!control"
