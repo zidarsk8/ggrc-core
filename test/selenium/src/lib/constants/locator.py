@@ -26,7 +26,7 @@ class Common(object):
   # info page (panel)
   _INFO = "info"
   INFO = "." + _INFO
-  _INFO_WIDGET = "info_widget"
+  _INFO_WIDGET = "info"
   INFO_WIDGET_ID = "#" + _INFO_WIDGET
   # dropdown
   DROPDOWN_MENU = ".dropdown-menu"
@@ -93,7 +93,7 @@ class PageHeader(object):
   BUTTON_SEARCH = (
       By.CSS_SELECTOR, _CONTENT + ' [data-toggle="unified-search"]')
   BUTTON_MY_TASKS = (
-      By.CSS_SELECTOR, _CONTENT + ' [href="/dashboard#!task_widget"]')
+      By.CSS_SELECTOR, _CONTENT + ' [href="/dashboard#!task"]')
   BUTTON_ALL_OBJECTS = (
       By.CSS_SELECTOR, _CONTENT + ' [href^="/objectBrowser"]')
   TOGGLE_USER_DROPDOWN = (By.CSS_SELECTOR, _CONTENT + " .dropdown-toggle")
@@ -109,7 +109,7 @@ class PageHeader(object):
   NOTIFICATIONS = (By.CSS_SELECTOR, USER_MENU + ' .notify-wrap')
   BUTTON_ADMIN_DASHBOARD = (
       By.CSS_SELECTOR,
-      Common.DROPDOWN_MENU + ' [href="/admin#!people_list_widget"]')
+      Common.DROPDOWN_MENU + ' [href="/admin#!people_list"]')
   CHECKBOX_DAILY_DIGEST = (By.CSS_SELECTOR, USER_MENU + ' input')
   CHECKBOX_DISABLED = (By.CSS_SELECTOR, USER_MENU + ' input.disabled')
 
@@ -558,7 +558,7 @@ class WidgetBar(object):
     @staticmethod
     def get_widget(object_name):
       return (By.CSS_SELECTOR,
-              '.object-nav [href$="#!{}_widget"]'.format(object_name))
+              '.object-nav [href$="#!{}"]'.format(object_name))
 
   class __metaclass__(type):
     def __init__(cls, *args):
@@ -592,7 +592,7 @@ class WidgetBarButtonAddDropdown(object):
       return (
           By.CSS_SELECTOR,
           '[data-test-id="button_widget_add_2c925d94"] '
-          '.object-nav [href$="#{}_widget"]'.format(object_name))
+          '.object-nav [href$="#{}"]'.format(object_name))
 
   class __metaclass__(type):
     def __init__(cls, *args):
@@ -910,7 +910,7 @@ class WidgetAdminRoles(object):
 
 class WidgetAdminEvents(object):
   """Locators for Events widget on Admin Dashboard."""
-  _BASE_CSS_SELECTOR = 'section#events_list_widget:not([class~="hidden"])'
+  _BASE_CSS_SELECTOR = 'section#events_list:not([class~="hidden"])'
   _TREE_ITEMS_SELECTOR = ".tree-item[data-model]"
   TREE_VIEW_ITEMS = (
       By.CSS_SELECTOR,
@@ -1061,7 +1061,7 @@ class AdminCustomAttributes(object):
     """Locators for Widget custom attributes on Admin Dashboard."""
     @staticmethod
     def get_toggle(child_id):
-      return (By.CSS_SELECTOR, '#custom_attribute_widget li:nth-child({}) '
+      return (By.CSS_SELECTOR, '#custom_attribute li:nth-child({}) '
               '.openclose'.format(child_id))
 
     @staticmethod
