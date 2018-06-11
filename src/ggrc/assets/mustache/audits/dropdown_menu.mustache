@@ -107,8 +107,7 @@
   {{#using program=instance.program}}
   {{^if instance.archived}}
     {{#if_helpers '\
-      #system_role' 'Administrator' '\
-      or #system_role' 'Superuser' '\
+      #current_user_is_admin' '\
       or #has_role' 'Program Managers' program}}
        <li>
           <a data-toggle="modal-ajax-archiveform"
@@ -141,15 +140,13 @@
   {{/if}}
 
   {{#if instance.archived}}
-    {{#if_helpers '\
-      #system_role' 'Administrator' '\
-      or #system_role' 'Superuser'}}
+    {{#current_user_is_admin}}
         <li>
            <unarchive-link instance="instance" notify="true">
                <i class="fa fa-archive"></i>
                Unarchive Audit
            </unarchive-link>
         </li>
-    {{/if_helpers}}
+    {{/current_user_is_admin}}
   {{/if}}
 </three-dots-menu>
