@@ -567,12 +567,12 @@ const AUDIT_ISSUE_TRACKER = {
     getHashFragment: function () {
       let widgetName = this.constructor.table_singular;
       if (window.location.hash
-        .startsWith(['#', widgetName, '_widget'].join(''))) {
+        .startsWith(['#', widgetName].join(''))) {
         return;
       }
 
       return [widgetName,
-        '_widget/',
+        '/',
         this.hash_fragment(),
         '&refetch=true'].join('');
     },

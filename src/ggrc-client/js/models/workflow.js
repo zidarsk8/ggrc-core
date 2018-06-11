@@ -74,7 +74,7 @@
 
       this._super(...arguments)
         .then((instance) => {
-          redirectLink = `${instance.viewLink}#task_group_widget`;
+          redirectLink = `${instance.viewLink}#task_group`;
           instance.attr('_redirect', redirectLink);
           if (!createDefaultTaskGroup || !taskGroupTitle ||
             !isNew || instance.clone) {

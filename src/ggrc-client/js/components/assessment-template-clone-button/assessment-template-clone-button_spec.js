@@ -27,33 +27,33 @@ describe('assessment-template-clone-button component', () => {
     it('dispatches "refreshTree" if it is Audit page ' +
     'and assessment_template widget', () => {
       pageInstanceSpy.and.returnValue({type: 'Audit'});
-      routerSpy.and.returnValue('assessment_template_widget');
+      routerSpy.and.returnValue('assessment_template');
 
       vm.refreshTreeView();
 
       expect(vm.dispatch).toHaveBeenCalledWith('refreshTree');
     });
 
-    it('sets "assessment_template_widget" to router with refetch flag ' +
+    it('sets "assessment_template" to router with refetch flag ' +
     'if it is Audit page but not assessment_template widget', () => {
       pageInstanceSpy.and.returnValue({type: 'Audit'});
 
       vm.refreshTreeView();
 
       expect(router.attr).toHaveBeenCalledWith({
-        widget: 'assessment_template_widget',
+        widget: 'assessment_template',
         refetch: true,
       });
     });
 
-    it('sets "assessment_template_widget" to router with refetch flag ' +
+    it('sets "assessment_template" to router with refetch flag ' +
     'if it is Audit page but not assessment_template widget', () => {
       pageInstanceSpy.and.returnValue({type: 'People'});
 
       vm.refreshTreeView();
 
       expect(router.attr).not.toHaveBeenCalledWith({
-        widget: 'assessment_template_widget',
+        widget: 'assessment_template',
         refetch: true,
       });
       expect(vm.dispatch).not.toHaveBeenCalledWith('refreshTree');

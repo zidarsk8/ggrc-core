@@ -33,7 +33,7 @@ let ApprovalWorkflow = can.Observe({
     let reviewTemplate = _.template('Object review for ${type} "${title}"');
     let notifyTemplate = _.template('<br/><br/> ${name} (${email}) asked ' +
       'you to review newly created ${type} "${title}" before ${before}. ' +
-      'Click <a href="${href}#workflows_widget">here</a> to perform a review.'
+      'Click <a href="${href}#workflows">here</a> to perform a review.'
     );
     let assigneeRole = getRole('TaskGroupTask', 'Task Assignees');
     let wfAdminRole = getRole('Workflow', 'Admin');

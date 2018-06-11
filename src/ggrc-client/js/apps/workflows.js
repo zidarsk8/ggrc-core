@@ -406,8 +406,8 @@ import InfoWidget from '../controllers/info_widget_controller';
     }
 
     new GGRC.WidgetList('ggrc_workflows', descriptor, [
-      'info_widget',
-      'task_widget',
+      'info',
+      'task',
     ]);
   };
 
@@ -565,8 +565,8 @@ import InfoWidget from '../controllers/info_widget_controller';
       };
     }
     new GGRC.WidgetList('ggrc_workflows', descriptor, [
-      'info_widget',
-      'task_widget',
+      'info',
+      'task',
     ]);
   };
 

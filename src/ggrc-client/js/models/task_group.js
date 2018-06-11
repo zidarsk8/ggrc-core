@@ -24,7 +24,7 @@ import Permission from '../permission';
     destroy: 'DELETE /api/task_groups/{id}',
     mixins: ['contactable'],
     permalink_options: {
-      url: '<%= base.viewLink %>#task_group_widget/' +
+      url: '<%= base.viewLink %>#task_group/' +
       'task_group/<%= instance.id %>',
       base: 'workflow',
     },
@@ -98,7 +98,7 @@ import Permission from '../permission';
 
     mixins: ['contactable', 'timeboxed', 'accessControlList'],
     permalink_options: {
-      url: '<%= base.viewLink %>#task_group_widget/' +
+      url: '<%= base.viewLink %>#task_group/' +
       'task_group/<%= instance.task_group.id %>',
       base: 'task_group:workflow',
     },
