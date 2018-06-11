@@ -53,26 +53,4 @@
   GGRC.MapperHelpers.Cross = function Cross(localMapping, remoteMapping) {
     return new GGRC.ListLoaders.CrossListLoader(localMapping, remoteMapping);
   };
-
-  GGRC.all_local_results = function (instance) {
-    // Returns directly-linked objects
-    let loaders;
-    let multiLoader;
-    let localLoaders = [];
-
-    if (instance._all_local_results_binding)
-      return instance._all_local_results_binding.refresh_stubs();
-
-    loaders = GGRC.Mappings.get_mappings_for(instance.constructor.shortName);
-    can.each(loaders, function (loader, name) {
-      if (loader instanceof GGRC.ListLoaders.DirectListLoader ||
-        loader instanceof GGRC.ListLoaders.ProxyListLoader) {
-        localLoaders.push(name);
-      }
-    });
-
-    multiLoader = new GGRC.ListLoaders.MultiListLoader(localLoaders);
-    instance._all_local_results_binding = multiLoader.attach(instance);
-    return instance._all_local_results_binding.refresh_stubs();
-  };
 })(window.GGRC, window.can);
