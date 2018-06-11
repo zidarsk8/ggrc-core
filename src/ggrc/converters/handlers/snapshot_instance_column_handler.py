@@ -26,14 +26,15 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
     if audit_column_handler:
       audit_items = audit_column_handler.parse_item()
       return audit_items[0]
+    return None
 
-  @cached_property
-  def audit_object_pool_query(self):
+  def get_audit_object_pool_query(self, child_ids=None):
     if self.row_converter.is_new and self.related_audit:
-      return models.Snapshot.query.filter(
+      query = models.Snapshot.query.filter(
           models.Snapshot.parent_id == self.related_audit.id,
           models.Snapshot.parent_type == models.Audit.__name__,
           models.Snapshot.child_type == self.mapping_object.__name__,
+
       )
     else:
       sub = models.Relationship.get_related_query(
@@ -49,11 +50,14 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
           ],
           else_=sub.c.source_id,
       )
-      return models.Snapshot.query.filter(
+      query = models.Snapshot.query.filter(
           models.Snapshot.parent_id == case_statement,
           models.Snapshot.parent_type == models.Audit.__name__,
           models.Snapshot.child_type == self.mapping_object.__name__,
       )
+    if child_ids:
+      query = query.filter(models.Snapshot.child_id.in_(child_ids))
+    return query
 
   @property
   def snapshoted_instances_query(self):
@@ -92,12 +96,38 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
       return
     row_obj = self.row_converter.obj
     relationships = []
+    child_ids = [o.id for o in self.value]
     child_id_snapshot_dict = {
-        i.child_id: i for i in self.audit_object_pool_query.all()
+        i.child_id: i
+        for i in self.get_audit_object_pool_query(
+            child_ids
+        ).options(
+            sqlalchemy.orm.undefer_group('Snapshot_complete')
+        )
     }
+    mapping_query = models.Relationship.query.filter(
+        models.Relationship.source_type == row_obj.type,
+        models.Relationship.source_id == row_obj.id,
+        models.Relationship.destination_type == models.Snapshot.__name__,
+    ).union(
+        models.Relationship.query.filter(
+            models.Relationship.destination_type == row_obj.type,
+            models.Relationship.destination_id == row_obj.id,
+            models.Relationship.source_type == models.Snapshot.__name__,
+        )
+    ).options(
+        sqlalchemy.orm.load_only(models.Relationship.id),
+        sqlalchemy.orm.load_only(models.Relationship.source_id),
+        sqlalchemy.orm.load_only(models.Relationship.source_type),
+        sqlalchemy.orm.load_only(models.Relationship.destination_id),
+        sqlalchemy.orm.load_only(models.Relationship.destination_type),
+    )
+    mappings = {(r.source_id
+                 if r.source_type == models.Snapshot.__name__
+                 else r.destination_id): r for r in mapping_query}
     for obj in self.value:
       snapshot = child_id_snapshot_dict.get(obj.id)
-      mapping = models.Relationship.find_related(row_obj, snapshot)
+      mapping = mappings.get(snapshot.id)
       if not self.unmap and not mapping:
         mapping = models.Relationship(source=row_obj, destination=snapshot)
         relationships.append(mapping)
@@ -130,7 +160,12 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
     "return True if data valid else False"
     if not to_append_ids:
       return True
-    pool_ids = {i.child_id for i in self.audit_object_pool_query.all()}
+    pool_ids = {
+        i.child_id for i in self.get_audit_object_pool_query(
+            to_append_ids
+        ).options(
+            sqlalchemy.orm.load_only(models.Snapshot.child_id)
+        )}
     if to_append_ids - pool_ids:
       self.add_error(errors.ILLEGAL_APPEND_CONTROL_VALUE,
                      object_type=self.row_converter.obj.__class__.__name__,
@@ -139,7 +174,7 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
     return True
 
   def parse_item(self, *args, **kwargs):
-    "parse items and make validation"
+    """Parse items and make validation"""
     items = super(SnapshotInstanceColumnHandler, self).parse_item(
         *args, **kwargs
     )
