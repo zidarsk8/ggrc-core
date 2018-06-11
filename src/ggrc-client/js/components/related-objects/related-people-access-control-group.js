@@ -51,12 +51,11 @@ export default can.Component.extend({
     changeEditableGroup: function (args) {
       if (args.editableMode) {
         this.attr('editableMode', true);
-        this.attr('backUpPeople')
-          .replace(this.attr('people'));
+        this.attr('backUpPeople', this.attr('people').attr());
       } else {
         this.attr('editableMode', false);
         this.attr('isDirty', false);
-        this.attr('people').replace(this.attr('backUpPeople'));
+        this.attr('people', this.attr('backUpPeople').attr());
       }
     },
     saveChanges: function () {
@@ -114,7 +113,7 @@ export default can.Component.extend({
   events: {
     init: function ($element, options) {
       let vm = this.viewModel;
-      vm.attr('backUpPeople').replace(vm.attr('people'));
+      vm.attr('backUpPeople', vm.attr('people').attr());
     },
   },
 });
