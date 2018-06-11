@@ -65,5 +65,5 @@ class TestPrincipalAssigneesPropagation(base.TestACLPropagation):
 
   @helpers.unwrap(PERMISSIONS)
   def test_access(self, role, model, action_name, expected_result):
-    """Principal Assignees {0:<7}: On {1:<20} test {2:<20} - Expected {3:<2} """
+    """Principal Assignees {0:<7}: On {1:<20} test {2:<20} - Expect {3:<2} """
     self.runtest(role, model, action_name, expected_result)
