@@ -4,7 +4,7 @@
  */
 
 import tracker from '../../tracker';
-import WorkflowHelpers from '../../plugins/utils/workflow-utils';
+import * as WorkflowHelpers from '../../plugins/utils/workflow-utils';
 
 describe('GGRC.Components.subTreeWrapper', function () {
   'use strict';

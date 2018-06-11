@@ -5,7 +5,7 @@
 
 import Component from '../cycle-task-group-object-task';
 import RefreshQueue from '../../../../models/refresh_queue';
-import WorkflowHelpers from '../../../../plugins/utils/workflow-utils';
+import * as WorkflowHelpers from '../../../../plugins/utils/workflow-utils';
 
 describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
   let viewModel;
