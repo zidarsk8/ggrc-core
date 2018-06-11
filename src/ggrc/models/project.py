@@ -18,6 +18,5 @@ class Project(Roleable, HasObjectState, CustomAttributable, Personable,
               Commentable, TestPlanned, BusinessObject, Indexed, db.Model):
   __tablename__ = 'projects'
   _aliases = {
-      "documents_url": None,
       "documents_file": None,
   }

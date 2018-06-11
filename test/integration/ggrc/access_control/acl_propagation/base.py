@@ -18,13 +18,17 @@ class TestACLPropagation(TestCase):
   SUCCESS_CREATED = 201
   FORBIDDEN = 403
 
-  ACCESS_ERROR = "Response for current operation has wrong status. {} " \
-                 "expected, {} received."
-  CAN_NOT_READ_ERROR = "{} objects weren't read. Non-zero object count " \
-                       "expected."
+  ACCESS_ERROR = ("Response for current operation has wrong status. {} "
+                  "expected, {} received.")
+  ACCESS_QUERY_API_ERROR = ("Current operation has wrong result. {} "
+                            "expected, {} received. ({} count={})")
+  CAN_NOT_READ_ERROR = ("{} objects weren't read. Non-zero object count "
+                        "expected.")
   CAN_READ_ERROR = "Some {} objects were read. No objects expected."
 
   READ_COLLECTION_OPERATIONS = ["read_revisions", "get_latest_version"]
+
+  QUERY_API_OPERATIONS = ["read_comments"]
 
   def setup_people(self):
     """Setup people with global roles."""
@@ -105,6 +109,21 @@ class TestACLPropagation(TestCase):
           self.ACCESS_ERROR.format(exp_statuses[0], response.status_code)
       )
 
+  def assert_query_api_response(self, response, expected_res):
+    """Check correctness of query API response.
+
+    Args:
+        response: query api result of action execution.
+        expected_res: Boolean flag.
+    """
+    for resp_item in response.json:
+      for obj, resp in resp_item.iteritems():
+        res = bool(resp['count'])
+        self.assertEqual(res, expected_res,
+                         self.ACCESS_QUERY_API_ERROR.format(expected_res,
+                                                            res, obj,
+                                                            resp['count']))
+
   def assert_result(self, response, expected_res, operation, model):
     """Check correctness of response result.
 
@@ -123,6 +142,8 @@ class TestACLPropagation(TestCase):
     for res in responses:
       if operation in self.READ_COLLECTION_OPERATIONS:
         self.assert_read_collection(res, expected_res, model)
+      elif operation in self.QUERY_API_OPERATIONS:
+        self.assert_query_api_response(res, expected_res)
       else:
         self.assert_status(res, expected_res)
 

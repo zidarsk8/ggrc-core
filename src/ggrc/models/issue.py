@@ -57,6 +57,7 @@ class Issue(Roleable, HasObjectState, TestPlanned, CustomAttributable,
           "description": "Options are: \n{} ".format('\n'.join(VALID_STATES))
       },
       "audit": None,
+      "documents_file": None,
   }
 
   audit_id = deferred(

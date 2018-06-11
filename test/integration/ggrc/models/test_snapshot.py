@@ -65,7 +65,6 @@ class TestSnapshot(TestCase):
       "people",
       "related_destinations",
       "related_sources",
-      "risk_objects",
       "risks",
       "task_group_objects",
       "task_group_tasks",
@@ -93,7 +92,7 @@ class TestSnapshot(TestCase):
 
       # revisions require complete data for documents,
       # while api returns only basic data in stubs
-      "documents_url",
+      "documents_reference_url",
       "documents_file",
       "documents_reference_url",
 

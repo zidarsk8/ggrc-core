@@ -48,7 +48,6 @@ import './system';
 import './join_models';
 import './risk_assessment';
 import './risk';
-import './risk_join_models';
 import './threat';
 import './cycle_models';
 import './task_group';

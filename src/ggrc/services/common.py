@@ -533,6 +533,7 @@ class Resource(ModelView):
             not permissions.has_conditions('update', self.model.__name__)):
       raise Forbidden()
 
+  @utils.validate_mimetype("application/json")
   def put(self, id):
     with benchmark("Query for object"):
       obj = self.get_object(id)
@@ -542,9 +543,6 @@ class Resource(ModelView):
     initial_state = dump_attrs(obj)
 
     src = self.request.json
-    if self.request.mimetype != 'application/json':
-      return current_app.make_response(
-          ('Content-Type must be application/json', 415, []))
     header_error = self.validate_headers_for_put_or_delete(obj)
     if header_error:
       return header_error
@@ -554,18 +552,16 @@ class Resource(ModelView):
     except KeyError:
       raise BadRequest('Required attribute "{0}" not found'.format(
           root_attribute))
-
     with benchmark("Set referenced_stubs"):
       flask.g.referenced_object_stubs = self._gather_referenced_objects(src)
-
+    with benchmark("Query update permissions"):
+      new_context = self.get_context_id_from_json(src)
+      self._check_put_permissions(obj, new_context)
     with benchmark("Deserialize object"):
       self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
     obj.updated_at = datetime.datetime.now()
     db.session.add(obj)
-    with benchmark("Query update permissions"):
-      new_context = self.get_context_id_from_json(src)
-      self._check_put_permissions(obj, new_context)
     with benchmark("Process actions"):
       self.process_actions(obj)
     with benchmark("Validate custom attributes"):
@@ -1031,12 +1027,9 @@ class Resource(ModelView):
     logger.warning(message)
     return (400, message)
 
-  def collection_post(self):  # noqa
+  @utils.validate_mimetype("application/json")  # noqa
+  def collection_post(self):
     with benchmark("collection post"):
-      if self.request.mimetype != 'application/json':
-        return current_app.make_response((
-            'Content-Type must be application/json', 415, []))
-
       if 'X-GGRC-BackgroundTask' in request.headers:
         if 'X-Appengine-Taskname' not in request.headers:
           task = create_task(request.method, request.full_path,

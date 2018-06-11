@@ -33,9 +33,8 @@ from ggrc_workflows.roles import (
     WorkflowOwner, WorkflowMember, BasicWorkflowReader, WorkflowBasicReader,
     WorkflowEditor
 )
-from ggrc_basic_permissions.models import ContextImplication
 from ggrc_basic_permissions.contributed_roles import (
-    RoleContributions, RoleDeclarations, DeclarativeRoleImplications
+    RoleContributions, RoleDeclarations
 )
 
 
@@ -244,10 +243,26 @@ def create_old_style_cycle(cycle, task_group, cycle_task_group, current_user):
 
 def build_cycle(workflow, cycle=None, current_user=None):
   """Build a cycle with it's child objects"""
+  build_failed = False
 
   if not workflow.tasks:
     logger.error("Starting a cycle has failed on Workflow with "
-                 "slug == '%s' and id == '%s'", workflow.slug, workflow.id)
+                 "slug == '%s' and id == '%s', due to empty setup",
+                 workflow.slug, workflow.id)
+    build_failed = True
+
+  # Use Admin role when this is called via the cron job.
+  if not current_user:
+    admins = workflow.get_persons_for_rolename("Admin")
+    if admins:
+      current_user = admins[0]
+    else:
+      logger.error("Cannot start cycle on Workflow with slug == '%s' and "
+                   "id == '%s', cause it doesn't have Admins",
+                   workflow.slug, workflow.id)
+      build_failed = True
+
+  if build_failed:
     pusher.update_or_create_notifications(workflow, date.today(),
                                           "cycle_start_failed")
     return
@@ -255,9 +270,6 @@ def build_cycle(workflow, cycle=None, current_user=None):
   # Determine the relevant Workflow
   cycle = cycle or models.Cycle()
 
-  # Use Admin role when this is called via the cron job.
-  if not current_user:
-    current_user = workflow.get_persons_for_rolename("Admin")[0]
   # Populate the top-level Cycle object
   cycle.workflow = workflow
   cycle.is_current = True
@@ -566,22 +578,6 @@ def handle_cycle_object_status(
   # db.session.commit()
 
 
-@signals.Restful.model_posted.connect_via(models.CycleTaskGroupObjectTask)
-def handle_cycle_task_group_object_task_post(
-        sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
-  Signals.status_change.send(
-      obj.__class__,
-      objs=[
-          Signals.StatusChangeSignalObjectContext(
-              instance=obj,
-              new_status=obj.status,
-              old_status=None,
-          )
-      ]
-  )
-  db.session.flush()
-
-
 @signals.Restful.model_put.connect_via(models.CycleTaskGroup)
 def handle_cycle_task_group_put(
         sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
@@ -725,30 +721,6 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
   workflow_context = obj.get_or_create_object_context(personal_context)
   obj.context = workflow_context
 
-  # ContextImplications linked only with `workflow_context` object, which
-  # was created but not added to DB yet. ContextImlications should be added to
-  # session explicitly due to SQLAlchemy Garbage collector deletes such
-  # objects, and it will not be added to session. On the other hand
-  # `workflow_context` was added to session automatically, because it is linked
-  # to `personal_context` that is already in DB.
-  # Create context implication for Workflow roles to default context.
-  db.session.add(ContextImplication(
-      source_context=workflow_context,
-      context=None,
-      source_context_scope='Workflow',
-      context_scope=None,
-      modified_by=get_current_user(),
-  ))
-  # Add role implication - global users can perform defined actions on workflow
-  # and its related objects.
-  db.session.add(ContextImplication(
-      source_context=None,
-      context=workflow_context,
-      source_context_scope=None,
-      context_scope='Workflow',
-      modified_by=get_current_user(),
-  ))
-
   if src.get('clone'):
     source_workflow.copy_task_groups(
         obj,
@@ -832,25 +804,8 @@ class WorkflowRoleDeclarations(RoleDeclarations):
     }
 
 
-class WorkflowRoleImplications(DeclarativeRoleImplications):
-  # (Source Context Type, Context Type)
-  #   -> Source Role -> Implied Role for Context
-  implications = {
-      (None, 'Workflow'): {
-          'ProgramCreator': ['BasicWorkflowReader'],
-          'Editor': ['WorkflowEditor'],
-          'Reader': ['BasicWorkflowReader'],
-          'Creator': ['WorkflowBasicReader'],
-      },
-      ('Workflow', None): {
-          'WorkflowEditor': ['WorkflowBasicReader'],
-      },
-  }
-
-
 ROLE_CONTRIBUTIONS = WorkflowRoleContributions()
 ROLE_DECLARATIONS = WorkflowRoleDeclarations()
-ROLE_IMPLICATIONS = WorkflowRoleImplications()
 
 contributed_notifications = notification.contributed_notifications
 contributed_importables = IMPORTABLE

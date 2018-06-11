@@ -102,40 +102,40 @@ def not_done_tasks_notify(tasks):
   if not tasks:
     return
   cycles = set()
-  notification_send_at_tasks_dict = collections.defaultdict(list)
-  notification_types = set()
+  declined_tasks = set()
   for task in tasks:
     cycles.add(task.cycle)
     if task.status == models.CycleTaskGroupObjectTask.DECLINED:
-      notification_send_at_tasks_dict[
-          ("cycle_task_declined", datetime.date.today())
-      ].append(task)
-      notification_types.add("cycle_task_declined")
-    for n_type in [get_notif_name_by_wf(task.cycle.workflow),
-                   "cycle_task_due_today",
-                   "cycle_task_overdue"]:
-      notification_send_at_tasks_dict[
-          (n_type, task.end_date)
-      ].append(task)
-      notification_types.add(n_type)
-  # delete all notifications for cycles about all tasks completed and
-  # all tasks notifications that required to be updated
-  pusher.get_notification_query(
-      *(list(cycles) + tasks),
-      **{"notification_names": [
-          "all_cycle_tasks_completed"
-      ] + list(notification_types)}
-  ).delete(
-      synchronize_session="fetch"
-  )
+      declined_tasks.add(task)
+  # delete all notifications for cycles about all tasks completed
+  if cycles:
+    pusher.get_notification_query(
+        *(list(cycles)),
+        **{"notification_names": ["all_cycle_tasks_completed"]}
+    ).delete(
+        synchronize_session="fetch"
+    )
+  if declined_tasks:
+    pusher.create_notifications_for_objects(
+        pusher.get_notification_type("cycle_task_declined"),
+        datetime.date.today(), *(list(declined_tasks))
+    )
+
+
+def handle_cycle_task_created(ctask):
+  """Create notifications on CycleTask POST operation.
+
+  Args:
+    ctask: CycleTask instance
+  """
+  notification_types = [get_notif_name_by_wf(ctask.workflow),
+                        "cycle_task_due_today",
+                        "cycle_task_overdue"]
   notification_type_query = pusher.get_notification_types(*notification_types)
   notification_types_dict = {t.name: t for t in notification_type_query}
-  for pair, pair_tasks in notification_send_at_tasks_dict.iteritems():
-    notification_type_name, send_at = pair
-    notification_type = notification_types_dict[notification_type_name]
-    pusher.create_notifications_for_objects(notification_type,
-                                            send_at,
-                                            *pair_tasks)
+  for n_type in notification_types:
+    pusher.create_notifications_for_objects(notification_types_dict[n_type],
+                                            ctask.end_date, *[ctask])
 
 
 def handle_cycle_task_status_change(*objs):

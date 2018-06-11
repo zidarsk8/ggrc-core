@@ -270,9 +270,14 @@ class Revision(Base, db.Model):
             "modified_by": None,
             "id": None,
         })
-    access_control_list = self._populate_acl_with_people(access_control_list)
+
+    acl_with_people = self._populate_acl_with_people(access_control_list)
+    filtered_acl = self._filter_internal_acls(acl_with_people)
+    result_acl = [
+        acl for acl in filtered_acl if acl["ac_role_id"] in roles_dict
+    ]
     return {
-        "access_control_list": self._filter_internal_acls(access_control_list)
+        "access_control_list": result_acl,
     }
 
   def populate_folder(self):

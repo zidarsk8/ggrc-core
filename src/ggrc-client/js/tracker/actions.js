@@ -12,6 +12,7 @@ export const FOCUS_AREAS = {
   IMPORT_AND_EXPORT: 'Import/Export',
   LHN: 'LHN',
   MAPPINGS: (type) => `Mappings to ${type}`,
+  COUNTS: 'Counts of Objects',
 };
 
 // Timing Variable in Google Analytics Timing API
@@ -35,6 +36,12 @@ export const USER_ACTIONS = {
   ADD_ATTACHMENT_TO_FOLDER: (count) =>
     `Attachment to folder of ${count} file(s)`,
   ADVANCED_SEARCH_FILTER: 'Advanced search filter',
+  CHANGE_LOG: 'Loading of Change Log',
+  API: {
+    COUNTS_MY_WORK: 'Loading counts for My Work page',
+    COUNTS_ALL_OBJECTS: 'Loading counts for All Objects page',
+    TASKS_COUNT: 'Loading counts for Tasks',
+  },
   TREEVIEW: {
     FILTER: 'Tree view filter',
     TREE_VIEW_PAGE_LOADING:
@@ -55,6 +62,8 @@ export const USER_ACTIONS = {
     OPEN_ASMT_GEN_MODAL: 'Open Assessment Generation modal',
     CHANGE_STATUS: 'Changing status of Assessment',
     EDIT_LCA: 'Editing Local CA',
+    RELATED_ASSESSMENTS: 'Loading Related Assessments',
+    RELATED_OBJECTS: 'Loading objects related to Assessment',
   },
   CYCLE_TASK: {
     CHANGE_STATUS: 'Changing status of Task',

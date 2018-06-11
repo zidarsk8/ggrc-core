@@ -271,6 +271,7 @@ import {hasQuestions} from '../plugins/utils/ggrcq-utils';
         this.tree_view_options.attr_list.push({
           attr_title: 'Questionnaire',
           attr_name: 'questionnaire',
+          disable_sorting: true,
         });
       }
 

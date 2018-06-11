@@ -313,6 +313,9 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):
     issue_tracker_info['enabled'] = False
 
   initial_assessment = kwargs.pop('initial_state', None)
+
+  issue_tracker_info['title'] = obj.title
+
   try:
     _update_issuetracker_issue(
         obj, issue_tracker_info, initial_assessment, initial_info, src)

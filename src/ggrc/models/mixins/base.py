@@ -105,7 +105,7 @@ class Identifiable(object):
         table_dict.update(table_arg)
       else:
         table_args.append(table_arg)
-    if len(table_dict) > 0:
+    if table_dict:
       table_args.append(table_dict)
     return tuple(table_args,)
 

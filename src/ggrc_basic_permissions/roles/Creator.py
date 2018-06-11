@@ -146,7 +146,6 @@ permissions = {
         "Document",
         "Evidence",
         "Facility",
-        "Help",
         "Market",
         "Objective",
         "ObjectPerson",

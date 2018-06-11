@@ -66,6 +66,22 @@ class TestAssigneesPropagation(base.TestACLPropagation):
               "create_and_map": False,
               "unmap": False,
           },
+          "Evidence Audit": {
+              "create_and_map": False,
+              "read": True,
+              "update": False,
+              "delete": False,
+              "read_comments": True,
+              "add_comment": False
+          },
+          "Evidence Assessment": {
+              "create_and_map": True,
+              "read": True,
+              "update": True,
+              "delete": False,
+              "read_comments": True,
+              "add_comment": True
+          }
       },
       "Reader": {
           "Assessment": {
@@ -116,6 +132,22 @@ class TestAssigneesPropagation(base.TestACLPropagation):
               "create_and_map": False,
               "unmap": False,
           },
+          "Evidence Audit": {
+              "create_and_map": False,
+              "read": True,
+              "update": False,
+              "delete": False,
+              "add_comment": False,
+              "read_comments": True
+          },
+          "Evidence Assessment": {
+              "create_and_map": True,
+              "read": True,
+              "update": True,
+              "delete": False,
+              "add_comment": True,
+              "read_comments": True
+          }
       },
       "Editor": {
           "Assessment": {
@@ -166,6 +198,22 @@ class TestAssigneesPropagation(base.TestACLPropagation):
               "create_and_map": True,
               "unmap": True,
           },
+          "Evidence Audit": {
+              "create_and_map": True,
+              "read": True,
+              "update": True,
+              "delete": False,
+              "read_comments": True,
+              "add_comment": True,
+          },
+          "Evidence Assessment": {
+              "create_and_map": True,
+              "read": True,
+              "update": True,
+              "delete": False,
+              "read_comments": True,
+              "add_comment": True,
+          }
       },
   }
 

@@ -8,14 +8,12 @@ from sqlalchemy.ext.declarative import declared_attr
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
-from ggrc.models.associationproxy import association_proxy
 from ggrc.models import mixins
 from ggrc.models.comment import Commentable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import TestPlanned
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
-from ggrc.models import reflection
 from ggrc.models import proposal
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
@@ -34,20 +32,11 @@ class Risk(Roleable, HasObjectState, mixins.CustomAttributable, Relatable,
     return deferred(db.Column(db.Text, nullable=False, default=u""),
                     cls.__name__)
 
-  risk_objects = db.relationship(
-      'RiskObject', backref='risk', cascade='all, delete-orphan')
-  objects = association_proxy('risk_objects', 'object', 'RiskObject')
-
-  _api_attrs = reflection.ApiAttributes(
-      'risk_objects',
-      reflection.Attribute('objects', create=False, update=False),
-  )
-
   _aliases = {
       "description": {
           "display_name": "Description",
-          "mandatory": True},
-      "documents_url": None,
+          "mandatory": True
+      },
       "documents_file": None,
       "status": {
           "display_name": "State",

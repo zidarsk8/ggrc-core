@@ -39,26 +39,37 @@ def _get_value(cav, _type):
   return cav["attribute_value"]
 
 
-def get_updated_cavs(new_attrs, old_attrs):
-  """Get dict of updated custom attributes of assessment"""
-  cad_list = old_attrs.get("custom_attribute_definitions", []) + \
+def get_updated_cavs(new_attrs, rev_content):
+  """Get dict of updated custom attributes of assessment.
+
+    Args:
+      new_attrs: dict which contains cads and cavs of the obj
+      rev_content: content of the revision of the obj
+
+    Returns:
+      names of cavs that have been updated
+    """
+  cad_list = rev_content.get("custom_attribute_definitions", []) + \
       new_attrs.get("custom_attribute_definitions", [])
   cad_names = {cad["id"]: cad["display_name"] for cad in cad_list}
   cad_types = {cad["id"]: cad["attribute_type"] for cad in cad_list}
 
-  old_cavs = old_attrs.get("custom_attribute_values", [])
+  old_cavs = rev_content.get("custom_attribute_values", [])
   new_cavs = new_attrs.get("custom_attribute_values", [])
 
-  old_cavs = {cad_names[cav["custom_attribute_id"]]:
-              _get_value(cav, cad_types[cav["custom_attribute_id"]])
-              for cav in old_cavs}
+  old_cavs_dict = {}
+
+  for cav in old_cavs:
+    cav_id = cav["custom_attribute_id"]
+    if cav_id in cad_names and cav_id in cad_types:
+      old_cavs_dict[cad_names[cav_id]] = _get_value(cav, cad_types[cav_id])
 
   new_cavs = {cad_names[cav["custom_attribute_id"]]:
               _get_value(cav, cad_types[cav["custom_attribute_id"]])
               for cav in new_cavs}
 
   for attr_name, new_val in new_cavs.iteritems():
-    old_val = old_cavs.get(attr_name, None)
+    old_val = old_cavs_dict.get(attr_name, None)
     if old_val != new_val:
       if not old_val and not new_val:
         continue

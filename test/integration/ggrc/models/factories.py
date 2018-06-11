@@ -24,8 +24,6 @@ from ggrc.models import all_models
 from ggrc.access_control import roleable
 
 from integration.ggrc.models.model_factory import ModelFactory
-from integration.ggrc_basic_permissions.models \
-    import factories as rbac_factories
 
 
 def random_str(length=8, prefix="", chars=None):
@@ -212,12 +210,6 @@ class AuditFactory(TitledFactory):
     instance = super(AuditFactory, cls)._create(target_class, *args, **kwargs)
     instance.context.related_object = instance
 
-    rbac_factories.ContextImplicationFactory(
-        context=instance.context,
-        source_context=instance.program.context,
-        context_scope="Audit",
-        source_context_scope="Program")
-
     if getattr(db.session, "single_commit", True):
       db.session.commit()
     return instance
@@ -299,6 +291,14 @@ class DocumentFactory(ModelFactory):
   link = "some link"
 
 
+class DocumentFileFactory(DocumentFactory):
+  kind = all_models.Document.FILE
+
+
+class DocumentReferenceUrlFactory(DocumentFactory):
+  kind = all_models.Document.REFERENCE_URL
+
+
 class EvidenceFactory(ModelFactory):
 
   class Meta:
@@ -315,18 +315,6 @@ class EvidenceUrlFactory(EvidenceFactory):
 class EvidenceFileFactory(EvidenceFactory):
   kind = all_models.Evidence.FILE
   source_gdrive_id = 'source_gdrive_id'
-
-
-class DocumentUrlFactory(DocumentFactory):
-  kind = all_models.Document.URL
-
-
-class DocumentFileFactory(DocumentFactory):
-  kind = all_models.Document.FILE
-
-
-class DocumentReferenceUrlFactory(DocumentFactory):
-  kind = all_models.Document.REFERENCE_URL
 
 
 class ObjectiveFactory(TitledFactory):

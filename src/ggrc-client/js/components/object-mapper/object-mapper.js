@@ -22,9 +22,12 @@ import {
 } from '../../plugins/utils/current-page-utils';
 import RefreshQueue from '../../models/refresh_queue';
 import {
+  BEFORE_MAPPING,
   REFRESH_MAPPING,
   REFRESH_SUB_TREE,
+  MAP_OBJECTS,
 } from '../../events/eventTypes';
+import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 import tracker from '../../tracker';
 
 (function (can, $) {
@@ -81,6 +84,7 @@ import tracker from '../../tracker';
       const refreshCounts = parentViewModel.attr('refresh_counts') !== undefined
         ? parentViewModel.attr('refresh_counts')
         : true;
+
       let config = {
         general: parentViewModel.attr('general'),
         special: parentViewModel.attr('special'),
@@ -97,8 +101,8 @@ import tracker from '../../tracker';
           (GGRC.page_instance() && GGRC.page_instance().id),
         object: resolvedConfig.object,
         type: getDefaultType(resolvedConfig.type, resolvedConfig.object),
-        config: config,
         refreshCounts,
+        config: config,
         useSnapshots: resolvedConfig.useSnapshots,
         isLoadingOrSaving: function () {
           return this.attr('is_saving') ||
@@ -152,10 +156,11 @@ import tracker from '../../tracker';
     },
 
     events: {
+      [`{parentInstance} ${MAP_OBJECTS.type}`](instance, event) {
+        this.mapObjects(event.objects);
+      },
       '.create-control modal:success': function (el, ev, model) {
-        this.viewModel.updateFreezedConfigToLatest();
-        this.viewModel.attr('newEntries').push(model);
-        this.mapObjects(this.viewModel.attr('newEntries'));
+        this.map(model);
       },
       '.create-control modal:added': function (el, ev, model) {
         this.viewModel.attr('newEntries').push(model);
@@ -164,6 +169,9 @@ import tracker from '../../tracker';
         // reset new entries
         this.viewModel.attr('newEntries', []);
         this.element.trigger('hideModal');
+      },
+      '.create-control modal:dismiss'() {
+        this.closeModal();
       },
       '{window} modal:dismiss': function (el, ev, options) {
         let joinObjectId = this.viewModel.attr('join_object_id');
@@ -196,6 +204,11 @@ import tracker from '../../tracker';
         }
 
         self.viewModel.attr('submitCbs').fire();
+      },
+      map(model) {
+        this.viewModel.updateFreezedConfigToLatest();
+        this.viewModel.attr('newEntries').push(model);
+        this.mapObjects(this.viewModel.attr('newEntries'));
       },
       closeModal: function () {
         this.viewModel.attr('is_saving', false);
@@ -255,6 +268,11 @@ import tracker from '../../tracker';
           tracker.USER_JOURNEY_KEYS.MAP_OBJECTS(type),
           tracker.USER_ACTIONS.MAPPING_OBJECTS(objects.length));
 
+        instance.dispatch({
+          ...BEFORE_MAPPING,
+          destinationType: type,
+        });
+
         que.enqueue(instance).trigger().done((inst) => {
           data.context = instance.context || null;
           objects.forEach((destination) => {
@@ -292,12 +310,13 @@ import tracker from '../../tracker';
             };
             data[mapping.option_attr] = destination;
             modelInstance = new Model(data);
-            defer.push(modelInstance.save());
+            defer.push(backendGdriveClient.withAuth(()=> {
+              return modelInstance.save();
+            }));
           });
 
           $.when.apply($, defer)
             .fail((response, message) => {
-              stopFn(true);
               $('body').trigger('ajax:flash', {error: message});
             })
             .always(() => {

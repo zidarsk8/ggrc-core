@@ -97,6 +97,22 @@ class TestProgramReadersPropagation(base.TestACLPropagation):
               "create_and_map": False,
               "unmap": False,
           },
+          "Evidence Audit": {
+              "create_and_map": False,
+              "read": True,
+              "update": False,
+              "delete": False,
+              "add_comment": False,
+              "read_comments": True
+          },
+          "Evidence Assessment": {
+              "create_and_map": False,
+              "read": True,
+              "update": False,
+              "delete": False,
+              "add_comment": False,
+              "read_comments": True
+          }
       },
       "Reader": {
           "Program": {
@@ -179,6 +195,22 @@ class TestProgramReadersPropagation(base.TestACLPropagation):
               "create_and_map": False,
               "unmap": False,
           },
+          "Evidence Audit": {
+              "create_and_map": False,
+              "read": True,
+              "update": False,
+              "delete": False,
+              "add_comment": False,
+              "read_comments": True
+          },
+          "Evidence Assessment": {
+              "create_and_map": False,
+              "read": True,
+              "update": False,
+              "delete": False,
+              "add_comment": False,
+              "read_comments": True
+          }
       },
       "Editor": {
           "Program": {
@@ -262,6 +294,22 @@ class TestProgramReadersPropagation(base.TestACLPropagation):
               "create_and_map": True,
               "unmap": True,
           },
+          "Evidence Audit": {
+              "create_and_map": True,
+              "read": True,
+              "update": True,
+              "delete": False,
+              "add_comment": True,
+              "read_comments": True
+          },
+          "Evidence Assessment": {
+              "create_and_map": True,
+              "read": True,
+              "update": True,
+              "delete": False,
+              "add_comment": True,
+              "read_comments": True
+          }
       },
   }
 

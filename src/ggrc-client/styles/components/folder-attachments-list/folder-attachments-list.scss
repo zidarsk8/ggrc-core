@@ -32,15 +32,17 @@
       display: none;
     }
   }
-  .sub-label{
-    display: block;
-    margin-bottom: 5px;
-  }
   mapping-tree-view {
     li {
       i {
         margin-right: 5px;
       }
+    }
+  }
+
+  .list-more {
+    .limit-button-container {
+      margin-bottom: 10px;
     }
   }
 }

@@ -13,15 +13,16 @@ from ggrc.converters import errors
 
 
 class AssessmentTemplateColumnHandler(handlers.MappingColumnHandler):
+  """Special handler for assessment template column only."""
 
   def parse_item(self):
     if len(self.raw_value.splitlines()) > 1:
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
-      return
+      return None
     if self.raw_value in self.new_slugs:
       self.add_error(errors.UNSUPPORTED_OPERATION_ERROR, operation="Creating "
                      "and using assessment templates in one sheet")
-      return
+      return None
     return super(AssessmentTemplateColumnHandler, self).parse_item()
 
   def set_obj_attr(self):
@@ -33,6 +34,7 @@ class AssessmentTemplateColumnHandler(handlers.MappingColumnHandler):
     pass
 
   def create_custom_attributes(self):
+    """Generates CADs instances for newly created Assessment instance."""
     table_singular = self.row_converter.obj._inflector.table_singular
     db.session.flush()
     if not self.value:
@@ -48,6 +50,12 @@ class AssessmentTemplateColumnHandler(handlers.MappingColumnHandler):
       attribute_definition.definition_type = table_singular
       attribute_definition.definition_id = self.row_converter.obj.id
       db.session.add(attribute_definition)
+      # pylint: disable=protected-access
+      if self.row_converter.block_converter._ca_definitions_cache:
+        key = (attribute_definition.definition_id, attribute_definition.title)
+        self.row_converter.block_converter._ca_definitions_cache[key] = (
+            attribute_definition
+        )
     db.session.commit()
 
   def get_value(self):

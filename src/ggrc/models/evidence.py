@@ -6,27 +6,26 @@
 from sqlalchemy import orm
 
 from ggrc import db
+from ggrc import login
 from ggrc.access_control.roleable import Roleable
 from ggrc.builder import simple_property
 from ggrc.fulltext import mixin
 from ggrc.models.deferred import deferred
-from ggrc.models.mixins import Slugged
-from ggrc.models.mixins import WithLastDeprecatedDate
+from ggrc.models import comment
+from ggrc.models import exceptions
+from ggrc.models import mixins
+from ggrc.models import reflection
+from ggrc.models.mixins import before_flush_handleable as bfh
 from ggrc.models.mixins.base import Identifiable
 from ggrc.models.mixins.statusable import Statusable
 from ggrc.models.mixins.with_auto_deprecation import WithAutoDeprecation
 from ggrc.models.relationship import Relatable
-from ggrc.models import comment
-from ggrc.models import exceptions
-from ggrc.models import reflection
-from ggrc.models import mixins
 from ggrc.utils import referenced_objects
-from ggrc.models.mixins import before_flush_handleable as bfh
 
 
 class Evidence(Roleable, Relatable, mixins.Titled,
-               bfh.BeforeFlushHandleable, Slugged, Statusable,
-               WithLastDeprecatedDate, comment.Commentable,
+               bfh.BeforeFlushHandleable, mixins.Slugged, Statusable,
+               mixins.WithLastDeprecatedDate, comment.Commentable,
                WithAutoDeprecation, mixin.Indexed, Identifiable, db.Model):
   """Evidence (Audit-scope URLs, FILE's) model."""
   __tablename__ = "evidence"
@@ -201,9 +200,9 @@ class Evidence(Roleable, Relatable, mixins.Titled,
 
   def _build_relationship(self, parent_obj):
     """Build relationship between evidence and parent object"""
-    from ggrc.models import relationship
+    from ggrc.models import all_models
     from ggrc.models.mixins.autostatuschangeable import AutoStatusChangeable
-    rel = relationship.Relationship(
+    rel = all_models.Relationship(
         source=parent_obj,
         destination=self
     )
@@ -244,13 +243,23 @@ class Evidence(Roleable, Relatable, mixins.Titled,
     folder_id = self._get_folder(parent)
     file_id = self.source_gdrive_id
     from ggrc.gdrive.file_actions import process_gdrive_file
-    response = process_gdrive_file(folder_id, file_id, postfix,
+    response = process_gdrive_file(file_id, folder_id, postfix,
                                    separator=Evidence.FILE_NAME_SEPARATOR,
                                    is_uploaded=self.is_uploaded)
     self._update_fields(response)
 
   def is_with_parent_obj(self):
     return bool(hasattr(self, '_parent_obj') and self._parent_obj)
+
+  def add_admin_role(self):
+    """Add current user as Evidence admin"""
+    from ggrc.models import all_models
+    admin_role = db.session.query(all_models.AccessControlRole).filter_by(
+        name="Admin", object_type=self.type).one()
+    self.extend_access_control_list([{
+        "ac_role": admin_role,
+        "person": login.get_current_user()
+    }])
 
   def handle_before_flush(self):
     """Handler that called  before SQLAlchemy flush event"""

@@ -5,7 +5,7 @@
 
 import template from './sortable-column.mustache';
 
-GGRC.Components('sortableColumn', {
+export default can.Component.extend({
   tag: 'sortable-column',
   template: template,
   viewModel: {

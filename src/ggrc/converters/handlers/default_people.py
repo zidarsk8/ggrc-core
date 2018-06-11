@@ -61,7 +61,8 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
           self.add_warning(errors.UNKNOWN_USER_WARNING,
                            column_name=self.display_name,
                            email=email)
-    if not people:
+
+    if not people and self.mandatory:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
     return people
 
@@ -71,7 +72,7 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
     These values are the normal selection in the default assignees dropdown.
     """
     value = self.PEOPLE_LABELS_MAP.get(self.raw_value.strip().lower())
-    if not value:
+    if not value and self.mandatory:
       self.add_error(errors.WRONG_REQUIRED_VALUE,
                      column_name=self.display_name,
                      value=self.raw_value.strip().lower())
@@ -85,30 +86,14 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
       return self._parse_label_values()
 
   def set_obj_attr(self):
-    """Set default_people attribute.
+    """Set default_assignees and default_verifiers attributes.
 
-    This is a joint function for default assignees and verifiers. The first
-    column that gets handled will save the value to "_default_people" and the
-    second column that gets handled will take that value, include it with its
-    own and store it into the correct "default_people" field.
-
-    NOTE: This is a temporary hack that that should be refactored once this
-    code is merged into the develop branch. The joining of default_assignees
-    and default_verifiers should be done by pre_commit_checks for imports.
+    Note that default_assignees and default_verifiers are not actual
+    properties on the object that get stored. These are used as temporary
+    placeholders and the property default_people, gets set using these
+    two values, in check_assessment_template pre commit hook.
     """
-    if not self.value or self.row_converter.ignore:
-      return
-
-    default_people = self.row_converter.obj.default_people or {}
-    default_people[self.KEY_MAP[self.key]] = self.value
-
-    _default_people = getattr(self.row_converter.obj, "_default_people", {})
-
-    if _default_people:
-      default_people.update(_default_people)
-      setattr(self.row_converter.obj, "default_people", default_people)
-    else:
-      setattr(self.row_converter.obj, "_default_people", default_people)
+    setattr(self.row_converter.obj, self.key, self.value)
 
   def get_value(self):
     """Get value from default_people attribute."""

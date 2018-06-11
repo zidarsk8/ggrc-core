@@ -9,35 +9,36 @@ import {
 } from '../../plugins/utils/ggrcq-utils';
 import template from './questions-link.mustache';
 
-(function (can) {
-  'use strict';
+export default can.Component.extend({
+  tag: 'questions-link',
+  template: template,
+  viewModel: {
+    define: {
+      hasQuestions: {
+        type: Boolean,
+        get: function () {
+          let instance = this.attr('instance');
 
-  GGRC.Components('questionsLink', {
-    tag: 'questions-link',
-    template: template,
-    viewModel: {
-      define: {
-        hasQuestions: {
-          type: Boolean,
-          get: function () {
-            let instance = this.attr('instance');
-            return hasQuestions(instance.class.title_singular);
-          },
-        },
-        questionsUrl: {
-          type: String,
-          get: function () {
-            let instance = this.attr('instance');
-            return getQuestionsUrl(instance);
-          },
+          if (instance.attr('status') === 'Deprecated') {
+            return false;
+          }
+
+          return hasQuestions(instance.class.title_singular);
         },
       },
-      instance: null,
-    },
-    events: {
-      '.question-link click': function (el, ev) {
-        ev.stopPropagation();
+      questionsUrl: {
+        type: String,
+        get: function () {
+          let instance = this.attr('instance');
+          return getQuestionsUrl(instance);
+        },
       },
     },
-  });
-})(window.can);
+    instance: null,
+  },
+  events: {
+    '.question-link click': function (el, ev) {
+      ev.stopPropagation();
+    },
+  },
+});

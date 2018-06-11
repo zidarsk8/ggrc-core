@@ -4,60 +4,76 @@
  */
 
 import '../object-list-item/editable-document-object-list-item';
+import {
+  BEFORE_MAPPING,
+  REFRESH_MAPPING,
+  BEFORE_DOCUMENT_CREATE,
+  DOCUMENT_CREATE_FAILED,
+} from '../../events/eventTypes';
+import Permission from '../../permission';
 import template from './folder-attachments-list.mustache';
 
-(function (GGRC, can) {
-  'use strict';
-
-  let tag = 'folder-attachments-list';
-
-  /**
-   * Wrapper Component for rendering and managing of folder and
-   * attachments lists
-   */
-  GGRC.Components('folderAttachmentsList', {
-    tag: tag,
-    template: template,
-    viewModel: {
-      define: {
-        denyNoFolder: {
-          type: 'boolean',
-          value: false,
-        },
-        readonly: {
-          type: 'boolean',
-          value: false,
-        },
-        showSpinner: {
-          type: 'boolean',
-          get: function () {
-            return this.attr('isUploading') || this.attr('isUnmapping') ||
-              this.attr('isListLoading');
-          },
-        },
-        /**
-         * Indicates whether uploading files without parent folder allowed
-         * @type {boolean}
-         */
-        isNoFolderUploadingAllowed: {
-          type: 'boolean',
-          get: function () {
-            return !this.attr('denyNoFolder') && !this.attr('folderError');
-          },
+/**
+ * Wrapper Component for rendering and managing of folder and
+ * attachments lists
+ */
+export default can.Component.extend({
+  tag: 'folder-attachments-list',
+  template: template,
+  viewModel: {
+    define: {
+      showSpinner: {
+        type: 'boolean',
+        get() {
+          return this.attr('isUnmapping')
+            || this.attr('isListLoading')
+            || this.attr('isMapping');
         },
       },
-      title: null,
-      subLabel: '@',
-      tooltip: null,
-      instance: null,
-      currentFolder: null,
-      folderError: null,
-      isUploading: false,
-      isUnmapping: false,
-      isListLoading: false,
+      readonly: {
+        type: 'boolean',
+        get() {
+          let instance = this.attr('instance');
+
+          if (!instance) {
+            return true;
+          }
+
+          let isSnapshot = this.attr('isSnapshot');
+          return isSnapshot || !Permission.is_allowed_for('update', instance);
+        },
+      },
+      showMore: {
+        type: 'boolean',
+        get() {
+          return !this.attr('isSnapshot');
+        },
+      },
     },
-    events: {
-      init: function () {},
+    readonly: false,
+    title: null,
+    tooltip: null,
+    instance: null,
+    isSnapshot: false,
+    folderError: null,
+    isAttaching: false,
+    isUnmapping: false,
+    isListLoading: false,
+  },
+  events: {
+    [`{viewModel.instance} ${BEFORE_DOCUMENT_CREATE.type}`]() {
+      this.viewModel.attr('isMapping', true);
     },
-  });
-})(window.GGRC, window.can);
+    [`{viewModel.instance} ${DOCUMENT_CREATE_FAILED.type}`]() {
+      this.viewModel.attr('isMapping', false);
+    },
+    [`{viewModel.instance} ${BEFORE_MAPPING.type}`](scope, ev) {
+      if (ev.destinationType === 'Document') {
+        this.viewModel.attr('isMapping', true);
+      }
+    },
+    [`{viewModel.instance} ${REFRESH_MAPPING.type}`]() {
+      this.viewModel.attr('isMapping', false);
+    },
+  },
+});

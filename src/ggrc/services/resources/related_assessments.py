@@ -104,7 +104,7 @@ class RelatedAssessmentsResource(common.Resource):
     # note that using pagination.get_total_count here would return wrong counts
     # due to query being an eager query.
 
-    return query, total
+    return query.all(), total
 
   @classmethod
   def _get_evidences(cls, assessments):
@@ -295,6 +295,8 @@ class RelatedAssessmentsResource(common.Resource):
 
   def _get_assessments_json(self, obj, assessments):
     """Get json representation for all assessments in result set."""
+    if not assessments:
+      return []
     with benchmark("get documents of related assessments"):
       evidence_json_map = self._get_evidences(assessments)
     with benchmark("get snapshots of related assessments"):
