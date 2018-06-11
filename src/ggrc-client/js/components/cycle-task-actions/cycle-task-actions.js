@@ -9,7 +9,7 @@ import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
 import template from './cycle-task-actions.mustache';
-import WorkflowHelpers from '../workflow/workflow-helpers';
+import WorkflowHelpers from '../../plugins/utils/workflow-utils';
 import Permission from '../../permission';
 
 (function (can, GGRC) {

@@ -7,7 +7,7 @@ import template from './templates/cycle-task-group-object-task.mustache';
 import '../../object-change-state/object-change-state';
 import '../../dropdown/dropdown';
 import RefreshQueue from '../../../models/refresh_queue';
-import WorkflowHelpers from '../workflow-helpers';
+import WorkflowHelpers from '../../../plugins/utils/workflow-utils';
 
 let viewModel = can.Map.extend({
   showLink: function () {
