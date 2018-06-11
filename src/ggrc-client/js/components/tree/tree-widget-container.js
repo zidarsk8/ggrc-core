@@ -626,6 +626,11 @@ viewModel = can.Map.extend({
         ') .tree-item-content')
       .addClass('item-active');
   },
+  showLastPage: function () {
+    const lastPageIndex = this.attr('pageInfo.count');
+
+    this.attr('pageInfo.current', lastPageIndex);
+  },
 });
 
 /**
@@ -731,6 +736,7 @@ export default GGRC.Components('treeWidgetContainer', {
 
           if (!newInstance) {
             this.viewModel.closeInfoPane();
+            this.viewModel.showLastPage();
 
             return can.Deferred().resolve();
           }
