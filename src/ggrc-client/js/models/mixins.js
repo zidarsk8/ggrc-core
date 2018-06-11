@@ -200,18 +200,20 @@ const AUDIT_ISSUE_TRACKER = {
   });
 
   can.Model.Mixin('assertions_categories', {
-    cleanupCollections() {
-      if (this.attr('categories') && !isSnapshot(this)) {
+    cleanupCollections(resource) {
+      if (isSnapshot(this)) {
+        return resource;
+      }
+
+      if (this.attr('categories')) {
         this.attr('categories').replace([]);
       }
 
-      if (this.attr('assertions') && !isSnapshot(this)) {
+      if (this.attr('assertions')) {
         this.attr('assertions').replace([]);
       }
-    },
 
-    'before:refresh': function () {
-      this.cleanupCollections();
+      return resource;
     },
     'before:restore'() {
       this.cleanupCollections();
