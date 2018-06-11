@@ -200,7 +200,7 @@ const AUDIT_ISSUE_TRACKER = {
   });
 
   can.Model.Mixin('assertions_categories', {
-    'before:refresh': function () {
+    cleanupCollections() {
       if (this.attr('categories') && !isSnapshot(this)) {
         this.attr('categories').replace([]);
       }
@@ -208,6 +208,13 @@ const AUDIT_ISSUE_TRACKER = {
       if (this.attr('assertions') && !isSnapshot(this)) {
         this.attr('assertions').replace([]);
       }
+    },
+
+    'before:refresh': function () {
+      this.cleanupCollections();
+    },
+    'before:restore'() {
+      this.cleanupCollections();
     },
   });
 
