@@ -100,3 +100,47 @@ class TestRelevant(TestCase, WithQueryApi):
             role,
         )
     )
+
+  def test_evidence_relevant(self):
+    """Return ids of evidence in scope of given audit
+
+    Exclude attached to audit itself
+    """
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      audit_id = audit.id
+      assessment1 = factories.AssessmentFactory(audit=audit)
+      assessment2 = factories.AssessmentFactory(audit=audit)
+      factories.AssessmentFactory(audit=audit)
+      evidence1 = factories.EvidenceUrlFactory()
+      evidence1_id = evidence1.id
+      evidence2 = factories.EvidenceUrlFactory()
+      evidence2_id = evidence2.id
+      evidence3 = factories.EvidenceUrlFactory()
+      evidence3_id = evidence3.id
+      factories.RelationshipFactory(source=assessment1,
+                                    destination=evidence1)
+
+      factories.RelationshipFactory(source=assessment2,
+                                    destination=evidence2)
+      factories.RelationshipFactory(source=audit,
+                                    destination=evidence3)
+
+    ids = self._get_first_result_set(
+        {
+            "object_name": "Evidence",
+            "type": "ids",
+            "filters": {
+                "expression": {
+                    "object_name": "Audit",
+                    "op": {"name": "related_evidence"},
+                    "ids": [audit_id],
+                }
+            }
+        },
+        "Evidence", "ids"
+    )
+    self.assertEqual(2, len(ids))
+    self.assertIn(evidence1_id, ids)
+    self.assertIn(evidence2_id, ids)
+    self.assertNotIn(evidence3_id, ids)
