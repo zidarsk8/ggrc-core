@@ -3,13 +3,10 @@
 
 """Handlers for special object mappings."""
 
-
-from sqlalchemy.orm.session import make_transient
-
 from ggrc import db
-from ggrc import models
 from ggrc.converters.handlers import handlers
 from ggrc.converters import errors
+from ggrc.models.hooks import assessment as asmt_hooks
 
 
 class AssessmentTemplateColumnHandler(handlers.MappingColumnHandler):
@@ -35,28 +32,15 @@ class AssessmentTemplateColumnHandler(handlers.MappingColumnHandler):
 
   def create_custom_attributes(self):
     """Generates CADs instances for newly created Assessment instance."""
-    table_singular = self.row_converter.obj._inflector.table_singular
-    db.session.flush()
     if not self.value:
       return
-    template = self.value[0]
-    cad = models.CustomAttributeDefinition
-    custom_attributes = cad.eager_query().filter(
-        cad.definition_type == template._inflector.table_singular,
-        cad.definition_id == template.id)
-    for attribute_definition in custom_attributes:
-      make_transient(attribute_definition)
-      attribute_definition.id = None
-      attribute_definition.definition_type = table_singular
-      attribute_definition.definition_id = self.row_converter.obj.id
-      db.session.add(attribute_definition)
-      # pylint: disable=protected-access
-      if self.row_converter.block_converter._ca_definitions_cache:
-        key = (attribute_definition.definition_id, attribute_definition.title)
-        self.row_converter.block_converter._ca_definitions_cache[key] = (
-            attribute_definition
-        )
-    db.session.commit()
+    created_cads = asmt_hooks.relate_ca(self.row_converter.obj, self.value[0])
+    # pylint: disable=protected-access
+    if self.row_converter.block_converter._ca_definitions_cache:
+      for cad in created_cads:
+        key = (cad.definition_id, cad.title)
+        self.row_converter.block_converter._ca_definitions_cache[key] = cad
+    db.session.flush(created_cads)
 
   def get_value(self):
     return ""
