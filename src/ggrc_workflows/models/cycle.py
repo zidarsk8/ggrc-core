@@ -177,11 +177,11 @@ class Cycle(roleable.Roleable,
 
   @property
   def cycle_url(self):
-    return self._get_cycle_url("current_widget")
+    return self._get_cycle_url("current")
 
   @property
   def cycle_inactive_url(self):
-    return self._get_cycle_url("history_widget")
+    return self._get_cycle_url("history")
 
   def log_json(self):
     out_json = super(Cycle, self).log_json()
