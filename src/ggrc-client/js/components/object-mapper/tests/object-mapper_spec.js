@@ -391,7 +391,6 @@ describe('GGRC.Components.objectMapper', function () {
       expect(spyObj.trigger)
         .toHaveBeenCalledWith('defer:add', [
           {multi_map: true, arr: []},
-          {map_and_save: true},
         ]);
     });
     it('calls closeModal', function () {
