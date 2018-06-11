@@ -58,6 +58,10 @@ describe('GGRC.Components.objectBulkUpdate', function () {
       expect(result.showTargetState).toBeTruthy();
     });
 
+    it('returns correct defaultSort', function () {
+      expect(result.defaultSort.serialize()[0].key).toEqual('task due date');
+    });
+
     it('returns correct availableTypes', function () {
       expect(result.availableTypes())
         .toEqual(mappingType);
