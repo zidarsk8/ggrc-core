@@ -157,6 +157,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
           parent_instance: instance,
           model: farModel,
           objectVersion: objectVersionConfig.isObjectVersion,
+          countsName: objectVersionConfig.countsName,
         },
       };
 

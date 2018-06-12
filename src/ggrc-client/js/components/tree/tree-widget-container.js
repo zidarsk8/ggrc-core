@@ -245,19 +245,19 @@ viewModel = can.Map.extend({
     const stopFn = tracker.start(this.attr('modelName'),
       tracker.USER_JOURNEY_KEYS.TREEVIEW,
       tracker.USER_ACTIONS.TREEVIEW.TREE_VIEW_PAGE_LOADING(page.pageSize));
+    const countsName = this.attr('options.countsName');
 
     pageInfo.attr('disabled', true);
     this.attr('loading', true);
 
     if (this._getFilterByName('status')) {
-      initCounts([widgetId], parent.type, parent.id);
+      initCounts([countsName], parent.type, parent.id);
     }
 
     return TreeViewUtils
       .loadFirstTierItems(widgetId, parent, page, filter, request)
       .then((data) => {
         const total = data.total;
-        const countsName = this.attr('options').countsName || widgetId;
 
         this.attr('showedItems', data.values);
         this.attr('pageInfo.total', total);
@@ -377,10 +377,10 @@ viewModel = can.Map.extend({
     this._triggerListeners(true);
   },
   _widgetShown: function () {
-    let modelName = this.attr('optionsData').widgetId;
+    let countsName = this.attr('options.countsName');
     let loaded = this.attr('loaded');
     let total = this.attr('pageInfo.total');
-    let counts = _.get(getCounts(), modelName);
+    let counts = _.get(getCounts(), countsName);
 
     if (!_.isNull(loaded) && (total !== counts)) {
       this.loadItems();

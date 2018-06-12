@@ -224,10 +224,9 @@ describe('GGRC.Components.treeWidgetContainer', function () {
           _.set({}, modelName, 123)
         );
         vm.attr({
-          model: {
-            shortName: modelName,
+          options: {
+            countsName: modelName,
           },
-          modelName: modelName,
           loaded: {},
           pageInfo: {
             total: 123,
@@ -247,10 +246,9 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
       beforeEach(function () {
         vm.attr({
-          model: {
-            shortName: modelName,
+          options: {
+            countsName: modelName,
           },
-          modelName: modelName,
         });
         vm.attr('loaded', null);
         vm.attr('pageInfo', {
@@ -276,10 +274,9 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
       beforeEach(function () {
         vm.attr({
-          model: {
-            shortName: modelName,
+          options: {
+            countsName: modelName,
           },
-          modelName: modelName,
         });
         vm.attr('loaded', {});
         vm.attr('pageInfo', {
