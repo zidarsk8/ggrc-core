@@ -11,49 +11,11 @@ services:
       - db
     networks:
       - network_cleandev
-      - selenium
-  cleandev_destructive:
-    extends:
-      service: cleandev
-      file: common-services.yml
-    depends_on:
-      - db_destructive
-    networks:
-      - network_cleandev_destructive
-      - selenium
   db:
     extends:
       service: db
       file: common-services.yml
     networks:
       - network_cleandev
-  db_destructive:
-    extends:
-      service: db
-      file: common-services.yml
-    networks:
-      network_cleandev_destructive:
-        aliases:
-          - db
-  selenium:
-    build:
-      context: .
-      dockerfile: Dockerfile-selenium
-    volumes:
-     - "./test/selenium:/selenium"
-     - "/dev/shm:/dev/shm"
-    depends_on:
-      - cleandev
-      - cleandev_destructive
-    networks:
-      - selenium
-    environment:
-     - "TZ=America/Los_Angeles"
-     - PYTHONDONTWRITEBYTECODE=true
-     - PYTHONPATH=/selenium/src
-     - SCREEN_WIDTH=1440
-     - SCREEN_HEIGHT=900
 networks:
   network_cleandev:
-  network_cleandev_destructive:
-  selenium:
