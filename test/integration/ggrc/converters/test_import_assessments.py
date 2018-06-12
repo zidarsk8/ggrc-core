@@ -826,8 +826,8 @@ class TestAssessmentExport(TestCase):
 
   def test_export_assessments_with_filters_and_conflicting_ca_names(self):
     """Test exporting assessments with conflicting custom attribute names."""
-    self.import_file(u"assessment_template_no_warnings.csv")
-    self.import_file(u"assessment_with_templates.csv")
+    self.import_file("assessment_template_no_warnings.csv")
+    self.import_file("assessment_with_templates.csv")
 
     # also create an object level custom attribute with a name that clashes
     # with a name of a "regular" attribute
