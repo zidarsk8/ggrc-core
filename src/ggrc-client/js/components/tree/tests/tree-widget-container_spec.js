@@ -38,10 +38,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       it('returns appopriate object', function () {
         let modelName = shortModelName;
         let expectedResult = {
-          name: modelName,
-          loadItemsModelName: modelName,
           widgetId: modelName,
-          countsName: modelName,
         };
 
         expect(vm.attr('optionsData')).toEqual(expectedResult);

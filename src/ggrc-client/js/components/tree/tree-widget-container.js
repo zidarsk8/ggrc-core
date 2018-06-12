@@ -112,10 +112,7 @@ viewModel = can.Map.extend({
         let modelName = this.attr('modelName');
         if (!this.attr('options.objectVersion')) {
           return {
-            name: modelName,
-            loadItemsModelName: modelName,
             widgetId: modelName,
-            countsName: modelName,
           };
         }
 
@@ -347,20 +344,6 @@ viewModel = can.Map.extend({
   },
   needToRefresh: function (refresh) {
     return this.attr('refreshLoaded');
-  },
-  initCount: function () {
-    let $el = this.attr('$el');
-    let counts = getCounts();
-    let countsName = this.attr('options').countsName ||
-      this.attr('optionsData.widgetId');
-
-    if ($el) {
-      can.trigger($el, 'updateCount', [counts.attr(countsName)]);
-    }
-
-    counts.on(countsName, function (ev, newVal, oldVal) {
-      can.trigger($el, 'updateCount', [newVal]);
-    });
   },
   registerFilter: function (option) {
     this.attr('filters').push(option);
