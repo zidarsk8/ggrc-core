@@ -42,7 +42,7 @@ class BaseTestCycleTaskImportUpdate(TestCase):
         'Cycle Task': {
             'block_warnings': {
                 errors.ONLY_IMPORTABLE_COLUMNS_WARNING.format(
-                    line=2,
+                    line=7,
                     columns=", ".join(columns)
                 )
             },
@@ -98,9 +98,21 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     """Test cycle task update via import with data which is the reason of
     warnings about non-importable columns."""
     self._generate_cycle_tasks()
+
+    expected_warnings = {
+        'Cycle Task': {
+            'block_warnings': {
+                errors.ONLY_IMPORTABLE_COLUMNS_WARNING.format(
+                    line=7,
+                    columns=", ".join(self.IMPORTABLE_COLUMN_NAMES)
+                )
+            },
+        }
+    }
+
     with freeze_time(self.ftime_active):
       response = self.import_file("cycle_task_warnings.csv", safe=False)
-      self._check_csv_response(response, self.expected_warnings)
+      self._check_csv_response(response, expected_warnings)
       self._cmp_tasks(self.expected_cycle_task_correct)
 
   def test_cycle_task_permission_error(self):
@@ -487,12 +499,6 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
         }
     }
 
-    # Below is description of warning for non-importable columns. It is needed
-    # for test_cycle_task_warnings.
-    self.expected_warnings = self.generate_expected_warning(
-        *self.IMPORTABLE_COLUMN_NAMES
-    )
-
     # This is an error message which should be shown during
     # test_cycle_task_create_error test
     self.expected_create_error = {
@@ -620,5 +626,17 @@ class TestCycleTaskImportUpdateAssignee(BaseTestCycleTaskImportUpdate):
     s_assignees = list(self.get_persons_for_role_name(
         self.query.first(), "Task Secondary Assignees"))
     self.assertEqual([self.s_assignee.email], [u.email for u in s_assignees])
-    self._check_csv_response(response, self.generate_expected_warning(
-        'Task Assignees', 'Task Secondary Assignees'))
+
+    expected_warnings = {
+        'Cycle Task': {
+            'block_warnings': {
+                errors.ONLY_IMPORTABLE_COLUMNS_WARNING.format(
+                    line=2,
+                    columns=", ".join(['Task Assignees',
+                                       'Task Secondary Assignees']),
+                )
+            },
+        }
+    }
+
+    self._check_csv_response(response, expected_warnings)
