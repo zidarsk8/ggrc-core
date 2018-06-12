@@ -1207,7 +1207,9 @@ export default can.Control({
         });
         instance.attr('custom_attribute_definitions', cad);
       }
-      instance.refresh();
+      instance.notifier.on_empty(() => {
+        instance.refresh();
+      });
       instance.dispatch(REFRESH_MAPPING);
     }
   },
