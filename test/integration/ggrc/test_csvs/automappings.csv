@@ -10,18 +10,18 @@ program,code*,title*,Program Managers,state,Privacy*,
 ,,,,,,
 ,,,,,,
 Object type,,,,,,
-Regulation,code*,title*,admin,state,Map: program,Map: control
+Regulation,code*,title*,admin,state,Map: program,Map: section
 ,reg-1,reg 1,user@example.com,Draft,"prog-1
 prog-2
-prog-3",control-1
-,reg-2,reg 2,user@example.com,Active,prog-1,control-2
-,reg-3,reg 3,user@example.com,Active,prog-1,"control-1
-control-2
-control-3
-control-4
-control-5
-control-6
-control-7"
+prog-3",section-1
+,reg-2,reg 2,user@example.com,Active,prog-1,section-2
+,reg-3,reg 3,user@example.com,Active,prog-1,"section-1
+section-2
+section-3
+section-4
+section-5
+section-6
+section-7"
 ,reg-4,reg 4,user@example.com,Active,prog-1,
 ,reg-5,reg 5,user@example.com,Active,prog-1,
 ,reg-6,reg 6,user@example.com,Active,prog-1,
@@ -30,11 +30,11 @@ control-7"
 ,,,,,,
 ,,,,,,
 Object type,,,,,,
-control,code*,title*,description,admin,,
-,control-1,control-1,test,user@example.com,,
-,control-2,control-2,test,user@example.com,,
-,control-3,control-3,test,user@example.com,,
-,control-4,control-4,test,user@example.com,,
-,control-5,control-5,test,user@example.com,,
-,control-6,control-6,test,user@example.com,,
-,control-7,control-7,test,user@example.com,,
+section,code*,title*,description,admin,,
+,section-1,section-1,test,user@example.com,,
+,section-2,section-2,test,user@example.com,,
+,section-3,section-3,test,user@example.com,,
+,section-4,section-4,test,user@example.com,,
+,section-5,section-5,test,user@example.com,,
+,section-6,section-6,test,user@example.com,,
+,section-7,section-7,test,user@example.com,,

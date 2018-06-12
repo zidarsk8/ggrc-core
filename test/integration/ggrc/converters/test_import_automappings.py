@@ -29,4 +29,4 @@ class TestBasicCsvImport(TestCase):
     response = self.export_csv(data)
     for i in range(1, 8):
       self.assertIn("reg-{}".format(i), response.data)
-      self.assertIn("control-{}".format(i), response.data)
+      self.assertIn("section-{}".format(i), response.data)
