@@ -1,3 +1,7 @@
+Object type,,,,,,,
+Person,name,email,company,role,,,
+,User1,user1@ggrc.com,,Administrator,,,
+,,,,,,,
 Object type,"Must be unique.  Can be left empty for autogeneration.  If updating or deleting, code is required",Mandatory field,,"options:
 yearly
 monthly
@@ -10,10 +14,3 @@ administrative
 control,code*,title*,description ,frequency,kind/nature,admin,reference url
 ,control-2,control-2,desc 2,monthly,detective,user1@ggrc.com,
 ,control-3,control 3,desc 3,,,user1@ggrc.com,https://img_123.jpg
-,,,,,,,
-,,,,,,,
-,,,,,,,
-,,,,,,,
-Object type,,,,,,,
-Person,name,email,company,role,,,
-,User1,user1@ggrc.com,,Administrator,,,
