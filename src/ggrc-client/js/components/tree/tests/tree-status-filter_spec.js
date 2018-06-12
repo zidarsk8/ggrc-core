@@ -119,22 +119,13 @@ describe('treeStatusFilter', () => {
     });
 
     describe('saves filter to display preferences', () => {
-      it('if widgetId is provided', () => {
+      it('by widget id', () => {
         viewModel.attr('widgetId', 'testId');
 
         viewModel.saveTreeStates(filters);
 
         expect(viewModel.attr('displayPrefs').setTreeViewStates)
           .toHaveBeenCalledWith('testId', filters);
-      });
-
-      it('if modelName is provided', () => {
-        viewModel.attr('modelName', 'testName');
-
-        viewModel.saveTreeStates(filters);
-
-        expect(viewModel.attr('displayPrefs').setTreeViewStates)
-          .toHaveBeenCalledWith('testName', filters);
       });
     });
   });

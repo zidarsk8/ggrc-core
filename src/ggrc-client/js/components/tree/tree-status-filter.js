@@ -24,12 +24,13 @@ let viewModel = can.Map.extend({
     this.setFilter(states);
   },
   getDefaultStates() {
-    let modelName = this.attr('widgetId') || this.attr('modelName');
+    let widgetId = this.attr('widgetId');
     // Get the status list from local storage
-    let savedStates = this.attr('displayPrefs').getTreeViewStates(modelName);
+    let savedStates = this.attr('displayPrefs').getTreeViewStates(widgetId);
     // Get the status list from query string
     let queryStates = router.attr('state');
 
+    let modelName = this.attr('modelName');
     let allStates = StateUtils.getStatesForModel(modelName);
     let defaultStates = (queryStates || savedStates).filter((state) => {
       return allStates.includes(state);
@@ -44,8 +45,8 @@ let viewModel = can.Map.extend({
   saveTreeStates(selectedStates) {
     this.setFilter(selectedStates);
 
-    let filterName = this.attr('widgetId') || this.attr('modelName');
-    this.attr('displayPrefs').setTreeViewStates(filterName, selectedStates);
+    let widgetId = this.attr('widgetId');
+    this.attr('displayPrefs').setTreeViewStates(widgetId, selectedStates);
   },
   setFilter(selected) {
     let statuses = this.attr('filterStates');
