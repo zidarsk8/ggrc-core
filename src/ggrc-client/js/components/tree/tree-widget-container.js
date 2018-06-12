@@ -73,27 +73,14 @@ viewModel = can.Map.extend({
       get: function () {
         let filters = can.makeArray(this.attr('filters'));
         let additionalFilter = this.attr('additionalFilter');
-        let optionsData;
-        let objectVersionfilter;
-        let isObjectVersion = this.attr('options.objectVersion');
 
         if (this.attr('advancedSearch.filter')) {
           return this.attr('advancedSearch.filter');
         }
 
-        if (isObjectVersion || additionalFilter) {
-          if (isObjectVersion) {
-            optionsData = this.attr('optionsData');
-            objectVersionfilter = optionsData.additionalFilter;
-          }
-          if (additionalFilter) {
-            additionalFilter = objectVersionfilter ?
-              objectVersionfilter + ' AND ' + additionalFilter :
-              additionalFilter;
-          }
-
+        if (additionalFilter) {
           additionalFilter = GGRC.query_parser
-            .parse(additionalFilter || objectVersionfilter);
+            .parse(additionalFilter);
         }
 
         return filters.filter(function (options) {
@@ -228,7 +215,7 @@ viewModel = can.Map.extend({
   refreshLoaded: true,
   canOpenInfoPin: true,
   loadItems: function () {
-    let {widgetId} = this.attr('optionsData');
+    let modelName = this.attr('modelName');
     let pageInfo = this.attr('pageInfo');
     let sortingInfo = this.attr('sortingInfo');
     let parent = this.attr('parent_instance');
@@ -242,7 +229,7 @@ viewModel = can.Map.extend({
       }],
     };
     let request = this.attr('advancedSearch.request');
-    const stopFn = tracker.start(this.attr('modelName'),
+    const stopFn = tracker.start(modelName,
       tracker.USER_JOURNEY_KEYS.TREEVIEW,
       tracker.USER_ACTIONS.TREEVIEW.TREE_VIEW_PAGE_LOADING(page.pageSize));
     const countsName = this.attr('options.countsName');
@@ -254,8 +241,15 @@ viewModel = can.Map.extend({
       initCounts([countsName], parent.type, parent.id);
     }
 
+    let loadSnapshots = this.attr('options.objectVersion');
     return TreeViewUtils
-      .loadFirstTierItems(widgetId, parent, page, filter, request)
+      .loadFirstTierItems(
+        modelName,
+        parent,
+        page,
+        filter,
+        request,
+        loadSnapshots)
       .then((data) => {
         const total = data.total;
 
