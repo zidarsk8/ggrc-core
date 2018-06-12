@@ -328,9 +328,6 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):
       logger.error(
           'Unable to update a ticket ID=%s while updating '
           'assessment ID=%d: %s', issue_id, obj.id, error)
-      issue_tracker_info = {
-          'enabled': False,
-      }
     obj.add_warning('issue_tracker', 'Unable to update a ticket.')
 
   _update_issuetracker_info(obj, issue_tracker_info)
