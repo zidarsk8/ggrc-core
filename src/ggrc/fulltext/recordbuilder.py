@@ -17,30 +17,6 @@ from ggrc.fulltext.mixin import Indexed
 LOGGER = logging.getLogger(__name__)
 
 
-class Record(object):  # pylint: disable=too-few-public-methods
-  """"Class required to collection index properties on build procedure."""
-
-  __slots__ = (
-      "key",
-      "type",
-      "context_id",
-      "tags",
-      "properties",
-  )
-
-  def __init__(self,  # pylint: disable=too-many-arguments
-               key,
-               rec_type,
-               context_id,
-               properties,
-               tags=""):
-    self.key = key
-    self.type = rec_type
-    self.context_id = context_id
-    self.tags = tags
-    self.properties = properties
-
-
 class RecordBuilder(object):
   """Basic record builder for full text index table."""
   # pylint: disable=too-few-public-methods
