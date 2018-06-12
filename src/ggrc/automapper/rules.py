@@ -98,12 +98,7 @@ def rules_to_str(rules):
 
 class Types(object):
   """Model names and collections to use in Rule initialization."""
-  all = {'Program', 'Regulation', 'Policy', 'Standard', 'Contract',
-         'Section', 'Clause', 'Objective', 'Control'}
   directives = {'Regulation', 'Policy', 'Standard', 'Contract'}
-  assets_business = {'System', 'Process', 'DataAsset', 'Product', 'Project',
-                     'Facility', 'Market'}
-  people_groups = {'AccessGroup', 'Person', 'OrgGroup', 'Vendor'}
 
 
 rules = make_rule_set(rule_list=[
@@ -111,23 +106,8 @@ rules = make_rule_set(rule_list=[
         # mapping directive to a program
         {'Program'},
         Types.directives,
-        Types.all - {'Program'} - Types.directives,
+        {'Section', 'Clause'}
     ),
-
-    Rule(
-        # mapping to sections and clauses
-        Types.directives,
-        {'Section', 'Clause'},
-        {'Objective', 'Control'},
-    ),
-
-    Rule(
-        # mapping to objective
-        {'Section'},
-        {'Objective'},
-        {'Control'},
-    ),
-
     Rule(
         # mappings for 'raise an issue' on assessment page
         {"Issue"},

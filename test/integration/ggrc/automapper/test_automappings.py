@@ -41,11 +41,11 @@ class TestAutomappings(TestCase):
     self.api = self.gen.api
 
   @classmethod
-  def create_ac_roles(cls, obj, person_id):
+  def create_ac_roles(cls, obj, person_id, role_name="Admin"):
     """Create access control roles"""
     ac_role = models.AccessControlRole.query.filter_by(
         object_type=obj.type,
-        name="Admin"
+        name=role_name
     ).first()
     factories.AccessControlListFactory(
         ac_role=ac_role,
@@ -131,8 +131,8 @@ class TestAutomappings(TestCase):
         lambda: self.create_object(models.Regulation, {
             'title': make_name('Test PD Regulation')
         }),
-        lambda: self.create_object(models.Objective, {
-            'title': make_name('Objective')
+        lambda: self.create_object(models.Section, {
+            'title': make_name('Section')
         }),
     )
     program = self.create_object(models.Program, {
@@ -162,17 +162,14 @@ class TestAutomappings(TestCase):
     })
     self.assert_mapping_implication(
         to_create=[(regulation, section), (objective, section)],
-        implied=(objective, regulation),
-
+        implied=[],
     )
     program = self.create_object(models.Program, {
         'title': make_name('Program')
     })
     self.assert_mapping_implication(
         to_create=[(objective, program)],
-        implied=[(regulation, section),
-                 (objective, section),
-                 (objective, regulation)],
+        implied=[(regulation, section), (objective, section)],
         relevant=[regulation, section, objective]
     )
 
@@ -212,11 +209,7 @@ class TestAutomappings(TestCase):
         to_create=[(regulation, section),
                    (section, objective),
                    (objective, control)],
-        implied=[
-            (regulation, objective),
-            (section, control),
-            (regulation, control),
-        ]
+        implied=[]
     )
 
     program = self.create_object(models.Program, {
@@ -224,15 +217,8 @@ class TestAutomappings(TestCase):
     })
     self.assert_mapping_implication(
         to_create=[(control, program)],
-        implied=[
-            (regulation, section),
-            (section, objective),
-            (objective, control),
-            (regulation, objective),
-            (section, control),
-            (regulation, control),
-        ],
-        relevant=[regulation, section, objective, control]
+        implied=[(regulation, section)],
+        relevant=[regulation, section]
     )
 
   def test_mapping_between_objectives(self):
@@ -254,9 +240,7 @@ class TestAutomappings(TestCase):
         to_create=[(regulation, section),
                    (section, objective1),
                    (objective1, objective2)],
-        implied=[
-            (regulation, objective1),
-        ]
+        implied=[]
     )
 
   def test_mapping_nested_controls(self):
@@ -283,51 +267,30 @@ class TestAutomappings(TestCase):
   def test_automapping_permissions(self):
     """Test automapping permissions"""
     _, creator = self.gen.generate_person(user_role="Creator")
-    _, admin = self.gen.generate_person(user_role="Administrator")
     program = self.create_object(models.Program, {
         'title': make_name('Program')
     })
+    # Program doesn't have Admin, so create "Primary Contact" as it has
+    # the same rights.
+    self.create_ac_roles(program, creator.id, "Primary Contacts")
     program = program.query.get(program.id)
 
     regulation = self.create_object(models.Regulation, {
         'title': make_name('Regulation'),
     })
-    self.create_ac_roles(regulation, admin.id)
+    self.create_ac_roles(regulation, creator.id)
     regulation = regulation.query.get(regulation.id)
 
-    self.api.set_user(creator)
     section = self.create_object(models.Section, {
         'title': make_name('Section'),
     })
     self.create_ac_roles(section, creator.id)
     section = section.query.get(section.id)
 
-    objective = self.create_object(models.Objective, {
-        'title': make_name('Objective'),
-    })
-    self.create_ac_roles(objective, creator.id)
-    objective = objective.query.get(objective.id)
-
-    control = self.create_object(models.Control, {
-        'title': make_name('Control'),
-    })
-    self.create_ac_roles(control, creator.id)
-    control = control.query.get(control.id)
-
-    self.api.set_user(admin)
+    self.api.set_user(creator)
     self.assert_mapping_implication(
         to_create=[(program, regulation), (regulation, section)],
         implied=[(program, section)]
-    )
-
-    self.api.set_user(creator)
-    self.assert_mapping_implication(
-        to_create=[(section, objective),
-                   (control, objective)],
-        implied=[(program, regulation),
-                 (program, section),
-                 (section, regulation),
-                 (control, section)],
     )
 
   def test_program_role_propagation(self):
@@ -378,18 +341,17 @@ class TestAutomappings(TestCase):
             (source_obj, regulation),
             (regulation, destination_obj)
         ],
-        implied=[(program, source_obj), (program, destination_obj)]
+        implied=[(program, destination_obj)]
     )
-    for obj in (source_obj, destination_obj):
-      acls = all_models.AccessControlList.query.filter(
-          all_models.AccessControlList.object_id == obj.id,
-          all_models.AccessControlList.object_type == obj.type,
-      ).all()
-      self.assertEqual(len(acls), 3)
-      self.assertItemsEqual(
-          roles,
-          [acl.parent.parent.ac_role.name for acl in acls]
-      )
+    acls = all_models.AccessControlList.query.filter(
+        all_models.AccessControlList.object_id == destination_obj.id,
+        all_models.AccessControlList.object_type == destination_obj.type,
+    ).all()
+    self.assertEqual(len(acls), 3)
+    self.assertItemsEqual(
+        roles,
+        [acl.parent.parent.ac_role.name for acl in acls]
+    )
 
   def test_automapping_deletion(self):
     """Test if automapping data is preserved even when the parent relationship
@@ -402,11 +364,11 @@ class TestAutomappings(TestCase):
     regulation = self.create_object(models.Regulation, {
         'title': make_name('Regulation')
     })
-    control = self.create_object(models.Control, {
-        'title': make_name('Control')
+    section = self.create_object(models.Section, {
+        'title': make_name('Section')
     })
     self.create_mapping(program, regulation)
-    rel1 = self.create_mapping(regulation, control)
+    rel1 = self.create_mapping(regulation, section)
 
     # Check if the correct automapping row is inserted:
     auto = Automapping.query.filter_by(
