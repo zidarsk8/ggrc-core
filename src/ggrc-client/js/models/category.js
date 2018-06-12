@@ -3,9 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-//= require can.jquery-all
-//= require models/cacheable
-
 can.Model.Cacheable('CMS.Models.CategoryBase', {
   root_object: 'category_base'
   , root_collection: 'category_bases'

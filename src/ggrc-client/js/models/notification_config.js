@@ -3,9 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-//= require can.jquery-all
-//= require models/cacheable
-
 (function (can) {
 
   can.Model.Cacheable('CMS.Models.NotificationConfig', {

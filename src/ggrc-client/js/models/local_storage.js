@@ -4,8 +4,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-// = require can.jquery-all
-
 // LocalStorage model, stubs AJAX requests to storage instead of going to the server.  Useful when a REST resource hasn't yet been implemented
 // Adapted from an example in the CanJS documentation.  http://canjs.us/recipes.html
 
