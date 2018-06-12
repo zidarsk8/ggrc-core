@@ -55,10 +55,15 @@ class TestAssessmentImport(TestCase):
     evidences = all_models.Evidence.query.filter(
         all_models.Evidence.kind == all_models.Evidence.FILE).all()
     self.assertEquals(len(evidences), 0)
-    expected_warning = (u"Line 3: 'Evidence File' can't be changed via import."
-                        u" Please go on Assessment page and make changes"
-                        u" manually. The column will be skipped")
-    self.assertEquals([expected_warning], response[2]['row_warnings'])
+    expected_warning = (u"Line 11: 'Evidence File' can't be changed via "
+                        u"import. Please go on Assessment page and make "
+                        u"changes manually. The column will be skipped")
+    expected_messages = {
+        "Assessment": {
+            "row_warnings": {expected_warning},
+        }
+    }
+    self._check_csv_response(response, expected_messages)
 
   def test_import_assessment_with_evidence_file_existing(self):
     """If file already mapped to evidence not show warning to user"""
