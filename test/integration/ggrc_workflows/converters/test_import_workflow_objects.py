@@ -40,8 +40,7 @@ class TestWorkflowObjectsImport(TestCase):
 
   def test_full_good_import(self):
     """Test full good import without any warnings."""
-    filename = "workflow_small_sheet.csv"
-    self.import_file(filename)
+    self.import_file("workflow_small_sheet.csv")
 
     self.assertEqual(1, Workflow.query.count())
     self.assertEqual(1, TaskGroup.query.count())
