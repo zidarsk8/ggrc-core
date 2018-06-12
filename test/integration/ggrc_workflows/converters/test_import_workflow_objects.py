@@ -82,19 +82,18 @@ class TestWorkflowObjectsImport(TestCase):
         type.
 
     """
-    filename = "workflow_big_sheet.csv"
-    response = self.import_file(filename, safe=False)
+    response = self.import_file("workflow_big_sheet.csv", safe=False)
     expected_errors = {
         "Task Group Task": {
             "row_warnings": {
                 errors.WRONG_REQUIRED_VALUE.format(
-                    line=38, value="aaaa", column_name="Task Type"
+                    line=82, value="aaaa", column_name="Task Type"
                 ),
                 errors.MISSING_VALUE_WARNING.format(
-                    line=39, default_value="Rich Text", column_name="Task Type"
+                    line=83, default_value="Rich Text", column_name="Task Type"
                 ),
                 errors.MISSING_VALUE_WARNING.format(
-                    line=40, default_value="Rich Text", column_name="Task Type"
+                    line=84, default_value="Rich Text", column_name="Task Type"
                 ),
             }
         },
