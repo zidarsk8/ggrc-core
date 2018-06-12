@@ -150,8 +150,7 @@ class TestBasicCsvImport(TestCase):
 
     Checks for fields being updarted correctly
     """
-    filename = "pci_program.csv"
-    self.import_file(filename)
+    self.import_file("pci_program.csv")
 
     assessment = models.Assessment.query.filter_by(slug="CA.PCI 1.1").first()
     audit = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()
@@ -159,8 +158,7 @@ class TestBasicCsvImport(TestCase):
     self.assertEqual(assessment.operationally, "Effective")
     self.assertIsNone(models.Relationship.find_related(assessment, audit))
 
-    filename = "pci_program_update.csv"
-    response = self.import_file(filename, safe=False)
+    response = self.import_file("pci_program_update.csv", safe=False)
 
     self._check_csv_response(response, {
         "Assessment": {
