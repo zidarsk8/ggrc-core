@@ -90,12 +90,12 @@ class TestAssessmentTemplatesImport(TestCase):
             "created": 4,
             "row_warnings": {
                 errors.UNKNOWN_USER_WARNING.format(
-                    line=5,
+                    line=12,
                     column_name="Default Verifiers",
                     email="user3@a.com",
                 ),
                 errors.UNKNOWN_USER_WARNING.format(
-                    line=5,
+                    line=12,
                     column_name="Default Verifiers",
                     email="user1@a.com"
                 ),
