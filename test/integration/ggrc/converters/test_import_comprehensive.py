@@ -270,19 +270,19 @@ class TestComprehensiveSheets(TestCase):
         "Assessment": {
             "row_warnings": {
                 errors.UNKNOWN_OBJECT.format(
-                    line=14, object_type="Audit", slug="x"),
+                    line=21, object_type="Audit", slug="x"),
             },
             "row_errors": {
                 errors.MISSING_VALUE_ERROR.format(
-                    line=14, column_name="Audit"),
+                    line=21, column_name="Audit"),
                 errors.MISSING_VALUE_ERROR.format(
-                    line=15, column_name="Audit"),
+                    line=22, column_name="Audit"),
             },
         },
         "Regulation": {
             "row_warnings": {
                 errors.DUPLICATE_IN_MULTI_VALUE.format(
-                    line=21,
+                    line=28,
                     column_name=u"Reference URL",
                     duplicates=u"double-url.com, duplicate-nonascii-url-€™.com"
                 )
