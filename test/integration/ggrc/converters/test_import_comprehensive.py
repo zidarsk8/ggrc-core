@@ -36,8 +36,7 @@ class TestComprehensiveSheets(TestCase):
   def test_comprehensive_with_ca(self):
     """Test comprehensive sheet with custom attributes."""
     self.create_custom_attributes()
-    filename = "comprehensive_sheet1.csv"
-    response = self.import_file(filename)
+    response = self.import_file("comprehensive_sheet1.csv", safe=False)
     indexed = {r["name"]: r for r in response}
 
     expected = {
@@ -179,12 +178,24 @@ class TestComprehensiveSheets(TestCase):
     # general numbers check
     for name, data in expected.items():
       current = indexed[name]
-      self.assertEqual(current["rows"], data["rows"], name)
-      self.assertEqual(current["ignored"], data["ignored"], name)
-      self.assertEqual(current["created"], data["created"], name)
-      self.assertEqual(len(current["row_errors"]), data["row_errors"], name)
-      self.assertEqual(
-          len(current["row_warnings"]), data["row_warnings"], name)
+
+      current_dict = {
+          "created": current["created"],
+          "ignored": current["ignored"],
+          "row_errors": len(current["row_errors"]),
+          "row_warnings": len(current["row_warnings"]),
+          "rows": current["rows"],
+      }
+
+      self.assertDictEqual(
+          current_dict,
+          data,
+          u"Numbers don't match for {}: expected {!r}, got {!r}".format(
+              name,
+              data,
+              current_dict,
+          ),
+      )
 
     prog = Program.query.filter_by(slug="prog-8").first()
     self.assertEqual(prog.title, "program 8")
