@@ -7,7 +7,6 @@ import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
-import * as ObjectVersions from '../../../plugins/utils/object-versions-utils';
 import tracker from '../../../tracker';
 
 describe('GGRC.Components.treeWidgetContainer', function () {
@@ -19,50 +18,6 @@ describe('GGRC.Components.treeWidgetContainer', function () {
   beforeEach(function () {
     Component = GGRC.Components.get('treeWidgetContainer');
     vm = GGRC.Components.getViewModel('treeWidgetContainer');
-  });
-
-  describe('optionsData get() method', function () {
-    let shortModelName = 'ModelName';
-
-    beforeEach(function () {
-      vm.attr('model', {
-        shortName: shortModelName,
-      });
-    });
-
-    describe('if options.objectVersion has a false value', function () {
-      beforeEach(function () {
-        vm.removeAttr('options.objectVersion', null);
-      });
-
-      it('returns appopriate object', function () {
-        let modelName = shortModelName;
-        let expectedResult = {
-          widgetId: modelName,
-        };
-
-        expect(vm.attr('optionsData')).toEqual(expectedResult);
-      });
-    });
-
-    describe('returns widget config which', function () {
-      beforeEach(function () {
-        vm.attr('options.objectVersion', {
-          data: 'Data',
-        });
-      });
-
-      it('returns result of ObjectVersions.getWidgetConfig with ' +
-      'passed params', function () {
-        let expectedResult = {};
-        let getWidgetConfig = spyOn(ObjectVersions, 'getWidgetConfig')
-          .and.returnValue(expectedResult);
-        let result = vm.attr('optionsData');
-
-        expect(result).toBe(expectedResult);
-        expect(getWidgetConfig).toHaveBeenCalledWith(shortModelName, true);
-      });
-    });
   });
 
   describe('display() method', function () {

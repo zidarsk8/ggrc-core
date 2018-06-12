@@ -43,9 +43,6 @@ import {
   initMappedInstances,
 } from '../../plugins/utils/current-page-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
-import {
-  getWidgetConfig,
-} from '../../plugins/utils/object-versions-utils';
 import Pagination from '../base-objects/pagination';
 import tracker from '../../tracker';
 import router from '../../router';
@@ -92,18 +89,6 @@ viewModel = can.Map.extend({
       type: String,
       get: function () {
         return this.attr('model').shortName;
-      },
-    },
-    optionsData: {
-      get: function () {
-        let modelName = this.attr('modelName');
-        if (!this.attr('options.objectVersion')) {
-          return {
-            widgetId: modelName,
-          };
-        }
-
-        return getWidgetConfig(modelName, true);
       },
     },
     statusFilterVisible: {
@@ -282,7 +267,7 @@ viewModel = can.Map.extend({
     let columns = TreeViewUtils.getColumnsForModel(
       this.attr('model').model_singular,
       this.attr('displayPrefs'),
-      this.attr('optionsData').widgetId
+      this.attr('options.widgetId')
     );
 
     this.attr('columns.available', columns.available);
@@ -303,7 +288,7 @@ viewModel = can.Map.extend({
       this.attr('model').model_singular,
       selectedColumns,
       this.attr('displayPrefs'),
-      this.attr('optionsData').widgetId
+      this.attr('options.widgetId')
     );
 
     this.attr('columns.selected', columns.selected);
