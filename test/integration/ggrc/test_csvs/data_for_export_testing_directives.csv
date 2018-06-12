@@ -1,17 +1,3 @@
-,,,,,
-Object type,,,,,
-Section,code*,title*,,admin,Policy / Regulation / Standard / Contract
-,sec-1,mapped section 1,,user@example.com,p1
-,sec-2,mapped section 2,,user@example.com,p2
-,sec-3,mapped section 3,,user@example.com,p3
-,sec-4,mapped section 4,,user@example.com,reg-1
-,sec-5,mapped section 5,,user@example.com,reg-2
-,sec-6,mapped section 6,,user@example.com,reg-3
-,sec-7,mapped section 7,,user@example.com,reg-4
-,sec-8,mapped section 8,,user@example.com,std-1
-,sec-9,mapped section 9,,user@example.com,std-2
-,sec-10,mapped section 10,,user@example.com,std-3
-,,,,,
 Object type,,,,,
 Standard,code*,title*,description ,admin,
 ,std-1,mapped standard 1,test,user@example.com,
@@ -51,3 +37,16 @@ Policy,code*,title*,description ,admin,
 ,p8,mapped policy 8,test,user@example.com,
 ,p9,mapped policy 9,test,user@example.com,
 ,p10,mapped policy 10,test,user@example.com,
+,,,,,
+Object type,,,,,
+Section,code*,title*,,admin,Policy / Regulation / Standard / Contract
+,sec-1,mapped section 1,,user@example.com,p1
+,sec-2,mapped section 2,,user@example.com,p2
+,sec-3,mapped section 3,,user@example.com,p3
+,sec-4,mapped section 4,,user@example.com,reg-1
+,sec-5,mapped section 5,,user@example.com,reg-2
+,sec-6,mapped section 6,,user@example.com,reg-3
+,sec-7,mapped section 7,,user@example.com,reg-4
+,sec-8,mapped section 8,,user@example.com,std-1
+,sec-9,mapped section 9,,user@example.com,std-2
+,sec-10,mapped section 10,,user@example.com,std-3
