@@ -58,13 +58,13 @@ class TestWorkflowObjectsImport(TestCase):
 
   def test_bad_imports(self):
     """Test workflow import with errors and warnings"""
-    filename = "workflow_with_warnings_and_errors.csv"
-    response = self.import_file(filename, safe=False)
+    response = self.import_file("workflow_with_warnings_and_errors.csv",
+                                safe=False)
 
     expected_errors = {
         "Workflow": {
             "row_warnings": {
-                errors.OWNER_MISSING.format(line=8, column_name="Admin")
+                errors.OWNER_MISSING.format(line=14, column_name="Admin")
             },
         }
     }
