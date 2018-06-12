@@ -107,8 +107,7 @@ class TestSnapshot(TestCase):
     """Set up test cases for all tests."""
     super(TestSnapshot, self).setUp()
     self._create_cas()
-    response = self._import_file("all_snapshottable_objects.csv")
-    self._check_csv_response(response, {})
+    self.import_file("all_snapshottable_objects.csv")
 
   @staticmethod
   def _create_cas():
