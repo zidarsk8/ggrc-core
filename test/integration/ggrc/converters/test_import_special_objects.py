@@ -35,14 +35,15 @@ class TestSpecialObjects(TestCase):
   def test_program_roles_imports(self):
     """ this tests if the audit gets imported with a mapped program """
 
-    filename = "program_audit.csv"
-    self.import_file(filename)
+    self.import_file("program_audit.csv")
     self.assertEqual(2, Program.query.count())
     program = Program.query.filter(Program.slug == "prog-1").first()
     p1_roles = all_models.AccessControlList.query.filter(
         all_models.AccessControlList.object_id == program.id,
         all_models.AccessControlList.object_type == "Program").all()
-    self.assertEqual(4, len(p1_roles))
+    # 2 Program Managers, 1 Primary Contact, 1 Secondary Contact,
+    # 1 Program Editors, 1 Program Readers
+    self.assertEqual(6, len(p1_roles))
     manager_ids = [r.person_id for r in p1_roles if
                    r.ac_role.name == "Program Managers"]
     editor_ids = [r.person_id for r in p1_roles if
