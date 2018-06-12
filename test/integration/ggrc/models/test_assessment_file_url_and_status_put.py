@@ -77,3 +77,38 @@ class TestAssessmentCompleteWithAction(ggrc.TestCase):
 
     asmt = all_models.Assessment.query.get(asmt_id)
     self.assertEqual(asmt.status, result_status)
+
+  @ddt.data("In Review", "Verified", "Completed")
+  def test_remove_required_evidence(self, status):
+    """Test remove mandatory evidence and update {0}
+    status to completed in single PUT. Result status
+    should be `In Progress`"""
+    asmt_id = self.asmt.id
+    cad = factories.CustomAttributeDefinitionFactory(
+        attribute_type="Dropdown",
+        definition_type="assessment",
+        definition_id=self.asmt.id,
+        multi_choice_options="value_1,value_2",
+        multi_choice_mandatory="0,2",
+    )
+    factories.CustomAttributeValueFactory(
+        custom_attribute=cad,
+        attributable=self.asmt,
+        attribute_value="value_2",
+    )
+    factories.RelationshipFactory(
+        source=self.asmt,
+        destination=self.evidence,
+    )
+    response = self.api.put(self.asmt, {
+        "status": status,
+        "actions": {"remove_related": [{"id": self.evidence.id,
+                                        "type": "Evidence"}]},
+    })
+    self.assertEqual(response.status_code, 400)
+    message = response.json["message"]
+    self.assertEqual(message, "CA-introduced completion preconditions "
+                              "are not satisfied. Check preconditions_failed"
+                              " of items of self.custom_attribute_values")
+    asmnt = all_models.Assessment.query.filter_by(id=asmt_id).first()
+    self.assertEqual(asmnt.status, "In Progress")
