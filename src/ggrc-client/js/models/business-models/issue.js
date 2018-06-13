@@ -31,6 +31,11 @@ export default can.Model.Cacheable('CMS.Models.Issue', {
       {attr_title: 'Reference URL', attr_name: 'reference_url'},
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       {
+        attr_title: 'Ticket Tracker',
+        attr_name: 'issue_url',
+        deny: !GGRC.ISSUE_TRACKER_ENABLED,
+      },
+      {
         attr_title: 'Description',
         attr_name: 'description',
         disable_sorting: true,
