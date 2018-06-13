@@ -4,6 +4,7 @@
  */
 
 import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
+import {refreshTGRelatedItems} from '../../plugins/utils/workflow-utils';
 
 let CloneTaskGroup = can.Model.Cacheable({
   defaults: {
@@ -48,6 +49,8 @@ can.Component.extend({
             content_view: contentView,
             custom_save_button_text: 'Proceed',
             button_view: BUTTON_VIEW_SAVE_CANCEL,
+          }).on('modal:success', (e, clonedTg) => {
+            refreshTGRelatedItems(clonedTg);
           });
         });
     },

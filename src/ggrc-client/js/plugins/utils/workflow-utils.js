@@ -4,7 +4,7 @@
 */
 
 import {confirm} from '../../plugins/utils/modals';
-
+import Permission from '../../permission';
 /**
  * A set of properties which describe minimum information
  * about cycle.
@@ -84,9 +84,15 @@ async function updateStatus(instance, status) {
   return refreshed.save();
 }
 
+function refreshTGRelatedItems(taskGroup) {
+  Permission.refresh();
+  taskGroup.refresh_all_force('workflow', 'context');
+}
+
 export {
   createCycle,
   redirectToCycle,
   generateCycle,
   updateStatus,
+  refreshTGRelatedItems,
 };
