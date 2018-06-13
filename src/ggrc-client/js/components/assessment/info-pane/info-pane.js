@@ -604,14 +604,4 @@ export default can.Component.extend({
       }
     },
   },
-  helpers: {
-    extraClass: function (type) {
-      switch (type()) {
-        case 'checkbox':
-          return 'inline-reverse';
-        default:
-          return '';
-      }
-    },
-  },
 });

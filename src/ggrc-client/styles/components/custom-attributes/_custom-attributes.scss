@@ -46,7 +46,7 @@ custom-attributes {
     align-items: flex-start;
     justify-content: flex-start;
 
-    &.inline-reverse {
+    &.custom-attribute-checkbox {
       flex-direction: row-reverse;
       flex-wrap: nowrap
     }
@@ -82,7 +82,7 @@ custom-attributes {
 
     .form-field__content {
       max-width: 360px;
-      &.inline-reverse {
+      &.custom-attribute-checkbox {
         min-width: auto;
         padding: 3px 8px 0 0;
       }
@@ -148,7 +148,7 @@ custom-attributes {
     text-transform: uppercase;
     line-height: 16px;
     padding: 5px 0;
-    &.inline-reverse {
+    &.custom-attribute-checkbox {
       max-width: 332px;
     }
   }

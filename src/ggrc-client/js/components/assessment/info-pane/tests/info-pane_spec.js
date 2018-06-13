@@ -1621,26 +1621,6 @@ describe('assessment-info-pane component', () => {
     });
   });
 
-  describe('extraClass() helper method', () => {
-    let helper;
-
-    beforeEach(function () {
-      helper = Component.prototype.helpers.extraClass.bind(vm);
-    });
-
-    it('returns "inline-reverse" string if passed type function returns ' +
-    'checkbox string', function () {
-      const result = helper(_.constant('checkbox'));
-      expect(result).toBe('inline-reverse');
-    });
-
-    it('returns empty string if passed type function returns unknown string',
-      function () {
-        const result = helper(_.constant('unknownType'));
-        expect(result).toBe('');
-      });
-  });
-
   describe('component scope', () => {
     let fakeComponent;
 
