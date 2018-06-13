@@ -13,6 +13,7 @@ from ggrc.models import mixins
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
 from ggrc.models import reflection
+from ggrc.models.mixins import base
 from ggrc.models.relationship import Relatable
 from ggrc.models.relationship import Relationship
 from ggrc.models.track_object_state import HasObjectState
@@ -30,6 +31,7 @@ class Section(Roleable,
               Commentable,
               mixins.TestPlanned,
               PublicDocumentable,
+              base.ContextRBAC,
               mixins.BusinessObject,
               db.Model):
   """Section model."""
@@ -46,11 +48,9 @@ class Section(Roleable,
       }
   }
 
-  na = deferred(db.Column(db.Boolean, default=False, nullable=False),
-                'Section')
   notes = deferred(db.Column(db.Text, nullable=False, default=u""), 'Section')
 
-  _api_attrs = reflection.ApiAttributes('na', 'notes')
+  _api_attrs = reflection.ApiAttributes('notes')
   _sanitize_html = ['notes']
   _include_links = []
 

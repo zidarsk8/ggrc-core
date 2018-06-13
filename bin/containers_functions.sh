@@ -114,6 +114,57 @@ setup_for_selenium () {
 }
 
 
+integration_acl_tests () {
+  PROJECT=$1
+  print_line
+
+  provision_dev "cleandev_1"
+
+  echo "Running ${PROJECT}"
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
+    source /vagrant/bin/init_vagrant_env
+    /vagrant/bin/run_integration_acl
+  " && rc=$? || rc=$?
+
+  print_line
+  return $rc
+}
+
+
+integration_ggrc_tests () {
+  PROJECT=$1
+  print_line
+
+  provision_dev "cleandev_1"
+
+  echo "Running ${PROJECT}"
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
+    source /vagrant/bin/init_vagrant_env
+    /vagrant/bin/run_integration_ggrc
+  " && rc=$? || rc=$?
+
+  print_line
+  return $rc
+}
+
+
+integration_non_ggrc_tests () {
+  PROJECT=$1
+  print_line
+
+  provision_dev "cleandev_1"
+
+  echo "Running ${PROJECT}"
+  docker exec -i ${PROJECT}_cleandev_1 su -c "
+    source /vagrant/bin/init_vagrant_env
+    /vagrant/bin/run_integration_non_ggrc
+  " && rc=$? || rc=$?
+
+  print_line
+  return $rc
+}
+
+
 integration_tests () {
   PROJECT=$1
   print_line

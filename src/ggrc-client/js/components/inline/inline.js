@@ -11,8 +11,8 @@ import '../form/fields/person-form-field';
 import '../form/fields/rich-text-form-field';
 import '../form/fields/text-form-field';
 import '../form/fields/numberbox-form-field';
+import {isInnerClick} from '../../plugins/ggrc_utils';
 import template from './inline.mustache';
-
 
 (function (can, GGRC) {
   'use strict';
@@ -126,8 +126,7 @@ import template from './inline.mustache';
           return;
         }
 
-        isInside = GGRC.Utils.events
-          .isInnerClick(this.element, ev.target);
+        isInside = isInnerClick(this.element, ev.target);
         editMode = viewModel.attr('editMode');
 
         if (editMode && !isInside) {

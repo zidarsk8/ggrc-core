@@ -55,8 +55,7 @@ function batchRequests(params) {
  * @param {Object} page - Information about page state.
  * @param {Number} page.current - Current page
  * @param {Number} page.pageSize - Page size
- * @param {String} page.sortBy - sortBy
- * @param {String} page.sortDirection - sortDirection
+ * @param {Array} page.sort - Array of sorting criteria
  * @param {String} page.filter - Filter string
  * @param {Object} relevant - Information about relevant object
  * @param {Object} relevant.type - Type of relevant object
@@ -76,8 +75,7 @@ function buildParams(objName, page, relevant, additionalFilter) {
  * @param {Object} page - Information about page state.
  * @param {Number} page.current - Current page
  * @param {Number} page.pageSize - Page size
- * @param {String} page.sortBy - sortBy
- * @param {String} page.sortDirection - sortDirection
+ * @param {Array} page.sort - Array of sorting criteria
  * @param {String} page.filter - Filter string
  * @param {Object} relevant - Information about relevant object
  * @param {Object} relevant.type - Type of relevant object
@@ -99,18 +97,16 @@ function buildRelevantIdsQuery(objName, page, relevant, additionalFilter) {
  * @param {Object} page - Information about page state.
  * @param {Number} page.current - Current page
  * @param {Number} page.pageSize - Page size
- * @param {String} page.sortBy - sortBy
- * @param {String} page.sortDirection - sortDirection
- * @param {String} page.filter - Filter string
+ * @param {Array} page.sort - Array of sorting criteria
  * @param {Object|Object[]} relevant - Information about relevant object
  * @param {Object} relevant.type - Type of relevant object
  * @param {Object} relevant.id - Id of relevant object
  * @param {Object} relevant.operation - Type of operation.
  * @param {Array} fields - Array of requested fields.
- * @param {Object|Array} additionalFilter - Additional filters to be applied
+ * @param {Object|Array} filters - Filters to be applied
  * @return {Object} Object of QueryAPIRequest
  */
-function buildParam(objName, page, relevant, fields, additionalFilter) {
+function buildParam(objName, page, relevant, fields, filters) {
   let first;
   let last;
   let params = {};
@@ -120,20 +116,31 @@ function buildParam(objName, page, relevant, fields, additionalFilter) {
   }
 
   params.object_name = objName;
-  params.filters =
-    _makeFilter(page.filter, relevant, additionalFilter);
+  params.filters = _makeFilter(filters, relevant);
 
   if (page.current && page.pageSize) {
     first = (page.current - 1) * page.pageSize;
     last = page.current * page.pageSize;
     params.limit = [first, last];
   }
-  if (page.sortBy) {
-    params.order_by = [{
-      name: page.sortBy,
-      desc: page.sortDirection === 'desc',
-    }];
+
+  if (page.sort) {
+    params.order_by = _
+      .chain(page.sort)
+      .map((el)=> {
+        if (el.key) {
+          return {
+            name: el.key,
+            desc: el.direction === 'desc',
+          };
+        }
+      })
+      .compact()
+      .value();
+
+    params.order_by = params.order_by.length ? params.order_by : undefined;
   }
+
   if (fields) {
     params.fields = fields;
   }
@@ -210,7 +217,7 @@ function _makeRelevantFilter(filter) {
   return relevantFilter;
 }
 
-function _makeFilter(filter, relevant, additionalFilter) {
+function _makeFilter(filter, relevant) {
   let relevantFilters;
   let filterList = [];
 
@@ -225,14 +232,10 @@ function _makeFilter(filter, relevant, additionalFilter) {
   }
 
   if (filter) {
-    filterList.push(GGRC.query_parser.parse(filter));
-  }
-
-  if (additionalFilter) {
-    additionalFilter = Array.isArray(additionalFilter) ?
-      additionalFilter :
-      can.makeArray(additionalFilter);
-    filterList = filterList.concat(additionalFilter);
+    filter = Array.isArray(filter) ?
+      filter :
+      can.makeArray(filter);
+    filterList = filterList.concat(filter);
   }
   if (filterList.length) {
     return filterList.reduce(function (left, right) {

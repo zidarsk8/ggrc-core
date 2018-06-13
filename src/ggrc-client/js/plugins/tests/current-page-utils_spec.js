@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 import * as TreeViewUtils from '../utils/tree-view-utils';
 import * as SnapshotUtils from '../utils/snapshot-utils';
 import * as CurrentPageUtils from '../utils/current-page-utils';
@@ -20,7 +21,7 @@ describe('GGRC Utils CurrentPage', function () {
   });
 
   beforeEach(function () {
-    let instance = new CMS.Models.Audit({
+    let instance = makeFakeInstance({model: CMS.Models.Audit})({
       id: 1,
       type: 'Audit',
     });
@@ -537,6 +538,31 @@ describe('GGRC Utils CurrentPage', function () {
           expect(countsMap.attr('Program')).toEqual(0);
           done();
         });
+    });
+  });
+
+  describe('cacheCurrentUser() method', function () {
+    let currentUser;
+
+    beforeAll(() => {
+      currentUser = GGRC.current_user;
+    });
+
+    afterAll(() => {
+      GGRC.current_user = currentUser;
+    });
+
+    it('should add current user to cache', function () {
+      GGRC.current_user = {
+        name: 'TestCurrentUser',
+        id: 0,
+      };
+
+      CurrentPageUtils.cacheCurrentUser();
+
+      let currenUserFromCache = CMS.Models.Person.findInCacheById(0);
+
+      expect(currenUserFromCache.name).toBe('TestCurrentUser');
     });
   });
 });

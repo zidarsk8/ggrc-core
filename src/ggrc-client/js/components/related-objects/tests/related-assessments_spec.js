@@ -4,7 +4,10 @@
  */
 
 import Component from '../related-assessments';
-import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import {
+  getComponentVM,
+  makeFakeModel,
+} from '../../../../js_specs/spec_helpers';
 import * as caUtils from '../../../plugins/utils/ca-utils';
 
 describe('GGRC.Components.relatedAssessments', () => {
@@ -122,7 +125,7 @@ describe('GGRC.Components.relatedAssessments', () => {
     });
 
     describe('unableToReuse get() method', ()=> {
-      it(`returns false if there are selected evidences 
+      it(`returns false if there are selected evidences
         and it is not saving`, ()=> {
           viewModel.attr('isSaving', false);
           viewModel.attr('selectedEvidences', ['item']);
@@ -163,6 +166,20 @@ describe('GGRC.Components.relatedAssessments', () => {
     });
 
     describe('buildEvidenceModel() method', ()=> {
+      let originalEvidenceModel;
+
+      beforeAll(function () {
+        originalEvidenceModel = CMS.Models.Evidence;
+      });
+
+      beforeEach(function () {
+        CMS.Models.Evidence = makeFakeModel({model: originalEvidenceModel});
+      });
+
+      afterAll(function () {
+        CMS.Models.Evidence = originalEvidenceModel;
+      });
+
       beforeEach(()=> {
         viewModel.attr({
           instance: {

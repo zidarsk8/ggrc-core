@@ -377,13 +377,18 @@ describe('GGRC.Components.mapperResults', function () {
 
     it('adds paging with sort to query if sort.key is defined', function () {
       viewModel.getQuery('values', true);
-      expect(QueryAPI.buildParam.calls.argsFor(0)[1])
-        .toEqual({
-          current: 'mock1',
-          pageSize: 'mock2',
-          sortBy: 'mock3',
-          sortDirection: 'mock4',
-        });
+      expect(QueryAPI.buildParam.calls.argsFor(0)[1].sort[0].key)
+        .toBe('mock3');
+      expect(QueryAPI.buildParam.calls.argsFor(0)[1].sort[0].direction)
+        .toBe('mock4');
+    });
+
+    it('adds defaultSort to paging if no sort', function () {
+      viewModel.removeAttr('sort');
+      viewModel.attr('defaultSort', [{key: 'mock5', direction: 'mock6'}]);
+      viewModel.getQuery('values', true);
+
+      expect(QueryAPI.buildParam.calls.argsFor(0)[1].sort[0].key).toBe('mock5');
     });
 
     it('sets "read" to permissions if model is person', function () {

@@ -50,6 +50,7 @@ can.Model.Cacheable('CMS.Models.Document', {
     recipients: 'Admin',
   },
   tree_view_options: {
+    attr_view: GGRC.mustache_path + '/documents/tree-item-attr.mustache',
     display_attr_names: ['title', 'status', 'updated_at', 'document_type'],
     attr_list: [
       {attr_title: 'Title', attr_name: 'title'},
@@ -60,6 +61,7 @@ can.Model.Cacheable('CMS.Models.Document', {
       {attr_title: 'Last Updated', attr_name: 'updated_at'},
       {attr_title: 'Last Deprecated Date', attr_name: 'last_deprecated_date'},
     ],
+    add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
   },
   init: function () {
     this.validateNonBlank('title');

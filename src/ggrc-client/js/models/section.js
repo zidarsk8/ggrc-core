@@ -4,7 +4,6 @@
 */
 
 
-// this model doesn't exist anymore, can we get rid of it?
 can.Model.Cacheable('CMS.Models.Section', {
   root_object: 'section',
   root_collection: 'sections',

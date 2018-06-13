@@ -9,6 +9,10 @@ import {getRolesForType} from '../../plugins/utils/acl-utils';
 import RefreshQueue from '../../models/refresh_queue';
 import template from './revision-log.mustache';
 import tracker from '../../tracker';
+import {
+  formatDate,
+  getHighestAssigneeRole,
+} from '../../plugins/ggrc_utils';
 
 (function (GGRC, can) {
   'use strict';
@@ -471,10 +475,10 @@ import tracker from '../../tracker';
             // format date fields
             if (this.attr('_DATE_FIELDS')[fieldName]) {
               if (value) {
-                value = GGRC.Utils.formatDate(value, true);
+                value = formatDate(value, true);
               }
               if (origVal) {
-                origVal = GGRC.Utils.formatDate(origVal, true);
+                origVal = formatDate(origVal, true);
               }
             }
             if (this.attr('_LIST_FIELDS')[fieldName]) {
@@ -540,7 +544,7 @@ import tracker from '../../tracker';
               if (!value.attribute_value) {
                 return value.attribute_value;
               }
-              return GGRC.Utils.formatDate(value.attribute_value, true);
+              return formatDate(value.attribute_value, true);
             default:
               return value.attribute_value;
           }
@@ -729,7 +733,7 @@ import tracker from '../../tracker';
               }
               return {
                 updated_at: rev.updated_at,
-                role: GGRC.Utils.get_highest_assignee_role(
+                role: getHighestAssigneeRole(
                   instance,
                   rev.content.attrs.AssigneeType.split(',')),
               };
@@ -772,7 +776,7 @@ import tracker from '../../tracker';
 
         _.forEach(unmodifiedAssignees, function (pid) {
           let existingRoles = assigneeRoles[pid];
-          let role = GGRC.Utils.get_highest_assignee_role(
+          let role = getHighestAssigneeRole(
             instance, existingRoles);
           perPersonRoleHistory[pid] = [{
             updated_at: instance.created_at,

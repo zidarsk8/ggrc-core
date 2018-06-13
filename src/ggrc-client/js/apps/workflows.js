@@ -15,7 +15,7 @@ import InfoWidget from '../controllers/info_widget_controller';
     'Program Regulation Policy Standard Contract Clause Section'.split(' '),
     'Request Control Objective OrgGroup Vendor AccessGroup'.split(' '),
     'System Process DataAsset Product Project Facility Market'.split(' '),
-    'Issue Risk Threat Document'.split(' ')
+    'Issue Risk Threat'.split(' ')
   );
 
   let draftOnUpdateMixin;
@@ -141,7 +141,7 @@ import InfoWidget from '../controllers/info_widget_controller';
             'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
             'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
             'Objective', 'Audit', 'AccessGroup',
-            'Document', 'Risk', 'Threat',
+            'Risk', 'Threat',
           ],
         },
         related_objects_as_source: Proxy(

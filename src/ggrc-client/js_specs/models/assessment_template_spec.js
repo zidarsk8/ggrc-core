@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {makeFakeInstance} from '../../js_specs/spec_helpers';
+
 describe('can.Model.AssessmentTemplate', function () {
   'use strict';
 
@@ -14,7 +16,7 @@ describe('can.Model.AssessmentTemplate', function () {
   });
 
   beforeEach(function () {
-    instance = new AssessmentTemplate();
+    instance = makeFakeInstance({model: AssessmentTemplate})();
   });
 
   describe('_packPeopleData() method', function () {

@@ -2,18 +2,23 @@
  Copyright (C) 2018 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
+
+import {makeFakeInstance} from '../../../js_specs/spec_helpers';
+
 describe('CMS.Models.Relationship ', function () {
   describe('unmap() method', function () {
-    let model;
+    let instance;
 
     beforeEach(function () {
-      model = new CMS.Models.Relationship({id: 'testId'});
+      instance = makeFakeInstance({model: CMS.Models.Relationship})({
+        id: 'testId',
+      });
     });
 
     it('sends correct request if not cascade', function () {
       spyOn($, 'ajax').and.returnValue(jasmine.createSpyObj(['done']));
 
-      model.unmap(false);
+      instance.unmap(false);
 
       expect($.ajax).toHaveBeenCalledWith({
         type: 'DELETE',
@@ -24,7 +29,7 @@ describe('CMS.Models.Relationship ', function () {
     it('sends correct request if cascade', function () {
       spyOn($, 'ajax').and.returnValue(jasmine.createSpyObj(['done']));
 
-      model.unmap(true);
+      instance.unmap(true);
 
       expect($.ajax).toHaveBeenCalledWith({
         type: 'DELETE',
@@ -36,10 +41,10 @@ describe('CMS.Models.Relationship ', function () {
       spyOn($, 'ajax').and.returnValue(can.Deferred().resolve());
       spyOn(can, 'trigger');
 
-      model.unmap(true);
+      instance.unmap(true);
 
       expect(can.trigger)
-        .toHaveBeenCalledWith(model.constructor, 'destroyed', model);
+        .toHaveBeenCalledWith(instance.constructor, 'destroyed', instance);
     });
   });
 });

@@ -5,8 +5,6 @@
 import sqlalchemy as sa
 from sqlalchemy import and_
 from sqlalchemy import literal
-from sqlalchemy import true, false
-from sqlalchemy import union
 from sqlalchemy import alias
 from ggrc import db
 from ggrc.models import all_models
@@ -61,8 +59,8 @@ def _get_custom_roles(contact_id, model_names):
       and_(
           all_models.AccessControlList.person_id == contact_id,
           all_models.AccessControlList.object_type.in_(model_names),
-          all_models.AccessControlRole.my_work == true(),
-          all_models.AccessControlRole.read == true()
+          all_models.AccessControlRole.my_work == sa.true(),
+          all_models.AccessControlRole.read == sa.true()
       )
   )
   return custom_roles_query
@@ -82,11 +80,7 @@ def get_myobjects_query(types=None, contact_id=None):  # noqa
   type_union_queries = []
 
   def _get_tasks_in_cycle(model):
-    """Filter tasks with particular statuses and cycle.
-
-    Filtering tasks with statuses "Assigned", "In Progress" and "Finished".
-    Where the task is in current users cycle.
-    """
+    """Filter tasks with current user cycle."""
     task_query = db.session.query(
         model.id.label('id'),
         literal(model.__name__).label('type'),
@@ -114,27 +108,13 @@ def get_myobjects_query(types=None, contact_id=None):  # noqa
                 ("Task Assignees", "Task Secondary Assignees")),
         )
     ).filter(
-        Cycle.is_current == true(),
-    )
-    return task_query.filter(
-        Cycle.is_verification_needed == true(),
-        model.status.in_([
-            all_models.CycleTaskGroupObjectTask.ASSIGNED,
-            all_models.CycleTaskGroupObjectTask.IN_PROGRESS,
-            all_models.CycleTaskGroupObjectTask.FINISHED,
-            all_models.CycleTaskGroupObjectTask.DECLINED,
-            all_models.CycleTaskGroupObjectTask.DEPRECATED,
-        ])
-    ).union_all(
-        task_query.filter(
-            Cycle.is_verification_needed == false(),
-            model.status.in_([
-                all_models.CycleTaskGroupObjectTask.ASSIGNED,
-                all_models.CycleTaskGroupObjectTask.IN_PROGRESS,
-                all_models.CycleTaskGroupObjectTask.DEPRECATED,
-            ])
+        and_(
+            Cycle.is_current == sa.true(),
+            all_models.AccessControlRole.read == sa.true(),
+            all_models.AccessControlRole.internal == sa.false(),
         )
     )
+    return task_query
 
   def _get_model_specific_query(model):
     """Prepare query specific for a particular model."""
@@ -156,4 +136,4 @@ def get_myobjects_query(types=None, contact_id=None):  # noqa
     if model is all_models.Person:
       type_union_queries.append(_get_people())
 
-  return alias(union(*type_union_queries))
+  return alias(sa.union(*type_union_queries))

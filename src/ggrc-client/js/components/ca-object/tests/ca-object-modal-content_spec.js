@@ -5,6 +5,7 @@
 
 import Component from '../ca-object-modal-content';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import * as Utils from '../../../plugins/ggrc_utils';
 
 describe('ca-object-modal-content component', ()=> {
   let viewModel;
@@ -35,7 +36,7 @@ describe('ca-object-modal-content component', ()=> {
       let saveDfd = can.Deferred();
       viewModel.attr('content.saveDfd', saveDfd);
       spyOn(viewModel, 'addComment');
-      spyOn(GGRC.Utils, 'getAssigneeType');
+      spyOn(Utils, 'getAssigneeType');
 
       viewModel.onCommentCreated({
         comment,

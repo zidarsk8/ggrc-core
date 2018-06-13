@@ -5,6 +5,7 @@ from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.comment import Commentable
+from ggrc.models.mixins import base
 from .mixins import (BusinessObject, LastDeprecatedTimeboxed,
                      CustomAttributable, TestPlanned)
 from .object_document import PublicDocumentable
@@ -15,8 +16,8 @@ from .track_object_state import HasObjectState
 
 class OrgGroup(Roleable, HasObjectState, CustomAttributable,
                Personable, Relatable, LastDeprecatedTimeboxed, Commentable,
-               TestPlanned, PublicDocumentable, BusinessObject,
-               Indexed, db.Model):
+               TestPlanned, PublicDocumentable, base.ContextRBAC,
+               BusinessObject, Indexed, db.Model):
   """Class representing OrgGroup."""
   __tablename__ = 'org_groups'
   _aliases = {

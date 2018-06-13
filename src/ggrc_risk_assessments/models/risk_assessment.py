@@ -8,6 +8,7 @@ from ggrc.fulltext.mixin import Indexed
 from ggrc.models.mixins import CustomAttributable, TestPlanned
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import Timeboxed
+from ggrc.models.mixins import base
 from ggrc.models.deferred import deferred
 from ggrc.models.object_document import Documentable
 from ggrc.models.person import Person
@@ -21,6 +22,7 @@ class RiskAssessment(Documentable,
                      CustomAttributable,
                      Relatable,
                      TestPlanned,
+                     base.ContextRBAC,
                      BusinessObject,
                      Indexed,
                      db.Model):

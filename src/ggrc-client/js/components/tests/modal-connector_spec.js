@@ -3,12 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import * as SnapshotUtils from '../../plugins/utils/snapshot-utils';
-import * as QueryAPI from '../../plugins/utils/query-api-utils';
-
 describe('GGRC.Components.modalConnector', function () {
-  'use strict';
-
   let Component;
   let viewModel;
   let events;
@@ -23,7 +18,6 @@ describe('GGRC.Components.modalConnector', function () {
   describe('init() method', function () {
     let handler;
     let that;
-    let reifiedInstance;
     let binding;
     beforeEach(function () {
       binding = {
@@ -42,14 +36,13 @@ describe('GGRC.Components.modalConnector', function () {
         }],
         mapping: 'mockSource',
         setListItems: jasmine.createSpy(),
-        instance_attr: '',
       });
       viewModel.instance = {
-        reify: jasmine.createSpy().and.returnValue(reifiedInstance),
         mark_for_addition: jasmine.createSpy(),
         get_binding: jasmine.createSpy().and.returnValue(binding),
       };
-      reifiedInstance = new can.Map(viewModel.instance);
+      viewModel.instance.reify = jasmine.createSpy()
+        .and.returnValue(new can.Map(viewModel.instance));
       that = {
         viewModel: viewModel,
         addListItem: jasmine.createSpy(),
@@ -66,13 +59,7 @@ describe('GGRC.Components.modalConnector', function () {
       expect(viewModel.attr('controller').viewModel)
         .toEqual(that.viewModel);
     });
-    it('sets true to viewModel.deferred if viewModel.instance is undefined',
-      function () {
-        viewModel.instance = undefined;
-        viewModel.default_mappings = [];
-        handler();
-        expect(viewModel.attr('deferred')).toEqual(true);
-      });
+
     it('sets reified instance to viewModel if it is defined',
       function () {
         handler();
@@ -106,36 +93,12 @@ describe('GGRC.Components.modalConnector', function () {
       handler();
       expect(that.setListItems).toHaveBeenCalledWith('mockList');
     });
-    it('sets parent_instance form viewModel to options', function () {
-      handler();
-      expect(that.options.parent_instance).toEqual(viewModel.parent_instance);
-    });
-    it('sets instance form viewModel to options', function () {
-      handler();
-      expect(that.options.instance).toEqual(viewModel.instance);
-    });
     it('calls on() method', function () {
       handler();
       expect(that.on).toHaveBeenCalled();
     });
   });
-  describe('destroy() method', function () {
-    let handler;
-    let that;
-    beforeEach(function () {
-      that = {
-        viewModel: {
-          parent_instance: new can.Map(),
-        },
-      };
-      handler = events.destroy.bind(that);
-    });
-    it('removes changes from parent_instance', function () {
-      that.viewModel.parent_instance.attr('changes', [1, 2]);
-      handler();
-      expect(that.viewModel.parent_instance._changes).toEqual(undefined);
-    });
-  });
+
   describe('setListItems() method', function () {
     let handler;
     let that;
@@ -194,11 +157,6 @@ describe('GGRC.Components.modalConnector', function () {
         expect(that.viewModel.changes[1])
           .toEqual(jasmine.objectContaining({what: 'mock', how: 'remove'}));
       });
-    it('adds all changes to parent_instance if it is deferred', function () {
-      that.viewModel.parent_instance._changes = [];
-      handler(element, event);
-      expect(that.viewModel.parent_instance._changes.length).toEqual(2);
-    });
   });
   describe('addMapings() method', function () {
     let handler;
@@ -229,10 +187,5 @@ describe('GGRC.Components.modalConnector', function () {
         expect(that.viewModel.changes[1])
           .toEqual(jasmine.objectContaining({how: 'add'}));
       });
-    it('adds all changes to parent_instance if it is deferred', function () {
-      that.viewModel.parent_instance._changes = [];
-      handler({}, event, {data: [1, 2]});
-      expect(that.viewModel.parent_instance._changes.length).toEqual(2);
-    });
   });
 });

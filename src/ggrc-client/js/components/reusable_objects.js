@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {isMapped as isMappedUtil} from '../plugins/ggrc_utils';
+
 (function (can, GGRC) {
   'use strict';
   /*
@@ -22,7 +24,7 @@
     },
     helpers: {
       isDisabled: function (instance, options) {
-        let isMapped = GGRC.Utils.is_mapped(
+        let isMapped = isMappedUtil(
           this.attr('baseInstance'), instance, this.attr('mapping'));
 
         if (isMapped) {

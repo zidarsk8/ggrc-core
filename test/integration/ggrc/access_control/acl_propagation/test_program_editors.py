@@ -113,7 +113,15 @@ class TestProgramEditorsPropagation(base.TestACLPropagation):
               "delete": False,
               "add_comment": True,
               "read_comments": True
-          }
+          },
+          "Document Program": {
+              "read": True,
+              "create_and_map": True,
+              "update": True,
+              "delete": False,
+              "read_comments": True,
+              "add_comment": True
+          },
       },
       "Reader": {
           "Program": {
@@ -212,7 +220,15 @@ class TestProgramEditorsPropagation(base.TestACLPropagation):
               "delete": False,
               "add_comment": True,
               "read_comments": True
-          }
+          },
+          "Document Program": {
+              "read": True,
+              "create_and_map": True,
+              "update": True,
+              "delete": False,
+              "read_comments": True,
+              "add_comment": True
+          },
       },
       "Editor": {
           "Program": {
@@ -311,7 +327,15 @@ class TestProgramEditorsPropagation(base.TestACLPropagation):
               "delete": False,
               "add_comment": True,
               "read_comments": True
-          }
+          },
+          "Document Program": {
+              "read": True,
+              "create_and_map": True,
+              "update": True,
+              "delete": False,
+              "read_comments": True,
+              "add_comment": True
+          },
       },
   }
 
@@ -332,7 +356,7 @@ class TestProgramEditorsPropagation(base.TestACLPropagation):
         object_type="Program",
     ).first()
 
-    rbac_factory = rbac_factories.get_factory(model)
+    rbac_factory = rbac_factories.TEST_FACTORIES_MAPPING[model]
     return rbac_factory(self.people[role].id, program_editor_acr, parent)
 
   @helpers.unwrap(PERMISSIONS)

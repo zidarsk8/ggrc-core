@@ -10,6 +10,7 @@ import {
   buildParam,
   makeRequest,
 } from '../../plugins/utils/query-api-utils';
+import {allowedToMap} from '../../plugins/ggrc_utils';
 
 export default GGRC.Components('issueUnmapItem', {
   tag: 'issue-unmap-item',
@@ -34,7 +35,7 @@ export default GGRC.Components('issueUnmapItem', {
       open: false,
     },
     canUnmap() {
-      return GGRC.Utils.allowed_to_map(this.attr('issueInstance'),
+      return allowedToMap(this.attr('issueInstance'),
         this.attr('target'), {isIssueUnmap: true});
     },
 

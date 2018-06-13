@@ -4,20 +4,37 @@
 */
 
 import workflowHelpers from '../workflow-helpers';
+import {
+  makeFakeInstance,
+  makeFakeModel,
+} from '../../../../js_specs/spec_helpers';
 
 describe('Workflow helpers', () => {
   describe('createCycle() method', () => {
     describe('returns cycle instance which contains', () => {
       let workflow;
+      let originalCycleModel;
+
+      beforeAll(function () {
+        originalCycleModel = CMS.Models.Cycle;
+      });
+
+      afterAll(function () {
+        CMS.Models.Cycle = originalCycleModel;
+      });
 
       beforeEach(function () {
-        workflow = new CMS.Models.Workflow();
+        CMS.Models.Cycle = makeFakeModel({model: CMS.Models.Cycle});
+        workflow = makeFakeInstance({model: CMS.Models.Workflow})();
         workflow.context = {
           stub: jasmine.createSpy('stub'),
         };
       });
 
       it('context equals to workflow context stub object', function () {
+        const stubType = 'Context';
+        const origContextModel = CMS.Models[stubType];
+        CMS.Models[stubType] = makeFakeModel({model: CMS.Models[stubType]});
         const stub = {
           id: 123,
           type: 'Context',
@@ -28,12 +45,16 @@ describe('Workflow helpers', () => {
           .createCycle(workflow)
           .attr('context');
         expect(context.attr()).toEqual(stub);
+        CMS.Models[stubType] = origContextModel;
       });
 
       it('workflow equals to workflow stub object', function () {
+        const stubType = 'Workflow';
+        const origContextModel = CMS.Models[stubType];
+        CMS.Models[stubType] = makeFakeModel({model: CMS.Models[stubType]});
         const stub = {
           id: 123,
-          type: 'Workflow',
+          type: stubType,
         };
         let wfStub;
         workflow.attr('id', stub.id);
@@ -41,6 +62,7 @@ describe('Workflow helpers', () => {
           .createCycle(workflow)
           .attr('workflow');
         expect(wfStub.attr()).toEqual(stub);
+        CMS.Models[stubType] = origContextModel;
       });
 
       it('autogenerate property equals to true', function () {

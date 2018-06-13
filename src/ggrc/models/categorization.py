@@ -7,13 +7,13 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from ggrc import db
 from ggrc.models import reflection
-
-from .mixins import Base
+from ggrc.models.mixins import base
+from ggrc.models.mixins import Base
 
 BACKREF_NAME_FORMAT = '{type}_{scope}_categorizable'
 
 
-class Categorization(Base, db.Model):
+class Categorization(base.ContextRBAC, Base, db.Model):
   """Categorization model."""
   __tablename__ = 'categorizations'
 

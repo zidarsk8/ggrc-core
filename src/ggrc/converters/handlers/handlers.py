@@ -273,8 +273,20 @@ class UserColumnHandler(ColumnHandler):
 class UsersColumnHandler(UserColumnHandler):
   """Handler for multi user fields."""
 
+  def _missed_mandatory_person(self):
+    """Create response for missing mandatory field"""
+    self.add_warning(errors.OWNER_MISSING, column_name=self.display_name)
+    return [get_current_user()]
+
   def parse_item(self):
+    """Parses multi users field."""
     people = set()
+    if self.raw_value in {"-", "--", "---"}:
+      if not self.mandatory:
+        self.set_empty = True
+        return None
+      return self._missed_mandatory_person()
+
     email_lines = self.raw_value.splitlines()
     owner_emails = filter(unicode.strip, email_lines)  # noqa
     for raw_line in owner_emails:
@@ -286,8 +298,7 @@ class UsersColumnHandler(UserColumnHandler):
         self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
 
     if not people and self.mandatory:
-      self.add_warning(errors.OWNER_MISSING, column_name=self.display_name)
-      people.add(get_current_user())
+      return self._missed_mandatory_person()
 
     return list(people)
 
@@ -416,39 +427,17 @@ class TextColumnHandler(ColumnHandler):
 
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
-    if not self.raw_value:
-      return ""
+    value = self.raw_value or ""
+    value = self.clean_whitespaces(value).strip()
 
-    return self.clean_whitespaces(self.raw_value)
+    if self.mandatory and not value:
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+
+    return value
 
   @staticmethod
   def clean_whitespaces(value):
     return re.sub(r'\s+', " ", value)
-
-
-class RequiredTextColumnHandler(TextColumnHandler):
-
-  def parse_item(self):
-    value = self.raw_value or ""
-    clean_value = self.clean_whitespaces(value)
-    if not clean_value:
-      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
-    return clean_value
-
-
-class TextareaColumnHandler(ColumnHandler):
-
-  """ Multi line text field handler """
-
-  def parse_item(self):
-    """ Remove multiple spaces and new lines from text """
-    if not self.raw_value:
-      if self.mandatory:
-        self.add_error(errors.MISSING_VALUE_ERROR,
-                       column_name=self.display_name)
-      return ""
-
-    return re.sub(r'\s+', " ", self.raw_value).strip()
 
 
 class MappingColumnHandler(ColumnHandler):

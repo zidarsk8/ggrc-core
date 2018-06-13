@@ -2,11 +2,12 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc import db
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models import reflection
 
 
-class Event(Base, db.Model):
+class Event(base.ContextRBAC, Base, db.Model):
   __tablename__ = 'events'
 
   action = db.Column(

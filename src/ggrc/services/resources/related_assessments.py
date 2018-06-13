@@ -307,6 +307,7 @@ class RelatedAssessmentsResource(common.Resource):
       for assessment in assessments:
         single_json = assessment.log_json_base()
         single_json["audit"] = assessment.audit.log_json_base()
+        single_json["verified"] = assessment.verified
         single_json["custom_attribute_values"] = [
             cav.log_json_base()
             for cav in assessment.custom_attribute_values

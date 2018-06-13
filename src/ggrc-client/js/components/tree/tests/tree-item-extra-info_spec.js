@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
+
 describe('GGRC.Components.treeItemExtraInfo', function () {
   'use strict';
 
@@ -21,7 +23,9 @@ describe('GGRC.Components.treeItemExtraInfo', function () {
 
     activeModel.forEach(function (model) {
       it('instance is ' + model, function () {
-        viewModel.attr('instance', new CMS.Models[model]());
+        viewModel.attr('instance', makeFakeInstance(
+          {model: CMS.Models[model]}
+        )());
         expect(viewModel.attr('isActive')).toBeTruthy();
       });
     });
@@ -39,7 +43,9 @@ describe('GGRC.Components.treeItemExtraInfo', function () {
     notActiveModels.forEach(function (model) {
       if (CMS.Models[model]) {
         it('instance is ' + model, function () {
-          viewModel.attr('instance', new CMS.Models[model]());
+          viewModel.attr('instance', makeFakeInstance(
+            {model: CMS.Models[model]}
+          )());
           expect(viewModel.attr('isActive')).toBeFalsy();
         });
       }
@@ -71,7 +77,9 @@ describe('GGRC.Components.treeItemExtraInfo', function () {
 
     it('returns true if instance is "CycleTasks" and overdue', function () {
       let result;
-      let instance = new CMS.Models.CycleTaskGroupObjectTask();
+      let instance = makeFakeInstance({
+        model: CMS.Models.CycleTaskGroupObjectTask,
+      })();
       instance.attr('end_date', moment().subtract(5, 'd'));
       viewModel.attr('instance', instance);
 
@@ -83,7 +91,9 @@ describe('GGRC.Components.treeItemExtraInfo', function () {
     it('returns false if instance is "CycleTasks" and not overdue',
       function () {
         let result;
-        let instance = new CMS.Models.CycleTaskGroupObjectTask();
+        let instance = makeFakeInstance({
+          model: CMS.Models.CycleTaskGroupObjectTask,
+        })();
         instance.attr('end_date', moment().add(5, 'd'));
         viewModel.attr('instance', instance);
 

@@ -8,6 +8,7 @@ import {
   buildModifiedListField,
   getInstanceView,
 } from '../utils/object-history-utils';
+import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 
 describe('"buildModifiedACL" method', () => {
   it('should not add duplicates', () => {
@@ -175,7 +176,7 @@ describe('"getInstanceView" method', () => {
     const expectedPath = `${GGRC.mustache_path}/base_objects/info.mustache`;
 
     // "GGRC.Templates" const doesn't contain template for Vendor
-    const instance = new CMS.Models.Vendor();
+    const instance = makeFakeInstance({model: CMS.Models.Vendor})();
 
     const view = getInstanceView(instance);
     expect(view).toEqual(expectedPath);
@@ -185,7 +186,7 @@ describe('"getInstanceView" method', () => {
     const expectedPath = `${GGRC.mustache_path}/risks/info.mustache`;
 
     // "GGRC.Templates" const contains template for Risk
-    const instance = new CMS.Models.Risk();
+    const instance = makeFakeInstance({model: CMS.Models.Risk})();
 
     const view = getInstanceView(instance);
     expect(view).toEqual(expectedPath);
@@ -194,7 +195,7 @@ describe('"getInstanceView" method', () => {
   it('should return "view" path for Person object', () => {
     const expectedPath = `${GGRC.mustache_path}/people_roles/info.mustache`;
 
-    const instance = new CMS.Models.Person();
+    const instance = makeFakeInstance({model: CMS.Models.Person})();
 
     const view = getInstanceView(instance);
     expect(view).toEqual(expectedPath);

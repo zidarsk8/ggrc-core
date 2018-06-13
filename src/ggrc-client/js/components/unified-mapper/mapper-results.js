@@ -90,7 +90,7 @@ export default GGRC.Components('mapperResults', {
 
       this.attr('items').replace([]);
       return this.load()
-        .then(items => {
+        .then((items) => {
           this.attr('items', items);
           this.attr('entries', items.map(function (item) {
             return item.data;
@@ -193,19 +193,16 @@ export default GGRC.Components('mapperResults', {
       // prepare QueryAPI data from advanced search
       let request = [];
       let status;
-      let filters = GGRC.query_parser.parse(
-        AdvancedSearch.buildFilter(this.attr('filterItems'),
-          request));
-      let mappings = GGRC.query_parser.parse(
-        AdvancedSearch.buildFilter(this.attr('mappingItems'),
-          request));
+      let filters =
+        AdvancedSearch.buildFilter(this.attr('filterItems'), request);
+      let mappings =
+        AdvancedSearch.buildFilter(this.attr('mappingItems'), request);
       let advancedFilters = GGRC.query_parser.join_queries(filters, mappings);
 
       // the edge case caused by stateless objects
       if (this.attr('statusItem.value.items')) {
-        status = GGRC.query_parser.parse(
-          AdvancedSearch.buildFilter([this.attr('statusItem')],
-            request));
+        status =
+          AdvancedSearch.buildFilter([this.attr('statusItem')], request);
         advancedFilters = GGRC.query_parser
           .join_queries(advancedFilters, status);
       }
@@ -215,9 +212,14 @@ export default GGRC.Components('mapperResults', {
       if (addPaging) {
         paging.current = this.attr('paging.current');
         paging.pageSize = this.attr('paging.pageSize');
-        if (this.attr('sort.key')) {
-          paging.sortBy = this.attr('sort.key');
-          paging.sortDirection = this.attr('sort.direction');
+
+        let sort = this.attr('sort');
+        let defaultSort = this.attr('defaultSort');
+
+        if (sort && sort.key) {
+          paging.sort = [sort];
+        } else if (defaultSort && defaultSort.length) {
+          paging.sort = defaultSort;
         }
       }
       if (this.shouldApplyUnlockedFilter(modelName)) {

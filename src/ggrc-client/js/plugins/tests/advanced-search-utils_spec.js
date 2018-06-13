@@ -4,78 +4,11 @@
 */
 
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
+import * as StateUtils from '../../plugins/utils/state-utils';
 
-'use strict';
-
-describe('AdvancedSearch', function () {
-  describe('buildFilter() method', function () {
-    it('builds correct statuses with "ANY" operator', function () {
-      let items = [
-        AdvancedSearch.create.state({
-          items: ['Active', 'Draft', 'Deprecated'],
-          operator: 'ANY',
-        }),
-      ];
-      let expectedResult = '("Status"="Active" ' +
-                           'OR "Status"="Draft" ' +
-                           'OR "Status"="Deprecated")';
-
-      expect(AdvancedSearch.buildFilter(items))
-        .toBe(expectedResult);
-    });
-
-    it(`builds correct statuses with "ANY" operator for
-      CycleTaskGroupObjectTask`,
-      function () {
-        let items = [
-          AdvancedSearch.create.state({
-            items: ['Active', 'Draft', 'Deprecated'],
-            operator: 'ANY',
-            modelName: 'CycleTaskGroupObjectTask',
-          }),
-        ];
-        let expectedResult = '("Task State"="Active" ' +
-                             'OR "Task State"="Draft" ' +
-                             'OR "Task State"="Deprecated")';
-
-        expect(AdvancedSearch.buildFilter(items))
-          .toBe(expectedResult);
-      });
-
-    it('builds correct statuses with "NONE" operator', function () {
-      let items = [
-        AdvancedSearch.create.state({
-          items: ['Active', 'Draft', 'Deprecated'],
-          operator: 'NONE',
-        }),
-      ];
-      let expectedResult = '("Status"!="Active" ' +
-                           'AND "Status"!="Draft" ' +
-                           'AND "Status"!="Deprecated")';
-
-      expect(AdvancedSearch.buildFilter(items))
-        .toBe(expectedResult);
-    });
-
-    it(`builds correct statuses with "NONE" operator for
-      CycleTaskGroupObjectTask`,
-      function () {
-        let items = [
-          AdvancedSearch.create.state({
-            items: ['Active', 'Draft', 'Deprecated'],
-            operator: 'NONE',
-            modelName: 'CycleTaskGroupObjectTask',
-          }),
-        ];
-        let expectedResult = '("Task State"!="Active" ' +
-                             'AND "Task State"!="Draft" ' +
-                             'AND "Task State"!="Deprecated")';
-
-        expect(AdvancedSearch.buildFilter(items))
-          .toBe(expectedResult);
-      });
-
-    it('builds correct filter string', function () {
+describe('AdvancedSearch', ()=> {
+  describe('buildFilter() method', ()=> {
+    it('builds correct filter string', ()=> {
       let items = [
         AdvancedSearch.create.state({
           items: ['Active', 'Draft'],
@@ -102,14 +35,44 @@ describe('AdvancedSearch', function () {
           }),
         ]),
       ];
-      let expectedResult = '("Status"="Active" OR "Status"="Draft") ' +
-                           'AND "Title" ~ "test" ' +
-                           'OR ("Para" = "meter" AND "Other" ~= "value")';
-      expect(AdvancedSearch.buildFilter(items))
-        .toBe(expectedResult);
+      let expectedResult = {
+        expression: {
+          left: {
+            left: {
+              left: 'Other',
+              op: {name: '~='},
+              right: 'value',
+            },
+            op: {name: 'AND'},
+            right: {
+              left: 'Para',
+              op: {name: '='},
+              right: 'meter',
+            },
+          },
+          op: {name: 'OR'},
+          right: {
+            left: {
+              left: 'Title',
+              op: {name: '~'},
+              right: 'test',
+            },
+            op: {name: 'AND'},
+            right: {
+              left: 'Status',
+              op: {name: 'IN'},
+              right: ['Active', 'Draft'],
+            },
+          },
+        },
+      };
+
+      let result = AdvancedSearch.buildFilter(items);
+
+      expect(result).toEqual(expectedResult);
     });
 
-    it('builds correct mapping filters', function () {
+    it('builds correct mapping filters', ()=> {
       let items = [
         AdvancedSearch.create.mappingCriteria({
           objectName: 'product',
@@ -156,7 +119,21 @@ describe('AdvancedSearch', function () {
           ]),
         }),
       ];
-      let expectedFilters = '#__previous__,1# AND #__previous__,4#';
+      let expectedFilters = {
+        expression: {
+          left: {
+            object_name: '__previous__',
+            op: {name: 'relevant'},
+            ids: [4],
+          },
+          op: {name: 'AND'},
+          right: {
+            object_name: '__previous__',
+            op: {name: 'relevant'},
+            ids: [1],
+          },
+        },
+      };
       let expectedRequest = [
         {
           object_name: 'system',
@@ -183,7 +160,7 @@ describe('AdvancedSearch', function () {
               right: {
                 object_name: '__previous__',
                 op: {name: 'relevant'},
-                ids: ['0'],
+                ids: [0],
               },
             },
           },
@@ -225,13 +202,13 @@ describe('AdvancedSearch', function () {
                 left: {
                   object_name: '__previous__',
                   op: {name: 'relevant'},
-                  ids: ['2'],
+                  ids: [3],
                 },
                 op: {name: 'OR'},
                 right: {
                   object_name: '__previous__',
                   op: {name: 'relevant'},
-                  ids: ['3'],
+                  ids: [2],
                 },
               },
             },
@@ -242,8 +219,186 @@ describe('AdvancedSearch', function () {
 
       let result = AdvancedSearch.buildFilter(items, request);
 
-      expect(result).toBe(expectedFilters);
-      expect(JSON.parse(JSON.stringify(request))).toEqual(expectedRequest);
+      expect(result).toEqual(expectedFilters);
+      expect(request).toEqual(expectedRequest);
+    });
+
+    it('uses group builder', ()=> {
+      spyOn(AdvancedSearch.builders, 'group').and.returnValue('result');
+      let data = 'data';
+      let request = 'request';
+
+      let result = AdvancedSearch.buildFilter(data, request);
+
+      expect(AdvancedSearch.builders.group).toHaveBeenCalledWith(data, request);
+      expect(result).toBe('result');
+    });
+  });
+
+  describe('reversePolishNotation() method', ()=> {
+    it('builds correct expression', ()=> {
+      let items = [
+        AdvancedSearch.create.state({
+          items: ['Active', 'Draft'],
+          operator: 'ANY',
+        }),
+        AdvancedSearch.create.operator('AND'),
+        AdvancedSearch.create.attribute({
+          field: 'Title',
+          operator: '~',
+          value: ' test',
+        }),
+        AdvancedSearch.create.operator('OR'),
+        AdvancedSearch.create.group([
+          AdvancedSearch.create.attribute({
+            field: 'Para',
+            operator: '=',
+            value: 'meter',
+          }),
+          AdvancedSearch.create.operator('AND'),
+          AdvancedSearch.create.attribute({
+            field: 'Other',
+            operator: '~=',
+            value: 'value ',
+          }),
+        ]),
+      ];
+      let expectedResult = [{
+        type: 'state',
+        value: {
+          items: ['Active', 'Draft'],
+          operator: 'ANY',
+        },
+      }, {
+        type: 'attribute',
+        value: {
+          field: 'Title',
+          operator: '~',
+          value: ' test',
+        },
+      }, {
+        type: 'operator',
+        value: 'AND',
+      }, {
+        type: 'group',
+        value: [{
+          type: 'attribute',
+          value: {
+            field: 'Para',
+            operator: '=',
+            value: 'meter',
+          },
+        }, {
+          type: 'operator',
+          value: 'AND',
+        }, {
+          type: 'attribute',
+          value: {
+            field: 'Other',
+            operator: '~=',
+            value: 'value ',
+          },
+        }]}, {
+        type: 'operator',
+        value: 'OR',
+      }];
+
+      let result = AdvancedSearch.reversePolishNotation(items);
+
+      expect(result).toEqual(expectedResult);
+    });
+  });
+
+  describe('builders', ()=> {
+    describe('attribute builder', ()=> {
+      it('builds correct filter expression', ()=> {
+        let item = AdvancedSearch.create.attribute({
+          field: 'field',
+          operator: 'operator',
+          value: 'value',
+        });
+
+        let expression = AdvancedSearch.builders.attribute(item.value);
+
+        expect(expression).toEqual({
+          expression: {
+            left: 'field',
+            op: {name: 'operator'},
+            right: 'value',
+          },
+        });
+      });
+    });
+
+    describe('state builder', ()=> {
+      let item;
+      let expectedResult;
+      beforeEach(()=> {
+        item = AdvancedSearch.create.state({
+          modelName: 'testModelName',
+          items: ['test'],
+        });
+        expectedResult = {test: 'result'};
+        spyOn(StateUtils, 'buildStatusFilter').and.returnValue(expectedResult);
+      });
+
+      it('correctly call buildStatusFilter() if operator is ANY', ()=> {
+        item.value.operator = 'ANY';
+
+        let result = AdvancedSearch.builders.state(item.value);
+
+        expect(StateUtils.buildStatusFilter)
+          .toHaveBeenCalledWith(['test'], 'testModelName', false);
+        expect(result).toBe(expectedResult);
+      });
+
+      it('correctly call buildStatusFilter() if operator is NONE', ()=> {
+        item.value.operator = 'NONE';
+
+        let result = AdvancedSearch.builders.state(item.value);
+
+        expect(StateUtils.buildStatusFilter)
+          .toHaveBeenCalledWith(['test'], 'testModelName', true);
+        expect(result).toBe(expectedResult);
+      });
+    });
+
+    describe('group builder', ()=> {
+      let items;
+      beforeEach(()=> {
+        items = [
+          AdvancedSearch.create.state({
+            modelName: 'testModelName',
+            items: ['test'],
+          }),
+          AdvancedSearch.create.operator('AND'),
+          AdvancedSearch.create.attribute({
+            field: 'field',
+            operator: 'operator',
+            value: 'value',
+          }),
+        ];
+      });
+
+      it('calls corresponding builder for each item', ()=> {
+        let expression = {expression: {}};
+        spyOn(AdvancedSearch.builders, 'state').and.returnValue(expression);
+        spyOn(AdvancedSearch.builders, 'attribute').and.returnValue(expression);
+
+        AdvancedSearch.builders.group(items);
+
+        expect(AdvancedSearch.builders.state).toHaveBeenCalled();
+        expect(AdvancedSearch.builders.attribute).toHaveBeenCalled();
+      });
+
+      it('joins results to single expression', ()=> {
+        spyOn(GGRC.query_parser, 'join_queries').and.returnValue('joined');
+
+        let result = AdvancedSearch.builders.group(items);
+
+        expect(GGRC.query_parser.join_queries).toHaveBeenCalled();
+        expect(result).toBe('joined');
+      });
     });
   });
 });

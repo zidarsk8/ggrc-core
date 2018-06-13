@@ -21,6 +21,20 @@ export default can.Component.extend({
     let type = attrs.type;
     let targetStates = getBulkStatesForModel(type);
     let targetState = targetStates.length ? targetStates[0] : null;
+    let defaultSort = [
+      {
+        key: 'task due date',
+        direction: 'asc',
+      },
+      {
+        key: 'Task Assignees',
+        direction: 'asc',
+      },
+      {
+        key: 'task title',
+        direction: 'asc',
+      },
+    ];
 
     return ObjectOperationsBaseVM.extend({
       type: attrs.type,
@@ -34,6 +48,7 @@ export default can.Component.extend({
       showTargetState: true,
       targetStates: targetStates,
       targetState: targetState,
+      defaultSort: defaultSort,
       callback: parentViewModel.attr('callback'),
     });
   },

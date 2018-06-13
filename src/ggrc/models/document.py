@@ -15,8 +15,8 @@ from ggrc.models import exceptions
 from ggrc.models import reflection
 from ggrc.models import mixins
 from ggrc.models.deferred import deferred
+from ggrc.models.mixins import base
 from ggrc.models.mixins import before_flush_handleable as bfh
-from ggrc.models.mixins.base import Identifiable
 from ggrc.models.mixins.statusable import Statusable
 from ggrc.models.mixins import with_relationship_created_handler as wrch
 from ggrc.models.relationship import Relatable
@@ -24,10 +24,10 @@ from ggrc.utils import referenced_objects
 
 
 class Document(Roleable, Relatable, mixins.Titled,
-               bfh.BeforeFlushHandleable, mixins.Slugged, Statusable,
+               bfh.BeforeFlushHandleable, Statusable,
                mixins.WithLastDeprecatedDate, comment.Commentable,
                wrch.WithRelationshipCreatedHandler,
-               Indexed, Identifiable, db.Model):
+               Indexed, base.ContextRBAC, mixins.Slugged, db.Model):
   """Document model."""
   __tablename__ = 'documents'
 

@@ -7,6 +7,7 @@ import template from './last-comment.mustache';
 import RefreshQueue from '../../models/refresh_queue';
 import {peopleWithRoleName} from '../../plugins/utils/acl-utils.js';
 import {COMMENT_CREATED} from '../../events/eventTypes';
+import {formatDate} from '../../plugins/ggrc_utils';
 
 export default can.Component.extend({
   tag: 'last-comment',
@@ -33,7 +34,7 @@ export default can.Component.extend({
       this.attr('author', person);
     },
     tooltip() {
-      const date = GGRC.Utils.formatDate(this.attr('comment.created_at'), true);
+      const date = formatDate(this.attr('comment.created_at'), true);
       const authorEmail = this.attr('author.email');
 
       if (date && authorEmail) {

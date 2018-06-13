@@ -4,6 +4,7 @@
 */
 
 import * as gDriveUtils from '../../../plugins/utils/gdrive-picker-utils';
+import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 
 describe('GGRC.Components.attachButton', function () {
   'use strict';
@@ -12,7 +13,9 @@ describe('GGRC.Components.attachButton', function () {
 
   beforeEach(function () {
     viewModel = GGRC.Components.getViewModel('attachButton');
-    viewModel.attr('instance', new CMS.Models.Assessment());
+    viewModel.attr('instance',
+      makeFakeInstance({model: CMS.Models.Assessment})()
+    );
   });
 
   describe('refresh() method', function () {

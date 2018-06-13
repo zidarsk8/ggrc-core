@@ -14,6 +14,7 @@ from ggrc.models.object_document import PublicDocumentable
 from ggrc.access_control.roleable import Roleable
 from ggrc.models.categorization import Categorizable
 from ggrc.models.category import CategoryBase
+from ggrc.models.mixins import base
 from ggrc.models import mixins
 from ggrc.models.mixins.with_last_assessment_date import WithLastAssessmentDate
 from ggrc.models.deferred import deferred
@@ -156,6 +157,7 @@ class Control(WithLastAssessmentDate,
               mixins.TestPlanned,
               Commentable,
               WithSimilarityScore,
+              base.ContextRBAC,
               mixins.BusinessObject,
               Indexed,
               mixins.Folderable,

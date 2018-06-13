@@ -12,6 +12,7 @@ import router from '../router';
 import {
   getDefaultStatesForModel,
 } from '../plugins/utils/state-utils';
+import {loadScript} from '../plugins/ggrc_utils';
 
 export default can.Control({
   defaults: {
@@ -322,7 +323,7 @@ export default can.Control({
       callback();
       return;
     }
-    GGRC.Utils.loadScript('https://www.gstatic.com/charts/loader.js', function () {
+    loadScript('https://www.gstatic.com/charts/loader.js', function () {
       google.charts.load('45', {packages: ['corechart']});
       google.charts.setOnLoadCallback(callback);
     });

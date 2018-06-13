@@ -8,9 +8,13 @@ from datetime import date
 
 import ddt
 from freezegun import freeze_time
+from dateutil import parser as date_parser
 
+from ggrc import db
 from ggrc.models import all_models
 from ggrc.utils import create_stub
+from ggrc.models.person_profile import (PersonProfile,
+                                        default_last_seen_date as default_date)
 
 from integration.ggrc.access_control import acl_helper
 from integration.ggrc.models import factories
@@ -32,6 +36,160 @@ class TestPersonResource(TestCase, WithQueryApi):
     self.api = Api()
     self.generator = WorkflowsGenerator()
 
+  @staticmethod
+  def _create_users_names_rbac(users):
+    """Create name and Creator role for users, created vid PersonFactory"""
+    if not users:
+      return
+    roles = {r.name: r for r in all_models.Role.query.all()}
+    for user in users:
+      user.name = user.email.split("@")[0]
+      rbac_factories.UserRoleFactory(role=roles["Creator"], person=user)
+
+  def assert_profile_get_successful(self, response, expected_datetime):
+    """Verify assertions for successful GET profile method"""
+    self.assert200(response)
+    response_datetime = date_parser.parse(response.json["last_seen_whats_new"])
+    self.assertEqual(expected_datetime, response_datetime)
+
+  @freeze_time("2018-05-20 12:23:17")
+  def test_profile_get_successful(self):
+    """Test person_profile GET method successfully achieves correct data"""
+    with factories.single_commit():
+      user = factories.PersonFactory()
+      self._create_users_names_rbac([user])
+    self.api.set_user(person=user)
+
+    response = self.api.client.get("/api/people/{}/profile".format(user.id))
+    self.assert_profile_get_successful(response, default_date())
+
+  def test_profile_get_no_profile(self):
+    """Test person_profile GET method achieves data with missing profile"""
+    with factories.single_commit():
+      user = factories.PersonFactory()
+      self._create_users_names_rbac([user])
+    self.api.set_user(person=user)
+
+    profiles_table = PersonProfile.__table__
+    db_request = profiles_table.delete().where(
+        profiles_table.c.person_id == user.id)
+    db.engine.execute(db_request)
+    with freeze_time("2018-05-28 23:30:10"):
+      response = self.api.client.get("/api/people/{}/profile".format(user.id))
+      self.assert_profile_get_successful(response, default_date())
+
+  def test_profile_get_failed(self):
+    """Test person_profiles GET method fails
+
+    Now only logged user can request his profile
+    """
+    with factories.single_commit():
+      valid_user = factories.PersonFactory()
+      self._create_users_names_rbac([valid_user])
+
+    response = self.client.get(
+        "/api/people/{}/profile".format(valid_user.id))
+    # logged with default user during setUp
+    self.assert403(response)
+    response = self.api.client.get(
+        "/api/people/{}/profile".format(valid_user.id))
+    # not authorized user
+    self.assert403(response)
+
+  def assert_profile_put_successful(self,
+                                    response,
+                                    correct_response,
+                                    user,
+                                    new_date):
+    """Verify assertions for successful PUT profile method"""
+    self.assert200(response)
+    self.assertEqual(response.json, correct_response)
+    profile = PersonProfile.query.filter_by(person_id=user.id).first()
+    self.assertEqual(profile.last_seen_whats_new, date_parser.parse(new_date))
+
+  def test_profile_put_successful(self):
+    """Test person_profile PUT method for setting data and correct response"""
+    with factories.single_commit():
+      user = factories.PersonFactory()
+      self._create_users_names_rbac([user])
+    self.api.set_user(person=user)
+
+    new_date = "2018-05-20 16:38:17"
+    data = {"last_seen_whats_new": new_date}
+    correct_response = {"Person": {"id": user.id, "profile": data}}
+    response = self.api.client.put("/api/people/{}/profile".format(user.id),
+                                   content_type='application/json',
+                                   data=json.dumps(data),
+                                   headers=[('X-Requested-By', 'Tests')])
+    self.assert_profile_put_successful(response,
+                                       correct_response,
+                                       user,
+                                       new_date)
+
+  def test_profile_put_no_profile(self):
+    """Test person_profile PUT method for setting data for missing profile"""
+    with factories.single_commit():
+      user = factories.PersonFactory()
+      self._create_users_names_rbac([user])
+    self.api.set_user(person=user)
+
+    new_date = "2018-05-20 22:05:17"
+    data = {"last_seen_whats_new": new_date}
+    correct_response = {"Person": {"id": user.id, "profile": data}}
+    profiles_table = PersonProfile.__table__
+    db_request = profiles_table.delete().where(
+        profiles_table.c.person_id == user.id)
+    db.engine.execute(db_request)
+    response = self.api.client.put("/api/people/{}/profile".format(user.id),
+                                   content_type='application/json',
+                                   data=json.dumps(data),
+                                   headers=[('X-Requested-By', 'Tests')])
+    self.assert_profile_put_successful(response,
+                                       correct_response,
+                                       user,
+                                       new_date)
+
+  def test_profile_put_unauthorized(self):
+    """Test person_profiles PUT method fails for unauthorized user"""
+    with factories.single_commit():
+      user = factories.PersonFactory()
+      self._create_users_names_rbac([user])
+
+    new_date = "2018-05-20 22:05:17"
+    data = {"last_seen_whats_new": new_date}
+    response = self.client.put("/api/people/{}/profile".format(user.id),
+                               content_type='application/json',
+                               data=json.dumps(data),
+                               headers=[('X-Requested-By', 'Tests')])
+    # logged with default user during setUp
+    self.assert403(response)
+    response = self.api.client.put("/api/people/{}/profile".format(user.id),
+                                   content_type='application/json',
+                                   data=json.dumps(data),
+                                   headers=[('X-Requested-By', 'Tests')])
+    # not authorized user
+    self.assert403(response)
+
+  @ddt.data({"last_seen_whats_new": "NOT A 123 DAT456A"},
+            {"other_key": "2018-05-20 22:05:17", "one_more_key": 42})
+  def test_profile_put_corrupted_data(self, data):
+    """Test person_profiles PUT method fails via incorrect request data
+
+    If request doesn't have "last_seen_whats_new" key or date is incorrect,
+      response is code 400 "Bad Request"
+    """
+    with factories.single_commit():
+      user = factories.PersonFactory()
+      self._create_users_names_rbac([user])
+    self.api.set_user(person=user)
+
+    response = self.api.client.put("/api/people/{}/profile".format(user.id),
+                                   content_type='application/json',
+                                   data=json.dumps(data),
+                                   headers=[('X-Requested-By', 'Tests')])
+    # missed key in request
+    self.assert400(response)
+
   def test_task_count_empty(self):
     """Test query count without any workflows and tasks."""
     user = all_models.Person.query.first()
@@ -43,19 +201,19 @@ class TestPersonResource(TestCase, WithQueryApi):
 
   @ddt.data(
       (True, [
-          ("task 1", "Finished", 3, True),
-          ("task 1", "Verified", 2, True),
-          ("task 2", "Declined", 2, True),
-          ("task 2", "Verified", 1, False),
-          ("task 2", "Finished", 2, True),
-          ("task 3", "Verified", 1, True),
-          ("task 2", "Verified", 0, False),
+          ("task 1", "Finished", 3, True, 3),
+          ("task 1", "Verified", 2, True, 3),
+          ("task 2", "Declined", 2, True, 3),
+          ("task 2", "Verified", 1, False, 3),
+          ("task 2", "Finished", 2, True, 3),
+          ("task 3", "Verified", 1, True, 3),
+          ("task 2", "Verified", 0, False, 3),
       ]),
       (False, [
-          ("task 1", "Finished", 2, True),
-          ("task 2", "In Progress", 2, True),
-          ("task 2", "Finished", 1, False),
-          ("task 3", "Finished", 0, False),
+          ("task 1", "Finished", 2, True, 3),
+          ("task 2", "In Progress", 2, True, 3),
+          ("task 2", "Finished", 1, False, 3),
+          ("task 3", "Finished", 0, False, 3),
       ]),
   )
   @ddt.unpack
@@ -81,6 +239,10 @@ class TestPersonResource(TestCase, WithQueryApi):
         all_models.AccessControlRole.name == "Task Assignees",
         all_models.AccessControlRole.object_type == "TaskGroupTask",
     ).one().id
+    secondary_role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Task Secondary Assignees",
+        all_models.AccessControlRole.object_type == "TaskGroupTask",
+    ).one().id
 
     one_time_workflow = {
         "title": "Person resource test workflow",
@@ -95,14 +257,19 @@ class TestPersonResource(TestCase, WithQueryApi):
                 "title": "task 1",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, user.id)],
+                    acl_helper.get_acl_json(role_id, user.id),
+                    acl_helper.get_acl_json(secondary_role_id, user.id)
+                ],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 15),
             }, {
                 "title": "task 2",
                 "description": "some task 3",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, user.id)],
+                    acl_helper.get_acl_json(role_id, user.id),
+                    acl_helper.get_acl_json(secondary_role_id, user.id),
+                    acl_helper.get_acl_json(secondary_role_id, dummy_user.id)
+                ],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 9, 16),
             }, {
@@ -183,12 +350,21 @@ class TestPersonResource(TestCase, WithQueryApi):
           {"open_task_count": 3, "has_overdue": True}
       )
 
-      for task, status, count, overdue in transitions:
+      for task, status, count, overdue, my_work_count in transitions:
         self.generator.modify_object(tasks[task], data={"status": status})
-        response = self.client.get("/api/people/{}/task_count".format(user_id))
+        task_count_response = \
+            self.client.get("/api/people/{}/task_count".format(user_id))
+        my_work_count_response = \
+            self.client.get("/api/people/{}/my_work_count".format(user_id))
+
         self.assertEqual(
-            response.json,
+            task_count_response.json,
             {"open_task_count": count, "has_overdue": overdue}
+        )
+
+        self.assertEqual(
+            my_work_count_response.json["CycleTaskGroupObjectTask"],
+            my_work_count
         )
 
   def test_task_count_multiple_wfs(self):

@@ -3,11 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {getInScopeModels} from '../../../plugins/utils/snapshot-utils';
+import * as Utils from '../../../plugins/ggrc_utils';
 
 describe('GGRC.Mappings', function () {
-  'use strict';
-
   let allTypes = [];
   let notMappableModels = [];
   let modules = {
@@ -99,10 +97,11 @@ describe('GGRC.Mappings', function () {
     Contract: _.difference(filtered, directives),
     Control: filtered,
     CycleTaskGroupObjectTask: _.difference(filtered, ['Person',
-      'TaskGroup', 'Workflow', 'Assessment']),
+      'TaskGroup', 'Workflow', 'Assessment', 'Document']),
     DataAsset: filtered,
     Evidence: ['Assessment', 'Audit'],
-    Document: _.difference(filtered, ['Audit', 'Assessment']),
+    Document: _.difference(filtered,
+      ['Audit', 'Assessment', 'Document', 'Person', 'Workflow', 'TaskGroup']),
     Facility: filtered,
     Issue: _.difference(filtered, [
       'Audit', 'Person', 'Workflow', 'Assessment']),
@@ -125,7 +124,7 @@ describe('GGRC.Mappings', function () {
     Standard: _.difference(filtered, directives),
     System: filtered,
     TaskGroup: _.difference(filtered, ['Audit', 'Person',
-      'TaskGroup', 'Workflow', 'Assessment']),
+      'TaskGroup', 'Workflow', 'Assessment', 'Document']),
     Threat: filtered,
     Vendor: filtered,
   };
@@ -217,7 +216,7 @@ describe('GGRC.Mappings', function () {
     it('adds type to governance group if no group with category of this type',
       function () {
         groups.category = undefined;
-        spyOn(GGRC.Utils, 'getModelByType')
+        spyOn(Utils, 'getModelByType')
           .and.returnValue({
             title_singular: 'title_singular',
           });
@@ -228,7 +227,7 @@ describe('GGRC.Mappings', function () {
     it('adds type to group of category of this type if this group exist',
       function () {
         groups.governance = undefined;
-        spyOn(GGRC.Utils, 'getModelByType')
+        spyOn(Utils, 'getModelByType')
           .and.returnValue({
             title_singular: 'title_singular',
           });
@@ -237,14 +236,14 @@ describe('GGRC.Mappings', function () {
       });
 
     it('does nothing if cmsModel is not defined', function () {
-      spyOn(GGRC.Utils, 'getModelByType');
+      spyOn(Utils, 'getModelByType');
       GGRC.Mappings._addFormattedType('name', groups);
       expect(groups.governance.items.length).toEqual(0);
       expect(groups[type.category].items.length).toEqual(0);
     });
     it('does nothing if singular title of cmsModel is not defined',
       function () {
-        spyOn(GGRC.Utils, 'getModelByType')
+        spyOn(Utils, 'getModelByType')
           .and.returnValue({});
         GGRC.Mappings._addFormattedType('name', groups);
         expect(groups.governance.items.length).toEqual(0);
@@ -252,7 +251,7 @@ describe('GGRC.Mappings', function () {
       });
     it('does nothing if singular title of cmsModel is "Reference"',
       function () {
-        spyOn(GGRC.Utils, 'getModelByType')
+        spyOn(Utils, 'getModelByType')
           .and.returnValue({
             title_singular: 'Reference',
           });
