@@ -66,6 +66,10 @@
                       {{/if}}
                     </div>
                   </div><!-- row-fluid end -->
+                  {{#if instance.can_use_issue_tracker}}
+                    <info-issue-tracker-fields {instance}="instance">
+                    </info-issue-tracker-fields>
+                  {{/if}}
                 </div><!-- hidden-fields-area end -->
               </div><!-- custom-attr-wrap end -->
               {{>'/static/mustache/custom_attributes/info.mustache'}}
