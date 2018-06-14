@@ -194,15 +194,15 @@ export default GGRC.Components('mapperResults', {
       let request = [];
       let status;
       let filters =
-        AdvancedSearch.buildFilter(this.attr('filterItems'), request);
+        AdvancedSearch.buildFilter(this.attr('filterItems').attr(), request);
       let mappings =
-        AdvancedSearch.buildFilter(this.attr('mappingItems'), request);
+        AdvancedSearch.buildFilter(this.attr('mappingItems').attr(), request);
       let advancedFilters = GGRC.query_parser.join_queries(filters, mappings);
 
       // the edge case caused by stateless objects
       if (this.attr('statusItem.value.items')) {
         status =
-          AdvancedSearch.buildFilter([this.attr('statusItem')], request);
+          AdvancedSearch.buildFilter([this.attr('statusItem').attr()], request);
         advancedFilters = GGRC.query_parser
           .join_queries(advancedFilters, status);
       }

@@ -555,8 +555,8 @@ viewModel = can.Map.extend({
     this.attr('advancedSearch.open', true);
   },
   applyAdvancedFilters: function () {
-    let filters = this.attr('advancedSearch.filterItems');
-    let mappings = this.attr('advancedSearch.mappingItems');
+    let filters = this.attr('advancedSearch.filterItems').attr();
+    let mappings = this.attr('advancedSearch.mappingItems').attr();
     let request = can.List();
     let advancedFilters;
 
