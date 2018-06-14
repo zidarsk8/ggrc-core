@@ -5,7 +5,7 @@
 
 from logging import getLogger
 
-from ggrc import models
+from ggrc.models import all_models
 from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
 from ggrc.login import get_current_user_id
@@ -18,7 +18,7 @@ logger = getLogger(__name__)
 class EvidenceUrlHandler(handlers.ColumnHandler):
   """Handler for Evidence URL field on evidence imports."""
 
-  KIND = models.Evidence.URL
+  KIND = all_models.Evidence.URL
 
   @staticmethod
   def _parse_line(line):
@@ -46,7 +46,7 @@ class EvidenceUrlHandler(handlers.ColumnHandler):
 
   def build_evidence(self, link, title, user_id):
     """Build evidence object"""
-    evidence = models.Evidence(
+    evidence = all_models.Evidence(
         link=link,
         title=title,
         modified_by_id=user_id,
@@ -110,8 +110,8 @@ class EvidenceUrlHandler(handlers.ColumnHandler):
       if new_link in old_link_map:
         old_link_map[new_link].title = new_evid.title
       else:
-        models.Relationship(source=self.row_converter.obj,
-                            destination=new_evid)
+        all_models.Relationship(source=self.row_converter.obj,
+                                destination=new_evid)
 
     for old_link, old_doc in old_link_map.iteritems():
       if old_link in new_link_map:
