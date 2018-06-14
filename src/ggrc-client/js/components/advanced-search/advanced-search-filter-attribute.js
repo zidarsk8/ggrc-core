@@ -30,8 +30,8 @@ let viewModel = can.Map.extend({
         let attribute = this.attr('attribute');
         if (attributes.length &&
           attributes[0].attr_title &&
-          !attribute.field) {
-          attribute.field = attributes[0].attr_title;
+          !attribute.attr('field')) {
+          attribute.attr('field', attributes[0].attr_title);
         }
         return attributes;
       },

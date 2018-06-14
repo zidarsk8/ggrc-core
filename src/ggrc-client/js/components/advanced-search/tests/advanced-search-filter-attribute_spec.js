@@ -23,7 +23,7 @@ describe('GGRC.Components.advancedSearchFilterAttribute', function () {
           attr_title: 'FirstAttr',
         }]);
 
-        expect(viewModel.attr('attribute').field).toBe('FirstAttr');
+        expect(viewModel.attr('attribute.field')).toBe('FirstAttr');
       });
 
     it('does not intialize "attribute.field" when it is already initialized',
