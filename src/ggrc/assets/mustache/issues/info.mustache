@@ -67,7 +67,9 @@
                     </div>
                   </div><!-- row-fluid end -->
                   {{#if instance.can_use_issue_tracker}}
-                    <info-issue-tracker-fields {instance}="instance">
+                    <info-issue-tracker-fields
+                      {instance}="instance"
+                      {note}="'If it is turned on, a bug will be generated for this issue.'">
                     </info-issue-tracker-fields>
                   {{/if}}
                 </div><!-- hidden-fields-area end -->

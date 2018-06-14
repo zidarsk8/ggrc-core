@@ -12,5 +12,6 @@ export default can.Component.extend({
   template,
   viewModel: {
     instance: {},
+    note: '',
   },
 });

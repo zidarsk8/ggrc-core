@@ -17,6 +17,7 @@ export default can.Component.extend({
   viewModel: {
     instance: {},
     issueTrackerEnabled: false,
+    note: '',
   },
   events: {
     inserted() {

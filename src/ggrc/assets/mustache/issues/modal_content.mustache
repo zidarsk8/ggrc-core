@@ -163,7 +163,9 @@
         <issue-tracker-switcher
           {instance}="instance"
           {(is-integration-enabled)}="instance.issue_tracker.enabled">
-            <modal-issue-tracker-fields {instance}="instance">
+            <modal-issue-tracker-fields
+              {instance}="instance"
+              {note}="'If it is turned on, a bug will be generated for this issue.'">
             </modal-issue-tracker-fields>
         </issue-tracker-switcher>
       </div>
