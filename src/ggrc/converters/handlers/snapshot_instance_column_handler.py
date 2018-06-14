@@ -29,19 +29,18 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
     return None
 
   def get_audit_object_pool_query(self, child_ids=None):
-    if self.row_converter.is_new and self.related_audit:
-      query = models.Snapshot.query.filter(
-          models.Snapshot.parent_id == self.related_audit.id,
-          models.Snapshot.parent_type == models.Audit.__name__,
-          models.Snapshot.child_type == self.mapping_object.__name__,
-
-      )
+    if isinstance(self.row_converter.obj, models.Audit):
+      audit_id = self.row_converter.obj.id
+    elif hasattr(self.row_converter.obj, "audit_id"):
+      audit_id = getattr(self.row_converter.obj, "audit_id")
+    elif self.row_converter.is_new and self.related_audit:
+      audit_id = self.related_audit.id
     else:
       sub = models.Relationship.get_related_query(
           self.row_converter.obj,
           models.Audit(),
       ).subquery("audit")
-      case_statement = sqlalchemy.case(
+      audit_id = sqlalchemy.case(
           [
               (
                   sub.c.destination_type == models.Audit.__name__,
@@ -50,11 +49,11 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
           ],
           else_=sub.c.source_id,
       )
-      query = models.Snapshot.query.filter(
-          models.Snapshot.parent_id == case_statement,
-          models.Snapshot.parent_type == models.Audit.__name__,
-          models.Snapshot.child_type == self.mapping_object.__name__,
-      )
+    query = models.Snapshot.query.filter(
+        models.Snapshot.parent_id == audit_id,
+        models.Snapshot.parent_type == models.Audit.__name__,
+        models.Snapshot.child_type == self.mapping_object.__name__,
+    )
     if child_ids:
       query = query.filter(models.Snapshot.child_id.in_(child_ids))
     return query
