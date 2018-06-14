@@ -20,19 +20,6 @@ class EvidenceUrlHandler(handlers.ColumnHandler):
 
   KIND = all_models.Evidence.URL
 
-  @staticmethod
-  def _parse_line(line):
-    """Parse a single line and return link and title.
-
-    Args:
-      line: string containing a single line from a cell.
-
-    Returns:
-      tuple containing a link and a title.
-    """
-    link = title = line.strip()
-    return link, title
-
   def _get_old_map(self):
     return {d.link: d for d in self.row_converter.obj.evidences_url}
 
@@ -44,11 +31,11 @@ class EvidenceUrlHandler(handlers.ColumnHandler):
     """
     return "\n".join(doc.link for doc in self.row_converter.obj.evidences_url)
 
-  def build_evidence(self, link, title, user_id):
+  def build_evidence(self, link, user_id):
     """Build evidence object"""
     evidence = all_models.Evidence(
         link=link,
-        title=title,
+        title=link,
         modified_by_id=user_id,
         context=self.row_converter.obj.context,
         kind=self.KIND,
@@ -69,15 +56,15 @@ class EvidenceUrlHandler(handlers.ColumnHandler):
     user_id = get_current_user_id()
 
     for line in self.raw_value.splitlines():
-      link, title = self._parse_line(line)
-      if not (link and title):
+      link = line.strip()
+      if not link:
         continue
 
       if link in new_links:
         duplicate_new_links.add(link)
       else:
         new_links.add(link)
-        evidences.append(self.build_evidence(link, title, user_id))
+        evidences.append(self.build_evidence(link, user_id))
 
     if duplicate_new_links:
       # NOTE: We rely on the fact that links in duplicate_new_links are all
