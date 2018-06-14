@@ -1,13 +1,14 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+from sqlalchemy import orm
+
 from ggrc import db
-from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models import reflection
 
 
-class Event(base.ContextRBAC, Base, db.Model):
+class Event(Base, db.Model):
   __tablename__ = 'events'
 
   action = db.Column(
@@ -42,8 +43,6 @@ class Event(base.ContextRBAC, Base, db.Model):
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(Event, cls).eager_query()
     return query.options(
         orm.subqueryload('revisions').undefer_group('Revision_complete'),
