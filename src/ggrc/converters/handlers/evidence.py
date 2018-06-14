@@ -124,7 +124,7 @@ class EvidenceUrlHandler(handlers.ColumnHandler):
         logger.warning("Invalid relationship state for document URLs.")
 
 
-class EvidenceFileHandler(EvidenceUrlHandler):
+class EvidenceFileHandler(handlers.ColumnHandler):
   """Handler for evidence of type file on evidence imports."""
 
   def set_obj_attr(self):

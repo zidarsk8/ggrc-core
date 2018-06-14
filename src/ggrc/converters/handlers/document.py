@@ -132,7 +132,7 @@ class DocumentReferenceUrlHandler(handlers.ColumnHandler):
         logger.warning("Invalid relationship state for document URLs.")
 
 
-class DocumentFileHandler(DocumentReferenceUrlHandler):
+class DocumentFileHandler(handlers.ColumnHandler):
   """Handler for Document File field on document imports."""
 
   KIND = all_models.Document.FILE
