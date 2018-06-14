@@ -8,14 +8,20 @@ import {getRole} from '../plugins/utils/acl-utils';
 import {getClosestWeekday} from '../plugins/utils/date-util';
 import {getPageType} from '../plugins/utils/current-page-utils';
 import {REFRESH_SUB_TREE} from '../events/eventTypes';
+import tracker from '../tracker';
 
 (function (can) {
   let _mustachePath;
 
   function refreshAttr(instance, attr) {
+    let result;
     if (instance.attr(attr).reify().selfLink) {
-      instance.attr(attr).reify().refresh();
+      result = instance.attr(attr).reify().refresh();
+    } else {
+      result = can.Deferred().resolve();
     }
+
+    return result;
   }
 
   function refreshAttrWrap(attr) {
@@ -159,11 +165,30 @@ import {REFRESH_SUB_TREE} from '../events/eventTypes';
     },
     init: function () {
       this._super.apply(this, arguments);
-      this.bind('created',
-        refreshAttrWrap('cycle_task_group_object_task').bind(this));
+      this.bind('created', (ev, instance) => {
+        if (instance instanceof this) {
+          return $.when(Permission.refresh(),
+            refreshAttr(instance, 'cycle_task_group_object_task'))
+            .then(() => {
+              tracker.stop('CycleTaskEntry',
+                tracker.USER_JOURNEY_KEYS.INFO_PANE,
+                tracker.USER_ACTIONS.CYCLE_TASK.ADD_COMMENT);
+            });
+        }
+      });
       this.validateNonBlank('description');
     },
-  }, {});
+  }, {
+    save() {
+      if (this.isNew()) {
+        tracker.start('CycleTaskEntry',
+          tracker.USER_JOURNEY_KEYS.INFO_PANE,
+          tracker.USER_ACTIONS.CYCLE_TASK.ADD_COMMENT);
+      }
+
+      return this._super(...arguments);
+    },
+  });
 
   _mustachePath = GGRC.mustache_path + '/cycle_task_groups';
   can.Model.Cacheable('CMS.Models.CycleTaskGroup', {
