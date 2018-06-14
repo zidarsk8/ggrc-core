@@ -221,7 +221,7 @@ class TestTaskAssigneesPropagation(base.TestACLPropagation):
         object_type="TaskGroupTask",
     ).first()
 
-    rbac_factory = rbac_factories.get_factory(model)
+    rbac_factory = rbac_factories.TEST_FACTORIES_MAPPING[model]
     return rbac_factory(self.people[role].id, task_assignees_acr, parent)
 
   @helpers.unwrap(PERMISSIONS)

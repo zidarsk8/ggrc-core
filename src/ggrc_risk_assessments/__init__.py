@@ -85,28 +85,28 @@ program_type.mix_risk_assessments_into_program()
 class RiskAssessmentRoleContributions(RoleContributions):
   contributions = {
       'ProgramOwner': {
-          'create': ['RiskAssessment', 'Document'],
-          'read': ['RiskAssessment', 'Document'],
-          'update': ['RiskAssessment', 'Document'],
-          'delete': ['RiskAssessment', 'Document'],
+          'create': ['RiskAssessment'],
+          'read': ['RiskAssessment'],
+          'update': ['RiskAssessment'],
+          'delete': ['RiskAssessment'],
       },
       'ProgramEditor': {
-          'create': ['RiskAssessment', 'Document'],
-          'read': ['RiskAssessment', 'Document'],
-          'update': ['RiskAssessment', 'Document'],
-          'delete': ['RiskAssessment', 'Document'],
+          'create': ['RiskAssessment'],
+          'read': ['RiskAssessment'],
+          'update': ['RiskAssessment'],
+          'delete': ['RiskAssessment'],
       },
       'ProgramReader': {
-          'read': ['RiskAssessment', 'Document']
+          'read': ['RiskAssessment']
       },
       'Reader': {
-          'read': ['RiskAssessment', 'Document']
+          'read': ['RiskAssessment']
       },
       'Editor': {
-          'create': ['RiskAssessment', 'Document'],
-          'read': ['RiskAssessment', 'Document'],
-          'update': ['RiskAssessment', 'Document'],
-          'delete': ['RiskAssessment', 'Document'],
+          'create': ['RiskAssessment'],
+          'read': ['RiskAssessment'],
+          'update': ['RiskAssessment'],
+          'delete': ['RiskAssessment'],
       },
   }
 

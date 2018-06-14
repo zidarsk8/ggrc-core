@@ -10,11 +10,12 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import db
 from ggrc.models.deferred import deferred
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models import reflection
 
 
-class Context(Base, db.Model):
+class Context(base.ContextRBAC, Base, db.Model):
   """Context class. Sign permissions object for specific user."""
   __tablename__ = 'contexts'
 

@@ -226,7 +226,7 @@ class CycleColumnHandler(handlers.ExportOnlyColumnHandler):
     return self.row_converter.obj.cycle.slug
 
 
-class TaskDescriptionColumnHandler(handlers.TextareaColumnHandler):
+class TaskDescriptionColumnHandler(handlers.TextColumnHandler):
 
   def set_obj_attr(self):
     """ Set task attribute based on task type """

@@ -1467,7 +1467,6 @@ def etag(last_modified, info=''):
 
 
 def send_event_job(event):
-  """Create bacground job for handling new revisions."""
-  revision_ids = [revision.id for revision in event.revisions]
+  """Create background job for handling new revisions."""
   from ggrc import views
-  views.start_compute_attributes(revision_ids)
+  views.start_compute_attributes(event_id=event.id)

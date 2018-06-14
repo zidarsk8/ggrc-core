@@ -12,9 +12,11 @@ from ggrc import db
 from ggrc.fulltext import attributes as ft_attributes
 from ggrc.fulltext import mixin as ft_mixin
 from ggrc.models import mixins
+from ggrc.models.mixins import base
 from ggrc.models import reflection
 from ggrc.utils import get_url_root
 from ggrc import builder
+from ggrc.access_control import roleable
 
 from ggrc_workflows.models import mixins as wf_mixins
 
@@ -28,11 +30,13 @@ def _query_filtered_by_contact(person):
   return []
 
 
-class Cycle(mixins.WithContact,
+class Cycle(roleable.Roleable,
+            mixins.WithContact,
             wf_mixins.CycleStatusValidatedMixin,
             mixins.Timeboxed,
             mixins.Described,
             mixins.Titled,
+            base.ContextRBAC,
             mixins.Slugged,
             mixins.Notifiable,
             ft_mixin.Indexed,

@@ -8,6 +8,7 @@ from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.comment import Commentable
 from ggrc.models import mixins
+from ggrc.models.mixins import base
 from .object_document import PublicDocumentable
 from .object_person import Personable
 from .track_object_state import HasObjectState
@@ -28,6 +29,7 @@ class Objective(WithLastAssessmentDate,
                 Commentable,
                 mixins.TestPlanned,
                 WithSimilarityScore,
+                base.ContextRBAC,
                 mixins.BusinessObject,
                 Indexed,
                 db.Model):

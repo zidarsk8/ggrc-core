@@ -7,10 +7,6 @@ services:
     extends:
       service: cleandev
       file: common-services.yml
-    ports:
-     - "127.0.0.1:8000:8000"
-     - "127.0.0.1:8080:8080"
-     - "127.0.0.1:9876:9876"
     depends_on:
       - db
     networks:

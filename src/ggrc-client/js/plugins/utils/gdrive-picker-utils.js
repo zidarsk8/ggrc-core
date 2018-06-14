@@ -4,6 +4,7 @@
  */
 
 import {gapiClient} from '../ggrc-gapi-client';
+import {getPickerElement} from '../ggrc_utils';
 
 export const GDRIVE_PICKER_ERR_CANCEL = 'GDRIVE_PICKER_ERR_CANCEL';
 
@@ -60,7 +61,7 @@ export function uploadFiles(opts = {}) {
     console.warn('Next two errors are expected.');
     picker.setVisible(true);
 
-    dialog = GGRC.Utils.getPickerElement(picker);
+    dialog = getPickerElement(picker);
     if (dialog) {
       dialog.style.zIndex = 4001; // our modals start with 2050
     }

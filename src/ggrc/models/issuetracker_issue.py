@@ -7,11 +7,12 @@ import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import db
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models import utils
 
 
-class IssuetrackerIssue(Base, db.Model):
+class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
   """Class representing IssuetrackerIssue."""
 
   __tablename__ = 'issuetracker_issues'

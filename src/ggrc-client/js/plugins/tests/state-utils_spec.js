@@ -7,21 +7,23 @@ import * as StateUtils from '../utils/state-utils';
 import * as CurrentPageUtils from '../utils/current-page-utils';
 
 describe('StateUtils', function () {
-  describe('statusFilter() method', function () {
-    it('statusFilter() should return filter with all statuses',
+  describe('buildStatusFilter() method', function () {
+    it('buildStatusFilter() should return filter with all statuses',
       function () {
         let statuses = [
           'Draft', 'Active', 'Deprecated',
         ];
+        let expectedFilter = {
+          expression: {
+            left: 'Status',
+            op: {name: 'IN'},
+            right: ['Draft', 'Active', 'Deprecated'],
+          },
+        };
 
-        let statesFilter = StateUtils.statusFilter(statuses, '');
+        let statesFilter = StateUtils.buildStatusFilter(statuses);
 
-        expect(statesFilter.indexOf('"Status"="Active"') > -1)
-          .toBe(true);
-        expect(statesFilter.indexOf('"Status"="Draft"') > -1)
-          .toBe(true);
-        expect(statesFilter.indexOf('"Status"="Deprecated"') > -1)
-          .toBe(true);
+        expect(statesFilter).toEqual(expectedFilter);
       }
     );
 
@@ -30,17 +32,18 @@ describe('StateUtils', function () {
         let statuses = [
           'Not Started', 'In Progress', 'In Review',
         ];
+        let expectedFilter = {
+          expression: {
+            left: 'Status',
+            op: {name: 'IN'},
+            right: ['Not Started', 'In Progress', 'In Review'],
+          },
+        };
 
-        let statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
+        let statesFilter =
+          StateUtils.buildStatusFilter(statuses, 'Assessment');
 
-        expect(statesFilter.indexOf('"Status"="Not Started"') > -1)
-          .toBe(true);
-        expect(statesFilter.indexOf('"Status"="In Progress"') > -1)
-          .toBe(true);
-        expect(statesFilter.indexOf('"Status"="In Review"') > -1)
-          .toBe(true);
-        expect(statesFilter.indexOf('"Status"="verified="') > -1)
-          .toBe(false);
+        expect(statesFilter).toEqual(expectedFilter);
       }
     );
 
@@ -49,18 +52,33 @@ describe('StateUtils', function () {
         let statuses = [
           'In Review', 'Completed and Verified',
         ];
+        let expectedFilter = {
+          expression: {
+            left: {
+              left: 'Status',
+              op: {name: 'IN'},
+              right: ['In Review'],
+            },
+            op: {name: 'OR'},
+            right: {
+              left: {
+                left: 'Status',
+                op: {name: '='},
+                right: 'Completed',
+              },
+              op: {name: 'AND'},
+              right: {
+                left: 'verified',
+                op: {name: '='},
+                right: 'true',
+              },
+            },
+          },
+        };
 
-        let statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
+        let statesFilter = StateUtils.buildStatusFilter(statuses, 'Assessment');
 
-        expect(statesFilter.indexOf('"Status"="In Review"') > -1)
-          .toBe(true);
-        expect(statesFilter.indexOf('"Status"="Completed"') > -1)
-          .toBe(true);
-        expect(statesFilter.indexOf('"Status"="Completed and Verified"') > -1)
-          .toBe(false);
-
-        expect(statesFilter.indexOf('verified=true') > -1)
-          .toBe(true);
+        expect(statesFilter).toEqual(expectedFilter);
       }
     );
 
@@ -69,19 +87,33 @@ describe('StateUtils', function () {
         let statuses = [
           'In Review', 'Completed (no verification)',
         ];
+        let expectedFilter = {
+          expression: {
+            left: {
+              left: 'Status',
+              op: {name: 'IN'},
+              right: ['In Review'],
+            },
+            op: {name: 'OR'},
+            right: {
+              left: {
+                left: 'Status',
+                op: {name: '='},
+                right: 'Completed',
+              },
+              op: {name: 'AND'},
+              right: {
+                left: 'verified',
+                op: {name: '='},
+                right: 'false',
+              },
+            },
+          },
+        };
 
-        let statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
+        let statesFilter = StateUtils.buildStatusFilter(statuses, 'Assessment');
 
-        expect(statesFilter.indexOf('"Status"="In Review"') > -1)
-          .toBe(true);
-        expect(statesFilter.indexOf('"Status"="Completed"') > -1)
-          .toBe(true);
-        expect(statesFilter
-          .indexOf('"Status"="Completed (no verification)"') > -1)
-          .toBe(false);
-
-        expect(statesFilter.indexOf('verified=false') > -1)
-          .toBe(true);
+        expect(statesFilter).toEqual(expectedFilter);
       }
     );
 
@@ -91,23 +123,17 @@ describe('StateUtils', function () {
           'In Progress', 'Completed (no verification)',
           'Completed and Verified',
         ];
+        let expectedFilter = {
+          expression: {
+            left: 'Status',
+            op: {name: 'IN'},
+            right: ['In Progress', 'Completed'],
+          },
+        };
 
-        let statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
+        let statesFilter = StateUtils.buildStatusFilter(statuses, 'Assessment');
 
-        expect(statesFilter.indexOf('"Status"="In Progress"') > -1)
-          .toBe(true);
-        expect(statesFilter.indexOf('"Status"="Completed"') > -1)
-          .toBe(true);
-
-        expect(statesFilter
-          .indexOf('"Status"="Completed (no verification)"') > -1)
-          .toBe(false);
-        expect(statesFilter
-          .indexOf('"Status"="Completed and Verified"') > -1)
-          .toBe(false);
-
-        expect(statesFilter.indexOf('verified=') > -1)
-          .toBe(false);
+        expect(statesFilter).toEqual(expectedFilter);
       }
     );
   });

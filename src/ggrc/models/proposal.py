@@ -11,6 +11,7 @@ from ggrc.models import reflection
 from ggrc.models import relationship
 from ggrc.models import types
 from ggrc.models import utils
+from ggrc.models.mixins import base
 from ggrc.fulltext import mixin as ft_mixin
 from ggrc.utils import referenced_objects
 from ggrc.access_control import roleable
@@ -56,6 +57,7 @@ class Proposal(mixins.person_relation_factory("applied_by"),
                mixins.Stateful,
                roleable.Roleable,
                relationship.Relatable,
+               base.ContextRBAC,
                mixins.Base,
                ft_mixin.Indexed,
                db.Model):

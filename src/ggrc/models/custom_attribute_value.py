@@ -11,6 +11,7 @@ from sqlalchemy.orm import foreign
 
 from ggrc import builder
 from ggrc import db
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models.revision import Revision
 from ggrc.models import reflection
@@ -20,7 +21,7 @@ from ggrc.fulltext import get_indexer
 from ggrc.utils import url_parser
 
 
-class CustomAttributeValue(Base, Indexed, db.Model):
+class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
   """Custom attribute value model"""
 
   __tablename__ = 'custom_attribute_values'
@@ -364,8 +365,7 @@ class CustomAttributeValue(Base, Indexed, db.Model):
       comment_found = False
     if not comment_found:
       return ["comment"]
-    else:
-      return []
+    return []
 
   @staticmethod
   def multi_choice_options_to_flags(cad):
@@ -397,9 +397,8 @@ class CustomAttributeValue(Base, Indexed, db.Model):
 
     if not cad.multi_choice_options or not cad.multi_choice_mandatory:
       return {}
-    else:
-      return dict(zip(
-          cad.multi_choice_options.split(","),
-          (make_flags(mask)
-           for mask in cad.multi_choice_mandatory.split(",")),
-      ))
+    return dict(zip(
+        cad.multi_choice_options.split(","),
+        (make_flags(mask)
+         for mask in cad.multi_choice_mandatory.split(",")),
+    ))

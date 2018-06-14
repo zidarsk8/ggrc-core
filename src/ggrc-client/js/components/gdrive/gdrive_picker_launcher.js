@@ -31,7 +31,6 @@ import tracker from '../../tracker';
       link_class: '@',
       click_event: '@',
       confirmationCallback: '@',
-      pickerActive: false,
       disabled: false,
       isUploading: false,
 
@@ -91,15 +90,11 @@ import tracker from '../../tracker';
             return files;
           })
           .then((files) => {
-            scope.attr('pickerActive', false);
             this.beforeCreateHandler(files);
 
             return this.createDocumentModel(files);
           })
-          .then((docs) => {
-            stopFn();
-            el.trigger('modal:success', {arr: docs});
-          })
+          .then(stopFn)
           .always(() => {
             this.attr('isUploading', false);
             this.dispatch('finish');
@@ -146,15 +141,12 @@ import tracker from '../../tracker';
               .then(function (files) {
                 that.beforeCreateHandler(files);
 
-                that.createDocumentModel(files)
-                  .then((docs)=> {
-                    stopFn();
-                    el.trigger('modal:success', {arr: docs});
-                  })
-                  .always(()=> {
-                    that.attr('isUploading', false);
-                    that.dispatch('finish');
-                  });
+                return that.createDocumentModel(files);
+              })
+              .then(stopFn)
+              .always(()=> {
+                that.attr('isUploading', false);
+                that.dispatch('finish');
               })
               .fail(function () {
                 // This case happens when user have no access to write in audit folder
@@ -163,7 +155,6 @@ import tracker from '../../tracker';
                 stopFn(true);
                 if (error && error.code === 403) {
                   GGRC.Errors.notifier('error', GGRC.Errors.messages[403]);
-                  el.trigger('modal:success');
                 } else if ( error && error.type !== GDRIVE_PICKER_ERR_CANCEL ) {
                   GGRC.Errors.notifier('error', error && error.message);
                 }

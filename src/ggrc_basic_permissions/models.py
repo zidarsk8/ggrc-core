@@ -11,6 +11,7 @@ from ggrc.models import all_models
 from ggrc.builder import simple_property
 from ggrc.models.context import Context
 from ggrc.models.person import Person
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base, Described
 from ggrc.models import reflection
 
@@ -24,7 +25,7 @@ from ggrc_basic_permissions.contributed_roles import (
 logger = getLogger(__name__)
 
 
-class Role(Base, Described, db.Model):
+class Role(base.ContextRBAC, Base, Described, db.Model):
   """A user role. All roles have a unique name. This name could be a simple
   string, an email address, or some other form of string identifier.
 
@@ -112,7 +113,7 @@ def _Context_eager_query(cls):
 Context.eager_query = classmethod(_Context_eager_query)
 
 
-class UserRole(Base, db.Model):
+class UserRole(base.ContextRBAC, Base, db.Model):
   __tablename__ = 'user_roles'
 
   # Override default from `ContextRBAC` to provide backref

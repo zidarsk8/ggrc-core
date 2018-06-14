@@ -19,10 +19,10 @@ export default can.Component.extend('commentDataProvider', {
       this.attr('comments').replace(comments);
     },
     buildQuery() {
-      let query = QueryAPI.buildParam('Comment', {
-        sortBy: 'created_at',
-        sortDirection: 'desc',
-      }, {
+      let query = QueryAPI.buildParam('Comment', {sort: [{
+        key: 'created_at',
+        direction: 'desc',
+      }]}, {
         type: this.attr('instance.type'),
         id: this.attr('instance.id'),
         operation: 'relevant',

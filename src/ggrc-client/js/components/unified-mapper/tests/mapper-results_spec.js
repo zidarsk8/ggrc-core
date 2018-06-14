@@ -312,8 +312,8 @@ describe('GGRC.Components.mapperResults', function () {
       key: 'mock3',
       direction: 'mock4',
     };
-    let mockFilterItems = ['filterItem'];
-    let mockMappingItems = ['mappingItem'];
+    let mockFilterItems = new can.List(['filterItem']);
+    let mockMappingItems = new can.List(['mappingItem']);
     let mockStatusItem = new can.Map({
       value: {
         items: ['statusItem'],
@@ -342,20 +342,20 @@ describe('GGRC.Components.mapperResults', function () {
 
     it('builds advanced filters', function () {
       viewModel.getQuery('values', true);
-      expect(AdvancedSearch.buildFilter.calls.argsFor(0)[0].attr())
-        .toEqual(mockFilterItems);
+      expect(AdvancedSearch.buildFilter.calls.argsFor(0)[0])
+        .toEqual(mockFilterItems.attr());
     });
 
     it('builds advanced mappings', function () {
       viewModel.getQuery('values', true);
-      expect(AdvancedSearch.buildFilter.calls.argsFor(1)[0].attr())
-        .toEqual(mockMappingItems);
+      expect(AdvancedSearch.buildFilter.calls.argsFor(1)[0])
+        .toEqual(mockMappingItems.attr());
     });
 
     it('builds advanced status', function () {
       viewModel.getQuery('values', true);
       expect(AdvancedSearch.buildFilter.calls.argsFor(2)[0][0])
-        .toEqual(mockStatusItem);
+        .toEqual(mockStatusItem.attr());
     });
 
     it('does not build advanced status if sttatus items are not provided',
@@ -377,13 +377,18 @@ describe('GGRC.Components.mapperResults', function () {
 
     it('adds paging with sort to query if sort.key is defined', function () {
       viewModel.getQuery('values', true);
-      expect(QueryAPI.buildParam.calls.argsFor(0)[1])
-        .toEqual({
-          current: 'mock1',
-          pageSize: 'mock2',
-          sortBy: 'mock3',
-          sortDirection: 'mock4',
-        });
+      expect(QueryAPI.buildParam.calls.argsFor(0)[1].sort[0].key)
+        .toBe('mock3');
+      expect(QueryAPI.buildParam.calls.argsFor(0)[1].sort[0].direction)
+        .toBe('mock4');
+    });
+
+    it('adds defaultSort to paging if no sort', function () {
+      viewModel.removeAttr('sort');
+      viewModel.attr('defaultSort', [{key: 'mock5', direction: 'mock6'}]);
+      viewModel.getQuery('values', true);
+
+      expect(QueryAPI.buildParam.calls.argsFor(0)[1].sort[0].key).toBe('mock5');
     });
 
     it('sets "read" to permissions if model is person', function () {

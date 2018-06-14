@@ -12,6 +12,7 @@ from ggrc import builder
 from ggrc.access_control.roleable import Roleable
 from ggrc.models.comment import Commentable
 from ggrc.models.deferred import deferred
+from ggrc.models.mixins import base
 from ggrc.models.mixins import (
     BusinessObject, LastDeprecatedTimeboxed, CustomAttributable, TestPlanned
 )
@@ -28,7 +29,7 @@ from ggrc.fulltext.mixin import Indexed
 class Issue(Roleable, HasObjectState, TestPlanned, CustomAttributable,
             PublicDocumentable, Personable, LastDeprecatedTimeboxed,
             Relatable, Commentable, AuditRelationship, WithAction,
-            BusinessObject, Indexed, db.Model):
+            base.ContextRBAC, BusinessObject, Indexed, db.Model):
   """Issue Model."""
 
   __tablename__ = 'issues'

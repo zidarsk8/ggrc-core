@@ -90,30 +90,26 @@ import tracker from '../tracker';
         attr_name: 'end_date',
         order: 12,
       }, {
-        attr_title: 'Reference URL',
-        attr_name: 'reference_url',
-        order: 13,
-      }, {
         attr_title: 'Conclusion: Design',
         attr_name: 'design',
-        order: 14,
+        order: 13,
       }, {
         attr_title: 'Conclusion: Operation',
         attr_name: 'operationally',
-        order: 15,
+        order: 14,
       }, {
         attr_title: 'Archived',
         attr_name: 'archived',
-        order: 16,
+        order: 15,
       }, {
         attr_title: 'Ticket Tracker',
         attr_name: 'issue_url',
-        order: 17,
+        order: 16,
         deny: !GGRC.ISSUE_TRACKER_ENABLED,
       }, {
         attr_title: 'Last Comment',
         attr_name: 'last_comment',
-        order: 18,
+        order: 17,
       }],
       display_attr_names: ['title', 'status', 'label', 'Assignees', 'Verifiers',
         'start_date', 'updated_at'],
@@ -376,7 +372,7 @@ import tracker from '../tracker';
               type: 'get',
               dataType: 'json',
             })
-              .then($.proxy(that.constructor, 'cleanupACL'))
+              .then($.proxy(that, 'cleanupAcl'))
               .then(function (model) {
                 delete that._pending_refresh;
                 if (model) {

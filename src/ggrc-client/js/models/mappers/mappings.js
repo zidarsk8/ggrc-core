@@ -3,6 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {
+  getModelByType,
+  getMappableTypes,
+} from '../../plugins/ggrc_utils';
+
 (function (GGRC, can) {
   let Proxy = GGRC.MapperHelpers.Proxy;
   let Direct = GGRC.MapperHelpers.Direct;
@@ -70,7 +75,7 @@
      * @return {Array} - list of allowed for mapping Models
      */
     getMappingList: function (type, include, exclude) {
-      let baseModel = GGRC.Utils.getModelByType(type);
+      let baseModel = getModelByType(type);
       exclude = exclude || [];
       include = include || [];
       if (!baseModel) {
@@ -85,11 +90,10 @@
           })
           .concat(include);
       }
-      return GGRC.Utils
-        .getMappableTypes(type, {
-          whitelist: include,
-          forbidden: exclude,
-        });
+      return getMappableTypes(type, {
+        whitelist: include,
+        forbidden: exclude,
+      });
     },
     /**
      * Return list of allowed for mapping types.
@@ -143,7 +147,7 @@
       let group;
       let type;
       let cmsModel;
-      cmsModel = GGRC.Utils.getModelByType(modelName);
+      cmsModel = getModelByType(modelName);
       if (!cmsModel || !cmsModel.title_singular ||
         cmsModel.title_singular === 'Reference') {
         return;

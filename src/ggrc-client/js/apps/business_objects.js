@@ -370,8 +370,6 @@ import {
         issues: {
           Issue: {
             mapping: 'related_issues',
-            add_item_view: GGRC.mustache_path +
-              '/issues/tree_add_item.mustache',
             draw_children: true,
           },
         },
@@ -584,10 +582,6 @@ import {
           Control: {
             draw_children: true,
             add_item_view: path + '/base_objects/tree_add_item.mustache',
-          },
-          Issue: {
-            mapping: 'related_issues',
-            add_item_view: path + '/issues/tree_add_item.mustache',
           },
           Audit: {
             draw_children: true,

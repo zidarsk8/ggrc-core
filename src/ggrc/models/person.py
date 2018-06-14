@@ -4,6 +4,7 @@
 import re
 from sqlalchemy import event
 from sqlalchemy.orm import validates
+from sqlalchemy.orm import relationship
 from sqlalchemy.orm.session import Session
 
 from ggrc import builder
@@ -13,16 +14,23 @@ from ggrc.fulltext.mixin import Indexed
 from ggrc.models.context import HasOwnContext
 from ggrc.models.exceptions import ValidationError
 from ggrc.models.deferred import deferred
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base, CustomAttributable
 from ggrc.models.custom_attribute_definition import CustomAttributeMapable
 from ggrc.models import reflection
 from ggrc.models.relationship import Relatable
 from ggrc.models.utils import validate_option
 from ggrc.rbac import SystemWideRoles
+from ggrc.models.person_profile import PersonProfile
 
 
 class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
-             Relatable, Base, Indexed, db.Model):
+             Relatable, base.ContextRBAC, Base, Indexed, db.Model):
+
+  def __init__(self, *args, **kwargs):
+    """Initialize profile relationship while creating Person instance"""
+    super(Person, self).__init__(*args, **kwargs)
+    self.profile = PersonProfile()
 
   __tablename__ = 'people'
 
@@ -41,9 +49,14 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
       'Option.role == "person_language")',
       uselist=False,
   )
+  profile = relationship(
+      "PersonProfile",
+      uselist=False,
+      back_populates="person",
+  )
 
   @staticmethod
-  def _extra_table_args(cls):
+  def _extra_table_args(_):
     return (
         db.Index('ix_people_name_email', 'name', 'email'),
         db.Index('uq_people_email', 'email', unique=True),

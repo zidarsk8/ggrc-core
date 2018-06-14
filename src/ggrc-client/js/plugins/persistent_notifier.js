@@ -57,10 +57,4 @@ export default can.Construct({
       this.list_empty_cbs.push(fn);
     }
   },
-  off_empty: function (fn) {
-    let idx;
-    if (~(idx = this.list_empty_cbs.indexOf(fn))) {
-      this.list_empty_cbs.splice(idx, 1);
-    }
-  },
 });

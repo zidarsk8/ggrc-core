@@ -8,6 +8,7 @@ from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.comment import Commentable
 from ggrc.models.deferred import deferred
+from ggrc.models.mixins import base
 from ggrc.models.mixins import (BusinessObject, LastDeprecatedTimeboxed,
                                 CustomAttributable, TestPlanned)
 from ggrc.models.object_document import PublicDocumentable
@@ -28,7 +29,7 @@ from ggrc.models import reflection
 # attributes in subclasses, we might want to use that approach)
 class SystemOrProcess(track_object_state.HasObjectState,
                       Commentable, TestPlanned, LastDeprecatedTimeboxed,
-                      BusinessObject, db.Model):
+                      base.ContextRBAC, BusinessObject, db.Model):
   # Override model_inflector
   _table_plural = 'systems_or_processes'
   __tablename__ = 'systems'

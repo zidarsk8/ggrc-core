@@ -13,6 +13,7 @@ import {
 } from './plugins/utils/current-page-utils';
 import {
   getRole,
+  isAuditor,
 } from './plugins/utils/acl-utils';
 import RefreshQueue from './models/refresh_queue';
 import Permission from './permission';
@@ -21,6 +22,11 @@ import {
   buildCountParams,
   batchRequests,
 } from './plugins/utils/query-api-utils';
+import {
+  formatDate,
+  isMappableType,
+  allowedToMap,
+} from './plugins/ggrc_utils';
 
 // Chrome likes to cache AJAX requests for Mustaches.
 let mustacheUrls = {};
@@ -775,7 +781,7 @@ Mustache.registerHelper('person_roles', function (person, scope, options) {
  */
 Mustache.registerHelper('date', function (date, hideTime) {
   date = Mustache.resolve(date);
-  return GGRC.Utils.formatDate(date, hideTime);
+  return formatDate(date, hideTime);
 });
 
 /**
@@ -937,7 +943,7 @@ Mustache.registerHelper('is_allowed_to_map',
 
     source = resolveComputed(source);
     target = resolveComputed(target);
-    canMap = GGRC.Utils.allowed_to_map(source, target, options);
+    canMap = allowedToMap(source, target, options);
 
     if (canMap) {
       return options.fn(options.contexts || this);
@@ -1699,49 +1705,6 @@ Mustache.registerHelper('with_most_recent_declining_task_entry',
       .add({most_recent_declining_task_entry: {}}));
   });
 
-function getProperUrl(url) {
-  let domain;
-  let maxLabel;
-  let urlSplit;
-
-  if (!url) {
-    return '';
-  }
-
-  if (!url.match(/^[a-zA-Z]+:/)) {
-    url = (window.location.protocol === 'https:' ?
-      'https://' : 'http://') + url;
-  }
-
-  // Make sure we can find the domain part of the url:
-  urlSplit = url.split('/');
-  if (urlSplit.length < 3) {
-    return 'javascript://';
-  }
-
-  domain = urlSplit[2];
-  maxLabel = _.max(domain.split('.').map(function (label) {
-    return label.length;
-  }));
-  if (maxLabel > 63 || domain.length > 253) {
-    // The url is invalid and might crash user's chrome tab
-    return 'javascript://';
-  }
-  return url;
-}
-
-Mustache.registerHelper('get_url_value', function (attrName, instance) {
-  instance = Mustache.resolve(instance);
-  attrName = Mustache.resolve(attrName);
-
-  if (instance[attrName]) {
-    if (['url', 'reference_url'].indexOf(attrName) !== -1) {
-      return getProperUrl(instance[attrName]);
-    }
-  }
-  return '';
-});
-
 /**
    * Retrieve the string value of an attribute of the given instance.
    *
@@ -1909,7 +1872,7 @@ Mustache.registerHelper('is_mappable_type',
   function (source, target, options) {
     target = Mustache.resolve(target);
     source = Mustache.resolve(source);
-    if (GGRC.Utils.isMappableType(source, target)) {
+    if (isMappableType(source, target)) {
       return options.fn(options.contexts);
     }
     return options.inverse(options.contexts);
@@ -2003,17 +1966,13 @@ Mustache.registerHelper('displayWidgetTab',
   }
 );
 Mustache.registerHelper('is_auditor', function (options) {
-  const auditor = getRole('Audit', 'Auditors');
   const audit = GGRC.page_instance();
   if (audit.type !== 'Audit') {
     console.warn('is_auditor called on non audit page');
     return options.inverse(options.contexts);
   }
-  const isAuditor = audit.access_control_list.filter(
-    (acl) => acl.ac_role_id === auditor.id &&
-                 acl.person_id === GGRC.current_user.id).length;
 
-  if (isAuditor) {
+  if (isAuditor(audit, GGRC.current_user)) {
     return options.fn(options.contexts);
   }
   return options.inverse(options.contexts);

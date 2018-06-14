@@ -42,8 +42,32 @@ function getComponentVM(Component) {
   return new (can.Map.extend(viewModelConfig));
 }
 
+function makeFakeModel({model, staticProps = {}, instanceProps = {}} = {}) {
+  const attrsForBaseModel = model.attributes;
+  const staticPresetup = {
+    // "attributes" isn't inherited from base model.
+    // We should explicitly set the same "attributes" for derived models from
+    // base model.
+    attributes: {...attrsForBaseModel},
+    ...staticProps,
+  };
+
+  return model.extend(staticPresetup, instanceProps);
+}
+
+function makeFakeInstance({
+  model,
+  staticProps = {},
+  instanceProps = {},
+} = {}) {
+  const fakeModel = makeFakeModel({model, staticProps, instanceProps});
+  return (...instanceArgs) => new fakeModel(...instanceArgs);
+}
+
 export {
   waitsFor,
   failAll,
   getComponentVM,
+  makeFakeModel,
+  makeFakeInstance,
 };

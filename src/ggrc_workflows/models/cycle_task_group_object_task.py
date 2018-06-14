@@ -20,6 +20,7 @@ from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.models import relationship
 from ggrc.models import types
+from ggrc.models.mixins import base
 from ggrc_workflows.models.cycle import Cycle
 from ggrc_workflows.models.workflow import Workflow
 from ggrc_workflows.models.cycle_task_group import CycleTaskGroup
@@ -39,6 +40,7 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
                                mixins.Titled,
                                mixins.Slugged,
                                mixins.Base,
+                               base.ContextRBAC,
                                ft_mixin.Indexed,
                                db.Model):
   """Cycle task model

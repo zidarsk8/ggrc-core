@@ -60,6 +60,7 @@ describe('mandatory-fields-modal component', () => {
       let result = method();
       expect(result.length).toBe(1);
       expect(result[0].id).toBe(2);
+      delete can.Model.Cacheable.cache;
     });
   });
 });

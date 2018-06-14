@@ -5,6 +5,7 @@
 
 import * as issueTrackerUtils from '../../plugins/utils/issue-tracker-utils';
 import * as queryApiUtils from '../../plugins/utils/query-api-utils';
+import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 
 describe('can.Model.Mixin.assessmentIssueTracker', () => {
   let Mixin;
@@ -29,7 +30,7 @@ describe('can.Model.Mixin.assessmentIssueTracker', () => {
       dfd.resolve(audit);
       spyOn(asmtProto, 'ensureParentAudit').and.returnValue(dfd);
       spyOn(asmtProto, 'initIssueTrackerForAssessment');
-      new CMS.Models.Assessment({type: 'Assessment'});
+      makeFakeInstance({model: CMS.Models.Assessment})({type: 'Assessment'});
       expect(asmtProto.initIssueTrackerForAssessment).toHaveBeenCalled();
     });
 
@@ -37,7 +38,7 @@ describe('can.Model.Mixin.assessmentIssueTracker', () => {
       let dfd = can.Deferred();
       spyOn(asmtProto, 'initIssueTracker').and.returnValue(dfd);
       spyOn(asmtProto, 'trackAuditUpdates');
-      new CMS.Models.Assessment({type: 'Assessment'});
+      makeFakeInstance({model: CMS.Models.Assessment})({type: 'Assessment'});
       dfd.then(() => {
         expect(asmtProto.trackAuditUpdates).toHaveBeenCalled();
         done();

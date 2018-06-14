@@ -3,20 +3,23 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 import Permission from '../../permission';
 import * as aclUtils from '../utils/acl-utils';
+import {
+  formatDate,
+  getMappableTypes,
+  isMappableType,
+  allowedToMap,
+  getAssigneeType,
+} from '../ggrc_utils';
 
 'use strict';
 
-describe('GGRC utils allowed_to_map() method', function () {
-  let allowedToMap;
+describe('allowedToMap() method', function () {
   let fakeOptions;
   let fakeProgram;
   let fakeAudit;
-
-  beforeAll(function () {
-    allowedToMap = GGRC.Utils.allowed_to_map;
-  });
 
   beforeEach(function () {
     fakeOptions = {};
@@ -24,8 +27,12 @@ describe('GGRC utils allowed_to_map() method', function () {
 
   describe('given an Audit and Program pair', function () {
     beforeEach(function () {
-      fakeProgram = new CMS.Models.Program({type: 'Program'});
-      fakeAudit = new CMS.Models.Audit({type: 'Audit'});
+      fakeProgram = makeFakeInstance({model: CMS.Models.Program})({
+        type: 'Program',
+      });
+      fakeAudit = makeFakeInstance({model: CMS.Models.Audit})({
+        type: 'Program',
+      });
 
       spyOn(GGRC.Mappings, 'get_canonical_mapping_name')
         .and.returnValue('audits');
@@ -59,7 +66,7 @@ describe('GGRC utils allowed_to_map() method', function () {
     });
 
     beforeEach(function () {
-      person = new CMS.Models.Person({type: 'Person'});
+      person = makeFakeInstance({model: CMS.Models.Person})({type: 'Person'});
       otherInstance = new can.Model({type: 'Foo'});
     });
 
@@ -70,9 +77,7 @@ describe('GGRC utils allowed_to_map() method', function () {
   });
 });
 
-describe('GGRC utils getMappableTypes() method', function () {
-  let mapper;
-
+describe('getMappableTypes() method', function () {
   beforeAll(function () {
     let canonicalMappings = {};
     let OBJECT_TYPES = [
@@ -82,7 +87,6 @@ describe('GGRC utils getMappableTypes() method', function () {
       'Objective', 'Audit', 'Assessment', 'AccessGroup',
       'Document', 'Risk', 'Threat',
     ];
-    mapper = GGRC.Utils.getMappableTypes;
     OBJECT_TYPES.forEach(function (item) {
       canonicalMappings[item] = {};
     });
@@ -91,29 +95,29 @@ describe('GGRC utils getMappableTypes() method', function () {
   });
 
   it('excludes the References type from the result', function () {
-    let result = mapper('Reference');
+    let result = getMappableTypes('Reference');
     expect(_.contains(result, 'Reference')).toBe(false);
   });
   it('does not return Issue type for Person', function () {
-    let result = mapper('Person');
+    let result = getMappableTypes('Person');
     expect(_.contains(result, 'Issue')).toBe(false);
   });
   it('returns only Audit type for AssessmentTemplate', function () {
-    let result = mapper('AssessmentTemplate');
+    let result = getMappableTypes('AssessmentTemplate');
     expect(result.length).toBe(1);
     expect(result[0]).toBe('Audit');
   });
   it('always returns whitelisted items', function () {
     let whitelisted = ['Hello', 'World'];
-    let result = mapper('AssessmentTemplate', {
+    let result = getMappableTypes('AssessmentTemplate', {
       whitelist: whitelisted,
     });
     expect(_.intersection(result, whitelisted)).toEqual(whitelisted);
   });
   it('always remove forbidden items', function () {
     let forbidden = ['Policy', 'Process', 'Product', 'Program'];
-    let list = mapper('DataAsset');
-    let result = mapper('DataAsset', {
+    let list = getMappableTypes('DataAsset');
+    let result = getMappableTypes('DataAsset', {
       forbidden: forbidden,
     });
     expect(_.difference(list, result).sort()).toEqual(forbidden.sort());
@@ -121,8 +125,8 @@ describe('GGRC utils getMappableTypes() method', function () {
   it('always leave whitelisted and remove forbidden items', function () {
     let forbidden = ['Policy', 'Process', 'Product', 'Program'];
     let whitelisted = ['Hello', 'World'];
-    let list = mapper('DataAsset');
-    let result = mapper('DataAsset', {
+    let list = getMappableTypes('DataAsset');
+    let result = getMappableTypes('DataAsset', {
       forbidden: forbidden,
       whitelist: whitelisted,
     });
@@ -133,24 +137,21 @@ describe('GGRC utils getMappableTypes() method', function () {
   });
 });
 
-describe('GGRC utils isMappableType() method', function () {
+describe('isMappableType() method', function () {
   it('returns false for AssessmentTemplate and  any type', function () {
-    let result = GGRC.Utils.isMappableType('AssessmentTemplate', 'Program');
+    let result = isMappableType('AssessmentTemplate', 'Program');
     expect(result).toBe(false);
   });
   it('returns true for Program and Control', function () {
-    let result = GGRC.Utils.isMappableType('Program', 'Control');
+    let result = isMappableType('Program', 'Control');
     expect(result).toBe(true);
   });
 });
 
-describe('GGRC utils getAssigneeType() method', function () {
-  let method;
+describe('getAssigneeType() method', function () {
   let instance;
 
   beforeAll(function () {
-    method = GGRC.Utils.getAssigneeType;
-
     instance = {
       type: 'Assessment',
       id: 2147483647,
@@ -174,7 +175,7 @@ describe('GGRC utils getAssigneeType() method', function () {
   });
 
   it('should return null. Empty ACL', function () {
-    let userType = method(instance);
+    let userType = getAssigneeType(instance);
     expect(userType).toBeNull();
   });
 
@@ -185,7 +186,7 @@ describe('GGRC utils getAssigneeType() method', function () {
       {ac_role_id: 1, person: {id: 5}},
     ];
 
-    userType = method(instance);
+    userType = getAssigneeType(instance);
     expect(userType).toBeNull();
   });
 
@@ -196,7 +197,7 @@ describe('GGRC utils getAssigneeType() method', function () {
       {ac_role_id: 1, person: {id: 3}},
     ];
 
-    userType = method(instance);
+    userType = getAssigneeType(instance);
     expect(userType).toEqual('Verifiers');
   });
 
@@ -209,7 +210,7 @@ describe('GGRC utils getAssigneeType() method', function () {
       {ac_role_id: 3, person: {id: 5}},
     ];
 
-    userType = method(instance);
+    userType = getAssigneeType(instance);
     expect(userType.indexOf('Verifiers') > -1).toBeTruthy();
     expect(userType.indexOf('Creators') > -1).toBeTruthy();
   });
@@ -224,7 +225,7 @@ describe('GGRC utils getAssigneeType() method', function () {
       {ac_role_id: 5, person: {id: 1}},
     ];
 
-    userType = method(instance);
+    userType = getAssigneeType(instance);
     expect(userType.indexOf('Verifiers') > -1).toBeTruthy();
     expect(userType.indexOf('Creators') > -1).toBeTruthy();
     expect(userType.indexOf('Assignees') > -1).toBeTruthy();
@@ -241,14 +242,12 @@ describe('GGRC utils getAssigneeType() method', function () {
       {ac_role_id: 5, person: {id: 1}},
     ];
 
-    userType = method(instance);
+    userType = getAssigneeType(instance);
     expect(userType).toEqual(expectedString);
   });
 });
 
 describe('GGRC utils formatDate() method', function () {
-  let formatDate = GGRC.Utils.formatDate;
-
   it('should return empty string for false values', function () {
     expect(formatDate(null)).toEqual('');
     expect(formatDate(undefined)).toEqual('');

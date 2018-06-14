@@ -8,6 +8,7 @@ import {
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import '../object-list/object-list';
+import {applyTypeFilter} from '../../plugins/ggrc_utils';
 import template from './mapped-objects.mustache';
 
 (function (can, GGRC) {
@@ -85,9 +86,8 @@ import template from './mapped-objects.mustache';
           return item.instance.type;
         }
 
-        return GGRC.Utils.filters
-          .applyTypeFilter(items,
-            this.attr('filter').attr(), getTypeFromInstance);
+        return applyTypeFilter(items,
+          this.attr('filter').attr(), getTypeFromInstance);
       },
       getBinding: function () {
         return this.attr('parentInstance').get_binding(this.attr('mapping'));

@@ -238,7 +238,7 @@ class ChangeTracked(object):
     )
 
 
-class Base(ChangeTracked, ContextRBAC, Identifiable):
+class Base(ChangeTracked, Identifiable):
 
   """Several of the models use the same mixins. This class covers that common
   case.

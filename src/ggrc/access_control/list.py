@@ -7,9 +7,10 @@ from ggrc import db
 from ggrc.builder import simple_property
 from ggrc.models import mixins
 from ggrc.models import reflection
+from ggrc.models.mixins import base
 
 
-class AccessControlList(mixins.Base, db.Model):
+class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
   """Access Control List
 
   Model is a mapping between a role a person and an object. It gives the

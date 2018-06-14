@@ -39,3 +39,50 @@ For the backend part:
   ids, we have to rely on flushes inside of a single request and then we have
   workarounds for imports and bulk operations. Avoiding use of direct ids
   allows simpler code where multiple db operations can be joined together.
+
+
+
+Checking for improvements and regressions
+-----------------------------------------
+
+When checking for any performance changes we must make sure to use as similar
+environment as possible. Time measurements on their own do not prove better
+or worse performance, we must always provide a comparison of before and after.
+
+When doing performance checks we must pay attention to:
+
+- Amount of data on both instances that are being compared.
+- Whether or not memcache is enabled or disabled.
+- If there are migrations between compared instances we must use the data on
+  older migration as a benchmark. All increase or decrease of data made in
+  a migration must be part of the comparison.
+- Which user we are testing under: His global role, and amount of ACL entries
+  for that user. Most of the time it should be enough to test under an Admin
+  user and Global creator user, both with more than 100k ACL entries.
+
+There are also two types of performance checks:
+
+1. Single action performance: this can be a single REST request, or a single
+   sql query, or single function execution.
+
+2. User flow performance: this is a set of actions that a user might perform.
+
+Difference between those two is that past actions might affect the performance
+of future actions.
+
+Few examples on what to watch for:
+
+1. If we're measuring performance of adding a comment on an assessment: 
+
+  - Adding a comment right after opening an assessment is not the same as 
+    opening an assessment and waiting on all other background requests to 
+    finish first before adding a comment.
+
+  - Adding a comment after opening an assessment waiting on everything to 
+    finish is not always the same as adding a comment after adding an URL to 
+    an assessment and waiting on all requests to finish. In the first case
+    permissions will be cached in memcache after opening an assessment, in the
+    second case adding a URL creates a mapping and that flushes memcache so 
+    performance for the same action will take longer.
+
+

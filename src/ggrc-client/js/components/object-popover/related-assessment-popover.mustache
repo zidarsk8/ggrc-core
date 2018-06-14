@@ -10,21 +10,21 @@
         <tab-panel {(panels)}="panels" title-text="Attributes">
             <div class="fields-wrapper flex-box flex-row">
                 <show-more items="selectedAssessmentFields">
-                    <div class="field-wrapper flex-size-1 {{extraClass type}}">
+                    <div class="field-wrapper flex-size-1 custom-attribute-{{type}}">
                         <form-validation-icon {validation}="validation"></form-validation-icon>
                         <div class="field__title form-field__title">
-                            <label class="field__title-text {{extraClass type}}" for="form-field-{{id}}">
+                            <label class="field__title-text custom-attribute-{{type}}" for="form-field-{{id}}">
                               {{title}}
                               {{#if helptext}}
                                   <i class="fa fa-question-circle field__title-helper-text" rel="tooltip" title="{{helptext}}"></i>
                               {{/if}}
                             </label>
                         </div>
-			<custom-attributes-field-view
+            <custom-attributes-field-view
                                 {type}="type"
                                 {value}="value"
-                                class="form-field__content {{{extraClass type}}"
-			></custom-attributes-field-view>
+                                class="form-field__content custom-attribute-{{type}}"
+            ></custom-attributes-field-view>
                     </div>
                 </show-more>
             </div>

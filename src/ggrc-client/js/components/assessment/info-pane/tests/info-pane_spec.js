@@ -3,28 +3,181 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import Component from '../info-pane';
+import {getComponentVM} from '../../../../../js_specs/spec_helpers';
 import tracker from '../../../../tracker';
-import DeferredTransaction from '../../../../plugins/utils/deferred-transaction-utils';
+import {
+  REFRESH_TAB_CONTENT,
+  RELATED_ITEMS_LOADED,
+  REFRESH_MAPPING,
+  REFRESH_RELATED,
+} from '../../../../events/eventTypes';
+import * as queryApiUtils from '../../../../plugins/utils/query-api-utils';
+import * as aclUtils from '../../../../plugins/utils/acl-utils';
+import * as caUtils from '../../../../plugins/utils/ca-utils';
+import * as DeferredTransactionUtil from '../../../../plugins/utils/deferred-transaction-utils';
 import Permission from '../../../../permission';
+import {CUSTOM_ATTRIBUTE_TYPE} from '../../../../plugins/utils/custom-attribute/custom-attribute-config';
 
-describe('GGRC.Components.assessmentInfoPane', function () {
+describe('assessment-info-pane component', () => {
   let vm;
-  let instanceSave;
 
   beforeEach(function () {
-    instanceSave = can.Deferred();
-    vm = GGRC.Components.getViewModel('assessmentInfoPane');
-    vm.attr('instance', {
-      save: () => instanceSave,
+    vm = getComponentVM(Component);
+  });
+
+  describe('verifiers get() method', () => {
+    beforeEach(function () {
+      vm.attr('instance', {});
+    });
+
+    describe('if there is no verifier role id', () => {
+      beforeEach(function () {
+        vm.attr('_verifierRoleId', null);
+      });
+
+      it('returns an empty array', function () {
+        expect(vm.attr('verifiers')).toEqual([]);
+      });
+    });
+
+    it('returns verifiers', function () {
+      const verifierRoleId = 1;
+      const acl = [
+        {ac_role_id: verifierRoleId, person: {id: 301}},
+        {ac_role_id: 2, person: {id: 100}},
+        {ac_role_id: verifierRoleId, person: {id: 432}},
+      ];
+      const expected = [
+        acl[0],
+        acl[2],
+      ].map((item) => item.person);
+      vm.attr('_verifierRoleId', verifierRoleId);
+      vm.attr('instance.access_control_list', acl);
+      expect(vm.attr('verifiers').serialize()).toEqual(expected);
     });
   });
 
-  describe('editMode attribute', function () {
+  describe('showProcedureSection get() method', () => {
+    beforeEach(function () {
+      vm.attr('instance', {});
+    });
+
+    it('returns test_plan value if it exists', function () {
+      const testPlan = 'Some value';
+      vm.attr('instance.test_plan', testPlan);
+      expect(vm.attr('showProcedureSection')).toBe(testPlan);
+    });
+
+    it('returns issue_tracker.issue_url value if there is no test_plan',
+      function () {
+        const issueUrl = 'Some value';
+        vm.attr('instance.issue_tracker', {issue_url: issueUrl});
+        expect(vm.attr('showProcedureSection')).toBe(issueUrl);
+      });
+  });
+
+  describe('assessmentTypeNameSingular get() method', () => {
+    let fakeType;
+
+    beforeEach(function () {
+      fakeType = 'FakeType';
+      CMS.Models[fakeType] = {};
+      vm.attr('instance', {
+        assessment_type: fakeType,
+      });
+    });
+
+    afterAll(function () {
+      delete CMS.Models[fakeType];
+    });
+
+    it('returns singular title for object which has type equals to ' +
+    'assessment object type', function () {
+      const title = 'Fake Title';
+      CMS.Models[fakeType].title_singular = title;
+      expect(vm.attr('assessmentTypeNameSingular')).toBe(title);
+    });
+  });
+
+  describe('assessmentTypeNamePlural get() method', () => {
+    let fakeType;
+
+    beforeEach(function () {
+      fakeType = 'FakeType';
+      CMS.Models[fakeType] = {};
+      vm.attr('instance', {
+        assessment_type: fakeType,
+      });
+    });
+
+    afterAll(function () {
+      delete CMS.Models[fakeType];
+    });
+
+    it('returns plural title for object which has type equals to ' +
+    'assessment object type', function () {
+      const title = 'Fake Title';
+      CMS.Models[fakeType].title_plural = title;
+      expect(vm.attr('assessmentTypeNamePlural')).toBe(title);
+    });
+  });
+
+  describe('assessmentTypeObjects get() method', () => {
+    beforeEach(function () {
+      vm.attr({
+        instance: {},
+        mappedSnapshots: [],
+      });
+    });
+
+    it('returns mapped snapshots, which has a child type equals to ' +
+    'assessment type', function () {
+      const asmtType = 'SomeType';
+      const mappedSnapshots = [
+        {child_type: asmtType, data: 'Data 1'},
+        {child_type: 'Type1', data: 'Data 2'},
+        {child_type: asmtType, data: 'Data 3'},
+      ];
+      const expected = [mappedSnapshots[0], mappedSnapshots[2]];
+      vm.attr('instance.assessment_type', asmtType);
+      vm.attr('mappedSnapshots', mappedSnapshots);
+      expect(vm.attr('assessmentTypeObjects').serialize()).toEqual(expected);
+    });
+  });
+
+  describe('relatedInformation get() method', () => {
+    beforeEach(function () {
+      vm.attr({
+        instance: {},
+        mappedSnapshots: [],
+      });
+    });
+
+    it('returns related information from mapped snapshots list', function () {
+      const asmtType = 'SomeType';
+      const mappedSnapshots = [
+        {child_type: asmtType, data: 'Data 1'},
+        {child_type: 'Type1', data: 'Data 2'},
+        {child_type: asmtType, data: 'Data 3'},
+      ];
+      const expected = [mappedSnapshots[1]];
+      vm.attr('instance.assessment_type', asmtType);
+      vm.attr('mappedSnapshots', mappedSnapshots);
+      expect(vm.attr('relatedInformation').serialize()).toEqual(expected);
+    });
+  });
+
+  describe('editMode attribute', () => {
     const editableStatuses = ['Not Started', 'In Progress', 'Rework Needed'];
     const nonEditableStates = ['In Review', 'Completed', 'Deprecated'];
     const allStatuses = editableStatuses.concat(nonEditableStates);
 
-    describe('get() method', function () {
+    describe('get() method', () => {
+      beforeEach(function () {
+        vm.attr('instance', {});
+      });
+
       it('returns false if instance is archived', function () {
         vm.attr('instance.archived', true);
 
@@ -34,7 +187,7 @@ describe('GGRC.Components.assessmentInfoPane', function () {
         });
       });
 
-      describe('if instance is not archived', function () {
+      describe('if instance is not archived', () => {
         it('returns true if instance status is editable otherwise false',
           function () {
             allStatuses.forEach((status) => {
@@ -45,19 +198,485 @@ describe('GGRC.Components.assessmentInfoPane', function () {
           });
       });
     });
+
+    describe('set() method', () => {
+      it('calls onStateChange handler for "In Progress" status without undo',
+        function () {
+          spyOn(vm, 'onStateChange');
+          vm.attr('editMode', true);
+          expect(vm.onStateChange).toHaveBeenCalledWith({
+            state: 'In Progress',
+            undo: false,
+          });
+        });
+    });
+  });
+
+  describe('isEditDenied get() method', () => {
+    beforeEach(function () {
+      spyOn(Permission, 'is_allowed_for');
+      vm.attr('instance', {});
+    });
+
+    it('returns true if there are no update permissions for the ' +
+    'current instance', function () {
+      let result;
+      Permission.is_allowed_for.and.returnValue(false);
+      result = vm.attr('isEditDenied');
+      expect(result).toBe(true);
+      expect(Permission.is_allowed_for).toHaveBeenCalledWith(
+        'update',
+        vm.attr('instance')
+      );
+    });
+
+    describe('when there are update permissions for the current instance',
+      () => {
+        beforeEach(function () {
+          Permission.is_allowed_for.and.returnValue(true);
+        });
+
+        it('returns true if the current instance is archived', function () {
+          vm.attr('instance.archived', true);
+          expect(vm.attr('isEditDenied')).toBe(true);
+        });
+
+        it('returns false if the current instance is not archived',
+          function () {
+            vm.attr('instance.archived', false);
+            expect(vm.attr('isEditDenied')).toBe(false);
+          });
+      });
+  });
+
+  describe('isInfoPaneSaving get() method', () => {
+    it('returns false if related items are updating', function () {
+      vm.attr('isUpdatingRelatedItems', true);
+      expect(vm.attr('isInfoPaneSaving')).toBe(false);
+    });
+
+    describe('returns true', () => {
+      beforeEach(function () {
+        vm.attr('isUpdatingRelatedItems', false);
+      });
+
+      it('if urls are updating', function () {
+        vm.attr('isUpdatingUrls', true);
+        expect(vm.attr('isInfoPaneSaving')).toBe(true);
+      });
+
+      it('if comments are updating', function () {
+        vm.attr('isUpdatingComments', true);
+        expect(vm.attr('isInfoPaneSaving')).toBe(true);
+      });
+
+      it('if files are updating', function () {
+        vm.attr('isUpdatingFiles', true);
+        expect(vm.attr('isInfoPaneSaving')).toBe(true);
+      });
+
+      it('if the assessment is saving', function () {
+        vm.attr('isAssessmentSaving', true);
+        expect(vm.attr('isInfoPaneSaving')).toBe(true);
+      });
+    });
+  });
+
+  describe('setUrlEditMode() method', () => {
+    it('sets value for VM attribute based on type', function () {
+      const type = 'Type';
+      const value = new can.Map({data: 'Important data'});
+      const expectedProp = `${type}EditMode`;
+      vm.setUrlEditMode(value, type);
+      expect(vm.attr(expectedProp)).toBe(value);
+    });
+  });
+
+  describe('setInProgressState() method', () => {
+    beforeEach(function () {
+      spyOn(vm, 'onStateChange');
+    });
+
+    it('calls onStateChange with appropriate object', function () {
+      const obj = {state: 'In Progress', undo: false};
+      vm.setInProgressState();
+      expect(vm.onStateChange).toHaveBeenCalledWith(obj);
+    });
+  });
+
+  describe('getQuery() method', () => {
+    beforeEach(function () {
+      spyOn(queryApiUtils, 'buildParam');
+    });
+
+    it('returns the built query', function () {
+      const expected = {};
+      queryApiUtils.buildParam.and.returnValue(expected);
+      const result = vm.getQuery();
+      expect(result).toBe(expected);
+    });
+
+    describe('builds query with help', () => {
+      let ARGS;
+
+      beforeAll(function () {
+        ARGS = {
+          TYPE: 0,
+          SORT_OBJ: 1,
+          REL_FILTER: 2,
+          FIELDS: 3,
+          ADT_FILTER: 4,
+        };
+      });
+
+      beforeEach(function () {
+        vm.attr('instance', {
+          type: 'instanceType',
+          id: 1,
+        });
+      });
+
+      it('passed type', function () {
+        const type = 'Type';
+        vm.getQuery(type, {}, []);
+        const args = queryApiUtils.buildParam.calls.argsFor(0);
+        expect(args[ARGS.TYPE]).toBe(type);
+      });
+
+      it('passed sortObj', function () {
+        const sortObj = {};
+        vm.getQuery('Type', sortObj, []);
+        const args = queryApiUtils.buildParam.calls.argsFor(0);
+        expect(args[ARGS.SORT_OBJ]).toBe(sortObj);
+      });
+
+      it('empty obj if sortObj is empty', function () {
+        const sortObj = null;
+        vm.getQuery('Type', sortObj, []);
+        const args = queryApiUtils.buildParam.calls.argsFor(0);
+        expect(args[ARGS.SORT_OBJ]).toEqual({});
+      });
+
+      it('relevant filter made from instance type and id', function () {
+        const relevantFilters = [{
+          type: vm.attr('instance.type'),
+          id: vm.attr('instance.id'),
+          operation: 'relevant',
+        }];
+        vm.getQuery('Type', {}, []);
+        const args = queryApiUtils.buildParam.calls.argsFor(0);
+        expect(args[ARGS.REL_FILTER]).toEqual(relevantFilters);
+      });
+
+      it('empty array of fields', function () {
+        vm.getQuery('Type', {}, []);
+        const args = queryApiUtils.buildParam.calls.argsFor(0);
+        expect(args[ARGS.FIELDS]).toEqual([]);
+      });
+
+      it('passed additional filter', function () {
+        const adtFilter = [];
+        vm.getQuery('Type', {}, adtFilter);
+        const args = queryApiUtils.buildParam.calls.argsFor(0);
+        expect(args[ARGS.ADT_FILTER]).toBe(adtFilter);
+      });
+
+      it('empty array if additional filter is empty', function () {
+        const adtFilter = null;
+        vm.getQuery('Type', {}, adtFilter);
+        const args = queryApiUtils.buildParam.calls.argsFor(0);
+        expect(args[ARGS.ADT_FILTER]).toEqual([]);
+      });
+    });
+  });
+
+  describe('getCommentQuery() method', () => {
+    beforeEach(function () {
+      spyOn(vm, 'getQuery');
+    });
+
+    it('returns result of getQuery method', function () {
+      const fakeQuery = {};
+      vm.getQuery.and.returnValue(fakeQuery);
+      const result = vm.getCommentQuery();
+      expect(result).toBe(fakeQuery);
+    });
+
+    it('sets "Comment" type and sortObj for getQuery method', function () {
+      const type = 'Comment';
+      const sortObj = {sort: [{
+        key: 'created_at',
+        direction: 'desc',
+      }]};
+      vm.getCommentQuery();
+      expect(vm.getQuery).toHaveBeenCalledWith(type, sortObj);
+    });
+  });
+
+  describe('getSnapshotQuery() method', () => {
+    beforeEach(function () {
+      spyOn(vm, 'getQuery');
+    });
+
+    it('returns result of getQuery method', function () {
+      const fakeQuery = {};
+      vm.getQuery.and.returnValue(fakeQuery);
+      const result = vm.getSnapshotQuery();
+      expect(result).toBe(fakeQuery);
+    });
+
+    it('sets "Snapshot" type for getQuery method', function () {
+      const type = 'Snapshot';
+      vm.getSnapshotQuery();
+      expect(vm.getQuery).toHaveBeenCalledWith(type);
+    });
+  });
+
+  describe('requestQuery() method', () => {
+    let dfd;
+
+    beforeEach(function () {
+      dfd = can.Deferred();
+      spyOn(queryApiUtils, 'batchRequests').and.returnValue(dfd);
+    });
+
+    it('sets "isUpdating{<passed capitalized type>}" property to true before ' +
+    'resolving a request', function () {
+      const type = 'type';
+      const expectedProp = `isUpdating${can.capitalize(type)}`;
+      vm.attr(expectedProp, false);
+      vm.requestQuery({}, type);
+      expect(vm.attr(expectedProp)).toBe(true);
+    });
+
+    it('makes request with help passed query', function () {
+      const query = {
+        param1: '',
+        param2: '',
+      };
+      vm.requestQuery(query);
+      expect(queryApiUtils.batchRequests).toHaveBeenCalledWith(query);
+    });
+
+    describe('when request was resolved', () => {
+      let response;
+
+      beforeEach(function () {
+        response = {
+          type1: {
+            values: [],
+          },
+          type2: {
+            values: [],
+          },
+        };
+
+        dfd.resolve(response);
+      });
+
+      it('returns values from first response object', async function (done) {
+        const resp = await vm.requestQuery({});
+        expect(resp).toBe(response.type1.values);
+        done();
+      });
+
+      it('sets "isUpdating{<passed capitalized type>}" property to false ',
+        async function (done) {
+          const type = 'type';
+          const expectedProp = `isUpdating${can.capitalize(type)}`;
+          await vm.requestQuery({}, type);
+          expect(vm.attr(expectedProp)).toBe(false);
+          done();
+        });
+    });
+
+    describe('when request was rejected', () => {
+      beforeEach(function () {
+        dfd.reject();
+      });
+
+      it('returns empty array', async function (done) {
+        const resp = await vm.requestQuery({});
+        expect(resp).toEqual([]);
+        done();
+      });
+
+      it('sets "isUpdating{<passed capitalized type>}" property to false ',
+        async function (done) {
+          const type = 'type';
+          const expectedProp = `isUpdating${can.capitalize(type)}`;
+          await vm.requestQuery({}, type);
+          expect(vm.attr(expectedProp)).toBe(false);
+          done();
+        });
+    });
+  });
+
+  describe('loadSnapshots() method', () => {
+    beforeEach(function () {
+      spyOn(vm, 'requestQuery');
+      spyOn(vm, 'getSnapshotQuery');
+    });
+
+    it('returns result of the snapshots query', function () {
+      const expectedResult = Promise.resolve();
+      vm.requestQuery.and.returnValue(expectedResult);
+      const result = vm.loadSnapshots();
+      expect(result).toBe(expectedResult);
+    });
+
+    it('uses query for Snapshots', function () {
+      const query = {field: 'f1'};
+      vm.getSnapshotQuery.and.returnValue(query);
+      vm.loadSnapshots();
+      expect(vm.requestQuery).toHaveBeenCalledWith(query);
+    });
+  });
+
+  describe('loadComments() method', () => {
+    beforeEach(function () {
+      spyOn(vm, 'requestQuery');
+      spyOn(vm, 'getCommentQuery');
+    });
+
+    it('returns result of the comments query', function () {
+      const expectedResult = Promise.resolve();
+      vm.requestQuery.and.returnValue(expectedResult);
+      const result = vm.loadComments();
+      expect(result).toBe(expectedResult);
+    });
+
+    it('uses query for Comments and "comments" type', function () {
+      const query = {field: 'f1'};
+      const type = 'comments';
+      vm.getCommentQuery.and.returnValue(query);
+      vm.loadComments();
+      expect(vm.requestQuery).toHaveBeenCalledWith(query, type);
+    });
+  });
+
+  describe('loadFiles() method', () => {
+    beforeEach(function () {
+      spyOn(vm, 'requestQuery');
+      spyOn(vm, 'getEvidenceQuery');
+    });
+
+    it('forms query from "FILE" evidence query', function () {
+      vm.loadFiles();
+      expect(vm.getEvidenceQuery).toHaveBeenCalledWith('FILE');
+    });
+
+    it('returns result of the files query', function () {
+      const expectedResult = Promise.resolve();
+      vm.requestQuery.and.returnValue(expectedResult);
+      const result = vm.loadFiles();
+      expect(result).toBe(expectedResult);
+    });
+
+    it('uses Evidence query and "files" type', function () {
+      const query = {field: 'f1'};
+      const type = 'files';
+      vm.getEvidenceQuery.and.returnValue(query);
+      vm.loadFiles();
+      expect(vm.requestQuery).toHaveBeenCalledWith(query, type);
+    });
+  });
+
+  describe('loadUrls() method', () => {
+    beforeEach(function () {
+      spyOn(vm, 'requestQuery');
+      spyOn(vm, 'getEvidenceQuery');
+    });
+
+    it('forms query from "URL" evidence query', function () {
+      vm.loadUrls();
+      expect(vm.getEvidenceQuery).toHaveBeenCalledWith('URL');
+    });
+
+    it('returns result of the urls query', function () {
+      const expectedResult = Promise.resolve();
+      vm.requestQuery.and.returnValue(expectedResult);
+      const result = vm.loadUrls();
+      expect(result).toBe(expectedResult);
+    });
+
+    it('uses Evidence query and "urls" type', function () {
+      const query = {field: 'f1'};
+      const type = 'urls';
+      vm.getEvidenceQuery.and.returnValue(query);
+      vm.loadUrls();
+      expect(vm.requestQuery).toHaveBeenCalledWith(query, type);
+    });
+  });
+
+  describe('updateItems() method', () => {
+    beforeEach(function () {
+      spyOn(vm, 'refreshCounts');
+    });
+
+    describe('for certain types', () => {
+      let types;
+
+      beforeEach(function () {
+        types = ['urls', 'files'];
+        types.forEach((type, i) => {
+          const methodName = `load${can.capitalize(type)}`;
+          vm.attr(type.toLowerCase(), []);
+          spyOn(vm, methodName);
+        });
+      });
+
+      it('calls appropriate methods with the passed capitalized types',
+        function () {
+          vm.updateItems(...types);
+          types.forEach((type) => {
+            const methodName = `load${can.capitalize(type)}`;
+            expect(vm[methodName]).toHaveBeenCalled();
+          });
+        });
+
+      it('replaces values of passed fields in VM with the results of ' +
+      'appropriate methods', function () {
+        const loadedData = types.map((type, i) => [type, i]);
+        types.forEach((type, i) => {
+          const methodName = `load${can.capitalize(type)}`;
+          vm[methodName].and.returnValue(loadedData[i]);
+        });
+        vm.updateItems(...types);
+        types.forEach((type, i) => {
+          expect(vm.attr(type).serialize()).toEqual(loadedData[i]);
+        });
+      });
+    });
+
+    it('not throws an exception if types is not passed', function () {
+      const closure = function () {
+        vm.updateItems();
+      };
+      expect(closure).not.toThrow();
+    });
+
+    it('refreshes counts for Evidence', function () {
+      vm.updateItems();
+      expect(vm.refreshCounts).toHaveBeenCalledWith(['Evidence']);
+    });
   });
 
   describe('isAllowedToMap attribute', ()=> {
     describe('get() method', ()=> {
-      it(`returns true if there is audit
-        and it is allowed to read instance.audit`, ()=> {
-          vm.attr('instance.audit', {});
-          spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+      beforeEach(function () {
+        vm.attr('instance', {});
+      });
 
-          let result = vm.attr('isAllowedToMap');
+      it('returns true if there is audit and it is allowed to read ' +
+      'instance.audit', ()=> {
+        vm.attr('instance.audit', {});
+        spyOn(Permission, 'is_allowed_for').and.returnValue(true);
 
-          expect(result).toBe(true);
-        });
+        let result = vm.attr('isAllowedToMap');
+
+        expect(result).toBe(true);
+      });
       it('returns false if there is no audit', ()=> {
         vm.attr('instance.audit', null);
 
@@ -66,28 +685,723 @@ describe('GGRC.Components.assessmentInfoPane', function () {
         expect(result).toBe(false);
       });
 
-      it(`returns false if there is audit
-        but it is not allowed to read instance.audit`, ()=> {
-          vm.attr('instance.audit', {});
-          spyOn(Permission, 'is_allowed_for').and.returnValue(false);
+      it('returns false if there is audit but it is not allowed ' +
+      'to read instance.audit', ()=> {
+        vm.attr('instance.audit', {});
+        spyOn(Permission, 'is_allowed_for').and.returnValue(false);
 
-          let result = vm.attr('isAllowedToMap');
+        let result = vm.attr('isAllowedToMap');
 
-          expect(result).toBe(false);
+        expect(result).toBe(false);
+      });
+    });
+  });
+
+  describe('afterCreate() method', () => {
+    let event;
+    let type;
+    let items;
+
+    beforeEach(function () {
+      type = 'type';
+      const commonStamp = [{}, {}];
+      const beforeCreate = [{
+        data: 'Fake data 1',
+        isDraft: false,
+        _stamp: commonStamp[0],
+      }, {
+        data: 'Fake data 2',
+        isDraft: false,
+        _stamp: commonStamp[1],
+      }, {
+        data: 'Fake data 3',
+        isDraft: false,
+        _stamp: {},
+      }];
+      vm.attr(type, beforeCreate);
+      items = new can.List([{
+        data: 'Important data 1',
+        isDraft: true,
+        _stamp: vm
+          .attr(type)[1]
+          .attr('_stamp'),
+      }, {
+        data: 'Important data 2',
+        isDraft: true,
+        _stamp: vm
+          .attr(type)[0]
+          .attr('_stamp'),
+      }, {
+        data: 'Important data 3',
+        isDraft: true,
+        _stamp: {},
+      }]);
+      event = {
+        items,
+        success: true,
+      };
+    });
+
+    it('sets "isUpdating{<passed capitalized type>}" property to false',
+      function () {
+        const expectedProp = `isUpdating${can.capitalize(type)}`;
+        vm.attr(expectedProp, true);
+        vm.afterCreate(event, type);
+        expect(vm.attr(expectedProp)).toBe(false);
+      });
+
+    it('sets new items only if each item from them is saved', function () {
+      const expectedResult = [{
+        data: 'Fake data 3',
+        isDraft: false,
+        _stamp: {},
+      }];
+      event.success = false;
+      vm.afterCreate(event, type);
+      expect(vm.attr(type).serialize()).toEqual(expectedResult);
+    });
+
+    describe('if some item from passed items has the same _stamp field value ' +
+    'as some item from original items array', () => {
+      it('removes _stamp and isDraft props from passed items placed in event ' +
+      'object', function () {
+        const expected = [{
+          data: 'Important data 1',
+        }, {
+          data: 'Important data 2',
+        }, {
+          data: 'Important data 3',
+          isDraft: true,
+          _stamp: {},
+        }];
+        vm.afterCreate(event, type);
+        expect(items.serialize()).toEqual(expected);
+      });
+
+      it('sets the flag isNotSaved to true for item from passed items if ' +
+      'event.success is false', function () {
+        const expected = [{
+          data: 'Important data 1',
+          isNotSaved: true,
+        }, {
+          data: 'Important data 2',
+          isNotSaved: true,
+        }, {
+          data: 'Important data 3',
+          isDraft: true,
+          _stamp: {},
+        }];
+        event.success = false;
+        vm.afterCreate(event, type);
+        expect(items.serialize()).toEqual(expected);
+      });
+    });
+  });
+
+  describe('addItems() method', () => {
+    let type;
+    let event;
+
+    beforeEach(function () {
+      type = 'Type';
+      event = {
+        items: [1, 2, 3],
+      };
+      vm.attr(type, [4, 5, 6]);
+    });
+
+    it('pushes items from event into beginning of the list with name from ' +
+    'type param', function () {
+      const beforeInvoke = vm.attr(type).serialize();
+      const expectedResult = event.items.concat(beforeInvoke);
+      vm.addItems(event, type);
+      expect(vm.attr(type).serialize()).toEqual(expectedResult);
+    });
+
+    it('sets "isUpdating{<passed capitalized type>}" property to true',
+      function () {
+        const expectedProp = `isUpdating${can.capitalize(type)}`;
+        vm.attr(expectedProp, false);
+
+        vm.addItems(event, type);
+        expect(vm.attr(expectedProp)).toBe(true);
+      });
+
+    it('works fine, when event.items prop is array-like object', function () {
+      const beforeInvoke = vm.attr(type).serialize();
+      const expectedResult = event.items.concat(beforeInvoke);
+
+      event.items = new can.List(event.items);
+      vm.addItems(event, type);
+
+      expect(vm
+        .attr(type)
+        .serialize()
+      ).toEqual(expectedResult);
+    });
+  });
+
+  describe('addAction() method', () => {
+    beforeEach(function () {
+      vm.attr('instance', {});
+    });
+
+    it('sets instance.actions to empty object if there are no actions',
+      function () {
+        vm.attr('instance.actions', null);
+        vm.addAction('actionType', {});
+        expect(vm.attr('instance.actions')).toBeDefined();
+      });
+
+    it('pushes into actions.{<passed actionType>} passed related item if ' +
+    'there is actions.{<passed actionType>}', function () {
+      const actionType = 'actionType';
+      const related = {
+        data: 'Important data',
+      };
+
+      vm.attr('instance.actions', {[actionType]: []});
+      vm.addAction(actionType, related);
+
+      const last = vm
+        .attr('instance.actions')
+        .attr(actionType).pop();
+      expect(last.serialize()).toEqual(related);
+    });
+
+    it('creates actions.{<passed actionType>} list for instance with passed ' +
+    'related item if there are no actions.{<passed actionType>}', function () {
+      const actionType = 'actionType';
+      const related = {
+        data: 'Important data',
+      };
+      const expected = [related];
+      vm.addAction(actionType, related);
+      expect(vm
+        .attr('instance.actions')
+        .attr(actionType)
+        .serialize()
+      ).toEqual(expected);
+    });
+  });
+
+  describe('addRelatedItem() method', () => {
+    let assessment;
+    let event;
+    let type;
+    let related;
+    let dfd;
+
+    beforeEach(function () {
+      dfd = can.Deferred();
+      type = 'type';
+      event = {
+        item: new can.Map({
+          id: 1,
+          type: 'Type',
+        }),
+      };
+      related = {
+        id: event.item.attr('id'),
+        type: event.item.attr('type'),
+      };
+      assessment = new can.Map({
+        actions: [],
+      });
+
+      vm.attr('instance', {});
+      vm.attr('instance').dispatch = jasmine.createSpy('dispatch');
+      vm.attr('deferredSave', {
+        push: jasmine.createSpy('push').and.returnValue(dfd),
+      });
+
+      spyOn(vm, 'addAction');
+      spyOn(vm, 'afterCreate');
+    });
+
+    describe('within pushed deferred function into deferredSave', () => {
+      let pushedFunc;
+
+      beforeEach(function () {
+        vm.addRelatedItem(event, type);
+        pushedFunc = vm.attr('deferredSave').push.calls.argsFor(0)[0];
+      });
+
+      it('adds add_related action with related object', function () {
+        pushedFunc();
+        expect(vm.addAction).toHaveBeenCalledWith(
+          'add_related',
+          related
+        );
+      });
+    });
+
+    describe('if deferredSave was resolved', () => {
+      beforeEach(function () {
+        dfd.resolve(assessment);
+      });
+
+      it('calls afterCreate with appropriate params with success equals ' +
+      'to true', function (done) {
+        vm.addRelatedItem(event, type);
+        dfd.then(() => {
+          expect(vm.afterCreate.calls.count()).toBe(1);
+          expect(vm.afterCreate).toHaveBeenCalledWith({
+            items: [event.item],
+            success: true,
+          }, type);
+          done();
         });
+      });
+
+      it('removes actions for assessment', function (done) {
+        vm.addRelatedItem(event, type);
+        dfd.always(() => {
+          expect(assessment.attr('actions')).toBeUndefined();
+          done();
+        });
+      });
+
+      it('dispatches RELATED_ITEMS_LOADED for instance', function (done) {
+        vm.addRelatedItem(event, type);
+        dfd.always(() => {
+          expect(vm.attr('instance').dispatch).toHaveBeenCalledWith(
+            RELATED_ITEMS_LOADED
+          );
+          done();
+        });
+      });
+
+      it('refreshes counts for "Evidence" if related items type is "Evidence"',
+        function (done) {
+          spyOn(vm, 'refreshCounts');
+          event.item.attr('type', 'Evidence');
+          vm.addRelatedItem(event, type);
+          dfd.always(() => {
+            expect(vm.refreshCounts).toHaveBeenCalledWith(
+              [event.item.type]
+            );
+            done();
+          });
+        });
+    });
+
+    describe('if deferredSave was rejected', () => {
+      beforeEach(function () {
+        dfd.reject(assessment);
+      });
+
+      it('calls afterCreate with appropriate params with success equals to ' +
+      'false', function (done) {
+        dfd.reject(assessment);
+        vm.addRelatedItem(event, type);
+        dfd.fail(() => {
+          expect(vm.afterCreate.calls.count()).toBe(1);
+          expect(vm.afterCreate).toHaveBeenCalledWith({
+            items: [event.item],
+            success: false,
+          }, type);
+          done();
+        });
+      });
+
+      it('removes actions for assessment', function (done) {
+        vm.addRelatedItem(event, type);
+        dfd.always(() => {
+          expect(assessment.attr('actions')).toBeUndefined();
+          done();
+        });
+      });
+
+      it('dispatches RELATED_ITEMS_LOADED for instance', function (done) {
+        vm.addRelatedItem(event, type);
+        dfd.always(() => {
+          expect(vm.attr('instance').dispatch).toHaveBeenCalledWith(
+            RELATED_ITEMS_LOADED
+          );
+          done();
+        });
+      });
+
+      it('refreshes counts for "Evidence" if related items type is "Evidence"',
+        function (done) {
+          spyOn(vm, 'refreshCounts');
+          event.item.attr('type', 'Evidence');
+          vm.addRelatedItem(event, type);
+          dfd.always(() => {
+            expect(vm.refreshCounts).toHaveBeenCalledWith(
+              [event.item.type]
+            );
+            done();
+          });
+        });
+    });
+  });
+
+  describe('removeRelatedItem() method', () => {
+    let dfd;
+    let type;
+    let item;
+    let items;
+    let related;
+    let assessment;
+
+    beforeEach(function () {
+      const countOfItems = 3;
+      dfd = can.Deferred();
+      type = 'type';
+      items = new can.List(
+        Array(countOfItems)
+      ).map((item, index) => {
+        return {
+          id: index,
+          type: 'Awesome type',
+        };
+      });
+      item = items.attr(countOfItems - 1);
+      related = {
+        id: item.attr('id'),
+        type: item.attr('type'),
+      };
+      assessment = new can.Map({
+        actions: [],
+      });
+      vm.attr(type, items);
+      vm.attr('deferredSave', {
+        push: jasmine.createSpy('push').and.returnValue(dfd),
+      });
+
+      spyOn(vm, 'addAction');
+      spyOn(GGRC.Errors, 'notifier');
+      spyOn(vm, 'refreshCounts');
+    });
+
+    it('sets "isUpdating{<passed capitalized type>}" property to true ' +
+    'before deferredSave\'s resolve', function () {
+      const expectedProp = `isUpdating${can.capitalize(type)}`;
+      vm.attr(expectedProp, false);
+      vm.removeRelatedItem(item, type);
+      expect(vm.attr(expectedProp)).toBe(true);
+    });
+
+    it('removes passed item from {<passed type>} list', function () {
+      vm.removeRelatedItem(item, type);
+      expect(items.indexOf(item)).toBe(-1);
+    });
+
+    describe('pushed function into deferredSave', () => {
+      let pushedFunc;
+
+      beforeEach(function () {
+        vm.removeRelatedItem(item, type);
+        pushedFunc = vm.attr('deferredSave').push.calls.argsFor(0)[0];
+      });
+
+      it('adds remove_related action with related object', function () {
+        pushedFunc();
+        expect(vm.addAction).toHaveBeenCalledWith(
+          'remove_related',
+          related
+        );
+      });
+    });
+
+    describe('if deferredSave was resolved', () => {
+      beforeEach(function () {
+        dfd.resolve(assessment);
+      });
+
+      it('sets "isUpdating{<passed capitalized type>}" property to false',
+        function (done) {
+          const expectedProp = `isUpdating${can.capitalize(type)}`;
+
+          vm.removeRelatedItem(item, type);
+
+          dfd.always(() => {
+            expect(vm.attr(expectedProp)).toBe(false);
+            done();
+          });
+        });
+
+      it('removes actions for assessment from response', function (done) {
+        vm.removeRelatedItem(item, type);
+
+        dfd.always(() => {
+          expect(assessment.attr('actions')).toBeUndefined();
+          done();
+        });
+      });
+    });
+
+    describe('if deferredSave was rejected ', () => {
+      beforeEach(function () {
+        dfd.reject(assessment);
+      });
+
+      it('shows error', function (done) {
+        vm.removeRelatedItem(item, type);
+        dfd.fail(() => {
+          expect(GGRC.Errors.notifier).toHaveBeenCalledWith(
+            'error',
+            'Unable to remove URL.'
+          );
+          done();
+        });
+      });
+
+      it('inserts removed item from {<passed type>} list at previous place',
+        function (done) {
+          vm.removeRelatedItem(item, type);
+          dfd.fail(() => {
+            expect(items.indexOf(item)).not.toBe(-1);
+            done();
+          });
+        });
+
+      it('sets "isUpdating{<passed capitalized type>}" property to false',
+        function (done) {
+          const expectedProp = `isUpdating${can.capitalize(type)}`;
+
+          vm.removeRelatedItem(item, type);
+
+          dfd.always(() => {
+            expect(vm.attr(expectedProp)).toBe(false);
+            done();
+          });
+        });
+
+      it('removes actions for assessment from response', function (done) {
+        vm.removeRelatedItem(item, type);
+
+        dfd.always(() => {
+          expect(assessment.attr('actions')).toBeUndefined();
+          done();
+        });
+      });
+    });
+  });
+
+  describe('updateRelatedItems() method', () => {
+    let dfd;
+
+    beforeEach(function () {
+      dfd = can.Deferred();
+      vm.attr('instance', {});
+      vm.attr('instance').getRelatedObjects =
+        jasmine.createSpy('getRelatedObjects').and.returnValue(dfd);
+    });
+
+    it('sets isUpdatingRelatedItems property to true', function () {
+      const prop = 'isUpdatingRelatedItems';
+      vm.attr(prop, false);
+      vm.updateRelatedItems();
+      expect(vm.attr(prop)).toBe(true);
+    });
+
+    describe('when related objects were received successfully', () => {
+      let data;
+
+      beforeEach(() => {
+        data = {};
+        dfd.resolve(data);
+      });
+
+      it('replaces mappedSnapshots list with loaded mapped snapshots',
+        function () {
+          data.Snapshot = {data: '1'};
+          vm.updateRelatedItems();
+          expect(vm.attr('mappedSnapshots').serialize()).toEqual([
+            data.Snapshot,
+          ]);
+        });
+
+      it('replaces comments list with loaded comments', function () {
+        data.Comment = {data: '1'};
+        vm.updateRelatedItems();
+        expect(vm.attr('comments').serialize()).toEqual([data.Comment]);
+      });
+
+      it('replaces files list with loaded files', function () {
+        data['Evidence:FILE'] = {data: '1'};
+        vm.updateRelatedItems();
+        expect(vm.attr('files').serialize()).toEqual([
+          data['Evidence:FILE'],
+        ]);
+      });
+
+      it('replaces urls list with loaded urls', function () {
+        data['Evidence:URL'] = {data: '1'};
+        vm.updateRelatedItems();
+        expect(vm.attr('urls').serialize()).toEqual([
+          data['Evidence:URL'],
+        ]);
+      });
+
+      it('sets isUpdatingRelatedItems to false', function () {
+        vm.updateRelatedItems();
+        expect(vm.attr('isUpdatingRelatedItems')).toBe(false);
+      });
+
+      it('dispatches RELATED_ITEMS_LOADED for the instance', function () {
+        const dispatchSpy = jasmine.createSpy('dispatch');
+        vm.attr('instance').dispatch = dispatchSpy;
+        vm.updateRelatedItems();
+        expect(dispatchSpy).toHaveBeenCalledWith(RELATED_ITEMS_LOADED);
+      });
+    });
+  });
+
+  describe('initializeFormFields() method', () => {
+    let results;
+
+    beforeEach(function () {
+      vm.attr({
+        formFields: [],
+        instance: {},
+      });
+      results = [1, 2, 3];
+      spyOn(caUtils, 'getCustomAttributes');
+      spyOn(caUtils, 'convertValuesToFormFields');
+    });
+
+    it('gets CA with help getCustomAttributes', function () {
+      vm.initializeFormFields();
+      expect(caUtils.getCustomAttributes).toHaveBeenCalledWith(
+        vm.attr('instance'), caUtils.CUSTOM_ATTRIBUTE_TYPE.LOCAL
+      );
+    });
+
+    it('assigns converted CA values to form fields', function () {
+      caUtils.getCustomAttributes.and.returnValue(results);
+      caUtils.convertValuesToFormFields.and.returnValue(results);
+      vm.initializeFormFields();
+      expect(
+        vm.attr('formFields').serialize()
+      ).toEqual(results);
+      expect(caUtils.convertValuesToFormFields).toHaveBeenCalledWith(results);
+    });
+  });
+
+  describe('initGlobalAttributes() method', () => {
+    beforeEach(function () {
+      vm.attr('instance', {
+        customAttr: jasmine.createSpy('customAttr'),
+      });
+    });
+
+    it('sets global custom attributes', function () {
+      const expectedResult = new can.List([]);
+      const customAttr = vm.attr('instance').customAttr;
+      customAttr.and.returnValue(expectedResult);
+
+      vm.initGlobalAttributes();
+
+      expect(customAttr).toHaveBeenCalledWith({
+        type: CUSTOM_ATTRIBUTE_TYPE.GLOBAL,
+      });
+      expect(vm.attr('globalAttributes')).toBe(expectedResult);
+    });
+  });
+
+  describe('initializeDeferredSave() method', () => {
+    beforeEach(function () {
+      vm.attr('deferredSave', {});
+    });
+
+    describe('calls a DeferredTransaction constructor for deferredSave with' +
+    'specified params, where', () => {
+      let args;
+      let ARGS_ORDER;
+
+      beforeAll(function () {
+        ARGS_ORDER = {
+          CALLBACK: 0,
+          TIMEOUT: 1,
+        };
+      });
+
+      beforeEach(function () {
+        const dfdT = spyOn(DeferredTransactionUtil, 'default');
+        vm.initializeDeferredSave();
+        args = dfdT.calls.argsFor(0);
+      });
+
+      it('completeTransaction param is a function', function () {
+        expect(
+          args[ARGS_ORDER.CALLBACK]
+        ).toEqual(jasmine.any(Function));
+      });
+
+      it('timeout param is 1000ms', function () {
+        expect(
+          args[ARGS_ORDER.TIMEOUT]
+        ).toBe(1000);
+      });
+
+      describe('completeTransaction function', () => {
+        let completeTransaction;
+        let resolveFunc;
+        let rejectFunc;
+        let dfd;
+
+        beforeEach(() => {
+          dfd = can.Deferred();
+          completeTransaction = args[ARGS_ORDER.CALLBACK];
+          vm.attr('instance', {
+            save: jasmine.createSpy('save').and.returnValue(dfd),
+          });
+          resolveFunc = jasmine.createSpy('resolveFunc');
+          rejectFunc = jasmine.createSpy('rejectFunc');
+        });
+
+        it('saves instance', function () {
+          completeTransaction();
+          expect(vm.attr('instance').save).toHaveBeenCalled();
+        });
+
+        it('calls passed resolve function if the saving was resolved',
+          function (done) {
+            dfd.resolve();
+            completeTransaction(resolveFunc, rejectFunc);
+            dfd.done(() => {
+              expect(resolveFunc).toHaveBeenCalled();
+              expect(rejectFunc).not.toHaveBeenCalled();
+              done();
+            });
+          });
+
+        it('calls passed reject function if the saving was rejected',
+          function (done) {
+            dfd.reject();
+            completeTransaction(resolveFunc, rejectFunc);
+            dfd.fail(function () {
+              expect(rejectFunc).toHaveBeenCalled();
+              expect(resolveFunc).not.toHaveBeenCalled();
+              done();
+            });
+          });
+      });
     });
   });
 
   describe('onStateChange() method', () => {
     let method;
+    let instanceSave;
 
     beforeEach(() => {
+      const {'default': DeferredTransaction} = DeferredTransactionUtil;
+      instanceSave = can.Deferred();
       method = vm.onStateChange.bind(vm);
       spyOn(tracker, 'start').and.returnValue(() => {});
-
+      vm.attr('instance', {
+        save() {
+          return instanceSave;
+        },
+      });
       vm.attr('deferredSave', new DeferredTransaction((resolve, reject) => {
         vm.attr('instance').save().done(resolve).fail(reject);
       }, 0, true));
+      spyOn(vm, 'initializeFormFields').and.returnValue(() => {});
     });
 
     it('prevents state change to deprecated for archived instance', (done) => {
@@ -141,6 +1455,355 @@ describe('GGRC.Components.assessmentInfoPane', function () {
       }).fail(() => {
         expect(vm.attr('instance.status')).toBe('Foo');
         done();
+      });
+    });
+  });
+
+  describe('saveGlobalAttributes() method', () => {
+    let event;
+
+    beforeEach(function () {
+      event = {
+        globalAttributes: [],
+      };
+      vm.attr('instance', {});
+    });
+
+    it('adds deferred transaction', function () {
+      const push = jasmine.createSpy('push');
+      vm.attr('deferredSave', {push});
+      vm.saveGlobalAttributes(event);
+      expect(push).toHaveBeenCalledWith(jasmine.any(Function));
+    });
+
+    describe('added deferred transaction', function () {
+      let action;
+      let customAttr;
+
+      beforeEach(function () {
+        const push = jasmine.createSpy('push');
+        customAttr = jasmine.createSpy('customAttr');
+        vm.attr('instance', {customAttr});
+        vm.attr('deferredSave', {push});
+        vm.saveGlobalAttributes(event);
+        action = push.calls.argsFor(0)[0];
+      });
+
+      it('sets global custom attributes from passed event object', function () {
+        event.globalAttributes = new can.Map({
+          '123': 'Value',
+          '2': 'Value2',
+        });
+        action();
+        expect(customAttr).toHaveBeenCalledWith('123', 'Value');
+        expect(customAttr).toHaveBeenCalledWith('2', 'Value2');
+      });
+    });
+  });
+
+  describe('showRequiredInfoModal() method', () => {
+    let event;
+
+    beforeEach(function () {
+      const field = new can.Map({
+        title: 'Perfect Title',
+        type: 'Perfect Type',
+        options: [],
+        value: {},
+        errorsMap: {
+          error1: true,
+          error2: false,
+          error3: false,
+        },
+        saveDfd: {},
+      });
+      event = {field};
+    });
+
+    describe('sets for modal.content', () => {
+      let field;
+
+      beforeEach(function () {
+        field = event.field;
+      });
+
+      it('"options" field', function () {
+        const expectedResult = field.attr('options');
+        vm.showRequiredInfoModal(event);
+        expect(vm.attr('modal.content.options')).toBe(expectedResult);
+      });
+
+      it('"contextScope" field', function () {
+        const expectedResult = field;
+        vm.showRequiredInfoModal(event);
+        expect(vm.attr('modal.content.contextScope')).toBe(expectedResult);
+      });
+
+      it('"fields" field', function () {
+        const errors = field.errorsMap;
+        const expectedResult = can.Map.keys(errors)
+          .map((error) => errors[error] ? error : null)
+          .filter((errorCode) => !!errorCode);
+        vm.showRequiredInfoModal(event);
+        expect(vm.attr('modal.content.fields').serialize())
+          .toEqual(expectedResult);
+      });
+
+      it('"value" field', function () {
+        const expectedResult = field.attr('value');
+        vm.showRequiredInfoModal(event);
+        expect(vm.attr('modal.content.value')).toBe(expectedResult);
+      });
+
+      it('"title" field', function () {
+        const expectedResult = field.attr('title');
+        vm.showRequiredInfoModal(event);
+        expect(vm.attr('modal.content.title')).toBe(expectedResult);
+      });
+
+      it('"type" field', function () {
+        const expectedResult = field.attr('type');
+        vm.showRequiredInfoModal(event);
+        expect(vm.attr('modal.content.type')).toBe(expectedResult);
+      });
+
+      describe('"saveDfd" field with', () => {
+        it('deferred object from event.saveDfd field', function () {
+          const expectedResult = can.Deferred();
+          event.saveDfd = expectedResult;
+          vm.showRequiredInfoModal(event);
+          expect(vm.attr('modal.content.saveDfd')).toBe(expectedResult);
+        });
+
+        it('resolved deferred object, if there is no event.saveDfd',
+          function (done) {
+            event.saveDfd = null;
+            vm.showRequiredInfoModal(event);
+            vm.attr('modal.content.saveDfd').then(done);
+          });
+      });
+    });
+
+    it('sets modal.modalTitle through getLCAPopupTitle', () => {
+      const title = 'something';
+      const expectedResult = `Required ${title}`;
+      spyOn(caUtils, 'getLCAPopupTitle').and.returnValue(title);
+      vm.showRequiredInfoModal(event);
+      expect(vm.attr('modal.modalTitle')).toBe(expectedResult);
+      expect(caUtils.getLCAPopupTitle).toHaveBeenCalledWith(
+        event.field.attr('errorsMap'));
+    });
+
+    it('sets modal.state.open field to true', () => {
+      vm.showRequiredInfoModal(event);
+      expect(vm.attr('modal.state.open')).toBe(true);
+    });
+  });
+
+  describe('setVerifierRoleId() method', () => {
+    beforeEach(function () {
+      spyOn(aclUtils, 'getRole');
+    });
+
+    it('assigns null to vm._verifierRoleId if there is no role for ' +
+    'Assessment.Verifiers', function () {
+      aclUtils.getRole.and.returnValue(undefined);
+      vm.setVerifierRoleId();
+      expect(vm.attr('_verifierRoleId')).toBeNull();
+    });
+
+    it('assigns role id (for "Assessment" type and "Verifiers" role name) ' +
+    'to vm._verifierRoleId if it exists', function () {
+      const verifierRole = {id: 1};
+      aclUtils.getRole.and.returnValue(verifierRole);
+      vm.setVerifierRoleId();
+      expect(vm.attr('_verifierRoleId')).toBe(verifierRole.id);
+    });
+  });
+
+  describe('component scope', () => {
+    let fakeComponent;
+
+    beforeEach(function () {
+      fakeComponent = {viewModel: vm};
+    });
+
+    describe('init() method', () => {
+      let init;
+
+      beforeEach(function () {
+        init = Component.prototype.init.bind(fakeComponent);
+        spyOn(vm, 'initializeFormFields');
+        spyOn(vm, 'initGlobalAttributes');
+        spyOn(vm, 'updateRelatedItems');
+        spyOn(vm, 'initializeDeferredSave');
+        spyOn(vm, 'setVerifierRoleId');
+      });
+
+      it('calls vm.initializeFormFields method', function () {
+        init();
+        expect(vm.initializeFormFields).toHaveBeenCalled();
+      });
+
+      it('calls vm.initGlobalAttributes method', function () {
+        init();
+        expect(vm.initGlobalAttributes).toHaveBeenCalled();
+      });
+
+      it('calls vm.updateRelatedItems method', function () {
+        init();
+        expect(vm.updateRelatedItems).toHaveBeenCalled();
+      });
+
+      it('calls initializeDeferredSave method', function () {
+        init();
+        expect(vm.initializeDeferredSave).toHaveBeenCalled();
+      });
+
+      it('calls setVerifierRoleId method', function () {
+        init();
+        expect(vm.setVerifierRoleId).toHaveBeenCalled();
+      });
+    });
+
+    describe('"{vm.instance} ${REFRESH_MAPPING.type}"() event handler',
+      () => {
+        let event;
+        let snapshots;
+        let evObject;
+
+        beforeEach(function () {
+          const eventName = `{viewModel.instance} ${REFRESH_MAPPING.type}`;
+          event = Component.prototype.events[eventName].bind(fakeComponent);
+          snapshots = {
+            data: 'Important data',
+          };
+          spyOn(vm, 'loadSnapshots').and.returnValue(snapshots);
+          vm.attr('instance', {});
+          evObject = {};
+        });
+
+        it('assigns loaded snapshots to vm.mappedSnapshots field',
+          function () {
+            event({}, evObject);
+            const result = vm.attr('mappedSnapshots').serialize();
+            expect(vm.loadSnapshots).toHaveBeenCalled();
+            expect(result).toEqual([snapshots]);
+          });
+
+        it('dispatches REFRESH_RELATED event with appropriate model name',
+          function () {
+            const dispatch = spyOn(vm.attr('instance'), 'dispatch');
+            evObject.destinationType = 'Type';
+            event({}, evObject);
+            expect(dispatch).toHaveBeenCalledWith({
+              ...REFRESH_RELATED,
+              model: evObject.destinationType,
+            });
+          });
+      });
+
+    describe('"{vm.instance} modelBeforeSave"() event handler',
+      () => {
+        let event;
+
+        beforeEach(function () {
+          const eventName = '{viewModel.instance} modelBeforeSave';
+          event = Component.prototype.events[eventName].bind(fakeComponent);
+        });
+
+        it('sets vm.isAssessmentSaving to true', function () {
+          event();
+          const result = vm.attr('isAssessmentSaving');
+          expect(result).toBe(true);
+        });
+      });
+
+    describe('"{vm.instance} modelAfterSave"() event handler',
+      () => {
+        let event;
+
+        beforeEach(function () {
+          const eventName = '{viewModel.instance} modelAfterSave';
+          event = Component.prototype.events[eventName].bind(fakeComponent);
+        });
+
+        it('sets vm.isAssessmentSaving to false', function () {
+          event();
+          const result = vm.attr('isAssessmentSaving');
+          expect(result).toBe(false);
+        });
+      });
+
+    describe('{vm.instance} assessment_type', () => {
+      let event;
+
+      beforeEach(function () {
+        const eventName = '{viewModel.instance} assessment_type';
+        event = Component.prototype.events[eventName].bind(fakeComponent);
+        vm.attr('instance', {});
+      });
+
+      it('binds "updated" handler', function () {
+        spyOn(vm.instance, 'bind');
+        event();
+        expect(vm.instance.bind).toHaveBeenCalledWith(
+          'updated',
+          jasmine.any(Function)
+        );
+      });
+
+      describe('when "updated" event was triggered on the instance', () => {
+        beforeEach(function () {
+          event();
+        });
+
+        it('dispatches refresh tab event with appropriate data',
+          function (done) {
+            const instance = vm.attr('instance');
+            instance.bind(REFRESH_TAB_CONTENT.type, (event) => {
+              expect(event.tabId).toBe('tab-related-assessments');
+              done();
+            });
+            instance.dispatch('updated');
+          });
+
+        it('unbinds "updated" event from the instance', function () {
+          const instance = vm.attr('instance');
+          spyOn(instance, 'unbind');
+          instance.dispatch('updated');
+          expect(instance.unbind).toHaveBeenCalledWith(
+            'updated',
+            jasmine.any(Function)
+          );
+        });
+      });
+    });
+
+    describe('"{viewModel} instance"() event handler', () => {
+      let event;
+
+      beforeEach(function () {
+        const eventName = '{viewModel} instance';
+        event = Component.prototype.events[eventName].bind(fakeComponent);
+        spyOn(vm, 'initializeFormFields');
+        spyOn(vm, 'initGlobalAttributes');
+        spyOn(vm, 'updateRelatedItems');
+      });
+
+      it('calls vm.initializeFormFields method', function () {
+        event();
+        expect(vm.initializeFormFields).toHaveBeenCalled();
+      });
+
+      it('calls vm.initGlobalAttributes method', function () {
+        event();
+        expect(vm.initGlobalAttributes).toHaveBeenCalled();
+      });
+
+      it('calls vm.updateRelatedItems method', function () {
+        event();
+        expect(vm.updateRelatedItems).toHaveBeenCalled();
       });
     });
   });

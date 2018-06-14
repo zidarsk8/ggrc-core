@@ -4,6 +4,7 @@
 */
 
 import Permission from '../permission';
+import {makeFakeInstance} from '../../js_specs/spec_helpers';
 
 describe('Permission', function () {
   describe('_admin_permission_for_context() method', function () {
@@ -178,289 +179,298 @@ describe('Permission', function () {
       permissions = {};
     });
 
-    it('return true if it is admin permission if no conditions', function () {
-      permissions.__GGRC_ADMIN__ = {
-        __GGRC_ALL__: {
-          contexts: [0],
-        },
-      };
-      instance = new CMS.Models.UserRole();
-      result = Permission._is_allowed_for(permissions, instance, 'create');
-      expect(result).toEqual(true);
-    });
-    it('return true if it is admin permission and matches all conditions',
-      function () {
+    describe('within userRole instance', () => {
+      let fakeUserRoleCreator;
+
+      beforeEach(function () {
+        fakeUserRoleCreator = makeFakeInstance({model: CMS.Models.UserRole});
+      });
+
+      it('return true if it is admin permission if no conditions', function () {
         permissions.__GGRC_ADMIN__ = {
           __GGRC_ALL__: {
             contexts: [0],
-            conditions: {
-              '0': [{
-                condition: 'contains',
-                terms: {
-                  value: {id: 0},
-                  list_property: 'list_value',
-                },
-              }],
-            },
           },
         };
-        instance = new CMS.Models.UserRole();
-        instance.list_value = [{id: 0}];
+        instance = fakeUserRoleCreator();
         result = Permission._is_allowed_for(permissions, instance, 'create');
         expect(result).toEqual(true);
       });
-    it('returns true if permissions resources contains instance id',
-      function () {
-        permissions.create = {
-          UserRole: {
-            resources: [10],
-          },
-        };
-        instance = new CMS.Models.UserRole();
-        instance.attr('id', 10);
-        result = Permission._is_allowed_for(permissions, instance, 'create');
-        expect(result).toEqual(true);
-      });
-    it('returns true if there is permission with null context ' +
-    'and no conditions', function () {
-      permissions.create = {
-        UserRole: {
-          contexts: [null],
-        },
-      };
-      instance = new CMS.Models.UserRole();
-      result = Permission._is_allowed_for(permissions, instance, 'create');
-      expect(result).toEqual(true);
-    });
-    it('returns true if there is permission with specified context ' +
-    'and no conditions', function () {
-      permissions.create = {
-        UserRole: {
-          contexts: [101],
-        },
-      };
-      instance = new CMS.Models.UserRole();
-      instance.attr('context', {id: 101});
-      result = Permission._is_allowed_for(permissions, instance, 'create');
-      expect(result).toEqual(true);
-    });
-    describe('returns false if there is permission ' +
-    'but conditions are not matched', function () {
-      it('for "contains" condition', function () {
-        permissions.create = {
-          UserRole: {
-            contexts: [101],
-            conditions: {
-              '101': [{
-                condition: 'contains',
-                terms: {
-                  value: {id: 0},
-                  list_property: 'list_value',
-                },
-              }],
-            },
-          },
-        };
-        instance = new CMS.Models.UserRole();
-        instance.attr('context', {id: 101});
-        instance.list_value = [{id: 100}];
-        result = Permission._is_allowed_for(permissions, instance, 'create');
-        expect(result).toEqual(false);
-      });
-      it('for "is" condition', function () {
-        permissions.create = {
-          UserRole: {
-            contexts: [101],
-            conditions: {
-              '101': [{
-                condition: 'is',
-                terms: {
-                  value: 'good_value',
-                  property_name: 'mockProperty',
-                },
-              }],
-            },
-          },
-        };
-
-        instance = new CMS.Models.UserRole();
-        instance.attr('context', {id: 101});
-        instance.mockProperty = 'bad_value';
-
-        result = Permission._is_allowed_for(permissions, instance, 'create');
-        expect(result).toEqual(false);
-      });
-      it('for "in" condition', function () {
-        permissions.create = {
-          UserRole: {
-            contexts: [101],
-            conditions: {
-              '101': [{
-                condition: 'in',
-                terms: {
-                  value: [1, 2, 3],
-                  property_name: 'mockProperty',
-                },
-              }],
-            },
-          },
-        };
-
-        instance = new CMS.Models.UserRole();
-        instance.attr('context', {id: 101});
-        instance.mockProperty = 4;
-
-        result = Permission._is_allowed_for(permissions, instance, 'create');
-        expect(result).toEqual(false);
-      });
-      it('for "forbid" condition', function () {
-        permissions.create = {
-          UserRole: {
-            contexts: [101],
-            conditions: {
-              '101': [{
-                condition: 'forbid',
-                terms: {
-                  blacklist: {
-                    create: [
-                      'bad_instance',
-                    ],
+      it('return true if it is admin permission and matches all conditions',
+        function () {
+          permissions.__GGRC_ADMIN__ = {
+            __GGRC_ALL__: {
+              contexts: [0],
+              conditions: {
+                '0': [{
+                  condition: 'contains',
+                  terms: {
+                    value: {id: 0},
+                    list_property: 'list_value',
                   },
-                },
-              }],
+                }],
+              },
             },
-          },
-        };
-
-        instance = new CMS.Models.UserRole();
-        instance.attr('context', {id: 101});
-        instance.attr('type', 'bad_instance');
-
-        result = Permission._is_allowed_for(permissions, instance, 'create');
-        expect(result).toEqual(false);
-      });
-    });
-    describe('returns true if there is permission ' +
-    'and conditions are matched', function () {
-      it('for "contains" condition', function () {
-        permissions.create = {
-          UserRole: {
-            contexts: [101],
-            conditions: {
-              '101': [{
-                condition: 'contains',
-                terms: {
-                  value: {id: 0},
-                  list_property: 'list_value',
-                },
-              }],
-            },
-          },
-        };
-        instance = new CMS.Models.UserRole();
-        instance.attr('context', {id: 101});
-        instance.list_value = [{id: 0}];
-        result = Permission._is_allowed_for(permissions, instance, 'create');
-        expect(result).toEqual(true);
-      });
-      it('for "is" condition', function () {
-        permissions.create = {
-          UserRole: {
-            contexts: [101],
-            conditions: {
-              '101': [{
-                condition: 'is',
-                terms: {
-                  value: 'mockValue',
-                  property_name: 'property_value',
-                },
-              }],
-            },
-          },
-        };
-
-        instance = new CMS.Models.UserRole();
-        instance.attr('context', {id: 101});
-        instance.attr('property_value', 'mockValue');
-
-        result = Permission._is_allowed_for(permissions, instance, 'create');
-        expect(result).toEqual(true);
-      });
-      it('for complex "is" condition', function () {
-        permissions.create = {
-          UserRole: {
-            contexts: [101],
-            conditions: {
-              '101': [{
-                condition: 'is',
-                terms: {
-                  value: 'mockValue',
-                  property_name: 'container.property_value',
-                },
-              }],
-            },
-          },
-        };
-
-        instance = new CMS.Models.UserRole();
-        instance.attr('context', {id: 101});
-        instance.attr('container', {
-          property_value: 'mockValue',
+          };
+          instance = fakeUserRoleCreator();
+          instance.list_value = [{id: 0}];
+          result = Permission._is_allowed_for(permissions, instance, 'create');
+          expect(result).toEqual(true);
         });
-
-        result = Permission._is_allowed_for(permissions, instance, 'create');
-        expect(result).toEqual(true);
-      });
-      it('for "in" condition', function () {
+      it('returns true if permissions resources contains instance id',
+        function () {
+          permissions.create = {
+            UserRole: {
+              resources: [10],
+            },
+          };
+          instance = fakeUserRoleCreator();
+          instance.attr('id', 10);
+          result = Permission._is_allowed_for(permissions, instance, 'create');
+          expect(result).toEqual(true);
+        });
+      it('returns true if there is permission with null context ' +
+      'and no conditions', function () {
         permissions.create = {
           UserRole: {
-            contexts: [101],
-            conditions: {
-              '101': [{
-                condition: 'in',
-                terms: {
-                  value: ['mockValue', 1, 2],
-                  property_name: 'property_value',
-                },
-              }],
-            },
+            contexts: [null],
           },
         };
-
-        instance = new CMS.Models.UserRole();
-        instance.attr('context', {id: 101});
-        instance.property_value = 'mockValue';
-
+        instance = fakeUserRoleCreator();
         result = Permission._is_allowed_for(permissions, instance, 'create');
         expect(result).toEqual(true);
       });
-      it('for "forbid" condition', function () {
+      it('returns true if there is permission with specified context ' +
+      'and no conditions', function () {
         permissions.create = {
           UserRole: {
             contexts: [101],
-            conditions: {
-              '101': [{
-                condition: 'forbid',
-                terms: {
-                  blacklist: {
-                    create: [
-                      'bad_instance',
-                    ],
+          },
+        };
+        instance = fakeUserRoleCreator();
+        instance.attr('context', {id: 101});
+        result = Permission._is_allowed_for(permissions, instance, 'create');
+        expect(result).toEqual(true);
+      });
+      describe('returns false if there is permission ' +
+      'but conditions are not matched', function () {
+        it('for "contains" condition', function () {
+          permissions.create = {
+            UserRole: {
+              contexts: [101],
+              conditions: {
+                '101': [{
+                  condition: 'contains',
+                  terms: {
+                    value: {id: 0},
+                    list_property: 'list_value',
                   },
-                },
-              }],
+                }],
+              },
             },
-          },
-        };
+          };
+          instance = fakeUserRoleCreator();
+          instance.attr('context', {id: 101});
+          instance.list_value = [{id: 100}];
+          result = Permission._is_allowed_for(permissions, instance, 'create');
+          expect(result).toEqual(false);
+        });
+        it('for "is" condition', function () {
+          permissions.create = {
+            UserRole: {
+              contexts: [101],
+              conditions: {
+                '101': [{
+                  condition: 'is',
+                  terms: {
+                    value: 'good_value',
+                    property_name: 'mockProperty',
+                  },
+                }],
+              },
+            },
+          };
 
-        instance = new CMS.Models.UserRole();
-        instance.attr('context', {id: 101});
-        instance.attr('type', 'UserRole');
+          instance = fakeUserRoleCreator();
+          instance.attr('context', {id: 101});
+          instance.mockProperty = 'bad_value';
 
-        result = Permission._is_allowed_for(permissions, instance, 'create');
-        expect(result).toEqual(true);
+          result = Permission._is_allowed_for(permissions, instance, 'create');
+          expect(result).toEqual(false);
+        });
+        it('for "in" condition', function () {
+          permissions.create = {
+            UserRole: {
+              contexts: [101],
+              conditions: {
+                '101': [{
+                  condition: 'in',
+                  terms: {
+                    value: [1, 2, 3],
+                    property_name: 'mockProperty',
+                  },
+                }],
+              },
+            },
+          };
+
+          instance = fakeUserRoleCreator();
+          instance.attr('context', {id: 101});
+          instance.mockProperty = 4;
+
+          result = Permission._is_allowed_for(permissions, instance, 'create');
+          expect(result).toEqual(false);
+        });
+        it('for "forbid" condition', function () {
+          permissions.create = {
+            UserRole: {
+              contexts: [101],
+              conditions: {
+                '101': [{
+                  condition: 'forbid',
+                  terms: {
+                    blacklist: {
+                      create: [
+                        'bad_instance',
+                      ],
+                    },
+                  },
+                }],
+              },
+            },
+          };
+
+          instance = fakeUserRoleCreator();
+          instance.attr('context', {id: 101});
+          instance.attr('type', 'bad_instance');
+
+          result = Permission._is_allowed_for(permissions, instance, 'create');
+          expect(result).toEqual(false);
+        });
+      });
+      describe('returns true if there is permission ' +
+      'and conditions are matched', function () {
+        it('for "contains" condition', function () {
+          permissions.create = {
+            UserRole: {
+              contexts: [101],
+              conditions: {
+                '101': [{
+                  condition: 'contains',
+                  terms: {
+                    value: {id: 0},
+                    list_property: 'list_value',
+                  },
+                }],
+              },
+            },
+          };
+          instance = fakeUserRoleCreator();
+          instance.attr('context', {id: 101});
+          instance.list_value = [{id: 0}];
+          result = Permission._is_allowed_for(permissions, instance, 'create');
+          expect(result).toEqual(true);
+        });
+        it('for "is" condition', function () {
+          permissions.create = {
+            UserRole: {
+              contexts: [101],
+              conditions: {
+                '101': [{
+                  condition: 'is',
+                  terms: {
+                    value: 'mockValue',
+                    property_name: 'property_value',
+                  },
+                }],
+              },
+            },
+          };
+
+          instance = fakeUserRoleCreator();
+          instance.attr('context', {id: 101});
+          instance.attr('property_value', 'mockValue');
+
+          result = Permission._is_allowed_for(permissions, instance, 'create');
+          expect(result).toEqual(true);
+        });
+        it('for complex "is" condition', function () {
+          permissions.create = {
+            UserRole: {
+              contexts: [101],
+              conditions: {
+                '101': [{
+                  condition: 'is',
+                  terms: {
+                    value: 'mockValue',
+                    property_name: 'container.property_value',
+                  },
+                }],
+              },
+            },
+          };
+
+          instance = fakeUserRoleCreator();
+          instance.attr('context', {id: 101});
+          instance.attr('container', {
+            property_value: 'mockValue',
+          });
+
+          result = Permission._is_allowed_for(permissions, instance, 'create');
+          expect(result).toEqual(true);
+        });
+        it('for "in" condition', function () {
+          permissions.create = {
+            UserRole: {
+              contexts: [101],
+              conditions: {
+                '101': [{
+                  condition: 'in',
+                  terms: {
+                    value: ['mockValue', 1, 2],
+                    property_name: 'property_value',
+                  },
+                }],
+              },
+            },
+          };
+
+          instance = fakeUserRoleCreator();
+          instance.attr('context', {id: 101});
+          instance.property_value = 'mockValue';
+
+          result = Permission._is_allowed_for(permissions, instance, 'create');
+          expect(result).toEqual(true);
+        });
+        it('for "forbid" condition', function () {
+          permissions.create = {
+            UserRole: {
+              contexts: [101],
+              conditions: {
+                '101': [{
+                  condition: 'forbid',
+                  terms: {
+                    blacklist: {
+                      create: [
+                        'bad_instance',
+                      ],
+                    },
+                  },
+                }],
+              },
+            },
+          };
+
+          instance = fakeUserRoleCreator();
+          instance.attr('context', {id: 101});
+          instance.attr('type', 'UserRole');
+
+          result = Permission._is_allowed_for(permissions, instance, 'create');
+          expect(result).toEqual(true);
+        });
       });
     });
+
     describe('for null context conditions', function () {
       it('returns false when condition not matched', function () {
         permissions.create = {
@@ -477,7 +487,7 @@ describe('Permission', function () {
             },
           },
         };
-        instance = new CMS.Models.Audit();
+        instance = makeFakeInstance({model: CMS.Models.Audit})();
         instance.attr('context', {id: 101});
         instance.list_value = [{id: 100}];
         result = Permission._is_allowed_for(permissions, instance, 'create');
@@ -498,7 +508,7 @@ describe('Permission', function () {
             },
           },
         };
-        instance = new CMS.Models.Audit();
+        instance = makeFakeInstance({model: CMS.Models.Audit})();
         instance.attr('context', {id: 101});
         instance.list_value = [{id: 0}];
         result = Permission._is_allowed_for(permissions, instance, 'create');

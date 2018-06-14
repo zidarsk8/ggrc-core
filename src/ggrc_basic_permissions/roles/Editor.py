@@ -227,7 +227,6 @@ permissions = {
         "Policy",
         "Regulation",
         "Standard",
-        "Document",
         "Facility",
         "Market",
         "Objective",

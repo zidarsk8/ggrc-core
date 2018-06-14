@@ -13,14 +13,9 @@ import template from './templates/tree-filter-input.mustache';
       filter: {
         type: 'string',
         set: function (newValue) {
-          this.attr('options.filter', newValue || '');
           this.onFilterChange(newValue);
           return newValue;
         },
-      },
-      operation: {
-        type: 'string',
-        value: 'AND',
       },
       depth: {
         type: 'boolean',
@@ -37,17 +32,14 @@ import template from './templates/tree-filter-input.mustache';
     },
     disabled: false,
     showAdvanced: false,
-    options: {},
-    filters: null,
+    options: {
+      query: null,
+    },
     init: function () {
       let options = this.attr('options');
-      let filter = this.attr('filter');
-      let operation = this.attr('operation');
       let depth = this.attr('depth');
       let filterDeepLimit = this.attr('filterDeepLimit');
 
-      options.attr('filter', filter);
-      options.attr('operation', operation);
       options.attr('depth', depth);
       options.attr('filterDeepLimit', filterDeepLimit);
       options.attr('name', 'custom');
@@ -66,6 +58,8 @@ import template from './templates/tree-filter-input.mustache';
         filter.expression.op.name !== 'text_search' &&
         filter.expression.op.name !== 'exclude_text_search';
       this.attr('isExpression', isExpression);
+
+      this.attr('options.query', newValue.length ? filter : null);
     },
     openAdvancedFilter: function () {
       this.dispatch('openAdvanced');

@@ -6,6 +6,7 @@ from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.comment import Commentable
+from ggrc.models.mixins import base
 from .mixins import (BusinessObject, LastDeprecatedTimeboxed,
                      CustomAttributable, TestPlanned)
 from .object_document import PublicDocumentable
@@ -16,8 +17,8 @@ from .track_object_state import HasObjectState
 
 class DataAsset(Roleable, HasObjectState, PublicDocumentable,
                 CustomAttributable, Personable, Relatable, Commentable,
-                TestPlanned, LastDeprecatedTimeboxed, BusinessObject, Indexed,
-                db.Model):
+                TestPlanned, LastDeprecatedTimeboxed, base.ContextRBAC,
+                BusinessObject, Indexed, db.Model):
   """Class representing DataAsset."""
 
   __tablename__ = 'data_assets'

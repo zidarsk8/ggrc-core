@@ -10,9 +10,12 @@ import ggrc.builder
 import ggrc.services
 from ggrc import db
 from ggrc.models import all_models
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models import reflection
 from ggrc.models.exceptions import ValidationError
+from ggrc.models.person import Person
+from ggrc.models.person_profile import PersonProfile, default_last_seen_date
 from ggrc.services.common import Resource
 from integration.ggrc import TestCase as BaseTestCase
 
@@ -27,7 +30,7 @@ def reset_first_request_flag():
   ggrc.app.app._got_first_request = False
 
 
-class ServicesTestMockModel(Base, db.Model):
+class ServicesTestMockModel(base.ContextRBAC, Base, db.Model):
   __tablename__ = 'test_model'
   foo = db.Column(db.String)
   code = db.Column(db.String, unique=True)
@@ -118,3 +121,21 @@ class TestCase(BaseTestCase):
     ggrc.db.session.add(mock)
     ggrc.db.session.commit()
     return mock
+
+  def assert_person_profile_created(self, emails):
+    """Checks profile was created successfully for listed users"""
+    for email in emails:
+      profile = PersonProfile.query.join(PersonProfile.person).filter_by(
+          email=email).one()
+      self.assertEqual(profile.last_seen_whats_new, default_last_seen_date())
+
+  def assert_profiles_restrictions(self):
+    """Checks restrictions imposed on people and people_profiles tables
+
+    We have 0 or 1 to 1 relationship, and people_profiles should be equal to
+    people inner join people_profiles (all existing profiles should be
+    attached to appropriate person)
+    """
+    profiles_count = PersonProfile.query.count()
+    join_count = Person.query.join(Person.profile).count()
+    self.assertEqual(profiles_count, join_count)

@@ -24,12 +24,13 @@ from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.models import relationship
 from ggrc.models import revision
+from ggrc.models.mixins import base
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins.with_last_assessment_date import WithLastAssessmentDate
 
 
 class Snapshot(Roleable, relationship.Relatable, WithLastAssessmentDate,
-               mixins.Base, db.Model):
+               base.ContextRBAC, mixins.Base, db.Model):
   """Snapshot object that holds a join of parent object, revision, child object
   and parent object's context.
 

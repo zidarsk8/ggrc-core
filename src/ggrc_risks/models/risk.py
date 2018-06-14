@@ -12,6 +12,7 @@ from ggrc.models import mixins
 from ggrc.models.comment import Commentable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import TestPlanned
+from ggrc.models.mixins import base
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
 from ggrc.models import proposal
@@ -21,8 +22,8 @@ from ggrc.models.track_object_state import HasObjectState
 
 class Risk(Roleable, HasObjectState, mixins.CustomAttributable, Relatable,
            Personable, PublicDocumentable, Commentable, TestPlanned,
-           mixins.LastDeprecatedTimeboxed, mixins.BusinessObject,
-           Indexed, proposal.Proposalable, db.Model):
+           mixins.LastDeprecatedTimeboxed, base.ContextRBAC,
+           mixins.BusinessObject, Indexed, proposal.Proposalable, db.Model):
   """Basic Risk model."""
   __tablename__ = 'risks'
 

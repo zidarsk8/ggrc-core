@@ -9,6 +9,7 @@ import '../object-list-item/editable-document-object-list-item';
 import '../assessment/attach-button';
 import template from './ca-object-modal-content.mustache';
 import tracker from '../../tracker';
+import {getAssigneeType} from '../../plugins/ggrc_utils';
 
 export default can.Component.extend({
   tag: 'ca-object-modal-content',
@@ -80,7 +81,7 @@ export default can.Component.extend({
       this.dispatch({
         type: 'beforeCommentCreated',
         items: [can.extend(comment.attr(), {
-          assignee_type: GGRC.Utils.getAssigneeType(instance),
+          assignee_type: getAssigneeType(instance),
           custom_attribute_revision: {
             custom_attribute: {
               title: this.attr('content.title'),
@@ -99,7 +100,7 @@ export default can.Component.extend({
         .then(()=> {
           this.addComment(comment, {
             context: context,
-            assignee_type: GGRC.Utils.getAssigneeType(instance),
+            assignee_type: getAssigneeType(instance),
             custom_attribute_revision_upd: {
               custom_attribute_value: {
                 id: this.attr('content.contextScope.valueId')(),

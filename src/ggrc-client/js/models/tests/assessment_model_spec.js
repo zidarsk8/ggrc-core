@@ -4,6 +4,7 @@
 */
 
 import * as aclUtils from '../../plugins/utils/acl-utils';
+import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 
 describe('CMS.Models.Assessment', function () {
   'use strict';
@@ -16,11 +17,12 @@ describe('CMS.Models.Assessment', function () {
     let program;
 
     beforeEach(function () {
-      assessment = new CMS.Models.Assessment();
-      context = new CMS.Models.Context({id: 42});
-      program = new CMS.Models.Program({id: 54});
-      audit = new CMS.Models.Audit({context: context, program: program});
-      auditWithoutContext = new CMS.Models.Audit({program: program});
+      assessment = makeFakeInstance({model: CMS.Models.Assessment})();
+      context = makeFakeInstance({model: CMS.Models.Context})({id: 42});
+      program = makeFakeInstance({model: CMS.Models.Program})({id: 54});
+      const fakeAuditCreator = makeFakeInstance({model: CMS.Models.Audit});
+      audit = fakeAuditCreator({context, program});
+      auditWithoutContext = fakeAuditCreator({program});
     });
 
     it('sets the program and context properties', function () {
@@ -60,7 +62,7 @@ describe('CMS.Models.Assessment', function () {
     let assessment;
 
     beforeEach(function () {
-      assessment = new CMS.Models.Assessment();
+      assessment = makeFakeInstance({model: CMS.Models.Assessment})();
     });
     it('does nothing if no backup of instance', function () {
       assessment.attr('name', '');
@@ -96,7 +98,7 @@ describe('CMS.Models.Assessment', function () {
     let assessment;
 
     beforeEach(function () {
-      assessment = new CMS.Models.Assessment();
+      assessment = makeFakeInstance({model: CMS.Models.Assessment})();
       spyOn(assessment, '_transformBackupProperty')
         .and.callThrough();
     });
@@ -128,12 +130,14 @@ describe('CMS.Models.Assessment', function () {
   describe('model() method', function () {
     it('does not update backup if backup was not created', function () {
       spyOn(_, 'extend');
-      CMS.Models.Assessment.model({data: 'test'}, new CMS.Models.Assessment());
+      CMS.Models.Assessment.model({data: 'test'}, makeFakeInstance({
+        model: CMS.Models.Assessment,
+      })());
       expect(_.extend).not.toHaveBeenCalled();
     });
 
     it('updates backup if backup was created', function () {
-      let model = new CMS.Models.Assessment();
+      let model = makeFakeInstance({model: CMS.Models.Assessment})();
       model.backup();
       CMS.Models.Assessment.model({data: 'test'}, model);
       expect(model._backupStore().data).toBe('test');
@@ -151,7 +155,7 @@ describe('CMS.Models.Assessment', function () {
     }
 
     it('populates access control roles based on audit roles', function () {
-      let model = new CMS.Models.Assessment();
+      let model = makeFakeInstance({model: CMS.Models.Assessment})();
       spyOn(model, 'before_create');
       spyOn(aclUtils, 'getRole').and.returnValues(
         {id: 10, name: 'Creators', object_type: 'Assessment'},
@@ -190,7 +194,7 @@ describe('CMS.Models.Assessment', function () {
     });
     it('defaults correctly when auditors/audit captains are undefined',
       function () {
-        let model = new CMS.Models.Assessment();
+        let model = makeFakeInstance({model: CMS.Models.Assessment})();
         spyOn(model, 'before_create');
         spyOn(aclUtils, 'getRole').and.returnValues(
           {id: 10, name: 'Creators', object_type: 'Assessment'},
@@ -225,7 +229,9 @@ describe('CMS.Models.Assessment', function () {
     });
 
     it('adds an audit title', (done) => {
-      const model = new CMS.Models.Assessment({audit: {id: 123}});
+      const model = makeFakeInstance({model: CMS.Models.Assessment})({
+        audit: {id: 123},
+      });
 
       model.getRelatedObjects().then(() => {
         expect(model.attr('audit.title')).toBe('FooBar');
