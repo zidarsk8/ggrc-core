@@ -2,24 +2,5 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-set -o nounset
-set -o errexit
-
-PROJECT="integration"
-SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
-cd "${SCRIPTPATH}/../.."
-source bin/containers_functions.sh
-
-PROJECT=$( project_name "$@" -d "$PROJECT" )
-
-# If containers take lots of CPU, stopping them frees up CPU for building
-# containers.
-teardown $PROJECT
-
-setup $PROJECT cleandev
-
-integration_tests $PROJECT && rc=$? || rc=$?
-
-teardown $PROJECT
-
-exit $rc
+# This test script will remain until we remove it from kokoro config
+echo "Skip legacy test runner"
