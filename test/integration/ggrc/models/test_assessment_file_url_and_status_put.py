@@ -124,7 +124,7 @@ class TestAssessmentCompleteWithAction(ggrc.TestCase):
   def test_remove_req_evid_deprecated(self):
     """Test remove mandatory evidence and update
     status to deprecated in single PUT. Result status
-    should be `In Progress`"""
+    should be `Deprecated`"""
     asmt_id = self.asmt.id
     self._prepare_mandatory_evidence_cad()
     rel = factories.RelationshipFactory(
@@ -140,6 +140,29 @@ class TestAssessmentCompleteWithAction(ggrc.TestCase):
     self.assertEqual(response.status_code, 200)
     asmnt = all_models.Assessment.query.filter_by(id=asmt_id).first()
     self.assertEqual(asmnt.status, "Deprecated")
+
+    relationship = all_models.Relationship.query.get(rel_id)
+    self.assertIsNone(relationship)
+
+  def test_remove_req_evid_progress(self):
+    """Test remove mandatory evidence and update
+    status to deprecated in single PUT. Result status
+    should be `In Progress`"""
+    asmt_id = self.asmt.id
+    self._prepare_mandatory_evidence_cad()
+    rel = factories.RelationshipFactory(
+        source=self.asmt,
+        destination=self.evidence,
+    )
+    rel_id = rel.id
+    response = self.api.put(self.asmt, {
+        "status": "In Progress",
+        "actions": {"remove_related": [{"id": self.evidence.id,
+                                        "type": "Evidence"}]},
+    })
+    self.assertEqual(response.status_code, 200)
+    asmnt = all_models.Assessment.query.filter_by(id=asmt_id).first()
+    self.assertEqual(asmnt.status, "In Progress")
 
     relationship = all_models.Relationship.query.get(rel_id)
     self.assertIsNone(relationship)
