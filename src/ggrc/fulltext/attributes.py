@@ -97,6 +97,37 @@ class FullTextAttr(object):
     return content.get(self.alias, None)
 
 
+class CustomOrderingFullTextAttr(FullTextAttr):
+  """Custom full text index attribute class for specific ordering
+
+  Used in case when we need to have custom sort
+  """
+  def __init__(self, *args, **kwargs):
+    kwargs["subproperties"] = None
+    order_prop_getter = kwargs.pop("order_prop_getter")
+
+    assert order_prop_getter is not None
+
+    self.order_prop_getter = order_prop_getter
+    super(CustomOrderingFullTextAttr, self).__init__(*args, **kwargs)
+
+  def get_order_value_for(self, instance):
+    """Get value from the given instance using 'order_prop_getter' rule"""
+    if callable(self.order_prop_getter):
+      return self.order_prop_getter(instance)
+
+    return getattr(instance, self.order_prop_getter)
+
+  def get_property_for(self, instance):
+    """Collect property dict for the given instance"""
+    attribute_name = self.get_attribute_name(instance)
+    value = self.get_value_for(instance)
+
+    order_value = self.get_order_value_for(instance)
+    results = {"__sort__": order_value, attribute_name: value}
+    return {attribute_name: results}
+
+
 class ValueMapFullTextAttr(FullTextAttr):
   """Custom full text index attribute class for specific values
 

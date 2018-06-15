@@ -19,7 +19,7 @@ from sqlalchemy.ext import hybrid
 from ggrc import builder
 from ggrc import db
 from ggrc.access_control import roleable, role
-from ggrc.fulltext import get_indexer
+from ggrc.fulltext import get_indexer, attributes
 from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
 from ggrc.models import mixins
@@ -114,6 +114,20 @@ class Workflow(roleable.Roleable,
       MONTH_UNIT: "monthly"
   }
 
+  # pylint: disable=unnecessary-lambda
+  REPEAT_MAPPING = {
+      None: lambda px, sx: "off",
+      DAY_UNIT: lambda px, sx: "every {}weekday{}".format(px, sx),
+      WEEK_UNIT: lambda px, sx: "every {}week{}".format(px, sx),
+      MONTH_UNIT: lambda px, sx: "every {}month{}".format(px, sx)
+  }
+  REPEAT_ORDER_MAPPING = {
+      None: 0,
+      DAY_UNIT: 1,
+      WEEK_UNIT: 2,
+      MONTH_UNIT: 3
+  }
+
   @hybrid.hybrid_property
   def frequency(self):
     """Hybrid property for SearchAPI filtering backward compatibility"""
@@ -129,6 +143,41 @@ class Workflow(roleable.Roleable,
         (self.unit == self.MONTH_UNIT,
          self.UNIT_FREQ_MAPPING[self.MONTH_UNIT]),
     ])
+
+  @classmethod
+  def _get_repeat(cls, unit, repeat_every):
+    """Return repeat field representation for QueryAPI"""
+    if repeat_every is None or repeat_every == 1:
+      prefix, suffix = "", ""
+    else:
+      prefix, suffix = "{} ".format(repeat_every), "s"
+
+    func = cls.REPEAT_MAPPING[unit]
+    return func(prefix, suffix)
+
+  @hybrid.hybrid_property
+  def repeat(self):
+    """Hybrid property for filtering in QueryAPI"""
+    return self._get_repeat(self.unit, self.repeat_every)
+
+  @repeat.expression
+  def repeat(self):
+    """Hybrid property for filtering in QueryAPI"""
+    case_ = [(self.unit.is_(None), self.REPEAT_MAPPING[None](None, None))]
+    case_.extend(((self.unit == unit) & (self.repeat_every == repeat_every),
+                 self._get_repeat(unit, repeat_every))
+                 for unit in self.VALID_UNITS
+                 for repeat_every in xrange(1, 31))
+
+    return case(case_)
+
+  @property
+  def repeat_order(self):
+    """Property for ordering in QueryAPI"""
+    unit_map = self.REPEAT_ORDER_MAPPING[self.unit]
+    repeat_every_map = self.repeat_every or 0
+
+    return u"{:0>4}_{:0>4}".format(unit_map, repeat_every_map)
 
   @builder.simple_property
   def can_start_cycle(self):
@@ -260,6 +309,13 @@ class Workflow(roleable.Roleable,
       'notify_custom_message',
   ]
 
+  _fulltext_attrs = [
+      attributes.CustomOrderingFullTextAttr(
+          'repeat', 'repeat',
+          order_prop_getter='repeat_order'
+      )
+  ]
+
   _api_attrs = reflection.ApiAttributes(
       'task_groups',
       'notify_on_change',
@@ -279,6 +335,8 @@ class Workflow(roleable.Roleable,
                            create=False, update=False),
       reflection.Attribute('kind',
                            create=False, update=False),
+      reflection.Attribute('repeat',
+                           create=False, update=False)
   )
 
   _aliases = {
