@@ -7,17 +7,19 @@ import {
   getModelByType,
   getMappableTypes,
 } from '../../plugins/ggrc_utils';
+import {
+  Proxy,
+  Direct,
+  Search,
+  Multi,
+  TypeFilter,
+  AttrFilter,
+  CustomFilter,
+  Cross,
+  Indirect,
+} from '../mappers/mapper-helpers';
 
 (function (GGRC, can) {
-  let Proxy = GGRC.MapperHelpers.Proxy;
-  let Direct = GGRC.MapperHelpers.Direct;
-  let Indirect = GGRC.MapperHelpers.Indirect;
-  let Search = GGRC.MapperHelpers.Search;
-  let Multi = GGRC.MapperHelpers.Multi;
-  let TypeFilter = GGRC.MapperHelpers.TypeFilter;
-  let AttrFilter = GGRC.MapperHelpers.AttrFilter;
-  let CustomFilter = GGRC.MapperHelpers.CustomFilter;
-  let Cross = GGRC.MapperHelpers.Cross;
   /*
     class GGRC.Mappings
     represents everything known about how GGRC objects connect to each other.

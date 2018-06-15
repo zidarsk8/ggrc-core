@@ -3,6 +3,13 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  Proxy,
+  Search,
+  Multi,
+  TypeFilter,
+} from '../models/mappers/mapper-helpers';
+
 (function ($, CMS, GGRC) {
   let RisksExtension = {};
 
@@ -52,11 +59,6 @@
 
   // Configure mapping extensions for ggrc_risks
   RisksExtension.init_mappings = function () {
-    let Proxy = GGRC.MapperHelpers.Proxy;
-    let Search = GGRC.MapperHelpers.Search;
-    let TypeFilter = GGRC.MapperHelpers.TypeFilter;
-    let Multi = GGRC.MapperHelpers.Multi;
-
     // Add mappings for risk objects
     let mappings = {
       related: {

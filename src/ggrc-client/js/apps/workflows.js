@@ -7,6 +7,16 @@ import {
   initCounts,
 } from '../plugins/utils/current-page-utils';
 import InfoWidget from '../controllers/info_widget_controller';
+import {
+  Proxy,
+  Direct,
+  Search,
+  Multi,
+  TypeFilter,
+  CustomFilter,
+  Reify,
+  Cross,
+} from '../models/mappers/mapper-helpers';
 
 (function ($, CMS, GGRC) {
   let WorkflowExtension = {};
@@ -59,15 +69,6 @@ import InfoWidget from '../controllers/info_widget_controller';
 
   // Configure mapping extensions for ggrc_workflows
   WorkflowExtension.init_mappings = function () {
-    let Proxy = GGRC.MapperHelpers.Proxy;
-    let Direct = GGRC.MapperHelpers.Direct;
-    let Cross = GGRC.MapperHelpers.Cross;
-    let Multi = GGRC.MapperHelpers.Multi;
-    let CustomFilter = GGRC.MapperHelpers.CustomFilter;
-    let Reify = GGRC.MapperHelpers.Reify;
-    let Search = GGRC.MapperHelpers.Search;
-    let TypeFilter = GGRC.MapperHelpers.TypeFilter;
-
     // Add mappings for basic workflow objects
     let mappings = {
       TaskGroup: {
