@@ -80,6 +80,29 @@ class TestAssessmentImport(TestCase):
     ]))
     self.assertEquals([], response[0]['row_warnings'])
 
+  def test_import_assessment_with_evidence_url_existing(self):
+    """If url already mapped to assessment ignore it"""
+    evidence_url = "test_gdrive_url"
+
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory()
+      assessment_slug = assessment.slug
+      factories.RelationshipFactory(source=audit,
+                                    destination=assessment)
+      evidence = factories.EvidenceUrlFactory(link=evidence_url)
+      factories.RelationshipFactory(source=assessment,
+                                    destination=evidence)
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assessment_slug),
+        ("Evidence Url", evidence_url),
+    ]))
+
+    evidences = all_models.Evidence.query.filter_by(link=evidence_url).all()
+    self.assertEquals(1, len(evidences))
+    self.assertEquals([], response[0]['row_warnings'])
+
   def test_import_assessment_with_evidence_file_multiple(self):
     """Show warning if at least one of Evidence Files not mapped"""
     evidence_url = "test_gdrive_url"
