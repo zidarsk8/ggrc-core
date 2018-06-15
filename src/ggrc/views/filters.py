@@ -27,6 +27,7 @@ DISPLAY_CLASS_MAPPINGS = {
     'Market': 'business',
     'System': 'business',
     'Process': 'business',
+    'Metric': 'business',
 
     'OrgGroup': 'entities',
     'Person': 'entities',

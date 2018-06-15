@@ -29,6 +29,7 @@ import template from './page-header.mustache';
     Project: 'header-style-1',
     Facility: 'header-style-1',
     Market: 'header-style-1',
+    Metric: 'header-style-1',
     Audit: 'header-style-2',
     Assessment: 'header-style-2',
     Issue: 'header-style-3',

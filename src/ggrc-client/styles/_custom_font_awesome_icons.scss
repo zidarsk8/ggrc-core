@@ -271,6 +271,11 @@
   &.color { color: #005580; }
 }
 
+.#{$fa-css-prefix}-metric {
+  &:before { content: $fa-var-bar-chart; }
+  &.color { color: $green; }
+}
+
 // Turn icons to black
 %black-icons {
   [class^="fa #{$fa-css-prefix}-"] {

@@ -25,7 +25,7 @@ import {
     'Program Regulation Policy Standard Contract Clause Section'.split(' '),
     'Request Control Objective OrgGroup Vendor AccessGroup'.split(' '),
     'System Process DataAsset Product Project Facility Market'.split(' '),
-    'Issue Risk Threat'.split(' ')
+    'Issue Risk Threat Metric'.split(' ')
   );
 
   let draftOnUpdateMixin;
@@ -141,7 +141,7 @@ import {
             'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
             'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
             'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
-            'Objective', 'Audit', 'AccessGroup',
+            'Objective', 'Audit', 'AccessGroup', 'Metric',
             'Risk', 'Threat',
           ],
         },
@@ -165,6 +165,7 @@ import {
         related_data_assets: TypeFilter('related_objects', 'DataAsset'),
         related_facilities: TypeFilter('related_objects', 'Facility'),
         related_markets: TypeFilter('related_objects', 'Market'),
+        related_metrics: TypeFilter('related_objects', 'Metric'),
         related_org_groups: TypeFilter('related_objects', 'OrgGroup'),
         related_vendors: TypeFilter('related_objects', 'Vendor'),
         related_processes: TypeFilter('related_objects', 'Process'),
