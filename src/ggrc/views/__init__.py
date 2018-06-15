@@ -647,6 +647,7 @@ def contributed_object_views():
       object_view(models.Snapshot),
       object_view(models.Standard),
       object_view(models.System),
+      object_view(models.TechnologyEnvironment),
       object_view(models.Vendor),
       object_view(models.Metric)
   ]
