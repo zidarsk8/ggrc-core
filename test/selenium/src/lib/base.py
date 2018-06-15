@@ -186,6 +186,10 @@ class TextInputField(Element):
     element = self._driver.find_element(*self.locator_or_element)
     self.text = element.get_attribute("value")
 
+  def send_enter_key(self):
+    """Send ENTER key."""
+    self.element.send_keys(keys.Keys.ENTER)
+
 
 class RichTextInputField(TextInputField):
   """Generic model for rich text input field."""
