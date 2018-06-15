@@ -12,6 +12,7 @@ import '../../components/mapping-controls/mapping-type-selector';
 import '../../components/collapsible-panel/collapsible-panel';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import template from './object-search.mustache';
+import Mappings from '../../models/mappers/mappings';
 
 (function (can, $) {
   'use strict';
@@ -24,7 +25,7 @@ import template from './object-search.mustache';
         object: 'MultitypeSearch',
         type: 'Control',
         availableTypes: function () {
-          let types = GGRC.Mappings.getMappingTypes(
+          let types = Mappings.getMappingTypes(
             this.attr('object'),
             ['TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask'],
             []);

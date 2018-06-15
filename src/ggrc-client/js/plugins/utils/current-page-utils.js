@@ -17,6 +17,7 @@ import {
   isObjectVersion,
   getWidgetConfigs,
 } from './object-versions-utils';
+import Mappings from '../../models/mappers/mappings';
 
 /**
  * Util methods for work with Current Page.
@@ -40,7 +41,7 @@ let CUSTOM_COUNTERS = {
 
 function initMappedInstances() {
   let currentPageInstance = GGRC.page_instance();
-  let models = GGRC.Mappings.getMappingList(currentPageInstance.type);
+  let models = Mappings.getMappingList(currentPageInstance.type);
   let reqParams = [];
 
   relatedToCurrentInstance.attr('initialized', true);

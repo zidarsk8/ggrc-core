@@ -15,9 +15,10 @@ import {
   CustomFilter,
   Cross,
 } from '../mappers/mapper-helpers';
+import Mappings from './mappings';
 
 (function (GGRC, can) {
-  new GGRC.Mappings('ggrc_core', {
+  new Mappings('ggrc_core', {
     base: {},
 
     // Governance

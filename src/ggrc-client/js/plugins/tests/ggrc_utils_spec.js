@@ -13,6 +13,7 @@ import {
   allowedToMap,
   getAssigneeType,
 } from '../ggrc_utils';
+import Mappings from '../../models/mappers/mappings';
 
 'use strict';
 
@@ -34,7 +35,7 @@ describe('allowedToMap() method', function () {
         type: 'Program',
       });
 
-      spyOn(GGRC.Mappings, 'get_canonical_mapping_name')
+      spyOn(Mappings, 'get_canonical_mapping_name')
         .and.returnValue('audits');
 
       spyOn(Permission, 'is_allowed_for').and.returnValue(true);
@@ -90,7 +91,7 @@ describe('getMappableTypes() method', function () {
     OBJECT_TYPES.forEach(function (item) {
       canonicalMappings[item] = {};
     });
-    spyOn(GGRC.Mappings, 'get_canonical_mappings_for')
+    spyOn(Mappings, 'get_canonical_mappings_for')
       .and.returnValue(canonicalMappings);
   });
 

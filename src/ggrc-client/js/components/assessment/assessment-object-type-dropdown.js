@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import Mappings from '../../models/mappers/mappings';
+
 (function (GGRC, can) {
   'use strict';
 
@@ -13,7 +15,7 @@
         objectTypes: {
           get: function () {
             let self = this;
-            let objectTypes = GGRC.Mappings
+            let objectTypes = Mappings
               .getMappingTypes('AssessmentTemplate', [], ['Issue']);
             // remove ignored types and sort the rest
             _.each(objectTypes, function (objGroup) {

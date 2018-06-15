@@ -6,6 +6,7 @@
 import RefreshQueue from '../models/refresh_queue';
 import Permission from '../permission';
 import {getRolesForType} from '../plugins/utils/acl-utils';
+import Mappings from '../models/mappers/mappings';
 
 /**
  * A module containing various utility functions.
@@ -242,7 +243,7 @@ function isMapped(target, destination, mapping) {
  */
 function getMappableTypes(type, options) {
   let result;
-  let canonical = GGRC.Mappings.get_canonical_mappings_for(type);
+  let canonical = Mappings.get_canonical_mappings_for(type);
   let list = GGRC.tree_view.base_widgets_by_type[type];
   let forbidden;
   let forbiddenList = {
@@ -363,9 +364,9 @@ function allowedToMap(source, target, options) {
     return false;
   }
 
-  canonical = GGRC.Mappings.get_canonical_mapping_name(
+  canonical = Mappings.get_canonical_mapping_name(
     sourceType, targetType);
-  canonicalMapping = GGRC.Mappings.get_canonical_mapping(
+  canonicalMapping = Mappings.get_canonical_mapping(
     sourceType, targetType);
 
   if (canonical && canonical.indexOf('_') === 0) {

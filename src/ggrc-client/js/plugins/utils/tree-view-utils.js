@@ -33,7 +33,6 @@ import {getRolesForType} from './acl-utils';
 import {getMappableTypes} from '../ggrc_utils';
 import {caDefTypeName} from './custom-attribute/custom-attribute-config';
 
-
 /**
 * TreeView-specific utils.
 */
@@ -362,7 +361,7 @@ function getModelsForSubTier(modelName) {
   let selectedModels;
 
   // getMappableTypes can't be run at once,
-  // cause GGRC.Mappings is not loaded yet
+  // cause Mappings is not loaded yet
   if (modelName === 'CycleTaskGroupObjectTask' &&
   !orderedModelsForSubTier[modelName].length) {
     orderedModelsForSubTier[modelName] =

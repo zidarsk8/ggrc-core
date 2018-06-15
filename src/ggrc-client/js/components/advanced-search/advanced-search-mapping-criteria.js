@@ -7,6 +7,7 @@ import '../simple-popover/simple-popover';
 import {getColumnsForModel} from '../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import template from './advanced-search-mapping-criteria.mustache';
+import Mappings from '../../models/mappers/mappings';
 
 /**
  * Mapping Criteria view model.
@@ -118,7 +119,7 @@ let viewModel = can.Map.extend({
       return [CMS.Models[modelName]];
     }
 
-    let mappings = GGRC.Mappings
+    let mappings = Mappings
       .get_canonical_mappings_for(this.attr('modelName'));
     let types = _.chain(mappings)
       .keys()

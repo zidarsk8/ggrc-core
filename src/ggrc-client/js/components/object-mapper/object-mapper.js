@@ -33,6 +33,7 @@ import {
   isMapped as isMappedUtil,
   allowedToMap,
 } from '../../plugins/ggrc_utils';
+import Mappings from '../../models/mappers/mappings';
 
 (function (can, $) {
   'use strict';
@@ -306,7 +307,7 @@ import {
             if ((!isPersonMapping && isMapped) || !isAllowed) {
               return;
             }
-            mapping = GGRC.Mappings.get_canonical_mapping(object, type);
+            mapping = Mappings.get_canonical_mapping(object, type);
             Model = CMS.Models[mapping.model_name];
             data[mapping.object_attr] = {
               href: instance.href,
