@@ -51,6 +51,7 @@ class TestTotalReindex(TestCase):
       'TaskGroupObject': 5,
       'TaskGroupTask': 4,
       'Workflow': 6,
+      'Product': 18,
   }
 
   def setUp(self):

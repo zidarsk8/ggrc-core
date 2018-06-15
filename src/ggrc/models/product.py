@@ -67,3 +67,12 @@ class Product(Roleable, HasObjectState, CustomAttributable, Personable,
 
     query = super(Product, cls).eager_query()
     return query.options(orm.joinedload('kind'))
+
+  @classmethod
+  def indexed_query(cls):
+    from sqlalchemy import orm
+    return super(Product, cls).indexed_query().options(
+        orm.Load(cls).undefer_group(
+            "Product_complete",
+        ),
+    )
