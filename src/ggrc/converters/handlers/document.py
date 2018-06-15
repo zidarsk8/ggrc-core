@@ -47,30 +47,29 @@ class DocumentReferenceUrlHandler(handlers.ColumnHandler):
     Returns:
       list of documents for all URLs and evidences.
     """
-    new_links = set()
-    duplicate_new_links = set()
-
     documents = []
-    user_id = get_current_user_id()
+    if self.raw_value:
+      seen_links = set()
+      duplicate_inks = set()
+      user_id = get_current_user_id()
+      for line in self.raw_value.splitlines():
+        link = line.strip()
+        if not link:
+          continue
 
-    for line in self.raw_value.splitlines():
-      link = line.strip()
-      if not link:
-        continue
+        if link not in seen_links:
+          seen_links.add(link)
+          documents.append(self.build_document(link, user_id))
+        else:
+          duplicate_inks.add(link)
 
-      if link in new_links:
-        duplicate_new_links.add(link)
-      else:
-        new_links.add(link)
-        documents.append(self.build_document(link, user_id))
-
-    if duplicate_new_links:
-      # NOTE: We rely on the fact that links in duplicate_new_links are all
-      # instances of unicode (if that assumption breaks, unicode encode/decode
-      # errors can occur for non-ascii link values)
-      self.add_warning(errors.DUPLICATE_IN_MULTI_VALUE,
-                       column_name=self.display_name,
-                       duplicates=u", ".join(sorted(duplicate_new_links)))
+      if duplicate_inks:
+        # NOTE: We rely on the fact that links in duplicate_inks are all
+        # instances of unicode (if that assumption breaks, unicode
+        # encode/decode errors can occur for non-ascii link values)
+        self.add_warning(errors.DUPLICATE_IN_MULTI_VALUE,
+                         column_name=self.display_name,
+                         duplicates=u", ".join(sorted(duplicate_inks)))
 
     return documents
 
@@ -108,6 +107,8 @@ class DocumentReferenceUrlHandler(handlers.ColumnHandler):
       if new_link not in old_link_map:
         all_models.Relationship(source=parent,
                                 destination=new_doc)
+      else:
+        db.session.expunge(new_doc)
 
     for old_link, old_doc in old_link_map.iteritems():
       if old_link in new_link_map:

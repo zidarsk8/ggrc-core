@@ -4,7 +4,7 @@
 """Handlers evidence entries."""
 
 from logging import getLogger
-
+from ggrc import db
 from ggrc.models import all_models
 from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
@@ -49,30 +49,30 @@ class EvidenceUrlHandler(handlers.ColumnHandler):
     Returns:
       list of evidences for all URLs and evidences.
     """
-    new_links = set()
-    duplicate_new_links = set()
-
     evidences = []
-    user_id = get_current_user_id()
+    if self.raw_value:
+      seen_links = set()
+      duplicate_links = set()
+      user_id = get_current_user_id()
 
-    for line in self.raw_value.splitlines():
-      link = line.strip()
-      if not link:
-        continue
+      for line in self.raw_value.splitlines():
+        link = line.strip()
+        if not link:
+          continue
 
-      if link in new_links:
-        duplicate_new_links.add(link)
-      else:
-        new_links.add(link)
-        evidences.append(self.build_evidence(link, user_id))
+        if link not in seen_links:
+          seen_links.add(link)
+          evidences.append(self.build_evidence(link, user_id))
+        else:
+          duplicate_links.add(link)
 
-    if duplicate_new_links:
-      # NOTE: We rely on the fact that links in duplicate_new_links are all
-      # instances of unicode (if that assumption breaks, unicode encode/decode
-      # errors can occur for non-ascii link values)
-      self.add_warning(errors.DUPLICATE_IN_MULTI_VALUE,
-                       column_name=self.display_name,
-                       duplicates=u", ".join(sorted(duplicate_new_links)))
+      if duplicate_links:
+        # NOTE: We rely on the fact that links in duplicate_links are all
+        # instances of unicode (if that assumption breaks,
+        # unicode encode/decode errors can occur for non-ascii link values)
+        self.add_warning(errors.DUPLICATE_IN_MULTI_VALUE,
+                         column_name=self.display_name,
+                         duplicates=u", ".join(sorted(duplicate_links)))
 
     return evidences
 
@@ -93,20 +93,20 @@ class EvidenceUrlHandler(handlers.ColumnHandler):
     new_link_map = {d.link: d for d in self.value}
     old_link_map = self._get_old_map()
 
-    for new_link, new_evid in new_link_map.iteritems():
-      if new_link in old_link_map:
-        old_link_map[new_link].title = new_evid.title
-      else:
+    for new_link, new_evidence in new_link_map.iteritems():
+      if new_link not in old_link_map:
         all_models.Relationship(source=self.row_converter.obj,
-                                destination=new_evid)
+                                destination=new_evidence)
+      else:
+        db.session.expunge(new_evidence)
 
-    for old_link, old_doc in old_link_map.iteritems():
+    for old_link, old_evidence in old_link_map.iteritems():
       if old_link in new_link_map:
         continue
-      if old_doc.related_destinations:
-        old_doc.related_destinations.pop()
-      elif old_doc.related_sources:
-        old_doc.related_sources.pop()
+      if old_evidence.related_destinations:
+        old_evidence.related_destinations.pop()
+      elif old_evidence.related_sources:
+        old_evidence.related_sources.pop()
       else:
         logger.warning("Invalid relationship state for document URLs.")
 
