@@ -6,6 +6,7 @@ set -o nounset
 set -o errexit
 
 PROJECT="integration_ggrc"
+DOCKER_COMPOSE_FILE="docker-compose-testing.yml"
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 cd "${SCRIPTPATH}/../.."
 source bin/containers_functions.sh

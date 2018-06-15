@@ -3,6 +3,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 PROJECT="selenium"
+DOCKER_COMPOSE_FILE="docker-compose-selenium.yml"
 
 cd "$(dirname $0)/.."
 source bin/containers_functions.sh
