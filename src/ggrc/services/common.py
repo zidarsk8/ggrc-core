@@ -22,6 +22,7 @@ import flask
 from flask import url_for, request, current_app, has_request_context
 from flask.views import View
 from flask.ext.sqlalchemy import Pagination
+import sqlalchemy as sa
 import sqlalchemy.orm.exc
 from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
@@ -106,6 +107,7 @@ def update_snapshot_index(session, cache):
 
 class ModelView(View):
   """Basic view handler for all models"""
+  # pylint: disable=too-many-public-methods
   # pylint: disable=protected-access
   # access to _sa_class_manager is needed for fetching the right mapper
   DEFAULT_PAGE_SIZE = 20
@@ -315,6 +317,18 @@ class ModelView(View):
     except sqlalchemy.orm.exc.NoResultFound:
       return None
 
+  def get_object_without_rels(self, obj_id):
+    """Get object by id without eager loading related models."""
+    try:
+      query = db.session.query(self.model).options(
+          sa.orm.Load(self.model).load_only(
+              "id", "context_id", self.modified_attr_name
+          )
+      )
+      return query.get(obj_id)
+    except sqlalchemy.orm.exc.NoResultFound:
+      return None
+
   def not_found_message(self):
     return '{0} not found.'.format(self.model._inflector.title_singular)
 
@@ -417,6 +431,10 @@ class Resource(ModelView):
             if self.pk in kwargs and kwargs[self.pk] is not None:
               return self.get(*args, **kwargs)
             return self.collection_get()
+          elif method == 'HEAD':
+            if self.pk in kwargs and kwargs[self.pk] is not None:
+              return self.head(*args, **kwargs)
+            raise NotImplementedError()
           elif method == 'POST':
             if self.pk in kwargs and kwargs[self.pk] is not None:
               return self.post(*args, **kwargs)
@@ -482,6 +500,23 @@ class Resource(ModelView):
     with benchmark("Make response"):
       return self.json_success_response(
           object_for_json, self.modified_at(obj), obj_etag=obj_etag)
+
+  def head(self, id):  # pylint: disable=redefined-builtin
+    """Get headers for object."""
+    with benchmark("Query for object"):
+      obj = self.get_object_without_rels(id)
+      if not obj:
+        return self.not_found_response()
+
+    with benchmark("Query read permissions"):
+      if not permissions.is_allowed_read_for(obj):
+        raise Forbidden()
+
+    obj_etag = etag(self.modified_at(obj), get_info(obj))
+    with benchmark("Make response"):
+      return self.json_success_response(
+          {}, self.modified_at(obj), obj_etag=obj_etag
+      )
 
   def validate_headers_for_put_or_delete(self, obj):
     """rfc 6585 defines a new status code for missing required headers"""
