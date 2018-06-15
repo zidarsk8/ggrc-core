@@ -488,46 +488,6 @@ Mustache.registerHelper('option_select',
     return deferRender(tagPrefix, getSelectHtml, optionsDfd);
   });
 
-Mustache.registerHelper('category_select',
-  function (object, attrName, categoryType, options) {
-    const selectedOptions = object[attrName] || [];
-    const selectedIds = can.map(selectedOptions, function (selectedOption) {
-      return selectedOption.id;
-    });
-    const optionsDfd = CMS.Models[categoryType].findAll();
-    let tabIndex = options.hash && options.hash.tabindex;
-    const tagPrefix = 'select class="span12" multiple="multiple"';
-
-    tabIndex = typeof tabIndex !== 'undefined' ?
-      ` tabindex="${tabIndex}"` :
-      '';
-
-    function getSelectHtml(options) {
-      const sortedOptions = _.sortBy(options, 'name');
-      const selectOpenTag = `
-        <select class="span12" multiple="multiple"
-          model="${categoryType}"
-          name="${attrName}"
-          ${tabIndex}
-        >`;
-      const selectCloseTag = '</select>';
-      const optionTags = can.map(sortedOptions, function (option) {
-        return `
-          <option value="${option.id}"
-            ${selectedIds.indexOf(option.id) > -1 ? ' selected=selected' : ''}
-          >${option.name}</option>`;
-      }).join('\n');
-
-      return [
-        selectOpenTag,
-        optionTags,
-        selectCloseTag,
-      ].join('');
-    }
-
-    return deferRender(tagPrefix, getSelectHtml, optionsDfd);
-  });
-
 Mustache.registerHelper('get_permalink_url', function () {
   return window.location.href;
 });

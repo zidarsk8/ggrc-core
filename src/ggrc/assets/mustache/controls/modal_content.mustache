@@ -183,7 +183,11 @@
           <a data-id="hide_assertions_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
           <div data-id="assertions_dd" tabindex="12">
-            {{{category_select this "assertions" "ControlAssertion"}}}
+            <multiselect-dropdown-wrapper
+              {model-name}="'ControlAssertion'"
+              {(selected)}="instance.assertions"
+              placeholder="Select Sssertions">
+            </multiselect-dropdown-wrapper>
           </div>
       </div>
       <div data-test-id="control_categories_1eb33246" data-id="categories_hidden" class="span4 hidable">
@@ -193,7 +197,11 @@
           <a data-id="hide_categories_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
           <div data-id="categories_dd" tabindex="13">
-            {{{category_select this "categories" "ControlCategory"}}}
+            <multiselect-dropdown-wrapper
+              {model-name}="'ControlCategory'"
+              {(selected)}="instance.categories"
+              placeholder="Select Categories">
+            </multiselect-dropdown-wrapper>
           </div>
       </div>
     </div>

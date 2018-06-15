@@ -28,6 +28,7 @@ import '../bulk-update-button/bulk-update-button';
 import '../assessment-template-clone-button/assessment-template-clone-button';
 import '../create-document-button/create-document-button';
 import '../dropdown/multiselect-dropdown';
+import '../dropdown/multiselect-dropdown-wrapper';
 import '../assessment/assessment-generator-button';
 import '../last-comment/last-comment';
 import template from './templates/tree-widget-container.mustache';
