@@ -39,7 +39,7 @@ from ggrc.fulltext import get_indexer
 from ggrc.login import get_current_user_id, get_current_user
 from ggrc.models.cache import Cache
 from ggrc.models.exceptions import ValidationError, translate_message
-from ggrc.rbac import permissions, context_query_filter
+from ggrc.rbac import permissions
 from ggrc.services.attribute_query import AttributeQueryBuilder
 from ggrc.services import signals
 from ggrc.models.background_task import BackgroundTask, create_task
@@ -174,12 +174,11 @@ class ModelView(View):
     # columns.append(self._get_polymorphic_column(model))
     return columns
 
-  def get_collection_matches(self, model, filter_by_contexts=True):
+  def get_collection_matches(self, model):
     columns = self.get_match_columns(self.model)
     query = db.session.query(*columns).filter(
         self._get_type_where_clause(model))
-    return self.filter_query_by_request(
-        query, filter_by_contexts=filter_by_contexts)
+    return self.filter_query_by_request(query)
 
   def get_resource_match_query(self, model, obj_id):
     columns = self.get_match_columns(model)
@@ -190,16 +189,15 @@ class ModelView(View):
     return query
 
   # Default model/DB helpers
-  def get_collection(self, filter_by_contexts=True):
+  def get_collection(self):
     if '__stubs_only' not in request.args and \
        hasattr(self.model, 'eager_query'):
       query = self.model.eager_query()
     else:
       query = db.session.query(self.model)
-    return self.filter_query_by_request(
-        query, filter_by_contexts=filter_by_contexts)
+    return self.filter_query_by_request(query)
 
-  def filter_query_by_request(self, query, filter_by_contexts=True):  # noqa
+  def filter_query_by_request(self, query):
     joinlist = []
     if request.args:
       querybuilder = AttributeQueryBuilder(self.model)
@@ -242,24 +240,6 @@ class ModelView(View):
       )
       query = query.filter(filter_)
 
-    if filter_by_contexts:
-      contexts = permissions.read_contexts_for(self.model.__name__)
-      resources = permissions.read_resources_for(self.model.__name__)
-      filter_expr = context_query_filter(self.model.context_id, contexts)
-      if resources:
-        filter_expr = or_(filter_expr, self.model.id.in_(resources))
-      query = query.filter(filter_expr)
-      for j in joinlist:
-        j_class = j.property.mapper.class_
-        j_contexts = permissions.read_contexts_for(j_class.__name__)
-        j_resources = permissions.read_resources_for(j_class.__name__)
-        if j_contexts is not None:
-          j_filter_expr = context_query_filter(j_class.context_id, j_contexts)
-          if resources:
-            j_filter_expr = or_(j_filter_expr, self.model.id.in_(j_resources))
-          query = query.filter(j_filter_expr)
-        elif resources:
-          query = query.filter(self.model.id.in_(resources))
     if '__search' in request.args:
       terms = request.args['__search']
       types = self._get_matching_types(self.model)
@@ -310,8 +290,7 @@ class ModelView(View):
     #   'contains_eager()' to the core query, because 'LIMIT 1' breaks up
     #   that JOIN result (e.g. Categorizable)
     try:
-      return self.get_collection(
-          filter_by_contexts=False).filter(self.model.id == obj_id).one()
+      return self.get_collection().filter(self.model.id == obj_id).one()
     except sqlalchemy.orm.exc.NoResultFound:
       return None
 
@@ -716,15 +695,7 @@ class Resource(ModelView):
             'application/json', 406, [('Content-Type', 'text/plain')]))
 
     with benchmark("dispatch_request > collection_get > Collection matches"):
-      # We skip querying by contexts for Creator role and relationship objects,
-      # because it will filter out objects that the Creator can access.
-      # We are doing a special permissions check for these objects
-      # below in the filter_resource method.
-      filter_by_contexts = not (
-          self.model.__name__ in ("Relationship", "Revision") and _is_creator()
-      )
-      matches_query = self.get_collection_matches(
-          self.model, filter_by_contexts)
+      matches_query = self.get_collection_matches(self.model)
     with benchmark("dispatch_request > collection_get > Query Data"):
       if '__page' in request.args or '__page_only' in request.args:
         with benchmark("Query matches with paging"):
@@ -1405,7 +1376,7 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
         return None
     else:
       if not user_permissions.is_allowed_read(resource['type'],
-                                              resource['id'], None):
+                                              resource['id']):
         return None
     # Then, filter any typed keys
     for key, value in resource.items():
