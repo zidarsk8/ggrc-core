@@ -14,7 +14,6 @@ from ggrc.fulltext.sql import SqlIndexer
 from ggrc.models import all_models
 from ggrc.models.inflector import get_model
 from ggrc.query import my_objects
-from ggrc.rbac import context_query_filter
 from ggrc.rbac import permissions
 from ggrc.utils import benchmark
 
@@ -70,14 +69,13 @@ class MysqlIndexer(SqlIndexer):
 
     type_queries = []
     for model_name in model_names:
-      contexts, resources = permissions.get_context_resource(
+      _, resources = permissions.get_context_resource(
           model_name=model_name,
           permission_type=permission_type,
           permission_model=permission_model
       )
       statement = sa.and_(
           MysqlRecordProperty.type == model_name,
-          context_query_filter(MysqlRecordProperty.context_id, contexts)
       )
       if resources:
         statement = sa.or_(sa.and_(MysqlRecordProperty.type == model_name,
