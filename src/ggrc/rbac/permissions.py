@@ -62,7 +62,7 @@ def has_system_wide_read():
   return system_wide_role in SystemWideRoles.read_roles
 
 
-def is_allowed_read(resource_type, resource_id, context_id):
+def is_allowed_read(resource_type, resource_id, context_id=None):
   """Whether or not the user is allowed to read a resource of the specified
   type in the context.
   """

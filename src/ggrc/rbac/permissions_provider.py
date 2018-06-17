@@ -260,16 +260,11 @@ class DefaultUserPermissions(object):
 
   def _is_allowed(self, permission):
     permissions = self._permissions()
-    if permission.context_id \
-       and self._is_allowed(permission._replace(context_id=None)):
-      return True
     if self._permission_match(permission, permissions):
       return True
     if self._permission_match(self.ADMIN_PERMISSION, permissions):
       return True
-    return self._permission_match(
-        self._admin_permission_for_context(permission.context_id),
-        permissions)
+    return False
 
   @staticmethod
   def _check_conditions(instance, action, conditions):
@@ -338,7 +333,7 @@ class DefaultUserPermissions(object):
     """Whether or not the user is allowed to create the given instance"""
     return self._is_allowed_for(instance, 'create')
 
-  def is_allowed_read(self, resource_type, resource_id, context_id):
+  def is_allowed_read(self, resource_type, resource_id, context_id=None):
     """Whether or not the user is allowed to read a resource of the specified
     type in the context."""
     return self._is_allowed(
