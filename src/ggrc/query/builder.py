@@ -15,7 +15,6 @@ import sqlalchemy as sa
 from ggrc import db
 from ggrc import models
 from ggrc.models import inflector
-from ggrc.rbac import context_query_filter
 from ggrc.utils import benchmark
 from ggrc.rbac import permissions
 from ggrc.query import custom_operators
@@ -209,27 +208,6 @@ class QueryHelper(object):
       object_query["ids"] = ids
     return self.query
 
-  @staticmethod
-  def _get_type_query(model, permission_type):
-    """Filter by contexts and resources
-
-    Prepare query to filter models based on the available contexts and
-    resources for the given type of object.
-    """
-    if permission_type == "read" and permissions.has_system_wide_read():
-      return None
-
-    if permission_type == "update" and permissions.has_system_wide_update():
-      return None
-
-    contexts, resources = permissions.get_context_resource(
-        model_name=model.__name__, permission_type=permission_type
-    )
-    if contexts is not None:
-      return sa.or_(context_query_filter(model.context_id, contexts),
-                    model.id.in_(resources) if resources else sa.sql.false())
-    return sa.sql.true()
-
   def _get_objects(self, object_query):
     """Get a set of objects described in the filters."""
 
@@ -268,10 +246,6 @@ class QueryHelper(object):
       tgt_class = getattr(models.all_models, child_type, object_class)
 
     requested_permissions = object_query.get("permissions", "read")
-    with benchmark("Get permissions: _get_ids > _get_type_query"):
-      type_query = self._get_type_query(object_class, requested_permissions)
-      if type_query is not None:
-        query = query.filter(type_query)
     with benchmark("Parse filter query: _get_ids > _build_expression"):
       filter_expression = custom_operators.build_expression(
           expression,
