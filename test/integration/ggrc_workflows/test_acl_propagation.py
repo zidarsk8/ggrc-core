@@ -88,7 +88,7 @@ class TestWorkflowAclPropagation(TestCase):
 
     def change_assignees(workflow, assignees):
       """Change workflow assignees."""
-      response = self.generator.api.put(workflow, {
+      self.generator.api.put(workflow, {
           "access_control_list": [
               {
                   "ac_role_id": self.acr_name_map["Admin"],
@@ -97,7 +97,6 @@ class TestWorkflowAclPropagation(TestCase):
               for i in assignees
           ],
       })
-      self.assert200(response)
 
     updated_wf = deepcopy(self.weekly_wf)
 
