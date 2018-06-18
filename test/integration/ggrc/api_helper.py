@@ -132,6 +132,9 @@ class Api(object):
   def get(self, obj, id_):
     return self.data_to_json(self.client.get(self.api_link(obj, id_)))
 
+  def head(self, obj, id_):
+    return self.data_to_json(self.client.head(self.api_link(obj, id_)))
+
   def get_collection(self, obj, ids):
     return self.data_to_json(self.client.get(
         "{}?ids={}".format(self.api_link(obj), ids)))
