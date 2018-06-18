@@ -36,7 +36,7 @@ class SystemWideRoles(object):
   }
 
 
-def context_query_filter(context_column, contexts):
+def context_query_filter(_, contexts):
   '''
   Intended for use by `model.query.filter(...)`
   If `contexts == None`, it's Admin (no filter), so return `True`
@@ -46,15 +46,4 @@ def context_query_filter(context_column, contexts):
   if contexts is None:
     # Admin context, no filter
     return sa.sql.true()
-  else:
-    filter_expr = None
-    # Handle `NULL` context specially
-    if None in contexts:
-      filter_expr = context_column.is_(None)
-      # We're modifying `contexts`, so copy
-      contexts = set(contexts)
-      contexts.remove(None)
-    if filter_expr is None:
-      # No valid contexts
-      return sa.sql.false()
-    return filter_expr
+  return sa.sql.false()
