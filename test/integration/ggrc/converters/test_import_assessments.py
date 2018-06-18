@@ -51,7 +51,8 @@ class TestAssessmentImport(TestCase):
 
   def test_import_assessment_with_evidence_file(self):
     """Test import evidence file should add warning"""
-    response = self.import_file("assessment_with_evidence_file.csv")
+    response = self.import_file("assessment_with_evidence_file.csv",
+                                safe=False)
     evidences = all_models.Evidence.query.filter(
         all_models.Evidence.kind == all_models.Evidence.FILE).all()
     self.assertEquals(len(evidences), 0)
@@ -272,7 +273,8 @@ class TestAssessmentImport(TestCase):
       https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=889865936
     """
     self.import_file("assessment_full_no_warnings.csv")
-    response = self.import_file("assessment_with_warnings_and_errors.csv")
+    response = self.import_file("assessment_with_warnings_and_errors.csv",
+                                safe=False)
 
     expected_errors = {
         "Assessment": {

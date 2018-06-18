@@ -61,7 +61,7 @@ class TestWorkflowObjectsImport(TestCase):
   def test_bad_imports(self):
     """Test workflow import with errors and warnings"""
     filename = "workflow_with_warnings_and_errors.csv"
-    response = self.import_file(filename)
+    response = self.import_file(filename, safe=False)
 
     expected_errors = {
         "Workflow": {
@@ -85,7 +85,7 @@ class TestWorkflowObjectsImport(TestCase):
 
     """
     filename = "workflow_big_sheet.csv"
-    response = self.import_file(filename)
+    response = self.import_file(filename, safe=False)
     expected_errors = {
         "Task Group Task": {
             "row_warnings": {
@@ -133,7 +133,7 @@ class TestWorkflowObjectsImport(TestCase):
     being bigger than the end date.
     """
     self.import_file("workflow_small_sheet.csv")
-    response = self.import_file("workflow_bad_task_dates.csv")
+    response = self.import_file("workflow_bad_task_dates.csv", safe=False)
 
     expected_errors = {
         "Task Group Task": {

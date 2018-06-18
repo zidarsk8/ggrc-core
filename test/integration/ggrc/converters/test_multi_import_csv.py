@@ -54,7 +54,7 @@ class TestCsvImport(TestCase):
   def test_multi_basic_policy_orggroup_product_with_warnings(self):
     """Test multi basic policy orggroup product with warnings"""
     filename = "multi_basic_policy_orggroup_product_with_warnings.csv"
-    response_json = self.import_file(filename)
+    response_json = self.import_file(filename, safe=False)
 
     row_messages = []
     object_counts = {

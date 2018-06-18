@@ -233,7 +233,8 @@ class TestComprehensiveSheets(TestCase):
     This test should test for all possible warnings and errors but it is still
     incomplete.
     """
-    response = self.import_file("import_with_all_warnings_and_errors.csv")
+    response = self.import_file("import_with_all_warnings_and_errors.csv",
+                                safe=False)
     expected_errors = {
         "Control": {
             "block_errors": {
@@ -307,7 +308,7 @@ class TestComprehensiveSheets(TestCase):
 
   def test_case_sensitive_slugs(self):
     """Test that mapping with case sensitive slugs work."""
-    response = self.import_file("case_sensitive_slugs.csv")
+    response = self.import_file("case_sensitive_slugs.csv", safe=False)
     expected_errors = {
         "Control": {
             "row_errors": {
@@ -341,7 +342,9 @@ class TestComprehensiveSheets(TestCase):
     The import file had an additional users block that contains missing users.
     """
     response = self.import_file(
-        "importing_task_group_task_warnings_and_errors.csv")
+        "importing_task_group_task_warnings_and_errors.csv",
+        safe=False
+    )
 
     expected_errors = {
         "Task Group Task": {
@@ -369,7 +372,8 @@ class TestComprehensiveSheets(TestCase):
 
   def test_missing_rich_text_field(self):
     """MISSING_VALUE_ERROR is returned on empty mandatory description."""
-    response = self.import_file("risk_missing_mandatory_description.csv")
+    response = self.import_file("risk_missing_mandatory_description.csv",
+                                safe=False)
 
     expected_errors = {
         "Risk": {
