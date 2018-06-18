@@ -263,6 +263,7 @@ class _AccessGroups(lhn.AccordionGroup):
 
 class _Scope(lhn.DropdownStatic):
   """Scope dropdown in LHN."""
+  # pylint: disable=too-many-instance-attributes
   _locator_element = locator.LhnMenu.TOGGLE_SCOPE
 
   def __init__(self, driver):
@@ -445,6 +446,7 @@ class _Threats(lhn.AccordionGroup):
 
 class Menu(base.AnimatedComponent):
   """Model of LHN menu."""
+  # pylint: disable=too-many-instance-attributes
   def __init__(self, driver):
     super(Menu, self).__init__(
         driver,
