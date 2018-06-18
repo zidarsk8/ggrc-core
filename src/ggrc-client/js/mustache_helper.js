@@ -1750,7 +1750,16 @@ Mustache.registerHelper('get_default_attr_value',
       last_comment: 1,
     });
 
+    let RICH_TEXT_ATTRS = Object.freeze({
+      notes: 1,
+      description: 1,
+      test_plan: 1,
+    });
+
     let res;
+
+    const regexTags = /<[^>]*>?/g;
+    const regexNewLines = /<\/p>?/g;
 
     instance = Mustache.resolve(instance);
     attrName = Mustache.resolve(attrName);
@@ -1767,6 +1776,13 @@ Mustache.registerHelper('get_default_attr_value',
       if (attrName in DATE_ATTRS) {
         // convert to a localized date
         return moment(res).format('MM/DD/YYYY');
+      }
+      if (attrName in RICH_TEXT_ATTRS) {
+        let lines = res
+          .replace(regexNewLines, '\n')
+          .replace(regexTags, ' ')
+          .trim();
+        return lines;
       }
     }
 

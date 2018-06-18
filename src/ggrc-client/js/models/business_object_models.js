@@ -41,6 +41,19 @@ import {hasQuestions} from '../plugins/utils/ggrcq-utils';
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
+        {
+          attr_title: 'Description',
+          attr_name: 'description',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Notes',
+          attr_name: 'notes',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Assessment Procedure',
+          attr_name: 'test_plan',
+          disable_sorting: true,
+        },
       ]),
     },
     sub_tree_view_options: {
@@ -105,6 +118,19 @@ import {hasQuestions} from '../plugins/utils/ggrcq-utils';
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
+        {
+          attr_title: 'Description',
+          attr_name: 'description',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Notes',
+          attr_name: 'notes',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Assessment Procedure',
+          attr_name: 'test_plan',
+          disable_sorting: true,
+        },
       ]),
       add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
     },
@@ -170,6 +196,19 @@ import {hasQuestions} from '../plugins/utils/ggrcq-utils';
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
+        {
+          attr_title: 'Description',
+          attr_name: 'description',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Notes',
+          attr_name: 'notes',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Assessment Procedure',
+          attr_name: 'test_plan',
+          disable_sorting: true,
+        },
       ]),
       add_item_view:
         GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
@@ -237,6 +276,19 @@ import {hasQuestions} from '../plugins/utils/ggrcq-utils';
         {attr_title: 'Kind/Type', attr_name: 'type', attr_sort_field: 'kind'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
+        {
+          attr_title: 'Description',
+          attr_name: 'description',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Notes',
+          attr_name: 'notes',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Assessment Procedure',
+          attr_name: 'test_plan',
+          disable_sorting: true,
+        },
       ]),
       add_item_view:
         GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
@@ -312,6 +364,19 @@ import {hasQuestions} from '../plugins/utils/ggrcq-utils';
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
+        {
+          attr_title: 'Description',
+          attr_name: 'description',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Notes',
+          attr_name: 'notes',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Assessment Procedure',
+          attr_name: 'test_plan',
+          disable_sorting: true,
+        },
       ]),
       add_item_view:
         GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
@@ -377,6 +442,19 @@ import {hasQuestions} from '../plugins/utils/ggrcq-utils';
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
+        {
+          attr_title: 'Description',
+          attr_name: 'description',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Notes',
+          attr_name: 'notes',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Assessment Procedure',
+          attr_name: 'test_plan',
+          disable_sorting: true,
+        },
       ]),
       add_item_view:
         GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
@@ -443,6 +521,19 @@ import {hasQuestions} from '../plugins/utils/ggrcq-utils';
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
+        {
+          attr_title: 'Description',
+          attr_name: 'description',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Notes',
+          attr_name: 'notes',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Assessment Procedure',
+          attr_name: 'test_plan',
+          disable_sorting: true,
+        },
       ]),
       add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
     },
@@ -508,6 +599,19 @@ import {hasQuestions} from '../plugins/utils/ggrcq-utils';
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
+        {
+          attr_title: 'Description',
+          attr_name: 'description',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Notes',
+          attr_name: 'notes',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Assessment Procedure',
+          attr_name: 'test_plan',
+          disable_sorting: true,
+        },
       ]),
       add_item_view:
         GGRC.mustache_path + '/base_objects/tree_add_item.mustache',

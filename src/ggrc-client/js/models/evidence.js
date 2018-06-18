@@ -61,7 +61,11 @@ can.Model.Cacheable('CMS.Models.Evidence', {
       {attr_title: 'Last Updated', attr_name: 'updated_at'},
       {attr_title: 'Last Deprecated Date', attr_name: 'last_deprecated_date'},
       {attr_title: 'Archived', attr_name: 'archived'},
-    ],
+      {
+        attr_title: 'Description',
+        attr_name: 'description',
+        disable_sorting: true,
+      }],
   },
   init() {
     this.validateNonBlank('title');
