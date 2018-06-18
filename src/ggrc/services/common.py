@@ -265,7 +265,7 @@ class ModelView(View):
       types = self._get_matching_types(self.model)
       indexer = get_indexer()
       models = indexer._get_grouped_types(types)
-      search_query = indexer.get_permissions_query(models, 'read', None)
+      search_query = indexer.get_permissions_query(models, 'read')
       search_query = and_(search_query, indexer._get_filter_query(terms))
       search_query = db.session.query(indexer.record_type.key).filter(
           search_query)

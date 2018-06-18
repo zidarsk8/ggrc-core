@@ -16,7 +16,6 @@ from ggrc import db
 def search():
   terms = request.args.get('q')
   permission_type = request.args.get('__permission_type', 'read')
-  permission_model = request.args.get('__permission_model', None)
   if terms is None:
     raise BadRequest('Query parameter "q" specifying search '
                      'terms must be provided.')
@@ -66,7 +65,7 @@ def search():
                                 relevant_objects)
   return basic_search(
       terms, types,
-      permission_type, permission_model,
+      permission_type,
       contact_id, extra_params, relevant_objects
   )
 
@@ -126,13 +125,13 @@ def _build_relevant_filter(types, relevant_objects):
 
 
 def do_search(terms, list_for_type, types=None, permission_type='read',
-              permission_model=None, contact_id=None, extra_params=None,
+              contact_id=None, extra_params=None,
               relevant_objects=None):
   indexer = get_indexer()
   with benchmark("Search"):
     results = indexer.search(
         terms, types=types, permission_type=permission_type,
-        permission_model=permission_model, contact_id=contact_id,
+        contact_id=contact_id,
         extra_params=extra_params
     )
 
@@ -167,14 +166,14 @@ def make_search_result(entries):
 
 
 def basic_search(terms, types=None,
-                 permission_type='read', permission_model=None,
+                 permission_type='read',
                  contact_id=None, extra_params=None, relevant_objects=None):
   entries = []
 
   def list_for_type(_):
     return entries
 
-  do_search(terms, list_for_type, types, permission_type, permission_model,
+  do_search(terms, list_for_type, types, permission_type,
             contact_id, extra_params, relevant_objects)
   return make_search_result(entries)
 
