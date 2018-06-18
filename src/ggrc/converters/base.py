@@ -24,6 +24,7 @@ from ggrc.fulltext import get_indexer
 
 class BaseConverter(object):
   """Base class for csv converters."""
+  # pylint: disable=too-few-public-methods
   def __init__(self):
     self.block_converters = []
     self.new_objects = defaultdict(structures.CaseInsensitiveDict)

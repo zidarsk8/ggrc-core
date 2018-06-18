@@ -19,7 +19,7 @@ from ggrc.utils import dump_attrs
 
 class RowConverter(object):
   """Base class for handling row data."""
-
+  # pylint: disable=too-few-public-methods
   def __init__(self, block_converter, object_class, headers, options):
     self.block_converter = block_converter
     self.object_class = object_class

@@ -458,8 +458,8 @@ class ImportBlockConverter(BlockConverter):
     super(ImportBlockConverter, self).__init__(
         converter,
         object_class=object_class,
-        rows=rows,
         raw_headers=raw_headers,
+        rows=rows,
         offset=offset,
         class_name=class_name,
         operation="import"
