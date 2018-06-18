@@ -306,11 +306,8 @@ class TestCase(BaseTestCase, object):
     response = cls.send_import_request(data, dry_run=dry_run, person=person)
     return response
 
-  def import_file(self, filename, dry_run=False, person=None):
+  def import_file(self, filename, person=None):
     """Import a csv file as a specific user."""
-    if dry_run:
-      return self._import_file(filename, dry_run=True, person=person)
-
     response_dry = self._import_file(filename, dry_run=True, person=person)
     response = self._import_file(filename, person=person)
     self.assertEqual(response_dry, response)

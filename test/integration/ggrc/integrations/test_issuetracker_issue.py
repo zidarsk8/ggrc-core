@@ -227,7 +227,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
           ('object_type', 'Assessment'),
           ('Code*', asmt.slug),
           ('Audit', audit.slug),
-      ]), dry_run=False)
+      ]))
       self._check_csv_response(response, {})
 
       # import new object
@@ -238,7 +238,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
           ('Creators', 'user@example.com'),
           ('Assignees*', 'user@example.com'),
           ('Title', 'Some Title'),
-      ]), dry_run=False)
+      ]))
       self._check_csv_response(response, {})
 
 

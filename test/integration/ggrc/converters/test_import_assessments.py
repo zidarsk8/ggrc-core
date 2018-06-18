@@ -245,7 +245,7 @@ class TestAssessmentImport(TestCase):
         ("Creators", "user@example.com"),
         ("Title", asmnt.title),
         ("State", "Completed"),
-    ]), dry_run=False)
+    ]))
     expected_errors = {
         "Assessment": {
             "row_errors": {
@@ -704,9 +704,8 @@ class TestAssessmentImport(TestCase):
         ("State", "Completed"),
         ("CAD", "Some value"),
     ])
-    for dry_run in [True, False]:
-      response = self.import_data(data, dry_run=dry_run)
-      self._check_csv_response(response, {})
+    response = self.import_data(data)
+    self._check_csv_response(response, {})
 
 
 @ddt.ddt
