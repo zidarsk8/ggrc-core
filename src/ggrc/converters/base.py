@@ -36,13 +36,6 @@ class BaseConverter(object):
       self.response_data.append(converter.get_info())
     return self.response_data
 
-  @classmethod
-  def drop_cache(cls):
-    if not getattr(settings, 'MEMCACHE_MECHANISM', False):
-      return
-    memcache = MemCache()
-    memcache.clean()
-
 
 class ImportConverter(BaseConverter):
   """Import Converter.
@@ -149,6 +142,13 @@ class ImportConverter(BaseConverter):
           revision_ids,
           cur_user.id
       )
+
+  @classmethod
+  def drop_cache(cls):
+    if not getattr(settings, 'MEMCACHE_MECHANISM', False):
+      return
+    memcache = MemCache()
+    memcache.clean()
 
 
 class ExportConverter(BaseConverter):
