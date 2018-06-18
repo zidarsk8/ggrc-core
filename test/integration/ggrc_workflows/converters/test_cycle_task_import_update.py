@@ -91,8 +91,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     """Test cycle task update via import with correct data"""
     self._generate_cycle_tasks()
     with freeze_time(self.ftime_active):
-      response = self.import_file("cycle_task_correct.csv")
-      self._check_csv_response(response, {})
+      self.import_file("cycle_task_correct.csv")
       self._cmp_tasks(self.expected_cycle_task_correct)
 
   def test_cycle_task_warnings(self):

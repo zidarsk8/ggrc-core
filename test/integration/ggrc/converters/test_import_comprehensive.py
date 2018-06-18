@@ -210,7 +210,7 @@ class TestComprehensiveSheets(TestCase):
   def test_full_good_import(self):
     """Test import of all objects with no warnings or errors."""
     filename = "full_good_import_no_warnings.csv"
-    response = self.import_file(filename)
+    self.import_file(filename)
 
     admin = db.session.query(Role.id).filter(Role.name == "Administrator")
     reader = db.session.query(Role.id).filter(Role.name == "Reader")
@@ -223,9 +223,6 @@ class TestComprehensiveSheets(TestCase):
     self.assertEqual(len(readers), 5)
     self.assertEqual(len(creators), 6)
     self.assertEqual(len(access_groups), 10)
-
-    expected_errors = {}
-    self._check_csv_response(response, expected_errors)
 
   def test_errors_and_warnings(self):
     """Test all possible errors and warnings.

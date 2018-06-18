@@ -19,13 +19,9 @@ class TestBasicCsvImport(TestCase):
     self.assertEqual(5, Person.query.count())
 
   def test_people_import_correct_order(self):
-    filename = "people_import_correct_order.csv"
-    response = self.import_file(filename)
+    self.import_file("people_import_correct_order.csv")
     self.assertEqual(5, Person.query.count())
-    self._check_csv_response(response, {})
 
   def test_people_import_wrong_order(self):
-    filename = "people_import_wrong_order.csv"
-    response = self.import_file(filename)
+    self.import_file("people_import_wrong_order.csv")
     self.assertEqual(5, Person.query.count())
-    self._check_csv_response(response, {})

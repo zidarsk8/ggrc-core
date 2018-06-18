@@ -151,9 +151,7 @@ class TestBasicCsvImport(TestCase):
     Checks for fields being updarted correctly
     """
     filename = "pci_program.csv"
-    response = self.import_file(filename)
-
-    self._check_csv_response(response, {})
+    self.import_file(filename)
 
     assessment = models.Assessment.query.filter_by(slug="CA.PCI 1.1").first()
     audit = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()
