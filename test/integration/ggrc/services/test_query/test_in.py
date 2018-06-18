@@ -27,6 +27,8 @@ class TestIn(TestCase, WithQueryApi):
     self.title_id_map = {ob.title: ob.id for ob in test_objects}
 
   @ddt.data(("Control", "status", ["Draft"], ["c1", "c2"]),
+            ("Control", "State", ["Draft"], ["c1", "c2"]),
+            ("Control", "State", ["Draft", "Active"], ["c1", "c2", "c3"]),
             ("Control", "title", ["c1", "c2"], ["c1", "c2"]),
             ("Control", "title", [], []),
             ("Control", "status", ["Fake_status"], []),
