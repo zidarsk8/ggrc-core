@@ -86,7 +86,7 @@ import Permission from '../permission';
           (instance === GGRC.page_instance())) {
           GGRC.navigate('/dashboard');
         } else if (modelName === 'people' || modelName === 'roles') {
-          window.location.assign('/admin#' + modelName + '_list_widget');
+          window.location.assign('/admin#' + modelName + '_list');
           GGRC.navigate();
         } else {
           $trigger.trigger('modal:success', data);

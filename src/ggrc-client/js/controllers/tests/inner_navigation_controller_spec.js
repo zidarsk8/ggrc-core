@@ -132,11 +132,11 @@ describe('CMS.Controllers.InnerNav', function () {
     beforeEach(() => {
       options = {
         widget_list: new can.Observe.List([
-          {selector: '#control_widget', model: CMS.Models.Control},
-          {selector: '#section_widget', model: CMS.Models.Section},
-          {selector: '#assessment_widget', model: CMS.Models.Assessment},
-          {selector: '#super_widget'},
-          {selector: '#objective_widget', model: CMS.Models.Objective},
+          {selector: '#control', model: CMS.Models.Control},
+          {selector: '#section', model: CMS.Models.Section},
+          {selector: '#assessment', model: CMS.Models.Assessment},
+          {selector: '#super'},
+          {selector: '#objective', model: CMS.Models.Objective},
         ]),
         refetchOnce: new Set(),
       };
@@ -149,25 +149,25 @@ describe('CMS.Controllers.InnerNav', function () {
     });
 
     it('should return "fasle". "refetchOnce" is empty', () => {
-      let result = tryToRefetchOnce('#control_widget');
+      let result = tryToRefetchOnce('#control');
       expect(result).toBeFalsy();
     });
 
     it('should return "false". control does not have "Vendor" widget', () => {
       ctrlInst.options.attr('refetchOnce').add('Vendor');
-      let result = tryToRefetchOnce('#vendor_widget');
+      let result = tryToRefetchOnce('#vendor');
       expect(result).toBeFalsy();
     });
 
     it('should return "false". "refetchOnce" does not have "Control"', () => {
       ctrlInst.options.attr('refetchOnce').add('Vendor');
-      let result = tryToRefetchOnce('#control_widget');
+      let result = tryToRefetchOnce('#control');
       expect(result).toBeFalsy();
     });
 
-    it('should return "false". "super_widget" does not have model', () => {
+    it('should return "false". "super" does not have model', () => {
       ctrlInst.options.attr('refetchOnce').add('Super');
-      let result = tryToRefetchOnce('#super_widget');
+      let result = tryToRefetchOnce('#super');
       expect(result).toBeFalsy();
     });
 
@@ -177,7 +177,7 @@ describe('CMS.Controllers.InnerNav', function () {
       refetchOnce.add('Vendor');
 
       expect(refetchOnce.size).toBe(2);
-      let result = tryToRefetchOnce('#control_widget');
+      let result = tryToRefetchOnce('#control');
       expect(result).toBeTruthy();
       expect(refetchOnce.size).toBe(1);
       expect(refetchOnce.has('Vendor')).toBeTruthy();

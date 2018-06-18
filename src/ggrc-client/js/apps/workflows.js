@@ -408,8 +408,8 @@ import {
     }
 
     new GGRC.WidgetList('ggrc_workflows', descriptor, [
-      'info_widget',
-      'task_widget',
+      'info',
+      'task',
     ]);
   };
 
@@ -567,8 +567,8 @@ import {
       };
     }
     new GGRC.WidgetList('ggrc_workflows', descriptor, [
-      'info_widget',
-      'task_widget',
+      'info',
+      'task',
     ]);
   };
 

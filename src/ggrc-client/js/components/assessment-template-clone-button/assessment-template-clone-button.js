@@ -30,11 +30,11 @@ export default can.Component.extend({
     },
     refreshTreeView() {
       if (GGRC.page_instance().type === 'Audit') {
-        if (router.attr('widget') === 'assessment_template_widget') {
+        if (router.attr('widget') === 'assessment_template') {
           this.dispatch('refreshTree');
         } else {
           router.attr({
-            widget: 'assessment_template_widget',
+            widget: 'assessment_template',
             refetch: true,
           });
         }
