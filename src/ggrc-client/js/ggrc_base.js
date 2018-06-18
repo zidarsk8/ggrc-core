@@ -13,9 +13,6 @@ import PersistentNotifier from './plugins/persistent_notifier';
   if (!GGRC.widget_descriptors) {
     GGRC.widget_descriptors = {};
   }
-  if (!GGRC.default_widgets) {
-    GGRC.default_widgets = [];
-  }
 
   GGRC.register_hook = function (path, hook) {
     let h, parent_path, last;
