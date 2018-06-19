@@ -205,6 +205,28 @@ class TestControlsImport(TestCase):
                         u"skipped".format(control.type))
     self.assertEquals([expected_warning], response[0]['row_warnings'])
 
+  def test_import_assessment_with_doc_file_blank_multiple(self):
+    """No warnings in Document Files mapping"""
+    doc_file = "test_gdrive_url \n \n test_gdrive_url_2"
+
+    with factories.single_commit():
+      control = factories.ControlFactory()
+      control_slug = control.slug
+      doc1 = factories.DocumentFileFactory(link="test_gdrive_url")
+      factories.RelationshipFactory(source=control,
+                                    destination=doc1)
+      doc2 = factories.DocumentFileFactory(link="test_gdrive_url_2")
+      factories.RelationshipFactory(source=control,
+                                    destination=doc2)
+
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Control"),
+        ("Code*", control_slug),
+        ("Document File", doc_file),
+    ]))
+
+    self.assertEquals([], response[0]['row_warnings'])
+
   def test_update_reference_url(self):
     """Reference Url updated properly via import"""
     doc_url = "test_gdrive_url"
