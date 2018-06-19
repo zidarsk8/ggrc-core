@@ -33,6 +33,9 @@ class ColumnHandler(object):
   value.
   """
 
+  # special marker to set the field empty
+  EXPLICIT_EMPTY_VALUE = {"-", "--", "---"}
+
   def __init__(self, row_converter, key, **options):
     self.row_converter = row_converter
     self.key = key
@@ -50,6 +53,9 @@ class ColumnHandler(object):
     self.unique = options.get("unique", False)
     if options.get("parse"):
       self.set_value()
+
+  def value_explicitly_empty(self, value):
+    return value in self.EXPLICIT_EMPTY_VALUE
 
   def check_unique_consistency(self):
     """Returns true if no object exists with the same unique field."""
@@ -277,7 +283,7 @@ class UsersColumnHandler(UserColumnHandler):
   def parse_item(self):
     """Parses multi users field."""
     people = set()
-    if self.raw_value in {"-", "--", "---"}:
+    if self.value_explicitly_empty(self.raw_value):
       if not self.mandatory:
         self.set_empty = True
         return None
@@ -386,12 +392,10 @@ class NullableDateColumnHandler(DateColumnHandler):
   """Nullable date column handler."""
 
   DEFAULT_EMPTY_VALUE = "--"
-  EMPTY_VALUE_LIST = ["--", "---"]
 
   def parse_item(self):
     """Datetime column can be nullable."""
-    value = self.raw_value
-    if value not in self.EMPTY_VALUE_LIST:
+    if not self.value_explicitly_empty(self.raw_value):
       return super(NullableDateColumnHandler, self).parse_item()
     if self.mandatory:
       self.add_error(
@@ -569,7 +573,7 @@ class OptionColumnHandler(ColumnHandler):
   """
 
   def parse_item(self):
-    if not self.mandatory and self.raw_value in {"--", "---"}:
+    if not self.mandatory and self.value_explicitly_empty(self.raw_value):
       self.set_empty = True
       return None
     prefixed_key = "{}_{}".format(

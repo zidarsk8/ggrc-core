@@ -54,7 +54,8 @@ class UnitColumnHandler(handlers.ColumnHandler):
   def parse_item(self):
     """Parse Unit column value."""
     value = self.raw_value.lower()
-    if value in {"-", "--", "---"}:
+
+    if self.value_explicitly_empty(value):
       self.set_empty = True
       value = None
     elif not value:
@@ -85,7 +86,8 @@ class RepeatEveryColumnHandler(handlers.ColumnHandler):
     """Parse 'repeat every' value
     """
     value = self.raw_value
-    if value in {"-", "--", "---"}:
+
+    if self.value_explicitly_empty(value):
       self.set_empty = True
       value = None
     elif value:
