@@ -173,6 +173,19 @@ class ImportRowConverter(RowConverter):
     self.initial_state = dump_attrs(obj)
     return obj
 
+  def setup_secondary_objects(self):
+    """Import secondary objects.
+
+    This function creates and stores all secondary object such as relationships
+    and any linked object that need the original object to be saved before they
+    can be processed. This is usually due to needing the id of the original
+    object that is created with a csv import.
+    """
+    if not self.obj or self.ignore or self.is_delete:
+      return
+    for mapping in self.objects.values():
+      mapping.set_obj_attr()
+
   def setup_object(self):
     """ Set the object values or relate object values
 
@@ -187,39 +200,29 @@ class ImportRowConverter(RowConverter):
       if not item_handler.view_only:
         item_handler.set_obj_attr()
 
-  def setup_secondary_objects(self):
-    """Import secondary objects.
+  def send_post_commit_signals(self, event=None):
+    """Send after commit signals for all objects
 
-    This function creates and stores all secondary object such as relationships
-    and any linked object that need the original object to be saved before they
-    can be processed. This is usually due to needing the id of the original
-    object that is created with a csv import.
-    """
-    if not self.obj or self.ignore or self.is_delete:
+    This function sends proper signals for all objects depending if the object
+    was created, updated or deleted.
+    Note: signals are only sent for the row objects. Secondary objects such as
+    Relationships do not get any signals triggered.
+    ."""
+    if self.ignore:
       return
-    for mapping in self.objects.values():
-      mapping.set_obj_attr()
-
-  def insert_object(self):
-    """Add the row object to the current database session."""
-    if self.ignore or self.is_delete:
-      return
-
-    if self.is_new:
-      db.session.add(self.obj)
-    for handler in self.attrs.values():
-      handler.insert_object()
-
-  def insert_secondary_objects(self):
-    """Add additional objects to the current database session.
-
-    This is used for adding any extra created objects such as Relationships, to
-    the current session to be committed.
-    """
-    if not self.obj or self.ignore or self.is_delete:
-      return
-    for secondary_object in self.objects.values():
-      secondary_object.insert_object()
+    service_class = getattr(ggrc.services, self.object_class.__name__)
+    service_class.model = self.object_class
+    if self.is_delete:
+      signals.Restful.model_deleted_after_commit.send(
+          self.object_class, obj=self.obj, service=service_class, event=event)
+    elif self.is_new:
+      signals.Restful.model_posted_after_commit.send(
+          self.object_class, obj=self.obj, src={}, service=service_class,
+          event=event)
+    else:
+      signals.Restful.model_put_after_commit.send(
+          self.object_class, obj=self.obj, src={}, service=service_class,
+          event=event)
 
   def send_before_commit_signals(self, event=None):
     """Send before commit signals for all objects.
@@ -260,29 +263,26 @@ class ImportRowConverter(RowConverter):
       signals.Restful.model_put.send(
           self.object_class, obj=self.obj, src={}, service=service_class)
 
-  def send_post_commit_signals(self, event=None):
-    """Send after commit signals for all objects
-
-    This function sends proper signals for all objects depending if the object
-    was created, updated or deleted.
-    Note: signals are only sent for the row objects. Secondary objects such as
-    Relationships do not get any signals triggered.
-    ."""
-    if self.ignore:
+  def insert_object(self):
+    """Add the row object to the current database session."""
+    if self.ignore or self.is_delete:
       return
-    service_class = getattr(ggrc.services, self.object_class.__name__)
-    service_class.model = self.object_class
-    if self.is_delete:
-      signals.Restful.model_deleted_after_commit.send(
-          self.object_class, obj=self.obj, service=service_class, event=event)
-    elif self.is_new:
-      signals.Restful.model_posted_after_commit.send(
-          self.object_class, obj=self.obj, src={}, service=service_class,
-          event=event)
-    else:
-      signals.Restful.model_put_after_commit.send(
-          self.object_class, obj=self.obj, src={}, service=service_class,
-          event=event)
+
+    if self.is_new:
+      db.session.add(self.obj)
+    for handler in self.attrs.values():
+      handler.insert_object()
+
+  def insert_secondary_objects(self):
+    """Add additional objects to the current database session.
+
+    This is used for adding any extra created objects such as Relationships, to
+    the current session to be committed.
+    """
+    if not self.obj or self.ignore or self.is_delete:
+      return
+    for secondery_object in self.objects.values():
+      secondery_object.insert_object()
 
 
 class ExportRowConverter(RowConverter):
