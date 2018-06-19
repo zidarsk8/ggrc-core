@@ -45,5 +45,5 @@ def context_query_filter(_, contexts):
 
   if contexts is None:
     # Admin context, no filter
-    return sa.sql.true()
-  return sa.sql.false()
+    return sa.true()
+  return sa.false()
