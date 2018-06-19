@@ -305,14 +305,6 @@ class UsersColumnHandler(UserColumnHandler):
     return list(people)
 
 
-class SlugColumnHandler(ColumnHandler):
-
-  def parse_item(self):
-    if self.raw_value:
-      return self.raw_value
-    return ""
-
-
 class DateColumnHandler(ColumnHandler):
   """Handler for fields that contains date."""
 
