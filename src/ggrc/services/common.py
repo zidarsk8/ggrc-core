@@ -24,7 +24,7 @@ from flask.views import View
 from flask.ext.sqlalchemy import Pagination
 import sqlalchemy as sa
 import sqlalchemy.orm.exc
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, false
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import tuple_
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -247,10 +247,12 @@ class ModelView(View):
     if filter_by_contexts:
       contexts = permissions.read_contexts_for(self.model.__name__)
       resources = permissions.read_resources_for(self.model.__name__)
-      filter_expr = context_query_filter(self.model.context_id, contexts)
-      if resources:
-        filter_expr = or_(filter_expr, self.model.id.in_(resources))
-      query = query.filter(filter_expr)
+      if contexts is not None:
+        if resources:
+          query = query.filter(self.model.id.in_(resources))
+        else:
+          query = query.filter(false())
+
       for j in joinlist:
         j_class = j.property.mapper.class_
         j_contexts = permissions.read_contexts_for(j_class.__name__)
