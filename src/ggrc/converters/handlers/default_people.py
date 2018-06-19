@@ -71,11 +71,11 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
 
     These values are the normal selection in the default assignees dropdown.
     """
-    value = self.PEOPLE_LABELS_MAP.get(self.raw_value.strip().lower())
+    value = self.PEOPLE_LABELS_MAP.get(self.raw_value.lower())
     if not value and self.mandatory:
       self.add_error(errors.WRONG_REQUIRED_VALUE,
                      column_name=self.display_name,
-                     value=self.raw_value.strip().lower())
+                     value=self.raw_value.lower())
     return value
 
   def parse_item(self):

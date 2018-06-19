@@ -20,7 +20,7 @@ class TemplateObjectColumnHandler(handlers.ColumnHandler):
   def parse_item(self):
     """Parse object type field for assessment templates."""
     exportables = converters.get_exportables()
-    object_type = exportables.get(self.raw_value.strip().lower())
+    object_type = exportables.get(self.raw_value.lower())
     if not object_type:
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
       return

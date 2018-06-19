@@ -313,13 +313,13 @@ class DateColumnHandler(ColumnHandler):
   def parse_item(self):
     if self.view_only:
       self._check_errors_non_importable_objects(
-          self.get_value().strip(), self.raw_value.strip()
+          self.get_value(), self.raw_value
       )
       return
-    value = self.raw_value.strip()
+    value = self.raw_value
     if value and not re.match(
         r"[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}|"
-        r"[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}", self.raw_value.strip()
+        r"[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}", self.raw_value
     ):
       self.add_error(errors.UNKNOWN_DATE_FORMAT, column_name=self.display_name)
       return
@@ -390,7 +390,7 @@ class NullableDateColumnHandler(DateColumnHandler):
 
   def parse_item(self):
     """Datetime column can be nullable."""
-    value = self.raw_value.strip()
+    value = self.raw_value
     if value not in self.EMPTY_VALUE_LIST:
       return super(NullableDateColumnHandler, self).parse_item()
     if self.mandatory:
@@ -425,7 +425,7 @@ class TextColumnHandler(ColumnHandler):
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
     value = self.raw_value or ""
-    value = self.clean_whitespaces(value).strip()
+    value = self.clean_whitespaces(value)
 
     if self.mandatory and not value:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
@@ -577,7 +577,7 @@ class OptionColumnHandler(ColumnHandler):
     )
     item = all_models.Option.query.filter(
         and_(
-            all_models.Option.title == self.raw_value.strip(),
+            all_models.Option.title == self.raw_value,
             or_(all_models.Option.role == self.key,
                 all_models.Option.role == prefixed_key)
         )
