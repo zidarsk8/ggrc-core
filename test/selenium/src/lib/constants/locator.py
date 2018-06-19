@@ -560,6 +560,25 @@ class ModalRelatedAssessments(object):
   MODAL = (By.CSS_SELECTOR, ".related-assessments")
 
 
+class ModalSetValueForAsmtCA(object):
+  """Locators for set value for assessment custom attribute."""
+  MODAL = "//div[@class = 'in']//div[@class = 'simple-modal ']"
+  MODAL_LOCATOR = (By.XPATH, MODAL)
+  MODAL_HEADER = (
+      By.XPATH, MODAL + "//div[@class = 'simple-modal__header-text']")
+  BUTTON_CLOSE = (By.XPATH, MODAL + "//button[text() = 'Close']")
+  BUTTON_SAVE = (By.XPATH, MODAL + "//button[text() = 'Save']")
+  INPUT_COMMENT = (By.XPATH, MODAL + "//div[text() = 'Comment']/parent::div"
+                                     "//div[contains(@class, 'ql-editor')]")
+  BUTTON_ADD_URL = (By.XPATH, MODAL + "//div[text() = 'Evidence url']"
+                                      "/parent::div//button[text() = 'Add']")
+  INPUT_EVIDENCE_URL = (By.XPATH, MODAL + "//div[text() = 'Evidence url']"
+                                          "/parent::div//input")
+  BUTTON_CONFIRM_URL = (
+      By.XPATH, MODAL + "//div[text() = 'Evidence url']/parent::div"
+                        "//button[@class = 'create-form__confirm']")
+
+
 class WidgetBar(object):
   """Locators for bar containing widgets/tabs."""
 
@@ -831,6 +850,8 @@ class WidgetInfoAssessment(WidgetInfoPanel, CommonAssessment):
   BUTTON_VERIFY = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-green")
   BUTTON_NEEDS_REWORK = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-red")
   ICON_VERIFIED = (By.CSS_SELECTOR, "i.verified-icon")
+  EVIDENCE_URLS_CSS = (By.CSS_SELECTOR,
+                       ".action-toolbar document-object-list-item a")
 
 
 class TabContainer(object):

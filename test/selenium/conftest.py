@@ -332,10 +332,10 @@ def new_assessments_from_template_rest(request, new_audit_rest):
   """Create new Assessments based on Assessment Template via REST API.
   Return: [lib.entities.entity.AssessmentEntity, ...]
   """
+  dict_executed_fixtures = dynamic_fixtures.dict_executed_fixtures
   control_snapshots = dynamic_fixtures.get_fixture_from_dict_fixtures(
       "new_controls_rest_snapshot")
   template = None
-  dict_executed_fixtures = dynamic_fixtures.dict_executed_fixtures
   for fixture_name in dict_executed_fixtures:
     if fixture_name.startswith("new_assessment_template"):
       template = dict_executed_fixtures[fixture_name][0]
