@@ -72,7 +72,6 @@ INDEX_REPLACE_STATEMENT = """
       `tags`,
       `property`,
       `content`,
-      `context_id`,
       `subproperty`
   )
   VALUES (
@@ -81,7 +80,6 @@ INDEX_REPLACE_STATEMENT = """
       :tags,
       :property,
       :content,
-      :context_id,
       :subproperty
   )
 """
@@ -557,7 +555,6 @@ def get_index_data(computed_values, snapshot_tag_map):
           "tags": tags,
           "property": attr.attribute_definition.name,
           "content": value,
-          "context_id": None,
           "subproperty": u"",
       })
   return data
