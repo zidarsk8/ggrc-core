@@ -39,8 +39,7 @@ class TestAssessmentImport(TestCase):
     """Test importing of assessments with templates."""
 
     self.import_file("assessment_template_no_warnings.csv")
-    response = self.import_file("assessment_with_templates.csv")
-    self._check_csv_response(response, {})
+    self.import_file("assessment_with_templates.csv")
 
     assessment = all_models.Assessment.query.filter(
         all_models.Assessment.slug == "A 4").first()
@@ -51,7 +50,8 @@ class TestAssessmentImport(TestCase):
 
   def test_import_assessment_with_evidence_file(self):
     """Test import evidence file should add warning"""
-    response = self.import_file("assessment_with_evidence_file.csv")
+    response = self.import_file("assessment_with_evidence_file.csv",
+                                safe=False)
     evidences = all_models.Evidence.query.filter(
         all_models.Evidence.kind == all_models.Evidence.FILE).all()
     self.assertEquals(len(evidences), 0)
@@ -152,8 +152,7 @@ class TestAssessmentImport(TestCase):
     CSV sheet:
       https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=704933240&vpid=A7
     """
-    response = self.import_file("assessment_full_no_warnings.csv")
-    self._check_csv_response(response, {})
+    self.import_file("assessment_full_no_warnings.csv")
 
     # Test first Assessment line in the CSV file
     asmt_1 = all_models.Assessment.query.filter_by(slug="Assessment 1").first()
@@ -193,16 +192,7 @@ class TestAssessmentImport(TestCase):
       https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=299569476
     """
     self.import_file("assessment_full_no_warnings.csv")
-    response = self.import_file("assessment_update_intermediate.csv")
-    expected_errors = {
-        "Assessment": {
-            "block_errors": set(),
-            "block_warnings": set(),
-            "row_errors": set(),
-            "row_warnings": set(),
-        }
-    }
-    self._check_csv_response(response, expected_errors)
+    self.import_file("assessment_update_intermediate.csv")
 
     assessments = {r.slug: r for r in all_models.Assessment.query.all()}
     self.assertEqual(assessments["Assessment 60"].status,
@@ -245,7 +235,7 @@ class TestAssessmentImport(TestCase):
         ("Creators", "user@example.com"),
         ("Title", asmnt.title),
         ("State", "Completed"),
-    ]), dry_run=False)
+    ]))
     expected_errors = {
         "Assessment": {
             "row_errors": {
@@ -272,7 +262,8 @@ class TestAssessmentImport(TestCase):
       https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=889865936
     """
     self.import_file("assessment_full_no_warnings.csv")
-    response = self.import_file("assessment_with_warnings_and_errors.csv")
+    response = self.import_file("assessment_with_warnings_and_errors.csv",
+                                safe=False)
 
     expected_errors = {
         "Assessment": {
@@ -704,9 +695,8 @@ class TestAssessmentImport(TestCase):
         ("State", "Completed"),
         ("CAD", "Some value"),
     ])
-    for dry_run in [True, False]:
-      response = self.import_data(data, dry_run=dry_run)
-      self._check_csv_response(response, {})
+    response = self.import_data(data)
+    self._check_csv_response(response, {})
 
 
 @ddt.ddt

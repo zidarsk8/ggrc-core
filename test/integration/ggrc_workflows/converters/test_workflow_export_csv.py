@@ -94,7 +94,8 @@ class TestExportMultipleObjects(TestCase):
 
   def setUp(self):
     self.clear_data()
-    self.import_file("workflow_big_sheet.csv")
+    # TODO: use here such a CSV that doesn't have errors or warnings
+    self.import_file("workflow_big_sheet.csv", safe=False)
     self.client.get("/login")
     self.headers = {
         'Content-Type': 'application/json',

@@ -326,8 +326,7 @@ class TestTaskOverdueNotificationsUsingImports(TestTaskOverdueNotifications):
     db.session.commit()
 
     filename = join(self.CSV_DIR, "workflow_small_sheet.csv")
-    response = self.import_file(filename)
-    self._check_csv_response(response, expected_messages={})
+    self.import_file(filename)
 
     workflow = Workflow.query.one()
     self.wf_generator.generate_cycle(workflow)
@@ -350,8 +349,7 @@ class TestTaskOverdueNotificationsUsingImports(TestTaskOverdueNotifications):
     db.session.commit()
 
     filename = join(self.CSV_DIR, "workflow_small_sheet.csv")
-    response = self.import_file(filename)
-    self._check_csv_response(response, expected_messages={})
+    self.import_file(filename)
 
     workflow = Workflow.query.one()
     self.wf_generator.generate_cycle(workflow)

@@ -306,14 +306,23 @@ class TestCase(BaseTestCase, object):
     response = cls.send_import_request(data, dry_run=dry_run, person=person)
     return response
 
-  def import_file(self, filename, dry_run=False, person=None):
-    """Import a csv file as a specific user."""
-    if dry_run:
-      return self._import_file(filename, dry_run=True, person=person)
+  def import_file(self, filename, person=None, safe=True):
+    """Import a csv file as a specific user.
 
+    Args:
+      filename: the file to import;
+      person: the user to use when calling the import endpoint;
+      safe: if True (which means import_file is used to set up data),
+            assert no errors and warnings occur.
+
+    Returns:
+      import response dict.
+    """
     response_dry = self._import_file(filename, dry_run=True, person=person)
     response = self._import_file(filename, person=person)
     self.assertEqual(response_dry, response)
+    if safe:
+      self._check_csv_response(response, {})
     return response
 
   def export_csv(self, data):

@@ -91,8 +91,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     """Test cycle task update via import with correct data"""
     self._generate_cycle_tasks()
     with freeze_time(self.ftime_active):
-      response = self.import_file("cycle_task_correct.csv")
-      self._check_csv_response(response, {})
+      self.import_file("cycle_task_correct.csv")
       self._cmp_tasks(self.expected_cycle_task_correct)
 
   def test_cycle_task_warnings(self):
@@ -100,7 +99,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     warnings about non-importable columns."""
     self._generate_cycle_tasks()
     with freeze_time(self.ftime_active):
-      response = self.import_file("cycle_task_warnings.csv")
+      response = self.import_file("cycle_task_warnings.csv", safe=False)
       self._check_csv_response(response, self.expected_warnings)
       self._cmp_tasks(self.expected_cycle_task_correct)
 
@@ -110,7 +109,8 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     self._generate_cycle_tasks()
     with freeze_time(self.ftime_active):
       _, creator = self.object_generator.generate_person(user_role="Creator")
-      response = self.import_file("cycle_task_correct.csv", person=creator)
+      response = self.import_file("cycle_task_correct.csv",
+                                  person=creator, safe=False)
       self._check_csv_response(response, self.expected_permission_error)
       # Cycle tasks' data shouldn't be changed in test DB after import run from
       # non-admin user

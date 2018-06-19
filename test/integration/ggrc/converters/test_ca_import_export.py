@@ -86,7 +86,7 @@ class TestCustomAttributeImportExport(TestCase):
     off and on, and checks for all warnings that should be present.
     """
     filename = "custom_attribute_tests.csv"
-    response = self.import_file(filename)[0]
+    response = self.import_file(filename, safe=False)[0]
     expected_warnings = {
         errors.WRONG_VALUE.format(line=6, column_name="man CH"),
         errors.WRONG_VALUE.format(line=8, column_name="normal select"),
@@ -134,7 +134,8 @@ class TestCustomAttributeImportExport(TestCase):
 
     This tests covers updates for all possible custom attributes
     """
-    self.import_file("custom_attribute_tests.csv")
+    # TODO: check response data explicitly
+    self.import_file("custom_attribute_tests.csv", safe=False)
     self.import_file("custom_attribute_update_tests.csv")
     prod_0 = Product.query.filter(Product.slug == "prod0").first()
     prod_0_expected = {
@@ -172,8 +173,8 @@ class TestCustomAttributeImportExport(TestCase):
     This tests relys on the import tests to work. If those fail they need to be
     fixied before this one.
     """
-    filename = "custom_attribute_tests.csv"
-    self.import_file(filename)
+    # TODO: check response data explicitly
+    self.import_file("custom_attribute_tests.csv", safe=False)
 
     data = {
         "export_to": "csv",
@@ -197,8 +198,8 @@ class TestCustomAttributeImportExport(TestCase):
   def tests_ca_export_filters(self):
     """Test filtering on custom attribute values."""
 
-    filename = "custom_attribute_tests.csv"
-    self.import_file(filename)
+    # TODO: check response data explicitly
+    self.import_file("custom_attribute_tests.csv", safe=False)
 
     data = {
         "export_to": "csv",
