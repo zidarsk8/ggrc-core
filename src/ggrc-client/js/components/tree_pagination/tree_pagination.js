@@ -52,29 +52,17 @@ export default can.Component.extend({
       }
     },
     getPaginationInfo: function () {
-      let _current = this.attr('paging.current');
-      let _size = this.attr('paging.pageSize');
-      let _total = this.attr('paging.total');
-      let _first;
-      let _last;
+      let current = this.attr('paging.current');
+      let size = this.attr('paging.pageSize');
+      let total = this.attr('paging.total');
+      let first;
+      let last;
 
-      _first = (_current - 1) * _size + 1;
-      _last = _current * _size < _total ? _current * _size : _total;
+      first = (current - 1) * size + 1;
+      last = current * size < total ? current * size : total;
 
-      return _last ? _first + '-' + _last + ' of ' + _total :
+      return total ? `${first}-${last} of ${total}` :
         'No records';
-    },
-    getPaginationPlaceholder: function () {
-      let _current = this.attr('paging.current');
-      let _count = this.attr('paging.count');
-
-      if (_count && _count >= _current) {
-        return 'Page ' + _current + ' of ' + _count;
-      } else if (!_count) {
-        return '';
-      }
-
-      return 'Wrong value';
     },
     setPageSize: function (pageSize) {
       if (parseInt(pageSize)) {
@@ -91,13 +79,13 @@ export default can.Component.extend({
       return pagesList;
     },
     getPageTitle: function (pageNumber) {
-      let _size = this.attr('paging.pageSize');
-      let _total = this.attr('paging.total');
+      let size = this.attr('paging.pageSize');
+      let total = this.attr('paging.total');
 
-      let _first = (pageNumber - 1) * _size + 1;
-      let _last = pageNumber * _size < _total ? pageNumber * _size : _total;
+      let first = (pageNumber - 1) * size + 1;
+      let last = pageNumber * size < total ? pageNumber * size : total;
 
-      return 'Page ' + pageNumber + ': ' + _first + '-' + _last;
+      return `Page ${pageNumber}: ${first}-${last}`;
     },
   },
 });

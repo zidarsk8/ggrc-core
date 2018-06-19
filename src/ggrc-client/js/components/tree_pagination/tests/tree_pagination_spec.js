@@ -41,32 +41,6 @@ describe('treePagination component', function () {
       expect(result).toEqual('No records');
     });
   });
-  describe('paginationPlaceholder() method in helpers', function () {
-    it('returns placeholder into page input', function () {
-      let result;
-      viewModel.attr('paging.pageSize', 10);
-      viewModel.attr('paging.current', 3);
-      viewModel.attr('paging.total', 30);
-      viewModel.attr('paging.count', 10);
-      result = viewModel.getPaginationPlaceholder();
-      expect(result).toEqual('Page 3 of 10');
-    });
-    it('returns empty string if we don\'t have amount of pages', function () {
-      let result;
-      viewModel.paging.attr('count', null);
-      result = viewModel.getPaginationPlaceholder();
-      expect(result).toEqual('');
-    });
-    it('returns empty string if current page bigger than amount of pages',
-      function () {
-        let result;
-        viewModel.paging.attr('pageSize', 2);
-        viewModel.paging.attr('total', 0);
-        viewModel.paging.attr('current', 10);
-        result = viewModel.getPaginationPlaceholder();
-        expect(result).toEqual('');
-      });
-  });
   describe('setNextPage() method ', function () {
     it('changes current and increase it by 1', function () {
       viewModel.paging.attr('current', 1);
