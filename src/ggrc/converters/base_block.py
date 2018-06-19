@@ -452,7 +452,7 @@ class ImportBlockConverter(BlockConverter):
         if field_name not in self.headers:
           continue
         importable_column_names.append(
-          self.headers[field_name]["display_name"])
+            self.headers[field_name]["display_name"])
       self.add_warning(errors.ONLY_IMPORTABLE_COLUMNS_WARNING,
                        line=self.offset + 2,
                        columns=", ".join(importable_column_names))
@@ -466,7 +466,7 @@ class ImportBlockConverter(BlockConverter):
                       s="")
 
   def row_converters_from_csv(self):
-    """Generate a row converter object for every csv row."""
+    """ Generate a row converter object for every csv row """
     if self.ignore:
       return
     self.row_converters = []
@@ -716,6 +716,7 @@ class ImportBlockConverter(BlockConverter):
     return rel_index + self.BLOCK_OFFSET + self.offset
 
   def remove_duplicate_keys(self, key, counts):
+
     for value, indexes in counts.items():
       if not any(self._in_range(index) for index in indexes):
         continue  # ignore duplicates in other related code blocks

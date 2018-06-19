@@ -75,8 +75,8 @@ class ImportRowConverter(RowConverter):
     handle_fields = self.headers if field_list is None else field_list
     for i, (attr_name, header_dict) in enumerate(self.headers.items()):
       if attr_name not in handle_fields or \
-         attr_name in self.attrs or \
-         self.is_delete:
+              attr_name in self.attrs or \
+              self.is_delete:
         continue
       handler = header_dict["handler"]
       item = handler(self, attr_name, parse=True,
@@ -281,8 +281,8 @@ class ImportRowConverter(RowConverter):
     """
     if not self.obj or self.ignore or self.is_delete:
       return
-    for secondery_object in self.objects.values():
-      secondery_object.insert_object()
+    for secondary_object in self.objects.values():
+      secondary_object.insert_object()
 
 
 class ExportRowConverter(RowConverter):
