@@ -9,7 +9,7 @@ export default can.Component.extend({
   tag: 'simple-popover',
   template: template,
   init: function (el) {
-    this.viewModel.element = el;
+    this.viewModel.attr('element', el);
   },
   viewModel: can.Map.extend({
     extraCssClass: '@',
@@ -32,7 +32,8 @@ export default can.Component.extend({
       }
     },
     handleEvent: function (event) {
-      if (this.element && !this.element.contains(event.target)) {
+      if (this.attr('element')
+        && !this.attr('element').contains(event.target)) {
         this.hide();
       }
     },
