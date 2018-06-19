@@ -594,9 +594,6 @@ class ParentColumnHandler(ColumnHandler):
 
   parent = None
 
-  def __init__(self, row_converter, key, **options):
-    super(ParentColumnHandler, self).__init__(row_converter, key, **options)
-
   def parse_item(self):
     """ get parent object """
     # pylint: disable=protected-access
@@ -649,9 +646,7 @@ class ParentColumnHandler(ColumnHandler):
 class ProgramColumnHandler(ParentColumnHandler):
   """Handler for program column on audit imports."""
 
-  def __init__(self, row_converter, key, **options):
-    self.parent = all_models.Program
-    super(ProgramColumnHandler, self).__init__(row_converter, key, **options)
+  parent = all_models.Program
 
   def set_obj_attr(self):
     if self.row_converter.is_new:
