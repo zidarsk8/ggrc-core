@@ -134,13 +134,6 @@ def _get_child_ids(parent_ids, child_class):
   )
 
 
-def _insert_select_acls(select_statement):
-  """Run insert from select with ignore acl inserter."""
-  acl_table = all_models.AccessControlList.__table__
-  inserter = acl_table.insert().prefix_with("IGNORE")
-  acl_utils.insert_select_acls(inserter, select_statement)
-
-
 def _propagate_to_wf_children(new_wf_acls, child_class):
   """Propagate newly added roles to workflow objects.
 
@@ -189,7 +182,7 @@ def _propagate_to_wf_children(new_wf_acls, child_class):
       acl_table.c.id.in_(new_wf_acls)
   )
 
-  _insert_select_acls(select_statement)
+  acl_utils.insert_select_acls(select_statement)
 
   return _get_child_ids(new_wf_acls, child_class)
 
@@ -234,7 +227,7 @@ def _propagate_to_children(new_tg_acls, child_class, id_name, parent_class):
       acl_table.c.id.in_(new_tg_acls),
   )
 
-  _insert_select_acls(select_statement)
+  acl_utils.insert_select_acls(select_statement)
 
   return _get_child_ids(new_tg_acls, child_class)
 

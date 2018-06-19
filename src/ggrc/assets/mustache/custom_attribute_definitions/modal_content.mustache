@@ -13,7 +13,14 @@
         <span class="required">*</span>
         <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_plural}} a name."></i>
       </label>
-      <input tabindex="1" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
+      <input-filter
+        name="title"
+        {(value)}="title"
+        placeholder="Enter Title"
+        exclude-symbols="*"
+        {tabindex}="1"
+        {autofocus}="true">
+      </input-filter>
     </div>
     <div class="span4">
       <label>

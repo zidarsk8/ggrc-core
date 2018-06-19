@@ -658,10 +658,9 @@ can.Control('CMS.Controllers.LHN_Search', {
     can.each(new_visible_list, function (item) {
       refresh_queue.enqueue(item);
     });
-    refresh_queue.trigger().then(function () {
-      visible_list.push.apply(visible_list, new_visible_list);
+    refresh_queue.trigger().then(function (newItems) {
+      visible_list.push.apply(visible_list, newItems);
       visible_list.attr('is_loading', false);
-        // visible_list.replace(new_visible_list);
       delete that._show_more_pending;
     }).done(stopFn);
     visible_list.attr('is_loading', true);
@@ -770,13 +769,10 @@ can.Control('CMS.Controllers.LHN_Search', {
       }
     });
   },
-  display_lists: function (search_result, display_now) {
+  display_lists: function (search_result) {
     var self = this
         , lists = this.get_visible_lists()
         , dfds = []
-        , search_text = this.current_term
-        , my_work = self.current_params && self.current_params.contact_id
-        , extra_params = self.current_params && self.current_params.extra_params
         ;
 
     can.each(lists, function (list) {
@@ -792,36 +788,21 @@ can.Control('CMS.Controllers.LHN_Search', {
       initial_visible_list =
           self.options.results_lists[model_name].slice(0, self.options.limit);
 
-      can.each(initial_visible_list, function (obj) {
-        refresh_queue.enqueue(obj);
-      });
+        can.each(initial_visible_list, function (obj) {
+          refresh_queue.enqueue(obj);
+        });
 
-      function finish_display(_) {
+      function finish_display(results) {
         can.Map.startBatch();
         self.options.visible_lists[model_name].attr('is_loading', false);
-        self.options.visible_lists[model_name].replace(initial_visible_list);
+        self.options.visible_lists[model_name].replace(results);
         can.Map.stopBatch();
         setTimeout(function () {
           $list.trigger('list_displayed', model_name);
         }, 1);
       }
-      dfd = refresh_queue.trigger().then(function (d) {
-        new CMS.Models.LocalListCache({
-          name: 'search_' + model_name
-            , objects: d
-            , search_text: search_text
-            , my_work: my_work
-            , extra_params: extra_params
-            , type: model_name
-            , keys: ['title', 'contact', 'private', 'viewLink']
-        }).save();
-        return d;
-      });
-      if (display_now) {
-        finish_display();
-      } else {
-        dfd = dfd.then(finish_display);
-      }
+      dfd = refresh_queue.trigger().then(finish_display);
+
       dfds.push(dfd);
     });
 
@@ -874,38 +855,6 @@ can.Control('CMS.Controllers.LHN_Search', {
       // Register that the lists are loaded
       can.each(models, function (model_name) {
         self.options.loaded_lists.push(model_name);
-      });
-
-      $.when.apply(
-        $
-        , models.map(function (model_name) {
-          return CMS.Models.LocalListCache.findAll({'name': 'search_' + model_name});
-        })
-      ).then(function () {
-        var types = {}, fake_search_result;
-        can.each(can.makeArray(arguments), function (a) {
-          var a = a[0];
-          if (a
-              && a.search_text == self.current_term
-              && a.my_work == (self.current_params && self.current_params.contact_id)
-              && a.extra_params == (self.current_params && self.current_params.extra_params)) {
-            types[a.name] = a.objects;
-          }
-        });
-
-        if (Object.keys(types).length > 0) {
-          fake_search_result = {
-            getResultsForType: function (type) {
-              if (types['search_' + type]) {
-                return types['search_' + type];
-              }
-            }
-          };
-          return fake_search_result;
-        }
-      }).done(function (fake_search_result) {
-        if (fake_search_result)
-          self.display_lists(fake_search_result, true);
       });
 
       return GGRC.Models.Search.search_for_types(

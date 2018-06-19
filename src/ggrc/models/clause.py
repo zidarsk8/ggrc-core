@@ -11,6 +11,7 @@ from ggrc.models.comment import Commentable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Hierarchical
 from ggrc.models.mixins import LastDeprecatedTimeboxed
+from ggrc.models.mixins import base
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
@@ -22,8 +23,8 @@ from ggrc.models import reflection
 
 class Clause(Roleable, HasObjectState, Hierarchical, CustomAttributable,
              Personable, LastDeprecatedTimeboxed, Relatable, Commentable,
-             PublicDocumentable, TestPlanned, BusinessObject, Indexed,
-             db.Model):
+             PublicDocumentable, TestPlanned, base.ContextRBAC,
+             BusinessObject, Indexed, db.Model):
 
   __tablename__ = 'clauses'
   _table_plural = 'clauses'

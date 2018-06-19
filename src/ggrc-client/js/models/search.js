@@ -119,9 +119,7 @@ can.Model('GGRC.Models.Search', {
       });
     }
 
-    return can.map(entries, function (stub) {
-      return CMS.Models.get_instance(model.shortName, stub.id);
-    });
+    return entries;
   },
   getCountFor: function (type) {
     let result;

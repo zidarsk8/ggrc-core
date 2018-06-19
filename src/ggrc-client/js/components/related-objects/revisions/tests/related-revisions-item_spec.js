@@ -5,6 +5,7 @@
 
 import Component from '../related-revisions-item';
 import {getComponentVM} from '../../../../../js_specs/spec_helpers';
+import * as Utils from '../../../../plugins/ggrc_utils';
 
 describe('RelatedRevisionsItem component', () => {
   let viewModel;
@@ -36,7 +37,7 @@ describe('RelatedRevisionsItem component', () => {
 
     beforeEach(() => {
       getPersonInfoDfd = can.Deferred();
-      spyOn(GGRC.Utils, 'getPersonInfo').and.returnValue(getPersonInfoDfd);
+      spyOn(Utils, 'getPersonInfo').and.returnValue(getPersonInfoDfd);
     });
 
     it('sets modifiedBy attr correctly ' +
@@ -53,7 +54,7 @@ describe('RelatedRevisionsItem component', () => {
 
     it('do not call getPersonInfo() method when passed value is empty', () => {
       viewModel.attr('revision', null);
-      expect(GGRC.Utils.getPersonInfo).not.toHaveBeenCalled();
+      expect(Utils.getPersonInfo).not.toHaveBeenCalled();
     });
   });
 });

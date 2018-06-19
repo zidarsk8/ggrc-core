@@ -34,7 +34,7 @@ import '../../components/datepicker/datepicker';
 import '../../components/external-data-autocomplete/inline-autocomplete-wrapper';
 import '../../components/multi-select-label/multi-select-label';
 import '../../components/proposal/create-proposal';
-import '../../components/create-document-button/create-document-button';
+import '../../components/input-filter/input-filter';
 import {BUTTON_VIEW_DONE} from '../../plugins/utils/modals'
 import {
   checkPreconditions,
@@ -1207,7 +1207,9 @@ export default can.Control({
         });
         instance.attr('custom_attribute_definitions', cad);
       }
-      instance.refresh();
+      instance.notifier.on_empty(() => {
+        instance.refresh();
+      });
       instance.dispatch(REFRESH_MAPPING);
     }
   },

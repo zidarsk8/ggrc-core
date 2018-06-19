@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 PROPAGATION_RETRIES = 10
 
 
-def insert_select_acls(inserter, select_statement):
+def insert_select_acls(select_statement):
   """Insert acl records from the select statement
   Args:
     select_statement: sql statement that contains the following columns
@@ -37,6 +37,7 @@ def insert_select_acls(inserter, select_statement):
   """
 
   acl_table = all_models.AccessControlList.__table__
+  inserter = acl_table.insert().prefix_with("IGNORE")
 
   last_error = None
   for _ in range(PROPAGATION_RETRIES):

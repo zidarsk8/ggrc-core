@@ -4,9 +4,11 @@
  */
 
 import {
-  toObject,
   isSnapshotType,
 } from '../plugins/utils/snapshot-utils';
+import {
+  handlePendingJoins,
+} from '../plugins/utils/models-utils';
 
 (function (can, $) {
   /*
@@ -31,39 +33,37 @@ import {
           value: false,
         },
       },
-      parent_instance: null,
       instance: null,
-      instance_attr: '@',
       source_mapping: '@',
       default_mappings: [], // expects array of objects
       mapping: '@',
-      deferred: '@',
-      attributes: {},
-      newInstance: false,
       list: [],
+      needToInstanceRefresh: true,
       // the following are just for the case when we have no object to start with,
       changes: [],
+      makeDelayedResolving() {
+        const instance = this.attr('instance');
+        const dfd = handlePendingJoins(instance);
+        instance.delay_resolving_save_until(dfd);
+      },
     },
     events: {
       init: function () {
         let that = this;
-        let key;
-        let instance;
         let vm = this.viewModel;
         vm.attr('controller', this);
-        if (!vm.instance) {
-          vm.attr('deferred', true);
-        } else if (vm.instance.reify) {
+        if (vm.instance.reify) {
           vm.attr('instance', vm.instance.reify());
         }
 
+        const instance = vm.attr('instance');
         vm.default_mappings.forEach(function (defaultMapping) {
           let model;
           let objectToAdd;
           if (defaultMapping.id && defaultMapping.type) {
             model = CMS.Models[defaultMapping.type];
             objectToAdd = model.findInCacheById(defaultMapping.id);
-            that.viewModel.instance
+            instance
               .mark_for_addition('related_objects_as_source', objectToAdd, {});
             that.addListItem(objectToAdd);
           }
@@ -73,32 +73,15 @@ import {
           vm.attr('source_mapping', vm.mapping);
         }
 
-        instance = vm.attr('instance');
-
-        if (instance) {
-          if (!vm.attr('customRelatedLoader')) {
-            instance.get_binding(vm.source_mapping)
-              .refresh_instances()
-              .then(function (list) {
-                this.setListItems(list);
-              }.bind(this));
-          }
-        } else {
-          key = vm.instance_attr + '_' + (vm.mapping || vm.source_mapping);
-          if (!vm.parent_instance._transient[key]) {
-            vm.attr('list', []);
-            vm.parent_instance.attr('_transient.' + key, vm.list);
-          } else {
-            vm.attr('list', vm.parent_instance._transient[key]);
-          }
+        if (!vm.attr('customRelatedLoader')) {
+          instance.get_binding(vm.source_mapping)
+            .refresh_instances()
+            .then(function (list) {
+              this.setListItems(list);
+            }.bind(this));
         }
 
-        this.options.parent_instance = vm.parent_instance;
-        this.options.instance = vm.instance;
         this.on();
-      },
-      destroy: function () {
-        this.viewModel.parent_instance.removeAttr('_changes');
       },
       setListItems: function (list) {
         let currentList = this.viewModel.attr('list');
@@ -107,71 +90,44 @@ import {
             return binding.instance || binding;
           })));
       },
-      '{viewModel} list': function () {
-        let person;
-        // Workaround so we render pre-defined users.
-        if (~['owners'].indexOf(this.viewModel.mapping) &&
-          this.viewModel.list && !this.viewModel.list.length) {
-          person = CMS.Models.Person.findInCacheById(GGRC.current_user.id);
-          this.viewModel.instance
-            .mark_for_addition(this.viewModel.mapping, person, {});
-          this.addListItem(person);
-        }
-      },
       deferred_update: function () {
-        let changes = this.viewModel.changes;
-        let instance = this.viewModel.instance;
+        const viewModel = this.viewModel;
+        let changes = viewModel.changes;
+        let instance = viewModel.instance;
 
         if (!changes.length) {
-          if (instance && instance._pending_joins &&
-            instance._pending_joins.length) {
-            instance.delay_resolving_save_until(instance.constructor
-              .resolve_deferred_bindings(instance));
+          const hasPendingJoins = _.get(instance, '_pending_joins.length') > 0;
+          if (hasPendingJoins) {
+            viewModel.makeDelayedResolving();
           }
           return;
         }
-        this.viewModel.attr('instance', this.viewModel.attr('parent_instance')
-          .attr(this.viewModel.instance_attr).reify());
         // Add pending operations
-        can.each(changes, function (item) {
-          let mapping = this.viewModel.mapping ||
+        can.each(changes, (item) => {
+          let mapping = viewModel.mapping ||
               GGRC.Mappings.get_canonical_mapping_name(
-                this.viewModel.instance.constructor.shortName,
+                viewModel.instance.constructor.shortName,
                 item.what.constructor.shortName);
           if (item.how === 'add') {
-            this.viewModel.instance
+            viewModel.instance
               .mark_for_addition(mapping, item.what, item.extra);
           } else {
-            this.viewModel.instance.mark_for_deletion(mapping, item.what);
+            viewModel.instance.mark_for_deletion(mapping, item.what);
           }
-        }.bind(this)
-        );
-        this.viewModel.instance
-          .delay_resolving_save_until(
-            this.viewModel.instance.constructor
-              .resolve_deferred_bindings(this.viewModel.instance));
+        });
+
+        viewModel.makeDelayedResolving();
       },
-      '{parent_instance} updated': 'deferred_update',
-      '{parent_instance} created': 'deferred_update',
+      '{instance} updated': 'deferred_update',
+      '{instance} created': 'deferred_update',
       '[data-toggle=unmap] click': function (el, ev) {
         ev.stopPropagation();
 
         can.map(el.find('.result'), function (resultEl) {
           let obj = $(resultEl).data('result');
           let len = this.viewModel.list.length;
-          let mapping;
 
-          if (this.viewModel.attr('deferred')) {
-            this.viewModel.changes.push({what: obj, how: 'remove'});
-            this.viewModel.parent_instance.attr('_changes',
-              this.viewModel.changes);
-          } else {
-            mapping = this.viewModel.mapping ||
-              GGRC.Mappings.get_canonical_mapping_name(
-                this.viewModel.instance.constructor.shortName,
-                obj.constructor.shortName);
-            this.viewModel.instance.mark_for_deletion(mapping, obj);
-          }
+          this.viewModel.changes.push({what: obj, how: 'remove'});
           for (; len >= 0; len--) {
             if (this.viewModel.list[len] === obj) {
               this.viewModel.list.splice(len, 1);
@@ -179,116 +135,15 @@ import {
           }
         }.bind(this));
       },
-      'input[null-if-empty] change': function (el) {
-        if (!el.val()) {
-          this.viewModel.attributes.attr(el.attr('name'), null);
-        }
-      },
-      'input keyup': function (el, ev) {
-        ev.stopPropagation();
-      },
-      'input, textarea, select change': function (el, ev) {
-        this.viewModel.attributes.attr(el.attr('name'), el.val());
-      },
-
-      'input:not([data-lookup], [data-mapping]), textarea keyup':
-        function (el, ev) {
-          if (el.prop('value').length === 0 ||
-            (typeof el.attr('value') !== 'undefined' &&
-            el.attr('value').length === 0)) {
-            this.viewModel.attributes.attr(el.attr('name'), el.val());
-          }
-        },
-      'a[data-toggle=submit]:not(.disabled) click': function (el, ev) {
-        let obj;
-        let mapping;
-        let that = this;
-        let binding = this.viewModel.instance
-          .get_binding(this.viewModel.mapping);
-        let extraAttrs = can.reduce(
-          this.element.find('input:not([data-mapping], [data-lookup])').get(),
-          function (attrs, el) {
-            if ($(el).attr('model')) {
-              attrs[$(el).attr('name')] =
-                CMS.Models[$(el).attr('model')].findInCacheById($(el).val());
-            } else {
-              attrs[$(el).attr('name')] = $(el).val();
-            }
-            return attrs;
-          }, {});
-
-        ev.stopPropagation();
-
-        extraAttrs[binding.loader.object_attr] = this.viewModel.instance;
-        if (binding.loader instanceof GGRC.ListLoaders.DirectListLoader) {
-          obj = new CMS.Models[binding.loader.model_name](extraAttrs);
-        } else {
-          obj = new CMS.Models[binding.loader.option_model_name](extraAttrs);
-        }
-
-        if (that.viewModel.attr('deferred')) {
-          that.viewModel.changes
-            .push({what: obj, how: 'add', extra: extraAttrs});
-        } else {
-          mapping = that.viewModel.mapping ||
-            GGRC.Mappings.get_canonical_mapping_name(
-              that.viewModel.instance.constructor.shortName,
-              obj.constructor.shortName);
-          that.viewModel.instance.mark_for_addition(mapping, obj, extraAttrs);
-        }
-        that.addListItem(obj);
-        that.viewModel.attr('attributes', {});
-      },
       'a[data-object-source] modal:success': 'addMapings',
       'defer:add': 'addMapings',
       addMapings: function (el, ev, data) {
-        let mapping;
         ev.stopPropagation();
 
         can.each(data.arr || [data], function (obj) {
-          if (this.viewModel.attr('deferred')) {
-            this.viewModel.changes.push({what: obj, how: 'add'});
-            this.viewModel.parent_instance.attr('_changes',
-              this.viewModel.changes);
-          } else {
-            mapping = this.viewModel.mapping ||
-              GGRC.Mappings.get_canonical_mapping_name(
-                this.viewModel.instance.constructor.shortName,
-                obj.constructor.shortName);
-            this.viewModel.instance.mark_for_addition(mapping, obj);
-          }
+          this.viewModel.changes.push({what: obj, how: 'add'});
           this.addListItem(obj);
         }, this);
-      },
-      '.ui-autocomplete-input modal:success': function (el, ev, data, options) {
-        let that = this;
-        let extraAttrs = can.reduce(this.element
-          .find('input:not([data-mapping], [data-lookup])').get(),
-        function (attrs, el) {
-          if ($(el).attr('model')) {
-            attrs[$(el).attr('name')] = CMS.Models[$(el).attr('model')]
-              .findInCacheById($(el).val());
-          } else {
-            attrs[$(el).attr('name')] = $(el).val();
-          }
-          return attrs;
-        }, {});
-
-        can.each(data.arr || [data], function (obj) {
-          let mapping;
-          if (that.viewModel.attr('deferred')) {
-            that.viewModel.changes
-              .push({what: obj, how: 'add', extra: extraAttrs});
-          } else {
-            mapping = that.viewModel.mapping ||
-              GGRC.Mappings.get_canonical_mapping_name(
-                that.viewModel.instance.constructor.shortName,
-                obj.constructor.shortName);
-            that.viewModel.instance.mark_for_addition(mapping, obj, extraAttrs);
-          }
-          that.addListItem(obj);
-          that.viewModel.attr('attributes', {});
-        });
       },
       addListItem: function (item) {
         let snapshotObject;

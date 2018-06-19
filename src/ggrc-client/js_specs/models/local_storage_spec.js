@@ -3,8 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-//= require models/local_storage
-
 import {waitsFor} from '../spec_helpers';
 
 describe('can.Model.LocalStorage', function () {

@@ -5,10 +5,10 @@
 
 <div class="fields-wrapper flex-box flex-row">
   {{#each fields}}
-    <div class="field-wrapper flex-size-1 {{extraClass type}} {{#isInvalidField validation.show validation.valid highlightInvalidFields}}invalid-field{{/isInvalidField}}">
+    <div class="field-wrapper flex-size-1 custom-attribute-{{type}} {{#isInvalidField validation.show validation.valid highlightInvalidFields}}invalid-field{{/isInvalidField}}">
       <form-validation-icon {validation}="validation"></form-validation-icon>
       <div class="field__title form-field__title">
-        <label class="field__title-text {{extraClass type}}" for="form-field-{{id}}">
+        <label class="field__title-text custom-attribute-{{type}}" for="form-field-{{id}}">
           {{title}}
           {{#if validation.mandatory}}
             <i class="fa fa-asterisk field__mandatory"></i>
@@ -23,7 +23,7 @@
           {placeholder}="placeholder"
           {options}="options"
           (value-changed)="fieldValueChanged(%event, %context)"
-	  class="form-field__content {{extraClass type}}"
+          class="form-field__content custom-attribute-{{type}}"
         ></custom-attributes-field>
         {{#if validation.hasMissingInfo}}
           <div class="form-field__validation-hint-placeholder">
@@ -40,7 +40,7 @@
         <custom-attributes-field-view
           {type}="type"
           {value}="value"
-          class="form-field__content {{extraClass type}}"
+          class="form-field__content custom-attribute-{{type}}"
         ></custom-attributes-field-view>
       {{/if}}
     </div>

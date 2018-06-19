@@ -6,12 +6,13 @@
 from sqlalchemy.orm import backref
 
 from ggrc import db
+from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models import utils
 from ggrc.models import reflection
 
 
-class NotificationConfig(Base, db.Model):
+class NotificationConfig(base.ContextRBAC, Base, db.Model):
   __tablename__ = 'notification_configs'
   name = db.Column(db.String, nullable=True)
   enable_flag = db.Column(db.Boolean)
@@ -34,7 +35,7 @@ class NotificationConfig(Base, db.Model):
   ]
 
 
-class NotificationType(Base, db.Model):
+class NotificationType(base.ContextRBAC, Base, db.Model):
   __tablename__ = 'notification_types'
 
   name = db.Column(db.String, nullable=False)
@@ -44,7 +45,7 @@ class NotificationType(Base, db.Model):
   instant = db.Column(db.Boolean, nullable=False, default=False)
 
 
-class Notification(Base, db.Model):
+class Notification(base.ContextRBAC, Base, db.Model):
   __tablename__ = 'notifications'
 
   object_id = db.Column(db.Integer, nullable=False)

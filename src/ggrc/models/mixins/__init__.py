@@ -76,7 +76,12 @@ class Titled(object):
   _api_attrs = reflection.ApiAttributes('title')
   _fulltext_attrs = ['title']
   _sanitize_html = ['title']
-  _aliases = {"title": "Title"}
+  _aliases = {
+      "title": {
+          "display_name": "Title",
+          "mandatory": True,
+      },
+  }
 
 
 class Described(object):

@@ -4,8 +4,8 @@
  */
 
 import template from './templates/tree-item-custom-attribute.mustache';
-
 import {CONTROL_TYPE} from '../../plugins/utils/control-utils';
+import {formatDate} from '../../plugins/ggrc_utils';
 
 const formatValueMap = {
   [CONTROL_TYPE.CHECKBOX](caObject) {
@@ -16,7 +16,7 @@ const formatValueMap = {
       ? null
       : caObject.value;
 
-    return GGRC.Utils.formatDate(date, true);
+    return formatDate(date, true);
   },
   [CONTROL_TYPE.PERSON](caObject, options) {
     const attr = caObject.attributeObject;

@@ -6,6 +6,10 @@
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 import DiffBaseVM from './diff-base-vm';
 import template from './templates/instance-diff-items.mustache';
+import {
+  formatDate,
+  getPersonInfo,
+} from '../../../js/plugins/ggrc_utils';
 const tag = 'instance-gca-diff';
 
 const viewModel = DiffBaseVM.extend({
@@ -86,7 +90,7 @@ const viewModel = DiffBaseVM.extend({
 
     // value is empty. Attr filled first time
     if (val && val.attribute_object) {
-      GGRC.Utils.getPersonInfo(val.attribute_object).then((person) => {
+      getPersonInfo(val.attribute_object).then((person) => {
         diffObject.currentVal = [person.email];
         dfd.resolve(diffObject);
       });
@@ -103,7 +107,7 @@ const viewModel = DiffBaseVM.extend({
 
     switch (type) {
       case 'Date':
-        return GGRC.Utils.formatDate(value, true);
+        return formatDate(value, true);
       case 'Checkbox':
         return value === true || value === '1' ?
           '✓' :

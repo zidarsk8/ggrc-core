@@ -301,7 +301,7 @@ class TestAuditorsPropagation(base.TestACLPropagation):
         object_type="Audit",
     ).first()
 
-    rbac_factory = rbac_factories.get_factory(model)
+    rbac_factory = rbac_factories.TEST_FACTORIES_MAPPING[model]
     return rbac_factory(self.people[role].id, auditor_acr, parent)
 
   @helpers.unwrap(PERMISSIONS)

@@ -3,6 +3,12 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {
+  inViewport,
+  isInnerClick,
+} from '../../plugins/ggrc_utils';
+import {DATE_FORMAT} from '../../plugins/utils/date-util';
+
 (function (can, GGRC, moment) {
   'use strict';
 
@@ -58,7 +64,7 @@
         this.attr('showTop', false);
         this.attr('isShown', true);
 
-        if (!GGRC.Utils.inViewport(this.picker)) {
+        if (!inViewport(this.picker)) {
           this.attr('showTop', true);
         }
       },
@@ -68,7 +74,7 @@
         this.picker.datepicker('setDate', null);
         this.attr('date', null);
       },
-      MOMENT_DISPLAY_FMT: GGRC.Date.MOMENT_DISPLAY_FMT,
+      MOMENT_DISPLAY_FMT: DATE_FORMAT.MOMENT_DISPLAY_FMT,
     }),
 
     events: {
@@ -79,9 +85,9 @@
         let maxDate;
         let date;
         let options = {
-          dateFormat: GGRC.Date.PICKER_ISO_DATE,
+          dateFormat: DATE_FORMAT.PICKER_ISO_DATE,
           altField: this.element.find('.datepicker__input'),
-          altFormat: GGRC.Date.PICKER_DISPLAY_FMT,
+          altFormat: DATE_FORMAT.PICKER_DISPLAY_FMT,
           onSelect: this.viewModel.onSelect.bind(this.viewModel),
         };
 
@@ -122,7 +128,7 @@
           // into account to not end up with a different date. Ideally this
           // should never happen, but that would require refactoring the way
           // Date objects are created throughout the app.
-          return moment(date).format(GGRC.Date.MOMENT_ISO_DATE);
+          return moment(date).format(DATE_FORMAT.MOMENT_ISO_DATE);
         } else if (this.isValidDate(date)) {
           return date;
         }
@@ -131,7 +137,7 @@
       },
 
       isValidDate: function (date) {
-        return moment(date, GGRC.Date.MOMENT_ISO_DATE, true).isValid();
+        return moment(date, DATE_FORMAT.MOMENT_ISO_DATE, true).isValid();
       },
 
       /**
@@ -167,7 +173,7 @@
           // into account to not end up with a different date. Ideally this
           // should never happen, but that would require refactoring the way
           // Date objects are created throughout the app.
-          date = moment(date).format(GGRC.Date.MOMENT_ISO_DATE);
+          date = moment(date).format(DATE_FORMAT.MOMENT_ISO_DATE);
         }
         date = moment.utc(date);
 
@@ -193,9 +199,9 @@
 
         if (val) {
           val = val.trim();
-          valF = moment.utc(val, GGRC.Date.MOMENT_DISPLAY_FMT, true);
+          valF = moment.utc(val, DATE_FORMAT.MOMENT_DISPLAY_FMT, true);
           valISO = valF.isValid() ?
-            valF.format(GGRC.Date.MOMENT_ISO_DATE) :
+            valF.format(DATE_FORMAT.MOMENT_ISO_DATE) :
             null;
         }
         return valISO;
@@ -210,7 +216,7 @@
           if (currentDateObj < updated) {
             this.viewModel.attr(
               '_date',
-              moment.utc(updated).format(GGRC.Date.MOMENT_DISPLAY_FMT));
+              moment.utc(updated).format(DATE_FORMAT.MOMENT_DISPLAY_FMT));
           }
         }
       },
@@ -231,7 +237,7 @@
         if (this.viewModel.attr('persistent')) {
           return;
         }
-        isInside = GGRC.Utils.events.isInnerClick(this.element, ev.target);
+        isInside = isInnerClick(this.element, ev.target);
 
         if (this.viewModel.isShown && !isInside) {
           this.viewModel.attr('isShown', false);

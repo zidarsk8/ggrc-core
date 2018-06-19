@@ -27,6 +27,7 @@ import {
   backendGdriveClient,
   gapiClient,
 } from '../../plugins/ggrc-gapi-client';
+import {getPickerElement} from '../../plugins/ggrc_utils';
 import errorTemplate from './templates/import-error.mustache';
 
 const messages = {
@@ -315,7 +316,7 @@ export default can.Component.extend({
 
         $('div.picker-dialog-bg').css('zIndex', 4000);
 
-        dialog = GGRC.Utils.getPickerElement(picker);
+        dialog = getPickerElement(picker);
         if (dialog) {
           dialog.style.zIndex = 4001;
         }

@@ -29,3 +29,5 @@ import '../generated/ggrc_filter_query_parser';
 import '../models';
 
 import '../modules/widget_list';
+
+import './user';

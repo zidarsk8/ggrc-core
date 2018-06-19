@@ -13,6 +13,7 @@ import './tree-item-actions';
 import './tree-item-map';
 import './tree-view';
 import './tree-item';
+import './tree-actions';
 import './tree-header';
 import './tree-filter-input';
 import './tree-status-filter';
@@ -25,23 +26,18 @@ import '../advanced-search/advanced-search-filter-container';
 import '../advanced-search/advanced-search-mapping-container';
 import '../bulk-update-button/bulk-update-button';
 import '../assessment-template-clone-button/assessment-template-clone-button';
+import '../create-document-button/create-document-button';
 import '../dropdown/multiselect-dropdown';
 import '../assessment_generator';
-import '../three-dots-menu/three-dots-menu';
 import '../last-comment/last-comment';
 import template from './templates/tree-widget-container.mustache';
 import * as StateUtils from '../../plugins/utils/state-utils';
-import {
-  isSnapshotModel,
-  isSnapshotScope,
-} from '../../plugins/utils/snapshot-utils';
 import {
   REFRESH_RELATED,
   REFRESH_MAPPING,
 } from '../../events/eventTypes';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
-  isMyAssessments,
   getCounts,
   initCounts,
   initMappedInstances,
@@ -101,7 +97,7 @@ viewModel = can.Map.extend({
         }
 
         return filters.filter(function (options) {
-          return options.filter;
+          return options.query;
         }).reduce(this._concatFilters, additionalFilter);
       },
     },
@@ -147,10 +143,6 @@ viewModel = can.Map.extend({
           classes.push('loading');
         }
 
-        if (isMyAssessments()) {
-          classes.push('my-assessments');
-        }
-
         return classes.join(' ');
       },
     },
@@ -184,48 +176,6 @@ viewModel = can.Map.extend({
         }
 
         return allowCreating;
-      },
-    },
-    addItem: {
-      type: String,
-      get: function () {
-        return this.attr('options.objectVersion') ?
-          false :
-          this.attr('options').add_item_view ||
-          this.attr('model').tree_view_options.add_item_view;
-      },
-    },
-    isSnapshots: {
-      type: Boolean,
-      get: function () {
-        let parentInstance = this.attr('parent_instance');
-        let model = this.attr('model');
-
-        return (isSnapshotScope(parentInstance) &&
-          isSnapshotModel(model.model_singular)) ||
-          this.attr('options.objectVersion');
-      },
-    },
-    showGenerateAssessments: {
-      type: Boolean,
-      get: function () {
-        let parentInstance = this.attr('parent_instance');
-        let model = this.attr('model');
-
-        return parentInstance.type === 'Audit' &&
-          model.shortName === 'Assessment';
-      },
-    },
-    showBulkUpdate: {
-      type: 'boolean',
-      get: function () {
-        return this.attr('options.showBulkUpdate');
-      },
-    },
-    show3bbs: {
-      type: Boolean,
-      get: function () {
-        return !isMyAssessments();
       },
     },
     noResults: {
@@ -289,8 +239,10 @@ viewModel = can.Map.extend({
     let page = {
       current: pageInfo.current,
       pageSize: pageInfo.pageSize,
-      sortBy: sortingInfo.sortBy,
-      sortDirection: sortingInfo.sortDirection,
+      sort: [{
+        key: sortingInfo.sortBy,
+        direction: sortingInfo.sortDirection,
+      }],
     };
     let request = this.attr('advancedSearch.request');
     const stopFn = tracker.start(this.attr('modelName'),
@@ -300,7 +252,7 @@ viewModel = can.Map.extend({
     pageInfo.attr('disabled', true);
     this.attr('loading', true);
 
-    if (!!this._getFilterByName('status')) {
+    if (this._getFilterByName('status')) {
       initCounts([widgetId], parent.type, parent.id);
     }
 
@@ -385,10 +337,10 @@ viewModel = can.Map.extend({
     let filters = can.makeArray(this.attr('filters'));
 
     return filters.filter(function (options) {
-      return options.filter &&
+      return options.query &&
         options.depth &&
         options.filterDeepLimit > deepLevel;
-    }).reduce(this._combineFilters, '');
+    }).reduce(this._concatFilters, null);
   },
   setRefreshFlag: function (refresh) {
     this.attr('refreshLoaded', refresh);
@@ -422,34 +374,13 @@ viewModel = can.Map.extend({
    * @private
    */
   _concatFilters: function (filter, options) {
-    let operation = options.operation || 'AND';
-
     if (filter) {
       filter = GGRC.query_parser.join_queries(
         filter,
-        GGRC.query_parser.parse(options.filter),
-        operation);
-    } else if (options.filter) {
-      filter = GGRC.query_parser.parse(options.filter);
-    }
-
-    return filter;
-  },
-  /**
-   * Concatenation active filters into one string.
-   *
-   * @param {String} filter - Filter string
-   * @param {Object} options - Filter parameters
-   * @return {string} - Result of concatenation filters.
-   * @private
-   */
-  _combineFilters(filter, options) {
-    let operation = options.operation || 'AND';
-
-    if (filter) {
-      filter += ' ' + operation + ' ' + options.filter;
-    } else if (options.filter) {
-      filter = options.filter;
+        options.query.attr(),
+        'AND');
+    } else if (options.query) {
+      filter = options.query;
     }
 
     return filter;
@@ -457,7 +388,7 @@ viewModel = can.Map.extend({
   _getFilterByName: function (name) {
     let filter = _.findWhere(this.attr('filters'), {name: name});
 
-    return filter && filter.filter ? filter.filter : null;
+    return filter && filter.query ? filter.query : null;
   },
   _widgetHidden: function () {
     this._triggerListeners(true);
@@ -624,8 +555,8 @@ viewModel = can.Map.extend({
     this.attr('advancedSearch.open', true);
   },
   applyAdvancedFilters: function () {
-    let filters = this.attr('advancedSearch.filterItems');
-    let mappings = this.attr('advancedSearch.mappingItems');
+    let filters = this.attr('advancedSearch.filterItems').attr();
+    let mappings = this.attr('advancedSearch.mappingItems').attr();
     let request = can.List();
     let advancedFilters;
 
@@ -633,10 +564,8 @@ viewModel = can.Map.extend({
     this.attr('advancedSearch.appliedMappingItems', mappings);
 
     advancedFilters = GGRC.query_parser.join_queries(
-      GGRC.query_parser
-        .parse(AdvancedSearch.buildFilter(filters, request)),
-      GGRC.query_parser
-        .parse(AdvancedSearch.buildFilter(mappings, request))
+      AdvancedSearch.buildFilter(filters, request),
+      AdvancedSearch.buildFilter(mappings, request)
     );
     this.attr('advancedSearch.request', request);
 

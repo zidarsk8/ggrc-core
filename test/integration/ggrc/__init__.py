@@ -59,6 +59,7 @@ class TestCase(BaseTestCase, object):
   CSV_DIR = os.path.join(THIS_ABS_PATH, "test_csvs/")
 
   model = None
+  testbed = None
 
   DEFAULT_DATETIME_FORMATS = [
       "{year}",
@@ -131,6 +132,7 @@ class TestCase(BaseTestCase, object):
         "test_model",
         "contexts",
         "people",
+        "people_profiles",
         # data platform models that are currently populated with a migration
         "namespaces",
         "attribute_definitions",
@@ -170,6 +172,7 @@ class TestCase(BaseTestCase, object):
 
   def tearDown(self):  # pylint: disable=no-self-use
     db.session.remove()
+    self.del_taskueue()
 
   @staticmethod
   def create_app():
@@ -259,26 +262,31 @@ class TestCase(BaseTestCase, object):
           writer.writerow([data_object_type] + keys)
         writer.writerow([""] + [data[k] for k in keys])
       tmp.seek(0)
-      cls.init_taskqueue()
       return cls._import_file(os.path.basename(tmp.name), dry_run, person)
 
   @classmethod
   def init_taskqueue(cls):
     """Init test environment for working with appengine."""
-    cls.testbed = testbed.Testbed()
-    cls.testbed.activate()
+    cls.testbed = cls.testbed or testbed.Testbed()
+    if not cls.testbed._activated:  # pylint: disable=protected-access
+      cls.testbed.activate()
 
     # root_path must be set the the location of queue.yaml.
-
     # Otherwise, only the 'default' queue will be available.
     cls.testbed.init_taskqueue_stub()
-    cls.taskqueue_stub = cls.testbed.get_stub(
-        testbed.TASKQUEUE_SERVICE_NAME
-    )
+    cls.taskqueue_stub = cls.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
 
-  @staticmethod
-  def send_import_request(data, dry_run=False, person=None):
+  @classmethod
+  def del_taskueue(cls):
+    """Remove current testbed."""
+    # pylint: disable=protected-access
+    if cls.testbed and cls.testbed._activated:
+      cls.testbed.deactivate()
+
+  @classmethod
+  def send_import_request(cls, data, dry_run=False, person=None):
     """Sending import post request."""
+    cls.init_taskqueue()
     headers = {
         "X-test-only": "true" if dry_run else "false",
         "X-requested-by": "GGRC",
@@ -300,7 +308,6 @@ class TestCase(BaseTestCase, object):
 
   def import_file(self, filename, dry_run=False, person=None):
     """Import a csv file as a specific user."""
-    self.init_taskqueue()
     if dry_run:
       return self._import_file(filename, dry_run=True, person=person)
 

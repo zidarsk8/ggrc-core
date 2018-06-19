@@ -6,22 +6,12 @@
 import {failAll} from '../spec_helpers';
 
 describe('can.Model.Cacheable conflict resolution', function () {
-  let _obj;
-  let id = 0;
+  let DummyModel;
 
   beforeAll(function () {
-    can.Model.Cacheable.extend('CMS.Models.DummyModel', {
+    DummyModel = can.Model.Cacheable.extend({
       update: 'PUT /api/dummy_models/{id}',
     }, {});
-  });
-
-  afterAll(function () {
-    delete CMS.Models.DummyModel;
-  });
-
-  beforeEach(function (done) {
-    _obj = new CMS.Models.DummyModel({id: ++id});
-    done();
   });
 
   function _resovleDfd(obj, reject) {
@@ -38,7 +28,7 @@ describe('can.Model.Cacheable conflict resolution', function () {
 
   it('triggers error flash when one property has an update conflict',
     function (done) {
-      let obj = _obj;
+      let obj = new DummyModel({id: 1});
       obj.attr('foo', 'bar');
       obj.backup();
 
@@ -57,7 +47,7 @@ describe('can.Model.Cacheable conflict resolution', function () {
         .and.callFake(function () {
           return _resovleDfd({status: 409}, true);
         });
-      CMS.Models.DummyModel.update(obj.id.toString(), obj.serialize()).then(
+      DummyModel.update(obj.id.toString(), obj.serialize()).then(
         function () {
           fail("The update handler isn't supposed to resolve here.");
           done();
@@ -70,11 +60,11 @@ describe('can.Model.Cacheable conflict resolution', function () {
     });
 
   it('does not refresh model', function (done) {
-    let obj = _obj;
+    let obj = new DummyModel({id: 1});
     spyOn(obj, 'refresh').and.returnValue($.when(obj));
     spyOn(can, 'ajax').and.returnValue(
       new $.Deferred().reject({status: 409}, 409, 'CONFLICT'));
-    CMS.Models.DummyModel.update(obj.id, obj.serialize()).then(function () {
+    DummyModel.update(obj.id, obj.serialize()).then(function () {
       done();
     }, function () {
       expect(obj.refresh).not.toHaveBeenCalled();
@@ -83,12 +73,12 @@ describe('can.Model.Cacheable conflict resolution', function () {
   });
 
   it('sets timeout id to XHR-response', function (done) {
-    let obj = _obj;
+    let obj = new DummyModel({id: 1});
     spyOn(obj, 'refresh').and.returnValue($.when(obj));
     spyOn(window, 'setTimeout').and.returnValue(999);
     spyOn(can, 'ajax').and.returnValue(
       new $.Deferred().reject({status: 409}, 409, 'CONFLICT'));
-    CMS.Models.DummyModel.update(obj.id, obj.serialize()).then(function () {
+    DummyModel.update(obj.id, obj.serialize()).then(function () {
       done();
     }, function (xhr) {
       expect(xhr.warningId).toEqual(999);
@@ -98,7 +88,7 @@ describe('can.Model.Cacheable conflict resolution', function () {
 
 
   it('merges changed properties and saves', function (done) {
-    let obj = _obj;
+    let obj = new DummyModel({id: 1});
     obj.attr('foo', 'bar');
     obj.backup();
     expect(obj._backupStore()).toEqual(
@@ -111,7 +101,7 @@ describe('can.Model.Cacheable conflict resolution', function () {
     });
     spyOn(can, 'ajax').and.returnValue(new $.Deferred().reject(
       {status: 409}, 409, 'CONFLICT'));
-    CMS.Models.DummyModel.update(obj.id, obj.serialize()).then(function () {
+    DummyModel.update(obj.id, obj.serialize()).then(function () {
       expect(obj).toEqual(jasmine.objectContaining(
         {id: obj.id, foo: 'plonk', baz: 'quux'}));
       expect(obj.save).toHaveBeenCalled();
@@ -123,12 +113,12 @@ describe('can.Model.Cacheable conflict resolution', function () {
 
 
   it('lets other error statuses pass through', function (done) {
-    let obj = new CMS.Models.DummyModel({id: 1});
+    let obj = new DummyModel({id: 1});
     let xhr = {status: 400};
     spyOn(obj, 'refresh').and.returnValue($.when(obj.serialize()));
     spyOn(can, 'ajax').and.returnValue(
       new $.Deferred().reject(xhr, 400, 'BAD REQUEST'));
-    CMS.Models.DummyModel.update(1, obj.serialize()).then(
+    DummyModel.update(1, obj.serialize()).then(
       failAll(done),
       function (_xhr) {
         expect(_xhr).toBe(xhr);

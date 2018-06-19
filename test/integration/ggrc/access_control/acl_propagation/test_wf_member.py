@@ -221,7 +221,7 @@ class TestWfMemberPropagation(base.TestACLPropagation):
         object_type="Workflow",
     ).first()
 
-    rbac_factory = rbac_factories.get_factory(model)
+    rbac_factory = rbac_factories.TEST_FACTORIES_MAPPING[model]
     return rbac_factory(self.people[role].id, wf_member_acr, parent)
 
   @helpers.unwrap(PERMISSIONS)

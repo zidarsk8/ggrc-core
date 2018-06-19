@@ -5,6 +5,7 @@
 
 import Proposal from '../../models/proposal';
 import template from './templates/create-proposal.mustache';
+import {hasPending as hasPendingUtil} from '../../plugins/ggrc_utils';
 import {
   REFRESH_TAB_CONTENT,
   REFRESH_COMMENTS,
@@ -72,7 +73,7 @@ export default can.Component.extend({
     },
     hasChanges() {
       const instance = this.attr('instance');
-      const hasPending = GGRC.Utils.hasPending(instance);
+      const hasPending = hasPendingUtil(instance);
       const isDirty = instance.isDirty(true);
 
       return isDirty || hasPending;

@@ -46,7 +46,6 @@ dashboard-js-template-files:
   - controls/categories_tree.mustache
   - controls/info.mustache
   - controls/contacts.mustache
-  - controls/urls.mustache
   - controls/modal_content.mustache
   - controls/tree-item-attr.mustache
   - assessments/modal_content.mustache
@@ -84,6 +83,7 @@ dashboard-js-template-files:
   - dashboard/lhn_search.mustache
   - documents/modal_content.mustache
   - documents/info.mustache
+  - documents/tree-item-attr.mustache
   - evidence/modal_content.mustache
   - evidence/info.mustache
   - evidence/tree-item-attr.mustache

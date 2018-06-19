@@ -12,6 +12,7 @@ from sqlalchemy.sql.schema import UniqueConstraint
 from ggrc import db
 from ggrc.models.mixins import attributevalidator
 from ggrc import builder
+from ggrc.models.mixins import base
 from ggrc.models import mixins
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.access_control import role as acr
@@ -33,7 +34,8 @@ def get_inflector_model_name_dict():
 
 
 class CustomAttributeDefinition(attributevalidator.AttributeValidator,
-                                mixins.Base, mixins.Titled, db.Model):
+                                base.ContextRBAC, mixins.Base, mixins.Titled,
+                                db.Model):
   """Custom attribute definition model.
 
   Attributes:

@@ -22,21 +22,24 @@ let viewModel = can.Map.extend({
     stateModel: {
       type: '*',
       set: function (state) {
-        let filterStates =
+        if (!state.attr('items')) {
+          let defaultStates =
+            StateUtils.getDefaultStatesForModel(this.attr('modelName'));
+          state.attr('items', defaultStates);
+        }
+        if (!state.attr('operator')) {
+          state.attr('operator', 'ANY');
+        }
+        state.attr('modelName', this.attr('modelName'));
+
+        let allStates =
           StateUtils.getStatesForModel(this.attr('modelName'));
-
-        state.items = state.items ||
-          StateUtils.getDefaultStatesForModel(this.attr('modelName'));
-
-        this.attr('filterStates', filterStates.map(function (filterState) {
+        this.attr('filterStates', allStates.map(function (filterState) {
           return {
             value: filterState,
-            checked: (state.items.indexOf(filterState) > -1),
+            checked: (state.attr('items').indexOf(filterState) > -1),
           };
         }));
-
-        state.operator = state.operator || 'ANY';
-        state.modelName = this.attr('modelName');
 
         return state;
       },

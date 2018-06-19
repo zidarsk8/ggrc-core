@@ -9,7 +9,7 @@ from sqlalchemy import or_
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
-from ggrc.access_control import role
+from ggrc.access_control import role, roleable
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.mixins import (
     Titled, Slugged, Described, Timeboxed, WithContact
@@ -17,11 +17,12 @@ from ggrc.models.mixins import (
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models import reflection
 from ggrc.models import all_models
+from ggrc.models.mixins import base
 from ggrc_workflows.models.task_group_object import TaskGroupObject
 
 
-class TaskGroup(
-        WithContact, Timeboxed, Described, Titled, Slugged, Indexed, db.Model):
+class TaskGroup(roleable.Roleable, WithContact, Timeboxed, Described,
+                Titled, base.ContextRBAC, Slugged, Indexed, db.Model):
   """Workflow TaskGroup model."""
 
   __tablename__ = 'task_groups'

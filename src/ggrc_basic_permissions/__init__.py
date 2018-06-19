@@ -16,6 +16,8 @@ from ggrc import settings
 from ggrc.login import is_external_app_user
 from ggrc.login import get_current_user
 from ggrc.models import all_models
+
+from ggrc.access_control.roleable import Roleable
 from ggrc.models.audit import Audit
 from ggrc.models.program import Program
 from ggrc.rbac import permissions as rbac_permissions
@@ -24,7 +26,6 @@ from ggrc.cache import utils as cache_utils
 from ggrc.services import signals
 from ggrc.services.registry import service
 from ggrc.utils import benchmark
-from ggrc_basic_permissions import basic_roles
 from ggrc_basic_permissions.contributed_roles import BasicRoleDeclarations
 from ggrc_basic_permissions.converters.handlers import COLUMN_HANDLERS
 from ggrc_basic_permissions.models import Role
@@ -320,21 +321,25 @@ def _get_acl_filter():
   Returns:
     list of filter statements.
   """
-  referenced_object_tuples = []
   stubs = getattr(flask.g, "referenced_object_stubs", {})
-  additional_filters = []
-  if stubs:
-    for type_, ids in stubs.items():
-      referenced_object_tuples.extend((type_, id_) for id_ in ids)
-    additional_filters.append(
-        sa.tuple_(
-            all_models.AccessControlList.object_type,
-            all_models.AccessControlList.object_id,
-        ).in_(
-            referenced_object_tuples,
-        )
-    )
-  return additional_filters
+  if not stubs:
+    return []
+  roleable_models = {m.__name__ for m in all_models.all_models
+                     if issubclass(m, Roleable)}
+  keys = [(type_, id_)
+          for type_, ids in stubs.iteritems()
+          for id_ in ids
+          if type_ in roleable_models]
+  if not keys:
+    return []
+  return [
+      sa.tuple_(
+          all_models.AccessControlList.object_type,
+          all_models.AccessControlList.object_id,
+      ).in_(
+          keys,
+      )
+  ]
 
 
 def load_access_control_list(user, permissions):
@@ -478,18 +483,6 @@ def handle_program_post(sender, obj=None, src=None, service=None):
   db.session.flush()
   obj.contexts.append(context)
   obj.context = context
-
-  # add a user_roles mapping assigning the user creating the program
-  # the ProgramOwner role in the program's context.
-  program_owner_role = basic_roles.program_owner()
-  user_role = UserRole(
-      person=get_current_user(),
-      role=program_owner_role,
-      context=context,
-      modified_by=get_current_user())
-  # pass along a temporary attribute for logging the events.
-  user_role._display_related_title = obj.title
-  db.session.add(user_role)
   db.session.flush()
 
 

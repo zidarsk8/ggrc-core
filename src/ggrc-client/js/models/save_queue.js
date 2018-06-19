@@ -4,6 +4,7 @@
 */
 
 import tracker from '../tracker';
+import {resolveDeferredBindings} from '../plugins/utils/models-utils';
 
 (function (can, $) {
   /*  GGRC.SaveQueue
@@ -97,8 +98,7 @@ import tracker from '../tracker';
         let cb = function (single) {
           return function () {
             this.created(single[1][bucket.type]);
-            return $.when(
-              can.Model.Cacheable.resolve_deferred_bindings(this));
+            return $.when(resolveDeferredBindings(this));
           };
         };
         can.each(objs, function (obj, idx) {

@@ -25,7 +25,7 @@ describe('GGRC.Components.advancedSearchFilterState', function () {
           .and.returnValue(states);
         viewModel.attr('modelName', 'Section');
 
-        viewModel.attr('stateModel', {});
+        viewModel.attr('stateModel', new can.Map());
 
         viewModel.attr('filterStates').each(function (item) {
           expect(item.checked).toBeTruthy();
@@ -37,9 +37,9 @@ describe('GGRC.Components.advancedSearchFilterState', function () {
     function () {
       viewModel.attr('modelName', 'Section');
 
-      viewModel.attr('stateModel', {
+      viewModel.attr('stateModel', new can.Map({
         items: [],
-      });
+      }));
 
       viewModel.attr('filterStates').each(function (item) {
         expect(item.checked).toBeFalsy();
@@ -50,9 +50,9 @@ describe('GGRC.Components.advancedSearchFilterState', function () {
       function () {
         let selectedItems;
         viewModel.attr('modelName', 'Section');
-        viewModel.attr('stateModel', {
+        viewModel.attr('stateModel', new can.Map({
           items: ['Active'],
-        });
+        }));
 
         selectedItems = _.filter(viewModel.attr('filterStates'), function (it) {
           return it.checked;
