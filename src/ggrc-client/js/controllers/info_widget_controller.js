@@ -102,6 +102,7 @@ export default can.Control({
         'Facility',
         'Issue',
         'Market',
+        'Metric',
         'Objective',
         'OrgGroup',
         'Person',

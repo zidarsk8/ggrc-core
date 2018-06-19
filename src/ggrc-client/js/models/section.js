@@ -45,7 +45,19 @@ can.Model.Cacheable('CMS.Models.Section', {
       {attr_title: 'Reference URL', attr_name: 'reference_url'},
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Last Deprecated Date', attr_name: 'last_deprecated_date'},
-    ]),
+      {
+        attr_title: 'Description',
+        attr_name: 'description',
+        disable_sorting: true,
+      }, {
+        attr_title: 'Notes',
+        attr_name: 'notes',
+        disable_sorting: true,
+      }, {
+        attr_title: 'Assessment Procedure',
+        attr_name: 'test_plan',
+        disable_sorting: true,
+      }]),
     add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
   },
   sub_tree_view_options: {
@@ -101,7 +113,19 @@ can.Model.Cacheable('CMS.Models.Clause', {
     attr_list: can.Model.Cacheable.attr_list.concat([
       {attr_title: 'Reference URL', attr_name: 'reference_url'},
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
-    ]),
+      {
+        attr_title: 'Description',
+        attr_name: 'description',
+        disable_sorting: true,
+      }, {
+        attr_title: 'Notes',
+        attr_name: 'notes',
+        disable_sorting: true,
+      }, {
+        attr_title: 'Assessment Procedure',
+        attr_name: 'test_plan',
+        disable_sorting: true,
+      }]),
     add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
   },
   sub_tree_view_options: {

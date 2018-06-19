@@ -31,7 +31,7 @@ class TestSplitArry(unittest.TestCase):
         ["hello", "world"],
         ["hello", "world"],
     ]
-    offests, data_blocks = import_helper.split_array(test_data)
+    offests, data_blocks = zip(*import_helper.split_array(test_data))
     self.assertEqual(len(data_blocks), 1)
     self.assertEqual(data_blocks[0], test_data)
     self.assertEqual(offests[0], 0)
@@ -46,7 +46,7 @@ class TestSplitArry(unittest.TestCase):
         ["hello", "world"],
         ["hello", "world"],
     ]
-    offests, data_blocks = import_helper.split_array(test_data)
+    offests, data_blocks = zip(*import_helper.split_array(test_data))
     self.assertEqual(len(data_blocks), 1)
     self.assertEqual(data_blocks[0], test_data[1:])
     self.assertEqual(offests[0], 1)
@@ -62,7 +62,7 @@ class TestSplitArry(unittest.TestCase):
         ["", ""],
         ["", ""],
     ]
-    offests, data_blocks = import_helper.split_array(test_data)
+    offests, data_blocks = zip(*import_helper.split_array(test_data))
     self.assertEqual(len(data_blocks), 1)
     self.assertEqual(data_blocks[0], test_data[3:7])
     self.assertEqual(offests[0], 3)
@@ -82,7 +82,7 @@ class TestSplitArry(unittest.TestCase):
         ["hello", "world"],
         ["hello", "world"],
     ]
-    offests, data_blocks = import_helper.split_array(test_data)
+    offests, data_blocks = zip(*import_helper.split_array(test_data))
     self.assertEqual(len(data_blocks), 2)
     self.assertEqual(data_blocks[0], test_data[1:3])
     self.assertEqual(data_blocks[1], test_data[4:6])
@@ -103,7 +103,7 @@ class TestSplitArry(unittest.TestCase):
         ["hello", "world"],
         ["hello", "world"],
     ]
-    offests, data_blocks = import_helper.split_array(test_data)
+    offests, data_blocks = zip(*import_helper.split_array(test_data))
     self.assertEqual(len(data_blocks), 3)
     self.assertEqual(data_blocks[0], test_data[1:4])
     self.assertEqual(data_blocks[1], test_data[6:7])

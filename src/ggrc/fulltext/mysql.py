@@ -57,8 +57,7 @@ class MysqlIndexer(SqlIndexer):
     return sa.and_(whitelist, MysqlRecordProperty.content.contains(terms))
 
   @staticmethod
-  def get_permissions_query(model_names, permission_type='read',
-                            permission_model=None):
+  def get_permissions_query(model_names, permission_type='read'):
     """Prepare the query based on the allowed contexts and resources for
      each of the required objects(models).
     """
@@ -73,7 +72,6 @@ class MysqlIndexer(SqlIndexer):
       contexts, resources = permissions.get_context_resource(
           model_name=model_name,
           permission_type=permission_type,
-          permission_model=permission_model
       )
       statement = sa.and_(
           MysqlRecordProperty.type == model_name,
@@ -143,7 +141,7 @@ class MysqlIndexer(SqlIndexer):
     return model_names
 
   def search(self, terms, types=None, permission_type='read',
-             permission_model=None, contact_id=None, extra_params=None):
+             contact_id=None, extra_params=None):
     """Prepare the search query and return the results set based on the
     full text table."""
     extra_params = extra_params or {}
@@ -159,7 +157,7 @@ class MysqlIndexer(SqlIndexer):
 
     query = db.session.query(*columns)
     query = query.filter(self.get_permissions_query(
-        model_names, permission_type, permission_model))
+        model_names, permission_type))
     query = query.filter(self._get_filter_query(terms))
     query = self.search_get_owner_query(query, types, contact_id)
 
@@ -172,7 +170,7 @@ class MysqlIndexer(SqlIndexer):
         continue
       extra_q = db.session.query(*columns)
       extra_q = extra_q.filter(
-          self.get_permissions_query([key], permission_type, permission_model))
+          self.get_permissions_query([key], permission_type))
       extra_q = extra_q.filter(self._get_filter_query(terms))
       extra_q = self.search_get_owner_query(extra_q, [key], contact_id)
       extra_q = self._add_extra_params_query(extra_q, key, value)

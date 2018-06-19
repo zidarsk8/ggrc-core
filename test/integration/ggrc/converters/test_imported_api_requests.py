@@ -43,7 +43,8 @@ class TestComprehensiveSheets(TestCase):
     self.generator = ObjectGenerator()
 
     self.create_custom_attributes()
-    self.import_file("comprehensive_sheet1.csv")
+    # TODO: use here such a CSV that doesn't have errors or warnings
+    self.import_file("comprehensive_sheet1.csv", safe=False)
 
     gen = WorkflowsGenerator()
     wfs = all_models.Workflow.eager_query().filter_by(status='Draft').all()

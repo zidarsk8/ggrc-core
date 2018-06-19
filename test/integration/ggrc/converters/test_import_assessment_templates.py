@@ -81,7 +81,7 @@ class TestAssessmentTemplatesImport(TestCase):
   def test_invalid_import(self):
     """Test invalid import."""
     data = "assessment_template_with_warnings_and_errors.csv"
-    response = self.import_file(data)
+    response = self.import_file(data, safe=False)
 
     expected_messages = {
         "Assessment Template": {

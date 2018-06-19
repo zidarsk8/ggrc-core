@@ -80,8 +80,7 @@ class TestExportSnapshots(TestCase):
     self.import_file("control_snapshot_data_single.csv")
     # Duplicate import because we have a bug in logging revisions and this
     # makes sure that the fixture created properly.
-    response = self.import_file("control_snapshot_data_single.csv")
-    self._check_csv_response(response, {})
+    self.import_file("control_snapshot_data_single.csv")
 
     controls = models.Control.query.all()
     with factories.single_commit():
@@ -321,8 +320,7 @@ class TestExportSnapshots(TestCase):
     self.import_file("control_snapshot_data_multiple.csv")
     # Duplicate import because we have a bug in logging revisions and this
     # makes sure that the fixture created properly.
-    response = self.import_file("control_snapshot_data_multiple.csv")
-    self._check_csv_response(response, {})
+    self.import_file("control_snapshot_data_multiple.csv")
 
     controls = models.Control.query.all()
     with factories.single_commit():

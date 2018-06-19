@@ -545,6 +545,7 @@ class TestPersonResourcePopulated(TestCase, WithQueryApi):
       "Threat",
       "Vendor",
       "CycleTaskGroupObjectTask",
+      "Metric"
   ]
 
   ALL_OBJECT_COUNTS = [
@@ -576,6 +577,7 @@ class TestPersonResourcePopulated(TestCase, WithQueryApi):
       "Vendor",
       "CycleTaskGroupObjectTask",
       "Workflow",
+      "Metric"
   ]
 
   def setUp(self):

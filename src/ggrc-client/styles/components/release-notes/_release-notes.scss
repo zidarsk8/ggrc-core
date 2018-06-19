@@ -8,6 +8,7 @@
 
   .simple-modal__header-text {
     font-size: 24px;
+    color: $black;
   }
 
   &__body {
@@ -38,6 +39,7 @@
     flex: 1;
     justify-content: flex-end;
     font-size: 13px;
+    color: $black;
   }
 
   &__date {

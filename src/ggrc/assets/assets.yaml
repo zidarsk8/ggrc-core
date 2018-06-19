@@ -97,6 +97,7 @@ dashboard-js-template-files:
   - facilities/modal_content.mustache
   - help/filters_helper_content.mustache
   - markets/modal_content.mustache
+  - metrics/modal_content.mustache
   - modals/archive_cancel_buttons.mustache
   - modals/close_buttons.mustache
   - modals/confirm.mustache

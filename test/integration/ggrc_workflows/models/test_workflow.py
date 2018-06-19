@@ -313,6 +313,75 @@ class TestWorkflow(TestCase):
       workflow = all_models.Workflow.query.get(wf_id)
       self.assertIs(workflow.is_verification_needed, verif_default)
 
+  @ddt.data(
+      ("off", None, None),
+      ("off", None, 42),
+      ("every weekday", all_models.Workflow.DAY_UNIT, None),
+      ("every weekday", all_models.Workflow.DAY_UNIT, 1),
+      ("every 30 weekdays", all_models.Workflow.DAY_UNIT, 30),
+      ("every week", all_models.Workflow.WEEK_UNIT, None),
+      ("every week", all_models.Workflow.WEEK_UNIT, 1),
+      ("every 30 weeks", all_models.Workflow.WEEK_UNIT, 30),
+      ("every month", all_models.Workflow.MONTH_UNIT, None),
+      ("every month", all_models.Workflow.MONTH_UNIT, 1),
+      ("every 30 months", all_models.Workflow.MONTH_UNIT, 30)
+  )
+  @ddt.unpack
+  def test_filtering_by_repeat(self, title, unit, repeat_every):
+    """Test filtering by repeat field. title={0}"""
+    with glob_factories.single_commit():
+      workflow = factories.WorkflowFactory(title=title,
+                                           unit=unit,
+                                           repeat_every=repeat_every)
+
+    for operator, expected_count in zip(["~", "!~", "=", "!="], [1, 0, 1, 0]):
+      response = self.api.send_request(self.api.client.post, workflow, data=[{
+          "object_name": "Workflow",
+          "filters": {
+              "expression": {
+                  "left": "repeat",
+                  "op": {"name": operator},
+                  "right": title
+              }
+          }
+      }], api_link='/query')
+      self.assert200(response)
+      count = response.json[0]["Workflow"]["count"]
+      self.assertEqual(count, expected_count)
+
+  def test_ordering_by_repeat(self):
+    """Test ordering by repeat field."""
+    workflows_data = [("Off", None, None),
+                      ("Off 1", None, 1),
+                      ("Every weekday", all_models.Workflow.DAY_UNIT, 1),
+                      ("Every 2 weekdays", all_models.Workflow.DAY_UNIT, 2),
+                      ("Every 30 weekdays", all_models.Workflow.DAY_UNIT, 30),
+                      ("Every week", all_models.Workflow.WEEK_UNIT, 1),
+                      ("Every 2 weeks", all_models.Workflow.WEEK_UNIT, 2),
+                      ("Every 30 weeks", all_models.Workflow.WEEK_UNIT, 30),
+                      ("Every month", all_models.Workflow.MONTH_UNIT, 1),
+                      ("Every 2 months", all_models.Workflow.MONTH_UNIT, 2),
+                      ("Every 30 months", all_models.Workflow.MONTH_UNIT, 30)]
+    for title, unit, repeat_every in workflows_data:
+      factories.WorkflowFactory(title=title, unit=unit,
+                                repeat_every=repeat_every)
+
+    response = self.api.send_request(self.api.client.post, None, data=[{
+        "object_name": "Workflow",
+        "filters": {
+            "expression": {},
+        },
+        "order_by": [{
+            "name": "repeat",
+            "desc": True
+        }]
+    }], api_link='/query')
+    self.assert200(response)
+    values = response.json[0]["Workflow"]["values"]
+    observed_result = [item["title"] for item in values]
+    expected_result = [title for title, _, _ in workflows_data[::-1]]
+    self.assertEqual(observed_result, expected_result)
+
 
 class TestWorkflowApiCalls(workflow_test_case.WorkflowTestCase):
   """Tests related to Workflow REST API calls."""

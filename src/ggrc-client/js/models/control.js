@@ -84,7 +84,19 @@ import {commentSort} from '../plugins/ggrc_utils';
         },
         {attr_title: 'Assertions', attr_name: 'assertions'},
         {attr_title: 'Categories', attr_name: 'categories'},
-      ]),
+        {
+          attr_title: 'Description',
+          attr_name: 'description',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Notes',
+          attr_name: 'notes',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Assessment Procedure',
+          attr_name: 'test_plan',
+          disable_sorting: true,
+        }]),
       display_attr_names: ['title', 'status', 'last_assessment_date',
         'updated_at'],
       add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',

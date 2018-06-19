@@ -36,7 +36,19 @@
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
-      ]),
+        {
+          attr_title: 'Description',
+          attr_name: 'description',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Notes',
+          attr_name: 'notes',
+          disable_sorting: true,
+        }, {
+          attr_title: 'Assessment Procedure',
+          attr_name: 'test_plan',
+          disable_sorting: true,
+        }]),
     },
     sub_tree_view_options: {
       default_filter: ['Control'],

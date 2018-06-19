@@ -1,8 +1,6 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-import unittest
-
 from sqlalchemy import and_
 from sqlalchemy import or_
 
@@ -56,7 +54,7 @@ class TestCsvImport(TestCase):
   def test_multi_basic_policy_orggroup_product_with_warnings(self):
     """Test multi basic policy orggroup product with warnings"""
     filename = "multi_basic_policy_orggroup_product_with_warnings.csv"
-    response_json = self.import_file(filename)
+    response_json = self.import_file(filename, safe=False)
 
     row_messages = []
     object_counts = {
@@ -130,9 +128,3 @@ class TestCsvImport(TestCase):
 
     self.assertEqual(get_relationships_for(p1).count(), 3)
     self.assertEqual(get_relationships_for(org1).count(), 5)
-
-  @unittest.skip("unskip when import/export fixed for workflows")
-  def test_big_import_with_mappings(self):
-    """Test big import with mappings"""
-    response = self.import_file("data_for_export_testing.csv")
-    self._check_csv_response(response, {})

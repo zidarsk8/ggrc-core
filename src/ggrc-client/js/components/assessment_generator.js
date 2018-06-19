@@ -58,7 +58,7 @@ import RefreshQueue from '../models/refresh_queue';
           type = 'progress';
         } else {
           type = 'success';
-          redirectLink = window.location.pathname + '#assessment_widget';
+          redirectLink = window.location.pathname + '#assessment';
         }
 
         flash[type] = messages[type];

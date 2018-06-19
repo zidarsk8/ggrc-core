@@ -89,9 +89,9 @@ class Evidence(Roleable, Relatable, mixins.Titled,
 
   _aliases = {
       "title": "Title",
-      "link": "Attachment",
-      "description": "description",
-      "kind": "type",
+      "link": "Link",
+      "description": "Description",
+      "kind": "Type",
       "archived": {
           "display_name": "Archived",
           "mandatory": False

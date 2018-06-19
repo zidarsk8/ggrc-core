@@ -35,6 +35,7 @@ import {
         evidence: CMS.Models.Evidence,
         access_group: CMS.Models.AccessGroup,
         market: CMS.Models.Market,
+        metric: CMS.Models.Metric,
         system_or_process: {
           _discriminator: function (data) {
             if (data.is_biz_process) {
@@ -322,6 +323,10 @@ import {
             mapping: 'related_markets',
             draw_children: true,
           },
+          Metric: {
+            mapping: 'related_metrics',
+            draw_children: true,
+          },
           OrgGroup: {
             mapping: 'related_org_groups',
             draw_children: true,
@@ -601,6 +606,9 @@ import {
         Market: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
         },
+        Metric: {
+          _mixins: ['governance_objects', 'business_objects', 'issues'],
+        },
         OrgGroup: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
         },
@@ -681,6 +689,10 @@ import {
           },
           Market: {
             mapping: 'extended_related_markets_via_search',
+            draw_children: true,
+          },
+          Metric: {
+            mapping: 'extended_related_metrics_via_search',
             draw_children: true,
           },
           OrgGroup: {

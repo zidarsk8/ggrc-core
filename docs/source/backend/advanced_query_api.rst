@@ -684,7 +684,6 @@ Response:
                         "type": "Regulation",
                         "viewLink": "/regulations/4530",
                         "modified_by": {
-                            "context_id": null,
                             "type": "Person",
                             "href": "/api/people/150",
                             "id": 150
@@ -702,12 +701,10 @@ Response:
                                 "selfLink": "/api/custom_attribute_definitions/1421",
                                 "helptext": "",
                                 "attribute_type": "Dropdown",
-                                "context": null,
                                 "updated_at": "2016-09-20T13:46:54",
                                 "type": "CustomAttributeDefinition",
                                 "id": 1421,
                                 "modified_by": {
-                                    "context_id": null,
                                     "type": "Person",
                                     "href": "/api/people/2",
                                     "id": 2
@@ -725,12 +722,10 @@ Response:
                                 "selfLink": "/api/custom_attribute_definitions/1432",
                                 "helptext": "",
                                 "attribute_type": "Dropdown",
-                                "context": null,
                                 "updated_at": "2016-09-21T14:59:23",
                                 "type": "CustomAttributeDefinition",
                                 "id": 1432,
                                 "modified_by": {
-                                    "context_id": null,
                                     "type": "Person",
                                     "href": "/api/people/230",
                                     "id": 230
@@ -748,7 +743,6 @@ Response:
                         "end_date": null,
                         "related_destinations": [
                             {
-                                "context_id": null,
                                 "type": "Relationship",
                                 "href": "/api/relationships/314025",
                                 "id": 314025
@@ -756,7 +750,6 @@ Response:
                         ],
                         "title": "Expected Regulation 2 (has \"access\" word in the title)",
                         "selfLink": "/api/regulations/4530",
-                        "context": null,
                         "updated_at": "2017-10-17T14:00:38",
                         "workflow_state": null,
                         "risk_objects": [],
@@ -773,14 +766,12 @@ Response:
                                 "modified_by": null,
                                 "ac_role_id": 102,
                                 "person": {
-                                    "context_id": null,
                                     "type": "Person",
                                     "href": "/api/people/150",
                                     "id": 150
                                 },
                                 "person_id": 150,
                                 "id": 31651,
-                                "context": null,
                                 "created_at": "2017-10-17T14:00:38"
                             }
                         ],
@@ -799,7 +790,6 @@ Response:
                         "type": "Regulation",
                         "viewLink": "/regulations/4529",
                         "modified_by": {
-                            "context_id": null,
                             "type": "Person",
                             "href": "/api/people/150",
                             "id": 150
@@ -807,7 +797,6 @@ Response:
                         "task_group_objects": [],
                         "related_sources": [
                             {
-                                "context_id": null,
                                 "type": "Relationship",
                                 "href": "/api/relationships/314024",
                                 "id": 314024
@@ -824,12 +813,10 @@ Response:
                                 "selfLink": "/api/custom_attribute_definitions/1421",
                                 "helptext": "",
                                 "attribute_type": "Dropdown",
-                                "context": null,
                                 "updated_at": "2016-09-20T13:46:54",
                                 "type": "CustomAttributeDefinition",
                                 "id": 1421,
                                 "modified_by": {
-                                    "context_id": null,
                                     "type": "Person",
                                     "href": "/api/people/2",
                                     "id": 2
@@ -847,12 +834,10 @@ Response:
                                 "selfLink": "/api/custom_attribute_definitions/1432",
                                 "helptext": "",
                                 "attribute_type": "Dropdown",
-                                "context": null,
                                 "updated_at": "2016-09-21T14:59:23",
                                 "type": "CustomAttributeDefinition",
                                 "id": 1432,
                                 "modified_by": {
-                                    "context_id": null,
                                     "type": "Person",
                                     "href": "/api/people/230",
                                     "id": 230
@@ -871,7 +856,6 @@ Response:
                         "related_destinations": [],
                         "title": "Expected Regulation 1 (\"permission in title\")",
                         "selfLink": "/api/regulations/4529",
-                        "context": null,
                         "updated_at": "2017-10-17T14:12:03",
                         "workflow_state": null,
                         "risk_objects": [],
@@ -888,14 +872,12 @@ Response:
                                 "modified_by": null,
                                 "ac_role_id": 102,
                                 "person": {
-                                    "context_id": null,
                                     "type": "Person",
                                     "href": "/api/people/150",
                                     "id": 150
                                 },
                                 "person_id": 150,
                                 "id": 31650,
-                                "context": null,
                                 "created_at": "2017-10-17T13:59:54"
                             }
                         ],

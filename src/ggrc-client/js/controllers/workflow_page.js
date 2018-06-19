@@ -20,7 +20,7 @@
             return;
           }
           window.location.hash =
-            'task_group_widget/task_group/' + instance.id;
+            'task_group/task_group/' + instance.id;
         }, 250);
       }
     },

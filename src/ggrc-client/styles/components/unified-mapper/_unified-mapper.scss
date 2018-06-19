@@ -404,7 +404,10 @@ mapper-results-items-header {
       @include cell-styles();
       font-size: 11px;
       text-transform: uppercase;
-      cursor: pointer;
+      
+      &_sortable {
+        cursor: pointer;
+      }
 
       &:first-child {
         flex: 1 1 $first-column-width;

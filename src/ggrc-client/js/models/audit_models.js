@@ -95,6 +95,11 @@ import {getRole} from '../plugins/utils/acl-utils';
         attr_title: 'Archived',
         attr_name: 'archived',
         order: 12,
+      }, {
+        attr_title: 'Description',
+        attr_name: 'description',
+        disable_sorting: true,
+        order: 13,
       }],
       draw_children: true,
     },

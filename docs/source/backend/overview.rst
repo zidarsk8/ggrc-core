@@ -55,9 +55,6 @@ General REST parameters
 Every REST API request can take the following parameters:
 
 -  ``__stubs_only`` - return only the ``id``, ``type``, ``href`` and
-   ``context_id`` (A context is a Role-Based Access Control context;
-   every program, audit or workflow has one) fields for each matched
-   object
 -  ``__fields`` - specify field names to return
 
 Every REST request (except for search) must pass an
