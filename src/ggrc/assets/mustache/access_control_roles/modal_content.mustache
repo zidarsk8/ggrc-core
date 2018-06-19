@@ -64,9 +64,15 @@
       <input
         type="checkbox"
         name="delete"
-        {{#if delete}}checked="checked"{{/if}}
+        {{^if_equals parent_type 'Evidence'}}
+        {{^if_equals parent_type 'Document'}}
+          {{#if delete}}checked="checked"{{/if}}
+        {{/if}}
+        {{/if}}
         class="input-block-level"
-        tabindex="4">
+        tabindex="4"
+        {{#if_equals parent_type 'Evidence'}}disabled{{/if_equals}}
+        {{#if_equals parent_type 'Document'}}disabled{{/if_equals}}>
     </div>
   </div>
 </form>
