@@ -53,9 +53,6 @@ class BlockConverter(object):
   # pylint: disable=too-many-instance-attributes
   """ Main block converter class for dealing with csv files and data
 
-  Constants:
-    BLOCK_OFFSET: offset from the block beginning to the first block line
-                  2 header rows and 1 for 0 based index
   Attributes:
     block_errors (list of str): list containing fatal import errors
     block_warnings (list of str): list containing blokc level import warnings
@@ -79,10 +76,6 @@ class BlockConverter(object):
             "valid_values": "list of valid values"
 
   """
-
-  ROW_CHUNK_SIZE = 50
-  BLOCK_OFFSET = 3
-
   def __init__(self, converter, object_class, class_name,
                operation, object_ids=None, raw_headers=None, offset=None,
                rows=None):
@@ -416,6 +409,14 @@ class BlockConverter(object):
 
 
 class ImportBlockConverter(BlockConverter):
+  """Import block processing functionality.
+
+  Constants:
+    BLOCK_OFFSET: offset from the block beginning to the first block line
+                  2 header rows and 1 for 0 based index
+  """
+  BLOCK_OFFSET = 3
+
   def __init__(self, converter, object_class, rows, raw_headers,
                offset, class_name):
     # pylint: disable=too-many-arguments
@@ -744,6 +745,10 @@ class ImportBlockConverter(BlockConverter):
 
 
 class ExportBlockConverter(BlockConverter):
+  """Export block processing functionality."""
+
+  ROW_CHUNK_SIZE = 50
+
   def __init__(self, converter, object_class, object_ids, fields, class_name):
     # pylint: disable=too-many-arguments
     super(ExportBlockConverter, self).__init__(
