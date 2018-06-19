@@ -40,7 +40,7 @@ from ggrc.fulltext import get_indexer
 from ggrc.login import get_current_user_id, get_current_user
 from ggrc.models.cache import Cache
 from ggrc.models.exceptions import ValidationError, translate_message
-from ggrc.rbac import permissions, context_query_filter
+from ggrc.rbac import permissions
 from ggrc.services.attribute_query import AttributeQueryBuilder
 from ggrc.services import signals
 from ggrc.models.background_task import BackgroundTask, create_task
@@ -257,13 +257,11 @@ class ModelView(View):
         j_class = j.property.mapper.class_
         j_contexts = permissions.read_contexts_for(j_class.__name__)
         j_resources = permissions.read_resources_for(j_class.__name__)
-        if j_contexts is not None:
-          j_filter_expr = context_query_filter(j_class.context_id, j_contexts)
-          if resources:
-            j_filter_expr = or_(j_filter_expr, self.model.id.in_(j_resources))
-          query = query.filter(j_filter_expr)
-        elif resources:
-          query = query.filter(self.model.id.in_(resources))
+        if resources:
+          if j_contexts is None:
+            query = query.filter(self.model.id.in_(resources))
+          else:
+            query = query.filter(self.model.id.in_(j_resources))
     if '__search' in request.args:
       terms = request.args['__search']
       types = self._get_matching_types(self.model)
