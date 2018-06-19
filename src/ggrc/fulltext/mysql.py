@@ -25,7 +25,6 @@ class MysqlRecordProperty(db.Model):
 
   key = db.Column(db.Integer, primary_key=True)
   type = db.Column(db.String(64), primary_key=True)
-  context_id = db.Column(db.Integer)
   tags = db.Column(db.String)
   property = db.Column(db.String(250), primary_key=True)
   subproperty = db.Column(db.String(64), primary_key=True)
@@ -37,7 +36,6 @@ class MysqlRecordProperty(db.Model):
         db.Index('ix_{}_tags'.format(cls.__tablename__), 'tags'),
         db.Index('ix_{}_key'.format(cls.__tablename__), 'key'),
         db.Index('ix_{}_type'.format(cls.__tablename__), 'type'),
-        db.Index('ix_{}_context_id'.format(cls.__tablename__), 'context_id'),
     )
 
 
