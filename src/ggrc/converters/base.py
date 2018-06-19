@@ -191,7 +191,6 @@ class ExportConverter(BaseConverter):
             object_ids=object_ids,
             class_name=class_name,
         )
-        block_converter.check_block_restrictions()
         self.block_converters.append(block_converter)
 
   def export_csv_data(self):

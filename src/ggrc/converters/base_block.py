@@ -57,8 +57,6 @@ class BlockConverter(object):
     BLOCK_OFFSET: offset from the block beginning to the first block line
                   2 header rows and 1 for 0 based index
   Attributes:
-    attr_index (dict): reverse index for getting attribute name from
-      display_name
     block_errors (list of str): list containing fatal import errors
     block_warnings (list of str): list containing blokc level import warnings
     row_errors (list of str): list containing row errors
@@ -128,40 +126,6 @@ class BlockConverter(object):
       self.name = self.object_class._inflector.human_singular.title()
     else:
       self.name = ""
-
-  def check_block_restrictions(self):
-    """Check some block related restrictions"""
-    if not self.object_class:
-      self.add_errors(errors.WRONG_OBJECT_TYPE, line=self.offset + 2,
-                      object_name=self.class_name)
-      return
-    if (self.operation == 'import' and
-            self.object_class is CycleTaskGroupObjectTask and
-            not permissions.is_admin()):
-      self.add_errors(errors.PERMISSION_ERROR, line=self.offset + 2)
-      logger.error("Import failed with: Only admin can update existing "
-                   "cycle-tasks via import")
-    if self._has_non_importable_columns:
-      importable_column_names = []
-      for field_name in self.object_class.IMPORTABLE_FIELDS:
-        if field_name == 'slug':
-          continue
-        if field_name not in self.headers:
-          continue
-        importable_column_names.append(
-            self.headers[field_name]["display_name"])
-      self.add_warning(errors.ONLY_IMPORTABLE_COLUMNS_WARNING,
-                       line=self.offset + 2,
-                       columns=", ".join(importable_column_names))
-
-    # Check mandatory column "code" for slugged objects.
-    if(self.operation == "import" and
-       issubclass(self.object_class, models.mixins.Slugged) and
-       "slug" not in self.headers):
-      self.add_errors(errors.MISSING_COLUMN,
-                      column_names="Code",
-                      line=self.offset + 2,
-                      s="")
 
   def _create_ca_definitions_cache(self):
     """Create dict cache for custom attribute definitions.
@@ -467,6 +431,38 @@ class ImportBlockConverter(BlockConverter):
     self.converter = converter
     self.unique_counts = self.get_unique_counts_dict(self.object_class)
     self.revision_ids = []
+
+  def check_block_restrictions(self):
+    """Check some block related restrictions"""
+    if not self.object_class:
+      self.add_errors(errors.WRONG_OBJECT_TYPE, line=self.offset + 2,
+                      object_name=self.class_name)
+      return
+    if self.object_class is CycleTaskGroupObjectTask and \
+       not permissions.is_admin():
+      self.add_errors(errors.PERMISSION_ERROR, line=self.offset + 2)
+      logger.error("Import failed with: Only admin can update existing "
+                   "cycle-tasks via import")
+    if self._has_non_importable_columns:
+      importable_column_names = []
+      for field_name in self.object_class.IMPORTABLE_FIELDS:
+        if field_name == 'slug':
+          continue
+        if field_name not in self.headers:
+          continue
+        importable_column_names.append(
+          self.headers[field_name]["display_name"])
+      self.add_warning(errors.ONLY_IMPORTABLE_COLUMNS_WARNING,
+                       line=self.offset + 2,
+                       columns=", ".join(importable_column_names))
+
+    # Check mandatory column "code" for slugged objects.
+    if issubclass(self.object_class, models.mixins.Slugged) and \
+       "slug" not in self.headers:
+      self.add_errors(errors.MISSING_COLUMN,
+                      column_names="Code",
+                      line=self.offset + 2,
+                      s="")
 
   def row_converters_from_csv(self):
     """Generate a row converter object for every csv row."""
