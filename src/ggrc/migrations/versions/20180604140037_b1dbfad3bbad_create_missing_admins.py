@@ -1,7 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """
-Create missing Admins
+Create missing Document Admins
 
 Create Date: 2018-06-04 14:00:37.299927
 """
