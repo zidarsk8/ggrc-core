@@ -36,7 +36,6 @@ import {commentSort} from '../plugins/ggrc_utils';
       people: 'CMS.Models.Person.stubs',
       objectives: 'CMS.Models.Objective.stubs',
       directive: 'CMS.Models.Directive.stub',
-      audit_objects: 'CMS.Models.AuditObject.stubs',
       sections: 'CMS.Models.get_stubs',
       programs: 'CMS.Models.Program.stubs',
       kind: 'CMS.Models.Option.stub',
