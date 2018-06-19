@@ -3,34 +3,33 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
- .simple-popover {
-   display: inline-block;
-   position: relative;
-   &__button {
-     display: inline;
-     button {
-       padding: 0px;
-     }
-   }
-   &__content {
-     position: absolute;
-     top: 0px;
-     white-space: nowrap;
-     border: solid 1px;
-     border-color: #B6B6B6;
-     border-radius: 4px;
-     background-color: #F8F8F8;
-     padding: 6px 0px;
-     box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-     top: 108%;
-     transform: none;
-     z-index: 10;
-   }
+.simple-popover {
+  display: inline-block;
+  position: relative;
+  &__button {
+    display: inline;
+    button {
+      padding: 0px;
+    }
+  }
+  &__content {
+    position: absolute;
+    white-space: nowrap;
+    border: solid 1px;
+    border-color: #B6B6B6;
+    border-radius: 4px;
+    background-color: #F8F8F8;
+    padding: 6px 0px;
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    top: 108%;
+    transform: none;
+    z-index: 10;
+  }
 
-   &.simple-popover__placement-top {
+  &.simple-popover__placement-top {
     .simple-popover__content {
       top: -8%;
       transform: translateY(-100%);
     }
-   }
- }
+  }
+}

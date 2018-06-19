@@ -52,11 +52,14 @@ tree-pagination {
               -webkit-appearance: menulist; // emulate native select
               cursor: pointer;
               height: 100%;
-              padding: 0 16px 0 5px;
               border: 1px solid $widgetBorder;
               background-color: $white;
               color: $textGray;
               margin-top: -1px;
+              display: inline-block;
+              min-width: 36px;
+              text-align: start;
+              text-indent: 5px;
             }
           }
 
