@@ -13,7 +13,6 @@ from flask import g
 from ggrc.utils import date_parsers
 from ggrc.fulltext.mixin import Indexed
 
-# pylint: disable=invalid-name
 logger = getLogger(__name__)
 
 EMPTY_SUBPROPERTY_KEY = ''

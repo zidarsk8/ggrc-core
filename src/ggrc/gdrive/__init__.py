@@ -22,7 +22,6 @@ _GOOGLE_AUTH_URI = "https://accounts.google.com/o/oauth2/auth"
 _GOOGLE_TOKEN_URI = "https://accounts.google.com/o/oauth2/token"
 _GOOGLE_API_GDRIVE_SCOPE = "https://www.googleapis.com/auth/drive"
 
-# pylint: disable=invalid-name
 logger = getLogger(__name__)
 
 

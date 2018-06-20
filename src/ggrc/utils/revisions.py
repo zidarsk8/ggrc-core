@@ -15,7 +15,7 @@ from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.snapshotter.rules import Types
 
-logger = getLogger(__name__)  # pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 def get_revisions_by_type(type_):

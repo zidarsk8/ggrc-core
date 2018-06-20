@@ -8,7 +8,6 @@ from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
 
 
-# pylint: disable=invalid-name
 logger = getLogger(__name__)
 
 

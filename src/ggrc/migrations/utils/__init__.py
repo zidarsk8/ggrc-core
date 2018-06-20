@@ -9,7 +9,6 @@ Place here your migration helpers that is shared among number of migrations.
 """
 
 from collections import namedtuple
-from logging import getLogger
 
 from sqlalchemy import text, Integer, String
 from sqlalchemy.sql import and_, table, column
@@ -28,8 +27,6 @@ snapshots_table = Snapshot.__table__  # pylint: disable=invalid-name
 
 
 Stub = namedtuple("Stub", ["type", "id"])
-
-logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
 def get_relationships(connection, type_, id_, filter_types=None):
