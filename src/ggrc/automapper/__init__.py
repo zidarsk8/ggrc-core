@@ -4,7 +4,6 @@
 """Automapper generator."""
 
 from datetime import datetime
-from logging import getLogger
 
 import sqlalchemy as sa
 
@@ -19,10 +18,6 @@ from ggrc.models import exceptions
 from ggrc.rbac import permissions
 from ggrc.models.cache import Cache
 from ggrc.utils import benchmark
-
-
-# pylint: disable=invalid-name
-logger = getLogger(__name__)
 
 
 class AutomapperGenerator(object):
@@ -84,8 +79,8 @@ class AutomapperGenerator(object):
           # Since Issue-Assessment-Audit is the only rule that
           # triggers Issue to Audit mapping, we should skip the
           # permission check for it
-          if not (self._can_map_to(src, relationship) and
-                  self._can_map_to(dst, relationship)):
+          if not (permissions.is_allowed_update(src.type, src.id, None) and
+                  permissions.is_allowed_update(dst.type, dst.id, None)):
             continue
 
         created = self._ensure_relationship(src, dst)
@@ -103,11 +98,6 @@ class AutomapperGenerator(object):
         relationship._json_extras = {  # pylint: disable=protected-access
             'automapping_limit_exceeded': True
         }
-
-  @staticmethod
-  def _can_map_to(obj, parent_relationship):
-    """True if the current user can edit obj in parent_relationship.context."""
-    return permissions.is_allowed_update(obj.type, obj.id, None)
 
   def _flush(self, parent_relationship):
     """Manually INSERT generated automappings."""
