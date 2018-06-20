@@ -24,7 +24,6 @@ from flask.views import View
 from flask.ext.sqlalchemy import Pagination
 import sqlalchemy as sa
 import sqlalchemy.orm.exc
-from sqlalchemy import and_, or_, false
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import tuple_
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -186,7 +185,7 @@ class ModelView(View):
   def get_resource_match_query(self, model, obj_id):
     columns = self.get_match_columns(model)
     query = db.session.query(*columns).filter(
-        and_(
+        sa.and_(
             self._get_type_where_clause(model),
             columns[0] == obj_id))
     return query
@@ -222,19 +221,19 @@ class ModelView(View):
       #    users with user_role BUT without global role:
       #    Reader, Editor, Administrator)
       subq = db.session.query(user_roles_module.person_id).filter(
-          or_(
+          sa.or_(
               # all users that have global user_role
               user_roles_module.context_id.is_(None),
               user_roles_module.context_id == 0
           )
       ).subquery()
-      filter_ = and_(
+      filter_ = sa.and_(
           # user is not superuser
           ~self.model.email.in_(superusers),
-          or_(
+          sa.or_(
               # user hasn't user_role in user_role table
               user_roles_module.id.is_(None),
-              and_(
+              sa.and_(
                   # user has user_role in user_role table
                   user_roles_module.id.isnot(None),
                   # user hasn't global role
@@ -251,7 +250,7 @@ class ModelView(View):
         if resources:
           query = query.filter(self.model.id.in_(resources))
         else:
-          query = query.filter(false())
+          query = query.filter(sa.false())
 
       for j in joinlist:
         j_class = j.property.mapper.class_
@@ -268,7 +267,7 @@ class ModelView(View):
       indexer = get_indexer()
       models = indexer._get_grouped_types(types)
       search_query = indexer.get_permissions_query(models, 'read')
-      search_query = and_(search_query, indexer._get_filter_query(terms))
+      search_query = sa.and_(search_query, indexer._get_filter_query(terms))
       search_query = db.session.query(indexer.record_type.key).filter(
           search_query)
       if '__mywork' in request.args:
