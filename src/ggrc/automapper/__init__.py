@@ -197,8 +197,8 @@ class AutomapperGenerator(object):
     if mappings:
       dst_related = (o for o in self.related(dst)
                      if o.type in mappings and o != src)
-      for r in dst_related:
-        entry = self.order(r, src)
+      for related in dst_related:
+        entry = self.order(related, src)
         if entry not in self.processed:
           self.queue.add(entry)
 
@@ -231,7 +231,7 @@ class AutomapperGenerator(object):
     """Fail if dst (Issue) is already mapped to an Audit."""
     # src, dst are ordered since they come from self.queue
     if (src.type, dst.type) == ("Audit", "Issue"):
-      if "Audit" in (r.type for r in self.related(dst)):
+      if "Audit" in (related.type for related in self.related(dst)):
         raise exceptions.ValidationError(
             "This request will result in automapping that will map "
             "Issue#{issue.id} to multiple Audits."
