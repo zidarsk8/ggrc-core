@@ -24,6 +24,7 @@ from ggrc.fulltext import get_indexer
 
 class BaseConverter(object):
   """Base class for csv converters."""
+  # pylint: disable=too-few-public-methods
   def __init__(self):
     self.new_objects = defaultdict(structures.CaseInsensitiveDict)
     self.shared_state = {}
@@ -32,13 +33,6 @@ class BaseConverter(object):
 
   def get_info(self):
     raise NotImplementedError()
-
-  @classmethod
-  def drop_cache(cls):
-    if not getattr(settings, 'MEMCACHE_MECHANISM', False):
-      return
-    memcache = MemCache()
-    memcache.clean()
 
 
 class ImportConverter(BaseConverter):
@@ -109,6 +103,13 @@ class ImportConverter(BaseConverter):
           cur_user.id
       )
 
+  @classmethod
+  def drop_cache(cls):
+    if not getattr(settings, 'MEMCACHE_MECHANISM', False):
+      return
+    memcache = MemCache()
+    memcache.clean()
+
 
 class ExportConverter(BaseConverter):
   """Export Converter.
@@ -155,7 +156,6 @@ class ExportConverter(BaseConverter):
             object_ids=object_ids,
             class_name=class_name,
         )
-        block_converter.check_block_restrictions()
         self.block_converters.append(block_converter)
 
   def export_csv_data(self):
