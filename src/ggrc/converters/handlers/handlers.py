@@ -15,18 +15,6 @@ from ggrc import db
 from ggrc.converters import errors
 from ggrc.converters import get_exportables
 from ggrc.login import get_current_user
-from ggrc.models import Audit
-from ggrc.models import CategoryBase
-from ggrc.models import Contract
-from ggrc.models import Assessment
-from ggrc.models import ObjectPerson
-from ggrc.models import Option
-from ggrc.models import Person
-from ggrc.models import Policy
-from ggrc.models import Program
-from ggrc.models import Regulation
-from ggrc.models import Relationship
-from ggrc.models import Standard
 from ggrc.models import all_models
 from ggrc.models.reflection import AttributeInfo
 from ggrc.rbac import permissions
@@ -247,9 +235,9 @@ class UserColumnHandler(ColumnHandler):
   def get_person(self, email):
     from ggrc.utils import user_generator
     new_objects = self.row_converter.block_converter.converter.new_objects
-    if email not in new_objects[Person]:
+    if email not in new_objects[all_models.Person]:
       try:
-        new_objects[Person][email] = user_generator.find_user(email)
+        new_objects[all_models.Person][email] = user_generator.find_user(email)
       except ValueError as ex:
         self.add_error(
             errors.VALIDATION_ERROR,
@@ -257,7 +245,7 @@ class UserColumnHandler(ColumnHandler):
             message=ex.message
         )
         return None
-    return new_objects[Person].get(email)
+    return new_objects[all_models.Person].get(email)
 
   def parse_item(self):
     email = self.raw_value.lower()
@@ -425,7 +413,7 @@ class EmailColumnHandler(ColumnHandler):
     email = self.raw_value.lower()
     if not email:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name="Email")
-    elif not Person.is_valid_email(email):
+    elif not all_models.Person.is_valid_email(email):
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
       return ""
     return email
@@ -515,13 +503,14 @@ class MappingColumnHandler(ColumnHandler):
     mapping = None
     for obj in self.value:
       if current_obj.id:
-        mapping = Relationship.find_related(current_obj, obj)
+        mapping = all_models.Relationship.find_related(current_obj, obj)
       if not self.unmap and not mapping:
         if not (
             self.mapping_object.__name__ == "Audit" and
             not getattr(current_obj, "allow_map_to_audit", True)
         ):
-          mapping = Relationship(source=current_obj, destination=obj)
+          mapping = all_models.Relationship(source=current_obj,
+                                            destination=obj)
           relationships.append(mapping)
           db.session.add(mapping)
         else:
@@ -559,7 +548,8 @@ class MappingColumnHandler(ColumnHandler):
 class ConclusionColumnHandler(ColumnHandler):
   """ Handler for design and operationally columns in ControlAssesments """
 
-  CONCLUSION_MAP = {i.lower(): i for i in Assessment.VALID_CONCLUSIONS}
+  CONCLUSION_MAP = {i.lower(): i
+                    for i in all_models.Assessment.VALID_CONCLUSIONS}
 
   def parse_item(self):
     """Parse conclusion design and operational values."""
@@ -585,10 +575,11 @@ class OptionColumnHandler(ColumnHandler):
     prefixed_key = "{}_{}".format(
         self.row_converter.object_class._inflector.table_singular, self.key
     )
-    item = Option.query.filter(
+    item = all_models.Option.query.filter(
         and_(
-            Option.title == self.raw_value.strip(),
-            or_(Option.role == self.key, Option.role == prefixed_key)
+            all_models.Option.title == self.raw_value.strip(),
+            or_(all_models.Option.role == self.key,
+                all_models.Option.role == prefixed_key)
         )
     ).first()
     return item
@@ -663,7 +654,7 @@ class ProgramColumnHandler(ParentColumnHandler):
   """Handler for program column on audit imports."""
 
   def __init__(self, row_converter, key, **options):
-    self.parent = Program
+    self.parent = all_models.Program
     super(ProgramColumnHandler, self).__init__(row_converter, key, **options)
 
   def set_obj_attr(self):
@@ -680,7 +671,8 @@ class SectionDirectiveColumnHandler(MappingColumnHandler):
 
   def parse_item(self):
     """ get a directive from slug """
-    allowed_directives = [Policy, Regulation, Standard, Contract]
+    allowed_directives = [all_models.Policy, all_models.Regulation,
+                          all_models.Standard, all_models.Contract]
     if self.raw_value == "":
       return None
     slug = self.raw_value
@@ -719,7 +711,7 @@ class AuditColumnHandler(MappingColumnHandler):
 
     audit = self.value[0]
 
-    if isinstance(audit, Audit):
+    if isinstance(audit, all_models.Audit):
       old_slug = None
       if (
           hasattr(self.row_converter.obj, "audit") and
@@ -754,16 +746,20 @@ class ObjectPersonColumnHandler(UserColumnHandler):
     pass
 
   def get_value(self):
-    object_person = db.session.query(ObjectPerson.person_id).filter_by(
+    object_person = db.session.query(
+        all_models.ObjectPerson.person_id,
+    ).filter_by(
         personable_id=self.row_converter.obj.id,
         personable_type=self.row_converter.obj.__class__.__name__
     )
-    users = Person.query.filter(Person.id.in_(object_person))
+    users = all_models.Person.query.filter(
+        all_models.Person.id.in_(object_person),
+    )
     emails = [user.email for user in users]
     return "\n".join(emails)
 
   def remove_current_people(self):
-    ObjectPerson.query.filter_by(
+    all_models.ObjectPerson.query.filter_by(
         personable_id=self.row_converter.obj.id,
         personable_type=self.row_converter.obj.__class__.__name__
     ).delete()
@@ -773,7 +769,7 @@ class ObjectPersonColumnHandler(UserColumnHandler):
       return
     self.remove_current_people()
     for person in self.value:
-      object_person = ObjectPerson(
+      object_person = all_models.ObjectPerson(
           personable=self.row_converter.obj,
           person=person,
           context=self.row_converter.obj.context
@@ -792,7 +788,8 @@ class PersonMappingColumnHandler(ObjectPersonColumnHandler):
   def remove_current_people(self):
     obj = self.row_converter.obj
     self.value = [
-        person for person in self.value if not ObjectPerson.query.filter_by(
+        person for person in self.value
+        if not all_models.ObjectPerson.query.filter_by(
             personable_id=obj.id,
             personable_type=obj.__class__.__name__,
             person=person
@@ -813,7 +810,7 @@ class PersonUnmappingColumnHandler(ObjectPersonColumnHandler):
     context = getattr(obj, 'context', None)
     user_role = getattr(all_models, 'UserRole', None)
     for person in self.value:
-      ObjectPerson.query.filter_by(
+      all_models.ObjectPerson.query.filter_by(
           personable_id=obj.id,
           personable_type=obj.__class__.__name__,
           person=person
@@ -833,10 +830,10 @@ class CategoryColumnHandler(ColumnHandler):
     names = [name for name in names if name != ""]
     if not names:
       return None
-    categories = CategoryBase.query.filter(
+    categories = all_models.CategoryBase.query.filter(
         and_(
-            CategoryBase.name.in_(names),
-            CategoryBase.type == self.category_base_type
+            all_models.CategoryBase.name.in_(names),
+            all_models.CategoryBase.type == self.category_base_type
         )
     ).all()
     category_names = set([c.name.strip() for c in categories])
