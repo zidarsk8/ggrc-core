@@ -16,6 +16,7 @@ import {
   isAdmin,
   getPageType,
   isObjectContextPage,
+  isMyAssessments,
 } from '../../plugins/utils/current-page-utils';
 import template from './page-header.mustache';
 
@@ -76,6 +77,11 @@ import template from './page-header.mustache';
       isObjectPage: {
         get() {
           return isObjectContextPage();
+        },
+      },
+      isMyAssessmentsPage: {
+        get() {
+          return isMyAssessments();
         },
       },
       model: {

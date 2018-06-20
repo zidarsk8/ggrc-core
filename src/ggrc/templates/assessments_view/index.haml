@@ -19,15 +19,8 @@
 
 -block body
   .area.flex-box.flex-col.area--distraction-free{ 'class': '={ model_display_class }' }
-    .header-content
-      %h2.logo-wrap{ 'class': '={ logo_wrap_class }' }
-        %a{ 'class': 'to-my-work', 'href': '/dashboard' }
-          -set logo_url = config.get("COMPANY_LOGO")
-          -if logo_url
-            %img{ "src" : "#{logo_url}", 'alt' : 'GRC', 'title' : 'GRC'}
-
-      %h1.entities
-        My Assessments
+    #page-header
+      -block header
 
     -block nav
       .top-inner-nav
