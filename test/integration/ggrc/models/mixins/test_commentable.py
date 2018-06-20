@@ -35,5 +35,3 @@ class TestCommentableMixin(TestCase):
 
     self.assertEquals(1, len(asmnt_comments))
     self.assertEquals("test0", "".join(c.description for c in asmnt_comments))
-    self.assertTrue("custom_attribute_revision" in
-                    asmnt_comments[0].log_json().keys())
