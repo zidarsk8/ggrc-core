@@ -359,18 +359,12 @@ def or_operation(exp, object_class, target_class, query):
 
 
 @validate("left", "right")
-def in_operation(exp, object_class, target_class, query):
-  """Operator generate sqlalchemy for in operation"""
-  if not exp["right"]:
+@build_op_shortcut
+def in_operation(left, right):
+  """IN operator."""
+  if not right:
     return sqlalchemy.sql.false()
-  return object_class.id.in_(
-      db.session.query(Record.key).filter(
-          Record.type == object_class.__name__,
-          Record.property == exp["left"],
-          Record.subproperty != '__sort__',
-          Record.content.in_(exp["right"])
-      )
-  )
+  return left.in_(right)
 
 
 @validate("issue", "assessment")
