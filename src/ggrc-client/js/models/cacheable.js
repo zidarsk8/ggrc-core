@@ -985,6 +985,7 @@ import tracker from '../tracker';
               dataType: 'json',
             })
               .then($.proxy(that, 'cleanupAcl'))
+              .then($.proxy(that, 'cleanupCollections'))
               .then($.proxy(that.constructor, 'model'))
               .done(function (response) {
                 response.backup();

@@ -120,26 +120,6 @@ const AUDIT_ISSUE_TRACKER = {
       }
     },
   }, {});
-  can.Model.Mixin('requestorable', {
-    before_create: function () {
-      if (!this.requestor) {
-        this.attr('requestor', {
-          id: GGRC.current_user.id,
-          type: 'Person',
-        });
-      }
-    },
-    form_preload: function (new_object_form) {
-      if (new_object_form) {
-        if (!this.requestor) {
-          this.attr('requestor', {
-            id: GGRC.current_user.id,
-            type: 'Person',
-          });
-        }
-      }
-    },
-  });
 
   can.Model.Mixin('contactable', {
     // NB : Because the attributes object
@@ -220,14 +200,23 @@ const AUDIT_ISSUE_TRACKER = {
   });
 
   can.Model.Mixin('assertions_categories', {
-    'before:refresh': function () {
-      if (this.attr('categories') && !isSnapshot(this)) {
+    cleanupCollections(resource) {
+      if (isSnapshot(this)) {
+        return resource;
+      }
+
+      if (this.attr('categories')) {
         this.attr('categories').replace([]);
       }
 
-      if (this.attr('assertions') && !isSnapshot(this)) {
+      if (this.attr('assertions')) {
         this.attr('assertions').replace([]);
       }
+
+      return resource;
+    },
+    'before:restore'() {
+      this.cleanupCollections();
     },
   });
 
