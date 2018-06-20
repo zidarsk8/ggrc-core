@@ -16,7 +16,7 @@ from ggrc.models.automapping import Automapping
 from ggrc.models.relationship import Relationship, RelationshipsCache, Stub
 from ggrc.models.issue import Issue
 from ggrc.models import exceptions
-from ggrc.rbac.permissions import is_allowed_update
+from ggrc.rbac import permissions
 from ggrc.models.cache import Cache
 from ggrc.utils import benchmark
 
@@ -107,16 +107,7 @@ class AutomapperGenerator(object):
   @staticmethod
   def _can_map_to(obj, parent_relationship):
     """True if the current user can edit obj in parent_relationship.context."""
-    context_id = None
-    if parent_relationship.context:
-      context_id = parent_relationship.context.id
-    elif parent_relationship.context_id:
-      logger.warning("context is unset but context_id is set on a "
-                     "relationship %r: context=%r, context_id=%r",
-                     parent_relationship, parent_relationship.context,
-                     parent_relationship.context_id)
-      context_id = parent_relationship.context_id
-    return is_allowed_update(obj.type, obj.id, context_id)
+    return permissions.is_allowed_update(obj.type, obj.id, None)
 
   def _flush(self, parent_relationship):
     """Manually INSERT generated automappings."""
