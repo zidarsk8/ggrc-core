@@ -25,16 +25,13 @@ from ggrc.fulltext import get_indexer
 class BaseConverter(object):
   """Base class for csv converters."""
   def __init__(self):
-    self.block_converters = []
     self.new_objects = defaultdict(structures.CaseInsensitiveDict)
     self.shared_state = {}
     self.response_data = []
     self.exportable = get_exportables()
 
   def get_info(self):
-    for converter in self.block_converters:
-      self.response_data.append(converter.get_info())
-    return self.response_data
+    raise NotImplementedError()
 
   @classmethod
   def drop_cache(cls):
@@ -51,26 +48,6 @@ class ImportConverter(BaseConverter):
   blocks and columns are handled in the correct order.
   """
 
-  CLASS_ORDER = [
-      "Person",
-      "Program",
-      "Risk Assessment",
-      "Audit",
-      "Issue",
-      "Assessment",
-      "Policy",
-      "Regulation",
-      "Standard",
-      "Section",
-      "Control",
-      "Assessment Template",
-      "Custom Attribute Definition",
-      "Assessment",
-      "Workflow",
-      "Task Group",
-      "Task Group Task",
-  ]
-
   priority_columns = [
       "email",
       "slug",
@@ -85,11 +62,11 @@ class ImportConverter(BaseConverter):
     self.indexer = get_indexer()
     super(ImportConverter, self).__init__()
 
-  def initialize_block_converters(self):
-    """ Initialize block converters.
+  def get_info(self):
+    return self.response_data
 
-    Prepare BlockConverters and order them like specified in self.CLASS_ORDER.
-    """
+  def initialize_block_converters(self):
+    """Initialize block converters."""
     offsets_and_data_blocks = split_blocks(self.csv_data)
     for offset, data in offsets_and_data_blocks:
       class_name = data[1][0].strip().lower()
@@ -104,44 +81,26 @@ class ImportConverter(BaseConverter):
           class_name=class_name,
       )
       block_converter.check_block_restrictions()
-      self.block_converters.append(block_converter)
-
-    order = defaultdict(int)
-    order.update({c: i for i, c in enumerate(self.CLASS_ORDER)})
-    order["Person"] = -1
-    self.block_converters.sort(key=lambda x: order[x.name])
+      yield block_converter
 
   def import_csv_data(self):
-    self.initialize_block_converters()
-    self.row_converters_from_csv()
-    self.handle_priority_columns()
-    self.import_objects()
-    self.import_secondary_objects()
-    self._start_compute_attributes_job()
-    self.drop_cache()
+    revision_ids = []
 
-  def row_converters_from_csv(self):
-    for converter in self.block_converters:
+    for converter in self.initialize_block_converters():
       converter.row_converters_from_csv()
-
-  def handle_priority_columns(self):
-    for converter in self.block_converters:
       for attr_name in self.priority_columns:
         converter.handle_row_data(attr_name)
-
-  def import_objects(self):
-    for converter in self.block_converters:
       converter.handle_row_data()
       converter.import_objects()
-
-  def import_secondary_objects(self):
-    for converter in self.block_converters:
       converter.import_secondary_objects()
 
-  def _start_compute_attributes_job(self):
-    revision_ids = []
-    for block_converter in self.block_converters:
-      revision_ids.extend(block_converter.revision_ids)
+      self.response_data.append(converter.get_info())
+      revision_ids.extend(converter.revision_ids)
+
+    self._start_compute_attributes_job(revision_ids)
+    self.drop_cache()
+
+  def _start_compute_attributes_job(self, revision_ids):
     if revision_ids:
       cur_user = login.get_current_user()
       deferred.defer(
@@ -161,10 +120,16 @@ class ExportConverter(BaseConverter):
   def __init__(self, ids_by_type):
     super(ExportConverter, self).__init__()
     self.dry_run = True  # TODO: fix ColumnHandler to not use it for exports
+    self.block_converters = []
     self.ids_by_type = ids_by_type
 
   def get_object_names(self):
     return [c.name for c in self.block_converters]
+
+  def get_info(self):
+    for converter in self.block_converters:
+      self.response_data.append(converter.get_info())
+    return self.response_data
 
   def initialize_block_converters(self):
     """Generate block converters.

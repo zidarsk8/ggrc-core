@@ -45,8 +45,7 @@ class TestAuditRBAC(TestCase):
         "audit_rbac_snapshot_update.csv"
     ])
 
-    response = self._import_file(next(self.csv_files))
-    self._check_csv_response(response, {})
+    self.import_file(next(self.csv_files))
 
     self.people = all_models.Person.eager_query().all()
 
@@ -105,8 +104,7 @@ class TestAuditRBAC(TestCase):
 
   def update_audit(self):
     """Update default audit"""
-    response = self._import_file(next(self.csv_files))
-    self._check_csv_response(response, {})
+    self.import_file(next(self.csv_files))
 
     audit = all_models.Audit.query.filter(
         all_models.Audit.title == "Snapshotable audit"

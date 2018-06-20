@@ -943,8 +943,7 @@ class TestQueryAssessmentCA(TestCase, WithQueryApi):
     """Set up test cases for all tests."""
     TestCase.clear_data()
     self._generate_special_assessments()
-    response = self._import_file("sorting_assessment_with_ca_setup.csv")
-    self._check_csv_response(response, {})
+    self.import_file("sorting_assessment_with_ca_setup.csv")
     self.client.get("/login")
 
   @staticmethod
@@ -1174,8 +1173,7 @@ class TestQueryWithCA(TestCase, WithQueryApi):
     """Set up test cases for all tests."""
     TestCase.clear_data()
     self._generate_cad()
-    response = self._import_file("sorting_with_ca_setup.csv")
-    self._check_csv_response(response, {})
+    self.import_file("sorting_with_ca_setup.csv")
     self.client.get("/login")
 
   @staticmethod

@@ -26,8 +26,8 @@ class TestControlsImport(TestCase):
     super(TestControlsImport, self).setUp()
     self.client.get("/login")
 
-  def test_import_controls_with_evidence(self):
-    """Test importing of assessments with templates."""
+  def test_import_controls_with_documents(self):
+    """Controls can be imported with Documents."""
     self.import_file("controls_no_warnings.csv")
 
     document = all_models.Document.query.filter_by(
