@@ -30,6 +30,7 @@ def get_evidence_admin_role_id(connection):
 
 def create_evid_temporary_table():
   """Tmp table to store evidence.id without Admins"""
+  op.execute("SET AUTOCOMMIT = 1")
   sql = """
         CREATE TEMPORARY TABLE evidence_wo_admins (
           id int(11) NOT NULL
@@ -88,6 +89,7 @@ def upgrade():
                                  evidence_admin_role_id)
   add_evidence_to_missing_revisions(connection)
   op.execute("DROP TABLE evidence_wo_admins")
+  op.execute("SET AUTOCOMMIT = 0")
 
 
 def downgrade():

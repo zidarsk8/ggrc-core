@@ -22,6 +22,7 @@ down_revision = '3a41fc031f53'
 
 def create_doc_temporary_table():
   """Tmp table to store document.id without Admins"""
+  op.execute("SET AUTOCOMMIT = 1")
   sql = """
       CREATE TEMPORARY TABLE documents_wo_admins (
         id int(11) NOT NULL
@@ -84,6 +85,7 @@ def upgrade():
                                  document_admin_role_id)
   add_doc_to_missing_revisions(connection)
   op.execute("DROP TABLE documents_wo_admins")
+  op.execute("SET AUTOCOMMIT = 0")
 
 
 def downgrade():
