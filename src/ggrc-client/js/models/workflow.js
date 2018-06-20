@@ -48,6 +48,7 @@
         {attr_title: 'State', attr_name: 'status'},
         {attr_title: 'Last Updated Date', attr_name: 'updated_at'},
         {attr_title: 'Last Updated By', attr_name: 'modified_by'},
+        {attr_title: 'Repeat', attr_name: 'repeat'},
         {
           attr_title: 'Description',
           attr_name: 'description',
