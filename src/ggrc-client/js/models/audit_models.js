@@ -36,7 +36,6 @@ import {getRole} from '../plugins/utils/acl-utils';
       object_people: 'CMS.Models.ObjectPerson.stubs',
       people: 'CMS.Models.Person.stubs',
       audit_firm: 'CMS.Models.OrgGroup.stub',
-      audit_objects: 'CMS.Models.AuditObject.stubs',
     },
     defaults: {
       status: 'Planned',

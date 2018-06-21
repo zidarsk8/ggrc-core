@@ -300,22 +300,4 @@ import RefreshQueue from './refresh_queue';
   can.Model.Join('CMS.Models.MultitypeSearchJoin', {
     join_keys: {},
   }, {});
-
-  can.Model.Join('CMS.Models.AuditObject', {
-    root_object: 'audit_object',
-    root_collection: 'audit_objects',
-    findAll: 'GET /api/audit_objects',
-    create: 'POST /api/audit_objects',
-    destroy: 'DELETE /api/audit_objects/{id}',
-    join_keys: {
-      auditable: can.Model.Cacheable,
-      audit: CMS.Models.Audit,
-    },
-    attributes: {
-      context: 'CMS.Models.Context.stub',
-      modified_by: 'CMS.Models.Person.stub',
-      audit: 'CMS.Models.Audit.stub',
-      auditable: 'CMS.Models.get_stub',
-    },
-  }, {});
 })(window.can, window.can.$);
