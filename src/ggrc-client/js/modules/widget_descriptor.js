@@ -58,7 +58,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
         '/base_objects/summary.mustache';
       return new this(
         instance.constructor.shortName + ':summary', {
-          widget_id: 'Summary',
+          widget_id: 'summary',
           widget_name: function () {
             return instance.constructor.title_singular + ' Summary';
           },

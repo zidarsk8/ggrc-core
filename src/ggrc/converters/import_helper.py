@@ -102,22 +102,50 @@ def equalize_array(array):
   return array
 
 
-def split_array(csv_data):
-  """ Split array by empty lines """
-  data_blocks = []
-  offsets = []
-  current_block = None
-  for offset, line in enumerate(csv_data):
-    if sum([len(l) for l in line]) > 0:
-      if current_block is None:
-        offsets.append(offset)
-        data_blocks.append([])
-        current_block = len(data_blocks) - 1
-      data_blocks[current_block].append(line)
-    else:
-      current_block = None
+def split_blocks(csv_data):
+  """Split array by empty lines and skip blocks shorter than 2 lines."""
 
-  return offsets, data_blocks
+  return ((offset, data_block)
+          for offset, data_block in split_array(csv_data)
+          if len(data_block) >= 2)
+
+
+def split_array(csv_data):
+  """Split array by empty lines.
+
+  Args:
+    csv_data - list of lists of strings (parsed CSV)
+
+  Yields:
+
+    [(offset, data_block)] - offset is the index of the starting line
+                             in the block, data_block is a slice of
+                             csv_data
+  """
+  def line_is_empty(list_of_strs):
+    return not any(cell for cell in list_of_strs)
+
+  current_offset = current_block = None
+
+  for offset, line in enumerate(csv_data):
+    if line_is_empty(line):
+      if current_block is None:
+        # starting or repeating empty lines, just skip
+        continue
+      # empty line after non-empty line, end of block
+      yield current_offset, current_block
+      current_offset = current_block = None
+    else:
+      if current_block is None:
+        # non-empty line after empty line, start of block
+        current_offset = offset
+        current_block = [line]
+      else:
+        # non-empty line after non-empty line, block continues
+        current_block.append(line)
+
+  if current_block is not None:
+    yield current_offset, current_block
 
 
 def generate_2d_array(width, height, value=None):
@@ -182,13 +210,11 @@ def count_objects(csv_data):
     return info
 
   exportables = get_exportables()
-  offsets, data_blocks = split_array(csv_data)
+  offsets_and_data_blocks = split_blocks(csv_data)
   blocks_info = []
   failed = False
   counts = {}
-  for offset, data in zip(offsets, data_blocks):
-    if len(data) < 2:
-      continue  # empty block
+  for offset, data in offsets_and_data_blocks:
     class_name = data[1][0].strip().lower()
     object_class = exportables.get(class_name, "")
     rows = len(data) - 2

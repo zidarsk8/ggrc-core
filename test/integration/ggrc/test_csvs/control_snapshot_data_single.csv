@@ -1,3 +1,9 @@
+Object Type,,,,,,,,,,,,,,,,,,,,,,,,,,
+person,Name,Email,Company,role,,,,,,,,,,,,,,,,,,,,,,
+,admin,admin@example.com,google,Administrator,,,,,,,,,,,,,,,,,,,,,,
+,creator,creator@example.com,google,creator,,,,,,,,,,,,,,,,,,,,,,
+,editor,editor@example.com,google,Editor,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,
 Object type,,,,,,,,"Options are:
 Draft
 Active
@@ -18,14 +24,3 @@ Security
 Availability","Data Centers
 Disaster Recovery
 Logical Access/ Access Control",creator@example.com,No,key,Corrective,Physical,creator@example.com,creator@example.com,creator@example.com,control.example.com,Weekly,yes,02/22/2022,one,creator@example.com,Rich text 1
-,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,
-Object Type,,,,,,,,,,,,,,,,,,,,,,,,,,
-person,Name,Email,Company,role,,,,,,,,,,,,,,,,,,,,,,
-,admin,admin@example.com,google,Administrator,,,,,,,,,,,,,,,,,,,,,,
-,creator,creator@example.com,google,creator,,,,,,,,,,,,,,,,,,,,,,
-,editor,editor@example.com,google,Editor,,,,,,,,,,,,,,,,,,,,,,

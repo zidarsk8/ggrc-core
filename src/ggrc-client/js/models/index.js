@@ -53,3 +53,4 @@ import './task_group';
 import './workflow';
 import './workflow_join_models';
 import './proposal';
+import './metric';

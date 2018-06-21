@@ -58,6 +58,10 @@ def _create_obj_dict(obj, audit_id, context_id, assessment_id=None):
               "id": context_id,
               "type": "Context"
           },
+          "audit": {
+              "id": audit_id,
+              "type": "Audit"
+          }
       },
       "relationship": {
           "context": {
@@ -95,21 +99,15 @@ class TestAuditArchivingBase(TestCase):
           for person in all_models.Person.eager_query().all()
       }
       created_objects = (
-          (all_models.Audit, all_models.Audit.slug == 'AUDIT-1', 'audit'),
-          (all_models.Audit,
-           all_models.Audit.slug == 'AUDIT-2', 'archived_audit'),
-          (all_models.Issue, all_models.Issue.slug == 'PMRBACISSUE-1',
-           'issue'),
-          (all_models.Issue, all_models.Issue.slug == 'PMRBACISSUE-2',
-           'archived_issue'),
-          (all_models.Assessment,
-           all_models.Assessment.slug == 'PMRBACASSESSMENT-1', 'assessment'),
-          (all_models.Assessment,
-           all_models.Assessment.slug == 'PMRBACASSESSMENT-2',
-           'archived_assessment')
+          (all_models.Audit, 'AUDIT-1', 'audit'),
+          (all_models.Audit, 'AUDIT-2', 'archived_audit'),
+          (all_models.Issue, 'PMRBACISSUE-1', 'issue'),
+          (all_models.Issue, 'PMRBACISSUE-2', 'archived_issue'),
+          (all_models.Assessment, 'PMRBACASSESSMENT-1', 'assessment'),
+          (all_models.Assessment, 'PMRBACASSESSMENT-2', 'archived_assessment')
       )
-      for obj, cond, name in created_objects:
-        setattr(cls, name, obj.eager_query().filter(cond).first())
+      for model, slug, name in created_objects:
+        setattr(cls, name, model.eager_query().filter_by(slug=slug).first())
 
       revision = all_models.Revision.query.filter(
           all_models.Revision.resource_type == 'Objective').first()

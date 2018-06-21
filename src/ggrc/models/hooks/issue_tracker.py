@@ -696,13 +696,15 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
       'reporter': reporter_email,
       'assignee': '',
       'verifier': '',
+      'status': issue_tracker_info['status'],
       'ccs': [],
       'comment': '\n'.join(comment),
   }
 
   assignee = issue_tracker_info.get('assignee')
   if assignee:
-    issue_params['status'] = 'ASSIGNED'
+    if not issue_tracker_info['status']:
+      issue_params['status'] = 'ASSIGNED'
     issue_params['assignee'] = assignee
     issue_params['verifier'] = assignee
 
@@ -718,6 +720,7 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
   """Creates an entry for IssueTracker model."""
   if not issue_tracker_info.get('title'):
     issue_tracker_info['title'] = assessment.title
+  issue_tracker_info['status'] = issues.STATUSES.get(assessment.status)
 
   if (issue_tracker_info.get('enabled') and
           _is_issue_tracker_enabled(audit=assessment.audit)):

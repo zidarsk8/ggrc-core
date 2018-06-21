@@ -26,7 +26,7 @@ class TestUserRoleColumnHandler(TestCase):
     Correct roles pass without errors, for incorrect role error is generated
     for the whole row.
     """
-    response_json = self.import_file("import_with_user_role.csv")
+    response_json = self.import_file("import_with_user_role.csv", safe=False)
     expected_errors = {
         errors.WRONG_VALUE.format(line="4", column_name="Role"),
         errors.WRONG_VALUE.format(line="7", column_name="Role"),

@@ -47,7 +47,7 @@ export default Filterable({
     this.element
       .addClass('widget')
       .addClass(this.options.object_category)
-      .attr('id', this.options.widget_id + '_widget');
+      .attr('id', this.options.widget_id);
 
     if (this.options.widgetType && this.options.widgetType === 'treeview') {
       let counts = getCounts();

@@ -36,8 +36,7 @@ class TestComprehensiveSheets(TestCase):
   def test_comprehensive_with_ca(self):
     """Test comprehensive sheet with custom attributes."""
     self.create_custom_attributes()
-    filename = "comprehensive_sheet1.csv"
-    response = self.import_file(filename)
+    response = self.import_file("comprehensive_sheet1.csv", safe=False)
     indexed = {r["name"]: r for r in response}
 
     expected = {
@@ -166,18 +165,37 @@ class TestComprehensiveSheets(TestCase):
             "row_errors": 1,
             "row_warnings": 0,
             "rows": 14,
+        },
+        "Metric": {
+            "created": 14,
+            "ignored": 2,
+            "row_errors": 3,
+            "row_warnings": 4,
+            "rows": 16,
         }
     }
 
     # general numbers check
     for name, data in expected.items():
       current = indexed[name]
-      self.assertEqual(current["rows"], data["rows"], name)
-      self.assertEqual(current["ignored"], data["ignored"], name)
-      self.assertEqual(current["created"], data["created"], name)
-      self.assertEqual(len(current["row_errors"]), data["row_errors"], name)
-      self.assertEqual(
-          len(current["row_warnings"]), data["row_warnings"], name)
+
+      current_dict = {
+          "created": current["created"],
+          "ignored": current["ignored"],
+          "row_errors": len(current["row_errors"]),
+          "row_warnings": len(current["row_warnings"]),
+          "rows": current["rows"],
+      }
+
+      self.assertDictEqual(
+          current_dict,
+          data,
+          u"Numbers don't match for {}: expected {!r}, got {!r}".format(
+              name,
+              data,
+              current_dict,
+          ),
+      )
 
     prog = Program.query.filter_by(slug="prog-8").first()
     self.assertEqual(prog.title, "program 8")
@@ -192,7 +210,7 @@ class TestComprehensiveSheets(TestCase):
   def test_full_good_import(self):
     """Test import of all objects with no warnings or errors."""
     filename = "full_good_import_no_warnings.csv"
-    response = self.import_file(filename)
+    self.import_file(filename)
 
     admin = db.session.query(Role.id).filter(Role.name == "Administrator")
     reader = db.session.query(Role.id).filter(Role.name == "Reader")
@@ -206,16 +224,14 @@ class TestComprehensiveSheets(TestCase):
     self.assertEqual(len(creators), 6)
     self.assertEqual(len(access_groups), 10)
 
-    expected_errors = {}
-    self._check_csv_response(response, expected_errors)
-
   def test_errors_and_warnings(self):
     """Test all possible errors and warnings.
 
     This test should test for all possible warnings and errors but it is still
     incomplete.
     """
-    response = self.import_file("import_with_all_warnings_and_errors.csv")
+    response = self.import_file("import_with_all_warnings_and_errors.csv",
+                                safe=False)
     expected_errors = {
         "Control": {
             "block_errors": {
@@ -254,19 +270,19 @@ class TestComprehensiveSheets(TestCase):
         "Assessment": {
             "row_warnings": {
                 errors.UNKNOWN_OBJECT.format(
-                    line=14, object_type="Audit", slug="x"),
+                    line=21, object_type="Audit", slug="x"),
             },
             "row_errors": {
                 errors.MISSING_VALUE_ERROR.format(
-                    line=14, column_name="Audit"),
+                    line=21, column_name="Audit"),
                 errors.MISSING_VALUE_ERROR.format(
-                    line=15, column_name="Audit"),
+                    line=22, column_name="Audit"),
             },
         },
         "Regulation": {
             "row_warnings": {
                 errors.DUPLICATE_IN_MULTI_VALUE.format(
-                    line=21,
+                    line=28,
                     column_name=u"Reference URL",
                     duplicates=u"double-url.com, duplicate-nonascii-url-€™.com"
                 )
@@ -289,7 +305,7 @@ class TestComprehensiveSheets(TestCase):
 
   def test_case_sensitive_slugs(self):
     """Test that mapping with case sensitive slugs work."""
-    response = self.import_file("case_sensitive_slugs.csv")
+    response = self.import_file("case_sensitive_slugs.csv", safe=False)
     expected_errors = {
         "Control": {
             "row_errors": {
@@ -323,7 +339,9 @@ class TestComprehensiveSheets(TestCase):
     The import file had an additional users block that contains missing users.
     """
     response = self.import_file(
-        "importing_task_group_task_warnings_and_errors.csv")
+        "importing_task_group_task_warnings_and_errors.csv",
+        safe=False
+    )
 
     expected_errors = {
         "Task Group Task": {
@@ -351,7 +369,8 @@ class TestComprehensiveSheets(TestCase):
 
   def test_missing_rich_text_field(self):
     """MISSING_VALUE_ERROR is returned on empty mandatory description."""
-    response = self.import_file("risk_missing_mandatory_description.csv")
+    response = self.import_file("risk_missing_mandatory_description.csv",
+                                safe=False)
 
     expected_errors = {
         "Risk": {

@@ -86,7 +86,7 @@ import Permission from '../permission';
           (instance === GGRC.page_instance())) {
           GGRC.navigate('/dashboard');
         } else if (modelName === 'people' || modelName === 'roles') {
-          window.location.assign('/admin#' + modelName + '_list_widget');
+          window.location.assign('/admin#' + modelName + '_list');
           GGRC.navigate();
         } else {
           $trigger.trigger('modal:success', data);
@@ -463,7 +463,6 @@ import Permission from '../permission';
       }).length < 1) {
       $el.on('keypress.preventdoublesubmit', function (ev) {
         if (ev.which === 13 &&
-          !$(document.activeElement).hasClass('wysihtml5') &&
           !$(document.activeElement).hasClass('create-form__input') &&
           !$(document.activeElement).parents('.pagination').length
         ) {

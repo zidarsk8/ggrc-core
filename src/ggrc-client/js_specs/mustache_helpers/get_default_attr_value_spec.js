@@ -77,4 +77,23 @@ describe('can.mustache.helper.get_default_attr_value', function () {
       }
     );
   });
+
+  describe('retrieving a rich text attribute', function () {
+    beforeEach(function () {
+      instance.attr('notes', 'Notes');
+    });
+
+    it('returns a correctly formatted value through the .attr() method',
+      function () {
+        let result;
+        spyOn(instance, 'attr')
+          .and.returnValue('<p><strong>Example</strong></p><p>Notes</p>');
+
+        result = helper('notes', instance);
+
+        expect(instance.attr).toHaveBeenCalledWith('notes');
+        expect(result).toEqual('Example \n Notes');
+      }
+    );
+  });
 });

@@ -26,10 +26,9 @@ class TestControlsImport(TestCase):
     super(TestControlsImport, self).setUp()
     self.client.get("/login")
 
-  def test_import_controls_with_evidence(self):
-    """Test importing of assessments with templates."""
-    response = self.import_file("controls_no_warnings.csv")
-    self._check_csv_response(response, {})
+  def test_import_controls_with_documents(self):
+    """Controls can be imported with Documents."""
+    self.import_file("controls_no_warnings.csv")
 
     document = all_models.Document.query.filter_by(
         link="https://img_123.jpg").all()
@@ -142,8 +141,8 @@ class TestControlsImport(TestCase):
 
     self.assertEquals([expected_warning], response[0]['row_warnings'])
 
-  def test_import_assessment_with_doc_file_existing(self):
-    """If file already mapped to document not show warning to user"""
+  def test_import_control_with_doc_file_existing(self):
+    """If file already mapped to control not show warning to user"""
     doc_url = "test_gdrive_url"
 
     with factories.single_commit():
@@ -159,7 +158,29 @@ class TestControlsImport(TestCase):
     ]))
     self.assertEquals([], response[0]['row_warnings'])
 
-  def test_import_assessment_with_doc_file_multiple(self):
+  def test_import_control_with_doc_url_existing(self):
+    """If reference url already mapped to control ignore it"""
+    doc_reference_url = "test_reference_url"
+
+    with factories.single_commit():
+      control = factories.ControlFactory()
+      control_slug = control.slug
+      doc = factories.DocumentReferenceUrlFactory(link=doc_reference_url)
+      factories.RelationshipFactory(source=control,
+                                    destination=doc)
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Control"),
+        ("Code*", control_slug),
+        ("Reference Url", doc_reference_url),
+    ]))
+
+    documents = all_models.Document.query.filter_by(
+        link=doc_reference_url
+    ).all()
+    self.assertEquals(1, len(documents))
+    self.assertEquals([], response[0]['row_warnings'])
+
+  def test_import_control_with_doc_file_multiple(self):
     """Show warning if at least one of Document Files not mapped"""
     doc_url = "test_gdrive_url"
 

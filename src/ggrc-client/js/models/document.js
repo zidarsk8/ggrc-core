@@ -60,7 +60,11 @@ can.Model.Cacheable('CMS.Models.Document', {
       {attr_title: 'Last Updated By', attr_name: 'modified_by'},
       {attr_title: 'Last Updated', attr_name: 'updated_at'},
       {attr_title: 'Last Deprecated Date', attr_name: 'last_deprecated_date'},
-    ],
+      {
+        attr_title: 'Description',
+        attr_name: 'description',
+        disable_sorting: true,
+      }],
     add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
   },
   init: function () {

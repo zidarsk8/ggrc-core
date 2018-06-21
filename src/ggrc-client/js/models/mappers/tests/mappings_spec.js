@@ -24,6 +24,7 @@ describe('GGRC.Mappings', function () {
         'Facility',
         'Issue',
         'Market',
+        'Metric',
         'Objective',
         'OrgGroup',
         'Person',
@@ -106,6 +107,7 @@ describe('GGRC.Mappings', function () {
     Issue: _.difference(filtered, [
       'Audit', 'Person', 'Workflow', 'Assessment']),
     Market: filtered,
+    Metric: filtered,
     Objective: filtered,
     OrgGroup: filtered,
     Person: _.difference(filtered, ['Person', 'Audit', 'TaskGroup',

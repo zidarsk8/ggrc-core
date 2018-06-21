@@ -49,7 +49,7 @@ setup () {
 
   git submodule update --init
 
-  docker-compose --file docker-compose-testing.yml \
+  docker-compose --file ${DOCKER_COMPOSE_FILE} \
     --project-name ${PROJECT} \
     up --build --force-recreate -d ${SERVICE}
 }
@@ -62,7 +62,7 @@ teardown () {
     PROJECT="${1}"
   fi
 
-  docker-compose --file docker-compose-testing.yml -p ${PROJECT} stop
+  docker-compose --file ${DOCKER_COMPOSE_FILE} -p ${PROJECT} stop
 }
 
 print_line () {
@@ -310,8 +310,6 @@ code_style_tests () {
   fi
 
   print_line
-
-  teardown $PROJECT
 
   echo '<?xml version="1.0" encoding="UTF-8"?>
 <testsuite name="code-style" tests="3" errors="'$((pylint_rc + flake_rc))'" failures="0" skip="0">

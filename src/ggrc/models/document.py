@@ -89,8 +89,8 @@ class Document(Roleable, Relatable, mixins.Titled,
   _aliases = {
       'title': 'Title',
       'link': 'Link',
-      'description': 'description',
-      'kind': 'type',
+      'description': 'Description',
+      'kind': 'Type',
   }
 
   ALLOWED_PARENTS = {'Control', 'Issue', 'RiskAssessment'}

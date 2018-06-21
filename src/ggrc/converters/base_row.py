@@ -19,27 +19,33 @@ from ggrc.utils import dump_attrs
 
 class RowConverter(object):
   """Base class for handling row data."""
-
-  def __init__(self, block_converter, object_class, **options):
+  # pylint: disable=too-few-public-methods
+  def __init__(self, block_converter, object_class, headers, options):
     self.block_converter = block_converter
-    self.options = options.copy()
     self.object_class = object_class
+    self.headers = headers
     self.obj = options.get("obj")
-    self.from_ids = self.obj is not None
+    self.attrs = collections.OrderedDict()
+    self.objects = collections.OrderedDict()
+    self.old_values = {}
+
+
+class ImportRowConverter(RowConverter):
+  """Class for handling row data for import"""
+  # pylint: disable=too-many-instance-attributes
+  def __init__(self, block_converter, object_class, headers, index, **options):
+    super(ImportRowConverter, self).__init__(block_converter, object_class,
+                                             headers, options)
+    self.index = index
     self.is_new = True
     self.is_delete = False
     self.is_deprecated = False
     self.do_not_expunge = False
     self.ignore = False
-    self.index = options.get("index", -1)
     self.row = options.get("row", [])
-    self.attrs = collections.OrderedDict()
-    self.objects = collections.OrderedDict()
     self.id_key = ""
-    self.line = self.index + self.block_converter.offset +\
+    self.line = self.index + self.block_converter.offset + \
         self.block_converter.BLOCK_OFFSET
-    self.headers = options.get("headers", [])
-    self.old_values = {}
     self.initial_state = None
 
   def add_error(self, template, **kwargs):
@@ -89,15 +95,6 @@ class RowConverter(object):
           self.obj = self.get_or_generate_object(attr_name)
           item.set_obj_attr()
       item.check_unique_consistency()
-
-  def handle_obj_row_data(self):
-    for attr_name, header_dict in self.headers.items():
-      handler = header_dict["handler"]
-      item = handler(self, attr_name, **header_dict)
-      if header_dict.get("type") == AttributeInfo.Type.PROPERTY:
-        self.attrs[attr_name] = item
-      else:
-        self.objects[attr_name] = item
 
   def handle_row_data(self, field_list=None):
     """Handle row data on import"""
@@ -284,8 +281,24 @@ class RowConverter(object):
     """
     if not self.obj or self.ignore or self.is_delete:
       return
-    for secondery_object in self.objects.values():
-      secondery_object.insert_object()
+    for secondary_object in self.objects.values():
+      secondary_object.insert_object()
+
+
+class ExportRowConverter(RowConverter):
+  """Class for handling row data for export"""
+  def __init__(self, block_converter, object_class, headers, **options):
+    super(ExportRowConverter, self).__init__(block_converter, object_class,
+                                             headers, options)
+
+  def handle_obj_row_data(self):
+    for attr_name, header_dict in self.headers.items():
+      handler = header_dict["handler"]
+      item = handler(self, attr_name, **header_dict)
+      if header_dict.get("type") == AttributeInfo.Type.PROPERTY:
+        self.attrs[attr_name] = item
+      else:
+        self.objects[attr_name] = item
 
   def to_array(self, fields):
     """Get an array representation of the current row.

@@ -60,6 +60,7 @@ GGRC_IMPORTABLE = {
     "standard": all_models.Standard,
     "system": all_models.System,
     "vendor": all_models.Vendor,
+    "metric": all_models.Metric,
 }
 
 GGRC_EXPORTABLE = {

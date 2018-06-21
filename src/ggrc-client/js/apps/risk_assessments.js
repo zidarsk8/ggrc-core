@@ -3,6 +3,13 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  Proxy,
+  Direct,
+  Multi,
+  TypeFilter,
+} from '../models/mappers/mapper-helpers';
+
 (function ($, CMS, GGRC) {
   let RiskAssessmentsExtension = {};
   let _risk_assessments_object_types = ['Program'];
@@ -21,11 +28,6 @@
 
   // Configure mapping extensions for ggrc_risk_assessments
   RiskAssessmentsExtension.init_mappings = function () {
-    let Proxy = GGRC.MapperHelpers.Proxy;
-    let Direct = GGRC.MapperHelpers.Direct;
-    let Multi = GGRC.MapperHelpers.Multi;
-    let TypeFilter = GGRC.MapperHelpers.TypeFilter;
-
     let mappings = {
       Program: {
         risk_assessments: Direct('RiskAssessment',

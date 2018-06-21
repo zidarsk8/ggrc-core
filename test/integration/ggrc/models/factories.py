@@ -231,6 +231,7 @@ class AssessmentTemplateFactory(TitledFactory):
   class Meta:
     model = all_models.AssessmentTemplate
 
+  audit = factory.LazyAttribute(lambda m: AuditFactory())
   template_object_type = None
   test_plan_procedure = False
   procedure_description = factory.LazyAttribute(
@@ -516,6 +517,12 @@ class ImportExportFactory(ModelFactory):
     """Stub to disable parent method"""
 
 
+class MetricFactory(TitledFactory):
+
+  class Meta:
+    model = all_models.Metric
+
+
 def get_model_factory(model_name):
   """Get object factory for provided model name"""
   from integration.ggrc_workflows.models import factories as wf_factories
@@ -562,5 +569,6 @@ def get_model_factory(model_name):
       "Workflow": wf_factories.WorkflowFactory,
       "Proposal": ProposalFactory,
       "ImportExport": ImportExportFactory,
+      "Metric": MetricFactory,
   }
   return model_factories[model_name]

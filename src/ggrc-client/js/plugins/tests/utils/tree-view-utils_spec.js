@@ -41,6 +41,9 @@ describe('TreeViewUtils module', function () {
         id: 16, attribute_type: 'Text',
         definition_type: 'market', title: 'CA def 16',
       }, {
+        id: 17, attribute_type: 'Rich Text',
+        definition_type: 'market', title: 'CA def 17',
+      }, {
         id: 5, attribute_type: 'Text',
         definition_type: 'policy', title: 'CA def 5',
       }, {
@@ -70,6 +73,39 @@ describe('TreeViewUtils module', function () {
         expect(result).toContain(jasmine.objectContaining(expected));
       });
     });
+
+    it('Sets disable_sorting flag to true for the GCAs with "Rich Text" type ',
+      function () {
+        let expected = {
+          attr_type: 'custom',
+          attr_title: 'CA def 17',
+          attr_name: 'CA def 17',
+          attr_sort_field: 'CA def 17',
+          disable_sorting: true,
+        };
+
+        let result = method('Market', null);
+        result = _.filter(result.available, {attr_type: 'custom'});
+
+        expect(result).toContain(jasmine.objectContaining(expected));
+      });
+
+    it(`Sets disable_sorting flag to false for the GCAs
+     with not "Rich Text" type `,
+      function () {
+        let expected = {
+          attr_type: 'custom',
+          attr_title: 'CA def 16',
+          attr_name: 'CA def 16',
+          attr_sort_field: 'CA def 16',
+          disable_sorting: false,
+        };
+
+        let result = method('Market', null);
+        result = _.filter(result.available, {attr_type: 'custom'});
+
+        expect(result).toContain(jasmine.objectContaining(expected));
+      });
   });
 
   describe('getSortingForModel() method', function () {

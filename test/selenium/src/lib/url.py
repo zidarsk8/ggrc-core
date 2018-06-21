@@ -16,6 +16,7 @@ API = "api"
 LOGIN = "login"
 DASHBOARD = "dashboard"
 ADMIN_DASHBOARD = "admin"
+PEOPLE_TAB = "#!people_list_widget"
 AUDIT = AUDITS + "/{0}"
 RELATIONSHIPS = "relationships"
 OBJECT_OWNERS = "object_owners"
@@ -32,19 +33,19 @@ class Widget(object):
   """URL's constants parts for widgets."""
   # pylint: disable=too-few-public-methods
   # admin dashboard page
-  CUSTOM_ATTRIBUTES = "#!custom_attribute_widget"
-  EVENTS = "#!events_list_widget"
-  ROLES = "#!roles_list_widget"
-  PEOPLE = "#!people_list_widget"
+  CUSTOM_ATTRIBUTES = "#!custom_attribute"
+  EVENTS = "#!events_list"
+  ROLES = "#!roles_list"
+  PEOPLE = "#!people_list"
   # widgets
-  INFO = "#!info_widget"
-  AUDITS = "#!audit_widget"
-  SUMMARY = "#!Summary_widget"  # audits
-  ASSESSMENTS = "#!assessment_widget"
-  ASSESSMENT_TEMPLATES = "#!assessment_template_widget"
-  CONTROLS = "#!control_widget"
-  ISSUES = "#!issue_widget"
-  PROGRAMS = "#!program_widget"
+  INFO = "#!info"
+  AUDITS = "#!audit"
+  SUMMARY = "#!summary"  # audits
+  ASSESSMENTS = "#!assessment"
+  ASSESSMENT_TEMPLATES = "#!assessment_template"
+  CONTROLS = "#!control"
+  ISSUES = "#!issue"
+  PROGRAMS = "#!program"
 
 
 class Urls(object):
@@ -53,6 +54,7 @@ class Urls(object):
 
   def __init__(self):
     self.admin_dashboard = environment.app_url + ADMIN_DASHBOARD
+    self.admin_people_tab = self.admin_dashboard + PEOPLE_TAB
     self.dashboard = environment.app_url + DASHBOARD
     self.login = environment.app_url + LOGIN
     self.gae_login = environment.app_url + GAE_LOGIN
@@ -85,7 +87,7 @@ class Utils(object):
     """
     middle_part = (get_singular(obj_name) if not is_versions_widget else
                    get_singular(obj_name, title=True) + "_versions")
-    return "#!" + middle_part + "_widget"
+    return "#!" + middle_part
 
   @staticmethod
   def get_src_obj_url(url):

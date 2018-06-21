@@ -172,3 +172,8 @@ class DynamicTreeToggle(base.Toggle):
 class WidgetAdminCustomAttributes(base.Widget):
   """Base model for custom attributes on Admin Dashboard page."""
   _locators = locator.AdminCustomAttributes
+
+
+class WidgetAdminPeople(base.Widget):
+  """Base model for people on Admin Dashboard page."""
+  _locators = locator.WidgetAdminPeople

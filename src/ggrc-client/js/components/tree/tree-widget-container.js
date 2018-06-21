@@ -628,6 +628,11 @@ viewModel = can.Map.extend({
         ') .tree-item-content')
       .addClass('item-active');
   },
+  showLastPage: function () {
+    const lastPageIndex = this.attr('pageInfo.count');
+
+    this.attr('pageInfo.current', lastPageIndex);
+  },
 });
 
 /**
@@ -713,8 +718,6 @@ export default GGRC.Components('treeWidgetContainer', {
       let componentSelector = 'assessment-info-pane';
       let itemIndex = this.viewModel.attr('selectedItem');
       let pageInfo = this.viewModel.attr('pageInfo');
-      let newInstance;
-      let items;
 
       let relativeIndex = this.viewModel
         .getRelativeItemNumber(itemIndex, pageInfo.pageSize);
@@ -730,13 +733,24 @@ export default GGRC.Components('treeWidgetContainer', {
 
       pageLoadDfd
         .then(function () {
-          items = this.viewModel.attr('showedItems');
-          newInstance = items[relativeIndex];
+          const items = this.viewModel.attr('showedItems');
+          const newInstance = items[relativeIndex];
+
+          if (!newInstance) {
+            this.viewModel.closeInfoPane();
+            this.viewModel.showLastPage();
+
+            return can.Deferred().resolve();
+          }
 
           return newInstance
             .refresh();
         }.bind(this))
-        .then(function () {
+        .then(function (newInstance) {
+          if (!newInstance) {
+            return;
+          }
+
           pinControl
             .updateInstance(componentSelector, newInstance);
           newInstance.dispatch('refreshRelatedDocuments');
@@ -748,9 +762,7 @@ export default GGRC.Components('treeWidgetContainer', {
           this.viewModel.updateActiveItemIndicator(relativeIndex);
         }.bind(this))
         .fail(function () {
-          $('body').trigger('ajax:flash', {
-            error: 'Failed to fetch an object.',
-          });
+          GGRC.Errors.notifier('error', 'Failed to fetch an object.');
         })
         .always(function () {
           pinControl.setLoadingIndicator(componentSelector, false);

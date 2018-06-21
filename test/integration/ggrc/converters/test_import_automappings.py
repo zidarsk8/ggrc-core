@@ -13,8 +13,7 @@ class TestBasicCsvImport(TestCase):
     self.client.get("/login")
 
   def test_basic_automappings(self):
-    filename = "automappings.csv"
-    response = self.import_file(filename)
+    self.import_file("automappings.csv")
     data = [{
         "object_name": "Program",
         "filters": {

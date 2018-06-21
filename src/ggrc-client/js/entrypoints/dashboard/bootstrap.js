@@ -59,7 +59,7 @@ if (!isAssessmentsView && getPageType() !== 'Workflow') {
 
 $area.cms_controllers_page_object(can.extend({
   widget_descriptors: widgetList,
-  default_widgets: defaults || GGRC.default_widgets || [],
+  default_widgets: defaults || [],
   instance: GGRC.page_instance(),
   header_view: GGRC.mustache_path + '/base_objects/page_header.mustache',
   GGRC: GGRC,  // make the global object available in Mustache templates

@@ -601,13 +601,13 @@ def get_cycle_dict(cycle, manual=False):
 
 
 def get_workflow_url(workflow):
-  url = "workflows/{}#current_widget".format(workflow.id)
+  url = "workflows/{}#current".format(workflow.id)
   return urljoin(get_url_root(), url)
 
 
 def get_cycle_task_url():
   """Get CycleTask notification url."""
-  return urljoin(get_url_root(), u"dashboard#!task_widget")
+  return urljoin(get_url_root(), u"dashboard#!task")
 
 
 def cycle_task_group_url(cycle_task, filter_exp=u""):
@@ -626,7 +626,7 @@ def cycle_task_group_url(cycle_task, filter_exp=u""):
 
   url = (u"/workflows/{workflow_id}"
          u"{filter_exp}"
-         u"#current_widget/cycle/{cycle_id}"
+         u"#current/cycle/{cycle_id}"
          u"/cycle_task_group/{cycle_task_group_id}").format(
       workflow_id=cycle_task.cycle_task_group.cycle.workflow.id,
       filter_exp=filter_exp,
@@ -652,7 +652,7 @@ def cycle_task_workflow_cycle_url(cycle_task, filter_exp=u""):
 
   url = (u"/workflows/{workflow_id}"
          u"{filter_exp}"
-         u"#current_widget/cycle/{cycle_id}").format(
+         u"#current/cycle/{cycle_id}").format(
       workflow_id=cycle_task.cycle_task_group.cycle.workflow.id,
       filter_exp=filter_exp,
       cycle_id=cycle_task.cycle_task_group.cycle.id,

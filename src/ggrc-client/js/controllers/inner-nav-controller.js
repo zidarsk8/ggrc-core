@@ -88,7 +88,7 @@ export default can.Control({
     let widget = this.widget_by_selector('#' + path);
     if (!widget && widgetList.length) {
       // Target was not found, but we can select the first widget in the list
-      let widgetId = widgetList[0].internav_id + '_widget';
+      let widgetId = widgetList[0].internav_id;
       router.attr('widget', widgetId);
       return;
     }
@@ -221,7 +221,7 @@ export default can.Control({
       widgetType: getWidgetType(widgetOptions.widget_id),
       internav_display: title,
       internav_id: widgetOptions.widget_id,
-      internav_href: buildUrl({widget: widgetOptions.widget_id + '_widget'}),
+      internav_href: buildUrl({widget: widgetOptions.widget_id}),
       forceRefetch: widgetOptions && widgetOptions.forceRefetch,
       spinner: this.options.spinners['#' + $widget.attr('id')],
       model: widgetOptions && widgetOptions.model,

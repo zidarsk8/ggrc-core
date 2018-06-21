@@ -290,13 +290,16 @@ class AutoStatusChangeable(object):
         service: The instance of Resource handling the PUT request.
       """
       # pylint: disable=unused-argument,unused-variable,protected-access
-
       endpoints = [obj.source.type, obj.destination.type]
       if model.__name__ not in endpoints:
         return
       target_object, related_object = cls._get_target_related(model, obj)
       related_mapping = cls.RELATED_OBJ_STATUS_MAPPING.get(related_object.type)
       if not related_mapping:
+        return
+      target_obj_attrs = inspect(target_object).attrs
+      if getattr(target_obj_attrs, "status", None) and \
+         target_obj_attrs.status.history.has_changes():
         return
       key = related_mapping['key'](related_object)
       monitor_states = related_mapping['mappings'].get(key, set())

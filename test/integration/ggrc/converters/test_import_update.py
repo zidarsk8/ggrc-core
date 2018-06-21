@@ -18,10 +18,7 @@ class TestImportUpdates(TestCase):
 
   def test_policy_basic_update(self):
     """ Test simple policy title update """
-    filename = "policy_basic_import.csv"
-    response = self.import_file(filename)
-
-    self._check_csv_response(response, {})
+    self.import_file("policy_basic_import.csv")
 
     policy = models.Policy.query.filter_by(slug="p1").first()
     self.assertEqual(policy.title, "some weird policy")
@@ -31,9 +28,7 @@ class TestImportUpdates(TestCase):
     ).count()
     self.assertEqual(revision_count, 2)
 
-    filename = "policy_basic_import_update.csv"
-    response = self.import_file(filename)
-    self._check_csv_response(response, {})
+    self.import_file("policy_basic_import_update.csv")
 
     policy = models.Policy.query.filter_by(slug="p1").first()
     self.assertEqual(policy.title, "Edited policy")

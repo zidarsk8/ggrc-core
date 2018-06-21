@@ -11,7 +11,6 @@ from docbuilder.descriptors.model import Model
 
 MOCK_DATA = {
     "id": "1",
-    "context": """{{ "id": 1, "type": "Context" }}""",
     "default_to_current_user": 'false',
     "delete": 'false',
     "mandatory": 'true',

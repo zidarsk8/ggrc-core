@@ -14,41 +14,25 @@ from ggrc.utils import structures
 from ggrc.cache.memcache import MemCache
 from ggrc.converters import get_exportables
 from ggrc.converters import import_helper
-from ggrc.converters.base_block import BlockConverter
+from ggrc.converters import base_block
 from ggrc.converters.snapshot_block import SnapshotBlockConverter
 from ggrc.converters.import_helper import extract_relevant_data
-from ggrc.converters.import_helper import split_array
+from ggrc.converters.import_helper import split_blocks
 from ggrc.converters.import_helper import CsvStringBuilder
 from ggrc.fulltext import get_indexer
 
 
 class BaseConverter(object):
   """Base class for csv converters."""
-  def __init__(self, **kwargs):
-    self.dry_run = kwargs.get("dry_run", True)
-    self.csv_data = kwargs.get("csv_data", [])
-    self.ids_by_type = kwargs.get("ids_by_type", [])
-    self.block_converters = []
+  # pylint: disable=too-few-public-methods
+  def __init__(self):
     self.new_objects = defaultdict(structures.CaseInsensitiveDict)
     self.shared_state = {}
     self.response_data = []
     self.exportable = get_exportables()
-    self.indexer = get_indexer()
 
   def get_info(self):
-    for converter in self.block_converters:
-      self.response_data.append(converter.get_info())
-    return self.response_data
-
-  def get_object_names(self):
-    return [c.name for c in self.block_converters]
-
-  @classmethod
-  def drop_cache(cls):
-    if not getattr(settings, 'MEMCACHE_MECHANISM', False):
-      return
-    memcache = MemCache()
-    memcache.clean()
+    raise NotImplementedError()
 
 
 class ImportConverter(BaseConverter):
@@ -58,26 +42,6 @@ class ImportConverter(BaseConverter):
   blocks and columns are handled in the correct order.
   """
 
-  CLASS_ORDER = [
-      "Person",
-      "Program",
-      "Risk Assessment",
-      "Audit",
-      "Issue",
-      "Assessment",
-      "Policy",
-      "Regulation",
-      "Standard",
-      "Section",
-      "Control",
-      "Assessment Template",
-      "Custom Attribute Definition",
-      "Assessment",
-      "Workflow",
-      "Task Group",
-      "Task Group Task",
-  ]
-
   priority_columns = [
       "email",
       "slug",
@@ -86,60 +50,51 @@ class ImportConverter(BaseConverter):
       "audit",
   ]
 
-  def initialize_block_converters(self):
-    """ Initialize block converters.
+  def __init__(self, dry_run=True, csv_data=None):
+    self.dry_run = dry_run
+    self.csv_data = csv_data or []
+    self.indexer = get_indexer()
+    super(ImportConverter, self).__init__()
 
-    Prepare BlockConverters and order them like specified in self.CLASS_ORDER.
-    """
-    offsets, data_blocks = split_array(self.csv_data)
-    for offset, data in zip(offsets, data_blocks):
-      if len(data) < 2:
-        continue  # empty block
+  def get_info(self):
+    return self.response_data
+
+  def initialize_block_converters(self):
+    """Initialize block converters."""
+    offsets_and_data_blocks = split_blocks(self.csv_data)
+    for offset, data in offsets_and_data_blocks:
       class_name = data[1][0].strip().lower()
       object_class = self.exportable.get(class_name)
       raw_headers, rows = extract_relevant_data(data)
-      block_converter = BlockConverter(self, object_class=object_class,
-                                       rows=rows, raw_headers=raw_headers,
-                                       offset=offset, class_name=class_name)
+      block_converter = base_block.ImportBlockConverter(
+          self,
+          object_class=object_class,
+          rows=rows,
+          raw_headers=raw_headers,
+          offset=offset,
+          class_name=class_name,
+      )
       block_converter.check_block_restrictions()
-      self.block_converters.append(block_converter)
-
-    order = defaultdict(int)
-    order.update({c: i for i, c in enumerate(self.CLASS_ORDER)})
-    order["Person"] = -1
-    self.block_converters.sort(key=lambda x: order[x.name])
+      yield block_converter
 
   def import_csv_data(self):
-    self.initialize_block_converters()
-    self.row_converters_from_csv()
-    self.handle_priority_columns()
-    self.import_objects()
-    self.import_secondary_objects()
-    self._start_compute_attributes_job()
-    self.drop_cache()
+    revision_ids = []
 
-  def row_converters_from_csv(self):
-    for converter in self.block_converters:
+    for converter in self.initialize_block_converters():
       converter.row_converters_from_csv()
-
-  def handle_priority_columns(self):
-    for attr_name in self.priority_columns:
-      for block_converter in self.block_converters:
-        block_converter.handle_row_data(attr_name)
-
-  def import_objects(self):
-    for converter in self.block_converters:
+      for attr_name in self.priority_columns:
+        converter.handle_row_data(attr_name)
       converter.handle_row_data()
       converter.import_objects()
+      converter.import_secondary_objects()
 
-  def import_secondary_objects(self):
-    for block_converter in self.block_converters:
-      block_converter.import_secondary_objects()
+      self.response_data.append(converter.get_info())
+      revision_ids.extend(converter.revision_ids)
 
-  def _start_compute_attributes_job(self):
-    revision_ids = []
-    for block_converter in self.block_converters:
-      revision_ids.extend(block_converter.revision_ids)
+    self._start_compute_attributes_job(revision_ids)
+    self.drop_cache()
+
+  def _start_compute_attributes_job(self, revision_ids):
     if revision_ids:
       cur_user = login.get_current_user()
       deferred.defer(
@@ -148,6 +103,13 @@ class ImportConverter(BaseConverter):
           cur_user.id
       )
 
+  @classmethod
+  def drop_cache(cls):
+    if not getattr(settings, 'MEMCACHE_MECHANISM', False):
+      return
+    memcache = MemCache()
+    memcache.clean()
+
 
 class ExportConverter(BaseConverter):
   """Export Converter.
@@ -155,6 +117,20 @@ class ExportConverter(BaseConverter):
   This class contains and handles all block converters and makes sure that
   blocks and columns are handled in the correct order.
   """
+
+  def __init__(self, ids_by_type):
+    super(ExportConverter, self).__init__()
+    self.dry_run = True  # TODO: fix ColumnHandler to not use it for exports
+    self.block_converters = []
+    self.ids_by_type = ids_by_type
+
+  def get_object_names(self):
+    return [c.name for c in self.block_converters]
+
+  def get_info(self):
+    for converter in self.block_converters:
+      self.response_data.append(converter.get_info())
+    return self.response_data
 
   def initialize_block_converters(self):
     """Generate block converters.
@@ -173,10 +149,13 @@ class ExportConverter(BaseConverter):
             SnapshotBlockConverter(self, object_ids, fields=fields)
         )
       else:
-        block_converter = BlockConverter(self, object_class=object_class,
-                                         fields=fields, object_ids=object_ids,
-                                         class_name=class_name)
-        block_converter.check_block_restrictions()
+        block_converter = base_block.ExportBlockConverter(
+            self,
+            object_class=object_class,
+            fields=fields,
+            object_ids=object_ids,
+            class_name=class_name,
+        )
         self.block_converters.append(block_converter)
 
   def export_csv_data(self):

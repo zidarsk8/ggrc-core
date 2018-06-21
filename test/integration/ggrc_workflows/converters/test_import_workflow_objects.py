@@ -40,10 +40,7 @@ class TestWorkflowObjectsImport(TestCase):
 
   def test_full_good_import(self):
     """Test full good import without any warnings."""
-    filename = "workflow_small_sheet.csv"
-    response = self.import_file(filename)
-
-    self._check_csv_response(response, {})
+    self.import_file("workflow_small_sheet.csv")
 
     self.assertEqual(1, Workflow.query.count())
     self.assertEqual(1, TaskGroup.query.count())
@@ -60,13 +57,13 @@ class TestWorkflowObjectsImport(TestCase):
 
   def test_bad_imports(self):
     """Test workflow import with errors and warnings"""
-    filename = "workflow_with_warnings_and_errors.csv"
-    response = self.import_file(filename)
+    response = self.import_file("workflow_with_warnings_and_errors.csv",
+                                safe=False)
 
     expected_errors = {
         "Workflow": {
             "row_warnings": {
-                errors.OWNER_MISSING.format(line=8, column_name="Admin")
+                errors.OWNER_MISSING.format(line=14, column_name="Admin")
             },
         }
     }
@@ -84,19 +81,18 @@ class TestWorkflowObjectsImport(TestCase):
         type.
 
     """
-    filename = "workflow_big_sheet.csv"
-    response = self.import_file(filename)
+    response = self.import_file("workflow_big_sheet.csv", safe=False)
     expected_errors = {
         "Task Group Task": {
             "row_warnings": {
                 errors.WRONG_REQUIRED_VALUE.format(
-                    line=38, value="aaaa", column_name="Task Type"
+                    line=82, value="aaaa", column_name="Task Type"
                 ),
                 errors.MISSING_VALUE_WARNING.format(
-                    line=39, default_value="Rich Text", column_name="Task Type"
+                    line=83, default_value="Rich Text", column_name="Task Type"
                 ),
                 errors.MISSING_VALUE_WARNING.format(
-                    line=40, default_value="Rich Text", column_name="Task Type"
+                    line=84, default_value="Rich Text", column_name="Task Type"
                 ),
             }
         },
@@ -133,7 +129,7 @@ class TestWorkflowObjectsImport(TestCase):
     being bigger than the end date.
     """
     self.import_file("workflow_small_sheet.csv")
-    response = self.import_file("workflow_bad_task_dates.csv")
+    response = self.import_file("workflow_bad_task_dates.csv", safe=False)
 
     expected_errors = {
         "Task Group Task": {

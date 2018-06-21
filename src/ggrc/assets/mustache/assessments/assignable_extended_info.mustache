@@ -7,7 +7,7 @@
   <div class="row-fluid">
     <div class="span12">
       {{#using program=instance.program}}
-        <a class="main-title {{instance.class.category}} oneline" href="{{#is_allowed 'view_object_page' 'Program' context=program.context}}{{viewLink}}{{else}}/dashboard#audit_widget/audit/{{id}}{{/is_allowed}}">
+        <a class="main-title {{instance.class.category}} oneline" href="{{#is_allowed 'view_object_page' 'Program' context=program.context}}{{viewLink}}{{else}}/dashboard#audit/audit/{{id}}{{/is_allowed}}">
           {{instance.title}}
         </a>
       {{/using}}
@@ -61,7 +61,7 @@
     <div class="row-fluid">
       <div class="span12">
         {{#using program=instance.program}}
-          <a class="secondary oneline {{instance.class.category}}" href="{{#is_allowed 'view_object_page' 'Program' context=program.context}}{{program.viewLink}}{{else}}/dashboard{{/is_allowed}}#audit_widget/audit/{{id}}">
+          <a class="secondary oneline {{instance.class.category}}" href="{{#is_allowed 'view_object_page' 'Program' context=program.context}}{{program.viewLink}}{{else}}/dashboard{{/is_allowed}}#audit/audit/{{id}}">
             View {{instance.title}}
           </a>
         {{/using}}

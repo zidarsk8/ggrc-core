@@ -146,8 +146,7 @@ class TestExportSingleObject(TestCase):
 
   def test_simple_relevant_query(self):
     """Test simple relevant query"""
-    res = self._import_file("data_for_export_testing_program_contract.csv")
-    self._check_csv_response(res, {})
+    self.import_file("data_for_export_testing_program_contract.csv")
     data = [{
         "object_name": "Program",
         "filters": {

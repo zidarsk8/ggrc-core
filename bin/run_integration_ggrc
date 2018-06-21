@@ -7,7 +7,9 @@ cd "${SCRIPTPATH}/../test"
 
 source "${SCRIPTPATH}/init_test_env"
 
-db_reset -d "ggrcdevtest"
+export GGRC_TEST_DB="test_ggrc"
+
+db_reset -d "$GGRC_TEST_DB"
 
 echo -e "\nRunning integration ggrc tests"
 nosetests integration \

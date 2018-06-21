@@ -24,7 +24,7 @@ import Permission from '../permission';
     destroy: 'DELETE /api/task_groups/{id}',
     mixins: ['contactable'],
     permalink_options: {
-      url: '<%= base.viewLink %>#task_group_widget/' +
+      url: '<%= base.viewLink %>#task_group/' +
       'task_group/<%= instance.id %>',
       base: 'workflow',
     },
@@ -46,6 +46,7 @@ import Permission from '../permission';
         {attr_title: 'Summary', attr_name: 'title'},
         {attr_title: 'Assignee', attr_name: 'assignee',
           attr_sort_field: 'contact'},
+        {attr_title: 'Description', attr_name: 'description'},
       ],
       disable_columns_configuration: true,
     },
@@ -98,7 +99,7 @@ import Permission from '../permission';
 
     mixins: ['contactable', 'timeboxed', 'accessControlList'],
     permalink_options: {
-      url: '<%= base.viewLink %>#task_group_widget/' +
+      url: '<%= base.viewLink %>#task_group/' +
       'task_group/<%= instance.task_group.id %>',
       base: 'task_group:workflow',
     },
@@ -112,6 +113,7 @@ import Permission from '../permission';
         '/task_group_tasks/tree-item-attr.mustache',
       mapper_attr_list: [
         {attr_title: 'Summary', attr_name: 'title'},
+        {attr_title: 'Description', attr_name: 'description'},
       ],
       disable_columns_configuration: true,
       assigneeRoleName: 'Task Assignees',

@@ -12,10 +12,11 @@ import re
 import pytest
 
 from lib import base, constants, url
-from lib.constants import objects, messages, users
+from lib.constants import objects, messages, users, roles
 from lib.constants.element import AdminWidgetCustomAttributes
 from lib.entities import entities_factory
 from lib.page import dashboard
+from lib.service import admin_webui_service
 from lib.utils import selenium_utils
 
 
@@ -89,3 +90,11 @@ class TestAdminDashboardPage(base.Test):
     # 'actual_ca': multi_choice_options (None)
     self.general_contain_assert(expected_ca, actual_cas,
                                 "multi_choice_options")
+
+  def test_create_new_person_w_no_role(self, selenium):
+    """Check newly created person is on Admin People widget"""
+    expected_person = entities_factory.PeopleFactory().create(
+        system_wide_role=roles.NO_ROLE)
+    actual_person = admin_webui_service.PeopleAdminWebUiService(
+        selenium).create_new_person(expected_person)
+    self.general_equal_assert(expected_person, actual_person)

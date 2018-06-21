@@ -5,14 +5,20 @@
 
 <div class="columns-wrapper">
   {{#each columns}}
-    <div class="title" can-click="applySort">
-      {{attr_title}}
-      {{#isSorted}}
-        <i class="fa
-          {{#isSortedAsc}}fa-caret-up{{/isSortedAsc}}
-          {{^isSortedAsc}}fa-caret-down{{/isSortedAsc}}">
-        </i>
-      {{/isSorted}}
-    </div>
+    {{#if disable_sorting}}
+      <div class="title">
+        {{attr_title}}
+      </div>
+    {{else}}
+      <div class="title title_sortable" can-click="applySort">
+        {{attr_title}}
+        {{#isSorted}}
+          <i class="fa
+            {{#isSortedAsc}}fa-caret-up{{/isSortedAsc}}
+            {{^isSortedAsc}}fa-caret-down{{/isSortedAsc}}">
+          </i>
+        {{/isSorted}}
+      </div>
+    {{/if}}
   {{/each}}
 </div>

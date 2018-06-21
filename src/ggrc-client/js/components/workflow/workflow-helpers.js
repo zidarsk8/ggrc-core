@@ -38,7 +38,7 @@ export default {
    * @param {number} id - cycle id.
    */
   redirectToCycle({id}) {
-    window.location.hash = `current_widget/cycle/${id}`;
+    window.location.hash = `current/cycle/${id}`;
   },
   generateCycle: function (workflow) {
     let dfd = new $.Deferred();

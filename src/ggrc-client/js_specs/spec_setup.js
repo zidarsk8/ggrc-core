@@ -41,7 +41,9 @@ GGRC.config = {
     'Regulation',
     'Threat',
     'Policy',
-    'Market'],
+    'Market',
+    'Metric',
+  ],
   VERSION: '1.0-Test (abc)',
 };
 GGRC.Bootstrap = {
@@ -124,6 +126,9 @@ GGRC.Bootstrap = {
     title_plural: 'Systems',
     model_singular: 'System',
   }, {
+    title_plural: 'Metrics',
+    model_singular: 'Metric',
+  }, {
     title_plural: 'Task Groups',
     model_singular: 'TaskGroup',
   }, {
@@ -205,6 +210,9 @@ GGRC.Bootstrap = {
   }, {
     title_plural: 'Systems',
     model_singular: 'System',
+  }, {
+    title_plural: 'Metrics',
+    model_singular: 'Metric',
   }, {
     title_plural: 'Task Groups',
     model_singular: 'TaskGroup',
