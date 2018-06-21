@@ -59,12 +59,6 @@ class SqlIndexer(object):
     if commit:
       db.session.commit()
 
-  def update_record(self, instance, commit=True):
-    """Update records values in db."""
-    # remove the obsolete index entries
-    self.delete_record(instance.id, instance.type, False)
-    self.create_record(instance, commit=commit)
-
   def delete_record(self, key, type, commit=True):
     """Delete records values in db for specific types."""
     db.session.query(
