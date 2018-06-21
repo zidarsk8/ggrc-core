@@ -364,12 +364,12 @@ Mustache.registerHelper('renderLive', function (template, context, options) {
 });
 
 // Renders one or more "hooks", which are templates registered under a
-//  particular key using GGRC.register_hook(), using the current context.
+//  particular key using registerHook, using the current context.
 //  Hook keys can be composed with dot separators by passing in multiple
 //  positional parameters.
 //
 // Example: {{{render_hooks 'Audit' 'test_info'}}}  renders all hooks registered
-//  with GGRC.register_hook("Audit.test_info", <template path>)
+//  with registerHook("Audit.test_info", <template path>)
 Mustache.registerHelper('render_hooks', function () {
   let args = can.makeArray(arguments);
   let options = args.splice(args.length - 1, 1)[0];

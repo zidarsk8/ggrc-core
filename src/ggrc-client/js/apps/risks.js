@@ -10,6 +10,7 @@ import {
   TypeFilter,
 } from '../models/mappers/mapper-helpers';
 import Mappings from '../models/mappers/mappings';
+import {registerHook} from '../plugins/ggrc_utils';
 
 (function ($, CMS, GGRC) {
   let RisksExtension = {};
@@ -317,7 +318,7 @@ import Mappings from '../models/mappers/mappings';
     new GGRC.WidgetList('ggrc_risks', descriptor);
   };
 
-  GGRC.register_hook('LHN.Sections_risk',
+  registerHook('LHN.Sections_risk',
     GGRC.mustache_path + '/dashboard/lhn_risks');
 
   RisksExtension.init_mappings();

@@ -6,6 +6,8 @@
 import {
   initCounts,
 } from '../plugins/utils/current-page-utils';
+import {registerHook} from '../plugins/ggrc_utils';
+
 import InfoWidget from '../controllers/info_widget_controller';
 import {
   Proxy,
@@ -302,7 +304,7 @@ import Mappings from '../models/mappers/mappings';
         'CMS.Models.TaskGroupObject.stubs';
 
       // Also register a render hook for object approval
-      GGRC.register_hook(
+      registerHook(
         type + '.info_widget_actions',
         GGRC.mustache_path + '/base_objects/approval_link.mustache'
       );
@@ -573,7 +575,7 @@ import Mappings from '../models/mappers/mappings';
     ]);
   };
 
-  GGRC.register_hook(
+  registerHook(
     'Dashboard.Widgets', GGRC.mustache_path + '/dashboard/widgets');
 
   WorkflowExtension.init_mappings();

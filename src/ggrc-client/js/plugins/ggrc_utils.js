@@ -483,6 +483,18 @@ function getAssigneeType(instance) {
   return userType;
 }
 
+function registerHook(path, hook) {
+  let h, parent_path, last;
+  parent_path = path.split('.');
+  last = parent_path.pop();
+  parent_path = can.getObject(parent_path.join('.'), GGRC.hooks, true);
+  if (!(h = parent_path[last])) {
+    h = new can.Observe.List();
+    parent_path[last] = h;
+  }
+  h.push(hook);
+}
+
 export {
   applyTypeFilter,
   commentSort,
@@ -501,5 +513,6 @@ export {
   getPlainText,
   getHighestAssigneeRole,
   getAssigneeType,
+  registerHook,
 };
 
