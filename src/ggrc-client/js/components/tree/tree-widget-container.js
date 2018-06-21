@@ -600,10 +600,10 @@ viewModel = can.Map.extend({
 /**
  *
  */
-export default GGRC.Components('treeWidgetContainer', {
+export default can.Component.extend({
   tag: 'tree-widget-container',
-  template: template,
-  viewModel: viewModel,
+  template,
+  viewModel,
   init: function () {
     let viewModel = this.viewModel;
     let parentInstance = viewModel.attr('parent_instance');

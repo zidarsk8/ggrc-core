@@ -6,9 +6,9 @@
 import '../person/person-data';
 import template from './templates/people-group-modal.mustache';
 
-export default GGRC.Components('peopleGroupModal', {
+export default can.Component.extend({
   tag: 'people-group-modal',
-  template: template,
+  template,
   viewModel: {
     define: {
       selectedCount: {

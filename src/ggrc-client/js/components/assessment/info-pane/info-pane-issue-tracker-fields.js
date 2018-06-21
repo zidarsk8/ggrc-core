@@ -10,9 +10,9 @@ import {showTrackerNotification} from
 
 const tag = 'info-pane-issue-tracker-fields';
 
-export default GGRC.Components('infoPaneIssueTrackerFields', {
-  tag: tag,
-  template: template,
+export default can.Component.extend({
+  tag,
+  template,
   viewModel: {
     instance: {},
   },

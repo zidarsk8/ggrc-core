@@ -12,9 +12,9 @@ import {
 } from '../../plugins/utils/query-api-utils';
 import {allowedToMap} from '../../plugins/ggrc_utils';
 
-export default GGRC.Components('issueUnmapItem', {
+export default can.Component.extend({
   tag: 'issue-unmap-item',
-  template: template,
+  template,
   viewModel: {
     define: {
       paging: {

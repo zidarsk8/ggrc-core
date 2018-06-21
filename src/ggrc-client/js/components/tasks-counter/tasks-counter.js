@@ -9,7 +9,7 @@ let baseCmpName = 'tasks-counter';
  *  Component to show number of Tasks Owned by Person
  *
  */
-export default GGRC.Components('tasksCounter', {
+export default can.Component.extend({
   tag: baseCmpName,
   template: '<div class="tasks-counter {{stateCss}}">{{tasksAmount}}</div>',
   viewModel: {

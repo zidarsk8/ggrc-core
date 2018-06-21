@@ -3,13 +3,16 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('GGRC.Components.TasksCounter', function () {
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../tasks-counter';
+
+describe('tasks-counter component', function () {
   'use strict';
 
   let viewModel;  // the viewModel under test
 
   beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('tasksCounter');
+    viewModel = getComponentVM(Component);
   });
 
   describe('initializes default viewModel values', function () {

@@ -12,9 +12,9 @@ import template from './external-data-autocomplete.mustache';
  * The autocomplete component used to load data from external sources.
  * When user picks an external item, system will create corresponding item in database.
  */
-export default GGRC.Components('externalDataAutocomplete', {
+export default can.Component.extend({
   tag: 'external-data-autocomplete',
-  template: template,
+  template,
   viewModel: {
     define: {
       /**

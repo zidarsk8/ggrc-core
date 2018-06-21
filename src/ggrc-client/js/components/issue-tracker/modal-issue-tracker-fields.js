@@ -11,9 +11,9 @@ import {showTrackerNotification} from
 
 const tag = 'modal-issue-tracker-fields';
 
-export default GGRC.Components('modalIssueTrackerFields', {
-  tag: tag,
-  template: template,
+export default can.Component.extend({
+  tag,
+  template,
   viewModel: {
     instance: {},
     issueTrackerEnabled: false,

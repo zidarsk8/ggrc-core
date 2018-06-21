@@ -8,17 +8,18 @@ import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 import Pagination from '../../base-objects/pagination';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../mapper-results';
 
-describe('GGRC.Components.mapperResults', function () {
+describe('mapper-results component', function () {
   'use strict';
 
   let viewModel;
 
   beforeEach(function () {
-    let Component = GGRC.Components.get('mapperResults');
     let init = Component.prototype.viewModel.init;
     Component.prototype.viewModel.init = undefined;
-    viewModel = GGRC.Components.getViewModel('mapperResults');
+    viewModel = getComponentVM(Component);
     viewModel.attr('mapper', {
       type: 'Control',
     });
@@ -825,7 +826,6 @@ describe('GGRC.Components.mapperResults', function () {
     let events;
 
     beforeEach(function () {
-      let Component = GGRC.Components.get('mapperResults');
       events = Component.prototype.events;
     });
 
@@ -938,9 +938,8 @@ describe('GGRC.Components.mapperResults', function () {
     let viewModel;
 
     beforeEach(function () {
-      let Component = GGRC.Components.get('mapperResults');
       Component.prototype.viewModel.init = undefined;
-      viewModel = GGRC.Components.getViewModel('mapperResults');
+      viewModel = getComponentVM(Component);
       viewModel.attr({});
     });
 

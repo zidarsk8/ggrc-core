@@ -9,7 +9,7 @@ import {
   initCounts,
 } from '../../plugins/utils/current-page-utils';
 
-export default GGRC.Components('addIssueButton', {
+export default can.Component.extend({
   tag: 'add-issue-button',
   template,
   viewModel: {

@@ -7,9 +7,9 @@ import template from './templates/info-issue-tracker-fields.mustache';
 
 const tag = 'info-issue-tracker-fields';
 
-export default GGRC.Components('infoIssueTrackerFields', {
-  tag: tag,
-  template: template,
+export default can.Component.extend({
+  tag,
+  template,
   viewModle: {
     instance: {},
   },

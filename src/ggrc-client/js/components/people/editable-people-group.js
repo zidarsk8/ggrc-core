@@ -88,10 +88,10 @@ let viewModel = peopleGroupVM.extend({
   },
 });
 
-export default GGRC.Components('editablePeopleGroup', {
+export default can.Component.extend({
   tag: 'editable-people-group',
-  template: template,
-  viewModel: viewModel,
+  template,
+  viewModel,
   events: {
     '{window} mousedown': function (el, ev) {
       let viewModel = this.viewModel;

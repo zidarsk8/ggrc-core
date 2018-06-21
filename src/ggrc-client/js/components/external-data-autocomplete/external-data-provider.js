@@ -6,7 +6,7 @@
 /**
  * The component is used to load data for autocomplete component from external sources.
  */
-export default GGRC.Components('externalDataProvider', {
+export default can.Component.extend({
   tag: 'external-data-provider',
   viewModel: {
     /**
@@ -47,9 +47,9 @@ export default GGRC.Components('externalDataProvider', {
       // Otherwise intermediate data will be displayed.
       let executeForLastRequest = (callback) => {
         return (response) => {
-          if (this.attr('currentRequest') == requestNumber) {
+          if (this.attr('currentRequest') === requestNumber) {
             callback(response);
-          };
+          }
         };
       };
 
