@@ -25,11 +25,94 @@
     transform: none;
     z-index: 10;
   }
+}
 
-  &.simple-popover__placement-top {
+.simple-popover_placement_top {
+  .simple-popover__content {
+    top: -8%;
+    transform: translateY(-100%);
+  }
+}
+
+.simple-popover_pagination_items {
+  height: 100%;
+
+  .simple-popover__button {
+    button {
+      -webkit-appearance: menulist; // emulate native select
+      cursor: pointer;
+      height: 100%;
+      border: 1px solid $widgetBorder;
+      background-color: $white;
+      color: $textGray;
+      margin-top: -1px;
+      display: inline-block;
+      min-width: 36px;
+      text-align: start;
+      text-indent: 5px;
+
+      &:hover {
+        color: $textGray;
+      }
+    }
+  }
+
+  .simple-popover__content {
+    right: 0;
+    padding: 6px 10px;
+  }
+
+  &.simple-popover_active {
+    .simple-popover__button {
+      button {
+        border-color: $lightBlue;
+      }
+    }
+  }
+}
+
+.simple-popover_pagination_pages {
+  height: 100%;
+
+  .simple-popover__button {
+    button {
+      cursor: pointer;
+      height: 100%;
+      padding: 0 25px;
+      background-color: $white;
+      color: $textGray;
+      margin-top: -1px;
+      border-radius: 0;
+      box-sizing: content-box;
+      margin-right: -1px;
+      border: 1px solid $widgetBorder;
+
+      &:hover {
+        color: $textGray;
+      }
+    }
+  }
+
+  .simple-popover__content {
+    right: 0;
+    width: 100%;
+    padding: 0;
+    box-sizing: border-box;
+    max-height: 300px;
+    overflow: auto;
+  }
+
+  &:not(.simple-popover_placement_top) {
     .simple-popover__content {
-      top: -8%;
-      transform: translateY(-100%);
+      top: 110%;
+    }
+  }
+
+  &.simple-popover_active {
+    .simple-popover__button {
+      button {
+        border-color: $lightBlue;
+      }
     }
   }
 }
