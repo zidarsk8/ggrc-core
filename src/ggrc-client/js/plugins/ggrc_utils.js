@@ -484,15 +484,15 @@ function getAssigneeType(instance) {
 }
 
 function registerHook(path, hook) {
-  let h, parent_path, last;
-  parent_path = path.split('.');
-  last = parent_path.pop();
-  parent_path = can.getObject(parent_path.join('.'), GGRC.hooks, true);
-  if (!(h = parent_path[last])) {
-    h = new can.Observe.List();
-    parent_path[last] = h;
+  let hs;
+  let parentPath = path.split('.');
+  let last = parentPath.pop();
+  parentPath = can.getObject(parentPath.join('.'), GGRC.hooks, true);
+  if (!(hs = parentPath[last])) {
+    hs = new can.Observe.List();
+    parentPath[last] = hs;
   }
-  h.push(hook);
+  hs.push(hook);
 }
 
 export {
