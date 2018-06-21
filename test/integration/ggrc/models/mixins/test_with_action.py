@@ -571,8 +571,9 @@ class TestCommentWithActionMixin(TestCase):
   def test_custom_comment_value(self):
     """Test add custom attribute value comment action."""
     assessment = factories.AssessmentFactory()
+    ca_def_title = "def1"
     ca_def = factories.CustomAttributeDefinitionFactory(
-        title="def1",
+        title=ca_def_title,
         definition_type="assessment",
         definition_id=assessment.id,
         attribute_type="Dropdown",
@@ -611,7 +612,11 @@ class TestCommentWithActionMixin(TestCase):
             },
         },
     })
-    self.assertTrue(comment.log_json()["custom_attribute_revision"])
+    comment_json = comment.log_json()
+    self.assertTrue("custom_attribute_revision" in comment_json.keys())
+    self.assertEqual(
+        comment_json["custom_attribute_revision"]['custom_attribute']['title'],
+        ca_def_title)
 
   def test_wrong_comment(self):
     """Test add custom attribute comment action without description."""
