@@ -8,7 +8,7 @@ import template from './issue-unmap-item.mustache';
 import Pagination from '../base-objects/pagination';
 import {
   buildParam,
-  makeRequest,
+  batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import {allowedToMap} from '../../plugins/ggrc_utils';
 
@@ -68,10 +68,10 @@ export default GGRC.Components('issueUnmapItem', {
       const auditsQuery = this.buildQuery('Audit');
 
       this.attr('isLoading', true);
-      return makeRequest({data: [snapshotsQuery, auditsQuery]})
-        .done((resp)=> {
-          const snapshots = resp[0].Snapshot;
-          const audits = resp[1].Audit;
+      return can.when(batchRequests(snapshotsQuery), batchRequests(auditsQuery))
+        .done((snapshotsResponse, auditsResponse)=> {
+          const snapshots = snapshotsResponse.Snapshot;
+          const audits = auditsResponse.Audit;
           this.attr('total', snapshots.total + audits.total);
           this.attr('relatedAudit', audits.values[0]);
           this.attr('relatedSnapshots', snapshots.values);
