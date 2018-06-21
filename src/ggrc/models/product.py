@@ -1,7 +1,9 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from sqlalchemy.orm import validates
+"""Product model."""
+
+from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
@@ -24,6 +26,7 @@ class Product(Roleable, HasObjectState, CustomAttributable, Personable,
               Relatable, LastDeprecatedTimeboxed, PublicDocumentable,
               Commentable, TestPlanned, base.ContextRBAC, BusinessObject,
               Indexed, db.Model):
+  """Representation for Product model."""
   __tablename__ = 'products'
 
   kind_id = deferred(db.Column(db.Integer), 'Product')
@@ -50,7 +53,7 @@ class Product(Roleable, HasObjectState, CustomAttributable, Personable,
       },
   }
 
-  @validates('kind')
+  @orm.validates('kind')
   def validate_product_options(self, key, option):
     return validate_option(
         self.__class__.__name__, key, option, 'product_type')
@@ -63,14 +66,11 @@ class Product(Roleable, HasObjectState, CustomAttributable, Personable,
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(Product, cls).eager_query()
     return query.options(orm.joinedload('kind'))
 
   @classmethod
   def indexed_query(cls):
-    from sqlalchemy import orm
     return super(Product, cls).indexed_query().options(
         orm.Load(cls).undefer_group(
             "Product_complete",
