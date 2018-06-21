@@ -42,6 +42,7 @@ let viewModel = peopleGroupVM.extend({
     showSeeMoreLink: {
       get: function () {
         return !this.attr('editableMode') &&
+          !this.attr('isLoading') &&
           !this.attr('isReadonly') &&
           this.attr('isModalLimitExceeded');
       },
