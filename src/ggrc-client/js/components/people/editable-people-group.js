@@ -22,9 +22,16 @@ let viewModel = peopleGroupVM.extend({
   define: {
     editableMode: {
       set: function (newValue, setValue) {
-        this.attr('showPeopleGroupModal',
-          this.attr('isModalLimitExceeded') && newValue);
-        setValue(newValue);
+        // the order of "showPeopleGroupModal" change is important
+        // to avoid render of {{^showPeopleGroupModal}} block
+        if (newValue) {
+          this.attr('showPeopleGroupModal', this.attr('isModalLimitExceeded'));
+          setValue(newValue);
+          return;
+        }
+
+        setValue(false);
+        this.attr('showPeopleGroupModal', false);
       },
     },
     isModalLimitExceeded: {
