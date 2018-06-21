@@ -275,6 +275,29 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       ]))
       self._check_csv_response(response, {})
 
+  @mock.patch('ggrc.integrations.issues.Client.create_issue')
+  def test_audit_delete(self, mock_create_issue):
+    """Test deletion of an audit."""
+    with mock.patch.object(issue_tracker, '_is_issue_tracker_enabled',
+                           return_value=True):
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=audit,
+          component_id="some id",
+          hotlist_id="some host id",
+      )
+      result = self.api.delete(audit)
+      self.assert200(result)
+
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=audit,
+          component_id="some id",
+          hotlist_id="some host id",
+      )
+      result = self.api.delete(audit)
+      self.assert200(result)
+
 
 @mock.patch('ggrc.models.hooks.issue_tracker._is_issue_tracker_enabled',
             return_value=True)
