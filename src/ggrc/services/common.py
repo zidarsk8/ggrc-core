@@ -24,7 +24,6 @@ from flask.views import View
 from flask.ext.sqlalchemy import Pagination
 import sqlalchemy as sa
 import sqlalchemy.orm.exc
-from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import tuple_
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -40,7 +39,7 @@ from ggrc.fulltext import get_indexer
 from ggrc.login import get_current_user_id, get_current_user
 from ggrc.models.cache import Cache
 from ggrc.models.exceptions import ValidationError, translate_message
-from ggrc.rbac import permissions, context_query_filter
+from ggrc.rbac import permissions
 from ggrc.services.attribute_query import AttributeQueryBuilder
 from ggrc.services import signals
 from ggrc.models.background_task import BackgroundTask, create_task
@@ -186,7 +185,7 @@ class ModelView(View):
   def get_resource_match_query(self, model, obj_id):
     columns = self.get_match_columns(model)
     query = db.session.query(*columns).filter(
-        and_(
+        sa.and_(
             self._get_type_where_clause(model),
             columns[0] == obj_id))
     return query
@@ -222,19 +221,19 @@ class ModelView(View):
       #    users with user_role BUT without global role:
       #    Reader, Editor, Administrator)
       subq = db.session.query(user_roles_module.person_id).filter(
-          or_(
+          sa.or_(
               # all users that have global user_role
               user_roles_module.context_id.is_(None),
               user_roles_module.context_id == 0
           )
       ).subquery()
-      filter_ = and_(
+      filter_ = sa.and_(
           # user is not superuser
           ~self.model.email.in_(superusers),
-          or_(
+          sa.or_(
               # user hasn't user_role in user_role table
               user_roles_module.id.is_(None),
-              and_(
+              sa.and_(
                   # user has user_role in user_role table
                   user_roles_module.id.isnot(None),
                   # user hasn't global role
@@ -247,28 +246,28 @@ class ModelView(View):
     if filter_by_contexts:
       contexts = permissions.read_contexts_for(self.model.__name__)
       resources = permissions.read_resources_for(self.model.__name__)
-      filter_expr = context_query_filter(self.model.context_id, contexts)
-      if resources:
-        filter_expr = or_(filter_expr, self.model.id.in_(resources))
-      query = query.filter(filter_expr)
+      if contexts is not None:
+        if resources:
+          query = query.filter(self.model.id.in_(resources))
+        else:
+          query = query.filter(sa.false())
+
       for j in joinlist:
         j_class = j.property.mapper.class_
         j_contexts = permissions.read_contexts_for(j_class.__name__)
         j_resources = permissions.read_resources_for(j_class.__name__)
-        if j_contexts is not None:
-          j_filter_expr = context_query_filter(j_class.context_id, j_contexts)
-          if resources:
-            j_filter_expr = or_(j_filter_expr, self.model.id.in_(j_resources))
-          query = query.filter(j_filter_expr)
-        elif resources:
-          query = query.filter(self.model.id.in_(resources))
+        if resources:
+          if j_contexts is None:
+            query = query.filter(self.model.id.in_(resources))
+          else:
+            query = query.filter(self.model.id.in_(j_resources))
     if '__search' in request.args:
       terms = request.args['__search']
       types = self._get_matching_types(self.model)
       indexer = get_indexer()
       models = indexer._get_grouped_types(types)
       search_query = indexer.get_permissions_query(models, 'read')
-      search_query = and_(search_query, indexer._get_filter_query(terms))
+      search_query = sa.and_(search_query, indexer._get_filter_query(terms))
       search_query = db.session.query(indexer.record_type.key).filter(
           search_query)
       if '__mywork' in request.args:

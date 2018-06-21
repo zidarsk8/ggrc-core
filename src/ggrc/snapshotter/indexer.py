@@ -327,7 +327,6 @@ def reindex_pairs(pairs):
       ),
       orm.load_only(
           "id",
-          "context_id",
           "parent_type",
           "parent_id",
           "child_type",
@@ -340,7 +339,6 @@ def reindex_pairs(pairs):
     revision = snapshot.revision
     snapshots[snapshot.id] = {
         "id": snapshot.id,
-        "context_id": snapshot.context_id,
         "parent_type": snapshot.parent_type,
         "parent_id": snapshot.parent_id,
         "child_type": snapshot.child_type,
@@ -360,7 +358,6 @@ def reindex_pairs(pairs):
               {
                   "key": snapshot["id"],
                   "type": "Snapshot",
-                  "context_id": snapshot["context_id"],
                   "tags": TAG_TMPL.format(**snapshot),
                   "subproperty": "",
               }

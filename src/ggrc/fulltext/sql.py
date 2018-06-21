@@ -45,7 +45,6 @@ class SqlIndexer(object):
           yield dict(
               key=instance.id,
               type=instance.type,
-              context_id=instance.context_id,
               tags="",
               property=prop,
               subproperty=unicode(subproperty),

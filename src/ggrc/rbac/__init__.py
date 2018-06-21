@@ -3,8 +3,6 @@
 
 """Basic permissions module."""
 
-import sqlalchemy as sa
-
 
 class SystemWideRoles(object):
   """List of system wide roles."""
@@ -34,27 +32,3 @@ class SystemWideRoles(object):
       ADMINISTRATOR,
       EDITOR,
   }
-
-
-def context_query_filter(context_column, contexts):
-  '''
-  Intended for use by `model.query.filter(...)`
-  If `contexts == None`, it's Admin (no filter), so return `True`
-  Else, return the full query
-  '''
-
-  if contexts is None:
-    # Admin context, no filter
-    return sa.sql.true()
-  else:
-    filter_expr = None
-    # Handle `NULL` context specially
-    if None in contexts:
-      filter_expr = context_column.is_(None)
-      # We're modifying `contexts`, so copy
-      contexts = set(contexts)
-      contexts.remove(None)
-    if filter_expr is None:
-      # No valid contexts
-      return sa.sql.false()
-    return filter_expr
