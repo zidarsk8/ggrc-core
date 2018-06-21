@@ -55,7 +55,7 @@ from ggrc import utils
 from ggrc.utils import benchmark, helpers
 from ggrc.utils import revisions
 
-logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+logger = logging.getLogger(__name__)
 REINDEX_CHUNK_SIZE = 100
 
 

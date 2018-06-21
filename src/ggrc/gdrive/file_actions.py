@@ -26,7 +26,6 @@ API_VERSION = 'v3'
 
 ALLOWED_FILENAME_CHARS = "_ ()-'"
 
-# pylint: disable=invalid-name
 logger = getLogger(__name__)
 
 

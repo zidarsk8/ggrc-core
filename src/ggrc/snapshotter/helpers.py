@@ -14,7 +14,7 @@ from ggrc.snapshotter.datastructures import Stub
 from ggrc.snapshotter.datastructures import Pair
 from ggrc.utils import benchmark
 
-logger = getLogger(__name__)  # pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 def get_revisions(pairs, revisions, filters=None):

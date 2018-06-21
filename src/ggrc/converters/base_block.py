@@ -42,7 +42,6 @@ from ggrc_workflows.models.cycle_task_group_object_task import \
 from ggrc.models.exceptions import StatusValidationError
 
 
-# pylint: disable=invalid-name
 logger = getLogger(__name__)
 
 CACHE_EXPIRY_IMPORT = 600

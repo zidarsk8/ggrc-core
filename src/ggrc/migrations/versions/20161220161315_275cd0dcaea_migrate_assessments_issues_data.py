@@ -34,7 +34,7 @@ from ggrc.migrations.utils import Stub
 from ggrc.migrations.utils.migrator import get_migration_user_id
 
 
-logger = getLogger(__name__)  # pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 # revision identifiers, used by Alembic.

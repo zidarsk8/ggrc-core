@@ -11,7 +11,6 @@ from ggrc.converters.handlers import handlers
 from ggrc.login import get_current_user_id
 
 
-# pylint: disable=invalid-name
 logger = getLogger(__name__)
 
 

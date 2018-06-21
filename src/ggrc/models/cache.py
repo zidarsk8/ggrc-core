@@ -4,7 +4,7 @@
 import logging
 from flask import g, has_app_context
 
-logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+logger = logging.getLogger(__name__)
 
 
 class Cache:
