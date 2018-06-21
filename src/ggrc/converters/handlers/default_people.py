@@ -102,6 +102,9 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
         "ERROR",
     )
 
+    if value is None:
+      return "--"
+
     assessment_template = self.row_converter.obj
     default_people_labels = assessment_template.DEFAULT_PEOPLE_LABELS
     if isinstance(value, list):
