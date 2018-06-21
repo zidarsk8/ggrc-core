@@ -483,16 +483,22 @@ function getAssigneeType(instance) {
   return userType;
 }
 
+const _hooks = {};
+
 function registerHook(path, hook) {
   let hs;
   let parentPath = path.split('.');
   let last = parentPath.pop();
-  parentPath = can.getObject(parentPath.join('.'), GGRC.hooks, true);
+  parentPath = can.getObject(parentPath.join('.'), _hooks, true);
   if (!(hs = parentPath[last])) {
     hs = new can.Observe.List();
     parentPath[last] = hs;
   }
   hs.push(hook);
+}
+
+function getHooks() {
+  return _hooks;
 }
 
 export {
@@ -514,5 +520,6 @@ export {
   getHighestAssigneeRole,
   getAssigneeType,
   registerHook,
+  getHooks,
 };
 

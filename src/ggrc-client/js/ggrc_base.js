@@ -8,7 +8,6 @@ import PersistentNotifier from './plugins/persistent_notifier';
 (function (GGRC, moment) {
   GGRC.mustache_path = '/static/mustache';
 
-  GGRC.hooks = GGRC.hooks || {};
   GGRC.extensions = GGRC.extensions || [];
   if (!GGRC.widget_descriptors) {
     GGRC.widget_descriptors = {};

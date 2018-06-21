@@ -26,6 +26,7 @@ import {
   formatDate,
   isMappableType,
   allowedToMap,
+  getHooks,
 } from './plugins/ggrc_utils';
 
 // Chrome likes to cache AJAX requests for Mustaches.
@@ -375,7 +376,7 @@ Mustache.registerHelper('render_hooks', function () {
   let options = args.splice(args.length - 1, 1)[0];
   let hook = can.map(args, Mustache.resolve).join('.');
 
-  return can.map(can.getObject(hook, GGRC.hooks) || [], function (hookTmpl) {
+  return can.map(can.getObject(hook, getHooks()) || [], function (hookTmpl) {
     return can.Mustache.getHelper('renderLive', options.contexts)
       .fn(hookTmpl, options.contexts, options);
   }).join('\n');
