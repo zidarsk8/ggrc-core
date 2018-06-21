@@ -6,7 +6,7 @@
 import '../dropdown/dropdown';
 import {
   buildParam,
-  makeRequest,
+  batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import template from './assessment_templates.mustache';
 import tracker from '../../tracker';
@@ -89,8 +89,8 @@ export default can.Component.extend({
       id: instance.id,
     }, ['id', 'type', 'title', 'template_object_type']);
 
-    makeRequest({data: [param]}).then((response)=> {
-      const values = response[0].AssessmentTemplate.values;
+    batchRequests(param).then((response)=> {
+      const values = response.AssessmentTemplate.values;
       viewModel.attr('responses', values);
       viewModel._selectInitialTemplate(viewModel.templates());
       viewModel.dispatch('assessmentTemplateLoaded');
