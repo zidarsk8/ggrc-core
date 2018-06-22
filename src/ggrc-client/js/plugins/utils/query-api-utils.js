@@ -263,7 +263,6 @@ export {
   buildParam,
   buildParams,
   buildRelevantIdsQuery,
-  makeRequest,
   batchRequests,
   buildCountParams,
 };
