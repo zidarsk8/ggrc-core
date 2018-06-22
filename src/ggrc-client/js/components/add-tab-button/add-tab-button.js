@@ -29,6 +29,7 @@ const viewModel = can.Map.extend({
   isNotProhibitedMap(shortName) {
     const prohibitedMapList = {
       Issue: ['Assessment', 'Audit'],
+      Assessment: ['Evidence'],
     };
 
     const instanceType = this.attr('instance.type');
