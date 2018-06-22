@@ -5,7 +5,7 @@
 
 import {
   buildRelevantIdsQuery,
-  makeRequest,
+  batchRequests,
 } from './utils/query-api-utils';
 import RefreshQueue from '../models/refresh_queue';
 
@@ -361,12 +361,12 @@ import RefreshQueue from '../models/refresh_queue';
 
         query = buildRelevantIdsQuery(objName, {}, relevant, filter);
 
-        makeRequest({data: [query]})
-         .done(function (responseArr) {
-           var ids = responseArr[0][objName].ids;
+        batchRequests(query)
+         .done((responseArr) => {
+           var ids = responseArr[objName].ids;
            var model = CMS.Models[objName];
 
-           var res = can.map(ids, function (id) {
+           var res = can.map(ids, (id) => {
              return CMS.Models.get_instance(model.shortName, id);
            });
            dfd.resolve(res);
