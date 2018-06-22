@@ -396,27 +396,27 @@ function getModelsForSubTier(modelName) {
  * @param {Number} pageInfo.sortDirection -
  * @param {Object} filter -
  * @param {Object} request - Collection of QueryAPI sub-requests
- * @param {Boolean} transforToSnapshot - Transform query to Snapshot
+ * @param {Boolean} transformToSnapshot - Transform query to Snapshot
  * @return {Promise} Deferred Object
  */
 function loadFirstTierItems(modelName,
   parent,
   pageInfo,
   filter,
-  request) {
-  let modelConfig = getWidgetConfig(modelName);
-
+  request,
+  transformToSnapshot) {
   let params = buildParam(
-    modelConfig.responseType,
+    modelName,
     pageInfo,
-    makeRelevantExpression(modelConfig.name, parent.type, parent.id),
+    makeRelevantExpression(modelName, parent.type, parent.id),
     null,
     filter
   );
   let requestedType;
   let requestData = request.slice() || can.List();
 
-  if ((isSnapshotScope(parent) && isSnapshotModel(modelConfig.name))) {
+  if (transformToSnapshot ||
+    (isSnapshotScope(parent) && isSnapshotModel(modelName))) {
     params = transformQuery(params);
   }
 
@@ -427,7 +427,7 @@ function loadFirstTierItems(modelName,
       response = _.last(response)[requestedType];
 
       response.values = response.values.map(function (source) {
-        return _createInstance(source, modelConfig.responseType);
+        return _createInstance(source, modelName);
       });
 
       return response;
@@ -470,22 +470,16 @@ function loadItemsForSubTier(models, type, id, filter) {
           pageInfo.current = 1;
           pageInfo.pageSize = countMap[modelObject.name];
         }
-
-        if (modelObject.additionalFilter) {
-          let additionalQuery =
-            GGRC.query_parser.parse(modelObject.additionalFilter);
-          filter = GGRC.query_parser.join_queries(filter, additionalQuery);
-        }
-
         params = buildParam(
-          modelObject.responseType,
+          modelObject.name,
           pageInfo,
           relevant,
           subTreeFields,
           filter
         );
 
-        if (isSnapshotRelated(relevant.type, params.object_name)) {
+        if (isSnapshotRelated(relevant.type, params.object_name) ||
+          modelObject.isObjectVersion) {
           params = transformQuery(params);
         }
 

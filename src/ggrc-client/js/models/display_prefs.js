@@ -3,8 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import * as StateUtils from '../plugins/utils/state-utils';
-
 let COLLAPSE = 'collapse';
 let LHN_SIZE = 'lhn_size';
 let OBJ_SIZE = 'obj_size';
@@ -171,12 +169,6 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
     let value = this.getObject(TREE_VIEW_STATES);
 
     if (!value || !value[modelName]) {
-      return [];
-    }
-
-    // Avoid User bugs:
-    // User may have wrong config in local storage
-    if (!StateUtils.hasFilter(modelName)) {
       return [];
     }
 

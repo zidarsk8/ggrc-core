@@ -15,41 +15,43 @@ describe('treeStatusFilter', () => {
     viewModel = new Component.prototype.viewModel();
   });
 
-  describe('setFilter() method', () => {
+  describe('buildSearchQuery() method', () => {
     const FILTER = {
       expression: 'test',
     };
     beforeEach(() => {
-      viewModel.attr('filterStates', [
-        {value: 'A'},
-        {value: 'B'},
-        {value: 'C'},
-      ]);
       spyOn(StateUtils, 'buildStatusFilter').and.returnValue(FILTER);
+      spyOn(StateUtils, 'getStatesForModel').and.returnValue(['A', 'B', 'C']);
     });
 
     it('set empty when all statuses selected', () => {
-      viewModel.setFilter(['A', 'B', 'C']);
+      viewModel.buildSearchQuery(['A', 'B', 'C']);
 
       expect(viewModel.attr('options.query')).toEqual(null);
     });
 
     it('set empty when no status selected', () => {
-      viewModel.setFilter([]);
+      viewModel.buildSearchQuery([]);
 
       expect(viewModel.attr('options.query')).toEqual(null);
     });
 
     it('set not empty when some status selected', () => {
-      viewModel.setFilter(['A']);
+      viewModel.buildSearchQuery(['A']);
 
       expect(viewModel.attr('options.query').attr()).toEqual(FILTER);
+    });
+  });
+
+  describe('setStatesRoute() method', () => {
+    beforeEach(() => {
+      spyOn(StateUtils, 'getStatesForModel').and.returnValue(['A', 'B', 'C']);
     });
 
     it('write states to query string property', () => {
       let statuses = ['A'];
 
-      viewModel.setFilter(statuses);
+      viewModel.setStatesRoute(statuses);
 
       let result = router.attr('state').attr();
       expect(result).toEqual(statuses);
@@ -59,7 +61,7 @@ describe('treeStatusFilter', () => {
       let statuses = [];
       router.attr('state', ['A']);
 
-      viewModel.setFilter(statuses);
+      viewModel.setStatesRoute(statuses);
 
       let result = router.attr('state');
       expect(result).toBeUndefined();
@@ -69,37 +71,30 @@ describe('treeStatusFilter', () => {
       let statuses = ['A', 'B', 'C'];
       router.attr('state', ['A']);
 
-      viewModel.setFilter(statuses);
+      viewModel.setStatesRoute(statuses);
 
       let result = router.attr('state');
       expect(result).toBeUndefined();
     });
   });
 
-  describe('initializeFilter() mthod', () => {
+  describe('setStatesDropdown() mthod', () => {
     beforeEach(() => {
       viewModel.attr('filterStates', [
         {value: 'A', checked: false},
         {value: 'B', checked: false},
         {value: 'C', checked: false},
       ]);
-      spyOn(viewModel, 'setFilter');
     });
 
     it('makes provided options checked', ()=> {
-      viewModel.initializeFilter(['A', 'C']);
+      viewModel.setStatesDropdown(['A', 'C']);
 
       expect(viewModel.attr('filterStates').serialize()).toEqual([
         {value: 'A', checked: true},
         {value: 'B', checked: false},
         {value: 'C', checked: true},
       ]);
-    });
-
-    it('set passed filters', () => {
-      viewModel.initializeFilter(['A', 'C']);
-
-      expect(viewModel.setFilter).toHaveBeenCalledWith(['A', 'C']);
     });
   });
 
@@ -108,33 +103,16 @@ describe('treeStatusFilter', () => {
     beforeEach(() => {
       let displayPrefs = jasmine.createSpyObj(['setTreeViewStates']);
       viewModel.attr('displayPrefs', displayPrefs);
-
-      spyOn(viewModel, 'setFilter');
-    });
-
-    it('set passed filters', () => {
-      viewModel.saveTreeStates(filters);
-
-      expect(viewModel.setFilter).toHaveBeenCalledWith(filters);
     });
 
     describe('saves filter to display preferences', () => {
-      it('if widgetId is provided', () => {
+      it('by widget id', () => {
         viewModel.attr('widgetId', 'testId');
 
         viewModel.saveTreeStates(filters);
 
         expect(viewModel.attr('displayPrefs').setTreeViewStates)
           .toHaveBeenCalledWith('testId', filters);
-      });
-
-      it('if modelName is provided', () => {
-        viewModel.attr('modelName', 'testName');
-
-        viewModel.saveTreeStates(filters);
-
-        expect(viewModel.attr('displayPrefs').setTreeViewStates)
-          .toHaveBeenCalledWith('testName', filters);
       });
     });
   });
@@ -171,62 +149,80 @@ describe('treeStatusFilter', () => {
 
   describe('"{viewModel.router} state" event handler', () => {
     let handler;
+    let newStatuses;
     beforeEach(() => {
       handler = Component.prototype.events['{viewModel.router} state'].bind({
         viewModel,
       });
-      spyOn(viewModel, 'initializeFilter');
+      spyOn(viewModel, 'buildSearchQuery');
+      spyOn(viewModel, 'setStatesDropdown');
       spyOn(viewModel, 'dispatch');
-      viewModel.attr('filterStates', [
-        {value: 'A'},
-        {value: 'B'},
-      ]);
     });
 
-    describe('when component is not disabled', () => {
-      beforeEach(() => {
-        viewModel.attr('disabled', false);
+    describe('launches search', () => {
+      afterEach(() => {
+        handler(router, null, newStatuses);
+        expect(viewModel.buildSearchQuery).toHaveBeenCalledWith(newStatuses);
+        expect(viewModel.setStatesDropdown).toHaveBeenCalledWith(newStatuses);
+        expect(viewModel.dispatch).toHaveBeenCalledWith('filter');
       });
 
-      describe('and new value was added', () => {
-        beforeEach(() => {
-          handler(null, null, ['A']);
+      it(`when component is enabled,
+        launched on current widget and statuses were changed`, () => {
+          viewModel.attr('filterStates', [
+            {value: 'A', checked: true},
+            {value: 'B', checked: true},
+          ]);
+          newStatuses = ['C', 'D'];
+          viewModel.attr('widgetId', 'test1');
+          router.attr('widget', 'test1');
+          viewModel.attr('disabled', false);
         });
-        it('initializes states', () => {
-          expect(viewModel.initializeFilter).toHaveBeenCalledWith(['A']);
-        });
-        it('dispatches "filter" event', () => {
-          expect(viewModel.dispatch).toHaveBeenCalledWith('filter');
-        });
-      });
-
-      describe('and value was removed', () => {
-        beforeEach(() => {
-          handler(null, null, null);
-        });
-        it('initializes states', () => {
-          expect(viewModel.initializeFilter.calls.argsFor(0)[0].attr())
-            .toEqual(['A', 'B']);
-        });
-        it('dispatches "filter" event', () => {
-          expect(viewModel.dispatch).toHaveBeenCalledWith('filter');
-        });
-      });
     });
 
-    describe('when component is disabled', () => {
-      beforeEach(() => {
-        viewModel.attr('disabled', true);
-        handler();
-      });
-
-      it('does not initialize states', () => {
-        expect(viewModel.initializeFilter).not.toHaveBeenCalled();
-      });
-
-      it('does not dispatch an event', () => {
+    describe('does not launch search', () => {
+      afterEach(() => {
+        handler(router, null, newStatuses);
+        expect(viewModel.buildSearchQuery).not.toHaveBeenCalled();
+        expect(viewModel.setStatesDropdown).not.toHaveBeenCalled();
         expect(viewModel.dispatch).not.toHaveBeenCalled();
       });
+
+      it(`when component is disabled,
+        launched on current widget and statuses were changed`, () => {
+          viewModel.attr('filterStates', [
+            {value: 'A', checked: true},
+            {value: 'B', checked: true},
+          ]);
+          newStatuses = ['C', 'D'];
+          viewModel.attr('widgetId', 'test1');
+          router.attr('widget', 'test1');
+          viewModel.attr('disabled', true);
+        });
+
+      it(`when component is enabled,
+        launched on other widget and statuses were changed`, () => {
+          viewModel.attr('filterStates', [
+            {value: 'A', checked: true},
+            {value: 'B', checked: true},
+          ]);
+          newStatuses = ['C', 'D'];
+          viewModel.attr('widgetId', 'test1');
+          router.attr('widget', 'test2');
+          viewModel.attr('disabled', false);
+        });
+
+      it(`when component is enabled,
+        launched on current widget and statuses were not changed`, () => {
+          viewModel.attr('filterStates', [
+            {value: 'A', checked: true},
+            {value: 'B', checked: true},
+          ]);
+          newStatuses = ['A', 'B'];
+          viewModel.attr('widgetId', 'test1');
+          router.attr('widget', 'test1');
+          viewModel.attr('disabled', false);
+        });
     });
   });
 
@@ -238,7 +234,8 @@ describe('treeStatusFilter', () => {
         viewModel,
       });
       defaultFilters = ['A', 'B'];
-      spyOn(viewModel, 'initializeFilter');
+      spyOn(viewModel, 'setStatesDropdown');
+      spyOn(viewModel, 'setStatesRoute');
       spyOn(viewModel, 'getDefaultStates').and.returnValue(defaultFilters);
     });
 
@@ -247,7 +244,8 @@ describe('treeStatusFilter', () => {
 
       handler();
 
-      expect(viewModel.initializeFilter).toHaveBeenCalledWith([]);
+      expect(viewModel.setStatesDropdown).toHaveBeenCalledWith([]);
+      expect(viewModel.setStatesRoute).toHaveBeenCalledWith([]);
     });
 
     it('initializes default filter if component is not disabled', () => {
@@ -256,7 +254,38 @@ describe('treeStatusFilter', () => {
       handler();
 
       expect(viewModel.getDefaultStates).toHaveBeenCalled();
-      expect(viewModel.initializeFilter).toHaveBeenCalledWith(defaultFilters);
+      expect(viewModel.setStatesDropdown).toHaveBeenCalledWith(defaultFilters);
+      expect(viewModel.setStatesRoute).toHaveBeenCalledWith(defaultFilters);
+    });
+  });
+
+  describe('"{viewModel.router} widget" event handler', () => {
+    let handler;
+    beforeEach(() => {
+      handler = Component.prototype.events['{viewModel.router} widget'].bind({
+        viewModel,
+      });
+      spyOn(viewModel, 'setStatesRoute');
+      viewModel.attr('filterStates', [
+        {value: 'A', checked: true},
+        {value: 'B', checked: true},
+      ]);
+    });
+
+    describe('sets current states to route', () => {
+      afterEach(() => {
+        handler(router);
+        expect(viewModel.setStatesRoute.calls.argsFor(0)[0].attr())
+          .toEqual(['A', 'B']);
+      });
+
+      it(`when component is enabled,
+        launched on current widget and there are no statuses in route`, () => {
+          viewModel.attr('disabled', false);
+          viewModel.attr('widgetId', 'test1');
+          router.attr('widget', 'test1');
+          router.removeAttr('state');
+        });
     });
   });
 });
