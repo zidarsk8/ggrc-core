@@ -22,6 +22,8 @@ from ggrc.models.mixins.with_auto_deprecation import WithAutoDeprecation
 from ggrc.models.relationship import Relatable
 from ggrc.utils import referenced_objects
 
+from ggrc.services import signals
+
 
 class Evidence(Roleable, Relatable, mixins.Titled,
                bfh.BeforeFlushHandleable, Statusable,
@@ -205,14 +207,12 @@ class Evidence(Roleable, Relatable, mixins.Titled,
   def _build_relationship(self, parent_obj):
     """Build relationship between evidence and parent object"""
     from ggrc.models import all_models
-    from ggrc.models.mixins.autostatuschangeable import AutoStatusChangeable
     rel = all_models.Relationship(
         source=parent_obj,
         destination=self
     )
     db.session.add(rel)
-    if isinstance(parent_obj, AutoStatusChangeable):
-      parent_obj.move_to_in_progress()
+    signals.Restful.model_put.send(rel.__class__, obj=rel, service=self)
 
   def _update_fields(self, response):
     """Update fields of evidence with values of the copied file"""
