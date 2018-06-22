@@ -5,7 +5,6 @@
 
 import {
   buildParam,
-  makeRequest,
   batchRequests,
 } from '../plugins/utils/query-api-utils';
 import {confirm} from '../plugins/utils/modals';
@@ -379,8 +378,8 @@ const AUDIT_ISSUE_TRACKER = {
             id: this.id,
           }, ['id', 'title', 'type', 'context', 'issue_tracker']);
 
-          makeRequest({data: [param]}).then((response) => {
-            this.audit = _.get(response, '[0].Audit.values[0]');
+          batchRequests(param).then((response) => {
+            this.audit = _.get(response, 'Audit.values[0]');
             dfd.resolve(this.audit);
           });
         }

@@ -85,14 +85,14 @@ describe('can.Model.Mixin.assessmentIssueTracker', () => {
         .and.returnValue({ });
 
       let dfd = new can.Deferred();
-      dfd.resolve(_.set({}, '[0].Audit.values[0]', audit));
-      spyOn(queryApiUtils, 'makeRequest').and.returnValue(dfd);
+      dfd.resolve(_.set({}, 'Audit.values[0]', audit));
+      spyOn(queryApiUtils, 'batchRequests').and.returnValue(dfd);
 
       assessment.attr('audit', null);
       assessment.isNew = () => false;
 
       method.apply(assessment).then((resolvedAudit) => {
-        expect(queryApiUtils.makeRequest).toHaveBeenCalled();
+        expect(queryApiUtils.batchRequests).toHaveBeenCalled();
         expect(resolvedAudit).toEqual(audit);
         done();
       });
