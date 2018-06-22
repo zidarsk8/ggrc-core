@@ -20,7 +20,6 @@ import {
 } from './current-page-utils';
 import {
   buildParam,
-  makeRequest,
   batchRequests,
   buildCountParams,
 } from './query-api-utils';
@@ -644,8 +643,8 @@ function _buildSubTreeCountMap(models, relevant, filter) {
         });
     }
 
-    result = makeRequest({data: countQuery})
-      .then(function (response) {
+    result = can.when(...countQuery.map((query) => batchRequests(query)))
+      .then((...response) => {
         let total = 0;
         let showMore = models.some(function (model, index) {
           let count = response[index][model] ?
