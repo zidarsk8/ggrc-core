@@ -8,12 +8,8 @@
 import CustomAttributeAccess from '../plugins/utils/custom-attribute/custom-attribute-access';
 import {
   isSnapshot,
-  toObjects,
   setAttrs,
 } from '../plugins/utils/snapshot-utils';
-import {
-  makeRequest,
-} from '../plugins/utils/query-api-utils';
 import {
   resolveDeferredBindings,
 } from '../plugins/utils/models-utils';
@@ -424,73 +420,6 @@ import tracker from '../tracker';
         return params;
       }
       return ms;
-    },
-
-    query: function (request) {
-      let deferred = can.Deferred();
-      let self = this;
-
-      makeRequest(request)
-        .then(function (sourceData) {
-          let values = [];
-          let listDfd = can.Deferred();
-          if (sourceData.length) {
-            sourceData = sourceData[0];
-          } else {
-            sourceData = {};
-          }
-
-          if (sourceData[self.shortName]) {
-            sourceData = sourceData[self.shortName];
-            values = sourceData.values;
-          } else if (sourceData.Snapshot) {
-            // This is response with snapshots - convert it to objects
-            sourceData = sourceData.Snapshot;
-            values = toObjects(sourceData.values);
-          }
-
-          if (!values.splice) {
-            values = [values];
-          }
-          self._modelize(values, listDfd);
-
-          listDfd.then(function (list) {
-            sourceData.values = list;
-            deferred.resolve(sourceData);
-          });
-        }, deferred.reject);
-
-      return deferred;
-    },
-
-    queryAll: function (request) {
-      let deferred = can.Deferred();
-
-      makeRequest(request)
-        .then(function (sourceData) {
-          let values = [];
-
-          sourceData = sourceData.length ? sourceData : {};
-
-          values = _.map(sourceData, function (object) {
-            return _.compact(_.map(object, function (obj, key) {
-              if (obj && obj.ids) {
-                return _.map(obj.ids, function (item) {
-                  return {id: item, type: key};
-                });
-              }
-              if (obj && obj.values) {
-                return obj.values;
-              }
-            }));
-          });
-
-          values = _.flattenDeep(values);
-
-          deferred.resolve(values);
-        }, deferred.reject.bind(deferred));
-
-      return deferred.promise();
     },
 
     _modelize: function (sourceData, deferred) {
