@@ -3,13 +3,16 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('GGRC.Components.repeatOnButtonWrapper', function () {
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../repeat-on-button-wrapper';
+
+describe('repeat-on-button-wrapper component', function () {
   'use strict';
 
   let viewModel;
 
   beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('repeatOnButtonWrapper');
+    viewModel = getComponentVM(Component);
   });
 
   describe('setRepeatOn method', function () {

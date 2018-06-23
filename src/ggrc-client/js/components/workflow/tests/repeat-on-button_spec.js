@@ -3,7 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('GGRC.Components.repeatOnButton', function () {
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../repeat-on-button';
+
+describe('repeat-on-button component', function () {
   'use strict';
 
   let viewModel;
@@ -13,12 +16,11 @@ describe('GGRC.Components.repeatOnButton', function () {
   };
 
   beforeAll(function () {
-    let Component = GGRC.Components.get('repeatOnButton');
     events = Component.prototype.events;
   });
 
   beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('repeatOnButton');
+    viewModel = getComponentVM(Component);
   });
 
   describe('buttonText getter', function () {

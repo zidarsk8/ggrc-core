@@ -1,0 +1,59 @@
+{{!
+    Copyright (C) 2018 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<a href="javascript://" ($click)="showDialog"
+   class="btn btn-small {{#if unit}}btn-green{{else}}btn-white{{/if}}">
+    {{buttonText}}
+</a>
+<simple-modal modal-title="modalTitle"
+              state="state"
+              extra-css-class="repeat-on">
+    <div class="simple-modal__body">
+        <div class="ggrc-form">
+          <div class="row-fluid">
+              <label class="input--inline repeat-options__toggle" for="repeat-checkbox">
+                  <input type="checkbox" can-value="repeatEnabled" id="repeat-checkbox"/>
+                  Repeat Workflow
+              </label>
+          </div>
+
+          <div class="row-fluid">
+              <div class="span5">
+                  <label class="{{#unless repeatEnabled}}disabled{{/unless}}">
+                      Repeats
+                  </label>
+                  <dropdown {options-list}="unitOptions"
+                            name="state.result.unit"
+                            id="repeats-select"
+                            {is-disabled}="repeatDisabled">
+                  </dropdown>
+              </div>
+              <div class="span5">
+                  <label class="{{#unless repeatEnabled}}disabled{{/unless}}">
+                      Repeat Every
+                  </label>
+                  <dropdown {options-list}="repeatOptions"
+                            name="state.result.repeatEvery"
+                            id="repeat-every-select"
+                            {is-disabled}="repeatDisabled">
+                  </dropdown>
+              </div>
+          </div>
+        </div>
+        <div class="simple-modal__footer">
+            <div class="confirm-buttons">
+                <button class="btn btn-small btn-green"
+                        ($click)="save()" {{^canSave}}disabled{{/canSave}}
+                    {{#if isSaving}}disabled{{/if}}>
+                    {{#if isSaving}}
+                        Saving, please wait...
+                    {{else}}
+                        Save &amp; Close
+                    {{/if}}
+                </button>
+            </div>
+        </div>
+    </div>
+</simple-modal>
