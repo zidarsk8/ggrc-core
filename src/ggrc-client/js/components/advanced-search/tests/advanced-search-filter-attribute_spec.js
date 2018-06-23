@@ -3,16 +3,17 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../advanced-search-filter-attribute';
 
-describe('GGRC.Components.advancedSearchFilterAttribute', function () {
+describe('advanced-search-filter-attribute component', function () {
   'use strict';
 
   let viewModel;
   let events;
 
   beforeEach(() => {
-    viewModel = new Component.prototype.viewModel();
+    viewModel = getComponentVM(Component);
     events = Component.prototype.events;
   });
 
