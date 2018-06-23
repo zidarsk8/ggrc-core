@@ -7,7 +7,7 @@ import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import Component from '../mapper-results-columns-configuration';
 
-describe('GGRC.Components.mapperResultsColumnsConfiguration', function () {
+describe('mapper-results-columns-configuration component', function () {
   'use strict';
   let viewModel;
 
