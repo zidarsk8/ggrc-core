@@ -227,10 +227,10 @@ def update_indexer(session):  # pylint:disable=unused-argument
   """General function to update index
 
   for all updated related instance before commit"""
-  with benchmark("Update indexer before commit"):
-    if not hasattr(db.session, "reindex_set"):
-      return
+  if not hasattr(db.session, "reindex_set"):
+    return
 
+  with benchmark("Update indexer before commit"):
     models_ids_to_reindex = defaultdict(set)
     db.session.flush()
     for for_index in db.session.reindex_set:
