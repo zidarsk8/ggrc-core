@@ -46,7 +46,6 @@ class ModelFactory(factory.Factory, object):
         action=action,
         resource_id=instance.id,
         resource_type=instance.type,
-        context=instance.context,
         revisions=[revision],
     )
     db.session.add(revision)

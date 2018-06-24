@@ -38,7 +38,6 @@ class TestDataHandler(TestCase):
         action="DELETE",
         resource_id=relationship.id,
         resource_type=relationship.type,
-        context_id=None,
         revisions=revisions
     )
     task_dict = get_cycle_task_dict(cycle_task)

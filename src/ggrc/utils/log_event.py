@@ -88,7 +88,6 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
     resource_id = 0
     resource_type = None
     action = "BULK"
-    context_id = 0
   else:
     resource_id = obj.id
     resource_type = str(obj.__class__.__name__)
@@ -99,7 +98,6 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
       action = "BULK"
       logger.warning("Request retrieval has failed: %s", exp.message)
 
-    context_id = obj.context_id
   if not revisions:
     return event
   if event is None:
@@ -108,7 +106,7 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
         action=action,
         resource_id=resource_id,
         resource_type=resource_type,
-        context_id=context_id)
+    )
     session.add(event)
   event.revisions.extend(revisions)
   return event
