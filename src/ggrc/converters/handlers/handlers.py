@@ -15,22 +15,9 @@ from ggrc import db
 from ggrc.converters import errors
 from ggrc.converters import get_exportables
 from ggrc.login import get_current_user
-from ggrc.models import Audit
-from ggrc.models import CategoryBase
-from ggrc.models import Contract
-from ggrc.models import Assessment
-from ggrc.models import ObjectPerson
-from ggrc.models import Option
-from ggrc.models import Person
-from ggrc.models import Policy
-from ggrc.models import Program
-from ggrc.models import Regulation
-from ggrc.models import Relationship
-from ggrc.models import Standard
 from ggrc.models import all_models
 from ggrc.models.reflection import AttributeInfo
 from ggrc.rbac import permissions
-
 
 # pylint: disable=invalid-name
 logger = getLogger(__name__)
@@ -45,6 +32,9 @@ class ColumnHandler(object):
   This handler can be used on any model attribute that can accept normal text
   value.
   """
+
+  # special marker to set the field empty
+  EXPLICIT_EMPTY_VALUE = {"-", "--", "---"}
 
   def __init__(self, row_converter, key, **options):
     self.row_converter = row_converter
@@ -64,6 +54,9 @@ class ColumnHandler(object):
     if options.get("parse"):
       self.set_value()
 
+  def value_explicitly_empty(self, value):
+    return value in self.EXPLICIT_EMPTY_VALUE
+
   def check_unique_consistency(self):
     """Returns true if no object exists with the same unique field."""
     if not self.unique:
@@ -72,14 +65,16 @@ class ColumnHandler(object):
       return
     if not self.row_converter.obj:
       return
-    nr_duplicates = self.row_converter.object_class.query.filter(and_(
-        getattr(self.row_converter.object_class, self.key) == self.value,
-        self.row_converter.object_class.id != self.row_converter.obj.id
-    )).count()
+    nr_duplicates = self.row_converter.object_class.query.filter(
+        and_(
+            getattr(self.row_converter.object_class, self.key) == self.value,
+            self.row_converter.object_class.id != self.row_converter.obj.id
+        )
+    ).count()
     if nr_duplicates > 0:
-      self.add_error(errors.DUPLICATE_VALUE,
-                     column_name=self.key,
-                     value=self.value)
+      self.add_error(
+          errors.DUPLICATE_VALUE, column_name=self.key, value=self.value
+      )
       self.row_converter.set_ignore()
 
   def set_value(self):
@@ -110,13 +105,18 @@ class ColumnHandler(object):
       if getattr(self.row_converter.obj, self.key, None) != self.value:
         setattr(self.row_converter.obj, self.key, self.value)
     except ValueError as e:
-      self.add_error(errors.VALIDATION_ERROR, column_name=self.display_name,
-                     message=e.message)
+      self.add_error(
+          errors.VALIDATION_ERROR,
+          column_name=self.display_name,
+          message=e.message
+      )
     except:  # pylint: disable=bare-except
       self.add_error(errors.UNKNOWN_ERROR)
       logger.exception(
           "Import failed with setattr(%r, %r, %r)",
-          self.row_converter.obj, self.key, self.value,
+          self.row_converter.obj,
+          self.key,
+          self.value,
       )
 
   def get_default(self):
@@ -148,8 +148,10 @@ class DeleteColumnHandler(ColumnHandler):
 
   def parse_item(self):
     if self.raw_value:
-      self.add_error(u"Line {line}: Delete column is temporary disabled, "
-                     "please use web interface to delete current object.")
+      self.add_error(
+          u"Line {line}: Delete column is temporary disabled, please use web "
+          u"interface to delete current object."
+      )
       return None
     if self.raw_value.lower() not in self.ALLOWED_VALUES:
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
@@ -164,20 +166,25 @@ class DeleteColumnHandler(ColumnHandler):
       return
     obj = self.row_converter.obj
     if self.row_converter.is_new:
-      self.add_error(errors.DELETE_NEW_OBJECT_ERROR,
-                     object_type=obj.type,
-                     slug=obj.slug)
+      self.add_error(
+          errors.DELETE_NEW_OBJECT_ERROR, object_type=obj.type, slug=obj.slug
+      )
       return
     if self.row_converter.ignore:
       return
     tr = db.session.begin_nested()
     try:
       tr.session.delete(obj)
-      deleted = len([o for o in tr.session.deleted
-                     if o.type not in self.DELETE_WHITELIST])
+      deleted = len(
+          [
+              o for o in tr.session.deleted
+              if o.type not in self.DELETE_WHITELIST
+          ]
+      )
       if deleted > 1 and not self._allow_cascade:
-        self.add_error(errors.DELETE_CASCADE_ERROR,
-                       object_type=obj.type, slug=obj.slug)
+        self.add_error(
+            errors.DELETE_CASCADE_ERROR, object_type=obj.type, slug=obj.slug
+        )
     finally:
       if self.dry_run or self.row_converter.ignore:
         tr.rollback()
@@ -234,9 +241,9 @@ class UserColumnHandler(ColumnHandler):
   def get_person(self, email):
     from ggrc.utils import user_generator
     new_objects = self.row_converter.block_converter.converter.new_objects
-    if email not in new_objects[Person]:
+    if email not in new_objects[all_models.Person]:
       try:
-        new_objects[Person][email] = user_generator.find_user(email)
+        new_objects[all_models.Person][email] = user_generator.find_user(email)
       except ValueError as ex:
         self.add_error(
             errors.VALIDATION_ERROR,
@@ -244,7 +251,7 @@ class UserColumnHandler(ColumnHandler):
             message=ex.message
         )
         return None
-    return new_objects[Person].get(email)
+    return new_objects[all_models.Person].get(email)
 
   def parse_item(self):
     email = self.raw_value.lower()
@@ -253,8 +260,9 @@ class UserColumnHandler(ColumnHandler):
       if email != "":
         self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
       elif self.mandatory:
-        self.add_error(errors.MISSING_VALUE_ERROR,
-                       column_name=self.display_name)
+        self.add_error(
+            errors.MISSING_VALUE_ERROR, column_name=self.display_name
+        )
     return person
 
   def get_value(self):
@@ -275,7 +283,7 @@ class UsersColumnHandler(UserColumnHandler):
   def parse_item(self):
     """Parses multi users field."""
     people = set()
-    if self.raw_value in {"-", "--", "---"}:
+    if self.value_explicitly_empty(self.raw_value):
       if not self.mandatory:
         self.set_empty = True
         return None
@@ -297,25 +305,20 @@ class UsersColumnHandler(UserColumnHandler):
     return list(people)
 
 
-class SlugColumnHandler(ColumnHandler):
-
-  def parse_item(self):
-    if self.raw_value:
-      return self.raw_value
-    return ""
-
-
 class DateColumnHandler(ColumnHandler):
   """Handler for fields that contains date."""
+
   def parse_item(self):
     if self.view_only:
-      self._check_errors_non_importable_objects(self.get_value().strip(),
-                                                self.raw_value.strip())
+      self._check_errors_non_importable_objects(
+          self.get_value(), self.raw_value
+      )
       return
-    value = self.raw_value.strip()
-    if value and not re.match(r"[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}|"
-                              r"[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}",
-                              self.raw_value.strip()):
+    value = self.raw_value
+    if value and not re.match(
+        r"[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}|"
+        r"[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}", self.raw_value
+    ):
       self.add_error(errors.UNKNOWN_DATE_FORMAT, column_name=self.display_name)
       return
 
@@ -346,16 +349,16 @@ class DateColumnHandler(ColumnHandler):
         try:
           import_date = datetime.strptime(import_date, "%m/%d/%Y")
         except ValueError:
-          self.add_warning(errors.EXPORT_ONLY_WARNING,
-                           column_name=self.display_name)
+          self.add_warning(
+              errors.EXPORT_ONLY_WARNING, column_name=self.display_name
+          )
           return
 
       object_date = datetime.strptime(object_date, '%m/%d/%Y')
 
       if object_date == import_date:
         return
-    self.add_warning(errors.EXPORT_ONLY_WARNING,
-                     column_name=self.display_name)
+    self.add_warning(errors.EXPORT_ONLY_WARNING, column_name=self.display_name)
 
   def get_value(self):
     value = getattr(self.row_converter.obj, self.key)
@@ -381,18 +384,15 @@ class NullableDateColumnHandler(DateColumnHandler):
   """Nullable date column handler."""
 
   DEFAULT_EMPTY_VALUE = "--"
-  EMPTY_VALUE_LIST = ["--", "---"]
 
   def parse_item(self):
     """Datetime column can be nullable."""
-    value = self.raw_value.strip()
-    if value not in self.EMPTY_VALUE_LIST:
+    if not self.value_explicitly_empty(self.raw_value):
       return super(NullableDateColumnHandler, self).parse_item()
     if self.mandatory:
       self.add_error(
-          errors.MISSING_COLUMN,
-          s="",
-          column_names=self.display_name)
+          errors.MISSING_COLUMN, s="", column_names=self.display_name
+      )
     else:
       self.set_empty = True
 
@@ -409,20 +409,19 @@ class EmailColumnHandler(ColumnHandler):
     email = self.raw_value.lower()
     if not email:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name="Email")
-    elif not Person.is_valid_email(email):
+    elif not all_models.Person.is_valid_email(email):
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
       return ""
     return email
 
 
 class TextColumnHandler(ColumnHandler):
-
   """ Single line text field handler """
 
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
     value = self.raw_value or ""
-    value = self.clean_whitespaces(value).strip()
+    value = self.clean_whitespaces(value)
 
     if self.mandatory and not value:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
@@ -435,7 +434,6 @@ class TextColumnHandler(ColumnHandler):
 
 
 class MappingColumnHandler(ColumnHandler):
-
   """ Handler for mapped objects """
 
   def __init__(self, row_converter, key, **options):
@@ -444,7 +442,8 @@ class MappingColumnHandler(ColumnHandler):
     self.attr_name = options.get("attr_name", "")
     self.mapping_object = exportable.get(self.attr_name)
     self.new_slugs = row_converter.block_converter.converter.new_objects[
-        self.mapping_object]
+        self.mapping_object
+    ]
     self.unmap = self.key.startswith(AttributeInfo.UNMAPPING_PREFIX)
     super(MappingColumnHandler, self).__init__(row_converter, key, **options)
 
@@ -479,9 +478,11 @@ class MappingColumnHandler(ColumnHandler):
       elif slug in self.new_slugs and self.dry_run:
         objects.append(slug)
       else:
-        self.add_warning(errors.UNKNOWN_OBJECT,
-                         object_type=class_._inflector.human_singular.title(),
-                         slug=slug)
+        self.add_warning(
+            errors.UNKNOWN_OBJECT,
+            object_type=class_._inflector.human_singular.title(),
+            slug=slug
+        )
     if self.mandatory and not objects and self.row_converter.is_new:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
     return objects
@@ -498,25 +499,34 @@ class MappingColumnHandler(ColumnHandler):
     mapping = None
     for obj in self.value:
       if current_obj.id:
-        mapping = Relationship.find_related(current_obj, obj)
+        mapping = all_models.Relationship.find_related(current_obj, obj)
       if not self.unmap and not mapping:
-        if not (self.mapping_object.__name__ == "Audit" and
-                not getattr(current_obj, "allow_map_to_audit", True)):
-          mapping = Relationship(source=current_obj, destination=obj)
+        if not (
+            self.mapping_object.__name__ == "Audit" and
+            not getattr(current_obj, "allow_map_to_audit", True)
+        ):
+          mapping = all_models.Relationship(source=current_obj,
+                                            destination=obj)
           relationships.append(mapping)
           db.session.add(mapping)
         else:
-          self.add_warning(errors.SINGLE_AUDIT_RESTRICTION,
-                           mapped_type=obj.type,
-                           object_type=current_obj.type)
+          self.add_warning(
+              errors.SINGLE_AUDIT_RESTRICTION,
+              mapped_type=obj.type,
+              object_type=current_obj.type
+          )
       elif self.unmap and mapping:
-        if not (self.mapping_object.__name__ == "Audit" and
-                not getattr(current_obj, "allow_unmap_from_audit", True)):
+        if not (
+            self.mapping_object.__name__ == "Audit" and
+            not getattr(current_obj, "allow_unmap_from_audit", True)
+        ):
           db.session.delete(mapping)
         else:
-          self.add_warning(errors.UNMAP_AUDIT_RESTRICTION,
-                           mapped_type=obj.type,
-                           object_type=current_obj.type)
+          self.add_warning(
+              errors.UNMAP_AUDIT_RESTRICTION,
+              mapped_type=obj.type,
+              object_type=current_obj.type
+          )
     db.session.flush()
     self.dry_run = True
 
@@ -532,10 +542,10 @@ class MappingColumnHandler(ColumnHandler):
 
 
 class ConclusionColumnHandler(ColumnHandler):
-
   """ Handler for design and operationally columns in ControlAssesments """
 
-  CONCLUSION_MAP = {i.lower(): i for i in Assessment.VALID_CONCLUSIONS}
+  CONCLUSION_MAP = {i.lower(): i
+                    for i in all_models.Assessment.VALID_CONCLUSIONS}
 
   def parse_item(self):
     """Parse conclusion design and operational values."""
@@ -555,15 +565,19 @@ class OptionColumnHandler(ColumnHandler):
   """
 
   def parse_item(self):
-    if not self.mandatory and self.raw_value in {"--", "---"}:
+    if not self.mandatory and self.value_explicitly_empty(self.raw_value):
       self.set_empty = True
       return None
     prefixed_key = "{}_{}".format(
-        self.row_converter.object_class._inflector.table_singular, self.key)
-    item = Option.query.filter(
-        and_(Option.title == self.raw_value.strip(),
-             or_(Option.role == self.key,
-                 Option.role == prefixed_key))).first()
+        self.row_converter.object_class._inflector.table_singular, self.key
+    )
+    item = all_models.Option.query.filter(
+        and_(
+            all_models.Option.title == self.raw_value,
+            or_(all_models.Option.role == self.key,
+                all_models.Option.role == prefixed_key)
+        )
+    ).first()
     return item
 
   def get_value(self):
@@ -576,13 +590,9 @@ class OptionColumnHandler(ColumnHandler):
 
 
 class ParentColumnHandler(ColumnHandler):
-
   """ handler for directly mapped columns """
 
   parent = None
-
-  def __init__(self, row_converter, key, **options):
-    super(ParentColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
     """ get parent object """
@@ -595,9 +605,11 @@ class ParentColumnHandler(ColumnHandler):
     if obj is None:
       obj = self.parent.query.filter(self.parent.slug == slug).first()
     if obj is None:
-      self.add_error(errors.UNKNOWN_OBJECT,
-                     object_type=self.parent._inflector.human_singular.title(),
-                     slug=slug)
+      self.add_error(
+          errors.UNKNOWN_OBJECT,
+          object_type=self.parent._inflector.human_singular.title(),
+          slug=slug
+      )
       return None
     context_id = None
     if hasattr(obj, "context_id") and \
@@ -607,8 +619,9 @@ class ParentColumnHandler(ColumnHandler):
         name = self.row_converter.obj.__class__.__name__
         if not permissions.is_allowed_create(name, None, context_id) \
            and not permissions.has_conditions('create', name):
-          self.add_error(errors.MAPPING_PERMISSION_ERROR,
-                         object_type=obj.type, slug=slug)
+          self.add_error(
+              errors.MAPPING_PERMISSION_ERROR, object_type=obj.type, slug=slug
+          )
           return None
     return obj
 
@@ -633,9 +646,7 @@ class ParentColumnHandler(ColumnHandler):
 class ProgramColumnHandler(ParentColumnHandler):
   """Handler for program column on audit imports."""
 
-  def __init__(self, row_converter, key, **options):
-    self.parent = Program
-    super(ProgramColumnHandler, self).__init__(row_converter, key, **options)
+  parent = all_models.Program
 
   def set_obj_attr(self):
     if self.row_converter.is_new:
@@ -651,7 +662,8 @@ class SectionDirectiveColumnHandler(MappingColumnHandler):
 
   def parse_item(self):
     """ get a directive from slug """
-    allowed_directives = [Policy, Regulation, Standard, Contract]
+    allowed_directives = [all_models.Policy, all_models.Regulation,
+                          all_models.Standard, all_models.Contract]
     if self.raw_value == "":
       return None
     slug = self.raw_value
@@ -690,18 +702,21 @@ class AuditColumnHandler(MappingColumnHandler):
 
     audit = self.value[0]
 
-    if isinstance(audit, Audit):
+    if isinstance(audit, all_models.Audit):
       old_slug = None
-      if (hasattr(self.row_converter.obj, "audit") and
-         self.row_converter.obj.audit):
+      if (
+          hasattr(self.row_converter.obj, "audit") and
+          self.row_converter.obj.audit
+      ):
         old_slug = self.row_converter.obj.audit.slug
       else:
         rel_audits = self.row_converter.obj.related_objects(_types="Audit")
         if rel_audits:
           old_slug = rel_audits.pop().slug
       if not self.row_converter.is_new and audit.slug != old_slug:
-        self.add_warning(errors.UNMODIFIABLE_COLUMN,
-                         column_name=self.display_name)
+        self.add_warning(
+            errors.UNMODIFIABLE_COLUMN, column_name=self.display_name
+        )
         self.value = []
       else:
         self.row_converter.obj.context = audit.context
@@ -709,7 +724,6 @@ class AuditColumnHandler(MappingColumnHandler):
 
 
 class ObjectPersonColumnHandler(UserColumnHandler):
-
   """
   ObjectPerson handler for all specific columns such as "owner" or any other
   role. This handler will remove all people not listed in the value and will
@@ -723,24 +737,30 @@ class ObjectPersonColumnHandler(UserColumnHandler):
     pass
 
   def get_value(self):
-    object_person = db.session.query(ObjectPerson.person_id).filter_by(
+    object_person = db.session.query(
+        all_models.ObjectPerson.person_id,
+    ).filter_by(
         personable_id=self.row_converter.obj.id,
-        personable_type=self.row_converter.obj.__class__.__name__)
-    users = Person.query.filter(Person.id.in_(object_person))
+        personable_type=self.row_converter.obj.__class__.__name__
+    )
+    users = all_models.Person.query.filter(
+        all_models.Person.id.in_(object_person),
+    )
     emails = [user.email for user in users]
     return "\n".join(emails)
 
   def remove_current_people(self):
-    ObjectPerson.query.filter_by(
+    all_models.ObjectPerson.query.filter_by(
         personable_id=self.row_converter.obj.id,
-        personable_type=self.row_converter.obj.__class__.__name__).delete()
+        personable_type=self.row_converter.obj.__class__.__name__
+    ).delete()
 
   def insert_object(self):
     if self.dry_run or not self.value:
       return
     self.remove_current_people()
     for person in self.value:
-      object_person = ObjectPerson(
+      object_person = all_models.ObjectPerson(
           personable=self.row_converter.obj,
           person=person,
           context=self.row_converter.obj.context
@@ -751,7 +771,6 @@ class ObjectPersonColumnHandler(UserColumnHandler):
 
 
 class PersonMappingColumnHandler(ObjectPersonColumnHandler):
-
   """
   This handler will only add people listed in self.value if they are not yet
   connected to the current object.
@@ -759,16 +778,17 @@ class PersonMappingColumnHandler(ObjectPersonColumnHandler):
 
   def remove_current_people(self):
     obj = self.row_converter.obj
-    self.value = [person for person in self.value
-                  if not ObjectPerson.query.filter_by(
-                      personable_id=obj.id,
-                      personable_type=obj.__class__.__name__,
-                      person=person).count()
-                  ]
+    self.value = [
+        person for person in self.value
+        if not all_models.ObjectPerson.query.filter_by(
+            personable_id=obj.id,
+            personable_type=obj.__class__.__name__,
+            person=person
+        ).count()
+    ]
 
 
 class PersonUnmappingColumnHandler(ObjectPersonColumnHandler):
-
   """
   This handler will only remove people listed in self.value if they are already
   connected to the current object.
@@ -781,7 +801,7 @@ class PersonUnmappingColumnHandler(ObjectPersonColumnHandler):
     context = getattr(obj, 'context', None)
     user_role = getattr(all_models, 'UserRole', None)
     for person in self.value:
-      ObjectPerson.query.filter_by(
+      all_models.ObjectPerson.query.filter_by(
           personable_id=obj.id,
           personable_type=obj.__class__.__name__,
           person=person
@@ -801,16 +821,18 @@ class CategoryColumnHandler(ColumnHandler):
     names = [name for name in names if name != ""]
     if not names:
       return None
-    categories = CategoryBase.query.filter(and_(
-        CategoryBase.name.in_(names),
-        CategoryBase.type == self.category_base_type
-    )).all()
+    categories = all_models.CategoryBase.query.filter(
+        and_(
+            all_models.CategoryBase.name.in_(names),
+            all_models.CategoryBase.type == self.category_base_type
+        )
+    ).all()
     category_names = set([c.name.strip() for c in categories])
     for name in names:
       if name not in category_names:
-        self.add_warning(errors.WRONG_MULTI_VALUE,
-                         column_name=self.display_name,
-                         value=name)
+        self.add_warning(
+            errors.WRONG_MULTI_VALUE, column_name=self.display_name, value=name
+        )
     return categories
 
   def set_obj_attr(self):
@@ -828,23 +850,25 @@ class ControlCategoryColumnHandler(CategoryColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.category_base_type = "ControlCategory"
-    super(ControlCategoryColumnHandler, self).__init__(
-        row_converter, key, **options)
+    super(ControlCategoryColumnHandler,
+          self).__init__(row_converter, key, **options)
 
 
 class ControlAssertionColumnHandler(CategoryColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.category_base_type = "ControlAssertion"
-    super(ControlAssertionColumnHandler, self).__init__(
-        row_converter, key, **options)
+    super(ControlAssertionColumnHandler,
+          self).__init__(row_converter, key, **options)
 
 
 class DocumentsColumnHandler(ColumnHandler):
 
   def get_value(self):
-    lines = [u"{} {}".format(d.title, d.link)
-             for d in self.row_converter.obj.documents]
+    lines = [
+        u"{} {}".format(d.title, d.link)
+        for d in self.row_converter.obj.documents
+    ]
     return u"\n".join(lines)
 
   def parse_item(self):
@@ -856,7 +880,8 @@ class DocumentsColumnHandler(ColumnHandler):
         continue
       title, link = line
       documents.append(
-          all_models.Document(title=title.strip(), link=link.strip()))
+          all_models.Document(title=title.strip(), link=link.strip())
+      )
     return documents
 
   def set_obj_attr(self):
