@@ -24,8 +24,8 @@ class TestTicketTrackerExport(TestCase):
   @patch('ggrc.integrations.issues.Client.update_issue')
   def test_ticket_tracker_export(self, _):
     """Import of Ticket Tracker attribute"""
-    with patch.object(models.hooks.issue_tracker, '_is_issue_tracker_enabled',
-                      return_value=True):
+    with patch.object(models.hooks.issue_tracker.assessment_integration,
+                      '_is_issue_tracker_enabled', return_value=True):
       iti = factories.IssueTrackerIssueFactory()
       asmt = iti.issue_tracked_obj
       asmt_id = asmt.id
