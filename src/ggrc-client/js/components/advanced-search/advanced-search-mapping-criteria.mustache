@@ -26,7 +26,7 @@
       </div>
       <div class="mapping-criteria__action">
         {{#if showPopover}}
-          <simple-popover {button-text}="'+ Add''" extra-css-class="advanced-search">
+          <simple-popover {button-text}="'+ Add''" extra-css-class="advanced-search" placement="top">
             <button class="mapping-criteria__action-button" ($click)="addRelevant()">Map Condition</button>
             {{^if isClone}}<button class="mapping-criteria__action-button" ($click)="createGroup()">Group Expression</button>{{/if}}
           </simple-popover>
