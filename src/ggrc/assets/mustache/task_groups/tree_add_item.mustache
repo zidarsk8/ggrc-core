@@ -4,11 +4,10 @@
 }}
 
 <create-task-group-button
+  {allow-mapping-or-creating}="allow_mapping_or_creating"
+  {allow-creating}="allow_creating"
   {workflow}="parent_instance">
-  {{#if allow_mapping_or_creating}}
-  {{#if allow_creating}}
-  {{#is_allowed 'update' workflow context='for'}}
-  {{^if_equals workflow.status 'Inactive'}}
+  {{#if showCreateButton}}
     <a href="javascript://"
       rel="tooltip"
       data-placement="left"
@@ -28,8 +27,5 @@
       }'>
       Create
     </a>
-  {{/if_equals}}
-  {{/is_allowed}}
-  {{/if}}
   {{/if}}
 </create-task-group-button>
