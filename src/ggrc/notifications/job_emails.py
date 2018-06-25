@@ -43,12 +43,17 @@ EXPORT_FAILED = {
 }
 
 
-def send_email(template, user_email, url_root, filename=""):
+def send_email(template, user_email, url_root, filename="", ie_id=None):
   """ Send email """
   subject = template["title"].format(filename=filename)
+
+  url = urljoin(url_root, template["url"])
+  if ie_id is not None:
+    url = "{}#!job_id={}".format(url, str(ie_id))
+
   data = {
       "body": template["body"],
-      "url": urljoin(url_root, template["url"]),
+      "url": url,
       "title": subject
   }
   body = settings.EMAIL_IMPORT_EXPORT.render(import_export=data)
