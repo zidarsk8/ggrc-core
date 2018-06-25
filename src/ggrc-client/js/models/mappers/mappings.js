@@ -7,17 +7,6 @@ import {
   getModelByType,
   getMappableTypes,
 } from '../../plugins/ggrc_utils';
-import {
-  Proxy,
-  Direct,
-  Search,
-  Multi,
-  TypeFilter,
-  AttrFilter,
-  CustomFilter,
-  Cross,
-  Indirect,
-} from '../mappers/mapper-helpers';
 
 /*
   class Mappings
@@ -39,16 +28,6 @@ import {
   }
 */
 export default can.Construct.extend({
-  // Convenience properties for building mappings types.
-  Proxy,
-  Direct,
-  Indirect,
-  Search,
-  Multi,
-  TypeFilter,
-  AttrFilter,
-  CustomFilter,
-  Cross,
   modules: {},
   getTypeGroups: function () {
     return {
