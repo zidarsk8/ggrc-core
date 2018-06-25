@@ -25,11 +25,7 @@ export default can.Component.extend({
       document.removeEventListener('mousedown', this);
     },
     toggle: function () {
-      if (this.attr('open')) {
-        this.hide();
-      } else {
-        this.show();
-      }
+      this.attr('open') ? this.hide() : this.show();
     },
     handleEvent: function (event) {
       if (this.attr('element')

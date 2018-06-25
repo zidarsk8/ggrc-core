@@ -55,11 +55,8 @@ export default can.Component.extend({
       let current = this.attr('paging.current');
       let size = this.attr('paging.pageSize');
       let total = this.attr('paging.total');
-      let first;
-      let last;
-
-      first = (current - 1) * size + 1;
-      last = current * size < total ? current * size : total;
+      let first = (current - 1) * size + 1;
+      let last = current * size < total ? current * size : total;
 
       return total ? `${first}-${last} of ${total}` :
         'No records';
@@ -70,13 +67,7 @@ export default can.Component.extend({
       }
     },
     pagesList: function () {
-      let pagesList = [];
-
-      for (let i = 1; i <= this.paging.attr('count'); i++) {
-        pagesList.push(i);
-      }
-
-      return pagesList;
+      return _.range(1, this.paging.attr('count') + 1);
     },
     getPageTitle: function (pageNumber) {
       let size = this.attr('paging.pageSize');
