@@ -5,7 +5,6 @@
 
 import {
   Proxy,
-  Search,
   Multi,
   TypeFilter,
 } from '../models/mappers/mapper-helpers';
@@ -127,22 +126,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
         _mixins: ['related', 'related_objects', 'related_risk'],
         orphaned_objects: Multi([]),
       },
-      Person: {
-        owned_risks: TypeFilter('related_objects_via_search', 'Risk'),
-        owned_threats: TypeFilter('related_objects_via_search', 'Threat'),
-        all_risks: Search(function (binding) {
-          return CMS.Models.Risk.findAll({});
-        }),
-        all_threats: Search(function (binding) {
-          return CMS.Models.Threat.findAll({});
-        }),
-      },
     };
-
-    // patch Person to extend query for dashboard
-    Mappings.modules.ggrc_core
-      .Person.related_objects_via_search
-      .observe_types.push('Risk', 'Threat');
 
     can.each(riskObjectTypes, function (type) {
       mappings[type] = _.assign(mappings[type] || {}, {
@@ -159,11 +143,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
   // Initialize widgets for risk page
   RisksExtension.init_widgets = function () {
     let pageInstance = getPageInstance();
-    let isMyWork = function () {
-      return pageInstance && pageInstance.type === 'Person';
-    };
 
-    let relatedOrOwned = isMyWork() ? 'owned_' : 'related_';
     let sortedWidgetTypes = _.sortBy(riskObjectTypes, function (type) {
       let model = CMS.Models[type] || {};
       return model.title_plural || type;
@@ -173,9 +153,6 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
     let extendedModuleTypes = riskObjectTypes.concat(moduleObjectNames);
     let subTrees = GGRC.tree_view.sub_tree_for;
 
-    if (/^\/objectBrowser\/?$/.test(window.location.pathname)) {
-      relatedOrOwned = 'all_';
-    }
     // Init widget descriptors:
     can.each(sortedWidgetTypes, function (modelName) {
       let model;
@@ -248,7 +225,6 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
         draw_children: true,
         parent_instance: pageInstance,
         model: CMS.Models.Threat,
-        mapping: relatedOrOwned + CMS.Models.Threat.table_plural,
       },
     };
     riskDescriptor = {
@@ -262,7 +238,6 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
         draw_children: true,
         parent_instance: pageInstance,
         model: CMS.Models.Risk,
-        mapping: relatedOrOwned + CMS.Models.Risk.table_plural,
       },
     };
 
