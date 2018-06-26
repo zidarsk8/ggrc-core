@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import RecentlyViewedObject from '../models/recently_viewed_object';
+import RecentlyViewedObject from '../models/local-storage/recently-viewed-object';
 
 can.Control('CMS.Controllers.InfiniteScroll', {
   defaults: {},

@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import LocalStorage from './local-storage';
+
 let COLLAPSE = 'collapse';
 let LHN_SIZE = 'lhn_size';
 let OBJ_SIZE = 'obj_size';
@@ -16,13 +18,13 @@ let MODAL_STATE = 'modal_state';
 const RELEASE_NOTES_DATE = 'RELEASE_NOTES_DATE';
 let path = window.location.pathname.replace(/\./g, '/');
 
-can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
+export default LocalStorage('CMS.Models.DisplayPrefs', {
   autoupdate: true,
   version: 20150129, // Last updated to add 2 accessors
 
   findAll: function () {
     let that = this;
-    let objsDfd = this._super.apply(this, arguments)
+    let objsDfd = this._super(...arguments)
       .then(function (objs) {
         let i;
         for (i = objs.length; i--;) {
@@ -38,7 +40,7 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
 
   findOne: function () {
     let that = this;
-    let objDfd = this._super.apply(this, arguments)
+    let objDfd = this._super(...arguments)
       .then(function (obj) {
         let dfd;
         let p;
