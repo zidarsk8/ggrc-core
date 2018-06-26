@@ -8,6 +8,7 @@ import {
   makeRequest,
 } from './utils/query-api-utils';
 import RefreshQueue from '../models/refresh_queue';
+import Mappings from '../models/mappers/mappings';
 
 (function ($) {
   'use strict';
@@ -225,7 +226,7 @@ import RefreshQueue from '../models/refresh_queue';
           baseSearch.indexOf('__mappable') === 0 ||
           baseSearch.indexOf('__all') === 0
         ) {
-          searchtypes = GGRC.Mappings.get_canonical_mappings_for(
+          searchtypes = Mappings.get_canonical_mappings_for(
             this.options.parent_instance.constructor.shortName
           );
           if (baseSearch.indexOf('__mappable') === 0) {
