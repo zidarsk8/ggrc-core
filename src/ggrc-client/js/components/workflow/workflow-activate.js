@@ -3,7 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import workflowHelpers from './workflow-helpers';
+import {
+  generateCycle,
+  redirectToCycle,
+} from '../../plugins/utils/workflow-utils';
 import {
   initCounts,
 } from '../../plugins/utils/current-page-utils';
@@ -30,7 +33,7 @@ const viewModel = can.Map.extend({
   },
   redirectToFirstCycle(workflow) {
     const cycleStub = workflow.attr('cycles')[0];
-    workflowHelpers.redirectToCycle(cycleStub);
+    redirectToCycle(cycleStub);
   },
   async repeatOnHandler(workflow) {
     let result = Promise.resolve();
@@ -52,7 +55,7 @@ const viewModel = can.Map.extend({
   async repeatOffHandler(workflow) {
     this.attr('waiting', true);
     try {
-      await workflowHelpers.generateCycle(workflow);
+      await generateCycle(workflow);
       await workflow.refresh();
       await workflow.attr('status', 'Active').save();
     } catch (err) {
