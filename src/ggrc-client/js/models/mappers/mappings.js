@@ -128,8 +128,7 @@ export default can.Construct.extend({
     let type;
     let cmsModel;
     cmsModel = getModelByType(modelName);
-    if (!cmsModel || !cmsModel.title_singular ||
-      cmsModel.title_singular === 'Reference') {
+    if (!cmsModel || !cmsModel.title_singular) {
       return;
     }
     type = this._prepareCorrectTypeFormat(cmsModel);

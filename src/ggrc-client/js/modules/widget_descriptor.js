@@ -144,10 +144,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
           } else if (farModel.title_plural === 'Audits') {
             return 'Mapped Audits';
           }
-          return (
-            farModel.title_plural === 'References' ?
-              'Linked ' : 'Mapped '
-          ) + farModelName;
+          return `Mapped ${farModelName}`;
         },
         widget_icon: farModel.table_singular,
         object_category: farModel.category || 'default',
