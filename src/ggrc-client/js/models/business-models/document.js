@@ -3,8 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {getRole} from '../plugins/utils/acl-utils';
-import {backendGdriveClient} from '../plugins/ggrc-gapi-client';
+import {getRole} from '../../plugins/utils/acl-utils';
+import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 
 const getAccessControlList = ()=> {
   let adminRole = getRole('Document', 'Admin');
@@ -15,7 +15,7 @@ const getAccessControlList = ()=> {
   }] : [];
 };
 
-can.Model.Cacheable('CMS.Models.Document', {
+export default can.Model.Cacheable('CMS.Models.Document', {
   root_object: 'document',
   root_collection: 'documents',
   title_singular: 'Document',

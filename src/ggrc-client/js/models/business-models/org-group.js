@@ -3,15 +3,15 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-can.Model.Cacheable('CMS.Models.Metric', {
-  root_object: 'metric',
-  root_collection: 'metrics',
+export default can.Model.Cacheable('CMS.Models.OrgGroup', {
+  root_object: 'org_group',
+  root_collection: 'org_groups',
   category: 'business',
-  findAll: '/api/metrics',
-  findOne: '/api/metrics/{id}',
-  create: 'POST /api/metrics',
-  update: 'PUT /api/metrics/{id}',
-  destroy: 'DELETE /api/metrics/{id}',
+  findAll: 'GET /api/org_groups',
+  findOne: 'GET /api/org_groups/{id}',
+  create: 'POST /api/org_groups',
+  update: 'PUT /api/org_groups/{id}',
+  destroy: 'DELETE /api/org_groups/{id}',
   mixins: [
     'unique_title',
     'ca_update',
@@ -19,6 +19,8 @@ can.Model.Cacheable('CMS.Models.Metric', {
     'accessControlList',
     'base-notifications',
   ],
+  is_custom_attributable: true,
+  isRoleable: true,
   attributes: {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
@@ -30,10 +32,12 @@ can.Model.Cacheable('CMS.Models.Metric', {
   },
   tree_view_options: {
     attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
+    add_item_view:
+    GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
     attr_list: can.Model.Cacheable.attr_list.concat([
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url'},
       {
         attr_title: 'Description',
         attr_name: 'description',
@@ -48,23 +52,32 @@ can.Model.Cacheable('CMS.Models.Metric', {
         disable_sorting: true,
       },
     ]),
-    add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
-    link_buttons: true,
-    display_attr_names: ['title', 'status', 'updated_at'],
-  },
-  is_custom_attributable: true,
-  isRoleable: true,
-  defaults: {
-    title: '',
-    url: '',
-    status: 'Draft',
   },
   sub_tree_view_options: {
-    default_filter: ['Product'],
+    default_filter: ['Program'],
+  },
+  links_to: {
+    System: {},
+    Process: {},
+    Program: {},
+    Product: {},
+    Facility: {},
+    OrgGroup: {},
+    Vendor: {},
+    Project: {},
+    DataAsset: {},
+    AccessGroup: {},
+    Market: {},
+  },
+  defaults: {
+    status: 'Draft',
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
+    if (this._super) {
+      this._super(...arguments);
+    }
+
     this.validateNonBlank('title');
-    this._super(...arguments);
   },
 }, {});

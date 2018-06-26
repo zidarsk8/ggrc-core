@@ -2,7 +2,8 @@
   Copyright (C) 2018 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
-import {getRole} from '../plugins/utils/acl-utils';
+
+import {getRole} from '../../plugins/utils/acl-utils';
 
 const getAccessControlList = ()=> {
   let adminRole = getRole('Evidence', 'Admin');
@@ -13,7 +14,7 @@ const getAccessControlList = ()=> {
   }] : [];
 };
 
-can.Model.Cacheable('CMS.Models.Evidence', {
+export default can.Model.Cacheable('CMS.Models.Evidence', {
   root_object: 'evidence',
   root_collection: 'evidence',
   title_singular: 'Evidence',
