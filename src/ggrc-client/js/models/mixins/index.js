@@ -14,7 +14,6 @@ import './contactable';
 import './in-scope-objects-preload';
 import './in-scope-objects';
 import './is-overdue';
-import './mapping-limit-issue';
 import './mapping-limit';
 import './mixin';
 import './proposable';

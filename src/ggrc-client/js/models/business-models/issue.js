@@ -15,7 +15,6 @@ export default can.Model.Cacheable('CMS.Models.Issue', {
   mixins: [
     'ca_update',
     'timeboxed',
-    'mapping-limit-issue',
     'inScopeObjects',
     'inScopeObjectsPreload',
     'accessControlList',
@@ -56,6 +55,12 @@ export default can.Model.Cacheable('CMS.Models.Issue', {
     status: 'Draft',
   },
   statuses: ['Draft', 'Deprecated', 'Active', 'Fixed', 'Fixed and Verified'],
+  getAllowedMappings() {
+    return _.union(
+      GGRC.config.snapshotable_objects,
+      ['Issue', 'Program', 'Project', 'TaskGroup', 'Document']
+    );
+  },
   init: function () {
     if (this._super) {
       this._super(...arguments);
