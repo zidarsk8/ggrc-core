@@ -681,14 +681,6 @@ import Permission from '../../permission';
       this.init_count();
     },
 
-    '[custom-event] click': function (el, ev) {
-      let eventName = el.attr('custom-event');
-      if (this.options.events &&
-        typeof this.options.events[eventName] === 'function') {
-        this.options.events[eventName].apply(this, arguments);
-      }
-    },
-
     clearList: function () {
       this.element.children('.tree-item, .tree-item-placeholder').remove();
     },
