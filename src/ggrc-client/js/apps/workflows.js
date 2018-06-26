@@ -243,13 +243,6 @@ import {
         workflow: Cross('cycle', 'workflow'),
       },
       Person: {
-        assigned_tasks: Search(function (binding) {
-          return CMS.Models.CycleTaskGroupObjectTask.findAll({
-            contact_id: binding.instance.id,
-            'cycle.is_current': true,
-            status__in: 'Assigned,In Progress,Finished,Declined,Deprecated',
-          });
-        }, 'Cycle'),
         assigned_tasks_with_history: Search(function (binding) {
           return CMS.Models.CycleTaskGroupObjectTask.findAll({
             contact_id: binding.instance.id,
