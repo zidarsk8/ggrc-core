@@ -192,7 +192,6 @@ import Search from '../models/service-models/search';
       let that = this;
       let $that = $(this.element);
       let baseSearch = $that.data('lookup');
-      let fromList = $that.data('from-list');
       let searchParams = $that.data('params');
       let permission = $that.data('permission-type');
       let searchtypes;
@@ -212,42 +211,8 @@ import Search from '../models/service-models/search';
         $(this).data(that.widgetFullName).search($(this).val());
       });
 
-      if (fromList) {
-        this.options.searchlist = $.when.apply(
-          this,
-          $.map(fromList.list, function (item) {
-            let props = baseSearch.trim().split('.');
-            return item.instance.refresh_all(...props);
-          })
-        );
-      } else if (baseSearch) {
-        baseSearch = baseSearch.trim();
-        if (
-          baseSearch.indexOf('__mappable') === 0 ||
-          baseSearch.indexOf('__all') === 0
-        ) {
-          searchtypes = Mappings.get_canonical_mappings_for(
-            this.options.parent_instance.constructor.shortName
-          );
-          if (baseSearch.indexOf('__mappable') === 0) {
-            searchtypes = can.map(searchtypes, function (mapping) {
-              return (mapping instanceof GGRC.ListLoaders.ProxyListLoader) ?
-                     mapping : undefined;
-            });
-          }
-          if (baseSearch.indexOf('_except:')) {
-            typeNames = baseSearch.substr(
-              baseSearch.indexOf('_except:') + 8
-            ).split(',');
-
-            can.each(typeNames, function (remove) {
-              delete searchtypes[remove];
-            });
-          }
-          searchtypes = Object.keys(searchtypes);
-        } else {
-          searchtypes = baseSearch.split(',');
-        }
+      if (baseSearch) {
+        searchtypes = baseSearch.trim().split(',');
 
         this.options.searchtypes = can.map(searchtypes, function (typeName) {
           return CMS.Models[typeName].model_singular;
