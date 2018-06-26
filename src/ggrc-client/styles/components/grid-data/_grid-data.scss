@@ -81,43 +81,6 @@
     }
   }
 
-  &.loading {
-    overflow: hidden;
-    opacity: 0.5;
-
-    // Should affect only direct children
-    > .spinner-wrapper {
-      padding: 0;
-      margin: 0;
-      display: flex;
-      opacity: 0;
-
-      &.active {
-        z-index: 9999;
-        opacity: 1;
-      }
-
-      .spinner {
-        position: absolute;
-        right: 0;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        display: flex;
-        align-items: center;
-        font-size: 18px;
-        // Bigger spinner with separate color for the grid
-        &.grid-spinner {
-          justify-content: center;
-
-          .fa {
-            color: $defaultWidget;
-            font-size: 32px;
-          }
-        }
-      }
-    }
-  }
   > object-list {
     > object-list-item {
       &:nth-child(2n) {
