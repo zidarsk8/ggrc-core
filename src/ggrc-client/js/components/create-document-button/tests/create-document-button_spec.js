@@ -61,7 +61,10 @@ describe('CreateDocumentButton component', () => {
       it('should attach existing documents if they are already exists',
         (done) => {
           let file = {};
-          let existingDocument = {};
+          let response = [{
+            exists: true,
+            object: {},
+          }];
           spyOn(viewModel, 'createDocuments')
             .and.returnValue(can.Deferred().resolve([]));
           spyOn(viewModel, 'useExistingDocuments')
@@ -69,12 +72,9 @@ describe('CreateDocumentButton component', () => {
 
           viewModel.mapDocuments([file]);
 
-          checkDocumentsExistDfd.resolve([{
-            exists: true,
-            object: existingDocument,
-          }]).then(() => {
+          checkDocumentsExistDfd.resolve(response).then(() => {
             expect(viewModel.useExistingDocuments)
-              .toHaveBeenCalledWith([existingDocument]);
+              .toHaveBeenCalledWith(response);
             done();
           });
         });
@@ -84,7 +84,15 @@ describe('CreateDocumentButton component', () => {
         let file2 = {id: 2};
         let files = [file1, file2];
 
-        let existingDocument = {};
+        let existingDocument = {
+          gdrive_id: 1,
+          exists: true,
+          object: existingDocument,
+        };
+        let notExistingDocument = {
+          gdrive_id: 2,
+          exists: false,
+        };
 
         spyOn(viewModel, 'createDocuments')
           .and.returnValue(can.Deferred().resolve([]));
@@ -93,14 +101,10 @@ describe('CreateDocumentButton component', () => {
 
         viewModel.mapDocuments(files);
 
-        checkDocumentsExistDfd.resolve([{
-          gdrive_id: 1,
-          exists: true,
-          object: existingDocument,
-        }, {
-          gdrive_id: 2,
-          exists: false,
-        }]).then(() => {
+        checkDocumentsExistDfd.resolve([
+          existingDocument,
+          notExistingDocument,
+        ]).then(() => {
           expect(viewModel.useExistingDocuments)
             .toHaveBeenCalledWith([existingDocument]);
           expect(viewModel.createDocuments)

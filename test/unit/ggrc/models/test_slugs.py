@@ -51,6 +51,7 @@ class TestSlugPrefix(unittest.TestCase):
       'Threat': 'THREAT',
       'Vendor': 'VENDOR',
       'Workflow': 'WORKFLOW',
+      'Metric': 'METRIC',
   }
 
   @ddt.data(*all_models.all_models)

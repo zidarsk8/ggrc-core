@@ -5,6 +5,7 @@
 
 import '../assessment/people/lhn-popup-people';
 import '../tasks-counter/tasks-counter';
+import '../tooltip-content/tooltip-content';
 import '../feedback-link/feedback-link';
 import '../release-notes-menu-item/release-notes-menu-item';
 import logo from '../../../images/ggrc-logo.svg';
@@ -28,6 +29,7 @@ import template from './page-header.mustache';
     Project: 'header-style-1',
     Facility: 'header-style-1',
     Market: 'header-style-1',
+    Metric: 'header-style-1',
     Audit: 'header-style-2',
     Assessment: 'header-style-2',
     Issue: 'header-style-3',

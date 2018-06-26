@@ -22,6 +22,8 @@ from ggrc.models.mixins.with_auto_deprecation import WithAutoDeprecation
 from ggrc.models.relationship import Relatable
 from ggrc.utils import referenced_objects
 
+from ggrc.services import signals
+
 
 class Evidence(Roleable, Relatable, mixins.Titled,
                bfh.BeforeFlushHandleable, Statusable,
@@ -57,6 +59,9 @@ class Evidence(Roleable, Relatable, mixins.Titled,
   description = deferred(db.Column(db.Text, nullable=False, default=u""),
                          "Evidence")
 
+  # Override from Commentable mixin (can be removed after GGRC-5192)
+  send_by_default = db.Column(db.Boolean, nullable=False, default=True)
+
   _api_attrs = reflection.ApiAttributes(
       "title",
       reflection.Attribute("link", update=False),
@@ -89,9 +94,9 @@ class Evidence(Roleable, Relatable, mixins.Titled,
 
   _aliases = {
       "title": "Title",
-      "link": "Attachment",
-      "description": "description",
-      "kind": "type",
+      "link": "Link",
+      "description": "Description",
+      "kind": "Type",
       "archived": {
           "display_name": "Archived",
           "mandatory": False
@@ -202,14 +207,12 @@ class Evidence(Roleable, Relatable, mixins.Titled,
   def _build_relationship(self, parent_obj):
     """Build relationship between evidence and parent object"""
     from ggrc.models import all_models
-    from ggrc.models.mixins.autostatuschangeable import AutoStatusChangeable
     rel = all_models.Relationship(
         source=parent_obj,
         destination=self
     )
     db.session.add(rel)
-    if isinstance(parent_obj, AutoStatusChangeable):
-      parent_obj.move_to_in_progress()
+    signals.Restful.model_put.send(rel.__class__, obj=rel, service=self)
 
   def _update_fields(self, response):
     """Update fields of evidence with values of the copied file"""

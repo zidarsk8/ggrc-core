@@ -58,9 +58,13 @@ class TestBaseBlock(TestCase):
               markets[i].slug
           )
 
-    block = base_block.BlockConverter(mock.MagicMock())
-    block.object_class = models.Regulation
-    block.object_ids = [r.id for r in regulations]
+    block = base_block.ExportBlockConverter(
+        mock.MagicMock(),
+        object_class=models.Regulation,
+        fields="all",
+        object_ids=[r.id for r in regulations],
+        class_name=models.Regulation.__name__,
+    )
 
     with QueryCounter() as counter:
       cache = block._create_mapping_cache()
@@ -94,8 +98,12 @@ class TestBaseBlock(TestCase):
             destination=regulation if i % 2 == 1 else controls[i],
         ))
 
-    block = base_block.BlockConverter(mock.MagicMock())
-    block.object_class = models.Regulation
-    block.object_ids = [regulation.id]
+    block = base_block.ExportBlockConverter(
+        mock.MagicMock(),
+        object_class=models.Regulation,
+        fields="all",
+        object_ids=[regulation.id],
+        class_name=models.Regulation.__name__,
+    )
     id_map = block._get_identifier_mappings(relationships)
     self.assertEqual(expected_id_map, id_map)

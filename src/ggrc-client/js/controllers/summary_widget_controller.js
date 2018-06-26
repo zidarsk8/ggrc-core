@@ -168,7 +168,7 @@ export default can.Control({
       if (selectedItem) {
         let topping = data.getValue(selectedItem.row, 0);
         router.attr({
-          widget: 'assessment_widget',
+          widget: 'assessment',
           state: [topping],
         });
       }

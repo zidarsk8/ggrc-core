@@ -7,6 +7,16 @@ import {
   initCounts,
 } from '../plugins/utils/current-page-utils';
 import InfoWidget from '../controllers/info_widget_controller';
+import {
+  Proxy,
+  Direct,
+  Search,
+  Multi,
+  TypeFilter,
+  CustomFilter,
+  Reify,
+  Cross,
+} from '../models/mappers/mapper-helpers';
 
 (function ($, CMS, GGRC) {
   let WorkflowExtension = {};
@@ -15,7 +25,7 @@ import InfoWidget from '../controllers/info_widget_controller';
     'Program Regulation Policy Standard Contract Clause Section'.split(' '),
     'Request Control Objective OrgGroup Vendor AccessGroup'.split(' '),
     'System Process DataAsset Product Project Facility Market'.split(' '),
-    'Issue Risk Threat'.split(' ')
+    'Issue Risk Threat Metric'.split(' ')
   );
 
   let draftOnUpdateMixin;
@@ -59,15 +69,6 @@ import InfoWidget from '../controllers/info_widget_controller';
 
   // Configure mapping extensions for ggrc_workflows
   WorkflowExtension.init_mappings = function () {
-    let Proxy = GGRC.MapperHelpers.Proxy;
-    let Direct = GGRC.MapperHelpers.Direct;
-    let Cross = GGRC.MapperHelpers.Cross;
-    let Multi = GGRC.MapperHelpers.Multi;
-    let CustomFilter = GGRC.MapperHelpers.CustomFilter;
-    let Reify = GGRC.MapperHelpers.Reify;
-    let Search = GGRC.MapperHelpers.Search;
-    let TypeFilter = GGRC.MapperHelpers.TypeFilter;
-
     // Add mappings for basic workflow objects
     let mappings = {
       TaskGroup: {
@@ -140,7 +141,7 @@ import InfoWidget from '../controllers/info_widget_controller';
             'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
             'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
             'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
-            'Objective', 'Audit', 'AccessGroup',
+            'Objective', 'Audit', 'AccessGroup', 'Metric',
             'Risk', 'Threat',
           ],
         },
@@ -164,6 +165,7 @@ import InfoWidget from '../controllers/info_widget_controller';
         related_data_assets: TypeFilter('related_objects', 'DataAsset'),
         related_facilities: TypeFilter('related_objects', 'Facility'),
         related_markets: TypeFilter('related_objects', 'Market'),
+        related_metrics: TypeFilter('related_objects', 'Metric'),
         related_org_groups: TypeFilter('related_objects', 'OrgGroup'),
         related_vendors: TypeFilter('related_objects', 'Vendor'),
         related_processes: TypeFilter('related_objects', 'Process'),
@@ -406,8 +408,8 @@ import InfoWidget from '../controllers/info_widget_controller';
     }
 
     new GGRC.WidgetList('ggrc_workflows', descriptor, [
-      'info_widget',
-      'task_widget',
+      'info',
+      'task',
     ]);
   };
 
@@ -565,8 +567,8 @@ import InfoWidget from '../controllers/info_widget_controller';
       };
     }
     new GGRC.WidgetList('ggrc_workflows', descriptor, [
-      'info_widget',
-      'task_widget',
+      'info',
+      'task',
     ]);
   };
 

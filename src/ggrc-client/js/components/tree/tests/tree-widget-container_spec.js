@@ -764,4 +764,19 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       expect(result).toBe(true);
     });
   });
+
+  describe('showLastPage() method', () => {
+    beforeEach(() => {
+    });
+
+    it('assigns last page index to pageInfo.current', () => {
+      const count = 711;
+      vm.attr('pageInfo.count', count);
+      vm.attr('pageInfo.current', count + 1);
+
+      vm.showLastPage();
+
+      expect(vm.attr('pageInfo.current')).toBe(count);
+    });
+  });
 });

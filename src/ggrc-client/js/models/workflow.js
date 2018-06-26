@@ -48,7 +48,12 @@
         {attr_title: 'State', attr_name: 'status'},
         {attr_title: 'Last Updated Date', attr_name: 'updated_at'},
         {attr_title: 'Last Updated By', attr_name: 'modified_by'},
-      ],
+        {attr_title: 'Repeat', attr_name: 'repeat'},
+        {
+          attr_title: 'Description',
+          attr_name: 'description',
+          disable_sorting: true,
+        }],
       display_attr_names: ['title', 'status', 'updated_at', 'Admin',
         'Workflow Member'],
       adminRoleName: 'Admin',
@@ -74,7 +79,7 @@
 
       this._super(...arguments)
         .then((instance) => {
-          redirectLink = `${instance.viewLink}#task_group_widget`;
+          redirectLink = `${instance.viewLink}#task_group`;
           instance.attr('_redirect', redirectLink);
           if (!createDefaultTaskGroup || !taskGroupTitle ||
             !isNew || instance.clone) {

@@ -23,7 +23,7 @@ class GetCycleTaskUrlTestCase(unittest.TestCase):
     """The method should return a correct URL for the given Task."""
     result = data_handler.get_cycle_task_url()
 
-    expected_url = u"http://www.foo.com/dashboard#!task_widget"
+    expected_url = u"http://www.foo.com/dashboard#!task"
     self.assertEqual(result, expected_url)
 
 
@@ -43,7 +43,7 @@ class GetCycleUrlTestCase(unittest.TestCase):
     # by default, a cycle is considered active
     expected_url = (
         u"http://www.foo.com/"
-        u"workflows/111#current_widget"
+        u"workflows/111#current"
         u"/cycle/22"
     )
     self.assertEqual(expected_url, cycle.cycle_url)
@@ -56,7 +56,7 @@ class GetCycleUrlTestCase(unittest.TestCase):
 
     expected_url = (
         u"http://www.foo.com/"
-        u"workflows/111#history_widget"
+        u"workflows/111#history"
         u"/cycle/22"
     )
     self.assertEqual(expected_url, cycle.cycle_inactive_url)

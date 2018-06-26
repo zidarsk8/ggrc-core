@@ -89,6 +89,7 @@ class TestCommentNotification(TestCase):
     """
 
     factories.AuditFactory(slug="Audit")
+    self.import_file("assessment_template_no_warnings.csv")
     self.import_file("assessment_with_templates.csv")
     asmt1 = Assessment.query.filter_by(slug="A 1").first()
     self.generator.generate_comment(
@@ -113,6 +114,7 @@ class TestCommentNotification(TestCase):
     """Test that comments are grouped by parent object in daily digest data."""
 
     factories.AuditFactory(slug="Audit")
+    self.import_file("assessment_template_no_warnings.csv")
     self.import_file("assessment_with_templates.csv")
     asmt1 = Assessment.query.filter_by(slug="A 1").first()
     asmt4 = Assessment.query.filter_by(slug="A 4").first()
@@ -174,6 +176,7 @@ class TestCommentNotification(TestCase):
       factories.ContractFactory,
       factories.RiskFactory,
       factories.ThreatFactory,
+      factories.MetricFactory
   )
   @patch("ggrc.notifications.common.send_email")
   def test_models_comments(self, obj_factory, _):

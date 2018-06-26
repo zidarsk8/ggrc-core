@@ -5,6 +5,7 @@
 
 from lib import base, exception
 from lib.constants import locator, objects
+from lib.entities.entities_factory import PeopleFactory
 from lib.page.widget import widget_base
 from lib.utils import selenium_utils
 
@@ -26,6 +27,37 @@ class Events(Widget):
     selenium_utils.get_when_clickable(
         self._driver, self._locators.FIRST_TREE_VIEW_ITEM)
     return self._driver.find_elements(*self._locators.TREE_VIEW_ITEMS)
+
+
+class People(Widget):
+  """People widget on Admin Dashboard."""
+  _locators = locator.WidgetAdminPeople
+
+  def __init__(self, driver):
+    super(People, self).__init__(driver)
+    self.people_tree_view = base.AdminTreeView(self._driver)
+
+  def get_people(self):
+    """Get list of people that displayed in Tree View on People widget.
+    """
+    tree_view_items = self.people_tree_view.tree_view_items()
+    people_as_lists = [item.text.splitlines() for item in tree_view_items]
+    return [PeopleFactory().create(
+        name=person[0], email=person[1], system_wide_role=person[2])
+        for person in people_as_lists]
+
+  def click_create_button(self):
+    """Click on the Create button on People widget"""
+    add_button = selenium_utils.get_when_clickable(
+        self._driver, self._locators.CREATE_PERSON_BUTTON_SELECTOR)
+    add_button.click()
+
+  def filter_by_name_email_company(self, str_to_filter_by):
+    """Filter people via filter by name email company text field"""
+    filter_tf = base.TextInputField(
+        self._driver, self._locators.FILTER_BY_NAME_EMAIL_COM_FIELD_SELECTOR)
+    filter_tf.enter_text(str_to_filter_by)
+    filter_tf.send_enter_key()
 
 
 class Roles(Widget):
@@ -56,8 +88,7 @@ class CustomAttributes(widget_base.WidgetAdminCustomAttributes):
       if i.text == item_title:
         if expand:
           return i.expand()
-        else:
-          return i.collapse()
+        return i.collapse()
     raise exception.ElementNotFound('{} in list {}'.format(item_title, items))
 
   def get_items_list(self):

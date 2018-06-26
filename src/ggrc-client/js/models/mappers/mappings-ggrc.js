@@ -4,18 +4,19 @@
 */
 
 import RefreshQueue from '../refresh_queue';
+import {
+  Proxy,
+  Direct,
+  Indirect,
+  Search,
+  Multi,
+  TypeFilter,
+  AttrFilter,
+  CustomFilter,
+  Cross,
+} from '../mappers/mapper-helpers';
 
 (function (GGRC, can) {
-  let Proxy = GGRC.MapperHelpers.Proxy;
-  let Direct = GGRC.MapperHelpers.Direct;
-  let Indirect = GGRC.MapperHelpers.Indirect;
-  let Search = GGRC.MapperHelpers.Search;
-  let Multi = GGRC.MapperHelpers.Multi;
-  let TypeFilter = GGRC.MapperHelpers.TypeFilter;
-  let AttrFilter = GGRC.MapperHelpers.AttrFilter;
-  let CustomFilter = GGRC.MapperHelpers.CustomFilter;
-  let Cross = GGRC.MapperHelpers.Cross;
-
   new GGRC.Mappings('ggrc_core', {
     base: {},
 
@@ -28,6 +29,7 @@ import RefreshQueue from '../refresh_queue';
         'related_data_assets', 'related_facilities', 'related_markets',
         'related_org_groups', 'related_vendors', 'related_processes',
         'related_products', 'related_projects', 'related_systems',
+        'related_metrics',
       ]),
       related_and_able_objects: Multi([
         'objectives', 'related_business_objects',
@@ -87,7 +89,7 @@ import RefreshQueue from '../refresh_queue';
           'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
           'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
           'Objective', 'Audit', 'Assessment', 'AssessmentTemplate',
-          'AccessGroup', 'Risk', 'Threat', 'Document',
+          'AccessGroup', 'Risk', 'Threat', 'Document', 'Metric',
         ],
       },
       related_objects_as_source: Proxy(
@@ -103,6 +105,7 @@ import RefreshQueue from '../refresh_queue';
       related_data_assets: TypeFilter('related_objects', 'DataAsset'),
       related_facilities: TypeFilter('related_objects', 'Facility'),
       related_markets: TypeFilter('related_objects', 'Market'),
+      related_metrics: TypeFilter('related_objects', 'Metric'),
       related_org_groups: TypeFilter('related_objects', 'OrgGroup'),
       related_vendors: TypeFilter('related_objects', 'Vendor'),
       related_processes: TypeFilter('related_objects', 'Process'),
@@ -212,6 +215,9 @@ import RefreshQueue from '../refresh_queue';
     Market: {
       _mixins: ['business_object'],
     },
+    Metric: {
+      _mixins: ['business_object'],
+    },
     OrgGroup: {
       _mixins: ['business_object'],
     },
@@ -235,8 +241,8 @@ import RefreshQueue from '../refresh_queue';
         related_objects: [
           'Program', 'Regulation', 'Contract', 'Policy', 'Standard',
           'AccessGroup', 'Objective', 'Control', 'Section', 'Clause',
-          'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
-          'Product', 'Project', 'System', 'Issue', 'Risk', 'Threat'],
+          'DataAsset', 'Facility', 'Market', 'Metric', 'OrgGroup', 'Vendor',
+          'Process', 'Product', 'Project', 'System', 'Issue', 'Risk', 'Threat'],
         authorizations: 'UserRole',
       },
       owned_programs: Indirect('Program', 'contact'),
@@ -252,6 +258,7 @@ import RefreshQueue from '../refresh_queue';
       owned_data_assets: Indirect('DataAsset', 'contact'),
       owned_facilities: Indirect('Facility', 'contact'),
       owned_markets: Indirect('Market', 'contact'),
+      owned_metrics: Indirect('Metric', 'contact'),
       owned_org_groups: Indirect('OrgGroup', 'contact'),
       owned_vendors: Indirect('Vendor', 'contact'),
       owned_processes: Indirect('Process', 'contact'),
@@ -275,6 +282,7 @@ import RefreshQueue from '../refresh_queue';
       related_data_assets: TypeFilter('related_objects', 'DataAsset'),
       related_facilities: TypeFilter('related_objects', 'Facility'),
       related_markets: TypeFilter('related_objects', 'Market'),
+      related_metrics: TypeFilter('related_objects', 'Metric'),
       related_org_groups: TypeFilter('related_objects', 'OrgGroup'),
       related_vendors: TypeFilter('related_objects', 'Vendor'),
       related_processes: TypeFilter('related_objects', 'Process'),
@@ -304,6 +312,7 @@ import RefreshQueue from '../refresh_queue';
       extended_related_facilities:
         Multi(['related_facilities', 'owned_facilities']),
       extended_related_markets: Multi(['related_markets', 'owned_markets']),
+      extended_related_metrics: Multi(['related_metrics', 'owned_metrics']),
       extended_related_org_groups:
         Multi(['related_org_groups', 'owned_org_groups']),
       extended_related_vendors: Multi(['related_vendors', 'owned_vendors']),
@@ -329,7 +338,7 @@ import RefreshQueue from '../refresh_queue';
         });
       }, 'Program,Regulation,Contract,Policy,Standard,Section,Clause,' +
         'Objective,Control,System,Process,DataAsset,AccessGroup,Product,' +
-        'Project,Facility,Market,OrgGroup,Vendor,' +
+        'Project,Facility,Market,Metric,OrgGroup,Vendor,' +
         'Audit,Assessment,Issue,Risk,Threat'),
       extended_related_programs_via_search:
         TypeFilter('related_objects_via_search', 'Program'),
@@ -357,6 +366,8 @@ import RefreshQueue from '../refresh_queue';
         TypeFilter('related_objects_via_search', 'Facility'),
       extended_related_markets_via_search:
         TypeFilter('related_objects_via_search', 'Market'),
+      extended_related_metrics_via_search:
+        TypeFilter('related_objects_via_search', 'Metric'),
       extended_related_org_groups_via_search:
         TypeFilter('related_objects_via_search', 'OrgGroup'),
       extended_related_vendors_via_search:

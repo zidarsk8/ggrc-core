@@ -13,27 +13,27 @@ def test_url_to_widget_info_regex():
   urls = [
       ("https://grc-test.appspot.com/dashboard/",
           "dashboard", "", "", "", ""),
-      ("https://grc-test.appspot.com/dashboard#data_asset_widget/",
-          "dashboard", "", "data_asset_widget", "", ""),
+      ("https://grc-test.appspot.com/dashboard#data_asset/",
+          "dashboard", "", "data_asset", "", ""),
       ("https://grc-test.appspot.com/data_assets/90#/clause/90/",
-          "data_assets", 90, "info_widget", "clause", 90),
+          "data_assets", 90, "info", "clause", 90),
       ("https://grc-test.appspot.com/data_assets/90#/",
-          "data_assets", 90, "info_widget", "", ""),
+          "data_assets", 90, "info", "", ""),
       ("https://grc-test.appspot.com/data_assets/90/",
-          "data_assets", 90, "info_widget", "", ""),
-      ("https://grc-test.appspot.com/data_assets/90#data_asset_widget/",
-          "data_assets", 90, "data_asset_widget", "", ""),
-      ("https://grc-test.appspot.com/data_assets/90#info_widget/",
-          "data_assets", 90, "info_widget", "", ""),
+          "data_assets", 90, "info", "", ""),
+      ("https://grc-test.appspot.com/data_assets/90#data_asset/",
+          "data_assets", 90, "data_asset", "", ""),
+      ("https://grc-test.appspot.com/data_assets/90#info/",
+          "data_assets", 90, "info", "", ""),
       ("https://grc-test.appspot.com/data_assets/107/",
-          "data_assets", 107, "info_widget", "", ""),
-      ("https://grc-test.appspot.com/data_assets/107#task_group_widget/",
-          "data_assets", 107, "task_group_widget", "", ""),
+          "data_assets", 107, "info", "", ""),
+      ("https://grc-test.appspot.com/data_assets/107#task_group/",
+          "data_assets", 107, "task_group", "", ""),
       (("https://grc-test.appspot.com/"
-        "data_assets/107#info_widget/workflow/107/"),
-          "data_assets", 107, "info_widget", "workflow", 107),
+        "data_assets/107#info/workflow/107/"),
+          "data_assets", 107, "info", "workflow", 107),
       ("https://grc-test.appspot.com/data_assets/107#/data_asset/107/",
-          "data_assets", 107, "info_widget", "data_asset", 107),
+          "data_assets", 107, "info", "data_asset", 107),
   ]
 
   for (url, expected_source_object_name, expected_source_object_id,
@@ -47,7 +47,7 @@ def test_url_to_widget_info_regex():
     if mapped_object_id:
       mapped_object_id = int(mapped_object_id)
     if widget_name == "" and source_object_name != "dashboard":
-      widget_name = "info_widget"  # if '#' in URL without name
+      widget_name = "info"  # if '#' in URL without name
 
     assert (
         expected_source_object_name, expected_source_object_id,

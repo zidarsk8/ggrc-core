@@ -162,7 +162,7 @@ def _add_state_change_notif(obj, state_change, remove_existing=False):
       models.Notification.object_id == obj.id,
       models.Notification.object_type == obj.type,
       models.Notification.notification_type_id.in_(notif_type_ids)
-  ).delete(synchronize_session=False)
+  ).delete(synchronize_session='fetch')
 
   notif_type = models.NotificationType.query.filter_by(
       name=state_change.value).first()
@@ -391,16 +391,17 @@ def handle_relationship_altered(rel):
   if asmt.type != u"Assessment":
     asmt, other = other, asmt
 
+  status_is_changed = inspect(asmt).attrs.status.history.has_changes()
   if other.type in (u"Evidence", u"Person", u"Snapshot"):
     if asmt.status != Statusable.START_STATE:
       _add_assessment_updated_notif(asmt)
-    else:
+    elif not status_is_changed:
       _add_state_change_notif(
           asmt, Transitions.TO_STARTED, remove_existing=True)
 
   if other.type in (u"Evidence", u"Snapshot"):
     # when modified, a done Assessment gets automatically reopened
-    if asmt.status in Statusable.DONE_STATES:
+    if asmt.status in Statusable.DONE_STATES and not status_is_changed:
       _add_state_change_notif(
           asmt, Transitions.TO_REOPENED, remove_existing=True)
 

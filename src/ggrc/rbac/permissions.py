@@ -166,8 +166,7 @@ def has_conditions(action, resource):
               .get('conditions', {}))
 
 
-def get_context_resource(model_name, permission_type='read',
-                         permission_model=None):
+def get_context_resource(model_name, permission_type='read'):
   """Get allowed contexts and resources."""
   permissions_map = {
       "create": (create_contexts_for, create_resources_for),
@@ -176,12 +175,7 @@ def get_context_resource(model_name, permission_type='read',
       "delete": (delete_contexts_for, delete_resources_for),
   }
 
-  contexts = permissions_map[permission_type][0](
-      permission_model or model_name)
-  resources = permissions_map[permission_type][1](
-      permission_model or model_name)
-
-  if permission_model and contexts:
-    contexts = set(contexts) & set(read_contexts_for(model_name))
+  contexts = permissions_map[permission_type][0](model_name)
+  resources = permissions_map[permission_type][1](model_name)
 
   return contexts, resources

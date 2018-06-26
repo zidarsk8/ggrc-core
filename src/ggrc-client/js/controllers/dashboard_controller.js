@@ -160,7 +160,7 @@ const Dashboard = can.Control({
     // Create widget in container?
     // return this.options.widget_container[0].add_widget(descriptor);
 
-    if ($('#' + descriptor.controller_options.widget_id + '_widget').length > 0) {
+    if ($('#' + descriptor.controller_options.widget_id).length > 0) {
       return;
     }
 

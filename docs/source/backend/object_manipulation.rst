@@ -32,8 +32,6 @@ Elements
 +----------------------------------+----------------------+-----------------------------------------------------------------------------------------------------------------------------+
 | program                          | :ref:`ggrc-object`   | Program reference                                                                                                           |
 +----------------------------------+----------------------+-----------------------------------------------------------------------------------------------------------------------------+
-| context                          | :ref:`ggrc-object`   | Context reference from included Program                                                                                     |
-+----------------------------------+----------------------+-----------------------------------------------------------------------------------------------------------------------------+
 | **Optional**                     |                      |                                                                                                                             |
 +----------------------------------+----------------------+-----------------------------------------------------------------------------------------------------------------------------+
 | description                      | str                  | Description of the audit object                                                                                             |
@@ -96,11 +94,6 @@ Examples
                "end_date": "2016-05-09",
                "report_start_date": "2016-05-02",
                "report_end_date": "2016-05-17",
-               "context": {
-                   "id": 7,
-                   "href": "/api/contexts/7",
-                   "type": "Context"
-               }
            }
        }
 
@@ -117,7 +110,6 @@ Examples
               "secondary_contact": null,
               "id": 2,
               "audit_firm": {
-                  "context_id": null,
                   "href": "/api/org_groups/1",
                   "type": "OrgGroup",
                   "id": 1
@@ -125,14 +117,12 @@ Examples
               "description": "",
               "object_folders": [],
               "modified_by": {
-                  "context_id": null,
                   "href": "/api/people/1",
                   "type": "Person",
                   "id": 1
               },
               "title": "2016: Test Program - Audit 2",
               "program": {
-                  "context_id": 7,
                   "href": "/api/programs/2",
                   "type": "Program",
                   "id": 2
@@ -153,16 +143,9 @@ Examples
               "notes": null,
               "reference_url": null,
               "contact": {
-                  "context_id": null,
                   "href": "/api/people/1",
                   "type": "Person",
                   "id": 1
-              },
-              "context": {
-                  "context_id": null,
-                  "href": "/api/contexts/9",
-                  "type": "Context",
-                  "id": 9
               },
               "requests": [],
               "created_at": "2016-05-19T14:44:25",
@@ -194,8 +177,6 @@ Elements
 | **Required**                     |                                         |                                     |
 +----------------------------------+-----------------------------------------+-------------------------------------+
 | title                            | str                                     | Assessment title                    |
-+----------------------------------+-----------------------------------------+-------------------------------------+
-| context                          | None or :ref:`ggrc-object`              | Context reference object            |
 +----------------------------------+-----------------------------------------+-------------------------------------+
 | **Optional**                     |                                         |                                     |
 +----------------------------------+-----------------------------------------+-------------------------------------+
@@ -304,7 +285,6 @@ Examples
                "operationally": "Needs improvement",
                "start_date": "2016-05-08",
                "end_date": "2016-05-18",
-               "context": null,
                "recipients": "Creator,Assessor,Verifier",
                "program": {
                    "id": 1,
@@ -326,7 +306,6 @@ Examples
               "task_group_objects": [],
               "design": "Ineffective",
               "secondary_contact": {
-                  "context_id": null,
                   "href": "/api/people/1",
                   "type": "Person",
                   "id": 1
@@ -339,7 +318,6 @@ Examples
               "recipients": "Creator,Assessor,Verifier",
               "title": "Example title",
               "contact": {
-                  "context_id": null,
                   "href": "/api/people/1",
                   "type": "Person",
                   "id": 1
@@ -357,26 +335,22 @@ Examples
               "updated_at": "2016-05-20T09:01:26",
               "object_documents": [],
               "modified_by": {
-                  "context_id": null,
                   "href": "/api/people/1",
                   "type": "Person",
                   "id": 1
               },
               "related_destinations": [
                   {
-                      "context_id": null,
                       "href": "/api/relationships/None",
                       "type": "Relationship",
                       "id": null
                   },
                   {
-                      "context_id": null,
                       "href": "/api/relationships/None",
                       "type": "Relationship",
                       "id": null
                   },
                   {
-                      "context_id": null,
                       "href": "/api/relationships/None",
                       "type": "Relationship",
                       "id": null
@@ -393,7 +367,6 @@ Examples
               "object_owners": [],
               "test_plan": "Example plan",
               "operationally": "Needs improvement",
-              "context": null,
               "created_at": "2016-05-20T09:01:26",
               "selfLink": "/api/assessments/2"
           }
@@ -445,8 +418,6 @@ Elements
 | **Required**                     |                              |                                                                                   |
 +----------------------------------+------------------------------+-----------------------------------------------------------------------------------+
 | title                            | str                          | Program unique title                                                              |
-+----------------------------------+------------------------------+-----------------------------------------------------------------------------------+
-| context                          | None or :ref:`ggrc-object`   | Context reference. When creating a new object, the value has to be set to None.   |
 +----------------------------------+------------------------------+-----------------------------------------------------------------------------------+
 | **Optional**                     |                              |                                                                                   |
 +----------------------------------+------------------------------+-----------------------------------------------------------------------------------+
@@ -510,7 +481,6 @@ Examples
              "start_date":"05/01/2016",
              "end_date":"05/31/2016",
              "status":"Draft",
-             "context":null
           }
        }
 
@@ -530,14 +500,12 @@ Examples
               "object_folders": [],
               "documents": [],
               "modified_by": {
-                  "context_id": null,
                   "href": "/api/people/1",
                   "type": "Person",
                   "id": 1
               },
               "title": "Test title",
               "secondary_contact": {
-                  "context_id": null,
                   "href": "/api/people/4",
                   "type": "Person",
                   "id": 4
@@ -564,18 +532,11 @@ Examples
               "reference_url": "referenceurl.com",
               "object_owners": [],
               "contact": {
-                  "context_id": null,
                   "href": "/api/people/3",
                   "type": "Person",
                   "id": 3
               },
               "risks": [],
-              "context": {
-                  "context_id": null,
-                  "href": "/api/contexts/17",
-                  "type": "Context",
-                  "id": 17
-              },
               "created_at": "2016-05-19T12:09:14",
               "selfLink": "/api/programs/10"
           }
@@ -633,8 +594,6 @@ Elements
 +----------------------------------+----------------------+---------------------------------------+
 | slug                             | str                  | Unique identifier for this request    |
 +----------------------------------+----------------------+---------------------------------------+
-| context                          | :ref:`ggrc-object`   |                                       |
-+----------------------------------+----------------------+---------------------------------------+
 
 Examples
 ~~~~~~~~
@@ -665,11 +624,6 @@ Examples
                "test": "Example test message",
                "notes": "Example notes",
                "slug": "test code",
-               "context": {
-                   "id": 5,
-                   "href": "/api/contexts/5",
-                   "type": "Context"
-               }
            }
        }
 
@@ -686,7 +640,6 @@ Examples
               "id": 1,
               "related_sources": [
                   {
-                      "context_id": null,
                       "href": "/api/relationships/14",
                       "type": "Relationship",
                       "id": 14
@@ -696,7 +649,6 @@ Examples
               "object_folders": [],
               "documents": [],
               "modified_by": {
-                  "context_id": null,
                   "href": "/api/people/1",
                   "type": "Person",
                   "id": 1
@@ -720,7 +672,6 @@ Examples
               "related_destinations": [],
               "slug": "test code",
               "audit": {
-                  "context_id": 5,
                   "href": "/api/audits/1",
                   "type": "Audit",
                   "id": 1
@@ -729,12 +680,6 @@ Examples
               "task_groups": [],
               "notes": "Example notes",
               "request_type": "documentation",
-              "context": {
-                  "context_id": null,
-                  "href": "/api/contexts/5",
-                  "type": "Context",
-                  "id": 5
-              },
               "created_at": "2016-05-20T10:14:42",
               "selfLink": "/api/requests/1"
           }
@@ -763,8 +708,6 @@ Elements
 | **Required**                     |                             |                                                                                  |
 +----------------------------------+-----------------------------+----------------------------------------------------------------------------------+
 | title                            | str                         | Workflow title                                                                   |
-+----------------------------------+-----------------------------+----------------------------------------------------------------------------------+
-| context                          | None or ref:`ggrc-object`   |                                                                                  |
 +----------------------------------+-----------------------------+----------------------------------------------------------------------------------+
 | **Optional**                     |                             |                                                                                  |
 +----------------------------------+-----------------------------+----------------------------------------------------------------------------------+
@@ -832,7 +775,6 @@ Examples
             "notify_custom_message":"Example email message.",
             "slug":"Some unique value",
             "owners":null,
-            "context":null
          }
           }
 
@@ -852,7 +794,6 @@ Examples
               "end_date":null,
               "people":[
                  {
-                    "context_id":null,
                     "href":"/api/people/1",
                     "type":"Person",
                     "id":1
@@ -868,7 +809,6 @@ Examples
               ],
               "kind":null,
               "modified_by":{
-                 "context_id":null,
                  "href":"/api/people/1",
                  "type":"Person",
                  "id":1
@@ -882,15 +822,8 @@ Examples
               "created_at":"2016-05-19T12:57:02",
               "workflow_state":null,
               "slug":"Some unique value",
-              "context":{
-                 "context_id":null,
-                 "href":"/api/contexts/4",
-                 "type":"Context",
-                 "id":4
-              },
               "workflow_people":[
                  {
-                    "context_id":4,
                     "href":"/api/workflow_people/1",
                     "type":"WorkflowPerson",
                     "id":1
@@ -935,8 +868,6 @@ Elements
 +----------------+----------------------+-------------------------------------------------+
 | workflow       | :ref:`ggrc-object`   | Workgroup object reference                      |
 +----------------+----------------------+-------------------------------------------------+
-| context        | :ref:`ggrc-object`   | Context reference of the referenced workgroup   |
-+----------------+----------------------+-------------------------------------------------+
 | **Optional**   |                      |                                                 |
 +----------------+----------------------+-------------------------------------------------+
 | contact        | :ref:`ggrc-object`   |                                                 |
@@ -964,11 +895,6 @@ Examples
                   "href": "/api/people/1",
                   "type": "Person"
               },
-              "context": {
-                  "id": 4,
-                  "href": "/api/contexts/4",
-                  "type": "Context"
-              }
           }
       }
 
@@ -981,7 +907,6 @@ Examples
                "description": null,
                "end_date": null,
                "workflow": {
-                   "context_id": 5,
                    "href": "/api/workflows/2",
                    "type": "Workflow",
                    "id": 2
@@ -990,7 +915,6 @@ Examples
                "task_group_objects": [],
                "objects": [],
                "modified_by": {
-                   "context_id": null,
                    "href": "/api/people/1",
                    "type": "Person",
                    "id": 1
@@ -1004,16 +928,9 @@ Examples
                "created_at": "2016-05-19T14:37:23",
                "sort_index": "",
                "contact": {
-                   "context_id": null,
                    "href": "/api/people/1",
                    "type": "Person",
                    "id": 1
-               },
-               "context": {
-                   "context_id": null,
-                   "href": "/api/contexts/5",
-                   "type": "Context",
-                   "id": 5
                },
                "type": "TaskGroup",
                "start_date": null,
@@ -1071,11 +988,6 @@ Examples
 
         {
             "user_role": {
-                "context": {
-                    "id": 11,
-                    "href": "/api/contexts/11",
-                    "type": "Context"
-                },
                 "person": {
                     "id": 1,
                     "href": "/api/people/1",
@@ -1097,7 +1009,6 @@ Examples
         {
             "user_role": {
                 "modified_by": {
-                    "context_id": null,
                     "href": "/api/people/1",
                     "type": "Person",
                     "id": 1
@@ -1105,22 +1016,14 @@ Examples
                 "created_at": "2016-05-19T14:50:24",
                 "updated_at": "2016-05-19T14:50:24",
                 "person": {
-                    "context_id": null,
                     "href": "/api/people/1",
                     "type": "Person",
                     "id": 1
                 },
                 "role": {
-                    "context_id": null,
                     "href": "/api/roles/14",
                     "type": "Role",
                     "id": 14
-                },
-                "context": {
-                    "context_id": null,
-                    "href": "/api/contexts/11",
-                    "type": "Context",
-                    "id": 11
                 },
                 "type": "UserRole",
                 "id": 7,
@@ -1187,7 +1090,6 @@ Examples
                     "href": "/api/assessments/3",
                     "type": "Assessment"
                 },
-                "context": null,
                 "attrs": {
                     "AssigneeType": "Assessor,Verifier"
                 }
@@ -1202,21 +1104,18 @@ Examples
             "relationship": {
                 "status": "Draft",
                 "modified_by": {
-                    "context_id": null,
                     "href": "/api/people/1",
                     "type": "Person",
                     "id": 1
                 },
                 "created_at": "2016-05-20T09:19:34",
                 "destination": {
-                    "context_id": null,
                     "href": "/api/assessments/3",
                     "type": "Assessment",
                     "id": 3
                 },
                 "updated_at": "2016-05-20T09:19:34",
                 "source": {
-                    "context_id": null,
                     "href": "/api/people/3",
                     "type": "Person",
                     "id": 3
@@ -1224,7 +1123,6 @@ Examples
                 "attrs": {
                     "AssigneeType": "Verifier,Assessor"
                 },
-                "context": null,
                 "type": "Relationship",
                 "id": 12,
                 "selfLink": "/api/relationships/12"
@@ -1307,7 +1205,6 @@ GGRC object Type
 * Audit
 * AccessGroup
 * Assessment
-* Context
 * Clause
 * Contract
 * Control

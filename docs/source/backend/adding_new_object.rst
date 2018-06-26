@@ -70,7 +70,6 @@ Create a CMS.Models.Cacheable object
       mixins : ["ownable", "contactable"],
       is_custom_attributable: true,
       attributes : {
-        context : "CMS.Models.Context.stub",
         modified_by : "CMS.Models.Person.stub",
         custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
         start_date: "date",

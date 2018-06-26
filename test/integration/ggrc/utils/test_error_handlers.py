@@ -9,5 +9,5 @@ from integration.ggrc import TestCase
 class TestErrorHandlers(TestCase):
 
   def test_non_flask_error_handling(self):
-    response = self.import_file("not_a_csv.txt", dry_run=True)
+    response = self.import_file("not_a_csv.txt", safe=False)
     self.assertEqual(response["message"], "Invalid file type.")

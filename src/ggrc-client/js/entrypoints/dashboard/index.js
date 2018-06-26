@@ -14,7 +14,6 @@ import '../../apps/business_objects';
 
 // Components
 import '../../components/spinner/spinner';
-import '../../components/tooltip-content/tooltip-content';
 import '../../components/read-more/read-more';
 import '../../components/object-list/object-list';
 import '../../components/show-more/show-more';

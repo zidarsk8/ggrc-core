@@ -176,6 +176,7 @@ permissions = {
         "SystemOrProcess",
         "System",
         "Process",
+        "Metric",
         "Program",
         "Context",
         {

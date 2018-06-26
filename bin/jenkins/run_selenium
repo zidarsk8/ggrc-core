@@ -6,6 +6,7 @@ set -o nounset
 set -o errexit
 
 PROJECT="selenium"
+DOCKER_COMPOSE_FILE="docker-compose-selenium.yml"
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 cd "${SCRIPTPATH}/../.."
 source bin/containers_functions.sh

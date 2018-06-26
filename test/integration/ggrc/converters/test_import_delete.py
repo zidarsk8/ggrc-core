@@ -16,7 +16,7 @@ class TestBasicCsvImport(TestCase):
     self.import_file(filename)
 
     filename = "ca_deletion.csv"
-    response_data = self.import_file(filename)
+    response_data = self.import_file(filename, safe=False)
 
     self.assertEqual(response_data[0]["deleted"], 0)
     self.assertEqual(response_data[0]["ignored"], 2)

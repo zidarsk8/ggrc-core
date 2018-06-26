@@ -26,7 +26,7 @@ const viewModel = can.Map.extend({
         let existingDocuments = [];
         statuses.forEach((status) => {
           if (status.exists) {
-            existingDocuments.push(status.object);
+            existingDocuments.push(status);
           } else {
             let file = files.find((file) => file.id === status.gdrive_id);
             newFiles.push(file);
@@ -67,7 +67,7 @@ const viewModel = can.Map.extend({
         () => this.makeAdmin(documents),
         () => dfd.resolve([]))
       .then(() => {
-        let docs = documents.map((doc) => new CMS.Models.Document(doc));
+        let docs = documents.map((doc) => new CMS.Models.Document(doc.object));
         dfd.resolve(docs);
       });
 

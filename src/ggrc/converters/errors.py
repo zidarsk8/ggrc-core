@@ -13,7 +13,8 @@ MISSING_COLUMN = (u"Line {line}: Missing mandatory column{s} {column_names},"
 MISSING_CUSTOM_ATTRIBUTE_COLUMN = (u"Line {line}: Missing custom column"
                                    " {column_name}, when adding object.")
 
-WRONG_OBJECT_TYPE = u"Line {line}: Unknown object type '{object_name}'"
+WRONG_OBJECT_TYPE = (u"Line {line}: Object type '{object_name}' doesn't "
+                     u"exist or can't be imported.")
 
 UNKNOWN_COLUMN = (u"Line {line}: Attribute '{column_name}' does not"
                   u" exist. Column will be ignored.")

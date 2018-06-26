@@ -7,7 +7,9 @@ cd "${SCRIPTPATH}/../test"
 
 source "${SCRIPTPATH}/init_test_env"
 
-db_reset -d "ggrcdevtest"
+export GGRC_TEST_DB="test_acl"
+
+db_reset -d "$GGRC_TEST_DB"
 
 echo -e "\nRunning access control integration tests"
 nosetests integration.ggrc.access_control \

@@ -27,7 +27,9 @@ class TestEvidences(asc.TestMixinAutoStatusChangeableBase):
       ('FILE', models.Assessment.START_STATE,
        models.Assessment.PROGRESS_STATE),
       ('FILE', models.Assessment.FINAL_STATE,
-       models.Assessment.PROGRESS_STATE)
+       models.Assessment.PROGRESS_STATE),
+      ('FILE', models.Assessment.REWORK_NEEDED,
+       models.Assessment.REWORK_NEEDED)
   )
   @ddt.unpack
   def test_map_parent(self, kind,
@@ -57,7 +59,9 @@ class TestEvidences(asc.TestMixinAutoStatusChangeableBase):
       ('FILE', models.Assessment.START_STATE,
        models.Assessment.PROGRESS_STATE),
       ('FILE', models.Assessment.FINAL_STATE,
-       models.Assessment.PROGRESS_STATE)
+       models.Assessment.PROGRESS_STATE),
+      ('FILE', models.Assessment.REWORK_NEEDED,
+       models.Assessment.REWORK_NEEDED)
   )
   @ddt.unpack
   def test_evidence_added_status_check(self, kind,
@@ -93,7 +97,9 @@ class TestEvidences(asc.TestMixinAutoStatusChangeableBase):
       ('FILE', models.Assessment.START_STATE,
        models.Assessment.PROGRESS_STATE),
       ('FILE', models.Assessment.FINAL_STATE,
-       models.Assessment.PROGRESS_STATE)
+       models.Assessment.PROGRESS_STATE),
+      ('FILE', models.Assessment.REWORK_NEEDED,
+       models.Assessment.REWORK_NEEDED)
   )
   @ddt.unpack
   def test_evidence_remove_related(self, kind,
@@ -131,7 +137,9 @@ class TestEvidences(asc.TestMixinAutoStatusChangeableBase):
       ('FILE', models.Assessment.START_STATE,
        models.Assessment.PROGRESS_STATE),
       ('FILE', models.Assessment.FINAL_STATE,
-       models.Assessment.PROGRESS_STATE)
+       models.Assessment.PROGRESS_STATE),
+      ('FILE', models.Assessment.REWORK_NEEDED,
+       models.Assessment.REWORK_NEEDED)
   )
   @ddt.unpack
   def test_evidence_delete(self, kind, from_status,
@@ -162,7 +170,9 @@ class TestEvidences(asc.TestMixinAutoStatusChangeableBase):
       ('FILE', models.Assessment.START_STATE,
        models.Assessment.PROGRESS_STATE),
       ('FILE', models.Assessment.FINAL_STATE,
-       models.Assessment.PROGRESS_STATE)
+       models.Assessment.PROGRESS_STATE),
+      ('FILE', models.Assessment.REWORK_NEEDED,
+       models.Assessment.REWORK_NEEDED)
   )
   @ddt.unpack
   def test_evidence_update_status_check(self, kind, from_status,

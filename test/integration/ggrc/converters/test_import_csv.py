@@ -55,7 +55,7 @@ class TestBasicCsvImport(TestCase):
       self.assert_roles(policy, Admin=owner)
 
     filename = "policy_import_working_with_warnings.csv"
-    response_json = self.import_file(filename)
+    response_json = self.import_file(filename, safe=False)
 
     expected_warnings = {
         errors.UNKNOWN_USER_WARNING.format(line=3, email="miha@policy.com"),
@@ -88,7 +88,7 @@ class TestBasicCsvImport(TestCase):
       self.assert_roles(policy, Admin=owner)
 
     filename = "policy_same_titles.csv"
-    response_json = self.import_file(filename)
+    response_json = self.import_file(filename, safe=False)
 
     self.assertEqual(3, response_json[0]["created"])
     self.assertEqual(6, response_json[0]["ignored"])
@@ -139,7 +139,7 @@ class TestBasicCsvImport(TestCase):
     self.assertEqual(response_json[0]["row_errors"], [])
 
     filename = "policy_sample2.csv"
-    response_json = self.import_file(filename)
+    response_json = self.import_file(filename, safe=False)
 
     self.assertEqual(response_json[0]["row_errors"], [
         "Line 3: title 'will this work' already exists.Record will be ignored."
@@ -150,10 +150,7 @@ class TestBasicCsvImport(TestCase):
 
     Checks for fields being updarted correctly
     """
-    filename = "pci_program.csv"
-    response = self.import_file(filename)
-
-    self._check_csv_response(response, {})
+    self.import_file("pci_program.csv")
 
     assessment = models.Assessment.query.filter_by(slug="CA.PCI 1.1").first()
     audit = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()
@@ -161,8 +158,7 @@ class TestBasicCsvImport(TestCase):
     self.assertEqual(assessment.operationally, "Effective")
     self.assertIsNone(models.Relationship.find_related(assessment, audit))
 
-    filename = "pci_program_update.csv"
-    response = self.import_file(filename)
+    response = self.import_file("pci_program_update.csv", safe=False)
 
     self._check_csv_response(response, {
         "Assessment": {
@@ -181,7 +177,7 @@ class TestBasicCsvImport(TestCase):
   def test_person_imports(self):
     """Test imports for Person object with user roles."""
     filename = "people_test.csv"
-    response = self.import_file(filename)[0]
+    response = self.import_file(filename, safe=False)[0]
 
     expected_errors = {
         errors.MISSING_VALUE_ERROR.format(line=8, column_name="Email"),
@@ -251,7 +247,7 @@ class TestBasicCsvImport(TestCase):
   def test_import_without_code_column(self):
     """Test error message when trying to import csv without 'Code' column."""
     file_name = "import_without_code_column.csv"
-    response = self.import_file(file_name)
+    response = self.import_file(file_name, safe=False)
 
     self.assertEqual(response[0]["created"], 0)
     self.assertEqual(response[0]["block_errors"], [

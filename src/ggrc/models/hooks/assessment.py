@@ -260,7 +260,7 @@ def relate_ca(assessment, template):
         template: Assessment Temaplte instance (may be None)
   """
   if not template:
-    return
+    return None
 
   ca_definitions = all_models.CustomAttributeDefinition.query.options(
       orm.undefer_group('CustomAttributeDefinition_complete'),
@@ -270,6 +270,7 @@ def relate_ca(assessment, template):
   ).order_by(
       all_models.CustomAttributeDefinition.id
   )
+  created_cads = []
   for definition in ca_definitions:
     cad = all_models.CustomAttributeDefinition(
         title=definition.title,
@@ -282,6 +283,8 @@ def relate_ca(assessment, template):
         placeholder=definition.placeholder,
     )
     db.session.add(cad)
+    created_cads.append(cad)
+  return created_cads
 
 
 def copy_snapshot_plan(assessment, snapshot):
