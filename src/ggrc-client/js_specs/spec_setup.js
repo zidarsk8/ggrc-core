@@ -43,6 +43,7 @@ GGRC.config = {
     'Policy',
     'Market',
     'Metric',
+    'TechnologyEnvironment',
   ],
   VERSION: '1.0-Test (abc)',
 };
@@ -129,6 +130,9 @@ GGRC.Bootstrap = {
     title_plural: 'Metrics',
     model_singular: 'Metric',
   }, {
+    title_plural: 'Technology Environments',
+    model_singular: 'TechnologyEnvironment',
+  }, {
     title_plural: 'Task Groups',
     model_singular: 'TaskGroup',
   }, {
@@ -213,6 +217,9 @@ GGRC.Bootstrap = {
   }, {
     title_plural: 'Metrics',
     model_singular: 'Metric',
+  }, {
+    title_plural: 'Technology Environments',
+    model_singular: 'TechnologyEnvironment',
   }, {
     title_plural: 'Task Groups',
     model_singular: 'TaskGroup',

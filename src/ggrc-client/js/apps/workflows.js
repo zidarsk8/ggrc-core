@@ -28,7 +28,7 @@ import Mappings from '../models/mappers/mappings';
     'Program Regulation Policy Standard Contract Clause Section'.split(' '),
     'Request Control Objective OrgGroup Vendor AccessGroup'.split(' '),
     'System Process DataAsset Product Project Facility Market'.split(' '),
-    'Issue Risk Threat Metric'.split(' ')
+    'Issue Risk Threat Metric TechnologyEnvironment'.split(' ')
   );
 
   let draftOnUpdateMixin;
@@ -145,7 +145,7 @@ import Mappings from '../models/mappers/mappings';
             'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
             'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
             'Objective', 'Audit', 'AccessGroup', 'Metric',
-            'Risk', 'Threat',
+            'Risk', 'TechnologyEnvironment', 'Threat',
           ],
         },
         related_objects_as_source: Proxy(
@@ -179,6 +179,8 @@ import Mappings from '../models/mappers/mappings';
         related_audits: TypeFilter('related_objects', 'Audit'),
         related_controls: TypeFilter('related_objects', 'Control'),
         related_documents: TypeFilter('related_objects', 'Document'),
+        related_technology_environments: TypeFilter('related_objects',
+          'TechnologyEnvironment'),
         regulations: TypeFilter('related_objects', 'Regulation'),
         contracts: TypeFilter('related_objects', 'Contract'),
         policies: TypeFilter('related_objects', 'Policy'),

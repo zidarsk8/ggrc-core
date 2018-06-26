@@ -956,7 +956,8 @@ Mustache.registerHelper('is_allowed_to_map_task', (sourceType, options)=> {
   const mappableTypes = ['Program', 'Regulation', 'Policy', 'Standard',
     'Contract', 'Clause', 'Section', 'Request', 'Control', 'Objective',
     'OrgGroup', 'Vendor', 'AccessGroup', 'System', 'Process', 'DataAsset',
-    'Product', 'Project', 'Facility', 'Market', 'Metric'];
+    'Product', 'Project', 'Facility', 'Market', 'Metric',
+    'TechnologyEnvironment'];
   sourceType = resolveComputed(sourceType);
 
   if (mappableTypes.includes(sourceType)) {

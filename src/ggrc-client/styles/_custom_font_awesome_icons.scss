@@ -255,6 +255,10 @@
   &:before { content: $fa-var-bar-chart; }
   &.color { color: $green; }
 }
+.#{$fa-css-prefix}-technology_environment {
+  &:before { content: $fa-var-th; }
+  &.color { color: $green; }
+}
 
 // Turn icons to black
 %black-icons {

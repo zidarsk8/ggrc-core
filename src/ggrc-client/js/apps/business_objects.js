@@ -56,6 +56,7 @@ import Mappings from '../models/mappers/mappings';
         clause: CMS.Models.Clause,
         person: CMS.Models.Person,
         role: CMS.Models.Role,
+        technology_environment: CMS.Models.TechnologyEnvironment,
         threat: CMS.Models.Threat,
         risk: CMS.Models.Risk,
         vulnerability: CMS.Models.Vulnerability,
@@ -368,6 +369,10 @@ import Mappings from '../models/mappers/mappings';
             mapping: 'risks',
             draw_children: true,
           },
+          TechnologyEnvironment: {
+            mapping: 'related_technology_environments',
+            draw_children: true,
+          },
           Threat: {
             mapping: 'threats',
             draw_children: true,
@@ -628,6 +633,9 @@ import Mappings from '../models/mappers/mappings';
         System: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
         },
+        TechnologyEnvironment: {
+          _mixins: ['governance_objects', 'business_objects', 'issues'],
+        },
         Person: {
           _mixins: ['issues'],
           Program: {
@@ -727,6 +735,10 @@ import Mappings from '../models/mappers/mappings';
           },
           Risk: {
             mapping: 'extended_related_risks_via_search',
+            draw_children: true,
+          },
+          TechnologyEnvironment: {
+            mapping: 'extended_related_technology_environments_via_search',
             draw_children: true,
           },
           Threat: {
