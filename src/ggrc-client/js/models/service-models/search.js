@@ -3,13 +3,12 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-can.Model('GGRC.Models.Search', {
-
+export default can.Model('GGRC.Models.Search', {
   findOne: 'GET /search',
   init: function () {
     let _findOne;
     if (this._super) {
-      this._super.apply(this, arguments);
+      this._super(...arguments);
     }
     _findOne = this.findOne;
 
@@ -72,7 +71,7 @@ can.Model('GGRC.Models.Search', {
       });
     });
 
-    return $.when.apply($, dfds).then(function () {
+    return $.when(...dfds).then(function () {
       let model_results = can.makeArray(arguments);
       let search_response = {
         entries: {},
@@ -105,7 +104,6 @@ can.Model('GGRC.Models.Search', {
     });
   },
   getResultsForType: function (model_name) {
-    let model = CMS.Models[model_name];
     let entries;
 
     if (!(this.entries instanceof Array ||
