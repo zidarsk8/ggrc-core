@@ -37,7 +37,7 @@ const ModelRefreshQueue = can.Construct({}, {
           self.completed = true;
           self.deferred.resolve();
         }, function () {
-          self.deferred.reject.apply(self.deferred, arguments);
+          self.deferred.reject(...arguments);
         });
       } else {
         this.completed = true;
@@ -81,8 +81,9 @@ const RefreshQueueManager = can.Construct({
   },
   triggered_queues: function () {
     return can.map(this.queues, function (queue) {
-      if (queue.triggered)
+      if (queue.triggered) {
         return queue;
+      }
     });
   },
   enqueue: function (obj, force) {
@@ -107,13 +108,15 @@ const RefreshQueueManager = can.Construct({
       model = CMS.Models[modelName];
     }
 
-    if (!force)
-    // Check if the ID is already contained in another queue
+    if (!force) {
+      // Check if the ID is already contained in another queue
       can.each(this.queues, function (queue) {
         if (!foundQueue &&
-          queue.model === model && queue.ids.indexOf(id) > -1)
+          queue.model === model && queue.ids.indexOf(id) > -1) {
           foundQueue = queue;
+        }
       });
+    }
 
     if (!foundQueue) {
       can.each(this.queues, function (queue) {
@@ -130,8 +133,9 @@ const RefreshQueueManager = can.Construct({
         foundQueue.enqueue(id);
         foundQueue.deferred.done(function () {
           let index = self.queues.indexOf(foundQueue);
-          if (index > -1)
+          if (index > -1) {
             self.queues.splice(index, 1);
+          }
         });
       }
     }
@@ -184,7 +188,7 @@ const RefreshQueue = can.Construct({
             });
             // Resolve the original deferred only when all list deferreds
             //   have been resolved
-            $.when.apply($, dfds).then(function (items) {
+            $.when(...dfds).then(function (items) {
               dfd.resolve(items);
             }, function () {
               dfd.reject.apply(this, arguments);
@@ -234,8 +238,9 @@ const RefreshQueue = can.Construct({
     this.objects.push(obj);
     if (force || !obj.selfLink) {
       queue = this.constructor.refresh_queue_manager.enqueue(obj, force);
-      if (this.queues.indexOf(queue) === -1)
+      if (this.queues.indexOf(queue) === -1) {
         this.queues.push(queue);
+      }
     }
     return this;
   },
@@ -255,12 +260,12 @@ const RefreshQueue = can.Construct({
     });
 
     if (deferreds.length) {
-      $.when.apply($, deferreds).then(function () {
+      $.when(...deferreds).then(function () {
         self.deferred.resolve(can.map(self.objects, function (obj) {
           return obj.reify();
         }));
       }, function () {
-        self.deferred.reject.apply(self.deferred, arguments);
+        self.deferred.reject(...arguments);
       });
     } else {
       return this.deferred.resolve(this.objects);
