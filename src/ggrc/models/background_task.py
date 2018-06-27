@@ -15,6 +15,7 @@ from werkzeug.datastructures import Headers
 from ggrc import db
 from ggrc import settings
 from ggrc.login import get_current_user
+from ggrc.access_control import roleable
 from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models.deferred import deferred
@@ -26,7 +27,8 @@ from ggrc.models import reflection
 logger = getLogger(__name__)
 
 
-class BackgroundTask(base.ContextRBAC, Base, Stateful, db.Model):
+class BackgroundTask(roleable.Roleable, base.ContextRBAC, Base, Stateful,
+                     db.Model):
   """Background task model."""
   __tablename__ = 'background_tasks'
 
