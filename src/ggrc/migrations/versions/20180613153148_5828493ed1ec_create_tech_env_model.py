@@ -24,7 +24,7 @@ from ggrc.migrations.utils import update_acr
 
 # revision identifiers, used by Alembic.
 revision = '5828493ed1ec'
-down_revision = '8ffc6d30dba2'
+down_revision = 'e1256da10630'
 
 
 NON_EDITABLE_ROLES = {
