@@ -41,7 +41,7 @@ class TestBasicCsvImport(TestCase):
     revisions = models.Revision.query.filter(
         models.Revision.resource_type == "Policy"
     ).count()
-    self.assertEqual(revisions, 6)
+    self.assertEqual(revisions, 3)
     policy = models.Policy.eager_query().first()
     self.assertEqual(policy.modified_by.email, "user@example.com")
 
