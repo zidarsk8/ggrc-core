@@ -49,22 +49,19 @@ describe('multiselectDropdownWrapper component', function () {
   });
 
   describe('modelName set()', () => {
-    beforeEach(function () {
-    });
-
-    it('calls findAll()', ()=> {
+    it('calls findAll()', () => {
       viewModel.attr('modelName', 'TestType');
 
       expect(CMS.Models.TestType.findAll).toHaveBeenCalled();
     });
 
-    it('calls _prepareModels()', (done)=> {
+    it('calls _prepareModels()', (done) => {
       spyOn(viewModel, '_prepareModels');
 
       viewModel.attr('modelName', 'TestType');
       findDfd.resolve(response);
 
-      findDfd.then((result)=> {
+      findDfd.then((result) => {
         expect(viewModel._prepareModels).toHaveBeenCalledWith(response);
 
         done();
@@ -87,22 +84,22 @@ describe('multiselectDropdownWrapper component', function () {
         ]);
       });
 
-      it('sets preparedOptions', (done)=> {
+      it('sets preparedOptions', (done) => {
         viewModel.attr('modelName', 'TestType');
         findDfd.resolve(response);
 
-        findDfd.then((result)=> {
+        findDfd.then((result) => {
           expect(viewModel.preparedOptions.length).toEqual(response.length);
 
           done();
         });
       });
 
-      it('converts models to a correct format', (done)=> {
+      it('converts models to a correct format', (done) => {
         viewModel.attr('modelName', 'TestType');
         findDfd.resolve(response);
 
-        findDfd.then((result)=> {
+        findDfd.then((result) => {
           expect(viewModel.preparedOptions[0].value).toEqual('1 item');
           expect(viewModel.preparedOptions[0].id).toEqual(1);
           expect(viewModel.preparedOptions[0].checked).toBeFalsy();
@@ -112,11 +109,11 @@ describe('multiselectDropdownWrapper component', function () {
         });
       });
 
-      it('sets selectedInternal', (done)=> {
+      it('sets selectedInternal', (done) => {
         viewModel.attr('modelName', 'TestType');
         findDfd.resolve(response);
 
-        findDfd.then((result)=> {
+        findDfd.then((result) => {
           expect(viewModel.selectedInternal.length)
             .toEqual(viewModel.selected.length);
 
@@ -124,11 +121,11 @@ describe('multiselectDropdownWrapper component', function () {
         });
       });
 
-      it('selectedInternal has correct format', (done)=> {
+      it('selectedInternal has correct format', (done) => {
         viewModel.attr('modelName', 'TestType');
         findDfd.resolve(response);
 
-        findDfd.then((result)=> {
+        findDfd.then((result) => {
           expect(viewModel.selectedInternal[0].value).toEqual('2 item');
           expect(viewModel.selectedInternal[0].id).toEqual(2);
           expect(viewModel.selectedInternal[0].checked).toBeTruthy();
@@ -155,13 +152,13 @@ describe('multiselectDropdownWrapper component', function () {
       newSelected = [{id: 1}];
     });
 
-    it('should call findInCacheById', ()=> {
+    it('should call findInCacheById', () => {
       handler({}, {}, newSelected);
 
       expect(CMS.Models.TestType.findInCacheById).toHaveBeenCalled();
     });
 
-    it('should get model from cache', ()=> {
+    it('should get model from cache', () => {
       handler({}, {}, newSelected);
 
       expect(viewModel.selected.length).toEqual(newSelected.length);
