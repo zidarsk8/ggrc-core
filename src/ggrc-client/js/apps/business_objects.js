@@ -11,6 +11,7 @@ import {
   getWidgetConfig,
 } from '../plugins/utils/object-versions-utils';
 import Mappings from '../models/mappers/mappings';
+import {inferObjectType} from '../plugins/utils/models-utils';
 
 (function (can, $) {
   let CoreExtension = {};
@@ -67,7 +68,7 @@ import Mappings from '../models/mappers/mappings';
     init_widgets: function () {
       let baseWidgetsByType = GGRC.tree_view.base_widgets_by_type;
       let widgetList = new GGRC.WidgetList('ggrc_core');
-      let objectClass = GGRC.infer_object_type(GGRC.page_object);
+      let objectClass = inferObjectType(GGRC.page_object);
       let objectTable = objectClass && objectClass.table_plural;
       let object = GGRC.page_instance();
       let path = GGRC.mustache_path;

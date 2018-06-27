@@ -6,6 +6,7 @@
 import SystemOrProcess from './system-or-process';
 import Program from './program';
 import {hasQuestions} from '../../plugins/utils/ggrcq-utils';
+import {inferObjectType} from '../../plugins/utils/models-utils';
 
 export default SystemOrProcess('CMS.Models.System', {
   root_object: 'system',
@@ -35,7 +36,7 @@ export default SystemOrProcess('CMS.Models.System', {
       SystemOrProcess.tree_view_options, {
         // systems is a special case; can be imported to programs
         add_item_view: GGRC.mustache_path +
-        (GGRC.infer_object_type(GGRC.page_object) === Program ?
+        (inferObjectType(GGRC.page_object) === Program ?
           '/snapshots/tree_add_item.mustache' :
           '/base_objects/tree_add_item.mustache'),
       });

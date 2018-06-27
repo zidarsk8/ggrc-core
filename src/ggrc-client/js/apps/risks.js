@@ -54,7 +54,7 @@ import {registerHook} from '../plugins/ggrc_utils';
 
   RisksExtension.name = 'risks';
 
-  // Register Risk Assessment models for use with `infer_object_type`
+  // Register Risk Assessment models for use with `inferObjectType`
   RisksExtension.object_type_decision_tree = function () {
     return {
       risk: CMS.Models.Risk,

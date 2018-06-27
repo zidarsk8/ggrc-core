@@ -58,7 +58,7 @@ import Mappings from '../models/mappers/mappings';
     taskGroup: 'TaskGroup',
   };
 
-  // Register Workflow models for use with `infer_object_type`
+  // Register Workflow models for use with `inferObjectType`
   WorkflowExtension.object_type_decision_tree = function () {
     return {
       cycle: CMS.Models.Cycle,

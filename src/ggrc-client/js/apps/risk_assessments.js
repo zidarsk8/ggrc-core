@@ -18,7 +18,7 @@ import Mappings from '../models/mappers/mappings';
 
   RiskAssessmentsExtension.name = 'risk_assessments';
 
-  // Register RA models for use with `infer_object_type`
+  // Register RA models for use with `inferObjectType`
   RiskAssessmentsExtension.object_type_decision_tree = function () {
     return {
       risk_assessment: CMS.Models.RiskAssessment,

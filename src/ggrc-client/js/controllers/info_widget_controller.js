@@ -11,6 +11,9 @@ import '../components/related-objects/proposals/related-proposals';
 import '../components/related-objects/proposals/related-proposals-item';
 import '../components/related-objects/revisions/related-revisions';
 import '../components/revision-history/restore-revision';
+import {
+  inferObjectType,
+} from '../plugins/utils/models-utils';
 
 export default can.Control({
   pluginName: 'ggrc_controllers_info_widget',
@@ -24,7 +27,7 @@ export default can.Control({
     can.$(function () {
       if (GGRC.page_object) {
         can.extend(that.defaults, {
-          model: GGRC.infer_object_type(GGRC.page_object),
+          model: inferObjectType(GGRC.page_object),
           instance: GGRC.page_instance(),
         });
       }

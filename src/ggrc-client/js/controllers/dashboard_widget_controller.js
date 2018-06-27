@@ -4,6 +4,9 @@
 */
 
 import {getDashboards} from '../plugins/utils/dashboards-utils';
+import {
+  inferObjectType,
+} from '../plugins/utils/models-utils';
 
 export default can.Control({
   defaults: {
@@ -16,7 +19,7 @@ export default can.Control({
     $(function () {
       if (GGRC.page_object) {
         $.extend(that.defaults, {
-          model: GGRC.infer_object_type(GGRC.page_object),
+          model: inferObjectType(GGRC.page_object),
           instance: GGRC.page_instance(),
         });
       }
