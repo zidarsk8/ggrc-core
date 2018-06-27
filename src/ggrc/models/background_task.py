@@ -15,6 +15,8 @@ from werkzeug.datastructures import Headers
 from ggrc import db
 from ggrc import settings
 from ggrc.login import get_current_user
+from ggrc.access_control import role
+from ggrc.access_control import list as acl
 from ggrc.access_control import roleable
 from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
@@ -85,6 +87,15 @@ class BackgroundTask(roleable.Roleable, base.ContextRBAC, Base, Stateful,
                               self.result['headers']))
 
 
+def _add_task_acl(task):
+  """Add ACL entry for the current users background task."""
+  roles = role.get_ac_roles_for(task.type)
+  acl.AccessControlList(
+      person=get_current_user(),
+      ac_role=roles["Admin"],
+      object=task,
+  )
+
 def create_task(name, url, queued_callback=None, parameters=None, method=None):
   """Create a enqueue a bacground task."""
   if not method:
@@ -94,6 +105,7 @@ def create_task(name, url, queued_callback=None, parameters=None, method=None):
   if not parameters:
     parameters = {}
   task = BackgroundTask(name=name + str(int(time())))
+  _add_task_acl(task)
   task.parameters = parameters
   task.modified_by = get_current_user()
   db.session.add(task)
