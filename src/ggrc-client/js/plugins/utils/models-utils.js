@@ -40,22 +40,12 @@ const getModelInstance = (id, type, requiredAttr) => {
 };
 
 const inferObjectType = (data) => {
-  let decision_tree = _getObjectTypeDecisionTree();
-
-  function resolve_by_key(subtree, data) {
-    let kind = data[subtree._key];
-    let model;
-    can.each(subtree, function (v, k) {
-      if (k != '_key' && v.meta_kinds.indexOf(kind) >= 0) {
-        model = v;
-      }
-    });
-    return model;
-  }
+  let decisionTree = _getObjectTypeDecisionTree();
 
   function resolve(subtree, data) {
-    if (typeof subtree === 'undefined')
+    if (typeof subtree === 'undefined') {
       return null;
+    }
     return can.isPlainObject(subtree) ?
       subtree._discriminator(data) :
       subtree;
@@ -65,7 +55,7 @@ const inferObjectType = (data) => {
     return null;
   } else {
     return can.reduce(Object.keys(data), function (a, b) {
-      return a || resolve(decision_tree[b], data[b]);
+      return a || resolve(decisionTree[b], data[b]);
     }, null);
   }
 };
@@ -218,10 +208,9 @@ function _removeHandler(obj, pj) {
   return dfds;
 }
 
-function _getObjectTypeDecisionTree() {
-  let tree = {},
-    extensions = GGRC.extensions || []
-  ;
+function _getObjectTypeDecisionTree() { // eslint-disable-line
+  let tree = {};
+  let extensions = GGRC.extensions || [];
 
   can.each(extensions, function (extension) {
     if (extension.object_type_decision_tree) {
