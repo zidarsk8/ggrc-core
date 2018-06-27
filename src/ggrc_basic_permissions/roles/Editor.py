@@ -63,14 +63,6 @@ permissions = {
         "Role",
         "Context",
         "UserRole",
-        {
-            "type": "BackgroundTask",
-            "terms": {
-                "property_name": "modified_by",
-                "value": "$current_user"
-            },
-            "condition": "is"
-        },
     ],
     "create": [
         "Audit",
@@ -124,14 +116,6 @@ permissions = {
         "Role",
         "UserRole",
         "Context",
-        {
-            "type": "BackgroundTask",
-            "terms": {
-                "property_name": "modified_by",
-                "value": "$current_user"
-            },
-            "condition": "is"
-        },
     ],
     "update": [
         {
@@ -190,14 +174,6 @@ permissions = {
         "Role",
         "UserRole",
         "Context",
-        {
-            "type": "BackgroundTask",
-            "terms": {
-                "property_name": "modified_by",
-                "value": "$current_user"
-            },
-            "condition": "is"
-        },
     ],
     "delete": [
         {
@@ -251,13 +227,5 @@ permissions = {
         "Role",
         "UserRole",
         "Context",
-        {
-            "type": "BackgroundTask",
-            "terms": {
-                "property_name": "modified_by",
-                "value": "$current_user"
-            },
-            "condition": "is"
-        },
     ]
 }

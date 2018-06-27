@@ -16,14 +16,6 @@ owner_base = [
     "ControlCategory",
     "ControlAssertion",
     "Option",
-    {
-        "type": "BackgroundTask",
-        "terms": {
-            "property_name": "modified_by",
-            "value": "$current_user"
-        },
-        "condition": "is"
-    },
     "CustomAttributeDefinition",
     "CustomAttributeValue",
 ]
@@ -179,14 +171,6 @@ permissions = {
         "Metric",
         "Program",
         "Context",
-        {
-            "type": "BackgroundTask",
-            "terms": {
-                "property_name": "modified_by",
-                "value": "$current_user"
-            },
-            "condition": "is"
-        },
     ],
     "update": owner_update,
     "delete": owner_update,
