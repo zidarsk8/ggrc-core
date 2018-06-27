@@ -48,6 +48,7 @@ class ImportConverter(BaseConverter):
       "delete",
       "task_type",
       "audit",
+      "assessment_template",
   ]
 
   def __init__(self, dry_run=True, csv_data=None):
