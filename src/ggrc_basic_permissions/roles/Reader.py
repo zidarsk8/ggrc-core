@@ -73,14 +73,6 @@ permissions = {
         "Role",
         "UserRole",
         "Context",
-        {
-            "type": "BackgroundTask",
-            "terms": {
-                "property_name": "modified_by",
-                "value": "$current_user"
-            },
-            "condition": "is"
-        },
         "Workflow",
         "TaskGroup",
         "TaskGroupObject",
