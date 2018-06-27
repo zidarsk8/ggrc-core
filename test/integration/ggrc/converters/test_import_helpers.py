@@ -482,6 +482,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Code",
         "Effective Date",
         "Last Deprecated Date",
+        "Due Date",
         "State",
         "Review State",
         "Delete",
