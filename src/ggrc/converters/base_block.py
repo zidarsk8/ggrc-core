@@ -435,6 +435,7 @@ class ImportBlockConverter(BlockConverter):
     self.converter = converter
     self.unique_counts = self.get_unique_counts_dict(self.object_class)
     self.revision_ids = []
+    self._import_info = self._make_empty_info()
 
   def check_block_restrictions(self):
     """Check some block related restrictions"""
@@ -486,6 +487,8 @@ class ImportBlockConverter(BlockConverter):
     self.handle_row_data()
     self.import_objects()
     self.import_secondary_objects()
+    for row in self.row_converters:
+      self._update_info(row)
 
   def handle_row_data(self, field_list=None):
     """Handle row data for all row converters on import.
@@ -675,38 +678,45 @@ class ImportBlockConverter(BlockConverter):
 
   def get_info(self):
     """Returns info dict for current block."""
-    created = 0
-    updated = 0
-    ignored = 0
-    deleted = 0
-    deprecated = 0
-    for row in self.row_converters:
-      if row.ignore:
-        ignored += 1
-        continue
-      if row.is_delete:
-        deleted += 1
-        continue
-      if row.is_new:
-        created += 1
-      else:
-        updated += 1
-      deprecated += int(row.is_deprecated)
-    info = {
-        "name": self.name,
-        "rows": len(self.rows),
-        "created": created,
-        "updated": updated,
-        "ignored": ignored,
-        "deleted": deleted,
-        "deprecated": deprecated,
+    info = self._import_info.copy()
+    info.update({
         "block_warnings": self.block_warnings,
         "block_errors": self.block_errors,
         "row_warnings": self.row_warnings,
         "row_errors": self.row_errors,
+    })
+    return info
+
+  def _make_empty_info(self):
+    """Empty info dict with all counts zero."""
+    return {
+        "name": self.name,
+        "rows": 0,
+        "created": 0,
+        "updated": 0,
+        "ignored": 0,
+        "deleted": 0,
+        "deprecated": 0,
+        "block_warnings": [],
+        "block_errors": [],
+        "row_warnings": [],
+        "row_errors": [],
     }
 
-    return info
+  def _update_info(self, row):
+    """Update counts for info response from row metadata."""
+    self._import_info["rows"] += 1
+    if row.ignore:
+      self._import_info["ignored"] += 1
+    elif row.is_delete:
+      self._import_info["deleted"] += 1
+    elif row.is_new:
+      self._import_info["created"] += 1
+    else:
+      self._import_info["updated"] += 1
+
+    if row.is_deprecated:
+      self._import_info["deprecated"] += 1
 
   def _in_range(self, index, remove_offset=True):
     """Checks if the value provided lays within the range of lines of the
