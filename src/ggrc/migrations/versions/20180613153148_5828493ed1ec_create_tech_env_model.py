@@ -14,8 +14,6 @@ from sqlalchemy.dialects import mysql
 
 from alembic import op
 
-from ggrc.migrations.utils import acr_propagation_constants_metric \
-    as prev_rules
 from ggrc.migrations.utils import acr_propagation_constants_tech_envs \
     as tech_env_rules
 from ggrc.migrations.utils import acr_propagation
@@ -106,9 +104,8 @@ def upgrade():
                                          NON_EDITABLE_ROLES)
   update_acr.update_ownable_models(['TechnologyEnvironment'])
 
-  acr_propagation.update_acr_propagation_tree(
-      prev_rules.GGRC_PROPAGATION,
-      tech_env_rules.GGRC_PROPAGATION
+  acr_propagation.propagate_roles(
+      tech_env_rules.GGRC_PROPAGATION, with_update=True
   )
 
 
@@ -116,10 +113,9 @@ def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
   op.drop_table('technology_environments')
 
-  acr_propagation.update_acr_propagation_tree(
-      tech_env_rules.GGRC_PROPAGATION,
-      prev_rules.GGRC_PROPAGATION
-  )
+  for object_type, roles_tree in tech_env_rules.GGRC_PROPAGATION.items():
+    if "TechnologyEnvironment" in object_type:
+      acr_propagation.remove_propagated_roles(object_type, roles_tree.keys())
 
   # Remove items from access_control_list
   op.execute("DELETE FROM access_control_list "
