@@ -9,7 +9,7 @@
 
 import {
   buildRelevantIdsQuery,
-  makeRequest,
+  batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import RefreshQueue from '../../models/refresh_queue';
 
@@ -46,11 +46,11 @@ export default can.Map.extend({
     }};
     let query = buildRelevantIdsQuery(objName, {}, null, filter);
 
-    return makeRequest({data: [query]});
+    return batchRequests(query);
   },
   getStubs: function (responseArr) {
     let objName = this.attr('model');
-    let ids = responseArr[0][objName].ids;
+    let ids = responseArr[objName].ids;
     let model = CMS.Models[objName];
 
     let res = can.map(ids, function (id) {

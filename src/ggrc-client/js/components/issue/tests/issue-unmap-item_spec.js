@@ -91,22 +91,26 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
 
   describe('loadRelatedObjects() method', ()=> {
     let reqDeferred;
-    let response;
+    let snapshotsResponse;
+    let auditsResponse;
 
     beforeEach(()=> {
-      response = [{
+      snapshotsResponse = {
         Snapshot: {
           values: [{}, {}],
           total: 10,
         },
-      }, {
+      };
+      auditsResponse = {
         Audit: {
           values: [{}],
           total: 1,
-        }}];
+        },
+      };
       reqDeferred = can.Deferred();
       spyOn(viewModel, 'buildQuery').and.returnValue(['query']);
-      spyOn(QueryAPI, 'makeRequest').and.returnValue(reqDeferred);
+      spyOn(QueryAPI, 'batchRequests');
+      spyOn(can, 'when').and.returnValue(reqDeferred);
       spyOn($.prototype, 'trigger');
     });
 
@@ -116,7 +120,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
       viewModel.loadRelatedObjects();
       expect(viewModel.attr('isLoading')).toBeTruthy();
 
-      reqDeferred.resolve(response);
+      reqDeferred.resolve(snapshotsResponse, auditsResponse);
       expect(viewModel.attr('isLoading')).toBeFalsy();
     });
 
@@ -132,7 +136,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
 
     it('should load snapshots correctly', ()=> {
       viewModel.loadRelatedObjects();
-      reqDeferred.resolve(response);
+      reqDeferred.resolve(snapshotsResponse, auditsResponse);
 
       expect(viewModel.attr('total')).toBe(11);
       expect(viewModel.attr('relatedSnapshots.length')).toBe(2);

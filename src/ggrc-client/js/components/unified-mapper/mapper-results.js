@@ -19,7 +19,7 @@ import {
 import {
   buildRelevantIdsQuery,
   buildParam,
-  makeRequest,
+  batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import Pagination from '../base-objects/pagination';
@@ -325,8 +325,8 @@ export default GGRC.Components('mapperResults', {
       let query = this.getQuery('values', true);
       this.attr('isLoading', true);
 
-      makeRequest({data: query.request})
-        .done(function (responseArr) {
+      can.when(...query.request.map((request) => batchRequests(request)))
+        .done((...responseArr) => {
           let data = responseArr[query.queryIndex];
           let relatedData = this.buildRelatedData(
             responseArr[query.relatedQueryIndex],
@@ -334,7 +334,7 @@ export default GGRC.Components('mapperResults', {
           let disabledIds;
 
           let result =
-            data[modelKey].values.map(function (value) {
+            data[modelKey].values.map((value) => {
               return {
                 id: value.id,
                 type: value.type,
@@ -350,14 +350,12 @@ export default GGRC.Components('mapperResults', {
           // Update paging object
           this.paging.attr('total', data[modelKey].total);
           dfd.resolve(result);
-        }.bind(this))
-        .fail(function () {
-          dfd.resolve([]);
         })
-        .always(function () {
+        .fail(() => dfd.resolve([]))
+        .always(() => {
           this.attr('isLoading', false);
           this.dispatch('loaded');
-        }.bind(this));
+        });
       return dfd;
     },
     buildRelatedData: function (relatedData, type) {
@@ -401,12 +399,12 @@ export default GGRC.Components('mapperResults', {
       let queryType = 'ids';
       let query = this.getQuery(queryType, false);
 
-      makeRequest({data: query.request})
-        .done(function (responseArr) {
+      can.when(...query.request.map((request)=> batchRequests(request)))
+        .done((...responseArr) => {
           let data = responseArr[query.queryIndex];
           let relatedData = responseArr[query.relatedQueryIndex];
           let values = data[modelKey][queryType];
-          let result = values.map(function (item) {
+          let result = values.map((item) => {
             return {
               id: item,
               type: modelKey,
@@ -414,15 +412,13 @@ export default GGRC.Components('mapperResults', {
           });
           // Do not perform extra mapping validation in case object generation
           if (!this.attr('objectGenerator') && relatedData) {
-            result = result.filter(function (item) {
+            result = result.filter((item) => {
               return relatedData[modelKey].ids.indexOf(item.id) < 0;
             });
           }
           dfd.resolve(result);
-        }.bind(this))
-        .fail(function () {
-          dfd.resolve([]);
-        });
+        })
+        .fail(() => dfd.resolve([]));
       return dfd;
     },
     setItemsDebounced: function () {
