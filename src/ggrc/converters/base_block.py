@@ -45,8 +45,6 @@ from ggrc.models.exceptions import StatusValidationError
 # pylint: disable=invalid-name
 logger = getLogger(__name__)
 
-CACHE_EXPIRY_IMPORT = 600
-
 
 class BlockConverter(object):
   # pylint: disable=too-many-public-methods
@@ -76,6 +74,9 @@ class BlockConverter(object):
             "valid_values": "list of valid values"
 
   """
+
+  CACHE_EXPIRY_IMPORT = 600
+
   def __init__(self, converter, object_class, class_name,
                operation, object_ids=None, raw_headers=None, offset=None,
                rows=None):
@@ -601,7 +602,7 @@ class ImportBlockConverter(BlockConverter):
       modified_objects = get_modified_objects(db.session)
       import_event = log_event(db.session, None)
       cache_utils.update_memcache_before_commit(
-          self, modified_objects, CACHE_EXPIRY_IMPORT)
+          self, modified_objects, self.CACHE_EXPIRY_IMPORT)
       for row_converter in self.row_converters:
         try:
           row_converter.send_before_commit_signals(import_event)
