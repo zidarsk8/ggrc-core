@@ -3,8 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import * as aclUtils from '../../plugins/utils/acl-utils';
-import {makeFakeInstance} from '../../../js_specs/spec_helpers';
+import * as aclUtils from '../../../plugins/utils/acl-utils';
+import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 
 describe('CMS.Models.Assessment', function () {
   'use strict';

@@ -3,9 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import * as issueTrackerUtils from '../../plugins/utils/issue-tracker-utils';
-import * as queryApiUtils from '../../plugins/utils/query-api-utils';
-import {makeFakeInstance} from '../../../js_specs/spec_helpers';
+import * as issueTrackerUtils from '../../../plugins/utils/issue-tracker-utils';
+import * as queryApiUtils from '../../../plugins/utils/query-api-utils';
+import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 
 describe('can.Model.Mixin.assessmentIssueTracker', () => {
   let Mixin;

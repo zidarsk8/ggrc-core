@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {makeFakeInstance} from '../../../js_specs/spec_helpers';
+import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 
 describe('CMS.Models.Comment', function () {
   'use strict';

@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import * as ModalsUtils from '../../plugins/utils/modals';
+import * as ModalsUtils from '../../../plugins/utils/modals';
 
 describe('CMS.Models.Mixins.autoStatusChangeable', function () {
   'use strict';

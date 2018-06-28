@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import * as issueTrackerUtils from '../../plugins/utils/issue-tracker-utils';
+import * as issueTrackerUtils from '../../../plugins/utils/issue-tracker-utils';
 
 describe('can.Model.Mixin.auditIssueTracker', () => {
   let Mixin;
