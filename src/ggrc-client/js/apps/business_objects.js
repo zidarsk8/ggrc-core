@@ -158,10 +158,6 @@ import Role from '../models/service-models/role';
         });
       });
 
-      function sort_sections(sections) {
-        return can.makeArray(sections).sort(window.natural_comparator);
-      }
-
       function apply_mixins(definitions) {
         let mappings = {};
 
@@ -367,21 +363,17 @@ import Role from '../models/service-models/role';
         governance_objects: {
           Regulation: {
             draw_children: true,
-            fetch_post_process: sort_sections,
             add_item_view: path + '/snapshots/tree_add_item.mustache',
           },
           Contract: {
             draw_children: true,
-            fetch_post_process: sort_sections,
           },
           Policy: {
             draw_children: true,
-            fetch_post_process: sort_sections,
             add_item_view: path + '/snapshots/tree_add_item.mustache',
           },
           Standard: {
             draw_children: true,
-            fetch_post_process: sort_sections,
             add_item_view: path + '/snapshots/tree_add_item.mustache',
           },
           Control: {
@@ -600,23 +592,18 @@ import Role from '../models/service-models/role';
           _mixins: ['issues'],
           Program: {
             draw_children: true,
-            fetch_post_process: sort_sections,
           },
           Regulation: {
             draw_children: true,
-            fetch_post_process: sort_sections,
           },
           Contract: {
             draw_children: true,
-            fetch_post_process: sort_sections,
           },
           Standard: {
             draw_children: true,
-            fetch_post_process: sort_sections,
           },
           Policy: {
             draw_children: true,
-            fetch_post_process: sort_sections,
           },
           Audit: {
             draw_children: true,
