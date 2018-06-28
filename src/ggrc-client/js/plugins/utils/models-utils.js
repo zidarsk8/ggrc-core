@@ -60,6 +60,16 @@ const inferObjectType = (data) => {
   }
 };
 
+const makeModelInstance = (data) => {
+  if (!data) {
+    return null;
+  } else if (!!GGRC.page_model && GGRC.page_object === data) {
+    return GGRC.page_model;
+  } else {
+    return GGRC.page_model = inferObjectType(data).model($.extend({}, data));
+  }
+};
+
 /**
  * Check the model has Related Assessments
  * @param {String} type - model type
@@ -231,5 +241,6 @@ export {
   relatedAssessmentsTypes,
   resolveDeferredBindings,
   handlePendingJoins,
+  makeModelInstance,
   inferObjectType,
 };

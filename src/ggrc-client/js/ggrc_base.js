@@ -4,7 +4,7 @@
 */
 
 import PersistentNotifier from './plugins/persistent_notifier';
-import {inferObjectType} from './plugins/utils/models-utils';
+import {makeModelInstance} from './plugins/utils/models-utils';
 
 (function (GGRC, moment) {
   GGRC.mustache_path = '/static/mustache';
@@ -33,19 +33,9 @@ import {inferObjectType} from './plugins/utils/models-utils';
     });
 
   $.extend(GGRC, {
-    make_model_instance: function (data) {
-      if (!data) {
-        return null;
-      } else if (!!GGRC.page_model && GGRC.page_object === data) {
-        return GGRC.page_model;
-      } else {
-        return GGRC.page_model = inferObjectType(data).model($.extend({}, data));
-      }
-    },
-
     page_instance: function () {
       if (!GGRC._page_instance && GGRC.page_object) {
-        GGRC._page_instance = GGRC.make_model_instance(GGRC.page_object);
+        GGRC._page_instance = makeModelInstance(GGRC.page_object);
       }
       return GGRC._page_instance;
     },
