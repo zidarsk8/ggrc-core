@@ -55,20 +55,20 @@ describe('multiselectDropdownWrapper component', function () {
       expect(CMS.Models.TestType.findAll).toHaveBeenCalled();
     });
 
-    it('calls _prepareModels()', (done) => {
-      spyOn(viewModel, '_prepareModels');
+    it('calls prepareOptions()', (done) => {
+      spyOn(viewModel, 'prepareOptions');
 
       viewModel.attr('modelName', 'TestType');
       findDfd.resolve(response);
 
       findDfd.then((result) => {
-        expect(viewModel._prepareModels).toHaveBeenCalledWith(response);
+        expect(viewModel.prepareOptions).toHaveBeenCalledWith(response);
 
         done();
       });
     });
 
-    describe('_prepareModels() method', () => {
+    describe('prepareOptions() method', () => {
       beforeEach(function () {
         viewModel.attr('selected', [
           {

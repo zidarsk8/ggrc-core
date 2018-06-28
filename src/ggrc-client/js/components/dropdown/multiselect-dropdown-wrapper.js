@@ -20,33 +20,33 @@ export default can.Component.extend({
         set(newModelName) {
           if (CMS.Models[newModelName]) {
             CMS.Models[newModelName].findAll()
-              .done(this._prepareModels.bind(this));
+              .done(this.prepareOptions.bind(this));
 
             return newModelName;
           }
         },
       },
     },
-    _prepareModels: function (items) {
+    prepareOptions: function (items) {
       let selected = this.attr('selected');
       let preparedOptions = [];
       let selectedInternal = [];
 
-      _.each(items, (item)=> {
+      items.forEach((item)=> {
         let isSelected = _.find(selected, (selectedItem)=> {
           return selectedItem.id === item.id;
         });
 
-        let selectObj = {
+        let option = {
           value: item.name,
           id: item.id,
           checked: isSelected ? true : false,
         };
 
-        preparedOptions.push(selectObj);
+        preparedOptions.push(option);
 
         if (isSelected) {
-          selectedInternal.push(selectObj);
+          selectedInternal.push(option);
         }
       });
 
