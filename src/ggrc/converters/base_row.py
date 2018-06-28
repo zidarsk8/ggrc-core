@@ -40,7 +40,6 @@ class ImportRowConverter(RowConverter):
     self.is_new = True
     self.is_delete = False
     self.is_deprecated = False
-    self.do_not_expunge = False
     self.ignore = False
     self.row = options.get("row", [])
     self.id_key = ""
@@ -94,6 +93,22 @@ class ImportRowConverter(RowConverter):
           self.id_key = attr_name
           self.obj = self.get_or_generate_object(attr_name)
           item.set_obj_attr()
+        if header_dict["unique"]:
+          value = self.get_value(attr_name)
+          if value:
+            unique_values = self.block_converter.unique_values
+            if unique_values[attr_name].get(value) is not None:
+              self.add_error(
+                  errors.DUPLICATE_VALUE_IN_CSV.format(
+                      line=self.line,
+                      processed_line=unique_values[attr_name][value],
+                      column_name=header_dict["display_name"],
+                      value=value,
+                  ),
+              )
+              item.is_duplicate = True
+            else:
+              self.block_converter.unique_values[attr_name][value] = self.line
       item.check_unique_consistency()
 
   def handle_row_data(self, field_list=None):
@@ -127,14 +142,6 @@ class ImportRowConverter(RowConverter):
 
   def set_ignore(self, ignore=True):
     self.ignore = ignore
-
-  def set_do_not_expunge(self, do_not_expunge=True):
-    """Mark an ignored object not to be expunged from a session
-
-    We may not expunge objects with duplicate slugs, because they represent
-    the same object.
-    """
-    self.do_not_expunge = do_not_expunge
 
   def get_or_generate_object(self, attr_name):
     """Fetch an existing object if possible or create and return a new one.

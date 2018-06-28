@@ -433,7 +433,7 @@ class ImportBlockConverter(BlockConverter):
         operation="import"
     )
     self.converter = converter
-    self.unique_counts = self.get_unique_counts_dict(self.object_class)
+    self.unique_values = self.get_unique_values_dict(self.object_class)
     self.revision_ids = []
     self._import_info = self._make_empty_info()
 
@@ -500,25 +500,9 @@ class ImportBlockConverter(BlockConverter):
     row_converter.handle_row_data(field_list)
     if field_list is None:
       row_converter.check_mandatory_fields()
-      self.check_unique_columns()
 
-  def check_unique_columns(self):
-    self.generate_unique_counts()
-    for key, counts in self.unique_counts.items():
-      self.remove_duplicate_keys(key, counts)
-
-  def generate_unique_counts(self):
-    """Populate unique_counts for sent data."""
-    for key, header in self.headers.items():
-      if not header["unique"]:
-        continue
-      for rel_index, row in enumerate(self.row_converters):
-        value = row.get_value(key)
-        if value:
-          self.unique_counts[key][value].add(self._calc_abs_index(rel_index))
-
-  def get_unique_counts_dict(self, object_class):
-    """Get the varible to storing unique counts.
+  def get_unique_values_dict(self, object_class):
+    """Get the varible to storing row numbers for unique values.
 
     Make sure to always return the same variable for object with shared tables,
     as defined in sharing rules.
@@ -527,9 +511,7 @@ class ImportBlockConverter(BlockConverter):
     classes = sharing_rules.get(object_class, object_class)
     shared_state = self.converter.shared_state
     if classes not in shared_state:
-      shared_state[classes] = defaultdict(
-          lambda: structures.CaseInsensitiveDefaultDict(set)
-      )
+      shared_state[classes] = defaultdict(structures.CaseInsensitiveDict)
     return shared_state[classes]
 
   def import_objects(self, row_converter):
@@ -574,8 +556,6 @@ class ImportBlockConverter(BlockConverter):
     """
     obj = row_converter.obj
     try:
-      if row_converter.do_not_expunge:
-        return
       if row_converter.ignore and obj in db.session:
         db.session.expunge(obj)
     except UnmappedInstanceError:
@@ -696,54 +676,6 @@ class ImportBlockConverter(BlockConverter):
 
     if row.is_deprecated:
       self._import_info["deprecated"] += 1
-
-  def _in_range(self, index, remove_offset=True):
-    """Checks if the value provided lays within the range of lines of the
-    current block
-    """
-    if remove_offset:
-      index = self._calc_offset(index)
-    return index >= 0 and index < len(self.row_converters)
-
-  def _calc_offset(self, index):
-    """Calculate an offset relative to the current block beginning
-    given an absolute line index
-    """
-    return index - self.BLOCK_OFFSET - self.offset
-
-  def _calc_abs_index(self, rel_index):
-    """Calculate an absolute line number given a relative index
-    """
-    return rel_index + self.BLOCK_OFFSET + self.offset
-
-  def remove_duplicate_keys(self, key, counts):
-
-    for value, indexes in counts.items():
-      if not any(self._in_range(index) for index in indexes):
-        continue  # ignore duplicates in other related code blocks
-
-      indexes = sorted(list(indexes))
-      if len(indexes) > 1:
-        str_indexes = [str(index) for index in indexes]
-        self.row_errors.append(
-            errors.DUPLICATE_VALUE_IN_CSV.format(
-                line_list=", ".join(str_indexes),
-                column_name=self.headers[key]["display_name"],
-                s="s" if len(str_indexes) > 2 else "",
-                value=value,
-                ignore_lines=", ".join(str_indexes[1:]),
-            )
-        )
-        if key == "slug":  # mark obj not to be expunged from the session
-          for index in indexes:
-            offset_index = self._calc_offset(index)
-            if self._in_range(offset_index, remove_offset=False):
-              self.row_converters[offset_index].set_do_not_expunge()
-
-      for index in indexes[1:]:
-        offset_index = self._calc_offset(index)
-        if self._in_range(offset_index, remove_offset=False):
-          self.row_converters[offset_index].set_ignore()
 
 
 class ExportBlockConverter(BlockConverter):
