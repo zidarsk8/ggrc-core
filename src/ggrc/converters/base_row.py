@@ -5,16 +5,30 @@
 """
 
 import collections
+from logging import getLogger
+
+from sqlalchemy import exc
+from sqlalchemy.orm.exc import UnmappedInstanceError
 
 import ggrc.services
 from ggrc import db
 from ggrc.converters import errors
 from ggrc.converters import get_importables
 from ggrc.login import get_current_user_id
-from ggrc.models.reflection import AttributeInfo
+from ggrc.models import all_models
+from ggrc.models.exceptions import StatusValidationError
 from ggrc.rbac import permissions
 from ggrc.services import signals
+from ggrc.snapshotter import create_snapshots
 from ggrc.utils import dump_attrs
+
+from ggrc.models.reflection import AttributeInfo
+from ggrc.services.common import get_modified_objects
+from ggrc.services.common import update_snapshot_index
+from ggrc.cache import utils as cache_utils
+from ggrc.utils.log_event import log_event
+
+logger = getLogger(__name__)
 
 
 class RowConverter(object):
@@ -46,6 +60,68 @@ class ImportRowConverter(RowConverter):
     self.line = self.index + self.block_converter.offset + \
         self.block_converter.BLOCK_OFFSET
     self.initial_state = None
+    self.is_new_object_set = False
+
+  def handle_raw_cell(self, attr_name, idx, header_dict):
+    """Process raw value from self.row[idx] for attr_name.
+
+    This function finds and instantiates the correct handler class and handles
+    special logic for deprecated status and primary key attributes, as well as
+    value uniqueness.
+    """
+    handler = header_dict["handler"]
+    item = handler(self, attr_name, parse=True,
+                   raw_value=self.row[idx], **header_dict)
+    if header_dict.get("type") == AttributeInfo.Type.PROPERTY:
+      self.attrs[attr_name] = item
+    else:
+      self.objects[attr_name] = item
+    if attr_name == "status" and hasattr(self.obj, "DEPRECATED"):
+      self.is_deprecated = (
+          self.obj.DEPRECATED == item.value != self.obj.status
+      )
+    if attr_name in ("slug", "email"):
+      self.id_key = attr_name
+      self.obj = self.get_or_generate_object(attr_name)
+      item.set_obj_attr()
+    if header_dict["unique"]:
+      value = self.get_value(attr_name)
+      if value:
+        unique_values = self.block_converter.unique_values
+        if unique_values[attr_name].get(value) is not None:
+          self.add_error(
+              errors.DUPLICATE_VALUE_IN_CSV.format(
+                  line=self.line,
+                  processed_line=unique_values[attr_name][value],
+                  column_name=header_dict["display_name"],
+                  value=value,
+              ),
+          )
+          item.is_duplicate = True
+        else:
+          self.block_converter.unique_values[attr_name][value] = self.line
+    item.check_unique_consistency()
+
+  def handle_raw_data(self):
+    """Pass raw values into column handlers for all cell in the row."""
+    row_headers = {attr_name: (idx, header_dict)
+                   for idx, (attr_name, header_dict)
+                   in enumerate(self.headers.iteritems())}
+    for attr_name in self.block_converter.handle_fields:
+      if attr_name not in row_headers or self.is_delete:
+        continue
+      idx, header_dict = row_headers[attr_name]
+      self.handle_raw_cell(attr_name, idx, header_dict)
+
+  def update_new_obj_cache(self):
+    if not self.is_new or not getattr(self.obj, self.id_key):
+      return
+    self.is_new_object_set = True
+    self.block_converter.converter.new_objects[
+        self.obj.__class__
+    ][
+        getattr(self.obj, self.id_key)
+    ] = self.obj
 
   def add_error(self, template, **kwargs):
     """Add error for current row.
@@ -59,61 +135,19 @@ class ImportRowConverter(RowConverter):
     """
     message = template.format(line=self.line, **kwargs)
     self.block_converter.row_errors.append(message)
-    new_objects = self.block_converter.converter.new_objects[self.object_class]
-    key = self.get_value(self.id_key)
-    if key in new_objects:
-      del new_objects[key]
+    if self.is_new_object_set:
+      new_objects = self.block_converter.converter.new_objects[
+          self.object_class
+      ]
+      key = self.get_value(self.id_key)
+      if key in new_objects:
+        del new_objects[key]
+      self.is_new_object_set = False
     self.ignore = True
 
   def add_warning(self, template, **kwargs):
     message = template.format(line=self.line, **kwargs)
     self.block_converter.row_warnings.append(message)
-
-  def handle_csv_row_data(self, field_list=None):
-    """ Pack row data with handlers """
-    handle_fields = self.headers if field_list is None else field_list
-    for i, (attr_name, header_dict) in enumerate(self.headers.items()):
-      if attr_name not in handle_fields or \
-              attr_name in self.attrs or \
-              self.is_delete:
-        continue
-      handler = header_dict["handler"]
-      item = handler(self, attr_name, parse=True,
-                     raw_value=self.row[i], **header_dict)
-      if header_dict.get("type") == AttributeInfo.Type.PROPERTY:
-        self.attrs[attr_name] = item
-      else:
-        self.objects[attr_name] = item
-      if not self.ignore:
-        if attr_name == "status" and hasattr(self.obj, "DEPRECATED"):
-          self.is_deprecated = (
-              self.obj.DEPRECATED == item.value != self.obj.status
-          )
-        if attr_name in ("slug", "email"):
-          self.id_key = attr_name
-          self.obj = self.get_or_generate_object(attr_name)
-          item.set_obj_attr()
-        if header_dict["unique"]:
-          value = self.get_value(attr_name)
-          if value:
-            unique_values = self.block_converter.unique_values
-            if unique_values[attr_name].get(value) is not None:
-              self.add_error(
-                  errors.DUPLICATE_VALUE_IN_CSV.format(
-                      line=self.line,
-                      processed_line=unique_values[attr_name][value],
-                      column_name=header_dict["display_name"],
-                      value=value,
-                  ),
-              )
-              item.is_duplicate = True
-            else:
-              self.block_converter.unique_values[attr_name][value] = self.line
-      item.check_unique_consistency()
-
-  def handle_row_data(self, field_list=None):
-    """Handle row data on import"""
-    self.handle_csv_row_data(field_list)
 
   def check_mandatory_fields(self):
     """Check if the new object contains all mandatory columns."""
@@ -192,6 +226,94 @@ class ImportRowConverter(RowConverter):
       return
     for mapping in self.objects.values():
       mapping.set_obj_attr()
+    if self.block_converter.converter.dry_run:
+      return
+    try:
+      self.insert_secondary_objects()
+    except exc.SQLAlchemyError as err:
+      db.session.rollback()
+      logger.exception("Import failed with: %s", err.message)
+      self.add_error(errors.UNKNOWN_ERROR)
+
+  def process_row(self):
+    """Parse, set, validate and commit data specified in self.row."""
+    self.handle_raw_data()
+    self.check_mandatory_fields()
+    if self.ignore:
+      return
+    self.update_new_obj_cache()
+    self.setup_object()
+    self.block_converter._check_object(self)
+    try:
+      if self.ignore and self.obj in db.session:
+        db.session.expunge(self.obj)
+    except UnmappedInstanceError:
+      return
+    if self.block_converter.ignore:
+      return
+    self.flush_object()
+    self.setup_secondary_objects()
+    self.commit_object()
+
+  def flush_object(self):
+    """Flush dirty data related to the current row."""
+    if self.block_converter.converter.dry_run or self.ignore:
+      return
+    self.send_pre_commit_signals()
+    try:
+      if self.object_class == all_models.Audit and self.is_new:
+        # This hack is needed only for snapshot creation
+        # for audit during import, this is really bad and
+        # need to be refactored
+        import_event = log_event(db.session, None)
+      self.insert_object()
+      db.session.flush()
+      if self.object_class == all_models.Audit and self.is_new:
+        # This hack is needed only for snapshot creation
+        # for audit during import, this is really bad and
+        # need to be refactored
+        create_snapshots(self.obj, import_event)
+    except exc.SQLAlchemyError as err:
+      db.session.rollback()
+      logger.exception("Import failed with: %s", err.message)
+      self.add_error(errors.UNKNOWN_ERROR)
+      return
+    if self.is_new and not self.ignore:
+      self.block_converter.send_collection_post_signals([self.obj])
+
+  def commit_object(self):
+    """Commit the row.
+
+    This method also calls pre-and post-commit signals and handles failures.
+    """
+    if self.block_converter.converter.dry_run or self.ignore:
+      return
+    try:
+      modified_objects = get_modified_objects(db.session)
+      import_event = log_event(db.session, None)
+      cache_utils.update_memcache_before_commit(
+          self.block_converter,
+          modified_objects,
+          self.block_converter.CACHE_EXPIRY_IMPORT,
+      )
+      try:
+        self.send_before_commit_signals(import_event)
+      except StatusValidationError as exp:
+        status_alias = self.headers.get("status", {}).get("display_name")
+        self.add_error(errors.VALIDATION_ERROR,
+                       column_name=status_alias,
+                       message=exp.message)
+      db.session.commit()
+      self.block_converter._store_revision_ids(import_event)
+      cache_utils.update_memcache_after_commit(self.block_converter)
+      update_snapshot_index(db.session, modified_objects)
+    except exc.SQLAlchemyError as err:
+      db.session.rollback()
+      logger.exception("Import failed with: %s", err.message)
+      self.block_converter.add_errors(errors.UNKNOWN_ERROR,
+                                      line=self.offset + 2)
+    else:
+      self.send_post_commit_signals(event=import_event)
 
   def setup_object(self):
     """ Set the object values or relate object values

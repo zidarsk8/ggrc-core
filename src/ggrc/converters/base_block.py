@@ -13,10 +13,8 @@ from collections import OrderedDict
 from collections import Counter
 
 from cached_property import cached_property
-from sqlalchemy import exc
 from sqlalchemy import or_
 from sqlalchemy import and_
-from sqlalchemy.orm.exc import UnmappedInstanceError
 from flask import _app_ctx_stack
 
 from ggrc import db
@@ -31,15 +29,9 @@ from ggrc.converters import pre_commit_checks
 from ggrc.converters import base_row
 from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import get_object_column_definitions
-from ggrc.services.common import get_modified_objects
-from ggrc.services.common import update_snapshot_index
-from ggrc.cache import utils as cache_utils
-from ggrc.utils.log_event import log_event
 from ggrc.services import signals
 from ggrc_workflows.models.cycle_task_group_object_task import \
     CycleTaskGroupObjectTask
-
-from ggrc.models.exceptions import StatusValidationError
 
 
 # pylint: disable=invalid-name
@@ -477,29 +469,24 @@ class ImportBlockConverter(BlockConverter):
       yield base_row.ImportRowConverter(self, self.object_class, row=row,
                                         headers=self.headers, index=i)
 
+  @property
+  def handle_fields(self):
+    """Column definitions in correct processing order.
+
+    Special columns which are primary keys logically or affect the valid set of
+    columns go before usual columns.
+    """
+    return [
+        k for k in self.headers if k in self.converter.priority_columns
+    ] + [
+        k for k in self.headers if k not in self.converter.priority_columns
+    ]
+
   def import_csv_data(self):
     """Perform import sequence for the block."""
     for row in self.row_converters_from_csv():
-      for attr_name in self.priority_columns:
-        self.handle_row_data(row, attr_name)
-      self.handle_row_data(row)
-      self.import_objects(row)
-      self.import_secondary_objects(row)
+      row.process_row()
       self._update_info(row)
-
-  def handle_row_data(self, row_converter, field_list=None):
-    """Handle row data for all row converters on import.
-
-    Note: When field_list is set, we are handling priority columns and we
-    don't have all the data needed for checking mandatory and duplicate values.
-
-    Args:
-      filed_list (list of strings): list of fields that should be handled by
-        row converters. This is used only for handling priority columns.
-    """
-    row_converter.handle_row_data(field_list)
-    if field_list is None:
-      row_converter.check_mandatory_fields()
 
   def get_unique_values_dict(self, object_class):
     """Get the varible to storing row numbers for unique values.
@@ -514,97 +501,10 @@ class ImportBlockConverter(BlockConverter):
       shared_state[classes] = defaultdict(structures.CaseInsensitiveDict)
     return shared_state[classes]
 
-  def import_objects(self, row_converter):
-    """Add all objects to the database.
-
-    This function flushes all objects to the database if the dry_run flag is
-    not set and all signals for the imported objects get sent.
-    """
-
-    self._import_objects_prepare(row_converter)
-
-    if not self.converter.dry_run:
-      new_objects = []
-      row_converter.send_pre_commit_signals()
-      try:
-        row_converter.insert_object()
-        db.session.flush()
-      except exc.SQLAlchemyError as err:
-        db.session.rollback()
-        logger.exception("Import failed with: %s", err.message)
-        row_converter.add_error(errors.UNKNOWN_ERROR)
-      else:
-        if row_converter.is_new and not row_converter.ignore:
-          new_objects.append(row_converter.obj)
-      self.send_collection_post_signals(new_objects)
-      import_event = self.save_import(row_converter)
-      row_converter.send_post_commit_signals(event=import_event)
-
-  def _import_objects_prepare(self, row_converter):
-    """Setup all objects and do pre-commit checks for them."""
-    row_converter.setup_object()
-
-    self._check_object(row_converter)
-
-    self.clean_session_from_ignored_objs(row_converter)
-
-  def clean_session_from_ignored_objs(self, row_converter):
-    """Clean DB session from ignored objects.
-
-    This function expunges objects from 'db.session' which are in rows that
-    marked as 'ignored' before commit.
-    """
-    obj = row_converter.obj
-    try:
-      if row_converter.ignore and obj in db.session:
-        db.session.expunge(obj)
-    except UnmappedInstanceError:
-      return
-
-  def save_import(self, row_converter):
-    """Commit all changes in the session and update memcache."""
-    try:
-      modified_objects = get_modified_objects(db.session)
-      import_event = log_event(db.session, None)
-      cache_utils.update_memcache_before_commit(
-          self, modified_objects, self.CACHE_EXPIRY_IMPORT)
-      try:
-        row_converter.send_before_commit_signals(import_event)
-      except StatusValidationError as exp:
-        status_alias = row_converter.headers.get("status",
-                                                 {}).get("display_name")
-        row_converter.add_error(
-            errors.VALIDATION_ERROR,
-            column_name=status_alias,
-            message=exp.message
-        )
-      db.session.commit()
-      self._store_revision_ids(import_event)
-      cache_utils.update_memcache_after_commit(self)
-      update_snapshot_index(db.session, modified_objects)
-      return import_event
-    except exc.SQLAlchemyError as err:
-      db.session.rollback()
-      logger.exception("Import failed with: %s", err.message)
-      self.add_errors(errors.UNKNOWN_ERROR, line=self.offset + 2)
-
   def _store_revision_ids(self, event):
     """Store revision ids from the current event."""
     if event:
       self.revision_ids.extend(revision.id for revision in event.revisions)
-
-  def import_secondary_objects(self, row_converter):
-    """Import secondary objects procedure."""
-    row_converter.setup_secondary_objects()
-
-    if not self.converter.dry_run:
-      try:
-        row_converter.insert_secondary_objects()
-      except exc.SQLAlchemyError as err:
-        db.session.rollback()
-        logger.exception("Import failed with: %s", err.message)
-        row_converter.add_error(errors.UNKNOWN_ERROR)
-      self.save_import(row_converter)
 
   @staticmethod
   def _check_object(row_converter):
