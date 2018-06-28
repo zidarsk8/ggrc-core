@@ -477,6 +477,15 @@ class ImportBlockConverter(BlockConverter):
                                         headers=self.headers, index=i)
       self.row_converters.append(row)
 
+  def import_csv_data(self):
+    """Perform import sequence for the block."""
+    self.row_converters_from_csv()
+    for attr_name in self.priority_columns:
+      self.handle_row_data(attr_name)
+    self.handle_row_data()
+    self.import_objects()
+    self.import_secondary_objects()
+
   def handle_row_data(self, field_list=None):
     """Handle row data for all row converters on import.
 
