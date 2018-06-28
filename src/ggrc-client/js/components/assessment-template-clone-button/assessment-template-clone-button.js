@@ -5,6 +5,7 @@
 
 import template from './assessment-template-clone-button.mustache';
 import router from '../../router';
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 export default can.Component.extend({
   tag: 'assessment-template-clone-button',
@@ -29,7 +30,7 @@ export default can.Component.extend({
         });
     },
     refreshTreeView() {
-      if (GGRC.page_instance().type === 'Audit') {
+      if (getPageInstance().type === 'Audit') {
         if (router.attr('widget') === 'assessment_template') {
           this.dispatch('refreshTree');
         } else {

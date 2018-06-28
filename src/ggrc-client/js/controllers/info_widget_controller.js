@@ -14,6 +14,7 @@ import '../components/revision-history/restore-revision';
 import {
   inferObjectType,
 } from '../plugins/utils/models-utils';
+import {getPageInstance} from '../plugins/utils/current-page-utils';
 
 export default can.Control({
   pluginName: 'ggrc_controllers_info_widget',
@@ -28,7 +29,7 @@ export default can.Control({
       if (GGRC.page_object) {
         can.extend(that.defaults, {
           model: inferObjectType(GGRC.page_object),
-          instance: GGRC.page_instance(),
+          instance: getPageInstance(),
         });
       }
     });

@@ -11,6 +11,7 @@ import {
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import {allowedToMap} from '../../plugins/ggrc_utils';
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 export default can.Component.extend({
   tag: 'issue-unmap-item',
@@ -112,7 +113,7 @@ export default can.Component.extend({
       window.open(url, '_blank');
     },
     async unmap() {
-      const currentObject = GGRC.page_instance();
+      const currentObject = getPageInstance();
       this.attr('isLoading', true);
       try {
         const relationship = await CMS.Models.Relationship.findRelationship(

@@ -18,6 +18,7 @@ import {
   getWidgetConfigs,
 } from './object-versions-utils';
 import Mappings from '../../models/mappers/mappings';
+import {makeModelInstance} from './models-utils';
 
 /**
  * Util methods for work with Current Page.
@@ -39,8 +40,15 @@ let CUSTOM_COUNTERS = {
   ALL_OBJECTS: () => _getCurrentUser().getWidgetCountForAllObjectPage(),
 };
 
+function getPageInstance() {
+  if (!GGRC._page_instance && GGRC.page_object) {
+    GGRC._page_instance = makeModelInstance(GGRC.page_object);
+  }
+  return GGRC._page_instance;
+}
+
 function initMappedInstances() {
-  let currentPageInstance = GGRC.page_instance();
+  let currentPageInstance = getPageInstance();
   let models = Mappings.getMappingList(currentPageInstance.type);
   let reqParams = [];
 
@@ -81,10 +89,10 @@ function initMappedInstances() {
 }
 
 // To identify pages like My Work, My Assessments and Admin Dashboard on the Server-side
-// was defined variable GGRC.pageType, because for all of them GGRC.page_instance().type = 'Person'.
-// For other pages using GGRC.page_instance() object.
+// was defined variable GGRC.pageType, because for all of them getPageInstance().type = 'Person'.
+// For other pages using getPageInstance() object.
 function getPageType() {
-  return GGRC.pageType ? GGRC.pageType : GGRC.page_instance().type;
+  return GGRC.pageType ? GGRC.pageType : getPageInstance().type;
 }
 
 function isMyAssessments() {
@@ -244,7 +252,7 @@ function _initWidgetCounts(widgets, type, id) {
 }
 
 function refreshCounts() {
-  let pageInstance = GGRC.page_instance();
+  let pageInstance = getPageInstance();
   let widgets;
   let location = window.location.pathname;
 
@@ -278,6 +286,7 @@ function initWidgets() {
 
 export {
   relatedToCurrentInstance as related,
+  getPageInstance,
   initMappedInstances,
   getPageType,
   isMyAssessments,

@@ -10,6 +10,7 @@ import '../../components/unified-mapper/mapper-results';
 import '../../components/collapsible-panel/collapsible-panel';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import template from './assessment-template-clone.mustache';
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 export default can.Component.extend({
   tag: 'assessment-template-clone',
@@ -17,7 +18,7 @@ export default can.Component.extend({
   viewModel: function () {
     return ObjectOperationsBaseVM.extend({
       isAuditPage() {
-        return GGRC.page_instance().type === 'Audit';
+        return getPageInstance().type === 'Audit';
       },
     });
   },

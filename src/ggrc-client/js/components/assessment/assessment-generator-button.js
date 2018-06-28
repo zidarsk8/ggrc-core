@@ -6,6 +6,7 @@
 import tracker from '../../tracker';
 import RefreshQueue from '../../models/refresh_queue';
 import template from './templates/generate_assessments_button.mustache';
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 export default can.Component.extend({
   tag: 'assessment-generator-button',
@@ -16,7 +17,7 @@ export default can.Component.extend({
   },
   events: {
     'a click': function (el, ev) {
-      let instance = this.viewModel.attr('audit') || GGRC.page_instance();
+      let instance = this.viewModel.attr('audit') || getPageInstance();
       let a;
       this._results = null;
       tracker.start(tracker.FOCUS_AREAS.ASSESSMENT,

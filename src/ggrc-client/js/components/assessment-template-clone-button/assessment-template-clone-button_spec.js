@@ -6,6 +6,7 @@
 import Component from './assessment-template-clone-button';
 import {getComponentVM} from '../../../js_specs/spec_helpers';
 import router from '../../router';
+import * as CurrentPageUtils from '../../plugins/utils/current-page-utils';
 
 describe('assessment-template-clone-button component', () => {
   let vm;
@@ -21,7 +22,7 @@ describe('assessment-template-clone-button component', () => {
     beforeEach(() => {
       spyOn(vm, 'dispatch');
       routerSpy = spyOn(router, 'attr');
-      pageInstanceSpy = spyOn(GGRC, 'page_instance');
+      pageInstanceSpy = spyOn(CurrentPageUtils, 'getPageInstance');
     });
 
     it('dispatches "refreshTree" if it is Audit page ' +

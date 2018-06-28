@@ -12,6 +12,7 @@ import {
 import {VALIDATION_ERROR, RELATED_ITEMS_LOADED} from '../../events/eventTypes';
 import tracker from '../../tracker';
 import Permission from '../../permission';
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 export default can.Component.extend({
   tag: 'assessment-local-ca',
@@ -231,7 +232,7 @@ export default can.Component.extend({
       this.viewModel.validateForm();
     },
     '{viewModel.instance} showInvalidField': function (ev) {
-      let pageType = GGRC.page_instance().type;
+      let pageType = getPageInstance().type;
       let $container = (pageType === 'Assessment') ?
         $('.object-area') : $('.cms_controllers_info_pin');
       let $body = (pageType === 'Assessment') ?

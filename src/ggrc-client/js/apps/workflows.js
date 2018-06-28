@@ -5,6 +5,7 @@
 
 import {
   initCounts,
+  getPageInstance,
 } from '../plugins/utils/current-page-utils';
 import {registerHook} from '../plugins/ggrc_utils';
 
@@ -304,7 +305,7 @@ import Mappings from '../models/mappers/mappings';
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
   // Initialize widgets for workflow page
   WorkflowExtension.init_widgets = function () {
-    let pageInstance = GGRC.page_instance();
+    let pageInstance = getPageInstance();
     let treeWidgets = GGRC.tree_view.base_widgets_by_type;
     let subTrees = GGRC.tree_view.sub_tree_for;
     let subTreeItems = ['Cycle'];
@@ -359,7 +360,7 @@ import Mappings from '../models/mappers/mappings';
 
   WorkflowExtension.init_widgets_for_other_pages = function () {
     let descriptor = {};
-    let pageInstance = GGRC.page_instance();
+    let pageInstance = getPageInstance();
 
     if (
       pageInstance &&
@@ -403,7 +404,7 @@ import Mappings from '../models/mappers/mappings';
     ];
     let historyWidgetDescriptor;
     let currentWidgetDescriptor;
-    let object = GGRC.page_instance();
+    let object = getPageInstance();
 
     can.each(
       GGRC.WidgetList.get_current_page_widgets(),
@@ -505,7 +506,7 @@ import Mappings from '../models/mappers/mappings';
 
   WorkflowExtension.init_widgets_for_person_page = function () {
     let descriptor = {};
-    let pageInstance = GGRC.page_instance();
+    let pageInstance = getPageInstance();
     const isObjectBrowser = /^\/objectBrowser\/?$/
       .test(window.location.pathname);
     const isPeoplePage = /^\/people\/.*$/
@@ -519,7 +520,7 @@ import Mappings from '../models/mappers/mappings';
         widget_name: 'My Tasks',
         model: CMS.Models.CycleTaskGroupObjectTask,
         content_controller_options: {
-          parent_instance: GGRC.page_instance(),
+          parent_instance: getPageInstance(),
           model: CMS.Models.CycleTaskGroupObjectTask,
           add_item_view:
             GGRC.mustache_path +

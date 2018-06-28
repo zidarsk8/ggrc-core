@@ -27,7 +27,7 @@ describe('GGRC Utils CurrentPage', function () {
       type: 'Audit',
     });
 
-    spyOn(GGRC, 'page_instance')
+    spyOn(CurrentPageUtils, 'getPageInstance')
       .and.returnValue(instance);
 
     GGRC.pageType = undefined;
@@ -44,7 +44,7 @@ describe('GGRC Utils CurrentPage', function () {
       expect(method()).toEqual('MOCK_PAGE');
     });
 
-    it('returns page_instance type if pageType not defined', function () {
+    it('returns page instance type if pageType not defined', function () {
       expect(method()).toEqual('Audit');
     });
   });

@@ -10,6 +10,7 @@ import {
 } from './plugins/utils/snapshot-utils';
 import {
   isAdmin,
+  getPageInstance,
 } from './plugins/utils/current-page-utils';
 import {
   getRole,
@@ -443,7 +444,7 @@ can.each(['with_page_object_as', 'with_current_user_as'], function (fname) {
     let pageObject = (fname === 'with_current_user_as'
       ? (CMS.Models.Person.findInCacheById(GGRC.current_user.id)
                           || CMS.Models.Person.model(GGRC.current_user))
-      : GGRC.page_instance()
+      : getPageInstance()
     );
     if (pageObject) {
       let po = {};
@@ -1974,7 +1975,7 @@ Mustache.registerHelper('displayWidgetTab',
   }
 );
 Mustache.registerHelper('is_auditor', function (options) {
-  const audit = GGRC.page_instance();
+  const audit = getPageInstance();
   if (audit.type !== 'Audit') {
     console.warn('is_auditor called on non audit page');
     return options.inverse(options.contexts);
@@ -2014,7 +2015,7 @@ Mustache.registerHelper('user_roles', (person, parentInstance, options) => {
   if (!options) {
     // if parent instance is not defined in helper use page instance
     options = parentInstance;
-    parentInstance = Mustache.resolve(GGRC.page_instance);
+    parentInstance = Mustache.resolve(getPageInstance);
   } else {
     parentInstance = Mustache.resolve(parentInstance);
   }

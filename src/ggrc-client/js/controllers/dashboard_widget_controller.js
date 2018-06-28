@@ -7,6 +7,7 @@ import {getDashboards} from '../plugins/utils/dashboards-utils';
 import {
   inferObjectType,
 } from '../plugins/utils/models-utils';
+import {getPageInstance} from '../plugins/utils/current-page-utils';
 
 export default can.Control({
   defaults: {
@@ -20,7 +21,7 @@ export default can.Control({
       if (GGRC.page_object) {
         $.extend(that.defaults, {
           model: inferObjectType(GGRC.page_object),
-          instance: GGRC.page_instance(),
+          instance: getPageInstance(),
         });
       }
     });

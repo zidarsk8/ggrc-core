@@ -7,6 +7,7 @@ import '../components/add-object-button/add-object-button';
 import '../components/assessment/assessment-generator-button';
 import {
   getCounts,
+  getPageInstance,
 } from '../plugins/utils/current-page-utils';
 import router from '../router';
 import {
@@ -52,7 +53,7 @@ export default can.Control({
       if (GGRC.page_object) {
         $.extend(that.defaults, {
           model: inferObjectType(GGRC.page_object),
-          instance: GGRC.page_instance(),
+          instance: getPageInstance(),
         });
       }
     });

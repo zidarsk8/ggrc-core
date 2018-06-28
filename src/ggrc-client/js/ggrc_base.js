@@ -4,7 +4,6 @@
 */
 
 import PersistentNotifier from './plugins/persistent_notifier';
-import {makeModelInstance} from './plugins/utils/models-utils';
 
 (function (GGRC, moment) {
   GGRC.mustache_path = '/static/mustache';
@@ -33,12 +32,6 @@ import {makeModelInstance} from './plugins/utils/models-utils';
     });
 
   $.extend(GGRC, {
-    page_instance: function () {
-      if (!GGRC._page_instance && GGRC.page_object) {
-        GGRC._page_instance = makeModelInstance(GGRC.page_object);
-      }
-      return GGRC._page_instance;
-    },
 
     eventqueue: [],
     eventqueueTimeout: null,

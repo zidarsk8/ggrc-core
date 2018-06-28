@@ -11,6 +11,7 @@ import {
 } from '../models/mappers/mapper-helpers';
 import Mappings from '../models/mappers/mappings';
 import {registerHook} from '../plugins/ggrc_utils';
+import {getPageInstance} from '../plugins/utils/current-page-utils';
 
 (function ($, CMS, GGRC) {
   let RisksExtension = {};
@@ -157,7 +158,7 @@ import {registerHook} from '../plugins/ggrc_utils';
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
   // Initialize widgets for risk page
   RisksExtension.init_widgets = function () {
-    let pageInstance = GGRC.page_instance();
+    let pageInstance = getPageInstance();
     let isMyWork = function () {
       return pageInstance && pageInstance.type === 'Person';
     };
@@ -312,7 +313,7 @@ import {registerHook} from '../plugins/ggrc_utils';
 
   RisksExtension.init_widgets_for_other_pages = function () {
     let descriptor = {};
-    let pageInstance = GGRC.page_instance();
+    let pageInstance = getPageInstance();
     if (pageInstance &&
       ~can.inArray(pageInstance.constructor.shortName, riskObjectTypes)) {
       descriptor[pageInstance.constructor.shortName] = {

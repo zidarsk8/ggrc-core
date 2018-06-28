@@ -19,6 +19,7 @@ import {
   isMyAssessments,
 } from '../../plugins/utils/current-page-utils';
 import template from './page-header.mustache';
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 (function (GGRC, can) {
   'use strict';
@@ -93,7 +94,7 @@ import template from './page-header.mustache';
       },
       instance: {
         get: function () {
-          return GGRC.page_instance();
+          return getPageInstance();
         },
       },
       current_user: {

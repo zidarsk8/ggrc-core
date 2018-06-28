@@ -7,6 +7,7 @@ import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 import {getRole} from '../../plugins/utils/acl-utils';
 import {sortByName} from '../../plugins/utils/label-utils';
 import tracker from '../../tracker';
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 export default can.Model.Cacheable('CMS.Models.Assessment', {
   root_object: 'assessment',
@@ -310,7 +311,7 @@ export default can.Model.Cacheable('CMS.Models.Assessment', {
     return this._super(checkAssociations);
   },
   form_preload: function (newObjectForm) {
-    let pageInstance = GGRC.page_instance();
+    let pageInstance = getPageInstance();
     let currentUser = CMS.Models.get_instance('Person',
       GGRC.current_user.id, GGRC.current_user);
 

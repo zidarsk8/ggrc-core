@@ -14,6 +14,7 @@ import {
   shouldApplyPreconditions,
 } from '../plugins/utils/controllers';
 import Permission from '../permission';
+import {getPageInstance} from '../plugins/utils/current-page-utils';
 
 (function (can, $, GGRC) {
   'use strict';
@@ -33,7 +34,7 @@ import Permission from '../permission';
       var modalSettings;
 
       if ($trigger.attr('data-object-id') === 'page') {
-        instance = GGRC.page_instance();
+        instance = getPageInstance();
       } else {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
@@ -83,7 +84,7 @@ import Permission from '../permission';
       $target.on('modal:success', function (e, data) {
         var modelName = $trigger.attr('data-object-plural').toLowerCase();
         if ($trigger.attr('data-object-id') === 'page' ||
-          (instance === GGRC.page_instance())) {
+          (instance === getPageInstance())) {
           GGRC.navigate('/dashboard');
         } else if (modelName === 'people' || modelName === 'roles') {
           window.location.assign('/admin#' + modelName + '_list');
@@ -113,7 +114,7 @@ import Permission from '../permission';
       var contentView;
 
       if ($trigger.attr('data-object-id') === 'page') {
-        instance = GGRC.page_instance();
+        instance = getPageInstance();
       } else {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
@@ -261,7 +262,7 @@ import Permission from '../permission';
       var instance;
 
       if ($trigger.attr('data-object-id') === 'page') {
-        instance = GGRC.page_instance();
+        instance = getPageInstance();
       } else {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }

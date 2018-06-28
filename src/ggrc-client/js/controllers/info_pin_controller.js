@@ -29,6 +29,7 @@ import {confirm} from '../plugins/utils/modals';
 import {
   getInstanceView
 } from '../plugins/utils/object-history-utils';
+import {getPageInstance} from '../plugins/utils/current-page-utils';
 
 export const pinContentHiddenClass = 'pin-content--hidden';
 export const pinContentMaximizedClass = 'pin-content--maximized';
@@ -82,7 +83,7 @@ export default can.Control({
           is_info_pin: true,
           options: options,
           result: options.result,
-          page_instance: GGRC.page_instance(),
+          page_instance: getPageInstance(),
           maximized: maximizedState,
           onChangeMaximizedState: function () {
             return self.changeMaximizedState.bind(self);
@@ -252,7 +253,7 @@ export default can.Control({
         //hide menu when scrolling down
         let dropdownMenu = header.find('.details-wrap');
         dropdownMenu.removeClass('open');
-        
+
       } else if (scrollTop < prevScrollTop) {
         //scroll top
         header.removeClass('pane-header_hidden');

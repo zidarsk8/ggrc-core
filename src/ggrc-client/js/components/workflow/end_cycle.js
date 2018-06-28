@@ -5,6 +5,7 @@
 
 import {
   initCounts,
+  getPageInstance,
 } from '../../plugins/utils/current-page-utils';
 
 /**
@@ -37,10 +38,10 @@ import {
             return cycle.attr('is_current', false).save();
           })
           .then(function () {
-            return GGRC.page_instance().refresh();
+            return getPageInstance().refresh();
           })
           .then(function () {
-            let pageInstance = GGRC.page_instance();
+            let pageInstance = getPageInstance();
             let WorkflowExtension =
               GGRC.extensions.find(function (extension) {
                 return extension.name === 'workflows';

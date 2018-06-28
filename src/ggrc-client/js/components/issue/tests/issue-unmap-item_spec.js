@@ -6,6 +6,7 @@
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../issue-unmap-item';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
+import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 
 describe('issue-unmap-related-snapshots component', ()=> {
   let viewModel;
@@ -271,7 +272,7 @@ describe('issue-unmap-related-snapshots component', ()=> {
   describe('unmap() method', ()=> {
     beforeEach(function () {
       spyOn($.prototype, 'trigger');
-      spyOn(GGRC, 'page_instance');
+      spyOn(CurrentPageUtils, 'getPageInstance');
       spyOn(GGRC, 'navigate');
     });
 
@@ -303,7 +304,7 @@ describe('issue-unmap-related-snapshots component', ()=> {
             unmap: () => Promise.resolve(),
           }));
         viewModel.attr('issueInstance.viewLink', 'temp url');
-        GGRC.page_instance.and.returnValue(viewModel.attr('issueInstance'));
+        CurrentPageUtils.getPageInstance.and.returnValue(viewModel.attr('issueInstance'));
         await viewModel.unmap();
         expect(GGRC.navigate).toHaveBeenCalledWith(
           viewModel.attr('issueInstance.viewLink')

@@ -4,6 +4,7 @@
 */
 
 import {makeModelInstance} from '../plugins/utils/models-utils';
+import {getPageInstance} from '../plugins/utils/current-page-utils';
 
 /* Role Assignment Modal Selector
   *
@@ -180,7 +181,7 @@ const userRolesModalSelector = can.Control.extend({
 
   refresh_option_list: function () {
     let self = this;
-    let instance = GGRC.page_instance();
+    let instance = getPageInstance();
     let params = {};
 
     // If this is a private model, set the scope
