@@ -14,6 +14,7 @@ import ggrc.services
 from ggrc import db
 from ggrc.converters import errors
 from ggrc.converters import get_importables
+from ggrc.converters import pre_commit_checks
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.models.exceptions import StatusValidationError
@@ -243,7 +244,7 @@ class ImportRowConverter(RowConverter):
       return
     self.update_new_obj_cache()
     self.setup_object()
-    self.block_converter._check_object(self)
+    self.check_object()
     try:
       if self.ignore and self.obj in db.session:
         db.session.expunge(self.obj)
@@ -254,6 +255,19 @@ class ImportRowConverter(RowConverter):
     self.flush_object()
     self.setup_secondary_objects()
     self.commit_object()
+
+  def check_object(self):
+    """Check object if it has any pre commit checks.
+
+    The check functions can mutate the row_converter object and mark it
+    to be ignored if there are any errors detected.
+
+    Args:
+        row_converter: Row converter for the row we want to check.
+    """
+    checker = pre_commit_checks.CHECKS.get(type(self.obj).__name__)
+    if checker and callable(checker):
+      checker(self)
 
   def flush_object(self):
     """Flush dirty data related to the current row."""

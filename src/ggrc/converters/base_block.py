@@ -25,7 +25,6 @@ from ggrc.utils import structures
 from ggrc.utils import list_chunks
 from ggrc.converters import errors
 from ggrc.converters import get_shared_unique_rules
-from ggrc.converters import pre_commit_checks
 from ggrc.converters import base_row
 from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import get_object_column_definitions
@@ -505,20 +504,6 @@ class ImportBlockConverter(BlockConverter):
     """Store revision ids from the current event."""
     if event:
       self.revision_ids.extend(revision.id for revision in event.revisions)
-
-  @staticmethod
-  def _check_object(row_converter):
-    """Check object if it has any pre commit checks.
-
-    The check functions can mutate the row_converter object and mark it
-    to be ignored if there are any errors detected.
-
-    Args:
-        row_converter: Row converter for the row we want to check.
-    """
-    checker = pre_commit_checks.CHECKS.get(type(row_converter.obj).__name__)
-    if checker and callable(checker):
-      checker(row_converter)
 
   @staticmethod
   def send_collection_post_signals(new_objects):
