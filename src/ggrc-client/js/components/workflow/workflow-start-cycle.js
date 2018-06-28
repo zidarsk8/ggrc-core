@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import workflowHelpers from './workflow-helpers';
+import {generateCycle} from '../../plugins/utils/workflow-utils';
 
 export default can.Component.extend({
   tag: 'workflow-start-cycle',
@@ -11,7 +11,7 @@ export default can.Component.extend({
   events: {
     click: function () {
       let workflow = GGRC.page_instance();
-      workflowHelpers.generateCycle(workflow)
+      generateCycle(workflow)
         .then(function () {
           return workflow.refresh_all('task_groups', 'task_group_tasks');
         });

@@ -9,9 +9,9 @@ from ggrc.models import all_models
 from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
 from ggrc.login import get_current_user_id
+from ggrc.converters.handlers.file_handler import FileHandler
 
 
-# pylint: disable=invalid-name
 logger = getLogger(__name__)
 
 
@@ -111,44 +111,8 @@ class EvidenceUrlHandler(handlers.ColumnHandler):
         logger.warning("Invalid relationship state for document URLs.")
 
 
-class EvidenceFileHandler(handlers.ColumnHandler):
+class EvidenceFileHandler(FileHandler, handlers.ColumnHandler):
   """Handler for evidence of type file on evidence imports."""
 
-  def set_obj_attr(self):
-    """Is not allowed to import evidence of type File
-
-    if file already mapped to parent we ignore it and not show warning
-    """
-    if self.raw_value:
-      parent = self.row_converter.obj
-      existing_evid_file_links = {evid.link for evid in parent.evidences_file}
-      for line in self.raw_value.splitlines():
-        link, _ = self._parse_line(line)
-        if link not in existing_evid_file_links:
-          self.add_warning(errors.DISALLOW_EVIDENCE_FILE)
-
-  def insert_object(self):
-    """Import not allowed"""
-    pass
-
-  @staticmethod
-  def _parse_line(line):
-    """Parse a single line and return link and title.
-
-    Args:
-      line: string containing a single line from a cell.
-
-    Returns:
-      tuple containing a link and a title.
-    """
-    parts = line.strip().split()
-    return parts[0], parts[0] if len(parts) == 1 else " ".join(parts[1:])
-
-  def get_value(self):
-    """Generate a new line separated string for all document links.
-
-    Returns:
-      string containing all evidence URLs and titles.
-    """
-    return u"\n".join(u"{} {}".format(d.link, d.title) for d in
-                      self.row_converter.obj.evidences_file)
+  files_object = "evidences_file"
+  file_error = errors.DISALLOW_EVIDENCE_FILE

@@ -8,7 +8,6 @@ from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
 
 
-# pylint: disable=invalid-name
 logger = getLogger(__name__)
 
 
@@ -28,7 +27,7 @@ class CheckboxColumnHandler(handlers.ColumnHandler):
 
   @property
   def raw_column_value(self):
-    return self.raw_value.lower().strip()
+    return self.raw_value.lower()
 
   def parse_item(self):
     """ mandatory checkboxes will get evelauted to false on empty value """

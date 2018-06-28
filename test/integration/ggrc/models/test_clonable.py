@@ -3,6 +3,7 @@
 
 """Integration test for Clonable mixin"""
 import ddt
+from mock import patch
 
 from ggrc import db
 from ggrc import models
@@ -13,8 +14,6 @@ from ggrc.snapshotter.rules import Types
 from integration.ggrc import generator
 from integration.ggrc.models import factories
 from integration.ggrc.snapshotter import SnapshotterBaseTestCase
-
-from mock import patch
 
 
 @ddt.ddt
@@ -311,7 +310,7 @@ class TestClonable(SnapshotterBaseTestCase):
   @patch('ggrc.integrations.issues.Client.update_issue')
   def test_audit_clone_with_issue_tracker(self, mock_update_issue):
     """Test that audit with issue tracker On gets copied without error"""
-    from ggrc.models.hooks import issue_tracker
+    from ggrc.models.hooks.issue_tracker import assessment_integration
     iti = factories.IssueTrackerIssueFactory()
     asmt = iti.issue_tracked_obj
     asmt_id = asmt.id
@@ -325,7 +324,7 @@ class TestClonable(SnapshotterBaseTestCase):
         },
     })
     asmt = db.session.query(models.Assessment).get(asmt_id)
-    with patch.object(issue_tracker, '_is_issue_tracker_enabled',
+    with patch.object(assessment_integration, '_is_issue_tracker_enabled',
                       return_value=True):
       self.api.modify_object(asmt, {
           "issue_tracker": {

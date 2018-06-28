@@ -33,7 +33,7 @@ from ggrc.snapshotter.indexer import reindex_pairs
 
 from ggrc.snapshotter.rules import get_rules
 
-logger = getLogger(__name__)  # pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 class SnapshotGenerator(object):

@@ -9,6 +9,7 @@ import {
   Multi,
   TypeFilter,
 } from '../models/mappers/mapper-helpers';
+import Mappings from '../models/mappers/mappings';
 
 (function ($, CMS, GGRC) {
   let RiskAssessmentsExtension = {};
@@ -53,7 +54,7 @@ import {
           'CycleTaskGroupObjectTask'),
       },
     };
-    new GGRC.Mappings('ggrc_risk_assessments', mappings);
+    new Mappings('ggrc_risk_assessments', mappings);
   };
 
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets

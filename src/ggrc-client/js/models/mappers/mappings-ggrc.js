@@ -15,9 +15,10 @@ import {
   CustomFilter,
   Cross,
 } from '../mappers/mapper-helpers';
+import Mappings from './mappings';
 
 (function (GGRC, can) {
-  new GGRC.Mappings('ggrc_core', {
+  new Mappings('ggrc_core', {
     base: {},
 
     // Governance
@@ -35,8 +36,6 @@ import {
         'objectives', 'related_business_objects',
         'people', 'programs', 'clauses',
       ]),
-      audits: Proxy(
-        'Audit', 'audit', 'AuditObject', 'auditable', 'audit_objects'),
       orphaned_objects: Multi([
         'related_objects', 'clauses', 'controls', 'programs', 'objectives',
         'people',
@@ -422,8 +421,6 @@ import {
       program_controls: Cross('_program', 'controls'),
       program_issues: Cross('_program', 'related_issues'),
       program_assessments: Cross('_program', 'related_assessments'),
-      objects:
-        Proxy(null, 'auditable', 'AuditObject', 'audit', 'audit_objects'),
       context: Direct('Context', 'related_object', 'context'),
       authorizations: Cross('context', 'user_roles'),
       authorized_program_people: Cross('_program', 'authorized_people'),
@@ -490,9 +487,6 @@ import {
         'Workflow', 'workflow', 'MultitypeSearchJoin'),
       evidence: Proxy(
         'Evidence', 'evidence', 'MultitypeSearchJoin'),
-    },
-    AuditObject: {
-      _auditable: Direct(null, null, 'auditable'),
     },
     // Used by Custom Attributes widget
     CustomAttributable: {

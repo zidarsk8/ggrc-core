@@ -42,18 +42,34 @@ tree-pagination {
       border-radius: 2px;
 
       &.dropdown-container {
-        select {
-          color: $textGray;
-          width: 100%;
-          cursor: pointer;
-          &.pagination-dropdown {
-            background-color: $paginationGray;
-            border-radius: 2px;
-          }
-          &:disabled {
-            cursor: default;
-          }
+        margin: 0 16px;
+      }
+
+      .dropdown-container__items-list {
+        margin: 10px 0;
+      }
+
+      .dropdown-container__item {
+        $ddItemWidth: 40px;
+        flex: 1 0 $ddItemWidth;
+        min-width: $ddItemWidth;
+        line-height: 24px;
+        text-align: center;
+        border: 1px solid $widgetBorder;
+        background-color: $white;
+        cursor: pointer;
+
+        &:hover {
+          background-color: $lightGray;
         }
+
+        &:not(:last-child) {
+          border-right: none;
+        }
+      }
+
+      .dropdown-container__item_selected {
+        background-color: lighten($gray, 30%);
       }
 
       .pagination-item {
@@ -93,20 +109,31 @@ tree-pagination {
             }
           }
         }
-        input {
-          border: 0;
-          vertical-align: top;
-          border-radius: 0;
-          height: 16px;
-          font-size: 12px;
-          margin-bottom: 0;
-          background-color: $white;
-          width: 110px;
-          float: left;
-          text-align: center;
-          &:focus {
-            border-color: $widgetBorder;
+
+        &:nth-child(2) {
+          border-right: 0;
+        }
+
+        &:nth-child(3) {
+          border-color: transparent;
+        }
+
+        .pagination-item__popover-item {
+          $ddItemWidth: 40px;
+          flex: 1 0 $ddItemWidth;
+          min-width: $ddItemWidth;
+          line-height: 24px;
+          text-align: left;
+          cursor: pointer;
+          padding: 3px 10px;
+
+          &:hover {
+            background-color: $lightGray;
           }
+        }
+
+        .pagination-item__popover-item_selected {
+          background-color: lighten($gray, 30%);
         }
       }
     }

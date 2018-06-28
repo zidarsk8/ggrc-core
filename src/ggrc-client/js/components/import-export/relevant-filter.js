@@ -4,6 +4,7 @@
 */
 
 import template from './templates/relevant-filter.mustache';
+import Mappings from '../../models/mappers/mappings';
 
 export default can.Component.extend({
   tag: 'relevant-filter',
@@ -52,7 +53,7 @@ export default can.Component.extend({
         });
         return _.sortBy(_.compact(models), 'model_singular');
       }
-      mappings = GGRC.Mappings.get_canonical_mappings_for(type);
+      mappings = Mappings.get_canonical_mappings_for(type);
       return _.sortBy(_.compact(_.map(_.keys(mappings), function (mapping) {
         return CMS.Models[mapping];
       })), 'model_singular');

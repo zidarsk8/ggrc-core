@@ -23,6 +23,7 @@ from ggrc.models.context import HasOwnContext
 from ggrc.models.mixins import base
 from ggrc.models.mixins import clonable
 from ggrc.models.mixins import WithLastDeprecatedDate
+from ggrc.models.mixins import issue_tracker as issue_tracker_mixins
 from ggrc.models.object_person import Personable
 from ggrc.models.program import Program
 from ggrc.models.relationship import Relatable
@@ -37,7 +38,7 @@ class Audit(Snapshotable,
             HasOwnContext,
             Relatable,
             Roleable,
-            issuetracker_issue.IssueTracked,
+            issue_tracker_mixins.IssueTracked,
             WithLastDeprecatedDate,
             mixins.Timeboxed,
             base.ContextRBAC,

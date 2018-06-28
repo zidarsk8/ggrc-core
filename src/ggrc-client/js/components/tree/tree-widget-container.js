@@ -43,9 +43,6 @@ import {
   initMappedInstances,
 } from '../../plugins/utils/current-page-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
-import {
-  getWidgetConfig,
-} from '../../plugins/utils/object-versions-utils';
 import Pagination from '../base-objects/pagination';
 import tracker from '../../tracker';
 import router from '../../router';
@@ -73,27 +70,14 @@ viewModel = can.Map.extend({
       get: function () {
         let filters = can.makeArray(this.attr('filters'));
         let additionalFilter = this.attr('additionalFilter');
-        let optionsData;
-        let objectVersionfilter;
-        let isObjectVersion = this.attr('options.objectVersion');
 
         if (this.attr('advancedSearch.filter')) {
           return this.attr('advancedSearch.filter');
         }
 
-        if (isObjectVersion || additionalFilter) {
-          if (isObjectVersion) {
-            optionsData = this.attr('optionsData');
-            objectVersionfilter = optionsData.additionalFilter;
-          }
-          if (additionalFilter) {
-            additionalFilter = objectVersionfilter ?
-              objectVersionfilter + ' AND ' + additionalFilter :
-              additionalFilter;
-          }
-
+        if (additionalFilter) {
           additionalFilter = GGRC.query_parser
-            .parse(additionalFilter || objectVersionfilter);
+            .parse(additionalFilter);
         }
 
         return filters.filter(function (options) {
@@ -105,21 +89,6 @@ viewModel = can.Map.extend({
       type: String,
       get: function () {
         return this.attr('model').shortName;
-      },
-    },
-    optionsData: {
-      get: function () {
-        let modelName = this.attr('modelName');
-        if (!this.attr('options.objectVersion')) {
-          return {
-            name: modelName,
-            loadItemsModelName: modelName,
-            widgetId: modelName,
-            countsName: modelName,
-          };
-        }
-
-        return getWidgetConfig(modelName, true);
       },
     },
     statusFilterVisible: {
@@ -231,7 +200,7 @@ viewModel = can.Map.extend({
   refreshLoaded: true,
   canOpenInfoPin: true,
   loadItems: function () {
-    let {widgetId} = this.attr('optionsData');
+    let modelName = this.attr('modelName');
     let pageInfo = this.attr('pageInfo');
     let sortingInfo = this.attr('sortingInfo');
     let parent = this.attr('parent_instance');
@@ -245,22 +214,29 @@ viewModel = can.Map.extend({
       }],
     };
     let request = this.attr('advancedSearch.request');
-    const stopFn = tracker.start(this.attr('modelName'),
+    const stopFn = tracker.start(modelName,
       tracker.USER_JOURNEY_KEYS.TREEVIEW,
       tracker.USER_ACTIONS.TREEVIEW.TREE_VIEW_PAGE_LOADING(page.pageSize));
+    const countsName = this.attr('options.countsName');
 
     pageInfo.attr('disabled', true);
     this.attr('loading', true);
 
     if (this._getFilterByName('status')) {
-      initCounts([widgetId], parent.type, parent.id);
+      initCounts([countsName], parent.type, parent.id);
     }
 
+    let loadSnapshots = this.attr('options.objectVersion');
     return TreeViewUtils
-      .loadFirstTierItems(widgetId, parent, page, filter, request)
+      .loadFirstTierItems(
+        modelName,
+        parent,
+        page,
+        filter,
+        request,
+        loadSnapshots)
       .then((data) => {
         const total = data.total;
-        const countsName = this.attr('options').countsName || widgetId;
 
         this.attr('showedItems', data.values);
         this.attr('pageInfo.total', total);
@@ -291,7 +267,7 @@ viewModel = can.Map.extend({
     let columns = TreeViewUtils.getColumnsForModel(
       this.attr('model').model_singular,
       this.attr('displayPrefs'),
-      this.attr('optionsData').widgetId
+      this.attr('options.widgetId')
     );
 
     this.attr('columns.available', columns.available);
@@ -312,7 +288,7 @@ viewModel = can.Map.extend({
       this.attr('model').model_singular,
       selectedColumns,
       this.attr('displayPrefs'),
-      this.attr('optionsData').widgetId
+      this.attr('options.widgetId')
     );
 
     this.attr('columns.selected', columns.selected);
@@ -348,20 +324,6 @@ viewModel = can.Map.extend({
   needToRefresh: function (refresh) {
     return this.attr('refreshLoaded');
   },
-  initCount: function () {
-    let $el = this.attr('$el');
-    let counts = getCounts();
-    let countsName = this.attr('options').countsName ||
-      this.attr('optionsData.widgetId');
-
-    if ($el) {
-      can.trigger($el, 'updateCount', [counts.attr(countsName)]);
-    }
-
-    counts.on(countsName, function (ev, newVal, oldVal) {
-      can.trigger($el, 'updateCount', [newVal]);
-    });
-  },
   registerFilter: function (option) {
     this.attr('filters').push(option);
   },
@@ -394,10 +356,10 @@ viewModel = can.Map.extend({
     this._triggerListeners(true);
   },
   _widgetShown: function () {
-    let modelName = this.attr('optionsData').widgetId;
+    let countsName = this.attr('options.countsName');
     let loaded = this.attr('loaded');
     let total = this.attr('pageInfo.total');
-    let counts = _.get(getCounts(), modelName);
+    let counts = _.get(getCounts(), countsName);
 
     if (!_.isNull(loaded) && (total !== counts)) {
       this.loadItems();

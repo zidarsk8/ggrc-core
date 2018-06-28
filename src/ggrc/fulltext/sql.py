@@ -45,7 +45,6 @@ class SqlIndexer(object):
           yield dict(
               key=instance.id,
               type=instance.type,
-              context_id=instance.context_id,
               tags="",
               property=prop,
               subproperty=unicode(subproperty),
@@ -58,12 +57,6 @@ class SqlIndexer(object):
       db.session.add(self.record_type(**db_record))
     if commit:
       db.session.commit()
-
-  def update_record(self, instance, commit=True):
-    """Update records values in db."""
-    # remove the obsolete index entries
-    self.delete_record(instance.id, instance.type, False)
-    self.create_record(instance, commit=commit)
 
   def delete_record(self, key, type, commit=True):
     """Delete records values in db for specific types."""

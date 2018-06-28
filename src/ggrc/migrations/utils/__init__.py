@@ -9,7 +9,6 @@ Place here your migration helpers that is shared among number of migrations.
 """
 
 from collections import namedtuple
-from logging import getLogger
 
 from sqlalchemy import text, Integer, String
 from sqlalchemy.sql import and_, table, column
@@ -28,8 +27,6 @@ snapshots_table = Snapshot.__table__  # pylint: disable=invalid-name
 
 
 Stub = namedtuple("Stub", ["type", "id"])
-
-logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
 def get_relationships(connection, type_, id_, filter_types=None):
@@ -275,4 +272,62 @@ def create_missing_admins(connection, migration_user_id, admin_role_id,
       admin_role_id=admin_role_id,
       object_type=object_type,
       revision_action=revision_action,
+  )
+
+
+def create_event(connection, user_id, resource_type,
+                 action='BULK'):
+  """Create event. Can be used for creating revisions in migrations"""
+  sql = """
+      INSERT INTO events (
+          modified_by_id,
+          created_at,
+          action,
+          resource_type,
+          updated_at)
+      VALUES (:user_id, NOW(), :action, :resource_type, NOW());
+  """
+  connection.execute(text(sql),
+                     action=action, resource_type=resource_type,
+                     user_id=user_id)
+  return last_insert_id(connection)
+
+
+# pylint: disable=too-many-arguments
+def create_revision(connection, slug, doc_id, content, event_id,
+                    resource_type, action, migrator_id):
+  """Create revision"""
+  sql = """
+      INSERT INTO revisions (
+        resource_id,
+        resource_type,
+        event_id,
+        action,
+        content,
+        created_at,
+        updated_at,
+        modified_by_id,
+        resource_slug
+      )
+      VALUES (
+        :resource_id,
+        :resource_type,
+        :event_id,
+        :action,
+        :content,
+        NOW(),
+        NOW(),
+        :modified_by_id,
+        :resource_slug
+      )
+  """
+  connection.execute(
+      text(sql),
+      resource_id=doc_id,
+      resource_type=resource_type,
+      event_id=event_id,
+      action=action,
+      content=content,
+      modified_by_id=migrator_id,
+      resource_slug=slug
   )

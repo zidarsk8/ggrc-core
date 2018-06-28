@@ -51,6 +51,8 @@ class TestTotalReindex(TestCase):
       'TaskGroupObject': 5,
       'TaskGroupTask': 4,
       'Workflow': 6,
+      'Product': 18,
+      'Metric': 8,
   }
 
   def setUp(self):
@@ -74,6 +76,8 @@ class TestTotalReindex(TestCase):
       ggrc_factories.ProgramFactory,
       ggrc_factories.RegulationFactory,
       ggrc_factories.DocumentFactory,
+      ggrc_factories.MetricFactory,
+      ggrc_factories.ProductFactory,
       wf_factories.CycleFactory,
       wf_factories.CycleTaskGroupFactory,
       wf_factories.CycleTaskEntryFactory,

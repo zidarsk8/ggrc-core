@@ -34,11 +34,10 @@ if settings.ISSUE_TRACKER_MOCK and not settings.PRODUCTION:
 
 setup_logging(settings.LOGGING)
 
-# pylint: disable=invalid-name
 logger = getLogger(__name__)
 
 
-app = Flask('ggrc', instance_relative_config=True)  # noqa: valid constant name
+app = Flask('ggrc', instance_relative_config=True)  # noqa pylint: disable=invalid-name
 app.config.from_object(settings)
 if "public_config" not in app.config:
   app.config.public_config = {}
@@ -84,8 +83,8 @@ def check_if_under_maintenance():
     from ggrc.models.maintenance import Maintenance
     try:
       db_row = db.session.query(Maintenance).get(1)
-    except sqlalchemy.exc.ProgrammingError as e:
-      if re.search(r"""\(1146, "Table '.+' doesn't exist"\)$""", e.message):
+    except sqlalchemy.exc.ProgrammingError as error:
+      if re.search(r"\(1146, \"Table '.+' doesn't exist\"\)$", error.message):
         db_row = None
       else:
         raise

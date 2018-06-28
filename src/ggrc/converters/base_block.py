@@ -42,7 +42,6 @@ from ggrc_workflows.models.cycle_task_group_object_task import \
 from ggrc.models.exceptions import StatusValidationError
 
 
-# pylint: disable=invalid-name
 logger = getLogger(__name__)
 
 CACHE_EXPIRY_IMPORT = 600
@@ -87,8 +86,6 @@ class BlockConverter(object):
     self._mapping_cache = None
     self._ticket_tracker_cache = None
     self._owners_cache = None
-    self._roles_cache = None
-    self._user_roles_cache = None
     self._ca_definitions_cache = None
     self.converter = converter
     self.offset = offset
@@ -228,50 +225,6 @@ class BlockConverter(object):
     if self._ticket_tracker_cache is None:
       self._ticket_tracker_cache = self._create_ticket_tracker_cache()
     return self._ticket_tracker_cache
-
-  def get_role(self, name):
-    """Get role from local cache for a given name."""
-    if not self._roles_cache:
-      self._roles_cache = {role.name: role for role in
-                           models.all_models.Role.query}
-    return self._roles_cache[name]
-
-  def _create_user_roles_cache(self):
-    """Create cache for user roles.
-
-    The cache returns a list of emails for a role in a context.
-    """
-    cache = defaultdict(lambda: defaultdict(set))
-    context_ids = {rc.obj.context_id for rc in self.row_converters}
-    user_roles = db.session.query(
-        models.all_models.UserRole.context_id,
-        models.all_models.UserRole.role_id,
-        models.all_models.UserRole.person_id,
-    ).filter(
-        models.all_models.UserRole.context_id.in_(context_ids)
-    ).all()
-
-    if not user_roles:
-      return cache
-
-    people_ids = {role[2] for role in user_roles}
-
-    emails_map = dict(db.session.query(
-        models.Person.id,
-        models.Person.email
-    ).filter(
-        models.Person.id.in_(people_ids)
-    ))
-
-    for context_id, role_id, person_id in user_roles:
-      cache[context_id][role_id].add(emails_map[person_id])
-    return cache
-
-  def get_user_roles_cache(self):
-    """Get cache for emails on user roles by context."""
-    if self._user_roles_cache is None:
-      self._user_roles_cache = self._create_user_roles_cache()
-    return self._user_roles_cache
 
   def _create_owners_cache(self):
     """Create a cache of emails for all object owners."""

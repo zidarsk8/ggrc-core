@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import Mappings from '../../../models/mappers/mappings';
+
 describe('GGRC.Components.objectSearch', function () {
   'use strict';
 
@@ -15,11 +17,11 @@ describe('GGRC.Components.objectSearch', function () {
   describe('availableTypes() method', function () {
     it('correctly calls getMappingTypes', function () {
       let result;
-      spyOn(GGRC.Mappings, 'getMappingTypes').and.returnValue('types');
+      spyOn(Mappings, 'getMappingTypes').and.returnValue('types');
       viewModel.attr('object', 'testObject');
 
       result = viewModel.availableTypes();
-      expect(GGRC.Mappings.getMappingTypes).toHaveBeenCalledWith('testObject',
+      expect(Mappings.getMappingTypes).toHaveBeenCalledWith('testObject',
         ['TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask'], []);
       expect(result).toEqual('types');
     });

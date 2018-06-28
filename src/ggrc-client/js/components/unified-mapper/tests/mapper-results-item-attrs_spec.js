@@ -32,12 +32,17 @@ describe('GGRC.Components.mapperResultsItemAttrs', function () {
 
     it('sets default mustache template path in viewModel.attrTemplate' +
     ' if attributes view of model not defined', function () {
-      let result;
-      viewModel.attr('modelType', 'AuditObject');
+      CMS.Models.TestModel = {
+        tree_view_options: {},
+      };
+
+      viewModel.attr('modelType', 'TestModel');
       viewModel.init();
-      result = viewModel.attr('attrTemplate');
-      expect(result)
-        .toEqual(DEFAULT_ATTR_TEMPLATE);
+      let result = viewModel.attr('attrTemplate');
+
+      expect(result).toEqual(DEFAULT_ATTR_TEMPLATE);
+
+      CMS.Models.TestModel = null;
     });
   });
 });

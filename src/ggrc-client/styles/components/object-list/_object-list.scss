@@ -7,41 +7,49 @@ object-list {
   box-sizing: border-box;
   width: 100%;
   align-self: stretch;
-  position: relative;
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   min-width: 0;
 
-  &.object-list__limited-height {
-    min-height: 28px;
-  }
-
   .hidden {
     opacity: 0;
   }
-  // Should affect only direct children
-  > spinner {
-    display: flex;
-    opacity: 0;
 
-    &.active {
-      z-index: 9999;
-      opacity: 1;
+  // Should affect only direct children
+  > .spinner-section {
+    flex: 1;
+    position: relative;
+    min-height: 28px;
+
+    > spinner {
+      display: flex;
+      opacity: 0;
+
+      &.active {
+        z-index: 9999;
+        opacity: 1;
+      }
+
+      .spinner {
+        position: absolute;
+        right: 0;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        // Bigger spinner with separate color for the grid
+
+      }
     }
 
-    .spinner {
-      position: absolute;
-      right: 0;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      display: flex;
-      align-items: center;
-      font-size: 18px;
-      // Bigger spinner with separate color for the grid
-      &.grid-spinner {
+    &.spinner-section_grid {
+      min-height: 58px;
+
+      > spinner .grid-spinner {
         justify-content: center;
 
         .fa {

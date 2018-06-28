@@ -8,7 +8,6 @@ import {
   getClosestWeekday,
   getDate,
 } from '../plugins/utils/date-util';
-import Permission from '../permission';
 
 (function (can, GGRC) {
   'use strict';
@@ -61,12 +60,6 @@ import Permission from '../permission';
       this.validateNonBlank('workflow');
       this.validateContact(['_transient.contact', 'contact']);
 
-      this.bind('created', function (ev, taskGroup) {
-        if (taskGroup instanceof that) {
-          Permission.refresh();
-          taskGroup.refresh_all_force('workflow', 'context');
-        }
-      });
       this.bind('updated', function (ev, instance) {
         if (instance instanceof that) {
           instance.refresh_all_force('workflow', 'context');

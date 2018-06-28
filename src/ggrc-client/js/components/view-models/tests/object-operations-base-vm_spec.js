@@ -5,6 +5,7 @@
 
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import ObjectOperationsBaseVM from '../object-operations-base-vm';
+import Mappings from '../../../models/mappers/mappings';
 
 describe('ObjectOperationsBaseVM', function () {
   'use strict';
@@ -23,11 +24,11 @@ describe('ObjectOperationsBaseVM', function () {
 
     it('correctly calls getMappingTypes', function () {
       let result;
-      spyOn(GGRC.Mappings, 'getMappingTypes').and.returnValue('types');
+      spyOn(Mappings, 'getMappingTypes').and.returnValue('types');
       baseVM.attr('object', 'testObject');
 
       result = baseVM.availableTypes();
-      expect(GGRC.Mappings.getMappingTypes).toHaveBeenCalledWith('testObject',
+      expect(Mappings.getMappingTypes).toHaveBeenCalledWith('testObject',
         [], ['test1', 'test2', 'TaskGroup']);
       expect(result).toEqual('types');
     });
@@ -126,7 +127,7 @@ describe('ObjectOperationsBaseVM', function () {
         },
       };
 
-      spyOn(GGRC.Mappings, 'getMappingTypes')
+      spyOn(Mappings, 'getMappingTypes')
         .and.returnValue(types);
 
       result = baseVM.modelFromType('v2');

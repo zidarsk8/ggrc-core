@@ -11,15 +11,11 @@ import {
  * Utils for state.
  */
 let snapshotableObject = GGRC.config.snapshotable_objects;
-let objectVersions = _.map(snapshotableObject, function (obj) {
-  return obj + '_versions';
-});
 
 let statesModels = [
   {
     models: ['AssessmentTemplate', 'Project', 'Program']
-      .concat(snapshotableObject)
-      .concat(objectVersions),
+      .concat(snapshotableObject),
     states: ['Active', 'Draft', 'Deprecated'],
   },
   {

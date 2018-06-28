@@ -5,7 +5,7 @@
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../workflow-activate';
-import helpers from '../workflow-helpers';
+import * as helpers from '../../../plugins/utils/workflow-utils';
 import Permission from '../../../permission';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 
