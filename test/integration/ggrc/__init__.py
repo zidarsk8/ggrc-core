@@ -160,7 +160,6 @@ class TestCase(BaseTestCase, object):
     acr = db.metadata.tables["access_control_roles"]
     db.engine.execute(acr.delete(~acr.c.non_editable))
     if hasattr(db.session, "reindex_set"):
-      db.session.reindex_set.invalidate()
       delattr(db.session, "reindex_set")
     db.session.commit()
 

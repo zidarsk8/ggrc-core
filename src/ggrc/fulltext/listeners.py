@@ -3,7 +3,7 @@
 
 """Fulltext event listeners"""
 
-from collections import Iterable
+from collections import Iterable, defaultdict
 import threading
 
 import sqlalchemy as sa
@@ -11,9 +11,9 @@ from sqlalchemy import event
 
 from ggrc import db
 from ggrc import fulltext
-from ggrc.models import all_models
+from ggrc.models import all_models, get_model
 from ggrc.fulltext import mixin
-
+from ggrc.utils import benchmark
 
 ACTIONS = ['after_insert', 'after_delete', 'after_update']
 
@@ -26,15 +26,35 @@ class ReindexSet(threading.local):
   def __init__(self, *args, **kwargs):
     super(ReindexSet, self).__init__(*args, **kwargs)
     self._pool = set()
+    self.model_ids_to_reindex = defaultdict(set)
 
   def add(self, item):
     self._pool.add(item)
 
-  def __iter__(self):
-    return iter(self._pool)
-
-  def invalidate(self):
+  def warmup(self):
+    for for_index in self._pool:
+      if for_index not in db.session:
+        continue
+      type_name, id_value = for_index.get_reindex_pair()
+      if not type_name:
+        continue
+      if id_value is None:
+        db.session.flush()
+        type_name, id_value = for_index.get_reindex_pair()
+      self.model_ids_to_reindex[type_name].add(id_value)
     self._pool = set()
+
+  def push_ft_records(self):
+    with benchmark("push ft records into DB"):
+      for obj in db.session:
+        if not isinstance(obj, mixin.Indexed):
+          continue
+        if obj.id in self.model_ids_to_reindex.get(obj.type, set()):
+          db.session.expire(obj)
+      for model_name, ids in self.model_ids_to_reindex.iteritems():
+        get_model(model_name).bulk_record_update_for(ids)
+      self.model_ids_to_reindex = defaultdict(set)
+
 
 
 def _runner(mapper, content, target):  # pylint:disable=unused-argument

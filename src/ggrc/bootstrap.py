@@ -35,6 +35,8 @@ def get_db():
     """
     database.session.plain_commit(*args, **kwargs)
     from ggrc.models.hooks import acl
+    if hasattr(database.session, "reindex_set"):
+       database.session.reindex_set.push_ft_records()
     acl.after_commit()
 
   database.session.commit = hooked_commit
