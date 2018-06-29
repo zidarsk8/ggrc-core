@@ -50,7 +50,7 @@ class TestComprehensiveSheets(TestCase):
         "Objective": {
             "created": 8,
             "ignored": 7,
-            "row_errors": 5,
+            "row_errors": 7,
             "row_warnings": 4,
             "rows": 15,
         },
@@ -310,18 +310,16 @@ class TestComprehensiveSheets(TestCase):
         "Control": {
             "row_errors": {
                 errors.DUPLICATE_VALUE_IN_CSV.format(
-                    line_list="3, 4",
+                    line="4",
+                    processed_line="3",
                     column_name="Code",
-                    s="",
-                    value="a",
-                    ignore_lines="4",
+                    value="A",
                 ),
                 errors.DUPLICATE_VALUE_IN_CSV.format(
-                    line_list="3, 4",
+                    line="4",
+                    processed_line="3",
                     column_name="Title",
-                    s="",
-                    value="a",
-                    ignore_lines="4",
+                    value="A",
                 ),
             }
         }
