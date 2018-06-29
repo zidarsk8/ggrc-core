@@ -285,7 +285,7 @@ function initWidgets() {
   });
 }
 
-const _onbeforeunload = function (evnt) {
+function _onbeforeunload(evnt) {
   evnt = evnt || window.event;
   let message = 'There are operations in progress. ' +
   'Are you sure you want to leave the page?';
@@ -294,27 +294,28 @@ const _onbeforeunload = function (evnt) {
     evnt.returnValue = message;
   }
   return message;
-};
+}
 
 const notifier = new PersistentNotifier({
-  while_queue_has_elements: function () {
+  while_queue_has_elements() {
     window.onbeforeunload = _onbeforeunload;
   },
-  when_queue_empties: function () {
+  when_queue_empties() {
     window.onbeforeunload = $.noop;
   },
   name: 'GGRC/window',
 });
 
 function navigate(url) {
-  function go() {
-    if (!url) {
-      window.location.reload();
-    } else {
-      window.location.assign(url);
-    }
+  notifier.on_empty(_goToUrl.bind(null, url));
+}
+
+function _goToUrl(url) {
+  if (!url) {
+    window.location.reload();
+  } else {
+    window.location.assign(url);
   }
-  notifier.on_empty(go);
 }
 
 export {
