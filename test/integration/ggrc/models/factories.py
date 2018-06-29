@@ -427,11 +427,11 @@ class ProductFactory(TitledFactory):
     model = all_models.Product
 
 
-class SectionFactory(TitledFactory):
-  """Section factory class"""
+class RequirementFactory(TitledFactory):
+  """Requirement factory class"""
 
   class Meta:
-    model = all_models.Section
+    model = all_models.Requirement
 
 
 class StandardFactory(TitledFactory):
@@ -574,9 +574,9 @@ def get_model_factory(model_name):
       "Project": ProjectFactory,
       "Proposal": ProposalFactory,
       "Regulation": RegulationFactory,
+      "Requirement": RequirementFactory,
       "Risk": RiskFactory,
       "RiskAssessment": RiskAssessmentFactory,
-      "Section": SectionFactory,
       "Standard": StandardFactory,
       "System": SystemFactory,
       "TaskGroup": wf_factories.TaskGroupFactory,
