@@ -4,6 +4,7 @@
 */
 
 import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
+import {navigate} from '../../plugins/utils/current-page-utils';
 
 let CloneWorkflow = can.Model.Cacheable({
   defaults : {
@@ -25,7 +26,7 @@ let CloneWorkflow = can.Model.Cacheable({
     });
 
     return workflow.save().then(function(workflow) {
-      GGRC.navigate(workflow.viewLink);
+      navigate(workflow.viewLink);
       return this;
     });
 

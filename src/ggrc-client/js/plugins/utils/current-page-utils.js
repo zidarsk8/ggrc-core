@@ -19,6 +19,7 @@ import {
 } from './object-versions-utils';
 import Mappings from '../../models/mappers/mappings';
 import {makeModelInstance} from './models-utils';
+import PersistentNotifier from '../persistent_notifier';
 
 /**
  * Util methods for work with Current Page.
@@ -284,6 +285,38 @@ function initWidgets() {
   });
 }
 
+const _onbeforeunload = function (evnt) {
+  evnt = evnt || window.event;
+  let message = 'There are operations in progress. ' +
+  'Are you sure you want to leave the page?';
+
+  if (evnt) {
+    evnt.returnValue = message;
+  }
+  return message;
+};
+
+const notifier = new PersistentNotifier({
+  while_queue_has_elements: function () {
+    window.onbeforeunload = _onbeforeunload;
+  },
+  when_queue_empties: function () {
+    window.onbeforeunload = $.noop;
+  },
+  name: 'GGRC/window',
+});
+
+function navigate(url) {
+  function go() {
+    if (!url) {
+      window.location.reload();
+    } else {
+      window.location.assign(url);
+    }
+  }
+  notifier.on_empty(go);
+}
+
 export {
   relatedToCurrentInstance as related,
   getPageInstance,
@@ -302,4 +335,6 @@ export {
   refreshCounts,
   initWidgets,
   cacheCurrentUser,
+  navigate,
+  notifier,
 };

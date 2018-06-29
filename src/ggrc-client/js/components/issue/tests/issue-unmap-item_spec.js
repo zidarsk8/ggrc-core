@@ -273,7 +273,7 @@ describe('issue-unmap-related-snapshots component', ()=> {
     beforeEach(function () {
       spyOn($.prototype, 'trigger');
       spyOn(CurrentPageUtils, 'getPageInstance');
-      spyOn(GGRC, 'navigate');
+      spyOn(CurrentPageUtils, 'navigate');
     });
 
     it('should change "isLoading" flag in case of success',
@@ -306,7 +306,7 @@ describe('issue-unmap-related-snapshots component', ()=> {
         viewModel.attr('issueInstance.viewLink', 'temp url');
         CurrentPageUtils.getPageInstance.and.returnValue(viewModel.attr('issueInstance'));
         await viewModel.unmap();
-        expect(GGRC.navigate).toHaveBeenCalledWith(
+        expect(CurrentPageUtils.navigate).toHaveBeenCalledWith(
           viewModel.attr('issueInstance.viewLink')
         );
         done();

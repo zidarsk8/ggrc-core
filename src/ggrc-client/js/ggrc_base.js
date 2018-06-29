@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import PersistentNotifier from './plugins/persistent_notifier';
+import {notifier} from './plugins/ggrc_utils';
 
 (function (GGRC, moment) {
   GGRC.mustache_path = '/static/mustache';
@@ -12,24 +12,6 @@ import PersistentNotifier from './plugins/persistent_notifier';
   if (!GGRC.widget_descriptors) {
     GGRC.widget_descriptors = {};
   }
-
-  let onbeforeunload = function (evnt) {
-      evnt = evnt || window.event;
-      let message = 'There are operations in progress. Are you sure you want to leave the page?';
-      if (evnt) {
-        evnt.returnValue = message;
-      }
-      return message;
-    },
-    notifier = new PersistentNotifier({
-      while_queue_has_elements: function () {
-        window.onbeforeunload = onbeforeunload;
-      },
-      when_queue_empties: function () {
-        window.onbeforeunload = $.noop;
-      },
-      name: 'GGRC/window',
-    });
 
   $.extend(GGRC, {
 
@@ -53,17 +35,6 @@ import PersistentNotifier from './plugins/persistent_notifier';
       GGRC.eventqueue.push.apply(GGRC.eventqueue, events);
       if (!GGRC.eventqueueTimeout)
         GGRC.eventqueueTimeout = setTimeout(GGRC.queue_exec_next, GGRC.eventqueueTimegap);
-    },
-
-    navigate: function (url) {
-      function go() {
-        if (!url) {
-          window.location.reload();
-        } else {
-          window.location.assign(url);
-        }
-      }
-      notifier.on_empty(go);
     },
 
     delay_leaving_page_until: $.proxy(notifier, 'queue'),

@@ -14,7 +14,10 @@ import {
   shouldApplyPreconditions,
 } from '../plugins/utils/controllers';
 import Permission from '../permission';
-import {getPageInstance} from '../plugins/utils/current-page-utils';
+import {
+  getPageInstance,
+  navigate,
+} from '../plugins/utils/current-page-utils';
 
 (function (can, $, GGRC) {
   'use strict';
@@ -85,10 +88,10 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
         var modelName = $trigger.attr('data-object-plural').toLowerCase();
         if ($trigger.attr('data-object-id') === 'page' ||
           (instance === getPageInstance())) {
-          GGRC.navigate('/dashboard');
+          navigate('/dashboard');
         } else if (modelName === 'people' || modelName === 'roles') {
           window.location.assign('/admin#' + modelName + '_list');
-          GGRC.navigate();
+          navigate();
         } else {
           $trigger.trigger('modal:success', data);
           $target.modal_form('hide');
@@ -187,11 +190,11 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
           refreshPage();
         } else if (formTarget === 'redirect') {
           if (typeof xhr !== 'undefined' && 'getResponseHeader' in xhr) {
-            GGRC.navigate(xhr.getResponseHeader('location'));
+            navigate(xhr.getResponseHeader('location'));
           } else if (data._redirect) {
-            GGRC.navigate(data._redirect);
+            navigate(data._redirect);
           } else {
-            GGRC.navigate(data.selfLink.replace('/api', ''));
+            navigate(data.selfLink.replace('/api', ''));
           }
         } else {
           $target.modal_form('hide');
@@ -322,7 +325,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
   }
 
   function refreshPage() {
-    setTimeout(GGRC.navigate.bind(GGRC), 10);
+    setTimeout(navigate.bind(GGRC), 10);
   }
 
   function arrangeBackgroundModals(modals, referenceModal) {
