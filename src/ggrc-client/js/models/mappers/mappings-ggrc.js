@@ -232,11 +232,13 @@ import AccessControlRole from '../custom-roles/access-control-role';
           'Program', 'Regulation', 'Contract', 'Policy', 'Standard',
           'AccessGroup', 'Objective', 'Control', 'Requirement', 'Clause',
           'DataAsset', 'Facility', 'Market', 'Metric', 'OrgGroup', 'Vendor',
-          'Process', 'Product', 'ProductGroup', 'Project', 'System', 'Issue',
-          'Risk', 'Threat', 'TechnologyEnvironment'],
+          'Process', 'Product', 'Project', 'System', 'Issue', 'Risk', 'Threat',
+          'Assessment', 'Document', 'TechnologyEnvironment', 'ProductGroup'],
         authorizations: 'UserRole',
       },
       authorizations: Direct('UserRole', 'person', 'user_roles'),
+      related_objects:
+        Multi(['related_objects_as_source', 'related_objects_as_destination']),
     },
     Context: {
       _canonical: {
