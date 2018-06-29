@@ -698,103 +698,106 @@ describe('assessment-info-pane component', () => {
   });
 
   describe('afterCreate() method', () => {
-    let event;
-    let type;
+    const itemsType = 'comments';
     let items;
 
-    beforeEach(function () {
-      type = 'type';
-      const commonStamp = [{}, {}];
-      const beforeCreate = [{
+    beforeEach(() => {
+      items = [{
         data: 'Fake data 1',
         isDraft: false,
-        _stamp: commonStamp[0],
+        _stamp: 1,
       }, {
         data: 'Fake data 2',
         isDraft: false,
-        _stamp: commonStamp[1],
+        _stamp: 2,
       }, {
         data: 'Fake data 3',
         isDraft: false,
-        _stamp: {},
+        _stamp: 3,
+      }, {
+        data: 'Fake data 4',
+        isDraft: false,
+        _stamp: 4,
       }];
-      vm.attr(type, beforeCreate);
-      items = new can.List([{
-        data: 'Important data 1',
+
+      vm.attr(itemsType, items);
+    });
+
+    it('shoud set "isUpdating" property to false', () => {
+      const expectedProp = `isUpdating${can.capitalize(itemsType)}`;
+      vm.attr(expectedProp, true);
+      vm.afterCreate({success: true, items: []}, itemsType);
+      expect(vm.attr(expectedProp)).toBe(false);
+    });
+
+    it('should remove all unsaved items from list', () => {
+      let newItems = new can.List([{
+        data: 'Updated data 2',
         isDraft: true,
-        _stamp: vm
-          .attr(type)[1]
-          .attr('_stamp'),
+        _stamp: 2,
       }, {
-        data: 'Important data 2',
+        data: 'Update data 4',
         isDraft: true,
-        _stamp: vm
-          .attr(type)[0]
-          .attr('_stamp'),
-      }, {
-        data: 'Important data 3',
-        isDraft: true,
-        _stamp: {},
+        _stamp: 4,
       }]);
-      event = {
-        items,
+
+      let event = {
+        items: newItems,
+        success: false,
+      };
+
+      vm.afterCreate(event, itemsType);
+      let actualItems = vm.attr(itemsType);
+      expect(actualItems.length).toBe(2);
+      expect(actualItems[0].attr('data')).toEqual(items[0].data);
+      expect(actualItems[1].attr('data')).toEqual(items[2].data);
+    });
+
+    it('should update items with the same stam in list', () => {
+      let newItems = new can.List([{
+        data: 'Updated data 2',
+        isDraft: true,
+        _stamp: 2,
+      }, {
+        data: 'Update data 4',
+        isDraft: true,
+        _stamp: 4,
+      }, {
+        data: 'No stamp item',
+        isDraft: true,
+      }]);
+
+      let event = {
+        items: newItems,
         success: true,
       };
+
+      vm.afterCreate(event, itemsType);
+      let actualItems = vm.attr(itemsType);
+      expect(actualItems.length).toBe(4);
+      expect(actualItems[0].attr('data')).toEqual(items[0].data);
+      expect(actualItems[1].attr('data')).toEqual(newItems[0].data);
+      expect(actualItems[2].attr('data')).toEqual(items[2].data);
+      expect(actualItems[3].attr('data')).toEqual(newItems[1].data);
     });
 
-    it('sets "isUpdating{<passed capitalized type>}" property to false',
-      function () {
-        const expectedProp = `isUpdating${can.capitalize(type)}`;
-        vm.attr(expectedProp, true);
-        vm.afterCreate(event, type);
-        expect(vm.attr(expectedProp)).toBe(false);
-      });
+    it('should remove "isDraft" and "_stamp" attrs from updated items', () => {
+      let newItems = new can.List([{
+        data: 'Updated data 1',
+        isDraft: true,
+        _stamp: 1,
+      }]);
 
-    it('sets new items only if each item from them is saved', function () {
-      const expectedResult = [{
-        data: 'Fake data 3',
-        isDraft: false,
-        _stamp: {},
-      }];
-      event.success = false;
-      vm.afterCreate(event, type);
-      expect(vm.attr(type).serialize()).toEqual(expectedResult);
-    });
+      let event = {
+        items: newItems,
+        success: true,
+      };
 
-    describe('if some item from passed items has the same _stamp field value ' +
-    'as some item from original items array', () => {
-      it('removes _stamp and isDraft props from passed items placed in event ' +
-      'object', function () {
-        const expected = [{
-          data: 'Important data 1',
-        }, {
-          data: 'Important data 2',
-        }, {
-          data: 'Important data 3',
-          isDraft: true,
-          _stamp: {},
-        }];
-        vm.afterCreate(event, type);
-        expect(items.serialize()).toEqual(expected);
-      });
-
-      it('sets the flag isNotSaved to true for item from passed items if ' +
-      'event.success is false', function () {
-        const expected = [{
-          data: 'Important data 1',
-          isNotSaved: true,
-        }, {
-          data: 'Important data 2',
-          isNotSaved: true,
-        }, {
-          data: 'Important data 3',
-          isDraft: true,
-          _stamp: {},
-        }];
-        event.success = false;
-        vm.afterCreate(event, type);
-        expect(items.serialize()).toEqual(expected);
-      });
+      vm.afterCreate(event, itemsType);
+      let actualItems = vm.attr(itemsType);
+      expect(actualItems[0].attr('data')).toEqual(newItems[0].data);
+      expect(actualItems[0].attr('isDraft')).toBeUndefined();
+      expect(actualItems[0].attr('_stamp')).toBeUndefined();
     });
   });
 
