@@ -45,22 +45,11 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
     'TechnologyEnvironment',
     'Vendor',
   ];
-  let relatedObjectDescriptors = {};
-  let threatDescriptor;
-  let riskDescriptor;
 
   // Register `risks` extension with GGRC
   GGRC.extensions.push(RisksExtension);
 
   RisksExtension.name = 'risks';
-
-  // Register Risk Assessment models for use with `inferObjectType`
-  RisksExtension.object_type_decision_tree = function () {
-    return {
-      risk: CMS.Models.Risk,
-      threat: CMS.Models.Threat,
-    };
-  };
 
   // Configure mapping extensions for ggrc_risks
   RisksExtension.init_mappings = function () {
@@ -137,166 +126,6 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
       });
     });
     new Mappings('ggrc_risks', mappings);
-  };
-
-  // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
-  // Initialize widgets for risk page
-  RisksExtension.init_widgets = function () {
-    let pageInstance = getPageInstance();
-
-    let sortedWidgetTypes = _.sortBy(riskObjectTypes, function (type) {
-      let model = CMS.Models[type] || {};
-      return model.title_plural || type;
-    });
-    let baseWidgetsByType = GGRC.tree_view.base_widgets_by_type;
-    let moduleObjectNames = ['Risk', 'Threat'];
-    let extendedModuleTypes = riskObjectTypes.concat(moduleObjectNames);
-    let subTrees = GGRC.tree_view.sub_tree_for;
-
-    // Init widget descriptors:
-    can.each(sortedWidgetTypes, function (modelName) {
-      let model;
-
-      if (modelName === 'MultitypeSearch' || !baseWidgetsByType[modelName]) {
-        return;
-      }
-      model = CMS.Models[modelName];
-
-      // First we add Risk and Threat to other object's maps
-      baseWidgetsByType[modelName] = baseWidgetsByType[modelName].concat(
-        moduleObjectNames);
-
-      relatedObjectDescriptors[modelName] = {
-        widgetType: 'treeview',
-        treeViewDepth: 2,
-        widget_id: model.table_singular,
-        widget_name: model.model_plural,
-        widget_icon: model.table_singular,
-        content_controller_options: {
-          add_item_view: GGRC.mustache_path +
-          '/base_objects/tree_add_item.mustache',
-          draw_children: true,
-          parent_instance: pageInstance,
-          model: model,
-        },
-      };
-    });
-
-    // Add risk and Threat to base widget types and set up
-    // tree_view.basic_model_list and tree_view.sub_tree_for for risk module
-    // objects
-    can.each(moduleObjectNames, function (name) {
-      let widgetList = baseWidgetsByType[name];
-      let childModelList = [];
-
-      baseWidgetsByType[name] = extendedModuleTypes;
-
-      GGRC.tree_view.basic_model_list.push({
-        model_name: name,
-        display_name: CMS.Models[name].title_singular,
-      });
-
-      can.each(widgetList, function (item) {
-        if (extendedModuleTypes.indexOf(item) !== -1) {
-          childModelList.push({
-            model_name: item,
-            display_name: CMS.Models[item].title_singular,
-          });
-        }
-      });
-
-      if (!_.isEmpty(subTrees.serialize())) {
-        subTrees.attr(name, {
-          model_list: childModelList,
-          display_list:
-          CMS.Models[name].tree_view_options.child_tree_display_list ||
-          widgetList,
-        });
-      }
-    });
-
-    threatDescriptor = {
-      widgetType: 'treeview',
-      treeViewDepth: 2,
-      widget_id: CMS.Models.Threat.table_singular,
-      widget_name: CMS.Models.Threat.title_plural,
-      widget_icon: CMS.Models.Threat.table_singular,
-      content_controller_options: {
-        draw_children: true,
-        parent_instance: pageInstance,
-        model: CMS.Models.Threat,
-      },
-    };
-    riskDescriptor = {
-      widgetType: 'treeview',
-      treeViewDepth: 2,
-      widget_id: CMS.Models.Risk.table_singular,
-      widget_name: CMS.Models.Risk.title_plural,
-      widget_icon: CMS.Models.Risk.table_singular,
-      order: 45, // between default Objective (40) and Control (50)
-      content_controller_options: {
-        draw_children: true,
-        parent_instance: pageInstance,
-        model: CMS.Models.Risk,
-      },
-    };
-
-    if (pageInstance instanceof CMS.Models.Risk) {
-      RisksExtension.init_widgets_for_risk_page();
-    } else if (pageInstance instanceof CMS.Models.Threat) {
-      RisksExtension.init_widgets_for_threat_page();
-    } else if (pageInstance instanceof CMS.Models.Person) {
-      RisksExtension.init_widgets_for_person_page();
-    } else {
-      RisksExtension.init_widgets_for_other_pages();
-    }
-  };
-
-  RisksExtension.init_widgets_for_risk_page = function () {
-    let riskDescriptors = $.extend({},
-      relatedObjectDescriptors, {
-        Threat: threatDescriptor,
-      }
-    );
-    new GGRC.WidgetList('ggrc_risks', {
-      Risk: riskDescriptors,
-    });
-  };
-
-  RisksExtension.init_widgets_for_threat_page = function () {
-    let threatDescriptors = $.extend({},
-      relatedObjectDescriptors, {
-        Risk: riskDescriptor,
-      }
-    );
-    new GGRC.WidgetList('ggrc_risks', {
-      Threat: threatDescriptors,
-    });
-  };
-
-  RisksExtension.init_widgets_for_person_page = function () {
-    let peopleWidgets = $.extend({}, {
-      Threat: threatDescriptor,
-    }, {
-      Risk: riskDescriptor,
-    });
-
-    new GGRC.WidgetList('ggrc_risks', {
-      Person: peopleWidgets,
-    });
-  };
-
-  RisksExtension.init_widgets_for_other_pages = function () {
-    let descriptor = {};
-    let pageInstance = getPageInstance();
-    if (pageInstance &&
-      ~can.inArray(pageInstance.constructor.shortName, riskObjectTypes)) {
-      descriptor[pageInstance.constructor.shortName] = {
-        risk: riskDescriptor,
-        threat: threatDescriptor,
-      };
-    }
-    new GGRC.WidgetList('ggrc_risks', descriptor);
   };
 
   registerHook('LHN.Requirements_risk',
