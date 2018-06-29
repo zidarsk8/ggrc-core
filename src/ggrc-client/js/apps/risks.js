@@ -128,8 +128,5 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
     new Mappings('ggrc_risks', mappings);
   };
 
-  registerHook('LHN.Requirements_risk',
-    GGRC.mustache_path + '/dashboard/lhn_risks');
-
   RisksExtension.init_mappings();
 })(window.can.$, window.CMS, window.GGRC);
