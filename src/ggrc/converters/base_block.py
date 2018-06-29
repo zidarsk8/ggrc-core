@@ -439,6 +439,12 @@ class ImportBlockConverter(BlockConverter):
     for row in self.row_converters_from_csv():
       row.process_row()
       self._update_info(row)
+    if self.converter.dry_run:
+      return
+    if self.ignore:
+      return
+    db.session.post_commit_semaphore.enable()
+    db.session.commit()
 
   def get_unique_values_dict(self, object_class):
     """Get the varible to storing row numbers for unique values.

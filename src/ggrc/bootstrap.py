@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Bootstrap for ggrc db."""
+import threading
 
 from flask.ext.sqlalchemy import SQLAlchemy
 
@@ -27,6 +28,36 @@ def get_db():
 
   database.session.plain_commit = database.session.commit
 
+  class PostCommitHooksSemaphore(threading.local):
+
+    def __init__(self, *args, **kwargs):
+      super(PostCommitHooksSemaphore, self).__init__(*args, **kwargs)
+      self._flag = True
+
+
+    def enable(self):
+      self._flag = True
+
+    def disable(self):
+      self._flag = False
+
+    def __bool__(self):
+      return self._flag
+
+    __nonzero__ = __bool__
+
+  database.session.post_commit_semaphore = PostCommitHooksSemaphore()
+
+  def post_commit_hooks():
+    if not database.session.post_commit_semaphore:
+      return
+    from ggrc.models.hooks import acl
+    if hasattr(database.session, "reindex_set"):
+      database.session.reindex_set.push_ft_records()
+    acl.after_commit()
+
+  database.session.post_commit_hooks = post_commit_hooks
+
   def hooked_commit(*args, **kwargs):
     """Commit override function.
 
@@ -34,10 +65,8 @@ def get_db():
     used for ACL propagation.
     """
     database.session.plain_commit(*args, **kwargs)
-    from ggrc.models.hooks import acl
-    if hasattr(database.session, "reindex_set"):
-       database.session.reindex_set.push_ft_records()
-    acl.after_commit()
+    database.session.post_commit_hooks()
 
   database.session.commit = hooked_commit
+
   return database
