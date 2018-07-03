@@ -7,12 +7,14 @@ import {
   ddValidationMapToValue,
 } from '../../../plugins/utils/ca-utils';
 import Permission from '../../../permission';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../assessment-local-ca';
 
-describe('assessmentLocalCa component', () => {
+describe('assessment-local-ca component', () => {
   let viewModel;
 
   beforeEach(() => {
-    viewModel = GGRC.Components.getViewModel('assessmentLocalCa');
+    viewModel = getComponentVM(Component);
   });
 
   describe('canEdit getter', () => {

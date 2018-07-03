@@ -52,7 +52,7 @@ export default can.Component.extend({
      */
     _selectInitialTemplate(templates) {
       const WARN_EMPTY_GROUP = [
-        'GGRC.Components.assessmentTemplates: ',
+        'can.Component.assessmentTemplates: ',
         'An empty template group encountered, possible API error',
       ].join('');
       let initialTemplate;

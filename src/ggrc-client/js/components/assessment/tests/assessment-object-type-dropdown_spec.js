@@ -4,15 +4,16 @@
 */
 
 import Mappings from '../../../models/mappers/mappings';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../assessment-object-type-dropdown';
 
-describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
+describe('assessment-object-type-dropdown component', function () {
   'use strict';
 
   let viewModel;
 
   beforeEach(function () {
-    viewModel = GGRC.Components
-      .getViewModel('assessmentObjectTypeDropdown');
+    viewModel = getComponentVM(Component);
   });
 
   it('returns the types obtained from the Mappings', function () {
@@ -80,7 +81,7 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
         groupFoo: {
           name: 'Foo Objects',
           items: [
-            {value: 'Contract'},  // this object type is relevant
+            {value: 'Contract'}, // this object type is relevant
             {value: 'Assessment'},
             {value: 'Audit'},
             {value: 'CycleTaskGroupObjectTask'},
@@ -89,7 +90,7 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
         groupBar: {
           name: 'Bar Objects',
           items: [
-            {value: 'Policy'},  // this object type is relevant
+            {value: 'Policy'}, // this object type is relevant
             {value: 'TaskGroup'},
             {value: 'TaskGroupTask'},
           ],
