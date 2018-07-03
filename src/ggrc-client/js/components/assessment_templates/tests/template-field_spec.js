@@ -8,7 +8,7 @@ import Component from '../template-field';
 describe('template-field component', function () {
   'use strict';
 
-  let scope;
+  let viewModel;
   let pads = new can.Map({
     COMMENT: 0,
     ATTACHMENT: 1,
@@ -27,8 +27,8 @@ describe('template-field component', function () {
     let denormalizeMandatory;
 
     beforeAll(function () {
-      scope = Component.prototype.scope({}, parentScope);
-      denormalizeMandatory = scope.denormalize_mandatory;
+      viewModel = Component.prototype.viewModel({}, parentScope);
+      denormalizeMandatory = viewModel.denormalize_mandatory;
     });
 
     it('returns correct denormalized field', function () {
@@ -92,8 +92,8 @@ describe('template-field component', function () {
     let normalizeMandatory;
 
     beforeAll(function () {
-      scope = Component.prototype.scope({}, parentScope);
-      normalizeMandatory = scope.normalize_mandatory;
+      viewModel = Component.prototype.viewModel({}, parentScope);
+      normalizeMandatory = viewModel.normalize_mandatory;
     });
 
     it('returns correct normalized attrs', function () {

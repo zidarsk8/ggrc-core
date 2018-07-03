@@ -17,26 +17,29 @@ import template from './templates/attribute_field.mustache';
 export default can.Component.extend({
   tag: 'template-field',
   template,
-  scope: function (attrs, parentScope, element) {
-    return {
+  viewModel(attrs, parentScope) {
+    return new can.Map({
       types: parentScope.attr('types'),
+
+      field: attrs.field,
+      fields: attrs.fields,
 
       _EV_FIELD_REMOVED: 'on-remove',
 
       /*
        * Removes `field` from `fields`
        */
-      removeField: function (scope, el, ev) {
+      removeField: function (viewModel, el, ev) {
         ev.preventDefault();
 
         // CAUTION: In order for the event to not get lost, triggering it
-        // must happen before changing any of the scope attributes that
+        // must happen before changing any of the viewModel attributes that
         // cause changes in the template.
         this.$rootEl.triggerHandler({
           type: this._EV_FIELD_REMOVED,
         });
 
-        scope.attr('_pending_delete', true);
+        viewModel.attr('_pending_delete', true);
       },
       /*
        * Denormalize field.multi_choice_mandatory into opts
@@ -82,7 +85,7 @@ export default can.Component.extend({
       normalize_mandatory: function (attrs) {
         return can.map(attrs, ddValidationMapToValue).join(',');
       },
-    };
+    });
   },
   events: {
     /**
@@ -93,21 +96,21 @@ export default can.Component.extend({
      * @param {Object} options - the component instantiation options
      */
     init: function (element, options) {
-      const field = this.scope.attr('field');
-      const denormalized = this.scope.denormalize_mandatory(field);
-      const types = this.scope.attr('types');
+      const field = this.viewModel.attr('field');
+      const denormalized = this.viewModel.denormalize_mandatory(field);
+      const types = this.viewModel.attr('types');
       const item = _.find(types, function (obj) {
         return obj.type === field.attr('attribute_type');
       });
-      this.scope.field.attr('attribute_name', item.name);
-      this.scope.attr('attrs', denormalized);
+      this.viewModel.field.attr('attribute_name', item.name);
+      this.viewModel.attr('attrs', denormalized);
 
-      this.scope.attr('$rootEl', $(element));
+      this.viewModel.attr('$rootEl', $(element));
     },
     '{attrs} change': function () {
-      const attrs = this.scope.attr('attrs');
-      const normalized = this.scope.normalize_mandatory(attrs);
-      this.scope.field.attr('multi_choice_mandatory', normalized);
+      const attrs = this.viewModel.attr('attrs');
+      const normalized = this.viewModel.normalize_mandatory(attrs);
+      this.viewModel.field.attr('multi_choice_mandatory', normalized);
     },
   },
 });

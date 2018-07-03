@@ -4,20 +4,19 @@
 */
 
 import Component from '../assessment-template-attributes';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
 describe('assessment-template-attributes component', function () {
   describe('fieldRemoved() method', function () {
     let method; // the method under test
-    let scope;
+    let viewModel;
     let remainingFields;
     let $el;
     let eventObj;
 
     beforeEach(function () {
-      scope = new can.Map({
-        fields: [],
-      });
-      method = Component.prototype.scope.fieldRemoved.bind(scope);
+      viewModel = getComponentVM(Component);
+      method = viewModel.fieldRemoved.bind(viewModel);
       $el = $('<p></p>');
       eventObj = $.Event('on-delete');
     });
@@ -30,11 +29,11 @@ describe('assessment-template-attributes component', function () {
         new can.Map({id: 4, title: 'bar'}),
         new can.Map({id: 52, title: 'baz'}),
       ];
-      scope.attr('fields').replace(currentFields);
+      viewModel.attr('fields').replace(currentFields);
 
       method(deletedField, $el, eventObj);
 
-      remainingFields = _.map(scope.fields, 'title');
+      remainingFields = _.map(viewModel.fields, 'title');
       expect(remainingFields).toEqual(['foo', 'baz']);
     });
 
@@ -46,11 +45,11 @@ describe('assessment-template-attributes component', function () {
         new can.Map({title: 'bar'}),
         new can.Map({id: 52, title: 'baz'}),
       ];
-      scope.attr('fields').replace(currentFields);
+      viewModel.attr('fields').replace(currentFields);
 
       method(deletedField, $el, eventObj);
 
-      remainingFields = _.map(scope.fields, 'title');
+      remainingFields = _.map(viewModel.fields, 'title');
       expect(remainingFields).toEqual(['foo', 'baz']);
     });
 
@@ -62,13 +61,13 @@ describe('assessment-template-attributes component', function () {
         new can.Map({id: 4, title: 'bar'}),
         new can.Map({id: 52, title: 'baz'}),
       ];
-      scope.attr('fields').replace(currentFields);
+      viewModel.attr('fields').replace(currentFields);
 
       spyOn(console, 'warn');
 
       method(deletedField, $el, eventObj);
 
-      remainingFields = _.map(scope.fields, 'title');
+      remainingFields = _.map(viewModel.fields, 'title');
       expect(remainingFields).toEqual(['foo', 'bar', 'baz']);
       expect(console.warn).toHaveBeenCalled();
     });

@@ -11,7 +11,7 @@
  */
 export default can.Component.extend({
   tag: 'assessment-template-attributes',
-  scope: {
+  viewModel: {
     fields: new can.List(),
     types: new can.List([{
       type: 'Text',
@@ -75,7 +75,7 @@ export default can.Component.extend({
       let sortables = el.find('li.sortable-item');
       // It's not nice way to rely on DOM for sorting,
       // but it was easiest for implementation
-      this.scope.fields.replace(_.map(sortables,
+      this.viewModel.fields.replace(_.map(sortables,
         function (item) {
           return $(item).data('field');
         }
