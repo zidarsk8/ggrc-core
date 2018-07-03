@@ -27,7 +27,6 @@ dashboard-js-template-files:
   - base_objects/title.mustache
   - base_objects/tree-item-attr.mustache
   - base_objects/tree_placeholder.mustache
-  - base_objects/generate_assessments_button.mustache
   - base_objects/form_restore.mustache
   - base_objects/info-pane-utility.mustache
   - base_objects/modal-content-reference-urls.mustache

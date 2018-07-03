@@ -3,13 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import tracker from '../tracker';
-import RefreshQueue from '../models/refresh_queue';
+import tracker from '../../tracker';
+import RefreshQueue from '../../models/refresh_queue';
+import template from './templates/generate_assessments_button.mustache';
 
 export default can.Component.extend({
   tag: 'assessment-generator-button',
-  template: '{{{> /static/mustache/base_objects/' +
-  'generate_assessments_button.mustache}}}',
+  template,
   viewModel: {
     audit: null,
     button: '@'
@@ -22,7 +22,7 @@ export default can.Component.extend({
         tracker.USER_JOURNEY_KEYS.LOADING,
         tracker.USER_ACTIONS.ASSESSMENT.OPEN_ASMT_GEN_MODAL);
 
-      import(/*webpackChunkName: "mapper"*/ '../controllers/mapper/mapper').then(mapper => {
+      import(/*webpackChunkName: "mapper"*/ '../../controllers/mapper/mapper').then(mapper => {
         mapper.ObjectGenerator.launch(el, {
           object: 'Audit',
           type: 'Control',
