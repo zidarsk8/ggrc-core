@@ -12,42 +12,43 @@ export default can.Component.extend({
   template,
   viewModel: {
     audit: null,
-    button: '@'
+    button: '@',
   },
   events: {
     'a click': function (el, ev) {
-      var instance = this.viewModel.attr('audit') || GGRC.page_instance();
+      let instance = this.viewModel.attr('audit') || GGRC.page_instance();
+      let a;
       this._results = null;
       tracker.start(tracker.FOCUS_AREAS.ASSESSMENT,
         tracker.USER_JOURNEY_KEYS.LOADING,
         tracker.USER_ACTIONS.ASSESSMENT.OPEN_ASMT_GEN_MODAL);
 
-      import(/*webpackChunkName: "mapper"*/ '../../controllers/mapper/mapper').then(mapper => {
-        mapper.ObjectGenerator.launch(el, {
-          object: 'Audit',
-          type: 'Control',
-          'join-object-id': instance.id,
-          'join-mapping': 'program_controls',
-          relevantTo: [{
-            readOnly: true,
-            type: instance.type,
-            id: instance.id,
-            title: instance.title
-          }],
-          callback: this.generateAssessments.bind(this)
+      import(/*webpackChunkName: "mapper"*/ '../../controllers/mapper/mapper')
+        .then((mapper) => {
+          mapper.ObjectGenerator.launch(el, {
+            object: 'Audit',
+            type: 'Control',
+            'join-object-id': instance.id,
+            'join-mapping': 'program_controls',
+            relevantTo: [{
+              readOnly: true,
+              type: instance.type,
+              id: instance.id,
+              title: instance.title,
+            }],
+            callback: this.generateAssessments.bind(this),
+          });
         });
-      });
-
     },
     showFlash: function (statuses) {
-      var flash = {};
-      var type;
-      var redirectLink;
-      var messages = {
+      let flash = {};
+      let type;
+      let redirectLink;
+      let messages = {
         error: 'Assessment generation has failed.',
         progress: 'Assessment generation is in progress. This may take ' +
         'several minutes.',
-        success: 'Assessment was generated successfully. {reload_link}'
+        success: 'Assessment was generated successfully. {reload_link}',
       };
       if (statuses.Failure > 0) {
         type = 'error';
@@ -62,14 +63,14 @@ export default can.Component.extend({
       $('body').trigger('ajax:flash', [flash, redirectLink]);
     },
     updateStatus: function (ids, count) {
-      var wait = [2, 4, 8, 16, 32, 64];
+      let wait = [2, 4, 8, 16, 32, 64];
       if (count >= wait.length) {
         count = wait.length - 1;
       }
       CMS.Models.BackgroundTask.findAll({
-        id__in: ids.join(',')
+        id__in: ids.join(','),
       }).then(function (tasks) {
-        var statuses = _.countBy(tasks, function (task) {
+        let statuses = _.countBy(tasks, function (task) {
           return task.status;
         });
         this.showFlash(statuses);
@@ -81,19 +82,19 @@ export default can.Component.extend({
       }.bind(this));
     },
     generateAssessments: function (list, options) {
-      var que = new RefreshQueue();
+      let que = new RefreshQueue();
 
       this._results = null;
       que.enqueue(list).trigger().then(function (items) {
-        var results = _.map(items, function (item) {
-          var id = options.assessmentTemplate.split('-')[0];
+        let results = _.map(items, function (item) {
+          let id = options.assessmentTemplate.split('-')[0];
           return this.generateModel(item, id, options.type);
         }.bind(this));
         this._results = results;
         $.when.apply($, results)
           .then(function () {
-            var tasks = arguments;
-            var ids;
+            let tasks = arguments;
+            let ids;
             this.showFlash({Pending: 1});
             options.context.closeModal();
             if (!tasks.length || tasks[0] instanceof CMS.Models.Assessment) {
@@ -111,26 +112,26 @@ export default can.Component.extend({
     generateModel: function (object, template, type) {
       let assessmentModel;
       let audit = this.viewModel.attr('audit');
-      var title = 'Generated Assessment for ' + audit.title;
-      var data = {
+      let title = 'Generated Assessment for ' + audit.title;
+      let data = {
         _generated: true,
         audit,
         // Provide actual Snapshot Object for Assessment
         object: {
           id: object.id,
           type: 'Snapshot',
-          href: object.selfLink
+          href: object.selfLink,
         },
         context: audit.context,
         title: title,
-        assessment_type: type
+        assessment_type: type,
       };
       data.run_in_background = true;
 
       if (template) {
         data.template = {
           id: Number(template),
-          type: 'AssessmentTemplate'
+          type: 'AssessmentTemplate',
         };
       }
       assessmentModel = new CMS.Models.Assessment(data);
@@ -141,9 +142,9 @@ export default can.Component.extend({
       return assessmentModel.save();
     },
     notify: function () {
-      var success;
-      var errors;
-      var msg;
+      let success;
+      let errors;
+      let msg;
 
       if (!this._results) {
         return;
@@ -159,20 +160,20 @@ export default can.Component.extend({
       if (errors < 1) {
         if (success === 0) {
           msg = {
-            success: 'Every Control already has an Assessment!'
+            success: 'Every Control already has an Assessment!',
           };
         } else {
           msg = {
-            success: success + ' Assessments successfully created.'
+            success: success + ' Assessments successfully created.',
           };
         }
       } else {
         msg = {
-          error: 'An error occurred when creating Assessments.'
+          error: 'An error occurred when creating Assessments.',
         };
       }
 
       $(document.body).trigger('ajax:flash', msg);
-    }
-  }
+    },
+  },
 });
