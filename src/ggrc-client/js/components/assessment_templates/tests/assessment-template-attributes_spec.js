@@ -3,17 +3,11 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.Components.templateAttributes', function () {
-  'use strict';
+import Component from '../assessment-template-attributes';
 
-  let Component;  // the component under test
-
-  beforeAll(function () {
-    Component = GGRC.Components.get('templateAttributes');
-  });
-
+describe('assessment-template-attributes component', function () {
   describe('fieldRemoved() method', function () {
-    let method;  // the method under test
+    let method; // the method under test
     let scope;
     let remainingFields;
     let $el;

@@ -3,10 +3,11 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.Components.templateAttributesField', function () {
+import Component from '../template-field';
+
+describe('template-field component', function () {
   'use strict';
 
-  let Component;  // the component under test
   let scope;
   let pads = new can.Map({
     COMMENT: 0,
@@ -20,7 +21,6 @@ describe('GGRC.Components.templateAttributesField', function () {
         return {};
       },
     });
-    Component = GGRC.Components.get('templateAttributesField');
   });
 
   describe('denormalize_mandatory() method', function () {
@@ -111,7 +111,7 @@ describe('GGRC.Components.templateAttributesField', function () {
 
   describe('emitting events', function () {
     describe('on-remove event', function () {
-      let $root;  // the component's root DOM element
+      let $root; // the component's root DOM element
       let onRemoveCallback;
 
       beforeEach(function () {

@@ -54,7 +54,6 @@ dashboard-js-template-files:
   - assessments/info.mustache
   - assessments/header.mustache
   - assessments/dates_list.mustache
-  - assessment_templates/attribute_field.mustache
   - assessment_templates/modal_content.mustache
   - assessment_templates/info.mustache
   - assessment_templates/tree_add_item.mustache
