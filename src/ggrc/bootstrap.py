@@ -7,6 +7,25 @@ import threading
 from flask.ext.sqlalchemy import SQLAlchemy
 
 
+class HooksSemaphore(threading.local):
+  """Special Semaphore construction that allows to run hook later."""
+
+  def __init__(self, *args, **kwargs):
+    super(HooksSemaphore, self).__init__(*args, **kwargs)
+    self._flag = True
+
+  def enable(self):
+    self._flag = True
+
+  def disable(self):
+    self._flag = False
+
+  def __bool__(self):
+    return self._flag
+
+  __nonzero__ = __bool__
+
+
 def get_db():
   """Get modified db object."""
   database = SQLAlchemy()
@@ -24,31 +43,15 @@ def get_db():
       if length is None:
         length = 250
       super(String, self).__init__(length, *args, **kwargs)
+
   database.String = String
 
   database.session.plain_commit = database.session.commit
 
-  class HooksSemaphore(threading.local):
-
-    def __init__(self, *args, **kwargs):
-      super(HooksSemaphore, self).__init__(*args, **kwargs)
-      self._flag = True
-
-
-    def enable(self):
-      self._flag = True
-
-    def disable(self):
-      self._flag = False
-
-    def __bool__(self):
-      return self._flag
-
-    __nonzero__ = __bool__
-
   database.session.delay_hooks_semaphore = HooksSemaphore()
 
   def pre_commit_hooks():
+    """All pre commit hooks handler."""
     if not database.session.delay_hooks_semaphore:
       return
     database.session.flush()
@@ -56,10 +59,12 @@ def get_db():
       database.session.reindex_set.push_ft_records()
 
   def post_commit_hooks():
+    """All post commit hooks handler."""
     if not database.session.delay_hooks_semaphore:
       return
     from ggrc.models.hooks import acl
     acl.after_commit()
+
   database.session.post_commit_hooks = post_commit_hooks
   database.session.pre_commit_hooks = pre_commit_hooks
 

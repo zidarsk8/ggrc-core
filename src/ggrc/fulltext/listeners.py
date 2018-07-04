@@ -32,6 +32,7 @@ class ReindexSet(threading.local):
     self._pool.add(item)
 
   def warmup(self):
+    """Function on pre-commit that collects objects keychain."""
     for for_index in self._pool:
       if for_index not in db.session:
         continue
@@ -45,6 +46,7 @@ class ReindexSet(threading.local):
     self._pool = set()
 
   def push_ft_records(self):
+    """Function that clear and push new full text records in DB."""
     with benchmark("push ft records into DB"):
       if self._pool:
         self.warmup()
@@ -56,7 +58,6 @@ class ReindexSet(threading.local):
       for model_name, ids in self.model_ids_to_reindex.iteritems():
         get_model(model_name).bulk_record_update_for(ids)
       self.model_ids_to_reindex = defaultdict(set)
-
 
 
 def _runner(mapper, content, target):  # pylint:disable=unused-argument

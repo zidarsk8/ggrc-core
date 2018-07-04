@@ -1,7 +1,6 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Full text index engine for Mysql DB backend"""
-from collections import defaultdict
 
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declared_attr
@@ -12,7 +11,6 @@ from sqlalchemy import event
 from ggrc import db
 from ggrc.fulltext.sql import SqlIndexer
 from ggrc.models import all_models
-from ggrc.models.inflector import get_model
 from ggrc.query import my_objects
 from ggrc.rbac import permissions
 from ggrc.utils import benchmark
