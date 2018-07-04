@@ -10,6 +10,7 @@ import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
 import {
   getWidgetConfig,
 } from '../plugins/utils/object-versions-utils';
+import Mappings from '../models/mappers/mappings';
 
 (function (can, $) {
   let CoreExtension = {};
@@ -762,7 +763,7 @@ import {
           descriptor = {
             instance: object,
             far_model: far_model,
-            mapping: GGRC.Mappings.get_canonical_mapping(object.constructor.shortName, far_model.shortName),
+            mapping: Mappings.get_canonical_mapping(object.constructor.shortName, far_model.shortName),
           };
         } else {
           widget_id = model_name;

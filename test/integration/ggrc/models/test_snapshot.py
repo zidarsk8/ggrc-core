@@ -6,7 +6,7 @@
 from ggrc.app import app
 from ggrc.models import all_models
 from ggrc.snapshotter.rules import Types
-from integration.ggrc import TestCase
+from integration.ggrc import TestCase, Api
 from integration.ggrc.models import factories
 
 
@@ -14,7 +14,7 @@ def get_snapshottable_models():
   return {getattr(all_models, stype) for stype in Types.all}
 
 
-class TestSnapshot(TestCase):
+class TestSnapshotQueryApi(TestCase):
   """Basic tests for /query api."""
 
   IGNORE_KEYS = {
@@ -94,7 +94,6 @@ class TestSnapshot(TestCase):
       # while api returns only basic data in stubs
       "documents_reference_url",
       "documents_file",
-      "documents_reference_url",
 
       # computed attributes are not stored in revisions and should be ignored.
       "attributes",
@@ -105,7 +104,7 @@ class TestSnapshot(TestCase):
 
   def setUp(self):
     """Set up test cases for all tests."""
-    super(TestSnapshot, self).setUp()
+    super(TestSnapshotQueryApi, self).setUp()
     self._create_cas()
     self.import_file("all_snapshottable_objects.csv")
 
@@ -204,3 +203,92 @@ class TestSnapshot(TestCase):
       generated_json = self._clean_json(obj.log_json())
       expected_json = self._clean_json(self._get_object(obj))
       self.assertEqual(expected_json, generated_json)
+
+
+class TestSnapshot(TestCase):
+  """Basic tests snapshots"""
+
+  def setUp(self):
+    super(TestSnapshot, self).setUp()
+    self.api = Api()
+
+  def test_search_by_reference_url(self):
+    """Test search audit related snapshots of control type by reference_url"""
+
+    expected_ref_url = "xxx"
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      audit_id = audit.id
+      doc1 = factories.DocumentReferenceUrlFactory(link=expected_ref_url,
+                                                   title=expected_ref_url)
+      doc_id1 = doc1.id
+      doc2 = factories.DocumentReferenceUrlFactory(link="yyy", title="yyy")
+      doc_id2 = doc2.id
+      control = factories.ControlFactory()
+      control_id = control.id
+
+    response = self.api.post(all_models.Relationship, {
+        "relationship": {
+            "source": {"id": control_id, "type": control.type},
+            "destination": {"id": doc_id1, "type": doc1.type},
+            "context": None
+        },
+    })
+    self.assertStatus(response, 201)
+    response = self.api.post(all_models.Relationship, {
+        "relationship": {
+            "source": {"id": control_id, "type": control.type},
+            "destination": {"id": doc_id2, "type": doc2.type},
+            "context": None
+        },
+    })
+    self.assertStatus(response, 201)
+    response = self.api.post(all_models.Relationship, {
+        "relationship": {
+            "source": {"id": control_id, "type": control.type},
+            "destination": {"id": audit_id, "type": audit.type},
+            "context": None
+        },
+    })
+    self.assertStatus(response, 201)
+    query_request_data = [{
+        "object_name": "Snapshot",
+        "filters": {
+            "expression": {
+                "left": {
+                    "left": "child_type",
+                    "op": {"name": "="},
+                    "right": "Control"
+                },
+                "op": {"name": "AND"},
+                "right": {
+                    "left": {
+                        "object_name": "Audit",
+                        "op": {"name": "relevant"},
+                        "ids": [audit_id]
+                    },
+                    "op": {"name": "AND"},
+                    "right": {
+                        "left": {
+                            "left": "Reference URL",
+                            "op": {"name": "~"},
+                            "right": expected_ref_url
+                        },
+                        "op": {"name": "AND"},
+                        "right": {
+                            "left": "Status",
+                            "op": {"name": "IN"},
+                            "right": ["Active", "Draft", "Deprecated"]
+                        }
+                    }
+                }
+            }
+        },
+    }]
+    response = self.api.send_request(
+        self.api.client.post,
+        data=query_request_data,
+        api_link="/query"
+    )
+    self.assert200(response)
+    self.assertEquals(1, response.json[0]["Snapshot"]["count"])

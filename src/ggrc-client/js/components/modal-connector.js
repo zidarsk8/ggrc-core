@@ -9,6 +9,7 @@ import {
 import {
   handlePendingJoins,
 } from '../plugins/utils/models-utils';
+import Mappings from '../models/mappers/mappings';
 
 (function (can, $) {
   /*
@@ -105,7 +106,7 @@ import {
         // Add pending operations
         can.each(changes, (item) => {
           let mapping = viewModel.mapping ||
-              GGRC.Mappings.get_canonical_mapping_name(
+              Mappings.get_canonical_mapping_name(
                 viewModel.instance.constructor.shortName,
                 item.what.constructor.shortName);
           if (item.how === 'add') {

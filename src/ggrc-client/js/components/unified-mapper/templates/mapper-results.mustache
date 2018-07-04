@@ -33,7 +33,7 @@
       {{/searchOnly}}
     </div>
     <div class="list-body {{#isLoading}}loading{{/isLoading}}">
-      <object-list items="items" is-loading="isLoading" spinner-css="grid-spinner">
+      <object-list items="items" is-loading="isLoading" {list-type}="'GRID'">
         <mapper-results-item
           class="{{#relatedAssessments.show}}has-related-assessments{{/relatedAssessments.show}}"
           item-data="data"
@@ -44,7 +44,7 @@
         </mapper-results-item>
       </object-list>
     </div>
-    <tree-pagination paging="paging"></tree-pagination>
+    <tree-pagination paging="paging" placement="top"></tree-pagination>
   {{else}}
     {{#if isLoading}}
       <div class="no-items-spinner-wrapper">

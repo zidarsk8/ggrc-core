@@ -7,6 +7,7 @@ import {
   buildCountParams,
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
+import Mappings from '../../models/mappers/mappings';
 
 (function (can, GGRC) {
   'use strict';
@@ -56,7 +57,7 @@ import {
         id: instance.id,
         type: instance.type,
       };
-      let types = type ? [type] : GGRC.Mappings.getMappingList(instance.type);
+      let types = type ? [type] : Mappings.getMappingList(instance.type);
       let countQuery = buildCountParams(types, relevant);
       let dfds = countQuery.map(batchRequests);
 

@@ -5,6 +5,7 @@
 
 import logging
 from collections import defaultdict
+from functools import partial
 import itertools
 
 from sqlalchemy.sql.expression import tuple_
@@ -223,8 +224,8 @@ def get_access_control_sort_subprop(rec, access_control_list):
       yield newrec
 
 
-def get_category_sort_subprop(rec, category_list):
-  """Get a categories_list subproperty for sorting
+def get_display_name_sort_subprop(rec, category_list):
+  """Get a display_name list subproperty for sorting
   """
   newrec = rec.copy()
   newrec.update({
@@ -235,13 +236,14 @@ def get_category_sort_subprop(rec, category_list):
   yield newrec
 
 
-def get_category_data(rec, category_item):
-  """Get category's name for fulltext indexing
+def get_display_name_data(rec, category_item, subproperty_name):
+  """Get display name for fulltext indexing
   """
   newrec = rec.copy()
   newrec.update({
       "content": category_item.get("display_name"),
-      "subproperty": "{}-category".format(category_item.get("id"))})
+      "subproperty": "{}-{}".format(category_item.get("id"),
+                                    subproperty_name)})
   yield newrec
 
 
@@ -273,20 +275,7 @@ def get_record_value(prop, val, rec):
     return itertools.chain(get_person_data(rec, val),
                            get_person_sort_subprop(rec, [val]))
   if isinstance(val, list):
-    if all([p.get("type") == "Person" for p in val]):
-      sort_getter = get_person_sort_subprop
-      item_getter = get_person_data
-    elif prop == "access_control_list":
-      sort_getter = get_access_control_sort_subprop
-      item_getter = get_access_control_role_data
-    elif prop in ("assertions", "categories"):
-      sort_getter = get_category_sort_subprop
-      item_getter = get_category_data
-    else:
-      return []
-    results = [item_getter(rec, i) for i in val]
-    results.append(sort_getter(rec, val))
-    return itertools.chain(*results)
+    return get_list_record_value(prop, rec, val)
   if isinstance(val, dict) and "title" in val:
     rec["content"] = val["title"]
   if isinstance(val, (bool, int, long)):
@@ -297,6 +286,29 @@ def get_record_value(prop, val, rec):
                  rec["type"], rec["key"], rec["property"],
                  rec["subproperty"], rec["content"])
   return []
+
+
+def get_list_record_value(prop, rec, val):
+  """Return itearble object with record as element of that object. val->list"""
+  if val and all([p.get("type") == "Person" for p in val]):
+    sort_getter = get_person_sort_subprop
+    item_getter = get_person_data
+  elif prop == "access_control_list":
+    sort_getter = get_access_control_sort_subprop
+    item_getter = get_access_control_role_data
+  elif prop in ("assertions", "categories"):
+    sort_getter = get_display_name_sort_subprop
+    item_getter = partial(get_display_name_data,
+                          subproperty_name="category")
+  elif prop == "documents_reference_url":
+    sort_getter = get_display_name_sort_subprop
+    item_getter = partial(get_display_name_data,
+                          subproperty_name="link")
+  else:
+    return []
+  results = [item_getter(rec, i) for i in val]
+  results.append(sort_getter(rec, val))
+  return itertools.chain(*results)
 
 
 def reindex_pairs(pairs):
@@ -327,7 +339,6 @@ def reindex_pairs(pairs):
       ),
       orm.load_only(
           "id",
-          "context_id",
           "parent_type",
           "parent_id",
           "child_type",
@@ -340,7 +351,6 @@ def reindex_pairs(pairs):
     revision = snapshot.revision
     snapshots[snapshot.id] = {
         "id": snapshot.id,
-        "context_id": snapshot.context_id,
         "parent_type": snapshot.parent_type,
         "parent_id": snapshot.parent_id,
         "child_type": snapshot.child_type,
@@ -360,7 +370,6 @@ def reindex_pairs(pairs):
               {
                   "key": snapshot["id"],
                   "type": "Snapshot",
-                  "context_id": snapshot["context_id"],
                   "tags": TAG_TMPL.format(**snapshot),
                   "subproperty": "",
               }

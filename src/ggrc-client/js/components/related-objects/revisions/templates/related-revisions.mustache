@@ -25,13 +25,8 @@
     <div class="flex-size-1">
     </div>
   </div>
-  {{#if loading}}
-    <div class="object-history__spinner">
-      <spinner toggle="loading"></spinner>
-    </div>
-  {{/if}}
   <div class="object-history__body {{#isLoading}}loading{{/isLoading}}">
-    <object-list {items}="visibleRevisions" {is-loading}="loading" spinner-css="grid-spinner">
+    <object-list {items}="visibleRevisions" {is-loading}="loading" {list-type}="'GRID'">
       <related-revisions-item
         class="object-history__row flex-box"
         {instance}="instance"

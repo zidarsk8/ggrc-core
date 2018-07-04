@@ -995,3 +995,9 @@ p {
     margin-top: 0px;
     margin-bottom: 0px;
 }
+
+.single-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

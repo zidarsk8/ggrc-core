@@ -36,7 +36,7 @@ from ggrc.migrations.utils.migrator import get_migration_user_id
 from ggrc.snapshotter.rules import Types
 
 
-logger = getLogger(__name__)  # pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 # revision identifiers, used by Alembic.

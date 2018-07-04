@@ -62,13 +62,10 @@ function getWidgetConfig(modelName, buildVersionFromOriginal) {
   let config;
   let isObjectVersion;
   let originalModelName;
-  let additionalFilter;
-  let responseType;
   let configObject;
 
   // Workflow approach
   if (_.isObject(modelName)) {
-    modelName.responseType = modelName.name;
     modelName.widgetName = modelName.name;
     modelName.widgetId = modelName.name;
     return modelName;
@@ -81,20 +78,12 @@ function getWidgetConfig(modelName, buildVersionFromOriginal) {
   config = _getObjectVersionConfig(modelName, buildVersionFromOriginal);
   isObjectVersion = !!config.originalModelName;
   originalModelName = config.originalModelName || modelName;
-  additionalFilter = isObjectVersion ?
-    'child_type = ' + originalModelName :
-    '';
-  responseType = isObjectVersion ?
-    'Snapshot' :
-    modelName;
 
   configObject = {
     name: originalModelName,
     widgetId: config.widgetId || modelName,
     widgetName: config.widgetName || modelName,
     countsName: modelName,
-    responseType: responseType,
-    additionalFilter: additionalFilter,
     isObjectVersion: isObjectVersion,
   };
 

@@ -62,7 +62,9 @@ export default GGRC.Components('mapperResults', {
     applyOwnedFilter: false,
     objectsPlural: false,
     relatedAssessments: {
-      state: {},
+      state: {
+        open: false,
+      },
       instance: null,
       show: false,
     },

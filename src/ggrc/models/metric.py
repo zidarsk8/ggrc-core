@@ -19,7 +19,7 @@ from ggrc.models import track_object_state
 class Metric(Personable, Roleable, Relatable,
              PublicDocumentable, track_object_state.HasObjectState,
              Commentable, TestPlanned, LastDeprecatedTimeboxed,
-             CustomAttributable, BusinessObject, Indexed, ContextRBAC,
+             CustomAttributable, BusinessObject, ContextRBAC, Indexed,
              db.Model):
   """Representation for Metric model."""
   __tablename__ = 'metrics'

@@ -5,7 +5,6 @@
 
 import collections
 import itertools
-from logging import getLogger
 
 
 class AutomappingRuleConfigError(ValueError):
@@ -17,9 +16,6 @@ TYPE_ORDERING = [['Program'],
                  ['Section', 'Clause'], ['Objective'], ['Control']]
 
 TYPE_ORDERING += [["Issue"], ["Assessment"], ["Audit", "Snapshot"]]
-
-# pylint: disable=invalid-name
-logger = getLogger(__name__)
 
 
 def get_type_levels():
@@ -42,9 +38,9 @@ def _check_rule_type_order(type_levels, *type_sets):
   try:
     levels = [{(type_levels[type_]) for type_ in set_}
               for set_ in type_sets]
-  except KeyError as e:
+  except KeyError as error:
     raise AutomappingRuleConfigError("Unknown level for {}"
-                                     .format(e.args[0]))
+                                     .format(error.args[0]))
 
   for i, level in enumerate(levels[1:], 1):
     if max(level) < min(levels[i - 1]):
@@ -101,7 +97,7 @@ class Types(object):
   directives = {'Regulation', 'Policy', 'Standard', 'Contract'}
 
 
-rules = make_rule_set(rule_list=[
+rules = make_rule_set(rule_list=[  # pylint: disable=invalid-name
     Rule(
         # mapping directive to a program
         {'Program'},

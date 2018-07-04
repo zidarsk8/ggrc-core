@@ -34,13 +34,8 @@
       <div class="flex-size-1">
       </div>
     </div>
-    {{#if isLoading}}
-      <div class="object-history__spinner">
-        <spinner toggle="isLoading"></spinner>
-      </div>
-    {{/if}}
     <div class="object-history__body {{#isLoading}}loading{{/isLoading}}">
-      <object-list {items}="relatedObjects" {is-loading}="isLoading" spinner-css="grid-spinner">
+      <object-list {items}="relatedObjects" {is-loading}="isLoading" {list-type}="'GRID'">
         <related-proposals-item
           class="object-history__row flex-box"
           {instance}="baseInstance"

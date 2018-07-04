@@ -46,12 +46,12 @@ class ModelFactory(factory.Factory, object):
         action=action,
         resource_id=instance.id,
         resource_type=instance.type,
-        context=instance.context,
         revisions=[revision],
     )
     db.session.add(revision)
     db.session.add(event)
-    indexer.update_record(instance, commit=False)
+    indexer.delete_record(instance.id, instance.type, commit=False)
+    indexer.create_record(instance, commit=False)
 
   @staticmethod
   def _get_user():

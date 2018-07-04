@@ -16,12 +16,14 @@ import {
   isAdmin,
   getPageType,
   isObjectContextPage,
+  isMyAssessments,
 } from '../../plugins/utils/current-page-utils';
 import template from './page-header.mustache';
 
 (function (GGRC, can) {
   'use strict';
   let colorsMap = {
+    OrgGroup: 'header-style-1',
     System: 'header-style-1',
     Process: 'header-style-1',
     DataAsset: 'header-style-1',
@@ -75,6 +77,11 @@ import template from './page-header.mustache';
       isObjectPage: {
         get() {
           return isObjectContextPage();
+        },
+      },
+      isMyAssessmentsPage: {
+        get() {
+          return isMyAssessments();
         },
       },
       model: {
