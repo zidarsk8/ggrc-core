@@ -6,6 +6,8 @@ import threading
 
 from flask.ext.sqlalchemy import SQLAlchemy
 
+from ggrc.utils import benchmark
+
 
 class HooksSemaphore(threading.local):
   """Special Semaphore construction that allows to run hook later."""
@@ -52,18 +54,20 @@ def get_db():
 
   def pre_commit_hooks():
     """All pre commit hooks handler."""
-    if not database.session.delay_hooks_semaphore:
-      return
-    database.session.flush()
-    if hasattr(database.session, "reindex_set"):
-      database.session.reindex_set.push_ft_records()
+    with benchmark("pre commit hooks"):
+      if not database.session.delay_hooks_semaphore:
+        return
+      database.session.flush()
+      if hasattr(database.session, "reindex_set"):
+        database.session.reindex_set.push_ft_records()
 
   def post_commit_hooks():
     """All post commit hooks handler."""
-    if not database.session.delay_hooks_semaphore:
-      return
-    from ggrc.models.hooks import acl
-    acl.after_commit()
+    with benchmark("post commit hooks"):
+      if not database.session.delay_hooks_semaphore:
+        return
+      from ggrc.models.hooks import acl
+      acl.after_commit()
 
   database.session.post_commit_hooks = post_commit_hooks
   database.session.pre_commit_hooks = pre_commit_hooks
@@ -75,7 +79,8 @@ def get_db():
     used for ACL propagation.
     """
     database.session.pre_commit_hooks()
-    database.session.plain_commit(*args, **kwargs)
+    with benchmark("plain commit"):
+      database.session.plain_commit(*args, **kwargs)
     database.session.post_commit_hooks()
 
   database.session.commit = hooked_commit
