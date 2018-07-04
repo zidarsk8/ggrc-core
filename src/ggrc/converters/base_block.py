@@ -439,6 +439,7 @@ class ImportBlockConverter(BlockConverter):
     for row in self.row_converters_from_csv():
       row.process_row()
       self._update_info(row)
+      _app_ctx_stack.top.sqlalchemy_queries = []
     if self.converter.dry_run:
       return
     if self.ignore:
