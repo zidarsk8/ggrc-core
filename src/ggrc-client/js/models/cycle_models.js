@@ -331,6 +331,11 @@ import tracker from '../tracker';
           attr_name: 'last_deprecated_date',
           attr_sort_field: 'task last deprecated date',
         },
+        {
+          attr_title: 'Task Description',
+          attr_name: 'description',
+          disable_sorting: true,
+        },
       ],
       display_attr_names: ['title',
         'status',
