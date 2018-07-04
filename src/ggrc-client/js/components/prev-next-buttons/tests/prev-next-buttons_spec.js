@@ -3,14 +3,17 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.Components.prevNextButtons', function () {
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../prev-next-buttons';
+
+describe('prev-next-buttons component', function () {
   'use strict';
 
   describe('hasNext getter', function () {
     let viewModel;
 
     beforeAll(function () {
-      viewModel = GGRC.Components.getViewModel('prevNextButtons');
+      viewModel = getComponentVM(Component);
     });
 
     it('returns true when current index is less than total',
@@ -62,7 +65,7 @@ describe('GGRC.Components.prevNextButtons', function () {
     let viewModel;
 
     beforeAll(function () {
-      viewModel = GGRC.Components.getViewModel('prevNextButtons');
+      viewModel = getComponentVM(Component);
     });
 
     it('returns true when current index is greater than 0',
@@ -90,7 +93,7 @@ describe('GGRC.Components.prevNextButtons', function () {
     let viewModel;
 
     beforeAll(function () {
-      viewModel = GGRC.Components.getViewModel('prevNextButtons');
+      viewModel = getComponentVM(Component);
     });
 
     it('increments current index when there is next item',
@@ -134,7 +137,7 @@ describe('GGRC.Components.prevNextButtons', function () {
     let viewModel;
 
     beforeAll(function () {
-      viewModel = GGRC.Components.getViewModel('prevNextButtons');
+      viewModel = getComponentVM(Component);
     });
 
     it('decrements current index when there is previous item',

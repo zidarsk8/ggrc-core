@@ -39,7 +39,7 @@ const viewModel = can.Map.extend({
   },
 });
 
-GGRC.Components('addTabButton', {
+export default can.Component.extend({
   tag: 'add-tab-button',
   template,
   viewModel,

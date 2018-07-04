@@ -5,25 +5,21 @@
 
 import template from './add-object-button.mustache';
 
-(function (can) {
-  'use strict';
-
-  GGRC.Components('addObjectButton', {
-    tag: 'add-object-button',
-    template: template,
-    viewModel: {
-      instance: null,
-      linkclass: '@',
-      content: '@',
-      text: '@',
-      singular: '@',
-      plural: '@',
-      define: {
-        noparams: {
-          type: 'htmlbool',
-          value: false,
-        },
+export default can.Component.extend({
+  tag: 'add-object-button',
+  template,
+  viewModel: {
+    instance: null,
+    linkclass: '@',
+    content: '@',
+    text: '@',
+    singular: '@',
+    plural: '@',
+    define: {
+      noparams: {
+        type: 'htmlbool',
+        value: false,
       },
     },
-  });
-})(window.can);
+  },
+});
