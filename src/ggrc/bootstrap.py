@@ -51,6 +51,7 @@ def get_db():
   def pre_commit_hooks():
     if not database.session.delay_hooks_semaphore:
       return
+    database.session.flush()
     if hasattr(database.session, "reindex_set"):
       database.session.reindex_set.push_ft_records()
 
@@ -59,7 +60,6 @@ def get_db():
       return
     from ggrc.models.hooks import acl
     acl.after_commit()
-
   database.session.post_commit_hooks = post_commit_hooks
   database.session.pre_commit_hooks = pre_commit_hooks
 
