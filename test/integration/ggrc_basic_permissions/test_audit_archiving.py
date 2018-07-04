@@ -355,12 +355,20 @@ class TestArchivedAudit(TestAuditArchivingBase):
   def test_audit_snapshot_editing(self, person, status, obj):
     """Test if {0} can edit objects in the audit context: {1} - {2}"""
     self.api.set_user(self.people[person])
-    obj_instance = getattr(self, obj)
+    obj_instance_id = getattr(self, obj).id
+    snapshot = all_models.Snapshot.query.get(obj_instance_id)
+    # update obj to create new revision
+    self.api.put(
+        all_models.Objective.query.get(snapshot.revision.resource_id),
+        {
+            "status": "Active",
+        }
+    )
     json = {
         "update_revision": "latest"
     }
 
-    response = self.api.put(obj_instance, json)
+    response = self.api.put(snapshot, json)
     assert response.status_code == status, \
         "{} put returned {} instead of {} for {}".format(
             person, response.status, status, obj)

@@ -48,6 +48,7 @@ class ImportConverter(BaseConverter):
       "delete",
       "task_type",
       "audit",
+      "assessment_template",
   ]
 
   def __init__(self, dry_run=True, csv_data=None):
@@ -81,15 +82,10 @@ class ImportConverter(BaseConverter):
     revision_ids = []
 
     for converter in self.initialize_block_converters():
-      converter.row_converters_from_csv()
-      for attr_name in self.priority_columns:
-        converter.handle_row_data(attr_name)
-      converter.handle_row_data()
-      converter.import_objects()
-      converter.import_secondary_objects()
-
+      if not converter.ignore:
+        converter.import_csv_data()
+        revision_ids.extend(converter.revision_ids)
       self.response_data.append(converter.get_info())
-      revision_ids.extend(converter.revision_ids)
 
     self._start_compute_attributes_job(revision_ids)
     self.drop_cache()

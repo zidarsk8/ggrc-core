@@ -13,10 +13,8 @@ from collections import OrderedDict
 from collections import Counter
 
 from cached_property import cached_property
-from sqlalchemy import exc
 from sqlalchemy import or_
 from sqlalchemy import and_
-from sqlalchemy.orm.exc import UnmappedInstanceError
 from flask import _app_ctx_stack
 
 from ggrc import db
@@ -27,24 +25,15 @@ from ggrc.utils import structures
 from ggrc.utils import list_chunks
 from ggrc.converters import errors
 from ggrc.converters import get_shared_unique_rules
-from ggrc.converters import pre_commit_checks
 from ggrc.converters import base_row
 from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import get_object_column_definitions
-from ggrc.services.common import get_modified_objects
-from ggrc.services.common import update_snapshot_index
-from ggrc.cache import utils as cache_utils
-from ggrc.utils.log_event import log_event
 from ggrc.services import signals
 from ggrc_workflows.models.cycle_task_group_object_task import \
     CycleTaskGroupObjectTask
 
-from ggrc.models.exceptions import StatusValidationError
-
 
 logger = getLogger(__name__)
-
-CACHE_EXPIRY_IMPORT = 600
 
 
 class BlockConverter(object):
@@ -75,6 +64,9 @@ class BlockConverter(object):
             "valid_values": "list of valid values"
 
   """
+
+  CACHE_EXPIRY_IMPORT = 600
+
   def __init__(self, converter, object_class, class_name,
                operation, object_ids=None, raw_headers=None, offset=None,
                rows=None):
@@ -105,7 +97,9 @@ class BlockConverter(object):
     self.class_name = class_name
     # TODO: remove 'if' statement. Init should initialize only.
     if self.object_class:
-      self.object_headers = get_object_column_definitions(self.object_class)
+      names = {n.strip().strip("*").lower() for n in raw_headers or []} or None
+      self.object_headers = get_object_column_definitions(self.object_class,
+                                                          names)
       if not raw_headers:
         all_header_names = [unicode(key)
                             for key in self._get_header_names().keys()]
@@ -383,8 +377,9 @@ class ImportBlockConverter(BlockConverter):
         operation="import"
     )
     self.converter = converter
-    self.unique_counts = self.get_unique_counts_dict(self.object_class)
+    self.unique_values = self.get_unique_values_dict(self.object_class)
     self.revision_ids = []
+    self._import_info = self._make_empty_info()
 
   def check_block_restrictions(self):
     """Check some block related restrictions"""
@@ -422,51 +417,31 @@ class ImportBlockConverter(BlockConverter):
     """ Generate a row converter object for every csv row """
     if self.ignore:
       return
-    self.row_converters = []
     for i, row in enumerate(self.rows):
-      row = base_row.ImportRowConverter(self, self.object_class, row=row,
+      yield base_row.ImportRowConverter(self, self.object_class, row=row,
                                         headers=self.headers, index=i)
-      self.row_converters.append(row)
 
-  def handle_row_data(self, field_list=None):
-    """Handle row data for all row converters on import.
+  @property
+  def handle_fields(self):
+    """Column definitions in correct processing order.
 
-    Note: When field_list is set, we are handling priority columns and we
-    don't have all the data needed for checking mandatory and duplicate values.
-
-    Args:
-      filed_list (list of strings): list of fields that should be handled by
-        row converters. This is used only for handling priority columns.
+    Special columns which are primary keys logically or affect the valid set of
+    columns go before usual columns.
     """
-    if self.ignore:
-      return
-    for row_converter in self.row_converters:
-      row_converter.handle_row_data(field_list)
-    if field_list is None:
-      self.check_mandatory_fields()
-      self.check_unique_columns()
+    return [
+        k for k in self.headers if k in self.converter.priority_columns
+    ] + [
+        k for k in self.headers if k not in self.converter.priority_columns
+    ]
 
-  def check_mandatory_fields(self):
-    for row_converter in self.row_converters:
-      row_converter.check_mandatory_fields()
+  def import_csv_data(self):
+    """Perform import sequence for the block."""
+    for row in self.row_converters_from_csv():
+      row.process_row()
+      self._update_info(row)
 
-  def check_unique_columns(self):
-    self.generate_unique_counts()
-    for key, counts in self.unique_counts.items():
-      self.remove_duplicate_keys(key, counts)
-
-  def generate_unique_counts(self):
-    """Populate unique_counts for sent data."""
-    for key, header in self.headers.items():
-      if not header["unique"]:
-        continue
-      for rel_index, row in enumerate(self.row_converters):
-        value = row.get_value(key)
-        if value:
-          self.unique_counts[key][value].add(self._calc_abs_index(rel_index))
-
-  def get_unique_counts_dict(self, object_class):
-    """Get the varible to storing unique counts.
+  def get_unique_values_dict(self, object_class):
+    """Get the varible to storing row numbers for unique values.
 
     Make sure to always return the same variable for object with shared tables,
     as defined in sharing rules.
@@ -475,129 +450,13 @@ class ImportBlockConverter(BlockConverter):
     classes = sharing_rules.get(object_class, object_class)
     shared_state = self.converter.shared_state
     if classes not in shared_state:
-      shared_state[classes] = defaultdict(
-          lambda: structures.CaseInsensitiveDefaultDict(set)
-      )
+      shared_state[classes] = defaultdict(structures.CaseInsensitiveDict)
     return shared_state[classes]
-
-  def import_objects(self):
-    """Add all objects to the database.
-
-    This function flushes all objects to the database if the dry_run flag is
-    not set and all signals for the imported objects get sent.
-    """
-    if self.ignore:
-      return
-
-    self._import_objects_prepare()
-
-    if not self.converter.dry_run:
-      new_objects = []
-      for row_converter in self.row_converters:
-        row_converter.send_pre_commit_signals()
-      for row_converter in self.row_converters:
-        try:
-          row_converter.insert_object()
-          db.session.flush()
-        except exc.SQLAlchemyError as err:
-          db.session.rollback()
-          logger.exception("Import failed with: %s", err.message)
-          row_converter.add_error(errors.UNKNOWN_ERROR)
-        else:
-          if row_converter.is_new and not row_converter.ignore:
-            new_objects.append(row_converter.obj)
-      self.send_collection_post_signals(new_objects)
-      import_event = self.save_import()
-      for row_converter in self.row_converters:
-        row_converter.send_post_commit_signals(event=import_event)
-
-  def _import_objects_prepare(self):
-    """Setup all objects and do pre-commit checks for them."""
-    for row_converter in self.row_converters:
-      row_converter.setup_object()
-
-    for row_converter in self.row_converters:
-      self._check_object(row_converter)
-
-    self.clean_session_from_ignored_objs()
-
-  def clean_session_from_ignored_objs(self):
-    """Clean DB session from ignored objects.
-
-    This function expunges objects from 'db.session' which are in rows that
-    marked as 'ignored' before commit.
-    """
-    for row_converter in self.row_converters:
-      obj = row_converter.obj
-      try:
-        if row_converter.do_not_expunge:
-          continue
-        if row_converter.ignore and obj in db.session:
-          db.session.expunge(obj)
-      except UnmappedInstanceError:
-        continue
-
-  def save_import(self):
-    """Commit all changes in the session and update memcache."""
-    try:
-      modified_objects = get_modified_objects(db.session)
-      import_event = log_event(db.session, None)
-      cache_utils.update_memcache_before_commit(
-          self, modified_objects, CACHE_EXPIRY_IMPORT)
-      for row_converter in self.row_converters:
-        try:
-          row_converter.send_before_commit_signals(import_event)
-        except StatusValidationError as exp:
-          status_alias = row_converter.headers.get("status",
-                                                   {}).get("display_name")
-          row_converter.add_error(
-              errors.VALIDATION_ERROR,
-              column_name=status_alias,
-              message=exp.message
-          )
-      db.session.commit()
-      self._store_revision_ids(import_event)
-      cache_utils.update_memcache_after_commit(self)
-      update_snapshot_index(db.session, modified_objects)
-      return import_event
-    except exc.SQLAlchemyError as err:
-      db.session.rollback()
-      logger.exception("Import failed with: %s", err.message)
-      self.add_errors(errors.UNKNOWN_ERROR, line=self.offset + 2)
 
   def _store_revision_ids(self, event):
     """Store revision ids from the current event."""
     if event:
       self.revision_ids.extend(revision.id for revision in event.revisions)
-
-  def import_secondary_objects(self):
-    """Import secondary objects procedure."""
-    for row_converter in self.row_converters:
-      row_converter.setup_secondary_objects()
-
-    if not self.converter.dry_run:
-      for row_converter in self.row_converters:
-        try:
-          row_converter.insert_secondary_objects()
-        except exc.SQLAlchemyError as err:
-          db.session.rollback()
-          logger.exception("Import failed with: %s", err.message)
-          row_converter.add_error(errors.UNKNOWN_ERROR)
-      self.save_import()
-
-  @staticmethod
-  def _check_object(row_converter):
-    """Check object if it has any pre commit checks.
-
-    The check functions can mutate the row_converter object and mark it
-    to be ignored if there are any errors detected.
-
-    Args:
-        row_converter: Row converter for the row we want to check.
-    """
-    checker = pre_commit_checks.CHECKS.get(type(row_converter.obj).__name__)
-    if checker and callable(checker):
-      checker(row_converter)
 
   @staticmethod
   def send_collection_post_signals(new_objects):
@@ -616,86 +475,45 @@ class ImportBlockConverter(BlockConverter):
 
   def get_info(self):
     """Returns info dict for current block."""
-    created = 0
-    updated = 0
-    ignored = 0
-    deleted = 0
-    deprecated = 0
-    for row in self.row_converters:
-      if row.ignore:
-        ignored += 1
-        continue
-      if row.is_delete:
-        deleted += 1
-        continue
-      if row.is_new:
-        created += 1
-      else:
-        updated += 1
-      deprecated += int(row.is_deprecated)
-    info = {
-        "name": self.name,
-        "rows": len(self.rows),
-        "created": created,
-        "updated": updated,
-        "ignored": ignored,
-        "deleted": deleted,
-        "deprecated": deprecated,
+    info = self._import_info.copy()
+    info.update({
         "block_warnings": self.block_warnings,
         "block_errors": self.block_errors,
         "row_warnings": self.row_warnings,
         "row_errors": self.row_errors,
-    }
-
+    })
     return info
 
-  def _in_range(self, index, remove_offset=True):
-    """Checks if the value provided lays within the range of lines of the
-    current block
-    """
-    if remove_offset:
-      index = self._calc_offset(index)
-    return index >= 0 and index < len(self.row_converters)
+  def _make_empty_info(self):
+    """Empty info dict with all counts zero."""
+    return {
+        "name": self.name,
+        "rows": 0,
+        "created": 0,
+        "updated": 0,
+        "ignored": 0,
+        "deleted": 0,
+        "deprecated": 0,
+        "block_warnings": [],
+        "block_errors": [],
+        "row_warnings": [],
+        "row_errors": [],
+    }
 
-  def _calc_offset(self, index):
-    """Calculate an offset relative to the current block beginning
-    given an absolute line index
-    """
-    return index - self.BLOCK_OFFSET - self.offset
+  def _update_info(self, row):
+    """Update counts for info response from row metadata."""
+    self._import_info["rows"] += 1
+    if row.ignore:
+      self._import_info["ignored"] += 1
+    elif row.is_delete:
+      self._import_info["deleted"] += 1
+    elif row.is_new:
+      self._import_info["created"] += 1
+    else:
+      self._import_info["updated"] += 1
 
-  def _calc_abs_index(self, rel_index):
-    """Calculate an absolute line number given a relative index
-    """
-    return rel_index + self.BLOCK_OFFSET + self.offset
-
-  def remove_duplicate_keys(self, key, counts):
-
-    for value, indexes in counts.items():
-      if not any(self._in_range(index) for index in indexes):
-        continue  # ignore duplicates in other related code blocks
-
-      indexes = sorted(list(indexes))
-      if len(indexes) > 1:
-        str_indexes = [str(index) for index in indexes]
-        self.row_errors.append(
-            errors.DUPLICATE_VALUE_IN_CSV.format(
-                line_list=", ".join(str_indexes),
-                column_name=self.headers[key]["display_name"],
-                s="s" if len(str_indexes) > 2 else "",
-                value=value,
-                ignore_lines=", ".join(str_indexes[1:]),
-            )
-        )
-        if key == "slug":  # mark obj not to be expunged from the session
-          for index in indexes:
-            offset_index = self._calc_offset(index)
-            if self._in_range(offset_index, remove_offset=False):
-              self.row_converters[offset_index].set_do_not_expunge()
-
-      for index in indexes[1:]:
-        offset_index = self._calc_offset(index)
-        if self._in_range(offset_index, remove_offset=False):
-          self.row_converters[offset_index].set_ignore()
+    if row.is_deprecated:
+      self._import_info["deprecated"] += 1
 
 
 class ExportBlockConverter(BlockConverter):

@@ -41,6 +41,7 @@ class ColumnHandler(object):
     self.key = key
     self.value = None
     self.set_empty = False
+    self.is_duplicate = False
     self.raw_value = options.get("raw_value", "").strip()
     self.validator = options.get("validator")
     self.mandatory = options.get("mandatory", False)
@@ -65,12 +66,13 @@ class ColumnHandler(object):
       return
     if not self.row_converter.obj:
       return
-    nr_duplicates = self.row_converter.object_class.query.filter(
-        and_(
-            getattr(self.row_converter.object_class, self.key) == self.value,
-            self.row_converter.object_class.id != self.row_converter.obj.id
-        )
-    ).count()
+    if self.is_duplicate:
+      # a hack to avoid two different errors for the same non-unique cell
+      return
+    nr_duplicates = self.row_converter.object_class.query.filter(and_(
+        getattr(self.row_converter.object_class, self.key) == self.value,
+        self.row_converter.object_class.id != self.row_converter.obj.id
+    )).count()
     if nr_duplicates > 0:
       self.add_error(
           errors.DUPLICATE_VALUE, column_name=self.key, value=self.value
