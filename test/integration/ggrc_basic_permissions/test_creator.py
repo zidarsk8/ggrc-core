@@ -50,13 +50,13 @@ class TestCreator(TestCase):
     creator_id = self.users["creator"].id
     audit_id = factories.AuditFactory().id
     all_errors = []
-    base_models = set([
+    base_models = {
         "Control", "DataAsset", "Contract",
         "Policy", "Regulation", "Standard", "Document", "Facility",
         "Market", "Objective", "OrgGroup", "Vendor", "Product",
         "Clause", "System", "Process", "Project", "AccessGroup",
-        "Metric", "TechnologyEnvironment",
-    ])
+        "Metric", "ProductGroup", "TechnologyEnvironment"
+    }
     for model_singular in base_models:
       try:
         model = get_model(model_singular)

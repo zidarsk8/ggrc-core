@@ -19,7 +19,7 @@ class TestAccessControlList(unittest.TestCase):
       'Control', 'DataAsset', 'Facility', 'Issue', 'Market',
       'Objective', 'OrgGroup', 'Policy', 'Process', 'Product', 'Project',
       'Program', 'Regulation', 'Risk', 'Section', 'Standard', 'System',
-      'System', 'Process', 'Threat', 'Vendor', 'Metric',
+      'System', 'Process', 'Threat', 'Vendor', 'Metric', 'ProductGroup',
       'TechnologyEnvironment')
 
   @data(*ACL_OBJECTS)

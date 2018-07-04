@@ -529,6 +529,12 @@ class MetricFactory(TitledFactory):
     model = all_models.Metric
 
 
+class ProductGroupFactory(TitledFactory):
+
+  class Meta:
+    model = all_models.ProductGroup
+
+
 def get_model_factory(model_name):
   """Get object factory for provided model name"""
   from integration.ggrc_workflows.models import factories as wf_factories
@@ -577,5 +583,6 @@ def get_model_factory(model_name):
       "ImportExport": ImportExportFactory,
       "Metric": MetricFactory,
       "TechnologyEnvironment": TechnologyEnvironmentFactory,
+      "ProductGroup": ProductGroupFactory,
   }
   return model_factories[model_name]

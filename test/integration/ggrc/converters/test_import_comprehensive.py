@@ -179,7 +179,14 @@ class TestComprehensiveSheets(TestCase):
             "row_errors": 3,
             "row_warnings": 4,
             "rows": 16,
-        }
+        },
+        "Product Group": {
+            "created": 14,
+            "ignored": 2,
+            "row_errors": 3,
+            "row_warnings": 4,
+            "rows": 16,
+        },
     }
 
     # general numbers check
