@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import Proposal from '../../models/proposal';
+import Proposal from '../../models/service-models/proposal';
 import template from './templates/create-proposal.mustache';
 import {hasPending as hasPendingUtil} from '../../plugins/ggrc_utils';
 import {

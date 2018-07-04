@@ -4,7 +4,7 @@
 */
 
 import './infinite-scroll-controller';
-import RecentlyViewedObject from '../models/recently_viewed_object';
+import RecentlyViewedObject from '../models/local-storage/recently-viewed-object';
 import tracker from '../tracker';
 import RefreshQueue from '../models/refresh_queue';
 
