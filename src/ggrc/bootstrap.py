@@ -28,10 +28,10 @@ def get_db():
 
   database.session.plain_commit = database.session.commit
 
-  class PostCommitHooksSemaphore(threading.local):
+  class HooksSemaphore(threading.local):
 
     def __init__(self, *args, **kwargs):
-      super(PostCommitHooksSemaphore, self).__init__(*args, **kwargs)
+      super(HooksSemaphore, self).__init__(*args, **kwargs)
       self._flag = True
 
 
@@ -46,17 +46,22 @@ def get_db():
 
     __nonzero__ = __bool__
 
-  database.session.post_commit_semaphore = PostCommitHooksSemaphore()
+  database.session.delay_hooks_semaphore = HooksSemaphore()
 
-  def post_commit_hooks():
-    if not database.session.post_commit_semaphore:
+  def pre_commit_hooks():
+    if not database.session.delay_hooks_semaphore:
       return
-    from ggrc.models.hooks import acl
     if hasattr(database.session, "reindex_set"):
       database.session.reindex_set.push_ft_records()
+
+  def post_commit_hooks():
+    if not database.session.delay_hooks_semaphore:
+      return
+    from ggrc.models.hooks import acl
     acl.after_commit()
 
   database.session.post_commit_hooks = post_commit_hooks
+  database.session.pre_commit_hooks = pre_commit_hooks
 
   def hooked_commit(*args, **kwargs):
     """Commit override function.
@@ -64,6 +69,7 @@ def get_db():
     This function is meant for a single after commit hook that should only be
     used for ACL propagation.
     """
+    database.session.pre_commit_hooks()
     database.session.plain_commit(*args, **kwargs)
     database.session.post_commit_hooks()
 

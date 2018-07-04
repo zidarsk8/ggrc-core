@@ -443,7 +443,7 @@ class ImportBlockConverter(BlockConverter):
       return
     if self.ignore:
       return
-    db.session.post_commit_semaphore.enable()
+    db.session.delay_hooks_semaphore.enable()
     db.session.commit()
 
   def get_unique_values_dict(self, object_class):
