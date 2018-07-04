@@ -46,6 +46,8 @@ class ReindexSet(threading.local):
 
   def push_ft_records(self):
     with benchmark("push ft records into DB"):
+      if self._pool:
+        self.warmup()
       for obj in db.session:
         if not isinstance(obj, mixin.Indexed):
           continue
