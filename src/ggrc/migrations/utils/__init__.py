@@ -227,6 +227,18 @@ def create_missing_admins(connection, migration_user_id, admin_role_id,
 
   If we have 'create' revision -> take modified_by_id as Admin
   else set current migration user as Admin
+
+  If there are multiple 'create' revisions, take each distinct modified_by_id
+  as Admin, because there is no way of knowing which of the duplicate revisions
+  is correct.
+
+  Args:
+    connection: SQLAlchemy connection object;
+    migration_user_id: the id of Migrator user (used as a default Admin);
+    admin_role_id: ACR.id of the correct Admin role;
+    table_name: name of the table with ids of objects with no Admins;
+    object_type: string name of object type processed (e.g. 'Document');
+    revision_action: the value for Revision.action field (e.g. 'created').
   """
   sql = """
       INSERT INTO access_control_list (
@@ -239,9 +251,9 @@ def create_missing_admins(connection, migration_user_id, admin_role_id,
         updated_at)
       SELECT
         IF(r.modified_by_id is NOT NULL,
-           r.modified_by_id, {migration_user_id}),
+           r.modified_by_id, {migration_user_id}) as person_id,
         :admin_role_id,
-        twoa.id,
+        twoa.id as object_id,
         :object_type,
         NOW(),
         :migration_user_id,
@@ -251,6 +263,7 @@ def create_missing_admins(connection, migration_user_id, admin_role_id,
           r.resource_id=twoa.id
           AND r.resource_type=:object_type
           AND r.action=:revision_action
+      GROUP BY object_id, person_id
   """.format(migration_user_id=migration_user_id,
              table_mame=table_mame)
   connection.execute(
