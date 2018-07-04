@@ -223,7 +223,7 @@ Indexer = MysqlIndexer
 
 
 @event.listens_for(db.session.__class__, 'before_commit')
-def update_indexer_phase_1(session):  # pylint:disable=unused-argument
+def update_indexer(session):  # pylint:disable=unused-argument
   """General function to update index
 
   for all updated related instance before commit"""
