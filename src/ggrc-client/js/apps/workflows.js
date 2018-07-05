@@ -245,20 +245,6 @@ import Mappings from '../models/mappers/mappings';
           'cycle_task_group_object_task'),
         workflow: Cross('cycle', 'workflow'),
       },
-      Person: {
-        assigned_tasks: Search(function (binding) {
-          return CMS.Models.CycleTaskGroupObjectTask.findAll({
-            contact_id: binding.instance.id,
-            'cycle.is_current': true,
-            status__in: 'Assigned,In Progress,Finished,Declined,Deprecated',
-          });
-        }, 'Cycle'),
-        assigned_tasks_with_history: Search(function (binding) {
-          return CMS.Models.CycleTaskGroupObjectTask.findAll({
-            contact_id: binding.instance.id,
-          });
-        }, 'Cycle'),
-      },
     };
 
     // Insert `workflows` mappings to all business object types
@@ -399,12 +385,6 @@ import Mappings from '../models/mappers/mappings';
               GGRC.mustache_path +
               '/cycle_task_group_object_tasks/tree_add_item.mustache',
             draw_children: true,
-            events: {
-              'show-history': function (el, ev) {
-                this.options.attr('mapping', el.attr('mapping'));
-                this.reload_list();
-              },
-            },
           },
         },
       };
@@ -546,12 +526,6 @@ import Mappings from '../models/mappers/mappings';
             '/cycle_task_group_object_tasks/tree_add_item.mustache',
           draw_children: true,
           showBulkUpdate: !isObjectBrowser,
-          events: {
-            'show-history': function (el, ev) {
-              this.options.attr('mapping', el.attr('mapping'));
-              this.reload_list();
-            },
-          },
         },
       },
     };
