@@ -33,7 +33,8 @@ class ReindexSet(threading.local):
 
   def warmup(self):
     """Function on pre-commit that collects objects keychain."""
-    for for_index in self._pool:
+    while self._pool:
+      for_index = self._pool.pop()
       if for_index not in db.session:
         continue
       type_name, id_value = for_index.get_reindex_pair()
@@ -43,21 +44,19 @@ class ReindexSet(threading.local):
         db.session.flush()
         type_name, id_value = for_index.get_reindex_pair()
       self.model_ids_to_reindex[type_name].add(id_value)
-    self._pool = set()
 
   def push_ft_records(self):
     """Function that clear and push new full text records in DB."""
     with benchmark("push ft records into DB"):
-      if self._pool:
-        self.warmup()
+      self.warmup()
       for obj in db.session:
         if not isinstance(obj, mixin.Indexed):
           continue
         if obj.id in self.model_ids_to_reindex.get(obj.type, set()):
           db.session.expire(obj)
-      for model_name, ids in self.model_ids_to_reindex.iteritems():
+      for model_name in self.model_ids_to_reindex.keys():
+        ids = self.model_ids_to_reindex.pop(model_name)
         get_model(model_name).bulk_record_update_for(ids)
-      self.model_ids_to_reindex = defaultdict(set)
 
 
 def _runner(mapper, content, target):  # pylint:disable=unused-argument
