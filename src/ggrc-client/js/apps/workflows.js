@@ -410,10 +410,7 @@ import Mappings from '../models/mappers/mappings';
       };
     }
 
-    new GGRC.WidgetList('ggrc_workflows', descriptor, [
-      'info',
-      'task',
-    ]);
+    new GGRC.WidgetList('ggrc_workflows', descriptor);
   };
 
   WorkflowExtension.init_widgets_for_workflow_page = function () {
@@ -569,10 +566,7 @@ import Mappings from '../models/mappers/mappings';
         },
       };
     }
-    new GGRC.WidgetList('ggrc_workflows', descriptor, [
-      'info',
-      'task',
-    ]);
+    new GGRC.WidgetList('ggrc_workflows', descriptor);
   };
 
   registerHook(
