@@ -7,7 +7,7 @@ import './mappers';
 import './mixins';
 import './cacheable';
 import './save_queue';
-import './models-extentions';
+import './models-extensions';
 
 import './business-models';
 import './custom-attributes';
