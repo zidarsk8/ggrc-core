@@ -35,7 +35,8 @@ div.nav {
       li {
         &.access_group, &.clause, &.contract, &.control, &.data_asset, &.facility,
         &.market, &.objective, &.org_group, &.policy, &.process, &.product, &.metric,
-        &.regulation, &.section, &.standard, &.system, &.vendor, &.risk, &.threat {
+        &.regulation, &.section, &.standard, &.system, &.vendor, &.risk,
+        &.technology_environment, &.threat {
           a {
             color: $blue;
             opacity: 1;

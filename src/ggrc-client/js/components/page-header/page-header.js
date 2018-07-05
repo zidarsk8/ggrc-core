@@ -36,6 +36,7 @@ import template from './page-header.mustache';
     Assessment: 'header-style-2',
     Issue: 'header-style-3',
     Risk: 'header-style-3',
+    TechnologyEnvironment: 'header-style-1',
     Threat: 'header-style-3',
     Regulation: 'header-style-4',
     Policy: 'header-style-4',

@@ -30,6 +30,7 @@ class Types(object):
       "System",
       "Vendor",
       "Risk",
+      "TechnologyEnvironment",
       "Threat",
       "Metric"
   }

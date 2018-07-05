@@ -41,6 +41,7 @@ import {registerHook} from '../plugins/ggrc_utils';
     'Section',
     'Standard',
     'System',
+    'TechnologyEnvironment',
     'Vendor',
   ];
   let relatedObjectDescriptors = {};
@@ -99,6 +100,8 @@ import {registerHook} from '../plugins/ggrc_utils';
         related_people: TypeFilter('related_objects', 'Person'),
         related_org_groups: TypeFilter('related_objects', 'OrgGroup'),
         related_vendors: TypeFilter('related_objects', 'Vendor'),
+        related_technology_environments: TypeFilter('related_objects',
+          'TechnologyEnvironment'),
 
       },
       related_risk: {

@@ -172,6 +172,13 @@ class TestComprehensiveSheets(TestCase):
             "row_errors": 3,
             "row_warnings": 4,
             "rows": 16,
+        },
+        "Technology Environment": {
+            "created": 14,
+            "ignored": 2,
+            "row_errors": 3,
+            "row_warnings": 4,
+            "rows": 16,
         }
     }
 

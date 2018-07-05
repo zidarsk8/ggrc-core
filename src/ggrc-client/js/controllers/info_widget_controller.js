@@ -115,6 +115,7 @@ export default can.Control({
         'Section',
         'Standard',
         'System',
+        'TechnologyEnvironment',
         'Threat',
         'Vendor',
       ];
