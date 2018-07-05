@@ -80,6 +80,9 @@ alphabetically):
   among others, when a PR fixes a blocking issue or a severe issue that needs
   to be shipped to production in the shortest time possible. Should be used
   sparsely,
+- ``complex`` - the PR has the high complexity and should be reviewed by 
+  experienced team member(s). Reviewers should consider it as PR complexity,
+  not as PR importance,
 - ``documentation`` - the PR contains updates to project documentation,
 - ``migration`` - the PR contains a migration script that changes the
   database schema. Such pull requests require additional setup and
