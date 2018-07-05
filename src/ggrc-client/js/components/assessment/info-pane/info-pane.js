@@ -286,26 +286,41 @@ export default can.Component.extend({
       let createdItems = event.items;
       let success = event.success;
       let items = this.attr(type);
-      let resultList = items
-        .map(function (item) {
-          createdItems.forEach(function (newItem) {
-            if (item._stamp && item._stamp === newItem._stamp) {
-              if (!success) {
-                newItem.attr('isNotSaved', true);
-              }
-              newItem.removeAttr('_stamp');
-              newItem.removeAttr('isDraft');
-              item = newItem;
-            }
-          });
-          return item;
-        })
-        .filter(function (item) {
-          return !item.attr('isNotSaved');
-        });
-      this.attr('isUpdating' + can.capitalize(type), false);
 
-      items.replace(resultList);
+      can.batch.start();
+      if (success) {
+        createdItems.forEach((newItem) => {
+          let item = _.find(
+            items,
+            (item) => item._stamp && item._stamp === newItem._stamp
+          );
+
+          if (!item) {
+            return;
+          }
+
+          // apply new values of properties
+          item.attr(newItem);
+
+          // remove unneeded attrs
+          item.removeAttr('_stamp');
+          item.removeAttr('isDraft');
+        });
+      } else {
+        // remove all "createdItems" from "items" with the same "_stamp"
+        let resultItems = items.filter((item) => {
+          let newItemIndex = _.findIndex(createdItems, (newItem) => {
+            return newItem._stamp === item._stamp;
+          });
+
+          return newItemIndex < 0;
+        });
+
+        items.replace(resultItems);
+      }
+      can.batch.stop();
+
+      this.attr('isUpdating' + can.capitalize(type), false);
     },
     addItems: function (event, type) {
       let items = event.items;
