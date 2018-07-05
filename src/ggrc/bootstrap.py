@@ -9,11 +9,11 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from ggrc.utils import benchmark
 
 
-class HooksSemaphore(threading.local):
+class CommitHooksEnableFlag(threading.local):
   """Special Semaphore construction that allows to run hook later."""
 
   def __init__(self, *args, **kwargs):
-    super(HooksSemaphore, self).__init__(*args, **kwargs)
+    super(CommitHooksEnableFlag, self).__init__(*args, **kwargs)
     self._flag = True
 
   def enable(self):
@@ -50,12 +50,12 @@ def get_db():
 
   database.session.plain_commit = database.session.commit
 
-  database.session.delay_hooks_semaphore = HooksSemaphore()
+  database.session.commit_hooks_enable_flag = CommitHooksEnableFlag()
 
   def pre_commit_hooks():
     """All pre commit hooks handler."""
     with benchmark("pre commit hooks"):
-      if not database.session.delay_hooks_semaphore:
+      if not database.session.commit_hooks_enable_flag:
         return
       database.session.flush()
       if hasattr(database.session, "reindex_set"):
@@ -64,7 +64,7 @@ def get_db():
   def post_commit_hooks():
     """All post commit hooks handler."""
     with benchmark("post commit hooks"):
-      if not database.session.delay_hooks_semaphore:
+      if not database.session.commit_hooks_enable_flag:
         return
       from ggrc.models.hooks import acl
       acl.after_commit()

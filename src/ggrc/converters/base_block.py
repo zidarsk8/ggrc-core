@@ -444,7 +444,7 @@ class ImportBlockConverter(BlockConverter):
       return
     if self.ignore:
       return
-    db.session.delay_hooks_semaphore.enable()
+    db.session.commit_hooks_enable_flag.enable()
     db.session.commit()
 
   def get_unique_values_dict(self, object_class):

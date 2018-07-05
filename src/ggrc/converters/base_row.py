@@ -317,7 +317,7 @@ class ImportRowConverter(RowConverter):
         self.add_error(errors.VALIDATION_ERROR,
                        column_name=status_alias,
                        message=exp.message)
-      db.session.delay_hooks_semaphore.disable()
+      db.session.commit_hooks_enable_flag.disable()
       db.session.commit()
       self.block_converter._store_revision_ids(import_event)
       cache_utils.update_memcache_after_commit(self.block_converter)
