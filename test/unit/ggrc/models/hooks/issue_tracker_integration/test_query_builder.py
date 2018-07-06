@@ -29,12 +29,14 @@ class TestBaseIssueTrackerQueryBuilder(unittest.TestCase):
   )
   def test_handle_issue_tracker_info_for_failure(self, issue_tracker_info):
     """Test 'handle_issue_tracker_info' method for failure cases."""
+    mock_object = mock.MagicMock()
     with self.assertRaises(exceptions.ValidationError):
-      self.builder.handle_issue_tracker_info(issue_tracker_info)
+      self.builder.handle_issue_tracker_info(mock_object, issue_tracker_info)
 
   def test_handle_issue_tracker_info(self):
     """Test 'handle_issue_tracker_info' method."""
     # Arrange test data.
+    mock_object = mock.MagicMock()
     issue_tracker_info = {
         "component_id": "123",
         "hotlist_id": 321,
@@ -53,7 +55,7 @@ class TestBaseIssueTrackerQueryBuilder(unittest.TestCase):
     }
 
     # Perform action.
-    self.builder.handle_issue_tracker_info(issue_tracker_info)
+    self.builder.handle_issue_tracker_info(mock_object, issue_tracker_info)
 
     # Assert results.
     self.assertEquals(self.builder.issue_tracker_query, expected_result)
