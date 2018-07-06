@@ -292,12 +292,6 @@ import Mappings from '../models/mappers/mappings';
 
       CMS.Models[type].attributes.task_group_objects =
         'CMS.Models.TaskGroupObject.stubs';
-
-      // Also register a render hook for object approval
-      registerHook(
-        type + '.info_widget_actions',
-        GGRC.mustache_path + '/base_objects/approval_link.mustache'
-      );
     });
     new Mappings('ggrc_workflows', mappings);
   };

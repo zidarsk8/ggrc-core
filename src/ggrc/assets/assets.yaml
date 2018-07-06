@@ -195,7 +195,6 @@ dashboard-js-template-files:
   - base_objects/task_group_subtree_footer.mustache
   - base_objects/task_group_subtree_add_item.mustache
   - base_objects/task_group_subtree.mustache
-  - base_objects/approval_link.mustache
   - cycles/info.mustache
   - cycle_task_entries/tree.mustache
   - cycle_task_entries/tree_add_item.mustache

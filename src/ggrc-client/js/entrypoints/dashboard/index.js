@@ -44,7 +44,7 @@ import '../../components/external-data-autocomplete/external-data-autocomplete';
 
 import '../../components/custom-roles/custom-roles';
 import '../../components/custom-roles/custom-roles-modal';
-import '../../components/review-link/review-link';
+import '../../components/approval-link/approval-link';
 
 import '../../common-handlers';
 
