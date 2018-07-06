@@ -44,6 +44,7 @@ import Mappings from '../../models/mappers/mappings';
     Section: 'Objective',
     Regulation: 'Section',
     Product: 'System',
+    ProductGroup: 'Product',
     Standard: 'Section',
     Contract: 'Clause',
     Control: 'Objective',

@@ -32,6 +32,7 @@ describe('Mappings', function () {
         'Policy',
         'Process',
         'Product',
+        'ProductGroup',
         'Program',
         'Project',
         'Regulation',
@@ -117,6 +118,7 @@ describe('Mappings', function () {
     Policy: _.difference(filtered, directives),
     Process: filtered,
     Product: filtered,
+    ProductGroup: filtered,
     Program: _.difference(allTypes,
       ['Program', 'Audit', 'RiskAssessment', 'Assessment']
         .concat(modules.core.notMappable, modules.workflows.notMappable)),

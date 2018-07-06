@@ -55,6 +55,7 @@ import Mappings from '../models/mappers/mappings';
         section: CMS.Models.Section,
         clause: CMS.Models.Clause,
         person: CMS.Models.Person,
+        product_group: CMS.Models.ProductGroup,
         role: CMS.Models.Role,
         technology_environment: CMS.Models.TechnologyEnvironment,
         threat: CMS.Models.Threat,
@@ -345,6 +346,10 @@ import Mappings from '../models/mappers/mappings';
             mapping: 'related_products',
             draw_children: true,
           },
+          ProductGroup: {
+            mapping: 'related_product_groups',
+            draw_children: true,
+          },
           Project: {
             mapping: 'related_projects',
             draw_children: true,
@@ -627,6 +632,9 @@ import Mappings from '../models/mappers/mappings';
         Product: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
         },
+        ProductGroup: {
+          _mixins: ['governance_objects', 'business_objects', 'issues'],
+        },
         Project: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
         },
@@ -718,6 +726,10 @@ import Mappings from '../models/mappers/mappings';
           },
           Product: {
             mapping: 'extended_related_products_via_search',
+            draw_children: true,
+          },
+          ProductGroup: {
+            mapping: 'extended_related_product_groups_via_search',
             draw_children: true,
           },
           Project: {
