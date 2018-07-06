@@ -124,6 +124,7 @@ class TestExportSnapshots(TestCase):
             "Assertions": u"\n".join(c.name for c in control.assertions),
             "Categories": u"\n".join(c.name for c in control.categories),
             "Folder": u"",
+            "Archived": u"yes" if audit.archived else u"no",
             # Computed attributes
             "Last Assessment Date": u"",
             "Admin": u"admin@example.com\ncreator@example.com\n"
@@ -229,6 +230,7 @@ class TestExportSnapshots(TestCase):
             "Type/Means": u"",
             # Special snapshot export fields
             "Audit": audit.slug,
+            "Archived": u"yes" if audit.archived else u"no",
             # Computed attributes
             "Last Assessment Date": u"",
             "Recipients": "",
@@ -450,6 +452,7 @@ class TestExportSnapshots(TestCase):
           'Last Updated Date': control.updated_at.strftime(DATE_FORMAT_US),
           'Last Updated By': "",
           "Folder": u"",
+          "Archived": u"yes" if audit.archived else u"no",
       }
       control_dicts[control.slug].update(**control_acr_people[control.slug])
 
