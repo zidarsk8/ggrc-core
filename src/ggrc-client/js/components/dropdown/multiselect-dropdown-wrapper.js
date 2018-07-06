@@ -64,13 +64,19 @@ export default can.Component.extend({
       Retrieved from Model.cache by Id and sent up to parent`s 'selected'
     */
     'multiselect-dropdown multiselect:changed':
-      function (element, event, selected) {
+      function (element, event, newSelected) {
         let self = this;
 
-        this.viewModel.attr('selected', _.map(selected, (item)=> {
-          return CMS.Models[self.viewModel.modelName]
-            .findInCacheById(item.id);
-        }));
+        /* reuse object to allow sort-by properly react
+        on selected change */
+        let selected = self.viewModel.attr('selected') || [];
+        // remove all old items
+        selected.splice(0);
+        // add all new items from Cache
+        newSelected.forEach((item) => {
+          selected.push(CMS.Models[self.viewModel.modelName]
+            .findInCacheById(item.id));
+        });
       },
   },
 });

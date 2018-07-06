@@ -144,6 +144,18 @@ describe('multiselectDropdownWrapper component', function () {
 
     beforeEach(function () {
       viewModel.attr('modelName', 'TestType');
+      viewModel.attr('selected', [
+        {
+          id: 2,
+          name: '2 item',
+          extra: 'extra',
+        },
+        {
+          id: 3,
+          name: '3 item',
+          extra: 'extra',
+        },
+      ]);
 
       events = Component.prototype.events;
       handler = events['multiselect-dropdown multiselect:changed']
@@ -165,6 +177,12 @@ describe('multiselectDropdownWrapper component', function () {
       expect(viewModel.selected[0].id).toEqual('testId');
       expect(viewModel.selected[0].name).toEqual('testName');
       expect(viewModel.selected[0].extra).toEqual('extra');
+    });
+
+    it('should keep an object', () => {
+      let initialObj = viewModel.selected;
+      handler({}, {}, newSelected);
+      expect(viewModel.selected).toEqual(initialObj);
     });
   });
 });
