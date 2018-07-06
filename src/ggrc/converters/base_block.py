@@ -436,16 +436,22 @@ class ImportBlockConverter(BlockConverter):
 
   def import_csv_data(self):
     """Perform import sequence for the block."""
-    for row in self.row_converters_from_csv():
-      row.process_row()
-      self._update_info(row)
-      _app_ctx_stack.top.sqlalchemy_queries = []
-    if self.converter.dry_run:
-      return
-    if self.ignore:
-      return
-    db.session.commit_hooks_enable_flag.enable()
-    db.session.commit()
+    try:
+      for row in self.row_converters_from_csv():
+        try:
+          row.process_row()
+        except Exception:  # pylint: disable=broad-except
+          row.add_error(errors.UNKNOWN_ERROR)
+          logger.exception("Unexpected error on import")
+        self._update_info(row)
+        _app_ctx_stack.top.sqlalchemy_queries = []
+    except Exception:  # pylint: disable=broad-except
+      logger.exception("Unexpected error on import")
+    finally:
+      db.session.commit_hooks_enable_flag.enable()
+      is_final_commit_required = not (self.converter.dry_run or self.ignore)
+      if is_final_commit_required:
+        db.session.commit()
 
   def get_unique_values_dict(self, object_class):
     """Get the varible to storing row numbers for unique values.
