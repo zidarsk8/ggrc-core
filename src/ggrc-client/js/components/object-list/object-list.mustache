@@ -19,11 +19,11 @@
           </div>
         </show-more>
       {{else}}
-        {{#items}}
+        {{#each items}}
           <div class="object-list__item {{#isSelected}}object-list__item-selected{{/isSelected}}" ($click)="modifySelection">
               <content>No item component or template is provided</content>
           </div>
-        {{/items}}
+        {{/each}}
       {{/if}}
   {{else}}
       <div class="object-list__item object-list__item-empty">

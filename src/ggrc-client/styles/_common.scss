@@ -586,10 +586,10 @@ p {
   .dropdown-menu,
   .dropdown-list {
     @extend %clearfix;
-    width: 320px;
+    width: 400px;
     .inner-nav-item {
       float: left;
-      width: 160px;
+      width: 200px;
     }
     &.right-pos {
       right: 0;

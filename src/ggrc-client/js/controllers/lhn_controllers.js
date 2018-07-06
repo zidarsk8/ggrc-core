@@ -4,7 +4,7 @@
 */
 
 import './infinite-scroll-controller';
-import RecentlyViewedObject from '../models/recently_viewed_object';
+import RecentlyViewedObject from '../models/local-storage/recently-viewed-object';
 import tracker from '../tracker';
 import RefreshQueue from '../models/refresh_queue';
 
@@ -226,11 +226,10 @@ can.Control('CMS.Controllers.LHN', {
   hide_lhn: function () {
     // UI-revamp
     // Here we should hide the button ||| also
-    var $area = $('.area')
-        , $lhsHolder = $('.lhs-holder')
-        , $bar = $('.bar-v')
-        , $lhnTrigger = $('.lhn-trigger')
-        ;
+    var $area = $('.area'),
+      $lhsHolder = $('.lhs-holder'),
+      $bar = $('.bar-v'),
+      $lhnTrigger = $('.lhn-trigger');
 
     this.element.hide();
     $lhsHolder.css('width', 0);
@@ -376,11 +375,10 @@ can.Control('CMS.Controllers.LHN_Search', {
   }
 }, {
   display: function () {
-    var self = this
-        , prefs = this.options.display_prefs
-        , prefs_dfd
-        , template_path = GGRC.mustache_path + this.element.data('template')
-        ;
+    var self = this,
+      prefs = this.options.display_prefs,
+      prefs_dfd,
+      template_path = GGRC.mustache_path + this.element.data('template');
 
     prefs_dfd = CMS.Models.DisplayPrefs.getSingleton();
 
@@ -389,11 +387,10 @@ can.Control('CMS.Controllers.LHN_Search', {
       //  We also listen for this value in the controller
       //  to trigger the search.
     return can.view(template_path, prefs_dfd.then(function (prefs) { return prefs.getLHNState(); })).then(function (frag, xhr) {
-      var lhn_prefs = prefs.getLHNState()
-          , initial_term
-          , initial_params = {}
-          , saved_filters = prefs.getLHNState().filter_params
-          ;
+      var lhn_prefs = prefs.getLHNState(),
+        initial_term,
+        initial_params = {},
+        saved_filters = prefs.getLHNState().filter_params;
 
       self.element.html(frag);
       self.post_init();
@@ -481,11 +478,10 @@ can.Control('CMS.Controllers.LHN_Search', {
     }
   },
   toggle_list_visibility: function (el, dont_update_prefs) {
-    var sub_selector = this.options.list_content_selector + ',' + this.options.actions_content_selector
-        , mid_selector = this.options.list_mid_level_selector
-        , $parent = el.parent('li')
-        , selector
-        ;
+    var sub_selector = this.options.list_content_selector + ',' + this.options.actions_content_selector,
+      mid_selector = this.options.list_mid_level_selector,
+      $parent = el.parent('li'),
+      selector;
 
     if ($parent.find(mid_selector).size()) {
       selector = mid_selector;
@@ -509,13 +505,12 @@ can.Control('CMS.Controllers.LHN_Search', {
   },
   open_list: function (el, $ul, selector, dont_update_prefs) {
       // Use a cached max-height if one exists
-    var holder = el.closest('.lhs-holder')
-      , $content = $ul.filter([this.options.list_content_selector,
-                               this.options.list_mid_level_selector].join(','))
-      , $siblings = selector ? $ul.closest('.lhs').find(selector) : $(false)
-      , extra_height = 0
-      , top
-      ;
+    var holder = el.closest('.lhs-holder'),
+      $content = $ul.filter([this.options.list_content_selector,
+                               this.options.list_mid_level_selector].join(',')),
+      $siblings = selector ? $ul.closest('.lhs').find(selector) : $(false),
+      extra_height = 0,
+      top;
 
       // Collapse other lists
     var $mids = $ul.closest('.lhs').find(this.options.list_mid_level_selector)
@@ -593,9 +588,8 @@ can.Control('CMS.Controllers.LHN_Search', {
 
 
     if ($content.length) {
-      var last_height = this._holder_height
-          , holder = this.element.closest('.lhs-holder')
-          ;
+      var last_height = this._holder_height,
+        holder = this.element.closest('.lhs-holder');
       this._holder_height = holder.outerHeight();
 
 
@@ -607,10 +601,9 @@ can.Control('CMS.Controllers.LHN_Search', {
     }
   },
   on_show_list: function (el, ev) {
-    var $list = $(el).closest(this.get_lists())
-        , model_name = this.get_list_model($list)
-        , that = this
-        ;
+    var $list = $(el).closest(this.get_lists()),
+      model_name = this.get_list_model($list),
+      that = this;
     let stopFn = tracker.start(
       `LHN: ${model_name}`,
       tracker.USER_JOURNEY_KEYS.LOADING,
@@ -632,14 +625,13 @@ can.Control('CMS.Controllers.LHN_Search', {
     if (this._show_more_pending)
       return;
 
-    var that = this
-        , $list = $el.closest(this.get_lists())
-        , model_name = this.get_list_model($list)
-        , visible_list = this.options.visible_lists[model_name]
-        , results_list = this.options.results_lists[model_name]
-        , refresh_queue
-        , new_visible_list
-        ;
+    var that = this,
+      $list = $el.closest(this.get_lists()),
+      model_name = this.get_list_model($list),
+      visible_list = this.options.visible_lists[model_name],
+      results_list = this.options.results_lists[model_name],
+      refresh_queue,
+      new_visible_list;
     let stopFn = tracker.start(
       `LHN: ${model_name}`,
       tracker.USER_JOURNEY_KEYS.LOADING,
@@ -691,13 +683,13 @@ can.Control('CMS.Controllers.LHN_Search', {
       model_name = self.get_list_model($list);
 
       var context = {
-        model: CMS.Models[model_name]
-          , filter_params: self.options.filter_params
-          , list: self.options.visible_lists[model_name]
-          , counts: self.options.counts
-          , count: can.compute(function () {
-            return self.options.results_lists[model_name].attr('length');
-          })
+        model: CMS.Models[model_name],
+        filter_params: self.options.filter_params,
+        list: self.options.visible_lists[model_name],
+        counts: self.options.counts,
+        count: can.compute(function () {
+          return self.options.results_lists[model_name].attr('length');
+        })
       };
 
       can.view($list.data('template') || self.options.list_view, context, function (frag, xhr) {
@@ -770,18 +762,17 @@ can.Control('CMS.Controllers.LHN_Search', {
     });
   },
   display_lists: function (search_result) {
-    var self = this
-        , lists = this.get_visible_lists()
-        , dfds = []
-        ;
+    var self = this,
+      lists = this.get_visible_lists(),
+      dfds = [];
 
     can.each(lists, function (list) {
-      var dfd
-          , $list = $(list)
-          , model_name = self.get_list_model($list)
-          , results = search_result.getResultsForType(model_name)
-          , refresh_queue = new RefreshQueue()
-          , initial_visible_list = null;
+      var dfd,
+        $list = $(list),
+        model_name = self.get_list_model($list),
+        results = search_result.getResultsForType(model_name),
+        refresh_queue = new RefreshQueue(),
+        initial_visible_list = null;
 
 
       self.options.results_lists[model_name].replace(results);
@@ -958,9 +949,9 @@ can.Control('CMS.Controllers.LHN_Search', {
 
 can.Control('GGRC.Controllers.RecentlyViewed', {
   defaults: {
-    list_view: GGRC.mustache_path + '/dashboard/recently_viewed_list.mustache'
-      , max_history: 10
-      , max_display: 3
+    list_view: GGRC.mustache_path + '/dashboard/recently_viewed_list.mustache',
+    max_history: 10,
+    max_display: 3
   }
 }, {
   init: function () {

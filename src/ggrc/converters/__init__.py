@@ -61,6 +61,9 @@ GGRC_IMPORTABLE = {
     "system": all_models.System,
     "vendor": all_models.Vendor,
     "metric": all_models.Metric,
+    "technology environment": all_models.TechnologyEnvironment,
+    "technology_environment": all_models.TechnologyEnvironment,
+    "technologyenvironment": all_models.TechnologyEnvironment,
 }
 
 GGRC_EXPORTABLE = {

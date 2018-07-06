@@ -178,6 +178,7 @@ permissions = {
         "Process",
         "Metric",
         "Program",
+        "TechnologyEnvironment",
         "Context",
         {
             "type": "BackgroundTask",

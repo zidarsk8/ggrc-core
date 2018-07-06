@@ -51,6 +51,7 @@ class TestTotalReindex(TestCase):
       'TaskGroupObject': 5,
       'TaskGroupTask': 4,
       'Workflow': 6,
+      'TechnologyEnvironment': 8,
       'Product': 18,
       'Metric': 8,
   }

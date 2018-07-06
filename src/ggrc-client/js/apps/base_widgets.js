@@ -36,6 +36,7 @@
     'Section',
     'Standard',
     'System',
+    'TechnologyEnvironment',
     'Threat',
     'Vendor',
   ];
@@ -50,6 +51,7 @@
     Product: 60,
     System: 70,
     Metric: 75,
+    TechnologyEnvironment: 77,
     Process: 80,
     Audit: 90,
     Person: 100,
@@ -118,6 +120,7 @@
       ['Contract', 'Policy', 'Regulation', 'Standard']),
     System: filteredTypes,
     Risk: filteredTypes,
+    TechnologyEnvironment: filteredTypes,
     Threat: filteredTypes,
     Vendor: filteredTypes,
   };

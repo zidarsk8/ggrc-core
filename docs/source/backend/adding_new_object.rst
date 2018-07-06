@@ -149,7 +149,7 @@ And then init the hook inside your module:
 
 ..  code-block:: javascript
 
-    GGRC.register_hook("LHN.Sections_new_object", GGRC.mustache_path + "/dashboard/lhn_new_object");
+    registerHook("LHN.Sections_new_object", GGRC.mustache_path + "/dashboard/lhn_new_object");
 
 Create mustache files
 ---------------------

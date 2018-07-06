@@ -9,74 +9,6 @@ import Component from '../mapped-controls';
 
 describe('GGRC.Component.assessmentMappedControl', () => {
   let viewModel;
-  const defaultResponseArr = [
-    {
-      Snapshot: {
-        values: [],
-      },
-    }, {
-      Snapshot: {
-        values: [],
-      },
-    }];
-  const noDataResponseArr = defaultResponseArr;
-  const params = {
-    data: [
-      {
-        object_name: 'Snapshot',
-        filters: {
-          expression: {
-            left: {
-              left: 'child_type',
-              op: {name: '='},
-              right: 'Objective'},
-            op: {name: 'AND'},
-            right: {
-              object_name: 'Snapshot',
-              op: {name: 'relevant'},
-              ids: ['1'],
-            },
-          },
-          keys: [],
-          order_by: {
-            keys: [],
-            order: '',
-            compare: null,
-          },
-        },
-        fields: ['revision'],
-      }, {
-        object_name: 'Snapshot',
-        filters: {
-          expression: {
-            left: {
-              left: 'child_type',
-              op: {name: '='},
-              right: 'Regulation',
-            },
-            op: {name: 'AND'},
-            right: {
-              object_name: 'Snapshot',
-              op: {name: 'relevant'},
-              ids: ['1'],
-            },
-          },
-          keys: [],
-          order_by: {
-            keys: [],
-            order: '',
-            compare: null,
-          },
-        },
-        fields: ['revision'],
-      }],
-  };
-  const selectedItem = {
-    data: {
-      id: 1,
-    },
-  };
-
   beforeEach(() => {
     viewModel = new (can.Map.extend(Component.prototype.viewModel));
   });
@@ -85,110 +17,48 @@ describe('GGRC.Component.assessmentMappedControl', () => {
     let pendingRequest;
     beforeEach(() => {
       pendingRequest = $.Deferred();
-      spyOn(SnapshotUtils, 'toObject');
-      spyOn(viewModel, 'setItems');
-      spyOn(viewModel, 'getParams')
-        .and.returnValue(params);
-      spyOn(QueryAPI, 'makeRequest')
+      spyOn(SnapshotUtils, 'toObject').and.callFake((obj)=> obj);
+      spyOn(QueryAPI, 'batchRequests')
         .and.returnValue(pendingRequest);
+      spyOn(viewModel, 'getParams').and.returnValue([{
+        type: 'testType',
+        request: 'mockRequest',
+      }]);
     });
 
-    it('sets default items when control was not selected', () => {
-      viewModel.loadItems();
-
-      expect(viewModel.setItems)
-        .toHaveBeenCalledWith(defaultResponseArr);
-    });
-
-    it('sets items when no data returned', () => {
-      viewModel.attr('selectedItem', selectedItem);
-
-      viewModel.loadItems();
-      expect(viewModel.getParams).toHaveBeenCalled();
-      expect(viewModel.attr('isLoading')).toBeTruthy();
-
-      pendingRequest.resolve(noDataResponseArr);
-      expect(viewModel.setItems)
-        .toHaveBeenCalledWith(noDataResponseArr);
-      expect(viewModel.attr('isLoading')).toBeFalsy();
-    });
-
-    it('sets items when appropriate data returned', () => {
-      const dataResponseArr = [{
-        id: 2,
-      }];
-      viewModel.attr('selectedItem', selectedItem);
-
-      viewModel.loadItems();
-      expect(viewModel.getParams).toHaveBeenCalled();
-      expect(viewModel.attr('isLoading')).toBeTruthy();
-
-      pendingRequest.resolve(dataResponseArr);
-      expect(viewModel.setItems)
-        .toHaveBeenCalledWith(dataResponseArr);
-      expect(viewModel.attr('isLoading')).toBeFalsy();
-    });
-
-    it('sets default items when request fails', () => {
-      viewModel.attr('selectedItem', selectedItem);
-      spyOn($.prototype, 'trigger');
-
-      viewModel.loadItems();
-
-      expect(viewModel.attr('isLoading')).toBeTruthy();
-
-      pendingRequest.reject();
-      expect($.prototype.trigger)
-        .toHaveBeenCalledWith('ajax:flash',
-          {error: 'Failed to fetch related objects.'});
-      expect(viewModel.setItems)
-        .toHaveBeenCalledWith(defaultResponseArr);
-      expect(viewModel.attr('isLoading')).toBeFalsy();
-    });
-  });
-
-  describe('setItems() method', () => {
-    const dummyObject = {
-      id: 1,
-    };
-    beforeEach(() => {
-      spyOn(SnapshotUtils, 'toObject')
-        .and.returnValue(dummyObject);
-    });
-
-    it('sets empty array when empty response', () => {
-      viewModel.setItems(noDataResponseArr);
-
-      expect(viewModel.attr('objectives.length'))
-        .toEqual(0);
-      expect(viewModel.attr('regulations.length'))
-        .toEqual(0);
-    });
-
-    it('sets an appropriate items for non empty response', () => {
-      const response = [
-        {
-          Snapshot: {
-            values: [
-              {
-                id: 2,
-              }],
-          },
+    it('sets items when appropriate data returned', (done) => {
+      let items = ['i1', 'i2'];
+      let response = {
+        Snapshot: {
+          values: items,
         },
-        {
-          Snapshot: {
-            values: [],
-          },
-        }];
+      };
 
-      viewModel.setItems(response);
+      viewModel.loadItems(1);
 
-      expect(viewModel.attr('objectives.length'))
-        .toEqual(1);
-      expect(viewModel.attr('objectives.0.id'))
-        .toEqual(1);
-      expect(viewModel.attr('regulations.length'))
-        .toEqual(0);
+      expect(viewModel.getParams).toHaveBeenCalled();
+      expect(viewModel.attr('isLoading')).toBeTruthy();
+
+      pendingRequest.resolve(response).then(()=> {
+        expect(viewModel.attr('isLoading')).toBeFalsy();
+        expect(viewModel.attr('testType').attr()).toEqual(items);
+        done();
+      });
+    });
+
+    it('turns off spinner when request fails', (done) => {
+      spyOn(GGRC.Errors, 'notifier');
+
+      viewModel.loadItems(1);
+
+      expect(viewModel.attr('isLoading')).toBeTruthy();
+
+      pendingRequest.reject().then(null, ()=> {
+        expect(viewModel.attr('isLoading')).toBeFalsy();
+        expect(GGRC.Errors.notifier)
+          .toHaveBeenCalledWith('error', 'Failed to fetch related objects.');
+        done();
+      });
     });
   });
 });

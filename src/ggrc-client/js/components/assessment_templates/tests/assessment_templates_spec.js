@@ -105,7 +105,7 @@ describe('assessmentTemplates', ()=> {
 
   describe('init() method', ()=> {
     const reqParam = {};
-    let makeRequestDfd;
+    let batchRequestsDfd;
     let method;
 
     beforeAll(()=> {
@@ -115,7 +115,7 @@ describe('assessmentTemplates', ()=> {
     });
 
     beforeEach(()=> {
-      makeRequestDfd = can.Deferred();
+      batchRequestsDfd = can.Deferred();
       viewModel.attr('instance', {
         id: 1,
         type: 'AssessmentTemplate',
@@ -123,8 +123,8 @@ describe('assessmentTemplates', ()=> {
 
       spyOn(QueryAPI, 'buildParam')
         .and.returnValue(reqParam);
-      spyOn(QueryAPI, 'makeRequest')
-        .and.returnValue(makeRequestDfd);
+      spyOn(QueryAPI, 'batchRequests')
+        .and.returnValue(batchRequestsDfd);
       spyOn(viewModel, '_selectInitialTemplate');
     });
 
@@ -133,8 +133,8 @@ describe('assessmentTemplates', ()=> {
 
       expect(QueryAPI.buildParam)
         .toHaveBeenCalled();
-      expect(QueryAPI.makeRequest)
-        .toHaveBeenCalledWith({data: [reqParam]});
+      expect(QueryAPI.batchRequests)
+        .toHaveBeenCalledWith(reqParam);
     });
 
     it('sets initial Assessment Template', ()=> {
@@ -142,11 +142,11 @@ describe('assessmentTemplates', ()=> {
 
       method();
 
-      makeRequestDfd.resolve([{
+      batchRequestsDfd.resolve({
         AssessmentTemplate: {
           values: [],
         },
-      }]);
+      });
 
       expect(viewModel._selectInitialTemplate)
         .toHaveBeenCalled();
@@ -157,11 +157,11 @@ describe('assessmentTemplates', ()=> {
 
       method();
 
-      makeRequestDfd.resolve([{
+      batchRequestsDfd.resolve({
         AssessmentTemplate: {
           values: [],
         },
-      }]);
+      });
 
       expect(viewModel.dispatch)
         .toHaveBeenCalledWith('assessmentTemplateLoaded');

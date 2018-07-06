@@ -43,7 +43,8 @@ class TestTaskGroupImport(workflow_test_case.WorkflowTestCase):
       (threat.Threat.__name__, True),
       (all_models.Assessment.__name__, False),
       (all_models.Audit.__name__, False),
-      (all_models.Metric.__name__, True)
+      (all_models.Metric.__name__, True),
+      (all_models.TechnologyEnvironment.__name__, True),
   )
   @ddt.unpack
   def test_task_group_import_objects(self, model_name, is_mapped):

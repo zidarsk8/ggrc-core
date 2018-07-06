@@ -70,6 +70,7 @@ from ggrc.models.label import Label
 from ggrc.models.object_label import ObjectLabel
 from ggrc.models.person_profile import PersonProfile
 from ggrc.models.metric import Metric
+from ggrc.models.technology_environment import TechnologyEnvironment
 
 all_models = [  # pylint: disable=invalid-name
     # data platform models
@@ -139,6 +140,7 @@ all_models = [  # pylint: disable=invalid-name
     Snapshot,
     Maintenance,
     ImportExport,
+    TechnologyEnvironment,
 ]
 
 __all__ = [m.__name__ for m in all_models]

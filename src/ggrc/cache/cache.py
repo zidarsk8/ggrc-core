@@ -59,6 +59,7 @@ def all_cache_entries():
       resource('issues', 'Issue'),
       resource('snapshots', 'Snapshot'),
       resource('metrics', 'Metric'),
+      resource('technology_environments', 'TechnologyEnvironment'),
 
       # ggrc notification models
       resource('notification_configs', 'NotificationConfig'),

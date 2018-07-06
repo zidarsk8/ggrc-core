@@ -6,7 +6,7 @@
 import '../sortable-column/sortable-column';
 import {REFRESH_RELATED} from '../../events/eventTypes';
 import {
-  makeRequest,
+  batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import Pagination from '../base-objects/pagination';
 
@@ -73,7 +73,6 @@ import Pagination from '../base-objects/pagination';
         let relatedType = this.attr('relatedItemsType');
         let isSnapshot = !!this.attr('baseInstance.snapshot');
         let filters;
-        let params = {};
 
         if (isSnapshot) {
           id = this.attr('baseInstance.snapshot.child_id');
@@ -83,12 +82,12 @@ import Pagination from '../base-objects/pagination';
           type = this.attr('baseInstance.type');
         }
         filters = this.getFilters(id, type);
-        params.data = [{
+        let params = {
           limit: this.attr('paging.limits'),
           object_name: relatedType,
           order_by: this.getSortingInfo(),
           filters: filters,
-        }];
+        };
         return params;
       },
       loadRelatedItems: function () {
@@ -96,10 +95,9 @@ import Pagination from '../base-objects/pagination';
         let params = this.getParams();
         this.attr('isLoading', true);
 
-        makeRequest(params)
-          .done(function (responseArr) {
+        batchRequests(params)
+          .done(function (data) {
             let relatedType = this.attr('relatedItemsType');
-            let data = responseArr[0];
             let values = data[relatedType].values;
             let result = values.map(function (item) {
               return {

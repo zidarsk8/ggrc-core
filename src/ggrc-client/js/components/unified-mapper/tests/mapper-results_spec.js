@@ -638,19 +638,20 @@ describe('GGRC.Components.mapperResults', function () {
         .and.returnValue({
           queryIndex: 0,
           relatedQueryIndex: 1,
+          request: [],
         });
       spyOn(viewModel, 'transformValue')
         .and.returnValue('transformedValue');
       spyOn(viewModel, 'setSelectedItems');
       spyOn(viewModel, 'setDisabledItems');
       dfdRequest = $.Deferred();
-      spyOn(QueryAPI, 'makeRequest')
+      spyOn(QueryAPI, 'batchRequests');
+      spyOn(can, 'when')
         .and.returnValue(dfdRequest.promise());
     });
 
     it('calls viewModel.setSelectedItems()', function () {
-      let responseArr = [data, relatedData];
-      dfdRequest.resolve(responseArr);
+      dfdRequest.resolve(data, relatedData);
       viewModel.load();
       expect(viewModel.setSelectedItems)
         .toHaveBeenCalledWith(expectedResult);
@@ -658,36 +659,31 @@ describe('GGRC.Components.mapperResults', function () {
 
     it('calls viewModel.setDisabledItems() if relatedData is defined',
       function () {
-        let responseArr;
         relatedData = {
           program: {
             ids: 'ids',
           },
         };
-        responseArr = [data, relatedData];
-        dfdRequest.resolve(responseArr);
+        dfdRequest.resolve(data, relatedData);
         viewModel.load();
         expect(viewModel.setDisabledItems)
           .toHaveBeenCalledWith(expectedResult, 'ids');
       });
 
     it('updates paging', function () {
-      let responseArr = [data, relatedData];
-      dfdRequest.resolve(responseArr);
+      dfdRequest.resolve(data, relatedData);
       viewModel.load();
       expect(viewModel.attr('paging.total')).toEqual(4);
     });
 
     it('sets isLoading to false', function () {
-      let responseArr = [data, relatedData];
-      dfdRequest.resolve(responseArr);
+      dfdRequest.resolve(data, relatedData);
       viewModel.load();
       expect(viewModel.attr('isLoading')).toEqual(false);
     });
 
     it('returns promise with array of items', function (done) {
-      let responseArr = [data, relatedData];
-      dfdRequest.resolve(responseArr);
+      dfdRequest.resolve(data, relatedData);
       resultDfd = viewModel.load();
       expect(resultDfd.state()).toEqual('resolved');
       resultDfd.then(function (result) {
@@ -728,7 +724,8 @@ describe('GGRC.Components.mapperResults', function () {
     beforeEach(function () {
       viewModel.attr({});
       dfdRequest = can.Deferred();
-      spyOn(QueryAPI, 'makeRequest')
+      spyOn(QueryAPI, 'batchRequests');
+      spyOn(can, 'when')
         .and.returnValue(dfdRequest.promise());
       spyOn(viewModel, 'getModelKey')
         .and.returnValue('program');
@@ -736,14 +733,14 @@ describe('GGRC.Components.mapperResults', function () {
         .and.returnValue({
           queryIndex: 0,
           relatedQueryIndex: 1,
+          request: [],
         });
       spyOn(viewModel, 'transformValue')
         .and.returnValue('transformedValue');
     });
 
     it('rerturns promise with items', function (done) {
-      let responseArr = [data, filters];
-      dfdRequest.resolve(responseArr);
+      dfdRequest.resolve(data, filters);
       viewModel.attr('objectGenerator', true);
       resultDfd = viewModel.loadAllItemsIds();
       expect(resultDfd.state()).toEqual('resolved');
@@ -755,8 +752,7 @@ describe('GGRC.Components.mapperResults', function () {
 
     it('performs extra mapping validation in case Assessment generation',
       function (done) {
-        let responseArr = [data, filters];
-        dfdRequest.resolve(responseArr);
+        dfdRequest.resolve(data, filters);
         viewModel.attr('objectGenerator', false);
         resultDfd = viewModel.loadAllItemsIds();
         expect(resultDfd.state()).toEqual('resolved');

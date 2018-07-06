@@ -10,6 +10,7 @@ import {
   TypeFilter,
 } from '../models/mappers/mapper-helpers';
 import Mappings from '../models/mappers/mappings';
+import {registerHook} from '../plugins/ggrc_utils';
 
 (function ($, CMS, GGRC) {
   let RisksExtension = {};
@@ -40,6 +41,7 @@ import Mappings from '../models/mappers/mappings';
     'Section',
     'Standard',
     'System',
+    'TechnologyEnvironment',
     'Vendor',
   ];
   let relatedObjectDescriptors = {};
@@ -98,6 +100,8 @@ import Mappings from '../models/mappers/mappings';
         related_people: TypeFilter('related_objects', 'Person'),
         related_org_groups: TypeFilter('related_objects', 'OrgGroup'),
         related_vendors: TypeFilter('related_objects', 'Vendor'),
+        related_technology_environments: TypeFilter('related_objects',
+          'TechnologyEnvironment'),
 
       },
       related_risk: {
@@ -317,7 +321,7 @@ import Mappings from '../models/mappers/mappings';
     new GGRC.WidgetList('ggrc_risks', descriptor);
   };
 
-  GGRC.register_hook('LHN.Sections_risk',
+  registerHook('LHN.Sections_risk',
     GGRC.mustache_path + '/dashboard/lhn_risks');
 
   RisksExtension.init_mappings();

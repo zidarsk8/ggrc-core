@@ -328,6 +328,7 @@ class Revision(base.ContextRBAC, Base, db.Model):
         "Section",
         "System",
         "Vendor",
+        "TechnologyEnvironment",
 
         # ggrc_risks
         "Risk",

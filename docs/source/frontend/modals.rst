@@ -15,8 +15,6 @@ Modals
 -  Spawns modals; named that way for historical reasons (Rails)
 -  A big click handler - looking at the ``data-toggle`` attribute to
    figure out which modal to open: ``data-toggle=modal-ajax``
--  ``GGRC.register_global_hook`` instantiates modals based on links that
-   have that attribute
 -  The biggest one is form - all the edit object modals
 -  We apply modals controller in this file as well
 -  We are handling modal:success on modal-ajax.js. It's used to navigate
@@ -30,8 +28,6 @@ Modals
 -  `line
    451 <https://github.com/reciprocity/ggrc-core/blob/1e370e487c4377d7e1162dd881954cc26cffe5a9/src/ggrc/assets/javascripts/bootstrap/modal-ajax.js#L451>`_
    extends the Bootstrap model
--  ``GGRC.register_global_hook`` can be used to add a special modal for
-   a module
 -  if you click Delete, a new modal is displayed, `lines
    119-151 <https://github.com/reciprocity/ggrc-core/blob/1e370e487c4377d7e1162dd881954cc26cffe5a9/src/ggrc/assets/javascripts/bootstrap/modal-ajax.js#L119-L151>`_
 
