@@ -38,7 +38,7 @@ import './system';
 import './system-or-process';
 import './task-group';
 import './task-group-task';
-import './technology_environment';
+import './technology-environment';
 import './threat';
 import './vendor';
 import './workflow';
