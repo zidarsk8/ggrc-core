@@ -52,6 +52,7 @@ class TestSlugPrefix(unittest.TestCase):
       'Vendor': 'VENDOR',
       'Workflow': 'WORKFLOW',
       'Metric': 'METRIC',
+      'ProductGroup': 'PRODUCTGROUP',
       'TechnologyEnvironment': 'TECHNOLOGYENVIRONMENT',
   }
 

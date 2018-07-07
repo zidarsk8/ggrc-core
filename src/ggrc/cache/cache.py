@@ -58,6 +58,7 @@ def all_cache_entries():
       resource('processes', 'Process'),
       resource('issues', 'Issue'),
       resource('snapshots', 'Snapshot'),
+      resource('product_groups', 'ProductGroup'),
       resource('metrics', 'Metric'),
       resource('technology_environments', 'TechnologyEnvironment'),
 

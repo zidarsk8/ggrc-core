@@ -65,6 +65,7 @@ class PersonResource(common.ExtendedResource):
       "Vendor": 0,
       "CycleTaskGroupObjectTask": 0,
       "Metric": 0,
+      "ProductGroup": 0,
   }
 
   ALL_OBJECTS = {
@@ -98,6 +99,7 @@ class PersonResource(common.ExtendedResource):
       "CycleTaskGroupObjectTask": 0,
       "Workflow": 0,
       "Metric": 0,
+      "ProductGroup": 0,
   }
 
   @classmethod

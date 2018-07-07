@@ -74,7 +74,6 @@ def _parse_object_data(object_data):
 
 def _add_subtree(tree, role_name, parent_id, with_update):
   """Add propagated roles for the given tree.
-
   keys of the tree must contain object data in form of "object_type RUD"
   strings or a list of those strings.
   """
@@ -162,7 +161,6 @@ def propagate_roles(propagation_rules, with_update=False):
 
 def remove_propagated_roles(object_type, role_names):
   """Remove propagated roles.
-
   Args:
     object_type: type of object for role deletion.
     role_names: list of role names for the given object type whose propagations
@@ -203,7 +201,6 @@ def remove_propagated_roles(object_type, role_names):
 
 def remove_deprecated_roles(role_names):
   """Remove old propagation roles.
-
   This should be used for previous propagation roles ending with keyword
   Mapped.
   """

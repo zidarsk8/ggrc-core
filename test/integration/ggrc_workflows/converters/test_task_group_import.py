@@ -44,6 +44,7 @@ class TestTaskGroupImport(workflow_test_case.WorkflowTestCase):
       (all_models.Assessment.__name__, False),
       (all_models.Audit.__name__, False),
       (all_models.Metric.__name__, True),
+      (all_models.ProductGroup.__name__, True),
       (all_models.TechnologyEnvironment.__name__, True),
   )
   @ddt.unpack

@@ -54,6 +54,7 @@ class TestTotalReindex(TestCase):
       'TechnologyEnvironment': 8,
       'Product': 18,
       'Metric': 8,
+      'ProductGroup': 8,
   }
 
   def setUp(self):
@@ -79,6 +80,7 @@ class TestTotalReindex(TestCase):
       ggrc_factories.DocumentFactory,
       ggrc_factories.MetricFactory,
       ggrc_factories.ProductFactory,
+      ggrc_factories.ProductGroupFactory,
       wf_factories.CycleFactory,
       wf_factories.CycleTaskGroupFactory,
       wf_factories.CycleTaskEntryFactory,

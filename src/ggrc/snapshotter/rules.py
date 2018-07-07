@@ -32,7 +32,8 @@ class Types(object):
       "Risk",
       "TechnologyEnvironment",
       "Threat",
-      "Metric"
+      "Metric",
+      "ProductGroup",
   }
 
   parents = {

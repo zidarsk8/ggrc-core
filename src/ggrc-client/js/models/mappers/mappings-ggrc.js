@@ -29,8 +29,8 @@ import Mappings from './mappings';
       related_business_objects: Multi([
         'related_data_assets', 'related_facilities', 'related_markets',
         'related_org_groups', 'related_vendors', 'related_processes',
-        'related_products', 'related_projects', 'related_systems',
-        'related_metrics', 'related_technology_environments',
+        'related_products', 'related_product_groups', 'related_projects',
+        'related_systems', 'related_metrics', 'related_technology_environments',
       ]),
       related_and_able_objects: Multi([
         'objectives', 'related_business_objects',
@@ -85,11 +85,11 @@ import Mappings from './mappings';
       _canonical: {
         related_objects_as_source: [
           'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
-          'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
-          'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
-          'Objective', 'Audit', 'Assessment', 'AssessmentTemplate',
-          'AccessGroup', 'Risk', 'Threat', 'Document', 'Metric',
-          'TechnologyEnvironment',
+          'Product', 'ProductGroup', 'Project', 'System', 'Regulation',
+          'Policy', 'Contract', 'Standard', 'Program', 'Issue', 'Control',
+          'Section', 'Clause', 'Objective', 'Audit', 'Assessment',
+          'AssessmentTemplate', 'AccessGroup', 'Risk', 'Threat', 'Document',
+          'Metric', 'TechnologyEnvironment',
         ],
       },
       related_objects_as_source: Proxy(
@@ -110,6 +110,7 @@ import Mappings from './mappings';
       related_vendors: TypeFilter('related_objects', 'Vendor'),
       related_processes: TypeFilter('related_objects', 'Process'),
       related_products: TypeFilter('related_objects', 'Product'),
+      related_product_groups: TypeFilter('related_objects', 'ProductGroup'),
       related_projects: TypeFilter('related_objects', 'Project'),
       related_systems: TypeFilter('related_objects', 'System'),
       related_issues: TypeFilter('related_objects', 'Issue'),
@@ -229,6 +230,9 @@ import Mappings from './mappings';
     Product: {
       _mixins: ['business_object'],
     },
+    ProductGroup: {
+      _mixins: ['business_object'],
+    },
     Project: {
       _mixins: ['business_object'],
     },
@@ -247,8 +251,8 @@ import Mappings from './mappings';
           'Program', 'Regulation', 'Contract', 'Policy', 'Standard',
           'AccessGroup', 'Objective', 'Control', 'Section', 'Clause',
           'DataAsset', 'Facility', 'Market', 'Metric', 'OrgGroup', 'Vendor',
-          'Process', 'Product', 'Project', 'System', 'Issue', 'Risk', 'Threat',
-          'TechnologyEnvironment'],
+          'Process', 'Product', 'ProductGroup', 'Project', 'System', 'Issue',
+          'Risk', 'Threat', 'TechnologyEnvironment'],
         authorizations: 'UserRole',
       },
       owned_programs: Indirect('Program', 'contact'),
@@ -269,6 +273,7 @@ import Mappings from './mappings';
       owned_vendors: Indirect('Vendor', 'contact'),
       owned_processes: Indirect('Process', 'contact'),
       owned_products: Indirect('Product', 'contact'),
+      owned_product_groups: Indirect('ProductGroup', 'contact'),
       owned_projects: Indirect('Project', 'contact'),
       owned_systems: Indirect('System', 'contact'),
       owned_risks: Indirect('Risk', 'contact'),
@@ -295,6 +300,7 @@ import Mappings from './mappings';
       related_vendors: TypeFilter('related_objects', 'Vendor'),
       related_processes: TypeFilter('related_objects', 'Process'),
       related_products: TypeFilter('related_objects', 'Product'),
+      related_product_groups: TypeFilter('related_objects', 'ProductGroup'),
       related_projects: TypeFilter('related_objects', 'Project'),
       related_systems: TypeFilter('related_objects', 'System'),
       related_issues: TypeFilter('related_objects', 'Issue'),
@@ -329,6 +335,8 @@ import Mappings from './mappings';
       extended_related_processes:
         Multi(['related_processes', 'owned_processes']),
       extended_related_products: Multi(['related_products', 'owned_products']),
+      extended_related_product_groups:
+        Multi(['related_product_groups', 'owned_product_groups']),
       extended_related_projects: Multi(['related_projects', 'owned_projects']),
       extended_related_systems: Multi(['related_systems', 'owned_systems']),
       extended_related_technology_environments:
@@ -351,7 +359,7 @@ import Mappings from './mappings';
         });
       }, 'Program,Regulation,Contract,Policy,Standard,Section,Clause,' +
         'Objective,Control,System,Process,DataAsset,AccessGroup,Product,' +
-        'Project,Facility,Market,Metric,OrgGroup,Vendor,' +
+        'ProductGroup,Project,Facility,Market,Metric,OrgGroup,Vendor,' +
         'Audit,Assessment,Issue,Risk,Threat,TechnologyEnvironment'),
       extended_related_programs_via_search:
         TypeFilter('related_objects_via_search', 'Program'),
@@ -389,6 +397,8 @@ import Mappings from './mappings';
         TypeFilter('related_objects_via_search', 'Process'),
       extended_related_products_via_search:
         TypeFilter('related_objects_via_search', 'Product'),
+      extended_related_product_groups_via_search:
+        TypeFilter('related_objects_via_search', 'ProductGroup'),
       extended_related_projects_via_search:
         TypeFilter('related_objects_via_search', 'Project'),
       extended_related_systems_via_search:

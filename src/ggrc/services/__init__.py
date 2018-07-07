@@ -72,7 +72,8 @@ def contributed_services():
       service('proposals', models.Proposal),
       service('related_assessments', None,
               related_assessments.RelatedAssessmentsResource),
-      service('technology_environments', models.TechnologyEnvironment)
+      service('technology_environments', models.TechnologyEnvironment),
+      service('product_groups', models.ProductGroup),
   ]
 
 
