@@ -18,6 +18,7 @@ export default can.Component.extend({
     },
     relevant_menu_item: '@',
     show_all: '@',
+    operators: [{title: 'AND', value: 'AND'}, {title: 'OR', value: 'OR'}],
     addFilter: function () {
       let menu = this.menu();
 
@@ -36,6 +37,7 @@ export default can.Component.extend({
         textValue: '',
         menu: menu,
         model_name: menu[0].model_singular,
+        operator: 'AND',
       });
     },
     menu: function () {
