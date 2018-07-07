@@ -1052,6 +1052,10 @@ class UnifiedMapperTreeView(TreeView):
   ITEMS = MODAL + Common.TREE_ITEM
   SHOW_FIELDS_BTN_CSS = (By.CSS_SELECTOR, HEADER + " .fa-bars")
   NO_RESULTS_MSG_CSS = (By.CSS_SELECTOR, ".well-small:not(.hidden)")
+  MAPPER_TREE_SPINNER_NO_RESULT = (
+      By.CSS_SELECTOR, ".no-items-spinner-wrapper spinner")
+  MAPPER_TREE_SPINNER_ITEMS = (
+      By.CSS_SELECTOR, ".spinner-section.spinner-section_grid  .spinner-icon")
 
 
 class BaseWidgetGeneric(object):

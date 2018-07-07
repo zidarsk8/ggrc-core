@@ -602,10 +602,39 @@ class TreeView(Component):
     """Wait loading elements of Tree View after made some action with
     object(s) under Tree View.
     """
+    from lib.utils.test_utils import wait_for
     selenium_utils.wait_until_not_present(
         self._driver, self._locators.ITEM_LOADING_CSS)
     selenium_utils.get_when_invisible(
         self._driver, self._locators.TREE_SPINNER_CSS)
+    if "MAPPER_TREE_SPINNER_NO_RESULT" in self._locators.__dict__:
+      def is_result_ready():
+        """Check if the results on mapper is ready."""
+        is_results_ready = False
+        if not selenium_utils.is_element_enabled(
+            selenium_utils.get_when_visible(
+                self._driver,
+                constants.locator.CommonModalUnifiedMapper.BUTTON_SEARCH)
+        ):
+          return is_results_ready
+        if (
+            selenium_utils.is_element_exist(
+                self._driver, self._locators.MAPPER_TREE_SPINNER_NO_RESULT) or
+            selenium_utils.is_element_exist(
+                self._driver, self._locators.MAPPER_TREE_SPINNER_ITEMS)
+        ):
+          return is_results_ready
+        if (
+            selenium_utils.is_element_exist(
+                self._driver, self.locator_no_results_message) or
+            selenium_utils.get_when_all_visible(
+                self._driver, (By.CSS_SELECTOR, self._locators.ITEMS))
+        ):
+          is_results_ready = True
+          return is_results_ready
+        return is_results_ready
+      wait_for(is_result_ready)
+    selenium_utils.wait_for_doc_is_ready(self._driver)
     selenium_utils.wait_for_js_to_load(self._driver)
 
   def _init_tree_view_headers(self):
