@@ -306,6 +306,8 @@ const notifier = new PersistentNotifier({
   name: 'GGRC/window',
 });
 
+const delayLeavingPageUntil = $.proxy(notifier, 'queue');
+
 function navigate(url) {
   notifier.on_empty(_goToUrl.bind(null, url));
 }
@@ -337,5 +339,5 @@ export {
   initWidgets,
   cacheCurrentUser,
   navigate,
-  notifier,
+  delayLeavingPageUntil,
 };

@@ -3,8 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {notifier} from './plugins/ggrc_utils';
-
 (function (GGRC, moment) {
   GGRC.mustache_path = '/static/mustache';
 
@@ -12,10 +10,6 @@ import {notifier} from './plugins/ggrc_utils';
   if (!GGRC.widget_descriptors) {
     GGRC.widget_descriptors = {};
   }
-
-  $.extend(GGRC, {
-    delay_leaving_page_until: $.proxy(notifier, 'queue'),
-  });
 
   GGRC.Errors = (function () {
     let messages = {
