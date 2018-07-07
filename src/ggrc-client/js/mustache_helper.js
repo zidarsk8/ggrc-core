@@ -885,16 +885,6 @@ Mustache.registerHelper('any_allowed', function (action, data, options) {
   return options[hasPassed ? 'fn' : 'inverse'](options.contexts || this);
 });
 
-Mustache.registerHelper('system_role', function (role, options) {
-  role = role.toLowerCase();
-  // If there is no user, it's same as No Role
-  let userRole = (GGRC.current_user ?
-    GGRC.current_user.system_wide_role : 'no access').toLowerCase();
-  let isValid = role === userRole;
-
-  return options[isValid ? 'fn' : 'inverse'](options.contexts || this);
-});
-
 Mustache.registerHelper('is_allowed_all',
   function (action, instances, options) {
     let passed = true;
