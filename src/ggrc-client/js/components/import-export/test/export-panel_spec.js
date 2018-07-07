@@ -3,11 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import exportPanel from '../export-panel';
+import Component from '../export-panel';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
-describe('GGRC.Components.exportPanel', function () {
-  'use strict';
-
+describe('export-panel component', function () {
   let viewModel;
   let modelAttributeDefenitions = {
     Assessment: [
@@ -43,7 +42,7 @@ describe('GGRC.Components.exportPanel', function () {
   };
 
   beforeAll(function () {
-    viewModel = new (can.Map.extend(exportPanel.prototype.viewModel));
+    viewModel = getComponentVM(Component);
   });
 
   describe('refreshItems functions', function () {

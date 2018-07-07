@@ -6,9 +6,7 @@
 import Component from '../export-group';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
-describe('export-group', function () {
-  'use strict';
-
+describe('export-group component', function () {
   describe('events', function () {
     describe('inserted() method', function () {
       let method; // the method under test

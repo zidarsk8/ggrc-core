@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import ExportComponent from '../export';
+import Component from '../export';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
 describe('export component', () => {
@@ -11,7 +11,7 @@ describe('export component', () => {
     let viewModel;
 
     beforeEach(function () {
-      viewModel = getComponentVM(ExportComponent);
+      viewModel = getComponentVM(Component);
     });
 
     it('returns object with empty expression if filters are empty', () => {
