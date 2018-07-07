@@ -14,29 +14,6 @@ import {notifier} from './plugins/ggrc_utils';
   }
 
   $.extend(GGRC, {
-
-    eventqueue: [],
-    eventqueueTimeout: null,
-    eventqueueTimegap: 20, //ms
-
-    queue_exec_next: function () {
-      let fn = GGRC.eventqueue.shift();
-      if (fn)
-        fn();
-      if (GGRC.eventqueue.length > 0)
-        GGRC.eventqueueTimeout = setTimeout(GGRC.queue_exec_next, GGRC.eventqueueTimegap);
-      else
-        GGRC.eventqueueTimeout = null;
-    },
-
-    queue_event: function (events) {
-      if (typeof (events) === 'function')
-        events = [events];
-      GGRC.eventqueue.push.apply(GGRC.eventqueue, events);
-      if (!GGRC.eventqueueTimeout)
-        GGRC.eventqueueTimeout = setTimeout(GGRC.queue_exec_next, GGRC.eventqueueTimegap);
-    },
-
     delay_leaving_page_until: $.proxy(notifier, 'queue'),
   });
 
