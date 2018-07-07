@@ -5,16 +5,17 @@
 
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../advanced-search-mapping-criteria';
 import Mappings from '../../../models/mappers/mappings';
 
-describe('GGRC.Components.advancedSearchMappingCriteria', function () {
+describe('advanced-search-mapping-criteria component', function () {
   'use strict';
 
   let viewModel;
 
   beforeEach(() => {
-    viewModel = new Component.prototype.viewModel();
+    viewModel = getComponentVM(Component);
   });
 
   describe('criteria set() method', function () {

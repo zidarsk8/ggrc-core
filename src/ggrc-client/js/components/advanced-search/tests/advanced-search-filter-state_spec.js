@@ -4,15 +4,16 @@
 */
 
 import * as StateUtils from '../../../plugins/utils/state-utils';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../advanced-search-filter-state';
 
-describe('GGRC.Components.advancedSearchFilterState', function () {
+describe('advanced-search-filter-state component', function () {
   'use strict';
 
   let viewModel;
 
   beforeEach(() => {
-    viewModel = new Component.prototype.viewModel();
+    viewModel = getComponentVM(Component);
   });
 
   describe('stateModel set() method', function () {
