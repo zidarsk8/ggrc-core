@@ -28,6 +28,7 @@ import template from './page-header.mustache';
     Process: 'header-style-1',
     DataAsset: 'header-style-1',
     Product: 'header-style-1',
+    ProductGroup: 'header-style-1',
     Project: 'header-style-1',
     Facility: 'header-style-1',
     Market: 'header-style-1',

@@ -61,6 +61,7 @@ permissions = {
         "Proposal",
         "TechnologyEnvironment",
         "Revision",
+        "ProductGroup",
         "Role",
         "Context",
         "UserRole",
@@ -124,6 +125,7 @@ permissions = {
         "Proposal",
         "TechnologyEnvironment",
         "Role",
+        "ProductGroup",
         "UserRole",
         "Context",
         {
@@ -189,6 +191,7 @@ permissions = {
         "System",
         "Process",
         "Metric",
+        "ProductGroup",
         "Program",
         "Role",
         "UserRole",
@@ -254,6 +257,7 @@ permissions = {
         "TechnologyEnvironment",
         "Role",
         "UserRole",
+        "ProductGroup",
         "Context",
         {
             "type": "BackgroundTask",

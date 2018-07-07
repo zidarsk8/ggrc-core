@@ -177,6 +177,7 @@ class ObjectsColumnHandler(multi_object.ObjectsColumnHandler):
       all_models.Issue.__name__,
       all_models.Metric.__name__,
       all_models.TechnologyEnvironment.__name__,
+      all_models.ProductGroup.__name__,
       risk.Risk.__name__,
       threat.Threat.__name__,
   )

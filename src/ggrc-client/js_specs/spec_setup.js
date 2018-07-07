@@ -25,6 +25,7 @@ GGRC.config = {
   snapshotable_objects: [
     'Control',
     'Product',
+    'ProductGroup',
     'OrgGroup',
     'Vendor',
     'Risk',
@@ -102,6 +103,9 @@ GGRC.Bootstrap = {
   }, {
     title_plural: 'Products',
     model_singular: 'Product',
+  }, {
+    title_plural: 'Product Groups',
+    model_singular: 'ProductGroup',
   }, {
     title_plural: 'Programs',
     model_singular: 'Program',
@@ -190,6 +194,9 @@ GGRC.Bootstrap = {
   }, {
     title_plural: 'Products',
     model_singular: 'Product',
+  }, {
+    title_plural: 'Product Groups',
+    model_singular: 'ProductGroup',
   }, {
     title_plural: 'Programs',
     model_singular: 'Program',

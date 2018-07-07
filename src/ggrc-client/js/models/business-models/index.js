@@ -27,6 +27,7 @@ import './person';
 import './policy';
 import './process';
 import './product';
+import './product-group';
 import './program';
 import './project';
 import './regulation';

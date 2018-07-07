@@ -28,7 +28,7 @@ import Mappings from '../models/mappers/mappings';
     'Program Regulation Policy Standard Contract Clause Section'.split(' '),
     'Request Control Objective OrgGroup Vendor AccessGroup'.split(' '),
     'System Process DataAsset Product Project Facility Market'.split(' '),
-    'Issue Risk Threat Metric TechnologyEnvironment'.split(' ')
+    'Issue Risk Threat Metric TechnologyEnvironment ProductGroup'.split(' ')
   );
 
   let draftOnUpdateMixin;
@@ -142,9 +142,9 @@ import Mappings from '../models/mappers/mappings';
         _canonical: {
           related_objects_as_source: [
             'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
-            'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
-            'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
-            'Objective', 'Audit', 'AccessGroup', 'Metric',
+            'Product', 'ProductGroup', 'Project', 'System', 'Regulation',
+            'Policy', 'Contract', 'Standard', 'Program', 'Issue', 'Control',
+            'Section', 'Clause', 'Objective', 'Audit', 'AccessGroup', 'Metric',
             'Risk', 'TechnologyEnvironment', 'Threat',
           ],
         },
@@ -173,6 +173,7 @@ import Mappings from '../models/mappers/mappings';
         related_vendors: TypeFilter('related_objects', 'Vendor'),
         related_processes: TypeFilter('related_objects', 'Process'),
         related_products: TypeFilter('related_objects', 'Product'),
+        related_product_groups: TypeFilter('related_objects', 'ProductGroup'),
         related_projects: TypeFilter('related_objects', 'Project'),
         related_systems: TypeFilter('related_objects', 'System'),
         related_issues: TypeFilter('related_objects', 'Issue'),

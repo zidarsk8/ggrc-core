@@ -109,6 +109,7 @@ export default can.Control({
         'Policy',
         'Process',
         'Product',
+        'ProductGroup',
         'Project',
         'Regulation',
         'Risk',
