@@ -1,37 +1,25 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Module provides various utils for Issue tracker integration service."""
+"""Assessment integration functionality via cron job."""
 
 import logging
-import time
 
-from sqlalchemy.sql import expression
-
-from ggrc import models
-from ggrc.integrations import integrations_errors
-from ggrc.integrations import issues
+from ggrc.integrations import issues, integrations_errors
+from ggrc.integrations.synchronization_jobs import utils
 
 
 logger = logging.getLogger(__name__)
 
 
-_BATCH_SIZE = 100
-
 # A list of field to watch for changes in.
-_FIELDS_TO_CHECK = ('status', 'type', 'priority', 'severity')
+FIELDS_TO_CHECK = ('status', 'type', 'priority', 'severity')
 
 
 def _collect_assessment_issues():
   """Returns issue infos associated with Assessments."""
   issue_params = {}
-
-  issuetracker_cls = models.IssuetrackerIssue
-  issue_objects = issuetracker_cls.query.filter(
-      issuetracker_cls.object_type == 'Assessment',
-      issuetracker_cls.enabled == expression.true(),
-      issuetracker_cls.issue_id.isnot(None),
-  ).order_by(issuetracker_cls.object_id).all()
+  issue_objects = utils.get_active_issue_info(model_name="Assessment")
   for iti in issue_objects:
     asmt = iti.issue_tracked_obj
     if not asmt:
@@ -58,57 +46,7 @@ def _collect_assessment_issues():
   return issue_params
 
 
-def _iter_issue_batches(ids):
-  """Generates a sequence of batches of issues from Issue Tracker by IDs."""
-  cli = issues.Client()
-
-  for i in xrange(0, len(ids), _BATCH_SIZE):
-    chunk = ids[i:i + _BATCH_SIZE]
-    logger.debug('Issue ids to process: %s', chunk)
-    try:
-      response = cli.search({
-          'issue_ids': chunk,
-          'page_size': _BATCH_SIZE,
-      })
-    except integrations_errors.HttpError as error:
-      logger.error(
-          'Unable to fetch Issue Tracker issues by IDs: %r', error)
-      return
-
-    issue_infos = {}
-    response_issues = response.get('issues') or []
-    for info in response_issues:
-      state = info['issueState'] or {}
-      issue_infos[info['issueId']] = {
-          'status': state.get('status'),
-          'type': state.get('type'),
-          'priority': state.get('priority'),
-          'severity': state.get('severity'),
-      }
-    if issue_infos:
-      yield issue_infos
-
-
-def _update_issue(cli, issue_id, params, max_attempts=5, interval=1):
-  """Performs issue update request."""
-  attempts = max_attempts
-  while True:
-    attempts -= 1
-    try:
-      cli.update_issue(issue_id, params)
-    except integrations_errors.HttpError as error:
-      if error.status == 429:
-        if attempts == 0:
-          raise
-        logger.warning(
-            'The request updating ticket ID=%s was '
-            'rate limited and will be re-tried: %s', issue_id, error)
-        time.sleep(interval)
-        continue
-    break
-
-
-def sync_issue_tracker_statuses():
+def sync_assessment_statuses():
   """Synchronizes issue tracker ticket statuses with the Assessment statuses.
 
   Checks for Assessments which are in sync with Issue Tracker issues and
@@ -122,7 +60,7 @@ def sync_issue_tracker_statuses():
 
   cli = issues.Client()
   processed_ids = set()
-  for batch in _iter_issue_batches(list(assessment_issues)):
+  for batch in utils.iter_issue_batches(list(assessment_issues)):
     for issue_id, issuetracker_state in batch.iteritems():
       issue_id = str(issue_id)
       issue_info = assessment_issues.get(issue_id)
@@ -135,12 +73,12 @@ def sync_issue_tracker_statuses():
       assessment_state = issue_info['state']
       if all(
           assessment_state.get(field) == issuetracker_state.get(field)
-          for field in _FIELDS_TO_CHECK
+          for field in FIELDS_TO_CHECK
       ):
         continue
 
       try:
-        _update_issue(cli, issue_id, assessment_state)
+        utils.update_issue(cli, issue_id, assessment_state)
       except integrations_errors.Error as error:
         logger.error(
             'Unable to update status of Issue Tracker issue ID=%s for '

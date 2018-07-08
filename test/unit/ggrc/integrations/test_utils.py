@@ -8,8 +8,9 @@ import unittest
 
 import mock
 
+from ggrc.integrations.synchronization_jobs import assessment_integration
 from ggrc.integrations import integrations_errors
-from ggrc.integrations import utils
+from ggrc.integrations.synchronization_jobs import utils
 
 
 class BaseClientTest(unittest.TestCase):
@@ -47,7 +48,7 @@ class BaseClientTest(unittest.TestCase):
         utils.models.IssuetrackerIssue,
         query=mock.MagicMock(filter=filter_mock)
     ):
-      actual = utils._collect_assessment_issues()
+      actual = assessment_integration._collect_assessment_issues()
       self.assertEquals(actual, {
           't1': {
               'assessment_id': 1,
@@ -88,7 +89,7 @@ class BaseClientTest(unittest.TestCase):
         },
     ])
     with mock.patch.object(utils.issues, 'Client', return_value=cli_mock):
-      actual = list(utils._iter_issue_batches([1, 2, 3]))
+      actual = list(utils.iter_issue_batches([1, 2, 3]))
       self.assertEquals(actual, [
           {
               't1': {
@@ -117,13 +118,13 @@ class BaseClientTest(unittest.TestCase):
     cli_mock = mock.MagicMock()
     cli_mock.search.side_effect = integrations_errors.HttpError('Test')
     with mock.patch.object(utils.issues, 'Client', return_value=cli_mock):
-      actual = list(utils._iter_issue_batches([1, 2, 3]))
+      actual = list(utils.iter_issue_batches([1, 2, 3]))
       self.assertEqual(actual, [])
 
   def test_update_issue(self):
     """Tests updating issue."""
     cli_mock = mock.MagicMock()
-    self.assertIsNone(utils._update_issue(cli_mock, 1, 'params'))
+    self.assertIsNone(utils.update_issue(cli_mock, 1, 'params'))
     cli_mock.update_issue.assert_called_once_with(1, 'params')
 
   def test_update_issue_with_retry(self):
@@ -138,7 +139,7 @@ class BaseClientTest(unittest.TestCase):
         None,
     ])
     with mock.patch.object(utils.time, 'sleep') as sleep_mock:
-      utils._update_issue(cli_mock, 1, 'params')
+      utils.update_issue(cli_mock, 1, 'params')
       self.assertEqual(cli_mock.update_issue.call_args_list, [
           mock.call(1, 'params'),
           mock.call(1, 'params'),
@@ -166,7 +167,7 @@ class BaseClientTest(unittest.TestCase):
     ])
     with mock.patch.object(utils.time, 'sleep') as sleep_mock:
       with self.assertRaises(integrations_errors.HttpError) as exc_mock:
-        utils._update_issue(cli_mock, 1, 'params')
+        utils.update_issue(cli_mock, 1, 'params')
         self.assertEqual(exc_mock.exception.status, 429)
         self.assertEqual(cli_mock.update_issue.call_args_list, [
             mock.call(1, 'params'),
@@ -235,19 +236,20 @@ class BaseClientTest(unittest.TestCase):
 
     with cli_patch, mock.patch.multiple(
         utils,
-        _collect_assessment_issues=mock.MagicMock(
-            return_value=assessment_issues),
-        _iter_issue_batches=mock.MagicMock(
+        iter_issue_batches=mock.MagicMock(
             return_value=iter(batches)),
-        _update_issue=mock.DEFAULT
+        update_issue=mock.DEFAULT
     ):
-      utils.sync_issue_tracker_statuses()
-      iter_calls = utils._iter_issue_batches.call_args_list
-      self.assertEqual(len(iter_calls), 1)
-      self.assertItemsEqual(iter_calls[0][0][0], ['1', '2'])
-      utils._update_issue.assert_called_once_with(cli_mock, '2', {
-          'status': 'ASSIGNED',
-          'type': 'BUG2',
-          'priority': 'P2',
-          'severity': 'S2',
-      })
+      with mock.patch.object(assessment_integration,
+                             "_collect_assessment_issues",
+                             return_value=assessment_issues):
+        assessment_integration.sync_assessment_statuses()
+        iter_calls = utils.iter_issue_batches.call_args_list
+        self.assertEqual(len(iter_calls), 1)
+        self.assertItemsEqual(iter_calls[0][0][0], ['1', '2'])
+        utils.update_issue.assert_called_once_with(cli_mock, '2', {
+            'status': 'ASSIGNED',
+            'type': 'BUG2',
+            'priority': 'P2',
+            'severity': 'S2',
+        })
