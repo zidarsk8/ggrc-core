@@ -11,7 +11,6 @@ import itertools
 import datetime
 from dateutil import relativedelta
 
-from sqlalchemy import and_
 from sqlalchemy import case
 from sqlalchemy import orm
 from sqlalchemy.ext import hybrid
@@ -19,7 +18,7 @@ from sqlalchemy.ext import hybrid
 from ggrc import builder
 from ggrc import db
 from ggrc.access_control import roleable, role
-from ggrc.fulltext import get_indexer, attributes
+from ggrc.fulltext import attributes
 from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
 from ggrc.models import mixins
@@ -27,8 +26,6 @@ from ggrc.models.mixins import base
 from ggrc.models import reflection
 from ggrc.models.context import HasOwnContext
 from ggrc.models.deferred import deferred
-from ggrc_workflows.models import cycle
-from ggrc_workflows.models import cycle_task_group
 from ggrc_workflows.services import google_holidays
 
 
@@ -436,68 +433,6 @@ class Workflow(roleable.Roleable,
             "Workflow_complete",
         ),
     )
-
-  @classmethod
-  def ensure_backlog_workflow_exists(cls):
-    """Ensures there is at least one backlog workflow with an active cycle.
-    If such workflow does not exist it creates one."""
-
-    def any_active_cycle(workflows):
-      """Checks if any active cycle exists from given workflows"""
-      for workflow in workflows:
-        for cur_cycle in workflow.cycles:
-          if cur_cycle.is_current:
-            return True
-      return False
-
-    # Check if backlog workflow already exists
-    backlog_workflows = Workflow.query.filter(
-        and_(Workflow.kind == "Backlog",
-             # the following means one_time wf
-             Workflow.unit is None)
-    ).all()
-
-    if len(backlog_workflows) > 0 and any_active_cycle(backlog_workflows):
-      return "At least one backlog workflow already exists"
-    # Create a backlog workflow
-    backlog_workflow = Workflow(description="Backlog workflow",
-                                title="Backlog (one time)",
-                                status="Active",
-                                recurrences=0,
-                                kind="Backlog")
-
-    # create wf context
-    wf_ctx = backlog_workflow.get_or_create_object_context(context=1)
-    backlog_workflow.context = wf_ctx
-    db.session.flush(backlog_workflow)
-    # create a cycle
-    backlog_cycle = cycle.Cycle(description="Backlog workflow",
-                                title="Backlog (one time)",
-                                is_current=1,
-                                status="Assigned",
-                                start_date=None,
-                                end_date=None,
-                                context=backlog_workflow
-                                .get_or_create_object_context(),
-                                workflow=backlog_workflow)
-
-    # create a cycletaskgroup
-    backlog_ctg = cycle_task_group\
-        .CycleTaskGroup(description="Backlog workflow taskgroup",
-                        title="Backlog TaskGroup",
-                        cycle=backlog_cycle,
-                        status=cycle_task_group.CycleTaskGroup.IN_PROGRESS,
-                        start_date=None,
-                        end_date=None,
-                        context=backlog_workflow
-                        .get_or_create_object_context())
-
-    db.session.add_all([backlog_workflow, backlog_cycle, backlog_ctg])
-    db.session.flush()
-
-    # add fulltext entries
-    get_indexer().create_record(backlog_workflow)
-    return "Backlog workflow created"
 
 
 class WorkflowState(object):
