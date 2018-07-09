@@ -3,7 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('GGRC.Components.mapperResultsItemAttrs', function () {
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../mapper-results-item-attrs';
+
+describe('mapper-results-item-attrs component', function () {
   'use strict';
 
   let viewModel;
@@ -11,10 +14,9 @@ describe('GGRC.Components.mapperResultsItemAttrs', function () {
     GGRC.mustache_path + '/base_objects/tree-item-attr.mustache';
 
   beforeEach(function () {
-    let Component = GGRC.Components.get('mapperResultsItemAttrs');
     let init = Component.prototype.viewModel.init;
     Component.prototype.viewModel.init = undefined;
-    viewModel = GGRC.Components.getViewModel('mapperResultsItemAttrs');
+    viewModel = getComponentVM(Component);
     Component.prototype.viewModel.init = init;
     viewModel.init = init;
   });

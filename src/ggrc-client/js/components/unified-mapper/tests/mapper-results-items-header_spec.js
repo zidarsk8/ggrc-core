@@ -3,14 +3,16 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.Components.mapperResultsItemsHeader', function () {
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../mapper-results-items-header';
+
+describe('mapper-results-items-header component', function () {
   'use strict';
 
   let viewModel;
 
   beforeEach(function () {
-    viewModel = GGRC.Components
-      .getViewModel('mapperResultsItemsHeader');
+    viewModel = getComponentVM(Component);
   });
 
   describe('isSorted() method', function () {

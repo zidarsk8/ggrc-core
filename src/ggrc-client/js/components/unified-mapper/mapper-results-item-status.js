@@ -5,14 +5,10 @@
 
 import template from './templates/mapper-results-item-status.mustache';
 
-(function (can, GGRC) {
-  'use strict';
-
-  GGRC.Components('mapperResultsItemStatus', {
-    tag: 'mapper-results-item-status',
-    template: template,
-    viewModel: {
-      itemData: {},
-    },
-  });
-})(window.can, window.GGRC);
+export default can.Component.extend({
+  tag: 'mapper-results-item-status',
+  template,
+  viewModel: {
+    itemData: {},
+  },
+});
