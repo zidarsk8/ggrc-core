@@ -7,26 +7,33 @@ import template from './templates/text-form-field.mustache';
 
 const TEXT_FORM_FIELD_VM = {
   define: {
-    _value: {
-      set(newValue, setValue, onError, oldValue) {
-        setValue(newValue);
-        if (oldValue === undefined ||
-            newValue === oldValue ||
-            newValue.length && !can.trim(newValue).length) {
+    inputValue: {
+      set(newValue) {
+        let _value = this.attr('_value');
+        if (_value === newValue ||
+          newValue.length && !can.trim(newValue).length) {
           return;
         }
+
+        this.attr('_value', newValue);
         this.valueChanged(newValue);
+      },
+      get() {
+        return this.attr('_value');
       },
     },
     value: {
-      set(newValue, setValue) {
-        setValue(newValue);
+      set(newValue) {
         this.attr('_value', newValue);
+      },
+      get() {
+        return this.attr('_value');
       },
     },
   },
   fieldId: null,
   placeholder: '',
+  _value: '',
   valueChanged(newValue) {
     this.dispatch({
       type: 'valueChanged',
