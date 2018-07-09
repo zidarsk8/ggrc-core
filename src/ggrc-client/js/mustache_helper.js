@@ -1108,50 +1108,6 @@ Mustache.registerHelper('current_user_is_admin', function (options) {
   return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper('owned_by_current_user', function (instance, options) {
-  let currentUserId = GGRC.current_user.id;
-  let owners;
-  instance = Mustache.resolve(instance);
-  owners = instance.attr('owners');
-  if (owners) {
-    for (let i = 0; i < owners.length; i++) {
-      if (currentUserId === owners[i].id) {
-        return options.fn(options.contexts);
-      }
-    }
-  }
-  return options.inverse(options.contexts);
-});
-
-Mustache.registerHelper('last_approved', function (instance, options) {
-  let loader;
-  let frame = new can.Observe();
-  instance = Mustache.resolve(instance);
-  loader = instance.get_binding('approval_tasks');
-
-  frame.attr(instance, loader.list);
-  function finish(list) {
-    let item;
-    list = list.serialize();
-    if (list.length > 1) {
-      let biggest = Math.max(...list.map(function (item) {
-        return item.instance.id;
-      }));
-      item = list.filter(function (item) {
-        return item.instance.id === biggest;
-      });
-    }
-    item = item ? item[0] : list[0];
-    return options.fn(item ? item : options.contexts);
-  }
-  function fail(error) {
-    return options.inverse(options.contexts.add({error: error}));
-  }
-
-  return deferRender('span', {done: finish, fail: fail},
-    loader.refresh_instances());
-});
-
 Mustache.registerHelper('with_is_reviewer', function (reviewTask, options) {
   let assigneeRole = getRole('CycleTaskGroupObjectTask', 'Task Assignees');
   let currentUserId = GGRC.current_user.id;
@@ -1670,33 +1626,6 @@ Mustache.registerHelper('update_link', function (instance, options) {
   }
   return options.fn(options.contexts);
 });
-
-Mustache.registerHelper('with_most_recent_declining_task_entry',
-  function (reviewTask, options) {
-    let entries = reviewTask.get_mapping('declining_cycle_task_entries');
-    let mostRecentEntry;
-
-    if (entries) {
-      for (let i = entries.length - 1; i >= 0; i--) {
-        let entry = entries[i];
-        if ('undefined' !== typeof mostRecentEntry) {
-          if (moment(mostRecentEntry.created_at)
-            .isBefore(moment(entry.created_at))) {
-            mostRecentEntry = entry;
-          }
-        } else {
-          mostRecentEntry = entry;
-        }
-      }
-    }
-
-    if (mostRecentEntry) {
-      return options.fn(options.contexts
-        .add({most_recent_declining_task_entry: mostRecentEntry}));
-    }
-    return options.fn(options.contexts
-      .add({most_recent_declining_task_entry: {}}));
-  });
 
 /**
    * Retrieve the string value of an attribute of the given instance.

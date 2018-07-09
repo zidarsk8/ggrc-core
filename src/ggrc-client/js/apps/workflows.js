@@ -212,15 +212,6 @@ import Mappings from '../models/mappers/mappings';
             );
           }
         ),
-
-        // This code needs to be reworked to figure out how to return the single
-        // most recent task entry with is_declining_review = true.
-        declining_cycle_task_entries: Search(function (binding) {
-          return CMS.Models.CycleTaskEntry.findAll({
-            cycle_task_group_object_task_id: binding.instance.id,
-            is_declining_review: 1,
-          });
-        }, 'Cycle'),
       },
 
       CycleTaskEntry: {

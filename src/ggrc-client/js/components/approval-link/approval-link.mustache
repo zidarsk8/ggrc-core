@@ -7,33 +7,21 @@
     data-object-type="{{instance.class.table_singular}}" {{#instance}}{{data 'model'}}{{/instance}}>
   {{#if_equals instance.os_state 'Reviewed'}}
       <i class="fa fa-check-square-o green"></i>
-      <span class="object-approved">Reviewed
-      {{#last_approved instance}}
-        by
+      <span class="object-approved">
+        Reviewed by
         <person-data {person}="instance.modified_by"></person-data>
          on {{instance.updated_at}}
-      {{/last_approved}}
       </span>
   {{else}}
     <div>
     {{#with_mapping 'approval_tasks' instance}}
       {{#with_review_task}}
         {{#with_is_reviewer review_task}}
-          {{#if_helpers '\\n #owned_by_current_user' instance '\\n or #current_user_is_admin'}}
-            {{^if is_reviewer}}
-              {{#if_equals review_task.status 'Declined'}}
-                {{#with_most_recent_declining_task_entry review_task}}
-                  <div>Review was declined on {{#date instance.created_at}}{{/date}}.</div>
-                {{/with_most_recent_declining_task_entry}}
-              {{/if_equals}}
-            {{/if}}
-          {{/if_helpers}}
           {{#if is_reviewer}}
             {{#if_equals review_task.status 'Declined'}}
-              {{#with_most_recent_declining_task_entry review_task}}
                 <div>Review was declined on {{#date instance.created_at}}{{/date}}.</div>
-              {{/with_most_recent_declining_task_entry}}
             {{/if_equals}}
+
             <div {{#review_task}}{{data 'model'}}{{/review_task}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model")}) }}>
               <button
                   class="btn btn-mini btn-green change-task-status {{instance._disabled}} {{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}"
@@ -67,29 +55,25 @@
               </a>
               <small><em>Approval applies only to this object and not to mapped objects.</em></small>
               {{#current_user_is_admin}}
-                {{#with_mapping 'approval_tasks' instance}}
                 <p>
                   If you wish to change the current reviewer, please click
                   <a href="{{instance.viewLink}}#!task"
-                     class="{{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}">
+                      class="{{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}">
                         here
-                   </a>
+                    </a>
                   and change the assignee.
                 </p>
-                {{/with_mapping}}
               {{/current_user_is_admin}}
             </div>
           {{else}}
-            <div>
-              {{#is_allowed "create" "Workflow" context="any"}}
-                <review-link {instance}="instance">
-                </review-link>
-              {{/is_allowed}}
-            </div>
+            {{#is_allowed "create" "Workflow" context="any"}}
+              <review-link {instance}="instance">
+              </review-link>
+            {{/is_allowed}}
           {{/if}}
         {{/with_is_reviewer}}
       {{/with_review_task}}
     {{/with_mapping}}
-  </div>
+    </div>
   {{/if_equals}}
 </div>
