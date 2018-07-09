@@ -27,7 +27,6 @@ dashboard-js-template-files:
   - base_objects/title.mustache
   - base_objects/tree-item-attr.mustache
   - base_objects/tree_placeholder.mustache
-  - base_objects/generate_assessments_button.mustache
   - base_objects/form_restore.mustache
   - base_objects/info-pane-utility.mustache
   - base_objects/modal-content-reference-urls.mustache
@@ -54,7 +53,6 @@ dashboard-js-template-files:
   - assessments/info.mustache
   - assessments/header.mustache
   - assessments/dates_list.mustache
-  - assessment_templates/attribute_field.mustache
   - assessment_templates/modal_content.mustache
   - assessment_templates/info.mustache
   - assessment_templates/tree_add_item.mustache
