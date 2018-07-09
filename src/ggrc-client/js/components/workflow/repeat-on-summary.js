@@ -3,42 +3,37 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (can, GGRC) {
-  'use strict';
+import template from './templates/repeat-on-summary.mustache';
 
-  let template = can.view(GGRC.mustache_path +
-    '/base_objects/repeat-on-summary.mustache');
+export default can.Component.extend({
+  tag: 'repeat-on-summary',
+  template,
+  viewModel: {
+    define: {
+      unitText: {
+        get: function () {
+          let result = '';
+          let repeatEvery = this.attr('repeatEvery');
+          let unit = _.find(GGRC.Workflow.unitOptions, function (option) {
+            return option.value === this.attr('unit');
+          }.bind(this));
 
-  GGRC.Components('repeatOnSummary', {
-    tag: 'repeat-on-summary',
-    template: template,
-    viewModel: {
-      define: {
-        unitText: {
-          get: function () {
-            let result = '';
-            let repeatEvery = this.attr('repeatEvery');
-            let unit = _.find(GGRC.Workflow.unitOptions, function (option) {
-              return option.value === this.attr('unit');
-            }.bind(this));
-
-            if (unit) {
-              if (repeatEvery > 1) {
-                result += repeatEvery + ' ' + unit.plural;
-              } else {
-                result += unit.singular;
-              }
+          if (unit) {
+            if (repeatEvery > 1) {
+              result += repeatEvery + ' ' + unit.plural;
+            } else {
+              result += unit.singular;
             }
-            return result;
-          },
-        },
-        hideRepeatOff: {
-          type: 'boolean',
-          value: true,
+          }
+          return result;
         },
       },
-      unit: null,
-      repeatEvery: null,
+      hideRepeatOff: {
+        type: 'boolean',
+        value: true,
+      },
     },
-  });
-})(window.can, window.GGRC);
+    unit: null,
+    repeatEvery: null,
+  },
+});
