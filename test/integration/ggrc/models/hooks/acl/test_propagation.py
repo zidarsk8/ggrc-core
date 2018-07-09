@@ -10,6 +10,7 @@
 
 import itertools
 from collections import defaultdict
+from collections import OrderedDict
 
 import ddt
 import flask
@@ -26,16 +27,23 @@ from integration.ggrc.models import factories
 from integration.ggrc_workflows.models import factories as wf_factories
 
 
+class BaseTestPropagation(TestCase):
+  """Base test case for all propagation scenarios."""
+
+  def setUp(self):
+    super(BaseTestPropagation, self).setUp()
+    self.roles = defaultdict(dict)
+    for role in all_models.AccessControlRole.query:
+      self.roles[role.object_type][role.name] = role
+
+
 @ddt.ddt
-class TestPropagation(TestCase):
+class TestPropagation(BaseTestPropagation):
   """TestAuditRoleProgation"""
 
   def setUp(self):
     super(TestPropagation, self).setUp()
     sa.event.remove(Session, "after_flush", acl.after_flush)
-    self.roles = defaultdict(dict)
-    for role in all_models.AccessControlRole.query:
-      self.roles[role.object_type][role.name] = role
 
   def tearDown(self):
     sa.event.listen(Session, "after_flush", acl.after_flush)
@@ -389,6 +397,7 @@ class TestPropagation(TestCase):
       document - regulation, objective, control
       evidence - assessment
     """
+    # pylint: disable=too-many-locals
     with factories.single_commit():
       person = factories.PersonFactory()
       control = factories.ControlFactory()
@@ -468,3 +477,74 @@ class TestPropagation(TestCase):
         # 6 for normal objects
         # 6 for normal object documents
     )
+
+
+class TestPropagationViaImport(BaseTestPropagation):
+  """Test case for import propagation scenarios."""
+
+  def test_import_propagation(self):
+    """Test propagation program roles via import"""
+    # pylint: disable=too-many-locals
+    program_roles = ["Program Editors"]
+    with factories.single_commit():
+      person = factories.PersonFactory()
+      program = factories.ProgramFactory()
+      control = factories.ControlFactory()
+      control_1 = factories.ControlFactory()
+      factories.RelationshipFactory(destination=program, source=control)
+      factories.RelationshipFactory(destination=program, source=control_1)
+      acls = [
+          factories.AccessControlListFactory(
+              ac_role=self.roles["Program"][r],
+              object=program,
+              person=person,
+          )
+          for r in program_roles
+      ]
+    person_id = person.id
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == control.id,
+        all_models.Revision.resource_type == control.type,
+    ).first()
+    with factories.single_commit():
+      audit = factories.AuditFactory(program=program)
+      rel = factories.RelationshipFactory(destination=audit.program,
+                                          source=audit)
+      snapshot = factories.SnapshotFactory(parent=audit,
+                                           revision_id=revision.id,
+                                           child_type=control.type,
+                                           child_id=control.id)
+      factories.RelationshipFactory(destination=audit, source=snapshot)
+    flask.g.new_relationship_ids = [rel.id]
+    flask.g.new_acl_ids = [a.id for a in acls]
+    flask.g.deleted_objects = []
+
+    propagation.propagate()
+    acl_q = all_models.AccessControlList.query.filter(
+        all_models.AccessControlList.person_id == person_id,
+        all_models.AccessControlList.object_type == "Assessment",
+    )
+    acl_count_before_import = int(acl_q.count())
+    response = self.import_data(
+        OrderedDict([
+            ("object_type", "Assessment"),
+            ("Code*", ""),
+            ("Audit*", audit.slug),
+            ("title", "Assessment title 1"),
+            ("Creators", "user@example.com"),
+            ("Assignees", "user@example.com"),
+            ("map:Control versions", control.slug),
+        ]),
+        OrderedDict([
+            ("object_type", "Assessment"),
+            ("Code*", ""),
+            ("Audit*", audit.slug),
+            ("title", "Assessment title 2"),
+            ("Creators", "user@example.com"),
+            ("Assignees", "user@example.com"),
+            ("map:Control versions", control.slug),
+        ]),
+    )
+    self.check_import_errors(response)
+    acl_count_after_import = int(acl_q.count())
+    self.assertEqual(acl_count_before_import + 2, acl_count_after_import)
