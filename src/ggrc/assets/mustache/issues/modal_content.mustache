@@ -162,9 +162,12 @@
       <div class="ggrc-form">
         <issue-tracker-switcher
           {instance}="instance"
-          {(is-integration-enabled)}="instance.issue_tracker.enabled">
+          {(is-integration-enabled)}="instance.issue_tracker.enabled"
+          {set-issue-title}="true"
+          {default-title}="instance.title">
             <modal-issue-tracker-fields
               {instance}="instance"
+              {set-issue-title}="setIssueTitle"
               {note}="'If it is turned on, a bug will be generated for this issue.'">
             </modal-issue-tracker-fields>
         </issue-tracker-switcher>

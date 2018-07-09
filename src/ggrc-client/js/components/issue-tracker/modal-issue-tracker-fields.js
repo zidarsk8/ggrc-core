@@ -18,6 +18,7 @@ export default can.Component.extend({
     instance: {},
     issueTrackerEnabled: false,
     note: '',
+    setIssueTitle: false,
   },
   events: {
     inserted() {

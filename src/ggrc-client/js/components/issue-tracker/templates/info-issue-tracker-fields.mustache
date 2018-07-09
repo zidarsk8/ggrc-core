@@ -64,5 +64,15 @@
         <span class="empty-message">None</span>
       {{/if}}
     </div>
+    {{#if showTitle}}
+    <div class="span4">
+      <h6>Issue Title</h6>
+        {{#if instance.issue_tracker.title}}
+          {{instance.issue_tracker.title}}
+        {{else}}
+          <span class="empty-message">None</span>
+        {{/if}}
+      </div>
+    {{/if}}
   </div>
 {{/if}}

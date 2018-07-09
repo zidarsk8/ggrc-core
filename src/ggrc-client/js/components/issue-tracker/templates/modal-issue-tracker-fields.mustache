@@ -78,7 +78,7 @@
       </dropdown>
     </div>
 
-    {{#if_instance_of instance "Assessment"}}
+    {{#if setIssueTitle}}
       <div class="ggrc-form-item__multiple-row {{#instance.computed_errors.issue_tracker_title}}field-failure{{/instance.computed_errors.issue_tracker_title}}">
         <label class="form-label required-label ggrc-form-item__label">
           Issue Title

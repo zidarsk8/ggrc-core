@@ -74,6 +74,7 @@ export default can.Model.Cacheable('CMS.Models.Issue', {
       issue_severity: 'S2',
       issue_priority: 'P2',
       issue_type: 'PROCESS',
+      title: instance.title || '',
       enabled: instance.isNew(),
     };
   },
@@ -88,6 +89,15 @@ export default can.Model.Cacheable('CMS.Models.Issue', {
       function () {
         if (this.attr('issue_tracker.enabled') &&
           !this.attr('issue_tracker.component_id')) {
+          return 'cannot be blank';
+        }
+      }
+    );
+    this.validate(
+      'issue_tracker_title',
+      function () {
+        if (this.attr('issue_tracker.enabled') &&
+          !this.attr('issue_tracker.title')) {
           return 'cannot be blank';
         }
       }
