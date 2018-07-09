@@ -12,23 +12,29 @@
         <tab-panel {(panels)}="panels" title-text="Attributes">
           <div class="info-pane__body">
             <div class="info-pane__main-content {{^if isSnapshot}}info-pane__main-content-with-sidebar{{/if}}">
-              {{#if instance.issue_tracker.issue_url}}
-                  {{#if instance.can_use_issue_tracker}}
-                    <div class="info-pane__section">
-                      <div class="issue-tracker-url">
-                          <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
-                              Ticket
-                          </a>
-                      </div>
-                    </div>
-                  {{/if }}
+              {{#if instance.issueCreated}}
+                <div class="info-pane__section">
+                  <div class="issue-tracker-url">
+                      <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
+                          Ticket
+                      </a>
+                  </div>
+                </div>
               {{/if}}
 
               {{>'/static/mustache/base_objects/object-review.mustache'}}
               {{>'/static/mustache/base_objects/description.mustache'}}
               {{>'/static/mustache/issues/remediation_plan.mustache'}}
               {{>'/static/mustache/base_objects/notes.mustache'}}
-              {{>'/static/mustache/base_objects/contacts.mustache'}}
+
+              <div class="row-fluid wrap-row">
+                <div data-test-id="title_manager_7a906d2e">
+                  <custom-roles
+                    {instance}="instance"
+                    {read-only}="instance.issueTrackerEnabled"></custom-roles>
+                </div>
+              </div>
+
               {{>'/static/mustache/base_objects/reference-urls.mustache'}}
 
               <div class="custom-attr-wrap info-pane__section">

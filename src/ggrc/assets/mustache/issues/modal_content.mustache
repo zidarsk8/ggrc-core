@@ -62,7 +62,8 @@
     <div class="span12 hide-wrap hidable">
       <access-control-list-roles-helper
         {instance}="."
-        {is-new-instance}="new_object_form">
+        {is-new-instance}="new_object_form"
+        {read-only}="instance.issueTrackerEnabled">
       </access-control-list-roles-helper>
     </div>
   </div>
@@ -113,7 +114,9 @@
                     no-value="true"
                     no-value-label="---"
                     name="instance.status"
-                    tabindex="23">
+                    tabindex="23"
+                    {is-disabled}="instance.issueTrackerEnabled"
+                    >
           </dropdown>
       </div>
     </div>

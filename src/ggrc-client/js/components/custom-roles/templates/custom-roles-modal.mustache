@@ -66,6 +66,10 @@
                         (item-selected)="addPerson(%event.selectedItem, @groupId)">
                       </external-data-autocomplete>
                       {{/if_config_exist}}
+                    {{else}}
+                      {{^if people.length}}
+                        <span class="empty-message">None</span>
+                      {{/if}}
                     {{/if}}
                   {{/if}}
                 </div>

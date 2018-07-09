@@ -12,9 +12,18 @@ const issueTrackerStaticFields = {
   issue_tracker_severities: ['S0', 'S1', 'S2', 'S3', 'S4'],
 };
 
-const isIssueTrackerEnabled = (instance) => {
-  // 'issue_tracker' has already created if component_id is filled;
+const isIssueTrackerInitialized = (instance) => {
+  // 'issue_tracker' has already initialized if component_id is filled;
   return !!(instance.attr('issue_tracker.component_id'));
+};
+
+const isIssueCreated = (instance) => {
+  return !!(instance.attr('issue_tracker.issue_url'));
+};
+
+const isIssueTrackerEnabled = (instance) => {
+  return isIssueCreated(instance)
+    && instance.attr('issue_tracker.enabled');
 };
 
 /**
@@ -29,7 +38,7 @@ function initIssueTrackerObject(
   defaultValues = {},
   canUseIssueTracker = false
 ) {
-  if (!isIssueTrackerEnabled(instance)) {
+  if (!isIssueTrackerInitialized(instance)) {
     instance.attr('issue_tracker', defaultValues);
   }
   instance.attr('can_use_issue_tracker', canUseIssueTracker);
@@ -45,7 +54,9 @@ function cleanUpWarnings(instance) {
 
 export {
   issueTrackerStaticFields,
+  isIssueTrackerInitialized,
   isIssueTrackerEnabled,
+  isIssueCreated,
   initIssueTrackerObject,
   cleanUpWarnings,
 };

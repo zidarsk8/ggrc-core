@@ -511,11 +511,14 @@
     }
 
     .custom-roles-modal {
+      display: block;
       outline: none;
+      margin-bottom: 10px;
       .people-group {
         flex-basis: 250px;
         margin-right: 30px;
         max-width: 250px;
+        margin-bottom: 10px;
       }
     }
   }

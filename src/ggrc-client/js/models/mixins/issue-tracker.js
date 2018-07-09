@@ -37,8 +37,13 @@ export default Mixin('issueTracker',
         true
       );
     },
+    issueCreated() {
+      return GGRC.ISSUE_TRACKER_ENABLED
+        && issueTrackerUtils.isIssueCreated(this);
+    },
     issueTrackerEnabled() {
-      return issueTrackerUtils.isIssueTrackerEnabled(this);
+      return GGRC.ISSUE_TRACKER_ENABLED
+        && issueTrackerUtils.isIssueTrackerEnabled(this);
     },
   },
 );

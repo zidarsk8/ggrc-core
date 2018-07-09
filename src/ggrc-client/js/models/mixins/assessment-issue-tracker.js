@@ -110,7 +110,7 @@ export default Mixin('assessmentIssueTracker',
       );
     },
     issueTrackerEnabled() {
-      return issueTrackerUtils.isIssueTrackerEnabled(this);
+      return issueTrackerUtils.isIssueTrackerInitialized(this);
     },
   },
 );
