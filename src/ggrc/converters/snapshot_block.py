@@ -37,6 +37,7 @@ class SnapshotBlockConverter(object):
 
   CUSTOM_SNAPSHOT_ALIASES = {
       "audit": "Audit",
+      "archived": "Archived",
       "revision_date": "Revision Date",
   }
 
@@ -111,6 +112,7 @@ class SnapshotBlockConverter(object):
     content["audit"] = {"type": "Audit", "id": snapshot.parent_id}
     content["slug"] = u"*{}".format(content["slug"])
     content["revision_date"] = unicode(snapshot.revision.created_at)
+    content["archived"] = snapshot.archived
     if snapshot.last_assessment_date:
       content["last_assessment_date"] = \
           snapshot.last_assessment_date.isoformat()

@@ -72,6 +72,7 @@ class Audit(Snapshotable,
 
   assessments = db.relationship('Assessment', backref='audit')
   issues = db.relationship('Issue', backref='audit')
+  snapshots = db.relationship('Snapshot', backref='audit')
   archived = deferred(db.Column(db.Boolean,
                                 nullable=False, default=False), 'Audit')
   assessment_templates = db.relationship('AssessmentTemplate', backref='audit')
