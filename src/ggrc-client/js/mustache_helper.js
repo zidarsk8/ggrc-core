@@ -1125,17 +1125,6 @@ Mustache.registerHelper('with_is_reviewer', function (reviewTask, options) {
   return options.fn(options.contexts.add({is_reviewer: isReviewer}));
 });
 
-Mustache.registerHelper('with_review_task', function (options) {
-  let tasks = options.contexts.attr('approval_tasks');
-  tasks = Mustache.resolve(tasks);
-  if (tasks) {
-    for (let i = 0; i < tasks.length; i++) {
-      return options.fn(options.contexts.add({review_task: tasks[i].instance}));
-    }
-  }
-  return options.fn(options.contexts.add({review_task: undefined}));
-});
-
 Mustache.registerHelper('default_audit_title', function (instance, options) {
   let index;
   let program;
