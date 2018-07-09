@@ -109,8 +109,13 @@ export default Mixin('assessmentIssueTracker',
         auditItr.enabled
       );
     },
+    issueCreated() {
+      return this.attr('can_use_issue_tracker')
+        && issueTrackerUtils.isIssueCreated(this);
+    },
     issueTrackerEnabled() {
-      return issueTrackerUtils.isIssueTrackerInitialized(this);
+      return this.attr('can_use_issue_tracker')
+        && issueTrackerUtils.isIssueTrackerEnabled(this);
     },
   },
 );

@@ -3,8 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#if instance.issue_tracker.issue_url}}
-  {{#if instance.can_use_issue_tracker}}
+{{#if instance.issueCreated}}
     <div class="ggrc-form-item">
         <div class="ggrc-form-item__row">
             <div class="issue-tracker-url">
@@ -14,7 +13,6 @@
             </div>
         </div>
     </div>
-  {{/if }}
 {{/if}}
 
 <div class="ggrc-form-item">
