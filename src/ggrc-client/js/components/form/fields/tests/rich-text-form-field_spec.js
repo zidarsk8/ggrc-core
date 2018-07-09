@@ -21,27 +21,19 @@ describe('GGRC.Components.richTextFormField', function () {
 
   it('sets the value of the input', function () {
     viewModel.attr('value', 'test');
-    expect(viewModel.attr('_value')).toEqual('test');
-  });
-
-  it('does not fire valueChanged event if value wasn\'t changed', function () {
-    viewModel.attr('value', '');
-    viewModel.attr('_value', 'newValue');
-    viewModel.attr('_value', 'newValue');
-    viewModel.onBlur();
-    expect(viewModel.dispatch).not.toHaveBeenCalled();
+    expect(viewModel.attr('inputValue')).toEqual('test');
   });
 
   it('fires valueChanged event on input value change', function () {
     viewModel.attr('value', '');
-    viewModel.attr('_value', 'newValue');
+    viewModel.attr('inputValue', 'newValue');
     viewModel.onBlur();
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',
       value: 'newValue',
     });
-    viewModel.attr('_value', 'newValue2');
+    viewModel.attr('inputValue', 'newValue2');
     viewModel.onBlur();
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',

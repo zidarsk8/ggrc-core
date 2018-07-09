@@ -18,26 +18,32 @@ import template from './rich-text-form-field.mustache';
       placeholder: '',
       define: {
         value: {
-          set: function (newValue, setValue) {
-            setValue(newValue);
+          set(newValue) {
             if (!_.isNull(newValue)) {
+              this.attr('_oldValue', newValue);
               this.attr('_value', newValue);
             }
           },
+          get() {
+            return this.attr('_value');
+          },
         },
-        _value: {
-          set: function (newValue, setValue, onError, oldValue) {
-            setValue(newValue);
-            this.attr('_oldValue', oldValue);
-            if (oldValue === undefined ||
-                newValue === oldValue ||
+        inputValue: {
+          set(newValue) {
+            let oldValue = this.attr('_oldValue');
+            if (newValue === oldValue ||
                 newValue.length && !can.trim(newValue).length) {
               return;
             }
 
+            this.attr('_value', newValue);
+
             setTimeout(function () {
               this.checkValueChanged();
             }.bind(this), 5000);
+          },
+          get() {
+            return this.attr('_value');
           },
         },
       },
@@ -46,6 +52,7 @@ import template from './rich-text-form-field.mustache';
         let newValue = this.attr('_value');
         let oldValue = this.attr('_oldValue');
         if (newValue !== oldValue) {
+          this.attr('_oldValue', newValue);
           this.valueChanged(newValue);
         }
       },
