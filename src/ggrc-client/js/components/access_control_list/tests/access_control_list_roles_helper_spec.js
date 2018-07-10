@@ -3,18 +3,21 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
+import {
+  makeFakeInstance,
+  getComponentVM,
+} from '../../../../js_specs/spec_helpers';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
+import Component from '../access-control-list-roles-helper';
 
 
-describe('GGRC.Components.accessControlListRolesHelper', function () {
+describe('access-control-list-roles-helper component', function () {
   'use strict';
 
   let viewModel;
 
   beforeEach(function () {
-    viewModel = GGRC.Components
-      .getViewModel('accessControlListRolesHelper');
+    viewModel = getComponentVM(Component);
   });
 
   describe('"setAutoPopulatedRoles" method', function () {

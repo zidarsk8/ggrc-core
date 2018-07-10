@@ -2,15 +2,17 @@
     Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
-import component from '../issue-unmap-item';
+
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../issue-unmap-item';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 
-describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
+describe('issue-unmap-related-snapshots component', ()=> {
   let viewModel;
   let events;
   beforeEach(()=> {
-    viewModel = new (can.Map.extend(component.prototype.viewModel));
-    events = component.prototype.events;
+    viewModel = getComponentVM(Component);
+    events = Component.prototype.events;
   });
 
   describe('paging value', ()=> {

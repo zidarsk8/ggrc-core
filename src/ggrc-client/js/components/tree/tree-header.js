@@ -9,9 +9,9 @@ import template from './templates/tree-header.mustache';
 import {getVisibleColumnsConfig, getSortingForModel}
   from '../../plugins/utils/tree-view-utils';
 
-export default GGRC.Components('treeHeader', {
+export default can.Component.extend({
   tag: 'tree-header',
-  template: template,
+  template,
   viewModel: {
     define: {
       cssClasses: {

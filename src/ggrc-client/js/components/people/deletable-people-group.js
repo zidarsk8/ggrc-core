@@ -7,8 +7,8 @@ import '../person/person-data';
 import viewModel from '../view-models/people-group-vm';
 import template from './deletable-people-group.mustache';
 
-export default GGRC.Components('deletablePeopleGroup', {
+export default can.Component.extend({
   tag: 'deletable-people-group',
-  template: template,
+  template,
   viewModel,
 });

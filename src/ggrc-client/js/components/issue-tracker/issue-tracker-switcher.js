@@ -5,9 +5,8 @@
 
 const tag = 'issue-tracker-switcher';
 
-export default GGRC.Components('issueTrackerSwitcher', {
-  tag: tag,
-  template: '<content/>',
+export default can.Component.extend({
+  tag,
   viewModel: {
     define: {
       isIntegrationEnabled: {

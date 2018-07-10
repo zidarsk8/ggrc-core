@@ -9,9 +9,9 @@ import '../../people/deletable-people-group';
 
 import template from './templates/lhn-popup-people.mustache';
 
-export default GGRC.Components('lhnPopupPeople', {
+export default can.Component.extend({
   tag: 'lhn-popup-people',
-  template: template,
+  template,
   viewModel: {
     define: {
       instance: {

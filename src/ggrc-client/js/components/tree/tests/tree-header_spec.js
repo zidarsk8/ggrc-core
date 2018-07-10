@@ -4,8 +4,9 @@
  */
 
 import Component from '../tree-header';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
-describe('GGRC.Components.treeHeader', function () {
+describe('tree-header component', function () {
   'use strict';
 
   let vm;
@@ -19,7 +20,7 @@ describe('GGRC.Components.treeHeader', function () {
   }
 
   beforeEach(function () {
-    vm = new (can.Map.extend(Component.prototype.viewModel));
+    vm = getComponentVM(Component);
   });
 
   describe('setColumns() method', function () {

@@ -10,7 +10,7 @@ import {
 } from '../../plugins/utils/acl-utils';
 import template from './access-control-list-roles-helper.mustache';
 
-export default GGRC.Components('accessControlListRolesHelper', {
+export default can.Component.extend({
   tag: 'access-control-list-roles-helper',
   template,
   viewModel: {

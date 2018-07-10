@@ -6,7 +6,7 @@
 import Component from '../inline-autocomplete-wrapper';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 
-describe('GGRC.Components.inline-autocomplete-wrapper', ()=> {
+describe('inline-autocomplete-wrapper component', ()=> {
   let viewModel;
   let instance;
   let path;

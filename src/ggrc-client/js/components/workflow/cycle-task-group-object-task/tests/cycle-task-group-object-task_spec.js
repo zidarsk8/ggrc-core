@@ -7,7 +7,7 @@ import Component from '../cycle-task-group-object-task';
 import RefreshQueue from '../../../../models/refresh_queue';
 import * as WorkflowHelpers from '../../../../plugins/utils/workflow-utils';
 
-describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
+describe('cycle-task-group-object-task component', function () {
   let viewModel;
 
   beforeEach(function () {

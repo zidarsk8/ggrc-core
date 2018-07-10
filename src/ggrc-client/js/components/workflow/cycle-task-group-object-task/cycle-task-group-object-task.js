@@ -85,8 +85,8 @@ let viewModel = can.Map.extend({
   },
 });
 
-export default GGRC.Components('cycleTaskGroupObjectTask', {
+export default can.Component.extend({
   tag: 'cycle-task-group-object-task',
-  template: template,
-  viewModel: viewModel,
+  template,
+  viewModel,
 });
