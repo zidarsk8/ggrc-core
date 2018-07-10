@@ -21,7 +21,6 @@ from ggrc.models.track_object_state import HasObjectState
 
 class Section(Roleable,
               HasObjectState,
-              mixins.Hierarchical,
               mixins.CustomAttributable,
               mixins.WithStartDate,
               mixins.WithLastDeprecatedDate,

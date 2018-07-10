@@ -9,7 +9,7 @@ from ggrc import db
 from ggrc.models import reflection
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import base
-from ggrc.models.mixins import Base, Hierarchical
+from ggrc.models.mixins import Base
 
 
 class CategorizedPublishable(object):
@@ -27,7 +27,7 @@ class CategorizedPublishable(object):
     return updater.query_for(self.rel_class, json_obj, self.attr_name, True)
 
 
-class CategoryBase(Hierarchical, base.ContextRBAC, Base, db.Model):
+class CategoryBase(base.ContextRBAC, Base, db.Model):
   """Base class for Categories"""
   _table_plural = 'category_bases'
   __tablename__ = 'categories'
