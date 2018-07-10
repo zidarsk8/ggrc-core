@@ -49,7 +49,7 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
                  LastDeprecatedTimeboxed, WithSimilarityScore, FinishedDate,
                  VerifiedDate, Notifiable, WithAction,
                  labeled.Labeled, with_last_comment.WithLastComment,
-                 issue_tracker_mixins.IssueTracked, base.ContextRBAC,
+                 issue_tracker_mixins.IssueTrackedWithUrl, base.ContextRBAC,
                  BusinessObject, Indexed, db.Model):
   """Class representing Assessment.
 
