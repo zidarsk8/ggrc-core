@@ -257,15 +257,6 @@ import Mappings from '../models/mappers/mappings';
           'task_group_objects',
           null
         ),
-        approval_tasks: Search(function (binding) {
-          return CMS.Models.CycleTaskGroupObjectTask.findAll({
-            object_approval: true,
-            // We only need to check destination_id/type because cycle tasks
-            // are allways mapped through destination
-            'related_destinations.destination_id': binding.instance.id,
-            'related_destinations.destination_type': binding.instance.type,
-          });
-        }),
         workflows: Cross('task_groups', 'workflow'),
         approval_workflows: CustomFilter('workflows', function (binding) {
           return binding.instance.attr('object_approval');

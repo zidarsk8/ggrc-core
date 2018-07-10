@@ -5,6 +5,7 @@
 
 import '../person/person-data';
 import '../review-link/review-link';
+import {REFRESH_APPROVAL} from '../../events/eventTypes';
 
 import {
   buildParam,
@@ -63,6 +64,7 @@ export default can.Component.extend({
         },
       };
 
+      this.attr('isInitializing', true);
       batchRequests(buildParam(type, pagingInfo, relevant, null, filter))
         .then((result)=> {
           let values = result[type].values.map((value) => {
@@ -75,6 +77,9 @@ export default can.Component.extend({
   },
   events: {
     inserted() {
+      this.viewModel.loadReviewTask();
+    },
+    [`{viewModel.instance} ${REFRESH_APPROVAL.type}`]() {
       this.viewModel.loadReviewTask();
     },
   },
