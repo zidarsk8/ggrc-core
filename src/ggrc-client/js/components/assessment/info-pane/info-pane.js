@@ -276,11 +276,9 @@ export default can.Component.extend({
       return this.requestQuery(query, 'urls');
     },
     updateItems: function () {
-      can.makeArray(arguments).forEach((type) => {
-        this['load' + can.capitalize(type)]().done((items) => {
-          this.attr(type, items);
-        });
-      });
+      can.makeArray(arguments).forEach(function (type) {
+        this.attr(type).replace(this['load' + can.capitalize(type)]());
+      }.bind(this));
 
       this.refreshCounts(['Evidence']);
     },

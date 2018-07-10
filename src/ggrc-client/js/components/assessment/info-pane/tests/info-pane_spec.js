@@ -622,7 +622,7 @@ describe('assessment-info-pane component', () => {
         types.forEach((type, i) => {
           const methodName = `load${can.capitalize(type)}`;
           vm.attr(type.toLowerCase(), []);
-          spyOn(vm, methodName).and.returnValue(can.Deferred());
+          spyOn(vm, methodName);
         });
       });
 
@@ -638,15 +638,11 @@ describe('assessment-info-pane component', () => {
       it('replaces values of passed fields in VM with the results of ' +
       'appropriate methods', function () {
         const loadedData = types.map((type, i) => [type, i]);
-
         types.forEach((type, i) => {
           const methodName = `load${can.capitalize(type)}`;
-          vm[methodName].and.returnValue(
-            can.Deferred().resolve(loadedData[i]));
+          vm[methodName].and.returnValue(loadedData[i]);
         });
-
         vm.updateItems(...types);
-
         types.forEach((type, i) => {
           expect(vm.attr(type).serialize()).toEqual(loadedData[i]);
         });
