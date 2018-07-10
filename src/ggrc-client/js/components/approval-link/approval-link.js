@@ -10,6 +10,8 @@ import {
   buildParam,
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
+import {getRole} from '../../plugins/utils/acl-utils';
+import Permission from '../../permission';
 
 import template from './approval-link.mustache';
 
@@ -17,6 +19,27 @@ export default can.Component.extend({
   tag: 'approval-link',
   template,
   viewModel: {
+    define: {
+      isReviewer: {
+        get() {
+          let assigneeRole = getRole(
+            'CycleTaskGroupObjectTask',
+            'Task Assignees');
+          let currentUserId = GGRC.current_user.id;
+          let reviewTask = this.attr('review_task');
+
+          let isReviewer = reviewTask &&
+              (_.some(reviewTask.access_control_list, function (acl) {
+                return acl.ac_role_id === assigneeRole.id &&
+                  acl.person &&
+                  acl.person.id === currentUserId;
+              }) ||
+              Permission.is_allowed('__GGRC_ADMIN__'));
+
+          return !!isReviewer;
+        },
+      },
+    },
     instance: null,
     review_task: null,
     isInitializing: true,

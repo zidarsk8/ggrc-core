@@ -16,8 +16,7 @@
     <div>
     <spinner toggle="isInitializing"></spinner>
     {{^if isInitializing}}
-    {{#with_is_reviewer review_task}}
-      {{#if is_reviewer}}
+      {{#if isReviewer}}
         {{#if_equals review_task.status 'Declined'}}
             <div>Review was declined on {{#date instance.created_at}}{{/date}}.</div>
         {{/if_equals}}
@@ -71,7 +70,6 @@
           </review-link>
         {{/is_allowed}}
       {{/if}}
-    {{/with_is_reviewer}}
     {{/if}}
     </div>
   {{/if_equals}}

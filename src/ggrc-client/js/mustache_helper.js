@@ -1108,23 +1108,6 @@ Mustache.registerHelper('current_user_is_admin', function (options) {
   return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper('with_is_reviewer', function (reviewTask, options) {
-  let assigneeRole = getRole('CycleTaskGroupObjectTask', 'Task Assignees');
-  let currentUserId = GGRC.current_user.id;
-  let isReviewer;
-
-  reviewTask = Mustache.resolve(reviewTask);
-
-  isReviewer = reviewTask &&
-      (_.some(reviewTask.access_control_list, function (acl) {
-        return acl.ac_role_id === assigneeRole.id &&
-          acl.person &&
-          acl.person.id === currentUserId;
-      }) ||
-      Permission.is_allowed('__GGRC_ADMIN__'));
-  return options.fn(options.contexts.add({is_reviewer: isReviewer}));
-});
-
 Mustache.registerHelper('default_audit_title', function (instance, options) {
   let index;
   let program;
