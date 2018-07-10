@@ -169,7 +169,10 @@ export default can.Component.extend({
           }, '');
 
         if (panel.attr('snapshot_type')) {
-          relevantFilter += ` AND child_type = ${panel.attr('snapshot_type')}`;
+          if (relevantFilter) {
+            relevantFilter += ' AND ';
+          }
+          relevantFilter += `child_type = ${panel.attr('snapshot_type')}`;
         }
 
         return {
