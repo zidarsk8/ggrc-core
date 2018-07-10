@@ -19,11 +19,15 @@
           </div>
         </show-more>
       {{else}}
+        {{! We've added _cid of view model to class because canjs can't
+            correctly render 2 versions of the same component with the same data}}
+        <div class="object-list__items {{_cid}}">
         {{#each items}}
           <div class="object-list__item {{#isSelected}}object-list__item-selected{{/isSelected}}" ($click)="modifySelection">
               <content>No item component or template is provided</content>
           </div>
         {{/each}}
+        </div>
       {{/if}}
   {{else}}
       <div class="object-list__item object-list__item-empty">
