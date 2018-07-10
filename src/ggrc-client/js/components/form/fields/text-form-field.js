@@ -24,6 +24,10 @@ const TEXT_FORM_FIELD_VM = {
     },
     value: {
       set(newValue) {
+        if (!this.isAllowToSet()) {
+          return;
+        }
+
         this.attr('_value', newValue);
       },
       get() {
@@ -34,6 +38,19 @@ const TEXT_FORM_FIELD_VM = {
   fieldId: null,
   placeholder: '',
   _value: '',
+  textField: null,
+  isAllowToSet() {
+    let textField = this.attr('textField');
+
+    if (!textField) {
+      return true;
+    }
+
+    let isFocus = textField.is(':focus');
+    let isEqualValues = textField.val() === this.attr('_value');
+
+    return !isFocus || isEqualValues;
+  },
   valueChanged(newValue) {
     this.dispatch({
       type: 'valueChanged',
@@ -47,6 +64,11 @@ export default can.Component.extend({
   template,
   tag: 'text-form-field',
   viewModel: TEXT_FORM_FIELD_VM,
+  events: {
+    inserted() {
+      this.viewModel.attr('textField', this.element.find('.text-field'));
+    },
+  },
 });
 
 export {TEXT_FORM_FIELD_VM};

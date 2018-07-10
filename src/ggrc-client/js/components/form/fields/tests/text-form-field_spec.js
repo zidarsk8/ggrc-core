@@ -48,4 +48,59 @@ describe('GGRC.Components.textFormField', () => {
       value: 'newValue2',
     });
   });
+
+  describe('isAllowToSet() method', () => {
+    let textField;
+
+    beforeEach(() => {
+      textField = $('<input type="text" value="myText"/>');
+      viewModel.attr('textField', textField);
+    });
+
+    it('should return TRUE. has focus and values are equal', () => {
+      let value = 'myText';
+      viewModel.attr('_value', value);
+      textField.val(value);
+
+      spyOn(textField, 'is').and.returnValue(true);
+      let isAllow = viewModel.isAllowToSet();
+
+      expect(isAllow).toBeTruthy();
+    });
+
+    it('should return TRUE. doesn\'t have focus and values are equal', () => {
+      let value = 'myText';
+      viewModel.attr('_value', value);
+      textField.val(value);
+
+      spyOn(textField, 'is').and.returnValue(false);
+      let isAllow = viewModel.isAllowToSet();
+
+      expect(isAllow).toBeTruthy();
+    });
+
+    it('should return TRUE. doesn\'t have focus and values NOT are equal',
+      () => {
+        let value = 'myText';
+        viewModel.attr('_value', value);
+        textField.val('new value');
+
+        spyOn(textField, 'is').and.returnValue(false);
+        let isAllow = viewModel.isAllowToSet();
+
+        expect(isAllow).toBeTruthy();
+      }
+    );
+
+    it('should return FALSE. has focus and values are NOT equal', () => {
+      let value = 'myText';
+      viewModel.attr('_value', value);
+      textField.val('new val');
+
+      spyOn(textField, 'is').and.returnValue(true);
+      let isAllow = viewModel.isAllowToSet();
+
+      expect(isAllow).toBeFalsy();
+    });
+  });
 });
