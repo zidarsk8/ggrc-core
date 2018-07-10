@@ -14,23 +14,31 @@ import template from './date-form-field.mustache';
     template: template,
     viewModel: {
       define: {
-        _value: {
-          set: function (newValue, setValue, onError, oldValue) {
-            setValue(newValue);
-            if (oldValue === undefined ||
-                newValue === oldValue) {
+        inputValue: {
+          set(newValue) {
+            let oldValue = this.attr('_value');
+
+            if (newValue === oldValue) {
               return;
             }
+
+            this.attr('_value', newValue);
             this.valueChanged(newValue);
+          },
+          get() {
+            return this.attr('_value');
           },
         },
         value: {
-          set: function (newValue, setValue) {
-            setValue(newValue);
+          set(newValue) {
             this.attr('_value', newValue);
+          },
+          get() {
+            return this.attr('_value');
           },
         },
       },
+      _value: null,
       fieldId: null,
       readonly: true,
       valueChanged: function (newValue) {

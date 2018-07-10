@@ -19,14 +19,25 @@ import {DATE_FORMAT} from '../../plugins/utils/date-util';
       '/components/datepicker/datepicker.mustache'
     ),
     viewModel: can.Map.extend({
-      date: null,
       format: '@',
       helptext: '@',
       label: '@',
       setMinDate: null,
       setMaxDate: null,
-      _date: null,  // the internal value of the text input field
+      _date: null, // the internal value of the text input field
       define: {
+        date: {
+          set(newValue, setValue, onError, oldValue) {
+            if (newValue === oldValue) {
+              return;
+            }
+
+            if (this.attr('picker')) {
+              this.attr('picker').datepicker('setDate', newValue);
+            }
+            setValue(newValue);
+          },
+        },
         readonly: {
           type: 'boolean',
           value: false,
