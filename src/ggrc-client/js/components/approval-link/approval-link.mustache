@@ -17,11 +17,11 @@
     <spinner toggle="isInitializing"></spinner>
     {{^if isInitializing}}
       {{#if isReviewer}}
-        {{#if_equals review_task.status 'Declined'}}
+        {{#if_equals reviewTask.status 'Declined'}}
             <div>Review was declined on {{#date instance.created_at}}{{/date}}.</div>
         {{/if_equals}}
 
-        <div {{#review_task}}{{data 'model'}}{{/review_task}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model")}) }}>
+        <div {{#reviewTask}}{{data 'model'}}{{/reviewTask}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model")}) }}>
           <button
               class="btn btn-mini btn-green change-task-status {{instance._disabled}} {{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}"
               data-name="status"
@@ -36,10 +36,10 @@
             data-toggle="modal-ajax-form"
             data-object-singular="CycleTaskEntry"
             data-object-params='{
-              "cycle" : {{review_task.cycle.id}},
-              "cycle_task_group_object_task" : {{review_task.id}},
+              "cycle" : {{reviewTask.cycle.id}},
+              "cycle_task_group_object_task" : {{reviewTask.id}},
               "is_declining_review" : 1,
-              "context": {{firstnonempty review_task.context.id "null"}} }'
+              "context": {{firstnonempty reviewTask.context.id "null"}} }'
             data-object-plural="cycle_task_entries"
             data-object-id=""
             data-placement="right"

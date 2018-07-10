@@ -25,8 +25,8 @@ describe('approval-link component', ()=> {
       spyOn(aclUtils, 'getRole').and.returnValue(assigneeRole);
     });
 
-    it('returns false when review_task is not set', () => {
-      viewModel.attr('review_task', null);
+    it('returns false when reviewTask is not set', () => {
+      viewModel.attr('reviewTask', null);
       spyOn(Permission, 'is_allowed').and.returnValue(false);
 
       let result = viewModel.attr('isReviewer');
@@ -35,7 +35,7 @@ describe('approval-link component', ()=> {
     });
 
     it('returns true when user is Admin', () => {
-      viewModel.attr('review_task', {});
+      viewModel.attr('reviewTask', {});
       spyOn(Permission, 'is_allowed').and.returnValue(true);
 
       let result = viewModel.attr('isReviewer');
@@ -44,7 +44,7 @@ describe('approval-link component', ()=> {
     });
 
     it('returns false when ACL person does not match current user', () => {
-      viewModel.attr('review_task', {
+      viewModel.attr('reviewTask', {
         access_control_list: {
           ac_role_id: assigneeRole.id,
           person: {
@@ -60,7 +60,7 @@ describe('approval-link component', ()=> {
     });
 
     it('returns false when ACL role non-Task Assignees for user', () => {
-      viewModel.attr('review_task', {
+      viewModel.attr('reviewTask', {
         access_control_list: {
           ac_role_id: 12,
           person: {
@@ -76,7 +76,7 @@ describe('approval-link component', ()=> {
     });
 
     it('returns true when ACL person role matches current user', () => {
-      viewModel.attr('review_task', {
+      viewModel.attr('reviewTask', {
         access_control_list: {
           ac_role_id: assigneeRole.id,
           person: {

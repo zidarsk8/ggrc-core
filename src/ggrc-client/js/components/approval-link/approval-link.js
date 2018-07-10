@@ -26,7 +26,7 @@ export default can.Component.extend({
             'CycleTaskGroupObjectTask',
             'Task Assignees');
           let currentUserId = GGRC.current_user.id;
-          let reviewTask = this.attr('review_task');
+          let reviewTask = this.attr('reviewTask');
 
           let isReviewer = reviewTask &&
               (_.some(reviewTask.access_control_list, function (acl) {
@@ -41,7 +41,7 @@ export default can.Component.extend({
       },
     },
     instance: null,
-    review_task: null,
+    reviewTask: null,
     isInitializing: true,
     loadReviewTask() {
       let instance = this.attr('instance');
@@ -68,7 +68,7 @@ export default can.Component.extend({
           let values = result[type].values.map((value) => {
             return new CMS.Models[type](value);
           });
-          this.attr('review_task', values[0]);
+          this.attr('reviewTask', values[0]);
           this.attr('isInitializing', false);
         });
     },
