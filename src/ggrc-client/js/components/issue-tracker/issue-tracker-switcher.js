@@ -30,14 +30,8 @@ export default can.Component.extend({
           setValue(newValue);
         },
       },
-      isParent: {
-        get: function () {
-          return !this.attr('parent');
-        },
-      },
     },
     instance: {},
-    parent: null,
     setIssueTitle: false,
     convertToBool: function (value) {
       if (typeof value === 'boolean') {
