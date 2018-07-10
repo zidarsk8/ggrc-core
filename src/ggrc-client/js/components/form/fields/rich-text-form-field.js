@@ -16,10 +16,11 @@ import template from './rich-text-form-field.mustache';
       _value: '',
       _oldValue: null,
       placeholder: '',
+      editorHasFocus: false,
       define: {
         value: {
           set(newValue) {
-            if (!_.isNull(newValue)) {
+            if (!_.isNull(newValue) && this.isAllowToSet(newValue)) {
               this.attr('_oldValue', newValue);
               this.attr('_value', newValue);
             }
@@ -48,6 +49,12 @@ import template from './rich-text-form-field.mustache';
         },
       },
       fieldId: null,
+      isAllowToSet() {
+        let isFocus = this.attr('editorHasFocus');
+        let isEqualValues = this.attr('_value') === this.attr('_oldValue');
+
+        return !isFocus || isEqualValues;
+      },
       checkValueChanged: function () {
         let newValue = this.attr('_value');
         let oldValue = this.attr('_oldValue');
