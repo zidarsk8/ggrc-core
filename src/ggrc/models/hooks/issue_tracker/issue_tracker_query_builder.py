@@ -123,12 +123,20 @@ class IssueQueryBuilder(BaseIssueTrackerQueryBuilder):
 
   def build_create_query(self, obj, issue_tracker_info):
     """Build create issue query for issue tracker."""
+    allowed_emails = integration_utils.exclude_auditor_emails(
+        {acl.person.email for acl in obj.access_control_list}
+    )
+
+    # Don't turn on integration if 'reporter' is auditor.
+    if obj.modified_by.email not in allowed_emails:
+      return {}
+
     self.comments.append(self.INITIAL_COMMENT_TMPL.format(
         model=self.MODEL_NAME,
         link=self.get_ggrc_object_url(obj)
     ))
     self.handle_issue_tracker_info(obj, issue_tracker_info)
-    self._handle_people_emails(obj)
+    self._handle_people_emails(obj, allowed_emails)
     self._handle_issue_attributes(obj)
     self.issue_tracker_query["status"] = "ASSIGNED"
 
@@ -169,7 +177,7 @@ class IssueQueryBuilder(BaseIssueTrackerQueryBuilder):
 
     return self.issue_tracker_query
 
-  def _handle_people_emails(self, obj):
+  def _handle_people_emails(self, obj, allowed_emails):
     """Handle emails.
 
     Reporter should be a person who triggers an event.
@@ -177,11 +185,15 @@ class IssueQueryBuilder(BaseIssueTrackerQueryBuilder):
     Assignee should be first person from Primary Contacts
              in alphabetical order.
     CCS should be all other persons that mentioned in custom roles.
+
+    No field should contain global auditors.
     """
     acls = obj.access_control_list
 
     # Handle Admins list.
-    admins = [acl.person for acl in acls if acl.ac_role.name == "Admin"]
+    admins = [acl.person for acl in acls
+              if acl.ac_role.name == "Admin" and
+              acl.person.email in allowed_emails]
     admins = sorted(admins, key=lambda person: person.name)
 
     issue_verifier_email = admins[0].email if admins else ""
@@ -190,7 +202,8 @@ class IssueQueryBuilder(BaseIssueTrackerQueryBuilder):
     # Handle Primary Contacts list.
     primary_contacts = [
         acl.person for acl in acls
-        if acl.ac_role.name == "Primary Contacts"
+        if acl.ac_role.name == "Primary Contacts" and
+        acl.person.email in allowed_emails
     ]
     primary_contacts = sorted(primary_contacts, key=lambda p: p.name)
     assignee_email = primary_contacts[0].email if primary_contacts else ""
@@ -201,9 +214,11 @@ class IssueQueryBuilder(BaseIssueTrackerQueryBuilder):
     self.issue_tracker_query["reporter"] = reporter_email
 
     # Handle CCS list.
-    emails = {acl.person.email for acl in acls}
-    emails -= {issue_verifier_email, assignee_email, reporter_email}
-    self.issue_tracker_query["ccs"] = list(emails)
+    # emails = {acl.person.email for acl in acls}
+    ccs = allowed_emails - {issue_verifier_email,
+                            assignee_email,
+                            reporter_email}
+    self.issue_tracker_query["ccs"] = list(ccs)
 
   def _handle_issue_attributes(self, obj):
     """Handle attributes from GGRC Issue object.

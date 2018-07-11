@@ -52,6 +52,9 @@ def create_issue_handler(obj, issue_tracker_info):
   builder = issue_tracker_query_builder.IssueQueryBuilder()
   issue_tracker_query = builder.build_create_query(obj, issue_tracker_info)
 
+  if not issue_tracker_query:
+    return
+
   # Try to create issue in issue tracker.
   try:
     res = issues.Client().create_issue(issue_tracker_query)

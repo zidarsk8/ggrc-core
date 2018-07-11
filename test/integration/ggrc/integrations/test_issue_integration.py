@@ -9,6 +9,7 @@ import ddt
 from ggrc import models
 from ggrc import settings
 from ggrc.models import all_models
+from ggrc.models.hooks.issue_tracker import integration_utils
 
 from integration.ggrc.models import factories
 from integration import ggrc
@@ -29,6 +30,7 @@ class TestIssueIntegration(ggrc.TestCase):
 
   @mock.patch("ggrc.integrations.issues.Client.create_issue",
               return_value={"issueId": "issueId"})
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_create_issue_tracker_info(self, mock_create_issue):
     """Test creation issue tracker issue for Issue object."""
     component_id = "1234"
@@ -36,12 +38,13 @@ class TestIssueIntegration(ggrc.TestCase):
     issue_type = "Default Issue type"
     issue_priority = "Default Issue priority"
     issue_severity = "Default Issue severity"
-    random_title = factories.random_str()
+    title = "test title"
 
-    with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True):
+    with mock.patch.object(integration_utils, "exclude_auditor_emails",
+                           return_value={u"user@example.com", }):
       response = self.api.post(all_models.Issue, {
           "issue": {
-              "title": random_title,
+              "title": title,
               "context": None,
               "issue_tracker": {
                   "enabled": True,
@@ -59,12 +62,26 @@ class TestIssueIntegration(ggrc.TestCase):
       issue_tracker_issue = models.IssuetrackerIssue.get_issue("Issue",
                                                                issue_id)
       self.assertTrue(issue_tracker_issue.enabled)
-      self.assertEqual(issue_tracker_issue.title, random_title)
+      self.assertEqual(issue_tracker_issue.title, title)
       self.assertEqual(issue_tracker_issue.component_id, component_id)
       self.assertEqual(issue_tracker_issue.hotlist_id, hotlist_id)
       self.assertEqual(issue_tracker_issue.issue_type, issue_type)
       self.assertEqual(issue_tracker_issue.issue_priority, issue_priority)
       self.assertEqual(issue_tracker_issue.issue_severity, issue_severity)
+
+  def test_exclude_auditor(self):
+    """Test 'exclude_auditor_emails' util."""
+    audit = factories.AuditFactory()
+    factories.AccessControlListFactory(
+        ac_role=factories.AccessControlRoleFactory(name="Auditors"),
+        person=factories.PersonFactory(email="auditor@example.com"),
+        object_id=audit.id,
+        object_type="Audit"
+    )
+
+    result = integration_utils.exclude_auditor_emails(["auditor@example.com",
+                                                       "admin@example.com"])
+    self.assertEqual(result, {"admin@example.com", })
 
   @ddt.data(
       ({"description": "new description"},
@@ -92,7 +109,7 @@ class TestIssueIntegration(ggrc.TestCase):
         issue_tracked_obj=factories.IssueFactory()
     )
     with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True):
-       self.api.put(iti.issue_tracked_obj, issue_attrs)
+      self.api.put(iti.issue_tracked_obj, issue_attrs)
     mock_update_issue.assert_called_with(iti.issue_id, expected_query)
 
   @mock.patch("ggrc.integrations.issues.Client.update_issue")

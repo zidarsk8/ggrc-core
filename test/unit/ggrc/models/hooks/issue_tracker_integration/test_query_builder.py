@@ -102,7 +102,9 @@ class TestIssueQueryBuilder(unittest.TestCase):
     assignee.person.email = "assignee_email"
     assignee.ac_role.name = "Primary Contacts"
 
-    mock_object.access_control_list = [verifier, assignee, ]
+    access_control_list = [verifier, assignee, ]
+    mock_object.access_control_list = access_control_list
+    allowed_emails = {acl.person.email for acl in access_control_list}
 
     expected_result = {
         "verifier": "verifier_email",
@@ -112,13 +114,14 @@ class TestIssueQueryBuilder(unittest.TestCase):
     }
 
     # Perform action.
-    self.builder._handle_people_emails(mock_object)
+    self.builder._handle_people_emails(mock_object, allowed_emails)
 
     # Assert results.
     self.assertDictEqual(self.builder.issue_tracker_query, expected_result)
 
   def test_handle_people_emails_with_ccs(self):
     """Test '_handle_people_emails' method with emails in ccs list."""
+    # Arrange test data.
     mock_object = mock.MagicMock()
     mock_object.modified_by.email = "reporter_email"
 
@@ -157,7 +160,7 @@ class TestIssueQueryBuilder(unittest.TestCase):
     custom_role_3.person.email = "verifier_email_1"
     custom_role_3.ac_role.name = "Custom Role"
 
-    mock_object.access_control_list = [
+    access_control_list = [
         verifier_1,
         verifier_2,
         assignee_1,
@@ -166,16 +169,58 @@ class TestIssueQueryBuilder(unittest.TestCase):
         custom_role_2,
         custom_role_3,
     ]
+    allowed_emails = {acl.person.email for acl in access_control_list}
+    mock_object.access_control_list = access_control_list
 
     expected_result = {
         "verifier": "verifier_email_1",
         "assignee": "assignee_email_1",
         "reporter": "reporter_email",
-        "ccs": ["custom_email", "assignee_email_2", "verifier_email_2"],
+        "ccs": ["custom_email", "verifier_email_2", "assignee_email_2"],
     }
 
     # Perform action.
-    self.builder._handle_people_emails(mock_object)
+    self.builder._handle_people_emails(mock_object, allowed_emails)
 
     # Assert results.
     self.assertDictEqual(self.builder.issue_tracker_query, expected_result)
+
+  def test_build_delete_query(self):
+    """Test 'build_delete_query' method."""
+    expected_result = {
+        "comment": "Changes to this GGRC object will no longer be "
+                   "tracked within this bug.",
+        "status": "OBSOLETE"
+    }
+    self.builder.build_delete_query()
+    self.assertEquals(self.builder.issue_tracker_query, expected_result)
+
+  def test_update_issue_comment_attributes(self):
+    """Test '_update_issue_comment_attributes' method."""
+    # Arrange test data.
+    mock_current_object = mock.MagicMock()
+    mock_current_object.description = "description"
+    mock_current_object.test_plan = "test plan"
+
+    mock_new_object = mock.MagicMock()
+    mock_new_object.description = "new description"
+    mock_new_object.test_plan = "new test plan"
+
+    mock_current_tracker_info = {"enabled": True}
+    mock_new_tracker_info = {"enabled": False}
+
+    expected_result = [
+        "Issue Description has been updated.\nnew description",
+        "Issue Remediation Plan has been updated.\nnew test plan",
+        "Changes to this GGRC object will no longer be "
+        "tracked within this bug."
+    ]
+
+    # Perform action.
+    self.builder._update_issue_comment_attributes(mock_new_object,
+                                                  mock_current_object,
+                                                  mock_new_tracker_info,
+                                                  mock_current_tracker_info)
+
+    # Assert results.
+    self.assertEquals(self.builder.comments, expected_result)
