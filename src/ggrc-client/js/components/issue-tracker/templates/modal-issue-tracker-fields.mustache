@@ -4,18 +4,23 @@
 }}
 
 <div class="ggrc-form-item">
-  <div class="ggrc-form-item__multiple-row">
+  <div class="ggrc-form-item__row">
     <label class="ggrc-form-item__label">
       Ticket Tracker
     </label>
-    <div class="ggrc-form-item__small-text">
-      <small>
-        <em>{{note}}</em>
-      </small>
+    <div class="ggrc-form-item__note">
+      {{{note}}}
+      {{#if instance.issueCreated}}
+        <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
+            Open Ticket
+        </a>
+      {{/if}}
     </div>
-    <dropdown options-list="instance.class.issue_tracker_enable_options"
-      name="isIntegrationEnabled">
-    </dropdown>
+    <div class="ggrc-form-item__multiple-row">
+      <dropdown options-list="instance.class.issue_tracker_enable_options"
+        name="isIntegrationEnabled">
+      </dropdown>
+    </div>
   </div>
 </div>
 
