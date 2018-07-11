@@ -54,7 +54,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
         assessment_template: CMS.Models.AssessmentTemplate,
         issue: CMS.Models.Issue,
         objective: CMS.Models.Objective,
-        section: CMS.Models.Section,
+        requirement: CMS.Models.Requirement,
         clause: CMS.Models.Clause,
         person: CMS.Models.Person,
         product_group: CMS.Models.ProductGroup,
@@ -419,8 +419,8 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
             mapping: 'objectives',
             draw_children: true,
           },
-          Section: {
-            mapping: 'sections',
+          Requirement: {
+            mapping: 'requirements',
             draw_children: true,
           },
           Clause: {
@@ -457,8 +457,8 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
             allow_mapping: false,
             allow_creating: false,
           },
-          Section: {
-            mapping: 'sections',
+          Requirement: {
+            mapping: 'requirements',
             draw_children: true,
           },
           Clause: {
@@ -503,8 +503,8 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
           _mixins: [
             'objectives', 'controls', 'business_objects',
           ],
-          Section: {
-            mapping: 'sections',
+          Requirement: {
+            mapping: 'requirements',
             draw_children: true,
           },
           Clause: {
@@ -535,7 +535,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
             draw_children: true,
           },
         },
-        Section: {
+        Requirement: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Audit: {
             mapping: 'related_audits',
@@ -564,8 +564,8 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
             allow_mapping: true,
             add_item_view: path + '/audits/tree_add_item.mustache',
           },
-          Section: {
-            mapping: 'sections',
+          Requirement: {
+            mapping: 'requirements',
             draw_children: true,
           },
           Clause: {
@@ -672,7 +672,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
           Audit: {
             draw_children: true,
           },
-          Section: {
+          Requirement: {
             add_item_view:
               GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
             draw_children: true,

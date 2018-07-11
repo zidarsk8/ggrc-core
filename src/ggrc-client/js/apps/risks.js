@@ -40,7 +40,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
     'Program',
     'Project',
     'Regulation',
-    'Section',
+    'Requirement',
     'Standard',
     'System',
     'TechnologyEnvironment',
@@ -92,7 +92,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
         related_systems: TypeFilter('related_objects', 'System'),
         related_controls: TypeFilter('related_objects', 'Control'),
         related_clauses: TypeFilter('related_objects', 'Clause'),
-        related_sections: TypeFilter('related_objects', 'Section'),
+        related_requirements: TypeFilter('related_objects', 'Requirement'),
         related_regulations: TypeFilter('related_objects', 'Regulation'),
         related_contracts: TypeFilter('related_objects', 'Contract'),
         related_policies: TypeFilter('related_objects', 'Policy'),
@@ -324,7 +324,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
     new GGRC.WidgetList('ggrc_risks', descriptor);
   };
 
-  registerHook('LHN.Sections_risk',
+  registerHook('LHN.Requirements_risk',
     GGRC.mustache_path + '/dashboard/lhn_risks');
 
   RisksExtension.init_mappings();
