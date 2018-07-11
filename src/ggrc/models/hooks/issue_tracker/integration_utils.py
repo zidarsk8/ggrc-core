@@ -3,8 +3,10 @@
 
 """This module contains common utils for integration functionality."""
 
+from ggrc import db
 from ggrc import settings
 from ggrc.models import exceptions
+from ggrc.models import all_models
 
 
 def validate_issue_tracker_info(info):
@@ -48,3 +50,23 @@ def build_issue_tracker_url(issue_id):
   issue_tracker_tmpl = settings.ISSUE_TRACKER_BUG_URL_TMPL
   url_tmpl = issue_tracker_tmpl if issue_tracker_tmpl else 'http://issue/%s'
   return url_tmpl % issue_id
+
+
+def exclude_auditor_emails(emails):
+  """Returns new email set with excluded auditor emails."""
+  acl = all_models.AccessControlList
+  acr = all_models.AccessControlRole
+
+  result = db.session.query(
+      all_models.Person.email
+  ).join(
+      acl, acl.person_id == all_models.Person.id
+  ).join(
+      acr
+  ).filter(
+      acr.name == "Auditors",
+      all_models.Person.email.in_(emails)
+  ).distinct().all()
+
+  emails_to_exlude = [line[0] for line in result]
+  return {email for email in emails if email not in emails_to_exlude}
