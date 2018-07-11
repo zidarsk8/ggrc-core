@@ -19,6 +19,9 @@ def create_object_handler(sender, objects=None, **kwargs):
       objects: A list of model instances created from the POSTed JSON.
       sources: A list of original POSTed JSON dictionaries.
   """
+  if not settings.ISSUE_TRACKER_ENABLED:
+    return
+
   sources = kwargs.get("sources", [])
   for obj, src in itertools.izip(objects, sources):
     object_handlers = handlers_mapping.ISSUE_TRACKER_HANDLERS.get(sender, {})
@@ -33,6 +36,9 @@ def delete_object_handler(sender, obj=None, **kwargs):
       sender: A class of Resource handling the DELETE request.
       obj: Model instance for deletion.
   """
+  if not settings.ISSUE_TRACKER_ENABLED:
+    return
+
   object_handlers = handlers_mapping.ISSUE_TRACKER_HANDLERS.get(sender, {})
   object_handlers[handlers_mapping.DELETE_HANDLER_NAME](obj)
 
@@ -43,6 +49,9 @@ def update_object_handler(sender, obj=None, initial_state=None, **kwargs):
       sender: A class of Resource handling the PUT request.
       obj: Model instance for update.
   """
+  if not settings.ISSUE_TRACKER_ENABLED:
+    return
+
   object_handlers = handlers_mapping.ISSUE_TRACKER_HANDLERS.get(sender, {})
   issue_tracker = kwargs.get("src", {}).get("issue_tracker")
   object_handlers[handlers_mapping.UPDATE_HANDLER_NAME](obj,
@@ -52,10 +61,6 @@ def update_object_handler(sender, obj=None, initial_state=None, **kwargs):
 
 def init_hook():
   """Initialize common handlers for all models from handlers dict."""
-
-  if not settings.ISSUE_TRACKER_ENABLED:
-    return
-
   issue_tracker_handlers = handlers_mapping.ISSUE_TRACKER_HANDLERS
   for model, model_handlers in issue_tracker_handlers.iteritems():
     if handlers_mapping.CREATE_HANDLER_NAME in model_handlers:
