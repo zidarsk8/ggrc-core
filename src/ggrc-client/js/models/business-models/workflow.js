@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import TaskGroup from './task-group';
+
 export default can.Model.Cacheable('CMS.Models.Workflow', {
   root_object: 'workflow',
   root_collection: 'workflows',
@@ -83,7 +85,7 @@ export default can.Model.Cacheable('CMS.Models.Workflow', {
           // skip next 'then' chain
           return can.Deferred().reject();
         }
-        taskGroup = new CMS.Models.TaskGroup({
+        taskGroup = new TaskGroup({
           title: taskGroupTitle,
           workflow: instance,
           contact: instance.people && instance.people[0]

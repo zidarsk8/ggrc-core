@@ -23,8 +23,8 @@ export default Directive('CMS.Models.Regulation', {
   isRoleable: true,
   attributes: {},
   mixins: ['accessControlList'],
-  meta_kinds: [ 'Regulation' ],
-  cache: can.getObject('cache', CMS.Models.Directive, true),
+  meta_kinds: ['Regulation'],
+  cache: can.getObject('cache', Directive, true),
   sub_tree_view_options: {
     default_filter: ['Section'],
   },
@@ -34,7 +34,7 @@ export default Directive('CMS.Models.Regulation', {
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
-    can.extend(this.attributes, CMS.Models.Directive.attributes);
+    can.extend(this.attributes, Directive.attributes);
     this._super(...arguments);
   },
 }, {});
