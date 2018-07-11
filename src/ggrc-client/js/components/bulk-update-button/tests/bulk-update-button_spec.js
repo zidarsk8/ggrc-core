@@ -3,15 +3,17 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Component from '../bulk-update-button';
 import updateService from '../../../plugins/utils/bulk-update-service';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../bulk-update-button';
 
-describe('GGRC.Components.bulkUpdateButton', function () {
+
+describe('bulk-update-button component', function () {
   let viewModel;
   let events;
 
   beforeAll(function () {
-    viewModel = new (can.Map.extend(Component.prototype.viewModel));
+    viewModel = getComponentVM(Component);
     events = Component.prototype.events;
   });
 
