@@ -74,7 +74,8 @@
   }
 
   tooltipPrototype.show = function () {
-    if (!this.hasContent() || !this.enabled) {
+    if (!this.hasContent() || !this.enabled
+      || !this.$element[0].matches(delegate)) {
       return;
     }
 

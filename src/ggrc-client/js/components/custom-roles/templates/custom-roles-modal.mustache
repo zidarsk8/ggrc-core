@@ -29,6 +29,11 @@
             {is-proposal}="isProposal"
             {updatable-group-id}="updatableGroupId"
             {read-only}="readOnly"
+            data-original-title="{{groupTooltip}}"
+            {{#showGroupTooltip}}
+              rel="tooltip"
+              data-placement="bottom"
+            {{/showGroupTooltip}}
             >
               <div>
                 <deletable-people-group

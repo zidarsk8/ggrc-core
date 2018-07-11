@@ -63,7 +63,9 @@
       <access-control-list-roles-helper
         {instance}="."
         {is-new-instance}="new_object_form"
-        {read-only}="instance.issueTrackerEnabled">
+        {read-only}="instance.issueTrackerEnabled"
+        {show-group-tooltip}="instance.issueTrackerEnabled"
+        {group-tooltip}="'Please go to the ticket and make changes there'">
       </access-control-list-roles-helper>
     </div>
   </div>
@@ -104,7 +106,12 @@
       <effective-dates instance="instance"/>
     </div>
     <div class="row-fluid">
-      <div data-id="state_hidden" class="span4 hidable">
+      <div data-id="state_hidden" class="span4 hidable"
+	      {{#if instance.issueTrackerEnabled}}
+          rel="tooltip"
+          data-original-title="Please go to the ticket and make changes there"
+          data-placement="bottom"
+        {{/if}}>
         <label>
           State
           <i class="fa fa-question-circle" rel="tooltip" title="Indicates the status of this object."></i>
@@ -115,8 +122,7 @@
                     no-value-label="---"
                     name="instance.status"
                     tabindex="23"
-                    {is-disabled}="instance.issueTrackerEnabled"
-                    >
+                    {is-disabled}="instance.issueTrackerEnabled">
           </dropdown>
       </div>
     </div>
