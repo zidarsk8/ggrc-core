@@ -119,23 +119,6 @@ export default can.Model.Cacheable('CMS.Models.Audit', {
         }
       }
     );
-
-    this.validate(['_transient.audit_firm', 'audit_firm'],
-      function () {
-        let auditFirm = this.attr('audit_firm');
-        let transientAuditFirm = this.attr('_transient.audit_firm');
-
-        if (!auditFirm && transientAuditFirm) {
-          if (_.isObject(transientAuditFirm) &&
-            (auditFirm.reify().title !== transientAuditFirm.reify().title) ||
-            (transientAuditFirm !== '' && transientAuditFirm !== null &&
-            auditFirm !== null &&
-            transientAuditFirm !== auditFirm.reify().title)) {
-            return 'No valid org group selected for firm';
-          }
-        }
-      }
-    );
   },
 }, {
   object_model: function () {
