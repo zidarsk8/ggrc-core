@@ -5,7 +5,7 @@
 
 runtime: python27
 api_version: 1
-threadsafe: true
+threadsafe: false
 instance_class: {INSTANCE_CLASS}
 
 {SCALING}
