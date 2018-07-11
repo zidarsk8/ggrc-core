@@ -120,6 +120,10 @@ class IssueQueryBuilder(BaseIssueTrackerQueryBuilder):
   UPDATE_REMEDIATION_PLAN_TMPL = (
       "Issue Remediation Plan has been updated.\n{}"
   )
+  EXCLUDE_REPORTER_EMAIL_ERROR_MSG = (
+      "Issue tracker integration is not activated because the reporter "
+      "is an Global auditor."
+  )
 
   def build_create_query(self, obj, issue_tracker_info):
     """Build create issue query for issue tracker."""
@@ -129,6 +133,7 @@ class IssueQueryBuilder(BaseIssueTrackerQueryBuilder):
 
     # Don't turn on integration if 'reporter' is auditor.
     if obj.modified_by.email not in allowed_emails:
+      obj.add_warning(self.EXCLUDE_REPORTER_EMAIL_ERROR_MSG)
       return {}
 
     self.comments.append(self.INITIAL_COMMENT_TMPL.format(

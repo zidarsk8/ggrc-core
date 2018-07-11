@@ -67,6 +67,7 @@ def create_issue_handler(obj, issue_tracker_info):
         "Unable to create a ticket while creating object ID=%d: %s",
         obj.id, error
     )
+    obj.add_warning("Unable to update a ticket.")
     issue_tracker_info["enabled"] = False
 
   # Fill necessary fields for issuetracker_issue object.
