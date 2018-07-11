@@ -49,8 +49,6 @@ export default can.Model.Cacheable('CMS.Models.Issue', {
   sub_tree_view_options: {
     default_filter: ['Control', 'Control_versions'],
   },
-  info_pane_options: {
-  },
   defaults: {
     status: 'Draft',
   },

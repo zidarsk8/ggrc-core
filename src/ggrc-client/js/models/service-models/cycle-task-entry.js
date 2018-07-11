@@ -27,8 +27,6 @@ export default can.Model.Cacheable('CMS.Models.CycleTaskEntry', {
   create: 'POST /api/cycle_task_entries',
   update: 'PUT /api/cycle_task_entries/{id}',
   destroy: 'DELETE /api/cycle_task_entries/{id}',
-  info_pane_options: {
-  },
   attributes: {
     cycle_task_group_object_task: 'CMS.Models.CycleTaskGroupObjectTask.stub',
     modified_by: 'CMS.Models.Person.stub',

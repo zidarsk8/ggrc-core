@@ -129,8 +129,6 @@ export default can.Model.Cacheable('CMS.Models.Assessment', {
   sub_tree_view_options: {
     default_filter: ['Control'],
   },
-  info_pane_options: {
-  },
   confirmEditModal: {
     title: 'Confirm moving Assessment to "In Progress"',
     description: 'You are about to move Assessment from ' +
