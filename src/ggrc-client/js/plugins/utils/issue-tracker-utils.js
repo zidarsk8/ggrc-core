@@ -52,11 +52,21 @@ function cleanUpWarnings(instance) {
   }
 }
 
+function checkWarnings(instance) {
+  let warnings = instance.attr('issue_tracker._warnings');
+
+  if (warnings && warnings.length) {
+    let warningMessage = warnings.join('; ');
+    GGRC.Errors.notifier('warning', warningMessage);
+  }
+}
+
 export {
   issueTrackerStaticFields,
   isIssueTrackerInitialized,
   isIssueTrackerEnabled,
   isIssueCreated,
   initIssueTrackerObject,
+  checkWarnings,
   cleanUpWarnings,
 };

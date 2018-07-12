@@ -18,6 +18,9 @@ export default Mixin('issueTracker',
     'after:refresh'() {
       this.initIssueTracker();
     },
+    after_save() {
+      issueTrackerUtils.checkWarnings(this);
+    },
     initIssueTracker() {
       if (!GGRC.ISSUE_TRACKER_ENABLED) {
         return;

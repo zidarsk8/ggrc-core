@@ -256,27 +256,6 @@ export default can.Model.Cacheable('CMS.Models.Assessment', {
     }
     this.bind('refreshInstance', this.refresh.bind(this));
   },
-  _checkIssueTrackerWarnings: function () {
-    let warnings;
-    let warningMessage;
-
-    if (!this.issue_tracker) {
-      return;
-    }
-
-    warnings = this.issue_tracker._warnings;
-
-    if (warnings && warnings.length) {
-      warningMessage = warnings.join('; ');
-      $(document.body).trigger('ajax:flash', {warning: warningMessage});
-    }
-  },
-  after_update: function () {
-    this._checkIssueTrackerWarnings();
-  },
-  after_create: function () {
-    this._checkIssueTrackerWarnings();
-  },
   before_create: function () {
     if (!this.audit) {
       throw new Error('Cannot save assessment, audit not set.');

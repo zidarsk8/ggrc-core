@@ -24,6 +24,9 @@ export default Mixin('assessmentIssueTracker',
     'after:refresh'() {
       this.initIssueTracker();
     },
+    after_save() {
+      issueTrackerUtils.checkWarnings(this);
+    },
     trackAuditUpdates() {
       let audit = this.attr('audit') && this.attr('audit').reify();
       if (!audit) {
