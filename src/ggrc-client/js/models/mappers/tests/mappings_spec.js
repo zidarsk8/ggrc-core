@@ -4,8 +4,9 @@
  */
 
 import * as Utils from '../../../plugins/ggrc_utils';
+import Mappings from '../mappings';
 
-describe('GGRC.Mappings', function () {
+describe('Mappings', function () {
   let allTypes = [];
   let notMappableModels = [];
   let modules = {
@@ -31,6 +32,7 @@ describe('GGRC.Mappings', function () {
         'Policy',
         'Process',
         'Product',
+        'ProductGroup',
         'Program',
         'Project',
         'Regulation',
@@ -39,6 +41,7 @@ describe('GGRC.Mappings', function () {
         'System',
         'Vendor',
         'Risk',
+        'TechnologyEnvironment',
         'Threat',
       ],
       notMappable: ['AssessmentTemplate', 'Evidence'],
@@ -115,6 +118,7 @@ describe('GGRC.Mappings', function () {
     Policy: _.difference(filtered, directives),
     Process: filtered,
     Product: filtered,
+    ProductGroup: filtered,
     Program: _.difference(allTypes,
       ['Program', 'Audit', 'RiskAssessment', 'Assessment']
         .concat(modules.core.notMappable, modules.workflows.notMappable)),
@@ -127,6 +131,7 @@ describe('GGRC.Mappings', function () {
     System: filtered,
     TaskGroup: _.difference(filtered, ['Audit', 'Person',
       'TaskGroup', 'Workflow', 'Assessment', 'Document']),
+    TechnologyEnvironment: filtered,
     Threat: filtered,
     Vendor: filtered,
   };
@@ -152,7 +157,7 @@ describe('GGRC.Mappings', function () {
     modelsForTests.forEach(function (type) {
       it('returns mappable types for ' + type, function () {
         let expectedModels = mappingRules[type];
-        let result = GGRC.Mappings.getMappingTypes(type, [], []);
+        let result = Mappings.getMappingTypes(type, [], []);
         let resultGroups = Object.keys(result);
         let resultModels = getModelsFromGroups(result, EXPECTED_GROUPS);
 
@@ -182,7 +187,7 @@ describe('GGRC.Mappings', function () {
 
     it('returns specified object', function () {
       let result;
-      result = GGRC.Mappings._prepareCorrectTypeFormat(cmsModel);
+      result = Mappings._prepareCorrectTypeFormat(cmsModel);
       expect(result).toEqual(expectedResult);
     });
 
@@ -191,7 +196,7 @@ describe('GGRC.Mappings', function () {
       let cmsModel1 = _.assign({}, cmsModel, {
         title_plural: 'Title Plural',
       });
-      result = GGRC.Mappings._prepareCorrectTypeFormat(cmsModel1);
+      result = Mappings._prepareCorrectTypeFormat(cmsModel1);
       expect(result.plural).toEqual(expectedResult.plural);
     });
   });
@@ -211,7 +216,7 @@ describe('GGRC.Mappings', function () {
           items: [],
         },
       };
-      spyOn(GGRC.Mappings, '_prepareCorrectTypeFormat')
+      spyOn(Mappings, '_prepareCorrectTypeFormat')
         .and.returnValue(type);
     });
 
@@ -222,7 +227,7 @@ describe('GGRC.Mappings', function () {
           .and.returnValue({
             title_singular: 'title_singular',
           });
-        GGRC.Mappings._addFormattedType('name', groups);
+        Mappings._addFormattedType('name', groups);
         expect(groups.governance.items[0]).toEqual(type);
       });
 
@@ -233,13 +238,13 @@ describe('GGRC.Mappings', function () {
           .and.returnValue({
             title_singular: 'title_singular',
           });
-        GGRC.Mappings._addFormattedType('name', groups);
+        Mappings._addFormattedType('name', groups);
         expect(groups[type.category].items[0]).toEqual(type);
       });
 
     it('does nothing if cmsModel is not defined', function () {
       spyOn(Utils, 'getModelByType');
-      GGRC.Mappings._addFormattedType('name', groups);
+      Mappings._addFormattedType('name', groups);
       expect(groups.governance.items.length).toEqual(0);
       expect(groups[type.category].items.length).toEqual(0);
     });
@@ -247,7 +252,7 @@ describe('GGRC.Mappings', function () {
       function () {
         spyOn(Utils, 'getModelByType')
           .and.returnValue({});
-        GGRC.Mappings._addFormattedType('name', groups);
+        Mappings._addFormattedType('name', groups);
         expect(groups.governance.items.length).toEqual(0);
         expect(groups[type.category].items.length).toEqual(0);
       });
@@ -257,7 +262,7 @@ describe('GGRC.Mappings', function () {
           .and.returnValue({
             title_singular: 'Reference',
           });
-        GGRC.Mappings._addFormattedType('name', groups);
+        Mappings._addFormattedType('name', groups);
         expect(groups.governance.items.length).toEqual(0);
         expect(groups[type.category].items.length).toEqual(0);
       });

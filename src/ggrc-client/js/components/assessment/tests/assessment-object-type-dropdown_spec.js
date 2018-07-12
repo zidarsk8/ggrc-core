@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import Mappings from '../../../models/mappers/mappings';
+
 describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
   'use strict';
 
@@ -13,7 +15,7 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
       .getViewModel('assessmentObjectTypeDropdown');
   });
 
-  it('returns the types obtained from the GGRC.Mappings', function () {
+  it('returns the types obtained from the Mappings', function () {
     let result;
 
     let objectTypes = {
@@ -27,7 +29,7 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
       },
     };
 
-    spyOn(GGRC.Mappings, 'getMappingTypes').and.returnValue(objectTypes);
+    spyOn(Mappings, 'getMappingTypes').and.returnValue(objectTypes);
     result = viewModel.attr('objectTypes');
     expect(result).toEqual(objectTypes);
   });
@@ -48,7 +50,7 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
       {name: 'Bar'}, {name: 'Car'}, {name: 'Dar'}, {name: 'Zar'},
     ];
 
-    spyOn(GGRC.Mappings, 'getMappingTypes').and.returnValue(objectTypes);
+    spyOn(Mappings, 'getMappingTypes').and.returnValue(objectTypes);
 
     result = viewModel.attr('objectTypes');
     expect(result.groupFoo.items).toEqual(expected);
@@ -64,7 +66,7 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
       },
     };
 
-    spyOn(GGRC.Mappings, 'getMappingTypes').and.returnValue(objectTypes);
+    spyOn(Mappings, 'getMappingTypes').and.returnValue(objectTypes);
 
     result = viewModel.attr('objectTypes');
     expect(result.all_objects).toBeUndefined();
@@ -112,7 +114,7 @@ describe('GGRC.Components.assessmentObjectTypeDropdown', function () {
         // the groupBaz group, being empty, is expected to have been removed
       };
 
-      spyOn(GGRC.Mappings, 'getMappingTypes').and.returnValue(objectTypes);
+      spyOn(Mappings, 'getMappingTypes').and.returnValue(objectTypes);
 
       result = viewModel.attr('objectTypes');
       expect(result).toEqual(expected);

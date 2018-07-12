@@ -25,6 +25,7 @@ GGRC.config = {
   snapshotable_objects: [
     'Control',
     'Product',
+    'ProductGroup',
     'OrgGroup',
     'Vendor',
     'Risk',
@@ -43,6 +44,7 @@ GGRC.config = {
     'Policy',
     'Market',
     'Metric',
+    'TechnologyEnvironment',
   ],
   VERSION: '1.0-Test (abc)',
 };
@@ -102,6 +104,9 @@ GGRC.Bootstrap = {
     title_plural: 'Products',
     model_singular: 'Product',
   }, {
+    title_plural: 'Product Groups',
+    model_singular: 'ProductGroup',
+  }, {
     title_plural: 'Programs',
     model_singular: 'Program',
   }, {
@@ -128,6 +133,9 @@ GGRC.Bootstrap = {
   }, {
     title_plural: 'Metrics',
     model_singular: 'Metric',
+  }, {
+    title_plural: 'Technology Environments',
+    model_singular: 'TechnologyEnvironment',
   }, {
     title_plural: 'Task Groups',
     model_singular: 'TaskGroup',
@@ -187,6 +195,9 @@ GGRC.Bootstrap = {
     title_plural: 'Products',
     model_singular: 'Product',
   }, {
+    title_plural: 'Product Groups',
+    model_singular: 'ProductGroup',
+  }, {
     title_plural: 'Programs',
     model_singular: 'Program',
   }, {
@@ -213,6 +224,9 @@ GGRC.Bootstrap = {
   }, {
     title_plural: 'Metrics',
     model_singular: 'Metric',
+  }, {
+    title_plural: 'Technology Environments',
+    model_singular: 'TechnologyEnvironment',
   }, {
     title_plural: 'Task Groups',
     model_singular: 'TaskGroup',

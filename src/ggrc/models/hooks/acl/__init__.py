@@ -7,6 +7,7 @@
 This package should have the single hook that should handle all acl propagation
 and deletion.
 """
+import collections
 
 import flask
 import sqlalchemy as sa
@@ -50,17 +51,20 @@ def _get_propagation_entries(session):
   Returns:
     lists of ids of new ACL, relationship, and delete objects
   """
-  acl_ids = set()
-  relationship_ids = set()
+  propagated_models = (all_models.AccessControlList, all_models.Relationship)
+  objs = collections.defaultdict(set)
   for obj in session.new:
-    if isinstance(obj, all_models.AccessControlList):
-      acl_ids.add(obj.id)
-    if isinstance(obj, all_models.Relationship):
-      relationship_ids.add(obj.id)
+    if not isinstance(obj, propagated_models):
+      continue
+    if obj.id is None:
+      continue
+    objs[obj.__class__].add(obj.id)
 
   deleted = {(obj.type, obj.id) for obj in session.deleted}
 
-  return acl_ids, relationship_ids, deleted
+  return (objs[all_models.AccessControlList],
+          objs[all_models.Relationship],
+          deleted)
 
 
 def after_flush(session, _):

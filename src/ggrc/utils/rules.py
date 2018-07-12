@@ -152,7 +152,8 @@ def _all_rules():
                 'Market', 'Objective', 'OrgGroup', 'Person',
                 'Policy', 'Process', 'Product', 'Program', 'Project',
                 'Regulation', 'Risk', 'Section', 'Standard',
-                'System', 'Threat', 'Vendor', 'Metric'}
+                'System', 'Threat', 'Vendor', 'Metric', 'ProductGroup',
+                'TechnologyEnvironment'}
 
   snapshots = snapshotter.rules.Types.all
 
@@ -183,9 +184,11 @@ def _all_rules():
       "Standard": all_models - {'Policy', 'Regulation',
                                 'Contract', 'Standard'},
       "System": all_models,
+      "TechnologyEnvironment": all_models,
       "Threat": all_models - {'Threat'},
       "Vendor": all_models,
       "Metric": all_models,
+      "ProductGroup": all_models,
   }
 
   # Audit and Audit-scope objects

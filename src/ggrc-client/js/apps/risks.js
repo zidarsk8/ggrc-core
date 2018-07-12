@@ -9,6 +9,8 @@ import {
   Multi,
   TypeFilter,
 } from '../models/mappers/mapper-helpers';
+import Mappings from '../models/mappers/mappings';
+import {registerHook} from '../plugins/ggrc_utils';
 
 (function ($, CMS, GGRC) {
   let RisksExtension = {};
@@ -33,12 +35,14 @@ import {
     'Policy',
     'Process',
     'Product',
+    'ProductGroup',
     'Program',
     'Project',
     'Regulation',
     'Section',
     'Standard',
     'System',
+    'TechnologyEnvironment',
     'Vendor',
   ];
   let relatedObjectDescriptors = {};
@@ -82,6 +86,7 @@ import {
         related_metrics: TypeFilter('related_objects', 'Metric'),
         related_processes: TypeFilter('related_objects', 'Process'),
         related_products: TypeFilter('related_objects', 'Product'),
+        related_product_groups: TypeFilter('related_objects', 'ProductGroup'),
         related_projects: TypeFilter('related_objects', 'Project'),
         related_systems: TypeFilter('related_objects', 'System'),
         related_controls: TypeFilter('related_objects', 'Control'),
@@ -97,6 +102,8 @@ import {
         related_people: TypeFilter('related_objects', 'Person'),
         related_org_groups: TypeFilter('related_objects', 'OrgGroup'),
         related_vendors: TypeFilter('related_objects', 'Vendor'),
+        related_technology_environments: TypeFilter('related_objects',
+          'TechnologyEnvironment'),
 
       },
       related_risk: {
@@ -132,7 +139,7 @@ import {
     };
 
     // patch Person to extend query for dashboard
-    GGRC.Mappings.modules.ggrc_core
+    Mappings.modules.ggrc_core
       .Person.related_objects_via_search
       .observe_types.push('Risk', 'Threat');
 
@@ -144,7 +151,7 @@ import {
         _mixins: ['related', 'related_risk', 'related_threat'],
       });
     });
-    new GGRC.Mappings('ggrc_risks', mappings);
+    new Mappings('ggrc_risks', mappings);
   };
 
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
@@ -316,7 +323,7 @@ import {
     new GGRC.WidgetList('ggrc_risks', descriptor);
   };
 
-  GGRC.register_hook('LHN.Sections_risk',
+  registerHook('LHN.Sections_risk',
     GGRC.mustache_path + '/dashboard/lhn_risks');
 
   RisksExtension.init_mappings();

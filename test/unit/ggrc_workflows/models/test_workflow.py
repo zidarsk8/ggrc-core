@@ -4,10 +4,10 @@
 """Unit Tests for Workflow model and WorkflowState mixin
 """
 
-import ddt
-from datetime import date
 import unittest
+from datetime import date
 
+import ddt
 from freezegun import freeze_time
 
 from ggrc_workflows.models import cycle_task_group_object_task as cycle_task
@@ -36,6 +36,7 @@ class TestWorkflowState(unittest.TestCase):
   @ddt.unpack
   def test_get_state(self, task_states, result):
     """Test get state for {0}."""
+    # pylint: disable=protected-access
     self.assertEqual(
         result,
         workflow.WorkflowState._get_state([

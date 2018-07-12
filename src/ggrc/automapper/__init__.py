@@ -4,7 +4,6 @@
 """Automapper generator."""
 
 from datetime import datetime
-from logging import getLogger
 
 import sqlalchemy as sa
 
@@ -16,13 +15,9 @@ from ggrc.models.automapping import Automapping
 from ggrc.models.relationship import Relationship, RelationshipsCache, Stub
 from ggrc.models.issue import Issue
 from ggrc.models import exceptions
-from ggrc.rbac.permissions import is_allowed_update
+from ggrc.rbac import permissions
 from ggrc.models.cache import Cache
 from ggrc.utils import benchmark
-
-
-# pylint: disable=invalid-name
-logger = getLogger(__name__)
 
 
 class AutomapperGenerator(object):
@@ -84,8 +79,8 @@ class AutomapperGenerator(object):
           # Since Issue-Assessment-Audit is the only rule that
           # triggers Issue to Audit mapping, we should skip the
           # permission check for it
-          if not (self._can_map_to(src, relationship) and
-                  self._can_map_to(dst, relationship)):
+          if not (permissions.is_allowed_update(src.type, src.id, None) and
+                  permissions.is_allowed_update(dst.type, dst.id, None)):
             continue
 
         created = self._ensure_relationship(src, dst)
@@ -103,20 +98,6 @@ class AutomapperGenerator(object):
         relationship._json_extras = {  # pylint: disable=protected-access
             'automapping_limit_exceeded': True
         }
-
-  @staticmethod
-  def _can_map_to(obj, parent_relationship):
-    """True if the current user can edit obj in parent_relationship.context."""
-    context_id = None
-    if parent_relationship.context:
-      context_id = parent_relationship.context.id
-    elif parent_relationship.context_id:
-      logger.warning("context is unset but context_id is set on a "
-                     "relationship %r: context=%r, context_id=%r",
-                     parent_relationship, parent_relationship.context,
-                     parent_relationship.context_id)
-      context_id = parent_relationship.context_id
-    return is_allowed_update(obj.type, obj.id, context_id)
 
   def _flush(self, parent_relationship):
     """Manually INSERT generated automappings."""
@@ -216,8 +197,8 @@ class AutomapperGenerator(object):
     if mappings:
       dst_related = (o for o in self.related(dst)
                      if o.type in mappings and o != src)
-      for r in dst_related:
-        entry = self.order(r, src)
+      for related in dst_related:
+        entry = self.order(related, src)
         if entry not in self.processed:
           self.queue.add(entry)
 
@@ -250,7 +231,7 @@ class AutomapperGenerator(object):
     """Fail if dst (Issue) is already mapped to an Audit."""
     # src, dst are ordered since they come from self.queue
     if (src.type, dst.type) == ("Audit", "Issue"):
-      if "Audit" in (r.type for r in self.related(dst)):
+      if "Audit" in (related.type for related in self.related(dst)):
         raise exceptions.ValidationError(
             "This request will result in automapping that will map "
             "Issue#{issue.id} to multiple Audits."

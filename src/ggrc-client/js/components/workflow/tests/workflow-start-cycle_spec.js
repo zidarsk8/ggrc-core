@@ -4,7 +4,7 @@
 */
 
 import component from '../workflow-start-cycle';
-import helpers from '../workflow-helpers';
+import * as helpers from '../../../plugins/utils/workflow-utils';
 
 describe('GGRC.WorkflowStartCycle', function () {
   let events;

@@ -28,6 +28,8 @@ DISPLAY_CLASS_MAPPINGS = {
     'System': 'business',
     'Process': 'business',
     'Metric': 'business',
+    'TechnologyEnvironment': 'business',
+    'ProductGroup': 'business',
 
     'OrgGroup': 'entities',
     'Person': 'entities',

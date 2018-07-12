@@ -17,34 +17,21 @@ from ggrc_workflows import models as wf_models
 
 
 class WorkflowColumnHandler(handlers.ParentColumnHandler):
+  """Handler for workflow column in task groups."""
 
-  """ handler for workflow column in task groups """
-
-  def __init__(self, row_converter, key, **options):
-    """ init workflow handler """
-    self.parent = wf_models.Workflow
-    super(WorkflowColumnHandler, self).__init__(row_converter, key, **options)
+  parent = all_models.Workflow
 
 
 class TaskGroupColumnHandler(handlers.ParentColumnHandler):
+  """Handler for task group column in task group tasks."""
 
-  """ handler for task group column in task group tasks """
-
-  def __init__(self, row_converter, key, **options):
-    """ init task group handler """
-    self.parent = wf_models.TaskGroup
-    super(TaskGroupColumnHandler, self).__init__(row_converter, key, **options)
+  parent = all_models.TaskGroup
 
 
 class CycleTaskGroupColumnHandler(handlers.ParentColumnHandler):
+  """Handler for cycle task group column in cycle task group tasks."""
 
-  """ handler for task group column in task group tasks """
-
-  def __init__(self, row_converter, key, **options):
-    """ init task group handler """
-    self.parent = wf_models.CycleTaskGroup
-    super(CycleTaskGroupColumnHandler, self) \
-        .__init__(row_converter, key, **options)
+  parent = all_models.CycleTaskGroup
 
 
 class UnitColumnHandler(handlers.ColumnHandler):
@@ -53,8 +40,9 @@ class UnitColumnHandler(handlers.ColumnHandler):
 
   def parse_item(self):
     """Parse Unit column value."""
-    value = self.raw_value.lower().strip()
-    if value in {"-", "--", "---"}:
+    value = self.raw_value.lower()
+
+    if self.value_explicitly_empty(value):
       self.set_empty = True
       value = None
     elif not value:
@@ -84,8 +72,9 @@ class RepeatEveryColumnHandler(handlers.ColumnHandler):
   def parse_item(self):
     """Parse 'repeat every' value
     """
-    value = self.raw_value.strip()
-    if value in {"-", "--", "---"}:
+    value = self.raw_value
+
+    if self.value_explicitly_empty(value):
       self.set_empty = True
       value = None
     elif value:
@@ -187,6 +176,8 @@ class ObjectsColumnHandler(multi_object.ObjectsColumnHandler):
       all_models.Objective.__name__,
       all_models.Issue.__name__,
       all_models.Metric.__name__,
+      all_models.TechnologyEnvironment.__name__,
+      all_models.ProductGroup.__name__,
       risk.Risk.__name__,
       threat.Threat.__name__,
   )

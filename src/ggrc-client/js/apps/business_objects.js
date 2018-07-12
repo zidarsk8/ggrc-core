@@ -10,6 +10,7 @@ import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
 import {
   getWidgetConfig,
 } from '../plugins/utils/object-versions-utils';
+import Mappings from '../models/mappers/mappings';
 
 (function (can, $) {
   let CoreExtension = {};
@@ -54,7 +55,9 @@ import {
         section: CMS.Models.Section,
         clause: CMS.Models.Clause,
         person: CMS.Models.Person,
+        product_group: CMS.Models.ProductGroup,
         role: CMS.Models.Role,
+        technology_environment: CMS.Models.TechnologyEnvironment,
         threat: CMS.Models.Threat,
         risk: CMS.Models.Risk,
         vulnerability: CMS.Models.Vulnerability,
@@ -343,6 +346,10 @@ import {
             mapping: 'related_products',
             draw_children: true,
           },
+          ProductGroup: {
+            mapping: 'related_product_groups',
+            draw_children: true,
+          },
           Project: {
             mapping: 'related_projects',
             draw_children: true,
@@ -365,6 +372,10 @@ import {
           },
           Risk: {
             mapping: 'risks',
+            draw_children: true,
+          },
+          TechnologyEnvironment: {
+            mapping: 'related_technology_environments',
             draw_children: true,
           },
           Threat: {
@@ -621,10 +632,16 @@ import {
         Product: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
         },
+        ProductGroup: {
+          _mixins: ['governance_objects', 'business_objects', 'issues'],
+        },
         Project: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
         },
         System: {
+          _mixins: ['governance_objects', 'business_objects', 'issues'],
+        },
+        TechnologyEnvironment: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
         },
         Person: {
@@ -711,6 +728,10 @@ import {
             mapping: 'extended_related_products_via_search',
             draw_children: true,
           },
+          ProductGroup: {
+            mapping: 'extended_related_product_groups_via_search',
+            draw_children: true,
+          },
           Project: {
             mapping: 'extended_related_projects_via_search',
             draw_children: true,
@@ -726,6 +747,10 @@ import {
           },
           Risk: {
             mapping: 'extended_related_risks_via_search',
+            draw_children: true,
+          },
+          TechnologyEnvironment: {
+            mapping: 'extended_related_technology_environments_via_search',
             draw_children: true,
           },
           Threat: {
@@ -762,7 +787,7 @@ import {
           descriptor = {
             instance: object,
             far_model: far_model,
-            mapping: GGRC.Mappings.get_canonical_mapping(object.constructor.shortName, far_model.shortName),
+            mapping: Mappings.get_canonical_mapping(object.constructor.shortName, far_model.shortName),
           };
         } else {
           widget_id = model_name;

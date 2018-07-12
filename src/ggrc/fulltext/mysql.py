@@ -1,7 +1,6 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Full text index engine for Mysql DB backend"""
-from collections import defaultdict
 
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declared_attr
@@ -12,9 +11,7 @@ from sqlalchemy import event
 from ggrc import db
 from ggrc.fulltext.sql import SqlIndexer
 from ggrc.models import all_models
-from ggrc.models.inflector import get_model
 from ggrc.query import my_objects
-from ggrc.rbac import context_query_filter
 from ggrc.rbac import permissions
 from ggrc.utils import benchmark
 
@@ -26,7 +23,6 @@ class MysqlRecordProperty(db.Model):
 
   key = db.Column(db.Integer, primary_key=True)
   type = db.Column(db.String(64), primary_key=True)
-  context_id = db.Column(db.Integer)
   tags = db.Column(db.String)
   property = db.Column(db.String(250), primary_key=True)
   subproperty = db.Column(db.String(64), primary_key=True)
@@ -38,7 +34,6 @@ class MysqlRecordProperty(db.Model):
         db.Index('ix_{}_tags'.format(cls.__tablename__), 'tags'),
         db.Index('ix_{}_key'.format(cls.__tablename__), 'key'),
         db.Index('ix_{}_type'.format(cls.__tablename__), 'type'),
-        db.Index('ix_{}_context_id'.format(cls.__tablename__), 'context_id'),
     )
 
 
@@ -58,8 +53,10 @@ class MysqlIndexer(SqlIndexer):
 
   @staticmethod
   def get_permissions_query(model_names, permission_type='read'):
-    """Prepare the query based on the allowed contexts and resources for
-     each of the required objects(models).
+    """Prepare the query based on the allowed resources
+
+    This filters for each of the required models based on permissions on every
+    object type.
     """
     if not model_names:
       # If there are no model names set, the result of the permissions query
@@ -73,20 +70,21 @@ class MysqlIndexer(SqlIndexer):
           model_name=model_name,
           permission_type=permission_type,
       )
-      statement = sa.and_(
-          MysqlRecordProperty.type == model_name,
-          context_query_filter(MysqlRecordProperty.context_id, contexts)
-      )
-      if resources:
-        statement = sa.or_(sa.and_(MysqlRecordProperty.type == model_name,
-                                   MysqlRecordProperty.key.in_(resources)),
-                           statement)
-      type_queries.append(statement)
 
-    return sa.and_(
-        MysqlRecordProperty.type.in_(model_names),
-        sa.or_(*type_queries)
-    )
+      if contexts is None:
+        # None context means user has full access of permission_type for the
+        # given model
+        type_queries.append(MysqlRecordProperty.type == model_name)
+      elif resources:
+        type_queries.append(sa.and_(
+            MysqlRecordProperty.type == model_name,
+            MysqlRecordProperty.key.in_(resources),
+        ))
+
+    if not type_queries:
+      return sa.false()
+
+    return sa.or_(*type_queries)
 
   @staticmethod
   def search_get_owner_query(query, types=None, contact_id=None):
@@ -228,22 +226,8 @@ def update_indexer(session):  # pylint:disable=unused-argument
 
   for all updated related instance before commit"""
   with benchmark("Update indexer before commit"):
-    if not hasattr(db.session, "reindex_set"):
-      return
-
-    models_ids_to_reindex = defaultdict(set)
-    db.session.flush()
-    for for_index in db.session.reindex_set:
-      if for_index not in db.session:
-        continue
-      type_name, id_value = for_index.get_reindex_pair()
-      if type_name:
-        models_ids_to_reindex[type_name].add(id_value)
-    # expire required to fix declared_attr cached value
-    db.session.expire_all()
-    db.session.reindex_set.invalidate()
-    for model_name, ids in models_ids_to_reindex.iteritems():
-      get_model(model_name).bulk_record_update_for(ids)
+    if hasattr(db.session, "reindex_set"):
+      db.session.reindex_set.warmup()
 
 
 # pylint:disable=unused-argument

@@ -2,7 +2,7 @@ Python
 ======
 
 We try to keep our code style as close as we can to
-`Google Code Style <https://google.github.io/styleguide/pyguide.html>`_.
+`Google Code Style <https://github.com/google/styleguide/blob/gh-pages/pyguide.md>`_.
 
 Unfortunately, because of our legacy code, there are a few exceptions,
 by far the biggest being the two space indent.
@@ -79,7 +79,7 @@ For a class:
             """Performs operation blah."""
 
 
-See `Google Code Style <https://google.github.io/styleguide/pyguide.html>`_
+See `Google Code Style <https://github.com/google/styleguide/blob/gh-pages/pyguide.md>`_.
 for explanations and more examples.
 
 Misleading pylint's complaints
@@ -92,6 +92,6 @@ duplicate-code (R0801): \*Similar lines in %s files*
 
 If you see such error about lines with import statements, it means that maybe you've missed next Code Style rule:
 
-**Use imports for packages and modules only.** (`Google Code Style Import section, revision 2.59 <https://google.github.io/styleguide/pyguide.html?showone=Imports#Imports>`_)
+**Use imports for packages and modules only.**
 
 Probably you have >= 4 duplicate lines in 2 source files import statements' section.

@@ -18,7 +18,7 @@
       ></tree-filter-input>
       {{#if statusFilterVisible}}
         <tree-status-filter class="flex-size-1"
-                            {widget-id}="optionsData.widgetId"
+                            {widget-id}="options.widgetId"
                             {model-name}="modelName"
                             {register-filter}="@registerFilter"
                             (filter)="onFilter"
@@ -101,7 +101,7 @@
 
   <div class="tree-footer flex-box">
     {{^if noResults}}
-      <tree-pagination {paging}="pageInfo"></tree-pagination>
+      <tree-pagination {paging}="pageInfo" placement="top"></tree-pagination>
     {{/if}}
   </div>
 </div>

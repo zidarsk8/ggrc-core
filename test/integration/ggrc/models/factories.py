@@ -507,6 +507,12 @@ class ProjectFactory(TitledFactory):
     model = all_models.Project
 
 
+class TechnologyEnvironmentFactory(TitledFactory):
+
+  class Meta:
+    model = all_models.TechnologyEnvironment
+
+
 class ImportExportFactory(ModelFactory):
 
   class Meta:
@@ -521,6 +527,12 @@ class MetricFactory(TitledFactory):
 
   class Meta:
     model = all_models.Metric
+
+
+class ProductGroupFactory(TitledFactory):
+
+  class Meta:
+    model = all_models.ProductGroup
 
 
 def get_model_factory(model_name):
@@ -570,5 +582,7 @@ def get_model_factory(model_name):
       "Proposal": ProposalFactory,
       "ImportExport": ImportExportFactory,
       "Metric": MetricFactory,
+      "TechnologyEnvironment": TechnologyEnvironmentFactory,
+      "ProductGroup": ProductGroupFactory,
   }
   return model_factories[model_name]

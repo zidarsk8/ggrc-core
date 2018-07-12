@@ -60,7 +60,13 @@ GGRC_IMPORTABLE = {
     "standard": all_models.Standard,
     "system": all_models.System,
     "vendor": all_models.Vendor,
+    "product group": all_models.ProductGroup,
+    "product_group": all_models.ProductGroup,
+    "productgroup": all_models.ProductGroup,
     "metric": all_models.Metric,
+    "technology environment": all_models.TechnologyEnvironment,
+    "technology_environment": all_models.TechnologyEnvironment,
+    "technologyenvironment": all_models.TechnologyEnvironment,
 }
 
 GGRC_EXPORTABLE = {

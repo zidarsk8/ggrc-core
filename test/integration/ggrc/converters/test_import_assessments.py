@@ -21,6 +21,7 @@ from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc.models import factories
 
 
+# pylint: disable=too-many-public-methods
 @ddt.ddt
 class TestAssessmentImport(TestCase):
   """Basic Assessment import tests with.
@@ -134,6 +135,30 @@ class TestAssessmentImport(TestCase):
                         u" Please go on Assessment page and make changes"
                         u" manually. The column will be skipped")
     self.assertEquals([expected_warning], response[0]['row_warnings'])
+
+  def test_import_assessment_with_evidence_file_blank_multiple(self):
+    """No warnings in Evidence Files"""
+    evidence_file = "test_gdrive_url \n \n another_gdrive_url"
+
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory()
+      assessment_slug = assessment.slug
+      factories.RelationshipFactory(source=audit, destination=assessment)
+      evidence1 = factories.EvidenceFileFactory(link="test_gdrive_url")
+      factories.RelationshipFactory(source=assessment,
+                                    destination=evidence1)
+      evidence2 = factories.EvidenceFileFactory(link="another_gdrive_url")
+      factories.RelationshipFactory(source=assessment,
+                                    destination=evidence2)
+
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assessment_slug),
+        ("Evidence File", evidence_file),
+    ]))
+
+    self.assertEquals([], response[0]['row_warnings'])
 
   def _test_assessment_users(self, asmt, users):
     """ Test that all users have correct roles on specified Assessment"""

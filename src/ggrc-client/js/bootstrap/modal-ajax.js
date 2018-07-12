@@ -178,6 +178,9 @@ import Permission from '../permission';
         var args = arguments;
 
         if (formTarget === 'nothing') {
+          $trigger.trigger(
+            'modal:success', Array.prototype.slice.call(args, 1)
+          );
           return;
         } else if (formTarget === 'refresh') {
           refreshPage();

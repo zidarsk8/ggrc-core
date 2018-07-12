@@ -15,7 +15,6 @@ import sqlalchemy as sa
 from ggrc import db
 from ggrc import models
 from ggrc.models import inflector
-from ggrc.rbac import context_query_filter
 from ggrc.utils import benchmark
 from ggrc.rbac import permissions
 from ggrc.query import custom_operators
@@ -225,10 +224,10 @@ class QueryHelper(object):
     contexts, resources = permissions.get_context_resource(
         model_name=model.__name__, permission_type=permission_type
     )
-    if contexts is not None:
-      return sa.or_(context_query_filter(model.context_id, contexts),
-                    model.id.in_(resources) if resources else sa.sql.false())
-    return sa.sql.true()
+    if contexts is None:
+      return None
+
+    return model.id.in_(resources) if resources else sa.sql.false()
 
   def _get_objects(self, object_query):
     """Get a set of objects described in the filters."""

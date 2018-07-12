@@ -6,6 +6,8 @@
 import {
   initCounts,
 } from '../plugins/utils/current-page-utils';
+import {registerHook} from '../plugins/ggrc_utils';
+
 import InfoWidget from '../controllers/info_widget_controller';
 import {
   Proxy,
@@ -17,6 +19,7 @@ import {
   Reify,
   Cross,
 } from '../models/mappers/mapper-helpers';
+import Mappings from '../models/mappers/mappings';
 
 (function ($, CMS, GGRC) {
   let WorkflowExtension = {};
@@ -25,7 +28,7 @@ import {
     'Program Regulation Policy Standard Contract Clause Section'.split(' '),
     'Request Control Objective OrgGroup Vendor AccessGroup'.split(' '),
     'System Process DataAsset Product Project Facility Market'.split(' '),
-    'Issue Risk Threat Metric'.split(' ')
+    'Issue Risk Threat Metric TechnologyEnvironment ProductGroup'.split(' ')
   );
 
   let draftOnUpdateMixin;
@@ -139,10 +142,10 @@ import {
         _canonical: {
           related_objects_as_source: [
             'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
-            'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
-            'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
-            'Objective', 'Audit', 'AccessGroup', 'Metric',
-            'Risk', 'Threat',
+            'Product', 'ProductGroup', 'Project', 'System', 'Regulation',
+            'Policy', 'Contract', 'Standard', 'Program', 'Issue', 'Control',
+            'Section', 'Clause', 'Objective', 'Audit', 'AccessGroup', 'Metric',
+            'Risk', 'TechnologyEnvironment', 'Threat',
           ],
         },
         related_objects_as_source: Proxy(
@@ -170,12 +173,15 @@ import {
         related_vendors: TypeFilter('related_objects', 'Vendor'),
         related_processes: TypeFilter('related_objects', 'Process'),
         related_products: TypeFilter('related_objects', 'Product'),
+        related_product_groups: TypeFilter('related_objects', 'ProductGroup'),
         related_projects: TypeFilter('related_objects', 'Project'),
         related_systems: TypeFilter('related_objects', 'System'),
         related_issues: TypeFilter('related_objects', 'Issue'),
         related_audits: TypeFilter('related_objects', 'Audit'),
         related_controls: TypeFilter('related_objects', 'Control'),
         related_documents: TypeFilter('related_objects', 'Document'),
+        related_technology_environments: TypeFilter('related_objects',
+          'TechnologyEnvironment'),
         regulations: TypeFilter('related_objects', 'Regulation'),
         contracts: TypeFilter('related_objects', 'Contract'),
         policies: TypeFilter('related_objects', 'Policy'),
@@ -242,20 +248,6 @@ import {
           'cycle_task_group_object_task'),
         workflow: Cross('cycle', 'workflow'),
       },
-      Person: {
-        assigned_tasks: Search(function (binding) {
-          return CMS.Models.CycleTaskGroupObjectTask.findAll({
-            contact_id: binding.instance.id,
-            'cycle.is_current': true,
-            status__in: 'Assigned,In Progress,Finished,Declined,Deprecated',
-          });
-        }, 'Cycle'),
-        assigned_tasks_with_history: Search(function (binding) {
-          return CMS.Models.CycleTaskGroupObjectTask.findAll({
-            contact_id: binding.instance.id,
-          });
-        }, 'Cycle'),
-      },
     };
 
     // Insert `workflows` mappings to all business object types
@@ -293,7 +285,7 @@ import {
         },
       };
       mappings[type].orphaned_objects = Multi([
-        GGRC.Mappings.get_mappings_for(type).orphaned_objects,
+        Mappings.get_mappings_for(type).orphaned_objects,
         mappings[type].workflows,
       ]);
 
@@ -301,12 +293,12 @@ import {
         'CMS.Models.TaskGroupObject.stubs';
 
       // Also register a render hook for object approval
-      GGRC.register_hook(
+      registerHook(
         type + '.info_widget_actions',
         GGRC.mustache_path + '/base_objects/approval_link.mustache'
       );
     });
-    new GGRC.Mappings('ggrc_workflows', mappings);
+    new Mappings('ggrc_workflows', mappings);
   };
 
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
@@ -396,12 +388,6 @@ import {
               GGRC.mustache_path +
               '/cycle_task_group_object_tasks/tree_add_item.mustache',
             draw_children: true,
-            events: {
-              'show-history': function (el, ev) {
-                this.options.attr('mapping', el.attr('mapping'));
-                this.reload_list();
-              },
-            },
           },
         },
       };
@@ -543,12 +529,6 @@ import {
             '/cycle_task_group_object_tasks/tree_add_item.mustache',
           draw_children: true,
           showBulkUpdate: !isObjectBrowser,
-          events: {
-            'show-history': function (el, ev) {
-              this.options.attr('mapping', el.attr('mapping'));
-              this.reload_list();
-            },
-          },
         },
       },
     };
@@ -572,7 +552,7 @@ import {
     ]);
   };
 
-  GGRC.register_hook(
+  registerHook(
     'Dashboard.Widgets', GGRC.mustache_path + '/dashboard/widgets');
 
   WorkflowExtension.init_mappings();

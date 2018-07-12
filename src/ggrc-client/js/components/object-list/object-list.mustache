@@ -3,7 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 {{#if showSpinner}}
-    <spinner {toggle}="isLoading" {extra-css-class}="spinnerCss" class="spinner-wrapper active"></spinner>
+  <div class="spinner-section {{#if isGrid}}spinner-section_grid{{/if}}">
+    {{#if isGrid}}
+      <spinner {toggle}="isLoading" {extra-css-class}="'grid-spinner'" class="spinner-wrapper active"></spinner>
+    {{else}}
+      <spinner {toggle}="isLoading" class="spinner-wrapper active"></spinner>
+    {{/if}}
+  </div>
 {{else}}
   {{#if items.length}}
       {{#if showMore}}
@@ -13,11 +19,11 @@
           </div>
         </show-more>
       {{else}}
-        {{#items}}
+        {{#each items}}
           <div class="object-list__item {{#isSelected}}object-list__item-selected{{/isSelected}}" ($click)="modifySelection">
               <content>No item component or template is provided</content>
           </div>
-        {{/items}}
+        {{/each}}
       {{/if}}
   {{else}}
       <div class="object-list__item object-list__item-empty">

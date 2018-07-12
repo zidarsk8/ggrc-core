@@ -72,9 +72,8 @@ def _parse_object_data(object_data):
   return object_type, permissions
 
 
-def _add_subtree(tree, role_name, parent_id):
+def _add_subtree(tree, role_name, parent_id, with_update):
   """Add propagated roles for the given tree.
-
   keys of the tree must contain object data in form of "object_type RUD"
   strings or a list of those strings.
   """
@@ -85,19 +84,29 @@ def _add_subtree(tree, role_name, parent_id):
       object_data_list = [object_data_list]
     for object_data in object_data_list:
       object_type, permissions_dict = _parse_object_data(object_data)
-      insert = connection.execute(
-          ACR_TABLE.insert().values(
-              name=role_name,
-              object_type=object_type,
-              parent_id=parent_id,
-              created_at=datetime.datetime.now(),
-              updated_at=datetime.datetime.now(),
-              internal=True,
-              non_editable=True,
-              **permissions_dict
-          )
-      )
-      _add_subtree(subtree, role_name, insert.lastrowid)
+
+      acr = None
+      if with_update:
+        acr = _get_acr(object_type, role_name)
+
+      if not acr:
+        insert = connection.execute(
+            ACR_TABLE.insert().values(
+                name=role_name,
+                object_type=object_type,
+                parent_id=parent_id,
+                created_at=datetime.datetime.now(),
+                updated_at=datetime.datetime.now(),
+                internal=True,
+                non_editable=True,
+                **permissions_dict
+            )
+        )
+
+      _add_subtree(subtree,
+                   role_name,
+                   acr.id if acr else insert.lastrowid,
+                   with_update)
 
 
 def _get_acr(object_type, name):
@@ -113,7 +122,7 @@ def _get_acr(object_type, name):
   ).fetchone()
 
 
-def _propagate_object_roles(object_type, roles_tree):
+def _propagate_object_roles(object_type, roles_tree, with_update):
   """Propagate roles in the role tree for a given object type.
 
   The role propagation rules are given in the following format:
@@ -142,17 +151,16 @@ def _propagate_object_roles(object_type, roles_tree):
 
     for role_name in role_names:
       role = _get_acr(object_type, role_name)
-      _add_subtree(propagation_tree, role.name, role.id)
+      _add_subtree(propagation_tree, role.name, role.id, with_update)
 
 
-def propagate_roles(propagation_rules):
+def propagate_roles(propagation_rules, with_update=False):
   for object_type, roles_tree in propagation_rules.items():
-    _propagate_object_roles(object_type, roles_tree)
+    _propagate_object_roles(object_type, roles_tree, with_update)
 
 
 def remove_propagated_roles(object_type, role_names):
   """Remove propagated roles.
-
   Args:
     object_type: type of object for role deletion.
     role_names: list of role names for the given object type whose propagations
@@ -193,7 +201,6 @@ def remove_propagated_roles(object_type, role_names):
 
 def remove_deprecated_roles(role_names):
   """Remove old propagation roles.
-
   This should be used for previous propagation roles ending with keyword
   Mapped.
   """

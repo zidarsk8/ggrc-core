@@ -177,7 +177,9 @@ permissions = {
         "System",
         "Process",
         "Metric",
+        "ProductGroup",
         "Program",
+        "TechnologyEnvironment",
         "Context",
         {
             "type": "BackgroundTask",

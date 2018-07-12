@@ -114,7 +114,7 @@ module.exports = function (env) {
         loader: 'raw-loader',
       }, {
         test: /\.js$/,
-        exclude: /(node_modules|vendor)/,
+        exclude: /(node_modules)/,
         loader: 'babel-loader',
         query: {
           cacheDirectory: true,

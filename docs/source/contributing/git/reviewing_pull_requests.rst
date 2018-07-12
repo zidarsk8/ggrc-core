@@ -91,7 +91,9 @@ alphabetically):
 - ``mising tests`` - the changes submitted are not sufficiently covered with
   automated tests, and the latter need to be added,
 - ``needs work`` - a reviewer or the PR author has concluded that the PR
-  requires additional work before it can be accepted and merged,
+  requires additional work before it can be accepted and merged. Should be
+  removed by PR author or reviewer after required work has been done and added
+  to PR,
 - ``new contribution`` - the PR author is a new contributor that might not yet
   be familiar with the project workflow, conventions, and other nuances. Please
   take extra care and effort to answer all the questions, and to explain things

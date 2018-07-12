@@ -7,7 +7,7 @@ import template from './templates/cycle-task-group-object-task.mustache';
 import '../../object-change-state/object-change-state';
 import '../../dropdown/dropdown';
 import RefreshQueue from '../../../models/refresh_queue';
-import WorkflowHelpers from '../workflow-helpers';
+import {updateStatus} from '../../../plugins/utils/workflow-utils';
 
 let viewModel = can.Map.extend({
   showLink: function () {
@@ -81,7 +81,7 @@ let viewModel = can.Map.extend({
   onStateChange(event) {
     const instance = this.attr('instance');
     const status = event.state;
-    WorkflowHelpers.updateStatus(instance, status);
+    updateStatus(instance, status);
   },
 });
 

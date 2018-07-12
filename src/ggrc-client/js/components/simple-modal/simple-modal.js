@@ -24,6 +24,7 @@ import template from './simple-modal.mustache';
       modalTitle: '',
       replaceContent: false,
       isDisabled: false,
+      modalWrapper: null,
       state: {
         open: false,
       },
@@ -33,21 +34,25 @@ import template from './simple-modal.mustache';
       show: function () {
         this.attr('state.open', true);
       },
+      showHideModal(showModal) {
+        const $modalWrapper = this.attr('modalWrapper');
+        if (showModal) {
+          $modalWrapper.modal().on('hidden.bs.modal', this.hide.bind(this));
+        } else {
+          $modalWrapper.modal('hide').off('hidden.bs.modal');
+        }
+      },
     },
-    helpers: {
-      modalWrapper: function (showContent) {
-        return (el) => {
-          let showHideModal = (val) => {
-            if (val) {
-              $(el).modal().on('hidden.bs.modal', this.hide.bind(this));
-            } else {
-              $(el).modal('hide').off('hidden.bs.modal');
-            }
-          };
-
-          showContent.bind('change', (ev, val) => showHideModal(val));
-          showHideModal(showContent);
-        };
+    events: {
+      inserted() {
+        const viewModel = this.viewModel;
+        const modalWrapper = this.element
+          .find('[data-modal-wrapper-target="true"]');
+        viewModel.attr('modalWrapper', modalWrapper);
+        viewModel.showHideModal(viewModel.attr('state.open'));
+      },
+      '{viewModel.state} open'(state, ev, newValue) {
+        this.viewModel.showHideModal(newValue);
       },
     },
   });

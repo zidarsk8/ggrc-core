@@ -30,8 +30,10 @@ class Types(object):
       "System",
       "Vendor",
       "Risk",
+      "TechnologyEnvironment",
       "Threat",
-      "Metric"
+      "Metric",
+      "ProductGroup",
   }
 
   parents = {

@@ -40,16 +40,6 @@ import {
             return GGRC.page_instance().refresh();
           })
           .then(function () {
-            // We need to update person's assigned_tasks mapping manually
-            let person = CMS.Models.Person.cache[GGRC.current_user.id];
-            let binding = person.get_binding('assigned_tasks');
-
-            // FIXME: Find a better way of removing stagnant
-            // items from the list.
-            binding.list.splice(0, binding.list.length);
-            return binding.loader.refresh_list(binding);
-          })
-          .then(function () {
             let pageInstance = GGRC.page_instance();
             let WorkflowExtension =
               GGRC.extensions.find(function (extension) {

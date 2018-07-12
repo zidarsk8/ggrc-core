@@ -7,9 +7,6 @@ import Filterable from './filterable_controller';
 import {
   getCounts,
 } from '../plugins/utils/current-page-utils';
-import {
-  getWidgetConfig,
-} from '../plugins/utils/object-versions-utils';
 
 export default Filterable({
   pluginName: 'dashboard_widgets',
@@ -57,11 +54,6 @@ export default Filterable({
           this.options.content_controller_options.countsName) ||
         this.options.model.shortName;
 
-      if (this.options.objectVersion) {
-        countsName = getWidgetConfig(countsName, true)
-          .widgetId;
-      }
-
       this.options.widget_count.attr('count', '' + counts.attr(countsName));
 
       counts.on(countsName, function (ev, newVal, oldVal) {
@@ -84,8 +76,8 @@ export default Filterable({
 
     this.element.html(frag[0]);
 
-    let content = this.element
-      , controller_content = null;
+    let content = this.element,
+      controller_content = null;
 
     if (prefs.getCollapsed(window.getPageToken(), this.element.attr('id'))) {
 

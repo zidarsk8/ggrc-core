@@ -146,6 +146,11 @@
   &.color { color: $green; }
 }
 
+.#{$fa-css-prefix}-product_group {
+  &:before { content: $fa-var-cubes; }
+  &.color { color: $green; }
+}
+
 .#{$fa-css-prefix}-history:before { content: $fa-var-clock-o; }
 
 .#{$fa-css-prefix}-request {
@@ -253,6 +258,10 @@
 
 .#{$fa-css-prefix}-metric {
   &:before { content: $fa-var-bar-chart; }
+  &.color { color: $green; }
+}
+.#{$fa-css-prefix}-technology_environment {
+  &:before { content: $fa-var-th; }
   &.color { color: $green; }
 }
 

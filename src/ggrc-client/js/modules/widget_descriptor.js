@@ -112,12 +112,13 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
           .debug('Arguments are missing or have incorrect format', arguments);
         return null;
       }
+      let widgetId = objectVersionConfig.isObjectVersion ?
+        objectVersionConfig.widgetId :
+        farModel.table_singular;
       descriptor = {
         widgetType: 'treeview',
         treeViewDepth: 2,
-        widget_id: objectVersionConfig.isObjectVersion ?
-          objectVersionConfig.widgetId :
-          farModel.table_singular,
+        widget_id: widgetId,
         widget_guard: function () {
           if (
             farModel.title_plural === 'Audits' &&
@@ -157,6 +158,8 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
           parent_instance: instance,
           model: farModel,
           objectVersion: objectVersionConfig.isObjectVersion,
+          countsName: objectVersionConfig.countsName,
+          widgetId,
         },
       };
 

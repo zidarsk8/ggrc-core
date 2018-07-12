@@ -40,6 +40,8 @@ class TestStatefulMixin(WithQueryApi, TestCase):
       "Section",
       "Threat",
       "Vendor",
+      "ProductGroup",
+      "TechnologyEnvironment",
   )
   def test_update_status(self, model_name):
     """Test status updating."""
@@ -75,6 +77,8 @@ class TestStatefulMixin(WithQueryApi, TestCase):
       "Section",
       "Threat",
       "Vendor",
+      "ProductGroup",
+      "TechnologyEnvironment",
   )
   def test_set_invalid_status(self, model_name):
     """Test returning 400 code for setting invalid status."""

@@ -95,7 +95,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "archived": boolean.CheckboxColumnHandler,
     "secondary_contact": handlers.UserColumnHandler,
     "send_by_default": boolean.CheckboxColumnHandler,
-    "slug": handlers.SlugColumnHandler,
+    "slug": handlers.ColumnHandler,
     "start_date": handlers.DateColumnHandler,
     "status": handlers.StatusColumnHandler,
     "os_state": handlers.ExportOnlyColumnHandler,

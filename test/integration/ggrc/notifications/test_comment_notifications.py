@@ -176,7 +176,9 @@ class TestCommentNotification(TestCase):
       factories.ContractFactory,
       factories.RiskFactory,
       factories.ThreatFactory,
-      factories.MetricFactory
+      factories.MetricFactory,
+      factories.TechnologyEnvironmentFactory,
+      factories.ProductGroupFactory,
   )
   @patch("ggrc.notifications.common.send_email")
   def test_models_comments(self, obj_factory, _):

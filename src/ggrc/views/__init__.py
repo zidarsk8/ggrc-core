@@ -55,7 +55,7 @@ from ggrc import utils
 from ggrc.utils import benchmark, helpers
 from ggrc.utils import revisions
 
-logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+logger = logging.getLogger(__name__)
 REINDEX_CHUNK_SIZE = 100
 
 
@@ -647,8 +647,10 @@ def contributed_object_views():
       object_view(models.Snapshot),
       object_view(models.Standard),
       object_view(models.System),
+      object_view(models.TechnologyEnvironment),
       object_view(models.Vendor),
-      object_view(models.Metric)
+      object_view(models.Metric),
+      object_view(models.ProductGroup),
   ]
 
 

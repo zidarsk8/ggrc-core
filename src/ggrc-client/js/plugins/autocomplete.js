@@ -5,9 +5,10 @@
 
 import {
   buildRelevantIdsQuery,
-  makeRequest,
+  batchRequests,
 } from './utils/query-api-utils';
 import RefreshQueue from '../models/refresh_queue';
+import Mappings from '../models/mappers/mappings';
 
 (function ($) {
   'use strict';
@@ -225,7 +226,7 @@ import RefreshQueue from '../models/refresh_queue';
           baseSearch.indexOf('__mappable') === 0 ||
           baseSearch.indexOf('__all') === 0
         ) {
-          searchtypes = GGRC.Mappings.get_canonical_mappings_for(
+          searchtypes = Mappings.get_canonical_mappings_for(
             this.options.parent_instance.constructor.shortName
           );
           if (baseSearch.indexOf('__mappable') === 0) {
@@ -361,12 +362,12 @@ import RefreshQueue from '../models/refresh_queue';
 
         query = buildRelevantIdsQuery(objName, {}, relevant, filter);
 
-        makeRequest({data: [query]})
-         .done(function (responseArr) {
-           var ids = responseArr[0][objName].ids;
+        batchRequests(query)
+         .done((responseArr) => {
+           var ids = responseArr[objName].ids;
            var model = CMS.Models[objName];
 
-           var res = can.map(ids, function (id) {
+           var res = can.map(ids, (id) => {
              return CMS.Models.get_instance(model.shortName, id);
            });
            dfd.resolve(res);

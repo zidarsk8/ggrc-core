@@ -568,6 +568,56 @@ class TestCommentWithActionMixin(TestCase):
     self.assertEqual(comment.description, "comment")
     self.assertEqual(comment.custom_attribute_definition_id, ca_def.id)
 
+  def test_custom_comment_value(self):
+    """Test add custom attribute value comment action."""
+    assessment = factories.AssessmentFactory()
+    ca_def_title = "def1"
+    ca_def = factories.CustomAttributeDefinitionFactory(
+        title=ca_def_title,
+        definition_type="assessment",
+        definition_id=assessment.id,
+        attribute_type="Dropdown",
+        multi_choice_options="no,yes",
+        multi_choice_mandatory="0,3"
+    )
+    ca_val = factories.CustomAttributeValueFactory(
+        custom_attribute=ca_def,
+        attributable=assessment,
+        attribute_value="no"
+    )
+    response = self.api.put(assessment, {
+        "custom_attribute_values": [{
+            "id": ca_val.id,
+            "custom_attribute_id": ca_def.id,
+            "attribute_value": "yes",
+            "type": "CustomAttributeValue",
+        }],
+        "actions": {"add_related": [{
+            "id": None,
+            "type": "Comment",
+            "description": "comment1",
+            "custom_attribute_definition_id": ca_def.id,
+        }]}
+    })
+    self.assert200(response)
+
+    relationship = _get_relationship("Assessment", assessment.id)
+    self.assertIsNotNone(relationship)
+
+    comment = all_models.Comment.query.get(relationship.destination_id)
+    comment.custom_attribute_revision_upd({
+        "custom_attribute_revision_upd": {
+            "custom_attribute_value": {
+                "id": ca_val.id,
+            },
+        },
+    })
+    comment_json = comment.log_json()
+    self.assertTrue("custom_attribute_revision" in comment_json.keys())
+    self.assertEqual(
+        comment_json["custom_attribute_revision"]['custom_attribute']['title'],
+        ca_def_title)
+
   def test_wrong_comment(self):
     """Test add custom attribute comment action without description."""
     with factories.single_commit():

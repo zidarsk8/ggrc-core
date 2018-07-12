@@ -15,9 +15,10 @@ import {
   CustomFilter,
   Cross,
 } from '../mappers/mapper-helpers';
+import Mappings from './mappings';
 
 (function (GGRC, can) {
-  new GGRC.Mappings('ggrc_core', {
+  new Mappings('ggrc_core', {
     base: {},
 
     // Governance
@@ -28,15 +29,13 @@ import {
       related_business_objects: Multi([
         'related_data_assets', 'related_facilities', 'related_markets',
         'related_org_groups', 'related_vendors', 'related_processes',
-        'related_products', 'related_projects', 'related_systems',
-        'related_metrics',
+        'related_products', 'related_product_groups', 'related_projects',
+        'related_systems', 'related_metrics', 'related_technology_environments',
       ]),
       related_and_able_objects: Multi([
         'objectives', 'related_business_objects',
         'people', 'programs', 'clauses',
       ]),
-      audits: Proxy(
-        'Audit', 'audit', 'AuditObject', 'auditable', 'audit_objects'),
       orphaned_objects: Multi([
         'related_objects', 'clauses', 'controls', 'programs', 'objectives',
         'people',
@@ -86,10 +85,11 @@ import {
       _canonical: {
         related_objects_as_source: [
           'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
-          'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
-          'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
-          'Objective', 'Audit', 'Assessment', 'AssessmentTemplate',
-          'AccessGroup', 'Risk', 'Threat', 'Document', 'Metric',
+          'Product', 'ProductGroup', 'Project', 'System', 'Regulation',
+          'Policy', 'Contract', 'Standard', 'Program', 'Issue', 'Control',
+          'Section', 'Clause', 'Objective', 'Audit', 'Assessment',
+          'AssessmentTemplate', 'AccessGroup', 'Risk', 'Threat', 'Document',
+          'Metric', 'TechnologyEnvironment',
         ],
       },
       related_objects_as_source: Proxy(
@@ -110,6 +110,7 @@ import {
       related_vendors: TypeFilter('related_objects', 'Vendor'),
       related_processes: TypeFilter('related_objects', 'Process'),
       related_products: TypeFilter('related_objects', 'Product'),
+      related_product_groups: TypeFilter('related_objects', 'ProductGroup'),
       related_projects: TypeFilter('related_objects', 'Project'),
       related_systems: TypeFilter('related_objects', 'System'),
       related_issues: TypeFilter('related_objects', 'Issue'),
@@ -118,6 +119,8 @@ import {
       related_assessments: TypeFilter('related_objects', 'Assessment'),
       related_risks: TypeFilter('related_objects', 'Risk'),
       related_threats: TypeFilter('related_objects', 'Threat'),
+      related_technology_environments: TypeFilter('related_objects',
+        'TechnologyEnvironment'),
       regulations: TypeFilter('related_objects', 'Regulation'),
       contracts: TypeFilter('related_objects', 'Contract'),
       policies: TypeFilter('related_objects', 'Policy'),
@@ -227,6 +230,9 @@ import {
     Product: {
       _mixins: ['business_object'],
     },
+    ProductGroup: {
+      _mixins: ['business_object'],
+    },
     Project: {
       _mixins: ['business_object'],
     },
@@ -236,13 +242,17 @@ import {
     Process: {
       _mixins: ['business_object'],
     },
+    TechnologyEnvironment: {
+      _mixins: ['business_object'],
+    },
     Person: {
       _canonical: {
         related_objects: [
           'Program', 'Regulation', 'Contract', 'Policy', 'Standard',
           'AccessGroup', 'Objective', 'Control', 'Section', 'Clause',
           'DataAsset', 'Facility', 'Market', 'Metric', 'OrgGroup', 'Vendor',
-          'Process', 'Product', 'Project', 'System', 'Issue', 'Risk', 'Threat'],
+          'Process', 'Product', 'ProductGroup', 'Project', 'System', 'Issue',
+          'Risk', 'Threat', 'TechnologyEnvironment'],
         authorizations: 'UserRole',
       },
       owned_programs: Indirect('Program', 'contact'),
@@ -263,10 +273,13 @@ import {
       owned_vendors: Indirect('Vendor', 'contact'),
       owned_processes: Indirect('Process', 'contact'),
       owned_products: Indirect('Product', 'contact'),
+      owned_product_groups: Indirect('ProductGroup', 'contact'),
       owned_projects: Indirect('Project', 'contact'),
       owned_systems: Indirect('System', 'contact'),
       owned_risks: Indirect('Risk', 'contact'),
       owned_threats: Indirect('Threat', 'contact'),
+      owned_technology_environments: Indirect('TechnologyEnvironment',
+        'contact'),
       related_objects: Proxy(
         null, 'personable', 'ObjectPerson', 'person', 'object_people'),
       related_programs: TypeFilter('related_objects', 'Program'),
@@ -287,11 +300,14 @@ import {
       related_vendors: TypeFilter('related_objects', 'Vendor'),
       related_processes: TypeFilter('related_objects', 'Process'),
       related_products: TypeFilter('related_objects', 'Product'),
+      related_product_groups: TypeFilter('related_objects', 'ProductGroup'),
       related_projects: TypeFilter('related_objects', 'Project'),
       related_systems: TypeFilter('related_objects', 'System'),
       related_issues: TypeFilter('related_objects', 'Issue'),
       related_risks: TypeFilter('related_objects', 'Risk'),
       related_threats: TypeFilter('related_objects', 'Threat'),
+      related_technology_environments: TypeFilter('related_objects',
+        'TechnologyEnvironment'),
       authorizations: Direct('UserRole', 'person', 'user_roles'),
       programs_via_authorizations:
         Cross('authorizations', 'program_via_context'),
@@ -319,8 +335,13 @@ import {
       extended_related_processes:
         Multi(['related_processes', 'owned_processes']),
       extended_related_products: Multi(['related_products', 'owned_products']),
+      extended_related_product_groups:
+        Multi(['related_product_groups', 'owned_product_groups']),
       extended_related_projects: Multi(['related_projects', 'owned_projects']),
       extended_related_systems: Multi(['related_systems', 'owned_systems']),
+      extended_related_technology_environments:
+        Multi(['related_technology_environments',
+          'owned_technology_environments']),
       related_objects_via_search: Search(function (binding) {
         let types = this.observe_types;
 
@@ -338,8 +359,8 @@ import {
         });
       }, 'Program,Regulation,Contract,Policy,Standard,Section,Clause,' +
         'Objective,Control,System,Process,DataAsset,AccessGroup,Product,' +
-        'Project,Facility,Market,Metric,OrgGroup,Vendor,' +
-        'Audit,Assessment,Issue,Risk,Threat'),
+        'ProductGroup,Project,Facility,Market,Metric,OrgGroup,Vendor,' +
+        'Audit,Assessment,Issue,Risk,Threat,TechnologyEnvironment'),
       extended_related_programs_via_search:
         TypeFilter('related_objects_via_search', 'Program'),
       extended_related_regulations_via_search:
@@ -376,6 +397,8 @@ import {
         TypeFilter('related_objects_via_search', 'Process'),
       extended_related_products_via_search:
         TypeFilter('related_objects_via_search', 'Product'),
+      extended_related_product_groups_via_search:
+        TypeFilter('related_objects_via_search', 'ProductGroup'),
       extended_related_projects_via_search:
         TypeFilter('related_objects_via_search', 'Project'),
       extended_related_systems_via_search:
@@ -390,6 +413,8 @@ import {
         TypeFilter('related_objects_via_search', 'Risk'),
       extended_related_threats_via_search:
         TypeFilter('related_objects_via_search', 'Threat'),
+      extended_related_technology_environments_via_search:
+        TypeFilter('related_objects_via_search', 'TechnologyEnvironment'),
     },
     Context: {
       _canonical: {
@@ -422,8 +447,6 @@ import {
       program_controls: Cross('_program', 'controls'),
       program_issues: Cross('_program', 'related_issues'),
       program_assessments: Cross('_program', 'related_assessments'),
-      objects:
-        Proxy(null, 'auditable', 'AuditObject', 'audit', 'audit_objects'),
       context: Direct('Context', 'related_object', 'context'),
       authorizations: Cross('context', 'user_roles'),
       authorized_program_people: Cross('_program', 'authorized_people'),
@@ -490,9 +513,6 @@ import {
         'Workflow', 'workflow', 'MultitypeSearchJoin'),
       evidence: Proxy(
         'Evidence', 'evidence', 'MultitypeSearchJoin'),
-    },
-    AuditObject: {
-      _auditable: Direct(null, null, 'auditable'),
     },
     // Used by Custom Attributes widget
     CustomAttributable: {

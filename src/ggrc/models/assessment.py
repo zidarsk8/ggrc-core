@@ -30,6 +30,7 @@ from ggrc.models.mixins import VerifiedDate
 from ggrc.models.mixins import reminderable
 from ggrc.models.mixins import statusable
 from ggrc.models.mixins import labeled
+from ggrc.models.mixins import issue_tracker as issue_tracker_mixins
 from ggrc.models.mixins.assignable import Assignable
 from ggrc.models.mixins.autostatuschangeable import AutoStatusChangeable
 from ggrc.models.mixins.with_action import WithAction
@@ -50,7 +51,7 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
                  LastDeprecatedTimeboxed, WithSimilarityScore, FinishedDate,
                  VerifiedDate, Notifiable, WithAction,
                  labeled.Labeled, with_last_comment.WithLastComment,
-                 issuetracker_issue.IssueTracked, base.ContextRBAC,
+                 issue_tracker_mixins.IssueTracked, base.ContextRBAC,
                  BusinessObject, Indexed, db.Model):
   """Class representing Assessment.
 

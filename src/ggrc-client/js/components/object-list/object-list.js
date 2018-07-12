@@ -53,8 +53,13 @@ import template from './object-list.mustache';
           type: 'string',
           value: 'None',
         },
+        isGrid: {
+          get() {
+            return this.attr('listType') === 'GRID';
+          },
+        },
       },
-      spinnerCss: '@',
+      listType: '@',
       isDisabled: false,
       showMore: false,
       /**

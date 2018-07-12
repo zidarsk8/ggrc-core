@@ -9,7 +9,7 @@ import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
 import template from './cycle-task-actions.mustache';
-import WorkflowHelpers from '../workflow/workflow-helpers';
+import {updateStatus} from '../../plugins/utils/workflow-utils';
 import Permission from '../../permission';
 
 (function (can, GGRC) {
@@ -87,7 +87,7 @@ import Permission from '../../permission';
       );
       this.attr('disabled', true);
       try {
-        await WorkflowHelpers.updateStatus(instance, status);
+        await updateStatus(instance, status);
         return true;
       } catch (e) {
         GGRC.Errors.notifier(

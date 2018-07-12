@@ -6,6 +6,7 @@
 import {
   getInScopeModels,
 } from '../../plugins/utils/snapshot-utils';
+import Mappings from '../../models/mappers/mappings';
 
 /**
  *  @typedef SpecialConfig
@@ -125,7 +126,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
   showResults: true,
   type: 'Control', // We set default as Control
   availableTypes: function () {
-    let types = GGRC.Mappings.getMappingTypes(
+    let types = Mappings.getMappingTypes(
       this.attr('object'),
       [],
       getInScopeModels().concat('TaskGroup'));

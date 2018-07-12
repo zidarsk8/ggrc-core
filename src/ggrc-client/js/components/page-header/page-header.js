@@ -16,16 +16,19 @@ import {
   isAdmin,
   getPageType,
   isObjectContextPage,
+  isMyAssessments,
 } from '../../plugins/utils/current-page-utils';
 import template from './page-header.mustache';
 
 (function (GGRC, can) {
   'use strict';
   let colorsMap = {
+    OrgGroup: 'header-style-1',
     System: 'header-style-1',
     Process: 'header-style-1',
     DataAsset: 'header-style-1',
     Product: 'header-style-1',
+    ProductGroup: 'header-style-1',
     Project: 'header-style-1',
     Facility: 'header-style-1',
     Market: 'header-style-1',
@@ -34,6 +37,7 @@ import template from './page-header.mustache';
     Assessment: 'header-style-2',
     Issue: 'header-style-3',
     Risk: 'header-style-3',
+    TechnologyEnvironment: 'header-style-1',
     Threat: 'header-style-3',
     Regulation: 'header-style-4',
     Policy: 'header-style-4',
@@ -75,6 +79,11 @@ import template from './page-header.mustache';
       isObjectPage: {
         get() {
           return isObjectContextPage();
+        },
+      },
+      isMyAssessmentsPage: {
+        get() {
+          return isMyAssessments();
         },
       },
       model: {

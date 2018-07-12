@@ -98,6 +98,7 @@ dashboard-js-template-files:
   - help/filters_helper_content.mustache
   - markets/modal_content.mustache
   - metrics/modal_content.mustache
+  - technology_environments/modal_content.mustache
   - modals/archive_cancel_buttons.mustache
   - modals/close_buttons.mustache
   - modals/confirm.mustache
@@ -131,6 +132,7 @@ dashboard-js-template-files:
   - processes/modal_content.mustache
   - products/info.mustache
   - products/modal_content.mustache
+  - product_groups/modal_content.mustache
   - programs/extended_info.mustache
   - programs/info.mustache
   - programs/modal_content.mustache
