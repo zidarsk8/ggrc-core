@@ -9,6 +9,7 @@ from dateutil import parser, tz
 
 from lib import factory, url
 from lib.constants import objects, messages, element, regex
+from lib.constants.locator import WidgetInfoAssessment
 from lib.element.tab_containers import DashboardWidget
 from lib.entities.entity import Representation
 from lib.page import dashboard
@@ -582,7 +583,6 @@ class AssessmentsService(BaseWebUiService):
     """Navigate to info page of object according to URL of object then find and
     click 'Verify' button then return info page of object in new state"""
     from lib.constants.locator import ObjectWidget
-    from lib.constants.locator import WidgetInfoAssessment
     self.open_info_page_of_obj(obj).click_verify()
     for locator in [ObjectWidget.HEADER_STATE_COMPLETED,
                     WidgetInfoAssessment.ICON_VERIFIED]:
@@ -633,6 +633,13 @@ class AssessmentsService(BaseWebUiService):
     mapped_titles = modal_edit.get_mapped_snapshots_titles()
     modal_edit.save_and_close()
     return mapped_titles
+
+  def choose_and_fill_dropdown_lca(
+      self, asmt, dropdown_id, option_title, **kwargs
+  ):
+    """Fill dropdown LCA for Assessment."""
+    asmt_info = self.open_info_page_of_obj(asmt)
+    asmt_info.choose_and_fill_dropdown_lca(dropdown_id, option_title, **kwargs)
 
 
 class ControlsService(SnapshotsWebUiService):

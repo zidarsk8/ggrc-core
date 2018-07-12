@@ -195,16 +195,20 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
   @staticmethod
   def generate_ca_defenitions_for_asmt_tmpls(list_ca_definitions):
     """Generate list of dictionaries of CA random values from exist list CA
-    definitions according to CA 'title', 'attribute_type' and
-    'multi_choice_options' for Dropdown. Return list of dictionaries of CA
-    definitions that ready to use via REST API:
+    definitions according to CA 'title', 'attribute_type',
+    'multi_choice_options' and 'multi_choice_mandatory' for Dropdown.
+    Return list of dictionaries of CA definitions that ready to use
+    via REST API:
     Example:
     :return
-    [{"title": "t1", "attribute_type": "Text", "multi_choice_options": ""},
-     {"title":"t2", "attribute_type":"Rich Text", "multi_choice_options":""}]
+    [{"title": "t1", "attribute_type": "Text", "multi_choice_options": "",
+      "multi_choice_mandatory": ""},
+     {"title":"t2", "attribute_type":"Rich Text", "multi_choice_options":"",
+      "multi_choice_mandatory": ""}]
     """
     return [{k: (v if v else "") for k, v in ca_def.__dict__.items()
-             if k in ("title", "attribute_type", "multi_choice_options")}
+             if k in ("title", "attribute_type", "multi_choice_options",
+                      "multi_choice_mandatory")}
             for ca_def in list_ca_definitions]
 
   def create_dashboard_ca(self, definition_type):
@@ -212,7 +216,7 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
     N'Dashboard'.
     """
     return self.obj_inst().update_attrs(
-        title=self._generate_ca_title(value_aliases.DASHBOARD),
+        title=self.generate_ca_title(value_aliases.DASHBOARD),
         attribute_type=AdminWidgetCustomAttributes.TEXT,
         definition_type=definition_type, mandatory=False)
 
@@ -230,7 +234,7 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
     ca_obj_attr_type = unicode(random.choice(
         AdminWidgetCustomAttributes.ALL_CA_TYPES))
     ca_obj = self.obj_inst().update_attrs(
-        title=self._generate_ca_title(ca_obj_attr_type),
+        title=self.generate_ca_title(ca_obj_attr_type),
         attribute_type=ca_obj_attr_type,
         multi_choice_options=(
             StringMethods.random_list_strings()
@@ -253,7 +257,7 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
     """
     # fix generated data
     if attrs.get("attribute_type"):
-      obj.title = self._generate_ca_title(attrs["attribute_type"])
+      obj.title = self.generate_ca_title(attrs["attribute_type"])
     if (obj.multi_choice_options and
             obj.attribute_type == AdminWidgetCustomAttributes.DROPDOWN and
             attrs.get("attribute_type") !=
@@ -275,7 +279,7 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
       obj.multi_choice_options = StringMethods.random_list_strings()
     return obj.update_attrs(**attrs)
 
-  def _generate_ca_title(self, first_part):
+  def generate_ca_title(self, first_part):
     """Generate title of custom attribute
     (same as usual title but without a star as it's disallowed, see GGRC-4954)
     """

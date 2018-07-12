@@ -5,12 +5,15 @@
 
 import re
 
+from selenium.webdriver.common.by import By
+
 from lib import base
 from lib.constants import (
     locator, objects, element, roles, regex, messages, users)
 from lib.constants.locator import WidgetInfoAssessment
 from lib.element import widget_info, tab_containers, tables
 from lib.page.modal import update_object
+from lib.page.modal.set_value_for_asmt_ca import SetValueForAsmtDropdown
 from lib.utils import selenium_utils, string_utils, help_utils
 
 
@@ -455,6 +458,7 @@ class Assessments(InfoWidget):
         [self.is_verified, self.creators_txt, self.assignees_txt,
          self.verifiers_txt, self.mapped_objects_titles_txt,
          self.comments_scopes_txt, self.asmt_type_txt])
+    self._extend_list_all_scopes(["evidence_urls"], [self.evidence_urls])
 
   def _get_mapped_objs_titles_txt(self):
     """Return lists of str for mapped snapshots titles text from current tab.
@@ -509,6 +513,28 @@ class Assessments(InfoWidget):
     """Click on 'Needs Rework' button."""
     base.Button(self.info_widget_elem,
                 WidgetInfoAssessment.BUTTON_NEEDS_REWORK).click()
+
+  def choose_and_fill_dropdown_lca(self, dropdown_id, option_title, **kwargs):
+    """Choose and fill comment or url for Assessment dropdown."""
+    self.select_ca_dropdown_option(dropdown_id, option_title)
+    SetValueForAsmtDropdown(self._driver).fill_dropdown_lca(**kwargs)
+    selenium_utils.get_when_clickable(
+        self._driver, WidgetInfoAssessment.BUTTON_COMPLETE)
+
+  def select_ca_dropdown_option(self, dropdown_id, option_value):
+    """Select custom attribute dropdown option."""
+    dropdown_locator = (
+        By.CSS_SELECTOR, "#form-field-{}".format(dropdown_id))
+    selenium_utils.get_when_clickable(
+        self.info_widget_elem, dropdown_locator)
+    base.DropdownStatic(self.info_widget_elem,
+                        dropdown_locator).select(option_value)
+
+  @property
+  def evidence_urls(self):
+    """Get text of evidence urls."""
+    return [url.text for url in self.info_widget_elem.find_elements(
+        *self._locators.EVIDENCE_URLS_CSS)]
 
 
 class AssessmentTemplates(InfoWidget):

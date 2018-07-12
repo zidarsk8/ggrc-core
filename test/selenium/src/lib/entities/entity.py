@@ -89,7 +89,8 @@ class Representation(object):
         els.CREATORS: "creators", els.VERIFIERS: "verifiers",
         els.COMMENTS_HEADER: "comments", els.CREATED_AT: "created_at",
         els.MODIFIED_BY: "modified_by", els.LAST_UPDATED_BY: "modified_by",
-        els.UPDATED_AT: "updated_at", els.ASMT_TYPE: "assessment_type"
+        els.UPDATED_AT: "updated_at", els.ASMT_TYPE: "assessment_type",
+        "EVIDENCE_URLS": "evidence_urls"
     }
     csv_remap_items = {
         csv.REVISION_DATE: "updated_at"
@@ -660,7 +661,8 @@ class CustomAttributeDefinitionEntity(Representation):
     self.set_attrs(
         "title", "id", "href", "type", "definition_type", "attribute_type",
         "helptext", "placeholder", "mandatory", "multi_choice_options",
-        "created_at", "updated_at", "modified_by", **attrs)
+        "created_at", "updated_at", "modified_by", "multi_choice_mandatory",
+        **attrs)
 
   def __lt__(self, other):
     return self.title < other.title
@@ -723,7 +725,8 @@ class AssessmentEntity(Entity):
     self.delete_attrs("admins", "os_state")
     self.set_attrs(
         "creators", "assignees", "verifiers", "assessment_type", "verified",
-        "mapped_objects", "audit", "template", "object", **attrs)
+        "mapped_objects", "audit", "template", "object", "evidence_urls",
+        **attrs)
 
   def cads_from_template(self):
     return [definition
