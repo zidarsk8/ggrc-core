@@ -14,8 +14,8 @@ from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.utils.custom_dict import MissingKeyDict
 
 
-class BaseIssueTrackerQueryBuilder(object):
-  """Base issue tracker query builder class.
+class BaseIssueTrackerParamsBuilder(object):
+  """Base issue tracker params builder class.
 
   This class and all classes which inherits from it provide
   functionality for building query to issue tracker.
@@ -56,7 +56,7 @@ class BaseIssueTrackerQueryBuilder(object):
 
   def __init__(self):
     """Basic initialization."""
-    self.issue_tracker_query = {}
+    self.issue_tracker_params = {}
     self.comments = []
 
   @staticmethod
@@ -72,7 +72,7 @@ class BaseIssueTrackerQueryBuilder(object):
     integration_utils.normalize_issue_tracker_info(issue_tracker_info)
 
     hotlist_id = issue_tracker_info.get("hotlist_id")
-    self.issue_tracker_query.update({
+    self.issue_tracker_params.update({
         "component_id": issue_tracker_info.get("component_id", ""),
         "hotlist_id": [hotlist_id] if hotlist_id else [],
         "title": issue_tracker_info.get("title", obj.title),
@@ -87,7 +87,7 @@ class BaseIssueTrackerQueryBuilder(object):
 
     difference_dict = self._build_difference_dict(new_issue_tracker_info,
                                                   current_issue_tracker_info)
-    self.issue_tracker_query.update(difference_dict)
+    self.issue_tracker_params.update(difference_dict)
 
   def _build_difference_dict(self, new_data, old_data):
     """Create dict of attributes with changed values
@@ -106,10 +106,14 @@ class BaseIssueTrackerQueryBuilder(object):
     return res
 
 
-class IssueQueryBuilder(BaseIssueTrackerQueryBuilder):
+class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
   """Issue tracker query builder for GGRC Issue object."""
 
   MODEL_NAME = "Issue"
+
+  ASSIGNED_ISSUE_STATUS = "ASSIGNED"
+  OBSOLETE_ISSUE_STATUS = "OBSOLETE"
+
   DESCRIPTION_TMPL = "Following is the issue Description from GGRC: {}"
   REMEDIATION_PLAN_TMPL = (
       "Following is the issue Remediation Plan from GGRC: {}"
@@ -125,14 +129,15 @@ class IssueQueryBuilder(BaseIssueTrackerQueryBuilder):
       "is an Global auditor."
   )
 
-  def build_create_query(self, obj, issue_tracker_info):
+  def build_create_issue_tracker_params(self, obj, issue_tracker_info):
     """Build create issue query for issue tracker."""
     allowed_emails = integration_utils.exclude_auditor_emails(
         {acl.person.email for acl in obj.access_control_list}
     )
 
     # Don't turn on integration if 'reporter' is auditor.
-    if obj.modified_by.email not in allowed_emails:
+    reporter_email = obj.modified_by.email
+    if reporter_email not in allowed_emails:
       obj.add_warning(self.EXCLUDE_REPORTER_EMAIL_ERROR_MSG)
       return {}
 
@@ -142,17 +147,20 @@ class IssueQueryBuilder(BaseIssueTrackerQueryBuilder):
     ))
     self.handle_issue_tracker_info(obj, issue_tracker_info)
     self._handle_people_emails(obj, allowed_emails)
-    self._handle_issue_attributes(obj)
-    self.issue_tracker_query["status"] = "ASSIGNED"
+    self._handle_issue_comment_attributes(obj)
+    self.issue_tracker_params["status"] = self.ASSIGNED_ISSUE_STATUS
 
     # Should be executed in the end of building process because
     # some steps can adds comments inside methods.
-    self.issue_tracker_query["comment"] = "\n\n".join(self.comments)
+    self.issue_tracker_params["comment"] = "\n\n".join(self.comments)
 
-    return self.issue_tracker_query
+    return self.issue_tracker_params
 
-  def build_update_query(self, obj, initial_state, new_issue_tracker_info,
-                         current_issue_tracker_info):
+  def build_update_issue_tracker_params(self,
+                                        obj,
+                                        initial_state,
+                                        new_issue_tracker_info,
+                                        current_issue_tracker_info):
     """Build update issue query for issue tracker."""
 
     if (not new_issue_tracker_info["enabled"] and
@@ -167,20 +175,20 @@ class IssueQueryBuilder(BaseIssueTrackerQueryBuilder):
                                     current_issue_tracker_info)
 
     if self.comments:
-      self.issue_tracker_query["comment"] = "\n\n".join(self.comments)
+      self.issue_tracker_params["comment"] = "\n\n".join(self.comments)
 
-    return self.issue_tracker_query
+    return self.issue_tracker_params
 
-  def build_delete_query(self):
+  def build_delete_issue_tracker_params(self):
     """Build delete issue query for issue tracker."""
     self.comments.append(self.DISABLE_TMPL.format(model="Issue"))
-    self.issue_tracker_query["status"] = "OBSOLETE"
+    self.issue_tracker_params["status"] = self.OBSOLETE_ISSUE_STATUS
 
     # Should be executed in the end of building process because
     # some steps can adds comments inside methods.
-    self.issue_tracker_query["comment"] = "\n\n".join(self.comments)
+    self.issue_tracker_params["comment"] = "\n\n".join(self.comments)
 
-    return self.issue_tracker_query
+    return self.issue_tracker_params
 
   def _handle_people_emails(self, obj, allowed_emails):
     """Handle emails.
@@ -202,7 +210,7 @@ class IssueQueryBuilder(BaseIssueTrackerQueryBuilder):
     admins = sorted(admins, key=lambda person: person.name)
 
     issue_verifier_email = admins[0].email if admins else ""
-    self.issue_tracker_query["verifier"] = issue_verifier_email
+    self.issue_tracker_params["verifier"] = issue_verifier_email
 
     # Handle Primary Contacts list.
     primary_contacts = [
@@ -212,20 +220,19 @@ class IssueQueryBuilder(BaseIssueTrackerQueryBuilder):
     ]
     primary_contacts = sorted(primary_contacts, key=lambda p: p.name)
     assignee_email = primary_contacts[0].email if primary_contacts else ""
-    self.issue_tracker_query["assignee"] = assignee_email
+    self.issue_tracker_params["assignee"] = assignee_email
 
     # Handle reporter list.
     reporter_email = obj.modified_by.email
-    self.issue_tracker_query["reporter"] = reporter_email
+    self.issue_tracker_params["reporter"] = reporter_email
 
     # Handle CCS list.
-    # emails = {acl.person.email for acl in acls}
     ccs = allowed_emails - {issue_verifier_email,
                             assignee_email,
                             reporter_email}
-    self.issue_tracker_query["ccs"] = list(ccs)
+    self.issue_tracker_params["ccs"] = list(ccs)
 
-  def _handle_issue_attributes(self, obj):
+  def _handle_issue_comment_attributes(self, obj):
     """Handle attributes from GGRC Issue object.
 
     This method adds Issue description and Remediation Plan as comments

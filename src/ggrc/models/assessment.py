@@ -3,8 +3,6 @@
 
 """Module for Assessment object"""
 
-import collections
-
 from sqlalchemy import and_
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import remote
@@ -16,7 +14,7 @@ from ggrc.builder import simple_property
 from ggrc.fulltext import mixin
 from ggrc.models.comment import Commentable
 from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
-from ggrc.models import issuetracker_issue, audit
+from ggrc.models import audit
 from ggrc.models.mixins import with_last_comment
 from ggrc.models.mixins.audit_relationship import AuditRelationship
 from ggrc.models.mixins import base
@@ -210,28 +208,6 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
           "view_only": True,
       }
   }
-
-  def __init__(self, *args, **kwargs):
-    super(Assessment, self).__init__(*args, **kwargs)
-    self._warnings = collections.defaultdict(list)
-
-  @orm.reconstructor
-  def init_on_load(self):
-    self._warnings = collections.defaultdict(list)
-
-  def add_warning(self, domain, msg):
-    self._warnings[domain].append(msg)
-
-  @simple_property
-  def issue_tracker(self):
-    """Returns representation of issue tracker related info as a dict."""
-    issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
-        'Assessment', self.id)
-    res = issue_obj.to_dict(
-        include_issue=True) if issue_obj is not None else {}
-    res['_warnings'] = self._warnings['issue_tracker']
-
-    return res
 
   @simple_property
   def archived(self):

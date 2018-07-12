@@ -13,7 +13,7 @@ from ggrc import db
 from ggrc.integrations import issues
 from ggrc.integrations import integrations_errors
 from ggrc.models import all_models
-from ggrc.models.hooks.issue_tracker import issue_tracker_query_builder
+from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.utils.custom_dict import MissingKeyDict
 
@@ -49,8 +49,11 @@ def create_issue_handler(obj, issue_tracker_info):
   # We need in flush here because we need object id for URL generation.
   db.session.flush()
 
-  builder = issue_tracker_query_builder.IssueQueryBuilder()
-  issue_tracker_query = builder.build_create_query(obj, issue_tracker_info)
+  builder = issue_tracker_params_builder.IssueParamsBuilder()
+  issue_tracker_query = builder.build_create_issue_tracker_params(
+      obj,
+      issue_tracker_info
+  )
 
   if not issue_tracker_query:
     return
@@ -67,7 +70,7 @@ def create_issue_handler(obj, issue_tracker_info):
         "Unable to create a ticket while creating object ID=%d: %s",
         obj.id, error
     )
-    obj.add_warning("Unable to update a ticket.")
+    obj.add_warning("Unable to create a ticket in issue tracker.")
     issue_tracker_info["enabled"] = False
 
   # Fill necessary fields for issuetracker_issue object.
@@ -83,31 +86,35 @@ def create_issue_handler(obj, issue_tracker_info):
 
 def delete_issue_handler(obj, **kwargs):
   """Event handler for issue object deletion."""
-  issue_obj = all_models.IssuetrackerIssue.get_issue("Issue", obj.id)
+  issue_tracker_object = all_models.IssuetrackerIssue.get_issue("Issue",
+                                                                obj.id)
 
-  if issue_obj:
-    if issue_obj.enabled and issue_obj.issue_id:
-      builder = issue_tracker_query_builder.IssueQueryBuilder()
-      issue_tracker_query = builder.build_delete_query()
+  if issue_tracker_object:
+    if issue_tracker_object.enabled and issue_tracker_object.issue_id:
+      builder = issue_tracker_params_builder.IssueParamsBuilder()
+      issue_tracker_query = builder.build_delete_issue_tracker_params()
       try:
-        issues.Client().update_issue(issue_obj.issue_id, issue_tracker_query)
+        issues.Client().update_issue(issue_tracker_object.issue_id,
+                                     issue_tracker_query)
       except integrations_errors.Error as error:
         logger.error("Unable to update a ticket ID=%s while deleting"
                      " issue ID=%d: %s",
-                     issue_obj.issue_id, obj.id, error)
-    db.session.delete(issue_obj)
+                     issue_tracker_object.issue_id, obj.id, error)
+        obj.add_warning("Unable to update a ticket in issue tracker.")
+    db.session.delete(issue_tracker_object)
 
 
 def update_issue_handler(obj, initial_state, new_issue_tracker_info=None):
   """Event handler for issue object renewal."""
-  issue_obj = all_models.IssuetrackerIssue.get_issue("Issue", obj.id)
+  issue_tracker_object = all_models.IssuetrackerIssue.get_issue("Issue",
+                                                                obj.id)
 
-  if not issue_obj:
+  if not issue_tracker_object:
     if new_issue_tracker_info and new_issue_tracker_info["enabled"]:
       create_issue_handler(obj, new_issue_tracker_info)
     return
 
-  current_issue_tracker_info = issue_obj.to_dict(
+  current_issue_tracker_info = issue_tracker_object.to_dict(
       include_issue=True,
       include_private=True
   )
@@ -117,8 +124,8 @@ def update_issue_handler(obj, initial_state, new_issue_tracker_info=None):
     new_issue_tracker_info = current_issue_tracker_info
 
   # Build query
-  builder = issue_tracker_query_builder.IssueQueryBuilder()
-  query = builder.build_update_query(
+  builder = issue_tracker_params_builder.IssueParamsBuilder()
+  query = builder.build_update_issue_tracker_params(
       obj,
       initial_state,
       new_issue_tracker_info,
@@ -127,11 +134,12 @@ def update_issue_handler(obj, initial_state, new_issue_tracker_info=None):
 
   if query:
     try:
-      issues.Client().update_issue(issue_obj.issue_id, query)
+      issues.Client().update_issue(issue_tracker_object.issue_id, query)
     except integrations_errors.Error as error:
       logger.error("Unable to update a ticket ID=%s while deleting"
                    " issue ID=%d: %s",
-                   issue_obj.issue_id, obj.id, error)
+                   issue_tracker_object.issue_id, obj.id, error)
+      obj.add_warning("Unable to update a ticket in issue tracker.")
 
   issue_tracker_attrs = build_issue_tracker_attrs(query)
   if issue_tracker_attrs:

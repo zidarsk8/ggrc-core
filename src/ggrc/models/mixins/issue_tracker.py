@@ -3,12 +3,14 @@
 
 """Mixins for issue tracker integration functionality."""
 
+# pylint: disable=unsubscriptable-object
+# pylint: disable=using-constant-test
+
 import sqlalchemy as sa
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc.models import reflection
-from ggrc.models import issuetracker_issue
 from ggrc.models.issuetracker_issue import IssuetrackerIssue
 
 from ggrc.builder import simple_property
@@ -54,10 +56,8 @@ class IssueTracked(object):
   @simple_property
   def issue_tracker(self):
     """Returns representation of issue tracker related info as a dict."""
-    issue_info = issuetracker_issue.IssuetrackerIssue.get_issue(
-        self.type, self.id
-    )
-    result = issue_info.to_dict(include_issue=True) if issue_info else {}
+    issue_info = self.issuetracker_issue
+    result = issue_info[0].to_dict(include_issue=True) if issue_info else {}
     result["_warnings"] = self._warnings
     return result
 

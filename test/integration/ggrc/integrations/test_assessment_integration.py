@@ -3,9 +3,9 @@
 
 """Integration tests for assessments with IssueTracker integration."""
 
-import mock
 from collections import OrderedDict
 
+import mock
 import ddt
 
 from ggrc import db

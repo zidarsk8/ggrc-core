@@ -329,7 +329,7 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):
       logger.error(
           'Unable to update a ticket ID=%s while updating '
           'assessment ID=%d: %s', issue_id, obj.id, error)
-    obj.add_warning('issue_tracker', 'Unable to update a ticket.')
+    obj.add_warning('Unable to update a ticket.')
 
   _update_issuetracker_info(obj, issue_tracker_info)
 
@@ -701,7 +701,7 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
       issue_tracker_info = {
           'enabled': False,
       }
-      assessment.add_warning('issue_tracker', 'Unable to create a ticket.')
+      assessment.add_warning('Unable to create a ticket.')
     else:
       issue_tracker_info['issue_id'] = issue_id
       issue_tracker_info['issue_url'] = _ISSUE_URL_TMPL % issue_id

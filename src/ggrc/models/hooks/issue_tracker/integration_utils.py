@@ -57,7 +57,10 @@ def exclude_auditor_emails(emails):
   acl = all_models.AccessControlList
   acr = all_models.AccessControlRole
 
-  result = db.session.query(
+  if not isinstance(emails, set):
+    emails = set(emails)
+
+  auditor_emails = db.session.query(
       all_models.Person.email
   ).join(
       acl, acl.person_id == all_models.Person.id
@@ -68,5 +71,5 @@ def exclude_auditor_emails(emails):
       all_models.Person.email.in_(emails)
   ).distinct().all()
 
-  emails_to_exlude = [line[0] for line in result]
-  return {email for email in emails if email not in emails_to_exlude}
+  emails_to_exlude = {line.email for line in auditor_emails}
+  return emails - emails_to_exlude

@@ -12,16 +12,16 @@ import ddt
 import mock
 
 from ggrc.models import exceptions
-from ggrc.models.hooks.issue_tracker import issue_tracker_query_builder
+from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder
 
 
 @ddt.ddt
-class TestBaseIssueTrackerQueryBuilder(unittest.TestCase):
-  """Test base class for issue tracker query builder."""
+class TestBaseIssueTrackerParamsBuilder(unittest.TestCase):
+  """Test base class for issue tracker params builder."""
 
   def setUp(self):
     """Perform initialisation for each test cases."""
-    self.builder = issue_tracker_query_builder.BaseIssueTrackerQueryBuilder()
+    self.builder = issue_tracker_params_builder.BaseIssueTrackerParamsBuilder()
 
   @ddt.data(
       {"component_id": "not float number"},
@@ -58,7 +58,7 @@ class TestBaseIssueTrackerQueryBuilder(unittest.TestCase):
     self.builder.handle_issue_tracker_info(mock_object, issue_tracker_info)
 
     # Assert results.
-    self.assertEquals(self.builder.issue_tracker_query, expected_result)
+    self.assertEquals(self.builder.issue_tracker_params, expected_result)
 
 
 @ddt.ddt
@@ -67,7 +67,7 @@ class TestIssueQueryBuilder(unittest.TestCase):
 
   def setUp(self):
     """Perform initialisation for each test cases."""
-    self.builder = issue_tracker_query_builder.IssueQueryBuilder()
+    self.builder = issue_tracker_params_builder.IssueParamsBuilder()
 
   def test_handle_issue_attributes(self):
     """Test '_handle_issue_attributes' method."""
@@ -82,7 +82,7 @@ class TestIssueQueryBuilder(unittest.TestCase):
     ]
 
     # Perform action.
-    self.builder._handle_issue_attributes(mock_object)
+    self.builder._handle_issue_comment_attributes(mock_object)
 
     # Assert results.
     self.assertEquals(self.builder.comments, expected_result)
@@ -117,7 +117,7 @@ class TestIssueQueryBuilder(unittest.TestCase):
     self.builder._handle_people_emails(mock_object, allowed_emails)
 
     # Assert results.
-    self.assertDictEqual(self.builder.issue_tracker_query, expected_result)
+    self.assertDictEqual(self.builder.issue_tracker_params, expected_result)
 
   def test_handle_people_emails_with_ccs(self):
     """Test '_handle_people_emails' method with emails in ccs list."""
@@ -183,7 +183,7 @@ class TestIssueQueryBuilder(unittest.TestCase):
     self.builder._handle_people_emails(mock_object, allowed_emails)
 
     # Assert results.
-    self.assertDictEqual(self.builder.issue_tracker_query, expected_result)
+    self.assertDictEqual(self.builder.issue_tracker_params, expected_result)
 
   def test_build_delete_query(self):
     """Test 'build_delete_query' method."""
@@ -192,8 +192,8 @@ class TestIssueQueryBuilder(unittest.TestCase):
                    "tracked within this bug.",
         "status": "OBSOLETE"
     }
-    self.builder.build_delete_query()
-    self.assertEquals(self.builder.issue_tracker_query, expected_result)
+    self.builder.build_delete_issue_tracker_params()
+    self.assertEquals(self.builder.issue_tracker_params, expected_result)
 
   def test_update_issue_comment_attributes(self):
     """Test '_update_issue_comment_attributes' method."""

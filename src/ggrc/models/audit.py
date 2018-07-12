@@ -9,7 +9,6 @@ from werkzeug.exceptions import Forbidden
 from ggrc import db
 from ggrc.access_control.list import AccessControlList
 from ggrc.access_control.roleable import Roleable
-from ggrc.builder import simple_property
 from ggrc.login import get_current_user
 from ggrc.models.deferred import deferred
 from ggrc.models import mixins
@@ -84,7 +83,6 @@ class Audit(Snapshotable,
       'program',
       'object_type',
       'archived',
-      reflection.Attribute('issue_tracker', create=False, update=False),
   )
 
   _fulltext_attrs = [
@@ -131,13 +129,6 @@ class Audit(Snapshotable,
           "description": "Options are:\n{}".format('\n'.join(VALID_STATES))
       }
   }
-
-  @simple_property
-  def issue_tracker(self):
-    """Returns representation of issue tracker related info as a dict."""
-    issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
-        'Audit', self.id)
-    return issue_obj.to_dict() if issue_obj is not None else {}
 
   def _clone(self, source_object):
     """Clone audit and all relevant attributes.
