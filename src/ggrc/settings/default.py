@@ -203,6 +203,6 @@ RISK_ASSESSMENT_URL = os.environ.get(
     'http://localhost:8080'
 )
 
-# Link for creation buganizer issue
+# Link for creation issue tracker issue
 CREATE_ISSUE_URL = os.environ.get('CREATE_ISSUE_URL', "")
 CREATE_ISSUE_BUTTON_NAME = os.environ.get('CREATE_ISSUE_BUTTON_NAME', "")
