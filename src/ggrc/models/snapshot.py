@@ -62,11 +62,7 @@ class Snapshot(Roleable, relationship.Relatable, WithLastAssessmentDate,
   ]
   _aliases = {
       "attributes": "Attributes",
-      "archived": {
-          "display_name": "Archived",
-          "mandatory": False,
-          "view_only": True,
-      },
+      "archived": "Archived",
       "mappings": {
           "display_name": "Mappings",
           "type": "mapping",
@@ -152,18 +148,13 @@ class Snapshot(Roleable, relationship.Relatable, WithLastAssessmentDate,
       _set_latest_revisions([self])
 
   @property
-  def parent_attr(self):
-    return '{0}_parent'.format(self.parent_type)
-
-  @property
-  def parent(self):  # DEPRECATED FEATURE, use 'audit' instead
-    return getattr(self, self.parent_attr)
+  def parent(self):
+    return self.audit
 
   @parent.setter
   def parent(self, value):
-    self.parent_id = getattr(value, 'id', None)
+    setattr(self, "audit", value)
     self.parent_type = "Audit"
-    return setattr(self, self.parent_attr, value)
 
   @staticmethod
   def _extra_table_args(_):
