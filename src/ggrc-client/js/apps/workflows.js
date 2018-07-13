@@ -366,7 +366,7 @@ import Mappings from '../models/mappers/mappings';
       ~can.inArray(pageInstance.constructor.shortName, _workflowObjectTypes)
     ) {
       descriptor[pageInstance.constructor.shortName] = {
-        workflow: {
+        Workflow: {
           widget_id: 'workflow',
           widget_name: 'Workflows',
           widgetType: 'treeview',
@@ -376,7 +376,7 @@ import Mappings from '../models/mappers/mappings';
             model: CMS.Models.Workflow,
           },
         },
-        task: {
+        CycleTaskGroupObjectTask: {
           widget_id: 'task',
           widget_name: 'Workflow Tasks',
           widgetType: 'treeview',
@@ -393,10 +393,7 @@ import Mappings from '../models/mappers/mappings';
       };
     }
 
-    new GGRC.WidgetList('ggrc_workflows', descriptor, [
-      'info',
-      'task',
-    ]);
+    new GGRC.WidgetList('ggrc_workflows', descriptor);
   };
 
   WorkflowExtension.init_widgets_for_workflow_page = function () {
@@ -515,7 +512,7 @@ import Mappings from '../models/mappers/mappings';
       .test(window.location.pathname);
 
     descriptor[pageInstance.constructor.shortName] = {
-      task: {
+      CycleTaskGroupObjectTask: {
         widget_id: 'task',
         widgetType: 'treeview',
         treeViewDepth: 1,
@@ -535,7 +532,7 @@ import Mappings from '../models/mappers/mappings';
 
     // add 'Workflows' tab for 'All Objects' and People view
     if (isObjectBrowser || isPeoplePage) {
-      descriptor[pageInstance.constructor.shortName].workflow = {
+      descriptor[pageInstance.constructor.shortName].Workflow = {
         widget_id: 'workflow',
         widget_name: 'Workflows',
         widgetType: 'treeview',
@@ -546,10 +543,7 @@ import Mappings from '../models/mappers/mappings';
         },
       };
     }
-    new GGRC.WidgetList('ggrc_workflows', descriptor, [
-      'info',
-      'task',
-    ]);
+    new GGRC.WidgetList('ggrc_workflows', descriptor);
   };
 
   registerHook(
