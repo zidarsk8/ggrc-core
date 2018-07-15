@@ -12,7 +12,9 @@ import ddt
 import mock
 
 from ggrc.models import exceptions
-from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder
+from ggrc.models.hooks.issue_tracker import integration_utils
+from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder \
+    as params_builder
 
 
 @ddt.ddt
@@ -21,7 +23,7 @@ class TestBaseIssueTrackerParamsBuilder(unittest.TestCase):
 
   def setUp(self):
     """Perform initialisation for each test cases."""
-    self.builder = issue_tracker_params_builder.BaseIssueTrackerParamsBuilder()
+    self.builder = params_builder.BaseIssueTrackerParamsBuilder()
 
   @ddt.data(
       {"component_id": "not float number"},
@@ -70,7 +72,7 @@ class TestIssueQueryBuilder(unittest.TestCase):
 
   def setUp(self):
     """Perform initialisation for each test cases."""
-    self.builder = issue_tracker_params_builder.IssueParamsBuilder()
+    self.builder = params_builder.IssueParamsBuilder()
 
   def test_handle_issue_attributes(self):
     """Test '_handle_issue_attributes' method."""
@@ -118,6 +120,7 @@ class TestIssueQueryBuilder(unittest.TestCase):
         "verifier": "verifier_email",
         "assignee": "assignee_email",
         "reporter": "reporter_email",
+        "ccs": [],
     }
 
     # Perform action.
@@ -198,19 +201,6 @@ class TestIssueQueryBuilder(unittest.TestCase):
         expected_result
     )
 
-  def test_build_delete_query(self):
-    """Test 'build_delete_query' method."""
-    expected_result = {
-        "comment": "Changes to this GGRC object will no longer be "
-                   "tracked within this bug.",
-        "status": "OBSOLETE"
-    }
-    self.builder.build_delete_issue_tracker_params()
-    self.assertEquals(
-        self.builder.params.get_issue_tracker_params(),
-        expected_result
-    )
-
   def test_update_issue_comment_attributes(self):
     """Test '_update_issue_comment_attributes' method."""
     # Arrange test data.
@@ -239,6 +229,72 @@ class TestIssueQueryBuilder(unittest.TestCase):
                                                   mock_current_tracker_info)
 
     # Assert results.
+    self.assertEquals(
+        self.builder.params.get_issue_tracker_params(),
+        expected_result
+    )
+
+  @mock.patch.object(params_builder.BaseIssueTrackerParamsBuilder,
+                     "get_ggrc_object_url",
+                     return_value="http://issue_url.com")
+  def test_build_create_issue_tracker_params(self, url_builder_mock):
+    """Test 'build_create_issue_tracker_params' method."""
+    # Arrange test data.
+    mock_object = mock.MagicMock()
+    mock_object.modified_by.email = "reporter@email.com"
+    mock_object.test_plan = "<p>test plan</p>"
+    mock_object.description = "<p>description</p>"
+
+    issue_tracker_info = {
+        "enabled": True,
+        "component_id": "1234",
+        "hotlist_id": "4321",
+        "issue_type": "PROCESS",
+        "issue_priority": "P2",
+        "issue_severity": "S2",
+        "title": "Issue title",
+    }
+    expected_result = {
+        "comment": "This bug was auto-generated to track a GGRC Issue. "
+                   "Use the following link to find the Issue - "
+                   "http://issue_url.com.\n\n"
+                   "Following is the issue Description from GGRC: "
+                   "description\n\n"
+                   "Following is the issue Remediation Plan from GGRC: "
+                   "test plan",
+        "component_id": 1234,
+        "hotlist_id": [4321, ],
+        "priority": "P2",
+        "reporter": "reporter@email.com",
+        "assignee": "",
+        "verifier": "",
+        "ccs": [],
+        "severity": "S2",
+        "status": "ASSIGNED",
+        "title": "Issue title",
+        "type": "PROCESS",
+    }
+
+    # Perform action.
+    with mock.patch.object(integration_utils, "exclude_auditor_emails",
+                           return_value={"reporter@email.com", }):
+      params = self.builder.build_create_issue_tracker_params(
+          mock_object,
+          issue_tracker_info
+      )
+
+    # Assert results.
+    url_builder_mock.assert_called_once()
+    self.assertDictEqual(params.get_issue_tracker_params(), expected_result)
+
+  def test_build_delete_params(self):
+    """Test 'build_delete_params' method."""
+    expected_result = {
+        "comment": "Changes to this GGRC object will no longer be "
+                   "tracked within this bug.",
+        "status": "OBSOLETE"
+    }
+    self.builder.build_delete_issue_tracker_params()
     self.assertEquals(
         self.builder.params.get_issue_tracker_params(),
         expected_result
