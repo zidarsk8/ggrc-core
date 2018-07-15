@@ -16,7 +16,7 @@ from ggrc.models.hooks.issue_tracker import issue_tracker_params_container
 
 @ddt.ddt
 class TestIssueTrackerParamsContainer(unittest.TestCase):
-  """Test class for containig Issue Tracker params."""
+  """Test class for containing Issue Tracker params."""
 
   def setUp(self):
     """Perform initialisation for each test cases."""

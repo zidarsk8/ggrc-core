@@ -3,6 +3,8 @@
 
 """Module for IssueTracker object."""
 
+# pylint: disable=too-many-instance-attributes
+
 from ggrc import db
 from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
