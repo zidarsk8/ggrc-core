@@ -8,7 +8,6 @@
 
 import logging
 
-
 from ggrc import db
 from ggrc.integrations import issues
 from ggrc.integrations import integrations_errors
@@ -50,37 +49,37 @@ def create_issue_handler(obj, issue_tracker_info):
   db.session.flush()
 
   builder = issue_tracker_params_builder.IssueParamsBuilder()
-  issue_tracker_query = builder.build_create_issue_tracker_params(
+  issue_tracker_params = builder.build_create_issue_tracker_params(
       obj,
       issue_tracker_info
   )
 
-  if not issue_tracker_query:
+  if issue_tracker_params.is_empty():
     return
 
-  # Try to create issue in issue tracker.
+  # Query to IssueTracker.
+  issue_tracker_query = issue_tracker_params.get_issue_tracker_params()
+
+  # Parameters for creation IssuetrackerIssue object in GGRC.
+  issuetracker_issue_params = issue_tracker_params.get_params_for_ggrc_object()
+
   try:
     res = issues.Client().create_issue(issue_tracker_query)
 
     issue_url = integration_utils.build_issue_tracker_url(res["issueId"])
-    issue_tracker_info["issue_url"] = issue_url
-    issue_tracker_info["issue_id"] = res["issueId"]
+    issuetracker_issue_params["issue_url"] = issue_url
+    issuetracker_issue_params["issue_id"] = res["issueId"]
   except integrations_errors.Error as error:
     logger.error(
         "Unable to create a ticket while creating object ID=%d: %s",
         obj.id, error
     )
     obj.add_warning("Unable to create a ticket in issue tracker.")
-    issue_tracker_info["enabled"] = False
-
-  # Fill necessary fields for issuetracker_issue object.
-  issue_tracker_info["cc_list"] = issue_tracker_query["ccs"]
-  issue_tracker_info["assignee"] = issue_tracker_query["assignee"]
-  issue_tracker_info["title"] = issue_tracker_query["title"]
+    issuetracker_issue_params["enabled"] = False
 
   # Create object in GGRC with info about issue tracker integration.
   all_models.IssuetrackerIssue.create_or_update_from_dict(
-      obj, issue_tracker_info
+      obj, issuetracker_issue_params
   )
 
 
@@ -92,7 +91,8 @@ def delete_issue_handler(obj, **kwargs):
   if issue_tracker_object:
     if issue_tracker_object.enabled and issue_tracker_object.issue_id:
       builder = issue_tracker_params_builder.IssueParamsBuilder()
-      issue_tracker_query = builder.build_delete_issue_tracker_params()
+      issue_tracker_params = builder.build_delete_issue_tracker_params()
+      issue_tracker_query = issue_tracker_params.get_issue_tracker_params()
       try:
         issues.Client().update_issue(issue_tracker_object.issue_id,
                                      issue_tracker_query)
@@ -125,26 +125,30 @@ def update_issue_handler(obj, initial_state, new_issue_tracker_info=None):
 
   # Build query
   builder = issue_tracker_params_builder.IssueParamsBuilder()
-  query = builder.build_update_issue_tracker_params(
+  issue_tracker_params = builder.build_update_issue_tracker_params(
       obj,
       initial_state,
       new_issue_tracker_info,
       current_issue_tracker_info
   )
 
-  if query:
+  # Query to IssueTracker.
+  issue_tracker_query = issue_tracker_params.get_issue_tracker_params()
+
+  # Parameters for creation IssuetrackerIssue object in GGRC.
+  issuetracker_issue_params = issue_tracker_params.get_params_for_ggrc_object()
+
+  if not issue_tracker_params.is_empty():
     try:
-      issues.Client().update_issue(issue_tracker_object.issue_id, query)
+      issue_id = issue_tracker_object.issue_id
+      issues.Client().update_issue(issue_id, issue_tracker_query)
     except integrations_errors.Error as error:
       logger.error("Unable to update a ticket ID=%s while deleting"
                    " issue ID=%d: %s",
                    issue_tracker_object.issue_id, obj.id, error)
       obj.add_warning("Unable to update a ticket in issue tracker.")
 
-  issue_tracker_attrs = build_issue_tracker_attrs(query)
-  if issue_tracker_attrs:
-    current_issue_tracker_info.update(issue_tracker_attrs)
-    current_issue_tracker_info["enabled"] = new_issue_tracker_info["enabled"]
+  if issuetracker_issue_params:
     all_models.IssuetrackerIssue.create_or_update_from_dict(
-        obj, current_issue_tracker_info
+        obj, issuetracker_issue_params
     )

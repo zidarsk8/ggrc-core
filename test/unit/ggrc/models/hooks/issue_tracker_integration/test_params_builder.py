@@ -42,23 +42,26 @@ class TestBaseIssueTrackerParamsBuilder(unittest.TestCase):
         "hotlist_id": 321,
         "title": "test_title",
         "issue_type": "test_type",
-        "issue_priority": "test_priority",
-        "issue_severity": "test_severity",
+        "issue_priority": "P2",
+        "issue_severity": "S2",
     }
     expected_result = {
         "component_id": 123,
         "hotlist_id": [321, ],
         "title": "test_title",
         "type": "test_type",
-        "priority": "test_priority",
-        "severity": "test_severity",
+        "priority": "P2",
+        "severity": "S2",
     }
 
     # Perform action.
     self.builder.handle_issue_tracker_info(mock_object, issue_tracker_info)
 
     # Assert results.
-    self.assertEquals(self.builder.issue_tracker_params, expected_result)
+    self.assertEquals(
+        self.builder.params.get_issue_tracker_params(),
+        expected_result
+    )
 
 
 @ddt.ddt
@@ -76,16 +79,21 @@ class TestIssueQueryBuilder(unittest.TestCase):
     mock_object = mock.MagicMock()
     mock_object.description = "<p>test_description</p>"
     mock_object.test_plan = "<p>test_plan</p>"
-    expected_result = [
-        "Following is the issue Description from GGRC: test_description",
-        "Following is the issue Remediation Plan from GGRC: test_plan"
-    ]
+    expected_result = {
+        "comment": "Following is the issue Description from GGRC: "
+                   "test_description\n\n"
+                   "Following is the issue Remediation Plan from GGRC: "
+                   "test_plan"
+    }
 
     # Perform action.
     self.builder._handle_issue_comment_attributes(mock_object)
 
     # Assert results.
-    self.assertEquals(self.builder.comments, expected_result)
+    self.assertEquals(
+        self.builder.params.get_issue_tracker_params(),
+        expected_result
+    )
 
   def test_handle_people_emails_without_ccs(self):
     """Test '_handle_people_emails' method without emails in ccs list."""
@@ -110,14 +118,16 @@ class TestIssueQueryBuilder(unittest.TestCase):
         "verifier": "verifier_email",
         "assignee": "assignee_email",
         "reporter": "reporter_email",
-        "ccs": [],
     }
 
     # Perform action.
     self.builder._handle_people_emails(mock_object, allowed_emails)
 
     # Assert results.
-    self.assertDictEqual(self.builder.issue_tracker_params, expected_result)
+    self.assertDictEqual(
+        self.builder.params.get_issue_tracker_params(),
+        expected_result
+    )
 
   def test_handle_people_emails_with_ccs(self):
     """Test '_handle_people_emails' method with emails in ccs list."""
@@ -183,7 +193,10 @@ class TestIssueQueryBuilder(unittest.TestCase):
     self.builder._handle_people_emails(mock_object, allowed_emails)
 
     # Assert results.
-    self.assertDictEqual(self.builder.issue_tracker_params, expected_result)
+    self.assertDictEqual(
+        self.builder.params.get_issue_tracker_params(),
+        expected_result
+    )
 
   def test_build_delete_query(self):
     """Test 'build_delete_query' method."""
@@ -193,7 +206,10 @@ class TestIssueQueryBuilder(unittest.TestCase):
         "status": "OBSOLETE"
     }
     self.builder.build_delete_issue_tracker_params()
-    self.assertEquals(self.builder.issue_tracker_params, expected_result)
+    self.assertEquals(
+        self.builder.params.get_issue_tracker_params(),
+        expected_result
+    )
 
   def test_update_issue_comment_attributes(self):
     """Test '_update_issue_comment_attributes' method."""
@@ -209,12 +225,12 @@ class TestIssueQueryBuilder(unittest.TestCase):
     mock_current_tracker_info = {"enabled": True}
     mock_new_tracker_info = {"enabled": False}
 
-    expected_result = [
-        "Issue Description has been updated.\nnew description",
-        "Issue Remediation Plan has been updated.\nnew test plan",
+    expected_result = {
+        "comment": "Issue Description has been updated.\nnew description\n\n"
+        "Issue Remediation Plan has been updated.\nnew test plan\n\n"
         "Changes to this GGRC object will no longer be "
         "tracked within this bug."
-    ]
+    }
 
     # Perform action.
     self.builder._update_issue_comment_attributes(mock_new_object,
@@ -223,4 +239,7 @@ class TestIssueQueryBuilder(unittest.TestCase):
                                                   mock_current_tracker_info)
 
     # Assert results.
-    self.assertEquals(self.builder.comments, expected_result)
+    self.assertEquals(
+        self.builder.params.get_issue_tracker_params(),
+        expected_result
+    )

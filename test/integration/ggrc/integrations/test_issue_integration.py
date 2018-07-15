@@ -36,8 +36,8 @@ class TestIssueIntegration(ggrc.TestCase):
     component_id = "1234"
     hotlist_id = "4321"
     issue_type = "Default Issue type"
-    issue_priority = "Default Issue priority"
-    issue_severity = "Default Issue severity"
+    issue_priority = "P2"
+    issue_severity = "S1"
     title = "test title"
 
     with mock.patch.object(integration_utils, "exclude_auditor_emails",
@@ -48,8 +48,8 @@ class TestIssueIntegration(ggrc.TestCase):
               "context": None,
               "issue_tracker": {
                   "enabled": True,
-                  "component_id": component_id,
-                  "hotlist_id": hotlist_id,
+                  "component_id": int(component_id),
+                  "hotlist_id": int(hotlist_id),
                   "issue_type": issue_type,
                   "issue_priority": issue_priority,
                   "issue_severity": issue_severity,
@@ -89,13 +89,13 @@ class TestIssueIntegration(ggrc.TestCase):
       ({"test_plan": "new test plan"},
        {"comment": "Issue Remediation Plan has been updated.\nnew test plan"}),
       ({"issue_tracker": {"component_id": "123", "enabled": True}},
-       {"component_id": u"123"}),
+       {"component_id": 123}),
       ({"issue_tracker": {"hotlist_id": "321", "enabled": True}},
-       {"hotlist_id": u"321"}),
-      ({"issue_tracker": {"issue_priority": "new priority", "enabled": True}},
-       {"priority": "new priority"}),
-      ({"issue_tracker": {"issue_severity": "new severity", "enabled": True}},
-       {"severity": "new severity"}),
+       {"hotlist_id": [321, ]}),
+      ({"issue_tracker": {"issue_priority": "P2", "enabled": True}},
+       {"priority": "P2"}),
+      ({"issue_tracker": {"issue_severity": "S2", "enabled": True}},
+       {"severity": "S2"}),
       ({"issue_tracker": {"enabled": False}},
        {"comment": "Changes to this GGRC object will no "
                    "longer be tracked within this bug."}),

@@ -11,7 +11,8 @@ import html2text
 
 from ggrc import utils as ggrc_utils
 from ggrc.models.hooks.issue_tracker import integration_utils
-from ggrc.utils.custom_dict import MissingKeyDict
+from ggrc.models.hooks.issue_tracker import \
+    issue_tracker_params_container as params_container
 
 
 class BaseIssueTrackerParamsBuilder(object):
@@ -47,17 +48,12 @@ class BaseIssueTrackerParamsBuilder(object):
       "hotlist_id",
       "issue_severity",
       "issue_priority",
+      "enabled",
   )
-
-  ISSUE_TRACKER_NAME_MAPPING = MissingKeyDict({
-      "issue_severity": "severity",
-      "issue_priority": "priority"
-  })
 
   def __init__(self):
     """Basic initialization."""
-    self.issue_tracker_params = {}
-    self.comments = []
+    self.params = params_container.IssueTrackerParamsContainer()
 
   @staticmethod
   def get_ggrc_object_url(obj):
@@ -69,41 +65,25 @@ class BaseIssueTrackerParamsBuilder(object):
 
   def handle_issue_tracker_info(self, obj, issue_tracker_info):
     """Handle issue tracker information."""
-    integration_utils.normalize_issue_tracker_info(issue_tracker_info)
-
-    hotlist_id = issue_tracker_info.get("hotlist_id")
-    self.issue_tracker_params.update({
-        "component_id": issue_tracker_info.get("component_id", ""),
-        "hotlist_id": [hotlist_id] if hotlist_id else [],
-        "title": issue_tracker_info.get("title", obj.title),
-        "type": issue_tracker_info.get("issue_type", ""),
-        "priority": issue_tracker_info.get("issue_priority", ""),
-        "severity": issue_tracker_info.get("issue_severity", "")
-    })
+    self.params.component_id = issue_tracker_info.get("component_id")
+    self.params.hotlist_id = issue_tracker_info.get("hotlist_id")
+    self.params.title = issue_tracker_info.get("title", obj.title)
+    self.params.issue_type = issue_tracker_info.get("issue_type")
+    self.params.issue_priority = issue_tracker_info.get("issue_priority")
+    self.params.issue_severity = issue_tracker_info.get("issue_severity")
+    self.params.enabled = issue_tracker_info.get("enabled")
 
   def _update_issue_tracker_info(self, new_issue_tracker_info,
                                  current_issue_tracker_info):
     """Update issue tracker information."""
 
-    difference_dict = self._build_difference_dict(new_issue_tracker_info,
-                                                  current_issue_tracker_info)
-    self.issue_tracker_params.update(difference_dict)
-
-  def _build_difference_dict(self, new_data, old_data):
-    """Create dict of attributes with changed values
-
-    Rename dict keys according to Issue tracker name mapping
-    """
-
     fields_to_check = self.ISSUE_TRACKER_INFO_FIELDS_TO_CHECK
-    name_mapping = self.ISSUE_TRACKER_NAME_MAPPING
-    res = {}
+
     for field in fields_to_check:
-      new_value = new_data.get(field)
-      old_value = old_data.get(field)
+      new_value = new_issue_tracker_info.get(field)
+      old_value = current_issue_tracker_info.get(field)
       if new_value != old_value:
-        res[name_mapping[field]] = new_value
-    return res
+        setattr(self.params, field, new_value)
 
 
 class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
@@ -139,22 +119,19 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
     reporter_email = obj.modified_by.email
     if reporter_email not in allowed_emails:
       obj.add_warning(self.EXCLUDE_REPORTER_EMAIL_ERROR_MSG)
-      return {}
+      return self.params
 
-    self.comments.append(self.INITIAL_COMMENT_TMPL.format(
+    self.params.status = self.ASSIGNED_ISSUE_STATUS
+    self.params.add_comment(self.INITIAL_COMMENT_TMPL.format(
         model=self.MODEL_NAME,
         link=self.get_ggrc_object_url(obj)
     ))
+
     self.handle_issue_tracker_info(obj, issue_tracker_info)
     self._handle_people_emails(obj, allowed_emails)
     self._handle_issue_comment_attributes(obj)
-    self.issue_tracker_params["status"] = self.ASSIGNED_ISSUE_STATUS
 
-    # Should be executed in the end of building process because
-    # some steps can adds comments inside methods.
-    self.issue_tracker_params["comment"] = "\n\n".join(self.comments)
-
-    return self.issue_tracker_params
+    return self.params
 
   def build_update_issue_tracker_params(self,
                                         obj,
@@ -165,30 +142,24 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
 
     if (not new_issue_tracker_info["enabled"] and
             not current_issue_tracker_info["enabled"]):
-      return {}
-
-    self._update_issue_comment_attributes(obj, initial_state,
-                                          new_issue_tracker_info,
-                                          current_issue_tracker_info)
+      return self.params
 
     self._update_issue_tracker_info(new_issue_tracker_info,
                                     current_issue_tracker_info)
 
-    if self.comments:
-      self.issue_tracker_params["comment"] = "\n\n".join(self.comments)
+    self._update_issue_comment_attributes(obj,
+                                          initial_state,
+                                          new_issue_tracker_info,
+                                          current_issue_tracker_info)
 
-    return self.issue_tracker_params
+    return self.params
 
   def build_delete_issue_tracker_params(self):
     """Build delete issue query for issue tracker."""
-    self.comments.append(self.DISABLE_TMPL.format(model="Issue"))
-    self.issue_tracker_params["status"] = self.OBSOLETE_ISSUE_STATUS
+    self.params.add_comment(self.DISABLE_TMPL.format(model="Issue"))
+    self.params.status = self.OBSOLETE_ISSUE_STATUS
 
-    # Should be executed in the end of building process because
-    # some steps can adds comments inside methods.
-    self.issue_tracker_params["comment"] = "\n\n".join(self.comments)
-
-    return self.issue_tracker_params
+    return self.params
 
   def _handle_people_emails(self, obj, allowed_emails):
     """Handle emails.
@@ -210,7 +181,7 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
     admins = sorted(admins, key=lambda person: person.name)
 
     issue_verifier_email = admins[0].email if admins else ""
-    self.issue_tracker_params["verifier"] = issue_verifier_email
+    self.params.verifier = issue_verifier_email
 
     # Handle Primary Contacts list.
     primary_contacts = [
@@ -220,17 +191,17 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
     ]
     primary_contacts = sorted(primary_contacts, key=lambda p: p.name)
     assignee_email = primary_contacts[0].email if primary_contacts else ""
-    self.issue_tracker_params["assignee"] = assignee_email
+    self.params.assignee = assignee_email
 
     # Handle reporter list.
     reporter_email = obj.modified_by.email
-    self.issue_tracker_params["reporter"] = reporter_email
+    self.params.reporter = reporter_email
 
     # Handle CCS list.
     ccs = allowed_emails - {issue_verifier_email,
                             assignee_email,
                             reporter_email}
-    self.issue_tracker_params["ccs"] = list(ccs)
+    self.params.cc_list = list(ccs)
 
   def _handle_issue_comment_attributes(self, obj):
     """Handle attributes from GGRC Issue object.
@@ -241,12 +212,12 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
     description = obj.description
     if description:
       description = html2text.HTML2Text().handle(description).strip("\n")
-      self.comments.append(self.DESCRIPTION_TMPL.format(description))
+      self.params.add_comment(self.DESCRIPTION_TMPL.format(description))
 
     test_plan = obj.test_plan
     if test_plan:
       test_plan = html2text.HTML2Text().handle(test_plan).strip("\n")
-      self.comments.append(self.REMEDIATION_PLAN_TMPL.format(test_plan))
+      self.params.add_comment(self.REMEDIATION_PLAN_TMPL.format(test_plan))
 
   def _update_issue_comment_attributes(self, obj, initial_state,
                                        new_issue_tracker_info,
@@ -256,17 +227,19 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
     initial_description = initial_state.description
     if description != initial_description:
       description = html2text.HTML2Text().handle(description).strip("\n")
-      self.comments.append(self.UPDATE_DESCRIPTION_TMPL.format(description))
+      self.params.add_comment(self.UPDATE_DESCRIPTION_TMPL.format(description))
 
     test_plan = obj.test_plan
     initial_test_plan = initial_state.test_plan
     if test_plan != initial_test_plan:
       test_plan = html2text.HTML2Text().handle(test_plan).strip("\n")
-      self.comments.append(self.UPDATE_REMEDIATION_PLAN_TMPL.format(test_plan))
+      self.params.add_comment(
+          self.UPDATE_REMEDIATION_PLAN_TMPL.format(test_plan)
+      )
 
     old_enabled = current_issue_tracker_info["enabled"]
     new_enabled = new_issue_tracker_info["enabled"]
     if old_enabled != new_enabled:
       enabled = new_enabled
       comment = self.ENABLE_TMPL if enabled else self.DISABLE_TMPL
-      self.comments.append(comment)
+      self.params.add_comment(comment)
