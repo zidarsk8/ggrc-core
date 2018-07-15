@@ -112,6 +112,23 @@ class TestIssueIntegration(ggrc.TestCase):
       self.api.put(iti.issue_tracked_obj, issue_attrs)
     mock_update_issue.assert_called_with(iti.issue_id, expected_query)
 
+  @ddt.data(
+      {"notes": "new notes"},
+      {"end_date": "2018-07-15"},
+      {"start_date": "2018-07-15"},
+  )
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_update_issue_with_untracked_fields(self, issue_attrs,
+                                              mock_update_issue):
+    """Test updating issue with fields which shouldn't be sync."""
+    iti = factories.IssueTrackerIssueFactory(
+        enabled=True,
+        issue_tracked_obj=factories.IssueFactory()
+    )
+    with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True):
+      self.api.put(iti.issue_tracked_obj, issue_attrs)
+    mock_update_issue.assert_not_called()
+
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
   def test_delete_issue(self, mock_update_issue):
     """Test updating issue tracker issue when issue in GGRC has been deleted"""
@@ -125,3 +142,66 @@ class TestIssueIntegration(ggrc.TestCase):
     with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True):
       self.api.delete(iti.issue_tracked_obj)
     mock_update_issue.assert_called_with(iti.issue_id, expected_query)
+
+
+@ddt.ddt
+class TestDisabledIssueIntegration(ggrc.TestCase):
+  """Tests for IssueTracker integration functionality with disabled sync."""
+
+  # pylint: disable=invalid-name
+
+  def setUp(self):
+    # pylint: disable=super-on-old-class
+    super(TestDisabledIssueIntegration, self).setUp()
+    self.api = Api()
+    self.client.get("/login")
+
+  @mock.patch("ggrc.integrations.issues.Client.create_issue")
+  def test_issue_creation(self, mock_create_issue):
+    """Test creating Issue object with disabled integration."""
+    with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True):
+      response = self.api.post(all_models.Issue, {
+          "issue": {
+              "title": "test title",
+              "context": None,
+              "issue_tracker": {
+                  "enabled": False,
+              }
+          },
+      })
+    mock_create_issue.assert_not_called()
+    self.assertEqual(response.status_code, 201)
+    issue_id = response.json.get("issue").get("id")
+    issue_tracker_issue = models.IssuetrackerIssue.get_issue("Issue",
+                                                             issue_id)
+    self.assertIsNone(issue_tracker_issue)
+
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_issue_deletion(self, mock_update_issue):
+    """Test deleting Issue object with disabled integration for issue."""
+    iti = factories.IssueTrackerIssueFactory(
+        enabled=False,
+        issue_tracked_obj=factories.IssueFactory()
+    )
+    with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True):
+      self.api.delete(iti.issue_tracked_obj)
+    mock_update_issue.assert_not_called()
+
+  @ddt.data(
+      {"description": "new description", "issue_tracker": {"enabled": False}},
+      {"test_plan": "new test plan", "issue_tracker": {"enabled": False}},
+      {"issue_tracker": {"component_id": "123", "enabled": False}},
+      {"issue_tracker": {"hotlist_id": "321", "enabled": False}},
+      {"issue_tracker": {"issue_priority": "P2", "enabled": False}},
+      {"issue_tracker": {"issue_severity": "S2", "enabled": False}},
+  )
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_update_issue_object(self, issue_attrs, mock_update_issue):
+    """Test updating issue object with disabled integration for issue."""
+    iti = factories.IssueTrackerIssueFactory(
+        enabled=False,
+        issue_tracked_obj=factories.IssueFactory()
+    )
+    with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True):
+      self.api.put(iti.issue_tracked_obj, issue_attrs)
+    mock_update_issue.assert_not_called()
