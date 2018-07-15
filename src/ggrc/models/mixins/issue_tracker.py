@@ -57,9 +57,13 @@ class IssueTracked(object):
   def issue_tracker(self):
     """Returns representation of issue tracker related info as a dict."""
     issue_info = self.issuetracker_issue
-    result = issue_info[0].to_dict(include_issue=True) if issue_info else {}
-    result["_warnings"] = self._warnings
-    return result
+    if issue_info:
+      issue_tracker_attrs = issue_info[0].to_dict(include_issue=True)
+    else:
+      issue_tracker_attrs = IssuetrackerIssue.get_issuetracker_issue_stub()
+
+    issue_tracker_attrs["_warnings"] = self._warnings
+    return issue_tracker_attrs
 
   def add_warning(self, message):
     self._warnings.append(message)
