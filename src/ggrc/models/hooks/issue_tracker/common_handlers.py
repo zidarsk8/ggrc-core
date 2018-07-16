@@ -76,7 +76,7 @@ def init_hook():
       )
 
     if handlers_mapping.UPDATE_HANDLER_NAME in model_handlers:
-      signals.Restful.model_put_after_commit.connect(
+      signals.Restful.model_put_before_commit.connect(
           update_object_handler,
           sender=model
       )
