@@ -477,6 +477,10 @@ def get_comment_data(notif):
   data = {}
   recipients = set()
   comment = get_notification_object(notif)
+
+  if comment is None:
+    return data
+
   comment_obj = None
 
   rel = _get_comment_relation(comment).first()
