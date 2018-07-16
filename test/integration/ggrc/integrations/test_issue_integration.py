@@ -3,6 +3,8 @@
 
 """Integration tests for Issue with IssueTracker integration."""
 
+# pylint: disable=unused-argument
+
 import mock
 import ddt
 
@@ -10,6 +12,7 @@ from ggrc import models
 from ggrc import settings
 from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import integration_utils
+from ggrc.integrations import integrations_errors
 
 from integration.ggrc.models import factories
 from integration import ggrc
@@ -205,3 +208,54 @@ class TestDisabledIssueIntegration(ggrc.TestCase):
     with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True):
       self.api.put(iti.issue_tracked_obj, issue_attrs)
     mock_update_issue.assert_not_called()
+
+  @mock.patch("ggrc.integrations.issues.Client.create_issue",
+              side_effect=[integrations_errors.Error, {"issueId": "issueId"}])
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_issue_recreation(self, mock_create_issue):
+    """Test retrying to turn on integration after failed creation."""
+    # Arrange data.
+    component_id = "1234"
+    hotlist_id = "4321"
+    issue_type = "Default Issue type"
+    issue_priority = "P2"
+    issue_severity = "S1"
+    title = "test title"
+    issue_tracker_attrs = {
+        "enabled": True,
+        "component_id": int(component_id),
+        "hotlist_id": int(hotlist_id),
+        "issue_type": issue_type,
+        "issue_priority": issue_priority,
+        "issue_severity": issue_severity,
+    }
+
+    # Perform actions and assert results.
+    with mock.patch.object(integration_utils, "exclude_auditor_emails",
+                           return_value={u"user@example.com", }):
+
+      # Try to create issue. create_issue should raise exception here.
+      response = self.api.post(all_models.Issue, {
+          "issue": {
+              "title": title,
+              "context": None,
+              "issue_tracker": issue_tracker_attrs
+          },
+      })
+
+      issue_id = response.json.get("issue").get("id")
+      issue_tracker_issue = models.IssuetrackerIssue.get_issue("Issue",
+                                                               issue_id)
+      self.assertIsNone(issue_tracker_issue.issue_id)
+      self.assertIsNone(issue_tracker_issue.issue_url)
+
+      # Try to turn on integration on already created issue.
+      self.api.put(
+          issue_tracker_issue.issue_tracked_obj,
+          {"issue_tracker": issue_tracker_attrs}
+      )
+
+      issue_id = issue_tracker_issue.issue_tracked_obj.id
+      issue_tracker_issue = models.IssuetrackerIssue.get_issue("Issue",
+                                                               issue_id)
+      self.assertEqual(issue_tracker_issue.issue_url, "http://issue/issueId")

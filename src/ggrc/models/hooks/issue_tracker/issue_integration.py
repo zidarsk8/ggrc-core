@@ -114,6 +114,12 @@ def update_issue_handler(obj, initial_state, new_issue_tracker_info=None):
       create_issue_handler(obj, new_issue_tracker_info)
     return
 
+  # Try to create ticket in Issue tracker if previous try failed.
+  if new_issue_tracker_info and new_issue_tracker_info["enabled"] \
+     and not issue_tracker_object.issue_id:
+    create_issue_handler(obj, new_issue_tracker_info)
+    return
+
   current_issue_tracker_info = issue_tracker_object.to_dict(
       include_issue=True,
       include_private=True
