@@ -492,6 +492,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         'Created Date',
         'Last Updated Date',
         'Last Updated By',
+        'Ticket Tracker',
     }
     expected_fields = {
         "mandatory": {

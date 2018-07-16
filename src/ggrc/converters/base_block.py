@@ -28,6 +28,7 @@ from ggrc.converters import get_shared_unique_rules
 from ggrc.converters import base_row
 from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import get_object_column_definitions
+from ggrc.models.mixins import issue_tracker as issue_tracker_mixins
 from ggrc.services import signals
 from ggrc_workflows.models.cycle_task_group_object_task import \
     CycleTaskGroupObjectTask
@@ -201,7 +202,8 @@ class BlockConverter(object):
 
   def _create_ticket_tracker_cache(self):
     """Create ticket tracker cache for object in the current block."""
-    if self.object_class.__name__ != models.Assessment.__name__ or \
+    if not issubclass(self.object_class,
+                      issue_tracker_mixins.IssueTrackedWithUrl) or \
        not self.object_ids:
       return {}
 
@@ -210,7 +212,7 @@ class BlockConverter(object):
         models.IssuetrackerIssue.issue_url
     ).filter(
         models.IssuetrackerIssue.object_id.in_(self.object_ids),
-        models.IssuetrackerIssue.object_type == models.Assessment.__name__
+        models.IssuetrackerIssue.object_type == self.object_class.__name__
     )
     return dict(query)
 

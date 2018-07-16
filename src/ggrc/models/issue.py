@@ -38,7 +38,7 @@ class Issue(Roleable,
             Commentable,
             AuditRelationship,
             WithAction,
-            issue_tracker.IssueTracked,
+            issue_tracker.IssueTrackedWithUrl,
             base.ContextRBAC,
             BusinessObject,
             Indexed,
@@ -64,6 +64,11 @@ class Issue(Roleable,
   _aliases = {
       "test_plan": {
           "display_name": "Remediation Plan"
+      },
+      "issue_tracker": {
+          "display_name": "Ticket Tracker",
+          "view_only": True,
+          "mandatory": False,
       },
       "status": {
           "display_name": "State",
