@@ -14,32 +14,39 @@ import template from './person-form-field.mustache';
     template: template,
     viewModel: {
       define: {
-        _value: {
-          set: function (newValue, setValue, onError, oldValue) {
-            setValue(newValue);
-            if (oldValue === undefined ||
-              oldValue === newValue) {
+        inputValue: {
+          set(newValue) {
+            let oldValue = this.attr('_value');
+            if (oldValue === newValue) {
               return;
             }
+
+            this.attr('_value', newValue);
             this.valueChanged(newValue);
+          },
+          get() {
+            return this.attr('_value');
           },
         },
         value: {
-          set: function (newValue, setValue) {
-            setValue(newValue);
+          set(newValue) {
             this.attr('_value', newValue);
+          },
+          get() {
+            return this.attr('_value');
           },
         },
         fieldId: {
           type: 'number',
         },
       },
+      _value: null,
       setPerson: function (ev) {
-        this.attr('_value', ev.selectedItem.serialize().id);
+        this.attr('inputValue', ev.selectedItem.serialize().id);
       },
       unsetPerson: function (scope, el, ev) {
         ev.preventDefault();
-        this.attr('_value', null);
+        this.attr('inputValue', null);
       },
       valueChanged: function (newValue) {
         this.dispatch({

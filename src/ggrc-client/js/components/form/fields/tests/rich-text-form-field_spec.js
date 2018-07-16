@@ -21,32 +21,72 @@ describe('GGRC.Components.richTextFormField', function () {
 
   it('sets the value of the input', function () {
     viewModel.attr('value', 'test');
-    expect(viewModel.attr('_value')).toEqual('test');
-  });
-
-  it('does not fire valueChanged event if value wasn\'t changed', function () {
-    viewModel.attr('value', '');
-    viewModel.attr('_value', 'newValue');
-    viewModel.attr('_value', 'newValue');
-    viewModel.onBlur();
-    expect(viewModel.dispatch).not.toHaveBeenCalled();
+    expect(viewModel.attr('inputValue')).toEqual('test');
   });
 
   it('fires valueChanged event on input value change', function () {
     viewModel.attr('value', '');
-    viewModel.attr('_value', 'newValue');
+    viewModel.attr('inputValue', 'newValue');
     viewModel.onBlur();
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',
       value: 'newValue',
     });
-    viewModel.attr('_value', 'newValue2');
+    viewModel.attr('inputValue', 'newValue2');
     viewModel.onBlur();
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',
       value: 'newValue2',
+    });
+  });
+
+  describe('isAllowToSet() method', () => {
+    it('should return TRUE. has focus and values are equal', () => {
+      let value = 'myText';
+      viewModel.attr('_value', value);
+      viewModel.attr('_oldValue', value);
+      viewModel.attr('editorHasFocus', true);
+
+      let isAllow = viewModel.isAllowToSet();
+
+      expect(isAllow).toBeTruthy();
+    });
+
+    it('should return TRUE. doesn\'t have focus and values are equal', () => {
+      let value = 'myText';
+      viewModel.attr('_value', value);
+      viewModel.attr('_oldValue', value);
+      viewModel.attr('editorHasFocus', false);
+
+      let isAllow = viewModel.isAllowToSet();
+
+      expect(isAllow).toBeTruthy();
+    });
+
+    it('should return TRUE. doesn\'t have focus and values NOT are equal',
+      () => {
+        let value = 'myText';
+        viewModel.attr('_value', value);
+        viewModel.attr('_oldValue', 'myTex');
+        viewModel.attr('editorHasFocus', false);
+
+        let isAllow = viewModel.isAllowToSet();
+
+        expect(isAllow).toBeTruthy();
+      }
+    );
+
+    it('should return FALSE. has focus and values are NOT equal', () => {
+      let value = 'myText';
+      viewModel.attr('_value', value);
+      viewModel.attr('_oldValue', 'myTex');
+      viewModel.attr('editorHasFocus', true);
+
+      let isAllow = viewModel.isAllowToSet();
+
+      expect(isAllow).toBeFalsy();
     });
   });
 });

@@ -16,36 +16,50 @@ import template from './rich-text-form-field.mustache';
       _value: '',
       _oldValue: null,
       placeholder: '',
+      editorHasFocus: false,
       define: {
         value: {
-          set: function (newValue, setValue) {
-            setValue(newValue);
-            if (!_.isNull(newValue)) {
+          set(newValue) {
+            if (!_.isNull(newValue) && this.isAllowToSet(newValue)) {
+              this.attr('_oldValue', newValue);
               this.attr('_value', newValue);
             }
           },
+          get() {
+            return this.attr('_value');
+          },
         },
-        _value: {
-          set: function (newValue, setValue, onError, oldValue) {
-            setValue(newValue);
-            this.attr('_oldValue', oldValue);
-            if (oldValue === undefined ||
-                newValue === oldValue ||
+        inputValue: {
+          set(newValue) {
+            let oldValue = this.attr('_oldValue');
+            if (newValue === oldValue ||
                 newValue.length && !can.trim(newValue).length) {
               return;
             }
+
+            this.attr('_value', newValue);
 
             setTimeout(function () {
               this.checkValueChanged();
             }.bind(this), 5000);
           },
+          get() {
+            return this.attr('_value');
+          },
         },
       },
       fieldId: null,
+      isAllowToSet() {
+        let isFocus = this.attr('editorHasFocus');
+        let isEqualValues = this.attr('_value') === this.attr('_oldValue');
+
+        return !isFocus || isEqualValues;
+      },
       checkValueChanged: function () {
         let newValue = this.attr('_value');
         let oldValue = this.attr('_oldValue');
         if (newValue !== oldValue) {
+          this.attr('_oldValue', newValue);
           this.valueChanged(newValue);
         }
       },

@@ -7,26 +7,50 @@ import template from './templates/text-form-field.mustache';
 
 const TEXT_FORM_FIELD_VM = {
   define: {
-    _value: {
-      set(newValue, setValue, onError, oldValue) {
-        setValue(newValue);
-        if (oldValue === undefined ||
-            newValue === oldValue ||
-            newValue.length && !can.trim(newValue).length) {
+    inputValue: {
+      set(newValue) {
+        let _value = this.attr('_value');
+        if (_value === newValue ||
+          newValue.length && !can.trim(newValue).length) {
           return;
         }
+
+        this.attr('_value', newValue);
         this.valueChanged(newValue);
+      },
+      get() {
+        return this.attr('_value');
       },
     },
     value: {
-      set(newValue, setValue) {
-        setValue(newValue);
+      set(newValue) {
+        if (!this.isAllowToSet()) {
+          return;
+        }
+
         this.attr('_value', newValue);
+      },
+      get() {
+        return this.attr('_value');
       },
     },
   },
   fieldId: null,
   placeholder: '',
+  _value: '',
+  textField: null,
+  isAllowToSet() {
+    let textField = this.attr('textField');
+
+    if (!textField) {
+      return true;
+    }
+
+    let isFocus = textField.is(':focus');
+    let isEqualValues = textField.val() === this.attr('_value');
+
+    return !isFocus || isEqualValues;
+  },
   valueChanged(newValue) {
     this.dispatch({
       type: 'valueChanged',
@@ -40,6 +64,11 @@ export default can.Component.extend({
   template,
   tag: 'text-form-field',
   viewModel: TEXT_FORM_FIELD_VM,
+  events: {
+    inserted() {
+      this.viewModel.attr('textField', this.element.find('.text-field'));
+    },
+  },
 });
 
 export {TEXT_FORM_FIELD_VM};

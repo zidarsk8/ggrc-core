@@ -4,7 +4,8 @@
 }}
 
 <div class="input-wrapper">
-  <rich-text {(content)}="_value"
+  <rich-text {(content)}="inputValue"
+             {^editor-has-focus}="editorHasFocus"
              {disabled}="disabled"
              {hidden-toolbar}="true"
              {placeholder}="placeholder"></rich-text>
