@@ -4,6 +4,7 @@
 */
 
 import Join from './join';
+import Person from '../business-models/person';
 
 export default Join('CMS.Models.ObjectPerson', {
   root_object: 'object_person',
@@ -14,7 +15,7 @@ export default Join('CMS.Models.ObjectPerson', {
   destroy: 'DELETE /api/object_people/{id}',
   join_keys: {
     personable: can.Model.Cacheable,
-    person: CMS.Models.Person,
+    person: Person,
   },
   attributes: {
     context: 'CMS.Models.Context.stub',

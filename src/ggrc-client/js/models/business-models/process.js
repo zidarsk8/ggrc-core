@@ -20,7 +20,7 @@ export default SystemOrProcess('CMS.Models.Process', {
   create: 'POST /api/processes',
   update: 'PUT /api/processes/{id}',
   destroy: 'DELETE /api/processes/{id}',
-  cache: can.getObject('cache', CMS.Models.SystemOrProcess, true),
+  cache: can.getObject('cache', SystemOrProcess, true),
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {},
@@ -34,10 +34,10 @@ export default SystemOrProcess('CMS.Models.Process', {
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
-    can.extend(this.attributes, CMS.Models.SystemOrProcess.attributes);
+    can.extend(this.attributes, SystemOrProcess.attributes);
     this._super && this._super(...arguments);
     this.tree_view_options = $.extend(true, {},
-      CMS.Models.SystemOrProcess.tree_view_options);
+      SystemOrProcess.tree_view_options);
 
     if (hasQuestions(this.shortName)) {
       this.tree_view_options.attr_list.push({

@@ -4,6 +4,7 @@
  */
 
 import SystemOrProcess from './system-or-process';
+import Program from './program';
 import {hasQuestions} from '../../plugins/utils/ggrcq-utils';
 
 export default SystemOrProcess('CMS.Models.System', {
@@ -14,7 +15,7 @@ export default SystemOrProcess('CMS.Models.System', {
   create: 'POST /api/systems',
   update: 'PUT /api/systems/{id}',
   destroy: 'DELETE /api/systems/{id}',
-  cache: can.getObject('cache', CMS.Models.SystemOrProcess, true),
+  cache: can.getObject('cache', SystemOrProcess, true),
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {},
@@ -28,13 +29,13 @@ export default SystemOrProcess('CMS.Models.System', {
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
-    can.extend(this.attributes, CMS.Models.SystemOrProcess.attributes);
+    can.extend(this.attributes, SystemOrProcess.attributes);
     this._super && this._super(...arguments);
     this.tree_view_options = $.extend(true, {},
-      CMS.Models.SystemOrProcess.tree_view_options, {
+      SystemOrProcess.tree_view_options, {
         // systems is a special case; can be imported to programs
         add_item_view: GGRC.mustache_path +
-        (GGRC.infer_object_type(GGRC.page_object) === CMS.Models.Program ?
+        (GGRC.infer_object_type(GGRC.page_object) === Program ?
           '/snapshots/tree_add_item.mustache' :
           '/base_objects/tree_add_item.mustache'),
       });

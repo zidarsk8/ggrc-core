@@ -2,6 +2,8 @@
     Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
+
+import CycleTaskGroup from './cycle-task-group';
 import {getRole} from '../../plugins/utils/acl-utils';
 import {REFRESH_SUB_TREE} from '../../events/eventTypes';
 import {getPageType} from '../../plugins/utils/current-page-utils';
@@ -185,7 +187,7 @@ export default can.Model.Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
     this.bind('created', (ev, instance) => {
       if (instance instanceof this) {
         const ctgId = instance.attr('cycle_task_group.id');
-        const ctg = CMS.Models.CycleTaskGroup.findInCacheById(ctgId);
+        const ctg = CycleTaskGroup.findInCacheById(ctgId);
 
         if (!ctg) {
           return;

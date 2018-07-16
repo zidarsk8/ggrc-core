@@ -4,6 +4,7 @@
 */
 
 import Join from './join';
+import Revision from '../service-models/revision';
 
 export default Join('CMS.Models.Snapshot', {
   root_object: 'snapshot',
@@ -29,7 +30,7 @@ export default Join('CMS.Models.Snapshot', {
   },
 }, {
   reinit: function () {
-    let revision = CMS.Models.Revision.findInCacheById(this.revision_id);
+    let revision = Revision.findInCacheById(this.revision_id);
     this.content = revision.content;
   },
   display_name: function () {
