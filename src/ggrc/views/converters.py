@@ -198,7 +198,7 @@ def run_export(objects, ie_id, user_id, url_root):
       ie.content = content
       db.session.commit()
       job_emails.send_email(job_emails.EXPORT_COMPLETED, user.email, url_root,
-                            ie.title)
+                            ie.title, ie_id)
     except Exception as e:  # pylint: disable=broad-except
       logger.exception("Export failed: %s", e.message)
       try:
