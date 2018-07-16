@@ -10,7 +10,9 @@ const tag = 'info-issue-tracker-fields';
 export default can.Component.extend({
   tag,
   template,
-  viewModle: {
+  viewModel: {
     instance: {},
+    showTitle: false,
+    note: '',
   },
 });

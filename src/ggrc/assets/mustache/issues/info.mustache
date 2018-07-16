@@ -12,11 +12,29 @@
         <tab-panel {(panels)}="panels" title-text="Attributes">
           <div class="info-pane__body">
             <div class="info-pane__main-content {{^if isSnapshot}}info-pane__main-content-with-sidebar{{/if}}">
+              {{#if instance.issueCreated}}
+                <div class="info-pane__section">
+                  <div class="issue-tracker-url">
+                      <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
+                          Ticket
+                      </a>
+                  </div>
+                </div>
+              {{/if}}
+
               {{>'/static/mustache/base_objects/object-review.mustache'}}
               {{>'/static/mustache/base_objects/description.mustache'}}
               {{>'/static/mustache/issues/remediation_plan.mustache'}}
               {{>'/static/mustache/base_objects/notes.mustache'}}
-              {{>'/static/mustache/base_objects/contacts.mustache'}}
+
+              <div class="row-fluid wrap-row">
+                <div data-test-id="title_manager_7a906d2e">
+                  <custom-roles
+                    {instance}="instance"
+                    {read-only}="instance.issueTrackerEnabled"></custom-roles>
+                </div>
+              </div>
+
               {{>'/static/mustache/base_objects/reference-urls.mustache'}}
 
               <div class="custom-attr-wrap info-pane__section">
@@ -66,6 +84,13 @@
                       {{/if}}
                     </div>
                   </div><!-- row-fluid end -->
+                  {{#if instance.can_use_issue_tracker}}
+                    <info-issue-tracker-fields
+                      {instance}="instance"
+                      {note}="'If it is turned on, a bug will be generated for this issue.'"
+                      {show-title}="true">
+                    </info-issue-tracker-fields>
+                  {{/if}}
                 </div><!-- hidden-fields-area end -->
               </div><!-- custom-attr-wrap end -->
               {{>'/static/mustache/custom_attributes/info.mustache'}}

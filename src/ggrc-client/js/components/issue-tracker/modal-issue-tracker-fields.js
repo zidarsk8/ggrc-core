@@ -16,16 +16,12 @@ export default can.Component.extend({
   template,
   viewModel: {
     instance: {},
-    issueTrackerEnabled: false,
+    note: '',
+    setIssueTitle: false,
   },
   events: {
-    inserted() {
-      this.viewModel.attr('issueTrackerEnabled',
-        this.viewModel.instance.issueTrackerEnabled());
-    },
     '{viewModel.instance.issue_tracker} hotlist_id'() {
-      if (this.viewModel.attr('issueTrackerEnabled') &&
-        this.viewModel.instance.attr('type') === 'Assessment') {
+      if (this.viewModel.instance.attr('type') === 'Assessment') {
         showTrackerNotification();
       }
     },

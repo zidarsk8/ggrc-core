@@ -20,7 +20,7 @@ export default can.Model.Cacheable('CMS.Models.Audit', {
     'ca_update',
     'timeboxed',
     'mapping-limit',
-    'auditIssueTracker',
+    'issueTracker',
   ],
   is_custom_attributable: true,
   is_clonable: true,
@@ -136,6 +136,16 @@ export default can.Model.Cacheable('CMS.Models.Audit', {
         }
       }
     );
+  },
+  buildIssueTrackerConfig() {
+    return {
+      hotlist_id: '766459',
+      component_id: '188208',
+      issue_severity: 'S2',
+      issue_priority: 'P2',
+      issue_type: 'PROCESS',
+      enabled: false,
+    };
   },
 }, {
   object_model: function () {

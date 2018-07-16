@@ -6,15 +6,7 @@
 import Mixin from './mixin';
 import * as issueTrackerUtils from '../../plugins/utils/issue-tracker-utils';
 
-const AUDIT_ISSUE_TRACKER = {
-  hotlist_id: '766459',
-  component_id: '188208',
-  issue_severity: 'S2',
-  issue_priority: 'P2',
-  issue_type: 'PROCESS',
-};
-
-export default Mixin('auditIssueTracker',
+export default Mixin('issueTracker',
   issueTrackerUtils.issueTrackerStaticFields,
   {
     'after:init'() {
@@ -26,6 +18,9 @@ export default Mixin('auditIssueTracker',
     'after:refresh'() {
       this.initIssueTracker();
     },
+    after_save() {
+      issueTrackerUtils.checkWarnings(this);
+    },
     initIssueTracker() {
       if (!GGRC.ISSUE_TRACKER_ENABLED) {
         return;
@@ -35,17 +30,23 @@ export default Mixin('auditIssueTracker',
         this.attr('issue_tracker', new can.Map({}));
       }
 
-      let auditIssueTracker = new can.Map(AUDIT_ISSUE_TRACKER).attr({
-        enabled: false, // turned OFF by default for AUDIT
-      });
+      let config = this.class.buildIssueTrackerConfig
+        ? this.class.buildIssueTrackerConfig(this)
+        : {enabled: false};
+
       issueTrackerUtils.initIssueTrackerObject(
         this,
-        auditIssueTracker,
+        config,
         true
       );
     },
+    issueCreated() {
+      return GGRC.ISSUE_TRACKER_ENABLED
+        && issueTrackerUtils.isIssueCreated(this);
+    },
     issueTrackerEnabled() {
-      return issueTrackerUtils.isIssueTrackerEnabled(this);
+      return GGRC.ISSUE_TRACKER_ENABLED
+        && issueTrackerUtils.isIssueTrackerEnabled(this);
     },
   },
 );

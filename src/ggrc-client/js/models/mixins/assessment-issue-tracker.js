@@ -24,6 +24,9 @@ export default Mixin('assessmentIssueTracker',
     'after:refresh'() {
       this.initIssueTracker();
     },
+    after_save() {
+      issueTrackerUtils.checkWarnings(this);
+    },
     trackAuditUpdates() {
       let audit = this.attr('audit') && this.attr('audit').reify();
       if (!audit) {
@@ -109,8 +112,13 @@ export default Mixin('assessmentIssueTracker',
         auditItr.enabled
       );
     },
+    issueCreated() {
+      return this.attr('can_use_issue_tracker')
+        && issueTrackerUtils.isIssueCreated(this);
+    },
     issueTrackerEnabled() {
-      return issueTrackerUtils.isIssueTrackerEnabled(this);
+      return this.attr('can_use_issue_tracker')
+        && issueTrackerUtils.isIssueTrackerEnabled(this);
     },
   },
 );

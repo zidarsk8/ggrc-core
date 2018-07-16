@@ -31,14 +31,12 @@
                             </assessment-inline-item>
                         </div>
                     {{/if}}
-                    {{#if instance.issue_tracker.issue_url}}
-                        {{#if instance.can_use_issue_tracker}}
-                            <div class="issue-tracker-url">
-                                <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
-                                    Ticket
-                                </a>
-                            </div>
-                        {{/if }}
+                    {{#if instance.issueCreated}}
+                        <div class="issue-tracker-url">
+                            <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
+                                Ticket
+                            </a>
+                        </div>
                     {{/if}}
                 </div>
             {{/if}}
