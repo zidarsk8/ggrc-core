@@ -12,20 +12,49 @@ from ggrc import models
 from ggrc.integrations import integrations_errors
 from ggrc.integrations import issues
 
-
 logger = logging.getLogger(__name__)
 
 
 _BATCH_SIZE = 100
 
 
+def collect_issue_tracker_info(model_name):
+  """Returns issue tracker info associated with GGRC object."""
+  issue_params = {}
+  issue_objects = get_active_issue_info(model_name=model_name)
+  for iti in issue_objects:
+    sync_object = iti.issue_tracked_obj
+    if not sync_object:
+      logger.error(
+          "The %s corresponding to the Issue Tracker Issue ID=%s "
+          "does not exist.", model_name, iti.issue_id)
+      continue
+
+    status_value = sync_object.status
+    if not status_value:
+      logger.error(
+          'Inexistent Issue Tracker status for %s ID=%d '
+          'with status: %s.', model_name, sync_object.id, status_value)
+      continue
+    issue_params[iti.issue_id] = {
+        "object_id": sync_object.id,
+        "state": {
+            "status": status_value,
+            "type": iti.issue_type,
+            "priority": iti.issue_priority,
+            "severity": iti.issue_severity,
+        },
+    }
+  return issue_params
+
+
 def get_active_issue_info(model_name):
   """Returns stored in GGRC issue tracker info associated with model."""
   issuetracker_cls = models.IssuetrackerIssue
   return issuetracker_cls.query.filter(
-    issuetracker_cls.object_type == model_name,
-    issuetracker_cls.enabled == expression.true(),
-    issuetracker_cls.issue_id.isnot(None),
+      issuetracker_cls.object_type == model_name,
+      issuetracker_cls.enabled == expression.true(),
+      issuetracker_cls.issue_id.isnot(None),
   ).order_by(issuetracker_cls.object_id).all()
 
 

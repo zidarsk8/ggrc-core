@@ -15,35 +15,15 @@ logger = logging.getLogger(__name__)
 # A list of field to watch for changes in.
 FIELDS_TO_CHECK = ('status', 'type', 'priority', 'severity')
 
-
-def _collect_assessment_issues():
-  """Returns issue infos associated with Assessments."""
-  issue_params = {}
-  issue_objects = utils.get_active_issue_info(model_name="Assessment")
-  for iti in issue_objects:
-    asmt = iti.issue_tracked_obj
-    if not asmt:
-      logger.error(
-          'The Assessment corresponding to the Issue Tracker Issue ID=%s '
-          'does not exist.', iti.issue_id)
-      continue
-
-    status_value = issues.STATUSES.get(asmt.status)
-    if not status_value:
-      logger.error(
-          'Inexistent Issue Tracker status for assessment ID=%d '
-          'with status: %s.', asmt.id, status_value)
-      continue
-    issue_params[iti.issue_id] = {
-        'assessment_id': asmt.id,
-        'state': {
-            'status': status_value,
-            'type': iti.issue_type,
-            'priority': iti.issue_priority,
-            'severity': iti.issue_severity,
-        },
-    }
-  return issue_params
+# Status values maps from GGRC to IssueTracker.
+ASSESSMENT_STATUSES_MAPPING = {
+    'Not Started': 'ASSIGNED',
+    'In Progress': 'ASSIGNED',
+    'In Review': 'FIXED',
+    'Rework Needed': 'ASSIGNED',
+    'Completed': 'VERIFIED',
+    'Deprecated': 'OBSOLETE',
+}
 
 
 def sync_assessment_statuses():
@@ -53,14 +33,14 @@ def sync_assessment_statuses():
   updates their statuses in accordance to the corresponding Assessments
   if differ.
   """
-  assessment_issues = _collect_assessment_issues()
+  assessment_issues = utils.collect_issue_tracker_info("Assessment")
   if not assessment_issues:
     return
   logger.debug('Syncing state of %d issues.', len(assessment_issues))
 
   cli = issues.Client()
   processed_ids = set()
-  for batch in utils.iter_issue_batches(list(assessment_issues)):
+  for batch in utils.iter_issue_batches(assessment_issues.keys()):
     for issue_id, issuetracker_state in batch.iteritems():
       issue_id = str(issue_id)
       issue_info = assessment_issues.get(issue_id)
@@ -71,6 +51,18 @@ def sync_assessment_statuses():
 
       processed_ids.add(issue_id)
       assessment_state = issue_info['state']
+
+      status_value = ASSESSMENT_STATUSES_MAPPING.get(
+          assessment_state["status"]
+      )
+      if not status_value:
+        logger.error(
+            'Inexistent Issue Tracker status for assessment ID=%d '
+            'with status: %s.', issue_info['object_id'], status_value
+        )
+        continue
+
+      assessment_state["status"] = status_value
       if all(
           assessment_state.get(field) == issuetracker_state.get(field)
           for field in FIELDS_TO_CHECK
@@ -83,7 +75,7 @@ def sync_assessment_statuses():
         logger.error(
             'Unable to update status of Issue Tracker issue ID=%s for '
             'assessment ID=%d: %r',
-            issue_id, issue_info['assessment_id'], error)
+            issue_id, issue_info['object_id'], error)
 
   logger.debug('Sync is done, %d issue(s) were processed.', len(processed_ids))
 

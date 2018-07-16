@@ -19,7 +19,6 @@ class BaseClientTest(unittest.TestCase):
   def test_collect_assessment_issues(self):
     """Tests collection issues associated with Assessments."""
     assessment1_mock = mock.MagicMock(id=1, status='In Review')
-    assessment2_mock = mock.MagicMock(id=2, status='WRONG STATUS')
     issue1_mock = mock.MagicMock(
         issue_tracked_obj=assessment1_mock,
         issue_id='t1',
@@ -27,33 +26,26 @@ class BaseClientTest(unittest.TestCase):
         issue_priority='P1',
         issue_severity='S1')
     issue2_mock = mock.MagicMock(
-        issue_tracked_obj=assessment2_mock,
+        issue_tracked_obj=None,
         issue_id='t2',
         issue_type='bug2',
-        issue_priority='P2',
-        issue_severity='S2')
-    issue3_mock = mock.MagicMock(
-        issue_tracked_obj=None,
-        issue_id='t3',
-        issue_type='bug3',
         issue_priority='P3',
         issue_severity='S3')
     filter_mock = mock.MagicMock()
     filter_mock.return_value.order_by.return_value.all.return_value = [
         issue1_mock,
         issue2_mock,
-        issue3_mock,
     ]
     with mock.patch.multiple(
         utils.models.IssuetrackerIssue,
         query=mock.MagicMock(filter=filter_mock)
     ):
-      actual = assessment_integration._collect_assessment_issues()
+      actual = utils.collect_issue_tracker_info("Assessment")
       self.assertEquals(actual, {
           't1': {
-              'assessment_id': 1,
+              'object_id': 1,
               'state': {
-                  'status': 'FIXED',
+                  'status': 'In Review',
                   'type': 'bug1',
                   'priority': 'P1',
                   'severity': 'S1',
@@ -189,7 +181,7 @@ class BaseClientTest(unittest.TestCase):
         '1': {
             'assessment_id': 1,
             'state': {
-                'status': 'FIXED',
+                'status': 'In Review',
                 'type': 'BUG1',
                 'priority': 'P1',
                 'severity': 'S1',
@@ -198,7 +190,7 @@ class BaseClientTest(unittest.TestCase):
         '2': {
             'assessment_id': 2,
             'state': {
-                'status': 'ASSIGNED',
+                'status': 'Not Started',
                 'type': 'BUG2',
                 'priority': 'P2',
                 'severity': 'S2',
@@ -240,8 +232,8 @@ class BaseClientTest(unittest.TestCase):
             return_value=iter(batches)),
         update_issue=mock.DEFAULT
     ):
-      with mock.patch.object(assessment_integration,
-                             "_collect_assessment_issues",
+      with mock.patch.object(utils,
+                             "collect_issue_tracker_info",
                              return_value=assessment_issues):
         assessment_integration.sync_assessment_statuses()
         iter_calls = utils.iter_issue_batches.call_args_list
