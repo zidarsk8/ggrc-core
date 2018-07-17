@@ -31,6 +31,7 @@ COLLECT_BAD_SNAPSHOT_IDS = """
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   connection = op.get_bind()
+  op.execute("SET AUTOCOMMIT = 1")
   connection.execute(
       "CREATE TEMPORARY TABLE `tmp_bad_snapshots`(`id` INT(11))"
   )
@@ -71,6 +72,7 @@ def upgrade():
         """
     )
   connection.execute("DROP TABLE IF EXISTS `tmp_bad_snapshots`")
+  op.execute("SET AUTOCOMMIT = 0")
   op.create_foreign_key(
       'fk_snapshots_audits',
       'snapshots',
