@@ -92,7 +92,6 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
   MODEL_NAME = "Issue"
 
   ASSIGNED_ISSUE_STATUS = "ASSIGNED"
-  OBSOLETE_ISSUE_STATUS = "OBSOLETE"
 
   DESCRIPTION_TMPL = "Following is the issue Description from GGRC: {}"
   REMEDIATION_PLAN_TMPL = (
@@ -157,7 +156,6 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
   def build_delete_issue_tracker_params(self):
     """Build delete issue query for issue tracker."""
     self.params.add_comment(self.DISABLE_TMPL.format(model="Issue"))
-    self.params.status = self.OBSOLETE_ISSUE_STATUS
 
     return self.params
 

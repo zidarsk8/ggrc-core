@@ -291,8 +291,7 @@ class TestIssueQueryBuilder(unittest.TestCase):
     """Test 'build_delete_params' method."""
     expected_result = {
         "comment": "Changes to this GGRC object will no longer be "
-                   "tracked within this bug.",
-        "status": "OBSOLETE"
+                   "tracked within this bug."
     }
     self.builder.build_delete_issue_tracker_params()
     self.assertEquals(

@@ -139,8 +139,7 @@ class TestIssueIntegration(ggrc.TestCase):
         enabled=True,
         issue_tracked_obj=factories.IssueFactory()
     )
-    expected_query = {"status": "OBSOLETE",
-                      "comment": "Changes to this GGRC object will no longer "
+    expected_query = {"comment": "Changes to this GGRC object will no longer "
                                  "be tracked within this bug."}
     with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True):
       self.api.delete(iti.issue_tracked_obj)
