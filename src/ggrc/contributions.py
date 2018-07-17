@@ -16,6 +16,7 @@ NIGHTLY_CRON_JOBS = [
 
 HOURLY_CRON_JOBS = [
     synchronization_jobs.sync_assessment_statuses,
+    synchronization_jobs.sync_issue_attributes,
 ]
 
 HALF_HOUR_CRON_JOBS = [
