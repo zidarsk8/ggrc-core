@@ -6,7 +6,7 @@
 import logging
 
 from ggrc.integrations import issues, integrations_errors
-from ggrc.integrations.synchronization_jobs import utils
+from ggrc.integrations.synchronization_jobs import sync_utils
 
 
 logger = logging.getLogger(__name__)
@@ -33,14 +33,14 @@ def sync_assessment_statuses():
   updates their statuses in accordance to the corresponding Assessments
   if differ.
   """
-  assessment_issues = utils.collect_issue_tracker_info("Assessment")
+  assessment_issues = sync_utils.collect_issue_tracker_info("Assessment")
   if not assessment_issues:
     return
   logger.debug('Syncing state of %d issues.', len(assessment_issues))
 
   cli = issues.Client()
   processed_ids = set()
-  for batch in utils.iter_issue_batches(assessment_issues.keys()):
+  for batch in sync_utils.iter_issue_batches(assessment_issues.keys()):
     for issue_id, issuetracker_state in batch.iteritems():
       issue_id = str(issue_id)
       issue_info = assessment_issues.get(issue_id)
@@ -70,7 +70,7 @@ def sync_assessment_statuses():
         continue
 
       try:
-        utils.update_issue(cli, issue_id, assessment_state)
+        sync_utils.update_issue(cli, issue_id, assessment_state)
       except integrations_errors.Error as error:
         logger.error(
             'Unable to update status of Issue Tracker issue ID=%s for '

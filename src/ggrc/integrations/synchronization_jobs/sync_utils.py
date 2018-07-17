@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 _BATCH_SIZE = 100
 
 
-def collect_issue_tracker_info(model_name):
+def collect_issue_tracker_info(model_name, include_object=False):
   """Returns issue tracker info associated with GGRC object."""
   issue_params = {}
   issue_objects = get_active_issue_info(model_name=model_name)
@@ -36,6 +36,7 @@ def collect_issue_tracker_info(model_name):
           'Inexistent Issue Tracker status for %s ID=%d '
           'with status: %s.', model_name, sync_object.id, status_value)
       continue
+
     issue_params[iti.issue_id] = {
         "object_id": sync_object.id,
         "state": {
@@ -45,6 +46,10 @@ def collect_issue_tracker_info(model_name):
             "severity": iti.issue_severity,
         },
     }
+
+    if include_object:
+      issue_params[iti.issue_id]["object"] = sync_object
+
   return issue_params
 
 

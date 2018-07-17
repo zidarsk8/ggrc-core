@@ -11,7 +11,7 @@ import html2text
 
 import sqlalchemy as sa
 
-from ggrc.integrations.synchronization_jobs.assessment_integration import \
+from ggrc.integrations.synchronization_jobs.assessment_sync_job import \
     ASSESSMENT_STATUSES_MAPPING
 from ggrc import access_control
 from ggrc import db
