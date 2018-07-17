@@ -182,8 +182,13 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Select control assertions."></i>
           <a data-id="hide_assertions_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-          <div data-id="assertions_dd" tabindex="12">
-            {{{category_select this "assertions" "ControlAssertion"}}}
+          <div data-id="assertions_dd" tabindex="12" class="no-outline">
+            <multiselect-dropdown-wrapper
+              {model-name}="'ControlAssertion'"
+              {(selected)}="instance.assertions"
+              placeholder="Select Sssertions"
+              class="multiselect-dropdown_controls">
+            </multiselect-dropdown-wrapper>
           </div>
       </div>
       <div data-test-id="control_categories_1eb33246" data-id="categories_hidden" class="span4 hidable">
@@ -192,8 +197,13 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Select control categories."></i>
           <a data-id="hide_categories_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-          <div data-id="categories_dd" tabindex="13">
-            {{{category_select this "categories" "ControlCategory"}}}
+          <div data-id="categories_dd" tabindex="13" class="no-outline">
+            <multiselect-dropdown-wrapper
+              {model-name}="'ControlCategory'"
+              {(selected)}="instance.categories"
+              placeholder="Select Categories"
+              class="multiselect-dropdown_controls">
+            </multiselect-dropdown-wrapper>
           </div>
       </div>
     </div>
