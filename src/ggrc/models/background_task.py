@@ -90,11 +90,17 @@ class BackgroundTask(roleable.Roleable, base.ContextRBAC, Base, Stateful,
 def _add_task_acl(task):
   """Add ACL entry for the current users background task."""
   roles = role.get_ac_roles_for(task.type)
+  admin_role = roles.get("Admin", None)
   acl.AccessControlList(
       person=get_current_user(),
-      ac_role=roles["Admin"],
+      ac_role=admin_role,
       object=task,
   )
+  db.session.add(task)
+  db.session.commit()
+  from ggrc.cache.utils import clear_permission_cache
+  clear_permission_cache()
+
 
 def create_task(name, url, queued_callback=None, parameters=None, method=None):
   """Create a enqueue a bacground task."""
@@ -104,12 +110,12 @@ def create_task(name, url, queued_callback=None, parameters=None, method=None):
   # task name must be unique
   if not parameters:
     parameters = {}
+
   task = BackgroundTask(name=name + str(int(time())))
-  _add_task_acl(task)
   task.parameters = parameters
   task.modified_by = get_current_user()
-  db.session.add(task)
-  db.session.commit()
+  _add_task_acl(task)
+
   banned = {
       "X-Appengine-Country",
       "X-Appengine-Queuename",

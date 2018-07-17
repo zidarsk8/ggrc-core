@@ -18,13 +18,14 @@ from ggrc.migrations.utils import acr_propagation
 
 # revision identifiers, used by Alembic.
 revision = '385ee48cd6b9'
-down_revision = '7a8eaf2c9b75'
+down_revision = '26488ecb342a'
 
 ROLE_NAME = "Admin"
 OBJECT_TYPE = "BackgroundTask"
 
 
 def upgrade():
+  """Upgrade database schema and/or data, creating a new revision."""
   op.execute(
       acr_propagation.ACR_TABLE.insert().values(
           name=ROLE_NAME,
@@ -43,6 +44,7 @@ def upgrade():
 
 
 def downgrade():
+  """Downgrade database schema and/or data back to the previous revision."""
   condition = sa.and_(
       acr_propagation.ACR_TABLE.c.name == ROLE_NAME,
       acr_propagation.ACR_TABLE.c.object_type == OBJECT_TYPE,
