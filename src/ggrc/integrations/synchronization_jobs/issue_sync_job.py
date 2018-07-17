@@ -38,12 +38,12 @@ def sync_assignee_email(issuetracker_state, sync_object, assignees_role):
   ).first()
   if new_assignee:
     issue_primary_contacts = sync_object.get_persons_for_rolename(
-      "Primary Contacts"
+        "Primary Contacts"
     )
     if issue_tracker_assignee not in issue_primary_contacts:
       sync_object.extend_access_control_list([{
-        "ac_role": assignees_role,
-        "person": new_assignee
+          "ac_role": assignees_role,
+          "person": new_assignee
       }])
 
 
@@ -51,14 +51,14 @@ def sync_verifier_email(issuetracker_state, sync_object, admin_role):
   """Sync Issue verifier email."""
   issue_tracker_verifier = issuetracker_state.get("verifier")
   new_verifier = all_models.Person.query.filter_by(
-        email=issue_tracker_verifier
+      email=issue_tracker_verifier
   ).first()
   if new_verifier:
     issue_admins = sync_object.get_persons_for_rolename("Admin")
     if issue_tracker_verifier not in issue_admins:
       sync_object.extend_access_control_list([{
-        "ac_role": admin_role,
-        "person": new_verifier
+          "ac_role": admin_role,
+          "person": new_verifier
       }])
 
 
@@ -110,7 +110,6 @@ def sync_issue_attributes():
       sync_statuses(issuetracker_state, sync_object)
       sync_assignee_email(issuetracker_state, sync_object, assignees_role)
       sync_verifier_email(issuetracker_state, sync_object, admin_role)
-
 
   db.session.commit()
   logger.debug("Sync is done, %d issue(s) were processed.", len(processed_ids))
