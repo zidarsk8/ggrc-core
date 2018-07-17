@@ -23,7 +23,7 @@ ISSUE_STATUS_MAPPING = {
     "fixed": "Fixed",
     "verified": "Fixed and Verified",
     "not reproducible": "Deprecated",
-    "intended behaviour": "Deprecated",
+    "intended behavior": "Deprecated",
     "obsolete": "Deprecated",
     "infeasible": "Deprecated",
     "duplicate": "Deprecated",

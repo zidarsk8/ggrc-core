@@ -4,6 +4,7 @@
 """Integration test for Issu object sync cron job."""
 
 # pylint: disable=protected-access
+# pylint: disable=invalid-name
 
 import unittest
 
@@ -33,7 +34,7 @@ class TestIssueIntegration(unittest.TestCase):
       ("fixed", "Fixed"),
       ("verified", "Fixed and Verified"),
       ("not reproducible", "Deprecated"),
-      ("intended behaviour", "Deprecated"),
+      ("intended behavior", "Deprecated"),
       ("obsolete", "Deprecated"),
       ("infeasible", "Deprecated"),
       ("duplicate", "Deprecated",)
