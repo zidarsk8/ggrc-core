@@ -55,7 +55,6 @@ export default can.Control({
     model: null, // model class to use when finding or creating new
     instance: null, // model instance to use instead of finding/creating (e.g. for update)
     new_object_form: false,
-    mapping: false,
     find_params: {},
     add_more: false,
     ui_array: [],
@@ -1010,12 +1009,8 @@ export default can.Control({
             }
             that.new_instance();
           } else {
-            that.element.trigger('modal:success', [
-              obj,
-              {
-                map_and_save: $('#map-and-save').is(':checked'),
-              },
-            ]).modal_form('hide');
+            that.element.trigger('modal:success', [obj])
+              .modal_form('hide');
             that.update_hash_fragment();
           }
         }

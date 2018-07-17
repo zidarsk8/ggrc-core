@@ -61,14 +61,11 @@
           this.scope.instance.attr(el.attr('name'), null);
         }
       },
-      // data-mapping is the element decoration that triggers an autocomplete based on a
-      //  mapping to a parent instance.  The mapping_autocomplete helper defined below is
-      //  generally for these.
-      'input:not([data-mapping]), select change': function (el) {
+      'input, select change': function (el) {
         let isCheckbox = el.is('[type=checkbox][multiple]');
         let isDropdown = el.is('select');
         if (isCheckbox) {
-          if(!this.scope.instance[el.attr('name')]) {
+          if (!this.scope.instance[el.attr('name')]) {
             this.scope.instance.attr(el.attr('name'), new can.List());
           }
           this.scope.instance

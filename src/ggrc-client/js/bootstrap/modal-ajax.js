@@ -109,7 +109,6 @@ import {
       var extendNewInstance = $trigger.attr('data-extend-new-instance');
       var triggerParent = $trigger.closest('.add-button');
       var model = CMS.Models[$trigger.attr('data-object-singular')];
-      var mapping = $trigger.data('mapping');
       var isProposal = $trigger.data('is-proposal');
       var instance;
       var modalTitle;
@@ -167,7 +166,6 @@ import {
           skip_refresh: !needToRefresh,
           modal_title: objectParams.modal_title || modalTitle,
           content_view: contentView,
-          mapping: mapping,
           isProposal: isProposal,
           $trigger: $trigger
         });

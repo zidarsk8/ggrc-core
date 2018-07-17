@@ -246,7 +246,7 @@ import Mappings from '../../models/mappers/mappings';
         };
 
         this.viewModel.attr('deferred_to').controller.element.trigger(
-          'defer:add', [data, {map_and_save: true}]);
+          'defer:add', [data]);
         this.closeModal();
       },
       '.modal-footer .btn-map click': function (el, ev) {
