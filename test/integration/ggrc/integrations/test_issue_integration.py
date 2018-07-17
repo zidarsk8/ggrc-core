@@ -94,7 +94,7 @@ class TestIssueIntegration(ggrc.TestCase):
       ({"issue_tracker": {"component_id": "123", "enabled": True}},
        {"component_id": 123}),
       ({"issue_tracker": {"hotlist_id": "321", "enabled": True}},
-       {"hotlist_id": [321, ]}),
+       {"hotlist_ids": [321, ]}),
       ({"issue_tracker": {"issue_priority": "P2", "enabled": True}},
        {"priority": "P2"}),
       ({"issue_tracker": {"issue_severity": "S2", "enabled": True}},

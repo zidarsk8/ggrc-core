@@ -146,10 +146,14 @@ class IssueTrackerParamsContainer(object):
         if getattr(self, field) is not None
     }
 
-    # hotlist_id should be sent to issue tracker as list.
-    hotlist_id = [self.hotlist_id, ] if self.hotlist_id else []
-    if hotlist_id:
-      issue_tracker_params["hotlist_id"] = hotlist_id
+    # hotlist_ids should be sent to issue tracker as list.
+    hotlist_ids = [self.hotlist_id, ] if self.hotlist_id else []
+    if hotlist_ids:
+      issue_tracker_params["hotlist_ids"] = hotlist_ids
+
+    # And we don't need to send hotlist_id, because it uses for GGRC purposes
+    if "hotlist_id" in issue_tracker_params:
+      del issue_tracker_params["hotlist_id"]
 
     return issue_tracker_params
 
