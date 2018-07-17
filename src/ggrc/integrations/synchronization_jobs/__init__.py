@@ -5,3 +5,5 @@
 
 from ggrc.integrations.synchronization_jobs.assessment_sync_job import \
     sync_assessment_statuses  # Noqa
+from ggrc.integrations.synchronization_jobs.issue_sync_job import \
+    sync_issue_attributes  # Noqa
