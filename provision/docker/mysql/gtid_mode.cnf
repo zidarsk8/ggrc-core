@@ -1,0 +1,5 @@
+[mysqld]
+enforce-gtid-consistency = ON
+gtid-mode                = ON
+log-bin                  = mysql-bin
+log-slave-updates        = ON
