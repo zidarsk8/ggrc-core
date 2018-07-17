@@ -132,15 +132,10 @@ def update_cycle_dates(cycle):
     cycle: Cycle for which we want to calculate the start and end dates.
 
   """
-  if not cycle.cycle_task_group_object_tasks and \
-     cycle.workflow.kind != "Backlog":
+  if not cycle.cycle_task_group_object_tasks:
     cycle.start_date, cycle.end_date = None, None
     cycle.next_due_date = None
     cycle.is_current = False
-    return
-
-  # Don't update cycle and cycle task group dates for backlog workflows
-  if cycle.workflow.kind == "Backlog":
     return
 
   for ctg in cycle.cycle_task_groups:
@@ -373,7 +368,6 @@ def _update_parent_status(parent, child_statuses):
 
 def update_cycle_task_tree(objs):
   """Update cycle task group status for sent cycle task"""
-  objs = [o for o in objs or [] if o.cycle.workflow.kind != "Backlog"]
   if not objs:
     return
   groups_dict = {i.cycle_task_group_id: i.cycle_task_group for i in objs}
@@ -414,7 +408,6 @@ def update_cycle_task_tree(objs):
 
 def update_cycle_task_group_parent_state(objs):
   """Update cycle status for sent cycle task group"""
-  objs = [obj for obj in objs or [] if obj.cycle.workflow.kind != "Backlog"]
   if not objs:
     return
   cycles_dict = {}
