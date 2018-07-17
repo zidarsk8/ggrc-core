@@ -4,6 +4,7 @@
  */
 
 import {confirm} from '../../plugins/utils/modals';
+import {navigate} from '../../plugins/utils/current-page-utils';
 
 (function (can, $) {
   'use strict';
@@ -43,7 +44,7 @@ import {confirm} from '../../plugins/utils/modals';
             },
           });
           clonedInstance.save().done(function (object) {
-            GGRC.navigate(object.viewLink);
+            navigate(object.viewLink);
           });
         }.bind(this));
       },

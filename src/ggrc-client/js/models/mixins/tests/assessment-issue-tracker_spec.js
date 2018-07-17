@@ -6,6 +6,7 @@
 import * as issueTrackerUtils from '../../../plugins/utils/issue-tracker-utils';
 import * as queryApiUtils from '../../../plugins/utils/query-api-utils';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
+import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 
 describe('can.Model.Mixin.assessmentIssueTracker', () => {
   let Mixin;
@@ -66,8 +67,8 @@ describe('can.Model.Mixin.assessmentIssueTracker', () => {
       });
     });
 
-    it('should resolve to audit from page_instance', function (done) {
-      spyOn(GGRC, 'page_instance')
+    it('should resolve to audit from page instance', function (done) {
+      spyOn(CurrentPageUtils, 'getPageInstance')
         .and.returnValue(audit);
 
       assessment.isNew = () => true;
@@ -80,8 +81,8 @@ describe('can.Model.Mixin.assessmentIssueTracker', () => {
     });
 
     it('should fetch audit from server if not assigned and not in' +
-       ' page_instance', function (done) {
-      spyOn(GGRC, 'page_instance')
+       ' page instance', function (done) {
+      spyOn(CurrentPageUtils, 'getPageInstance')
         .and.returnValue({ });
 
       let dfd = new can.Deferred();

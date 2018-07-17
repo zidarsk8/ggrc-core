@@ -5,6 +5,7 @@
 
 import Permission from '../permission';
 import {makeFakeInstance} from '../../js_specs/spec_helpers';
+import * as CurrentPageUtils from '../plugins/utils/current-page-utils';
 
 describe('Permission', function () {
   describe('_admin_permission_for_context() method', function () {
@@ -588,7 +589,7 @@ describe('Permission', function () {
       let context = {
         id: 711,
       };
-      spyOn(GGRC, 'page_instance')
+      spyOn(CurrentPageUtils, 'getPageInstance')
         .and.returnValue({context: context});
       expect(Permission.page_context_id()).toEqual(context.id);
     });

@@ -7,7 +7,10 @@ import {
   buildParam,
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
-import {initCounts} from '../../plugins/utils/current-page-utils';
+import {
+  initCounts,
+  getPageInstance,
+} from '../../plugins/utils/current-page-utils';
 import {
   REFRESH_MAPPING,
   DESTINATION_UNMAPPED,
@@ -228,7 +231,7 @@ import pubsub from '../../pub-sub';
         }
       },
       refreshTabCounts: function () {
-        let pageInstance = GGRC.page_instance();
+        let pageInstance = getPageInstance();
         let modelType = this.attr('modelType');
         initCounts(
           [modelType],

@@ -12,13 +12,14 @@ import {
   initWidgets,
   isMyAssessments,
   isMyWork,
+  getPageInstance,
 } from '../../plugins/utils/current-page-utils';
 import {RouterConfig} from '../../router';
 import routes from './routes';
 import '../../plugins/utils/it-enable/issue-tracker-enable';
 
 const $area = $('.area').first();
-const instance = GGRC.page_instance();
+const instance = getPageInstance();
 const location = window.location.pathname;
 const isAssessmentsView = isMyAssessments();
 const modelName = instance.constructor.shortName;
@@ -60,7 +61,7 @@ if (!isAssessmentsView && getPageType() !== 'Workflow') {
 $area.cms_controllers_page_object(can.extend({
   widget_descriptors: widgetList,
   default_widgets: defaults || [],
-  instance: GGRC.page_instance(),
+  instance: getPageInstance(),
   header_view: GGRC.mustache_path + '/base_objects/page_header.mustache',
   GGRC: GGRC,  // make the global object available in Mustache templates
   page_title: function (controller) {

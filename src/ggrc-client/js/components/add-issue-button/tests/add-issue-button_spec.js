@@ -49,7 +49,8 @@ describe('add-issue-button component', function () {
         spyOn(CMS.Models, 'Issue');
         fakeIssueInstance = new CMS.Models.Issue();
         spyOn(CurrentPageUtils, 'initCounts');
-        spyOn(GGRC, 'page_instance').and.returnValue(fakePageInstance);
+        spyOn(CurrentPageUtils, 'getPageInstance')
+          .and.returnValue(fakePageInstance);
       });
 
       it('should dispatch refreshInstance event ' +

@@ -9,6 +9,7 @@ import {
   buildParam,
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 export default Mixin('assessmentIssueTracker',
   issueTrackerUtils.issueTrackerStaticFields,
@@ -61,7 +62,7 @@ export default Mixin('assessmentIssueTracker',
       return dfd;
     },
     ensureParentAudit() {
-      const pageInstance = GGRC.page_instance();
+      const pageInstance = getPageInstance();
       const dfd = new can.Deferred();
       if (this.audit) {
         return dfd.resolve(this.audit);

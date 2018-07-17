@@ -7,12 +7,16 @@ import '../components/add-object-button/add-object-button';
 import '../components/assessment/assessment-generator-button';
 import {
   getCounts,
+  getPageInstance,
 } from '../plugins/utils/current-page-utils';
 import router from '../router';
 import {
   getDefaultStatesForModel,
 } from '../plugins/utils/state-utils';
 import {loadScript} from '../plugins/ggrc_utils';
+import {
+  inferObjectType,
+} from '../plugins/utils/models-utils';
 
 export default can.Control({
   defaults: {
@@ -48,8 +52,8 @@ export default can.Control({
     $(function () {
       if (GGRC.page_object) {
         $.extend(that.defaults, {
-          model: GGRC.infer_object_type(GGRC.page_object),
-          instance: GGRC.page_instance(),
+          model: inferObjectType(GGRC.page_object),
+          instance: getPageInstance(),
         });
       }
     });

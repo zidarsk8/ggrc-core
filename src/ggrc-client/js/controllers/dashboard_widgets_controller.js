@@ -7,6 +7,7 @@ import Filterable from './filterable_controller';
 import {
   getCounts,
 } from '../plugins/utils/current-page-utils';
+import {inferObjectType} from '../plugins/utils/models-utils';
 
 export default Filterable({
   pluginName: 'dashboard_widgets',
@@ -28,7 +29,7 @@ export default Filterable({
 }, {
   init: function () {
     if (!this.options.model && GGRC.page_model) {
-      this.options.model = GGRC.infer_object_type(GGRC.page_object);
+      this.options.model = inferObjectType(GGRC.page_object);
     }
 
     if (!this.options.widget_icon && this.options.model) {

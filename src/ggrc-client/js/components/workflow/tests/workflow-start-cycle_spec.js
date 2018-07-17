@@ -5,6 +5,7 @@
 
 import component from '../workflow-start-cycle';
 import * as helpers from '../../../plugins/utils/workflow-utils';
+import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 
 describe('GGRC.WorkflowStartCycle', function () {
   let events;
@@ -22,7 +23,7 @@ describe('GGRC.WorkflowStartCycle', function () {
       workflowMock = jasmine.createSpyObj('workflow', ['refresh_all']);
       generateDfd = can.Deferred();
 
-      spyOn(GGRC, 'page_instance')
+      spyOn(CurrentPageUtils, 'getPageInstance')
         .and.returnValue(workflowMock);
       spyOn(helpers, 'generateCycle')
         .and.returnValue(generateDfd);
