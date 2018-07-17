@@ -62,14 +62,33 @@ class Snapshot(Roleable, relationship.Relatable, WithLastAssessmentDate,
   ]
   _aliases = {
       "attributes": "Attributes",
+      "archived": "Archived",
       "mappings": {
           "display_name": "Mappings",
           "type": "mapping",
       }
   }
 
-  parent_id = deferred(db.Column(db.Integer, nullable=False), "Snapshot")
-  parent_type = deferred(db.Column(db.String, nullable=False), "Snapshot")
+  parent_id = deferred(
+      db.Column(
+          db.Integer,
+          db.ForeignKey("audits.id", ondelete='CASCADE'),
+          nullable=False
+      ),
+      "Snapshot",
+  )
+  parent_type = deferred(
+      db.Column(db.String, nullable=False, default="Audit"),
+      "Snapshot",
+  )
+
+  @orm.validates("parent_type")
+  def validate_parent_type(self, _, value):
+    """Validates parent_type equals 'Audit'"""
+    # pylint: disable=no-self-use
+    if value != "Audit":
+      raise ValueError("Wrong 'parent_type' value. Only 'Audit' supported")
+    return value
 
   # Child ID and child type are data denormalisations - we could easily get
   # them from revision.content, but since that is a JSON field it will be
@@ -97,7 +116,7 @@ class Snapshot(Roleable, relationship.Relatable, WithLastAssessmentDate,
 
   @builder.simple_property
   def archived(self):
-    return self.parent.archived if self.parent else False
+    return self.audit.archived if self.audit else False
 
   @builder.simple_property
   def is_latest_revision(self):
@@ -115,6 +134,7 @@ class Snapshot(Roleable, relationship.Relatable, WithLastAssessmentDate,
     return cls.eager_inclusions(query, Snapshot._include_links).options(
         orm.subqueryload('revision'),
         orm.subqueryload('revisions'),
+        orm.joinedload('audit').load_only("id", "archived"),
     )
 
   @hybrid_property
@@ -128,18 +148,13 @@ class Snapshot(Roleable, relationship.Relatable, WithLastAssessmentDate,
       _set_latest_revisions([self])
 
   @property
-  def parent_attr(self):
-    return '{0}_parent'.format(self.parent_type)
-
-  @property
   def parent(self):
-    return getattr(self, self.parent_attr)
+    return self.audit
 
   @parent.setter
   def parent(self, value):
-    self.parent_id = getattr(value, 'id', None)
-    self.parent_type = getattr(value, 'type', None)
-    return setattr(self, self.parent_attr, value)
+    setattr(self, "audit", value)
+    self.parent_type = "Audit"
 
   @staticmethod
   def _extra_table_args(_):
