@@ -63,7 +63,7 @@ def get_active_issue_info(model_name):
   ).order_by(issuetracker_cls.object_id).all()
 
 
-def iter_issue_batches(ids):
+def iter_issue_batches(ids, include_emails=False):
   """Generates a sequence of batches of issues from Issue Tracker by IDs."""
   cli = issues.Client()
 
@@ -84,12 +84,22 @@ def iter_issue_batches(ids):
     response_issues = response.get('issues') or []
     for info in response_issues:
       state = info['issueState'] or {}
-      issue_infos[info['issueId']] = {
+      issue_info = {
           'status': state.get('status'),
           'type': state.get('type'),
           'priority': state.get('priority'),
           'severity': state.get('severity'),
       }
+
+      if include_emails:
+        issue_info.update({
+            'assignee': state.get('assignee'),
+            'reporter': state.get('reporter'),
+            'verifier': state.get('verifier'),
+        })
+
+      issue_infos[info['issueId']] = issue_info
+
     if issue_infos:
       yield issue_infos
 
