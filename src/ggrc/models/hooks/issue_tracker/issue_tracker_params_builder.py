@@ -30,7 +30,8 @@ class BaseIssueTrackerParamsBuilder(object):
   )
 
   DISABLE_TMPL = (
-      "Changes to this GGRC object will no longer be tracked within this bug."
+      "GGRC object has been deleted. GGRC changes will "
+      "no longer be tracked within this bug."
   )
 
   ENABLE_TMPL = (
