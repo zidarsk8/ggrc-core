@@ -114,7 +114,7 @@ class TestIssueTrackerParamsContainer(unittest.TestCase):
         "ccs": ["secondary@email.com", ],
         "comment": "Test_comment",
         "component_id": 1234,
-        "hotlist_id": [4321, ],
+        "hotlist_ids": [4321, ],
         "priority": "P2",
         "reporter": "reporter@email.com",
         "severity": "S2",

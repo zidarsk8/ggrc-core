@@ -49,7 +49,7 @@ class TestBaseIssueTrackerParamsBuilder(unittest.TestCase):
     }
     expected_result = {
         "component_id": 123,
-        "hotlist_id": [321, ],
+        "hotlist_ids": [321, ],
         "title": "test_title",
         "type": "test_type",
         "priority": "P2",
@@ -263,7 +263,7 @@ class TestIssueQueryBuilder(unittest.TestCase):
                    "Following is the issue Remediation Plan from GGRC: "
                    "test plan",
         "component_id": 1234,
-        "hotlist_id": [4321, ],
+        "hotlist_ids": [4321, ],
         "priority": "P2",
         "reporter": "reporter@email.com",
         "assignee": "",
