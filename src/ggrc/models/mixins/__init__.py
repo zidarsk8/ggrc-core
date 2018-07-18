@@ -541,7 +541,7 @@ class Slugged(Base):
   def validate_slug(self, _, value):
     """Validates slug for presence of forbidden symbols"""
     # pylint: disable=no-self-use
-    if value is not None and "*" in value:
+    if value and "*" in value:
       raise exceptions.ValidationError(
           "Field 'Code' contains unsupported symbol '*'"
       )
