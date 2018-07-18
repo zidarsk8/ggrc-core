@@ -16,7 +16,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '0e385718442a'
-down_revision = '054d15be7a29'
+down_revision = '0e40a37a05f4'
 
 
 TABLES_WITH_SLUG = {
@@ -49,11 +49,20 @@ CREATE TEMPORARY TABLE `tmp_cache`(
     KEY (`tbl`),
     KEY (`slug`)
 );
+CREATE TEMPORARY TABLE `tmp_same_new_slugs`(
+    `tbl` VARCHAR(250),
+    `slug` VARCHAR(250),
+
+    KEY (`tbl`),
+    KEY (`slug`)
+);
 """
 
 
 DROP_TMP_TABLE = """
-DROP TABLE IF EXISTS `{tbl}`;
+DROP TABLE IF EXISTS `tmp_change_slugs`;
+DROP TABLE IF EXISTS `tmp_cache`;
+DROP TABLE IF EXISTS `tmp_same_new_slugs`;
 """
 
 
@@ -69,8 +78,8 @@ FROM `{tbl}`
 WHERE `slug` LIKE :mask
 """
 
-CREATE_TABLE_WITH_SAME_NEW_SLUGS = """
-CREATE TEMPORARY TABLE tmp_same_new_slugs
+INSERT_SAME_NEW_SLUGS = """
+INSERT INTO `tmp_same_new_slugs`
 SELECT `tbl`, `new_slug` AS `slug`
 FROM `tmp_change_slugs`
 GROUP BY `new_slug`, `tbl`
@@ -120,14 +129,13 @@ def upgrade():
   )
   if not connection.execute(sa.sql.text(query), mask="%*%").rowcount:
     # Quit if query not found matching slugs
-    connection.execute(DROP_TMP_TABLE.format(tbl="tmp_change_slugs"))
-    connection.execute(DROP_TMP_TABLE.format(tbl="tmp_cache"))
+    connection.execute(DROP_TMP_TABLE)
     op.execute("SET AUTOCOMMIT = 0")
     return
 
   # Fix slugs in tmp table in case of same new_slugs
   # example: 'C*-1', 'C-*1'
-  connection.execute(CREATE_TABLE_WITH_SAME_NEW_SLUGS)
+  connection.execute(INSERT_SAME_NEW_SLUGS)
   connection.execute(UPDATE_TMP_SLUGS.format(_join="tmp_same_new_slugs"))
 
   # Collect set of tables in tmp_change_slugs
@@ -150,9 +158,7 @@ def upgrade():
     connection.execute(UPDATE_SLUG.format(tbl=tbl))
 
   # Drop temporary tables
-  connection.execute(DROP_TMP_TABLE.format(tbl="tmp_change_slugs"))
-  connection.execute(DROP_TMP_TABLE.format(tbl="tmp_cache"))
-  connection.execute(DROP_TMP_TABLE.format(tbl="tmp_same_new_slugs"))
+  connection.execute(DROP_TMP_TABLE)
   op.execute("SET AUTOCOMMIT = 0")
 
 
