@@ -186,7 +186,15 @@ const DOCUMENT_CREATE_FAILED = {
  */
 const MAP_OBJECTS = {
   type: 'mapObjects',
-}
+};
+
+/**
+ * Refresh object approval.
+ * @event refreshApproval
+ */
+const REFRESH_APPROVAL = {
+  type: 'refreshApproval',
+};
 
 export {
   REFRESH_SUB_TREE,
@@ -207,4 +215,5 @@ export {
   BEFORE_DOCUMENT_CREATE,
   DOCUMENT_CREATE_FAILED,
   MAP_OBJECTS,
+  REFRESH_APPROVAL,
 };
