@@ -6,7 +6,6 @@
 # pylint: disable=protected-access
 # pylint: disable=invalid-name
 
-import unittest
 
 import ddt
 import mock
@@ -15,15 +14,17 @@ import flask
 from ggrc.models import all_models
 from ggrc.integrations.synchronization_jobs import issue_sync_job
 from ggrc.integrations.synchronization_jobs import sync_utils
+from integration import ggrc
 from integration.ggrc.models import factories
 from api_search.helpers import create_rand_person
 
 
 @ddt.ddt
-class TestIssueIntegration(unittest.TestCase):
+class TestIssueIntegration(ggrc.TestCase):
   """Test crom job for sync Issue object attributes."""
 
   def setUp(self):
+    super(TestIssueIntegration, self).setUp()
     self.verifier = factories.PersonFactory()
     self.assignee = factories.PersonFactory()
 
