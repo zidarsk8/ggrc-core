@@ -111,7 +111,6 @@ export default can.Model.Cacheable('CMS.Models.Assessment', {
     }, {
       attr_title: 'Description',
       attr_name: 'description',
-      disable_sorting: true,
       order: 18,
     }, {
       attr_title: 'Notes',
