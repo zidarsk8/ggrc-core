@@ -383,7 +383,7 @@ function allowedToMap(source, target, options) {
     // Also allow mapping to source if the source is about to be created.
     _.isUndefined(source.created_at);
 
-  if (target instanceof can.Model) {
+  if (target instanceof can.Map && targetType) {
     canMap = canMap &&
       (Permission.is_allowed_for('update', target) ||
       targetType === 'Person' ||
@@ -512,4 +512,3 @@ export {
   registerHook,
   getHooks,
 };
-
