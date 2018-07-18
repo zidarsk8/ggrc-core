@@ -84,3 +84,24 @@ export function customAttributeResolver(
 
   return conflict;
 }
+
+export function objectListResolver(
+  previousValue = [],
+  currentValue = [],
+  remoteValue = [],
+  container = new can.List()) {
+  let previousIds = _.pluck(previousValue, 'id').sort();
+  let currentIds = _.pluck(currentValue, 'id').sort();
+  let remoteIds = _.pluck(remoteValue, 'id').sort();
+
+  let {hasConflict, isChangedLocally} = buildChangeDescriptor(
+    previousIds,
+    currentIds,
+    remoteIds);
+
+  if (isChangedLocally) {
+    container.replace(currentValue);
+  }
+
+  return hasConflict;
+}
