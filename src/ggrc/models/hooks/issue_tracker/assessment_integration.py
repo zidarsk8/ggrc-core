@@ -11,6 +11,8 @@ import html2text
 
 import sqlalchemy as sa
 
+from ggrc.integrations.synchronization_jobs.assessment_sync_job import \
+    ASSESSMENT_STATUSES_MAPPING
 from ggrc import access_control
 from ggrc import db
 from ggrc import utils
@@ -529,7 +531,7 @@ def _fill_current_value(issue_params, assessment, initial_info):
 
   if 'status' not in issue_params:
     # Resend status on any change.
-    status_value = issues.STATUSES.get(assessment.status)
+    status_value = ASSESSMENT_STATUSES_MAPPING.get(assessment.status)
     if status_value:
       issue_params['status'] = status_value
 
@@ -682,7 +684,9 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
   """Creates an entry for IssueTracker model."""
   if not issue_tracker_info.get('title'):
     issue_tracker_info['title'] = assessment.title
-  issue_tracker_info['status'] = issues.STATUSES.get(assessment.status)
+  issue_tracker_info['status'] = ASSESSMENT_STATUSES_MAPPING.get(
+      assessment.status
+  )
 
   if (issue_tracker_info.get('enabled') and
           _is_issue_tracker_enabled(audit=assessment.audit)):

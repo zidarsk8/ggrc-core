@@ -12,7 +12,8 @@ from ggrc import db
 from ggrc import models
 from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import assessment_integration
-from ggrc.integrations import utils
+from ggrc.integrations.synchronization_jobs import sync_utils
+from ggrc.integrations import synchronization_jobs
 from ggrc.access_control.role import AccessControlRole
 
 from integration.ggrc.models import factories
@@ -71,7 +72,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
 
   def test_update_issuetracker_info(self):
     """Test that Issue Tracker issues are updated by the utility."""
-    cli_patch = mock.patch.object(utils.issues, 'Client')
+    cli_patch = mock.patch.object(sync_utils.issues, 'Client')
     hook_patch = mock.patch.object(assessment_integration,
                                    '_is_issue_tracker_enabled',
                                    return_value=True)
@@ -125,8 +126,8 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
         'next_page_token': None,
     }
 
-    with mock.patch.object(utils.issues, 'Client', return_value=cli_mock):
-      utils.sync_issue_tracker_statuses()
+    with mock.patch.object(sync_utils.issues, 'Client', return_value=cli_mock):
+      synchronization_jobs.sync_assessment_statuses()
       cli_mock.update_issue.assert_called_once_with(
           iti_issue_id[0], {
               'status': 'ASSIGNED',
