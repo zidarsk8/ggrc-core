@@ -8,6 +8,8 @@ import unittest
 import ddt
 
 from ggrc.models import all_models
+from ggrc.models import exceptions
+from ggrc.models.mixins import Slugged
 
 
 @ddt.ddt
@@ -77,4 +79,20 @@ class TestSlugPrefix(unittest.TestCase):
     self.assertEqual(
         sorted(all_prefixes),
         sorted(set(all_prefixes))
+    )
+
+  @ddt.data("*BAD-SLUG", "BAD**SLUG", "BAD-SLUG*")
+  def test_bad_slug_validation(self, bad_slug):
+    """Test slug validation with bad value"""
+    self.assertRaises(
+        exceptions.ValidationError,
+        Slugged().validate_slug, "slug", bad_slug
+    )
+
+  @ddt.data("GOOD-SLUG", None)
+  def test_good_slug_validation(self, good_slug):
+    """Test slug validation with good value"""
+    self.assertEqual(
+        Slugged().validate_slug("slug", good_slug),
+        good_slug
     )

@@ -29,6 +29,7 @@ from sqlalchemy.orm.session import Session
 
 from ggrc import db
 from ggrc.models import reflection
+from ggrc.models import exceptions
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins.customattributable import CustomAttributable
 from ggrc.models.mixins.notifiable import Notifiable
@@ -535,6 +536,16 @@ class Slugged(Base):
   @classmethod
   def generate_slug_prefix(cls):
     return cls.__name__.upper()
+
+  @validates("slug")
+  def validate_slug(self, _, value):
+    """Validates slug for presence of forbidden symbols"""
+    # pylint: disable=no-self-use
+    if value and "*" in value:
+      raise exceptions.ValidationError(
+          "Field 'Code' contains unsupported symbol '*'"
+      )
+    return value
 
   @classmethod
   def ensure_slug_before_flush(cls, session, flush_context, instances):
