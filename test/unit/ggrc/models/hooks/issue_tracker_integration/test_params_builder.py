@@ -218,8 +218,8 @@ class TestIssueQueryBuilder(unittest.TestCase):
     expected_result = {
         "comment": "Issue Description has been updated.\nnew description\n\n"
         "Issue Remediation Plan has been updated.\nnew test plan\n\n"
-        "Changes to this GGRC object will no longer be "
-        "tracked within this bug."
+        "GGRC object has been deleted. GGRC changes will "
+        "no longer be tracked within this bug."
     }
 
     # Perform action.
@@ -290,9 +290,8 @@ class TestIssueQueryBuilder(unittest.TestCase):
   def test_build_delete_params(self):
     """Test 'build_delete_params' method."""
     expected_result = {
-        "comment": "Changes to this GGRC object will no longer be "
-                   "tracked within this bug.",
-        "status": "OBSOLETE"
+        "comment": "GGRC object has been deleted. GGRC changes will "
+                   "no longer be tracked within this bug."
     }
     self.builder.build_delete_issue_tracker_params()
     self.assertEquals(

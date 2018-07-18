@@ -100,8 +100,8 @@ class TestIssueIntegration(ggrc.TestCase):
       ({"issue_tracker": {"issue_severity": "S2", "enabled": True}},
        {"severity": "S2"}),
       ({"issue_tracker": {"enabled": False}},
-       {"comment": "Changes to this GGRC object will no "
-                   "longer be tracked within this bug."}),
+       {"comment": "GGRC object has been deleted. GGRC changes "
+                   "will no longer be tracked within this bug."}),
   )
   @ddt.unpack
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
@@ -139,9 +139,8 @@ class TestIssueIntegration(ggrc.TestCase):
         enabled=True,
         issue_tracked_obj=factories.IssueFactory()
     )
-    expected_query = {"status": "OBSOLETE",
-                      "comment": "Changes to this GGRC object will no longer "
-                                 "be tracked within this bug."}
+    expected_query = {"comment": "GGRC object has been deleted. GGRC changes "
+                                 "will no longer be tracked within this bug."}
     with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True):
       self.api.delete(iti.issue_tracked_obj)
     mock_update_issue.assert_called_with(iti.issue_id, expected_query)
