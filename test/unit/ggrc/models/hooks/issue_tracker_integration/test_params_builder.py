@@ -276,14 +276,18 @@ class TestIssueQueryBuilder(unittest.TestCase):
     }
 
     # Perform action.
-    with mock.patch.object(integration_utils, "exclude_auditor_emails",
-                           return_value={"reporter@email.com", }):
+    with mock.patch.object(
+        integration_utils,
+        "exclude_auditor_emails",
+        return_value={"reporter@email.com", }
+    ) as exclude_emails_mock:
       params = self.builder.build_create_issue_tracker_params(
           mock_object,
           issue_tracker_info
       )
 
     # Assert results.
+    exclude_emails_mock.assert_called_with({"reporter@email.com", })
     url_builder_mock.assert_called_once()
     self.assertDictEqual(params.get_issue_tracker_params(), expected_result)
 
