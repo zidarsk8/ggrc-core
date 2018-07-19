@@ -104,18 +104,24 @@ export default can.Control({
       userFetch = new can.Deferred().resolve(currentUser);
     }
 
-    userFetch.then(function () {
-      if (this.element) {
+    userFetch
+      .then(() => {
         this.after_preload();
-      }
-    }.bind(this));
+      });
   },
   after_preload: function (content) {
-    let that = this;
+    if (this.wasDestroyed()) {
+      return;
+    }
+
     if (content) {
       this.element.html(content);
     }
-    CMS.Models.DisplayPrefs.getSingleton().then(function (displayPrefs) {
+    CMS.Models.DisplayPrefs.getSingleton().then((displayPrefs) => {
+      if (this.wasDestroyed()) {
+        return;
+      }
+
       this.display_prefs = displayPrefs;
 
       this.options.attr('$header', this.element.find('.modal-header'));
@@ -125,18 +131,19 @@ export default can.Control({
       this.fetch_all()
         .then(this.proxy('apply_object_params'))
         .then(this.proxy('serialize_form'))
-        .then(function () {
-          // If the modal is closed early, the element no longer exists
-          if (that.element) {
-            that.element.trigger('preload');
+        .then(() => {
+          if (!this.wasDestroyed()) {
+            this.element.trigger('preload');
           }
         })
         .then(this.proxy('autocomplete'))
         .then(function () {
-          this.options.afterFetch(this.element);
-          this.restore_ui_status_from_storage();
+          if (!this.wasDestroyed()) {
+            this.options.afterFetch(this.element);
+            this.restore_ui_status_from_storage();
+          }
         }.bind(this));
-    }.bind(this));
+    });
   },
 
   apply_object_params: function () {
@@ -314,8 +321,7 @@ export default can.Control({
           that.options.attr('instance', new that.options.model(params));
           return instance;
         }).done(function () {
-          // Check if modal was closed
-          if (that.element !== null) {
+          if (!that.wasDestroyed()) {
             that.on(); // listen to instance.
           }
         });
@@ -348,8 +354,7 @@ export default can.Control({
   reset_form: function (setFieldsCb) {
     let preloadDfd;
 
-    // If the modal is closed early, the element no longer exists
-    if (this.element) {
+    if (!this.wasDestroyed()) {
       // Do the fields (re-)setting
       if (_.isFunction(setFieldsCb)) {
         setFieldsCb();
@@ -382,6 +387,10 @@ export default can.Control({
   },
 
   draw: function (content, header, footer, customAttributes) {
+    if (this.wasDestroyed()) {
+      return;
+    }
+
     let modalTitle = this.options.modal_title;
     let isProposal = this.options.isProposal;
     let isObjectModal = modalTitle && (modalTitle.indexOf('Edit') === 0 ||
@@ -391,10 +400,6 @@ export default can.Control({
     let hidableTabs;
     let storableUI;
     let i;
-    // Don't draw if this has been destroyed previously
-    if (!this.element) {
-      return;
-    }
     if (can.isArray(content)) {
       content = content[0];
     }
@@ -601,6 +606,10 @@ export default can.Control({
     }
   },
   '[data-before], [data-after] change': function (el, ev) {
+    if (this.wasDestroyed()) {
+      return;
+    }
+
     let date;
     let data;
     let options;
@@ -717,6 +726,10 @@ export default can.Control({
   },
 
   '{$content} #formHide click': function () {
+    if (this.wasDestroyed()) {
+      return false;
+    }
+
     let i;
     let uiArrLength = this.options.ui_array.length;
     let $hidables = this.element.find('.hidable');
@@ -750,6 +763,10 @@ export default can.Control({
   },
 
   '{$content} #formRestore click': function () {
+    if (this.wasDestroyed()) {
+      return false;
+    }
+
     // Update UI status array to initial state
     let i;
     let uiArrLength = this.options.ui_array.length;
@@ -822,6 +839,10 @@ export default can.Control({
   },
 
   restore_ui_status: function () {
+    if (this.wasDestroyed()) {
+      return;
+    }
+
     let $selected;
     let str;
     let tabindex;
@@ -897,6 +918,10 @@ export default can.Control({
   },
 
   triggerSave(el, ev) {
+    if (this.wasDestroyed()) {
+      return;
+    }
+
     // disable ui while the form is being processed (loading)
     this.disableEnableContentUI(true);
 
@@ -944,6 +969,10 @@ export default can.Control({
     $.when(this.options.attr('instance', newInstance))
       .done(function () {
         this.reset_form(function () {
+          if (this.wasDestroyed()) {
+            return;
+          }
+
           let $form = $(this.element).find('form');
           $form.trigger('reset');
         }.bind(this));
@@ -979,6 +1008,10 @@ export default can.Control({
     let ajd;
     let instanceId = instance.id;
     let params;
+
+    if (this.wasDestroyed()) {
+      return can.Deferred().reject();
+    }
 
     if (instance.errors()) {
       instance.removeAttr('_suppress_errors');
@@ -1071,6 +1104,10 @@ export default can.Control({
   '{instance} destroyed': ' hide',
 
   ' hide': function (el, ev) {
+    if (this.wasDestroyed()) {
+      return;
+    }
+
     let cad;
     const instance = this.options.instance;
     if (this.disable_hide) {
@@ -1157,5 +1194,11 @@ export default can.Control({
     } else {
       content.removeClass('ui-disabled');
     }
+  },
+  /**
+   * @return {boolean} - true, if modal was destroyed, otherwise - false
+   */
+  wasDestroyed() {
+    return !this.element;
   },
 });
