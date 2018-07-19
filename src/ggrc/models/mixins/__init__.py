@@ -399,7 +399,7 @@ class FinishedDate(object):
     if (value in self.DONE_STATES and
         (self.NOT_DONE_STATES is None or
          self.status in self.NOT_DONE_STATES)):
-      self.finished_date = datetime.datetime.now()
+      self.finished_date = datetime.datetime.utcnow()
     elif ((self.NOT_DONE_STATES is None or
            value in self.NOT_DONE_STATES) and
             self.status in self.DONE_STATES):
@@ -467,7 +467,7 @@ class VerifiedDate(object):
       value = super(VerifiedDate, self).validate_status(key, value)
     if (value in self.VERIFIED_STATES and
             self.status not in self.VERIFIED_STATES):
-      self.verified_date = datetime.datetime.now()
+      self.verified_date = datetime.datetime.utcnow()
       value = self.FINAL_STATE
     elif (value not in self.END_STATES and
           (self.status in self.VERIFIED_STATES or
