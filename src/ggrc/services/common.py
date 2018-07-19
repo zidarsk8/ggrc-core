@@ -14,7 +14,6 @@ import json
 import time
 
 from logging import getLogger
-from exceptions import TypeError
 from wsgiref.handlers import format_date_time
 from urllib import urlencode
 
@@ -90,9 +89,8 @@ def get_modified_objects(session):
   return None
 
 
-def update_snapshot_index(session, cache):
+def update_snapshot_index(cache):
   """Update fulltext index records for cached snapshtos."""
-  del session  # Unused
   from ggrc.snapshotter.indexer import reindex_snapshots
   if cache is None:
     return
@@ -624,7 +622,7 @@ class Resource(ModelView):
     with benchmark("Serialize collection"):
       object_for_json = self.object_for_json(obj)
     with benchmark("Update index"):
-      update_snapshot_index(db.session, modified_objects)
+      update_snapshot_index(modified_objects)
     with benchmark("Update memcache after commit for collection PUT"):
       cache_utils.update_memcache_after_commit(self.request)
     with benchmark("Send PUT - after commit event"):
@@ -679,7 +677,7 @@ class Resource(ModelView):
     with benchmark("Commit"):
       db.session.commit()
     with benchmark("Update index"):
-      update_snapshot_index(db.session, modified_objects)
+      update_snapshot_index(modified_objects)
     with benchmark("Update memcache after commit for collection DELETE"):
       cache_utils.update_memcache_after_commit(self.request)
     with benchmark("Send DELETEd - after commit event"):
@@ -1040,7 +1038,7 @@ class Resource(ModelView):
     with benchmark("Commit collection"):
       db.session.commit()
     with benchmark("Update index"):
-      update_snapshot_index(db.session, modified_objects)
+      update_snapshot_index(modified_objects)
     with benchmark("Update memcache after commit for collection POST"):
       cache_utils.update_memcache_after_commit(self.request)
 
@@ -1276,8 +1274,6 @@ class Resource(ModelView):
     json_obj = ggrc.builder.json.publish(
         obj, properties_to_include or [], inclusion_filter)
     ggrc.builder.json.publish_representation(json_obj)
-    if hasattr(obj, "_json_extras"):
-      json_obj["extras"] = obj._json_extras
     return {model_name: json_obj}
 
   def build_resource_representation(self, obj, extras=None):
