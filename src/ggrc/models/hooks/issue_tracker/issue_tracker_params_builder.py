@@ -112,6 +112,8 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
   def build_create_issue_tracker_params(self, obj, issue_tracker_info):
     """Build create issue query for issue tracker."""
     all_emails = {acl.person.email for acl in obj.access_control_list}
+
+    # Add the person who triggered the event.
     all_emails |= {obj.modified_by.email}
     allowed_emails = integration_utils.exclude_auditor_emails(all_emails)
 
