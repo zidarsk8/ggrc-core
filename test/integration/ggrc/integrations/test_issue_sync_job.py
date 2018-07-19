@@ -34,8 +34,8 @@ class TestIssueIntegration(ggrc.TestCase):
       ("accepted", "Active"),
       ("fixed", "Fixed"),
       ("verified", "Fixed and Verified"),
-      ("not reproducible", "Deprecated"),
-      ("intended behavior", "Deprecated"),
+      ("not_reproducible", "Deprecated"),
+      ("intended_behavior", "Deprecated"),
       ("obsolete", "Deprecated"),
       ("infeasible", "Deprecated"),
       ("duplicate", "Deprecated",)
