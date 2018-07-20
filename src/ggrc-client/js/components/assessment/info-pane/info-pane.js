@@ -61,6 +61,7 @@ import template from './info-pane.mustache';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/custom-attribute-config';
 import pubsub from '../../../pub-sub';
 import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
+import {notifier} from '../../../plugins/utils/notifiers-utils';
 
 const editableStatuses = ['Not Started', 'In Progress', 'Rework Needed'];
 
@@ -423,7 +424,7 @@ export default can.Component.extend({
         self.addAction('remove_related', related);
       })
         .fail(function () {
-          GGRC.Errors.notifier('error', 'Unable to remove URL.');
+          notifier('error', 'Unable to remove URL.');
           items.splice(index, 0, item);
         })
         .always(function (assessment) {

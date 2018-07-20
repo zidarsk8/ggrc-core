@@ -15,6 +15,7 @@ import {
   getPageInstance,
   navigate,
 } from '../../plugins/utils/current-page-utils';
+import {notifier} from '../../plugins/utils/notifiers-utils';
 
 export default can.Component.extend({
   tag: 'issue-unmap-item',
@@ -82,7 +83,7 @@ export default can.Component.extend({
           this.attr('paging.total', snapshots.total);
         })
         .fail(()=> {
-          GGRC.Errors.notifier(
+          notifier(
             'error',
             'There was a problem with retrieving related objects.');
         })
@@ -130,7 +131,7 @@ export default can.Component.extend({
           this.attr('modalState.open', false);
         }
       } catch (error) {
-        GGRC.Errors.notifier('error', 'There was a problem with unmapping.');
+        notifier('error', 'There was a problem with unmapping.');
       } finally {
         this.attr('isLoading', false);
       }
@@ -140,7 +141,7 @@ export default can.Component.extend({
       const targetTitle = this.attr('target.title');
       const targetType = this.attr('target').class.title_singular;
 
-      GGRC.Errors.notifier('error',
+      notifier('error',
         `Unmapping cannot be performed.
         Please unmap Issue (${issueTitle})
         from ${targetType} version (${targetTitle}),
@@ -167,7 +168,7 @@ export default can.Component.extend({
           this.viewModel.dispatch('unmapIssue');
         }
       } catch (error) {
-        GGRC.Errors.notifier('error', 'There was a problem with unmapping.');
+        notifier('error', 'There was a problem with unmapping.');
       }
     },
     '{viewModel.paging} current'() {

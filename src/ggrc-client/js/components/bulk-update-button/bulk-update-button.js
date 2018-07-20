@@ -5,6 +5,7 @@
 
 import template from './bulk-update-button.mustache';
 import updateService from '../../plugins/utils/bulk-update-service';
+import {notifier} from '../../plugins/utils/notifiers-utils';
 
 export default can.Component.extend({
   tag: 'bulk-update-button',
@@ -28,14 +29,14 @@ export default can.Component.extend({
         `${nameSingular} update is in progress. This may take several minutes.`;
 
       context.closeModal();
-      GGRC.Errors.notifier('progress', progressMessage);
+      notifier('progress', progressMessage);
       return updateService.update(model, args.selected, args.options)
         .then(function (res) {
           var updated = _.filter(res, {status: 'updated'});
           var updatedCount = updated.length;
           var message = this.getResultNotification(model, updatedCount);
 
-          GGRC.Errors.notifier('info', message);
+          notifier('info', message);
 
           if (updatedCount > 0) {
             can.trigger(el.closest('tree-widget-container'), 'refreshTree');

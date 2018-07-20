@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {notifier} from '../plugins/utils/notifiers-utils';
+
 /**
  * Shows modal window that inform user about requested scopes.
  */
@@ -287,13 +289,13 @@ class GGRCGapiClient {
     this.loadClientLibrary('oauth2').then((oauth2)=> {
       oauth2.userinfo.get().execute((user)=> {
         if (user.error) {
-          GGRC.Errors.notifier('error', user.error);
+          notifier('error', user.error);
           return;
         }
 
         if (user.email.toLowerCase().trim() !==
         GGRC.current_user.email.toLowerCase().trim()) {
-          GGRC.Errors.notifier('warning', `
+          notifier('warning', `
             You are signed into GGRC as ${GGRC.current_user.email} 
             and into Google Apps as ${user.email}. 
             You may experience problems uploading evidence.`);

@@ -7,6 +7,7 @@ import RefreshQueue from '../models/refresh_queue';
 import Permission from '../permission';
 import {getRolesForType} from '../plugins/utils/acl-utils';
 import Mappings from '../models/mappers/mappings';
+import {notifier} from '../plugins/utils/notifiers-utils';
 
 /**
  * A module containing various utility functions.
@@ -136,7 +137,7 @@ function getPersonInfo(person) {
         dfd.resolve(personItem);
       })
       .fail(function () {
-        GGRC.Errors.notifier('error',
+        notifier('error',
           'Failed to fetch data for person ' + person.id + '.');
         dfd.reject();
       });

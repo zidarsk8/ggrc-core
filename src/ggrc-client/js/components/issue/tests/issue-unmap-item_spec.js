@@ -7,6 +7,7 @@ import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../issue-unmap-item';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
+import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
 
 describe('issue-unmap-related-snapshots component', ()=> {
   let viewModel;
@@ -356,13 +357,13 @@ describe('issue-unmap-related-snapshots component', ()=> {
           title_singular: targetType,
         },
       });
-      spyOn(GGRC.Errors, 'notifier');
+      spyOn(NotifiersUtils, 'notifier');
     });
 
     it('shows correct message', ()=> {
       viewModel.showNoRelationhipError();
 
-      expect(GGRC.Errors.notifier).toHaveBeenCalledWith('error',
+      expect(NotifiersUtils.notifier).toHaveBeenCalledWith('error',
         `Unmapping cannot be performed.
         Please unmap Issue (${issueTitle})
         from ${targetType} version (${targetTitle}),

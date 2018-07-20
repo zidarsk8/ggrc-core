@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {notifier} from '../../../plugins/utils/notifiers-utils';
+
 (function (GGRC, CMS, can) {
   'use strict';
 
@@ -18,7 +20,7 @@
         let attrs;
 
         if (!value || !value.length) {
-          GGRC.Errors.notifier('error', 'Please enter a URL.');
+          notifier('error', 'Please enter a URL.');
           return;
         }
 
@@ -36,7 +38,7 @@
         this.dispatch({type: 'beforeCreate', items: [evidence]});
         evidence.save()
           .fail(function () {
-            GGRC.Errors.notifier('error', 'Unable to create URL.');
+            notifier('error', 'Unable to create URL.');
           })
           .done(function (data) {
             self.dispatch({type: 'created', item: data});
