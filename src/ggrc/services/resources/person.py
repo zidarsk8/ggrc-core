@@ -362,7 +362,8 @@ class PersonResource(common.ExtendedResource):
 
     try:
       requested_date_time = date_parser.parse(json["last_seen_whats_new"])
-      get_profile[1].last_seen_whats_new = requested_date_time
+      offset_naive = requested_date_time.replace(tzinfo=None)
+      get_profile[1].last_seen_whats_new = offset_naive
     except Exception as err:
       logger.exception(err)
       raise BadRequest()
