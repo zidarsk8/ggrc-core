@@ -69,17 +69,11 @@ import Mappings from './mappings';
         'Person', 'person', 'ObjectPerson', 'personable', 'object_people'),
     },
     assignable: {
-      urls: TypeFilter('related_objects', 'Document'),
       info_related_objects: CustomFilter('related_objects',
         function (relatedObjects) {
           return !_.includes(['Comment', 'Document', 'Person'],
             relatedObjects.instance.type);
         }),
-      comments: TypeFilter('related_objects', 'Comment'),
-      documents_from_comments: Cross('comments', 'documents'),
-      urls_from_comments: Cross('comments', 'urls'),
-      all_documents: Multi(['documents', 'documents_from_comments']),
-      all_urls: Multi(['urls', 'urls_from_comments']),
     },
     related_object: {
       _canonical: {
@@ -497,8 +491,6 @@ import Mappings from './mappings';
     },
     Comment: {
       _mixins: ['related_object'],
-      urls: TypeFilter('related_objects', 'Document'),
-      documents_and_urls: Multi(['documents', 'urls']),
     },
     MultitypeSearch: {
       _mixins: ['directive_object'],

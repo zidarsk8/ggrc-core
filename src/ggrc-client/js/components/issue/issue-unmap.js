@@ -6,9 +6,9 @@
 import './issue-unmap-item';
 import template from './issue-unmap.mustache';
 
-export default GGRC.Components('issueUnmap', {
+export default can.Component.extend({
   tag: 'issue-unmap',
-  template: template,
+  template,
   viewModel: {
     issueInstance: {},
     target: {},

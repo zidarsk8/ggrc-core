@@ -13,22 +13,25 @@ import template from './checkbox-form-field.mustache';
     template: template,
     viewModel: {
       define: {
-        _value: {
-          set: function (newValue, setValue, onError, oldValue) {
-            setValue(newValue);
-            if (oldValue === undefined) {
-              return;
-            }
+        inputValue: {
+          set(newValue) {
+            this.attr('_value', newValue);
             this.valueChanged(newValue);
+          },
+          get() {
+            return this.attr('_value');
           },
         },
         value: {
-          set: function (newValue, setValue) {
-            setValue(newValue);
+          set(newValue) {
             this.attr('_value', newValue);
+          },
+          get() {
+            return this.attr('_value');
           },
         },
       },
+      _value: false,
       fieldId: null,
       valueChanged: function (newValue) {
         this.dispatch({

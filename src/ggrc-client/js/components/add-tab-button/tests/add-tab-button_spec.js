@@ -3,15 +3,17 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../add-tab-button';
 import Permission from '../../../permission';
 
-describe('GGRC.Components.addTabButton', function () {
+describe('add-tab-button component', function () {
   'use strict';
 
   let viewModel;
 
   beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('addTabButton');
+    viewModel = getComponentVM(Component);
     viewModel.attr('instance', new can.Map());
   });
 

@@ -4,6 +4,7 @@
 """Automapper generator."""
 
 from datetime import datetime
+import logging
 
 import sqlalchemy as sa
 
@@ -18,6 +19,9 @@ from ggrc.models import exceptions
 from ggrc.rbac import permissions
 from ggrc.models.cache import Cache
 from ggrc.utils import benchmark
+
+
+logger = logging.getLogger(__name__)
 
 
 class AutomapperGenerator(object):
@@ -95,9 +99,8 @@ class AutomapperGenerator(object):
       if len(self.auto_mappings) <= self.COUNT_LIMIT:
         self._flush(relationship)
       else:
-        relationship._json_extras = {  # pylint: disable=protected-access
-            'automapping_limit_exceeded': True
-        }
+        logger.error("Automapping limit exceeded: limit=%s, count=%s",
+                     self.COUNT_LIMIT, len(self.auto_mappings))
 
   def _flush(self, parent_relationship):
     """Manually INSERT generated automappings."""
@@ -116,7 +119,7 @@ class AutomapperGenerator(object):
       )
       automapping_id = automapping_result.inserted_primary_key[0]
       self.automapping_ids.add(automapping_id)
-      now = datetime.now()
+      now = datetime.utcnow()
       # We are doing an INSERT IGNORE INTO here to mitigate a race condition
       # that happens when multiple simultaneous requests create the same
       # automapping. If a relationship object fails our unique constraint

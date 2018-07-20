@@ -10,6 +10,7 @@ import {
 } from './plugins/utils/snapshot-utils';
 import {
   isAdmin,
+  getPageInstance,
 } from './plugins/utils/current-page-utils';
 import {
   getRole,
@@ -443,7 +444,7 @@ can.each(['with_page_object_as', 'with_current_user_as'], function (fname) {
     let pageObject = (fname === 'with_current_user_as'
       ? (CMS.Models.Person.findInCacheById(GGRC.current_user.id)
                           || CMS.Models.Person.model(GGRC.current_user))
-      : GGRC.page_instance()
+      : getPageInstance()
     );
     if (pageObject) {
       let po = {};
@@ -482,46 +483,6 @@ Mustache.registerHelper('option_select',
           ].join('');
         }).join('\n'),
         '</select>',
-      ].join('');
-    }
-
-    return deferRender(tagPrefix, getSelectHtml, optionsDfd);
-  });
-
-Mustache.registerHelper('category_select',
-  function (object, attrName, categoryType, options) {
-    const selectedOptions = object[attrName] || [];
-    const selectedIds = can.map(selectedOptions, function (selectedOption) {
-      return selectedOption.id;
-    });
-    const optionsDfd = CMS.Models[categoryType].findAll();
-    let tabIndex = options.hash && options.hash.tabindex;
-    const tagPrefix = 'select class="span12" multiple="multiple"';
-
-    tabIndex = typeof tabIndex !== 'undefined' ?
-      ` tabindex="${tabIndex}"` :
-      '';
-
-    function getSelectHtml(options) {
-      const sortedOptions = _.sortBy(options, 'name');
-      const selectOpenTag = `
-        <select class="span12" multiple="multiple"
-          model="${categoryType}"
-          name="${attrName}"
-          ${tabIndex}
-        >`;
-      const selectCloseTag = '</select>';
-      const optionTags = can.map(sortedOptions, function (option) {
-        return `
-          <option value="${option.id}"
-            ${selectedIds.indexOf(option.id) > -1 ? ' selected=selected' : ''}
-          >${option.name}</option>`;
-      }).join('\n');
-
-      return [
-        selectOpenTag,
-        optionTags,
-        selectCloseTag,
       ].join('');
     }
 
@@ -885,16 +846,6 @@ Mustache.registerHelper('any_allowed', function (action, data, options) {
   return options[hasPassed ? 'fn' : 'inverse'](options.contexts || this);
 });
 
-Mustache.registerHelper('system_role', function (role, options) {
-  role = role.toLowerCase();
-  // If there is no user, it's same as No Role
-  let userRole = (GGRC.current_user ?
-    GGRC.current_user.system_wide_role : 'no access').toLowerCase();
-  let isValid = role === userRole;
-
-  return options[isValid ? 'fn' : 'inverse'](options.contexts || this);
-});
-
 Mustache.registerHelper('is_allowed_all',
   function (action, instances, options) {
     let passed = true;
@@ -1115,78 +1066,6 @@ Mustache.registerHelper('current_user_is_admin', function (options) {
     return options.fn(options.contexts);
   }
   return options.inverse(options.contexts);
-});
-
-Mustache.registerHelper('owned_by_current_user', function (instance, options) {
-  let currentUserId = GGRC.current_user.id;
-  let owners;
-  instance = Mustache.resolve(instance);
-  owners = instance.attr('owners');
-  if (owners) {
-    for (let i = 0; i < owners.length; i++) {
-      if (currentUserId === owners[i].id) {
-        return options.fn(options.contexts);
-      }
-    }
-  }
-  return options.inverse(options.contexts);
-});
-
-Mustache.registerHelper('last_approved', function (instance, options) {
-  let loader;
-  let frame = new can.Observe();
-  instance = Mustache.resolve(instance);
-  loader = instance.get_binding('approval_tasks');
-
-  frame.attr(instance, loader.list);
-  function finish(list) {
-    let item;
-    list = list.serialize();
-    if (list.length > 1) {
-      let biggest = Math.max(...list.map(function (item) {
-        return item.instance.id;
-      }));
-      item = list.filter(function (item) {
-        return item.instance.id === biggest;
-      });
-    }
-    item = item ? item[0] : list[0];
-    return options.fn(item ? item : options.contexts);
-  }
-  function fail(error) {
-    return options.inverse(options.contexts.add({error: error}));
-  }
-
-  return deferRender('span', {done: finish, fail: fail},
-    loader.refresh_instances());
-});
-
-Mustache.registerHelper('with_is_reviewer', function (reviewTask, options) {
-  let assigneeRole = getRole('CycleTaskGroupObjectTask', 'Task Assignees');
-  let currentUserId = GGRC.current_user.id;
-  let isReviewer;
-
-  reviewTask = Mustache.resolve(reviewTask);
-
-  isReviewer = reviewTask &&
-      (_.some(reviewTask.access_control_list, function (acl) {
-        return acl.ac_role_id === assigneeRole.id &&
-          acl.person &&
-          acl.person.id === currentUserId;
-      }) ||
-      Permission.is_allowed('__GGRC_ADMIN__'));
-  return options.fn(options.contexts.add({is_reviewer: isReviewer}));
-});
-
-Mustache.registerHelper('with_review_task', function (options) {
-  let tasks = options.contexts.attr('approval_tasks');
-  tasks = Mustache.resolve(tasks);
-  if (tasks) {
-    for (let i = 0; i < tasks.length; i++) {
-      return options.fn(options.contexts.add({review_task: tasks[i].instance}));
-    }
-  }
-  return options.fn(options.contexts.add({review_task: undefined}));
 });
 
 Mustache.registerHelper('default_audit_title', function (instance, options) {
@@ -1680,33 +1559,6 @@ Mustache.registerHelper('update_link', function (instance, options) {
   return options.fn(options.contexts);
 });
 
-Mustache.registerHelper('with_most_recent_declining_task_entry',
-  function (reviewTask, options) {
-    let entries = reviewTask.get_mapping('declining_cycle_task_entries');
-    let mostRecentEntry;
-
-    if (entries) {
-      for (let i = entries.length - 1; i >= 0; i--) {
-        let entry = entries[i];
-        if ('undefined' !== typeof mostRecentEntry) {
-          if (moment(mostRecentEntry.created_at)
-            .isBefore(moment(entry.created_at))) {
-            mostRecentEntry = entry;
-          }
-        } else {
-          mostRecentEntry = entry;
-        }
-      }
-    }
-
-    if (mostRecentEntry) {
-      return options.fn(options.contexts
-        .add({most_recent_declining_task_entry: mostRecentEntry}));
-    }
-    return options.fn(options.contexts
-      .add({most_recent_declining_task_entry: {}}));
-  });
-
 /**
    * Retrieve the string value of an attribute of the given instance.
    *
@@ -1984,7 +1836,7 @@ Mustache.registerHelper('displayWidgetTab',
   }
 );
 Mustache.registerHelper('is_auditor', function (options) {
-  const audit = GGRC.page_instance();
+  const audit = getPageInstance();
   if (audit.type !== 'Audit') {
     console.warn('is_auditor called on non audit page');
     return options.inverse(options.contexts);
@@ -2024,7 +1876,7 @@ Mustache.registerHelper('user_roles', (person, parentInstance, options) => {
   if (!options) {
     // if parent instance is not defined in helper use page instance
     options = parentInstance;
-    parentInstance = Mustache.resolve(GGRC.page_instance);
+    parentInstance = Mustache.resolve(getPageInstance);
   } else {
     parentInstance = Mustache.resolve(parentInstance);
   }

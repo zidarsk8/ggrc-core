@@ -12,25 +12,24 @@ import Mappings from '../../models/mappers/mappings';
 
 describe('GGRC Utils CurrentPage', function () {
   let pageType;
+  let pageInstance;
 
   beforeAll(() => {
+    pageInstance = GGRC._page_instance;
     pageType = GGRC.pageType;
   });
 
   afterAll(function () {
     GGRC.pageType = pageType;
+    GGRC._page_instance = pageInstance;
   });
 
   beforeEach(function () {
-    let instance = makeFakeInstance({model: CMS.Models.Audit})({
+    GGRC.pageType = undefined;
+    GGRC._page_instance = makeFakeInstance({model: CMS.Models.Audit})({
       id: 1,
       type: 'Audit',
     });
-
-    spyOn(GGRC, 'page_instance')
-      .and.returnValue(instance);
-
-    GGRC.pageType = undefined;
   });
   describe('getPageType() method', function () {
     let method;
@@ -44,7 +43,7 @@ describe('GGRC Utils CurrentPage', function () {
       expect(method()).toEqual('MOCK_PAGE');
     });
 
-    it('returns page_instance type if pageType not defined', function () {
+    it('returns page instance type if pageType not defined', function () {
       expect(method()).toEqual('Audit');
     });
   });

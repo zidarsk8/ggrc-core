@@ -103,10 +103,6 @@ def init_extra_services(app):
   from ggrc.services.suggest import suggest
   app.add_url_rule('/people/suggest', 'suggest', login_required(suggest))
 
-  from ggrc.services.description import ServiceDescription
-  app.add_url_rule(
-      '/api', view_func=ServiceDescription.as_view('ServiceDescription'))
-
 
 def init_all_services(app):
   """Register all GGRC REST services with the Flask application ``app``."""

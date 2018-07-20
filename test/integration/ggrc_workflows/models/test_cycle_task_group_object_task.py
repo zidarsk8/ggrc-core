@@ -323,13 +323,13 @@ class CycleTaskObjectApprovalQuery(query_helper.WithQueryApi,
 
     approved_ids = self.simple_query(
         "CycleTaskGroupObjectTask",
-        expression=["object approval", "=", "true"],
+        expression=["object_approval", "=", "true"],
         type_="ids",
         field="ids",
     )
     not_approved_ids = self.simple_query(
         "CycleTaskGroupObjectTask",
-        expression=["object approval", "=", "false"],
+        expression=["object_approval", "=", "false"],
         type_="ids",
         field="ids",
     )

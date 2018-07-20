@@ -19,6 +19,7 @@ import {
 } from '../../plugins/utils/snapshot-utils';
 import {
   refreshCounts,
+  getPageInstance,
 } from '../../plugins/utils/current-page-utils';
 import RefreshQueue from '../../models/refresh_queue';
 import {
@@ -106,7 +107,7 @@ import Mappings from '../../models/mappers/mappings';
       return ObjectOperationsBaseVM.extend({
         join_object_id: resolvedConfig.isNew ? null :
           resolvedConfig['join-object-id'] ||
-          (GGRC.page_instance() && GGRC.page_instance().id),
+          (getPageInstance() && getPageInstance().id),
         object: resolvedConfig.object,
         type: getDefaultType(resolvedConfig.type, resolvedConfig.object),
         refreshCounts,
@@ -245,7 +246,7 @@ import Mappings from '../../models/mappers/mappings';
         };
 
         this.viewModel.attr('deferred_to').controller.element.trigger(
-          'defer:add', [data, {map_and_save: true}]);
+          'defer:add', [data]);
         this.closeModal();
       },
       '.modal-footer .btn-map click': function (el, ev) {

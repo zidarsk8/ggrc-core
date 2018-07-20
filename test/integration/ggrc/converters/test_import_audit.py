@@ -19,6 +19,35 @@ class TestAuditImport(TestCase):
     super(TestAuditImport, self).setUp()
     self.client.get("/login")
 
+  def test_audit_import_db_lock(self):
+    """Import 2 audits one of them with control"""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      control = factories.ControlFactory()
+      factories.RelationshipFactory(source=program, destination=control)
+
+    response = self.import_data(*[
+        OrderedDict([
+            ("object_type", "Audit"),
+            ("Code", ""),
+            ("Title", "Audit-import-2"),
+            ("State", "In Progress"),
+            ("Audit Captains", "user@example.com"),
+            ("Program", program.slug),
+            ("map:control versions", ""),
+        ]),
+        OrderedDict([
+            ("object_type", "Audit"),
+            ("Code", ""),
+            ("Title", "Audit-import-3"),
+            ("State", "Planned"),
+            ("Audit Captains", "user@example.com"),
+            ("Program", program.slug),
+            ("map:control versions", control.slug),
+        ])
+    ])
+    self.assertEquals(2, response[0]["created"])
+
   def test_update_audit_with_control(self):
     """Test import of existing Audit with mapped Control Snapshot."""
     with factories.single_commit():

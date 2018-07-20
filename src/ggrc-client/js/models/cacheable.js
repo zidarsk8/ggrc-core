@@ -18,6 +18,7 @@ import PersistentNotifier from '../plugins/persistent_notifier';
 import RefreshQueue from './refresh_queue';
 import tracker from '../tracker';
 import Mappings from './mappers/mappings';
+import {delayLeavingPageUntil} from '../plugins/utils/current-page-utils';
 
 (function (can, GGRC, CMS) {
   let _oldAttr;
@@ -1141,8 +1142,8 @@ import Mappings from './mappers/mappings';
             that.dispatch('modelAfterSave');
           });
 
-        GGRC.delay_leaving_page_until(xhr);
-        GGRC.delay_leaving_page_until(dfd);
+        delayLeavingPageUntil(xhr);
+        delayLeavingPageUntil(dfd);
       });
       return dfd;
     },

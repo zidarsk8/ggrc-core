@@ -332,3 +332,21 @@ class TestBasicCsvImport(TestCase):
     self.assertEqual(response[0]["block_errors"], [
         errors.MISSING_COLUMN.format(column_names="Code", line=2, s="")
     ])
+
+  def test_import_code_validation(self):
+    """Test validation of 'Code' column during import"""
+    response = self.import_data(OrderedDict([
+        ("object_type", "Control"),
+        ("Code*", "*CONTROL-1"),
+        ("Admin", "user@example.com"),
+        ("Title", "Control_1")
+    ]))
+    self._check_csv_response(response, {
+        "Control": {
+            "row_errors": {
+                "Line 3: Field 'Code' validation failed with the following "
+                "reason: Field 'Code' contains unsupported symbol '*'. "
+                "The line will be ignored."
+            }
+        }
+    })

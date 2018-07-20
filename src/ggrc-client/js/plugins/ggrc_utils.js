@@ -66,15 +66,6 @@ function applyTypeFilter(items, filterObj, getTypeSelectFn) {
   return _applyFilter(items, filter, getTypeSelectFn);
 }
 
-function commentSort(a, b) {
-  if (a.created_at < b.created_at) {
-    return 1;
-  } else if (a.created_at > b.created_at) {
-    return -1;
-  }
-  return 0;
-}
-
 function isInnerClick(el, target) {
   el = el instanceof $ ? el : $(el);
   return el.has(target).length || el.is(target);
@@ -392,7 +383,7 @@ function allowedToMap(source, target, options) {
     // Also allow mapping to source if the source is about to be created.
     _.isUndefined(source.created_at);
 
-  if (target instanceof can.Model) {
+  if (target instanceof can.Map && targetType) {
     canMap = canMap &&
       (Permission.is_allowed_for('update', target) ||
       targetType === 'Person' ||
@@ -503,7 +494,6 @@ function getHooks() {
 
 export {
   applyTypeFilter,
-  commentSort,
   isInnerClick,
   inViewport,
   formatDate,
@@ -522,4 +512,3 @@ export {
   registerHook,
   getHooks,
 };
-

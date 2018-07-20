@@ -21,7 +21,7 @@ import './current-exports/current-exports';
 
 const DEFAULT_TIMEOUT = 2000;
 
-can.Component.extend({
+export default can.Component.extend({
   tag: 'csv-export',
   template: csvExportTemplate,
   viewModel: {
@@ -151,25 +151,30 @@ can.Component.extend({
       let panels = this.attr('panels');
 
       return _.map(panels, function (panel, index) {
-        let relevantFilter;
-        let predicates;
         let allItems = panel.attr('attributes')
           .concat(panel.attr('mappings'))
           .concat(panel.attr('localAttributes'));
+        let relevantFilter = _.reduce(panel.attr('relevant'),
+          (result, el, filterIndex) => {
+            const isPrevious = el.model_name === '__previous__';
+            const id = isPrevious ? index - 1 : el.filter.id;
 
-        predicates = _.map(panel.attr('relevant'), function (el) {
-          let id = el.model_name === '__previous__' ?
-            index - 1 : el.filter.id;
-          return id ? '#' + el.model_name + ',' + id + '#' : null;
-        });
+            if (id !== undefined) {
+              const filter = `#${el.model_name},${id}#`;
+
+              return filterIndex ?
+                `${result} ${el.operator} ${filter}` : filter;
+            }
+            return result;
+          }, '');
+
         if (panel.attr('snapshot_type')) {
-          predicates.push(
-            ' child_type = ' + panel.attr('snapshot_type') + ' '
-          );
+          if (relevantFilter) {
+            relevantFilter += ' AND ';
+          }
+          relevantFilter += `child_type = ${panel.attr('snapshot_type')}`;
         }
-        relevantFilter = _.reduce(predicates, function (p1, p2) {
-          return p1 + ' AND ' + p2;
-        });
+
         return {
           object_name: panel.type,
           fields: allItems

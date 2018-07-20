@@ -3,13 +3,14 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../issue-tracker-switcher';
 
-describe('GGRC.Components.issueTrackerSwitcher', () => {
+describe('issue-tracker-switcher component', () => {
   let viewModel;
 
   beforeAll(() => {
-    viewModel = new (can.Map.extend(Component.prototype.viewModel));
+    viewModel = getComponentVM(Component);
   });
 
   describe('"convertToBool" method', () => {

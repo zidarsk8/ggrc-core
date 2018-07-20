@@ -28,8 +28,7 @@ There are two main objects that are useful in managing the data model:
 -  ``GGRC``
 -  ``CMS``
 
-For example, ``GGRC.page_instance()`` returns the current page instance,
-and ``GGRC.page_object`` is the object rendered by the current page
+For example, ``GGRC.page_object`` is the object rendered by the current page
 (e.g. a Program), as it was received from the server (mapped objects are
 stubs).
 

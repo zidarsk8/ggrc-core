@@ -3,8 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import PersistentNotifier from './plugins/persistent_notifier';
-
 (function (GGRC, moment) {
   GGRC.mustache_path = '/static/mustache';
 
@@ -12,126 +10,6 @@ import PersistentNotifier from './plugins/persistent_notifier';
   if (!GGRC.widget_descriptors) {
     GGRC.widget_descriptors = {};
   }
-
-  let onbeforeunload = function (evnt) {
-      evnt = evnt || window.event;
-      let message = 'There are operations in progress. Are you sure you want to leave the page?';
-      if (evnt) {
-        evnt.returnValue = message;
-      }
-      return message;
-    },
-    notifier = new PersistentNotifier({
-      while_queue_has_elements: function () {
-        window.onbeforeunload = onbeforeunload;
-      },
-      when_queue_empties: function () {
-        window.onbeforeunload = $.noop;
-      },
-      name: 'GGRC/window',
-    });
-
-  $.extend(GGRC, {
-    get_object_type_decision_tree: function () {
-      let tree = {},
-        extensions = GGRC.extensions || []
-      ;
-
-      can.each(extensions, function (extension) {
-        if (extension.object_type_decision_tree) {
-          if (can.isFunction(extension.object_type_decision_tree)) {
-            $.extend(tree, extension.object_type_decision_tree());
-          } else {
-            $.extend(tree, extension.object_type_decision_tree);
-          }
-        }
-      });
-
-      return tree;
-    },
-
-    infer_object_type: function (data) {
-      let decision_tree = GGRC.get_object_type_decision_tree();
-
-      function resolve_by_key(subtree, data) {
-        let kind = data[subtree._key];
-        let model;
-        can.each(subtree, function (v, k) {
-          if (k != '_key' && v.meta_kinds.indexOf(kind) >= 0) {
-            model = v;
-          }
-        });
-        return model;
-      }
-
-      function resolve(subtree, data) {
-        if (typeof subtree === 'undefined')
-          return null;
-        return can.isPlainObject(subtree) ?
-          subtree._discriminator(data) :
-          subtree;
-      }
-
-      if (!data) {
-        return null;
-      } else {
-        return can.reduce(Object.keys(data), function (a, b) {
-          return a || resolve(decision_tree[b], data[b]);
-        }, null);
-      }
-    },
-    make_model_instance: function (data) {
-      if (!data) {
-        return null;
-      } else if (!!GGRC.page_model && GGRC.page_object === data) {
-        return GGRC.page_model;
-      } else {
-        return GGRC.page_model = GGRC.infer_object_type(data).model($.extend({}, data));
-      }
-    },
-
-    page_instance: function () {
-      if (!GGRC._page_instance && GGRC.page_object) {
-        GGRC._page_instance = GGRC.make_model_instance(GGRC.page_object);
-      }
-      return GGRC._page_instance;
-    },
-
-    eventqueue: [],
-    eventqueueTimeout: null,
-    eventqueueTimegap: 20, //ms
-
-    queue_exec_next: function () {
-      let fn = GGRC.eventqueue.shift();
-      if (fn)
-        fn();
-      if (GGRC.eventqueue.length > 0)
-        GGRC.eventqueueTimeout = setTimeout(GGRC.queue_exec_next, GGRC.eventqueueTimegap);
-      else
-        GGRC.eventqueueTimeout = null;
-    },
-
-    queue_event: function (events) {
-      if (typeof (events) === 'function')
-        events = [events];
-      GGRC.eventqueue.push.apply(GGRC.eventqueue, events);
-      if (!GGRC.eventqueueTimeout)
-        GGRC.eventqueueTimeout = setTimeout(GGRC.queue_exec_next, GGRC.eventqueueTimegap);
-    },
-
-    navigate: function (url) {
-      function go() {
-        if (!url) {
-          window.location.reload();
-        } else {
-          window.location.assign(url);
-        }
-      }
-      notifier.on_empty(go);
-    },
-
-    delay_leaving_page_until: $.proxy(notifier, 'queue'),
-  });
 
   GGRC.Errors = (function () {
     let messages = {

@@ -21,8 +21,8 @@ let events = {
   },
 };
 
-export default GGRC.Components('objectChangeState', {
+export default can.Component.extend({
   tag: 'object-change-state',
-  viewModel: viewModel,
-  events: events,
+  viewModel,
+  events,
 });

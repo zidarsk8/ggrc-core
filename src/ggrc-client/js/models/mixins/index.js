@@ -6,7 +6,6 @@
 import './access-control-list';
 import './assertions-categories';
 import './assessment-issue-tracker';
-import './audit-issue-tracker';
 import './auto-status-changeable';
 import './base-notifications';
 import './ca-update';
@@ -14,6 +13,7 @@ import './contactable';
 import './in-scope-objects-preload';
 import './in-scope-objects';
 import './is-overdue';
+import './issue-tracker';
 import './mapping-limit';
 import './mixin';
 import './proposable';

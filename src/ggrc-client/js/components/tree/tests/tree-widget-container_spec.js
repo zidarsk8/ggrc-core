@@ -8,16 +8,16 @@ import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 import tracker from '../../../tracker';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../tree-widget-container';
 
-describe('GGRC.Components.treeWidgetContainer', function () {
+describe('tree-widget-container component', function () {
   'use strict';
 
   let vm;
-  let Component;
 
   beforeEach(function () {
-    Component = GGRC.Components.get('treeWidgetContainer');
-    vm = GGRC.Components.getViewModel('treeWidgetContainer');
+    vm = getComponentVM(Component);
   });
 
   describe('display() method', function () {

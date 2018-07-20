@@ -9,6 +9,7 @@ import {
   buildParam,
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 export default Mixin('assessmentIssueTracker',
   issueTrackerUtils.issueTrackerStaticFields,
@@ -23,6 +24,9 @@ export default Mixin('assessmentIssueTracker',
     },
     'after:refresh'() {
       this.initIssueTracker();
+    },
+    after_save() {
+      issueTrackerUtils.checkWarnings(this);
     },
     trackAuditUpdates() {
       let audit = this.attr('audit') && this.attr('audit').reify();
@@ -58,7 +62,7 @@ export default Mixin('assessmentIssueTracker',
       return dfd;
     },
     ensureParentAudit() {
-      const pageInstance = GGRC.page_instance();
+      const pageInstance = getPageInstance();
       const dfd = new can.Deferred();
       if (this.audit) {
         return dfd.resolve(this.audit);
@@ -109,8 +113,13 @@ export default Mixin('assessmentIssueTracker',
         auditItr.enabled
       );
     },
+    issueCreated() {
+      return this.attr('can_use_issue_tracker')
+        && issueTrackerUtils.isIssueCreated(this);
+    },
     issueTrackerEnabled() {
-      return issueTrackerUtils.isIssueTrackerEnabled(this);
+      return this.attr('can_use_issue_tracker')
+        && issueTrackerUtils.isIssueTrackerEnabled(this);
     },
   },
 );

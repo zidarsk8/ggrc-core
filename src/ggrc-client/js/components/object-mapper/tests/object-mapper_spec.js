@@ -5,6 +5,7 @@
 
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import RefreshQueue from '../../../models/refresh_queue';
+import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 
 describe('GGRC.Components.objectMapper', function () {
   'use strict';
@@ -43,7 +44,7 @@ describe('GGRC.Components.objectMapper', function () {
     it(`initializes join_object_id with page instance id if
     "join-object-id" and "isNew" are not passed`,
       function () {
-        spyOn(GGRC, 'page_instance').and.returnValue({id: 'testId'});
+        spyOn(CurrentPageUtils, 'getPageInstance').and.returnValue({id: 'testId'});
         let result = Component.prototype.viewModel({}, parentViewModel)();
         expect(result.join_object_id).toBe('testId');
       });
@@ -391,7 +392,6 @@ describe('GGRC.Components.objectMapper', function () {
       expect(spyObj.trigger)
         .toHaveBeenCalledWith('defer:add', [
           {multi_map: true, arr: []},
-          {map_and_save: true},
         ]);
     });
     it('calls closeModal', function () {

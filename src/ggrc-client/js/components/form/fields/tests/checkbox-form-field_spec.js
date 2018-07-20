@@ -21,18 +21,18 @@ describe('GGRC.Components.checkboxFormField', function () {
 
   it('sets the value of the input', function () {
     viewModel.attr('value', true);
-    expect(viewModel.attr('_value')).toEqual(true);
+    expect(viewModel.attr('inputValue')).toEqual(true);
   });
 
   it('fires valueChanged event on input value change', function () {
     viewModel.attr('value', false);
-    viewModel.attr('_value', true);
+    viewModel.attr('inputValue', true);
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',
       value: true,
     });
-    viewModel.attr('_value', false);
+    viewModel.attr('inputValue', false);
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',

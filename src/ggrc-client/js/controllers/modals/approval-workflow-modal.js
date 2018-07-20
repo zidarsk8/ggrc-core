@@ -6,6 +6,7 @@
 import ModalsController from './modals_controller';
 import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
 import {getRole} from '../../plugins/utils/acl-utils';
+import {REFRESH_APPROVAL} from '../../events/eventTypes';
 
 let ApprovalWorkflowErrors = function () {
   let errors = null;
@@ -154,8 +155,7 @@ let ApprovalWorkflow = can.Observe({
           context: wf.context,
         }).save();
         cycleDfd.then(function () {
-          const binding = that.original_object.get_binding('approval_tasks');
-          return binding.loader.refresh_list(binding);
+          that.original_object.dispatch(REFRESH_APPROVAL);
         });
         return cycleDfd;
       });

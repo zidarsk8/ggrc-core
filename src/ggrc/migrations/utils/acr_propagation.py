@@ -95,8 +95,8 @@ def _add_subtree(tree, role_name, parent_id, with_update):
                 name=role_name,
                 object_type=object_type,
                 parent_id=parent_id,
-                created_at=datetime.datetime.now(),
-                updated_at=datetime.datetime.now(),
+                created_at=datetime.datetime.utcnow(),
+                updated_at=datetime.datetime.utcnow(),
                 internal=True,
                 non_editable=True,
                 **permissions_dict

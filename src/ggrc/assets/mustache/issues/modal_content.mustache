@@ -62,7 +62,10 @@
     <div class="span12 hide-wrap hidable">
       <access-control-list-roles-helper
         {instance}="."
-        {is-new-instance}="new_object_form">
+        {is-new-instance}="new_object_form"
+        {read-only}="instance.issueTrackerEnabled"
+        {show-group-tooltip}="instance.issueTrackerEnabled"
+        {group-tooltip}="'Please go to the ticket and make changes there'">
       </access-control-list-roles-helper>
     </div>
   </div>
@@ -103,7 +106,12 @@
       <effective-dates instance="instance"/>
     </div>
     <div class="row-fluid">
-      <div data-id="state_hidden" class="span4 hidable">
+      <div data-id="state_hidden" class="span4 hidable"
+	      {{#if instance.issueTrackerEnabled}}
+          rel="tooltip"
+          data-original-title="Please go to the ticket and make changes there"
+          data-placement="bottom"
+        {{/if}}>
         <label>
           State
           <i class="fa fa-question-circle" rel="tooltip" title="Indicates the status of this object."></i>
@@ -113,7 +121,8 @@
                     no-value="true"
                     no-value-label="---"
                     name="instance.status"
-                    tabindex="23">
+                    tabindex="23"
+                    {is-disabled}="instance.issueTrackerEnabled">
           </dropdown>
       </div>
     </div>
@@ -143,6 +152,38 @@
     {{/if}}
   </div>
 </div>
+{{#if instance.can_use_issue_tracker}}
+  <div class="expanded-area">
+    <div class="expand-link">
+      <a class="show-hidden-fields info-show-hide active" href="javascript://">
+        <span class="out">
+          <i class="fa fa-caret-right"></i>
+          SHOW
+        </span>
+        <span class="in">
+          <i class="fa fa-caret-down"></i>
+          HIDE
+        </span>
+        TICKET TRACKER INFO
+      </a>
+    </div>
+    <div class="hidden-fields-area">
+      <div class="ggrc-form">
+        <issue-tracker-switcher
+          {instance}="instance"
+          {(is-integration-enabled)}="instance.issue_tracker.enabled"
+          {set-issue-title}="true"
+          {default-title}="instance.title">
+            <modal-issue-tracker-fields
+              {instance}="instance"
+              {set-issue-title}="setIssueTitle"
+              {note}="'If turned on, a bug will be generated for this issue. Any subsequent updates to admins, primary contacts, &lt;/br&gt; secondary contacts and state fields should be made through tracking system and synced with GGRC.'">
+            </modal-issue-tracker-fields>
+        </issue-tracker-switcher>
+      </div>
+    </div>
+  </div>
+{{/if }}
 {{/instance}}
 </div>
 {{!/div}}

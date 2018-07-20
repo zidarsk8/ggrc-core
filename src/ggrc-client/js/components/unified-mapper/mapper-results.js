@@ -27,9 +27,9 @@ import tracker from '../../tracker';
 
 const DEFAULT_PAGE_SIZE = 10;
 
-export default GGRC.Components('mapperResults', {
+export default can.Component.extend({
   tag: 'mapper-results',
-  template: template,
+  template,
   viewModel: {
     define: {
       paging: {

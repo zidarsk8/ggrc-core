@@ -5,9 +5,8 @@
 
 const tag = 'issue-tracker-switcher';
 
-export default GGRC.Components('issueTrackerSwitcher', {
-  tag: tag,
-  template: '<content/>',
+export default can.Component.extend({
+  tag,
   viewModel: {
     define: {
       isIntegrationEnabled: {
@@ -31,14 +30,8 @@ export default GGRC.Components('issueTrackerSwitcher', {
           setValue(newValue);
         },
       },
-      isParent: {
-        get: function () {
-          return !this.attr('parent');
-        },
-      },
     },
     instance: {},
-    parent: null,
     setIssueTitle: false,
     convertToBool: function (value) {
       if (typeof value === 'boolean') {

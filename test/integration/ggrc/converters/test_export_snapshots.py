@@ -124,6 +124,7 @@ class TestExportSnapshots(TestCase):
             "Assertions": u"\n".join(c.name for c in control.assertions),
             "Categories": u"\n".join(c.name for c in control.categories),
             "Folder": u"",
+            "Archived": u"yes" if audit.archived else u"no",
             # Computed attributes
             "Last Assessment Date": u"",
             "Admin": u"admin@example.com\ncreator@example.com\n"
@@ -229,6 +230,7 @@ class TestExportSnapshots(TestCase):
             "Type/Means": u"",
             # Special snapshot export fields
             "Audit": audit.slug,
+            "Archived": u"yes" if audit.archived else u"no",
             # Computed attributes
             "Last Assessment Date": u"",
             "Recipients": "",
@@ -450,6 +452,7 @@ class TestExportSnapshots(TestCase):
           'Last Updated Date': control.updated_at.strftime(DATE_FORMAT_US),
           'Last Updated By': "",
           "Folder": u"",
+          "Archived": u"yes" if audit.archived else u"no",
       }
       control_dicts[control.slug].update(**control_acr_people[control.slug])
 
@@ -511,3 +514,28 @@ class TestExportSnapshots(TestCase):
     }]
     parsed_data = self.export_parsed_csv(search_request)["Control Snapshot"][0]
     self.assertNotIn("Custom Role", parsed_data)
+
+  def test_export_archived_snapshot(self):
+    """Test exporting snapshots 'archived' status"""
+    with factories.single_commit():
+      controls = [factories.ControlFactory()]
+      audit = factories.AuditFactory()
+      audit_slug = audit.slug
+      self._create_snapshots(audit, controls)
+      audit_archived = factories.AuditFactory(archived=True)
+      audit_archived_slug = audit_archived.slug
+      self._create_snapshots(audit_archived, controls)
+
+    search_request = [{
+        "object_name": "Snapshot",
+        "filters": {
+            "expression": {},
+        },
+    }]
+    parsed_data = self.export_parsed_csv(search_request)["Control Snapshot"]
+    result = {
+        parsed_data[0]["Audit"]: parsed_data[0]["Archived"],
+        parsed_data[1]["Audit"]: parsed_data[1]["Archived"],
+    }
+    self.assertEqual(result[audit_slug], u"no")
+    self.assertEqual(result[audit_archived_slug], u"yes")

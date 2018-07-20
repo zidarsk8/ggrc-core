@@ -6,8 +6,9 @@
 import Component from '../cycle-task-group-object-task';
 import RefreshQueue from '../../../../models/refresh_queue';
 import * as WorkflowHelpers from '../../../../plugins/utils/workflow-utils';
+import * as CurrentPageUtils from '../../../../plugins/utils/current-page-utils';
 
-describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
+describe('cycle-task-group-object-task component', function () {
   let viewModel;
 
   beforeEach(function () {
@@ -232,7 +233,7 @@ describe('GGRC.Components.cycleTaskGroupObjectTask', function () {
       let pageInstance;
 
       beforeEach(function () {
-        pageInstance = spyOn(GGRC, 'page_instance');
+        pageInstance = spyOn(CurrentPageUtils, 'getPageInstance');
       });
 
       describe('returns true', function () {

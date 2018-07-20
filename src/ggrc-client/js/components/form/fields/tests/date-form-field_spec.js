@@ -21,26 +21,26 @@ describe('GGRC.Components.dateFormField', function () {
 
   it('sets the value of the input', function () {
     viewModel.attr('value', 'test');
-    expect(viewModel.attr('_value')).toEqual('test');
+    expect(viewModel.attr('inputValue')).toEqual('test');
   });
 
   it('does not fire valueChanged event if value wasn\'t changed', function () {
     viewModel.attr('value', '');
-    viewModel.attr('_value', 'newValue');
+    viewModel.attr('inputValue', 'newValue');
     viewModel.dispatch.calls.reset();
-    viewModel.attr('_value', 'newValue');
+    viewModel.attr('inputValue', 'newValue');
     expect(viewModel.dispatch).not.toHaveBeenCalled();
   });
 
   it('fires valueChanged event on input value change', function () {
     viewModel.attr('value', '');
-    viewModel.attr('_value', 'newValue');
+    viewModel.attr('inputValue', 'newValue');
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',
       value: 'newValue',
     });
-    viewModel.attr('_value', 'newValue2');
+    viewModel.attr('inputValue', 'newValue2');
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',

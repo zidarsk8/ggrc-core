@@ -3,14 +3,15 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../assessment_templates';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 
-describe('assessmentTemplates', ()=> {
+describe('assessment-templates component', ()=> {
   let viewModel;
 
   beforeAll(()=> {
-    viewModel = new (can.Map.extend(Component.prototype.viewModel));
+    viewModel = getComponentVM(Component);
   });
 
   describe('_selectInitialTemplate() method', function () {
@@ -79,7 +80,7 @@ describe('assessmentTemplates', ()=> {
 
     it('issues a warning if an empty group is encountered', ()=> {
       const expectedMsg = [
-        'GGRC.Components.assessmentTemplates: ',
+        'can.Component.assessmentTemplates: ',
         'An empty template group encountered, possible API error',
       ].join('');
 

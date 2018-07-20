@@ -11,10 +11,14 @@ import {
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import {allowedToMap} from '../../plugins/ggrc_utils';
+import {
+  getPageInstance,
+  navigate,
+} from '../../plugins/utils/current-page-utils';
 
-export default GGRC.Components('issueUnmapItem', {
+export default can.Component.extend({
   tag: 'issue-unmap-item',
-  template: template,
+  template,
   viewModel: {
     define: {
       paging: {
@@ -112,7 +116,7 @@ export default GGRC.Components('issueUnmapItem', {
       window.open(url, '_blank');
     },
     async unmap() {
-      const currentObject = GGRC.page_instance();
+      const currentObject = getPageInstance();
       this.attr('isLoading', true);
       try {
         const relationship = await CMS.Models.Relationship.findRelationship(
@@ -121,7 +125,7 @@ export default GGRC.Components('issueUnmapItem', {
         );
         await relationship.unmap(true);
         if (currentObject === this.attr('issueInstance')) {
-          GGRC.navigate(this.attr('issueInstance.viewLink'));
+          navigate(this.attr('issueInstance.viewLink'));
         } else {
           this.attr('modalState.open', false);
         }

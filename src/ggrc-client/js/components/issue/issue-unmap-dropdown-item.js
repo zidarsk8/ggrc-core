@@ -6,9 +6,9 @@
 import './issue-unmap';
 import template from './issue-unmap-dropdown-item.mustache';
 
-export default GGRC.Components('issueUnmapDropdownItem', {
+export default can.Component.extend({
   tag: 'issue-unmap-dropdown-item',
-  template: template,
+  template,
   viewModel: {
     define: {
       issueUnmap: {

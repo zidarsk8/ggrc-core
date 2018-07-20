@@ -4,12 +4,12 @@
 }}
 
 <div class="input-wrapper">
-  {{#if _value}}
+  {{#if inputValue}}
     <div class="person-info-wrapper">
       <a class="person-info-wrapper__remove-value" href="#" ($click)="unsetPerson">
         <i class="fa fa-times" aria-hidden="true"></i>
       </a>
-      <person-data {person-id}="_value"></person-data>
+      <person-data {person-id}="inputValue"></person-data>
     </div>
   {{else}}
     {{^if_config_exist 'external_services.Person'}}

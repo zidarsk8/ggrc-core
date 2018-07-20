@@ -5,6 +5,7 @@
 
 import {confirm} from '../plugins/utils/modals';
 import {hasPending as hasPendingUtil} from '../plugins/ggrc_utils';
+import {navigate} from '../plugins/utils/current-page-utils';
 
 (function ($) {
   'use strict';
@@ -73,13 +74,13 @@ import {hasPending as hasPendingUtil} from '../plugins/ggrc_utils';
         delete_target = this.$trigger.data('delete-target');
         if (delete_target === 'refresh') {
           // Refresh the page
-          GGRC.navigate(window.location.href.replace(/#.*/, ''));
+          navigate(window.location.href.replace(/#.*/, ''));
         } else if (xhr && xhr.getResponseHeader('location')) {
           // Otherwise redirect if possible
-          GGRC.navigate(xhr.getResponseHeader('location'));
+          navigate(xhr.getResponseHeader('location'));
         } else {
           // Otherwise refresh the page
-          GGRC.navigate(window.location.href.replace(/#.*/, ''));
+          navigate(window.location.href.replace(/#.*/, ''));
         }
       }
     },
@@ -316,10 +317,10 @@ import {hasPending as hasPendingUtil} from '../plugins/ggrc_utils';
         // Maybe handle AJAX/JSON redirect or refresh
         if (xhr.status === 278) {
           // Handle 278 redirect (AJAX redirect)
-          GGRC.navigate(xhr.getResponseHeader('location'));
+          navigate(xhr.getResponseHeader('location'));
         } else if (xhr.status === 279) {
           // Handle 279 page refresh
-          GGRC.navigate(window.location.href.replace(/#.*/, ''));
+          navigate(window.location.href.replace(/#.*/, ''));
         } else {
           modal_form = $('.modal:visible:last').data('modal_form');
           if (modal_form && xhr === modal_form.xhr) {

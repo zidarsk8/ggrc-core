@@ -12,6 +12,7 @@ import {isObjectVersion} from '../plugins/utils/object-versions-utils';
 import router, {buildUrl} from '../router';
 import '../components/add-tab-button/add-tab-button';
 import pubSub from '../pub-sub';
+import {getPageInstance} from '../plugins/utils/current-page-utils';
 
 export default can.Control({
   defaults: {
@@ -26,7 +27,6 @@ export default can.Control({
     isMenuVisible: true,
     counts: null,
     hasHiddenWidgets: false,
-    showAddTabButton: true,
     /*
       The widget should refetch items when opening
       if "refetchOnce" has the model name of the widget.
@@ -40,7 +40,7 @@ export default can.Control({
 }, {
   init: function (options) {
     CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {
-      const instance = GGRC.page_instance();
+      const instance = getPageInstance();
       this.display_prefs = prefs;
       this.options = new can.Map(this.options);
       if (!this.options.widget_list) {
@@ -51,8 +51,6 @@ export default can.Control({
       if (!(this.options.contexts instanceof can.Observe)) {
         this.options.attr('contexts', new can.Observe(this.options.contexts));
       }
-      this.options.attr('showAddTabButton',
-        !['Audit', 'Person', 'Evidence'].includes(getPageType()));
 
       router.bind('widget', (ev, newVal)=>{
         this.route(newVal);

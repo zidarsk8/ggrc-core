@@ -3,13 +3,16 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.Components.mapperResultsItem', function () {
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../mapper-results-item';
+
+describe('mapper-results-item', function () {
   'use strict';
 
   let viewModel;
 
   beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('mapperResultsItem');
+    viewModel = getComponentVM(Component);
   });
 
   describe('displayItem() method', function () {

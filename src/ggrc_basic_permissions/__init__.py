@@ -3,8 +3,10 @@
 
 """RBAC module"""
 
+import cPickle
 import datetime
 import itertools
+import zlib
 
 import flask
 import sqlalchemy as sa
@@ -160,8 +162,11 @@ def query_memcache(key):
     cache.set('permissions:list', cached_keys_set, PERMISSION_CACHE_TIMEOUT)
     return cache, None
 
-  permissions_cache = cache.get(key)
-  if permissions_cache:
+  permissions_data = cache.get(key)
+  if permissions_data:
+    # permissions_cache is stored in compressed state,
+    # need to decompress it before using
+    permissions_cache = cPickle.loads(zlib.decompress(permissions_data))
     # If the key is both in permissions:list and in memcache itself
     # it is safe to return the cached permissions
     return cache, permissions_cache
@@ -394,10 +399,14 @@ def store_results_into_memcache(permissions, cache, key):
 
   cached_keys_set = cache.get('permissions:list') or set()
   if key in cached_keys_set:
+    # Size of permissions dict can be too big for memcache (> 1 Mb),
+    # so compressed dict will be stored.
+    compressed_permissions = zlib.compress(cPickle.dumps(permissions))
+
     # We only add the permissions to the cache if the
     # key still exists in the permissions:list after
     # the query has executed.
-    cache.set(key, permissions, PERMISSION_CACHE_TIMEOUT)
+    cache.set(key, compressed_permissions, PERMISSION_CACHE_TIMEOUT)
 
 
 def load_permissions_for(user):
@@ -472,7 +481,7 @@ def handle_program_post(sender, obj=None, src=None, service=None):
       context=personal_context,
       name='{object_type} Context {timestamp}'.format(
           object_type=service.model.__name__,
-          timestamp=datetime.datetime.now()),
+          timestamp=datetime.datetime.utcnow()),
       description='',
   )
   context.modified_by = get_current_user()
@@ -491,7 +500,7 @@ def create_audit_context(audit):
   context = audit.build_object_context(
       context=audit.context,
       name='Audit Context {timestamp}'.format(
-          timestamp=datetime.datetime.now()),
+          timestamp=datetime.datetime.utcnow()),
       description='',
   )
   context.modified_by = get_current_user()

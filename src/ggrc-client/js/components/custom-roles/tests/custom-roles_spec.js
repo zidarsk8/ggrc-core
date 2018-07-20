@@ -14,34 +14,55 @@ describe('custom-roles component', () => {
     vm = getComponentVM(Component);
   });
 
-  describe('isReadOnlyForInstance() method', () => {
+  describe('isReadonly prop', () => {
     it('returns false if there is no instance', () => {
       let falseInstances = [null, undefined, '', 0, false, NaN];
 
       falseInstances.forEach((instance) => {
-        expect(vm.isReadOnlyForInstance(instance)).toBe(false);
+        vm.attr('instance', instance);
+        expect(vm.attr('isReadonly')).toBe(false);
       });
     });
 
-    it('returns value of instance.class.isProposable if instance is defined',
-      () => {
-        let instance = {
-          'class': {
-            isProposable: true,
-          },
-        };
-        expect(vm.isReadOnlyForInstance(instance)).toBe(true);
+    it('returns value of instance.class.isProposable if instance is defined ' +
+      'and readonly is FALSE',
+    () => {
+      vm.attr('readOnly', false);
+      let instance = {
+        'class': {
+          isProposable: true,
+        },
+      };
+      vm.attr('instance', instance);
 
-        instance.class.isProposable = false;
-        expect(vm.isReadOnlyForInstance(instance)).toBe(false);
-      });
+      expect(vm.attr('isReadonly')).toBe(true);
+
+      vm.attr('instance.class.isProposable', false);
+      expect(vm.attr('isReadonly')).toBe(false);
+    });
+
+    it('returns value of readOnly prop if instance is defined ' +
+      'and instance.class.isProposable is FALSE',
+    () => {
+      let instance = {
+        'class': {
+          isProposable: false,
+        },
+      };
+      vm.attr('instance', instance);
+
+      vm.attr('readOnly', false);
+      expect(vm.attr('isReadonly')).toBe(false);
+
+      vm.attr('readOnly', true);
+      expect(vm.attr('isReadonly')).toBe(true);
+    });
   });
 
   describe('filterACL() method', () => {
     let acl;
 
     beforeEach(() => {
-      spyOn(vm, 'isReadOnlyForInstance');
       vm.attr('instance', {});
     });
 
@@ -63,7 +84,6 @@ describe('custom-roles component', () => {
 
     beforeEach(() => {
       args = {};
-      spyOn(vm, 'isReadOnlyForInstance');
       saveDfd = new can.Deferred();
       vm.attr('instance', {
         save: jasmine.createSpy().and.returnValue(saveDfd),

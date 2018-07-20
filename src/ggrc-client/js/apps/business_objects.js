@@ -11,6 +11,8 @@ import {
   getWidgetConfig,
 } from '../plugins/utils/object-versions-utils';
 import Mappings from '../models/mappers/mappings';
+import {inferObjectType} from '../plugins/utils/models-utils';
+import {getPageInstance} from '../plugins/utils/current-page-utils';
 
 (function (can, $) {
   let CoreExtension = {};
@@ -67,9 +69,9 @@ import Mappings from '../models/mappers/mappings';
     init_widgets: function () {
       let baseWidgetsByType = GGRC.tree_view.base_widgets_by_type;
       let widgetList = new GGRC.WidgetList('ggrc_core');
-      let objectClass = GGRC.infer_object_type(GGRC.page_object);
+      let objectClass = inferObjectType(GGRC.page_object);
       let objectTable = objectClass && objectClass.table_plural;
-      let object = GGRC.page_instance();
+      let object = getPageInstance();
       let path = GGRC.mustache_path;
       let infoWidgetViews;
       let summaryWidgetViews;
@@ -437,7 +439,7 @@ import Mappings from '../models/mappers/mappings';
             add_item_view: path + '/audits/tree_add_item.mustache',
           },
           Person: {
-            parent_instance: GGRC.page_instance(),
+            parent_instance: getPageInstance(),
             allow_reading: true,
             allow_mapping: true,
             allow_creating: true,
@@ -449,7 +451,7 @@ import Mappings from '../models/mappers/mappings';
         Audit: {
           _mixins: ['issues', 'governance_objects', 'business_objects'],
           Program: {
-            parent_instance: GGRC.page_instance(),
+            parent_instance: getPageInstance(),
             draw_children: true,
             model: CMS.Models.Program,
             allow_mapping: false,
@@ -473,7 +475,7 @@ import Mappings from '../models/mappers/mappings';
           },
           Assessment: {
             mapping: 'related_assessments',
-            parent_instance: GGRC.page_instance(),
+            parent_instance: getPageInstance(),
             allow_mapping: true,
             draw_children: true,
             model: CMS.Models.Assessment,
@@ -761,7 +763,7 @@ import Mappings from '../models/mappers/mappings';
       });
 
       // Disable editing on profile pages, as long as it isn't audits on the dashboard
-      if (GGRC.page_instance() instanceof CMS.Models.Person) {
+      if (getPageInstance() instanceof CMS.Models.Person) {
         let person_options = extraContentControllerOptions.Person;
         can.each(person_options, function (options, model_name) {
           if (model_name !== 'Audit' || !/dashboard/.test(window.location)) {

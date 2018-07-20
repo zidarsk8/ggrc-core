@@ -3,12 +3,13 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../autocomplete-results';
 
-describe('GGRC.Components.autocompleteResults', ()=> {
+describe('autocomplete-results component', ()=> {
   let viewModel;
   beforeEach(()=> {
-    viewModel = new (can.Map.extend(Component.prototype.viewModel));
+    viewModel = getComponentVM(Component);
   });
 
   describe('viewModel', ()=> {

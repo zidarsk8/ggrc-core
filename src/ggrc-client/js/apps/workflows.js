@@ -5,6 +5,7 @@
 
 import {
   initCounts,
+  getPageInstance,
 } from '../plugins/utils/current-page-utils';
 import {registerHook} from '../plugins/ggrc_utils';
 
@@ -58,7 +59,7 @@ import Mappings from '../models/mappers/mappings';
     taskGroup: 'TaskGroup',
   };
 
-  // Register Workflow models for use with `infer_object_type`
+  // Register Workflow models for use with `inferObjectType`
   WorkflowExtension.object_type_decision_tree = function () {
     return {
       cycle: CMS.Models.Cycle,
@@ -211,15 +212,6 @@ import Mappings from '../models/mappers/mappings';
             );
           }
         ),
-
-        // This code needs to be reworked to figure out how to return the single
-        // most recent task entry with is_declining_review = true.
-        declining_cycle_task_entries: Search(function (binding) {
-          return CMS.Models.CycleTaskEntry.findAll({
-            cycle_task_group_object_task_id: binding.instance.id,
-            is_declining_review: 1,
-          });
-        }, 'Cycle'),
       },
 
       CycleTaskEntry: {
@@ -265,15 +257,6 @@ import Mappings from '../models/mappers/mappings';
           'task_group_objects',
           null
         ),
-        approval_tasks: Search(function (binding) {
-          return CMS.Models.CycleTaskGroupObjectTask.findAll({
-            object_approval: true,
-            // We only need to check destination_id/type because cycle tasks
-            // are allways mapped through destination
-            'related_destinations.destination_id': binding.instance.id,
-            'related_destinations.destination_type': binding.instance.type,
-          });
-        }),
         workflows: Cross('task_groups', 'workflow'),
         approval_workflows: CustomFilter('workflows', function (binding) {
           return binding.instance.attr('object_approval');
@@ -291,12 +274,6 @@ import Mappings from '../models/mappers/mappings';
 
       CMS.Models[type].attributes.task_group_objects =
         'CMS.Models.TaskGroupObject.stubs';
-
-      // Also register a render hook for object approval
-      registerHook(
-        type + '.info_widget_actions',
-        GGRC.mustache_path + '/base_objects/approval_link.mustache'
-      );
     });
     new Mappings('ggrc_workflows', mappings);
   };
@@ -304,7 +281,7 @@ import Mappings from '../models/mappers/mappings';
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
   // Initialize widgets for workflow page
   WorkflowExtension.init_widgets = function () {
-    let pageInstance = GGRC.page_instance();
+    let pageInstance = getPageInstance();
     let treeWidgets = GGRC.tree_view.base_widgets_by_type;
     let subTrees = GGRC.tree_view.sub_tree_for;
     let subTreeItems = ['Cycle'];
@@ -359,7 +336,7 @@ import Mappings from '../models/mappers/mappings';
 
   WorkflowExtension.init_widgets_for_other_pages = function () {
     let descriptor = {};
-    let pageInstance = GGRC.page_instance();
+    let pageInstance = getPageInstance();
 
     if (
       pageInstance &&
@@ -403,7 +380,7 @@ import Mappings from '../models/mappers/mappings';
     ];
     let historyWidgetDescriptor;
     let currentWidgetDescriptor;
-    let object = GGRC.page_instance();
+    let object = getPageInstance();
 
     can.each(
       GGRC.WidgetList.get_current_page_widgets(),
@@ -505,7 +482,7 @@ import Mappings from '../models/mappers/mappings';
 
   WorkflowExtension.init_widgets_for_person_page = function () {
     let descriptor = {};
-    let pageInstance = GGRC.page_instance();
+    let pageInstance = getPageInstance();
     const isObjectBrowser = /^\/objectBrowser\/?$/
       .test(window.location.pathname);
     const isPeoplePage = /^\/people\/.*$/
@@ -519,7 +496,7 @@ import Mappings from '../models/mappers/mappings';
         widget_name: 'My Tasks',
         model: CMS.Models.CycleTaskGroupObjectTask,
         content_controller_options: {
-          parent_instance: GGRC.page_instance(),
+          parent_instance: getPageInstance(),
           model: CMS.Models.CycleTaskGroupObjectTask,
           add_item_view:
             GGRC.mustache_path +

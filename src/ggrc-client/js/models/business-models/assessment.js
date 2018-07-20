@@ -7,6 +7,7 @@ import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 import {getRole} from '../../plugins/utils/acl-utils';
 import {sortByName} from '../../plugins/utils/label-utils';
 import tracker from '../../tracker';
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 export default can.Model.Cacheable('CMS.Models.Assessment', {
   root_object: 'assessment',
@@ -110,7 +111,6 @@ export default can.Model.Cacheable('CMS.Models.Assessment', {
     }, {
       attr_title: 'Description',
       attr_name: 'description',
-      disable_sorting: true,
       order: 18,
     }, {
       attr_title: 'Notes',
@@ -128,8 +128,6 @@ export default can.Model.Cacheable('CMS.Models.Assessment', {
   },
   sub_tree_view_options: {
     default_filter: ['Control'],
-  },
-  info_pane_options: {
   },
   confirmEditModal: {
     title: 'Confirm moving Assessment to "In Progress"',
@@ -256,27 +254,6 @@ export default can.Model.Cacheable('CMS.Models.Assessment', {
     }
     this.bind('refreshInstance', this.refresh.bind(this));
   },
-  _checkIssueTrackerWarnings: function () {
-    let warnings;
-    let warningMessage;
-
-    if (!this.issue_tracker) {
-      return;
-    }
-
-    warnings = this.issue_tracker._warnings;
-
-    if (warnings && warnings.length) {
-      warningMessage = warnings.join('; ');
-      $(document.body).trigger('ajax:flash', {warning: warningMessage});
-    }
-  },
-  after_update: function () {
-    this._checkIssueTrackerWarnings();
-  },
-  after_create: function () {
-    this._checkIssueTrackerWarnings();
-  },
   before_create: function () {
     if (!this.audit) {
       throw new Error('Cannot save assessment, audit not set.');
@@ -312,7 +289,7 @@ export default can.Model.Cacheable('CMS.Models.Assessment', {
     return this._super(checkAssociations);
   },
   form_preload: function (newObjectForm) {
-    let pageInstance = GGRC.page_instance();
+    let pageInstance = getPageInstance();
     let currentUser = CMS.Models.get_instance('Person',
       GGRC.current_user.id, GGRC.current_user);
 

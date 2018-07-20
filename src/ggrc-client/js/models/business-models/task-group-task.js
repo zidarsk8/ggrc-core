@@ -8,6 +8,7 @@ import {
   getClosestWeekday,
   getDate,
 } from '../../plugins/utils/date-util';
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 export default can.Model.Cacheable('CMS.Models.TaskGroupTask', {
   root_object: 'task_group_task',
@@ -65,7 +66,7 @@ export default can.Model.Cacheable('CMS.Models.TaskGroupTask', {
 
     this.validate(['start_date', 'end_date'], function () {
       let that = this;
-      let workflow = GGRC.page_instance();
+      let workflow = getPageInstance();
       let datesAreValid = true;
       let startDate = getDate(that.attr('start_date'));
       let endDate = getDate(that.attr('end_date'));

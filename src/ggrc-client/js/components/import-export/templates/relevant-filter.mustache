@@ -16,7 +16,13 @@
     {{^readOnly}}
       <i class="fa fa-trash" ($click)="removeFilter(%element, @index)"></i>
     {{/readOnly}}
-    {{#if @index}}AND {{/if}}Mapped to:
+    {{#if @index}}
+      <dropdown options-list="operators"
+                name="operator"
+                class="inline-block">
+      </dropdown>
+    {{/if}}
+    Mapped to:
     <select class="filter-type-selector select-filter{{@index}}"
             {{#readOnly}}disabled="disabled"{{/readOnly}}
             can-value="model_name">

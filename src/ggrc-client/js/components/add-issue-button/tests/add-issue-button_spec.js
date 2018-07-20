@@ -3,24 +3,24 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../add-issue-button';
 import '../add-issue-button';
 import {REFRESH_RELATED} from '../../../events/eventTypes';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 
-describe('GGRC.Components.addIssueButton', function () {
+describe('add-issue-button component', function () {
   'use strict';
 
-  let Component;
   let viewModel;
   let events;
 
   beforeAll(function () {
-    Component = GGRC.Components.get('addIssueButton');
     events = Component.prototype.events;
   });
 
   beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('addIssueButton');
+    viewModel = getComponentVM(Component);
   });
 
   describe('refreshIssueList() method', function () {
@@ -49,7 +49,8 @@ describe('GGRC.Components.addIssueButton', function () {
         spyOn(CMS.Models, 'Issue');
         fakeIssueInstance = new CMS.Models.Issue();
         spyOn(CurrentPageUtils, 'initCounts');
-        spyOn(GGRC, 'page_instance').and.returnValue(fakePageInstance);
+        spyOn(CurrentPageUtils, 'getPageInstance')
+          .and.returnValue(fakePageInstance);
       });
 
       it('should dispatch refreshInstance event ' +

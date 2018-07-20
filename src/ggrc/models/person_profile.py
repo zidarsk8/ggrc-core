@@ -16,7 +16,7 @@ DEFAULT_LAST_SEEN_OFFSET = 60
 
 def default_last_seen_date():
   """Function counts last_seen_whats_new date for new users"""
-  now = datetime.now()
+  now = datetime.utcnow()
   return now.replace(microsecond=0) - timedelta(DEFAULT_LAST_SEEN_OFFSET)
 
 
