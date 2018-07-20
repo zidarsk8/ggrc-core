@@ -9,7 +9,7 @@ describe('can.Model.AssessmentTemplate', function () {
   'use strict';
 
   let AssessmentTemplate;
-  let instance;  // an AssessmentTemplate instance
+  let instance; // an AssessmentTemplate instance
 
   beforeAll(function () {
     AssessmentTemplate = CMS.Models.AssessmentTemplate;
@@ -112,7 +112,7 @@ describe('can.Model.AssessmentTemplate', function () {
     it('clears the assignees IDs dict if needed', function () {
       instance.attr('assigneesList', {'42': true});
       instance.attr('default_people', {
-        assignees: 'Some User Group',  // not a list of IDs
+        assignees: 'Some User Group', // not a list of IDs
       });
 
       instance._unpackPeopleData();
@@ -148,7 +148,7 @@ describe('can.Model.AssessmentTemplate', function () {
     it('clears the verifiers IDs dict if needed', function () {
       instance.attr('verifiersList', {'42': true});
       instance.attr('default_people', {
-        verifiers: 'Some User Group',  // not a list of IDs
+        verifiers: 'Some User Group', // not a list of IDs
       });
 
       instance._unpackPeopleData();

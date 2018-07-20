@@ -6,7 +6,7 @@
 describe('can.mustache.helper.if_string', function () {
   'use strict';
 
-  let fakeOptions;  // fake mustache options object passed to the helper
+  let fakeOptions; // fake mustache options object passed to the helper
   let helper;
   let someContext;
 

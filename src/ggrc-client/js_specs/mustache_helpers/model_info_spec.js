@@ -8,8 +8,8 @@ describe('can.mustache.helper.model_info', function () {
 
   let helper;
   let fakeModel;
-  let fakeOptions;  // a fake "options" argument
-  let origModel;  // the original model, if any, in the CMS.Models
+  let fakeOptions; // a fake "options" argument
+  let origModel; // the original model, if any, in the CMS.Models
 
   beforeAll(function () {
     helper = can.Mustache._helpers.model_info.fn;

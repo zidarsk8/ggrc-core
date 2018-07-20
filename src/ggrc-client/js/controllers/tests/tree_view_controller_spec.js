@@ -9,14 +9,14 @@ import '../tree/tree-view';
 describe('CMS.Controllers.TreeView', function () {
   'use strict';
 
-  let Ctrl;  // the controller under test
+  let Ctrl; // the controller under test
 
   beforeAll(function () {
     Ctrl = CMS.Controllers.TreeView;
   });
 
   describe('init() method', function () {
-    let ctrlInst;  // fake controller instance
+    let ctrlInst; // fake controller instance
     let dfdSingleton;
     let method;
     let options;

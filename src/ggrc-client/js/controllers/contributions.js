@@ -123,7 +123,7 @@ const userRolesModalSelector = can.Control.extend({
         self.element.trigger('loaded');
       });
 
-    this.on();  // Start listening for events
+    this.on(); // Start listening for events
 
     return deferred;
   },

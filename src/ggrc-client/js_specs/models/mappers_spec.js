@@ -531,14 +531,14 @@ describe('mappers', function () {
       });
 
       it('removes no instance when nothing is supplied to remove', function () {
-        let instance =  new Dummy({ id: 3 });
+        let instance = new Dummy({ id: 3 });
         let binding = { list: [{ instance: instance, mappings: [] }] };
         ll.remove_instance(binding, {}, 'b');
         expect(binding.list).toEqual([{ instance: instance, mappings: [] }]);
       });
 
       it("removes no instance when instance doesn't match type", function () {
-        let instance =  new Dummy({ id: 3 });
+        let instance = new Dummy({ id: 3 });
         let WrongClass = can.Map.extend();
         WrongClass.shortName = 'Wrong';
         let wrong_instance = new WrongClass({ id: 3 });
@@ -548,14 +548,14 @@ describe('mappers', function () {
       });
 
       it('removes the instance from mappings when matching', function () {
-        let instance =  new Dummy({ id: 3 });
+        let instance = new Dummy({ id: 3 });
         let binding = { list: [{ instance: instance, mappings: [] }] };
         ll.remove_instance(binding, instance, 'b');
         expect(binding.list).toEqual([]);
       });
 
       it('removes the instance from mappings on just type and ID match', function () {
-        let instance =  new Dummy({ id: 3 });
+        let instance = new Dummy({ id: 3 });
         let matching_instance = new Dummy({ id: 3 });
         let binding = { list: [{ instance: instance, mappings: [] }] };
         expect(matching_instance).not.toBe(instance);
@@ -566,7 +566,7 @@ describe('mappers', function () {
       describe('with mappings defined', function () {
 
         it('deletes only if all mappings are accounted for in instance', function () {
-          let instance =  new Dummy({ id: 3 });
+          let instance = new Dummy({ id: 3 });
           let binding = {
             list: [{
               instance: instance,
@@ -585,7 +585,7 @@ describe('mappers', function () {
         });
 
         it('does not delete if not all mappings are accounted for', function () {
-          let instance =  new Dummy({ id: 3 });
+          let instance = new Dummy({ id: 3 });
           let binding = {
             list: [{
               instance: instance,

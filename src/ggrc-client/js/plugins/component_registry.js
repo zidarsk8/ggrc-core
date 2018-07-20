@@ -8,7 +8,7 @@
   'use strict';
 
   if (_.isFunction(GGRC.Components)) {
-    return;  // no need to create the component registry again
+    return; // no need to create the component registry again
   }
 
   // make the registry publicly available
