@@ -227,10 +227,8 @@ class Revision(base.ContextRBAC, Base, db.Model):
         acl["person"] = {"id": acl.get("person_id"), "type": "Person"}
     return access_control_list
 
-  def populate_acl(self):  # noqa #pylint: disable=too-many-locals, too-many-branches
+  def populate_acl(self):
     """Add access_control_list info for older revisions."""
-    # requirements after renaming are special cases
-    requirement_type = True if self.resource_type == "Requirement" else False
     roles_dict = role.get_custom_roles_for(self.resource_type)
     reverted_roles_dict = {n: i for i, n in roles_dict.iteritems()}
     access_control_list = self._content.get("access_control_list") or []
@@ -243,23 +241,9 @@ class Revision(base.ContextRBAC, Base, db.Model):
     }
     exists_roles = {i["ac_role_id"] for i in access_control_list}
 
-    # update orphan acl in revision.content
-    if requirement_type:
-      for role_id in exists_roles:
-        if role_id not in map_field_to_role.values():
-          for acl in access_control_list:
-            if role_id == acl["ac_role_id"]:
-              acl["object_type"] = "Requirement"
-
     for field, role_id in map_field_to_role.items():
       if role_id in exists_roles or role_id is None:
-        # update existing acl in revision.content
-        if requirement_type:
-          for acl in access_control_list:
-            if role_id == acl["ac_role_id"]:
-              acl["object_type"] = "Requirement"
-        else:
-          continue
+        continue
       if field not in self._content:
         continue
       field_content = self._content.get(field) or {}
@@ -422,27 +406,13 @@ class Revision(base.ContextRBAC, Base, db.Model):
 
     but now they are associated to instance."""
     from ggrc.models import custom_attribute_definition
-    # requirements after renaming are special cases
-    requirement_type = True if self.resource_type == "Requirement" else False
     cads = custom_attribute_definition.get_custom_attributes_for(
         self.resource_type, self.resource_id)
     cavs = {int(i["custom_attribute_id"]): i for i in self._get_cavs()}
-
-    # updating content for cavs in content with lost cad
-    if requirement_type:
-      cad_ids = [cad["id"] for cad in cads]
-      for cad_id in cavs.keys():
-        if cad_id not in cad_ids:
-          cavs[cad_id]["attributable_type"] = "Requirement"
-
     for cad in cads:
       custom_attribute_id = int(cad["id"])
       if custom_attribute_id in cavs:
-        # updating content for actual cavs in content
-        if requirement_type:
-          cavs[custom_attribute_id]["attributable_type"] = "Requirement"
-        else:
-          continue
+        continue
       if cad["attribute_type"] == "Map:Person":
         value = "Person"
       else:
@@ -477,11 +447,75 @@ class Revision(base.ContextRBAC, Base, db.Model):
       cads.append(cad)
     return {"custom_attribute_definitions": cads}
 
-  def populate_type(self):
-    """Populate type field for Requirement revisions"""
-    if self.resource_type == "Requirement":
-      return{"type": "Requirement"}
-    return {}
+  def populate_requirements(self, populated_content):  # noqa pylint: disable=too-many-branches
+    """Populates revision content for Requirement models and models with fields
+
+    that can contain Requirement old names. This fields would be checked and
+    updated where necessary
+    """
+    # change to add Requirement old names
+    requirement_type = ["Section", ]
+    # change to add models and fields that can contain Requirement old names
+    affected_models = {
+        "AccessControlList": ["object_type", ],
+        "AccessControlRole": ["object_type", ],
+        "Assessment": ["assessment_type", ],
+        "AssessmentTemplate": ["template_object_type", ],
+        "Automapping": ["source_type", "destination_type", ],
+        "CustomAttributeValue": ["attributable_type", ],
+        "Event": ["resource_type", ],
+        "ObjectPerson": ["personable_type", ],
+        "Relationship": ["source_type", "destination_type", ],
+        "Revision": ["resource_type", ],
+        "Label": ["object_type", ],
+        "Context": ["related_object_type", ],
+        "IssuetrackerIssue": ["object_type", ],
+        "ObjectLabel": ["object_type", ],
+        "ObjectTemplates": ["name", ],
+        "Proposal": ["instance_type", ],
+        "Snapshot": ["child_type", "parent_type", ],
+        "TaskGroupObject": ["object_type", ],
+    }
+    # change to add special values cases
+    special_cases = {
+        "CustomAttributeDefinition": {
+            "fields": ["definition_type", ],
+            "old_values": ["section", ],
+            "new_value": "requirement",
+        }
+    }
+
+    obj_type = self.resource_type
+
+    # populate fields if they contain old names
+    if obj_type in affected_models.keys():
+      for field in affected_models[obj_type]:
+        if populated_content.get(field) in requirement_type:
+          populated_content[field] = "Requirement"
+
+    # populate fields for models that contain old names in special spelling
+    if obj_type in special_cases.keys():
+      for field in special_cases[obj_type]["fields"]:
+        if populated_content[field] in special_cases[obj_type]["old_values"]:
+          populated_content[field] = special_cases[obj_type]["new_value"]
+
+    # populate Requirements revisions
+    if obj_type == "Requirement":
+      populated_content["type"] = "Requirement"
+
+      acls = populated_content.get("access_control_list", {})
+      if acls:
+        for acl in acls:
+          if acl.get("object_type") in requirement_type:
+            acl["object_type"] = "Requirement"
+        populated_content["access_control_list"] = acls
+
+      cavs = populated_content.get("custom_attribute_values", {})
+      if cavs:
+        for cav in cavs:
+          if cav.get("attributable_type") in requirement_type:
+            cav["attributable_type"] = "Requirement"
+        populated_content["custom_attribute_values"] = cavs
 
   @builder.simple_property
   def content(self):
@@ -500,8 +534,8 @@ class Revision(base.ContextRBAC, Base, db.Model):
     populated_content.update(self.populate_categoies("assertions"))
     populated_content.update(self.populate_cad_default_values())
     populated_content.update(self.populate_cavs())
-    populated_content.update(self.populate_type())
 
+    self.populate_requirements(populated_content)
     # remove custom_attributes,
     # it's old style interface and now it's not needed
     populated_content.pop("custom_attributes", None)
