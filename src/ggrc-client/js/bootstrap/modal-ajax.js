@@ -22,19 +22,19 @@ import {
 (function (can, $, GGRC) {
   'use strict';
 
-  var originalModalShow = $.fn.modal.Constructor.prototype.show;
-  var originalModalHide = $.fn.modal.Constructor.prototype.hide;
+  let originalModalShow = $.fn.modal.Constructor.prototype.show;
+  let originalModalHide = $.fn.modal.Constructor.prototype.hide;
 
-  var handlers = {
+  let handlers = {
     modal: function ($target, $trigger, option) {
       $target.modal(option).draggable({handle: '.modal-header'});
     },
 
     deleteform: function ($target, $trigger, option) {
-      var model = CMS.Models[$trigger.attr('data-object-singular')];
-      var instance;
-      var deleteCounts = new can.Map({loading: true, counts: ''});
-      var modalSettings;
+      let model = CMS.Models[$trigger.attr('data-object-singular')];
+      let instance;
+      let deleteCounts = new can.Map({loading: true, counts: ''});
+      let modalSettings;
 
       if ($trigger.attr('data-object-id') === 'page') {
         instance = getPageInstance();
@@ -85,7 +85,7 @@ import {
         });
 
       $target.on('modal:success', function (e, data) {
-        var modelName = $trigger.attr('data-object-plural').toLowerCase();
+        let modelName = $trigger.attr('data-object-plural').toLowerCase();
         if ($trigger.attr('data-object-id') === 'page' ||
           (instance === getPageInstance())) {
           navigate('/dashboard');
@@ -104,16 +104,16 @@ import {
         $trigger.data('refresh') ||
         $trigger.data('refresh') === undefined
       );
-      var formTarget = $trigger.data('form-target');
-      var objectParams = $trigger.attr('data-object-params');
-      var extendNewInstance = $trigger.attr('data-extend-new-instance');
-      var triggerParent = $trigger.closest('.add-button');
-      var model = CMS.Models[$trigger.attr('data-object-singular')];
-      var isProposal = $trigger.data('is-proposal');
-      var instance;
-      var modalTitle;
-      var titleOverride;
-      var contentView;
+      let formTarget = $trigger.data('form-target');
+      let objectParams = $trigger.attr('data-object-params');
+      let extendNewInstance = $trigger.attr('data-extend-new-instance');
+      let triggerParent = $trigger.closest('.add-button');
+      let model = CMS.Models[$trigger.attr('data-object-singular')];
+      let isProposal = $trigger.data('is-proposal');
+      let instance;
+      let modalTitle;
+      let titleOverride;
+      let contentView;
 
       if ($trigger.attr('data-object-id') === 'page') {
         instance = getPageInstance();
@@ -171,13 +171,13 @@ import {
         });
 
       $target.on('modal:success', function (e, data, xhr) {
-        var dirty;
-        var $active;
-        var WARN_MSG = [
+        let dirty;
+        let $active;
+        let WARN_MSG = [
           'The $trigger element was not found in the DOM, thus some',
           'application events will not be propagated.'
         ].join(' ');
-        var args = arguments;
+        let args = arguments;
 
         if (formTarget === 'nothing') {
           $trigger.trigger(
@@ -227,8 +227,8 @@ import {
           }
 
           Permission.refresh().then(function () {
-            var hiddenElement;
-            var tagName;
+            let hiddenElement;
+            let tagName;
 
             // 'is_allowed' helper rerenders an elements
             // we should trigger event for hidden element
@@ -259,8 +259,8 @@ import {
     },
 
     archiveform: function ($target, $trigger, option) {
-      var model = CMS.Models[$trigger.attr('data-object-singular')];
-      var instance;
+      let model = CMS.Models[$trigger.attr('data-object-singular')];
+      let instance;
 
       if ($trigger.attr('data-object-id') === 'page') {
         instance = getPageInstance();
@@ -290,7 +290,7 @@ import {
   };
 
   function preloadContent() {
-    var template =
+    let template =
       ['<div class="modal-header">',
         '<a class="pull-right modal-dismiss" href="#" data-dismiss="modal">',
         '<i class="fa fa-times black"></i>',
@@ -327,9 +327,9 @@ import {
   }
 
   function arrangeBackgroundModals(modals, referenceModal) {
-    var $header;
-    var headerHeight;
-    var _top;
+    let $header;
+    let headerHeight;
+    let _top;
     modals = $(modals).not(referenceModal);
     if (modals.length < 1) return;
 
@@ -354,15 +354,15 @@ import {
   }
 
   function arrangeTopModal(modal) {
-    var $header = modal.find('.modal-header:first');
-    var headerHeight = $header.height() +
+    let $header = modal.find('.modal-header:first');
+    let headerHeight = $header.height() +
       Number($header.css('padding-top')) +
       Number($header.css('padding-bottom'));
 
-    var offsetParent = modal.offsetParent();
-    var _scrollY = 0;
-    var _top = 0;
-    var _left = modal.position().left;
+    let offsetParent = modal.offsetParent();
+    let _scrollY = 0;
+    let _top = 0;
+    let _left = modal.position().left;
     if (!offsetParent.length || offsetParent.is('html, body')) {
       offsetParent = $(window);
       _scrollY = window.scrollY;
@@ -386,13 +386,13 @@ import {
   }
 
   function reconfigureModals() {
-    var modalBackdrops = $('.modal-backdrop').css('z-index', function (i) {
+    let modalBackdrops = $('.modal-backdrop').css('z-index', function (i) {
       return 2990 + i * 20;
     });
 
-    var modals = $('.modal:visible');
+    let modals = $('.modal:visible');
     modals.each(function (i) {
-      var parent = this.parentNode;
+      let parent = this.parentNode;
       if (parent !== document.body) {
         modalBackdrops
           .eq(i)
@@ -413,10 +413,10 @@ import {
   }
 
   $.fn.modal.Constructor.prototype.show = function () {
-    var that = this;
-    var $el = this.$element;
-    var shownevents;
-    var keyevents;
+    let that = this;
+    let $el = this.$element;
+    let shownevents;
+    let keyevents;
     if (!(shownevents = $._data($el[0], 'events').shown) ||
       $(shownevents).filter(function () {
         return $.inArray('arrange', this.namespace.split('.')) > -1;
@@ -510,9 +510,9 @@ import {
   };
 
   $.fn.modal.Constructor.prototype.hide = function (ev) {
-    var modals;
-    var lastModal;
-    var animated;
+    let modals;
+    let lastModal;
+    let animated;
     // We already hid one
     if (ev && (ev.modalHidden)) {
       return;
@@ -561,14 +561,14 @@ import {
         '[data-toggle=modal-ajax-' + toggle + ']' :
           '[data-toggle=modal-ajax]',
         function (e) {
-          var $this = $(this);
-          var loadHref;
-          var modalId;
-          var target;
-          var $target;
-          var option;
-          var href;
-          var newTarget;
+          let $this = $(this);
+          let loadHref;
+          let modalId;
+          let target;
+          let $target;
+          let option;
+          let href;
+          let newTarget;
 
           if ($this.hasClass('disabled')) {
             return;

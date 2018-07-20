@@ -12,7 +12,7 @@ import template from './autocomplete.mustache';
   'use strict';
 
   // the component's configuration object (i.e. its constructor's prototype)
-  var component = {
+  let component = {
     tag: 'autocomplete',
 
     template: template,

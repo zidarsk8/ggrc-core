@@ -11,7 +11,7 @@ export default can.Component.extend({
     instance: {},
     deferredTo: {},
     openMapper: function () {
-      var data = {
+      let data = {
         join_object_type: this.attr('instance.type'),
         join_object_id: this.attr('instance.id'),
         type: this.attr('instance.assessment_type'),

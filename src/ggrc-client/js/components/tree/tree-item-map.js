@@ -8,7 +8,7 @@ import template from './templates/tree-item-map.mustache';
 (function (can, GGRC) {
   'use strict';
 
-  var viewModel = can.Map.extend({
+  let viewModel = can.Map.extend({
     define: {
       title: {
         type: String,
@@ -23,8 +23,8 @@ import template from './templates/tree-item-map.mustache';
       objectParams: {
         type: String,
         get: function () {
-          var instance = this.attr('instance');
-          var params = {
+          let instance = this.attr('instance');
+          let params = {
             section: {
               id: instance.id,
               title: instance.title,
@@ -47,8 +47,8 @@ import template from './templates/tree-item-map.mustache';
     viewModel: viewModel,
     events: {
       'a click': function (el, ev) {
-        var viewModel = this.viewModel;
-        var instance = viewModel.attr('instance');
+        let viewModel = this.viewModel;
+        let instance = viewModel.attr('instance');
 
         if (!viewModel.attr('disableLink')) {
           if (instance.attr('type') === 'Assessment') {

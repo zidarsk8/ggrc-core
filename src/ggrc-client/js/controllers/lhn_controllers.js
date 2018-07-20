@@ -13,7 +13,7 @@ can.Control('CMS.Controllers.LHN', {
   defaults: {}
 }, {
   init: function () {
-    var self = this
+    let self = this
         ;
 
     this.obs = new can.Observe();
@@ -29,7 +29,7 @@ can.Control('CMS.Controllers.LHN', {
     this.element.find('.lhs-holder').on('scroll', self.lhs_holder_onscroll);
   },
   is_lhn_open: function () {
-    var _is_open = this.options.display_prefs.getLHNState().is_open;
+    let _is_open = this.options.display_prefs.getLHNState().is_open;
 
     if (typeof _is_open === 'undefined') {
       return false;
@@ -38,7 +38,7 @@ can.Control('CMS.Controllers.LHN', {
     return _is_open;
   },
   'input.widgetsearch keypress': function (el, ev) {
-    var value;
+    let value;
     if (ev.which === 13) {
       ev.preventDefault();
 
@@ -50,13 +50,13 @@ can.Control('CMS.Controllers.LHN', {
   'submit': function (el, ev) {
     ev.preventDefault();
 
-    var value = $(ev.target).find('input.widgetsearch').val();
+    let value = $(ev.target).find('input.widgetsearch').val();
     this.do_search(value);
     this.toggle_filter_active();
   },
   toggle_filter_active: function () {
       // Set active state to search field if the input is not empty:
-    var $filter = this.element.find('.widgetsearch'),
+    let $filter = this.element.find('.widgetsearch'),
       $button = this.element.find('.widgetsearch-submit'),
       $off = this.element.find('.filter-off'),
       $search_title = this.element.find('.search-title'),
@@ -75,7 +75,7 @@ can.Control('CMS.Controllers.LHN', {
     this.toggle_filter_active();
   },
   "a[data-name='work_type'] click": function (el, ev) {
-    var target = $(ev.target),
+    let target = $(ev.target),
       checked;
 
     checked = target.data('value') === 'my_work';
@@ -86,7 +86,7 @@ can.Control('CMS.Controllers.LHN', {
   },
   toggle_lhn: function (ev) {
     ev && ev.preventDefault();
-    var is_open = this.is_lhn_open();
+    let is_open = this.is_lhn_open();
 
     if (is_open) {
       this.close_lhn();
@@ -102,7 +102,7 @@ can.Control('CMS.Controllers.LHN', {
       // not nested
     $('.lhn-trigger').removeClass('active');
 
-    var _width = this.options.display_prefs.getLHNavSize(null, null).lhs,
+    let _width = this.options.display_prefs.getLHNavSize(null, null).lhs,
       width = _width || this.element.find('.lhs-holder').width(),
       safety = 20;
 
@@ -113,7 +113,7 @@ can.Control('CMS.Controllers.LHN', {
     this.options.display_prefs.setLHNState({is_open: false});
   },
   open_lhn: function () {
-    var lhsCtr = $('#lhs').control();
+    let lhsCtr = $('#lhs').control();
     this.set_active_tab();
 
     // not nested
@@ -135,7 +135,7 @@ can.Control('CMS.Controllers.LHN', {
   set_active_tab: function (newval) {
     newval || (newval = this.obs.attr('my_work'));
 
-    var value = ['all', 'my_work'][Number(newval)];
+    let value = ['all', 'my_work'][Number(newval)];
     $("a[data-name='work_type']").removeClass('active');
     $("a[data-name='work_type'][data-value='" + value + "'").addClass('active');
     $('input.widgetsearch').attr('placeholder',
@@ -144,7 +144,7 @@ can.Control('CMS.Controllers.LHN', {
 
   init_lhn: function () {
     CMS.Models.DisplayPrefs.getSingleton().done(function (prefs) {
-      var $lhs = $('#lhs'),
+      let $lhs = $('#lhs'),
         lhn_search_dfd,
         my_work_tab = false;
 
@@ -167,7 +167,7 @@ can.Control('CMS.Controllers.LHN', {
 
         // Delay LHN initializations until after LHN is rendered
       lhn_search_dfd.then(function () {
-        var checked = this.obs.attr('my_work'),
+        let checked = this.obs.attr('my_work'),
           value = checked ? 'my_work' : 'all',
           target = this.element.find('#lhs input.my-work[value=' + value + ']');
 
@@ -206,7 +206,7 @@ can.Control('CMS.Controllers.LHN', {
   // requestAnimationFrame takes browser render optimizations into account
   // it ain't pretty, but it works
   initial_lhn_render: function () {
-    var self = this;
+    let self = this;
     if (!$('.lhs-holder').size() || !$('.lhn-trigger').size()) {
       window.requestAnimationFrame(this.initial_lhn_render.bind(this));
       return;
@@ -227,7 +227,7 @@ can.Control('CMS.Controllers.LHN', {
   hide_lhn: function () {
     // UI-revamp
     // Here we should hide the button ||| also
-    var $area = $('.area'),
+    let $area = $('.area'),
       $lhsHolder = $('.lhs-holder'),
       $bar = $('.bar-v'),
       $lhnTrigger = $('.lhn-trigger');
@@ -242,7 +242,7 @@ can.Control('CMS.Controllers.LHN', {
     window.resize_areas();
   },
   do_search: function (value) {
-    var $search_title = this.element.find('.search-title');
+    let $search_title = this.element.find('.search-title');
     value = $.trim(value);
     if (this._value === value) {
       return;
@@ -257,7 +257,7 @@ can.Control('CMS.Controllers.LHN', {
   resize_lhn: function (resize, no_trigger) {
     resize || (resize = this.options.display_prefs && this.options.display_prefs.getLHNavSize(null, null).lhs);
 
-    var max_width = window.innerWidth * .75,
+    let max_width = window.innerWidth * .75,
       default_size = 240;
 
     if (resize < default_size) {
@@ -276,7 +276,7 @@ can.Control('CMS.Controllers.LHN', {
     }
   },
   '.bar-v mousedown': function (el, ev) {
-    var $target = $(ev.target);
+    let $target = $(ev.target);
     this.mousedown = true;
     this.dragged = false;
   },
@@ -301,16 +301,16 @@ can.Control('CMS.Controllers.LHN', {
     this.resize_lhn(null, true); // takes care of height and min/max width
   },
   '{window} mousedown': function (el, event) {
-    var x = event.pageX,
+    let x = event.pageX,
       y = event.pageY;
 
     if (x === undefined || y === undefined) {
       return;
     }
 
-    var on_lhn = ['.lhn-trigger:visible', '.lhs-holder:visible']
+    let on_lhn = ['.lhn-trigger:visible', '.lhs-holder:visible']
             .reduce(function (yes, selector) {
-              var $selector = $(selector),
+              let $selector = $(selector),
                 bounds;
 
               if (!$selector.length) {
@@ -376,7 +376,7 @@ can.Control('CMS.Controllers.LHN_Search', {
   }
 }, {
   display: function () {
-    var self = this,
+    let self = this,
       prefs = this.options.display_prefs,
       prefs_dfd,
       template_path = GGRC.mustache_path + this.element.data('template');
@@ -388,7 +388,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       //  We also listen for this value in the controller
       //  to trigger the search.
     return can.view(template_path, prefs_dfd.then(function (prefs) { return prefs.getLHNState(); })).then(function (frag, xhr) {
-      var lhn_prefs = prefs.getLHNState(),
+      let lhn_prefs = prefs.getLHNState(),
         initial_term,
         initial_params = {},
         saved_filters = prefs.getLHNState().filter_params;
@@ -419,7 +419,7 @@ can.Control('CMS.Controllers.LHN_Search', {
         //  sent to the search service.
 
       if (lhn_prefs.open_category) {
-        var selector = self.options.list_selector
+        let selector = self.options.list_selector
                   .split(',')
                   .map(function (s) {
                     return s + ' > a[data-object-singular=' + lhn_prefs.open_category + ']';
@@ -433,8 +433,8 @@ can.Control('CMS.Controllers.LHN_Search', {
     });
   },
   post_init: function () {
-    var lhnCtr = $('#lhn').control();
-    var refreshCounts = _.debounce(this.refresh_counts.bind(this), 1000, {
+    let lhnCtr = $('#lhn').control();
+    let refreshCounts = _.debounce(this.refresh_counts.bind(this), 1000, {
       leading: true,
       trailing: false
     });
@@ -443,8 +443,8 @@ can.Control('CMS.Controllers.LHN_Search', {
     this.init_list_views();
 
     can.Model.Cacheable.bind('created', function (ev, instance) {
-      var modelNames;
-      var modelName;
+      let modelNames;
+      let modelName;
 
       if (instance instanceof can.Model.Join) {
           // Don't refresh LHN counts when joins are created
@@ -471,7 +471,7 @@ can.Control('CMS.Controllers.LHN_Search', {
     this.toggle_list_visibility(el);
   },
   ensure_parent_open: function (el) {
-    var $toggle = el.parents(this.options.list_mid_level_selector).parents('li').find('a.list-toggle.top'),
+    let $toggle = el.parents(this.options.list_mid_level_selector).parents('li').find('a.list-toggle.top'),
       $ul = $toggle.parent('li').find(this.options.list_mid_level_selector);
 
     if ($toggle.size() && !$toggle.hasClass('active')) {
@@ -479,7 +479,7 @@ can.Control('CMS.Controllers.LHN_Search', {
     }
   },
   toggle_list_visibility: function (el, dont_update_prefs) {
-    var sub_selector = this.options.list_content_selector + ',' + this.options.actions_content_selector,
+    let sub_selector = this.options.list_content_selector + ',' + this.options.actions_content_selector,
       mid_selector = this.options.list_mid_level_selector,
       $parent = el.parent('li'),
       selector;
@@ -490,7 +490,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       selector = sub_selector;
     }
 
-    var $ul = $parent.find(selector);
+    let $ul = $parent.find(selector);
 
       // Needed because the `list_selector` selector matches the Recently Viewed
       // list, which will cause errors
@@ -506,7 +506,7 @@ can.Control('CMS.Controllers.LHN_Search', {
   },
   open_list: function (el, $ul, selector, dont_update_prefs) {
       // Use a cached max-height if one exists
-    var holder = el.closest('.lhs-holder'),
+    let holder = el.closest('.lhs-holder'),
       $content = $ul.filter([this.options.list_content_selector,
                                this.options.list_mid_level_selector].join(',')),
       $siblings = selector ? $ul.closest('.lhs').find(selector) : $(false),
@@ -514,7 +514,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       top;
 
       // Collapse other lists
-    var $mids = $ul.closest('.lhs').find(this.options.list_mid_level_selector)
+    let $mids = $ul.closest('.lhs').find(this.options.list_mid_level_selector)
                     .not(el.parents(this.options.list_mid_level_selector))
                     .not(el.parent().find(this.options.list_mid_level_selector)),
       $non_children = $ul.closest('.lhs')
@@ -535,7 +535,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       // Remove active classes from others
       // remove all except current element or children
       // this works because open_list is called twice if we ensure parent is open
-    var $others = $ul.closest('.lhs').find(this.options.list_selector)
+    let $others = $ul.closest('.lhs').find(this.options.list_selector)
               .find('a.active')
               .not(el)
               .filter(function (i, el) {
@@ -550,7 +550,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       // based on the size of the content that is sliding away.
     top = $content.offset().top;
     $siblings.filter(':visible').each(function () {
-      var sibling_top = $(this).offset().top;
+      let sibling_top = $(this).offset().top;
       if (sibling_top <= top) {
         extra_height += this.offsetHeight + (sibling_top < 0 ? -holder[0].scrollTop : 0);
       }
@@ -585,11 +585,11 @@ can.Control('CMS.Controllers.LHN_Search', {
     }
   },
   ' resize': function () {
-    var $content = this.element.find([this.options.list_content_selector].join(',')).filter(':visible');
+    let $content = this.element.find([this.options.list_content_selector].join(',')).filter(':visible');
 
 
     if ($content.length) {
-      var last_height = this._holder_height,
+      let last_height = this._holder_height,
         holder = this.element.closest('.lhs-holder');
       this._holder_height = holder.outerHeight();
 
@@ -602,7 +602,7 @@ can.Control('CMS.Controllers.LHN_Search', {
     }
   },
   on_show_list: function (el, ev) {
-    var $list = $(el).closest(this.get_lists()),
+    let $list = $(el).closest(this.get_lists()),
       model_name = this.get_list_model($list),
       that = this;
     let stopFn = tracker.start(
@@ -626,7 +626,7 @@ can.Control('CMS.Controllers.LHN_Search', {
     if (this._show_more_pending)
       return;
 
-    var that = this,
+    let that = this,
       $list = $el.closest(this.get_lists()),
       model_name = this.get_list_model($list),
       visible_list = this.options.visible_lists[model_name],
@@ -660,14 +660,14 @@ can.Control('CMS.Controllers.LHN_Search', {
   },
 
   init_object_lists: function () {
-    var self = this;
+    let self = this;
     if (!this.options.results_lists)
       this.options.results_lists = {};
     if (!this.options.visible_lists)
       this.options.visible_lists = {};
 
     can.each(this.get_lists(), function ($list) {
-      var model_name;
+      let model_name;
       $list = $($list);
       model_name = self.get_list_model($list);
       self.options.results_lists[model_name] = new can.Observe.List();
@@ -676,14 +676,14 @@ can.Control('CMS.Controllers.LHN_Search', {
     });
   },
   init_list_views: function () {
-    var self = this;
+    let self = this;
 
     can.each(this.get_lists(), function ($list) {
-      var model_name;
+      let model_name;
       $list = $($list);
       model_name = self.get_list_model($list);
 
-      var context = {
+      let context = {
         model: CMS.Models[model_name],
         filter_params: self.options.filter_params,
         list: self.options.visible_lists[model_name],
@@ -728,7 +728,7 @@ can.Control('CMS.Controllers.LHN_Search', {
     if (!$list.attr(this.options.model_extra_attr)) {
       return null;
     }
-    var model = $list.attr(this.options.model_attr),
+    let model = $list.attr(this.options.model_attr),
       extra = $list.attr(this.options.model_extra_attr).split(',');
 
     extra = $.map(extra, function (e) {
@@ -737,7 +737,7 @@ can.Control('CMS.Controllers.LHN_Search', {
     return extra;
   },
   display_counts: function (search_result) {
-    var self = this;
+    let self = this;
 
       // Remove all current counts
     self.options.counts.each(function (val, key) {
@@ -747,7 +747,7 @@ can.Control('CMS.Controllers.LHN_Search', {
     self.options.counts.attr(search_result.counts);
 
     can.each(this.get_lists(), function ($list) {
-      var model_name, count;
+      let model_name, count;
       $list = $($list);
       model_name = self.get_list_model($list, true);
       if (model_name) {
@@ -763,12 +763,12 @@ can.Control('CMS.Controllers.LHN_Search', {
     });
   },
   display_lists: function (search_result) {
-    var self = this,
+    let self = this,
       lists = this.get_visible_lists(),
       dfds = [];
 
     can.each(lists, function (list) {
-      var dfd,
+      let dfd,
         $list = $(list),
         model_name = self.get_list_model($list),
         results = search_result.getResultsForType(model_name),
@@ -802,9 +802,9 @@ can.Control('CMS.Controllers.LHN_Search', {
   },
 
   refresh_counts: function () {
-    var search_id = this.search_id;
-    var models;
-    var extraModels;
+    let search_id = this.search_id;
+    let models;
+    let extraModels;
 
     if (!$('.lhn-trigger').hasClass('active')) {
       this.options._hasPendingRefresh = true;
@@ -828,10 +828,10 @@ can.Control('CMS.Controllers.LHN_Search', {
   },
 
   refresh_visible_lists: function () {
-    var self = this;
-    var search_id = this.search_id;
-    var lists = this.get_visible_lists();
-    var models = can.map(lists, this.proxy('get_list_model'));
+    let self = this;
+    let search_id = this.search_id;
+    let lists = this.get_visible_lists();
+    let models = can.map(lists, this.proxy('get_list_model'));
 
     if (!$('.lhn-trigger').hasClass('active')) {
       this.options._hasPendingRefresh = true;
@@ -893,7 +893,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       this.options.display_prefs.setLHNState('filter_params',
           this.options.filter_params);
       this.options.filter_params.each(function (obj, type) {
-        var properties_list = [];
+        let properties_list = [];
         obj.each(function (v, k) {
           properties_list.push(k + '=' + v);
         });
@@ -915,7 +915,7 @@ can.Control('CMS.Controllers.LHN_Search', {
           this.element.find(this.options.list_selector));
   },
   get_visible_lists: function () {
-    var self = this;
+    let self = this;
     return can.map(this.get_lists(), function ($list) {
       $list = $($list);
       if ($list.find([self.options.list_content_selector,
@@ -925,7 +925,7 @@ can.Control('CMS.Controllers.LHN_Search', {
   },
 
   '.filters a click': function (el, ev) {
-    var term = this.options.display_prefs.getLHNState().search_text || '',
+    let term = this.options.display_prefs.getLHNState().search_text || '',
       param = {},
       key = el.data('key'),
       value = el.data('value'),
@@ -956,19 +956,19 @@ can.Control('GGRC.Controllers.RecentlyViewed', {
   }
 }, {
   init: function () {
-    var page_model = getPageInstance();
-    var instance_list = [];
-    var that = this;
+    let page_model = getPageInstance();
+    let instance_list = [];
+    let that = this;
 
     RecentlyViewedObject.findAll().done(function (objs) {
-      var max_history = that.options.max_history;
+      let max_history = that.options.max_history;
       if (page_model) {
         instance_list.push(new RecentlyViewedObject(page_model));
         instance_list[0].save();
         max_history--;
       }
 
-      for (var i = objs.length - 1; i >= 0; i--) {
+      for (let i = objs.length - 1; i >= 0; i--) {
         if ((page_model && page_model.viewLink === objs[i].viewLink)
             || objs.length - i > max_history || !('viewLink' in objs[i])
           ) {
