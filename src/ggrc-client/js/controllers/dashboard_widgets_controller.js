@@ -77,8 +77,8 @@ export default Filterable({
 
     this.element.html(frag[0]);
 
-    let content = this.element,
-      controller_content = null;
+    let content = this.element;
+    let controller_content = null;
 
     if (prefs.getCollapsed(window.getPageToken(), this.element.attr('id'))) {
 

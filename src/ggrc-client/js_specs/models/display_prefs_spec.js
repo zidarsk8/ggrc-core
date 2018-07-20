@@ -10,7 +10,8 @@ import {
 
 describe('display prefs model', function () {
 
-  let display_prefs, exp;
+  let display_prefs;
+  let exp;
   beforeAll(function () {
     display_prefs = makeFakeInstance({model: CMS.Models.DisplayPrefs})();
     exp = CMS.Models.DisplayPrefs.exports;
@@ -233,7 +234,9 @@ describe('display prefs model', function () {
   });
 
   describe('#findAll', function () {
-    let dp_noversion, dp2_outdated, dp3_current;
+    let dp_noversion;
+    let dp2_outdated;
+    let dp3_current;
     beforeEach(function () {
       const instanceCreator = makeFakeInstance({
         model: CMS.Models.DisplayPrefs
@@ -272,7 +275,9 @@ describe('display prefs model', function () {
   });
 
   describe('#findOne', function () {
-    let dp_noversion, dp2_outdated, dp3_current;
+    let dp_noversion;
+    let dp2_outdated;
+    let dp3_current;
     beforeEach(function () {
       dp_noversion = new CMS.Models.DisplayPrefs({});
       dp2_outdated = new CMS.Models.DisplayPrefs({ version: 1});
