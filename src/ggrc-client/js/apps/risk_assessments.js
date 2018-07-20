@@ -73,7 +73,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
     });
     if (page_instance && ~can.inArray(page_instance.constructor.shortName, _risk_assessments_object_types)) {
       descriptor[page_instance.constructor.shortName] = {
-        risk_assessments: {
+        RiskAssessment: {
           widget_id: 'risk_assessments',
           widget_name: 'Risk Assessments',
           widgetType: 'treeview',
