@@ -348,7 +348,7 @@ class TestUserGenerator(TestCase):
         self._check_csv_response(response, {})
         self.assertEqual(
             len(assessment_template.default_people['assignees']), 1)
-        if len(verifier_email) > 2:
+        if verifier_email and verifier_email != '--':
           self.assertEqual(
               len(assessment_template.default_people['verifiers']), 1)
         else:
@@ -374,7 +374,8 @@ class TestUserGenerator(TestCase):
   @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
   @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
   @freeze_time("2018-05-30 02:22:11")
-  def test_import_template_update(self):
+  @ddt.data('--', '')
+  def test_import_template_update(self, verifier_update_email):
     """Test for template update via import."""
     with mock.patch.multiple(
         PersonClient,
@@ -401,7 +402,7 @@ class TestUserGenerator(TestCase):
           ('Code*', slug),
           ('Audit*', audit.slug),
           ('Default Assignees', 'aturing2@example.com'),
-          ('Default Verifiers', '--'),
+          ('Default Verifiers', verifier_update_email),
           ('Title', 'Title'),
           ('Object Under Assessment', 'Control'),
       ]))
@@ -410,7 +411,10 @@ class TestUserGenerator(TestCase):
       self._check_csv_response(response, {})
       self.assertNotEqual(updated_template.default_people['assignees'],
                           imported_template.default_people['assignees'])
-      self.assertEqual(updated_template.default_people['verifiers'], None)
+      if not verifier_update_email:
+        self.assertEqual(len(updated_template.default_people['verifiers']), 1)
+      if verifier_update_email == "--":
+        self.assertEqual(updated_template.default_people['verifiers'], None)
 
   @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
   @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
