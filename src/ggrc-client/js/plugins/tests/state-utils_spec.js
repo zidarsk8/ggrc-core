@@ -144,11 +144,26 @@ describe('StateUtils', function () {
 
       spyOn(CurrentPageUtils, 'isMyAssessments')
         .and.returnValue(true);
+      spyOn(CurrentPageUtils, 'isMyWork')
+        .and.returnValue(false);
 
       defaultStates = StateUtils.getDefaultStatesForModel('Assessment');
 
-      expect(defaultStates.length).toEqual(2);
-      expect(defaultStates[0]).toEqual('Not Started');
+      expect(defaultStates).toEqual(['Not Started', 'In Progress']);
+    });
+
+    it('get default states for "My Tasks" page', function () {
+      let defaultStates;
+
+      spyOn(CurrentPageUtils, 'isMyAssessments')
+        .and.returnValue(false);
+      spyOn(CurrentPageUtils, 'isMyWork')
+        .and.returnValue(true);
+
+      defaultStates = StateUtils
+        .getDefaultStatesForModel('CycleTaskGroupObjectTask');
+
+      expect(defaultStates).toEqual(['Assigned', 'In Progress']);
     });
 
     it('get default states for "Control" type', function () {
@@ -156,11 +171,12 @@ describe('StateUtils', function () {
 
       spyOn(CurrentPageUtils, 'isMyAssessments')
         .and.returnValue(false);
+      spyOn(CurrentPageUtils, 'isMyWork')
+        .and.returnValue(false);
 
       defaultStates = StateUtils.getDefaultStatesForModel('Control');
 
-      expect(defaultStates.length).toEqual(3);
-      expect(defaultStates[0]).toEqual('Active');
+      expect(defaultStates).toEqual(['Active', 'Draft', 'Deprecated']);
     });
   });
 
