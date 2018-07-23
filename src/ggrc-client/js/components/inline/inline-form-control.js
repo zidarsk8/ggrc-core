@@ -5,24 +5,20 @@
 
 import {notifierXHR} from '../../plugins/utils/notifiers-utils';
 
-(function (can) {
-  'use strict';
+export default can.Component.extend({
+  tag: 'inline-form-control',
+  viewModel: {
+    deferredSave: null,
+    instance: null,
 
-  GGRC.Components('inlineFormControl', {
-    tag: 'inline-form-control',
-    viewModel: {
-      deferredSave: null,
-      instance: null,
+    saveInlineForm: function (args) {
+      let self = this;
 
-      saveInlineForm: function (args) {
-        let self = this;
-
-        this.attr('deferredSave').push(function () {
-          self.attr('instance.' + args.propName, args.value);
-        }).fail(function (instance, xhr) {
-          notifierXHR('error')(xhr);
-        });
-      },
+      this.attr('deferredSave').push(function () {
+        self.attr('instance.' + args.propName, args.value);
+      }).fail(function (instance, xhr) {
+        notifierXHR('error')(xhr);
+      });
     },
-  });
-})(window.can);
+  },
+});
