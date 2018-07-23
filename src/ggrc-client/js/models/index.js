@@ -8,7 +8,6 @@ import './save_queue';
 import './models-extensions';
 
 import './business-models';
-import './custom-attributes';
 import './custom-roles';
 import './join-models';
 import './service-models';
