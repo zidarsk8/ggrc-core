@@ -19,7 +19,6 @@ import './tree-filter-input';
 import './tree-status-filter';
 import './tree-item-status-for-workflow';
 import './tree-no-results';
-import './tree-assignee-field';
 import './tree-field';
 import './tree-people-with-role-list-field';
 import '../advanced-search/advanced-search-filter-container';
