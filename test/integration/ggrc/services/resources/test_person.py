@@ -100,21 +100,24 @@ class TestPersonResource(TestCase, WithQueryApi):
                                     response,
                                     correct_response,
                                     user,
-                                    new_date):
+                                    expected):
     """Verify assertions for successful PUT profile method"""
     self.assert200(response)
     self.assertEqual(response.json, correct_response)
     profile = PersonProfile.query.filter_by(person_id=user.id).first()
-    self.assertEqual(profile.last_seen_whats_new, date_parser.parse(new_date))
+    self.assertEqual(profile.last_seen_whats_new, date_parser.parse(expected))
 
-  def test_profile_put_successful(self):
+  @ddt.data(
+      ["2018-05-20 16:38:17", "2018-05-20 16:38:17"],
+      ["2018-07-05T14:11:31Z", "2018-07-05T14:11:31"])
+  @ddt.unpack
+  def test_profile_put_successful(self, new_date, expected_date):
     """Test person_profile PUT method for setting data and correct response"""
     with factories.single_commit():
       user = factories.PersonFactory()
       self._create_users_names_rbac([user])
     self.api.set_user(person=user)
 
-    new_date = "2018-05-20 16:38:17"
     data = {"last_seen_whats_new": new_date}
     correct_response = {"Person": {"id": user.id, "profile": data}}
     response = self.api.client.put("/api/people/{}/profile".format(user.id),
@@ -124,7 +127,7 @@ class TestPersonResource(TestCase, WithQueryApi):
     self.assert_profile_put_successful(response,
                                        correct_response,
                                        user,
-                                       new_date)
+                                       expected_date)
 
   def test_profile_put_no_profile(self):
     """Test person_profile PUT method for setting data for missing profile"""
