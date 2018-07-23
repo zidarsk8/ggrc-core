@@ -47,6 +47,7 @@ import {
   notifierXHR,
 } from '../../plugins/utils/notifiers-utils';
 import Relationship from '../../models/join-models/relationship';
+import DisplayPrefs from '../../models/local-storage/display-prefs';
 
 export default can.Control({
   pluginName: 'ggrc_controllers_modals',
@@ -121,7 +122,7 @@ export default can.Control({
     if (content) {
       this.element.html(content);
     }
-    CMS.Models.DisplayPrefs.getSingleton().then((displayPrefs) => {
+    DisplayPrefs.getSingleton().then((displayPrefs) => {
       if (this.wasDestroyed()) {
         return;
       }

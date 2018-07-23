@@ -11,5 +11,4 @@ import './business-models';
 import './custom-attributes';
 import './custom-roles';
 import './join-models';
-import './local-storage';
 import './service-models';
