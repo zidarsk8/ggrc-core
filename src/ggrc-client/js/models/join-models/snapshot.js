@@ -17,7 +17,7 @@ export default Join('CMS.Models.Snapshot', {
   },
   join_keys: {
     parent: Cacheable,
-    revision: can.Model.Revision,
+    revision: Revision,
   },
   defaults: {
     parent: null,
