@@ -40,14 +40,6 @@ import Role from '../models/service-models/role';
         access_group: CMS.Models.AccessGroup,
         market: CMS.Models.Market,
         metric: CMS.Models.Metric,
-        system_or_process: {
-          _discriminator: function (data) {
-            if (data.is_biz_process) {
-              return CMS.Models.Process;
-            }
-            return CMS.Models.System;
-          },
-        },
         system: CMS.Models.System,
         process: CMS.Models.Process,
         control: CMS.Models.Control,

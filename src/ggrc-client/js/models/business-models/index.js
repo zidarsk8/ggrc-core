@@ -36,7 +36,6 @@ import './risk-assessment';
 import './requirement';
 import './standard';
 import './system';
-import './system-or-process';
 import './task-group';
 import './task-group-task';
 import './technology-environment';
