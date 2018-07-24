@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+function cacheCurrentUser() {
+  CMS.Models.Person.model(GGRC.current_user);
+}
+
 let profilePromise;
 
 function loadUserProfile() {
@@ -37,6 +41,7 @@ function updateUserProfile(profile) {
 }
 
 export {
+  cacheCurrentUser,
   loadUserProfile,
   updateUserProfile,
 };

@@ -272,10 +272,6 @@ function _getCurrentUser() {
   return CMS.Models.Person.findInCacheById(userId);
 }
 
-function cacheCurrentUser() {
-  CMS.Models.Person.model(GGRC.current_user);
-}
-
 function initWidgets() {
   // Ensure each extension has had a chance to initialize widgets
   can.each(GGRC.extensions, function (extension) {
@@ -337,7 +333,6 @@ export {
   initWidgetCounts as initCounts,
   refreshCounts,
   initWidgets,
-  cacheCurrentUser,
   navigate,
   delayLeavingPageUntil,
 };
