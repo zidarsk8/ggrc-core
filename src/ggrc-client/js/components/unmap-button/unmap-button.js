@@ -4,6 +4,7 @@
  */
 
 import {DESTINATION_UNMAPPED} from '../../events/eventTypes';
+import Relationship from '../../models/join-models/relationship';
 
 const defaultType = 'Relationship';
 
@@ -53,7 +54,7 @@ export default can.Component.extend({
       let sources;
       let mapping;
       if (type === defaultType) {
-        return CMS.Models.Relationship.findRelationship(
+        return Relationship.findRelationship(
           this.source, this.destination);
       } else {
         destinations = this.attr('destination')

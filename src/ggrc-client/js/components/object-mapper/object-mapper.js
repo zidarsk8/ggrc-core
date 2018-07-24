@@ -35,6 +35,7 @@ import {
   allowedToMap,
 } from '../../plugins/ggrc_utils';
 import Mappings from '../../models/mappers/mappings';
+import Relationship from '../../models/join-models/relationship';
 
 (function (can, $) {
   'use strict';
@@ -291,7 +292,7 @@ import Mappings from '../../models/mappers/mappings';
             let isPersonMapping = type === 'Person';
             // Use simple Relationship Model to map Snapshot
             if (this.viewModel.attr('useSnapshots')) {
-              modelInstance = new CMS.Models.Relationship({
+              modelInstance = new Relationship({
                 context: data.context,
                 source: instance,
                 destination: {

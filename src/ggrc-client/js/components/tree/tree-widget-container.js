@@ -49,6 +49,7 @@ import router from '../../router';
 import Permission from '../../permission';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import Cacheable from '../../models/cacheable';
+import Relationship from '../../models/join-models/relationship';
 
 let viewModel;
 
@@ -391,7 +392,7 @@ viewModel = can.Map.extend({
   _isRefreshNeeded(instance) {
     let needToRefresh = true;
 
-    if (instance instanceof CMS.Models.Relationship) {
+    if (instance instanceof Relationship) {
       needToRefresh = this._needToRefreshAfterRelRemove(instance);
     }
 
@@ -454,7 +455,7 @@ viewModel = can.Map.extend({
     }
 
     function _verifyRelationship(instance, shortName, parentInstance) {
-      if (!(instance instanceof CMS.Models.Relationship)) {
+      if (!(instance instanceof Relationship)) {
         return false;
       }
 

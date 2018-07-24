@@ -46,6 +46,7 @@ import {
   notifier,
   notifierXHR,
 } from '../../plugins/utils/notifiers-utils';
+import Relationship from '../../models/join-models/relationship';
 
 export default can.Control({
   pluginName: 'ggrc_controllers_modals',
@@ -1055,7 +1056,7 @@ export default can.Control({
         params = that.options.object_params;
         if (obj instanceof CMS.Models.Objective &&
           params && params.section) {
-          new CMS.Models.Relationship({
+          new Relationship({
             source: obj,
             destination: CMS.Models.Requirement
               .findInCacheById(params.section.id),

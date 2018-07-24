@@ -3,6 +3,8 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import Relationship from '../models/join-models/relationship';
+
 (function (can, $) {
   can.Control('GGRC.Controllers.PbcWorkflows', {}, {
     '{CMS.Models.AssessmentTemplate} updated': function (model, ev, instance) {
@@ -55,7 +57,7 @@
       if (!context) {
         context = source.context;
       }
-      return new CMS.Models.Relationship({
+      return new Relationship({
         source: source.stub(),
         destination: destination,
         context: context,

@@ -16,6 +16,7 @@ import {
   DESTINATION_UNMAPPED,
 } from '../../events/eventTypes';
 import pubsub from '../../pub-sub';
+import Relationship from '../../models/join-models/relationship';
 
 (function (can, $, _, GGRC) {
   'use strict';
@@ -142,7 +143,7 @@ import pubsub from '../../pub-sub';
         return document.save();
       },
       createRelationship: function (document) {
-        let relationship = new CMS.Models.Relationship({
+        let relationship = new Relationship({
           source: this.instance,
           destination: document,
           context: this.instance.context ||
@@ -172,7 +173,7 @@ import pubsub from '../../pub-sub';
       removeRelatedDocument: async function (document) {
         let self = this;
         let documents;
-        let relationship = await CMS.Models.Relationship.findRelationship(
+        let relationship = await Relationship.findRelationship(
           document, this.instance);
         if (!relationship.id) {
           console.log('Unable to find relationship');
