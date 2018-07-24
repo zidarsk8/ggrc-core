@@ -14,13 +14,11 @@
 
       saveInlineForm: function (args) {
         let self = this;
-        let oldValue = this.attr('instance.' + args.propName);
 
         this.attr('deferredSave').push(function () {
           self.attr('instance.' + args.propName, args.value);
-        }).fail(function () {
-          self.attr('instance.' + args.propName, oldValue);
-          GGRC.Errors.notifier('error', 'Unable to save changes.');
+        }).fail(function (instance, xhr) {
+          GGRC.Errors.notifierXHR('error')(xhr);
         });
       },
     },
