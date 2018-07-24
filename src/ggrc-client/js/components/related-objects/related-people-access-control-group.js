@@ -39,7 +39,6 @@ export default can.Component.extend({
     groupId: '@',
     title: '@',
     people: [],
-    editableMode: false,
     isDirty: false,
     required: false,
     backUpPeople: [],
@@ -50,17 +49,13 @@ export default can.Component.extend({
 
     changeEditableGroup: function (args) {
       if (args.editableMode) {
-        this.attr('editableMode', true);
         this.attr('backUpPeople', this.attr('people').attr());
       } else {
-        this.attr('editableMode', false);
         this.attr('isDirty', false);
         this.attr('people', this.attr('backUpPeople').attr());
       }
     },
     saveChanges: function () {
-      this.attr('editableMode', false);
-
       if (this.attr('isDirty')) {
         this.attr('isDirty', false);
         this.dispatch({
