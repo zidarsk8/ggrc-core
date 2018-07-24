@@ -6,13 +6,9 @@
 import {DESTINATION_UNMAPPED} from '../../events/eventTypes';
 import Relationship from '../../models/join-models/relationship';
 
-const defaultType = 'Relationship';
-
 export default can.Component.extend({
   tag: 'unmap-button',
   viewModel: {
-    mappingType: '@',
-    objectProp: '@',
     destination: {},
     source: {},
     isUnmapping: false,
@@ -49,28 +45,8 @@ export default can.Component.extend({
       return true;
     },
     getMapping: function () {
-      let type = this.attr('mappingType') || defaultType;
-      let destinations;
-      let sources;
-      let mapping;
-      if (type === defaultType) {
-        return Relationship.findRelationship(
-          this.source, this.destination);
-      } else {
-        destinations = this.attr('destination')
-          .attr(this.attr('objectProp')) || [];
-        sources = this.attr('source')
-          .attr(this.attr('objectProp')) || [];
-      }
-      sources = sources
-        .map(function (item) {
-          return item.id;
-        });
-      mapping = destinations
-        .filter(function (dest) {
-          return sources.indexOf(dest.id) > -1;
-        })[0];
-      return new CMS.Models[type](mapping || {}).refresh();
+      return Relationship.findRelationship(
+        this.source, this.destination);
     },
   },
   events: {
