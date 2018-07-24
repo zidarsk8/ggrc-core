@@ -26,7 +26,7 @@
             return this._create_relationship(instance, item);
           }.bind(this)) :
           [];
-        instance.delay_resolving_save_until($.when.apply($, dfd));
+        instance.delay_resolving_save_until($.when(...dfd));
       }.bind(this));
     },
     '{CMS.Models.Requirement} created': function (model, ev, instance) {

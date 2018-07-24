@@ -335,7 +335,7 @@ can.Control('CMS.Controllers.LHN', {
   },
   destroy: function () {
     this.element.find('.lhs-holder').off('scroll', self.lhs_holder_onscroll);
-    this._super && this._super.apply(this, arguments);
+    this._super && this._super(...arguments);
   },
   '.lhn-pin click': function (element, event) {
     if (this.options.display_prefs.getLHNState().is_pinned) {
@@ -652,7 +652,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       refresh_queue.enqueue(item);
     });
     refresh_queue.trigger().then(function (newItems) {
-      visible_list.push.apply(visible_list, newItems);
+      visible_list.push(...newItems);
       visible_list.attr('is_loading', false);
       delete that._show_more_pending;
     }).done(stopFn);
@@ -799,7 +799,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       dfds.push(dfd);
     });
 
-    return $.when.apply($, dfds);
+    return $.when(...dfds);
   },
 
   refresh_counts: function () {
@@ -823,7 +823,7 @@ can.Control('CMS.Controllers.LHN_Search', {
         this.current_term, models, this.current_params, extraModels
       ).then(function () {
         if (this.search_id === search_id) {
-          return this.display_counts.apply(this, arguments);
+          return this.display_counts(...arguments);
         }
       }.bind(this));
   },
@@ -854,7 +854,7 @@ can.Control('CMS.Controllers.LHN_Search', {
           this.current_term, models, this.current_params
         ).then(function () {
           if (self.search_id === search_id) {
-            return self.display_lists.apply(self, arguments);
+            return self.display_lists(...arguments);
           }
         });
     } else {

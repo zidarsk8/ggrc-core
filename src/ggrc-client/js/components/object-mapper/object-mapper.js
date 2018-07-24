@@ -159,7 +159,7 @@ import Mappings from '../../models/mappers/mappings';
         onSubmit: function () {
           this.updateFreezedConfigToLatest();
           // calls base version
-          this._super.apply(this, arguments);
+          this._super(...arguments);
         },
       });
     },
@@ -324,7 +324,7 @@ import Mappings from '../../models/mappers/mappings';
             }));
           });
 
-          $.when.apply($, defer)
+          $.when(...defer)
             .fail((response, message) => {
               $('body').trigger('ajax:flash', {error: message});
             })

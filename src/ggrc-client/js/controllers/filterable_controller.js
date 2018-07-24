@@ -32,7 +32,7 @@ export default can.Control({
       $(spinner.el).css(this.options.spinner_style);
       this.element.append(spinner.el);
     }
-    return $.when.apply($, search_dfds).then(function (data) {
+    return $.when(...search_dfds).then(function (data) {
       let _filter = null;
       let ids = null;
       if (data) {

@@ -163,7 +163,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
         },
       };
 
-      $.extend.apply($, [true, descriptor].concat(extenders || []));
+      $.extend(...([true, descriptor].concat(extenders || [])));
 
       return new this(
         instance.constructor.shortName + ':' +
@@ -189,7 +189,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
         return GGRC.widget_descriptors[id];
       }
 
-      ret = this._super.apply(this, arguments);
+      ret = this._super(...arguments);
       $.extend(ret, opts);
       GGRC.widget_descriptors[id] = ret;
       return ret;

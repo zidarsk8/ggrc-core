@@ -637,7 +637,7 @@ import Permission from '../../permission';
         $(this.element).sortable({element: 'li.tree-item', handle: '.drag'});
       }
       this.options.attr('filteredList', filteredItems);
-      res = $.when.apply($, drawItemsDfds);
+      res = $.when(...drawItemsDfds);
 
       res.then(function () {
         _.defer(this.draw_visible.bind(this));

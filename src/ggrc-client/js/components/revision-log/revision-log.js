@@ -240,7 +240,7 @@ import {
           .map(fetchRevisions)
           .flatten()
           .value();
-        return $.when.apply($, dfds).then(function () {
+        return $.when(...dfds).then(function () {
           return _.filter(_.flatten(arguments), function (revision) {
             // revisions where source == destination will be introduced when
             // spoofing the obj <-> instance mapping
