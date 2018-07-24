@@ -560,11 +560,11 @@ class TestGetObjectColumnDefinitions(TestCase):
     }
     self._test_single_object(models.Clause, names, self.COMMON_EXPECTED)
 
-  def test_section_definitions(self):
-    """Test default headers for Section."""
+  def test_requirement_definitions(self):
+    """Test default headers for Requirement."""
     names = {
         "Title",
-        "Text of Section",
+        "Text of Requirement",
         "Notes",
         "Policy / Regulation / Standard / Contract",
         "Admin",
@@ -585,7 +585,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Deprecated Date",
         "Effective Date",
     }
-    self._test_single_object(models.Section, names, self.COMMON_EXPECTED)
+    self._test_single_object(models.Requirement, names, self.COMMON_EXPECTED)
 
   def test_control_definitions(self):
     """Test default headers for Control."""
