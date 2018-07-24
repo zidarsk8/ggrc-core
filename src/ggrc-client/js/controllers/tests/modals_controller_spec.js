@@ -3,11 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import DisplayPrefs from '../../models/local-storage/display-prefs';
 import ModalsController from '../modals/modals_controller';
 
 describe('ModalsController', function () {
-  'use strict';
-
   let Ctrl;  // the controller under test
 
   beforeAll(function () {
@@ -96,28 +95,6 @@ describe('ModalsController', function () {
         expect(ctrlInst.after_preload).toHaveBeenCalled();
       }
     );
-
-    it('does not call after_preload if there is no element for modal', () => {
-      let userId = GGRC.current_user.id;
-      let dfdRefresh = new can.Deferred();
-      let fetchedUser = new can.Map({id: userId, email: 'john@doe.com'});
-
-      let partialUser = new can.Map({
-        id: userId,
-        email: '',
-        refresh: jasmine.createSpy().and.returnValue(dfdRefresh.promise()),
-      });
-
-      spyOn(partialUser, 'reify').and.returnValue(partialUser);
-      CMS.Models.Person.store[userId] = partialUser;
-
-      init();
-
-      expect(ctrlInst.after_preload).not.toHaveBeenCalled();
-      ctrlInst.element = null;
-      dfdRefresh.resolve(fetchedUser);
-      expect(ctrlInst.after_preload).not.toHaveBeenCalled();
-    });
   });
 
   describe('save_error method', function () {
@@ -155,6 +132,25 @@ describe('ModalsController', function () {
     it('calls "disableEnableContentUI" method', () => {
       method();
       expect(ctrlInst.disableEnableContentUI).toHaveBeenCalledWith(false);
+    });
+  });
+
+  describe('after_preload() method', () => {
+    let ctrlInst;
+    let afterPreload; // the method under tests
+
+    beforeEach(function () {
+      ctrlInst = {
+        wasDestroyed: jasmine.createSpy('wasDestroyed'),
+      };
+      afterPreload = Ctrl.prototype.after_preload.bind(ctrlInst);
+    });
+
+    it('does not call DisplayPrefs.getSingleton if modal was destroyed', () => {
+      ctrlInst.wasDestroyed.and.returnValue(true);
+      spyOn(DisplayPrefs, 'getSingleton').and.returnValue(can.Deferred());
+      afterPreload();
+      expect(DisplayPrefs.getSingleton).not.toHaveBeenCalled();
     });
   });
 });
