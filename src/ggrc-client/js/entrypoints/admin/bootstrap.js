@@ -9,6 +9,7 @@ import {
 import '../../controllers/dashboard_controller';
 import {RouterConfig} from '../../router';
 import routes from './routes';
+import {gapiClient} from '../../plugins/ggrc-gapi-client';
 
 const path = GGRC.mustache_path || '/static/mustache';
 const HEADER_VIEW = `${path}/base_objects/page_header.mustache`;
@@ -31,6 +32,7 @@ const sortByNameEmail = list => {
 };
 
 RouterConfig.setupRoutes(routes);
+gapiClient.loadGapiClient();
 
 const adminListDescriptors = {
   people: {

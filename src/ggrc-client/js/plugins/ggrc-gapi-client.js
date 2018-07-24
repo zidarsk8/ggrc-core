@@ -143,8 +143,6 @@ class GGRCGapiClient {
     this.oauthResult = can.Deferred();
     this.client = can.Deferred();
     this.showGapiModal = showGapiModal;
-
-    this.loadGapiClient();
   }
 
   /**
