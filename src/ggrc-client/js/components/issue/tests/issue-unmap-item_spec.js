@@ -314,6 +314,9 @@ describe('issue-unmap-related-snapshots component', ()=> {
 
     it('should change open modal state to false if page instance is not issue',
       async function (done) {
+        spyOn(CMS.Models.Relationship, 'findRelationship')
+          .and.returnValue({});
+
         await viewModel.unmap();
         expect(viewModel.attr('modalState.open')).toBe(false);
         done();
