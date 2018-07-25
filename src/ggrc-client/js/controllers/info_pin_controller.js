@@ -48,8 +48,8 @@ export default can.Control({
     return !this.element.hasClass(pinContentHiddenClass);
   },
   findOptions: function (el) {
-    var options;
-    var treeNode = el.closest('.cms_controllers_tree_view_node');
+    let options;
+    let treeNode = el.closest('.cms_controllers_tree_view_node');
 
     if (treeNode.length) {
       options = treeNode.control().options;
@@ -69,9 +69,9 @@ export default can.Control({
       .html('');
   },
   setHtml: function (opts, view, confirmEdit, options, maximizedState) {
-    var instance = opts.attr('instance');
-    var parentInstance = opts.attr('parent_instance');
-    var self = this;
+    let instance = opts.attr('instance');
+    let parentInstance = opts.attr('parent_instance');
+    let self = this;
     import(/* webpackChunkName: "modalsCtrls" */'./modals')
       .then(() => {
         this.element.html(can.view(view, {
@@ -95,11 +95,11 @@ export default can.Control({
       });
   },
   prepareView: function (opts, el, maximizedState) {
-    var instance = opts.attr('instance');
-    var options = this.findOptions(el);
-    var populatedOpts = opts.attr('options');
-    var confirmEdit = instance.class.confirmEditModal || {};
-    var view = getInstanceView(instance);
+    let instance = opts.attr('instance');
+    let options = this.findOptions(el);
+    let populatedOpts = opts.attr('options');
+    let confirmEdit = instance.class.confirmEditModal || {};
+    let view = getInstanceView(instance);
 
     if (populatedOpts && !options.attr('result')) {
       options = populatedOpts;
@@ -112,9 +112,9 @@ export default can.Control({
     this.setHtml(opts, view, confirmEdit, options, maximizedState);
   },
   setInstance: function (opts, el, maximizedState) {
-    var instance = opts.attr('instance');
-    var infoPaneOpenDfd = can.Deferred();
-    var isSubtreeItem = opts.attr('options.isSubTreeItem');
+    let instance = opts.attr('instance');
+    let infoPaneOpenDfd = can.Deferred();
+    let isSubtreeItem = opts.attr('options.isSubTreeItem');
 
     opts.attr('options.isDirectlyRelated',
       !isSubtreeItem ||
@@ -146,7 +146,7 @@ export default can.Control({
     }
   },
   updateInstance: function (selector, instance) {
-    var vm = this.element.find(selector).viewModel();
+    let vm = this.element.find(selector).viewModel();
 
     vm.attr('instance', instance);
     vm.attr('instance').dispatch({
@@ -161,8 +161,8 @@ export default can.Control({
       .attr('isLoading', isLoading);
   },
   confirmEdit: function (instance, modalDetails) {
-    var confirmDfd = $.Deferred();
-    var renderer = can.view.mustache(modalDetails.description);
+    let confirmDfd = $.Deferred();
+    let renderer = can.view.mustache(modalDetails.description);
     confirm({
       modal_description: renderer(instance).textContent,
       modal_confirm: modalDetails.button,
@@ -174,7 +174,7 @@ export default can.Control({
   changeMaximizedState: function (maximizedState) {
     this.showInstance(maximizedState);
 
-    var $activeTree = $('.cms_controllers_tree_view_node.active');
+    let $activeTree = $('.cms_controllers_tree_view_node.active');
     if (maximizedState) {
       $activeTree
         .addClass('maximized-info-pane');
@@ -184,8 +184,8 @@ export default can.Control({
     }
   },
   close: function () {
-    var visibleWidget = $('.widget-area .widget:visible');
-    var element = visibleWidget.find('.cms_controllers_tree_view');
+    let visibleWidget = $('.widget-area .widget:visible');
+    let element = visibleWidget.find('.cms_controllers_tree_view');
 
     if (element.length) {
       element.control().deselect();

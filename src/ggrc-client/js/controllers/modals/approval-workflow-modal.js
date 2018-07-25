@@ -42,7 +42,7 @@ let ApprovalWorkflow = can.Observe({
     return aws_dfd.then(function (aws) {
       const createDefaultTaskGroup = false;
       let ret;
-      var user = GGRC.current_user;
+      let user = GGRC.current_user;
       if (aws.length < 1) {
         ret = $.when(
           new CMS.Models.Workflow({

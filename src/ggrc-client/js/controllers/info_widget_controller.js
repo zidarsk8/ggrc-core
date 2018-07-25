@@ -24,7 +24,7 @@ export default can.Control({
     widget_view: GGRC.mustache_path + '/base_objects/info.mustache',
   },
   init: function () {
-    var that = this;
+    let that = this;
     can.$(function () {
       if (GGRC.page_object) {
         can.extend(that.defaults, {
@@ -64,7 +64,7 @@ export default can.Control({
   },
 
   get_widget_view: function (el) {
-    var widgetView = can.$(el)
+    let widgetView = can.$(el)
         .closest('[data-widget-view]').attr('data-widget-view');
     if (widgetView && widgetView.length > 0) {
       return GGRC.mustache_path + widgetView;
@@ -87,7 +87,7 @@ export default can.Control({
   },
 
   init_menu: function () {
-    var names;
+    let names;
     if (!this.options.start_menu) {
       names = [
         'Program',

@@ -12,8 +12,8 @@ import Mappings from '../models/mappers/mappings';
 
 (function ($) {
   'use strict';
-  var MAX_RESULTS = 20;
-  var SEARCH_DEBOUNCE = 50;
+  let MAX_RESULTS = 20;
+  let SEARCH_DEBOUNCE = 50;
 
   $.widget('ggrc.autocomplete', $.ui.autocomplete, {
     options: {
@@ -28,10 +28,10 @@ import Mappings from '../models/mappers/mappings';
       minLength: 0,
       source: _.debounce(function (request, response) {
         // Search based on the term
-        var query = request.term || '';
-        var queue = new RefreshQueue();
-        var isNextPage = _.isNumber(request.start);
-        var dfd;
+        let query = request.term || '';
+        let queue = new RefreshQueue();
+        let isNextPage = _.isNumber(request.start);
+        let dfd;
 
         if (query.indexOf('@') > -1) {
           query = '"' + query + '"';
@@ -84,14 +84,14 @@ import Mappings from '../models/mappers/mappings';
       },
 
       source_for_refreshable_objects: function (request) {
-        var that = this;
+        let that = this;
 
         if (this.options.searchlist) {
           this.options.searchlist.then(function () {
-            var filteredList = [];
+            let filteredList = [];
             return $.map(arguments, function (item) {
-              var searchAttr;
-              var term;
+              let searchAttr;
+              let term;
               if (!item) {
                 return;
               }
@@ -120,7 +120,7 @@ import Mappings from '../models/mappers/mappings';
           this.options.search_params
         )
         .then(function (searchResult) {
-          var objects = [];
+          let objects = [];
 
           can.each(that.options.searchtypes, function (searchtype) {
             objects.push.apply(objects,
@@ -131,10 +131,10 @@ import Mappings from '../models/mappers/mappings';
       },
 
       select: function (ev, ui) {
-        var origEvent;
-        var $this = $(this);
-        var widgetName = $this.data('autocomplete-widget-name');
-        var ctl = $this.data(widgetName).options.controller;
+        let origEvent;
+        let $this = $(this);
+        let widgetName = $this.data('autocomplete-widget-name');
+        let ctl = $this.data(widgetName).options.controller;
 
         if (ui.item) {
           $this.trigger('autocomplete:select', [ui]);
@@ -189,14 +189,14 @@ import Mappings from '../models/mappers/mappings';
       }
     },
     _create: function () {
-      var that = this;
-      var $that = $(this.element);
-      var baseSearch = $that.data('lookup');
-      var fromList = $that.data('from-list');
-      var searchParams = $that.data('params');
-      var permission = $that.data('permission-type');
-      var searchtypes;
-      var typeNames;
+      let that = this;
+      let $that = $(this.element);
+      let baseSearch = $that.data('lookup');
+      let fromList = $that.data('from-list');
+      let searchParams = $that.data('params');
+      let permission = $that.data('permission-type');
+      let searchtypes;
+      let typeNames;
 
       this._super.apply(this, arguments);
       this.options.search_params = {
@@ -216,7 +216,7 @@ import Mappings from '../models/mappers/mappings';
         this.options.searchlist = $.when.apply(
           this,
           $.map(fromList.list, function (item) {
-            var props = baseSearch.trim().split('.');
+            let props = baseSearch.trim().split('.');
             return item.instance.refresh_all.apply(item.instance, props);
           })
         );
@@ -256,9 +256,9 @@ import Mappings from '../models/mappers/mappings';
     },
 
     _setup_menu_context: function (items) {
-      var modelClass = this.element.data('lookup');
-      var dataModel = this.element.data('model');
-      var model = CMS.Models[modelClass || dataModel] ||
+      let modelClass = this.element.data('lookup');
+      let dataModel = this.element.data('model');
+      let model = CMS.Models[modelClass || dataModel] ||
                   GGRC.Models[modelClass || dataModel];
 
       return {
@@ -272,10 +272,10 @@ import Mappings from '../models/mappers/mappings';
     },
 
     _renderMenu: function (ul, items) {
-      var template = this.element.data('template');
-      var context = new can.Observe(this._setup_menu_context(items));
-      var model = context.model;
-      var $ul = $(ul);
+      let template = this.element.data('template');
+      let context = new can.Observe(this._setup_menu_context(items));
+      let model = context.model;
+      let $ul = $(ul);
 
       if (!template) {
         if (
@@ -292,7 +292,7 @@ import Mappings from '../models/mappers/mappings';
 
       $ul.unbind('scrollNext')
         .bind('scrollNext', function (ev, data) {
-          var listItems;
+          let listItems;
           if (context.attr('scroll_op_in_progress') ||
               context.attr('oldLen') === context.attr('items').length) {
             return;
@@ -340,18 +340,18 @@ import Mappings from '../models/mappers/mappings';
   $.widget('ggrc.query_autocomplete', $.ggrc.autocomplete, {
     options: {
       source_for_refreshable_objects: function (request) {
-        var queryField = this.element.attr('data-query-field') || 'title';
-        var queryRelevantType = this.element.attr('data-query-relevant-type');
-        var queryRelevantId = this.element.attr('data-query-relevant-id');
-        var dfd = can.Deferred();
-        var objName = this.options.searchtypes[0];
-        var relevant;
-        var filter = {expression: {
+        let queryField = this.element.attr('data-query-field') || 'title';
+        let queryRelevantType = this.element.attr('data-query-relevant-type');
+        let queryRelevantId = this.element.attr('data-query-relevant-id');
+        let dfd = can.Deferred();
+        let objName = this.options.searchtypes[0];
+        let relevant;
+        let filter = {expression: {
           left: queryField,
           op: {name: '~'},
           right: request.term,
         }};
-        var query;
+        let query;
 
         if (queryRelevantType && queryRelevantId) {
           relevant = {
@@ -364,10 +364,10 @@ import Mappings from '../models/mappers/mappings';
 
         batchRequests(query)
          .done((responseArr) => {
-           var ids = responseArr[objName].ids;
-           var model = CMS.Models[objName];
+           let ids = responseArr[objName].ids;
+           let model = CMS.Models[objName];
 
-           var res = can.map(ids, (id) => {
+           let res = can.map(ids, (id) => {
              return CMS.Models.get_instance(model.shortName, id);
            });
            dfd.resolve(res);
@@ -390,7 +390,7 @@ import Mappings from '../models/mappers/mappings';
    * @param {DOM.Element} el - the element to convert
    */
   $.cms_autocomplete = function (el) {
-    var ctl = this;
+    let ctl = this;
     // Add autocomplete to the owner field
     if (!el) {
       if (!this.element) {

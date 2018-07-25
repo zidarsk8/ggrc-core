@@ -53,7 +53,7 @@ const BUTTON_CREATE_PROPOSAL = `${path}/modals/create_proposal.mustache`;
  * @return {Object} - confirm window
  *
  * @example <caption>Default usage</caption>
- * var options = {
+ * let options = {
  *  skip_refresh: false,               // refreshes information about instance
  *  modal_title: 'Delete operation',   // title for popup
  *  objectShortInfo: 'Object #21',     // short title for object, for which confirmation is required
@@ -73,9 +73,9 @@ const BUTTON_CREATE_PROPOSAL = `${path}/modals/create_proposal.mustache`;
  * )
  */
 function warning(options, success, fail, extra) {
-  var confirmOptions = _.extend({}, warning.settings, options);
-  var confirmController;
-  var confirmResult;
+  let confirmOptions = _.extend({}, warning.settings, options);
+  let confirmController;
+  let confirmResult;
 
   extra = extra || {};
 
@@ -87,7 +87,7 @@ function warning(options, success, fail, extra) {
 }
 
 function confirm (options, success, dismiss) {
-  var $target = $('<div class="modal hide ' +
+  let $target = $('<div class="modal hide ' +
     options.extraCssClass +
     '"></div>');
 
@@ -104,7 +104,7 @@ function confirm (options, success, dismiss) {
           content_view: CONTENT_VIEW_CONFIRM,
         }, options))
         .on('click', 'a.btn[data-toggle=confirm]', function (e) {
-          var params = $(e.target).closest('.modal').find('form')
+          let params = $(e.target).closest('.modal').find('form')
             .serializeArray();
           $target.modal('hide').remove();
           if (success) {
@@ -136,15 +136,15 @@ warning.settings = Object.freeze({
 });
 
 function _setupWarning(confirm, settings) {
-  var confirmText = settings.confirmTextForTyping.toLowerCase();
-  var toggleClasses = settings.buttonExtraClasses;
-  var operation = settings.confirmOperationName;
-  var buttonSelector = '[data-toggle=' + operation + ']';
+  let confirmText = settings.confirmTextForTyping.toLowerCase();
+  let toggleClasses = settings.buttonExtraClasses;
+  let operation = settings.confirmOperationName;
+  let buttonSelector = '[data-toggle=' + operation + ']';
 
   confirm.on('change paste keyup', 'input[data-edit=confirm]',
   function (e) {
-    var confirmButton = confirm.find(buttonSelector);
-    var text = $(this)
+    let confirmButton = confirm.find(buttonSelector);
+    let text = $(this)
       .val()
         .trim()
         .toLowerCase();

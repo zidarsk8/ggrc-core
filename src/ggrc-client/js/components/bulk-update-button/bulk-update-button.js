@@ -22,18 +22,18 @@ export default can.Component.extend({
         });
     },
     updateObjects: function (el, context, args) {
-      var model = this.attr('model');
-      var nameSingular = model.name_singular;
-      var progressMessage =
+      let model = this.attr('model');
+      let nameSingular = model.name_singular;
+      let progressMessage =
         `${nameSingular} update is in progress. This may take several minutes.`;
 
       context.closeModal();
       GGRC.Errors.notifier('progress', progressMessage);
       return updateService.update(model, args.selected, args.options)
         .then(function (res) {
-          var updated = _.filter(res, {status: 'updated'});
-          var updatedCount = updated.length;
-          var message = this.getResultNotification(model, updatedCount);
+          let updated = _.filter(res, {status: 'updated'});
+          let updatedCount = updated.length;
+          let message = this.getResultNotification(model, updatedCount);
 
           GGRC.Errors.notifier('info', message);
 
@@ -43,9 +43,9 @@ export default can.Component.extend({
         }.bind(this));
     },
     getResultNotification: function (model, updatedCount) {
-      var nameSingularLowerCase = model.name_singular.toLowerCase();
-      var namePlural = model.name_plural;
-      var namePluralLowerCase = namePlural.toLowerCase();
+      let nameSingularLowerCase = model.name_singular.toLowerCase();
+      let namePlural = model.name_plural;
+      let namePluralLowerCase = namePlural.toLowerCase();
 
       if (updatedCount === 0) {
         return `No ${namePluralLowerCase} were updated.`;
@@ -59,8 +59,8 @@ export default can.Component.extend({
   },
   events: {
     'a click': function (el) {
-      var model = this.viewModel.attr('model');
-      var type = model.model_singular;
+      let model = this.viewModel.attr('model');
+      let type = model.model_singular;
 
       this.viewModel.openBulkUpdateModal(el, type);
     },

@@ -17,7 +17,7 @@ let CloneWorkflow = can.Model.Cacheable({
     return $.when(this);
   },
   save: function() {
-    var workflow = new CMS.Models.Workflow({
+    let workflow = new CMS.Models.Workflow({
       clone: this.source_workflow.id,
       context: null,
       clone_people: this.clone_people,
@@ -38,7 +38,7 @@ can.Component.extend({
   template: "<content/>",
   events: {
     click: function(el) {
-      var $target;
+      let $target;
 
       $target = $('<div class="modal hide"></div>').uniqueId();
       $target.modal_form({}, el);

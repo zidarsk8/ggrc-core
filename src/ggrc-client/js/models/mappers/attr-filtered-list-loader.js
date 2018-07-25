@@ -7,7 +7,7 @@
   GGRC.ListLoaders.StubFilteredListLoader(
     'GGRC.ListLoaders.AttrFilteredListLoader', {}, {
       init: function (source, prop, value, type) {
-        var filterFn = function (binding) {
+        let filterFn = function (binding) {
           // TODO: We should filter by type as well
           if (!binding.mappings) {
             return;
