@@ -175,9 +175,6 @@ dashboard-js-template-files:
   - people_roles/info.mustache
   # ggrc_gdrive_integration
   - gdrive/auth_button.mustache
-  - gdrive/gapi_errors.mustache
-  - gdrive/gdrive_folder.mustache
-  - gdrive/gdrive_file.mustache
   - gdrive/confirm_buttons.mustache
   # ggrc_risk_assessments
   - dashboard/lhn_risk_assessments.mustache
