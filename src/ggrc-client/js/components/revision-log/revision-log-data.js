@@ -18,7 +18,7 @@ let viewModel = can.Map.extend({
   },
 });
 
-GGRC.Components('revisionLogData', {
+export default can.Component.extend({
   tag: 'revision-log-data',
   template: template,
   viewModel: viewModel,
