@@ -135,6 +135,31 @@ class TestIssueIntegration(ggrc.TestCase):
     mock_update_issue.assert_not_called()
 
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_issue_tracker_error(self, update_issue_mock):
+    """Test that issue tracker does not change state
+       in case receiving an error."""
+    iti = factories.IssueTrackerIssueFactory(
+        enabled=True,
+        issue_tracked_obj=factories.IssueFactory()
+    )
+    update_issue_mock.side_effect = integrations_errors.HttpError("data")
+    issue_attrs = {
+        "issue_tracker": {
+            "enabled": True,
+            "hotlist_id": "123",
+            "issue_id": iti.issue_id,
+
+        }
+    }
+    with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True),\
+        mock.patch.object(all_models.IssuetrackerIssue,
+                          "create_or_update_from_dict") as update_info_mock:
+      self.api.put(iti.issue_tracked_obj, issue_attrs)
+
+    # Check that "enabled" flag hasn't been changed.
+    self.assertTrue("enabled" not in update_info_mock.call_args[0][1])
+
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
   def test_delete_issue(self, mock_update_issue):
     """Test updating issue tracker issue when issue in GGRC has been deleted"""
     iti = factories.IssueTrackerIssueFactory(
