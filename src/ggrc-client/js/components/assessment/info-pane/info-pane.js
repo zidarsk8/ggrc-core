@@ -186,7 +186,9 @@ export default can.Component.extend({
       },
     },
     modal: {
-      open: false,
+      state: {
+        open: false,
+      },
     },
     pubsub,
     _verifierRoleId: undefined,
@@ -577,11 +579,8 @@ export default can.Component.extend({
       let title = 'Required ' + getLCAPopupTitle(errors);
 
       can.batch.start();
-      this.attr('modal', {
-        content: data,
-        modalTitle: title,
-        state: {},
-      });
+      this.attr('modal.content', data);
+      this.attr('modal.modalTitle', title);
       can.batch.stop();
       this.attr('modal.state.open', true);
     },
