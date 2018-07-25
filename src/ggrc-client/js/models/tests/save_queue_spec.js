@@ -8,7 +8,7 @@ describe('GGRC.SaveQueue', function () {
 
   describe('_process_save_responses() method', function () {
     let bucket;
-    let method;  // the method under test
+    let method; // the method under test
 
     beforeEach(function () {
       let thisContext = {};

@@ -208,7 +208,7 @@ describe('GGRC.Components.relatedUrls', function () {
         method(url);
 
         matches = _.filter(viewModel.attr('urls'), {link: url});
-        expect(matches.length).toEqual(1);  // still only 1
+        expect(matches.length).toEqual(1); // still only 1
         expect(viewModel.createUrl).not.toHaveBeenCalled();
       });
 

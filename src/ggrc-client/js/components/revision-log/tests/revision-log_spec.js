@@ -180,7 +180,7 @@ describe('GGRC.Components.revisionLog', function () {
   });
 
   describe('_objectChangeDiff() method', function () {
-    let origModelAttrDefs = GGRC.model_attr_defs;  // original user-friendly attribute name settings
+    let origModelAttrDefs = GGRC.model_attr_defs; // original user-friendly attribute name settings
 
     beforeAll(function () {
       spyOn(viewModel, '_objectCADiff').and.returnValue({});
@@ -470,7 +470,7 @@ describe('GGRC.Components.revisionLog', function () {
   });
 
   describe('_fetchRevisionsData() method', function () {
-    let Revision;  // the Revision object constructor
+    let Revision; // the Revision object constructor
 
     // fake Deferred objects to return from the mocked Revision.findAll()
     let dfdResource;

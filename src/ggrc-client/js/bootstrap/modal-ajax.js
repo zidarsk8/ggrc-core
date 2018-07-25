@@ -574,7 +574,7 @@ import {
             return;
           }
           if (e.type === 'keydown' && e.which !== 13) {
-            return;  // activate for keydown on Enter/Return only.
+            return; // activate for keydown on Enter/Return only.
           }
 
           href = $this.attr('data-href') || $this.attr('href');

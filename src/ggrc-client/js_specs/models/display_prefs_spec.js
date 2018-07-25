@@ -155,7 +155,7 @@ describe('display prefs model', function () {
 
       it('sets the value for a widget', function () {
         display_prefs[func]('this arg is ignored', 'foo', fooValue);
-        let fooActual  = display_prefs.attr([exp.path, exp_token, 'foo'].join('.'));
+        let fooActual = display_prefs.attr([exp.path, exp_token, 'foo'].join('.'));
         expect(fooActual.serialize ? fooActual.serialize() : fooActual).toEqual(fooValue);
       });
 

@@ -7,15 +7,15 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
 import ModalsController from '../modals/modals_controller';
 
 describe('ModalsController', function () {
-  let Ctrl;  // the controller under test
+  let Ctrl; // the controller under test
 
   beforeAll(function () {
     Ctrl = ModalsController;
   });
 
   describe('init() method', function () {
-    let ctrlInst;  // fake controller instance
-    let init;  // the method under tests
+    let ctrlInst; // fake controller instance
+    let init; // the method under tests
 
     beforeEach(function () {
       let html = [
@@ -60,7 +60,7 @@ describe('ModalsController', function () {
 
         let partialUser = new can.Map({
           id: userId,
-          email: '',  // simulate user object only partially loaded
+          email: '', // simulate user object only partially loaded
           refresh: jasmine.createSpy().and.returnValue(dfdRefresh.promise()),
         });
 

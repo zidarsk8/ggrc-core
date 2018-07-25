@@ -6,7 +6,7 @@
 describe('GGRC.Components.autocomplete', function () {
   'use strict';
 
-  let Component;  // the component under test
+  let Component; // the component under test
 
   beforeAll(function () {
     Component = GGRC.Components.get('autocomplete');
@@ -28,7 +28,7 @@ describe('GGRC.Components.autocomplete', function () {
     let eventData;
     let eventObj;
     let fakeViewModel;
-    let handler;  // the event handler under test
+    let handler; // the event handler under test
     let $childInput;
     let $element;
 

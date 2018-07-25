@@ -7,7 +7,7 @@ describe('can.mustache.helper.file_type', function () {
   'use strict';
 
   let helper,
-    instance;  // the argument passed to the helper on invocation
+    instance; // the argument passed to the helper on invocation
 
   beforeAll(function () {
     helper = can.Mustache._helpers.file_type.fn;
@@ -43,7 +43,7 @@ describe('can.mustache.helper.file_type', function () {
   });
 
   it('returns a default value if there is no file extension', function () {
-    instance.title = 'txt';  // the filename matches a common extension
+    instance.title = 'txt'; // the filename matches a common extension
     expect(helper(instance)).toEqual('default');
   });
 

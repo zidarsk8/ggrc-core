@@ -386,7 +386,7 @@ import {
       if ($tree.hasClass('active') &&
         ((maximizeInfoPane && treeHasMaximizedClass) ||
         (!maximizeInfoPane && !treeHasMaximizedClass))) {
-        return;  // tree node already selected, no need to activate it again
+        return; // tree node already selected, no need to activate it again
       }
 
       $tree.closest('section')
