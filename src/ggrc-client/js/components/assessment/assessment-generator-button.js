@@ -41,7 +41,7 @@ export default can.Component.extend({
           });
         });
     },
-    showFlash: function (statuses) {
+    showFlash: function (status) {
       let flash = {};
       let type;
       let redirectLink;
@@ -51,9 +51,9 @@ export default can.Component.extend({
         'several minutes.',
         success: 'Assessment was generated successfully. {reload_link}',
       };
-      if (statuses.Failure > 0) {
+      if (status.Failure) {
         type = 'error';
-      } else if (statuses.Pending > 0 || statuses.Running > 0) {
+      } else if (status.Pending || status.Running) {
         type = 'progress';
       } else {
         type = 'success';
@@ -63,24 +63,26 @@ export default can.Component.extend({
       flash[type] = messages[type];
       $('body').trigger('ajax:flash', [flash, redirectLink]);
     },
-    updateStatus: function (ids, count) {
+    updateStatus: function (id, count) {
       let wait = [2, 4, 8, 16, 32, 64];
       if (count >= wait.length) {
         count = wait.length - 1;
       }
-      CMS.Models.BackgroundTask.findAll({
-        id__in: ids.join(','),
-      }).then(function (tasks) {
-        let statuses = _.countBy(tasks, function (task) {
-          return task.status;
-        });
-        this.showFlash(statuses);
-        if (statuses.Pending || statuses.Running) {
+      CMS.Models.BackgroundTask.findOne({id: id})
+        .then(function (task) {
+          let status = {[task.status]: true};
+          this.showFlash(status);
+          if (status.Pending || status.Running) {
+            setTimeout(function () {
+              this.updateStatus(id, ++count);
+            }.bind(this), wait[count] * 1000);
+          }
+        }.bind(this))
+        .fail(function () {
           setTimeout(function () {
-            this.updateStatus(ids, ++count);
+            this.updateStatus(id, ++count);
           }.bind(this), wait[count] * 1000);
-        }
-      }.bind(this));
+        }.bind(this));
     },
     generateAssessments: function (list, options) {
       let que = new RefreshQueue();
@@ -96,7 +98,7 @@ export default can.Component.extend({
           .then(function () {
             let tasks = arguments;
             let ids;
-            this.showFlash({Pending: 1});
+            this.showFlash({Pending: true});
             options.context.closeModal();
             if (!tasks.length || tasks[0] instanceof CMS.Models.Assessment) {
               // We did not create a task
@@ -106,7 +108,7 @@ export default can.Component.extend({
             ids = _.uniq(_.map(arguments, function (task) {
               return task.id;
             }));
-            this.updateStatus(ids, 0);
+            this.updateStatus(ids[0], 0);
           }.bind(this));
       }.bind(this));
     },
