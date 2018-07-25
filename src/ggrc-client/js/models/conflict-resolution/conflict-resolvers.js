@@ -90,9 +90,9 @@ export function objectListResolver(
   currentValue = [],
   remoteValue = [],
   container = new can.List()) {
-  let previousIds = _.pluck(previousValue, 'id').sort();
-  let currentIds = _.pluck(currentValue, 'id').sort();
-  let remoteIds = _.pluck(remoteValue, 'id').sort();
+  let previousIds = previousValue.map(({id}) => id).sort();
+  let currentIds = currentValue.map(({id}) => id).sort();
+  let remoteIds = remoteValue.map(({id}) => id).sort();
 
   let {hasConflict, isChangedLocally} = buildChangeDescriptor(
     previousIds,
