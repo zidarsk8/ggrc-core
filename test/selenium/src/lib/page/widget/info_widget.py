@@ -10,7 +10,7 @@ from selenium.webdriver.common.by import By
 from lib import base
 from lib.constants import (
     locator, objects, element, roles, regex, messages, users)
-from lib.constants.locator import WidgetInfoAssessment
+from lib.constants.locator import WidgetInfoAssessment, WidgetInfoControl
 from lib.element import widget_info, tab_containers, tables
 from lib.page.modal import update_object
 from lib.page.modal.set_value_for_asmt_ca import SetValueForAsmtDropdown
@@ -692,6 +692,75 @@ class Controls(InfoWidget):
     self._extend_list_all_scopes(
         [self.admin_text, self.primary_contact_text],
         [self.admin_entered_text, self.primary_contact_entered_text])
+    self._add_obj_review_to_lsopes()
+
+  def _add_obj_review_to_lsopes(self):
+    """Extend list of scopes by object review section """
+    review_msg = None
+    if selenium_utils.is_element_exist(self._driver,
+                                       self._locators.REVIEW_REJECTED_TXT):
+      review_msg = self._driver.find_element(*self._locators.
+                                             REVIEW_REJECTED_TXT).text
+    elif selenium_utils.is_element_exist(self._driver,
+                                         self._locators.REVIEW_APPROVED_TXT):
+      review_msg = self._driver.find_element(*self._locators.
+                                             REVIEW_APPROVED_TXT).text
+
+    self._extend_list_all_scopes(self._elements.OBJECT_REVIEW_FULL,
+                                 review_msg)
+
+  def open_submit_for_review_popup(self):
+    """Open submit for control popub by clicking on corresponding button."""
+    self._driver.find_element(
+        *WidgetInfoControl.LINK_SUBMIT_FOR_REVIEW).click()
+    selenium_utils.wait_for_js_to_load(self._driver)
+
+  def select_assignee_user(self, user_email):
+    """Select assignee user from dropdown on submit for review popup."""
+    elem = self._driver.find_element(*WidgetInfoControl.ASSIGN_REVIEWER_EMPTY)
+    elem.send_keys(user_email)
+    selenium_utils.wait_for_js_to_load(self._driver)
+    selenium_utils.get_when_all_visible(self._driver, WidgetInfoControl.
+                                        ASSIGN_REVIEWER_DROPDOWN)
+    base.ElementsList(
+        self._driver,
+        self._driver.find_element(*WidgetInfoControl.
+                                  ASSIGN_REVIEWER_DROPDOWN)).get_item(
+        user_email).click()
+
+  def select_first_available_date(self):
+    """Select first available day on datepicker on submit for review popup."""
+    date_picker = base.DatePicker(self._driver,
+                                  WidgetInfoControl.DATE_PICKER_FIELD,
+                                  WidgetInfoControl.DATE_PICKER_LOCATOR)
+    date_picker.select_month_start()
+
+  def click_submit(self):
+    """Click submit."""
+    self._driver.find_element(*WidgetInfoControl.SUBMIT_REVIEW_BUTTON).click()
+    selenium_utils.wait_for_js_to_load(self._driver)
+
+  def click_approve_review(self):
+    """Click approve review button."""
+    self._driver.find_element(*WidgetInfoControl.
+                              OBJECT_REVIEW_APPROVE_BTN).click()
+
+  def click_decline_review(self):
+    """Click on becline review button."""
+    self._driver.find_element(*WidgetInfoControl.
+                              OBJECT_REVIEW_DECLINE_BTN).click()
+
+  def leave_decline_comment(self, comment_msg):
+    """Leave decline comment for decline option."""
+    comments_elem = self._driver.find_element(*WidgetInfoControl.
+                                              DECLINE_REVIEW_COMMENTS)
+    comments_elem.click()
+    comments_elem.send_keys(comment_msg)
+
+  def click_save_and_close_on_decline(self):
+    """Click save and close on decline popup."""
+    self._driver.find_element(
+        *WidgetInfoControl.SAVE_AND_CLOSE_BTN).click()
 
 
 class Objectives(InfoWidget):

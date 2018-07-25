@@ -762,6 +762,23 @@ class WidgetSnapshotsInfoPanel(WidgetInfoPanel):
       By.CSS_SELECTOR, ".pane-header__snapshot-info [can-click='compareIt']")
   SNAPSHOT_OBJ_VER = (By.CSS_SELECTOR, "span.snapshot")
 
+  OBJECT_REVIEW_DECLINE_BTN = (By.XPATH, "//*[contains(text(), 'Decline')]")
+  OBJECT_REVIEW_APPROVE_BTN = (By.XPATH, "//*[contains(text(), 'Approve')]")
+  DECLINE_REVIEW_COMMENTS = (
+      By.XPATH, "//*[contains(@data-placeholder,'Enter Comments')]")
+  SAVE_AND_CLOSE_BTN = (
+      By.XPATH,
+      "//*[contains(@class,'confirm-buttons')]//*[contains(text(), 'Close')]")
+  ASSIGN_REVIEWER_EMPTY = (By.CSS_SELECTOR, ".people-autocomplete > input")
+  ASSIGN_REVIEWER_DROPDOWN = (By.XPATH, "//*[@id='ui-id-1']")
+  DATE_PICKER_LOCATOR = (By.XPATH, "//*[@name='end_date']")
+  DATE_PICKER_FIELD = (By.XPATH, "//*[@data-handler='selectDay']")
+  SUBMIT_REVIEW_BUTTON = (By.XPATH, "//*[text()='Submit']")
+  REVIEW_REJECTED_TXT = (
+      By.XPATH,
+      "//*[@class='ggrc_controllers_quick_form']/preceding-sibling::div")
+  REVIEW_APPROVED_TXT = (By.XPATH, "//*[@class='object-approved']")
+
 
 class WidgetInfoProgram(WidgetInfoPanel):
   """Locators for Program Info widgets."""

@@ -135,6 +135,10 @@ class Common(object):
   PRIMARY_CONTACTS = roles.PRIMARY_CONTACTS
   SECONDARY_CONTACTS = roles.SECONDARY_CONTACTS
   OTHERS = "Others"
+  OBJECT_REVIEW = "Object review"
+  OBJECT_REVIEW_FULL = "object_review_txt"
+  APPROVED_DATE_REGEX = r" \w{3} \w{3} \d*\s*\w*"
+  DECLINED_DATE_REGEX = r"\d.+\w*\s*[^.]"
 
 
 class CommonModalCreate(object):

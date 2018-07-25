@@ -79,6 +79,7 @@ class Representation(object):
         els.TITLE: "title", els.ADMIN: "admins",
         els.CODE: "slug", els.REVIEW_STATE: "os_state",
         els.OBJECT_REVIEW: "os_state",
+        els.OBJECT_REVIEW_FULL: "object_review_txt",
         els.STATE: "status"
     }
     ui_remap_items = {
@@ -613,7 +614,7 @@ class Entity(Representation):
         "primary_contacts", "secondary_contacts", "status", "os_state",
         "comments", "custom_attribute_definitions", "custom_attribute_values",
         "custom_attributes", "created_at", "updated_at", "modified_by",
-        **attrs)
+        "object_review_txt", **attrs)
 
   @staticmethod
   def all_entities_classes():
