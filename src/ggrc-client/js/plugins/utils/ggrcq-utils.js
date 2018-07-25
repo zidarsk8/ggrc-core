@@ -6,15 +6,16 @@
 /**
  * Util methods for integration with GGRCQ.
  */
-let models = ['Process', 'Product', 'System'];
 
 /**
  * Determine whether model type could have mapped questions.
- * @param {String} model - The model name
+ * @param {String} type - The model name
  * @return {Boolean} True or False
  */
-function hasQuestions(model) {
-  return GGRC.GGRC_Q_INTEGRATION_URL && models.indexOf(model) > -1;
+function hasQuestions(type) {
+  const model = CMS.Models[type];
+
+  return model && model.isQuestionnaireable;
 }
 
 /**
