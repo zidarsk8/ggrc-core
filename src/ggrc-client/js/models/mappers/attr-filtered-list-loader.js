@@ -12,7 +12,7 @@
           if (!binding.mappings) {
             return;
           }
-          return _.any(binding.mappings, function (mapping) {
+          return _.some(binding.mappings, function (mapping) {
             let instance = mapping.instance;
             if (instance instanceof CMS.Models.Relationship) {
               if (_.exists(instance, 'attrs') &&
