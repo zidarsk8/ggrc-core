@@ -1,6 +1,5 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
 """Module contains Indexed mixin class"""
 import itertools
 from collections import namedtuple
@@ -41,24 +40,25 @@ class Indexed(object):
   def get_insert_query_for(cls, ids):
     """Return insert class record query. It will return None, if it's empty."""
     if not ids:
-      return
+      return None
     instances = cls.indexed_query().filter(cls.id.in_(ids))
     indexer = fulltext.get_indexer()
     rows = itertools.chain(*[indexer.records_generator(i) for i in instances])
     values = list(rows)
-    if values:
-      return indexer.record_type.__table__.insert().values(values)
+    if not values:
+      return None
+    return indexer.record_type.__table__.insert().values(values)
 
   @classmethod
   def get_delete_query_for(cls, ids):
     """Return delete class record query. If ids are empty, will return None."""
     if not ids:
-      return
+      return None
     indexer = fulltext.get_indexer()
     return indexer.record_type.__table__.delete().where(
         indexer.record_type.type == cls.__name__
     ).where(
-        indexer.record_type.key.in_(ids)
+        indexer.record_type.key.in_(ids),
     )
 
   @classmethod
@@ -72,6 +72,4 @@ class Indexed(object):
 
   @classmethod
   def indexed_query(cls):
-    return cls.query.options(
-        orm.Load(cls).load_only("id"),
-    )
+    return cls.query.options(orm.Load(cls).load_only("id"),)
