@@ -16,7 +16,6 @@ import '../plugins/datepicker';
 import '../plugins/can_control';
 import '../plugins/autocomplete';
 import '../plugins/ajax_extensions';
-import '../plugins/component_registry';
 import '../plugins/openclose';
 import '../plugins/tooltip';
 import '../plugins/popover';
