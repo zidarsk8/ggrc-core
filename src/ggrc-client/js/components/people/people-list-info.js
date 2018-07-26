@@ -6,41 +6,37 @@
 import template from './people-list-info.mustache';
 import '../../models/service-models/role';
 
-(function (can, GGRC) {
-  'use strict';
+let viewModel = can.Map.extend({
+  instance: null,
+  isOpen: false,
+  isHidden: false,
+  isRefreshed: false,
+  isAttributesDisabled: false,
+  refreshInstance() {
+    if (this.attr('isRefreshed')) {
+      return;
+    }
 
-  let viewModel = can.Map.extend({
-    instance: null,
-    isOpen: false,
-    isHidden: false,
-    isRefreshed: false,
-    isAttributesDisabled: false,
-    refreshInstance() {
-      if (this.attr('isRefreshed')) {
-        return;
-      }
+    this.attr('isAttributesDisabled', true);
+    this.attr('instance').refresh().then(() => {
+      this.attr('isAttributesDisabled', false);
+    });
+    this.attr('isRefreshed', true);
+  },
+});
 
-      this.attr('isAttributesDisabled', true);
-      this.attr('instance').refresh().then(() => {
-        this.attr('isAttributesDisabled', false);
-      });
-      this.attr('isRefreshed', true);
+export default can.Component.extend({
+  tag: 'people-list-info',
+  template,
+  viewModel,
+  events: {
+    ' open'() {
+      this.viewModel.attr('isHidden', false);
+      this.viewModel.attr('isOpen', true);
+      this.viewModel.refreshInstance();
     },
-  });
-
-  GGRC.Components('peopleListInfo', {
-    tag: 'people-list-info',
-    template: template,
-    viewModel: viewModel,
-    events: {
-      ' open'() {
-        this.viewModel.attr('isHidden', false);
-        this.viewModel.attr('isOpen', true);
-        this.viewModel.refreshInstance();
-      },
-      ' close'() {
-        this.viewModel.attr('isHidden', true);
-      },
+    ' close'() {
+      this.viewModel.attr('isHidden', true);
     },
-  });
-})(window.can, window.GGRC);
+  },
+});
