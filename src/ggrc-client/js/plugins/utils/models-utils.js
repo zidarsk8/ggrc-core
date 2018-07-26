@@ -104,7 +104,7 @@ function _resolveDeferredBindings(obj) {
   const pendingJoins = obj._pending_joins.slice(0); // refresh of bindings later will muck up the pending joins on the object
   const uniqueThrough = _(pendingJoins).chain()
     .map((pj) => pj.through)
-    .unique()
+    .uniq()
     .value();
 
   const refreshDfds = [];

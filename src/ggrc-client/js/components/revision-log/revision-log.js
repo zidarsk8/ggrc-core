@@ -555,7 +555,7 @@ import {
         newValues = _.indexBy(newValues, 'custom_attribute_id');
         newDefs = _.indexBy(newDefs, 'id');
 
-        ids = _.unique(_.keys(origValues).concat(_.keys(newValues)));
+        ids = _.uniq(_.keys(origValues).concat(_.keys(newValues)));
         defs = _.merge(origDefs, newDefs);
 
         return _.chain(ids)
@@ -748,7 +748,7 @@ import {
             return [pid, history];
           }));
 
-        modifiers = _.unique(
+        modifiers = _.uniq(
           _.map(
             _.union(
               revisions.object,
