@@ -92,7 +92,7 @@ let viewModel = can.Map.extend({
       return;
     }
 
-    states = _.pluck(selectedStates, 'value');
+    states = _.map(selectedStates, 'value');
 
     this.attr('stateModel.items', states);
   },
