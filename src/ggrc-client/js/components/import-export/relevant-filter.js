@@ -107,7 +107,7 @@ export default can.Component.extend({
     },
     '{viewModel.relevant} change': function (list, item, which) {
       this.viewModel.attr('has_parent',
-        _.findWhere(this.viewModel.attr('relevant'),
+        _.find(this.viewModel.attr('relevant'),
           {model_name: '__previous__'}));
       if (!/model_name/gi.test(which)) {
         return;

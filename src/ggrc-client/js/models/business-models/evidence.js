@@ -75,7 +75,7 @@ export default can.Model.Cacheable('CMS.Models.Evidence', {
 }, {
   kindTitle() {
     let value = this.attr('kind');
-    let title = _.findWhere(this.class.kinds, {value}).title;
+    let title = _.find(this.class.kinds, {value}).title;
     return title;
   },
 });

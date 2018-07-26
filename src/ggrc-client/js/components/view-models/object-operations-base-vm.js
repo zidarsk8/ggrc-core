@@ -153,7 +153,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
       }
       return memo;
     }, []);
-    return _.findWhere(types, {value: type});
+    return _.find(types, {value: type});
   },
   onSubmit: function () {
     this.attr('submitCbs').fire();

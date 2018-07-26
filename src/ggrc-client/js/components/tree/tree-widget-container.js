@@ -349,7 +349,7 @@ viewModel = can.Map.extend({
     return filter;
   },
   _getFilterByName: function (name) {
-    let filter = _.findWhere(this.attr('filters'), {name: name});
+    let filter = _.find(this.attr('filters'), {name: name});
 
     return filter && filter.query ? filter.query : null;
   },

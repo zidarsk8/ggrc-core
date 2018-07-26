@@ -103,7 +103,7 @@ export default can.Component.extend({
      */
     placeholder(options) {
       let types = this.attr('types');
-      let item = _.findWhere(types, {
+      let item = _.find(types, {
         type: this.attr('selected.type'),
       });
       if (item) {
