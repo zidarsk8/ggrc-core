@@ -255,7 +255,7 @@ function openMapperByElement(ev, disableMapper) {
     ev.preventDefault();
   }
 
-  import(/*webpackChunkName: "mapper"*/ './controllers/mapper/mapper')
+  import(/* webpackChunkName: "mapper" */ './controllers/mapper/mapper')
     .then((mapper) => {
       mapper.ObjectMapper.openMapper(data, disableMapper, btn);
     });

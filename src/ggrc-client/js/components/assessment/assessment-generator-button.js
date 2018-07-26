@@ -24,7 +24,7 @@ export default can.Component.extend({
         tracker.USER_JOURNEY_KEYS.LOADING,
         tracker.USER_ACTIONS.ASSESSMENT.OPEN_ASMT_GEN_MODAL);
 
-      import(/*webpackChunkName: "mapper"*/ '../../controllers/mapper/mapper')
+      import(/* webpackChunkName: "mapper" */ '../../controllers/mapper/mapper')
         .then((mapper) => {
           mapper.ObjectGenerator.launch(el, {
             object: 'Audit',

@@ -412,7 +412,7 @@ describe('mappers', function () {
     let ll;
     beforeEach(function () {
       ll = new GGRC.ListLoaders.BaseListLoader();
-      //init_listeners is abstract -- called by base init but not implemented in base.
+      // init_listeners is abstract -- called by base init but not implemented in base.
       ll.init_listeners = jasmine.createSpy();
     });
 
@@ -470,14 +470,14 @@ describe('mappers', function () {
         expect(ll.is_duplicate_result({instance: 1, mappings: null}, {instance: 1, mappings: [] })).toBe(false);
         expect(ll.is_duplicate_result({instance: 1, mappings: []}, {instance: 1, mappings: null })).toBe(false);
         expect(ll.is_duplicate_result({instance: 1, mappings: []}, {instance: 1, mappings: [] })).toBe(false);
-        //expect(ll.is_duplicate_result({instance : 1, mappings : 'a'}, {instance : 1, mappings : [] })).toBe(false);
+        // expect(ll.is_duplicate_result({instance : 1, mappings : 'a'}, {instance : 1, mappings : [] })).toBe(false);
       });
 
       it('returns false if either result has multiple mappings', function () {
         expect(ll.is_duplicate_result({instance: 1, mappings: ['a', 'b']}, {instance: 1, mappings: ['a'] })).toBe(false);
         expect(ll.is_duplicate_result({instance: 1, mappings: ['a']}, {instance: 1, mappings: ['a','b'] })).toBe(false);
         expect(ll.is_duplicate_result({instance: 1, mappings: ['a','b']}, {instance: 1, mappings: ['a','b'] })).toBe(false);
-        //expect(ll.is_duplicate_result({instance : 1, mappings : 'a'}, {instance : 1, mappings : [] })).toBe(false);
+        // expect(ll.is_duplicate_result({instance : 1, mappings : 'a'}, {instance : 1, mappings : [] })).toBe(false);
       });
 
       it('returns true if boths results have null mappings', function () {
@@ -606,7 +606,7 @@ describe('mappers', function () {
               },
             }],
           };
-          ll.remove_instance(binding, instance, ['a']); //only one of the mappings
+          ll.remove_instance(binding, instance, ['a']); // only one of the mappings
           expect(binding.list).toEqual([{ instance: instance, mappings: ['b'], remove_mapping: jasmine.any(Function) }]);
         });
       });
@@ -801,7 +801,7 @@ describe('mappers', function () {
       describe('source_binding.list remove', function () {
         it('calls remove_instance on the list loader for each item', function () {
           let new_result = new LL.MappingResult({id: 1}, []);
-          spyOn(RefreshQueue.prototype, 'trigger').and.returnValue($.when()); //Avoid AJAX
+          spyOn(RefreshQueue.prototype, 'trigger').and.returnValue($.when()); // Avoid AJAX
           spyOn(rll, 'remove_instance');
           binding.list.push(new_result);
           source_binding.list.push(new_result);

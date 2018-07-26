@@ -51,7 +51,7 @@ export default can.Component.extend({
         if (instance.attr('type') === 'Assessment') {
           el.data('type', instance.attr('assessment_type'));
         }
-        import(/*webpackChunkName: "mapper"*/ '../../controllers/mapper/mapper')
+        import(/* webpackChunkName: "mapper" */ '../../controllers/mapper/mapper')
           .then(() => {
             can.trigger(el, 'openMapper', ev);
           });
