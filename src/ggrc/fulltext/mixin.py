@@ -22,7 +22,10 @@ class ReindexRule(namedtuple("ReindexRule", ["model", "rule", "fields"])):
 
 # pylint: disable=too-few-public-methods
 class Indexed(object):
-  """Mixin for Index And auto reindex current model instance"""
+  """Mixin for Index And auto reindex current model instance.
+
+  It should be last mixin in the scope if mixin that generate indexed query.
+  """
 
   AUTO_REINDEX_RULES = [
       # Usage: ReindexRule("ModelName", lambda x: x.value)
