@@ -3,14 +3,14 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import './object-list-item/editable-document-object-list-item';
-import {notifierXHR} from '../plugins/utils/notifiers-utils';
+import template from './mapping-tree-view.mustache';
+import '../object-list-item/editable-document-object-list-item';
+import {notifierXHR} from '../../plugins/utils/notifiers-utils';
 
 export default can.Component.extend({
   tag: 'mapping-tree-view',
-  template: can.view(GGRC.mustache_path +
-    '/base_templates/mapping_tree_view.mustache'),
-  scope: {
+  template,
+  viewModel: {
     treeViewClass: '@',
     expandable: '@',
     sortField: '@',
@@ -33,41 +33,41 @@ export default can.Component.extend({
     let binding;
 
     _.forEach(['mapping', 'itemTemplate'], (prop) => {
-      if (!this.scope.attr(prop)) {
-        this.scope.attr(prop,
+      if (!this.viewModel.attr(prop)) {
+        this.viewModel.attr(prop,
           el.attr(can.camelCaseToDashCase(prop)));
       }
     });
 
-    binding = this.scope.parentInstance.get_binding(this.scope.mapping);
+    binding = this.viewModel.parentInstance.get_binding(this.viewModel.mapping);
 
     binding.refresh_instances().then(function (mappedObjects) {
-      this.scope.attr('mappedObjects').replace(
+      this.viewModel.attr('mappedObjects').replace(
         this._sortObjects(mappedObjects)
       );
     }.bind(this));
 
     // We are tracking binding changes, so mapped items update accordingly
     binding.list.on('change', function () {
-      this.scope.attr('mappedObjects').replace(
+      this.viewModel.attr('mappedObjects').replace(
         this._sortObjects(binding.list)
       );
     }.bind(this));
   },
   /**
-    * Sort objects list by this.scope.sortField, if defined
-    * in order defined in this.scope.sortOrder (asc or desc)
+    * Sort objects list by this.viewModel.sortField, if defined
+    * in order defined in this.viewModel.sortOrder (asc or desc)
     *
     * @param {Array} mappedObjects - the list of objects to be sorted
     *
-    * @return {Array} - if this.scope.sortField is defined, mappedObjects
+    * @return {Array} - if this.viewModel.sortField is defined, mappedObjects
     *                   sorted by field this field;
-    *                   if this.scope.sortField is undefined, unsorted
+    *                   if this.viewModel.sortField is undefined, unsorted
     *                   mappedObjects.
     */
   _sortObjects: function (mappedObjects) {
-    let sortField = this.scope.attr('sortField');
-    let sortOrder = this.scope.attr('sortOrder');
+    let sortField = this.viewModel.attr('sortField');
+    let sortOrder = this.viewModel.attr('sortOrder');
     if (sortField) {
       return _.orderBy(mappedObjects, sortField, sortOrder);
     }
@@ -76,8 +76,8 @@ export default can.Component.extend({
   events: {
     '[data-toggle=unmap] click': function (el, ev) {
       let instance = el.find('.result').data('result');
-      let mappings = this.scope.parentInstance.get_mapping(
-        this.scope.mapping);
+      let mappings = this.viewModel.parentInstance.get_mapping(
+        this.viewModel.mapping);
       let binding;
 
       ev.stopPropagation();

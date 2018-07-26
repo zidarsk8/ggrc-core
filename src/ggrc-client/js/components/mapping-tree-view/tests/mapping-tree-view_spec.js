@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import Component from '../mapped_tree_view';
+import Component from '../mapping-tree-view';
 
 describe('mapping-tree-view component', function () {
   'use strict';
@@ -31,15 +31,15 @@ describe('mapping-tree-view component', function () {
 
   describe('_sortObjects() method', function () {
     let method;
-    let scope;
+    let viewModel;
 
     beforeAll(function () {
-      scope = new can.Map({
-        scope: {
+      viewModel = new can.Map({
+        viewModel: {
           sortField: null,
         },
       });
-      method = Component.prototype._sortObjects.bind(scope);
+      method = Component.prototype._sortObjects.bind(viewModel);
     });
 
     it('returns unsorted array when sortField is not defined', function () {
@@ -47,14 +47,14 @@ describe('mapping-tree-view component', function () {
     });
 
     it('returns asc sorted array when sortField is defined', function () {
-      scope.attr('scope.sortField', 'field');
+      viewModel.attr('viewModel.sortField', 'field');
       expect(method(unsortedArray)).toEqual(sortedAsc);
     });
 
     it('returns desc sorted array when sortField and sortOrder are defined',
       function () {
-        scope.attr('scope.sortField', 'field');
-        scope.attr('scope.sortOrder', 'desc');
+        viewModel.attr('viewModel.sortField', 'field');
+        viewModel.attr('viewModel.sortOrder', 'desc');
         expect(method(unsortedArray)).toEqual(sortedDesc);
       });
   });

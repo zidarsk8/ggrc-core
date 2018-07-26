@@ -34,7 +34,6 @@ dashboard-js-template-files:
   - base_objects/mapper-item-description.mustache
   - base_objects/dashboard_widget.mustache
   - base_templates/mapped_objects.mustache
-  - base_templates/mapping_tree_view.mustache
   - assessments/assignable_extended_info.mustache
   - clauses/modal_content.mustache
   - contracts/modal_content.mustache
