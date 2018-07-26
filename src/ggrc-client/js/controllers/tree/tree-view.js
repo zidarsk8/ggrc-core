@@ -567,7 +567,7 @@ import Permission from '../../permission';
       }
       this.options.attr('filter_shown', 0);
       this.options.attr('filteredList', []);
-      finalDfd = _.foldl(queue, function (dfd, listWindow) {
+      finalDfd = _.reduce(queue, function (dfd, listWindow) {
         return dfd.then(function () {
           let res = can.Deferred();
           if (that._add_child_lists_id !== opId) {
