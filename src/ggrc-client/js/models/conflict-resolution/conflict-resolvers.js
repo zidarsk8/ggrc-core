@@ -53,9 +53,9 @@ export function customAttributeResolver(
   currentValue = [],
   remoteValue = [],
   container = []) {
-  let currentValuesById = _.indexBy(currentValue, 'custom_attribute_id');
-  let remoteValuesById = _.indexBy(remoteValue, 'custom_attribute_id');
-  let containerValuesById = _.indexBy(container, 'custom_attribute_id');
+  let currentValuesById = _.keyBy(currentValue, 'custom_attribute_id');
+  let remoteValuesById = _.keyBy(remoteValue, 'custom_attribute_id');
+  let containerValuesById = _.keyBy(container, 'custom_attribute_id');
 
   let conflict = false;
   previousValue.forEach((previousValueItem) => {

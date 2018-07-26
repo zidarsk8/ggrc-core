@@ -550,10 +550,10 @@ import {
           }
         };
 
-        origValues = _.indexBy(origValues, 'custom_attribute_id');
-        origDefs = _.indexBy(origDefs, 'id');
-        newValues = _.indexBy(newValues, 'custom_attribute_id');
-        newDefs = _.indexBy(newDefs, 'id');
+        origValues = _.keyBy(origValues, 'custom_attribute_id');
+        origDefs = _.keyBy(origDefs, 'id');
+        newValues = _.keyBy(newValues, 'custom_attribute_id');
+        newDefs = _.keyBy(newDefs, 'id');
 
         ids = _.uniq(_.keys(origValues).concat(_.keys(newValues)));
         defs = _.merge(origDefs, newDefs);
