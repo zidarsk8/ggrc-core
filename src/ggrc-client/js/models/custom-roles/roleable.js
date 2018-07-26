@@ -18,7 +18,7 @@ export default can.Model.Cacheable('CMS.Models.Roleable', {
   findAll: function () {
     // We do not query the backend, this implementation is used to diplay
     // a list of objects in the Custom Roles widget.
-    let types = _.sortByOrder(GGRC.roleableTypes, 'category', false);
+    let types = _.orderBy(GGRC.roleableTypes, 'category', false);
 
     let instances = can.map(types, function (type, i) {
       let withId = can.extend(type, {id: i});

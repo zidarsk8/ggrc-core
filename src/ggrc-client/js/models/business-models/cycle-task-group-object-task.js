@@ -46,7 +46,7 @@ function populateFromWorkflow(form, workflow) {
       );
       return;
     }
-    activeCycleList = _.sortByOrder(
+    activeCycleList = _.orderBy(
       activeCycleList, ['start_date'], ['desc']);
     activeCycle = activeCycleList[0];
     form.attr('workflow', {id: workflow.id, type: 'Workflow'});

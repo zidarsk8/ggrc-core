@@ -13,7 +13,7 @@
   */
 export default can.Model.Cacheable('CMS.Models.CustomAttributable', {
   findAll: function () {
-    let types = _.sortByOrder(GGRC.custom_attributable_types,
+    let types = _.orderBy(GGRC.custom_attributable_types,
       'category', false);
 
     return can.when(can.map(types, function (type, i) {

@@ -70,7 +70,7 @@ import {notifierXHR} from '../plugins/utils/notifiers-utils';
       let sortField = this.scope.attr('sortField');
       let sortOrder = this.scope.attr('sortOrder');
       if (sortField) {
-        return _.sortByOrder(mappedObjects, sortField, sortOrder);
+        return _.orderBy(mappedObjects, sortField, sortOrder);
       }
       return mappedObjects;
     },

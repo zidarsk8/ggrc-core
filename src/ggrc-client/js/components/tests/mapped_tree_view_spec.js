@@ -24,8 +24,8 @@ describe('GGRC.Components.mappingTreeView', function () {
       field: 'b',
     },
   ];
-  let sortedAsc = _.sortByOrder(unsortedArray, 'field');
-  let sortedDesc = _.sortByOrder(unsortedArray, 'field', 'desc');
+  let sortedAsc = _.orderBy(unsortedArray, 'field');
+  let sortedDesc = _.orderBy(unsortedArray, 'field', 'desc');
   let Component; // the component under test
 
   beforeAll(function () {
