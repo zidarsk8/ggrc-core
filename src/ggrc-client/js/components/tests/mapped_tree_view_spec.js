@@ -3,7 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('GGRC.Components.mappingTreeView', function () {
+import Component from '../mapped_tree_view';
+
+describe('mapping-tree-view component', function () {
   'use strict';
 
   let unsortedArray = [
@@ -26,11 +28,6 @@ describe('GGRC.Components.mappingTreeView', function () {
   ];
   let sortedAsc = _.orderBy(unsortedArray, 'field');
   let sortedDesc = _.orderBy(unsortedArray, 'field', 'desc');
-  let Component; // the component under test
-
-  beforeAll(function () {
-    Component = GGRC.Components.get('mappingTreeView');
-  });
 
   describe('_sortObjects() method', function () {
     let method;
