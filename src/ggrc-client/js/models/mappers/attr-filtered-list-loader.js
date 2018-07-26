@@ -32,7 +32,7 @@
       init_listeners: function (binding) {
         this._super(binding);
         function itemFromList(list, id) {
-          return _.first(can.makeArray(list).filter(function (item) {
+          return _.head(can.makeArray(list).filter(function (item) {
             return item.instance.id === id;
           }));
         }

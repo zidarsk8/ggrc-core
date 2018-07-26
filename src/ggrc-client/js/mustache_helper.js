@@ -1016,7 +1016,7 @@ Mustache.registerHelper('assignee_types', function (value, options) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
   value = resolveComputed(value) || '';
-  value = _.first(_.map(value.split(','), function (type) {
+  value = _.head(_.map(value.split(','), function (type) {
     let lowercaseType = _.trim(type).toLowerCase();
 
     if (lowercaseType === 'assessor') {

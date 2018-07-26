@@ -91,7 +91,7 @@ export default can.Component.extend({
     init() {
       let types = this.viewModel.attr('types');
       if (!this.viewModel.attr('selected.type')) {
-        this.viewModel.attr('selected.type', _.first(types).attr('type'));
+        this.viewModel.attr('selected.type', _.head(types).attr('type'));
       }
     },
   },
