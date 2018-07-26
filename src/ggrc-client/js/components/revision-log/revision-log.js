@@ -185,7 +185,7 @@ import {
         let id = this.attr('instance.id');
         let type = this.attr('instance.type');
         let filterElegible = function (obj) {
-          return _.contains(this.attr('_EMBED_MAPPINGS')[type], obj.type);
+          return _.includes(this.attr('_EMBED_MAPPINGS')[type], obj.type);
         }.bind(this);
         let dfds;
 

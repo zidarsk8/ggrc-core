@@ -42,7 +42,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
       _.find(
         config.special,
         function (special) {
-          return _.contains(special.types, type);
+          return _.includes(special.types, type);
         }),
       'config'
     );

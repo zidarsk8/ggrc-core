@@ -17,7 +17,7 @@
             if (instance instanceof CMS.Models.Relationship) {
               if (_.exists(instance, 'attrs') &&
                   instance.attrs[prop] && (!value ||
-                _.contains(instance.attrs[prop].split(','), value))) {
+                _.includes(instance.attrs[prop].split(','), value))) {
                 return true;
               }
             }
@@ -62,7 +62,7 @@
           if (!active) {
             return;
           }
-          contains = _.contains(value.split(','), this.keyword);
+          contains = _.includes(value.split(','), this.keyword);
           if (!contains && activeInList) {
             binding.list.splice(
               _.map(binding.list, function (e) {

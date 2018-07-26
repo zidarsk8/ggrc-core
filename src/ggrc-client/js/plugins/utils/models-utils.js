@@ -76,7 +76,7 @@ const makeModelInstance = (data) => {
  * @return {Boolean}
  */
 const hasRelatedAssessments = (type) => {
-  return _.contains(relatedAssessmentsTypes, type);
+  return _.includes(relatedAssessmentsTypes, type);
 };
 
 const handlePendingJoins = (obj) => {

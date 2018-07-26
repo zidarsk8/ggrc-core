@@ -457,7 +457,7 @@ import Permission from '../../permission';
           // invocation and this continue can be dropped too.
           continue;
         }
-        if (!_.contains(visible, control)) {
+        if (!_.includes(visible, control)) {
           visible.push(control);
           toRender.push(control);
         }

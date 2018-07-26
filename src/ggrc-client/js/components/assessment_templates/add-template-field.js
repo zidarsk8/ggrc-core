@@ -60,7 +60,7 @@ export default can.Component.extend({
           });
       },
       validateValues(viewModel, type, values) {
-        let invalidValues = _.contains(viewModel.valueAttrs, type) && !values;
+        let invalidValues = _.includes(viewModel.valueAttrs, type) && !values;
         viewModel.attr('selected.invalidValues', invalidValues);
       },
       validateTitle(validators) {

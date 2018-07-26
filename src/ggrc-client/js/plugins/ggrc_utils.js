@@ -276,7 +276,7 @@ function isMappableType(target, source, options) {
     return false;
   }
   result = getMappableTypes(target, options);
-  return _.contains(result, source);
+  return _.includes(result, source);
 }
 
 /**
@@ -365,7 +365,7 @@ function allowedToMap(source, target, options) {
     canonical = null;
   }
 
-  hasWidget = _.contains(
+  hasWidget = _.includes(
     GGRC.tree_view.base_widgets_by_type[sourceType] || [],
     targetType);
 
@@ -380,7 +380,7 @@ function allowedToMap(source, target, options) {
 
   canMap = Permission.is_allowed_for('update', source) ||
     sourceType === 'Person' ||
-    _.contains(createContexts, sourceContext) ||
+    _.includes(createContexts, sourceContext) ||
     // Also allow mapping to source if the source is about to be created.
     _.isUndefined(source.created_at);
 
@@ -388,7 +388,7 @@ function allowedToMap(source, target, options) {
     canMap = canMap &&
       (Permission.is_allowed_for('update', target) ||
       targetType === 'Person' ||
-      _.contains(createContexts, targetContext));
+      _.includes(createContexts, targetContext));
   }
   return canMap;
 }

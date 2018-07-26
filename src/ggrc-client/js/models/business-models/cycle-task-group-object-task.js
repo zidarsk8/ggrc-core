@@ -270,6 +270,6 @@ export default can.Model.Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
     let status = this.attr('status');
 
     return cycle.attr('is_current') &&
-      !_.contains(['Finished', 'Verified'], status);
+      !_.includes(['Finished', 'Verified'], status);
   },
 });
