@@ -18,14 +18,11 @@
   <div class="datepicker__input-wrapper">
     <i class="fa fa-calendar"></i>
     <input
-      {{#if disabled}}disabled{{/if}}
-      {{#if_helpers '\
-        #if' readonly '\
-        or #if' denyInput}}readonly
-      {{/if_helpers}}
+      {{#if disabled}} disabled {{/if}}
+      {{#if readonly}} readonly {{/if}}
       placeholder="{{MOMENT_DISPLAY_FMT}}"
       type="text"
-      class="datepicker__input date {{#if denyInput}}datepicker__input--denied{{/if}}"
+      class="datepicker__input date {{#if readonly}}datepicker__input--denied{{/if}}"
       {(value)}="_date"
       can-focus="onFocus"
     >

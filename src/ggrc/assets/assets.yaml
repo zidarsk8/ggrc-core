@@ -56,7 +56,6 @@ dashboard-js-template-files:
   - issues/remediation_plan.mustache
   - issues/tree_add_item.mustache
   - components/object-mapper/object-mapper.mustache #contains if_helpers
-  - components/datepicker/datepicker.mustache #contains if_helpers
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache

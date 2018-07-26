@@ -5,15 +5,14 @@
 
 import * as Utils from '../../plugins/ggrc_utils';
 import {DATE_FORMAT} from '../../plugins/utils/date-util';
+import {getComponentVM} from '../../../js_specs/spec_helpers';
+import Component from '../datepicker/datepicker';
 
-describe('GGRC.Components.datepicker', function () {
-  'use strict';
 
-  let Component; // the component under test
+describe('datepicker component', function () {
   let events;
 
   beforeAll(function () {
-    Component = GGRC.Components.get('datepicker');
     events = Component.prototype.events;
   });
 
@@ -21,7 +20,7 @@ describe('GGRC.Components.datepicker', function () {
     let viewModel;
 
     beforeEach(function () {
-      viewModel = Component.prototype.viewModel();
+      viewModel = getComponentVM(Component);
     });
 
     describe('onSelect() method', function () {
