@@ -12,35 +12,6 @@
   </h2>
   {{#if allowedToCreate}}
     {{#is_allowed 'create' model.singular context='any'}}
-      {{#if_helpers '\
-        #if_equals' type 'AssessmentTemplate' '\
-        or #if_equals' type 'RiskAssessment'}}
-
-        <span class="create-new-object">
-          Map existing object or
-          <a class="btn btn-link create-control"
-              href="javascript://"
-              data-toggle="modal-ajax-form"
-              data-unique-id="{{join_object_id}}"
-              data-modal-class="modal-wide"
-              data-object-singular="{{model_info type 'model_singular'}}"
-              data-object-plural="{{model_info type 'root_collection'}}"
-              data-object-params='{
-                "{{parentInstance.class.root_object}}": {
-                  "id": {{parentInstance.id}},
-                  "type": "{{parentInstance.type}}",
-                  "title": "{{json_escape parentInstance.title}}"
-                },
-                "context": {
-                  "id": {{parentInstance.context.id}},
-                  "type": "{{json_escape parentInstance.context.type}}"
-                }
-            }'
-            data-join-object-id="{{join_object_id}}">
-            Create and map new object
-          </a>
-        </span>
-      {{else}}
         {{#if_equals type 'Document'}}
           <span class="create-new-object">
             Do you want to search for an existing document or
@@ -66,7 +37,6 @@
             </span>
           {{/if}}
         {{/if_equals}}
-      {{/if_equals}}
     {{/is_allowed}}
   {{/if}}
 </div>

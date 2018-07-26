@@ -6,18 +6,15 @@
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import RefreshQueue from '../../../models/refresh_queue';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
+import Component from '../object-mapper';
 
-describe('GGRC.Components.objectMapper', function () {
-  'use strict';
-
-  let Component;
+describe('object-mapper component', function () {
   let events;
   let viewModel;
   let handler;
   let helpers;
 
   beforeAll(function () {
-    Component = GGRC.Components.get('objectMapper');
     events = Component.prototype.events;
     helpers = Component.prototype.helpers;
   });
@@ -44,7 +41,8 @@ describe('GGRC.Components.objectMapper', function () {
     it(`initializes join_object_id with page instance id if
     "join-object-id" and "isNew" are not passed`,
       function () {
-        spyOn(CurrentPageUtils, 'getPageInstance').and.returnValue({id: 'testId'});
+        spyOn(CurrentPageUtils, 'getPageInstance')
+          .and.returnValue({id: 'testId'});
         let result = Component.prototype.viewModel({}, parentViewModel)();
         expect(result.join_object_id).toBe('testId');
       });
