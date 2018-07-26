@@ -6,6 +6,7 @@
 import {
   simpleFieldResolver,
   customAttributeResolver,
+  objectListResolver,
 } from './conflict-resolvers';
 
 export function checkValues(baseAttrs, attrs, remoteAttrs, obj) {
@@ -21,6 +22,14 @@ export function checkValues(baseAttrs, attrs, remoteAttrs, obj) {
       // We have a special way for customAttributes because it is nested field
       case 'custom_attribute_values':
         unableToResolve = customAttributeResolver(
+          baseAttrs[key],
+          attrs[key],
+          remoteAttrs[key],
+          obj.attr(key));
+        break;
+      case 'assertions':
+      case 'categories':
+        unableToResolve = objectListResolver(
           baseAttrs[key],
           attrs[key],
           remoteAttrs[key],
