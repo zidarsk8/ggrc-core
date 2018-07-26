@@ -13,66 +13,62 @@ const errorMessages = {
   any: 'cannot be blank',
 };
 
-(function (can, GGRC) {
-  'use strict';
+/**
+ * This component renders edit controls for Global Custom Attributes
+ */
 
-  /**
-   * This component renders edit controls for Global Custom Attributes
-   */
+export default can.Component.extend({
+  tag: 'gca-controls',
+  template,
+  viewModel: {
+    instance: {},
+    items: [],
+    allowHide: false,
+    validateControls: function () {
+      const items = this.attr('items');
+      let valid;
+      items.each((caObject) => caObject.validate());
 
-  GGRC.Components('gcaControls', {
-    tag: 'gca-controls',
-    template: template,
-    viewModel: {
-      instance: {},
-      items: [],
-      allowHide: false,
-      validateControls: function () {
-        const items = this.attr('items');
-        let valid;
-        items.each((caObject) => caObject.validate());
-
-        valid = _.find(items, (caObject) =>
-          caObject.validationState.hasGCAErrors
-        ) === undefined;
-        this.instance.attr('_gca_valid', valid);
-      },
-      initGlobalAttributes: function () {
-        const instance = this.attr('instance');
-        const globalCaObjects = instance.customAttr({
-          type: CUSTOM_ATTRIBUTE_TYPE.GLOBAL,
-        });
-        this.attr('items', globalCaObjects);
-      },
-      updateGlobalAttribute: function (event) {
-        const instance = this.attr('instance');
-        const {
-          fieldId: caId,
-          value: caValue,
-        } = event;
-
-        instance.customAttr(caId, caValue);
-        this.validateControls();
-      },
+      valid = _.find(items, (caObject) =>
+        caObject.validationState.hasGCAErrors
+      ) === undefined;
+      this.instance.attr('_gca_valid', valid);
     },
-    helpers: {
-      errorMessage(type) {
-        type = Mustache.resolve(type);
-        return errorMessages[type] || errorMessages.any;
-      },
-      isHidable(item, options) {
-        const hidable = (this.attr('allowHide') && !item.mandatory);
-        return hidable
-          ? options.fn()
-          : options.inverse();
-      },
+    initGlobalAttributes: function () {
+      const instance = this.attr('instance');
+      const globalCaObjects = instance.customAttr({
+        type: CUSTOM_ATTRIBUTE_TYPE.GLOBAL,
+      });
+      this.attr('items', globalCaObjects);
     },
-    init: function () {
-      if (!this.viewModel.attr('items').length) {
-        this.viewModel.initGlobalAttributes();
-      }
+    updateGlobalAttribute: function (event) {
+      const instance = this.attr('instance');
+      const {
+        fieldId: caId,
+        value: caValue,
+      } = event;
 
-      this.viewModel.validateControls();
+      instance.customAttr(caId, caValue);
+      this.validateControls();
     },
-  });
-})(window.can, window.GGRC);
+  },
+  helpers: {
+    errorMessage(type) {
+      type = Mustache.resolve(type);
+      return errorMessages[type] || errorMessages.any;
+    },
+    isHidable(item, options) {
+      const hidable = (this.attr('allowHide') && !item.mandatory);
+      return hidable
+        ? options.fn()
+        : options.inverse();
+    },
+  },
+  init: function () {
+    if (!this.viewModel.attr('items').length) {
+      this.viewModel.initGlobalAttributes();
+    }
+
+    this.viewModel.validateControls();
+  },
+});

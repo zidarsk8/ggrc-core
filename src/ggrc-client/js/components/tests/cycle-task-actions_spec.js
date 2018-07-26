@@ -5,16 +5,17 @@
 
 import tracker from '../../tracker';
 import * as WorkflowHelpers from '../../plugins/utils/workflow-utils';
+import Component from '../cycle-task-actions/cycle-task-actions';
+import {getComponentVM} from '../../../js_specs/spec_helpers';
 
-describe('GGRC.Components.subTreeWrapper', function () {
+describe('cycle-task-actions component', function () {
   'use strict';
 
   let vm;
   let fakeEvent;
 
   beforeEach(function () {
-    vm = GGRC.Components.getViewModel('cycleTaskActions');
-
+    vm = getComponentVM(Component);
     fakeEvent = {
       stopPropagation: jasmine.createSpy(),
     };
