@@ -322,7 +322,7 @@ const userRolesModalSelector = can.Control.extend({
 
     // Create the new join (skipping "No Role" role, with id == 0)
     if (clickedOption.id > 0 && !alreadyExists) {
-      $.when.apply($, deleteDfds).then(function () {
+      $.when(...deleteDfds).then(function () {
         join = self.get_new_join(
           clickedOption.id,
           clickedOption.scope,
@@ -336,7 +336,7 @@ const userRolesModalSelector = can.Control.extend({
         });
       });
     } else {
-      $.when.apply($, deleteDfds).then(function () {
+      $.when(...deleteDfds).then(function () {
         $('body').trigger('treeupdate');
       });
     }

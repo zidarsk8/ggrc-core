@@ -484,7 +484,7 @@ function loadItemsForSubTier(models, type, id, filter) {
         return batchRequests(params);
       });
 
-      resultDfd = can.when.apply(can, dfds).promise();
+      resultDfd = can.when(...dfds).promise();
 
       if (!related.initialized) {
         mappedDfd = initMappedInstances();

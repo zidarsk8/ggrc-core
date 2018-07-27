@@ -94,7 +94,7 @@ export default can.Component.extend({
           return this.generateModel(item, id, options.type);
         }.bind(this));
         this._results = results;
-        $.when.apply($, results)
+        $.when(...results)
           .then(function () {
             let tasks = arguments;
             let ids;

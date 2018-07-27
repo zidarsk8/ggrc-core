@@ -143,7 +143,7 @@ let viewModel = can.Map.extend({
     if (dfdReady.state() === 'pending') {
       this.attr('spin', true);
       dfds.push(dataPromise);
-      dfdReady = $.when.apply($, dfds).then(function () {
+      dfdReady = $.when(...dfds).then(function () {
         this.attr('spin', false);
       }.bind(this));
 

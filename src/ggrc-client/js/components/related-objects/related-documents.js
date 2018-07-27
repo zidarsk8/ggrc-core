@@ -122,8 +122,7 @@ import pubsub from '../../pub-sub';
       addDocuments: function (event) {
         let items = event.items;
         this.attr('isLoading', true);
-        return this.attr('documents').unshift
-          .apply(this.attr('documents'), items);
+        return this.attr('documents').unshift(...items);
       },
       createDocument: function (data) {
         let date = new Date();
