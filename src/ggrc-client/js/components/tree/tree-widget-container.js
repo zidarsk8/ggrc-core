@@ -48,6 +48,7 @@ import Pagination from '../base-objects/pagination';
 import tracker from '../../tracker';
 import router from '../../router';
 import Permission from '../../permission';
+import {notifier} from '../../plugins/utils/notifiers-utils';
 
 let viewModel;
 
@@ -725,7 +726,7 @@ export default can.Component.extend({
           this.viewModel.updateActiveItemIndicator(relativeIndex);
         }.bind(this))
         .fail(function () {
-          GGRC.Errors.notifier('error', 'Failed to fetch an object.');
+          notifier('error', 'Failed to fetch an object.');
         })
         .always(function () {
           pinControl.setLoadingIndicator(componentSelector, false);

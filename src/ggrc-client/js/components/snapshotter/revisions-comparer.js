@@ -9,6 +9,7 @@ import {
   getInstanceView,
 } from '../../plugins/utils/object-history-utils';
 import RefreshQueue from '../../models/refresh_queue';
+import {notifier} from '../../plugins/utils/notifiers-utils';
 
 export default can.Component.extend({
   tag: 'revisions-comparer',
@@ -263,7 +264,7 @@ export default can.Component.extend({
         .then(function () {
           let message = instance.child_type +
         ' was refreshed successfully.';
-          GGRC.Errors.notifier('success', [message]);
+          notifier('success', [message]);
         });
     },
 

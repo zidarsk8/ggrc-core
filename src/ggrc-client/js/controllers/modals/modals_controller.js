@@ -42,7 +42,10 @@ import {
   becameDeprecated,
 } from '../../plugins/utils/controllers';
 import {REFRESH_MAPPING} from '../../events/eventTypes';
-
+import {
+  notifier,
+  notifierXHR,
+} from '../../plugins/utils/notifiers-utils';
 
 export default can.Control({
   pluginName: 'ggrc_controllers_modals',
@@ -1082,10 +1085,10 @@ export default can.Control({
   save_error: function (_, error) {
     if (error) {
       if (error.status !== 409) {
-        GGRC.Errors.notifier('error', error.responseText);
+        notifier('error', error.responseText);
       } else {
         clearTimeout(error.warningId);
-        GGRC.Errors.notifierXHR('warning')(error);
+        notifierXHR('warning')(error);
       }
     }
     // enable ui after a fail
