@@ -74,7 +74,7 @@ class TestWfMemberPropagation(base.TestACLPropagation):
           "CycleTaskEntry": {
               "create": False,
               "read": True,
-              "update": (False, "unimplemented"),
+              "update": False,
               "delete": False,
           },
       },
@@ -136,7 +136,7 @@ class TestWfMemberPropagation(base.TestACLPropagation):
           "CycleTaskEntry": {
               "create": False,
               "read": True,
-              "update": (False, "unimplemented"),
+              "update": False,
               "delete": False,
           },
       },
@@ -198,7 +198,7 @@ class TestWfMemberPropagation(base.TestACLPropagation):
           "CycleTaskEntry": {
               "create": True,
               "read": True,
-              "update": (True, "unimplemented"),
+              "update": True,
               "delete": True,
           },
       },

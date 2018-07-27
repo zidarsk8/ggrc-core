@@ -75,7 +75,7 @@ class TestWfAdminPropagation(base.TestACLPropagation):
           "CycleTaskEntry": {
               "create": True,
               "read": True,
-              "update": (True, "unimplemented"),
+              "update": True,
               "delete": True,
           },
       },
@@ -137,7 +137,7 @@ class TestWfAdminPropagation(base.TestACLPropagation):
           "CycleTaskEntry": {
               "create": True,
               "read": True,
-              "update": (True, "unimplemented"),
+              "update": True,
               "delete": True,
           },
       },
@@ -199,7 +199,7 @@ class TestWfAdminPropagation(base.TestACLPropagation):
           "CycleTaskEntry": {
               "create": True,
               "read": True,
-              "update": (True, "unimplemented"),
+              "update": True,
               "delete": True,
           },
       },
