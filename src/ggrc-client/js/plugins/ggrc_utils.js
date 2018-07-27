@@ -442,7 +442,7 @@ function getHighestAssigneeRole(obj, roles) {
   roles = _.map(roles, _.capitalize);
 
   roles.unshift('none');
-  return _.max(roles, Array.prototype.indexOf.bind(roleOrder));
+  return _.maxBy(roles, Array.prototype.indexOf.bind(roleOrder));
 }
 
 /**
