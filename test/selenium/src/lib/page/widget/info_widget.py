@@ -7,14 +7,14 @@ import re
 
 from selenium.webdriver.common.by import By
 
-from lib import base, users
+from lib import base
 from lib.constants import (
     locator, objects, element, roles, regex, messages)
 from lib.constants.locator import WidgetInfoAssessment, WidgetInfoControl
 from lib.element import widget_info, tab_containers, tables
 from lib.page.modal import update_object
 from lib.page.modal.set_value_for_asmt_ca import SetValueForAsmtDropdown
-from lib.page.widget import page_tab
+from lib.page.widget import page_tab, page_elements
 from lib.page.widget.page_mixins import (WithAssignFolder, WithObjectReview,
                                          WithPageElements)
 from lib.utils import selenium_utils, string_utils, help_utils
@@ -103,8 +103,8 @@ class InfoWidget(page_tab.WithPageTab, WithPageElements, base.Widget):
     self._extend_list_all_scopes_by_review_state()
     if not self.is_asmts_info_widget:
       self._extend_list_all_scopes_by_code()
-      self._extend_list_all_scopes_by_cas()
     self.comment_area = self._comment_area()
+    self.edit_popup = self._edit_popup()
 
   def wait_save(self):
     """Wait for object to be saved and page to be updated.
@@ -211,121 +211,62 @@ class InfoWidget(page_tab.WithPageTab, WithPageElements, base.Widget):
     return (people_header_txt,
             None if people_value_txt == ["None"] else people_value_txt)
 
-  def get_headers_and_values_dict_from_cas_scopes(self, is_gcas_not_lcas=True):  # noqa: ignore=C901
-    """Get text of all CAs headers and values elements scopes and convert it to
-    dictionary. If 'is_gcas_not_lcas' then get GCAs, if not 'is_gcas_not_lcas'
+  def global_custom_attributes(self):
+    """Returns GCA values."""
+    return self.get_custom_attributes()
+
+  def get_custom_attributes(self, is_gcas_not_lcas=True):
+    """Get text of all CAs headers and values and convert it to dictionary.
+    If 'is_gcas_not_lcas' then get GCAs, if not 'is_gcas_not_lcas'
     then get LCAs.
     Example:
     :return {'ca_header1': 'ca_value1', 'ca_header2': 'ca_value2', ...}
     """
-    # pylint: disable=invalid-name
-    # pylint: disable=too-many-branches
-    selenium_utils.wait_for_js_to_load(self._driver)
-    cas_locator = (self._locators.CAS_HEADERS_AND_VALUES if is_gcas_not_lcas
-                   else self._locators.LCAS_HEADERS_AND_VALUES)
-    cas_headers_and_values = self.info_widget_elem.find_elements(*cas_locator)
-    dict_cas_scopes = {}
-    if len(cas_headers_and_values) >= 1:
-      list_text_cas_scopes = []
-      for scope in cas_headers_and_values:
-        ca_header_text = scope.text.splitlines()[0]
-        if len(scope.text.splitlines()) >= 2:
-          if scope.text.splitlines()[1].strip():
-            list_text_cas_scopes.append(
-                [ca_header_text, scope.text.splitlines()[1]])
-          else:
-            list_text_cas_scopes.append([ca_header_text, None])
-        if len(scope.text.splitlines()) == 1:
-          if (element.AdminWidgetCustomAttributes.CHECKBOX.upper() in
-                  ca_header_text):
-            list_text_cas_scopes.append(
-                [ca_header_text,
-                 unicode(int(base.Checkbox(self._driver, scope.find_element(
-                     *self._locators.CAS_CHECKBOXES)).is_checked_via_js()))
-                 ])
-          else:
-            list_text_cas_scopes.append([ca_header_text, None])
-        if not is_gcas_not_lcas:
-          self.collect_lcas_attr_name_value(
-              ca_header_text, list_text_cas_scopes, scope)
-      cas_headers, _cas_values = [list(text_cas_scope) for text_cas_scope
-                                  in zip(*list_text_cas_scopes)]
-      # conversion
-      cas_values = []
-      for ca_val in _cas_values:
-        if ca_val is None:
-          cas_values.append(None)
-        elif ca_val == users.SUPERUSER_EMAIL:
-          # Example User
-          cas_values.append(
-              unicode(objects.get_singular(objects.PEOPLE).title()))
-        elif "/" in ca_val and len(ca_val) == 10:
-          # Date
-          _date = ca_val.split("/")
-          cas_values.append(unicode("{y}-{m}-{d}".format(
-              y=_date[2], m=_date[0], d=_date[1])))
-        else:
-          # Other
-          cas_values.append(ca_val)
-      dict_cas_scopes = dict(zip(cas_headers, cas_values))
-    return dict_cas_scopes
+    custom_attributes = {}
+    ca_manager = page_elements.CustomAttributeManager(
+        self._browser,
+        obj_type=self.child_cls_name.lower(),
+        is_global=is_gcas_not_lcas,
+        is_inline=True)
+    all_ca_titles = ca_manager.all_ca_titles()
+    for ca_title in all_ca_titles:
+      ca_elem = ca_manager.find_ca_elem_by_title(ca_title)
+      custom_attributes[ca_title] = ca_elem.get_value()
+    return custom_attributes
 
-  def collect_lcas_attr_name_value(self, ca_header_text, list_text_cas_scopes,
-                                   scope):
-    """Collect all local attribute with values"""
-    ca_type = scope.get_attribute("class")
-    if "custom-attribute-checkbox" in ca_type:
-      ca_value = unicode(int(base.Checkbox(self._driver, scope.find_element(
-          *self._locators.CAS_CHECKBOXES)).is_checked_via_js()))
-    elif "custom-attribute-date" in ca_type:
-      ca_value = scope.find_element(
-          *locator.WidgetInfoPanel.
-          DATE_CA_INPUT).get_attribute("value")
-    elif "custom-attribute-text" in ca_type:
-      ca_value = scope.find_element(
-          *locator.WidgetInfoPanel.RICH_TEXT_CA_INPUT).text
-    elif "custom-attribute-input" in ca_type:
-      ca_value = scope.find_element(
-          *locator.WidgetInfoPanel.TEXT_CA_INPUT).text
-    elif "custom-attribute-dropdown" in ca_type:
-      ca_value = (
-          selenium_utils.get_element_value_js(
-              self._driver, scope.find_element(
-                  *locator.WidgetInfoPanel.DROPDOWN_CA_ITEM)))
-    elif "custom-attribute-person" in ca_type:
-      ca_value = scope.find_element(
-          *locator.WidgetInfoPanel.PERSON_CA).text
-    else:
-      raise NotImplementedError()
-    list_text_cas_scopes.append([ca_header_text, ca_value])
+  def fill_global_cas_in_popup(self, custom_attributes):
+    """Fills GCAs using Edit popup."""
+    self.open_info_3bbs().select_edit()
+    self.fill_ca_values(custom_attributes, is_global=True, is_inline=False)
 
-  def fill_lcas_attr_values(self):
-    """Fill all local custom attribute with values."""
-    selenium_utils.wait_for_js_to_load(self._driver)
-    cas_headers_and_values = self.info_widget_elem.find_elements(
-        *locator.WidgetInfoAssessment.LCAS_HEADERS_AND_VALUES)
-    dict_cas_scopes = {}
-    if len(cas_headers_and_values) >= 1:
-      for scope in cas_headers_and_values:
-        ca_type = scope.get_attribute("class")
-        if "custom-attribute-date" in ca_type:
-          ca_elem = base.DateCustomAttribute(
-              scope, locator.WidgetInfoPanel.DATE_CA_FIELDS,
-              locator.WidgetInfoPanel.DATE_CA_INPUT)
-          ca_elem.set_value()
-          dict_cas_scopes.update({scope.text: ca_elem.get_value()})
+  def fill_global_cas_inline(self, custom_attributes):
+    """Fills GCAs inline."""
+    self.fill_ca_values(custom_attributes, is_global=True, is_inline=True)
 
-    selenium_utils.wait_for_element_text(
-        self._driver,
-        locator.WidgetInfoPanel.CA_SAVED_STATUS,
-        element.GenericWidget.ALL_CHANGES_SAVED)
-    return dict_cas_scopes
+  def fill_ca_values(self, custom_attributes, is_global, is_inline):
+    """Fills custom attributes with values."""
+    ca_manager = page_elements.CustomAttributeManager(
+        self._browser,
+        obj_type=self.child_cls_name.lower(),
+        is_global=is_global,
+        is_inline=is_inline)
+    for attr_title, attr_value in custom_attributes.iteritems():
+      elem_class = ca_manager.find_ca_elem_by_title(attr_title)
+      elem_class.set_value(attr_value)
+      if is_inline:
+        self.wait_save()
+    if not is_inline:
+      self.edit_popup.save_and_close()
 
   def get_info_widget_obj_scope(self):
     """Get dict from object (text scope) which displayed on info page or
     info panel according to list of headers text and list of values text.
     """
-    return dict(zip(self.list_all_headers_txt, self.list_all_values_txt))
+    obj_scope = {
+        "custom_attributes": self.global_custom_attributes()
+    }
+    obj_scope.update(zip(self.list_all_headers_txt, self.list_all_values_txt))
+    return obj_scope
 
   def _extend_list_all_scopes(self, headers, values):
     """Extend 'list all scopes' by headers' text and values' text."""
@@ -340,14 +281,6 @@ class InfoWidget(page_tab.WithPageTab, WithPageElements, base.Widget):
         self.get_header_and_value_txt_from_custom_scopes(
             self._elements.CODE.upper()))
     self._extend_list_all_scopes(self.code_lbl_txt, self.code_txt)
-
-  def _extend_list_all_scopes_by_cas(self):
-    """Set attributes related to 'global custom attributes' and extend
-    'list all scopes' accordingly.
-    """
-    self.cas_lbl_txt = self._elements.CAS.upper()
-    self.cas_scope_txt = self.get_headers_and_values_dict_from_cas_scopes()
-    self._extend_list_all_scopes(self.cas_lbl_txt, self.cas_scope_txt)
 
   def _extend_list_all_scopes_by_review_state(self):
     """Set attributes related to 'review state' and extend
@@ -520,8 +453,6 @@ class Assessments(InfoWidget):
     self.asmt_type_txt = objects.get_obj_type(self.asmt_type.text)
     self.mapped_objects_lbl_txt = self._elements.MAPPED_OBJECTS.upper()
     self.mapped_objects_titles_txt = self._get_mapped_objs_titles_txt()
-    self.lcas_scope_txt = self.get_headers_and_values_dict_from_cas_scopes(
-        is_gcas_not_lcas=False)
     self.creators_lbl_txt, self.creators_txt = (
         self.get_header_and_value_txt_from_people_scopes(
             self._elements.CREATORS.upper()))
@@ -537,7 +468,6 @@ class Assessments(InfoWidget):
     self.comments_scopes_txt = self.comments_panel.scopes
     self._assessment_tab_name = "Assessment"
     self._other_attributes_tab_name = "Other Attributes"
-    # todo: implement separate add lcas and gcas
     # todo: implement separate add mapped ctrls and mapped other objs
     self._extend_list_all_scopes(
         [self.is_verified_lbl_txt, self.creators_lbl_txt,
@@ -584,25 +514,36 @@ class Assessments(InfoWidget):
     self.core_elem = self.tab_container.active_tab_elem
     self.mapped_objects_titles_txt += self._get_mapped_objs_titles_txt()
     self._extend_list_all_scopes_by_code()
-    self._extend_list_all_scopes_by_cas()
+    custom_attributes = self.global_custom_attributes()
+    custom_attributes.update(self.local_custom_attributes())
     obj_scope = {
+        "custom_attributes": custom_attributes,
         "evidence_urls": self.evidence_urls.get_urls(),
         "primary_contacts": self.primary_contacts.get_people_emails()
     }
     obj_scope.update(zip(self.list_all_headers_txt, self.list_all_values_txt))
     return obj_scope
 
-  def _extend_list_all_scopes_by_cas(self):
-    """Extend attributes related to 'local and global custom attributes' and
-    extend 'list all scopes' if 'Other Attributes' tab opened.
-    """
-    # todo: implement separate entities' model for lcas and gcas
-    if (self.tab_container.tab_controller.active_tab.text ==
-            element.AssessmentTabContainer.OTHER_ATTRS_TAB):
-      self.cas_lbl_txt = self._elements.CAS.upper()
-      self.cas_scope_txt = self.get_headers_and_values_dict_from_cas_scopes()
-      self.cas_scope_txt.update(self.lcas_scope_txt)
-      self._extend_list_all_scopes(self.cas_lbl_txt, self.cas_scope_txt)
+  def global_custom_attributes(self):
+    """Switches to tab with GCA and returns their values."""
+    self.ensure_tab(self._other_attributes_tab_name)
+    return self.get_custom_attributes()
+
+  def local_custom_attributes(self):
+    """Switches to tab with LCA and returns their values."""
+    self.ensure_tab(self._assessment_tab_name)
+    custom_attributes = self.get_custom_attributes(False)
+    return {k.upper(): v for k, v in custom_attributes.iteritems()}
+
+  def fill_local_cas(self, custom_attributes):
+    """Fills LCAs on asmt page."""
+    self.ensure_tab(self._assessment_tab_name)
+    self.fill_ca_values(custom_attributes, is_global=False, is_inline=True)
+
+  def fill_global_cas_inline(self, custom_attributes):
+    """Fills GCAs inline."""
+    self.ensure_tab(self._other_attributes_tab_name)
+    self.fill_ca_values(custom_attributes, is_global=True, is_inline=True)
 
   def _extend_list_all_scopes_by_review_state(self):
     """Method overriding without action due to Assessments don't have
@@ -658,12 +599,6 @@ class AssessmentTemplates(InfoWidget):
   def _extend_list_all_scopes_by_code(self):
     """Method overriding without action due to Assessment Templates don't have
     'code'.
-    """
-    pass
-
-  def _extend_list_all_scopes_by_cas(self):
-    """Method overriding without action due to Assessment Templates don't have
-    'global custom attributes'.
     """
     pass
 

@@ -10,12 +10,13 @@ import os
 import urlparse
 
 import pytest
-# Wokaround https://github.com/pytest-dev/pytest/issues/3775
+# Workaround https://github.com/pytest-dev/pytest/issues/3775
 from pytest_selenium import pytest_selenium as pt_selenium
 from selenium.webdriver.remote.remote_connection import (
     LOGGER as SELENIUM_LOGGER)
 
 from lib import dynamic_fixtures, environment, url, users
+from lib.constants import element
 from lib.constants.test_runner import DESTRUCTIVE_TEST_METHOD_PREFIX
 from lib.custom_pytest_scheduling import CustomPytestScheduling
 from lib.entities import entities_factory
@@ -371,7 +372,7 @@ def new_assessments_from_template_rest(request, new_audit_rest):
   assessments = assessments_service.create_assessments(
       audit=new_audit_rest,
       template=template,
-      control_snapshots=control_snapshots
+      snapshots=control_snapshots
   )
   return assessments
 
@@ -592,6 +593,20 @@ def audit(program):
 def audits(program):
   """Create 2 audits mapped to the program"""
   return [rest_facade.create_audit(program) for _ in xrange(2)]
+
+
+@pytest.fixture()
+def assessment(audit):
+  """Creates an assessment within audit."""
+  return rest_facade.create_asmt(audit)
+
+
+@pytest.fixture()
+def gcads_for_asmt():
+  """Creates GCADs of all types for Assessment."""
+  return [rest_facade.create_gcad(definition_type="assessment",
+                                  attribute_type=ca_type)
+          for ca_type in element.AdminWidgetCustomAttributes.ALL_CA_TYPES]
 
 
 @pytest.fixture()

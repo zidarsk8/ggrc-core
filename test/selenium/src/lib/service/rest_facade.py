@@ -5,14 +5,11 @@ Reasons for a facade:
 * It is not very convenient to use
 * More high level functions are often needed
 """
-
 from lib import factory
 from lib.constants import roles
-from lib.constants.element import AdminWidgetCustomAttributes
-from lib.entities.entities_factory import CustomAttributeDefinitionsFactory
+from lib.entities import entities_factory
 from lib.entities.entity import Representation
 from lib.service import rest_service
-from lib.utils.string_utils import StringMethods
 
 
 def create_program(**attrs):
@@ -37,74 +34,38 @@ def create_audit(program, **attrs):
       factory_params=attrs)
 
 
-def create_asmt_template(audit, **attrs):
-  """Create assessment template."""
-  return rest_service.AssessmentTemplatesService().create_obj(
-      audit=audit.__dict__,
-      factory_params=attrs)
-
-
-def create_asmt_template_w_dropdown(audit, dropdown_types_list):
-  """Create assessment template with dropdown custom attribute."""
-  multi_choice_mandatory = {"file": "2", "url": "4", "comment": "1",
-                            "file_url": "6", "url_comment": "5",
-                            "file_comment": "3", "file_url_comment": "7",
-                            "nothing": "0"}
-  ca_definitions_factory = CustomAttributeDefinitionsFactory()
-  custom_attribute_definitions = [ca_definitions_factory.create(
-      title=(ca_definitions_factory.generate_ca_title(
-          AdminWidgetCustomAttributes.DROPDOWN)),
-      attribute_type=AdminWidgetCustomAttributes.DROPDOWN,
-      definition_type=AdminWidgetCustomAttributes.DROPDOWN,
-      multi_choice_mandatory=(",".join(
-          multi_choice_mandatory[dropdown_type]
-          for dropdown_type in dropdown_types_list)),
-      multi_choice_options=(
-          StringMethods.random_list_strings(
-              list_len=len(dropdown_types_list))))]
-  custom_attribute_definitions = (ca_definitions_factory.
-                                  generate_ca_defenitions_for_asmt_tmpls(
-                                      custom_attribute_definitions))
-  return create_asmt_template(
-      audit, custom_attribute_definitions=custom_attribute_definitions)
-
-
-def create_asmt_from_template_rest(
-    audit, control, asmt_template
-):
-  """Create new Assessment based on Assessment Template via REST API.
-  Return: lib.entities.entity.AssessmentEntity
-  """
-  control_snapshots = [Representation.convert_repr_to_snapshot(
-      objs=control, parent_obj=audit)]
-  assessments_service = rest_service.AssessmentsFromTemplateService()
-  assessments = assessments_service.create_assessments(
-      audit=audit,
-      template=asmt_template,
-      control_snapshots=control_snapshots
-  )
-  return assessments[0]
-
-
-def create_assessment(audit, **attrs):
+def create_asmt(audit, **attrs):
   """Create an assessment within an audit `audit`"""
   attrs["audit"] = audit.__dict__
-  return rest_service.AssessmentsService().create_obj(
-      audit=audit.__dict__,
-      factory_params=attrs)
+  return rest_service.AssessmentsService().create_obj(factory_params=attrs)
 
 
-def create_assessment_template(audit, **attrs):
-  """Create an assessment template"""
+def create_asmt_template(audit, **attrs):
+  """Create assessment template."""
+  obj_attrs, cad_attrs = _split_attrs(
+      attrs, ["cad_type", "dropdown_types_list"])
+  if "cad_type" in cad_attrs:
+    cads = [entities_factory.AssessmentTemplatesFactory.generate_cad(
+        **cad_attrs)]
+    obj_attrs["custom_attribute_definitions"] = cads
+  obj_attrs["audit"] = audit.__dict__
   return rest_service.AssessmentTemplatesService().create_obj(
-      audit=audit.__dict__,
-      factory_params=attrs)
+      factory_params=obj_attrs)
 
 
-def create_assessment_from_template(audit, template, **attrs):
+def create_asmt_from_template(audit, asmt_template, obj_to_map):
   """Create an assessment from template"""
+  snapshots = [Representation.convert_repr_to_snapshot(
+      objs=obj_to_map, parent_obj=audit)]
   return rest_service.AssessmentsFromTemplateService().create_assessments(
-      audit=audit, template=template, **attrs)[0]
+      audit=audit, template=asmt_template, snapshots=snapshots
+  )[0]
+
+
+def create_gcad(**attrs):
+  """Creates global CADs for all types."""
+  return rest_service.CustomAttributeDefinitionsService().create_obj(
+      factory_params=attrs)
 
 
 def create_issue(program=None):
@@ -167,19 +128,11 @@ def _create_obj_in_program_scope(obj_name, program, **attrs):
   return obj
 
 
-def _split_attrs(attrs, keys_for_template=None):
+def _split_attrs(attrs, second_part_keys=None):
   """Split `attrs` dictionary into two parts:
-  * Dict with keys that are not in `keys_for_template`
-  * Remainder dict with keys in `keys_for_template`
+  * Dict with keys that are not in `second_part_keys`
+  * Remainder dict with keys in `second_part_keys`
   """
-  if keys_for_template is None:
-    keys_for_template = []
-  attrs_remainder = {}
-  factory_params = {}
-  for key, value in attrs.items():
-    if key in keys_for_template:
-      d = attrs_remainder
-    else:
-      d = factory_params
-    d[key] = value
-  return factory_params, attrs_remainder
+  dict_1 = {k: v for k, v in attrs.iteritems() if k not in second_part_keys}
+  dict_2 = {k: v for k, v in attrs.iteritems() if k in second_part_keys}
+  return dict_1, dict_2
