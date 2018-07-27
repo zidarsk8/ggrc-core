@@ -16,7 +16,6 @@ from ggrc.integrations.synchronization_jobs import issue_sync_job
 from ggrc.integrations.synchronization_jobs import sync_utils
 from integration import ggrc
 from integration.ggrc.models import factories
-from api_search.helpers import create_rand_person
 
 
 @ddt.ddt
@@ -25,8 +24,8 @@ class TestIssueIntegration(ggrc.TestCase):
 
   def setUp(self):
     super(TestIssueIntegration, self).setUp()
-    self.verifier = create_rand_person()
-    self.assignee = create_rand_person()
+    self.verifier = factories.PersonFactory(name="a")
+    self.assignee = factories.PersonFactory(name="b")
     self.admin_role = all_models.AccessControlRole.query.filter_by(
         object_type=all_models.Issue.__name__, name="Admin"
     ).first()
@@ -104,7 +103,7 @@ class TestIssueIntegration(ggrc.TestCase):
   def test_sync_verifier_email(self):
     """Test adding new verifier email into Issue ACL."""
     # Arrange test data.
-    new_verifier = create_rand_person()
+    new_verifier = factories.PersonFactory(name="c")
     iti = self.initialize_test_issuetracker_info()
 
     batches = [
@@ -145,7 +144,7 @@ class TestIssueIntegration(ggrc.TestCase):
   def test_sync_assignee_email(self):
     """Test adding new assignee email into Issue ACL."""
     # Arrange test data.
-    new_assignee = create_rand_person()
+    new_assignee = factories.PersonFactory(name="d")
     iti = self.initialize_test_issuetracker_info()
 
     batches = [
@@ -195,12 +194,12 @@ class TestIssueIntegration(ggrc.TestCase):
     Other Admins and Primary Contacts shouldn't be removed.
     """
     # Arrange test data.
-    new_assignee = create_rand_person()
-    new_verifier = create_rand_person()
+    new_assignee = factories.PersonFactory(name="e")
+    new_verifier = factories.PersonFactory(name="f")
     iti = self.initialize_test_issuetracker_info()
 
     # Add more admins into issue.
-    second_verifier = create_rand_person()
+    second_verifier = factories.PersonFactory(name="g")
     # Change names to be sure that names in alphabetical order.
     self.verifier.name = "A" + self.verifier.name
     second_verifier.name = "B" + second_verifier.name
@@ -212,7 +211,7 @@ class TestIssueIntegration(ggrc.TestCase):
     )
 
     # Add more primary contacts into issue.
-    second_assignee = create_rand_person()
+    second_assignee = factories.PersonFactory(name="h")
     # Change names to be sure that names in alphabetical order.
     self.assignee.name = "A" + self.assignee.name
     second_assignee.name = "B" + second_assignee.name
