@@ -23,94 +23,93 @@ class TestSplitArry(unittest.TestCase):
   def test_sigle_block(self):
     """Test splitting of a single csv block
 
-    The array reprisents a read csv file with no lines that contain only
+    The array represents a read csv file with no lines that contain only
     commas.
     """
     test_data = [
-        ["hello", "world"],
+        ["Object type", "world"],
         ["hello", "world"],
         ["hello", "world"],
     ]
-    offests, data_blocks = zip(*import_helper.split_array(test_data))
+    offsets, data_blocks, _ = zip(*import_helper.split_array(test_data))
     self.assertEqual(len(data_blocks), 1)
     self.assertEqual(data_blocks[0], test_data)
-    self.assertEqual(offests[0], 0)
+    self.assertEqual(offsets[0], 0)
 
   def test_sigle_block_with_padding(self):
     """Test stripping away empty csv lins
     """
     test_data = [
         ["", ""],
-        ["hello", "world"],
+        ["Object type", "world"],
         ["hello", "world", "uet"],
         ["hello", "world"],
         ["hello", "world"],
     ]
-    offests, data_blocks = zip(*import_helper.split_array(test_data))
+    offsets, data_blocks, _ = zip(*import_helper.split_array(test_data))
     self.assertEqual(len(data_blocks), 1)
     self.assertEqual(data_blocks[0], test_data[1:])
-    self.assertEqual(offests[0], 1)
+    self.assertEqual(offsets[0], 1)
 
     test_data = [
         ["", ""],
         ["", ""],
         ["", ""],
-        ["hello", "world"],
+        ["Object type", "world"],
         ["hello", "world", "uet"],
         ["hello", "world"],
         ["hello", "world"],
         ["", ""],
         ["", ""],
     ]
-    offests, data_blocks = zip(*import_helper.split_array(test_data))
+    offsets, data_blocks, _ = zip(*import_helper.split_array(test_data))
     self.assertEqual(len(data_blocks), 1)
     self.assertEqual(data_blocks[0], test_data[3:7])
-    self.assertEqual(offests[0], 3)
+    self.assertEqual(offsets[0], 3)
 
   def test_multiple_blocks(self):
     """Test splitting blocks of csv file
 
-    Test that split_array function splits a csv file by one or more empty
-    lines. The lines with only empty strings represent comma only lines in a
-    read csv file.
+    Test that split_array function splits a csv file by lines beginning with
+    "Object type" cell
     """
     test_data = [
         ["", ""],
-        ["hello", "world"],
+        ["Object type", "foo"],
         ["hello", "world", "uet"],
         ["", ""],
-        ["hello", "world"],
+        ["Object type", "bar"],
         ["hello", "world"],
     ]
-    offests, data_blocks = zip(*import_helper.split_array(test_data))
+    offsets, data_blocks, _ = zip(*import_helper.split_array(test_data))
     self.assertEqual(len(data_blocks), 2)
     self.assertEqual(data_blocks[0], test_data[1:3])
     self.assertEqual(data_blocks[1], test_data[4:6])
-    self.assertEqual(offests[0], 1)
-    self.assertEqual(offests[1], 4)
+    self.assertEqual(offsets[0], 1)
+    self.assertEqual(offsets[1], 4)
 
     test_data = [
         ["", ""],
-        ["hello", "world"],
+        ["Object type", "world"],
         ["hello", "world", "uet"],
         ["hello", "world"],
         ["", ""],
         ["", ""],
-        ["hello", "world"],
+        ["Object type", "foo"],
         ["", ""],
         ["", ""],
-        ["hello", "world"],
+        ["Object type", "bar"],
         ["hello", "world"],
         ["hello", "world"],
     ]
-    offests, data_blocks = zip(*import_helper.split_array(test_data))
+    offsets, data_blocks, _ = zip(*import_helper.split_array(test_data))
     self.assertEqual(len(data_blocks), 3)
     self.assertEqual(data_blocks[0], test_data[1:4])
     self.assertEqual(data_blocks[1], test_data[6:7])
     self.assertEqual(data_blocks[2], test_data[9:])
-    self.assertEqual(offests[0], 1)
-    self.assertEqual(offests[1], 6)
-    self.assertEqual(offests[2], 9)
+    self.assertEqual(offsets[0], 1)
+    self.assertEqual(offsets[1], 6)
+    self.assertEqual(offsets[2], 9)
 
 
 class TestColumnOrder(unittest.TestCase):
@@ -119,11 +118,11 @@ class TestColumnOrder(unittest.TestCase):
   """
 
   def test_column_order(self):
-    """Test sorting of colums by a predined positions.
+    """Test sorting of columns by a predefined positions.
 
-    The predifined positions for all columns can be found in reflection.py.
+    The predefined positions for all columns can be found in reflection.py.
     Attr_list is created in an expected correct order, against which a newly
-    orderd list is compaired.
+    ordered list is compared.
     """
     attr_list = [
         "slug",
