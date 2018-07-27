@@ -100,7 +100,7 @@ describe('display prefs model', function () {
 
       let exp_token;
       beforeEach(function () {
-        exp_token = exp[token]; //late binding b/c not available when describe block is created
+        exp_token = exp[token]; // late binding b/c not available when describe block is created
       });
 
       // TODO: figure out why these fail, error is "can.Map: Object does not exist thrown"
@@ -178,8 +178,8 @@ describe('display prefs model', function () {
 
       beforeEach(function () {
         can.each([exp.SORTS, exp.COLLAPSE], function (exp_token) {
-          display_prefs.makeObject(exp_token, 'unit_test').attr('foo', 'bar'); //page type defaults
-          display_prefs.makeObject(exp.path, exp_token).attr('foo', 'baz'); //page custom settings
+          display_prefs.makeObject(exp_token, 'unit_test').attr('foo', 'bar'); // page type defaults
+          display_prefs.makeObject(exp.path, exp_token).attr('foo', 'baz'); // page custom settings
         });
       });
       afterEach(function () {
@@ -201,8 +201,8 @@ describe('display prefs model', function () {
     describe('#setPageAsDefault', function () {
       beforeEach(function () {
         can.each([exp.SORTS, exp.COLLAPSE], function (exp_token) {
-          display_prefs.makeObject(exp_token, 'unit_test').attr('foo', 'bar'); //page type defaults
-          display_prefs.makeObject(exp.path, exp_token).attr('foo', 'baz'); //page custom settings
+          display_prefs.makeObject(exp_token, 'unit_test').attr('foo', 'bar'); // page type defaults
+          display_prefs.makeObject(exp.path, exp_token).attr('foo', 'baz'); // page custom settings
         });
       });
       afterEach(function () {
@@ -256,7 +256,7 @@ describe('display prefs model', function () {
         expect(dp_noversion.destroy).toHaveBeenCalled();
       });
 
-      waitsFor(function () { //sanity check --ensure deferred resolves/rejects
+      waitsFor(function () { // sanity check --ensure deferred resolves/rejects
         return dfd.state() !== 'pending';
       }, done);
     });
@@ -292,7 +292,7 @@ describe('display prefs model', function () {
         expect(pseudoxhr.status).toBe(404);
         expect(dp_noversion.destroy).toHaveBeenCalled();
       });
-      waitsFor(function () { //sanity check --ensure deferred resolves/rejects
+      waitsFor(function () { // sanity check --ensure deferred resolves/rejects
         return dfd.state() !== 'pending';
       }, done);
     });

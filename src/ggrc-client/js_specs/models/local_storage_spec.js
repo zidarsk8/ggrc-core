@@ -7,7 +7,7 @@ import {waitsFor} from '../spec_helpers';
 
 describe('can.Model.LocalStorage', function () {
 
-  //run-once setup
+  // run-once setup
   beforeAll(function () {
     can.Model.LocalStorage('SpecModel');
   });
@@ -123,7 +123,7 @@ describe('can.Model.LocalStorage', function () {
       let success = false;
       window.localStorage.setItem('spec_model:ids', '[]');
       new SpecModel({ foo: model1.foo }).save().done(function (item) {
-        expect(item.id + 1).not.toBe(item.id); //not infinity, not NaN
+        expect(item.id + 1).not.toBe(item.id); // not infinity, not NaN
         expect(item.foo).toEqual(model1.foo);
 
         let ids = JSON.parse(window.localStorage.getItem('spec_model:ids'));
@@ -131,7 +131,7 @@ describe('can.Model.LocalStorage', function () {
         expect(window.localStorage.getItem('spec_model:' + ids[0])).toBeDefined();
         success = true;
       });
-      window.localStorage.removeItem('spec_model:-Infinity'); //the problem key
+      window.localStorage.removeItem('spec_model:-Infinity'); // the problem key
       expect(success).toBe(true);
     });
 

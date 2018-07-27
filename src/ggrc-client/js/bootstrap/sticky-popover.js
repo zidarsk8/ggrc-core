@@ -53,7 +53,7 @@
         if (this.displayState !== 'show') {
           this.$element.trigger($.Event('show'));
         } else {
-          //fix the opacity value as it currently stands to prevent show-hide-show after loading.
+          // fix the opacity value as it currently stands to prevent show-hide-show after loading.
           this.tip().css({opacity: window.getComputedStyle(this.tip()[0]).opacity});
         }
 
