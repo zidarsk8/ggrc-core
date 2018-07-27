@@ -57,7 +57,6 @@
 < src/ggrc/templates/maintenance/maintenance.html
 < src/ggrc/templates/maintenance/trigger.html
 < src/packages
-< test/api_search/db_dump/api_search.sql
 < test/integration/ggrc/test_csvs/not_a_csv.txt
 < test/selenium/.gitignore
 < test/selenium/pytest.ini
