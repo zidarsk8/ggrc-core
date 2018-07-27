@@ -721,7 +721,7 @@ import {
           })
           .value();
 
-        perPersonRoleHistory = _.zipObject(
+        perPersonRoleHistory = _.fromPairs(
           _.map(perPersonMappings, function (revisions, pid) {
             let history = _.map(revisions, function (rev) {
               // Add extra check to fix possible issue with inconsistent data
@@ -766,7 +766,7 @@ import {
               });
           })), 'id');
 
-        assigneeRoles = _.zipObject(
+        assigneeRoles = _.fromPairs(
           _.map(currentAssignees, function (rolePeople, pid) {
             return [pid, _.map(rolePeople, 'type')];
           }));
