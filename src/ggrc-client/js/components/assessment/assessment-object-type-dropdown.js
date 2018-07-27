@@ -23,7 +23,7 @@ export default can.Component.extend({
           });
 
           // remove the groups that have ended up being empty
-          objectTypes = _.pick(objectTypes, function (objGroup) {
+          objectTypes = _.pickBy(objectTypes, function (objGroup) {
             return objGroup.items && objGroup.items.length > 0;
           });
 
