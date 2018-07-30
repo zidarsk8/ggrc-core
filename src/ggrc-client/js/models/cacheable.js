@@ -20,34 +20,6 @@ import tracker from '../tracker';
 import Mappings from './mappers/mappings';
 import {delayLeavingPageUntil} from '../plugins/utils/current-page-utils';
 
-function makeFindRelated(thistype, othertype) {
-  return function (params) {
-    if (!params[thistype + '_type']) {
-      params[thistype + '_type'] = this.shortName;
-    }
-    return CMS.Models.Relationship.findAll(params).then(
-      function (relationships) {
-        let dfds = [];
-        let things = new can.Model.List();
-        can.each(relationships, function (rel, idx) {
-          let dfd;
-          if (rel[othertype].selfLink) {
-            things.push(rel[othertype]);
-          } else {
-            dfd = rel[othertype].refresh().then(function (dest) {
-              things.splice(idx, 1, dest);
-            });
-            dfds.push(dfd);
-            things.push(dfd);
-          }
-        });
-        return $.when(...dfds).then(function () {
-          return things;
-        });
-      });
-  };
-}
-
 function dateConverter(date, oldValue, fn, key) {
   let conversion = 'YYYY-MM-DD\\THH:mm:ss\\Z';
   let ret;
@@ -399,9 +371,6 @@ export default can.Model('can.Model.Cacheable', {
     }
     return pargs;
   },
-
-  findRelated: makeFindRelated('source', 'destination'),
-  findRelatedSource: makeFindRelated('destination', 'source'),
 
   models: function (params) {
     let ms;
