@@ -12,7 +12,7 @@ needed by ggrc notifications.
 # pylint: disable=too-few-public-methods
 
 from collections import namedtuple
-from datetime import date, datetime
+from datetime import date, datetime, time
 from functools import partial
 from itertools import chain, izip
 from operator import attrgetter
@@ -39,6 +39,8 @@ class Transitions(Enum):
 
 
 IdValPair = namedtuple("IdValPair", ["id", "val"])
+
+SEND_TIME = time(8, 0)
 
 
 def _add_notification(obj, notif_type, when=None):
