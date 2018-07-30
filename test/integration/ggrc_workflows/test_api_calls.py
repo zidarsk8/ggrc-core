@@ -14,8 +14,10 @@ import sqlalchemy as sa
 from ggrc import db
 from ggrc.models import all_models
 from ggrc.fulltext import mysql
+from ggrc.notifications.common import generate_cycle_tasks_notifs
 
 from integration.ggrc import TestCase
+
 from integration.ggrc.api_helper import Api
 from integration.ggrc import generator
 from integration.ggrc.models import factories
@@ -519,6 +521,7 @@ class TestStatusApiPatch(TestCase):
     self.assertEqual(self.VERIFIED, self.group.status)
     self.assertEqual(self.VERIFIED, self.cycle.status)
     self.assertEqual(all_models.Workflow.INACTIVE, self.workflow.status)
+    generate_cycle_tasks_notifs(datetime.date.today())
     for task in self.tasks:
       self.assert_notifications_for_object(task)
     self.cycle = self.tasks[0].cycle
@@ -552,6 +555,7 @@ class TestStatusApiPatch(TestCase):
     self.assertEqual(self.IN_PROGRESS, self.group.status)
     self.assertEqual(self.IN_PROGRESS, self.cycle.status)
     self.assertEqual(all_models.Workflow.ACTIVE, self.workflow.status)
+    generate_cycle_tasks_notifs(datetime.date.today())
     self.assert_notifications_for_object(self.tasks[0])
     for task in self.tasks[1:]:
       self.assert_notifications_for_object(task,
@@ -567,6 +571,7 @@ class TestStatusApiPatch(TestCase):
     self.assertEqual(self.FINISHED, self.group.status)
     self.assertEqual(self.FINISHED, self.cycle.status)
     self.assertEqual(all_models.Workflow.INACTIVE, self.workflow.status)
+    generate_cycle_tasks_notifs(datetime.date.today())
     for task in self.tasks:
       self.assert_notifications_for_object(task)
     self.cycle = self.tasks[0].cycle
@@ -658,6 +663,7 @@ class TestStatusApiPatch(TestCase):
     self.assertEqual(self.IN_PROGRESS, group.cycle.status)
     self.assertEqual(all_models.Workflow.ACTIVE, self.workflow.status)
     self.assertEqual(all_models.Workflow.ACTIVE, group.cycle.workflow.status)
+    generate_cycle_tasks_notifs(datetime.date.today())
     self.assert_notifications_for_object(self.tasks[0])
     for task in self.tasks[1:]:
       self.assert_notifications_for_object(task,
@@ -679,6 +685,7 @@ class TestStatusApiPatch(TestCase):
     self.assertEqual(self.FINISHED, group.cycle.status)
     self.assertEqual(all_models.Workflow.INACTIVE, self.workflow.status)
     self.assertEqual(all_models.Workflow.INACTIVE, group.cycle.workflow.status)
+    generate_cycle_tasks_notifs(datetime.date.today())
     for task in self.tasks:
       self.assert_notifications_for_object(task)
     self.assert_notifications_for_object(self.cycle,
