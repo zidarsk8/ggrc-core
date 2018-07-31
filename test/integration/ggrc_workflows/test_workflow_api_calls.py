@@ -277,7 +277,7 @@ class TestWorkflowsApiPost(TestCase):
          all_models.CycleTaskEntry.__name__)
     )
     related_count = len(related_objects)
-    bd_tasks_count = len(all_models.BackgroundTask.query.all())
+    bd_tasks_count = all_models.BackgroundTask.query.count()
 
     all_acl = [acl for acl in all_models.AccessControlList.eager_query().all()]
     self.assertEqual(

@@ -91,15 +91,17 @@ def _add_task_acl(task):
   """Add ACL entry for the current users background task."""
   roles = role.get_ac_roles_for(task.type)
   admin_role = roles.get("Admin", None)
-  acl.AccessControlList(
-      person=get_current_user(),
-      ac_role=admin_role,
-      object=task,
-  )
+  if admin_role:
+    acl.AccessControlList(
+        person=get_current_user(),
+        ac_role=admin_role,
+        object=task,
+    )
   db.session.add(task)
   db.session.commit()
-  from ggrc.cache.utils import clear_permission_cache
-  clear_permission_cache()
+  if admin_role:
+    from ggrc.cache.utils import clear_permission_cache
+    clear_permission_cache()
 
 
 def create_task(name, url, queued_callback=None, parameters=None, method=None):
