@@ -41,3 +41,61 @@ def strip_spaces_ensure_uniq(tables, field, uniq_tables):
             val=new_value,
             id=rec_id
         )
+
+
+def get_unique_value(value, existing_values):
+  """Create new value if the current value exist."""
+  index = 1
+  new_value = value
+  while new_value in existing_values:
+    new_value = '{}-{}'.format(value, index)
+    index += 1
+  return new_value
+
+
+def get_queries_for_stripping(table_name, field, records, unique):
+  """Create list of queries for stripping whitespaces from values."""
+  queries = []
+  unique_values = set(records.values())
+  records = {rec_id: rec_value for (rec_id, rec_value)
+             in records.items() if rec_value}
+  for rec_id, rec_value in records.iteritems():
+    new_value = rec_value.strip()
+    if new_value == rec_value:
+      continue
+    if unique:
+      new_value = get_unique_value(new_value, unique_values)
+    unique_values.add(new_value)
+    queries.append(
+        {
+            'text': 'UPDATE {} SET {} = :val WHERE id = :id'.format(
+                table_name, field
+            ),
+            'val': new_value,
+            'id': rec_id
+        }
+    )
+  # reverse needed to avoid errors when unique_table
+  # contains some values like this ' data', 'data '.
+  # e.g. if we try out put stripped value 'data' in table
+  # we will got mysql error "Duplicate entry 'data' for key..."
+  # because mysql varchar 'data ' is equal 'data'.
+  queries.reverse()
+  return queries
+
+
+def strip_text_field_ensure_unique(tables, field, unique_tables=None):
+  """Strip trailing spaces from text field and ensure uniqueness."""
+  if unique_tables is None:
+    unique_tables = tables
+  connection = op.get_bind()
+  for table in tables:
+    records = connection.execute(
+        'SELECT {table}.id as id, {table}.{field} as value '
+        'FROM {table}'.format(table=table, field=field)
+    )
+    records = {record.id: record.value for record in records}
+    queries = get_queries_for_stripping(table, field, records,
+                                        table in unique_tables)
+    for query in queries:
+      connection.execute(text(query['text']), val=query['val'], id=query['id'])
