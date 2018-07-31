@@ -3,6 +3,7 @@
 
 
 """Tests for Audit model."""
+from ggrc import db
 from ggrc.models import all_models
 from integration.ggrc import generator
 from integration.ggrc import TestCase, Api
@@ -167,3 +168,29 @@ class TestAudit(TestCase):
     self.assertIsNotNone(audit)
     self.assertIsNotNone(snapshot)
     self.assertIsNotNone(relationships)
+
+  def test_slug_validation_create(self):
+    """Test post slug with leading space"""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+    audit_data = {
+        "slug": " SLUG",
+        "program": {"id": program.id},
+    }
+    response, audit = self.gen.generate_object(all_models.Audit, audit_data)
+    self.assertEqual(response.status_code, 201)
+    current_slug = audit.slug
+    expected_slug = "SLUG"
+    self.assertEqual(current_slug, expected_slug)
+
+  def test_slug_validation_update(self):
+    """Test put slug with trailing space"""
+    with factories.single_commit():
+      audit = factories.AuditFactory(slug="SLUG-01")
+
+    response = self.api.put(audit, {"slug": "SLUG "})
+    self.assert200(response)
+    audit = db.session.query(all_models.Audit).get(audit.id)
+    current_slug = audit.slug
+    expected_slug = "SLUG"
+    self.assertEqual(current_slug, expected_slug)
