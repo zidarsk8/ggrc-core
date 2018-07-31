@@ -104,7 +104,7 @@ export default Cacheable('CMS.Models.Person', {
   },
   init: function () {
     let rEmail =
-      /^[-!#$%&*+\\.\/0-9=?A-Z^_`{|}~]+@([-0-9A-Z]+\.)+([0-9A-Z]){2,4}$/i;
+      /^[-!#$%&*+\\./0-9=?A-Z^_`{|}~]+@([-0-9A-Z]+\.)+([0-9A-Z]){2,4}$/i;
     this._super(...arguments);
 
     this.validateNonBlank('email');

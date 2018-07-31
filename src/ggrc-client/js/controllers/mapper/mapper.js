@@ -32,7 +32,7 @@ const ObjectMapper = can.Control.extend({
       $trigger.attr('data-href') || $trigger.attr('href') :
       '';
     let modalId = 'ajax-modal-' + (href || '')
-      .replace(/[\/\?=\&#%]/g, '-')
+      .replace(/[/?=&#%]/g, '-')
       .replace(/^-/, '');
     let $target =
       $('<div id="' + modalId +

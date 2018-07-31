@@ -149,7 +149,7 @@ function getPersonInfo(person) {
 function getPickerElement(picker) {
   return _.find(_.values(picker), function (val) {
     if (val instanceof Node) {
-      return /picker\-dialog/.test(val.className);
+      return /picker-dialog/.test(val.className);
     }
     return false;
   });

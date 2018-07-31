@@ -77,7 +77,7 @@ const userRolesModalSelector = can.Control.extend({
     // Extract parameters from data attributes
     let href = $trigger.attr('data-href') || $trigger.attr('href');
     let modalId =
-      'ajax-modal-' + href.replace(/[\/\?=\&#%]/g, '-').replace(/^-/, '');
+      'ajax-modal-' + href.replace(/[/?=&#%]/g, '-').replace(/^-/, '');
     let $target = $(
       '<div id="' + modalId + '" class="modal modal-selector hide"></div>'
     );
