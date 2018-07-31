@@ -18,6 +18,10 @@
     display: block;
     margin: 0 16px 16px 0;
 
+    .issue-tracker-url {
+      float: right;
+    }
+
     &.info-pane__section-procedure {
       display: flex;
 

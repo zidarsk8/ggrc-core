@@ -3,12 +3,12 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import '../ggrc_base';
+import '../apps/base_widgets';
 import '../tracker';
 import '../bootstrap/modal-ajax';
 import '../bootstrap/modal-form';
 import '../plugins/lodash_helpers';
-import '../ggrc_base';
-import '../apps/base_widgets';
 import '../application';
 import '../plugins/ggrc_utils';
 import '../plugins/datepicker';

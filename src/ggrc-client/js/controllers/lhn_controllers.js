@@ -7,6 +7,7 @@ import './infinite-scroll-controller';
 import RecentlyViewedObject from '../models/local-storage/recently-viewed-object';
 import tracker from '../tracker';
 import RefreshQueue from '../models/refresh_queue';
+import {getPageInstance} from '../plugins/utils/current-page-utils';
 
 can.Control('CMS.Controllers.LHN', {
   defaults: {}
@@ -955,7 +956,7 @@ can.Control('GGRC.Controllers.RecentlyViewed', {
   }
 }, {
   init: function () {
-    var page_model = GGRC.page_instance();
+    var page_model = getPageInstance();
     var instance_list = [];
     var that = this;
 

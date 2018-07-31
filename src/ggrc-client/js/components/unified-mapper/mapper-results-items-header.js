@@ -5,38 +5,34 @@
 
 import template from './templates/mapper-results-items-header.mustache';
 
-(function (can, GGRC, CMS) {
-  'use strict';
-
-  GGRC.Components('mapperResultsItemsHeader', {
-    tag: 'mapper-results-items-header',
-    template: template,
-    viewModel: {
-      columns: [],
-      sortKey: '',
-      sortDirection: 'asc',
-      modelType: '',
-      isSorted: function (attr) {
-        return attr.attr('attr_sort_field') === this.attr('sortKey');
-      },
-      isSortedAsc: function () {
-        return this.attr('sortDirection') === 'asc';
-      },
-      applySort: function (attr) {
-        if (this.isSorted(attr)) {
-          this.toggleSortDirection();
-          return;
-        }
-        this.attr('sortKey', attr.attr('attr_sort_field'));
-        this.attr('sortDirection', 'asc');
-      },
-      toggleSortDirection: function () {
-        if (this.attr('sortDirection') === 'asc') {
-          this.attr('sortDirection', 'desc');
-        } else {
-          this.attr('sortDirection', 'asc');
-        }
-      },
+export default can.Component.extend({
+  tag: 'mapper-results-items-header',
+  template,
+  viewModel: {
+    columns: [],
+    sortKey: '',
+    sortDirection: 'asc',
+    modelType: '',
+    isSorted(attr) {
+      return attr.attr('attr_sort_field') === this.attr('sortKey');
     },
-  });
-})(window.can, window.GGRC, window.CMS);
+    isSortedAsc() {
+      return this.attr('sortDirection') === 'asc';
+    },
+    applySort(attr) {
+      if (this.isSorted(attr)) {
+        this.toggleSortDirection();
+        return;
+      }
+      this.attr('sortKey', attr.attr('attr_sort_field'));
+      this.attr('sortDirection', 'asc');
+    },
+    toggleSortDirection() {
+      if (this.attr('sortDirection') === 'asc') {
+        this.attr('sortDirection', 'desc');
+      } else {
+        this.attr('sortDirection', 'asc');
+      }
+    },
+  },
+});

@@ -13,14 +13,19 @@ export default can.Component.extend({
   template: template,
   viewModel: {
     define: {
-      instance: {
-        set(newValue, setValue) {
-          const isReadonly = this.isReadOnlyForInstance(newValue);
-          this.attr('readOnly', isReadonly);
-          setValue(newValue);
+      isReadonly: {
+        get() {
+          let instance = this.attr('instance');
+          if (!instance) {
+            return false;
+          }
+
+          let readonly = this.attr('readOnly');
+          return instance.class.isProposable || readonly;
         },
       },
     },
+    instance: null,
     deferredSave: null,
     updatableGroupId: null,
     includeRoles: [],
@@ -28,13 +33,6 @@ export default can.Component.extend({
     conflictRoles: [],
     orderOfRoles: [],
     readOnly: false,
-    isReadOnlyForInstance(instance) {
-      if (!instance) {
-        return false;
-      }
-
-      return instance.class.isProposable;
-    },
     // When we delete some role this action can delete another acl role on the backend.
     // In this case we get in response less objects then was in request.
     // But canJs is merging array-attributes not replacing.

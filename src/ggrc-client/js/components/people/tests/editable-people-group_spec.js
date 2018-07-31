@@ -4,8 +4,9 @@
 */
 
 import Component from '../editable-people-group';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
-describe('GGRC.Components.editablePeopleGroup', function () {
+describe('editable-people-group', function () {
   'use strict';
 
   let viewModel;
@@ -14,7 +15,7 @@ describe('GGRC.Components.editablePeopleGroup', function () {
   ];
 
   beforeEach(function () {
-    viewModel = new Component.prototype.viewModel;
+    viewModel = getComponentVM(Component);
     viewModel.attr('editableMode', false);
   });
 

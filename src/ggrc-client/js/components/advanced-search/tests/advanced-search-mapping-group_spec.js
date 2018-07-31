@@ -4,15 +4,16 @@
 */
 
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../advanced-search-mapping-group';
 
-describe('GGRC.Components.advancedSearchMappingGroup', function () {
+describe('advanced-search-mapping-group component', function () {
   'use strict';
 
   let viewModel;
 
   beforeEach(() => {
-    viewModel = new Component.prototype.viewModel();
+    viewModel = getComponentVM(Component);
   });
 
   describe('addMappingCriteria() method', function () {

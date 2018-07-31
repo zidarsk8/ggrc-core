@@ -7,9 +7,9 @@ import {NAVIGATE_TO_TAB} from '../../events/eventTypes';
 import './tab-panel';
 import template from './tab-container.mustache';
 
-export default GGRC.Components('tabContainer', {
+export default can.Component.extend({
   tag: 'tab-container',
-  template: template,
+  template,
   viewModel: {
     lastErrorTab: null,
     define: {

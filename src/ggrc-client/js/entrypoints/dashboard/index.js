@@ -21,7 +21,6 @@ import '../../components/autocomplete/autocomplete';
 import '../../components/person/person-data';
 import '../../components/link_to_clipboard';
 import '../../components/mapped_tree_view';
-import '../../components/reusable_objects';
 import '../../components/tabs/tab-container';
 import '../../components/lazy_open_close';
 import '../../components/revision-log/revision-log';
@@ -45,7 +44,7 @@ import '../../components/external-data-autocomplete/external-data-autocomplete';
 
 import '../../components/custom-roles/custom-roles';
 import '../../components/custom-roles/custom-roles-modal';
-import '../../components/review-link/review-link';
+import '../../components/approval-link/approval-link';
 
 import '../../common-handlers';
 

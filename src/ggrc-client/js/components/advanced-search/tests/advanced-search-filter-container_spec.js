@@ -5,9 +5,10 @@
 
 import * as StateUtils from '../../../plugins/utils/state-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../advanced-search-filter-container';
 
-describe('GGRC.Components.advancedSearchFilterContainer', function () {
+describe('advanced-search-filter-container component', function () {
   'use strict';
 
   let viewModel;
@@ -15,7 +16,7 @@ describe('GGRC.Components.advancedSearchFilterContainer', function () {
   beforeEach(() => {
     spyOn(StateUtils, 'getDefaultStatesForModel')
       .and.returnValue(['state']);
-    viewModel = new Component.prototype.viewModel();
+    viewModel = getComponentVM(Component);
   });
 
   describe('items get() method', function () {

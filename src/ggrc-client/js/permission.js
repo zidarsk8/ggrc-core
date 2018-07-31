@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {getPageInstance} from './plugins/utils/current-page-utils';
+
 let ADMIN_PERMISSION;
 let _CONDITIONS_MAP = {
   contains: function (instance, args) {
@@ -202,7 +204,7 @@ const Permission = can.Construct({
   },
 
   page_context_id: function () {
-    let page_instance = GGRC.page_instance();
+    let page_instance = getPageInstance();
     return (page_instance && page_instance.context &&
             page_instance.context.id) || null;
   },

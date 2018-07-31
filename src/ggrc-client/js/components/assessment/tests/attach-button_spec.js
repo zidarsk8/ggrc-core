@@ -5,14 +5,16 @@
 
 import * as gDriveUtils from '../../../plugins/utils/gdrive-picker-utils';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../attach-button';
 
-describe('GGRC.Components.attachButton', function () {
+describe('attach-button component', function () {
   'use strict';
 
   let viewModel;
 
   beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('attachButton');
+    viewModel = getComponentVM(Component);
     viewModel.attr('instance',
       makeFakeInstance({model: CMS.Models.Assessment})()
     );

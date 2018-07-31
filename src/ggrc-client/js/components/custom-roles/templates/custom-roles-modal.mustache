@@ -29,6 +29,11 @@
             {is-proposal}="isProposal"
             {updatable-group-id}="updatableGroupId"
             {read-only}="readOnly"
+            data-original-title="{{groupTooltip}}"
+            {{#showGroupTooltip}}
+              rel="tooltip"
+              data-placement="bottom"
+            {{/showGroupTooltip}}
             >
               <div>
                 <deletable-people-group
@@ -66,6 +71,10 @@
                         (item-selected)="addPerson(%event.selectedItem, @groupId)">
                       </external-data-autocomplete>
                       {{/if_config_exist}}
+                    {{else}}
+                      {{^if people.length}}
+                        <span class="empty-message">None</span>
+                      {{/if}}
                     {{/if}}
                   {{/if}}
                 </div>

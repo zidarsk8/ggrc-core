@@ -4,6 +4,8 @@
 */
 
 import Join from './join';
+import Role from '../service-models/role';
+import Person from '../business-models/person';
 
 export default Join('CMS.Models.UserRole', {
   root_object: 'user_role',
@@ -19,8 +21,8 @@ export default Join('CMS.Models.UserRole', {
     role: 'CMS.Models.Role.stub',
   },
   join_keys: {
-    person: CMS.Models.Person,
-    role: CMS.Models.Role,
+    person: Person,
+    role: Role,
   },
 }, {
   save: function () {
@@ -31,12 +33,12 @@ export default Join('CMS.Models.UserRole', {
       return _super.apply(this, arguments);
     }
 
-    role = _.find(CMS.Models.Role.cache, {name: this.role_name});
+    role = _.find(Role.cache, {name: this.role_name});
     if (role) {
       this.attr('role', role.stub());
       return _super.apply(this, arguments);
     }
-    return CMS.Models.Role.findAll({
+    return Role.findAll({
       name__in: this.role_name,
     }).then(function (role) {
       if (!role.length) {

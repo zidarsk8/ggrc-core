@@ -187,7 +187,7 @@ class MultiClonable(object):
         collections.append(
             views.build_collection_representation(cls, obj.log_json())
         )
-    return views.json_success_response(collections, datetime.datetime.now())
+    return views.json_success_response(collections, datetime.datetime.utcnow())
 
   def _clone(self, target=None):
     """Create a copy of self.

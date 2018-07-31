@@ -9,9 +9,9 @@ import template from './autocomplete-results.mustache';
 /**
  * The component is used to show autocomplete results and handle user's clicks.
  */
-export default GGRC.Components('autocompleteResults', {
+export default can.Component.extend({
   tag: 'autocomplete-results',
-  template: template,
+  template,
   viewModel: {
     define: {
       /**

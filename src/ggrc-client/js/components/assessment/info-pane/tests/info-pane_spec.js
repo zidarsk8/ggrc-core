@@ -622,7 +622,7 @@ describe('assessment-info-pane component', () => {
         types.forEach((type, i) => {
           const methodName = `load${can.capitalize(type)}`;
           vm.attr(type.toLowerCase(), []);
-          spyOn(vm, methodName).and.returnValue(can.Deferred());
+          spyOn(vm, methodName);
         });
       });
 
@@ -638,15 +638,11 @@ describe('assessment-info-pane component', () => {
       it('replaces values of passed fields in VM with the results of ' +
       'appropriate methods', function () {
         const loadedData = types.map((type, i) => [type, i]);
-
         types.forEach((type, i) => {
           const methodName = `load${can.capitalize(type)}`;
-          vm[methodName].and.returnValue(
-            can.Deferred().resolve(loadedData[i]));
+          vm[methodName].and.returnValue(loadedData[i]);
         });
-
         vm.updateItems(...types);
-
         types.forEach((type, i) => {
           expect(vm.attr(type).serialize()).toEqual(loadedData[i]);
         });
@@ -1841,5 +1837,131 @@ describe('assessment-info-pane component', () => {
         callback();
         expect(vm.attr('instance').customAttr).toHaveBeenCalledWith('1', true);
       });
+  });
+
+  describe('"instance updated" event', () => {
+    let handler;
+    let viewModel;
+
+    beforeEach(() => {
+      const {'default': DeferredTransaction} = DeferredTransactionUtil;
+
+      viewModel = getComponentVM(Component);
+      viewModel.attr('deferredSave', new DeferredTransaction());
+      spyOn(viewModel, 'reinitFormFields');
+
+      let eventContext = {
+        viewModel,
+      };
+
+      let events = Component.prototype.events;
+      handler = events['{viewModel.instance} updated'].bind(eventContext);
+    });
+
+    it('should NOT call "reinitFormFields" method' +
+    'if "deferredSave" queue is NOT empty', () => {
+      spyOn(viewModel.attr('deferredSave'), 'isPending')
+        .and.returnValue(true);
+
+      handler();
+      expect(viewModel.reinitFormFields.calls.count()).toBe(0);
+    });
+
+    it('should call "reinitFormFields" method' +
+    'if "deferredSave" queue is empty', () => {
+      spyOn(viewModel.attr('deferredSave'), 'isPending')
+        .and.returnValue(false);
+
+      handler();
+      expect(viewModel.reinitFormFields.calls.count()).toBe(1);
+    });
+  });
+
+  describe('reinitFormFields() method', () => {
+    beforeEach(() => {
+      vm.attr({
+        formFields: [],
+      });
+      spyOn(caUtils, 'getCustomAttributes');
+    });
+
+    it('should update all values. Equal ids', () => {
+      let currentFormFields = [
+        {id: 1, value: 'text_val #1'},
+        {id: 2, value: 'text_val #2'},
+        {id: 3, value: 'text_val #3'},
+      ];
+
+      let updatedFormFields = new can.List([
+        {id: 1, value: 'text_val #1'},
+        {id: 2, value: 'text_val #_2'},
+        {id: 3, value: 'text_val #3'},
+      ]);
+
+      vm.attr('formFields', currentFormFields);
+      spyOn(caUtils, 'convertValuesToFormFields')
+        .and.returnValue(updatedFormFields);
+
+      vm.reinitFormFields();
+
+      let formFields = vm.attr('formFields');
+      formFields.forEach((formField, index) => {
+        expect(formField.attr('value'))
+          .toEqual(updatedFormFields[index].attr('value'));
+      });
+    });
+
+    it('should update values of form fields with equal ids', () => {
+      let currentFormFields = [
+        {id: 1, value: 'text_val #1'},
+        {id: 2, value: 'text_val #2'},
+        {id: 3, value: 'text_val #3'},
+      ];
+
+      let updatedFormFields = new can.List([
+        {id: 11, value: 'text_val #11'},
+        {id: 2, value: 'text_val #_2'},
+        {id: 33, value: 'text_val #33'},
+        {id: 44, value: 'text_val #33'},
+      ]);
+
+      vm.attr('formFields', currentFormFields);
+      spyOn(caUtils, 'convertValuesToFormFields')
+        .and.returnValue(updatedFormFields);
+
+      vm.reinitFormFields();
+
+      let formFields = vm.attr('formFields');
+      expect(formFields[0].attr('value'))
+        .toEqual(currentFormFields[0].value);
+      expect(formFields[1].attr('value'))
+        .toEqual(updatedFormFields[1].attr('value'));
+      expect(formFields[2].attr('value'))
+        .toEqual(currentFormFields[2].value);
+    });
+
+    it('should NOT update count of form fields', () => {
+      let currentFormFields = [
+        {id: 1, value: 'text_val #1'},
+        {id: 2, value: 'text_val #2'},
+        {id: 3, value: 'text_val #3'},
+      ];
+
+      let updatedFormFields = new can.List([
+        {id: 1, value: 'text_val #1'},
+        {id: 2, value: 'text_val #22'},
+        {id: 3, value: 'text_val #3'},
+        {id: 4, value: 'text_val #4'},
+      ]);
+
+      vm.attr('formFields', currentFormFields);
+      spyOn(caUtils, 'convertValuesToFormFields')
+        .and.returnValue(updatedFormFields);
+
+      vm.reinitFormFields();
+
+      let formFields = vm.attr('formFields');
+      expect(formFields.length).toBe(currentFormFields.length);
+    });
   });
 });

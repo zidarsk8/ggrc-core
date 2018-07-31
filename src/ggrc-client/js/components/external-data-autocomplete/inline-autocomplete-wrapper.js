@@ -10,7 +10,7 @@
  *
  * Generally it emulates autocomplete_select handlers from several controllers.
  */
-export default GGRC.Components('inlineAutocompleteWrapper', {
+export default can.Component.extend({
   tag: 'inline-autocomplete-wrapper',
   viewModel: {
     /**

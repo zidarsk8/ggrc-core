@@ -3,18 +3,19 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('GGRC.Components.mapperResultsItemDetails', function () {
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../mapper-results-item-details';
+
+describe('mapper-results-item-details component', function () {
   'use strict';
 
-  let Component;
   let viewModel;
 
   beforeEach(function () {
     let init;
-    Component = GGRC.Components.get('mapperResultsItemDetails');
     init = Component.prototype.viewModel.init;
     Component.prototype.viewModel.init = undefined;
-    viewModel = GGRC.Components.getViewModel('mapperResultsItemDetails');
+    viewModel = getComponentVM(Component);
     Component.prototype.viewModel.init = init;
     viewModel.init = init;
   });

@@ -5,10 +5,11 @@
 
 import template from './issue-tracker-enable.mustache';
 import logger from './issue-tracker-log';
+import {getPageInstance} from '../current-page-utils';
 
 /* eslint-disable no-console */
 
-const audit = GGRC.page_instance();
+const audit = getPageInstance();
 
 let isButtonActivated = false;
 
@@ -235,7 +236,7 @@ const IssueTrackerEnabler = can.Map.extend({
 
 GGRC.enableIssueTracker = () => {
   if (audit.type !== 'Audit') {
-    console.warn(`This function is applicable only in Audit scope. 
+    console.warn(`This function is applicable only in Audit scope.
       Please open the Audit page and try again!`);
     return;
   }

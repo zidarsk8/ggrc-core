@@ -3,8 +3,7 @@
 
 """Lists of ggrc contributions."""
 
-from ggrc.integrations import utils
-
+from ggrc.integrations import synchronization_jobs
 from ggrc.notifications import common
 from ggrc.notifications import notification_handlers
 from ggrc.notifications import data_handlers
@@ -16,7 +15,8 @@ NIGHTLY_CRON_JOBS = [
 ]
 
 HOURLY_CRON_JOBS = [
-    utils.sync_issue_tracker_statuses,
+    synchronization_jobs.sync_assessment_statuses,
+    synchronization_jobs.sync_issue_attributes,
 ]
 
 HALF_HOUR_CRON_JOBS = [

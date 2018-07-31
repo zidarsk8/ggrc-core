@@ -104,4 +104,10 @@ export default function (completeTransaction, timeout) {
 
     return dfd.promise();
   };
-};
+
+  /**
+  * Returns actions state of deferredQueue
+  * @return {boolean} - deferredQueue has pending actions.
+  */
+  this.isPending = () => !!deferredQueue.length;
+}

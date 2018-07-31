@@ -7,6 +7,7 @@ import './widget_descriptor';
 import SummaryWidgetController from '../controllers/summary_widget_controller';
 import DashboardWidget from '../controllers/dashboard_widget_controller';
 import InfoWidget from '../controllers/info_widget_controller';
+import {getPageInstance} from '../plugins/utils/current-page-utils';
 
 (function ($, CMS, GGRC) {
   /*
@@ -105,7 +106,7 @@ import InfoWidget from '../controllers/info_widget_controller';
     */
     get_current_page_widgets: function () {
       return this.get_widget_list_for(
-        GGRC.page_instance().constructor.shortName);
+        getPageInstance().constructor.shortName);
     },
   }, {
     init: function (name, opts) {

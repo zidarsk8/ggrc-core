@@ -10,6 +10,7 @@ import {
   TypeFilter,
 } from '../models/mappers/mapper-helpers';
 import Mappings from '../models/mappers/mappings';
+import {getPageInstance} from '../plugins/utils/current-page-utils';
 
 (function ($, CMS, GGRC) {
   let RiskAssessmentsExtension = {};
@@ -18,7 +19,7 @@ import Mappings from '../models/mappers/mappings';
 
   RiskAssessmentsExtension.name = 'risk_assessments';
 
-  // Register RA models for use with `infer_object_type`
+  // Register RA models for use with `inferObjectType`
   RiskAssessmentsExtension.object_type_decision_tree = function () {
     return {
       risk_assessment: CMS.Models.RiskAssessment,
@@ -61,7 +62,7 @@ import Mappings from '../models/mappers/mappings';
   // Initialize widgets for risk assessment page
   RiskAssessmentsExtension.init_widgets = function init_widgets() {
     let descriptor = {};
-    let page_instance = GGRC.page_instance();
+    let page_instance = getPageInstance();
     let tree_widgets = GGRC.tree_view.base_widgets_by_type;
 
     _.each(_risk_assessments_object_types, function (type) {

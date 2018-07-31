@@ -11,6 +11,8 @@ import html2text
 
 import sqlalchemy as sa
 
+from ggrc.integrations.synchronization_jobs.assessment_sync_job import \
+    ASSESSMENT_STATUSES_MAPPING
 from ggrc import access_control
 from ggrc import db
 from ggrc import utils
@@ -18,7 +20,7 @@ from ggrc import settings
 from ggrc.models import all_models
 from ggrc.integrations import issues
 from ggrc.integrations import integrations_errors
-from ggrc.models import exceptions
+from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.services import signals
 from ggrc.utils import referenced_objects
 
@@ -155,7 +157,9 @@ def _handle_assessment_tmpl_post(sender, objects=None, sources=None):
   del sender  # Unused
 
   for src in sources:
-    _validate_issue_tracker_info(src.get('issue_tracker') or {})
+    integration_utils.validate_issue_tracker_info(
+        src.get('issue_tracker') or {}
+    )
 
   db.session.flush()
   template_ids = {
@@ -206,7 +210,7 @@ def _handle_assessment_tmpl_put(sender, obj=None, src=None, service=None,
   del sender, service, initial_state  # Unused
 
   issue_tracker_info = src.get('issue_tracker') or {}
-  _validate_issue_tracker_info(issue_tracker_info)
+  integration_utils.validate_issue_tracker_info(issue_tracker_info)
 
   audit = all_models.Audit.query.join(
       all_models.Relationship,
@@ -247,7 +251,7 @@ def _handle_audit_post(sender, objects=None, sources=None):
     issue_tracker_info = src.get('issue_tracker')
     if not issue_tracker_info:
       continue
-    _validate_issue_tracker_info(issue_tracker_info)
+    integration_utils.validate_issue_tracker_info(issue_tracker_info)
     all_models.IssuetrackerIssue.create_or_update_from_dict(
         obj, issue_tracker_info)
 
@@ -257,7 +261,7 @@ def _handle_audit_put(sender, obj=None, src=None, service=None):
   del sender, service  # Unused
   issue_tracker_info = src.get('issue_tracker')
   if issue_tracker_info:
-    _validate_issue_tracker_info(issue_tracker_info)
+    integration_utils.validate_issue_tracker_info(issue_tracker_info)
     all_models.IssuetrackerIssue.create_or_update_from_dict(
         obj, issue_tracker_info)
 
@@ -327,7 +331,7 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):
       logger.error(
           'Unable to update a ticket ID=%s while updating '
           'assessment ID=%d: %s', issue_id, obj.id, error)
-    obj.add_warning('issue_tracker', 'Unable to update a ticket.')
+    obj.add_warning('Unable to update a ticket.')
 
   _update_issuetracker_info(obj, issue_tracker_info)
 
@@ -419,42 +423,6 @@ def handle_assessment_create(assessment, src):
       info = audit.issue_tracker
 
   _create_issuetracker_info(assessment, info)
-
-
-def _validate_issue_tracker_info(info):
-  """Validates that component ID and hotlist ID are integers."""
-  component_id = info.get('component_id')
-  if component_id:
-    try:
-      int(component_id)
-    except (TypeError, ValueError):
-      raise exceptions.ValidationError('Component ID must be a number.')
-
-  hotlist_id = info.get('hotlist_id')
-  if hotlist_id:
-    try:
-      int(hotlist_id)
-    except (TypeError, ValueError):
-      raise exceptions.ValidationError('Hotlist ID must be a number.')
-
-
-def _normalize_issue_tracker_info(info):
-  """Insures that component ID and hotlist ID are integers."""
-  # TODO(anushovan): remove data type casting once integration service
-  #   supports strings for following properties.
-  component_id = info.get('component_id')
-  if component_id:
-    try:
-      info['component_id'] = int(component_id)
-    except (TypeError, ValueError):
-      raise exceptions.ValidationError('Component ID must be a number.')
-
-  hotlist_id = info.get('hotlist_id')
-  if hotlist_id:
-    try:
-      info['hotlist_id'] = int(hotlist_id)
-    except (TypeError, ValueError):
-      raise exceptions.ValidationError('Hotlist ID must be a number.')
 
 
 def _handle_basic_props(issue_tracker_info, initial_info):
@@ -563,7 +531,7 @@ def _fill_current_value(issue_params, assessment, initial_info):
 
   if 'status' not in issue_params:
     # Resend status on any change.
-    status_value = issues.STATUSES.get(assessment.status)
+    status_value = ASSESSMENT_STATUSES_MAPPING.get(assessment.status)
     if status_value:
       issue_params['status'] = status_value
 
@@ -646,7 +614,7 @@ def _is_issue_tracker_enabled(audit=None):
 
 def _create_issuetracker_issue(assessment, issue_tracker_info):
   """Collects information and sends a request to create external issue."""
-  _normalize_issue_tracker_info(issue_tracker_info)
+  integration_utils.normalize_issue_tracker_info(issue_tracker_info)
 
   person, acl, acr = (all_models.Person, all_models.AccessControlList,
                       all_models.AccessControlRole)
@@ -716,7 +684,9 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
   """Creates an entry for IssueTracker model."""
   if not issue_tracker_info.get('title'):
     issue_tracker_info['title'] = assessment.title
-  issue_tracker_info['status'] = issues.STATUSES.get(assessment.status)
+  issue_tracker_info['status'] = ASSESSMENT_STATUSES_MAPPING.get(
+      assessment.status
+  )
 
   if (issue_tracker_info.get('enabled') and
           _is_issue_tracker_enabled(audit=assessment.audit)):
@@ -735,7 +705,7 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
       issue_tracker_info = {
           'enabled': False,
       }
-      assessment.add_warning('issue_tracker', 'Unable to create a ticket.')
+      assessment.add_warning('Unable to create a ticket.')
     else:
       issue_tracker_info['issue_id'] = issue_id
       issue_tracker_info['issue_url'] = _ISSUE_URL_TMPL % issue_id
@@ -767,7 +737,7 @@ def _update_issuetracker_issue(assessment, issue_tracker_info,
     # If feature remains in the same status which is 'disabled'.
     return
 
-  _normalize_issue_tracker_info(issue_tracker_info)
+  integration_utils.normalize_issue_tracker_info(issue_tracker_info)
 
   issue_params = _handle_basic_props(issue_tracker_info, initial_info)
 

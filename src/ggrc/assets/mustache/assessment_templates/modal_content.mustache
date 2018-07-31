@@ -313,9 +313,10 @@
             <div class="ggrc-form">
               <issue-tracker-switcher
                 {instance}="instance"
-                {(is-integration-enabled)}="instance.issue_tracker.enabled"
-                {parent}="instance.audit">
-                  <modal-issue-tracker-fields {instance}="instance">
+                {(is-integration-enabled)}="instance.issue_tracker.enabled">
+                  <modal-issue-tracker-fields
+                    {instance}="instance"
+                    {note}="'If turned on, one bug will be created for each assessment.'">
                   </modal-issue-tracker-fields>
               </issue-tracker-switcher>
             </div>

@@ -8,10 +8,11 @@ import '../../object-change-state/object-change-state';
 import '../../dropdown/dropdown';
 import RefreshQueue from '../../../models/refresh_queue';
 import {updateStatus} from '../../../plugins/utils/workflow-utils';
+import {getPageInstance} from '../../../plugins/utils/current-page-utils';
 
 let viewModel = can.Map.extend({
   showLink: function () {
-    let pageInstance = GGRC.page_instance();
+    let pageInstance = getPageInstance();
 
     return pageInstance.type !== 'Workflow';
   },
@@ -85,8 +86,8 @@ let viewModel = can.Map.extend({
   },
 });
 
-export default GGRC.Components('cycleTaskGroupObjectTask', {
+export default can.Component.extend({
   tag: 'cycle-task-group-object-task',
-  template: template,
-  viewModel: viewModel,
+  template,
+  viewModel,
 });

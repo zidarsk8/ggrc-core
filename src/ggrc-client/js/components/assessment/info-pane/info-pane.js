@@ -53,7 +53,10 @@ import {REFRESH_TAB_CONTENT,
   REFRESH_RELATED,
 } from '../../../events/eventTypes';
 import Permission from '../../../permission';
-import {initCounts} from '../../../plugins/utils/current-page-utils';
+import {
+  initCounts,
+  getPageInstance,
+} from '../../../plugins/utils/current-page-utils';
 import template from './info-pane.mustache';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/custom-attribute-config';
 import pubsub from '../../../pub-sub';
@@ -197,7 +200,7 @@ export default can.Component.extend({
     deprecatedState: 'Deprecated',
     assessmentMainRoles: ['Creators', 'Assignees', 'Verifiers'],
     refreshCounts: function (types) {
-      let pageInstance = GGRC.page_instance();
+      let pageInstance = getPageInstance();
       initCounts(
         types,
         pageInstance.attr('type'),
@@ -276,11 +279,9 @@ export default can.Component.extend({
       return this.requestQuery(query, 'urls');
     },
     updateItems: function () {
-      can.makeArray(arguments).forEach((type) => {
-        this['load' + can.capitalize(type)]().done((items) => {
-          this.attr(type, items);
-        });
-      });
+      can.makeArray(arguments).forEach(function (type) {
+        this.attr(type).replace(this['load' + can.capitalize(type)]());
+      }.bind(this));
 
       this.refreshCounts(['Evidence']);
     },
@@ -460,6 +461,24 @@ export default can.Component.extend({
         convertValuesToFormFields(cavs)
       );
     },
+    reinitFormFields() {
+      const cavs = getCustomAttributes(
+        this.attr('instance'),
+        CA_UTILS_CA_TYPE.LOCAL
+      );
+
+      let updatedFormFields = convertValuesToFormFields(cavs);
+      let updatedFieldsIds = _.indexBy(updatedFormFields, 'id');
+
+      this.attr('formFields').forEach((field) => {
+        let updatedField = updatedFieldsIds[field.attr('id')];
+
+        if (updatedField &&
+          field.attr('value') !== updatedField.attr('value')) {
+          field.attr('value', updatedField.attr('value'));
+        }
+      });
+    },
     initGlobalAttributes: function () {
       const instance = this.attr('instance');
       const caObjects = instance
@@ -590,6 +609,15 @@ export default can.Component.extend({
         ...REFRESH_RELATED,
         model: event.destinationType,
       });
+    },
+    '{viewModel.instance} updated'() {
+      const vm = this.viewModel;
+      const isPending = vm.attr('deferredSave').isPending();
+      if (!isPending) {
+        // reinit LCA when queue is empty
+        // to avoid rewriting of changed values
+        vm.reinitFormFields();
+      }
     },
     '{viewModel.instance} modelBeforeSave': function () {
       this.viewModel.attr('isAssessmentSaving', true);

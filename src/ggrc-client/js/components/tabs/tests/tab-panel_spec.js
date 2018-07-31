@@ -3,13 +3,16 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('GGRC.Components.tabPanel', function () {
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../tab-panel';
+
+describe('tab-panel component', function () {
   'use strict';
 
   let viewModel;
 
   beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('tabPanel');
+    viewModel = getComponentVM(Component);
   });
 
   describe('.addPanel() method', function () {

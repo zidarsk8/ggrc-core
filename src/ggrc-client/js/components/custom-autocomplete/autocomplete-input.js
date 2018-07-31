@@ -8,7 +8,7 @@
 
 import template from './templates/autocomplete-input.mustache';
 
-const keyMap = {
+export const keyMap = {
   ENTER: 13,
   ESCAPE: 27,
   ARROW_LEFT: 37,

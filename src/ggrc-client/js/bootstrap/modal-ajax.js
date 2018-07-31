@@ -14,6 +14,10 @@ import {
   shouldApplyPreconditions,
 } from '../plugins/utils/controllers';
 import Permission from '../permission';
+import {
+  getPageInstance,
+  navigate,
+} from '../plugins/utils/current-page-utils';
 
 (function (can, $, GGRC) {
   'use strict';
@@ -33,7 +37,7 @@ import Permission from '../permission';
       var modalSettings;
 
       if ($trigger.attr('data-object-id') === 'page') {
-        instance = GGRC.page_instance();
+        instance = getPageInstance();
       } else {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
@@ -83,11 +87,11 @@ import Permission from '../permission';
       $target.on('modal:success', function (e, data) {
         var modelName = $trigger.attr('data-object-plural').toLowerCase();
         if ($trigger.attr('data-object-id') === 'page' ||
-          (instance === GGRC.page_instance())) {
-          GGRC.navigate('/dashboard');
+          (instance === getPageInstance())) {
+          navigate('/dashboard');
         } else if (modelName === 'people' || modelName === 'roles') {
           window.location.assign('/admin#' + modelName + '_list');
-          GGRC.navigate();
+          navigate();
         } else {
           $trigger.trigger('modal:success', data);
           $target.modal_form('hide');
@@ -105,7 +109,6 @@ import Permission from '../permission';
       var extendNewInstance = $trigger.attr('data-extend-new-instance');
       var triggerParent = $trigger.closest('.add-button');
       var model = CMS.Models[$trigger.attr('data-object-singular')];
-      var mapping = $trigger.data('mapping');
       var isProposal = $trigger.data('is-proposal');
       var instance;
       var modalTitle;
@@ -113,7 +116,7 @@ import Permission from '../permission';
       var contentView;
 
       if ($trigger.attr('data-object-id') === 'page') {
-        instance = GGRC.page_instance();
+        instance = getPageInstance();
       } else {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
@@ -163,7 +166,6 @@ import Permission from '../permission';
           skip_refresh: !needToRefresh,
           modal_title: objectParams.modal_title || modalTitle,
           content_view: contentView,
-          mapping: mapping,
           isProposal: isProposal,
           $trigger: $trigger
         });
@@ -186,11 +188,11 @@ import Permission from '../permission';
           refreshPage();
         } else if (formTarget === 'redirect') {
           if (typeof xhr !== 'undefined' && 'getResponseHeader' in xhr) {
-            GGRC.navigate(xhr.getResponseHeader('location'));
+            navigate(xhr.getResponseHeader('location'));
           } else if (data._redirect) {
-            GGRC.navigate(data._redirect);
+            navigate(data._redirect);
           } else {
-            GGRC.navigate(data.selfLink.replace('/api', ''));
+            navigate(data.selfLink.replace('/api', ''));
           }
         } else {
           $target.modal_form('hide');
@@ -261,7 +263,7 @@ import Permission from '../permission';
       var instance;
 
       if ($trigger.attr('data-object-id') === 'page') {
-        instance = GGRC.page_instance();
+        instance = getPageInstance();
       } else {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
@@ -321,7 +323,7 @@ import Permission from '../permission';
   }
 
   function refreshPage() {
-    setTimeout(GGRC.navigate.bind(GGRC), 10);
+    setTimeout(navigate.bind(GGRC), 10);
   }
 
   function arrangeBackgroundModals(modals, referenceModal) {

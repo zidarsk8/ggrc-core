@@ -29,6 +29,7 @@ from sqlalchemy.orm.session import Session
 
 from ggrc import db
 from ggrc.models import reflection
+from ggrc.models import exceptions
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins.customattributable import CustomAttributable
 from ggrc.models.mixins.notifiable import Notifiable
@@ -398,7 +399,7 @@ class FinishedDate(object):
     if (value in self.DONE_STATES and
         (self.NOT_DONE_STATES is None or
          self.status in self.NOT_DONE_STATES)):
-      self.finished_date = datetime.datetime.now()
+      self.finished_date = datetime.datetime.utcnow()
     elif ((self.NOT_DONE_STATES is None or
            value in self.NOT_DONE_STATES) and
             self.status in self.DONE_STATES):
@@ -466,7 +467,7 @@ class VerifiedDate(object):
       value = super(VerifiedDate, self).validate_status(key, value)
     if (value in self.VERIFIED_STATES and
             self.status not in self.VERIFIED_STATES):
-      self.verified_date = datetime.datetime.now()
+      self.verified_date = datetime.datetime.utcnow()
       value = self.FINAL_STATE
     elif (value not in self.END_STATES and
           (self.status in self.VERIFIED_STATES or
@@ -535,6 +536,16 @@ class Slugged(Base):
   @classmethod
   def generate_slug_prefix(cls):
     return cls.__name__.upper()
+
+  @validates("slug")
+  def validate_slug(self, _, value):
+    """Validates slug for presence of forbidden symbols"""
+    # pylint: disable=no-self-use
+    if value and "*" in value:
+      raise exceptions.ValidationError(
+          "Field 'Code' contains unsupported symbol '*'"
+      )
+    return value
 
   @classmethod
   def ensure_slug_before_flush(cls, session, flush_context, instances):

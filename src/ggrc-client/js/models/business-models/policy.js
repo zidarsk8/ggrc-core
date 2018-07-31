@@ -32,7 +32,7 @@ export default Directive('CMS.Models.Policy', {
     'Contract-Related Policy',
     'Company Controls Policy',
   ],
-  cache: can.getObject('cache', CMS.Models.Directive, true),
+  cache: can.getObject('cache', Directive, true),
   sub_tree_view_options: {
     default_filter: ['DataAsset'],
   },
@@ -42,8 +42,8 @@ export default Directive('CMS.Models.Policy', {
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
-    can.extend(this.attributes, CMS.Models.Directive.attributes);
-    can.extend(this.tree_view_options, CMS.Models.Directive.tree_view_options);
+    can.extend(this.attributes, Directive.attributes);
+    can.extend(this.tree_view_options, Directive.tree_view_options);
     this.tree_view_options.attr_list = can.Model.Cacheable.attr_list.concat([
       {
         attr_title: 'Kind/Type',

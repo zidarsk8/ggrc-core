@@ -39,6 +39,37 @@ const getModelInstance = (id, type, requiredAttr) => {
   return promise;
 };
 
+const inferObjectType = (data) => {
+  let decisionTree = _getObjectTypeDecisionTree();
+
+  function resolve(subtree, data) {
+    if (typeof subtree === 'undefined') {
+      return null;
+    }
+    return can.isPlainObject(subtree) ?
+      subtree._discriminator(data) :
+      subtree;
+  }
+
+  if (!data) {
+    return null;
+  } else {
+    return can.reduce(Object.keys(data), function (a, b) {
+      return a || resolve(decisionTree[b], data[b]);
+    }, null);
+  }
+};
+
+const makeModelInstance = (data) => {
+  if (!data) {
+    return null;
+  } else if (!!GGRC.page_model && GGRC.page_object === data) {
+    return GGRC.page_model;
+  } else {
+    return GGRC.page_model = inferObjectType(data).model($.extend({}, data));
+  }
+};
+
 /**
  * Check the model has Related Assessments
  * @param {String} type - model type
@@ -187,10 +218,29 @@ function _removeHandler(obj, pj) {
   return dfds;
 }
 
+function _getObjectTypeDecisionTree() { // eslint-disable-line
+  let tree = {};
+  let extensions = GGRC.extensions || [];
+
+  can.each(extensions, function (extension) {
+    if (extension.object_type_decision_tree) {
+      if (can.isFunction(extension.object_type_decision_tree)) {
+        $.extend(tree, extension.object_type_decision_tree());
+      } else {
+        $.extend(tree, extension.object_type_decision_tree);
+      }
+    }
+  });
+
+  return tree;
+}
+
 export {
   getModelInstance,
   hasRelatedAssessments,
   relatedAssessmentsTypes,
   resolveDeferredBindings,
   handlePendingJoins,
+  makeModelInstance,
+  inferObjectType,
 };

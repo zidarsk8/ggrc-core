@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
 /**
  * A model describing a comment to Assessment or Request objects.
  */
@@ -23,7 +24,7 @@ export default can.Model.Cacheable('CMS.Models.Comment', {
   },
 }, {
   form_preload: function () {
-    let pageInstance = GGRC.page_instance();
+    let pageInstance = getPageInstance();
     this.attr('comment', pageInstance);
   },
   /**

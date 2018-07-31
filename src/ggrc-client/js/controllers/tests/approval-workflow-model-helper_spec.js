@@ -5,6 +5,7 @@
 
 import {ApprovalWorkflow as Model} from '../modals/approval-workflow-modal';
 import * as aclUtils from '../../plugins/utils/acl-utils';
+import {REFRESH_APPROVAL} from '../../events/eventTypes';
 
 describe('ApprovalWorkflow', ()=> {
   describe('save() method', ()=> {
@@ -16,6 +17,7 @@ describe('ApprovalWorkflow', ()=> {
     let assigneeRole;
     let wfAdminRole;
     let awBinding;
+    let instance;
 
     beforeAll(()=> {
       assigneeRole = {
@@ -43,14 +45,9 @@ describe('ApprovalWorkflow', ()=> {
     });
 
     beforeEach(()=> {
-      let instance;
-
       awsDfd = new can.Deferred();
       awBinding = {
         refresh_list: jasmine.createSpy().and.returnValue(awsDfd),
-        loader: {
-          refresh_list: jasmine.createSpy(),
-        },
       };
       originalObject = {
         get_binding: jasmine.createSpy().and.returnValue(awBinding),
@@ -62,6 +59,7 @@ describe('ApprovalWorkflow', ()=> {
         contact: currentUser,
       });
       spyOn(instance.original_object, 'reify');
+      spyOn(instance.original_object, 'dispatch');
       spyOn(aclUtils, 'getRole').and.returnValues(assigneeRole, wfAdminRole);
 
       method = Model.prototype.save.bind(instance);
@@ -211,7 +209,6 @@ describe('ApprovalWorkflow', ()=> {
         saveCycleDfd.resolve();
 
         expect(originalObject.get_binding).toHaveBeenCalled();
-        expect(awBinding.loader.refresh_list).toHaveBeenCalled();
       });
     });
 
@@ -313,16 +310,14 @@ describe('ApprovalWorkflow', ()=> {
         });
       });
 
-      it('reloads approval_tasks mapping binding object', ()=> {
-        let binding = originalObject.get_binding;
-
+      it('dispatches event to reload approval tasks', ()=> {
         saveTgDfd.resolve(tg);
         refreshTgtDfd.resolve(tgt);
         saveTgtDfd.resolve();
         saveCycleDfd.resolve();
 
-        expect(binding).toHaveBeenCalledWith('approval_tasks');
-        expect(awBinding.loader.refresh_list).toHaveBeenCalled();
+        expect(instance.original_object.dispatch)
+          .toHaveBeenCalledWith(REFRESH_APPROVAL);
       });
     });
   });

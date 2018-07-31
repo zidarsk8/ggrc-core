@@ -9,6 +9,7 @@ import {
 import {getRole} from './acl-utils';
 import Permission from '../../permission';
 import {hasRelatedAssessments} from './models-utils';
+import {getPageInstance} from '../utils/current-page-utils';
 
 /**
  * Util methods for work with Snapshots.
@@ -48,7 +49,7 @@ function isSnapshot(instance) {
  * @return {Boolean} True or False
  */
 function isSnapshotScope(parentInstance) {
-  let instance = parentInstance || GGRC.page_instance();
+  let instance = parentInstance || getPageInstance();
   return instance ?
     instance.is_snapshotable || isInScopeModel(instance.type) :
     false;
@@ -126,7 +127,7 @@ function toObject(instance) {
   let audit;
 
   content.originalLink = getParentUrl(instance);
-  content.snapshot = new CMS.Models.Snapshot(instance);
+  content.snapshot = new can.Map(instance);
   content.related_sources = [];
   content.related_destinations = [];
   content.viewLink = content.snapshot.viewLink;

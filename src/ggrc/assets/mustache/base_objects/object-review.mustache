@@ -8,7 +8,8 @@
   <div class="span12">
     <h6>Object Review</h6>
     {{#if class}}
-      {{{render_hooks instance.class.shortName 'info_widget_actions'}}}
+      <approval-link instance="instance">
+      </approval-link>
     {{/if}}
   </div>
 </div>

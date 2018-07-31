@@ -321,7 +321,7 @@ class ImportRowConverter(RowConverter):
       db.session.commit()
       self.block_converter._store_revision_ids(import_event)
       cache_utils.update_memcache_after_commit(self.block_converter)
-      update_snapshot_index(db.session, modified_objects)
+      update_snapshot_index(modified_objects)
     except exc.SQLAlchemyError as err:
       db.session.rollback()
       logger.exception("Import failed with: %s", err.message)

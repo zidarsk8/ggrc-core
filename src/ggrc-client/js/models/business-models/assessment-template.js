@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
+
 /**
  * A model describing a template for the newly created Assessment objects.
  *
@@ -111,7 +113,7 @@ export default can.Model.Cacheable('CMS.Models.AssessmentTemplate', {
    *
    */
   form_preload: function (isNewObject) {
-    const pageInstance = GGRC.page_instance();
+    const pageInstance = getPageInstance();
     if (pageInstance && (!this.audit || !this.audit.id || !this.audit.type)) {
       if (pageInstance.type === 'Audit') {
         this.attr('audit', pageInstance);

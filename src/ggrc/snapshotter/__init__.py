@@ -325,13 +325,9 @@ class SnapshotGenerator(object):
       operation: sqlalchemy operation
       data: a list of dictionaries with keys representing column names and
         values to insert with operation
-    Returns:
-      True if successful.
     """
     if data and not self.dry_run:
-      engine = db.engine
-      engine.execute(operation, data)
-      db.session.commit()
+      db.session.execute(operation, data)
 
   def create(self, event, revisions, _filter=None):
     """Create snapshots of parent object's neighborhood per provided rules

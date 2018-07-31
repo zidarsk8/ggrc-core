@@ -164,6 +164,12 @@
       word-wrap: break-word;
     }
 
+    .ggrc-form-item__note {
+      font-size: 13px;
+      margin-bottom: 8px;
+      word-wrap: break-word;
+    }
+
     /*
       It was made for create/edit modals. It should be removed
       when these modals will have editable items with normal values

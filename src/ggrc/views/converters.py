@@ -198,12 +198,12 @@ def run_export(objects, ie_id, user_id, url_root):
       ie.content = content
       db.session.commit()
       job_emails.send_email(job_emails.EXPORT_COMPLETED, user.email, url_root,
-                            ie.title)
+                            ie.title, ie_id)
     except Exception as e:  # pylint: disable=broad-except
       logger.exception("Export failed: %s", e.message)
       try:
         ie.status = "Failed"
-        ie.end_date = datetime.now()
+        ie.end_date = datetime.utcnow()
         db.session.commit()
         job_emails.send_email(job_emails.EXPORT_FAILED, user.email, url_root)
       except Exception as e:  # pylint: disable=broad-except
@@ -263,7 +263,7 @@ def run_import_phases(ie_id, user_id, url_root):  # noqa: ignore=C901
       logger.exception("Import failed: %s", e.message)
       try:
         ie_job.status = "Failed"
-        ie_job.end_date = datetime.now()
+        ie_job.end_date = datetime.utcnow()
         db.session.commit()
         job_emails.send_email(job_emails.IMPORT_FAILED, user.email,
                               url_root, ie_job.title)

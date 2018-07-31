@@ -182,12 +182,6 @@
       color: $darkBlue;
     }
 
-    .related-assessments &:hover,
-    .related-assessments__tab-container &:hover {
-      text-decoration: underline;
-      color: $blue;
-    }
-
     &.selected {
       background: #40c4ff;
       color: $white;
@@ -285,4 +279,10 @@
     background-image: none;
     box-shadow: none;
   }
+}
+
+.related-assessments .btn-link:hover,
+.related-assessments__tab-container .btn-link:hover {
+  text-decoration: underline;
+  color: $blue;
 }

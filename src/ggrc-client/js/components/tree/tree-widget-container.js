@@ -28,7 +28,8 @@ import '../bulk-update-button/bulk-update-button';
 import '../assessment-template-clone-button/assessment-template-clone-button';
 import '../create-document-button/create-document-button';
 import '../dropdown/multiselect-dropdown';
-import '../assessment_generator';
+import '../dropdown/multiselect-dropdown-wrapper';
+import '../assessment/assessment-generator-button';
 import '../last-comment/last-comment';
 import template from './templates/tree-widget-container.mustache';
 import * as StateUtils from '../../plugins/utils/state-utils';
@@ -600,10 +601,10 @@ viewModel = can.Map.extend({
 /**
  *
  */
-export default GGRC.Components('treeWidgetContainer', {
+export default can.Component.extend({
   tag: 'tree-widget-container',
-  template: template,
-  viewModel: viewModel,
+  template,
+  viewModel,
   init: function () {
     let viewModel = this.viewModel;
     let parentInstance = viewModel.attr('parent_instance');

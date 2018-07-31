@@ -24,7 +24,7 @@ export default Directive('CMS.Models.Standard', {
   attributes: {},
   meta_kinds: ['Standard'],
   mixins: ['accessControlList'],
-  cache: can.getObject('cache', CMS.Models.Directive, true),
+  cache: can.getObject('cache', Directive, true),
   sub_tree_view_options: {
     default_filter: ['Section'],
   },
@@ -34,7 +34,7 @@ export default Directive('CMS.Models.Standard', {
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
-    can.extend(this.attributes, CMS.Models.Directive.attributes);
+    can.extend(this.attributes, Directive.attributes);
     this._super(...arguments);
   },
 }, {});

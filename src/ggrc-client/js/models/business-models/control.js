@@ -3,8 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {commentSort} from '../../plugins/ggrc_utils';
-
 export default can.Model.Cacheable('CMS.Models.Control', {
   root_object: 'control',
   root_collection: 'controls',
@@ -102,14 +100,6 @@ export default can.Model.Cacheable('CMS.Models.Control', {
   },
   sub_tree_view_options: {
     default_filter: ['Objective'],
-  },
-  info_pane_options: {
-    evidence: {
-      model: CMS.Models.Document,
-      mapping: 'all_documents',
-      show_view: GGRC.mustache_path + '/base_templates/attachment.mustache',
-      sort_function: commentSort,
-    },
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {

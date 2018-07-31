@@ -19,6 +19,7 @@ export default can.Model.Cacheable('CMS.Models.Issue', {
     'inScopeObjectsPreload',
     'accessControlList',
     'base-notifications',
+    'issueTracker',
   ],
   is_custom_attributable: true,
   isRoleable: true,
@@ -29,6 +30,11 @@ export default can.Model.Cacheable('CMS.Models.Issue', {
     attr_list: can.Model.Cacheable.attr_list.concat([
       {attr_title: 'Reference URL', attr_name: 'reference_url'},
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
+      {
+        attr_title: 'Ticket Tracker',
+        attr_name: 'issue_url',
+        deny: !GGRC.ISSUE_TRACKER_ENABLED,
+      },
       {
         attr_title: 'Description',
         attr_name: 'description',
@@ -49,8 +55,6 @@ export default can.Model.Cacheable('CMS.Models.Issue', {
   sub_tree_view_options: {
     default_filter: ['Control', 'Control_versions'],
   },
-  info_pane_options: {
-  },
   defaults: {
     status: 'Draft',
   },
@@ -61,11 +65,41 @@ export default can.Model.Cacheable('CMS.Models.Issue', {
       ['Issue', 'Program', 'Project', 'TaskGroup', 'Document']
     );
   },
+  buildIssueTrackerConfig(instance) {
+    return {
+      hotlist_id: '864697',
+      component_id: '188208',
+      issue_severity: 'S2',
+      issue_priority: 'P2',
+      issue_type: 'PROCESS',
+      title: instance.title || '',
+      enabled: instance.isNew(),
+    };
+  },
   init: function () {
     if (this._super) {
       this._super(...arguments);
     }
     this.validateNonBlank('title');
+
+    this.validate(
+      'issue_tracker_component_id',
+      function () {
+        if (this.attr('issue_tracker.enabled') &&
+          !this.attr('issue_tracker.component_id')) {
+          return 'cannot be blank';
+        }
+      }
+    );
+    this.validate(
+      'issue_tracker_title',
+      function () {
+        if (this.attr('issue_tracker.enabled') &&
+          !this.attr('issue_tracker.title')) {
+          return 'cannot be blank';
+        }
+      }
+    );
   },
 }, {
   object_model: function () {

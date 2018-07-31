@@ -193,7 +193,7 @@ export default can.Component.extend('richText', {
         }
       }
 
-      // innerHTML could containe only tags f.e. <p><br></p>
+      // innerHTML could contain only tags f.e. <p><br></p>
       // we have to save empty string in this case;
       let content = textLength ? editor.root.innerHTML : '';
       this.attr('content', content);

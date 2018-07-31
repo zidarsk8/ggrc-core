@@ -4,15 +4,16 @@
 */
 
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../advanced-search-filter-group';
 
-describe('GGRC.Components.advancedSearchFilterGroup', function () {
+describe('advanced-search-filter-group component', function () {
   'use strict';
 
   let viewModel;
 
   beforeEach(() => {
-    viewModel = Component.prototype.viewModel();
+    viewModel = getComponentVM(Component);
   });
 
   describe('addFilterCriterion() method', function () {

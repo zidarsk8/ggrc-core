@@ -7,9 +7,10 @@ import {REFRESH_RELATED} from '../../events/eventTypes';
 import template from './add-issue-button.mustache';
 import {
   initCounts,
+  getPageInstance,
 } from '../../plugins/utils/current-page-utils';
 
-export default GGRC.Components('addIssueButton', {
+export default can.Component.extend({
   tag: 'add-issue-button',
   template,
   viewModel: {
@@ -39,7 +40,7 @@ export default GGRC.Components('addIssueButton', {
       let model = 'Issue';
 
       if (instance instanceof CMS.Models.Issue) {
-        let pageInstance = GGRC.page_instance();
+        let pageInstance = getPageInstance();
         initCounts(
           [model],
           pageInstance.type,

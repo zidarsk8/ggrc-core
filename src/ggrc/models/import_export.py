@@ -86,7 +86,7 @@ def create_import_export_entry(**kwargs):
   results = json.dumps(kwargs['results']) if 'results' in kwargs else None
   ie_job = ImportExport(job_type=kwargs.get('job_type', 'Import'),
                         status=kwargs.get('status', 'Not Started'),
-                        created_at=datetime.now(),
+                        created_at=datetime.utcnow(),
                         created_by=get_current_user(),
                         title=kwargs.get('title'),
                         content=kwargs.get('content'),

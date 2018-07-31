@@ -3,6 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {makeModelInstance} from '../plugins/utils/models-utils';
+import {getPageInstance} from '../plugins/utils/current-page-utils';
+
 /* Role Assignment Modal Selector
   *
   * parameters:
@@ -178,7 +181,7 @@ const userRolesModalSelector = can.Control.extend({
 
   refresh_option_list: function () {
     let self = this;
-    let instance = GGRC.page_instance();
+    let instance = getPageInstance();
     let params = {};
 
     // If this is a private model, set the scope
@@ -409,7 +412,7 @@ function getOptionSet(name, data) {
     extraJoinQuery = {context_id: context.id};
   } else if (GGRC.page_object && !GGRC.page_object.person) {
     // Otherwise use the page context
-    context = GGRC.make_model_instance(GGRC.page_object).context;
+    context = makeModelInstance(GGRC.page_object).context;
     if (!context) {
       throw new Error('`context` is required for Assignments model');
     }

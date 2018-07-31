@@ -8,7 +8,8 @@ import '../../components/issue-tracker/issue-tracker-switcher';
 import '../../components/access_control_list/access-control-list-roles-helper';
 import '../../components/assessment/assessment-people';
 import '../../components/assessment/assessment-object-type-dropdown';
-import '../../components/assessment_attributes';
+import '../../components/assessment_templates/assessment-template-attributes';
+import '../../components/assessment_templates/template-field';
 import '../../components/assessment_templates/add-template-field';
 import '../../components/textarea-array/textarea-array';
 import '../../components/object-list-item/object-list-item-updater';
@@ -54,7 +55,6 @@ export default can.Control({
     model: null, // model class to use when finding or creating new
     instance: null, // model instance to use instead of finding/creating (e.g. for update)
     new_object_form: false,
-    mapping: false,
     find_params: {},
     add_more: false,
     ui_array: [],
@@ -1009,12 +1009,8 @@ export default can.Control({
             }
             that.new_instance();
           } else {
-            that.element.trigger('modal:success', [
-              obj,
-              {
-                map_and_save: $('#map-and-save').is(':checked'),
-              },
-            ]).modal_form('hide');
+            that.element.trigger('modal:success', [obj])
+              .modal_form('hide');
             that.update_hash_fragment();
           }
         }

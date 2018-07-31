@@ -3,13 +3,14 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../object-change-state';
 
-describe('GGRC.Components.objectChangeState', function () {
+describe('object-change-state component', function () {
   let viewModel;
 
   beforeEach(function () {
-    viewModel = new Component.prototype.viewModel;
+    viewModel = getComponentVM(Component);
   });
 
   describe('viewModel scope', function () {

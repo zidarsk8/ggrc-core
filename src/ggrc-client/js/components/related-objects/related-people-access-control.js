@@ -6,7 +6,7 @@
 import {ROLES_CONFLICT} from '../../events/eventTypes';
 import {getRolesForType} from '../../plugins/utils/acl-utils';
 
-export default GGRC.Components('relatedPeopleAccessControl', {
+export default can.Component.extend({
   tag: 'related-people-access-control',
   viewModel: {
     instance: {},

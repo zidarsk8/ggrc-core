@@ -3,13 +3,15 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {getPageInstance} from '../plugins/utils/current-page-utils';
+
 ;(function (can, $, GGRC, CMS) {
   GGRC.register_modal_hook('approvalform', function ($target, $trigger, option) {
     let instance,
       object_params = JSON.parse($trigger.attr('data-object-params') || '{}');
 
     if($trigger.attr('data-object-id') === 'page') {
-      instance = GGRC.page_instance();
+      instance = getPageInstance();
     } else {
       instance = CMS.Models.get_instance(
         $trigger.data('object-singular'),

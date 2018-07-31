@@ -9,9 +9,9 @@ import {REFRESH_TAB_CONTENT} from '../../events/eventTypes';
 
 const PRE_RENDER_DELAY = 3000;
 
-export default GGRC.Components('tabPanel', {
+export default can.Component.extend({
   tag: 'tab-panel',
-  template: template,
+  template,
   viewModel: {
     define: {
       cssClasses: {
