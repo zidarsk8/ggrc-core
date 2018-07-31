@@ -7,14 +7,16 @@ import {
   waitsFor,
   makeFakeInstance,
 } from '../spec_helpers';
+import DisplayPrefs from '../../js/models/local-storage/display-prefs';
+import LocalStorage from '../../js/models/local-storage/local-storage';
 
 describe('display prefs model', function () {
 
   let display_prefs;
   let exp;
   beforeAll(function () {
-    display_prefs = makeFakeInstance({model: CMS.Models.DisplayPrefs})();
-    exp = CMS.Models.DisplayPrefs.exports;
+    display_prefs = makeFakeInstance({model: DisplayPrefs})();
+    exp = DisplayPrefs.exports;
   });
 
   afterEach(function () {
@@ -239,19 +241,19 @@ describe('display prefs model', function () {
     let dp3_current;
     beforeEach(function () {
       const instanceCreator = makeFakeInstance({
-        model: CMS.Models.DisplayPrefs
+        model: DisplayPrefs
       });
       dp_noversion = instanceCreator();
       dp2_outdated = instanceCreator({version: 1});
-      dp3_current = instanceCreator({version: CMS.Models.DisplayPrefs.version});
+      dp3_current = instanceCreator({version: DisplayPrefs.version});
 
-      spyOn(can.Model.LocalStorage, 'findAll').and.returnValue(new $.Deferred().resolve([dp_noversion, dp2_outdated, dp3_current]));
+      spyOn(LocalStorage, 'findAll').and.returnValue(new $.Deferred().resolve([dp_noversion, dp2_outdated, dp3_current]));
       spyOn(dp_noversion, 'destroy');
       spyOn(dp2_outdated, 'destroy');
       spyOn(dp3_current, 'destroy');
     });
     it('deletes any prefs that do not have a version set', function (done) {
-      let dfd = CMS.Models.DisplayPrefs.findAll().done(function (dps) {
+      let dfd = DisplayPrefs.findAll().done(function (dps) {
         expect(dps).not.toContain(dp_noversion);
         expect(dp_noversion.destroy).toHaveBeenCalled();
       });
@@ -261,13 +263,13 @@ describe('display prefs model', function () {
       }, done);
     });
     it('deletes any prefs that have an out of date version', function () {
-      CMS.Models.DisplayPrefs.findAll().done(function (dps) {
+      DisplayPrefs.findAll().done(function (dps) {
         expect(dps).not.toContain(dp2_outdated);
         expect(dp2_outdated.destroy).toHaveBeenCalled();
       });
     });
     it('retains any prefs that do not have a version set', function () {
-      CMS.Models.DisplayPrefs.findAll().done(function (dps) {
+      DisplayPrefs.findAll().done(function (dps) {
         expect(dps).toContain(dp3_current);
         expect(dp3_current.destroy).not.toHaveBeenCalled();
       });
@@ -279,14 +281,14 @@ describe('display prefs model', function () {
     let dp2_outdated;
     let dp3_current;
     beforeEach(function () {
-      dp_noversion = new CMS.Models.DisplayPrefs({});
-      dp2_outdated = new CMS.Models.DisplayPrefs({ version: 1});
-      dp3_current = new CMS.Models.DisplayPrefs({ version: CMS.Models.DisplayPrefs.version });
+      dp_noversion = new DisplayPrefs({});
+      dp2_outdated = new DisplayPrefs({ version: 1});
+      dp3_current = new DisplayPrefs({ version: DisplayPrefs.version });
     });
     it('404s if the display pref does not have a version set', function (done) {
-      spyOn(can.Model.LocalStorage, 'findOne').and.returnValue(new $.Deferred().resolve(dp_noversion));
+      spyOn(LocalStorage, 'findOne').and.returnValue(new $.Deferred().resolve(dp_noversion));
       spyOn(dp_noversion, 'destroy');
-      let dfd = CMS.Models.DisplayPrefs.findOne().done(function (dps) {
+      let dfd = DisplayPrefs.findOne().done(function (dps) {
         fail('Should not have resolved findOne for the unversioned display pref');
       }).fail(function (pseudoxhr) {
         expect(pseudoxhr.status).toBe(404);
@@ -297,9 +299,9 @@ describe('display prefs model', function () {
       }, done);
     });
     it('404s if the display pref has an out of date version', function () {
-      spyOn(can.Model.LocalStorage, 'findOne').and.returnValue(new $.Deferred().resolve(dp2_outdated));
+      spyOn(LocalStorage, 'findOne').and.returnValue(new $.Deferred().resolve(dp2_outdated));
       spyOn(dp2_outdated, 'destroy');
-      CMS.Models.DisplayPrefs.findOne().done(function (dps) {
+      DisplayPrefs.findOne().done(function (dps) {
         fail('Should not have resolved findOne for the outdated display pref');
       }).fail(function (pseudoxhr) {
         expect(pseudoxhr.status).toBe(404);
@@ -307,9 +309,9 @@ describe('display prefs model', function () {
       });
     });
     it('retains any prefs that do not have a version set', function () {
-      spyOn(can.Model.LocalStorage, 'findOne').and.returnValue(new $.Deferred().resolve(dp3_current));
+      spyOn(LocalStorage, 'findOne').and.returnValue(new $.Deferred().resolve(dp3_current));
       spyOn(dp3_current, 'destroy');
-      CMS.Models.DisplayPrefs.findOne().done(function (dps) {
+      DisplayPrefs.findOne().done(function (dps) {
         expect(dp3_current.destroy).not.toHaveBeenCalled();
       }).fail(function () {
         fail('Should have resolved on findOne for the current display pref');

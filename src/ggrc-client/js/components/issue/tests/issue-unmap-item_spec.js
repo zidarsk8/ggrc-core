@@ -8,6 +8,7 @@ import Component from '../issue-unmap-item';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
+import Relationship from '../../../models/join-models/relationship';
 
 describe('issue-unmap-related-snapshots component', ()=> {
   let viewModel;
@@ -279,7 +280,7 @@ describe('issue-unmap-related-snapshots component', ()=> {
 
     it('should change "isLoading" flag in case of success',
       async function (done) {
-        spyOn(CMS.Models.Relationship, 'findRelationship')
+        spyOn(Relationship, 'findRelationship')
           .and.returnValue(Promise.resolve());
         viewModel.attr('isLoading', true);
         await viewModel.unmap();
@@ -289,7 +290,7 @@ describe('issue-unmap-related-snapshots component', ()=> {
 
     it('should change "isLoading" flag in case of error',
       async function (done) {
-        spyOn(CMS.Models.Relationship, 'findRelationship')
+        spyOn(Relationship, 'findRelationship')
           .and.returnValue(Promise.reject());
         viewModel.attr('isLoading', true);
 
@@ -300,7 +301,7 @@ describe('issue-unmap-related-snapshots component', ()=> {
 
     it('should refresh issue page if page instance is issue',
       async function (done) {
-        spyOn(CMS.Models.Relationship, 'findRelationship')
+        spyOn(Relationship, 'findRelationship')
           .and.returnValue(Promise.resolve({
             unmap: () => Promise.resolve(),
           }));
@@ -325,7 +326,7 @@ describe('issue-unmap-related-snapshots component', ()=> {
 
     it('should unmap issue correctly', async function (done) {
       const relationship = jasmine.createSpyObj(['unmap']);
-      spyOn(CMS.Models.Relationship, 'findRelationship')
+      spyOn(Relationship, 'findRelationship')
         .and.returnValue(Promise.resolve(relationship));
       await viewModel.unmap();
       expect(relationship.unmap).toHaveBeenCalledWith(true);
@@ -333,7 +334,7 @@ describe('issue-unmap-related-snapshots component', ()=> {
     });
 
     it('should handle server errors correctly', async function (done) {
-      spyOn(CMS.Models.Relationship, 'findRelationship')
+      spyOn(Relationship, 'findRelationship')
         .and.returnValue(Promise.resolve({
           unmap: () => Promise.reject(),
         }));
@@ -386,7 +387,7 @@ describe('issue-unmap-related-snapshots component', ()=> {
     });
 
     it('prevents default action of the event', async function (done) {
-      spyOn(CMS.Models.Relationship, 'findRelationship')
+      spyOn(Relationship, 'findRelationship')
         .and.returnValue(Promise.resolve({
           unmap: () => Promise.resolve(),
         }));
@@ -396,7 +397,7 @@ describe('issue-unmap-related-snapshots component', ()=> {
     });
 
     it('shows error if there is no relationship', async function (done) {
-      spyOn(CMS.Models.Relationship, 'findRelationship')
+      spyOn(Relationship, 'findRelationship')
         .and.returnValue(Promise.resolve(false));
       await handler(null, event);
       expect(viewModel.showNoRelationhipError).toHaveBeenCalled();
@@ -410,7 +411,7 @@ describe('issue-unmap-related-snapshots component', ()=> {
           target: {related_sources: [{id: 1}]},
           issueInstance: {related_sources: [{id: 1}]},
         });
-        spyOn(CMS.Models.Relationship, 'findRelationship')
+        spyOn(Relationship, 'findRelationship')
           .and.returnValue(Promise.resolve(rel));
       });
 

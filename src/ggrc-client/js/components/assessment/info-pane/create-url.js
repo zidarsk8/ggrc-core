@@ -4,6 +4,7 @@
 */
 
 import {notifier} from '../../../plugins/utils/notifiers-utils';
+import Context from '../../../models/service-models/context';
 
 (function (GGRC, CMS, can) {
   'use strict';
@@ -27,7 +28,7 @@ import {notifier} from '../../../plugins/utils/notifiers-utils';
         attrs = {
           link: value,
           title: value,
-          context: this.attr('context') || new CMS.Models.Context({id: null}),
+          context: this.attr('context') || new Context({id: null}),
           kind: 'URL',
           created_at: new Date(),
           isDraft: true,

@@ -16,6 +16,7 @@ import {
   navigate,
 } from '../../plugins/utils/current-page-utils';
 import {notifier} from '../../plugins/utils/notifiers-utils';
+import Relationship from '../../models/join-models/relationship';
 
 export default can.Component.extend({
   tag: 'issue-unmap-item',
@@ -120,7 +121,7 @@ export default can.Component.extend({
       const currentObject = getPageInstance();
       this.attr('isLoading', true);
       try {
-        const relationship = await CMS.Models.Relationship.findRelationship(
+        const relationship = await Relationship.findRelationship(
           this.attr('issueInstance'),
           this.attr('target')
         );
@@ -152,7 +153,7 @@ export default can.Component.extend({
     async click(el, ev) {
       ev.preventDefault();
       try {
-        const relationship = await CMS.Models.Relationship.findRelationship(
+        const relationship = await Relationship.findRelationship(
           this.viewModel.attr('issueInstance'),
           this.viewModel.attr('target')
         );

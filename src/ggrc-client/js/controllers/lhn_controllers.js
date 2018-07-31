@@ -8,6 +8,9 @@ import RecentlyViewedObject from '../models/local-storage/recently-viewed-object
 import tracker from '../tracker';
 import RefreshQueue from '../models/refresh_queue';
 import {getPageInstance} from '../plugins/utils/current-page-utils';
+import Cacheable from '../models/cacheable'
+import Search from '../models/service-models/search';
+import DisplayPrefs from '../models/local-storage/display-prefs';
 
 can.Control('CMS.Controllers.LHN', {
   defaults: {}
@@ -143,7 +146,7 @@ can.Control('CMS.Controllers.LHN', {
   },
 
   init_lhn: function () {
-    CMS.Models.DisplayPrefs.getSingleton().done(function (prefs) {
+    DisplayPrefs.getSingleton().done(function (prefs) {
       let $lhs = $('#lhs');
       let lhn_search_dfd;
       let my_work_tab = false;
@@ -381,7 +384,7 @@ can.Control('CMS.Controllers.LHN_Search', {
     let prefs_dfd;
     let template_path = GGRC.mustache_path + this.element.data('template');
 
-    prefs_dfd = CMS.Models.DisplayPrefs.getSingleton();
+    prefs_dfd = DisplayPrefs.getSingleton();
 
       // 2-way binding is set up in the view using can-value, directly connecting the
       //  search box and the display prefs to save the search value between page loads.
@@ -442,7 +445,7 @@ can.Control('CMS.Controllers.LHN_Search', {
     this.init_object_lists();
     this.init_list_views();
 
-    can.Model.Cacheable.bind('created', function (ev, instance) {
+    Cacheable.bind('created', function (ev, instance) {
       let modelNames;
       let modelName;
 
@@ -819,7 +822,7 @@ can.Control('CMS.Controllers.LHN_Search', {
 
     this.options._hasPendingRefresh = false;
     // Retrieve and display counts
-    return GGRC.Models.Search.counts_for_types(
+    return Search.counts_for_types(
         this.current_term, models, this.current_params, extraModels
       ).then(function () {
         if (this.search_id === search_id) {
@@ -850,7 +853,7 @@ can.Control('CMS.Controllers.LHN_Search', {
         self.options.loaded_lists.push(model_name);
       });
 
-      return GGRC.Models.Search.search_for_types(
+      return Search.search_for_types(
           this.current_term, models, this.current_params
         ).then(function () {
           if (self.search_id === search_id) {
