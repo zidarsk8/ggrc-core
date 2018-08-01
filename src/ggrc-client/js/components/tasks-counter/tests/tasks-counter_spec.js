@@ -9,7 +9,7 @@ import Component from '../tasks-counter';
 describe('tasks-counter component', function () {
   'use strict';
 
-  let viewModel;  // the viewModel under test
+  let viewModel; // the viewModel under test
 
   beforeEach(function () {
     viewModel = getComponentVM(Component);

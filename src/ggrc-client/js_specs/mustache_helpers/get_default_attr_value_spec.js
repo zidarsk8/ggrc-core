@@ -7,7 +7,7 @@ describe('can.mustache.helper.get_default_attr_value', function () {
   'use strict';
 
   let helper;
-  let instance;  // an object the helper retrieves an attribute value from
+  let instance; // an object the helper retrieves an attribute value from
 
   beforeAll(function () {
     helper = can.Mustache._helpers.get_default_attr_value.fn;

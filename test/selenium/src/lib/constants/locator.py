@@ -417,11 +417,12 @@ class ModalCreateNewControl(BaseModalCreateNew):
       By.CSS_SELECTOR, '[data-test-id="control_description-label_9cc51ca3"]')
   UI_DESCRIPTION = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_description-text_9cc51ca3"] iframe')
+      '[data-test-id="control_description-text_9cc51ca3"] .ql-editor')
   TEST_PLAN = (
       By.CSS_SELECTOR, '[data-test-id="control_test_plan_d8b5a2f4"] label')
   UI_TEST_PLAN = (
-      By.CSS_SELECTOR, '[data-test-id="control_test_plan_d8b5a2f4"] iframe')
+      By.CSS_SELECTOR, '[data-test-id="control_test_plan_d8b5a2f4"] '
+                       '.ql-editor')
   NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] label')
   KIND_OR_NATURE = (
       By.CSS_SELECTOR, '[data-test-id="control_kind_nature_dadc232f"] label')
@@ -437,8 +438,6 @@ class ModalCreateNewControl(BaseModalCreateNew):
       By.CSS_SELECTOR, '[data-test-id="control_frequency_fb20318a"] select')
   ASSERTIONS = (
       By.CSS_SELECTOR, '[data-test-id="control_assertions_5d8b7f7a"] label')
-  SELECTABLE_ASSERTIONS = (
-      By.CSS_SELECTOR, '[data-test-id="control_assertions_5d8b7f7a"] select')
   ADMIN = (
       By.CSS_SELECTOR, '[data-test-id="control_owner_587d12d6"] label')
   BUTTON_ADD_OWNER = (By.CSS_SELECTOR, 'isolate-form .btn')
@@ -453,18 +452,16 @@ class ModalCreateNewControl(BaseModalCreateNew):
       By.CSS_SELECTOR, '[data-test-id="control_type_means_2ffa1b64"] select')
   CATEGORIES = (
       By.CSS_SELECTOR, '[data-test-id="control_categories_1eb33246"] label')
-  SELECTABLE_CATEGORIES = (
-      By.CSS_SELECTOR, '[data-test-id="control_categories_1eb33246"] select')
   STATE = (
       By.CSS_SELECTOR, '[data-test-id="control_state_5d184456"] label')
   DROPDOWN_STATE = (
       By.CSS_SELECTOR, '[data-test-id="control_state_5d184456"] select')
-  UI_NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] iframe')
-  EFFECTIVE_DATE = (
+  UI_NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] .ql-editor')
+  UI_EFFECTIVE_DATE = (
       By.CSS_SELECTOR,
       '[test-id="control_effective_dates_0376cf90"] '
       '[data-id="effective_date_hidden"] .datepicker__input')
-  DATEPICKER_EFFECTIVE_DATE = (
+  EFFECTIVE_DATE_DATEPICKER = (
       By.CSS_SELECTOR,
       '[test-id="control_effective_dates_0376cf90"] '
       '[data-id="effective_date_hidden"] [data-handler="selectDay"]')
@@ -729,7 +726,8 @@ class CommonWidgetInfo(object):
       By.CSS_SELECTOR, _PEOPLE_ITEM + " editable-people-group-header")
   PEOPLE_VALUE_CSS = (By.CSS_SELECTOR, _PEOPLE_ITEM + " object-list")
   # user input elements
-  BUTTON_3BBS = (By.XPATH, _INFO_WIDGET_XPATH + "//*[@data-toggle='dropdown']")
+  BUTTON_3BBS_XPATH = _INFO_WIDGET_XPATH + "//*[@data-toggle='dropdown']"
+  BUTTON_3BBS = (By.XPATH, BUTTON_3BBS_XPATH)
   # controllers
   TAB_CONTAINER_CSS = (By.CSS_SELECTOR, "tab-container")
 
@@ -745,12 +743,39 @@ class WidgetInfoPanel(CommonWidgetInfo):
   # People section
   PEOPLE_HEADERS_AND_VALUES = (By.CSS_SELECTOR, ".editable-people-group")
 
+  # Local custom attributes section
+  DATE_CA_INPUT = (By.CSS_SELECTOR, '.datepicker__input.date')
+  DATE_CA_FIELDS = (By.CSS_SELECTOR, '[data-handler="selectDay"]')
+  DROPDOWN_CA_ITEM = (By.CSS_SELECTOR, "dropdown-form-field select")
+  TEXT_CA_INPUT = (By.CSS_SELECTOR, "text-form-field input")
+  RICH_TEXT_CA_INPUT = (By.CSS_SELECTOR, "rich-text-form-field p")
+  PERSON_CA = (By.CSS_SELECTOR, "person-form-field input")
+  CA_SAVED_STATUS = (
+      By.CSS_SELECTOR, "custom-attributes-status loading-status")
+
 
 class WidgetSnapshotsInfoPanel(WidgetInfoPanel):
   """Locators specific for Info panels of snapshotable objects."""
   LINK_GET_LAST_VER = (
       By.CSS_SELECTOR, ".pane-header__snapshot-info [can-click='compareIt']")
   SNAPSHOT_OBJ_VER = (By.CSS_SELECTOR, "span.snapshot")
+
+  OBJECT_REVIEW_DECLINE_BTN = (By.XPATH, "//*[contains(text(), 'Decline')]")
+  OBJECT_REVIEW_APPROVE_BTN = (By.XPATH, "//*[contains(text(), 'Approve')]")
+  DECLINE_REVIEW_COMMENTS = (
+      By.XPATH, "//*[contains(@data-placeholder,'Enter Comments')]")
+  SAVE_AND_CLOSE_BTN = (
+      By.XPATH,
+      "//*[contains(@class,'confirm-buttons')]//*[contains(text(), 'Close')]")
+  ASSIGN_REVIEWER_EMPTY = (By.CSS_SELECTOR, ".people-autocomplete > input")
+  ASSIGN_REVIEWER_DROPDOWN = (By.XPATH, "//*[@id='ui-id-1']")
+  DATE_PICKER_LOCATOR = (By.XPATH, "//*[@name='end_date']")
+  DATE_PICKER_FIELD = (By.XPATH, "//*[@data-handler='selectDay']")
+  SUBMIT_REVIEW_BUTTON = (By.XPATH, "//*[text()='Submit']")
+  REVIEW_REJECTED_TXT = (
+      By.XPATH,
+      "//*[@class='ggrc_controllers_quick_form']/preceding-sibling::div")
+  REVIEW_APPROVED_TXT = (By.XPATH, "//*[@class='object-approved']")
 
 
 class WidgetInfoProgram(WidgetInfoPanel):
@@ -825,8 +850,7 @@ class WidgetInfoAssessment(WidgetInfoPanel, CommonAssessment):
   HEADERS_AND_VALUES = (By.CSS_SELECTOR, ".ggrc-form-item__multiple-row")
   # Base
   LCAS_HEADERS_AND_VALUES = (
-      By.CSS_SELECTOR,
-      WIDGET + " .field-wrapper.flex-size-1")
+      By.CSS_SELECTOR, "custom-attributes div[class*='custom-attribute']")
   CAS_HEADERS_AND_VALUES = (
       By.CSS_SELECTOR,
       WIDGET + " assessment-custom-attributes inline-edit-control")
@@ -879,8 +903,8 @@ class WidgetInfoClause(WidgetSnapshotsInfoPanel):
   """Locators for Clause Info widgets."""
 
 
-class WidgetInfoSection(WidgetSnapshotsInfoPanel):
-  """Locators for Section Info widgets."""
+class WidgetInfoRequirement(WidgetSnapshotsInfoPanel):
+  """Locators for Requirement Info widgets."""
 
 
 class WidgetInfoControl(WidgetSnapshotsInfoPanel):
@@ -1119,7 +1143,7 @@ class AdminCustomAttributes(object):
       items = (
           objects.WORKFLOWS, objects.RISK_ASSESSMENTS, objects.THREATS,
           objects.RISKS, objects.PROGRAMS, objects.AUDITS,
-          objects.OBJECTIVES, objects.SECTIONS, objects.CONTROLS,
+          objects.OBJECTIVES, objects.REQUIREMENTS, objects.CONTROLS,
           objects.ISSUES, objects.ASSESSMENTS, objects.STANDARDS,
           objects.REGULATIONS, objects.POLICIES, objects.CONTRACTS,
           objects.CLAUSES, objects.VENDORS, objects.PEOPLE,

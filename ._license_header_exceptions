@@ -46,10 +46,6 @@
 < ._license_header_exceptions
 < node_modules
 < provision/docker/inventory
-< provision/docker/my.cnf
-< provision/docker/mysql/default_utf8.cnf
-< provision/docker/mysql/log.cnf
-< provision/docker/mysql/packet_size.cnf
 < PULL_REQUEST_TEMPLATE.md
 < pylintrc
 < README.md

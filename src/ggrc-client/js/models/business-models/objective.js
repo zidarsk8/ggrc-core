@@ -3,7 +3,14 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-export default can.Model.Cacheable('CMS.Models.Objective', {
+import Cacheable from '../cacheable';
+import '../mixins/unique-title';
+import '../mixins/ca-update';
+import '../mixins/access-control-list';
+import '../mixins/base-notifications';
+import '../mixins/related-assessments-loader';
+
+export default Cacheable('CMS.Models.Objective', {
   root_object: 'objective',
   root_collection: 'objectives',
   category: 'objectives',
@@ -26,14 +33,14 @@ export default can.Model.Cacheable('CMS.Models.Objective', {
   attributes: {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
-    sections: 'CMS.Models.get_stubs',
+    requirements: 'CMS.Models.get_stubs',
     controls: 'CMS.Models.Control.stubs',
     object_people: 'CMS.Models.ObjectPerson.stubs',
     objective_objects: 'CMS.Models.ObjectObjective.stubs',
   },
   tree_view_options: {
     attr_view: GGRC.mustache_path + '/objectives/tree-item-attr.mustache',
-    attr_list: can.Model.Cacheable.attr_list.concat([
+    attr_list: Cacheable.attr_list.concat([
       {
         attr_title: 'Last Assessment Date',
         attr_name: 'last_assessment_date',

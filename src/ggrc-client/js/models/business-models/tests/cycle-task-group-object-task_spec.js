@@ -16,7 +16,7 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
 
   describe('responseOptionsEditable method', function () {
     let instance;
-    let method;  // the method under test
+    let method; // the method under test
     let Model;
     let origCycleConfig;
 

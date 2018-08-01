@@ -8,15 +8,15 @@ import '../tree/tree-view-node';
 describe('CMS.Controllers.TreeViewNode', function () {
   'use strict';
 
-  let Ctrl;  // the controller under test
+  let Ctrl; // the controller under test
 
   beforeAll(function () {
     Ctrl = CMS.Controllers.TreeViewNode;
   });
 
   describe('draw_node() method', function () {
-    let ctrlInst;  // fake controller instance
-    let ifNotRemovedResult;  // fake return value of the _ifNotRemoved() method
+    let ctrlInst; // fake controller instance
+    let ifNotRemovedResult; // fake return value of the _ifNotRemoved() method
     let method;
     let $element;
 
@@ -83,7 +83,7 @@ describe('CMS.Controllers.TreeViewNode', function () {
 
       ctrlInst.options.attr('isActive', false);
       ctrlInst.options.attr('disable_lazy_loading', true);
-      $element.removeClass('active');  // make sure it is indeed inactive
+      $element.removeClass('active'); // make sure it is indeed inactive
 
       method();
 
@@ -106,7 +106,7 @@ describe('CMS.Controllers.TreeViewNode', function () {
   });
 
   describe('expand() method', function () {
-    let ctrlInst;  // fake controller instance
+    let ctrlInst; // fake controller instance
     let displaySubtreesDfd;
     let method;
     let $tree;

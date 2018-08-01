@@ -148,7 +148,7 @@ class Revision(base.ContextRBAC, Base, db.Model):
                           action=self.action)
     elif 'mapped_directive' in self._content:
       # then this is a special case of combined map/creation
-      # should happen only for Section and Control
+      # should happen only for Requirement and Control
       mapped_directive = self._content['mapped_directive']
       if self.action == 'created':
         result = u"New {0}, {1}, created and mapped to {2}".format(
@@ -240,10 +240,11 @@ class Revision(base.ContextRBAC, Base, db.Model):
         "owners": reverted_roles_dict.get("Admin"),
     }
     exists_roles = {i["ac_role_id"] for i in access_control_list}
+
     for field, role_id in map_field_to_role.items():
-      if field not in self._content:
-        continue
       if role_id in exists_roles or role_id is None:
+        continue
+      if field not in self._content:
         continue
       field_content = self._content.get(field) or {}
       if not field_content:
@@ -325,7 +326,7 @@ class Revision(base.ContextRBAC, Base, db.Model):
         "Product",
         "Program",
         "Project",
-        "Section",
+        "Requirement",
         "System",
         "Vendor",
 
@@ -446,6 +447,76 @@ class Revision(base.ContextRBAC, Base, db.Model):
       cads.append(cad)
     return {"custom_attribute_definitions": cads}
 
+  def populate_requirements(self, populated_content):  # noqa pylint: disable=too-many-branches
+    """Populates revision content for Requirement models and models with fields
+
+    that can contain Requirement old names. This fields would be checked and
+    updated where necessary
+    """
+    # change to add Requirement old names
+    requirement_type = ["Section", ]
+    # change to add models and fields that can contain Requirement old names
+    affected_models = {
+        "AccessControlList": ["object_type", ],
+        "AccessControlRole": ["object_type", ],
+        "Assessment": ["assessment_type", ],
+        "AssessmentTemplate": ["template_object_type", ],
+        "Automapping": ["source_type", "destination_type", ],
+        "CustomAttributeValue": ["attributable_type", ],
+        "Event": ["resource_type", ],
+        "ObjectPerson": ["personable_type", ],
+        "Relationship": ["source_type", "destination_type", ],
+        "Revision": ["resource_type", ],
+        "Label": ["object_type", ],
+        "Context": ["related_object_type", ],
+        "IssuetrackerIssue": ["object_type", ],
+        "ObjectLabel": ["object_type", ],
+        "ObjectTemplates": ["name", ],
+        "Proposal": ["instance_type", ],
+        "Snapshot": ["child_type", "parent_type", ],
+        "TaskGroupObject": ["object_type", ],
+    }
+    # change to add special values cases
+    special_cases = {
+        "CustomAttributeDefinition": {
+            "fields": ["definition_type", ],
+            "old_values": ["section", ],
+            "new_value": "requirement",
+        }
+    }
+
+    obj_type = self.resource_type
+
+    # populate fields if they contain old names
+    if obj_type in affected_models.keys():
+      for field in affected_models[obj_type]:
+        if populated_content.get(field) in requirement_type:
+          populated_content[field] = "Requirement"
+
+    # populate fields for models that contain old names in special spelling
+    if obj_type in special_cases.keys():
+      for field in special_cases[obj_type]["fields"]:
+        if populated_content[field] in special_cases[obj_type]["old_values"]:
+          populated_content[field] = special_cases[obj_type]["new_value"]
+
+    # populate Requirements revisions
+    if obj_type == "Requirement":
+      populated_content["type"] = "Requirement"
+
+      acls = populated_content.get("access_control_list", {})
+      if acls:
+        for acl in acls:
+          if acl.get("object_type") in requirement_type:
+            acl["object_type"] = "Requirement"
+        populated_content["access_control_list"] = acls
+
+      cavs = populated_content.get("custom_attribute_values", {})
+      if cavs:
+        for cav in cavs:
+          if cav.get("attributable_type") in requirement_type:
+            cav["attributable_type"] = "Requirement"
+        populated_content["custom_attribute_values"] = cavs
+
   @builder.simple_property
   def content(self):
     """Property. Contains the revision content dict.
@@ -464,6 +535,7 @@ class Revision(base.ContextRBAC, Base, db.Model):
     populated_content.update(self.populate_cad_default_values())
     populated_content.update(self.populate_cavs())
 
+    self.populate_requirements(populated_content)
     # remove custom_attributes,
     # it's old style interface and now it's not needed
     populated_content.pop("custom_attributes", None)

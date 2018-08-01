@@ -79,17 +79,20 @@ class Representation(object):
         els.TITLE: "title", els.ADMIN: "admins",
         els.CODE: "slug", els.REVIEW_STATE: "os_state",
         els.OBJECT_REVIEW: "os_state",
+        els.OBJECT_REVIEW_FULL: "object_review_txt",
         els.STATE: "status"
     }
     ui_remap_items = {
-        els.MANAGER: "managers", els.VERIFIED: "verified",
+        els.PROGRAM_MANAGERS: "managers", els.VERIFIED: "verified",
         els.STATUS: "status", els.LAST_UPDATED: "updated_at",
         els.AUDIT_CAPTAINS: "audit_captains", els.CAS: "custom_attributes",
+        els.AUDITORS: "auditors",
         els.MAPPED_OBJECTS: "mapped_objects", els.ASSIGNEES: "assignees",
         els.CREATORS: "creators", els.VERIFIERS: "verifiers",
         els.COMMENTS_HEADER: "comments", els.CREATED_AT: "created_at",
         els.MODIFIED_BY: "modified_by", els.LAST_UPDATED_BY: "modified_by",
         els.UPDATED_AT: "updated_at", els.ASMT_TYPE: "assessment_type",
+        els.LCAS: "custom_attribute_definitions",
         "EVIDENCE_URLS": "evidence_urls"
     }
     csv_remap_items = {
@@ -333,7 +336,7 @@ class Representation(object):
       """Update object's attributes values."""
       for obj_attr_name in attrs:
         obj_attr_value = None
-        if (obj_attr_name in Representation.all_attrs_names()):
+        if obj_attr_name in Representation.all_attrs_names():
           _obj_attr_value = attrs.get(obj_attr_name)
           if not is_replace_values_of_dicts:
             # convert repr from objects to dicts exclude datetime objects
@@ -612,7 +615,7 @@ class Entity(Representation):
         "primary_contacts", "secondary_contacts", "status", "os_state",
         "comments", "custom_attribute_definitions", "custom_attribute_values",
         "custom_attributes", "created_at", "updated_at", "modified_by",
-        **attrs)
+        "object_review_txt", **attrs)
 
   @staticmethod
   def all_entities_classes():
@@ -648,10 +651,20 @@ class PersonEntity(Entity):
         "slug", "title", "admins", "primary_contacts", "secondary_contacts",
         "status", "os_state", "comments")
     self.set_attrs(
-        "name", "email", "company", "system_wide_role", **attrs)
+        "name", "id", "type", "email", "company", "system_wide_role", **attrs)
 
   def __lt__(self, other):
     return self.email < other.email
+
+
+class UserRoleEntity(Representation):
+  """Class that represents model for user role entity"""
+
+  def __init__(self):
+    super(UserRoleEntity, self).__init__()
+    self.set_attrs(
+        "type", "id", "created_at", "updated_at", "modified_by",
+        "person", "role")
 
 
 class CustomAttributeDefinitionEntity(Representation):

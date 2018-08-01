@@ -3,10 +3,11 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import Cacheable from '../../models/cacheable';
 import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
 import {navigate} from '../../plugins/utils/current-page-utils';
 
-let CloneWorkflow = can.Model.Cacheable({
+let CloneWorkflow = Cacheable({
   defaults : {
     clone_people: true,
     clone_tasks: true,
@@ -17,7 +18,7 @@ let CloneWorkflow = can.Model.Cacheable({
     return $.when(this);
   },
   save: function() {
-    var workflow = new CMS.Models.Workflow({
+    let workflow = new CMS.Models.Workflow({
       clone: this.source_workflow.id,
       context: null,
       clone_people: this.clone_people,
@@ -38,7 +39,7 @@ can.Component.extend({
   template: "<content/>",
   events: {
     click: function(el) {
-      var $target;
+      let $target;
 
       $target = $('<div class="modal hide"></div>').uniqueId();
       $target.modal_form({}, el);

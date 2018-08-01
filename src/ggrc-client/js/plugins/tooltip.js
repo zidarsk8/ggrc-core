@@ -114,7 +114,7 @@
      *      P.S. Old button is destroyed.
      * 3) After DELAY in (1) Bootstrap uses data for the tooltip which was destroyed in (2).
      */
-    var intervalId = setInterval(function () {
+    let intervalId = setInterval(function () {
       if (actions.isShown && actions.isClicked) {
         clearAllShowedTooltips();
         actions.isClicked = false;

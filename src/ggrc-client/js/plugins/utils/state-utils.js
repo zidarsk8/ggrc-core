@@ -5,6 +5,7 @@
 
 import {
   isMyAssessments,
+  isMyWork,
 } from './current-page-utils';
 
 /**
@@ -255,9 +256,17 @@ function buildAssessmentFilter(statuses, builder) {
  * @return {Array} List of default states for model
  */
 function getDefaultStatesForModel(model) {
-  return isMyAssessments() ?
-    ['Not Started', 'In Progress'] :
-    getStatesForModel(model);
+  let states;
+
+  if (isMyAssessments()) {
+    states = ['Not Started', 'In Progress'];
+  } else if (isMyWork() && model === 'CycleTaskGroupObjectTask') {
+    states = ['Assigned', 'In Progress'];
+  } else {
+    states = getStatesForModel(model);
+  }
+
+  return states;
 }
 
 export {

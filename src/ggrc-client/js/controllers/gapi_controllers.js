@@ -11,8 +11,8 @@
     drivedfd: null,
     gapidfd: new $.Deferred(), // DFD which is resolved upon gapi library loader is available
     reAuthorize: function (token) {
-      var params = ['https://www.googleapis.com/auth/drive'];
-      var dfd;
+      let params = ['https://www.googleapis.com/auth/drive'];
+      let dfd;
 
       if (_.isEmpty(token)) {
         dfd = this.authorize(params, true);
@@ -26,8 +26,8 @@
       return this.canonical_instance.authorize(newscopes, force);
     },
     doGAuth: function (scopes, usePopup) {
-      var that = this;
-      var $modal;
+      let that = this;
+      let $modal;
 
       this.drive = this.drive || new $.Deferred();
       if (this.oauth_dfd.state() !== 'pending') {
@@ -79,8 +79,8 @@
       }
     },
     doGAuth_step2: function (scopes, usePopup) {
-      var authdfd = new $.Deferred();
-      var that = this;
+      let authdfd = new $.Deferred();
+      let that = this;
 
       scopes = scopes || this.canonical_instance.options.scopes;
 
@@ -105,7 +105,7 @@
 
       $.when(authdfd, this.o2dfd)
       .then(function (authresult) {
-        var o2d = new $.Deferred();
+        let o2d = new $.Deferred();
 
         gapi.client.oauth2.userinfo.get().execute(function (user) {
           if (user.error) {
@@ -137,13 +137,13 @@
       }.bind(this));
     },
     gapi_request_with_auth: function (params) {
-      var that = this;
+      let that = this;
 
       return that.authorize(params.scopes).then(function () {
-        var dfd = new $.Deferred();
-        var cb = params.callback;
-        var checkAuth = function (result) {
-          var args = can.makeArray(arguments);
+        let dfd = new $.Deferred();
+        let cb = params.callback;
+        let checkAuth = function (result) {
+          let args = can.makeArray(arguments);
           args.unshift(dfd);
           if (result && result.error && result.error.code === 401) {
             // that.doGAuth(scopes); //changes oauth_dfd to a new deferred
@@ -151,9 +151,9 @@
             that.authorize(params.scopes, true)
               .then($.proxy(that.gapi_request_with_auth, that, params))
               .then(function () {
-                dfd.resolve.apply(dfd, arguments);
+                dfd.resolve(...arguments);
               }, function () {
-                dfd.reject.apply(dfd, arguments);
+                dfd.reject(...arguments);
               });
           } else {
             cb.apply(window, args);
@@ -169,7 +169,7 @@
     }
   }, {
     init: function () {
-      this._super.apply(this, arguments);
+      this._super(...arguments);
       if (!this.constructor.canonical_instance) {
         this.constructor.canonical_instance = this;
       }
@@ -178,9 +178,9 @@
           this.constructor, this.options.scopes, false), 500);
     },
     authorize: function (newscopes, force) {
-      var dfd = this.constructor.oauth_dfd;
-      var that = this;
-      var reAuthWithNewScopes = false;
+      let dfd = this.constructor.oauth_dfd;
+      let that = this;
+      let reAuthWithNewScopes = false;
 
       can.each(newscopes, function (ns) {
         // if new scope not in the list of scopes

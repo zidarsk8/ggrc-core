@@ -1,7 +1,6 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Services for create and manipulate objects via UI."""
-
 import os
 import re
 
@@ -14,7 +13,7 @@ from lib.element.tab_containers import DashboardWidget
 from lib.entities.entity import Representation
 from lib.page import dashboard
 from lib.page.widget.info_widget import SnapshotedInfoPanel
-from lib.utils import selenium_utils, file_utils
+from lib.utils import selenium_utils, file_utils, conftest_utils
 from lib.utils.string_utils import StringMethods, Symbols
 
 
@@ -95,6 +94,16 @@ class BaseWebUiService(object):
     return [
         factory_obj.update_attrs(is_allow_none=True, **scope) for
         scope, factory_obj in zip(list_scopes_to_convert, list_factory_objs)]
+
+  def create_obj(self):
+    """Create object via LHN"""
+    obj_info_page = conftest_utils.create_obj_via_lhn(
+        self.driver, getattr(element.Lhn, self.obj_name.upper()))
+    scope = obj_info_page.get_info_widget_obj_scope()
+    obj = self._create_list_objs(
+        entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
+    obj.url = self.driver.current_url
+    return obj
 
   def open_widget_of_mapped_objs(self, src_obj):
     """Navigate to generic widget URL of mapped objects according to URL of
@@ -419,6 +428,25 @@ class BaseWebUiService(object):
     related_asmts_table = obj_page.show_related_assessments()
     return related_asmts_table.get_related_titles(asmt_type=obj.type)
 
+  def open_info_page_of_obj_fill_lca(self, obj):
+    """Open obj Info Page. Populate local custom attributes with random values.
+    Only Date population implemented.
+    """
+    ca_values = self.open_info_page_of_obj(obj).fill_lcas_attr_values()
+    updated_attrs = self.set_custom_attr_values(obj, ca_values)
+    obj.update_attrs(custom_attribute_values=updated_attrs)
+    return obj
+
+  def set_custom_attr_values(self, obj, cas):
+    """Update custom attribute values in custom_attribute_definitions"""
+    attrs = []
+    for attr_name, attr_value in cas.iteritems():
+      for attr in obj.custom_attribute_definitions:
+        if attr['title'].upper() == attr_name.upper():
+          attrs.append({'custom_attribute_id': attr['id'],
+                        'attribute_value': attr_value})
+    return attrs
+
 
 class SnapshotsWebUiService(BaseWebUiService):
   """Class for snapshots business layer's services objects."""
@@ -450,6 +478,30 @@ class SnapshotsWebUiService(BaseWebUiService):
     """
     obj_info_panel = (self.open_info_panel_of_obj_by_title(src_obj, obj).panel)
     return obj_info_panel.is_link_get_latest_ver_exist()
+
+  def submit_obj_for_review(self, obj, usr_email):
+    """Submit control for review scenario."""
+    widget = self.open_info_page_of_obj(obj)
+    widget.open_submit_for_review_popup()
+    widget.select_assignee_user(usr_email)
+    widget.select_first_available_date()
+    widget.click_submit()
+    return self.info_widget_cls(self.driver)
+
+  def decline_review(self, obj, comment_msg):
+    """Decline review scenario."""
+    widget = self.open_info_page_of_obj(obj)
+    widget.click_decline_review()
+    widget.leave_decline_comment(comment_msg)
+    widget.click_save_and_close_on_decline()
+    return self.info_widget_cls(self.driver)
+
+  def approve_review(self, obj):
+    """Approve review scenario."""
+    widget = self.open_info_page_of_obj(obj)
+    widget.click_approve_review()
+    selenium_utils.wait_for_js_to_load(self.driver)
+    return self.info_widget_cls(self.driver)
 
 
 class AuditsService(BaseWebUiService):
@@ -634,12 +686,16 @@ class AssessmentsService(BaseWebUiService):
     modal_edit.save_and_close()
     return mapped_titles
 
-  def choose_and_fill_dropdown_lca(
-      self, asmt, dropdown_id, option_title, **kwargs
-  ):
+  def choose_and_fill_dropdown_lca(self, asmt, dropdown, **kwargs):
     """Fill dropdown LCA for Assessment."""
     asmt_info = self.open_info_page_of_obj(asmt)
-    asmt_info.choose_and_fill_dropdown_lca(dropdown_id, option_title, **kwargs)
+    asmt_info.choose_and_fill_dropdown_lca(
+        dropdown.id, dropdown.multi_choice_options, **kwargs)
+
+    updated_attrs = self.set_custom_attr_values(
+        asmt, {dropdown.title: dropdown.multi_choice_options})
+    asmt.update_attrs(custom_attribute_values=updated_attrs)
+    return asmt
 
 
 class ControlsService(SnapshotsWebUiService):

@@ -6,6 +6,7 @@
 import Component from '../related-urls';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Permission from '../../../permission';
+import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
 
 describe('GGRC.Components.relatedUrls', function () {
   'use strict';
@@ -178,7 +179,7 @@ describe('GGRC.Components.relatedUrls', function () {
       method = viewModel.submitCreateUrlForm.bind(viewModel);
       spyOn(viewModel, 'createUrl');
       spyOn(viewModel, 'toggleFormVisibility');
-      spyOn(GGRC.Errors, 'notifier');
+      spyOn(NotifiersUtils, 'notifier');
     });
 
     describe('in case of non-empty input', function () {
@@ -208,7 +209,7 @@ describe('GGRC.Components.relatedUrls', function () {
         method(url);
 
         matches = _.filter(viewModel.attr('urls'), {link: url});
-        expect(matches.length).toEqual(1);  // still only 1
+        expect(matches.length).toEqual(1); // still only 1
         expect(viewModel.createUrl).not.toHaveBeenCalled();
       });
 
@@ -221,7 +222,7 @@ describe('GGRC.Components.relatedUrls', function () {
 
         method('www.bar.com');
 
-        expect(GGRC.Errors.notifier).toHaveBeenCalledWith(
+        expect(NotifiersUtils.notifier).toHaveBeenCalledWith(
           'error', 'URL already exists.');
       });
 
@@ -260,7 +261,7 @@ describe('GGRC.Components.relatedUrls', function () {
 
       it('should show notification with error message', function () {
         method(url);
-        expect(GGRC.Errors.notifier).toHaveBeenCalledWith(
+        expect(NotifiersUtils.notifier).toHaveBeenCalledWith(
           'error', 'Please enter a URL.');
       });
     });

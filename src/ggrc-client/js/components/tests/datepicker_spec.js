@@ -9,7 +9,7 @@ import {DATE_FORMAT} from '../../plugins/utils/date-util';
 describe('GGRC.Components.datepicker', function () {
   'use strict';
 
-  let Component;  // the component under test
+  let Component; // the component under test
   let events;
 
   beforeAll(function () {

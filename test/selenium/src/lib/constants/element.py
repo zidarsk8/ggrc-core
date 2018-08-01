@@ -21,7 +21,7 @@ class Lhn(object):
           cls.STANDARDS,
           cls.CONTRACTS,
           cls.CLAUSES,
-          cls.SECTIONS)
+          cls.REQUIREMENTS)
       cls.CONTROLS_OR_OBJECTIVES_MEMBERS = (
           cls.CONTROLS,
           cls.OBJECTIVES)
@@ -126,6 +126,7 @@ class Common(object):
   STATE = Base.STATE
   # fictional elements (need to convert UI attrs to Entities attrs)
   CAS = "CAs"
+  LCAS = "LCAs"
   MODIFIED_BY = "Last updated by"
   CREATED_AT = "Created date"
   UPDATED_AT = "Updated at"
@@ -134,6 +135,10 @@ class Common(object):
   PRIMARY_CONTACTS = roles.PRIMARY_CONTACTS
   SECONDARY_CONTACTS = roles.SECONDARY_CONTACTS
   OTHERS = "Others"
+  OBJECT_REVIEW = "Object review"
+  OBJECT_REVIEW_FULL = "object_review_txt"
+  APPROVED_DATE_REGEX = r" \w{3} \w{3} \d*\s*\w*"
+  DECLINED_DATE_REGEX = r"\d.+\w*\s*[^.]"
 
 
 class CommonModalCreate(object):
@@ -167,7 +172,8 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   VERIFIED = "Verified"
   STATUS = "Status"
   AUDIT_CAPTAINS = "Audit Captains"
-  MANAGER = "Manager"
+  AUDITORS = "Auditors"
+  PROGRAM_MANAGERS = "Program Managers"
   MAPPED_OBJECTS = "Mapped Objects"
   REVIEW_STATE = "Review State"
   CREATORS = roles.CREATORS
@@ -422,7 +428,7 @@ class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
       CommonProgram.PROGRAM)
   REVIEW_STATE = TransformationSetVisibleFields.REVIEW_STATE
-  MANAGER = CommonProgram.MANAGER
+  MANAGER = CommonProgram.PROGRAM_MANAGERS
   EFFECTIVE_DATE = Base.EFFECTIVE_DATE
   PRIMARY_CONTACTS = TransformationSetVisibleFields.PRIMARY_CONTACTS
   SECONDARY_CONTACTS = TransformationSetVisibleFields.SECONDARY_CONTACTS
@@ -516,6 +522,7 @@ class UnifiedMapperModal(object):
 class GenericWidget(object):
   """Elements' labels and properties for Generic Widget."""
   NO_FILTER_RESULTS = "No results, please check your filter criteria"
+  ALL_CHANGES_SAVED = "All changes saved"
 
 
 class ExportPage(object):
