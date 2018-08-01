@@ -54,6 +54,7 @@ from ggrc.views.registry import object_view
 from ggrc import utils
 from ggrc.utils import benchmark, helpers
 from ggrc.utils import revisions
+from ggrc.cache.utils import clear_permission_cache
 
 logger = logging.getLogger(__name__)
 REINDEX_CHUNK_SIZE = 100
@@ -732,5 +733,6 @@ def make_document_admin():
   for doc in docs:
     doc.add_admin_role()
   db.session.commit()
+  clear_permission_cache()
   response = DocumentEndpoint.build_make_admin_response(request.json, docs)
   return Response(json.dumps(response), mimetype='application/json')
