@@ -9,6 +9,7 @@ including the import/export api endponts.
 
 import re
 
+from functools import wraps
 from logging import getLogger
 from StringIO import StringIO
 from datetime import datetime
@@ -26,11 +27,12 @@ from werkzeug.exceptions import (
 )
 
 from ggrc import db
-from ggrc.gdrive import file_actions as fa
 from ggrc.app import app
+from ggrc.converters import get_exportables
 from ggrc.converters.base import ImportConverter, ExportConverter
 from ggrc.converters.import_helper import count_objects, \
-    read_csv_file, get_export_filename
+    read_csv_file, get_export_filename, get_object_column_definitions
+from ggrc.gdrive import file_actions as fa
 from ggrc.models import import_export, person
 from ggrc.notifications import job_emails
 from ggrc.query.exceptions import BadQueryException
@@ -39,6 +41,14 @@ from ggrc.login import login_required, get_current_user
 from ggrc import settings
 from ggrc.utils import benchmark, get_url_root
 
+
+EXPORTABLES_MAP = {exportable.__name__: exportable for exportable
+                   in get_exportables().values()}
+
+IGNORE_FIELD_IN_TEMPLATE = {
+    "Assessment": {"evidences_file"},
+    "Audit": {"evidences_file"},
+}
 
 # pylint: disable=invalid-name
 logger = getLogger(__name__)
@@ -83,34 +93,68 @@ def export_file(export_to, filename, csv_string=None):
   raise BadRequest("Bad params")
 
 
+def handle_export_request_error(handle_function):
+  """Decorator for handle exceptions during exporting"""
+  @wraps(handle_function)
+  def handle_wrapper(*args, **kwargs):
+    """Wrapper for handle exceptions during exporting"""
+    try:
+      return handle_function(*args, **kwargs)
+    except BadQueryException as exception:
+      raise BadRequest(exception.message)
+    except Unauthorized as ex:
+      raise Unauthorized("{} Try to reload /export page".format(ex.message))
+    except HttpError as e:
+      message = json.loads(e.content).get("error").get("message")
+      if e.resp.code == 401:
+        raise Unauthorized("{} Try to reload /export page".format(message))
+      raise InternalServerError(message)
+    except Exception as e:  # pylint: disable=broad-except
+      logger.exception("Export failed: %s", e.message)
+      if settings.TESTING:
+        raise
+      raise InternalServerError("Export failed due to internal server error.")
+  return handle_wrapper
+
+
+@handle_export_request_error
 def handle_export_request():
   """Export request handler"""
   # pylint: disable=too-many-locals
-  try:
-    with benchmark("handle export request data"):
-      data = parse_export_request()
-      objects = data.get("objects")
-      export_to = data.get("export_to")
-      current_time = data.get("current_time")
-    with benchmark("Generate CSV string"):
-      csv_string, object_names = make_export(objects)
-    with benchmark("Make response."):
-      filename = "{}_{}.csv".format(object_names, current_time)
-      return export_file(export_to, filename, csv_string)
-  except BadQueryException as exception:
-    raise BadRequest(exception.message)
-  except Unauthorized as ex:
-    raise Unauthorized("{} Try to reload /export page".format(ex.message))
-  except HttpError as e:
-    message = json.loads(e.content).get("error").get("message")
-    if e.resp.code == 401:
-      raise Unauthorized("{} Try to reload /export page".format(message))
-    raise InternalServerError(message)
-  except Exception as e:  # pylint: disable=broad-except
-    logger.exception("Export failed: %s", e.message)
-    if settings.TESTING:
-      raise
-    raise InternalServerError("Export failed due to internal server error.")
+  with benchmark("handle export request data"):
+    data = parse_export_request()
+    objects = data.get("objects")
+    export_to = data.get("export_to")
+    current_time = data.get("current_time")
+  with benchmark("Generate CSV string"):
+    csv_string, object_names = make_export(objects)
+  with benchmark("Make response."):
+    filename = "{}_{}.csv".format(object_names, current_time)
+    return export_file(export_to, filename, csv_string)
+
+
+def get_csv_template(objects):
+  """Make csv template"""
+  for object_data in objects:
+    class_name = object_data["object_name"]
+    object_class = EXPORTABLES_MAP[class_name]
+    ignore_fields = IGNORE_FIELD_IN_TEMPLATE.get(class_name, [])
+    filtered_fields = [field for field in
+                       get_object_column_definitions(object_class)
+                       if field not in ignore_fields]
+    object_data["fields"] = filtered_fields
+  return make_export(objects)
+
+
+@handle_export_request_error
+def handle_export_csv_template_request():
+  """Export template request handler"""
+  data = parse_export_request()
+  objects = data.get("objects")
+  export_to = "csv"
+  csv_string, object_names = get_csv_template(objects)
+  filename = "{}_template.csv".format(object_names)
+  return export_file(export_to, filename, csv_string)
 
 
 def make_export(objects):
@@ -283,6 +327,13 @@ def init_converter_views():
     """Calls export handler"""
     with benchmark("handle export request"):
       return handle_export_request()
+
+  @app.route("/_service/export_csv_template", methods=["POST"])
+  @login_required
+  def handle_export_csv_template():
+    """Calls export csv template handler"""
+    with benchmark("handle export csv templae"):
+      return handle_export_csv_template_request()
 
   @app.route("/_service/import_csv", methods=["POST"])
   @login_required
