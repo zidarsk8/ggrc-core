@@ -73,8 +73,8 @@ class Evidence(Roleable, Relatable, mixins.Titled,
       "status",
       reflection.Attribute("kind", update=False),
       reflection.Attribute("parent_obj", read=False, update=False),
-      reflection.Attribute('archived', create=False, update=False),
-      reflection.Attribute('is_uploaded', read=False, update=False),
+      reflection.Attribute("archived", create=False, update=False),
+      reflection.Attribute("is_uploaded", read=False, update=False),
   )
 
   _fulltext_attrs = [
@@ -106,8 +106,8 @@ class Evidence(Roleable, Relatable, mixins.Titled,
       },
   }
 
-  _allowed_parents = {'Assessment', 'Audit'}
-  FILE_NAME_SEPARATOR = '_ggrc'
+  _allowed_parents = {"Assessment", "Audit"}
+  FILE_NAME_SEPARATOR = "_ggrc"
 
   @orm.validates("kind")
   def validate_kind(self, key, kind):
@@ -129,11 +129,11 @@ class Evidence(Roleable, Relatable, mixins.Titled,
   @classmethod
   def _populate_query(cls, query):
     return query.options(
-      orm.subqueryload(cls._related_assessment),
-      orm.subqueryload(cls._related_audit).load_only("archived"),
-      orm.Load(cls).undefer_group(
-        "Evidence_complete",
-      ),
+        orm.subqueryload(cls._related_assessment),
+        orm.subqueryload(cls._related_audit).load_only("archived"),
+        orm.Load(cls).undefer_group(
+            "Evidence_complete",
+        ),
     )
 
   @classmethod
@@ -156,7 +156,7 @@ class Evidence(Roleable, Relatable, mixins.Titled,
 
   def log_json(self):
     tmp = super(Evidence, self).log_json()
-    tmp['type'] = 'Evidence'
+    tmp["type"] = "Evidence"
     return tmp
 
   @simple_property
@@ -165,7 +165,7 @@ class Evidence(Roleable, Relatable, mixins.Titled,
 
     In that case we need just rename file, not copy.
     """
-    return self._is_uploaded if hasattr(self, '_is_uploaded') else False
+    return self._is_uploaded if hasattr(self, "_is_uploaded") else False
 
   @is_uploaded.setter
   def is_uploaded(self, value):
@@ -183,22 +183,22 @@ class Evidence(Roleable, Relatable, mixins.Titled,
 
   def _get_parent_obj(self):
     """Get parent object specified"""
-    if 'id' not in self._parent_obj:
-      raise exceptions.ValidationError('"id" is mandatory for parent_obj')
-    if 'type' not in self._parent_obj:
+    if "id" not in self._parent_obj:
+      raise exceptions.ValidationError("'id' is mandatory for parent_obj")
+    if "type" not in self._parent_obj:
       raise exceptions.ValidationError(
-          '"type" is mandatory for parent_obj')
-    if self._parent_obj['type'] not in self._allowed_parents:
+          "'type' is mandatory for parent_obj")
+    if self._parent_obj["type"] not in self._allowed_parents:
       raise exceptions.ValidationError(
-          'Allowed types are: {}.'.format(', '.join(self._allowed_parents)))
+          "Allowed types are: {}.".format(", ".join(self._allowed_parents)))
 
-    parent_type = self._parent_obj['type']
-    parent_id = self._parent_obj['id']
+    parent_type = self._parent_obj["type"]
+    parent_id = self._parent_obj["id"]
     obj = referenced_objects.get(parent_type, parent_id)
 
     if not obj:
       raise ValueError(
-          'Parent object not found: {type} {id}'.format(type=parent_type,
+          "Parent object not found: {type} {id}".format(type=parent_type,
                                                         id=parent_id))
     return obj
 
@@ -207,14 +207,14 @@ class Evidence(Roleable, Relatable, mixins.Titled,
     """Build postfix for given parent object"""
     postfix_parts = [Evidence.FILE_NAME_SEPARATOR, parent_obj.slug]
 
-    related_snapshots = parent_obj.related_objects(_types=['Snapshot'])
+    related_snapshots = parent_obj.related_objects(_types=["Snapshot"])
     related_snapshots = sorted(related_snapshots, key=lambda it: it.id)
 
-    slugs = (sn.revision.content['slug'] for sn in related_snapshots if
+    slugs = (sn.revision.content["slug"] for sn in related_snapshots if
              sn.child_type == parent_obj.assessment_type)
 
     postfix_parts.extend(slugs)
-    postfix_sting = '_'.join(postfix_parts).lower()
+    postfix_sting = "_".join(postfix_parts).lower()
 
     return postfix_sting
 
@@ -230,14 +230,14 @@ class Evidence(Roleable, Relatable, mixins.Titled,
 
   def _update_fields(self, response):
     """Update fields of evidence with values of the copied file"""
-    self.gdrive_id = response['id']
-    self.link = response['webViewLink']
-    self.title = response['name']
+    self.gdrive_id = response["id"]
+    self.link = response["webViewLink"]
+    self.title = response["name"]
     self.kind = Evidence.FILE
 
   @staticmethod
   def _get_folder(parent):
-    return parent.folder if hasattr(parent, 'folder') else ''
+    return parent.folder if hasattr(parent, "folder") else ""
 
   def _map_parent(self):
     """Maps evidence to parent object
@@ -267,7 +267,7 @@ class Evidence(Roleable, Relatable, mixins.Titled,
     self._update_fields(response)
 
   def is_with_parent_obj(self):
-    return bool(hasattr(self, '_parent_obj') and self._parent_obj)
+    return bool(hasattr(self, "_parent_obj") and self._parent_obj)
 
   def add_admin_role(self):
     """Add current user as Evidence admin"""
