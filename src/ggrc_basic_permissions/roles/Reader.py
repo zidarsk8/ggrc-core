@@ -107,6 +107,11 @@ permissions = {
                 "action": "update",
             }
         },
+        {
+            "type": "Assessment",
+            "condition": "is_auditor",
+            "terms": {}
+        },
         "AssessmentTemplate",
         "Workflow",
         {
