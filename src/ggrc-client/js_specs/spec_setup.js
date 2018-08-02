@@ -18,7 +18,6 @@ GGRC.permissions = {
   'delete': {},
   read: {},
   update: {},
-  view_object_page: {},
 };
 GGRC.config = {
   snapshotable_parents: ['Audit'],
