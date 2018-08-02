@@ -23,7 +23,7 @@ export default can.Component.extend({
             return false;
           }
 
-          return hasQuestions(instance.class.title_singular);
+          return hasQuestions(instance.attr('type'));
         },
       },
       questionsUrl: {

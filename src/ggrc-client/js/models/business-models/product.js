@@ -4,12 +4,12 @@
 */
 
 import Cacheable from '../cacheable';
-import {hasQuestions} from '../../plugins/utils/ggrcq-utils';
 import '../mixins/unique-title';
 import '../mixins/ca-update';
 import '../mixins/timeboxed';
 import '../mixins/access-control-list';
 import '../mixins/base-notifications';
+import '../mixins/questionnaire';
 
 export default Cacheable('CMS.Models.Product', {
   root_object: 'product',
@@ -26,6 +26,7 @@ export default Cacheable('CMS.Models.Product', {
     'timeboxed',
     'accessControlList',
     'base-notifications',
+    'questionnaire',
   ],
   is_custom_attributable: true,
   isRoleable: true,
@@ -86,14 +87,6 @@ export default Cacheable('CMS.Models.Product', {
   init: function () {
     if (this._super) {
       this._super(...arguments);
-    }
-
-    if (hasQuestions(this.shortName)) {
-      this.tree_view_options.attr_list.push({
-        attr_title: 'Questionnaire',
-        attr_name: 'questionnaire',
-        disable_sorting: true,
-      });
     }
 
     this.validateNonBlank('title');

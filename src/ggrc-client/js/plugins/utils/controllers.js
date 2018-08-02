@@ -4,11 +4,11 @@
  */
 
 import {warning} from './modals';
+import {hasQuestions} from './ggrcq-utils';
 
 /**
  * Utils methods shared between GGRC controllers (GGRC.Controllers)
  */
-let typesWithWarning = ['System', 'Process', 'Product'];
 
 function checkPreconditions(options, success) {
   let instance = options.instance;
@@ -43,7 +43,7 @@ function becameDeprecated(instance, prevStatus) {
 function hasWarningType(instance) {
   return (
     instance &&
-    _.includes(typesWithWarning, instance.type)
+    hasQuestions(instance.attr('type'))
   );
 }
 
