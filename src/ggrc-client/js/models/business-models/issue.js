@@ -39,6 +39,7 @@ export default Cacheable('CMS.Models.Issue', {
     attr_list: Cacheable.attr_list.concat([
       {attr_title: 'Reference URL', attr_name: 'reference_url'},
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
+      {attr_title: 'Due Date', attr_name: 'due_date'},
       {
         attr_title: 'Ticket Tracker',
         attr_name: 'issue_url',
