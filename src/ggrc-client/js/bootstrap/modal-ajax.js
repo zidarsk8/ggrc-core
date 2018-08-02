@@ -64,7 +64,7 @@ import {
       };
 
       if (hasWarningType(instance)) {
-        modalSettings = _.extend(
+        modalSettings = _.assign(
           modalSettings,
           warning.settings,
           {

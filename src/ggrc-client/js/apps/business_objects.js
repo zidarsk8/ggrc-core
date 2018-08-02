@@ -19,7 +19,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
 
   CoreExtension.name = 'core"';
   GGRC.extensions.push(CoreExtension);
-  _.extend(CoreExtension, {
+  _.assign(CoreExtension, {
     object_type_decision_tree: function () {
       return {
         program: CMS.Models.Program,

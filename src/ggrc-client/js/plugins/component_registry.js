@@ -92,7 +92,7 @@
         scope[key] = val;
       });
 
-      return _.extend({}, originalScope, scope);
+      return _.assign({}, originalScope, scope);
     };
   };
 

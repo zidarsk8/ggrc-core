@@ -229,7 +229,7 @@ export default can.Model.Cacheable('CMS.Models.Assessment', {
     // In this case we have to update backup to solve isDirty issues.
     backup = model._backupStore();
     if (backup) {
-      _.extend(backup, attributes);
+      _.assign(backup, attributes);
     }
 
     // This is a temporary solution

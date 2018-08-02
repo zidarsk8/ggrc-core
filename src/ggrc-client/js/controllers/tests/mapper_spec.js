@@ -103,7 +103,7 @@ describe('ObjectMapper', function () {
       'if data has is_new`,
         function (done) {
           let args;
-          method(_.extend(fakeData, {
+          method(_.assign(fakeData, {
             is_new: true,
           }), false);
 
@@ -153,7 +153,7 @@ describe('ObjectMapper', function () {
       let fakeDataForCommon;
 
       beforeEach(function () {
-        fakeDataForCommon = _.extend({}, fakeData, {
+        fakeDataForCommon = _.assign({}, fakeData, {
           toggle: 'unified unified-search',
         });
         spyOn(ObjectSearch, 'launch');

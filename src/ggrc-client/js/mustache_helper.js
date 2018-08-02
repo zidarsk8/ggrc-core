@@ -665,7 +665,7 @@ Mustache.registerHelper('with_mapping', function (binding, options) {
 
   function finish(list) {
     return options
-      .fn(options.contexts.add(_.extend({}, frame, {results: list})));
+      .fn(options.contexts.add(_.assign({}, frame, {results: list})));
   }
   function fail(error) {
     return options.inverse(options.contexts.add({error: error}));
@@ -1681,7 +1681,7 @@ Example:
 */
 Mustache.registerHelper('add_to_current_scope', function (options) {
   return options.fn(options.contexts
-    .add(_.extend({}, options.context, options.hash)));
+    .add(_.assign({}, options.context, options.hash)));
 });
 
 /**

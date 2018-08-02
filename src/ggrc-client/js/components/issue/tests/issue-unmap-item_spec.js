@@ -254,7 +254,7 @@ describe('issue-unmap-related-snapshots component', ()=> {
           let oldRelatedObjectType = relatedObject.type;
           let expectedUrl;
 
-          _.extend(relatedObject, {
+          _.assign(relatedObject, {
             type: relatedObjectType,
             child_type: oldRelatedObjectType,
             child_id: 54321,
