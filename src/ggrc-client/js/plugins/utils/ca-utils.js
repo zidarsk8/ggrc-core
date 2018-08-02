@@ -180,7 +180,7 @@ function prepareCustomAttributes(definitions, values) {
     let stub = {
       id: null,
       custom_attribute_id: id,
-      attribute_value: null,
+      attribute_value: def.default_value,
       attribute_object: null,
       validation: {
         empty: true,
