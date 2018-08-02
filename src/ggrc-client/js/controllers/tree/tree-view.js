@@ -436,7 +436,7 @@ import Permission from '../../permission';
         hi += 1;
       }
 
-      _.each(alreadyVisible, function (control) {
+      _.forEach(alreadyVisible, function (control) {
         if (!control) {
           return;
         }

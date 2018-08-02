@@ -54,7 +54,7 @@ export default can.Component.extend({
           attribute_type: type,
           multi_choice_options: values,
         });
-        _.each(['title', 'values', 'multi_choice_options'],
+        _.forEach(['title', 'values', 'multi_choice_options'],
           (type) => {
             selected.attr(type, '');
           });

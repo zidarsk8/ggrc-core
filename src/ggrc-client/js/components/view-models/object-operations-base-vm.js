@@ -176,7 +176,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
     can.batch.start();
 
     // do not update fields with the same values in VM and config
-    _.each(config, function (value, key) {
+    _.forEach(config, (value, key) => {
       let vmValue = this.attr(key);
       let hasSerialize = Boolean(vmValue && vmValue.serialize);
 
@@ -187,7 +187,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
       if (!_.isEqual(vmValue, value)) {
         this.attr(key, value);
       }
-    }.bind(this));
+    });
 
     can.batch.stop();
   },

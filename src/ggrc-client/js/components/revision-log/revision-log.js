@@ -123,13 +123,13 @@ import {
           // manually include people for modified_by since using __include would
           // result in a lot of duplication
           let rq = new RefreshQueue();
-          _.each(objRevisions.concat(mappingsSrc, mappingsDest),
+          _.forEach(objRevisions.concat(mappingsSrc, mappingsDest),
             function (revision) {
               if (revision.modified_by) {
                 rq.enqueue(revision.modified_by);
               }
             });
-          _.each(mappingsSrc, function (revision) {
+          _.forEach(mappingsSrc, function (revision) {
             if (revision.destination_type && revision.destination_id) {
               revision.destination = can.Stub.get_or_create({
                 id: revision.destination_id,
@@ -138,7 +138,7 @@ import {
               rq.enqueue(revision.destination);
             }
           });
-          _.each(mappingsDest, function (revision) {
+          _.forEach(mappingsDest, function (revision) {
             if (revision.source_type && revision.source_id) {
               revision.source = can.Stub.get_or_create({
                 id: revision.source_id,
@@ -151,7 +151,7 @@ import {
             .then(function (embedded) {
               return rq.trigger().then(function () {
                 let reify = function (revision) {
-                  _.each(['modified_by', 'source', 'destination'],
+                  _.forEach(['modified_by', 'source', 'destination'],
                     function (field) {
                       if (revision[field] && revision[field].reify) {
                         revision.attr(field, revision[field].reify());

@@ -271,7 +271,7 @@ export default class CustomAttributeObject {
 
     can.batch.start();
     // set for caValue requiered fields if they were missed
-    _.each(requiredDefaultFields, (requiredValue, key) => {
+    _.forEach(requiredDefaultFields, (requiredValue, key) => {
       const hasMissedRequieredField = !caValueKeys.includes(key);
       if (hasMissedRequieredField) {
         caValue.attr(key, requiredValue);

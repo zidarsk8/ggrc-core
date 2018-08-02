@@ -459,7 +459,7 @@ function getAssigneeType(instance) {
     return;
   }
 
-  _.each(roles, function (role) {
+  _.forEach(roles, function (role) {
     let aclPerson = instance
       .access_control_list
       .filter((item) => item.ac_role_id === role.id &&

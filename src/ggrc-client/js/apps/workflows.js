@@ -287,7 +287,7 @@ import Mappings from '../models/mappers/mappings';
     let subTreeItems = ['Cycle'];
     let models = ['TaskGroup', 'Workflow', 'CycleTaskEntry',
       'CycleTaskGroupObjectTask', 'CycleTaskGroupObject', 'CycleTaskGroup'];
-    _.each(_workflowObjectTypes, function (type) {
+    _.forEach(_workflowObjectTypes, function (type) {
       let widget;
       if (!type || !treeWidgets[type]) {
         return;
