@@ -57,6 +57,9 @@ def _get_propagation_entries(session):
     if not isinstance(obj, propagated_models):
       continue
     if obj.id is None:
+      # This can happen if we call flush with a list of objects and only those
+      # get flushed and the rest remain as None. All the none objects are still
+      # inserted at the last full flush before the session gets committed.
       continue
     objs[obj.__class__].add(obj.id)
 
