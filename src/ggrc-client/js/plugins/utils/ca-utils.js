@@ -395,9 +395,8 @@ function updateCustomAttributeValue(ca, value) {
     ca.attr('attribute_value', 'Person');
     ca.attr('attribute_object', {id: id, type: 'Person'});
   } else {
-    ca.attr('attribute_value',
-      convertToCaValue(ca.attr('attributeType'), value)
-    );
+    let convertedValue = convertToCaValue(ca.attr('attributeType'), value);
+    ca.attr('attribute_value', convertedValue || ca.def.default_value);
   }
 }
 
