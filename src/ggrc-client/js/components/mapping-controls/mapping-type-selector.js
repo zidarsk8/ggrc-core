@@ -25,7 +25,7 @@ import template from './mapping-type-selector.mustache';
 
       groups.forEach(function (name) {
         let groupItems = types.attr(name + '.items');
-        values = values.concat(_.pluck(groupItems, 'value'));
+        values = values.concat(_.map(groupItems, 'value'));
       });
       if (values.indexOf(selectedType) < 0) {
         this.viewModel.attr('selectedType', values[0]);

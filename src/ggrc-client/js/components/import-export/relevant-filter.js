@@ -48,7 +48,7 @@ export default can.Component.extend({
         // find all widget types and manually add Cycle since it's missing
         // convert names to CMS models and prune invalid (undefined)
         models = can.Map.keys(GGRC.tree_view.base_widgets_by_type);
-        models = _.difference(_.unique(models),
+        models = _.difference(_.uniq(models),
           ['CycleTaskEntry', 'CycleTaskGroupObject']);
         models = _.map(models, function (mapping) {
           return CMS.Models[mapping];
@@ -107,7 +107,7 @@ export default can.Component.extend({
     },
     '{viewModel.relevant} change': function (list, item, which) {
       this.viewModel.attr('has_parent',
-        _.findWhere(this.viewModel.attr('relevant'),
+        _.find(this.viewModel.attr('relevant'),
           {model_name: '__previous__'}));
       if (!/model_name/gi.test(which)) {
         return;

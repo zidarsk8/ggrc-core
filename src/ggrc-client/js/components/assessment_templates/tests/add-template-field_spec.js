@@ -243,7 +243,7 @@ describe('add-template-field component', () => {
 
       spyOn(Validations, 'isDublicateTitle').and
         .callFake((fields, title) => {
-          return _.contains(fields, title) ?
+          return _.includes(fields, title) ?
             'duplicates val message' :
             '';
         });

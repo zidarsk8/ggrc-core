@@ -15,7 +15,7 @@ export default can.Component.extend({
           let objectTypes = Mappings
             .getMappingTypes('AssessmentTemplate', [], ['Issue']);
           // remove ignored types and sort the rest
-          _.each(objectTypes, function (objGroup) {
+          _.forEach(objectTypes, function (objGroup) {
             objGroup.items = _.filter(objGroup.items, function (item) {
               return !self.getNonRelevantObjectTypes()[item.value];
             });
@@ -23,7 +23,7 @@ export default can.Component.extend({
           });
 
           // remove the groups that have ended up being empty
-          objectTypes = _.pick(objectTypes, function (objGroup) {
+          objectTypes = _.pickBy(objectTypes, function (objGroup) {
             return objGroup.items && objGroup.items.length > 0;
           });
 

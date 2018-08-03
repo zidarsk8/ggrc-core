@@ -154,7 +154,7 @@ describe('GGRC.Components.objectMapper', function () {
     });
 
     it('updates freezed config to the current config', function () {
-      _.extend(viewModel, {
+      _.assign(viewModel, {
         updateFreezedConfigToLatest:
           jasmine.createSpy('updateFreezedConfigToLatest'),
       });

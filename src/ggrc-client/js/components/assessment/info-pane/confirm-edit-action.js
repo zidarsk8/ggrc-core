@@ -27,7 +27,7 @@ import {confirm} from '../../../plugins/utils/modals';
       },
       isInEditableState: function () {
         let editableStates = ['In Progress', 'Not Started', 'Rework Needed'];
-        return _.contains(editableStates, this.attr('instance.status'));
+        return _.includes(editableStates, this.attr('instance.status'));
       },
       showConfirm: function () {
         let self = this;

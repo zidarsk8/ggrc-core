@@ -19,7 +19,7 @@
       let values = scope.attr('instance.' + scope.attr('property'));
 
       if (values && _.isString(values)) {
-        _.each(_.splitTrim(values, ','), function (val) {
+        _.forEach(_.splitTrim(values, ','), function (val) {
           if (val) {
             scope.attr('values.' + val, true);
           }

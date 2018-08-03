@@ -74,12 +74,12 @@
       parentScope = parentScope || {};
       element = element instanceof jQuery ? element : $(element);
 
-      _.each(originalScope, function (obj, key) {
+      _.forEach(originalScope, function (obj, key) {
         if (originalScope[key] === '@') {
           scope[key] = element.attr(can.camelCaseToDashCase(key));
         }
       });
-      _.each(definitions, function (obj, key) {
+      _.forEach(definitions, function (obj, key) {
         let prefix = '';
         if (obj.type === 'function') {
           prefix = 'can-';
@@ -92,7 +92,7 @@
         scope[key] = val;
       });
 
-      return _.extend({}, originalScope, scope);
+      return _.assign({}, originalScope, scope);
     };
   };
 

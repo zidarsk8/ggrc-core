@@ -171,7 +171,7 @@ export default can.Control({
    */
   sortWidgets: function () {
     this.options.attr('widget_list',
-      _.sortByAll(this.options.widget_list, ['order', 'internav_display']));
+      _.sortBy(this.options.widget_list, ['order', 'internav_display']));
   },
 
   update_widget: function (widgetElement, index) {

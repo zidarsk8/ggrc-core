@@ -97,11 +97,11 @@ describe('getMappableTypes() method', function () {
 
   it('excludes the References type from the result', function () {
     let result = getMappableTypes('Reference');
-    expect(_.contains(result, 'Reference')).toBe(false);
+    expect(_.includes(result, 'Reference')).toBe(false);
   });
   it('does not return Issue type for Person', function () {
     let result = getMappableTypes('Person');
-    expect(_.contains(result, 'Issue')).toBe(false);
+    expect(_.includes(result, 'Issue')).toBe(false);
   });
   it('returns only Audit type for AssessmentTemplate', function () {
     let result = getMappableTypes('AssessmentTemplate');

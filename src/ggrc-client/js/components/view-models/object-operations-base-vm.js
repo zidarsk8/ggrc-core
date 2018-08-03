@@ -42,7 +42,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
       _.find(
         config.special,
         function (special) {
-          return _.contains(special.types, type);
+          return _.includes(special.types, type);
         }),
       'config'
     );
@@ -153,7 +153,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
       }
       return memo;
     }, []);
-    return _.findWhere(types, {value: type});
+    return _.find(types, {value: type});
   },
   onSubmit: function () {
     this.attr('submitCbs').fire();
@@ -176,7 +176,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
     can.batch.start();
 
     // do not update fields with the same values in VM and config
-    _.each(config, function (value, key) {
+    _.forEach(config, (value, key) => {
       let vmValue = this.attr(key);
       let hasSerialize = Boolean(vmValue && vmValue.serialize);
 
@@ -187,7 +187,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
       if (!_.isEqual(vmValue, value)) {
         this.attr(key, value);
       }
-    }.bind(this));
+    });
 
     can.batch.stop();
   },

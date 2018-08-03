@@ -667,7 +667,7 @@ Mustache.registerHelper('with_mapping', function (binding, options) {
 
   function finish(list) {
     return options
-      .fn(options.contexts.add(_.extend({}, frame, {results: list})));
+      .fn(options.contexts.add(_.assign({}, frame, {results: list})));
   }
   function fail(error) {
     return options.inverse(options.contexts.add({error: error}));
@@ -1017,7 +1017,7 @@ Mustache.registerHelper('assignee_types', function (value, options) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
   value = resolveComputed(value) || '';
-  value = _.first(_.map(value.split(','), function (type) {
+  value = _.head(_.map(value.split(','), function (type) {
     let lowercaseType = _.trim(type).toLowerCase();
 
     if (lowercaseType === 'assessor') {
@@ -1682,7 +1682,7 @@ Example:
 */
 Mustache.registerHelper('add_to_current_scope', function (options) {
   return options.fn(options.contexts
-    .add(_.extend({}, options.context, options.hash)));
+    .add(_.assign({}, options.context, options.hash)));
 });
 
 /**

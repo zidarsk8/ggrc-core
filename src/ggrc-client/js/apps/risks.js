@@ -145,7 +145,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
       .observe_types.push('Risk', 'Threat');
 
     can.each(riskObjectTypes, function (type) {
-      mappings[type] = _.extend(mappings[type] || {}, {
+      mappings[type] = _.assign(mappings[type] || {}, {
         _canonical: {
           related_objects_as_source: ['Risk', 'Threat'],
         },

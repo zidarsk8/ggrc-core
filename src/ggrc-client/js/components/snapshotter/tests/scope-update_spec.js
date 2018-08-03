@@ -33,7 +33,7 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
         model_singular: 'Control',
       },
     };
-    _.extend(updaterViewModel, {
+    _.assign(updaterViewModel, {
       instance: new can.Map({
         title: 'TITLE',
         refresh: jasmine
@@ -107,7 +107,7 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
 
     it('does not set refresh flag for each tree-widget-container that does ' +
     'not contain snapshots', function () {
-      _.extend(containerVM.model, {model_singular: 'Something'});
+      _.assign(containerVM.model, {model_singular: 'Something'});
       method();
       $('tree-widget-container').each(function () {
         let viewModel = $(this).viewModel();

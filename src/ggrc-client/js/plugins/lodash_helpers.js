@@ -63,7 +63,7 @@
      * @return {Array} - Returns array of truthy keys
      */
     getExistingKeys: function (object) {
-      return _.keys(_.pick(object, _.identity));
+      return _.keys(_.pickBy(object, _.identity));
     },
   });
 })(_);

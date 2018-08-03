@@ -124,13 +124,13 @@ import Revision from '../../models/service-models/revision';
           // manually include people for modified_by since using __include would
           // result in a lot of duplication
           let rq = new RefreshQueue();
-          _.each(objRevisions.concat(mappingsSrc, mappingsDest),
+          _.forEach(objRevisions.concat(mappingsSrc, mappingsDest),
             function (revision) {
               if (revision.modified_by) {
                 rq.enqueue(revision.modified_by);
               }
             });
-          _.each(mappingsSrc, function (revision) {
+          _.forEach(mappingsSrc, function (revision) {
             if (revision.destination_type && revision.destination_id) {
               revision.destination = can.Stub.get_or_create({
                 id: revision.destination_id,
@@ -139,7 +139,7 @@ import Revision from '../../models/service-models/revision';
               rq.enqueue(revision.destination);
             }
           });
-          _.each(mappingsDest, function (revision) {
+          _.forEach(mappingsDest, function (revision) {
             if (revision.source_type && revision.source_id) {
               revision.source = can.Stub.get_or_create({
                 id: revision.source_id,
@@ -152,7 +152,7 @@ import Revision from '../../models/service-models/revision';
             .then(function (embedded) {
               return rq.trigger().then(function () {
                 let reify = function (revision) {
-                  _.each(['modified_by', 'source', 'destination'],
+                  _.forEach(['modified_by', 'source', 'destination'],
                     function (field) {
                       if (revision[field] && revision[field].reify) {
                         revision.attr(field, revision[field].reify());
@@ -186,7 +186,7 @@ import Revision from '../../models/service-models/revision';
         let id = this.attr('instance.id');
         let type = this.attr('instance.type');
         let filterElegible = function (obj) {
-          return _.contains(this.attr('_EMBED_MAPPINGS')[type], obj.type);
+          return _.includes(this.attr('_EMBED_MAPPINGS')[type], obj.type);
         }.bind(this);
         let dfds;
 
@@ -551,12 +551,12 @@ import Revision from '../../models/service-models/revision';
           }
         };
 
-        origValues = _.indexBy(origValues, 'custom_attribute_id');
-        origDefs = _.indexBy(origDefs, 'id');
-        newValues = _.indexBy(newValues, 'custom_attribute_id');
-        newDefs = _.indexBy(newDefs, 'id');
+        origValues = _.keyBy(origValues, 'custom_attribute_id');
+        origDefs = _.keyBy(origDefs, 'id');
+        newValues = _.keyBy(newValues, 'custom_attribute_id');
+        newDefs = _.keyBy(newDefs, 'id');
 
-        ids = _.unique(_.keys(origValues).concat(_.keys(newValues)));
+        ids = _.uniq(_.keys(origValues).concat(_.keys(newValues)));
         defs = _.merge(origDefs, newDefs);
 
         return _.chain(ids)
@@ -722,7 +722,7 @@ import Revision from '../../models/service-models/revision';
           })
           .value();
 
-        perPersonRoleHistory = _.zipObject(
+        perPersonRoleHistory = _.fromPairs(
           _.map(perPersonMappings, function (revisions, pid) {
             let history = _.map(revisions, function (rev) {
               // Add extra check to fix possible issue with inconsistent data
@@ -749,7 +749,7 @@ import Revision from '../../models/service-models/revision';
             return [pid, history];
           }));
 
-        modifiers = _.unique(
+        modifiers = _.uniq(
           _.map(
             _.union(
               revisions.object,
@@ -767,7 +767,7 @@ import Revision from '../../models/service-models/revision';
               });
           })), 'id');
 
-        assigneeRoles = _.zipObject(
+        assigneeRoles = _.fromPairs(
           _.map(currentAssignees, function (rolePeople, pid) {
             return [pid, _.map(rolePeople, 'type')];
           }));

@@ -218,7 +218,7 @@ export default can.Control({
     const insideInfoPane = $target.closest('.pin-content').length > 0;
     const excludeForEscapeKey = ['button', '[role=button]', '.btn', 'input',
       'textarea'];
-    const isExcludingControl = _.any(excludeForEscapeKey, (typeName) =>
+    const isExcludingControl = _.some(excludeForEscapeKey, (typeName) =>
       $target.is(typeName)
     );
     return (

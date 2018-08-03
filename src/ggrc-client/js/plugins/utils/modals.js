@@ -73,7 +73,7 @@ const BUTTON_CREATE_PROPOSAL = `${path}/modals/create_proposal.mustache`;
  * )
  */
 function warning(options, success, fail, extra) {
-  let confirmOptions = _.extend({}, warning.settings, options);
+  let confirmOptions = _.assign({}, warning.settings, options);
   let confirmController;
   let confirmResult;
 

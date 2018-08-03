@@ -33,12 +33,12 @@ import {notifierXHR} from '../plugins/utils/notifiers-utils';
       let el = $(element);
       let binding;
 
-      _.each(['mapping', 'itemTemplate'], function (prop) {
+      _.forEach(['mapping', 'itemTemplate'], (prop) => {
         if (!this.scope.attr(prop)) {
           this.scope.attr(prop,
             el.attr(can.camelCaseToDashCase(prop)));
         }
-      }, this);
+      });
 
       binding = this.scope.parentInstance.get_binding(this.scope.mapping);
 
@@ -70,7 +70,7 @@ import {notifierXHR} from '../plugins/utils/notifiers-utils';
       let sortField = this.scope.attr('sortField');
       let sortOrder = this.scope.attr('sortOrder');
       if (sortField) {
-        return _.sortByOrder(mappedObjects, sortField, sortOrder);
+        return _.orderBy(mappedObjects, sortField, sortOrder);
       }
       return mappedObjects;
     },
@@ -88,7 +88,7 @@ import {notifierXHR} from '../plugins/utils/notifiers-utils';
           return mapping.instance.id === instance.id &&
             mapping.instance.type === instance.type;
         });
-        _.each(binding.get_mappings(), function (mapping) {
+        _.forEach(binding.get_mappings(), function (mapping) {
           mapping.refresh()
             .then(function () {
               return mapping.destroy();

@@ -92,7 +92,7 @@ import {
     '{instance} custom_attribute_values':
       function (object, ev, newVal, oldVal) {
         function getValues(cav) {
-          return _.pluck(cav.reify(), 'attribute_value');
+          return _.map(cav.reify(), 'attribute_value');
         }
         if ((!oldVal || !newVal) || (oldVal.length === newVal.length &&
           _.difference(getValues(oldVal), getValues(newVal)).length)) {
