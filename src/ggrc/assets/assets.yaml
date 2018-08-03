@@ -21,7 +21,6 @@ dashboard-js-template-files:
   - base_objects/view_link.mustache
   - base_objects/unmap.mustache
   - base_objects/page_header.mustache
-  - base_objects/paginate.mustache
   - base_objects/search_actions.mustache
   - base_objects/search_result.mustache
   - base_objects/title.mustache

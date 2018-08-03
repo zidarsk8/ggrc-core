@@ -4,7 +4,7 @@
  */
 
 import './revision-log-data';
-import '../paginate';
+import '../paginate/paginate';
 import {getRolesForType} from '../../plugins/utils/acl-utils';
 import RefreshQueue from '../../models/refresh_queue';
 import template from './revision-log.mustache';
