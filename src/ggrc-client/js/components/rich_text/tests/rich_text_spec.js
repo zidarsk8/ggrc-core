@@ -6,7 +6,7 @@
 import Component from '../rich_text';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
-describe('richText component', ()=> {
+describe('rich-text component', ()=> {
   let viewModel;
 
   beforeEach(()=> {

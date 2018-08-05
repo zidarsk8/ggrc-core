@@ -77,7 +77,7 @@ describe('datepicker component', function () {
       let element;
 
       beforeEach(function () {
-        viewModel = Component.prototype.viewModel();
+        viewModel = getComponentVM(Component);
         viewModel.onSelect.bind = jasmine.createSpy()
           .and.returnValue('mockOnSelect');
         element = $('<div class="datepicker__calendar"></div>');
@@ -147,7 +147,7 @@ describe('datepicker component', function () {
       let viewModel;
 
       beforeEach(function () {
-        viewModel = Component.prototype.viewModel();
+        viewModel = getComponentVM(Component);
         that = {
           viewModel: viewModel,
           isValidDate: events.isValidDate.bind(that),
@@ -172,7 +172,7 @@ describe('datepicker component', function () {
 
       beforeEach(function () {
         that = {
-          viewModel: Component.prototype.viewModel(),
+          viewModel: getComponentVM(Component),
         };
         method = events.isValidDate.bind(that);
       });
@@ -229,7 +229,7 @@ describe('datepicker component', function () {
       let viewModel;
 
       beforeEach(function () {
-        viewModel = Component.prototype.viewModel();
+        viewModel = getComponentVM(Component);
         method = events.prepareDate.bind(viewModel);
       });
 
@@ -253,9 +253,9 @@ describe('datepicker component', function () {
       let that;
 
       beforeEach(function () {
-        viewModel = Component.prototype.viewModel();
+        viewModel = getComponentVM(Component);
         that = {
-          viewModel: viewModel,
+          viewModel,
         };
         method = events['{viewModel} setMinDate'].bind(that);
       });
@@ -309,7 +309,7 @@ describe('datepicker component', function () {
       let viewModel;
 
       beforeEach(function () {
-        viewModel = Component.prototype.viewModel();
+        viewModel = getComponentVM(Component);
         viewModel.picker = {
           datepicker: jasmine.createSpy(),
         };
@@ -337,7 +337,7 @@ describe('datepicker component', function () {
       let viewModel;
 
       beforeEach(function () {
-        viewModel = Component.prototype.viewModel();
+        viewModel = getComponentVM(Component);
         that = {
           viewModel: viewModel,
         };

@@ -7,11 +7,12 @@ import * as SnapshotUtils from '../../../../plugins/utils/snapshot-utils';
 import * as QueryAPI from '../../../../plugins/utils/query-api-utils';
 import * as NotifiersUtils from '../../../../plugins/utils/notifiers-utils';
 import Component from '../mapped-controls';
+import {getComponentVM} from '../../../../../js_specs/spec_helpers';
 
-describe('GGRC.Component.assessmentMappedControl', () => {
+describe('assessment-mapped-controls component', () => {
   let viewModel;
   beforeEach(() => {
-    viewModel = new (can.Map.extend(Component.prototype.viewModel));
+    viewModel = getComponentVM(Component);
   });
 
   describe('loadItems() method', () => {

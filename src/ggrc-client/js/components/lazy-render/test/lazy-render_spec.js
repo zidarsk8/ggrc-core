@@ -12,7 +12,7 @@ describe('lazy-render component', function () {
   let viewModel;
 
   beforeEach(function () {
-    viewModel = viewModel = getComponentVM(Component);
+    viewModel = getComponentVM(Component);
   });
 
   it('should render content only once when the trigger is truthy', function () {
