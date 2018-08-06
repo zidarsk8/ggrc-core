@@ -160,10 +160,6 @@ const userRolesModalSelector = can.Control.extend({
     self.active_list.replace(
       can.map(self.join_list, function (join) {
         return new can.Observe({
-          option: CMS.Models.get_instance(
-            CMS.Models.get_link_type(join, self.options.option_attr),
-            join[self.options.option_attr].id
-          ),
           join: join,
         });
       }));

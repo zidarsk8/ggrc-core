@@ -98,19 +98,3 @@ CMS.Models.get_instances = function (objects) {
   }
   return instances;
 };
-
-CMS.Models.get_link_type = function (instance, attr) {
-  let type;
-  let model;
-
-  type = instance[attr + '_type'];
-  if (!type) {
-    model = instance[attr] && instance[attr].constructor;
-    if (model) {
-      type = model.shortName;
-    } else if (instance[attr]) {
-      type = instance[attr].type;
-    }
-  }
-  return type;
-};
