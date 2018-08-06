@@ -7,17 +7,6 @@ import {
   getModelByType,
   getMappableTypes,
 } from '../../plugins/ggrc_utils';
-import {
-  Proxy,
-  Direct,
-  Search,
-  Multi,
-  TypeFilter,
-  AttrFilter,
-  CustomFilter,
-  Cross,
-  Indirect,
-} from '../mappers/mapper-helpers';
 
 /*
   class Mappings
@@ -39,16 +28,6 @@ import {
   }
 */
 export default can.Construct.extend({
-  // Convenience properties for building mappings types.
-  Proxy,
-  Direct,
-  Indirect,
-  Search,
-  Multi,
-  TypeFilter,
-  AttrFilter,
-  CustomFilter,
-  Cross,
   modules: {},
   getTypeGroups: function () {
     return {
@@ -149,8 +128,7 @@ export default can.Construct.extend({
     let type;
     let cmsModel;
     cmsModel = getModelByType(modelName);
-    if (!cmsModel || !cmsModel.title_singular ||
-      cmsModel.title_singular === 'Reference') {
+    if (!cmsModel || !cmsModel.title_singular) {
       return;
     }
     type = this._prepareCorrectTypeFormat(cmsModel);
@@ -236,58 +214,6 @@ export default can.Construct.extend({
       }
     });
     return mappings;
-  },
-  /*
-    return the join model for the canonical mapping between two objects if and only if the canonical mapping is a Proxy.
-    model_name_a - the string type (shortName) of the "from" object's class
-    model_name_b - the string type (shortName) of the "to" object's class
-
-    return: a string of the shortName of the join model (subclass of can.Model.Join) or null
-  */
-  join_model_name_for: function (modelNameA, modelNameB) {
-    let joinDescriptor = this.get_canonical_mapping(modelNameA, modelNameB);
-    let result;
-    if (joinDescriptor instanceof GGRC.ListLoaders.ProxyListLoader) {
-      result = joinDescriptor.model_name;
-    } else {
-      result = null;
-    }
-    return result;
-  },
-  /*
-    make a new instance of the join model for the canonical mapping between two objects
-     if and only if the canonical mapping is a Proxy.
-    object - the string type (shortName) of the "from" object's class
-    option - the string type (shortName) of the "to" object's class
-    join_attrs - any other attributes to add to the new instance
-
-    return: an instance of the join model (subclass of can.Model.Join) or null
-  */
-  make_join_object: function (object, option, joinAttrs) {
-    let joinModel;
-    let joinMapping = this.get_canonical_mapping(object.constructor.shortName,
-      option.constructor.shortName);
-    let objectAttrs = {
-      id: object.id,
-      type: object.constructor.shortName,
-    };
-    let optionAttrs = {
-      id: option.id,
-      type: option.constructor.shortName,
-    };
-    let result;
-
-    if (joinMapping && joinMapping.model_name) {
-      joinModel = CMS.Models[joinMapping.model_name];
-      joinAttrs = $.extend({}, joinAttrs || {});
-      joinAttrs[joinMapping.option_attr] = optionAttrs;
-      joinAttrs[joinMapping.object_attr] = objectAttrs;
-
-      result = new joinModel(joinAttrs);
-    } else {
-      result = null;
-    }
-    return result;
   },
 }, {
   /*

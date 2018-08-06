@@ -48,6 +48,7 @@
     Regulation: 20,
     Requirement: 30,
     Objective: 40,
+    Risk: 45,
     Control: 50,
     Product: 60,
     System: 70,

@@ -29,16 +29,6 @@ import AccessControlRole from '../custom-roles/access-control-role';
       _mixins: [
         'related_object', 'personable', 'assignable',
       ],
-      related_business_objects: Multi([
-        'related_data_assets', 'related_facilities', 'related_markets',
-        'related_org_groups', 'related_vendors', 'related_processes',
-        'related_products', 'related_product_groups', 'related_projects',
-        'related_systems', 'related_metrics', 'related_technology_environments',
-      ]),
-      related_and_able_objects: Multi([
-        'objectives', 'related_business_objects',
-        'people', 'programs', 'clauses',
-      ]),
       orphaned_objects: Multi([
         'related_objects', 'clauses', 'controls', 'programs', 'objectives',
         'people',
@@ -46,10 +36,6 @@ import AccessControlRole from '../custom-roles/access-control-role';
     },
     Objective: {
       _mixins: ['related_object', 'personable'],
-      related_and_able_objects: Multi([
-        'controls', 'objectives', 'related_objects', 'people',
-        'requirements', 'clauses',
-      ]),
       orphaned_objects: Multi([
         'related_objects', 'clauses', 'contracts', 'controls',
         'objectives', 'people', 'policies', 'programs', 'regulations',
@@ -154,9 +140,6 @@ import AccessControlRole from '../custom-roles/access-control-role';
         Cross('authorization_contexts', 'user_roles'),
       authorizations: Cross('authorization_contexts', 'user_roles'),
       authorized_people: Cross('authorization_contexts', 'authorized_people'),
-      mapped_and_or_authorized_people: Multi([
-        'people', 'authorized_people',
-      ]),
       owner_authorizations: CustomFilter('program_authorizations',
         function (authBinding) {
           return new RefreshQueue()
@@ -249,171 +232,13 @@ import AccessControlRole from '../custom-roles/access-control-role';
           'Program', 'Regulation', 'Contract', 'Policy', 'Standard',
           'AccessGroup', 'Objective', 'Control', 'Requirement', 'Clause',
           'DataAsset', 'Facility', 'Market', 'Metric', 'OrgGroup', 'Vendor',
-          'Process', 'Product', 'ProductGroup', 'Project', 'System', 'Issue',
-          'Risk', 'Threat', 'TechnologyEnvironment'],
+          'Process', 'Product', 'Project', 'System', 'Issue', 'Risk', 'Threat',
+          'Assessment', 'Document', 'TechnologyEnvironment', 'ProductGroup'],
         authorizations: 'UserRole',
       },
-      owned_programs: Indirect('Program', 'contact'),
-      owned_regulations: Indirect('Regulation', 'contact'),
-      owned_contracts: Indirect('Contract', 'contact'),
-      owned_policies: Indirect('Policy', 'contact'),
-      owned_standards: Indirect('Standard', 'contact'),
-      owned_objectives: Indirect('Objective', 'contact'),
-      owned_controls: Indirect('Control', 'contact'),
-      owned_requirements: Indirect('Requirement', 'contact'),
-      owned_clauses: Indirect('Clause', 'contact'),
-      owned_access_groups: Indirect('AccessGroup', 'contact'),
-      owned_data_assets: Indirect('DataAsset', 'contact'),
-      owned_facilities: Indirect('Facility', 'contact'),
-      owned_markets: Indirect('Market', 'contact'),
-      owned_metrics: Indirect('Metric', 'contact'),
-      owned_org_groups: Indirect('OrgGroup', 'contact'),
-      owned_vendors: Indirect('Vendor', 'contact'),
-      owned_processes: Indirect('Process', 'contact'),
-      owned_products: Indirect('Product', 'contact'),
-      owned_product_groups: Indirect('ProductGroup', 'contact'),
-      owned_projects: Indirect('Project', 'contact'),
-      owned_systems: Indirect('System', 'contact'),
-      owned_risks: Indirect('Risk', 'contact'),
-      owned_threats: Indirect('Threat', 'contact'),
-      owned_technology_environments: Indirect('TechnologyEnvironment',
-        'contact'),
-      related_objects: Proxy(
-        null, 'personable', 'ObjectPerson', 'person', 'object_people'),
-      related_programs: TypeFilter('related_objects', 'Program'),
-      related_regulations: TypeFilter('related_objects', 'Regulation'),
-      related_contracts: TypeFilter('related_objects', 'Contract'),
-      related_policies: TypeFilter('related_objects', 'Policy'),
-      related_standards: TypeFilter('related_objects', 'Standard'),
-      related_objectives: TypeFilter('related_objects', 'Objective'),
-      related_controls: TypeFilter('related_objects', 'Control'),
-      related_requirements: TypeFilter('related_objects', 'Requirement'),
-      related_clauses: TypeFilter('related_objects', 'Clause'),
-      related_access_groups: TypeFilter('related_objects', 'AccessGroup'),
-      related_data_assets: TypeFilter('related_objects', 'DataAsset'),
-      related_facilities: TypeFilter('related_objects', 'Facility'),
-      related_markets: TypeFilter('related_objects', 'Market'),
-      related_metrics: TypeFilter('related_objects', 'Metric'),
-      related_org_groups: TypeFilter('related_objects', 'OrgGroup'),
-      related_vendors: TypeFilter('related_objects', 'Vendor'),
-      related_processes: TypeFilter('related_objects', 'Process'),
-      related_products: TypeFilter('related_objects', 'Product'),
-      related_product_groups: TypeFilter('related_objects', 'ProductGroup'),
-      related_projects: TypeFilter('related_objects', 'Project'),
-      related_systems: TypeFilter('related_objects', 'System'),
-      related_issues: TypeFilter('related_objects', 'Issue'),
-      related_risks: TypeFilter('related_objects', 'Risk'),
-      related_threats: TypeFilter('related_objects', 'Threat'),
-      related_technology_environments: TypeFilter('related_objects',
-        'TechnologyEnvironment'),
       authorizations: Direct('UserRole', 'person', 'user_roles'),
-      programs_via_authorizations:
-        Cross('authorizations', 'program_via_context'),
-      extended_related_programs: Multi(['related_programs', 'owned_programs',
-        'programs_via_authorizations']),
-      extended_related_regulations:
-        Multi(['related_regulations', 'owned_regulations']),
-      extended_related_contracts:
-        Multi(['related_contracts', 'owned_contracts']),
-      extended_related_policies: Multi(['related_policies', 'owned_policies']),
-      extended_related_objectives:
-        Multi(['related_objectives', 'owned_objectives']),
-      extended_related_controls: Multi(['related_controls', 'owned_controls']),
-      extended_related_requirements:
-        Multi(['related_requirements', 'owned_requirements']),
-      extended_related_clauses: Multi(['related_clauses', 'owned_clauses']),
-      extended_related_data_assets:
-        Multi(['related_data_assets', 'owned_data_assets']),
-      extended_related_facilities:
-        Multi(['related_facilities', 'owned_facilities']),
-      extended_related_markets: Multi(['related_markets', 'owned_markets']),
-      extended_related_metrics: Multi(['related_metrics', 'owned_metrics']),
-      extended_related_org_groups:
-        Multi(['related_org_groups', 'owned_org_groups']),
-      extended_related_vendors: Multi(['related_vendors', 'owned_vendors']),
-      extended_related_processes:
-        Multi(['related_processes', 'owned_processes']),
-      extended_related_products: Multi(['related_products', 'owned_products']),
-      extended_related_product_groups:
-        Multi(['related_product_groups', 'owned_product_groups']),
-      extended_related_projects: Multi(['related_projects', 'owned_projects']),
-      extended_related_systems: Multi(['related_systems', 'owned_systems']),
-      extended_related_technology_environments:
-        Multi(['related_technology_environments',
-          'owned_technology_environments']),
-      related_objects_via_search: Search(function (binding) {
-        let types = this.observe_types;
-
-        // checkfor window.location
-        if (/^\/objectBrowser\/?$/.test(window.location.pathname)) {
-          return SearchModel.search_for_types('', types, {})
-            .pipe(function (mappings) {
-              return mappings.entries;
-            });
-        }
-        return SearchModel.search_for_types('', types, {
-          contact_id: binding.instance.id,
-        }).pipe(function (mappings) {
-          return mappings.entries;
-        });
-      }, 'Program,Regulation,Contract,Policy,Standard,Requirement,Clause,' +
-        'Objective,Control,System,Process,DataAsset,AccessGroup,Product,' +
-        'ProductGroup,Project,Facility,Market,Metric,OrgGroup,Vendor,' +
-        'Audit,Assessment,Issue,Risk,Threat,TechnologyEnvironment'),
-      extended_related_programs_via_search:
-        TypeFilter('related_objects_via_search', 'Program'),
-      extended_related_regulations_via_search:
-        TypeFilter('related_objects_via_search', 'Regulation'),
-      extended_related_contracts_via_search:
-        TypeFilter('related_objects_via_search', 'Contract'),
-      extended_related_policies_via_search:
-        TypeFilter('related_objects_via_search', 'Policy'),
-      extended_related_standards_via_search:
-        TypeFilter('related_objects_via_search', 'Standard'),
-      extended_related_objectives_via_search:
-        TypeFilter('related_objects_via_search', 'Objective'),
-      extended_related_controls_via_search:
-        TypeFilter('related_objects_via_search', 'Control'),
-      extended_related_requirements_via_search:
-        TypeFilter('related_objects_via_search', 'Requirement'),
-      extended_related_clauses_via_search:
-        TypeFilter('related_objects_via_search', 'Clause'),
-      extended_related_access_groups_via_search:
-        TypeFilter('related_objects_via_search', 'AccessGroup'),
-      extended_related_data_assets_via_search:
-        TypeFilter('related_objects_via_search', 'DataAsset'),
-      extended_related_facilities_via_search:
-        TypeFilter('related_objects_via_search', 'Facility'),
-      extended_related_markets_via_search:
-        TypeFilter('related_objects_via_search', 'Market'),
-      extended_related_metrics_via_search:
-        TypeFilter('related_objects_via_search', 'Metric'),
-      extended_related_org_groups_via_search:
-        TypeFilter('related_objects_via_search', 'OrgGroup'),
-      extended_related_vendors_via_search:
-        TypeFilter('related_objects_via_search', 'Vendor'),
-      extended_related_processes_via_search:
-        TypeFilter('related_objects_via_search', 'Process'),
-      extended_related_products_via_search:
-        TypeFilter('related_objects_via_search', 'Product'),
-      extended_related_product_groups_via_search:
-        TypeFilter('related_objects_via_search', 'ProductGroup'),
-      extended_related_projects_via_search:
-        TypeFilter('related_objects_via_search', 'Project'),
-      extended_related_systems_via_search:
-        TypeFilter('related_objects_via_search', 'System'),
-      extended_related_audits_via_search:
-        TypeFilter('related_objects_via_search', 'Audit'),
-      extended_related_issues_via_search:
-        TypeFilter('related_objects_via_search', 'Issue'),
-      extended_related_assessment_via_search:
-        TypeFilter('related_objects_via_search', 'Assessment'),
-      extended_related_risks_via_search:
-        TypeFilter('related_objects_via_search', 'Risk'),
-      extended_related_threats_via_search:
-        TypeFilter('related_objects_via_search', 'Threat'),
-      extended_related_technology_environments_via_search:
-        TypeFilter('related_objects_via_search', 'TechnologyEnvironment'),
+      related_objects:
+        Multi(['related_objects_as_source', 'related_objects_as_destination']),
     },
     Context: {
       _canonical: {
@@ -427,7 +252,6 @@ import AccessControlRole from '../custom-roles/access-control-role';
     UserRole: {
       // FIXME: These should not need to be `Indirect` --
       //   `context.related_object` *should* point to the right object.
-      program_via_context: Indirect('Program', 'context'),
       audit_via_context: Indirect('Audit', 'context'),
       person: Direct('Person', 'user_roles', 'person'),
       role: Direct('Role', 'user_roles', 'role'),
@@ -444,8 +268,6 @@ import AccessControlRole from '../custom-roles/access-control-role';
       _program: Direct('Program', 'audits', 'program'),
       evidence: TypeFilter('related_objects', 'Evidence'),
       program_controls: Cross('_program', 'controls'),
-      program_issues: Cross('_program', 'related_issues'),
-      program_assessments: Cross('_program', 'related_assessments'),
       context: Direct('Context', 'related_object', 'context'),
       authorizations: Cross('context', 'user_roles'),
       authorized_program_people: Cross('_program', 'authorized_people'),
@@ -461,8 +283,6 @@ import AccessControlRole from '../custom-roles/access-control-role';
           });
       }),
       auditors: Cross('auditor_authorizations', 'person'),
-      related_assessment_templates: TypeFilter(
-        'related_objects', 'AssessmentTemplate'),
     },
     Assessment: {
       _canonical: {
@@ -473,7 +293,6 @@ import AccessControlRole from '../custom-roles/access-control-role';
       ],
       evidence: TypeFilter('related_objects', 'Evidence'),
       audits: TypeFilter('related_objects', 'Audit'),
-      related_controls: TypeFilter('related_objects', 'Control'),
       related_regulations: TypeFilter('related_objects', 'Regulation'),
       people: AttrFilter('related_objects', null, 'Person'),
     },
