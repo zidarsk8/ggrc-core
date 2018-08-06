@@ -16,6 +16,7 @@ import CustomAttributable from '../../models/custom-attributes/custom-attributab
 import CustomAttributeDefinition from '../../models/custom-attributes/custom-attribute-definition';
 import AccessControlRole from '../../models/custom-roles/access-control-role';
 import Roleable from '../../models/custom-roles/roleable';
+import Person from '../../models/business-models/person';
 
 const path = GGRC.mustache_path || '/static/mustache';
 const HEADER_VIEW = `${path}/base_objects/page_header.mustache`;
@@ -42,7 +43,7 @@ gapiClient.loadGapiClient();
 
 const adminListDescriptors = {
   people: {
-    model: CMS.Models.Person,
+    model: Person,
     roles: new can.List(),
     init: function () {
       let self = this;
@@ -124,7 +125,7 @@ const adminListDescriptors = {
 new GGRC.WidgetList('ggrc_admin', {
   admin: {
     people: {
-      model: CMS.Models.Person,
+      model: Person,
       content_controller: GGRC.Controllers.ListView,
       content_controller_options: adminListDescriptors.people,
       widget_id: 'people_list',

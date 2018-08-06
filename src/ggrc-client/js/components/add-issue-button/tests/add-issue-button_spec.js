@@ -8,6 +8,7 @@ import Component from '../add-issue-button';
 import '../add-issue-button';
 import {REFRESH_RELATED} from '../../../events/eventTypes';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
+import Issue from '../../../models/business-models/issue';
 
 describe('add-issue-button component', function () {
   'use strict';
@@ -46,8 +47,7 @@ describe('add-issue-button component', function () {
       };
 
       beforeEach(function () {
-        spyOn(CMS.Models, 'Issue');
-        fakeIssueInstance = new CMS.Models.Issue();
+        fakeIssueInstance = new Issue();
         spyOn(CurrentPageUtils, 'initCounts');
         spyOn(CurrentPageUtils, 'getPageInstance')
           .and.returnValue(fakePageInstance);

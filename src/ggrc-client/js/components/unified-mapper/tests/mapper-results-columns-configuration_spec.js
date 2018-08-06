@@ -7,6 +7,7 @@ import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import Component from '../mapper-results-columns-configuration';
 import DisplayPrefs from '../../../models/local-storage/display-prefs';
+import Program from '../../../models/business-models/program';
 
 describe('mapper-results-columns-configuration component', function () {
   'use strict';
@@ -76,7 +77,7 @@ describe('mapper-results-columns-configuration component', function () {
       let result;
       viewModel.attr('modelType', 'Program');
       result = viewModel.getModel();
-      expect(result).toEqual(CMS.Models.Program);
+      expect(result).toEqual(Program);
     });
   });
 

@@ -11,6 +11,7 @@ import Pagination from '../../base-objects/pagination';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../mapper-results';
 import DisplayPrefs from '../../../models/local-storage/display-prefs';
+import Program from '../../../models/business-models/program';
 
 describe('mapper-results component', function () {
   'use strict';
@@ -486,7 +487,7 @@ describe('mapper-results component', function () {
       spyOn(viewModel, 'getModelKey')
         .and.returnValue('Program');
       result = viewModel.getModel();
-      expect(result).toEqual(CMS.Models.Program);
+      expect(result).toEqual(Program);
     });
   });
 
@@ -495,7 +496,7 @@ describe('mapper-results component', function () {
       let result;
       viewModel.attr('type', 'Program');
       result = viewModel.getDisplayModel();
-      expect(result).toEqual(CMS.Models.Program);
+      expect(result).toEqual(Program);
     });
   });
 

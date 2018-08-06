@@ -4,6 +4,15 @@
 */
 
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
+import Assessment from '../../business-models/assessment';
+import Control from '../../business-models/control';
+import Objective from '../../business-models/objective';
+import Audit from '../../business-models/audit';
+import Program from '../../business-models/program';
+import Regulation from '../../business-models/regulation';
+import System from '../../business-models/system';
+import Issue from '../../business-models/issue';
+import Requirement from '../../business-models/requirement';
 
 const ENDPOINT = '/api/related_assessments';
 
@@ -14,7 +23,7 @@ describe('relatedAssessmentsLoader mixin', () => {
 
   describe('for Assessment model', () => {
     it('should contain getRelatedAssessments method', () => {
-      const model = makeFakeInstance({model: CMS.Models.Assessment})({});
+      const model = makeFakeInstance({model: Assessment})({});
 
       expect(model.getRelatedAssessments).toBeTruthy();
     });
@@ -22,7 +31,7 @@ describe('relatedAssessmentsLoader mixin', () => {
 
   describe('for Control model', () => {
     it('should contain getRelatedAssessments method', () => {
-      const model = makeFakeInstance({model: CMS.Models.Control})({});
+      const model = makeFakeInstance({model: Control})({});
 
       expect(model.getRelatedAssessments).toBeTruthy();
     });
@@ -30,7 +39,7 @@ describe('relatedAssessmentsLoader mixin', () => {
 
   describe('for Objective model', () => {
     it('should contain getRelatedAssessments method', () => {
-      const model = makeFakeInstance({model: CMS.Models.Objective})({});
+      const model = makeFakeInstance({model: Objective})({});
 
       expect(model.getRelatedAssessments).toBeTruthy();
     });
@@ -38,7 +47,7 @@ describe('relatedAssessmentsLoader mixin', () => {
 
   describe('for Snapshot model', () => {
     it('should build correct response', () => {
-      const model = makeFakeInstance({model: CMS.Models.Control})({
+      const model = makeFakeInstance({model: Control})({
         id: 1,
         type: 'Control',
         snapshot: {
@@ -60,12 +69,12 @@ describe('relatedAssessmentsLoader mixin', () => {
 
   describe('for other models', () => {
     it('should not contain getRelatedAssessments method', () => {
-      const audit = makeFakeInstance({model: CMS.Models.Audit})({});
-      const program = makeFakeInstance({model: CMS.Models.Program})({});
-      const reg = makeFakeInstance({model: CMS.Models.Regulation})({});
-      const system = makeFakeInstance({model: CMS.Models.System})({});
-      const issue = makeFakeInstance({model: CMS.Models.Issue})({});
-      const requirement = makeFakeInstance({model: CMS.Models.Requirement})({});
+      const audit = makeFakeInstance({model: Audit})({});
+      const program = makeFakeInstance({model: Program})({});
+      const reg = makeFakeInstance({model: Regulation})({});
+      const system = makeFakeInstance({model: System})({});
+      const issue = makeFakeInstance({model: Issue})({});
+      const requirement = makeFakeInstance({model: Requirement})({});
 
       expect(audit.getRelatedAssessments).toBeFalsy();
       expect(program.getRelatedAssessments).toBeFalsy();
@@ -80,7 +89,7 @@ describe('relatedAssessmentsLoader mixin', () => {
     let fakeAssessmentCreator;
 
     beforeEach(function () {
-      fakeAssessmentCreator = makeFakeInstance({model: CMS.Models.Assessment});
+      fakeAssessmentCreator = makeFakeInstance({model: Assessment});
     });
 
 

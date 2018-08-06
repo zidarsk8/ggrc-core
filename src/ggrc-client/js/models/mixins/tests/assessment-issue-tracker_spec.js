@@ -7,14 +7,16 @@ import * as issueTrackerUtils from '../../../plugins/utils/issue-tracker-utils';
 import * as queryApiUtils from '../../../plugins/utils/query-api-utils';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
+import assessmentIssueTracker from '../assessment-issue-tracker';
+import Assessment from '../../business-models/assessment';
 
-describe('can.Model.Mixin.assessmentIssueTracker', () => {
+describe('assessmentIssueTracker mixin', () => {
   let Mixin;
   let audit;
 
   beforeAll(function () {
     GGRC.ISSUE_TRACKER_ENABLED = true;
-    Mixin = CMS.Models.Mixins.assessmentIssueTracker;
+    Mixin = assessmentIssueTracker;
 
     audit = new can.Map({
       id: 123,
@@ -24,14 +26,14 @@ describe('can.Model.Mixin.assessmentIssueTracker', () => {
   });
 
   describe('"after:init" event', () => {
-    const asmtProto = CMS.Models.Assessment.prototype;
+    const asmtProto = Assessment.prototype;
 
     it('should call "initIssueTrackerForAssessment" for audit', () => {
       let dfd = new can.Deferred();
       dfd.resolve(audit);
       spyOn(asmtProto, 'ensureParentAudit').and.returnValue(dfd);
       spyOn(asmtProto, 'initIssueTrackerForAssessment');
-      makeFakeInstance({model: CMS.Models.Assessment})({type: 'Assessment'});
+      makeFakeInstance({model: Assessment})({type: 'Assessment'});
       expect(asmtProto.initIssueTrackerForAssessment).toHaveBeenCalled();
     });
 
@@ -39,7 +41,7 @@ describe('can.Model.Mixin.assessmentIssueTracker', () => {
       let dfd = can.Deferred();
       spyOn(asmtProto, 'initIssueTracker').and.returnValue(dfd);
       spyOn(asmtProto, 'trackAuditUpdates');
-      makeFakeInstance({model: CMS.Models.Assessment})({type: 'Assessment'});
+      makeFakeInstance({model: Assessment})({type: 'Assessment'});
       dfd.then(() => {
         expect(asmtProto.trackAuditUpdates).toHaveBeenCalled();
         done();

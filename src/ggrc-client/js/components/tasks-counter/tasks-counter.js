@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import Person from '../../models/business-models/person';
+import CycleTaskGroupObjectTask from '../../models/business-models/cycle-task-group-object-task';
+
 let baseCmpName = 'tasks-counter';
 
 /**
@@ -45,10 +48,10 @@ export default can.Component.extend({
     },
     loadTasks: function () {
       let id = this.attr('person.id');
-      let user = CMS.Models.Person.findInCacheById(id);
+      let user = Person.findInCacheById(id);
 
       if (!user) {
-        user = new CMS.Models.Person(this.attr('person'));
+        user = new Person(this.attr('person'));
       }
       return user.getTasksCount()
         .then(function (results) {
@@ -59,7 +62,7 @@ export default can.Component.extend({
   },
   events: {
     onModelChange: function (model, event, instance) {
-      if (instance instanceof CMS.Models.CycleTaskGroupObjectTask) {
+      if (instance instanceof CycleTaskGroupObjectTask) {
         this.viewModel.loadTasks();
       }
     },

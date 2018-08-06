@@ -5,6 +5,11 @@
 
 import '../object-tasks/object-tasks';
 import '../mapped-counter/mapped-counter';
+import Directive from '../../models/business-models/directive';
+import Requirement from '../../models/business-models/requirement';
+import CycleTaskGroupObjectTask from '../../models/business-models/cycle-task-group-object-task';
+import CycleTaskGroup from '../../models/business-models/cycle-task-group';
+import Cycle from '../../models/business-models/cycle';
 
 import template from './templates/tree-item-extra-info.mustache';
 
@@ -26,26 +31,25 @@ let viewModel = can.Map.extend({
     isDirective: {
       type: 'boolean',
       get: function () {
-        return this.attr('instance') instanceof CMS.Models.Directive;
+        return this.attr('instance') instanceof Directive;
       },
     },
     isRequirement: {
       type: 'boolean',
       get: function () {
-        return this.attr('instance') instanceof CMS.Models.Requirement;
+        return this.attr('instance') instanceof Requirement;
       },
     },
     isCycleTaskGroupObjectTask: {
       type: 'boolean',
       get: function () {
-        return this.attr('instance') instanceof
-          CMS.Models.CycleTaskGroupObjectTask;
+        return this.attr('instance') instanceof CycleTaskGroupObjectTask;
       },
     },
     isCycleTaskGroup: {
       type: 'boolean',
       get: function () {
-        return this.attr('instance') instanceof CMS.Models.CycleTaskGroup;
+        return this.attr('instance') instanceof CycleTaskGroup;
       },
     },
     isCycleTasks: {
@@ -53,7 +57,7 @@ let viewModel = can.Map.extend({
       get: function () {
         return this.attr('isCycleTaskGroup') ||
           this.attr('isCycleTaskGroupObjectTask') ||
-          this.attr('instance') instanceof CMS.Models.Cycle;
+          this.attr('instance') instanceof Cycle;
       },
     },
     isLoading: {
@@ -74,7 +78,7 @@ let viewModel = can.Map.extend({
     disablePopover: {
       type: 'boolean',
       get: function () {
-        return this.attr('instance') instanceof CMS.Models.Cycle;
+        return this.attr('instance') instanceof Cycle;
       },
     },
     drawStatuses: {

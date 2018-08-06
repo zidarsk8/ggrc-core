@@ -6,6 +6,7 @@
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../tree-item-extra-info';
+import CycleTaskGroupObjectTask from '../../../models/business-models/cycle-task-group-object-task';
 
 describe('tree-item-extra-info component', function () {
   'use strict';
@@ -86,7 +87,7 @@ describe('tree-item-extra-info component', function () {
     it('returns true if instance is "CycleTasks" and overdue', function () {
       let result;
       let instance = makeFakeInstance({
-        model: CMS.Models.CycleTaskGroupObjectTask,
+        model: CycleTaskGroupObjectTask,
       })();
       instance.attr('end_date', moment().subtract(5, 'd'));
       viewModel.attr('instance', instance);
@@ -100,7 +101,7 @@ describe('tree-item-extra-info component', function () {
       function () {
         let result;
         let instance = makeFakeInstance({
-          model: CMS.Models.CycleTaskGroupObjectTask,
+          model: CycleTaskGroupObjectTask,
         })();
         instance.attr('end_date', moment().add(5, 'd'));
         viewModel.attr('instance', instance);
