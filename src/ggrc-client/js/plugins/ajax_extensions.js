@@ -9,7 +9,9 @@ import {
 import {
   isConnectionLost,
   handleAjaxError,
+  getAjaxErrorInfo,
 } from './utils/errors-utils';
+import tracker from '../tracker';
 
 $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
   // setup timezone offset header in each ajax request
@@ -135,6 +137,12 @@ can.ajax = $.ajax = function (options) {
 };
 
 $(document).ajaxError(function (event, jqxhr, settings, exception) {
+  let isExpectedError = jqxhr.getResponseHeader('X-Expected-Error');
+
+  if (!isExpectedError) {
+    tracker.trackError(getAjaxErrorInfo(jqxhr, exception));
+  }
+
   if (!jqxhr.hasFailCallback) {
     if (isConnectionLost()) {
       notifier('error', 'Internet connection was lost.');
