@@ -92,6 +92,12 @@ UNKNOWN_ERROR = u"Line {line}: Import failed due to unknown error."
 INVALID_START_END_DATES = (u"Line {line}: {start_date} can not be after "
                            u"{end_date}. The line will be ignored.")
 
+START_DATE_ON_WEEKEND_ERROR = (u"Line {line}: Task Start Date can not occur "
+                               u"on weekends.")
+
+END_DATE_ON_WEEKEND_ERROR = (u"Line {line}: Task Due Date can not occur "
+                             u"on weekends.")
+
 UNKNOWN_DATE_FORMAT = (u"Line {line}: Field {column_name} contains invalid "
                        u"date format, use YYYY-MM-DD or MM/DD/YYYY. The line "
                        u"will be ignored.")
