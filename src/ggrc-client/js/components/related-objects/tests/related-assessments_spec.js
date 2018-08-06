@@ -10,7 +10,7 @@ import {
 } from '../../../../js_specs/spec_helpers';
 import * as caUtils from '../../../plugins/utils/ca-utils';
 
-describe('GGRC.Components.relatedAssessments', () => {
+describe('related-assessments component', () => {
   describe('viewModel scope', () => {
     let originalModels;
     let viewModel;

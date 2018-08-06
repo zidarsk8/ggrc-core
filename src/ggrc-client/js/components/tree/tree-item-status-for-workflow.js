@@ -27,7 +27,7 @@ const viewModel = can.Map.extend({
   instance: {},
 });
 
-export default can.Component({
+export default can.Component.extend({
   tag: 'tree-item-status-for-workflow',
   template,
   viewModel,

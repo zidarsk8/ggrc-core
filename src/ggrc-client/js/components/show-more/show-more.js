@@ -13,66 +13,65 @@ import template from './show-more.mustache';
  *          <some-item-component></some-item-component>
  *        </show-more>
  */
-(function (GGRC, can) {
-  GGRC.Components('showMore', {
-    tag: 'show-more',
-    template: template,
-    viewModel: {
-      define: {
-        limit: {
-          type: 'number',
-          value: 5,
-        },
-        items: {
-          value: function () {
-            return [];
-          },
-        },
-        shouldShowAllItems: {
-          type: 'boolean',
-          value: function () {
-            let isOverLimit = this.attr('isOverLimit');
-            return isOverLimit;
-          },
-        },
-        isOverLimit: {
-          get: function () {
-            let itemsCount = this.attr('items.length');
-            let limit = this.attr('limit');
 
-            return itemsCount > limit;
-          },
-        },
-        visibleItems: {
-          get: function () {
-            let limit = this.attr('limit');
-            let isOverLimit = this.attr('isOverLimit');
-            let shouldShowAllItems = this.attr('shouldShowAllItems');
-            let items = this.attr('items');
-
-            return (isOverLimit && !shouldShowAllItems) ?
-              items.slice(0, limit) :
-              items;
-          },
-        },
-        showAllButtonText: {
-          get: function () {
-            let itemsCount = this.attr('items.length');
-            let limit = this.attr('limit');
-            let shouldShowAllItems = this.attr('shouldShowAllItems');
-
-            return !shouldShowAllItems ?
-              'Show more (' + (itemsCount - limit) + ')' :
-              'Show less';
-          },
+export default can.Component.extend({
+  tag: 'show-more',
+  template,
+  viewModel: {
+    define: {
+      limit: {
+        type: 'number',
+        value: 5,
+      },
+      items: {
+        value: function () {
+          return [];
         },
       },
-      toggleShowAll: function (event) {
-        let newValue;
-        event.stopPropagation();
-        newValue = !this.attr('shouldShowAllItems');
-        this.attr('shouldShowAllItems', newValue);
+      shouldShowAllItems: {
+        type: 'boolean',
+        value: function () {
+          let isOverLimit = this.attr('isOverLimit');
+          return isOverLimit;
+        },
+      },
+      isOverLimit: {
+        get: function () {
+          let itemsCount = this.attr('items.length');
+          let limit = this.attr('limit');
+
+          return itemsCount > limit;
+        },
+      },
+      visibleItems: {
+        get: function () {
+          let limit = this.attr('limit');
+          let isOverLimit = this.attr('isOverLimit');
+          let shouldShowAllItems = this.attr('shouldShowAllItems');
+          let items = this.attr('items');
+
+          return (isOverLimit && !shouldShowAllItems) ?
+            items.slice(0, limit) :
+            items;
+        },
+      },
+      showAllButtonText: {
+        get: function () {
+          let itemsCount = this.attr('items.length');
+          let limit = this.attr('limit');
+          let shouldShowAllItems = this.attr('shouldShowAllItems');
+
+          return !shouldShowAllItems ?
+            'Show more (' + (itemsCount - limit) + ')' :
+            'Show less';
+        },
       },
     },
-  });
-})(window.GGRC, window.can);
+    toggleShowAll: function (event) {
+      let newValue;
+      event.stopPropagation();
+      newValue = !this.attr('shouldShowAllItems');
+      this.attr('shouldShowAllItems', newValue);
+    },
+  },
+});

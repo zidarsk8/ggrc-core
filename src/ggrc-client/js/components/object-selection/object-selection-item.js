@@ -5,31 +5,27 @@
 
 import template from './object-selection-item.mustache';
 
-(function (can, GGRC) {
-  'use strict';
-
-  can.Component.extend({
-    tag: 'object-selection-item',
-    template: template,
-    viewModel: {
-      isSaving: false,
-      objectType: null,
-      objectId: null,
-      isDisabled: false,
-      isSelected: false,
-      toggleSelection: function (scope, el, isSelected) {
-        let event = isSelected ? 'selectItem' : 'deselectItem';
-        can.trigger(el, event, [scope.objectId, scope.objectType]);
-      },
+export default can.Component.extend({
+  tag: 'object-selection-item',
+  template,
+  viewModel: {
+    isSaving: false,
+    objectType: null,
+    objectId: null,
+    isDisabled: false,
+    isSelected: false,
+    toggleSelection: function (scope, el, isSelected) {
+      let event = isSelected ? 'selectItem' : 'deselectItem';
+      can.trigger(el, event, [scope.objectId, scope.objectType]);
     },
-    events: {
-      'input[type="checkbox"] click': function (el, ev) {
-        let isSelected = el[0].checked;
-        ev.preventDefault();
-        ev.stopPropagation();
-        this.viewModel
-          .toggleSelection(this.viewModel, this.element, isSelected);
-      },
+  },
+  events: {
+    'input[type="checkbox"] click': function (el, ev) {
+      let isSelected = el[0].checked;
+      ev.preventDefault();
+      ev.stopPropagation();
+      this.viewModel
+        .toggleSelection(this.viewModel, this.element, isSelected);
     },
-  });
-})(window.can, window.GGRC);
+  },
+});

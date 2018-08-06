@@ -34,9 +34,8 @@ let CloneWorkflow = Cacheable({
   }
 });
 
-can.Component.extend({
+export default can.Component.extend({
   tag: "workflow-clone",
-  template: "<content/>",
   events: {
     click: function(el) {
       let $target;

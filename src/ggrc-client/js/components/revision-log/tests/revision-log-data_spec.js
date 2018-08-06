@@ -3,17 +3,20 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.Components.revisionLogData', function () {
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../revision-log-data';
+
+describe('revision-log-data component', function () {
   'use strict';
 
   let viewModel;
 
   beforeAll(function () {
-    viewModel = GGRC.Components.getViewModel('revisionLogData');
+    viewModel = getComponentVM(Component);
   });
 
   afterAll(function () {
-    viewModel = GGRC.Components.getViewModel('revisionLogData');
+    viewModel = getComponentVM(Component);
   });
 
   describe('isObject', function () {

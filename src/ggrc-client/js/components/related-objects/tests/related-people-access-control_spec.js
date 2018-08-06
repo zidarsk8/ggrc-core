@@ -4,13 +4,14 @@
  */
 
 import Component from '../related-people-access-control';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
 
-describe('GGRC.relatedPeopleAccessControl', function () {
+describe('related-people-access-control component', function () {
   let viewModel;
 
   beforeAll(function () {
-    viewModel = new (can.Map.extend(Component.prototype.viewModel));
+    viewModel = getComponentVM(Component);
   });
 
   describe('"updateRoles" method', () => {

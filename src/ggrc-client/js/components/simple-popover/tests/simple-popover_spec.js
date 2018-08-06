@@ -6,7 +6,7 @@
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../simple-popover';
 
-describe('simplePopover component', function () {
+describe('simple-popover component', function () {
   let viewModel;
   let init;
 

@@ -5,28 +5,24 @@
 
 import template from './editable-people-group-header.mustache';
 
-(function (can, GGRC) {
-  'use strict';
-
-  GGRC.Components('editablePeopleGroupHeader', {
-    tag: 'editable-people-group-header',
-    template: template,
-    viewModel: {
-      define: {
-        peopleCount: {
-          get: function () {
-            return this.attr('people.length');
-          },
+export default can.Component.extend({
+  tag: 'editable-people-group-header',
+  template,
+  viewModel: {
+    define: {
+      peopleCount: {
+        get: function () {
+          return this.attr('people.length');
         },
       },
-      editableMode: false,
-      isLoading: false,
-      canEdit: true,
-      required: false,
-      people: [],
-      openEditMode: function () {
-        this.dispatch('editPeopleGroup');
-      },
     },
-  });
-})(window.can, window.GGRC);
+    editableMode: false,
+    isLoading: false,
+    canEdit: true,
+    required: false,
+    people: [],
+    openEditMode: function () {
+      this.dispatch('editPeopleGroup');
+    },
+  },
+});

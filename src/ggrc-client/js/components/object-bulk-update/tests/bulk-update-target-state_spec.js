@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../bulk-update-target-state.js';
 
 let objectStateToWarningMap = {
@@ -19,9 +20,9 @@ let objectStateToWarningMap = {
 };
 let viewModel;
 
-describe('GGRC.Components.bulkUpdateTargetState', function () {
+describe('bulk-update-target-state component', function () {
   beforeAll(function () {
-    viewModel = new (can.Map.extend(Component.prototype.viewModel));
+    viewModel = getComponentVM(Component);
   });
   describe('warningMessage property', function () {
     it('should return appropriate warnings for objects', function () {

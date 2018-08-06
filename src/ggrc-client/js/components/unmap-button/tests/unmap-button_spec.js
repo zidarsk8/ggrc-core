@@ -6,7 +6,7 @@
 import Component from '../unmap-button';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
-describe('unmapButton', function () {
+describe('unmap-button component', function () {
   'use strict';
   let events;
   let viewModel;

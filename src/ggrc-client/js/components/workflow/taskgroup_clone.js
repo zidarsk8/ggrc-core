@@ -30,7 +30,7 @@ let CloneTaskGroup = Cacheable({
   },
 });
 
-can.Component.extend({
+export default can.Component.extend({
   tag: 'task-group-clone',
   events: {
     click(el) {

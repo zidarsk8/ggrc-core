@@ -3,22 +3,16 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.Components.UnarchiveLink', function () {
-  'use strict';
+import Component from '../unarchive_link';
 
-  let Component;
-
-  beforeAll(function () {
-    Component = GGRC.Components.get('unarchiveLink');
-  });
-
+describe('unarchive-link component', function () {
   describe('click() event', function () {
     let displayName = 'DISPLAY NAME';
     let notifyText = 'was unarchived successfully';
     let eventObj;
     let instance;
     let pendingSave;
-    let scope;
+    let viewModel;
     let $element;
     let event;
 
@@ -33,7 +27,7 @@ describe('GGRC.Components.UnarchiveLink', function () {
         },
       });
 
-      scope = new can.Map({
+      viewModel = new can.Map({
         instance: instance,
         notifyText: notifyText,
       });
@@ -43,7 +37,7 @@ describe('GGRC.Components.UnarchiveLink', function () {
       spyOn($.fn, 'trigger').and.callThrough();
 
       event = Component.prototype.events['a click']
-        .bind({scope: scope});
+        .bind({viewModel});
     });
 
     it('instance was not unarchived if was not archived', function () {
@@ -68,7 +62,7 @@ describe('GGRC.Components.UnarchiveLink', function () {
     it('instance was saved without notification', function () {
       let successMessage = displayName + ' ' + notifyText;
       instance.attr('archived', true);
-      scope.attr('notify', true);
+      viewModel.attr('notify', true);
 
       event($element, eventObj);
       pendingSave.resolve();

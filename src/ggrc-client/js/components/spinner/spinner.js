@@ -5,16 +5,12 @@
 
 import template from './spinner.mustache';
 
-(function (can) {
-  'use strict';
-
-  GGRC.Components('spinner', {
-    tag: 'spinner',
-    template: template,
-    scope: {
-      extraCssClass: '@',
-      size: '@',
-      toggle: null,
-    },
-  });
-})(window.can);
+export default can.Component.extend({
+  tag: 'spinner',
+  template,
+  scope: {
+    extraCssClass: '@',
+    size: '@',
+    toggle: null,
+  },
+});

@@ -3,13 +3,14 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../read-more';
 
-describe('GGRC.Component.ReadMore', () => {
+describe('read-more component', () => {
   let vm;
 
   beforeEach(() => {
-    vm = new (can.Map.extend(Component.prototype.viewModel));
+    vm = getComponentVM(Component);
   });
 
   describe('toggle() method', () => {

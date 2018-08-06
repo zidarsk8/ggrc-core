@@ -10,7 +10,7 @@ import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
 import Relationship from '../../../models/join-models/relationship';
 
-describe('issue-unmap-related-snapshots component', ()=> {
+describe('issue-unmap-item component', ()=> {
   let viewModel;
   let events;
   beforeEach(()=> {

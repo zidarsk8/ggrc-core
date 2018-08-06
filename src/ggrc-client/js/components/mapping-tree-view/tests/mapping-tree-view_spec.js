@@ -3,7 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('GGRC.Components.mappingTreeView', function () {
+import Component from '../mapping-tree-view';
+
+describe('mapping-tree-view component', function () {
   'use strict';
 
   let unsortedArray = [
@@ -26,23 +28,18 @@ describe('GGRC.Components.mappingTreeView', function () {
   ];
   let sortedAsc = _.orderBy(unsortedArray, 'field');
   let sortedDesc = _.orderBy(unsortedArray, 'field', 'desc');
-  let Component; // the component under test
-
-  beforeAll(function () {
-    Component = GGRC.Components.get('mappingTreeView');
-  });
 
   describe('_sortObjects() method', function () {
     let method;
-    let scope;
+    let viewModel;
 
     beforeAll(function () {
-      scope = new can.Map({
-        scope: {
+      viewModel = new can.Map({
+        viewModel: {
           sortField: null,
         },
       });
-      method = Component.prototype._sortObjects.bind(scope);
+      method = Component.prototype._sortObjects.bind(viewModel);
     });
 
     it('returns unsorted array when sortField is not defined', function () {
@@ -50,14 +47,14 @@ describe('GGRC.Components.mappingTreeView', function () {
     });
 
     it('returns asc sorted array when sortField is defined', function () {
-      scope.attr('scope.sortField', 'field');
+      viewModel.attr('viewModel.sortField', 'field');
       expect(method(unsortedArray)).toEqual(sortedAsc);
     });
 
     it('returns desc sorted array when sortField and sortOrder are defined',
       function () {
-        scope.attr('scope.sortField', 'field');
-        scope.attr('scope.sortOrder', 'desc');
+        viewModel.attr('viewModel.sortField', 'field');
+        viewModel.attr('viewModel.sortOrder', 'desc');
         expect(method(unsortedArray)).toEqual(sortedDesc);
       });
   });
