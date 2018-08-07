@@ -33,7 +33,6 @@ export default Cacheable('CMS.Models.Metric', {
     modified_by: 'CMS.Models.Person.stub',
     object_people: 'CMS.Models.ObjectPerson.stubs',
     people: 'CMS.Models.Person.stubs',
-    objectives: 'CMS.Models.Objective.stubs',
     controls: 'CMS.Models.Control.stubs',
     requirements: 'CMS.Models.get_stubs',
   },

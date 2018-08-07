@@ -42,7 +42,6 @@ export default Cacheable('CMS.Models.Clause', {
     children: 'CMS.Models.get_stubs',
     directive_sections: 'CMS.Models.DirectiveSection.stubs',
     directives: 'CMS.Models.get_stubs',
-    objectives: 'CMS.Models.Objective.stubs',
   },
   tree_view_options: {
     attr_view: '/static/mustache/requirements/tree-item-attr.mustache',
