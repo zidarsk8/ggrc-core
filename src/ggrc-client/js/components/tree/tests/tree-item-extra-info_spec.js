@@ -4,15 +4,23 @@
  */
 
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../tree-item-extra-info';
 
-describe('GGRC.Components.treeItemExtraInfo', function () {
+describe('tree-item-extra-info component', function () {
   'use strict';
 
   let viewModel;
-  let activeModel = ['Regulation', 'Contract', 'Policy', 'Standard', 'Section'];
+  let activeModel = [
+    'Regulation',
+    'Contract',
+    'Policy',
+    'Standard',
+    'Requirement',
+  ];
 
   beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('treeItemExtraInfo');
+    viewModel = getComponentVM(Component);
   });
 
   describe('is active if', function () {

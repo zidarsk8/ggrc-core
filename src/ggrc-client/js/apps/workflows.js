@@ -13,7 +13,6 @@ import InfoWidget from '../controllers/info_widget_controller';
 import {
   Proxy,
   Direct,
-  Search,
   Multi,
   TypeFilter,
   CustomFilter,
@@ -21,12 +20,13 @@ import {
   Cross,
 } from '../models/mappers/mapper-helpers';
 import Mappings from '../models/mappers/mappings';
+import CycleTaskEntry from '../models/service-models/cycle-task-entry';
 
 (function ($, CMS, GGRC) {
   let WorkflowExtension = {};
   let _workflowObjectTypes = Array.prototype.concat.call(
     [],
-    'Program Regulation Policy Standard Contract Clause Section'.split(' '),
+    'Program Regulation Policy Standard Contract Clause Requirement'.split(' '),
     'Request Control Objective OrgGroup Vendor AccessGroup'.split(' '),
     'System Process DataAsset Product Project Facility Market'.split(' '),
     'Issue Risk Threat Metric TechnologyEnvironment ProductGroup'.split(' ')
@@ -63,7 +63,7 @@ import Mappings from '../models/mappers/mappings';
   WorkflowExtension.object_type_decision_tree = function () {
     return {
       cycle: CMS.Models.Cycle,
-      cycle_task_entry: CMS.Models.CycleTaskEntry,
+      cycle_task_entry: CycleTaskEntry,
       cycle_task_group: CMS.Models.CycleTaskGroup,
       cycle_task_group_object_task: CMS.Models.CycleTaskGroupObjectTask,
       task_group: CMS.Models.TaskGroup,
@@ -145,8 +145,8 @@ import Mappings from '../models/mappers/mappings';
             'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
             'Product', 'ProductGroup', 'Project', 'System', 'Regulation',
             'Policy', 'Contract', 'Standard', 'Program', 'Issue', 'Control',
-            'Section', 'Clause', 'Objective', 'Audit', 'AccessGroup', 'Metric',
-            'Risk', 'TechnologyEnvironment', 'Threat',
+            'Requirement', 'Clause', 'Objective', 'Audit', 'AccessGroup',
+            'Metric', 'Risk', 'TechnologyEnvironment', 'Threat',
           ],
         },
         related_objects_as_source: Proxy(
@@ -189,7 +189,7 @@ import Mappings from '../models/mappers/mappings';
         standards: TypeFilter('related_objects', 'Standard'),
         programs: TypeFilter('related_objects', 'Program'),
         controls: TypeFilter('related_objects', 'Control'),
-        sections: TypeFilter('related_objects', 'Section'),
+        requirements: TypeFilter('related_objects', 'Requirement'),
         clauses: TypeFilter('related_objects', 'Clause'),
         objectives: TypeFilter('related_objects', 'Objective'),
         cycle: Direct(

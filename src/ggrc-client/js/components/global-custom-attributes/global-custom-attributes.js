@@ -7,6 +7,7 @@ import {
   CUSTOM_ATTRIBUTE_TYPE,
 } from '../../plugins/utils/custom-attribute/custom-attribute-config';
 import Permission from '../../permission';
+import {notifierXHR} from '../../plugins/utils/notifiers-utils';
 
 (function (can, GGRC) {
   'use strict';
@@ -69,11 +70,10 @@ import Permission from '../../permission';
             $(document.body).trigger('ajax:flash', {
               success: 'Saved',
             });
+            instance.backup();
           })
-          .fail(function () {
-            $(document.body).trigger('ajax:flash', {
-              error: 'There was a problem saving',
-            });
+          .fail(function (instance, xhr) {
+            notifierXHR('error')(xhr);
           })
           .always(function () {
             this.attr('isSaving', false);

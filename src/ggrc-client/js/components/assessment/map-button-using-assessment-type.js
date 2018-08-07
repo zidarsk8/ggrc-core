@@ -11,14 +11,14 @@ export default can.Component.extend({
     instance: {},
     deferredTo: {},
     openMapper: function () {
-      var data = {
+      let data = {
         join_object_type: this.attr('instance.type'),
         join_object_id: this.attr('instance.id'),
         type: this.attr('instance.assessment_type'),
         deferred_to: this.attr('deferredTo')
       };
 
-      import(/*webpackChunkName: "mapper"*/ '../../controllers/mapper/mapper')
+      import(/* webpackChunkName: "mapper" */ '../../controllers/mapper/mapper')
         .then(mapper => {
           mapper.ObjectMapper.openMapper(data);
         });
@@ -26,7 +26,7 @@ export default can.Component.extend({
     onClick: function (el, ev) {
       el.data('type', this.attr('instance.assessment_type'));
       el.data('deferred_to', this.attr('deferredTo'));
-      import(/*webpackChunkName: "mapper"*/ '../../controllers/mapper/mapper')
+      import(/* webpackChunkName: "mapper" */ '../../controllers/mapper/mapper')
         .then(() => {
           can.trigger(el, 'openMapper', ev);
         });

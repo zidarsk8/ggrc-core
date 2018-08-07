@@ -24,6 +24,7 @@ import {getPageInstance} from '../../plugins/utils/current-page-utils';
 (function (GGRC, can) {
   'use strict';
   let colorsMap = {
+    AccessGroup: 'header-style-1',
     OrgGroup: 'header-style-1',
     System: 'header-style-1',
     Process: 'header-style-1',
@@ -45,10 +46,11 @@ import {getPageInstance} from '../../plugins/utils/current-page-utils';
     Standard: 'header-style-4',
     Contract: 'header-style-4',
     Clause: 'header-style-4',
-    Section: 'header-style-4',
+    Requirement: 'header-style-4',
     Control: 'header-style-4',
     Objective: 'header-style-4',
     Program: 'header-style-5',
+    Vendor: 'header-style-1',
   };
 
   let viewModel = can.Map.extend({

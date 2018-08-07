@@ -6,8 +6,8 @@
 describe('can.mustache.helper.file_type', function () {
   'use strict';
 
-  let helper,
-    instance;  // the argument passed to the helper on invocation
+  let helper;
+  let instance; // the argument passed to the helper on invocation
 
   beforeAll(function () {
     helper = can.Mustache._helpers.file_type.fn;
@@ -22,8 +22,8 @@ describe('can.mustache.helper.file_type', function () {
 
   it('raises an error if passed an object of type other than Document',
     function () {
-      let callWithInvalid,
-        errMsg = 'Cannot determine file type for a non-document object';
+      let callWithInvalid;
+      let errMsg = 'Cannot determine file type for a non-document object';
 
       instance.type = 'FooBar';
       callWithInvalid = helper.bind(helper, instance);
@@ -33,8 +33,8 @@ describe('can.mustache.helper.file_type', function () {
   );
 
   it('raises an error if the file name cannot be determined', function () {
-    let callWithInvalid,
-      errMsg = "Cannot determine the object's file name";
+    let callWithInvalid;
+    let errMsg = "Cannot determine the object's file name";
 
     instance.title = undefined;
     callWithInvalid = helper.bind(helper, instance);
@@ -43,7 +43,7 @@ describe('can.mustache.helper.file_type', function () {
   });
 
   it('returns a default value if there is no file extension', function () {
-    instance.title = 'txt';  // the filename matches a common extension
+    instance.title = 'txt'; // the filename matches a common extension
     expect(helper(instance)).toEqual('default');
   });
 

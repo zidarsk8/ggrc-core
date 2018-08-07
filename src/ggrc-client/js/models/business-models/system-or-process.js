@@ -3,7 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-export default can.Model.Cacheable('CMS.Models.SystemOrProcess', {
+import Cacheable from '../cacheable';
+import '../mixins/unique-title';
+import '../mixins/timeboxed';
+import '../mixins/base-notifications';
+import '../mixins/ca-update';
+import '../mixins/access-control-list';
+
+export default Cacheable('CMS.Models.SystemOrProcess', {
   root_object: 'system_or_process',
   root_collection: 'systems_or_processes',
   title_plural: 'Systems/Processes',
@@ -41,12 +48,12 @@ export default can.Model.Cacheable('CMS.Models.SystemOrProcess', {
     people: 'CMS.Models.Person.stubs',
     objectives: 'CMS.Models.Objective.stubs',
     controls: 'CMS.Models.Control.stubs',
-    sections: 'CMS.Models.get_stubs',
+    requirements: 'CMS.Models.get_stubs',
     network_zone: 'CMS.Models.Option.stub',
   },
   tree_view_options: {
     attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
-    attr_list: can.Model.Cacheable.attr_list.concat([
+    attr_list: Cacheable.attr_list.concat([
       {
         attr_title: 'Network Zone',
         attr_name: 'network_zone',

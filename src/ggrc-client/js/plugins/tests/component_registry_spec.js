@@ -6,8 +6,8 @@
 describe('GGRC component registry', function () {
   'use strict';
 
-  let origStorage;  // the existing component private storage
-  let Components;  // the component registry utility
+  let origStorage; // the existing component private storage
+  let Components; // the component registry utility
 
   beforeAll(function () {
     Components = GGRC.Components;
@@ -89,7 +89,7 @@ describe('GGRC component registry', function () {
     });
 
     it('silently does nothing if a component does not exist', function () {
-      delete Components._registry.foo;  // the "foo" component does not exist
+      delete Components._registry.foo; // the "foo" component does not exist
 
       try {
         Components.unregister('foo');

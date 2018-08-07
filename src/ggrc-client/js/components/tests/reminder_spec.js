@@ -6,7 +6,7 @@
 describe('GGRC.Components.reminder', function () {
   'use strict';
 
-  let Component;  // the component under test
+  let Component; // the component under test
 
   beforeAll(function () {
     Component = GGRC.Components.get('reminder');
@@ -15,7 +15,7 @@ describe('GGRC.Components.reminder', function () {
   describe('reminder() method', function () {
     let eventObj;
     let instance;
-    let method;  // the method under test
+    let method; // the method under test
     let pendingRefresh;
     let pendingSave;
     let scope;

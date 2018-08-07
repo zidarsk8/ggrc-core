@@ -13,6 +13,7 @@ import {
 import Mappings from '../models/mappers/mappings';
 import {inferObjectType} from '../plugins/utils/models-utils';
 import {getPageInstance} from '../plugins/utils/current-page-utils';
+import Role from '../models/service-models/role';
 
 (function (can, $) {
   let CoreExtension = {};
@@ -54,11 +55,11 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
         assessment_template: CMS.Models.AssessmentTemplate,
         issue: CMS.Models.Issue,
         objective: CMS.Models.Objective,
-        section: CMS.Models.Section,
+        requirement: CMS.Models.Requirement,
         clause: CMS.Models.Clause,
         person: CMS.Models.Person,
         product_group: CMS.Models.ProductGroup,
-        role: CMS.Models.Role,
+        role: Role,
         technology_environment: CMS.Models.TechnologyEnvironment,
         threat: CMS.Models.Threat,
         risk: CMS.Models.Risk,
@@ -204,8 +205,9 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
 
         can.each(definitions, function (definition, name) {
           // Only output the mappings if it's a model, e.g., uppercase first letter
-          if (name[0] === name[0].toUpperCase())
+          if (name[0] === name[0].toUpperCase()) {
             mappings[name] = reify_mixins(definition);
+          }
         });
 
         return mappings;
@@ -419,8 +421,8 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
             mapping: 'objectives',
             draw_children: true,
           },
-          Section: {
-            mapping: 'sections',
+          Requirement: {
+            mapping: 'requirements',
             draw_children: true,
           },
           Clause: {
@@ -457,8 +459,8 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
             allow_mapping: false,
             allow_creating: false,
           },
-          Section: {
-            mapping: 'sections',
+          Requirement: {
+            mapping: 'requirements',
             draw_children: true,
           },
           Clause: {
@@ -503,8 +505,8 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
           _mixins: [
             'objectives', 'controls', 'business_objects',
           ],
-          Section: {
-            mapping: 'sections',
+          Requirement: {
+            mapping: 'requirements',
             draw_children: true,
           },
           Clause: {
@@ -535,7 +537,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
             draw_children: true,
           },
         },
-        Section: {
+        Requirement: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Audit: {
             mapping: 'related_audits',
@@ -564,8 +566,8 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
             allow_mapping: true,
             add_item_view: path + '/audits/tree_add_item.mustache',
           },
-          Section: {
-            mapping: 'sections',
+          Requirement: {
+            mapping: 'requirements',
             draw_children: true,
           },
           Clause: {
@@ -672,7 +674,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
           Audit: {
             draw_children: true,
           },
-          Section: {
+          Requirement: {
             add_item_view:
               GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
             draw_children: true,
@@ -779,9 +781,9 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
         let widgetConfig = getWidgetConfig(model_name);
         model_name = widgetConfig.name;
 
-        let sources = [],
-          far_model, descriptor = {},
-          widget_id;
+        let far_model;
+        let descriptor = {};
+        let widget_id;
 
         far_model = CMS.Models[model_name];
         if (far_model) {

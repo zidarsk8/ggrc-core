@@ -7,7 +7,7 @@ describe('can.mustache.helper.get_item', function () {
   'use strict';
 
   let helper;
-  let fakeOptions;  // a fake "options" argument
+  let fakeOptions; // a fake "options" argument
 
   beforeAll(function () {
     helper = can.Mustache._helpers.get_item.fn;

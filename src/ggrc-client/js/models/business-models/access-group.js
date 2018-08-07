@@ -3,10 +3,16 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-export default can.Model.Cacheable('CMS.Models.AccessGroup', {
+import Cacheable from '../cacheable';
+import '../mixins/unique-title';
+import '../mixins/ca-update';
+import '../mixins/access-control-list';
+import '../mixins/base-notifications';
+
+export default Cacheable('CMS.Models.AccessGroup', {
   root_object: 'access_group',
   root_collection: 'access_groups',
-  category: 'entities',
+  category: 'business',
   findAll: 'GET /api/access_groups',
   findOne: 'GET /api/access_groups/{id}',
   create: 'POST /api/access_groups',
@@ -27,11 +33,11 @@ export default can.Model.Cacheable('CMS.Models.AccessGroup', {
     people: 'CMS.Models.Person.stubs',
     objectives: 'CMS.Models.Objective.stubs',
     controls: 'CMS.Models.Control.stubs',
-    sections: 'CMS.Models.get_stubs',
+    requirements: 'CMS.Models.get_stubs',
   },
   tree_view_options: {
     attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
-    attr_list: can.Model.Cacheable.attr_list.concat([
+    attr_list: Cacheable.attr_list.concat([
       {attr_title: 'Reference URL', attr_name: 'reference_url'},
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
