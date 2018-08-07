@@ -8,7 +8,6 @@ dashboard-js-template-files:
   - base_objects/confirm_delete.mustache
   - base_objects/confirm_warning.mustache
   - base_objects/contacts.mustache
-  - base_objects/create_objective_dropdown_option.mustache
   - base_objects/general-page-header.mustache
   - base_objects/object-review.mustache
   - base_objects/description.mustache
