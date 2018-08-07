@@ -100,8 +100,8 @@ def _add_task_acl(task):
   db.session.add(task)
   db.session.commit()
   if admin_role:
-    from ggrc.cache.utils import clear_permission_cache
-    clear_permission_cache()
+    from ggrc.cache.utils import clear_users_permission_cache
+    clear_users_permission_cache([get_current_user().id])
 
 
 def create_task(name, url, queued_callback=None, parameters=None, method=None):
