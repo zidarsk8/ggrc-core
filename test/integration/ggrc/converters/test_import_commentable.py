@@ -34,7 +34,9 @@ COMMENTABLE_MODELS = [
     "Risk",
     "Threat",
 ]
-RECIPIENTS = ["Admin", "Primary Contacts", "Secondary Contacts"]
+RECIPIENTS = ["Admin", "Primary Contacts", "Secondary Contacts",
+              "Product Managers", "Technical / Program Managers",
+              "Technical Leads", "System Owners", "Legal Counsels"]
 
 
 class TestCommentableImport(TestCase):
@@ -75,5 +77,5 @@ class TestCommentableImport(TestCase):
     for model_name in COMMENTABLE_MODELS:
       model_cls = inflector.get_model(model_name)
       obj = model_cls.query.first()
-      self.assertEqual(obj.recipients, ",".join(RECIPIENTS))
+      self.assertEqual(sorted(obj.recipients.split(",")), sorted(RECIPIENTS))
       self.assertEqual(obj.send_by_default, True)

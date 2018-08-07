@@ -50,6 +50,11 @@ class Commentable(object):
       "Admin",
       "Primary Contacts",
       "Secondary Contacts",
+      "Product Managers",
+      "Technical / Program Managers",
+      "Technical Leads",
+      "System Owners",
+      "Legal Counsels",
   ])
 
   @validates("recipients")

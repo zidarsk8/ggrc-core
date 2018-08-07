@@ -187,7 +187,9 @@ class TestCommentNotification(TestCase):
     Check if the correct notification entries are created when a comment gets
     posted.
     """
-    recipient_types = ["Admin", "Primary Contacts", "Secondary Contacts"]
+    recipient_types = ["Admin", "Primary Contacts", "Secondary Contacts",
+                       "Product Managers", "Technical / Program Managers",
+                       "Technical Leads", "System Owners", "Legal Counsels"]
     person = all_models.Person.query.first()
     person_email = person.email
 
