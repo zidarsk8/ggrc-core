@@ -350,3 +350,53 @@ class TestBasicCsvImport(TestCase):
             }
         }
     })
+
+  def test_import_lines(self):
+    """Test importing CSV with empty lines in block
+    and check correct lines numbering"""
+    file_name = "import_empty_lines.csv"
+    response = self.import_file(file_name, safe=False)
+    results = {r["name"]: r for r in response}
+    expected = {
+        "Person": {
+            "created": 4,
+            "ignored": 0,
+            "row_errors": 0,
+            "row_warnings": 0,
+            "rows": 4,
+        },
+        "Audit": {
+            "created": 2,
+            "ignored": 0,
+            "row_errors": 0,
+            "row_warnings": 1,
+            "rows": 2,
+        },
+        "Program": {
+            "created": 2,
+            "ignored": 0,
+            "row_errors": 0,
+            "row_warnings": 1,
+            "rows": 2,
+        },
+    }
+    for name, data in expected.items():
+      result = results[name]
+      result_dict = {
+          "created": result["created"],
+          "ignored": result["ignored"],
+          "row_errors": len(result["row_errors"]),
+          "row_warnings": len(result["row_warnings"]),
+          "rows": result["rows"],
+      }
+      self.assertDictEqual(
+          result_dict,
+          data,
+          u"Numbers don't match for {}: expected {!r}, got {!r}".format(
+              name,
+              data,
+              result_dict,
+          ),
+      )
+    self.assertIn(u"Line 16", results["Program"]["row_warnings"][0])
+    self.assertIn(u"Line 21", results["Audit"]["row_warnings"][0])
