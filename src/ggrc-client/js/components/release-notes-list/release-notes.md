@@ -1,6 +1,8 @@
-[//]: <> (updated 8/01/2018)
+[//]: <> (updated 8/08/2018)
 
 Our Product Team worked hard to make your day-to-day life easier. Here is a list of improvements.
+
+[Requirement object type](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.5ombjz5q4zcx)
 
 [Linking issue object with other issue tracking systems](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.cb8a70sw2yog)
 
@@ -48,17 +50,21 @@ Our Product Team worked hard to make your day-to-day life easier. Here is a list
 
 [Improvements to RBAC model](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.61naj7lj55l1)
 
+### Requirement object type
+
+The requirement object needs to be used to track individual requirements from directives (i.e. regulations, standards). All data from what used to be called as sections before have been transferred into requirements. For more information on how requirements need to be used see (go/grc-model).
+
 ### Linking issue object with other issue tracking systems
 
 You can link an issue object with other issue tracking/ticketing systems, to receive notifications about its updates. When you switch the integration on, the system will auto-generate a ticket for the issue. The system will assign the tracking ticket to a primary contact. When the integration is turned on, updates to assignments and states are allowed only through ticket tracking system. You can turn it off at any time.
 
 ### New scoping objects
 
-Now you can use new scoping object types: Product Group, Technology Environment, Metric.
+New object types are now available to track scope: Product Group, Technology Environment, Metric.
 
 ### Disable some automatic mapping rules
 
-To prevent unnecessary automated mappings, the system won’t create auto mappings that bring Objectives mapped to a Requirement or to higher levels in the hierarchy and Controls mapped to Objectives or to higher levels in the hierarchy.
+To prevent unnecessary automated mappings, the system won’t create automatic mappings that bring Objectives mapped to a Requirement or to regulations/standards and program.  Same applies to controls.
 
 ### Document object
 
