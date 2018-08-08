@@ -21,6 +21,8 @@ CHANGETRACKED_MODELS = (
     'Contract',
     'Control',
     'DataAsset',
+    'Document',
+    'Evidence',
     'Facility',
     'Issue',
     'Market',
