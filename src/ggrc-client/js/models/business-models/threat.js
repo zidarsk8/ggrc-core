@@ -34,7 +34,6 @@ export default Cacheable('CMS.Models.Threat', {
     object_objectives: 'CMS.Models.ObjectObjective.stubs',
     object_controls: 'CMS.Models.ObjectControl.stubs',
     object_sections: 'CMS.Models.ObjectSection.stubs',
-    requirements: 'CMS.Models.get_stubs',
   },
   tree_view_options: {
     add_item_view: GGRC.mustache_path +
