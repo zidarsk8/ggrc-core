@@ -37,7 +37,6 @@ export default Cacheable('CMS.Models.Requirement', {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
     object_people: 'CMS.Models.ObjectPerson.stubs',
-    children: 'CMS.Models.get_stubs',
     directive_requirements: 'CMS.Models.DirectiveRequirement.stubs',
     directives: 'CMS.Models.get_stubs',
   },

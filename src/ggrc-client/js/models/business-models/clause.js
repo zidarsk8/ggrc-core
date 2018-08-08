@@ -37,7 +37,6 @@ export default Cacheable('CMS.Models.Clause', {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
     object_people: 'CMS.Models.ObjectPerson.stubs',
-    children: 'CMS.Models.get_stubs',
     directive_sections: 'CMS.Models.DirectiveSection.stubs',
     directives: 'CMS.Models.get_stubs',
   },
