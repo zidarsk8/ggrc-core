@@ -3,29 +3,7 @@
 
 """Metaclasses module"""
 
-import pytest
-
-from lib import exception, constants, environment
-
-
-class DecorateFlakyTests(type):
-  # todo: this should be refactored to DecorateMethods and used with a
-  # factory
-  """Decorates all test methods with decorator that repeats failed test
- couple of times
- """
-
-  def __new__(mcs, name, bases, dct):
-    for attr_name, value in dct.items():
-      if any(
-          [method_name in attr_name for method_name in [
-              constants.test_runner.TEST_METHOD_PREFIX,
-              constants.test_runner.TEST_METHOD_POSTFIX]
-           ]) and callable(value):
-        dct[attr_name] = pytest.mark.flaky(
-            reruns=environment.RERUN_FAILED_TEST)(value)
-
-    return super(DecorateFlakyTests, mcs).__new__(mcs, name, bases, dct)
+from lib import exception
 
 
 class RequireDocs(type):
