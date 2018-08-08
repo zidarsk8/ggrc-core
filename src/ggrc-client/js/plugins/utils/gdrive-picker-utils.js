@@ -85,7 +85,7 @@ export function uploadFiles(opts = {}) {
       // NB: picker file object have different format then GDrive file objects
       // "name" <=> "title", "url" <=> "alternateLink"
       // RefreshQueue converts picker file objects into GDrive file objects
-      let pickedFilesById = _.indexBy(pickedFiles, 'id');
+      let pickedFilesById = _.keyBy(pickedFiles, 'id');
       let refreshDfds = pickedFiles.map((file)=> findGDriveItemById(file.id));
       can.when(...refreshDfds).then((...files)=> {
         // adding a newUpload flag so we can later distinguish newly

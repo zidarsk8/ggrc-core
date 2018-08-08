@@ -3,14 +3,17 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('GGRC.Components.relatedDocuments', function () {
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../related-documents';
+
+describe('related-documents component', function () {
   'use strict';
 
   let viewModel;
   let instance;
 
   beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('relatedDocuments');
+    viewModel = getComponentVM(Component);
     instance = {
       id: '5',
       type: 'Assessment',

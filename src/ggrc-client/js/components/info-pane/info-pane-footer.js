@@ -5,19 +5,15 @@
 
 import template from './info-pane-footer.mustache';
 
-(function (can, GGRC) {
-  'use strict';
-
-  /**
-   * Specific Info Pane Footer Component
-   */
-  GGRC.Components('infoPaneFooter', {
-    tag: 'info-pane-footer',
-    template: template,
-    viewModel: {
-      createdAt: '',
-      modifiedAt: '',
-      modifiedBy: {},
-    },
-  });
-})(window.can, window.GGRC);
+/**
+ * Specific Info Pane Footer Component
+ */
+export default can.Component.extend({
+  tag: 'info-pane-footer',
+  template,
+  viewModel: {
+    createdAt: '',
+    modifiedAt: '',
+    modifiedBy: {},
+  },
+});

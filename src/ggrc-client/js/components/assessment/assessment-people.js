@@ -10,7 +10,7 @@ import template from './templates/assessment-people.mustache';
 
 const tag = 'assessment-people';
 
-can.Component.extend({
+export default can.Component.extend({
   tag,
   template,
   viewModel: {

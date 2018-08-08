@@ -332,7 +332,7 @@ export default can.Component.extend({
         if (data[ACTION] === PICKED) {
           file = data[DOCUMENTS][0];
 
-          if (file && _.any(allowedTypes, function (type) {
+          if (file && _.some(allowedTypes, function (type) {
             return type === file.mimeType;
           })) {
             if (that.attr('jobId')) {

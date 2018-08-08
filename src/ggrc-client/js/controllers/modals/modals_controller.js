@@ -628,7 +628,7 @@ export default can.Control({
       after: 'minDate',
     };
 
-    _.each(options, function (val, key) {
+    _.forEach(options, (val, key) => {
       let targetEl;
       let isInput;
       let targetDate;
@@ -645,7 +645,7 @@ export default can.Control({
         otherKey = key === 'before' ? 'after' : 'before';
         targetEl.datepicker('option', options[otherKey], date);
       }
-    }, this);
+    });
   },
 
   "{$footer} a.btn[data-toggle='modal-submit-addmore'] click":

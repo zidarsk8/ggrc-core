@@ -104,7 +104,7 @@ allTypes.forEach(function (type) {
         order: defaultOrderTypes[type],
       };
     })
-    .sortByAll(['order', 'name'])
+    .sortBy(['order', 'name'])
     .map('name')
     .value();
 });

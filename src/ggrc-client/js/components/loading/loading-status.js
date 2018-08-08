@@ -5,28 +5,24 @@
 
 import template from './loading-status.mustache';
 
-(function (can, GGRC) {
-  'use strict';
-
-  GGRC.Components('loadingStatus', {
-    tag: 'loading-status',
-    template: template,
-    viewModel: {
-      define: {
-        showSpinner: {
-          type: 'boolean',
-          value: false,
-        },
-        alwaysShowText: {
-          type: 'boolean',
-          value: false,
-        },
-        isLoading: {
-          type: 'boolean',
-          value: false,
-        },
+export default can.Component.extend({
+  tag: 'loading-status',
+  template,
+  viewModel: {
+    define: {
+      showSpinner: {
+        type: 'boolean',
+        value: false,
       },
-      loadingText: '@',
+      alwaysShowText: {
+        type: 'boolean',
+        value: false,
+      },
+      isLoading: {
+        type: 'boolean',
+        value: false,
+      },
     },
-  });
-})(window.can, window.GGRC);
+    loadingText: '@',
+  },
+});

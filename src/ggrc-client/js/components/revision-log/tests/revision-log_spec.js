@@ -4,18 +4,20 @@
 */
 
 import Revision from '../../../models/service-models/revision';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../revision-log';
 
-describe('GGRC.Components.revisionLog', function () {
+describe('revision-log component', function () {
   'use strict';
 
   let viewModel;
 
   beforeAll(function () {
-    viewModel = GGRC.Components.getViewModel('revisionLog');
+    viewModel = getComponentVM(Component);
   });
 
   afterAll(function () {
-    viewModel = GGRC.Components.getViewModel('revisionLog');
+    viewModel = getComponentVM(Component);
   });
 
   describe('defining default scope values', function () {
@@ -41,7 +43,7 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     afterAll(function () {
-      viewModel = GGRC.Components.getViewModel('revisionLog');
+      viewModel = getComponentVM(Component);
     });
 
     it('displays a toaster error if fetching the data fails', function () {
@@ -117,7 +119,7 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     afterAll(function () {
-      viewModel = GGRC.Components.getViewModel('revisionLog');
+      viewModel = getComponentVM(Component);
     });
 
     it('computes an empty list on empty Revision history', function () {
@@ -196,7 +198,7 @@ describe('GGRC.Components.revisionLog', function () {
 
     afterAll(function () {
       GGRC.model_attr_defs = origModelAttrDefs;
-      viewModel = GGRC.Components.getViewModel('revisionLog');
+      viewModel = getComponentVM(Component);
     });
 
     it('includes the modification time in the result', function () {
@@ -490,7 +492,7 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     afterAll(function () {
-      viewModel = GGRC.Components.getViewModel('revisionLog');
+      viewModel = getComponentVM(Component);
     });
 
     beforeEach(function () {
@@ -600,7 +602,7 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     afterAll(function () {
-      viewModel = GGRC.Components.getViewModel('revisionLog');
+      viewModel = getComponentVM(Component);
     });
 
     it('creates a list of mapping changes from a Revision list', function () {
@@ -633,7 +635,7 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     afterAll(function () {
-      viewModel = GGRC.Components.getViewModel('revisionLog');
+      viewModel = getComponentVM(Component);
     });
 
     it('returns correct change information when the instance is at the ' +
@@ -946,7 +948,7 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     afterAll(function () {
-      viewModel = GGRC.Components.getViewModel('revisionLog');
+      viewModel = getComponentVM(Component);
     });
     it('returns current max role when no revisions exist', function () {
       let roleHistory = viewModel._computeRoleChanges([]);
@@ -1040,7 +1042,7 @@ describe('GGRC.Components.revisionLog', function () {
     });
 
     afterAll(function () {
-      viewModel = GGRC.Components.getViewModel('revisionLog');
+      viewModel = getComponentVM(Component);
     });
     it('returns correct role for a given person at initial time', function () {
       expect(viewModel
@@ -1090,7 +1092,7 @@ describe('GGRC.Components.revisionLog', function () {
     let viewModel;
 
     beforeEach(() => {
-      viewModel = GGRC.Components.getViewModel('revisionLog');
+      viewModel = getComponentVM(Component);
     });
 
     it('should return TRUE. empty arrays', () => {
@@ -1131,7 +1133,7 @@ describe('GGRC.Components.revisionLog', function () {
     let viewModel;
 
     beforeEach(() => {
-      viewModel = GGRC.Components.getViewModel('revisionLog');
+      viewModel = getComponentVM(Component);
     });
 
     it('should return array with users emails', () => {
@@ -1159,7 +1161,7 @@ describe('GGRC.Components.revisionLog', function () {
     let viewModel;
 
     beforeEach(() => {
-      viewModel = GGRC.Components.getViewModel('revisionLog');
+      viewModel = getComponentVM(Component);
     });
 
     it('should return empty list. ACL is undefined', () => {

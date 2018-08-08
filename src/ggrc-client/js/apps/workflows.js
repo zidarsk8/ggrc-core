@@ -287,7 +287,7 @@ import CycleTaskEntry from '../models/service-models/cycle-task-entry';
     let subTreeItems = ['Cycle'];
     let models = ['TaskGroup', 'Workflow', 'CycleTaskEntry',
       'CycleTaskGroupObjectTask', 'CycleTaskGroupObject', 'CycleTaskGroup'];
-    _.each(_workflowObjectTypes, function (type) {
+    _.forEach(_workflowObjectTypes, function (type) {
       let widget;
       if (!type || !treeWidgets[type]) {
         return;

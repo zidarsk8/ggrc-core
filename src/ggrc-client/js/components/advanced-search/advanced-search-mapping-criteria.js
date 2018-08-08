@@ -134,7 +134,7 @@ let viewModel = can.Map.extend({
       .value();
 
     if (!this.attr('criteria.objectName')) {
-      this.attr('criteria.objectName', _.first(types).model_singular);
+      this.attr('criteria.objectName', _.head(types).model_singular);
     }
 
     return types;

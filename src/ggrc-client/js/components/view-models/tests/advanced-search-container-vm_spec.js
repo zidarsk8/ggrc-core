@@ -6,7 +6,7 @@
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 import AdvancedSearchContainer from '../../view-models/advanced-search-container-vm';
 
-describe('AdvancedSearchContainer', function () {
+describe('advanced-search-container viewModel', function () {
   'use strict';
 
   let viewModel;

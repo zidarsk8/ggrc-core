@@ -4,14 +4,15 @@
  */
 
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
-import Component from '../related-people-access-control-group';
 import Permission from '../../../permission';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../related-people-access-control-group';
 
-describe('GGRC.Components.relatedPeopleAccessControlGroup', () => {
+describe('related-people-access-control-group component', () => {
   let viewModel;
 
   beforeEach(() => {
-    viewModel = new (can.Map.extend(Component.prototype.viewModel));
+    viewModel = getComponentVM(Component);
     viewModel.attr('instance', {});
   });
 

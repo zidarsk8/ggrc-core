@@ -3,20 +3,21 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import component from '../comment-data-provider';
+import Component from '../comment-data-provider';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 
-describe('GGRC.Component.commentDataProvider', ()=> {
+describe('comment-data-provider component', ()=> {
   let viewModel;
 
   beforeEach(()=> {
-    viewModel = new (can.Map.extend(component.prototype.viewModel));
+    viewModel = getComponentVM(Component);
   });
 
   describe('init() method', ()=> {
     let method;
     beforeEach(()=> {
-      method = component.prototype.init.bind({viewModel});
+      method = Component.prototype.init.bind({viewModel});
     });
 
     it('loads comments', ()=> {

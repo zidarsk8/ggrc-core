@@ -7,12 +7,13 @@ import * as caUtils from '../../../plugins/utils/ca-utils';
 import Component from '../revisions-comparer';
 import RefreshQueue from '../../../models/refresh_queue';
 import Revision from '../../../models/service-models/revision';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
-describe('GGRC.Components.revisionsComparer', function () {
+describe('revisions-comparer companent', function () {
   let viewModel;
 
   beforeEach(function () {
-    viewModel = new (can.Map.extend(Component.prototype.viewModel));
+    viewModel = getComponentVM(Component);
   });
 
   describe('prepareInstances() method', function () {

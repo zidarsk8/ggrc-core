@@ -65,7 +65,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
     let page_instance = getPageInstance();
     let tree_widgets = GGRC.tree_view.base_widgets_by_type;
 
-    _.each(_risk_assessments_object_types, function (type) {
+    _.forEach(_risk_assessments_object_types, function (type) {
       if (!type || !tree_widgets[type]) {
         return;
       }

@@ -3,15 +3,16 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component,
 {FLOAT_NUMBER_PATTERN, INT_NUMBER_PATTERN, NEGATIVE_NUMBER_PATTERN}
   from '../numberbox';
 
-describe('GGRC.Components.numberbox', () => {
+describe('numberbox component', () => {
   let viewModel;
 
   beforeAll(() => {
-    viewModel = new (can.Map.extend(Component.prototype.viewModel));
+    viewModel = getComponentVM(Component);
   });
 
   function checkAllNumbers(testMethod) {
@@ -23,7 +24,7 @@ describe('GGRC.Components.numberbox', () => {
       result = testMethod(keyValue);
       expect(result).toBeTruthy();
     }
-  };
+  }
 
   function checkNotNumberSymbols(testMethod) {
     const charSet = 'abcdef[]{}=+()@#$%^&*!,/?ZXYW';

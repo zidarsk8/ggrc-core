@@ -25,7 +25,7 @@ export default can.Component.extend({
         title: 'No template',
         value: '',
       };
-      _.each(responses, function (instance) {
+      _.forEach(responses, function (instance) {
         let type;
         type = instance.template_object_type;
         if (!result[type]) {

@@ -8,6 +8,7 @@ import '../mixins/unique-title';
 import '../mixins/ca-update';
 import '../mixins/access-control-list';
 import '../mixins/base-notifications';
+import '../mixins/questionnaire';
 
 export default Cacheable('CMS.Models.AccessGroup', {
   root_object: 'access_group',
@@ -23,6 +24,7 @@ export default Cacheable('CMS.Models.AccessGroup', {
     'ca_update',
     'accessControlList',
     'base-notifications',
+    'questionnaire',
   ],
   is_custom_attributable: true,
   isRoleable: true,

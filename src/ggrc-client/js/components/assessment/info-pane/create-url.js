@@ -6,49 +6,45 @@
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 import Context from '../../../models/service-models/context';
 
-(function (GGRC, CMS, can) {
-  'use strict';
+export default can.Component.extend({
+  tag: 'create-url',
+  viewModel: {
+    value: null,
+    context: null,
+    create: function () {
+      let value = this.attr('value');
+      let self = this;
+      let evidence;
+      let attrs;
 
-  GGRC.Components('createUrl', {
-    tag: 'create-url',
-    viewModel: {
-      value: null,
-      context: null,
-      create: function () {
-        let value = this.attr('value');
-        let self = this;
-        let evidence;
-        let attrs;
+      if (!value || !value.length) {
+        notifier('error', 'Please enter a URL.');
+        return;
+      }
 
-        if (!value || !value.length) {
-          notifier('error', 'Please enter a URL.');
-          return;
-        }
+      attrs = {
+        link: value,
+        title: value,
+        context: this.attr('context') || new Context({id: null}),
+        kind: 'URL',
+        created_at: new Date(),
+        isDraft: true,
+        _stamp: Date.now(),
+      };
 
-        attrs = {
-          link: value,
-          title: value,
-          context: this.attr('context') || new Context({id: null}),
-          kind: 'URL',
-          created_at: new Date(),
-          isDraft: true,
-          _stamp: Date.now(),
-        };
-
-        evidence = new CMS.Models.Evidence(attrs);
-        this.dispatch({type: 'beforeCreate', items: [evidence]});
-        evidence.save()
-          .fail(function () {
-            notifier('error', 'Unable to create URL.');
-          })
-          .done(function (data) {
-            self.dispatch({type: 'created', item: data});
-            self.clear();
-          });
-      },
-      clear: function () {
-        this.attr('value', null);
-      },
+      evidence = new CMS.Models.Evidence(attrs);
+      this.dispatch({type: 'beforeCreate', items: [evidence]});
+      evidence.save()
+        .fail(function () {
+          notifier('error', 'Unable to create URL.');
+        })
+        .done(function (data) {
+          self.dispatch({type: 'created', item: data});
+          self.clear();
+        });
     },
-  });
-})(window.GGRC, window.CMS, window.can);
+    clear: function () {
+      this.attr('value', null);
+    },
+  },
+});

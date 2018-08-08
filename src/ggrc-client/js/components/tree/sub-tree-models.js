@@ -103,7 +103,7 @@ let events = {
   },
 };
 
-can.Component.extend({
+export default can.Component.extend({
   tag: 'sub-tree-models',
   template: template,
   viewModel: viewModel,

@@ -5,31 +5,27 @@
 
 import template from './mapping-type-selector.mustache';
 
-(function (can, GGRC) {
-  'use strict';
+export default can.Component.extend({
+  tag: 'mapping-type-selector',
+  template,
+  viewModel: {
+    disabled: false,
+    readonly: false,
+    types: [],
+    selectedType: '',
+  },
+  init: function () {
+    let selectedType = this.viewModel.selectedType;
+    let types = this.viewModel.types;
+    let groups = ['business', 'entities', 'governance'];
+    let values = [];
 
-  GGRC.Components('mappingTypeSelector', {
-    tag: 'mapping-type-selector',
-    template: template,
-    viewModel: {
-      disabled: false,
-      readonly: false,
-      types: [],
-      selectedType: '',
-    },
-    init: function () {
-      let selectedType = this.viewModel.selectedType;
-      let types = this.viewModel.types;
-      let groups = ['business', 'entities', 'governance'];
-      let values = [];
-
-      groups.forEach(function (name) {
-        let groupItems = types.attr(name + '.items');
-        values = values.concat(_.pluck(groupItems, 'value'));
-      });
-      if (values.indexOf(selectedType) < 0) {
-        this.viewModel.attr('selectedType', values[0]);
-      }
-    },
-  });
-})(window.can, window.GGRC);
+    groups.forEach(function (name) {
+      let groupItems = types.attr(name + '.items');
+      values = values.concat(_.map(groupItems, 'value'));
+    });
+    if (values.indexOf(selectedType) < 0) {
+      this.viewModel.attr('selectedType', values[0]);
+    }
+  },
+});

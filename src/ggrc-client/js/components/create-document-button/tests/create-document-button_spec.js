@@ -11,7 +11,7 @@ import {
   DOCUMENT_CREATE_FAILED,
 } from '../../../events/eventTypes';
 
-describe('CreateDocumentButton component', () => {
+describe('create-document-button component', () => {
   let viewModel;
   beforeEach(() => {
     viewModel = getComponentVM(Component);

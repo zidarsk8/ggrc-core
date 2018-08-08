@@ -7,15 +7,11 @@ import '../form/fields/dropdown-form-field';
 import '../person/person-data';
 import template from './readonly-inline-content.mustache';
 
-(function (can, GGRC) {
-  'use strict';
-
-  GGRC.Components('readonlyInlineContent', {
-    tag: 'readonly-inline-content',
-    template: template,
-    viewModel: {
-      withReadMore: false,
-      value: '@',
-    },
-  });
-})(window.can, window.GGRC);
+export default can.Component.extend({
+  tag: 'readonly-inline-content',
+  template,
+  viewModel: {
+    withReadMore: false,
+    value: '@',
+  },
+});

@@ -7,7 +7,7 @@ import component from '../workflow-start-cycle';
 import * as helpers from '../../../plugins/utils/workflow-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 
-describe('GGRC.WorkflowStartCycle', function () {
+describe('workflow-start-cycle component', function () {
   let events;
   beforeAll(function () {
     events = component.prototype.events;

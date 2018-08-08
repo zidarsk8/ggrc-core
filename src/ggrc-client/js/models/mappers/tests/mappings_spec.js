@@ -256,15 +256,5 @@ describe('Mappings', function () {
         expect(groups.governance.items.length).toEqual(0);
         expect(groups[type.category].items.length).toEqual(0);
       });
-    it('does nothing if singular title of cmsModel is "Reference"',
-      function () {
-        spyOn(Utils, 'getModelByType')
-          .and.returnValue({
-            title_singular: 'Reference',
-          });
-        Mappings._addFormattedType('name', groups);
-        expect(groups.governance.items.length).toEqual(0);
-        expect(groups[type.category].items.length).toEqual(0);
-      });
   });
 });

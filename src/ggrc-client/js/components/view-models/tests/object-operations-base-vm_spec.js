@@ -7,7 +7,7 @@ import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import ObjectOperationsBaseVM from '../object-operations-base-vm';
 import Mappings from '../../../models/mappers/mappings';
 
-describe('ObjectOperationsBaseVM', function () {
+describe('object-operations-base viewModel', function () {
   'use strict';
 
   let baseVM;

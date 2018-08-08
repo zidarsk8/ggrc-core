@@ -3,14 +3,17 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('showMore', function () {
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../show-more';
+
+describe('show-more component', function () {
   'use strict';
 
   let viewModel;
 
   describe('should have some default values', function () {
     beforeEach(function () {
-      viewModel = GGRC.Components.getViewModel('showMore');
+      viewModel = getComponentVM(Component);
     });
 
     it('and they should be correct', function () {
@@ -24,7 +27,7 @@ describe('showMore', function () {
     let items = new can.List([{id: 1}, {id: 2}]);
 
     beforeEach(function () {
-      viewModel = GGRC.Components.getViewModel('showMore');
+      viewModel = getComponentVM(Component);
       viewModel.attr('items', items);
     });
 
@@ -51,7 +54,7 @@ describe('showMore', function () {
     let items = new can.List([{id: 1}, {id: 2}]);
 
     beforeEach(function () {
-      viewModel = GGRC.Components.getViewModel('showMore');
+      viewModel = getComponentVM(Component);
       viewModel.attr('items', items);
     });
 
@@ -80,7 +83,7 @@ describe('showMore', function () {
     let items = new can.List([{id: 1}, {id: 2}]);
 
     beforeEach(function () {
-      viewModel = GGRC.Components.getViewModel('showMore');
+      viewModel = getComponentVM(Component);
       viewModel.attr('items', items);
     });
 
@@ -120,7 +123,7 @@ describe('showMore', function () {
     };
 
     beforeEach(function () {
-      viewModel = GGRC.Components.getViewModel('showMore');
+      viewModel = getComponentVM(Component);
     });
 
     it('should set shouldShowAll property when was false',

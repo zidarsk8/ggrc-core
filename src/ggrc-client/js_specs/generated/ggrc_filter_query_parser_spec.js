@@ -293,7 +293,7 @@ describe('GGRC.query_parser', function () {
         'title ~ "test\\""',
       ];
 
-      _.each(queries, function (query) {
+      _.forEach(queries, function (query) {
         let value = query.split('~')[1].trim().replace(/^"|"$/g, '');
         let result = GGRC.query_parser.parse(query);
 
@@ -309,7 +309,7 @@ describe('GGRC.query_parser', function () {
         'title ~ test\\"',
       ];
 
-      _.each(queries, function (query) {
+      _.forEach(queries, function (query) {
         let value = query.split('~')[1].trim();
         let result = GGRC.query_parser.parse(query);
 

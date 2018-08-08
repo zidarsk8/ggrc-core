@@ -21,7 +21,6 @@ dashboard-js-template-files:
   - base_objects/view_link.mustache
   - base_objects/unmap.mustache
   - base_objects/page_header.mustache
-  - base_objects/paginate.mustache
   - base_objects/search_actions.mustache
   - base_objects/search_result.mustache
   - base_objects/title.mustache
@@ -34,7 +33,6 @@ dashboard-js-template-files:
   - base_objects/mapper-item-description.mustache
   - base_objects/dashboard_widget.mustache
   - base_templates/mapped_objects.mustache
-  - base_templates/mapping_tree_view.mustache
   - assessments/assignable_extended_info.mustache
   - clauses/modal_content.mustache
   - contracts/modal_content.mustache
@@ -56,8 +54,6 @@ dashboard-js-template-files:
   - issues/info.mustache
   - issues/remediation_plan.mustache
   - issues/tree_add_item.mustache
-  - components/object-mapper/object-mapper.mustache #contains if_helpers
-  - components/datepicker/datepicker.mustache #contains if_helpers
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache
@@ -175,9 +171,6 @@ dashboard-js-template-files:
   - people_roles/info.mustache
   # ggrc_gdrive_integration
   - gdrive/auth_button.mustache
-  - gdrive/gapi_errors.mustache
-  - gdrive/gdrive_folder.mustache
-  - gdrive/gdrive_file.mustache
   - gdrive/confirm_buttons.mustache
   # ggrc_risk_assessments
   - dashboard/lhn_risk_assessments.mustache

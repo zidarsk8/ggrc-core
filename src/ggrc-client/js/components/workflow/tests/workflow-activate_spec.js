@@ -9,7 +9,7 @@ import * as helpers from '../../../plugins/utils/workflow-utils';
 import Permission from '../../../permission';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 
-describe('GGRC.WorkflowActivate', function () {
+describe('workflow-activate component', function () {
   let viewModel;
 
   beforeEach(function () {

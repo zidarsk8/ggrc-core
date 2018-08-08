@@ -471,7 +471,7 @@ export default can.Component.extend({
       );
 
       let updatedFormFields = convertValuesToFormFields(cavs);
-      let updatedFieldsIds = _.indexBy(updatedFormFields, 'id');
+      let updatedFieldsIds = _.keyBy(updatedFormFields, 'id');
 
       this.attr('formFields').forEach((field) => {
         let updatedField = updatedFieldsIds[field.attr('id')];

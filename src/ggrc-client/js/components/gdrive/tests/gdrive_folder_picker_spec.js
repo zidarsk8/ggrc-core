@@ -3,21 +3,22 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('GGRC.Components.gDriveFolderPicker', function () {
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../gdrive_folder_picker';
+
+describe('gdrive-folder-picker component', function () {
   'use strict';
 
-  let Component;
   let events;
   let viewModel;
   let folderId = 'folder id';
 
   beforeAll(function () {
-    Component = GGRC.Components.get('gDriveFolderPicker');
     events = Component.prototype.events;
   });
 
   beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('gDriveFolderPicker');
+    viewModel = getComponentVM(Component);
   });
 
   describe('events', function () {

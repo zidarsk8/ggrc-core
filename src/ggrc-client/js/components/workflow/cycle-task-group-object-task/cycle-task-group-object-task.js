@@ -32,7 +32,7 @@ let viewModel = can.Map.extend({
       dfdResult = new RefreshQueue()
         .enqueue(stubCycle)
         .trigger()
-        .then(_.first)
+        .then(_.head)
         .then(function (cycle) {
           this.attr('cycle', cycle);
           return cycle;
@@ -57,7 +57,7 @@ let viewModel = can.Map.extend({
     workflow = workflowStub.reify();
     return new RefreshQueue().enqueue(workflow)
       .trigger()
-      .then(_.first)
+      .then(_.head)
       .then(function (loadedWorkflow) {
         this.attr('workflow', loadedWorkflow);
       }.bind(this));

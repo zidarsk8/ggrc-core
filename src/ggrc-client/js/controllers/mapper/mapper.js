@@ -88,11 +88,11 @@ const ObjectMapper = can.Control.extend({
         config: getConfigForCommonObjects(data).general,
       }];
 
-      _.extend(config.general, {useSnapshots: true});
-      _.extend(config.special, special);
+      _.assign(config.general, {useSnapshots: true});
+      _.assign(config.special, special);
 
       if (data.is_new) {
-        _.extend(config.general, {
+        _.assign(config.general, {
           object: data.join_object_type,
           type: data.join_option_type,
           isNew: true,
@@ -127,7 +127,7 @@ const ObjectMapper = can.Control.extend({
           return;
         }
 
-        _.extend(config.general, {
+        _.assign(config.general, {
           object: data.join_object_type,
           'join-object-id': data.join_object_id,
           type: data.join_option_type,
@@ -172,7 +172,7 @@ const ObjectMapper = can.Control.extend({
     function getConfigForCommonObjects(data) {
       let base = getBaseConfig();
 
-      _.extend(base.general, {
+      _.assign(base.general, {
         object: data.join_object_type,
         type: data.join_option_type,
         'join-object-id': data.join_object_id,

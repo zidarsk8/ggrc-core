@@ -4,14 +4,18 @@
 */
 
 import * as ModalsUtils from '../../../plugins/utils/modals';
-import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
+import {
+  makeFakeInstance,
+  getComponentVM,
+} from '../../../../js_specs/spec_helpers';
+import Component from '../info-pane/confirm-edit-action';
 
-describe('GGRC.Components.confirmEditAction', function () {
+describe('confirm-edit-action component', function () {
   let viewModel;
 
   beforeEach(function () {
     const instance = makeFakeInstance({model: CMS.Models.Assessment})();
-    viewModel = GGRC.Components.getViewModel('confirmEditAction');
+    viewModel = getComponentVM(Component);
     viewModel.attr('instance', instance);
   });
 

@@ -6,13 +6,13 @@
 import Component from '../tree-status-filter';
 import * as StateUtils from '../../../plugins/utils/state-utils';
 import router from '../../../router';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
-
-describe('treeStatusFilter', () => {
+describe('tree-status-filter component', () => {
   let viewModel;
 
   beforeEach(() => {
-    viewModel = new Component.prototype.viewModel();
+    viewModel = getComponentVM(Component);
   });
 
   describe('buildSearchQuery() method', () => {
