@@ -31,7 +31,6 @@ export default Cacheable('CMS.Models.Program', {
   isRoleable: true,
   attributes: {
     context: 'CMS.Models.Context.stub',
-    owners: 'CMS.Models.Person.stubs',
     modified_by: 'CMS.Models.Person.stub',
     object_people: 'CMS.Models.ObjectPerson.stubs',
     audits: 'CMS.Models.Audit.stubs',
