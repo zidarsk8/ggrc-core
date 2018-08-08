@@ -70,7 +70,6 @@ export default Cacheable('CMS.Models.Directive', {
     people: 'CMS.Models.Person.stubs',
     programs: 'CMS.Models.Program.stubs',
     requirements: 'CMS.Models.get_stubs',
-    controls: 'CMS.Models.Control.stubs',
   },
   init: function () {
     this.validateNonBlank('title');

@@ -33,7 +33,6 @@ export default Cacheable('CMS.Models.Threat', {
     people: 'CMS.Models.Person.stubs',
     object_objectives: 'CMS.Models.ObjectObjective.stubs',
     object_controls: 'CMS.Models.ObjectControl.stubs',
-    controls: 'CMS.Models.Control.stubs',
     object_sections: 'CMS.Models.ObjectSection.stubs',
     requirements: 'CMS.Models.get_stubs',
   },

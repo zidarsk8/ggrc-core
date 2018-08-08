@@ -34,7 +34,6 @@ export default Cacheable('CMS.Models.Objective', {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
     requirements: 'CMS.Models.get_stubs',
-    controls: 'CMS.Models.Control.stubs',
     object_people: 'CMS.Models.ObjectPerson.stubs',
     objective_objects: 'CMS.Models.ObjectObjective.stubs',
   },

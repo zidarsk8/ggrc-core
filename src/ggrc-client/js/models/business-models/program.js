@@ -37,7 +37,6 @@ export default Cacheable('CMS.Models.Program', {
     people: 'CMS.Models.Person.stubs',
     requirements: 'CMS.Models.get_stubs',
     directives: 'CMS.Models.Directive.stubs',
-    controls: 'CMS.Models.Control.stubs',
     audits: 'CMS.Models.Audit.stubs',
   },
   programRoles: ['Program Managers', 'Program Editors', 'Program Readers'],
