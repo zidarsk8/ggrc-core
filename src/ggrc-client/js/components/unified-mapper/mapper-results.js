@@ -25,7 +25,7 @@ import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import Pagination from '../base-objects/pagination';
 import tracker from '../../tracker';
 import DisplayPrefs from '../../models/local-storage/display-prefs';
-import Snapshot from '../../models/join-models/snapshot';
+import Snapshot from '../../models/service-models/snapshot';
 
 const DEFAULT_PAGE_SIZE = 10;
 

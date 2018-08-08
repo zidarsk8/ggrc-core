@@ -12,7 +12,7 @@ import RefreshQueue from '../../models/refresh_queue';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import Revision from '../../models/service-models/revision';
 import Person from '../../models/business-models/person';
-import Snapshot from '../../models/join-models/snapshot';
+import Snapshot from '../../models/service-models/snapshot';
 
 export default can.Component.extend({
   tag: 'revisions-comparer',

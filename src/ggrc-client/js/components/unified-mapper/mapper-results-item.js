@@ -9,7 +9,7 @@ import './mapper-results-item-attrs';
 import '../view-object-buttons/view-object-buttons';
 import '../object-selection/object-selection-item';
 import template from './templates/mapper-results-item.mustache';
-import Snapshot from '../../models/join-models/snapshot';
+import Snapshot from '../../models/service-models/snapshot';
 
 export default can.Component.extend({
   tag: 'mapper-results-item',
