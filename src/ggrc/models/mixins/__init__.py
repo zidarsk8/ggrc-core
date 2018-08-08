@@ -542,9 +542,11 @@ class Slugged(Base):
     """Validates slug for presence of forbidden symbols"""
     # pylint: disable=no-self-use
     if value:
-      logger.warning("Slug \"%s\" contains unsupported leading or trailing "
-                     "whitespace. Slug will be trimmed.", value)
-      value = value.strip()
+      new_value = value.strip()
+      if new_value != value:
+        logger.warning("Slug \"%s\" contains unsupported leading or trailing "
+                       "whitespace. Slug will be trimmed.", value)
+        value = new_value
     if value and "*" in value:
       raise exceptions.ValidationError(
           "Field 'Code' contains unsupported symbol '*'"
