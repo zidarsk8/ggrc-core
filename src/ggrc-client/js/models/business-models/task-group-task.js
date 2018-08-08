@@ -4,6 +4,7 @@
  */
 
 import Cacheable from '../cacheable';
+import Workflow from './workflow';
 import {getRole} from '../../plugins/utils/acl-utils';
 import {
   getClosestWeekday,
@@ -75,7 +76,7 @@ export default Cacheable('CMS.Models.TaskGroupTask', {
       let startDate = getDate(that.attr('start_date'));
       let endDate = getDate(that.attr('end_date'));
 
-      if (!(workflow instanceof CMS.Models.Workflow)) {
+      if (!(workflow instanceof Workflow)) {
         return;
       }
 

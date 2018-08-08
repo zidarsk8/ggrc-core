@@ -6,6 +6,7 @@
 import Revision from '../../../models/service-models/revision';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../revision-log';
+import Person from '../../../models/business-models/person';
 
 describe('revision-log component', function () {
   'use strict';
@@ -1140,7 +1141,7 @@ describe('revision-log component', function () {
       const userEmail = 'user@example.com';
       let result;
 
-      spyOn(CMS.Models.Person, 'findInCacheById')
+      spyOn(Person, 'findInCacheById')
         .and.returnValue({email: userEmail});
 
       result = viewModel._buildPeopleEmails([{id: 1}, {id: 2}]);

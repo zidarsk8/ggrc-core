@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import Person from '../../models/business-models/person';
+
 // #region ACL
 const buildAclObject = (person, roleId) => {
   return {
@@ -184,7 +186,7 @@ const getInstanceView = (instance) => {
 
   typeView = `${instance.class.table_plural}/info`;
 
-  if (instance instanceof CMS.Models.Person) {
+  if (instance instanceof Person) {
     view = `${GGRC.mustache_path}/people_roles/info.mustache`;
   } else if (typeView in GGRC.Templates) {
     view = `${GGRC.mustache_path}/${typeView}.mustache`;

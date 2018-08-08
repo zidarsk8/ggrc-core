@@ -9,6 +9,7 @@ import {
   initCounts,
   getPageInstance,
 } from '../../plugins/utils/current-page-utils';
+import Issue from '../../models/business-models/issue';
 
 export default can.Component.extend({
   tag: 'add-issue-button',
@@ -39,7 +40,7 @@ export default can.Component.extend({
     refreshIssueList: function (window, event, instance) {
       let model = 'Issue';
 
-      if (instance instanceof CMS.Models.Issue) {
+      if (instance instanceof Issue) {
         let pageInstance = getPageInstance();
         initCounts(
           [model],

@@ -5,6 +5,7 @@
 
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 import Context from '../../../models/service-models/context';
+import Evidence from '../../../models/business-models/evidence';
 
 export default can.Component.extend({
   tag: 'create-url',
@@ -32,7 +33,7 @@ export default can.Component.extend({
         _stamp: Date.now(),
       };
 
-      evidence = new CMS.Models.Evidence(attrs);
+      evidence = new Evidence(attrs);
       this.dispatch({type: 'beforeCreate', items: [evidence]});
       evidence.save()
         .fail(function () {

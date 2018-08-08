@@ -10,6 +10,8 @@ import {getRole} from './acl-utils';
 import Permission from '../../permission';
 import {hasRelatedAssessments} from './models-utils';
 import {getPageInstance} from '../utils/current-page-utils';
+import Person from '../../models/business-models/person';
+import Audit from '../../models/business-models/audit';
 
 /**
  * Util methods for work with Snapshots.
@@ -153,7 +155,7 @@ function toObject(instance) {
 
   if (content.access_control_list) {
     content.access_control_list.forEach(function (item) {
-      item.person = new CMS.Models.Person({id: item.person_id}).stub();
+      item.person = new Person({id: item.person_id}).stub();
     });
   }
 
@@ -165,8 +167,8 @@ function toObject(instance) {
   object.attr('originalLink', content.originalLink);
   // Update archived flag in content when audit is archived:
   if (instance.parent &&
-    CMS.Models.Audit.findInCacheById(instance.parent.id)) {
-    audit = CMS.Models.Audit.findInCacheById(instance.parent.id);
+    Audit.findInCacheById(instance.parent.id)) {
+    audit = Audit.findInCacheById(instance.parent.id);
     audit.bind('change', function () {
       let field = arguments[1];
       let newValue = arguments[3];

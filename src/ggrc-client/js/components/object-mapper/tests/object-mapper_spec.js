@@ -7,6 +7,7 @@ import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import RefreshQueue from '../../../models/refresh_queue';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import Component from '../object-mapper';
+import Program from '../../../models/business-models/program';
 
 describe('object-mapper component', function () {
   let events;
@@ -416,7 +417,7 @@ describe('object-mapper component', function () {
       instance = new can.Map({
         refresh: $.noop,
       });
-      spyOn(CMS.Models.Program, 'findInCacheById')
+      spyOn(Program, 'findInCacheById')
         .and.returnValue(instance);
       event = {
         preventDefault: function () {},

@@ -14,6 +14,9 @@ import {
   getAssigneeType,
 } from '../ggrc_utils';
 import Mappings from '../../models/mappers/mappings';
+import Program from '../../models/business-models/program';
+import Audit from '../../models/business-models/audit';
+import Person from '../../models/business-models/person';
 
 'use strict';
 
@@ -28,10 +31,10 @@ describe('allowedToMap() method', function () {
 
   describe('given an Audit and Program pair', function () {
     beforeEach(function () {
-      fakeProgram = makeFakeInstance({model: CMS.Models.Program})({
+      fakeProgram = makeFakeInstance({model: Program})({
         type: 'Program',
       });
-      fakeAudit = makeFakeInstance({model: CMS.Models.Audit})({
+      fakeAudit = makeFakeInstance({model: Audit})({
         type: 'Program',
       });
 
@@ -67,7 +70,7 @@ describe('allowedToMap() method', function () {
     });
 
     beforeEach(function () {
-      person = makeFakeInstance({model: CMS.Models.Person})({type: 'Person'});
+      person = makeFakeInstance({model: Person})({type: 'Person'});
       otherInstance = new can.Model({type: 'Foo'});
     });
 

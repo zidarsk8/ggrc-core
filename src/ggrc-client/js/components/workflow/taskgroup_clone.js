@@ -6,6 +6,7 @@
 import Cacheable from '../../models/cacheable';
 import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
 import {refreshTGRelatedItems} from '../../plugins/utils/workflow-utils';
+import TaskGroup from '../../models/business-models/task-group';
 
 let CloneTaskGroup = Cacheable({
   defaults: {
@@ -18,7 +19,7 @@ let CloneTaskGroup = Cacheable({
     return $.when(this);
   },
   save() {
-    const task_group = new CMS.Models.TaskGroup({
+    const task_group = new TaskGroup({
       clone: this.source_task_group.id,
       context: null,
       clone_objects: this.clone_objects,

@@ -9,6 +9,7 @@ import * as SnapshotUtils from '../utils/snapshot-utils';
 import * as CurrentPageUtils from '../utils/current-page-utils';
 import * as QueryAPI from '../utils/query-api-utils';
 import Mappings from '../../models/mappers/mappings';
+import Audit from '../../models/business-models/audit';
 
 describe('GGRC Utils CurrentPage', function () {
   let pageType;
@@ -26,7 +27,7 @@ describe('GGRC Utils CurrentPage', function () {
 
   beforeEach(function () {
     GGRC.pageType = undefined;
-    GGRC._page_instance = makeFakeInstance({model: CMS.Models.Audit})({
+    GGRC._page_instance = makeFakeInstance({model: Audit})({
       id: 1,
       type: 'Audit',
     });

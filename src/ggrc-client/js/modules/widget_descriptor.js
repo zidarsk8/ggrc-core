@@ -7,6 +7,7 @@ import SummaryWidgetController from '../controllers/summary_widget_controller';
 import DashboardWidget from '../controllers/dashboard_widget_controller';
 import InfoWidget from '../controllers/info_widget_controller';
 import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
+import Program from '../models/business-models/program';
 
 (function ($, CMS, GGRC) {
   // A widget descriptor has the minimum five properties:
@@ -122,7 +123,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
         widget_guard: function () {
           if (
             farModel.title_plural === 'Audits' &&
-            instance instanceof CMS.Models.Program
+            instance instanceof Program
           ) {
             return 'context' in instance && !!(instance.context.id);
           }

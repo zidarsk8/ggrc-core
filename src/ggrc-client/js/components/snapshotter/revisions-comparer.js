@@ -11,6 +11,8 @@ import {
 import RefreshQueue from '../../models/refresh_queue';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import Revision from '../../models/service-models/revision';
+import Person from '../../models/business-models/person';
+import Snapshot from '../../models/join-models/snapshot';
 
 export default can.Component.extend({
   tag: 'revisions-comparer',
@@ -114,7 +116,7 @@ export default can.Component.extend({
       let refreshQueue = new RefreshQueue();
 
       instance.attr('access_control_list').forEach((acl) => {
-        let person = CMS.Models.Person.findInCacheById(acl.person.id) || {};
+        let person = Person.findInCacheById(acl.person.id) || {};
         if (!person.email) {
           refreshQueue.enqueue(acl.person);
         }
@@ -209,7 +211,7 @@ export default can.Component.extend({
 
         if (content.access_control_list) {
           content.access_control_list.forEach(function (item) {
-            let stub = new CMS.Models.Person({id: item.person_id}).stub();
+            let stub = new Person({id: item.person_id}).stub();
             item.attr('person', stub);
           });
         }
@@ -241,7 +243,7 @@ export default can.Component.extend({
       });
     },
     updateRevision: function () {
-      let instance = new CMS.Models.Snapshot(this.instance.snapshot);
+      let instance = new Snapshot(this.instance.snapshot);
 
       // close info-pane
       $('info-pin-buttons:visible [data-trigger="close"]')

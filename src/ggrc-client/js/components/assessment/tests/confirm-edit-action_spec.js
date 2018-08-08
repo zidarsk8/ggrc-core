@@ -9,12 +9,13 @@ import {
   getComponentVM,
 } from '../../../../js_specs/spec_helpers';
 import Component from '../info-pane/confirm-edit-action';
+import Assessment from '../../../models/business-models/assessment';
 
 describe('confirm-edit-action component', function () {
   let viewModel;
 
   beforeEach(function () {
-    const instance = makeFakeInstance({model: CMS.Models.Assessment})();
+    const instance = makeFakeInstance({model: Assessment})();
     viewModel = getComponentVM(Component);
     viewModel.attr('instance', instance);
   });

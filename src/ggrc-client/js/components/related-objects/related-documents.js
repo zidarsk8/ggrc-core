@@ -18,6 +18,8 @@ import {
 import pubsub from '../../pub-sub';
 import Relationship from '../../models/join-models/relationship';
 import Context from '../../models/service-models/context';
+import Evidence from '../../models/business-models/evidence';
+import Document from '../../models/business-models/document';
 
 let DOCUMENT_KIND_MAP = {
   FILE: 'documents_file',
@@ -269,8 +271,8 @@ export default can.Component.extend({
     },
     '{pubsub} objectDeleted'(pubsub, event) {
       let instance = event.instance;
-      if (instance instanceof CMS.Models.Evidence ||
-        instance instanceof CMS.Models.Document) {
+      if (instance instanceof Evidence ||
+        instance instanceof Document) {
         this.viewModel.refreshRelatedDocuments();
       }
     },

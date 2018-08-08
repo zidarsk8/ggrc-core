@@ -4,12 +4,15 @@
  */
 
 import Relationship from '../models/join-models/relationship';
+import AssessmentTemplate from '../models/business-models/assessment-template';
+import Issue from '../models/business-models/issue';
+import Requirement from '../models/business-models/requirement';
 
 (function (can, $) {
   can.Control('GGRC.Controllers.PbcWorkflows', {}, {
     '{CMS.Models.AssessmentTemplate} updated': function (model, ev, instance) {
       // Make sure instance.custom_attribute_definitions cache is cleared
-      if (!(instance instanceof CMS.Models.AssessmentTemplate)) {
+      if (!(instance instanceof AssessmentTemplate)) {
         return;
       }
       instance.custom_attribute_definitions.splice(0,
@@ -18,7 +21,7 @@ import Relationship from '../models/join-models/relationship';
     '{CMS.Models.Issue} created': function (model, ev, instance) {
       let dfd;
 
-      if (!(instance instanceof CMS.Models.Issue)) {
+      if (!(instance instanceof Issue)) {
         return;
       }
 
@@ -34,7 +37,7 @@ import Relationship from '../models/join-models/relationship';
     '{CMS.Models.Requirement} created': function (model, ev, instance) {
       let directiveDfd;
 
-      if (!(instance instanceof CMS.Models.Requirement)) {
+      if (!(instance instanceof Requirement)) {
         return;
       }
 

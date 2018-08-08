@@ -48,6 +48,10 @@ import {
 } from '../../plugins/utils/notifiers-utils';
 import Relationship from '../../models/join-models/relationship';
 import DisplayPrefs from '../../models/local-storage/display-prefs';
+import Person from '../../models/business-models/person';
+import Assessment from '../../models/business-models/assessment';
+import Objective from '../../models/business-models/objective';
+import Requirement from '../../models/business-models/requirement';
 
 export default can.Control({
   pluginName: 'ggrc_controllers_modals',
@@ -91,14 +95,14 @@ export default can.Control({
     // loaded before rendering the form, otherwise initial validation can
     // incorrectly fail for form fields whose values rely on current user's
     // attributes.
-    currentUser = CMS.Models.Person.store[GGRC.current_user.id];
+    currentUser = Person.store[GGRC.current_user.id];
 
     if (currentUser) {
       currentUser = currentUser.reify();
     }
 
     if (!currentUser) {
-      userFetch = CMS.Models.Person.findOne({id: GGRC.current_user.id});
+      userFetch = Person.findOne({id: GGRC.current_user.id});
     } else if (currentUser && !currentUser.email) {
       // If email - a required attribute - is missing, the user object is
       // not fully loaded and we need to force-fetch it first - yes, it can
@@ -340,7 +344,7 @@ export default can.Control({
     dfd.then(function () {
       if (instance &&
         _.exists(instance, 'class.is_custom_attributable') &&
-        !(instance instanceof CMS.Models.Assessment)) {
+        !(instance instanceof Assessment)) {
         return $.when(
           instance.load_custom_attribute_definitions &&
           instance.load_custom_attribute_definitions(),
@@ -1055,11 +1059,11 @@ export default can.Control({
 
         // If this was an Objective created directly from a Requirement, create a join
         params = that.options.object_params;
-        if (obj instanceof CMS.Models.Objective &&
+        if (obj instanceof Objective &&
           params && params.section) {
           new Relationship({
             source: obj,
-            destination: CMS.Models.Requirement
+            destination: Requirement
               .findInCacheById(params.section.id),
             context: {id: null},
           }).save()

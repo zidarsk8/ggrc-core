@@ -18,6 +18,7 @@ import {
   inferObjectType,
 } from '../plugins/utils/models-utils';
 import Relationship from '../models/join-models/relationship';
+import Assessment from '../models/business-models/assessment';
 
 export default can.Control({
   defaults: {
@@ -97,7 +98,7 @@ export default can.Control({
   '{CMS.Models.Relationship} destroyed': 'onRelationshipChange',
   '{CMS.Models.Relationship} created': 'onRelationshipChange',
   '{CMS.Models.Assessment} updated': function (model, ev, instance) {
-    if (instance instanceof CMS.Models.Assessment) {
+    if (instance instanceof Assessment) {
       this.options.forceRefresh = true;
     }
   },

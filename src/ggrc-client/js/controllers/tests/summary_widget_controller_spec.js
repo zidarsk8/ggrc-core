@@ -8,6 +8,7 @@ import * as CurrentPageUtils from '../../plugins/utils/current-page-utils';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 import Relationship from '../../models/join-models/relationship';
+import Assessment from '../../models/business-models/assessment';
 
 describe('SummaryWidgetController', function () {
   'use strict';
@@ -26,7 +27,7 @@ describe('SummaryWidgetController', function () {
     });
 
     it('sets true to options.forceRefresh', function () {
-      let assessment = makeFakeInstance({model: CMS.Models.Assessment})();
+      let assessment = makeFakeInstance({model: Assessment})();
       method({}, {}, assessment);
       expect(ctrlInst.options.forceRefresh).toBe(true);
     });

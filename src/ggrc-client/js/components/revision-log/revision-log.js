@@ -14,6 +14,7 @@ import {
   getHighestAssigneeRole,
 } from '../../plugins/ggrc_utils';
 import Revision from '../../models/service-models/revision';
+import Person from '../../models/business-models/person';
 
 const EMPTY_DIFF_VALUE = '—';
 
@@ -310,7 +311,7 @@ export default can.Component.extend({
         }
 
         revision.content.access_control_list.forEach((aclItem) => {
-          if (!CMS.Models.Person.findInCacheById(aclItem.person.id)) {
+          if (!Person.findInCacheById(aclItem.person.id)) {
             refreshQueue.enqueue(aclItem.person);
           }
         });
@@ -331,8 +332,8 @@ export default can.Component.extend({
      */
     _buildPeopleEmails: function (people) {
       const peopleList = people.map((person) =>
-        CMS.Models.Person.findInCacheById(person.id) ?
-          CMS.Models.Person.findInCacheById(person.id).email :
+        Person.findInCacheById(person.id) ?
+          Person.findInCacheById(person.id).email :
           ''
       );
 
@@ -532,7 +533,7 @@ export default can.Component.extend({
             if (!value.attribute_object) {
               return;
             }
-            obj = CMS.Models.Person
+            obj = Person
               .findInCacheById(value.attribute_object_id);
             if (obj === undefined) {
               return value.attribute_value;
