@@ -41,7 +41,6 @@ export default Cacheable('CMS.Models.Control', {
     kind: 'CMS.Models.Option.stub',
     means: 'CMS.Models.Option.stub',
     verify_frequency: 'CMS.Models.Option.stub',
-    secondary_assessor: 'CMS.Models.Person.stub',
   },
   links_to: {},
   defaults: {
