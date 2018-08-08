@@ -34,7 +34,6 @@ export default Cacheable('CMS.Models.Product', {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
     object_people: 'CMS.Models.ObjectPerson.stubs',
-    people: 'CMS.Models.Person.stubs',
     kind: 'CMS.Models.Option.stub',
   },
   tree_view_options: {
