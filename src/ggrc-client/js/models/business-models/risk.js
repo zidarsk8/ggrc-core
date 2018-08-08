@@ -31,7 +31,6 @@ export default Cacheable('CMS.Models.Risk', {
   attributes: {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
-    objects: 'CMS.Models.get_stubs',
   },
   tree_view_options: {
     add_item_view:
