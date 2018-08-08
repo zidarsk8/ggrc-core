@@ -447,10 +447,18 @@ class Resource(ModelView):
         except (IntegrityError, ValidationError, ValueError) as err:
           logger.exception(err)
           message = translate_message(err)
-          raise BadRequest(message)
+          if settings.TESTING:
+            raise BadRequest(message)
+          else:
+            raise BadRequest("Server error occurred. Please contact your "
+                             "system administrator to receive more details.")
         except Exception as err:
           logger.exception(err)
-          raise
+          if settings.TESTING:
+            raise
+          else:
+            raise BadRequest("Server error occurred. Please contact your "
+                             "system administrator to receive more details.")
         finally:
           # When running integration tests, cache sometimes does not clear
           # correctly
