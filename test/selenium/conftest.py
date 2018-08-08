@@ -10,7 +10,8 @@ import os
 import urlparse
 
 import pytest
-from pytest_selenium import pytest_selenium
+# Wokaround https://github.com/pytest-dev/pytest/issues/3775
+from pytest_selenium import pytest_selenium as pt_selenium
 from selenium.webdriver.remote.remote_connection import (
     LOGGER as SELENIUM_LOGGER)
 
@@ -78,7 +79,7 @@ def patch_pytest_selenium_screenshot():
     if pytest_html is not None:
       extra.append(pytest_html.extras.image(screenshot, 'Screenshot'))
 
-  pytest_selenium._gather_screenshot = gather_screenshot
+  pt_selenium._gather_screenshot = gather_screenshot
 
 
 patch_pytest_selenium_screenshot()

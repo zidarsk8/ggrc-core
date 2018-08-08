@@ -4,5 +4,5 @@
 from lib import meta
 
 
-class MetaTestDecorator(meta.RequireDocs, meta.DecorateFlakyTests):
+class MetaTestDecorator(meta.RequireDocs):
   """Composition of multiple metaclasses"""
