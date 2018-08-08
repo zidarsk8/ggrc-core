@@ -27,13 +27,13 @@ export default Cacheable('CMS.Models.Workflow', {
     modified_by: 'CMS.Models.Person.stub',
     context: 'CMS.Models.Context.stub',
     repeat_every: 'number',
-    default_lhn_filters: {
-      Workflow: {status: 'Active'},
-      Workflow_All: {},
-      Workflow_Active: {status: 'Active'},
-      Workflow_Inactive: {status: 'Inactive'},
-      Workflow_Draft: {status: 'Draft'},
-    },
+  },
+  default_lhn_filters: {
+    Workflow: {status: 'Active'},
+    Workflow_All: {},
+    Workflow_Active: {status: 'Active'},
+    Workflow_Inactive: {status: 'Inactive'},
+    Workflow_Draft: {status: 'Draft'},
   },
   defaults: {
     task_group_title: 'Task Group 1',
