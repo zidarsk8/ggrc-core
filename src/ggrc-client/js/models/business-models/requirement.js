@@ -36,7 +36,6 @@ export default Cacheable('CMS.Models.Requirement', {
   attributes: {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
-    object_people: 'CMS.Models.ObjectPerson.stubs',
   },
   tree_view_options: {
     attr_view: '/static/mustache/requirements/tree-item-attr.mustache',

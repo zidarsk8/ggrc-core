@@ -32,7 +32,6 @@ export default Cacheable('CMS.Models.Program', {
   attributes: {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
-    object_people: 'CMS.Models.ObjectPerson.stubs',
     audits: 'CMS.Models.Audit.stubs',
   },
   programRoles: ['Program Managers', 'Program Editors', 'Program Readers'],

@@ -38,7 +38,6 @@ export default Cacheable('CMS.Models.Audit', {
     modified_by: 'CMS.Models.Person.stub',
     report_start_date: 'date',
     report_end_date: 'date',
-    object_people: 'CMS.Models.ObjectPerson.stubs',
     audit_firm: 'CMS.Models.OrgGroup.stub',
   },
   defaults: {
