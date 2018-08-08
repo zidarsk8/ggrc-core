@@ -67,7 +67,6 @@ export default Cacheable('CMS.Models.Directive', {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
     object_people: 'CMS.Models.ObjectPerson.stubs',
-    programs: 'CMS.Models.Program.stubs',
   },
   init: function () {
     this.validateNonBlank('title');

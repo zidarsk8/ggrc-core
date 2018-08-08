@@ -38,7 +38,6 @@ export default Cacheable('CMS.Models.Control', {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
     object_people: 'CMS.Models.ObjectPerson.stubs',
-    programs: 'CMS.Models.Program.stubs',
     kind: 'CMS.Models.Option.stub',
     means: 'CMS.Models.Option.stub',
     verify_frequency: 'CMS.Models.Option.stub',
