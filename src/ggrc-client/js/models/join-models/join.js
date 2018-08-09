@@ -42,15 +42,6 @@ export default Cacheable('can.Model.Join', {
     }
   },
 }, {
-  init: function () {
-    this._super(...arguments);
-    can.each(this.constructor.join_keys, function (cls, key) {
-      this.bind(key + '.stub_destroyed', function () {
-        // Trigger `destroyed` on self, since it was destroyed on the server
-        this.destroyed();
-      }.bind(this));
-    }.bind(this));
-  },
   reinit: function () {
     this.init_join_objects();
   },

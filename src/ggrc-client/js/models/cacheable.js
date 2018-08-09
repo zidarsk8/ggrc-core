@@ -1196,33 +1196,7 @@ can.Observe('can.Stub', {
     }
     return CMS.Models.stub_cache[type][id];
   },
-}, {
-  init: function () {
-    let that = this;
-    this._super(...arguments);
-    this._instance().bind('destroyed', function (ev) {
-      // Trigger propagating `change` event to convey `stub-destroyed` message
-      can.trigger(
-        that, 'change', ['stub_destroyed', 'stub_destroyed', that, null]);
-      delete CMS.Models.stub_cache[that.type][that.id];
-    });
-  },
-
-  _model: function () {
-    return CMS.Models[this.type] || GGRC.Models[this.type];
-  },
-
-  _instance: function () {
-    if (!this.__instance) {
-      this.__instance = this._model().model(this);
-    }
-    return this.__instance;
-  },
-
-  getInstance: function () {
-    return this._instance();
-  },
-});
+}, {});
 
 can.Observe.List.prototype.stubs = function () {
   return new can.Observe.List(can.map(this, function (obj) {
