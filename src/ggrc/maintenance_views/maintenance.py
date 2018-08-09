@@ -96,7 +96,7 @@ def run_migration():
   if "access_token" not in request.form:
     gae_user = users.get_current_user()
     if not (gae_user and gae_user.email() in settings.BOOTSTRAP_ADMIN_USERS):
-      return "Unauthorized", 403
+      return json.dumps({"message": "Unauthorized"}), 403
 
     trigger_migration()
     return redirect(url_for('index'))
