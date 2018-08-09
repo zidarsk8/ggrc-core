@@ -101,7 +101,7 @@ class TestIssueIntegration(ggrc.TestCase):
        {"priority": "P2"}),
       ({"issue_tracker": {"issue_severity": "S2", "enabled": True}},
        {"severity": "S2"}),
-      ({"issue_tracker": {"enabled": False}},
+      ({"issue_tracker": {"enabled": False, "hotlist_ids": [999, ]}},
        {"comment": "Changes to this GGRC object will no longer be "
                    "tracked within this bug."}),
   )
