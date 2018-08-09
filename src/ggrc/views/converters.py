@@ -28,7 +28,7 @@ from werkzeug.exceptions import (
 
 from ggrc import db
 from ggrc.app import app
-from ggrc.converters import get_exportables
+from ggrc.converters import get_exportables, errors
 from ggrc.converters.base import ImportConverter, ExportConverter
 from ggrc.converters.import_helper import count_objects, \
     read_csv_file, get_export_filename, get_object_column_definitions
@@ -56,15 +56,17 @@ logger = getLogger(__name__)
 
 def check_required_headers(required_headers):
   """Check required headers to the current request"""
-  errors = []
+  headers_errors = []
   for header, valid_values in required_headers.items():
     if header not in request.headers:
-      errors.append("Missing required header '{}'".format(header))
+      headers_errors.append(
+          "Missing required header '{}'".format(header))
     elif request.headers[header] not in valid_values:
-      errors.append("Invalid header value for '{}'".format(header))
+      headers_errors.append(
+          "Invalid header value for '{}'".format(header))
 
-  if errors:
-    raise BadRequest("\n".join(errors))
+  if headers_errors:
+    raise BadRequest("\n".join(headers_errors))
 
 
 def parse_export_request():
@@ -90,7 +92,7 @@ def export_file(export_to, filename, csv_string=None):
         ("Content-Disposition", "attachment"),
     ]
     return current_app.make_response((csv_string, 200, headers))
-  raise BadRequest("Bad params")
+  raise BadRequest(errors.BAD_PARAMS)
 
 
 def handle_export_request_error(handle_function):
@@ -103,17 +105,18 @@ def handle_export_request_error(handle_function):
     except BadQueryException as exception:
       raise BadRequest(exception.message)
     except Unauthorized as ex:
-      raise Unauthorized("{} Try to reload /export page".format(ex.message))
+      raise Unauthorized("%s %s" % (ex.message, errors.RELOAD_PAGE))
     except HttpError as e:
       message = json.loads(e.content).get("error").get("message")
       if e.resp.code == 401:
-        raise Unauthorized("{} Try to reload /export page".format(message))
+        raise Unauthorized("%s %s" % (message, errors.RELOAD_PAGE))
       raise InternalServerError(message)
     except Exception as e:  # pylint: disable=broad-except
-      logger.exception("Export failed: %s", e.message)
+      logger.exception("%s %s",
+                       errors.JOB_FAILED.format("Export"), e.message)
       if settings.TESTING:
         raise
-      raise InternalServerError("Export failed due to internal server error.")
+      raise InternalServerError(errors.INTERNAL_SERVER_ERROR.format("Export"))
   return handle_wrapper
 
 
@@ -170,10 +173,10 @@ def make_export(objects):
 def check_import_file():
   """Check if imported file format and type is valid"""
   if "file" not in request.files or not request.files["file"]:
-    raise BadRequest("Missing csv file")
+    raise BadRequest(errors.MISSING_FILE)
   csv_file = request.files["file"]
   if not csv_file.filename.lower().endswith(".csv"):
-    raise BadRequest("Invalid file type.")
+    raise BadRequest(errors.WRONG_FILE_TYPE.format(line=0))
   return csv_file
 
 
@@ -189,7 +192,7 @@ def parse_import_request():
     dry_run = request.headers["X-test-only"] == "true"
     return dry_run, file_data
   except:  # pylint: disable=bare-except
-    raise BadRequest("Export failed due incorrect request data.")
+    raise BadRequest(errors.INCORRECT_REQUEST_DATA.format("Export"))
 
 
 def handle_import_request():
@@ -216,14 +219,16 @@ def make_import(csv_data, dry_run):
     logger.exception("Import failed: %s", e.message)
     if settings.TESTING:
       raise
-    raise BadRequest("Import failed due to server error: %s" % e.message)
+    raise BadRequest("%s %s" %
+                     (errors.INTERNAL_SERVER_ERROR.format("Import"),
+                      e.message))
 
 
 def check_for_previous_run():
   """Check whether previous run is failed"""
   import webapp2  # pylint: disable=import-error
   if int(webapp2.get_request().headers["X-Appengine-Taskexecutioncount"]):
-    raise InternalServerError("previous run is failed")
+    raise InternalServerError(errors.PREVIOUS_RUN_FAILED)
 
 
 def run_export(objects, ie_id, user_id, url_root):
@@ -253,7 +258,7 @@ def run_export(objects, ie_id, user_id, url_root):
         db.session.commit()
         job_emails.send_email(job_emails.EXPORT_FAILED, user.email, url_root)
       except Exception as e:  # pylint: disable=broad-except
-        logger.exception("Failed to set job status: %s", e.message)
+        logger.exception("%s: %s", errors.STATUS_SET_FAILED, e.message)
 
 
 def run_import_phases(ie_id, user_id, url_root):  # noqa: ignore=C901
@@ -309,7 +314,8 @@ def run_import_phases(ie_id, user_id, url_root):  # noqa: ignore=C901
         job_emails.send_email(job_emails.IMPORT_COMPLETED, user.email,
                               url_root, ie_job.title)
     except Exception as e:  # pylint: disable=broad-except
-      logger.exception("Import failed: %s", e.message)
+      logger.exception("%s %s", errors.JOB_FAILED.format("Import"),
+                       e.message)
       try:
         ie_job.status = "Failed"
         ie_job.end_at = datetime.utcnow()
@@ -317,7 +323,7 @@ def run_import_phases(ie_id, user_id, url_root):  # noqa: ignore=C901
         job_emails.send_email(job_emails.IMPORT_FAILED, user.email,
                               url_root, ie_job.title)
       except Exception as e:  # pylint: disable=broad-except
-        logger.exception("Failed to set job status: %s", e.message)
+        logger.exception("%s: %s", errors.STATUS_SET_FAILED, e.message)
 
 
 def init_converter_views():
@@ -381,7 +387,7 @@ def handle_start(ie_job, user_id):
   elif ie_job.status == "Blocked":
     ie_job.status = "In Progress"
   else:
-    raise BadRequest("Wrong status")
+    raise BadRequest(errors.WRONG_STATUS)
   try:
     ie_job.start_at = datetime.utcnow()
     db.session.commit()
@@ -392,8 +398,8 @@ def handle_start(ie_job, user_id):
                    _queue="ggrcImport")
     return make_import_export_response(ie_job.log_json())
   except Exception as e:
-    logger.exception("Import failed: %s", e.message)
-    raise BadRequest("Import failed")
+    logger.exception("%s %s", errors.JOB_FAILED, e.message)
+    raise BadRequest(errors.JOB_FAILED)
 
 
 def handle_import_put(**kwargs):
@@ -404,20 +410,20 @@ def handle_import_put(**kwargs):
   if user.system_wide_role == 'No Access':
     raise Forbidden()
   if not ie_id or not command or command not in ("start", "stop"):
-    raise BadRequest("Import failed due incorrect request data")
+    raise BadRequest(errors.INCORRECT_REQUEST_DATA.format("Import"))
   try:
     ie_job = import_export.get(ie_id)
   except (Forbidden, NotFound):
     raise
   except Exception as e:
-    logger.exception("Import failed due incorrect request data: %s",
+    logger.exception("%s %s", errors.INCORRECT_REQUEST_DATA.format("Import"),
                      e.message)
-    raise BadRequest("Import failed due incorrect request data")
+    raise BadRequest(errors.INCORRECT_REQUEST_DATA.format("Import"))
   if command == 'start':
     return handle_start(ie_job, user.id)
   elif command == "stop":
     return handle_import_stop(**kwargs)
-  raise BadRequest("Bad params")
+  raise BadRequest(errors.BAD_PARAMS)
 
 
 def handle_import_get(**kwargs):
@@ -442,9 +448,9 @@ def handle_get(id2, command, job_type):
   except (Forbidden, NotFound):
     raise
   except Exception as e:
-    logger.exception("%s failed due incorrect request data: %s",
-                     job_type, e.message)
-    raise BadRequest("%s failed due incorrect request data" % job_type)
+    logger.exception("%s %s", errors.INCORRECT_REQUEST_DATA.format(job_type),
+                     e.message)
+    raise BadRequest(errors.INCORRECT_REQUEST_DATA.format(job_type))
 
   return make_import_export_response(res)
 
@@ -480,9 +486,9 @@ def handle_import_post(**kwargs):
   except Unauthorized:
     raise
   except Exception as e:
-    logger.exception("Import failed due incorrect request data: %s",
+    logger.exception("%s %s", errors.INCORRECT_REQUEST_DATA.format("Import"),
                      e.message)
-    raise BadRequest("Import failed due incorrect request data")
+    raise BadRequest(errors.INCORRECT_REQUEST_DATA.format("Import"))
 
 
 def handle_file_download(id2):
@@ -494,9 +500,10 @@ def handle_file_download(id2):
   except (Forbidden, NotFound, Unauthorized):
     raise
   except Exception as e:
-    logger.exception("Download failed due incorrect request data: %s",
+    logger.exception("%s %s",
+                     errors.INCORRECT_REQUEST_DATA.format("Download"),
                      e.message)
-    raise BadRequest("Download failed due incorrect request data")
+    raise BadRequest(errors.INCORRECT_REQUEST_DATA.format("Download"))
 
 
 def handle_export_put(**kwargs):
@@ -504,7 +511,7 @@ def handle_export_put(**kwargs):
   command = kwargs.get("command2")
   ie_id = kwargs.get("id2")
   if not ie_id or not command or command != "stop":
-    raise BadRequest("Export failed due incorrect request data")
+    raise BadRequest(errors.INCORRECT_REQUEST_DATA.format("Export"))
   return handle_export_stop(**kwargs)
 
 
@@ -522,7 +529,7 @@ def handle_export_post(**kwargs):
   if user.system_wide_role == 'No Access':
     raise Forbidden()
   if not objects or not current_time:
-    raise BadRequest("Export failed due incorrect request data")
+    raise BadRequest(errors.INCORRECT_REQUEST_DATA.format("Export"))
   try:
     filename = get_export_filename(objects, current_time)
     ie = import_export.create_import_export_entry(
@@ -539,9 +546,9 @@ def handle_export_post(**kwargs):
                    _queue="ggrcImport")
     return make_import_export_response(ie.log_json())
   except Exception as e:
-    logger.exception("Export failed due incorrect request data: %s",
+    logger.exception("%s %s", errors.INCORRECT_REQUEST_DATA.format("Export"),
                      e.message)
-    raise BadRequest("Export failed due incorrect request data")
+    raise BadRequest(errors.INCORRECT_REQUEST_DATA.format("Export"))
 
 
 def handle_delete(**kwargs):
@@ -555,9 +562,10 @@ def handle_delete(**kwargs):
   except (Forbidden, NotFound):
     raise
   except Exception as e:
-    logger.exception("Import/Export failed due incorrect request data: %s",
+    logger.exception("%s %s",
+                     errors.INCORRECT_REQUEST_DATA.format("Import/Export"),
                      e.message)
-    raise BadRequest("Import/Export failed due incorrect request data")
+    raise BadRequest(errors.INCORRECT_REQUEST_DATA.format("Import/Export"))
 
 
 def handle_import_stop(**kwargs):
@@ -571,12 +579,12 @@ def handle_import_stop(**kwargs):
   except Forbidden:
     raise
   except Exception as e:
-    logger.exception("Import stop failed due incorrect request data: %s",
+    logger.exception("%s %s", errors.INCORRECT_REQUEST_DATA.format("Import"),
                      e.message)
-    raise BadRequest("Import stop failed due incorrect request data")
+    raise BadRequest(errors.INCORRECT_REQUEST_DATA.format("Import"))
   # Need to implement a better solution in order to identify specific
   # errors like here
-  raise BadRequest("Wrong status")
+  raise BadRequest(errors.WRONG_STATUS)
 
 
 def handle_export_stop(**kwargs):
@@ -590,7 +598,7 @@ def handle_export_stop(**kwargs):
   except Forbidden:
     raise
   except Exception as e:
-    logger.exception("Export stop failed due incorrect request data: %s",
+    logger.exception("%s %s", errors.INCORRECT_REQUEST_DATA.format("Export"),
                      e.message)
-    raise BadRequest("Export stop failed due incorrect request data")
-  raise BadRequest("Wrong status")
+    raise BadRequest(errors.INCORRECT_REQUEST_DATA.format("Export"))
+  raise BadRequest(errors.WRONG_STATUS)

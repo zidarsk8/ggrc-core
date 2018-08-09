@@ -45,6 +45,7 @@ from ggrc.models.background_task import BackgroundTask, create_task
 from ggrc.query import utils as query_utils
 from ggrc import settings
 from ggrc.cache import utils as cache_utils
+from ggrc.utils import errors as ggrc_errors
 
 
 # pylint: disable=invalid-name
@@ -450,15 +451,13 @@ class Resource(ModelView):
           if settings.TESTING:
             raise BadRequest(message)
           else:
-            raise BadRequest("Server error occurred. Please contact your "
-                             "system administrator to receive more details.")
-        except Exception as err:
+            raise BadRequest(ggrc_errors.BAD_REQUEST_MESSAGE)
+        except Exception as err:  # pylint: disable=broad-except
           logger.exception(err)
           if settings.TESTING:
             raise
           else:
-            raise BadRequest("Server error occurred. Please contact your "
-                             "system administrator to receive more details.")
+            raise BadRequest(ggrc_errors.BAD_REQUEST_MESSAGE)
         finally:
           # When running integration tests, cache sometimes does not clear
           # correctly
