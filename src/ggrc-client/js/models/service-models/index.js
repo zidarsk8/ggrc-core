@@ -7,4 +7,5 @@ import './control-assertion';
 import './control-category';
 import './label';
 import './multitype-search';
+import './relationship';
 import './snapshot';

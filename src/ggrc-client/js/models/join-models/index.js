@@ -6,6 +6,5 @@
 import './join';
 import './multitype-search-join';
 import './object-person';
-import './relationship';
 import './task-group-object';
 import './user-role';

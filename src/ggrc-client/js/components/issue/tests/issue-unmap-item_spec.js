@@ -8,7 +8,7 @@ import Component from '../issue-unmap-item';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
-import Relationship from '../../../models/join-models/relationship';
+import Relationship from '../../../models/service-models/relationship';
 
 describe('issue-unmap-item component', ()=> {
   let viewModel;

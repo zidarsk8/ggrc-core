@@ -16,7 +16,7 @@ import {
   DESTINATION_UNMAPPED,
 } from '../../events/eventTypes';
 import pubsub from '../../pub-sub';
-import Relationship from '../../models/join-models/relationship';
+import Relationship from '../../models/service-models/relationship';
 import Context from '../../models/service-models/context';
 import Evidence from '../../models/business-models/evidence';
 import Document from '../../models/business-models/document';
