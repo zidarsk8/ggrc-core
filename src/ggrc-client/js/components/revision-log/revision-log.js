@@ -130,7 +130,7 @@ export default can.Component.extend({
           });
         _.forEach(mappingsSrc, function (revision) {
           if (revision.destination_type && revision.destination_id) {
-            revision.destination = can.Stub.get_or_create({
+            revision.destination = new can.Stub({
               id: revision.destination_id,
               type: revision.destination_type,
             });
@@ -139,7 +139,7 @@ export default can.Component.extend({
         });
         _.forEach(mappingsDest, function (revision) {
           if (revision.source_type && revision.source_id) {
-            revision.source = can.Stub.get_or_create({
+            revision.source = new can.Stub({
               id: revision.source_id,
               type: revision.source_type,
             });
@@ -202,7 +202,7 @@ export default can.Component.extend({
                 source_type: type,
                 source_id: id,
                 source: instance,
-                destination: can.Stub.get_or_create({
+                destination: can.Stub({
                   type: revision.destination_type,
                   id: revision.destination_id,
                 }),
@@ -223,7 +223,7 @@ export default can.Component.extend({
                 destination_type: type,
                 destination_id: id,
                 destination: instance,
-                source: can.Stub.get_or_create({
+                source: can.Stub({
                   type: revision.source_type,
                   id: revision.source_id,
                 }),

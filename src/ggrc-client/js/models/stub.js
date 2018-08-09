@@ -3,21 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-export default can.Observe('can.Stub', {
-  get_or_create: function (obj) {
-    let id = obj.id;
-    let stub;
-    let type = obj.type;
-
-    CMS.Models.stub_cache = CMS.Models.stub_cache || {};
-    CMS.Models.stub_cache[type] = CMS.Models.stub_cache[type] || {};
-    if (!CMS.Models.stub_cache[type][id]) {
-      stub = new can.Stub(obj);
-      CMS.Models.stub_cache[type][id] = stub;
-    }
-    return CMS.Models.stub_cache[type][id];
-  },
-}, {});
+export default can.Observe('can.Stub', {}, {});
 
 can.Observe.prototype.stub = function () {
   let type;
@@ -47,7 +33,7 @@ can.Observe.prototype.stub = function () {
     return null;
   }
 
-  return can.Stub.get_or_create({
+  return new can.Stub({
     id: id,
     href: this.selfLink || this.href,
     type: type,
