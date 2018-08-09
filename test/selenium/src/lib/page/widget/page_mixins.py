@@ -14,6 +14,9 @@ class WithPageElements(base.WithBrowser):
     """Return RelatedUrls page element with label `label`"""
     return page_elements.RelatedUrls(self._browser, label)
 
+  def _assessment_evidence_urls(self):
+    return page_elements.AssessmentEvidenceUrls(self._browser)
+
   def _comment_area(self):
     """Return CommentArea page element"""
     return page_elements.CommentArea(self._browser)

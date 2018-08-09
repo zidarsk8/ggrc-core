@@ -10,8 +10,7 @@
 import pytest
 
 from lib import base, url
-from lib.constants import messages, objects, element
-from lib.constants.element import AssessmentStates, ObjectStates
+from lib.constants import messages, objects, object_states
 from lib.constants.element import Lhn, MappingStatusAttrs
 from lib.entities.entity import Representation
 from lib.factory import get_cls_webui_service, get_cls_rest_service
@@ -600,10 +599,10 @@ class TestSnapshots(base.Test):
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
       "dynamic_objects, dynamic_relationships, expected_state",
-      [("new_assessment_rest", None, element.AssessmentStates.NOT_STARTED),
+      [("new_assessment_rest", None, object_states.NOT_STARTED),
        (["new_assessment_rest", "new_issue_rest"],
         "map_new_assessment_rest_to_new_control_rest_snapshot",
-        element.IssueStates.DRAFT)],
+        object_states.DRAFT)],
       ids=["Mapping snapshot of Control to Assessment",
            "Mapping Assessment with mapped snapshot of Control to Issue"],
       indirect=["dynamic_objects", "dynamic_relationships"])
@@ -647,12 +646,12 @@ class TestSnapshots(base.Test):
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
       "dynamic_objects, dynamic_object_state",
-      [("new_assessment_rest", AssessmentStates.NOT_STARTED),
-       ("new_assessment_rest", AssessmentStates.IN_PROGRESS),
-       ("new_assessment_rest", AssessmentStates.READY_FOR_REVIEW),
-       ("new_assessment_rest", AssessmentStates.COMPLETED),
+      [("new_assessment_rest", object_states.NOT_STARTED),
+       ("new_assessment_rest", object_states.IN_PROGRESS),
+       ("new_assessment_rest", object_states.READY_FOR_REVIEW),
+       ("new_assessment_rest", object_states.COMPLETED),
        pytest.mark.xfail(reason="Issue GGRC-2817", strict=True)
-          (("new_issue_rest", ObjectStates.DRAFT))],
+          (("new_issue_rest", object_states.DRAFT))],
       indirect=["dynamic_objects"])
   def test_destructive_snapshot_can_be_unmapped_from_assessment_or_issue(
       self, create_audit_with_control_and_update_control, dynamic_objects,

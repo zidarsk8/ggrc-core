@@ -648,6 +648,13 @@ class AssessmentsService(BaseWebUiService):
     self.open_info_page_of_obj(obj).click_needs_rework()
     return self.info_widget_cls(self.driver)
 
+  def add_evidence_url(self, obj, urls):
+    """Add evidence url for `obj` (audit or asmt)"""
+    page = self.open_info_page_of_obj(obj)
+    for evidence_url in urls:
+      page.evidence_urls.add_url(evidence_url)
+      page.wait_save()
+
   def create_obj_and_get_mapped_titles_from_modal(self, src_obj, obj):
     """Open generic widget of mapped objects, open creation modal from
     Tree View, fill data according to object attributes and create new object.
