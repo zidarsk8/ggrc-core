@@ -29,12 +29,19 @@ export default can.Component.extend({
             .is_allowed_for('update', this.attr('instance'));
         },
       },
+      notificationsInfo: {
+        value: 'Send Notifications',
+        set(newValue) {
+          return this.attr('instance').class.category === 'business' ?
+            'Notify Contacts' :
+            newValue;
+        },
+      },
     },
     instance: {},
     sendNotifications: true,
     isSaving: false,
     isLoading: false,
-    notificationsInfo: 'Send Notifications',
     getCommentData: function () {
       let source = this.attr('instance');
 
