@@ -22,54 +22,6 @@ from lib.utils.filter_utils import FilterUtils
 from lib.utils.string_utils import StringMethods
 
 
-@pytest.fixture()
-def program():
-  return rest_facade.create_program()
-
-
-@pytest.fixture()
-def issue_mapped_to_program(program):
-  return rest_facade.create_issue(program)
-
-
-@pytest.fixture()
-def control_mapped_to_program(program):
-  return rest_facade.create_control(program)
-
-
-@pytest.fixture()
-def controls_mapped_to_program(program):
-  return [rest_facade.create_control(program) for _ in xrange(2)]
-
-
-@pytest.fixture()
-def objective_mapped_to_program(program):
-  return rest_facade.create_objective(program)
-
-
-@pytest.fixture()
-def objectives_mapped_to_program(program):
-  return [rest_facade.create_objective(program) for _ in xrange(2)]
-
-
-@pytest.fixture()
-def audit(program):
-  return rest_facade.create_audit(program)
-
-
-@pytest.fixture()
-def audits(program):
-  return [rest_facade.create_audit(program) for _ in xrange(2)]
-
-
-@pytest.fixture()
-def obj(request):
-  """A fixture that calls any other fixture when parametrization
-  with indirect is used.
-  """
-  return request.getfixturevalue(request.param)
-
-
 def _create_mapped_asmt(audit, assessment_type, objs_to_map):
   """Create assessment with assessment type=`assessment_type` and
   map it to snapshots of `objs_to_map`"""
