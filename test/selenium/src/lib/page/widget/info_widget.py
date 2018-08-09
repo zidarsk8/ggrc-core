@@ -105,6 +105,13 @@ class InfoWidget(WithPageElements, base.Widget):
       self._extend_list_all_scopes_by_cas()
     self.comment_area = self._comment_area()
 
+  def wait_save(self):
+    """Wait for page to save and page to be updated.
+    Please note that spinner is removed before DOM changes are finished
+    but hopefully it would be OK.
+    """
+    self._browser.element(class_name="spinner").wait_until_not_present()
+
   def get_state_txt(self):
     """Get object's state text from Info Widget."""
     return objects.get_normal_form(
@@ -511,6 +518,7 @@ class Assessments(InfoWidget):
     self.asmt_type_txt = objects.get_obj_type(self.asmt_type.text)
     self.mapped_objects_lbl_txt = self._elements.MAPPED_OBJECTS.upper()
     self.mapped_objects_titles_txt = self._get_mapped_objs_titles_txt()
+    self.evidence_urls = self._assessment_evidence_urls()
     self.lcas_scope_txt = self.get_headers_and_values_dict_from_cas_scopes(
         is_gcas_not_lcas=False)
     self.creators_lbl_txt, self.creators_txt = (
@@ -536,7 +544,8 @@ class Assessments(InfoWidget):
         [self.is_verified, self.creators_txt, self.assignees_txt,
          self.verifiers_txt, self.mapped_objects_titles_txt,
          self.comments_scopes_txt, self.asmt_type_txt])
-    self._extend_list_all_scopes(["evidence_urls"], [self.evidence_urls])
+    self._extend_list_all_scopes(["evidence_urls"],
+                                 [self.evidence_urls.get_urls()])
 
   def _get_mapped_objs_titles_txt(self):
     """Return lists of str for mapped snapshots titles text from current tab.
@@ -607,12 +616,6 @@ class Assessments(InfoWidget):
         self.info_widget_elem, dropdown_locator)
     base.DropdownStatic(self.info_widget_elem,
                         dropdown_locator).select(option_value)
-
-  @property
-  def evidence_urls(self):
-    """Get text of evidence urls."""
-    return [url.text for url in self.info_widget_elem.find_elements(
-        *self._locators.EVIDENCE_URLS_CSS)]
 
 
 class AssessmentTemplates(InfoWidget):

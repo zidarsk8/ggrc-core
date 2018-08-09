@@ -11,8 +11,9 @@
 import pytest
 
 from lib import base, factory
-from lib.constants import messages, element, value_aliases as alias, objects
-from lib.constants.element import AssessmentStates, AdminWidgetCustomAttributes
+from lib.constants import (
+    messages, element, value_aliases as alias, objects, object_states)
+from lib.constants.element import AdminWidgetCustomAttributes
 from lib.entities import entities_factory
 from lib.entities.entities_factory import (
     CustomAttributeDefinitionsFactory, PeopleFactory)
@@ -20,54 +21,6 @@ from lib.entities.entity import Representation
 from lib.service import rest_facade, rest_service, webui_service
 from lib.utils.filter_utils import FilterUtils
 from lib.utils.string_utils import StringMethods
-
-
-@pytest.fixture()
-def program():
-  return rest_facade.create_program()
-
-
-@pytest.fixture()
-def issue_mapped_to_program(program):
-  return rest_facade.create_issue(program)
-
-
-@pytest.fixture()
-def control_mapped_to_program(program):
-  return rest_facade.create_control(program)
-
-
-@pytest.fixture()
-def controls_mapped_to_program(program):
-  return [rest_facade.create_control(program) for _ in xrange(2)]
-
-
-@pytest.fixture()
-def objective_mapped_to_program(program):
-  return rest_facade.create_objective(program)
-
-
-@pytest.fixture()
-def objectives_mapped_to_program(program):
-  return [rest_facade.create_objective(program) for _ in xrange(2)]
-
-
-@pytest.fixture()
-def audit(program):
-  return rest_facade.create_audit(program)
-
-
-@pytest.fixture()
-def audits(program):
-  return [rest_facade.create_audit(program) for _ in xrange(2)]
-
-
-@pytest.fixture()
-def obj(request):
-  """A fixture that calls any other fixture when parametrization
-  with indirect is used.
-  """
-  return request.getfixturevalue(request.param)
 
 
 def _create_mapped_asmt(audit, assessment_type, objs_to_map):
@@ -139,7 +92,7 @@ class TestAssessmentsWorkflow(base.Test):
     expected_asmt.update_attrs(
         updated_at=self.info_service().get_obj(obj=expected_asmt).updated_at,
         comments=expected_asmt_comments,
-        status=AssessmentStates.IN_PROGRESS).repr_ui()
+        status=object_states.IN_PROGRESS).repr_ui()
     actual_asmt = asmts_ui_service.get_obj_from_info_page(obj=expected_asmt)
     # 'actual_asmt': audit (None)
     self.general_equal_assert(expected_asmt, actual_asmt, "audit", "comments")
@@ -182,49 +135,49 @@ class TestAssessmentsWorkflow(base.Test):
       ("dynamic_objects_w_factory_params",
        "action", "expected_final_state",
        "expected_verified"),
-      [(("new_assessment_rest", {"status": AssessmentStates.NOT_STARTED}),
+      [(("new_assessment_rest", {"status": object_states.NOT_STARTED}),
         "edit_obj_via_edit_modal_from_info_page",
-        AssessmentStates.NOT_STARTED, False),
-       (("new_assessment_rest", {"status": AssessmentStates.NOT_STARTED,
+        object_states.NOT_STARTED, False),
+       (("new_assessment_rest", {"status": object_states.NOT_STARTED,
                                  "verifiers": [PeopleFactory.superuser]}),
         "edit_obj_via_edit_modal_from_info_page",
-        AssessmentStates.NOT_STARTED, False),
-       (("new_assessment_rest", {"status": AssessmentStates.IN_PROGRESS}),
+        object_states.NOT_STARTED, False),
+       (("new_assessment_rest", {"status": object_states.IN_PROGRESS}),
         "edit_obj_via_edit_modal_from_info_page",
-        AssessmentStates.IN_PROGRESS, False),
-       (("new_assessment_rest", {"status": AssessmentStates.IN_PROGRESS,
+        object_states.IN_PROGRESS, False),
+       (("new_assessment_rest", {"status": object_states.IN_PROGRESS,
                                  "verifiers": [PeopleFactory.superuser]}),
         "edit_obj_via_edit_modal_from_info_page",
-        AssessmentStates.IN_PROGRESS, False),
-       (("new_assessment_rest", {"status": AssessmentStates.COMPLETED}),
+        object_states.IN_PROGRESS, False),
+       (("new_assessment_rest", {"status": object_states.COMPLETED}),
         "edit_obj_via_edit_modal_from_info_page",
-        AssessmentStates.IN_PROGRESS, False),
-       (("new_assessment_rest", {"status": AssessmentStates.COMPLETED,
+        object_states.IN_PROGRESS, False),
+       (("new_assessment_rest", {"status": object_states.COMPLETED,
                                  "verifiers": [PeopleFactory.superuser]}),
         "edit_obj_via_edit_modal_from_info_page",
-        AssessmentStates.IN_PROGRESS, False),
-       (("new_assessment_rest", {"status": AssessmentStates.NOT_STARTED}),
+        object_states.IN_PROGRESS, False),
+       (("new_assessment_rest", {"status": object_states.NOT_STARTED}),
         "complete_assessment",
-        AssessmentStates.COMPLETED, False),
-       (("new_assessment_rest", {"status": AssessmentStates.NOT_STARTED,
-                                 "verifiers": [PeopleFactory.superuser]}),
-        "complete_assessment",
-        AssessmentStates.READY_FOR_REVIEW, False),
-       (("new_assessment_rest", {"status": AssessmentStates.IN_PROGRESS}),
-        "complete_assessment",
-        AssessmentStates.COMPLETED, False),
-       (("new_assessment_rest", {"status": AssessmentStates.IN_PROGRESS,
+        object_states.COMPLETED, False),
+       (("new_assessment_rest", {"status": object_states.NOT_STARTED,
                                  "verifiers": [PeopleFactory.superuser]}),
         "complete_assessment",
-        AssessmentStates.READY_FOR_REVIEW, False),
-       (("new_assessment_rest", {"status": AssessmentStates.NOT_STARTED,
+        object_states.READY_FOR_REVIEW, False),
+       (("new_assessment_rest", {"status": object_states.IN_PROGRESS}),
+        "complete_assessment",
+        object_states.COMPLETED, False),
+       (("new_assessment_rest", {"status": object_states.IN_PROGRESS,
+                                 "verifiers": [PeopleFactory.superuser]}),
+        "complete_assessment",
+        object_states.READY_FOR_REVIEW, False),
+       (("new_assessment_rest", {"status": object_states.NOT_STARTED,
                                  "verifiers": [PeopleFactory.superuser]}),
         "verify_assessment",
-        AssessmentStates.COMPLETED, True),
-       (("new_assessment_rest", {"status": AssessmentStates.NOT_STARTED,
+        object_states.COMPLETED, True),
+       (("new_assessment_rest", {"status": object_states.NOT_STARTED,
                                  "verifiers": [PeopleFactory.superuser]}),
         "reject_assessment",
-        AssessmentStates.REWORK_NEEDED, False)],
+        object_states.REWORK_NEEDED, False)],
       ids=["Edit asmt's title w'o verifier 'Not Started' - 'Not Started'",
            "Edit asmt's title w' verifier 'Not Started' - 'Not Started'",
            "Edit asmt's title w'o verifier 'In Progress' - 'In Progress'",
@@ -447,7 +400,7 @@ class TestAssessmentsWorkflow(base.Test):
         updated_at=self.info_service().get_obj(obj=expected_asmt).updated_at,
         evidence_urls=expected_asmt_urls,
         mapped_objects=[control_mapped_to_program.title],
-        status=AssessmentStates.IN_PROGRESS).repr_ui()
+        status=object_states.IN_PROGRESS).repr_ui()
     actual_asmt = asmt_service.get_obj_from_info_page(obj=expected_asmt)
     self.general_equal_assert(expected_asmt, actual_asmt, "audit")
 
@@ -484,7 +437,7 @@ class TestAssessmentsWorkflow(base.Test):
         updated_at=self.info_service().get_obj(obj=expected_asmt).updated_at,
         comments=expected_asmt_comments,
         mapped_objects=[control_mapped_to_program.title],
-        status=AssessmentStates.IN_PROGRESS).repr_ui()
+        status=object_states.IN_PROGRESS).repr_ui()
     expected_asmt_comments_descriptions = [
         comment.description for comment in expected_asmt_comments]
     actual_asmt = asmt_service.get_obj_from_info_page(obj=expected_asmt)

@@ -20,7 +20,7 @@ from lib.constants.test_runner import DESTRUCTIVE_TEST_METHOD_PREFIX
 from lib.custom_pytest_scheduling import CustomPytestScheduling
 from lib.entities import entities_factory
 from lib.page import dashboard
-from lib.service import rest_service
+from lib.service import rest_service, rest_facade
 from lib.utils import conftest_utils, help_utils, selenium_utils
 from lib.utils.selenium_utils import get_full_screenshot_as_base64
 
@@ -179,6 +179,8 @@ def reset_logged_in_users():
   """
   users.reset_logged_in_users()
 
+
+# Legacy app fixtures
 
 def _common_fixtures(fixture):
   """Generate common fixtures and return global dictionary of executed
@@ -540,3 +542,61 @@ def dynamic_relationships(request):
      'map_new_control_rest_to_new_objective_rest': resp2}.
   """
   yield _common_request_param(request)
+
+
+# New app fixtures
+
+@pytest.fixture()
+def program():
+  """Create a program"""
+  return rest_facade.create_program()
+
+
+@pytest.fixture()
+def issue_mapped_to_program(program):
+  """Create an issue mapped to the program"""
+  return rest_facade.create_issue(program)
+
+
+@pytest.fixture()
+def control_mapped_to_program(program):
+  """Create a control mapped to the program"""
+  return rest_facade.create_control(program)
+
+
+@pytest.fixture()
+def controls_mapped_to_program(program):
+  """Create 2 controls mapped to the program"""
+  return [rest_facade.create_control(program) for _ in xrange(2)]
+
+
+@pytest.fixture()
+def objective_mapped_to_program(program):
+  """Create an objective mapped to the program"""
+  return rest_facade.create_objective(program)
+
+
+@pytest.fixture()
+def objectives_mapped_to_program(program):
+  """Create 2 objectives mapped to the program"""
+  return [rest_facade.create_objective(program) for _ in xrange(2)]
+
+
+@pytest.fixture()
+def audit(program):
+  """Create an audit within program"""
+  return rest_facade.create_audit(program)
+
+
+@pytest.fixture()
+def audits(program):
+  """Create 2 audits mapped to the program"""
+  return [rest_facade.create_audit(program) for _ in xrange(2)]
+
+
+@pytest.fixture()
+def obj(request):
+  """A fixture that calls any other fixture when parametrization
+  with indirect is used.
+  """
+  return request.getfixturevalue(request.param)
