@@ -114,7 +114,7 @@ import Program from '../models/business-models/program';
         return null;
       }
       let widgetId = objectVersionConfig.isObjectVersion ?
-        objectVersionConfig.widgetId :
+        farModel.table_singular + '_version' :
         farModel.table_singular;
       descriptor = {
         widgetType: 'treeview',
