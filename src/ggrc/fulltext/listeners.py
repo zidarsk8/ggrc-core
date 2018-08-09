@@ -11,9 +11,10 @@ from sqlalchemy import event
 
 from ggrc import db
 from ggrc import fulltext
+from ggrc import utils
 from ggrc.models import all_models, get_model
 from ggrc.fulltext import mixin
-from ggrc.utils import benchmark
+from ggrc.utils import benchmark, helpers
 
 ACTIONS = ['after_insert', 'after_delete', 'after_update']
 
@@ -23,6 +24,8 @@ class ReindexSet(threading.local):
 
    That will collect pool of objects that required to be reindexed."""
 
+  CHUNK_SIZE = 50
+
   def __init__(self, *args, **kwargs):
     super(ReindexSet, self).__init__(*args, **kwargs)
     self._pool = set()
@@ -31,6 +34,7 @@ class ReindexSet(threading.local):
   def add(self, item):
     self._pool.add(item)
 
+  @helpers.without_sqlalchemy_cache
   def warmup(self):
     """Function on pre-commit that collects objects keychain."""
     while self._pool:
@@ -45,6 +49,7 @@ class ReindexSet(threading.local):
         type_name, id_value = for_index.get_reindex_pair()
       self.model_ids_to_reindex[type_name].add(id_value)
 
+  @helpers.without_sqlalchemy_cache
   def push_ft_records(self):
     """Function that clear and push new full text records in DB."""
     with benchmark("push ft records into DB"):
@@ -56,7 +61,9 @@ class ReindexSet(threading.local):
           db.session.expire(obj)
       for model_name in self.model_ids_to_reindex.keys():
         ids = self.model_ids_to_reindex.pop(model_name)
-        get_model(model_name).bulk_record_update_for(ids)
+        chunk_list = utils.list_chunks(list(ids), chunk_size=self.CHUNK_SIZE)
+        for ids_chunk in chunk_list:
+          get_model(model_name).bulk_record_update_for(ids_chunk)
 
 
 def _runner(mapper, content, target):  # pylint:disable=unused-argument
