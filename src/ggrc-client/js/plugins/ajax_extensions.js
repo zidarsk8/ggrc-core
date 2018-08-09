@@ -5,9 +5,11 @@
 
 import {
   notifier,
-  notifierXHR,
-  messages,
 } from '../plugins/utils/notifiers-utils';
+import {
+  isConnectionLost,
+  handleAjaxError,
+} from './utils/errors-utils';
 
 $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
   // setup timezone offset header in each ajax request
@@ -133,28 +135,11 @@ can.ajax = $.ajax = function (options) {
 };
 
 $(document).ajaxError(function (event, jqxhr, settings, exception) {
-  let isExpectedError = jqxhr.getResponseHeader('X-Expected-Error');
-
-  if (!jqxhr.hasFailCallback && !isExpectedError) {
-    let response = jqxhr.responseJSON;
-
-    if (!response) {
-      try {
-        response = JSON.parse(jqxhr.responseText);
-      } catch (e) {
-        console.warn('Response not in JSON format');
-      }
-    }
-
-    let message = jqxhr.getResponseHeader('X-Flash-Error') ||
-      messages[jqxhr.status] ||
-      (response && response.message) ||
-      exception.message || exception;
-
-    if (message) {
-      notifier('error', message);
+  if (!jqxhr.hasFailCallback) {
+    if (isConnectionLost()) {
+      notifier('error', 'Internet connection was lost.');
     } else {
-      notifierXHR('error')(jqxhr);
+      handleAjaxError(jqxhr, exception);
     }
   }
 });
