@@ -75,8 +75,7 @@ def export_file(export_to, filename, csv_string=None):
   if export_to == "csv":
     headers = [
         ("Content-Type", "text/csv"),
-        ("Content-Disposition",
-         "attachment; filename='{}'".format(filename)),
+        ("Content-Disposition", "attachment"),
     ]
     return current_app.make_response((csv_string, 200, headers))
   raise BadRequest("Bad params")
