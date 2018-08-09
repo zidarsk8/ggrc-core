@@ -76,25 +76,7 @@ CMS.Models.get_stub = function (object) {
   return instance.stub();
 };
 
-CMS.Models.get_stubs = function (objects) {
-  return new can.Stub.List(
-    can.map(CMS.Models.get_instances(objects), function (obj) {
-      if (!obj || !obj.stub) {
-        console.warn('`Models.get_stubs` instance has no stubs ', arguments);
-        return;
-      }
-      return obj.stub();
-    }));
-};
-
-CMS.Models.get_instances = function (objects) {
-  let i;
-  let instances = [];
-  if (!objects) {
-    return [];
-  }
-  for (i = 0; i < objects.length; i++) {
-    instances[i] = CMS.Models.get_instance(objects[i]);
-  }
-  return instances;
+CMS.Models.get_stubs = function (objects = []) {
+  let stubs = objects.map((obj) => CMS.Models.get_instance(obj).stub());
+  return new can.Stub.List(stubs);
 };

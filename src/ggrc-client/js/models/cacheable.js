@@ -922,7 +922,7 @@ export default can.Model('can.Model.Cacheable', {
         fnName = this.constructor.attributes[name];
         fnName = fnName.substr(fnName.lastIndexOf('.') + 1);
         if (fnName === 'stubs' || fnName === 'get_stubs' ||
-        fnName === 'models' || fnName === 'get_instances') {
+        fnName === 'models') {
         // val can be null in some cases
           if (val) {
             serial[name] = val.stubs().serialize();
