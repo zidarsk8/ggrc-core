@@ -8,7 +8,7 @@ import collections
 import functools
 
 from logging import getLogger
-from werkzeug.exceptions import Forbidden, BadRequest
+from werkzeug.exceptions import Forbidden, BadRequest, MethodNotAllowed
 from sqlalchemy.orm.exc import NoResultFound
 from dateutil import parser as date_parser
 
@@ -154,6 +154,14 @@ class PersonResource(common.ExtendedResource):
 
     return wrapper
 
+  @staticmethod
+  def raise_not_allowed_exception(*args, **kwargs):
+    """Raise not allowed exception for person resource."""
+    del args
+    del kwargs
+    raise MethodNotAllowed(description="Creation of new profile for person "
+                                       "by POST request is not allowed")
+
   def get(self, *args, **kwargs):  # pylint: disable=arguments-differ
     # This is to extend the get request for additional data.
     command_map = {
@@ -175,6 +183,7 @@ class PersonResource(common.ExtendedResource):
         "imports": self.verify_is_current(converters.handle_import_post),
         # create export entry and start export background task
         "exports": self.verify_is_current(converters.handle_export_post),
+        "profile": self.raise_not_allowed_exception,
     }
     return self._process_request(command_map, *args, **kwargs)
 
