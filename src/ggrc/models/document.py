@@ -93,7 +93,34 @@ class Document(Roleable, Relatable, mixins.Titled,
       'kind': 'Type',
   }
 
-  ALLOWED_PARENTS = {'Control', 'Issue', 'RiskAssessment'}
+  ALLOWED_PARENTS = {
+      'Control',
+      'Issue',
+      'RiskAssessment',
+      'AccessGroup',
+      'Clause',
+      'Contract',
+      'DataAsset',
+      'Facility',
+      'Market',
+      'Metric',
+      'Objective',
+      'OrgGroup',
+      'Policy',
+      'Process',
+      'Product',
+      'ProductGroup',
+      'Program',
+      'Project',
+      'Regulation',
+      'Requirement',
+      'Risk',
+      'Standard',
+      'System',
+      'TechnologyEnvironment',
+      'Threat',
+      'Vendor',
+  }
 
   @orm.validates('kind')
   def validate_kind(self, key, kind):
