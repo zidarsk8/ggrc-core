@@ -37,6 +37,21 @@ export default can.Component.extend({
             newValue;
         },
       },
+      tooltipTitle: {
+        get() {
+          let title;
+          if (this.attr('instance').class.category === 'business') {
+            title = 'Comments will be sent as a part of daily digest email ' +
+            'notifications to Admins, Primary Contacts, Secondary Contacts, ' +
+            'Product Managers, Technical Leads, Technical / Program Managers,' +
+            ' Legal Counsels, System Owners';
+          } else {
+            title = 'Comments will be sent as part of daily digest email ' +
+            'notification.';
+          }
+          return title;
+        },
+      },
     },
     instance: {},
     sendNotifications: true,
