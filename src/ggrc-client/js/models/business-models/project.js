@@ -8,7 +8,7 @@ import '../mixins/unique-title';
 import '../mixins/ca-update';
 import '../mixins/timeboxed';
 import '../mixins/access-control-list';
-import '../mixins/base-notifications';
+import '../mixins/scope-object-notifications';
 import '../mixins/questionnaire';
 
 export default Cacheable('CMS.Models.Project', {
@@ -25,7 +25,7 @@ export default Cacheable('CMS.Models.Project', {
     'ca_update',
     'timeboxed',
     'accessControlList',
-    'base-notifications',
+    'scope-object-notifications',
     'questionnaire',
   ],
   is_custom_attributable: true,

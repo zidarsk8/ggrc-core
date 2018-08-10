@@ -7,7 +7,7 @@ import Cacheable from '../cacheable';
 import '../mixins/unique-title';
 import '../mixins/ca-update';
 import '../mixins/access-control-list';
-import '../mixins/base-notifications';
+import '../mixins/scope-object-notifications';
 import '../mixins/questionnaire';
 
 export default Cacheable('CMS.Models.AccessGroup', {
@@ -23,7 +23,7 @@ export default Cacheable('CMS.Models.AccessGroup', {
     'unique_title',
     'ca_update',
     'accessControlList',
-    'base-notifications',
+    'scope-object-notifications',
     'questionnaire',
   ],
   is_custom_attributable: true,
