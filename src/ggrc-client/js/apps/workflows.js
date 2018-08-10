@@ -29,7 +29,7 @@ import * as businessModels from '../models/business-models';
 (function ($, CMS, GGRC) {
   let WorkflowExtension = {};
   let _workflowObjectTypes = [
-    'Program', 'Regulation', 'Policy', 'Standard', 'Contract', 'Clause',
+    'Program', 'Regulation', 'Policy', 'Standard', 'Contract',
     'Requirement', 'Control', 'Objective', 'OrgGroup', 'Vendor', 'AccessGroup',
     'System', 'Process', 'DataAsset', 'Product', 'Project', 'Facility',
     'Market', 'Issue', 'Risk', 'Threat', 'Metric', 'TechnologyEnvironment',
