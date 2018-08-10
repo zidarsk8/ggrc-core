@@ -13,6 +13,7 @@ import {notifier} from '../../plugins/utils/notifiers-utils';
 import Revision from '../../models/service-models/revision';
 import Person from '../../models/business-models/person';
 import Snapshot from '../../models/service-models/snapshot';
+import Stub from '../../models/stub';
 
 export default can.Component.extend({
   tag: 'revisions-comparer',
@@ -211,7 +212,7 @@ export default can.Component.extend({
 
         if (content.access_control_list) {
           content.access_control_list.forEach(function (item) {
-            let stub = new Person({id: item.person_id}).stub();
+            let stub = new Stub(new Person({id: item.person_id}));
             item.attr('person', stub);
           });
         }

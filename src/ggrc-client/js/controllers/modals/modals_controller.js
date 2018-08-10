@@ -49,6 +49,7 @@ import {
 import DisplayPrefs from '../../models/local-storage/display-prefs';
 import Person from '../../models/business-models/person';
 import Assessment from '../../models/business-models/assessment';
+import Stub from '../../models/stub';
 
 export default can.Control({
   pluginName: 'ggrc_controllers_modals',
@@ -234,7 +235,7 @@ export default can.Control({
       if (!instance.attr(path)) {
         instance.attr(path, []);
       }
-      instance.attr(path).splice(index, 1, ui.item.stub());
+      instance.attr(path).splice(index, 1, new Stub(ui.item));
     } else {
       path = path.join('.');
       setTimeout(function () {

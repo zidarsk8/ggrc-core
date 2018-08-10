@@ -6,6 +6,7 @@
 import Join from './join';
 import Role from '../service-models/role';
 import Person from '../business-models/person';
+import Stub from '../stub';
 
 export default Join('CMS.Models.UserRole', {
   root_object: 'user_role',
@@ -35,7 +36,7 @@ export default Join('CMS.Models.UserRole', {
 
     role = _.find(Role.cache, {name: this.role_name});
     if (role) {
-      this.attr('role', role.stub());
+      this.attr('role', new Stub(role));
       return _super.apply(this, arguments);
     }
     return Role.findAll({
@@ -45,7 +46,7 @@ export default Join('CMS.Models.UserRole', {
         return new $.Deferred().reject('Role not found');
       }
       role = role[0];
-      this.attr('role', role.stub());
+      this.attr('role', new Stub(role));
       return _super.apply(this, arguments);
     }.bind(this));
   },

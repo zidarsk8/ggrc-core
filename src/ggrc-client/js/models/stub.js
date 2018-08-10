@@ -3,48 +3,29 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-export default can.Observe('can.Stub', {}, {});
+let Stub = can.Map.extend({
+  setup(model) {
+    let type = (model instanceof can.Model)
+      ? model.constructor.shortName
+      : model.type;
+    let href = model.selfLink || model.href;
 
-can.Observe.prototype.stub = function () {
-  let type;
-  let id;
+    this._super({
+      id: model.id,
+      type,
+      href,
+    });
+  },
+});
 
-  if (!(this instanceof can.Model || this instanceof can.Stub)) {
-    console.debug('.stub() called on non-stub, non-instance object', this);
-  }
-
-  if (this instanceof can.Stub) {
-    return this;
-  }
-
-  if (this instanceof can.Model) {
-    type = this.constructor.shortName;
-  } else {
-    type = this.type;
-  }
-
-  if (this.constructor.id) {
-    id = this[this.constructor.id];
-  } else {
-    id = this.id;
-  }
-
-  if (!id && id !== 0) {
-    return null;
-  }
-
-  return new can.Stub({
-    id: id,
-    href: this.selfLink || this.href,
-    type: type,
-  });
-};
-
-can.Observe.List.prototype.stubs = function () {
-  return new can.Observe.List(can.map(this, function (obj) {
-    return obj.stub();
-  }));
-};
+Stub.List = can.List.extend({
+  Map: Stub,
+}, {
+  setup(models=[]) {
+    let converted = models.map((model) => new Stub(model));
+    this._super(converted);
+  },
+});
 
 can.Observe.prototype.reify = function () {
   let type;
@@ -52,9 +33,6 @@ can.Observe.prototype.reify = function () {
 
   if (this instanceof can.Model) {
     return this;
-  }
-  if (!(this instanceof can.Stub)) {
-    // console.debug('`reify()` called on non-stub, non-instance object', this);
   }
 
   type = this.type;
@@ -72,3 +50,5 @@ can.Observe.List.prototype.reify = function () {
     return obj.reify();
   }));
 };
+
+export default Stub;

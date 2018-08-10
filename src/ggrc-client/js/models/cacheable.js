@@ -19,6 +19,7 @@ import RefreshQueue from './refresh_queue';
 import tracker from '../tracker';
 import Mappings from './mappers/mappings';
 import {delayLeavingPageUntil} from '../plugins/utils/current-page-utils';
+import Stub from './stub';
 
 function dateConverter(date, oldValue, fn, key) {
   let conversion = 'YYYY-MM-DD\\THH:mm:ss\\Z';
@@ -453,7 +454,7 @@ export default can.Model('can.Model.Cacheable', {
       if (!instance) {
         return instance;
       }
-      return instance.stub();
+      return new Stub(instance);
     }));
   },
 
@@ -461,7 +462,7 @@ export default can.Model('can.Model.Cacheable', {
     if (!params) {
       return params;
     }
-    return this.model(params).stub();
+    return new Stub(this.model(params));
   },
   model: function (params) {
     let model;
@@ -925,21 +926,21 @@ export default can.Model('can.Model.Cacheable', {
         fnName === 'models') {
         // val can be null in some cases
           if (val) {
-            serial[name] = val.stubs().serialize();
+            serial[name] = (new Stub.List(val)).serialize();
           }
         } else if (fnName === 'stub' || fnName === 'get_stub' ||
         fnName === 'model' || fnName === 'get_instance') {
-          serial[name] = (val ? val.stub().serialize() : null);
+          serial[name] = (val ? new Stub(val).serialize() : null);
         } else {
           serial[name] = val;
         }
       } else if (val && can.isFunction(val.save)) {
-        serial[name] = val.stub().serialize();
+        serial[name] = (new Stub(val)).serialize();
       } else if (typeof val === 'object' && val !== null && val.length) {
         serial[name] = can.map(val, function (v) {
           let isModel = v && can.isFunction(v.save);
           return isModel ?
-            v.stub().serialize() :
+            (new Stub(v)).serialize() :
             (v && v.serialize) ? v.serialize() : v;
         });
       } else if (!can.isFunction(val)) {

@@ -5,6 +5,7 @@
 
 import RefreshQueue from '../refresh_queue';
 import Cacheable from '../cacheable';
+import Stub from '../stub';
 
 export default Cacheable('can.Model.Join', {
   join_keys: null,
@@ -72,9 +73,9 @@ export default Cacheable('can.Model.Join', {
     if (objectId) {
       this.attr(
         attr,
-        CMS.Models.get_instance(
+        new Stub(CMS.Models.get_instance(
           modelName, objectId, this[attr]
-        ).stub() || this[attr]
+        )) || this[attr]
       );
     }
   },

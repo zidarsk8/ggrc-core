@@ -8,6 +8,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
 import Role from '../models/service-models/role';
 import Person from '../models/business-models/person';
 import UserRole from '../models/join-models/user-role';
+import Stub from '../models/stub';
 
 /* Role Assignment Modal Selector
   *
@@ -415,7 +416,7 @@ function getOptionSet(name, data) {
     if (!context) {
       throw new Error('`context` is required for Assignments model');
     }
-    context = context.stub();
+    context = new Stub(context);
     extraJoinQuery = {context_id: context.id};
   } else {
     context = {id: null};

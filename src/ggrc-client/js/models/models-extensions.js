@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import Stub from './stub';
+
 window.CMS = window.CMS || {};
 window.CMS.Models = window.CMS.Models || {};
 
@@ -12,7 +14,7 @@ CMS.Models.get_instance = function (objectType, objectId, paramsOrObject) {
   let instance;
   let href;
 
-  if (typeof objectType === 'object' || objectType instanceof can.Stub) {
+  if (typeof objectType === 'object' || objectType instanceof Stub) {
     // assume we only passed in params_or_object
     paramsOrObject = objectType;
     if (!paramsOrObject) {
@@ -20,7 +22,7 @@ CMS.Models.get_instance = function (objectType, objectId, paramsOrObject) {
     }
     if (paramsOrObject instanceof can.Model) {
       objectType = paramsOrObject.constructor.shortName;
-    } else if (paramsOrObject instanceof can.Stub) {
+    } else if (paramsOrObject instanceof Stub) {
       objectType = paramsOrObject.type;
     } else if (!paramsOrObject.selfLink && paramsOrObject.type) {
       objectType = paramsOrObject.type;
@@ -73,10 +75,10 @@ CMS.Models.get_stub = function (object) {
   if (!instance) {
     return;
   }
-  return instance.stub();
+  return new Stub(instance);
 };
 
 CMS.Models.get_stubs = function (objects = []) {
-  let stubs = objects.map((obj) => CMS.Models.get_instance(obj).stub());
-  return new can.Stub.List(stubs);
+  let stubs = objects.map((obj) => new Stub(CMS.Models.get_instance(obj)));
+  return new can.List(stubs);
 };

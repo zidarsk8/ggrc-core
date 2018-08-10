@@ -26,10 +26,4 @@ export default LocalStorage('GGRC.Models.RecentlyViewedObject', {
   init: function () {
     this.attr('model', GGRC.Models[this.type] || CMS.Models[this.type]);
   },
-  stub: function () {
-    return can.extend(this._super(), {
-      title: this.title,
-      viewLink: this.viewLink,
-    });
-  },
 });
