@@ -3,6 +3,7 @@
 
 """ Tests for ggrc.models.Revision """
 import ddt
+import mock
 
 import ggrc.models
 from ggrc.models import all_models
@@ -302,3 +303,37 @@ class TestRevisions(TestCase):
   def test_revisions_with_empty_lcads(self, attribute_type, attribute_value):
     """Population cavs and local cads for type {0}."""
     self._test_revision_with_empty_cads(attribute_type, attribute_value, False)
+
+  @ddt.data("", u"0", u"", None, "0")
+  @mock.patch(
+      "ggrc.models.custom_attribute_value.CustomAttributeValue"
+      "._validate_checkbox", return_value=True
+  )
+  def test_revisions_invalid_cavs(self, value, _):
+    """Test filtering of Checkbox CAVs."""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      ca_def = factories.CustomAttributeDefinitionFactory(
+          definition_id=program.id,
+          definition_type="program",
+          title="CA",
+          attribute_type="Checkbox",
+      )
+
+    self.gen.api.modify_object(
+        program, {
+            "custom_attribute_values": [{
+                "attributable_id": program.id,
+                "attributable_type": "program",
+                "attribute_value": value,
+                "custom_attribute_id": ca_def.id,
+            }, ],
+        },
+    )
+    revisions = ggrc.models.Revision.query.filter(
+        ggrc.models.Revision.resource_id == program.id,
+        ggrc.models.Revision.resource_type == "Program",
+    ).order_by(ggrc.models.Revision.id.desc()).all()
+    content = revisions[0].content
+    self.assertEqual(
+        content["custom_attribute_values"][0]["attribute_value"], "0")
