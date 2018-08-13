@@ -4,6 +4,7 @@
 */
 
 import Cacheable from '../cacheable';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.CustomAttributeDefinition', {
   root_object: 'custom_attribute_definition',
@@ -15,7 +16,7 @@ export default Cacheable('CMS.Models.CustomAttributeDefinition', {
   update: 'PUT /api/custom_attribute_definitions/{id}',
   destroy: 'DELETE /api/custom_attribute_definitions/{id}',
   attributes: {
-    modified_by: 'CMS.Models.Person.stub',
+    modified_by: Stub,
   },
   links_to: {},
   defaults: {

@@ -6,6 +6,7 @@
 import Cacheable from '../cacheable';
 import tracker from '../../tracker';
 import Permission from '../../permission';
+import Stub from '../stub';
 
 const mustachePath = GGRC.mustache_path + '/cycle_task_entries';
 
@@ -29,10 +30,10 @@ export default Cacheable('CMS.Models.CycleTaskEntry', {
   update: 'PUT /api/cycle_task_entries/{id}',
   destroy: 'DELETE /api/cycle_task_entries/{id}',
   attributes: {
-    cycle_task_group_object_task: 'CMS.Models.CycleTaskGroupObjectTask.stub',
-    modified_by: 'CMS.Models.Person.stub',
-    context: 'CMS.Models.Context.stub',
-    cycle: 'CMS.Models.Cycle.stub',
+    cycle_task_group_object_task: Stub,
+    modified_by: Stub,
+    context: Stub,
+    cycle: Stub,
   },
 
   tree_view_options: {

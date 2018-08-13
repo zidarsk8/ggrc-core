@@ -5,6 +5,7 @@
 
 import Cacheable from '../cacheable';
 import '../mixins/is-overdue';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.CycleTaskGroup', {
   root_object: 'cycle_task_group',
@@ -17,11 +18,11 @@ export default Cacheable('CMS.Models.CycleTaskGroup', {
   destroy: 'DELETE /api/cycle_task_groups/{id}',
   mixins: ['isOverdue'],
   attributes: {
-    cycle: 'CMS.Models.Cycle.stub',
-    task_group: 'CMS.Models.TaskGroup.stub',
-    cycle_task_group_tasks: 'CMS.Models.CycleTaskGroupObjectTask.stubs',
-    modified_by: 'CMS.Models.Person.stub',
-    context: 'CMS.Models.Context.stub',
+    cycle: Stub,
+    task_group: Stub,
+    cycle_task_group_tasks: Stub.List,
+    modified_by: Stub,
+    context: Stub,
   },
 
   tree_view_options: {

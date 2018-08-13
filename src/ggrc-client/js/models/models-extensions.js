@@ -69,16 +69,3 @@ CMS.Models.get_instance = function (objectType, objectId, paramsOrObject) {
   }
   return instance;
 };
-
-CMS.Models.get_stub = function (object) {
-  let instance = CMS.Models.get_instance(object);
-  if (!instance) {
-    return;
-  }
-  return new Stub(instance);
-};
-
-CMS.Models.get_stubs = function (objects = []) {
-  let stubs = objects.map((obj) => new Stub(CMS.Models.get_instance(obj)));
-  return new can.List(stubs);
-};

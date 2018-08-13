@@ -16,10 +16,10 @@ export default Join('CMS.Models.UserRole', {
   create: 'POST /api/user_roles',
   destroy: 'DELETE /api/user_roles/{id}',
   attributes: {
-    context: 'CMS.Models.Context.stub',
-    modified_by: 'CMS.Models.Person.stub',
-    person: 'CMS.Models.Person.stub',
-    role: 'CMS.Models.Role.stub',
+    context: Stub,
+    modified_by: Stub,
+    person: Stub,
+    role: Stub,
   },
   join_keys: {
     person: Person,

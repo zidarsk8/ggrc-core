@@ -448,22 +448,6 @@ export default can.Model('can.Model.Cacheable', {
     }
     return params;
   },
-
-  stubs: function (params) {
-    return new can.List(can.map(this.models(params), function (instance) {
-      if (!instance) {
-        return instance;
-      }
-      return new Stub(instance);
-    }));
-  },
-
-  stub: function (params) {
-    if (!params) {
-      return params;
-    }
-    return new Stub(this.model(params));
-  },
   model: function (params) {
     let model;
     params = this.object_from_resource(params);
@@ -908,7 +892,6 @@ export default can.Model('can.Model.Cacheable', {
   // TODO: should be refactored and sliced on multiple functions
   serialize: function () {
     let serial = {};
-    let fnName;
     let val;
     if (arguments.length) {
       return this._super(...arguments);
@@ -920,17 +903,9 @@ export default can.Model('can.Model.Cacheable', {
       }
       val = this[name];
       if (this.constructor.attributes && this.constructor.attributes[name]) {
-        fnName = this.constructor.attributes[name];
-        fnName = fnName.substr(fnName.lastIndexOf('.') + 1);
-        if (fnName === 'stubs' || fnName === 'get_stubs' ||
-        fnName === 'models') {
-        // val can be null in some cases
-          if (val) {
-            serial[name] = (new Stub.List(val)).serialize();
-          }
-        } else if (fnName === 'stub' || fnName === 'get_stub' ||
-        fnName === 'model' || fnName === 'get_instance') {
-          serial[name] = (val ? new Stub(val).serialize() : null);
+        let attrConstructor = this.constructor.attributes[name];
+        if (attrConstructor === Stub || attrConstructor === Stub.List) {
+          serial[name] = val ? (new attrConstructor(val)).serialize() : null;
         } else {
           serial[name] = val;
         }

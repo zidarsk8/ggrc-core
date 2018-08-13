@@ -6,6 +6,7 @@
 import Join from './join';
 import Person from '../business-models/person';
 import Cacheable from '../cacheable';
+import Stub from '../stub';
 
 export default Join('CMS.Models.ObjectPerson', {
   root_object: 'object_person',
@@ -19,9 +20,9 @@ export default Join('CMS.Models.ObjectPerson', {
     person: Person,
   },
   attributes: {
-    context: 'CMS.Models.Context.stub',
-    modified_by: 'CMS.Models.Person.stub',
-    person: 'CMS.Models.Person.stub',
-    personable: 'CMS.Models.get_stub',
+    context: Stub,
+    modified_by: Stub,
+    person: Stub,
+    personable: Stub,
   },
 }, {});

@@ -27,6 +27,7 @@ import CycleTaskGroupObjectTask from '../models/business-models/cycle-task-group
 import TaskGroup from '../models/business-models/task-group';
 import Workflow from '../models/business-models/workflow';
 import Person from '../models/business-models/person';
+import Stub from '../models/stub';
 
 (function ($, CMS, GGRC) {
   let WorkflowExtension = {};
@@ -274,8 +275,7 @@ import Person from '../models/business-models/person';
         mappings[type].workflows,
       ]);
 
-      CMS.Models[type].attributes.task_group_objects =
-        'CMS.Models.TaskGroupObject.stubs';
+      CMS.Models[type].attributes.task_group_objects = Stub.List;
     });
     new Mappings('ggrc_workflows', mappings);
   };

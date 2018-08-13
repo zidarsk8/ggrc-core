@@ -11,6 +11,7 @@ import '../mixins/in-scope-objects-preload';
 import '../mixins/access-control-list';
 import '../mixins/base-notifications';
 import '../mixins/issue-tracker';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Issue', {
   root_object: 'issue',
@@ -33,7 +34,7 @@ export default Cacheable('CMS.Models.Issue', {
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {
-    context: 'CMS.Models.Context.stub',
+    context: Stub,
   },
   tree_view_options: {
     attr_list: Cacheable.attr_list.concat([

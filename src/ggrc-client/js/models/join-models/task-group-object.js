@@ -6,6 +6,7 @@
 import Join from './join';
 import TaskGroup from '../business-models/task-group';
 import Cacheable from '../cacheable';
+import Stub from '../stub';
 
 export default Join('CMS.Models.TaskGroupObject', {
   root_object: 'task_group_object',
@@ -15,10 +16,10 @@ export default Join('CMS.Models.TaskGroupObject', {
     object: Cacheable,
   },
   attributes: {
-    context: 'CMS.Models.Context.stub',
-    modified_by: 'CMS.Models.Person.stub',
-    task_group: 'CMS.Models.TaskGroup.stub',
-    object: 'CMS.Models.get_stub',
+    context: Stub,
+    modified_by: Stub,
+    task_group: Stub,
+    object: Stub,
   },
   findAll: 'GET /api/task_group_objects',
   create: 'POST /api/task_group_objects',
