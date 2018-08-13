@@ -50,11 +50,6 @@ class Commentable(object):
       "Admin",
       "Primary Contacts",
       "Secondary Contacts",
-      "Product Managers",
-      "Technical / Program Managers",
-      "Technical Leads",
-      "System Owners",
-      "Legal Counsels",
   ])
 
   @validates("recipients")
@@ -343,3 +338,25 @@ class CommentInitiator(object):  # pylint: disable=too-few-public-methods
         primaryjoin=join_function,
         backref=Comment.INITIATOR_INSTANCE_TMPL.format(cls.__name__),
     )
+
+
+class ScopedCommentable(Commentable):
+  """Mixin for commentable scoping objects.
+
+  This is a mixin for adding default options to objects on which people can
+  comment.
+  """
+
+  VALID_RECIPIENTS = frozenset([
+      "Assignees",
+      "Creators",
+      "Verifiers",
+      "Admin",
+      "Primary Contacts",
+      "Secondary Contacts",
+      "Product Managers",
+      "Technical / Program Managers",
+      "Technical Leads",
+      "System Owners",
+      "Legal Counsels",
+  ])

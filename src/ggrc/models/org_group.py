@@ -4,7 +4,7 @@
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
-from ggrc.models.comment import Commentable
+from ggrc.models.comment import ScopedCommentable
 from ggrc.models import mixins
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
@@ -18,7 +18,7 @@ class OrgGroup(Roleable,
                Personable,
                Relatable,
                mixins.LastDeprecatedTimeboxed,
-               Commentable,
+               ScopedCommentable,
                mixins.TestPlanned,
                PublicDocumentable,
                mixins.base.ContextRBAC,
