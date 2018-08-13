@@ -97,7 +97,7 @@ class TestRBAC(base.Test):
     users.set_current_user(login_user)
     url = string_utils.StringMethods.random_string()
     asmt_service = webui_service.AssessmentsService(selenium)
-    asmt_service.add_evidence_url(asmt, [url])
+    asmt_service.add_evidence_urls(asmt, [url])
     actual_asmt = asmt_service.get_obj_from_info_page(obj=asmt)
     asmt.update_attrs(
         updated_at=rest_facade.get_obj(asmt).updated_at,
