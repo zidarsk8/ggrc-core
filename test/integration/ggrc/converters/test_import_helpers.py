@@ -150,10 +150,10 @@ class TestCustomAttributesDefinitions(TestCase):
         "Program Managers",
         "Program Editors",
         "Program Readers",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
-        'Folder',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
     }
     expected_names = element_names.union(mapping_names)
     self.assertEqual(expected_names, display_names)
@@ -164,6 +164,7 @@ class TestCustomAttributesDefinitions(TestCase):
     self.assertTrue(vals["Choose"]["mandatory"])
 
 
+# pylint: disable=too-many-public-methods
 @ddt.ddt
 class TestGetObjectColumnDefinitions(TestCase):
 
@@ -182,6 +183,14 @@ class TestGetObjectColumnDefinitions(TestCase):
           "Code",
           "Title",
       },
+  }
+
+  SCOPING_ROLES = {
+      "Technical / Program Managers",
+      "Product Managers",
+      "Technical Leads",
+      "Legal Counsels",
+      "System Owners",
   }
 
   @classmethod
@@ -316,10 +325,10 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Program Managers",
         "Program Editors",
         "Program Readers",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
-        'Folder',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
     }
     expected_fields = {
         "mandatory": {
@@ -352,11 +361,11 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Evidence URL",
         "Evidence File",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
-        'Folder',
-        'Last Deprecated Date'
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
+        "Last Deprecated Date",
     }
     expected_fields = {
         "mandatory": {
@@ -386,9 +395,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Custom Attributes",
         "Code",
         "Archived",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
         "Delete",
         "State",
     }
@@ -697,11 +706,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
-        "Technical / Program Managers",
-        "Product Managers",
-        "Technical Leads",
-        "Legal Counsels",
-        "System Owners",
         "Recipients",
         "Send by default",
         "Comments",
@@ -711,6 +715,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated By",
         "Folder",
     }
+    names.update(self.SCOPING_ROLES)
     self._test_single_object(models.System, names, self.COMMON_EXPECTED)
 
   def test_process_definitions(self):
@@ -728,8 +733,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
-        "Legal Counsels",
-        "System Owners",
+        "Primary Contacts",
+        "Secondary Contacts",
         "Recipients",
         "Send by default",
         "Comments",
@@ -738,12 +743,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated Date",
         "Last Updated By",
         "Folder",
-        "Product Managers",
-        "Technical Leads",
-        "Primary Contacts",
-        "Secondary Contacts",
-        "Technical / Program Managers",
     }
+    names.update(self.SCOPING_ROLES)
     self._test_single_object(models.Process, names, self.COMMON_EXPECTED)
 
   def test_product_definitions(self):
@@ -763,11 +764,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
-        "Product Managers",
-        "Legal Counsels",
-        "Technical Leads",
-        "Technical / Program Managers",
-        "System Owners",
         "Recipients",
         "Send by default",
         "Comments",
@@ -777,6 +773,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated By",
         "Folder",
     }
+    names.update(self.SCOPING_ROLES)
     self._test_single_object(models.Product, names, self.COMMON_EXPECTED)
 
   def test_risk_definitions(self):
@@ -817,6 +814,41 @@ class TestGetObjectColumnDefinitions(TestCase):
         },
     }
     self._test_single_object(r_models.Risk, names, expected_fields)
+
+  @ddt.data(
+      models.Metric,
+      models.ProductGroup,
+      models.TechnologyEnvironment,
+  )
+  def test_documentable_objects(self, model):
+    """Tests Metric, ProductGroup, TechnologyEnvironment models. """
+
+    names = {
+        "Title",
+        "Description",
+        "Notes",
+        "Admin",
+        "Reference URL",
+        "Code",
+        "Effective Date",
+        "Last Deprecated Date",
+        "State",
+        "Review State",
+        "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
+        "Recipients",
+        "Send by default",
+        "Comments",
+        "Assessment Procedure",
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
+        "Document File",
+    }
+    names.update(self.SCOPING_ROLES)
+    self._test_single_object(model, names, self.COMMON_EXPECTED)
 
   @ddt.data(
       models.Contract,
@@ -876,11 +908,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
-        "Technical Leads",
-        "Technical / Program Managers",
-        "Product Managers",
-        "Legal Counsels",
-        "System Owners",
         "Recipients",
         "Send by default",
         "Comments",
@@ -890,6 +917,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated By",
         "Folder",
     }
+    names.update(self.SCOPING_ROLES)
     self._test_single_object(model, names, self.COMMON_EXPECTED)
 
 

@@ -238,12 +238,6 @@ class Revision(base.ContextRBAC, Base, db.Model):
         "contact": reverted_roles_dict.get("Primary Contacts"),
         "secondary_contact": reverted_roles_dict.get("Secondary Contacts"),
         "owners": reverted_roles_dict.get("Admin"),
-        "product_managers": reverted_roles_dict.get("Product Managers"),
-        "technical_leads": reverted_roles_dict.get("Technical Leads"),
-        "technical_pms":
-            reverted_roles_dict.get("Technical / Program Managers"),
-        "legal_counsels": reverted_roles_dict.get("Legal Counsels"),
-        "system_owners": reverted_roles_dict.get("System Owners"),
     }
     exists_roles = {i["ac_role_id"] for i in access_control_list}
 

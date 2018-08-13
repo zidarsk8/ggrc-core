@@ -10,6 +10,7 @@ Create Date: 2018-08-09 13:18:32.732660
 # pylint: disable=invalid-name
 
 import sqlalchemy as sa
+from sqlalchemy import func
 
 from alembic import op
 
@@ -41,10 +42,10 @@ def upgrade():
         name, sa.Column('recipients', sa.String(length=250))
     )
     op.execute(commentable_table.update().values(
-        recipients="Admin,Primary Contacts,Secondary Contacts,"
-                   "Product Managers,Technical Leads,"
-                   "Technical / Program Managers,"
-                   "Legal Counsels,System Owners"
+        recipients=func.concat(commentable_table.c.recipients,
+                               ",Product Managers,Technical Leads,"
+                               "Technical / Program Managers,"
+                               "Legal Counsels,System Owners")
     ))
 
 
