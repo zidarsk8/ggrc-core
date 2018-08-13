@@ -61,12 +61,14 @@ class GetValueTestCase(CustomAttributeColumHandlerTestCase):
     result = self.handler.get_value()
     self.assertEqual(result, u"TRUE")
 
-  def test_returns_string_false_for_falsy_checkbox(self, get_ca_definition):
+  @ddt.data(u"0", "", None)
+  def test_returns_string_false_for_falsy_checkbox(self, value,
+                                                   get_ca_definition):
     """The method should return "FALSE" for unchecked checkbox CAs."""
     get_ca_definition.return_value = MagicMock(id=117)
 
     ca_value = self._ca_value_factory(
-        id_=117, type_=CA_TYPES.CHECKBOX, value=u"0")
+        id_=117, type_=CA_TYPES.CHECKBOX, value=value)
     self.handler.row_converter.obj.custom_attribute_values.append(ca_value)
 
     result = self.handler.get_value()
