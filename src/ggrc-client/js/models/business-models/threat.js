@@ -29,14 +29,6 @@ export default Cacheable('CMS.Models.Threat', {
   attributes: {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
-    object_people: 'CMS.Models.ObjectPerson.stubs',
-    people: 'CMS.Models.Person.stubs',
-    object_objectives: 'CMS.Models.ObjectObjective.stubs',
-    objectives: 'CMS.Models.Objective.stubs',
-    object_controls: 'CMS.Models.ObjectControl.stubs',
-    controls: 'CMS.Models.Control.stubs',
-    object_sections: 'CMS.Models.ObjectSection.stubs',
-    requirements: 'CMS.Models.get_stubs',
   },
   tree_view_options: {
     add_item_view: GGRC.mustache_path +

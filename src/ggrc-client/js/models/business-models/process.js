@@ -39,11 +39,6 @@ export default Cacheable('CMS.Models.Process', {
   attributes: {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
-    object_people: 'CMS.Models.ObjectPerson.stubs',
-    people: 'CMS.Models.Person.stubs',
-    objectives: 'CMS.Models.Objective.stubs',
-    controls: 'CMS.Models.Control.stubs',
-    requirements: 'CMS.Models.get_stubs',
     network_zone: 'CMS.Models.Option.stub',
   },
   defaults: {
