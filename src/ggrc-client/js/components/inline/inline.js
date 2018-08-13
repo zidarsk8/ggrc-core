@@ -71,10 +71,9 @@ export default can.Component.extend({
       }
 
       this.attr('editMode', false);
-      // In case value is String and consists only of spaces - do nothing
-      if (typeof value === 'string' && !value.trim()) {
-        this.attr('context.value', '');
-        value = null;
+
+      if (typeof value === 'string') {
+        value = value.trim();
       }
 
       if (oldValue === value) {
