@@ -9,7 +9,6 @@ import string
 from mock import MagicMock
 
 import ddt
-import sqlalchemy as sa
 
 from ggrc import db
 from ggrc.models import all_models
@@ -417,19 +416,6 @@ class TestStatusApiPatch(TestCase):
     self.group = all_models.CycleTaskGroup.query.get(self.group_id)
     self.cycle = self.group.cycle
     self.workflow = self.group.cycle.workflow
-
-  def assert_notifications_for_object(self, obj, *expected_notification_list):
-    """Assert object notifications are equal to expected notification list."""
-    active_notifications = all_models.Notification.query.filter(
-        all_models.Notification.object_id == obj.id,
-        all_models.Notification.object_type == obj.type,
-        sa.or_(all_models.Notification.sent_at.is_(None),
-               all_models.Notification.repeating == sa.true())
-    ).all()
-    self.assertEqual(
-        sorted(expected_notification_list),
-        sorted([n.notification_type.name for n in active_notifications])
-    )
 
   def assert_latest_revision_status(self, *obj_status_chain):
     """Assert last status for object and status chain."""

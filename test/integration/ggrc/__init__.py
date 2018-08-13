@@ -12,6 +12,7 @@ import csv
 from StringIO import StringIO
 from mock import patch
 
+import sqlalchemy as sa
 from sqlalchemy import exc
 from sqlalchemy import func
 from sqlalchemy.sql.expression import tuple_
@@ -534,4 +535,17 @@ class TestCase(BaseTestCase, object):
     return db.session.query(all_models.Attributes).filter(
         all_models.Attributes.object_type == model_name,
         all_models.Attributes.object_id.in_(ids),
+    )
+
+  def assert_notifications_for_object(self, obj, *expected_notification_list):
+    """Assert object notifications are equal to expected notification list."""
+    active_notifications = all_models.Notification.query.filter(
+        all_models.Notification.object_id == obj.id,
+        all_models.Notification.object_type == obj.type,
+        sa.or_(all_models.Notification.sent_at.is_(None),
+               all_models.Notification.repeating == sa.true())
+    ).all()
+    self.assertEqual(
+        sorted(expected_notification_list),
+        sorted([n.notification_type.name for n in active_notifications])
     )
