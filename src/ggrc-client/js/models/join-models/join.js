@@ -6,6 +6,7 @@
 import RefreshQueue from '../refresh_queue';
 import Cacheable from '../cacheable';
 import Stub from '../stub';
+import {getInstance} from '../models-extensions';
 
 export default Cacheable('can.Model.Join', {
   join_keys: null,
@@ -57,13 +58,13 @@ export default Cacheable('can.Model.Join', {
     objectType = this[attr + '_type'] || (this[attr] || {}).type;
 
     if (objectId && objectType && typeof objectType === 'string') {
-      this.attr(attr, CMS.Models.get_instance(
+      this.attr(attr, getInstance(
         objectType,
         objectId,
         this[attr]
       ) || this[attr]);
     } else if (objectId) {
-      this.attr(attr, CMS.Models.get_instance(this[attr]));
+      this.attr(attr, getInstance(this[attr]));
     }
   },
 
@@ -73,7 +74,7 @@ export default Cacheable('can.Model.Join', {
     if (objectId) {
       this.attr(
         attr,
-        new Stub(CMS.Models.get_instance(
+        new Stub(getInstance(
           modelName, objectId, this[attr]
         )) || this[attr]
       );

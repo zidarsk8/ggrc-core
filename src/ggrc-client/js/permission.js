@@ -5,6 +5,7 @@
 
 import {getPageInstance} from './plugins/utils/current-page-utils';
 import Stub from '../js/models/stub';
+import {getInstance} from '../js/models/models-extensions';
 
 let ADMIN_PERMISSION;
 let _CONDITIONS_MAP = {
@@ -108,7 +109,7 @@ const Permission = can.Construct({
     if ($.type(value) == 'string') {
       if (value[0] == '$') {
         if (value == '$current_user') {
-          return CMS.Models.get_instance('Person', GGRC.current_user.id);
+          return getInstance('Person', GGRC.current_user.id);
         }
         throw new Error('unknown permission variable: ' + value);
       }

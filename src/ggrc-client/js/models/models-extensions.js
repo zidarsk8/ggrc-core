@@ -5,10 +5,7 @@
 
 import Stub from './stub';
 
-window.CMS = window.CMS || {};
-window.CMS.Models = window.CMS.Models || {};
-
-CMS.Models.get_instance = function (objectType, objectId, paramsOrObject) {
+const getInstance = (objectType, objectId, paramsOrObject) => {
   let model;
   let params = {};
   let instance;
@@ -68,4 +65,8 @@ CMS.Models.get_instance = function (objectType, objectId, paramsOrObject) {
     }
   }
   return instance;
+};
+
+export {
+  getInstance,
 };

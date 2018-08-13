@@ -10,6 +10,7 @@ import {
 import RefreshQueue from '../models/refresh_queue';
 import Mappings from '../models/mappers/mappings';
 import Search from '../models/service-models/search';
+import {getInstance} from '../models/models-extensions';
 
 (function ($) {
   'use strict';
@@ -333,7 +334,7 @@ import Search from '../models/service-models/search';
            let model = CMS.Models[objName];
 
            let res = can.map(ids, (id) => {
-             return CMS.Models.get_instance(model.shortName, id);
+             return getInstance(model.shortName, id);
            });
            dfd.resolve(res);
          });
