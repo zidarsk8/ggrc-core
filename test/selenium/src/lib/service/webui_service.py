@@ -660,8 +660,8 @@ class AssessmentsService(BaseWebUiService):
     page = self.open_info_page_of_obj(obj)
     page.edit_answers()
 
-  def add_evidence_url(self, obj, urls):
-    """Add evidence url for `obj` (audit or asmt)"""
+  def add_evidence_urls(self, obj, urls):
+    """Add evidence urls for `obj` (audit or asmt)"""
     page = self.open_info_page_of_obj(obj)
     for evidence_url in urls:
       page.evidence_urls.add_url(evidence_url)

@@ -19,6 +19,7 @@ from lib.entities.entities_factory import (
     CustomAttributeDefinitionsFactory, PeopleFactory)
 from lib.entities.entity import Representation
 from lib.service import rest_facade, rest_service, webui_service
+from lib.utils import string_utils
 from lib.utils.filter_utils import FilterUtils
 from lib.utils.string_utils import StringMethods
 
@@ -494,6 +495,24 @@ class TestAssessmentsWorkflow(base.Test):
     exp_asmt.update_attrs(updated_at=act_asmt.updated_at,
                           status=act_asmt.status)
     _assert_asmt(asmts_ui_service, exp_asmt, True)
+
+  @pytest.mark.smoke_tests
+  def test_view_evidence_urls_as_verifier(self, program, audit, selenium):
+    """Test that an assessment verifier can see evidence urls
+    on assessment page
+    """
+    verifier = rest_facade.create_user_with_role(roles.CREATOR)
+    asmt = rest_facade.create_assessment(audit, verifiers=[verifier])
+    asmt_service = webui_service.AssessmentsService(selenium)
+    url = string_utils.StringMethods.random_string()
+    asmt_service.add_evidence_urls(asmt, [url])
+    users.set_current_user(verifier)
+    actual_asmt = asmt_service.get_obj_from_info_page(asmt)
+    asmt.update_attrs(
+        status=object_states.IN_PROGRESS,
+        updated_at=rest_facade.get_obj(asmt).updated_at,
+        evidence_urls=[url]).repr_ui()
+    self.general_equal_assert(asmt, actual_asmt, "audit")
 
 
 class TestRelatedAssessments(base.Test):
