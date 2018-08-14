@@ -264,8 +264,6 @@ class TestExternalRelationship(TestCase):
       product = factories.ProductFactory()
       system = factories.SystemFactory()
 
-    import ipdb
-    ipdb.set_trace()
     rel = self.create_relationship(product, system, False, self.person_ext)
     response = self.api.delete(rel)
     self.assert400(response)
