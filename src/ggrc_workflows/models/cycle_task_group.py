@@ -96,12 +96,18 @@ class CycleTaskGroup(roleable.Roleable,
                                   with_template=False),
   ]
 
+  # This parameter is overridden by cycle backref, but is here to ensure
+  # pylint does not complain
+  _cycle = None
+
   @hybrid.hybrid_property
   def cycle(self):
+    """Getter for cycle foreign key."""
     return self._cycle
 
   @cycle.setter
   def cycle(self, cycle):
+    """Set cycle foreign key and relationship."""
     if not self._cycle and cycle:
       relationship.Relationship(source=cycle, destination=self)
     self._cycle = cycle

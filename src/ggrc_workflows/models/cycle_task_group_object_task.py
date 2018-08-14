@@ -129,12 +129,18 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
   finished_date = db.Column(db.DateTime)
   verified_date = db.Column(db.DateTime)
 
+  # This parameter is overridden by cycle task group backref, but is here to
+  # ensure pylint does not complain
+  _cycle_task_group = None
+
   @hybrid.hybrid_property
   def cycle_task_group(self):
+    """Getter for cycle task group foreign key."""
     return self._cycle_task_group
 
   @cycle_task_group.setter
   def cycle_task_group(self, cycle_task_group):
+    """Setter for cycle task group foreign key."""
     if not self._cycle_task_group and cycle_task_group:
       relationship.Relationship(source=cycle_task_group, destination=self)
     self._cycle_task_group = cycle_task_group
@@ -155,6 +161,7 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
 
   @builder.simple_property
   def folder(self):
+    """Simple property for cycle folder."""
     if self.cycle:
       return self.cycle.folder
     return ""
@@ -426,6 +433,7 @@ class CycleTaskable(object):
 
   @classmethod
   def eager_query(cls):
+    """Eager query for objects with cycle tasks."""
     query = super(CycleTaskable, cls).eager_query()
     return query.options(
         orm.subqueryload('related_sources')
