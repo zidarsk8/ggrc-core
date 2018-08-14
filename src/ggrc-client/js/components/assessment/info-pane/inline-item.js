@@ -6,27 +6,23 @@
 import './confirm-edit-action';
 import template from './inline-item.mustache';
 
-(function (can) {
-  'use strict';
-
-  GGRC.Components('assessmentInlineItem', {
-    tag: 'assessment-inline-item',
-    template: template,
-    viewModel: {
-      instance: {},
-      propName: '@',
-      value: '',
-      type: '@',
-      dropdownOptions: [],
-      dropdownOptionsGroups: {},
-      dropdownClass: '@',
-      isGroupedDropdown: false,
-      dropdownNoValue: false,
-      withReadMore: false,
-      isEditIconDenied: false,
-      onStateChangeDfd: can.Deferred().resolve(),
-      mandatory: false,
-      isConfirmationNeeded: true,
-    },
-  });
-})(window.can);
+export default can.Component.extend({
+  tag: 'assessment-inline-item',
+  template,
+  viewModel: {
+    instance: {},
+    propName: '@',
+    value: '',
+    type: '@',
+    dropdownOptions: [],
+    dropdownOptionsGroups: {},
+    dropdownClass: '@',
+    isGroupedDropdown: false,
+    dropdownNoValue: false,
+    withReadMore: false,
+    isEditIconDenied: false,
+    onStateChangeDfd: can.Deferred().resolve(),
+    mandatory: false,
+    isConfirmationNeeded: true,
+  },
+});

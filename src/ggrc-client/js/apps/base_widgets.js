@@ -48,6 +48,7 @@
     Regulation: 20,
     Requirement: 30,
     Objective: 40,
+    Risk: 45,
     Control: 50,
     Product: 60,
     System: 70,
@@ -128,7 +129,7 @@
     Vendor: filteredTypes,
   };
 
-  baseWidgetsByType = _.extend(baseWidgetsByType, objectVersionWidgets);
+  baseWidgetsByType = _.assign(baseWidgetsByType, objectVersionWidgets);
 
   GGRC.tree_view = GGRC.tree_view || new can.Map();
   GGRC.tree_view.attr('base_widgets_by_type', baseWidgetsByType);

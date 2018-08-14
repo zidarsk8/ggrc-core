@@ -5,7 +5,7 @@
 
 import childModelsMap from '../child-models-map';
 
-describe('childModelsMap object', () => {
+describe('child-models-map object', () => {
   afterEach(() => {
     childModelsMap.attr('container', {});
   });

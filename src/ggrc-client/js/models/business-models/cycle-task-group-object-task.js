@@ -51,7 +51,7 @@ function populateFromWorkflow(form, workflow) {
       );
       return;
     }
-    activeCycleList = _.sortByOrder(
+    activeCycleList = _.orderBy(
       activeCycleList, ['start_date'], ['desc']);
     activeCycle = activeCycleList[0];
     form.attr('workflow', {id: workflow.id, type: 'Workflow'});
@@ -275,6 +275,6 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
     let status = this.attr('status');
 
     return cycle.attr('is_current') &&
-      !_.contains(['Finished', 'Verified'], status);
+      !_.includes(['Finished', 'Verified'], status);
   },
 });

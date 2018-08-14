@@ -436,7 +436,7 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
         hi += 1;
       }
 
-      _.each(alreadyVisible, function (control) {
+      _.forEach(alreadyVisible, function (control) {
         if (!control) {
           return;
         }
@@ -457,7 +457,7 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
           // invocation and this continue can be dropped too.
           continue;
         }
-        if (!_.contains(visible, control)) {
+        if (!_.includes(visible, control)) {
           visible.push(control);
           toRender.push(control);
         }
@@ -567,7 +567,7 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
       }
       this.options.attr('filter_shown', 0);
       this.options.attr('filteredList', []);
-      finalDfd = _.foldl(queue, function (dfd, listWindow) {
+      finalDfd = _.reduce(queue, function (dfd, listWindow) {
         return dfd.then(function () {
           let res = can.Deferred();
           if (that._add_child_lists_id !== opId) {

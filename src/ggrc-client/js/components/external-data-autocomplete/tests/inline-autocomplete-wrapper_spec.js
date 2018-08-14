@@ -5,7 +5,10 @@
 
 import Cacheable from '../../../models/cacheable';
 import Component from '../inline-autocomplete-wrapper';
-import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
+import {
+  makeFakeInstance,
+  getComponentVM,
+} from '../../../../js_specs/spec_helpers';
 
 describe('inline-autocomplete-wrapper component', ()=> {
   let viewModel;
@@ -15,10 +18,11 @@ describe('inline-autocomplete-wrapper component', ()=> {
     instance = makeFakeInstance({model: Cacheable})({id: 25});
     path = 'testPath';
 
-    viewModel = new (can.Map.extend(Component.prototype.viewModel))({
-      instance,
-      path,
-    });
+    viewModel = getComponentVM(Component)
+      .attr({
+        instance,
+        path,
+      });
   });
 
   describe('viewModel', ()=> {

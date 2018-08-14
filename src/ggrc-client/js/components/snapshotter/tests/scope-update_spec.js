@@ -5,8 +5,10 @@
 
 import * as ModalsUtils from '../../../plugins/utils/modals';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../scope-update';
 
-describe('GGRC.Components.SnapshotScopeUpdater', function () {
+describe('snapshot-scope-updater component', function () {
   'use strict';
 
   let updaterViewModel;
@@ -22,7 +24,7 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
   });
 
   beforeEach(function () {
-    updaterViewModel = GGRC.Components.getViewModel('SnapshotScopeUpdater');
+    updaterViewModel = getComponentVM(Component);
     document.body.innerHTML =
       '<tree-widget-container></tree-widget-container>' +
       '<tree-widget-container></tree-widget-container>';
@@ -33,7 +35,7 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
         model_singular: 'Control',
       },
     };
-    _.extend(updaterViewModel, {
+    _.assign(updaterViewModel, {
       instance: new can.Map({
         title: 'TITLE',
         refresh: jasmine
@@ -107,7 +109,7 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
 
     it('does not set refresh flag for each tree-widget-container that does ' +
     'not contain snapshots', function () {
-      _.extend(containerVM.model, {model_singular: 'Something'});
+      _.assign(containerVM.model, {model_singular: 'Something'});
       method();
       $('tree-widget-container').each(function () {
         let viewModel = $(this).viewModel();

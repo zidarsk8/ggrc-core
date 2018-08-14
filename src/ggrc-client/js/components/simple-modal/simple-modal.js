@@ -5,55 +5,51 @@
 
 import template from './simple-modal.mustache';
 
-(function (can, GGRC) {
-  'use strict';
-
-  /**
-   * Simple Modal Component is a general abstraction to visualize
-   * modal and pop-ups with overlay.
-   * Simple Modal can be initialized in any part of the HTML.
-   * Simple Modal provides only logic less basic markup. All business logic should be placed on the level of inner components.
-   * To simplify styling additional helper CSS classes were created: 'simple-modal__footer', 'simple-modal__body' and 'simple-modal__header'
-   */
-  can.Component.extend({
-    tag: 'simple-modal',
-    template: template,
-    viewModel: {
-      extraCssClass: '@',
-      instance: {},
-      modalTitle: '',
-      replaceContent: false,
-      isDisabled: false,
-      modalWrapper: null,
-      state: {
-        open: false,
-      },
-      hide: function () {
-        this.attr('state.open', false);
-      },
-      show: function () {
-        this.attr('state.open', true);
-      },
-      showHideModal(showModal) {
-        const $modalWrapper = this.attr('modalWrapper');
-        if (showModal) {
-          $modalWrapper.modal().on('hidden.bs.modal', this.hide.bind(this));
-        } else {
-          $modalWrapper.modal('hide').off('hidden.bs.modal');
-        }
-      },
+/**
+ * Simple Modal Component is a general abstraction to visualize
+ * modal and pop-ups with overlay.
+ * Simple Modal can be initialized in any part of the HTML.
+ * Simple Modal provides only logic less basic markup. All business logic should be placed on the level of inner components.
+ * To simplify styling additional helper CSS classes were created: 'simple-modal__footer', 'simple-modal__body' and 'simple-modal__header'
+ */
+export default can.Component.extend({
+  tag: 'simple-modal',
+  template,
+  viewModel: {
+    extraCssClass: '@',
+    instance: {},
+    modalTitle: '',
+    replaceContent: false,
+    isDisabled: false,
+    modalWrapper: null,
+    state: {
+      open: false,
     },
-    events: {
-      inserted() {
-        const viewModel = this.viewModel;
-        const modalWrapper = this.element
-          .find('[data-modal-wrapper-target="true"]');
-        viewModel.attr('modalWrapper', modalWrapper);
-        viewModel.showHideModal(viewModel.attr('state.open'));
-      },
-      '{viewModel.state} open'(state, ev, newValue) {
-        this.viewModel.showHideModal(newValue);
-      },
+    hide: function () {
+      this.attr('state.open', false);
     },
-  });
-})(window.can, window.GGRC);
+    show: function () {
+      this.attr('state.open', true);
+    },
+    showHideModal(showModal) {
+      const $modalWrapper = this.attr('modalWrapper');
+      if (showModal) {
+        $modalWrapper.modal().on('hidden.bs.modal', this.hide.bind(this));
+      } else {
+        $modalWrapper.modal('hide').off('hidden.bs.modal');
+      }
+    },
+  },
+  events: {
+    inserted() {
+      const viewModel = this.viewModel;
+      const modalWrapper = this.element
+        .find('[data-modal-wrapper-target="true"]');
+      viewModel.attr('modalWrapper', modalWrapper);
+      viewModel.showHideModal(viewModel.attr('state.open'));
+    },
+    '{viewModel.state} open'(state, ev, newValue) {
+      this.viewModel.showHideModal(newValue);
+    },
+  },
+});

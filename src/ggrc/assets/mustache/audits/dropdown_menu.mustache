@@ -93,14 +93,12 @@
     </issue-unmap-dropdown-item>
 
     {{#if instance.viewLink}}
-      {{#is_allowed "view_object_page" instance}}
-        <li>
-          <a href="{{instance.viewLink}}">
-            <i class="fa fa-long-arrow-right"></i>
-            Open {{instance.class.title_singular}}
-          </a>
-        </li>
-      {{/is_allowed}}
+      <li>
+        <a href="{{instance.viewLink}}">
+          <i class="fa fa-long-arrow-right"></i>
+          Open {{instance.class.title_singular}}
+        </a>
+      </li>
     {{/if}}
   {{/is_info_pin}}
 

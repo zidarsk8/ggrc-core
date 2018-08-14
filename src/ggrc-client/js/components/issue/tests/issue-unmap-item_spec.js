@@ -10,7 +10,7 @@ import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
 import Relationship from '../../../models/join-models/relationship';
 
-describe('issue-unmap-related-snapshots component', ()=> {
+describe('issue-unmap-item component', ()=> {
   let viewModel;
   let events;
   beforeEach(()=> {
@@ -255,7 +255,7 @@ describe('issue-unmap-related-snapshots component', ()=> {
           let oldRelatedObjectType = relatedObject.type;
           let expectedUrl;
 
-          _.extend(relatedObject, {
+          _.assign(relatedObject, {
             type: relatedObjectType,
             child_type: oldRelatedObjectType,
             child_id: 54321,

@@ -112,7 +112,7 @@ export default can.Component.extend({
       // duplicate URLs check
       existingUrls = _.map(this.attr('urls'), 'link');
 
-      if (_.contains(existingUrls, trimmedUrl)) {
+      if (_.includes(existingUrls, trimmedUrl)) {
         notifier('error', 'URL already exists.');
         this.toggleFormVisibility(true, true);
         return false;

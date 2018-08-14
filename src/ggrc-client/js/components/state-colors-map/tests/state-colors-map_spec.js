@@ -3,7 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.Components.stateColorsMap', function () {
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../state-colors-map';
+
+describe('state-colors-map component', function () {
   'use strict';
 
   let completedState = 'In Progress';
@@ -14,7 +17,7 @@ describe('GGRC.Components.stateColorsMap', function () {
     let viewModel;
 
     beforeEach(function () {
-      viewModel = GGRC.Components.getViewModel('stateColorsMap');
+      viewModel = getComponentVM(Component);
     });
 
     it('suffix property should be "inprogress"', function () {
@@ -27,7 +30,7 @@ describe('GGRC.Components.stateColorsMap', function () {
     let viewModel;
 
     beforeEach(function () {
-      viewModel = GGRC.Components.getViewModel('stateColorsMap');
+      viewModel = getComponentVM(Component);
     });
 
     it('suffix property should be "notstarted"', function () {

@@ -3,13 +3,13 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.Components.modalConnector', function () {
-  let Component;
+import Component from '../modal-connector';
+
+describe('ggrc-modal-connector component', function () {
   let viewModel;
   let events;
 
   beforeAll(function () {
-    Component = GGRC.Components.get('modalConnector');
     events = Component.prototype.events;
   });
   beforeEach(function () {

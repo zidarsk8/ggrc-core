@@ -5,9 +5,10 @@
 
 import * as pickerUtils from '../../../plugins/utils/gdrive-picker-utils';
 import tracker from '../../../tracker';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../gdrive_picker_launcher';
 
-
-describe('GGRC.Components.gDrivePickerLauncher', function () {
+describe('gdrive-picker-launcher', function () {
   'use strict';
 
   let viewModel;
@@ -16,7 +17,7 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
   };
 
   beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('gDrivePickerLauncher');
+    viewModel = getComponentVM(Component);
     spyOn(tracker, 'start').and.returnValue(() => {});
   });
 

@@ -10,7 +10,6 @@ import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
 import {
   getWidgetConfig,
 } from '../plugins/utils/object-versions-utils';
-import Mappings from '../models/mappers/mappings';
 import {inferObjectType} from '../plugins/utils/models-utils';
 import {getPageInstance} from '../plugins/utils/current-page-utils';
 import Role from '../models/service-models/role';
@@ -20,7 +19,7 @@ import Role from '../models/service-models/role';
 
   CoreExtension.name = 'core"';
   GGRC.extensions.push(CoreExtension);
-  _.extend(CoreExtension, {
+  _.assign(CoreExtension, {
     object_type_decision_tree: function () {
       return {
         program: CMS.Models.Program,
@@ -40,14 +39,6 @@ import Role from '../models/service-models/role';
         access_group: CMS.Models.AccessGroup,
         market: CMS.Models.Market,
         metric: CMS.Models.Metric,
-        system_or_process: {
-          _discriminator: function (data) {
-            if (data.is_biz_process) {
-              return CMS.Models.Process;
-            }
-            return CMS.Models.System;
-          },
-        },
         system: CMS.Models.System,
         process: CMS.Models.Process,
         control: CMS.Models.Control,
@@ -166,10 +157,6 @@ import Role from '../models/service-models/role';
           display_list: CMS.Models[name].tree_view_options.child_tree_display_list || w_list,
         });
       });
-
-      function sort_sections(sections) {
-        return can.makeArray(sections).sort(window.natural_comparator);
-      }
 
       function apply_mixins(definitions) {
         let mappings = {};
@@ -309,124 +296,96 @@ import Role from '../models/service-models/role';
         },
         business_objects: {
           Audit: {
-            mapping: 'related_audits',
             draw_children: true,
             allow_mapping: true,
             add_item_view: path + '/audits/tree_add_item.mustache',
           },
           AccessGroup: {
-            mapping: 'related_access_groups',
             draw_children: true,
           },
           DataAsset: {
-            mapping: 'related_data_assets',
             draw_children: true,
           },
           Facility: {
-            mapping: 'related_facilities',
             draw_children: true,
           },
           Market: {
-            mapping: 'related_markets',
             draw_children: true,
           },
           Metric: {
-            mapping: 'related_metrics',
             draw_children: true,
           },
           OrgGroup: {
-            mapping: 'related_org_groups',
             draw_children: true,
           },
           Vendor: {
-            mapping: 'related_vendors',
             draw_children: true,
           },
           Process: {
-            mapping: 'related_processes',
             draw_children: true,
           },
           Product: {
-            mapping: 'related_products',
             draw_children: true,
           },
           ProductGroup: {
-            mapping: 'related_product_groups',
             draw_children: true,
           },
           Project: {
-            mapping: 'related_projects',
             draw_children: true,
           },
           System: {
-            mapping: 'related_systems',
             draw_children: true,
           },
           Assessment: {
-            mapping: 'related_assessments',
             draw_children: true,
           },
           Person: {
-            mapping: 'people',
             draw_children: true,
           },
           Program: {
-            mapping: 'programs',
             draw_children: true,
           },
           Risk: {
-            mapping: 'risks',
             draw_children: true,
           },
           TechnologyEnvironment: {
-            mapping: 'related_technology_environments',
             draw_children: true,
           },
           Threat: {
-            mapping: 'threats',
             draw_children: true,
           },
         },
         issues: {
           Issue: {
-            mapping: 'related_issues',
             draw_children: true,
           },
         },
         governance_objects: {
           Regulation: {
             draw_children: true,
-            fetch_post_process: sort_sections,
             add_item_view: path + '/snapshots/tree_add_item.mustache',
           },
           Contract: {
             draw_children: true,
-            fetch_post_process: sort_sections,
           },
           Policy: {
             draw_children: true,
-            fetch_post_process: sort_sections,
             add_item_view: path + '/snapshots/tree_add_item.mustache',
           },
           Standard: {
             draw_children: true,
-            fetch_post_process: sort_sections,
             add_item_view: path + '/snapshots/tree_add_item.mustache',
           },
           Control: {
-            mapping: 'controls',
             draw_children: true,
           },
           Objective: {
-            mapping: 'objectives',
             draw_children: true,
           },
           Requirement: {
-            mapping: 'requirements',
             draw_children: true,
           },
           Clause: {
-            mapping: 'clauses',
             draw_children: true,
           },
         },
@@ -446,7 +405,6 @@ import Role from '../models/service-models/role';
             allow_mapping: true,
             allow_creating: true,
             model: CMS.Models.Person,
-            mapping: 'mapped_and_or_authorized_people',
             draw_children: true,
           },
         },
@@ -460,23 +418,18 @@ import Role from '../models/service-models/role';
             allow_creating: false,
           },
           Requirement: {
-            mapping: 'requirements',
             draw_children: true,
           },
           Clause: {
-            mapping: 'clauses',
             draw_children: true,
           },
           Threat: {
-            mapping: 'threats',
             draw_children: true,
           },
           Risk: {
-            mapping: 'risks',
             draw_children: true,
           },
           Assessment: {
-            mapping: 'related_assessments',
             parent_instance: getPageInstance(),
             allow_mapping: true,
             draw_children: true,
@@ -484,7 +437,6 @@ import Role from '../models/service-models/role';
             add_item_view: path + '/assessments/tree_add_item.mustache',
           },
           AssessmentTemplate: {
-            mapping: 'related_assessment_templates',
             draw_children: false,
             allow_mapping: false,
             add_item_view: GGRC.mustache_path +
@@ -506,15 +458,12 @@ import Role from '../models/service-models/role';
             'objectives', 'controls', 'business_objects',
           ],
           Requirement: {
-            mapping: 'requirements',
             draw_children: true,
           },
           Clause: {
-            mapping: 'clauses',
             draw_children: true,
           },
           Audit: {
-            mapping: 'related_audits',
             draw_children: true,
           },
         },
@@ -533,28 +482,24 @@ import Role from '../models/service-models/role';
         Clause: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Audit: {
-            mapping: 'related_audits',
             draw_children: true,
           },
         },
         Requirement: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Audit: {
-            mapping: 'related_audits',
             draw_children: true,
           },
         },
         Objective: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Audit: {
-            mapping: 'related_audits',
             draw_children: true,
           },
         },
         Control: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Audit: {
-            mapping: 'related_audits',
             draw_children: true,
           },
         },
@@ -567,17 +512,14 @@ import Role from '../models/service-models/role';
             add_item_view: path + '/audits/tree_add_item.mustache',
           },
           Requirement: {
-            mapping: 'requirements',
             draw_children: true,
           },
           Clause: {
-            mapping: 'clauses',
             draw_children: true,
           },
         },
         AssessmentTemplate: {
           Audit: {
-            mapping: 'related_audits',
             draw_children: true,
             allow_creating: false,
             allow_mapping: true,
@@ -586,14 +528,12 @@ import Role from '../models/service-models/role';
         Risk: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Threat: {
-            mapping: 'threats',
             draw_children: true,
           },
         },
         Threat: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Risk: {
-            mapping: 'risks',
             draw_children: true,
           },
         },
@@ -651,25 +591,19 @@ import Role from '../models/service-models/role';
         Person: {
           _mixins: ['issues'],
           Program: {
-            mapping: 'extended_related_programs_via_search',
             draw_children: true,
-            fetch_post_process: sort_sections,
           },
           Regulation: {
             draw_children: true,
-            fetch_post_process: sort_sections,
           },
           Contract: {
             draw_children: true,
-            fetch_post_process: sort_sections,
           },
           Standard: {
             draw_children: true,
-            fetch_post_process: sort_sections,
           },
           Policy: {
             draw_children: true,
-            fetch_post_process: sort_sections,
           },
           Audit: {
             draw_children: true,
@@ -693,72 +627,55 @@ import Role from '../models/service-models/role';
             add_item_view: path + '/base_objects/tree_add_item.mustache',
           },
           Issue: {
-            mapping: 'extended_related_issues_via_search',
             draw_children: true,
           },
           AccessGroup: {
-            mapping: 'extended_related_access_groups_via_search',
             draw_children: true,
           },
           DataAsset: {
-            mapping: 'extended_related_data_assets_via_search',
             draw_children: true,
           },
           Facility: {
-            mapping: 'extended_related_facilities_via_search',
             draw_children: true,
           },
           Market: {
-            mapping: 'extended_related_markets_via_search',
             draw_children: true,
           },
           Metric: {
-            mapping: 'extended_related_metrics_via_search',
             draw_children: true,
           },
           OrgGroup: {
-            mapping: 'extended_related_org_groups_via_search',
             draw_children: true,
           },
           Vendor: {
-            mapping: 'extended_related_vendors_via_search',
             draw_children: true,
           },
           Process: {
-            mapping: 'extended_related_processes_via_search',
             draw_children: true,
           },
           Product: {
-            mapping: 'extended_related_products_via_search',
             draw_children: true,
           },
           ProductGroup: {
-            mapping: 'extended_related_product_groups_via_search',
             draw_children: true,
           },
           Project: {
-            mapping: 'extended_related_projects_via_search',
             draw_children: true,
           },
           System: {
-            mapping: 'extended_related_systems_via_search',
             draw_children: true,
           },
           Assessment: {
-            mapping: 'extended_related_assessment_via_search',
             draw_children: true,
             add_item_view: null,
           },
           Risk: {
-            mapping: 'extended_related_risks_via_search',
             draw_children: true,
           },
           TechnologyEnvironment: {
-            mapping: 'extended_related_technology_environments_via_search',
             draw_children: true,
           },
           Threat: {
-            mapping: 'extended_related_threats_via_search',
             draw_children: true,
           },
         },
@@ -791,7 +708,6 @@ import Role from '../models/service-models/role';
           descriptor = {
             instance: object,
             far_model: far_model,
-            mapping: Mappings.get_canonical_mapping(object.constructor.shortName, far_model.shortName),
           };
         } else {
           widget_id = model_name;

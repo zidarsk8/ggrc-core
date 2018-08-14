@@ -9,6 +9,7 @@ import '../mixins/ca-update';
 import '../mixins/timeboxed';
 import '../mixins/access-control-list';
 import '../mixins/base-notifications';
+import '../mixins/questionnaire';
 
 export default Cacheable('CMS.Models.OrgGroup', {
   root_object: 'org_group',
@@ -25,6 +26,7 @@ export default Cacheable('CMS.Models.OrgGroup', {
     'timeboxed',
     'accessControlList',
     'base-notifications',
+    'questionnaire',
   ],
   is_custom_attributable: true,
   isRoleable: true,

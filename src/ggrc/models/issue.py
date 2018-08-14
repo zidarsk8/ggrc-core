@@ -10,6 +10,7 @@ from sqlalchemy import orm
 from ggrc import db
 from ggrc import builder
 from ggrc.access_control.roleable import Roleable
+from ggrc.fulltext import attributes
 from ggrc.models.comment import Commentable
 from ggrc.models.deferred import deferred
 from ggrc.models import mixins
@@ -64,9 +65,13 @@ class Issue(Roleable,
       reflection.Attribute("allow_unmap_from_audit",
                            create=False,
                            update=False),
+      reflection.Attribute("due_date"),
   )
 
   _aliases = {
+      "due_date": {
+          "display_name": "Due Date"
+      },
       "test_plan": {
           "display_name": "Remediation Plan"
       },
@@ -84,9 +89,14 @@ class Issue(Roleable,
       "documents_file": None,
   }
 
+  _fulltext_attrs = [
+      attributes.DateFullTextAttr('due_date', 'due_date'),
+  ]
+
   audit_id = deferred(
       db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=True),
       'Issue')
+  due_date = db.Column(db.Date)
 
   @builder.simple_property
   def allow_map_to_audit(self):
@@ -123,7 +133,9 @@ class Issue(Roleable,
 
   @classmethod
   def indexed_query(cls):
-    return cls._populate_query(super(Issue, cls).indexed_query())
+    return super(Issue, cls).indexed_query().options(
+        orm.Load(cls).load_only("due_date"),
+    )
 
   @classmethod
   def eager_query(cls):

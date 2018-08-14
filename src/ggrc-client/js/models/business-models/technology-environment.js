@@ -9,6 +9,7 @@ import '../mixins/ca-update';
 import '../mixins/timeboxed';
 import '../mixins/access-control-list';
 import '../mixins/base-notifications';
+import '../mixins/questionnaire';
 
 export default Cacheable('CMS.Models.TechnologyEnvironment', {
   root_object: 'technology_environment',
@@ -25,6 +26,7 @@ export default Cacheable('CMS.Models.TechnologyEnvironment', {
     'timeboxed',
     'accessControlList',
     'base-notifications',
+    'questionnaire',
   ],
   attributes: {
     context: 'CMS.Models.Context.stub',

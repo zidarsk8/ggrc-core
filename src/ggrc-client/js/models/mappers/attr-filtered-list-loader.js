@@ -14,12 +14,12 @@
           if (!binding.mappings) {
             return;
           }
-          return _.any(binding.mappings, function (mapping) {
+          return _.some(binding.mappings, function (mapping) {
             let instance = mapping.instance;
             if (instance instanceof Relationship) {
               if (_.exists(instance, 'attrs') &&
                   instance.attrs[prop] && (!value ||
-                _.contains(instance.attrs[prop].split(','), value))) {
+                _.includes(instance.attrs[prop].split(','), value))) {
                 return true;
               }
             }
@@ -34,7 +34,7 @@
       init_listeners: function (binding) {
         this._super(binding);
         function itemFromList(list, id) {
-          return _.first(can.makeArray(list).filter(function (item) {
+          return _.head(can.makeArray(list).filter(function (item) {
             return item.instance.id === id;
           }));
         }
@@ -64,7 +64,7 @@
           if (!active) {
             return;
           }
-          contains = _.contains(value.split(','), this.keyword);
+          contains = _.includes(value.split(','), this.keyword);
           if (!contains && activeInList) {
             binding.list.splice(
               _.map(binding.list, function (e) {

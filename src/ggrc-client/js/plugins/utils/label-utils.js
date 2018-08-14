@@ -4,7 +4,7 @@
 */
 
 const sortByName = (labels) => {
-  const sortedLabels = _.sortByOrder(
+  const sortedLabels = _.orderBy(
     labels,
     (label) => {
       return label.name && label.name.toLowerCase ?

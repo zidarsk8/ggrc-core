@@ -3,35 +3,30 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (can, $) {
-  'use strict';
+export default can.Component.extend({
+  tag: 'checkbox-to-list',
+  viewModel: {
+    property: '@',
+    instance: null,
+    values: {},
+  },
+  init: function () {
+    let viewModel = this.viewModel;
+    let values = viewModel.attr('instance.' + viewModel.attr('property'));
 
-  GGRC.Components('checkboxToList', {
-    tag: 'checkbox-to-list',
-    template: '<content></content>',
-    scope: {
-      property: '@',
-      instance: null,
-      values: {},
+    if (values && _.isString(values)) {
+      _.forEach(_.splitTrim(values, ','), function (val) {
+        if (val) {
+          viewModel.attr('values.' + val, true);
+        }
+      });
+    }
+  },
+  events: {
+    '{viewModel.values} change': function () {
+      let viewModel = this.viewModel;
+      let values = _.getExistingKeys(viewModel.attr('values').serialize());
+      viewModel.instance.attr(viewModel.attr('property'), values.join(','));
     },
-    init: function () {
-      let scope = this.scope;
-      let values = scope.attr('instance.' + scope.attr('property'));
-
-      if (values && _.isString(values)) {
-        _.each(_.splitTrim(values, ','), function (val) {
-          if (val) {
-            scope.attr('values.' + val, true);
-          }
-        });
-      }
-    },
-    events: {
-      '{scope.values} change': function () {
-        let scope = this.scope;
-        let values = _.getExistingKeys(scope.attr('values').serialize());
-        scope.instance.attr(scope.attr('property'), values.join(','));
-      },
-    },
-  });
-})(window.can, window.can.$);
+  },
+});

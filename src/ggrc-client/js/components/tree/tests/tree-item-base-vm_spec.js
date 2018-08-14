@@ -6,7 +6,7 @@
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import BaseTreeItemVM from '../tree-item-base-vm';
 
-describe('GGRC.VM.BaseTreeItemVM', function () {
+describe('tree-item-base viewModel', function () {
   'use strict';
 
   let vm;

@@ -67,7 +67,7 @@ export default Cacheable('CMS.Models.CustomAttributeDefinition', {
         return 'Blank values not allowed.';
       }
 
-      uniques = _.unique(nonBlanks);
+      uniques = _.uniq(nonBlanks);
       if (uniques.length < nonBlanks.length) {
         return 'Duplicate values found.';
       }

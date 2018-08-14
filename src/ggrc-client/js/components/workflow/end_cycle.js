@@ -22,40 +22,36 @@ import {
  *   </cycle-end-cycle>
  *
  */
-(function (GGRC, can) {
-  'use strict';
 
-  GGRC.Components('endCycleButtonWrap', {
-    tag: 'cycle-end-cycle',
-    template: '<content/>',
-    events: {
-      click: function (el, ev) {
-        ev.stopPropagation();
+export default can.Component.extend({
+  tag: 'cycle-end-cycle',
+  events: {
+    click: function (el, ev) {
+      ev.stopPropagation();
 
-        this.scope.cycle
-          .refresh()
-          .then(function (cycle) {
-            return cycle.attr('is_current', false).save();
-          })
-          .then(function () {
-            return getPageInstance().refresh();
-          })
-          .then(function () {
-            let pageInstance = getPageInstance();
-            let WorkflowExtension =
-              GGRC.extensions.find(function (extension) {
-                return extension.name === 'workflows';
-              });
+      this.scope.cycle
+        .refresh()
+        .then(function (cycle) {
+          return cycle.attr('is_current', false).save();
+        })
+        .then(function () {
+          return getPageInstance().refresh();
+        })
+        .then(function () {
+          let pageInstance = getPageInstance();
+          let WorkflowExtension =
+            GGRC.extensions.find(function (extension) {
+              return extension.name === 'workflows';
+            });
 
-            can.trigger(el, 'refreshTree');
+          can.trigger(el, 'refreshTree');
 
-            return initCounts([
-              WorkflowExtension.countsMap.history,
-            ],
-            pageInstance.type,
-            pageInstance.id);
-          }.bind(this));
-      },
+          return initCounts([
+            WorkflowExtension.countsMap.history,
+          ],
+          pageInstance.type,
+          pageInstance.id);
+        });
     },
-  });
-})(window.GGRC, window.can);
+  },
+});

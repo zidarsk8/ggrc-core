@@ -6,7 +6,7 @@
 import Component from '../input-filter';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
-describe('GGRC.Components.inputFilter', () => {
+describe('input-filter component', () => {
   let viewModel;
 
   beforeAll(() => {

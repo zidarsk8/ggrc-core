@@ -3,13 +3,16 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('GGRC.Components.lazyRender', function () {
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../lazy-render';
+
+describe('lazy-render component', function () {
   'use strict';
 
   let viewModel;
 
   beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('lazyRender');
+    viewModel = getComponentVM(Component);
   });
 
   it('should render content only once when the trigger is truthy', function () {

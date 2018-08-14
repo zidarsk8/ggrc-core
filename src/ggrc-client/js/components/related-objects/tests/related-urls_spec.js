@@ -8,7 +8,7 @@ import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Permission from '../../../permission';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
 
-describe('GGRC.Components.relatedUrls', function () {
+describe('related-urls component', function () {
   'use strict';
 
   let viewModel;

@@ -3,20 +3,16 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.Components.autocomplete', function () {
-  'use strict';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../autocomplete';
 
-  let Component; // the component under test
 
-  beforeAll(function () {
-    Component = GGRC.Components.get('autocomplete');
-  });
-
+describe('autocomplete', function () {
   describe('defining default viewModel values', function () {
     let viewModel;
 
     beforeAll(function () {
-      viewModel = Component.prototype.viewModel;
+      viewModel = getComponentVM(Component);
     });
 
     it('sets the automappingOff flag to true', function () {

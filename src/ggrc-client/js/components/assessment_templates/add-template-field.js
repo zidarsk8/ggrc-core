@@ -54,13 +54,13 @@ export default can.Component.extend({
           attribute_type: type,
           multi_choice_options: values,
         });
-        _.each(['title', 'values', 'multi_choice_options'],
+        _.forEach(['title', 'values', 'multi_choice_options'],
           (type) => {
             selected.attr(type, '');
           });
       },
       validateValues(viewModel, type, values) {
-        let invalidValues = _.contains(viewModel.valueAttrs, type) && !values;
+        let invalidValues = _.includes(viewModel.valueAttrs, type) && !values;
         viewModel.attr('selected.invalidValues', invalidValues);
       },
       validateTitle(validators) {
@@ -91,7 +91,7 @@ export default can.Component.extend({
     init() {
       let types = this.viewModel.attr('types');
       if (!this.viewModel.attr('selected.type')) {
-        this.viewModel.attr('selected.type', _.first(types).attr('type'));
+        this.viewModel.attr('selected.type', _.head(types).attr('type'));
       }
     },
   },
@@ -103,7 +103,7 @@ export default can.Component.extend({
      */
     placeholder(options) {
       let types = this.attr('types');
-      let item = _.findWhere(types, {
+      let item = _.find(types, {
         type: this.attr('selected.type'),
       });
       if (item) {

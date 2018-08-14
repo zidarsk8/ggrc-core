@@ -80,7 +80,7 @@ describe('sub-tree-models component', function () {
         {}, {}, {}, {}, {},
       ]));
 
-      result = _.uniq(vm.attr('uniqueModelsList'), function (el) {
+      result = _.uniqBy(vm.attr('uniqueModelsList'), function (el) {
         return el.attr('inputId');
       });
 

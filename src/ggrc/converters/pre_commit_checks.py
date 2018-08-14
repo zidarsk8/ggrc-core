@@ -4,6 +4,7 @@
 """Checker function for import pre commit hooks."""
 
 from ggrc.converters import errors
+from ggrc.models import all_models
 
 
 def check_tasks(row_converter):
@@ -27,6 +28,12 @@ def check_tasks(row_converter):
         start_date="Start date",
         end_date="End date",
     )
+
+  if obj.start_date.isoweekday() > all_models.Workflow.WORK_WEEK_LEN:
+    row_converter.add_error(errors.START_DATE_ON_WEEKEND_ERROR)
+
+  if obj.end_date.isoweekday() > all_models.Workflow.WORK_WEEK_LEN:
+    row_converter.add_error(errors.END_DATE_ON_WEEKEND_ERROR)
 
 
 DENY_FINISHED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "

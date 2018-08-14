@@ -130,11 +130,11 @@ describe('CMS.Models.Assessment', function () {
 
   describe('model() method', function () {
     it('does not update backup if backup was not created', function () {
-      spyOn(_, 'extend');
+      spyOn(_, 'assign');
       CMS.Models.Assessment.model({data: 'test'}, makeFakeInstance({
         model: CMS.Models.Assessment,
       })());
-      expect(_.extend).not.toHaveBeenCalled();
+      expect(_.assign).not.toHaveBeenCalled();
     });
 
     it('updates backup if backup was created', function () {

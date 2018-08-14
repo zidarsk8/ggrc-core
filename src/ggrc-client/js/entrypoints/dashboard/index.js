@@ -20,7 +20,7 @@ import '../../components/show-more/show-more';
 import '../../components/autocomplete/autocomplete';
 import '../../components/person/person-data';
 import '../../components/link_to_clipboard';
-import '../../components/mapped_tree_view';
+import '../../components/mapping-tree-view/mapping-tree-view';
 import '../../components/tabs/tab-container';
 import '../../components/lazy_open_close';
 import '../../components/revision-log/revision-log';
