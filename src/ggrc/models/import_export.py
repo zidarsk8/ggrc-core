@@ -81,7 +81,7 @@ class ImportExport(Identifiable, db.Model):
 
 def create_import_export_entry(**kwargs):
   """Create ImportExport entry"""
-  meta = json.dumps(kwargs['gdrive_metadata']) if 'gride_metadata' in kwargs \
+  meta = json.dumps(kwargs['gdrive_metadata']) if 'gdrive_metadata' in kwargs \
       else None
   results = json.dumps(kwargs['results']) if 'results' in kwargs else None
   ie_job = ImportExport(job_type=kwargs.get('job_type', 'Import'),
