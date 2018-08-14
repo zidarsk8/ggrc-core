@@ -106,9 +106,10 @@ class InfoWidget(WithPageElements, base.Widget):
     self.comment_area = self._comment_area()
 
   def wait_save(self):
-    """Wait for page to save and page to be updated.
-    Please note that spinner is removed before DOM changes are finished
-    but hopefully it would be OK.
+    """Wait for object to be saved and page to be updated.
+    Please note that in some cases spinner disappears before DOM changes
+    are fully finished. So this code may need to be changed
+    in case of a race condition.
     """
     self._browser.element(class_name="spinner").wait_until_not_present()
 
@@ -616,6 +617,12 @@ class Assessments(InfoWidget):
         self.info_widget_elem, dropdown_locator)
     base.DropdownStatic(self.info_widget_elem,
                         dropdown_locator).select(option_value)
+
+  def edit_answers(self):
+    """Click to Edit Answers and Confirm"""
+    self._browser.button(text="Edit Answers").click()
+    self._browser.element(class_name="modal").link(text="Confirm").click()
+    self.wait_save()
 
 
 class AssessmentTemplates(InfoWidget):

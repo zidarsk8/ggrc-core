@@ -15,16 +15,20 @@ class RelatedUrls(object):
 
 
 class AssessmentEvidenceUrls(object):
+  """Represents assessment urls section on info widgets"""
+
   def __init__(self, descendant_el):
     self._root = descendant_el.element(
         class_name="info-pane__section-title", text="Evidence URL").parent()
 
   def add_url(self, url):
+    """Add url"""
     self._root.button(text="Add").click()
     self._root.text_field(class_name="create-form__input").set(url)
     self._root.element(class_name="create-form__confirm").click()
 
   def get_urls(self):
+    """Get urls"""
     return [el.text for el in self._root.elements(class_name="link")]
 
 

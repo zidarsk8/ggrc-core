@@ -421,6 +421,7 @@ class DropdownMenuItemTypes(object):
   UNMAP = "ban"
   CLONE = "clone"
   UPDATE = "refresh"
+  DEPRECATE = "times-circle"
 
 
 class TransformationElements(TransformationSetVisibleFields, CommonAssessment):
