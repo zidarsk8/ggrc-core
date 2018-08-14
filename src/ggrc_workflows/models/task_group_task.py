@@ -66,12 +66,18 @@ class TaskGroupTask(roleable.Roleable,
   response_options = db.Column(
       JsonType(), nullable=False, default=[])
 
+  # This parameter is overridden by workflow backref, but is here to ensure
+  # pylint does not complain
+  _task_group = None
+
   @hybrid.hybrid_property
   def task_group(self):
+    """Getter for task group foreign key."""
     return self._task_group
 
   @task_group.setter
   def task_group(self, task_group):
+    """Setter for task group foreign key."""
     if not self._task_group and task_group:
       relationship.Relationship(source=task_group, destination=self)
     self._task_group = task_group

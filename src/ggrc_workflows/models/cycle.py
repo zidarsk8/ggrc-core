@@ -46,6 +46,7 @@ class Cycle(roleable.Roleable,
             db.Model):
   """Workflow Cycle model
   """
+  # pylint: disable=too-many-instance-attributes
 
   __tablename__ = 'cycles'
   _title_uniqueness = False
@@ -67,12 +68,18 @@ class Cycle(roleable.Roleable,
                          nullable=False)
   next_due_date = db.Column(db.Date)
 
+  # This parameter is overridden by workflow backref, but is here to ensure
+  # pylint does not complain
+  _workflow = None
+
   @hybrid.hybrid_property
   def workflow(self):
+    """Getter for workflow foreign key."""
     return self._workflow
 
   @workflow.setter
   def workflow(self, workflow):
+    """Set workflow foreign key and relationship."""
     if not self._workflow and workflow:
       relationship.Relationship(source=workflow, destination=self)
     self._workflow = workflow

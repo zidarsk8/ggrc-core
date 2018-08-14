@@ -93,12 +93,18 @@ class TaskGroup(roleable.Roleable,
       },
   }
 
+  # This parameter is overridden by workflow backref, but is here to ensure
+  # pylint does not complain
+  _workflow = None
+
   @hybrid.hybrid_property
   def workflow(self):
+    """Getter for workflow foreign key."""
     return self._workflow
 
   @workflow.setter
   def workflow(self, workflow):
+    """Setter for workflow foreign key."""
     if not self._workflow and workflow:
       all_models.Relationship(source=workflow, destination=self)
     self._workflow = workflow
