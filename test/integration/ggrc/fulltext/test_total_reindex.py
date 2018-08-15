@@ -30,23 +30,25 @@ class TestTotalReindex(TestCase):
       'AssessmentTemplate': 6,
       'Audit': 7,
       'Comment': 4,
-      'Contract': 9,
-      'Control': 12,
-      'Cycle': 5,
-      'CycleTaskEntry': 4,
-      'CycleTaskGroup': 5,
-      'CycleTaskGroupObjectTask': 5,
-      'Evidence': 25,   # TODO improve
+      'Contract': 19,  # was 9
+      'Control': 21,  # was 11
+      'Cycle': 4,
+      # for workflow objects the additional queries are counted
+      # TODO: rewrite test
+      'CycleTaskEntry': 45,
+      'CycleTaskGroup': 10,
+      'CycleTaskGroupObjectTask': 26,
+      'Evidence': 7,
       'Document': 5,
       'Issue': 8,
       'Market': 8,
-      'Objective': 9,
+      'Objective': 19,  # was 9
       'OrgGroup': 8,
       'Person': 5,
-      'Policy': 9,
+      'Policy': 19,  # was 9
       'Process': 8,
-      'Program': 7,
-      'Regulation': 9,
+      'Program': 17,  # was 7
+      'Regulation': 19,  # was 9
       'TaskGroup': 4,
       'TaskGroupObject': 5,
       'TaskGroupTask': 4,
@@ -78,6 +80,7 @@ class TestTotalReindex(TestCase):
       ggrc_factories.ProgramFactory,
       ggrc_factories.RegulationFactory,
       ggrc_factories.DocumentFactory,
+      ggrc_factories.EvidenceFactory,
       ggrc_factories.MetricFactory,
       ggrc_factories.ProductFactory,
       ggrc_factories.ProductGroupFactory,
@@ -130,7 +133,8 @@ class TestTotalReindex(TestCase):
     for instance in query:
       db.session.reindex_set.add(instance)
     with QueryCounter() as counter:
-      mysql.update_indexer(db.session)
+      db.session.reindex_set.push_ft_records()
+      self.assertNotEqual(counter.get, 0)
       self.assertLessEqual(
           counter.get,
           self.INDEX_QUERY_LIMIT[model.__name__],
