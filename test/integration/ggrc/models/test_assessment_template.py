@@ -40,8 +40,10 @@ class TestAssessmentTemplate(TestCase):
       audit_id = audit.id
       factories.IssueTrackerIssueFactory(
           issue_tracked_obj=audit,
-          component_id="some id",
+          component_id="some component id",
           hotlist_id="some host id",
+          title="some title",
+          issue_id="some issue id"
       )
       template_id = factories.AssessmentTemplateFactory(
           audit=audit,
@@ -53,17 +55,21 @@ class TestAssessmentTemplate(TestCase):
     self.assertEqual(
         response.json["assessment_template"]["audit"],
         {
-            "type": "Audit",
-            "id": audit.id,
-            "href": "/api/audits/{}".format(audit.id),
-            "context_id": audit.context.id,
-            "issue_tracker": {
-                "component_id": "some id",
-                "enabled": False,
-                "issue_severity": None,
-                "hotlist_id": "some host id",
-                "issue_priority": None,
-                "issue_type": None
+            u"type": u"Audit",
+            u"id": long(audit.id),
+            u"href": u"/api/audits/{}".format(long(audit.id)),
+            u"context_id": long(audit.context.id),
+            u"issue_tracker": {
+                u'_warnings': [],
+                u"component_id": u"some component id",
+                u"enabled": False,
+                u"issue_severity": None,
+                u"hotlist_id": u"some host id",
+                u"issue_id": u"some issue id",
+                u"issue_priority": None,
+                u"issue_type": None,
+                u"issue_url": None,
+                u"title": "some title"
             }
         }
     )

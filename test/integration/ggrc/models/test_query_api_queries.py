@@ -55,7 +55,7 @@ class TestAllModels(WithQueryApi, TestCase):
       'ProductGroup': 14,
   }
 
-  INDEXED_MODEL_FACTORIES = [
+  MODEL_FACTORIES = [
       ggrc_factories.AuditFactory,
       ggrc_factories.AssessmentFactory,
       ggrc_factories.AssessmentTemplateFactory,
@@ -88,7 +88,7 @@ class TestAllModels(WithQueryApi, TestCase):
 
   UPPER_BOUND_COUNT = 20
 
-  QUERY_API_TEST_CASES = [(f, count) for f in INDEXED_MODEL_FACTORIES
+  QUERY_API_TEST_CASES = [(f, count) for f in MODEL_FACTORIES
                           for count in (LOWER_BOUND_COUNT,
                                         UPPER_BOUND_COUNT)]
 
@@ -99,6 +99,7 @@ class TestAllModels(WithQueryApi, TestCase):
 
     model = factory._meta.model  # pylint: disable=protected-access
     with ggrc_factories.single_commit():
+      # pylint: disable=expression-not-assigned
       {factory() for _ in range(obj_count)}
     with QueryCounter() as counter:
       self._post([{

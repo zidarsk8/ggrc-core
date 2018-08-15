@@ -16,7 +16,6 @@ from ggrc.models.mixins.with_evidence import WithEvidence
 from ggrc.rbac import SystemWideRoles
 
 from ggrc.fulltext.mixin import Indexed
-from ggrc.models import issuetracker_issue
 from ggrc.models import reflection
 from ggrc.models.context import HasOwnContext
 from ggrc.models.mixins import base
@@ -235,18 +234,10 @@ def build_audit_stub(obj):
   audit_id = obj.audit_id
   if audit_id is None:
     return None
-  if getattr(obj, "issuetracker_issue", None) is not None:
-    issue_dict = obj.issue_tracker \
-        if getattr(obj, "issue_tracker", None) \
-        else obj.issuetracker_issue.to_dict()
-  else:
-    issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
-        'Audit', audit_id)
-    issue_dict = issue_obj.to_dict() if issue_obj is not None else {}
   return {
       'type': 'Audit',
       'id': audit_id,
       'context_id': obj.context_id,
       'href': '/api/audits/%d' % audit_id,
-      'issue_tracker': issue_dict,
+      'issue_tracker': obj.audit.issue_tracker,
   }
