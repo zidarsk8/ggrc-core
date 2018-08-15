@@ -3,36 +3,14 @@
 
 """Module for general purpose signaling"""
 
-
-from blinker import Namespace
+import blinker
 
 
 # pylint: disable=too-few-public-methods
-class Signals(object):
-  """Class storing various general purpose signals
-
-  Class storing various general purpose non-RESTful signals.
-  """
-  # pylint: disable=too-few-public-methods
-  signals = Namespace()
-
-  custom_attribute_changed = signals.signal(
-      "Custom Attribute updated",
-      """
-      Indicates that a custom attribute was successfully saved to database.
-
-        :obj: The model instance
-        :value: New custom attribute value
-        :service: The instance of model handling the Custom Attribute update
-          operation
-      """,
-  )
-
-
 class Restful(object):
   """Class storing REST-related signals."""
 
-  signals = Namespace()
+  signals = blinker.Namespace()
   model_posted = signals.signal(
       "Model POSTed",
       """
@@ -44,7 +22,8 @@ class Restful(object):
         :obj: The model instance created from the POSTed JSON.
         :src: The original POSTed JSON dictionary.
         :service: The instance of Resource handling the POST request.
-      """,)
+      """,
+  )
   collection_posted = signals.signal(
       "Collection POSTed",
       """
@@ -56,7 +35,8 @@ class Restful(object):
         :objects: The model instance created from the POSTed JSON.
         :src: The original POSTed JSON dictionary.
         :service: The instance of Resource handling the POST request.
-      """,)
+      """,
+  )
   model_posted_after_commit = signals.signal(
       "Model POSTed - after",
       """
@@ -69,7 +49,8 @@ class Restful(object):
         :src: The original POSTed JSON dictionary.
         :service: The instance of Resource handling the POST request.
         :event: Instance of an Event (if change took place) or None otherwise
-      """,)
+      """,
+  )
   model_put = signals.signal(
       "Model PUT",
       """
@@ -81,7 +62,8 @@ class Restful(object):
         :obj: The model instance updated from the PUT JSON.
         :src: The original PUT JSON dictionary.
         :service: The instance of Resource handling the PUT request.
-      """,)
+      """,
+  )
   model_put_before_commit = signals.signal(
       "Model PUT - before",
       """
@@ -97,7 +79,8 @@ class Restful(object):
         :event: Instance of an Event (if change took place) or None otherwise
         :initial_state: A named tuple of initial values of an object before
           applying any change.
-      """,)
+      """,
+  )
   model_put_after_commit = signals.signal(
       "Model PUT - after",
       """
@@ -112,7 +95,8 @@ class Restful(object):
         :event: Instance of an Event (if change took place) or None otherwise
         :initial_state: A named tuple of initial values of an object before
           applying any change.
-      """,)
+      """,
+  )
   model_deleted = signals.signal(
       "Model DELETEd",
       """
@@ -122,7 +106,8 @@ class Restful(object):
 
         :obj: The model instance removed.
         :service: The instance of Resource handling the DELETE request.
-      """,)
+      """,
+  )
   model_deleted_after_commit = signals.signal(
       "Model DELETEd - after",
       """
@@ -133,4 +118,5 @@ class Restful(object):
         :obj: The model instance removed.
         :service: The instance of Resource handling the DELETE request.
         :event: Instance of an Event (if change took place) or None otherwise
-      """,)
+      """,
+  )
