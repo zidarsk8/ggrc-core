@@ -4,7 +4,7 @@
  */
 
 import {DESTINATION_UNMAPPED} from '../../events/eventTypes';
-import Relationship from '../../models/join-models/relationship';
+import Relationship from '../../models/service-models/relationship';
 
 export default can.Component.extend({
   tag: 'unmap-button',

@@ -5,7 +5,7 @@
 
 import * as QueryAPI from '../../plugins/utils/query-api-utils';
 import {REFRESH_COMMENTS} from '../../events/eventTypes';
-import Relationship from '../../models/join-models/relationship';
+import Relationship from '../../models/service-models/relationship';
 
 export default can.Component.extend('commentDataProvider', {
   tag: 'comment-data-provider',

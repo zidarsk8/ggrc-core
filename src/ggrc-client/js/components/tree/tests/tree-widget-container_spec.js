@@ -10,7 +10,7 @@ import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 import tracker from '../../../tracker';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../tree-widget-container';
-import Relationship from '../../../models/join-models/relationship';
+import Relationship from '../../../models/service-models/relationship';
 import DisplayPrefs from '../../../models/local-storage/display-prefs';
 
 describe('tree-widget-container component', function () {

@@ -17,7 +17,7 @@ import {loadScript} from '../plugins/ggrc_utils';
 import {
   inferObjectType,
 } from '../plugins/utils/models-utils';
-import Relationship from '../models/join-models/relationship';
+import Relationship from '../models/service-models/relationship';
 import Assessment from '../models/business-models/assessment';
 
 export default can.Control({

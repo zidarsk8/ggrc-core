@@ -46,12 +46,9 @@ import {
   notifier,
   notifierXHR,
 } from '../../plugins/utils/notifiers-utils';
-import Relationship from '../../models/join-models/relationship';
 import DisplayPrefs from '../../models/local-storage/display-prefs';
 import Person from '../../models/business-models/person';
 import Assessment from '../../models/business-models/assessment';
-import Objective from '../../models/business-models/objective';
-import Requirement from '../../models/business-models/requirement';
 
 export default can.Control({
   pluginName: 'ggrc_controllers_modals',
@@ -1016,7 +1013,6 @@ export default can.Control({
     let instance = this.options.instance;
     let ajd;
     let instanceId = instance.id;
-    let params;
 
     if (this.wasDestroyed()) {
       return can.Deferred().reject();
@@ -1057,32 +1053,14 @@ export default can.Control({
           }
         }
 
-        // If this was an Objective created directly from a Requirement, create a join
-        params = that.options.object_params;
-        if (obj instanceof Objective &&
-          params && params.section) {
-          new Relationship({
-            source: obj,
-            destination: Requirement
-              .findInCacheById(params.section.id),
-            context: {id: null},
-          }).save()
-            .fail(that.save_error.bind(that))
-            .done(function () {
-              $(document.body).trigger('ajax:flash',
-                {success: 'Objective mapped successfully.'});
-              finish();
-            });
-        } else {
-          if (instanceId === undefined &&
-            obj.is_declining_review &&
-            obj.is_declining_review === '1') { // new element
-            $(document.body).trigger('ajax:flash', {
-              success: 'Review declined',
-            });
-          }
-          finish();
+        if (instanceId === undefined &&
+          obj.is_declining_review &&
+          obj.is_declining_review === '1') { // new element
+          $(document.body).trigger('ajax:flash', {
+            success: 'Review declined',
+          });
         }
+        finish();
       });
     this.save_ui_status();
     return ajd;

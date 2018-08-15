@@ -5,7 +5,7 @@
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../mapper-results-item';
-import Snapshot from '../../../models/join-models/snapshot';
+import Snapshot from '../../../models/service-models/snapshot';
 import Program from '../../../models/business-models/program';
 
 describe('mapper-results-item', function () {

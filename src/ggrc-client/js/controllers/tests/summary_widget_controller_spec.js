@@ -7,7 +7,7 @@ import Ctrl from '../summary_widget_controller';
 import * as CurrentPageUtils from '../../plugins/utils/current-page-utils';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {makeFakeInstance} from '../../../js_specs/spec_helpers';
-import Relationship from '../../models/join-models/relationship';
+import Relationship from '../../models/service-models/relationship';
 import Assessment from '../../models/business-models/assessment';
 
 describe('SummaryWidgetController', function () {

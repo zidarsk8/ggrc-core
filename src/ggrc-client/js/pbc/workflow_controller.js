@@ -3,7 +3,7 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import Relationship from '../models/join-models/relationship';
+import Relationship from '../models/service-models/relationship';
 import AssessmentTemplate from '../models/business-models/assessment-template';
 import Issue from '../models/business-models/issue';
 import Requirement from '../models/business-models/requirement';
