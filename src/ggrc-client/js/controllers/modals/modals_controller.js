@@ -353,11 +353,11 @@ export default can.Control({
     });
 
     return dfd.done(function () {
-      this.reset_form();
+      this.reset_form(this.options.instance);
     }.bind(that));
   },
 
-  reset_form: function (setFieldsCb) {
+  reset_form: function (instance, setFieldsCb) {
     let preloadDfd;
 
     if (!this.wasDestroyed()) {
@@ -368,19 +368,20 @@ export default can.Control({
       // This is to trigger `focus_first_element` in modal_ajax handling
       this.element.trigger('loaded');
     }
-    if (!this.options.instance._transient) {
-      this.options.instance.attr('_transient', new can.Observe({}));
+    if (!instance._transient) {
+      instance.attr('_transient', new can.Observe({}));
     }
-    if (this.options.instance.form_preload) {
-      preloadDfd = this.options.instance.form_preload(
+    if (instance.form_preload) {
+      preloadDfd = instance.form_preload(
         this.options.new_object_form,
         this.options.object_params);
       if (preloadDfd) {
         preloadDfd.then(function () {
-          this.options.instance.backup();
-        }.bind(this));
+          instance.backup();
+        });
       }
     }
+    return preloadDfd || can.Deferred().resolve();
   },
 
   fetch_all: function () {
@@ -972,20 +973,19 @@ export default can.Control({
   new_instance: function (data) {
     let newInstance = this.prepareInstance();
 
-    $.when(this.options.attr('instance', newInstance))
-      .done(function () {
-        this.reset_form(function () {
-          if (this.wasDestroyed()) {
-            return;
-          }
+    this.reset_form(newInstance, () => {
+      if (this.wasDestroyed()) {
+        return;
+      }
 
-          let $form = $(this.element).find('form');
-          $form.trigger('reset');
-        }.bind(this));
-      }.bind(this))
-      .then(this.proxy('apply_object_params'))
-      .then(this.proxy('serialize_form'))
-      .then(this.proxy('autocomplete'));
+      let $form = $(this.element).find('form');
+      $form.trigger('reset');
+    }).done(() => {
+      $.when(this.options.attr('instance', newInstance))
+        .then(this.proxy('apply_object_params'))
+        .then(this.proxy('serialize_form'))
+        .then(this.proxy('autocomplete'));
+    });
 
     this.restore_ui_status();
   },
