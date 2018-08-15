@@ -1,6 +1,8 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Editor permissions. """
+
 scope = "System"
 description = """
   This role grants a user basic object creation and editing permission.
@@ -65,14 +67,6 @@ permissions = {
         "Role",
         "Context",
         "UserRole",
-        {
-            "type": "BackgroundTask",
-            "terms": {
-                "property_name": "modified_by",
-                "value": "$current_user"
-            },
-            "condition": "is"
-        },
     ],
     "create": [
         "Audit",
@@ -128,14 +122,6 @@ permissions = {
         "ProductGroup",
         "UserRole",
         "Context",
-        {
-            "type": "BackgroundTask",
-            "terms": {
-                "property_name": "modified_by",
-                "value": "$current_user"
-            },
-            "condition": "is"
-        },
     ],
     "update": [
         {
@@ -196,14 +182,6 @@ permissions = {
         "Role",
         "UserRole",
         "Context",
-        {
-            "type": "BackgroundTask",
-            "terms": {
-                "property_name": "modified_by",
-                "value": "$current_user"
-            },
-            "condition": "is"
-        },
     ],
     "delete": [
         {
@@ -259,13 +237,5 @@ permissions = {
         "UserRole",
         "ProductGroup",
         "Context",
-        {
-            "type": "BackgroundTask",
-            "terms": {
-                "property_name": "modified_by",
-                "value": "$current_user"
-            },
-            "condition": "is"
-        },
     ]
 }
