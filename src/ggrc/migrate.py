@@ -117,12 +117,6 @@ def extension_migrations_list():
   return ret
 
 
-def all_extensions():
-  extension_modules = ['ggrc']
-  extension_modules.extend(getattr(settings, 'EXTENSIONS', []))
-  return extension_modules
-
-
 # Additional commands for `migrate.py` command
 
 
@@ -143,10 +137,10 @@ def upgradeall(config=None, row_id=None):
       raise
 
   try:
-    for module_name in all_extensions():
-      logger.info("Upgrading %s", module_name)
-      config = make_extension_config(module_name)
-      command.upgrade(config, 'head')
+    module_name = 'ggrc'
+    logger.info("Upgrading %s", module_name)
+    config = make_extension_config(module_name)
+    command.upgrade(config, 'head')
 
   except Exception as e:
     if mig_row:
@@ -174,15 +168,15 @@ def migrate(row_id=None):
 
 def downgradeall(config=None, drop_versions_table=False):
   '''Downgrade all modules'''
-  for module_name in reversed(all_extensions()):
-    print("Downgrading {}".format(module_name))
-    config = make_extension_config(module_name)
-    command.downgrade(config, 'base')
-    if drop_versions_table:
-      from ggrc.app import db
-      extension_module_name = config.get_main_option('extension_module_name')
-      db.session.execute('DROP TABLE {0}'.format(
-          extension_version_table(extension_module_name)))
+  module_name = 'ggrc'
+  print("Downgrading {}".format(module_name))
+  config = make_extension_config(module_name)
+  command.downgrade(config, 'base')
+  if drop_versions_table:
+    from ggrc.app import db
+    extension_module_name = config.get_main_option('extension_module_name')
+    db.session.execute('DROP TABLE {0}'.format(
+        extension_version_table(extension_module_name)))
 
 
 class MigrateCommandLine(CommandLine):
@@ -210,14 +204,13 @@ class MigrateCommandLine(CommandLine):
 
 
 def main(args):
-  if len(args) < 3:
+  if len(args) < 2:
     print('usage: migrate module_name <alembic command string>')
     return -1
-  extension_module_name = args[1]
 
   cmd_line = MigrateCommandLine()
-  options = cmd_line.parser.parse_args(args[2:])
-  cfg = make_extension_config(extension_module_name)
+  options = cmd_line.parser.parse_args(args[1:])
+  cfg = make_extension_config('ggrc')
   cmd_line.run_cmd(cfg, options)
   return 0
 
