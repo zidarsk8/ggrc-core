@@ -448,16 +448,11 @@ class Resource(ModelView):
         except (IntegrityError, ValidationError, ValueError) as err:
           logger.exception(err)
           message = translate_message(err)
-          if settings.TESTING:
-            raise BadRequest(message)
-          else:
-            raise BadRequest(ggrc_errors.BAD_REQUEST_MESSAGE)
+          raise BadRequest(message)
         except Exception as err:  # pylint: disable=broad-except
           logger.exception(err)
-          if settings.TESTING:
-            raise
-          else:
-            raise BadRequest(ggrc_errors.BAD_REQUEST_MESSAGE)
+          err.message = ggrc_errors.BAD_REQUEST_MESSAGE
+          raise
         finally:
           # When running integration tests, cache sometimes does not clear
           # correctly
