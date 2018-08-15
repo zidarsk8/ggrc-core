@@ -47,7 +47,7 @@ let parserString = fs.readFileSync(parserGrammar, 'utf8');
 let filterTemplate = fs.readFileSync(parserTemplateFile, 'utf8');
 
 console.log('building parser');
-parserSrc = peg.buildParser(parserString, {output: 'source'});
+parserSrc = peg.generate(parserString, {output: 'source'});
 
 console.log('saving parser to js files');
 ggrcParser = filterTemplate.replace('"GENERATED_PLACEHOLDER"', parserSrc);

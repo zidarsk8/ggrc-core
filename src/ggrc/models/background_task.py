@@ -15,6 +15,9 @@ from werkzeug.datastructures import Headers
 from ggrc import db
 from ggrc import settings
 from ggrc.login import get_current_user
+from ggrc.access_control import role
+from ggrc.access_control import list as acl
+from ggrc.access_control import roleable
 from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models.deferred import deferred
@@ -26,7 +29,8 @@ from ggrc.models import reflection
 logger = getLogger(__name__)
 
 
-class BackgroundTask(base.ContextRBAC, Base, Stateful, db.Model):
+class BackgroundTask(roleable.Roleable, base.ContextRBAC, Base, Stateful,
+                     db.Model):
   """Background task model."""
   __tablename__ = 'background_tasks'
 
@@ -83,6 +87,23 @@ class BackgroundTask(base.ContextRBAC, Base, Stateful, db.Model):
                               self.result['headers']))
 
 
+def _add_task_acl(task):
+  """Add ACL entry for the current users background task."""
+  roles = role.get_ac_roles_for(task.type)
+  admin_role = roles.get("Admin", None)
+  if admin_role:
+    acl.AccessControlList(
+        person=get_current_user(),
+        ac_role=admin_role,
+        object=task,
+    )
+  db.session.add(task)
+  db.session.commit()
+  if admin_role:
+    from ggrc.cache.utils import clear_users_permission_cache
+    clear_users_permission_cache([get_current_user().id])
+
+
 def create_task(name, url, queued_callback=None, parameters=None, method=None):
   """Create a enqueue a bacground task."""
   if not method:
@@ -91,11 +112,12 @@ def create_task(name, url, queued_callback=None, parameters=None, method=None):
   # task name must be unique
   if not parameters:
     parameters = {}
+
   task = BackgroundTask(name=name + str(int(time())))
   task.parameters = parameters
   task.modified_by = get_current_user()
-  db.session.add(task)
-  db.session.commit()
+  _add_task_acl(task)
+
   banned = {
       "X-Appengine-Country",
       "X-Appengine-Queuename",

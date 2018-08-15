@@ -9,6 +9,8 @@ import {
 } from '../../../../js_specs/spec_helpers';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
 import Component from '../access-control-list-roles-helper';
+import Assessment from '../../../models/business-models/assessment';
+import Control from '../../../models/business-models/control';
 
 
 describe('access-control-list-roles-helper component', function () {
@@ -45,7 +47,7 @@ describe('access-control-list-roles-helper component', function () {
         },
       ]);
 
-      instance = makeFakeInstance({model: CMS.Models.Assessment})({id: 25});
+      instance = makeFakeInstance({model: Assessment})({id: 25});
       viewModel.attr('instance', instance);
       expect(instance.access_control_list.length).toEqual(0);
       viewModel.setAutoPopulatedRoles();
@@ -68,7 +70,7 @@ describe('access-control-list-roles-helper component', function () {
         },
       ]);
 
-      instance = makeFakeInstance({model: CMS.Models.Control})({id: 25});
+      instance = makeFakeInstance({model: Control})({id: 25});
       viewModel.attr('instance', instance);
       expect(instance.access_control_list.length).toEqual(0);
       viewModel.setAutoPopulatedRoles();

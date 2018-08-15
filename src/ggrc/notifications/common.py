@@ -16,6 +16,7 @@ from operator import itemgetter
 
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import true
+from sqlalchemy import inspect
 from werkzeug.exceptions import Forbidden
 from google.appengine.api import mail
 
@@ -23,7 +24,7 @@ from ggrc import db
 from ggrc import extensions
 from ggrc import settings
 from ggrc.models import Person
-from ggrc.models import Notification
+from ggrc.models import Notification, NotificationHistory
 from ggrc.rbac import permissions
 from ggrc.utils import DATE_FORMAT_US, merge_dict, benchmark
 
@@ -293,22 +294,42 @@ def send_daily_digest_notifications():
         send_email(user_email, subject, email_body)
         sent_emails.append(user_email)
 
-    with benchmark("setting daily notifications sent time"):
-      set_notification_sent_time(notif_list)
+    with benchmark("processing sent notifications"):
+      process_sent_notifications(notif_list)
 
     return "emails sent to: <br> {}".format("<br>".join(sent_emails))
 
 
-def set_notification_sent_time(notif_list):
-  """Set sent time to now for all notifications in the list.
+def process_sent_notifications(notif_list):
+  """Process sent notifications.
+
+  Set sent time to now for all notifications in the list
+  and move all non-repeatable notifications to history table.
 
   Args:
     notif_list (list of Notification): List of notification for which we want
       to modify sent_at field.
   """
   for notif in notif_list:
-    notif.sent_at = datetime.utcnow()
+    if notif.repeating:
+      notif.sent_at = datetime.utcnow()
+    else:
+      notif_history = create_notification_history_obj(notif)
+      db.session.add(notif_history)
+      db.session.delete(notif)
   db.session.commit()
+
+
+def create_notification_history_obj(notif):
+  """Create notification history object.
+
+  Args:
+    notif: Notification object.
+  """
+  notif_history_context = {c.key: getattr(notif, c.key)
+                           for c in inspect(notif).mapper.column_attrs}
+  notif_history_context["sent_at"] = datetime.utcnow()
+  return NotificationHistory(**notif_history_context)
 
 
 def show_pending_notifications():

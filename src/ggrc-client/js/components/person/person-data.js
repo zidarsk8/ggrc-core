@@ -6,6 +6,7 @@
 import RefreshQueue from '../../models/refresh_queue';
 import template from './person-data.mustache';
 import {notifier} from '../../plugins/utils/notifiers-utils';
+import Person from '../../models/business-models/person';
 
 const tag = 'person-data';
 /**
@@ -31,13 +32,13 @@ export default can.Component.extend({
             return;
           }
 
-          actualPerson = CMS.Models.Person.store[newVal.id] || {};
+          actualPerson = Person.store[newVal.id] || {};
           if (actualPerson.email) {
             setVal(actualPerson);
           } else if (newVal.email) {
             setVal(newVal);
           } else {
-            actualPerson = new CMS.Models.Person({id: newVal.id});
+            actualPerson = new Person({id: newVal.id});
             new RefreshQueue()
               .enqueue(actualPerson)
               .trigger()

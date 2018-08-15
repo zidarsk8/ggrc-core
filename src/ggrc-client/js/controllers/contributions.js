@@ -6,6 +6,8 @@
 import {makeModelInstance} from '../plugins/utils/models-utils';
 import {getPageInstance} from '../plugins/utils/current-page-utils';
 import Role from '../models/service-models/role';
+import Person from '../models/business-models/person';
+import UserRole from '../models/join-models/user-role';
 
 /* Role Assignment Modal Selector
   *
@@ -449,9 +451,9 @@ function getOptionSet(name, data) {
     related_title_singular: 'Person',
     related_title_plural: 'People',
 
-    object_model: CMS.Models.Person,
+    object_model: Person,
     option_model: Role,
-    join_model: CMS.Models.UserRole,
+    join_model: UserRole,
 
     object_query: objectQuery,
 

@@ -6,6 +6,7 @@
 import template from './issue-tracker-enable.mustache';
 import logger from './issue-tracker-log';
 import {getPageInstance} from '../current-page-utils';
+import Assessment from '../../../models/business-models/assessment';
 
 /* eslint-disable no-console */
 
@@ -61,8 +62,8 @@ const updateAssessments = (assessments) => {
           status: 'loaded',
         });
 
-        delete CMS.Models.Assessment.cache[assessment.id];
-        delete CMS.Models.Assessment.store[assessment.id];
+        delete Assessment.cache[assessment.id];
+        delete Assessment.store[assessment.id];
 
         deferred.resolve([...updated, assessment]);
       }, () => {
@@ -160,7 +161,7 @@ const IssueTrackerEnabler = can.Map.extend({
   },
   enableByIds(ids) {
     let assessmentsForUpdate = ids.splice(0, 5)
-      .map((id) => CMS.Models.Assessment.findOne({id}));
+      .map((id) => Assessment.findOne({id}));
 
     return $.when(...assessmentsForUpdate)
       .then((...assessments) => {

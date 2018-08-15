@@ -98,10 +98,10 @@ class TestCustomAttributesDefinitions(TestCase):
         "Send by default",
         "Comments",
         "Assessment Procedure",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
-        'Folder',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
     }
     expected_names = element_names.union(mapping_names)
     self.assertEqual(expected_names, display_names)
@@ -150,10 +150,10 @@ class TestCustomAttributesDefinitions(TestCase):
         "Program Managers",
         "Program Editors",
         "Program Readers",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
-        'Folder',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
     }
     expected_names = element_names.union(mapping_names)
     self.assertEqual(expected_names, display_names)
@@ -164,6 +164,7 @@ class TestCustomAttributesDefinitions(TestCase):
     self.assertTrue(vals["Choose"]["mandatory"])
 
 
+# pylint: disable=too-many-public-methods
 @ddt.ddt
 class TestGetObjectColumnDefinitions(TestCase):
 
@@ -182,6 +183,14 @@ class TestGetObjectColumnDefinitions(TestCase):
           "Code",
           "Title",
       },
+  }
+
+  SCOPING_ROLES = {
+      "Technical / Program Managers",
+      "Product Managers",
+      "Technical Leads",
+      "Legal Counsels",
+      "System Owners",
   }
 
   @classmethod
@@ -316,10 +325,10 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Program Managers",
         "Program Editors",
         "Program Readers",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
-        'Folder',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
     }
     expected_fields = {
         "mandatory": {
@@ -352,11 +361,11 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Evidence URL",
         "Evidence File",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
-        'Folder',
-        'Last Deprecated Date'
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
+        "Last Deprecated Date",
     }
     expected_fields = {
         "mandatory": {
@@ -386,9 +395,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Custom Attributes",
         "Code",
         "Archived",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
         "Delete",
         "State",
     }
@@ -443,13 +452,13 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
         "Comments",
-        'Labels',
-        'Last Comment',
-        'Ticket Tracker',
+        "Labels",
+        "Last Comment",
+        "Ticket Tracker",
     }
     expected_fields = {
         "mandatory": {
@@ -491,11 +500,11 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Recipients",
         "Send by default",
         "Comments",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
-        'Ticket Tracker',
-        'Folder',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Ticket Tracker",
+        "Folder",
     }
     expected_fields = {
         "mandatory": {
@@ -531,10 +540,10 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Send by default",
         "Comments",
         "Assessment Procedure",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
-        'Folder',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
     }
     self._test_single_object(models.Policy, names, self.COMMON_EXPECTED)
 
@@ -583,9 +592,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Recipients",
         "Send by default",
         "Comments",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
         "Assessment Procedure",
         "Last Deprecated Date",
         "Effective Date",
@@ -624,10 +633,10 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Recipients",
         "Send by default",
         "Comments",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
-        'Folder',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
     }
     self._test_single_object(models.Control, names, self.COMMON_EXPECTED)
 
@@ -701,11 +710,12 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Send by default",
         "Comments",
         "Assessment Procedure",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
-        'Folder',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
     }
+    names.update(self.SCOPING_ROLES)
     self._test_single_object(models.System, names, self.COMMON_EXPECTED)
 
   def test_process_definitions(self):
@@ -729,11 +739,12 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Send by default",
         "Comments",
         "Assessment Procedure",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
-        'Folder',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
     }
+    names.update(self.SCOPING_ROLES)
     self._test_single_object(models.Process, names, self.COMMON_EXPECTED)
 
   def test_product_definitions(self):
@@ -757,11 +768,12 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Send by default",
         "Comments",
         "Assessment Procedure",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
-        'Folder',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
     }
+    names.update(self.SCOPING_ROLES)
     self._test_single_object(models.Product, names, self.COMMON_EXPECTED)
 
   def test_risk_definitions(self):
@@ -784,10 +796,10 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Send by default",
         "Comments",
         "Assessment Procedure",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
-        'Folder',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
     }
     expected_fields = {
         "mandatory": {
@@ -804,16 +816,44 @@ class TestGetObjectColumnDefinitions(TestCase):
     self._test_single_object(r_models.Risk, names, expected_fields)
 
   @ddt.data(
-      models.AccessGroup,
+      models.Metric,
+      models.ProductGroup,
+      models.TechnologyEnvironment,
+  )
+  def test_documentable_objects(self, model):
+    """Tests Metric, ProductGroup, TechnologyEnvironment models. """
+
+    names = {
+        "Title",
+        "Description",
+        "Notes",
+        "Admin",
+        "Reference URL",
+        "Code",
+        "Effective Date",
+        "Last Deprecated Date",
+        "State",
+        "Review State",
+        "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
+        "Recipients",
+        "Send by default",
+        "Comments",
+        "Assessment Procedure",
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
+        "Document File",
+    }
+    names.update(self.SCOPING_ROLES)
+    self._test_single_object(model, names, self.COMMON_EXPECTED)
+
+  @ddt.data(
       models.Contract,
-      models.DataAsset,
-      models.Facility,
-      models.Market,
-      models.OrgGroup,
-      models.Project,
       models.Regulation,
       models.Standard,
-      models.Vendor,
   )
   def test_common_model_definitions(self, model):
     """Test common definition names"""
@@ -835,11 +875,49 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Send by default",
         "Comments",
         "Assessment Procedure",
-        'Created Date',
-        'Last Updated Date',
-        'Last Updated By',
-        'Folder',
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
     }
+    self._test_single_object(model, names, self.COMMON_EXPECTED)
+
+  @ddt.data(
+      models.AccessGroup,
+      models.DataAsset,
+      models.Facility,
+      models.Market,
+      models.OrgGroup,
+      models.Project,
+      models.Vendor,
+  )
+  def test_scoping_model_definitions(self, model):
+    """Test common definition names"""
+
+    names = {
+        "Title",
+        "Description",
+        "Notes",
+        "Admin",
+        "Reference URL",
+        "Code",
+        "Effective Date",
+        "Last Deprecated Date",
+        "State",
+        "Review State",
+        "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
+        "Recipients",
+        "Send by default",
+        "Comments",
+        "Assessment Procedure",
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        "Folder",
+    }
+    names.update(self.SCOPING_ROLES)
     self._test_single_object(model, names, self.COMMON_EXPECTED)
 
 

@@ -6,6 +6,7 @@
 import DisplayPrefs from '../../models/local-storage/display-prefs';
 import ModalsController from '../modals/modals_controller';
 import * as NotifiersUtils from '../../plugins/utils/notifiers-utils';
+import Person from '../../models/business-models/person';
 
 describe('ModalsController', function () {
   let Ctrl; // the controller under test
@@ -42,8 +43,8 @@ describe('ModalsController', function () {
         let dfdFetch = new can.Deferred();
         let fetchedUser = new can.Map({id: userId, email: 'john@doe.com'});
 
-        spyOn(CMS.Models.Person, 'findOne').and.returnValue(dfdFetch.promise());
-        delete CMS.Models.Person.cache[userId];
+        spyOn(Person, 'findOne').and.returnValue(dfdFetch.promise());
+        delete Person.cache[userId];
 
         init();
 
@@ -66,7 +67,7 @@ describe('ModalsController', function () {
         });
 
         spyOn(partialUser, 'reify').and.returnValue(partialUser);
-        CMS.Models.Person.store[userId] = partialUser;
+        Person.store[userId] = partialUser;
 
         init();
 
@@ -88,7 +89,7 @@ describe('ModalsController', function () {
         });
 
         spyOn(fullUser, 'reify').and.returnValue(fullUser);
-        CMS.Models.Person.store[userId] = fullUser;
+        Person.store[userId] = fullUser;
 
         init();
 

@@ -9,7 +9,8 @@ import copy
 import random
 
 from lib import factory, users
-from lib.constants import element, objects, roles, value_aliases, messages
+from lib.constants import (
+    element, objects, roles, value_aliases, messages, object_states)
 from lib.constants.element import AdminWidgetCustomAttributes
 from lib.decorator import lazy_property
 from lib.entities.entity import (
@@ -30,6 +31,7 @@ class EntitiesFactory(object):
     if self.__class__ not in [CustomAttributeDefinitionEntity, PersonEntity,
                               CommentEntity]:
       self.obj_slug = self.generate_slug()
+    self._acl_roles = []
 
   def obj_inst(self):
     """Create object's instance and set value for attribute type."""
@@ -46,9 +48,16 @@ class EntitiesFactory(object):
     """Create random object's instance, if 'is_add_rest_attrs' then add
     attributes for REST, if 'attrs' then update attributes accordingly.
     """
-    return self._create_random_obj(
+    obj = self._create_random_obj(
         is_add_rest_attrs=is_add_rest_attrs).update_attrs(
         is_allow_none=False, **attrs)
+    for acr_name, role_id, default_list in self._acl_roles:
+      if acr_name in attrs:
+        people_list = attrs[acr_name]
+      else:
+        people_list = default_list
+      self._set_acl(obj, acr_name, people_list, role_id, is_add_rest_attrs)
+    return obj
 
   @classmethod
   def generate_string(cls, first_part,
@@ -71,6 +80,21 @@ class EntitiesFactory(object):
     """Generate email in unicode format according to domain."""
     return unicode("{mail_name}@{domain}".format(
         mail_name=StringMethods.random_uuid(), domain=domain))
+
+  def _set_acl(self, obj, acr_name, person_list, role_id, is_add_rest_attrs):
+    """To be invoked in `create` method to set `access_control_list`
+    and `acr_name` attributes.
+    """
+    if not hasattr(obj, "access_control_list"):
+      obj.access_control_list = []
+    attrs_to_set = {
+        acr_name: PeopleFactory.extract_people_emails(person_list)
+    }
+    if is_add_rest_attrs:
+      attrs_to_set["access_control_list"] = (
+          obj.access_control_list +
+          PeopleFactory.get_acl_members(role_id, person_list))
+    obj.update_attrs(**attrs_to_set)
 
 
 class PeopleFactory(EntitiesFactory):
@@ -303,25 +327,23 @@ class ProgramsFactory(EntitiesFactory):
 
   def __init__(self):
     super(ProgramsFactory, self).__init__(objects.PROGRAMS)
-    self.managers = [users.current_user()]
+    self._acl_roles = [
+        ("managers", roles.ACLRolesIDs.PROGRAM_MANAGERS,
+         [users.current_user()])
+    ]
 
   def _create_random_obj(self, is_add_rest_attrs):
     """Create Program entity with randomly and predictably filled fields, if
     'is_add_rest_attrs' then add attributes for REST."""
     program_obj = self.obj_inst().update_attrs(
         title=self.obj_title, slug=self.obj_slug,
-        managers=PeopleFactory.extract_people_emails(self.managers),
-        status=unicode(element.ObjectStates.DRAFT),
+        status=unicode(object_states.DRAFT),
         os_state=unicode(element.ReviewStates.UNREVIEWED))
     if is_add_rest_attrs:
       program_obj.update_attrs(
           recipients=",".join((
               unicode(roles.ADMIN), unicode(roles.PRIMARY_CONTACTS),
-              unicode(roles.SECONDARY_CONTACTS))),
-          access_control_list=string_utils.StringMethods.
-          convert_list_elements_to_list(
-              [PeopleFactory.get_acl_members(
-                  roles.ACLRolesIDs.PROGRAM_MANAGERS, self.managers)]))
+              unicode(roles.SECONDARY_CONTACTS))))
     return program_obj
 
 
@@ -329,25 +351,22 @@ class ControlsFactory(EntitiesFactory):
   """Factory class for Controls entities."""
   def __init__(self):
     super(ControlsFactory, self).__init__(objects.CONTROLS)
-    self.admins = [users.current_user()]
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.CONTROL_ADMINS, [users.current_user()])
+    ]
 
   def _create_random_obj(self, is_add_rest_attrs):
     """Create Control entity with randomly and predictably filled fields, if
     'is_add_rest_attrs' then add attributes for REST."""
     control_obj = self.obj_inst().update_attrs(
         title=self.obj_title, slug=self.obj_slug,
-        status=unicode(element.ObjectStates.DRAFT),
-        admins=PeopleFactory.extract_people_emails(self.admins),
+        status=unicode(object_states.DRAFT),
         os_state=unicode(element.ReviewStates.UNREVIEWED))
     if is_add_rest_attrs:
       control_obj.update_attrs(
           recipients=",".join((
               unicode(roles.ADMIN), unicode(roles.PRIMARY_CONTACTS),
-              unicode(roles.SECONDARY_CONTACTS))),
-          access_control_list=string_utils.StringMethods.
-          convert_list_elements_to_list(
-              [PeopleFactory.get_acl_members(
-                  roles.ACLRolesIDs.CONTROL_ADMINS, self.admins)]))
+              unicode(roles.SECONDARY_CONTACTS))))
     return control_obj
 
 
@@ -355,25 +374,22 @@ class ObjectivesFactory(EntitiesFactory):
   """Factory class for Objectives entities."""
   def __init__(self):
     super(ObjectivesFactory, self).__init__(objects.OBJECTIVES)
-    self.admins = [users.current_user()]
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.OBJECTIVE_ADMINS, [users.current_user()])
+    ]
 
   def _create_random_obj(self, is_add_rest_attrs):
     """Create Objective entity with randomly and predictably filled fields, if
     'is_add_rest_attrs' then add attributes for REST."""
     objective_obj = self.obj_inst().update_attrs(
         title=self.obj_title, slug=self.obj_slug,
-        status=unicode(element.ObjectStates.DRAFT),
-        admins=PeopleFactory.extract_people_emails(self.admins),
+        status=unicode(object_states.DRAFT),
         os_state=unicode(element.ReviewStates.UNREVIEWED))
     if is_add_rest_attrs:
       objective_obj.update_attrs(
           recipients=",".join((
               unicode(roles.ADMIN), unicode(roles.PRIMARY_CONTACTS),
-              unicode(roles.SECONDARY_CONTACTS))),
-          access_control_list=string_utils.StringMethods.
-          convert_list_elements_to_list(
-              [PeopleFactory.get_acl_members(
-                  roles.ACLRolesIDs.OBJECTIVE_ADMINS, self.admins)]))
+              unicode(roles.SECONDARY_CONTACTS))))
     return objective_obj
 
 
@@ -381,7 +397,11 @@ class AuditsFactory(EntitiesFactory):
   """Factory class for Audit entity."""
   def __init__(self):
     super(AuditsFactory, self).__init__(objects.AUDITS)
-    self.admins = [users.current_user()]
+    self._acl_roles = [
+        ("audit_captains", roles.ACLRolesIDs.AUDIT_CAPTAINS,
+         [users.current_user()]),
+        ("auditors", roles.ACLRolesIDs.AUDITORS, [])
+    ]
 
   @staticmethod
   def clone(audit, count_to_clone=1):
@@ -395,35 +415,12 @@ class AuditsFactory(EntitiesFactory):
         created_at=None, updated_at=None, href=None, url=None, id=None)
         for num in xrange(1, count_to_clone + 1)]
 
-  def create(self, is_add_rest_attrs=False, **attrs):
-    """Create random Audit object's instance, if 'is_add_rest_attrs' then
-    add attributes for REST, if 'attrs' then update attributes accordingly.
-    """
-    audit_obj = self._create_random_obj(
-        is_add_rest_attrs=is_add_rest_attrs).update_attrs(
-        is_allow_none=False, **attrs)
-    if getattr(audit_obj, "auditors"):
-      audit_obj.update_attrs(
-          auditors=PeopleFactory.extract_people_emails(attrs["auditors"]),
-          access_control_list=string_utils.StringMethods.
-          convert_list_elements_to_list(
-              audit_obj.access_control_list + [PeopleFactory.get_acl_members(
-                  roles.ACLRolesIDs.AUDITORS, attrs["auditors"])]))
-    return audit_obj
-
   def _create_random_obj(self, is_add_rest_attrs):
     """Create Audit entity with randomly and predictably filled fields, if
     'is_add_rest_attrs' then add attributes for REST."""
     audit_obj = self.obj_inst().update_attrs(
         title=self.obj_title, slug=self.obj_slug,
-        audit_captains=PeopleFactory.extract_people_emails(self.admins),
-        os_state=unicode(element.AuditStates.PLANNED))
-    if is_add_rest_attrs:
-      audit_obj.update_attrs(
-          access_control_list=string_utils.StringMethods.
-          convert_list_elements_to_list(
-              [PeopleFactory.get_acl_members(
-                  roles.ACLRolesIDs.AUDIT_CAPTAINS, self.admins)]))
+        os_state=unicode(object_states.PLANNED))
     return audit_obj
 
 
@@ -450,7 +447,7 @@ class AssessmentTemplatesFactory(EntitiesFactory):
         title=self.obj_title, slug=self.obj_slug,
         assignees=unicode(roles.PRINCIPAL_ASSIGNEES),
         verifiers=unicode(roles.AUDITORS),
-        status=unicode(element.ObjectStates.DRAFT),
+        status=unicode(object_states.DRAFT),
         template_object_type=objects.get_obj_type(objects.CONTROLS))
     if is_add_rest_attrs:
       elements = element.CommonAudit
@@ -475,9 +472,14 @@ class AssessmentsFactory(EntitiesFactory):
 
   def __init__(self):
     super(AssessmentsFactory, self).__init__(objects.ASSESSMENTS)
-    current_user = users.current_user()
-    self.admins = [current_user]
-    self.assignees = [current_user]
+    self.admins = [users.current_user()]
+    self._acl_roles = [
+        ("creators", roles.ACLRolesIDs.ASSESSMENT_CREATORS,
+         [users.current_user()]),
+        ("assignees", roles.ACLRolesIDs.ASSESSMENT_ASSIGNEES,
+         [users.current_user()]),
+        ("verifiers", roles.ACLRolesIDs.ASSESSMENT_VERIFIERS, [])
+    ]
 
   def obj_inst(self):
     """Create Assessment object's instance and set values for attributes:
@@ -485,7 +487,7 @@ class AssessmentsFactory(EntitiesFactory):
     """
     return self.obj_entity_cls().update_attrs(
         is_allow_none=False, type=self.obj_type, verified=False,
-        status=unicode(element.AssessmentStates.NOT_STARTED))
+        status=unicode(object_states.NOT_STARTED))
 
   def generate(self, mapped_objects, audit, asmt_tmpl=None):
     """Generate Assessment objects' instances under 'audit' based on info
@@ -533,44 +535,18 @@ class AssessmentsFactory(EntitiesFactory):
                mapped_objects)]
     return asmts_objs
 
-  def create(self, is_add_rest_attrs=False, **attrs):
-    """Create random Assessment object's instance, if 'is_add_rest_attrs' then
-    add attributes for REST, if 'attrs' then update attributes accordingly.
-    """
-    asmt_obj = self._create_random_obj(
-        is_add_rest_attrs=is_add_rest_attrs).update_attrs(
-        is_allow_none=False, **attrs)
-    # todo: add global logic to update attrs 'ACLs to People', 'People to ACLs'
-    if getattr(asmt_obj, "verifiers"):
-      asmt_obj.update_attrs(
-          verifiers=PeopleFactory.extract_people_emails(attrs["verifiers"]),
-          access_control_list=string_utils.StringMethods.
-          convert_list_elements_to_list(
-              asmt_obj.access_control_list + [PeopleFactory.get_acl_members(
-                  roles.ACLRolesIDs.ASSESSMENT_VERIFIERS,
-                  attrs["verifiers"])]))
-    return asmt_obj
-
   def _create_random_obj(self, is_add_rest_attrs):
     """Create Assessment entity with randomly and predictably filled fields, if
     'is_add_rest_attrs' then add attributes for REST."""
     asmt_obj = self.obj_inst().update_attrs(
         title=self.obj_title, slug=self.obj_slug,
-        status=unicode(element.AssessmentStates.NOT_STARTED),
-        creators=PeopleFactory.extract_people_emails(self.admins),
-        assignees=PeopleFactory.extract_people_emails(self.assignees),
+        status=unicode(object_states.NOT_STARTED),
         assessment_type=objects.get_obj_type(objects.CONTROLS), verified=False)
     if is_add_rest_attrs:
       asmt_obj.update_attrs(
           recipients=",".join((
               unicode(roles.ASSIGNEES), unicode(roles.CREATORS),
-              unicode(roles.VERIFIERS))),
-          access_control_list=string_utils.StringMethods.
-          convert_list_elements_to_list(
-              [PeopleFactory.get_acl_members(
-                  roles.ACLRolesIDs.ASSESSMENT_CREATORS, self.admins),
-               PeopleFactory.get_acl_members(
-                   roles.ACLRolesIDs.ASSESSMENT_ASSIGNEES, self.assignees)]))
+              unicode(roles.VERIFIERS))))
     return asmt_obj
 
 
@@ -579,23 +555,20 @@ class IssuesFactory(EntitiesFactory):
 
   def __init__(self):
     super(IssuesFactory, self).__init__(objects.ISSUES)
-    self.admins = [users.current_user()]
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.ISSUE_ADMINS, [users.current_user()])
+    ]
 
   def _create_random_obj(self, is_add_rest_attrs):
     """Create Issue entity with randomly and predictably filled fields, if
     'is_add_rest_attrs' then add attributes for REST."""
     issue_obj = self.obj_inst().update_attrs(
         title=self.obj_title, slug=self.obj_slug,
-        status=unicode(element.IssueStates.DRAFT),
-        admins=PeopleFactory.extract_people_emails(self.admins),
+        status=unicode(object_states.DRAFT),
         os_state=unicode(element.ReviewStates.UNREVIEWED))
     if is_add_rest_attrs:
       issue_obj.update_attrs(
           recipients=",".join((
               unicode(roles.ADMIN), unicode(roles.PRIMARY_CONTACTS),
-              unicode(roles.SECONDARY_CONTACTS))),
-          access_control_list=string_utils.StringMethods.
-          convert_list_elements_to_list(
-              [PeopleFactory.get_acl_members(
-                  roles.ACLRolesIDs.ISSUE_ADMINS, self.admins)]))
+              unicode(roles.SECONDARY_CONTACTS))))
     return issue_obj

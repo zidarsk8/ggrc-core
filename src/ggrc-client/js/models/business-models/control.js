@@ -37,18 +37,9 @@ export default Cacheable('CMS.Models.Control', {
   attributes: {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
-    object_people: 'CMS.Models.ObjectPerson.stubs',
-    documents: 'CMS.Models.Document.stubs',
-    people: 'CMS.Models.Person.stubs',
-    objectives: 'CMS.Models.Objective.stubs',
-    directive: 'CMS.Models.Directive.stub',
-    requirements: 'CMS.Models.get_stubs',
-    programs: 'CMS.Models.Program.stubs',
     kind: 'CMS.Models.Option.stub',
     means: 'CMS.Models.Option.stub',
     verify_frequency: 'CMS.Models.Option.stub',
-    principal_assessor: 'CMS.Models.Person.stub',
-    secondary_assessor: 'CMS.Models.Person.stub',
   },
   links_to: {},
   defaults: {

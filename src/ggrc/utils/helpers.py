@@ -18,6 +18,13 @@ def without_sqlalchemy_cache(func):
   """
   def wrapper(*args, **kwargs):
     """Wrapper function."""
+    # Running migration can trigger this decorator, but in such case
+    # no top will be there as flask-sqlalchemy haven't created it.
+    # For such case just run the function without patching
+    # _app_ctx_stack.top.sqlalchemy_queries.
+    if not getattr(_app_ctx_stack, "top"):
+      return func(*args, **kwargs)
+
     queries = None
     has_queries = False
     if hasattr(_app_ctx_stack.top, "sqlalchemy_queries"):

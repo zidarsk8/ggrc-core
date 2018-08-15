@@ -13,19 +13,10 @@ from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
 COMMENTABLE_MODELS = [
-    "AccessGroup",
     "Clause",
     "Control",
-    "DataAsset",
-    "Facility",
-    "Market",
     "Objective",
-    "OrgGroup",
-    "System",
-    "Process",
-    "Product",
     "Requirement",
-    "Vendor",
     "Issue",
     "Policy",
     "Regulation",
@@ -34,7 +25,28 @@ COMMENTABLE_MODELS = [
     "Risk",
     "Threat",
 ]
+
+SCOPING_MODELS = [
+    "AccessGroup",
+    "DataAsset",
+    "Facility",
+    "Market",
+    "System",
+    "OrgGroup",
+    "Process",
+    "Product",
+    "Project",
+    "Vendor",
+    "Metric",
+    "TechnologyEnvironment",
+    "ProductGroup",
+]
+
 RECIPIENTS = ["Admin", "Primary Contacts", "Secondary Contacts"]
+
+SCOPING_RECIPIENTS = ["Admin", "Primary Contacts", "Secondary Contacts",
+                      "Product Managers", "Technical / Program Managers",
+                      "Technical Leads", "System Owners", "Legal Counsels"]
 
 
 class TestCommentableImport(TestCase):
@@ -49,6 +61,8 @@ class TestCommentableImport(TestCase):
     with factories.single_commit():
       for model in COMMENTABLE_MODELS:
         self.import_model(model, audit, ",".join(RECIPIENTS), True)
+      for model in SCOPING_MODELS:
+        self.import_model(model, audit, ",".join(SCOPING_RECIPIENTS), True)
 
   def import_model(self, model_name, audit, recipients, send_by_default):
     """Import model data with commentable fields"""
@@ -75,5 +89,12 @@ class TestCommentableImport(TestCase):
     for model_name in COMMENTABLE_MODELS:
       model_cls = inflector.get_model(model_name)
       obj = model_cls.query.first()
-      self.assertEqual(obj.recipients, ",".join(RECIPIENTS))
+      self.assertEqual(sorted(obj.recipients.split(",")),
+                       sorted(RECIPIENTS))
+      self.assertEqual(obj.send_by_default, True)
+    for model_name in SCOPING_MODELS:
+      model_cls = inflector.get_model(model_name)
+      obj = model_cls.query.first()
+      self.assertEqual(sorted(obj.recipients.split(",")),
+                       sorted(SCOPING_RECIPIENTS))
       self.assertEqual(obj.send_by_default, True)

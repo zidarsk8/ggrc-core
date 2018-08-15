@@ -6,7 +6,7 @@ from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models import mixins
-from ggrc.models.comment import Commentable
+from ggrc.models.comment import ScopedCommentable
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
@@ -19,7 +19,7 @@ class DataAsset(Roleable,
                 mixins.CustomAttributable,
                 Personable,
                 Relatable,
-                Commentable,
+                ScopedCommentable,
                 mixins.TestPlanned,
                 mixins.LastDeprecatedTimeboxed,
                 mixins.base.ContextRBAC,

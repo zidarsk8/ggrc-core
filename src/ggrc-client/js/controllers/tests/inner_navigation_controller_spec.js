@@ -6,6 +6,10 @@
 import * as CurrentPageUtils from '../../plugins/utils/current-page-utils';
 import * as DashboardUtils from '../../plugins/utils/dashboards-utils';
 import Ctrl from '../inner-nav-controller';
+import Control from '../../models/business-models/control';
+import Requirement from '../../models/business-models/requirement';
+import Assessment from '../../models/business-models/assessment';
+import Objective from '../../models/business-models/objective';
 
 describe('CMS.Controllers.InnerNav', function () {
   'use strict';
@@ -132,11 +136,11 @@ describe('CMS.Controllers.InnerNav', function () {
     beforeEach(() => {
       options = {
         widget_list: new can.Observe.List([
-          {selector: '#control', model: CMS.Models.Control},
-          {selector: '#requirement', model: CMS.Models.Requirement},
-          {selector: '#assessment', model: CMS.Models.Assessment},
+          {selector: '#control', model: Control},
+          {selector: '#requirement', model: Requirement},
+          {selector: '#assessment', model: Assessment},
           {selector: '#super'},
-          {selector: '#objective', model: CMS.Models.Objective},
+          {selector: '#objective', model: Objective},
         ]),
         refetchOnce: new Set(),
       };

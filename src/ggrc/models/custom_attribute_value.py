@@ -66,6 +66,7 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
       "Date": lambda self: self._validate_date(),
       "Dropdown": lambda self: self._validate_dropdown(),
       "Map:Person": lambda self: self._validate_map_person(),
+      "Checkbox": lambda self: self._validate_checkbox(),
   }
 
   @property
@@ -282,6 +283,11 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
   def _validate_rich_text(self):
     """Add tags for links."""
     self.attribute_value = url_parser.parse(self.attribute_value)
+
+  def _validate_checkbox(self):
+    """Set falsy value to zero."""
+    if not self.attribute_value:
+      self.attribute_value = "0"
 
   def validate(self):
     """Validate custom attribute value."""

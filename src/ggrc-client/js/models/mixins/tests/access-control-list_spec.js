@@ -5,6 +5,7 @@
 
 import * as snapshotUtils from '../../../plugins/utils/snapshot-utils';
 import Cacheable from '../../cacheable';
+import Control from '../../business-models/control';
 
 describe('can.Model.Mixin.accessControlList', () => {
   describe('"cleanupAcl" method: ', () => {
@@ -17,7 +18,7 @@ describe('can.Model.Mixin.accessControlList', () => {
       id = 711;
       objectFromResourceSpy =
         spyOn(Cacheable, 'object_from_resource');
-      model = new CMS.Models.Control({id: id});
+      model = new Control({id: id});
     });
 
     afterEach(() => {

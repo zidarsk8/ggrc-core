@@ -8,6 +8,8 @@ import Component from '../revisions-comparer';
 import RefreshQueue from '../../../models/refresh_queue';
 import Revision from '../../../models/service-models/revision';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Control from '../../../models/business-models/control';
+import Person from '../../../models/business-models/person';
 
 describe('revisions-comparer companent', function () {
   let viewModel;
@@ -38,7 +40,7 @@ describe('revisions-comparer companent', function () {
     it('returns instances of necessary type and with isRevision', function () {
       let result = method(fakeData);
       result.forEach(function (item) {
-        expect(item.instance instanceof CMS.Models.Control).toBeTruthy();
+        expect(item.instance instanceof Control).toBeTruthy();
         expect(item.instance.type).toBe('Control');
         expect(item.instance.isRevision).toBe(true);
       });
@@ -207,12 +209,10 @@ describe('revisions-comparer companent', function () {
   });
 
   describe('"loadACLPeople" method', () => {
-    let Person;
     let method;
     let instance;
 
     beforeEach(() => {
-      Person = CMS.Models.Person;
       method = viewModel.loadACLPeople;
       instance = new can.Map({
         access_control_list: [{

@@ -9,6 +9,7 @@ import {
   makeFakeInstance,
   getComponentVM,
 } from '../../../../js_specs/spec_helpers';
+import Control from '../../../models/business-models/control';
 
 describe('inline-autocomplete-wrapper component', ()=> {
   let viewModel;
@@ -109,7 +110,7 @@ describe('inline-autocomplete-wrapper component', ()=> {
 
       beforeEach(function () {
         const caDefs = [{id: 1}];
-        instance = makeFakeInstance({model: CMS.Models.Control})({
+        instance = makeFakeInstance({model: Control})({
           custom_attribute_definitions: caDefs,
         });
         item = new can.Map({test: true});

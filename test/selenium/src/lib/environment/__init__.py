@@ -32,9 +32,6 @@ _settings = _get_settings(PROJECT_ROOT_PATH + constants.path.CONFIG)
 SERVER_WAIT_TIME = int(_settings.get(
     constants.settings.Section.APP,
     constants.settings.Values.WAIT_FOR_APP_SERVER))
-RERUN_FAILED_TEST = int(_settings.get(
-    constants.settings.Section.PYTEST,
-    constants.settings.Values.RERUN_FAILED_TEST))
 
 # register loggers
 _set_loggers(_settings)

@@ -9,6 +9,7 @@ import './mapper-results-item-attrs';
 import '../view-object-buttons/view-object-buttons';
 import '../object-selection/object-selection-item';
 import template from './templates/mapper-results-item.mustache';
+import Snapshot from '../../models/service-models/snapshot';
 
 export default can.Component.extend({
   tag: 'mapper-results-item',
@@ -44,8 +45,7 @@ export default can.Component.extend({
       this.attr('showDetails', !this.attr('showDetails'));
     },
     isSnapshot() {
-      return this.attr('itemData.type') ===
-        CMS.Models.Snapshot.model_singular;
+      return this.attr('itemData.type') === Snapshot.model_singular;
     },
     objectType() {
       if (this.isSnapshot()) {

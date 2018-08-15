@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
@@ -267,6 +268,26 @@ class TestImportExports(TestCase):
         headers=self.headers)
     self.assert200(response)
     self.assertEqual(response.data, "test content")
+
+  @ddt.data(u'漢字.csv', u'фыв.csv', u'asd.csv')
+  def test_download_unicode_filename(self, filename):
+    """Test import history download unicode filename"""
+    user = all_models.Person.query.first()
+    import_export = factories.ImportExportFactory(
+        job_type='Import',
+        status='Finished',
+        created_at=datetime.now(),
+        created_by=user,
+        title=filename,
+        content='Test content'
+    )
+    response = self.client.get(
+        "/api/people/{}/imports/{}/download?export_to=csv".format(
+            user.id,
+            import_export.id),
+        headers=self.headers)
+    self.assert200(response)
+    self.assertEqual(response.data, "Test content")
 
   @ddt.data(("Import", "Analysis"),
             ("Export", "In Progress"))

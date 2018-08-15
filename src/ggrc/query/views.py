@@ -14,7 +14,6 @@ from werkzeug.exceptions import BadRequest
 from ggrc.models import all_models
 from ggrc.query.exceptions import BadQueryException
 from ggrc.query.default_handler import DefaultHandler
-from ggrc.query.assessment_related_objects import AssessmentRelatedObjects
 from ggrc.login import login_required
 from ggrc.models.inflector import get_model
 from ggrc.services.common import etag
@@ -23,11 +22,6 @@ from ggrc.utils import benchmark
 
 
 logger = logging.getLogger()
-
-
-OPTIMIZED_HANDLERS = [
-    AssessmentRelatedObjects,
-]
 
 
 def build_collection_representation(model, description):
@@ -57,20 +51,6 @@ def http_timestamp(timestamp):
   return format_date_time(time.mktime(timestamp.utctimetuple()))
 
 
-def _get_query_handler(query):
-  """Get the first matching query handler for a given query."""
-  for optimized_handler in OPTIMIZED_HANDLERS:
-    try:
-      if optimized_handler.match(query):
-        return optimized_handler
-    except Exception:  # pylint: disable=broad-except
-      # No exception in the query matcher should affect the response of the
-      # request. We need to safely fallback to default query handler if
-      # anything happens.
-      logger.info("Error matching %s handler.", optimized_handler.__name__)
-  return DefaultHandler
-
-
 def get_handler_results(query):
   """Get results from the best matching query handler.
 
@@ -80,9 +60,7 @@ def get_handler_results(query):
     dict containing json serializable query results.
   """
 
-  handler_class = _get_query_handler(query)
-
-  query_handler = handler_class(query)
+  query_handler = DefaultHandler(query)
   name = query_handler.__class__.__name__
   with benchmark("Get query Handler results from: {}".format(name)):
     return query_handler.get_results()

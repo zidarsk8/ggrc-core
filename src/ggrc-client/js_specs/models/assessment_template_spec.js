@@ -4,16 +4,12 @@
 */
 
 import {makeFakeInstance} from '../../js_specs/spec_helpers';
+import AssessmentTemplate from '../../js/models/business-models/assessment-template';
 
 describe('can.Model.AssessmentTemplate', function () {
   'use strict';
 
-  let AssessmentTemplate;
   let instance; // an AssessmentTemplate instance
-
-  beforeAll(function () {
-    AssessmentTemplate = CMS.Models.AssessmentTemplate;
-  });
 
   beforeEach(function () {
     instance = makeFakeInstance({model: AssessmentTemplate})();

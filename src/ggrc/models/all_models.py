@@ -46,6 +46,7 @@ from ggrc.models.issue import Issue
 from ggrc.models.issuetracker_issue import IssuetrackerIssue
 from ggrc.models.market import Market
 from ggrc.models.notification import Notification
+from ggrc.models.notification import NotificationHistory
 from ggrc.models.notification import NotificationConfig
 from ggrc.models.notification import NotificationType
 from ggrc.models.object_person import ObjectPerson
@@ -136,6 +137,7 @@ all_models = [  # pylint: disable=invalid-name
     NotificationConfig,
     NotificationType,
     Notification,
+    NotificationHistory,
     Issue,
     IssuetrackerIssue,
     Snapshot,

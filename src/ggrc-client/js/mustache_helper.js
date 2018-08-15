@@ -31,6 +31,7 @@ import {
 } from './plugins/ggrc_utils';
 import Option from './models/service-models/option';
 import Search from './models/service-models/search';
+import Person from './models/business-models/person';
 
 // Chrome likes to cache AJAX requests for Mustaches.
 let mustacheUrls = {};
@@ -444,8 +445,8 @@ can.each(['with_page_object_as', 'with_current_user_as'], function (fname) {
       name = fname.replace(/with_(.*)_as/, '$1');
     }
     let pageObject = (fname === 'with_current_user_as'
-      ? (CMS.Models.Person.findInCacheById(GGRC.current_user.id)
-                          || CMS.Models.Person.model(GGRC.current_user))
+      ? (Person.findInCacheById(GGRC.current_user.id)
+                          || Person.model(GGRC.current_user))
       : getPageInstance()
     );
     if (pageObject) {

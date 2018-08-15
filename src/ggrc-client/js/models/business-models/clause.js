@@ -36,13 +36,6 @@ export default Cacheable('CMS.Models.Clause', {
   attributes: {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
-    object_people: 'CMS.Models.ObjectPerson.stubs',
-    people: 'CMS.Models.Person.stubs',
-    directive: 'CMS.Models.get_stub',
-    children: 'CMS.Models.get_stubs',
-    directive_sections: 'CMS.Models.DirectiveSection.stubs',
-    directives: 'CMS.Models.get_stubs',
-    objectives: 'CMS.Models.Objective.stubs',
   },
   tree_view_options: {
     attr_view: '/static/mustache/requirements/tree-item-attr.mustache',

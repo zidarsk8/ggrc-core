@@ -5,6 +5,7 @@
 
 import * as module from '../../../plugins/utils/tree-view-utils';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
+import CycleTaskGroupObjectTask from '../../../models/business-models/cycle-task-group-object-task';
 
 describe('TreeViewUtils module', function () {
   'use strict';
@@ -33,7 +34,7 @@ describe('TreeViewUtils module', function () {
         {id: 3, name: 'Role 3', object_type: 'Audit'},
       ]);
 
-      origAttrs = [].concat(CMS.Models.CycleTaskGroupObjectTask
+      origAttrs = [].concat(CycleTaskGroupObjectTask
         .tree_view_options.display_attr_names);
 
       origCustomAttrDefs = GGRC.custom_attr_defs;
@@ -54,7 +55,7 @@ describe('TreeViewUtils module', function () {
 
     afterAll(function () {
       GGRC.custom_attr_defs = origCustomAttrDefs;
-      CMS.Models.CycleTaskGroupObjectTask
+      CycleTaskGroupObjectTask
         .tree_view_options.display_attr_names =
           origAttrs;
     });
@@ -137,7 +138,7 @@ describe('TreeViewUtils module', function () {
 
     beforeAll(function () {
       baseWidgetsByType = GGRC.tree_view.attr('base_widgets_by_type');
-      origFilter = CMS.Models.CycleTaskGroupObjectTask
+      origFilter = CycleTaskGroupObjectTask
         .sub_tree_view_options.default_filter;
 
       GGRC.tree_view.attr('base_widgets_by_type', {
@@ -147,7 +148,7 @@ describe('TreeViewUtils module', function () {
 
     afterAll(function () {
       GGRC.tree_view.attr('base_widgets_by_type', baseWidgetsByType);
-      CMS.Models.CycleTaskGroupObjectTask
+      CycleTaskGroupObjectTask
         .sub_tree_view_options.default_filter = origFilter;
     });
 
@@ -155,7 +156,7 @@ describe('TreeViewUtils module', function () {
       function () {
         let result;
 
-        CMS.Models.CycleTaskGroupObjectTask
+        CycleTaskGroupObjectTask
           .sub_tree_view_options.default_filter = ['Audit'];
 
         result = module.getModelsForSubTier('CycleTaskGroupObjectTask');
@@ -168,7 +169,7 @@ describe('TreeViewUtils module', function () {
       'model\'s default_filter is not available', function () {
       let result;
 
-      CMS.Models.CycleTaskGroupObjectTask
+      CycleTaskGroupObjectTask
         .sub_tree_view_options.default_filter = null;
 
       result = module.getModelsForSubTier('CycleTaskGroupObjectTask');

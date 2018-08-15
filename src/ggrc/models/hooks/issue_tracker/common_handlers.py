@@ -68,6 +68,9 @@ def handle_comment_creation_event(sender, objects=None, **kwargs):
 
   for obj in objects:
     comment, other = obj.source, obj.destination
+    if comment.type != u"Comment" and other.type != u"Comment":
+      continue
+
     if comment.type != u"Comment":
       comment, other = other, comment
 

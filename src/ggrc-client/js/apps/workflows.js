@@ -21,6 +21,12 @@ import {
 } from '../models/mappers/mapper-helpers';
 import Mappings from '../models/mappers/mappings';
 import CycleTaskEntry from '../models/service-models/cycle-task-entry';
+import Cycle from '../models/business-models/cycle';
+import CycleTaskGroup from '../models/business-models/cycle-task-group';
+import CycleTaskGroupObjectTask from '../models/business-models/cycle-task-group-object-task';
+import TaskGroup from '../models/business-models/task-group';
+import Workflow from '../models/business-models/workflow';
+import Person from '../models/business-models/person';
 
 (function ($, CMS, GGRC) {
   let WorkflowExtension = {};
@@ -62,12 +68,12 @@ import CycleTaskEntry from '../models/service-models/cycle-task-entry';
   // Register Workflow models for use with `inferObjectType`
   WorkflowExtension.object_type_decision_tree = function () {
     return {
-      cycle: CMS.Models.Cycle,
+      cycle: Cycle,
       cycle_task_entry: CycleTaskEntry,
-      cycle_task_group: CMS.Models.CycleTaskGroup,
-      cycle_task_group_object_task: CMS.Models.CycleTaskGroupObjectTask,
-      task_group: CMS.Models.TaskGroup,
-      workflow: CMS.Models.Workflow,
+      cycle_task_group: CycleTaskGroup,
+      cycle_task_group_object_task: CycleTaskGroupObjectTask,
+      task_group: TaskGroup,
+      workflow: Workflow,
     };
   };
 
@@ -302,7 +308,7 @@ import CycleTaskEntry from '../models/service-models/cycle-task-entry';
             .concat(['CycleTaskGroupObjectTask']),
           model_list: widget.model_list
             .concat({
-              display_name: CMS.Models.CycleTaskGroupObjectTask.title_singular,
+              display_name: CycleTaskGroupObjectTask.title_singular,
               display_status: true,
               model_name: 'CycleTaskGroupObjectTask',
             }),
@@ -325,9 +331,9 @@ import CycleTaskEntry from '../models/service-models/cycle-task-entry';
       });
     });
 
-    if (pageInstance instanceof CMS.Models.Workflow) {
+    if (pageInstance instanceof Workflow) {
       WorkflowExtension.init_widgets_for_workflow_page();
-    } else if (pageInstance instanceof CMS.Models.Person) {
+    } else if (pageInstance instanceof Person) {
       WorkflowExtension.init_widgets_for_person_page();
     } else {
       WorkflowExtension.init_widgets_for_other_pages();
@@ -350,7 +356,7 @@ import CycleTaskEntry from '../models/service-models/cycle-task-entry';
           treeViewDepth: 0,
           content_controller_options: {
             parent_instance: pageInstance,
-            model: CMS.Models.Workflow,
+            model: Workflow,
           },
         },
         CycleTaskGroupObjectTask: {
@@ -360,7 +366,7 @@ import CycleTaskEntry from '../models/service-models/cycle-task-entry';
           treeViewDepth: 1,
           content_controller_options: {
             parent_instance: pageInstance,
-            model: CMS.Models.CycleTaskGroupObjectTask,
+            model: CycleTaskGroupObjectTask,
             add_item_view:
               GGRC.mustache_path +
               '/cycle_task_group_object_tasks/tree_add_item.mustache',
@@ -411,10 +417,10 @@ import CycleTaskEntry from '../models/service-models/cycle-task-entry';
           widget_icon: 'task_group',
           widgetType: 'treeview',
           treeViewDepth: 0,
-          model: CMS.Models.TaskGroup,
+          model: TaskGroup,
           content_controller_options: {
             parent_instance: object,
-            model: CMS.Models.TaskGroup,
+            model: TaskGroup,
             sortable: true,
             draw_children: true,
           },
@@ -428,14 +434,14 @@ import CycleTaskEntry from '../models/service-models/cycle-task-entry';
       widget_id: 'history',
       widget_name: 'History',
       widget_icon: 'history',
-      model: CMS.Models.Cycle,
+      model: Cycle,
       forceRefetch: true,
       content_controller_options: {
         depth: true,
         filterDeepLimit: 2,
         draw_children: true,
         parent_instance: object,
-        model: CMS.Models.Cycle,
+        model: Cycle,
         countsName: historyWidgetCountsName,
         additional_filter: historyWidgetFilter,
       },
@@ -447,14 +453,14 @@ import CycleTaskEntry from '../models/service-models/cycle-task-entry';
       widget_id: 'current',
       widget_name: 'Active Cycles',
       widget_icon: 'cycle',
-      model: CMS.Models.Cycle,
+      model: Cycle,
       forceRefetch: true,
       content_controller_options: {
         depth: true,
         filterDeepLimit: 2,
         draw_children: true,
         parent_instance: object,
-        model: CMS.Models.Cycle,
+        model: Cycle,
         countsName: currentWidgetCountsName,
         additional_filter: currentWidgetFilter,
         add_item_view:
@@ -494,10 +500,10 @@ import CycleTaskEntry from '../models/service-models/cycle-task-entry';
         widgetType: 'treeview',
         treeViewDepth: 1,
         widget_name: 'My Tasks',
-        model: CMS.Models.CycleTaskGroupObjectTask,
+        model: CycleTaskGroupObjectTask,
         content_controller_options: {
           parent_instance: getPageInstance(),
-          model: CMS.Models.CycleTaskGroupObjectTask,
+          model: CycleTaskGroupObjectTask,
           add_item_view:
             GGRC.mustache_path +
             '/cycle_task_group_object_tasks/tree_add_item.mustache',
@@ -516,7 +522,7 @@ import CycleTaskEntry from '../models/service-models/cycle-task-entry';
         treeViewDepth: 0,
         content_controller_options: {
           parent_instance: pageInstance,
-          model: CMS.Models.Workflow,
+          model: Workflow,
         },
       };
     }

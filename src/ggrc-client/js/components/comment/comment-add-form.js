@@ -29,12 +29,34 @@ export default can.Component.extend({
             .is_allowed_for('update', this.attr('instance'));
         },
       },
+      notificationsInfo: {
+        value: 'Send Notifications',
+        set(newValue) {
+          return this.attr('instance').class.category === 'business' ?
+            'Notify Contacts' :
+            newValue;
+        },
+      },
+      tooltipTitle: {
+        get() {
+          let title;
+          if (this.attr('instance').class.category === 'business') {
+            title = 'Comments will be sent as a part of daily digest email ' +
+            'notifications to Admins, Primary Contacts, Secondary Contacts, ' +
+            'Product Managers, Technical Leads, Technical / Program Managers,' +
+            ' Legal Counsels, System Owners';
+          } else {
+            title = 'Comments will be sent as part of daily digest email ' +
+            'notification.';
+          }
+          return title;
+        },
+      },
     },
     instance: {},
     sendNotifications: true,
     isSaving: false,
     isLoading: false,
-    notificationsInfo: 'Send Notifications',
     getCommentData: function () {
       let source = this.attr('instance');
 

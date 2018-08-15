@@ -8,7 +8,7 @@ import Component from '../issue-unmap-item';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
-import Relationship from '../../../models/join-models/relationship';
+import Relationship from '../../../models/service-models/relationship';
 
 describe('issue-unmap-item component', ()=> {
   let viewModel;
@@ -316,7 +316,7 @@ describe('issue-unmap-item component', ()=> {
 
     it('should change open modal state to false if page instance is not issue',
       async function (done) {
-        spyOn(CMS.Models.Relationship, 'findRelationship')
+        spyOn(Relationship, 'findRelationship')
           .and.returnValue({});
 
         await viewModel.unmap();
