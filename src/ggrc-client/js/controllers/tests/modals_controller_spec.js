@@ -155,4 +155,176 @@ describe('ModalsController', function () {
       expect(DisplayPrefs.getSingleton).not.toHaveBeenCalled();
     });
   });
+
+  describe('reset_form() method', () => {
+    let ctrlInst;
+    let method;
+    let instance;
+    let setFieldsCb;
+
+    beforeEach(function () {
+      instance = new can.Map();
+      ctrlInst = {
+        wasDestroyed: jasmine.createSpy('wasDestroyed'),
+        element: {
+          trigger: jasmine.createSpy('trigger'),
+        },
+        options: {
+          new_object_form: 'mock1',
+          object_params: 'mock2',
+        },
+      };
+      method = Ctrl.prototype.reset_form.bind(ctrlInst);
+    });
+
+    describe('if modal was not destroyed', () => {
+      beforeEach(() => {
+        ctrlInst.wasDestroyed.and.returnValue(false);
+      });
+
+      it('calls setFieldsCb() if it is function', (done) => {
+        setFieldsCb = function () {
+          done();
+        };
+
+        method(instance, setFieldsCb);
+      });
+
+      it('triggers loaded event', () => {
+        method(instance);
+
+        expect(ctrlInst.element.trigger).toHaveBeenCalledWith('loaded');
+      });
+
+      it('calls form_preload of instance if it is defined', () => {
+        instance.form_preload = jasmine.createSpy();
+
+        method(instance);
+
+        expect(instance.form_preload).toHaveBeenCalledWith(
+          ctrlInst.options.new_object_form,
+          ctrlInst.options.object_params
+        );
+      });
+
+      describe('if form_preload returns deferred', () => {
+        let formPreloadDfd;
+
+        beforeEach(() => {
+          formPreloadDfd = can.Deferred();
+          instance.backup = jasmine.createSpy('backup');
+          instance.form_preload = jasmine.createSpy('form_preload').and
+            .returnValue(formPreloadDfd);
+        });
+
+        it('calls instance.backup() when resolved', (done) => {
+          method(instance);
+
+          formPreloadDfd.done(() => {
+            expect(instance.backup).toHaveBeenCalled();
+            done();
+          });
+
+          formPreloadDfd.resolve();
+        });
+
+        it('returns formPreloadDfd', () => {
+          expect(method(instance)).toBe(formPreloadDfd);
+        });
+      });
+
+      it('returns resolved deferred if form_preload is not defined', (done) => {
+        method(instance).done(() => {
+          done();
+        });
+      });
+    });
+
+    it('sets new can.Observe object into _transient ' +
+    'if it is not defined', () => {
+      instance.attr('_transient', undefined);
+
+      method(instance);
+
+      expect(instance.attr('_transient') instanceof can.Observe).toBe(true);
+      expect(instance.attr('_transient').serialize()).toEqual({});
+    });
+
+    it('does not change _transient if it is  defined', () => {
+      let transient = 123;
+      instance.attr('_transient', transient);
+
+      method(instance);
+
+      expect(instance.attr('_transient')).toBe(transient);
+    });
+  });
+
+  describe('new_instance method', () => {
+    let ctrlInst;
+    let method;
+    let newInstance;
+    let resetFormDfd;
+
+    beforeEach(function () {
+      newInstance = new can.Map();
+      resetFormDfd = can.Deferred();
+      ctrlInst = {
+        prepareInstance: jasmine.createSpy('prepareInstance').and
+          .returnValue(newInstance),
+        reset_form: jasmine.createSpy('reset_form').and
+          .returnValue(resetFormDfd),
+        proxy: jasmine.createSpy('proxy'),
+        restore_ui_status: jasmine.createSpy('restore_ui_status'),
+        options: new can.Map(),
+      };
+      method = Ctrl.prototype.new_instance.bind(ctrlInst);
+    });
+
+    it('calls reset_form() with new prepared instance', (done) => {
+      resetFormDfd.resolve();
+
+      method();
+
+      expect(ctrlInst.reset_form).toHaveBeenCalledWith(
+        newInstance, jasmine.any(Function));
+      done();
+    });
+
+    it('assigns new prepared instance into controller options ' +
+    'after reset_form()', (done) => {
+      method();
+
+      resetFormDfd.done(() => {
+        expect(ctrlInst.options.attr('instance')).toBe(newInstance);
+        done();
+      });
+
+      resetFormDfd.resolve();
+    });
+
+    it('calls proxy() with "apply_object_params"', (done) => {
+      resetFormDfd.resolve();
+      method();
+
+      expect(ctrlInst.proxy).toHaveBeenCalledWith('apply_object_params');
+      done();
+    });
+
+    it('calls proxy() with "serialize_form"', (done) => {
+      resetFormDfd.resolve();
+      method();
+
+      expect(ctrlInst.proxy).toHaveBeenCalledWith('serialize_form');
+      done();
+    });
+
+    it('calls proxy() with "autocomplete"', (done) => {
+      resetFormDfd.resolve();
+      method();
+
+      expect(ctrlInst.proxy).toHaveBeenCalledWith('autocomplete');
+      done();
+    });
+  });
 });
