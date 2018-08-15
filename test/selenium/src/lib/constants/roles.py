@@ -35,6 +35,11 @@ PRINCIPAL_ASSIGNEES = "Principal " + ASSIGNEES
 SECONDARY_ASSIGNEES = "Secondary " + ASSIGNEES
 PRIMARY_CONTACTS = "Primary Contacts"
 SECONDARY_CONTACTS = "Secondary Contacts"
+PRODUCT_MANAGERS = "Product Managers"
+TECHNICAL_LEADS = "Technical Leads"
+TECHNICAL_PMS = "Technical / Program Managers"
+LEGAL_COUNSELS = "Legal Counsels"
+SYSTEM_OWNERS = "System Owners"
 
 # role scopes
 SYSTEM = "System"

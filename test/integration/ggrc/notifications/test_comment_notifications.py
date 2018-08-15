@@ -155,6 +155,22 @@ class TestCommentNotification(TestCase):
         expected_suffix = "asmt " + str(parent_obj_key.id)
         self.assertTrue(comment["description"].endswith(expected_suffix))
 
+  SCOPING_OBJECT_FACTORIES = {
+      factories.AccessGroupFactory,
+      factories.DataAssetFactory,
+      factories.FacilityFactory,
+      factories.MarketFactory,
+      factories.SystemFactory,
+      factories.ProcessFactory,
+      factories.ProductFactory,
+      factories.ProjectFactory,
+      factories.MetricFactory,
+      factories.TechnologyEnvironmentFactory,
+      factories.ProductGroupFactory,
+      factories.OrgGroupFactory,
+      factories.VendorFactory,
+  }
+
   @ddt.data(
       factories.AccessGroupFactory,
       factories.ClauseFactory,
@@ -187,7 +203,12 @@ class TestCommentNotification(TestCase):
     Check if the correct notification entries are created when a comment gets
     posted.
     """
-    recipient_types = ["Admin", "Primary Contacts", "Secondary Contacts"]
+    if obj_factory in self.SCOPING_OBJECT_FACTORIES:
+      recipient_types = ["Admin", "Primary Contacts", "Secondary Contacts",
+                         "Product Managers", "Technical / Program Managers",
+                         "Technical Leads", "System Owners", "Legal Counsels"]
+    else:
+      recipient_types = ["Admin", "Primary Contacts", "Secondary Contacts"]
     person = all_models.Person.query.first()
     person_email = person.email
 
