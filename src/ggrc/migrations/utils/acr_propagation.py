@@ -144,6 +144,7 @@ def _propagate_object_roles(object_type, roles_tree, with_update):
   Args:
     object_type: Class name of the object for which we want to propagate roles.
     roles_tree: a dictionary with the role propagation rules.
+    with_update: updates subtree with new rules instead of replacing
   """
   for role_names, propagation_tree in roles_tree.items():
     if isinstance(role_names, basestring):

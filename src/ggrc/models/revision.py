@@ -230,7 +230,7 @@ class Revision(base.ContextRBAC, Base, db.Model):
         acl["person"] = {"id": acl.get("person_id"), "type": "Person"}
     return access_control_list
 
-  def populate_acl(self):
+  def populate_acl(self):  # pylint: disable=too-many-locals
     """Add access_control_list info for older revisions."""
     roles_dict = role.get_custom_roles_for(self.resource_type)
     reverted_roles_dict = {n: i for i, n in roles_dict.iteritems()}
@@ -241,11 +241,17 @@ class Revision(base.ContextRBAC, Base, db.Model):
         "contact": reverted_roles_dict.get("Primary Contacts"),
         "secondary_contact": reverted_roles_dict.get("Secondary Contacts"),
         "owners": reverted_roles_dict.get("Admin"),
+        "primary_contacts": reverted_roles_dict.get("Compliance Contacts"),
+        "secondary_contacts": reverted_roles_dict.get("Compliance Contacts"),
     }
+    migrate_role_keys = ["primary_contacts", "secondary_contacts"]
+
     exists_roles = {i["ac_role_id"] for i in access_control_list}
 
     for field, role_id in map_field_to_role.items():
-      if role_id in exists_roles or role_id is None:
+      if role_id is None:
+        continue
+      if role_id in exists_roles and role_id not in migrate_role_keys:
         continue
       if field not in self._content:
         continue

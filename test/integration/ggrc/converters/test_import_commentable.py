@@ -44,7 +44,7 @@ SCOPING_MODELS = [
 
 RECIPIENTS = ["Admin", "Primary Contacts", "Secondary Contacts"]
 
-SCOPING_RECIPIENTS = ["Admin", "Primary Contacts", "Secondary Contacts",
+SCOPING_RECIPIENTS = ["Admin", "Assignee", "Verifier", "Compliance Contacts"
                       "Product Managers", "Technical / Program Managers",
                       "Technical Leads", "System Owners", "Legal Counsels"]
 
