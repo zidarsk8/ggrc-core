@@ -194,6 +194,7 @@ def run_export(objects, ie_id, user_id, url_root):
       if ie.status == "Stopped":
         return
       ie.status = "Finished"
+      ie.end_at = datetime.utcnow()
       ie.content = content
       db.session.commit()
       job_emails.send_email(job_emails.EXPORT_COMPLETED, user.email, url_root,
@@ -202,7 +203,7 @@ def run_export(objects, ie_id, user_id, url_root):
       logger.exception("Export failed: %s", e.message)
       try:
         ie.status = "Failed"
-        ie.end_date = datetime.utcnow()
+        ie.end_at = datetime.utcnow()
         db.session.commit()
         job_emails.send_email(job_emails.EXPORT_FAILED, user.email, url_root)
       except Exception as e:  # pylint: disable=broad-except
@@ -230,6 +231,7 @@ def run_import_phases(ie_id, user_id, url_root):  # noqa: ignore=C901
         for block_info in info:
           if block_info["block_errors"] or block_info["row_errors"]:
             ie_job.status = "Analysis Failed"
+            ie_job.end_at = datetime.utcnow()
             db.session.commit()
             job_emails.send_email(job_emails.IMPORT_FAILED, user.email,
                                   url_root, ie_job.title)
@@ -250,11 +252,13 @@ def run_import_phases(ie_id, user_id, url_root):  # noqa: ignore=C901
         for block_info in info:
           if block_info["block_errors"] or block_info["row_errors"]:
             ie_job.status = "Analysis Failed"
+            ie_job.end_at = datetime.utcnow()
             job_emails.send_email(job_emails.IMPORT_FAILED, user.email,
                                   url_root, ie_job.title)
             db.session.commit()
             return
         ie_job.status = "Finished"
+        ie_job.end_at = datetime.utcnow()
         db.session.commit()
         job_emails.send_email(job_emails.IMPORT_COMPLETED, user.email,
                               url_root, ie_job.title)
@@ -262,7 +266,7 @@ def run_import_phases(ie_id, user_id, url_root):  # noqa: ignore=C901
       logger.exception("Import failed: %s", e.message)
       try:
         ie_job.status = "Failed"
-        ie_job.end_date = datetime.utcnow()
+        ie_job.end_at = datetime.utcnow()
         db.session.commit()
         job_emails.send_email(job_emails.IMPORT_FAILED, user.email,
                               url_root, ie_job.title)
@@ -326,6 +330,7 @@ def handle_start(ie_job, user_id):
   else:
     raise BadRequest("Wrong status")
   try:
+    ie_job.start_at = datetime.utcnow()
     db.session.commit()
     deferred.defer(run_import_phases,
                    ie_job.id,
@@ -375,6 +380,7 @@ def handle_get(id2, command, job_type):
       BadRequest("Unknown command")
     return handle_file_download(id2)
   try:
+    import_export.clear_overtimed_tasks()
     if id2:
       res = import_export.get(id2).log_json()
     else:
@@ -458,7 +464,9 @@ def handle_export_post(**kwargs):
     ie = import_export.create_import_export_entry(
         job_type="Export",
         status="In Progress",
-        title=filename)
+        title=filename,
+        start_at=datetime.utcnow(),
+    )
     deferred.defer(run_export,
                    objects,
                    ie.id,
