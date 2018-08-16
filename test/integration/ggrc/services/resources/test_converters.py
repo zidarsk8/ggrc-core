@@ -73,7 +73,7 @@ class TestImportExports(TestCase):
     task_thread.join()
 
   @mock.patch("ggrc.gdrive.file_actions.get_gdrive_file_data",
-              new=lambda x: (x, None, None))
+              new=lambda x: (x, None, ''))
   def test_failed_imports_post(self):
     """Test imports post"""
     user = all_models.Person.query.first()
@@ -110,7 +110,7 @@ class TestImportExports(TestCase):
         self.assertFalse(block["block_errors"])
 
   @mock.patch("ggrc.gdrive.file_actions.get_gdrive_file_data",
-              new=lambda x: (x, None, None))
+              new=lambda x: (x, None, ''))
   def test_imports_post(self):
     """Test imports post"""
     user = all_models.Person.query.first()
@@ -289,6 +289,24 @@ class TestImportExports(TestCase):
     self.assert200(response)
     self.assertEqual(response.data, "Test content")
 
+  @ddt.data(r"\\\\test.csv",
+            "test###.csv",
+            '??test##.csv',
+            '?test#.csv',
+            r'\\filename?.csv',
+            '??somenamea??.csv',
+            r'!@##??\\.csv')
+  def test_imports_with_spec_symbols(self, filename):
+    """Test import with special symbols in file name"""
+    with mock.patch("ggrc.gdrive.file_actions.get_gdrive_file_data",
+                    new=lambda x: (x, None, filename)):
+      user = all_models.Person.query.first()
+      response = self.client.post(
+          "/api/people/{}/imports".format(user.id),
+          data=json.dumps([]),
+          headers=self.headers)
+      self.assert400(response)
+
   @ddt.data(("Import", "Analysis"),
             ("Export", "In Progress"))
   @ddt.unpack
@@ -315,7 +333,7 @@ class TestImportExports(TestCase):
             ("Finished", False))
   @ddt.unpack
   @mock.patch("ggrc.gdrive.file_actions.get_gdrive_file_data",
-              new=lambda x: (x, None, None))
+              new=lambda x: (x, None, ''))
   def test_delete_previous_imports(self, status, should_be_none):
     """Test deletion of previous imports"""
     user = all_models.Person.query.first()
@@ -351,7 +369,7 @@ class TestImportExports(TestCase):
 
   @mock.patch(
       "ggrc.gdrive.file_actions.get_gdrive_file_data",
-      new=lambda x: (x, None, None)
+      new=lambda x: (x, None, '')
   )
   def test_import_control_revisions(self):
     """Test if new revisions created during import."""
@@ -382,7 +400,7 @@ class TestImportExports(TestCase):
 
   @mock.patch(
       "ggrc.gdrive.file_actions.get_gdrive_file_data",
-      new=lambda x: (x, None, None)
+      new=lambda x: (x, None, '')
   )
   def test_import_snapshot(self):
     """Test if snapshots can be created from imported objects."""
