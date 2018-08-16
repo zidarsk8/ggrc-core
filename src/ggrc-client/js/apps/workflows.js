@@ -96,7 +96,6 @@ import Person from '../models/business-models/person';
 
       Workflow: {
         _canonical: {
-          task_groups: 'TaskGroup',
           context: 'Context',
         },
         task_groups: Direct(
