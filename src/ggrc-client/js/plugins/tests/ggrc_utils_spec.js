@@ -106,11 +106,6 @@ describe('getMappableTypes() method', function () {
     let result = getMappableTypes('Person');
     expect(_.includes(result, 'Issue')).toBe(false);
   });
-  it('returns only Audit type for AssessmentTemplate', function () {
-    let result = getMappableTypes('AssessmentTemplate');
-    expect(result.length).toBe(1);
-    expect(result[0]).toBe('Audit');
-  });
   it('always returns whitelisted items', function () {
     let whitelisted = ['Hello', 'World'];
     let result = getMappableTypes('AssessmentTemplate', {
