@@ -95,6 +95,50 @@ describe('related-people-access-control-group component', () => {
     });
   });
 
+  describe('canAdd prop', () => {
+    let people = ['user1'];
+
+    it('returns "false" when singleUserRole is "true" and people.length > 0',
+      () => {
+        viewModel.attr('people', people);
+        viewModel.attr('singleUserRole', true);
+
+        let result = viewModel.attr('canAdd');
+
+        expect(result).toEqual(false);
+      });
+
+    it('returns "true" when singleUserRole is "false" and people.length > 0',
+      () => {
+        viewModel.attr('people', people);
+        viewModel.attr('singleUserRole', false);
+
+        let result = viewModel.attr('canAdd');
+
+        expect(result).toEqual(true);
+      });
+
+    it('returns "true" when singleUserRole is "false" and people.length is 0',
+      () => {
+        viewModel.attr('people', []);
+        viewModel.attr('singleUserRole', false);
+
+        let result = viewModel.attr('canAdd');
+
+        expect(result).toEqual(true);
+      });
+
+    it('returns "true" when singleUserRole is "true" and people.length is 0',
+      () => {
+        viewModel.attr('people', []);
+        viewModel.attr('singleUserRole', true);
+
+        let result = viewModel.attr('canAdd');
+
+        expect(result).toEqual(true);
+      });
+  });
+
   describe('check methods for updating "people" property', () => {
     let peopleList = [
       {id: 1, desc: 'Existent Person'},
