@@ -7,6 +7,6 @@ import Mixin from './mixin';
 
 export default Mixin('scope-object-notifications', {
   send_by_default: true,
-  recipients: 'Admin,Primary Contacts,Secondary Contacts,Product Managers,' +
+  recipients: 'Admin,Assignee,Verifier,Compliance Contacts,Product Managers,' +
   'Technical Leads,Technical / Program Managers,Legal Counsels,System Owners',
 });
