@@ -41,7 +41,45 @@ function handleAjaxError(jqxhr, errorThrown = '') {
   }
 }
 
+function getAjaxErrorInfo(jqxhr, errorThrown = '') {
+  let name = '';
+  let details = '';
+
+  if (jqxhr.status) {
+    name += jqxhr.status;
+  }
+
+  if (jqxhr.statusText) {
+    name += ` ${jqxhr.statusText}`;
+  }
+
+  let response = jqxhr.responseJSON;
+
+  if (!response) {
+    try {
+      response = JSON.parse(jqxhr.responseText);
+    } catch (e) {
+      response = null;
+    }
+  }
+
+  details = (response && response.message) || jqxhr.responseText ||
+    errorThrown.message || errorThrown;
+
+  if (isConnectionLost()) {
+    name = 'Connection Lost Error';
+    details = 'Internet connection was lost.';
+  }
+
+  return {
+    category: 'AJAX Error',
+    name,
+    details,
+  };
+}
+
 export {
   isConnectionLost,
   handleAjaxError,
+  getAjaxErrorInfo,
 };
