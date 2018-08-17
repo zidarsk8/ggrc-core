@@ -38,6 +38,7 @@ export default can.Component.extend({
     isNewInstance: false,
     groupId: '@',
     title: '@',
+    singleUserRole: false,
     people: [],
     isDirty: false,
     required: false,
@@ -79,7 +80,12 @@ export default can.Component.extend({
       }
 
       this.attr('isDirty', true);
-      this.attr('people').push(person);
+
+      if (this.attr('singleUserRole')) {
+        this.attr('people').replace(person);
+      } else {
+        this.attr('people').push(person);
+      }
 
       if (this.attr('autoUpdate')) {
         this.saveChanges();
