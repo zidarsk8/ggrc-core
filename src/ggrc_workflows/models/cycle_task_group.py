@@ -5,11 +5,13 @@
 """
 
 from sqlalchemy import orm, inspect
+from sqlalchemy.ext import hybrid
 
 from ggrc import db
 from ggrc.access_control import roleable
 from ggrc.models import mixins
 from ggrc.models import reflection
+from ggrc.models import relationship
 from ggrc.models.mixins import base
 from ggrc.fulltext import mixin as index_mixin
 from ggrc.fulltext import attributes
@@ -28,6 +30,7 @@ def _query_filtered_by_contact(person):
 
 
 class CycleTaskGroup(roleable.Roleable,
+                     relationship.Relatable,
                      mixins.WithContact,
                      wf_mixins.CycleTaskGroupRelatedStatusValidatedMixin,
                      mixins.Slugged,
@@ -56,7 +59,7 @@ class CycleTaskGroup(roleable.Roleable,
       db.Integer, db.ForeignKey('task_groups.id'), nullable=True)
   cycle_task_group_tasks = db.relationship(
       'CycleTaskGroupObjectTask',
-      backref='cycle_task_group',
+      backref='_cycle_task_group',
       cascade='all, delete-orphan'
   )
   sort_index = db.Column(
@@ -92,6 +95,22 @@ class CycleTaskGroup(roleable.Roleable,
                                   lambda x: x.cycle.next_due_date,
                                   with_template=False),
   ]
+
+  # This parameter is overridden by cycle backref, but is here to ensure
+  # pylint does not complain
+  _cycle = None
+
+  @hybrid.hybrid_property
+  def cycle(self):
+    """Getter for cycle foreign key."""
+    return self._cycle
+
+  @cycle.setter
+  def cycle(self, cycle):
+    """Set cycle foreign key and relationship."""
+    if not self._cycle and cycle:
+      relationship.Relationship(source=cycle, destination=self)
+    self._cycle = cycle
 
   @property
   def workflow(self):
