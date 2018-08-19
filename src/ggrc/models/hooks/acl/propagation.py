@@ -17,7 +17,6 @@ from ggrc import db
 from ggrc import login
 from ggrc import utils
 from ggrc.utils import helpers
-from ggrc.access_control import utils as acl_utils
 from ggrc.models import all_models
 
 logger = logging.getLogger(__name__)
@@ -26,6 +25,64 @@ logger = logging.getLogger(__name__)
 # it suggests invalid propagation tree entries, or the propagation tree could
 # contain cycles.
 PROPAGATION_DEPTH_LIMIT = 50
+
+# retry count for possible deadlock issues.
+PROPAGATION_RETRIES = 10
+
+
+def _insert_select_acls(select_statement):
+  """Insert acl records from the select statement
+  Args:
+    select_statement: sql statement that contains the following columns
+      person_id,
+      ac_role_id,
+      object_id,
+      object_type,
+      created_at,
+      modified_by_id,
+      updated_at,
+      parent_id,
+      parent_id_nn,
+  """
+
+  acl_table = all_models.AccessControlList.__table__
+  inserter = acl_table.insert().prefix_with("IGNORE")
+
+  last_error = None
+  for _ in range(PROPAGATION_RETRIES):
+    try:
+      last_error = None
+      db.session.execute(
+          inserter.from_select(
+              [
+                  acl_table.c.person_id,
+                  acl_table.c.ac_role_id,
+                  acl_table.c.object_id,
+                  acl_table.c.object_type,
+                  acl_table.c.created_at,
+                  acl_table.c.modified_by_id,
+                  acl_table.c.updated_at,
+                  acl_table.c.parent_id,
+                  acl_table.c.parent_id_nn,
+              ],
+              select_statement
+          )
+      )
+      db.session.plain_commit()
+      break
+    except sa.exc.OperationalError as error:
+      logger.exception(error)
+      last_error = error
+
+  if last_error:
+    logger.critical(
+        "ACL propagation failed with %d retries on statement: \n %s",
+        PROPAGATION_RETRIES,
+        select_statement,
+    )
+    # The following error if exists will only be sa.exc.OperationalError so the
+    # pylint warning is invalid.
+    raise last_error  # pylint: disable=raising-bad-type
 
 
 def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
@@ -202,7 +259,7 @@ def _handle_propagation_parents(parent_acl_ids):
   src_select = _rel_parent(parent_acl_ids, source=True)
   dst_select = _rel_parent(parent_acl_ids, source=False)
   select_statement = sa.union(src_select, dst_select)
-  acl_utils.insert_select_acls(select_statement)
+  _insert_select_acls(select_statement)
 
 
 def _handle_propagation_children(new_parent_ids):
@@ -210,7 +267,7 @@ def _handle_propagation_children(new_parent_ids):
   src_select = _rel_child(new_parent_ids, source=True)
   dst_select = _rel_child(new_parent_ids, source=False)
   select_statement = sa.union(src_select, dst_select)
-  acl_utils.insert_select_acls(select_statement)
+  _insert_select_acls(select_statement)
 
 
 def _handle_propagation_rel(relationship_ids, new_acl_ids):
@@ -226,7 +283,7 @@ def _handle_propagation_rel(relationship_ids, new_acl_ids):
       source=False
   )
   select_statement = sa.union(src_select, dst_select)
-  acl_utils.insert_select_acls(select_statement)
+  _insert_select_acls(select_statement)
 
 
 def _handle_acl_step(parent_acl_ids):
