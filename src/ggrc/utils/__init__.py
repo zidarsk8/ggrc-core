@@ -346,3 +346,13 @@ def validate_mimetype(accepted_mimetype):
       return function(*args, **kwargs)
     return inner
   return mimetype_decorator
+
+
+def get_task_attr(attr_name, params=None):
+  """Get attribute value from params dict or request data."""
+  attr = None
+  if params and attr_name in params:
+    attr = params.get(attr_name)
+  elif flask.request.json and attr_name in flask.request.json:
+    attr = flask.request.json.get(attr_name)
+  return attr
