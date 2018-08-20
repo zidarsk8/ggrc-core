@@ -4,6 +4,8 @@
 import logging
 from flask import g, has_app_context
 
+from ggrc.utils import benchmark
+
 logger = logging.getLogger(__name__)
 
 
@@ -20,16 +22,17 @@ class Cache:
     Before the flush happens, we can still access to-be-deleted objects, so
     record JSON for log here
     """
-    for o in session.new:
-      if hasattr(o, 'log_json'):
-        self.new[o] = o.log_json()
-    for o in session.deleted:
-      if hasattr(o, 'log_json'):
-        self.deleted[o] = o.log_json()
-    dirty = set(o for o in session.dirty if session.is_modified(o))
-    for o in dirty - set(self.new) - set(self.deleted):
-      if hasattr(o, 'log_json'):
-        self.dirty[o] = o.log_json()
+    with benchmark("log json before flush"):
+      for o in session.new:
+        if hasattr(o, 'log_json'):
+          self.new[o] = o.log_json()
+      for o in session.deleted:
+        if hasattr(o, 'log_json'):
+          self.deleted[o] = o.log_json()
+      dirty = set(o for o in session.dirty if session.is_modified(o))
+      for o in dirty - set(self.new) - set(self.deleted):
+        if hasattr(o, 'log_json'):
+          self.dirty[o] = o.log_json()
 
   def update_after_flush(self, session, flush_context):
     """

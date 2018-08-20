@@ -9,6 +9,7 @@ from ggrc.models import reflection
 from ggrc.models import all_models
 from ggrc.models.all_models import *  # noqa
 from ggrc.utils import html_cleaner
+from ggrc.utils import benchmark
 
 """All GGRC model objects and associated utilities."""
 
@@ -67,14 +68,16 @@ def init_session_monitor_cache():
   from ggrc.models.cache import Cache
 
   def update_cache_before_flush(session, flush_context, objects):
-    cache = Cache.get_cache(create=True)
-    if cache:
-      cache.update_before_flush(session, flush_context)
+    with benchmark("update cache before flush"):
+      cache = Cache.get_cache(create=True)
+      if cache:
+        cache.update_before_flush(session, flush_context)
 
   def update_cache_after_flush(session, flush_context):
-    cache = Cache.get_cache(create=False)
-    if cache:
-      cache.update_after_flush(session, flush_context)
+    with benchmark("update cache after flush"):
+      cache = Cache.get_cache(create=False)
+      if cache:
+        cache.update_after_flush(session, flush_context)
 
   def clear_cache(session):
     cache = Cache.get_cache()
