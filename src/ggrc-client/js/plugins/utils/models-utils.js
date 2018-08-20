@@ -43,21 +43,11 @@ const getModelInstance = (id, type, requiredAttr) => {
 const inferObjectType = (data) => {
   let decisionTree = _getObjectTypeDecisionTree();
 
-  function resolve(subtree, data) {
-    if (typeof subtree === 'undefined') {
-      return null;
-    }
-    return can.isPlainObject(subtree) ?
-      subtree._discriminator(data) :
-      subtree;
-  }
-
   if (!data) {
     return null;
   } else {
-    return can.reduce(Object.keys(data), function (a, b) {
-      return a || resolve(decisionTree[b], data[b]);
-    }, null);
+    return can.reduce(Object.keys(data), (a, b) =>
+      a || decisionTree[b] || null, null);
   }
 };
 
