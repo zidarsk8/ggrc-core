@@ -406,10 +406,6 @@ viewModel = can.Map.extend({
     function onCreated(ev, instance) {
       if (activeTabModel === instance.type) {
         _refresh(true);
-      } else if (isPerson(instance)) {
-        self.attr('parent_instance').refresh().then(function () {
-          _refresh();
-        });
       }
     }
 
@@ -417,8 +413,7 @@ viewModel = can.Map.extend({
       let current;
 
       if (_verifyRelationship(instance, activeTabModel) ||
-        instance instanceof CMS.Models[activeTabModel] ||
-        isPerson(instance)) {
+        instance instanceof CMS.Models[activeTabModel]) {
         if (self.attr('showedItems').length === 1) {
           current = self.attr('pageInfo.current');
           self.attr('pageInfo.current',
@@ -479,11 +474,6 @@ viewModel = can.Map.extend({
         return true;
       }
       return false;
-    }
-
-    function isPerson(instance) {
-      return _.includes(['UserRole'],
-        instance.type);
     }
 
     return function (needDestroy) {
