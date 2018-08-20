@@ -41,7 +41,10 @@ const getModelInstance = (id, type, requiredAttr) => {
 };
 
 const inferObjectType = (data) => {
-  let decisionTree = _getObjectTypeDecisionTree();
+  let decisionTree = _(GGRC.extensions)
+    .filter((extension) => extension.object_type_decision_tree)
+    .reduce((tree, extension) =>
+      Object.assign(tree, extension.object_type_decision_tree()), {});
 
   if (!data) {
     return null;
@@ -69,23 +72,6 @@ const makeModelInstance = (data) => {
 const hasRelatedAssessments = (type) => {
   return _.includes(relatedAssessmentsTypes, type);
 };
-
-function _getObjectTypeDecisionTree() { // eslint-disable-line
-  let tree = {};
-  let extensions = GGRC.extensions || [];
-
-  can.each(extensions, function (extension) {
-    if (extension.object_type_decision_tree) {
-      if (can.isFunction(extension.object_type_decision_tree)) {
-        $.extend(tree, extension.object_type_decision_tree());
-      } else {
-        $.extend(tree, extension.object_type_decision_tree);
-      }
-    }
-  });
-
-  return tree;
-}
 
 const getInstance = (objectType, objectId, paramsOrObject) => {
   let model;

@@ -65,17 +65,6 @@ import * as businessModels from '../models/business-models';
     taskGroup: 'TaskGroup',
   };
 
-  // Register Workflow models for use with `inferObjectType`
-  WorkflowExtension.object_type_decision_tree = function () {
-    return {
-      cycle: Cycle,
-      cycle_task_entry: CycleTaskEntry,
-      cycle_task_group: CycleTaskGroup,
-      cycle_task_group_object_task: CycleTaskGroupObjectTask,
-      task_group: TaskGroup,
-      workflow: Workflow,
-    };
-  };
 
   // Configure mapping extensions for ggrc_workflows
   WorkflowExtension.init_mappings = function () {
