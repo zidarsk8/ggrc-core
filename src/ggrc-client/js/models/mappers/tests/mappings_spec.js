@@ -53,6 +53,7 @@ describe('Mappings', function () {
     workflows: {
       models: [
         'TaskGroup',
+        'TaskGroupTask',
         'Workflow',
         'CycleTaskEntry',
         'CycleTaskGroupObjectTask',
@@ -61,6 +62,7 @@ describe('Mappings', function () {
       ],
       notMappable: [
         'Workflow',
+        'TaskGroupTask',
         'CycleTaskEntry',
         'CycleTaskGroupObjectTask',
         'CycleTaskGroupObject',
@@ -134,6 +136,8 @@ describe('Mappings', function () {
     TechnologyEnvironment: filtered,
     Threat: filtered,
     Vendor: filtered,
+    MultitypeSearch: _.difference(allTypes, ['CycleTaskEntry', 'CycleTaskGroup',
+      'CycleTaskGroupObject', 'RiskAssessment']),
   };
 
   beforeAll(function () {
@@ -147,7 +151,10 @@ describe('Mappings', function () {
 
   describe('getMappingTypes() method', function () {
     let EXPECTED_GROUPS = ['entities', 'business', 'governance'];
-    let modelsForTests = _.difference(allTypes, [
+
+    let types = allTypes.concat('MultitypeSearch');
+    let modelsForTests = _.difference(types, [
+      'TaskGroupTask',
       'CycleTaskEntry',
       'CycleTaskGroup',
       'CycleTaskGroupObject',

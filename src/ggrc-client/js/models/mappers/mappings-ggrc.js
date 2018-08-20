@@ -304,18 +304,17 @@ import AccessControlRole from '../custom-roles/access-control-role';
       _mixins: ['related_object'],
     },
     MultitypeSearch: {
-      _mixins: ['directive_object'],
       _canonical: {
-        audits: 'Audit',
-        workflows: 'Workflow',
-        evidence: 'Evidence',
+        related_objects_as_source: [
+          'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
+          'Product', 'ProductGroup', 'Project', 'System', 'Regulation',
+          'Policy', 'Contract', 'Standard', 'Program', 'Issue', 'Control',
+          'Requirement', 'Clause', 'Objective', 'Audit', 'Assessment',
+          'AssessmentTemplate', 'AccessGroup', 'Risk', 'Threat', 'Document',
+          'Metric', 'TechnologyEnvironment', 'Workflow', 'Evidence', 'Person',
+          'TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask',
+        ],
       },
-      audits: Proxy(
-        'Audit', 'audit', 'MultitypeSearchJoin'),
-      workflows: Proxy(
-        'Workflow', 'workflow', 'MultitypeSearchJoin'),
-      evidence: Proxy(
-        'Evidence', 'evidence', 'MultitypeSearchJoin'),
     },
     // Used by Custom Attributes widget
     CustomAttributable: {
