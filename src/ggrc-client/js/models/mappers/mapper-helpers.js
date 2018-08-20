@@ -32,12 +32,6 @@ function TypeFilter(source, modelName) {
   return new GGRC.ListLoaders.TypeFilteredListLoader(source, [modelName]);
 }
 
-function AttrFilter(source, filterName,
-  keyword, type) {
-  return new GGRC.ListLoaders.AttrFilteredListLoader(source, filterName,
-    keyword, type);
-}
-
 function CustomFilter(source, filterFn) {
   return new GGRC.ListLoaders.CustomFilteredListLoader(source, filterFn);
 }
@@ -57,7 +51,6 @@ export {
   Search,
   Multi,
   TypeFilter,
-  AttrFilter,
   CustomFilter,
   Reify,
   Cross,
