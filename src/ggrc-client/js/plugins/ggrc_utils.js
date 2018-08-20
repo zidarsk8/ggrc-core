@@ -242,7 +242,6 @@ function getMappableTypes(type, options) {
   let forbiddenList = {
     Program: ['Audit'],
     Audit: ['Assessment', 'Program'],
-    Person: ['Issue'],
   };
   options = options || {};
   if (!type) {

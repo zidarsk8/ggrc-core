@@ -21,6 +21,7 @@ const forbiddenMapList = [
   'RiskAssessment',
   'Evidence',
   'AssessmentTemplate',
+  'Person',
 ];
 
 const viewModel = can.Map.extend({

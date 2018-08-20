@@ -216,20 +216,6 @@ import AccessControlRole from '../custom-roles/access-control-role';
     TechnologyEnvironment: {
       _mixins: ['business_object'],
     },
-    Person: {
-      _canonical: {
-        related_objects: [
-          'Program', 'Regulation', 'Contract', 'Policy', 'Standard',
-          'AccessGroup', 'Objective', 'Control', 'Requirement', 'Clause',
-          'DataAsset', 'Facility', 'Market', 'Metric', 'OrgGroup', 'Vendor',
-          'Process', 'Product', 'Project', 'System', 'Issue', 'Risk', 'Threat',
-          'Assessment', 'Document', 'TechnologyEnvironment', 'ProductGroup'],
-        authorizations: 'UserRole',
-      },
-      authorizations: Direct('UserRole', 'person', 'user_roles'),
-      related_objects:
-        Multi(['related_objects_as_source', 'related_objects_as_destination']),
-    },
     Context: {
       _canonical: {
         user_roles: 'UserRole',
