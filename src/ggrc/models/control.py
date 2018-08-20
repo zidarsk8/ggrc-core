@@ -26,6 +26,7 @@ from ggrc.fulltext.mixin import Indexed
 from ggrc.fulltext import attributes
 from ggrc.models import reflection
 from ggrc.models import proposal
+from ggrc.models import review
 
 
 class ControlCategory(CategoryBase):
@@ -148,6 +149,7 @@ class AssertionCategorized(Categorizable):
 
 class Control(WithLastAssessmentDate,
               HasObjectState,
+              review.Reviewable,
               Roleable,
               Relatable,
               mixins.CustomAttributable,
