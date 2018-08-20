@@ -11,12 +11,10 @@ import {
   Search,
   Multi,
   TypeFilter,
-  AttrFilter,
   CustomFilter,
   Cross,
 } from '../mappers/mapper-helpers';
 import Mappings from './mappings';
-import SearchModel from '../service-models/search';
 import CustomAttributeDefinition from '../custom-attributes/custom-attribute-definition';
 import AccessControlRole from '../custom-roles/access-control-role';
 
@@ -27,36 +25,28 @@ import AccessControlRole from '../custom-roles/access-control-role';
     // Governance
     Control: {
       _mixins: [
-        'related_object', 'personable', 'assignable',
+        'related_object', 'assignable',
       ],
       orphaned_objects: Multi([
         'related_objects', 'clauses', 'controls', 'programs', 'objectives',
-        'people',
       ]),
     },
     Objective: {
-      _mixins: ['related_object', 'personable'],
+      _mixins: ['related_object'],
       orphaned_objects: Multi([
         'related_objects', 'clauses', 'contracts', 'controls',
-        'objectives', 'people', 'policies', 'programs', 'regulations',
+        'objectives', 'policies', 'programs', 'regulations',
         'requirements', 'standards',
       ]),
     },
     Requirement: {
-      _mixins: ['related_object', 'personable'],
+      _mixins: ['related_object'],
     },
     Clause: {
-      _mixins: ['related_object', 'personable'],
+      _mixins: ['related_object'],
     },
     Document: {
       _mixins: ['business_object'],
-    },
-    personable: {
-      _canonical: {
-        people: 'Person',
-      },
-      people: Proxy(
-        'Person', 'person', 'ObjectPerson', 'personable', 'object_people'),
     },
     assignable: {
       info_related_objects: CustomFilter('related_objects',
@@ -120,7 +110,7 @@ import AccessControlRole from '../custom-roles/access-control-role';
     // Program
     Program: {
       _mixins: [
-        'related_object', 'personable',
+        'related_object',
       ],
       _canonical: {
         audits: 'Audit',
@@ -151,15 +141,15 @@ import AccessControlRole from '../custom-roles/access-control-role';
         }),
       program_owners: Cross('owner_authorizations', 'person'),
       orphaned_objects: Multi([
-        'related_objects', 'people',
+        'related_objects',
       ]),
     },
     directive_object: {
       _mixins: [
-        'related_object', 'personable',
+        'related_object',
       ],
       orphaned_objects: Multi([
-        'people', 'controls', 'objectives', 'related_objects',
+        'controls', 'objectives', 'related_objects',
       ]),
     },
 
@@ -180,10 +170,10 @@ import AccessControlRole from '../custom-roles/access-control-role';
     // Business objects
     business_object: {
       _mixins: [
-        'related_object', 'personable',
+        'related_object',
       ],
       orphaned_objects: Multi([
-        'related_objects', 'people', 'controls', 'objectives', 'requirements',
+        'related_objects', 'controls', 'objectives', 'requirements',
         'clauses',
       ]),
     },
@@ -289,12 +279,11 @@ import AccessControlRole from '../custom-roles/access-control-role';
         evidence: 'Evidence',
       },
       _mixins: [
-        'related_object', 'personable', 'assignable',
+        'related_object', 'assignable',
       ],
       evidence: TypeFilter('related_objects', 'Evidence'),
       audits: TypeFilter('related_objects', 'Audit'),
       related_regulations: TypeFilter('related_objects', 'Regulation'),
-      people: AttrFilter('related_objects', null, 'Person'),
     },
     Evidence: {
       _canonical: {
@@ -307,7 +296,7 @@ import AccessControlRole from '../custom-roles/access-control-role';
     AssessmentTemplate: {},
     Issue: {
       _mixins: [
-        'related_object', 'personable', 'assignable',
+        'related_object', 'assignable',
       ],
       audits: TypeFilter('related_objects', 'Audit'),
     },

@@ -44,7 +44,7 @@ describe('Mappings', function () {
         'TechnologyEnvironment',
         'Threat',
       ],
-      notMappable: ['AssessmentTemplate', 'Evidence'],
+      notMappable: ['AssessmentTemplate', 'Evidence', 'Person'],
     },
     risk_assessments: {
       models: ['RiskAssessment'],
@@ -120,7 +120,7 @@ describe('Mappings', function () {
     Product: filtered,
     ProductGroup: filtered,
     Program: _.difference(allTypes,
-      ['Program', 'Audit', 'RiskAssessment', 'Assessment']
+      ['Program', 'Audit', 'RiskAssessment', 'Assessment', 'Person']
         .concat(modules.core.notMappable, modules.workflows.notMappable)),
     Project: filtered,
     Regulation: _.difference(filtered, directives),
