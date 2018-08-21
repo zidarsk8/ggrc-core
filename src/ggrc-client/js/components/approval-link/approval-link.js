@@ -40,7 +40,18 @@ export default can.Component.extend({
           return !!isReviewer;
         },
       },
+      disabled: {
+        get() {
+          const instance = this.attr('instance');
+          const isModalComparer = Boolean(
+            instance.attr('snapshot') ||
+            instance.attr('isRevision')
+          );
+          return this.attr('isSaving') || isModalComparer;
+        },
+      },
     },
+    isSaving: false,
     instance: null,
     reviewTask: null,
     isInitializing: true,
@@ -72,6 +83,21 @@ export default can.Component.extend({
           });
           this.attr('reviewTask', values[0]);
           this.attr('isInitializing', false);
+        });
+    },
+    onApprove() {
+      const reviewTask = this.attr('reviewTask');
+      this.attr('isSaving', true);
+      reviewTask
+        .refresh()
+        .then((refreshedReviewTask) =>
+          refreshedReviewTask
+            .attr('status', 'Verified')
+            .save()
+        )
+        .then(() => this.attr('instance').refresh())
+        .always(() => {
+          this.attr('isSaving', false);
         });
     },
   },

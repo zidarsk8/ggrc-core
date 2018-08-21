@@ -749,17 +749,14 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
   def _add_obj_review_to_lsopes(self):
     """Extend list of scopes by object review section """
     review_msg = None
-    if selenium_utils.is_element_exist(self._driver,
-                                       self._locators.REVIEW_REJECTED_TXT):
-      review_msg = self._driver.find_element(*self._locators.
-                                             REVIEW_REJECTED_TXT).text
-    elif selenium_utils.is_element_exist(self._driver,
-                                         self._locators.REVIEW_APPROVED_TXT):
-      review_msg = self._driver.find_element(*self._locators.
-                                             REVIEW_APPROVED_TXT).text
-
-    self._extend_list_all_scopes(self._elements.OBJECT_REVIEW_FULL,
-                                 review_msg)
+    rejected_el = self._browser.element(toggle="isInitializing").next_sibling(
+        text=re.compile("Review was declined"))
+    approved_el = self._browser.element(class_name="object-approved")
+    if rejected_el.present:
+      review_msg = rejected_el.text
+    elif approved_el.present:
+      review_msg = approved_el.text
+    self._extend_list_all_scopes(self._elements.OBJECT_REVIEW_FULL, review_msg)
 
   def open_submit_for_review_popup(self):
     """Open submit for control popub by clicking on corresponding button."""
@@ -769,16 +766,9 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
 
   def select_assignee_user(self, user_email):
     """Select assignee user from dropdown on submit for review popup."""
-    elem = self._driver.find_element(*WidgetInfoControl.ASSIGN_REVIEWER_EMPTY)
-    elem.send_keys(user_email)
-    selenium_utils.wait_for_js_to_load(self._driver)
-    selenium_utils.get_when_all_visible(self._driver, WidgetInfoControl.
-                                        ASSIGN_REVIEWER_DROPDOWN)
-    base.ElementsList(
-        self._driver,
-        self._driver.find_element(*WidgetInfoControl.
-                                  ASSIGN_REVIEWER_DROPDOWN)).get_item(
-        user_email).click()
+    self._browser.text_field(placeholder="Find reviewer").set(user_email)
+    self._browser.element(id="ui-id-1").element(
+        class_name="ui-menu-item", text=re.compile(user_email)).click()
 
   def select_first_available_date(self):
     """Select first available day on datepicker on submit for review popup."""
