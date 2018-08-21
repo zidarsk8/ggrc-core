@@ -13,7 +13,6 @@ import {
   Proxy,
   Direct,
   Multi,
-  TypeFilter,
   CustomFilter,
   Cross,
 } from '../models/mappers/mapper-helpers';
@@ -141,32 +140,6 @@ import * as businessModels from '../models/business-models';
             relatedObjects.instance.type);
           }
         ),
-      },
-      CycleTaskEntry: {
-        related_objects_as_source: Proxy(
-          null,
-          'destination', 'Relationship',
-          'source', 'related_destinations'
-        ),
-        related_objects_as_destination: Proxy(
-          null,
-          'source', 'Relationship',
-          'destination', 'related_sources'
-        ),
-        related_objects: Multi(
-          ['related_objects_as_source', 'related_objects_as_destination']
-        ),
-        destinations: Direct('Relationship', 'source', 'related_destinations'),
-        sources: Direct('Relationship', 'destination', 'related_sources'),
-        relationships: Multi(['sources', 'destinations']),
-        documents: TypeFilter('related_objects', 'Document'),
-        cycle: Direct(
-          'Cycle', 'cycle_task_entries', 'cycle'),
-        cycle_task_group_object_task: Direct(
-          'CycleTaskGroupObjectTask',
-          'cycle_task_entries',
-          'cycle_task_group_object_task'),
-        workflow: Cross('cycle', 'workflow'),
       },
     };
 

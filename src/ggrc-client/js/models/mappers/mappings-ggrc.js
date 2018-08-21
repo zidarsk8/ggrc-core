@@ -3,15 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import RefreshQueue from '../refresh_queue';
 import {
   Proxy,
   Direct,
-  Indirect,
   Search,
   Multi,
-  TypeFilter,
-  CustomFilter,
   Cross,
 } from '../mappers/mapper-helpers';
 import Mappings from './mappings';
@@ -46,7 +42,7 @@ const scopingObjects = [
     // Governance
     Control: {
       _mixins: [
-        'related_object', 'assignable', 'relatedMappings',
+        'related_object', 'relatedMappings',
       ],
       orphaned_objects: Multi([
         'related_objects', 'controls', 'programs', 'objectives',
@@ -67,89 +63,20 @@ const scopingObjects = [
       _mixins: ['related_object'],
       _related: ['Person'],
     },
-    assignable: {
-      info_related_objects: CustomFilter('related_objects',
-        function (relatedObjects) {
-          return !_.includes(['Comment', 'Document', 'Person'],
-            relatedObjects.instance.type);
-        }),
-    },
     related_object: {
       _canonical: {
         related_objects_as_source: businessObjects,
       },
       related_objects_as_source: Proxy(
         null, 'destination', 'Relationship', 'source', 'related_destinations'),
-      related_objects_as_destination: Proxy(
-        null, 'source', 'Relationship', 'destination', 'related_sources'),
       related_objects:
         Multi(['related_objects_as_source', 'related_objects_as_destination']),
-      destinations: Direct('Relationship', 'source', 'related_destinations'),
-      sources: Direct('Relationship', 'destination', 'related_sources'),
-      relationships: Multi(['sources', 'destinations']),
-      related_access_groups: TypeFilter('related_objects', 'AccessGroup'),
-      related_data_assets: TypeFilter('related_objects', 'DataAsset'),
-      related_facilities: TypeFilter('related_objects', 'Facility'),
-      related_markets: TypeFilter('related_objects', 'Market'),
-      related_metrics: TypeFilter('related_objects', 'Metric'),
-      related_org_groups: TypeFilter('related_objects', 'OrgGroup'),
-      related_vendors: TypeFilter('related_objects', 'Vendor'),
-      related_processes: TypeFilter('related_objects', 'Process'),
-      related_products: TypeFilter('related_objects', 'Product'),
-      related_product_groups: TypeFilter('related_objects', 'ProductGroup'),
-      related_projects: TypeFilter('related_objects', 'Project'),
-      related_systems: TypeFilter('related_objects', 'System'),
-      related_issues: TypeFilter('related_objects', 'Issue'),
-      related_audits: TypeFilter('related_objects', 'Audit'),
-      related_controls: TypeFilter('related_objects', 'Control'),
-      related_assessments: TypeFilter('related_objects', 'Assessment'),
-      related_risks: TypeFilter('related_objects', 'Risk'),
-      related_threats: TypeFilter('related_objects', 'Threat'),
-      related_technology_environments: TypeFilter('related_objects',
-        'TechnologyEnvironment'),
-      regulations: TypeFilter('related_objects', 'Regulation'),
-      contracts: TypeFilter('related_objects', 'Contract'),
-      policies: TypeFilter('related_objects', 'Policy'),
-      standards: TypeFilter('related_objects', 'Standard'),
-      programs: TypeFilter('related_objects', 'Program'),
-      controls: TypeFilter('related_objects', 'Control'),
-      requirements: TypeFilter('related_objects', 'Requirement'),
-      objectives: TypeFilter('related_objects', 'Objective'),
-      risks: TypeFilter('related_objects', 'Risk'),
-      threats: TypeFilter('related_objects', 'Threat'),
     },
     // Program
     Program: {
       _mixins: [
         'related_object', 'relatedMappings',
       ],
-      _canonical: {
-        audits: 'Audit',
-      },
-      related_issues: TypeFilter('related_objects', 'Issue'),
-      audits: Direct('Audit', 'program', 'audits'),
-      related_people_via_audits:
-        TypeFilter('related_objects_via_audits', 'Person'),
-      authorizations_via_audits: Cross('audits', 'authorizations'),
-      context: Direct('Context', 'related_object', 'context'),
-      contexts_via_audits: Cross('audits', 'context'),
-      program_authorized_people: Cross('context', 'authorized_people'),
-      program_authorizations: Cross('context', 'user_roles'),
-      authorization_contexts: Multi(['context', 'contexts_via_audits']),
-      authorizations_via_contexts:
-        Cross('authorization_contexts', 'user_roles'),
-      authorizations: Cross('authorization_contexts', 'user_roles'),
-      authorized_people: Cross('authorization_contexts', 'authorized_people'),
-      owner_authorizations: CustomFilter('program_authorizations',
-        function (authBinding) {
-          return new RefreshQueue()
-            .enqueue(authBinding.instance.role.reify())
-            .trigger()
-            .then(function (roles) {
-              return roles[0].name === 'ProgramOwner';
-            });
-        }),
-      program_owners: Cross('owner_authorizations', 'person'),
       orphaned_objects: Multi([
         'related_objects',
       ]),
@@ -240,77 +167,39 @@ const scopingObjects = [
     TechnologyEnvironment: {
       _mixins: ['business_object'],
     },
-    Context: {
-      _canonical: {
-        user_roles: 'UserRole',
-        authorized_people: 'Person',
-      },
-      user_roles: Direct('UserRole', 'context', 'user_roles'),
-      authorized_people: Proxy('Person', 'person', 'UserRole', 'context',
-        'user_roles'),
-    },
     UserRole: {
-      // FIXME: These should not need to be `Indirect` --
-      //   `context.related_object` *should* point to the right object.
-      audit_via_context: Indirect('Audit', 'context'),
       person: Direct('Person', 'user_roles', 'person'),
       role: Direct('Role', 'user_roles', 'role'),
     },
     Audit: {
       _canonical: {
         _program: 'Program',
-        evidence: 'Evidence',
       },
+      _related: ['Evidence'],
       _mixins: [
         'related_object',
       ],
       _program: Direct('Program', 'audits', 'program'),
-      evidence: TypeFilter('related_objects', 'Evidence'),
       program_controls: Cross('_program', 'controls'),
-      context: Direct('Context', 'related_object', 'context'),
-      authorizations: Cross('context', 'user_roles'),
-      authorized_program_people: Cross('_program', 'authorized_people'),
-      authorized_audit_people: Cross('authorizations', 'person'),
-      authorized_people:
-        Multi(['authorized_audit_people', 'authorized_program_people']),
-      auditor_authorizations: CustomFilter('authorizations', function (result) {
-        return new RefreshQueue()
-          .enqueue(result.instance.role.reify())
-          .trigger()
-          .then(function (roles) {
-            return roles[0].name === 'Auditor';
-          });
-      }),
-      auditors: Cross('auditor_authorizations', 'person'),
     },
     Assessment: {
-      _canonical: {
-        evidence: 'Evidence',
-      },
-      _related: ['Person'],
+      _related: ['Person', 'Evidence'],
       _mixins: [
-        'related_object', 'assignable',
+        'related_object',
       ],
-      evidence: TypeFilter('related_objects', 'Evidence'),
-      audits: TypeFilter('related_objects', 'Audit'),
-      related_regulations: TypeFilter('related_objects', 'Regulation'),
     },
     Evidence: {
       _canonical: {
         related_objects_as_source: ['Audit', 'Assessment'],
       },
-      related_objects_as_source: Proxy(
-        null, 'destination', 'Relationship', 'source', 'related_destinations',
-      ),
     },
     AssessmentTemplate: {
       _related: ['Audit'],
     },
     Issue: {
       _mixins: [
-        'related_object', 'assignable', 'relatedMappings',
+        'related_object', 'relatedMappings',
       ],
-      audits: TypeFilter('related_objects', 'Audit'),
     },
     Comment: {
       _mixins: ['related_object'],
