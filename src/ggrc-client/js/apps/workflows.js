@@ -7,7 +7,6 @@ import {
   initCounts,
   getPageInstance,
 } from '../plugins/utils/current-page-utils';
-import {registerHook} from '../plugins/ggrc_utils';
 
 import InfoWidget from '../controllers/info_widget_controller';
 import {
@@ -512,9 +511,6 @@ import * as businessModels from '../models/business-models';
     }
     new GGRC.WidgetList('ggrc_workflows', descriptor);
   };
-
-  registerHook(
-    'Dashboard.Widgets', GGRC.mustache_path + '/dashboard/widgets');
 
   WorkflowExtension.init_mappings();
 })(window.can.$, window.CMS, window.GGRC);
