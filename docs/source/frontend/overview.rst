@@ -549,10 +549,6 @@ Each type of mapping is defined below:
    ``directive`` attribute, so Section has a Direct mapping to
    Directive.
 
--  **Indirect** :src:`ggrc/assets/javascripts/models/mappers/indirect-list-loader.js`:
-   An indirect mapping is the reverse of ``Direct``, but
-   the implementation is inconsistent with the rest of the mappers.
-
 -  **Search** :src:`ggrc/assets/javascripts/models/mappers/search-list-loader.js`:
    A search mapping is a relationship where results are
    produced by a function returning a deferred. This mapping is f
@@ -566,11 +562,6 @@ Each type of mapping is defined below:
    Constructs a mapping which is the union of zero or more
    other mappings.  Specifically, the set of ``result.instance`` values
    is the union of ``result.instance`` from the contributing mappings.
-
--  **TypeFilter** :src:`ggrc/assets/javascripts/models/mappers/type-filtered-list-loader.js`:
-   A TypeFiltered mapping takes the result of another
-   mapping and returns only the results which are instances of a
-   specified type. This is useful for filtering polymorphic proxies.
 
 -  **CustomFilter** :src:`ggrc/assets/javascripts/models/mappers/custom-filtered-list-loader.js`:
    A custom filtered mapping runs a filter function on

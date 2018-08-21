@@ -16,20 +16,12 @@ function Direct(
     optionModelName, instanceJoinAttr, remoteJoinAttr);
 }
 
-function Indirect(instModelName, joinAttr) {
-  return new GGRC.ListLoaders.IndirectListLoader(instModelName, joinAttr);
-}
-
 function Search(queryFunction, observeTypes) {
   return new GGRC.ListLoaders.SearchListLoader(queryFunction, observeTypes);
 }
 
 function Multi(sources) {
   return new GGRC.ListLoaders.MultiListLoader(sources);
-}
-
-function TypeFilter(source, modelName) {
-  return new GGRC.ListLoaders.TypeFilteredListLoader(source, [modelName]);
 }
 
 function CustomFilter(source, filterFn) {
@@ -43,10 +35,8 @@ function Cross(localMapping, remoteMapping) {
 export {
   Proxy,
   Direct,
-  Indirect,
   Search,
   Multi,
-  TypeFilter,
   CustomFilter,
   Cross,
 };
