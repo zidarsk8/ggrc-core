@@ -300,24 +300,16 @@ function allowedToMap(source, target, options) {
   let targetContext;
   let sourceContext;
   let createContexts;
-  let canonical;
-  let hasWidget;
-  let canonicalMapping;
 
   let FORBIDDEN = Object.freeze({
     oneWay: Object.freeze({
       // mapping audit to issue is not allowed,
       // but unmap can be possible
       'issue audit': !(options && options.isIssueUnmap),
-      'issue person': true,
     }),
     // NOTE: the names in every type pair must be sorted alphabetically!
     twoWay: Object.freeze({
       'audit program': true,
-      'audit request': true,
-      'cacheable person': true,
-      'person risk': true,
-      'person threat': true,
     }),
   });
 
@@ -355,30 +347,16 @@ function allowedToMap(source, target, options) {
     return false;
   }
 
-  canonical = Mappings.get_canonical_mapping_name(
-    sourceType, targetType);
-  canonicalMapping = Mappings.get_canonical_mapping(
-    sourceType, targetType);
-
-  if (canonical && canonical.indexOf('_') === 0) {
-    canonical = null;
-  }
-
-  hasWidget = _.includes(
-    GGRC.tree_view.base_widgets_by_type[sourceType] || [],
-    targetType);
-
-  if (_.exists(options, 'hash.join') && (!canonical || !hasWidget) ||
-    (canonical && !canonicalMapping.model_name)) {
+  if (!isMappableType(sourceType, targetType)) {
     return false;
   }
+
   targetContext = _.exists(target, 'context.id');
   sourceContext = _.exists(source, 'context.id');
   createContexts = _.exists(
     GGRC, 'permissions.create.Relationship.contexts');
 
   canMap = Permission.is_allowed_for('update', source) ||
-    sourceType === 'Person' ||
     _.includes(createContexts, sourceContext) ||
     // Also allow mapping to source if the source is about to be created.
     _.isUndefined(source.created_at);
@@ -386,7 +364,6 @@ function allowedToMap(source, target, options) {
   if (target instanceof can.Map && targetType) {
     canMap = canMap &&
       (Permission.is_allowed_for('update', target) ||
-      targetType === 'Person' ||
       _.includes(createContexts, targetContext));
   }
   return canMap;
