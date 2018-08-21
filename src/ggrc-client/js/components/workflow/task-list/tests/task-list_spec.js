@@ -8,6 +8,7 @@ import Component from '../task-list';
 import {getComponentVM} from '../../../../../js_specs/spec_helpers';
 import Permission from '../../../../permission';
 import {REFRESH_RELATED} from '../../../../events/eventTypes';
+import * as businessModels from '../../../../models/business-models';
 
 describe('task-list component', () => {
   let viewModel;
@@ -163,13 +164,12 @@ describe('task-list component', () => {
           beforeEach(function () {
             origRelatedItemsType = staticVmProps.relatedItemsType;
             staticVmProps.relatedItemsType = 'TestType';
-            Cacheable.extend(
-              `CMS.Models.${staticVmProps.relatedItemsType}`, {}
-            );
-            instance = new CMS.Models[staticVmProps.relatedItemsType];
+            businessModels[staticVmProps.relatedItemsType] = can.Model.extend();
+            instance = new businessModels[staticVmProps.relatedItemsType];
           });
 
           afterEach(function () {
+            businessModels[staticVmProps.relatedItemsType] = undefined;
             staticVmProps.relatedItemsType = origRelatedItemsType;
           });
 
@@ -207,14 +207,12 @@ describe('task-list component', () => {
 
           beforeEach(function () {
             staticVmProps.relatedItemsType = 'TestType';
-            Cacheable.extend(
-              `CMS.Models.${staticVmProps.relatedItemsType}`, {}
-            );
-            instance = new CMS.Models[staticVmProps.relatedItemsType];
+            businessModels[staticVmProps.relatedItemsType] = can.Model.extend();
+            instance = new businessModels[staticVmProps.relatedItemsType];
           });
 
           afterEach(function () {
-            delete CMS.Models[staticVmProps.relatedItemsType];
+            businessModels[staticVmProps.relatedItemsType] = undefined;
           });
 
           it('updates items of the page', function () {

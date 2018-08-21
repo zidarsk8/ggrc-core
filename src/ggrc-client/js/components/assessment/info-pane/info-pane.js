@@ -63,6 +63,7 @@ import pubsub from '../../../pub-sub';
 import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 import Evidence from '../../../models/business-models/evidence';
+import * as businessModels from '../../../models/business-models';
 
 const editableStatuses = ['Not Started', 'In Progress', 'Rework Needed'];
 
@@ -108,13 +109,13 @@ export default can.Component.extend({
       assessmentTypeNameSingular: {
         get: function () {
           let type = this.attr('instance.assessment_type');
-          return CMS.Models[type].title_singular;
+          return businessModels[type].title_singular;
         },
       },
       assessmentTypeNamePlural: {
         get: function () {
           let type = this.attr('instance.assessment_type');
-          return CMS.Models[type].title_plural;
+          return businessModels[type].title_plural;
         },
       },
       assessmentTypeObjects: {

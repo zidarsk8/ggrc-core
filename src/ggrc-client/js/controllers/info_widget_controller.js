@@ -15,6 +15,7 @@ import {
   inferObjectType,
 } from '../plugins/utils/models-utils';
 import {getPageInstance} from '../plugins/utils/current-page-utils';
+import * as businessModels from '../models/business-models';
 
 export default can.Control({
   pluginName: 'ggrc_controllers_info_widget',
@@ -75,12 +76,12 @@ export default can.Control({
   generate_menu_items: function (itemNames, displayPrefix) {
     displayPrefix = displayPrefix || '';
     return _.filter(_.map(itemNames, function (name) {
-      if (name in CMS.Models) {
+      if (name in businessModels) {
         return {
-          model_name: CMS.Models[name].model_singular,
-          model_lowercase: CMS.Models[name].table_singular,
-          model_plural: CMS.Models[name].table_plural,
-          display_name: displayPrefix + CMS.Models[name].title_singular,
+          model_name: businessModels[name].model_singular,
+          model_lowercase: businessModels[name].table_singular,
+          model_plural: businessModels[name].table_plural,
+          display_name: displayPrefix + businessModels[name].title_singular,
         };
       }
     }));

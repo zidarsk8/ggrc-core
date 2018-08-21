@@ -10,6 +10,7 @@ import {
   handlePendingJoins,
 } from '../plugins/utils/models-utils';
 import Mappings from '../models/mappers/mappings';
+import * as businessModels from '../models/business-models';
 
 /*
  Below this line we're defining a can.Component, which is in this file
@@ -61,7 +62,7 @@ export default can.Component.extend({
         let model;
         let objectToAdd;
         if (defaultMapping.id && defaultMapping.type) {
-          model = CMS.Models[defaultMapping.type];
+          model = businessModels[defaultMapping.type];
           objectToAdd = model.findInCacheById(defaultMapping.id);
           instance
             .mark_for_addition('related_objects_as_source', objectToAdd, {});

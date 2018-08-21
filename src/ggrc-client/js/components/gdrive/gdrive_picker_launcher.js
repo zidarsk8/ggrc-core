@@ -16,6 +16,7 @@ import {
   messages,
 } from '../../plugins/utils/notifiers-utils';
 import Context from '../../models/service-models/context';
+import * as businessModels from '../../models/business-models';
 
 export default can.Component.extend({
   tag: 'ggrc-gdrive-picker-launcher',
@@ -177,7 +178,7 @@ export default can.Component.extend({
       let instanceType = this.attr('instance.type');
       let contextId = this.attr('instance.context.id') || null;
       let modelType = this.attr('modelType');
-      let ModelClass = CMS.Models[modelType];
+      let ModelClass = businessModels[modelType];
 
       let dfdDocs = files.map(function (file) {
         let model = new ModelClass({

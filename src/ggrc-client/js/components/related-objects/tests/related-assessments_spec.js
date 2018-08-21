@@ -8,10 +8,10 @@ import {
   getComponentVM,
 } from '../../../../js_specs/spec_helpers';
 import * as caUtils from '../../../plugins/utils/ca-utils';
+import * as businessModels from '../../../models/business-models';
 
 describe('related-assessments component', () => {
   describe('viewModel scope', () => {
-    let originalModels;
     let viewModel;
 
     beforeEach(() => {
@@ -19,24 +19,23 @@ describe('related-assessments component', () => {
     });
 
     describe('relatedObjectsTitle get() method', () => {
-      beforeAll(() => {
-        originalModels = CMS.Models;
+      let asmtModelType;
+      let modelPlural;
+      beforeEach(() => {
+        asmtModelType = 'Model1';
+        modelPlural = 'Awesome_models1';
+        businessModels[asmtModelType] = {
+          model_plural: modelPlural,
+        };
       });
 
-      afterAll(() => {
-        CMS.Models = originalModels;
+      afterEach(() => {
+        businessModels[asmtModelType] = undefined;
       });
 
       it('returns title based on instance.assessment_type', () => {
-        let asmtModelType = 'Model1';
-        let modelPlural = 'Awesome_models1';
         let expectedTitle;
 
-        CMS.Models = {
-          [asmtModelType]: {
-            model_plural: modelPlural,
-          },
-        };
         viewModel.attr('instance.assessment_type', asmtModelType);
         expectedTitle = `Related ${modelPlural}`;
 
@@ -45,17 +44,10 @@ describe('related-assessments component', () => {
 
       it(`returns title based on instance.type if is gotten related
           assessments not from assessment info pane`, () => {
-          let modelType = 'Model1';
-          let modelPlural = 'Awesome_models1';
           let expectedTitle;
 
-          CMS.Models = {
-            [modelType]: {
-              model_plural: modelPlural,
-            },
-          };
           viewModel.attr('instance.assessment_type', null);
-          viewModel.attr('instance.type', modelType);
+          viewModel.attr('instance.type', asmtModelType);
           expectedTitle = `Related ${modelPlural}`;
 
           expect(viewModel.attr('relatedObjectsTitle')).toBe(expectedTitle);

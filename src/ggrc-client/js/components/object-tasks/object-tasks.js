@@ -8,6 +8,7 @@ import {
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import template from './object-tasks.mustache';
+import CycleTaskGroupObjectTask from '../../models/business-models/cycle-task-group-object-task';
 
 const REQUIRED_TYPE = 'CycleTaskGroupObjectTask';
 const REQUIRED_FIELDS = Object.freeze([
@@ -40,7 +41,7 @@ let viewModel = can.Map.extend({
         let tasks = [];
 
         response[REQUIRED_TYPE].values.forEach(function (item) {
-          tasks.push(CMS.Models[REQUIRED_TYPE].model(item));
+          tasks.push(CycleTaskGroupObjectTask.model(item));
         });
 
         this.attr('tasks', tasks);

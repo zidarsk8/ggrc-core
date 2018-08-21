@@ -6,6 +6,7 @@
 import './external-data-provider';
 import './autocomplete-results';
 import '../spinner/spinner';
+import * as businessModels from '../../models/business-models';
 import template from './external-data-autocomplete.mustache';
 
 /**
@@ -123,7 +124,7 @@ export default can.Component.extend({
      */
     createOrGet(item) {
       const type = this.attr('type');
-      const ModelClass = CMS.Models[type];
+      const ModelClass = businessModels[type];
 
       item.attr('context', null);
       item.attr('external', true);

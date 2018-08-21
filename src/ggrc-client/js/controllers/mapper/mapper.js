@@ -17,6 +17,7 @@ import objectMapperTemplate from './object-mapper-modal.mustache';
 import objectSearchTemplate from './object-search-modal.mustache';
 import objectBulkUpdateTemplate from './object-bulk-update-modal.mustache';
 import {notifier} from '../../plugins/utils/notifiers-utils';
+import * as businessModels from '../../models/business-models';
 
 const DATA_CORRUPTION_MESSAGE = 'Some Data is corrupted! ' +
             'Missing Scope Object';
@@ -115,7 +116,7 @@ const ObjectMapper = can.Control.extend({
 
       self.isLoading = true;
       inScopeObject =
-        CMS.Models[data.join_object_type].store[data.join_object_id];
+        businessModels[data.join_object_type].store[data.join_object_id];
       inScopeObject.updateScopeObject().then(function () {
         let scopeObject = inScopeObject.attr('audit');
 

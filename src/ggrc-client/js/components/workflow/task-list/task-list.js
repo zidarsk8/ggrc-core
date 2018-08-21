@@ -7,6 +7,7 @@ import template from './templates/task-list.mustache';
 import Pagination from '../../base-objects/pagination';
 import Permission from '../../../permission';
 import {REFRESH_RELATED} from '../../../events/eventTypes';
+import * as businessModels from '../../../models/business-models';
 
 const viewModel = can.Map.extend({
   /**
@@ -80,14 +81,14 @@ const events = {
   [`{CMS.Models.${viewModel.relatedItemsType}} destroyed`](
     model, event, instance
   ) {
-    if (instance instanceof CMS.Models[viewModel.relatedItemsType]) {
+    if (instance instanceof businessModels[viewModel.relatedItemsType]) {
       this.viewModel.updatePagingAfterDestroy();
     }
   },
   [`{CMS.Models.${viewModel.relatedItemsType}} created`](
     model, event, instance
   ) {
-    if (instance instanceof CMS.Models[viewModel.relatedItemsType]) {
+    if (instance instanceof businessModels[viewModel.relatedItemsType]) {
       this.viewModel.updatePagingAfterCreate();
     }
   },
