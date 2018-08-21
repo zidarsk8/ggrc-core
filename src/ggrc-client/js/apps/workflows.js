@@ -208,10 +208,14 @@ import Person from '../models/business-models/person';
         info_related_objects: CustomFilter(
           'related_objects',
           function (relatedObjects) {
-            return !_.includes(
-              ['Comment', 'Document', 'Person'],
-              relatedObjects.instance.type
-            );
+            return !_.includes([
+              'CycleTaskGroup',
+              'CycleTaskEntry',
+              'Comment',
+              'Document',
+              'Person',
+            ],
+            relatedObjects.instance.type);
           }
         ),
       },
