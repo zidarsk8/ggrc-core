@@ -9,8 +9,9 @@ export default can.Component.extend({
   tag: 'multiselect-dropdown-wrapper',
   template: template,
   viewModel: {
-    placeholder: '@',
+    placeholder: '',
     selected: [],
+    'class': '',
     define: {
       /*
         Multiselect-dropdown wrapper when data should be fetched first
