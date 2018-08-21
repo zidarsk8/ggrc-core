@@ -10,6 +10,7 @@ export default can.Component.extend({
   template: template,
   viewModel: {
     placeholder: '@',
+    selected: [],
     define: {
       /*
         Multiselect-dropdown wrapper when data should be fetched first
@@ -69,7 +70,7 @@ export default can.Component.extend({
 
         /* reuse object to allow sort-by properly react
         on selected change */
-        let selected = self.viewModel.attr('selected') || [];
+        let selected = self.viewModel.attr('selected');
         // remove all old items
         selected.splice(0);
         // add all new items from Cache
