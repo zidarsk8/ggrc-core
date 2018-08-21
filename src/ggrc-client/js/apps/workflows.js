@@ -163,10 +163,6 @@ import * as businessModels from '../models/business-models';
         _canonical: {
           task_groups: 'TaskGroup',
         },
-        orphaned_objects: Multi([
-          Mappings.get_mappings_for(type).orphaned_objects,
-          workflowsMapper,
-        ]),
       };
 
       businessModels[type].attributes.task_group_objects = Stub.List;

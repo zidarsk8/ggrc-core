@@ -5,7 +5,6 @@
 
 import {getMappableTypes} from '../../plugins/ggrc_utils';
 import {getModelByType} from '../../plugins/utils/models-utils';
-import Join from '../join-models/join';
 import * as businessModels from '../business-models';
 
 /*
@@ -313,36 +312,6 @@ export default can.Construct.extend({
       return binding.list;
     }
     return [];
-  },
-  get_orphaned_count: function (model) {
-    if (!this.get_binding('orphaned_objects', model)) {
-      return can.Deferred().reject();
-    }
-    return this.get_list_loader('orphaned_objects', model).then((list) => {
-      function isJoin(mapping) {
-        if (mapping.mappings.length > 0) {
-          for (let i = 0, child; child = mapping.mappings[i]; i++) {
-            if (child = isJoin(child)) {
-              return child;
-            }
-          }
-        }
-        return mapping.instance &&
-          mapping.instance instanceof Join &&
-          mapping.instance;
-      }
-
-      const mappings = [];
-      can.each(list, (mapping) => {
-        const inst = isJoin(mapping);
-
-        if (inst) {
-          mappings.push(inst);
-        }
-      });
-
-      return mappings.length;
-    });
   },
   /*
     return all related mappings from all modules for an object type.

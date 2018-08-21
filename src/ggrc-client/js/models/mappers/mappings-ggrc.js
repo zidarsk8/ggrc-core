@@ -7,7 +7,6 @@ import {
   Proxy,
   Direct,
   Search,
-  Multi,
 } from '../mappers/mapper-helpers';
 import Mappings from './mappings';
 import CustomAttributeDefinition from '../custom-attributes/custom-attribute-definition';
@@ -43,17 +42,9 @@ const scopingObjects = [
       _mixins: [
         'related_object', 'relatedMappings',
       ],
-      orphaned_objects: Multi([
-        'related_objects', 'controls', 'programs', 'objectives',
-      ]),
     },
     Objective: {
       _mixins: ['related_object', 'relatedMappings'],
-      orphaned_objects: Multi([
-        'related_objects', 'contracts', 'controls',
-        'objectives', 'policies', 'programs', 'regulations',
-        'requirements', 'standards',
-      ]),
     },
     Requirement: {
       _mixins: ['related_object', 'relatedMappings'],
@@ -74,17 +65,11 @@ const scopingObjects = [
       _mixins: [
         'related_object', 'relatedMappings',
       ],
-      orphaned_objects: Multi([
-        'related_objects',
-      ]),
     },
     directive_object: {
       _mixins: [
         'related_object', 'relatedMappings',
       ],
-      orphaned_objects: Multi([
-        'controls', 'objectives', 'related_objects',
-      ]),
     },
 
     // Directives
@@ -121,9 +106,6 @@ const scopingObjects = [
           ['Standard', 'Regulation']),
       },
       _related: ['Workflow', 'Person', 'Standard', 'Regulation'],
-      orphaned_objects: Multi([
-        'related_objects', 'controls', 'objectives', 'requirements',
-      ]),
     },
     AccessGroup: {
       _mixins: ['business_object'],
