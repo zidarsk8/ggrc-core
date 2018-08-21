@@ -117,7 +117,10 @@ class AssertionCategorized(Categorizable):
   )
   _include_links = []
   _aliases = {
-      "assertions": "Assertions",
+      "assertions": {
+          "display_name": "Assertions",
+          "mandatory": True,
+      }
   }
 
   @classmethod
