@@ -4,6 +4,7 @@
 from sqlalchemy import inspect
 
 from ggrc.services import signals
+from ggrc.utils import benchmark
 from ggrc_workflows.models import (
     Workflow,
     Cycle,
@@ -57,7 +58,8 @@ def register_listeners():
   @signals.Restful.model_put.connect_via(CycleTaskGroupObjectTask)
   def cycle_task_group_object_task_put_listener(
           sender, obj=None, src=None, service=None):
-    handle_cycle_task_group_object_task_put(obj)
+    with benchmark("update notifications on CycleTask put"):
+      handle_cycle_task_group_object_task_put(obj)
 
   @signals.Restful.model_put.connect_via(Cycle)
   def cycle_put_listener(sender, obj=None, src=None, service=None):
@@ -74,7 +76,9 @@ def register_listeners():
 
   @Signals.status_change.connect_via(CycleTaskGroupObjectTask)
   def cycle_task_status_change_listener(sender, objs=None):
-    handle_cycle_task_status_change(*[o.instance for o in objs])
+    """Generate notifications on CycleTask status change."""
+    with benchmark("update notifications on CycleTask status change"):
+      handle_cycle_task_status_change(*[o.instance for o in objs])
 
 
 """

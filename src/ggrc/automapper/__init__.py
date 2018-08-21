@@ -248,10 +248,11 @@ def register_automapping_listeners():
 
   def automap(session, _):
     """Automap after_flush handler."""
-    automapper = AutomapperGenerator()
-    for obj in session.new:
-      if isinstance(obj, Relationship):
-        automapper.generate_automappings(obj)
-    automapper.propagate_acl()
+    with benchmark("automap"):
+      automapper = AutomapperGenerator()
+      for obj in session.new:
+        if isinstance(obj, Relationship):
+          automapper.generate_automappings(obj)
+      automapper.propagate_acl()
 
   sa.event.listen(sa.orm.session.Session, "after_flush", automap)

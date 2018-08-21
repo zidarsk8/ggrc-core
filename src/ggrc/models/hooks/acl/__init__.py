@@ -72,24 +72,25 @@ def _get_propagation_entries(session):
 
 def after_flush(session, _):
   """Handle all ACL hooks after after flush."""
-  if not flask.has_app_context():
-    return
+  with benchmark("handle ACL hooks after flush"):
+    if not flask.has_app_context():
+      return
 
-  acl_ids, relationship_ids, deleted = _get_propagation_entries(session)
+    acl_ids, relationship_ids, deleted = _get_propagation_entries(session)
 
-  _add_or_update("new_acl_ids", acl_ids)
-  _add_or_update("new_relationship_ids", relationship_ids)
-  _add_or_update("deleted_objects", deleted)
+    _add_or_update("new_acl_ids", acl_ids)
+    _add_or_update("new_relationship_ids", relationship_ids)
+    _add_or_update("deleted_objects", deleted)
 
-  # Legacy propagation for workflows that will have to be refactored to use
-  # relationships and the code above
-  wf_acls, wf_comments = workflow.get_new_wf_acls(session)
-  _add_or_update("new_wf_acls", wf_acls)
-  _add_or_update("new_wf_comment_ct_ids", wf_comments)
-  _add_or_update(
-      "deleted_wf_objects",
-      workflow.get_deleted_wf_objects(session)
-  )
+    # Legacy propagation for workflows that will have to be refactored to use
+    # relationships and the code above
+    wf_acls, wf_comments = workflow.get_new_wf_acls(session)
+    _add_or_update("new_wf_acls", wf_acls)
+    _add_or_update("new_wf_comment_ct_ids", wf_comments)
+    _add_or_update(
+        "deleted_wf_objects",
+        workflow.get_deleted_wf_objects(session)
+    )
 
 
 def after_commit():
