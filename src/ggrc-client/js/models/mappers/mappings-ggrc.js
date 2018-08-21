@@ -8,7 +8,6 @@ import {
   Direct,
   Search,
   Multi,
-  Cross,
 } from '../mappers/mapper-helpers';
 import Mappings from './mappings';
 import CustomAttributeDefinition from '../custom-attributes/custom-attribute-definition';
@@ -69,8 +68,6 @@ const scopingObjects = [
       },
       related_objects_as_source: Proxy(
         null, 'destination', 'Relationship', 'source', 'related_destinations'),
-      related_objects:
-        Multi(['related_objects_as_source', 'related_objects_as_destination']),
     },
     // Program
     Program: {
@@ -172,15 +169,10 @@ const scopingObjects = [
       role: Direct('Role', 'user_roles', 'role'),
     },
     Audit: {
-      _canonical: {
-        _program: 'Program',
-      },
       _related: ['Evidence'],
       _mixins: [
         'related_object',
       ],
-      _program: Direct('Program', 'audits', 'program'),
-      program_controls: Cross('_program', 'controls'),
     },
     Assessment: {
       _related: ['Person', 'Evidence'],
