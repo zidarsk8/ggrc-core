@@ -822,6 +822,10 @@ class CategoryColumnHandler(ColumnHandler):
     names = [v.strip() for v in self.raw_value.split("\n")]
     names = [name for name in names if name != ""]
     if not names:
+      if self.row_converter.is_new and self.mandatory:
+        self.add_error(
+            errors.MISSING_VALUE_ERROR, column_name=self.display_name
+        )
       return None
     categories = all_models.CategoryBase.query.filter(
         and_(
