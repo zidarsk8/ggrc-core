@@ -313,12 +313,8 @@ function allowedToMap(source, target, options) {
     }),
   });
 
-  if (target instanceof can.Model) {
-    targetType = target.constructor.shortName;
-  } else {
-    targetType = target.type || target;
-  }
-  sourceType = source.constructor.shortName || source;
+  targetType = getType(target);
+  sourceType = getType(source);
   types = [sourceType.toLowerCase(), targetType.toLowerCase()];
 
   // One-way check
@@ -367,6 +363,22 @@ function allowedToMap(source, target, options) {
       _.includes(createContexts, targetContext));
   }
   return canMap;
+}
+
+function getType(object) {
+  let type;
+
+  if (object instanceof can.Model) {
+    type = object.constructor.shortName;
+  } else {
+    type = object.type || object;
+  }
+
+  if (type === 'Snapshot') {
+    type = object.child_type; // check Snapshot original object type
+  }
+
+  return type;
 }
 
 /**
