@@ -839,6 +839,10 @@ class CategoryColumnHandler(ColumnHandler):
         self.add_warning(
             errors.WRONG_MULTI_VALUE, column_name=self.display_name, value=name
         )
+    if not categories and self.row_converter.is_new and self.mandatory:
+      self.add_error(
+          errors.MISSING_VALUE_ERROR, column_name=self.display_name
+      )
     return categories
 
   def set_obj_attr(self):

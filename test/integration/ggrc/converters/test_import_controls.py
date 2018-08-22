@@ -319,3 +319,32 @@ class TestControlsImport(TestCase):
         }
     })
     self.assertEqual(all_models.Control.query.count(), 0)
+
+  def test_invalid_assertions(self):
+    """Test creating a control without an assertion field"""
+    invalid_assertion = "invalid assertion content"
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Control"),
+        ("Code*", ""),
+        ("Title", "bad control"),
+        ("Assertions", invalid_assertion),
+    ]))
+    self._check_csv_response(response, {
+        "Control":
+        {
+            "row_warnings": {
+                errors.WRONG_MULTI_VALUE.format(
+                    line=3,
+                    column_name="Assertions",
+                    value=invalid_assertion,
+                ),
+            },
+            "row_errors": {
+                errors.MISSING_VALUE_ERROR.format(
+                    line=3,
+                    column_name="Assertions",
+                ),
+            },
+        }
+    })
+    self.assertEqual(all_models.Control.query.count(), 0)
