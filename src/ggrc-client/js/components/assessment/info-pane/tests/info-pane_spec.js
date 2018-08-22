@@ -916,23 +916,23 @@ describe('assessment-info-pane component', () => {
       vm.attr('instance', {});
       vm.attr('instance').dispatch = jasmine.createSpy('dispatch');
       vm.attr('deferredSave', {
-        push: jasmine.createSpy('push').and.returnValue(dfd),
+        execute: jasmine.createSpy('execute').and.returnValue(dfd),
       });
 
       spyOn(vm, 'addAction');
       spyOn(vm, 'afterCreate');
     });
 
-    describe('within pushed deferred function into deferredSave', () => {
-      let pushedFunc;
+    describe('within executed deferred function into deferredSave', () => {
+      let executedFunc;
 
       beforeEach(function () {
         vm.addRelatedItem(event, type);
-        pushedFunc = vm.attr('deferredSave').push.calls.argsFor(0)[0];
+        executedFunc = vm.attr('deferredSave').execute.calls.argsFor(0)[0];
       });
 
       it('adds add_related action with related object', function () {
-        pushedFunc();
+        executedFunc();
         expect(vm.addAction).toHaveBeenCalledWith(
           'add_related',
           related
