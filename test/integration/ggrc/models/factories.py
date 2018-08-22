@@ -324,6 +324,12 @@ class ObjectiveFactory(TitledFactory):
     model = all_models.Objective
 
 
+class OptionFactory(TitledFactory):
+
+  class Meta:
+    model = all_models.Option
+
+
 class RegulationFactory(TitledFactory):
 
   class Meta:
@@ -565,6 +571,7 @@ def get_model_factory(model_name):
       "Objective": ObjectiveFactory,
       "ObjectLabel": ObjectLabelFactory,
       "OrgGroup": OrgGroupFactory,
+      "Option": OptionFactory,
       "Person": PersonFactory,
       "Policy": PolicyFactory,
       "Process": ProcessFactory,
