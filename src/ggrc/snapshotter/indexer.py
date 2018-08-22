@@ -110,6 +110,23 @@ def get_searchable_attributes(attributes, cads, content):
   return searchable_values
 
 
+def get_options():
+  """Get options.
+
+  Args:
+    -
+  Returns:
+    Dict of "key": "value" from revision content
+  """
+  options_dict = dict(db.session.query(
+      models.Option
+  ).values(
+      models.Option.id,
+      models.Option.title
+  ))
+  return options_dict
+
+
 @helpers.without_sqlalchemy_cache
 def reindex():
   """Reindex all snapshots."""
@@ -264,8 +281,22 @@ def get_properties(snapshot):
   return properties
 
 
-def get_record_value(prop, val, rec):
-  """Return itearble object with record as element of that object."""
+def get_record_value(prop, val, rec, options):
+  """Return iterable object with record.
+
+  Return iterable object with record
+  as element of that object.
+
+  Args:
+    prop: prepared data of property.
+    val: content of property.
+    options: dictionary containing {id: title} of
+      all existing options.
+
+  Returns:
+    iterable object with record as element of
+    that object.
+  """
   if not prop or val is None:
     return []
   rec["property"] = prop
@@ -276,8 +307,13 @@ def get_record_value(prop, val, rec):
                            get_person_sort_subprop(rec, [val]))
   if isinstance(val, list):
     return get_list_record_value(prop, rec, val)
-  if isinstance(val, dict) and "title" in val:
-    rec["content"] = val["title"]
+  # Option.title isn't included into content for old revisions.
+  # It will be filled from currently existing options.
+  if isinstance(val, dict):
+    if "title" in val:
+      rec["content"] = val["title"]
+    elif val.get("type") == "Option" and val["id"] in options:
+      rec["content"] = options[val["id"]]
   if isinstance(val, (bool, int, long)):
     rec["content"] = unicode(val)
   if isinstance(rec["content"], basestring):
@@ -321,6 +357,7 @@ def reindex_pairs(pairs):
   if not pairs:
     return
   snapshots = dict()
+  options = get_options()
   snapshot_query = models.Snapshot.query.filter(
       tuple_(
           models.Snapshot.parent_type,
@@ -372,7 +409,8 @@ def reindex_pairs(pairs):
                   "type": "Snapshot",
                   "tags": TAG_TMPL.format(**snapshot),
                   "subproperty": "",
-              }
+              },
+              options
           )
       )
   delete_records(snapshots.keys())
