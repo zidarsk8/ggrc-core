@@ -821,8 +821,6 @@ class CategoryColumnHandler(ColumnHandler):
   def parse_item(self):
     names = [v.strip() for v in self.raw_value.split("\n")]
     names = [name for name in names if name != ""]
-    if not names:
-      return None
     categories = all_models.CategoryBase.query.filter(
         and_(
             all_models.CategoryBase.name.in_(names),
@@ -835,6 +833,12 @@ class CategoryColumnHandler(ColumnHandler):
         self.add_warning(
             errors.WRONG_MULTI_VALUE, column_name=self.display_name, value=name
         )
+    if not categories:
+      if self.row_converter.is_new and self.mandatory:
+        self.add_error(
+            errors.MISSING_VALUE_ERROR, column_name=self.display_name
+        )
+      return None
     return categories
 
   def set_obj_attr(self):

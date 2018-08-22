@@ -76,6 +76,8 @@ class TestCommentableImport(TestCase):
         ("Send by default", send_by_default),
     ]
     model_cls = inflector.get_model(model_name)
+    if model_name == "Control":
+      import_data.append(("Assertions*", "Privacy"))
     if issubclass(model_cls, AuditRelationship):
       import_data.append(("Map:Audit", audit))
     if (issubclass(model_cls, Described) and

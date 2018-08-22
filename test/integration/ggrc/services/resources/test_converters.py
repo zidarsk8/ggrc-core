@@ -356,8 +356,8 @@ class TestImportExports(TestCase):
   def test_import_control_revisions(self):
     """Test if new revisions created during import."""
     data = "Object type,,,\n" \
-           "Control,Code*,Title*,Admin*\n" \
-           ",,Test control,user@example.com"
+           "Control,Code*,Title*,Admin*,Assertions*\n" \
+           ",,Test control,user@example.com,Privacy"
 
     user = all_models.Person.query.first()
     imp_exp = factories.ImportExportFactory(
@@ -387,10 +387,10 @@ class TestImportExports(TestCase):
   def test_import_snapshot(self):
     """Test if snapshots can be created from imported objects."""
     data = "Object type,,,\n" \
-           "Control,Code*,Title*,Admin*\n" \
-           ",,Control1,user@example.com\n" \
-           ",,Control2,user@example.com\n" \
-           ",,Control3,user@example.com"
+           "Control,Code*,Title*,Admin*,Assertions*\n" \
+           ",,Control1,user@example.com,Privacy\n" \
+           ",,Control2,user@example.com,Privacy\n" \
+           ",,Control3,user@example.com,Privacy"
 
     user = all_models.Person.query.first()
     with factories.single_commit():
