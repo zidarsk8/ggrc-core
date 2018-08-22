@@ -348,3 +348,36 @@ class TestControlsImport(TestCase):
         }
     })
     self.assertEqual(all_models.Control.query.count(), 0)
+
+  def test_assertion_removal(self):
+    """Test creating a control without an assertion field"""
+
+    assertions = all_models.ControlAssertion.query.all()
+    assertion_name = assertions[4].name
+    with factories.single_commit():
+      control1 = factories.ControlFactory(
+          assertions=[assertions[4]],
+      )
+    slug = control1.slug
+
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Control"),
+        ("Code*", slug),
+        ("Title", "edited control 1"),
+        ("Assertions", "--"),
+    ]))
+    self._check_csv_response(response, {
+        "Control":
+        {
+            "row_warnings": {
+                errors.WRONG_MULTI_VALUE.format(
+                    line=3,
+                    column_name="Assertions",
+                    value="--",
+                ),
+            },
+        }
+    })
+    control = all_models.Control.query.first()
+    self.assertEqual(len(control.assertions), 1)
+    self.assertEqual(control.assertions[0].name, assertion_name)
