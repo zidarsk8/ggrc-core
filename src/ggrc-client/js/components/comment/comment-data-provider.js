@@ -6,6 +6,7 @@
 import * as QueryAPI from '../../plugins/utils/query-api-utils';
 import {REFRESH_COMMENTS} from '../../events/eventTypes';
 import Relationship from '../../models/service-models/relationship';
+import Context from '../../models/service-models/context';
 
 export default can.Component.extend('commentDataProvider', {
   tag: 'comment-data-provider',
@@ -68,7 +69,7 @@ export default can.Component.extend('commentDataProvider', {
     },
     mapToInstance(comment) {
       return (new Relationship({
-        context: this.attr('instance.context') || {id: null},
+        context: this.attr('instance.context') || new Context({id: null}),
         source: this.attr('instance'),
         destination: comment,
       }))

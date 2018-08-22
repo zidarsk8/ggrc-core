@@ -7,6 +7,7 @@ import {
   getInScopeModels,
 } from '../../plugins/utils/snapshot-utils';
 import Mappings from '../../models/mappers/mappings';
+import {getInstance} from '../../models/models-extensions';
 
 /**
  *  @typedef SpecialConfig
@@ -54,8 +55,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
   define: {
     parentInstance: {
       get: function () {
-        return CMS.Models
-          .get_instance(this.attr('object'), this.attr('join_object_id'));
+        return getInstance(this.attr('object'), this.attr('join_object_id'));
       },
     },
     model: {

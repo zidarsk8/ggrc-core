@@ -9,6 +9,7 @@ import '../mixins/ca-update';
 import '../mixins/access-control-list';
 import '../mixins/base-notifications';
 import '../mixins/proposable';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Risk', {
   root_object: 'risk',
@@ -29,8 +30,8 @@ export default Cacheable('CMS.Models.Risk', {
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {
-    context: 'CMS.Models.Context.stub',
-    modified_by: 'CMS.Models.Person.stub',
+    context: Stub,
+    modified_by: Stub,
   },
   tree_view_options: {
     add_item_view:

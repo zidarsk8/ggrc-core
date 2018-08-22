@@ -10,6 +10,7 @@ import '../mixins/timeboxed';
 import '../mixins/access-control-list';
 import '../mixins/scope-object-notifications';
 import '../mixins/questionnaire';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.System', {
   root_object: 'system',
@@ -31,9 +32,9 @@ export default Cacheable('CMS.Models.System', {
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {
-    context: 'CMS.Models.Context.stub',
-    modified_by: 'CMS.Models.Person.stub',
-    network_zone: 'CMS.Models.Option.stub',
+    context: Stub,
+    modified_by: Stub,
+    network_zone: Stub,
   },
   defaults: {
     title: '',

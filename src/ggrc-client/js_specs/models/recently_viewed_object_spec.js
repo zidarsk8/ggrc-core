@@ -28,17 +28,4 @@ describe('RecentlyViewedObject model', function () {
       expect(rvo_obj.title).toBe('blah');
     });
   });
-
-  describe('#stub', function () {
-    it('include title and view link', function () {
-      let obj = {
-        viewLink: '/',
-        title: 'blah',
-      };
-      let rvo_obj = new RecentlyViewedObject(obj).stub();
-      expect(rvo_obj.title).toBe('blah');
-      expect(rvo_obj.viewLink).toBe('/');
-      expect(rvo_obj.id).not.toBeDefined();
-    });
-  });
 });

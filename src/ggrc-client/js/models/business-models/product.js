@@ -10,6 +10,7 @@ import '../mixins/timeboxed';
 import '../mixins/access-control-list';
 import '../mixins/scope-object-notifications';
 import '../mixins/questionnaire';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Product', {
   root_object: 'product',
@@ -31,9 +32,9 @@ export default Cacheable('CMS.Models.Product', {
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {
-    context: 'CMS.Models.Context.stub',
-    modified_by: 'CMS.Models.Person.stub',
-    kind: 'CMS.Models.Option.stub',
+    context: Stub,
+    modified_by: Stub,
+    kind: Stub,
   },
   tree_view_options: {
     attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',

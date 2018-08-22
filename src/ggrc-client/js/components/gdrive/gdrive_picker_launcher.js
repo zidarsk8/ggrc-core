@@ -15,6 +15,7 @@ import {
   notifier,
   messages,
 } from '../../plugins/utils/notifiers-utils';
+import Context from '../../models/service-models/context';
 
 export default can.Component.extend({
   tag: 'ggrc-gdrive-picker-launcher',
@@ -180,7 +181,7 @@ export default can.Component.extend({
 
       let dfdDocs = files.map(function (file) {
         let model = new ModelClass({
-          context: {id: contextId},
+          context: new Context({id: contextId}),
           title: file.title,
           source_gdrive_id: file.id,
           is_uploaded: file.newUpload,

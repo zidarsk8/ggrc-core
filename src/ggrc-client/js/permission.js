@@ -4,6 +4,8 @@
 */
 
 import {getPageInstance} from './plugins/utils/current-page-utils';
+import Stub from '../js/models/stub';
+import {getInstance} from '../js/models/models-extensions';
 
 let ADMIN_PERMISSION;
 let _CONDITIONS_MAP = {
@@ -23,7 +25,7 @@ let _CONDITIONS_MAP = {
     let propertyValue = _.reduce(args.property_name.split('.'),
       function (obj, key) {
         let value = obj.attr(key);
-        if (value instanceof can.Stub) {
+        if (value instanceof Stub) {
           value = value.reify();
         }
         return value;
@@ -33,7 +35,7 @@ let _CONDITIONS_MAP = {
   'in': function (instance, args) {
     let value = Permission._resolve_permission_variable(args.value);
     let property_value = instance[args.property_name];
-    if (property_value instanceof can.Stub) {
+    if (property_value instanceof Stub) {
       property_value = property_value.reify();
     }
     return value.indexOf(property_value) >= 0;
@@ -107,7 +109,7 @@ const Permission = can.Construct({
     if ($.type(value) == 'string') {
       if (value[0] == '$') {
         if (value == '$current_user') {
-          return CMS.Models.get_instance('Person', GGRC.current_user.id);
+          return getInstance('Person', GGRC.current_user.id);
         }
         throw new Error('unknown permission variable: ' + value);
       }

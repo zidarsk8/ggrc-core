@@ -10,6 +10,7 @@ import '../mixins/ca-update';
 import '../mixins/timeboxed';
 import '../mixins/access-control-list';
 import '../mixins/base-notifications';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Program', {
   root_object: 'program',
@@ -30,9 +31,9 @@ export default Cacheable('CMS.Models.Program', {
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {
-    context: 'CMS.Models.Context.stub',
-    modified_by: 'CMS.Models.Person.stub',
-    audits: 'CMS.Models.Audit.stubs',
+    context: Stub,
+    modified_by: Stub,
+    audits: Stub.List,
   },
   programRoles: ['Program Managers', 'Program Editors', 'Program Readers'],
   orderOfRoles: ['Program Managers', 'Program Editors', 'Program Readers'],

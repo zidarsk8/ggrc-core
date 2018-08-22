@@ -4,6 +4,7 @@
 */
 
 import Cacheable from '../cacheable';
+import Context from '../service-models/context';
 
 export default Cacheable('CMS.Models.NotificationConfig', {
   root_object: 'notification_config',
@@ -48,7 +49,7 @@ export default Cacheable('CMS.Models.NotificationConfig', {
             person_id: GGRC.current_user.id,
             notif_type: type,
             enable_flag: null,
-            context: {id: null},
+            context: new Context({id: null}),
           });
         }
         return configs[index];

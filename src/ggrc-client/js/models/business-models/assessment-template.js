@@ -10,6 +10,7 @@ import '../mixins/in-scope-objects';
 import '../mixins/in-scope-objects-preload';
 import '../mixins/refetch-hash';
 import '../mixins/assessment-issue-tracker';
+import Stub from '../stub';
 
 /**
  * A model describing a template for the newly created Assessment objects.
@@ -41,7 +42,7 @@ export default Cacheable('CMS.Models.AssessmentTemplate', {
   create: 'POST /api/assessment_templates',
   is_custom_attributable: false,
   attributes: {
-    context: 'CMS.Models.Context.stub',
+    context: Stub,
   },
   defaults: {
     test_plan_procedure: true,

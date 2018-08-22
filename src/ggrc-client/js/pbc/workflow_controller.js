@@ -7,6 +7,7 @@ import Relationship from '../models/service-models/relationship';
 import AssessmentTemplate from '../models/business-models/assessment-template';
 import Issue from '../models/business-models/issue';
 import Requirement from '../models/business-models/requirement';
+import Stub from '../models/stub';
 
 (function (can, $) {
   can.Control('GGRC.Controllers.PbcWorkflows', {}, {
@@ -61,7 +62,7 @@ import Requirement from '../models/business-models/requirement';
         context = source.context;
       }
       return new Relationship({
-        source: source.stub(),
+        source: new Stub(source),
         destination: destination,
         context: context,
       }).save();

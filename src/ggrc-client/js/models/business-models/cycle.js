@@ -6,6 +6,7 @@
 import Cacheable from '../cacheable';
 import Permission from '../../permission';
 import '../mixins/is-overdue';
+import Stub from '../stub';
 
 function refreshAttr(instance, attr) {
   let result;
@@ -38,10 +39,10 @@ export default Cacheable('CMS.Models.Cycle', {
   destroy: 'DELETE /api/cycles/{id}',
   mixins: ['isOverdue'],
   attributes: {
-    workflow: 'CMS.Models.Workflow.stub',
-    cycle_task_groups: 'CMS.Models.CycleTaskGroup.stubs',
-    modified_by: 'CMS.Models.Person.stub',
-    context: 'CMS.Models.Context.stub',
+    workflow: Stub,
+    cycle_task_groups: Stub.List,
+    modified_by: Stub,
+    context: Stub,
   },
   tree_view_options: {
     draw_children: true,

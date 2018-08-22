@@ -6,6 +6,7 @@
 import baseAutocompleteWrapper from '../autocomplete-wrapper';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 import RefreshQueue from '../../../models/refresh_queue';
+import {getInstance} from '../../../models/models-extensions';
 
 describe('autocomplete-wrapper viewModel', () => {
   let viewModel;
@@ -150,8 +151,8 @@ describe('autocomplete-wrapper viewModel', () => {
       };
 
       const fakeRes = [
-        CMS.Models.get_instance(name, ids[0]),
-        CMS.Models.get_instance(name, ids[1]),
+        getInstance(name, ids[0]),
+        getInstance(name, ids[1]),
       ];
 
       viewModel.attr('model', name);

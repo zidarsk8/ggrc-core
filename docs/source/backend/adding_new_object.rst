@@ -60,6 +60,8 @@ Create a CMS.Models.Cacheable object
 
 ..  code-block:: javascript
 
+    import Stub from '../stub';
+
     can.Model.Cacheable("CMS.Models.NewObject", {
       root_object : "new_object",
       root_collection : "new_objects",
@@ -70,8 +72,8 @@ Create a CMS.Models.Cacheable object
       mixins : ["ownable", "contactable"],
       is_custom_attributable: true,
       attributes : {
-        modified_by : "CMS.Models.Person.stub",
-        custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
+        modified_by : Stub,
+        custom_attribute_values : Stub.List,
         start_date: "date",
         end_date: "date"
       },

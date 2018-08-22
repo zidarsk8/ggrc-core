@@ -49,6 +49,8 @@ import {
 import DisplayPrefs from '../../models/local-storage/display-prefs';
 import Person from '../../models/business-models/person';
 import Assessment from '../../models/business-models/assessment';
+import Stub from '../../models/stub';
+import {getInstance} from '../../models/models-extensions';
 
 export default can.Control({
   pluginName: 'ggrc_controllers_modals',
@@ -234,7 +236,7 @@ export default can.Control({
       if (!instance.attr(path)) {
         instance.attr(path, []);
       }
-      instance.attr(path).splice(index, 1, ui.item.stub());
+      instance.attr(path).splice(index, 1, new Stub(ui.item));
     } else {
       path = path.join('.');
       setTimeout(function () {
@@ -552,12 +554,12 @@ export default can.Control({
     if (model) {
       if (item.value instanceof Array) {
         value = can.map(item.value, function (id) {
-          return CMS.Models.get_instance(model, id);
+          return getInstance(model, id);
         });
       } else if (item.value instanceof Object) {
-        value = CMS.Models.get_instance(model, item.value.id);
+        value = getInstance(model, item.value.id);
       } else {
-        value = CMS.Models.get_instance(model, item.value);
+        value = getInstance(model, item.value);
       }
     } else if ($elem.is('[type=checkbox]')) {
       value = $elem.is(':checked');

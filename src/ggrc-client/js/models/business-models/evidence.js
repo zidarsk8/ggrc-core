@@ -7,6 +7,7 @@ import Cacheable from '../cacheable';
 import {getRole} from '../../plugins/utils/acl-utils';
 import '../mixins/access-control-list';
 import '../mixins/ca-update';
+import Stub from '../stub';
 
 const getAccessControlList = ()=> {
   let adminRole = getRole('Evidence', 'Admin');
@@ -33,7 +34,7 @@ export default Cacheable('CMS.Models.Evidence', {
     'ca_update',
   ],
   attributes: {
-    context: 'CMS.Models.Context.stub',
+    context: Stub,
   },
   isRoleable: true,
   statuses: [

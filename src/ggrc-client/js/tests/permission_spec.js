@@ -8,6 +8,7 @@ import {makeFakeInstance} from '../../js_specs/spec_helpers';
 import * as CurrentPageUtils from '../plugins/utils/current-page-utils';
 import UserRole from '../models/join-models/user-role';
 import Audit from '../models/business-models/audit';
+import {getInstance} from '../models/models-extensions';
 
 describe('Permission', function () {
   describe('_admin_permission_for_context() method', function () {
@@ -158,7 +159,7 @@ describe('Permission', function () {
       });
     it('returns current user instance ' +
     'if value is equal to "$current_user"', function () {
-      let currentUser = CMS.Models.get_instance('Person', GGRC.current_user.id);
+      let currentUser = getInstance('Person', GGRC.current_user.id);
       value = '$current_user';
       expect(Permission._resolve_permission_variable(value))
         .toEqual(currentUser);

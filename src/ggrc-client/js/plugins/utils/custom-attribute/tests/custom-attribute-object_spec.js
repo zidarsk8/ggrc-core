@@ -42,11 +42,8 @@ describe('CustomAttributeObject module', () => {
     });
 
     describe('calls _initCaValue() method', () => {
-      let _setupCaValue;
-
       beforeEach(function () {
-        _setupCaValue = spyOn(CustomAttributeObject.prototype, '_setupCaValue')
-          .and.callThrough();
+        spyOn(CustomAttributeObject.prototype, '_setupCaValue');
       });
 
       it('with empty can.Map if caValue was not passed via params',
@@ -54,7 +51,6 @@ describe('CustomAttributeObject module', () => {
           let caObject;
           let caValue;
 
-          _setupCaValue.and.stub();
           caObject = new CustomAttributeObject(
             new can.Map(),
             new can.Map()

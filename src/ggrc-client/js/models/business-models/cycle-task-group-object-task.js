@@ -13,6 +13,7 @@ import '../mixins/timeboxed';
 import '../mixins/is-overdue';
 import '../mixins/access-control-list';
 import '../mixins/ca-update';
+import Stub from '../stub';
 
 const _mustachePath = GGRC.mustache_path + '/cycle_task_group_object_tasks';
 
@@ -78,12 +79,12 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
   name_singular: 'Task',
   name_plural: 'Tasks',
   attributes: {
-    cycle_task_group: 'CMS.Models.CycleTaskGroup.stub',
-    task_group_task: 'CMS.Models.TaskGroupTask.stub',
-    cycle_task_entries: 'CMS.Models.CycleTaskEntry.stubs',
-    modified_by: 'CMS.Models.Person.stub',
-    context: 'CMS.Models.Context.stub',
-    cycle: 'CMS.Models.Cycle.stub',
+    cycle_task_group: Stub,
+    task_group_task: Stub,
+    cycle_task_entries: Stub.List,
+    modified_by: Stub,
+    context: Stub,
+    cycle: Stub,
   },
   permalink_options: {
     url: '<%= base.viewLink %>#current' +

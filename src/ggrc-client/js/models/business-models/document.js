@@ -8,6 +8,7 @@ import {getRole} from '../../plugins/utils/acl-utils';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 import '../mixins/access-control-list';
 import '../mixins/ca-update';
+import Stub from '../stub';
 
 const getAccessControlList = ()=> {
   let adminRole = getRole('Document', 'Admin');
@@ -42,7 +43,7 @@ export default Cacheable('CMS.Models.Document', {
     {title: 'Reference URL', value: 'REFERENCE_URL'},
   ],
   attributes: {
-    context: 'CMS.Models.Context.stub',
+    context: Stub,
   },
   isRoleable: true,
   defaults: {

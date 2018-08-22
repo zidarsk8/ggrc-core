@@ -17,25 +17,21 @@ describe('Workflow helpers', () => {
 
       beforeEach(function () {
         workflow = makeFakeInstance({model: Workflow})();
-        workflow.context = {
-          stub: jasmine.createSpy('stub'),
-        };
+        workflow.context = {};
       });
 
       it('context equals to workflow context stub object', function () {
         const stubType = 'Context';
         const origContextModel = CMS.Models[stubType];
         CMS.Models[stubType] = makeFakeModel({model: CMS.Models[stubType]});
-        const stub = {
+        workflow.context = {
           id: 123,
           type: 'Context',
         };
-        let context;
-        workflow.context.stub.and.returnValue(stub);
-        context = workflowHelpers
+        let context = workflowHelpers
           .createCycle(workflow)
           .attr('context');
-        expect(context.attr()).toEqual(stub);
+        expect(context.attr()).toEqual(workflow.context);
         CMS.Models[stubType] = origContextModel;
       });
 
@@ -43,16 +39,14 @@ describe('Workflow helpers', () => {
         const stubType = 'Workflow';
         const origContextModel = CMS.Models[stubType];
         CMS.Models[stubType] = makeFakeModel({model: CMS.Models[stubType]});
-        const stub = {
-          id: 123,
-          type: stubType,
-        };
-        let wfStub;
-        workflow.attr('id', stub.id);
-        wfStub = workflowHelpers
+        workflow.attr('id', 123);
+        let wfStub = workflowHelpers
           .createCycle(workflow)
           .attr('workflow');
-        expect(wfStub.attr()).toEqual(stub);
+        expect(wfStub.attr()).toEqual({
+          id: 123,
+          type: 'Workflow',
+        });
         CMS.Models[stubType] = origContextModel;
       });
 
