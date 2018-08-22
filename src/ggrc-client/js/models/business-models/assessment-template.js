@@ -5,7 +5,6 @@
 
 import Cacheable from '../cacheable';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
-import '../mixins/mapping-limit';
 import '../mixins/in-scope-objects';
 import '../mixins/in-scope-objects-preload';
 import '../mixins/refetch-hash';
@@ -29,7 +28,6 @@ export default Cacheable('CMS.Models.AssessmentTemplate', {
   table_singular: 'assessment_template',
   table_plural: 'assessment_templates',
   mixins: [
-    'mapping-limit',
     'inScopeObjects',
     'inScopeObjectsPreload',
     'refetchHash',

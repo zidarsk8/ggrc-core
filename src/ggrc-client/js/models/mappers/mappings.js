@@ -85,12 +85,7 @@ export default can.Construct.extend({
    */
   getMappingTypes: function (type, include, exclude) {
     let list = this.getMappingList(type, include, exclude);
-    let groups = this.getTypeGroups();
-
-    list.forEach(function (modelName) {
-      return this._addFormattedType(modelName, groups);
-    }.bind(this));
-    return groups;
+    return this.groupTypes(list);
   },
   /**
    * Return allowed for mapping type in appropriate group.
@@ -98,8 +93,19 @@ export default can.Construct.extend({
    * @return {Array} - object with one allowed for mapping Model
    */
   getMappingType: function (type) {
+    return this.groupTypes([type]);
+  },
+  /**
+   * Return grouped types.
+   * @param {Array} types - array of base model types
+   * @return {Array} - object with one allowed for mapping Model
+   */
+  groupTypes(types) {
     let groups = this.getTypeGroups();
-    this._addFormattedType(type, groups);
+
+    types.forEach((modelName) => {
+      return this._addFormattedType(modelName, groups);
+    });
     return groups;
   },
   /**

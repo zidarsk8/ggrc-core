@@ -304,9 +304,7 @@ import AccessControlRole from '../custom-roles/access-control-role';
         null, 'destination', 'Relationship', 'source', 'related_destinations',
       ),
     },
-    AssessmentTemplate: {
-      _mixins: ['related_object'],
-    },
+    AssessmentTemplate: {},
     Issue: {
       _mixins: [
         'related_object', 'personable', 'assignable',
