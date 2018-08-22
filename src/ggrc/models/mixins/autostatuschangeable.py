@@ -16,6 +16,8 @@ from ggrc.models import relationship
 
 from ggrc.services import signals
 
+from ggrc.utils import benchmark
+
 
 class AutoStatusChangeable(object):
   """A mixin for automatic status changes.
@@ -217,10 +219,11 @@ class AutoStatusChangeable(object):
     """
 
     # pylint: disable=unused-argument,protected-access
-    for obj in alchemy_session.identity_map.values():
-      if isinstance(obj, AutoStatusChangeable) and obj._need_status_reset:
-        obj.move_to_in_progress()
-        obj._need_status_reset = False
+    with benchmark("adjust status before flush"):
+      for obj in alchemy_session.identity_map.values():
+        if isinstance(obj, AutoStatusChangeable) and obj._need_status_reset:
+          obj.move_to_in_progress()
+          obj._need_status_reset = False
 
   @staticmethod
   def has_custom_attr_changes(custom_attributes):

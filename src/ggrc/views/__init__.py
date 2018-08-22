@@ -34,6 +34,7 @@ from ggrc.login import get_current_user
 from ggrc.login import login_required
 from ggrc.login import admin_required
 from ggrc.models import all_models
+from ggrc.models import background_task
 from ggrc.models.background_task import create_task
 from ggrc.models.background_task import make_task_response
 from ggrc.models.background_task import queued_task
@@ -104,20 +105,21 @@ def full_reindex(_):
 
 
 @app.route("/_background_tasks/compute_attributes", methods=["POST"])
-@queued_task
-def compute_attributes(args):
+def compute_attributes(*_, **kwargs):
   """Web hook to update the full text search index."""
   with benchmark("Run compute_attributes background task"):
-    from ggrc.data_platform import computed_attributes
-    if args.parameters["event_id"] and not args.parameters["revision_ids"]:
-      rows = db.session.query(Revision.id).filter_by(
-          event_id=args.parameters["event_id"],).all()
+    event_id = utils.get_task_attr("event_id", kwargs)
+    revision_ids = utils.get_task_attr("revision_ids", kwargs)
+
+    if event_id and not revision_ids:
+      rows = db.session.query(Revision.id).filter_by(event_id=event_id).all()
       revision_ids = [revision_id for revision_id, in rows]
-    elif str(args.parameters["revision_ids"]) == "all_latest":
+    elif str(revision_ids) == "all_latest":
       revision_ids = "all_latest"
     else:
-      revision_ids = [id_ for id_ in args.parameters["revision_ids"]]
+      revision_ids = list(revision_ids)
 
+    from ggrc.data_platform import computed_attributes
     computed_attributes.compute_attributes(revision_ids)
     return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
@@ -170,14 +172,13 @@ def update_audit_issues(args):
 
 def start_compute_attributes(revision_ids=None, event_id=None):
   """Start a background task for computed attributes."""
-  task = create_task(
+  background_task.create_lightweight_task(
       name="compute_attributes",
       url=url_for(compute_attributes.__name__),
       parameters={"revision_ids": revision_ids, "event_id": event_id},
-      method=u"POST",
+      method="POST",
       queued_callback=compute_attributes
   )
-  task.start()
 
 
 def start_update_audit_issues(audit_id, message):

@@ -112,10 +112,13 @@ class TestBackgroundTaskRolePropagation(TestCase):
     }
 
     self.api.set_user(self.people["created_auditor"])
-    response = self.api.post(all_models.Assessment, {
-        "assessment": assessment_dict
-    })
-    self.assertEqual(response.status_code, 201)
+    response = self.api.send_request(
+        self.api.client.post,
+        all_models.Assessment,
+        [{"assessment": assessment_dict}],
+        {"X-GGRC-BackgroundTask": "true"},
+    )
+    self.assertEqual(response.status_code, 200)
     bg_tasks = all_models.BackgroundTask.query.all()
     self.assertEqual(len(bg_tasks), 1)
 
