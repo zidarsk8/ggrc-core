@@ -367,7 +367,7 @@ export default can.Component.extend({
         type: relatedItemType,
       };
 
-      this.attr('deferredSave').push(function () {
+      this.attr('deferredSave').execute(function () {
         self.addAction('add_related', related);
       })
         .done(function () {
