@@ -66,6 +66,24 @@ A few cases when commits must be split in order to improve readability:
    functions, such code should be in its own commit with a clear description as
    per commit message guidelines.
 
+Merge commits
+~~~~~~~~~~~~~
+
+1. Merge commits can retain the default title and content.
+
+2. If there are conflicts in a merge commit, it is recommended that we list the
+   conflicting files at the end of the merge commit message. Git generates the
+   list by default, and we should just uncomment it. Example:
+
+
+    Merge branch 'master' into 'dev'
+
+    Conflicts:
+            src/ggrc/settings/default.py
+
+
+
+
 Before Issuing a New Pull Request
 ---------------------------------
 
