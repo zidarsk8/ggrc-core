@@ -62,20 +62,6 @@ class Roleable(object):
     self._remove_values(old_values - new_values)
     self._add_values(new_values - old_values)
 
-  def extend_access_control_list(self, values):
-    """Extend access control list.
-
-    Args:
-        values: List of access control roles or dicts containing json
-        representation of custom attribute values.
-    """
-    if values is None:
-      return
-
-    new_values = self._parse_values(values)
-    old_values = self._get_old_values()
-    self._add_values(new_values - old_values)
-
   def _get_old_values(self):
     """Return Set of tuples (Role, Person)"""
     return {(acl.ac_role, acl.person) for acl in self.access_control_list}

@@ -55,7 +55,6 @@ from ggrc.views.registry import object_view
 from ggrc import utils
 from ggrc.utils import benchmark, helpers
 from ggrc.utils import revisions
-from ggrc.cache.utils import clear_permission_cache
 
 logger = logging.getLogger(__name__)
 REINDEX_CHUNK_SIZE = 100
@@ -696,20 +695,4 @@ def is_document_exists():
       all_models.Document.gdrive_id.in_(ids))
   response = DocumentEndpoint.build_doc_exists_response(request.json,
                                                         result_set)
-  return Response(json.dumps(response), mimetype='application/json')
-
-
-@app.route("/api/document/make_admin", methods=["POST"])
-@login_required
-def make_document_admin():
-  """Add current user as document admin"""
-  DocumentEndpoint.validate_doc_request(request.json)
-  ids = request.json["gdrive_ids"]
-  docs = all_models.Document.query.filter(
-      all_models.Document.gdrive_id.in_(ids))
-  for doc in docs:
-    doc.add_admin_role()
-  db.session.commit()
-  clear_permission_cache()
-  response = DocumentEndpoint.build_make_admin_response(request.json, docs)
   return Response(json.dumps(response), mimetype='application/json')
