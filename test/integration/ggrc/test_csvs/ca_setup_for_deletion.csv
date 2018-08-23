@@ -1,4 +1,4 @@
-Object type,,,,,
-Control,Code*,Title*,Admin*,,
-,c1,c1,user@example.com,,
-,c2,c2,user@example.com,,
+Object type,,,,
+Control,Code*,Title*,Admin*,Assertions*
+,c1,c1,user@example.com,Privacy
+,c2,c2,user@example.com,Privacy

@@ -558,6 +558,9 @@ class TestExportMultipleObjects(TestCase):
           ("Start Date", ""),
           ("End Date", ""),
       ]))
+      if model == "Control":
+        import_queries[-1]["Assertions"] = "Privacy"
+
     self.check_import_errors(self.import_data(*import_queries))
 
     model_cls = inflector.get_model(model)

@@ -171,6 +171,8 @@ class TestACLImportExport(TestCase):
         ("title", "Title"),
         ("Admin", "user@example.com"),
     ])
+    if object_type == "Control":
+      import_dict["Assertions*"] = "Privacy"
     for role_name, emails in roles.items():
       import_dict[role_name] = "\n".join(emails)
     return import_dict
