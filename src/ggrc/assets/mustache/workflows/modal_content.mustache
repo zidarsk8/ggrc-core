@@ -40,7 +40,7 @@
 
     <access-control-list-roles-helper
       {instance}="instance"
-      {is-new-instance}="instance.isNew">
+      {is-new-instance}="new_object_form">
     </access-control-list-roles-helper>
 
     <div class="ggrc-form-item">
@@ -48,11 +48,11 @@
         <label class="ggrc-form-item__label">
           Repeat Workflow
         </label>
-        {{#if instance.isNew}}
+        {{#if new_object_form}}
           <repeat-on-button-wrapper {(instance)}="instance"></repeat-on-button-wrapper>
         {{/if}}
         <repeat-on-summary {unit}="instance.unit" {repeat-every}="instance.repeat_every"
-                           {hide-repeat-off}="instance.isNew">
+                           {hide-repeat-off}="new_object_form">
         </repeat-on-summary>
       </div>
       <div class="ggrc-form-item__multiple-row">
@@ -96,7 +96,7 @@
       </div>
     </div>
 
-    {{#if instance.isNew}}
+    {{#if new_object_form}}
       <div class="ggrc-form-item">
         <div class="ggrc-form-item__row">
           <label class="ggrc-form-item__label">
