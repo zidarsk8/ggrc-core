@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for CSV column definition tests."""
+from copy import deepcopy
 
 import ddt
 
@@ -638,7 +639,11 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated By",
         "Folder",
     }
-    self._test_single_object(models.Control, names, self.COMMON_EXPECTED)
+
+    # Control has additional mandatory field - Assertions
+    control_expected = deepcopy(self.COMMON_EXPECTED)
+    control_expected["mandatory"].add("Assertions")
+    self._test_single_object(models.Control, names, control_expected)
 
   def test_objective_definitions(self):
     """Test default headers for Objective."""
