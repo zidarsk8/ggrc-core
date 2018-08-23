@@ -665,3 +665,42 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
         "{}-name".format(person_id): person_name,
         "__sort__": person_email,
     })
+
+  def test_reindex_snapshots_option_without_title(self):
+    """Test that reindex processed successfully.
+
+    Reindex processed successfully with Option
+    without 'title' attribute.
+    """
+    with factories.single_commit():
+      control = factories.ControlFactory()
+      audit = factories.AuditFactory()
+      option = factories.OptionFactory()
+      audit_id = audit.id
+      control_id = control.id
+      option_title = option.title
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == control.id,
+        all_models.Revision.resource_type == control.type
+    ).one()
+    revision_content = revision.content
+    revision_content["kind"] = {
+        "context_id": "null",
+        "href": "/api/options/{}".format(option.id),
+        "type": "Option",
+        "id": option.id
+    }
+    revision.content = revision_content
+    db.session.add(revision)
+    db.session.commit()
+    self._create_snapshots(audit, [control])
+    self.client.post("/admin/reindex_snapshots")
+    snapshot = all_models.Snapshot.query.filter(
+        all_models.Snapshot.parent_id == audit_id,
+        all_models.Snapshot.parent_type == "Audit",
+        all_models.Snapshot.child_id == control_id,
+        all_models.Snapshot.child_type == "Control",
+    ).one()
+    self.assert_indexed_fields(snapshot, "kind", {
+        "": option_title
+    })
