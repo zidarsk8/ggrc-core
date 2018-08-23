@@ -660,6 +660,10 @@ class TestClonable(SnapshotterBaseTestCase):
         destination=assessment_template
     )
     self.clone_asmnt_templates([assessment_template.id], audit_2)
+    templates_count = models.AssessmentTemplate.query.count()
+    self.assertEqual(templates_count, 2,
+                     msg="Unexpected assessment templates "
+                         "appeared in database.")
     template_copy = models.AssessmentTemplate.query.filter(
         models.AssessmentTemplate.title == assessment_template.title,
         models.AssessmentTemplate.id != assessment_template.id
