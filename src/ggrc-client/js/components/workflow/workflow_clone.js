@@ -6,6 +6,7 @@
 import Cacheable from '../../models/cacheable';
 import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
 import {navigate} from '../../plugins/utils/current-page-utils';
+import Workflow from '../../models/business-models/workflow';
 
 let CloneWorkflow = Cacheable({
   defaults : {
@@ -18,7 +19,7 @@ let CloneWorkflow = Cacheable({
     return $.when(this);
   },
   save: function() {
-    let workflow = new CMS.Models.Workflow({
+    let workflow = new Workflow({
       clone: this.source_workflow.id,
       context: null,
       clone_people: this.clone_people,

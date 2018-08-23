@@ -3,13 +3,15 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('can.Model.Mixin.isOverdue', function () {
+import isOverdue from '../is-overdue';
+
+describe('isOverdue mixin', function () {
   'use strict';
 
   let Mixin;
 
   beforeAll(function () {
-    Mixin = CMS.Models.Mixins.isOverdue;
+    Mixin = isOverdue;
   });
 
   describe('_isOverdue() method: ', function () {

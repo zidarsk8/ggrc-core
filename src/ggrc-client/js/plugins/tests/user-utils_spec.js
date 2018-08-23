@@ -4,6 +4,7 @@
  */
 
 import * as UserUtils from '../utils/user-utils';
+import Person from '../../models/business-models/person';
 
 describe('User Utils', function () {
   describe('cacheCurrentUser() method', function () {
@@ -25,7 +26,7 @@ describe('User Utils', function () {
 
       UserUtils.cacheCurrentUser();
 
-      let currenUserFromCache = CMS.Models.Person.findInCacheById(0);
+      let currenUserFromCache = Person.findInCacheById(0);
 
       expect(currenUserFromCache.name).toBe('TestCurrentUser');
     });

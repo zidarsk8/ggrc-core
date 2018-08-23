@@ -49,7 +49,7 @@ import router from '../../router';
 import Permission from '../../permission';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import Cacheable from '../../models/cacheable';
-import Relationship from '../../models/join-models/relationship';
+import Relationship from '../../models/service-models/relationship';
 import DisplayPrefs from '../../models/local-storage/display-prefs';
 
 let viewModel;

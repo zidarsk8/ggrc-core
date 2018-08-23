@@ -6,10 +6,11 @@
 import {
   buildParam,
 } from './query-api-utils';
-import {getRole} from './acl-utils';
 import Permission from '../../permission';
 import {hasRelatedAssessments} from './models-utils';
 import {getPageInstance} from '../utils/current-page-utils';
+import Person from '../../models/business-models/person';
+import Audit from '../../models/business-models/audit';
 
 /**
  * Util methods for work with Snapshots.
@@ -88,33 +89,6 @@ function isInScopeModel(model) {
   return inScopeModels.indexOf(model) > -1;
 }
 
-function _buildACL(content) {
-  /**
-   * Build acl from deprecated contact fields. This is needed when
-   * displaying old revisions that do not have the access_control_list
-   * property.
-   * @param {Object} content - revision contant dict
-   * @return {Array} Access Control List created from old contact fields
-   */
-  let mapper = {
-    contact_id: 'Primary Contacts',
-    secondary_contact_id: 'Secondary Contacts',
-    principal_assessor_id: 'Principal Assignees',
-    secondary_assessor_id: 'Secondary Assignees',
-  };
-  return _.filter(_.map(mapper, function (v, k) {
-    let role = getRole(content.type, v);
-
-    if (!role || !content[k]) {
-      return;
-    }
-    return {
-      ac_role_id: role.id,
-      person_id: content[k],
-    };
-  }), Boolean);
-}
-
 /**
  * Convert snapshot to object
  * @param {Object} instance - Snapshot instance
@@ -147,13 +121,9 @@ function toObject(instance) {
     !instance.original_object_deleted &&
     !instance.archived;
 
-  if (content.access_control_list === undefined) {
-    content.access_control_list = _buildACL(content);
-  }
-
   if (content.access_control_list) {
     content.access_control_list.forEach(function (item) {
-      item.person = new CMS.Models.Person({id: item.person_id}).stub();
+      item.person = new Person({id: item.person_id}).stub();
     });
   }
 
@@ -165,8 +135,8 @@ function toObject(instance) {
   object.attr('originalLink', content.originalLink);
   // Update archived flag in content when audit is archived:
   if (instance.parent &&
-    CMS.Models.Audit.findInCacheById(instance.parent.id)) {
-    audit = CMS.Models.Audit.findInCacheById(instance.parent.id);
+    Audit.findInCacheById(instance.parent.id)) {
+    audit = Audit.findInCacheById(instance.parent.id);
     audit.bind('change', function () {
       let field = arguments[1];
       let newValue = arguments[3];

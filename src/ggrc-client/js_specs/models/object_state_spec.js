@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import Audit from '../../js/models/business-models/audit';
+import Assessment from '../../js/models/business-models/assessment';
+import Issue from '../../js/models/business-models/issue';
+
 describe('Model states test', function () {
   let basicStateObjects = ['AccessGroup', 'Clause', 'Contract',
     'Control', 'DataAsset', 'Facility', 'Market',
@@ -20,17 +24,17 @@ describe('Model states test', function () {
   it('checks if Audit has expected statuses', function () {
     let expectedStatuses = ['Planned', 'In Progress', 'Manager Review',
       'Ready for External Review', 'Completed', 'Deprecated'];
-    expect(CMS.Models.Audit.statuses).toEqual(expectedStatuses);
+    expect(Audit.statuses).toEqual(expectedStatuses);
   });
   it('checks if Assessment has correct statuses', function () {
     let expectedStatuses = ['Not Started', 'In Progress', 'In Review',
       'Verified', 'Completed', 'Deprecated', 'Rework Needed'];
-    expect(CMS.Models.Assessment.statuses).toEqual(expectedStatuses);
+    expect(Assessment.statuses).toEqual(expectedStatuses);
   });
   it('checks if Issue has correct statuses', function () {
     let expectedStatuses = ['Draft', 'Deprecated', 'Active', 'Fixed',
       'Fixed and Verified'];
-    expect(CMS.Models.Issue.statuses).toEqual(expectedStatuses);
+    expect(Issue.statuses).toEqual(expectedStatuses);
   });
 });
 

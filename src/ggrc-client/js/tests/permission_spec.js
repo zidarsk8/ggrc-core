@@ -6,6 +6,8 @@
 import Permission from '../permission';
 import {makeFakeInstance} from '../../js_specs/spec_helpers';
 import * as CurrentPageUtils from '../plugins/utils/current-page-utils';
+import UserRole from '../models/join-models/user-role';
+import Audit from '../models/business-models/audit';
 
 describe('Permission', function () {
   describe('_admin_permission_for_context() method', function () {
@@ -184,7 +186,7 @@ describe('Permission', function () {
       let fakeUserRoleCreator;
 
       beforeEach(function () {
-        fakeUserRoleCreator = makeFakeInstance({model: CMS.Models.UserRole});
+        fakeUserRoleCreator = makeFakeInstance({model: UserRole});
       });
 
       it('return true if it is admin permission if no conditions', function () {
@@ -488,7 +490,7 @@ describe('Permission', function () {
             },
           },
         };
-        instance = makeFakeInstance({model: CMS.Models.Audit})();
+        instance = makeFakeInstance({model: Audit})();
         instance.attr('context', {id: 101});
         instance.list_value = [{id: 100}];
         result = Permission._is_allowed_for(permissions, instance, 'create');
@@ -509,7 +511,7 @@ describe('Permission', function () {
             },
           },
         };
-        instance = makeFakeInstance({model: CMS.Models.Audit})();
+        instance = makeFakeInstance({model: Audit})();
         instance.attr('context', {id: 101});
         instance.list_value = [{id: 0}];
         result = Permission._is_allowed_for(permissions, instance, 'create');

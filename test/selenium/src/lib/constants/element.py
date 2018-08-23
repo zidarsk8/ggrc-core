@@ -266,40 +266,6 @@ class ReviewStates(object):
   UNREVIEWED = "Unreviewed"
 
 
-class ObjectStates(object):
-  """States for objects."""
-  DRAFT = "Draft"
-  DEPRECATED = "Deprecated"
-  ACTIVE = "Active"
-
-
-class BaseStates(object):
-  """Common states for Audit and Assessment objects."""
-  IN_PROGRESS = "In Progress"
-  COMPLETED = "Completed"
-
-
-class AuditStates(BaseStates):
-  """States for Audits objects."""
-  PLANNED = "Planned"
-  MANAGER_REVIEW = "Manager Review"
-  READY_FOR_EXT_REVIEW = "Ready for External Review"
-
-
-class AssessmentStates(BaseStates):
-  """States for Assessments objects."""
-  NOT_STARTED = "Not Started"
-  READY_FOR_REVIEW = "In Review"
-  VERIFIED = "Verified"
-  REWORK_NEEDED = "Rework Needed"
-
-
-class IssueStates(ObjectStates):
-  """States for Issues objects."""
-  FIXED = "Fixed"
-  FIXED_AND_VERIFIED = "Fixed and Verified"
-
-
 class ProgramInfoWidget(CommonProgram):
   """Elements' labels and properties for Programs Info widgets."""
   WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonProgram.PROGRAM)
@@ -455,6 +421,7 @@ class DropdownMenuItemTypes(object):
   UNMAP = "ban"
   CLONE = "clone"
   UPDATE = "refresh"
+  DEPRECATE = "times-circle"
 
 
 class TransformationElements(TransformationSetVisibleFields, CommonAssessment):

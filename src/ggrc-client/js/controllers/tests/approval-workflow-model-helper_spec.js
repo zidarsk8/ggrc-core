@@ -6,6 +6,11 @@
 import {ApprovalWorkflow as Model} from '../modals/approval-workflow-modal';
 import * as aclUtils from '../../plugins/utils/acl-utils';
 import {REFRESH_APPROVAL} from '../../events/eventTypes';
+import Workflow from '../../models/business-models/workflow';
+import TaskGroup from '../../models/business-models/task-group';
+import TaskGroupTask from '../../models/business-models/task-group-task';
+import Cycle from '../../models/business-models/cycle';
+import TaskGroupObject from '../../models/join-models/task-group-object';
 
 describe('ApprovalWorkflow', ()=> {
   describe('save() method', ()=> {
@@ -79,23 +84,23 @@ describe('ApprovalWorkflow', ()=> {
         saveTgoDfd = new can.Deferred();
         saveCycleDfd = new can.Deferred();
 
-        spyOn(CMS.Models, 'Workflow')
+        spyOn(Workflow, 'newInstance')
           .and.returnValue({
             save: jasmine.createSpy().and.returnValue(saveWfDfd),
           });
-        spyOn(CMS.Models, 'TaskGroup')
+        spyOn(TaskGroup, 'newInstance')
           .and.returnValue({
             save: jasmine.createSpy().and.returnValue(saveTgDfd),
           });
-        spyOn(CMS.Models, 'TaskGroupTask')
+        spyOn(TaskGroupTask, 'newInstance')
           .and.returnValue({
             save: jasmine.createSpy().and.returnValue(saveTgDfd),
           });
-        spyOn(CMS.Models, 'TaskGroupObject')
+        spyOn(TaskGroupObject, 'newInstance')
           .and.returnValue({
             save: jasmine.createSpy().and.returnValue(saveTgoDfd),
           });
-        spyOn(CMS.Models, 'Cycle')
+        spyOn(Cycle, 'newInstance')
           .and.returnValue({
             save: jasmine.createSpy().and.returnValue(saveCycleDfd),
           });
@@ -105,7 +110,7 @@ describe('ApprovalWorkflow', ()=> {
       });
 
       it('creates an appropriate Workflow', ()=> {
-        expect(CMS.Models.Workflow).toHaveBeenCalledWith({
+        expect(Workflow.newInstance).toHaveBeenCalledWith({
           access_control_list: [{
             ac_role_id: wfAdminRole.id,
             person: {
@@ -129,7 +134,7 @@ describe('ApprovalWorkflow', ()=> {
 
         saveWfDfd.resolve(wf);
 
-        expect(CMS.Models.TaskGroup).toHaveBeenCalledWith({
+        expect(TaskGroup.newInstance).toHaveBeenCalledWith({
           workflow: wf,
           title: jasmine.any(String),
           contact: currentUser,
@@ -144,7 +149,7 @@ describe('ApprovalWorkflow', ()=> {
         saveWfDfd.resolve(wf);
         saveTgDfd.resolve(tg);
 
-        expect(CMS.Models.TaskGroupTask).toHaveBeenCalledWith({
+        expect(TaskGroupTask.newInstance).toHaveBeenCalledWith({
           task_group: tg,
           start_date: jasmine.any(String),
           end_date: undefined,
@@ -171,7 +176,7 @@ describe('ApprovalWorkflow', ()=> {
         saveWfDfd.resolve(wf);
         saveTgDfd.resolve(tg);
 
-        expect(CMS.Models.TaskGroupObject).toHaveBeenCalledWith({
+        expect(TaskGroupObject.newInstance).toHaveBeenCalledWith({
           task_group: tg,
           object: jasmine.any(Object),
           context: wf.context,
@@ -189,7 +194,7 @@ describe('ApprovalWorkflow', ()=> {
         saveTgtDfd.resolve({});
         saveTgoDfd.resolve({});
 
-        expect(CMS.Models.Cycle).toHaveBeenCalledWith({
+        expect(Cycle.newInstance).toHaveBeenCalledWith({
           workflow: wf,
           autogenerate: true,
           context: wf.context,
@@ -262,7 +267,7 @@ describe('ApprovalWorkflow', ()=> {
           },
         }];
 
-        spyOn(CMS.Models, 'Cycle')
+        spyOn(Cycle, 'newInstance')
           .and.returnValue({
             save: jasmine.createSpy().and.returnValue(saveCycleDfd),
           });
@@ -303,7 +308,7 @@ describe('ApprovalWorkflow', ()=> {
         refreshTgtDfd.resolve(tgt);
         saveTgtDfd.resolve();
 
-        expect(CMS.Models.Cycle).toHaveBeenCalledWith({
+        expect(Cycle.newInstance).toHaveBeenCalledWith({
           workflow: awInstance,
           autogenerate: true,
           context: undefined,

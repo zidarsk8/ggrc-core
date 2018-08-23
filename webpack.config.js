@@ -173,9 +173,11 @@ module.exports = function (env) {
       ...config.plugins,
       new UglifyJSPlugin({
         sourceMap: true,
-        output: {
-          comments: false,
-          beautify: false,
+        uglifyOptions: {
+          output: {
+            comments: false,
+            beautify: false,
+          },
         },
       }),
       new CleanWebpackPlugin(['./src/ggrc/static/'], {

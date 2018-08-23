@@ -25,6 +25,7 @@ import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import Pagination from '../base-objects/pagination';
 import tracker from '../../tracker';
 import DisplayPrefs from '../../models/local-storage/display-prefs';
+import Snapshot from '../../models/service-models/snapshot';
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -271,7 +272,7 @@ export default can.Component.extend({
     },
     getModelKey: function () {
       return this.attr('useSnapshots') ?
-        CMS.Models.Snapshot.model_singular :
+        Snapshot.model_singular :
         this.attr('type');
     },
     getModel: function () {

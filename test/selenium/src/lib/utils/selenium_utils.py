@@ -352,16 +352,9 @@ def set_chrome_download_location(driver, download_dir):
   """Headless Chrome doesn't support download.default_directory preference.
   Downloads are disallowed by default.
   In order to allow a download we should send a command that will allow them.
-  Language bindings currently don't have this possibility.
   """
-  # pylint: disable=protected-access
-  driver.command_executor._commands["send_command"] = (
-      "POST", "/session/{}/chromium/send_command".format(driver.session_id))
-  params = {
-      "cmd": "Page.setDownloadBehavior",
-      "params": {"behavior": "allow", "downloadPath": download_dir}
-  }
-  driver.execute("send_command", params)
+  cmd_args = {"behavior": "allow", "downloadPath": download_dir}
+  driver.execute_cdp_cmd("Page.setDownloadBehavior", cmd_args)
 
 
 def is_headless_chrome(pytestconfig):

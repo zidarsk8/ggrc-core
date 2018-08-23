@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
- import Relationship from '../join-models/relationship';
+ import Relationship from '../service-models/relationship';
 
 (function (GGRC, can) {
   GGRC.ListLoaders.StubFilteredListLoader(

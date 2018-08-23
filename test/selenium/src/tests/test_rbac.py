@@ -6,9 +6,10 @@
 import pytest
 
 from lib import base, users
-from lib.constants import roles
+from lib.constants import roles, object_states
 from lib.entities import entities_factory
-from lib.service import rest_facade, webui_facade
+from lib.service import rest_facade, webui_facade, webui_service
+from lib.utils import string_utils
 
 
 class TestRBAC(base.Test):
@@ -67,6 +68,42 @@ class TestRBAC(base.Test):
         webui_facade.assert_can_delete(selenium, obj, can_delete=can_edit)
       else:
         webui_facade.assert_cannot_view(selenium, obj)
+
+  @pytest.mark.smoke_tests
+  @pytest.mark.parametrize(
+      "login_role",
+      [roles.CREATOR, roles.READER]
+  )
+  @pytest.mark.parametrize(
+      "obj, obj_role",
+      [
+          ("audit", "auditors"),
+          ("assessment", "assignees"),
+          ("assessment", "verifiers")
+      ]
+  )
+  def test_add_evidence_url(
+      self, program, login_role, obj, obj_role, selenium
+  ):
+    """Test that various users have possibility to add an evidence url into
+    assessment.
+    """
+    login_user = rest_facade.create_user_with_role(login_role)
+    obj_args = {obj_role: [login_user]}
+    audit = rest_facade.create_audit(
+        program, **obj_args if obj == "audit" else {})
+    asmt = rest_facade.create_assessment(
+        audit, **obj_args if obj == "assessment" else {})
+    users.set_current_user(login_user)
+    url = string_utils.StringMethods.random_string()
+    asmt_service = webui_service.AssessmentsService(selenium)
+    asmt_service.add_evidence_urls(asmt, [url])
+    actual_asmt = asmt_service.get_obj_from_info_page(obj=asmt)
+    asmt.update_attrs(
+        updated_at=rest_facade.get_obj(asmt).updated_at,
+        status=object_states.IN_PROGRESS,
+        evidence_urls=[url]).repr_ui()
+    self.general_equal_assert(asmt, actual_asmt, "audit")
 
 
 class TestAuditorRole(base.Test):

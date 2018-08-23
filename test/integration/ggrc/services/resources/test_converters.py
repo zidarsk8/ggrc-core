@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
@@ -268,6 +269,26 @@ class TestImportExports(TestCase):
     self.assert200(response)
     self.assertEqual(response.data, "test content")
 
+  @ddt.data(u'漢字.csv', u'фыв.csv', u'asd.csv')
+  def test_download_unicode_filename(self, filename):
+    """Test import history download unicode filename"""
+    user = all_models.Person.query.first()
+    import_export = factories.ImportExportFactory(
+        job_type='Import',
+        status='Finished',
+        created_at=datetime.now(),
+        created_by=user,
+        title=filename,
+        content='Test content'
+    )
+    response = self.client.get(
+        "/api/people/{}/imports/{}/download?export_to=csv".format(
+            user.id,
+            import_export.id),
+        headers=self.headers)
+    self.assert200(response)
+    self.assertEqual(response.data, "Test content")
+
   @ddt.data(("Import", "Analysis"),
             ("Export", "In Progress"))
   @ddt.unpack
@@ -335,8 +356,8 @@ class TestImportExports(TestCase):
   def test_import_control_revisions(self):
     """Test if new revisions created during import."""
     data = "Object type,,,\n" \
-           "Control,Code*,Title*,Admin*\n" \
-           ",,Test control,user@example.com"
+           "Control,Code*,Title*,Admin*,Assertions*\n" \
+           ",,Test control,user@example.com,Privacy"
 
     user = all_models.Person.query.first()
     imp_exp = factories.ImportExportFactory(
@@ -366,10 +387,10 @@ class TestImportExports(TestCase):
   def test_import_snapshot(self):
     """Test if snapshots can be created from imported objects."""
     data = "Object type,,,\n" \
-           "Control,Code*,Title*,Admin*\n" \
-           ",,Control1,user@example.com\n" \
-           ",,Control2,user@example.com\n" \
-           ",,Control3,user@example.com"
+           "Control,Code*,Title*,Admin*,Assertions*\n" \
+           ",,Control1,user@example.com,Privacy\n" \
+           ",,Control2,user@example.com,Privacy\n" \
+           ",,Control3,user@example.com,Privacy"
 
     user = all_models.Person.query.first()
     with factories.single_commit():

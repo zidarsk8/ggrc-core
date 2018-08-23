@@ -17,6 +17,7 @@ import template from './templates/related-assessments.mustache';
 import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 import tracker from '../../tracker';
+import Evidence from '../../models/business-models/evidence';
 
 const defaultOrderBy = [
   {field: 'finished_date', direction: 'desc'},
@@ -84,7 +85,7 @@ export default can.Component.extend({
 
       let data = Object.assign({}, baseData, specificData);
 
-      return new CMS.Models.Evidence(data);
+      return new Evidence(data);
     },
     reuseSelected: function () {
       let reusedObjectList = this.attr('selectedEvidences').map((evidence)=> {

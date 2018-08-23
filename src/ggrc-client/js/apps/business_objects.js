@@ -13,6 +13,7 @@ import {
 import {inferObjectType} from '../plugins/utils/models-utils';
 import {getPageInstance} from '../plugins/utils/current-page-utils';
 import Role from '../models/service-models/role';
+import * as businessModels from '../models/business-models/index';
 
 (function (can, $) {
   let CoreExtension = {};
@@ -22,40 +23,40 @@ import Role from '../models/service-models/role';
   _.assign(CoreExtension, {
     object_type_decision_tree: function () {
       return {
-        program: CMS.Models.Program,
-        audit: CMS.Models.Audit,
-        contract: CMS.Models.Contract,
-        policy: CMS.Models.Policy,
-        standard: CMS.Models.Standard,
-        regulation: CMS.Models.Regulation,
-        org_group: CMS.Models.OrgGroup,
-        vendor: CMS.Models.Vendor,
-        project: CMS.Models.Project,
-        facility: CMS.Models.Facility,
-        product: CMS.Models.Product,
-        data_asset: CMS.Models.DataAsset,
-        document: CMS.Models.Document,
-        evidence: CMS.Models.Evidence,
-        access_group: CMS.Models.AccessGroup,
-        market: CMS.Models.Market,
-        metric: CMS.Models.Metric,
-        system: CMS.Models.System,
-        process: CMS.Models.Process,
-        control: CMS.Models.Control,
-        assessment: CMS.Models.Assessment,
-        assessment_template: CMS.Models.AssessmentTemplate,
-        issue: CMS.Models.Issue,
-        objective: CMS.Models.Objective,
-        requirement: CMS.Models.Requirement,
-        clause: CMS.Models.Clause,
-        person: CMS.Models.Person,
-        product_group: CMS.Models.ProductGroup,
+        program: businessModels.Program,
+        audit: businessModels.Audit,
+        contract: businessModels.Contract,
+        policy: businessModels.Policy,
+        standard: businessModels.Standard,
+        regulation: businessModels.Regulation,
+        org_group: businessModels.OrgGroup,
+        vendor: businessModels.Vendor,
+        project: businessModels.Project,
+        facility: businessModels.Facility,
+        product: businessModels.Product,
+        data_asset: businessModels.DataAsset,
+        document: businessModels.Document,
+        evidence: businessModels.Evidence,
+        access_group: businessModels.AccessGroup,
+        market: businessModels.Market,
+        metric: businessModels.Metric,
+        system: businessModels.System,
+        process: businessModels.Process,
+        control: businessModels.Control,
+        assessment: businessModels.Assessment,
+        assessment_template: businessModels.AssessmentTemplate,
+        issue: businessModels.Issue,
+        objective: businessModels.Objective,
+        requirement: businessModels.Requirement,
+        clause: businessModels.Clause,
+        person: businessModels.Person,
+        product_group: businessModels.ProductGroup,
         role: Role,
-        technology_environment: CMS.Models.TechnologyEnvironment,
-        threat: CMS.Models.Threat,
-        risk: CMS.Models.Risk,
-        vulnerability: CMS.Models.Vulnerability,
-        template: CMS.Models.Template,
+        technology_environment: businessModels.TechnologyEnvironment,
+        threat: businessModels.Threat,
+        risk: businessModels.Risk,
+        vulnerability: businessModels.Vulnerability,
+        template: businessModels.Template,
       };
     },
     init_widgets: function () {
@@ -404,7 +405,7 @@ import Role from '../models/service-models/role';
             allow_reading: true,
             allow_mapping: true,
             allow_creating: true,
-            model: CMS.Models.Person,
+            model: businessModels.Person,
             draw_children: true,
           },
         },
@@ -413,7 +414,7 @@ import Role from '../models/service-models/role';
           Program: {
             parent_instance: getPageInstance(),
             draw_children: true,
-            model: CMS.Models.Program,
+            model: businessModels.Program,
             allow_mapping: false,
             allow_creating: false,
           },
@@ -433,7 +434,7 @@ import Role from '../models/service-models/role';
             parent_instance: getPageInstance(),
             allow_mapping: true,
             draw_children: true,
-            model: CMS.Models.Assessment,
+            model: businessModels.Assessment,
             add_item_view: path + '/assessments/tree_add_item.mustache',
           },
           AssessmentTemplate: {
@@ -682,7 +683,7 @@ import Role from '../models/service-models/role';
       });
 
       // Disable editing on profile pages, as long as it isn't audits on the dashboard
-      if (getPageInstance() instanceof CMS.Models.Person) {
+      if (getPageInstance() instanceof businessModels.Person) {
         let person_options = extraContentControllerOptions.Person;
         can.each(person_options, function (options, model_name) {
           if (model_name !== 'Audit' || !/dashboard/.test(window.location)) {

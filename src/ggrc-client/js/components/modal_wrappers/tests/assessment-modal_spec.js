@@ -9,6 +9,7 @@ import {
 } from '../../../../js_specs/spec_helpers';
 import Component from '../assessment-modal';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
+import Assessment from '../../../models/business-models/assessment';
 
 describe('<assessment-modal/> component', () => {
   let vm;
@@ -26,7 +27,7 @@ describe('<assessment-modal/> component', () => {
 
   describe('loadData() method', () => {
     it('sets the correct data', (done) => {
-      let model = makeFakeInstance({model: CMS.Models.Assessment})();
+      let model = makeFakeInstance({model: Assessment})();
 
       spyOn(model, 'getRelatedObjects').and
         .returnValue(can.Deferred().resolve({

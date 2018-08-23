@@ -7,6 +7,11 @@ import ModalsController from './modals_controller';
 import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
 import {getRole} from '../../plugins/utils/acl-utils';
 import {REFRESH_APPROVAL} from '../../events/eventTypes';
+import Workflow from '../../models/business-models/workflow';
+import TaskGroup from '../../models/business-models/task-group';
+import TaskGroupTask from '../../models/business-models/task-group-task';
+import Cycle from '../../models/business-models/cycle';
+import TaskGroupObject from '../../models/join-models/task-group-object';
 
 let ApprovalWorkflowErrors = function () {
   let errors = null;
@@ -45,7 +50,7 @@ let ApprovalWorkflow = can.Observe({
       let user = GGRC.current_user;
       if (aws.length < 1) {
         ret = $.when(
-          new CMS.Models.Workflow({
+          new Workflow({
             access_control_list: [{
               ac_role_id: wfAdminRole.id,
               person: {
@@ -75,7 +80,7 @@ let ApprovalWorkflow = can.Observe({
         ).then(function (wf) {
           return $.when(
             wf,
-            new CMS.Models.TaskGroup({
+            new TaskGroup({
               workflow: wf,
               title: reviewTemplate({
                 type: that.original_object.constructor.title_singular,
@@ -88,7 +93,7 @@ let ApprovalWorkflow = can.Observe({
         }).then(function (wf, tg) {
           return $.when(
             wf,
-            new CMS.Models.TaskGroupTask({
+            new TaskGroupTask({
               task_group: tg,
               start_date: moment().format('MM/DD/YYYY'),
               end_date: that.end_date,
@@ -107,7 +112,7 @@ let ApprovalWorkflow = can.Observe({
                 title: that.original_object.title,
               }),
             }).save(),
-            new CMS.Models.TaskGroupObject({
+            new TaskGroupObject({
               task_group: tg,
               object: that.original_object,
               context: wf.context,
@@ -148,7 +153,7 @@ let ApprovalWorkflow = can.Observe({
       }
 
       return ret.then(function (wf) {
-        let cycleDfd = new CMS.Models.Cycle({
+        let cycleDfd = new Cycle({
           workflow: wf,
           autogenerate: true,
           context: wf.context,

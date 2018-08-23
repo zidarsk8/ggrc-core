@@ -5,6 +5,7 @@
 
 import Spinner from 'spin.js';
 import NotificationConfig from './models/service-models/notification-config';
+import Control from './models/business-models/control';
 
 let $body = $('body');
 let $window = $(window);
@@ -42,7 +43,7 @@ $body.on('click', 'a[data-toggle=unmap]', function (ev) {
 
     can.each(mappings, function (mapping) {
       mapping.refresh().done(function () {
-        if (mapping instanceof CMS.Models.Control) {
+        if (mapping instanceof Control) {
           mapping.removeAttr('directive');
           mapping.save().then(notify);
         } else {

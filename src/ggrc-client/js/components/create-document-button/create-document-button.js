@@ -16,6 +16,7 @@ import {
 } from '../../events/eventTypes';
 import Permission from '../../permission';
 import template from './create-document-button.mustache';
+import Document from '../../models/business-models/document';
 
 const viewModel = can.Map.extend({
   parentInstance: null,
@@ -67,7 +68,7 @@ const viewModel = can.Map.extend({
         () => this.makeAdmin(documents),
         () => dfd.resolve([]))
       .then(() => {
-        let docs = documents.map((doc) => new CMS.Models.Document(doc.object));
+        let docs = documents.map((doc) => new Document(doc.object));
         dfd.resolve(docs);
       });
 
@@ -81,7 +82,7 @@ const viewModel = can.Map.extend({
     this.attr('parentInstance').dispatch(BEFORE_DOCUMENT_CREATE);
 
     let dfdDocs = files.map((file) => {
-      let instance = new CMS.Models.Document({
+      let instance = new Document({
         title: file.title,
         source_gdrive_id: file.id,
         created_at: Date.now(),

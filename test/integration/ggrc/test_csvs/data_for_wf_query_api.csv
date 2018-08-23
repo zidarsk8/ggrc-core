@@ -18,7 +18,7 @@ Workflow,code*,title*,description,admin,frequency,force real-time email updates,
 ,wf-10,wf-10,test,user1@ggrc.com,Monthly,yes,,user2@ggrc.com,False
 ,,,,,,,,,
 ,,,,,,,,,
-Object Type,,,,,,,,,
+Object type,,,,,,,,,
 person,Name,Email,Company,role,,,,,
 ,First User,user1@ggrc.com,google,reader,,,,,
 ,Second User,user2@ggrc.com,google,reader,,,,,

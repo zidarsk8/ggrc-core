@@ -30,25 +30,30 @@ import {
 import {getPickerElement} from '../../plugins/ggrc_utils';
 import errorTemplate from './templates/import-error.mustache';
 import {notifier} from '../../plugins/utils/notifiers-utils';
+import {
+  isConnectionLost,
+  handleAjaxError,
+} from '../../plugins/utils/errors-utils';
+import {connectionLostNotifier} from './connection-lost-notifier';
 
 const messages = {
-  INCORRECT_FORMAT: `The file is not in a recognized format. 
+  INCORRECT_FORMAT: `The file is not in a recognized format.
   Please import a Google sheet or a file in .csv format.`,
   EMPTY_FILE: 'You are going to import: <span class="gray">0 rows</span>',
-  PLEASE_CONFIRM: `Please note that importing incomplete or inaccurate data can 
+  PLEASE_CONFIRM: `Please note that importing incomplete or inaccurate data can
   result in data corruption.`,
-  IN_PROGRESS: `Your import request has been submitted. 
-  You may close this page or continue your work. We will send you an email 
+  IN_PROGRESS: `Your import request has been submitted.
+  You may close this page or continue your work. We will send you an email
   notification when it completes or if there are errors or warnings.`,
-  ANALYSIS_FAILED: `Your file could not be imported due to the following errors 
-  that were found. You can download your file, fix the errors 
+  ANALYSIS_FAILED: `Your file could not be imported due to the following errors
+  that were found. You can download your file, fix the errors
   and try importing again.`,
-  FAILED: `The volume of import is too big. Please split your import in smaller 
-  portion of 200 or less rows and import one after another. 
+  FAILED: `The volume of import is too big. Please split your import in smaller
+  portion of 200 or less rows and import one after another.
   Sorry for inconvenience.`,
   FILE_STATS: (objects) => {
     const stats = Object.keys(objects).map((model) => {
-      return `${objects[model]} 
+      return `${objects[model]}
       ${objects[model] === 1 ? model : CMS.Models[model].model_plural}`;
     }).join(', ');
     return `You are going to import: <span class="gray">${stats}</span>
@@ -242,7 +247,7 @@ export default can.Component.extend({
     trackStatusOfImport(jobId, timeout = 2000) {
       let timioutId = setTimeout(() => {
         getImportJobInfo(jobId)
-          .then((info) => {
+          .done((info) => {
             const strategy = this.attr('statusStrategies')[info.status]
               .bind(this);
 
@@ -250,6 +255,13 @@ export default can.Component.extend({
             this.attr('state', info.status);
 
             strategy(info, timeout * 2);
+          })
+          .fail((jqxhr, textStatus, errorThrown) => {
+            if (isConnectionLost()) {
+              connectionLostNotifier();
+            } else {
+              handleAjaxError(jqxhr, errorThrown);
+            }
           })
           .always(() => {
             this.attr('isLoading', false);

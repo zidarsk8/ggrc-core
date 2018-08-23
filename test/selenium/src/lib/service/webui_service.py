@@ -437,7 +437,8 @@ class BaseWebUiService(object):
     obj.update_attrs(custom_attribute_values=updated_attrs)
     return obj
 
-  def set_custom_attr_values(self, obj, cas):
+  @staticmethod
+  def set_custom_attr_values(obj, cas):
     """Update custom attribute values in custom_attribute_definitions"""
     attrs = []
     for attr_name, attr_value in cas.iteritems():
@@ -647,6 +648,24 @@ class AssessmentsService(BaseWebUiService):
     """
     self.open_info_page_of_obj(obj).click_needs_rework()
     return self.info_widget_cls(self.driver)
+
+  def deprecate_assessment(self, obj):
+    """Deprecate an object"""
+    page = self.open_info_page_of_obj(obj)
+    page.open_info_3bbs().select_deprecate()
+    page.wait_save()
+
+  def edit_assessment_answers(self, obj):
+    """Edit answers of assessment"""
+    page = self.open_info_page_of_obj(obj)
+    page.edit_answers()
+
+  def add_evidence_urls(self, obj, urls):
+    """Add evidence urls for `obj` (audit or asmt)"""
+    page = self.open_info_page_of_obj(obj)
+    for evidence_url in urls:
+      page.evidence_urls.add_url(evidence_url)
+      page.wait_save()
 
   def create_obj_and_get_mapped_titles_from_modal(self, src_obj, obj):
     """Open generic widget of mapped objects, open creation modal from

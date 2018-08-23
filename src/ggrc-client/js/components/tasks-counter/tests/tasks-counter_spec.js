@@ -5,6 +5,7 @@
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../tasks-counter';
+import Person from '../../../models/business-models/person';
 
 describe('tasks-counter component', function () {
   'use strict';
@@ -67,7 +68,7 @@ describe('tasks-counter component', function () {
 
     describe('.loadTasks() method should', function () {
       beforeEach(() => {
-        spyOn(CMS.Models.Person, 'findInCacheById')
+        spyOn(Person, 'findInCacheById')
           .and.callFake(() => {
             return {
               getTasksCount: () => can.Deferred().resolve({
@@ -80,7 +81,7 @@ describe('tasks-counter component', function () {
 
       it('update hasOverdue and tasksAmount properties', function () {
         viewModel.loadTasks();
-        expect(CMS.Models.Person.findInCacheById).toHaveBeenCalled();
+        expect(Person.findInCacheById).toHaveBeenCalled();
         expect(viewModel.attr('tasksAmount')).toBe(5);
         expect(viewModel.attr('hasOverdue')).toBe(true);
       });

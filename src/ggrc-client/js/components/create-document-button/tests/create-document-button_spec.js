@@ -10,6 +10,7 @@ import {
   BEFORE_DOCUMENT_CREATE,
   DOCUMENT_CREATE_FAILED,
 } from '../../../events/eventTypes';
+import Document from '../../../models/business-models/document';
 
 describe('create-document-button component', () => {
   let viewModel;
@@ -137,7 +138,7 @@ describe('create-document-button component', () => {
         () => {
           let parentInstance = viewModel.attr('parentInstance');
           spyOn(parentInstance, 'dispatch');
-          spyOn(CMS.Models.Document.prototype, 'save').and.returnValue({});
+          spyOn(Document.prototype, 'save').and.returnValue({});
 
           viewModel.createDocuments([{}]);
 
@@ -148,7 +149,7 @@ describe('create-document-button component', () => {
       it('should return new document after saving', (done) => {
         let saveDfd = can.Deferred();
         let newDocument = {};
-        spyOn(CMS.Models.Document.prototype, 'save').and.returnValue(saveDfd);
+        spyOn(Document.prototype, 'save').and.returnValue(saveDfd);
 
         viewModel.createDocuments([{}]);
 
@@ -164,7 +165,7 @@ describe('create-document-button component', () => {
           let parentInstance = viewModel.attr('parentInstance');
           spyOn(parentInstance, 'dispatch');
 
-          spyOn(CMS.Models.Document.prototype, 'save')
+          spyOn(Document.prototype, 'save')
             .and.returnValue(can.Deferred().reject());
 
           let result = viewModel.createDocuments([{}]);

@@ -9,6 +9,9 @@ import {
   getInstanceView,
 } from '../utils/object-history-utils';
 import {makeFakeInstance} from '../../../js_specs/spec_helpers';
+import Vendor from '../../models/business-models/vendor';
+import Risk from '../../models/business-models/risk';
+import Person from '../../models/business-models/person';
 
 describe('"buildModifiedACL" method', () => {
   it('should not add duplicates', () => {
@@ -176,7 +179,7 @@ describe('"getInstanceView" method', () => {
     const expectedPath = `${GGRC.mustache_path}/base_objects/info.mustache`;
 
     // "GGRC.Templates" const doesn't contain template for Vendor
-    const instance = makeFakeInstance({model: CMS.Models.Vendor})();
+    const instance = makeFakeInstance({model: Vendor})();
 
     const view = getInstanceView(instance);
     expect(view).toEqual(expectedPath);
@@ -186,7 +189,7 @@ describe('"getInstanceView" method', () => {
     const expectedPath = `${GGRC.mustache_path}/risks/info.mustache`;
 
     // "GGRC.Templates" const contains template for Risk
-    const instance = makeFakeInstance({model: CMS.Models.Risk})();
+    const instance = makeFakeInstance({model: Risk})();
 
     const view = getInstanceView(instance);
     expect(view).toEqual(expectedPath);
@@ -195,7 +198,7 @@ describe('"getInstanceView" method', () => {
   it('should return "view" path for Person object', () => {
     const expectedPath = `${GGRC.mustache_path}/people_roles/info.mustache`;
 
-    const instance = makeFakeInstance({model: CMS.Models.Person})();
+    const instance = makeFakeInstance({model: Person})();
 
     const view = getInstanceView(instance);
     expect(view).toEqual(expectedPath);

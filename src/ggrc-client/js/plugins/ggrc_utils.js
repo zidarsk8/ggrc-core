@@ -8,6 +8,7 @@ import Permission from '../permission';
 import {getRolesForType} from '../plugins/utils/acl-utils';
 import Mappings from '../models/mappers/mappings';
 import {notifier} from '../plugins/utils/notifiers-utils';
+import Person from '../models/business-models/person';
 
 /**
  * A module containing various utility functions.
@@ -124,11 +125,11 @@ function getPersonInfo(person) {
     return dfd;
   }
 
-  actualPerson = CMS.Models.Person.store[person.id] || {};
+  actualPerson = Person.store[person.id] || {};
   if (actualPerson.email) {
     dfd.resolve(actualPerson);
   } else {
-    actualPerson = new CMS.Models.Person({id: person.id});
+    actualPerson = new Person({id: person.id});
     new RefreshQueue()
       .enqueue(actualPerson)
       .trigger()

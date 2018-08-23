@@ -103,3 +103,7 @@ class OrgGroups(CommonInfoDropdownSettings):
 class Assessments(CommonInfoDropdownSettings):
   """Assessments 3BBS button/dropdown settings on Info pages and Info panels.
   """
+
+  def select_deprecate(self):
+    """Select deprecate in 3BBS dropdown modal"""
+    self.get_dropdown_item(self._elements.DEPRECATE).click()

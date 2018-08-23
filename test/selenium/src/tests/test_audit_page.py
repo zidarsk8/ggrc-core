@@ -9,8 +9,8 @@
 import pytest
 
 from lib import base, environment
-from lib.constants import value_aliases as aliases
-from lib.constants.element import ObjectStates, AuditStates, objects
+from lib.constants import value_aliases as aliases, object_states
+from lib.constants.element import objects
 from lib.entities import entities_factory
 from lib.entities.entity import Representation
 from lib.factory import get_cls_rest_service
@@ -191,11 +191,11 @@ class TestAuditPage(base.Test):
   @pytest.mark.cloning
   @pytest.mark.parametrize(
       "create_and_clone_audit_w_params_to_update",
-      [("new_audit_rest", {"status": AuditStates.PLANNED}),
-       ("new_audit_rest", {"status": AuditStates.IN_PROGRESS}),
-       ("new_audit_rest", {"status": AuditStates.MANAGER_REVIEW}),
-       ("new_audit_rest", {"status": AuditStates.READY_FOR_EXT_REVIEW}),
-       ("new_audit_rest", {"status": AuditStates.COMPLETED})],
+      [("new_audit_rest", {"status": object_states.PLANNED}),
+       ("new_audit_rest", {"status": object_states.IN_PROGRESS}),
+       ("new_audit_rest", {"status": object_states.MANAGER_REVIEW}),
+       ("new_audit_rest", {"status": object_states.READY_FOR_EXT_REVIEW}),
+       ("new_audit_rest", {"status": object_states.COMPLETED})],
       ids=["Audit statuses: 'Planned' - 'Planned'",
            "Audit statuses: 'In Progress' - 'Planned'",
            "Audit statuses: 'Manager Review' - 'Planned'",
@@ -213,7 +213,7 @@ class TestAuditPage(base.Test):
     """
     expected_audit = (
         create_and_clone_audit_w_params_to_update["expected_audit"].
-        update_attrs(status=AuditStates.PLANNED).repr_ui())
+        update_attrs(status=object_states.PLANNED).repr_ui())
     actual_audit = create_and_clone_audit_w_params_to_update["actual_audit"]
     # 'expected_audit': created_at, updated_at, slug (None) *factory
     # 'actual_audit': program (None)
@@ -250,9 +250,9 @@ class TestAuditPage(base.Test):
   @pytest.mark.cloning
   @pytest.mark.parametrize(
       "create_and_clone_audit_w_params_to_update",
-      [("new_assessment_template_rest", {"status": ObjectStates.DRAFT}),
-       ("new_assessment_template_rest", {"status": ObjectStates.DEPRECATED}),
-       ("new_assessment_template_rest", {"status": ObjectStates.ACTIVE})],
+      [("new_assessment_template_rest", {"status": object_states.DRAFT}),
+       ("new_assessment_template_rest", {"status": object_states.DEPRECATED}),
+       ("new_assessment_template_rest", {"status": object_states.ACTIVE})],
       ids=["Assessment Template's statuses: 'Draft' - 'Draft'",
            "Assessment Template's' statuses: 'Deprecated' - 'Deprecated'",
            "Assessment Template's statuses: 'Active' - 'Active'"],
@@ -280,7 +280,7 @@ class TestAuditPage(base.Test):
     # 'actual_asmt_tmpls': created_at, updated_at, custom_attributes,
     #                      modified_by, audit, assignees, verifiers,
     #                      template_object_type (None)
-    is_expect_ggrc_3423 = (expected_asmt_tmpl.status != ObjectStates.DRAFT)
+    is_expect_ggrc_3423 = (expected_asmt_tmpl.status != object_states.DRAFT)
     exclude_attrs = (
         Representation.tree_view_attrs_to_exclude +
         ("slug", "modified_by", "audit", "assignees", "verifiers",

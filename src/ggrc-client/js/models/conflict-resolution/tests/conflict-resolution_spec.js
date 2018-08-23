@@ -50,16 +50,14 @@ describe('cacheable conflict resolution', ()=> {
     });
 
     it('returns true if there was conflict', () => {
-      it('uses customAttributeResolver for other fields', () => {
-        let baseAttrs = {
-          test: 'test',
-        };
-        conflictResolvers.simpleFieldResolver.and.returnValue(true);
+      let baseAttrs = {
+        test: 'test',
+      };
+      conflictResolvers.simpleFieldResolver.and.returnValue(true);
 
-        let hasConflict = checkValues(baseAttrs, [], [], new can.List());
+      let hasConflict = checkValues(baseAttrs, [], [], new can.List());
 
-        expect(hasConflict).toBe(true);
-      });
+      expect(hasConflict).toBe(true);
     });
   });
 });

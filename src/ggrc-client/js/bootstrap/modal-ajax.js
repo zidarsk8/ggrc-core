@@ -129,10 +129,7 @@ import {
         ($trigger.attr('data-object-singular-override') ||
         model.title_singular ||
         $trigger.attr('data-object-singular'));
-      // If this was initiated via quick join link
-      if (objectParams.section) {
-        modalTitle = 'Map ' + modalTitle + ' to ' + objectParams.section.title;
-      }
+
       titleOverride = $trigger.attr('data-modal-title-override');
       if (titleOverride) {
         modalTitle = titleOverride;

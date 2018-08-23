@@ -541,12 +541,13 @@ def handle_cycle_task_group_object_task_put(
   # Doing this regardless of status.history.has_changes() is important in order
   # to update objects that have been declined. It updates the os_last_updated
   # date and last_updated_by.
-  if getattr(obj.task_group_task, 'object_approval', None):
-    for tgobj in obj.task_group_task.task_group.objects:
-      if obj.status == 'Verified':
-        tgobj.modified_by = get_current_user()
-        tgobj.set_reviewed_state()
-    db.session.flush()
+  with benchmark("handle CycleTask put"):
+    if getattr(obj.task_group_task, 'object_approval', None):
+      for tgobj in obj.task_group_task.task_group.objects:
+        if obj.status == 'Verified':
+          tgobj.modified_by = get_current_user()
+          tgobj.set_reviewed_state()
+      db.session.flush()
 
 
 @signals.Restful.model_posted.connect_via(
@@ -560,8 +561,9 @@ def handle_cycle_object_status(
         sender, obj=None, src=None, service=None, event=None,
         initial_state=None):
   """Calculate status of cycle and cycle task group"""
-  update_cycle_task_tree([obj])
-  # db.session.commit()
+  with benchmark("calculate status of Cycle and CycleTaskGroup"):
+    update_cycle_task_tree([obj])
+    # db.session.commit()
 
 
 @signals.Restful.model_put.connect_via(models.CycleTaskGroup)
@@ -670,21 +672,22 @@ def handle_cycle_status_change(sender, objs=None):
 # noqa pylint: disable=unused-argument
 @Signals.status_change.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_status_change(sender, objs=None):
-  objs = objs or []
-  for obj in objs:
-    if obj.old_status == obj.new_status:
-      continue
-    if obj.new_status == obj.instance.VERIFIED:
-      obj.instance.verified_date = datetime.utcnow()
-      if obj.instance.finished_date is None:
-        obj.instance.finished_date = obj.instance.verified_date
-    elif obj.new_status == obj.instance.FINISHED:
-      obj.instance.finished_date = (obj.instance.finished_date or
-                                    datetime.utcnow())
-      obj.instance.verified_date = None
-    else:
-      obj.instance.finished_date = None
-      obj.instance.verified_date = None
+  with benchmark("handle CycleTask status change"):
+    objs = objs or []
+    for obj in objs:
+      if obj.old_status == obj.new_status:
+        continue
+      if obj.new_status == obj.instance.VERIFIED:
+        obj.instance.verified_date = datetime.utcnow()
+        if obj.instance.finished_date is None:
+          obj.instance.finished_date = obj.instance.verified_date
+      elif obj.new_status == obj.instance.FINISHED:
+        obj.instance.finished_date = (obj.instance.finished_date or
+                                      datetime.utcnow())
+        obj.instance.verified_date = None
+      else:
+        obj.instance.finished_date = None
+        obj.instance.verified_date = None
 
 
 def _validate_post_workflow_fields(workflow):

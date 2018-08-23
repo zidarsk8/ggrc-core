@@ -1,7 +1,7 @@
 Object type,Test duplicate column error.,,,,
-Control,Code*,Title*,Admin*,,
-,a,a,user@example.com,,
-,A,A,user@example.com,,
+Control,Code*,Title*,Admin*,Assertions*,
+,a,a,user@example.com,Privacy,
+,A,A,user@example.com,Privacy,
 ,,,,,
 Object type,,,,,
 Person,Name,Email*,Company,Role,map: Control

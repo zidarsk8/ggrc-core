@@ -37,7 +37,7 @@ import {
   allowedToMap,
 } from '../../plugins/ggrc_utils';
 import Mappings from '../../models/mappers/mappings';
-import Relationship from '../../models/join-models/relationship';
+import Relationship from '../../models/service-models/relationship';
 
 let DEFAULT_OBJECT_MAP = {
   Assessment: 'Control',

@@ -64,8 +64,12 @@ class TestWorkflowsApiPost(TestCase):
     ).count()
     self.assertEqual(related_acl_count, 0)
 
+    bg_task_count = all_models.AccessControlList.query.filter(
+        all_models.AccessControlList.object_type == "BackgroundTask"
+    ).count()
+
     all_acl_count = all_models.AccessControlList.query.count()
-    self.assertEqual(all_acl_count, exp_acl_count)
+    self.assertEqual(all_acl_count - bg_task_count, exp_acl_count)
 
   def test_acl_on_object_deletion(self):
     """Test related ACL records removed on related object delete"""
@@ -100,7 +104,10 @@ class TestWorkflowsApiPost(TestCase):
     self.assert200(response)
 
     acl_count = all_models.AccessControlList.query.count()
-    self.assertEqual(acl_count, 0)
+    bg_acl_count = all_models.AccessControlList.query.filter(
+        all_models.AccessControlList.object_type == "BackgroundTask"
+    ).count()
+    self.assertEqual(acl_count, bg_acl_count)
 
   def test_acl_for_new_related_object(self):
     """Test Workflow ACL propagation for new related objects."""
@@ -270,9 +277,13 @@ class TestWorkflowsApiPost(TestCase):
          all_models.CycleTaskEntry.__name__)
     )
     related_count = len(related_objects)
+    bd_tasks_count = all_models.BackgroundTask.query.count()
 
     all_acl = [acl for acl in all_models.AccessControlList.eager_query().all()]
-    self.assertEqual(len(all_acl), roles_count + roles_count * related_count)
+    self.assertEqual(
+        len(all_acl),
+        bd_tasks_count + roles_count + roles_count * related_count
+    )
 
     workflow = all_models.Workflow.query.one()
     parent_acl, related_acl = [], []

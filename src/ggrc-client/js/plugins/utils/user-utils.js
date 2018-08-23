@@ -3,8 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import Person from '../../models/business-models/person';
+
 function cacheCurrentUser() {
-  CMS.Models.Person.model(GGRC.current_user);
+  Person.model(GGRC.current_user);
 }
 
 let profilePromise;

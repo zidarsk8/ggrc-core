@@ -8,24 +8,15 @@ import {
   makeFakeInstance,
   makeFakeModel,
 } from '../../../../js_specs/spec_helpers';
+import Workflow from '../../../models/business-models/workflow';
 
 describe('Workflow helpers', () => {
   describe('createCycle() method', () => {
     describe('returns cycle instance which contains', () => {
       let workflow;
-      let originalCycleModel;
-
-      beforeAll(function () {
-        originalCycleModel = CMS.Models.Cycle;
-      });
-
-      afterAll(function () {
-        CMS.Models.Cycle = originalCycleModel;
-      });
 
       beforeEach(function () {
-        CMS.Models.Cycle = makeFakeModel({model: CMS.Models.Cycle});
-        workflow = makeFakeInstance({model: CMS.Models.Workflow})();
+        workflow = makeFakeInstance({model: Workflow})();
         workflow.context = {
           stub: jasmine.createSpy('stub'),
         };

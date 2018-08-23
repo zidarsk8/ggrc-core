@@ -101,7 +101,7 @@ class TestIssueIntegration(ggrc.TestCase):
        {"priority": "P2"}),
       ({"issue_tracker": {"issue_severity": "S2", "enabled": True}},
        {"severity": "S2"}),
-      ({"issue_tracker": {"enabled": False}},
+      ({"issue_tracker": {"enabled": False, "hotlist_ids": [999, ]}},
        {"comment": "Changes to this GGRC object will no longer be "
                    "tracked within this bug."}),
   )
@@ -201,6 +201,40 @@ class TestIssueIntegration(ggrc.TestCase):
       })
     url_builder_mock.assert_called_once()
     update_issue_mock.assert_called_with(iti.issue_id, expected_result)
+
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_mapping_document(self, update_issue_mock):
+    """Test map document action on issue.
+
+    Issue in Issue tracker shouldn't be updated when reference url has been
+    added to issue.
+    """
+    iti = factories.IssueTrackerIssueFactory(
+        enabled=True,
+        issue_tracked_obj=factories.IssueFactory()
+    )
+    document = factories.DocumentFactory()
+    response = self.api.put(
+        iti.issue_tracked_obj,
+        {
+            "actions": {
+                "add_related": [{"id": document.id, "type": "Document", }, ]
+            }
+        }
+    )
+    self.assert200(response)
+
+    relationship = all_models.Relationship.query.filter(
+        all_models.Relationship.source_type == "Issue",
+        all_models.Relationship.source_id == response.json["issue"]["id"],
+    ).order_by(all_models.Relationship.id.desc()).first()
+
+    self.assertEqual(relationship.destination_id, document.id)
+    self.assertEqual(relationship.source_id, iti.issue_tracked_obj.id)
+
+    # Check that issue in Issue Tracker hasn't been updated.
+    update_issue_mock.assert_not_called()
 
 
 @ddt.ddt

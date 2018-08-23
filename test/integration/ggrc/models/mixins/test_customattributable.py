@@ -14,6 +14,7 @@ from integration.ggrc import api_helper
 from integration.ggrc.generator import ObjectGenerator
 
 
+@ddt.ddt
 class TestCustomAttributableMixin(TestCase):
 
   """Test cases for functions in custom attributable mixin."""
@@ -114,50 +115,62 @@ class TestCustomAttributableMixin(TestCase):
     self.assertEqual(prog.custom_attribute_values[0].attribute_value,
                      "http://www.some.url")
 
-  def test_validate_rich_text_ca(self):
+  @ddt.data((" http://www.some.url",
+             ' <a href="http://www.some.url">http://www.some.url</a>'),
+            ("<a>http://www.some.url</a>",
+             "<a>http://www.some.url</a>"))
+  @ddt.unpack
+  def test_validate_rich_text_ca(self, initial_value, expected_value):
     """Test validator for Rich Text CA value."""
     generator = ObjectGenerator()
     with factories.single_commit():
       prog = factories.ProgramFactory()
-      cad1 = factories.CustomAttributeDefinitionFactory(
+      cad = factories.CustomAttributeDefinitionFactory(
           definition_type="program",
           definition_id=prog.id,
           attribute_type="Rich Text",
-          title="CA 1",
-      )
-      cad2 = factories.CustomAttributeDefinitionFactory(
-          definition_type="program",
-          definition_id=prog.id,
-          attribute_type="Rich Text",
-          title="CA 2",
+          title="CA",
       )
 
     generator.api.modify_object(
-        prog,
-        {
-            "custom_attribute_values": [
-                {
-                    "attribute_value": " http://www.some.url",
-                    "attributable_id": prog.id,
-                    "attributable_type": "program",
-                    "custom_attribute_id": cad1.id,
-                },
-                {
-                    "attribute_value": "<a>http://www.some.url</a>",
-                    "attributable_id": prog.id,
-                    "attributable_type": "program",
-                    "custom_attribute_id": cad2.id,
-                }
-            ],
+        prog, {
+            "custom_attribute_values": [{
+                "attribute_value": initial_value,
+                "attributable_id": prog.id,
+                "attributable_type": "program",
+                "custom_attribute_id": cad.id,
+            }, ],
         },
     )
-
     prog = prog.__class__.query.get(prog.id)
     self.assertEqual(prog.custom_attribute_values[0].attribute_value,
-                     (' <a href="http://www.some.url">'
-                      'http://www.some.url</a>'))
-    self.assertEqual(prog.custom_attribute_values[1].attribute_value,
-                     '<a>http://www.some.url</a>')
+                     expected_value)
+
+  @ddt.data("", u"0", u"", None, "0")
+  def test_validate_checkbox_ca(self, value):
+    """Test validator for Checkbox CA value."""
+    generator = ObjectGenerator()
+    with factories.single_commit():
+      prog = factories.ProgramFactory()
+      cad = factories.CustomAttributeDefinitionFactory(
+          definition_type="program",
+          definition_id=prog.id,
+          attribute_type="Checkbox",
+          title="CA",
+      )
+
+    generator.api.modify_object(
+        prog, {
+            "custom_attribute_values": [{
+                "attribute_value": value,
+                "attributable_id": prog.id,
+                "attributable_type": "program",
+                "custom_attribute_id": cad.id,
+            }, ],
+        },
+    )
+    prog = prog.__class__.query.get(prog.id)
+    self.assertEqual(prog.custom_attribute_values[0].attribute_value, "0")
 
   def test_ca_setattr(self):
     """Test setting custom attribute values with setattr."""
@@ -181,35 +194,26 @@ class TestCustomAttributableMixin(TestCase):
     )
     self.assertEqual(len(prog.custom_attribute_values), 1)
 
-  def test_setting_ca_dict(self):
+  @ddt.data("55", "129aaaaaa")
+  def test_setting_ca_dict(self, value):
     """Test setting custom attribute values dict."""
     with factories.single_commit():
       prog = factories.ProgramFactory()
-      cad1 = factories.CustomAttributeDefinitionFactory(
+      cad = factories.CustomAttributeDefinitionFactory(
           definition_type="program",
-          title="CA 1", )
-      cad2 = factories.CustomAttributeDefinitionFactory(
-          definition_type="program",
-          title="CA 2",
-      )
+          title="CA")
 
     prog.custom_attribute_values = [
         {
-            "attribute_value": "55",
-            "custom_attribute_id": cad1.id,
-        }, {
-            "attribute_value": "129aaaaaa",
-            "custom_attribute_id": cad2.id,
+            "attribute_value": value,
+            "custom_attribute_id": cad.id,
         }
     ]
     db.session.commit()
     prog = prog.__class__.query.get(prog.id)
 
-    self.assertEqual(
-        {"55", "129aaaaaa"},
-        set(v.attribute_value for v in prog.custom_attribute_values),
-    )
-    self.assertEqual(len(prog.custom_attribute_values), 2)
+    self.assertEqual(prog.custom_attribute_values[0].attribute_value, value)
+    self.assertEqual(len(prog.custom_attribute_values), 1)
 
   def test_updating_ca_dict(self):
     """Test updating custom attribute values with a dict."""

@@ -125,11 +125,11 @@ class TestComprehensiveSheets(TestCase):
             "rows": 16,
         },
         "Project": {
-            "created": 8,
-            "ignored": 0,
-            "row_errors": 0,
-            "row_warnings": 0,
-            "rows": 8,
+            "created": 13,
+            "ignored": 2,
+            "row_errors": 3,
+            "row_warnings": 7,
+            "rows": 15,
         },
         "Facility": {
             "created": 14,

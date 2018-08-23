@@ -67,6 +67,8 @@ class Service(Descriptor):
   @cached_property
   def name(self):
     """Service name."""
+    if not self.model:
+      return self.obj.name
     return '%s -> %s' % (self.model.name, self.obj.name)
 
   @cached_property
@@ -100,6 +102,9 @@ class Service(Descriptor):
   @cached_property
   def model(self):
     """Descriptor of wrapped model class."""
+    if not self.obj.model_class:
+      # Service not associated with a model
+      return None
     return Model(self.obj.model_class)
 
   @cached_property

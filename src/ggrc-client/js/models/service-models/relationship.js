@@ -3,10 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Join from './join';
 import Cacheable from '../cacheable';
 
-export default Join('CMS.Models.Relationship', {
+export default Cacheable('CMS.Models.Relationship', {
   root_object: 'relationship',
   root_collection: 'relationships',
   attributes: {
@@ -14,10 +13,6 @@ export default Join('CMS.Models.Relationship', {
     modified_by: 'CMS.Models.Person.stub',
     source: 'CMS.Models.get_stub',
     destination: 'CMS.Models.get_stub',
-  },
-  join_keys: {
-    source: Cacheable,
-    destination: Cacheable,
   },
   defaults: {
     source: null,
@@ -56,24 +51,6 @@ export default Join('CMS.Models.Relationship', {
   update: 'PUT /api/relationships/{id}',
   destroy: 'DELETE /api/relationships/{id}',
 }, {
-  reinit: function () {
-    this.attr('source', CMS.Models.get_instance(
-      this.source_type ||
-        (this.source &&
-          (this.source.constructor &&
-            this.source.constructor.shortName ||
-            (!this.source.selfLink && this.source.type))),
-      this.source_id || (this.source && this.source.id),
-      this.source) || this.source);
-    this.attr('destination', CMS.Models.get_instance(
-      this.destination_type ||
-        (this.destination &&
-          (this.destination.constructor &&
-            this.destination.constructor.shortName ||
-            (!this.source.selfLink && this.destination.type))),
-      this.destination_id || (this.destination && this.destination.id),
-      this.destination) || this.destination);
-  },
   unmap: function (cascade) {
     return $.ajax({
       type: 'DELETE',

@@ -7,6 +7,7 @@ import * as gDriveUtils from '../../../plugins/utils/gdrive-picker-utils';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../attach-button';
+import Assessment from '../../../models/business-models/assessment';
 
 describe('attach-button component', function () {
   'use strict';
@@ -16,7 +17,7 @@ describe('attach-button component', function () {
   beforeEach(function () {
     viewModel = getComponentVM(Component);
     viewModel.attr('instance',
-      makeFakeInstance({model: CMS.Models.Assessment})()
+      makeFakeInstance({model: Assessment})()
     );
   });
 

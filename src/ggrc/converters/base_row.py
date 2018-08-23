@@ -48,18 +48,16 @@ class RowConverter(object):
 class ImportRowConverter(RowConverter):
   """Class for handling row data for import"""
   # pylint: disable=too-many-instance-attributes
-  def __init__(self, block_converter, object_class, headers, index, **options):
+  def __init__(self, block_converter, object_class, headers, line, **options):
     super(ImportRowConverter, self).__init__(block_converter, object_class,
                                              headers, options)
-    self.index = index
     self.is_new = True
     self.is_delete = False
     self.is_deprecated = False
     self.ignore = False
     self.row = options.get("row", [])
     self.id_key = ""
-    self.line = self.index + self.block_converter.offset + \
-        self.block_converter.BLOCK_OFFSET
+    self.line = line
     self.initial_state = None
     self.is_new_object_set = False
 

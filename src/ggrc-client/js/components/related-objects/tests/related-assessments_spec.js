@@ -6,7 +6,6 @@
 import Component from '../related-assessments';
 import {
   getComponentVM,
-  makeFakeModel,
 } from '../../../../js_specs/spec_helpers';
 import * as caUtils from '../../../plugins/utils/ca-utils';
 
@@ -166,20 +165,6 @@ describe('related-assessments component', () => {
     });
 
     describe('buildEvidenceModel() method', ()=> {
-      let originalEvidenceModel;
-
-      beforeAll(function () {
-        originalEvidenceModel = CMS.Models.Evidence;
-      });
-
-      beforeEach(function () {
-        CMS.Models.Evidence = makeFakeModel({model: originalEvidenceModel});
-      });
-
-      afterAll(function () {
-        CMS.Models.Evidence = originalEvidenceModel;
-      });
-
       beforeEach(()=> {
         viewModel.attr({
           instance: {

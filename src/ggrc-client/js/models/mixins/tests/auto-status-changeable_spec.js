@@ -4,14 +4,15 @@
 */
 
 import * as ModalsUtils from '../../../plugins/utils/modals';
+import autoStatusChangeable from '../auto-status-changeable';
 
-describe('CMS.Models.Mixins.autoStatusChangeable', function () {
+describe('autoStatusChangeable mixin', function () {
   'use strict';
 
   let Mixin;
 
   beforeAll(function () {
-    Mixin = CMS.Models.Mixins.autoStatusChangeable;
+    Mixin = autoStatusChangeable;
   });
 
   describe('confirmBeginEdit() method', function () {

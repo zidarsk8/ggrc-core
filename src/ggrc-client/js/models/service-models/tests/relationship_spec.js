@@ -4,7 +4,7 @@
  */
 
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
-import Relationship from '../relationship'
+import Relationship from '../relationship';
 
 describe('Relationship model', function () {
   describe('unmap() method', function () {

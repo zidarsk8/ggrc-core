@@ -63,7 +63,7 @@ class ImportConverter(BaseConverter):
   def initialize_block_converters(self):
     """Initialize block converters."""
     offsets_and_data_blocks = split_blocks(self.csv_data)
-    for offset, data in offsets_and_data_blocks:
+    for offset, data, csv_lines in offsets_and_data_blocks:
       class_name = data[1][0].strip().lower()
       object_class = self.exportable.get(class_name)
       raw_headers, rows = extract_relevant_data(data)
@@ -74,6 +74,7 @@ class ImportConverter(BaseConverter):
           raw_headers=raw_headers,
           offset=offset,
           class_name=class_name,
+          csv_lines=csv_lines[2:],  # Skip 2 header lines
       )
       block_converter.check_block_restrictions()
       yield block_converter

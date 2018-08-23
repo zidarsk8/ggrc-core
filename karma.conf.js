@@ -6,7 +6,7 @@
 const devConfig = require('./webpack.config')({test: true});
 
 module.exports = function (config) {
-  var configuration = {
+  let configuration = {
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
@@ -68,7 +68,13 @@ module.exports = function (config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false
+    singleRun: false,
+
+    client: {
+      jasmine: {
+        random: false,
+      },
+    },
   };
 
   config.set(configuration);

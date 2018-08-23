@@ -358,16 +358,9 @@ class BlockConverter(object):
 
 
 class ImportBlockConverter(BlockConverter):
-  """Import block processing functionality.
-
-  Constants:
-    BLOCK_OFFSET: offset from the block beginning to the first block line
-                  2 header rows and 1 for 0 based index
-  """
-  BLOCK_OFFSET = 3
-
+  """Import block processing functionality."""
   def __init__(self, converter, object_class, rows, raw_headers,
-               offset, class_name):
+               offset, class_name, csv_lines):
     # pylint: disable=too-many-arguments
     super(ImportBlockConverter, self).__init__(
         converter,
@@ -378,6 +371,7 @@ class ImportBlockConverter(BlockConverter):
         class_name=class_name,
         operation="import"
     )
+    self.csv_lines = csv_lines
     self.converter = converter
     self.unique_values = self.get_unique_values_dict(self.object_class)
     self.revision_ids = []
@@ -420,8 +414,9 @@ class ImportBlockConverter(BlockConverter):
     if self.ignore:
       return
     for i, row in enumerate(self.rows):
+      line = self.csv_lines[i]
       yield base_row.ImportRowConverter(self, self.object_class, row=row,
-                                        headers=self.headers, index=i)
+                                        headers=self.headers, line=line)
 
   @property
   def handle_fields(self):

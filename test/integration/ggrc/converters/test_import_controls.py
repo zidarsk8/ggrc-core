@@ -8,6 +8,7 @@
 import collections
 from ggrc import db
 from ggrc.models import all_models
+from ggrc.converters import errors
 
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
@@ -249,3 +250,134 @@ class TestControlsImport(TestCase):
     self.assertEquals(1, len(control1.documents_reference_url))
     self.assertEquals("new_gdrive_url",
                       control1.documents_reference_url[0].link)
+
+  def test_assertion_update(self):
+    """Test valid import of category and assertion fields."""
+    assertions = all_models.ControlAssertion.query.all()
+    with factories.single_commit():
+      control1 = factories.ControlFactory(
+          assertions=assertions[:3],
+      )
+    slug = control1.slug
+    new_assertion = assertions[4].name
+
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Control"),
+        ("Code*", slug),
+        ("Title", "edited control 1"),
+        ("Assertions", ""),
+    ]))
+    self._check_csv_response(response, {})
+
+    control = all_models.Control.query.first()
+    self.assertEqual(len(control.assertions), 3)
+
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Control"),
+        ("Code*", slug),
+        ("Title", "edited control 2"),
+        ("Assertions", new_assertion),
+    ]))
+    self._check_csv_response(response, {})
+
+    control = all_models.Control.query.first()
+    self.assertEqual(len(control.assertions), 1)
+    self.assertEqual(control.assertions[0].name, new_assertion)
+
+  def test_assertion_creation(self):
+    """Test creating a control with proper assertion field."""
+    assertion_name = all_models.ControlAssertion.query.first().name
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Control"),
+        ("Code*", ""),
+        ("Title", "new control 1"),
+        ("Admin", "user@example.com"),
+        ("Assertions", assertion_name),
+    ]))
+    self._check_csv_response(response, {})
+    control = all_models.Control.query.first()
+    self.assertEqual(len(control.assertions), 1)
+    self.assertEqual(control.assertions[0].name, assertion_name)
+
+  def test_assertion_errors(self):
+    """Test creating a control without an assertion field"""
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Control"),
+        ("Code*", ""),
+        ("Title", "bad control"),
+        ("Assertions", ""),
+    ]))
+    self._check_csv_response(response, {
+        "Control":
+        {
+            "row_errors": {
+                errors.MISSING_VALUE_ERROR.format(
+                    line=3,
+                    column_name="Assertions",
+                )
+            }
+        }
+    })
+    self.assertEqual(all_models.Control.query.count(), 0)
+
+  def test_invalid_assertions(self):
+    """Test creating a control without an assertion field"""
+    invalid_assertion = "invalid assertion content"
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Control"),
+        ("Code*", ""),
+        ("Title", "bad control"),
+        ("Assertions", invalid_assertion),
+    ]))
+    self._check_csv_response(response, {
+        "Control":
+        {
+            "row_warnings": {
+                errors.WRONG_MULTI_VALUE.format(
+                    line=3,
+                    column_name="Assertions",
+                    value=invalid_assertion,
+                ),
+            },
+            "row_errors": {
+                errors.MISSING_VALUE_ERROR.format(
+                    line=3,
+                    column_name="Assertions",
+                ),
+            },
+        }
+    })
+    self.assertEqual(all_models.Control.query.count(), 0)
+
+  def test_assertion_removal(self):
+    """Test creating a control without an assertion field"""
+
+    assertions = all_models.ControlAssertion.query.all()
+    assertion_name = assertions[4].name
+    with factories.single_commit():
+      control1 = factories.ControlFactory(
+          assertions=[assertions[4]],
+      )
+    slug = control1.slug
+
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Control"),
+        ("Code*", slug),
+        ("Title", "edited control 1"),
+        ("Assertions", "--"),
+    ]))
+    self._check_csv_response(response, {
+        "Control":
+        {
+            "row_warnings": {
+                errors.WRONG_MULTI_VALUE.format(
+                    line=3,
+                    column_name="Assertions",
+                    value="--",
+                ),
+            },
+        }
+    })
+    control = all_models.Control.query.first()
+    self.assertEqual(len(control.assertions), 1)
+    self.assertEqual(control.assertions[0].name, assertion_name)

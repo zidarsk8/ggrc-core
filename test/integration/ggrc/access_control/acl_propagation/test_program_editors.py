@@ -149,8 +149,8 @@ class TestProgramEditorsPropagation(base.TestACLPropagation):
               "summary": True,
           },
           "Assessment": {
-              "create": (True, "unimplemented"),
-              "generate": (True, "unimplemented"),
+              "create": True,
+              "generate": True,
               "read": True,
               "update": True,
               "delete": False,

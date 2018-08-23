@@ -4,6 +4,7 @@
 */
 
 import Component from '../modal-connector';
+import Assessment from '../../models/business-models/assessment';
 
 describe('ggrc-modal-connector component', function () {
   let viewModel;
@@ -50,7 +51,7 @@ describe('ggrc-modal-connector component', function () {
         options: {},
         on: jasmine.createSpy(),
       };
-      spyOn(CMS.Models.Assessment, 'findInCacheById')
+      spyOn(Assessment, 'findInCacheById')
         .and.returnValue('mockObject');
       handler = events.init.bind(that);
     });

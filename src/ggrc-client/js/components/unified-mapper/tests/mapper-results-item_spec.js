@@ -5,6 +5,8 @@
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../mapper-results-item';
+import Snapshot from '../../../models/service-models/snapshot';
+import Program from '../../../models/business-models/program';
 
 describe('mapper-results-item', function () {
   'use strict';
@@ -121,7 +123,7 @@ describe('mapper-results-item', function () {
     it('returns true if it is snapshot', function () {
       let result;
       viewModel.attr('itemData', {
-        type: CMS.Models.Snapshot.model_singular,
+        type: Snapshot.model_singular,
       });
       result = viewModel.isSnapshot();
       expect(result).toEqual(true);
@@ -141,7 +143,7 @@ describe('mapper-results-item', function () {
     it('returns child_type if it is snapshot', function () {
       let result;
       viewModel.attr('itemData', {
-        type: CMS.Models.Snapshot.model_singular,
+        type: Snapshot.model_singular,
         child_type: 'mockType',
       });
       result = viewModel.objectType();
@@ -165,7 +167,7 @@ describe('mapper-results-item', function () {
       viewModel.attr('itemData', {
         type: 'Program',
       });
-      postfix = CMS.Models.Program.table_singular;
+      postfix = Program.table_singular;
       result = viewModel.objectTypeIcon();
       expect(result).toEqual('fa-' + postfix);
     });

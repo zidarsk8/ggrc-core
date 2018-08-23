@@ -53,7 +53,6 @@ class BaseIssueTrackerParamsBuilder(object):
       "hotlist_id",
       "issue_severity",
       "issue_priority",
-      "enabled",
   )
 
   def __init__(self):
@@ -84,11 +83,20 @@ class BaseIssueTrackerParamsBuilder(object):
 
     fields_to_check = self.ISSUE_TRACKER_INFO_FIELDS_TO_CHECK
 
-    for field in fields_to_check:
-      new_value = new_issue_tracker_info.get(field)
-      old_value = current_issue_tracker_info.get(field)
-      if new_value != old_value:
-        setattr(self.params, field, new_value)
+    # Handle integration toggling.
+    old_enabled = current_issue_tracker_info["enabled"]
+    new_enabled = new_issue_tracker_info["enabled"]
+    if old_enabled != new_enabled:
+      comment = self.ENABLE_TMPL if new_enabled else self.DISABLE_TMPL
+      self.params.enabled = new_enabled
+      self.params.add_comment(comment)
+
+    if new_enabled:
+      for field in fields_to_check:
+        new_value = new_issue_tracker_info.get(field)
+        old_value = current_issue_tracker_info.get(field)
+        if new_value != old_value:
+          setattr(self.params, field, new_value)
 
 
 class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
@@ -145,18 +153,11 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
                                         new_issue_tracker_info,
                                         current_issue_tracker_info):
     """Build update issue query for issue tracker."""
-
-    if (not new_issue_tracker_info["enabled"] and
-            not current_issue_tracker_info["enabled"]):
-      return self.params
-
     self._update_issue_tracker_info(new_issue_tracker_info,
                                     current_issue_tracker_info)
 
-    self._update_issue_comment_attributes(obj,
-                                          initial_state,
-                                          new_issue_tracker_info,
-                                          current_issue_tracker_info)
+    if new_issue_tracker_info["enabled"]:
+      self._update_issue_comment_attributes(obj, initial_state)
 
     return self.params
 
@@ -235,9 +236,7 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
       test_plan = html2text.HTML2Text().handle(test_plan).strip("\n")
       self.params.add_comment(self.REMEDIATION_PLAN_TMPL.format(test_plan))
 
-  def _update_issue_comment_attributes(self, obj, initial_state,
-                                       new_issue_tracker_info,
-                                       current_issue_tracker_info):
+  def _update_issue_comment_attributes(self, obj, initial_state):
     """Update issue tracker comments"""
     description = obj.description
     initial_description = initial_state.description
@@ -252,10 +251,3 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
       self.params.add_comment(
           self.UPDATE_REMEDIATION_PLAN_TMPL.format(test_plan)
       )
-
-    old_enabled = current_issue_tracker_info["enabled"]
-    new_enabled = new_issue_tracker_info["enabled"]
-    if old_enabled != new_enabled:
-      enabled = new_enabled
-      comment = self.ENABLE_TMPL if enabled else self.DISABLE_TMPL
-      self.params.add_comment(comment)

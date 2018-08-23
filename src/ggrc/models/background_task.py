@@ -3,7 +3,9 @@
 
 """Module for ggrc background tasks."""
 
+import json
 import traceback
+import uuid
 from logging import getLogger
 from functools import wraps
 from time import time
@@ -15,6 +17,9 @@ from werkzeug.datastructures import Headers
 from ggrc import db
 from ggrc import settings
 from ggrc.login import get_current_user
+from ggrc.access_control import role
+from ggrc.access_control import list as acl
+from ggrc.access_control import roleable
 from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models.deferred import deferred
@@ -25,8 +30,20 @@ from ggrc.models import reflection
 
 logger = getLogger(__name__)
 
+BANNED_HEADERS = {
+    "X-Appengine-Country",
+    "X-Appengine-Queuename",
+    "X-Appengine-Current-Namespace",
+    "X-Appengine-Taskname",
+    "X-Appengine-Tasketa",
+    "X-Appengine-Taskexecutioncount",
+    "X-Appengine-Taskretrycount",
+    "X-Task-Id",
+}
 
-class BackgroundTask(base.ContextRBAC, Base, Stateful, db.Model):
+
+class BackgroundTask(roleable.Roleable, base.ContextRBAC, Base, Stateful,
+                     db.Model):
   """Background task model."""
   __tablename__ = 'background_tasks'
 
@@ -83,6 +100,28 @@ class BackgroundTask(base.ContextRBAC, Base, Stateful, db.Model):
                               self.result['headers']))
 
 
+def _add_task_acl(task):
+  """Add ACL entry for the current users background task."""
+  roles = role.get_ac_roles_for(task.type)
+  admin_role = roles.get("Admin", None)
+  if admin_role:
+    acl.AccessControlList(
+        person=get_current_user(),
+        ac_role=admin_role,
+        object=task,
+    )
+  db.session.add(task)
+  db.session.commit()
+  if admin_role:
+    from ggrc.cache.utils import clear_users_permission_cache
+    clear_users_permission_cache([get_current_user().id])
+
+
+def collect_task_headers():
+  """Get headers required for appengine background task run."""
+  return Headers({k: v for k, v in request.headers if k not in BANNED_HEADERS})
+
+
 def create_task(name, url, queued_callback=None, parameters=None, method=None):
   """Create a enqueue a bacground task."""
   if not method:
@@ -91,26 +130,16 @@ def create_task(name, url, queued_callback=None, parameters=None, method=None):
   # task name must be unique
   if not parameters:
     parameters = {}
+
   task = BackgroundTask(name=name + str(int(time())))
   task.parameters = parameters
   task.modified_by = get_current_user()
-  db.session.add(task)
-  db.session.commit()
-  banned = {
-      "X-Appengine-Country",
-      "X-Appengine-Queuename",
-      "X-Appengine-Current-Namespace",
-      "X-Appengine-Taskname",
-      "X-Appengine-Tasketa",
-      "X-Appengine-Taskexecutioncount",
-      "X-Appengine-Taskretrycount",
-      "X-Task-Id",
-  }
+  _add_task_acl(task)
 
   # schedule a task queue
   if getattr(settings, 'APP_ENGINE', False):
     from google.appengine.api import taskqueue
-    headers = Headers({k: v for k, v in request.headers if k not in banned})
+    headers = collect_task_headers()
     headers.add('X-Task-Id', task.id)
     taskqueue.add(
         queue_name="ggrc",
@@ -123,6 +152,37 @@ def create_task(name, url, queued_callback=None, parameters=None, method=None):
   elif queued_callback:
     queued_callback(task)
   return task
+
+
+def create_lightweight_task(name, url, queued_callback=None, parameters=None,
+                            method=None):
+  """Create background task.
+
+  This function create an app engine background task without handling
+  related BackgroundTask object.
+  """
+  if not method:
+    method = request.method
+
+  if not parameters:
+    parameters = {}
+
+  if getattr(settings, 'APP_ENGINE', False):
+    from google.appengine.api import taskqueue
+    taskqueue.add(
+        queue_name="ggrc",
+        url=url,
+        name="{}_{}".format(name + str(int(time())), uuid.uuid4()),
+        payload=json.dumps(parameters),
+        method=method,
+        headers=collect_task_headers()
+    )
+  elif queued_callback:
+    queued_callback(**parameters)
+  else:
+    raise ValueError(
+        "Either queued_callback should be provided or APP_ENGINE set to true."
+    )
 
 
 def make_task_response(id_):

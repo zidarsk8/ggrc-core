@@ -5,6 +5,7 @@
 
 import RefreshQueue from '../../../models/refresh_queue';
 import Component from '../object-generator';
+import Program from '../../../models/business-models/program';
 
 describe('object-generator component', function () {
   'use strict';
@@ -131,7 +132,7 @@ describe('object-generator component', function () {
         join_object_id: '123',
         selected: [],
       });
-      spyOn(CMS.Models.Program, 'findInCacheById')
+      spyOn(Program, 'findInCacheById')
         .and.returnValue('instance');
       event = {
         preventDefault: function () {},

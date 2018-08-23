@@ -36,7 +36,6 @@ export default Cacheable('CMS.Models.Person', {
   attributes: {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
-    object_people: 'CMS.Models.ObjectPerson.stubs',
     language: 'CMS.Models.Option.stub',
     user_roles: 'CMS.Models.UserRole.stubs',
     name: 'trimmed',

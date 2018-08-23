@@ -412,6 +412,10 @@ class Revision(base.ContextRBAC, Base, db.Model):
     for cad in cads:
       custom_attribute_id = int(cad["id"])
       if custom_attribute_id in cavs:
+        # Old revisions can contain falsy values for a Checkbox
+        if cad["attribute_type"] == "Checkbox" \
+                and not cavs[custom_attribute_id]["attribute_value"]:
+          cavs[custom_attribute_id]["attribute_value"] = cad["default_value"]
         continue
       if cad["attribute_type"] == "Map:Person":
         value = "Person"

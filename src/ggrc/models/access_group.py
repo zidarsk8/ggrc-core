@@ -5,7 +5,7 @@
 
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
-from ggrc.models.comment import Commentable
+from ggrc.models.comment import ScopedCommentable
 from ggrc.models.mixins import base
 from ggrc.models import mixins
 from ggrc.models.object_document import PublicDocumentable
@@ -18,7 +18,7 @@ from ggrc.fulltext.mixin import Indexed
 class AccessGroup(Roleable,
                   HasObjectState,
                   PublicDocumentable,
-                  Commentable,
+                  ScopedCommentable,
                   mixins.CustomAttributable,
                   Personable,
                   Relatable,

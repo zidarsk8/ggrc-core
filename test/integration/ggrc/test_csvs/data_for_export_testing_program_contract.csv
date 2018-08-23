@@ -1,4 +1,4 @@
-Object Type,,,,
+Object type,,,,
 contract,Code,Title,Admin,
 ,contract-25,con 5,user@example.com,
 ,contract-26,con 10,user@example.com,
@@ -25,7 +25,7 @@ contract,Code,Title,Admin,
 ,contract-47,con 115,user@example.com,
 ,contract-48,con 120,user@example.com,
 ,,,,
-Object Type,,,,
+Object type,,,,
 program,Code,Title,Program Managers,map:contract
 ,prog-1,Cat ipsum 1,user@example.com,"contract-25
 contract-27"

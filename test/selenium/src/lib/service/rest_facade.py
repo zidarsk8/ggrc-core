@@ -17,9 +17,7 @@ from lib.utils.string_utils import StringMethods
 
 def create_program(**attrs):
   """Create a program"""
-  factory_params, attrs_remainder = _split_attrs(attrs)
-  return rest_service.ProgramsService().create_obj(
-      factory_params=factory_params, **attrs_remainder)
+  return rest_service.ProgramsService().create_obj(factory_params=attrs)
 
 
 def create_objective(program=None, **attrs):
@@ -34,17 +32,16 @@ def create_control(program=None, **attrs):
 
 def create_audit(program, **attrs):
   """Create an audit within a `program`"""
-  factory_params, attrs_remainder = _split_attrs(attrs)
   return rest_service.AuditsService().create_obj(
-      factory_params=factory_params,
       program=program.__dict__,
-      **attrs_remainder)
+      factory_params=attrs)
 
 
 def create_asmt_template(audit, **attrs):
   """Create assessment template."""
-  attrs["audit"] = audit.__dict__
-  return rest_service.AssessmentTemplatesService().create_obj(**attrs)
+  return rest_service.AssessmentTemplatesService().create_obj(
+      audit=audit.__dict__,
+      factory_params=attrs)
 
 
 def create_asmt_template_w_dropdown(audit, dropdown_types_list):
@@ -92,13 +89,16 @@ def create_asmt_from_template_rest(
 def create_assessment(audit, **attrs):
   """Create an assessment within an audit `audit`"""
   attrs["audit"] = audit.__dict__
-  return rest_service.AssessmentsService().create_obj(**attrs)
+  return rest_service.AssessmentsService().create_obj(
+      audit=audit.__dict__,
+      factory_params=attrs)
 
 
 def create_assessment_template(audit, **attrs):
   """Create an assessment template"""
-  attrs["audit"] = audit.__dict__
-  return rest_service.AssessmentTemplatesService().create_obj(**attrs)
+  return rest_service.AssessmentTemplatesService().create_obj(
+      audit=audit.__dict__,
+      factory_params=attrs)
 
 
 def create_assessment_from_template(audit, template, **attrs):
@@ -134,6 +134,11 @@ def map_objs(src_obj, dest_obj):
   """Map two objects to each other"""
   rest_service.RelationshipsService().map_objs(
       src_obj=src_obj, dest_objs=dest_obj)
+
+
+def get_obj(obj):
+  """Get an object"""
+  return rest_service.ObjectsInfoService().get_obj(obj)
 
 
 def get_snapshot(obj, parent_obj):

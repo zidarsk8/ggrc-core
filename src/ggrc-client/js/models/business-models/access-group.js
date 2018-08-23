@@ -7,7 +7,7 @@ import Cacheable from '../cacheable';
 import '../mixins/unique-title';
 import '../mixins/ca-update';
 import '../mixins/access-control-list';
-import '../mixins/base-notifications';
+import '../mixins/scope-object-notifications';
 import '../mixins/questionnaire';
 
 export default Cacheable('CMS.Models.AccessGroup', {
@@ -23,7 +23,7 @@ export default Cacheable('CMS.Models.AccessGroup', {
     'unique_title',
     'ca_update',
     'accessControlList',
-    'base-notifications',
+    'scope-object-notifications',
     'questionnaire',
   ],
   is_custom_attributable: true,
@@ -31,11 +31,6 @@ export default Cacheable('CMS.Models.AccessGroup', {
   attributes: {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',
-    object_people: 'CMS.Models.ObjectPerson.stubs',
-    people: 'CMS.Models.Person.stubs',
-    objectives: 'CMS.Models.Objective.stubs',
-    controls: 'CMS.Models.Control.stubs',
-    requirements: 'CMS.Models.get_stubs',
   },
   tree_view_options: {
     attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',

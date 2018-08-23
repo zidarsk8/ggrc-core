@@ -253,7 +253,7 @@ export default Cacheable('CMS.Models.Assessment', {
   /**
    * Replace Cacheble#findInCacheById method with the latest feature of can.Model - store
    * @param {String} id - Id of requested Model
-   * @return {CMS.Models.Assessment} - already existing model
+   * @return {Assessment} - already existing model
    */
   findInCacheById: function (id) {
     return this.store[id];

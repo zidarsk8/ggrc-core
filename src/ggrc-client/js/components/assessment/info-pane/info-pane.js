@@ -62,6 +62,7 @@ import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/cus
 import pubsub from '../../../pub-sub';
 import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
+import Evidence from '../../../models/business-models/evidence';
 
 const editableStatuses = ['Not Started', 'In Progress', 'Rework Needed'];
 
@@ -645,7 +646,7 @@ export default can.Component.extend({
       let instance = event.instance;
       // handle removing evidence on Evidence tab
       // evidence on Assessment tab should be updated
-      if (instance instanceof CMS.Models.Evidence) {
+      if (instance instanceof Evidence) {
         this.viewModel.updateItems('files', 'urls');
       }
     },

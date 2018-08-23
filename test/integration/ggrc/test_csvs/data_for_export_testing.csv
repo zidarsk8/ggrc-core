@@ -1,4 +1,4 @@
-Object Type,,,,,,,,,,,,,,,,
+Object type,,,,,,,,,,,,,,,,
 person,Name,Email,Company,role,,,,,,,,,,,,
 ,Smotko,smotko@example.com,google,Administrator,,,,,,,,,,,,
 ,Urban,Urbon.S@example.com,google,Administrator,,,,,,,,,,,,
@@ -9,7 +9,7 @@ person,Name,Email,Company,role,,,,,,,,,,,,
 ,First User,user1@ggrc.com,google,reader,,,,,,,,,,,,
 ,Second User,user2@ggrc.com,google,reader,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,
-Object Type,,,,,,,,,,,,,,,,
+Object type,,,,,,,,,,,,,,,,
 issue,Title,Description,Notes,Remediation Plan,Admin,Reference URL,Code,Effective Date,State,,,,,,,
 ,Corporate ipsum - 1.2.5,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
@@ -228,7 +228,7 @@ Lol.",no notes here,"Do all the things
 
 really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-134,12/13/2015,Draft,,,,,,,
 ,,,,,,,,,,,,,,,,
-Object Type,,,,,,,,,,,,,,,,
+Object type,,,,,,,,,,,,,,,,
 regulation,Title,Description,Notes,Admin,Reference URL,Code,Effective Date,State,,,,,,,,
 ,Hipster ipsum A 1,,tea,swizec@example.com,http://i.imgur.com/vcz0gBo.jpg,regulation-9000,12/13/2015,Draft,,,,,,,,
 ,Hipster ipsum A 2,Humblebrag Time!,earl gray,swizec@example.com,http://i.imgur.com/vcz0gBo.jpg,regulation-9001,12/14/2015,Draft,,,,,,,,
@@ -278,7 +278,7 @@ regulation,Title,Description,Notes,Admin,Reference URL,Code,Effective Date,State
 ,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,
-Object Type,,,,,,,,,,,,,,,,
+Object type,,,,,,,,,,,,,,,,
 standard,Title,Description,Notes,Admin,Reference URL,Code,Effective Date,State,,,,,,,,
 ,std 1,nothing funny in standards 1,really this is lame,user@example.com,http://i.imgur.com/VjicYvY.webm,standard-1,1/19/2016,active,,,,,,,,
 ,std 2,nothing funny in standards 2,really this is lame,user@example.com,http://i.imgur.com/VjicYvY.webm,standard-2,1/20/2016,draft,,,,,,,,
@@ -306,7 +306,7 @@ standard,Title,Description,Notes,Admin,Reference URL,Code,Effective Date,State,,
 ,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,
-Object Type,,,,,,,,,,,,,,,,
+Object type,,,,,,,,,,,,,,,,
 contract,Title,Description,Notes,Admin,Reference URL,Code,Effective Date,State,,,,,,,,
 ,con 5,bah 111110,really this is lame,user@example.com,http://i.imgur.com/VjicYvY.webm,contract-25,2/11/2016,draft,,,,,,,,
 ,con 10,bah 111115,really this is lame,user@example.com,http://i.imgur.com/VjicYvY.webm,contract-26,2/12/2016,active,,,,,,,,
@@ -334,7 +334,7 @@ contract,Title,Description,Notes,Admin,Reference URL,Code,Effective Date,State,,
 ,con 120,bah 111225,really this is lame,user@example.com,http://i.imgur.com/VjicYvY.webm,contract-48,3/5/2016,active,,,,,,,,
 ,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,
-Object Type,,,,,,,,,,,,,,,,
+Object type,,,,,,,,,,,,,,,,
 clause,Title,Text of Clause,Notes,Admin,Code,Effective Date,State,,,,,,,,,
 ,Startupsum 5,Series A financing success channels.<br> Ecosystem conversion rockstar value proposition bandwidth,success 111,smotko@example.com,clause-1,3/4/2016,active,,,,,,,,,
 ,Startupsum 6,facebook validation responsive web design business plan.<br> Startup pivot founders.<br> Infrastructure f,success 112,smotko@example.com,clause-2,3/5/2016,active,,,,,,,,,
@@ -380,7 +380,7 @@ Workflow,code*,title*,description,admin,repeat every,unit,force real-time email 
 ,wf-10,wf-10,test,user1@ggrc.com,1,month,yes,,user2@ggrc.com,False,,,,,,
 ,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,
-Object Type,,,,,,,,,,,,,,,,
+Object type,,,,,,,,,,,,,,,,
 control,Title,Description,Assessment Procedure,Admin,Reference URL,Code,Kind/Nature,Fraud Related,Significance,Type/Means,Frequency,Assertions,Categories,State,map:standard,map:clause
 ,Startupsum 115,Series A financing success channels.<br> Ecosystem conversion rockstar value proposition bandwidth,success 111,smotko@example.com,http://i.imgur.com/aP8UU5I.jpg,control-1,Preventative,yes,,Technical,Monthly,Confidentiality,,Draft,"standard-1
 standard-5","clause-1
@@ -403,46 +403,46 @@ clause-2"
 ,Startupsum 121,graphical user interface.<br> Accelerator user experience metrics MVP.<br> Business model canvas termsheet respo,success 117,Urbon.S@example.com,http://i.imgur.com/aP8UU5I.jpg,control-7,,,key,manual,,Privacy,Physical Security,Draft,"standard-1
 standard-5","clause-1
 clause-2"
-,Startupsum 122,nsive web design launch party long tail innovator burn rate stealth seed money disruptive startup metrics business plan funding.<br> Early adopters bandwidth monetization equity.<br> Infrastructure ownership iPhone early adopters lean startup buyer iPad founders equity accelerator.<br> Graphical user interface angel investor niche market partnership strategy business-to-business di,success 118,zidar@example.com,http://i.imgur.com/aP8UU5I.jpg,control-8,,,Non-key,automated,,,Authentication,Draft,"standard-1
+,Startupsum 122,nsive web design launch party long tail innovator burn rate stealth seed money disruptive startup metrics business plan funding.<br> Early adopters bandwidth monetization equity.<br> Infrastructure ownership iPhone early adopters lean startup buyer iPad founders equity accelerator.<br> Graphical user interface angel investor niche market partnership strategy business-to-business di,success 118,zidar@example.com,http://i.imgur.com/aP8UU5I.jpg,control-8,,,Non-key,automated,,Confidentiality,Authentication,Draft,"standard-1
 standard-5","clause-1
 clause-2"
-,Startupsum 123,rect mailing founders burn rate crowdsource.<br> Alpha startup client channels hackathon value proposition.<br> Vira,success 119,Urbon.S@example.com,http://i.imgur.com/aP8UU5I.jpg,control-9,,,key,Technical,,,Authentication,Draft,"standard-1
+,Startupsum 123,rect mailing founders burn rate crowdsource.<br> Alpha startup client channels hackathon value proposition.<br> Vira,success 119,Urbon.S@example.com,http://i.imgur.com/aP8UU5I.jpg,control-9,,,key,Technical,,Confidentiality,Authentication,Draft,"standard-1
 standard-5","clause-1
 clause-2"
-,Startupsum 124,lity pivot seed round social media creative burn rate vesting period hackathon metrics branding.<br> Conversion analytics launch party growth hacking android virality.<br> Partnership mass market twitter return on investment seed money lean startup investor iPad.<br>,success 120,Urbon.S@example.com,http://i.imgur.com/aP8UU5I.jpg,control-10,,,,Physical,,,Authentication,Draft,"standard-1
+,Startupsum 124,lity pivot seed round social media creative burn rate vesting period hackathon metrics branding.<br> Conversion analytics launch party growth hacking android virality.<br> Partnership mass market twitter return on investment seed money lean startup investor iPad.<br>,success 120,Urbon.S@example.com,http://i.imgur.com/aP8UU5I.jpg,control-10,,,,Physical,,Confidentiality,Authentication,Draft,"standard-1
 standard-5","clause-1
 clause-2"
-,Startupsum 125,,success 121,Urbon.S@example.com,http://i.imgur.com/aP8UU5I.jpg,control-11,Corrective,,,manual,,,Access Management,Draft,"standard-1
+,Startupsum 125,,success 121,Urbon.S@example.com,http://i.imgur.com/aP8UU5I.jpg,control-11,Corrective,,,manual,,Confidentiality,Access Management,Draft,"standard-1
 standard-5","clause-1
 clause-2"
-,Startupsum 126,Market deployment network effects.<br> Bootstrapping virality android backing seed round prototype rockstar pitch trac,success 122,Urbon.S@example.com,http://i.imgur.com/aP8UU5I.jpg,control-12,,,,automated,,,Access Management,Draft,"standard-1
+,Startupsum 126,Market deployment network effects.<br> Bootstrapping virality android backing seed round prototype rockstar pitch trac,success 122,Urbon.S@example.com,http://i.imgur.com/aP8UU5I.jpg,control-12,,,,automated,,Confidentiality,Access Management,Draft,"standard-1
 standard-5","clause-1
 clause-2"
-,Startupsum 127,tion.<br> Bootstrapping user experience scrum project analytics business plan supply chain first mover advantage channels paradigm shift gen-z backing.<br> Churn rate seed round ecosystem social media buyer bandwidth.<br> Business-to-consumer strategy marketing early adopters growth hacking churn rate non-disclosure agreement holy grail launch party network effects creative iPad analytics.<br>,success 123,Urbon.S@example.com,http://i.imgur.com/aP8UU5I.jpg,control-13,,,,Technical,,,Access Management,Draft,"standard-1
+,Startupsum 127,tion.<br> Bootstrapping user experience scrum project analytics business plan supply chain first mover advantage channels paradigm shift gen-z backing.<br> Churn rate seed round ecosystem social media buyer bandwidth.<br> Business-to-consumer strategy marketing early adopters growth hacking churn rate non-disclosure agreement holy grail launch party network effects creative iPad analytics.<br>,success 123,Urbon.S@example.com,http://i.imgur.com/aP8UU5I.jpg,control-13,,,,Technical,,Confidentiality,Access Management,Draft,"standard-1
 standard-5","clause-1
 clause-2"
-,Startupsum 128,Growth hacking learning curve entrepreneur.<br> Android series A financing buzz network effects burn rate ownership.<br>,success 124,zidar@example.com,http://i.imgur.com/aP8UU5I.jpg,control-14,,,,automated,,,Physical Security,Draft,"standard-1
+,Startupsum 128,Growth hacking learning curve entrepreneur.<br> Android series A financing buzz network effects burn rate ownership.<br>,success 124,zidar@example.com,http://i.imgur.com/aP8UU5I.jpg,control-14,,,,automated,,Confidentiality,Physical Security,Draft,"standard-1
 standard-5","clause-1
 clause-2"
-,Startupsum 129,Research & development market pitch focus creative assets.<br> Low hanging fruit alpha social media.<br> Buzz interaction design return on investment monetization A/B testing hypotheses gamification stealth traction niche market.<br>,success 125,zidar@example.com,http://i.imgur.com/aP8UU5I.jpg,control-15,,,,manual,,,Physical Security,Draft,"standard-1
+,Startupsum 129,Research & development market pitch focus creative assets.<br> Low hanging fruit alpha social media.<br> Buzz interaction design return on investment monetization A/B testing hypotheses gamification stealth traction niche market.<br>,success 125,zidar@example.com,http://i.imgur.com/aP8UU5I.jpg,control-15,,,,manual,,Confidentiality,Physical Security,Draft,"standard-1
 standard-5",
-,Startupsum 130,Hypotheses www.<br>discoverartisans.<br>com pitch launch party ownership virality partner network direct mailing bandwid,success 126,zidar@example.com,http://i.imgur.com/aP8UU5I.jpg,control-16,,,,Physical,,,,Draft,"standard-1
+,Startupsum 130,Hypotheses www.<br>discoverartisans.<br>com pitch launch party ownership virality partner network direct mailing bandwid,success 126,zidar@example.com,http://i.imgur.com/aP8UU5I.jpg,control-16,,,,Physical,,Confidentiality,,Draft,"standard-1
 standard-5",
-,Startupsum 131,th scrum project beta A/B testing.<br> Holy grail equity low hanging fruit release market.<br> Accelerator direct mailin,success 127,zidar@example.com,http://i.imgur.com/aP8UU5I.jpg,control-17,Corrective,,,Administrative,,,,Draft,"standard-1
+,Startupsum 131,th scrum project beta A/B testing.<br> Holy grail equity low hanging fruit release market.<br> Accelerator direct mailin,success 127,zidar@example.com,http://i.imgur.com/aP8UU5I.jpg,control-17,Corrective,,,Administrative,,Confidentiality,,Draft,"standard-1
 standard-5",
-,Startupsum 132,g growth hacking business model canvas vesting period agile development startup partner network.<br> Scrum project infographic infrastructure analytics traction hackathon partner network iPad www.<br>discoverartisans.<br>com freemium holy grail customer.<br> Learning curve sales vesting period facebook user experience A/B testing social media niche market ramen ecosystem.<br> Direct mailing incubat,success 128,zidar@example.com,http://i.imgur.com/aP8UU5I.jpg,control-18,,,,automated,,,,Draft,"standard-1
+,Startupsum 132,g growth hacking business model canvas vesting period agile development startup partner network.<br> Scrum project infographic infrastructure analytics traction hackathon partner network iPad www.<br>discoverartisans.<br>com freemium holy grail customer.<br> Learning curve sales vesting period facebook user experience A/B testing social media niche market ramen ecosystem.<br> Direct mailing incubat,success 128,zidar@example.com,http://i.imgur.com/aP8UU5I.jpg,control-18,,,,automated,,Confidentiality,,Draft,"standard-1
 standard-5",
-,Startupsum 133,or handshake product management innovator metrics venture social proof android series A financing iPhone agile developmen,success 129,zidar@example.com,http://i.imgur.com/aP8UU5I.jpg,control-19,Corrective,,,Administrative,,,,Draft,"standard-1
+,Startupsum 133,or handshake product management innovator metrics venture social proof android series A financing iPhone agile developmen,success 129,zidar@example.com,http://i.imgur.com/aP8UU5I.jpg,control-19,Corrective,,,Administrative,,Confidentiality,,Draft,"standard-1
 standard-5",
-,Startupsum 134,t traction niche market.<br> Graphical user interface founders sales traction www.<br>discoverartisans.<br>com incubator,success 130,user@example.com,http://i.imgur.com/aP8UU5I.jpg,control-20,,,,automated,Yearly,,,Draft,"standard-1
+,Startupsum 134,t traction niche market.<br> Graphical user interface founders sales traction www.<br>discoverartisans.<br>com incubator,success 130,user@example.com,http://i.imgur.com/aP8UU5I.jpg,control-20,,,,automated,Yearly,Confidentiality,,Draft,"standard-1
 standard-5",
-,Startupsum 135,analytics first mover advantage.<br> Stock virality backing.<br> Launch party advisor MVP research & development market startup.<br> Value proposition hackathon graphical user interface innovator beta non-disclosure agreement early adopters influencer agile development stock.<br>,success 131,user@example.com,http://i.imgur.com/aP8UU5I.jpg,control-21,,,,manual,Yearly,,,Draft,,
-,Startupsum 136,Client rockstar business-to-business vesting period innovator.<br> Rockstar business model canvas sales stealth.<br> Resea,success 132,user@example.com,http://i.imgur.com/aP8UU5I.jpg,control-22,,,,automated,Yearly,,,Draft,,
-,Startupsum 137,rch & development iPad seed round ecosystem gen-z focus user experience ownership beta startup funding.<br> User experience focus infrastructure partnership.<br> Startup stock pitch A/B testing pivot termsheet validation vesting period.<br> Bootstrapping supply chain business-to-business research & development influencer venture ecosystem android gamification.<br> Business-to-consumer crowdfunding,success 133,user@example.com,http://i.imgur.com/aP8UU5I.jpg,control-23,,,,Administrative,Yearly,,,Draft,,
-,Startupsum 138,twitter bandwidth partnership termsheet handshake research & development marketing direct mailing gamification social media burn rate branding.<br> Interaction design social proof metrics.<br> Startup focus burn rate crowdsource infographic mass market.<br> A/B testing value proposition sales market iteration scrum project non-disclosure agreement www.<br>discoverartisans.<br>com funding bootst,success 134,user@example.com,http://i.imgur.com/aP8UU5I.jpg,control-24,,,,automated,,,,Draft,,
-,Startupsum 139,rapping freemium rockstar.<br>,success 135,user@example.com,http://i.imgur.com/aP8UU5I.jpg,control-25,,,,manual,,,,Draft,,
+,Startupsum 135,analytics first mover advantage.<br> Stock virality backing.<br> Launch party advisor MVP research & development market startup.<br> Value proposition hackathon graphical user interface innovator beta non-disclosure agreement early adopters influencer agile development stock.<br>,success 131,user@example.com,http://i.imgur.com/aP8UU5I.jpg,control-21,,,,manual,Yearly,Confidentiality,,Draft,,
+,Startupsum 136,Client rockstar business-to-business vesting period innovator.<br> Rockstar business model canvas sales stealth.<br> Resea,success 132,user@example.com,http://i.imgur.com/aP8UU5I.jpg,control-22,,,,automated,Yearly,Confidentiality,,Draft,,
+,Startupsum 137,rch & development iPad seed round ecosystem gen-z focus user experience ownership beta startup funding.<br> User experience focus infrastructure partnership.<br> Startup stock pitch A/B testing pivot termsheet validation vesting period.<br> Bootstrapping supply chain business-to-business research & development influencer venture ecosystem android gamification.<br> Business-to-consumer crowdfunding,success 133,user@example.com,http://i.imgur.com/aP8UU5I.jpg,control-23,,,,Administrative,Yearly,Confidentiality,,Draft,,
+,Startupsum 138,twitter bandwidth partnership termsheet handshake research & development marketing direct mailing gamification social media burn rate branding.<br> Interaction design social proof metrics.<br> Startup focus burn rate crowdsource infographic mass market.<br> A/B testing value proposition sales market iteration scrum project non-disclosure agreement www.<br>discoverartisans.<br>com funding bootst,success 134,user@example.com,http://i.imgur.com/aP8UU5I.jpg,control-24,,,,automated,,Confidentiality,,Draft,,
+,Startupsum 139,rapping freemium rockstar.<br>,success 135,user@example.com,http://i.imgur.com/aP8UU5I.jpg,control-25,,,,manual,,Confidentiality,,Draft,,
 ,,,,,,,,,,,,,,,,
-Object Type,,,,,,,,,,,,,,,,
+Object type,,,,,,,,,,,,,,,,
 policy,Title,Description,Notes,Admin,Reference URL,Kind/Type,Code,Effective Date,State,map:control,,,,,,
 ,Cheese ipsum ch 5,Queso cheese and wine say cheese.<br> Croque monsieur macaroni cheese squirty,stinky cheese,french.dude@example.com,http://i.imgur.com/tHvlnpW.jpg,Product policy,policy-1,12/31/2015,active,control-1,,,,,,
 ,Cheese ipsum ch 6,cheese when the cheese comes out everybody's happy pepper jack mascarpone,stinky cheese,french.dude@example.com,http://i.imgur.com/tHvlnpW.jpg,Product policy,policy-2,1/1/2016,draft,control-2,,,,,,
@@ -475,7 +475,7 @@ control-7",,,,,,
 ,Cheese ipsum ch 24,eicester dolcelatte pepper jack lancashire st. agur blue cheese danish fontina.,stinky cheese,french.dude@example.com,http://i.imgur.com/tHvlnpW.jpg,Product policy,policy-20,1/19/2016,draft,"control-5
 control-7",,,,,,
 ,,,,,,,,,,,,,,,,
-Object Type,,,,,,,,,,,,,,,,
+Object type,,,,,,,,,,,,,,,,
 objective,Title,Description,Notes,Admin,Reference URL,Code,State,map:control,,,,,,,,
 ,Startupsum 155,Series A financing success channels.<br> Ecosystem conversion rockstar value proposition bandwidth,success 111,"zidar@example.com
 user@example.com",http://i.imgur.com/SiuyNdp.jpg,objective-1,Active,"control-1
@@ -593,7 +593,7 @@ Policy,code*,title*,description,admin,state,notes,effective date,reference url,K
 ,p9,mapped policy 9,test,smotko@example.com,Active,this is a note,7/1/2015,http://i.imgur.com/Qj0DvUH.jpg,Product Policy,,,,,,,
 ,p10,mapped policy 10,test,Urbon.S@example.com,Active,this is a note,7/1/2015,http://i.imgur.com/VjicYvY.webm,Contract Related Policy,,,,,,,
 ,,,,,,,,,,,,,,,,
-Object Type,,,,,,,,,,,,,,,,
+Object type,,,,,,,,,,,,,,,,
 program,Title,Description,Notes,Program Managers,Reference URL,Primary Contacts,Code,Effective Date,State,map:policy,map:contract,map:  regulation,map: control,map: objective,,
 ,Cat ipsum 1,Climb leg rub face on everything give attitude nap all day for under the bed. Chase mice attack feet,,smotko@example.com,http://www.google.com,sec.con@example.com,prog-1,5/9/2015,Draft,"policy-1
 policy-2

@@ -10,15 +10,17 @@ import {
 } from '../spec_helpers';
 import CustomAttributeObject from '../../js/plugins/utils/custom-attribute/custom-attribute-object';
 import * as modelUtils from '../../js/plugins/utils/models-utils';
+import Mixin from '../../js/models/mixins/mixin';
 
 describe('Cacheable model', function () {
   let origGcaDefs;
   let DummyModel;
+  let dummyable
 
   beforeEach(function () {
     origGcaDefs = GGRC.custom_attr_defs;
-    can.Model.Mixin('dummyable');
-    spyOn(CMS.Models.Mixins.dummyable, 'add_to');
+    dummyable = Mixin('dummyable');
+    spyOn(dummyable, 'add_to');
 
     DummyModel = makeFakeModel({
       model: Cacheable,
@@ -44,7 +46,7 @@ describe('Cacheable model', function () {
 
   describe('::setup', function () {
     it('prefers pre-set static names over root object & collection', function () {
-      let Model = Cacheable.extend('CMS.Models.Dummy', {
+      let Model = Cacheable.extend({
         root_object: 'wrong_name',
         root_collection: 'wrong_names',
         model_singular: 'RightName',
@@ -65,7 +67,6 @@ describe('Cacheable model', function () {
       expect(Model.model_plural).toBe('RightNames');
       expect(Model.table_plural).toBe('right_names');
       expect(Model.title_plural).toBe('Right Names');
-      delete CMS.Models.Dummy;
     });
 
     it('sets various forms of the name based on root object & collection by default', function () {
@@ -89,7 +90,7 @@ describe('Cacheable model', function () {
     });
 
     it('applies mixins based on the mixins property', function () {
-      expect(CMS.Models.Mixins.dummyable.add_to)
+      expect(dummyable.add_to)
         .toHaveBeenCalledWith(DummyModel);
     });
 

@@ -15,9 +15,14 @@ import {
   deleteExportJob,
   jobStatuses,
 } from './import-export-utils';
+import {
+  isConnectionLost,
+  handleAjaxError,
+} from '../../plugins/utils/errors-utils';
 import {confirm} from '../../plugins/utils/modals';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 import './current-exports/current-exports';
+import {connectionLostNotifier} from './connection-lost-notifier';
 
 const DEFAULT_TIMEOUT = 2000;
 
@@ -64,6 +69,13 @@ export default can.Component.extend({
           } else {
             this.attr('isInProgress', false);
             this.attr('timeout', DEFAULT_TIMEOUT);
+          }
+        })
+        .fail((jqxhr, textStatus, errorThrown) => {
+          if (isConnectionLost()) {
+            connectionLostNotifier();
+          } else {
+            handleAjaxError(jqxhr, errorThrown);
           }
         });
     },

@@ -16,7 +16,7 @@ import {
   navigate,
 } from '../../plugins/utils/current-page-utils';
 import {notifier} from '../../plugins/utils/notifiers-utils';
-import Relationship from '../../models/join-models/relationship';
+import Relationship from '../../models/service-models/relationship';
 
 export default can.Component.extend({
   tag: 'issue-unmap-item',

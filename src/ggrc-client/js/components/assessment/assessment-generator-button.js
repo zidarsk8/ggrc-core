@@ -8,6 +8,7 @@ import RefreshQueue from '../../models/refresh_queue';
 import template from './templates/generate_assessments_button.mustache';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import BackgroundTask from '../../models/service-models/background-task';
+import Assessment from '../../models/business-models/assessment';
 
 export default can.Component.extend({
   tag: 'assessment-generator-button',
@@ -101,7 +102,7 @@ export default can.Component.extend({
             let ids;
             this.showFlash({Pending: true});
             options.context.closeModal();
-            if (!tasks.length || tasks[0] instanceof CMS.Models.Assessment) {
+            if (!tasks.length || tasks[0] instanceof Assessment) {
               // We did not create a task
               window.location.reload();
               return;
@@ -138,7 +139,7 @@ export default can.Component.extend({
           type: 'AssessmentTemplate',
         };
       }
-      assessmentModel = new CMS.Models.Assessment(data);
+      assessmentModel = new Assessment(data);
 
       // force remove issue_tracker field
       delete assessmentModel.issue_tracker;

@@ -96,6 +96,36 @@ class TestPersonResource(TestCase, WithQueryApi):
     # not authorized user
     self.assert403(response)
 
+  @ddt.data("Creator", "Reader", "Editor", "Administrator")
+  def test_profile_post_empty_body(self, role_name):
+    """Test person_profile POST method with empty body - {}."""
+    role = all_models.Role.query.filter(
+        all_models.Role.name == role_name
+    ).one()
+    with factories.single_commit():
+      user = factories.PersonFactory()
+      rbac_factories.UserRoleFactory(role=role, person=user)
+    self.api.set_user(person=user)
+
+    response = self.api.send_request(
+        self.api.client.post,
+        data={},
+        api_link="/api/people/{}/profile".format(user.id))
+
+    self.assert405(response)
+
+  def test_profile_post_unauthorized(self):
+    """Test person_profile POST method with empty body - No Access."""
+    with factories.single_commit():
+      user = factories.PersonFactory()
+
+    response = self.api.send_request(
+        self.api.client.post,
+        data={},
+        api_link="/api/people/{}/profile".format(user.id))
+    # not authorized user
+    self.assert405(response)
+
   def assert_profile_put_successful(self,
                                     response,
                                     correct_response,

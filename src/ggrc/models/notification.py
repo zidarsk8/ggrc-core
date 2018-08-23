@@ -4,6 +4,7 @@
 """GGRC notification SQLAlchemy layer data model extensions."""
 
 from sqlalchemy.orm import backref
+from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import db
 from ggrc.models.mixins import base
@@ -45,8 +46,9 @@ class NotificationType(base.ContextRBAC, Base, db.Model):
   instant = db.Column(db.Boolean, nullable=False, default=False)
 
 
-class Notification(base.ContextRBAC, Base, db.Model):
-  __tablename__ = 'notifications'
+class BaseNotification(base.ContextRBAC, Base, db.Model):
+  """Base notifications and notifications history model."""
+  __abstract__ = True
 
   object_id = db.Column(db.Integer, nullable=False)
   object_type = db.Column(db.String, nullable=False)
@@ -55,10 +57,25 @@ class Notification(base.ContextRBAC, Base, db.Model):
   custom_message = db.Column(db.Text, nullable=False, default=u"")
   force_notifications = db.Column(db.Boolean, default=False, nullable=False)
   repeating = db.Column(db.Boolean, nullable=False, default=False)
-  notification_type_id = db.Column(
-      db.Integer, db.ForeignKey('notification_types.id'), nullable=False)
-  notification_type = db.relationship(
-      'NotificationType', foreign_keys='Notification.notification_type_id')
-
   object = utils.PolymorphicRelationship("object_id", "object_type",
                                          "{}_notifiable")
+
+  @declared_attr
+  def notification_type_id(cls):  # pylint: disable=no-self-argument
+    return db.Column(db.Integer,
+                     db.ForeignKey('notification_types.id'),
+                     nullable=False)
+
+  @declared_attr
+  def notification_type(cls):  # pylint: disable=no-self-argument
+    return db.relationship('NotificationType',
+                           foreign_keys='{}.notification_type_id'.format(
+                               cls.__name__))
+
+
+class Notification(BaseNotification):
+  __tablename__ = 'notifications'
+
+
+class NotificationHistory(BaseNotification):
+  __tablename__ = 'notifications_history'

@@ -3,7 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import 'jasmine-fixture/dist/jasmine-fixture';
 import './spec_setup';
 import './spec_helpers';
 import '../../ggrc/static/dashboard-templates';

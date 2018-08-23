@@ -20,6 +20,7 @@ import {
 import Mappings from '../../models/mappers/mappings';
 import {makeModelInstance} from './models-utils';
 import PersistentNotifier from '../persistent_notifier';
+import Person from '../../models/business-models/person';
 
 /**
  * Util methods for work with Current Page.
@@ -269,7 +270,7 @@ function refreshCounts() {
 function _getCurrentUser() {
   let userId = GGRC.current_user.id;
 
-  return CMS.Models.Person.findInCacheById(userId);
+  return Person.findInCacheById(userId);
 }
 
 function initWidgets() {

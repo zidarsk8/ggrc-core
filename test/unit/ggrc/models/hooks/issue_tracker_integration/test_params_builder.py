@@ -65,6 +65,49 @@ class TestBaseIssueTrackerParamsBuilder(unittest.TestCase):
         expected_result
     )
 
+  def test_turning_off_integration(self):
+    """Test turning off Issue tracker integration.
+
+    No changes should be sent to issue tracker except comment.
+    """
+    # Arrange test data.
+    current_issue_tracker_info = {
+        "enabled": True,
+        "component_id": "123",
+        "hotlist_id": 321,
+        "title": "test_title",
+        "issue_type": "test_type",
+        "issue_priority": "P2",
+        "issue_severity": "S2",
+    }
+
+    new_issue_tracker_info = {
+        "enabled": False,
+        "component_id": "12345",
+        "hotlist_id": 54321,
+        "title": "new_test_title",
+        "issue_type": "new_test_type",
+        "issue_priority": "P3",
+        "issue_severity": "S3",
+    }
+
+    expected_result = {
+        "comment": u"Changes to this GGRC object will no longer be "
+                   u"tracked within this bug."
+    }
+
+    # Perform action.
+    self.builder._update_issue_tracker_info(
+        new_issue_tracker_info,
+        current_issue_tracker_info
+    )
+
+    # Assert results.
+    self.assertEquals(
+        self.builder.params.get_issue_tracker_params(),
+        expected_result
+    )
+
 
 @ddt.ddt
 class TestIssueQueryBuilder(unittest.TestCase):
@@ -212,21 +255,14 @@ class TestIssueQueryBuilder(unittest.TestCase):
     mock_new_object.description = "new description"
     mock_new_object.test_plan = "new test plan"
 
-    mock_current_tracker_info = {"enabled": True}
-    mock_new_tracker_info = {"enabled": False}
-
     expected_result = {
         "comment": "Issue Description has been updated.\nnew description\n\n"
-        "Issue Remediation Plan has been updated.\nnew test plan\n\n"
-        "Changes to this GGRC object will no longer "
-        "be tracked within this bug."
+        "Issue Remediation Plan has been updated.\nnew test plan"
     }
 
     # Perform action.
     self.builder._update_issue_comment_attributes(mock_new_object,
-                                                  mock_current_object,
-                                                  mock_new_tracker_info,
-                                                  mock_current_tracker_info)
+                                                  mock_current_object)
 
     # Assert results.
     self.assertEquals(

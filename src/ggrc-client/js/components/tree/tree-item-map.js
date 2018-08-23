@@ -17,21 +17,6 @@ let viewModel = can.Map.extend({
         return this.attr('instance.model');
       },
     },
-    objectParams: {
-      type: String,
-      get: function () {
-        let instance = this.attr('instance');
-        let params = {
-          section: {
-            id: instance.id,
-            title: instance.title,
-            description: instance.description,
-          },
-        };
-
-        return JSON.stringify(params);
-      },
-    },
   },
   instance: null,
   cssClasses: null,

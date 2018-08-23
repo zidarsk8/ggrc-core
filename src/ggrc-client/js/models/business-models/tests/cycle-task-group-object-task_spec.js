@@ -3,14 +3,16 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CycleTaskGroupObjectTask from '../cycle-task-group-object-task';
+import Workflow from '../workflow';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 
-describe('CMS.Models.CycleTaskGroupObjectTask', function () {
+describe('CycleTaskGroupObjectTask model', function () {
   let fakeCTModelCreator;
 
   beforeEach(function () {
     fakeCTModelCreator = makeFakeInstance({
-      model: CMS.Models.CycleTaskGroupObjectTask,
+      model: CycleTaskGroupObjectTask,
     });
   });
 
@@ -21,7 +23,7 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
     let origCycleConfig;
 
     beforeAll(function () {
-      Model = CMS.Models.CycleTaskGroupObjectTask;
+      Model = CycleTaskGroupObjectTask;
 
       // override the Task's cycle attribute config to disable the magic that
       // happens when trying to manually set a mocked Cycle on a Task instance
@@ -104,7 +106,7 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
         id: 'cycle id',
         is_current: true}];
 
-      let workflow = makeFakeInstance({model: CMS.Models.Workflow})({
+      let workflow = makeFakeInstance({model: Workflow})({
         id: 'workflow id',
         context: {
           id: 'context id',

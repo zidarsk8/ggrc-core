@@ -409,8 +409,8 @@ can.Control('CMS.Controllers.LHN_Search', {
         initial_params = {'contact_id': GGRC.current_user.id};
       }
       $.map(CMS.Models, function (model, name) {
-        if (model.attributes && model.attributes.default_lhn_filters) {
-          self.options.filter_params.attr(model.attributes.default_lhn_filters);
+        if (model.default_lhn_filters) {
+          self.options.filter_params.attr(model.default_lhn_filters);
         }
       });
       self.options.filter_params.attr(saved_filters);

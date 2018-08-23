@@ -5,6 +5,7 @@
 
 import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 import * as SnapshotUtils from '../utils/snapshot-utils';
+import Audit from '../../models/business-models/audit';
 
 describe('SnapshotUtils', function () {
   describe('isSnapshotType() method', function () {
@@ -71,7 +72,7 @@ describe('SnapshotUtils', function () {
     });
 
     beforeEach(function () {
-      makeFakeInstance({model: CMS.Models.Audit})({id: 1});
+      makeFakeInstance({model: Audit})({id: 1});
       snapshot = {
         id: 12345,
         type: 'Snapshot',
