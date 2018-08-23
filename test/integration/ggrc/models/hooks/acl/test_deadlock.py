@@ -3,8 +3,9 @@
 
 """Test deadlocks on parallel propagation requests."""
 
-import flask
 import mock
+
+import flask
 
 from ggrc import db
 from ggrc.models import all_models
