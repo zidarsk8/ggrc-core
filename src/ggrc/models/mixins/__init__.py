@@ -160,6 +160,7 @@ class Hierarchical(object):
 
   @classmethod
   def eager_query(cls):
+    """Eager query"""
     query = super(Hierarchical, cls).eager_query()
     return query.options(
         orm.subqueryload('children'),
@@ -186,6 +187,7 @@ class WithStartDate(object):
 
   @validates('start_date')
   def validate_date(self, _, value):
+    """Validator for start_date"""
     # pylint: disable=no-self-use
     return value.date() if isinstance(value, datetime.datetime) else value
 
@@ -215,6 +217,7 @@ class WithEndDate(object):
 
   @validates('end_date')
   def validate_date(self, _, value):
+    """Validator for end_date"""
     # pylint: disable=no-self-use
     return value.date() if isinstance(value, datetime.datetime) else value
 
