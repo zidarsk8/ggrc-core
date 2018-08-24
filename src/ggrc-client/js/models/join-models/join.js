@@ -5,6 +5,8 @@
 
 import RefreshQueue from '../refresh_queue';
 import Cacheable from '../cacheable';
+import Stub from '../stub';
+import {getInstance} from '../models-extensions';
 
 export default Cacheable('can.Model.Join', {
   join_keys: null,
@@ -42,15 +44,6 @@ export default Cacheable('can.Model.Join', {
     }
   },
 }, {
-  init: function () {
-    this._super(...arguments);
-    can.each(this.constructor.join_keys, function (cls, key) {
-      this.bind(key + '.stub_destroyed', function () {
-        // Trigger `destroyed` on self, since it was destroyed on the server
-        this.destroyed();
-      }.bind(this));
-    }.bind(this));
-  },
   reinit: function () {
     this.init_join_objects();
   },
@@ -65,13 +58,13 @@ export default Cacheable('can.Model.Join', {
     objectType = this[attr + '_type'] || (this[attr] || {}).type;
 
     if (objectId && objectType && typeof objectType === 'string') {
-      this.attr(attr, CMS.Models.get_instance(
+      this.attr(attr, getInstance(
         objectType,
         objectId,
         this[attr]
       ) || this[attr]);
     } else if (objectId) {
-      this.attr(attr, CMS.Models.get_instance(this[attr]));
+      this.attr(attr, getInstance(this[attr]));
     }
   },
 
@@ -81,9 +74,9 @@ export default Cacheable('can.Model.Join', {
     if (objectId) {
       this.attr(
         attr,
-        CMS.Models.get_instance(
+        new Stub(getInstance(
           modelName, objectId, this[attr]
-        ).stub() || this[attr]
+        )) || this[attr]
       );
     }
   },

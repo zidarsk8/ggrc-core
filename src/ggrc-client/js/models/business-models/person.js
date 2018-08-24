@@ -6,6 +6,7 @@
 import Cacheable from '../cacheable';
 import tracker from '../../tracker';
 import '../mixins/ca-update';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Person', {
   root_object: 'person',
@@ -34,10 +35,10 @@ export default Cacheable('CMS.Models.Person', {
   },
   is_custom_attributable: true,
   attributes: {
-    context: 'CMS.Models.Context.stub',
-    modified_by: 'CMS.Models.Person.stub',
-    language: 'CMS.Models.Option.stub',
-    user_roles: 'CMS.Models.UserRole.stubs',
+    context: Stub,
+    modified_by: Stub,
+    language: Stub,
+    user_roles: Stub.List,
     name: 'trimmed',
     email: 'trimmedLower',
   },

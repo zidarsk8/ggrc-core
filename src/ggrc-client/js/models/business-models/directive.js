@@ -8,6 +8,7 @@ import '../mixins/unique-title';
 import '../mixins/timeboxed';
 import '../mixins/ca-update';
 import '../mixins/base-notifications';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Directive', {
   root_object: 'directive',
@@ -64,8 +65,8 @@ export default Cacheable('CMS.Models.Directive', {
     }
   },
   attributes: {
-    context: 'CMS.Models.Context.stub',
-    modified_by: 'CMS.Models.Person.stub',
+    context: Stub,
+    modified_by: Stub,
   },
   init: function () {
     this.validateNonBlank('title');

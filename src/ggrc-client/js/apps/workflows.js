@@ -27,18 +27,17 @@ import CycleTaskGroupObjectTask from '../models/business-models/cycle-task-group
 import TaskGroup from '../models/business-models/task-group';
 import Workflow from '../models/business-models/workflow';
 import Person from '../models/business-models/person';
+import Stub from '../models/stub';
 
 (function ($, CMS, GGRC) {
   let WorkflowExtension = {};
   let _workflowObjectTypes = Array.prototype.concat.call(
     [],
     'Program Regulation Policy Standard Contract Clause Requirement'.split(' '),
-    'Request Control Objective OrgGroup Vendor AccessGroup'.split(' '),
+    'Control Objective OrgGroup Vendor AccessGroup'.split(' '),
     'System Process DataAsset Product Project Facility Market'.split(' '),
     'Issue Risk Threat Metric TechnologyEnvironment ProductGroup'.split(' ')
   );
-
-  let draftOnUpdateMixin;
 
   let historyWidgetCountsName = 'cycles:history';
   let currentWidgetCountsName = 'cycles:active';
@@ -96,7 +95,6 @@ import Person from '../models/business-models/person';
 
       Workflow: {
         _canonical: {
-          task_groups: 'TaskGroup',
           context: 'Context',
         },
         task_groups: Direct(
@@ -147,13 +145,12 @@ import Person from '../models/business-models/person';
 
       CycleTaskGroupObjectTask: {
         _canonical: {
-          related_objects_as_source: [
-            'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
-            'Product', 'ProductGroup', 'Project', 'System', 'Regulation',
-            'Policy', 'Contract', 'Standard', 'Program', 'Issue', 'Control',
-            'Requirement', 'Clause', 'Objective', 'Audit', 'AccessGroup',
-            'Metric', 'Risk', 'TechnologyEnvironment', 'Threat',
-          ],
+          // It is needed for an object list generation. This object list
+          // describes which objects can be mapped to CycleTaskGroupObjectTask.
+          // Types placed within this collection will be intersected
+          // with GGRC.tree_view.base_widgets_by_type["CycleTaskGroupObjectTask"]
+          // collection. The result of the operation is the total list.
+          related_objects_as_source: _workflowObjectTypes.concat('Audit'),
         },
         related_objects_as_source: Proxy(
           null,
@@ -278,8 +275,7 @@ import Person from '../models/business-models/person';
         mappings[type].workflows,
       ]);
 
-      CMS.Models[type].attributes.task_group_objects =
-        'CMS.Models.TaskGroupObject.stubs';
+      CMS.Models[type].attributes.task_group_objects = Stub.List;
     });
     new Mappings('ggrc_workflows', mappings);
   };
@@ -290,7 +286,6 @@ import Person from '../models/business-models/person';
     let pageInstance = getPageInstance();
     let treeWidgets = GGRC.tree_view.base_widgets_by_type;
     let subTrees = GGRC.tree_view.sub_tree_for;
-    let subTreeItems = ['Cycle'];
     let models = ['TaskGroup', 'Workflow', 'CycleTaskEntry',
       'CycleTaskGroupObjectTask', 'CycleTaskGroupObject', 'CycleTaskGroup'];
     _.forEach(_workflowObjectTypes, function (type) {
@@ -315,19 +310,15 @@ import Person from '../models/business-models/person';
         });
       }
     });
-    subTreeItems.concat(models).forEach(function (item) {
-      let defaults = {
-        model_list: GGRC.tree_view.basic_model_list,
-        display_list: can.Map.keys(GGRC.tree_view.base_widgets_by_type),
-      };
-      defaults.display_list.concat(models);
 
-      treeWidgets.attr(item,
-        can.Map.keys(GGRC.tree_view.base_widgets_by_type).concat(models));
+    const subTreeItems = ['Cycle'].concat(models);
+    const updatedTreeWidgets = can.Map.keys(treeWidgets).concat(models);
+
+    subTreeItems.forEach((item) => {
+      treeWidgets.attr(item, updatedTreeWidgets);
       subTrees.attr(item, {
-        display_list: defaults.display_list
-          .concat(models),
-        model_list: defaults.model_list,
+        display_list: updatedTreeWidgets,
+        model_list: GGRC.tree_view.basic_model_list,
       });
     });
 
@@ -533,20 +524,4 @@ import Person from '../models/business-models/person';
     'Dashboard.Widgets', GGRC.mustache_path + '/dashboard/widgets');
 
   WorkflowExtension.init_mappings();
-
-  draftOnUpdateMixin = can.Model.Mixin({
-  }, {
-    before_update: function () {
-      if (this.status && this.os_state === 'Approved') {
-        this.attr('status', 'Draft');
-      }
-    },
-  });
-  can.each(_workflowObjectTypes, function (modelName) {
-    let model = CMS.Models[modelName];
-    if (model === undefined || model === null) {
-      return;
-    }
-    draftOnUpdateMixin.add_to(model);
-  });
 })(window.can.$, window.CMS, window.GGRC);

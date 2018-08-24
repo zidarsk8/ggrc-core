@@ -11,14 +11,10 @@ export default can.Component.extend({
     define: {
       objectTypes: {
         get: function () {
-          let self = this;
           let objectTypes = Mappings
-            .getMappingTypes('AssessmentTemplate', [], ['Issue']);
-          // remove ignored types and sort the rest
+            .groupTypes(GGRC.config.snapshotable_objects);
+
           _.forEach(objectTypes, function (objGroup) {
-            objGroup.items = _.filter(objGroup.items, function (item) {
-              return !self.getNonRelevantObjectTypes()[item.value];
-            });
             objGroup.items = _.sortBy(objGroup.items, 'name');
           });
 
@@ -33,16 +29,5 @@ export default can.Component.extend({
     },
     assessmentType: '',
     instance: {},
-    getNonRelevantObjectTypes: function () {
-      return Object.freeze({
-        AssessmentTemplate: true,
-        Assessment: true,
-        Audit: true,
-        CycleTaskGroupObjectTask: true,
-        TaskGroup: true,
-        TaskGroupTask: true,
-        Workflow: true,
-      });
-    },
   },
 });

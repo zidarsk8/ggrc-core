@@ -4,8 +4,9 @@
 */
 
 import {getPageInstance} from '../plugins/utils/current-page-utils';
+import {getInstance} from '../models/models-extensions';
 
-;(function (can, $, GGRC, CMS) {
+(function (can, $, GGRC, CMS) {
   GGRC.register_modal_hook('approvalform', function ($target, $trigger, option) {
     let instance;
     let object_params = JSON.parse($trigger.attr('data-object-params') || '{}');
@@ -13,7 +14,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
     if($trigger.attr('data-object-id') === 'page') {
       instance = getPageInstance();
     } else {
-      instance = CMS.Models.get_instance(
+      instance = getInstance(
         $trigger.data('object-singular'),
         $trigger.attr('data-object-id')
       );

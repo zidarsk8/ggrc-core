@@ -14,6 +14,7 @@ import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import '../mixins/contactable';
 import '../mixins/timeboxed';
 import '../mixins/access-control-list';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.TaskGroupTask', {
   root_object: 'task_group_task',
@@ -30,9 +31,9 @@ export default Cacheable('CMS.Models.TaskGroupTask', {
     base: 'task_group:workflow',
   },
   attributes: {
-    context: 'CMS.Models.Context.stub',
-    modified_by: 'CMS.Models.Person.stub',
-    task_group: 'CMS.Models.TaskGroup.stub',
+    context: Stub,
+    modified_by: Stub,
+    task_group: Stub,
   },
   tree_view_options: {
     attr_view: GGRC.mustache_path +

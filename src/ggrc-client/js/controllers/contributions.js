@@ -8,6 +8,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
 import Role from '../models/service-models/role';
 import Person from '../models/business-models/person';
 import UserRole from '../models/join-models/user-role';
+import Stub from '../models/stub';
 
 /* Role Assignment Modal Selector
   *
@@ -160,10 +161,6 @@ const userRolesModalSelector = can.Control.extend({
     self.active_list.replace(
       can.map(self.join_list, function (join) {
         return new can.Observe({
-          option: CMS.Models.get_instance(
-            CMS.Models.get_link_type(join, self.options.option_attr),
-            join[self.options.option_attr].id
-          ),
           join: join,
         });
       }));
@@ -419,7 +416,7 @@ function getOptionSet(name, data) {
     if (!context) {
       throw new Error('`context` is required for Assignments model');
     }
-    context = context.stub();
+    context = new Stub(context);
     extraJoinQuery = {context_id: context.id};
   } else {
     context = {id: null};

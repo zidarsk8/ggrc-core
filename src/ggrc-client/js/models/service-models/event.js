@@ -4,6 +4,7 @@
 */
 
 import Cacheable from '../cacheable';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Event', {
   root_object: 'event',
@@ -15,6 +16,6 @@ export default Cacheable('CMS.Models.Event', {
     },
   },
   attributes: {
-    modified_by: 'CMS.Models.Person.stub',
+    modified_by: Stub,
   },
 }, {});

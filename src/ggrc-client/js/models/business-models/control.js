@@ -12,6 +12,7 @@ import '../mixins/base-notifications';
 import '../mixins/proposable';
 import '../mixins/assertions-categories';
 import '../mixins/related-assessments-loader';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Control', {
   root_object: 'control',
@@ -35,11 +36,11 @@ export default Cacheable('CMS.Models.Control', {
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {
-    context: 'CMS.Models.Context.stub',
-    modified_by: 'CMS.Models.Person.stub',
-    kind: 'CMS.Models.Option.stub',
-    means: 'CMS.Models.Option.stub',
-    verify_frequency: 'CMS.Models.Option.stub',
+    context: Stub,
+    modified_by: Stub,
+    kind: Stub,
+    means: Stub,
+    verify_frequency: Stub,
   },
   links_to: {},
   defaults: {

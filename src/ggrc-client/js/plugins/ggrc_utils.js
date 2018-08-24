@@ -316,7 +316,6 @@ function allowedToMap(source, target, options) {
     twoWay: Object.freeze({
       'audit program': true,
       'audit request': true,
-      'assessmenttemplate cacheable': true,
       'cacheable person': true,
       'person risk': true,
       'person threat': true,

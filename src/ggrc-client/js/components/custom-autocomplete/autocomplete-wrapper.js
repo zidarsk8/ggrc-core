@@ -12,6 +12,7 @@ import {
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import RefreshQueue from '../../models/refresh_queue';
+import {getInstance} from '../../models/models-extensions';
 
 export default can.Map.extend({
   currentValue: '',
@@ -54,7 +55,7 @@ export default can.Map.extend({
     let model = CMS.Models[objName];
 
     let res = can.map(ids, function (id) {
-      return CMS.Models.get_instance(model.shortName, id);
+      return getInstance(model.shortName, id);
     });
 
     return new can.Deferred().resolve(res);
