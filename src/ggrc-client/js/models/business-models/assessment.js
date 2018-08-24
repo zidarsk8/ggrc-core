@@ -19,7 +19,7 @@ import '../mixins/access-control-list';
 import '../mixins/refetch-hash';
 import '../mixins/assessment-issue-tracker';
 import '../mixins/related-assessments-loader';
-import {getInstance} from '../models-extensions';
+import {getInstance} from '../../plugins/utils/models-utils';
 
 export default Cacheable('CMS.Models.Assessment', {
   root_object: 'assessment',

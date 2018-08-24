@@ -8,7 +8,7 @@ import {makeFakeInstance} from '../../js_specs/spec_helpers';
 import * as CurrentPageUtils from '../plugins/utils/current-page-utils';
 import UserRole from '../models/join-models/user-role';
 import Audit from '../models/business-models/audit';
-import {getInstance} from '../models/models-extensions';
+import {getInstance} from '../plugins/utils/models-utils';
 
 describe('Permission', function () {
   describe('_admin_permission_for_context() method', function () {

@@ -50,7 +50,7 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
 import Person from '../../models/business-models/person';
 import Assessment from '../../models/business-models/assessment';
 import Stub from '../../models/stub';
-import {getInstance} from '../../models/models-extensions';
+import {getInstance} from '../../plugins/utils/models-utils';
 
 export default can.Control({
   pluginName: 'ggrc_controllers_modals',

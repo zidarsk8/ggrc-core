@@ -6,7 +6,6 @@
 import './mappers';
 import './save_queue';
 import './stub';
-import './models-extensions';
 
 import './business-models';
 import './join-models';

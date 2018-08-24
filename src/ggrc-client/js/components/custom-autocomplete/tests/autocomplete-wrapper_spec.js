@@ -6,7 +6,7 @@
 import baseAutocompleteWrapper from '../autocomplete-wrapper';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 import RefreshQueue from '../../../models/refresh_queue';
-import {getInstance} from '../../../models/models-extensions';
+import {getInstance} from '../../../plugins/utils/models-utils';
 
 describe('autocomplete-wrapper viewModel', () => {
   let viewModel;
