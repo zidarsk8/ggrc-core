@@ -8,19 +8,19 @@ import sqlalchemy as sa
 
 from ggrc import db
 from ggrc import builder
+from ggrc.access_control import roleable
+from ggrc.login import get_current_user
 from ggrc.models import mixins
 from ggrc.models import utils as model_utils
 from ggrc.models import reflection
-
 from ggrc.models.mixins import issue_tracker
-from ggrc.fulltext import mixin as ft_mixin
-from ggrc.access_control import roleable
-
-from ggrc.models.mixins.before_flush_handleable import BeforeFlushHandleable
+from ggrc.models.mixins import rest_handable
 from ggrc.models.relationship import Relatable
+from ggrc.fulltext import mixin as ft_mixin
 
 
-class Reviewable(object):
+class Reviewable(rest_handable.WithPutHandable,
+                 rest_handable.WithRelationshipsHandable):
   """Mixin to setup object as reviewable."""
 
   # REST properties
@@ -75,12 +75,43 @@ class Reviewable(object):
     out_json["review_status"] = self.review_status
     return out_json
 
+  ATTRS_TO_IGNORE = {"review", "updated_at", "modified_by_id", "slug"}
+
+  def _update_status_on_attr(self):
+    """Update review status when reviewable attrs are changed"""
+    from ggrc.models import all_models
+    if (self.review and
+            self.review.status != all_models.Review.STATES.UNREVIEWED):
+      changed = {a.key for a in db.inspect(self).attrs
+                 if a.history.has_changes()}
+
+      if changed - self.ATTRS_TO_IGNORE:
+        self.review.status = all_models.Review.STATES.UNREVIEWED
+
+  def _update_status_on_mapping(self, counterparty):
+    """Update review status on mapping to reviewable"""
+    from ggrc.snapshotter.rules import Types
+    from ggrc.models import all_models
+    if self.review_status != all_models.Review.STATES.UNREVIEWED:
+      if counterparty.type in Types.all:
+        self.review.status = all_models.Review.STATES.UNREVIEWED
+
+  def handle_put(self):
+    self._update_status_on_attr()
+
+  def handle_relationship_post(self, counterparty):
+    self._update_status_on_mapping(counterparty)
+
+  def handle_relationship_delete(self, counterparty):
+    self._update_status_on_mapping(counterparty)
+
 
 class Review(mixins.person_relation_factory("last_reviewed_by"),
              mixins.person_relation_factory("created_by"),
              mixins.datetime_mixin_factory("last_reviewed_at"),
              mixins.Stateful,
-             BeforeFlushHandleable,
+             rest_handable.WithPostHandable,
+             rest_handable.WithPutHandable,
              roleable.Roleable,
              issue_tracker.IssueTracked,
              Relatable,
@@ -91,6 +122,11 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
   """Review object"""
   # pylint: disable=too-few-public-methods
   __tablename__ = "reviews"
+
+  def __init__(self, *args, **kwargs):
+    super(Review, self).__init__(*args, **kwargs)
+    self.last_reviewed_by = None
+    self.last_reviewed_at = None
 
   class STATES(object):
     """Review states container """
@@ -143,9 +179,11 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
       "reviewable_type",
   ]
 
-  def handle_before_flush(self):
-    """Override with custom handling"""
+  def handle_post(self):
     self._create_relationship()
+    self._update_new_reviewed_by()
+
+  def handle_put(self):
     self._update_reviewed_by()
 
   def _create_relationship(self):
@@ -155,6 +193,13 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
       db.session.add(
           all_models.Relationship(source=self.reviewable, destination=self)
       )
+
+  def _update_new_reviewed_by(self):
+    """When create new review with state REVIEWED set last_reviewed_by"""
+    from ggrc.models import all_models
+    if self.status == all_models.Review.STATES.REVIEWED:
+      self.last_reviewed_by = get_current_user()
+      self.last_reviewed_at = datetime.datetime.now()
 
   def _update_reviewed_by(self):
     """Update last_reviewed_by, last_reviewed_at"""
