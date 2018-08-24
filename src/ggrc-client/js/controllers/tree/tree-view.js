@@ -42,7 +42,6 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
       is_subtree: false,
       subTreeElementsLimit: 20,
       limitDeepOfTree: 2,
-      disable_lazy_loading: true,
     },
     do_not_propagate: [
       'header_view',
@@ -64,9 +63,6 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
         this._super(el);
       }
 
-      if (typeof (opts.model) === 'string') {
-        opts.model = CMS.Models[opts.model];
-      }
       optionsProperty = opts.options_property || defaults.options_property;
       defaultOptions = opts.model[optionsProperty] || {};
 
@@ -129,11 +125,6 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
         } else {
           this.options.attr('allow_mapping_or_creating',
             this.options.allow_mapping || this.options.allow_creating);
-        }
-
-        if (this.element.parent().length === 0 || // element not attached
-          this.element.data('disable-lazy-loading')) { // comment list
-          this.options.disable_lazy_loading = true;
         }
 
         this.options.update_count =
@@ -344,156 +335,6 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
       original._child_options_prepared = v;
       return v;
     },
-    el_position: function (el) {
-      let se = this.options.scroll_element;
-      let seO = se.offset().top;
-      let seH = se.outerHeight();
-      let elO;
-      let elH;
-      let aboveTop;
-      let belowBottom;
-      if (!(el instanceof jQuery)) {
-        el = $(el);
-      }
-      if (!el.offset()) {
-        return 0;
-      }
-      elO = el.offset().top;
-      elH = el.outerHeight();
-      aboveTop = (elO + elH - seO) / seH;
-      belowBottom = (elO - seO) / seH - 1;
-      if (aboveTop < 0) {
-        return aboveTop;
-      } else if (belowBottom > 0) {
-        return belowBottom;
-      }
-      return 0;
-    },
-    draw_visible_call_count: 0,
-    draw_visible: _.debounce(function () {
-      let MAX_STEPS = 100;
-      let elPosition;
-      let children;
-      let lo;
-      let hi;
-      let max;
-      let steps;
-      let visible;
-      let alreadyVisible;
-      let toRender;
-      let i;
-      let control;
-      let index;
-      let pageCount;
-      let mid;
-      let pos;
-      let options = this.options;
-
-      if (options.disable_lazy_loading ||
-        !this.element ||
-        options.attr('drawingItems')) {
-        return;
-      }
-
-      elPosition = this.el_position.bind(this);
-      children = options.attr('filteredList') || [];
-
-      if (!children.length || !children[0].element) {
-        return;
-      }
-
-      lo = 0;
-      hi = children.length - 1;
-      max = hi;
-      steps = 0;
-      visible = [];
-      toRender = [];
-
-      alreadyVisible = _.filter(children, function (child) {
-        return !child.options.attr('isPlaceholder');
-      });
-
-      while (steps < MAX_STEPS && lo < hi) {
-        steps += 1;
-        mid = (lo + hi) / 2 | 0;
-        pos = elPosition(children[mid].element);
-        if (pos < 0) {
-          lo = mid;
-          continue;
-        }
-        if (pos > 0) {
-          hi = mid;
-          continue;
-        }
-        lo = mid;
-        hi = mid;
-      }
-      pageCount = options.scroll_page_count;
-      while (lo > 0 && elPosition(children[lo - 1].element) >= (-pageCount)) {
-        lo -= 1;
-      }
-      while (hi < max && elPosition(children[hi + 1].element) <= pageCount) {
-        hi += 1;
-      }
-
-      _.forEach(alreadyVisible, function (control) {
-        if (!control) {
-          return;
-        }
-        if (Math.abs(elPosition(control.element)) <= pageCount) {
-          visible.push(control);
-        } else {
-          control.draw_placeholder();
-        }
-      });
-
-      for (i = lo; i <= hi; i++) {
-        index = this._is_scrolling_up ? (hi - (i - lo)) : i;
-        control = children[index];
-        if (!control) {
-          // TODO this should not be necessary
-          // draw_visible is called too soon when controllers are not yet
-          // available and then again when they are. Remove the too soon
-          // invocation and this continue can be dropped too.
-          continue;
-        }
-        if (!_.includes(visible, control)) {
-          visible.push(control);
-          toRender.push(control);
-        }
-      }
-      this.renderStep(toRender, ++this.draw_visible_call_count);
-    }, 100, {leading: true}),
-    renderStep: function (toRender, count) {
-      // If there is nothing left to render or if draw_visible was run while
-      // rendering we simply terminate.
-      if (toRender.length === 0 || this.draw_visible_call_count > count) {
-        return;
-      }
-      toRender[0].draw_node();
-      setTimeout(function () {
-        this.renderStep(toRender.slice(1), count);
-      }.bind(this), 0);
-    },
-    _last_scroll_top: 0,
-
-    _is_scrolling_up: false,
-
-    '{scroll_element} scroll': function (el, ev) {
-      this._is_scrolling_up = this._last_scroll_top > el.scrollTop();
-      this._last_scroll_top = el.scrollTop();
-      this.draw_visible();
-    },
-
-    '{scroll_element} resize': function (el, ev) {
-      setTimeout(this.draw_visible.bind(this), 0);
-    },
-
-    '.tree-item-placeholder click': function (el, ev) {
-      let node = el.control();
-      node.draw_node();
-      node.select();
-    },
 
     '{original_list} remove': function (list, ev, removedItems, index) {
       let removedItemsIds = removedItems.map((remItem) => {
@@ -619,9 +460,6 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
       items = _.map(items, function (options) {
         let control;
         let elem = document.createElement('li');
-        if (this.options.disable_lazy_loading) {
-          options.disable_lazy_loading = true;
-        }
         control = new CMS.Controllers.TreeViewNode(elem, options);
         drawItemsDfds.push(control._draw_node_deferred);
         filteredItems.push(control);
@@ -638,10 +476,6 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
       }
       this.options.attr('filteredList', filteredItems);
       res = $.when(...drawItemsDfds);
-
-      res.then(function () {
-        _.defer(this.draw_visible.bind(this));
-      }.bind(this));
       return res;
     },
 
@@ -674,7 +508,6 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
         return;
       }
       this._draw_list_deferred = false;
-      this._is_scrolling_up = false;
       this.find_all_deferred = false;
       this.options.list.replace([]);
       this.draw_list(this.options.original_list, forceReload);
@@ -682,7 +515,7 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
     },
 
     clearList: function () {
-      this.element.children('.tree-item, .tree-item-placeholder').remove();
+      this.element.children('.tree-item').remove();
     },
   });
 })(window.can, window.$);
