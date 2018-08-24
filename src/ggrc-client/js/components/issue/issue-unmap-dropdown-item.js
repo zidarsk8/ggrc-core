@@ -17,11 +17,6 @@ export default can.Component.extend({
             this.attr('instance.type') === 'Issue';
         },
       },
-      visibleIssueUnmap: {
-        get: function () {
-          return this.attr('page_instance.type') !== 'Person';
-        },
-      },
       denyUnmap: {
         get: function () {
           return (this.attr('page_instance.type') === 'Audit'

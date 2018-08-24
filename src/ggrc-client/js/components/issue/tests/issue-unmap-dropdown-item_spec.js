@@ -34,20 +34,6 @@ describe('issue-unmap-dropdown-item component', function () {
         });
     });
 
-    describe('visibleIssueUnmap get() method', function () {
-      it('returns true if page_instance.type does not equal to "Person" ' +
-      'string', function () {
-        viewModel.attr('page_instance.type', 'Type');
-        expect(viewModel.attr('visibleIssueUnmap')).toBe(true);
-      });
-
-      it('returns false if page_instance.type equals to "Person" string',
-        function () {
-          viewModel.attr('page_instance.type', 'Person');
-          expect(viewModel.attr('visibleIssueUnmap')).toBe(false);
-        });
-    });
-
     describe('denyUnmap get() method', function () {
       it('returns true if page_instance.type equals to "Audit" and' +
       'instance.allow_unmap_from_audit is false', function () {
