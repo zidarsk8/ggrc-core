@@ -32,6 +32,7 @@ import {
 import Option from './models/service-models/option';
 import Search from './models/service-models/search';
 import Person from './models/business-models/person';
+import modalModels from './models/modal-models';
 
 // Chrome likes to cache AJAX requests for Mustaches.
 let mustacheUrls = {};
@@ -1265,7 +1266,7 @@ Mustache.registerHelper('with_model_as',
   function (varName, modelName, options) {
     let frame = {};
     modelName = resolveComputed(Mustache.resolve(modelName));
-    frame[varName] = CMS.Models[modelName];
+    frame[varName] = modalModels[modelName];
     return options.fn(options.contexts.add(frame));
   });
 
@@ -1286,7 +1287,7 @@ Mustache.registerHelper('if_instance_of', function (inst, cls, options) {
 
   if (typeof cls === 'string') {
     cls = cls.split('|').map(function (cl) {
-      return CMS.Models[cl];
+      return modalModels[cl];
     });
   } else if (typeof cls !== 'function') {
     cls = [cls.constructor];
