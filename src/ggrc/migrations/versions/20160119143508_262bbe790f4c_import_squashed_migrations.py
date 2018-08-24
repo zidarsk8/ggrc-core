@@ -16,7 +16,7 @@ git reset HEAD bin/db_reset
 all_modules=$GGRC_SETTINGS_MODULE
 export GGRC_SETTINGS_MODULE="development"  # enable only the ggrc module
 db_reset
-mysqldump -uroot -proot ggrcdev > ggrcdev_ggrc.sql
+mysqldump -uroot -proot ggrcdev > ggrcdev.sql
 export GGRC_SETTINGS_MODULE=all_modules
 git checkout bin/db_reset
 git checkout -
@@ -54,7 +54,7 @@ down_revision = None
 def upgrade():
   """Import squashed migrations."""
   dirname = os.path.dirname(os.path.realpath(__file__))
-  dump_file = os.path.join(dirname, "ggrcdev_ggrc.sql")
+  dump_file = os.path.join(dirname, "ggrcdev.sql")
   dump = open(dump_file, "r")
   op.execute(dump.read())
 
