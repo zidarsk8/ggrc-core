@@ -9,7 +9,7 @@ import {
   makeFakeModel,
 } from '../spec_helpers';
 import CustomAttributeObject from '../../js/plugins/utils/custom-attribute/custom-attribute-object';
-import * as modelUtils from '../../js/plugins/utils/models-utils';
+import * as pendingJoins from '../../js/models/pending-joins';
 import Mixin from '../../js/models/mixins/mixin';
 
 describe('Cacheable model', function () {
@@ -133,14 +133,14 @@ describe('Cacheable model', function () {
 
     it('calls resolveDeferredBindings after send success', function (done) {
       let obj = _obj;
-      spyOn(modelUtils, 'resolveDeferredBindings')
+      spyOn(pendingJoins, 'resolveDeferredBindings')
         .and
         .returnValue(obj);
       spyOn(can, 'ajax').and.returnValue($.when({dummy_model: {id: obj.id}}));
       DummyModel
         .update(obj.id, obj.serialize())
         .then(function () {
-          expect(modelUtils.resolveDeferredBindings)
+          expect(pendingJoins.resolveDeferredBindings)
             .toHaveBeenCalledWith(obj);
           setTimeout(done, 10);
         }, failAll(done));

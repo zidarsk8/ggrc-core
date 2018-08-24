@@ -12,7 +12,7 @@ import {
 } from '../plugins/utils/snapshot-utils';
 import {
   resolveDeferredBindings,
-} from '../plugins/utils/models-utils';
+} from './pending-joins';
 import resolveConflict from './conflict-resolution/conflict-resolution';
 import PersistentNotifier from '../plugins/persistent_notifier';
 import RefreshQueue from './refresh_queue';

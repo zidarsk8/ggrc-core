@@ -8,7 +8,7 @@ import {
 } from '../plugins/utils/snapshot-utils';
 import {
   handlePendingJoins,
-} from '../plugins/utils/models-utils';
+} from '../models/pending-joins';
 import Mappings from '../models/mappers/mappings';
 import * as businessModels from '../models/business-models';
 

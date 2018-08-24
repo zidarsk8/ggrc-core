@@ -4,7 +4,7 @@
 */
 
 import tracker from '../tracker';
-import {resolveDeferredBindings} from '../plugins/utils/models-utils';
+import {resolveDeferredBindings} from './pending-joins';
 import BackgroundTask from '../models/service-models/background-task';
 
 (function (can, $) {
