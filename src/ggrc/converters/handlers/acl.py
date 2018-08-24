@@ -54,6 +54,8 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
     list_new = set(self.value)
     self._add_people(list_new - list_old)
     self._remove_people(list_old - list_new)
+    if hasattr(self.row_converter.obj, 'validate_acl'):
+      self.row_converter.obj.validate_acl()
 
   def get_value(self):
     """Get list of emails for people with the current AC role."""
