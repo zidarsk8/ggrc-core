@@ -10,6 +10,7 @@ import {
   isConnectionLost,
   handleAjaxError,
   getAjaxErrorInfo,
+  isExpectedError,
 } from './utils/errors-utils';
 import tracker from '../tracker';
 
@@ -137,9 +138,7 @@ can.ajax = $.ajax = function (options) {
 };
 
 $(document).ajaxError(function (event, jqxhr, settings, exception) {
-  let isExpectedError = jqxhr.getResponseHeader('X-Expected-Error');
-
-  if (!isExpectedError) {
+  if (!isExpectedError(jqxhr)) {
     tracker.trackError(getAjaxErrorInfo(jqxhr, exception));
   }
 

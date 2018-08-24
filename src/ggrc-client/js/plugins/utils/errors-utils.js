@@ -13,10 +13,12 @@ function isConnectionLost() {
   return !navigator.onLine;
 }
 
-function handleAjaxError(jqxhr, errorThrown = '') {
-  let isExpectedError = jqxhr.getResponseHeader('X-Expected-Error');
+function isExpectedError(jqxhr) {
+  return !!jqxhr.getResponseHeader('X-Expected-Error');
+}
 
-  if (!isExpectedError) {
+function handleAjaxError(jqxhr, errorThrown = '') {
+  if (!isExpectedError(jqxhr)) {
     let response = jqxhr.responseJSON;
 
     if (!response) {
@@ -80,6 +82,7 @@ function getAjaxErrorInfo(jqxhr, errorThrown = '') {
 
 export {
   isConnectionLost,
+  isExpectedError,
   handleAjaxError,
   getAjaxErrorInfo,
 };
