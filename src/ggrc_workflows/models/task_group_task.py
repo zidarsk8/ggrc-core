@@ -8,6 +8,7 @@ import datetime
 
 from sqlalchemy import orm
 from sqlalchemy import schema
+from sqlalchemy.ext import hybrid
 
 from ggrc import db
 from ggrc.access_control import roleable, role
@@ -17,11 +18,13 @@ from ggrc.login import get_current_user
 from ggrc.models import mixins
 from ggrc.models.types import JsonType
 from ggrc.models import reflection
+from ggrc.models import relationship
 from ggrc_workflows.models.task_group import TaskGroup
 from ggrc.models.mixins import base
 
 
 class TaskGroupTask(roleable.Roleable,
+                    relationship.Relatable,
                     mixins.Titled,
                     mixins.Described,
                     base.ContextRBAC,
@@ -62,6 +65,22 @@ class TaskGroupTask(roleable.Roleable,
 
   response_options = db.Column(
       JsonType(), nullable=False, default=[])
+
+  # This parameter is overridden by workflow backref, but is here to ensure
+  # pylint does not complain
+  _task_group = None
+
+  @hybrid.hybrid_property
+  def task_group(self):
+    """Getter for task group foreign key."""
+    return self._task_group
+
+  @task_group.setter
+  def task_group(self, task_group):
+    """Setter for task group foreign key."""
+    if not self._task_group and task_group:
+      relationship.Relationship(source=task_group, destination=self)
+    self._task_group = task_group
 
   TEXT = 'text'
   MENU = 'menu'

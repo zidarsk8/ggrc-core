@@ -265,7 +265,6 @@ class TestExternalRelationship(TestCase):
       system = factories.SystemFactory()
 
     rel = self.create_relationship(product, system, False, self.person_ext)
-
     response = self.api.delete(rel)
     self.assert400(response)
     self.assertEqual(

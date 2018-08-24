@@ -5,6 +5,7 @@
 
 
 from sqlalchemy import or_
+from sqlalchemy.ext import hybrid
 
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
@@ -16,13 +17,22 @@ from ggrc.models.mixins import (
 )
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models import reflection
+from ggrc.models import relationship
 from ggrc.models import all_models
 from ggrc.models.mixins import base
 from ggrc_workflows.models.task_group_object import TaskGroupObject
 
 
-class TaskGroup(roleable.Roleable, WithContact, Timeboxed, Described,
-                Titled, base.ContextRBAC, Slugged, Indexed, db.Model):
+class TaskGroup(roleable.Roleable,
+                relationship.Relatable,
+                WithContact,
+                Timeboxed,
+                Described,
+                Titled,
+                base.ContextRBAC,
+                Slugged,
+                Indexed,
+                db.Model):
   """Workflow TaskGroup model."""
 
   __tablename__ = 'task_groups'
@@ -36,13 +46,13 @@ class TaskGroup(roleable.Roleable, WithContact, Timeboxed, Described,
   lock_task_order = db.Column(db.Boolean(), nullable=True)
 
   task_group_objects = db.relationship(
-      'TaskGroupObject', backref='task_group', cascade='all, delete-orphan')
+      'TaskGroupObject', backref='_task_group', cascade='all, delete-orphan')
 
   objects = association_proxy(
       'task_group_objects', 'object', 'TaskGroupObject')
 
   task_group_tasks = db.relationship(
-      'TaskGroupTask', backref='task_group', cascade='all, delete-orphan')
+      'TaskGroupTask', backref='_task_group', cascade='all, delete-orphan')
 
   cycle_task_groups = db.relationship(
       'CycleTaskGroup', backref='task_group')
@@ -82,6 +92,22 @@ class TaskGroup(roleable.Roleable, WithContact, Timeboxed, Described,
           "filter_by": "_filter_by_objects",
       },
   }
+
+  # This parameter is overridden by workflow backref, but is here to ensure
+  # pylint does not complain
+  _workflow = None
+
+  @hybrid.hybrid_property
+  def workflow(self):
+    """Getter for workflow foreign key."""
+    return self._workflow
+
+  @workflow.setter
+  def workflow(self, workflow):
+    """Setter for workflow foreign key."""
+    if not self._workflow and workflow:
+      all_models.Relationship(source=workflow, destination=self)
+    self._workflow = workflow
 
   def ensure_assignee_is_workflow_member(self):  # pylint: disable=invalid-name
     """Add Workflow Member role to user without role in scope of Workflow."""
