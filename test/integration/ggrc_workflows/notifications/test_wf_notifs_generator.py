@@ -89,6 +89,26 @@ class TestWfNotifsGenerator(TestCase):
                                            "cycle_task_overdue",
                                            "cycle_task_declined")
 
+  def test_ctasks_notifs_generator_daily_digest_called_twice(self):
+    """No duplicated notifications should be generated"""
+    with freeze_time("2015-05-01 14:29:00"):
+      generate_cycle_tasks_notifs(date(2015, 5, 1))
+      self.assert_notifications_for_object(self.cycle, "manual_cycle_created")
+      self.assert_notifications_for_object(self.ctask,
+                                           "manual_cycle_created",
+                                           "cycle_task_due_in",
+                                           "cycle_task_due_today",
+                                           "cycle_task_overdue")
+
+      # Move task to Finished
+      self.wf_generator.modify_object(
+          self.ctask, data={"status": "Verified"})
+      generate_cycle_tasks_notifs(date(2015, 5, 1))
+      generate_cycle_tasks_notifs(date(2015, 5, 1))
+      self.assert_notifications_for_object(self.cycle,
+                                           "all_cycle_tasks_completed",
+                                           "manual_cycle_created")
+
   def test_ctasks_notifs_generator_cron_job(self):
     """Test cycle tasks notifications generation cron job."""
     with freeze_time("2015-05-2 08:00:00"):

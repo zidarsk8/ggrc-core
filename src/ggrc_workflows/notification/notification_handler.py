@@ -88,15 +88,22 @@ def done_tasks_notify(tasks, day):
 
   done_cycles = [cycle for cycle, cycle_tasks in cycle_tasks_dict.iteritems()
                  if all(task.is_done for task in cycle_tasks)]
-  pusher.get_notification_query(
+
+  # this filtration is required for correct work of
+  # '/admin/generate_wf_tasks_notifications' endpoint
+  existing_notifications = pusher.get_notification_query(
       *done_cycles,
       **{"notification_names": ["all_cycle_tasks_completed"]}
-  ).delete(
-      synchronize_session=False
-  )
+  ).all()
+  cycles_with_notifications_ids = [notif.object_id
+                                   for notif in existing_notifications]
+  done_cycles_without_notifs = [cycle for cycle in done_cycles
+                                if cycle.id not in
+                                cycles_with_notifications_ids]
+
   pusher.create_notifications_for_objects("all_cycle_tasks_completed",
                                           datetime.date.today(),
-                                          *done_cycles,
+                                          *done_cycles_without_notifs,
                                           day=day)
 
 
