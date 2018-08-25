@@ -53,7 +53,7 @@ def handle_workflow_modify(sender, obj=None, src=None, service=None):
       pusher.push(task, notif_type, task.start_date)
 
 
-def done_tasks_notify(tasks):
+def done_tasks_notify(tasks, day):
   """Notification handling for tasks that moved in done state.
 
   It will
@@ -96,10 +96,11 @@ def done_tasks_notify(tasks):
   )
   pusher.create_notifications_for_objects("all_cycle_tasks_completed",
                                           datetime.date.today(),
-                                          *done_cycles)
+                                          *done_cycles,
+                                          day=day)
 
 
-def not_done_tasks_notify(tasks):
+def not_done_tasks_notify(tasks, day):
   """Notification handling for tasks that moved to active state.
 
   It will
@@ -118,13 +119,14 @@ def not_done_tasks_notify(tasks):
         synchronize_session=False
     )
   # recreate notifications if it's necessary
-  for obj in tasks:
+  for task in tasks:
     pusher.update_or_create_notifications(
-        obj,
-        obj.end_date,
-        get_notif_name_by_wf(obj.cycle.workflow),
+        task,
+        task.end_date,
+        get_notif_name_by_wf(task.cycle.workflow),
         "cycle_task_due_today",
-        "cycle_task_overdue"
+        "cycle_task_overdue",
+        day=day
     )
 
 

@@ -329,8 +329,8 @@ def generate_cycle_tasks_notifs(day=None):
         done_tasks.append(obj)
       else:
         not_done_tasks.append(obj)
-    done_tasks_notify(done_tasks)
-    not_done_tasks_notify(not_done_tasks)
+    done_tasks_notify(done_tasks, day)
+    not_done_tasks_notify(not_done_tasks, day)
     db.session.commit()
 
 

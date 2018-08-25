@@ -34,8 +34,6 @@ class TestWfNotifsGenerator(TestCase):
     self.object_generator = ObjectGenerator()
     Notification.query.delete()
 
-  def test_ctasks_notifs_generator(self):
-    """Test cycle tasks notifications generation job."""
     with freeze_time("2015-05-01 14:29:00"):
       wf_slug = "wf1"
       with factories.single_commit():
@@ -50,13 +48,16 @@ class TestWfNotifsGenerator(TestCase):
       data = workflow_api.get_cycle_post_dict(wf)
       self.api.post(all_models.Cycle, data)
       wf = all_models.Workflow.query.filter_by(slug=wf_slug).one()
-      cycle = all_models.Cycle.query.filter_by(workflow_id=wf.id).one()
-      ctask = all_models.CycleTaskGroupObjectTask.query.filter_by(
-          cycle_id=cycle.id).first()
+      self.cycle = all_models.Cycle.query.filter_by(workflow_id=wf.id).one()
+      self.ctask = all_models.CycleTaskGroupObjectTask.query.filter_by(
+          cycle_id=self.cycle.id).first()
 
+  def test_ctasks_notifs_generator_daily_digest(self):
+    """Test cycle tasks notifications generation job."""
+    with freeze_time("2015-05-01 14:29:00"):
       generate_cycle_tasks_notifs(date(2015, 5, 1))
-      self.assert_notifications_for_object(cycle, "manual_cycle_created")
-      self.assert_notifications_for_object(ctask,
+      self.assert_notifications_for_object(self.cycle, "manual_cycle_created")
+      self.assert_notifications_for_object(self.ctask,
                                            "manual_cycle_created",
                                            "cycle_task_due_in",
                                            "cycle_task_due_today",
@@ -64,25 +65,37 @@ class TestWfNotifsGenerator(TestCase):
 
       # Move task to Finished
       self.wf_generator.modify_object(
-          ctask, data={"status": "Verified"})
+          self.ctask, data={"status": "Verified"})
       generate_cycle_tasks_notifs(date(2015, 5, 1))
-      self.assert_notifications_for_object(cycle, "all_cycle_tasks_completed",
+      self.assert_notifications_for_object(self.cycle,
+                                           "all_cycle_tasks_completed",
                                            "manual_cycle_created")
 
       # Undo finish
       self.wf_generator.modify_object(
-          ctask, data={"status": "In Progress"})
+          self.ctask, data={"status": "In Progress"})
       generate_cycle_tasks_notifs(date(2015, 5, 1))
-      self.assert_notifications_for_object(cycle, "manual_cycle_created")
-      self.assert_notifications_for_object(ctask,
+      self.assert_notifications_for_object(self.cycle, "manual_cycle_created")
+      self.assert_notifications_for_object(self.ctask,
                                            "cycle_task_due_in",
                                            "cycle_task_due_today",
                                            "cycle_task_overdue")
 
       self.wf_generator.modify_object(
-          ctask, data={"status": "Declined"})
-      self.assert_notifications_for_object(ctask,
+          self.ctask, data={"status": "Declined"})
+      self.assert_notifications_for_object(self.ctask,
                                            "cycle_task_due_in",
                                            "cycle_task_due_today",
                                            "cycle_task_overdue",
                                            "cycle_task_declined")
+
+  def test_ctasks_notifs_generator_cron_job(self):
+    """Test cycle tasks notifications generation cron job."""
+    with freeze_time("2015-05-2 08:00:00"):
+      generate_cycle_tasks_notifs()
+      self.assert_notifications_for_object(self.cycle, "manual_cycle_created")
+      self.assert_notifications_for_object(self.ctask,
+                                           "manual_cycle_created",
+                                           "cycle_task_due_in",
+                                           "cycle_task_due_today",
+                                           "cycle_task_overdue")
