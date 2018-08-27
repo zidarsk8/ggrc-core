@@ -24,13 +24,17 @@ class BaseClientTest(unittest.TestCase):
         issue_id='t1',
         issue_type='bug1',
         issue_priority='P1',
-        issue_severity='S1')
+        issue_severity='S1',
+        due_date=None
+    )
     issue2_mock = mock.MagicMock(
         issue_tracked_obj=None,
         issue_id='t2',
         issue_type='bug2',
         issue_priority='P3',
-        issue_severity='S3')
+        issue_severity='S3',
+        due_date=None
+    )
     filter_mock = mock.MagicMock()
     filter_mock.return_value.order_by.return_value.all.return_value = [
         issue1_mock,
@@ -49,6 +53,7 @@ class BaseClientTest(unittest.TestCase):
                   'type': 'bug1',
                   'priority': 'P1',
                   'severity': 'S1',
+                  'due_date': None,
               },
           }
       })
@@ -66,6 +71,12 @@ class BaseClientTest(unittest.TestCase):
                         'type': 'bug1',
                         'priority': 'P1',
                         'severity': 'S1',
+                        'custom_fields': [{
+                            'name': 'Due Date',
+                            'value': '2018-09-13',
+                            'type': 'Date',
+                            'display_string': 'Due Date',
+                        }],
                         'ccs': []
                     },
                 },
@@ -91,6 +102,12 @@ class BaseClientTest(unittest.TestCase):
                   'type': 'bug1',
                   'priority': 'P1',
                   'severity': 'S1',
+                  'custom_fields': [{
+                      'name': 'Due Date',
+                      'value': '2018-09-13',
+                      'type': 'Date',
+                      'display_string': 'Due Date',
+                  }],
                   'ccs': []
               },
               't2': {
@@ -98,6 +115,7 @@ class BaseClientTest(unittest.TestCase):
                   'type': 'bug2',
                   'priority': 'P2',
                   'severity': 'S2',
+                  'custom_fields': [],
                   'ccs': []
               },
           },
@@ -189,6 +207,7 @@ class BaseClientTest(unittest.TestCase):
                 'type': 'BUG1',
                 'priority': 'P1',
                 'severity': 'S1',
+                'due_date': None,
             },
         },
         '2': {
@@ -198,6 +217,7 @@ class BaseClientTest(unittest.TestCase):
                 'type': 'BUG2',
                 'priority': 'P2',
                 'severity': 'S2',
+                'due_date': None,
             },
         },
     }
@@ -208,6 +228,7 @@ class BaseClientTest(unittest.TestCase):
                 'type': 'BUG1',
                 'priority': 'P1',
                 'severity': 'S1',
+                'custom_fields': [],
             },
         },
         {
@@ -216,12 +237,14 @@ class BaseClientTest(unittest.TestCase):
                 'type': 'BUG2',
                 'priority': 'P2',
                 'severity': 'S2',
+                'custom_fields': [],
             },
             3: {
                 'status': 'FIXED',
                 'type': 'BUG2',
                 'priority': 'P2',
                 'severity': 'S2',
+                'custom_fields': [],
             },
         },
     ]
@@ -239,7 +262,7 @@ class BaseClientTest(unittest.TestCase):
       with mock.patch.object(sync_utils,
                              "collect_issue_tracker_info",
                              return_value=assessment_issues):
-        assessment_sync_job.sync_assessment_statuses()
+        assessment_sync_job.sync_assessment_attributes()
         iter_calls = sync_utils.iter_issue_batches.call_args_list
         self.assertEqual(len(iter_calls), 1)
         self.assertItemsEqual(iter_calls[0][0][0], ['1', '2'])
