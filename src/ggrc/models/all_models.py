@@ -68,6 +68,7 @@ from ggrc.models.relationship import Relationship
 from ggrc.models.requirement import Requirement
 from ggrc.models.revision import Revision
 from ggrc.models.risk import Risk
+from ggrc.models.risk_assessment import RiskAssessment
 from ggrc.models.snapshot import Snapshot
 from ggrc.models.system import Process
 from ggrc.models.system import System
@@ -142,6 +143,7 @@ all_models = [  # pylint: disable=invalid-name
     Requirement,
     Revision,
     Risk,
+    RiskAssessment,
     Snapshot,
     Standard,
     System,
