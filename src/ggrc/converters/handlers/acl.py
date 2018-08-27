@@ -4,7 +4,9 @@
 """Handlers for access control roles."""
 
 from ggrc import models
+from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
+from ggrc.models.exceptions import ValidationError
 
 
 class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
@@ -55,7 +57,12 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
     self._add_people(list_new - list_old)
     self._remove_people(list_old - list_new)
     if hasattr(self.row_converter.obj, 'validate_acl'):
-      self.row_converter.obj.validate_acl()
+      try:
+        self.row_converter.obj.validate_acl()
+      except (ValueError, ValidationError) as exception:
+        self.add_error(errors.VALIDATION_ERROR,
+                       column_name=self.display_name,
+                       message=exception.message)
 
   def get_value(self):
     """Get list of emails for people with the current AC role."""
