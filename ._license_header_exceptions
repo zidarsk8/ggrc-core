@@ -53,7 +53,7 @@
 < setup.cfg
 < src/ggrc/assets/vendor/bootstrap-sass
 < src/ggrc-client/js/components/release-notes-list/release-notes.md
-< src/ggrc/migrations/versions/ggrcdev_ggrc.sql
+< src/ggrc/migrations/versions/ggrcdev.sql
 < src/ggrc/templates/maintenance/maintenance.html
 < src/ggrc/templates/maintenance/trigger.html
 < src/packages
