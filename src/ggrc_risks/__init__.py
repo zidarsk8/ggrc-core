@@ -22,13 +22,6 @@ blueprint = Blueprint(
 )
 
 
-def contributed_services():
-  return [
-      service('risks', models.Risk),
-      service('threats', models.Threat),
-  ]
-
-
 def contributed_object_views():
   from . import models
   from ggrc.views.registry import object_view
