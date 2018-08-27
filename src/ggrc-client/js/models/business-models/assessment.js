@@ -375,7 +375,7 @@ export default Cacheable('CMS.Models.Assessment', {
             .then(function (model) {
               delete that._pending_refresh;
               if (model) {
-                model = CMS.Models.Assessment.model(model, that);
+                model = that.constructor.model(model, that);
                 model.backup();
                 return model;
               }

@@ -141,7 +141,7 @@ export default Cacheable('CMS.Models.Audit', {
     return CMS.Models[this.attr('object_type')];
   },
   clone: function (options) {
-    let cloneModel = new CMS.Models.Audit({
+    let cloneModel = new this.constructor({
       operation: 'clone',
       cloneOptions: options.cloneOptions,
       program: this.program,
