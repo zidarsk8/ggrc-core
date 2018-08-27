@@ -8,7 +8,6 @@ from flask import Blueprint
 from ggrc.services.registry import service
 import ggrc_risks.models as models
 from ggrc_basic_permissions.contributed_roles import RoleContributions
-from ggrc_risks.converters import IMPORTABLE
 import ggrc_risks.views
 
 # Initialize signal handler for status changes
@@ -69,6 +68,3 @@ class RiskRoleContributions(RoleContributions):
 
 
 ROLE_CONTRIBUTIONS = RiskRoleContributions()
-
-
-contributed_importables = IMPORTABLE
