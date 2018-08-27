@@ -15,13 +15,10 @@ import {
   Multi,
   TypeFilter,
   CustomFilter,
-  Reify,
   Cross,
 } from '../models/mappers/mapper-helpers';
 import Mappings from '../models/mappers/mappings';
-import CycleTaskEntry from '../models/service-models/cycle-task-entry';
 import Cycle from '../models/business-models/cycle';
-import CycleTaskGroup from '../models/business-models/cycle-task-group';
 import CycleTaskGroupObjectTask from '../models/business-models/cycle-task-group-object-task';
 import TaskGroup from '../models/business-models/task-group';
 import Workflow from '../models/business-models/workflow';
@@ -70,68 +67,36 @@ import * as businessModels from '../models/business-models';
     // Add mappings for basic workflow objects
     let mappings = {
       TaskGroup: {
+        /**
+         * @property {string[]} _canonical.objects - "objects" is a mapper name.
+         * This field contains collection of model names.
+         */
         _canonical: {
-          objects: _workflowObjectTypes.concat(['Cacheable']),
+          objects: _workflowObjectTypes,
         },
-        task_group_tasks: Direct(
-          'TaskGroupTask', 'task_group', 'task_group_tasks'),
+        /**
+         * Mapper, which will be used for appropriate canonical mapper name
+         * "objects".
+         */
         objects: Proxy(
           null, 'object', 'TaskGroupObject', 'task_group',
           'task_group_objects'),
+        /**
+         * "workflow" property is used for Object Review functionality (when
+         * review-link is loaded)
+         */
         workflow: Direct(
           'Workflow', 'task_groups', 'workflow'),
       },
-
       Workflow: {
-        _canonical: {
-          context: 'Context',
-        },
-        task_groups: Direct(
-          'TaskGroup', 'workflow', 'task_groups'),
-        tasks: Cross(
-          'task_groups', 'task_group_tasks'),
+        // "cycles" and "current_cycle" are needed for Object Review
+        // functionality
         cycles: Direct(
           'Cycle', 'workflow', 'cycles'),
-        previous_cycles: CustomFilter('cycles', function (result) {
-          return !result.instance.attr('is_current');
-        }),
         current_cycle: CustomFilter('cycles', function (result) {
           return result.instance.attr('is_current');
         }),
-        current_task_groups: Cross('current_cycle', 'cycle_task_groups'),
-        current_tasks: Cross(
-          'current_task_groups', 'cycle_task_group_object_tasks'
-        ),
-        current_all_tasks: Cross(
-          'current_task_groups', 'cycle_task_group_tasks'
-        ),
-        context: Direct(
-          'Context', 'related_object', 'context'),
       },
-
-      Cycle: {
-        cycle_task_groups: Direct(
-          'CycleTaskGroup', 'cycle', 'cycle_task_groups'),
-        reify_cycle_task_groups: Reify('cycle_task_groups'),
-        workflow: Direct('Workflow', 'cycles', 'workflow'),
-      },
-
-      CycleTaskGroup: {
-        cycle: Direct(
-          'Cycle', 'cycle_task_groups', 'cycle'),
-        cycle_task_group_tasks: Direct(
-          'CycleTaskGroupObjectTask',
-          'cycle_task_group',
-          'cycle_task_group_tasks'),
-
-        // effectively an alias for 'cycle_task_group_tasks', specifying just
-        // the latter's name as a string does not work for some reason
-        cycle_task_group_object_tasks: Direct(
-          'CycleTaskGroupObjectTask',
-          'cycle_task_group',
-          'cycle_task_group_tasks'),
-      },
-
       CycleTaskGroupObjectTask: {
         _canonical: {
           // It is needed for an object list generation. This object list
@@ -141,60 +106,38 @@ import * as businessModels from '../models/business-models';
           // collection. The result of the operation is the total list.
           related_objects_as_source: _workflowObjectTypes.concat('Audit'),
         },
+        // Needed for related_objects mapper
         related_objects_as_source: Proxy(
           null,
           'destination', 'Relationship',
           'source', 'related_destinations'
         ),
+        // Needed for related_objects mapper
         related_objects_as_destination: Proxy(
           null,
           'source', 'Relationship',
           'destination', 'related_sources'
         ),
+        // Needed to show mapped objects for CycleTaskGroupObjectTask
         related_objects: Multi(
           ['related_objects_as_source', 'related_objects_as_destination']
         ),
-        destinations: Direct('Relationship', 'source', 'related_destinations'),
-        sources: Direct('Relationship', 'destination', 'related_sources'),
-        relationships: Multi(['sources', 'destinations']),
-        related_access_groups: TypeFilter('related_objects', 'AccessGroup'),
-        related_data_assets: TypeFilter('related_objects', 'DataAsset'),
-        related_facilities: TypeFilter('related_objects', 'Facility'),
-        related_markets: TypeFilter('related_objects', 'Market'),
-        related_metrics: TypeFilter('related_objects', 'Metric'),
-        related_org_groups: TypeFilter('related_objects', 'OrgGroup'),
-        related_vendors: TypeFilter('related_objects', 'Vendor'),
-        related_processes: TypeFilter('related_objects', 'Process'),
-        related_products: TypeFilter('related_objects', 'Product'),
-        related_product_groups: TypeFilter('related_objects', 'ProductGroup'),
-        related_projects: TypeFilter('related_objects', 'Project'),
-        related_systems: TypeFilter('related_objects', 'System'),
-        related_issues: TypeFilter('related_objects', 'Issue'),
-        related_audits: TypeFilter('related_objects', 'Audit'),
-        related_controls: TypeFilter('related_objects', 'Control'),
-        related_documents: TypeFilter('related_objects', 'Document'),
-        related_technology_environments: TypeFilter('related_objects',
-          'TechnologyEnvironment'),
-        regulations: TypeFilter('related_objects', 'Regulation'),
-        contracts: TypeFilter('related_objects', 'Contract'),
-        policies: TypeFilter('related_objects', 'Policy'),
-        standards: TypeFilter('related_objects', 'Standard'),
-        programs: TypeFilter('related_objects', 'Program'),
-        controls: TypeFilter('related_objects', 'Control'),
-        requirements: TypeFilter('related_objects', 'Requirement'),
-        clauses: TypeFilter('related_objects', 'Clause'),
-        objectives: TypeFilter('related_objects', 'Objective'),
+        /**
+         * "cycle", "cycle_task_entries" mappers are needed for mapped
+         * comments and objects under CycleTaskGroupObjectTask into
+         * mapping-tree-view component.
+         */
         cycle: Direct(
           'Cycle', 'cycle_task_group_object_tasks', 'cycle'),
-        cycle_task_group: Direct(
-          'CycleTaskGroup',
-          'cycle_task_group_object_tasks',
-          'cycle_task_group'),
         cycle_task_entries: Direct(
           'CycleTaskEntry',
           'cycle_task_group_object_task',
           'cycle_task_entries'),
-
+        /**
+         * This mapping name is needed for objects mapped to CTGOT.
+         * It helps to filter results of objects mapped to CTGOT.
+         * We can just remove some objects from results.
+         */
         info_related_objects: CustomFilter(
           'related_objects',
           function (relatedObjects) {
@@ -209,7 +152,6 @@ import * as businessModels from '../models/business-models';
           }
         ),
       },
-
       CycleTaskEntry: {
         related_objects_as_source: Proxy(
           null,
@@ -240,6 +182,7 @@ import * as businessModels from '../models/business-models';
 
     // Insert `workflows` mappings to all business object types
     can.each(_workflowObjectTypes, function (type) {
+      const workflowsMapper = Cross('task_groups', 'workflow');
       let model = businessModels[type];
       if (model === undefined || model === null) {
         return;
@@ -253,7 +196,7 @@ import * as businessModels from '../models/business-models';
           'task_group_objects',
           null
         ),
-        workflows: Cross('task_groups', 'workflow'),
+        workflows: workflowsMapper,
         approval_workflows: CustomFilter('workflows', function (binding) {
           return binding.instance.attr('object_approval');
         }),
@@ -261,11 +204,11 @@ import * as businessModels from '../models/business-models';
         _canonical: {
           task_groups: 'TaskGroup',
         },
+        orphaned_objects: Multi([
+          Mappings.get_mappings_for(type).orphaned_objects,
+          workflowsMapper,
+        ]),
       };
-      mappings[type].orphaned_objects = Multi([
-        Mappings.get_mappings_for(type).orphaned_objects,
-        mappings[type].workflows,
-      ]);
 
       businessModels[type].attributes.task_group_objects = Stub.List;
     });

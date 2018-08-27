@@ -36,10 +36,6 @@ function CustomFilter(source, filterFn) {
   return new GGRC.ListLoaders.CustomFilteredListLoader(source, filterFn);
 }
 
-function Reify(source) {
-  return new GGRC.ListLoaders.ReifyingListLoader(source);
-}
-
 function Cross(localMapping, remoteMapping) {
   return new GGRC.ListLoaders.CrossListLoader(localMapping, remoteMapping);
 }
@@ -52,7 +48,6 @@ export {
   Multi,
   TypeFilter,
   CustomFilter,
-  Reify,
   Cross,
 };
 
