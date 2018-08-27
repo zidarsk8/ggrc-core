@@ -67,21 +67,6 @@ program_type.mix_risk_assessments_into_program()
 
 class RiskAssessmentRoleContributions(RoleContributions):
   contributions = {
-      'ProgramOwner': {
-          'create': ['RiskAssessment'],
-          'read': ['RiskAssessment'],
-          'update': ['RiskAssessment'],
-          'delete': ['RiskAssessment'],
-      },
-      'ProgramEditor': {
-          'create': ['RiskAssessment'],
-          'read': ['RiskAssessment'],
-          'update': ['RiskAssessment'],
-          'delete': ['RiskAssessment'],
-      },
-      'ProgramReader': {
-          'read': ['RiskAssessment']
-      },
       'Reader': {
           'read': ['RiskAssessment']
       },
