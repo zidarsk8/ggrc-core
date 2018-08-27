@@ -5,8 +5,8 @@
 
 import sys
 
-from ggrc.access_control.role import AccessControlRole
 from ggrc.access_control.list import AccessControlList
+from ggrc.access_control.role import AccessControlRole
 from ggrc.data_platform.attribute_definitions import AttributeDefinitions
 from ggrc.data_platform.attribute_templates import AttributeTemplates
 from ggrc.data_platform.attribute_types import AttributeTypes
@@ -44,35 +44,35 @@ from ggrc.models.facility import Facility
 from ggrc.models.import_export import ImportExport
 from ggrc.models.issue import Issue
 from ggrc.models.issuetracker_issue import IssuetrackerIssue
+from ggrc.models.label import Label
+from ggrc.models.maintenance import Maintenance
 from ggrc.models.market import Market
+from ggrc.models.metric import Metric
 from ggrc.models.notification import Notification
-from ggrc.models.notification import NotificationHistory
 from ggrc.models.notification import NotificationConfig
+from ggrc.models.notification import NotificationHistory
 from ggrc.models.notification import NotificationType
+from ggrc.models.object_label import ObjectLabel
 from ggrc.models.object_person import ObjectPerson
 from ggrc.models.objective import Objective
 from ggrc.models.option import Option
 from ggrc.models.org_group import OrgGroup
 from ggrc.models.person import Person
+from ggrc.models.person_profile import PersonProfile
 from ggrc.models.product import Product
+from ggrc.models.product_group import ProductGroup
 from ggrc.models.program import Program
 from ggrc.models.project import Project
 from ggrc.models.proposal import Proposal
 from ggrc.models.relationship import Relationship
-from ggrc.models.revision import Revision
 from ggrc.models.requirement import Requirement
+from ggrc.models.revision import Revision
 from ggrc.models.snapshot import Snapshot
 from ggrc.models.system import Process
 from ggrc.models.system import System
 from ggrc.models.system import SystemOrProcess
-from ggrc.models.vendor import Vendor
-from ggrc.models.maintenance import Maintenance
-from ggrc.models.label import Label
-from ggrc.models.object_label import ObjectLabel
-from ggrc.models.person_profile import PersonProfile
-from ggrc.models.metric import Metric
-from ggrc.models.product_group import ProductGroup
 from ggrc.models.technology_environment import TechnologyEnvironment
+from ggrc.models.vendor import Vendor
 
 all_models = [  # pylint: disable=invalid-name
     # data platform models
