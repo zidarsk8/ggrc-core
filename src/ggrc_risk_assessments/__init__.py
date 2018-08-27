@@ -10,7 +10,6 @@ from ggrc import settings
 from ggrc.models import all_models
 from ggrc.models import reflection
 from ggrc.rbac import permissions
-from ggrc_basic_permissions.contributed_roles import RoleContributions
 
 
 # Initialize Flask Blueprint for extension
@@ -63,20 +62,3 @@ program_type = getattr(all_models, "Program")
 program_type.__bases__ = (MixRiskAssessmentsIntoProgram,) \
     + program_type.__bases__
 program_type.mix_risk_assessments_into_program()
-
-
-class RiskAssessmentRoleContributions(RoleContributions):
-  contributions = {
-      'Reader': {
-          'read': ['RiskAssessment']
-      },
-      'Editor': {
-          'create': ['RiskAssessment'],
-          'read': ['RiskAssessment'],
-          'update': ['RiskAssessment'],
-          'delete': ['RiskAssessment'],
-      },
-  }
-
-
-ROLE_CONTRIBUTIONS = RiskAssessmentRoleContributions()
