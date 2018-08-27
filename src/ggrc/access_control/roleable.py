@@ -215,7 +215,6 @@ class Roleable(object):
     """Check correctness of access_control_list."""
     assignees = 0
     verifiers = 0
-
     for acl in self.access_control_list:
       if acl.ac_role.object_type != "Workflow" and \
          acl.object_type != acl.ac_role.object_type:
@@ -226,23 +225,20 @@ class Roleable(object):
                 acl.ac_role.object_type
             )
         )
-
       if acl.ac_role.name == 'Assignee':
         assignees += 1
-
       if acl.ac_role.name == 'Verifier':
         verifiers += 1
 
     if assignees > self.MAX_ASSIGNEES_NUM:
       raise ValueError(
-        "Assignee role must have only {} person(s) assign".format(
-          self.MAX_ASSIGNEES_NUM
-        )
+          "Assignee role must have only {} person(s) assigned".format(
+              self.MAX_ASSIGNEES_NUM
+          )
       )
-
     if verifiers > self.MAX_VERIFIER_NUM:
       raise ValueError(
-        "Verifier role must have only {} person(s) assign".format(
-          self.MAX_VERIFIER_NUM
-        )
+          "Verifier role must have only {} person(s) assigned".format(
+              self.MAX_VERIFIER_NUM
+          )
       )
