@@ -3,33 +3,39 @@ Copyright (C) 2018 Google Inc.
 Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 `}}
 
-<related-objects {base-instance}="baseInstance" {predefined-filter}="relatedIssuesFilter" related-items-type="Issue">
-    <div class="grid-data__toolbar flex-box">
-        <tree-pagination {paging}="paging" class="grid-data__toolbar-item"></tree-pagination>
-        {{^if baseInstance.archived}}
-                <add-issue-button {snapshots}="allRelatedSnapshots" {related-instance}="baseInstance" class="grid-data__toolbar-item"></add-issue-button>
-        {{/if}}
-    </div>
-    <div class="grid-data-header flex-row flex-box">
-        <div class="flex-size-2">
-            Title
+<model-loader {path}="'business-models/issue'">
+    <related-objects
+        {base-instance}="baseInstance"
+        {predefined-filter}="relatedIssuesFilter"
+        {model-constructor}="loadedModel"
+        related-items-type="Issue">
+        <div class="grid-data__toolbar flex-box">
+            <tree-pagination {paging}="paging" class="grid-data__toolbar-item"></tree-pagination>
+            {{^if baseInstance.archived}}
+                    <add-issue-button {snapshots}="allRelatedSnapshots" {related-instance}="baseInstance" class="grid-data__toolbar-item"></add-issue-button>
+            {{/if}}
         </div>
-        <div class="flex-size-3">
-            Description
-        </div>
-    </div>
-    <div class="grid-data-body">
-        <object-list {items}="relatedObjects" {is-loading}="isLoading" {list-type}="'GRID'">
-            <div class="grid-data-row flex-row flex-box">
-                <div class="flex-size-2">
-                    <a href="{{instance.viewLink}}" target="_blank" class="grid-data-item__title-cell">
-                      {{instance.title}}
-                    </a>
-                </div>
-                <div class="flex-size-3">
-                    <read-more {text}="instance.description" max-lines-number="2"></read-more>
-                </div>
+        <div class="grid-data-header flex-row flex-box">
+            <div class="flex-size-2">
+                Title
             </div>
-        </object-list>
-    </div>
-</related-objects>
+            <div class="flex-size-3">
+                Description
+            </div>
+        </div>
+        <div class="grid-data-body">
+            <object-list {items}="relatedObjects" {is-loading}="isLoading" {list-type}="'GRID'">
+                <div class="grid-data-row flex-row flex-box">
+                    <div class="flex-size-2">
+                        <a href="{{instance.viewLink}}" target="_blank" class="grid-data-item__title-cell">
+                        {{instance.title}}
+                        </a>
+                    </div>
+                    <div class="flex-size-3">
+                        <read-more {text}="instance.description" max-lines-number="2"></read-more>
+                    </div>
+                </div>
+            </object-list>
+        </div>
+    </related-objects>
+</model-loader>

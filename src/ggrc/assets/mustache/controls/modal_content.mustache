@@ -187,12 +187,14 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Select control assertions."></i>
         </label>
           <div data-id="assertions_dd" tabindex="12" class="no-outline">
-            <multiselect-dropdown-wrapper
-              {model-name}="'ControlAssertion'"
-              {(selected)}="instance.assertions"
-              {placeholder}="'Select Assertions'"
-              {class}="'multiselect-dropdown_controls'">
-            </multiselect-dropdown-wrapper>
+            <model-loader {path}="'service-models/control-assertion'">
+              <multiselect-dropdown-wrapper
+                {model-constructor}="loadedModel"
+                {(selected)}="instance.assertions"
+                {placeholder}="'Select Assertions'"
+                {class}="'multiselect-dropdown_controls'">
+              </multiselect-dropdown-wrapper>
+            </model-loader>
           </div>
           {{#instance.computed_errors.assertions}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.assertions}}
       </div>
@@ -203,12 +205,14 @@
           <a data-id="hide_categories_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
           <div data-id="categories_dd" tabindex="13" class="no-outline">
-            <multiselect-dropdown-wrapper
-              {model-name}="'ControlCategory'"
-              {(selected)}="instance.categories"
-              {placeholder}="'Select Categories'"
-              {class}="'multiselect-dropdown_controls'">
-            </multiselect-dropdown-wrapper>
+            <model-loader {path}="'service-models/control-category'">
+              <multiselect-dropdown-wrapper
+                {model-constructor}="loadedModel"
+                {(selected)}="instance.categories"
+                {placeholder}="'Select Categories'"
+                {class}="'multiselect-dropdown_controls'">
+              </multiselect-dropdown-wrapper>
+            </model-loader>
           </div>
       </div>
     </div>

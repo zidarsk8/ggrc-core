@@ -15,16 +15,16 @@ export default can.Component.extend({
     define: {
       /*
         Multiselect-dropdown wrapper when data should be fetched first
-        {modelName}: Name of CMS.Model to fetch
+        {modelConstructor}: Model definition to fetch
         {(selected)}: Two-way binding parent`s target attribute
       */
-      modelName: {
-        set(newModelName) {
-          if (CMS.Models[newModelName]) {
-            CMS.Models[newModelName].findAll()
+      modelConstructor: {
+        set(newModelConstructor) {
+          if (newModelConstructor) {
+            newModelConstructor.findAll()
               .done(this.prepareOptions.bind(this));
 
-            return newModelName;
+            return newModelConstructor;
           }
         },
       },
@@ -76,7 +76,7 @@ export default can.Component.extend({
         selected.splice(0);
         // add all new items from Cache
         newSelected.forEach((item) => {
-          selected.push(CMS.Models[self.viewModel.modelName]
+          selected.push(self.viewModel.modelConstructor
             .findInCacheById(item.id));
         });
       },
