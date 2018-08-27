@@ -13,7 +13,6 @@ from ggrc.rbac import permissions
 from ggrc.services.registry import service
 from ggrc_basic_permissions.contributed_roles import RoleContributions
 from ggrc_risk_assessments import models
-from ggrc_risk_assessments.converters import IMPORTABLE
 from ggrc_risk_assessments.models import relationship_helper
 
 
@@ -111,6 +110,5 @@ class RiskAssessmentRoleContributions(RoleContributions):
 
 
 ROLE_CONTRIBUTIONS = RiskAssessmentRoleContributions()
-contributed_importables = IMPORTABLE
 
 contributed_get_ids_related_to = relationship_helper.get_ids_related_to
