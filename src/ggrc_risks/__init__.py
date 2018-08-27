@@ -22,12 +22,6 @@ blueprint = Blueprint(
 )
 
 
-def get_public_config(current_user):
-  """Expose additional permissions-dependent config to client.
-  """
-  return {}
-
-
 def contributed_services():
   return [
       service('risks', models.Risk),
