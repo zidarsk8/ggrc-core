@@ -5,8 +5,6 @@
 
 from flask import Blueprint
 
-from ggrc_basic_permissions.contributed_roles import RoleContributions
-
 # Initialize signal handler for status changes
 from blinker import Namespace
 signals = Namespace()
@@ -18,23 +16,3 @@ blueprint = Blueprint(
     static_folder='static',
     static_url_path='/static/ggrc_risks',
 )
-
-
-class RiskRoleContributions(RoleContributions):
-  contributions = {
-      'Creator': {
-          'read': [],
-          'create': ['Threat', 'Risk'],
-      },
-      'Editor': {
-          'read': ['Threat', 'Risk'],
-          'create': ['Threat', 'Risk'],
-      },
-      'Reader': {
-          'read': ['Threat', 'Risk'],
-          'create': ['Threat', 'Risk'],
-      },
-  }
-
-
-ROLE_CONTRIBUTIONS = RiskRoleContributions()
