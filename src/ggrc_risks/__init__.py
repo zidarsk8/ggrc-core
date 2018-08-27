@@ -8,7 +8,6 @@ from flask import Blueprint
 from ggrc.services.registry import service
 import ggrc_risks.models as models
 from ggrc_basic_permissions.contributed_roles import RoleContributions
-import ggrc_risks.views
 
 # Initialize signal handler for status changes
 from blinker import Namespace
@@ -43,11 +42,6 @@ def contributed_object_views():
       object_view(models.Risk),
       object_view(models.Threat),
   ]
-
-
-# Initialize non-RESTful views
-def init_extra_views(app):
-  ggrc_risks.views.init_extra_views(app)
 
 
 class RiskRoleContributions(RoleContributions):
