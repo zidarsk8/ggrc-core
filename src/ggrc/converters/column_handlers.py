@@ -97,6 +97,8 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "operationally": handlers.ConclusionColumnHandler,
     "os_state": handlers.ExportOnlyColumnHandler,
     "program": handlers.ProgramColumnHandler,
+    "ra_counsel": handlers.UserColumnHandler,
+    "ra_manager": handlers.UserColumnHandler,
     "recipients": list_handlers.ValueListHandler,
     "report_end_date": handlers.DateColumnHandler,
     "report_start_date": handlers.DateColumnHandler,
