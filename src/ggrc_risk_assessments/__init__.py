@@ -4,11 +4,8 @@
 """Risk Assessment module"""
 
 from flask import Blueprint
-from sqlalchemy import orm
 
 from ggrc import settings
-from ggrc.models import all_models
-from ggrc.models import reflection
 from ggrc.rbac import permissions
 
 
@@ -31,34 +28,3 @@ def get_public_config(current_user):
     if hasattr(settings, 'RISK_ASSESSMENT_URL'):
       public_config['RISK_ASSESSMENT_URL'] = settings.RISK_ASSESSMENT_URL
   return public_config
-
-
-# Mixin to mix risk_assessments into Program
-class MixRiskAssessmentsIntoProgram(object):
-
-  @classmethod
-  def mix_risk_assessments_into_program(cls):
-    # cls.risk_assessments = db.relationship(
-    pass  # 'RiskAssessment', cascade='all, delete-orphan')
-
-  _api_attrs = reflection.ApiAttributes(
-      reflection.Attribute('risk_assessments', create=False, update=False),
-  )
-
-  _include_links = []
-
-  @classmethod
-  def eager_query(cls):
-
-    query = super(MixRiskAssessmentsIntoProgram, cls).eager_query()
-    return cls.eager_inclusions(
-        query, MixRiskAssessmentsIntoProgram._include_links).options(
-        orm.subqueryload('risk_assessments'))
-
-# Mix RiskAssessments into Program
-
-
-program_type = getattr(all_models, "Program")
-program_type.__bases__ = (MixRiskAssessmentsIntoProgram,) \
-    + program_type.__bases__
-program_type.mix_risk_assessments_into_program()
