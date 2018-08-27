@@ -9,6 +9,7 @@ from collections import OrderedDict
 import ddt
 
 from ggrc import models
+from ggrc.access_control.roleable import Roleable
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
@@ -365,3 +366,28 @@ class TestACLImportExport(TestCase):
       program = models.all_models.Program.query.first()
       for acl in program.access_control_list:
         self.assertNotEqual(acl.ac_role.name, role)
+
+  @ddt.data("Assignee", "Verifier")
+  def test_import_acl_validation(self, role):
+    """Test import object with {} roles exceeding max limit"""
+    role_max = getattr(Roleable, "MAX_{}_NUM".format(role.upper()))
+    with factories.single_commit():
+      for i in range(role_max + 1):
+        factories.PersonFactory(email="user{}@example.com".format(i))
+    roles = "\n".join(
+        "user{}@example.com".format(i) for i in range(role_max + 1)
+    )
+    response = self.import_data(OrderedDict([
+        ("object_type", "OrgGroup"),
+        ("Code*", "OrgGroup-1"),
+        ("Admin", "user@example.com"),
+        ("title", "Test OrgGroup"),
+        (role, roles),
+    ]))
+    self.assertIn(
+        "{} role must have only {} person(s) assigned".format(
+            role,
+            role_max
+        ),
+        response[0]["row_errors"][0]
+    )
