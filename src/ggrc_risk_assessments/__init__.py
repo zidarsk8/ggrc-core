@@ -37,18 +37,6 @@ def get_public_config(current_user):
   return public_config
 
 
-# Initialize service endpoints
-
-def contributed_services():
-  return [
-      service('risk_assessments', models.RiskAssessment),
-  ]
-
-
-def contributed_object_views():
-  return []
-
-
 # Mixin to mix risk_assessments into Program
 class MixRiskAssessmentsIntoProgram(object):
 
