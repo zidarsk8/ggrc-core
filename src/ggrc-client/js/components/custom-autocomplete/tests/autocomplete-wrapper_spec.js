@@ -7,6 +7,7 @@ import baseAutocompleteWrapper from '../autocomplete-wrapper';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 import RefreshQueue from '../../../models/refresh_queue';
 import {getInstance} from '../../../plugins/utils/models-utils';
+import Label from '../../../models/service-models/label';
 
 describe('autocomplete-wrapper viewModel', () => {
   let viewModel;
@@ -107,7 +108,7 @@ describe('autocomplete-wrapper viewModel', () => {
         },
       };
 
-      viewModel.attr('model', objName);
+      viewModel.attr('modelName', objName);
       viewModel.attr('queryField', queryField);
 
       spyOn(QueryAPI, 'buildRelevantIdsQuery');
@@ -155,7 +156,9 @@ describe('autocomplete-wrapper viewModel', () => {
         getInstance(name, ids[1]),
       ];
 
-      viewModel.attr('model', name);
+      viewModel.attr('modelName', name);
+      viewModel.attr('modelConstructor', Label);
+
       viewModel.getStubs(responseArr).done((res) => {
         expect(res).toEqual(fakeRes);
         done();
@@ -173,7 +176,7 @@ describe('autocomplete-wrapper viewModel', () => {
       };
       const fakeRes = [];
 
-      viewModel.attr('model', name);
+      viewModel.attr('modelName', name);
       viewModel.getStubs(responseArr).done((res) => {
         expect(res).toEqual(fakeRes);
         done();
