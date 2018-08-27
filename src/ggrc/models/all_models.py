@@ -158,7 +158,7 @@ def register_model(model):
   """Add model to all models.
 
   This function is used for adding models from different ggrc modules, such as
-  ggrc_workflows or ggrc_risks, to the list of all models in the ggrc module.
+  ggrc_workflows, to the list of all models in the ggrc module.
 
   Args:
     model: sqlalchemy model to be added to the list of all models.

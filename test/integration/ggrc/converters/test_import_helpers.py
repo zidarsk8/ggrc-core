@@ -14,7 +14,6 @@ from ggrc.converters import import_helper
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.utils import rules
 from ggrc.utils import title_from_camelcase
-from ggrc_risks import models as r_models
 from ggrc_risk_assessments import models as ra_models
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
@@ -818,7 +817,7 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Title",
         },
     }
-    self._test_single_object(r_models.Risk, names, expected_fields)
+    self._test_single_object(models.Risk, names, expected_fields)
 
   @ddt.data(
       models.Metric,

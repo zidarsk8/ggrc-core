@@ -24,7 +24,6 @@ USER_PERMISSIONS_PROVIDER = \
 EXTENSIONS = [
     'ggrc_basic_permissions',
     'ggrc_risk_assessments',
-    'ggrc_risks',
     'ggrc_workflows',
 ]
 exports = [
