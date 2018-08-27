@@ -27,7 +27,7 @@ class Roleable(object):
   _fulltext_attrs = [CustomRoleAttr('access_control_list'), ]
   _api_attrs = reflection.ApiAttributes(
       reflection.Attribute('access_control_list', True, True, True))
-  MAX_ASSIGNEES_NUM = 1
+  MAX_ASSIGNEE_NUM = 1
   MAX_VERIFIER_NUM = 1
 
   @declared_attr
@@ -230,10 +230,10 @@ class Roleable(object):
       if acl.ac_role.name == 'Verifier':
         verifiers += 1
 
-    if assignees > self.MAX_ASSIGNEES_NUM:
+    if assignees > self.MAX_ASSIGNEE_NUM:
       raise ValueError(
           "Assignee role must have only {} person(s) assigned".format(
-              self.MAX_ASSIGNEES_NUM
+              self.MAX_ASSIGNEE_NUM
           )
       )
     if verifiers > self.MAX_VERIFIER_NUM:
