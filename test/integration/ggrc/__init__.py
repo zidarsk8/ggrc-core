@@ -79,6 +79,10 @@ class TestCase(BaseTestCase, object):
 
   maxDiff = None
 
+  def __init__(self, *args, **kwargs):
+    super(TestCase, self).__init__(*args, **kwargs)
+    self._headers = {}
+
   @staticmethod
   def get_role_id_for_obj(obj, role_name):
     """Return role id for ent instance and role_name."""
@@ -181,6 +185,23 @@ class TestCase(BaseTestCase, object):
     app.testing = True
     app.debug = False
     return app
+
+  @property
+  def headers(self):
+    """HTTP headers property"""
+    if not self._headers:
+      self._headers = {
+          'Content-Type': 'application/json',
+          "X-requested-by": "GGRC",
+          "X-export-view": "blocks",
+      }
+    if hasattr(self, "_custom_headers"):
+      self._headers.update(self._custom_headers)
+    return self._headers
+
+  @headers.setter
+  def headers(self, value):
+    self._headers = value
 
   def _check_csv_response(self, response, expected_messages):
     """Test that response contains all expected errors and warnigs.
@@ -331,19 +352,24 @@ class TestCase(BaseTestCase, object):
     return post action response to export_csv service with data argument as
     sended data
     """
-    if not hasattr(self, "headers") or not self.headers:
-      self.headers = {
-          'Content-Type': 'application/json',
-          "X-requested-by": "GGRC",
-          "X-export-view": "blocks",
-      }
-    if hasattr(self, "_custom_headers"):
-      self.headers.update(self._custom_headers)
     request_body = {
         "export_to": "csv",
         "objects": data
     }
     return self.client.post("/_service/export_csv",
+                            data=json.dumps(request_body),
+                            headers=self.headers)
+
+  def export_csv_template(self, objects):
+    """Export csv template handle
+
+    return post action response to export_csv_template service with objects
+    argument as objects to make template
+    """
+    request_body = {
+        "objects": objects,
+    }
+    return self.client.post("/_service/export_csv_template",
                             data=json.dumps(request_body),
                             headers=self.headers)
 

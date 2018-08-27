@@ -59,7 +59,7 @@ export const deleteExportJob = (jobId) => {
   return request(`/api/people/${currentUserId}/exports/${jobId}`, 'DELETE');
 };
 
-export const exportRequest = (request) => {
+export const downloadTemplate = (request) => {
   return $.ajax({
     type: 'POST',
     headers: $.extend({
@@ -67,7 +67,7 @@ export const exportRequest = (request) => {
       'X-export-view': 'blocks',
       'X-requested-by': 'GGRC',
     }, request.headers || {}),
-    url: '/_service/export_csv',
+    url: '/_service/export_csv_template',
     data: JSON.stringify(request.data || {}),
   });
 };
