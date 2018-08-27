@@ -67,11 +67,13 @@ from ggrc.models.proposal import Proposal
 from ggrc.models.relationship import Relationship
 from ggrc.models.requirement import Requirement
 from ggrc.models.revision import Revision
+from ggrc.models.risk import Risk
 from ggrc.models.snapshot import Snapshot
 from ggrc.models.system import Process
 from ggrc.models.system import System
 from ggrc.models.system import SystemOrProcess
 from ggrc.models.technology_environment import TechnologyEnvironment
+from ggrc.models.threat import Threat
 from ggrc.models.vendor import Vendor
 
 all_models = [  # pylint: disable=invalid-name
@@ -118,6 +120,8 @@ all_models = [  # pylint: disable=invalid-name
     ObjectPerson,
     Option,
     OrgGroup,
+    Risk,
+    Threat,
     Vendor,
     Person,
     Product,
