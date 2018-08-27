@@ -5,8 +5,6 @@
 
 from flask import Blueprint
 
-from ggrc.services.registry import service
-import ggrc_risks.models as models
 from ggrc_basic_permissions.contributed_roles import RoleContributions
 
 # Initialize signal handler for status changes
@@ -20,15 +18,6 @@ blueprint = Blueprint(
     static_folder='static',
     static_url_path='/static/ggrc_risks',
 )
-
-
-def contributed_object_views():
-  from . import models
-  from ggrc.views.registry import object_view
-  return [
-      object_view(models.Risk),
-      object_view(models.Threat),
-  ]
 
 
 class RiskRoleContributions(RoleContributions):
