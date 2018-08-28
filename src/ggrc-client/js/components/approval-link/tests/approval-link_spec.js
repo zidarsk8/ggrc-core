@@ -10,7 +10,7 @@ import * as aclUtils from '../../../plugins/utils/acl-utils';
 import * as queryApiUtils from '../../../plugins/utils/query-api-utils';
 import {REFRESH_APPROVAL} from '../../../events/eventTypes';
 
-describe('approval-link component', ()=> {
+describe('approval-link component', () => {
   let viewModel;
 
   beforeEach(() => {

@@ -87,7 +87,7 @@ describe('tree-status-filter component', () => {
       ]);
     });
 
-    it('makes provided options checked', ()=> {
+    it('makes provided options checked', () => {
       viewModel.setStatesDropdown(['A', 'C']);
 
       expect(viewModel.attr('filterStates').serialize()).toEqual([

@@ -9,7 +9,7 @@ import Component from '../instance-acl-diff';
 describe('instance-acl-diff component', () => {
   let viewModel;
 
-  beforeAll(()=> {
+  beforeAll(() => {
     viewModel = getComponentVM(Component);
   });
 

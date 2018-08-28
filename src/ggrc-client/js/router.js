@@ -7,7 +7,7 @@ const router = new can.Map();
 
 class RouterConfig {
   static setupRoutes(routes) {
-    routes.forEach((route)=> {
+    routes.forEach((route) => {
       can.route(route.template, route.defaults);
     });
     can.route.map(router);

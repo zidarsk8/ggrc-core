@@ -11,11 +11,11 @@ import {
 } from '../../../../js_specs/spec_helpers';
 import Control from '../../../models/business-models/control';
 
-describe('inline-autocomplete-wrapper component', ()=> {
+describe('inline-autocomplete-wrapper component', () => {
   let viewModel;
   let instance;
   let path;
-  beforeEach(()=> {
+  beforeEach(() => {
     instance = makeFakeInstance({model: Cacheable})({id: 25});
     path = 'testPath';
 
@@ -26,15 +26,15 @@ describe('inline-autocomplete-wrapper component', ()=> {
       });
   });
 
-  describe('viewModel', ()=> {
-    describe('setItem() method', ()=> {
-      beforeEach(()=> {
+  describe('viewModel', () => {
+    describe('setItem() method', () => {
+      beforeEach(() => {
         spyOn(viewModel, 'updateTextValue');
         spyOn(viewModel, 'updateTransient');
       });
 
-      describe('when argument is empty', ()=> {
-        it('clears value', ()=> {
+      describe('when argument is empty', () => {
+        it('clears value', () => {
           instance.attr(path, {});
 
           viewModel.setItem('');
@@ -42,27 +42,27 @@ describe('inline-autocomplete-wrapper component', ()=> {
           expect(instance.attr(path)).toBe(null);
         });
 
-        it('does not update text', ()=> {
+        it('does not update text', () => {
           viewModel.setItem('');
           expect(viewModel.updateTextValue).not.toHaveBeenCalled();
         });
 
-        it('updates transient', ()=> {
+        it('updates transient', () => {
           viewModel.setItem('');
           expect(viewModel.updateTransient).toHaveBeenCalled();
         });
       });
 
-      describe('when argument is not empty', ()=> {
-        describe('object', ()=> {
+      describe('when argument is not empty', () => {
+        describe('object', () => {
           let item;
-          beforeEach(()=> {
+          beforeEach(() => {
             item = {
               test: true,
             };
           });
 
-          it('updates value', ()=> {
+          it('updates value', () => {
             instance.attr(path, {});
 
             viewModel.setItem(item);
@@ -70,25 +70,25 @@ describe('inline-autocomplete-wrapper component', ()=> {
             expect(instance.attr(path).serialize()).toEqual(item);
           });
 
-          it('updates text', ()=> {
+          it('updates text', () => {
             viewModel.setItem(item);
 
             expect(viewModel.updateTextValue).toHaveBeenCalledWith(item);
           });
 
-          it('updates transient', ()=> {
+          it('updates transient', () => {
             viewModel.setItem(item);
             expect(viewModel.updateTransient).toHaveBeenCalled();
           });
         });
 
-        describe('string', ()=> {
+        describe('string', () => {
           let item;
-          beforeEach(()=> {
+          beforeEach(() => {
             item = 'testValue';
           });
 
-          it('does not update value', ()=> {
+          it('does not update value', () => {
             instance.attr(path, null);
 
             viewModel.setItem(item);
@@ -96,7 +96,7 @@ describe('inline-autocomplete-wrapper component', ()=> {
             expect(instance.attr(path)).toBe(null);
           });
 
-          it('updates transient', ()=> {
+          it('updates transient', () => {
             viewModel.setItem(item);
             expect(viewModel.updateTransient).toHaveBeenCalled();
           });
@@ -104,7 +104,7 @@ describe('inline-autocomplete-wrapper component', ()=> {
       });
     });
 
-    describe('setCustomAttribute() method', ()=> {
+    describe('setCustomAttribute() method', () => {
       let instance;
       let item;
 
@@ -117,14 +117,14 @@ describe('inline-autocomplete-wrapper component', ()=> {
         viewModel.attr('instance', instance);
       });
 
-      it('sets person id for custom attribute', ()=> {
+      it('sets person id for custom attribute', () => {
         const cadId = 1;
         item.attr('id', 123);
         viewModel.setCustomAttribute(item, cadId);
         expect(instance.customAttr(cadId).value).toBe(item.attr('id'));
       });
 
-      it('updates text', ()=> {
+      it('updates text', () => {
         const cadId = 1;
         spyOn(viewModel, 'updateTextValue');
         viewModel.setCustomAttribute(item, cadId);
@@ -132,8 +132,8 @@ describe('inline-autocomplete-wrapper component', ()=> {
       });
     });
 
-    describe('updateTextValue() method', ()=> {
-      it('sets "displayProp" value if argument is object', ()=> {
+    describe('updateTextValue() method', () => {
+      it('sets "displayProp" value if argument is object', () => {
         viewModel.attr('displayProp', 'test');
         viewModel.attr('textValue', null);
 
@@ -144,7 +144,7 @@ describe('inline-autocomplete-wrapper component', ()=> {
         expect(viewModel.attr('textValue')).toBe('testTextValue');
       });
 
-      it('sets argument if argument is not object', ()=> {
+      it('sets argument if argument is not object', () => {
         viewModel.attr('textValue', null);
 
         viewModel.updateTextValue('testTextValue');
@@ -153,8 +153,8 @@ describe('inline-autocomplete-wrapper component', ()=> {
       });
     });
 
-    describe('updateTransient() method', ()=> {
-      it('creates "_transient" property if it not exist or empty', ()=> {
+    describe('updateTransient() method', () => {
+      it('creates "_transient" property if it not exist or empty', () => {
         instance.attr('_transient', null);
 
         viewModel.updateTransient('test');
@@ -162,7 +162,7 @@ describe('inline-autocomplete-wrapper component', ()=> {
         expect(instance.attr('_transient')).toBeTruthy();
       });
 
-      it('set argument to "_transient" property by path', ()=> {
+      it('set argument to "_transient" property by path', () => {
         instance.attr('_transient', null);
 
         viewModel.updateTransient('test');

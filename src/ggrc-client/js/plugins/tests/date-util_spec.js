@@ -9,9 +9,9 @@ import {
   getUtcDate,
 } from '../utils/date-util';
 
-describe('GGRC DateUtil', ()=> {
-  describe('getClosestWeekday() method', ()=> {
-    it('adjusts to Friday when weekend provided', ()=> {
+describe('GGRC DateUtil', () => {
+  describe('getClosestWeekday() method', () => {
+    it('adjusts to Friday when weekend provided', () => {
       let date = new Date(2017, 11, 24);
       let actual;
 
@@ -20,7 +20,7 @@ describe('GGRC DateUtil', ()=> {
       expect(actual.getDate()).toEqual(22);
     });
 
-    it('leaves date as is when week day provided', ()=> {
+    it('leaves date as is when week day provided', () => {
       let date = new Date(2017, 11, 20);
       let actual;
 
@@ -95,7 +95,7 @@ describe('GGRC DateUtil', ()=> {
       });
   });
 
-  describe('getUtcDate() method', ()=> {
+  describe('getUtcDate() method', () => {
     let date;
     let result;
     let expectedDefaultResult;

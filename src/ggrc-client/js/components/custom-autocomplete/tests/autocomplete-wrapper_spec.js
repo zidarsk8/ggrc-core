@@ -11,7 +11,7 @@ import {getInstance} from '../../../models/models-extensions';
 describe('autocomplete-wrapper viewModel', () => {
   let viewModel;
 
-  beforeEach(()=> {
+  beforeEach(() => {
     viewModel = baseAutocompleteWrapper();
   });
 

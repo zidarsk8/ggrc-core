@@ -10,7 +10,7 @@ import '../mixins/access-control-list';
 import '../mixins/ca-update';
 import Stub from '../stub';
 
-const getAccessControlList = ()=> {
+const getAccessControlList = () => {
   let adminRole = getRole('Document', 'Admin');
 
   return adminRole ? [{
@@ -83,7 +83,7 @@ export default Cacheable('CMS.Models.Document', {
   },
   save() {
     let baseSave = this._super;
-    return backendGdriveClient.withAuth(()=> {
+    return backendGdriveClient.withAuth(() => {
       return baseSave.call(this);
     });
   },

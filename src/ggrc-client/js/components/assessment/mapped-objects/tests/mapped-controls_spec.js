@@ -19,7 +19,7 @@ describe('assessment-mapped-controls component', () => {
     let pendingRequest;
     beforeEach(() => {
       pendingRequest = $.Deferred();
-      spyOn(SnapshotUtils, 'toObject').and.callFake((obj)=> obj);
+      spyOn(SnapshotUtils, 'toObject').and.callFake((obj) => obj);
       spyOn(QueryAPI, 'batchRequests')
         .and.returnValue(pendingRequest);
       spyOn(viewModel, 'getParams').and.returnValue([{
@@ -41,7 +41,7 @@ describe('assessment-mapped-controls component', () => {
       expect(viewModel.getParams).toHaveBeenCalled();
       expect(viewModel.attr('isLoading')).toBeTruthy();
 
-      pendingRequest.resolve(response).then(()=> {
+      pendingRequest.resolve(response).then(() => {
         expect(viewModel.attr('isLoading')).toBeFalsy();
         expect(viewModel.attr('testType').attr()).toEqual(items);
         done();
@@ -55,7 +55,7 @@ describe('assessment-mapped-controls component', () => {
 
       expect(viewModel.attr('isLoading')).toBeTruthy();
 
-      pendingRequest.reject().then(null, ()=> {
+      pendingRequest.reject().then(null, () => {
         expect(viewModel.attr('isLoading')).toBeFalsy();
         expect(NotifiersUtils.notifier)
           .toHaveBeenCalledWith('error', 'Failed to fetch related objects.');

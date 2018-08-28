@@ -6,22 +6,22 @@
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../autocomplete-results';
 
-describe('autocomplete-results component', ()=> {
+describe('autocomplete-results component', () => {
   let viewModel;
-  beforeEach(()=> {
+  beforeEach(() => {
     viewModel = getComponentVM(Component);
   });
 
-  describe('viewModel', ()=> {
-    describe('results get()', ()=> {
+  describe('viewModel', () => {
+    describe('results get()', () => {
       let item;
-      beforeEach(()=> {
+      beforeEach(() => {
         item = {
           email: 'email1',
           name: 'name1',
         };
       });
-      it('correctly maps results when paths are defined', ()=> {
+      it('correctly maps results when paths are defined', () => {
         viewModel.attr('titleFieldPath', 'name');
         viewModel.attr('infoFieldPath', 'email');
 
@@ -35,7 +35,7 @@ describe('autocomplete-results component', ()=> {
         });
       });
 
-      it('correctly maps results when patches are not defined', ()=> {
+      it('correctly maps results when patches are not defined', () => {
         viewModel.attr('values', [item]);
         let results = viewModel.attr('results');
 
@@ -47,10 +47,10 @@ describe('autocomplete-results component', ()=> {
       });
     });
 
-    describe('pickItem() method', ()=> {
+    describe('pickItem() method', () => {
       let event;
       let item;
-      beforeEach(()=> {
+      beforeEach(() => {
         event = jasmine.createSpyObj(['stopPropagation']);
         item = {
           test: true,
@@ -58,7 +58,7 @@ describe('autocomplete-results component', ()=> {
         spyOn(viewModel, 'dispatch');
       });
 
-      it('dispatches "itemPicked" event', ()=> {
+      it('dispatches "itemPicked" event', () => {
         viewModel.pickItem(item, event);
 
         expect(viewModel.dispatch).toHaveBeenCalledWith({
@@ -67,7 +67,7 @@ describe('autocomplete-results component', ()=> {
         });
       });
 
-      it('stops event propagation', ()=> {
+      it('stops event propagation', () => {
         viewModel.pickItem(item, event);
 
         expect(event.stopPropagation).toHaveBeenCalled();

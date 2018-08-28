@@ -187,7 +187,7 @@ export default can.Component.extend({
       this.attr('fileId', file.id);
       this.attr('fileName', file.name);
 
-      return backendGdriveClient.withAuth(()=> {
+      return backendGdriveClient.withAuth(() => {
         return analyseBeforeImport(file.id);
       }, {responseJSON: {message: 'Unable to Authorize'}})
         .then((response) => {

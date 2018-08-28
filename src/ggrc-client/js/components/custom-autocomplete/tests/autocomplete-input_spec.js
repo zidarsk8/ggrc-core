@@ -9,7 +9,7 @@ import Component, {keyMap} from '../autocomplete-input';
 describe('autocomplete-input component', () => {
   let viewModel;
 
-  beforeEach(()=> {
+  beforeEach(() => {
     viewModel = getComponentVM(Component);
   });
 
