@@ -282,7 +282,8 @@ def get_public_config():
     external_service = "/people/suggest"
   else:
     external_service = None
-  return {
+
+  public_config = {
       "external_help_url": getattr(settings, "EXTERNAL_HELP_URL", ""),
       "external_import_help_url":
           getattr(settings, "EXTERNAL_IMPORT_HELP_URL", ""),
@@ -292,6 +293,11 @@ def get_public_config():
       "external_services": {"Person": external_service},
       "enable_release_notes": settings.ENABLE_RELEASE_NOTES,
   }
+
+  if permissions.is_admin():
+    if hasattr(settings, "RISK_ASSESSMENT_URL"):
+      public_config["RISK_ASSESSMENT_URL"] = settings.RISK_ASSESSMENT_URL
+  return public_config
 
 
 def get_full_user_json():
