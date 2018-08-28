@@ -7,6 +7,7 @@ import Cacheable from '../cacheable';
 import '../mixins/ca-update';
 import '../mixins/timeboxed';
 import '../mixins/base-notifications';
+import Stub from '../stub';
 
 const path = GGRC.mustache_path + '/risk_assessments';
 
@@ -22,11 +23,11 @@ export default Cacheable('CMS.Models.RiskAssessment', {
   destroy: 'DELETE /api/risk_assessments/{id}',
   is_custom_attributable: true,
   attributes: {
-    ra_manager: 'CMS.Models.Person.stub',
-    ra_counsel: 'CMS.Models.Person.stub',
-    context: 'CMS.Models.Context.stub',
-    program: 'CMS.Models.Program.stub',
-    modified_by: 'CMS.Models.Person.stub',
+    ra_manager: Stub,
+    ra_counsel: Stub,
+    context: Stub,
+    program: Stub,
+    modified_by: Stub,
   },
   tree_view_options: {
     attr_list: [

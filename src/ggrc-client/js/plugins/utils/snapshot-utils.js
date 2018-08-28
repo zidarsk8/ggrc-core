@@ -11,6 +11,7 @@ import {hasRelatedAssessments} from './models-utils';
 import {getPageInstance} from '../utils/current-page-utils';
 import Person from '../../models/business-models/person';
 import Audit from '../../models/business-models/audit';
+import Stub from '../../models/stub';
 
 /**
  * Util methods for work with Snapshots.
@@ -123,7 +124,7 @@ function toObject(instance) {
 
   if (content.access_control_list) {
     content.access_control_list.forEach(function (item) {
-      item.person = new Person({id: item.person_id}).stub();
+      item.person = new Stub(new Person({id: item.person_id}));
     });
   }
 

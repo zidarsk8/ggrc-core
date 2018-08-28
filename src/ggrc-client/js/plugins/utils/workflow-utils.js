@@ -6,6 +6,7 @@
 import {confirm} from '../../plugins/utils/modals';
 import Permission from '../../permission';
 import Cycle from '../../models/business-models/cycle';
+import Stub from '../../models/stub';
 
 /**
  * A set of properties which describe minimum information
@@ -28,8 +29,8 @@ import Cycle from '../../models/business-models/cycle';
  */
 function createCycle(workflow) {
   return new Cycle({
-    context: workflow.context.stub(),
-    workflow: {id: workflow.id, type: 'Workflow'},
+    context: new Stub(workflow.context),
+    workflow: new Stub(workflow),
     autogenerate: true,
   });
 }

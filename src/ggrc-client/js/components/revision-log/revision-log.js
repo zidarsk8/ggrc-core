@@ -15,6 +15,7 @@ import {
 } from '../../plugins/ggrc_utils';
 import Revision from '../../models/service-models/revision';
 import Person from '../../models/business-models/person';
+import Stub from '../../models/stub';
 
 const EMPTY_DIFF_VALUE = '—';
 
@@ -130,7 +131,7 @@ export default can.Component.extend({
           });
         _.forEach(mappingsSrc, function (revision) {
           if (revision.destination_type && revision.destination_id) {
-            revision.destination = can.Stub.get_or_create({
+            revision.destination = new Stub({
               id: revision.destination_id,
               type: revision.destination_type,
             });
@@ -139,7 +140,7 @@ export default can.Component.extend({
         });
         _.forEach(mappingsDest, function (revision) {
           if (revision.source_type && revision.source_id) {
-            revision.source = can.Stub.get_or_create({
+            revision.source = new Stub({
               id: revision.source_id,
               type: revision.source_type,
             });
@@ -202,7 +203,7 @@ export default can.Component.extend({
                 source_type: type,
                 source_id: id,
                 source: instance,
-                destination: can.Stub.get_or_create({
+                destination: new Stub({
                   type: revision.destination_type,
                   id: revision.destination_id,
                 }),
@@ -223,7 +224,7 @@ export default can.Component.extend({
                 destination_type: type,
                 destination_id: id,
                 destination: instance,
-                source: can.Stub.get_or_create({
+                source: new Stub({
                   type: revision.source_type,
                   id: revision.source_id,
                 }),
@@ -637,7 +638,7 @@ export default can.Component.extend({
         object = revision.destination;
       }
 
-      if (object instanceof can.Stub) {
+      if (object instanceof Stub) {
         object = object.reify();
       }
 

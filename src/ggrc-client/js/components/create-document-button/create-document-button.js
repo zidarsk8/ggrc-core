@@ -17,6 +17,7 @@ import {
 import Permission from '../../permission';
 import template from './create-document-button.mustache';
 import Document from '../../models/business-models/document';
+import Context from '../../models/service-models/context';
 
 const viewModel = can.Map.extend({
   parentInstance: null,
@@ -86,7 +87,7 @@ const viewModel = can.Map.extend({
         title: file.title,
         source_gdrive_id: file.id,
         created_at: Date.now(),
-        context: {id: null},
+        context: new Context({id: null}),
       });
 
       return instance.save();

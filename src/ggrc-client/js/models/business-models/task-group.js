@@ -5,6 +5,7 @@
 
 import Cacheable from '../cacheable';
 import '../mixins/contactable';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.TaskGroup', {
   root_object: 'task_group',
@@ -22,13 +23,13 @@ export default Cacheable('CMS.Models.TaskGroup', {
     base: 'workflow',
   },
   attributes: {
-    workflow: 'CMS.Models.Workflow.stub',
-    task_group_tasks: 'CMS.Models.TaskGroupTask.stubs',
-    tasks: 'CMS.Models.Task.stubs',
-    task_group_objects: 'CMS.Models.TaskGroupObject.stubs',
-    objects: 'CMS.Models.get_stubs',
-    modified_by: 'CMS.Models.Person.stub',
-    context: 'CMS.Models.Context.stub',
+    workflow: Stub,
+    task_group_tasks: Stub.List,
+    tasks: Stub.List,
+    task_group_objects: Stub.List,
+    objects: Stub.List,
+    modified_by: Stub,
+    context: Stub,
     end_date: 'date',
   },
 

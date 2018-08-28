@@ -9,6 +9,7 @@ import '../mixins/ca-update';
 import '../mixins/access-control-list';
 import '../mixins/scope-object-notifications';
 import '../mixins/questionnaire';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.AccessGroup', {
   root_object: 'access_group',
@@ -29,8 +30,8 @@ export default Cacheable('CMS.Models.AccessGroup', {
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {
-    context: 'CMS.Models.Context.stub',
-    modified_by: 'CMS.Models.Person.stub',
+    context: Stub,
+    modified_by: Stub,
   },
   tree_view_options: {
     attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',

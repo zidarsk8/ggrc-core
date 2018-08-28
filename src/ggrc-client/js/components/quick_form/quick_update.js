@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import Stub from '../../models/stub';
+
 /*
   This component is for quickly updating the properties of an object through form fields.
   It works similar to GGRC.Controllers.QuickForm but has an extra feature: if the instance
@@ -46,7 +48,7 @@ export default can.Component.extend({
         delete serial.created_at;
         delete serial.updated_at;
         delete serial.provisional_id;
-        serial[el.attr('name')] = ui.item.stub();
+        serial[el.attr('name')] = new Stub(ui.item);
         that.viewModel.instance.destroy().then(function () {
           new that.viewModel.model(serial).save();
         });

@@ -13,6 +13,7 @@ import Mappings from '../models/mappers/mappings';
 import {getPageInstance} from '../plugins/utils/current-page-utils';
 import RiskAssessment from '../models/business-models/risk-assessment';
 import Program from '../models/business-models/program';
+import Stub from '../models/stub';
 
 (function ($, CMS, GGRC) {
   let RiskAssessmentsExtension = {};
@@ -28,7 +29,7 @@ import Program from '../models/business-models/program';
     };
   };
 
-  Program.attributes.risk_assessments = 'CMS.Models.RiskAssessment.stubs';
+  Program.attributes.risk_assessments = Stub.List;
 
   // Configure mapping extensions for ggrc_risk_assessments
   RiskAssessmentsExtension.init_mappings = function () {

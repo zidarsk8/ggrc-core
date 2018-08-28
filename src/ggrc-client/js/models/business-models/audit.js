@@ -11,6 +11,7 @@ import '../mixins/ca-update';
 import '../mixins/timeboxed';
 import '../mixins/mapping-limit';
 import '../mixins/issue-tracker.js';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Audit', {
   root_object: 'audit',
@@ -33,12 +34,12 @@ export default Cacheable('CMS.Models.Audit', {
   is_clonable: true,
   isRoleable: true,
   attributes: {
-    context: 'CMS.Models.Context.stub',
-    program: 'CMS.Models.Program.stub',
-    modified_by: 'CMS.Models.Person.stub',
+    context: Stub,
+    program: Stub,
+    modified_by: Stub,
     report_start_date: 'date',
     report_end_date: 'date',
-    audit_firm: 'CMS.Models.OrgGroup.stub',
+    audit_firm: Stub,
   },
   defaults: {
     status: 'Planned',
@@ -140,13 +141,16 @@ export default Cacheable('CMS.Models.Audit', {
     return CMS.Models[this.attr('object_type')];
   },
   clone: function (options) {
-    let model = CMS.Models.Audit;
-    return new model({
+    let cloneModel = new CMS.Models.Audit({
       operation: 'clone',
       cloneOptions: options.cloneOptions,
       program: this.program,
       title: this.title + new Date(),
     });
+
+    delete cloneModel.custom_attribute_values;
+
+    return cloneModel;
   },
   save: function () {
     // Make sure the context is always set to the parent program

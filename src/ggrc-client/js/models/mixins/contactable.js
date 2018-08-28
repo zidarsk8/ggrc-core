@@ -4,6 +4,7 @@
 */
 
 import Mixin from './mixin';
+import Stub from '../stub';
 
 export default Mixin('contactable', {
   // NB : Because the attributes object
@@ -12,8 +13,8 @@ export default Mixin('contactable', {
   //  parent class's attributes using `can.extend(this.attributes, <parent_class>.attributes);`
   //  in the child class's static init function.
   'extend:attributes': {
-    contact: 'CMS.Models.Person.stub',
-    secondary_contact: 'CMS.Models.Person.stub',
+    contact: Stub,
+    secondary_contact: Stub,
   },
 }, {
   before_create: function () {

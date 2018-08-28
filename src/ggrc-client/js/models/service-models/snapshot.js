@@ -4,14 +4,15 @@
 */
 
 import Cacheable from '../cacheable';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Snapshot', {
   root_object: 'snapshot',
   root_collection: 'snapshots',
   attributes: {
-    context: 'CMS.Models.Context.stub',
-    modified_by: 'CMS.Models.Person.stub',
-    parent: 'Cacheable.stub',
+    context: Stub,
+    modified_by: Stub,
+    parent: Stub,
   },
   defaults: {
     parent: null,

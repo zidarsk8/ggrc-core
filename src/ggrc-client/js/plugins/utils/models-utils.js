@@ -5,6 +5,7 @@
 
 import {notifier} from './notifiers-utils';
 import RefreshQueue from '../../models/refresh_queue';
+import Stub from '../../models/stub';
 
 const relatedAssessmentsTypes = Object.freeze(['Control', 'Objective']);
 
@@ -167,10 +168,10 @@ function _addHandler(obj, pj) {
   const dfd = $.when(pjDfd)
     .then(function () {
       if (binding.loader.object_attr) {
-        inst.attr(binding.loader.object_attr, obj.stub());
+        inst.attr(binding.loader.object_attr, new Stub(obj));
       }
       if (binding.loader.option_attr) {
-        inst.attr(binding.loader.option_attr, pj.what.stub());
+        inst.attr(binding.loader.option_attr, new Stub(pj.what));
       }
       if (pj.extra) {
         inst.attr(pj.extra);

@@ -19,6 +19,7 @@ import RefreshQueue from './refresh_queue';
 import tracker from '../tracker';
 import Mappings from './mappers/mappings';
 import {delayLeavingPageUntil} from '../plugins/utils/current-page-utils';
+import Stub from './stub';
 
 function dateConverter(date, oldValue, fn, key) {
   let conversion = 'YYYY-MM-DD\\THH:mm:ss\\Z';
@@ -446,22 +447,6 @@ export default can.Model('can.Model.Cacheable', {
       }
     }
     return params;
-  },
-
-  stubs: function (params) {
-    return new can.List(can.map(this.models(params), function (instance) {
-      if (!instance) {
-        return instance;
-      }
-      return instance.stub();
-    }));
-  },
-
-  stub: function (params) {
-    if (!params) {
-      return params;
-    }
-    return this.model(params).stub();
   },
   model: function (params) {
     let model;
@@ -907,7 +892,6 @@ export default can.Model('can.Model.Cacheable', {
   // TODO: should be refactored and sliced on multiple functions
   serialize: function () {
     let serial = {};
-    let fnName;
     let val;
     if (arguments.length) {
       return this._super(...arguments);
@@ -919,27 +903,19 @@ export default can.Model('can.Model.Cacheable', {
       }
       val = this[name];
       if (this.constructor.attributes && this.constructor.attributes[name]) {
-        fnName = this.constructor.attributes[name];
-        fnName = fnName.substr(fnName.lastIndexOf('.') + 1);
-        if (fnName === 'stubs' || fnName === 'get_stubs' ||
-        fnName === 'models' || fnName === 'get_instances') {
-        // val can be null in some cases
-          if (val) {
-            serial[name] = val.stubs().serialize();
-          }
-        } else if (fnName === 'stub' || fnName === 'get_stub' ||
-        fnName === 'model' || fnName === 'get_instance') {
-          serial[name] = (val ? val.stub().serialize() : null);
+        let attrConstructor = this.constructor.attributes[name];
+        if (attrConstructor === Stub || attrConstructor === Stub.List) {
+          serial[name] = val ? (new attrConstructor(val)).serialize() : null;
         } else {
           serial[name] = val;
         }
       } else if (val && can.isFunction(val.save)) {
-        serial[name] = val.stub().serialize();
+        serial[name] = (new Stub(val)).serialize();
       } else if (typeof val === 'object' && val !== null && val.length) {
         serial[name] = can.map(val, function (v) {
           let isModel = v && can.isFunction(v.save);
           return isModel ?
-            v.stub().serialize() :
+            (new Stub(v)).serialize() :
             (v && v.serialize) ? v.serialize() : v;
         });
       } else if (!can.isFunction(val)) {
@@ -1075,10 +1051,6 @@ export default can.Model('can.Model.Cacheable', {
       if (this.before_create) {
         this.before_create(preSaveNotifier);
       }
-    } else {
-      if (this.before_update) {
-        this.before_update(preSaveNotifier);
-      }
     }
 
     preSaveNotifier.on_empty(function () {
@@ -1149,114 +1121,4 @@ can.Observe.prototype.attr = function (key, val) {
     return _oldAttr.apply(this, [key.serialize()]);
   }
   return _oldAttr.apply(this, arguments);
-};
-
-can.Observe.prototype.stub = function () {
-  let type;
-  let id;
-
-  if (!(this instanceof can.Model || this instanceof can.Stub)) {
-    console.debug('.stub() called on non-stub, non-instance object', this);
-  }
-
-  if (this instanceof can.Stub) {
-    return this;
-  }
-
-  if (this instanceof can.Model) {
-    type = this.constructor.shortName;
-  } else {
-    type = this.type;
-  }
-
-  if (this.constructor.id) {
-    id = this[this.constructor.id];
-  } else {
-    id = this.id;
-  }
-
-  if (!id && id !== 0) {
-    return null;
-  }
-
-  return can.Stub.get_or_create({
-    id: id,
-    href: this.selfLink || this.href,
-    type: type,
-  });
-};
-
-can.Observe('can.Stub', {
-  get_or_create: function (obj) {
-    let id = obj.id;
-    let stub;
-    let type = obj.type;
-
-    CMS.Models.stub_cache = CMS.Models.stub_cache || {};
-    CMS.Models.stub_cache[type] = CMS.Models.stub_cache[type] || {};
-    if (!CMS.Models.stub_cache[type][id]) {
-      stub = new can.Stub(obj);
-      CMS.Models.stub_cache[type][id] = stub;
-    }
-    return CMS.Models.stub_cache[type][id];
-  },
-}, {
-  init: function () {
-    let that = this;
-    this._super(...arguments);
-    this._instance().bind('destroyed', function (ev) {
-      // Trigger propagating `change` event to convey `stub-destroyed` message
-      can.trigger(
-        that, 'change', ['stub_destroyed', 'stub_destroyed', that, null]);
-      delete CMS.Models.stub_cache[that.type][that.id];
-    });
-  },
-
-  _model: function () {
-    return CMS.Models[this.type] || GGRC.Models[this.type];
-  },
-
-  _instance: function () {
-    if (!this.__instance) {
-      this.__instance = this._model().model(this);
-    }
-    return this.__instance;
-  },
-
-  getInstance: function () {
-    return this._instance();
-  },
-});
-
-can.Observe.List.prototype.stubs = function () {
-  return new can.Observe.List(can.map(this, function (obj) {
-    return obj.stub();
-  }));
-};
-
-can.Observe.prototype.reify = function () {
-  let type;
-  let model;
-
-  if (this instanceof can.Model) {
-    return this;
-  }
-  if (!(this instanceof can.Stub)) {
-    // console.debug('`reify()` called on non-stub, non-instance object', this);
-  }
-
-  type = this.type;
-  model = CMS.Models[type] || GGRC.Models[type];
-
-  if (!model) {
-    console.debug('`reify()` called with unrecognized type', this);
-  } else {
-    return model.model(this);
-  }
-};
-
-can.Observe.List.prototype.reify = function () {
-  return new can.Observe.List(can.map(this, function (obj) {
-    return obj.reify();
-  }));
 };

@@ -19,6 +19,7 @@ import '../mixins/access-control-list';
 import '../mixins/refetch-hash';
 import '../mixins/assessment-issue-tracker';
 import '../mixins/related-assessments-loader';
+import {getInstance} from '../models-extensions';
 
 export default Cacheable('CMS.Models.Assessment', {
   root_object: 'assessment',
@@ -296,12 +297,12 @@ export default Cacheable('CMS.Models.Assessment', {
     }
   },
   isDirty: function (checkAssociations) {
-    this._transformBackupProperty(['design', 'operationally', '_disabled']);
+    this._transformBackupProperty(['design', 'operationally']);
     return this._super(checkAssociations);
   },
   form_preload: function (newObjectForm) {
     let pageInstance = getPageInstance();
-    let currentUser = CMS.Models.get_instance('Person',
+    let currentUser = getInstance('Person',
       GGRC.current_user.id, GGRC.current_user);
 
     if (pageInstance && (!this.audit || !this.audit.id || !this.audit.type)) {

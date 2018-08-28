@@ -19,10 +19,14 @@ import {
   isConnectionLost,
   handleAjaxError,
 } from '../../plugins/utils/errors-utils';
-import {confirm} from '../../plugins/utils/modals';
+import {
+  confirm,
+  BUTTON_VIEW_CLOSE,
+} from '../../plugins/utils/modals';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 import './current-exports/current-exports';
 import {connectionLostNotifier} from './connection-lost-notifier';
+import router from '../../router';
 
 const DEFAULT_TIMEOUT = 2000;
 
@@ -30,6 +34,19 @@ export default can.Component.extend({
   tag: 'csv-export',
   template: csvExportTemplate,
   viewModel: {
+    define: {
+      exportAllowed: {
+        get() {
+          if (!this.attr('panels.length')) {
+            return false;
+          }
+
+          return _.reduce(this.attr('panels'), (allowed, panel) => {
+            return allowed && panel.attr('isValidConfiguration');
+          }, true);
+        },
+      },
+    },
     isInProgress: false,
     loading: false,
     fileName: 'export_objects.csv',
@@ -44,7 +61,7 @@ export default can.Component.extend({
       });
     },
     getExports(ids) {
-      getExportsHistory(ids)
+      return getExportsHistory(ids)
         .then((exports) => {
           const timeout = this.attr('timeout');
           if (ids) {
@@ -199,10 +216,30 @@ export default can.Component.extend({
         };
       });
     },
+    verifyTargetJob: function () {
+      let targetJobId = router.attr('job_id');
+
+      if (targetJobId) {
+        let isJobActive = _.find(this.attr('currentExports'), function (el) {
+          return el.id === parseInt(targetJobId);
+        });
+
+        if (!isJobActive) {
+          confirm({
+            modal_title: 'Warning',
+            modal_description: `You have already downloaded a file generated
+              for this export request.`,
+            button_view: BUTTON_VIEW_CLOSE,
+          });
+        }
+      }
+    },
   },
   events: {
     inserted() {
-      this.viewModel.getExports();
+      this.viewModel.getExports().then(() => {
+        this.viewModel.verifyTargetJob();
+      });
     },
     toggleIndicator: function (currentFilter) {
       let isExpression =

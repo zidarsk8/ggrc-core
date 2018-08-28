@@ -8,6 +8,7 @@ import TaskGroup from './task-group';
 import '../mixins/ca-update';
 import '../mixins/timeboxed';
 import '../mixins/access-control-list';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Workflow', {
   root_object: 'workflow',
@@ -22,10 +23,10 @@ export default Cacheable('CMS.Models.Workflow', {
   is_custom_attributable: true,
 
   attributes: {
-    task_groups: 'CMS.Models.TaskGroup.stubs',
-    cycles: 'CMS.Models.Cycle.stubs',
-    modified_by: 'CMS.Models.Person.stub',
-    context: 'CMS.Models.Context.stub',
+    task_groups: Stub.List,
+    cycles: Stub.List,
+    modified_by: Stub,
+    context: Stub,
     repeat_every: 'number',
   },
   default_lhn_filters: {

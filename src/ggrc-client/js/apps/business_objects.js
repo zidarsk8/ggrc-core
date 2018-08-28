@@ -217,6 +217,9 @@ import * as businessModels from '../models/business-models/index';
             Evidence: {
               treeViewDepth: 0,
             },
+            AssessmentTemplate: {
+              treeViewDepth: 0,
+            },
             Person: {
               widget_icon: 'person',
             },

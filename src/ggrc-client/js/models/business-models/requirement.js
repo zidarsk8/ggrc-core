@@ -8,6 +8,7 @@ import '../mixins/unique-title';
 import '../mixins/ca-update';
 import '../mixins/access-control-list';
 import '../mixins/base-notifications';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Requirement', {
   root_object: 'requirement',
@@ -34,8 +35,8 @@ export default Cacheable('CMS.Models.Requirement', {
     'base-notifications',
   ],
   attributes: {
-    context: 'CMS.Models.Context.stub',
-    modified_by: 'CMS.Models.Person.stub',
+    context: Stub,
+    modified_by: Stub,
   },
   tree_view_options: {
     attr_view: '/static/mustache/requirements/tree-item-attr.mustache',

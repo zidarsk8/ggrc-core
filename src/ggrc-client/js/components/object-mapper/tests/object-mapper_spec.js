@@ -8,6 +8,7 @@ import RefreshQueue from '../../../models/refresh_queue';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import Component from '../object-mapper';
 import Program from '../../../models/business-models/program';
+import * as modelsExtensions from '../../../models/models-extensions';
 
 describe('object-mapper component', function () {
   let events;
@@ -473,7 +474,7 @@ describe('object-mapper component', function () {
     it('returns title of parentInstance if parentInstance defined',
       function () {
         let result;
-        spyOn(CMS.Models, 'get_instance').and.returnValue({
+        spyOn(modelsExtensions, 'getInstance').and.returnValue({
           title: 'mockTitle',
         });
         result = helper.call(viewModel);

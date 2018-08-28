@@ -18,6 +18,7 @@ import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 import tracker from '../../tracker';
 import Evidence from '../../models/business-models/evidence';
+import Context from '../../models/service-models/context';
 
 const defaultOrderBy = [
   {field: 'finished_date', direction: 'desc'},
@@ -71,7 +72,7 @@ export default can.Component.extend({
     relatedAssessments: [],
     buildEvidenceModel: function (evidence) {
       const baseData = {
-        context: {id: this.attr('instance.context.id') || null},
+        context: new Context({id: this.attr('instance.context.id') || null}),
         parent_obj: {
           id: this.attr('instance.id'),
           type: this.attr('instance.type'),

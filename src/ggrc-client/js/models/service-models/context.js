@@ -4,6 +4,7 @@
 */
 
 import Cacheable from '../cacheable';
+import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Context', {
   root_object: 'context',
@@ -15,8 +16,8 @@ export default Cacheable('CMS.Models.Context', {
   update: 'PUT /api/contexts/{id}',
   destroy: 'DELETE /api/contexts/{id}',
   attributes: {
-    context: 'CMS.Models.Context.stub',
-    related_object: 'CMS.Models.get_stub',
-    user_roles: 'CMS.Models.UserRole.stubs',
+    context: Stub,
+    related_object: Stub,
+    user_roles: Stub.List,
   },
 }, {});

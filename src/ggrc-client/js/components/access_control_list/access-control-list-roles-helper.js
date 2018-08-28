@@ -49,12 +49,18 @@ export default can.Component.extend({
         }
       });
     },
+    setupRoles() {
+      if (this.attr('isNewInstance')) {
+        this.setAutoPopulatedRoles();
+      }
+    },
   },
   events: {
-    inserted: function () {
-      if (this.viewModel.attr('isNewInstance')) {
-        this.viewModel.setAutoPopulatedRoles();
-      }
+    inserted() {
+      this.viewModel.setupRoles();
+    },
+    '{viewModel} instance'() {
+      this.viewModel.setupRoles();
     },
   },
 });
