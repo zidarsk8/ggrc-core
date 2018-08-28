@@ -19,7 +19,8 @@ export default can.Component.extend({
   viewModel: {
     define: {
       showAttributes: {
-        set: function (newValue, setValue) {
+        value: true,
+        set(newValue, setValue) {
           this.updateIsSelected(
             this.attr('item.attributes'), newValue);
 
@@ -27,7 +28,8 @@ export default can.Component.extend({
         },
       },
       showMappings: {
-        set: function (newValue, setValue) {
+        value: true,
+        set(newValue, setValue) {
           this.updateIsSelected(
             this.attr('item.mappings'), newValue);
 
@@ -35,7 +37,8 @@ export default can.Component.extend({
         },
       },
       showLocalAttributes: {
-        set: function (newValue, setValue) {
+        value: true,
+        set(newValue, setValue) {
           this.updateIsSelected(
             this.attr('item.localAttributes'), newValue);
 
@@ -64,59 +67,21 @@ export default can.Component.extend({
         }));
       }.bind(this));
     },
-    getModelAttributeDefenitions: function (type) {
-      return GGRC.model_attr_defs[type];
-    },
-    useLocalAttribute: function () {
-      return this.attr('item.type') === 'Assessment';
-    },
-    filterModelAttributes: function (attr, predicate) {
-      return predicate &&
-        !attr.import_only &&
-        attr.display_name.indexOf('unmap:') === -1;
-    },
-    refreshItems: function () {
-      let currentPanel = this.attr('item');
-      let definitions = this
-        .getModelAttributeDefenitions(currentPanel.attr('type'));
-      let localAttributes;
-
-      let attributes = _.filter(definitions, function (el) {
-        return this.filterModelAttributes(el,
-          el.type !== 'mapping' && el.type !== 'object_custom');
-      }.bind(this));
-
-      let mappings = _.filter(definitions, function (el) {
-        return this.filterModelAttributes(el, el.type === 'mapping');
-      }.bind(this));
-
-      currentPanel.attr('attributes', attributes);
-      currentPanel.attr('mappings', mappings);
-
-      if (this.useLocalAttribute()) {
-        localAttributes = _.filter(definitions, function (el) {
-          return this.filterModelAttributes(el, el.type === 'object_custom');
-        }.bind(this));
-
-        currentPanel.attr('localAttributes', localAttributes);
-      }
-    },
     updateIsSelected: function (items, isSelected) {
-      can.batch.start();
+      if (!items) {
+        return;
+      }
 
+      can.batch.start();
       items.forEach(function (item) {
         item.attr('isSelected', isSelected);
       });
-
       can.batch.stop();
     },
     setSelected: function () {
       this.attr('showMappings', true);
       this.attr('showAttributes', true);
-
-      if (this.useLocalAttribute()) {
-        this.attr('showLocalAttributes', true);
-      }
+      this.attr('showLocalAttributes', true);
     },
   },
   events: {
@@ -126,8 +91,6 @@ export default can.Component.extend({
       if (panelNumber === 1 && url.relevant_id && url.relevant_type) {
         this.viewModel.fetch_relevant_data(url.relevant_id, url.relevant_type);
       }
-      this.viewModel.refreshItems();
-      this.viewModel.setSelected();
     },
     '[data-action=select_toggle] click': function (el, ev) {
       let type = el.data('type');
@@ -151,17 +114,7 @@ export default can.Component.extend({
       this.viewModel.updateIsSelected(targetList, value);
     },
     '{viewModel} type': function (viewModel, ev, type) {
-      viewModel.attr('item.relevant', []);
-      viewModel.attr('item.filter', '');
-      viewModel.attr('item.snapshot_type', '');
-      viewModel.attr('item.has_parent', false);
-      viewModel.attr('item.type', type);
-
-      if (viewModel.attr('type') === 'Snapshot') {
-        viewModel.attr('item.snapshot_type', 'Control');
-      }
-
-      viewModel.refreshItems();
+      viewModel.attr('item').changeType(type);
       viewModel.setSelected();
     },
   },
