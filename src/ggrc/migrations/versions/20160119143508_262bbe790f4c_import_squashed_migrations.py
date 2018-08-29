@@ -5,21 +5,15 @@
 
 Revision ID: 262bbe790f4c
 Revises: 297131e22e28
-Create Date: 2016-01-19 14:35:08.577857
+Create Date: 2018-08-24 11:35:08.577857
 
 
 These migration were generated with the following procedure:
 
-git checkout 0.9.5-Zucchini-P1
-git checkout develop bin/db_reset
-git reset HEAD bin/db_reset
-all_modules=$GGRC_SETTINGS_MODULE
-export GGRC_SETTINGS_MODULE="development"  # enable only the ggrc module
+git checkout 1.19.0-Strawberry
 db_reset
-mysqldump -uroot -proot ggrcdev > ggrcdev_ggrc.sql
-export GGRC_SETTINGS_MODULE=all_modules
-git checkout bin/db_reset
-git checkout -
+mysqldump -hdb --set-gtid-purged=OFF ggrcdev > \
+  src/ggrc/migrations/versions/ggrcdev.sql
 
 
 To test these migrations you can simply compare the migrations from two commits
@@ -30,7 +24,7 @@ squash - current commit
 git checkout develop
 db_reset && mysqldump -uroot -proot ggrcdev > dev.sql
 git checkout squash
-db_reset && mysqldump -uroot -proot ggrcdev > squ.sql
+db_reset && mysqldump -uroot -proot ggrcdev > squash.sql
 
 
 Note: Some of the squashed migrations can produce different database states
@@ -54,7 +48,7 @@ down_revision = None
 def upgrade():
   """Import squashed migrations."""
   dirname = os.path.dirname(os.path.realpath(__file__))
-  dump_file = os.path.join(dirname, "ggrcdev_ggrc.sql")
+  dump_file = os.path.join(dirname, "ggrcdev.sql")
   dump = open(dump_file, "r")
   op.execute(dump.read())
 

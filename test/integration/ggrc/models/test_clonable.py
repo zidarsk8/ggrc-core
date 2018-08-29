@@ -80,7 +80,8 @@ class TestClonable(SnapshotterBaseTestCase):
         "test_plan_procedure",
         "procedure_description",
         "default_people",
-        "title"
+        "title",
+        "status",
     ]
     # Check that fields in copy template is same as in source
     self.assertEqual(
@@ -636,3 +637,35 @@ class TestClonable(SnapshotterBaseTestCase):
         ).count(),
         0, "No snapshots should exist for new control."
     )
+
+  @ddt.data(
+      "Active",
+      "Draft",
+      "Deprecated",
+  )
+  def test_cloned_assessment_template_status(self, status):
+    """Test that the status of cloned Assessment Template is equal original
+    Assessment Template status"""
+    audit_1 = factories.AuditFactory()
+    audit_2 = factories.AuditFactory()
+    assessment_template = factories.AssessmentTemplateFactory(
+        template_object_type="Control",
+        procedure_description="Test procedure",
+        title="Test clone of Assessment Template",
+        context=audit_1.context,
+        status=status,
+    )
+    factories.RelationshipFactory(
+        source=audit_1,
+        destination=assessment_template
+    )
+    self.clone_asmnt_templates([assessment_template.id], audit_2)
+    templates_count = models.AssessmentTemplate.query.count()
+    self.assertEqual(templates_count, 2,
+                     msg="Unexpected assessment templates "
+                         "appeared in database.")
+    template_copy = models.AssessmentTemplate.query.filter(
+        models.AssessmentTemplate.title == assessment_template.title,
+        models.AssessmentTemplate.id != assessment_template.id
+    ).first()
+    self.assertEqual(template_copy.status, status)

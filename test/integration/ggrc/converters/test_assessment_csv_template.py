@@ -19,11 +19,6 @@ class TestAssessmentCSVTemplate(TestCase):
     """Set up for test cases."""
     super(TestAssessmentCSVTemplate, self).setUp()
     self.client.get("/login")
-    self.headers = {
-        'Content-Type': 'application/json',
-        "X-Requested-By": "GGRC",
-        "X-export-view": "blocks",
-    }
 
   def test_exported_csv(self):
     """Tests attributes order in exported assessment csv."""
@@ -40,3 +35,9 @@ class TestAssessmentCSVTemplate(TestCase):
     response = self.export_csv(data)
     self.assertEqual(response.status_code, 200)
     self.assertIn("Verifiers,Comments,Last Comment,GCA 1", response.data)
+
+  def test_exclude_evidence_file(self):
+    """Test exclude evidence file field from csv template"""
+    objects = [{"object_name": "Assessment"}]
+    response = self.export_csv_template(objects)
+    self.assertNotIn("Evidence File", response.data)

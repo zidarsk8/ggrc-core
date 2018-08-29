@@ -5,7 +5,7 @@
 
 import '../../dropdown/multiselect-dropdown';
 import template from './download-template.mustache';
-import {exportRequest, download} from '../import-export-utils';
+import {downloadTemplate, download} from '../import-export-utils';
 
 const tag = 'download-template';
 const CSV_FILE_NAME = 'import_template.csv';
@@ -54,14 +54,12 @@ const viewModel = can.Map.extend({
     objects = Array.from(selected).map(({name}) => {
       return {
         object_name: name,
-        fields: 'all',
       };
     });
 
-    return exportRequest({
+    return downloadTemplate({
       data: {
         objects,
-        export_to: 'csv',
       },
     }).then(function (data) {
       download(CSV_FILE_NAME, data);

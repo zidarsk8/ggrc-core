@@ -6,7 +6,7 @@
 """A module with tests for the GGRC Workflow's data_handler module."""
 
 import unittest
-from mock import MagicMock, patch
+from mock import patch
 
 from ggrc_workflows import models
 from ggrc_workflows.notification import data_handler
@@ -36,8 +36,7 @@ class GetCycleUrlTestCase(unittest.TestCase):
 
   def test_generates_correct_url_for_active_cycle(self, *mocks):
     """The method should return correct URL for active Cycles."""
-    workflow = MagicMock()
-    workflow.id = 111
+    workflow = models.Workflow(id=111)
     cycle = models.Cycle(id=22, workflow=workflow)
 
     # by default, a cycle is considered active
@@ -50,8 +49,7 @@ class GetCycleUrlTestCase(unittest.TestCase):
 
   def test_generates_correct_url_for_inactive_cycle(self, *mocks):
     """The method should return correct URL for inactive Cycles."""
-    workflow = MagicMock()
-    workflow.id = 111
+    workflow = models.Workflow(id=111)
     cycle = models.Cycle(id=22, workflow=workflow)
 
     expected_url = (

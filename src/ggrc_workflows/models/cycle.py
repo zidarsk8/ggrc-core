@@ -7,13 +7,15 @@
 from urlparse import urljoin
 
 from sqlalchemy import orm, inspect
+from sqlalchemy.ext import hybrid
 
 from ggrc import db
 from ggrc.fulltext import attributes as ft_attributes
 from ggrc.fulltext import mixin as ft_mixin
 from ggrc.models import mixins
-from ggrc.models.mixins import base
 from ggrc.models import reflection
+from ggrc.models import relationship
+from ggrc.models.mixins import base
 from ggrc.utils import get_url_root
 from ggrc import builder
 from ggrc.access_control import roleable
@@ -31,6 +33,7 @@ def _query_filtered_by_contact(person):
 
 
 class Cycle(roleable.Roleable,
+            relationship.Relatable,
             mixins.WithContact,
             wf_mixins.CycleStatusValidatedMixin,
             mixins.Timeboxed,
@@ -43,6 +46,7 @@ class Cycle(roleable.Roleable,
             db.Model):
   """Workflow Cycle model
   """
+  # pylint: disable=too-many-instance-attributes
 
   __tablename__ = 'cycles'
   _title_uniqueness = False
@@ -53,7 +57,7 @@ class Cycle(roleable.Roleable,
       nullable=False,
   )
   cycle_task_groups = db.relationship(
-      'CycleTaskGroup', backref='cycle', cascade='all, delete-orphan')
+      'CycleTaskGroup', backref='_cycle', cascade='all, delete-orphan')
   cycle_task_group_object_tasks = db.relationship(
       'CycleTaskGroupObjectTask', backref='cycle',
       cascade='all, delete-orphan')
@@ -63,6 +67,22 @@ class Cycle(roleable.Roleable,
                          default=True,
                          nullable=False)
   next_due_date = db.Column(db.Date)
+
+  # This parameter is overridden by workflow backref, but is here to ensure
+  # pylint does not complain
+  _workflow = None
+
+  @hybrid.hybrid_property
+  def workflow(self):
+    """Getter for workflow foreign key."""
+    return self._workflow
+
+  @workflow.setter
+  def workflow(self, workflow):
+    """Set workflow foreign key and relationship."""
+    if not self._workflow and workflow:
+      relationship.Relationship(source=workflow, destination=self)
+    self._workflow = workflow
 
   @property
   def is_done(self):
