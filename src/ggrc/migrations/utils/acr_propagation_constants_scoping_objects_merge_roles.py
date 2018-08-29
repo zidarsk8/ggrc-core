@@ -24,9 +24,11 @@ COMMENT_DOCUMENT_RUD = {
 NEW_ROLES_PROPAGATION = {
     "Assignee": COMMENT_DOCUMENT_RUD,
     "Verifier": COMMENT_DOCUMENT_RUD,
+    "Compliance Contacts": COMMENT_DOCUMENT_RUD,
 }
 
 TO_DELETE_ROLES_PROPAGATION = {
+    "Primary Contacts": COMMENT_DOCUMENT_RUD,
     "Secondary Contacts": COMMENT_DOCUMENT_RUD,
 }
 
