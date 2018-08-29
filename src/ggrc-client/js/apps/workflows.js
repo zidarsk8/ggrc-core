@@ -28,13 +28,12 @@ import * as businessModels from '../models/business-models';
 
 (function ($, CMS, GGRC) {
   let WorkflowExtension = {};
-  let _workflowObjectTypes = Array.prototype.concat.call(
-    [],
-    'Program Regulation Policy Standard Contract Clause Requirement'.split(' '),
-    'Control Objective OrgGroup Vendor AccessGroup'.split(' '),
-    'System Process DataAsset Product Project Facility Market'.split(' '),
-    'Issue Risk Threat Metric TechnologyEnvironment ProductGroup'.split(' ')
-  );
+  let _workflowObjectTypes = [
+    'Program', 'Regulation', 'Policy', 'Standard', 'Contract', 'Clause',
+    'Requirement', 'Control', 'Objective', 'OrgGroup', 'Vendor', 'AccessGroup',
+    'System', 'Process', 'DataAsset', 'Product', 'Project', 'Facility',
+    'Market', 'Issue', 'Risk', 'Threat', 'Metric', 'TechnologyEnvironment',
+    'ProductGroup'];
 
   let historyWidgetCountsName = 'cycles:history';
   let currentWidgetCountsName = 'cycles:active';
