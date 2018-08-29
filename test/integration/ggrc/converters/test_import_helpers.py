@@ -14,7 +14,6 @@ from ggrc.converters import import_helper
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.utils import rules
 from ggrc.utils import title_from_camelcase
-from ggrc_risk_assessments import models as ra_models
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 from integration.ggrc.generator import ObjectGenerator
@@ -938,7 +937,7 @@ class TestRiskAssessmentColumnDefinitions(TestCase):
 
   def test_risk_assessemnt(self):
     """Test default headers for Risk Assessment."""
-    definitions = get_object_column_definitions(ra_models.RiskAssessment)
+    definitions = get_object_column_definitions(all_models.RiskAssessment)
     display_names = {val["display_name"] for val in definitions.itervalues()}
     expected_names = {
         "Title",

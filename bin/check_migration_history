@@ -4,7 +4,6 @@
 
 for module in ggrc \
               ggrc_basic_permissions \
-              ggrc_risk_assessments \
               ggrc_workflows
 do
   HEADS="$(alembic $module history | grep head)"
