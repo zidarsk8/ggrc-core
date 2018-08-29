@@ -336,7 +336,6 @@ checkstyle_tests () {
                         src/ggrc_basic_permissions\
                         src/ggrc_gdrive_integration\
                         src/ggrc_risk_assessments\
-                        src/ggrc_risks\
                         src/ggrc_workflows\
                         test/integration\
                         test/selenium/src\
