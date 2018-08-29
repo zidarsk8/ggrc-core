@@ -42,13 +42,20 @@ SCOPING_OBJECTS = [
 NEW_ROLES = [
     "Assignee",
     "Verifier",
+    "Compliance Contacts",
 ]
+
+MANDATORY = {
+    "Assignee": 1,
+    "Verifier": 1,
+    "Compliance Contacts": 0,
+}
 
 DESTINATION_ROLE = "Compliance Contacts"
 
 SOURCE_ROLE = "Primary Contacts"
 
-ROLE_TO_DELETE = "Secondary Contacts"
+MERGE_ROLE = "Secondary Contacts"
 
 
 def _add_roles_for_objects(objects, new_roles):
@@ -64,9 +71,12 @@ def _add_roles_for_objects(objects, new_roles):
   for object_name in objects:
     for role_name in new_roles:
       update_entries.append(
-          "('{}', '{}', NOW(), NOW(), {}, 1)".format(role_name,
-                                                     object_name,
-                                                     user_id)
+          "('{}', '{}', NOW(), NOW(), {}, 1, {})".format(
+              role_name,
+              object_name,
+              user_id,
+              MANDATORY[role_name]
+          )
       )
   insert_sql = """
       INSERT INTO access_control_roles (
@@ -75,24 +85,10 @@ def _add_roles_for_objects(objects, new_roles):
           created_at,
           updated_at,
           modified_by_id,
-          non_editable
+          non_editable,
+          mandatory
       ) values """ + ", ".join(update_entries)
   connection.execute(insert_sql)
-
-
-def _replace_role_name(object_types, source_role, destination_role):
-  """Change role name in ACR."""
-  connection = op.get_bind()
-  for object_type in object_types:
-    update_sql = """
-        UPDATE access_control_roles
-        SET name = REPLACE(name, '{0}', '{1}')
-        WHERE name like '%{0}%' and object_type = :object_type
-    """.format(source_role, destination_role)
-    connection.execute(
-        sa.text(update_sql),
-        {"object_type": object_type}
-    )
 
 
 def _merge_role_acl(object_types, source_role, destination_role):
@@ -155,33 +151,25 @@ def upgrade():
       with_update=True
   )
 
-  # Rename Primary Contacts to Compliance Contacts
-  _replace_role_name(SCOPING_OBJECTS, SOURCE_ROLE, DESTINATION_ROLE)
+  # Move Primary Contacts to Compliance Contacts
+  _merge_role_acl(SCOPING_OBJECTS, SOURCE_ROLE, DESTINATION_ROLE)
   # Merge Secondary Contacts to Compliance Contacts
-  _merge_role_acl(SCOPING_OBJECTS, ROLE_TO_DELETE, DESTINATION_ROLE)
+  _merge_role_acl(SCOPING_OBJECTS, MERGE_ROLE, DESTINATION_ROLE)
 
   # Remove Secondary Contacts role from acr tree
   for object_type, roles_tree in \
           scoping_objects_rules.GGRC_TO_DELETE_ROLES_PROPAGATION.items():
     acr_propagation.remove_propagated_roles(object_type, roles_tree.keys())
 
-  # Delete Secondary Contacts role
-  _delete_roles_for_objects(SCOPING_OBJECTS, [ROLE_TO_DELETE])
-
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
-  # Add Secondary Contacts role
-  _add_roles_for_objects(SCOPING_OBJECTS, [ROLE_TO_DELETE])
 
   # Propagate Secondary Contact role
   acr_propagation.propagate_roles(
       scoping_objects_rules.GGRC_TO_DELETE_ROLES_PROPAGATION,
       with_update=True
   )
-
-  # Rename Compliance Contacts to Primary Contacts
-  _replace_role_name(SCOPING_OBJECTS, DESTINATION_ROLE, SOURCE_ROLE)
 
   # Remove Assignee, Verifier roles from acr tree
   for object_type, roles_tree in \
