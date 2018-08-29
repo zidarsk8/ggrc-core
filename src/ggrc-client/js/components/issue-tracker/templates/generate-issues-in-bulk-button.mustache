@@ -1,0 +1,25 @@
+{{!
+    Copyright (C) 2018 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#if isAllowedToGenerate}}
+<div class="row-fluid wrap-row">
+  <div class="span-12">
+    <button 
+              class="btn btn-green btn-small generate-issues-in-bulk"
+              {{#if disableButton}} disabled {{/if}}
+              ($click)="generate()"
+      >
+        Generate
+      </button>
+      {{^if isGettingInitialStatus}}
+        {{#if isGeneratingInProgress}}
+          <span>Tickets generation is in progress. The button will be available, when generation is complete.</span>
+        {{else}}
+          <span>Tickets will be generated for all existing assessments, that are not linked to tickets.</span>
+        {{/if}}
+      {{/if}}
+  </div>
+</div>
+{{/if}}
