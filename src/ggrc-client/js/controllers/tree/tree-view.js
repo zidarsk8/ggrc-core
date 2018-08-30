@@ -36,7 +36,7 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
       allow_creating: true,
       child_options: [], // this is how we can make nested configs. if you want to use an existing
       // example child option:
-      // { property: "controls", model: CMS.Models.Control, }
+      // { property: "controls", model: Control, }
       // { parent_find_param: "system_id" ... }
       scroll_page_count: 1, // pages above and below viewport
       is_subtree: false,

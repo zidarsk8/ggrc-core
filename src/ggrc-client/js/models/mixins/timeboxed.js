@@ -7,8 +7,6 @@ import Mixin from './mixin';
 
 /**
  * A mixin to use for objects that can have a time limit imposed on them.
- *
- * @class CMS.Models.Mixins.timeboxed
  */
 export default Mixin('timeboxed', {
   'extend:attributes': {

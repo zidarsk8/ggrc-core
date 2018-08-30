@@ -681,7 +681,7 @@ function _isFullSubTree(type) {
 /**
  * @param {Object} source - Instance object.
  * @param {String} modelName - Name of model.
- * @return {CMS.Models} - Instance of model.
+ * @return {Cacheable} - Instance of model.
  * @private
  */
 function _createInstance(source, modelName) {
