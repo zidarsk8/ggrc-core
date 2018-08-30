@@ -16,7 +16,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '31cde07a1abe'
-down_revision = 'fe3ce1807a4e'
+down_revision = 'b46bdb31d869'
 
 
 COMMENTABLE_SCOPING_TABLES = [
