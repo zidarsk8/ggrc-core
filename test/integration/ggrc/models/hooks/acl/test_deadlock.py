@@ -49,30 +49,14 @@ class TestDeadlocks(TestCase):
 
     # Emulate connections from three parallel requests
     with new_conn() as conn0, new_conn() as conn1, new_conn() as conn2:
+      for rel, conn in zip(self.rels, [conn0, conn1, conn2]):
+        with mock.patch("ggrc.access_control.utils.db.session.execute",
+                        conn.execute):
+          flask.g.new_acl_ids = {}
+          flask.g.new_relationship_ids = {rel.id}
+          flask.g.deleted_objects = {}
 
-      with mock.patch("ggrc.access_control.utils.db.session.execute",
-                      conn0.execute):
-        flask.g.new_acl_ids = {}
-        flask.g.new_relationship_ids = {self.rels[0].id}
-        flask.g.deleted_objects = {}
-
-        propagation.propagate()
-
-      with mock.patch("ggrc.access_control.utils.db.session.execute",
-                      conn1.execute):
-        flask.g.new_acl_ids = {}
-        flask.g.new_relationship_ids = {self.rels[1].id}
-        flask.g.deleted_objects = {}
-
-        propagation.propagate()
-
-      with mock.patch("ggrc.access_control.utils.db.session.execute",
-                      conn2.execute):
-        flask.g.new_acl_ids = {}
-        flask.g.new_relationship_ids = {self.rels[2].id}
-        flask.g.deleted_objects = {}
-
-        propagation.propagate()
+          propagation.propagate()
 
     self.assertEqual(
         all_models.AccessControlList.query.filter_by(
