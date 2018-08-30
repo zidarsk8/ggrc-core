@@ -128,16 +128,16 @@ def _merge_role_acl(object_types, source_role, destination_role):
 
   # Move ACL from source role to destignation role
   for source_role_id, destination_role_id in ROLE_IDS_MAPPING.items():
-    connection.execute(sa.text(
-        """
-        UPDATE IGNORE access_control_list
-        SET ac_role_id = :destination_role_id
-        WHERE ac_role_id = :source_role_id
-        """),
-        {
-            "source_role_id": source_role_id,
-            "destination_role_id": destination_role_id
-        }
+    connection.execute(
+        sa.text(
+            """
+            UPDATE IGNORE access_control_list
+            SET ac_role_id = :destination_role_id
+            WHERE ac_role_id = :source_role_id
+            """
+        ),
+        {"source_role_id": source_role_id,
+         "destination_role_id": destination_role_id}
     )
 
   # Collect new ACLs for create_missing_revisions
@@ -172,6 +172,94 @@ def _delete_roles_for_objects(objects, roles_to_delete):
       )
 
 
+def create_acl_record(connection, person_id, ac_role_id,
+                      object_id, object_type):
+  """Creates ACL record"""
+  connection.execute("""
+      INSERT INTO access_control_list
+      (person_id, ac_role_id, object_id, object_type, created_at,
+      modified_by_id, updated_at,  context_id, parent_id, parent_id_nn)
+      VALUES
+      ({}, {}, {}, "{}", NOW(), NULL, NOW(), NULL, NULL, 0);
+      """.format(person_id, ac_role_id, object_id, object_type))
+  # utils.add_to_objects_without_revisions(
+  #             connection, acl.id, "AccessControlList", "created"
+  #         )
+
+
+def _populate_mandatory_roles(objects):
+  """Assign one admin of object as Assignee/Verifier if them not assigned"""
+  TABLES = {
+      "AccessGroup": "access_groups",
+      "DataAsset": "data_assets",
+      "Facility": "facilities",
+      "Market": "markets",
+      "Metric": "metrics",
+      "OrgGroup": "org_groups",
+      "Product": "product_groups",
+      "ProductGroup": "products",
+      "Project": "projects",
+      "System": "systems",
+      "Process": "systems",  # TODO IS IT OK?
+      "TechnologyEnvironment": "technology_environments",
+      "Vendor": "vendors",
+  }
+  query = """
+      SELECT
+          obj.id AS obj_id,
+          "{obj_type}" AS object_type,
+          acl_a.person_id AS 'assignee',
+          acl_v.person_id AS 'verifier',
+          acl_adm.person_id AS 'admin'
+      FROM {table} AS obj
+      LEFT JOIN
+      (   SELECT acl1.object_id, acl1.person_id
+          FROM access_control_roles AS acr1
+          JOIN access_control_list AS acl1
+          ON acl1.ac_role_id = acr1.id
+          WHERE acr1.name = "Assignee"
+              AND acl1.object_type = "{obj_type}") AS acl_a
+      ON acl_a.object_id = obj.id
+      LEFT JOIN
+      (   SELECT acl1.object_id, acl1.person_id
+          FROM access_control_roles AS acr1
+          JOIN access_control_list AS acl1
+          ON acl1.ac_role_id = acr1.id
+          WHERE acr1.name = "Verifier"
+              AND acl1.object_type = "{obj_type}") AS acl_v
+      ON acl_v.object_id = obj.id
+      LEFT JOIN
+      (   SELECT acl1.object_id, acl1.person_id
+          FROM access_control_roles AS acr1
+          JOIN access_control_list AS acl1
+          ON acl1.ac_role_id = acr1.id
+          WHERE acr1.name = "Admin"
+              AND acl1.object_type = "{obj_type}"
+          LIMIT 1) AS acl_adm
+      ON acl_adm.object_id = obj.id
+  """
+  connection = op.get_bind()
+  for object_name in objects:
+    response = connection.execute(
+        query.format(table=TABLES[object_name], obj_type=object_name)
+    )
+    assignee_role_id = connection.execute("""
+        SELECT id FROM access_control_roles
+        WHERE object_type = "{}" AND name = "Assignee"
+    """.format(object_name)).fetchone()[0]
+    verifier_role_id = connection.execute("""
+        SELECT id FROM access_control_roles
+        WHERE object_type = "{}" AND name = "Verifier"
+    """.format(object_name)).fetchone()[0]
+    for row in response:
+      if row.assignee is None:
+        create_acl_record(connection, row.admin, assignee_role_id,
+                          row.obj_id, row.object_type)
+      if row.verifier is None:
+        create_acl_record(connection, row.admin, verifier_role_id,
+                          row.obj_id, row.object_type)
+
+
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   # Add Assignee, Verifier roles
@@ -190,6 +278,9 @@ def upgrade():
   for object_type, roles_tree in \
           scoping_objects_rules.GGRC_TO_DELETE_ROLES_PROPAGATION.items():
     acr_propagation.remove_propagated_roles(object_type, roles_tree.keys())
+
+  # Populate Assignee/Verifier with Admin
+  _populate_mandatory_roles(SCOPING_OBJECTS)
 
 
 def downgrade():
