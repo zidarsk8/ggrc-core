@@ -12,6 +12,7 @@ Create Date: 2018-08-15 15:19:46.890174
 from alembic import op
 import sqlalchemy as sa
 
+from ggrc.migrations import utils
 from ggrc.migrations.utils.migrator import get_migration_user_id
 from ggrc.migrations.utils import \
     acr_propagation_constants_scoping_objects_merge_roles \
@@ -113,6 +114,16 @@ def _merge_role_acl(object_types, source_role, destination_role):
     ROLE_IDS_MAPPING[source_role_id] = destination_role_id
 
   for source_role_id, destination_role_id in ROLE_IDS_MAPPING.items():
+    response = connection.execute(sa.text(
+        """
+        SELECT object_id, object_type
+        FROM access_control_list
+        WHERE ac_role_id IN (:roles_list)
+        """),
+        roles_list=", ".join(_id for _id in ROLE_IDS_MAPPING.keys())
+    )
+    for acl in response:
+        utils.add_to_objects_without_revisions(connection, acl[0], acl[1], "modified")
     connection.execute(sa.text("""
         UPDATE IGNORE access_control_list
         SET ac_role_id = :destination_role_id
@@ -123,6 +134,7 @@ def _merge_role_acl(object_types, source_role, destination_role):
         DELETE FROM access_control_list
         WHERE ac_role_id = :source_role_id
     """), {"source_role_id": source_role_id})
+
 
 
 def _delete_roles_for_objects(objects, roles_to_delete):
