@@ -963,22 +963,6 @@ export default can.Model('can.Model.Cacheable', {
   },
 
   /*
-    * Set up a deferred join object update when this object is updated.
-    */
-  mark_for_update: function (joinAttr, obj, extraAttrs, options) {
-    obj = obj.reify ? obj.reify() : obj;
-    extraAttrs = _.isEmpty(extraAttrs) ? undefined : extraAttrs;
-
-    this.remove_duplicate_pending_joins(obj);
-    this._pending_joins.push({
-      how: 'update',
-      what: obj,
-      through: joinAttr,
-      extra: extraAttrs,
-      opts: options,
-    });
-  },
-  /*
     * Set up a deferred join object deletion when this object is updated.
     */
   mark_for_deletion: function (joinAttr, obj, extraAttrs, options) {

@@ -36,9 +36,6 @@ function _resolveDeferredBindings(obj) {
           case 'add':
             dfds.push(..._addHandler(obj, pj));
             break;
-          case 'update':
-            dfds.push(..._updateHandler(obj, pj));
-            break;
           case 'remove':
             dfds.push(..._removeHandler(obj, pj));
             break;
@@ -94,26 +91,6 @@ function _addHandler(obj, pj) {
       return inst.save();
     });
   dfds.push(dfd);
-  return dfds;
-}
-
-function _updateHandler(obj, pj) {
-  const dfds = [];
-  let binding = obj.get_binding(pj.through);
-  binding.list.forEach(function (boundObj) {
-    let blOptionAttr = binding.loader.option_attr;
-    if (boundObj.instance === pj.what ||
-        boundObj.instance[blOptionAttr] === pj.what) {
-      boundObj.get_mappings().forEach(function (mapping) {
-        dfds.push(mapping.refresh().then(function () {
-          if (pj.extra) {
-            mapping.attr(pj.extra);
-          }
-          return mapping.save();
-        }));
-      });
-    }
-  });
   return dfds;
 }
 
