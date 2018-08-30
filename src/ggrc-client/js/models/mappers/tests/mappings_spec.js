@@ -60,6 +60,7 @@ describe('Mappings', function () {
         'CycleTaskGroup',
       ],
       notMappable: [
+        'Workflow',
         'CycleTaskEntry',
         'CycleTaskGroupObjectTask',
         'CycleTaskGroupObject',
