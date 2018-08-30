@@ -52,6 +52,11 @@
                       <i class="fa fa-asterisk"></i>
                     {{/if}}
                   </label>
+                  {{#if singleUserRole}}
+                    <div class="people-group__title-tooltip">
+                      <small><em>You can add only one person for this role</em></small>
+                    </div>
+                  {{/if}}
                 </deletable-people-group>
                 <div>
                   {{#if isUpdating}}
