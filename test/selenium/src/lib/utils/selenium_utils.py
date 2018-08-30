@@ -360,3 +360,19 @@ def set_chrome_download_location(driver, download_dir):
 def is_headless_chrome(pytestconfig):
   """Return whether `--headless = True` is specified in pytest config."""
   return pytestconfig.getoption("headless") == "True"
+
+
+def filter_by_text(elements, text):
+  """Filter elements by text."""
+  # Text filter is not converted to XPath in Nerodia. E.g.
+  #   browser.elements(cls=cls, text=text)
+  # has O(N) complexity where N is the number of elements with class `cls`
+  browser = elements[0].browser
+  return browser.execute_script("""
+    var elements = arguments;
+    return $(elements).filter(function() {{
+      var s = _.escapeRegExp('{0}');
+      var reg = new RegExp(s, 'ig');
+      return reg.test($(this).text());
+    }})
+  """.format(text), *elements)[0]
