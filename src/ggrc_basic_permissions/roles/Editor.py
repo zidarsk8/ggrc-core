@@ -126,6 +126,7 @@ permissions = {
         "ProductGroup",
         "UserRole",
         "Context",
+        "Review"
     ],
     "update": [
         {

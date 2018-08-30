@@ -185,6 +185,7 @@ permissions = {
         "Program",
         "TechnologyEnvironment",
         "Context",
+        "Review"
     ],
     "update": owner_update,
     "delete": owner_update,

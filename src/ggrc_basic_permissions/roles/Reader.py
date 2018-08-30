@@ -185,6 +185,7 @@ permissions = {
         "Role",
         "Context",
         "BackgroundTask",
+        "Review"
     ],
     "update": owner_update,
     "delete": owner_update,
