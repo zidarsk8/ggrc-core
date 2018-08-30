@@ -41,6 +41,13 @@ TECHNICAL_PMS = "Technical / Program Managers"
 LEGAL_COUNSELS = "Legal Counsels"
 SYSTEM_OWNERS = "System Owners"
 
+# Some Smoke ACL tests check functionality under this set of roles
+IMPORTANT_ASMT_ROLES = [
+    ("audit", "auditors"),
+    ("assessment", "assignees"),
+    ("assessment", "verifiers")
+]
+
 # role scopes
 SYSTEM = "System"
 PRIVATE_PROGRAM = "Private Program"

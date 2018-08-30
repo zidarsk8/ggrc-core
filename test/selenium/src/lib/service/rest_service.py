@@ -8,7 +8,7 @@ import json
 import requests
 
 from lib import environment, factory, url
-from lib.constants import objects, messages
+from lib.constants import objects, messages, roles
 from lib.entities import entities_factory
 from lib.entities.entities_factory import (
     PeopleFactory, CustomAttributeDefinitionsFactory, AssessmentsFactory)
@@ -283,7 +283,18 @@ class AssessmentsFromTemplateService(HelpRestService):
       assessment = AssessmentsFactory().create()
       assessment.__dict__.update({k: v for k, v in attrs.iteritems()
                                   if v and k not in ["type", ]})
-      assessment.verifiers = assessment.creators
+      for acr_name in ("assignees", "verifiers"):
+        people = getattr(template, acr_name)
+        if people == roles.PRINCIPAL_ASSIGNEES:
+          people = snapshot.principal_assignees
+        elif people == roles.AUDITORS:
+          people = audit.auditors
+        elif people == "Audit Captain":
+          people = audit.audit_captains
+        # handle other roles if needed
+        if not people:
+          people = audit.audit_captains
+        setattr(assessment, acr_name, people)
       assessments.append(assessment)
     return assessments
 

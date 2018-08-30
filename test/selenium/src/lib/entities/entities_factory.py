@@ -461,21 +461,31 @@ class AssessmentTemplatesFactory(EntitiesFactory):
       asmt_tmpl_factory = AsmtTemplateWithAttrFactory()
     return asmt_tmpl_factory.generate_cad(**attrs)
 
-  def _create_random_obj(self, is_add_rest_attrs):
-    """Create Assessment Template entity with randomly and predictably filled
-    fields, if 'is_add_rest_attrs' then add attributes for REST."""
-    asmt_tmpl_obj = self.obj_inst().update_attrs(
-        title=self.obj_title, slug=self.obj_slug,
-        assignees=unicode(roles.PRINCIPAL_ASSIGNEES),
-        verifiers=unicode(roles.AUDITORS),
-        status=unicode(object_states.DRAFT),
-        template_object_type=objects.get_obj_type(objects.CONTROLS))
+  def _set_attrs(self, is_add_rest_attrs=False, **attrs):
+    """Creates random object's instance, if 'is_add_rest_attrs' then add
+    attributes for REST, if 'attrs' then update attributes accordingly.
+    """
+    attrs = copy.deepcopy(attrs)
+    attrs.setdefault("title", self.obj_title)
+    attrs.setdefault("slug", self.obj_slug)
+    attrs.setdefault("status", object_states.DRAFT)
+    attrs.setdefault("template_object_type", "Control")
+    default_people = {"assignees": roles.PRINCIPAL_ASSIGNEES,
+                      "verifiers": roles.AUDITORS}
+    for acr_name in default_people:
+      person_list = attrs.get(acr_name, default_people[acr_name])
+      if isinstance(person_list, list):
+        default_people[acr_name] = [person.id for person in person_list]
+        person_list = PeopleFactory.extract_people_emails(person_list)
+      else:
+        default_people[acr_name] = person_list
+      attrs.setdefault(acr_name, person_list)
+    obj = self.obj_inst()
+    obj.update_attrs(is_allow_none=False, **attrs)
     if is_add_rest_attrs:
       elements = element.CommonAudit
-      asmt_tmpl_obj.update_attrs(
-          default_people={
-              "assignees": asmt_tmpl_obj.assignees,
-              "verifiers": asmt_tmpl_obj.verifiers},
+      obj.update_attrs(
+          default_people=default_people,
           people_values=[{"value": v, "title": t} for v, t in [
               (roles.ADMIN, elements.OBJECT_ADMINS),
               (roles.AUDIT_LEAD, elements.AUDIT_CAPTAIN),
@@ -485,7 +495,7 @@ class AssessmentTemplatesFactory(EntitiesFactory):
               (roles.PRIMARY_CONTACTS, elements.PRIMARY_CONTACTS),
               (roles.SECONDARY_CONTACTS, elements.SECONDARY_CONTACTS),
               (roles.OTHER, elements.OTHERS)]])
-    return asmt_tmpl_obj
+    return obj
 
 
 class AsmtTemplateWithDropdownFactory(AssessmentTemplatesFactory):
