@@ -11,6 +11,7 @@ import {
   isObjectContextPage,
   getPageType,
 } from '../../plugins/utils/current-page-utils';
+import TreeViewOptions from './tree-view-options';
 
 (function (can, $) {
   function _firstElementChild(el) {
@@ -52,7 +53,7 @@ import {
           }
         });
       } else {
-        this.options = new CMS.Models.TreeViewOptions(this.constructor.defaults)
+        this.options = new TreeViewOptions(this.constructor.defaults)
           .attr(opts.model ? opts.model[opts.options_property ||
             this.constructor.defaults.options_property] : {})
           .attr(opts);

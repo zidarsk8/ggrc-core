@@ -9,6 +9,7 @@ import {
 } from '../../plugins/utils/current-page-utils';
 import Permission from '../../permission';
 import DisplayPrefs from '../../models/local-storage/display-prefs';
+import TreeViewOptions from './tree-view-options';
 
 (function (can, $) {
   CMS.Controllers.TreeLoader.extend('CMS.Controllers.TreeView', {
@@ -301,9 +302,9 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
       if (v._child_options_prepared && !forceReload) {
         return v._child_options_prepared;
       }
-      if (!(v instanceof CMS.Models.TreeViewOptions)) {
+      if (!(v instanceof TreeViewOptions)) {
         tmp = v;
-        v = new CMS.Models.TreeViewOptions();
+        v = new TreeViewOptions();
         v.attr('instance', tmp);
         this.options.each(function (val, k) {
           if (can.inArray(k, that.constructor.do_not_propagate) === -1) {
