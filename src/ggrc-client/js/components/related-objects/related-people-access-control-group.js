@@ -33,6 +33,12 @@ export default can.Component.extend({
             this.attr('groupId');
         },
       },
+      placeholder: {
+        get: function () {
+          return this.attr('singleUserRole') ?
+            'Change person' : 'Add person';
+        },
+      },
     },
     instance: {},
     isNewInstance: false,
