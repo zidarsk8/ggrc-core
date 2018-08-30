@@ -54,9 +54,7 @@ MANDATORY = {
 
 DESTINATION_ROLE = "Compliance Contacts"
 
-SOURCE_ROLE = "Primary Contacts"
-
-MERGE_ROLE = "Secondary Contacts"
+SOURCE_ROLES = ["Primary Contacts", "Secondary Contacts"]
 
 
 def _add_roles_for_objects(objects, new_roles):
@@ -113,28 +111,49 @@ def _merge_role_acl(object_types, source_role, destination_role):
 
     ROLE_IDS_MAPPING[source_role_id] = destination_role_id
 
-  for source_role_id, destination_role_id in ROLE_IDS_MAPPING.items():
-    response = connection.execute(sa.text(
-        """
+  # Collect objects with changings ACL for create_missing_revisions
+  for _id in ROLE_IDS_MAPPING.keys():
+    response = connection.execute(
+        sa.text("""
         SELECT object_id, object_type
         FROM access_control_list
-        WHERE ac_role_id IN (:roles_list)
+        WHERE ac_role_id = (:role)
         """),
-        roles_list=", ".join(_id for _id in ROLE_IDS_MAPPING.keys())
+        role=str(_id)
     )
-    for acl in response:
-        utils.add_to_objects_without_revisions(connection, acl[0], acl[1], "modified")
-    connection.execute(sa.text("""
+    for row in response:
+      utils.add_to_objects_without_revisions(
+          connection, row.object_id, row.object_type, "modified"
+      )
+
+  # Move ACL from source role to destignation role
+  for source_role_id, destination_role_id in ROLE_IDS_MAPPING.items():
+    connection.execute(sa.text(
+        """
         UPDATE IGNORE access_control_list
         SET ac_role_id = :destination_role_id
         WHERE ac_role_id = :source_role_id
-    """), {"source_role_id": source_role_id,
-           "destination_role_id": destination_role_id})
-    connection.execute(sa.text("""
-        DELETE FROM access_control_list
-        WHERE ac_role_id = :source_role_id
-    """), {"source_role_id": source_role_id})
+        """),
+        {
+            "source_role_id": source_role_id,
+            "destination_role_id": destination_role_id
+        }
+    )
 
+  # Collect new ACLs for create_missing_revisions
+  for _id in ROLE_IDS_MAPPING.values():
+      response = connection.execute(
+          sa.text("""
+          SELECT id
+          FROM access_control_list
+          WHERE ac_role_id = (:role)
+          """),
+          role=str(_id)
+      )
+      for row in response:
+        utils.add_to_objects_without_revisions(
+            connection, row.id, "AccessControlList", "created"
+        )
 
 
 def _delete_roles_for_objects(objects, roles_to_delete):
@@ -164,9 +183,8 @@ def upgrade():
   )
 
   # Move Primary Contacts to Compliance Contacts
-  _merge_role_acl(SCOPING_OBJECTS, SOURCE_ROLE, DESTINATION_ROLE)
-  # Merge Secondary Contacts to Compliance Contacts
-  _merge_role_acl(SCOPING_OBJECTS, MERGE_ROLE, DESTINATION_ROLE)
+  for src_role in SOURCE_ROLES:
+    _merge_role_acl(SCOPING_OBJECTS, src_role, DESTINATION_ROLE)
 
   # Remove Secondary Contacts role from acr tree
   for object_type, roles_tree in \
