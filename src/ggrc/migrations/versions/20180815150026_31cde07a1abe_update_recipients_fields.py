@@ -16,30 +16,92 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '31cde07a1abe'
-down_revision = 'fe3ce1807a4e'
+down_revision = 'b46bdb31d869'
 
 
-COMMENTABLE_SCOPING_TABLES = [
-    "access_groups",
-    "data_assets",
-    "facilities",
-    "markets",
-    "metrics",
-    "org_groups",
-    "systems",
-    "products",
-    "product_groups",
-    "projects",
-    "technology_environments",
-    "vendors"
-]
+COMMENTABLE_SCOPING_TABLES = {
+    "AccessGroup": "access_groups",
+    "DataAsset": "data_assets",
+    "Facility": "facilities",
+    "Market": "markets",
+    "Metric": "metrics",
+    "OrgGroup": "org_groups",
+    # "Process", is included in systems table
+    "Product": "product_groups",
+    "ProductGroup": "products",
+    "Project": "projects",
+    "System": "systems",
+    "TechnologyEnvironment": "technology_environments",
+    "Vendor": "vendors",
+}
+
+
+revision_queue = sa.sql.table(
+    'objects_without_revisions',
+    sa.Column('obj_id', sa.Integer),
+    sa.Column('obj_type', sa.String(length=250)),
+    sa.Column('action', sa.String(length=250)),
+)
+
+
+def _select_ids(table_name, object_type):
+  object_table = sa.sql.table(
+      table_name,
+      sa.Column('id', sa.Integer),
+      sa.Column('recipients', sa.String(length=250)),
+  )
+
+  return sa.select([
+      object_table.c.id,
+      sa.literal(object_type).label("obj_type"),
+      sa.literal("modified").label("action"),
+  ]).select_from(
+      object_table
+  )
+
+
+def _select_system_ids(object_type, table_name):
+  object_table = sa.sql.table(
+      table_name,
+      sa.Column('id', sa.Integer),
+      sa.Column('is_biz_process', sa.String(length=250)),
+      sa.Column('recipients', sa.String(length=250)),
+  )
+
+  return sa.select([
+      object_table.c.id,
+      sa.literal(object_type).label("obj_type"),
+      sa.literal("modified").label("action"),
+  ]).select_from(
+      object_table
+  ).where(
+      object_table.c.is_biz_process == (object_type == "Process")
+  )
+
+def _insert_revision_queue(object_type, table_name):
+  if object_type in ["System", "Process"]:
+    ids_select = _select_system_ids(object_type, table_name)
+  else:
+    ids_select = _select_ids(table_name, object_type)
+
+  inserter = revision_queue.insert().prefix_with("IGNORE")
+  op.execute(inserter.from_select(
+      [
+          revision_queue.c.obj_id,
+          revision_queue.c.obj_type,
+          revision_queue.c.action,
+      ],
+      ids_select
+  ))
 
 
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
-  for name in COMMENTABLE_SCOPING_TABLES:
+  for object_type, table_name in COMMENTABLE_SCOPING_TABLES.items():
     commentable_table = sa.sql.table(
-        name, sa.Column('recipients', sa.String(length=250))
+        table_name,
+        sa.Column('id', sa.Integer),
+        sa.Column('recipients', sa.String(length=250)),
     )
 
     # replace all None data with empty string for recipients field
@@ -74,6 +136,9 @@ def upgrade():
                .values(recipients=func.concat(commentable_table.c.recipients,
                                               "Assignee,Verifier,"
                                               "Compliance Contacts")))
+
+    _insert_revision_queue(object_type, table_name)
+
 
 
 def downgrade():
