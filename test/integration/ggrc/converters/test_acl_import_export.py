@@ -365,3 +365,23 @@ class TestACLImportExport(TestCase):
       program = models.all_models.Program.query.first()
       for acl in program.access_control_list:
         self.assertNotEqual(acl.ac_role.name, role)
+
+  @ddt.data("Assignee", "Verifier")
+  def test_import_acl_validation(self, role):
+    """Test import object with {} roles exceeding max limit"""
+    with factories.single_commit():
+      factories.PersonFactory(email="user0@example.com")
+      factories.PersonFactory(email="user1@example.com")
+    roles = "user0@example.com\nuser1@example.com"
+    response = self.import_data(OrderedDict([
+        ("object_type", "OrgGroup"),
+        ("Code*", "OrgGroup-1"),
+        ("Admin", "user@example.com"),
+        ("title", "Test OrgGroup"),
+        (role, roles),
+    ]))
+    self.assertIn(
+        "{} role must have only 1 person(s) assigned".format(role),
+        response[0]["row_errors"][0]
+    )
+    self.assertEqual(len(response[0]["row_errors"]), 1)

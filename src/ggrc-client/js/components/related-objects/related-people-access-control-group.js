@@ -27,6 +27,13 @@ export default can.Component.extend({
           return canEdit;
         },
       },
+      canAdd: {
+        value: true,
+        get() {
+          return !this.attr('singleUserRole') ||
+            !this.attr('people.length') > 0;
+        },
+      },
       isLoading: {
         get: function () {
           return this.attr('updatableGroupId') ===
@@ -38,6 +45,7 @@ export default can.Component.extend({
     isNewInstance: false,
     groupId: '@',
     title: '@',
+    singleUserRole: false,
     people: [],
     isDirty: false,
     required: false,

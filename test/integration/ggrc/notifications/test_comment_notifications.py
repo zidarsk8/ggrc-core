@@ -204,9 +204,10 @@ class TestCommentNotification(TestCase):
     posted.
     """
     if obj_factory in self.SCOPING_OBJECT_FACTORIES:
-      recipient_types = ["Admin", "Primary Contacts", "Secondary Contacts",
+      recipient_types = ["Admin", "Assignee", "Compliance Contacts",
                          "Product Managers", "Technical / Program Managers",
-                         "Technical Leads", "System Owners", "Legal Counsels"]
+                         "Technical Leads", "System Owners", "Verifier",
+                         "Legal Counsels"]
     else:
       recipient_types = ["Admin", "Primary Contacts", "Secondary Contacts"]
     person = all_models.Person.query.first()
