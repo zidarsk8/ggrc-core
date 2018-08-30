@@ -41,6 +41,7 @@ class TestDeadlocks(TestCase):
     db.session.execute(
         "DELETE FROM access_control_list WHERE parent_id IS NOT NULL",
     )
+    db.session.commit()
 
   def test_deadlock(self):
     """No deadlocks occur if propagation for three Audits goes in parallel."""
@@ -52,11 +53,18 @@ class TestDeadlocks(TestCase):
       for rel, conn in zip(self.rels, [conn0, conn1, conn2]):
         with mock.patch("ggrc.access_control.utils.db.session.execute",
                         conn.execute):
-          flask.g.new_acl_ids = {}
-          flask.g.new_relationship_ids = {rel.id}
-          flask.g.deleted_objects = {}
+          def commit():
+            conn.execute("COMMIT")
 
-          propagation.propagate()
+          with mock.patch("ggrc.access_control.utils.db.session.plain_commit",
+                          commit):
+            flask.g.new_acl_ids = {}
+            flask.g.new_relationship_ids = {rel.id}
+            flask.g.deleted_objects = {}
+
+            propagation.propagate()
+
+    db.session.rollback()
 
     self.assertEqual(
         all_models.AccessControlList.query.filter_by(
