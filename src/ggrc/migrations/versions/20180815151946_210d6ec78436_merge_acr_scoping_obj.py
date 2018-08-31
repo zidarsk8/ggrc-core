@@ -52,6 +52,12 @@ MANDATORY = {
     "Compliance Contacts": 0,
 }
 
+DEFAULT_TO_CURRENT_USER = {
+    "Assignee": 1,
+    "Verifier": 1,
+    "Compliance Contacts": 0,
+}
+
 DESTINATION_ROLE = "Compliance Contacts"
 
 SOURCE_ROLES = ["Primary Contacts", "Secondary Contacts"]
@@ -70,11 +76,12 @@ def _add_roles_for_objects(objects, new_roles):
   for object_name in objects:
     for role_name in new_roles:
       update_entries.append(
-          "('{}', '{}', NOW(), NOW(), {}, 1, {})".format(
+          "('{}', '{}', NOW(), NOW(), {}, 1, {}, {})".format(
               role_name,
               object_name,
               user_id,
-              MANDATORY[role_name]
+              MANDATORY[role_name],
+              DEFAULT_TO_CURRENT_USER[role_name]
           )
       )
   insert_sql = """
@@ -85,7 +92,8 @@ def _add_roles_for_objects(objects, new_roles):
           updated_at,
           modified_by_id,
           non_editable,
-          mandatory
+          mandatory,
+          default_to_current_user
       ) values """ + ", ".join(update_entries)
   connection.execute(insert_sql)
 
