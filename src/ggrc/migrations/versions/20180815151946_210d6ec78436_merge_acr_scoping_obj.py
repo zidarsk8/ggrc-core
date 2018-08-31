@@ -282,23 +282,12 @@ def upgrade():
   for src_role in SOURCE_ROLES:
     _merge_role_acl(SCOPING_OBJECTS, src_role, DESTINATION_ROLE)
 
-  # Remove Secondary Contacts role from acr tree
-  for object_type, roles_tree in \
-          scoping_objects_rules.GGRC_TO_DELETE_ROLES_PROPAGATION.items():
-    acr_propagation.remove_propagated_roles(object_type, roles_tree.keys())
-
   # Populate Assignee/Verifier with Admin
   _populate_mandatory_roles(SCOPING_OBJECTS)
 
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
-
-  # Propagate Secondary Contact role
-  acr_propagation.propagate_roles(
-      scoping_objects_rules.GGRC_TO_DELETE_ROLES_PROPAGATION,
-      with_update=True
-  )
 
   # Remove Assignee, Verifier roles from acr tree
   for object_type, roles_tree in \
