@@ -121,7 +121,7 @@ class CustomAttributeManager(object):
     self.all_labels = self._get_all_labels()
 
   def _get_all_labels(self):
-    """Returns list of all labels"""
+    """Returns list of all labels."""
     if self.is_global:
       if not self.is_inline:
         elements = self._browser.element(

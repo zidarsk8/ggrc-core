@@ -76,11 +76,7 @@ class TestRBAC(base.Test):
   )
   @pytest.mark.parametrize(
       "obj, obj_role",
-      [
-          ("audit", "auditors"),
-          ("assessment", "assignees"),
-          ("assessment", "verifiers")
-      ]
+      roles.IMPORTANT_ASMT_ROLES
   )
   def test_add_evidence_url(
       self, program, login_role, obj, obj_role, selenium
