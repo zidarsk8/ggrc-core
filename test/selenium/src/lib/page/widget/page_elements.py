@@ -3,12 +3,11 @@
 """Page objects for child elements of pages"""
 # pylint: disable=too-few-public-methods
 import datetime
-import re
 import time
 
 from lib.constants import objects
 from lib.constants.element import AdminWidgetCustomAttributes
-from lib.utils import selenium_utils
+from lib.utils import selenium_utils, ui_utils
 
 
 class InlineEdit(object):
@@ -48,9 +47,7 @@ class RelatedPeopleList(object):
     self._inline_edit.open()
     email = person.email
     self._root.text_field(placeholder="Add person").set(email)
-    autocomplete_row = self._root.element(
-        class_name="ui-menu-item", text=re.compile(email))
-    autocomplete_row.click()
+    ui_utils.select_user(self._root, email)
     self._inline_edit.confirm()
 
   def get_people_emails(self):
@@ -409,5 +406,4 @@ class PersonCAActionsStrategy(CAActionsStrategy):
   def _select_user(self, value):
     """Chooses user."""
     self._input.send_keys(value)
-    self._root.element(class_name="ui-menu-item",
-                       text=re.compile(value)).click()
+    ui_utils.select_user(self._root, value)
