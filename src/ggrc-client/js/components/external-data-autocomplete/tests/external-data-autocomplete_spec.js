@@ -6,17 +6,17 @@
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../external-data-autocomplete';
 
-describe('external-data-autocomplete component', ()=> {
+describe('external-data-autocomplete component', () => {
   let viewModel;
-  beforeEach(()=> {
+  beforeEach(() => {
     viewModel = getComponentVM(Component);
   });
 
-  describe('viewModel', ()=> {
-    describe('renderResults get()', ()=> {
-      describe('returns true', ()=> {
+  describe('viewModel', () => {
+    describe('renderResults get()', () => {
+      describe('returns true', () => {
         it(`when "showResults" flag is turned on
-            and "searchCriteria" length is greather than "minLength"`, ()=> {
+            and "searchCriteria" length is greather than "minLength"`, () => {
             viewModel.attr('showResults', true);
             viewModel.attr('minLength', 2);
             viewModel.attr('searchCriteria', 'test');
@@ -27,9 +27,9 @@ describe('external-data-autocomplete component', ()=> {
           });
       });
 
-      describe('returns false', ()=> {
+      describe('returns false', () => {
         it(`when "showResults" flag is turned off
-            and "searchCriteria" length is greather than "minLength"`, ()=> {
+            and "searchCriteria" length is greather than "minLength"`, () => {
             viewModel.attr('showResults', false);
             viewModel.attr('minLength', 2);
             viewModel.attr('searchCriteria', 'test');
@@ -40,7 +40,7 @@ describe('external-data-autocomplete component', ()=> {
           });
 
         it(`when "showResults" flag is turned on
-            and "searchCriteria" length is less than "minLength"`, ()=> {
+            and "searchCriteria" length is less than "minLength"`, () => {
             viewModel.attr('showResults', true);
             viewModel.attr('minLength', 2);
             viewModel.attr('searchCriteria', '');
@@ -51,7 +51,7 @@ describe('external-data-autocomplete component', ()=> {
           });
 
         it(`when "showResults" flag is turned off
-            and "searchCriteria" length is less than "minLength"`, ()=> {
+            and "searchCriteria" length is less than "minLength"`, () => {
             viewModel.attr('showResults', false);
             viewModel.attr('minLength', 2);
             viewModel.attr('searchCriteria', '');
@@ -63,8 +63,8 @@ describe('external-data-autocomplete component', ()=> {
       });
     });
 
-    describe('openResults() method', ()=> {
-      it('turnes on "showResults" flag', ()=> {
+    describe('openResults() method', () => {
+      it('turnes on "showResults" flag', () => {
         viewModel.attr('showResults', false);
 
         viewModel.openResults();
@@ -73,8 +73,8 @@ describe('external-data-autocomplete component', ()=> {
       });
     });
 
-    describe('closeResults() method', ()=> {
-      it('turnes off "showResults" flag', ()=> {
+    describe('closeResults() method', () => {
+      it('turnes off "showResults" flag', () => {
         viewModel.attr('showResults', true);
 
         viewModel.closeResults();
@@ -83,28 +83,28 @@ describe('external-data-autocomplete component', ()=> {
       });
     });
 
-    describe('setSearchCriteria() method', ()=> {
+    describe('setSearchCriteria() method', () => {
       let element = {
         val: jasmine.createSpy().and.returnValue('criteria'),
       };
 
-      it('updates "searchCriteria" property', (done)=> {
+      it('updates "searchCriteria" property', (done) => {
         viewModel.attr('searchCriteria', null);
 
         viewModel.setSearchCriteria(element);
 
-        setTimeout(()=> {
+        setTimeout(() => {
           expect(viewModel.attr('searchCriteria')).toBe('criteria');
           done();
         }, 600);
       });
 
-      it('dispatches "criteriaChanged" event', (done)=> {
+      it('dispatches "criteriaChanged" event', (done) => {
         spyOn(viewModel, 'dispatch');
 
         viewModel.setSearchCriteria(element);
 
-        setTimeout(()=> {
+        setTimeout(() => {
           expect(viewModel.dispatch).toHaveBeenCalledWith({
             type: 'criteriaChanged',
             value: 'criteria',
@@ -114,10 +114,10 @@ describe('external-data-autocomplete component', ()=> {
       });
     });
 
-    describe('onItemPicked() method', ()=> {
+    describe('onItemPicked() method', () => {
       let saveDfd;
       let item;
-      beforeEach(()=> {
+      beforeEach(() => {
         saveDfd = can.Deferred();
         item = {
           test: true,
@@ -125,7 +125,7 @@ describe('external-data-autocomplete component', ()=> {
         spyOn(viewModel, 'createOrGet').and.returnValue(saveDfd);
       });
 
-      it('turns on "saving" flag', ()=> {
+      it('turns on "saving" flag', () => {
         viewModel.attr('saving', false);
 
         viewModel.onItemPicked(item);
@@ -133,18 +133,18 @@ describe('external-data-autocomplete component', ()=> {
         expect(viewModel.attr('saving')).toBe(true);
       });
 
-      it('call createOrGet() method', ()=> {
+      it('call createOrGet() method', () => {
         viewModel.onItemPicked(item);
 
         expect(viewModel.createOrGet).toHaveBeenCalledWith(item);
       });
 
-      it('dispatches event when istance was saved', ()=> {
+      it('dispatches event when istance was saved', () => {
         spyOn(viewModel, 'dispatch');
 
         viewModel.onItemPicked(item);
 
-        saveDfd.resolve(item).then(()=> {
+        saveDfd.resolve(item).then(() => {
           expect(viewModel.dispatch).toHaveBeenCalledWith({
             type: 'itemSelected',
             selectedItem: item,
@@ -152,49 +152,49 @@ describe('external-data-autocomplete component', ()=> {
         });
       });
 
-      it('turns off "saving" flag', ()=> {
+      it('turns off "saving" flag', () => {
         viewModel.attr('saving', true);
 
         viewModel.onItemPicked(item);
 
-        saveDfd.resolve().then(()=> {
+        saveDfd.resolve().then(() => {
           expect(viewModel.attr('saving')).toBe(false);
         });
       });
 
-      it('cleans search criteria if "autoClean" is turned on', ()=> {
+      it('cleans search criteria if "autoClean" is turned on', () => {
         viewModel.attr('searchCriteria', 'someText');
         viewModel.attr('autoClean', true);
 
         viewModel.onItemPicked(item);
 
-        saveDfd.resolve().then(()=> {
+        saveDfd.resolve().then(() => {
           expect(viewModel.attr('searchCriteria')).toBe('');
         });
       });
 
-      it('does not clean search criteria if "autoClean" is turned on', ()=> {
+      it('does not clean search criteria if "autoClean" is turned on', () => {
         viewModel.attr('searchCriteria', 'someText');
         viewModel.attr('autoClean', false);
 
         viewModel.onItemPicked(item);
 
-        saveDfd.resolve().then(()=> {
+        saveDfd.resolve().then(() => {
           expect(viewModel.attr('searchCriteria')).toBe('someText');
         });
       });
     });
 
-    describe('createOrGet() method', ()=> {
+    describe('createOrGet() method', () => {
       let originalModels;
       let createDfd;
       let item;
       let response;
       let model;
-      beforeAll(()=> originalModels = CMS.Models);
-      afterAll(()=> CMS.Models = originalModels);
+      beforeAll(() => originalModels = CMS.Models);
+      afterAll(() => CMS.Models = originalModels);
 
-      beforeEach(()=> {
+      beforeEach(() => {
         createDfd = can.Deferred();
         item = new can.Map({test: true});
         viewModel.attr('type', 'TestType');
@@ -213,13 +213,13 @@ describe('external-data-autocomplete component', ()=> {
         ]];
       });
 
-      it('make call to create model', ()=> {
+      it('make call to create model', () => {
         viewModel.createOrGet(item);
 
         expect(CMS.Models.TestType.create).toHaveBeenCalledWith(item);
       });
 
-      it('creates model with empty context', ()=> {
+      it('creates model with empty context', () => {
         item.attr('context', 'test');
         viewModel.createOrGet(item);
 
@@ -227,7 +227,7 @@ describe('external-data-autocomplete component', ()=> {
         expect(model.attr('context')).toBe(null);
       });
 
-      it('creates model with "external" flag', ()=> {
+      it('creates model with "external" flag', () => {
         item.attr('external', false);
         viewModel.createOrGet(item);
 
@@ -235,39 +235,39 @@ describe('external-data-autocomplete component', ()=> {
         expect(model.attr('external')).toBe(true);
       });
 
-      it('returns new model if there is no value in cache', (done)=> {
+      it('returns new model if there is no value in cache', (done) => {
         let resultDfd = viewModel.createOrGet(item);
 
         createDfd.resolve(response);
 
-        resultDfd.then((resultModel)=> {
+        resultDfd.then((resultModel) => {
           expect(resultModel.attr('id')).toBe('testId');
           expect(resultModel instanceof CMS.Models.TestType).toBe(true);
           done();
         });
       });
 
-      it('returns cached model if there is value in cache', (done)=> {
+      it('returns cached model if there is value in cache', (done) => {
         CMS.Models.TestType.cache['testId'] = {cached: true};
 
         let resultDfd = viewModel.createOrGet(item);
 
         createDfd.resolve(response);
 
-        resultDfd.then((resultModel)=> {
+        resultDfd.then((resultModel) => {
           expect(resultModel).toBe(CMS.Models.TestType.cache['testId']);
           done();
         });
       });
 
-      it('calls model reify', (done)=> {
+      it('calls model reify', (done) => {
         model.reify = jasmine.createSpy('reify').and.returnValue(model);
 
         let resultDfd = viewModel.createOrGet(item);
 
         createDfd.resolve(response);
 
-        resultDfd.then((resultModel)=> {
+        resultDfd.then((resultModel) => {
           expect(model.reify).toHaveBeenCalled();
           done();
         });

@@ -6,21 +6,21 @@ import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../external-data-provider';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
 
-describe('external-data-provider component', ()=> {
+describe('external-data-provider component', () => {
   let viewModel;
   let events;
-  beforeEach(()=> {
+  beforeEach(() => {
     viewModel = getComponentVM(Component);
     events = Component.prototype.events;
   });
 
-  describe('init() method', ()=> {
+  describe('init() method', () => {
     let method;
-    beforeEach(()=> {
+    beforeEach(() => {
       method = Component.prototype.init.bind({viewModel});
     });
 
-    it('loads data', ()=> {
+    it('loads data', () => {
       spyOn(viewModel, 'loadData');
 
       method();
@@ -29,14 +29,14 @@ describe('external-data-provider component', ()=> {
     });
   });
 
-  describe('viewModel', ()=> {
-    describe('loadData() method', ()=> {
+  describe('viewModel', () => {
+    describe('loadData() method', () => {
       let originalConfig;
       let requestDfd;
       let $getSpy;
-      beforeAll(()=> originalConfig = GGRC.config);
-      afterAll(()=> GGRC.config = originalConfig);
-      beforeEach(()=> {
+      beforeAll(() => originalConfig = GGRC.config);
+      afterAll(() => GGRC.config = originalConfig);
+      beforeEach(() => {
         GGRC.config = {
           external_services: {
             Person: 'testUrl',
@@ -47,7 +47,7 @@ describe('external-data-provider component', ()=> {
         $getSpy.and.returnValue(requestDfd);
       });
 
-      it('turns on "loading" flag', ()=> {
+      it('turns on "loading" flag', () => {
         viewModel.attr('loading', false);
 
         viewModel.loadData();
@@ -55,7 +55,7 @@ describe('external-data-provider component', ()=> {
         expect(viewModel.attr('loading')).toBe(true);
       });
 
-      it('increases request number', ()=> {
+      it('increases request number', () => {
         viewModel.attr('currentRequest', 0);
 
         viewModel.loadData();
@@ -63,7 +63,7 @@ describe('external-data-provider component', ()=> {
         expect(viewModel.attr('currentRequest')).toBe(1);
       });
 
-      it('send correct request', ()=> {
+      it('send correct request', () => {
         viewModel.attr('searchCriteria', 'someText');
         viewModel.attr('type', 'Person');
 
@@ -77,54 +77,54 @@ describe('external-data-provider component', ()=> {
         });
       });
 
-      it('sets response to "values" property', (done)=> {
+      it('sets response to "values" property', (done) => {
         let testResponse = ['res1', 'res2'];
         viewModel.attr('values', null);
 
         viewModel.loadData();
 
-        requestDfd.resolve(testResponse).then(()=> {
+        requestDfd.resolve(testResponse).then(() => {
           expect(viewModel.attr('values').serialize()).toEqual(testResponse);
           done();
         });
       });
 
-      it('shows message if there was error', (done)=> {
+      it('shows message if there was error', (done) => {
         spyOn(NotifiersUtils, 'notifier');
         viewModel.attr('type', 'TestModel');
 
         viewModel.loadData();
 
-        requestDfd.reject().always(()=> {
+        requestDfd.reject().always(() => {
           expect(NotifiersUtils.notifier)
             .toHaveBeenCalledWith('error', 'Unable to load TestModels');
           done();
         });
       });
 
-      describe('turns off "loading" flag', ()=> {
-        beforeEach(()=> {
+      describe('turns off "loading" flag', () => {
+        beforeEach(() => {
           spyOn(NotifiersUtils, 'notifier');
           viewModel.attr('loading', true);
           viewModel.loadData();
         });
 
-        it('when there was success', (done)=> {
-          requestDfd.resolve().always(()=> {
+        it('when there was success', (done) => {
+          requestDfd.resolve().always(() => {
             expect(viewModel.attr('loading')).toBe(false);
             done();
           });
         });
 
-        it('when there was error', (done)=> {
-          requestDfd.reject().always(()=> {
+        it('when there was error', (done) => {
+          requestDfd.reject().always(() => {
             expect(viewModel.attr('loading')).toBe(false);
             done();
           });
         });
       });
 
-      it('processes callbacks only for latest request', (done)=> {
+      it('processes callbacks only for latest request', (done) => {
         let request1 = can.Deferred();
         let response1 = ['res1'];
         let request2 = can.Deferred();
@@ -138,7 +138,7 @@ describe('external-data-provider component', ()=> {
         request2.resolve(response2);
         request1.resolve(response1);
 
-        can.when(request1, request2).then(()=> {
+        can.when(request1, request2).then(() => {
           expect(viewModel.attr('values').serialize()).toEqual(response2);
           done();
         });
@@ -146,14 +146,14 @@ describe('external-data-provider component', ()=> {
     });
   });
 
-  describe('events', ()=> {
-    describe('"{viewModel} searchCriteria" handler', ()=> {
+  describe('events', () => {
+    describe('"{viewModel} searchCriteria" handler', () => {
       let handler;
-      beforeEach(()=> {
+      beforeEach(() => {
         handler = events['{viewModel} searchCriteria'].bind({viewModel});
       });
 
-      it('loads data', ()=> {
+      it('loads data', () => {
         spyOn(viewModel, 'loadData');
 
         handler();

@@ -9,7 +9,7 @@ import Component from '../sortable-column';
 describe('sortable-column component', () => {
   let viewModel;
 
-  beforeAll(()=> {
+  beforeAll(() => {
     viewModel = getComponentVM(Component);
   });
 

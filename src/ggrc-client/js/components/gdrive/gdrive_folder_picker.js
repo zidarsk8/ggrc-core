@@ -173,7 +173,7 @@ export default can.Component.extend({
           files,
         });
       })
-        .fail((err)=>{
+        .fail((err) => {
           if ( err && err.type === GDRIVE_PICKER_ERR_CANCEL ) {
             el.trigger('rejected');
           }

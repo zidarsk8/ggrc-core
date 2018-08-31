@@ -48,7 +48,7 @@ export default can.Component.extend('richText', {
     showAlert: false,
     length: 0,
     initEditor(container, toolbarContainer, countContainer) {
-      import(/* webpackChunkName: "quill" */'quill').then((Quill)=> {
+      import(/* webpackChunkName: "quill" */'quill').then((Quill) => {
         let editor = new Quill(container, {
           theme: 'snow',
           bounds: container,
@@ -103,7 +103,7 @@ export default can.Component.extend('richText', {
     },
     restrictMaxLength(editor) {
       let maxLength = this.attr('maxLength');
-      editor.on('text-change', ()=> {
+      editor.on('text-change', () => {
         let currentLength = this.getLength(editor);
         if (currentLength > maxLength) {
           editor.history.undo();
@@ -123,7 +123,7 @@ export default can.Component.extend('richText', {
 
       if (matches) {
         let ops = [];
-        matches.forEach((match)=> {
+        matches.forEach((match) => {
           let split = insertedText.split(match);
           let beforeLink = split.shift();
           if (beforeLink.length) {

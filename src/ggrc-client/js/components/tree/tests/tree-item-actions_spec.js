@@ -20,8 +20,8 @@ describe('tree-item-actions component', function () {
       viewModel.attr('isSnapshot', false);
     });
     describe('returns false', () => {
-      describe('if instance type is Assessment', ()=> {
-        beforeEach(()=> {
+      describe('if instance type is Assessment', () => {
+        beforeEach(() => {
           viewModel.attr('instance', {
             type: 'Assessment',
           });
@@ -55,8 +55,8 @@ describe('tree-item-actions component', function () {
     });
 
     describe('returns true', () => {
-      describe('if instance type is Assessment', ()=> {
-        beforeEach(()=> {
+      describe('if instance type is Assessment', () => {
+        beforeEach(() => {
           viewModel.attr('instance', {
             type: 'Assessment',
           });

@@ -118,7 +118,7 @@ describe('CMS.Controllers.TreeView', function () {
 
       expect(ctrlInst.options.attr('filteredList').length).toBe(4);
       filteredListIds = ctrlInst.options.attr('filteredList')
-        .map((item)=>item.options.attr('instance.id')).serialize();
+        .map((item) => item.options.attr('instance.id')).serialize();
       expect(filteredListIds).toEqual([2, 3, 4, 5]);
     });
 
@@ -129,7 +129,7 @@ describe('CMS.Controllers.TreeView', function () {
       expect(ctrlInst.options.attr('list').length).toBe(4);
 
       listIds = ctrlInst.options.attr('list')
-        .map((item)=>item.attr('instance.id')).serialize();
+        .map((item) => item.attr('instance.id')).serialize();
       expect(listIds).toEqual([2, 3, 4, 5]);
     });
   });

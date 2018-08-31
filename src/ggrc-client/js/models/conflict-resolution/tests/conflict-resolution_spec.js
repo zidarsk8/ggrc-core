@@ -6,14 +6,14 @@
 import {checkValues} from '../conflict-resolution';
 import * as conflictResolvers from '../conflict-resolvers';
 
-describe('cacheable conflict resolution', ()=> {
+describe('cacheable conflict resolution', () => {
   describe('checkValues method', () => {
     beforeEach(() => {
       spyOn(conflictResolvers, 'simpleFieldResolver');
       spyOn(conflictResolvers, 'customAttributeResolver');
     });
 
-    it('skips "updated_at" field', ()=> {
+    it('skips "updated_at" field', () => {
       let baseAttrs = {
         updated_at: 'test',
       };

@@ -318,7 +318,7 @@ export default can.Component.extend({
           };
           data[mapping.option_attr] = destination;
           modelInstance = new Model(data);
-          defer.push(backendGdriveClient.withAuth(()=> {
+          defer.push(backendGdriveClient.withAuth(() => {
             return modelInstance.save();
           }));
         });

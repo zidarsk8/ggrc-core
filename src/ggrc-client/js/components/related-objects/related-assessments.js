@@ -89,17 +89,17 @@ export default can.Component.extend({
       return new Evidence(data);
     },
     reuseSelected: function () {
-      let reusedObjectList = this.attr('selectedEvidences').map((evidence)=> {
+      let reusedObjectList = this.attr('selectedEvidences').map((evidence) => {
         let model = this.buildEvidenceModel(evidence);
 
-        return backendGdriveClient.withAuth(()=> {
+        return backendGdriveClient.withAuth(() => {
           return model.save();
         });
       });
 
       this.attr('isSaving', true);
 
-      can.when(...reusedObjectList).always(()=> {
+      can.when(...reusedObjectList).always(() => {
         this.attr('selectedEvidences').replace([]);
         this.attr('isSaving', false);
         this.dispatch('afterObjectReused');

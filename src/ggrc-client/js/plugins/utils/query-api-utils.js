@@ -127,7 +127,7 @@ function buildParam(objName, page, relevant, fields, filters) {
   if (page.sort) {
     params.order_by = _
       .chain(page.sort)
-      .map((el)=> {
+      .map((el) => {
         if (el.key) {
           return {
             name: el.key,

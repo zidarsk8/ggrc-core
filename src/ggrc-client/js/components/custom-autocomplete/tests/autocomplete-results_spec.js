@@ -8,7 +8,7 @@ import baseAutocompleteResults from '../autocomplete-results';
 describe('autocomplete-results viewModel', () => {
   let viewModel;
 
-  beforeEach(()=> {
+  beforeEach(() => {
     viewModel = baseAutocompleteResults();
   });
 

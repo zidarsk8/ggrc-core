@@ -905,7 +905,7 @@ Mustache.registerHelper('is_allowed_to_map',
     return options.inverse(options.contexts || this);
   });
 
-Mustache.registerHelper('is_allowed_to_map_task', (sourceType, options)=> {
+Mustache.registerHelper('is_allowed_to_map_task', (sourceType, options) => {
   const mappableTypes = ['Program', 'Regulation', 'Policy', 'Standard',
     'Contract', 'Clause', 'Requirement', 'Request', 'Control', 'Objective',
     'OrgGroup', 'Vendor', 'AccessGroup', 'System', 'Process', 'DataAsset',

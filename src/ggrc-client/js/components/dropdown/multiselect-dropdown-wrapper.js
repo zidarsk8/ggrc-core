@@ -34,8 +34,8 @@ export default can.Component.extend({
       let preparedOptions = [];
       let selectedInternal = [];
 
-      items.forEach((item)=> {
-        let isSelected = _.find(selected, (selectedItem)=> {
+      items.forEach((item) => {
+        let isSelected = _.find(selected, (selectedItem) => {
           return selectedItem.id === item.id;
         });
 

@@ -35,15 +35,15 @@ export default can.Component.extend('commentDataProvider', {
       let dfd = can.Deferred();
       this.attr('isLoading', true);
       QueryAPI.batchRequests(query)
-        .done((response)=> {
+        .done((response) => {
           let type = Object.keys(response)[0];
           let values = response[type].values;
           dfd.resolve(values);
         })
-        .fail(()=> {
+        .fail(() => {
           dfd.resolve([]);
         })
-        .always(()=> {
+        .always(() => {
           this.attr('isLoading', false);
         });
       return dfd.promise();
@@ -60,7 +60,7 @@ export default can.Component.extend('commentDataProvider', {
     },
     processComment(event) {
       if (event.success) {
-        this.mapToInstance(event.item).then(()=> {
+        this.mapToInstance(event.item).then(() => {
           this.attr('instance').refresh();
         });
       } else {
@@ -74,7 +74,7 @@ export default can.Component.extend('commentDataProvider', {
         destination: comment,
       }))
         .save()
-        .fail(()=> {
+        .fail(() => {
           this.removeComment(comment);
         });
     },

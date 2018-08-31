@@ -77,7 +77,7 @@ export default can.Component.extend({
 
       this.attr('isInitializing', true);
       batchRequests(buildParam(type, pagingInfo, relevant, null, filter))
-        .then((result)=> {
+        .then((result) => {
           let values = result[type].values.map((value) => {
             return new CMS.Models[type](value);
           });

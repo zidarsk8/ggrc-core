@@ -147,7 +147,7 @@ export default can.Component.extend({
               return that.createDocumentModel(files);
             })
             .then(stopFn)
-            .always(()=> {
+            .always(() => {
               that.attr('isUploading', false);
               that.dispatch('finish');
             })
@@ -191,15 +191,15 @@ export default can.Component.extend({
           },
         });
 
-        return backendGdriveClient.withAuth(()=> {
+        return backendGdriveClient.withAuth(() => {
           return model.save();
         });
       });
       // waiting for all docs promises
-      return can.when(...dfdDocs).then(()=> {
+      return can.when(...dfdDocs).then(() => {
         this.attr('instance').refresh();
         return can.makeArray(arguments);
-      }, (xhr)=> {
+      }, (xhr) => {
         let message = (xhr.responseJSON && xhr.responseJSON.message) ?
           xhr.responseJSON.message :
           xhr.responseText;

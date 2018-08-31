@@ -6,28 +6,28 @@
 import Component from '../rich_text';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
-describe('rich-text component', ()=> {
+describe('rich-text component', () => {
   let viewModel;
 
-  beforeEach(()=> {
+  beforeEach(() => {
     viewModel = getComponentVM(Component);
   });
 
-  describe('viewModel', ()=> {
-    describe('getLength() method', ()=> {
+  describe('viewModel', () => {
+    describe('getLength() method', () => {
       let editor;
 
-      beforeEach(()=> {
+      beforeEach(() => {
         editor = jasmine.createSpyObj(['getLength']);
       });
 
-      it('should call getLength()', ()=> {
+      it('should call getLength()', () => {
         viewModel.getLength(editor);
 
         expect(editor.getLength).toHaveBeenCalled();
       });
 
-      it('should not return service symbol', ()=> {
+      it('should not return service symbol', () => {
         let length = 5;
         editor.getLength.and.returnValue(length);
 
@@ -37,8 +37,8 @@ describe('rich-text component', ()=> {
       });
     });
 
-    describe('urlMatcher() method', ()=> {
-      it('should return empty delta if there is no changes', ()=> {
+    describe('urlMatcher() method', () => {
+      it('should return empty delta if there is no changes', () => {
         let node = {
           data: 'someEmptyText',
         };
@@ -51,7 +51,7 @@ describe('rich-text component', ()=> {
         expect(result).toEqual(delta);
       });
 
-      it('should return delta if there are no matches', ()=> {
+      it('should return delta if there are no matches', () => {
         let node = {
           data: 'sometext',
         };
@@ -66,7 +66,7 @@ describe('rich-text component', ()=> {
         expect(result.ops[0]).toBe(delta.ops[0]);
       });
 
-      it('should update delta if there are matches', ()=> {
+      it('should update delta if there are matches', () => {
         let node = {
           data: 'http://the.url and http://another.url ok?',
         };
@@ -100,10 +100,10 @@ describe('rich-text component', ()=> {
       });
     });
 
-    describe('restrictMaxLength() method', ()=> {
+    describe('restrictMaxLength() method', () => {
       let editor;
 
-      beforeEach(()=> {
+      beforeEach(() => {
         editor = {
           on: jasmine.createSpy(),
           history: {
@@ -112,23 +112,23 @@ describe('rich-text component', ()=> {
         };
       });
 
-      it('should subscribe "text-change" event', ()=> {
+      it('should subscribe "text-change" event', () => {
         viewModel.restrictMaxLength(editor);
 
         expect(editor.on.calls.argsFor(0)[0]).toBe('text-change');
       });
 
-      describe('text-change callback', ()=> {
+      describe('text-change callback', () => {
         let callback;
 
-        beforeEach(()=> {
-          editor.on.and.callFake((eventName, cb)=> {
+        beforeEach(() => {
+          editor.on.and.callFake((eventName, cb) => {
             callback = cb;
           });
         });
 
         it(`should not call history.undo() if current
-          length is less than max length`, ()=> {
+          length is less than max length`, () => {
             viewModel.attr('maxLength', 10);
             spyOn(viewModel, 'getLength').and.returnValue(9);
             viewModel.restrictMaxLength(editor);
@@ -139,7 +139,7 @@ describe('rich-text component', ()=> {
           });
 
         it(`should call history.undo() if current
-          length is greather than max length`, ()=> {
+          length is greather than max length`, () => {
             viewModel.attr('maxLength', 9);
             spyOn(viewModel, 'getLength').and.returnValue(10);
             viewModel.restrictMaxLength(editor);
@@ -151,97 +151,97 @@ describe('rich-text component', ()=> {
       });
     });
 
-    describe('restrictPasteOperation() method', ()=> {
+    describe('restrictPasteOperation() method', () => {
       let editor;
 
-      beforeEach(()=> {
+      beforeEach(() => {
         editor = {
           root: jasmine.createSpyObj(['addEventListener']),
         };
       });
 
-      it('should subscribe "paste" event', ()=> {
+      it('should subscribe "paste" event', () => {
         viewModel.restrictPasteOperation(editor);
 
         expect(editor.root.addEventListener.calls.argsFor(0)[0]).toBe('paste');
       });
 
-      describe('paste callback', ()=> {
+      describe('paste callback', () => {
         let event;
         let callback;
 
-        beforeEach(()=> {
+        beforeEach(() => {
           event = {
             preventDefault: jasmine.createSpy(),
             clipboardData: {
               getData: jasmine.createSpy(),
             },
           };
-          editor.root.addEventListener.and.callFake((eventName, cb)=> {
+          editor.root.addEventListener.and.callFake((eventName, cb) => {
             callback = cb;
           });
           spyOn(document, 'execCommand');
         });
 
-        describe('if pasted text length is less than allowed', ()=> {
-          beforeEach(()=> {
+        describe('if pasted text length is less than allowed', () => {
+          beforeEach(() => {
             event.clipboardData.getData.and.returnValue('0123456789');
             viewModel.attr('maxLength', 20);
             viewModel.attr('length', 5);
             viewModel.restrictPasteOperation(editor);
           });
 
-          it('should not call preventDefault', ()=> {
+          it('should not call preventDefault', () => {
             callback(event);
 
             expect(event.preventDefault).not.toHaveBeenCalled();
           });
 
-          it('should not call execCommand', ()=> {
+          it('should not call execCommand', () => {
             callback(event);
 
             expect(document.execCommand).not.toHaveBeenCalled();
           });
         });
 
-        describe('if pasted text length is greather than allowed', ()=> {
-          beforeEach(()=> {
+        describe('if pasted text length is greather than allowed', () => {
+          beforeEach(() => {
             event.clipboardData.getData.and.returnValue('0123456789');
             viewModel.attr('maxLength', 10);
             viewModel.attr('length', 5);
             viewModel.restrictPasteOperation(editor);
           });
 
-          it('should call preventDefault', ()=> {
+          it('should call preventDefault', () => {
             callback(event);
 
             expect(event.preventDefault).toHaveBeenCalled();
           });
 
-          describe('should call execCommand', ()=> {
-            beforeEach(()=> {
+          describe('should call execCommand', () => {
+            beforeEach(() => {
               callback(event);
             });
 
-            it('with correct command name', ()=> {
+            it('with correct command name', () => {
               expect(document.execCommand).toHaveBeenCalled();
               expect(document.execCommand.calls.argsFor(0)[0])
                 .toBe('insertText');
             });
 
-            it('with correct configuration', ()=> {
+            it('with correct configuration', () => {
               expect(document.execCommand).toHaveBeenCalled();
               expect(document.execCommand.calls.argsFor(0)[1]).toBe(false);
             });
 
-            it('with correctly sliced text', ()=> {
+            it('with correctly sliced text', () => {
               expect(document.execCommand).toHaveBeenCalled();
               expect(document.execCommand.calls.argsFor(0)[2])
                 .toBe('01234');
             });
           });
 
-          it('should show alert', ()=> {
+          it('should show alert', () => {
             viewModel.attr('showAlert', false);
 
             callback(event);
@@ -252,8 +252,8 @@ describe('rich-text component', ()=> {
       });
     });
 
-    describe('onChange() method', ()=> {
-      it('should reset "showAlert" flag if length is less than allowed', ()=> {
+    describe('onChange() method', () => {
+      it('should reset "showAlert" flag if length is less than allowed', () => {
         viewModel.attr('showAlert', true);
         spyOn(viewModel, 'getLength').and.returnValue(99);
         viewModel.attr('maxLength', 100);

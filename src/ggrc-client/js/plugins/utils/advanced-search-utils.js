@@ -14,7 +14,7 @@ export const create = {
    * @param {object} value - Filter Attribute data.
    * @return {object} - Attribute model.
    */
-  attribute: (value)=> {
+  attribute: (value) => {
     return {
       type: 'attribute',
       value: value || { },
@@ -25,7 +25,7 @@ export const create = {
    * @param {Array} value - Group data.
    * @return {object} - Group model.
    */
-  group: (value)=> {
+  group: (value) => {
     return {
       type: 'group',
       value: value || [],
@@ -36,7 +36,7 @@ export const create = {
    * @param {string} value - Operator name.
    * @return {object} - Operator model.
    */
-  operator: (value)=> {
+  operator: (value) => {
     return {
       type: 'operator',
       value: value || '',
@@ -47,7 +47,7 @@ export const create = {
    * @param {object} value - State data.
    * @return {object} - State model.
    */
-  state: (value)=> {
+  state: (value) => {
     return {
       type: 'state',
       value: value || { },
@@ -58,7 +58,7 @@ export const create = {
    * @param {object} value - Mapping Criteria data.
    * @return {object} - Mapping Criteria model.
    */
-  mappingCriteria: (value)=> {
+  mappingCriteria: (value) => {
     return {
       type: 'mappingCriteria',
       value: value || { },
@@ -72,7 +72,7 @@ export const create = {
  * @param {Array} request - Collection of QueryAPI sub-requests.
  * @return {number} - QueryAPI request id.
  */
-export const addMappingCriteria = (mapping, request)=> {
+export const addMappingCriteria = (mapping, request) => {
   let filterObject = builders.attribute(mapping.filter.value);
 
   if (mapping.mappedTo) {
@@ -95,7 +95,7 @@ export const addMappingCriteria = (mapping, request)=> {
  * @param {Array} items - Collection of Advanced Search models.
  * @return {Array} - Collection of Advanced Search models sorted in reverse polish notation.
  */
-export const reversePolishNotation = (items)=> {
+export const reversePolishNotation = (items) => {
   const result = [];
   const stack = [];
   const priorities = {
@@ -103,7 +103,7 @@ export const reversePolishNotation = (items)=> {
     AND: 2,
   };
 
-  items.forEach((item)=> {
+  items.forEach((item) => {
     if (item.type !== 'operator') {
       result.push(item);
     } else {
@@ -131,7 +131,7 @@ export const builders = {
    * @param {object} attribute - Filter Attribute model value.
    * @return {object} - Valid QueryAPI filter expression.
    */
-  attribute: (attribute)=> {
+  attribute: (attribute) => {
     return {
       expression: {
         left: attribute.field,
@@ -145,7 +145,7 @@ export const builders = {
    * @param {object} state - State model value.
    * @return {object} - Valid QueryAPI filter expression.
    */
-  state: (state)=> {
+  state: (state) => {
     let inverse = state.operator === 'NONE';
     return StateUtils.buildStatusFilter(state.items, state.modelName, inverse);
   },
@@ -159,7 +159,7 @@ export const builders = {
     items = reversePolishNotation(items);
 
     const stack = [];
-    items.forEach((item)=> {
+    items.forEach((item) => {
       if (item.type !== 'operator') {
         stack.push(builders[item.type](item.value, request));
       } else {
@@ -177,7 +177,7 @@ export const builders = {
    * @param {Array} request - Collection of QueryAPI sub-requests.
    * @return {object} - Valid QueryAPI filter expression.
    */
-  mappingCriteria: (criteria, request)=> {
+  mappingCriteria: (criteria, request) => {
     let criteriaId = addMappingCriteria(criteria, request);
     return {
       expression: {
@@ -195,7 +195,7 @@ export const builders = {
  * @param {Array} request - Collection of QueryAPI sub-requests.
  * @return {object} - valid QueryAPI filter expression.
  */
-export const buildFilter = (data, request)=> {
+export const buildFilter = (data, request) => {
   let result = builders.group(data, request);
   return result;
 };

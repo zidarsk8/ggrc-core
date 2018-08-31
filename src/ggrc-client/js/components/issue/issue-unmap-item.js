@@ -46,7 +46,7 @@ export default can.Component.extend({
     },
 
     processRelatedSnapshots() {
-      this.loadRelatedObjects().done(()=> {
+      this.loadRelatedObjects().done(() => {
         if (this.attr('total')) {
           this.showModal();
         } else {
@@ -75,7 +75,7 @@ export default can.Component.extend({
 
       this.attr('isLoading', true);
       return can.when(batchRequests(snapshotsQuery), batchRequests(auditsQuery))
-        .done((snapshotsResponse, auditsResponse)=> {
+        .done((snapshotsResponse, auditsResponse) => {
           const snapshots = snapshotsResponse.Snapshot;
           const audits = auditsResponse.Audit;
           this.attr('total', snapshots.total + audits.total);
@@ -83,12 +83,12 @@ export default can.Component.extend({
           this.attr('relatedSnapshots', snapshots.values);
           this.attr('paging.total', snapshots.total);
         })
-        .fail(()=> {
+        .fail(() => {
           notifier(
             'error',
             'There was a problem with retrieving related objects.');
         })
-        .always(()=> {
+        .always(() => {
           this.attr('isLoading', false);
         });
     },

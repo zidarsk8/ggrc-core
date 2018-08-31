@@ -6,9 +6,9 @@
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import * as StateUtils from '../../plugins/utils/state-utils';
 
-describe('AdvancedSearch', ()=> {
-  describe('buildFilter() method', ()=> {
-    it('builds correct filter string', ()=> {
+describe('AdvancedSearch', () => {
+  describe('buildFilter() method', () => {
+    it('builds correct filter string', () => {
       let items = [
         AdvancedSearch.create.state({
           items: ['Active', 'Draft'],
@@ -72,7 +72,7 @@ describe('AdvancedSearch', ()=> {
       expect(result).toEqual(expectedResult);
     });
 
-    it('builds correct mapping filters', ()=> {
+    it('builds correct mapping filters', () => {
       let items = [
         AdvancedSearch.create.mappingCriteria({
           objectName: 'product',
@@ -223,7 +223,7 @@ describe('AdvancedSearch', ()=> {
       expect(request).toEqual(expectedRequest);
     });
 
-    it('uses group builder', ()=> {
+    it('uses group builder', () => {
       spyOn(AdvancedSearch.builders, 'group').and.returnValue('result');
       let data = 'data';
       let request = 'request';
@@ -235,8 +235,8 @@ describe('AdvancedSearch', ()=> {
     });
   });
 
-  describe('reversePolishNotation() method', ()=> {
-    it('builds correct expression', ()=> {
+  describe('reversePolishNotation() method', () => {
+    it('builds correct expression', () => {
       let items = [
         AdvancedSearch.create.state({
           items: ['Active', 'Draft'],
@@ -309,9 +309,9 @@ describe('AdvancedSearch', ()=> {
     });
   });
 
-  describe('builders', ()=> {
-    describe('attribute builder', ()=> {
-      it('builds correct filter expression', ()=> {
+  describe('builders', () => {
+    describe('attribute builder', () => {
+      it('builds correct filter expression', () => {
         let item = AdvancedSearch.create.attribute({
           field: 'field',
           operator: 'operator',
@@ -330,10 +330,10 @@ describe('AdvancedSearch', ()=> {
       });
     });
 
-    describe('state builder', ()=> {
+    describe('state builder', () => {
       let item;
       let expectedResult;
-      beforeEach(()=> {
+      beforeEach(() => {
         item = AdvancedSearch.create.state({
           modelName: 'testModelName',
           items: ['test'],
@@ -342,7 +342,7 @@ describe('AdvancedSearch', ()=> {
         spyOn(StateUtils, 'buildStatusFilter').and.returnValue(expectedResult);
       });
 
-      it('correctly call buildStatusFilter() if operator is ANY', ()=> {
+      it('correctly call buildStatusFilter() if operator is ANY', () => {
         item.value.operator = 'ANY';
 
         let result = AdvancedSearch.builders.state(item.value);
@@ -352,7 +352,7 @@ describe('AdvancedSearch', ()=> {
         expect(result).toBe(expectedResult);
       });
 
-      it('correctly call buildStatusFilter() if operator is NONE', ()=> {
+      it('correctly call buildStatusFilter() if operator is NONE', () => {
         item.value.operator = 'NONE';
 
         let result = AdvancedSearch.builders.state(item.value);
@@ -363,9 +363,9 @@ describe('AdvancedSearch', ()=> {
       });
     });
 
-    describe('group builder', ()=> {
+    describe('group builder', () => {
       let items;
-      beforeEach(()=> {
+      beforeEach(() => {
         items = [
           AdvancedSearch.create.state({
             modelName: 'testModelName',
@@ -380,7 +380,7 @@ describe('AdvancedSearch', ()=> {
         ];
       });
 
-      it('calls corresponding builder for each item', ()=> {
+      it('calls corresponding builder for each item', () => {
         let expression = {expression: {}};
         spyOn(AdvancedSearch.builders, 'state').and.returnValue(expression);
         spyOn(AdvancedSearch.builders, 'attribute').and.returnValue(expression);
@@ -391,7 +391,7 @@ describe('AdvancedSearch', ()=> {
         expect(AdvancedSearch.builders.attribute).toHaveBeenCalled();
       });
 
-      it('joins results to single expression', ()=> {
+      it('joins results to single expression', () => {
         spyOn(GGRC.query_parser, 'join_queries').and.returnValue('joined');
 
         let result = AdvancedSearch.builders.group(items);

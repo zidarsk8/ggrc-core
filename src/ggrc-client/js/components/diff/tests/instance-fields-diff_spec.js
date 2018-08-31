@@ -9,7 +9,7 @@ import Component from '../instance-fields-diff';
 describe('instance-fields-diff component', () => {
   let viewModel;
 
-  beforeAll(()=> {
+  beforeAll(() => {
     viewModel = getComponentVM(Component);
   });
 

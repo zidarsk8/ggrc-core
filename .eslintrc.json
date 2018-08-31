@@ -43,6 +43,7 @@
   },
 
   "rules": {
+    "arrow-spacing": ["error", {"before": true, "after": true}],
     "eqeqeq": 2,
     "comma-dangle": [
       1, "always-multiline"

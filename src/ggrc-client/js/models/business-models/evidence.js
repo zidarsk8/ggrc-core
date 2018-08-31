@@ -9,7 +9,7 @@ import '../mixins/access-control-list';
 import '../mixins/ca-update';
 import Stub from '../stub';
 
-const getAccessControlList = ()=> {
+const getAccessControlList = () => {
   let adminRole = getRole('Evidence', 'Admin');
 
   return adminRole ? [{
