@@ -17,7 +17,7 @@ from lib.page.modal.set_value_for_asmt_ca import SetValueForAsmtDropdown
 from lib.page.widget import page_tab, page_elements
 from lib.page.widget.page_mixins import (WithAssignFolder, WithObjectReview,
                                          WithPageElements)
-from lib.utils import selenium_utils, string_utils, help_utils
+from lib.utils import selenium_utils, string_utils, help_utils, ui_utils
 
 
 class InfoWidget(page_tab.WithPageTab, WithPageElements, base.Widget):
@@ -714,8 +714,7 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
   def select_assignee_user(self, user_email):
     """Select assignee user from dropdown on submit for review popup."""
     self._browser.text_field(placeholder="Find reviewer").set(user_email)
-    self._browser.element(id="ui-id-1").element(
-        class_name="ui-menu-item", text=re.compile(user_email)).click()
+    ui_utils.select_user(self._browser, user_email)
 
   def select_first_available_date(self):
     """Select first available day on datepicker on submit for review popup."""
