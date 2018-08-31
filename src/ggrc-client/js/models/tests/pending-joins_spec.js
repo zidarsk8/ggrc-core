@@ -6,25 +6,19 @@
 import {resolveDeferredBindings} from '../pending-joins';
 import {makeFakeModel} from '../../../js_specs/spec_helpers';
 import Cacheable from '../cacheable';
+import * as mappingModels from '../mapping-models';
 
 describe('pending-joins module', () => {
   describe('resolveDeferredBindings() util', function () {
-    let origDummyModel;
-    let origDummyJoin;
-
-    beforeAll(function () {
-      origDummyModel = CMS.Models.DummyModel;
-      origDummyJoin = CMS.Models.DummyJoin;
-    });
+    let DummyModel;
 
     afterAll(function () {
-      CMS.Models.DummyModel = origDummyModel;
-      CMS.Models.DummyJoin = origDummyJoin;
+      mappingModels.DummyJoin = null;
     });
 
     beforeEach(function () {
-      CMS.Models.DummyModel = makeFakeModel({model: Cacheable});
-      CMS.Models.DummyJoin = makeFakeModel({model: Cacheable});
+      DummyModel = makeFakeModel({model: Cacheable});
+      mappingModels.DummyJoin = makeFakeModel({model: Cacheable});
     });
 
     it('iterates _pending_joins, calling refresh_stubs on each binding',
@@ -44,7 +38,7 @@ describe('pending-joins module', () => {
       let binding;
       let dummy;
       beforeEach(function () {
-        dummy = new CMS.Models.DummyModel({id: 1});
+        dummy = new DummyModel({id: 1});
         instance = jasmine.createSpyObj('instance',
           ['get_binding', 'isNew', 'refresh', 'attr', 'dispatch']);
         binding = jasmine.createSpyObj('binding', ['refresh_stubs']);
@@ -53,21 +47,21 @@ describe('pending-joins module', () => {
         instance.get_binding.and.returnValue(binding);
         binding.loader = {model_name: 'DummyJoin'};
         binding.list = [];
-        spyOn(CMS.Models.DummyJoin, 'newInstance');
-        spyOn(CMS.Models.DummyJoin.prototype, 'save');
+        spyOn(mappingModels.DummyJoin, 'newInstance');
+        spyOn(mappingModels.DummyJoin.prototype, 'save');
       });
 
       it('creates a proxy object when it does not exist', function () {
         resolveDeferredBindings(instance);
-        expect(CMS.Models.DummyJoin.newInstance).toHaveBeenCalled();
-        expect(CMS.Models.DummyJoin.prototype.save).toHaveBeenCalled();
+        expect(mappingModels.DummyJoin.newInstance).toHaveBeenCalled();
+        expect(mappingModels.DummyJoin.prototype.save).toHaveBeenCalled();
       });
 
       it('does not create proxy object when it already exists', function () {
         binding.list.push({instance: dummy});
         resolveDeferredBindings(instance);
-        expect(CMS.Models.DummyJoin.newInstance).not.toHaveBeenCalled();
-        expect(CMS.Models.DummyJoin.prototype.save).not.toHaveBeenCalled();
+        expect(mappingModels.DummyJoin.newInstance).not.toHaveBeenCalled();
+        expect(mappingModels.DummyJoin.prototype.save).not.toHaveBeenCalled();
       });
     });
 
@@ -77,8 +71,8 @@ describe('pending-joins module', () => {
       let dummy;
       let dummy_join;
       beforeEach(function () {
-        dummy = new CMS.Models.DummyModel({id: 1});
-        dummy_join = new CMS.Models.DummyJoin({id: 1});
+        dummy = new DummyModel({id: 1});
+        dummy_join = new mappingModels.DummyJoin({id: 1});
         instance = jasmine.createSpyObj('instance',
           ['get_binding', 'isNew', 'refresh', 'attr', 'dispatch']);
         binding = jasmine.createSpyObj('binding', ['refresh_stubs']);
@@ -87,8 +81,8 @@ describe('pending-joins module', () => {
         instance.get_binding.and.returnValue(binding);
         binding.loader = {model_name: 'DummyJoin'};
         binding.list = [];
-        spyOn(CMS.Models.DummyJoin, 'newInstance');
-        spyOn(CMS.Models.DummyJoin.prototype, 'save');
+        spyOn(mappingModels.DummyJoin, 'newInstance');
+        spyOn(mappingModels.DummyJoin.prototype, 'save');
       });
 
       it('removes proxy object if it exists', function () {

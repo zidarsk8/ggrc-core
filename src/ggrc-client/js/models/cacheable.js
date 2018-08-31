@@ -10,9 +10,6 @@ import {
   isSnapshot,
   setAttrs,
 } from '../plugins/utils/snapshot-utils';
-import {
-  resolveDeferredBindings,
-} from './pending-joins';
 import resolveConflict from './conflict-resolution/conflict-resolution';
 import PersistentNotifier from '../plugins/persistent_notifier';
 import RefreshQueue from './refresh_queue';
@@ -278,7 +275,8 @@ export default can.Model('can.Model.Cacheable', {
     //  below when the update endpoint isn't set in the model's static config.
     //  This leads to conflicts not actually rejecting because on the second go-round
     //  the local and remote objects look the same.  --BM 2015-02-06
-    this.update = function (id, params) {
+    this.update = async function (id, params) {
+      const {resolveDeferredBindings} = await import('./pending-joins');
       let ret = _update
         .call(this, id, this.process_args(params))
         .then(resolveDeferredBindings,
@@ -292,7 +290,8 @@ export default can.Model('can.Model.Cacheable', {
       delete ret.hasFailCallback;
       return ret;
     };
-    this.create = function (params) {
+    this.create = async function (params) {
+      const {resolveDeferredBindings} = await import('./pending-joins');
       let ret = _create
         .call(this, this.process_args(params))
         .then(resolveDeferredBindings);

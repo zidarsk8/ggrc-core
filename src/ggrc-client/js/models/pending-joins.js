@@ -4,6 +4,7 @@
 */
 
 import Stub from './stub';
+import * as mappingModels from '../models/mapping-models';
 
 const resolveDeferredBindings = (obj) => {
   const hasPendingJoins = _.get(obj, '_pending_joins.length') > 0;
@@ -68,8 +69,7 @@ function _addHandler(obj, pj) {
       }), pj.what))) {
     return dfds;
   }
-  const model = (CMS.Models[binding.loader.model_name] ||
-    GGRC.Models[binding.loader.model_name]);
+  const model = mappingModels[binding.loader.model_name];
   const inst = pj.what instanceof model
     ? pj.what
     : new model({

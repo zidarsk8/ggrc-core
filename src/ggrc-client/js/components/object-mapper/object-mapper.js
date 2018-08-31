@@ -39,6 +39,7 @@ import {
 import Mappings from '../../models/mappers/mappings';
 import Relationship from '../../models/service-models/relationship';
 import * as businessModels from '../../models/business-models';
+import * as mappingModels from '../../models/mapping-models';
 
 let DEFAULT_OBJECT_MAP = {
   Assessment: 'Control',
@@ -310,7 +311,7 @@ export default can.Component.extend({
             return;
           }
           mapping = Mappings.get_canonical_mapping(object, type);
-          Model = CMS.Models[mapping.model_name];
+          Model = mappingModels[mapping.model_name];
           data[mapping.object_attr] = {
             href: instance.href,
             type: instance.type,
