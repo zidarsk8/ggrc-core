@@ -12,6 +12,21 @@ from ggrc import models
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
+SCOPING_OBJECTS = {
+    "Access Group",
+    "Data Asset",
+    "Facility",
+    "Market",
+    "Metric",
+    "Org Group",
+    "Process",
+    "Product",
+    "ProductGroup",
+    "Project",
+    "System",
+    "TechnologyEnvironment",
+    "Vendor",
+}
 
 @ddt.ddt
 class TestACLImportExport(TestCase):
@@ -33,6 +48,8 @@ class TestACLImportExport(TestCase):
         ("code", "market-1"),
         ("title", "Title"),
         ("Admin", "user@example.com"),
+        ("Assignee", "user@example.com"),
+        ("Verifier", "user@example.com"),
         (role.name, "user@example.com"),
     ]))
     self._check_csv_response(response, {})
@@ -57,6 +74,8 @@ class TestACLImportExport(TestCase):
         ("code", "market-1"),
         ("title", "Title"),
         ("Admin", "user@example.com"),
+        ("Assignee", "user@example.com"),
+        ("Verifier", "user@example.com"),
         (role.name, "\n".join(emails)),
     ]))
     self._check_csv_response(response, {})
@@ -79,6 +98,8 @@ class TestACLImportExport(TestCase):
         ("code", "market-1"),
         ("title", "Title"),
         ("Admin", "user@example.com"),
+        ("Assignee", "user@example.com"),
+        ("Verifier", "user@example.com"),
         (role_name, "\n".join(emails)),
     ]))
     self._check_csv_response(response, {})
@@ -107,6 +128,8 @@ class TestACLImportExport(TestCase):
         ("code", "market-1"),
         ("title", "Title"),
         ("Admin", "user@example.com"),
+        ("Assignee", "user@example.com"),
+        ("Verifier", "user@example.com"),
         (role_name, "\n".join(emails)),
     ]))
     self._check_csv_response(response, {})
@@ -138,6 +161,8 @@ class TestACLImportExport(TestCase):
         ("code", "market-1"),
         ("title", "Title"),
         ("Admin", "user@example.com"),
+        ("Assignee", "user@example.com"),
+        ("Verifier", "user@example.com"),
         (role_name, "\n".join(emails)),
     ]))
 
@@ -173,6 +198,9 @@ class TestACLImportExport(TestCase):
     ])
     if object_type == "Control":
       import_dict["Assertions*"] = "Privacy"
+    if object_type in SCOPING_OBJECTS:
+      import_dict["Assignee"] = "user@example.com"
+      import_dict["Verifier"] = "user@example.com"
     for role_name, emails in roles.items():
       import_dict[role_name] = "\n".join(emails)
     return import_dict
@@ -321,6 +349,8 @@ class TestACLImportExport(TestCase):
         ("code", "market-1"),
         ("title", "Title"),
         ("Admin", "user@example.com"),
+        ("Assignee", "user@example.com"),
+        ("Verifier", "user@example.com"),
         (role_name, "\n".join(emails)),
     ]))
     self._check_csv_response(response, {})
@@ -337,7 +367,7 @@ class TestACLImportExport(TestCase):
     acl_revisions = models.Revision.query.filter_by(
         resource_type="AccessControlList"
     ).count()
-    self.assertEqual(acl_revisions, 4)
+    self.assertEqual(acl_revisions, 6)
 
   def test_acl_roles_clear(self):
     """Test clearing ACL roles for Program with '--' value"""
@@ -366,9 +396,8 @@ class TestACLImportExport(TestCase):
       for acl in program.access_control_list:
         self.assertNotEqual(acl.ac_role.name, role)
 
-  @ddt.data("Assignee", "Verifier")
-  def test_import_acl_validation(self, role):
-    """Test import object with {} roles exceeding max limit"""
+  def test_import_acl_validation(self):
+    """Test import object with roles exceeding max limit"""
     with factories.single_commit():
       factories.PersonFactory(email="user0@example.com")
       factories.PersonFactory(email="user1@example.com")
@@ -378,10 +407,15 @@ class TestACLImportExport(TestCase):
         ("Code*", "OrgGroup-1"),
         ("Admin", "user@example.com"),
         ("title", "Test OrgGroup"),
-        (role, roles),
+        ("Assignee", roles),
+        ("Verifier", roles),
     ]))
     self.assertIn(
-        "{} role must have only 1 person(s) assigned".format(role),
+        "role must have only 1 person(s) assigned",
         response[0]["row_errors"][0]
     )
-    self.assertEqual(len(response[0]["row_errors"]), 1)
+    self.assertIn(
+        "role must have only 1 person(s) assigned",
+        response[0]["row_errors"][1]
+    )
+    self.assertEqual(len(response[0]["row_errors"]), 2)

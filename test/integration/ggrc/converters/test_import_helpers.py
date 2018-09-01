@@ -737,7 +737,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Secondary Contacts",
     }
     names.update(self.SCOPING_ROLES)
-    self._test_single_object(all_models.System, names, self.SCOPE_COMMON_EXPECTED)
+    self._test_single_object(all_models.System, names,
+                             self.SCOPE_COMMON_EXPECTED)
 
   def test_process_definitions(self):
     """Test default headers for Process."""
@@ -769,7 +770,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Secondary Contacts",
     }
     names.update(self.SCOPING_ROLES)
-    self._test_single_object(all_models.Process, names, self.SCOPE_COMMON_EXPECTED)
+    self._test_single_object(all_models.Process, names,
+                             self.SCOPE_COMMON_EXPECTED)
 
   def test_product_definitions(self):
     """Test default headers for Product."""
@@ -801,7 +803,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Secondary Contacts",
     }
     names.update(self.SCOPING_ROLES)
-    self._test_single_object(all_models.Product, names, self.SCOPE_COMMON_EXPECTED)
+    self._test_single_object(all_models.Product, names,
+                             self.SCOPE_COMMON_EXPECTED)
 
   def test_risk_definitions(self):
     """Test default headers for Risk."""
