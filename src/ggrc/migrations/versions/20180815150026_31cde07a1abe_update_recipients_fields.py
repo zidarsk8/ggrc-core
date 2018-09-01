@@ -47,22 +47,6 @@ def upgrade():
                .where(commentable_table.c.recipients.is_(None))
                .values(recipients=''))
 
-    # remove Primary Contacts from recipients list
-    op.execute(commentable_table.update().values(
-        recipients=func.replace(commentable_table.c.recipients,
-                                "Primary Contacts,", "")))
-    op.execute(commentable_table.update().values(
-        recipients=func.replace(commentable_table.c.recipients,
-                                "Primary Contacts", "")))
-
-    # remove Secondary Contacts from recipients list
-    op.execute(commentable_table.update().values(
-        recipients=func.replace(commentable_table.c.recipients,
-                                "Secondary Contacts,", "")))
-    op.execute(commentable_table.update().values(
-        recipients=func.replace(commentable_table.c.recipients,
-                                "Secondary Contacts", "")))
-
     # add Assignee, Verifier, Compliance Contacts to recipients list
     op.execute(commentable_table.update()
                .where(commentable_table.c.recipients != '')
@@ -82,12 +66,11 @@ def downgrade():
     commentable_table = sa.sql.table(
         name, sa.Column('recipients', sa.String(length=250))
     )
-    # remove new roles and
-    # put to all recipients list Primary Contacts and Secondary Contacts
+    # remove new roles
     op.execute(commentable_table.update().values(
         recipients=func.replace(commentable_table.c.recipients,
                                 "Assignee,Verifier,Compliance Contacts",
-                                "Primary Contacts,Secondary Contacts")))
+                                "")))
 
     # trim commas from all recipients lists
     connection = op.get_bind()

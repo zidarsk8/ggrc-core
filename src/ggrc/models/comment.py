@@ -352,6 +352,8 @@ class ScopedCommentable(Commentable):
       "Creators",
       "Verifiers",
       "Admin",
+      "Primary Contacts",
+      "Secondary Contacts",
       "Product Managers",
       "Technical / Program Managers",
       "Technical Leads",
