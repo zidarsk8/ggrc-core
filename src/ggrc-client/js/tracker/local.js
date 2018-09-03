@@ -12,4 +12,8 @@ export default class LocalStrategy extends BaseStrategy {
     Label: ${label},
     time: ${value}`);
   }
+  trackError() {
+    // just stub for Strategies consistency
+    // no need to locally track errors, there is enough info in devTools
+  }
 }
