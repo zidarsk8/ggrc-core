@@ -165,7 +165,8 @@ def add_acls(connection, object_id, object_type, role_name,
     )
 
 
-def get_acl_user_ids(connection, object_type, object_id, role_name):
+def get_acl_user_ids(connection, object_type, object_id,
+                     role_name, is_first=False):
   """Return list of user ids for given object by role name"""
   sql = """
       SELECT p.id
@@ -176,6 +177,8 @@ def get_acl_user_ids(connection, object_type, object_id, role_name):
         acl.object_type = :object_type
         AND acl.object_id = :object_id
         AND acr.name = :role_name
+      ORDER BY 
+        id
   """
   result = connection.execute(
       text(sql),
@@ -183,6 +186,10 @@ def get_acl_user_ids(connection, object_type, object_id, role_name):
       object_id=object_id,
       role_name=role_name
   )
+  if is_first:
+    first = result.fetchone()
+    result = [first] if first else []
+
   return [res.id for res in result]
 
 
@@ -265,7 +272,7 @@ def process_with_external_data(
 def process_with_ggrc_data(connection, object_id, object_type, migrator_id):
   """Copy object roles based on external+ggrc data"""
   admin_user_ids = get_acl_user_ids(
-      connection, object_type, object_id, "Admin"
+      connection, object_type, object_id, "Admin", is_first=True
   )
   assignee_user_ids = get_acl_user_ids(
       connection, object_type, object_id, "Assignee"
