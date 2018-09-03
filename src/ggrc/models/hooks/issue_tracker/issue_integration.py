@@ -40,14 +40,64 @@ def build_issue_tracker_attrs(query):
           if field in query}
 
 
-def create_issue_handler(obj, issue_tracker_info):
-  """Event handler for issue object creation."""
-  if not issue_tracker_info or not issue_tracker_info.get("enabled"):
+def _is_already_linked(ticket_id):
+  """Checks if ticket with ticket_id is already linked to GGRC object"""
+  exists_query = db.session.query(
+      all_models.IssuetrackerIssue.issue_id
+  ).filter_by(issue_id=ticket_id).exists()
+  return db.session.query(exists_query).scalar()
+
+
+def link_issue(obj, ticket_id, issue_tracker_info):
+  """Link issue to existing IssueTracker ticket"""
+
+  builder = issue_tracker_params_builder.IssueParamsBuilder()
+  issue_tracker_params = builder.build_it_params_for_issue_link(
+      obj,
+      ticket_id,
+      issue_tracker_info,
+  )
+
+  if issue_tracker_params.is_empty():
     return
 
-  # We need in flush here because we need object id for URL generation.
-  db.session.flush()
+  if _is_already_linked(ticket_id):
+    logger.error(
+        "Unable to link a ticket while creating object ID=%d: %s ticket ID is "
+        "already linked to another GGRC object",
+        obj.id,
+        ticket_id,
+    )
+    obj.add_warning("Unable to create a ticket in issue tracker.")
+    return
 
+  # Query to IssueTracker.
+  issue_tracker_query = issue_tracker_params.get_issue_tracker_params()
+
+  # Parameters for creation IssuetrackerIssue object in GGRC.
+  issuetracker_issue_params = issue_tracker_params.get_params_for_ggrc_object()
+
+  try:
+    issues.Client().update_issue(ticket_id, issue_tracker_query)
+
+    ticket_url = integration_utils.build_issue_tracker_url(ticket_id)
+    issuetracker_issue_params["issue_url"] = ticket_url
+    issuetracker_issue_params["issue_id"] = ticket_id
+  except integrations_errors.Error as error:
+    logger.error("Unable to update a ticket ID=%s while deleting"
+                 " issue ID=%d: %s",
+                 ticket_id, obj.id, error)
+    obj.add_warning("Unable to update a ticket in issue tracker.")
+    issuetracker_issue_params["enabled"] = False
+
+  if issuetracker_issue_params:
+    all_models.IssuetrackerIssue.create_or_update_from_dict(
+        obj, issuetracker_issue_params
+    )
+
+
+def create_ticket_for_new_issue(obj, issue_tracker_info):
+  """Create new IssueTracker ticket for issue"""
   builder = issue_tracker_params_builder.IssueParamsBuilder()
   issue_tracker_params = builder.build_create_issue_tracker_params(
       obj,
@@ -81,6 +131,22 @@ def create_issue_handler(obj, issue_tracker_info):
   all_models.IssuetrackerIssue.create_or_update_from_dict(
       obj, issuetracker_issue_params
   )
+
+
+def create_issue_handler(obj, issue_tracker_info):
+  """Event handler for issue object creation."""
+  if not issue_tracker_info or not issue_tracker_info.get("enabled"):
+    return
+
+  # We need in flush() here because we need object id for URL generation.
+  db.session.flush()
+
+  ticket_id = issue_tracker_info.get("ticket_id")
+
+  if ticket_id:
+    link_issue(obj, ticket_id, issue_tracker_info)
+  else:
+    create_ticket_for_new_issue(obj, issue_tracker_info)
 
 
 def delete_issue_handler(obj, **kwargs):
