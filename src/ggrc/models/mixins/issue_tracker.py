@@ -59,7 +59,7 @@ class IssueTracked(object):
     """Define fields to be loaded eagerly to lower the count of DB queries."""
     query = super(IssueTracked, cls).eager_query()
     return query.options(
-        orm.subqueryload('issuetracker_issue')
+        orm.joinedload('issuetracker_issue')
     )
 
   @simple_property

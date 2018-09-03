@@ -24,10 +24,10 @@ class TestAllModels(WithQueryApi, TestCase):
     self.api = api_helper.Api()
 
   QUERY_API_LIMIT = {
-      'Assessment': 17,
-      'AssessmentTemplate': 11,
+      'Assessment': 16,
+      'AssessmentTemplate': 10,
       'AccessGroup': 17,
-      'Audit': 15,
+      'Audit': 14,
       'Comment': 8,
       'Contract': 15,
       'Control': 18,
@@ -36,7 +36,7 @@ class TestAllModels(WithQueryApi, TestCase):
       # 'CycleTaskGroup': 27, 47
       # 'CycleTaskGroupObjectTask': 49, 89
       'Document': 9,
-      'Issue': 15,
+      'Issue': 14,
       'Market': 14,
       'Objective': 15,
       'OrgGroup': 14,
@@ -48,7 +48,7 @@ class TestAllModels(WithQueryApi, TestCase):
       # 'TaskGroup': 27, 47
       'TaskGroupObject': 4,
       # 'TaskGroupTask': 28, 48
-      'Workflow': 12,
+      'Workflow': 14,
       'TechnologyEnvironment': 8,
       'Product': 14,
       'Metric': 14,
