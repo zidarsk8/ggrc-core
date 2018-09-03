@@ -15,7 +15,7 @@ from ggrc.models import exceptions
 from ggrc.models import reflection
 from ggrc.models import mixins
 from ggrc.models.deferred import deferred
-from ggrc.models.mixins import base
+from ggrc.models.mixins import base, Folderable
 from ggrc.models.mixins import before_flush_handleable as bfh
 from ggrc.models.mixins.statusable import Statusable
 from ggrc.models.mixins import with_relationship_created_handler as wrch
@@ -182,16 +182,24 @@ class Document(Roleable, Relatable, mixins.Titled,
 
   def _get_parent_obj(self):
     """Get parent object specified"""
+    from ggrc.models.object_document import Documentable
+    from ggrc.models import all_models
     if 'id' not in self._parent_obj:
       raise exceptions.ValidationError('"id" is mandatory for parent_obj')
     if 'type' not in self._parent_obj:
       raise exceptions.ValidationError(
           '"type" is mandatory for parent_obj')
-    if self._parent_obj['type'] not in self.ALLOWED_PARENTS:
-      raise exceptions.ValidationError(
-          'Allowed types are: {}.'.format(', '.join(self.ALLOWED_PARENTS)))
-
     parent_type = self._parent_obj['type']
+    parent_model = getattr(all_models, parent_type, None)
+    if parent_model is None:
+      raise exceptions.ValidationError(
+          'Type "{}" not found.'.format(parent_type)
+      )
+    if not issubclass(parent_model, Documentable):
+      raise exceptions.ValidationError(
+          'Type "{}" is not Documentable.'.format(parent_type)
+      )
+
     parent_id = self._parent_obj['id']
     obj = referenced_objects.get(parent_type, parent_id)
 
@@ -265,8 +273,9 @@ class Document(Roleable, Relatable, mixins.Titled,
 
   def handle_relationship_created(self, target):
     """Add document to parent folder if specified"""
-    if (target.type in self.ALLOWED_PARENTS and self.kind == Document.FILE and
-            self.source_gdrive_id):
+    from ggrc.models.object_document import Documentable
+    if (isinstance(target, Documentable) and isinstance(target, Folderable) and
+            self.kind == Document.FILE and self.source_gdrive_id):
       parent_folder_id = self._get_folder(target)
       self.add_gdrive_file_folder(parent_folder_id)
 

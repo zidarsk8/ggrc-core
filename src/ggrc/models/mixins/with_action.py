@@ -196,11 +196,9 @@ class WithAction(object):
     @staticmethod
     def _validate_parent(parent):
       """Validates if paren in allowed parents"""
-      if parent not in Document.ALLOWED_PARENTS:
-        allowed_parents = ','.join(Document.ALLOWED_PARENTS)
-        raise ValueError('Unable to mad Document to {}.'
-                         ' Allowed parents: {}'.format(parent.type,
-                                                       allowed_parents))
+      from ggrc.models.object_document import Documentable
+      if not isinstance(parent, Documentable):
+        raise ValueError('Type "{}" is not Documentable.'.format(parent.type))
 
     def _create(self, parent, action):
       self._validate_parent(parent)
