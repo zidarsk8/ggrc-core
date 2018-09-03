@@ -224,16 +224,7 @@ export default can.Model('can.Model.Cacheable', {
 
     if (staticProps.mixins) {
       can.each(staticProps.mixins, function (mixin) {
-        let _mixin = mixin;
-        if (typeof _mixin === 'string') {
-          _mixin = can.getObject(_mixin, CMS.Models.Mixins);
-        }
-        if (_mixin) {
-          _mixin.add_to(that);
-        } else {
-          throw new Error('Error: Cannot find mixin ' +
-            mixin + ' for class ' + that.fullName);
-        }
+        mixin.add_to(that);
       });
       delete this.mixins;
     }

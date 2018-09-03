@@ -9,7 +9,7 @@ import {
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
 
-export default Mixin('inScopeObjects', {}, {
+export default Mixin({}, {
   updateScopeObject: function () {
     let objType = 'Audit';
     let queryType = 'values';

@@ -7,7 +7,7 @@ import * as snapshotUtils from '../../../plugins/utils/snapshot-utils';
 import Cacheable from '../../cacheable';
 import Control from '../../business-models/control';
 
-describe('can.Model.Mixin.accessControlList', () => {
+describe('accessControlList mixin', () => {
   describe('"cleanupAcl" method: ', () => {
     let resource;
     let objectFromResourceSpy;

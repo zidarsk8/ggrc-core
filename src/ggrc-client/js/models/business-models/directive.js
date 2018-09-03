@@ -4,10 +4,10 @@
 */
 
 import Cacheable from '../cacheable';
-import '../mixins/unique-title';
-import '../mixins/timeboxed';
-import '../mixins/ca-update';
-import '../mixins/base-notifications';
+import uniqueTitle from '../mixins/unique-title';
+import timeboxed from '../mixins/timeboxed';
+import caUpdate from '../mixins/ca-update';
+import baseNotifications from '../mixins/base-notifications';
 import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Directive', {
@@ -18,7 +18,7 @@ export default Cacheable('CMS.Models.Directive', {
   root_model: 'Directive',
   findAll: '/api/directives',
   findOne: '/api/directives/{id}',
-  mixins: ['unique_title', 'timeboxed', 'ca_update', 'base-notifications'],
+  mixins: [uniqueTitle, timeboxed, caUpdate, baseNotifications],
   tree_view_options: {
     attr_view: GGRC.mustache_path + '/directives/tree-item-attr.mustache',
     attr_list: Cacheable.attr_list.concat([

@@ -4,13 +4,13 @@
 */
 
 import Cacheable from '../cacheable';
-import '../mixins/ca-update';
-import '../mixins/timeboxed';
-import '../mixins/in-scope-objects';
-import '../mixins/in-scope-objects-preload';
-import '../mixins/access-control-list';
-import '../mixins/base-notifications';
-import '../mixins/issue-tracker';
+import caUpdate from '../mixins/ca-update';
+import timeboxed from '../mixins/timeboxed';
+import inScopeObjects from '../mixins/in-scope-objects';
+import inScopeObjectsPreload from '../mixins/in-scope-objects-preload';
+import accessControlList from '../mixins/access-control-list';
+import baseNotifications from '../mixins/base-notifications';
+import issueTracker from '../mixins/issue-tracker';
 import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Issue', {
@@ -23,13 +23,13 @@ export default Cacheable('CMS.Models.Issue', {
   destroy: 'DELETE /api/issues/{id}',
   create: 'POST /api/issues',
   mixins: [
-    'ca_update',
-    'timeboxed',
-    'inScopeObjects',
-    'inScopeObjectsPreload',
-    'accessControlList',
-    'base-notifications',
-    'issueTracker',
+    caUpdate,
+    timeboxed,
+    inScopeObjects,
+    inScopeObjectsPreload,
+    accessControlList,
+    baseNotifications,
+    issueTracker,
   ],
   is_custom_attributable: true,
   isRoleable: true,

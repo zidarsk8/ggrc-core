@@ -4,7 +4,7 @@
 */
 
 import Directive from './directive';
-import '../mixins/access-control-list';
+import accessControlList from '../mixins/access-control-list';
 
 export default Directive('CMS.Models.Regulation', {
   root_object: 'regulation',
@@ -23,7 +23,7 @@ export default Directive('CMS.Models.Regulation', {
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {},
-  mixins: ['accessControlList'],
+  mixins: [accessControlList],
   cache: can.getObject('cache', Directive, true),
   sub_tree_view_options: {
     default_filter: ['Requirement'],

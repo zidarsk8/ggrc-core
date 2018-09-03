@@ -4,11 +4,11 @@
 */
 
 import Cacheable from '../cacheable';
-import '../mixins/unique-title';
-import '../mixins/ca-update';
-import '../mixins/access-control-list';
-import '../mixins/scope-object-notifications';
-import '../mixins/questionnaire';
+import uniqueTitle from '../mixins/unique-title';
+import caUpdate from '../mixins/ca-update';
+import accessControlList from '../mixins/access-control-list';
+import scopeObjectNotifications from '../mixins/scope-object-notifications';
+import questionnaire from '../mixins/questionnaire';
 import Stub from '../stub';
 
 export default Cacheable('CMS.Models.AccessGroup', {
@@ -21,11 +21,11 @@ export default Cacheable('CMS.Models.AccessGroup', {
   update: 'PUT /api/access_groups/{id}',
   destroy: 'DELETE /api/access_groups/{id}',
   mixins: [
-    'unique_title',
-    'ca_update',
-    'accessControlList',
-    'scope-object-notifications',
-    'questionnaire',
+    uniqueTitle,
+    caUpdate,
+    accessControlList,
+    scopeObjectNotifications,
+    questionnaire,
   ],
   is_custom_attributable: true,
   isRoleable: true,

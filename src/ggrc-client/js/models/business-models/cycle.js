@@ -5,7 +5,7 @@
 
 import Cacheable from '../cacheable';
 import Permission from '../../permission';
-import '../mixins/is-overdue';
+import isOverdue from '../mixins/is-overdue';
 import Stub from '../stub';
 
 function refreshAttr(instance, attr) {
@@ -37,7 +37,7 @@ export default Cacheable('CMS.Models.Cycle', {
   create: 'POST /api/cycles',
   update: 'PUT /api/cycles/{id}',
   destroy: 'DELETE /api/cycles/{id}',
-  mixins: ['isOverdue'],
+  mixins: [isOverdue],
   attributes: {
     workflow: Stub,
     modified_by: Stub,

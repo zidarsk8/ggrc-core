@@ -4,11 +4,11 @@
 */
 
 import Cacheable from '../cacheable';
-import '../mixins/unique-title';
-import '../mixins/ca-update';
-import '../mixins/access-control-list';
-import '../mixins/base-notifications';
-import '../mixins/related-assessments-loader';
+import uniqueTitle from '../mixins/unique-title';
+import caUpdate from '../mixins/ca-update';
+import accessControlList from '../mixins/access-control-list';
+import baseNotifications from '../mixins/base-notifications';
+import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
 import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Objective', {
@@ -23,11 +23,11 @@ export default Cacheable('CMS.Models.Objective', {
   update: 'PUT /api/objectives/{id}',
   destroy: 'DELETE /api/objectives/{id}',
   mixins: [
-    'unique_title',
-    'ca_update',
-    'accessControlList',
-    'base-notifications',
-    'relatedAssessmentsLoader',
+    uniqueTitle,
+    caUpdate,
+    accessControlList,
+    baseNotifications,
+    relatedAssessmentsLoader,
   ],
   is_custom_attributable: true,
   isRoleable: true,

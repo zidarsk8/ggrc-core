@@ -4,7 +4,7 @@
 */
 
 import Directive from './directive';
-import '../mixins/access-control-list';
+import accessControlList from '../mixins/access-control-list';
 
 export default Directive('CMS.Models.Contract', {
   root_object: 'contract',
@@ -20,7 +20,7 @@ export default Directive('CMS.Models.Contract', {
   create: 'POST /api/contracts',
   update: 'PUT /api/contracts/{id}',
   destroy: 'DELETE /api/contracts/{id}',
-  mixins: ['accessControlList'],
+  mixins: [accessControlList],
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {

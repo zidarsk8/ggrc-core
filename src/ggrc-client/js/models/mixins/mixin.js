@@ -4,15 +4,6 @@
 */
 
 export default can.Construct.extend('can.Model.Mixin', {
-  extend(fullName, staticProps, proto) {
-    const Constructor = this._super(staticProps, proto);
-
-    // instead mixins sit under CMS.Models.Mixins
-    Constructor.fullName = fullName;
-    can.getObject('CMS.Models.Mixins', window, true)[fullName] = Constructor;
-
-    return Constructor;
-  },
   newInstance: function () {
     throw new Error('Mixins cannot be directly instantiated');
   },
@@ -69,9 +60,9 @@ export default can.Construct.extend('can.Model.Mixin', {
       };
     }
 
-    if (!~can.inArray(this.fullName, cls._mixins)) {
+    if (!~can.inArray(this, cls._mixins)) {
       cls._mixins = cls._mixins || [];
-      cls._mixins.push(this.fullName);
+      cls._mixins.push(this);
       Object.keys(this).forEach(function (key) {
         setupFns(cls)(this[key], key);
       }.bind(this));

@@ -5,7 +5,7 @@
 
 import Mixin from './mixin';
 
-export default Mixin('mapping-limit', {
+export default Mixin({
   getAllowedMappings() {
     return _.union(
       GGRC.config.snapshotable_objects,
