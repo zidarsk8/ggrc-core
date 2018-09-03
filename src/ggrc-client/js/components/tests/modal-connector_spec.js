@@ -5,6 +5,7 @@
 
 import Component from '../modal-connector';
 import Assessment from '../../models/business-models/assessment';
+import Mappings from '../../models/mappers/mappings';
 
 describe('ggrc-modal-connector component', function () {
   let viewModel;
@@ -40,8 +41,8 @@ describe('ggrc-modal-connector component', function () {
       });
       viewModel.instance = {
         mark_for_addition: jasmine.createSpy(),
-        get_binding: jasmine.createSpy().and.returnValue(binding),
       };
+      spyOn(Mappings, 'get_binding').and.returnValue(binding);
       viewModel.instance.reify = jasmine.createSpy()
         .and.returnValue(new can.Map(viewModel.instance));
       that = {
@@ -66,7 +67,7 @@ describe('ggrc-modal-connector component', function () {
         handler();
         expect(viewModel.attr('instance'))
           .toEqual(jasmine.any(can.Map));
-        expect(!!viewModel.attr('instance').get_binding)
+        expect(!!Mappings.get_binding)
           .toEqual(true);
       });
     it('marks for addition mapped objects', function () {

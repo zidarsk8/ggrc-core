@@ -14,7 +14,6 @@ import resolveConflict from './conflict-resolution/conflict-resolution';
 import PersistentNotifier from '../plugins/persistent_notifier';
 import RefreshQueue from './refresh_queue';
 import tracker from '../tracker';
-import Mappings from './mappers/mappings';
 import {delayLeavingPageUntil} from '../plugins/utils/current-page-utils';
 import Stub from './stub';
 
@@ -580,15 +579,6 @@ export default can.Model('can.Model.Cacheable', {
       return findPageFunc(collectionUrl, params, baseParams, that);
     };
   },
-
-  get_mapper: function (name) {
-    let mapper;
-    let mappers = Mappings.get_mappings_for(this.shortName);
-    if (mappers) {
-      mapper = mappers[name];
-      return mapper;
-    }
-  },
 }, {
   init: function () {
     let cache = can.getObject('cache', this.constructor, true);
@@ -704,115 +694,6 @@ export default can.Model('can.Model.Cacheable', {
   },
   computed_unsuppressed_errors: function () {
     return this.errors();
-  },
-
-  get_list_loader: function (name) {
-    let binding = this.get_binding(name);
-    return binding.refresh_list();
-  },
-
-  get_mapping: function (name) {
-    let binding = this.get_binding(name);
-    if (binding) {
-      binding.refresh_list();
-      return binding.list;
-    }
-    return [];
-  },
-
-  get_orphaned_count: function () {
-    if (!this.get_binding('orphaned_objects')) {
-      return can.Deferred().reject();
-    }
-    return this.get_list_loader('orphaned_objects').then((list) => {
-      function isJoin(mapping) {
-        if (mapping.mappings.length > 0) {
-          for (let i = 0, child; child = mapping.mappings[i]; i++) {
-            if (child = isJoin(child)) {
-              return child;
-            }
-          }
-        }
-        return mapping.instance &&
-          mapping.instance instanceof can.Model.Join &&
-          mapping.instance;
-      }
-
-      const mappings = [];
-      can.each(list, (mapping) => {
-        const inst = isJoin(mapping);
-
-        if (inst) {
-          mappings.push(inst);
-        }
-      });
-
-      return mappings.length;
-    });
-  },
-
-  _get_binding_attr: function (mapper) {
-    if (typeof (mapper) === 'string') {
-      return '_' + mapper + '_binding';
-    }
-  },
-
-  // checks if binding exists without throwing debug statements
-  // modeled after what get_binding is doing
-  has_binding: function (mapper) {
-    let binding;
-    let mapping;
-    let bindingAttr = this._get_binding_attr(mapper);
-
-    if (bindingAttr) {
-      binding = this[bindingAttr];
-    }
-
-    if (!binding) {
-      if (typeof (mapper) === 'string') {
-        mapping = this.constructor.get_mapper(mapper);
-        if (!mapping) {
-          return false;
-        }
-      } else if (!(mapper instanceof GGRC.ListLoaders.BaseListLoader)) {
-        return false;
-      }
-    }
-
-    return true;
-  },
-
-  get_binding: function (mapper) {
-    let mapping;
-    let binding;
-    let bindingAttr = this._get_binding_attr(mapper);
-
-    if (bindingAttr) {
-      binding = this[bindingAttr];
-    }
-
-    if (!binding) {
-      if (typeof (mapper) === 'string') {
-      // Lookup and attach named mapper
-        mapping = this.constructor.get_mapper(mapper);
-        if (!mapping) {
-          console.debug(
-            'No such mapper:  ' + this.constructor.shortName + '.' + mapper);
-        } else {
-          binding = mapping.attach(this);
-        }
-      } else if (mapper instanceof GGRC.ListLoaders.BaseListLoader) {
-      // Loader directly provided, so just attach
-        binding = mapper.attach(this);
-      } else {
-        console.debug('Invalid mapper specified:', mapper);
-      }
-      if (binding && bindingAttr) {
-        this[bindingAttr] = binding;
-        binding.name = this.constructor.shortName + '.' + mapper;
-      }
-    }
-    return binding;
   },
   refresh: function (params) {
     let dfd;

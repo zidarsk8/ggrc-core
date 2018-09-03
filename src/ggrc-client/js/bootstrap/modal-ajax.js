@@ -19,6 +19,7 @@ import {
   navigate,
 } from '../plugins/utils/current-page-utils';
 import modalModels from '../models/modal-models';
+import Mappings from '../models/mappers/mappings';
 
 (function (can, $, GGRC) {
   'use strict';
@@ -43,7 +44,7 @@ import modalModels from '../models/modal-models';
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
 
-      instance.get_orphaned_count().done(function (counts) {
+      Mappings.get_orphaned_count(instance).done(function (counts) {
         deleteCounts.attr('loading', false);
         deleteCounts.attr('counts', counts);
       }).fail(function () {

@@ -7,6 +7,7 @@ import {resolveDeferredBindings} from '../pending-joins';
 import {makeFakeModel} from '../../../js_specs/spec_helpers';
 import Cacheable from '../cacheable';
 import * as mappingModels from '../mapping-models';
+import Mappings from '../mappers/mappings';
 
 describe('pending-joins module', () => {
   describe('resolveDeferredBindings() util', function () {
@@ -23,10 +24,10 @@ describe('pending-joins module', () => {
 
     it('iterates _pending_joins, calling refresh_stubs on each binding',
       function () {
-        let instance = jasmine.createSpyObj('instance', ['get_binding']);
+        let instance = {};
         let binding = jasmine.createSpyObj('binding', ['refresh_stubs']);
         instance._pending_joins = [{what: {}, how: 'add', through: 'foo'}];
-        instance.get_binding.and.returnValue(binding);
+        spyOn(Mappings, 'get_binding').and.returnValue(binding);
         spyOn($.when, 'apply').and.returnValue(new $.Deferred().reject());
 
         resolveDeferredBindings(instance);
@@ -40,11 +41,11 @@ describe('pending-joins module', () => {
       beforeEach(function () {
         dummy = new DummyModel({id: 1});
         instance = jasmine.createSpyObj('instance',
-          ['get_binding', 'isNew', 'refresh', 'attr', 'dispatch']);
+          ['isNew', 'refresh', 'attr', 'dispatch']);
         binding = jasmine.createSpyObj('binding', ['refresh_stubs']);
         instance._pending_joins = [{what: dummy, how: 'add', through: 'foo'}];
         instance.isNew.and.returnValue(false);
-        instance.get_binding.and.returnValue(binding);
+        spyOn(Mappings, 'get_binding').and.returnValue(binding);
         binding.loader = {model_name: 'DummyJoin'};
         binding.list = [];
         spyOn(mappingModels.DummyJoin, 'newInstance');
@@ -74,11 +75,11 @@ describe('pending-joins module', () => {
         dummy = new DummyModel({id: 1});
         dummy_join = new mappingModels.DummyJoin({id: 1});
         instance = jasmine.createSpyObj('instance',
-          ['get_binding', 'isNew', 'refresh', 'attr', 'dispatch']);
+          ['isNew', 'refresh', 'attr', 'dispatch']);
         binding = jasmine.createSpyObj('binding', ['refresh_stubs']);
         instance._pending_joins = [{what: dummy, how: 'remove', through: 'foo'}];
         instance.isNew.and.returnValue(false);
-        instance.get_binding.and.returnValue(binding);
+        spyOn(Mappings, 'get_binding').and.returnValue(binding);
         binding.loader = {model_name: 'DummyJoin'};
         binding.list = [];
         spyOn(mappingModels.DummyJoin, 'newInstance');

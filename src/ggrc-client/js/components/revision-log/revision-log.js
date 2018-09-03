@@ -16,6 +16,7 @@ import {
 import Revision from '../../models/service-models/revision';
 import Person from '../../models/business-models/person';
 import Stub from '../../models/stub';
+import Mappings from '../../models/mappers/mappings';
 
 const EMPTY_DIFF_VALUE = '—';
 
@@ -770,7 +771,8 @@ export default can.Component.extend({
 
       currentAssignees = _.groupBy(
         _.flattenDeep(_.map(assigneeList, function (assignableType) {
-          return _.map(instance.get_binding(assignableType.mapping).list,
+          return _.map(
+            Mappings.get_binding(assignableType.mapping, instance).list,
             function (person) {
               return {
                 id: person.instance.id,

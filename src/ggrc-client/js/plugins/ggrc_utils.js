@@ -207,10 +207,10 @@ function isMapped(target, destination, mapping) {
   }
   if (_.isUndefined(mapping)) {
     tablePlural = CMS.Models[destination.type].table_plural;
-    mapping = (target.has_binding(tablePlural) ? '' : 'related_') +
+    mapping = (Mappings.has_binding(tablePlural, target) ? '' : 'related_') +
       tablePlural;
   }
-  bindings = target.get_binding(mapping);
+  bindings = Mappings.get_binding(mapping, target);
   if (bindings && bindings.list && bindings.list.length) {
     return _.find(bindings.list, function (item) {
       return item.instance.id === destination.id;

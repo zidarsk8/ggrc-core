@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import Mappings from './mappers/mappings';
+
 /*  RefreshQueue
  *
  *  enqueue(obj, force=false) -> queue or null
@@ -150,8 +152,8 @@ const RefreshQueue = can.Construct({
         refreshQueue.enqueue(next, force);
         deferred = refreshQueue.trigger();
       } else if (instance.get_binding) {
-        next = instance.get_binding(prop);
-        hasBinding = instance.has_binding(prop);
+        next = Mappings.get_binding(prop, instance);
+        hasBinding = Mappings.has_binding(prop, instance);
 
         if (!hasBinding) {
           dfd.reject({

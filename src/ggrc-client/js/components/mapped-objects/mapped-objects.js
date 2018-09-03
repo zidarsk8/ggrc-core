@@ -10,6 +10,7 @@ import {
 import '../object-list/object-list';
 import {applyTypeFilter} from '../../plugins/ggrc_utils';
 import template from './mapped-objects.mustache';
+import Mappings from '../../models/mappers/mappings';
 
 const tag = 'mapped-objects';
 /**
@@ -87,7 +88,9 @@ export default can.Component.extend({
         this.attr('filter').attr(), getTypeFromInstance);
     },
     getBinding: function () {
-      return this.attr('parentInstance').get_binding(this.attr('mapping'));
+      return Mappings.get_binding(
+        this.attr('mapping'),
+        this.attr('parentInstance'));
     },
     getSnapshotQueryFilters: function () {
       let includeTypes = this.attr('filter.only').attr();
