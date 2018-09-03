@@ -63,14 +63,14 @@ class TestDocument(TestCase):
   def test_parent_obj_validation_wrong_type(self):
     """Validation parent_obj type.
 
-    Type should be in Document.ALLOWED_PARENTS.
+    Type should be Documentable.
     """
-    control = factories.ControlFactory()
+    audit = factories.AuditFactory()
     with self.assertRaises(exceptions.ValidationError):
       factories.DocumentFileFactory(
           parent_obj={
-              'id': control.id,
-              'type': 'Workflow'
+              'id': audit.id,
+              'type': 'Audit'
           })
 
   def test_update_title(self):
