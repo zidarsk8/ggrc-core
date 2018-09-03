@@ -22,6 +22,7 @@ from lib.custom_pytest_scheduling import CustomPytestScheduling
 from lib.entities import entities_factory
 from lib.page import dashboard
 from lib.service import rest_service, rest_facade
+from lib.service.rest import session_pool
 from lib.utils import conftest_utils, help_utils, selenium_utils
 from lib.utils.selenium_utils import get_full_screenshot_as_base64
 
@@ -174,11 +175,13 @@ def set_superuser_as_current_user():
 
 
 @pytest.fixture(autouse=True)
-def reset_logged_in_users():
-  """Reset cache of logged in users.
-  This cache is used to check if user has already logged in.
+def reset_state():
+  """Reset caches of logged in users and requests sessions.
+  Cache with logged in users is used to check if user has already logged in.
+  Cache with sessions is used to reuse REST sessions between requests.
   """
   users.reset_logged_in_users()
+  session_pool.reset_sessions()
 
 
 # Legacy app fixtures

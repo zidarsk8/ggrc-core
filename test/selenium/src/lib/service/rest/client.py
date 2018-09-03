@@ -1,22 +1,17 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """REST API client."""
-# pylint: disable=redefined-builtin
 
 import json
 import urlparse
 
-import requests
-
 from lib import environment, url as url_module, users
+from lib.service.rest import session_pool
 from lib.service.rest.template_provider import TemplateProvider
 
 
 class RestClient(object):
   """Client for HTTP interactions with GGRC's REST API."""
-  BASIC_HEADERS = {'X-Requested-By': 'GGRC',
-                   'Content-Type': 'application/json',
-                   'Accept-Encoding': 'gzip, deflate, br'}
 
   STATUS_CODES = {'OK': 200,
                   'FAIL': [400, 404, 500]}
@@ -25,9 +20,7 @@ class RestClient(object):
     self.is_api = "" if endpoint == url_module.QUERY else url_module.API
     self.endpoint_url = urlparse.urljoin(
         environment.app_url, "/".join([self.is_api, endpoint]))
-    self.session = requests.Session()
-    self.session.headers = self.BASIC_HEADERS
-    self.login()
+    self.session = session_pool.get_session(users.current_user())
 
   def send_get(self, url, **kwargs):
     """Send GET request to `url`"""
@@ -39,16 +32,11 @@ class RestClient(object):
     url = urlparse.urljoin(environment.app_url, url)
     return self.session.post(url, **kwargs).json()
 
-  def login(self):
-    """Set dev_appserver_login and session cookies."""
-    self.session.get(url_module.Urls().gae_login(users.current_user()))
-    self.session.get(url_module.Urls().login)
-
-  def create_object(self, type, **kwargs):
+  def create_object(self, **kwargs):
     """Create object or make other operations used POST request and
     return raw response.
     """
-    create_obj_req_body = self.generate_body(type_name=type, **kwargs)
+    create_obj_req_body = self.generate_body(kwargs.pop("type"), **kwargs)
     create_obj_resp = self.session.post(
         url=self.endpoint_url, data=create_obj_req_body)
     return create_obj_resp
