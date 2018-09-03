@@ -10,13 +10,12 @@ export default can.Component.extend({
   template,
   viewModel: {
     isSaving: false,
-    objectType: null,
-    objectId: null,
+    item: null,
     isDisabled: false,
     isSelected: false,
-    toggleSelection: function (scope, el, isSelected) {
+    toggleSelection: function (el, isSelected) {
       let event = isSelected ? 'selectItem' : 'deselectItem';
-      can.trigger(el, event, [scope.objectId, scope.objectType]);
+      can.trigger(el, event, [this.attr('item')]);
     },
   },
   events: {
@@ -25,7 +24,7 @@ export default can.Component.extend({
       ev.preventDefault();
       ev.stopPropagation();
       this.viewModel
-        .toggleSelection(this.viewModel, this.element, isSelected);
+        .toggleSelection(this.element, isSelected);
     },
   },
 });

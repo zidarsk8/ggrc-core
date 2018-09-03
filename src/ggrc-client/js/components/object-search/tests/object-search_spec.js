@@ -24,8 +24,7 @@ describe('object-search component', function () {
       viewModel.attr('object', 'testObject');
 
       result = viewModel.availableTypes();
-      expect(Mappings.getMappingTypes).toHaveBeenCalledWith('testObject',
-        ['TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask'], []);
+      expect(Mappings.getMappingTypes).toHaveBeenCalledWith('testObject');
       expect(result).toEqual('types');
     });
   });

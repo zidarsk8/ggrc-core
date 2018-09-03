@@ -40,7 +40,6 @@
           {{/if}}
 
           {{#if isAllowedToEdit}}
-            {{#is_allowed 'update' instance context='for'}}
               <li>
                 <a href="javascript://"
                   data-link-purpose="open-edit-modal"
@@ -54,7 +53,6 @@
                   Edit object
                 </a>
               </li>
-            {{/is_allowed}}
           {{/if}}
 
           <li>

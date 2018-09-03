@@ -18,19 +18,21 @@ export default can.Component.extend({
     refreshSelection: null,
     allSelected: false,
     selectAllCheckboxValue: false,
-    select: function (id, type) {
+    select: function (item) {
+      let id = item.attr('id');
+      let type = item.attr('type');
+
       if (this.indexOfSelected(id, type) < 0) {
-        this.attr('selectedItems').push({
-          id: id,
-          type: type,
-        });
+        this.attr('selectedItems').push(item);
         this.markItem(id, type, true);
       } else {
         console.warn('Same Object is Selected Twice!' +
           ' id: ', id, ' type:', type);
       }
     },
-    deselect: function (id, type) {
+    deselect: function (item) {
+      let id = item.attr('id');
+      let type = item.attr('type');
       let list = this.attr('selectedItems');
       let index = this.indexOfSelected(id, type);
       if (index >= 0) {
@@ -108,11 +110,11 @@ export default can.Component.extend({
     '{viewModel.items} add': function () {
       this.viewModel.markSelectedItems();
     },
-    'object-selection-item selectItem': function (el, ev, id, type) {
-      this.viewModel.select(id, type);
+    'object-selection-item selectItem': function (el, ev, item) {
+      this.viewModel.select(item);
     },
-    'object-selection-item deselectItem': function (el, ev, id, type) {
-      this.viewModel.deselect(id, type);
+    'object-selection-item deselectItem': function (el, ev, item) {
+      this.viewModel.deselect(item);
     },
     '{viewModel} selectAllCheckboxValue': function (scope, ev, value) {
       if (value) {
