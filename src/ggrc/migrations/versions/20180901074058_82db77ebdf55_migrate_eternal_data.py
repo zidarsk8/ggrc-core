@@ -133,6 +133,7 @@ def get_acr_id(connection, object_type, role_name):
   ).fetchone().id
 
 
+# pylint: disable-msg=too-many-arguments
 def add_acls(connection, object_id, object_type, role_name,
              migrator_id, user_ids):
   """Create new acl item"""
@@ -343,7 +344,7 @@ def process_object(connection, object_type, object_id, migrator_id):
       process_with_external_data(
           connection, object_id, object_type, external_data, migrator_id
       )
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
       update_synq_status(
           connection,
           object_id,

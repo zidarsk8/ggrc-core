@@ -28,6 +28,7 @@ SCOPING_OBJECTS = {
     "Vendor",
 }
 
+
 @ddt.ddt
 class TestACLImportExport(TestCase):
   """Test import and export with custom attributes."""

@@ -3,12 +3,11 @@
 
 """Document RBAC Factory."""
 
+from ggrc import db
 from ggrc.models import all_models
 from integration.ggrc import Api, generator
 from integration.ggrc.access_control.rbac_factories import base
 from integration.ggrc.models import factories
-
-from ggrc import db
 from integration.ggrc.models.factories import get_model_factory
 
 FACTORIES_MAPPING = {
@@ -23,6 +22,7 @@ class UniversalRBACFactory(base.BaseRBACFactory):
 
   Can be used in 'one rank' tests
   """
+  # pylint: disable=too-many-instance-attributes
 
   def __init__(self, user_id, acr, parent=None):
     """Set up objects for permission tests.
