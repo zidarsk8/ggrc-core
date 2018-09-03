@@ -26,14 +26,6 @@ export default Directive('CMS.Models.Policy', {
   isRoleable: true,
   attributes: {},
   mixins: ['accessControlList'],
-  meta_kinds: [
-    'Company Policy',
-    'Org Group Policy',
-    'Data Asset Policy',
-    'Product Policy',
-    'Contract-Related Policy',
-    'Company Controls Policy',
-  ],
   cache: can.getObject('cache', Directive, true),
   sub_tree_view_options: {
     default_filter: ['DataAsset'],
