@@ -180,7 +180,7 @@ export default can.Construct.extend({
         mod._canonical_mappings[object][option]) {
         mapping = this.get_mapper(
           mod._canonical_mappings[object][option],
-          CMS.Models[object].shortName);
+          object);
         return false;
       }
     });
@@ -217,7 +217,7 @@ export default can.Construct.extend({
         can.each(mod._canonical_mappings[object], (mappingName, option) => {
           mappings[option] = this.get_mapper(
             mappingName,
-            CMS.Models[object].shortName);
+            object);
         });
       }
     });
