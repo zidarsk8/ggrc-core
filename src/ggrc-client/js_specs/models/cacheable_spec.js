@@ -15,7 +15,7 @@ import Mixin from '../../js/models/mixins/mixin';
 describe('Cacheable model', function () {
   let origGcaDefs;
   let DummyModel;
-  let dummyable
+  let dummyable;
 
   beforeEach(function () {
     origGcaDefs = GGRC.custom_attr_defs;

@@ -218,7 +218,7 @@ describe('display prefs model', function () {
         display_prefs.setPageAsDefault('unit_test');
         can.each([exp.SORTS, exp.COLLAPSE], function (exp_token) {
           expect(display_prefs.attr([exp_token, 'unit_test', 'foo'].join('.'))).toBe('baz');
-        })
+        });
       });
 
       it('keeps the page and the defaults separated', function () {
