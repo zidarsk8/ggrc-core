@@ -822,6 +822,32 @@ class TestRelatedAssessments(base.Test):
     assert self._related_asmts_of_obj(obj, selenium) ==\
         related_asmts_titles[::-1]
 
+  @pytest.mark.smoke_tests
+  def test_related_asmts_on_control_snapshot_page(
+      self, control_mapped_to_program, audit, selenium
+  ):
+    """Objects structure:
+    Program
+    -> Control
+    -> Audit
+      -> Asmt-1 mapped to Control
+      -> Asmt-2 mapped to Control
+    Check Related Assessments on Control snapshot's page
+    """
+    assessments = [_create_mapped_asmt(
+        audit=audit, assessment_type="Control",
+        objs_to_map=[control_mapped_to_program])
+        for _ in xrange(2)]
+    control_panel = webui_service.ControlsService(
+        selenium).open_info_panel_of_obj_by_title(
+            assessments[0], control_mapped_to_program)
+    related_asmts_table = control_panel.show_related_assessments()
+    related_asmts_titles = [
+        (assessment.title, control_mapped_to_program.title, audit.title)
+        for assessment in assessments]
+    assert related_asmts_table.get_related_titles(asmt_type="Control") ==\
+        related_asmts_titles[::-1]
+
 
 class TestRelatedIssues(base.Test):
   """Tests for related issues"""
