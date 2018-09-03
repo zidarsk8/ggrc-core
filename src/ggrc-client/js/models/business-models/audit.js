@@ -104,7 +104,6 @@ export default Cacheable('CMS.Models.Audit', {
       disable_sorting: true,
       order: 13,
     }],
-    draw_children: true,
   },
   sub_tree_view_options: {
     default_filter: ['Product'],

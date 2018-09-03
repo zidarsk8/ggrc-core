@@ -72,7 +72,6 @@ export default Cacheable('CMS.Models.Objective', {
     add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
     create_link: true,
     show_related_assessments: true,
-    // draw_children: true,
     start_expanded: false,
   },
   sub_tree_view_options: {

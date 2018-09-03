@@ -132,7 +132,6 @@ WorkflowExtension.init_widgets_for_other_pages = function () {
           add_item_view:
             GGRC.mustache_path +
             '/cycle_task_group_object_tasks/tree_add_item.mustache',
-          draw_children: true,
         },
       },
     };
@@ -180,7 +179,6 @@ WorkflowExtension.init_widgets_for_workflow_page = function () {
           parent_instance: object,
           model: TaskGroup,
           sortable: true,
-          draw_children: true,
         },
       },
     }
@@ -197,7 +195,6 @@ WorkflowExtension.init_widgets_for_workflow_page = function () {
     content_controller_options: {
       depth: true,
       filterDeepLimit: 2,
-      draw_children: true,
       parent_instance: object,
       model: Cycle,
       countsName: historyWidgetCountsName,
@@ -216,7 +213,6 @@ WorkflowExtension.init_widgets_for_workflow_page = function () {
     content_controller_options: {
       depth: true,
       filterDeepLimit: 2,
-      draw_children: true,
       parent_instance: object,
       model: Cycle,
       countsName: currentWidgetCountsName,
@@ -265,7 +261,6 @@ WorkflowExtension.init_widgets_for_person_page = function () {
         add_item_view:
           GGRC.mustache_path +
           '/cycle_task_group_object_tasks/tree_add_item.mustache',
-        draw_children: true,
         showBulkUpdate: !isObjectBrowser,
       },
     },

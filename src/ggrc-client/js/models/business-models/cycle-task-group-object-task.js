@@ -160,7 +160,6 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
       'start_date',
       'end_date'],
     mandatory_attr_name: ['title'],
-    draw_children: true,
   },
   sub_tree_view_options: {
     default_filter: ['Control'],

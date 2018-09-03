@@ -106,7 +106,6 @@ export default Cacheable('CMS.Models.Control', {
       'updated_at'],
     add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
     show_related_assessments: true,
-    draw_children: true,
   },
   sub_tree_view_options: {
     default_filter: ['Objective'],

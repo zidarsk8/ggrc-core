@@ -242,116 +242,38 @@ _.assign(CoreExtension, {
     extraContentOptions = applyMixins({
       objectives: {
         Objective: {
-          draw_children: true,
           add_item_view: path + '/snapshots/tree_add_item.mustache',
         },
       },
       controls: {
         Control: {
-          draw_children: true,
           add_item_view: path + '/snapshots/tree_add_item.mustache',
         },
       },
       business_objects: {
         Audit: {
-          draw_children: true,
           allow_mapping: true,
           add_item_view: path + '/audits/tree_add_item.mustache',
-        },
-        AccessGroup: {
-          draw_children: true,
-        },
-        DataAsset: {
-          draw_children: true,
-        },
-        Facility: {
-          draw_children: true,
-        },
-        Market: {
-          draw_children: true,
-        },
-        Metric: {
-          draw_children: true,
-        },
-        OrgGroup: {
-          draw_children: true,
-        },
-        Vendor: {
-          draw_children: true,
-        },
-        Process: {
-          draw_children: true,
-        },
-        Product: {
-          draw_children: true,
-        },
-        ProductGroup: {
-          draw_children: true,
-        },
-        Project: {
-          draw_children: true,
-        },
-        System: {
-          draw_children: true,
-        },
-        Assessment: {
-          draw_children: true,
-        },
-        Person: {
-          draw_children: true,
-        },
-        Program: {
-          draw_children: true,
-        },
-        Risk: {
-          draw_children: true,
-        },
-        TechnologyEnvironment: {
-          draw_children: true,
-        },
-        Threat: {
-          draw_children: true,
-        },
-      },
-      issues: {
-        Issue: {
-          draw_children: true,
         },
       },
       governance_objects: {
         Regulation: {
-          draw_children: true,
           add_item_view: path + '/snapshots/tree_add_item.mustache',
         },
-        Contract: {
-          draw_children: true,
-        },
         Policy: {
-          draw_children: true,
           add_item_view: path + '/snapshots/tree_add_item.mustache',
         },
         Standard: {
-          draw_children: true,
           add_item_view: path + '/snapshots/tree_add_item.mustache',
-        },
-        Control: {
-          draw_children: true,
-        },
-        Objective: {
-          draw_children: true,
-        },
-        Requirement: {
-          draw_children: true,
         },
       },
       Program: {
         _mixins: [
           'governance_objects', 'objectives', 'controls',
-          'business_objects', 'issues',
+          'business_objects',
         ],
         Audit: {
           allow_mapping: true,
-          draw_children: true,
           add_item_view: path + '/audits/tree_add_item.mustache',
         },
         Person: {
@@ -360,36 +282,23 @@ _.assign(CoreExtension, {
           allow_mapping: true,
           allow_creating: true,
           model: businessModels.Person,
-          draw_children: true,
         },
       },
       Audit: {
-        _mixins: ['issues', 'governance_objects', 'business_objects'],
+        _mixins: ['governance_objects', 'business_objects'],
         Program: {
           parent_instance: getPageInstance(),
-          draw_children: true,
           model: businessModels.Program,
           allow_mapping: false,
           allow_creating: false,
         },
-        Requirement: {
-          draw_children: true,
-        },
-        Threat: {
-          draw_children: true,
-        },
-        Risk: {
-          draw_children: true,
-        },
         Assessment: {
           parent_instance: getPageInstance(),
           allow_mapping: true,
-          draw_children: true,
           model: businessModels.Assessment,
           add_item_view: path + '/assessments/tree_add_item.mustache',
         },
         AssessmentTemplate: {
-          draw_children: false,
           allow_mapping: false,
           add_item_view: GGRC.mustache_path +
             '/assessment_templates/tree_add_item.mustache',
@@ -398,7 +307,6 @@ _.assign(CoreExtension, {
           widget_id: 'person',
           widget_name: 'People',
           widget_icon: 'person',
-          draw_children: true,
           content_controller_options: {
             allow_mapping: false,
             allow_creating: false,
@@ -409,209 +317,110 @@ _.assign(CoreExtension, {
         _mixins: [
           'objectives', 'controls', 'business_objects',
         ],
-        Requirement: {
-          draw_children: true,
-        },
-        Audit: {
-          draw_children: true,
-        },
       },
       Regulation: {
-        _mixins: ['directive', 'issues'],
+        _mixins: ['directive'],
       },
       Standard: {
-        _mixins: ['directive', 'issues'],
+        _mixins: ['directive'],
       },
       Policy: {
-        _mixins: ['directive', 'issues'],
+        _mixins: ['directive'],
       },
       Contract: {
-        _mixins: ['directive', 'issues'],
+        _mixins: ['directive'],
       },
       Requirement: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
-        Audit: {
-          draw_children: true,
-        },
+        _mixins: ['governance_objects', 'business_objects'],
       },
       Objective: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
-        Audit: {
-          draw_children: true,
-        },
+        _mixins: ['governance_objects', 'business_objects'],
       },
       Control: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
-        Audit: {
-          draw_children: true,
-        },
+        _mixins: ['governance_objects', 'business_objects'],
       },
       Assessment: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
+        _mixins: ['governance_objects', 'business_objects'],
         Audit: {
-          draw_children: true,
           allow_creating: false,
           allow_mapping: true,
           add_item_view: path + '/audits/tree_add_item.mustache',
         },
-        Requirement: {
-          draw_children: true,
-        },
       },
       AssessmentTemplate: {
         Audit: {
-          draw_children: true,
           allow_creating: false,
           allow_mapping: true,
         },
       },
       Risk: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
-        Threat: {
-          draw_children: true,
-        },
+        _mixins: ['governance_objects', 'business_objects'],
       },
       Threat: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
-        Risk: {
-          draw_children: true,
-        },
+        _mixins: ['governance_objects', 'business_objects'],
       },
       Issue: {
         _mixins: ['governance_objects', 'business_objects'],
         Control: {
-          draw_children: true,
           add_item_view: path + '/base_objects/tree_add_item.mustache',
         },
         Audit: {
-          draw_children: true,
           add_item_view:
             GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
         },
       },
       AccessGroup: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
+        _mixins: ['governance_objects', 'business_objects'],
       },
       DataAsset: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
+        _mixins: ['governance_objects', 'business_objects'],
       },
       Facility: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
+        _mixins: ['governance_objects', 'business_objects'],
       },
       Market: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
+        _mixins: ['governance_objects', 'business_objects'],
       },
       Metric: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
+        _mixins: ['governance_objects', 'business_objects'],
       },
       OrgGroup: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
+        _mixins: ['governance_objects', 'business_objects'],
       },
       Vendor: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
+        _mixins: ['governance_objects', 'business_objects'],
       },
       Process: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
+        _mixins: ['governance_objects', 'business_objects'],
       },
       Product: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
+        _mixins: ['governance_objects', 'business_objects'],
       },
       ProductGroup: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
+        _mixins: ['governance_objects', 'business_objects'],
       },
       Project: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
+        _mixins: ['governance_objects', 'business_objects'],
       },
       System: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
+        _mixins: ['governance_objects', 'business_objects'],
       },
       TechnologyEnvironment: {
-        _mixins: ['governance_objects', 'business_objects', 'issues'],
+        _mixins: ['governance_objects', 'business_objects'],
       },
       Person: {
-        _mixins: ['issues'],
-        Program: {
-          draw_children: true,
-        },
-        Regulation: {
-          draw_children: true,
-        },
-        Contract: {
-          draw_children: true,
-        },
-        Standard: {
-          draw_children: true,
-        },
-        Policy: {
-          draw_children: true,
-        },
-        Audit: {
-          draw_children: true,
-        },
         Requirement: {
           add_item_view:
             GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
-          draw_children: true,
         },
         Objective: {
-          draw_children: true,
           add_item_view: path + '/base_objects/tree_add_item.mustache',
         },
         Control: {
-          draw_children: true,
           add_item_view: path + '/base_objects/tree_add_item.mustache',
         },
-        Issue: {
-          draw_children: true,
-        },
-        AccessGroup: {
-          draw_children: true,
-        },
-        DataAsset: {
-          draw_children: true,
-        },
-        Facility: {
-          draw_children: true,
-        },
-        Market: {
-          draw_children: true,
-        },
-        Metric: {
-          draw_children: true,
-        },
-        OrgGroup: {
-          draw_children: true,
-        },
-        Vendor: {
-          draw_children: true,
-        },
-        Process: {
-          draw_children: true,
-        },
-        Product: {
-          draw_children: true,
-        },
-        ProductGroup: {
-          draw_children: true,
-        },
-        Project: {
-          draw_children: true,
-        },
-        System: {
-          draw_children: true,
-        },
         Assessment: {
-          draw_children: true,
           add_item_view: null,
-        },
-        Risk: {
-          draw_children: true,
-        },
-        TechnologyEnvironment: {
-          draw_children: true,
-        },
-        Threat: {
-          draw_children: true,
         },
       },
     });

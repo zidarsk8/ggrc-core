@@ -152,7 +152,6 @@ export default can.Construct.extend({
       model: farModel,
       objectVersion: objectVersionConfig.isObjectVersion,
       content_controller_options: {
-        draw_children: true,
         parent_instance: instance,
         model: farModel,
         objectVersion: objectVersionConfig.isObjectVersion,
