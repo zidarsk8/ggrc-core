@@ -178,7 +178,7 @@ def get_acl_user_ids(connection, object_type, object_id,
         acl.object_type = :object_type
         AND acl.object_id = :object_id
         AND acr.name = :role_name
-      ORDER BY 
+      ORDER BY
         id
   """
   result = connection.execute(
@@ -351,6 +351,9 @@ def process_object(connection, object_type, object_id, migrator_id):
           object_type,
           status="Failed: {}".format(e.message)
       )
+      print "Processing external data for {} ID:{} failed:{}".format(
+          object_type, object_id, e.message
+      )
     else:
       update_synq_status(connection, object_id, object_type, status="OK")
   else:
@@ -372,16 +375,29 @@ def run():
   connection = op.get_bind()
   migrator_id = get_migration_user_id(connection)
   for table, object_type in SCOPING_TABLES:
+    print "Migrate {} objects roles with external data".format(object_type)
     object_ids = get_object_ids(connection, table)
+    print "Found {} {} objects in DB".format(len(object_ids), object_type)
     process_table(connection, object_ids, object_type, migrator_id)
 
   # Systems
+  print "Migrate System objects roles with external data"
   object_ids = get_system_ids(connection)
+  print "Found {} System objects in DB".format(len(object_ids))
   process_table(connection, object_ids, "System", migrator_id)
 
   # Process
+  print "Migrate Process objects roles with external data"
   object_ids = get_process_ids(connection)
+  print "Found {} Process objects in DB".format(len(object_ids))
   process_table(connection, object_ids, "Process", migrator_id)
+  if is_external_service_data_available(connection):
+    sql = """SELECT t.status AS status, count(t.status) AS cnt
+             FROM temp_external_app_roles AS t GROUP BY status;"""
+    print "Summary status of external data:"
+    result = connection.execute(text(sql))
+    for row in result:
+      print "{} : {}".format(row.cnt, row.status)
 
 
 def upgrade():
