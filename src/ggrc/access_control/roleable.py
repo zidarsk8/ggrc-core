@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Roleable model"""
+from collections import defaultdict
 from sqlalchemy import and_
 from sqlalchemy import orm
 from sqlalchemy.orm import remote
@@ -213,8 +214,6 @@ class Roleable(object):
 
   def validate_acl(self):
     """Check correctness of access_control_list."""
-    assignees = 0
-    verifiers = 0
     for acl in self.access_control_list:
       if acl.ac_role.object_type != "Workflow" and \
          acl.object_type != acl.ac_role.object_type:
@@ -225,20 +224,28 @@ class Roleable(object):
                 acl.ac_role.object_type
             )
         )
-      if acl.ac_role.name == 'Assignee':
-        assignees += 1
-      if acl.ac_role.name == 'Verifier':
-        verifiers += 1
+    self.validate_role_limit()
 
-    if assignees > self.MAX_ASSIGNEE_NUM:
-      raise ValueError(
-          "Assignee role must have only {} person(s) assigned".format(
-              self.MAX_ASSIGNEE_NUM
-          )
-      )
-    if verifiers > self.MAX_VERIFIER_NUM:
-      raise ValueError(
-          "Verifier role must have only {} person(s) assigned".format(
-              self.MAX_VERIFIER_NUM
-          )
-      )
+  def validate_role_limit(self, _import=False):
+    """Validate the number of roles assigned to object
+
+    Args:
+      _import: if True than function return list of errors for 'add_error'
+    """
+    errors = []
+    count_roles = defaultdict(int)
+    for acl in self.access_control_list:
+      count_roles[acl.ac_role.name] += 1
+
+    for _role in count_roles.keys():
+      max_attr = "MAX_{}_NUM".format(_role).upper()
+      _max = getattr(self, max_attr) if hasattr(self, max_attr) else None
+      if _max and count_roles[_role] > _max:
+        message = "{} role must have only {} person(s) assigned".format(_role,
+                                                                        _max)
+        if _import:
+          errors.append((_role, message))
+        else:
+          raise ValueError(message)
+    if _import:
+      return errors

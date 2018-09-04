@@ -225,6 +225,12 @@ class ImportRowConverter(RowConverter):
       return
     for mapping in self.objects.values():
       mapping.set_obj_attr()
+    if hasattr(self.obj, "validate_role_limit"):
+      results = self.obj.validate_role_limit(_import=True)
+      for role, msg in results:
+        self.add_error(errors.VALIDATION_ERROR,
+                       column_name=role,
+                       message=msg)
     if self.block_converter.converter.dry_run:
       return
     try:

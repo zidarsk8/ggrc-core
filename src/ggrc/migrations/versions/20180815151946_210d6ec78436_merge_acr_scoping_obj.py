@@ -10,7 +10,6 @@ Create Date: 2018-08-15 15:19:46.890174
 # pylint: disable=invalid-name
 
 from alembic import op
-import sqlalchemy as sa
 
 from ggrc.migrations.utils.migrator import get_migration_user_id
 from ggrc.migrations.utils import \
