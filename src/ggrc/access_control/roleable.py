@@ -225,9 +225,11 @@ class Roleable(object):
                 acl.ac_role.object_type
             )
         )
-      if acl.ac_role.name == 'Assignee':
+      # This should only work on scoped objects but checking for non editable
+      # is good enough for now.
+      if acl.ac_role.non_editable and acl.ac_role.name == 'Assignee':
         assignees += 1
-      if acl.ac_role.name == 'Verifier':
+      if acl.ac_role.non_editable and acl.ac_role.name == 'Verifier':
         verifiers += 1
 
     if assignees > self.MAX_ASSIGNEE_NUM:
