@@ -253,7 +253,7 @@ WorkflowExtension.init_widgets_for_person_page = function () {
       widget_id: 'task',
       widgetType: 'treeview',
       treeViewDepth: 1,
-      widget_name: 'My Tasks',
+      widget_name: 'Tasks',
       model: CycleTaskGroupObjectTask,
       content_controller_options: {
         parent_instance: getPageInstance(),

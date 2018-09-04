@@ -192,7 +192,7 @@ export default can.Control({
     widget.attr({
       internav_icon: widgetOptions.widget_icon,
       widgetType: isObjectVersion(widgetId) ? 'version' : '',
-      internav_display: title.replace(/^(Mapped|Linked|My)\s+/, ''),
+      internav_display: title,
       internav_id: widgetId,
       internav_href: buildUrl({widget: widgetId}),
       forceRefetch: widgetOptions && widgetOptions.forceRefetch,

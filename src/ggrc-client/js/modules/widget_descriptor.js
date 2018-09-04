@@ -133,19 +133,8 @@ export default can.Construct.extend({
         let farModelName = objectVersionConfig.isObjectVersion ?
           objectVersionConfig.widgetName :
           farModel.title_plural;
-        let $objectArea = $('.object-area');
-        if (
-          $objectArea.hasClass('dashboard-area') ||
-          instance.constructor.title_singular === 'Person'
-        ) {
-          if (/dashboard/.test(window.location)) {
-            return 'My ' + farModelName;
-          }
-          return farModelName;
-        } else if (farModel.title_plural === 'Audits') {
-          return 'Mapped Audits';
-        }
-        return `Mapped ${farModelName}`;
+
+        return farModelName;
       },
       widget_icon: farModel.table_singular,
       object_category: farModel.category || 'default',
