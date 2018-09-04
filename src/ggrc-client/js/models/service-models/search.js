@@ -31,18 +31,11 @@ export default can.Model('GGRC.Models.Search', {
     }, params));
   },
   search_for_types: function (str, types, params) {
-    let result;
-    if ((!str || str.trim().length === 0) && (!params || params.length === 0)) {
-      // Empty search, so actually hit normal endpoints instead of search
-      // This returns a search instance which will search across all given types.
-      result = this.load_via_model_endpoints(types);
-    } else {
-      // This returns a Search instance, NOT a model instance.
-      result = this.findOne($.extend({
-        q: this._escapeSymbols(str),
-        types: types.join(','),
-      }, params));
-    }
+    // This returns a Search instance, NOT a model instance.
+    let result = this.findOne($.extend({
+      q: this._escapeSymbols(str),
+      types: types.join(','),
+    }, params));
     return result;
   },
   counts: function (str, params) {
@@ -59,31 +52,6 @@ export default can.Model('GGRC.Models.Search', {
         counts_only: true,
         extra_columns: extra_columns && extra_columns.join(','),
       }, params));
-  },
-  load_via_model_endpoints: function (types) {
-    let dfds;
-
-    dfds = can.map(types, function (model_name) {
-      // FIXME: This should use __stubs_only=true when paging is used
-      return CMS.Models[model_name].findAll({
-        __stubs_only: true,
-        __sort: 'title,email',
-      });
-    });
-
-    return $.when(...dfds).then(function () {
-      let model_results = can.makeArray(arguments);
-      let search_response = {
-        entries: {},
-        selfLink: 'Fake',
-      };
-      // Mock the search resource format
-      can.each(types, function (model_name, index) {
-        search_response.entries[model_name] = model_results[index];
-      });
-
-      return new GGRC.Models.Search(search_response);
-    });
   },
   _escapeSymbols: function (str) {
     return str.replace(/(\\|%|_)/g, '\\$1');
