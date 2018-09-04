@@ -183,9 +183,6 @@ _.assign(CoreExtension, {
           AssessmentTemplate: {
             treeViewDepth: 0,
           },
-          Person: {
-            widget_icon: 'person',
-          },
         };
 
         let defOrder = TreeViewConfig.attr('defaultOrderTypes');
@@ -198,13 +195,6 @@ _.assign(CoreExtension, {
 
         return all;
       })(),
-      Program: {
-        Person: {
-          widget_id: 'person',
-          widget_name: 'People',
-          widget_icon: 'person',
-        },
-      },
 
       // An Audit has a different set of object that are more relevant to it,
       // thus these objects have a customized priority. On the other hand,
@@ -220,21 +210,6 @@ _.assign(CoreExtension, {
         },
         Evidence: {
           order: 9,
-        },
-        program: {
-          widget_id: 'program',
-          widget_name: 'Program',
-          widget_icon: 'program',
-        },
-        Person: {
-          widget_id: 'person',
-          widget_name: 'People',
-          widget_icon: 'person',
-          // NOTE: "order" not overridden
-          content_controller_options: {
-            allow_mapping: false,
-            allow_creating: false,
-          },
         },
       },
     };
@@ -277,25 +252,18 @@ _.assign(CoreExtension, {
           add_item_view: path + '/audits/tree_add_item.mustache',
         },
         Person: {
-          parent_instance: getPageInstance(),
-          allow_reading: true,
           allow_mapping: true,
           allow_creating: true,
-          model: businessModels.Person,
         },
       },
       Audit: {
         _mixins: ['governance_objects', 'business_objects'],
         Program: {
-          parent_instance: getPageInstance(),
-          model: businessModels.Program,
           allow_mapping: false,
           allow_creating: false,
         },
         Assessment: {
-          parent_instance: getPageInstance(),
           allow_mapping: true,
-          model: businessModels.Assessment,
           add_item_view: path + '/assessments/tree_add_item.mustache',
         },
         AssessmentTemplate: {
@@ -304,9 +272,6 @@ _.assign(CoreExtension, {
             '/assessment_templates/tree_add_item.mustache',
         },
         Person: {
-          widget_id: 'person',
-          widget_name: 'People',
-          widget_icon: 'person',
           content_controller_options: {
             allow_mapping: false,
             allow_creating: false,
