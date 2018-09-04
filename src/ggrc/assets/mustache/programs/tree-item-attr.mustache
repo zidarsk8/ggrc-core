@@ -5,7 +5,9 @@
 
 {{#switch attr_name}}
   {{#case 'modified_by'}}
-      <tree-field {source}="instance.modified_by" {field}="'email'"/>
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.modified_by" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
   {{/case}}
   {{#case 'status'}}
     {{#using status=instance.status}}
