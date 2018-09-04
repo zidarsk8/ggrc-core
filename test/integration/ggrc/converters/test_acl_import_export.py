@@ -9,6 +9,7 @@ from collections import OrderedDict
 import ddt
 
 from ggrc import models
+from ggrc.converters import errors
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
@@ -411,12 +412,19 @@ class TestACLImportExport(TestCase):
         ("Assignee", roles),
         ("Verifier", roles),
     ]))
-    self.assertIn(
-        "role must have only 1 person(s) assigned",
-        response[0]["row_errors"][0]
-    )
-    self.assertIn(
-        "role must have only 1 person(s) assigned",
-        response[0]["row_errors"][1]
-    )
-    self.assertEqual(len(response[0]["row_errors"]), 2)
+    self._check_csv_response(response, {
+        "Org Group": {
+            "row_errors": {
+                errors.VALIDATION_ERROR.format(
+                    line=3,
+                    column_name="Assignee",
+                    message="Assignee role must have only 1 person(s) assigned"
+                ),
+                errors.VALIDATION_ERROR.format(
+                    line=3,
+                    column_name="Verifier",
+                    message="Verifier role must have only 1 person(s) assigned"
+                ),
+            },
+        }
+    })
