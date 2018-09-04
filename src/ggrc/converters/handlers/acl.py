@@ -11,12 +11,14 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
   """Handler for access control roles."""
 
   def __init__(self, row_converter, key, **options):
+    options.pop("parse", None)
     super(AccessControlRoleColumnHandler, self).__init__(
         row_converter, key, **options)
     self.role = models.AccessControlRole.query.filter_by(
         name=(options.get("attr_name") or self.display_name),
         object_type=self.row_converter.obj.type
     ).one()
+    self.set_value()
 
   def _add_people(self, people_list):
     """Add people to AC list with the current role."""

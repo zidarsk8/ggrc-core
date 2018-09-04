@@ -17,7 +17,7 @@ from ggrc.converters import get_importables
 from ggrc.converters import pre_commit_checks
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
-from ggrc.models.exceptions import StatusValidationError, ValidationError
+from ggrc.models.exceptions import StatusValidationError
 from ggrc.rbac import permissions
 from ggrc.services import signals
 from ggrc.snapshotter import create_snapshots
@@ -254,16 +254,6 @@ class ImportRowConverter(RowConverter):
     self.setup_secondary_objects()
     self.commit_object()
 
-  def row_validate_acl(self):
-    """Validate ACL of precessing row"""
-    if hasattr(self.obj, 'validate_acl'):
-      try:
-        self.obj.validate_acl()
-      except (ValueError, ValidationError) as exception:
-        self.add_error(errors.VALIDATION_ERROR,
-                       column_name=self.display_name,
-                       message=exception.message)
-
   def check_object(self):
     """Check object if it has any pre commit checks.
 
@@ -273,7 +263,6 @@ class ImportRowConverter(RowConverter):
     Args:
         row_converter: Row converter for the row we want to check.
     """
-    self.row_validate_acl()
     checker = pre_commit_checks.CHECKS.get(type(self.obj).__name__)
     if checker and callable(checker):
       checker(self)

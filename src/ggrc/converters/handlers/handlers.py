@@ -282,6 +282,27 @@ class UsersColumnHandler(UserColumnHandler):
     self.add_warning(errors.OWNER_MISSING, column_name=self.display_name)
     return [get_current_user()]
 
+  def _check_role_restrictions(self, people):
+    role = getattr(self, "role", None)
+    # Check for internal role is so that we don't enforce any restriction to
+    # user defined custom roles.
+    if role and role.non_editable:
+      if role.name == "Verifier" and len(people) > 1:
+        self.add_error(
+            errors.VALIDATION_ERROR,
+            column_name=self.display_name,
+            message="Verifier role must have only 1 person(s) "
+            "assigned",
+        )
+
+      if role.name == "Assignee" and len(people) > 1:
+        self.add_error(
+            errors.VALIDATION_ERROR,
+            column_name=self.display_name,
+            message="Assignee role must have only 1 person(s) "
+            "assigned",
+        )
+
   def parse_item(self):
     """Parses multi users field."""
     people = set()
@@ -302,7 +323,11 @@ class UsersColumnHandler(UserColumnHandler):
         self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
 
     if not people and self.mandatory:
+      # This should actually be checking for "default_to_current_user" field in
+      # access control roles!
       return self._missed_mandatory_person()
+
+    self._check_role_restrictions(people)
 
     return list(people)
 
