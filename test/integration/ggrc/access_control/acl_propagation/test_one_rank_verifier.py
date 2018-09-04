@@ -1,7 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Test Access Control roles Primary Contacts propagation"""
+"""Test Access Control roles Verifier propagation"""
 
 import ddt
 
@@ -12,8 +12,8 @@ from integration.ggrc.utils import helpers
 
 
 @ddt.ddt
-class TestPrimaryContactsPropagation(base.TestACLPropagation):
-  """Test Primary Contacts role permissions propagation"""
+class TestVerifierPropagation(base.TestACLPropagation):
+  """Test Verifier role permissions propagation"""
 
   PERMISSIONS = {
       "Creator": {
@@ -415,7 +415,7 @@ class TestPrimaryContactsPropagation(base.TestACLPropagation):
   }
 
   def init_factory(self, role, model, parent):
-    """Initialize RBAC factory with propagated Primary Contacts role.
+    """Initialize RBAC factory with propagated Verifier role.
 
     Args:
         role: Global Custom role that user have (Creator/Reader/Editor).
@@ -427,7 +427,7 @@ class TestPrimaryContactsPropagation(base.TestACLPropagation):
     """
     self.setup_people()
     primary_contacts = all_models.AccessControlRole.query.filter_by(
-        name="Primary Contacts",
+        name="Verifier",
         object_type=parent,
     ).first()
     rbac_factory = rbac_factories.TEST_FACTORIES_MAPPING[model]

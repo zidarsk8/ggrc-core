@@ -150,6 +150,8 @@ class TestImportIssues(TestCase):
         ("code", "market-1"),
         ("title", "Title"),
         ("Admin", "user@example.com"),
+        ("Assignee", "user@example.com"),
+        ("Verifier", "user@example.com"),
         (mandatory_role, email),
     ]))
     self._check_csv_response(response_json, {})
@@ -175,6 +177,8 @@ class TestImportIssues(TestCase):
         ("code", "market-1"),
         ("title", "Title"),
         ("Admin", "user@example.com"),
+        ("Assignee", "user@example.com"),
+        ("Verifier", "user@example.com"),
         (not_mandatory_role, email),
     ]))
 
@@ -210,6 +214,8 @@ class TestImportIssues(TestCase):
         ("code", "market-1"),
         ("title", "Title"),
         ("Admin", "user@example.com"),
+        ("Assignee", "user@example.com"),
+        ("Verifier", "user@example.com"),
         (not_mandatory_role, email),
         (mandatory_role, ""),
     ]))

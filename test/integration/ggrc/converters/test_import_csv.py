@@ -139,6 +139,8 @@ class TestBasicCsvImport(TestCase):
             ("Code*", "HOUSE-{}".format(idx)),
             ("title", "Facility-{}".format(idx)),
             ("admin", "user@example.com"),
+            ("assignee", "user@example.com"),
+            ("verifier", "user@example.com"),
             ("map:facility", "" if idx == 1 else "HOUSE-{}".format(idx - 1)),
         ])
         for idx in (xrange(1, 5) if not reverse_order else xrange(4, 0, -1))

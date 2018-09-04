@@ -184,6 +184,20 @@ class TestGetObjectColumnDefinitions(TestCase):
       },
   }
 
+  SCOPE_COMMON_EXPECTED = {
+      "mandatory": {
+          "Title",
+          "Admin",
+          "Code",
+          "Assignee",
+          "Verifier",
+      },
+      "unique": {
+          "Code",
+          "Title",
+      },
+  }
+
   SCOPING_ROLES = {
       "Technical / Program Managers",
       "Product Managers",
@@ -708,8 +722,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
-        "Primary Contacts",
-        "Secondary Contacts",
+        "Compliance Contacts",
+        "Assignee",
+        "Verifier",
         "Recipients",
         "Send by default",
         "Comments",
@@ -718,9 +733,12 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated Date",
         "Last Updated By",
         "Folder",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     names.update(self.SCOPING_ROLES)
-    self._test_single_object(all_models.System, names, self.COMMON_EXPECTED)
+    self._test_single_object(all_models.System, names,
+                             self.SCOPE_COMMON_EXPECTED)
 
   def test_process_definitions(self):
     """Test default headers for Process."""
@@ -737,8 +755,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
-        "Primary Contacts",
-        "Secondary Contacts",
+        "Compliance Contacts",
+        "Assignee",
+        "Verifier",
         "Recipients",
         "Send by default",
         "Comments",
@@ -747,9 +766,12 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated Date",
         "Last Updated By",
         "Folder",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     names.update(self.SCOPING_ROLES)
-    self._test_single_object(all_models.Process, names, self.COMMON_EXPECTED)
+    self._test_single_object(all_models.Process, names,
+                             self.SCOPE_COMMON_EXPECTED)
 
   def test_product_definitions(self):
     """Test default headers for Product."""
@@ -766,8 +788,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
-        "Primary Contacts",
-        "Secondary Contacts",
+        "Compliance Contacts",
+        "Assignee",
+        "Verifier",
         "Recipients",
         "Send by default",
         "Comments",
@@ -776,9 +799,12 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated Date",
         "Last Updated By",
         "Folder",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     names.update(self.SCOPING_ROLES)
-    self._test_single_object(all_models.Product, names, self.COMMON_EXPECTED)
+    self._test_single_object(all_models.Product, names,
+                             self.SCOPE_COMMON_EXPECTED)
 
   def test_risk_definitions(self):
     """Test default headers for Risk."""
@@ -839,8 +865,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
-        "Primary Contacts",
-        "Secondary Contacts",
+        "Compliance Contacts",
+        "Assignee",
+        "Verifier",
         "Recipients",
         "Send by default",
         "Comments",
@@ -850,9 +877,11 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated By",
         "Folder",
         "Document File",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     names.update(self.SCOPING_ROLES)
-    self._test_single_object(model, names, self.COMMON_EXPECTED)
+    self._test_single_object(model, names, self.SCOPE_COMMON_EXPECTED)
 
   @ddt.data(
       all_models.Contract,
@@ -910,8 +939,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
-        "Primary Contacts",
-        "Secondary Contacts",
+        "Compliance Contacts",
+        "Assignee",
+        "Verifier",
         "Recipients",
         "Send by default",
         "Comments",
@@ -920,9 +950,11 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated Date",
         "Last Updated By",
         "Folder",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     names.update(self.SCOPING_ROLES)
-    self._test_single_object(model, names, self.COMMON_EXPECTED)
+    self._test_single_object(model, names, self.SCOPE_COMMON_EXPECTED)
 
 
 class TestRiskAssessmentColumnDefinitions(TestCase):

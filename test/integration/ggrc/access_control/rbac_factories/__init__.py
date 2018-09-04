@@ -14,7 +14,8 @@ from integration.ggrc.access_control.rbac_factories import (audit, assessment,
                                                             cycle_task_group,
                                                             cycle_task,
                                                             cycle_task_entry,
-                                                            evidence)
+                                                            evidence,
+                                                            universal_factory)
 
 
 TEST_FACTORIES_MAPPING = {
@@ -33,4 +34,5 @@ TEST_FACTORIES_MAPPING = {
     "CycleTaskGroup": cycle_task_group.CycleTaskGroupRBACFactory,
     "CycleTask": cycle_task.CycleTaskRBACFactory,
     "CycleTaskEntry": cycle_task_entry.CycleTaskEntryRBACFactory,
+    "Universal": universal_factory.UniversalRBACFactory
 }

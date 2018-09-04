@@ -16,6 +16,7 @@ export default can.Component.extend({
         },
       },
     },
+    singleUserRole: false,
     editableMode: false,
     isLoading: false,
     canEdit: true,

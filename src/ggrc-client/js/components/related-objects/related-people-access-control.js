@@ -20,6 +20,10 @@ export default can.Component.extend({
     orderOfRoles: [],
     hasConflicts: false,
     readOnly: false,
+    singleUserRoles: Object.freeze({
+      Assignee: true,
+      Verifier: true,
+    }),
 
     updateRoles: function (args) {
       if (this.attr('deferredSave')) {
@@ -133,6 +137,7 @@ export default can.Component.extend({
       let title = role.name;
       let group;
       let people;
+      let singleUserRole = this.singleUserRoles[title] ? true : false;
 
       if (includeRoles.length && includeRoles.indexOf(title) === -1) {
         return;
@@ -155,6 +160,7 @@ export default can.Component.extend({
         groupId: groupId,
         people: people,
         required: role.mandatory,
+        singleUserRole: singleUserRole,
       };
     },
     filterByIncludeExclude: function (includeRoles, excludeRoles) {
