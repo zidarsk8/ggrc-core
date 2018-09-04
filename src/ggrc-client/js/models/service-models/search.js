@@ -57,20 +57,6 @@ export default can.Model('GGRC.Models.Search', {
     return str.replace(/(\\|%|_)/g, '\\$1');
   },
 }, {
-  getResultsFor: function (type) {
-    let _class = type.shortName ? type :
-      (can.getObject('CMS.Models.' + type) ||
-        can.getObject('GGRC.Models.' + type));
-
-    type = _class.shortName;
-    return can.map(this.entries, function (v) {
-      let inst;
-      if (v.type === type) {
-        inst = new _class({id: v.id});
-        return inst;
-      }
-    });
-  },
   getResultsForType: function (model_name) {
     let entries;
 
