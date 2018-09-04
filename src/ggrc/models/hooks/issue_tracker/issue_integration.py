@@ -15,6 +15,8 @@ from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.utils.custom_dict import MissingKeyDict
+from ggrc.integrations.synchronization_jobs.issue_sync_job import \
+    ISSUE_STATUS_MAPPING
 
 logger = logging.getLogger(__name__)
 
@@ -48,17 +50,59 @@ def _is_already_linked(ticket_id):
   return db.session.query(exists_query).scalar()
 
 
+def create_missed_issue_acl(email, role_name, obj):
+  """Create missed acl for emails from IssueTracker"""
+  person = all_models.Person.query.filter_by(email=email).first()
+  acr = all_models.AccessControlRole.query.filter_by(
+      name=role_name,
+      object_type=all_models.Issue.__name__,
+  ).first()
+  all_models.AccessControlList(
+      person_id=person.id,
+      ac_role_id=acr.id,
+      object=obj,
+  )
+
+
+def update_initial_issue(obj, issue_tracker_params):
+  """Updates initial object according to business requirements"""
+  issue_tracker_status = issue_tracker_params.status.lower()
+  ggrc_status = ISSUE_STATUS_MAPPING.get(issue_tracker_status)
+  if ggrc_status:
+    obj.status = ggrc_status
+
+  issue_admins = [p.email for p in obj.get_persons_for_rolename("Admin")]
+  issue_primary_contacts = [
+      p.email for p in obj.get_persons_for_rolename("Primary Contacts")
+  ]
+  issue_secondary_contacts = [
+      p.email for p in obj.get_persons_for_rolename("Secondary Contacts")
+  ]
+
+  verifier_email = issue_tracker_params.verifier
+  if verifier_email and verifier_email not in issue_admins:
+    create_missed_issue_acl(verifier_email, "Admin", obj)
+
+  assignee_email = issue_tracker_params.assignee
+  if assignee_email and assignee_email not in issue_primary_contacts:
+    create_missed_issue_acl(assignee_email, "Primary Contacts", obj)
+
+  for secondary_contact in issue_tracker_params.cc_list:
+    if secondary_contact not in issue_secondary_contacts:
+      create_missed_issue_acl(secondary_contact, "Secondary Contacts", obj)
+
+
 def link_issue(obj, ticket_id, issue_tracker_info):
   """Link issue to existing IssueTracker ticket"""
 
   builder = issue_tracker_params_builder.IssueParamsBuilder()
-  issue_tracker_params = builder.build_it_params_for_issue_link(
+  issue_tracker_container = builder.build_params_for_issue_link(
       obj,
       ticket_id,
       issue_tracker_info,
   )
 
-  if issue_tracker_params.is_empty():
+  if issue_tracker_container.is_empty():
     return
 
   if _is_already_linked(ticket_id):
@@ -68,27 +112,32 @@ def link_issue(obj, ticket_id, issue_tracker_info):
         obj.id,
         ticket_id,
     )
-    obj.add_warning("Unable to create a ticket in issue tracker.")
+    obj.add_warning(
+        "Unable to link to issue tracker. Ticket is already linked to another"
+        "GGRC object"
+    )
     return
 
   # Query to IssueTracker.
-  issue_tracker_query = issue_tracker_params.get_issue_tracker_params()
+  issue_tracker_query = issue_tracker_container.get_issue_tracker_params()
 
   # Parameters for creation IssuetrackerIssue object in GGRC.
-  issuetracker_issue_params = issue_tracker_params.get_params_for_ggrc_object()
+  issuetracker_issue_params = \
+      issue_tracker_container.get_params_for_ggrc_object()
 
   try:
     issues.Client().update_issue(ticket_id, issue_tracker_query)
-
-    ticket_url = integration_utils.build_issue_tracker_url(ticket_id)
-    issuetracker_issue_params["issue_url"] = ticket_url
-    issuetracker_issue_params["issue_id"] = ticket_id
   except integrations_errors.Error as error:
     logger.error("Unable to update a ticket ID=%s while deleting"
                  " issue ID=%d: %s",
                  ticket_id, obj.id, error)
     obj.add_warning("Unable to update a ticket in issue tracker.")
     issuetracker_issue_params["enabled"] = False
+  else:
+    ticket_url = integration_utils.build_issue_tracker_url(ticket_id)
+    issuetracker_issue_params["issue_url"] = ticket_url
+    issuetracker_issue_params["issue_id"] = ticket_id
+    update_initial_issue(obj, issue_tracker_container)
 
   if issuetracker_issue_params:
     all_models.IssuetrackerIssue.create_or_update_from_dict(
@@ -141,7 +190,7 @@ def create_issue_handler(obj, issue_tracker_info):
   # We need in flush() here because we need object id for URL generation.
   db.session.flush()
 
-  ticket_id = issue_tracker_info.get("ticket_id")
+  ticket_id = issue_tracker_info.get("issue_id")
 
   if ticket_id:
     link_issue(obj, ticket_id, issue_tracker_info)
