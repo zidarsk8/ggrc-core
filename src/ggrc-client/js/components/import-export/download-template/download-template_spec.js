@@ -47,22 +47,21 @@ describe('download-template component', () => {
 
   describe('downloadCSV method', () => {
     it('should do ajax call in proper format', (done) => {
-      spyOn(Utils, 'exportRequest')
+      spyOn(Utils, 'downloadTemplate')
         .and.returnValue(can.Deferred().resolve('FooBar'));
       spyOn(Utils, 'download');
 
       vm.attr('selected', [{name: 'Foo'}, {name: 'Bar'}, {name: 'Baz'}]);
 
       vm.downloadCSV().then(() => {
-        expect(Utils.exportRequest)
+        expect(Utils.downloadTemplate)
           .toHaveBeenCalledWith({
             data: {
               objects: [
-                {object_name: 'Foo', fields: 'all'},
-                {object_name: 'Bar', fields: 'all'},
-                {object_name: 'Baz', fields: 'all'},
+                {object_name: 'Foo'},
+                {object_name: 'Bar'},
+                {object_name: 'Baz'},
               ],
-              export_to: 'csv',
             },
           });
         expect(Utils.download)
@@ -74,27 +73,27 @@ describe('download-template component', () => {
     });
 
     it('should not do ajax call if nothing selected', () => {
-      spyOn(Utils, 'exportRequest');
+      spyOn(Utils, 'downloadTemplate');
       spyOn(Utils, 'download');
 
       vm.attr('selected', []);
 
       vm.downloadCSV();
 
-      expect(Utils.exportRequest).not.toHaveBeenCalled();
+      expect(Utils.downloadTemplate).not.toHaveBeenCalled();
       expect(Utils.download).not.toHaveBeenCalled();
     });
 
     it('should not download CSV and should close the modal after error during' +
-      '"exportRequest" phase', (done) => {
-      spyOn(Utils, 'exportRequest')
+      '"downloadTemplate" phase', (done) => {
+      spyOn(Utils, 'downloadTemplate')
         .and.returnValue(can.Deferred().reject());
       spyOn(Utils, 'download');
 
       vm.attr('selected', [1, 2, 3]);
 
       vm.downloadCSV().fail(() => {
-        expect(Utils.exportRequest).toHaveBeenCalled();
+        expect(Utils.downloadTemplate).toHaveBeenCalled();
         expect(Utils.download).not.toHaveBeenCalled();
         expect(vm.attr('modalState.open')).toEqual(false);
 

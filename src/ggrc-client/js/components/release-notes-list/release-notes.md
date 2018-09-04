@@ -1,4 +1,4 @@
-[//]: <> (updated 8/28/2018)
+[//]: <> (updated 9/04/2018)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 

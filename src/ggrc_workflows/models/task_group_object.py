@@ -5,6 +5,8 @@
 
 
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext import hybrid
+from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.models.mixins import Base
@@ -12,11 +14,16 @@ from ggrc.models.mixins import base
 from ggrc.models.mixins import Timeboxed
 from ggrc.models import reflection
 from ggrc.models import utils
+from ggrc.models import relationship
 
 from ggrc.access_control import roleable
 
 
-class TaskGroupObject(roleable.Roleable, Timeboxed, base.ContextRBAC, Base,
+class TaskGroupObject(roleable.Roleable,
+                      relationship.Relatable,
+                      Timeboxed,
+                      base.ContextRBAC,
+                      Base,
                       db.Model):
   """Workflow TaskGroupObject model."""
 
@@ -32,6 +39,22 @@ class TaskGroupObject(roleable.Roleable, Timeboxed, base.ContextRBAC, Base,
 
   object = utils.JsonPolymorphicRelationship("object_id", "object_type",
                                              "{}_object")
+
+  # This parameter is overridden by workflow backref, but is here to ensure
+  # pylint does not complain
+  _task_group = None
+
+  @hybrid.hybrid_property
+  def task_group(self):
+    """Getter for task group foreign key."""
+    return self._task_group
+
+  @task_group.setter
+  def task_group(self, task_group):
+    """Setter for task group foreign key."""
+    if not self._task_group and task_group:
+      relationship.Relationship(source=task_group, destination=self)
+    self._task_group = task_group
 
   @property
   def workflow(self):
@@ -51,7 +74,6 @@ class TaskGroupObject(roleable.Roleable, Timeboxed, base.ContextRBAC, Base,
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
 
     query = super(TaskGroupObject, cls).eager_query()
     return query.options(
@@ -99,8 +121,6 @@ class TaskGroupable(object):
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(TaskGroupable, cls).eager_query()
     return cls.eager_inclusions(query, TaskGroupable._include_links).options(
         orm.subqueryload('task_group_objects'))
