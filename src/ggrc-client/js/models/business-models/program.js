@@ -67,18 +67,6 @@ export default Cacheable('CMS.Models.Program', {
   sub_tree_view_options: {
     default_filter: ['Standard'],
   },
-  links_to: {
-    System: {},
-    Process: {},
-    Facility: {},
-    OrgGroup: {},
-    Vendor: {},
-    Project: {},
-    DataAsset: {},
-    AccessGroup: {},
-    Product: {},
-    Market: {},
-  },
   defaults: {
     status: 'Draft',
   },

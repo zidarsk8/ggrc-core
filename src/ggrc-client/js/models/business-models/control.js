@@ -42,7 +42,6 @@ export default Cacheable('CMS.Models.Control', {
     means: Stub,
     verify_frequency: Stub,
   },
-  links_to: {},
   defaults: {
     selected: false,
     title: '',

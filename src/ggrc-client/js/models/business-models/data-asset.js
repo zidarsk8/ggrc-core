@@ -65,19 +65,6 @@ export default Cacheable('CMS.Models.DataAsset', {
   sub_tree_view_options: {
     default_filter: ['Policy'],
   },
-  links_to: {
-    System: {},
-    Process: {},
-    Program: {},
-    Product: {},
-    Facility: {},
-    OrgGroup: {},
-    Vendor: {},
-    Project: {},
-    DataAsset: {},
-    AccessGroup: {},
-    Market: {},
-  },
   defaults: {
     status: 'Draft',
   },
