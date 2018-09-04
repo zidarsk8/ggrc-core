@@ -93,22 +93,6 @@ def _add_roles_for_objects(objects, new_roles):
   connection.execute(insert_sql)
 
 
-def _delete_roles_for_objects(objects, roles_to_delete):
-  """
-    Removes roles for a given list of objects.
-  :param objects: object names for which new roles should be removed
-  :param roles_to_delete: list of roles to delete from the acr
-  """
-  connection = op.get_bind()
-  for object_name in objects:
-    for role_to_delete in roles_to_delete:
-      connection.execute(
-          sa.text("""DELETE FROM access_control_roles
-                  WHERE name = :name and object_type = :object_type"""),
-          {"name": role_to_delete, "object_type": object_name}
-      )
-
-
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   # Add Assignee, Verifier roles
@@ -122,11 +106,4 @@ def upgrade():
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
-
-  # Remove Assignee, Verifier roles from acr tree
-  for object_type, roles_tree in \
-          scoping_objects_rules.GGRC_NEW_ROLES_PROPAGATION.items():
-    acr_propagation.remove_propagated_roles(object_type, roles_tree.keys())
-
-  # Delete Assignee, Verifier roles
-  _delete_roles_for_objects(SCOPING_OBJECTS, NEW_ROLES)
+  raise Exception("Downgrade is not supported.")
