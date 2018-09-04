@@ -55,9 +55,7 @@ def upgrade():
                                               "Compliance Contacts")))
     op.execute(commentable_table.update()
                .where(commentable_table.c.recipients == '')
-               .values(recipients=func.concat(commentable_table.c.recipients,
-                                              "Assignee,Verifier,"
-                                              "Compliance Contacts")))
+               .values(recipients="Assignee,Verifier,Compliance Contacts"))
 
 
 def downgrade():
