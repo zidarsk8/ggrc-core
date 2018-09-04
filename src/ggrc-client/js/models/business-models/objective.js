@@ -69,10 +69,7 @@ export default Cacheable('CMS.Models.Objective', {
       }]),
     display_attr_names: ['title', 'status', 'last_assessment_date',
       'updated_at'],
-    add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
-    create_link: true,
     show_related_assessments: true,
-    start_expanded: false,
   },
   sub_tree_view_options: {
     default_filter: ['Control'],

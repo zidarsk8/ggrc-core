@@ -5,7 +5,7 @@
 
 {{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping_or_creating}}
-    {{^if_equals model.shortName 'Assessment'}}
+  {{^if parent_instance.archived}}
       <a
         class="btn btn-mini action-button map-button"
         href="javascript://"
@@ -18,6 +18,6 @@
         data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
         Map
       </a>
-    {{/if_equals}}
+  {{/if}}
 {{/if}}
-{{/is_allowed_to_map}}
+{{/is_allowed_to_map}}    

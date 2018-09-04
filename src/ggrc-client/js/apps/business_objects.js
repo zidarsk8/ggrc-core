@@ -215,49 +215,23 @@ _.assign(CoreExtension, {
     };
 
     extraContentOptions = applyMixins({
-      objectives: {
-        Objective: {
-          add_item_view: path + '/snapshots/tree_add_item.mustache',
-        },
-      },
-      controls: {
-        Control: {
-          add_item_view: path + '/snapshots/tree_add_item.mustache',
-        },
-      },
       business_objects: {
         Audit: {
           allow_mapping: true,
           add_item_view: path + '/audits/tree_add_item.mustache',
         },
       },
-      governance_objects: {
-        Regulation: {
-          add_item_view: path + '/snapshots/tree_add_item.mustache',
-        },
-        Policy: {
-          add_item_view: path + '/snapshots/tree_add_item.mustache',
-        },
-        Standard: {
-          add_item_view: path + '/snapshots/tree_add_item.mustache',
-        },
-      },
       Program: {
         _mixins: [
-          'governance_objects', 'objectives', 'controls',
           'business_objects',
         ],
-        Audit: {
-          allow_mapping: true,
-          add_item_view: path + '/audits/tree_add_item.mustache',
-        },
         Person: {
           allow_mapping: true,
           allow_creating: true,
         },
       },
       Audit: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
         Program: {
           allow_mapping: false,
           allow_creating: false,
@@ -278,34 +252,29 @@ _.assign(CoreExtension, {
           },
         },
       },
-      directive: {
-        _mixins: [
-          'objectives', 'controls', 'business_objects',
-        ],
-      },
       Regulation: {
-        _mixins: ['directive'],
+        _mixins: ['business_objects'],
       },
       Standard: {
-        _mixins: ['directive'],
+        _mixins: ['business_objects'],
       },
       Policy: {
-        _mixins: ['directive'],
+        _mixins: ['business_objects'],
       },
       Contract: {
-        _mixins: ['directive'],
+        _mixins: ['business_objects'],
       },
       Requirement: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       Objective: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       Control: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       Assessment: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
         Audit: {
           allow_creating: false,
           allow_mapping: true,
@@ -319,74 +288,52 @@ _.assign(CoreExtension, {
         },
       },
       Risk: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       Threat: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       Issue: {
-        _mixins: ['governance_objects', 'business_objects'],
-        Control: {
-          add_item_view: path + '/base_objects/tree_add_item.mustache',
-        },
-        Audit: {
-          add_item_view:
-            GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
-        },
+        _mixins: ['business_objects'],
       },
       AccessGroup: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       DataAsset: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       Facility: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       Market: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       Metric: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       OrgGroup: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       Vendor: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       Process: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       Product: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       ProductGroup: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       Project: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       System: {
-        _mixins: ['governance_objects', 'business_objects'],
+        _mixins: ['business_objects'],
       },
       TechnologyEnvironment: {
-        _mixins: ['governance_objects', 'business_objects'],
-      },
-      Person: {
-        Requirement: {
-          add_item_view:
-            GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
-        },
-        Objective: {
-          add_item_view: path + '/base_objects/tree_add_item.mustache',
-        },
-        Control: {
-          add_item_view: path + '/base_objects/tree_add_item.mustache',
-        },
-        Assessment: {
-          add_item_view: null,
-        },
+        _mixins: ['business_objects'],
       },
     });
 

@@ -66,7 +66,6 @@ export default Cacheable('CMS.Models.Requirement', {
         attr_name: 'review_status',
         order: 80,
       }]),
-    add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
   },
   sub_tree_view_options: {
     default_filter: ['Objective'],

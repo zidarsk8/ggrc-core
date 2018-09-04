@@ -58,7 +58,6 @@ export default Cacheable('CMS.Models.Directive', {
         attr_name: 'end_date',
         order: 110,
       }]),
-    add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
   },
   attributes: {
     context: Stub,

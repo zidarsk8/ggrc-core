@@ -34,8 +34,6 @@ export default Cacheable('CMS.Models.Risk', {
     modified_by: Stub,
   },
   tree_view_options: {
-    add_item_view:
-      GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
     attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
     attr_list: Cacheable.attr_list.concat([
       {attr_title: 'Reference URL', attr_name: 'reference_url', order: 85},

@@ -69,7 +69,6 @@ export default Cacheable('CMS.Models.Document', {
         attr_name: 'description',
         disable_sorting: true,
       }],
-    add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
   },
   init: function () {
     this.validateNonBlank('title');
