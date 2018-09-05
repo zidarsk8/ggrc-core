@@ -4,6 +4,10 @@
  */
 
 import Mappings from './mappers/mappings';
+import * as businessModels from './business-models';
+import * as serviceModels from './service-models';
+
+const allModels = Object.assign({}, businessModels, serviceModels);
 
 /*  RefreshQueue
  *
@@ -92,7 +96,7 @@ const RefreshQueueManager = can.Construct({}, {
         modelName = obj.type || obj.kind;
       }
     }
-    model = CMS.Models[modelName];
+    model = allModels[modelName];
 
     if (!force) {
       // Check if the ID is already contained in another queue
