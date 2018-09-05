@@ -18,40 +18,40 @@ class TestComplianceContactsPropagation(base.TestACLPropagation):
   PERMISSIONS = {
       "Creator": {
           "Universal Market": {
-              # "create_and_map_document": True,
-              # "read_document": True,
-              # "update_document": True,
-              # "delete_document": False,
-              # "create_and_map_comment": True,
-              # "read_comment": True,
+              "create_and_map_document": True,
+              "read_document": True,
+              "update_document": True,
+              "delete_document": False,
+              "create_and_map_comment": True,
+              "read_comment": True,
               "create_and_map_document_comment": True,
-              # "read_document_comment": True,
+              "read_document_comment": True,
           },
       },
-      # "Reader": {
-      #     "Universal Metric": {
-      #         "create_and_map_document": True,
-      #         "read_document": True,
-      #         "update_document": True,
-      #         "delete_document": False,
-      #         "create_and_map_comment": True,
-      #         "read_comment": True,
-      #         "create_and_map_document_comment": True,
-      #         "read_document_comment": True,
-      #     },
-      # },
-      # "Editor": {
-      #     "Universal OrgGroup": {
-      #         "create_and_map_document": True,
-      #         "read_document": True,
-      #         "update_document": True,
-      #         "delete_document": False,
-      #         "create_and_map_comment": True,
-      #         "read_comment": True,
-      #         "create_and_map_document_comment": True,
-      #         "read_document_comment": True,
-      #     },
-      # }
+      "Reader": {
+          "Universal Metric": {
+              "create_and_map_document": True,
+              "read_document": True,
+              "update_document": True,
+              "delete_document": False,
+              "create_and_map_comment": True,
+              "read_comment": True,
+              "create_and_map_document_comment": True,
+              "read_document_comment": True,
+          },
+      },
+      "Editor": {
+          "Universal OrgGroup": {
+              "create_and_map_document": True,
+              "read_document": True,
+              "update_document": True,
+              "delete_document": False,
+              "create_and_map_comment": True,
+              "read_comment": True,
+              "create_and_map_document_comment": True,
+              "read_document_comment": True,
+          },
+      }
   }
 
   def init_factory(self, role, model, parent):
