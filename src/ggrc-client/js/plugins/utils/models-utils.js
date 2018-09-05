@@ -149,6 +149,21 @@ function isScopeModel(type) {
   return model && model.category === 'business';
 }
 
+/**
+ * Return Model Constructor Instance
+ * @param {String} type - Model type
+ * @return {CMS.Model.Cacheble|null} - Return Model Constructor
+ */
+const getModelByType = (type) => {
+  if (!type || typeof type !== 'string') {
+    console.debug('Type is not provided or has incorrect format',
+      'Value of Type is: ', type);
+    return null;
+  }
+  return allModels[type];
+};
+
+
 can.Observe.prototype.reify = function () {
   let type;
   let model;
@@ -181,4 +196,5 @@ export {
   inferObjectType,
   getInstance,
   isScopeModel,
+  getModelByType,
 };

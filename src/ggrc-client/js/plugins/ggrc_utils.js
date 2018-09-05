@@ -354,20 +354,6 @@ function getType(object) {
 }
 
 /**
- * Return Model Constructor Instance
- * @param {String} type - Model type
- * @return {CMS.Model.Cacheble|null} - Return Model Constructor
- */
-function getModelByType(type) {
-  if (!type || typeof type !== 'string') {
-    console.debug('Type is not provided or has incorrect format',
-      'Value of Type is: ', type);
-    return null;
-  }
-  return CMS.Models[type] || GGRC.Models[type];
-}
-
-/**
  * Remove all HTML tags from the string
  * @param {String} originalText - original string for parsing
  * @return {string} - plain text without tags
@@ -465,7 +451,6 @@ export {
   getMappableTypes,
   isMappableType,
   allowedToMap,
-  getModelByType,
   getPlainText,
   getHighestAssigneeRole,
   getAssigneeType,

@@ -3,10 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {
-  getModelByType,
-  getMappableTypes,
-} from '../../plugins/ggrc_utils';
+import {getMappableTypes} from '../../plugins/ggrc_utils';
+import {getModelByType} from '../../plugins/utils/models-utils';
 import Join from '../join-models/join';
 
 /*
