@@ -7,7 +7,6 @@ import * as StateUtils from '../../plugins/utils/state-utils';
 import {
   getCounts,
 } from '../../plugins/utils/widgets-utils';
-import Permission from '../../permission';
 import TreeLoader from './tree-loader';
 import TreeViewNode from './tree-view-node';
 import TreeViewOptions from './tree-view-options';
@@ -33,7 +32,6 @@ export default TreeLoader({
     find_function: null,
     options_property: 'tree_view_options',
     allow_reading: true,
-    allow_mapping: true,
     allow_creating: true,
     child_options: [], // this is how we can make nested configs. if you want to use an existing
     // example child option:
@@ -73,7 +71,6 @@ export default TreeLoader({
   },
 
   init: function (el, opts) {
-    let setAllowMapping;
     let states = StateUtils.getStatesForModel(this.options.model.shortName);
 
     let filterStates = states.map(function (state) {
@@ -91,21 +88,6 @@ export default TreeLoader({
 
     this.options.attr('is_subtree',
       this.element && this.element.closest('.inner-tree').length > 0);
-
-    if ('parent_instance' in opts && 'status' in opts.parent_instance) {
-      setAllowMapping = function () {
-        let isAccepted = opts.parent_instance.attr('status') === 'Accepted';
-        let admin = Permission.is_allowed('__GGRC_ADMIN__');
-        this.options.attr('allow_mapping_or_creating',
-          (admin || !isAccepted) &&
-          (this.options.allow_mapping || this.options.allow_creating));
-      }.bind(this);
-      setAllowMapping();
-      opts.parent_instance.bind('change', setAllowMapping);
-    } else {
-      this.options.attr('allow_mapping_or_creating',
-        this.options.allow_mapping || this.options.allow_creating);
-    }
 
     this.options.update_count =
       _.isBoolean(this.element.data('update-count')) ?

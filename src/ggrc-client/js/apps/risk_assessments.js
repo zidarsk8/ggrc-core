@@ -45,7 +45,6 @@ RiskAssessmentsExtension.init_widgets = function () {
             '/risk_assessments/tree_add_item.mustache',
           parent_instance: pageInstance,
           model: RiskAssessment,
-          allow_mapping: false,
         },
       },
     };

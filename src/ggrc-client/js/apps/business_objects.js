@@ -217,7 +217,6 @@ _.assign(CoreExtension, {
     extraContentOptions = applyMixins({
       business_objects: {
         Audit: {
-          allow_mapping: true,
           add_item_view: path + '/audits/tree_add_item.mustache',
         },
       },
@@ -226,28 +225,23 @@ _.assign(CoreExtension, {
           'business_objects',
         ],
         Person: {
-          allow_mapping: true,
           allow_creating: true,
         },
       },
       Audit: {
         _mixins: ['business_objects'],
         Program: {
-          allow_mapping: false,
           allow_creating: false,
         },
         Assessment: {
-          allow_mapping: true,
           add_item_view: path + '/assessments/tree_add_item.mustache',
         },
         AssessmentTemplate: {
-          allow_mapping: false,
           add_item_view: GGRC.mustache_path +
             '/assessment_templates/tree_add_item.mustache',
         },
         Person: {
           content_controller_options: {
-            allow_mapping: false,
             allow_creating: false,
           },
         },
@@ -277,14 +271,12 @@ _.assign(CoreExtension, {
         _mixins: ['business_objects'],
         Audit: {
           allow_creating: false,
-          allow_mapping: true,
           add_item_view: path + '/audits/tree_add_item.mustache',
         },
       },
       AssessmentTemplate: {
         Audit: {
           allow_creating: false,
-          allow_mapping: true,
         },
       },
       Risk: {
@@ -344,7 +336,6 @@ _.assign(CoreExtension, {
         if (modelName !== 'Audit' || !/dashboard/.test(window.location)) {
           can.extend(options, {
             allow_creating: false,
-            allow_mapping: true,
           });
         }
       });

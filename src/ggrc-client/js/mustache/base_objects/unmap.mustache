@@ -3,22 +3,22 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#if options.allow_mapping}}
-    {{#is_allowed_to_map instance page_instance}}
-      {{^is_dashboard_or_all}}
-        {{#options.isDirectlyRelated}}
-          <li class="border">
-              <unmap-button {source}="parentInstance"
-              {{#if instance.snapshot}}
-                {destination}="instance.snapshot"
-              {{else}}
-                {destination}="instance"
-              {{/if}}
-              class="unmap-link">
-                  <i class="fa fa-ban"></i>Unmap
-              </unmap-button>
-          </li>
-        {{/options.directlyRelated}}
-      {{/is_dashboard_or_all}}
-    {{/is_allowed_to_map}}
-{{/if}}
+
+{{#is_allowed_to_map instance page_instance}}
+  {{^is_dashboard_or_all}}
+    {{#options.isDirectlyRelated}}
+      <li class="border">
+          <unmap-button {source}="parentInstance"
+          {{#if instance.snapshot}}
+            {destination}="instance.snapshot"
+          {{else}}
+            {destination}="instance"
+          {{/if}}
+          class="unmap-link">
+              <i class="fa fa-ban"></i>Unmap
+          </unmap-button>
+      </li>
+    {{/options.directlyRelated}}
+  {{/is_dashboard_or_all}}
+{{/is_allowed_to_map}}
+

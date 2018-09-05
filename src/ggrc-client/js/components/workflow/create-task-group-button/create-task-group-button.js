@@ -12,7 +12,6 @@ const viewModel = can.Map.extend({
       get() {
         const workflow = this.attr('workflow');
         return (
-          this.attr('allowMappingOrCreating') &&
           this.attr('allowCreating') &&
           Permission.is_allowed_for('update', workflow) &&
           workflow.attr('status') !== 'Inactive'
@@ -20,7 +19,6 @@ const viewModel = can.Map.extend({
       },
     },
   },
-  allowMappingOrCreating: false,
   allowCreating: false,
   workflow: null,
   needToUpdateRelatedItems: false,

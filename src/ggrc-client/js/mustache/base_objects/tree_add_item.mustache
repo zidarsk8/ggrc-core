@@ -4,7 +4,6 @@
 }}
 
 {{#is_allowed_to_map parent_instance model.shortName}}
-{{#if allow_mapping_or_creating}}
   {{^if parent_instance.archived}}
       <a
         class="btn btn-mini action-button map-button"
@@ -19,5 +18,4 @@
         Map
       </a>
   {{/if}}
-{{/if}}
 {{/is_allowed_to_map}}    

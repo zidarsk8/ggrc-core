@@ -48,7 +48,6 @@ import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import Pagination from '../base-objects/pagination';
 import tracker from '../../tracker';
 import router from '../../router';
-import Permission from '../../permission';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import Cacheable from '../../models/cacheable';
 import Relationship from '../../models/service-models/relationship';
@@ -128,19 +127,6 @@ viewModel = can.Map.extend({
         return this.attr('options').parent_instance;
       },
     },
-    allow_mapping: {
-      type: Boolean,
-      get: function () {
-        let allowMapping = true;
-        let options = this.attr('options');
-
-        if ('allow_mapping' in options) {
-          allowMapping = options.allow_mapping;
-        }
-
-        return allowMapping;
-      },
-    },
     allow_creating: {
       type: Boolean,
       get: function () {
@@ -171,7 +157,6 @@ viewModel = can.Map.extend({
   /**
    *
    */
-  allow_mapping_or_creating: null,
   sortingInfo: {
     sortDirection: null,
     sortBy: null,
@@ -608,29 +593,8 @@ export default can.Component.extend({
   template,
   viewModel,
   init: function () {
-    let viewModel = this.viewModel;
-    let parentInstance = viewModel.attr('parent_instance');
-    let allowMapping = viewModel.attr('allow_mapping');
-    let allowCreating = viewModel.attr('allow_creating');
-
-    function setAllowMapping() {
-      let isAccepted = parentInstance.attr('status') === 'Accepted';
-      let admin = Permission.is_allowed('__GGRC_ADMIN__');
-
-      viewModel.attr('allow_mapping_or_creating',
-        (admin || !isAccepted) && (allowMapping || allowCreating));
-    }
-
-    if (parentInstance && 'status' in parentInstance) {
-      setAllowMapping();
-      parentInstance.bind('change', setAllowMapping);
-    } else {
-      viewModel.attr('allow_mapping_or_creating',
-        allowMapping || allowCreating);
-    }
-
-    viewModel.setColumnsConfiguration();
-    viewModel.setSortingConfiguration();
+    this.viewModel.setColumnsConfiguration();
+    this.viewModel.setSortingConfiguration();
   },
   events: {
     '{viewModel.pageInfo} current': function () {
