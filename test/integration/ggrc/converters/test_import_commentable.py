@@ -45,6 +45,7 @@ SCOPING_MODELS = [
 RECIPIENTS = ["Admin", "Primary Contacts", "Secondary Contacts"]
 
 SCOPING_RECIPIENTS = ["Admin", "Primary Contacts", "Secondary Contacts",
+                      "Assignee", "Verifier", "Compliance Contacts",
                       "Product Managers", "Technical / Program Managers",
                       "Technical Leads", "System Owners", "Legal Counsels"]
 
@@ -76,6 +77,9 @@ class TestCommentableImport(TestCase):
         ("Send by default", send_by_default),
     ]
     model_cls = inflector.get_model(model_name)
+    if model_name in SCOPING_MODELS:
+      import_data.append(("Assignee", "user@example.com"))
+      import_data.append(("Verifier", "user@example.com"))
     if model_name == "Control":
       import_data.append(("Assertions*", "Privacy"))
     if issubclass(model_cls, AuditRelationship):

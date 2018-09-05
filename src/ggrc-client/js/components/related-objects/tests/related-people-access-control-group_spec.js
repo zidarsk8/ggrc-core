@@ -117,6 +117,17 @@ describe('related-people-access-control-group component', () => {
         viewModel.addPerson(peopleList[0], viewModel.attr('groupId'));
         expect(viewModel.attr('people').length).toBe(1);
       });
+
+      it('should replace person if singleUserRole attr is truthy',
+        () => {
+          viewModel.attr('singleUserRole', true);
+
+          viewModel.addPerson(peopleList[1], viewModel.attr('groupId'));
+
+          let people = viewModel.attr('people');
+          expect(people.length).toBe(1);
+          expect(people[0]).toEqual(jasmine.objectContaining(peopleList[1]));
+        });
     });
 
     describe('"removePerson" method', () => {

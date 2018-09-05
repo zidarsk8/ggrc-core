@@ -28,7 +28,7 @@ class TestACLPropagation(TestCase):
 
   READ_COLLECTION_OPERATIONS = ["read_revisions", "get_latest_version"]
 
-  QUERY_API_OPERATIONS = ["read_comments"]
+  QUERY_API_OPERATIONS = ["read_comments", "read_document_comments"]
 
   def setup_people(self):
     """Setup people with global roles."""

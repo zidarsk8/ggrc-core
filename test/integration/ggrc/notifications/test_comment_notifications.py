@@ -205,6 +205,7 @@ class TestCommentNotification(TestCase):
     """
     if obj_factory in self.SCOPING_OBJECT_FACTORIES:
       recipient_types = ["Admin", "Primary Contacts", "Secondary Contacts",
+                         "Assignee", "Compliance Contacts", "Verifier",
                          "Product Managers", "Technical / Program Managers",
                          "Technical Leads", "System Owners", "Legal Counsels"]
     else:
