@@ -403,6 +403,20 @@ class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
       PRIMARY_CONTACTS)
 
 
+class AuditModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+ fields for Audits.
+ """
+  MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
+      "Audit")
+  AUDITORS = "Auditors"
+  AUDIT_CAPTAINS = "Audit Captains"
+  DEFAULT_SET_FIELDS = (
+      CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
+      CommonModalSetVisibleFields.STATE,
+      CommonModalSetVisibleFields.LAST_UPDATED_BY, AUDITORS, AUDIT_CAPTAINS)
+
+
 class MappingStatusAttrs(namedtuple('_MappingStatusAttrs',
                                     ['title', 'is_checked', 'is_disabled'])):
   """Class for representation of html attributes for mapping checkboxes

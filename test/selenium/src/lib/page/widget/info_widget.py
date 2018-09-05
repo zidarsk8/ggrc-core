@@ -14,13 +14,13 @@ from lib.constants.locator import WidgetInfoAssessment, WidgetInfoControl
 from lib.element import widget_info, tab_containers, tables
 from lib.page.modal import update_object
 from lib.page.modal.set_value_for_asmt_ca import SetValueForAsmtDropdown
-from lib.page.widget import page_tab, page_elements
+from lib.page.widget import page_tab, page_elements, object_modal
 from lib.page.widget.page_mixins import (WithAssignFolder, WithObjectReview,
                                          WithPageElements)
 from lib.utils import selenium_utils, string_utils, help_utils, ui_utils
 
 
-class InfoWidget(page_tab.WithPageTab, WithPageElements, base.Widget):
+class InfoWidget(WithPageElements, base.Widget):
   """Abstract class of common info for Info pages and Info panels.
   For labels (headers) Will be used actual unicode elements from UI or pseudo
   string elements from 'lib.element' module in upper case.
@@ -37,6 +37,7 @@ class InfoWidget(page_tab.WithPageTab, WithPageElements, base.Widget):
   def __init__(self, driver):
     super(InfoWidget, self).__init__(driver)
     self.child_cls_name = self.__class__.__name__
+    self.obj_name = objects.get_singular(self.child_cls_name)
     self.is_asmts_info_widget = (
         self.child_cls_name.lower() == objects.ASSESSMENTS)
     self.list_all_headers_txt = []
@@ -104,7 +105,9 @@ class InfoWidget(page_tab.WithPageTab, WithPageElements, base.Widget):
     if not self.is_asmts_info_widget:
       self._extend_list_all_scopes_by_code()
     self.comment_area = self._comment_area()
-    self.edit_popup = self._edit_popup()
+    self.edit_popup = object_modal.get_modal_obj(self.obj_name, self._driver)
+    self.top_tabs = page_tab.Tabs(self._browser, page_tab.Tabs.TOP)
+    self.tabs = page_tab.Tabs(self._browser, page_tab.Tabs.INTERNAL)
 
   def wait_save(self):
     """Wait for object to be saved and page to be updated.
@@ -126,6 +129,26 @@ class InfoWidget(page_tab.WithPageTab, WithPageElements, base.Widget):
     return (element.ReviewStates.REVIEWED if selenium_utils.is_element_exist(
         self.info_widget_elem, self._locators.TXT_OBJECT_REVIEWED) else
         element.ReviewStates.UNREVIEWED)
+
+  def _get_url_match(self):
+    """Returns instance of re.MatchObject for current page url."""
+    current_url = self._browser.url
+    pattern = r"/{}/(\d+)".format(objects.get_plural(self.obj_name))
+    return re.search(pattern, current_url)
+
+  def get_url(self):
+    """Gets url of the page if it is info page."""
+    match = self._get_url_match()
+    if match:
+      return match.string
+    return None
+
+  def get_obj_id(self):
+    """Gets id of the object (if possible)."""
+    match = self._get_url_match()
+    if match:
+      return match.group(1)
+    return None
 
   def show_related_assessments(self):
     """Click `Assessments` button on control or objective page and return
@@ -211,6 +234,15 @@ class InfoWidget(page_tab.WithPageTab, WithPageElements, base.Widget):
     return (people_header_txt,
             None if people_value_txt == ["None"] else people_value_txt)
 
+  def description(self):
+    """Returns the text of description."""
+    return self._description_field().text
+
+  @property
+  def admins(self):
+    """Returns Admin page element."""
+    return self._related_people_list("Admin")
+
   def global_custom_attributes(self):
     """Returns GCA values."""
     return self.get_custom_attributes()
@@ -258,13 +290,26 @@ class InfoWidget(page_tab.WithPageTab, WithPageElements, base.Widget):
     if not is_inline:
       self.edit_popup.save_and_close()
 
+  def obj_scope(self):
+    """Returns dict of object."""
+    scope = {
+        "description": self.description(),
+        "custom_attributes": self.global_custom_attributes(),
+        "url": self.get_url(),
+        "id": self.get_obj_id()
+    }
+    self.update_obj_scope(scope)
+    return scope
+
+  def update_obj_scope(self, scope):
+    """Updates obj scope. May be overridden in the child class."""
+    pass
+
   def get_info_widget_obj_scope(self):
     """Get dict from object (text scope) which displayed on info page or
     info panel according to list of headers text and list of values text.
     """
-    obj_scope = {
-        "custom_attributes": self.global_custom_attributes()
-    }
+    obj_scope = self.obj_scope()
     obj_scope.update(zip(self.list_all_headers_txt, self.list_all_values_txt))
     return obj_scope
 
@@ -353,10 +398,6 @@ class Programs(WithObjectReview, InfoWidget):
         self.tab_container.active_tab_elem,
         self._locators.TOGGLE_SHOW_ADVANCED)
     self.show_advanced.toggle()
-    self.description = base.Label(
-        self.tab_container.active_tab_elem, self._locators.DESCRIPTION)
-    self.description_entered = base.Label(
-        self.tab_container.active_tab_elem, self._locators.DESCRIPTION_ENTERED)
     self.manager, self.manager_entered = (
         self.get_header_and_value_txt_from_people_scopes(
             self._elements.PROGRAM_MANAGERS.upper()))
@@ -478,22 +519,35 @@ class Assessments(InfoWidget):
          self.verifiers_txt, self.mapped_objects_titles_txt,
          self.comments_scopes_txt, self.asmt_type_txt])
 
+  def update_obj_scope(self, scope):
+    """Updates obj scope."""
+    scope.update(
+        custom_attributes=self.custom_attributes(),
+        evidence_urls=self.evidence_urls.get_urls(),
+        primary_contacts=self.primary_contacts.get_people_emails()
+    )
+
+  def description(self):
+    """Switch to tab with description and return a text of description."""
+    self.tabs.ensure_tab(self._other_attributes_tab_name)
+    return self._assessment_form_field("Description").text
+
   @property
   def evidence_urls(self):
     """Switch to tab with evidence urls and return a page element"""
-    self.ensure_tab(self._assessment_tab_name)
+    self.tabs.ensure_tab(self._assessment_tab_name)
     return self._assessment_evidence_urls()
 
   @property
   def primary_contacts(self):
     """Switch to tab with primary contacts and return a page element"""
-    self.ensure_tab(self._other_attributes_tab_name)
+    self.tabs.ensure_tab(self._other_attributes_tab_name)
     return self._related_people_list("Primary Contacts")
 
   @property
   def assignees(self):
     """Switch to tab with assignees and return a page element."""
-    self.ensure_tab(self._assessment_tab_name)
+    self.tabs.ensure_tab(self._assessment_tab_name)
     return self._related_people_list("Assignees")
 
   def _get_mapped_objs_titles_txt(self):
@@ -514,35 +568,35 @@ class Assessments(InfoWidget):
     self.core_elem = self.tab_container.active_tab_elem
     self.mapped_objects_titles_txt += self._get_mapped_objs_titles_txt()
     self._extend_list_all_scopes_by_code()
-    custom_attributes = self.global_custom_attributes()
-    custom_attributes.update(self.local_custom_attributes())
-    obj_scope = {
-        "custom_attributes": custom_attributes,
-        "evidence_urls": self.evidence_urls.get_urls(),
-        "primary_contacts": self.primary_contacts.get_people_emails()
-    }
+    obj_scope = self.obj_scope()
     obj_scope.update(zip(self.list_all_headers_txt, self.list_all_values_txt))
     return obj_scope
 
+  def custom_attributes(self):
+    """Returns the dictionary of all custom attributes."""
+    custom_attributes = self.global_custom_attributes()
+    custom_attributes.update(self.local_custom_attributes())
+    return custom_attributes
+
   def global_custom_attributes(self):
     """Switches to tab with GCA and returns their values."""
-    self.ensure_tab(self._other_attributes_tab_name)
+    self.tabs.ensure_tab(self._other_attributes_tab_name)
     return self.get_custom_attributes()
 
   def local_custom_attributes(self):
     """Switches to tab with LCA and returns their values."""
-    self.ensure_tab(self._assessment_tab_name)
+    self.tabs.ensure_tab(self._assessment_tab_name)
     custom_attributes = self.get_custom_attributes(False)
     return {k.upper(): v for k, v in custom_attributes.iteritems()}
 
   def fill_local_cas(self, custom_attributes):
     """Fills LCAs on asmt page."""
-    self.ensure_tab(self._assessment_tab_name)
+    self.tabs.ensure_tab(self._assessment_tab_name)
     self.fill_ca_values(custom_attributes, is_global=False, is_inline=True)
 
   def fill_global_cas_inline(self, custom_attributes):
     """Fills GCAs inline."""
-    self.ensure_tab(self._other_attributes_tab_name)
+    self.tabs.ensure_tab(self._other_attributes_tab_name)
     self.fill_ca_values(custom_attributes, is_global=True, is_inline=True)
 
   def _extend_list_all_scopes_by_review_state(self):
@@ -775,6 +829,12 @@ class OrgGroups(InfoWidget):
   def __init__(self, driver):
     super(OrgGroups, self).__init__(driver)
 
+  def update_obj_scope(self, scope):
+    """Updates obj scope."""
+    scope.update(
+        admin=self.admins.get_people_emails()
+    )
+
 
 class Vendors(InfoWidget):
   """Model for Vendor object Info pages and Info panels."""
@@ -859,6 +919,12 @@ class Risks(InfoWidget):
 
   def __init__(self, driver):
     super(Risks, self).__init__(driver)
+
+  def update_obj_scope(self, scope):
+    """Updates obj scope."""
+    scope.update(
+        admin=self.admins.get_people_emails()
+    )
 
 
 class Threats(InfoWidget):

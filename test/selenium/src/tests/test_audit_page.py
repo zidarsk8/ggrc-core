@@ -8,13 +8,14 @@
 
 import pytest
 
-from lib import base, environment
+from lib import base, environment, users
 from lib.constants import value_aliases as aliases, object_states
 from lib.constants.element import objects
 from lib.entities import entities_factory
 from lib.entities.entity import Representation
 from lib.factory import get_cls_rest_service
-from lib.service import webui_service, rest_service
+from lib.page.widget import object_modal
+from lib.service import webui_service, rest_service, rest_facade
 from lib.utils.string_utils import StringMethods
 
 
@@ -62,6 +63,22 @@ class TestAuditPage(base.Test):
     }
 
   @pytest.mark.smoke_tests
+  def test_create_audit(self, program, selenium):
+    """Test creation of an audit via UI."""
+    audit = entities_factory.AuditsFactory().create()
+    audits_service = webui_service.AuditsService(selenium)
+    audits_service.create_obj_via_tree_view(program, audit)
+    tree_view_audit = audits_service.get_list_objs_from_tree_view(program)[0]
+    actual_audit = audits_service.get_obj_from_info_page(tree_view_audit)
+    rest_audit = rest_facade.get_obj(actual_audit)
+    audit.update_attrs(
+        created_at=rest_audit.created_at,
+        updated_at=rest_audit.updated_at,
+        modified_by=users.current_user(),
+        slug=rest_audit.slug).repr_ui()
+    self.general_equal_assert(audit, actual_audit, "custom_attributes")
+
+  @pytest.mark.smoke_tests
   def test_asmt_tmpl_creation(self, new_program_rest, new_audit_rest,
                               selenium):
     """Check if Assessment Template can be created from Audit page via
@@ -83,67 +100,69 @@ class TestAuditPage(base.Test):
     # 'actual_asmt_tmpls': assignees, verifiers, template_object_type (None)
     self.general_equal_assert(
         [expected_asmt_tmpl], actual_asmt_tmpls,
-        "modified_by", "assignees", "verifiers", "template_object_type")
+        "modified_by", "assignees", "verifiers", "template_object_type",
+        "slug")
 
   @pytest.mark.smoke_tests
-  def test_asmt_creation(self, new_program_rest, new_audit_rest, selenium):
+  def test_asmt_creation(self, program, audit, selenium):
     """Check if Assessment can be created from Audit page via
     Assessments widget.
     Preconditions:
     - Audit created under Program via REST API.
     """
-    expected_asmt = (
-        entities_factory.AssessmentsFactory().create())
-    asmts_ui_service = webui_service.AssessmentsService(selenium)
-    asmts_ui_service.create_obj_via_tree_view(
-        src_obj=new_audit_rest, obj=expected_asmt)
-    actual_asmts_tab_count = asmts_ui_service.get_count_objs_from_tab(
-        src_obj=new_audit_rest)
-    assert len([expected_asmt]) == actual_asmts_tab_count
-    actual_asmts = asmts_ui_service.get_list_objs_from_tree_view(
-        src_obj=new_audit_rest)
-    # 'expected_asmts': modified_by (None) *factory
-    # 'actual_asmts': os_state (None)
-    self.general_equal_assert(
-        [expected_asmt], actual_asmts,
-        "modified_by", "os_state", "assessment_type")
+    asmt = entities_factory.AssessmentsFactory().create()
+    asmts_service = webui_service.AssessmentsService(selenium)
+    asmts_service.create_obj_via_tree_view(src_obj=audit, obj=asmt)
+    tree_view_asmt = asmts_service.get_list_objs_from_tree_view(audit)[0]
+    actual_asmt = asmts_service.get_obj_from_info_page(tree_view_asmt)
+    rest_asmt = rest_facade.get_obj(actual_asmt)
+    asmt.update_attrs(
+        created_at=rest_asmt.created_at,
+        updated_at=rest_asmt.updated_at,
+        modified_by=rest_asmt.modified_by
+    ).repr_ui()
+    self.general_equal_assert(asmt, actual_asmt, "custom_attributes")
+
+  @pytest.mark.smoke_tests
+  def test_mapped_objs_titles_in_create_modal(
+      self, program, control_mapped_to_program, audit, selenium
+  ):
+    """Test that mapped objects appear in modal after mapping."""
+    webui_service.AssessmentsService(selenium).open_widget_of_mapped_objs(
+        audit).tree_view.open_create()
+    create_asmt_modal = object_modal.AssessmentModal(selenium)
+    create_asmt_modal.map_objects([control_mapped_to_program])
+    actual_titles = create_asmt_modal.get_mapped_snapshots_titles()
+    assert actual_titles == [control_mapped_to_program.title]
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
-      "dynamic_objects, dynamic_relationships",
-      [("new_control_rest", "map_new_program_rest_to_new_control_rest"),
-       ("new_objective_rest", "map_new_program_rest_to_new_objective_rest")],
+      "obj",
+      ["control_mapped_to_program", "objective_mapped_to_program"],
       indirect=True)
   def test_asmt_creation_with_mapping(
-      self, new_program_rest, dynamic_objects, dynamic_relationships,
-      new_audit_rest, selenium
+      self, program, obj, audit, selenium
   ):
     """Check if Assessment can be created with mapped snapshot via
-    Modal Create on Assessments TreeView. Additional check existing of
-    mapped objs Titles on Modal Create.
-    Preconditions:
-    - Program, dynamic_objects created via REST API.
-    - dynamic_objects mapped to Program via REST API.
-    - Audit created under Program via REST API.
-    Test parameters:
-    - 'dynamic_objects'.
-    - 'dynamic_relationships'.
+    Modal Create on Assessments TreeView.
+    Objects structure:
+    Program
+    -> Obj (Control or Objective)
+    -> Audit
     """
     expected_asmt = (
-        entities_factory.AssessmentsFactory().create(
-            mapped_objects=[dynamic_objects]))
-    expected_titles = [dynamic_objects.title]
-    asmts_ui_service = webui_service.AssessmentsService(selenium)
-    actual_titles = (
-        asmts_ui_service.create_obj_and_get_mapped_titles_from_modal(
-            src_obj=new_audit_rest, obj=expected_asmt))
-    assert expected_titles == actual_titles
-    actual_asmt = asmts_ui_service.get_list_objs_from_info_panels(
-        src_obj=new_audit_rest, objs=expected_asmt)
-    expected_asmt = expected_asmt.repr_ui()
-    # 'expected_asmt': custom_attributes (None) *factory
-    self.general_equal_assert(
-        expected_asmt, actual_asmt, "custom_attributes")
+        entities_factory.AssessmentsFactory().create(mapped_objects=[obj]))
+    asmts_service = webui_service.AssessmentsService(selenium)
+    asmts_service.create_obj_via_tree_view(src_obj=audit, obj=expected_asmt)
+    tree_view_asmt = asmts_service.get_list_objs_from_tree_view(audit)[0]
+    actual_asmt = asmts_service.get_obj_from_info_page(tree_view_asmt)
+    rest_asmt = rest_facade.get_obj(actual_asmt)
+    expected_asmt.update_attrs(
+        created_at=rest_asmt.created_at,
+        updated_at=rest_asmt.updated_at,
+        modified_by=users.current_user(),
+        slug=rest_asmt.slug).repr_ui()
+    self.general_equal_assert(expected_asmt, actual_asmt, "custom_attributes")
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(

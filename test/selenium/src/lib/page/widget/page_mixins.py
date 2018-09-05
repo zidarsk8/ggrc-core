@@ -26,9 +26,13 @@ class WithPageElements(base.WithBrowser):
     """Return CommentArea page element"""
     return page_elements.CommentArea(self._browser)
 
-  def _edit_popup(self):
-    """Returns Edit popup page element."""
-    return page_elements.EditPopup(self._browser)
+  def _description_field(self):
+    """Returns DescriptionField page element."""
+    return page_elements.DescriptionField(self._browser)
+
+  def _assessment_form_field(self, label):
+    """Returns AssessmentFormField page element."""
+    return page_elements.AssessmentFormField(self._browser, label)
 
 
 class WithAssignFolder(base.WithBrowser):

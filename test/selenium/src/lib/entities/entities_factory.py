@@ -404,6 +404,55 @@ class ObjectivesFactory(EntitiesFactory):
     return objective_obj
 
 
+class RisksFactory(EntitiesFactory):
+  """Factory class for Risks entities."""
+
+  def __init__(self):
+    super(RisksFactory, self).__init__(objects.RISKS)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.RISK_ADMINS, [users.current_user()])
+    ]
+
+  def _create_random_obj(self, is_add_rest_attrs):
+    """Creates Risk entity with randomly and predictably filled fields, if
+    'is_add_rest_attrs' then add attributes for REST."""
+    obj = self.obj_inst().update_attrs(
+        title=self.obj_title, slug=self.obj_slug,
+        description=self.generate_string("description"),
+        status=unicode(object_states.DRAFT),
+        os_state=unicode(element.ReviewStates.UNREVIEWED))
+    if is_add_rest_attrs:
+      obj.update_attrs(
+          recipients=",".join((
+              unicode(roles.ADMIN), unicode(roles.PRIMARY_CONTACTS),
+              unicode(roles.SECONDARY_CONTACTS))))
+    return obj
+
+
+class OrgGroupsFactory(EntitiesFactory):
+  """Factory class for Org Groups entities."""
+
+  def __init__(self):
+    super(OrgGroupsFactory, self).__init__(objects.ORG_GROUPS)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.ORG_GROUPS_ADMINS, [users.current_user()])
+    ]
+
+  def _create_random_obj(self, is_add_rest_attrs):
+    """Creates OrgGroup entity with randomly and predictably filled fields, if
+    'is_add_rest_attrs' then add attributes for REST."""
+    obj = self.obj_inst().update_attrs(
+        title=self.obj_title, slug=self.obj_slug,
+        status=unicode(object_states.DRAFT),
+        os_state=unicode(element.ReviewStates.UNREVIEWED))
+    if is_add_rest_attrs:
+      obj.update_attrs(
+          recipients=",".join((
+              unicode(roles.ADMIN), unicode(roles.PRIMARY_CONTACTS),
+              unicode(roles.SECONDARY_CONTACTS))))
+    return obj
+
+
 class AuditsFactory(EntitiesFactory):
   """Factory class for Audit entity."""
   def __init__(self):
@@ -431,7 +480,7 @@ class AuditsFactory(EntitiesFactory):
     'is_add_rest_attrs' then add attributes for REST."""
     audit_obj = self.obj_inst().update_attrs(
         title=self.obj_title, slug=self.obj_slug,
-        os_state=unicode(object_states.PLANNED))
+        status=unicode(object_states.PLANNED))
     return audit_obj
 
 
