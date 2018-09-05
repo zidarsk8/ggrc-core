@@ -33,7 +33,6 @@ import {
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 import tracker from '../../tracker';
 import {
-  isMapped as isMappedUtil,
   allowedToMap,
 } from '../../plugins/ggrc_utils';
 import Mappings from '../../models/mappers/mappings';
@@ -286,9 +285,7 @@ export default can.Component.extend({
         data.context = instance.context || null;
         objects.forEach((destination) => {
           let modelInstance;
-          let isMapped;
           let isAllowed;
-          let isPersonMapping = type === 'Person';
           // Use simple Relationship Model to map Snapshot
           if (this.viewModel.attr('useSnapshots')) {
             modelInstance = new Relationship({
@@ -304,10 +301,9 @@ export default can.Component.extend({
             return defer.push(modelInstance.save());
           }
 
-          isMapped = isMappedUtil(instance, destination);
           isAllowed = allowedToMap(instance, destination);
 
-          if ((!isPersonMapping && isMapped) || !isAllowed) {
+          if (!isAllowed) {
             return;
           }
           mapping = Mappings.get_canonical_mapping(object, type);

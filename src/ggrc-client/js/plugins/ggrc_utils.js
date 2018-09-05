@@ -196,33 +196,6 @@ function hasPending(parentInstance, instance, how) {
   });
 }
 
-function isMapped(target, destination, mapping) {
-  let tablePlural;
-  let bindings;
-
-  // Should check all passed arguments are presented
-  if (!target || !destination) {
-    console.error('Incorrect arguments list: ', arguments); // eslint-disable-line
-    return false;
-  }
-  if (_.isUndefined(mapping)) {
-    tablePlural = CMS.Models[destination.type].table_plural;
-    mapping = (Mappings.has_binding(tablePlural, target) ? '' : 'related_') +
-      tablePlural;
-  }
-  bindings = Mappings.get_binding(mapping, target);
-  if (bindings && bindings.list && bindings.list.length) {
-    return _.find(bindings.list, function (item) {
-      return item.instance.id === destination.id;
-    });
-  }
-  if (target.objects && target.objects.length) {
-    return _.find(target.objects, function (item) {
-      return item.id === destination.id && item.type === destination.type;
-    });
-  }
-}
-
 /**
  * Get list of mappable objects for certain type
  *
@@ -489,7 +462,6 @@ export {
   getPickerElement,
   loadScript,
   hasPending,
-  isMapped,
   getMappableTypes,
   isMappableType,
   allowedToMap,
