@@ -5,13 +5,19 @@
 
 {{#switch attr_name}}
   {{#case 'contact'}}
-      <tree-field {source}="instance.contact" {field}="'email'"/>
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.contact" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
   {{/case}}
   {{#case 'secondary_contact'}}
-      <tree-field {source}="instance.secondary_contact" {field}="'email'"/>
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.secondary_contact" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
   {{/case}}
   {{#case 'network_zone'}}
-    <tree-field {source}="instance.network_zone"/>
+    <model-loader {path}="'service-models/option'">
+      <tree-field {source}="instance.network_zone" {type}="loadedModel"/>
+    </model-loader>
   {{/case}}
   {{#case 'design'}}
     {{#using design=instance.design}}
@@ -31,11 +37,15 @@
     {{/using}}
   {{/case}}
   {{#case 'type'}}
-    <tree-field {source}="instance.kind"/>
+    <model-loader {path}="'service-models/option'">
+      <tree-field {source}="instance.kind" {type}="loadedModel"/>
+    </model-loader>
   {{/case}}
 
   {{#case 'modified_by'}}
-      <tree-field {source}="instance.modified_by" {field}="'email'"/>
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.modified_by" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
   {{/case}}
   {{#case 'created_at'}}
       {{localize_date instance.created_at}}

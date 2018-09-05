@@ -8,6 +8,7 @@ import '../tree/tree-visible-column-checkbox';
 import tmpl from './templates/mapper-results-columns-configuration.mustache';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import DisplayPrefs from '../../models/local-storage/display-prefs';
+import * as businessModels from '../../models/business-models';
 
 export default can.Component.extend({
   tag: 'mapper-results-columns-configuration',
@@ -39,7 +40,7 @@ export default can.Component.extend({
       });
     },
     getModel() {
-      return CMS.Models[this.attr('modelType')];
+      return businessModels[this.attr('modelType')];
     },
     initializeColumns() {
       const selectedColumns = this.attr('selectedColumns');

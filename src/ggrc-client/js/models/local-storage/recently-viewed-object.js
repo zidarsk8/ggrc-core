@@ -4,6 +4,7 @@
 */
 
 import LocalStorage from './local-storage';
+import * as businessObjects from '../business-models';
 
 export default LocalStorage('GGRC.Models.RecentlyViewedObject', {
   newInstance: function (attrs) {
@@ -24,6 +25,6 @@ export default LocalStorage('GGRC.Models.RecentlyViewedObject', {
   },
 }, {
   init: function () {
-    this.attr('model', GGRC.Models[this.type] || CMS.Models[this.type]);
+    this.attr('model', businessObjects[this.type]);
   },
 });

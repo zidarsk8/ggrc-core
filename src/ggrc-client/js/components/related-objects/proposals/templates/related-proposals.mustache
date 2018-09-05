@@ -4,12 +4,14 @@
 }}
 
 {{#baseInstance}}
+<model-loader {path}="'service-models/proposal'">
   <related-objects
     class="object-history"
     initial-order-by="status,created_at"
     {predefined-filter}="predefinedFilter"
     {base-instance}="baseInstance"
     {(related-objects)}="proposals"
+    {model-constructor}="loadedModel"
     related-items-type="Proposal">
 
     <div class="grid-data__toolbar flex-box">
@@ -44,4 +46,5 @@
       </object-list>
     </div>
   </related-objects>
+</model-loader>
 {{/baseInstance}}

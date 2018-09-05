@@ -12,6 +12,7 @@ import '../../components/collapsible-panel/collapsible-panel';
 import '../../components/unified-mapper/mapper-results';
 import '../../components/mapping-controls/mapping-type-selector';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
+import * as businessModels from '../../models/business-models';
 import template from './object-generator.mustache';
 
 /**
@@ -60,7 +61,7 @@ export default can.Component.extend({
       let object = this.viewModel.attr('object');
       let assessmentTemplate =
         this.viewModel.attr('assessmentTemplate');
-      let instance = CMS.Models[object].findInCacheById(
+      let instance = businessModels[object].findInCacheById(
         this.viewModel.attr('join_object_id'));
 
       ev.preventDefault();

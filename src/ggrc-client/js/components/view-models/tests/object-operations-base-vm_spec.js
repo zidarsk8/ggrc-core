@@ -6,7 +6,7 @@
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import ObjectOperationsBaseVM from '../object-operations-base-vm';
 import Mappings from '../../../models/mappers/mappings';
-import * as modelsExtensions from '../../../models/models-extensions';
+import * as modelsUtils from '../../../plugins/utils/models-utils';
 
 describe('object-operations-base viewModel', function () {
   'use strict';
@@ -37,7 +37,7 @@ describe('object-operations-base viewModel', function () {
 
   describe('get() for baseVM.parentInstance', function () {
     beforeEach(function () {
-      spyOn(modelsExtensions, 'getInstance')
+      spyOn(modelsUtils, 'getInstance')
         .and.returnValue('parentInstance');
     });
 

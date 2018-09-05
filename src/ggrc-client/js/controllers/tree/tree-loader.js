@@ -4,14 +4,6 @@
  */
 
 (function (can, $) {
-  can.Map.extend('CMS.Models.TreeViewOptions', {
-    defaults: {
-      instance: undefined,
-      parent: null,
-      children_drawn: false,
-    },
-  }, {});
-
   can.Control.extend('CMS.Controllers.TreeLoader', {
     defaults: {},
   }, {

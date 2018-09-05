@@ -28,6 +28,7 @@ import TaskGroup from '../models/business-models/task-group';
 import Workflow from '../models/business-models/workflow';
 import Person from '../models/business-models/person';
 import Stub from '../models/stub';
+import * as businessModels from '../models/business-models';
 
 (function ($, CMS, GGRC) {
   let WorkflowExtension = {};
@@ -251,7 +252,7 @@ import Stub from '../models/stub';
 
     // Insert `workflows` mappings to all business object types
     can.each(_workflowObjectTypes, function (type) {
-      let model = CMS.Models[type];
+      let model = businessModels[type];
       if (model === undefined || model === null) {
         return;
       }
@@ -278,7 +279,7 @@ import Stub from '../models/stub';
         mappings[type].workflows,
       ]);
 
-      CMS.Models[type].attributes.task_group_objects = Stub.List;
+      businessModels[type].attributes.task_group_objects = Stub.List;
     });
     new Mappings('ggrc_workflows', mappings);
   };

@@ -7,16 +7,14 @@ import {
   waitsFor,
   makeFakeInstance,
 } from '../spec_helpers';
-import DisplayPrefs from '../../js/models/local-storage/display-prefs';
+import DisplayPrefs, * as exp from '../../js/models/local-storage/display-prefs';
 import LocalStorage from '../../js/models/local-storage/local-storage';
 
 describe('display prefs model', function () {
 
   let display_prefs;
-  let exp;
   beforeAll(function () {
     display_prefs = makeFakeInstance({model: DisplayPrefs})();
-    exp = DisplayPrefs.exports;
   });
 
   afterEach(function () {

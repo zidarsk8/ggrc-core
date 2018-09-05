@@ -4,11 +4,13 @@
 */
 
 import RefreshQueue from '../models/refresh_queue';
+
 const TOOLTIP_ITEMS_LIMIT = 5;
 
 const viewModel = can.Map.extend({
   field: 'title',
   source: null,
+  type: null,
   items: [],
   resultStr: '',
   showTooltip: true,
@@ -61,9 +63,10 @@ const viewModel = can.Map.extend({
   },
   loadItems: function (items) {
     const rq = new RefreshQueue();
+    const Type = this.attr('type');
 
     can.each(items, function (item) {
-      rq.enqueue(CMS.Models[item.type].model(item));
+      rq.enqueue(Type.model(item));
     });
 
     return rq.trigger();

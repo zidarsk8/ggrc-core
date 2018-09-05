@@ -40,6 +40,7 @@ export default can.Component.extend({
       },
     },
     baseInstance: null,
+    modelConstructor: null,
     relatedItemsType: '@',
     orderBy: {},
     initialOrderBy: '@',
@@ -95,10 +96,11 @@ export default can.Component.extend({
       batchRequests(params)
         .done(function (data) {
           let relatedType = this.attr('relatedItemsType');
+          let ModelConstructor = this.attr('modelConstructor');
           let values = data[relatedType].values;
           let result = values.map(function (item) {
             return {
-              instance: CMS.Models[relatedType].model(item),
+              instance: ModelConstructor.model(item),
             };
           });
           // Update paging object

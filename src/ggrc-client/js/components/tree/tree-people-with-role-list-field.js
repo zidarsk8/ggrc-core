@@ -6,6 +6,7 @@
 import {
   peopleWithRoleName,
 } from '../../plugins/utils/acl-utils';
+import Person from '../../models/business-models/person';
 
 const viewModel = can.Map.extend({
   define: {
@@ -19,10 +20,16 @@ const viewModel = can.Map.extend({
   },
   instance: {},
   role: '',
+  type: Person,
 });
 
 export default can.Component.extend('treePeopleWithRoleListField', {
   tag: 'tree-people-with-role-list-field',
-  template: '<tree-field {source}="peopleList" {field}="\'email\'"/>',
+  template: `
+    <tree-field
+      {source}="peopleList"
+      {type}="type"
+      {field}="'email'"
+    />`,
   viewModel,
 });

@@ -14,6 +14,7 @@ import Revision from '../../models/service-models/revision';
 import Person from '../../models/business-models/person';
 import Snapshot from '../../models/service-models/snapshot';
 import Stub from '../../models/stub';
+import * as businessModels from '../../models/business-models';
 
 export default can.Component.extend({
   tag: 'revisions-comparer',
@@ -204,7 +205,7 @@ export default can.Component.extend({
         let content = value.content;
         let revision = {};
         const proposalContent = this.attr('rightRevision.content');
-        const model = CMS.Models[value.resource_type];
+        const model = businessModels[value.resource_type];
 
         content.attr('isRevision', true);
         content.attr('type', value.resource_type);

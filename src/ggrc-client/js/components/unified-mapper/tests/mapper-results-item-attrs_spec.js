@@ -5,6 +5,7 @@
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../mapper-results-item-attrs';
+import * as businessModels from '../../../models/business-models';
 
 describe('mapper-results-item-attrs component', function () {
   'use strict';
@@ -34,7 +35,7 @@ describe('mapper-results-item-attrs component', function () {
 
     it('sets default mustache template path in viewModel.attrTemplate' +
     ' if attributes view of model not defined', function () {
-      CMS.Models.TestModel = {
+      businessModels.TestModel = {
         tree_view_options: {},
       };
 
@@ -44,7 +45,7 @@ describe('mapper-results-item-attrs component', function () {
 
       expect(result).toEqual(DEFAULT_ATTR_TEMPLATE);
 
-      CMS.Models.TestModel = null;
+      businessModels.TestModel = null;
     });
   });
 });

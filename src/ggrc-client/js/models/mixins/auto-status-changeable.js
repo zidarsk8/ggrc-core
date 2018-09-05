@@ -10,7 +10,7 @@ import {confirm} from '../../plugins/utils/modals';
  * A mixin to use for objects that can have their status automatically
  * changed when they are edited.
  *
- * @class CMS.Models.Mixins.autoStatusChangeable
+ * @class Mixins.autoStatusChangeable
  */
 export default Mixin('autoStatusChangeable', {}, {
   /**

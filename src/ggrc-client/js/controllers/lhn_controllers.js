@@ -11,6 +11,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
 import Cacheable from '../models/cacheable'
 import Search from '../models/service-models/search';
 import DisplayPrefs from '../models/local-storage/display-prefs';
+import * as businessModels from '../models/business-models';
 
 can.Control('CMS.Controllers.LHN', {
   defaults: {}
@@ -408,7 +409,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       if (self.options.observer.my_work) {
         initial_params = {'contact_id': GGRC.current_user.id};
       }
-      $.map(CMS.Models, function (model, name) {
+      $.map(businessModels, function (model, name) {
         if (model.default_lhn_filters) {
           self.options.filter_params.attr(model.default_lhn_filters);
         }
@@ -687,7 +688,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       model_name = self.get_list_model($list);
 
       let context = {
-        model: CMS.Models[model_name],
+        model: businessModels[model_name],
         filter_params: self.options.filter_params,
         list: self.options.visible_lists[model_name],
         counts: self.options.counts,

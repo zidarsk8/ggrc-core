@@ -6,6 +6,7 @@
 import Audit from '../../js/models/business-models/audit';
 import Assessment from '../../js/models/business-models/assessment';
 import Issue from '../../js/models/business-models/issue';
+import * as businessModels from '../../js/models/business-models';
 
 describe('Model states test', function () {
   let basicStateObjects = ['AccessGroup', 'Clause', 'Contract',
@@ -17,7 +18,7 @@ describe('Model states test', function () {
   basicStateObjects.forEach(function (object) {
     let expectedStatuses = ['Draft', 'Deprecated', 'Active'];
     it('checks if ' + object + ' has expected statuses', function () {
-      expect(CMS.Models[object].statuses).toEqual(
+      expect(businessModels[object].statuses).toEqual(
         expectedStatuses, 'for object ' + object);
     });
   });
@@ -46,9 +47,9 @@ describe('Model review state test', function () {
     'Threat', 'Vendor'];
   reviewObjects.forEach(function (object) {
     it('checks if ' + object + ' has os state in attr_list', function () {
-      expect(_.map(CMS.Models[object].attr_list, 'attr_title'))
+      expect(_.map(businessModels[object].attr_list, 'attr_title'))
         .toContain('Review State', 'for object ' + object);
-      expect(_.map(CMS.Models[object].attr_list, 'attr_name'))
+      expect(_.map(businessModels[object].attr_list, 'attr_name'))
         .toContain('os_state', 'for object ' + object);
     });
   });

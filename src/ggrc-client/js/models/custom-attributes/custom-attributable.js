@@ -18,8 +18,8 @@ export default Cacheable('CMS.Models.CustomAttributable', {
     let types = _.orderBy(GGRC.custom_attributable_types,
       'category', false);
 
-    return can.when(can.map(types, function (type, i) {
-      return new CMS.Models.CustomAttributable(can.extend(type, {
+    return can.when(can.map(types, (type, i) => {
+      return new this(can.extend(type, {
         id: i,
       }));
     }));

@@ -112,8 +112,4 @@ export default Cacheable('CMS.Models.Issue', {
       }
     );
   },
-}, {
-  object_model: function () {
-    return CMS.Models[this.attr('object_type')];
-  },
-});
+}, {});

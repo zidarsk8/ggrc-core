@@ -3,11 +3,11 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {resolveDeferredBindings} from '../../utils/models-utils';
-import {makeFakeModel} from '../../../../js_specs/spec_helpers';
-import Cacheable from '../../../models/cacheable';
+import {resolveDeferredBindings} from '../pending-joins';
+import {makeFakeModel} from '../../../js_specs/spec_helpers';
+import Cacheable from '../cacheable';
 
-describe('models-utils module', () => {
+describe('pending-joins module', () => {
   describe('resolveDeferredBindings() util', function () {
     let origDummyModel;
     let origDummyJoin;

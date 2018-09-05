@@ -6,16 +6,24 @@
 
 {{#switch attr_name}}
   {{#case 'contact'}}
-      <tree-field {source}="instance.contact" {field}="'email'"/>
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.contact" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
   {{/case}}
   {{#case 'secondary_contact'}}
-      <tree-field {source}="instance.secondary_contact" {field}="'email'"/>
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.secondary_contact" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
   {{/case}}
   {{#case 'modified_by'}}
-      <tree-field {source}="instance.modified_by" {field}="'email'"/>
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.modified_by" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
   {{/case}}
   {{#case 'kind'}}
-    <tree-field {source}="instance.kind" {show-tooltip}="false"/>
+    <model-loader {path}="'service-models/option'">
+      <tree-field {source}="instance.kind" {type}="loadedModel" {show-tooltip}="false"/>
+    </model-loader>
   {{/case}}
   {{#case 'fraud_related'}}
     {{#if_equals instance.fraud_related "0"}}
@@ -34,19 +42,27 @@
     {{/if}}
   {{/case}}
   {{#case 'means'}}
-    <tree-field {source}="instance.means" {show-tooltip}="false"/>
+    <model-loader {path}="'service-models/option'">
+      <tree-field {source}="instance.means" {type}="loadedModel" {show-tooltip}="false"/>
+    </model-loader>
   {{/case}}
   {{#case 'frequency'}}
-    <tree-field {source}="instance.verify_frequency" {show-tooltip}="false"/>
+    <model-loader {path}="'service-models/option'">
+      <tree-field {source}="instance.verify_frequency" {type}="loadedModel" {show-tooltip}="false"/>
+    </model-loader>
   {{/case}}
   {{#case 'assertions'}}
     <sort-by {items}="instance.assertions" {is-snapshot}="instance.snapshot">
-      <tree-field {source}="sortedItems" {field}="'name'"/>
+      <model-loader {path}="'service-models/control-assertion'">
+        <tree-field {source}="sortedItems" {type}="loadedModel" {field}="'name'"/>
+      </model-loader>
     </sort-by>
   {{/case}}
   {{#case 'categories'}}
     <sort-by {items}="instance.categories" {is-snapshot}="instance.snapshot">
-      <tree-field {source}="sortedItems" {field}="'name'"/>
+      <model-loader {path}="'service-models/control-category'">
+        <tree-field {source}="sortedItems" {type}="loadedModel" {field}="'name'"/>
+      </model-loader>
     </sort-by>
   {{/case}}
   {{#case 'last_assessment_date'}}

@@ -51,6 +51,7 @@ import {notifier} from '../../plugins/utils/notifiers-utils';
 import Cacheable from '../../models/cacheable';
 import Relationship from '../../models/service-models/relationship';
 import DisplayPrefs from '../../models/local-storage/display-prefs';
+import * as businessModels from '../../models/business-models';
 
 let viewModel;
 
@@ -413,7 +414,7 @@ viewModel = can.Map.extend({
       let current;
 
       if (_verifyRelationship(instance, activeTabModel) ||
-        instance instanceof CMS.Models[activeTabModel]) {
+        instance instanceof businessModels[activeTabModel]) {
         if (self.attr('showedItems').length === 1) {
           current = self.attr('pageInfo.current');
           self.attr('pageInfo.current',

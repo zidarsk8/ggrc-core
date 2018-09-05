@@ -7,6 +7,7 @@ import {
   peopleWithRoleName,
 } from '../../plugins/utils/acl-utils';
 import './inline-aggregate-field';
+import Person from '../../models/business-models/person';
 
 const viewModel = can.Map.extend({
   define: {
@@ -20,11 +21,16 @@ const viewModel = can.Map.extend({
   },
   instance: {},
   role: '',
+  type: Person,
 });
 
 export default can.Component.extend('peopleWithRoleInlineField', {
   tag: 'people-with-role-inline-field',
-  template: `<inline-aggregate-field {source}="peopleList"
-    {field}="'email'"/>`,
+  template: `
+    <inline-aggregate-field
+      {source}="peopleList"
+      {type}="type"
+      {field}="'email'"
+    />`,
   viewModel,
 });

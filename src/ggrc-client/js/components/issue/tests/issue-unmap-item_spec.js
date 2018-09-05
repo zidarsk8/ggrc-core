@@ -9,6 +9,7 @@ import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
 import Relationship from '../../../models/service-models/relationship';
+import * as businessModels from '../../../models/business-models';
 
 describe('issue-unmap-item component', () => {
   let viewModel;
@@ -186,7 +187,6 @@ describe('issue-unmap-item component', () => {
 
   describe('openObject() method', () => {
     let relatedObject;
-    let originalModels;
     let getParam;
     let ARGS;
 
@@ -198,11 +198,6 @@ describe('issue-unmap-item component', () => {
         FIRST: 0,
         SECOND: 1,
       };
-      originalModels = CMS.Models;
-    });
-
-    afterAll(() => {
-      CMS.Models = originalModels;
     });
 
     beforeEach(() => {
@@ -211,12 +206,15 @@ describe('issue-unmap-item component', () => {
         type: 'Type',
       };
 
-      CMS.Models = {};
-      CMS.Models[relatedObject.type] = {
+      businessModels[relatedObject.type] = {
         root_collection: 'rootCollectionType',
       };
 
       spyOn(window, 'open');
+    });
+
+    afterEach(() => {
+      businessModels[relatedObject.type] = null;
     });
 
     it('calls window.open with second "_blank" param', () => {
@@ -238,7 +236,7 @@ describe('issue-unmap-item component', () => {
       it(`url consists of root_collection from appopriate model and id
         based on passed related object`, () => {
           let rootCollectionType =
-            CMS.Models[relatedObject.type].root_collection;
+            businessModels[relatedObject.type].root_collection;
           let expectedUrl;
 
           viewModel.openObject(relatedObject);
@@ -251,7 +249,7 @@ describe('issue-unmap-item component', () => {
       child_id props if a type of related object equals to "Snapshot"`, () => {
           let relatedObjectType = 'Snapshot';
           let rootCollectionType =
-            CMS.Models[relatedObject.type].root_collection;
+            businessModels[relatedObject.type].root_collection;
           let oldRelatedObjectType = relatedObject.type;
           let expectedUrl;
 

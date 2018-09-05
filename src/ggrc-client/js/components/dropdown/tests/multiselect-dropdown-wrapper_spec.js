@@ -10,6 +10,7 @@ describe('multiselect-dropdown-wrapper component', function () {
   let viewModel;
   let response;
   let findDfd;
+  let TestType;
 
   beforeEach(function () {
     viewModel = getComponentVM(Component);
@@ -37,7 +38,7 @@ describe('multiselect-dropdown-wrapper component', function () {
     ];
 
     findDfd = can.Deferred();
-    CMS.Models.TestType = can.Map.extend({
+    TestType = can.Map.extend({
       findAll: jasmine.createSpy('findAll').and.returnValue(findDfd),
       findInCacheById: jasmine.createSpy('findInCacheById')
         .and.returnValue({
@@ -48,17 +49,17 @@ describe('multiselect-dropdown-wrapper component', function () {
     }, {});
   });
 
-  describe('modelName set()', () => {
+  describe('modelConstructor set()', () => {
     it('calls findAll()', () => {
-      viewModel.attr('modelName', 'TestType');
+      viewModel.attr('modelConstructor', TestType);
 
-      expect(CMS.Models.TestType.findAll).toHaveBeenCalled();
+      expect(TestType.findAll).toHaveBeenCalled();
     });
 
     it('calls prepareOptions()', (done) => {
       spyOn(viewModel, 'prepareOptions');
 
-      viewModel.attr('modelName', 'TestType');
+      viewModel.attr('modelConstructor', TestType);
       findDfd.resolve(response);
 
       findDfd.then((result) => {
@@ -85,7 +86,7 @@ describe('multiselect-dropdown-wrapper component', function () {
       });
 
       it('sets preparedOptions', (done) => {
-        viewModel.attr('modelName', 'TestType');
+        viewModel.attr('modelConstructor', TestType);
         findDfd.resolve(response);
 
         findDfd.then((result) => {
@@ -96,7 +97,7 @@ describe('multiselect-dropdown-wrapper component', function () {
       });
 
       it('converts models to a correct format', (done) => {
-        viewModel.attr('modelName', 'TestType');
+        viewModel.attr('modelConstructor', TestType);
         findDfd.resolve(response);
 
         findDfd.then((result) => {
@@ -110,7 +111,7 @@ describe('multiselect-dropdown-wrapper component', function () {
       });
 
       it('sets selectedInternal', (done) => {
-        viewModel.attr('modelName', 'TestType');
+        viewModel.attr('modelConstructor', TestType);
         findDfd.resolve(response);
 
         findDfd.then((result) => {
@@ -122,7 +123,7 @@ describe('multiselect-dropdown-wrapper component', function () {
       });
 
       it('selectedInternal has correct format', (done) => {
-        viewModel.attr('modelName', 'TestType');
+        viewModel.attr('modelConstructor', TestType);
         findDfd.resolve(response);
 
         findDfd.then((result) => {
@@ -143,7 +144,7 @@ describe('multiselect-dropdown-wrapper component', function () {
     let newSelected;
 
     beforeEach(function () {
-      viewModel.attr('modelName', 'TestType');
+      viewModel.attr('modelConstructor', TestType);
       viewModel.attr('selected', [
         {
           id: 2,
@@ -167,7 +168,7 @@ describe('multiselect-dropdown-wrapper component', function () {
     it('should call findInCacheById', () => {
       handler({}, {}, newSelected);
 
-      expect(CMS.Models.TestType.findInCacheById).toHaveBeenCalled();
+      expect(TestType.findInCacheById).toHaveBeenCalled();
     });
 
     it('should get model from cache', () => {

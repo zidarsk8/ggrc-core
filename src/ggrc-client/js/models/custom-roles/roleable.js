@@ -22,9 +22,9 @@ export default Cacheable('CMS.Models.Roleable', {
     // a list of objects in the Custom Roles widget.
     let types = _.orderBy(GGRC.roleableTypes, 'category', false);
 
-    let instances = can.map(types, function (type, i) {
+    let instances = can.map(types, (type, i) => {
       let withId = can.extend(type, {id: i});
-      return new CMS.Models.Roleable(withId);
+      return new this(withId);
     });
 
     return can.when(instances);

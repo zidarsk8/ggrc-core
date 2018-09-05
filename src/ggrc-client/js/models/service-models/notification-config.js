@@ -37,15 +37,15 @@ export default Cacheable('CMS.Models.NotificationConfig', {
       return input.value;
     });
 
-    return this.findActive().then(function (configs) {
+    return this.findActive().then((configs) => {
       existing_types = $.map(configs, function (config) {
         return config.notif_type;
       });
-      all_types = $.map(valid_types, function (type) {
+      all_types = $.map(valid_types, (type) => {
         let index = existing_types.indexOf(type);
         if (index === -1) {
           // Create a new notificationConfig if it doesn't exist yet
-          return new CMS.Models.NotificationConfig({
+          return new this({
             person_id: GGRC.current_user.id,
             notif_type: type,
             enable_flag: null,

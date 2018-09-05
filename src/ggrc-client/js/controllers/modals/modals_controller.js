@@ -50,7 +50,7 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
 import Person from '../../models/business-models/person';
 import Assessment from '../../models/business-models/assessment';
 import Stub from '../../models/stub';
-import {getInstance} from '../../models/models-extensions';
+import {getInstance} from '../../plugins/utils/models-utils';
 
 export default can.Control({
   pluginName: 'ggrc_controllers_modals',
@@ -251,34 +251,6 @@ export default can.Control({
     }
   },
 
-  immediate_find_or_create: function (el, ev, data) {
-    let that = this;
-    let prop = el.data('drop');
-    let model = CMS.Models[el.data('lookup')];
-    let context = that.options.instance.context;
-    let params = {
-      context: context && context.serialize ? context.serialize() : context,
-    };
-
-    setTimeout(function () {
-      params[prop] = el.val();
-      el.prop('disabled', true);
-      model.findAll(params).then(function (list) {
-        if (list.length) {
-          that.autocomplete_select(el, ev, {item: list[0]});
-        } else {
-          new model(params).save().then(function (item) {
-            that.autocomplete_select(el, ev, {item: item});
-          });
-        }
-      })
-        .always(function () {
-          el.prop('disabled', false);
-        });
-    }, 100);
-  },
-  'input[data-lookup][data-drop] paste': 'immediate_find_or_create',
-  'input[data-lookup][data-drop] drop': 'immediate_find_or_create',
   fetch_templates: function (dfd) {
     let that = this;
     dfd = dfd ? dfd.then(function () {

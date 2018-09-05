@@ -5,7 +5,9 @@
 
 {{#switch attr_name}}
   {{#case 'assignee'}}
-      <tree-field {source}="instance.contact" {field}="'email'"/>
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.contact" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
   {{/case}}
   {{#case 'status'}}
     {{#using status=instance.status}}

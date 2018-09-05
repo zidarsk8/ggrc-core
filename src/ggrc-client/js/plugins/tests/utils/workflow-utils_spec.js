@@ -6,9 +6,9 @@
 import * as workflowHelpers from '../../utils/workflow-utils';
 import {
   makeFakeInstance,
-  makeFakeModel,
 } from '../../../../js_specs/spec_helpers';
 import Workflow from '../../../models/business-models/workflow';
+import Context from '../../../models/service-models/context';
 
 describe('Workflow helpers', () => {
   describe('createCycle() method', () => {
@@ -21,24 +21,17 @@ describe('Workflow helpers', () => {
       });
 
       it('context equals to workflow context stub object', function () {
-        const stubType = 'Context';
-        const origContextModel = CMS.Models[stubType];
-        CMS.Models[stubType] = makeFakeModel({model: CMS.Models[stubType]});
-        workflow.context = {
+        workflow.context = makeFakeInstance({model: Context})({
           id: 123,
           type: 'Context',
-        };
+        });
         let context = workflowHelpers
           .createCycle(workflow)
           .attr('context');
-        expect(context.attr()).toEqual(workflow.context);
-        CMS.Models[stubType] = origContextModel;
+        expect(context.serialize()).toEqual(workflow.context.serialize());
       });
 
       it('workflow equals to workflow stub object', function () {
-        const stubType = 'Workflow';
-        const origContextModel = CMS.Models[stubType];
-        CMS.Models[stubType] = makeFakeModel({model: CMS.Models[stubType]});
         workflow.attr('id', 123);
         let wfStub = workflowHelpers
           .createCycle(workflow)
@@ -47,7 +40,6 @@ describe('Workflow helpers', () => {
           id: 123,
           type: 'Workflow',
         });
-        CMS.Models[stubType] = origContextModel;
       });
 
       it('autogenerate property equals to true', function () {
