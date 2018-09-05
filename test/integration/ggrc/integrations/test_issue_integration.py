@@ -134,6 +134,69 @@ class TestIssueIntegration(ggrc.TestCase):
       self.api.put(iti.issue_tracked_obj, issue_attrs)
     mock_update_issue.assert_not_called()
 
+  @ddt.data((
+      {"issue": {
+          "title": "title1",
+          "context": None,
+          "issue_tracker": {
+              "enabled": True,
+              "component_id": 1234,
+              "hotlist_id": 4321,
+              "issue_id": 654321,
+              "issue_type": "Default Issue type",
+              "issue_priority": "P2",
+              "issue_severity": "S1",
+              "title": "title1",
+          }}},
+      {"issueState": {
+          "component_id": 4321,
+          "hotlist_id": 4321,
+          "issue_id": 654321,
+          "status": "new",
+          "issue_type": "Default Issue type",
+          "issue_priority": "P1",
+          "issue_severity": "S2",
+          "title": "test title",
+          "verifier": "user@example.com",
+          "assignee": "user@example.com",
+          "ccs": ["user@example.com"]}}
+  ),)
+  @ddt.unpack
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_new_issue_linking(self, issue_attrs, ticket_attrs, update_mock):
+    """Test linking new Issue to existing IssueTracker ticket"""
+    with mock.patch("ggrc.integrations.issues.Client.get_issue",
+                    return_value=ticket_attrs) as get_mock:
+      with mock.patch.object(integration_utils, "exclude_auditor_emails",
+                             return_value={u"user@example.com", }):
+        response = self.api.post(all_models.Issue, issue_attrs)
+      get_mock.assert_called_once()
+    update_mock.assert_called_once()
+
+    self.assertEqual(response.status_code, 201)
+    issue_id = response.json.get("issue").get("id")
+    issue_tracker_issue = models.IssuetrackerIssue.get_issue("Issue", issue_id)
+
+    self.assertTrue(issue_tracker_issue.enabled)
+
+    # According to our business logic these attributes should be taken
+    # from issue information
+    self.assertEqual(issue_tracker_issue.title,
+                     issue_attrs["issue"]["title"])
+    self.assertEqual(int(issue_tracker_issue.component_id),
+                     issue_attrs["issue"]["issue_tracker"]["component_id"])
+    self.assertEqual(int(issue_tracker_issue.hotlist_id),
+                     issue_attrs["issue"]["issue_tracker"]["hotlist_id"])
+    self.assertEqual(issue_tracker_issue.issue_priority,
+                     issue_attrs["issue"]["issue_tracker"]["issue_priority"])
+    self.assertEqual(issue_tracker_issue.issue_severity,
+                     issue_attrs["issue"]["issue_tracker"]["issue_severity"])
+    self.assertEqual(int(issue_tracker_issue.issue_id),
+                     issue_attrs["issue"]["issue_tracker"]["issue_id"])
+    self.assertEqual(issue_tracker_issue.issue_type,
+                     issue_attrs["issue"]["issue_tracker"]["issue_type"])
+
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
   def test_issue_tracker_error(self, update_issue_mock):
     """Test that issue tracker does not change state
