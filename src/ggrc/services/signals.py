@@ -120,3 +120,14 @@ class Restful(object):
         :event: Instance of an Event (if change took place) or None otherwise
       """,
   )
+
+
+class Proposal(object):
+  """Class storing proposal signals."""
+  signals = blinker.Namespace()
+  proposal_applied = signals.signal(
+      "Proposal applied",
+      """
+        :instance: The object that modified after applying of proposal.
+      """,
+  )

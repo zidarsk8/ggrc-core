@@ -167,14 +167,23 @@ class TestReviewStatusUpdate(TestCase):
       )
     review_id = review.id
 
-    factories.AccessControlListFactory(
-        ac_role_id=all_models.AccessControlRole.query.filter_by(
-            name="Primary Contacts", object_type="Control"
-        ).one().id,
-        person=all_models.Person.query.filter_by(
-            email="user@example.com"
-        ).one(),
-        object=control
+    ac_role_id = all_models.AccessControlRole.query.filter_by(
+        name="Primary Contacts", object_type="Control"
+    ).one().id
+
+    user_id = all_models.Person.query.filter_by(
+        email="user@example.com"
+    ).one().id
+
+    self.api.modify_object(
+        control, {
+            "access_control_list": [{
+                "ac_role_id": ac_role_id,
+                "person": {
+                    "id": user_id
+                },
+            }],
+        }
     )
     review = all_models.Review.query.get(review_id)
     self.assertEqual(review.status, all_models.Review.STATES.REVIEWED)
@@ -268,7 +277,7 @@ class TestReviewStatusUpdate(TestCase):
 
     review = all_models.Review.query.get(review_id)
     resp = self.api.modify_object(
-      review, {"status": all_models.Review.STATES.REVIEWED}
+        review, {"status": all_models.Review.STATES.REVIEWED}
     )
     self.assert200(resp)
 
@@ -336,3 +345,28 @@ class TestReviewStatusUpdate(TestCase):
     self.assert200(resp)
     review = all_models.Review.query.get(review_id)
     self.assertEqual(review.status, all_models.Review.STATES.REVIEWED)
+
+  @unittest.skip("Skipped until control not Reviewable")
+  def test_proposal_apply(self):
+    """Reviewable object changed via proposal -> review.state-> UNREVIEWED"""
+    with factories.single_commit():
+      control = factories.ControlFactory()
+      review = factories.ReviewFactory(
+          status=all_models.Review.STATES.REVIEWED, reviewable=control
+      )
+      review_id = review.id
+
+      proposal_content = {
+          "fields": {
+              "title": "new title"
+          },
+      }
+      proposal = factories.ProposalFactory(instance=control,
+                                           content=proposal_content,
+                                           agenda="agenda content")
+    self.api.modify_object(proposal, {
+        "status": proposal.STATES.APPLIED
+    })
+
+    review = all_models.Review.query.get(review_id)
+    self.assertEqual(review.status, all_models.Review.STATES.UNREVIEWED)

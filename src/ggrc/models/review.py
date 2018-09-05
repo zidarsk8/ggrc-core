@@ -15,12 +15,14 @@ from ggrc.models import utils as model_utils
 from ggrc.models import reflection
 from ggrc.models.mixins import issue_tracker
 from ggrc.models.mixins import rest_handable
+from ggrc.models.mixins import with_proposal_handable
 from ggrc.models.relationship import Relatable
 from ggrc.fulltext import mixin as ft_mixin
 
 
 class Reviewable(rest_handable.WithPutHandable,
-                 rest_handable.WithRelationshipsHandable):
+                 rest_handable.WithRelationshipsHandable,
+                 with_proposal_handable.WithProposalHandable):
   """Mixin to setup object as reviewable."""
 
   # REST properties
@@ -44,7 +46,7 @@ class Reviewable(rest_handable.WithPutHandable,
     if not self.review.issuetracker_issue:
       return None
     notification_type = self.review.notification_type
-    if not notification_type == self.NotificationContext.Types.ISSUE_TRACKER:
+    if notification_type != self.NotificationContext.Types.ISSUE_TRACKER:
       return None
     return self.review.issuetracker_issue.issue_url
 
@@ -75,7 +77,8 @@ class Reviewable(rest_handable.WithPutHandable,
     out_json["review_status"] = self.review_status
     return out_json
 
-  ATTRS_TO_IGNORE = {"review", "updated_at", "modified_by_id", "slug"}
+  ATTRS_TO_IGNORE = {"review", "updated_at", "modified_by_id",
+                     "slug", "_access_control_list"}
 
   def _update_status_on_attr(self):
     """Update review status when reviewable attrs are changed"""
@@ -104,6 +107,10 @@ class Reviewable(rest_handable.WithPutHandable,
 
   def handle_relationship_delete(self, counterparty):
     self._update_status_on_mapping(counterparty)
+
+  def handle_proposal_applied(self):
+    from ggrc.models import all_models
+    self.review.status = all_models.Review.STATES.UNREVIEWED
 
 
 class Review(mixins.person_relation_factory("last_reviewed_by"),
@@ -199,7 +206,7 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
     from ggrc.models import all_models
     if self.status == all_models.Review.STATES.REVIEWED:
       self.last_reviewed_by = get_current_user()
-      self.last_reviewed_at = datetime.datetime.now()
+      self.last_reviewed_at = datetime.datetime.utcnow()
 
   def _update_reviewed_by(self):
     """Update last_reviewed_by, last_reviewed_at"""
@@ -208,8 +215,8 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
     if not db.inspect(self).attrs["status"].history.has_changes():
       return
 
-    self.reviewable.updated_at = datetime.datetime.now()
+    self.reviewable.updated_at = datetime.datetime.utcnow()
 
     if self.status == all_models.Review.STATES.REVIEWED:
       self.last_reviewed_by = self.modified_by
-      self.last_reviewed_at = datetime.datetime.now()
+      self.last_reviewed_at = datetime.datetime.utcnow()
