@@ -6,6 +6,14 @@
 import {notifier} from './notifiers-utils';
 import RefreshQueue from '../../models/refresh_queue';
 import Stub from '../../models/stub';
+import * as businessModels from '../../models/business-models';
+import * as serviceModels from '../../models/service-models';
+import * as joinModels from '../../models/join-models';
+
+const allModels = Object.assign({},
+  businessModels,
+  serviceModels,
+  joinModels);
 
 const relatedAssessmentsTypes = Object.freeze(['Control', 'Objective']);
 
@@ -17,12 +25,12 @@ const getModelInstance = (id, type, requiredAttr) => {
       reject();
     }
 
-    modelInstance = CMS.Models[type].findInCacheById(id) || {};
+    modelInstance = allModels[type].findInCacheById(id) || {};
 
     if (modelInstance && modelInstance.hasOwnProperty(requiredAttr)) {
       resolve(modelInstance);
     } else {
-      modelInstance = new CMS.Models[type]({id: id});
+      modelInstance = new allModels[type]({id: id});
       new RefreshQueue()
         .enqueue(modelInstance)
         .trigger()
@@ -101,7 +109,7 @@ const getInstance = (objectType, objectId, paramsOrObject) => {
     objectId = paramsOrObject.id;
   }
 
-  model = CMS.Models[objectType];
+  model = allModels[objectType];
 
   if (!model) {
     return null;
@@ -136,10 +144,34 @@ const getInstance = (objectType, objectId, paramsOrObject) => {
 };
 
 function isScopeModel(type) {
-  const model = CMS.Models[type];
+  const model = businessModels[type];
 
   return model && model.category === 'business';
 }
+
+can.Observe.prototype.reify = function () {
+  let type;
+  let model;
+
+  if (this instanceof can.Model) {
+    return this;
+  }
+
+  type = this.type;
+  model = allModels[type];
+
+  if (!model) {
+    console.debug('`reify()` called with unrecognized type', this);
+  } else {
+    return model.model(this);
+  }
+};
+
+can.Observe.List.prototype.reify = function () {
+  return new can.Observe.List(can.map(this, function (obj) {
+    return obj.reify();
+  }));
+};
 
 export {
   getModelInstance,
