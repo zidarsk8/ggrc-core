@@ -8,7 +8,7 @@ import RecentlyViewedObject from '../models/local-storage/recently-viewed-object
 import tracker from '../tracker';
 import RefreshQueue from '../models/refresh_queue';
 import {getPageInstance} from '../plugins/utils/current-page-utils';
-import Cacheable from '../models/cacheable'
+import Cacheable from '../models/cacheable';
 import Search from '../models/service-models/search';
 import DisplayPrefs from '../models/local-storage/display-prefs';
 import * as businessModels from '../models/business-models';

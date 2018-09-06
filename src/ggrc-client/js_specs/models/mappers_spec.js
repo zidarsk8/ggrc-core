@@ -226,7 +226,7 @@ describe('mappers', function () {
       let mr;
       beforeEach(function () {
         mr = new LL.MappingResult('foo', ['bar'], 'baz');
-      })
+      });
 
       it('returns the saved compute if it exists.', function () {
         let compute = can.compute();
@@ -307,7 +307,7 @@ describe('mappers', function () {
       let mr;
       beforeEach(function () {
         mr = new LL.MappingResult('foo', ['bar'], 'baz');
-      })
+      });
 
       it('returns the saved compute if it exists.', function () {
         let compute = can.compute();
