@@ -1,6 +1,6 @@
-[//]: <> (updated 8/23/2018)
+[//]: <> (updated 9/04/2018)
 
-Our Product Team worked hard to make your day-to-day life easier. Here is a list of improvements.
+Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 
 [New roles for scoping objects (v1.19.0, 08/23/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.isxssko8q9a4)
 
@@ -56,7 +56,7 @@ Our Product Team worked hard to make your day-to-day life easier. Here is a list
 
 ### New roles for scoping objects (v1.19.0, 08/23/2018)
 
-All scoping objects (like product, systems, entities etc.) will have the following people roles associated with them. Multiple people can be added within each role.  
+All scoping objects (like product, systems, entities etc.) will have the following people roles associated with them. Multiple people can be added within each role.
 
 - Product Managers;
 - Technical Leads;
@@ -177,7 +177,7 @@ The performance has been improved in the following places in application:
 - loading of object counts in the tabs on my work page (5 times faster);
 - loading of the graph on audit summary page (now is less than 0.5 sec);
 - loading of my tasks count in the header (20 times faster);
-- loading a workflow, especially a big one (in about a sec) ;
+- loading a workflow, especially a big one (in about a sec);
 - loading objects in tree view (20-50% faster).
 
 Overall these improvements reduced the load on the server and make the entire application more responsive.
