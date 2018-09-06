@@ -9,6 +9,7 @@
 import sqlalchemy as sa
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from ggrc.models import reflection
 from ggrc.models.issuetracker_issue import IssuetrackerIssue
@@ -68,6 +69,10 @@ class IssueTracked(object):
 
   def add_warning(self, message):
     self._warnings.append(message)
+
+  @hybrid_property
+  def warnings(self):
+    return self._warnings
 
 
 class IssueTrackedWithUrl(IssueTracked):
