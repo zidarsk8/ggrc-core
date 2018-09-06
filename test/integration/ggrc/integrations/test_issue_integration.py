@@ -22,6 +22,8 @@ from integration.ggrc.models import factories
 from integration import ggrc
 from integration.ggrc.api_helper import Api
 
+TICKET_ID = 123
+
 
 @ddt.ddt
 class TestIssueIntegration(ggrc.TestCase):
@@ -121,15 +123,25 @@ class TestIssueIntegration(ggrc.TestCase):
        {"comment": "Issue Description has been updated.\nnew description"}),
       ({"test_plan": "new test plan"},
        {"comment": "Issue Remediation Plan has been updated.\nnew test plan"}),
-      ({"issue_tracker": {"component_id": "123", "enabled": True}},
+      ({"issue_tracker": {"component_id": "123",
+                          "enabled": True,
+                          "issue_id": TICKET_ID}},
        {"component_id": 123}),
-      ({"issue_tracker": {"hotlist_id": "321", "enabled": True}},
+      ({"issue_tracker": {"hotlist_id": "321",
+                          "enabled": True,
+                          "issue_id": TICKET_ID}},
        {"hotlist_ids": [321, ]}),
-      ({"issue_tracker": {"issue_priority": "P2", "enabled": True}},
+      ({"issue_tracker": {"issue_priority": "P2",
+                          "enabled": True,
+                          "issue_id": TICKET_ID}},
        {"priority": "P2"}),
-      ({"issue_tracker": {"issue_severity": "S2", "enabled": True}},
+      ({"issue_tracker": {"issue_severity": "S2",
+                          "enabled": True,
+                          "issue_id": TICKET_ID}},
        {"severity": "S2"}),
-      ({"issue_tracker": {"enabled": False, "hotlist_ids": [999, ]}},
+      ({"issue_tracker": {"enabled": False,
+                          "hotlist_ids": [999, ],
+                          "issue_id": TICKET_ID}},
        {"comment": "Changes to this GGRC object will no longer be "
                    "tracked within this bug."}),
   )
@@ -139,8 +151,10 @@ class TestIssueIntegration(ggrc.TestCase):
     """Test updating issue tracker issue."""
     iti = factories.IssueTrackerIssueFactory(
         enabled=True,
+        issue_id=TICKET_ID,
         issue_tracked_obj=factories.IssueFactory()
     )
+
     with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True):
       self.api.put(iti.issue_tracked_obj, issue_attrs)
     mock_update_issue.assert_called_with(iti.issue_id, expected_query)
@@ -319,6 +333,7 @@ class TestIssueIntegration(ggrc.TestCase):
        in case receiving an error."""
     iti = factories.IssueTrackerIssueFactory(
         enabled=True,
+        # issue_id=TICKET_ID,
         issue_tracked_obj=factories.IssueFactory()
     )
     update_issue_mock.side_effect = integrations_errors.HttpError("data")
@@ -364,8 +379,9 @@ class TestIssueIntegration(ggrc.TestCase):
     comment = factories.CommentFactory(description="test comment")
 
     expected_result = {
-        "comment": u"A new comment is added by 'Example User' to the 'Issue': "
-                   u"'test comment'.\nUse the following to link to get more "
+        "comment": u"A new comment is added by 'user@example.com' to the"
+                   u" 'Issue': 'test comment'.\n"
+                   u"Use the following to link to get more "
                    u"information from the GGRC 'Issue'. Link - "
                    u"http://issue_url.com"
     }
@@ -460,18 +476,29 @@ class TestDisabledIssueIntegration(ggrc.TestCase):
     mock_update_issue.assert_not_called()
 
   @ddt.data(
-      {"description": "new description", "issue_tracker": {"enabled": False}},
-      {"test_plan": "new test plan", "issue_tracker": {"enabled": False}},
-      {"issue_tracker": {"component_id": "123", "enabled": False}},
-      {"issue_tracker": {"hotlist_id": "321", "enabled": False}},
-      {"issue_tracker": {"issue_priority": "P2", "enabled": False}},
-      {"issue_tracker": {"issue_severity": "S2", "enabled": False}},
+      {"description": "new description",
+       "issue_tracker": {"issue_id": TICKET_ID, "enabled": False}},
+      {"test_plan": "new test plan",
+       "issue_tracker": {"issue_id": TICKET_ID, "enabled": False}},
+      {"issue_tracker": {"issue_id": TICKET_ID,
+                         "component_id": "123",
+                         "enabled": False}},
+      {"issue_tracker": {"issue_id": TICKET_ID,
+                         "hotlist_id": "321",
+                         "enabled": False}},
+      {"issue_tracker": {"issue_id": TICKET_ID,
+                         "issue_priority": "P2",
+                         "enabled": False}},
+      {"issue_tracker": {"issue_id": TICKET_ID,
+                         "issue_severity": "S2",
+                         "enabled": False}},
   )
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
   def test_update_issue_object(self, issue_attrs, mock_update_issue):
     """Test updating issue object with disabled integration for issue."""
     iti = factories.IssueTrackerIssueFactory(
         enabled=False,
+        issue_id=TICKET_ID,
         issue_tracked_obj=factories.IssueFactory()
     )
     with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True):
