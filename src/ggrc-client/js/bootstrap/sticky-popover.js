@@ -5,7 +5,7 @@
 
 !function ($) {
 
-  'use strict'; // jshint ;_;
+  'use strict';
 
 
   /* STICKY_POPOVER PUBLIC CLASS DEFINITION

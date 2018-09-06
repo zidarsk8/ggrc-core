@@ -19,5 +19,3 @@ if [[ $(py_files) ]]; then
 else
   echo "No python files changed."
 fi
-
-# TODO: add jshint and jscs checks.

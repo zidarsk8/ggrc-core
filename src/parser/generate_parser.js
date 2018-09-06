@@ -24,13 +24,6 @@ if npm install returns a 404 just run the next command and try again.
 
 then edit the parser.pegjs file and run the generator
   ./generate_parser.js
- 
-to run the tests first install nodeunit
-  npm install -g nodeunit
-
-and run with the test folder
-  nodeunit test
-  
 */
 
 
