@@ -12,8 +12,8 @@ import TaskGroupTask from '../../models/business-models/task-group-task';
 import Cycle from '../../models/business-models/cycle';
 import TaskGroupObject from '../../models/join-models/task-group-object';
 
-describe('ApprovalWorkflow', ()=> {
-  describe('save() method', ()=> {
+describe('ApprovalWorkflow', () => {
+  describe('save() method', () => {
     let method;
     let originalObject;
     let awsDfd;
@@ -24,7 +24,7 @@ describe('ApprovalWorkflow', ()=> {
     let awBinding;
     let instance;
 
-    beforeAll(()=> {
+    beforeAll(() => {
       assigneeRole = {
         object_type: 'TaskGroupTask',
         name: 'Task Assignees',
@@ -45,11 +45,11 @@ describe('ApprovalWorkflow', ()=> {
       GGRC.current_user = currentUser;
     });
 
-    afterAll(()=> {
+    afterAll(() => {
       GGRC.current_user = userOldValue;
     });
 
-    beforeEach(()=> {
+    beforeEach(() => {
       awsDfd = new can.Deferred();
       awBinding = {
         refresh_list: jasmine.createSpy().and.returnValue(awsDfd),
@@ -70,14 +70,14 @@ describe('ApprovalWorkflow', ()=> {
       method = Model.prototype.save.bind(instance);
     });
 
-    describe('no approval Workflow', ()=> {
+    describe('no approval Workflow', () => {
       let saveWfDfd;
       let saveTgDfd;
       let saveTgtDfd;
       let saveTgoDfd;
       let saveCycleDfd;
 
-      beforeEach(()=> {
+      beforeEach(() => {
         saveWfDfd = new can.Deferred();
         saveTgDfd = new can.Deferred();
         saveTgtDfd = new can.Deferred();
@@ -109,7 +109,7 @@ describe('ApprovalWorkflow', ()=> {
         awsDfd.resolve([]);
       });
 
-      it('creates an appropriate Workflow', ()=> {
+      it('creates an appropriate Workflow', () => {
         expect(Workflow.newInstance).toHaveBeenCalledWith({
           access_control_list: [{
             ac_role_id: wfAdminRole.id,
@@ -129,7 +129,7 @@ describe('ApprovalWorkflow', ()=> {
         });
       });
 
-      it('creates an appropriate TaskGroup', ()=> {
+      it('creates an appropriate TaskGroup', () => {
         const wf = {};
 
         saveWfDfd.resolve(wf);
@@ -142,7 +142,7 @@ describe('ApprovalWorkflow', ()=> {
         });
       });
 
-      it('creates an appropriate TaskGroupTask', ()=> {
+      it('creates an appropriate TaskGroupTask', () => {
         const wf = {};
         const tg = {};
 
@@ -167,7 +167,7 @@ describe('ApprovalWorkflow', ()=> {
         });
       });
 
-      it('creates an appropriate TaskGroupObject', ()=> {
+      it('creates an appropriate TaskGroupObject', () => {
         const tg = {};
         const wf = new can.Map({
           context: {},
@@ -183,7 +183,7 @@ describe('ApprovalWorkflow', ()=> {
         });
       });
 
-      it('creates an appropriate Cycle', ()=> {
+      it('creates an appropriate Cycle', () => {
         const tg = {};
         const wf = {
           context: {},
@@ -201,7 +201,7 @@ describe('ApprovalWorkflow', ()=> {
         });
       });
 
-      it('reloads approval mapping binding object', ()=> {
+      it('reloads approval mapping binding object', () => {
         const tg = {};
         const wf = {
           context: {},
@@ -217,7 +217,7 @@ describe('ApprovalWorkflow', ()=> {
       });
     });
 
-    describe('couple of approval Workflows', ()=> {
+    describe('couple of approval Workflows', () => {
       let aws;
       let tgt;
       let tg;
@@ -227,7 +227,7 @@ describe('ApprovalWorkflow', ()=> {
       let saveCycleDfd;
       let awInstance;
 
-      beforeEach(()=> {
+      beforeEach(() => {
         saveTgDfd = can.Deferred();
         saveTgtDfd = can.Deferred();
         refreshTgtDfd = can.Deferred();
@@ -276,22 +276,22 @@ describe('ApprovalWorkflow', ()=> {
         awsDfd.resolve(aws);
       });
 
-      it('refreshes first Approval WF and TGs only', ()=> {
+      it('refreshes first Approval WF and TGs only', () => {
         expect(aws[0].instance.refresh).toHaveBeenCalled();
         expect(aws[0].instance.task_groups.reify).toHaveBeenCalled();
         expect(tg.refresh).toHaveBeenCalled();
         expect(aws[1].instance.refresh).not.toHaveBeenCalled();
       });
 
-      it('updates contact for TGs', ()=> {
+      it('updates contact for TGs', () => {
         expect(tg.attr('contact')).toEqual(currentUser);
       });
 
-      it('updates TGs contact', ()=> {
+      it('updates TGs contact', () => {
         expect(tg.attr('contact')).toEqual(currentUser);
       });
 
-      it('updates TGTs ACL', ()=> {
+      it('updates TGTs ACL', () => {
         saveTgDfd.resolve(tg);
         refreshTgtDfd.resolve(tgt);
 
@@ -303,7 +303,7 @@ describe('ApprovalWorkflow', ()=> {
           .toEqual('Person');
       });
 
-      it('creates an appropriate Cycle', ()=> {
+      it('creates an appropriate Cycle', () => {
         saveTgDfd.resolve(tg);
         refreshTgtDfd.resolve(tgt);
         saveTgtDfd.resolve();
@@ -315,7 +315,7 @@ describe('ApprovalWorkflow', ()=> {
         });
       });
 
-      it('dispatches event to reload approval tasks', ()=> {
+      it('dispatches event to reload approval tasks', () => {
         saveTgDfd.resolve(tg);
         refreshTgtDfd.resolve(tgt);
         saveTgtDfd.resolve();

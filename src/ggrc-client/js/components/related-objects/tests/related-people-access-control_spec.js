@@ -477,6 +477,7 @@ describe('related-people-access-control component', function () {
             type: assignment.type,
           }],
           required: roles[1].mandatory,
+          singleUserRole: false,
         };
         expect(result).toEqual(group);
       }
@@ -490,9 +491,44 @@ describe('related-people-access-control component', function () {
           groupId: roles[1].id,
           people: [],
           required: roles[1].mandatory,
+          singleUserRole: false,
         };
         expect(result).toEqual(group);
       }
+    );
+
+    it(`should generate group w/ "singleUserRole=true" if role is present
+       in singleUserRoles attr`, () => {
+      const group = {
+        title: roles[1].name,
+        groupId: roles[1].id,
+        people: [],
+        required: roles[1].mandatory,
+        singleUserRole: true,
+      };
+      viewModel.attr('singleUserRoles', {'Role Name2': true});
+
+      const result = viewModel.buildGroups(roles[1], [{person: {id: 4}}]);
+
+      expect(result).toEqual(group);
+    }
+    );
+
+    it(`should generate group w/ "singleUserRole=false" if role not present
+    in singleUserRoles attr`, () => {
+      const group = {
+        title: roles[1].name,
+        groupId: roles[1].id,
+        people: [],
+        required: roles[1].mandatory,
+        singleUserRole: false,
+      };
+      viewModel.attr('singleUserRoles', {'Role Name1': true});
+
+      const result = viewModel.buildGroups(roles[1], [{person: {id: 4}}]);
+
+      expect(result).toEqual(group);
+    }
     );
   });
 

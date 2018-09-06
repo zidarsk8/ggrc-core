@@ -359,4 +359,7 @@ class ScopedCommentable(Commentable):
       "Technical Leads",
       "System Owners",
       "Legal Counsels",
+      "Assignee",
+      "Verifier",
+      "Compliance Contacts",
   ])

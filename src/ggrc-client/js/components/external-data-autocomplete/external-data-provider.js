@@ -62,11 +62,11 @@ export default can.Component.extend({
         data: {
           prefix: searchCriteria,
         },
-      }).done(executeForLastRequest((response)=>{
+      }).done(executeForLastRequest((response) => {
         this.attr('values', response);
-      })).fail(executeForLastRequest(()=> {
+      })).fail(executeForLastRequest(() => {
         notifier('error', `Unable to load ${type}s`);
-      })).always(executeForLastRequest(()=> {
+      })).always(executeForLastRequest(() => {
         this.attr('loading', false);
       })));
 

@@ -4,10 +4,12 @@
 */
 
 import baseAutocompleteWrapper from './../custom-autocomplete/autocomplete-wrapper';
+import Label from '../../models/service-models/label';
 
 let viewModel = baseAutocompleteWrapper.extend({
   currentValue: '',
-  model: 'Label',
+  modelName: 'Label',
+  modelConstructor: Label,
   queryField: 'name',
   result: [],
   objectsToExclude: [],

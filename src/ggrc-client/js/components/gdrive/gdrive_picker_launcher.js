@@ -16,6 +16,7 @@ import {
   messages,
 } from '../../plugins/utils/notifiers-utils';
 import Context from '../../models/service-models/context';
+import * as businessModels from '../../models/business-models';
 
 export default can.Component.extend({
   tag: 'ggrc-gdrive-picker-launcher',
@@ -147,7 +148,7 @@ export default can.Component.extend({
               return that.createDocumentModel(files);
             })
             .then(stopFn)
-            .always(()=> {
+            .always(() => {
               that.attr('isUploading', false);
               that.dispatch('finish');
             })
@@ -177,7 +178,7 @@ export default can.Component.extend({
       let instanceType = this.attr('instance.type');
       let contextId = this.attr('instance.context.id') || null;
       let modelType = this.attr('modelType');
-      let ModelClass = CMS.Models[modelType];
+      let ModelClass = businessModels[modelType];
 
       let dfdDocs = files.map(function (file) {
         let model = new ModelClass({
@@ -191,15 +192,15 @@ export default can.Component.extend({
           },
         });
 
-        return backendGdriveClient.withAuth(()=> {
+        return backendGdriveClient.withAuth(() => {
           return model.save();
         });
       });
       // waiting for all docs promises
-      return can.when(...dfdDocs).then(()=> {
+      return can.when(...dfdDocs).then(() => {
         this.attr('instance').refresh();
         return can.makeArray(arguments);
-      }, (xhr)=> {
+      }, (xhr) => {
         let message = (xhr.responseJSON && xhr.responseJSON.message) ?
           xhr.responseJSON.message :
           xhr.responseText;

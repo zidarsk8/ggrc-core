@@ -19,7 +19,7 @@ import '../mixins/access-control-list';
 import '../mixins/refetch-hash';
 import '../mixins/assessment-issue-tracker';
 import '../mixins/related-assessments-loader';
-import {getInstance} from '../models-extensions';
+import {getInstance} from '../../plugins/utils/models-utils';
 
 export default Cacheable('CMS.Models.Assessment', {
   root_object: 'assessment',
@@ -375,7 +375,7 @@ export default Cacheable('CMS.Models.Assessment', {
             .then(function (model) {
               delete that._pending_refresh;
               if (model) {
-                model = CMS.Models.Assessment.model(model, that);
+                model = that.constructor.model(model, that);
                 model.backup();
                 return model;
               }

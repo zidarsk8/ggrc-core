@@ -9,7 +9,7 @@ import Component from '../sort-by';
 describe('sort-by component', () => {
   let viewModel;
 
-  beforeAll(()=> {
+  beforeAll(() => {
     viewModel = getComponentVM(Component);
   });
 

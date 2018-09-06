@@ -12,6 +12,7 @@ import {getPageInstance} from '../utils/current-page-utils';
 import Person from '../../models/business-models/person';
 import Audit from '../../models/business-models/audit';
 import Stub from '../../models/stub';
+import * as businessModels from '../../models/business-models';
 
 /**
  * Util methods for work with Snapshots.
@@ -97,7 +98,7 @@ function isInScopeModel(model) {
  */
 function toObject(instance) {
   let object;
-  let model = CMS.Models[instance.child_type];
+  let model = businessModels[instance.child_type];
   let content = instance.revision.content;
   let audit;
 
@@ -158,7 +159,7 @@ function toObject(instance) {
  * @return {String} Url
  */
 function getParentUrl(instance) {
-  let model = CMS.Models[instance.child_type];
+  let model = businessModels[instance.child_type];
   let plural = model.table_plural;
   let link = '/' + plural + '/' + instance.child_id;
 

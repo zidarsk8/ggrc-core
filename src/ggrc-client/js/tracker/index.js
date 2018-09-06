@@ -56,11 +56,20 @@ const stop = (category, action, label, skipTracking = false) => {
   }
 };
 
+const trackError = (errorInfo) => {
+  trackerStrategy.trackError({}, {
+    eventCategory: errorInfo.category,
+    eventAction: errorInfo.name,
+    eventLabel: errorInfo.details,
+  });
+};
+
 init();
 
 export default {
   start,
   stop,
+  trackError,
   FOCUS_AREAS,
   USER_JOURNEY_KEYS,
   USER_ACTIONS,

@@ -76,11 +76,7 @@ class TestRBAC(base.Test):
   )
   @pytest.mark.parametrize(
       "obj, obj_role",
-      [
-          ("audit", "auditors"),
-          ("assessment", "assignees"),
-          ("assessment", "verifiers")
-      ]
+      roles.IMPORTANT_ASMT_ROLES
   )
   def test_add_evidence_url(
       self, program, login_role, obj, obj_role, selenium
@@ -92,7 +88,7 @@ class TestRBAC(base.Test):
     obj_args = {obj_role: [login_user]}
     audit = rest_facade.create_audit(
         program, **obj_args if obj == "audit" else {})
-    asmt = rest_facade.create_assessment(
+    asmt = rest_facade.create_asmt(
         audit, **obj_args if obj == "assessment" else {})
     users.set_current_user(login_user)
     url = string_utils.StringMethods.random_string()
@@ -192,7 +188,7 @@ class TestAuditorRole(base.Test):
     creator = test_data["creator"]
     users.set_current_user(creator)
     audit = test_data["audit"]
-    expected_asmt = rest_facade.create_assessment(audit)
+    expected_asmt = rest_facade.create_asmt(audit)
     webui_facade.assert_can_edit_asmt(
         selenium, expected_asmt)
 
@@ -210,7 +206,7 @@ class TestAuditorRole(base.Test):
     creator = test_data["creator"]
     users.set_current_user(creator)
     audit = test_data["audit"]
-    expected_asmt = rest_facade.create_assessment(audit)
+    expected_asmt = rest_facade.create_asmt(audit)
     asmt_service = webui_service.AssessmentsService(selenium)
     asmt_service.add_asignee(expected_asmt, test_data["editor"])
     expected_asmt.update_attrs(

@@ -129,6 +129,38 @@ class TestDocumentWithActionMixin(TestCase, WithQueryApi):
     self.assertEqual(relationship.destination_id, document.id)
     self.assertEqual(relationship.source_id, issue.id)
 
+  def test_map_document_assessment(self):
+    """Test map document action on assessment without id."""
+    assessment = factories.AssessmentFactory()
+    response = self.api.put(assessment, {"actions": {"add_related": [
+        {
+            "id": None,
+            "type": "Document",
+            "link": "example.com",
+            "title": "document 1",
+            "kind": all_models.Document.REFERENCE_URL,
+        }
+    ]}})
+    self.assert400(response)
+
+  def test_map_document_issue_wo_id(self):
+    """Test map document action on control without id."""
+    issue = factories.IssueFactory()
+    response = self.api.put(issue, {"actions": {"add_related": [
+        {
+            "id": None,
+            "type": "Document",
+            "link": "example.com",
+            "title": "document 1",
+            "kind": all_models.Document.REFERENCE_URL,
+        }
+    ]}})
+    self.assert200(response)
+    relationship = _get_relationship(
+        "Issue", issue.id
+    )
+    self.assertTrue(relationship)
+
   def test_wrong_add_url(self):
     """Test wrong add url action."""
     assessment = factories.AssessmentFactory()

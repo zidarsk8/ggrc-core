@@ -7,7 +7,7 @@ import {
   getInScopeModels,
 } from '../../plugins/utils/snapshot-utils';
 import Mappings from '../../models/mappers/mappings';
-import {getInstance} from '../../models/models-extensions';
+import {getInstance} from '../../plugins/utils/models-utils';
 
 /**
  *  @typedef SpecialConfig

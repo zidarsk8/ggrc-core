@@ -19,6 +19,7 @@ import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 import tracker from '../../tracker';
 import Evidence from '../../models/business-models/evidence';
 import Context from '../../models/service-models/context';
+import * as businessModels from '../../models/business-models';
 
 const defaultOrderBy = [
   {field: 'finished_date', direction: 'desc'},
@@ -53,7 +54,7 @@ export default can.Component.extend({
         get: function () {
           const relObjType = this.attr('relatedObjectType');
 
-          const objectName = CMS.Models[relObjType].model_plural;
+          const objectName = businessModels[relObjType].model_plural;
           return `Related ${objectName}`;
         },
       },
@@ -89,17 +90,17 @@ export default can.Component.extend({
       return new Evidence(data);
     },
     reuseSelected: function () {
-      let reusedObjectList = this.attr('selectedEvidences').map((evidence)=> {
+      let reusedObjectList = this.attr('selectedEvidences').map((evidence) => {
         let model = this.buildEvidenceModel(evidence);
 
-        return backendGdriveClient.withAuth(()=> {
+        return backendGdriveClient.withAuth(() => {
           return model.save();
         });
       });
 
       this.attr('isSaving', true);
 
-      can.when(...reusedObjectList).always(()=> {
+      can.when(...reusedObjectList).always(() => {
         this.attr('selectedEvidences').replace([]);
         this.attr('isSaving', false);
         this.dispatch('afterObjectReused');

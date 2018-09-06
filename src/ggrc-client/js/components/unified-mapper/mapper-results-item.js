@@ -10,6 +10,7 @@ import '../view-object-buttons/view-object-buttons';
 import '../object-selection/object-selection-item';
 import template from './templates/mapper-results-item.mustache';
 import Snapshot from '../../models/service-models/snapshot';
+import * as businessModels from '../../models/business-models';
 
 export default can.Component.extend({
   tag: 'mapper-results-item',
@@ -35,7 +36,7 @@ export default can.Component.extend({
     },
     objectTypeIcon() {
       let objectType = this.objectType();
-      let Model = CMS.Models[objectType];
+      let Model = businessModels[objectType];
       return 'fa-' + Model.table_singular;
     },
     toggleIconCls() {

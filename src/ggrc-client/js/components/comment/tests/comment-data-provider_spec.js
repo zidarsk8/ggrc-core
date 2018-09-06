@@ -7,20 +7,20 @@ import Component from '../comment-data-provider';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 
-describe('comment-data-provider component', ()=> {
+describe('comment-data-provider component', () => {
   let viewModel;
 
-  beforeEach(()=> {
+  beforeEach(() => {
     viewModel = getComponentVM(Component);
   });
 
-  describe('init() method', ()=> {
+  describe('init() method', () => {
     let method;
-    beforeEach(()=> {
+    beforeEach(() => {
       method = Component.prototype.init.bind({viewModel});
     });
 
-    it('loads comments', ()=> {
+    it('loads comments', () => {
       spyOn(viewModel, 'loadComments');
 
       method();
@@ -29,30 +29,30 @@ describe('comment-data-provider component', ()=> {
     });
   });
 
-  describe('loadComments() method', ()=> {
-    beforeEach(()=> {
+  describe('loadComments() method', () => {
+    beforeEach(() => {
       spyOn(viewModel, 'buildQuery').and.returnValue('query');
       spyOn(viewModel, 'getComments').and.returnValue(['comment']);
       viewModel.loadComments();
     });
 
-    it('builds query', ()=> {
+    it('builds query', () => {
       expect(viewModel.buildQuery).toHaveBeenCalled();
     });
 
-    it('gets comments using query', ()=> {
+    it('gets comments using query', () => {
       expect(viewModel.getComments).toHaveBeenCalledWith('query');
     });
 
-    it('sets query to "comments" propery', ()=> {
+    it('sets query to "comments" propery', () => {
       expect(viewModel.attr('comments').attr()).toEqual(['comment']);
     });
   });
 
-  describe('getComments() method', ()=> {
+  describe('getComments() method', () => {
     let queryDeferred;
     let resultDeferred;
-    beforeEach(()=> {
+    beforeEach(() => {
       queryDeferred = can.Deferred();
       spyOn(QueryAPI, 'batchRequests')
         .and.returnValue(queryDeferred);
@@ -62,13 +62,13 @@ describe('comment-data-provider component', ()=> {
         .and.returnValue(resultDeferred);
     });
 
-    it('returns can.promise', ()=> {
+    it('returns can.promise', () => {
       viewModel.getComments();
 
       expect(resultDeferred.promise).toHaveBeenCalled();
     });
 
-    it('turns on isLoading flag', ()=> {
+    it('turns on isLoading flag', () => {
       viewModel.attr('isLoading', false);
 
       viewModel.getComments();
@@ -76,7 +76,7 @@ describe('comment-data-provider component', ()=> {
       expect(viewModel.attr('isLoading')).toBe(true);
     });
 
-    it('resolves result deferred with items if all is OK', ()=> {
+    it('resolves result deferred with items if all is OK', () => {
       viewModel.getComments();
       queryDeferred.resolve({
         test: {
@@ -87,7 +87,7 @@ describe('comment-data-provider component', ()=> {
       expect(resultDeferred.resolve).toHaveBeenCalledWith(['value']);
     });
 
-    it('resolves result deferred with epmty array if failed', ()=> {
+    it('resolves result deferred with epmty array if failed', () => {
       viewModel.getComments();
       queryDeferred.reject();
 
@@ -95,8 +95,8 @@ describe('comment-data-provider component', ()=> {
     });
   });
 
-  describe('addComment() methid', ()=> {
-    it('adds comment to the beginning of the collection', ()=> {
+  describe('addComment() methid', () => {
+    it('adds comment to the beginning of the collection', () => {
       viewModel.attr('comments').replace(['comment2']);
       viewModel.addComment({
         items: ['comment1'],
@@ -106,8 +106,8 @@ describe('comment-data-provider component', ()=> {
     });
   });
 
-  describe('removeComment() method', ()=> {
-    it('removes the comment based on "_stamp" property', ()=> {
+  describe('removeComment() method', () => {
+    it('removes the comment based on "_stamp" property', () => {
       viewModel.attr('comments').replace([{
         title: 'comment1',
         _stamp: '1',
@@ -124,9 +124,9 @@ describe('comment-data-provider component', ()=> {
     });
   });
 
-  describe('processComment() method', ()=> {
+  describe('processComment() method', () => {
     let mapDfd;
-    beforeEach(()=>{
+    beforeEach(() => {
       mapDfd = can.Deferred();
       spyOn(viewModel, 'mapToInstance').and.returnValue(mapDfd.promise());
       viewModel.attr('instance', {
@@ -134,22 +134,22 @@ describe('comment-data-provider component', ()=> {
       });
     });
 
-    it('calls mapToInstance if success', ()=> {
+    it('calls mapToInstance if success', () => {
       viewModel.processComment({success: true, item: 'item'});
 
       expect(viewModel.mapToInstance).toHaveBeenCalledWith('item');
     });
 
-    it('refresh instance when comment was mapped', (done)=> {
+    it('refresh instance when comment was mapped', (done) => {
       viewModel.processComment({success: true, item: 'item'});
 
-      mapDfd.resolve().then(()=> {
+      mapDfd.resolve().then(() => {
         expect(viewModel.attr('instance').refresh).toHaveBeenCalled();
         done();
       });
     });
 
-    it('calls removeComment if fail', ()=> {
+    it('calls removeComment if fail', () => {
       spyOn(viewModel, 'removeComment');
 
       viewModel.processComment({success: false, item: 'item'});

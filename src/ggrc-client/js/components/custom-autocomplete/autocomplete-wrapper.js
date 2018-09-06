@@ -12,11 +12,12 @@ import {
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import RefreshQueue from '../../models/refresh_queue';
-import {getInstance} from '../../models/models-extensions';
+import {getInstance} from '../../plugins/utils/models-utils';
 
 export default can.Map.extend({
   currentValue: '',
-  model: null,
+  modelName: null,
+  modelConstructor: null,
   result: [],
   objectsToExclude: [],
   showResults: false,
@@ -39,7 +40,7 @@ export default can.Map.extend({
   // Gets ids of items using QueryAPI
   requestItems: function (value) {
     let queryField = this.attr('queryField');
-    let objName = this.attr('model');
+    let objName = this.attr('modelName');
     let filter = {expression: {
       left: queryField,
       op: {name: '~'},
@@ -50,12 +51,12 @@ export default can.Map.extend({
     return batchRequests(query);
   },
   getStubs: function (responseArr) {
-    let objName = this.attr('model');
+    let objName = this.attr('modelName');
     let ids = responseArr[objName].ids;
-    let model = CMS.Models[objName];
+    let modelConstructor = this.attr('modelConstructor');
 
     let res = can.map(ids, function (id) {
-      return getInstance(model.shortName, id);
+      return getInstance(modelConstructor.shortName, id);
     });
 
     return new can.Deferred().resolve(res);

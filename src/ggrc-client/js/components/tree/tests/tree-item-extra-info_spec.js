@@ -7,6 +7,7 @@ import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../tree-item-extra-info';
 import CycleTaskGroupObjectTask from '../../../models/business-models/cycle-task-group-object-task';
+import * as businessModels from '../../../models/business-models';
 
 describe('tree-item-extra-info component', function () {
   'use strict';
@@ -33,7 +34,7 @@ describe('tree-item-extra-info component', function () {
     activeModel.forEach(function (model) {
       it('instance is ' + model, function () {
         viewModel.attr('instance', makeFakeInstance(
-          {model: CMS.Models[model]}
+          {model: businessModels[model]}
         )());
         expect(viewModel.attr('isActive')).toBeTruthy();
       });
@@ -50,10 +51,10 @@ describe('tree-item-extra-info component', function () {
     });
 
     notActiveModels.forEach(function (model) {
-      if (CMS.Models[model]) {
+      if (businessModels[model]) {
         it('instance is ' + model, function () {
           viewModel.attr('instance', makeFakeInstance(
-            {model: CMS.Models[model]}
+            {model: businessModels[model]}
           )());
           expect(viewModel.attr('isActive')).toBeFalsy();
         });

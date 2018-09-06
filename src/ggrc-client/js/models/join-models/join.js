@@ -6,7 +6,7 @@
 import RefreshQueue from '../refresh_queue';
 import Cacheable from '../cacheable';
 import Stub from '../stub';
-import {getInstance} from '../models-extensions';
+import {getInstance} from '../../plugins/utils/models-utils';
 
 export default Cacheable('can.Model.Join', {
   join_keys: null,

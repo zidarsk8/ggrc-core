@@ -21,6 +21,7 @@ const forbiddenMapList = [
   'RiskAssessment',
   'Evidence',
   'AssessmentTemplate',
+  'Person',
 ];
 
 const viewModel = can.Map.extend({
@@ -54,11 +55,13 @@ const viewModel = can.Map.extend({
     isAllowedToEdit: {
       type: 'boolean',
       get() {
-        let type = this.attr('instance.type');
+        let instance = this.attr('instance');
+        let type = instance.attr('type');
         let isSnapshot = this.attr('isSnapshot');
-        let isArchived = this.attr('instance.archived');
+        let isArchived = instance.attr('archived');
         let isInForbiddenList = forbiddenEditList.indexOf(type) > -1;
-        return !(isSnapshot || isInForbiddenList || isArchived);
+        return Permission.is_allowed_for('update', instance) &&
+          !(isSnapshot || isInForbiddenList || isArchived);
       },
     },
     isAllowedToMap: {

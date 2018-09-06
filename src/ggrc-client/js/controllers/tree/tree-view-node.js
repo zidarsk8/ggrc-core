@@ -3,7 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
   isSnapshot,
 } from '../../plugins/utils/snapshot-utils';
@@ -12,6 +11,7 @@ import {
   isObjectContextPage,
   getPageType,
 } from '../../plugins/utils/current-page-utils';
+import TreeViewOptions from './tree-view-options';
 
 (function (can, $) {
   function _firstElementChild(el) {
@@ -47,19 +47,13 @@ import {
       }
       if (opts instanceof can.Map) {
         this.options = opts;
-        if (typeof (this.options.model) === 'string') {
-          this.options.attr('model', CMS.Models[this.options.model]);
-        }
         can.each(this.constructor.defaults, function (v, k) {
           if (!that.options.hasOwnProperty(k)) {
             that.options.attr(k, v);
           }
         });
       } else {
-        if (typeof (opts.model) === 'string') {
-          opts.model = CMS.Models[opts.model];
-        }
-        this.options = new CMS.Models.TreeViewOptions(this.constructor.defaults)
+        this.options = new TreeViewOptions(this.constructor.defaults)
           .attr(opts.model ? opts.model[opts.options_property ||
             this.constructor.defaults.options_property] : {})
           .attr(opts);
@@ -81,11 +75,7 @@ import {
       // this timeout is required because the invoker will access the control via
       // the element synchronously so we must not replace the element just yet
       setTimeout(function () {
-        if (this.options.disable_lazy_loading) {
-          this.draw_node();
-        } else {
-          this.draw_placeholder();
-        }
+        this.draw_node();
       }.bind(this), 0);
     },
 
@@ -96,7 +86,7 @@ import {
         }
         if ((!oldVal || !newVal) || (oldVal.length === newVal.length &&
           _.difference(getValues(oldVal), getValues(newVal)).length)) {
-          this.draw_node(true);
+          this.draw_node();
         }
       },
     ' updateCount'(el, ev, count, updateCount) {
@@ -122,18 +112,12 @@ import {
      * Trigger rendering the tree node in the DOM.
      * @param {Boolean} force - indicates redraw is/is not mandatory
      */
-    draw_node: function (force) {
-      let isActive;
-      let isPlaceholder;
-      let lazyLoading = this.options.disable_lazy_loading;
-
+    draw_node: function () {
       if (!this.element) {
         return;
       }
-      isPlaceholder = this.element.hasClass('tree-item-placeholder');
 
-      if (this._draw_node_in_progress ||
-        !force && (!lazyLoading && !isPlaceholder)) {
+      if (this._draw_node_in_progress) {
         return;
       }
 
@@ -141,7 +125,7 @@ import {
 
       // the node's isActive state is not stored anywhere, thus we need to
       // determine it from the presemce of the corresponding CSS class
-      isActive = this.element.hasClass('active');
+      let isActive = this.element.hasClass('active');
 
       can.view(
         this.options.show_view,
@@ -157,26 +141,7 @@ import {
         }.bind(this))
       );
 
-      this.options.attr('isPlaceholder', false);
       this._draw_node_in_progress = false;
-    },
-
-    draw_placeholder: function () {
-      can.view(
-        GGRC.mustache_path + '/base_objects/tree_placeholder.mustache',
-        this.options,
-        this._ifNotRemoved(function (frag) {
-          let model = CMS.Models[this.options.instance.type];
-          this.replace_element(frag);
-          this._draw_node_deferred.resolve();
-          this.options.expanded = false;
-          if (isSnapshot(this.options.instance)) {
-            model.removeFromCacheById(this.options.instance.id);
-          }
-          delete this._expand_deferred;
-        }.bind(this))
-      );
-      this.options.attr('isPlaceholder', true);
     },
 
     should_draw_children: function () {

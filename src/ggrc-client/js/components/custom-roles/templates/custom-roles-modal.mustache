@@ -30,6 +30,7 @@
             {updatable-group-id}="updatableGroupId"
             {read-only}="readOnly"
             data-original-title="{{groupTooltip}}"
+            {single-user-role}="singleUserRole"
             {{#showGroupTooltip}}
               rel="tooltip"
               data-placement="bottom"
@@ -51,6 +52,11 @@
                       <i class="fa fa-asterisk"></i>
                     {{/if}}
                   </label>
+                  {{#if singleUserRole}}
+                    <div class="people-group__title-tooltip">
+                      <small><em>You can add only one person for this role</em></small>
+                    </div>
+                  {{/if}}
                 </deletable-people-group>
                 <div>
                   {{#if isUpdating}}
@@ -61,12 +67,12 @@
                       <autocomplete
                           search-items-type="Person"
                           (item-selected)="addPerson(%event.selectedItem, @groupId)"
-                          placeholder="Add person">
+                          {placeholder}="placeholder">
                       </autocomplete>
                       {{else}}
                       <external-data-autocomplete
                         {type}="'Person'"
-                        {placeholder}="'Add person'"
+                        {placeholder}="placeholder"
                         {min-length}="2"
                         (item-selected)="addPerson(%event.selectedItem, @groupId)">
                       </external-data-autocomplete>

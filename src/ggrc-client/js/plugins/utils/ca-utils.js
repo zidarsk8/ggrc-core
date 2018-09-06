@@ -389,11 +389,10 @@ function getCustomAttributes(instance, type) {
  * @param {*} value
  */
 function updateCustomAttributeValue(ca, value) {
-  let id;
   if (ca.attr('attributeType') === 'person') {
-    id = value || null;
+    let attributeObject = value ? {id: value, type: 'Person'} : null;
     ca.attr('attribute_value', 'Person');
-    ca.attr('attribute_object', {id: id, type: 'Person'});
+    ca.attr('attribute_object', attributeObject);
   } else {
     let convertedValue = convertToCaValue(ca.attr('attributeType'), value);
     ca.attr('attribute_value', convertedValue || ca.def.default_value);

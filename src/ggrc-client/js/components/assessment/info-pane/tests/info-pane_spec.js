@@ -19,6 +19,7 @@ import * as DeferredTransactionUtil from '../../../../plugins/utils/deferred-tra
 import Permission from '../../../../permission';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../../../../plugins/utils/custom-attribute/custom-attribute-config';
 import * as NotifiersUtils from '../../../../plugins/utils/notifiers-utils';
+import * as businessModels from '../../../../models/business-models';
 
 describe('assessment-info-pane component', () => {
   let vm;
@@ -83,20 +84,20 @@ describe('assessment-info-pane component', () => {
 
     beforeEach(function () {
       fakeType = 'FakeType';
-      CMS.Models[fakeType] = {};
+      businessModels[fakeType] = {};
       vm.attr('instance', {
         assessment_type: fakeType,
       });
     });
 
     afterAll(function () {
-      delete CMS.Models[fakeType];
+      businessModels[fakeType] = undefined;
     });
 
     it('returns singular title for object which has type equals to ' +
     'assessment object type', function () {
       const title = 'Fake Title';
-      CMS.Models[fakeType].title_singular = title;
+      businessModels[fakeType].title_singular = title;
       expect(vm.attr('assessmentTypeNameSingular')).toBe(title);
     });
   });
@@ -106,20 +107,20 @@ describe('assessment-info-pane component', () => {
 
     beforeEach(function () {
       fakeType = 'FakeType';
-      CMS.Models[fakeType] = {};
+      businessModels[fakeType] = {};
       vm.attr('instance', {
         assessment_type: fakeType,
       });
     });
 
     afterAll(function () {
-      delete CMS.Models[fakeType];
+      businessModels[fakeType] = undefined;
     });
 
     it('returns plural title for object which has type equals to ' +
     'assessment object type', function () {
       const title = 'Fake Title';
-      CMS.Models[fakeType].title_plural = title;
+      businessModels[fakeType].title_plural = title;
       expect(vm.attr('assessmentTypeNamePlural')).toBe(title);
     });
   });
@@ -663,14 +664,14 @@ describe('assessment-info-pane component', () => {
     });
   });
 
-  describe('isAllowedToMap attribute', ()=> {
-    describe('get() method', ()=> {
+  describe('isAllowedToMap attribute', () => {
+    describe('get() method', () => {
       beforeEach(function () {
         vm.attr('instance', {});
       });
 
       it('returns true if there is audit and it is allowed to read ' +
-      'instance.audit', ()=> {
+      'instance.audit', () => {
         vm.attr('instance.audit', {});
         spyOn(Permission, 'is_allowed_for').and.returnValue(true);
 
@@ -678,7 +679,7 @@ describe('assessment-info-pane component', () => {
 
         expect(result).toBe(true);
       });
-      it('returns false if there is no audit', ()=> {
+      it('returns false if there is no audit', () => {
         vm.attr('instance.audit', null);
 
         let result = vm.attr('isAllowedToMap');
@@ -687,7 +688,7 @@ describe('assessment-info-pane component', () => {
       });
 
       it('returns false if there is audit but it is not allowed ' +
-      'to read instance.audit', ()=> {
+      'to read instance.audit', () => {
         vm.attr('instance.audit', {});
         spyOn(Permission, 'is_allowed_for').and.returnValue(false);
 

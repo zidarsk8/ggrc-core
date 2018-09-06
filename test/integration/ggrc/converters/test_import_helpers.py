@@ -7,15 +7,13 @@ from copy import deepcopy
 import ddt
 
 from ggrc import converters
-from ggrc import models
+from ggrc.models import all_models
 from ggrc.access_control import roleable
 from ggrc.converters import column_handlers
 from ggrc.converters import import_helper
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.utils import rules
 from ggrc.utils import title_from_camelcase
-from ggrc_risks import models as r_models
-from ggrc_risk_assessments import models as ra_models
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 from integration.ggrc.generator import ObjectGenerator
@@ -43,7 +41,7 @@ def get_mapping_names(class_name):
 class TestACLAttributeDefinitions(TestCase):
   """Tests for ACL column definitions on all models."""
 
-  @ddt.data(*models.all_models.all_models)
+  @ddt.data(*all_models.all_models)
   def test_acl_definitions(self, model):
     """Test ACL column definitions."""
     with factories.single_commit():
@@ -75,8 +73,8 @@ class TestCustomAttributesDefinitions(TestCase):
     self.generator.generate_custom_attribute("policy", title="My Attribute")
     self.generator.generate_custom_attribute(
         "policy", title="Mandatory Attribute", mandatory=True)
-    definitions = get_object_column_definitions(models.Policy)
-    mapping_names = get_mapping_names(models.Policy.__name__)
+    definitions = get_object_column_definitions(all_models.Policy)
+    mapping_names = get_mapping_names(all_models.Policy.__name__)
     display_names = {val["display_name"] for val in definitions.itervalues()}
     element_names = {
         "Code",
@@ -129,8 +127,8 @@ class TestCustomAttributesDefinitions(TestCase):
         attribute_type="Dropdown",
         multi_choice="hello,world,what's,up"
     )
-    definitions = get_object_column_definitions(models.Program)
-    mapping_names = get_mapping_names(models.Program.__name__)
+    definitions = get_object_column_definitions(all_models.Program)
+    mapping_names = get_mapping_names(all_models.Program.__name__)
     display_names = {val["display_name"] for val in definitions.itervalues()}
     element_names = {
         "Title",
@@ -179,6 +177,20 @@ class TestGetObjectColumnDefinitions(TestCase):
           "Title",
           "Admin",
           "Code",
+      },
+      "unique": {
+          "Code",
+          "Title",
+      },
+  }
+
+  SCOPE_COMMON_EXPECTED = {
+      "mandatory": {
+          "Title",
+          "Admin",
+          "Code",
+          "Assignee",
+          "Verifier",
       },
       "unique": {
           "Code",
@@ -342,7 +354,7 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Title",
         },
     }
-    self._test_single_object(models.Program, names, expected_fields)
+    self._test_single_object(all_models.Program, names, expected_fields)
 
   def test_audit_definitions(self):
     """Test default headers for Audit."""
@@ -380,7 +392,7 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Title",
         },
     }
-    self._test_single_object(models.Audit, names, expected_fields)
+    self._test_single_object(all_models.Audit, names, expected_fields)
 
   def test_assessment_template_defs(self):
     """Test default headers for Assessment Template."""
@@ -418,8 +430,8 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Archived",
         }
     }
-    self._test_single_object(models.AssessmentTemplate, names, expected_fields,
-                             has_mappings=False)
+    self._test_single_object(all_models.AssessmentTemplate, names,
+                             expected_fields, has_mappings=False)
 
   def test_assessment_definitions(self):
     """Test default headers for Assessment."""
@@ -478,7 +490,7 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Archived",
         }
     }
-    self._test_single_object(models.Assessment, names, expected_fields)
+    self._test_single_object(all_models.Assessment, names, expected_fields)
 
   def test_issue_definitions(self):
     """Test default headers for Issue."""
@@ -518,7 +530,7 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Title",
         },
     }
-    self._test_single_object(models.Issue, names, expected_fields)
+    self._test_single_object(all_models.Issue, names, expected_fields)
 
   def test_policy_definitions(self):
     """Test default headers for Policy."""
@@ -546,7 +558,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated By",
         "Folder",
     }
-    self._test_single_object(models.Policy, names, self.COMMON_EXPECTED)
+    self._test_single_object(all_models.Policy, names, self.COMMON_EXPECTED)
 
   def test_clause_definitions(self):
     """Test default headers for Clause."""
@@ -573,7 +585,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Assessment Procedure",
         "Folder",
     }
-    self._test_single_object(models.Clause, names, self.COMMON_EXPECTED)
+    self._test_single_object(all_models.Clause, names, self.COMMON_EXPECTED)
 
   def test_requirement_definitions(self):
     """Test default headers for Requirement."""
@@ -601,7 +613,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Folder",
     }
-    self._test_single_object(models.Requirement, names, self.COMMON_EXPECTED)
+    self._test_single_object(all_models.Requirement, names,
+                             self.COMMON_EXPECTED)
 
   def test_control_definitions(self):
     """Test default headers for Control."""
@@ -643,7 +656,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     # Control has additional mandatory field - Assertions
     control_expected = deepcopy(self.COMMON_EXPECTED)
     control_expected["mandatory"].add("Assertions")
-    self._test_single_object(models.Control, names, control_expected)
+    self._test_single_object(all_models.Control, names, control_expected)
 
   def test_objective_definitions(self):
     """Test default headers for Objective."""
@@ -671,7 +684,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Folder",
     }
-    self._test_single_object(models.Objective, names, self.COMMON_EXPECTED)
+    self._test_single_object(all_models.Objective, names, self.COMMON_EXPECTED)
 
   def test_person_definitions(self):
     """Test default headers for Person."""
@@ -692,7 +705,7 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Email",
         },
     }
-    self._test_single_object(models.Person, names, expected_fields)
+    self._test_single_object(all_models.Person, names, expected_fields)
 
   def test_system_definitions(self):
     """Test default headers for System."""
@@ -709,8 +722,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
-        "Primary Contacts",
-        "Secondary Contacts",
+        "Compliance Contacts",
+        "Assignee",
+        "Verifier",
         "Recipients",
         "Send by default",
         "Comments",
@@ -719,9 +733,12 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated Date",
         "Last Updated By",
         "Folder",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     names.update(self.SCOPING_ROLES)
-    self._test_single_object(models.System, names, self.COMMON_EXPECTED)
+    self._test_single_object(all_models.System, names,
+                             self.SCOPE_COMMON_EXPECTED)
 
   def test_process_definitions(self):
     """Test default headers for Process."""
@@ -738,8 +755,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
-        "Primary Contacts",
-        "Secondary Contacts",
+        "Compliance Contacts",
+        "Assignee",
+        "Verifier",
         "Recipients",
         "Send by default",
         "Comments",
@@ -748,9 +766,12 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated Date",
         "Last Updated By",
         "Folder",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     names.update(self.SCOPING_ROLES)
-    self._test_single_object(models.Process, names, self.COMMON_EXPECTED)
+    self._test_single_object(all_models.Process, names,
+                             self.SCOPE_COMMON_EXPECTED)
 
   def test_product_definitions(self):
     """Test default headers for Product."""
@@ -767,8 +788,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
-        "Primary Contacts",
-        "Secondary Contacts",
+        "Compliance Contacts",
+        "Assignee",
+        "Verifier",
         "Recipients",
         "Send by default",
         "Comments",
@@ -777,9 +799,12 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated Date",
         "Last Updated By",
         "Folder",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     names.update(self.SCOPING_ROLES)
-    self._test_single_object(models.Product, names, self.COMMON_EXPECTED)
+    self._test_single_object(all_models.Product, names,
+                             self.SCOPE_COMMON_EXPECTED)
 
   def test_risk_definitions(self):
     """Test default headers for Risk."""
@@ -818,12 +843,12 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Title",
         },
     }
-    self._test_single_object(r_models.Risk, names, expected_fields)
+    self._test_single_object(all_models.Risk, names, expected_fields)
 
   @ddt.data(
-      models.Metric,
-      models.ProductGroup,
-      models.TechnologyEnvironment,
+      all_models.Metric,
+      all_models.ProductGroup,
+      all_models.TechnologyEnvironment,
   )
   def test_documentable_objects(self, model):
     """Tests Metric, ProductGroup, TechnologyEnvironment models. """
@@ -840,8 +865,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
-        "Primary Contacts",
-        "Secondary Contacts",
+        "Compliance Contacts",
+        "Assignee",
+        "Verifier",
         "Recipients",
         "Send by default",
         "Comments",
@@ -851,14 +877,16 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated By",
         "Folder",
         "Document File",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     names.update(self.SCOPING_ROLES)
-    self._test_single_object(model, names, self.COMMON_EXPECTED)
+    self._test_single_object(model, names, self.SCOPE_COMMON_EXPECTED)
 
   @ddt.data(
-      models.Contract,
-      models.Regulation,
-      models.Standard,
+      all_models.Contract,
+      all_models.Regulation,
+      all_models.Standard,
   )
   def test_common_model_definitions(self, model):
     """Test common definition names"""
@@ -888,13 +916,13 @@ class TestGetObjectColumnDefinitions(TestCase):
     self._test_single_object(model, names, self.COMMON_EXPECTED)
 
   @ddt.data(
-      models.AccessGroup,
-      models.DataAsset,
-      models.Facility,
-      models.Market,
-      models.OrgGroup,
-      models.Project,
-      models.Vendor,
+      all_models.AccessGroup,
+      all_models.DataAsset,
+      all_models.Facility,
+      all_models.Market,
+      all_models.OrgGroup,
+      all_models.Project,
+      all_models.Vendor,
   )
   def test_scoping_model_definitions(self, model):
     """Test common definition names"""
@@ -911,8 +939,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
-        "Primary Contacts",
-        "Secondary Contacts",
+        "Compliance Contacts",
+        "Assignee",
+        "Verifier",
         "Recipients",
         "Send by default",
         "Comments",
@@ -921,9 +950,11 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated Date",
         "Last Updated By",
         "Folder",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     names.update(self.SCOPING_ROLES)
-    self._test_single_object(model, names, self.COMMON_EXPECTED)
+    self._test_single_object(model, names, self.SCOPE_COMMON_EXPECTED)
 
 
 class TestRiskAssessmentColumnDefinitions(TestCase):
@@ -938,7 +969,7 @@ class TestRiskAssessmentColumnDefinitions(TestCase):
 
   def test_risk_assessemnt(self):
     """Test default headers for Risk Assessment."""
-    definitions = get_object_column_definitions(ra_models.RiskAssessment)
+    definitions = get_object_column_definitions(all_models.RiskAssessment)
     display_names = {val["display_name"] for val in definitions.itervalues()}
     expected_names = {
         "Title",

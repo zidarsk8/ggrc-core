@@ -20,12 +20,12 @@ describe('related-urls component', function () {
     viewModel.attr('instance', instance);
   });
 
-  describe('canAddUrl get() method', ()=> {
-    beforeEach(()=> {
+  describe('canAddUrl get() method', () => {
+    beforeEach(() => {
       spyOn(Permission, 'is_allowed_for');
     });
 
-    it('returns false if user can not update instance', ()=> {
+    it('returns false if user can not update instance', () => {
       Permission.is_allowed_for.and.returnValue(false);
 
       let result = viewModel.attr('canAddUrl');
@@ -34,7 +34,7 @@ describe('related-urls component', function () {
     });
 
     it(`returns false if user can update instance 
-        but edit is disabled in the component`, ()=> {
+        but edit is disabled in the component`, () => {
         Permission.is_allowed_for.and.returnValue(true);
         viewModel.attr('isNotEditable', true);
 
@@ -43,22 +43,23 @@ describe('related-urls component', function () {
         expect(result).toBe(false);
       });
 
-    it('returns true if user can update instance and edit is not denied', ()=> {
-      Permission.is_allowed_for.and.returnValue(true);
-      viewModel.attr('isNotEditable', false);
+    it('returns true if user can update instance and edit is not denied',
+      () => {
+        Permission.is_allowed_for.and.returnValue(true);
+        viewModel.attr('isNotEditable', false);
 
-      let result = viewModel.attr('canAddUrl');
+        let result = viewModel.attr('canAddUrl');
 
-      expect(result).toBe(true);
-    });
+        expect(result).toBe(true);
+      });
   });
 
-  describe('canRemoveUrl get() method', ()=> {
-    beforeEach(()=> {
+  describe('canRemoveUrl get() method', () => {
+    beforeEach(() => {
       spyOn(Permission, 'is_allowed_for');
     });
 
-    it('returns false if user can not update instance', ()=> {
+    it('returns false if user can not update instance', () => {
       Permission.is_allowed_for.and.returnValue(false);
 
       let result = viewModel.attr('canRemoveUrl');
@@ -67,7 +68,7 @@ describe('related-urls component', function () {
     });
 
     it(`returns false if user can update instance 
-        but edit is disabled in the component`, ()=> {
+        but edit is disabled in the component`, () => {
         Permission.is_allowed_for.and.returnValue(true);
         viewModel.attr('isNotEditable', true);
 
@@ -77,7 +78,7 @@ describe('related-urls component', function () {
       });
 
     it(`returns false if user can update instance, edit is is not denied,
-        but removal is disabled by flag`, ()=> {
+        but removal is disabled by flag`, () => {
         Permission.is_allowed_for.and.returnValue(true);
         viewModel.attr('isNotEditable', false);
         viewModel.attr('allowToRemove', false);
@@ -88,7 +89,7 @@ describe('related-urls component', function () {
       });
 
     it(`returns true if user can update instance, edit is not denied,
-        and removal is not disabled`, ()=> {
+        and removal is not disabled`, () => {
         Permission.is_allowed_for.and.returnValue(true);
         viewModel.attr('isNotEditable', false);
         viewModel.attr('allowToRemove', true);

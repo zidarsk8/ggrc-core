@@ -7,17 +7,17 @@ import Component from '../ca-object-modal-content';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import * as Utils from '../../../plugins/ggrc_utils';
 
-describe('ca-object-modal-content component', ()=> {
+describe('ca-object-modal-content component', () => {
   let viewModel;
 
-  beforeEach(()=> {
+  beforeEach(() => {
     viewModel = getComponentVM(Component);
   });
 
-  describe('onCommentCreated() method', ()=> {
+  describe('onCommentCreated() method', () => {
     let comment;
 
-    beforeEach(()=> {
+    beforeEach(() => {
       viewModel.attr({
         instance: new can.Map(),
         state: {},
@@ -32,7 +32,7 @@ describe('ca-object-modal-content component', ()=> {
       comment = new can.Map();
     });
 
-    it('call "addComment" when saveDfd resolved', (done)=> {
+    it('call "addComment" when saveDfd resolved', (done) => {
       let saveDfd = can.Deferred();
       viewModel.attr('content.saveDfd', saveDfd);
       spyOn(viewModel, 'addComment');
@@ -44,7 +44,7 @@ describe('ca-object-modal-content component', ()=> {
 
       expect(viewModel.addComment).not.toHaveBeenCalled();
 
-      saveDfd.resolve().then(()=> {
+      saveDfd.resolve().then(() => {
         expect(viewModel.addComment).toHaveBeenCalled();
         done();
       });

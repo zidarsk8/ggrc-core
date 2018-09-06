@@ -32,6 +32,7 @@ import {
 import Option from './models/service-models/option';
 import Search from './models/service-models/search';
 import Person from './models/business-models/person';
+import modalModels from './models/modal-models';
 
 // Chrome likes to cache AJAX requests for Mustaches.
 let mustacheUrls = {};
@@ -905,7 +906,7 @@ Mustache.registerHelper('is_allowed_to_map',
     return options.inverse(options.contexts || this);
   });
 
-Mustache.registerHelper('is_allowed_to_map_task', (sourceType, options)=> {
+Mustache.registerHelper('is_allowed_to_map_task', (sourceType, options) => {
   const mappableTypes = ['Program', 'Regulation', 'Policy', 'Standard',
     'Contract', 'Clause', 'Requirement', 'Request', 'Control', 'Objective',
     'OrgGroup', 'Vendor', 'AccessGroup', 'System', 'Process', 'DataAsset',
@@ -1265,7 +1266,7 @@ Mustache.registerHelper('with_model_as',
   function (varName, modelName, options) {
     let frame = {};
     modelName = resolveComputed(Mustache.resolve(modelName));
-    frame[varName] = CMS.Models[modelName];
+    frame[varName] = modalModels[modelName];
     return options.fn(options.contexts.add(frame));
   });
 
@@ -1286,7 +1287,7 @@ Mustache.registerHelper('if_instance_of', function (inst, cls, options) {
 
   if (typeof cls === 'string') {
     cls = cls.split('|').map(function (cl) {
-      return CMS.Models[cl];
+      return modalModels[cl];
     });
   } else if (typeof cls !== 'function') {
     cls = [cls.constructor];
@@ -1684,37 +1685,6 @@ Example:
 Mustache.registerHelper('add_to_current_scope', function (options) {
   return options.fn(options.contexts
     .add(_.assign({}, options.context, options.hash)));
-});
-
-/**
-   * Return a value of a CMS.Model constructor's property.
-   *
-   * If a Model is not found, an error is raised. If a property does not exist
-   * on the model, undefined is returned.
-   *
-   * @param {String} modelName - the name of the Model to inspect
-   * @param {String} attr - the name of a modelName's property
-   *
-   * @return {*} - the value of the modelName[attr]
-   */
-Mustache.registerHelper('model_info', function (modelName, attr, options) {
-  let model;
-
-  if (arguments.length !== 3) {
-    throw new Error(
-      'Invalid number of arguments (' +
-        (arguments.length - 1) + // do not count the auto-provided options arg
-        '), expected 2.');
-  }
-
-  modelName = Mustache.resolve(modelName);
-  model = CMS.Models[modelName];
-
-  if (typeof model === 'undefined') {
-    throw new Error('Model not found (' + modelName + ').');
-  }
-
-  return model[attr];
 });
 
 /*

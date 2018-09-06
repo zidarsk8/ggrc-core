@@ -62,11 +62,11 @@
                 scopes: scopes,
                 modal_title: 'Please log in to Google API',
                 new_object_form: true,
-                onAccept: ()=> {
+                onAccept: () => {
                   that.doGAuth_step2(null, true);
                   return that.oauth_dfd;
                 },
-                onDecline: ()=> {
+                onDecline: () => {
                   that.oauth_dfd.reject('User canceled operation');
                 },
               });

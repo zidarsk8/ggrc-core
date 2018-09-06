@@ -53,7 +53,7 @@ export default can.Control({
         this.options.attr('contexts', new can.Observe(this.options.contexts));
       }
 
-      router.bind('widget', (ev, newVal)=>{
+      router.bind('widget', (ev, newVal) => {
         this.route(newVal);
       });
 

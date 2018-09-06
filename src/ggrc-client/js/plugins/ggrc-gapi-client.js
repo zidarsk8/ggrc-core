@@ -81,7 +81,7 @@ class BackendGdriveClient {
    */
   authorizeBackendGapi(authDfd) {
     let popup = this.showAuthModal();
-    let timer = setInterval(()=> {
+    let timer = setInterval(() => {
       if (popup.closed) {
         clearInterval(timer);
         this.checkBackendAuth()
@@ -97,11 +97,11 @@ class BackendGdriveClient {
     this.authDfd = can.Deferred();
     this.showGapiModal({
       scopes: ['https://www.googleapis.com/auth/drive'],
-      onAccept: ()=> {
+      onAccept: () => {
         this.authorizeBackendGapi(this.authDfd);
         return this.authDfd.promise();
       },
-      onDecline: ()=> this.authDfd.reject('User canceled operation'),
+      onDecline: () => this.authDfd.reject('User canceled operation'),
     });
   }
 
@@ -112,7 +112,7 @@ class BackendGdriveClient {
    * @return {Deferred} - The deferred object containing result of action or predefined data in case of auth failure.
    */
   withAuth(action, rejectResponse) {
-    return action().then(null, (e)=> {
+    return action().then(null, (e) => {
       // if BE auth token was corrupted or missed.
       if (e.status === 401) {
         // We need to reuse the same dfd to handle case of multiple requests.
@@ -121,9 +121,9 @@ class BackendGdriveClient {
         }
 
         let resultDfd = can.Deferred();
-        this.authDfd.then(()=> {
+        this.authDfd.then(() => {
           action().then(resultDfd.resolve, resultDfd.reject);
-        }, (error)=> resultDfd.reject(rejectResponse || error));
+        }, (error) => resultDfd.reject(rejectResponse || error));
 
         return resultDfd;
       }
@@ -155,7 +155,7 @@ class GGRCGapiClient {
     script.src = 'https://apis.google.com/js/client.js?onload=resolvegapi';
     script.async = true;
 
-    window.resolvegapi = ()=> {
+    window.resolvegapi = () => {
       this.client.resolve(window.gapi);
       window.resolvegapi = null;
     };
@@ -171,7 +171,7 @@ class GGRCGapiClient {
   addNewScopes(newScopes) {
     let scopesWereAdded = false;
 
-    newScopes.forEach((scope)=> {
+    newScopes.forEach((scope) => {
       if (!this.currentScopes.includes(scope)) {
         this.currentScopes.push(scope);
         scopesWereAdded = true;
@@ -188,13 +188,13 @@ class GGRCGapiClient {
    */
   authorizeGapi(requiredScopes = []) {
     let needToRequestForNewScopes = this.addNewScopes(requiredScopes);
-    return this.client.then((gapi)=> {
+    return this.client.then((gapi) => {
       let token = gapi.auth.getToken();
 
       if (needToRequestForNewScopes || !token) {
         this.oauthResult.reject();
         this.oauthResult = can.Deferred();
-        this.oauthResult.then(()=>this.checkLoggedUser());
+        this.oauthResult.then(() =>this.checkLoggedUser());
         this.runAuthorization(true);
       }
 
@@ -209,15 +209,15 @@ class GGRCGapiClient {
   runAuthorization(immediate) {
     // make auth request
     this.makeGapiAuthRequest(immediate)
-      .then(this.oauthResult.resolve, ()=> {
+      .then(this.oauthResult.resolve, () => {
         if (immediate) {
           this.showGapiModal({
             scopes: this.currentScopes,
-            onAccept: ()=> {
+            onAccept: () => {
               this.runAuthorization();
               return this.oauthResult;
             },
-            onDecline: ()=> {
+            onDecline: () => {
               this.oauthResult.reject('User canceled operation');
             },
           });
@@ -250,9 +250,9 @@ class GGRCGapiClient {
     let result = can.Deferred();
 
     gapi.client.request({path, method})
-      .then((response)=> {
+      .then((response) => {
         result.resolve(response.result);
-      }, (response)=> {
+      }, (response) => {
         result.reject(response.result.error);
       });
 
@@ -270,7 +270,7 @@ class GGRCGapiClient {
     if (this.loadedClientLibraries[libraryName]) {
       result.resolve(this.loadedClientLibraries[libraryName]);
     } else {
-      gapi.client.load(libraryName, 'v2').then(()=>{
+      gapi.client.load(libraryName, 'v2').then(() => {
         let loadedLibrary = gapi.client[libraryName];
         this.loadedClientLibraries[libraryName] = loadedLibrary;
         result.resolve(loadedLibrary);
@@ -284,8 +284,8 @@ class GGRCGapiClient {
    * Check whether user looged in google with ggrc email.
    */
   checkLoggedUser() {
-    this.loadClientLibrary('oauth2').then((oauth2)=> {
-      oauth2.userinfo.get().execute((user)=> {
+    this.loadClientLibrary('oauth2').then((oauth2) => {
+      oauth2.userinfo.get().execute((user) => {
         if (user.error) {
           notifier('error', user.error);
           return;

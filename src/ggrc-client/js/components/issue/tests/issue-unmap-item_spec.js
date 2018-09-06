@@ -9,37 +9,38 @@ import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
 import Relationship from '../../../models/service-models/relationship';
+import * as businessModels from '../../../models/business-models';
 
-describe('issue-unmap-item component', ()=> {
+describe('issue-unmap-item component', () => {
   let viewModel;
   let events;
-  beforeEach(()=> {
+  beforeEach(() => {
     viewModel = getComponentVM(Component);
     events = Component.prototype.events;
   });
 
-  describe('paging value', ()=> {
-    it('returns Pagination object with [5, 10, 15] pagination', ()=> {
+  describe('paging value', () => {
+    it('returns Pagination object with [5, 10, 15] pagination', () => {
       let pagination = viewModel.attr('paging');
       expect(pagination.attr('pageSizeSelect').serialize())
         .toEqual([5, 10, 15]);
     });
   });
 
-  describe('buildQuery() method', ()=> {
-    it('sets object_name to passed type', ()=> {
+  describe('buildQuery() method', () => {
+    it('sets object_name to passed type', () => {
       let type = 'Type';
       let query = viewModel.buildQuery(type);
       expect(query.object_name).toBe(type);
     });
 
-    it('sets limit to [0, 5]', ()=> {
+    it('sets limit to [0, 5]', () => {
       let query = viewModel.buildQuery('Type');
       expect(query.limit).toEqual([0, 5]);
     });
 
-    describe('configures filters.expression namely', ()=> {
-      it('sets assessment.id from viewModel.target.id', ()=> {
+    describe('configures filters.expression namely', () => {
+      it('sets assessment.id from viewModel.target.id', () => {
         let query;
         let id = 1234567;
 
@@ -49,7 +50,7 @@ describe('issue-unmap-item component', ()=> {
         expect(query.filters.expression.assessment.id).toBe(id);
       });
 
-      it('sets issue.id from viewModel.issueInstance.id', ()=> {
+      it('sets issue.id from viewModel.issueInstance.id', () => {
         let query;
         let id = 1234567;
 
@@ -59,7 +60,7 @@ describe('issue-unmap-item component', ()=> {
         expect(query.filters.expression.issue.id).toBe(id);
       });
 
-      it('sets op.name to "cascade_unmappable" string', ()=> {
+      it('sets op.name to "cascade_unmappable" string', () => {
         let operationName = 'cascade_unmappable';
         let query = viewModel.buildQuery('Type');
         expect(query.filters.expression.op.name).toBe(operationName);
@@ -67,15 +68,15 @@ describe('issue-unmap-item component', ()=> {
     });
   });
 
-  describe('processRelatedSnapshots() method', ()=> {
-    beforeEach(()=> {
+  describe('processRelatedSnapshots() method', () => {
+    beforeEach(() => {
       spyOn(viewModel, 'loadRelatedObjects')
         .and.returnValue(can.Deferred().resolve());
       spyOn(viewModel, 'showModal');
       spyOn(viewModel, 'unmap');
     });
 
-    it('shows modal if there are items to unmap', ()=> {
+    it('shows modal if there are items to unmap', () => {
       viewModel.attr('total', 2);
 
       viewModel.processRelatedSnapshots();
@@ -84,7 +85,7 @@ describe('issue-unmap-item component', ()=> {
       expect(viewModel.unmap).not.toHaveBeenCalled();
     });
 
-    it('unmaps issue if there are no related items', ()=> {
+    it('unmaps issue if there are no related items', () => {
       viewModel.attr('total', 0);
 
       viewModel.processRelatedSnapshots();
@@ -94,12 +95,12 @@ describe('issue-unmap-item component', ()=> {
     });
   });
 
-  describe('loadRelatedObjects() method', ()=> {
+  describe('loadRelatedObjects() method', () => {
     let reqDeferred;
     let snapshotsResponse;
     let auditsResponse;
 
-    beforeEach(()=> {
+    beforeEach(() => {
       snapshotsResponse = {
         Snapshot: {
           values: [{}, {}],
@@ -119,7 +120,7 @@ describe('issue-unmap-item component', ()=> {
       spyOn($.prototype, 'trigger');
     });
 
-    it('should change "isLoading" flag in case of success', ()=> {
+    it('should change "isLoading" flag in case of success', () => {
       viewModel.attr('isLoading', false);
 
       viewModel.loadRelatedObjects();
@@ -129,7 +130,7 @@ describe('issue-unmap-item component', ()=> {
       expect(viewModel.attr('isLoading')).toBeFalsy();
     });
 
-    it('should change "isLoading" flag in case of error', ()=> {
+    it('should change "isLoading" flag in case of error', () => {
       viewModel.attr('isLoading', false);
 
       viewModel.loadRelatedObjects();
@@ -139,7 +140,7 @@ describe('issue-unmap-item component', ()=> {
       expect(viewModel.attr('isLoading')).toBeFalsy();
     });
 
-    it('should load snapshots correctly', ()=> {
+    it('should load snapshots correctly', () => {
       viewModel.loadRelatedObjects();
       reqDeferred.resolve(snapshotsResponse, auditsResponse);
 
@@ -148,7 +149,7 @@ describe('issue-unmap-item component', ()=> {
       expect(viewModel.attr('paging.total')).toBe(10);
     });
 
-    it('should handle server errors correctly', ()=> {
+    it('should handle server errors correctly', () => {
       viewModel.loadRelatedObjects();
       reqDeferred.reject();
 
@@ -158,8 +159,8 @@ describe('issue-unmap-item component', ()=> {
     });
   });
 
-  describe('showModal() method', ()=> {
-    it('updates singular title', ()=> {
+  describe('showModal() method', () => {
+    it('updates singular title', () => {
       viewModel.attr('total', 1);
 
       viewModel.showModal();
@@ -167,7 +168,7 @@ describe('issue-unmap-item component', ()=> {
       expect(viewModel.attr('modalTitle')).toBe('Unmapping (1 object)');
     });
 
-    it('updates plural title', ()=> {
+    it('updates plural title', () => {
       viewModel.attr('total', 5);
 
       viewModel.showModal();
@@ -175,7 +176,7 @@ describe('issue-unmap-item component', ()=> {
       expect(viewModel.attr('modalTitle')).toBe('Unmapping (5 objects)');
     });
 
-    it('changes modal state', ()=> {
+    it('changes modal state', () => {
       viewModel.attr('modalState.open', false);
 
       viewModel.showModal();
@@ -184,13 +185,12 @@ describe('issue-unmap-item component', ()=> {
     });
   });
 
-  describe('openObject() method', ()=> {
+  describe('openObject() method', () => {
     let relatedObject;
-    let originalModels;
     let getParam;
     let ARGS;
 
-    beforeAll(()=> {
+    beforeAll(() => {
       getParam = function (spy, index) {
         return spy.calls.argsFor(0)[index];
       };
@@ -198,47 +198,45 @@ describe('issue-unmap-item component', ()=> {
         FIRST: 0,
         SECOND: 1,
       };
-      originalModels = CMS.Models;
     });
 
-    afterAll(()=> {
-      CMS.Models = originalModels;
-    });
-
-    beforeEach(()=> {
+    beforeEach(() => {
       relatedObject = {
         id: 123,
         type: 'Type',
       };
 
-      CMS.Models = {};
-      CMS.Models[relatedObject.type] = {
+      businessModels[relatedObject.type] = {
         root_collection: 'rootCollectionType',
       };
 
       spyOn(window, 'open');
     });
 
-    it('calls window.open with second "_blank" param', ()=> {
+    afterEach(() => {
+      businessModels[relatedObject.type] = null;
+    });
+
+    it('calls window.open with second "_blank" param', () => {
       let secondParam;
       viewModel.openObject(relatedObject);
       secondParam = getParam(window.open, ARGS.SECOND);
       expect(secondParam).toBe('_blank');
     });
 
-    describe('sets url as a first param where', ()=> {
+    describe('sets url as a first param where', () => {
       let buildUrl;
 
-      beforeAll(()=> {
+      beforeAll(() => {
         buildUrl = function (type, id) {
           return '/' + type + '/' + id;
         };
       });
 
       it(`url consists of root_collection from appopriate model and id
-        based on passed related object`, ()=> {
+        based on passed related object`, () => {
           let rootCollectionType =
-            CMS.Models[relatedObject.type].root_collection;
+            businessModels[relatedObject.type].root_collection;
           let expectedUrl;
 
           viewModel.openObject(relatedObject);
@@ -248,10 +246,10 @@ describe('issue-unmap-item component', ()=> {
         });
 
       it(`url consists of type and id from relatet object's child_type and
-        child_id props if a type of related object equals to "Snapshot"`, ()=> {
+      child_id props if a type of related object equals to "Snapshot"`, () => {
           let relatedObjectType = 'Snapshot';
           let rootCollectionType =
-            CMS.Models[relatedObject.type].root_collection;
+            businessModels[relatedObject.type].root_collection;
           let oldRelatedObjectType = relatedObject.type;
           let expectedUrl;
 
@@ -271,7 +269,7 @@ describe('issue-unmap-item component', ()=> {
     });
   });
 
-  describe('unmap() method', ()=> {
+  describe('unmap() method', () => {
     beforeEach(function () {
       spyOn($.prototype, 'trigger');
       spyOn(CurrentPageUtils, 'getPageInstance');
@@ -346,12 +344,12 @@ describe('issue-unmap-item component', ()=> {
     });
   });
 
-  describe('showNoRelationhipError() method', ()=> {
+  describe('showNoRelationhipError() method', () => {
     const issueTitle = 'TEST_ISSUE_TITLE';
     const targetType = 'TEST_TARGET_TYPE';
     const targetTitle = 'TEST_TARGET_TITLE';
 
-    beforeEach(()=> {
+    beforeEach(() => {
       viewModel.attr('issueInstance', {
         title: issueTitle,
       });
@@ -364,7 +362,7 @@ describe('issue-unmap-item component', ()=> {
       spyOn(NotifiersUtils, 'notifier');
     });
 
-    it('shows correct message', ()=> {
+    it('shows correct message', () => {
       viewModel.showNoRelationhipError();
 
       expect(NotifiersUtils.notifier).toHaveBeenCalledWith('error',
@@ -375,10 +373,10 @@ describe('issue-unmap-item component', ()=> {
     });
   });
 
-  describe('"click" event', ()=> {
+  describe('"click" event', () => {
     let handler;
     let event;
-    beforeEach(()=> {
+    beforeEach(() => {
       handler = events.click.bind({viewModel: viewModel});
       event = jasmine.createSpyObj(['preventDefault']);
       spyOn(viewModel, 'processRelatedSnapshots');
@@ -437,14 +435,14 @@ describe('issue-unmap-item component', ()=> {
     });
   });
 
-  describe('"{viewModel.paging} current" event', ()=> {
+  describe('"{viewModel.paging} current" event', () => {
     let handler;
-    beforeEach(()=> {
+    beforeEach(() => {
       handler = events['{viewModel.paging} current']
         .bind({viewModel: viewModel});
     });
 
-    it('call loadRelatedObjects() method', ()=> {
+    it('call loadRelatedObjects() method', () => {
       spyOn(viewModel, 'loadRelatedObjects');
 
       handler();
@@ -453,14 +451,14 @@ describe('issue-unmap-item component', ()=> {
     });
   });
 
-  describe('"{viewModel.paging} pageSize" event', ()=> {
+  describe('"{viewModel.paging} pageSize" event', () => {
     let handler;
-    beforeEach(()=> {
+    beforeEach(() => {
       handler = events['{viewModel.paging} pageSize']
         .bind({viewModel: viewModel});
     });
 
-    it('call loadRelatedObjects() method', ()=> {
+    it('call loadRelatedObjects() method', () => {
       spyOn(viewModel, 'loadRelatedObjects');
 
       handler();

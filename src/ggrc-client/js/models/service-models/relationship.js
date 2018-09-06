@@ -41,7 +41,7 @@ export default Cacheable('CMS.Models.Relationship', {
     return relationship[0].refresh();
   },
   _findRelationship: async function (source, destination) {
-    return CMS.Models.Relationship.findAll({
+    return this.findAll({
       source_id: source.attr('id'),
       source_type: source.attr('type'),
       destination_id: destination.attr('id'),

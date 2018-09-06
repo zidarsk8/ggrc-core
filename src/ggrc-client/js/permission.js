@@ -5,7 +5,7 @@
 
 import {getPageInstance} from './plugins/utils/current-page-utils';
 import Stub from '../js/models/stub';
-import {getInstance} from '../js/models/models-extensions';
+import {getInstance} from '../js/plugins/utils/models-utils';
 
 let ADMIN_PERMISSION;
 let _CONDITIONS_MAP = {

@@ -17,7 +17,7 @@ describe('mandatory-fields-modal component', () => {
   describe('initModal() method', () => {
     let method;
 
-    beforeEach(()=> {
+    beforeEach(() => {
       method = viewModel.initModal.bind(viewModel);
     });
 
@@ -36,7 +36,7 @@ describe('mandatory-fields-modal component', () => {
   describe('getInvalidCAsFields', () => {
     let method;
 
-    beforeEach(()=> {
+    beforeEach(() => {
       method = viewModel.getInvalidCAsFields.bind(viewModel);
     });
 

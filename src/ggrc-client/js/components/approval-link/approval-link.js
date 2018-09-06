@@ -6,6 +6,7 @@
 import '../person/person-data';
 import '../review-link/review-link';
 import {REFRESH_APPROVAL} from '../../events/eventTypes';
+import CycleTaskGroupObjectTask from '../../models/business-models/cycle-task-group-object-task';
 
 import {
   buildParam,
@@ -77,9 +78,9 @@ export default can.Component.extend({
 
       this.attr('isInitializing', true);
       batchRequests(buildParam(type, pagingInfo, relevant, null, filter))
-        .then((result)=> {
+        .then((result) => {
           let values = result[type].values.map((value) => {
-            return new CMS.Models[type](value);
+            return new CycleTaskGroupObjectTask(value);
           });
           this.attr('reviewTask', values[0]);
           this.attr('isInitializing', false);

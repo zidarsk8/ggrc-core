@@ -44,7 +44,7 @@ describe('Mappings', function () {
         'TechnologyEnvironment',
         'Threat',
       ],
-      notMappable: ['AssessmentTemplate', 'Evidence'],
+      notMappable: ['AssessmentTemplate', 'Evidence', 'Person'],
     },
     risk_assessments: {
       models: ['RiskAssessment'],
@@ -53,6 +53,7 @@ describe('Mappings', function () {
     workflows: {
       models: [
         'TaskGroup',
+        'TaskGroupTask',
         'Workflow',
         'CycleTaskEntry',
         'CycleTaskGroupObjectTask',
@@ -60,6 +61,8 @@ describe('Mappings', function () {
         'CycleTaskGroup',
       ],
       notMappable: [
+        'Workflow',
+        'TaskGroupTask',
         'CycleTaskEntry',
         'CycleTaskGroupObjectTask',
         'CycleTaskGroupObject',
@@ -112,14 +115,13 @@ describe('Mappings', function () {
     Metric: filtered,
     Objective: filtered,
     OrgGroup: filtered,
-    Person: _.difference(filtered, ['Person', 'Audit', 'TaskGroup',
-      'Workflow', 'Issue']),
+    Person: [],
     Policy: _.difference(filtered, directives),
     Process: filtered,
     Product: filtered,
     ProductGroup: filtered,
     Program: _.difference(allTypes,
-      ['Program', 'Audit', 'RiskAssessment', 'Assessment']
+      ['Program', 'Audit', 'RiskAssessment', 'Assessment', 'Person']
         .concat(modules.core.notMappable, modules.workflows.notMappable)),
     Project: filtered,
     Regulation: _.difference(filtered, directives),
@@ -133,6 +135,8 @@ describe('Mappings', function () {
     TechnologyEnvironment: filtered,
     Threat: filtered,
     Vendor: filtered,
+    MultitypeSearch: _.difference(allTypes, ['CycleTaskEntry', 'CycleTaskGroup',
+      'CycleTaskGroupObject', 'RiskAssessment']),
   };
 
   beforeAll(function () {
@@ -146,7 +150,10 @@ describe('Mappings', function () {
 
   describe('getMappingTypes() method', function () {
     let EXPECTED_GROUPS = ['entities', 'business', 'governance'];
-    let modelsForTests = _.difference(allTypes, [
+
+    let types = allTypes.concat('MultitypeSearch');
+    let modelsForTests = _.difference(types, [
+      'TaskGroupTask',
       'CycleTaskEntry',
       'CycleTaskGroup',
       'CycleTaskGroupObject',

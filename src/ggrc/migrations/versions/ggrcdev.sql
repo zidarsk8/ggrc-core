@@ -2094,16 +2094,6 @@ CREATE TABLE `objects_without_revisions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `objects_without_revisions`
---
-
-LOCK TABLES `objects_without_revisions` WRITE;
-/*!40000 ALTER TABLE `objects_without_revisions` DISABLE KEYS */;
-INSERT INTO `objects_without_revisions` VALUES (0,'','created');
-/*!40000 ALTER TABLE `objects_without_revisions` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `options`
 --
 

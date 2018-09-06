@@ -8,6 +8,7 @@ import {
   ObjectSearch,
 } from '../mapper/mapper';
 import * as NotifiersUtils from '../../plugins/utils/notifiers-utils';
+import Assessment from '../../models/business-models/assessment';
 
 describe('ObjectMapper', function () {
   'use strict';
@@ -16,17 +17,8 @@ describe('ObjectMapper', function () {
     let method;
     let fakeCtrlInst;
     let fakeData;
-    let originalModel;
     let updateScopeObject;
     let scopeObject;
-
-    beforeAll(function () {
-      originalModel = CMS.Models.Assessment;
-    });
-
-    afterAll(function () {
-      CMS.Models.Assessment = originalModel;
-    });
 
     beforeEach(function () {
       updateScopeObject = can.Deferred();
@@ -34,16 +26,14 @@ describe('ObjectMapper', function () {
         id: 1,
       });
 
-      CMS.Models.Assessment = {
-        store: [
-          new can.Map({
-            updateScopeObject: jasmine.createSpy('updateScopeObject')
-              .and
-              .returnValue(updateScopeObject),
-            audit: scopeObject,
-          }),
-        ],
-      };
+      Assessment.store = [
+        new can.Map({
+          updateScopeObject: jasmine.createSpy('updateScopeObject')
+            .and
+            .returnValue(updateScopeObject),
+          audit: scopeObject,
+        }),
+      ];
       fakeCtrlInst = {
         isLoading: false,
         launch: jasmine.createSpy('launch'),

@@ -17,6 +17,7 @@ import {
 } from '../../plugins/utils/current-page-utils';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import Relationship from '../../models/service-models/relationship';
+import * as businessModels from '../../models/business-models';
 
 export default can.Component.extend({
   tag: 'issue-unmap-item',
@@ -46,7 +47,7 @@ export default can.Component.extend({
     },
 
     processRelatedSnapshots() {
-      this.loadRelatedObjects().done(()=> {
+      this.loadRelatedObjects().done(() => {
         if (this.attr('total')) {
           this.showModal();
         } else {
@@ -75,7 +76,7 @@ export default can.Component.extend({
 
       this.attr('isLoading', true);
       return can.when(batchRequests(snapshotsQuery), batchRequests(auditsQuery))
-        .done((snapshotsResponse, auditsResponse)=> {
+        .done((snapshotsResponse, auditsResponse) => {
           const snapshots = snapshotsResponse.Snapshot;
           const audits = auditsResponse.Audit;
           this.attr('total', snapshots.total + audits.total);
@@ -83,12 +84,12 @@ export default can.Component.extend({
           this.attr('relatedSnapshots', snapshots.values);
           this.attr('paging.total', snapshots.total);
         })
-        .fail(()=> {
+        .fail(() => {
           notifier(
             'error',
             'There was a problem with retrieving related objects.');
         })
-        .always(()=> {
+        .always(() => {
           this.attr('isLoading', false);
         });
     },
@@ -111,7 +112,7 @@ export default can.Component.extend({
         id = relatedObject.child_id;
       }
 
-      model = CMS.Models[objectType];
+      model = businessModels[objectType];
       type = model.root_collection;
       url = '/' + type + '/' + id;
 
