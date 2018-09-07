@@ -168,21 +168,3 @@ DISALLOW_EVIDENCE_FILE = (u"Line {line}: 'Evidence File' can't be changed "
 DISALLOW_DOCUMENT_FILE = (u"Line {line}: 'Document File' can't be changed "
                           u"via import. Please go on {parent} page and "
                           u"make changes manually. The column will be skipped")
-
-WRONG_STATUS = u"Wrong status."
-
-BAD_PARAMS = u"Bad request parameters."
-
-INCORRECT_REQUEST_DATA = u"{job_type} failed due incorrect request data."
-
-INTERNAL_SERVER_ERROR = u"{job_type} failed due to internal server error."
-
-JOB_FAILED = u"{job_type} failed."
-
-PREVIOUS_RUN_FAILED = u"Previous run has failed."
-
-STATUS_SET_FAILED = u"Failed to set job status"
-
-RELOAD_PAGE = u"Try to reload /export page."
-
-MISSING_FILE = u"The file is missing."
