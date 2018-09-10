@@ -64,8 +64,9 @@ export default Filterable({
     }
   },
   prepare: function () {
-    if (this._prepare_deferred)
+    if (this._prepare_deferred) {
       return this._prepare_deferred;
+    }
 
     this._prepare_deferred = $.when(
       can.view(this.options.widget_view, $.when(this.options))
@@ -97,10 +98,10 @@ export default Filterable({
 
     if (this.options.content_controller) {
       controller_content = this.element.find(this.options.content_selector);
-      if (this.options.content_controller_selector)
+      if (this.options.content_controller_selector) {
         controller_content =
           controller_content.find(this.options.content_controller_selector);
-
+      }
       if (this.options.content_controller_options.init) {
         this.options.content_controller_options.init();
       }

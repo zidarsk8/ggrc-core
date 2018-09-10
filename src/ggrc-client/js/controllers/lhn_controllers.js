@@ -627,8 +627,9 @@ can.Control('CMS.Controllers.LHN_Search', {
   },
   '.sub-level scrollNext': 'show_more',
   show_more: function ($el, ev) {
-    if (this._show_more_pending)
+    if (this._show_more_pending) {
       return;
+    }
 
     let that = this;
     let $list = $el.closest(this.get_lists());
@@ -643,8 +644,9 @@ can.Control('CMS.Controllers.LHN_Search', {
       tracker.USER_ACTIONS.LHN.SHOW_MORE
     );
 
-    if (visible_list.length >= results_list.length)
+    if (visible_list.length >= results_list.length) {
       return;
+    }
 
     this._show_more_pending = true;
     refresh_queue = new RefreshQueue();
@@ -665,10 +667,12 @@ can.Control('CMS.Controllers.LHN_Search', {
 
   init_object_lists: function () {
     let self = this;
-    if (!this.options.results_lists)
+    if (!this.options.results_lists) {
       this.options.results_lists = {};
-    if (!this.options.visible_lists)
+    }
+    if (!this.options.visible_lists) {
       this.options.visible_lists = {};
+    }
 
     can.each(this.get_lists(), function ($list) {
       let model_name;
@@ -718,8 +722,9 @@ can.Control('CMS.Controllers.LHN_Search', {
   },
   get_list_model: function ($list, count) {
     $list = $($list);
-    if (this.options.model_attr_selector)
+    if (this.options.model_attr_selector) {
       $list = $list.find(this.options.model_attr_selector).first();
+    }
     if (count && $list.attr('data-count')) {
       return $list.attr('data-count');
     }
@@ -727,8 +732,9 @@ can.Control('CMS.Controllers.LHN_Search', {
   },
   get_extra_list_model: function ($list) {
     $list = $($list);
-    if (this.options.model_attr_selector)
+    if (this.options.model_attr_selector) {
       $list = $list.find(this.options.model_attr_selector).first();
+    }
     if (!$list.attr(this.options.model_extra_attr)) {
       return null;
     }
@@ -844,8 +850,9 @@ can.Control('CMS.Controllers.LHN_Search', {
     }
 
     models = can.map(models, function (model_name) {
-      if (self.options.loaded_lists.indexOf(model_name) == -1)
+      if (self.options.loaded_lists.indexOf(model_name) == -1) {
         return model_name;
+      }
     });
 
     if (models.length > 0) {
@@ -924,8 +931,9 @@ can.Control('CMS.Controllers.LHN_Search', {
     return can.map(this.get_lists(), function ($list) {
       $list = $($list);
       if ($list.find([self.options.list_content_selector,
-                        self.options.list_mid_level_selector].join(',')).hasClass('in'))
+        self.options.list_mid_level_selector].join(',')).hasClass('in')) {
         return $list;
+      }  
     });
   },
 

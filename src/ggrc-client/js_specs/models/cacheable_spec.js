@@ -196,8 +196,9 @@ describe('Cacheable model', function () {
       let st = 3; // preload Date.now() because it's called once before we even get to modelizing
       spyOn(Date, 'now').and.callFake(function () {
         // Date.now() is called once per item.
-        if ((++st % 5) === 0)
+        if ((++st % 5) === 0) {
           st += 100; // after three, push the time ahead 100ms to force a new call to modelizeMS
+        }
         return st;
       });
       // return model instances for the list of returned items from the server
