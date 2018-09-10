@@ -1088,7 +1088,7 @@ class UnifiedMapperTreeView(TreeView):
   """Common locators for UnifiedMapper from Tree View"""
   MODAL = ".object-modal"
   HEADER = MODAL + " .list-header"
-  ITEMS = MODAL + Common.TREE_ITEM
+  ITEMS = MODAL + " mapper-results-item"
   SHOW_FIELDS_BTN_CSS = (By.CSS_SELECTOR, HEADER + " .fa-bars")
   NO_RESULTS_MSG_CSS = (By.CSS_SELECTOR, ".well-small:not(.hidden)")
   MAPPER_TREE_SPINNER_NO_RESULT = (

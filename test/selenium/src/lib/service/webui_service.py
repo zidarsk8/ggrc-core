@@ -12,6 +12,7 @@ from lib.constants.locator import WidgetInfoAssessment
 from lib.element.tab_containers import DashboardWidget
 from lib.entities.entity import Representation
 from lib.page import dashboard
+from lib.page.widget import object_modal
 from lib.page.widget.info_widget import SnapshotedInfoPanel
 from lib.utils import selenium_utils, file_utils, conftest_utils
 from lib.utils.string_utils import StringMethods, Symbols
@@ -95,15 +96,23 @@ class BaseWebUiService(object):
         factory_obj.update_attrs(is_allow_none=True, **scope) for
         scope, factory_obj in zip(list_scopes_to_convert, list_factory_objs)]
 
-  def create_obj(self):
-    """Create object via LHN"""
-    obj_info_page = conftest_utils.create_obj_via_lhn(
-        self.driver, getattr(element.Lhn, self.obj_name.upper()))
-    scope = obj_info_page.get_info_widget_obj_scope()
-    obj = self._create_list_objs(
+  def submit_obj_modal(self, obj):
+    """Submits object modal with `obj`."""
+    object_modal.get_modal_obj(obj.type, self.driver).submit_obj(obj)
+
+  def build_obj_from_page(self):
+    """Builds obj from opened page."""
+    info_page = self.info_widget_cls(self.driver)
+    scope = info_page.get_info_widget_obj_scope()
+    return self._create_list_objs(
         entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
-    obj.url = self.driver.current_url
-    return obj
+
+  def create_obj_and_get_obj(self, obj):
+    """Creates obj via LHN and returns a created obj."""
+    object_name = objects.get_plural(obj.type)
+    conftest_utils.get_lhn_accordion(self.driver, object_name).create_new()
+    self.submit_obj_modal(obj)
+    return self.build_obj_from_page()
 
   def open_widget_of_mapped_objs(self, src_obj):
     """Navigate to generic widget URL of mapped objects according to URL of
@@ -151,10 +160,9 @@ class BaseWebUiService(object):
         list_scopes=list_objs_scopes), mapping_statuses
 
   def get_obj_from_info_page(self, obj):
-    """Get and return object from Info page."""
-    scope = self.get_scope_from_info_page(obj)
-    return self._create_list_objs(
-        entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
+    """Gets and returns object from Info page."""
+    self.open_info_page_of_obj(obj)
+    return self.build_obj_from_page()
 
   def get_list_objs_from_info_panels(self, src_obj, objs):
     """Get and return object or list of objects from Info panels navigate by
@@ -191,7 +199,8 @@ class BaseWebUiService(object):
     """Open generic widget of mapped objects, open creation modal from
     Tree View, fill data according to object attributes and create new object.
     """
-    self._open_create_modal_and_fill_data(src_obj, obj).save_and_close()
+    self.open_widget_of_mapped_objs(src_obj).tree_view.open_create()
+    object_modal.get_modal_obj(obj.type, self.driver).submit_obj(obj)
 
   def export_objs_via_tree_view(self, path_to_export_dir, src_obj):
     # pylint: disable=fixme
@@ -391,17 +400,6 @@ class BaseWebUiService(object):
     return sorted(dashboard.Dashboard(
         self.driver).get_mappable_via_add_widgets_objs_aliases())
 
-  def _open_create_modal_and_fill_data(self, src_obj, obj):
-    """Open generic widget of mapped objects, open creation modal from
-    Tree View, fill minimal data according to object attributes.
-      - Return: "Create New Object", according to object type.
-    """
-    # pylint: disable=invalid-name
-    modal_create = (self.open_widget_of_mapped_objs(src_obj).
-                    tree_view.open_create())
-    modal_create.fill_minimal_data(title=obj.title, code=obj.slug)
-    return modal_create
-
   def is_dashboard_tab_exist(self, obj):
     """Navigate to InfoPage of object and check is 'Dashboard' tab exist.
       - Return: bool.
@@ -442,6 +440,23 @@ class BaseWebUiService(object):
     """Open obj Info Page. Fill global custom attributes inline."""
     obj_page = self.open_info_page_of_obj(obj)
     obj_page.fill_global_cas_inline(custom_attributes)
+
+  def edit_obj_via_edit_modal_from_info_page(self, obj):
+    """Open generic widget of object, open edit modal from drop down menu.
+    Modify current title and code and then apply changes by pressing
+    'save and close' button.
+    """
+    # pylint: disable=invalid-name
+    self.edit_obj(obj, title="[EDITED]" + obj.title)
+    return self.info_widget_cls(self.driver)
+
+  def edit_obj(self, obj, **changes):
+    """Opens `obj` and makes `changes` using Edit modal."""
+    obj_info_page = self.open_info_page_of_obj(obj)
+    obj_info_page.open_info_3bbs().select_edit()
+    modal = object_modal.get_modal_obj(obj.type, self.driver)
+    modal.fill_form(**changes)
+    modal.save_and_close()
 
 
 class SnapshotsWebUiService(BaseWebUiService):
@@ -533,13 +548,6 @@ class AssessmentTemplatesService(BaseWebUiService):
     super(AssessmentTemplatesService, self).__init__(
         driver, objects.ASSESSMENT_TEMPLATES)
 
-  def create_obj_via_tree_view(self, src_obj, obj):
-    """Open generic widget of mapped objects, open creation modal from
-    Tree View, fill data according to object attributes and create new object.
-    """
-    (self._open_create_modal_and_fill_data(src_obj, obj).
-     select_assignee(obj.assignees).save_and_close())
-
 
 class AssessmentsService(BaseWebUiService):
   """Class for Assessments business layer's services objects."""
@@ -571,18 +579,6 @@ class AssessmentsService(BaseWebUiService):
      generate_asmts(asmt_tmpl_title=asmt_tmpl_title,
                     objs_under_asmt_titles=objs_under_asmt_titles))
     objs_widget.show_generated_results()
-
-  def edit_obj_via_edit_modal_from_info_page(self, src_obj):
-    """Open generic widget of object, open edit modal from drop down menu.
-    Modify current title and code and then apply changes by pressing
-    'save and close' button
-    """
-    # pylint: disable=invalid-name
-    src_obj_info_page = self.open_info_page_of_obj(src_obj)
-    (src_obj_info_page.open_info_3bbs().select_edit().edit_minimal_data(
-        title=element.AssessmentInfoWidget.TITLE_EDITED_PART + src_obj.title).
-        save_and_close())
-    return self.info_widget_cls(self.driver)
 
   def get_log_pane_validation_result(self, obj):
     """Open assessment Info Page. Open Log Pane on Assessment Info Page.
@@ -674,43 +670,14 @@ class AssessmentsService(BaseWebUiService):
     page.assignees.add_person(person)
     page.wait_save()
 
-  def create_obj_and_get_mapped_titles_from_modal(self, src_obj, obj):
-    """Open generic widget of mapped objects, open creation modal from
-    Tree View, fill data according to object attributes and create new object.
-      - Return: [mapped_titles on create_modal]
-    """
-    # pylint: disable=invalid-name
-    modal_create = self._open_create_modal_and_fill_data(src_obj, obj)
-    mapped_titles = modal_create.get_mapped_snapshots_titles()
-    modal_create.save_and_close()
-    return mapped_titles
-
-  def _open_create_modal_and_fill_data(self, src_obj, obj):
-    """Open generic widget of mapped objects, open creation modal from
-    Tree View, fill minimal data according to object attributes,
-    map objs_under_assessment if exists.
-      - Return: lib.page.modal.create_new_object.AssessmentsCreate
-    """
-    modal_create = (self.open_widget_of_mapped_objs(src_obj).
-                    tree_view.open_create())
-    modal_create.fill_minimal_data(title=obj.title, code=obj.slug)
-    if obj.mapped_objects:
-      modal_create.map_controls(obj.mapped_objects)
-    return modal_create
-
-  def map_objs_and_get_mapped_titles_from_edit_modal(self, src_obj,
-                                                     objs_to_map):
+  def map_objs_in_edit_modal(self, obj, objs_to_map):
     """Open ModalEdit from InfoPage of object. Open 3BBS. Select 'Edit' button
     and map snapshots from mapped_objects attribute of passed object.
-      - Return: list of str. Titles of mapped Snapshots from Modal Edit.
     """
-    # pylint: disable=invalid-name
-    modal_edit = (self.open_info_page_of_obj(src_obj).open_info_3bbs().
-                  select_edit())
-    modal_edit.map_controls(objs_to_map)
-    mapped_titles = modal_edit.get_mapped_snapshots_titles()
-    modal_edit.save_and_close()
-    return mapped_titles
+    self.open_info_page_of_obj(obj).open_info_3bbs().select_edit()
+    modal = object_modal.AssessmentModal(self.driver)
+    modal.map_objects(objs_to_map)
+    modal.save_and_close()
 
   def choose_and_fill_dropdown_lca(self, asmt, dropdown, **kwargs):
     """Fill dropdown LCA for Assessment."""
@@ -731,6 +698,20 @@ class ObjectivesService(SnapshotsWebUiService):
   def __init__(self, driver, is_versions_widget=False):
     super(ObjectivesService, self).__init__(
         driver, objects.OBJECTIVES, is_versions_widget)
+
+
+class RisksService(SnapshotsWebUiService):
+  """Class for Risks business layer's services objects."""
+  def __init__(self, driver, is_versions_widget=False):
+    super(RisksService, self).__init__(
+        driver, objects.RISKS, is_versions_widget)
+
+
+class OrgGroupsService(SnapshotsWebUiService):
+  """Class for Org Groups business layer's services objects."""
+  def __init__(self, driver, is_versions_widget=False):
+    super(OrgGroupsService, self).__init__(
+        driver, objects.ORG_GROUPS, is_versions_widget)
 
 
 class IssuesService(BaseWebUiService):

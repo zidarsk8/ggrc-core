@@ -4,9 +4,11 @@
 # pylint: disable=no-self-use
 # pylint: disable=invalid-name
 
-import pytest  # pylint: disable=import-error
+import pytest
 
-from lib import base, url
+from lib import base, users
+from lib.entities import entities_factory
+from lib.service import webui_service, rest_facade
 
 
 class TestOrgGroupPage(base.Test):
@@ -14,15 +16,16 @@ class TestOrgGroupPage(base.Test):
   # pylint: disable=too-few-public-methods
 
   @pytest.mark.smoke_tests
-  def test_app_redirects_to_new_org_group_page(self, new_org_group_ui):
-    """Tests if after saving and closing lhn_modal app redirects to
-    the object page.
-    Generally we start at random url. Here we verify that after saving
-    and closing lhn_modal we're redirected to an url that contains an
-    object id.
-    """
-    # pylint: disable=unused-argument
-    expected_url = (
-        url.ORG_GROUPS + "/" + new_org_group_ui.source_obj_id_from_url)
-    actual_url = new_org_group_ui.url
-    assert expected_url in actual_url
+  def test_create_org_group(self, selenium):
+    """Tests Org Group creation via UI."""
+    org_group = entities_factory.OrgGroupsFactory().create()
+    actual_org_group = webui_service.OrgGroupsService(
+        selenium).create_obj_and_get_obj(org_group)
+    rest_org_group = rest_facade.get_obj(actual_org_group)
+    org_group.update_attrs(
+        created_at=rest_org_group.created_at,
+        updated_at=rest_org_group.updated_at,
+        modified_by=users.current_user(),
+        slug=rest_org_group.slug,
+        url=rest_org_group.url).repr_ui()
+    self.general_equal_assert(org_group, actual_org_group, "custom_attributes")

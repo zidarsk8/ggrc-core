@@ -1,11 +1,6 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Utility classes and functions for page objects used in tests.
-Details:
-Most of tests require sequence of primitive methods of page
-object. If sequence repeats itself among tests, it should be shared in
-this module.
-"""
+"""Utility classes and functions for tests."""
 # pylint: disable=too-few-public-methods
 
 import re
@@ -13,8 +8,7 @@ import uuid
 
 import waiting
 
-from lib import base, constants
-from lib.constants.test import modal_create_new, modal_custom_attribute
+from lib import constants
 
 
 def append_random_string(text):
@@ -36,113 +30,8 @@ class HtmlParser(object):
     return re.sub(r'\s+', " ", text)
 
 
-class ModalInput(base.TestUtil):
-  """Base class for filling out modals."""
-  @staticmethod
-  def enter_test_data(modal):
-    modal.enter_title(append_random_string(modal_create_new.SHORT_TITLE))
-
-
-class ModalNewControls(ModalInput):
-  """Methods for simulating common user actions."""
-
-  @staticmethod
-  def enter_test_data(modal):
-    """Fills out all fields in lhn_modal.
-    Args: modal (lib.page.lhn_modal.new_control.Controls)
-    """
-    modal.enter_title(append_random_string(modal_create_new.SHORT_TITLE))
-    modal.enter_description(append_random_string(
-        modal_create_new.SHORT_TITLE))
-    modal.enter_test_plan(append_random_string(
-        modal_create_new.SHORT_TITLE))
-    modal.enter_notes(append_random_string(modal_create_new.SHORT_TITLE))
-    if modal.is_create_modal:
-      modal.code.enter_text(append_random_string(modal_create_new.SHORT_TITLE))
-
-
-class ModalNewPrograms(ModalInput):
-  """Methods for simulating common user actions."""
-
-  @staticmethod
-  def set_start_date(modal, day_start):
-    """Sets start date from datepicker in new program/edit modal.
-    Args:
-    modal (lib.page.modal.edit_object.Programs)
-    day_start (int): for more info see
-    base.DatePicker.select_day_in_current_month
-    """
-    modal.enter_effective_date_start_month(day_start)
-
-  @staticmethod
-  def enter_test_data(modal):
-    """Fills out all fields in lhn_modal.
-    Args: modal (lib.page.modal.edit_object.Programs)
-    """
-    modal.enter_title(append_random_string(modal_create_new.SHORT_TITLE))
-    modal.enter_description(append_random_string(
-        modal_create_new.SHORT_TITLE))
-    modal.enter_notes(append_random_string(modal_create_new.SHORT_TITLE))
-    if modal.is_create_modal:
-      modal.code.enter_text(append_random_string(modal_create_new.SHORT_TITLE))
-    ModalNewPrograms.set_start_date(modal, 0)
-
-
-class ModalNewProgramCustomAttribute(ModalInput):
-  @staticmethod
-  def enter_test_data(modal):
-    """Fills out all fields in lhn_modal.
-    Args: modal (lib.page.modal.custom_attribute.ModalCustomAttributes)
-    """
-    modal.enter_title(append_random_string(
-        modal_custom_attribute.Programs.TITLE))
-    modal.enter_inline_help(append_random_string(
-        modal_custom_attribute.Programs.INLINE_HELP))
-    modal.enter_placeholder(append_random_string(
-        modal_custom_attribute.Programs.PLACEHOLDER))
-
-
-class ModalNewOrgGroups(ModalInput):
-  """Utils for data entry for Org Group modals."""
-
-
-class ModalNewRisks(ModalInput):
-  """Utils for data entry for Risk modals."""
-  @staticmethod
-  def enter_test_data(modal):
-    """Fills out all fields in lhn_modal.
-    Args: modal (lib.page.modal.edit_object.EditRisksModal)
-    """
-    modal.enter_title(append_random_string(modal_create_new.SHORT_TITLE))
-    modal.enter_description(append_random_string(
-        modal_create_new.SHORT_TITLE))
-
-
-class ModalNewIssues(ModalInput):
-  """Utils for data entry for Issues modals."""
-
-
-class ModalNewProcesses(ModalInput):
-  """Utils for data entry for Process modals."""
-
-
-class ModalNewDataAssets(ModalInput):
-  """Utils for data entry for Data asset modals."""
-
-
-class ModalNewSystems(ModalInput):
-  """Utils for data entry for System modals."""
-
-
-class ModalNewProducts(ModalInput):
-  """Utils for data entry for Product modals."""
-
-
-class ModalNewProjects(ModalInput):
-  """Utils for data entry for Project modals."""
-
-
 def wait_for(*args, **kwargs):
+  """Waits for function to return truthy value."""
   if "timeout_seconds" not in kwargs:
     kwargs["timeout_seconds"] = constants.ux.MAX_USER_WAIT_SECONDS
   return waiting.wait(*args, **kwargs)
