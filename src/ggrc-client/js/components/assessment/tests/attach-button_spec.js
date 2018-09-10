@@ -22,19 +22,12 @@ describe('attach-button component', function () {
   });
 
   describe('refresh() method', function () {
-    it('dispatches "refreshInstance" event', function () {
-      spyOn(viewModel.instance, 'dispatch');
+    it('dispatches "refreshEvidences" event', function () {
+      spyOn(viewModel, 'dispatch');
       viewModel.refresh();
 
-      expect(viewModel.instance.dispatch)
-        .toHaveBeenCalledWith('refreshInstance');
-    });
-
-    it('does not throw error if instance is not provided', function () {
-      viewModel.removeAttr('instance');
-
-      expect(viewModel.refresh.bind(viewModel))
-        .not.toThrowError();
+      expect(viewModel.dispatch)
+        .toHaveBeenCalledWith('refreshEvidences');
     });
   });
 

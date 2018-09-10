@@ -40,10 +40,6 @@ export default can.Component.extend({
     },
     refresh: function () {
       this.dispatch('refreshEvidences');
-
-      if (this.attr('instance')) {
-        this.attr('instance').dispatch('refreshInstance');
-      }
     },
     checkFolder: function () {
       let self = this;
