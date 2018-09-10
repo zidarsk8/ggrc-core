@@ -83,6 +83,10 @@ alphabetically):
 - ``complex`` - the PR has the high complexity and should be reviewed by 
   experienced team member(s). Reviewers should consider it as PR complexity,
   not as PR importance,
+- ``important`` - the PR has the high importance and should be reviewed before
+  other pull requests except critical. Reviewers should consider it as PR
+  priority over other pull requests, not as this PR should be reviewed
+  immediately,
 - ``documentation`` - the PR contains updates to project documentation,
 - ``migration`` - the PR contains a migration script that changes the
   database schema. Such pull requests require additional setup and
