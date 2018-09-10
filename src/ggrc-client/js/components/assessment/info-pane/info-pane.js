@@ -230,10 +230,6 @@ export default can.Component.extend({
         [],
         additionalFilter || []);
     },
-    getCommentQuery: function () {
-      return this.getQuery('Comment',
-        {sort: [{key: 'created_at', direction: 'desc'}]});
-    },
     getSnapshotQuery: function () {
       return this.getQuery('Snapshot');
     },
@@ -270,10 +266,6 @@ export default can.Component.extend({
     loadSnapshots: function () {
       let query = this.getSnapshotQuery();
       return this.requestQuery(query);
-    },
-    loadComments: function () {
-      let query = this.getCommentQuery();
-      return this.requestQuery(query, 'comments');
     },
     loadFiles: function () {
       let query = this.getEvidenceQuery('FILE');

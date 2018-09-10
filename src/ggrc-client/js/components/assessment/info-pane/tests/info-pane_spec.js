@@ -392,29 +392,6 @@ describe('assessment-info-pane component', () => {
     });
   });
 
-  describe('getCommentQuery() method', () => {
-    beforeEach(function () {
-      spyOn(vm, 'getQuery');
-    });
-
-    it('returns result of getQuery method', function () {
-      const fakeQuery = {};
-      vm.getQuery.and.returnValue(fakeQuery);
-      const result = vm.getCommentQuery();
-      expect(result).toBe(fakeQuery);
-    });
-
-    it('sets "Comment" type and sortObj for getQuery method', function () {
-      const type = 'Comment';
-      const sortObj = {sort: [{
-        key: 'created_at',
-        direction: 'desc',
-      }]};
-      vm.getCommentQuery();
-      expect(vm.getQuery).toHaveBeenCalledWith(type, sortObj);
-    });
-  });
-
   describe('getSnapshotQuery() method', () => {
     beforeEach(function () {
       spyOn(vm, 'getQuery');
@@ -532,28 +509,6 @@ describe('assessment-info-pane component', () => {
       vm.getSnapshotQuery.and.returnValue(query);
       vm.loadSnapshots();
       expect(vm.requestQuery).toHaveBeenCalledWith(query);
-    });
-  });
-
-  describe('loadComments() method', () => {
-    beforeEach(function () {
-      spyOn(vm, 'requestQuery');
-      spyOn(vm, 'getCommentQuery');
-    });
-
-    it('returns result of the comments query', function () {
-      const expectedResult = Promise.resolve();
-      vm.requestQuery.and.returnValue(expectedResult);
-      const result = vm.loadComments();
-      expect(result).toBe(expectedResult);
-    });
-
-    it('uses query for Comments and "comments" type', function () {
-      const query = {field: 'f1'};
-      const type = 'comments';
-      vm.getCommentQuery.and.returnValue(query);
-      vm.loadComments();
-      expect(vm.requestQuery).toHaveBeenCalledWith(query, type);
     });
   });
 
