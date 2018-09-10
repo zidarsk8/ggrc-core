@@ -126,7 +126,10 @@ jQuery(function ($) {
   }
   function updateNotifications() {
     NotificationConfig.findActive().then(checkActive);
-    $body.off('click', '.user-dropdown > .dropdown-toggle', updateNotifications);
+    $body.off('click',
+      '.user-dropdown > .dropdown-toggle',
+      updateNotifications
+    );
   }
 
   $body.on('click', '.user-dropdown > .dropdown-toggle', updateNotifications);
