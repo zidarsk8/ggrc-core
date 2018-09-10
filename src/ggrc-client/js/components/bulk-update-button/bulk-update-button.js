@@ -14,7 +14,7 @@ export default can.Component.extend({
     model: null,
     openBulkUpdateModal: function (el, type) {
       import(/* webpackChunkName: "mapper" */ '../../controllers/mapper/mapper')
-        .then(mapper => {
+        .then((mapper) => {
           mapper.ObjectBulkUpdate.launch(el, {
             object: type,
             type: type,
