@@ -9,36 +9,35 @@ import {navigate} from '../../plugins/utils/current-page-utils';
 import Workflow from '../../models/business-models/workflow';
 
 let CloneWorkflow = Cacheable({
-  defaults : {
+  defaults: {
     clone_people: true,
     clone_tasks: true,
-    clone_objects: true
-  }
+    clone_objects: true,
+  },
 }, {
-  refresh: function() {
+  refresh() {
     return $.when(this);
   },
-  save: function() {
+  save() {
     let workflow = new Workflow({
       clone: this.source_workflow.id,
       context: null,
       clone_people: this.clone_people,
       clone_tasks: this.clone_tasks,
-      clone_objects: this.clone_objects
+      clone_objects: this.clone_objects,
     });
 
-    return workflow.save().then(function(workflow) {
+    return workflow.save().then((workflow) => {
       navigate(workflow.viewLink);
       return this;
     });
-
-  }
+  },
 });
 
 export default can.Component.extend({
-  tag: "workflow-clone",
+  tag: 'workflow-clone',
   events: {
-    click: function(el) {
+    click(el) {
       let $target;
 
       $target = $('<div class="modal hide"></div>').uniqueId();
@@ -46,14 +45,15 @@ export default can.Component.extend({
       import(/* webpackChunkName: "modalsCtrls" */'../../controllers/modals')
         .then(() => {
           $target.ggrc_controllers_modals({
-            modal_title: "Clone Workflow",
+            modal_title: 'Clone Workflow',
             model: CloneWorkflow,
             instance: new CloneWorkflow({source_workflow: this.scope.workflow}),
-            content_view: GGRC.mustache_path + "/workflows/clone_modal_content.mustache",
-            custom_save_button_text: "Proceed",
-            button_view: BUTTON_VIEW_SAVE_CANCEL
+            content_view: GGRC.mustache_path +
+              '/workflows/clone_modal_content.mustache',
+            custom_save_button_text: 'Proceed',
+            button_view: BUTTON_VIEW_SAVE_CANCEL,
           });
         });
-    }
-  }
+    },
+  },
 });
