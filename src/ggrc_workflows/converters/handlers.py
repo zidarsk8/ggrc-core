@@ -23,8 +23,12 @@ class WorkflowColumnHandler(handlers.ParentColumnHandler):
   def parse_item(self):
     """Workflow column shouldn't be changed for TaskGroup."""
     obj = self.row_converter.obj
-    parent = getattr(obj, self.key, None)
-    if parent and parent.slug != self.raw_value:
+    workflow = db.session.query(
+        wf_models.Workflow.slug
+    ).filter_by(
+        id=obj.workflow_id
+    ).first()
+    if workflow and workflow.slug != self.raw_value:
       self.add_error(errors.TASKGROUP_MAPPED_TO_ANOTHER_WORKFLOW,
                      slug=obj.slug)
     return super(WorkflowColumnHandler, self).parse_item()
