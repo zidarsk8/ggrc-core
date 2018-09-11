@@ -13,8 +13,8 @@ describe('LocalStorage model', function () {
     LocalStorage('SpecModel');
   });
 
-  let model1 = {'id': 1, 'foo': 'bar'};
-  let model2 = {'id': 2, 'foo': 'baz'};
+  let model1 = {id: 1, foo: 'bar'};
+  let model2 = {id: 2, foo: 'baz'};
 
   beforeEach(function () {
     window.localStorage.setItem('spec_model:ids', '[1, 2]');

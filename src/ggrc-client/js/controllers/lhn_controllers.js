@@ -28,7 +28,7 @@ can.Control('CMS.Controllers.LHN', {
       // whole LHN search panel.  scroll events do not bubble, so this cannot be
       // set as a delegate on the controller element.
     self.lhs_holder_onscroll = _.debounce(function () {
-      self.options.display_prefs.setLHNState({'panel_scroll': this.scrollTop});
+      self.options.display_prefs.setLHNState({panel_scroll: this.scrollTop});
     }, 250);
     this.element.find('.lhs-holder').on('scroll', self.lhs_holder_onscroll);
   },
@@ -51,7 +51,7 @@ can.Control('CMS.Controllers.LHN', {
       this.toggle_filter_active();
     }
   },
-  'submit': function (el, ev) {
+  submit: function (el, ev) {
     ev.preventDefault();
 
     let value = $(ev.target).find('input.widgetsearch').val();
@@ -407,7 +407,7 @@ can.Control('CMS.Controllers.LHN_Search', {
 
       initial_term = self.options.display_prefs.getLHNState().search_text || '';
       if (self.options.observer.my_work) {
-        initial_params = {'contact_id': GGRC.current_user.id};
+        initial_params = {contact_id: GGRC.current_user.id};
       }
       $.map(businessModels, function (model, name) {
         if (model.default_lhn_filters) {
@@ -573,7 +573,7 @@ can.Control('CMS.Controllers.LHN_Search', {
 
       // Notify the display prefs that the category the user just opened is to be reopened on next page load.
     if (!dont_update_prefs) {
-      this.options.display_prefs.setLHNState({'open_category': el.attr('data-object-singular')});
+      this.options.display_prefs.setLHNState({open_category: el.attr('data-object-singular')});
     }
 
     this.ensure_parent_open(el);
@@ -585,7 +585,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       // on closing a category, set the display prefs to reflect that there is no open category and no scroll
         //  for the next category opened.
     if (!dont_update_prefs) {
-      this.options.display_prefs.setLHNState({'open_category': null, category_scroll: 0});
+      this.options.display_prefs.setLHNState({open_category: null, category_scroll: 0});
     }
   },
   ' resize': function () {
@@ -623,7 +623,7 @@ can.Control('CMS.Controllers.LHN_Search', {
     this.run_search(newval, this.current_params);
   },
   '{observer} my_work': function (el, ev, newval) {
-    this.run_search(this.current_term, newval ? {'contact_id': GGRC.current_user.id} : null);
+    this.run_search(this.current_term, newval ? {contact_id: GGRC.current_user.id} : null);
   },
   '.sub-level scrollNext': 'show_more',
   show_more: function ($el, ev) {
@@ -937,7 +937,7 @@ can.Control('CMS.Controllers.LHN_Search', {
     let for_model = el.parent().data('for');
     let filters = this.options.filter_params;
     if (this.options.observer.my_work) {
-      param = {'contact_id': GGRC.current_user.id};
+      param = {contact_id: GGRC.current_user.id};
     }
 
     if (el.hasClass('active')) {

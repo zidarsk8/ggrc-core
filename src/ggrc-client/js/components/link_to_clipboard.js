@@ -22,13 +22,13 @@ export default can.Component.extend({
     'a click': function (el, evnt) {
       evnt.preventDefault();
     },
-    'inserted': function (el, evnt) {
+    inserted: function (el, evnt) {
       let timeout = this.viewModel.attr('timeout') || 10000;
       this._clip = new Clipboard(el.find('a')[0]);
 
       this._clip.on('success', function () {
         if (this.viewModel.attr('notify')) {
-          $('body').trigger('ajax:flash', {'success': this.viewModel.attr('notifyText')});
+          $('body').trigger('ajax:flash', {success: this.viewModel.attr('notifyText')});
         }
         this.viewModel.attr('isActive', true);
         setTimeout(function () {
