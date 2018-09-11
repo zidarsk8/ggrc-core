@@ -20,6 +20,7 @@ from werkzeug.exceptions import (
 from ggrc.converters.import_helper import read_csv_file
 from ggrc.gdrive import get_http_auth
 from ggrc.gdrive import handle_token_error
+from ggrc.gdrive import errors
 
 API_SERVICE_NAME = 'drive'
 API_VERSION = 'v3'
@@ -38,8 +39,7 @@ def hande_http_error(ex):
     raise Unauthorized(message)
   if ex.resp.status == 400:
     logger.warning(message)
-    raise BadRequest("The file is not in a recognized format. " +
-                     "Please import a Google sheet or a file in .csv format.")
+    raise BadRequest(errors.WRONG_FILE_FORMAT)
   raise InternalServerError(message)
 
 
@@ -90,14 +90,14 @@ def get_gdrive_file_data(file_data):
     csv_data = read_csv_file(StringIO(file_data))
   except AttributeError:
     # when file_data has no splitlines() method
-    raise BadRequest('Wrong file format.')
+    raise BadRequest(errors.WRONG_FILE_FORMAT)
   except HttpAccessTokenRefreshError:
     handle_token_error('Try to reload /import page')
   except HttpError as ex:
     hande_http_error(ex)
   except Exception as ex:
     logger.error(ex.message)
-    raise InternalServerError('Import failed due to internal server error.')
+    raise InternalServerError(errors.INTERNAL_SERVER_ERROR)
   return csv_data, file_data, file_meta.get('name')
 
 
@@ -141,8 +141,7 @@ def validate_response(response):
 
   if missed_keys:
     keys = ', '.join(missed_keys)
-    raise InternalServerError('Unable to validate gdrive api'
-                              ' response: missed keys {}'.format(keys))
+    raise InternalServerError(errors.MISSING_KEYS.format(keys))
 
 
 def process_gdrive_file(file_id, folder_id, postfix, separator,
@@ -169,8 +168,7 @@ def process_gdrive_file(file_id, folder_id, postfix, separator,
     hande_http_error(ex)
   except Exception as ex:
     logger.error(ex.message)
-    raise InternalServerError('Processing of the file failed due to'
-                              ' internal server error.')
+    raise InternalServerError(errors.INTERNAL_SERVER_ERROR)
   return response
 
 
@@ -188,8 +186,7 @@ def get_gdrive_file_link(file_id):
     hande_http_error(ex)
   except Exception as ex:
     logger.error(ex.message)
-    raise InternalServerError('Processing of the file failed due to'
-                              ' internal server error.')
+    raise InternalServerError(errors.INTERNAL_SERVER_ERROR)
   return file_meta['webViewLink']
 
 
@@ -206,8 +203,7 @@ def add_gdrive_file_folder(file_id, folder_id):
     hande_http_error(ex)
   except Exception as ex:
     logger.error(ex.message)
-    raise InternalServerError('Processing of the file failed due to'
-                              ' internal server error.')
+    raise InternalServerError(errors.INTERNAL_SERVER_ERROR)
   return response['webViewLink']
 
 

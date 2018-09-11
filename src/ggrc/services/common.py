@@ -45,6 +45,7 @@ from ggrc.models.background_task import BackgroundTask, create_task
 from ggrc.query import utils as query_utils
 from ggrc import settings
 from ggrc.cache import utils as cache_utils
+from ggrc.utils import errors as ggrc_errors
 
 
 # pylint: disable=invalid-name
@@ -448,8 +449,9 @@ class Resource(ModelView):
           logger.exception(err)
           message = translate_message(err)
           raise BadRequest(message)
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
           logger.exception(err)
+          err.message = ggrc_errors.BAD_REQUEST_MESSAGE
           raise
         finally:
           # When running integration tests, cache sometimes does not clear
