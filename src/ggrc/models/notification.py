@@ -14,6 +14,7 @@ from ggrc.models import reflection
 
 
 class NotificationConfig(base.ContextRBAC, Base, db.Model):
+  """NotificationConfig model representation"""
   __tablename__ = 'notification_configs'
   name = db.Column(db.String, nullable=True)
   enable_flag = db.Column(db.Boolean)
@@ -37,6 +38,7 @@ class NotificationConfig(base.ContextRBAC, Base, db.Model):
 
 
 class NotificationType(base.ContextRBAC, Base, db.Model):
+  """NotificationType model representation"""
   __tablename__ = 'notification_types'
 
   name = db.Column(db.String, nullable=False)
@@ -50,6 +52,9 @@ class BaseNotification(base.ContextRBAC, Base, db.Model):
   """Base notifications and notifications history model."""
   __abstract__ = True
 
+  RUNNER_DAILY = "daily"
+  RUNNER_FAST = "fast"
+
   object_id = db.Column(db.Integer, nullable=False)
   object_type = db.Column(db.String, nullable=False)
   send_on = db.Column(db.DateTime, nullable=False)
@@ -59,6 +64,11 @@ class BaseNotification(base.ContextRBAC, Base, db.Model):
   repeating = db.Column(db.Boolean, nullable=False, default=False)
   object = utils.PolymorphicRelationship("object_id", "object_type",
                                          "{}_notifiable")
+  runner = db.Column(
+      db.Enum(RUNNER_DAILY, RUNNER_FAST),
+      nullable=False,
+      default=RUNNER_DAILY
+  )
 
   @declared_attr
   def notification_type_id(cls):  # pylint: disable=no-self-argument
