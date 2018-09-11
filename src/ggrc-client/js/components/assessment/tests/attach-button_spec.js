@@ -21,13 +21,13 @@ describe('attach-button component', function () {
     );
   });
 
-  describe('refresh() method', function () {
-    it('dispatches "refreshEvidences" event', function () {
+  describe('finish() method', function () {
+    it('dispatches "finish" event', function () {
       spyOn(viewModel, 'dispatch');
-      viewModel.refresh();
+      viewModel.finish();
 
       expect(viewModel.dispatch)
-        .toHaveBeenCalledWith('refreshEvidences');
+        .toHaveBeenCalledWith('finish');
     });
   });
 

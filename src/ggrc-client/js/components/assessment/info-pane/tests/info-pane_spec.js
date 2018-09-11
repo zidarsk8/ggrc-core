@@ -20,6 +20,7 @@ import Permission from '../../../../permission';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../../../../plugins/utils/custom-attribute/custom-attribute-config';
 import * as NotifiersUtils from '../../../../plugins/utils/notifiers-utils';
 import * as businessModels from '../../../../models/business-models';
+import Evidence from '../../../../models/business-models/evidence';
 
 describe('assessment-info-pane component', () => {
   let vm;
@@ -612,11 +613,6 @@ describe('assessment-info-pane component', () => {
       };
       expect(closure).not.toThrow();
     });
-
-    it('refreshes counts for Evidence', function () {
-      vm.updateItems();
-      expect(vm.refreshCounts).toHaveBeenCalledWith(['Evidence']);
-    });
   });
 
   describe('isAllowedToMap attribute', () => {
@@ -1162,7 +1158,10 @@ describe('assessment-info-pane component', () => {
       let data;
 
       beforeEach(() => {
-        data = {};
+        data = {
+          'Evidence:FILE': [],
+          'Evidence:URL': [],
+        };
         dfd.resolve(data);
       });
 
@@ -1182,19 +1181,39 @@ describe('assessment-info-pane component', () => {
       });
 
       it('replaces files list with loaded files', function () {
-        data['Evidence:FILE'] = {data: '1'};
+        let evidenceData = {data: '1'};
+        data['Evidence:FILE'] = [evidenceData];
         vm.updateRelatedItems();
         expect(vm.attr('files').serialize()).toEqual([
-          data['Evidence:FILE'],
+          (new Evidence(evidenceData)).serialize(),
         ]);
       });
 
+      it('creates Evidence model for each loaded file', function () {
+        data['Evidence:FILE'] = [{data: '1'}, {data: '2'}];
+        vm.updateRelatedItems();
+
+        vm.attr('files').forEach((file) => {
+          expect(file).toEqual(jasmine.any(Evidence));
+        });
+      });
+
       it('replaces urls list with loaded urls', function () {
-        data['Evidence:URL'] = {data: '1'};
+        let evidenceData = {data: '1'};
+        data['Evidence:URL'] = [evidenceData];
         vm.updateRelatedItems();
         expect(vm.attr('urls').serialize()).toEqual([
-          data['Evidence:URL'],
+          (new Evidence(evidenceData)).serialize(),
         ]);
+      });
+
+      it('creates Evidence model for each loaded url', function () {
+        data['Evidence:URL'] = [{data: '1'}, {data: '2'}];
+        vm.updateRelatedItems();
+
+        vm.attr('urls').forEach((url) => {
+          expect(url).toEqual(jasmine.any(Evidence));
+        });
       });
 
       it('sets isUpdatingRelatedItems to false', function () {
@@ -1928,6 +1947,49 @@ describe('assessment-info-pane component', () => {
 
       let formFields = vm.attr('formFields');
       expect(formFields.length).toBe(currentFormFields.length);
+    });
+  });
+
+  describe('verifyObjects() method', () => {
+    it('removes new objects', () => {
+      let obj1 = new Evidence({id: 1});
+      let obj2 = new Evidence({id: 2});
+      let obj3 = new Evidence();
+
+      vm.attr('files', [obj1, obj3, obj2]);
+
+      vm.verifyObjects('files');
+
+      expect(vm.attr('files').serialize()).toEqual(new can.List([
+        obj1, obj2,
+      ]).serialize());
+    });
+
+    it('turns off "isUpdating" flag for requested type', () => {
+      vm.attr('urls', []);
+      vm.attr('isUpdatingUrls', true);
+
+      vm.verifyObjects('urls');
+
+      expect(vm.attr('isUpdatingUrls')).toBe(false);
+    });
+
+    it('does not refresh counts if count key is not provided', () => {
+      vm.attr('urls', []);
+      spyOn(vm, 'refreshCounts');
+
+      vm.verifyObjects('urls');
+
+      expect(vm.refreshCounts).not.toHaveBeenCalled();
+    });
+
+    it('refreshes counts if count key is provided', () => {
+      vm.attr('urls', []);
+      spyOn(vm, 'refreshCounts');
+
+      vm.verifyObjects('urls', 'Evidence');
+
+      expect(vm.refreshCounts).toHaveBeenCalledWith(['Evidence']);
     });
   });
 });

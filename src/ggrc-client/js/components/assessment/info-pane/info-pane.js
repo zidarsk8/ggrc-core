@@ -279,8 +279,6 @@ export default can.Component.extend({
       can.makeArray(arguments).forEach(function (type) {
         this.attr(type).replace(this['load' + can.capitalize(type)]());
       }.bind(this));
-
-      this.refreshCounts(['Evidence']);
     },
     afterCreate: function (event, type) {
       let createdItems = event.items;
@@ -437,8 +435,10 @@ export default can.Component.extend({
         .then((data) => {
           this.attr('mappedSnapshots').replace(data.Snapshot);
           this.attr('comments').replace(data.Comment);
-          this.attr('files').replace(data['Evidence:FILE']);
-          this.attr('urls').replace(data['Evidence:URL']);
+          this.attr('files')
+            .replace(data['Evidence:FILE'].map((file) => new Evidence(file)));
+          this.attr('urls')
+            .replace(data['Evidence:URL'].map((url) => new Evidence(url)));
 
           this.attr('isUpdatingRelatedItems', false);
           this.attr('instance').dispatch(RELATED_ITEMS_LOADED);
@@ -584,6 +584,15 @@ export default can.Component.extend({
 
       let verifierRoleId = verifierRole ? verifierRole.id : null;
       this.attr('_verifierRoleId', verifierRoleId);
+    },
+    verifyObjects(type, countKey) {
+      let objects = this.attr(type).filter((item) => !item.isNew());
+      this.attr(type, objects);
+      this.attr(`isUpdating${can.capitalize(type)}`, false);
+
+      if (countKey) {
+        this.refreshCounts([countKey]);
+      }
     },
   },
   init: function () {
