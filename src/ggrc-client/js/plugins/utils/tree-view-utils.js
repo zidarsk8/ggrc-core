@@ -337,7 +337,7 @@ function getSortingForModel(modelType) {
   let key = DEFAULT_SORT_KEY;
   let direction = DEFAULT_SORT_DIRECTION;
 
-  if (NO_DEFAULT_SORTING_LIST.indexOf(modelType) != -1) {
+  if (NO_DEFAULT_SORTING_LIST.indexOf(modelType) !== -1) {
     key = null;
     direction = null;
   }
