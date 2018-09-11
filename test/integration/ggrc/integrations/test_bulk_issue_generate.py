@@ -528,6 +528,41 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
         [["Assessment", id_, "500 Test Error"] for id_ in assessment_ids]
     )
 
+  def test_err_notification(self):
+    """Test notification about failed bulk child generation."""
+    audit_id, _ = self.setup_assessments(3)
+    _, side_user = self.gen.generate_person(user_role="Creator")
+    self.api.set_user(side_user)
+    with mock.patch("ggrc.notifications.common.send_email") as send_mock:
+      response = self.generate_children_issues_for(
+          "Audit", audit_id, "Assessment"
+      )
+    self.assert200(response)
+    self.assertEqual(send_mock.call_count, 1)
+    (email, title, body), _ = send_mock.call_args_list[0]
+    cur_user = all_models.Person.query.get(side_user.id)
+    self.assertEqual(email, cur_user.email)
+    self.assertEqual(title, issuetracker_bulk_sync.ISSUETRACKER_SYNC_TITLE)
+    self.assertIn("There were some errors in generating tickets", body)
+
+  def test_succeeded_notification(self):
+    """Test notification about succeeded bulk child generation."""
+    audit_id, _ = self.setup_assessments(3)
+    with mock.patch("ggrc.notifications.common.send_email") as send_mock:
+      response = self.generate_children_issues_for(
+          "Audit", audit_id, "Assessment"
+      )
+    self.assert200(response)
+    self.assertEqual(send_mock.call_count, 1)
+    (email, title, body), _ = send_mock.call_args_list[0]
+    self.assertEqual(email, "user@example.com")
+    self.assertEqual(title, issuetracker_bulk_sync.ISSUETRACKER_SYNC_TITLE)
+    title = all_models.Audit.query.get(audit_id).title
+    self.assertIn(
+        "Tickets generation for audit \"{}\" was completed".format(title),
+        body
+    )
+
 
 class TestBulkIssuesUpdate(TestBulkIssuesSync):
   """Test bulk issues update."""
