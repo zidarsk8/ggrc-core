@@ -1,8 +1,10 @@
-[//]: <> (updated 9/04/2018)
+[//]: <> (updated 9/11/2018)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 
-[New roles for scoping objects (v1.19.0, 08/23/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.isxssko8q9a4)
+[Roles reorganization for scoping objects (v1.22.0, 09/11/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.ry1yh4i02ceq)
+
+[New roles for scoping objects (v1.19.0, 08/23/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.mfp0k3svtkws)
 
 [Due Date for Issue object (v1.18.0, 08/14/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.is6tlxqjgft)
 
@@ -53,6 +55,12 @@ Our product team is working hard to engineer compliance @ scale and make your da
 [Linking assessments with other issue tracking systems (v0.10.36, 12/12/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.9ry21bbez6aa)
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
+
+### Roles reorganization for scoping objects (v1.22.0, 09/11/2018)
+
+In addition to all the new roles added last release, there will be two new roles for scoping objects: ‘Assignee’ and ‘Verifiers’. These fields will be mandatory and accept only one person and will be used in GGRCQ for integration with ticket tracking system.
+
+People from ‘Primary Contacts’ and ‘Secondary Contacts’ fields will be migrated into a new role ‘Compliance Contacts’.
 
 ### New roles for scoping objects (v1.19.0, 08/23/2018)
 
