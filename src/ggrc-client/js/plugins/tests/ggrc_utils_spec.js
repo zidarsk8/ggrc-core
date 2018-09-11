@@ -98,14 +98,6 @@ describe('getMappableTypes() method', function () {
       .and.returnValue(canonicalMappings);
   });
 
-  it('excludes the References type from the result', function () {
-    let result = getMappableTypes('Reference');
-    expect(_.includes(result, 'Reference')).toBe(false);
-  });
-  it('does not return Issue type for Person', function () {
-    let result = getMappableTypes('Person');
-    expect(_.includes(result, 'Issue')).toBe(false);
-  });
   it('always returns whitelisted items', function () {
     let whitelisted = ['Hello', 'World'];
     let result = getMappableTypes('AssessmentTemplate', {

@@ -23,7 +23,7 @@ export function uploadFiles(opts = {}) {
   let picker;
 
   gapiClient.authorizeGapi(['https://www.googleapis.com/auth/drive'])
-    .then(()=> {
+    .then(() => {
       gapi.load('picker', {callback: createPicker});
     }, dfd.reject);
 
@@ -86,11 +86,11 @@ export function uploadFiles(opts = {}) {
       // "name" <=> "title", "url" <=> "alternateLink"
       // RefreshQueue converts picker file objects into GDrive file objects
       let pickedFilesById = _.keyBy(pickedFiles, 'id');
-      let refreshDfds = pickedFiles.map((file)=> findGDriveItemById(file.id));
-      can.when(...refreshDfds).then((...files)=> {
+      let refreshDfds = pickedFiles.map((file) => findGDriveItemById(file.id));
+      can.when(...refreshDfds).then((...files) => {
         // adding a newUpload flag so we can later distinguish newly
         // uploaded files from the picked ones.
-        files.forEach((file)=>{
+        files.forEach((file) => {
           file.newUpload = pickedFilesById[file.id].isNew;
         });
         dfd.resolve(files);
@@ -113,5 +113,5 @@ export function findGDriveItemById(id) {
   let path = `/drive/v2/files/${id}`;
 
   return gapiClient.authorizeGapi(['https://www.googleapis.com/auth/drive'])
-    .then(()=> gapiClient.makeGapiRequest({path, method: 'get'}));
+    .then(() => gapiClient.makeGapiRequest({path, method: 'get'}));
 }

@@ -6,6 +6,7 @@
 import './external-data-provider';
 import './autocomplete-results';
 import '../spinner/spinner';
+import * as businessModels from '../../models/business-models';
 import template from './external-data-autocomplete.mustache';
 
 /**
@@ -103,7 +104,7 @@ export default can.Component.extend({
      */
     onItemPicked(item) {
       this.attr('saving', true);
-      this.createOrGet(item).then((model)=> {
+      this.createOrGet(item).then((model) => {
         if (this.attr('autoClean')) {
           this.attr('searchCriteria', '');
         }
@@ -112,7 +113,7 @@ export default can.Component.extend({
           type: 'itemSelected',
           selectedItem: model,
         });
-      }).always(()=> {
+      }).always(() => {
         this.attr('saving', false);
       });
     },
@@ -123,12 +124,12 @@ export default can.Component.extend({
      */
     createOrGet(item) {
       const type = this.attr('type');
-      const ModelClass = CMS.Models[type];
+      const ModelClass = businessModels[type];
 
       item.attr('context', null);
       item.attr('external', true);
 
-      return ModelClass.create(item).then((response)=> {
+      return ModelClass.create(item).then((response) => {
         let data = response[0];
         let model = data[1][ModelClass.root_object];
 

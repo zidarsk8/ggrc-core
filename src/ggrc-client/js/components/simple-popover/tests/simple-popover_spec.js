@@ -18,7 +18,7 @@ describe('simple-popover component', function () {
   });
 
   describe('init() method ', function () {
-    it('saves element in viewModel', ()=> {
+    it('saves element in viewModel', () => {
       let element = {};
       init(element);
 
@@ -31,13 +31,13 @@ describe('simple-popover component', function () {
       viewModel.hide();
     });
 
-    it('opens popover', ()=> {
+    it('opens popover', () => {
       viewModel.show();
 
       expect(viewModel.attr('open')).toBeTruthy();
     });
 
-    it('creates event listener', ()=> {
+    it('creates event listener', () => {
       spyOn(document, 'addEventListener');
       viewModel.show();
 
@@ -50,13 +50,13 @@ describe('simple-popover component', function () {
       viewModel.show();
     });
 
-    it('closes popover', ()=> {
+    it('closes popover', () => {
       viewModel.hide();
 
       expect(viewModel.attr('open')).toBeFalsy();
     });
 
-    it('removes event listener', ()=> {
+    it('removes event listener', () => {
       spyOn(document, 'removeEventListener');
       viewModel.hide();
 
@@ -65,7 +65,7 @@ describe('simple-popover component', function () {
   });
 
   describe('toggle() method ', function () {
-    it('delegates to hide', ()=> {
+    it('delegates to hide', () => {
       viewModel.attr('open', true);
       spyOn(viewModel, 'hide');
       viewModel.toggle();
@@ -73,7 +73,7 @@ describe('simple-popover component', function () {
       expect(viewModel.hide).toHaveBeenCalled();
     });
 
-    it('delegates to show', ()=> {
+    it('delegates to show', () => {
       viewModel.attr('open', false);
       spyOn(viewModel, 'show');
       viewModel.toggle();

@@ -32,6 +32,7 @@ import {getRolesForType} from './acl-utils';
 import {getMappableTypes} from '../ggrc_utils';
 import {caDefTypeName} from './custom-attribute/custom-attribute-config';
 import Cacheable from '../../models/cacheable';
+import * as businessModels from '../../models/business-models';
 
 /**
 * TreeView-specific utils.
@@ -147,7 +148,7 @@ function skipUnusable(modelName, attrList) {
  * @return {Object} Table columns configuration.
  */
 function getColumnsForModel(modelType, displayPrefs, modelName) {
-  let Model = CMS.Models[modelType];
+  let Model = businessModels[modelType];
   let modelDefinition = Model.root_object;
   let mandatoryAttrNames =
     Model.tree_view_options.mandatory_attr_names ||
@@ -289,7 +290,7 @@ function setColumnsForModel(modelType, columnNames, displayPrefs,
 
   if (displayPrefs) {
     displayPrefs.setTreeViewHeaders(
-      modelName || CMS.Models[modelType].model_singular,
+      modelName || businessModels[modelType].model_singular,
       selectedNames
     );
     displayPrefs.save();
@@ -353,7 +354,7 @@ function getSortingForModel(modelType) {
  * @return {Object} Sub tier filter configuration.
  */
 function getModelsForSubTier(modelName) {
-  let Model = CMS.Models[modelName];
+  let Model = businessModels[modelName];
   let availableModels;
   let selectedModels;
 
@@ -680,7 +681,7 @@ function _isFullSubTree(type) {
 /**
  * @param {Object} source - Instance object.
  * @param {String} modelName - Name of model.
- * @return {CMS.Models} - Instance of model.
+ * @return {Cacheable} - Instance of model.
  * @private
  */
 function _createInstance(source, modelName) {
@@ -689,7 +690,7 @@ function _createInstance(source, modelName) {
   if (source.type === 'Snapshot') {
     instance = toObject(source);
   } else {
-    instance = CMS.Models[modelName].model(source);
+    instance = businessModels[modelName].model(source);
   }
   return instance;
 }

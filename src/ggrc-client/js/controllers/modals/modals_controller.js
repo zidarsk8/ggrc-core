@@ -50,7 +50,7 @@ import DisplayPrefs from '../../models/local-storage/display-prefs';
 import Person from '../../models/business-models/person';
 import Assessment from '../../models/business-models/assessment';
 import Stub from '../../models/stub';
-import {getInstance} from '../../models/models-extensions';
+import {getInstance} from '../../plugins/utils/models-utils';
 
 export default can.Control({
   pluginName: 'ggrc_controllers_modals',
@@ -251,34 +251,6 @@ export default can.Control({
     }
   },
 
-  immediate_find_or_create: function (el, ev, data) {
-    let that = this;
-    let prop = el.data('drop');
-    let model = CMS.Models[el.data('lookup')];
-    let context = that.options.instance.context;
-    let params = {
-      context: context && context.serialize ? context.serialize() : context,
-    };
-
-    setTimeout(function () {
-      params[prop] = el.val();
-      el.prop('disabled', true);
-      model.findAll(params).then(function (list) {
-        if (list.length) {
-          that.autocomplete_select(el, ev, {item: list[0]});
-        } else {
-          new model(params).save().then(function (item) {
-            that.autocomplete_select(el, ev, {item: item});
-          });
-        }
-      })
-        .always(function () {
-          el.prop('disabled', false);
-        });
-    }, 100);
-  },
-  'input[data-lookup][data-drop] paste': 'immediate_find_or_create',
-  'input[data-lookup][data-drop] drop': 'immediate_find_or_create',
   fetch_templates: function (dfd) {
     let that = this;
     dfd = dfd ? dfd.then(function () {
@@ -355,11 +327,11 @@ export default can.Control({
     });
 
     return dfd.done(function () {
-      this.reset_form();
+      this.reset_form(this.options.instance);
     }.bind(that));
   },
 
-  reset_form: function (setFieldsCb) {
+  reset_form: function (instance, setFieldsCb) {
     let preloadDfd;
 
     if (!this.wasDestroyed()) {
@@ -370,19 +342,20 @@ export default can.Control({
       // This is to trigger `focus_first_element` in modal_ajax handling
       this.element.trigger('loaded');
     }
-    if (!this.options.instance._transient) {
-      this.options.instance.attr('_transient', new can.Observe({}));
+    if (!instance._transient) {
+      instance.attr('_transient', new can.Observe({}));
     }
-    if (this.options.instance.form_preload) {
-      preloadDfd = this.options.instance.form_preload(
+    if (instance.form_preload) {
+      preloadDfd = instance.form_preload(
         this.options.new_object_form,
         this.options.object_params);
       if (preloadDfd) {
         preloadDfd.then(function () {
-          this.options.instance.backup();
-        }.bind(this));
+          instance.backup();
+        });
       }
     }
+    return preloadDfd || can.Deferred().resolve();
   },
 
   fetch_all: function () {
@@ -974,20 +947,19 @@ export default can.Control({
   new_instance: function (data) {
     let newInstance = this.prepareInstance();
 
-    $.when(this.options.attr('instance', newInstance))
-      .done(function () {
-        this.reset_form(function () {
-          if (this.wasDestroyed()) {
-            return;
-          }
+    this.reset_form(newInstance, () => {
+      if (this.wasDestroyed()) {
+        return;
+      }
 
-          let $form = $(this.element).find('form');
-          $form.trigger('reset');
-        }.bind(this));
-      }.bind(this))
-      .then(this.proxy('apply_object_params'))
-      .then(this.proxy('serialize_form'))
-      .then(this.proxy('autocomplete'));
+      let $form = $(this.element).find('form');
+      $form.trigger('reset');
+    }).done(() => {
+      $.when(this.options.attr('instance', newInstance))
+        .then(this.proxy('apply_object_params'))
+        .then(this.proxy('serialize_form'))
+        .then(this.proxy('autocomplete'));
+    });
 
     this.restore_ui_status();
   },

@@ -38,6 +38,7 @@ import {
 } from '../../plugins/ggrc_utils';
 import Mappings from '../../models/mappers/mappings';
 import Relationship from '../../models/service-models/relationship';
+import * as businessModels from '../../models/business-models';
 
 let DEFAULT_OBJECT_MAP = {
   Assessment: 'Control',
@@ -75,7 +76,7 @@ let DEFAULT_OBJECT_MAP = {
 let getDefaultType = function (type, object) {
   let treeView = GGRC.tree_view.sub_tree_for[object];
   let defaultType =
-    (CMS.Models[type] && type) ||
+    (businessModels[type] && type) ||
     DEFAULT_OBJECT_MAP[object] ||
     (treeView ? treeView.display_list[0] : 'Control');
   return defaultType;
@@ -265,7 +266,7 @@ export default can.Component.extend({
     mapObjects: function (objects) {
       let type = this.viewModel.attr('type');
       let object = this.viewModel.attr('object');
-      let instance = CMS.Models[object].findInCacheById(
+      let instance = businessModels[object].findInCacheById(
         this.viewModel.attr('join_object_id'));
       let mapping;
       let Model;
@@ -318,7 +319,7 @@ export default can.Component.extend({
           };
           data[mapping.option_attr] = destination;
           modelInstance = new Model(data);
-          defer.push(backendGdriveClient.withAuth(()=> {
+          defer.push(backendGdriveClient.withAuth(() => {
             return modelInstance.save();
           }));
         });
@@ -363,7 +364,7 @@ export default can.Component.extend({
       );
     },
     get_object: function (options) {
-      let type = CMS.Models[this.attr('type')];
+      let type = businessModels[this.attr('type')];
       if (type && type.title_plural) {
         return type.title_plural;
       }

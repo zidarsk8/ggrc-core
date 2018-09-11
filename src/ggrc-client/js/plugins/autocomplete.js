@@ -8,9 +8,8 @@ import {
   batchRequests,
 } from './utils/query-api-utils';
 import RefreshQueue from '../models/refresh_queue';
-import Mappings from '../models/mappers/mappings';
 import Search from '../models/service-models/search';
-import {getInstance} from '../models/models-extensions';
+import {getInstance} from '../plugins/utils/models-utils';
 
 (function ($) {
   'use strict';

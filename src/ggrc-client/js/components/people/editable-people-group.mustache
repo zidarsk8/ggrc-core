@@ -55,12 +55,12 @@
               <autocomplete
                   search-items-type="Person"
                   (item-selected)="personSelected(%event.selectedItem)"
-                  placeholder="Add person">
+                  {placeholder}="placeholder">
               </autocomplete>
               {{else}}
               <external-data-autocomplete
                 {type}="'Person'"
-                {placeholder}="'Add person'"
+                {placeholder}="placeholder"
                 {min-length}="2"
                 (item-selected)="personSelected(%event.selectedItem)">
               </external-data-autocomplete>

@@ -15,6 +15,22 @@ from integration.ggrc.models import factories
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
 
+SCOPING_OBJECTS = {
+    "Access Group",
+    "Data Asset",
+    "Facility",
+    "Market",
+    "Metric",
+    "Org Group",
+    "Process",
+    "Product",
+    "ProductGroup",
+    "Project",
+    "System",
+    "TechnologyEnvironment",
+    "Vendor",
+}
+
 
 class TestExportEmptyTemplate(TestCase):
 
@@ -538,7 +554,7 @@ class TestExportMultipleObjects(TestCase):
       "Threat",
   )
   def test_asmnt_procedure_export(self, model):
-    """Test export of Assessment Procedure."""
+    """Test export of Assessment Procedure. {}"""
     with factories.single_commit():
       program = factories.ProgramFactory()
       audit = factories.AuditFactory(program=program)
@@ -560,6 +576,9 @@ class TestExportMultipleObjects(TestCase):
       ]))
       if model == "Control":
         import_queries[-1]["Assertions"] = "Privacy"
+      if model in SCOPING_OBJECTS:
+        import_queries[-1]["Assignee"] = "user@example.com"
+        import_queries[-1]["Verifier"] = "user@example.com"
 
     self.check_import_errors(self.import_data(*import_queries))
 

@@ -62,10 +62,10 @@ export default can.Component.extend({
     addComment(comment, data) {
       return comment.attr(data)
         .save()
-        .done((comment)=> {
+        .done((comment) => {
           this.afterCreation(comment, true);
         })
-        .fail((comment)=> {
+        .fail((comment) => {
           this.afterCreation(comment, false);
         });
     },
@@ -97,7 +97,7 @@ export default can.Component.extend({
       this.attr('state.save', false);
 
       this.attr('content.saveDfd')
-        .then(()=> {
+        .then(() => {
           this.addComment(comment, {
             context: context,
             assignee_type: getAssigneeType(instance),

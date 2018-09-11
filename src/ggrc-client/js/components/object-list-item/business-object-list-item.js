@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as businessModels from '../../models/business-models';
 import template from './business-object-list-item.mustache';
 
 let tag = 'business-object-list-item';
@@ -28,7 +29,7 @@ export default can.Component.extend({
           const objectType = !this.attr('isSnapshot') ?
             this.attr('instance.type') :
             this.attr('instance.child_type');
-          const model = CMS.Models[objectType];
+          const model = businessModels[objectType];
           return `fa-${model.table_singular}`;
         },
       },

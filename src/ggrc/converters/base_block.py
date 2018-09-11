@@ -13,12 +13,14 @@ from collections import OrderedDict
 from collections import Counter
 
 from cached_property import cached_property
+import sqlalchemy as sa
 from sqlalchemy import or_
 from sqlalchemy import and_
 from flask import _app_ctx_stack
 
 from ggrc import db
 from ggrc import models
+from ggrc.models import reflection
 from ggrc.rbac import permissions
 from ggrc.utils import benchmark
 from ggrc.utils import structures
@@ -120,7 +122,19 @@ class BlockConverter(object):
         type.
     """
     cad = models.CustomAttributeDefinition
-    defs = cad.eager_query().filter(cad.definition_type == self.table_singular)
+    gca_prefix = reflection.AttributeInfo.CUSTOM_ATTR_PREFIX
+    lca_prefix = reflection.AttributeInfo.OBJECT_CUSTOM_ATTR_PREFIX
+    defs = cad.eager_query().filter(
+        cad.definition_type == self.table_singular,
+        sa.or_(
+            cad.mandatory,
+            cad.title.in_(
+                v["attr_name"]
+                for k, v in self.headers.items()
+                if k.startswith(gca_prefix) or k.startswith(lca_prefix)
+            ),
+        ),
+    )
     return {(d.definition_id, d.title): d for d in defs}
 
   def get_ca_definitions_cache(self):

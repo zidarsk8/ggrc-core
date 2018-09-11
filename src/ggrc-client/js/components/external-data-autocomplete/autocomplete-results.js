@@ -29,7 +29,7 @@ export default can.Component.extend({
           let titleFieldPath = this.attr('titleFieldPath');
           let infoFieldPath = this.attr('infoFieldPath');
 
-          let results = values.map((result)=> {
+          let results = values.map((result) => {
             return {
               title: titleFieldPath ? result.attr(titleFieldPath) : '',
               info: infoFieldPath ? result.attr(infoFieldPath) : '',

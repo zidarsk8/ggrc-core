@@ -5,10 +5,14 @@
 
 {{#switch attr_name}}
   {{#case 'ra_manager'}}
-      <tree-field {source}="instance.ra_manager" {field}="'email'"/>
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.ra_manager" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
   {{/case}}
   {{#case 'ra_counsel'}}
-      <tree-field {source}="instance.ra_counsel" {field}="'email'"/>
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.ra_counsel" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
   {{/case}}
   {{#case 'status'}}
     {{#using status=instance.status}}

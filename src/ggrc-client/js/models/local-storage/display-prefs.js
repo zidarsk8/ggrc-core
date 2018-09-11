@@ -72,11 +72,11 @@ export default LocalStorage('CMS.Models.DisplayPrefs', {
       return $.when(this.cache);
     }
 
-    this.findAll().then(function (d) {
+    this.findAll().then((d) => {
       if (d.length > 0) {
         prefs = d[0];
       } else {
-        prefs = new CMS.Models.DisplayPrefs();
+        prefs = new this();
         prefs.save();
       }
     });
@@ -312,10 +312,8 @@ export default LocalStorage('CMS.Models.DisplayPrefs', {
 
 });
 
-if (typeof jasmine !== 'undefined') {
-  CMS.Models.DisplayPrefs.exports = {
-    COLLAPSE: COLLAPSE,
-    SORTS: SORTS,
-    path: path,
-  };
-}
+export {
+  COLLAPSE,
+  SORTS,
+  path,
+};

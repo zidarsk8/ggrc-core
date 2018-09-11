@@ -21,8 +21,8 @@
         data-modal-class="modal-wide"
         data-in-cloner="true"
         {{#isAuditPage}}data-update-hash="true"{{/isAuditPage}}
-        data-object-singular="{{model_info 'AssessmentTemplate' 'model_singular'}}"
-        data-object-plural="{{model_info 'AssessmentTemplate' 'root_collection'}}"
+        data-object-singular="AssessmentTemplate"
+        data-object-plural="assessment_templates"
         data-extend-new-instance='{
           "audit": {{json_stringify parentInstance fields='id,type,issue_tracker'}},
           "context": {

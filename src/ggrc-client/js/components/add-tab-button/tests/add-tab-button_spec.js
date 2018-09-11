@@ -27,7 +27,7 @@ describe('add-tab-button component', function () {
         expect(result).toBe(false);
       });
 
-      it('if instance type is Assessment but there is no audit', ()=> {
+      it('if instance type is Assessment but there is no audit', () => {
         viewModel.attr('instance', {
           type: 'Assessment',
           audit: null,

@@ -89,7 +89,7 @@ export default can.Component.extend({
       id: instance.id,
     }, ['id', 'type', 'title', 'template_object_type']);
 
-    batchRequests(param).then((response)=> {
+    batchRequests(param).then((response) => {
       const values = response.AssessmentTemplate.values;
       viewModel.attr('responses', values);
       viewModel._selectInitialTemplate(viewModel.templates());

@@ -20,6 +20,7 @@ import Relationship from '../../models/service-models/relationship';
 import Context from '../../models/service-models/context';
 import Evidence from '../../models/business-models/evidence';
 import Document from '../../models/business-models/document';
+import * as businessModels from '../../models/business-models';
 
 let DOCUMENT_KIND_MAP = {
   FILE: 'documents_file',
@@ -128,7 +129,7 @@ export default can.Component.extend({
     createDocument: function (data) {
       let date = new Date();
       let modelType = this.attr('modelType');
-      let document = new CMS.Models[modelType]({
+      let document = new businessModels[modelType]({
         link: data,
         title: data,
         created_at: date.toISOString(),

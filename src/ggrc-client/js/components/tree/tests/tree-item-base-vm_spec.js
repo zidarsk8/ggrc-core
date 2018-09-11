@@ -40,40 +40,40 @@ describe('tree-item-base viewModel', function () {
       event = {};
     });
 
-    describe('if event target is link', ()=> {
-      beforeEach(()=> {
+    describe('if event target is link', () => {
+      beforeEach(() => {
         event = {
           target: $('<a class="link"></a>'),
           stopPropagation: jasmine.createSpy(),
         };
       });
 
-      it('it is stopping event propagation', ()=> {
+      it('it is stopping event propagation', () => {
         vm.onClick('element', event);
 
         expect(event.stopPropagation).toHaveBeenCalled();
       });
 
-      it('does not select current item', ()=> {
+      it('does not select current item', () => {
         vm.onClick('element', event);
 
         expect(vm.select).not.toHaveBeenCalled();
       });
     });
 
-    describe('if instance is Cycle', ()=> {
-      beforeEach(()=> {
+    describe('if instance is Cycle', () => {
+      beforeEach(() => {
         vm.attr('instance', new can.Map({
           type: 'Cycle',
         }));
       });
 
-      describe('toggle "expanded" option if page is "Workflow"', ()=> {
-        beforeEach(()=> {
+      describe('toggle "expanded" option if page is "Workflow"', () => {
+        beforeEach(() => {
           spyOn(CurrentPageUtils, 'getPageType')
             .and.returnValue('Workflow');
         });
-        it('when option was false', ()=> {
+        it('when option was false', () => {
           vm.attr('expanded', false);
 
           vm.onClick('element', event);
@@ -81,7 +81,7 @@ describe('tree-item-base viewModel', function () {
           expect(vm.attr('expanded')).toBe(true);
         });
 
-        it('when option was true', ()=> {
+        it('when option was true', () => {
           vm.attr('expanded', true);
 
           vm.onClick('element', event);
@@ -90,7 +90,7 @@ describe('tree-item-base viewModel', function () {
         });
       });
 
-      it('call select() if page is not Workflow', ()=> {
+      it('call select() if page is not Workflow', () => {
         spyOn(CurrentPageUtils, 'getPageType')
           .and.returnValue('AnotherType');
         vm.attr('result', true);
@@ -101,20 +101,20 @@ describe('tree-item-base viewModel', function () {
       });
     });
 
-    describe('if instance is CycleTaskGroup', ()=> {
-      beforeEach(()=> {
+    describe('if instance is CycleTaskGroup', () => {
+      beforeEach(() => {
         vm.attr('instance', new can.Map({
           type: 'CycleTaskGroup',
         }));
       });
 
-      describe('toggle "expanded" option if page is "Workflow"', ()=> {
-        beforeEach(()=> {
+      describe('toggle "expanded" option if page is "Workflow"', () => {
+        beforeEach(() => {
           spyOn(CurrentPageUtils, 'getPageType')
             .and.returnValue('Workflow');
         });
 
-        it('when option was false', ()=> {
+        it('when option was false', () => {
           vm.attr('expanded', false);
 
           vm.onClick('element', event);
@@ -122,7 +122,7 @@ describe('tree-item-base viewModel', function () {
           expect(vm.attr('expanded')).toBe(true);
         });
 
-        it('when option was true', ()=> {
+        it('when option was true', () => {
           vm.attr('expanded', true);
 
           vm.onClick('element', event);
@@ -131,7 +131,7 @@ describe('tree-item-base viewModel', function () {
         });
       });
 
-      it('call select() if page is not Workflow', ()=> {
+      it('call select() if page is not Workflow', () => {
         spyOn(CurrentPageUtils, 'getPageType')
           .and.returnValue('AnotherType');
         vm.attr('result', true);
@@ -143,10 +143,10 @@ describe('tree-item-base viewModel', function () {
     });
   });
 
-  describe('select() method', ()=> {
+  describe('select() method', () => {
     let fakeElement;
 
-    beforeEach(()=> {
+    beforeEach(() => {
       fakeElement = {
         closest: jasmine.createSpy().and.returnValue('closest'),
       };
@@ -155,13 +155,13 @@ describe('tree-item-base viewModel', function () {
       vm.attr('itemSelector', 'fakeSelector');
     });
 
-    it('looks for correct element', ()=> {
+    it('looks for correct element', () => {
       vm.select(fakeElement);
 
       expect(fakeElement.closest).toHaveBeenCalledWith('fakeSelector');
     });
 
-    it('triggers "selectTreeItem" event', ()=> {
+    it('triggers "selectTreeItem" event', () => {
       vm.select(fakeElement);
 
       expect(can.trigger).toHaveBeenCalledWith(

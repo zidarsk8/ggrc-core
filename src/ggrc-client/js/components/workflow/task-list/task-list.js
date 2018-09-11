@@ -7,14 +7,9 @@ import template from './templates/task-list.mustache';
 import Pagination from '../../base-objects/pagination';
 import Permission from '../../../permission';
 import {REFRESH_RELATED} from '../../../events/eventTypes';
+import TaskGroupTask from '../../../models/business-models/task-group-task';
 
 const viewModel = can.Map.extend({
-  /**
-   * A model name. Each item within the task list
-   * will have this model name.
-   */
-  relatedItemsType: 'TaskGroupTask',
-}, {
   define: {
     paging: {
       value() {
@@ -28,11 +23,6 @@ const viewModel = can.Map.extend({
           Permission.is_allowed_for('update', this.attr('baseInstance')) &&
           workflow && workflow.attr('status') !== 'Inactive'
         );
-      },
-    },
-    relatedItemsType: {
-      get() {
-        return this.constructor.relatedItemsType;
       },
     },
   },
@@ -52,7 +42,7 @@ const viewModel = can.Map.extend({
       // (we are already on first page)
       this.attr('baseInstance').dispatch({
         ...REFRESH_RELATED,
-        model: this.attr('relatedItemsType'),
+        model: 'TaskGroupTask',
       });
     }
   },
@@ -70,24 +60,20 @@ const viewModel = can.Map.extend({
       // update current page
       this.attr('baseInstance').dispatch({
         ...REFRESH_RELATED,
-        model: this.attr('relatedItemsType'),
+        model: 'TaskGroupTask',
       });
     }
   },
 });
 
 const events = {
-  [`{CMS.Models.${viewModel.relatedItemsType}} destroyed`](
-    model, event, instance
-  ) {
-    if (instance instanceof CMS.Models[viewModel.relatedItemsType]) {
+  '{CMS.Models.TaskGroupTask} destroyed'(model, event, instance) {
+    if (instance instanceof TaskGroupTask) {
       this.viewModel.updatePagingAfterDestroy();
     }
   },
-  [`{CMS.Models.${viewModel.relatedItemsType}} created`](
-    model, event, instance
-  ) {
-    if (instance instanceof CMS.Models[viewModel.relatedItemsType]) {
+  '{CMS.Models.TaskGroupTask} created'(model, event, instance) {
+    if (instance instanceof TaskGroupTask) {
       this.viewModel.updatePagingAfterCreate();
     }
   },

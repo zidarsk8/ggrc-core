@@ -49,6 +49,9 @@ permissions = {
         "ObjectPerson",
         "Option",
         "OrgGroup",
+        "Risk",
+        "RiskAssessment",
+        "Threat",
         "Vendor",
         "PopulationSample",
         "Product",
@@ -123,8 +126,11 @@ permissions = {
         },
         {
             "type": "CycleTaskEntry",
-            "condition": "is_workflow_admin",
-            "terms": {},
+            "condition": "is_allowed_based_on",
+            "terms": {
+                "property_name": "cycle_task_group_object_task",
+                "action": "update",
+            }
         },
         {
             "type": "TaskGroupObject",
@@ -153,6 +159,8 @@ permissions = {
         "ObjectPerson",
         "Option",
         "OrgGroup",
+        "Risk",
+        "Threat",
         "Vendor",
         "PopulationSample",
         "Product",

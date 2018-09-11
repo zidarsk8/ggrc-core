@@ -12,8 +12,8 @@
 * =============================== */
 
   let StickyPopover = function ( element, options ) {
-    this.init('sticky_popover', element, options)
-  }
+    this.init('sticky_popover', element, options);
+  };
 
 
   /* NOTE: STICKY_POPOVER EXTENDS BOOTSTRAP-POPOVER.js and BOOTSTRAP-TOOLTIP.js
@@ -123,7 +123,7 @@
       e.currentTarget = this.$element[0];
       $.fn.popover.Constructor.prototype.leave.apply(this, arguments);
     },
-  })
+  });
 
 
   /* STICKY_POPOVER PLUGIN DEFINITION
@@ -133,19 +133,19 @@
     return this.each(function () {
       let $this = $(this);
       let data = $this.data('sticky_popover');
-      let options = typeof option == 'object' && option
+      let options = typeof option == 'object' && option;
       if (!data) {
         $this.data('sticky_popover', (data = new StickyPopover(this, options)));
         // Make instantiated popovers findable by $('[data-sticky_popover]');
         $this.attr('data-sticky_popover', true);
       }
-      if (typeof option == 'string') data[option]()
-    })
-  }
+      if (typeof option == 'string') data[option]();
+    });
+  };
 
-  $.fn.sticky_popover.Constructor = StickyPopover
+  $.fn.sticky_popover.Constructor = StickyPopover;
 
   $.fn.sticky_popover.defaults = $.extend({}, $.fn.popover.defaults, {
-  })
+  });
 
 }(window.jQuery);

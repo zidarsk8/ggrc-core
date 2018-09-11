@@ -85,14 +85,14 @@ class Representation(object):
     ui_remap_items = {
         els.PROGRAM_MANAGERS: "managers", els.VERIFIED: "verified",
         els.STATUS: "status", els.LAST_UPDATED: "updated_at",
-        els.AUDIT_CAPTAINS: "audit_captains", els.CAS: "custom_attributes",
+        els.AUDIT_CAPTAINS: "audit_captains",
         els.AUDITORS: "auditors",
         els.MAPPED_OBJECTS: "mapped_objects", els.ASSIGNEES: "assignees",
         els.CREATORS: "creators", els.VERIFIERS: "verifiers",
         els.COMMENTS_HEADER: "comments", els.CREATED_AT: "created_at",
         els.MODIFIED_BY: "modified_by", els.LAST_UPDATED_BY: "modified_by",
         els.UPDATED_AT: "updated_at", els.ASMT_TYPE: "assessment_type",
-        els.LCAS: "custom_attribute_definitions",
+        "CUSTOM_ATTRIBUTES": "custom_attributes",
         "EVIDENCE_URLS": "evidence_urls",
         "ASSERTIONS": "assertions",
         "PRIMARY_CONTACTS": "primary_contacts"
@@ -169,8 +169,6 @@ class Representation(object):
             converted_attr_value = (
                 unicode(attr_value.get("title")) if
                 attr_name != "custom_attribute_definitions" else
-                {attr_value.get("id"): attr_value.get("title")} if
-                attr_value.get("definition_id") else
                 {attr_value.get("id"): attr_value.get("title").upper()}
             )
           if attr_name in ["custom_attribute_values"]:
@@ -233,11 +231,10 @@ class Representation(object):
                                 isinstance(cas_val, list) else [None])
           _cas_val = [
               {k: v} for k, v in
-              CustomAttributeDefinitionsFactory.generate_cas(
+              CustomAttributeDefinitionsFactory.generate_ca_title_id(
                   [Representation.repr_dict_to_obj(cad)
-                   for cad in origin_obj.custom_attribute_definitions],
-                  is_none_values=True).iteritems()
-              if k not in cas_val_dicts_keys]
+                   for cad in origin_obj.custom_attribute_definitions]
+              ).iteritems() if k not in cas_val_dicts_keys]
           cas_val = _cas_val if not cas_val else cas_val + _cas_val
         cas_def_dict = (
             dict([_def.iteritems().next() for _def in cas_def]) if
@@ -250,6 +247,8 @@ class Representation(object):
              all(isinstance(_def, dict)
                  for _def in cas_def)) else None)
         cas = StringMethods.merge_dicts_by_same_key(cas_def_dict, cas_val_dict)
+        if obj.custom_attributes:
+          cas.update(obj.custom_attributes)
         if cas in [{None: None}, {}]:
           cas = None
         setattr(obj, "custom_attributes", cas)
@@ -689,7 +688,7 @@ class CustomAttributeDefinitionEntity(Representation):
 
 
 class CustomAttributeValueEntity(Representation):
-  """Class that represents model for Custom Attribute Value entity"""
+  """Class that represents model for Custom Attribute Value entity."""
 
   def __init__(self, **attrs):
     super(CustomAttributeValueEntity, self).__init__()

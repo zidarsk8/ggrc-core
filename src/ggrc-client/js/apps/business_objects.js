@@ -155,7 +155,7 @@ import * as businessModels from '../models/business-models/index';
         });
         GGRC.tree_view.sub_tree_for.attr(name, {
           model_list: child_model_list,
-          display_list: CMS.Models[name].tree_view_options.child_tree_display_list || w_list,
+          display_list: businessModels[name].tree_view_options.child_tree_display_list || w_list,
         });
       });
 
@@ -706,7 +706,7 @@ import * as businessModels from '../models/business-models/index';
         let descriptor = {};
         let widget_id;
 
-        far_model = CMS.Models[model_name];
+        far_model = businessModels[model_name];
         if (far_model) {
           widget_id = widgetConfig.widgetId;
           descriptor = {

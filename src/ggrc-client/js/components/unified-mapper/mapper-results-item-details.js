@@ -8,6 +8,7 @@ import '../related-objects/related-people-access-control-group';
 import '../people/deletable-people-group';
 import '../unarchive_link';
 import template from './templates/mapper-results-item-details.mustache';
+import * as businessModels from '../../models/business-models';
 
 export default can.Component.extend({
   tag: 'mapper-results-item-details',
@@ -18,7 +19,7 @@ export default can.Component.extend({
       if (instance.snapshotObject) {
         this.attr('instance', instance.snapshotObject);
       } else {
-        this.attr('model', CMS.Models[instance.type]);
+        this.attr('model', businessModels[instance.type]);
       }
     },
     item: null,

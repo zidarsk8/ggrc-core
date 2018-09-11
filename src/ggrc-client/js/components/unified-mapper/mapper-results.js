@@ -26,6 +26,7 @@ import Pagination from '../base-objects/pagination';
 import tracker from '../../tracker';
 import DisplayPrefs from '../../models/local-storage/display-prefs';
 import Snapshot from '../../models/service-models/snapshot';
+import * as businessModels from '../../models/business-models';
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -276,10 +277,10 @@ export default can.Component.extend({
         this.attr('type');
     },
     getModel: function () {
-      return CMS.Models[this.getModelKey()];
+      return businessModels[this.getModelKey()];
     },
     getDisplayModel: function () {
-      return CMS.Models[this.attr('type')];
+      return businessModels[this.attr('type')];
     },
     setDisabledItems: function (allItems, relatedIds) {
       if (this.attr('searchOnly') || this.attr('objectGenerator')) {
@@ -401,7 +402,7 @@ export default can.Component.extend({
       let queryType = 'ids';
       let query = this.getQuery(queryType, false);
 
-      can.when(...query.request.map((request)=> batchRequests(request)))
+      can.when(...query.request.map((request) => batchRequests(request)))
         .done((...responseArr) => {
           let data = responseArr[query.queryIndex];
           let relatedData = responseArr[query.relatedQueryIndex];

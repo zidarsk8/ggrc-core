@@ -22,11 +22,7 @@ export default can.Component.extend({
       object: 'MultitypeSearch',
       type: 'Control',
       availableTypes: function () {
-        let types = Mappings.getMappingTypes(
-          this.attr('object'),
-          ['TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask'],
-          []);
-        return types;
+        return Mappings.getMappingTypes(this.attr('object'));
       },
       resultsRequested: false,
       onSubmit: function () {

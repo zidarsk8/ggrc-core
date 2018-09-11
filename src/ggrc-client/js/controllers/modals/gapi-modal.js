@@ -25,7 +25,7 @@ export default ModalsController({
   },
   '{$content} a.btn[data-toggle=gapi]:not(.disabled) click': function (el) {
     el.addClass('disabled');
-    this.options.onAccept().always(()=> {
+    this.options.onAccept().always(() => {
       this.element.modal_form('hide');
     });
   },

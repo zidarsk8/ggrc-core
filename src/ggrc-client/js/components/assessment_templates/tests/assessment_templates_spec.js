@@ -7,17 +7,17 @@ import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../assessment_templates';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 
-describe('assessment-templates component', ()=> {
+describe('assessment-templates component', () => {
   let viewModel;
 
-  beforeAll(()=> {
+  beforeAll(() => {
     viewModel = getComponentVM(Component);
   });
 
   describe('_selectInitialTemplate() method', function () {
     let templates;
 
-    beforeEach(()=> {
+    beforeEach(() => {
       templates = [
         {
           title: 'No Template',
@@ -43,13 +43,13 @@ describe('assessment-templates component', ()=> {
     });
 
     it('selects the first item from the first option group if it was empty',
-      ()=> {
+      () => {
         viewModel.attr('assessmentTemplate', null);
         viewModel._selectInitialTemplate(templates);
         expect(viewModel.attr('assessmentTemplate')).toEqual('foo');
       });
 
-    it('leaves item if the option was not empty', ()=> {
+    it('leaves item if the option was not empty', () => {
       viewModel.attr('assessmentTemplate', 'template-123');
       viewModel._selectInitialTemplate(templates);
       expect(viewModel.attr('assessmentTemplate')).toEqual('template-123');
@@ -57,7 +57,7 @@ describe('assessment-templates component', ()=> {
 
     it(`leaves the current template unchanged if only a dummy value in
       the templates list`,
-      ()=> {
+      () => {
         viewModel.attr('assessmentTemplate', 'template-123');
         templates.splice(1); // keep only the 1st (dummy) option
 
@@ -67,7 +67,7 @@ describe('assessment-templates component', ()=> {
       });
 
     it('leaves the current template unchanged if first object group empty',
-      ()=> {
+      () => {
         viewModel.attr('assessmentTemplate', 'template-123');
         templates[1].subitems.length = 0;
         spyOn(console, 'warn'); // just to silence it
@@ -78,7 +78,7 @@ describe('assessment-templates component', ()=> {
       }
     );
 
-    it('issues a warning if an empty group is encountered', ()=> {
+    it('issues a warning if an empty group is encountered', () => {
       const expectedMsg = [
         'can.Component.assessmentTemplates: ',
         'An empty template group encountered, possible API error',
@@ -93,7 +93,7 @@ describe('assessment-templates component', ()=> {
     });
 
     it('selects the first non-dummy value if it precedes all object groups',
-      ()=> {
+      () => {
         viewModel.attr('assessmentTemplate', null);
         templates.splice(1, 0, {title: 'No Group Template', value: 'single'});
 
@@ -104,18 +104,18 @@ describe('assessment-templates component', ()=> {
     );
   });
 
-  describe('init() method', ()=> {
+  describe('init() method', () => {
     const reqParam = {};
     let batchRequestsDfd;
     let method;
 
-    beforeAll(()=> {
+    beforeAll(() => {
       method = Component.prototype.init.bind({
         viewModel,
       });
     });
 
-    beforeEach(()=> {
+    beforeEach(() => {
       batchRequestsDfd = can.Deferred();
       viewModel.attr('instance', {
         id: 1,
@@ -129,7 +129,7 @@ describe('assessment-templates component', ()=> {
       spyOn(viewModel, '_selectInitialTemplate');
     });
 
-    it('makse relevant call', ()=> {
+    it('makse relevant call', () => {
       method();
 
       expect(QueryAPI.buildParam)
@@ -138,7 +138,7 @@ describe('assessment-templates component', ()=> {
         .toHaveBeenCalledWith(reqParam);
     });
 
-    it('sets initial Assessment Template', ()=> {
+    it('sets initial Assessment Template', () => {
       spyOn(viewModel, 'dispatch');
 
       method();
@@ -153,7 +153,7 @@ describe('assessment-templates component', ()=> {
         .toHaveBeenCalled();
     });
 
-    it('dispatches "assessmentTemplateLoaded" event', ()=> {
+    it('dispatches "assessmentTemplateLoaded" event', () => {
       spyOn(viewModel, 'dispatch');
 
       method();

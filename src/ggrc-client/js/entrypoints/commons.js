@@ -30,3 +30,6 @@ import '../models';
 import '../modules/widget_list';
 
 import './user';
+
+// Common components
+import '../components/model-loader/model-loader';

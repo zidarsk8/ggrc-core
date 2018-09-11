@@ -4,7 +4,7 @@
 */
 
 import {getPageInstance} from '../plugins/utils/current-page-utils';
-import {getInstance} from '../models/models-extensions';
+import {getInstance} from '../plugins/utils/models-utils';
 
 (function (can, $, GGRC, CMS) {
   GGRC.register_modal_hook('approvalform', function ($target, $trigger, option) {

@@ -3,9 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-const toBulkModel = (instances, targetProps)=> {
+const toBulkModel = (instances, targetProps) => {
   let state = targetProps.state;
-  return _.map(instances, (item)=> {
+  return _.map(instances, (item) => {
     return {
       id: item.id,
       state: state,

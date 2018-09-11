@@ -5,13 +5,19 @@
 
 {{#switch attr_name}}
   {{#case 'contact'}}
-      <tree-field {source}="instance.contact" {field}="'email'"/>
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.contact" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
   {{/case}}
   {{#case 'secondary_contact'}}
-      <tree-field {source}="instance.secondary_contact" {field}="'email'"/>
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.secondary_contact" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
   {{/case}}
   {{#case 'modified_by'}}
-      <tree-field {source}="instance.modified_by" {field}="'email'"/>
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.modified_by" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
   {{/case}}
   {{#case 'last_assessment_date'}}
     {{localize_date instance.last_assessment_date}}

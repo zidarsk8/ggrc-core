@@ -24,6 +24,8 @@ def dummy_gdrive_response_link(*args, **kwargs):
 class TestDocument(TestCase):
   """Document test cases"""
   # pylint: disable=invalid-name
+  # pylint: disable=no-self-use
+  # pylint: disable=too-many-public-methods
 
   def setUp(self):
     super(TestDocument, self).setUp()
@@ -61,14 +63,14 @@ class TestDocument(TestCase):
   def test_parent_obj_validation_wrong_type(self):
     """Validation parent_obj type.
 
-    Type should be in 'Control', 'Issue', 'RiskAssessment'.
+    Type should be Documentable.
     """
-    control = factories.ControlFactory()
+    audit = factories.AuditFactory()
     with self.assertRaises(exceptions.ValidationError):
       factories.DocumentFileFactory(
           parent_obj={
-              'id': control.id,
-              'type': 'Program'
+              'id': audit.id,
+              'type': 'Audit'
           })
 
   def test_update_title(self):

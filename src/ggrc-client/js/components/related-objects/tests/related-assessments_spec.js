@@ -8,10 +8,10 @@ import {
   getComponentVM,
 } from '../../../../js_specs/spec_helpers';
 import * as caUtils from '../../../plugins/utils/ca-utils';
+import * as businessModels from '../../../models/business-models';
 
 describe('related-assessments component', () => {
   describe('viewModel scope', () => {
-    let originalModels;
     let viewModel;
 
     beforeEach(() => {
@@ -19,24 +19,23 @@ describe('related-assessments component', () => {
     });
 
     describe('relatedObjectsTitle get() method', () => {
-      beforeAll(() => {
-        originalModels = CMS.Models;
+      let asmtModelType;
+      let modelPlural;
+      beforeEach(() => {
+        asmtModelType = 'Model1';
+        modelPlural = 'Awesome_models1';
+        businessModels[asmtModelType] = {
+          model_plural: modelPlural,
+        };
       });
 
-      afterAll(() => {
-        CMS.Models = originalModels;
+      afterEach(() => {
+        businessModels[asmtModelType] = undefined;
       });
 
       it('returns title based on instance.assessment_type', () => {
-        let asmtModelType = 'Model1';
-        let modelPlural = 'Awesome_models1';
         let expectedTitle;
 
-        CMS.Models = {
-          [asmtModelType]: {
-            model_plural: modelPlural,
-          },
-        };
         viewModel.attr('instance.assessment_type', asmtModelType);
         expectedTitle = `Related ${modelPlural}`;
 
@@ -45,17 +44,10 @@ describe('related-assessments component', () => {
 
       it(`returns title based on instance.type if is gotten related
           assessments not from assessment info pane`, () => {
-          let modelType = 'Model1';
-          let modelPlural = 'Awesome_models1';
           let expectedTitle;
 
-          CMS.Models = {
-            [modelType]: {
-              model_plural: modelPlural,
-            },
-          };
           viewModel.attr('instance.assessment_type', null);
-          viewModel.attr('instance.type', modelType);
+          viewModel.attr('instance.type', asmtModelType);
           expectedTitle = `Related ${modelPlural}`;
 
           expect(viewModel.attr('relatedObjectsTitle')).toBe(expectedTitle);
@@ -123,9 +115,9 @@ describe('related-assessments component', () => {
       });
     });
 
-    describe('unableToReuse get() method', ()=> {
+    describe('unableToReuse get() method', () => {
       it(`returns false if there are selected evidences
-        and it is not saving`, ()=> {
+        and it is not saving`, () => {
           viewModel.attr('isSaving', false);
           viewModel.attr('selectedEvidences', ['item']);
 
@@ -134,8 +126,8 @@ describe('related-assessments component', () => {
           expect(result).toBe(false);
         });
 
-      describe('returns true', ()=> {
-        it('if there are no selected items and it is not saving', ()=> {
+      describe('returns true', () => {
+        it('if there are no selected items and it is not saving', () => {
           viewModel.attr('isSaving', false);
           viewModel.attr('selectedEvidences', []);
 
@@ -144,7 +136,7 @@ describe('related-assessments component', () => {
           expect(result).toBe(true);
         });
 
-        it('if there are selected items and it is saving', ()=> {
+        it('if there are selected items and it is saving', () => {
           viewModel.attr('isSaving', true);
           viewModel.attr('selectedEvidences', ['item']);
 
@@ -153,7 +145,7 @@ describe('related-assessments component', () => {
           expect(result).toBe(true);
         });
 
-        it('if there are no selected items and it is saving', ()=> {
+        it('if there are no selected items and it is saving', () => {
           viewModel.attr('isSaving', true);
           viewModel.attr('selectedEvidences', []);
 
@@ -164,8 +156,8 @@ describe('related-assessments component', () => {
       });
     });
 
-    describe('buildEvidenceModel() method', ()=> {
-      beforeEach(()=> {
+    describe('buildEvidenceModel() method', () => {
+      beforeEach(() => {
         viewModel.attr({
           instance: {
             context: {id: 'contextId'},
@@ -175,7 +167,7 @@ describe('related-assessments component', () => {
         });
       });
 
-      it('builds FILE model correctly', ()=> {
+      it('builds FILE model correctly', () => {
         let evidence = new can.Map({
           kind: 'FILE',
           title: 'title',
@@ -201,7 +193,7 @@ describe('related-assessments component', () => {
         });
       });
 
-      it('builds URL model correctly', ()=> {
+      it('builds URL model correctly', () => {
         let evidence = new can.Map({
           kind: 'URL',
           title: 'title',
@@ -228,10 +220,10 @@ describe('related-assessments component', () => {
       });
     });
 
-    describe('reuseSelected() method', ()=> {
+    describe('reuseSelected() method', () => {
       let saveDfd;
       let saveSpy;
-      beforeEach(()=> {
+      beforeEach(() => {
         viewModel.attr('selectedEvidences', [{
           id: 'id',
           title: 'evidence1',
@@ -244,7 +236,7 @@ describe('related-assessments component', () => {
         });
       });
 
-      it('turning on "isSaving" flag', ()=> {
+      it('turning on "isSaving" flag', () => {
         viewModel.attr('isSaving', false);
 
         viewModel.reuseSelected();
@@ -252,57 +244,57 @@ describe('related-assessments component', () => {
         expect(viewModel.attr('isSaving')).toBe(true);
       });
 
-      it('builds evidence model', ()=> {
+      it('builds evidence model', () => {
         viewModel.reuseSelected();
 
         expect(viewModel.buildEvidenceModel).toHaveBeenCalled();
       });
 
-      it('saves builded model', ()=> {
+      it('saves builded model', () => {
         viewModel.reuseSelected();
 
         expect(saveSpy).toHaveBeenCalled();
       });
 
-      describe('after saving', ()=> {
-        it('cleans selectedEvidences', (done)=> {
+      describe('after saving', () => {
+        it('cleans selectedEvidences', (done) => {
           viewModel.reuseSelected();
 
-          saveDfd.resolve().then(()=> {
+          saveDfd.resolve().then(() => {
             expect(viewModel.attr('selectedEvidences.length')).toBe(0);
             done();
           });
         });
 
-        it('turns off isSaving flag', (done)=> {
+        it('turns off isSaving flag', (done) => {
           viewModel.reuseSelected();
 
           viewModel.attr('isSaving', true);
 
-          saveDfd.resolve().then(()=> {
+          saveDfd.resolve().then(() => {
             expect(viewModel.attr('isSaving')).toBe(false);
             done();
           });
         });
 
-        it('dispatches "afterObjectReused" event', (done)=> {
+        it('dispatches "afterObjectReused" event', (done) => {
           spyOn(viewModel, 'dispatch');
 
           viewModel.reuseSelected();
 
-          saveDfd.resolve().then(()=> {
+          saveDfd.resolve().then(() => {
             expect(viewModel.dispatch)
               .toHaveBeenCalledWith('afterObjectReused');
             done();
           });
         });
 
-        it('dispatches "refreshInstance" event on instance', (done)=> {
+        it('dispatches "refreshInstance" event on instance', (done) => {
           spyOn(viewModel.attr('instance'), 'dispatch');
 
           viewModel.reuseSelected();
 
-          saveDfd.resolve().then(()=> {
+          saveDfd.resolve().then(() => {
             expect(viewModel.attr('instance').dispatch)
               .toHaveBeenCalledWith('refreshInstance');
             done();
@@ -311,8 +303,8 @@ describe('related-assessments component', () => {
       });
     });
 
-    describe('checkReuseAbility() method', ()=> {
-      it('returns true if evidence is not a file', ()=> {
+    describe('checkReuseAbility() method', () => {
+      it('returns true if evidence is not a file', () => {
         let evidence = new can.Map({
           kind: 'URL',
         });
@@ -322,7 +314,7 @@ describe('related-assessments component', () => {
         expect(result).toBe(true);
       });
 
-      it('returns true if evidence is a file with gdrive_id', ()=> {
+      it('returns true if evidence is a file with gdrive_id', () => {
         let evidence = new can.Map({
           kind: 'FILE',
           gdrive_id: 'gdrive_id',
@@ -333,7 +325,7 @@ describe('related-assessments component', () => {
         expect(result).toBe(true);
       });
 
-      it('returns false if evidence is a file without gdrive_id', ()=> {
+      it('returns false if evidence is a file without gdrive_id', () => {
         let evidence = new can.Map({
           kind: 'FILE',
           gdrive_id: '',
@@ -346,29 +338,29 @@ describe('related-assessments component', () => {
     });
   });
 
-  describe('helpers', ()=> {
+  describe('helpers', () => {
     let viewModel;
-    beforeEach(()=> {
+    beforeEach(() => {
       viewModel = getComponentVM(Component);
     });
 
-    describe('isAllowedToReuse helper', ()=> {
+    describe('isAllowedToReuse helper', () => {
       let isAllowedToReuse;
       let evidence;
-      beforeEach(()=> {
+      beforeEach(() => {
         isAllowedToReuse = Component.prototype.helpers
           .isAllowedToReuse.bind(viewModel);
         spyOn(viewModel, 'checkReuseAbility');
         evidence = jasmine.createSpy();
       });
 
-      it('calls checkReuseAbility()', ()=>{
+      it('calls checkReuseAbility()', () => {
         isAllowedToReuse(evidence);
 
         expect(viewModel.checkReuseAbility).toHaveBeenCalled();
       });
 
-      it('returns checkReuseAbility result', ()=> {
+      it('returns checkReuseAbility result', () => {
         let abilityResult = {test: true};
         viewModel.checkReuseAbility.and.returnValue(abilityResult);
 
@@ -377,18 +369,18 @@ describe('related-assessments component', () => {
         expect(result).toBe(abilityResult);
       });
 
-      it('resolves compute argument', ()=> {
+      it('resolves compute argument', () => {
         isAllowedToReuse(evidence);
 
         expect(evidence).toHaveBeenCalled();
       });
     });
 
-    describe('ifAllowedToReuse helper', ()=> {
+    describe('ifAllowedToReuse helper', () => {
       let ifAllowedToReuse;
       let evidence;
       let options;
-      beforeEach(()=> {
+      beforeEach(() => {
         ifAllowedToReuse = Component.prototype.helpers
           .ifAllowedToReuse.bind(viewModel);
         spyOn(viewModel, 'checkReuseAbility');
@@ -400,13 +392,13 @@ describe('related-assessments component', () => {
         spyOn(Mustache, 'resolve');
       });
 
-      it('resolves compute argument', ()=> {
+      it('resolves compute argument', () => {
         ifAllowedToReuse(evidence, options);
 
         expect(Mustache.resolve).toHaveBeenCalledWith(evidence);
       });
 
-      it('calls fn if able to reuse', ()=> {
+      it('calls fn if able to reuse', () => {
         viewModel.checkReuseAbility.and.returnValue(true);
 
         ifAllowedToReuse(evidence, options);
@@ -414,7 +406,7 @@ describe('related-assessments component', () => {
         expect(options.fn).toHaveBeenCalled();
       });
 
-      it('calls inverse if not able to reuse', ()=> {
+      it('calls inverse if not able to reuse', () => {
         viewModel.checkReuseAbility.and.returnValue(false);
 
         ifAllowedToReuse(evidence, options);
