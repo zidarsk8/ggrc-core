@@ -14,6 +14,7 @@ from ggrc.access_control.people import AccessControlPeople
 from ggrc.access_control import role
 from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc.models import reflection
+from ggrc.utils import referenced_objects
 
 
 class Roleable(object):
@@ -31,26 +32,13 @@ class Roleable(object):
   MAX_VERIFIER_NUM = 1
 
   def __init__(self, *args, **kwargs):
-    super(Roleable, self).__init__(*args, **kwargs)
     for ac_role in role.get_ac_roles_for(self.type).values():
       AccessControlList(
           object=self,
           ac_role=ac_role,
       )
-
-  @declared_attr
-  def _access_control_people(cls):  # pylint: disable=no-self-argument
-    """access_control_list"""
-    return db.relationship(
-        'AccessControlPeople',
-        primaryjoin=lambda: and_(
-            remote(AccessControlList.object_id) == cls.id,
-            remote(AccessControlList.object_type) == cls.__name__,
-            remote(AccessControlList.parent_id_nn) == 0,
-            remote(AccessControlPeople.ac_list_id) == AccessControlList.id
-        ),
-        viewonly=True,
-    )
+    super(Roleable, self).__init__(*args, **kwargs)
+    print self
 
   @declared_attr
   def _access_control_list(cls):  # pylint: disable=no-self-argument
@@ -69,8 +57,9 @@ class Roleable(object):
   @property
   def access_control_list(self):
     return [
-        (acp.person_id, acp.acl_id)
-        for acp in self._access_control_people
+        (acp.person, acp.ac_list)
+        for acl in self._access_control_list
+        for acp in acl.access_control_people
     ]
 
   @access_control_list.setter
@@ -81,14 +70,13 @@ class Roleable(object):
         values: List of access control roles or dicts containing json
         representation of custom attribute values.
     """
-    import ipdb; ipdb.set_trace()
     # using ac_role_id instead of ac_role means we can't (easily) create a new
     # role and map people to it in a single request.
     role_map = {acl.ac_role.id: acl for acl in self._access_control_list}
     for value in values:
       AccessControlPeople(
-          acl_id=role_map[value["ac_role_id"]],
-          person_id=value["person"]["id"],
+          ac_list=role_map[value["ac_role_id"]],
+          person=referenced_objects.get("Person", value["person"]["id"]),
       )
 
   def extend_access_control_list(self, values):
