@@ -3,11 +3,12 @@
 
 """Test deadlocks on parallel propagation requests."""
 
-import mock
+import threading
 
 import flask
 
 from ggrc import db
+from ggrc.app import app
 from ggrc.models import all_models
 from ggrc.models.hooks.acl import propagation
 from integration.ggrc import TestCase
@@ -45,24 +46,12 @@ class TestDeadlocks(TestCase):
 
   def test_deadlock(self):
     """No deadlocks occur if propagation for three Audits goes in parallel."""
-
-    new_conn = db.engine.begin
-
     # Emulate connections from three parallel requests
-    with new_conn() as conn0, new_conn() as conn1, new_conn() as conn2:
-      for rel, conn in zip(self.rels, [conn0, conn1, conn2]):
-        with mock.patch("ggrc.access_control.utils.db.session.execute",
-                        conn.execute):
-          def commit():
-            conn.execute("COMMIT")
-
-          with mock.patch("ggrc.access_control.utils.db.session.plain_commit",
-                          commit):
-            flask.g.new_acl_ids = {}
-            flask.g.new_relationship_ids = {rel.id}
-            flask.g.deleted_objects = {}
-
-            propagation.propagate()
+    for relationship in self.rels:
+      thread = threading.Thread(target=self._execute_propagation,
+                                args=(relationship, ))
+      thread.start()
+      thread.join()
 
     db.session.rollback()
 
@@ -72,3 +61,13 @@ class TestDeadlocks(TestCase):
         ).count(),
         3,
     )
+
+  @staticmethod
+  def _execute_propagation(relationship):
+    """Execute propagation regarding relationship."""
+    with app.app_context():
+      flask.g.new_acl_ids = {}
+      flask.g.new_relationship_ids = {relationship.id}
+      flask.g.deleted_objects = {}
+
+      propagation.propagate()
