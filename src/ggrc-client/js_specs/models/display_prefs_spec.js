@@ -63,7 +63,7 @@ describe('display prefs model', function () {
       it('returns a set value whether or not the value is an Observe', function () {
         expect(display_prefs.getObject('foo')).toBe('bar');
         display_prefs.makeObject('baz', 'quux');
-        expect(display_prefs.getObject('baz').serialize()).toEqual({'quux': {}});
+        expect(display_prefs.getObject('baz').serialize()).toEqual({quux: {}});
       });
 
       it('returns undefined when the key is not found', function (){
@@ -161,7 +161,7 @@ describe('display prefs model', function () {
       });
 
       it('sets all values as a collection', function () {
-        display_prefs[func]('this arg is ignored', {'foo': fooValue, 'bar': barValue});
+        display_prefs[func]('this arg is ignored', {foo: fooValue, bar: barValue});
         let fooActual = display_prefs.attr([exp.path, exp_token, 'foo'].join('.'));
         let barActual = display_prefs.attr([exp.path, exp_token, 'bar'].join('.'));
         expect(fooActual.serialize ? fooActual.serialize() : fooActual).toEqual(fooValue);
@@ -281,7 +281,7 @@ describe('display prefs model', function () {
     beforeEach(function () {
       dp_noversion = new DisplayPrefs({});
       dp2_outdated = new DisplayPrefs({version: 1});
-      dp3_current = new DisplayPrefs({version: DisplayPrefs.version });
+      dp3_current = new DisplayPrefs({version: DisplayPrefs.version});
     });
     it('404s if the display pref does not have a version set', function (done) {
       spyOn(LocalStorage, 'findOne').and.returnValue(new $.Deferred().resolve(dp_noversion));

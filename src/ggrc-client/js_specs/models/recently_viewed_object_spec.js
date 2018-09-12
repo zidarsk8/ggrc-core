@@ -9,7 +9,7 @@ describe('RecentlyViewedObject model', function () {
 
   describe('::newInstance', function () {
     it('creates a new recently viewed object given non-Model instance', function () {
-      let obj = RecentlyViewedObject.newInstance({'foo': 'bar'});
+      let obj = RecentlyViewedObject.newInstance({foo: 'bar'});
       expect(obj.foo).toBe('bar');
       expect(obj instanceof RecentlyViewedObject).toBeTruthy();
     });

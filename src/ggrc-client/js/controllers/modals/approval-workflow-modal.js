@@ -133,16 +133,16 @@ let ApprovalWorkflow = can.Observe({
                   return tgt.refresh().then(function (tgt) {
 
                     return tgt.attr({
-                      'access_control_list': [{
+                      access_control_list: [{
                         ac_role_id: assigneeRole.id,
                         person: {
                           id: that.contact.id,
                           type: 'Person',
                         },
                       }],
-                      'end_date': that.end_date,
-                      'start_date': moment().format('MM/DD/YYYY'),
-                      'task_type': tgt.task_type || 'text',
+                      end_date: that.end_date,
+                      start_date: moment().format('MM/DD/YYYY'),
+                      task_type: tgt.task_type || 'text',
                     }).save();
                   });
                 }));

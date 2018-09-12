@@ -76,6 +76,7 @@ from ggrc.models.system import SystemOrProcess
 from ggrc.models.technology_environment import TechnologyEnvironment
 from ggrc.models.threat import Threat
 from ggrc.models.vendor import Vendor
+from ggrc.models.review import Review
 
 all_models = [  # pylint: disable=invalid-name
     # data platform models
@@ -141,6 +142,7 @@ all_models = [  # pylint: disable=invalid-name
     Regulation,
     Relationship,
     Requirement,
+    Review,
     Revision,
     Risk,
     RiskAssessment,

@@ -143,7 +143,6 @@ class TreeView(base.TreeView):
     super(TreeView, self).__init__(driver, obj_name)
     self.info_widget_cls = info_widget_cls
     self.obj_name = obj_name
-    self.create_obj_cls = factory.get_cls_create_obj(object_name=obj_name)
     self.dropdown_settings_cls = factory.get_cls_3bbs_dropdown_settings(
         object_name=obj_name, is_tree_view_not_info=True)
     self.dropdown_tree_view_item_cls = factory.get_cls_dropdown_tree_view_item(
@@ -154,17 +153,12 @@ class TreeView(base.TreeView):
         self._driver, locator.Common.SPINNER_CSS)
 
   def open_create(self):
-    """Click to Create button on Tree View to open new object creation modal.
-
-    Return: If obj_name == 'assessment_templates' then
-    lib.page.modal.unified_mapper."CloneOrCreateAssessmentTemplatesModal" else
-    lib.page.modal.create_new_object."create_obj_cls
+    """Clicks on Create button on Tree View to open new object creation modal.
     """
     base.Button(self._driver, self._locators.CREATE_BTN_CSS).click()
     if self.obj_name == objects.ASSESSMENT_TEMPLATES:
       unified_mapper.CloneOrCreateAssessmentTemplatesModal(
           self._driver, self.obj_name).create_asmt_tmpl_btn.click()
-    return self.create_obj_cls(self._driver)
 
   def open_map(self):
     """Click to Map button on Tree View to open unified mapper modal.
@@ -264,6 +258,14 @@ class Controls(Widget):
 
 class Objectives(Widget):
   """Model for Objectives generic widgets."""
+
+
+class Risks(Widget):
+  """Model for Risks generic widgets."""
+
+
+class OrgGroups(Widget):
+  """Model for Org Groups generic widgets."""
 
 
 class Issues(Widget):

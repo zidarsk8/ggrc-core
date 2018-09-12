@@ -36,18 +36,21 @@ import Cacheable from '../cacheable';
       });
 
       model.bind('created', function (ev, mapping) {
-        if (mapping instanceof model)
+        if (mapping instanceof model) {
           self.filter_and_insert_instances_from_mappings(binding, [mapping]);
+        }
       });
 
       model.bind('destroyed', function (ev, mapping) {
-        if (mapping instanceof model)
+        if (mapping instanceof model) {
           self.remove_instance_from_mapping(binding, mapping);
+        }
       });
 
       model.bind('orphaned', function (ev, mapping) {
-        if (mapping instanceof model)
+        if (mapping instanceof model) {
           self.remove_instance_from_mapping(binding, mapping);
+        }
       });
     },
     is_valid_mapping: function (binding, mapping) {
@@ -64,8 +67,9 @@ import Cacheable from '../cacheable';
       let matchingMappings;
 
       matchingMappings = can.map(can.makeArray(mappings), function (mapping) {
-        if (self.is_valid_mapping(binding, mapping))
+        if (self.is_valid_mapping(binding, mapping)) {
           return mapping;
+        }
       });
       return this.insert_instances_from_mappings(binding, matchingMappings);
     },
@@ -84,8 +88,9 @@ import Cacheable from '../cacheable';
       if (this.is_valid_mapping(binding, mapping)) {
         instance = this.get_instance_from_mapping(binding, mapping);
         result = this.find_result_from_mapping(binding, mapping);
-        if (instance)
+        if (instance) {
           this.remove_instance(binding, instance, result);
+        }
       }
     },
     get_result_from_mapping: function (binding, mapping) {
@@ -108,9 +113,10 @@ import Cacheable from '../cacheable';
 
       for (resultInd = 0; resultInd < binding.list.length; resultInd++) {
         result = binding.list[resultInd];
-        if (result.instance === mapping)
-        // DirectListLoader can't have multiple mappings
+        if (result.instance === mapping) {
+          // DirectListLoader can't have multiple mappings
           return result.mappings[0];
+        }
       }
     },
     _refresh_stubs: function (binding) {

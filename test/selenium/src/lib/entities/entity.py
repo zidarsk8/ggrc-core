@@ -93,9 +93,12 @@ class Representation(object):
         els.MODIFIED_BY: "modified_by", els.LAST_UPDATED_BY: "modified_by",
         els.UPDATED_AT: "updated_at", els.ASMT_TYPE: "assessment_type",
         "CUSTOM_ATTRIBUTES": "custom_attributes",
+        "DESCRIPTION": "description",
         "EVIDENCE_URLS": "evidence_urls",
         "ASSERTIONS": "assertions",
-        "PRIMARY_CONTACTS": "primary_contacts"
+        "PRIMARY_CONTACTS": "primary_contacts",
+        "URL": "url",
+        "ID": "id"
     }
     csv_remap_items = {
         csv.REVISION_DATE: "updated_at"
@@ -619,7 +622,7 @@ class Entity(Representation):
         "primary_contacts", "secondary_contacts", "status", "os_state",
         "comments", "custom_attribute_definitions", "custom_attribute_values",
         "custom_attributes", "created_at", "updated_at", "modified_by",
-        "object_review_txt", **attrs)
+        "object_review_txt", "description", **attrs)
 
   @staticmethod
   def all_entities_classes():
@@ -627,7 +630,8 @@ class Entity(Representation):
     return (
         PersonEntity, CustomAttributeDefinitionEntity, ProgramEntity,
         ControlEntity, AuditEntity, AssessmentEntity, AssessmentTemplateEntity,
-        IssueEntity, CommentEntity, ObjectiveEntity)
+        IssueEntity, CommentEntity, ObjectiveEntity, RiskEntity,
+        OrgGroupEntity)
 
   def __lt__(self, other):
     return self.slug < other.slug
@@ -723,6 +727,14 @@ class ControlEntity(Entity):
 
 class ObjectiveEntity(Entity):
   """Class that represent model for Objective entity."""
+
+
+class RiskEntity(Entity):
+  """Class that represent model for Risk entity."""
+
+
+class OrgGroupEntity(Entity):
+  """Class that represent model for Org Group entity."""
 
 
 class AuditEntity(Entity):

@@ -46,19 +46,22 @@ import RefreshQueue from '../refresh_queue';
       }
 
       model.bind('created', function (ev, mapping) {
-        if (mapping instanceof model)
+        if (mapping instanceof model) {
           self.filter_and_insert_instances_from_mappings(binding, [mapping]);
+        }
       });
 
       model.bind('destroyed', function (ev, mapping) {
-        if (mapping instanceof model)
+        if (mapping instanceof model) {
           self.remove_instance_from_mapping(binding, mapping);
+        }
       });
 
       //  FIXME: This is only needed in DirectListLoader, right?
       model.bind('orphaned', function (ev, mapping) {
-        if (mapping instanceof model)
+        if (mapping instanceof model) {
           self.remove_instance_from_mapping(binding, mapping);
+        }
       });
     },
     is_valid_mapping: function (binding, mapping) {
@@ -78,8 +81,9 @@ import RefreshQueue from '../refresh_queue';
       let matchingMappings;
 
       matchingMappings = can.map(can.makeArray(mappings), function (mapping) {
-        if (self.is_valid_mapping(binding, mapping))
+        if (self.is_valid_mapping(binding, mapping)) {
           return mapping;
+        }
       });
       return this.insert_instances_from_mappings(binding, matchingMappings);
     },
@@ -98,8 +102,9 @@ import RefreshQueue from '../refresh_queue';
       if (this.is_valid_mapping(binding, mapping)) {
         instance = this.get_instance_from_mapping(binding, mapping);
         result = this.find_result_from_mapping(binding, mapping);
-        if (instance)
+        if (instance) {
           this.remove_instance(binding, instance, result);
+        }
       }
     },
     get_result_from_mapping: function (binding, mapping) {
@@ -129,8 +134,9 @@ import RefreshQueue from '../refresh_queue';
         result = binding.list[resultInd];
         for (mapInd = 0; mapInd < result.mappings.length; mapInd++) {
           mappingResult = result.mappings[mapInd];
-          if (mappingResult.instance === mapping)
+          if (mappingResult.instance === mapping) {
             return mappingResult;
+          }
         }
       }
     },
@@ -157,8 +163,9 @@ import RefreshQueue from '../refresh_queue';
       let validMappings = [];
 
       for (i = 0; i < mappings.length; i++) {
-        if (mappings[i][this.option_attr])
+        if (mappings[i][this.option_attr]) {
           validMappings.push(mappings[i]);
+        }
       }
       return validMappings;
     },

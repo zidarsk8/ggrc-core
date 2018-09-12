@@ -4,10 +4,11 @@
 """Tests if error handling is done correctly"""
 
 from integration.ggrc import TestCase
+from ggrc.utils import errors
 
 
 class TestErrorHandlers(TestCase):
 
   def test_non_flask_error_handling(self):
     response = self.import_file("not_a_csv.txt", safe=False)
-    self.assertEqual(response["message"], "Invalid file type.")
+    self.assertEqual(response["message"], errors.WRONG_FILE_TYPE)

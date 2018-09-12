@@ -20,6 +20,7 @@ from lib.entities import entities_factory
 from lib.entities.entities_factory import (
     CustomAttributeDefinitionsFactory, PeopleFactory)
 from lib.entities.entity import Representation
+from lib.page.widget import object_modal
 from lib.service import rest_facade, rest_service, webui_service
 from lib.utils import string_utils
 from lib.utils.filter_utils import FilterUtils
@@ -351,41 +352,41 @@ class TestAssessmentsWorkflow(base.Test):
     assert expected_results == actual_results, error_message
 
   @pytest.mark.smoke_tests
+  def test_mapped_obj_title_in_edit_modal(
+      self, program, control_mapped_to_program, audit, assessment, selenium
+  ):
+    """Test that mapped objects appear in modal after mapping."""
+    webui_service.AssessmentsService(selenium).open_info_page_of_obj(
+        assessment).open_info_3bbs().select_edit()
+    edit_asmt_modal = object_modal.AssessmentModal(selenium)
+    edit_asmt_modal.map_objects([control_mapped_to_program])
+    actual_titles = edit_asmt_modal.get_mapped_snapshots_titles()
+    assert actual_titles == [control_mapped_to_program.title]
+
+  @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
-      "dynamic_objects, dynamic_relationships",
-      [("new_objective_rest", "map_new_program_rest_to_new_objective_rest"),
-       ("new_control_rest", "map_new_program_rest_to_new_control_rest")],
+      "obj",
+      ["control_mapped_to_program", "objective_mapped_to_program"],
       indirect=True)
-  def test_map_snapsots_to_asmt_via_edit_modal(
-      self, new_program_rest, dynamic_objects, dynamic_relationships,
-      new_audit_rest, new_assessment_rest, selenium
+  def test_map_snapshots_to_asmt_via_edit_modal(
+      self, program, obj, audit, assessment, selenium
   ):
     """Check Assessment can be mapped with snapshot via Modal Edit
     on Assessments Info Page. Additional check existing of mapped obj Titles
     on Modal Edit.
-    Preconditions:
-    - Program, dynamic_objects created via REST API.
-    - dynamic_objects mapped to Program via REST API.
-    - Audit created under Program via REST API.
-    - Assessment created under audit via REST API.
-    Test parameters:
-    - 'dynamic_objects'.
-    - 'dynamic_relationships'.
+    Objects structure:
+    Program
+    -> Obj (control or objective)
+    -> Audit
+      -> Assessment
     """
-    expected_asmt = (new_assessment_rest.update_attrs(
-        mapped_objects=[dynamic_objects]))
-    expected_titles = [dynamic_objects.title]
     asmts_ui_service = webui_service.AssessmentsService(selenium)
-    actual_titles = (
-        asmts_ui_service.map_objs_and_get_mapped_titles_from_edit_modal(
-            expected_asmt, expected_asmt.mapped_objects))
-    assert expected_titles == actual_titles
-    expected_asmt.update_attrs(
-        updated_at=self.info_service().get_obj(expected_asmt).updated_at
-    ).repr_ui()
-    actual_asmt = asmts_ui_service.get_obj_from_info_page(expected_asmt)
-    # 'actual_asmts': audit (None)
-    self.general_equal_assert(expected_asmt, actual_asmt, "audit")
+    asmts_ui_service.map_objs_in_edit_modal(assessment, [obj])
+    assessment.update_attrs(
+        mapped_objects=[obj],
+        updated_at=rest_facade.get_obj(assessment).updated_at).repr_ui()
+    actual_asmt = asmts_ui_service.get_obj_from_info_page(assessment)
+    self.general_equal_assert(assessment, actual_asmt, "audit")
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(

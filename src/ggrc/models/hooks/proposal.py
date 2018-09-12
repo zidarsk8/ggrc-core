@@ -57,6 +57,9 @@ def apply_proposal(
     obj.instance.modified_by = current_user
     obj.instance.updated_at = now
   add_comment_about(obj, obj.STATES.APPLIED, obj.apply_reason)
+  # notify proposalable instance that proposal applied
+  signals.Proposal.proposal_applied.send(obj.instance.__class__,
+                                         instance=obj.instance)
 
 
 def decline_proposal(

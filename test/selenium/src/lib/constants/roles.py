@@ -100,6 +100,14 @@ class ACLRolesIDsMetaClass(type):
     return cls.id_of_role(object_type="Objective", name="Admin")
 
   @property
+  def RISK_ADMINS(cls):
+    return cls.id_of_role(object_type="Risk", name="Admin")
+
+  @property
+  def ORG_GROUPS_ADMINS(cls):
+    return cls.id_of_role(object_type="OrgGroup", name="Admin")
+
+  @property
   def ASSESSMENT_CREATORS(cls):
     return cls.id_of_role(object_type="Assessment", name="Creators")
 

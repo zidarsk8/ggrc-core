@@ -5,7 +5,7 @@ import itertools
 
 from lib import base
 from lib.constants import locator, element, objects
-from lib.page.modal import create_new_object
+from lib.page.widget import object_modal
 from lib.utils import selenium_utils
 
 
@@ -74,8 +74,7 @@ class AssessmentRelatedIssuesTable(CommonTable):
     raise_btn = base.Button(self._driver, self.table_element.find_element(
         *self._locators.TAB_BUTTON))
     raise_btn.click()
-    create_new_object.IssuesCreate(self._driver).fill_minimal_data(
-        issue_entity.title, issue_entity.slug).save_and_close()
+    object_modal.get_modal_obj("issue", self._driver).submit_obj(issue_entity)
     selenium_utils.wait_for_js_to_load(self._driver)
 
 

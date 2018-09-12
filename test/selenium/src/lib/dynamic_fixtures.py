@@ -12,9 +12,7 @@ from lib import factory
 from lib.constants import element, objects, counters
 from lib.entities.entities_factory import CustomAttributeDefinitionsFactory
 from lib.entities.entity import Representation
-from lib.page.widget import info_widget
 from lib.service import rest_service
-from lib.utils import conftest_utils, test_utils
 from lib.utils.string_utils import StringMethods
 
 dict_executed_fixtures = {}
@@ -150,30 +148,6 @@ def generate_common_fixtures(*fixtures):  # noqa: ignore=C901
                                 has_cas=has_cas, factory_params=factory_params)
     return new_objs
 
-  def new_ui_fixture(web_driver, fixture):
-    """Extract arguments of 'new_ui_fixture' fixture from fixture name,
-    create new objects via UI (LHN) and return UI page object.
-    """
-    fixture_params = fixture.replace("new_", "").replace("_ui", "")
-    obj_name = fixture_params
-    obj_count = counters.BATCH_COUNT
-    if (objects.get_plural(obj_name) in objects.ALL_OBJS and
-            objects.get_plural(obj_name) != objects.PROGRAMS):
-      obj_name = objects.get_plural(obj_name)
-      obj_count = 1
-      objs_info_pages = [conftest_utils.create_obj_via_lhn(
-          web_driver,
-          getattr(element.Lhn, obj_name.upper())) for _ in xrange(obj_count)]
-      return objs_info_pages
-    elif objects.get_plural(obj_name) == objects.PROGRAMS:
-      modal = conftest_utils.get_lhn_accordion(
-          web_driver,
-          getattr(element.Lhn, objects.PROGRAMS.upper())).create_new()
-      test_utils.ModalNewPrograms.enter_test_data(modal)
-      modal.save_and_close()
-      program_info_page = info_widget.Programs(web_driver)
-      return modal, program_info_page
-
   def map_rest_fixture(fixture):
     """Extract arguments of 'map_rest_fixture' fixture from fixture name,
     find previously created source and destination objects,
@@ -255,12 +229,7 @@ def generate_common_fixtures(*fixtures):  # noqa: ignore=C901
     if isinstance(fixture, tuple):
       fixture, fixture_params = fixture
     if isinstance(fixture, str):
-      if (fixture.startswith("new_") and fixture.endswith("_ui") and
-              dict_executed_fixtures.get("selenium")):
-        new_objs = new_ui_fixture(
-            web_driver=dict_executed_fixtures["selenium"], fixture=fixture)
-        dict_executed_fixtures.update({fixture: new_objs})
-      elif fixture.endswith(("_rest", "_snapshot")):
+      if fixture.endswith(("_rest", "_snapshot")):
         if fixture.startswith("new_"):
           new_objs = new_rest_fixture(fixture=fixture,
                                       factory_params=fixture_params)

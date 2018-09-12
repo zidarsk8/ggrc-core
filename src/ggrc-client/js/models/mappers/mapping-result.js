@@ -39,8 +39,9 @@
     _make_mappings: function (mappings) {
       mappings = mappings || [];
       return mappings.map(function (mapping) {
-        if (!(mapping instanceof GGRC.ListLoaders.MappingResult))
+        if (!(mapping instanceof GGRC.ListLoaders.MappingResult)) {
           mapping = new GGRC.ListLoaders.MappingResult(mapping);
+        }
         return mapping;
       });
     },
@@ -53,16 +54,18 @@
     //    "first-level mappings" which both `bindings_compute` and
     //    `mappings_compute` depend on.
     observe_trigger: function () {
-      if (!this._observe_trigger)
+      if (!this._observe_trigger) {
         this._observe_trigger = new can.Map({change_count: 1});
+      }
       return this._observe_trigger;
     },
 
     watch_observe_trigger: function () {
       this.observe_trigger().attr('change_count');
       can.each(this.mappings, function (mapping) {
-        if (mapping.watch_observe_trigger)
+        if (mapping.watch_observe_trigger) {
           mapping.watch_observe_trigger();
+        }
       });
     },
 
@@ -97,15 +100,17 @@
       let bindings = [];
 
       this.walk_instances(function (instance, result, depth) {
-        if (depth === 1)
+        if (depth === 1) {
           bindings.push(result.binding);
+        }
       });
       return bindings;
     },
 
     bindings_compute: function () {
-      if (!this._bindings_compute)
+      if (!this._bindings_compute) {
         this._bindings_compute = this.get_bindings_compute();
+      }
       return this._bindings_compute;
     },
 
@@ -132,9 +137,9 @@
 
       this.walk_instances(function (instance, result, depth) {
         if (depth === 1) {
-          if (instance === true)
+          if (instance === true) {
             mappings.push(self.instance);
-          else
+          } else
             mappings.push(instance);
         }
       });
@@ -142,8 +147,9 @@
     },
 
     mappings_compute: function () {
-      if (!this._mappings_compute)
+      if (!this._mappings_compute) {
         this._mappings_compute = this.get_mappings_compute();
+      }
       return this._mappings_compute;
     },
 
@@ -165,8 +171,9 @@
     //    per time they appear in a traversal path of `binding.mappings`.
     walk_instances: function (fn, lastInstance, depth) {
       let i;
-      if (!depth)
+      if (!depth) {
         depth = 0;
+      }
       if (this.instance !== lastInstance) {
         fn(this.instance, this, depth);
         depth++;

@@ -12,11 +12,13 @@
           let modelName;
           for (i = 0; i < modelNames.length; i++) {
             modelName = modelNames[i];
-            if (typeof modelName !== 'string')
+            if (typeof modelName !== 'string') {
               modelName = modelName.shortName;
+            }
             if (result.instance.constructor &&
-              result.instance.constructor.shortName === modelName)
+              result.instance.constructor.shortName === modelName) {
               return true;
+            }
           }
           return false;
         };

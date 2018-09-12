@@ -13,8 +13,9 @@
     init_listeners: function (binding) {
       let self = this;
 
-      if (!binding.source_bindings)
+      if (!binding.source_bindings) {
         binding.source_bindings = [];
+      }
 
       can.each(this.sources, function (source) {
         let sourceBinding = binding.instance.get_binding(source);

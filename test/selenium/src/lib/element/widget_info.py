@@ -4,8 +4,7 @@
 
 from lib.constants import locator, element
 from lib.element import elements_list
-from lib.page.modal import (delete_object, edit_object, update_object,
-                            clone_object)
+from lib.page.modal import delete_object, update_object, clone_object
 
 
 class CommonInfoDropdownSettings(elements_list.DropdownMenu):
@@ -23,11 +22,8 @@ class CommonInfoDropdownSettings(elements_list.DropdownMenu):
     self.get_dropdown_item(self._elements.OPEN).click()
 
   def select_edit(self):
-    """Select edit button in 3BBS dropdown modal.
-    Return: lib.page.modal.edit_object.EditModal
-    """
+    """Selects edit button in 3BBS dropdown modal."""
     self.get_dropdown_item(self._elements.EDIT).click()
-    return getattr(edit_object, self.__class__.__name__)(self._driver)
 
   def select_get_permalink(self):
     """Select get permalink in 3BBS dropdown modal."""
