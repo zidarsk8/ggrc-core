@@ -24,7 +24,7 @@ describe('child-models-map object', () => {
         let returnValue;
 
         types.forEach((type) => {
-          returnValue = 'child_models_for_' + type;
+          returnValue = ['Audit'];
           spy.and.returnValue(returnValue);
 
           childModelsMap.getModels(type);
@@ -40,10 +40,20 @@ describe('child-models-map object', () => {
 
       it('returns childModels for specified type', () => {
         let type = 'Program';
-        let expectedResult = 'child_models_for_Program';
-        spy.and.returnValue('child_models_for_Program');
+        let expectedResult = ['Audit'];
+        spy.and.returnValue(expectedResult);
 
-        expect(childModelsMap.getModels(type)).toEqual(expectedResult);
+        expect(childModelsMap.getModels(type).serialize())
+          .toEqual(expectedResult);
+      });
+
+      it('filters models that do not exists', () => {
+        let type = 'Program';
+        let expectedResult = ['Audit', 'any_non_business_model'];
+        spy.and.returnValue(expectedResult);
+
+        expect(childModelsMap.getModels(type).serialize())
+          .toEqual(['Audit']);
       });
     });
 
@@ -53,7 +63,7 @@ describe('child-models-map object', () => {
 
         types.forEach((type) => {
           childModelsMap.attr('container')
-            .attr(type, 'child_models_for_' + type);
+            .attr(type, ['Audit']);
 
           childModelsMap.getModels(type);
         });
