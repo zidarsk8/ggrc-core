@@ -24,10 +24,10 @@
     constructor: StickyPopover,
 
     init: function (type, element, options) {
-      if (options.trigger == 'sticky-hover') {
+      if (options.trigger === 'sticky-hover') {
         options.sticky_hover = true;
         options.trigger = 'hover';
-      } else if (options.trigger == 'click') {
+      } else if (options.trigger === 'click') {
         options.trigger_click = true;
         options.trigger = 'manual';
       }
@@ -135,13 +135,13 @@
     return this.each(function () {
       let $this = $(this);
       let data = $this.data('sticky_popover');
-      let options = typeof option == 'object' && option;
+      let options = typeof option === 'object' && option;
       if (!data) {
         $this.data('sticky_popover', (data = new StickyPopover(this, options)));
         // Make instantiated popovers findable by $('[data-sticky_popover]');
         $this.attr('data-sticky_popover', true);
       }
-      if (typeof option == 'string') data[option]();
+      if (typeof option === 'string') data[option]();
     });
   };
 
