@@ -161,8 +161,9 @@ import RefreshQueue from '../refresh_queue';
     remove_instance: function (binding, instance, mappings) {
       let indexesToRemove = [];
 
-      if (!(can.isArray(mappings) || mappings instanceof can.Observe.List))
+      if (!(can.isArray(mappings) || mappings instanceof can.Observe.List)) {
         mappings = [mappings];
+      }
 
       can.each(binding.list, function (data, instanceIndex) {
         let mappingAttr = binding.list[instanceIndex].mappings;
@@ -176,8 +177,9 @@ import RefreshQueue from '../refresh_queue';
             can.each(mappings, function (mapping) {
               let wasRemoved = data.remove_mapping(mapping);
               if (wasRemoved) {
-                if (mappingAttr.length === 0)
+                if (mappingAttr.length === 0) {
                   indexesToRemove.push(instanceIndex);
+                }
               }
             });
           }

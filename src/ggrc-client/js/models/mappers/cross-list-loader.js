@@ -48,12 +48,14 @@
       let localResults;
       let remoteBinding;
 
-      if (!binding.remote_bindings)
+      if (!binding.remote_bindings) {
         binding.remote_bindings = [];
+      }
 
       for (i = 0; i < binding.remote_bindings.length; i++) {
-        if (binding.remote_bindings[i].instance === localResult.instance)
+        if (binding.remote_bindings[i].instance === localResult.instance) {
           return binding.remote_bindings[i];
+        }
       }
 
       remoteBinding =
@@ -83,12 +85,14 @@
       let i;
       let remoteBindingIndex;
 
-      if (!binding.remote_bindings)
+      if (!binding.remote_bindings) {
         binding.remote_bindings = [];
+      }
 
       for (i = 0; i < binding.remote_bindings.length; i++) {
-        if (binding.remote_bindings[i].instance === localResult.instance)
+        if (binding.remote_bindings[i].instance === localResult.instance) {
           remoteBinding = binding.remote_bindings[i];
+        }
       }
 
       if (!remoteBinding) {
