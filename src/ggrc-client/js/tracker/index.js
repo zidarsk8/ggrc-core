@@ -20,9 +20,7 @@ const pendingTimings = {};
 const init = () => {
   if (GOOGLE_ANALYTICS_ID) {
     trackerStrategy = new AnalyticsStrategy();
-  }
-
-  if (!GOOGLE_ANALYTICS_ID && DEV_MODE) {
+  } else {
     trackerStrategy = new LocalStrategy();
   }
 };
