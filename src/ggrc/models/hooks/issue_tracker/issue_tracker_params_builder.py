@@ -123,7 +123,7 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
 
   def build_create_issue_tracker_params(self, obj, issue_tracker_info):
     """Build create issue query for issue tracker."""
-    all_emails = {acl.person.email for acl in obj.access_control_list}
+    all_emails = {person.email for person, _ in obj.access_control_list}
 
     # Add the person who triggered the event.
     all_emails |= {obj.modified_by.email}
@@ -192,9 +192,9 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
     acls = obj.access_control_list
 
     # Handle Admins list.
-    admins = [acl.person for acl in acls
+    admins = [person for person, acl in acls
               if acl.ac_role.name == "Admin" and
-              acl.person.email in allowed_emails]
+              person.email in allowed_emails]
     admins = sorted(admins, key=lambda person: person.name)
 
     issue_verifier_email = admins[0].email if admins else ""
@@ -202,9 +202,9 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
 
     # Handle Primary Contacts list.
     primary_contacts = [
-        acl.person for acl in acls
+        person for person, acl in acls
         if acl.ac_role.name == "Primary Contacts" and
-        acl.person.email in allowed_emails
+        person.email in allowed_emails
     ]
     primary_contacts = sorted(primary_contacts, key=lambda p: p.name)
     assignee_email = primary_contacts[0].email if primary_contacts else ""
