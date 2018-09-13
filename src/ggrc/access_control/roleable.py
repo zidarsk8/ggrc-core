@@ -215,8 +215,7 @@ class Roleable(object):
   def validate_acl(self):
     """Check correctness of access_control_list."""
     for acl in self.access_control_list:
-      if acl.ac_role.object_type != "Workflow" and \
-         acl.object_type != acl.ac_role.object_type:
+      if acl.object_type != acl.ac_role.object_type:
         raise ValueError(
             "Access control list has different object_type '{}' with "
             "access control role '{}'".format(
