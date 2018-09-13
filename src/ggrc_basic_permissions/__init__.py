@@ -351,6 +351,7 @@ def load_access_control_list(user, permissions):
   """Load permissions from access_control_list"""
   acl = all_models.AccessControlList
   acr = all_models.AccessControlRole
+  acp = all_models.AccessControlPeople
   additional_filters = _get_acl_filter()
   access_control_list = db.session.query(
       acl.object_type,
@@ -358,11 +359,10 @@ def load_access_control_list(user, permissions):
       sa.func.max(acr.read),
       sa.func.max(acr.update),
       sa.func.max(acr.delete),
-  ).with_hint(
-      acl, "USE INDEX (ix_person_object)"
   ).filter(
       sa.and_(
-          acl.person_id == user.id,
+          acp.person_id == user.id,
+          acp.ac_list_id == acl.id,
           acl.ac_role_id == acr.id,
           acl.object_type != all_models.Relationship.__name__,
           *additional_filters

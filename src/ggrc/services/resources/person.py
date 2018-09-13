@@ -235,13 +235,15 @@ class PersonResource(common.ExtendedResource):
               JOIN access_control_list AS acl
                   ON acl.object_id = ct.id
                   AND acl.object_type = "CycleTaskGroupObjectTask"
+              JOIN access_control_people AS acp
+                  ON acp.ac_list_id = acl.id
               JOIN access_control_roles as acr
                   ON acl.ac_role_id = acr.id
               WHERE
                   ct.status != "Verified" AND
                   c.is_verification_needed = 1 AND
                   c.is_current = 1 AND
-                  acl.person_id = :person_id AND
+                  acp.person_id = :person_id AND
                   acr.name IN ("Task Assignees", "Task Secondary Assignees")
               GROUP BY overdue
 
@@ -256,13 +258,15 @@ class PersonResource(common.ExtendedResource):
               JOIN access_control_list AS acl
                   ON acl.object_id = ct.id
                   AND acl.object_type = "CycleTaskGroupObjectTask"
+              JOIN access_control_people AS acp
+                  ON acp.ac_list_id = acl.id
               JOIN access_control_roles as acr
                   ON acl.ac_role_id = acr.id
               WHERE
                   ct.status != "Finished" AND
                   c.is_verification_needed = 0 AND
                   c.is_current = 1 AND
-                  acl.person_id = :person_id AND
+                  acp.person_id = :person_id AND
                   acr.name IN ("Task Assignees", "Task Secondary Assignees")
               GROUP BY overdue
           ) as temp

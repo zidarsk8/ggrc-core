@@ -63,7 +63,6 @@ def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
     grandchild_object_type = rel_table.c.source_type
 
   select_statement = sa.select([
-      acl_table.c.person_id.label("person_id"),
       child_acr.c.id.label("ac_role_id"),
       rel_table.c.id.label("object_id"),
       sa.literal(all_models.Relationship.__name__).label("object_type"),
@@ -129,7 +128,6 @@ def _rel_child(parent_acl_ids, source=True):
   )
 
   select_statement = sa.select([
-      acl_table.c.person_id.label("person_id"),
       child_acr.c.id.label("ac_role_id"),
       object_id.label("object_id"),
       object_type.label("object_type"),

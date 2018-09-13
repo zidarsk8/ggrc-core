@@ -14,6 +14,7 @@ from ggrc.access_control.people import AccessControlPeople
 from ggrc.access_control import role
 from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc.models import reflection
+from ggrc import utils
 from ggrc.utils import referenced_objects
 
 
@@ -24,12 +25,17 @@ class Roleable(object):
   control list includes a list of AccessControlList objects.
   """
 
-  _update_raw = _include_links = ['access_control_list', ]
+  _update_raw = ['access_control_list', ]
+  _include_links = []
   _fulltext_attrs = [CustomRoleAttr('access_control_list'), ]
   _api_attrs = reflection.ApiAttributes(
       reflection.Attribute('access_control_list', True, True, True))
   MAX_ASSIGNEE_NUM = 1
   MAX_VERIFIER_NUM = 1
+
+  _custom_publish = {
+      'access_control_list': lambda obj: obj.acl_json,
+  }
 
   def __init__(self, *args, **kwargs):
     for ac_role in role.get_ac_roles_for(self.type).values():
@@ -38,7 +44,6 @@ class Roleable(object):
           ac_role=ac_role,
       )
     super(Roleable, self).__init__(*args, **kwargs)
-    print self
 
   @declared_attr
   def _access_control_list(cls):  # pylint: disable=no-self-argument
@@ -119,12 +124,22 @@ class Roleable(object):
         ),
     )
 
+  def acl_json(self):
+    acl_json = []
+    for person, acl in self.access_control_list:
+      person_entry = acl.log_json()
+      person_entry["person"] = utils.create_stub(person)
+      person_entry["person_email"] = person.email
+      person_entry["person_id"] = person.id
+      person_entry["person_name"] = person.name
+      acl_json.append(person_entry)
+    return acl_json
+
   def log_json(self):
     """Log custom attribute values."""
     # pylint: disable=not-an-iterable
     res = super(Roleable, self).log_json()
-    res["access_control_list"] = [
-        value.log_json() for value in self.access_control_list]
+    res["access_control_list"] = self.acl_json()
     return res
 
   def get_persons_for_rolename(self, role_name):
@@ -137,7 +152,7 @@ class Roleable(object):
 
   def validate_acl(self):
     """Check correctness of access_control_list."""
-    for acl in self.access_control_list:
+    for _, acl in self.access_control_list:
       if acl.object_type != acl.ac_role.object_type:
         raise ValueError(
             "Access control list has different object_type '{}' with "
@@ -154,9 +169,11 @@ class Roleable(object):
     Args:
       _import: if True than function return list of errors for 'add_error'
     """
+    # This can now be fully refactored due to ACP, I am leaving this for the
+    # end though.
     errors = []
     count_roles = defaultdict(int)
-    for acl in self.access_control_list:
+    for _, acl in self.access_control_list:
       count_roles[acl.ac_role.name] += 1
 
     for _role in count_roles.keys():

@@ -26,7 +26,6 @@ def insert_select_acls(select_statement):
   """Insert acl records from the select statement
   Args:
     select_statement: sql statement that contains the following columns
-      person_id,
       ac_role_id,
       object_id,
       object_type,
@@ -51,7 +50,6 @@ def insert_select_acls(select_statement):
     return dict(
         zip(
             [
-                'person_id',
                 'ac_role_id',
                 'object_id',
                 'object_type',
