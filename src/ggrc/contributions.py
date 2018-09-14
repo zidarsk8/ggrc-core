@@ -12,6 +12,7 @@ from ggrc.utils import proposal
 
 
 NIGHTLY_CRON_JOBS = [
+    common.generate_cycle_tasks_notifs,
     common.send_daily_digest_notifications,
     import_export.clear_overtimed_tasks,
 ]
