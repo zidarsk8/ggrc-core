@@ -78,13 +78,13 @@
                 {{#if_helpers '\
                   #if' instance.archived '\
                   or ^is_allowed' "update" instance context="for"}}
-                    <ggrc-gdrive-folder-picker 
+                    <ggrc-gdrive-folder-picker
                       {hide-label}="true"
                       {readonly}="true"
                       {instance}="instance">
                     </ggrc-gdrive-folder-picker>
                 {{else}}
-                  <ggrc-gdrive-folder-picker 
+                  <ggrc-gdrive-folder-picker
                     {hide-label}="true"
                     {instance}="instance">
                   </ggrc-gdrive-folder-picker>
@@ -171,8 +171,10 @@
                 <info-issue-tracker-fields
                   {instance}="instance"
                   {note}="'If turned on, one bug will be created for each assessment.'">
-                  <generate-issues-in-bulk-button {instance}="instance">
-                  </generate-issues-in-bulk-button>
+                  {{^if instance.archived}}
+                    <generate-issues-in-bulk-button {instance}="instance">
+                    </generate-issues-in-bulk-button>
+                  {{/if}}
                 </info-issue-tracker-fields>
               {{/if }}
             </div><!-- hidden-fields-area end -->
