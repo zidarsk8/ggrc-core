@@ -95,16 +95,6 @@ def update_initial_issue(obj, issue_tracker_params):
 def link_issue(obj, ticket_id, issue_tracker_info):
   """Link issue to existing IssueTracker ticket"""
 
-  builder = issue_tracker_params_builder.IssueParamsBuilder()
-  issue_tracker_container = builder.build_params_for_issue_link(
-      obj,
-      ticket_id,
-      issue_tracker_info,
-  )
-
-  if issue_tracker_container.is_empty():
-    return
-
   if _is_already_linked(ticket_id):
     logger.error(
         "Unable to link a ticket while creating object ID=%d: %s ticket ID is "
@@ -116,6 +106,16 @@ def link_issue(obj, ticket_id, issue_tracker_info):
         "Unable to link to issue tracker. Ticket is already linked to another"
         "GGRC object"
     )
+    return
+
+  builder = issue_tracker_params_builder.IssueParamsBuilder()
+  issue_tracker_container = builder.build_params_for_issue_link(
+      obj,
+      ticket_id,
+      issue_tracker_info,
+  )
+
+  if issue_tracker_container.is_empty():
     return
 
   # Query to IssueTracker.
@@ -239,7 +239,9 @@ def update_issue_handler(obj, initial_state, new_it_info=None):
     return
 
   it_object = all_models.IssuetrackerIssue.get_issue("Issue", obj.id)
-  old_ticket_id = int(it_object.issue_id) if it_object.issue_id else None
+  old_ticket_id = None
+  if it_object:
+    old_ticket_id = int(it_object.issue_id) if it_object.issue_id else None
   get_id = new_it_info.get("issue_id") if new_it_info else None
   new_ticket_id = int(get_id) if get_id else None
 
