@@ -103,8 +103,9 @@ def link_issue(obj, ticket_id, issue_tracker_info):
         ticket_id,
     )
     obj.add_warning(
-        "Unable to link to issue tracker. Ticket is already linked to another"
-        "GGRC object"
+        "This ticket was already linked to another GGRC issue, assessment "
+        "or review object. Linking the same ticket to multiple objects is not "
+        "allowed due to potential for conflicting updates."
     )
     return
 
