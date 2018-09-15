@@ -19,7 +19,7 @@ from flask import url_for
 from flask import request
 from werkzeug import exceptions
 
-from ggrc import models, login
+from ggrc import models
 from ggrc import settings
 from ggrc.app import app
 from ggrc.app import db

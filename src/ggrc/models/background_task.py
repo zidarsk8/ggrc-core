@@ -15,7 +15,7 @@ from flask.wrappers import Response
 from werkzeug import exceptions
 from werkzeug.datastructures import Headers
 
-from ggrc import db, login
+from ggrc import db
 from ggrc import settings
 from ggrc.login import get_current_user
 from ggrc.access_control import role
