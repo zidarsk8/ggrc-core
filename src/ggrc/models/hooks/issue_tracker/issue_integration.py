@@ -233,8 +233,10 @@ def detach_issue(new_ticket_id, old_ticket_id):
                  old_ticket_id, error)
 
 
-def update_issue_handler(obj, initial_state, new_it_info=None):
+# pylint: disable=too-many-locals
+def update_issue_handler(obj, initial_state, new_it_info=None):  # noqa
   """Event handler for issue object renewal."""
+  # TODO: refactor this handler to be not so complex and more generic
   if not new_it_info:
     return
 
@@ -252,6 +254,13 @@ def update_issue_handler(obj, initial_state, new_it_info=None):
 
   if needs_creation:
     create_issue_handler(obj, new_it_info)
+    if not obj.warnings:
+      it_issue = all_models.IssuetrackerIssue.get_issue(
+          obj.__class__.__name__, obj.id
+      )
+      new_ticket_id = it_issue.issue_id if it_issue else None
+      if old_ticket_id and new_ticket_id and old_ticket_id != new_ticket_id:
+        detach_issue(new_ticket_id, old_ticket_id)
     return
 
   if not it_object:
