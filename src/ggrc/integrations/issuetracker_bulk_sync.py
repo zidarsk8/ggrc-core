@@ -406,6 +406,7 @@ class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
     Returns:
         flask.wrappers.Response - response with result of generation.
     """
+    errors = []
     try:
       issuetracked_info = []
       with benchmark("Load issuetracked objects from database"):
@@ -425,9 +426,9 @@ class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
       logger.info("Synchronized issues count: %s, failed count: %s",
                   len(created), len(errors))
     except:  # pylint: disable=bare-except
-      self.send_exception_notification()
+      self.send_notification(parent_type, parent_id, failed=True)
     else:
-      self.send_errors_notification(parent_type, parent_id, errors)
+      self.send_notification(parent_type, parent_id, errors=errors)
     return self.make_response(errors)
 
   def bulk_sync_allowed(self, obj):
@@ -448,33 +449,26 @@ class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
     return allow_func(obj)
 
   @staticmethod
-  def send_errors_notification(parent_type, parent_id, errors):
+  def send_notification(parent_type, parent_id, errors=None, failed=False):
     """Send mail notification with information about errors."""
     parent_model = models.get_model(parent_type)
     parent = parent_model.query.get(parent_id)
 
-    if errors:
-      data = {
-          "title": parent.title,
-          "assessments": [
-              {
-                  "url": get_object_url(obj),
-                  "code": obj.slug,
-                  "title": obj.title,
-              } for (obj, _) in errors
-          ]
-      }
+    data = {"title": parent.title}
+    if failed:
+      body = settings.EMAIL_BULK_SYNC_EXCEPTION.render()
+    elif errors:
+      data["assessments"] = [
+          {
+              "url": get_object_url(obj),
+              "code": obj.slug,
+              "title": obj.title,
+          } for (obj, _) in errors
+      ]
       body = settings.EMAIL_BULK_SYNC_FAILED.render(sync_data=data)
     else:
-      data = {"title": parent.title}
       body = settings.EMAIL_BULK_SYNC_SUCCEEDED.render(sync_data=data)
-    receiver = login.get_current_user()
-    common.send_email(receiver.email, ISSUETRACKER_SYNC_TITLE, body)
 
-  @staticmethod
-  def send_exception_notification():
-    """Send mail notification about failed bulk synchronization."""
-    body = settings.EMAIL_BULK_SYNC_EXCEPTION.render()
     receiver = login.get_current_user()
     common.send_email(receiver.email, ISSUETRACKER_SYNC_TITLE, body)
 

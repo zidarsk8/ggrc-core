@@ -21,8 +21,13 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
   <div {{ style.bulk_sync_container() }} >
     <div {{ style.bulk_sync_block() }}>
       <h1 {{ style.bulk_sync_title() }}>
-        Something went wrong, we are looking into it
+        There were some errors in generating tickets for "{{ sync_data.title }}"
       </h1>
+
+      <hr>
+      <p {{ style.header_color() }}>
+        Something went wrong, we are looking into it
+      </p>
     </div>
     <div {{ style.bulk_sync_footer() }}>Google GRC</div>
   </div>
