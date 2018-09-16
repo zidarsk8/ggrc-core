@@ -664,7 +664,7 @@ def get_background_task_status(object_type, object_id):
   bg_operation = models.BackgroundOperation
   task = bg_task.query.join(
       bg_operation,
-      bg_operation.id == bg_task.background_operation_id
+      bg_operation.bg_task_id == bg_task.id
   ).filter(
       bg_operation.object_type == object_type,
       bg_operation.object_id == object_id,
@@ -672,7 +672,7 @@ def get_background_task_status(object_type, object_id):
       bg_task.created_at.desc()
   ).first()
 
-  if task:
+  if task and task.bg_operation:
     body = {
         "status": task.status,
         "operation": task.bg_operation.bg_operation_type.name

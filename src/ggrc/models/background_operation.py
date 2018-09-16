@@ -17,5 +17,6 @@ class BackgroundOperation(mixins.Base, db.Model):
   )
   object_type = db.Column(db.String, nullable=False)
   object_id = db.Column(db.Integer, nullable=False)
+  bg_task_id = db.Column(db.Integer, db.ForeignKey('background_tasks.id'))
 
   bg_operation_type = db.relationship("BackgroundOperationType")

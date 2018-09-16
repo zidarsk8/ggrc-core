@@ -57,11 +57,12 @@ class BackgroundTask(roleable.Roleable, base.ContextRBAC, Base, Stateful,
   name = deferred(db.Column(db.String), 'BackgroundTask')
   parameters = deferred(db.Column(CompressedType), 'BackgroundTask')
   result = deferred(db.Column(CompressedType), 'BackgroundTask')
-  background_operation_id = deferred(
-      db.Column(db.Integer, db.ForeignKey('background_operations.id')),
-      'BackgroundTask'
+
+  bg_operation = db.relationship(
+      "BackgroundOperation",
+      backref='bg_task',
+      uselist=False
   )
-  bg_operation = db.relationship("BackgroundOperation")
 
   _api_attrs = reflection.ApiAttributes('name', 'result')
 
@@ -247,7 +248,7 @@ def bg_operation_running(operation_type, object_type, object_id):
   bg_type = models.BackgroundOperationType
   tasks = bg_task.query.join(
       bg_operation,
-      bg_operation.id == bg_task.background_operation_id
+      bg_operation.bg_task_id == bg_task.id
   ).join(
       bg_type,
       bg_type.id == bg_operation.bg_operation_type_id
@@ -255,7 +256,7 @@ def bg_operation_running(operation_type, object_type, object_id):
       bg_operation.object_type == object_type,
       bg_operation.object_id == object_id,
       bg_type.name == operation_type,
-      bg_task.status == "Running",
+      bg_task.status.in_(("Pending", "Running")),
   )
   return db.session.query(tasks.exists()).scalar()
 

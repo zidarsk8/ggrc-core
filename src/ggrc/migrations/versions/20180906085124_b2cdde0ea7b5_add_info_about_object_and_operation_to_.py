@@ -35,6 +35,7 @@ def upgrade():
       "background_operations",
       sa.Column("id", sa.Integer(), primary_key=True),
       sa.Column("bg_operation_type_id", sa.Integer, nullable=False),
+      sa.Column("bg_task_id", sa.Integer, nullable=False),
       sa.Column("object_type", sa.String(length=250), nullable=False),
       sa.Column("object_id", sa.Integer(), nullable=False),
       sa.Column("modified_by_id", sa.Integer(), nullable=True),
@@ -43,16 +44,8 @@ def upgrade():
       sa.ForeignKeyConstraint(
           ["bg_operation_type_id"],
           ["background_operation_types.id"],
-      )
-  )
-  op.add_column(
-      "background_tasks",
-      sa.Column("background_operation_id", sa.Integer(), nullable=True),
-  )
-  op.create_foreign_key(
-      "fk_background_operation_id",
-      "background_tasks", "background_operations",
-      ["background_operation_id"], ["id"],
+      ),
+      sa.ForeignKeyConstraint(["bg_task_id"], ["background_tasks.id"])
   )
 
   connection = op.get_bind()
@@ -70,11 +63,5 @@ def upgrade():
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
-  op.drop_constraint(
-      "fk_background_operation_id",
-      "background_tasks",
-      "foreignkey",
-  )
   op.drop_table("background_operations")
-  op.drop_column("background_tasks", "background_operation_id")
   op.drop_table("background_operation_types")
