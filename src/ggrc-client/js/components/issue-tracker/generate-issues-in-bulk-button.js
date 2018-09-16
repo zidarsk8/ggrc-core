@@ -60,8 +60,8 @@ export default can.Component.extend({
 
       this.generateChildrenIssues()
         .done((resp) => {
-          notifier('progress', `Tickets will be generated using a background 
-            job and linked to assessments. An email notification will be sent 
+          notifier('progress', `Tickets will be generated using a background
+            job and linked to assessments. An email notification will be sent
             to you once this process is complete or if there are errors.`);
           this.trackStatus(DEFAULT_TIMEOUT);
         })
@@ -91,13 +91,21 @@ export default can.Component.extend({
               break;
             }
             case 'Success': {
-              notifier('success', 'Tickets were generated successfully.');
+              let errors = task.errors;
+
+              if (errors && errors.length) {
+                notifier('error', 'There were some errors in generating ' +
+                  'tickets. More details will be sent by email.');
+              } else {
+                notifier('success', 'Tickets were generated successfully.');
+              }
+
               this.attr('isGeneratingInProgress', false);
               break;
             }
             case 'Failure': {
               notifier('error', 'There were some errors in generating ' +
-                'tickets. More details will be sent by email.');
+                'tickets.');
               this.attr('isGeneratingInProgress', false);
               break;
             }
