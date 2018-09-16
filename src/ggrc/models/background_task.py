@@ -117,6 +117,15 @@ class BackgroundTask(roleable.Roleable, base.ContextRBAC, Base, Stateful,
         ))
     )
 
+  def get_content(self):
+    """Get result content of the task."""
+    try:
+      content_json = self.result.get("content", "{}") if self.result else "{}"
+      content = json.loads(content_json)
+    except (TypeError, ValueError):
+      content = {}
+    return content
+
 
 def _add_task_acl(task):
   """Add ACL entry for the current users background task."""

@@ -675,7 +675,8 @@ def get_background_task_status(object_type, object_id):
   if task and task.bg_operation:
     body = {
         "status": task.status,
-        "operation": task.bg_operation.bg_operation_type.name
+        "operation": task.bg_operation.bg_operation_type.name,
+        "errors": task.get_content().get("errors", []),
     }
     response = app.make_response(
         (json.dumps(body), 200, [("Content-Type", "application/json")])

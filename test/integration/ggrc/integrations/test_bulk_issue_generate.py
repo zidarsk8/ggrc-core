@@ -439,6 +439,7 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
         response.json.get("operation"),
         "generate_children_issues"
     )
+    self.assertEqual(response.json.get("errors"), [])
 
   def test_task_already_run_status(self):
     """Test if new task started when another is in progress."""
@@ -478,11 +479,11 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
         response.json.get("operation"),
         "generate_children_issues"
     )
+    self.assertEqual(response.json.get("errors"), [])
 
   def test_task_failed_status(self):
     """Test background task status if it failed."""
     audit_id, _ = self.setup_assessments(2)
-    self.init_taskqueue()
     with mock.patch(
         "ggrc.integrations.issuetracker_bulk_sync."
         "IssueTrackerBulkChildCreator.sync_issuetracker",
@@ -499,6 +500,32 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
     self.assertEqual(
         response.json.get("operation"),
         "generate_children_issues"
+    )
+    self.assertEqual(response.json.get("errors"), [])
+
+  def test_errors_task_status(self):
+    """Test background task status if it failed."""
+    audit_id, assessment_ids = self.setup_assessments(2)
+    with mock.patch(
+        "ggrc.integrations.issues.Client.create_issue",
+        side_effect=integrations_errors.HttpError("Test Error")
+    ):
+      response = self.api.send_request(
+          self.api.client.post,
+          api_link="/generate_children_issues",
+          data={
+              "parent": {"type": "Audit", "id": audit_id},
+              "child_type": "Assessment"
+          }
+      )
+    self.assert200(response)
+    url = "background_task_status/{}/{}".format("audit", audit_id)
+    response = self.api.client.get(url)
+    self.assert200(response)
+    self.assertEqual(response.json.get("status"), "Success")
+    self.assertEqual(
+        response.json.get("errors"),
+        [["Assessment", id_, "500 Test Error"] for id_ in assessment_ids]
     )
 
 
