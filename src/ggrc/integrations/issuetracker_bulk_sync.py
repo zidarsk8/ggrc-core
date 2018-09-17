@@ -12,7 +12,7 @@ from werkzeug import exceptions
 import sqlalchemy as sa
 from sqlalchemy.sql import expression as expr
 
-from ggrc import models, db, login
+from ggrc import models, db, login, settings
 from ggrc.app import app
 from ggrc.integrations import integrations_errors, issues
 from ggrc.integrations.synchronization_jobs import sync_utils
@@ -20,6 +20,8 @@ from ggrc.models import all_models, inflector
 from ggrc.models import exceptions as ggrc_exceptions
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc import utils
+from ggrc.notifications import common
+from ggrc.notifications.data_handlers import get_object_url
 from ggrc.rbac import permissions
 from ggrc.utils import benchmark
 
@@ -28,6 +30,9 @@ logger = logging.getLogger(__name__)
 # IssueTracker sync errors
 WRONG_COMPONENT_ERR = "Component {} does not exist"
 WRONG_HOTLIST_ERR = "No Hotlist with id: {}"
+
+# Email title
+ISSUETRACKER_SYNC_TITLE = "Tickets generation status"
 
 
 class IssueTrackerBulkCreator(object):
@@ -401,23 +406,29 @@ class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
     Returns:
         flask.wrappers.Response - response with result of generation.
     """
-    issuetracked_info = []
-    with benchmark("Load issuetracked objects from database"):
-      handler = self.INTEGRATION_HANDLERS[child_type]
-      if not hasattr(handler, "load_issuetracked_objects"):
-        raise integrations_errors.Error(
-            "Creation tickets for {} in scope of {} is not supported.".format(
-                parent_type, child_type
-            )
-        )
+    errors = []
+    try:
+      issuetracked_info = []
+      with benchmark("Load issuetracked objects from database"):
+        handler = self.INTEGRATION_HANDLERS[child_type]
+        if not hasattr(handler, "load_issuetracked_objects"):
+          raise integrations_errors.Error(
+              "Creation issues for {} in scope of {} is not supported.".format(
+                  parent_type, child_type
+              )
+          )
 
-      for obj in handler.load_issuetracked_objects(parent_type, parent_id):
-        issuetracked_info.append(IssuetrackedObjInfo(obj))
+        for obj in handler.load_issuetracked_objects(parent_type, parent_id):
+          issuetracked_info.append(IssuetrackedObjInfo(obj))
 
-    created, errors = self.handle_issuetracker_sync(issuetracked_info)
+      created, errors = self.handle_issuetracker_sync(issuetracked_info)
 
-    logger.info("Synchronized issues count: %s, failed count: %s",
-                len(created), len(errors))
+      logger.info("Synchronized issues count: %s, failed count: %s",
+                  len(created), len(errors))
+    except:  # pylint: disable=bare-except
+      self.send_notification(parent_type, parent_id, failed=True)
+    else:
+      self.send_notification(parent_type, parent_id, errors=errors)
     return self.make_response(errors)
 
   def bulk_sync_allowed(self, obj):
@@ -436,6 +447,30 @@ class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
         self.bulk_sync_allowed
     )
     return allow_func(obj)
+
+  @staticmethod
+  def send_notification(parent_type, parent_id, errors=None, failed=False):
+    """Send mail notification with information about errors."""
+    parent_model = models.get_model(parent_type)
+    parent = parent_model.query.get(parent_id)
+
+    data = {"title": parent.title}
+    if failed:
+      body = settings.EMAIL_BULK_SYNC_EXCEPTION.render()
+    elif errors:
+      data["assessments"] = [
+          {
+              "url": get_object_url(obj),
+              "code": obj.slug,
+              "title": obj.title,
+          } for (obj, _) in errors
+      ]
+      body = settings.EMAIL_BULK_SYNC_FAILED.render(sync_data=data)
+    else:
+      body = settings.EMAIL_BULK_SYNC_SUCCEEDED.render(sync_data=data)
+
+    receiver = login.get_current_user()
+    common.send_email(receiver.email, ISSUETRACKER_SYNC_TITLE, body)
 
 
 class IssuetrackedObjInfo(collections.namedtuple(
