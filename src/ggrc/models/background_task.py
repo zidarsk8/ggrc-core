@@ -12,6 +12,7 @@ from time import time
 
 from flask import request
 from flask.wrappers import Response
+from werkzeug import exceptions
 from werkzeug.datastructures import Headers
 
 from ggrc import db
@@ -57,6 +58,12 @@ class BackgroundTask(roleable.Roleable, base.ContextRBAC, Base, Stateful,
   parameters = deferred(db.Column(CompressedType), 'BackgroundTask')
   result = deferred(db.Column(CompressedType), 'BackgroundTask')
 
+  bg_operation = db.relationship(
+      "BackgroundOperation",
+      backref='bg_task',
+      uselist=False
+  )
+
   _api_attrs = reflection.ApiAttributes('name', 'result')
 
   _aliases = {
@@ -99,6 +106,26 @@ class BackgroundTask(roleable.Roleable, base.ContextRBAC, Base, Stateful,
                               self.result['status_code'],
                               self.result['headers']))
 
+  def task_scheduled_response(self):
+    """Create success response with info about scheduled task."""
+    from ggrc.app import app
+    return self.make_response(
+        app.make_response((
+            json.dumps("scheduled %s" % self.name),
+            200,
+            [("Content-Type", "application/json")]
+        ))
+    )
+
+  def get_content(self):
+    """Get result content of the task."""
+    try:
+      content_json = self.result.get("content", "{}") if self.result else "{}"
+      content = json.loads(content_json)
+    except (TypeError, ValueError):
+      content = {}
+    return content
+
 
 def _add_task_acl(task):
   """Add ACL entry for the current users background task."""
@@ -122,7 +149,9 @@ def collect_task_headers():
   return Headers({k: v for k, v in request.headers if k not in BANNED_HEADERS})
 
 
-def create_task(name, url, queued_callback=None, parameters=None, method=None):
+# pylint: disable=too-many-arguments
+def create_task(name, url, queued_callback=None, parameters=None, method=None,
+                operation_type=None):
   """Create a enqueue a bacground task."""
   if not method:
     method = request.method
@@ -131,7 +160,23 @@ def create_task(name, url, queued_callback=None, parameters=None, method=None):
   if not parameters:
     parameters = {}
 
-  task = BackgroundTask(name=name + str(int(time())))
+  parent_type, parent_id = None, None
+  if isinstance(parameters, dict):
+    parent_type = parameters.get("parent", {}).get("type")
+    parent_id = parameters.get("parent", {}).get("id")
+
+  if bg_operation_running(operation_type, parent_type, parent_id):
+    raise exceptions.BadRequest(
+        "Task '{}' already run for {} {}.".format(
+            operation_type, parent_type, parent_id
+        )
+    )
+  bg_operation = create_bg_operation(operation_type, parent_type, parent_id)
+
+  task = BackgroundTask(
+      name=name + str(int(time())),
+      bg_operation=bg_operation,
+  )
   task.parameters = parameters
   task.modified_by = get_current_user()
   _add_task_acl(task)
@@ -183,6 +228,46 @@ def create_lightweight_task(name, url, queued_callback=None, parameters=None,
     raise ValueError(
         "Either queued_callback should be provided or APP_ENGINE set to true."
     )
+
+
+def create_bg_operation(operation_type, object_type, object_id):
+  """Create background task operation instance."""
+  bg_operation = None
+  if operation_type:
+    from ggrc import models
+    bg_operation_type = models.BackgroundOperationType.query.filter_by(
+        name=operation_type
+    ).first()
+
+    if bg_operation_type and object_type and object_id:
+      bg_operation = models.BackgroundOperation(
+          object_type=object_type,
+          object_id=object_id,
+          bg_operation_type=bg_operation_type,
+          modified_by=get_current_user()
+      )
+  return bg_operation
+
+
+def bg_operation_running(operation_type, object_type, object_id):
+  """Check if there is a background task in running state related to object."""
+  from ggrc import models
+  bg_task = models.BackgroundTask
+  bg_operation = models.BackgroundOperation
+  bg_type = models.BackgroundOperationType
+  tasks = bg_task.query.join(
+      bg_operation,
+      bg_operation.bg_task_id == bg_task.id
+  ).join(
+      bg_type,
+      bg_type.id == bg_operation.bg_operation_type_id
+  ).filter(
+      bg_operation.object_type == object_type,
+      bg_operation.object_id == object_id,
+      bg_type.name == operation_type,
+      bg_task.status.in_(("Pending", "Running")),
+  )
+  return db.session.query(tasks.exists()).scalar()
 
 
 def make_task_response(id_):
