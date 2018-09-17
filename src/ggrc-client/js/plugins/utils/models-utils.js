@@ -41,23 +41,16 @@ const getModelInstance = (id, type, requiredAttr) => {
 };
 
 const inferObjectType = (data) => {
-  let decisionTree = _getObjectTypeDecisionTree();
-
-  function resolve(subtree, data) {
-    if (typeof subtree === 'undefined') {
-      return null;
-    }
-    return can.isPlainObject(subtree) ?
-      subtree._discriminator(data) :
-      subtree;
-  }
+  let decisionTree = _(GGRC.extensions)
+    .filter((extension) => extension.object_type_decision_tree)
+    .reduce((tree, extension) =>
+      Object.assign(tree, extension.object_type_decision_tree()), {});
 
   if (!data) {
     return null;
   } else {
-    return can.reduce(Object.keys(data), function (a, b) {
-      return a || resolve(decisionTree[b], data[b]);
-    }, null);
+    return can.reduce(Object.keys(data), (a, b) =>
+      a || decisionTree[b] || null, null);
   }
 };
 
@@ -79,23 +72,6 @@ const makeModelInstance = (data) => {
 const hasRelatedAssessments = (type) => {
   return _.includes(relatedAssessmentsTypes, type);
 };
-
-function _getObjectTypeDecisionTree() { // eslint-disable-line
-  let tree = {};
-  let extensions = GGRC.extensions || [];
-
-  can.each(extensions, function (extension) {
-    if (extension.object_type_decision_tree) {
-      if (can.isFunction(extension.object_type_decision_tree)) {
-        $.extend(tree, extension.object_type_decision_tree());
-      } else {
-        $.extend(tree, extension.object_type_decision_tree);
-      }
-    }
-  });
-
-  return tree;
-}
 
 const getInstance = (objectType, objectId, paramsOrObject) => {
   let model;

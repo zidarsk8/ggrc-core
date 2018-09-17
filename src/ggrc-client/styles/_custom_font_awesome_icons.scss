@@ -153,11 +153,6 @@
 
 .#{$fa-css-prefix}-history:before { content: $fa-var-clock-o; }
 
-.#{$fa-css-prefix}-request {
-  &:before { content: $fa-var-file-o; }
-  &.color { color: $purple; }
-}
-
 .#{$fa-css-prefix}-event:before { content: $fa-var-history; }
 
 .#{$fa-css-prefix}-project {

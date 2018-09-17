@@ -34,7 +34,6 @@ let _LIST_FIELDS = {
   recipients: 1,
 };
 let _EMBED_MAPPINGS = {
-  Request: ['Comment', 'Document'],
   Assessment: ['Comment', 'Document'],
 };
 
