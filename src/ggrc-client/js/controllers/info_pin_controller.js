@@ -9,6 +9,7 @@ import '../components/info-pane/info-pane-footer';
 import '../components/assessment/info-pane/info-pane';
 import '../components/folder-attachments-list/folder-attachments-list';
 import '../components/issue-tracker/info-issue-tracker-fields';
+import '../components/issue-tracker/generate-issues-in-bulk-button';
 import '../components/comment/comment-data-provider';
 import '../components/comment/comment-add-form';
 import '../components/comment/mapped-comments';
