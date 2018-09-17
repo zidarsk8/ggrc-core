@@ -106,6 +106,15 @@ EMAIL_DIGEST = JINJA2.get_template("notifications/email_digest.html")
 EMAIL_DAILY = JINJA2.get_template("notifications/view_daily_digest.html")
 EMAIL_PENDING = JINJA2.get_template("notifications/view_pending_digest.html")
 EMAIL_IMPORT_EXPORT = JINJA2.get_template("notifications/import_export.html")
+EMAIL_BULK_SYNC_SUCCEEDED = JINJA2.get_template(
+    "notifications/bulk_sync_succeded.html"
+)
+EMAIL_BULK_SYNC_FAILED = JINJA2.get_template(
+    "notifications/bulk_sync_failed.html"
+)
+EMAIL_BULK_SYNC_EXCEPTION = JINJA2.get_template(
+    "notifications/bulk_sync_exception.html"
+)
 
 USE_APP_ENGINE_ASSETS_SUBDOMAIN = False
 
