@@ -15,11 +15,11 @@ export default can.Component.extend({
         join_object_type: this.attr('instance.type'),
         join_object_id: this.attr('instance.id'),
         type: this.attr('instance.assessment_type'),
-        deferred_to: this.attr('deferredTo')
+        deferred_to: this.attr('deferredTo'),
       };
 
       import(/* webpackChunkName: "mapper" */ '../../controllers/mapper/mapper')
-        .then(mapper => {
+        .then((mapper) => {
           mapper.ObjectMapper.openMapper(data);
         });
     },
@@ -30,7 +30,7 @@ export default can.Component.extend({
         .then(() => {
           can.trigger(el, 'openMapper', ev);
         });
-    }
+    },
   },
   events: {
     inserted: function () {
@@ -41,6 +41,6 @@ export default can.Component.extend({
       this.viewModel.onClick(el, ev);
       ev.preventDefault();
       return false;
-    }
-  }
+    },
+  },
 });

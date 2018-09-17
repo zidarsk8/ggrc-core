@@ -20,7 +20,6 @@ export default can.Component.extend({
   events: {
     'a click': function (el, ev) {
       let instance = this.viewModel.attr('audit') || getPageInstance();
-      let a;
       this._results = null;
       tracker.start(tracker.FOCUS_AREAS.ASSESSMENT,
         tracker.USER_JOURNEY_KEYS.LOADING,
