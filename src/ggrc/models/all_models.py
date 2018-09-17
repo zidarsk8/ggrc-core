@@ -20,7 +20,9 @@ from ggrc.models.assessment import Assessment
 from ggrc.models.assessment_template import AssessmentTemplate
 from ggrc.models.audit import Audit
 from ggrc.models.automapping import Automapping
+from ggrc.models.background_operation_type import BackgroundOperationType
 from ggrc.models.background_task import BackgroundTask
+from ggrc.models.background_operation import BackgroundOperation
 from ggrc.models.categorization import Categorization
 from ggrc.models.category import CategoryBase
 from ggrc.models.clause import Clause
@@ -98,6 +100,8 @@ all_models = [  # pylint: disable=invalid-name
     Audit,
     Automapping,
     BackgroundTask,
+    BackgroundOperation,
+    BackgroundOperationType,
     Categorization,
     CategoryBase,
     Clause,

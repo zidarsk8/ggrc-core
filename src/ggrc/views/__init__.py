@@ -653,6 +653,41 @@ def get_task_response(id_task):
   return make_task_response(id_task)
 
 
+@app.route(
+    "/background_task_status/<object_type>/<object_id>",
+    methods=['GET']
+)
+@login_required
+def get_background_task_status(object_type, object_id):
+  """Gets the status of a background task which was created for object."""
+  bg_task = models.BackgroundTask
+  bg_operation = models.BackgroundOperation
+  task = bg_task.query.join(
+      bg_operation,
+      bg_operation.bg_task_id == bg_task.id
+  ).filter(
+      bg_operation.object_type == object_type,
+      bg_operation.object_id == object_id,
+  ).order_by(
+      bg_task.created_at.desc()
+  ).first()
+
+  if task and task.bg_operation:
+    body = {
+        "status": task.status,
+        "operation": task.bg_operation.bg_operation_type.name,
+        "errors": task.get_content().get("errors", []),
+    }
+    response = app.make_response(
+        (json.dumps(body), 200, [("Content-Type", "application/json")])
+    )
+  else:
+    response = app.make_response(
+        ("", 404, [("Content-Type", "application/json")])
+    )
+  return response
+
+
 def contributed_object_views():
   """Contributed object views"""
 
@@ -790,6 +825,7 @@ def generate_children_issues():
       url_for(run_children_issues_generation.__name__),
       run_children_issues_generation,
       request.json,
+      operation_type="generate_children_issues",
   )
   return task_queue.task_scheduled_response()
 
