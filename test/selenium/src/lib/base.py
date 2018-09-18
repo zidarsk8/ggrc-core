@@ -14,7 +14,7 @@ from selenium.webdriver.common import keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote import webelement
 
-from lib import constants, exception, mixin, url
+from lib import constants, exception, mixin, url, environment
 from lib.constants import messages, objects
 from lib.constants.element import MappingStatusAttrs
 from lib.constants.locator import CommonDropdownMenu
@@ -697,17 +697,19 @@ class TreeView(Component):
     """Get list of scopes (dicts) from members (text scopes) which displayed on
     Tree View according to current set of visible fields.
     """
-    list_scopes = self._tree_view_items
-    if self._init_tree_view_items():
+    tree_view_items = self.tree_view_items()
+    list_scopes = []
+    if tree_view_items:
       list_headers = [_item.text.splitlines()[:len(self.fields_to_set)] for
                       _item in self.tree_view_headers()]
-      # u'Ex' to u'Ex', u'Ex1, Ex2' to [u'Ex1', u'Ex2']
       list_lists_items = [
           [_.split(", ") if len(_.split(", ")) >= 2 else _ for
            _ in _item.cell_values[:len(self.fields_to_set)]] for
-          _item in self.tree_view_items()]
-      list_scopes = [
-          dict(zip(list_headers[0], item)) for item in list_lists_items]
+          _item in tree_view_items]
+      for tree_view_item, list_item in zip(tree_view_items, list_lists_items):
+        scope = dict(zip(list_headers[0], list_item))
+        scope.update(url=tree_view_item.url(), id=tree_view_item.obj_id())
+        list_scopes.append(scope)
     return list_scopes
 
 
@@ -792,6 +794,23 @@ class TreeViewItem(Element):
         None if item_btn_locator is None else
         selenium_utils.get_element_safe(
             self.element, item_btn_locator))
+    if self.item_btn:
+      self.js_field_name = "instance"
+    else:
+      self.js_field_name = "itemData"
+
+  def url(self):
+    """Returns url to the object."""
+    view_link = self._driver.execute_script(
+        "return $(arguments[0]).viewModel().{}.viewLink".format(
+            self.js_field_name), self.element)
+    return environment.app_url[:-1] + view_link
+
+  def obj_id(self):
+    """Returns id of the object."""
+    return self._driver.execute_script(
+        "return $(arguments[0]).viewModel().{}.id".format(self.js_field_name),
+        self.element)
 
   def expand(self):
     """Expand Tree View item if it is not expanded already."""

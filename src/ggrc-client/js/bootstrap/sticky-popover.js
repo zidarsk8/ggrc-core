@@ -5,7 +5,7 @@
 
 !function ($) {
 
-  'use strict'; // jshint ;_;
+  'use strict';
 
 
   /* STICKY_POPOVER PUBLIC CLASS DEFINITION
@@ -37,8 +37,9 @@
       //   (otherwise it flickers if `animation` is true
       this.displayState = this.displayState || 'hide';
 
-      if (this.options.show)
+      if (this.options.show) {
         this.show();
+      }
       if (this.options.trigger_click) {
         this.$element.on('click', $.proxy(this.click_toggle, this));
       }
@@ -103,8 +104,9 @@
             self.$element.attr('data-original-title', $data.filter('.popover-title').html());
             self.$element.attr('data-content', $data.filter('.popover-content').html());
             self.$element.data('popover-loaded', true);
-            if (self.displayState === 'show')
+            if (self.displayState === 'show') {
               self.show(true);
+            }
           },
         });
       }

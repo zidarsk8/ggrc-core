@@ -73,7 +73,7 @@ def _get_singular(plurals):
  """
   singulars = []
   for name in plurals:
-    name = name.lower()
+    name = inflection.underscore(name)
     if name == PEOPLE:
       singular = "person"
     elif name == POLICIES:
@@ -94,7 +94,7 @@ def _get_plural(singulars):
   """
   plurals = []
   for name in singulars:
-    name = name.lower()
+    name = inflection.underscore(name)
     if name == "people":
       plural = PEOPLE
     elif name == "policy":

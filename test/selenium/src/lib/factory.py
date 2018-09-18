@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 "Factory for modules, classes, methods, functions."
 
-from lib import base, cache, constants, exception
+from lib import cache, constants, exception
 from lib.constants import objects, element
 from lib.element import tree_view, widget_info, tree_view_item
 
@@ -69,16 +69,6 @@ def get_fields_to_set(object_name):
   return set_fields_modal_cls().DEFAULT_SET_FIELDS
 
 
-def get_cls_test_utils(object_name):
-  """Return test utils class based on object name
- Args:
-    object_name (basestring)
- """
-  cls_name = constants.cls_name.TEST_MODAL_NEW_PREFIX + object_name
-  return _factory(cls_name=cls_name, parent_cls=base.TestUtil,
-                  search_nested_subclasses=True)
-
-
 def get_cls_widget(object_name, is_info=False, is_admin=False):
   """Get and return class of widget. If is_info is True then class
   info_widget.'obj_name', if is_admin is True then class
@@ -135,14 +125,6 @@ def get_cls_webui_service(object_name):
   base_cls = webui_service.BaseWebUiService
   return _factory(cls_name=cls_name, parent_cls=base_cls,
                   search_nested_subclasses=True)
-
-
-def get_cls_create_obj(object_name):
-  """Get and return class of create object."""
-  from lib.page.modal import create_new_object
-  cls_name = object_name + constants.cls_name.CREATE
-  base_cls = create_new_object.CreateNewObjectModal
-  return _factory(cls_name=cls_name, parent_cls=base_cls)
 
 
 def get_cls_3bbs_dropdown_settings(object_name, is_tree_view_not_info):

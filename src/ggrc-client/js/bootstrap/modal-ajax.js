@@ -420,8 +420,9 @@ import modalModels from '../models/modal-models';
         return $.inArray('arrange', this.namespace.split('.')) > -1;
       }).length < 1) {
       $el.on('shown.arrange, loaded.arrange', function (ev) {
-        if (ev.target === ev.currentTarget)
+        if (ev.target === ev.currentTarget) {
           reconfigureModals.call(that);
+        }
       });
     }
 

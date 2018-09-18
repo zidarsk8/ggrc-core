@@ -28,7 +28,7 @@ can.Control('CMS.Controllers.LHN', {
       // whole LHN search panel.  scroll events do not bubble, so this cannot be
       // set as a delegate on the controller element.
     self.lhs_holder_onscroll = _.debounce(function () {
-      self.options.display_prefs.setLHNState({'panel_scroll': this.scrollTop});
+      self.options.display_prefs.setLHNState({panel_scroll: this.scrollTop});
     }, 250);
     this.element.find('.lhs-holder').on('scroll', self.lhs_holder_onscroll);
   },
@@ -51,7 +51,7 @@ can.Control('CMS.Controllers.LHN', {
       this.toggle_filter_active();
     }
   },
-  'submit': function (el, ev) {
+  submit: function (el, ev) {
     ev.preventDefault();
 
     let value = $(ev.target).find('input.widgetsearch').val();
@@ -391,7 +391,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       //  search box and the display prefs to save the search value between page loads.
       //  We also listen for this value in the controller
       //  to trigger the search.
-    return can.view(template_path, prefs_dfd.then(function (prefs) { return prefs.getLHNState(); })).then(function (frag, xhr) {
+    return can.view(template_path, prefs_dfd.then(function (prefs) {return prefs.getLHNState();})).then(function (frag, xhr) {
       let lhn_prefs = prefs.getLHNState();
       let initial_term;
       let initial_params = {};
@@ -407,7 +407,7 @@ can.Control('CMS.Controllers.LHN_Search', {
 
       initial_term = self.options.display_prefs.getLHNState().search_text || '';
       if (self.options.observer.my_work) {
-        initial_params = {'contact_id': GGRC.current_user.id};
+        initial_params = {contact_id: GGRC.current_user.id};
       }
       $.map(businessModels, function (model, name) {
         if (model.default_lhn_filters) {
@@ -573,7 +573,7 @@ can.Control('CMS.Controllers.LHN_Search', {
 
       // Notify the display prefs that the category the user just opened is to be reopened on next page load.
     if (!dont_update_prefs) {
-      this.options.display_prefs.setLHNState({'open_category': el.attr('data-object-singular')});
+      this.options.display_prefs.setLHNState({open_category: el.attr('data-object-singular')});
     }
 
     this.ensure_parent_open(el);
@@ -585,7 +585,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       // on closing a category, set the display prefs to reflect that there is no open category and no scroll
         //  for the next category opened.
     if (!dont_update_prefs) {
-      this.options.display_prefs.setLHNState({'open_category': null, category_scroll: 0});
+      this.options.display_prefs.setLHNState({open_category: null, category_scroll: 0});
     }
   },
   ' resize': function () {
@@ -623,12 +623,13 @@ can.Control('CMS.Controllers.LHN_Search', {
     this.run_search(newval, this.current_params);
   },
   '{observer} my_work': function (el, ev, newval) {
-    this.run_search(this.current_term, newval ? {'contact_id': GGRC.current_user.id} : null);
+    this.run_search(this.current_term, newval ? {contact_id: GGRC.current_user.id} : null);
   },
   '.sub-level scrollNext': 'show_more',
   show_more: function ($el, ev) {
-    if (this._show_more_pending)
+    if (this._show_more_pending) {
       return;
+    }
 
     let that = this;
     let $list = $el.closest(this.get_lists());
@@ -643,8 +644,9 @@ can.Control('CMS.Controllers.LHN_Search', {
       tracker.USER_ACTIONS.LHN.SHOW_MORE
     );
 
-    if (visible_list.length >= results_list.length)
+    if (visible_list.length >= results_list.length) {
       return;
+    }
 
     this._show_more_pending = true;
     refresh_queue = new RefreshQueue();
@@ -665,10 +667,12 @@ can.Control('CMS.Controllers.LHN_Search', {
 
   init_object_lists: function () {
     let self = this;
-    if (!this.options.results_lists)
+    if (!this.options.results_lists) {
       this.options.results_lists = {};
-    if (!this.options.visible_lists)
+    }
+    if (!this.options.visible_lists) {
       this.options.visible_lists = {};
+    }
 
     can.each(this.get_lists(), function ($list) {
       let model_name;
@@ -718,8 +722,9 @@ can.Control('CMS.Controllers.LHN_Search', {
   },
   get_list_model: function ($list, count) {
     $list = $($list);
-    if (this.options.model_attr_selector)
+    if (this.options.model_attr_selector) {
       $list = $list.find(this.options.model_attr_selector).first();
+    }
     if (count && $list.attr('data-count')) {
       return $list.attr('data-count');
     }
@@ -727,8 +732,9 @@ can.Control('CMS.Controllers.LHN_Search', {
   },
   get_extra_list_model: function ($list) {
     $list = $($list);
-    if (this.options.model_attr_selector)
+    if (this.options.model_attr_selector) {
       $list = $list.find(this.options.model_attr_selector).first();
+    }
     if (!$list.attr(this.options.model_extra_attr)) {
       return null;
     }
@@ -844,8 +850,9 @@ can.Control('CMS.Controllers.LHN_Search', {
     }
 
     models = can.map(models, function (model_name) {
-      if (self.options.loaded_lists.indexOf(model_name) == -1)
+      if (self.options.loaded_lists.indexOf(model_name) == -1) {
         return model_name;
+      }
     });
 
     if (models.length > 0) {
@@ -924,8 +931,9 @@ can.Control('CMS.Controllers.LHN_Search', {
     return can.map(this.get_lists(), function ($list) {
       $list = $($list);
       if ($list.find([self.options.list_content_selector,
-                        self.options.list_mid_level_selector].join(',')).hasClass('in'))
+        self.options.list_mid_level_selector].join(',')).hasClass('in')) {
         return $list;
+      }  
     });
   },
 
@@ -937,7 +945,7 @@ can.Control('CMS.Controllers.LHN_Search', {
     let for_model = el.parent().data('for');
     let filters = this.options.filter_params;
     if (this.options.observer.my_work) {
-      param = {'contact_id': GGRC.current_user.id};
+      param = {contact_id: GGRC.current_user.id};
     }
 
     if (el.hasClass('active')) {

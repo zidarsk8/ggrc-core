@@ -56,7 +56,6 @@ class AccordionGroup(base.DropdownDynamic):
   _locator_button_create_new = None
   _locator_accordion_members = None
   # modal class which is used when creating a new object
-  _create_new_modal_cls = None
 
   def __init__(self, driver):
     """
@@ -109,10 +108,8 @@ class AccordionGroup(base.DropdownDynamic):
 
   def create_new(self):
     """Create new modal for object in LHN.
-    Return: lib.page.modal.create_new_object.CreateNewObjectModal
     """
     self.button_create_new.click()
-    return self._create_new_modal_cls(self._driver)
 
   def hover_over_visible_member(self, member_title):
     """Hovers over visible member with (unique) title "member_title".

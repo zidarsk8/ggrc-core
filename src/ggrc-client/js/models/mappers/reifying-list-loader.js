@@ -10,9 +10,9 @@ import RefreshQueue from '../refresh_queue';
     init: function (source) {
       this._super();
 
-      if (source instanceof GGRC.ListLoaders.ListBinding)
+      if (source instanceof GGRC.ListLoaders.ListBinding) {
         this.source_binding = source;
-      else
+      } else
         this.source = source;
     },
     insert_from_source_binding: function (binding, results) {
@@ -31,11 +31,10 @@ import RefreshQueue from '../refresh_queue';
     init_listeners: function (binding) {
       let self = this;
 
-      if (this.source_binding)
+      if (this.source_binding) {
         binding.source_binding = this.source_binding;
-      else
+      } else
         binding.source_binding = binding.instance.get_binding(this.source);
-
       this.insert_from_source_binding(binding, binding.source_binding.list, 0);
 
       binding.source_binding.list.bind('add', function (ev, results, index) {

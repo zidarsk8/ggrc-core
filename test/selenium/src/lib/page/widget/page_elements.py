@@ -33,6 +33,31 @@ class InlineEdit(object):
     time.sleep(1)
 
 
+class DescriptionField(object):
+  """Represents description field on info widget."""
+
+  def __init__(self, container):
+    self._root = container.h6(xpath=".//*[.='Description']").parent()
+
+  @property
+  def text(self):
+    """Returns text of description."""
+    return self._root.element(class_name="read-more").text
+
+
+class AssessmentFormField(object):
+  """Represents form field on Assessment info widget."""
+
+  def __init__(self, container, label):
+    self._root = container.element(
+        class_name="ggrc-form__title", text=label).parent(class_name="inline")
+
+  @property
+  def text(self):
+    """Returns text of description."""
+    return self._root.element(class_name="inline__content").text
+
+
 class RelatedPeopleList(object):
   """Represents related people element"""
 
@@ -91,18 +116,6 @@ class CommentArea(object):
         class_name="comment-add-form__section")
 
 
-class EditPopup(object):
-  """Represents edit popup."""
-
-  def __init__(self, container):
-    self.modal = container.element(class_name="modal-wide")
-
-  def save_and_close(self):
-    """Saves and closes edit popup."""
-    self.modal.element(data_toggle="modal-submit").click()
-    self.modal.wait_until_not_present()
-
-
 class CustomAttributeManager(object):
   """Manager for custom attributes.
   It finds them based on object type, whether it is
@@ -121,8 +134,9 @@ class CustomAttributeManager(object):
     """Returns list of all labels."""
     if self.is_global:
       if not self.is_inline:
+        # Workaround https://github.com/watir/watir/issues/759
         elements = self._browser.element(
-            tag_name="gca-controls").elements(
+            tag_name="gca-controls").wait_until(lambda e: e.exists).elements(
             class_name="ggrc-form-item__label-text")
       elif self.obj_type == objects.ASSESSMENTS:
         elements = self._browser.element(

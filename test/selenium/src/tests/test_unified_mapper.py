@@ -3,13 +3,13 @@
 """Unified mapper tests."""
 # pylint: disable=no-self-use
 # pylint: disable=invalid-name
-# pylint: disable=too-few-public-methods
 
 import pytest
 
-from lib import base
+from lib import base, users
+from lib.entities import entities_factory
 from lib.entities.entity import Representation
-from lib.service import webui_service
+from lib.service import webui_service, rest_facade
 
 
 class TestProgramPage(base.Test):
@@ -24,7 +24,6 @@ class TestProgramPage(base.Test):
     Preconditions:
     - Program, Controls created via REST API.
     """
-    # pylint: disable=no-self-use
     expected_controls = [
         expected_control.repr_ui() for expected_control in new_controls_rest]
     controls_ui_service = webui_service.ControlsService(selenium)
@@ -39,3 +38,21 @@ class TestProgramPage(base.Test):
     self.general_equal_assert(
         sorted(expected_controls), sorted(actual_controls),
         *Representation.tree_view_attrs_to_exclude)
+
+  def test_create_and_map_control(self, program, selenium):
+    """Test that control can be created and mapped using Unified mapper."""
+    controls_service = webui_service.ControlsService(selenium)
+    controls_service.open_widget_of_mapped_objs(
+        program).tree_view.open_map().click_create_and_map_obj()
+    control = entities_factory.ControlsFactory().create()
+    controls_service.submit_obj_modal(control)
+    tree_view_control = controls_service.get_list_objs_from_tree_view(
+        program)[0]
+    actual_control = controls_service.get_obj_from_info_page(tree_view_control)
+    rest_control = rest_facade.get_obj(actual_control)
+    control.update_attrs(
+        created_at=rest_control.created_at,
+        updated_at=rest_control.updated_at,
+        modified_by=users.current_user(),
+        slug=rest_control.slug).repr_ui()
+    self.general_equal_assert(control, actual_control, "custom_attributes")

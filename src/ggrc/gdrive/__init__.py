@@ -16,6 +16,7 @@ from werkzeug.exceptions import Unauthorized
 
 from ggrc import settings
 from ggrc.login import login_required
+from ggrc.gdrive import errors
 
 
 _GOOGLE_AUTH_URI = "https://accounts.google.com/o/oauth2/auth"
@@ -40,7 +41,7 @@ def get_http_auth():
       http instance authorized with the credentials
   """
   if 'credentials' not in flask.session:
-    raise GdriveUnauthorized('Unable to get valid credentials')
+    raise GdriveUnauthorized(errors.GDRIVE_UNAUTHORIZED)
   try:
     credentials = client.OAuth2Credentials.from_json(
         flask.session['credentials'])
@@ -48,7 +49,7 @@ def get_http_auth():
   except Exception as ex:
     logger.exception(ex.message)
     del flask.session['credentials']
-    raise GdriveUnauthorized('Unable to get valid credentials.')
+    raise GdriveUnauthorized(errors.GDRIVE_UNAUTHORIZED)
   flask.session['credentials'] = credentials.to_json()
   return http_auth
 
@@ -56,8 +57,7 @@ def get_http_auth():
 def handle_token_error(message=''):
   """Helper method to clean credentials"""
   del flask.session['credentials']
-  raise GdriveUnauthorized('Unable to get valid'
-                           ' credentials. {}'.format(message))
+  raise GdriveUnauthorized("%s %s" % (errors.GDRIVE_UNAUTHORIZED, message))
 
 
 def is_gdrive_authorized():
@@ -87,10 +87,10 @@ def auth_gdrive():
 def authorize_app():
   """Second step of the OAuth2"""
   if 'code' not in flask.request.args:
-    raise Unauthorized('Broken OAuth2 flow, go to /auth_gdrive first')
+    raise Unauthorized(errors.BROKEN_OAUTH_FLOW)
   # Cross Site Request Forgery (XSRF) guard.
   if flask.request.args['state'] != flask.session['state']:
-    raise Unauthorized('Wrong state.')
+    raise Unauthorized(errors.WRONG_FLASK_STATE)
 
   flow = init_flow()
   auth_code = flask.request.args['code']
@@ -98,7 +98,7 @@ def authorize_app():
     credentials = flow.step2_exchange(auth_code)
   except FlowExchangeError as ex:
     logger.exception(ex.message)
-    raise Unauthorized('Unable to get token. {}'.format(ex.message))
+    raise Unauthorized(errors.UNABLE_GET_TOKEN.format(ex.message))
 
   flask.session['credentials'] = credentials.to_json()
   return render_template('gdrive/auth_gdrive.haml')

@@ -54,7 +54,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "1.22.0-Strawberry" + BUILD_NUMBER
+VERSION = "1.23.0-Strawberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -106,6 +106,15 @@ EMAIL_DIGEST = JINJA2.get_template("notifications/email_digest.html")
 EMAIL_DAILY = JINJA2.get_template("notifications/view_daily_digest.html")
 EMAIL_PENDING = JINJA2.get_template("notifications/view_pending_digest.html")
 EMAIL_IMPORT_EXPORT = JINJA2.get_template("notifications/import_export.html")
+EMAIL_BULK_SYNC_SUCCEEDED = JINJA2.get_template(
+    "notifications/bulk_sync_succeded.html"
+)
+EMAIL_BULK_SYNC_FAILED = JINJA2.get_template(
+    "notifications/bulk_sync_failed.html"
+)
+EMAIL_BULK_SYNC_EXCEPTION = JINJA2.get_template(
+    "notifications/bulk_sync_exception.html"
+)
 
 USE_APP_ENGINE_ASSETS_SUBDOMAIN = False
 

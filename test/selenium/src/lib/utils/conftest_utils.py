@@ -20,14 +20,6 @@ def get_lhn_accordion(driver, object_name):
   return getattr(lhn_menu, constants.method.SELECT_PREFIX + object_name)()
 
 
-def create_obj_via_lhn(driver, object_name):
-  """Create object via LHN."""
-  modal = get_lhn_accordion(driver, object_name).create_new()
-  factory.get_cls_test_utils(object_name).enter_test_data(modal)
-  modal.save_and_close()
-  return factory.get_cls_widget(object_name, is_info=True)(driver)
-
-
 def delete_obj_via_info_widget(driver, object_name):
   """Delete object via Info Widget."""
   (factory.get_cls_widget(object_name, is_info=True)(driver)

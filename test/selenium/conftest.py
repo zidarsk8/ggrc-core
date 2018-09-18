@@ -222,30 +222,6 @@ def header_dashboard(selenium):
 
 
 @pytest.fixture(scope="function")
-def new_program_ui(selenium, request):
-  """Create new Program object via UI (LHN).
-  Return: (Program modal, Program Info widget).
-  """
-  yield _common_fixtures(request.fixturename)
-
-
-@pytest.fixture(scope="function")
-def new_org_group_ui(selenium, request):
-  """Create new Org Group object via UI (LHN).
-  Return: lib.page.widget.OrgGroupInfo
-  """
-  yield _common_fixtures(request.fixturename)
-
-
-@pytest.fixture(scope="function")
-def new_risk_ui(selenium, request):
-  """Create new Risk Group object via UI (LHN).
-  Return: lib.page.widget.Risks
-  """
-  yield _common_fixtures(request.fixturename)
-
-
-@pytest.fixture(scope="function")
 def new_program_rest(request):
   """Create new Program object via REST API.
   Return: lib.entities.entity.ProgramEntity

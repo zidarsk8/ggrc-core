@@ -196,8 +196,9 @@ describe('Cacheable model', function () {
       let st = 3; // preload Date.now() because it's called once before we even get to modelizing
       spyOn(Date, 'now').and.callFake(function () {
         // Date.now() is called once per item.
-        if ((++st % 5) === 0)
+        if ((++st % 5) === 0) {
           st += 100; // after three, push the time ahead 100ms to force a new call to modelizeMS
+        }
         return st;
       });
       // return model instances for the list of returned items from the server
@@ -206,7 +207,7 @@ describe('Cacheable model', function () {
       //  models calls new DummyModel.List() which we're already spying out,
       //  so spy models() out in order to *not* call it.
       spyOn(DummyModel, 'models').and.callFake(function (items) {
-        let ids = can.map(items, function (item) { return item.id; });
+        let ids = can.map(items, function (item) {return item.id;});
         return can.map(dummy_insts, function (inst) {
           return ~can.inArray(inst.id, ids) ? inst : undefined;
         });
