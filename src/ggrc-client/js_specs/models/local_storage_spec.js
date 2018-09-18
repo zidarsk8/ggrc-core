@@ -72,7 +72,6 @@ describe('LocalStorage model', function () {
       });
       expect(success).toBe(true);
     });
-
   });
 
   describe('::findOne', function () {
@@ -114,13 +113,15 @@ describe('LocalStorage model', function () {
 
         let ids = JSON.parse(window.localStorage.getItem('spec_model:ids'));
         expect(ids.length).toEqual(1);
-        expect(window.localStorage.getItem('spec_model:' + ids[0])).toBeDefined();
+        expect(window.localStorage.getItem('spec_model:' + ids[0]))
+          .toBeDefined();
         success = true;
       });
       expect(success).toBe(true);
     });
 
-    it('creates a model with an appropriate ID when the array of IDs is empty', function () {
+    it('creates a model with an appropriate ID when the array of IDs ' +
+       'is empty', function () {
       let success = false;
       window.localStorage.setItem('spec_model:ids', '[]');
       new SpecModel({foo: model1.foo}).save().done(function (item) {
@@ -129,13 +130,13 @@ describe('LocalStorage model', function () {
 
         let ids = JSON.parse(window.localStorage.getItem('spec_model:ids'));
         expect(ids.length).toEqual(1);
-        expect(window.localStorage.getItem('spec_model:' + ids[0])).toBeDefined();
+        expect(window.localStorage.getItem('spec_model:' + ids[0]))
+          .toBeDefined();
         success = true;
       });
       window.localStorage.removeItem('spec_model:-Infinity'); // the problem key
       expect(success).toBe(true);
     });
-
   });
 
   describe('::update', function () {
@@ -145,7 +146,8 @@ describe('LocalStorage model', function () {
       let m = new SpecModel(model1);
       m.attr('quux', 'thud').save().done(function (item) {
         expect(item instanceof SpecModel).toBeTruthy();
-        expect(JSON.parse(window.localStorage.getItem('spec_model:1'))).toEqual(can.extend({quux: 'thud'}, model1));
+        expect(JSON.parse(window.localStorage.getItem('spec_model:1')))
+          .toEqual(can.extend({quux: 'thud'}, model1));
         success = true;
       });
       expect(success).toBe(true);
@@ -170,7 +172,8 @@ describe('LocalStorage model', function () {
       let success = false;
       new SpecModel(model1).destroy().done(function (item) {
         expect(item.serialize()).toEqual(model1);
-        expect(JSON.parse(window.localStorage.getItem('spec_model:1'))).toBeNull();
+        expect(JSON.parse(window.localStorage.getItem('spec_model:1')))
+          .toBeNull();
         let ids = JSON.parse(window.localStorage.getItem('spec_model:ids'));
         expect(ids.length).toBe(1);
         expect(ids[0]).not.toEqual(item.id);
@@ -189,7 +192,5 @@ describe('LocalStorage model', function () {
         return failure;
       }, done);
     });
-
   });
-
 });

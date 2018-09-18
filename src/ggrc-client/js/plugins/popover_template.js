@@ -87,7 +87,7 @@
   $.fn.popover_template = Plugin;
   $.fn.popover_template.Constructor = Popover;
 
-  $('body').on('mouseover.popover-template', '.popover-template', function (evnt) {
+  $('body').on('mouseover.popover-template', '.popover-template', (evnt) => {
     $(evnt.currentTarget).popover_template();
   });
 })(window, jQuery, GGRC);

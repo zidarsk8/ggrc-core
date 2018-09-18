@@ -12,12 +12,12 @@ import CustomAttributeObject from '../../js/plugins/utils/custom-attribute/custo
 import * as pendingJoins from '../../js/models/pending-joins';
 import Mixin from '../../js/models/mixins/mixin';
 
-describe('Cacheable model', function () {
+describe('Cacheable model', () => {
   let origGcaDefs;
   let DummyModel;
   let dummyable;
 
-  beforeEach(function () {
+  beforeEach(() => {
     origGcaDefs = GGRC.custom_attr_defs;
     dummyable = Mixin({}, {});
     spyOn(dummyable, 'add_to');
@@ -40,12 +40,12 @@ describe('Cacheable model', function () {
     });
   });
 
-  afterEach(function () {
+  afterEach(() => {
     GGRC.custom_attr_defs = origGcaDefs;
   });
 
-  describe('::setup', function () {
-    it('prefers pre-set static names over root object & collection', function () {
+  describe('::setup', () => {
+    it('prefers pre-set static names over root object & collection', () => {
       let Model = Cacheable.extend({
         root_object: 'wrong_name',
         root_collection: 'wrong_names',
@@ -69,7 +69,8 @@ describe('Cacheable model', function () {
       expect(Model.title_plural).toBe('Right Names');
     });
 
-    it('sets various forms of the name based on root object & collection by default', function () {
+    it('sets various forms of the name based on root object & ' +
+       'collection by default', () => {
       // note that these are not explicit in beforeAll above.
       // model singular is CamelCased form of root_object
       expect(DummyModel.model_singular).toBe('DummyModel');
@@ -83,18 +84,19 @@ describe('Cacheable model', function () {
       expect(DummyModel.title_plural).toBe('Dummy Models');
     });
 
-    it('sets findAll to default based on root_collection if not set', function () {
+    it('sets findAll to default based on root_collection if not set', () => {
       spyOn(can.Model, 'setup');
       let DummyFind = Cacheable.extend({root_collection: 'foos'}, {});
       expect(DummyFind.findAll).toBe('GET /api/foos');
     });
 
-    it('applies mixins based on the mixins property', function () {
+    it('applies mixins based on the mixins property', () => {
       expect(dummyable.add_to)
         .toHaveBeenCalledWith(DummyModel);
     });
 
-    it('merges in default attributes for created_at and updated_at', function () {
+    it('merges in default attributes for created_at and ' +
+       'updated_at', () => {
       expect(DummyModel.attributes).toEqual({
         created_at: 'datetime',
         updated_at: 'datetime',
@@ -103,8 +105,8 @@ describe('Cacheable model', function () {
     });
   });
 
-  describe('::init', function () {
-    it('sets custom attributes', function () {
+  describe('::init', () => {
+    it('sets custom attributes', () => {
       // NB using $.extend here creates a new object with all of the static properties of the function.
       //  This is how the custom attributable is implemented in setup.
       expect(GGRC.custom_attributable_types)
@@ -112,7 +114,7 @@ describe('Cacheable model', function () {
     });
   });
 
-  describe('::update', function () {
+  describe('::update', () => {
     let _obj;
 
     beforeEach(function (done) {
@@ -125,7 +127,7 @@ describe('Cacheable model', function () {
       let obj = _obj;
       spyOn(DummyModel, 'process_args');
       spyOn(can, 'ajax').and.returnValue($.when({}));
-      DummyModel.update(obj.id, obj).then(function () {
+      DummyModel.update(obj.id, obj).then(() => {
         expect(DummyModel.process_args).toHaveBeenCalledWith(obj);
         done();
       });
@@ -139,7 +141,7 @@ describe('Cacheable model', function () {
       spyOn(can, 'ajax').and.returnValue($.when({dummy_model: {id: obj.id}}));
       DummyModel
         .update(obj.id, obj.serialize())
-        .then(function () {
+        .then(() => {
           expect(pendingJoins.resolveDeferredBindings)
             .toHaveBeenCalledWith(obj);
           setTimeout(done, 10);
@@ -147,8 +149,9 @@ describe('Cacheable model', function () {
     });
   });
 
-  describe('::findAll', function () {
-    it('throws errors when called directly on Cacheable instead of a subclass', function () {
+  describe('::findAll', () => {
+    it('throws errors when called directly on Cacheable ' +
+       'instead of a subclass', () => {
       expect(Cacheable.findAll)
         .toThrow(
           new Error('No default findAll() exists for subclasses of Cacheable')
@@ -156,7 +159,11 @@ describe('Cacheable model', function () {
     });
 
     it('unboxes collections when passed back from the find', function (done) {
-      spyOn(can, 'ajax').and.returnValue($.when({dummy_models_collection: {dummy_models: [{id: 1}]}}));
+      spyOn(can, 'ajax').and.returnValue($.when({
+        dummy_models_collection: {
+          dummy_models: [{id: 1}],
+        },
+      }));
       DummyModel.findAll().then(function (data) {
         expect(can.ajax).toHaveBeenCalled();
         expect(data).toEqual(jasmine.any(can.List));
@@ -167,7 +174,8 @@ describe('Cacheable model', function () {
       }, failAll(done));
     });
 
-    it('makes a collection of a single object when passed back from the find', function (done) {
+    it('makes a collection of a single object when passed back ' +
+       'from the find', function (done) {
       spyOn(can, 'ajax').and.returnValue($.when({id: 1}));
       DummyModel.findAll().then(function (data) {
         expect(can.ajax).toHaveBeenCalled();
@@ -183,7 +191,8 @@ describe('Cacheable model', function () {
     //  things like timing, and it's a bit of a hack to spy on Date.now()
     //  since that function is used in more places than just our modelize function.
     //  -- BM 2015-02-03
-    it('only pushes instances into the list for 100ms before yielding', function (done) {
+    it('only pushes instances into the list for 100ms ' +
+       'before yielding', function (done) {
       let list = new DummyModel.List();
       let dummy_models = [
         {id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}, {id: 7},
@@ -194,7 +203,7 @@ describe('Cacheable model', function () {
       spyOn(list, 'push').and.callThrough();
       spyOn(can, 'ajax').and.returnValue($.when(dummy_models));
       let st = 3; // preload Date.now() because it's called once before we even get to modelizing
-      spyOn(Date, 'now').and.callFake(function () {
+      spyOn(Date, 'now').and.callFake(() => {
         // Date.now() is called once per item.
         if ((++st % 5) === 0) {
           st += 100; // after three, push the time ahead 100ms to force a new call to modelizeMS
@@ -212,7 +221,7 @@ describe('Cacheable model', function () {
           return ~can.inArray(inst.id, ids) ? inst : undefined;
         });
       });
-      DummyModel.findAll().then(function () {
+      DummyModel.findAll().then(() => {
         // finally, we show that with the 100ms gap between pushing ids 3 and 4, we force a separate push.
         expect(list.push).toHaveBeenCalledWith(
           jasmine.objectContaining({id: 1}),
@@ -232,8 +241,9 @@ describe('Cacheable model', function () {
     });
   });
 
-  describe('::findPage', function () {
-    it('throws errors when called directly on Cacheable instead of a subclass', function () {
+  describe('::findPage', () => {
+    it('throws errors when called directly on Cacheable instead of a ' +
+       'subclass', () => {
       expect(Cacheable.findPage)
         .toThrow(
           new Error('No default findPage() exists for subclasses of Cacheable')
@@ -241,19 +251,20 @@ describe('Cacheable model', function () {
     });
   });
 
-  describe('#refresh', function () {
+  describe('#refresh', () => {
     let inst;
-    beforeEach(function () {
+    beforeEach(() => {
       inst = new DummyModel({href: '/api/dummy_models/1'});
       spyOn(can, 'ajax').and.returnValue(new $.Deferred(function (dfd) {
-        setTimeout(function () {
+        setTimeout(() => {
           dfd.resolve(inst.serialize());
         }, 10);
       }));
     });
 
-    it('calls the object endpoint with the supplied href if no selfLink', function (done) {
-      inst.refresh().then(function () {
+    it('calls the object endpoint with the supplied href if no ' +
+       'selfLink', function (done) {
+      inst.refresh().then(() => {
         expect(can.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
           url: '/api/dummy_models/1',
           type: 'get',
@@ -265,21 +276,22 @@ describe('Cacheable model', function () {
     it('throttles the requests to once per second', function (done) {
       inst.refresh();
       inst.refresh();
-      setTimeout(function () {
-        inst.refresh().then(function () {
+      setTimeout(() => {
+        inst.refresh().then(() => {
           expect(can.ajax.calls.count()).toBe(2);
           done();
         }, fail);
       }, 1000); // 1000ms is enough to trigger a new call to the debounced function
-      inst.refresh().then(function () {
+      inst.refresh().then(() => {
         expect(can.ajax.calls.count()).toBe(1);
       }, fail);
     });
 
-    it('backs up the refreshed state immediately after refreshing', function (done) {
+    it('backs up the refreshed state immediately after ' +
+       'refreshing', function (done) {
       spyOn(DummyModel, 'model').and.returnValue(inst);
       spyOn(inst, 'backup');
-      inst.refresh().then(function () {
+      inst.refresh().then(() => {
         expect(inst.backup).toHaveBeenCalled();
         done();
       }, fail);
@@ -289,22 +301,22 @@ describe('Cacheable model', function () {
   describe('::customAttr', () => {
     let instance;
 
-    beforeEach(function () {
+    beforeEach(() => {
       instance = new DummyModel();
     });
 
     describe('when the instance is not custom attributable', () => {
-      beforeEach(function () {
+      beforeEach(() => {
         spyOn(instance, 'isCustomAttributable').and.returnValue(false);
       });
 
-      it('throws Error', function () {
+      it('throws Error', () => {
         expect(instance.customAttr.bind(instance)).toThrow();
       });
     });
 
     describe('when count of arguments is 0', () => {
-      it('returns all custom attriubtes', function () {
+      it('returns all custom attriubtes', () => {
         const customAttrs = new can.List([]);
         let result;
         spyOn(instance, '_getAllCustomAttr').and.returnValue(customAttrs);
@@ -314,7 +326,7 @@ describe('Cacheable model', function () {
     });
 
     describe('when count of arguments is 1', () => {
-      it('returns certain custom attribute object by ca id', function () {
+      it('returns certain custom attribute object by ca id', () => {
         const caId = 12345;
         const caObject = new CustomAttributeObject(
           new can.Map(),
@@ -330,7 +342,7 @@ describe('Cacheable model', function () {
     });
 
     describe('when count of arguments is 2', () => {
-      it('sets value for caObject which has certain ca id', function () {
+      it('sets value for caObject which has certain ca id', () => {
         const caId = 12345;
         const value = 'Value 1';
         const setCA = spyOn(instance, '_setCustomAttr');
@@ -341,7 +353,7 @@ describe('Cacheable model', function () {
   });
 
   describe('::_getAllCustomAttr', () => {
-    it('returns all custom attributes', function () {
+    it('returns all custom attributes', () => {
       const caDefs = [{id: 1}, {id: 2}, {id: 3}];
       const instance = new DummyModel({
         custom_attribute_definitions: caDefs,
@@ -355,7 +367,7 @@ describe('Cacheable model', function () {
 
   describe('::_getCustomAttr', () => {
     it('returns certain custom attribute object by custom attribute id',
-      function () {
+      () => {
         const caId = 2;
         const caDefs = [{id: 1}, {id: caId}, {id: 3}];
         const instance = new DummyModel({
@@ -367,7 +379,7 @@ describe('Cacheable model', function () {
   });
 
   describe('::_setCustomAttr', () => {
-    it('writes some value for certain caObject', function () {
+    it('writes some value for certain caObject', () => {
       const caId = 2;
       const expectedValue = 'Some value';
       const caDefs = [
@@ -386,7 +398,7 @@ describe('Cacheable model', function () {
       expect(instance.customAttr(caId).value).toBe(expectedValue);
     });
 
-    it('converts string ca id to number', function () {
+    it('converts string ca id to number', () => {
       const caId = '2';
       const expectedValue = 'Some value';
       const caDefs = [
@@ -411,16 +423,16 @@ describe('Cacheable model', function () {
   describe('::isCustomAttributable', () => {
     let instance;
 
-    beforeEach(function () {
+    beforeEach(() => {
       instance = new DummyModel();
     });
 
-    it('returns true if the instance is custom attributable', function () {
+    it('returns true if the instance is custom attributable', () => {
       const result = instance.isCustomAttributable();
       expect(result).toBe(true);
     });
 
-    it('returns false if the instance is not custom attributable', function () {
+    it('returns false if the instance is not custom attributable', () => {
       let result;
       instance.constructor.is_custom_attributable = false;
       result = instance.isCustomAttributable();
@@ -431,7 +443,7 @@ describe('Cacheable model', function () {
   describe('::updateCaObjects', () => {
     let instance;
 
-    beforeEach(function () {
+    beforeEach(() => {
       instance = new DummyModel();
     });
 
@@ -439,13 +451,13 @@ describe('Cacheable model', function () {
     'attributable', () => {
       let caValues;
 
-      beforeEach(function () {
+      beforeEach(() => {
         caValues = [];
         spyOn(instance, 'isCustomAttributable').and.returnValue(true);
         instance.init();
       });
 
-      it('updates ca objects with appropriate ca values', function () {
+      it('updates ca objects with appropriate ca values', () => {
         const update = spyOn(instance._customAttributeAccess,
           'updateCaObjects');
         instance.updateCaObjects(caValues);

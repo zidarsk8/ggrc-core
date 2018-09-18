@@ -15,9 +15,11 @@ export default can.Component.extend({
     timeout: '@',
     notifyText: 'Link has been copied to your clipboard.',
   },
-  template: ['<a data-clipboard-text="{{text}}" {{#isActive}}class="active"{{/isActive}} href="#">',
-    '<i class="fa fa-link"></i> {{title}}',
-    '</a>'].join(''),
+  template:
+    `<a data-clipboard-text="{{text}}"
+        {{#isActive}}class="active"{{/isActive}} href="#">
+      <i class="fa fa-link"></i> {{title}}
+    </a>`,
   events: {
     'a click': function (el, evnt) {
       evnt.preventDefault();
@@ -28,7 +30,8 @@ export default can.Component.extend({
 
       this._clip.on('success', function () {
         if (this.viewModel.attr('notify')) {
-          $('body').trigger('ajax:flash', {success: this.viewModel.attr('notifyText')});
+          $('body').trigger('ajax:flash', {
+            success: this.viewModel.attr('notifyText')});
         }
         this.viewModel.attr('isActive', true);
         setTimeout(function () {
