@@ -217,10 +217,12 @@ def remove_deprecated_roles(role_names):
           )
       )
   )
-  ACR_TABLE.delete().where(
-      sa.and_(
-          ACR_TABLE.c.name.in_(role_names),
-          ACR_TABLE.c.internal == 1,
+  op.execute(
+      ACR_TABLE.delete().where(
+          sa.and_(
+              ACR_TABLE.c.name.in_(role_names),
+              ACR_TABLE.c.internal == 1,
+          )
       )
   )
 

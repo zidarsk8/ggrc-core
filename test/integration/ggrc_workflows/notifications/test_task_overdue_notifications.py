@@ -22,6 +22,7 @@ from ggrc.notifications import common
 from ggrc_workflows.models import CycleTaskGroupObjectTask, Workflow
 
 from integration.ggrc import TestCase
+
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.access_control import acl_helper
 from integration.ggrc.api_helper import Api
@@ -220,6 +221,7 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
       # state, and the overdue notification should disappear.
 
       self.wf_generator.modify_object(task1, {"status": final_state})
+      common.generate_cycle_tasks_notifs(date.today())
       _, notif_data = common.get_daily_notifications()
       user_notifs = notif_data.get(user_email, {})
       self.assertNotIn("task_overdue", user_notifs)

@@ -55,8 +55,7 @@ import * as businessModels from '../models/business-models/index';
         technology_environment: businessModels.TechnologyEnvironment,
         threat: businessModels.Threat,
         risk: businessModels.Risk,
-        vulnerability: businessModels.Vulnerability,
-        template: businessModels.Template,
+        workflow: businessModels.Workflow,
       };
     },
     init_widgets: function () {

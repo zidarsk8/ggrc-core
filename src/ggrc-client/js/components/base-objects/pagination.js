@@ -27,7 +27,7 @@ export default can.Map.extend({
       type: 'number',
       value: 5,
       set: function (newValue) {
-        if (!this.attr('disabled') && newValue != this.pageSize) {
+        if (!this.attr('disabled') && newValue !== this.pageSize) {
           this.attr('current', 1);
           return newValue;
         }

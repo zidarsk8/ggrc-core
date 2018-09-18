@@ -20,7 +20,7 @@ export default can.Component.extend({
       let that = this;
       let $el = $(el);
       import(/* webpackChunkName: "mapper" */ '../../controllers/mapper/mapper')
-        .then(mapper => {
+        .then((mapper) => {
           mapper.AssessmentTemplateClone.launch($el, {
             object: that.attr('parentType'),
             type: that.attr('objectType'),

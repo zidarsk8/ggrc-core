@@ -194,7 +194,6 @@ dashboard-js-template-files:
   - cycle_task_group_object_tasks/tree-item-attr.mustache
   - cycle_task_group_object_tasks/modal_content.mustache
   - cycle_task_group_object_tasks/tree_add_item.mustache
-  - dashboard/widgets.mustache
   - dashboard/object_nav_actions.mustache
   - dashboard/info/workflow_progress.mustache
   - task_groups/info.mustache

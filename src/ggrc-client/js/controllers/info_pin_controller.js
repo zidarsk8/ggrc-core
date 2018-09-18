@@ -27,9 +27,7 @@ import '../components/unarchive_link';
 import '../components/sort/sort-by';
 import * as TreeViewUtils from '../plugins/utils/tree-view-utils';
 import {confirm} from '../plugins/utils/modals';
-import {
-  getInstanceView
-} from '../plugins/utils/object-history-utils';
+import {getInstanceView} from '../plugins/utils/object-history-utils';
 import {getPageInstance} from '../plugins/utils/current-page-utils';
 
 export const pinContentHiddenClass = 'pin-content--hidden';
@@ -39,8 +37,8 @@ export const pinContentMinimizedClass = 'pin-content--minimized';
 export default can.Control({
   pluginName: 'cms_controllers_info_pin',
   defaults: {
-    view: GGRC.mustache_path + '/base_objects/info.mustache'
-  }
+    view: GGRC.mustache_path + '/base_objects/info.mustache',
+  },
 }, {
   init: function (el, options) {
     this.unsetInstance();
@@ -91,7 +89,7 @@ export default can.Control({
           },
           onClose: function () {
             return self.close.bind(self);
-          }
+          },
         }));
       });
   },
@@ -141,8 +139,7 @@ export default can.Control({
 
     if (maximizedState) {
       this.element.addClass(pinContentMaximizedClass);
-    }
-    else {
+    } else {
       this.element.addClass(pinContentMinimizedClass);
     }
   },
@@ -151,7 +148,7 @@ export default can.Control({
 
     vm.attr('instance', instance);
     vm.attr('instance').dispatch({
-      type: 'update'
+      type: 'update',
     });
   },
   setLoadingIndicator: function (selector, isLoading) {
@@ -168,7 +165,7 @@ export default can.Control({
       modal_description: renderer(instance).textContent,
       modal_confirm: modalDetails.button,
       modal_title: modalDetails.title,
-      button_view: GGRC.mustache_path + '/quick_form/confirm_buttons.mustache'
+      button_view: GGRC.mustache_path + '/quick_form/confirm_buttons.mustache',
     }, confirmDfd.resolve);
     return confirmDfd;
   },
@@ -254,7 +251,6 @@ export default can.Control({
         // hide menu when scrolling down
         let dropdownMenu = header.find('.details-wrap');
         dropdownMenu.removeClass('open');
-
       } else if (scrollTop < prevScrollTop) {
         // scroll top
         header.removeClass('pane-header_hidden');
