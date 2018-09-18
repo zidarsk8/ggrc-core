@@ -19,7 +19,7 @@ from ggrc.migrations.utils import acr_propagation_constants_workflows as const
 
 # revision identifiers, used by Alembic.
 revision = 'c3ef0656a527'
-down_revision = 'b2cdde0ea7b5'
+down_revision = 'eabcf439ab5d'
 
 
 def upgrade():
