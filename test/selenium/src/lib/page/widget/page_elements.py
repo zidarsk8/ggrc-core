@@ -33,18 +33,6 @@ class InlineEdit(object):
     time.sleep(1)
 
 
-class DescriptionField(object):
-  """Represents description field on info widget."""
-
-  def __init__(self, container):
-    self._root = container.h6(xpath=".//*[.='Description']").parent()
-
-  @property
-  def text(self):
-    """Returns text of description."""
-    return self._root.element(class_name="read-more").text
-
-
 class AssessmentFormField(object):
   """Represents form field on Assessment info widget."""
 
@@ -56,6 +44,33 @@ class AssessmentFormField(object):
   def text(self):
     """Returns text of description."""
     return self._root.element(class_name="inline__content").text
+
+
+class InfoPaneFormField(object):
+  """Represents info pane form field."""
+
+  def __init__(self, container, label):
+    self._root = container.element(
+        class_name="info-pane__section-title", text=label).parent()
+
+  @property
+  def text(self):
+    """Returns text of description."""
+    return self._root.span().text
+
+
+class SimpleField(object):
+  """Represents a simple field
+  (with h6 header and a text within the same element).
+  """
+
+  def __init__(self, container, label):
+    self._label_text = label
+    self._root = container.h6(text=label).parent()
+
+  @property
+  def text(self):
+    return self._root.text[len(self._label_text):].strip()
 
 
 class RelatedPeopleList(object):

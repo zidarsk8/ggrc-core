@@ -15,7 +15,7 @@ from pytest_selenium import pytest_selenium as pt_selenium
 from selenium.webdriver.remote.remote_connection import (
     LOGGER as SELENIUM_LOGGER)
 
-from lib import dynamic_fixtures, environment, url, users
+from lib import dynamic_fixtures, environment, url, users, browsers
 from lib.constants import element
 from lib.constants.test_runner import DESTRUCTIVE_TEST_METHOD_PREFIX
 from lib.custom_pytest_scheduling import CustomPytestScheduling
@@ -126,6 +126,7 @@ def selenium(selenium, pytestconfig):
     selenium.set_window_size(
         os.environ["SCREEN_WIDTH"], os.environ["SCREEN_HEIGHT"])
   dynamic_fixtures.dict_executed_fixtures.update({"selenium": selenium})
+  browsers.set_driver(selenium)
   yield selenium
 
 
@@ -175,11 +176,14 @@ def set_superuser_as_current_user():
 
 
 @pytest.fixture(autouse=True)
-def reset_state():
+def reset_state(request):
   """Reset caches of logged in users and requests sessions.
   Cache with logged in users is used to check if user has already logged in.
   Cache with sessions is used to reuse REST sessions between requests.
   """
+  if "selenium" not in request.fixturenames:
+    # Reset driver for non-browser tests.
+    browsers.set_driver(None)
   users.reset_logged_in_users()
   session_pool.reset_sessions()
 
@@ -209,7 +213,7 @@ def _snapshots_fixtures(fixturename):
 def my_work_dashboard(selenium):
   """Open My Work Dashboard URL and
   return My Work Dashboard page objects model."""
-  selenium_utils.open_url(selenium, url.Urls().dashboard)
+  selenium_utils.open_url(url.Urls().dashboard)
   return dashboard.Dashboard(selenium)
 
 
@@ -217,7 +221,7 @@ def my_work_dashboard(selenium):
 def header_dashboard(selenium):
   """Open My Work Dashboard URL and
   return Header Dashboard page objects model."""
-  selenium_utils.open_url(selenium, url.Urls().dashboard)
+  selenium_utils.open_url(url.Urls().dashboard)
   return dashboard.Header(selenium)
 
 

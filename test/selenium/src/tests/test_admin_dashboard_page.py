@@ -29,7 +29,7 @@ class TestAdminDashboardPage(base.Test):
   def admin_dashboard(self, selenium):
     """Open Admin Dashboard URL and
     return AdminDashboard page objects model."""
-    selenium_utils.open_url(selenium, url.Urls().admin_dashboard)
+    selenium_utils.open_url(url.Urls().admin_dashboard)
     return dashboard.AdminDashboard(selenium)
 
   @pytest.mark.smoke_tests

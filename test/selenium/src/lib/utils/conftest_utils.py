@@ -11,7 +11,7 @@ from lib.utils import selenium_utils
 
 def get_lhn_accordion(driver, object_name):
   """Select relevant section in LHN and return relevant section accordion."""
-  selenium_utils.open_url(driver, url.Urls().dashboard)
+  selenium_utils.open_url(url.Urls().dashboard)
   lhn_menu = dashboard.Header(driver).open_lhn_menu()
   # if object button not visible, open this section first
   if object_name in cache.LHN_SECTION_MEMBERS:

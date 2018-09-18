@@ -120,7 +120,7 @@ class BaseWebUiService(object):
     """
     generic_widget_url = self.url_mapped_objs.format(src_obj_url=src_obj.url)
     # todo fix freezing when navigate through tabs by URLs and using driver.get
-    selenium_utils.open_url(self.driver, generic_widget_url, is_via_js=True)
+    selenium_utils.open_url(generic_widget_url, is_via_js=True)
     return self.generic_widget_cls(self.driver, self.obj_name)
 
   def open_info_page_of_obj(self, obj):
@@ -129,7 +129,7 @@ class BaseWebUiService(object):
     """
     info_page_url = self.url_obj_info_page.format(
         obj_url=obj.url)
-    selenium_utils.open_url(self.driver, info_page_url)
+    selenium_utils.open_url(info_page_url)
     return self.info_widget_cls(self.driver)
 
   def open_info_panel_of_obj_by_title(self, src_obj, obj):

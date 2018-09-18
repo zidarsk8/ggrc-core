@@ -57,7 +57,7 @@ def assert_can_view(selenium, obj):
 
 def assert_cannot_view(selenium, obj):
   """Assert that current user cannot view object via UI"""
-  selenium_utils.open_url(selenium, obj.url)
+  selenium_utils.open_url(obj.url)
   assert is_error_403(selenium)
 
 
@@ -82,7 +82,7 @@ def assert_can_delete(selenium, obj, can_delete):
   assert info_page.info_3bbs_btn.exists == can_delete
   if can_delete:
     info_page.open_info_3bbs().select_delete().confirm_delete()
-    selenium_utils.open_url(selenium, obj.url)
+    selenium_utils.open_url(obj.url)
     assert is_error_404(selenium)
 
 

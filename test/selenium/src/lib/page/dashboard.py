@@ -134,8 +134,13 @@ class Dashboard(widget_bar.Dashboard, Header):
   """Main dashboard page."""
   # pylint: disable=abstract-method
 
-  def __init__(self, driver):
+  def __init__(self, driver=None):
     super(Dashboard, self).__init__(driver)
+
+  def start_workflow(self):
+    """Clicks "Start new Workflow" button."""
+    self._browser.element(class_name="get-started__list__item",
+                          text="Start new Workflow").click()
 
 
 class AdminDashboard(widget_bar.AdminDashboard, GenericHeader):
