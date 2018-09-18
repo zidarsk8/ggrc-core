@@ -102,24 +102,24 @@ describe('advanced-search-filter-attribute component', function () {
 
     it(`sets attribute.value to "empty" if new attribute.operator
     value is "is"`,
-      function () {
-        viewModel.attr('attribute.value', 'value');
+    function () {
+      viewModel.attr('attribute.value', 'value');
 
-        handler.call(that, viewModel.attribute, {}, 'is');
+      handler.call(that, viewModel.attribute, {}, 'is');
 
-        let result = viewModel.attr('attribute.value');
-        expect(result).toEqual('empty');
-      });
+      let result = viewModel.attr('attribute.value');
+      expect(result).toEqual('empty');
+    });
 
     it(`sets attribute.value to empty string if previous attribute.operator
     value was "is"`,
-      function () {
-        viewModel.attr('attribute.value', 'value');
+    function () {
+      viewModel.attr('attribute.value', 'value');
 
-        handler.call(that, viewModel.attribute, {}, 'val', 'is');
+      handler.call(that, viewModel.attribute, {}, 'val', 'is');
 
-        let result = viewModel.attr('attribute.value');
-        expect(result).toEqual('');
-      });
+      let result = viewModel.attr('attribute.value');
+      expect(result).toEqual('');
+    });
   });
 });

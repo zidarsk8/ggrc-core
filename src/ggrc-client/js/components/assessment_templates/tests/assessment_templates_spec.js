@@ -57,14 +57,14 @@ describe('assessment-templates component', () => {
 
     it(`leaves the current template unchanged if only a dummy value in
       the templates list`,
-      () => {
-        viewModel.attr('assessmentTemplate', 'template-123');
-        templates.splice(1); // keep only the 1st (dummy) option
+    () => {
+      viewModel.attr('assessmentTemplate', 'template-123');
+      templates.splice(1); // keep only the 1st (dummy) option
 
-        viewModel._selectInitialTemplate(templates);
+      viewModel._selectInitialTemplate(templates);
 
-        expect(viewModel.attr('assessmentTemplate')).toEqual('template-123');
-      });
+      expect(viewModel.attr('assessmentTemplate')).toEqual('template-123');
+    });
 
     it('leaves the current template unchanged if first object group empty',
       () => {
