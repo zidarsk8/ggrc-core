@@ -8,7 +8,7 @@
     <div class="tier-content">
       {{>'/static/mustache/base_objects/general-page-header.mustache'}}
 
-      <tab-container>
+      <tab-container {instance}="instance">
         <tab-panel {(panels)}="panels" title-text="Attributes">
           <div class="info-pane__body">
             <div class="info-pane__main-content {{^if isSnapshot}}info-pane__main-content-with-sidebar{{/if}}">
