@@ -7,6 +7,7 @@ import Component from '../tree-item-actions';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Permission from '../../../permission';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
+import Mapper from '../../../models/mappers/mappings';
 
 describe('tree-item-actions component', function () {
   let viewModel;
@@ -46,8 +47,9 @@ describe('tree-item-actions component', function () {
         });
       });
 
-      it('if instance type is in forbiddenMapList', () => {
+      it('if there is no objects to map to instance type', () => {
         spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+        spyOn(Mapper, 'getMappingList').and.returnValue([]);
         viewModel.attr('instance.type', 'Workflow');
 
         let result = viewModel.attr('isAllowedToMap');
@@ -81,9 +83,10 @@ describe('tree-item-actions component', function () {
         });
       });
 
-      it('if instance type is not in forbiddenMapList and ' +
-        'has permissions to update instance', () => {
+      it('if there are objects to map to instance type and ' +
+        'user has permissions to update instance', () => {
         spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+        spyOn(Mapper, 'getMappingList').and.returnValue(['Object1']);
         viewModel.attr('instance.type', 'Type');
 
         let result = viewModel.attr('isAllowedToMap');
