@@ -204,3 +204,25 @@ def get_ac_roles_for(object_type):
     for role in query:
       flask.g.global_ac_roles[role.object_type][role.name] = role
   return flask.g.global_ac_roles[object_type]
+
+
+def get_ac_roles_data_for(object_type):
+  """Get all ACRs data for the given object type.
+
+  Data stored as tuple to avoid DetachedInstanceError
+  Args:
+      object_type: Object type for which ACR records should be returned.
+  Returns:
+      Dict like {"Access Control Role Name": ACR data, ...}
+  """
+  if getattr(flask.g, "global_ac_roles_data", None) is None:
+    flask.g.global_ac_roles_data = collections.defaultdict(dict)
+    query = AccessControlRole.query.filter(
+        AccessControlRole.internal == sa.sql.expression.false(),
+    ).options(
+        load_only("id", "name", "object_type", "mandatory")
+    )
+    for role in query:
+      role_data = (role.id, role.name, role.object_type, role.mandatory)
+      flask.g.global_ac_roles_data[role.object_type][role.name] = role_data
+  return flask.g.global_ac_roles_data[object_type]
