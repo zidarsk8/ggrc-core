@@ -188,7 +188,7 @@ import * as businessModels from '../models/business-models';
       }
       mappings[type] = {
         task_groups:
-          new GGRC.ListLoaders.ProxyListLoader(
+        new GGRC.ListLoaders.ProxyListLoader(
           'TaskGroupObject',
           'object',
           'task_group',

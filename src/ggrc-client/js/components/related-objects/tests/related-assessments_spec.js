@@ -44,14 +44,14 @@ describe('related-assessments component', () => {
 
       it(`returns title based on instance.type if is gotten related
           assessments not from assessment info pane`, () => {
-          let expectedTitle;
+        let expectedTitle;
 
-          viewModel.attr('instance.assessment_type', null);
-          viewModel.attr('instance.type', asmtModelType);
-          expectedTitle = `Related ${modelPlural}`;
+        viewModel.attr('instance.assessment_type', null);
+        viewModel.attr('instance.type', asmtModelType);
+        expectedTitle = `Related ${modelPlural}`;
 
-          expect(viewModel.attr('relatedObjectsTitle')).toBe(expectedTitle);
-        });
+        expect(viewModel.attr('relatedObjectsTitle')).toBe(expectedTitle);
+      });
     });
 
     describe('loadRelatedAssessments() method', () => {
@@ -118,13 +118,13 @@ describe('related-assessments component', () => {
     describe('unableToReuse get() method', () => {
       it(`returns false if there are selected evidences
         and it is not saving`, () => {
-          viewModel.attr('isSaving', false);
-          viewModel.attr('selectedEvidences', ['item']);
+        viewModel.attr('isSaving', false);
+        viewModel.attr('selectedEvidences', ['item']);
 
-          let result = viewModel.attr('unableToReuse');
+        let result = viewModel.attr('unableToReuse');
 
-          expect(result).toBe(false);
-        });
+        expect(result).toBe(false);
+      });
 
       describe('returns true', () => {
         it('if there are no selected items and it is not saving', () => {

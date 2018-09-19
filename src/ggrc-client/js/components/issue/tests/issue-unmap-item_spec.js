@@ -235,37 +235,37 @@ describe('issue-unmap-item component', () => {
 
       it(`url consists of root_collection from appopriate model and id
         based on passed related object`, () => {
-          let rootCollectionType =
+        let rootCollectionType =
             businessModels[relatedObject.type].root_collection;
-          let expectedUrl;
+        let expectedUrl;
 
-          viewModel.openObject(relatedObject);
-          expectedUrl = buildUrl(rootCollectionType, relatedObject.id);
+        viewModel.openObject(relatedObject);
+        expectedUrl = buildUrl(rootCollectionType, relatedObject.id);
 
-          expect(getParam(window.open, ARGS.FIRST)).toBe(expectedUrl);
-        });
+        expect(getParam(window.open, ARGS.FIRST)).toBe(expectedUrl);
+      });
 
       it(`url consists of type and id from relatet object's child_type and
       child_id props if a type of related object equals to "Snapshot"`, () => {
-          let relatedObjectType = 'Snapshot';
-          let rootCollectionType =
+        let relatedObjectType = 'Snapshot';
+        let rootCollectionType =
             businessModels[relatedObject.type].root_collection;
-          let oldRelatedObjectType = relatedObject.type;
-          let expectedUrl;
+        let oldRelatedObjectType = relatedObject.type;
+        let expectedUrl;
 
-          _.assign(relatedObject, {
-            type: relatedObjectType,
-            child_type: oldRelatedObjectType,
-            child_id: 54321,
-          });
-          viewModel.openObject(relatedObject);
-          expectedUrl = buildUrl(
-            rootCollectionType,
-            relatedObject.child_id
-          );
-
-          expect(getParam(window.open, ARGS.FIRST)).toBe(expectedUrl);
+        _.assign(relatedObject, {
+          type: relatedObjectType,
+          child_type: oldRelatedObjectType,
+          child_id: 54321,
         });
+        viewModel.openObject(relatedObject);
+        expectedUrl = buildUrl(
+          rootCollectionType,
+          relatedObject.child_id
+        );
+
+        expect(getParam(window.open, ARGS.FIRST)).toBe(expectedUrl);
+      });
     });
   });
 
@@ -415,13 +415,13 @@ describe('issue-unmap-item component', () => {
 
       it(`calls processRelatedSnapshots() if target is assessment and
       not allowed to unmap issue from audit`, async function (done) {
-          viewModel.attr('target.type', 'Assessment');
-          viewModel.attr('issueInstance.allow_unmap_from_audit', false);
-          await handler(null, event);
-          expect(viewModel.processRelatedSnapshots).toHaveBeenCalled();
-          expect(viewModel.dispatch).not.toHaveBeenCalled();
-          done();
-        });
+        viewModel.attr('target.type', 'Assessment');
+        viewModel.attr('issueInstance.allow_unmap_from_audit', false);
+        await handler(null, event);
+        expect(viewModel.processRelatedSnapshots).toHaveBeenCalled();
+        expect(viewModel.dispatch).not.toHaveBeenCalled();
+        done();
+      });
 
       it('dispatches "unmapIssue" event if target', async function (done) {
         viewModel.attr('relationship', {test: 'true'});

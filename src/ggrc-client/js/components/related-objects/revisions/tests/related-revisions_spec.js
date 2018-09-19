@@ -26,18 +26,18 @@ describe('RelatedRevisions component', () => {
   describe('setVisibleRevisions() method', () => {
     it(`sets visibleRevisions according to paging.limits
       and recalculates pages`, () => {
-        let revisions = new Array(10);
-        revisions.fill(1);
-        viewModel.attr('visibleRevisions', null);
-        viewModel.attr('revisions', revisions);
-        viewModel.attr('paging.limits', [0, 5]);
-        viewModel.attr('paging.total', 0);
+      let revisions = new Array(10);
+      revisions.fill(1);
+      viewModel.attr('visibleRevisions', null);
+      viewModel.attr('revisions', revisions);
+      viewModel.attr('paging.limits', [0, 5]);
+      viewModel.attr('paging.total', 0);
 
-        viewModel.setVisibleRevisions();
+      viewModel.setVisibleRevisions();
 
-        expect(viewModel.attr('visibleRevisions').length).toBe(5);
-        expect(viewModel.attr('paging.total')).toBe(10);
-      });
+      expect(viewModel.attr('visibleRevisions').length).toBe(5);
+      expect(viewModel.attr('paging.total')).toBe(10);
+    });
   });
 
   describe('loadRevisions() method', () => {

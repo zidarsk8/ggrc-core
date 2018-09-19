@@ -1591,7 +1591,7 @@ Mustache.registerHelper('get_default_attr_value',
       last_deprecated_date: 1,
     });
 
-      // attribute names considered "default" and not representing a date
+    // attribute names considered "default" and not representing a date
     let NON_DATE_ATTRS = Object.freeze({
       kind: 1,
       title: 1,

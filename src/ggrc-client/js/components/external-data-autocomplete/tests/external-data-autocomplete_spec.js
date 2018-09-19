@@ -18,49 +18,49 @@ describe('external-data-autocomplete component', () => {
       describe('returns true', () => {
         it(`when "showResults" flag is turned on
             and "searchCriteria" length is greather than "minLength"`, () => {
-            viewModel.attr('showResults', true);
-            viewModel.attr('minLength', 2);
-            viewModel.attr('searchCriteria', 'test');
+          viewModel.attr('showResults', true);
+          viewModel.attr('minLength', 2);
+          viewModel.attr('searchCriteria', 'test');
 
-            let result = viewModel.attr('renderResults');
+          let result = viewModel.attr('renderResults');
 
-            expect(result).toBe(true);
-          });
+          expect(result).toBe(true);
+        });
       });
 
       describe('returns false', () => {
         it(`when "showResults" flag is turned off
             and "searchCriteria" length is greather than "minLength"`, () => {
-            viewModel.attr('showResults', false);
-            viewModel.attr('minLength', 2);
-            viewModel.attr('searchCriteria', 'test');
+          viewModel.attr('showResults', false);
+          viewModel.attr('minLength', 2);
+          viewModel.attr('searchCriteria', 'test');
 
-            let result = viewModel.attr('renderResults');
+          let result = viewModel.attr('renderResults');
 
-            expect(result).toBe(false);
-          });
+          expect(result).toBe(false);
+        });
 
         it(`when "showResults" flag is turned on
             and "searchCriteria" length is less than "minLength"`, () => {
-            viewModel.attr('showResults', true);
-            viewModel.attr('minLength', 2);
-            viewModel.attr('searchCriteria', '');
+          viewModel.attr('showResults', true);
+          viewModel.attr('minLength', 2);
+          viewModel.attr('searchCriteria', '');
 
-            let result = viewModel.attr('renderResults');
+          let result = viewModel.attr('renderResults');
 
-            expect(result).toBe(false);
-          });
+          expect(result).toBe(false);
+        });
 
         it(`when "showResults" flag is turned off
             and "searchCriteria" length is less than "minLength"`, () => {
-            viewModel.attr('showResults', false);
-            viewModel.attr('minLength', 2);
-            viewModel.attr('searchCriteria', '');
+          viewModel.attr('showResults', false);
+          viewModel.attr('minLength', 2);
+          viewModel.attr('searchCriteria', '');
 
-            let result = viewModel.attr('renderResults');
+          let result = viewModel.attr('renderResults');
 
-            expect(result).toBe(false);
-          });
+          expect(result).toBe(false);
+        });
       });
     });
 
