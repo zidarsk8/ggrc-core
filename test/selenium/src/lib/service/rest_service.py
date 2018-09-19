@@ -299,12 +299,6 @@ class AssessmentsFromTemplateService(HelpRestService):
     return assessments
 
 
-class ObjectsOwnersService(HelpRestService):
-  """Service for assigning owners to entities."""
-  def __init__(self):
-    super(ObjectsOwnersService, self).__init__(url.OBJECT_OWNERS)
-
-
 class ObjectsInfoService(HelpRestService):
   """Service for getting information about entities."""
   def __init__(self):

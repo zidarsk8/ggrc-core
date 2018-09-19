@@ -28,7 +28,6 @@ WORKFLOW_MANAGER = "Workflow Manager"
 # other roles
 OTHER = "other"
 CREATORS = CREATOR + "s"
-OBJECT_OWNERS = "Object Owners"
 AUDIT_LEAD = "Audit Lead"
 AUDITORS = "Auditors"
 PRINCIPAL_ASSIGNEES = "Principal " + ASSIGNEES
