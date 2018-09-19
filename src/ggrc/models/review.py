@@ -8,6 +8,7 @@ import sqlalchemy as sa
 
 from ggrc import db
 from ggrc import builder
+from ggrc.access_control import role
 from ggrc.access_control import roleable
 from ggrc.login import get_current_user
 from ggrc.models import mixins, exceptions
@@ -18,7 +19,6 @@ from ggrc.models.mixins import rest_handable
 from ggrc.models.mixins import with_proposal_handable
 from ggrc.models.mixins import with_mappimg_via_import_handable
 
-from ggrc.access_control.role import get_ac_roles_for
 from ggrc.models.relationship import Relatable
 from ggrc.fulltext import mixin as ft_mixin
 
@@ -59,7 +59,7 @@ class Reviewable(rest_handable.WithPutHandable,
     if not self.review.issuetracker_issue:
       return None
     notification_type = self.review.notification_type
-    if notification_type != self.NotificationContext.Types.ISSUE_TRACKER:
+    if notification_type != Review.NotificationTypes.ISSUE_TRACKER:
       return None
     return self.review.issuetracker_issue.issue_url
 
@@ -104,8 +104,7 @@ class Reviewable(rest_handable.WithPutHandable,
                  if a.history.has_changes()}
 
       if changed - self.ATTRS_TO_IGNORE:
-        self.review.status = all_models.Review.STATES.UNREVIEWED
-        self.add_email_notification()
+        self._set_review_status_unreviewed()
 
   def add_email_notification(self):
     """Add email notification of type STATUS_UNREVIEWED"""
@@ -120,8 +119,7 @@ class Reviewable(rest_handable.WithPutHandable,
     from ggrc.models import all_models
     if self.review_status != all_models.Review.STATES.UNREVIEWED:
       if counterparty.type in Types.all:
-        self.review.status = all_models.Review.STATES.UNREVIEWED
-        self.add_email_notification()
+        self._set_review_status_unreviewed()
 
   def _set_review_status_unreviewed(self):
     """Set review status -> unreviewed"""
@@ -215,19 +213,17 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
       "reviewable_type",
   ]
 
-  def __init__(self, *args, **kwargs):
-    super(Review, self).__init__(*args, **kwargs)
-    self.last_reviewed_by = None
-    self.last_reviewed_at = None
-
   def validate_acl(self):
     """Reviewer is mandatory Role"""
     super(Review, self).validate_acl()
-    reviewer_role_id = get_ac_roles_for("Review")[self.REVIEWER_ROLE_NAME].id
-    is_reviewers_acl = any(acl for acl in self.access_control_list
-                           if acl.ac_role_id == reviewer_role_id)
-    if not is_reviewers_acl:
-      raise exceptions.ValidationError("Reviewer role is mandatory")
+    review_global_roles = role.get_ac_roles_data_for("Review").values()
+    mandatory_role_ids = {acr[0] for acr in review_global_roles if acr[3]}
+    passed_acr_ids = {acl.ac_role_id for acl in self.access_control_list}
+    missed_mandatory_roles = mandatory_role_ids - passed_acr_ids
+    if missed_mandatory_roles:
+      raise exceptions.ValidationError("{} roles are mandatory".format(
+          ",".join(missed_mandatory_roles))
+      )
 
   def handle_post(self):
     self._create_relationship()
@@ -249,6 +245,7 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
 
   def _update_new_reviewed_by(self):
     """When create new review with state REVIEWED set last_reviewed_by"""
+    # pylint: disable=attribute-defined-outside-init
     from ggrc.models import all_models
     if self.status == all_models.Review.STATES.REVIEWED:
       self.last_reviewed_by = get_current_user()

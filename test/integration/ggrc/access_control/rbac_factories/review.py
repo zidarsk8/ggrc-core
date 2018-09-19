@@ -26,14 +26,16 @@ class MappedReviewRBACFactory(universal_factory.UniversalRBACFactory):
     self.parent_id = self.parent.id
     self.parent_name = parent_name
     if self.role_at_review:
-      self.review_id = self._setup_review(self.acr.id, self.user_id).id
+      _, review = self.setup_review(self.acr.id, self.user_id)
+      self.review_id = review.id
     else:
-      self.review_id = self._setup_review().id
+      _, review = self.setup_review()
+      self.review_id = review.id
       self.assign_person(self.parent, self.acr, self.user_id)
 
-  def _setup_review(self, acr_id=None, user_id=None):
-    """Setup review"""
-    _, review = self.objgen.generate_object(
+  def setup_review(self, acr_id=None, user_id=None):
+    """Create new review object"""
+    resp, review = self.objgen.generate_object(
         all_models.Review,
         {
             "reviewable": {
@@ -46,26 +48,12 @@ class MappedReviewRBACFactory(universal_factory.UniversalRBACFactory):
             "notification_type": all_models.Review.NotificationTypes.EMAIL_TYPE
         },
     )
-    return review
+    return resp, review
 
-  def create_review(self):
-    """Create new Review object."""
-    result = self.api.post(all_models.Review, {
-        "review": {
-            "access_control_list": [{
-                "ac_role_id": self.reviewer_acr_id,
-                "person": {"id": self.user_id, "type": "Person"}
-            }],
-            "reviewable": {
-                "type": self.parent_name,
-                "id": self.parent_id,
-            },
-            "context": None,
-            "notification_type": "email",
-            "status": all_models.Review.STATES.UNREVIEWED,
-        },
-    })
-    return result
+  def create_review(self, acr_id=None, user_id=None):
+    """Create review"""
+    resp, _ = self.setup_review(acr_id, user_id)
+    return resp
 
   def read_review(self):
     """Read existing Review object."""

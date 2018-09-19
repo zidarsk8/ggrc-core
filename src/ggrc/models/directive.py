@@ -25,8 +25,7 @@ from ggrc.models.utils import validate_option
 # to be run in the context of each particular subclass.
 # (of course, if there is a nice way of overriding/customizing declared
 # attributes in subclasses, we might want to use that approach)
-class Directive(review.Reviewable,
-                mixins.LastDeprecatedTimeboxed,
+class Directive(mixins.LastDeprecatedTimeboxed,
                 Commentable,
                 mixins.TestPlanned,
                 mixins.base.ContextRBAC,
@@ -151,7 +150,8 @@ class Directive(review.Reviewable,
 
 
 # FIXME: For subclasses, restrict kind
-class Policy(Roleable,
+class Policy(review.Reviewable,
+             Roleable,
              mixins.CustomAttributable,
              Relatable,
              Personable,
@@ -179,7 +179,8 @@ class Policy(Roleable,
     return 'Policy'
 
 
-class Regulation(Roleable,
+class Regulation(review.Reviewable,
+                 Roleable,
                  mixins.CustomAttributable,
                  Relatable,
                  Personable,
@@ -205,7 +206,8 @@ class Regulation(Roleable,
     return 'Regulation'
 
 
-class Standard(Roleable,
+class Standard(review.Reviewable,
+               Roleable,
                mixins.CustomAttributable,
                Relatable,
                Personable,
@@ -231,7 +233,8 @@ class Standard(Roleable,
     return 'Standard'
 
 
-class Contract(Roleable,
+class Contract(review.Reviewable,
+               Roleable,
                mixins.CustomAttributable,
                Relatable,
                Personable,

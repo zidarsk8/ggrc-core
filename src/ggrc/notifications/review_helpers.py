@@ -3,14 +3,16 @@
 
 """  Review helpers """
 import collections
-
-from ggrc.models import all_models
-
-from ggrc import db
+from logging import getLogger
 from sqlalchemy.orm import joinedload
 
+from ggrc import db
+from ggrc.models import all_models
 from ggrc.notifications.common import create_notification_history_obj
 from ggrc.notifications.data_handlers import get_object_url
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 REVIEW_REQUEST_CREATED = "review_request_created"
 
@@ -39,6 +41,8 @@ def build_review_data(review_notifications):
   for notification in review_notifications:
     review = notification.object
     reviewable = review.reviewable
+    if not reviewable:
+      continue
     link = get_object_url(reviewable)
     fill_reviewers_data(link, review, reviewable, reviewers_data)
     fill_owners_data(link, notification, owners_data, review, reviewable)
