@@ -91,6 +91,7 @@ class BaseRBACFactory(object):
     """Assign person to object."""
     if sa.inspect(acr).detached:
       db.session.add(acr)
+    acr = all_models.AccessControlRole.query.get(acr.id)
     if object_.type == acr.object_type:
       factories.AccessControlListFactory(
           object=object_,
