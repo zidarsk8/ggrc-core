@@ -32,7 +32,6 @@ MIGRATED_REVIEWABLES = {
 
 NON_MIGRATED_REVIEWABLES = {
     ("access_groups", "AccessGroup"),
-    ("assessments", "Assessment"),  # not in BA list
     ("data_assets", "DataAsset"),
     ("facilities", "Facilities"),
     ("issues", "Issue"),
@@ -282,10 +281,10 @@ def process_migrated_reviewed(conn, migrator_id, reviewer_acr_id):
   """Process objects that had Reviewed state and migrated"""
   for reviewable, obj_type in MIGRATED_REVIEWABLES:
     print "Processing -> {}: {}".format(obj_type, "Reviewed")
-    created_reviews_reviewable_ids = set()
+    reviews_reviewable_ids = set()
     for data in get_object_mapping_info(conn, reviewable,
                                         obj_type, "Reviewed"):
-      if data.obj_id not in created_reviews_reviewable_ids:
+      if data.obj_id not in reviews_reviewable_ids and data.reviewer_id:
         review_id = create_review(
             conn, data.obj_id, data.obj_type, data.reviewer_id,
             data.reviewed_at, migrator_id
@@ -294,7 +293,7 @@ def process_migrated_reviewed(conn, migrator_id, reviewer_acr_id):
         assign_reviewer(
             conn, data.reviewer_id, reviewer_acr_id, review_id, migrator_id
         )
-        created_reviews_reviewable_ids.add(data.obj_id)
+        reviews_reviewable_ids.add(data.obj_id)
 
       unmap_cycle_task_group_object_task(conn, data.rel_id)
       update_cycle_task_group_object_task(

@@ -113,7 +113,7 @@ def get_last_revision_content(obj_type, obj_id):
   last_revision = all_models.Revision.query.filter_by(
       resource_type=obj_type, resource_id=obj_id
   ).order_by(all_models.Revision.created_at.desc()).first()
-  if last_revision.action == u"deleted":
+  if last_revision and last_revision.action == u"deleted":
     logger.info("Deleted revision already logged for Object '%s' "
                 "with id '%s', 'deleted' revision generation skipped",
                 obj_type, obj_id)
