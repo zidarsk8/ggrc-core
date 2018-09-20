@@ -25,7 +25,6 @@ def _update_sub_tree(branch, flag="RUD"):
   branch["Control {}".format(flag)]["Relationship R"]["Review RU"] = {}
   branch["Regulation {}".format(flag)]["Relationship R"]["Review RU"] = {}
   branch["Objective {}".format(flag)]["Relationship R"]["Review RU"] = {}
-  branch["Clause {}".format(flag)]["Relationship R"]["Review RU"] = {}
   branch["Requirement {}".format(flag)]["Relationship R"]["Review RU"] = {}
   branch["Contract {}".format(flag)]["Relationship R"]["Review RU"] = {}
   branch["Policy {}".format(flag)]["Relationship R"]["Review RU"] = {}
@@ -70,7 +69,6 @@ def _update_control(branch):
 OBJECTS = {
     "Objective",
     "Regulation",
-    "Clause",
     "Contract",
     "Policy",
     "Risk",

@@ -102,7 +102,7 @@ class InfoWidget(WithPageElements, base.Widget):
                       self.tab_container.active_tab_elem)
     # for overridable methods
     if (self.__class__ in
-        [Controls, Programs, Regulations, Objectives, Clauses, Contracts,
+        [Controls, Programs, Regulations, Objectives, Contracts,
          Policies, Risks, Standards, Threats, Requirements]):
       self._extend_list_all_scopes_by_review_state()
     if not self.is_asmts_info_widget:

@@ -301,38 +301,6 @@ CURRENT_TREE = {
     "BackgroundTask": {
         "Admin": {}
     },
-    "Clause": {
-        "Admin": {
-            "Relationship R": {
-                "Comment R": {},
-                "Document RU": {
-                    "Relationship R": {
-                        "Comment R": {}
-                    }
-                }
-            }
-        },
-        "Primary Contacts": {
-            "Relationship R": {
-                "Comment R": {},
-                "Document RU": {
-                    "Relationship R": {
-                        "Comment R": {}
-                    }
-                }
-            }
-        },
-        "Secondary Contacts": {
-            "Relationship R": {
-                "Comment R": {},
-                "Document RU": {
-                    "Relationship R": {
-                        "Comment R": {}
-                    }
-                }
-            }
-        }
-    },
     "Comment": {
         "Admin": {}
     },
@@ -1489,16 +1457,6 @@ CURRENT_TREE = {
                         "Snapshot RU": {}
                     }
                 },
-                "Clause RUD": {
-                    "Relationship R": {
-                        "Comment R": {},
-                        "Document RU": {
-                            "Relationship R": {
-                                "Comment R": {}
-                            }
-                        }
-                    }
-                },
                 "Comment R": {},
                 "Contract RUD": {
                     "Relationship R": {
@@ -1782,16 +1740,6 @@ CURRENT_TREE = {
                         "Snapshot RU": {}
                     }
                 },
-                "Clause RUD": {
-                    "Relationship R": {
-                        "Comment R": {},
-                        "Document RU": {
-                            "Relationship R": {
-                                "Comment R": {}
-                            }
-                        }
-                    }
-                },
                 "Comment R": {},
                 "Contract RUD": {
                     "Relationship R": {
@@ -2073,16 +2021,6 @@ CURRENT_TREE = {
                             }
                         },
                         "Snapshot R": {}
-                    }
-                },
-                "Clause R": {
-                    "Relationship R": {
-                        "Comment R": {},
-                        "Document R": {
-                            "Relationship R": {
-                                "Comment R": {}
-                            }
-                        }
                     }
                 },
                 "Comment R": {},

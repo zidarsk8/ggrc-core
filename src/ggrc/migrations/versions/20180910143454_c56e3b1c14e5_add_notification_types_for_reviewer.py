@@ -71,7 +71,6 @@ def upgrade():
     "Program",
     "Regulation",
     "Objective",
-    "Clause",
     "Contract",
     "Policy",
     "Risk",

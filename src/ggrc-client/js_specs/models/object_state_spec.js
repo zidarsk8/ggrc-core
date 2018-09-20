@@ -44,7 +44,7 @@ describe('Model review state test', function () {
     'Policy', 'Program', 'Regulation', 'Risk', 'Requirement', 'Standard',
     'Threat'];
   const objectsWithoutReview = ['AccessGroup', 'Assessment',
-    'AssessmentTemplate', 'Audit', 'Clause', 'DataAsset', 'Facility', 'Issue', 'Market',
+    'AssessmentTemplate', 'Audit', 'DataAsset', 'Facility', 'Issue', 'Market',
     'Metric', 'OrgGroup', 'Process', 'Product', 'ProductGroup', 'Project',
     'System', 'TechnologyEnvironment', 'Vendor'];
 

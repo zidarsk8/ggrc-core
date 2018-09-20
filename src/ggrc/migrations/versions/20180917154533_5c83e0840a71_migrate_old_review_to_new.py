@@ -18,7 +18,6 @@ revision = '5c83e0840a71'
 down_revision = 'c56e3b1c14e5'
 
 MIGRATED_REVIEWABLES = {
-    ("clauses", "Clause"),
     ("controls", "Control"),
     ("directives", "Policy"),
     ("directives", "Standard"),
