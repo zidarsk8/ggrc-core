@@ -61,7 +61,7 @@ import modalModels from '../models/modal-models';
         delete_counts: deleteCounts,
         modal_title: 'Delete ' + $trigger.attr('data-object-singular'),
         content_view:
-          GGRC.mustache_path + '/base_objects/confirm_delete.mustache'
+          GGRC.mustache_path + '/base_objects/confirm_delete.mustache',
       };
 
       if (hasWarningType(instance)) {
@@ -71,7 +71,7 @@ import modalModels from '../models/modal-models';
           {
             objectShortInfo: [instance.type, instance.title].join(' '),
             confirmOperationName: 'delete',
-            operation: 'deletion'
+            operation: 'deletion',
           }
         );
       }
@@ -82,7 +82,7 @@ import modalModels from '../models/modal-models';
         _.constant({}), {
           controller: $target
             .modal_form(option, $trigger)
-            .ggrc_controllers_delete.bind($target)
+            .ggrc_controllers_delete.bind($target),
         });
 
       $target.on('modal:success', function (e, data) {
@@ -113,7 +113,6 @@ import modalModels from '../models/modal-models';
       let isProposal = $trigger.data('is-proposal');
       let instance;
       let modalTitle;
-      let titleOverride;
       let contentView;
 
       if ($trigger.attr('data-object-id') === 'page') {
@@ -123,7 +122,9 @@ import modalModels from '../models/modal-models';
       }
 
       objectParams = objectParams ? JSON.parse(objectParams) : {};
-      extendNewInstance = extendNewInstance ? JSON.parse(extendNewInstance) : {};
+      extendNewInstance = extendNewInstance
+        ? JSON.parse(extendNewInstance)
+        : {};
 
       modalTitle =
         (instance ? 'Edit ' : 'New ') +
@@ -131,10 +132,6 @@ import modalModels from '../models/modal-models';
         model.title_singular ||
         $trigger.attr('data-object-singular'));
 
-      titleOverride = $trigger.attr('data-modal-title-override');
-      if (titleOverride) {
-        modalTitle = titleOverride;
-      }
       if (isProposal) {
         modalTitle = `Proposal for ${model.title_singular}`;
       }
@@ -155,7 +152,7 @@ import modalModels from '../models/modal-models';
             BUTTON_VIEW_SAVE_CANCEL_DELETE,
           model: model,
           oldData: {
-            status: instance && instance.status // status before changing
+            status: instance && instance.status, // status before changing
           },
           applyPreconditions:
             shouldApplyPreconditions(instance),
@@ -165,7 +162,7 @@ import modalModels from '../models/modal-models';
           modal_title: objectParams.modal_title || modalTitle,
           content_view: contentView,
           isProposal: isProposal,
-          $trigger: $trigger
+          $trigger: $trigger,
         });
 
       $target.on('modal:success', function (e, data, xhr) {
@@ -173,7 +170,7 @@ import modalModels from '../models/modal-models';
         let $active;
         let WARN_MSG = [
           'The $trigger element was not found in the DOM, thus some',
-          'application events will not be propagated.'
+          'application events will not be propagated.',
         ].join(' ');
         let args = arguments;
 
@@ -213,7 +210,7 @@ import modalModels from '../models/modal-models';
           if (!document.contains($trigger[0])) {
             $trigger = $('[data-link-purpose="open-edit-modal"]');
             if (_.isEmpty($trigger)) {
-              console.warn(WARN_MSG);
+              console.warn(WARN_MSG); // eslint-disable-line
               return;
             }
           }
@@ -277,14 +274,14 @@ import modalModels from '../models/modal-models';
           instance: instance,
           modal_title: 'Archive ' + $trigger.attr('data-object-singular'),
           content_view: GGRC.mustache_path +
-          '/base_objects/confirm_archive.mustache'
+          '/base_objects/confirm_archive.mustache',
         });
 
       $target.on('modal:success', function (e, data) {
         $trigger.trigger('modal:success', data);
         $target.modal_form('hide');
       });
-    }
+    },
   };
 
   function preloadContent() {
@@ -297,7 +294,7 @@ import modalModels from '../models/modal-models';
         '</div>',
         '<div class="modal-body" style="padding-top:150px;"></div>',
         '<div class="modal-footer">',
-        '</div>'
+        '</div>',
       ];
     return $(template.join('\n'))
       .filter('.modal-body')
@@ -306,7 +303,7 @@ import modalModels from '../models/modal-models';
           .css({
             width: '100px', height: '100px',
             left: '50%', top: '50%',
-            zIndex: calculate_spinner_z_index
+            zIndex: calculate_spinner_z_index,
           })
       ).end();
   }
@@ -346,7 +343,7 @@ import modalModels from '../models/modal-models';
         return _top - (modals.length - i) * (headerHeight);
       },
       'margin-top': 0,
-      position: 'absolute'
+      position: 'absolute',
     });
     modals.off('scroll.modalajax');
   }
@@ -526,7 +523,7 @@ import modalModels from '../models/modal-models';
       $('body').on(
         'click.modal-ajax.data-api keydown.modal-ajax.data-api',
         toggle ?
-        '[data-toggle=modal-ajax-' + toggle + ']' :
+          '[data-toggle=modal-ajax-' + toggle + ']' :
           '[data-toggle=modal-ajax]',
         function (e) {
           let $this = $(this);
@@ -591,11 +588,10 @@ import modalModels from '../models/modal-models';
       '': handlers.modal,
       form: handlers.form,
       deleteform: handlers.deleteform,
-      archiveform: handlers.archiveform
+      archiveform: handlers.archiveform,
     },
-      function (launchFn, toggle) {
-        GGRC.register_modal_hook(toggle, launchFn);
-      }
-    );
+    function (launchFn, toggle) {
+      GGRC.register_modal_hook(toggle, launchFn);
+    });
   });
 })(window.can, window.can.$, window.GGRC);

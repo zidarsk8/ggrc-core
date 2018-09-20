@@ -1,6 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Program model."""
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
 from ggrc.access_control.roleable import Roleable
@@ -11,11 +12,11 @@ from ggrc.models.deferred import deferred
 from ggrc.models import object_document
 from ggrc.models.object_person import Personable
 from ggrc.models import reflection
+from ggrc.models import review
 from ggrc.models.relationship import Relatable
-from ggrc.models.track_object_state import HasObjectState
 
 
-class Program(HasObjectState,
+class Program(review.Reviewable,
               mixins.CustomAttributable,
               object_document.PublicDocumentable,
               Roleable,
@@ -28,6 +29,7 @@ class Program(HasObjectState,
               mixins.Folderable,
               Indexed,
               db.Model):
+  """Representation for Program model."""
   __tablename__ = 'programs'
 
   KINDS = ['Directive']

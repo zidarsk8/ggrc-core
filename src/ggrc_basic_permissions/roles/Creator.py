@@ -177,7 +177,6 @@ permissions = {
             "condition": "relationship",
         },
         "Requirement",
-        "Clause",
         "SystemOrProcess",
         "System",
         "Process",
@@ -186,6 +185,7 @@ permissions = {
         "Program",
         "TechnologyEnvironment",
         "Context",
+        "Review"
     ],
     "update": owner_update,
     "delete": owner_update,

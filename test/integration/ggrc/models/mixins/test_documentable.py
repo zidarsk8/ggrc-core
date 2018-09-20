@@ -17,7 +17,6 @@ class TestPublicDocumentable(TestCase):
       'Control',
       'Issue',
       'AccessGroup',
-      'Clause',
       'Contract',
       'DataAsset',
       'Facility',

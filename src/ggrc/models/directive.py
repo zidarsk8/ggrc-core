@@ -1,5 +1,6 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+"""Module for Directive, Contract, Policy, Regulation, Standard model."""
 
 from sqlalchemy import orm
 from sqlalchemy.orm import validates
@@ -7,14 +8,13 @@ from sqlalchemy.orm import validates
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
-from ggrc.models import reflection
+from ggrc.models import reflection, review
 from ggrc.models.comment import Commentable
 from ggrc.models.deferred import deferred
 from ggrc.models import mixins
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
-from ggrc.models.track_object_state import HasObjectState
 from ggrc.models.utils import validate_option
 
 
@@ -25,14 +25,15 @@ from ggrc.models.utils import validate_option
 # to be run in the context of each particular subclass.
 # (of course, if there is a nice way of overriding/customizing declared
 # attributes in subclasses, we might want to use that approach)
-class Directive(HasObjectState,
-                mixins.LastDeprecatedTimeboxed,
+class Directive(mixins.LastDeprecatedTimeboxed,
                 Commentable,
                 mixins.TestPlanned,
                 mixins.base.ContextRBAC,
                 mixins.BusinessObject,
                 mixins.Folderable,
                 db.Model):
+  """Directive model"""
+
   __tablename__ = 'directives'
 
   version = deferred(db.Column(db.String), 'Directive')
@@ -149,7 +150,8 @@ class Directive(HasObjectState,
 
 
 # FIXME: For subclasses, restrict kind
-class Policy(Roleable,
+class Policy(review.Reviewable,
+             Roleable,
              mixins.CustomAttributable,
              Relatable,
              Personable,
@@ -177,7 +179,8 @@ class Policy(Roleable,
     return 'Policy'
 
 
-class Regulation(Roleable,
+class Regulation(review.Reviewable,
+                 Roleable,
                  mixins.CustomAttributable,
                  Relatable,
                  Personable,
@@ -203,7 +206,8 @@ class Regulation(Roleable,
     return 'Regulation'
 
 
-class Standard(Roleable,
+class Standard(review.Reviewable,
+               Roleable,
                mixins.CustomAttributable,
                Relatable,
                Personable,
@@ -229,7 +233,8 @@ class Standard(Roleable,
     return 'Standard'
 
 
-class Contract(Roleable,
+class Contract(review.Reviewable,
+               Roleable,
                mixins.CustomAttributable,
                Relatable,
                Personable,

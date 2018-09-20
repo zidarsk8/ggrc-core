@@ -169,15 +169,15 @@ describe('tree-status-filter component', () => {
 
       it(`when component is enabled,
         launched on current widget and statuses were changed`, () => {
-          viewModel.attr('filterStates', [
-            {value: 'A', checked: true},
-            {value: 'B', checked: true},
-          ]);
-          newStatuses = ['C', 'D'];
-          viewModel.attr('widgetId', 'test1');
-          router.attr('widget', 'test1');
-          viewModel.attr('disabled', false);
-        });
+        viewModel.attr('filterStates', [
+          {value: 'A', checked: true},
+          {value: 'B', checked: true},
+        ]);
+        newStatuses = ['C', 'D'];
+        viewModel.attr('widgetId', 'test1');
+        router.attr('widget', 'test1');
+        viewModel.attr('disabled', false);
+      });
     });
 
     describe('does not launch search', () => {
@@ -190,39 +190,39 @@ describe('tree-status-filter component', () => {
 
       it(`when component is disabled,
         launched on current widget and statuses were changed`, () => {
-          viewModel.attr('filterStates', [
-            {value: 'A', checked: true},
-            {value: 'B', checked: true},
-          ]);
-          newStatuses = ['C', 'D'];
-          viewModel.attr('widgetId', 'test1');
-          router.attr('widget', 'test1');
-          viewModel.attr('disabled', true);
-        });
+        viewModel.attr('filterStates', [
+          {value: 'A', checked: true},
+          {value: 'B', checked: true},
+        ]);
+        newStatuses = ['C', 'D'];
+        viewModel.attr('widgetId', 'test1');
+        router.attr('widget', 'test1');
+        viewModel.attr('disabled', true);
+      });
 
       it(`when component is enabled,
         launched on other widget and statuses were changed`, () => {
-          viewModel.attr('filterStates', [
-            {value: 'A', checked: true},
-            {value: 'B', checked: true},
-          ]);
-          newStatuses = ['C', 'D'];
-          viewModel.attr('widgetId', 'test1');
-          router.attr('widget', 'test2');
-          viewModel.attr('disabled', false);
-        });
+        viewModel.attr('filterStates', [
+          {value: 'A', checked: true},
+          {value: 'B', checked: true},
+        ]);
+        newStatuses = ['C', 'D'];
+        viewModel.attr('widgetId', 'test1');
+        router.attr('widget', 'test2');
+        viewModel.attr('disabled', false);
+      });
 
       it(`when component is enabled,
         launched on current widget and statuses were not changed`, () => {
-          viewModel.attr('filterStates', [
-            {value: 'A', checked: true},
-            {value: 'B', checked: true},
-          ]);
-          newStatuses = ['A', 'B'];
-          viewModel.attr('widgetId', 'test1');
-          router.attr('widget', 'test1');
-          viewModel.attr('disabled', false);
-        });
+        viewModel.attr('filterStates', [
+          {value: 'A', checked: true},
+          {value: 'B', checked: true},
+        ]);
+        newStatuses = ['A', 'B'];
+        viewModel.attr('widgetId', 'test1');
+        router.attr('widget', 'test1');
+        viewModel.attr('disabled', false);
+      });
     });
   });
 
@@ -281,11 +281,11 @@ describe('tree-status-filter component', () => {
 
       it(`when component is enabled,
         launched on current widget and there are no statuses in route`, () => {
-          viewModel.attr('disabled', false);
-          viewModel.attr('widgetId', 'test1');
-          router.attr('widget', 'test1');
-          router.removeAttr('state');
-        });
+        viewModel.attr('disabled', false);
+        viewModel.attr('widgetId', 'test1');
+        router.attr('widget', 'test1');
+        router.removeAttr('state');
+      });
     });
   });
 });

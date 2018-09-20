@@ -13,14 +13,6 @@ let allowedObjectTypes = ['Program'];
 GGRC.extensions.push(RiskAssessmentsExtension);
 
 RiskAssessmentsExtension.name = 'risk_assessments';
-
-// Register RA models for use with `inferObjectType`
-RiskAssessmentsExtension.object_type_decision_tree = function () {
-  return {
-    risk_assessment: RiskAssessment,
-  };
-};
-
 Program.attributes.risk_assessments = Stub.List;
 
 // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets

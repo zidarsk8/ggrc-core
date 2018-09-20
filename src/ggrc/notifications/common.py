@@ -13,6 +13,7 @@ from datetime import date
 from datetime import datetime
 from logging import getLogger
 from operator import itemgetter
+from dateutil import relativedelta
 
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import true
@@ -27,6 +28,11 @@ from ggrc.models import Person
 from ggrc.models import Notification, NotificationHistory
 from ggrc.rbac import permissions
 from ggrc.utils import DATE_FORMAT_US, merge_dict, benchmark
+from ggrc.notifications.notification_handlers import SEND_TIME
+
+from ggrc_workflows.models import CycleTaskGroupObjectTask
+from ggrc_workflows.notification.notification_handler \
+    import done_tasks_notify, not_done_tasks_notify
 
 from ggrc_workflows.notification.data_handler import (
     cycle_tasks_cache, deleted_task_rels_cache, get_cycle_task_data
@@ -215,6 +221,7 @@ def get_daily_notifications():
       and corresponding data for those notifications.
   """
   notifications = db.session.query(Notification).filter(
+      (Notification.runner == Notification.RUNNER_DAILY) &
       (Notification.send_on <= datetime.today()) &
       ((Notification.sent_at.is_(None)) | (Notification.repeating == true()))
   ).all()
@@ -298,6 +305,34 @@ def send_daily_digest_notifications():
       process_sent_notifications(notif_list)
 
     return "emails sent to: <br> {}".format("<br>".join(sent_emails))
+
+
+def generate_cycle_tasks_notifs(day=None):
+  """Generate notifications for cycle
+  task group object tasks on status change.
+
+  Args:
+    day (date): send notification date.
+  """
+  with benchmark("generate notifications for cycle tasks"):
+    if day is None:
+      day = date.today() - relativedelta.relativedelta(days=1)
+    send_datetime = datetime.combine(day, SEND_TIME)
+
+    updated_tasks = CycleTaskGroupObjectTask.query.filter(
+        CycleTaskGroupObjectTask.updated_at >= send_datetime
+    ).all()
+
+    done_tasks = []
+    not_done_tasks = []
+    for obj in updated_tasks:
+      if obj.is_done:
+        done_tasks.append(obj)
+      else:
+        not_done_tasks.append(obj)
+    done_tasks_notify(done_tasks, day)
+    not_done_tasks_notify(not_done_tasks, day)
+    db.session.commit()
 
 
 def process_sent_notifications(notif_list):

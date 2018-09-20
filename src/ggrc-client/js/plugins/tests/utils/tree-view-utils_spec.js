@@ -93,20 +93,20 @@ describe('TreeViewUtils module', function () {
 
     it(`Sets disable_sorting flag to false for the GCAs
      with not "Rich Text" type `,
-      function () {
-        let expected = {
-          attr_type: 'custom',
-          attr_title: 'CA def 16',
-          attr_name: 'CA def 16',
-          attr_sort_field: 'CA def 16',
-          disable_sorting: false,
-        };
+    function () {
+      let expected = {
+        attr_type: 'custom',
+        attr_title: 'CA def 16',
+        attr_name: 'CA def 16',
+        attr_sort_field: 'CA def 16',
+        disable_sorting: false,
+      };
 
-        let result = method('Market', null);
-        result = _.filter(result.available, {attr_type: 'custom'});
+      let result = method('Market', null);
+      result = _.filter(result.available, {attr_type: 'custom'});
 
-        expect(result).toContain(jasmine.objectContaining(expected));
-      });
+      expect(result).toContain(jasmine.objectContaining(expected));
+    });
   });
 
   describe('getSortingForModel() method', function () {

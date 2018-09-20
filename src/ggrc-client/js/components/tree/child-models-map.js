@@ -4,6 +4,7 @@
 */
 
 import DisplayPrefs from '../../models/local-storage/display-prefs';
+import * as businessModels from '../../models/business-models/index';
 
 const childModelsMap = can.Map.extend({
   displayPrefs: null,
@@ -15,8 +16,15 @@ const childModelsMap = can.Map.extend({
   },
   getModels: function (parentType) {
     if (!this.attr('container.' + parentType)) {
-      this.attr('container').attr(parentType, this.attr('displayPrefs')
-        .getChildTreeDisplayList(parentType));
+      let savedModels = this.attr('displayPrefs')
+        .getChildTreeDisplayList(parentType);
+
+      if (savedModels) {
+        // filter types that do not exist
+        savedModels = savedModels.filter((type) => businessModels[type]);
+      }
+
+      this.attr('container').attr(parentType, savedModels);
     }
     return this.attr('container.' + parentType);
   },

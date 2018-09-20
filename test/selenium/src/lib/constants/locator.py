@@ -709,13 +709,9 @@ class CommonWidgetInfo(object):
            "//*[contains(normalize-space(./@class), 'state-value state')]")
   TXT_FOOTER_CSS = (By.CSS_SELECTOR, _FOOTER)
   TXT_MODIFIED_BY_CSS = (By.CSS_SELECTOR, _FOOTER + " .person-name")
-  TXT_OBJECT_REVIEW = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="title_review_0ad9fbaf"] h6'.format(WIDGET))
   TXT_OBJECT_REVIEWED = (
       By.CSS_SELECTOR, "{} .object-approved".format(WIDGET))
-  LINK_SUBMIT_FOR_REVIEW = (By.CSS_SELECTOR,
-                            "{} .non-transparent".format(WIDGET))
+
   # buttons
   SHOW_RELATED_ASSESSMENTS = (
       By.XPATH, _INFO_WIDGET_XPATH + "//a[@title='Show Related Assessments']")
@@ -760,16 +756,11 @@ class WidgetSnapshotsInfoPanel(WidgetInfoPanel):
       By.CSS_SELECTOR, ".pane-header__snapshot-info [can-click='compareIt']")
   SNAPSHOT_OBJ_VER = (By.CSS_SELECTOR, "span.snapshot")
 
-  OBJECT_REVIEW_DECLINE_BTN = (By.XPATH, "//*[contains(text(), 'Decline')]")
-  OBJECT_REVIEW_APPROVE_BTN = (By.XPATH, "//*[contains(text(), 'Approve')]")
-  DECLINE_REVIEW_COMMENTS = (
-      By.XPATH, "//*[contains(@data-placeholder,'Enter Comments')]")
   SAVE_AND_CLOSE_BTN = (
       By.XPATH,
       "//*[contains(@class,'confirm-buttons')]//*[contains(text(), 'Close')]")
   DATE_PICKER_LOCATOR = (By.XPATH, "//*[@name='end_date']")
   DATE_PICKER_FIELD = (By.XPATH, "//*[@data-handler='selectDay']")
-  SUBMIT_REVIEW_BUTTON = (By.XPATH, "//*[text()='Submit']")
 
 
 class WidgetInfoProgram(WidgetInfoPanel):
@@ -891,10 +882,6 @@ class WidgetInfoStandard(WidgetSnapshotsInfoPanel):
 
 class WidgetInfoContract(WidgetSnapshotsInfoPanel):
   """Locators for Contract Info widgets."""
-
-
-class WidgetInfoClause(WidgetSnapshotsInfoPanel):
-  """Locators for Clause Info widgets."""
 
 
 class WidgetInfoRequirement(WidgetSnapshotsInfoPanel):
@@ -1140,7 +1127,7 @@ class AdminCustomAttributes(object):
           objects.OBJECTIVES, objects.REQUIREMENTS, objects.CONTROLS,
           objects.ISSUES, objects.ASSESSMENTS, objects.STANDARDS,
           objects.REGULATIONS, objects.POLICIES, objects.CONTRACTS,
-          objects.CLAUSES, objects.VENDORS, objects.PEOPLE,
+          objects.VENDORS, objects.PEOPLE,
           objects.ACCESS_GROUPS, objects.ORG_GROUPS, objects.PRODUCTS,
           objects.MARKETS, objects.PROCESSES, objects.FACILITIES,
           objects.PROJECTS, objects.DATA_ASSETS, objects.SYSTEMS)

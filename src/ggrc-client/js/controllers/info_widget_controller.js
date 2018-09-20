@@ -66,7 +66,7 @@ export default can.Control({
 
   get_widget_view: function (el) {
     let widgetView = can.$(el)
-        .closest('[data-widget-view]').attr('data-widget-view');
+      .closest('[data-widget-view]').attr('data-widget-view');
     if (widgetView && widgetView.length > 0) {
       return GGRC.mustache_path + widgetView;
     }
@@ -100,7 +100,6 @@ export default can.Control({
     if (!this.options.object_menu) {
       names = [
         'AccessGroup',
-        'Clause',
         'Contract',
         'Control',
         'DataAsset',

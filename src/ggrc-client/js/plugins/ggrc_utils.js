@@ -328,7 +328,6 @@ function allowedToMap(source, target, options) {
   // Two-way check:
   // special case check:
   // - mapping an Audit to a Program is not allowed
-  // - mapping an Audit to a Request is not allowed
   // (and vice versa)
   if (FORBIDDEN.twoWay[types.sort().join(' ')]) {
     return false;

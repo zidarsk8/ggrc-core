@@ -99,11 +99,6 @@
   }
 }
 
-.#{$fa-css-prefix}-clause {
-  &:before { content: $fa-var-sticky-note; }
-  &.color { color: #135c89; }
-}
-
 .#{$fa-css-prefix}-cycle:before { content: $fa-var-play-circle; }
 
 .#{$fa-css-prefix}-access_group {
@@ -152,11 +147,6 @@
 }
 
 .#{$fa-css-prefix}-history:before { content: $fa-var-clock-o; }
-
-.#{$fa-css-prefix}-request {
-  &:before { content: $fa-var-file-o; }
-  &.color { color: $purple; }
-}
 
 .#{$fa-css-prefix}-event:before { content: $fa-var-history; }
 

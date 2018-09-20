@@ -22,29 +22,29 @@ describe('editable-people-group', function () {
   describe('"showSeeMoreLink" property', function () {
     it(`"showSeeMoreLink" should be FALSE.
         edit mode is true, can edit is true`,
-      function () {
-        viewModel.attr('people', peopleItems);
-        viewModel.attr('canEdit', true);
-        viewModel.attr('editableMode', true);
-        expect(viewModel.attr('showSeeMoreLink')).toBe(false);
-      });
+    function () {
+      viewModel.attr('people', peopleItems);
+      viewModel.attr('canEdit', true);
+      viewModel.attr('editableMode', true);
+      expect(viewModel.attr('showSeeMoreLink')).toBe(false);
+    });
 
     it(`"showSeeMoreLink" should be TRUE.
         edit mode is false, can edit is true`,
-      function () {
-        viewModel.attr('people', peopleItems);
-        viewModel.attr('canEdit', true);
-        expect(viewModel.attr('showSeeMoreLink')).toBe(true);
-      });
+    function () {
+      viewModel.attr('people', peopleItems);
+      viewModel.attr('canEdit', true);
+      expect(viewModel.attr('showSeeMoreLink')).toBe(true);
+    });
 
     it(`"showSeeMoreLink" should be FALSE.
         edit mode is false, can edit is false, saving is not in progress`,
-      function () {
-        viewModel.attr('people', peopleItems);
-        viewModel.attr('canEdit', false);
-        viewModel.attr('updatableGroupId', null);
-        expect(viewModel.attr('showSeeMoreLink')).toBe(false);
-      });
+    function () {
+      viewModel.attr('people', peopleItems);
+      viewModel.attr('canEdit', false);
+      viewModel.attr('updatableGroupId', null);
+      expect(viewModel.attr('showSeeMoreLink')).toBe(false);
+    });
 
     it('"showSeeMoreLink" should be FALSE. People length less than 5',
       function () {
@@ -74,25 +74,25 @@ describe('editable-people-group', function () {
 
     it(`"showPeopleGroupModal" should be TRUE when people limit exceeded
       and editable mode is on`,
-      function () {
-        viewModel.attr('people', peopleItems);
+    function () {
+      viewModel.attr('people', peopleItems);
 
-        // trigger editableMode setter
-        viewModel.attr('editableMode', true);
+      // trigger editableMode setter
+      viewModel.attr('editableMode', true);
 
-        expect(viewModel.attr('showPeopleGroupModal')).toBe(true);
-      }
+      expect(viewModel.attr('showPeopleGroupModal')).toBe(true);
+    }
     );
 
     it(`"showPeopleGroupModal" should be FALSE when people limit is exceeded
       and editable mode is off`, () => {
-        viewModel.attr('people', peopleItems);
+      viewModel.attr('people', peopleItems);
 
-        // trigger editableMode setter
-        viewModel.attr('editableMode', false);
+      // trigger editableMode setter
+      viewModel.attr('editableMode', false);
 
-        expect(viewModel.attr('showPeopleGroupModal')).toBe(false);
-      });
+      expect(viewModel.attr('showPeopleGroupModal')).toBe(false);
+    });
   });
 
   describe('"isReadonly" property', () => {
@@ -137,10 +137,10 @@ describe('editable-people-group', function () {
 
     it(`should return shorten list
       when limit is exceeded and group is editable`, () => {
-        viewModel.attr('canEdit', true);
-        viewModel.attr('people', peopleItems);
+      viewModel.attr('canEdit', true);
+      viewModel.attr('people', peopleItems);
 
-        expect(viewModel.attr('showPeople').length).toBe(4);
-      });
+      expect(viewModel.attr('showPeople').length).toBe(4);
+    });
   });
 });

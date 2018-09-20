@@ -194,7 +194,7 @@ class GGRCGapiClient {
       if (needToRequestForNewScopes || !token) {
         this.oauthResult.reject();
         this.oauthResult = can.Deferred();
-        this.oauthResult.then(() =>this.checkLoggedUser());
+        this.oauthResult.then(() => this.checkLoggedUser());
         this.runAuthorization(true);
       }
 

@@ -19,7 +19,7 @@ let CloneTaskGroup = Cacheable({
     return $.when(this);
   },
   save() {
-    const task_group = new TaskGroup({
+    const taskGroup = new TaskGroup({
       clone: this.source_task_group.id,
       context: null,
       clone_objects: this.clone_objects,
@@ -27,7 +27,7 @@ let CloneTaskGroup = Cacheable({
       clone_people: this.clone_people,
     });
 
-    return task_group.save();
+    return taskGroup.save();
   },
 });
 
@@ -45,8 +45,7 @@ export default can.Component.extend({
             modal_title: 'Clone Task Group',
             model: CloneTaskGroup,
             instance: new CloneTaskGroup({
-              source_task_group:
-              this.viewModel.taskGroup
+              source_task_group: this.viewModel.taskGroup,
             }),
             content_view: contentView,
             custom_save_button_text: 'Proceed',

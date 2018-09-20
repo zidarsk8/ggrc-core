@@ -5,19 +5,21 @@
 
 This module is used for coordinating email notifications.
 """
+import datetime
 
-from ggrc import extensions
-
+from ggrc import extensions, db
 
 # changes of some of the attributes are not considered as a modification of
 # the obj itself, e.g. metadata not editable by the end user, or changes
 # covered by other event types such as "comment created"
 # pylint: disable=invalid-name
+from ggrc.login import get_current_user_id
+
 IGNORE_ATTRS = frozenset((
     u"_notifications", u"comments", u"context", u"context_id", u"created_at",
     u"custom_attribute_definitions", u"custom_attribute_values",
     u"_custom_attribute_values", u"finished_date", u"id", u"modified_by",
-    u"modified_by_id", u"object_level_definitions", u"os_state",
+    u"modified_by_id", u"object_level_definitions", u"review_status",
     u"related_destinations", u"related_sources", u"status",
     u"task_group_objects", u"updated_at", u"verified_date", u"audit_id",
     u"custom_attributes", u"display_name",
@@ -74,3 +76,22 @@ def get_updated_cavs(new_attrs, rev_content):
       if not old_val and not new_val:
         continue
       yield attr_name
+
+
+def add_notification(obj, notif_type_name):
+  """Add notification for object uses notif_type_cache as cache"""
+  from ggrc.models import all_models
+  notif_type_id = all_models.NotificationType.query.filter_by(
+      name=notif_type_name).one().id
+
+  # I don't like to have flush here, but we need a ID for newly created objects
+  if not obj.id:
+    db.session.flush()
+
+  db.session.add(all_models.Notification(
+      object=obj,
+      send_on=datetime.datetime.utcnow(),
+      notification_type_id=notif_type_id,
+      runner=all_models.Notification.RUNNER_FAST,
+      modified_by_id=get_current_user_id()
+  ))

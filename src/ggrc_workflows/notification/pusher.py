@@ -56,9 +56,9 @@ def push(obj, notif_type, send_on=None, repeating=False):
   )
 
 
-def get_notification_context(notification_type, send_at):
+def get_notification_context(notification_type, send_at, day):
   """Return notification context dict for sent data."""
-  today = datetime.datetime.combine(datetime.date.today(),
+  today = datetime.datetime.combine(day,
                                     datetime.datetime.min.time())
   repeatable_notification = notification_type.name in REPEATABLE_NOTIFICATIONS
   send_on_date = send_at - relativedelta.relativedelta(
@@ -73,13 +73,14 @@ def get_notification_context(notification_type, send_at):
           "repeating": repeatable_notification}
 
 
-def update_or_create_notifications(obj, send_at, *notification_names):
-  today = datetime.datetime.combine(datetime.date.today(),
-                                    datetime.datetime.min.time())
+def update_or_create_notifications(obj, send_at,
+                                   *notification_names, **kwargs):
+  day = kwargs.get("day", datetime.date.today())
+  today = datetime.datetime.combine(day, datetime.datetime.min.time())
   types = {n.name: n for n in get_notification_types(*notification_names)}
   for notification_name in notification_names:
     notif_type = types[notification_name]
-    notification_context = get_notification_context(notif_type, send_at)
+    notification_context = get_notification_context(notif_type, send_at, day)
     query = get_notification_query(
         obj
     ).filter(
@@ -97,14 +98,14 @@ def update_or_create_notifications(obj, send_at, *notification_names):
       push(obj, **notification_context)
 
 
-def create_notifications_for_objects(notification_type, send_at, *objs):
+def create_notifications_for_objects(notification_type, send_at,
+                                     *objs, **kwargs):
   """Only creates objects for selected notification_name.
 
   Args:
       notification_type can be base_string or instance of notification type.
       objs list of notified instances
   """
-
   if not objs:
     return
   if isinstance(notification_type, basestring):
@@ -112,9 +113,11 @@ def create_notifications_for_objects(notification_type, send_at, *objs):
   if not isinstance(notification_type, NotificationType):
     raise TypeError("notification_type should be basestring or "
                     "NotificationType instance.")
-  notification_context = get_notification_context(notification_type, send_at)
-  today = datetime.datetime.combine(datetime.date.today(),
-                                    datetime.datetime.min.time())
+  day = kwargs.get("day", datetime.date.today())
+  notification_context = get_notification_context(notification_type,
+                                                  send_at,
+                                                  day)
+  today = datetime.datetime.combine(day, datetime.datetime.min.time())
   send_on = notification_context["send_on"]
   if send_on < today:
     return

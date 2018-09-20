@@ -259,6 +259,8 @@ class QueryHelper(object):
     if expression is None:
       return set()
     object_class = inflector.get_model(object_name)
+    if object_class is None:
+      return set()
     query = db.session.query(object_class.id)
 
     tgt_class = object_class

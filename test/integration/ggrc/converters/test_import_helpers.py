@@ -462,7 +462,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Recipients",
         "Send by default",
         "Comments",
-        "Review State",
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
@@ -507,7 +506,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Deprecated Date",
         "Due Date",
         "State",
-        "Review State",
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
@@ -560,33 +558,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Folder",
     }
     self._test_single_object(all_models.Policy, names, self.COMMON_EXPECTED)
-
-  def test_clause_definitions(self):
-    """Test default headers for Clause."""
-    names = {
-        "Title",
-        "Text of Clause",
-        "Notes",
-        "Admin",
-        "Reference URL",
-        "Code",
-        "Effective Date",
-        "Last Deprecated Date",
-        "State",
-        "Review State",
-        "Delete",
-        "Primary Contacts",
-        "Secondary Contacts",
-        "Recipients",
-        "Send by default",
-        "Comments",
-        "Created Date",
-        "Last Updated Date",
-        "Last Updated By",
-        "Assessment Procedure",
-        "Folder",
-    }
-    self._test_single_object(all_models.Clause, names, self.COMMON_EXPECTED)
 
   def test_requirement_definitions(self):
     """Test default headers for Requirement."""
@@ -721,7 +692,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Last Deprecated Date",
         "Launch Status",
-        "Review State",
         "Delete",
         "Compliance Contacts",
         "Assignee",
@@ -754,7 +724,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Last Deprecated Date",
         "Launch Status",
-        "Review State",
         "Delete",
         "Compliance Contacts",
         "Assignee",
@@ -787,7 +756,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Last Deprecated Date",
         "Launch Status",
-        "Review State",
         "Delete",
         "Compliance Contacts",
         "Assignee",
@@ -864,7 +832,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Last Deprecated Date",
         "Launch Status",
-        "Review State",
         "Delete",
         "Compliance Contacts",
         "Assignee",
@@ -939,7 +906,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Deprecated Date",
         ("Launch Status" if issubclass(model, mixins.ScopeObject)
          else "State"),
-        "Review State",
         "Delete",
         "Compliance Contacts",
         "Assignee",

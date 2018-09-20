@@ -147,6 +147,66 @@ class TestPrimaryContactsPropagation(base.TestACLPropagation):
               "create_and_map_document_comment": True,
               "read_document_comment": True,
           },
+          "MappedReview Program": {
+              "create_review": True,
+              "read_review": True,
+              "update_review": True,
+              "delete_review": False,
+          },
+          "MappedReview Regulation": {
+              "create_review": True,
+              "read_review": True,
+              "update_review": True,
+              "delete_review": False,
+          },
+          "MappedReview Objective": {
+              "create_review": True,
+              "read_review": True,
+              "update_review": True,
+              "delete_review": False,
+          },
+          "MappedReview Control": {
+              "create_review": True,
+              "read_review": True,
+              "update_review": True,
+              "delete_review": False,
+          },
+          "MappedReview Contract": {
+              "create_review": True,
+              "read_review": True,
+              "update_review": True,
+              "delete_review": False,
+          },
+          "MappedReview Policy": {
+              "create_review": True,
+              "read_review": True,
+              "update_review": True,
+              "delete_review": False,
+          },
+          "MappedReview Risk": {
+              "create_review": True,
+              "read_review": True,
+              "update_review": True,
+              "delete_review": False,
+          },
+          "MappedReview Standard": {
+              "create_review": True,
+              "read_review": True,
+              "update_review": True,
+              "delete_review": False,
+          },
+          "MappedReview Threat": {
+              "create_review": True,
+              "read_review": True,
+              "update_review": True,
+              "delete_review": False,
+          },
+          "MappedReview Requirement": {
+              "create_review": True,
+              "read_review": True,
+              "update_review": True,
+              "delete_review": False,
+          },
       },
       "Reader": {
           "Universal AccessGroup": {

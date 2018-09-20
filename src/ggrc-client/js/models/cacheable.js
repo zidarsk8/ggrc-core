@@ -119,11 +119,6 @@ export default can.Model('can.Model.Cacheable', {
       attr_name: 'modified_by',
       order: 71,
     },
-    {
-      attr_title: 'Review State',
-      attr_name: 'os_state',
-      order: 80,
-    },
   ],
 
   root_collection: '',
@@ -720,13 +715,6 @@ export default can.Model('can.Model.Cacheable', {
   computed_unsuppressed_errors: function () {
     return this.errors();
   },
-  get_list_counter: function (name) {
-    let binding = this.get_binding(name);
-    if (!binding) {
-      return can.Deferred().reject();
-    }
-    return binding.refresh_count();
-  },
 
   get_list_loader: function (name) {
     let binding = this.get_binding(name);
@@ -740,10 +728,6 @@ export default can.Model('can.Model.Cacheable', {
       return binding.list;
     }
     return [];
-  },
-
-  get_mapping_deferred: function (name) {
-    return this.get_binding(name).refresh_list();
   },
 
   get_orphaned_count: function () {

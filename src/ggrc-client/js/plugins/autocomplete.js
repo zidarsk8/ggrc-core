@@ -21,7 +21,7 @@ import {getInstance} from '../plugins/utils/models-utils';
       // Ensure that the input.change event still occurs
       change: function (event, ui) {
         if (!$(event.target).parents(document.body).length) {
-          console.warn(
+          console.warn( // eslint-disable-line
             'autocomplete menu change event is coming from detached nodes');
         }
         $(event.target).trigger('change');
@@ -61,7 +61,7 @@ import {getInstance} from '../plugins/utils/models-utils';
               // shallow copy done by jQuery in `response()`
               objs = can.map(objs, function (obj) {
                 return {
-                  item: obj
+                  item: obj,
                 };
               });
               response(objs);
@@ -120,14 +120,14 @@ import {getInstance} from '../plugins/utils/models-utils';
           this.options.searchtypes,
           this.options.search_params
         )
-        .then(function (searchResult) {
-          let objects = [];
+          .then(function (searchResult) {
+            let objects = [];
 
-          can.each(that.options.searchtypes, function (searchtype) {
-            objects.push(...searchResult.getResultsForType(searchtype));
+            can.each(that.options.searchtypes, function (searchtype) {
+              objects.push(...searchResult.getResultsForType(searchtype));
+            });
+            return objects;
           });
-          return objects;
-        });
       },
 
       select: function (ev, ui) {
@@ -160,7 +160,7 @@ import {getInstance} from '../plugins/utils/models-utils';
                 }
               }
               $this.trigger('autocomplete:select', [{
-                item: newObj
+                item: newObj,
               }]);
               $this.trigger('modal:success', newObj);
             })
@@ -170,23 +170,13 @@ import {getInstance} from '../plugins/utils/models-utils';
               }, 100);
             });
 
-          while ((origEvent = origEvent.originalEvent)) {
-            if (origEvent.type === 'keydown') {
-              // This selection event was generated from a keydown, so click
-              // the add new link.
-              // FIXME: el is not defined, this would result in an error
-              widgetName = el.data('autocompleteWidgetName');
-              el.data(widgetName).menu.active.find('a').click();
-              break;
-            }
-          }
           return false;
         }
       },
 
       close: function () {
         this.scroll_op_in_progress = undefined;
-      }
+      },
     },
     _create: function () {
       let that = this;
@@ -195,11 +185,10 @@ import {getInstance} from '../plugins/utils/models-utils';
       let searchParams = $that.data('params');
       let permission = $that.data('permission-type');
       let searchtypes;
-      let typeNames;
 
       this._super(...arguments);
       this.options.search_params = {
-        extra_params: searchParams
+        extra_params: searchParams,
       };
       if (permission) {
         this.options.search_params.__permission_type = permission;
@@ -232,7 +221,7 @@ import {getInstance} from '../plugins/utils/models-utils';
         // Reverse the enveloping we did 25 lines up
         items: can.map(items, function (item) {
           return item.item;
-        })
+        }),
       };
     },
 
@@ -279,7 +268,7 @@ import {getInstance} from '../plugins/utils/models-utils';
               // Really ugly way to hide canjs exception during scrolling.
               // Please note that it occurs in really rear cases.
               // Better solution is needed.
-              console.warn(error);
+              console.warn(error); // eslint-disable-line
             }
 
             context.removeAttr('items_loading');
@@ -289,15 +278,19 @@ import {getInstance} from '../plugins/utils/models-utils';
           });
         }.bind(this));
 
-      import(/* webpackChunkName: "infiniteScroll" */'../controllers/infinite-scroll-controller').then(function () {
+      import(
+        /* webpackChunkName: "infiniteScroll" */
+        '../controllers/infinite-scroll-controller'
+      ).then(() => {
         can.view.render(GGRC.mustache_path + template,
-        context, function (frag) {
-          $ul.html(frag);
-          $ul.cms_controllers_lhn_tooltips().cms_controllers_infinite_scroll();
-          can.view.hookup(ul);
-        });
+          context, function (frag) {
+            $ul.html(frag);
+            $ul.cms_controllers_lhn_tooltips()
+              .cms_controllers_infinite_scroll();
+            can.view.hookup(ul);
+          });
       });
-    }
+    },
   });
 
   $.widget.bridge('ggrc_autocomplete', $.ggrc.autocomplete);
@@ -328,15 +321,15 @@ import {getInstance} from '../plugins/utils/models-utils';
         query = buildRelevantIdsQuery(objName, {}, relevant, filter);
 
         batchRequests(query)
-         .done((responseArr) => {
-           let ids = responseArr[objName].ids;
-           let model = CMS.Models[objName];
+          .done((responseArr) => {
+            let ids = responseArr[objName].ids;
+            let model = CMS.Models[objName];
 
-           let res = can.map(ids, (id) => {
-             return getInstance(model.shortName, id);
-           });
-           dfd.resolve(res);
-         });
+            let res = can.map(ids, (id) => {
+              return getInstance(model.shortName, id);
+            });
+            dfd.resolve(res);
+          });
 
         return dfd;
       },
@@ -370,7 +363,7 @@ import {getInstance} from '../plugins/utils/models-utils';
     }
     el.filter("[name][name!='']:not([data-query])")
       .ggrc_autocomplete({
-        controller: ctl
+        controller: ctl,
       });
 
     el.filter('[data-query]')
