@@ -50,6 +50,12 @@ export default can.Component.extend({
             this.attr('hasUpdatePermission');
         },
       },
+      showHistoryLink: {
+        get() {
+          return !this.attr('isReviewed') &&
+            !isSnapshot(this.attr('instance'));
+        },
+      },
       hasUpdatePermission: {
         get() {
           const instance = this.attr('review') || this.attr('instance');

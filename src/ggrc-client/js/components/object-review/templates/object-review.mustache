@@ -24,7 +24,7 @@
         <person-data class="inline-block" {person}="review.last_reviewed_by"></person-data>
         on {{getDate}}
       </div>
-      {{^if isReviewed}}
+      {{#if showHistoryLink}}
         <a class="object-review__body-history" href="javascript:void(0)" ($click)="showLastChanges()">
           Review History
         </a>
