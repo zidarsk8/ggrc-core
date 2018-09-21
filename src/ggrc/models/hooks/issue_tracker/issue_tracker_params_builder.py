@@ -6,13 +6,18 @@
 # pylint: disable=invalid-name
 
 import urlparse
+import logging
 
 import html2text
 
 from ggrc import utils as ggrc_utils
+from ggrc.integrations import issues
+from ggrc.integrations import integrations_errors
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.models.hooks.issue_tracker import \
     issue_tracker_params_container as params_container
+
+logger = logging.getLogger(__name__)
 
 
 class BaseIssueTrackerParamsBuilder(object):
@@ -120,9 +125,19 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
       u"Issue tracker integration is not activated because the reporter "
       "is an Global auditor."
   )
+  ISSUE_LINK_TMPL = (
+      u"This bug was linked to a GGRC Issue. Use the following link to find "
+      u"the issue - {issue_link}."
+  )
 
-  def build_create_issue_tracker_params(self, obj, issue_tracker_info):
-    """Build create issue query for issue tracker."""
+  def _build_allowed_emails(self, obj):
+    """Handle emails from object.
+
+    Excludes auditors from emails list because no contact field should contain
+             global auditors.
+    Args: obj - object to collect emails
+    Return: A tuple (reporter_email, allowed_emails).
+    """
     all_emails = {acl.person.email for acl in obj.access_control_list}
 
     # Add the person who triggered the event.
@@ -133,6 +148,14 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
     reporter_email = obj.modified_by.email
     if reporter_email not in allowed_emails:
       obj.add_warning(self.EXCLUDE_REPORTER_EMAIL_ERROR_MSG)
+      return None
+    return allowed_emails
+
+  def build_create_issue_tracker_params(self, obj, issue_tracker_info):
+    """Build create issue query for issue tracker."""
+
+    allowed_emails = self._build_allowed_emails(obj)
+    if allowed_emails is None:
       return self.params
 
     self.params.status = self.ASSIGNED_ISSUE_STATUS
@@ -144,6 +167,32 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
     self.handle_issue_tracker_info(obj, issue_tracker_info)
     self._handle_people_emails(obj, allowed_emails)
     self._handle_issue_comment_attributes(obj)
+
+    return self.params
+
+  def build_params_for_issue_link(self, obj, ticket_id, it_info):
+    """Build update issue query for linking IssueTracker ticket to Issue"""
+    allowed_emails = self._build_allowed_emails(obj)
+    if allowed_emails is None:
+      return self.params
+
+    try:
+      res = issues.Client().get_issue(ticket_id)
+    except integrations_errors.Error as error:
+      logger.error(
+          "Unable to link a ticket while creating object ID=%d: %s",
+          obj.id,
+          error,
+      )
+      obj.add_warning(
+          "Ticket tracker ID does not exist or you do not have access to it."
+      )
+    else:
+      self.params.status = res["issueState"]["status"]
+      self._add_link_message(obj)
+      self.handle_issue_tracker_info(obj, it_info)
+      self._handle_emails_from_response(res)
+      self.params.reporter = obj.modified_by.email
 
     return self.params
 
@@ -177,6 +226,12 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
         link=self.get_ggrc_object_url(sync_obj),
     ))
     return self.params
+
+  def _handle_emails_from_response(self, response):
+    """Handle emails from response for GET request to IssueTracker"""
+    self.params.verifier = response["issueState"]["verifier"]
+    self.params.assignee = response["issueState"]["assignee"]
+    self.params.cc_list = response["issueState"]["ccs"]
 
   def _handle_people_emails(self, obj, allowed_emails):
     """Handle emails.
@@ -219,6 +274,13 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
                             assignee_email,
                             reporter_email}
     self.params.cc_list = list(ccs)
+
+  def _add_link_message(self, obj):
+    """Adds link message to IssueTracker ticket"""
+    self.params.add_comment(self.ISSUE_LINK_TMPL.format(
+        issue_link=self.get_ggrc_object_url(obj),
+    ))
+    self._handle_issue_comment_attributes(obj)
 
   def _handle_issue_comment_attributes(self, obj):
     """Handle attributes from GGRC Issue object.

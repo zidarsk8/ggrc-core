@@ -15,6 +15,8 @@ from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder \
     as params_builder
 from ggrc.integrations import integrations_errors
+from ggrc.integrations.synchronization_jobs.issue_sync_job import \
+    ISSUE_STATUS_MAPPING
 
 from integration.ggrc.models import factories
 from integration import ggrc
@@ -24,6 +26,32 @@ from integration.ggrc.api_helper import Api
 @ddt.ddt
 class TestIssueIntegration(ggrc.TestCase):
   """Test set for IssueTracker integration functionality."""
+  DEFAULT_ISSUE_ATTRS = {
+      "title": "title1",
+      "context": None,
+      "status": "Draft",
+      "enabled": True,
+      "component_id": 1234,
+      "hotlist_id": 4321,
+      "issue_id": 654321,
+      "issue_type": "Default Issue Type",
+      "issue_priority": "P2",
+      "issue_severity": "S1",
+  }
+
+  DEFAULT_TICKET_ATTRS = {
+      "component_id": 1234,
+      "hotlist_id": 4321,
+      "issue_id": 654321,
+      "status": "new",
+      "issue_type": "Default Issue type",
+      "issue_priority": "P1",
+      "issue_severity": "S2",
+      "title": "test title",
+      "verifier": "user@example.com",
+      "assignee": "user@example.com",
+      "ccs": ["user@example.com"],
+  }
 
   # pylint: disable=invalid-name
 
@@ -133,6 +161,157 @@ class TestIssueIntegration(ggrc.TestCase):
     with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True):
       self.api.put(iti.issue_tracked_obj, issue_attrs)
     mock_update_issue.assert_not_called()
+
+  def request_payload_builder(self, issue_attrs):
+    """Build payload for update request to Issue Tracker"""
+    payload_attrs = dict(self.DEFAULT_ISSUE_ATTRS, **issue_attrs)
+    payload = {"issue": {
+        "title": payload_attrs["title"],
+        "context": payload_attrs["context"],
+        "status": payload_attrs["status"],
+        "issue_tracker": {
+            "enabled": payload_attrs["enabled"],
+            "component_id": payload_attrs["component_id"],
+            "hotlist_id": payload_attrs["hotlist_id"],
+            "issue_id": payload_attrs["issue_id"],
+            "issue_type": payload_attrs["issue_type"],
+            "issue_priority": payload_attrs["issue_priority"],
+            "issue_severity": payload_attrs["issue_severity"],
+            "title": payload_attrs["title"],
+        }
+    }}
+    return payload
+
+  def response_payload_builder(self, ticket_attrs):
+    """Build payload for response from Issue Tracker via get_issue method"""
+    payload_attrs = dict(self.DEFAULT_TICKET_ATTRS, **ticket_attrs)
+    payload = {"issueState": {
+        "component_id": payload_attrs["component_id"],
+        "hotlist_id": payload_attrs["hotlist_id"],
+        "issue_id": payload_attrs["issue_id"],
+        "status": payload_attrs["status"],
+        "issue_type": payload_attrs["issue_type"],
+        "issue_priority": payload_attrs["issue_priority"],
+        "issue_severity": payload_attrs["issue_severity"],
+        "title": payload_attrs["title"],
+        "verifier": payload_attrs["verifier"],
+        "assignee": payload_attrs["assignee"],
+        "ccs": payload_attrs["ccs"],
+    }}
+    return payload
+
+  def check_issuetracker_issue_fields(self,
+                                      obj,
+                                      issue_tracker_issue,
+                                      issue_attrs,
+                                      issue_tracker_ticket_attrs):
+    """Checks issuetracker_issue were updated correctly.
+
+    Make assertions to check if issue tracker fields were updated according
+    our business logic.
+    For Issue model we should get title, component_id, hotlist_id,
+    priority, severity, issue_id and issue_type from GGRC and status from
+    Issue Tracker.
+    """
+
+    self.assertTrue(issue_tracker_issue.enabled)
+
+    # According to our business logic these attributes should be taken
+    # from issue information
+    self.assertEqual(issue_tracker_issue.title,
+                     issue_attrs["issue"]["title"])
+    self.assertEqual(int(issue_tracker_issue.component_id),
+                     issue_attrs["issue"]["issue_tracker"]["component_id"])
+    self.assertEqual(int(issue_tracker_issue.hotlist_id),
+                     issue_attrs["issue"]["issue_tracker"]["hotlist_id"])
+    self.assertEqual(issue_tracker_issue.issue_priority,
+                     issue_attrs["issue"]["issue_tracker"]["issue_priority"])
+    self.assertEqual(issue_tracker_issue.issue_severity,
+                     issue_attrs["issue"]["issue_tracker"]["issue_severity"])
+    self.assertEqual(int(issue_tracker_issue.issue_id),
+                     issue_attrs["issue"]["issue_tracker"]["issue_id"])
+    self.assertEqual(issue_tracker_issue.issue_type,
+                     issue_attrs["issue"]["issue_tracker"]["issue_type"])
+
+    # These attributes should be taken from ticket information
+    ticket_status = issue_tracker_ticket_attrs["issueState"]["status"]
+    ticket_mapped_status = ISSUE_STATUS_MAPPING[ticket_status]
+    self.assertEqual(obj.status, ticket_mapped_status)
+
+  @ddt.data(
+      ({"title": "first_title"}, {"title": "other_title"}),
+      ({"issue_type": "type1"}, {"issue_type": "process"}),
+      ({"issue_severity": "S0"}, {"issue_severity": "S1"}),
+      ({"issue_priority": "P0"}, {"issue_priority": "P1"}),
+      ({"hotlist_id": 1234}, {"hotlist_id": 4321}),
+      ({"component_id": 1234}, {"component_id": 4321}),
+      ({"status": "Draft"}, {"status": "fixed"}),
+  )
+  @ddt.unpack
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_new_issue_linking(self, issue_attrs, ticket_attrs, update_mock):
+    """Test linking new Issue to IssueTracker ticket sets correct fields"""
+    issue_request_payload = self.request_payload_builder(issue_attrs)
+    response_payload = self.response_payload_builder(ticket_attrs)
+    with mock.patch("ggrc.integrations.issues.Client.get_issue",
+                    return_value=response_payload) as get_mock:
+      with mock.patch.object(integration_utils, "exclude_auditor_emails",
+                             return_value={u"user@example.com", }):
+        response = self.api.post(all_models.Issue, issue_request_payload)
+      get_mock.assert_called_once()
+    update_mock.assert_called_once()
+
+    self.assertEqual(response.status_code, 201)
+    issue_id = response.json.get("issue").get("id")
+    issue_tracker_issue = models.IssuetrackerIssue.get_issue("Issue", issue_id)
+    issue = all_models.Issue.query.filter_by(id=issue_id).first()
+    self.check_issuetracker_issue_fields(issue,
+                                         issue_tracker_issue,
+                                         issue_request_payload,
+                                         response_payload)
+
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_people_merge_after_linking(self, update_mock):
+    """Test people roles were updated while linking new ticket"""
+    ticket_attrs = {
+        "verifier": "verifier@example.com",
+        "assignee": "assignee@example.com",
+        "ccs": ["cc1@example.com", "cc2@example.com"],
+    }
+
+    with factories.single_commit():
+      factories.PersonFactory(email="verifier@example.com")
+      factories.PersonFactory(email="assignee@example.com")
+      for email in ["cc1@example.com", "cc2@example.com"]:
+        factories.PersonFactory(email=email)
+
+    issue_request_payload = self.request_payload_builder({})
+    response_payload = self.response_payload_builder(ticket_attrs)
+    with mock.patch("ggrc.integrations.issues.Client.get_issue",
+                    return_value=response_payload) as get_mock:
+      with mock.patch.object(integration_utils, "exclude_auditor_emails",
+                             return_value={u"user@example.com", }):
+        response = self.api.post(all_models.Issue, issue_request_payload)
+      get_mock.assert_called_once()
+    update_mock.assert_called_once()
+
+    self.assertEqual(response.status_code, 201)
+    issue_id = response.json.get("issue").get("id")
+    issue = all_models.Issue.query.filter_by(id=issue_id).first()
+
+    admins = [person.email for person
+              in issue.get_persons_for_rolename("Admin")]
+    primary = [person.email for person
+               in issue.get_persons_for_rolename("Primary Contacts")]
+    secondary = [person.email for person
+                 in issue.get_persons_for_rolename("Secondary Contacts")]
+    # assert ticket roles were added to Issue
+    self.assertIn("verifier@example.com", admins)
+    self.assertIn("assignee@example.com", primary)
+    for person in ["cc1@example.com", "cc2@example.com"]:
+      self.assertIn(person, secondary)
 
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
   def test_issue_tracker_error(self, update_issue_mock):
