@@ -112,12 +112,11 @@ def handle_export_request_error(handle_function):
         raise Unauthorized("%s %s" % (message, app_errors.RELOAD_PAGE))
       raise InternalServerError(message)
     except Exception as e:  # pylint: disable=broad-except
-      logger.exception("%s %s",
-                       app_errors.JOB_FAILED.format("Export"), e.message)
+      logger.exception(e.message)
       if settings.TESTING:
         raise
       raise InternalServerError(
-          app_errors.INTERNAL_SERVER_ERROR.format("Export"))
+          app_errors.INTERNAL_SERVER_ERROR.format(job_type="Export"))
   return handle_wrapper
 
 
@@ -193,7 +192,8 @@ def parse_import_request():
     dry_run = request.headers["X-test-only"] == "true"
     return dry_run, file_data
   except:  # pylint: disable=bare-except
-    raise BadRequest(app_errors.INCORRECT_REQUEST_DATA.format("Export"))
+    raise BadRequest(
+        app_errors.INCORRECT_REQUEST_DATA.format(job_type="Export"))
 
 
 def handle_import_request():
@@ -220,9 +220,9 @@ def make_import(csv_data, dry_run):
     logger.exception("Import failed: %s", e.message)
     if settings.TESTING:
       raise
-    raise BadRequest("%s %s" %
-                     (app_errors.INTERNAL_SERVER_ERROR.format("Import"),
-                      e.message))
+    raise BadRequest("{} {}".format(
+        app_errors.INTERNAL_SERVER_ERROR.format(job_type="Import"), e.message
+    ))
 
 
 def check_for_previous_run():
@@ -315,8 +315,7 @@ def run_import_phases(ie_id, user_id, url_root):  # noqa: ignore=C901
         job_emails.send_email(job_emails.IMPORT_COMPLETED, user.email,
                               url_root, ie_job.title)
     except Exception as e:  # pylint: disable=broad-except
-      logger.exception("%s %s", app_errors.JOB_FAILED.format("Import"),
-                       e.message)
+      logger.exception(e.message)
       try:
         ie_job.status = "Failed"
         ie_job.end_at = datetime.utcnow()
@@ -399,8 +398,8 @@ def handle_start(ie_job, user_id):
                    _queue="ggrcImport")
     return make_import_export_response(ie_job.log_json())
   except Exception as e:
-    logger.exception("%s %s", app_errors.JOB_FAILED, e.message)
-    raise BadRequest(app_errors.JOB_FAILED)
+    logger.exception(e.message)
+    raise BadRequest(app_errors.JOB_FAILED.format(job_type="Import"))
 
 
 def handle_import_put(**kwargs):
@@ -411,16 +410,16 @@ def handle_import_put(**kwargs):
   if user.system_wide_role == 'No Access':
     raise Forbidden()
   if not ie_id or not command or command not in ("start", "stop"):
-    raise BadRequest(app_errors.INCORRECT_REQUEST_DATA.format("Import"))
+    raise BadRequest(
+        app_errors.INCORRECT_REQUEST_DATA.format(job_type="Import"))
   try:
     ie_job = import_export.get(ie_id)
   except (Forbidden, NotFound):
     raise
   except Exception as e:
-    logger.exception("%s %s",
-                     app_errors.INCORRECT_REQUEST_DATA.format("Import"),
-                     e.message)
-    raise BadRequest(app_errors.INCORRECT_REQUEST_DATA.format("Import"))
+    logger.exception(e.message)
+    raise BadRequest(
+        app_errors.INCORRECT_REQUEST_DATA.format(job_type="Import"))
   if command == 'start':
     return handle_start(ie_job, user.id)
   elif command == "stop":
@@ -450,10 +449,9 @@ def handle_get(id2, command, job_type):
   except (Forbidden, NotFound):
     raise
   except Exception as e:
-    logger.exception("%s %s",
-                     app_errors.INCORRECT_REQUEST_DATA.format(job_type),
-                     e.message)
-    raise BadRequest(app_errors.INCORRECT_REQUEST_DATA.format(job_type))
+    logger.exception(e.message)
+    raise BadRequest(
+        app_errors.INCORRECT_REQUEST_DATA.format(job_type=job_type))
 
   return make_import_export_response(res)
 
@@ -489,10 +487,9 @@ def handle_import_post(**kwargs):
   except Unauthorized:
     raise
   except Exception as e:
-    logger.exception("%s %s",
-                     app_errors.INCORRECT_REQUEST_DATA.format("Import"),
-                     e.message)
-    raise BadRequest(app_errors.INCORRECT_REQUEST_DATA.format("Import"))
+    logger.exception(e.message)
+    raise BadRequest(
+        app_errors.INCORRECT_REQUEST_DATA.format(job_type="Import"))
 
 
 def handle_file_download(id2):
@@ -504,10 +501,9 @@ def handle_file_download(id2):
   except (Forbidden, NotFound, Unauthorized):
     raise
   except Exception as e:
-    logger.exception("%s %s",
-                     app_errors.INCORRECT_REQUEST_DATA.format("Download"),
-                     e.message)
-    raise BadRequest(app_errors.INCORRECT_REQUEST_DATA.format("Download"))
+    logger.exception(e.message)
+    raise BadRequest(
+        app_errors.INCORRECT_REQUEST_DATA.format(job_type="Download"))
 
 
 def handle_export_put(**kwargs):
@@ -515,7 +511,8 @@ def handle_export_put(**kwargs):
   command = kwargs.get("command2")
   ie_id = kwargs.get("id2")
   if not ie_id or not command or command != "stop":
-    raise BadRequest(app_errors.INCORRECT_REQUEST_DATA.format("Export"))
+    raise BadRequest(
+        app_errors.INCORRECT_REQUEST_DATA.format(job_type="Export"))
   return handle_export_stop(**kwargs)
 
 
@@ -533,7 +530,8 @@ def handle_export_post(**kwargs):
   if user.system_wide_role == 'No Access':
     raise Forbidden()
   if not objects or not current_time:
-    raise BadRequest(app_errors.INCORRECT_REQUEST_DATA.format("Export"))
+    raise BadRequest(
+        app_errors.INCORRECT_REQUEST_DATA.format(job_type="Export"))
   try:
     filename = get_export_filename(objects, current_time)
     ie = import_export.create_import_export_entry(
@@ -550,10 +548,9 @@ def handle_export_post(**kwargs):
                    _queue="ggrcImport")
     return make_import_export_response(ie.log_json())
   except Exception as e:
-    logger.exception("%s %s",
-                     app_errors.INCORRECT_REQUEST_DATA.format("Export"),
-                     e.message)
-    raise BadRequest(app_errors.INCORRECT_REQUEST_DATA.format("Export"))
+    logger.exception(e.message)
+    raise BadRequest(
+        app_errors.INCORRECT_REQUEST_DATA.format(job_type="Export"))
 
 
 def handle_delete(**kwargs):
@@ -567,10 +564,9 @@ def handle_delete(**kwargs):
   except (Forbidden, NotFound):
     raise
   except Exception as e:
-    logger.exception("%s %s",
-                     app_errors.INCORRECT_REQUEST_DATA.format("Import/Export"),
-                     e.message)
-    raise BadRequest(app_errors.INCORRECT_REQUEST_DATA.format("Import/Export"))
+    logger.exception(e.message)
+    raise BadRequest(
+        app_errors.INCORRECT_REQUEST_DATA.format(job_type="Import/Export"))
 
 
 def handle_import_stop(**kwargs):
@@ -584,10 +580,9 @@ def handle_import_stop(**kwargs):
   except Forbidden:
     raise
   except Exception as e:
-    logger.exception("%s %s",
-                     app_errors.INCORRECT_REQUEST_DATA.format("Import"),
-                     e.message)
-    raise BadRequest(app_errors.INCORRECT_REQUEST_DATA.format("Import"))
+    logger.exception(e.message)
+    raise BadRequest(
+        app_errors.INCORRECT_REQUEST_DATA.format(job_type="Import"))
   # Need to implement a better solution in order to identify specific
   # errors like here
   raise BadRequest(app_errors.WRONG_STATUS)
@@ -604,8 +599,7 @@ def handle_export_stop(**kwargs):
   except Forbidden:
     raise
   except Exception as e:
-    logger.exception("%s %s",
-                     app_errors.INCORRECT_REQUEST_DATA.format("Export"),
-                     e.message)
-    raise BadRequest(app_errors.INCORRECT_REQUEST_DATA.format("Export"))
+    logger.exception(e.message)
+    raise BadRequest(
+        app_errors.INCORRECT_REQUEST_DATA.format(job_type="Export"))
   raise BadRequest(app_errors.WRONG_STATUS)
