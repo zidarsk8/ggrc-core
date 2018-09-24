@@ -541,7 +541,7 @@ def handle_export_post(**kwargs):
   if not objects or not current_time:
     raise BadRequest(app_errors.INCORRECT_REQUEST_DATA.format("Export"))
   try:
-    filename = get_export_filename(objects, current_time)
+    filename = get_export_filename(objects, current_time, exportable_objects)
     ie = import_export.create_import_export_entry(
         job_type="Export",
         status="In Progress",
