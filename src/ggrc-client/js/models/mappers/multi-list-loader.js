@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import Mappings from './mappings';
+
 (function (GGRC, can) {
   GGRC.ListLoaders.BaseListLoader('GGRC.ListLoaders.MultiListLoader', {}, {
     init: function (sources) {
@@ -18,7 +20,7 @@
       }
 
       can.each(this.sources, function (source) {
-        let sourceBinding = binding.instance.get_binding(source);
+        let sourceBinding = Mappings.get_binding(source, binding.instance);
         if (source) {
           binding.source_bindings.push(sourceBinding);
           self.init_source_listeners(binding, sourceBinding);

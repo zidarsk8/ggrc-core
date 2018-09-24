@@ -5,7 +5,7 @@
 
 import Cacheable from '../cacheable';
 import Directive from './directive';
-import '../mixins/access-control-list';
+import accessControlList from '../mixins/access-control-list';
 
 export default Directive('CMS.Models.Policy', {
   root_object: 'policy',
@@ -25,15 +25,7 @@ export default Directive('CMS.Models.Policy', {
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {},
-  mixins: ['accessControlList'],
-  meta_kinds: [
-    'Company Policy',
-    'Org Group Policy',
-    'Data Asset Policy',
-    'Product Policy',
-    'Contract-Related Policy',
-    'Company Controls Policy',
-  ],
+  mixins: [accessControlList],
   cache: can.getObject('cache', Directive, true),
   sub_tree_view_options: {
     default_filter: ['DataAsset'],

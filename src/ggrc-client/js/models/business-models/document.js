@@ -6,8 +6,8 @@
 import Cacheable from '../cacheable';
 import {getRole} from '../../plugins/utils/acl-utils';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
-import '../mixins/access-control-list';
-import '../mixins/ca-update';
+import accessControlList from '../mixins/access-control-list';
+import caUpdate from '../mixins/ca-update';
 import Stub from '../stub';
 
 const getAccessControlList = () => {
@@ -31,8 +31,8 @@ export default Cacheable('CMS.Models.Document', {
   update: 'PUT /api/documents/{id}',
   destroy: 'DELETE /api/documents/{id}',
   mixins: [
-    'accessControlList',
-    'ca_update',
+    accessControlList,
+    caUpdate,
   ],
   statuses: [
     'Active',

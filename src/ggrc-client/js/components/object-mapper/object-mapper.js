@@ -33,12 +33,12 @@ import {
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 import tracker from '../../tracker';
 import {
-  isMapped as isMappedUtil,
   allowedToMap,
 } from '../../plugins/ggrc_utils';
 import Mappings from '../../models/mappers/mappings';
 import Relationship from '../../models/service-models/relationship';
 import * as businessModels from '../../models/business-models';
+import * as mappingModels from '../../models/mapping-models';
 
 let DEFAULT_OBJECT_MAP = {
   Assessment: 'Control',
@@ -285,9 +285,7 @@ export default can.Component.extend({
         data.context = instance.context || null;
         objects.forEach((destination) => {
           let modelInstance;
-          let isMapped;
           let isAllowed;
-          let isPersonMapping = type === 'Person';
           // Use simple Relationship Model to map Snapshot
           if (this.viewModel.attr('useSnapshots')) {
             modelInstance = new Relationship({
@@ -303,14 +301,13 @@ export default can.Component.extend({
             return defer.push(modelInstance.save());
           }
 
-          isMapped = isMappedUtil(instance, destination);
           isAllowed = allowedToMap(instance, destination);
 
-          if ((!isPersonMapping && isMapped) || !isAllowed) {
+          if (!isAllowed) {
             return;
           }
           mapping = Mappings.get_canonical_mapping(object, type);
-          Model = CMS.Models[mapping.model_name];
+          Model = mappingModels[mapping.model_name];
           data[mapping.object_attr] = {
             href: instance.href,
             type: instance.type,

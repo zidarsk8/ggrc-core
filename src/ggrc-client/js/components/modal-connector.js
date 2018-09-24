@@ -75,7 +75,7 @@ export default can.Component.extend({
       }
 
       if (!vm.attr('customRelatedLoader')) {
-        instance.get_binding(vm.source_mapping)
+        Mappings.get_binding(vm.source_mapping, instance)
           .refresh_instances()
           .then(function (list) {
             this.setListItems(list);

@@ -8,7 +8,7 @@ import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import Cacheable from '../../cacheable';
 import issueTracker from '../issue-tracker';
 
-describe('can.Model.Mixin.issueTracker', () => {
+describe('issueTracker mixin', () => {
   let Mixin;
 
   beforeAll(function () {

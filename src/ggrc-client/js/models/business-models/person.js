@@ -5,7 +5,7 @@
 
 import Cacheable from '../cacheable';
 import tracker from '../../tracker';
-import '../mixins/ca-update';
+import caUpdate from '../mixins/ca-update';
 import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Person', {
@@ -42,7 +42,7 @@ export default Cacheable('CMS.Models.Person', {
     name: 'trimmed',
     email: 'trimmedLower',
   },
-  mixins: ['ca_update'],
+  mixins: [caUpdate],
   defaults: {
     name: '',
     email: '',

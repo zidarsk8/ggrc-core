@@ -6,6 +6,7 @@
 import template from './mapping-tree-view.mustache';
 import '../object-list-item/editable-document-object-list-item';
 import {notifierXHR} from '../../plugins/utils/notifiers-utils';
+import Mappings from '../../models/mappers/mappings';
 
 export default can.Component.extend({
   tag: 'mapping-tree-view',
@@ -39,7 +40,9 @@ export default can.Component.extend({
       }
     });
 
-    binding = this.viewModel.parentInstance.get_binding(this.viewModel.mapping);
+    binding = Mappings.get_binding(
+      this.viewModel.mapping,
+      this.viewModel.parentInstance);
 
     binding.refresh_instances().then(function (mappedObjects) {
       this.viewModel.attr('mappedObjects').replace(
@@ -76,8 +79,9 @@ export default can.Component.extend({
   events: {
     '[data-toggle=unmap] click': function (el, ev) {
       let instance = el.find('.result').data('result');
-      let mappings = this.viewModel.parentInstance.get_mapping(
-        this.viewModel.mapping);
+      let mappings = Mappings.get_mapping(
+        this.viewModel.mapping,
+        this.viewModel.parentInstance);
       let binding;
 
       ev.stopPropagation();

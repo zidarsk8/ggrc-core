@@ -4,10 +4,10 @@
 */
 
 import Cacheable from '../cacheable';
-import '../mixins/unique-title';
-import '../mixins/timeboxed';
-import '../mixins/ca-update';
-import '../mixins/base-notifications';
+import uniqueTitle from '../mixins/unique-title';
+import timeboxed from '../mixins/timeboxed';
+import caUpdate from '../mixins/ca-update';
+import baseNotifications from '../mixins/base-notifications';
 import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Directive', {
@@ -18,7 +18,7 @@ export default Cacheable('CMS.Models.Directive', {
   root_model: 'Directive',
   findAll: '/api/directives',
   findOne: '/api/directives/{id}',
-  mixins: ['unique_title', 'timeboxed', 'ca_update', 'base-notifications'],
+  mixins: [uniqueTitle, timeboxed, caUpdate, baseNotifications],
   tree_view_options: {
     attr_view: GGRC.mustache_path + '/directives/tree-item-attr.mustache',
     attr_list: Cacheable.attr_list.concat([
@@ -48,30 +48,6 @@ export default Cacheable('CMS.Models.Directive', {
       }]),
     add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
   },
-  model: function (params) {
-    if (this.shortName !== 'Directive') {
-      return this._super(params);
-    }
-    if (!params) {
-      return params;
-    }
-    params = this.object_from_resource(params);
-    if (!params.selfLink) {
-      if (params.type !== 'Directive') {
-        return CMS.Models[params.type].model(params);
-      }
-    } else {
-      if (CMS.Models.Contract.meta_kinds.indexOf(params.kind) > -1) {
-        return CMS.Models.Contract.model(params);
-      } else if (CMS.Models.Regulation.meta_kinds.indexOf(params.kind) > -1) {
-        return CMS.Models.Regulation.model(params);
-      } else if (CMS.Models.Policy.meta_kinds.indexOf(params.kind) > -1) {
-        return CMS.Models.Policy.model(params);
-      } else if (CMS.Models.Standard.meta_kinds.indexOf(params.kind) > -1) {
-        return CMS.Models.Standard.model(params);
-      }
-    }
-  },
   attributes: {
     context: Stub,
     modified_by: Stub,
@@ -80,12 +56,4 @@ export default Cacheable('CMS.Models.Directive', {
     this.validateNonBlank('title');
     this._super(...arguments);
   },
-  meta_kinds: [],
-}, {
-  init: function () {
-    this._super && this._super(...arguments);
-  },
-  lowercase_kind: function () {
-    return this.kind ? this.kind.toLowerCase() : undefined;
-  },
-});
+}, {});

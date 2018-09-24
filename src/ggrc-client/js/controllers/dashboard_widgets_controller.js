@@ -3,14 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Filterable from './filterable_controller';
 import {
   getCounts,
 } from '../plugins/utils/current-page-utils';
 import {inferObjectType} from '../plugins/utils/models-utils';
 import DisplayPrefs from '../models/local-storage/display-prefs';
 
-export default Filterable({
+export default can.Control({
   pluginName: 'dashboard_widgets',
   defaults: {
     model: null,

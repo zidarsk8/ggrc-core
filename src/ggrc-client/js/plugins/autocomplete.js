@@ -10,6 +10,7 @@ import {
 import RefreshQueue from '../models/refresh_queue';
 import Search from '../models/service-models/search';
 import {getInstance} from '../plugins/utils/models-utils';
+import * as businessModels from '../models/business-models';
 
 (function ($) {
   'use strict';
@@ -204,7 +205,7 @@ import {getInstance} from '../plugins/utils/models-utils';
         searchtypes = baseSearch.trim().split(',');
 
         this.options.searchtypes = can.map(searchtypes, function (typeName) {
-          return CMS.Models[typeName].model_singular;
+          return businessModels[typeName].model_singular;
         });
       }
     },
@@ -212,8 +213,7 @@ import {getInstance} from '../plugins/utils/models-utils';
     _setup_menu_context: function (items) {
       let modelClass = this.element.data('lookup');
       let dataModel = this.element.data('model');
-      let model = CMS.Models[modelClass || dataModel] ||
-                  GGRC.Models[modelClass || dataModel];
+      let model = businessModels[modelClass || dataModel];
 
       return {
         model_class: modelClass,
@@ -323,7 +323,7 @@ import {getInstance} from '../plugins/utils/models-utils';
         batchRequests(query)
           .done((responseArr) => {
             let ids = responseArr[objName].ids;
-            let model = CMS.Models[objName];
+            let model = businessModels[objName];
 
             let res = can.map(ids, (id) => {
               return getInstance(model.shortName, id);

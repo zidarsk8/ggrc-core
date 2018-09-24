@@ -6,7 +6,7 @@
 import Mixin from './mixin';
 import {isSnapshot} from '../../plugins/utils/snapshot-utils';
 
-export default Mixin('assertions_categories', {
+export default Mixin({
   cleanupCollections(resource) {
     if (isSnapshot(this)) {
       return resource;

@@ -4,6 +4,8 @@
 */
 
 import Stub from './stub';
+import * as mappingModels from '../models/mapping-models';
+import Mappings from '../models/mappers/mappings';
 
 const resolveDeferredBindings = (obj) => {
   const hasPendingJoins = _.get(obj, '_pending_joins.length') > 0;
@@ -25,7 +27,7 @@ function _resolveDeferredBindings(obj) {
 
   const refreshDfds = [];
   can.each(uniqueThrough, (binding) => {
-    refreshDfds.push(obj.get_binding(binding).refresh_stubs());
+    refreshDfds.push(Mappings.get_binding(binding, obj).refresh_stubs());
   });
 
   return $.when(...refreshDfds)
@@ -57,7 +59,7 @@ function _resolveDeferredBindings(obj) {
 }
 
 function _addHandler(obj, pj) {
-  const binding = obj.get_binding(pj.through);
+  const binding = Mappings.get_binding(pj.through, obj);
   const dfds = [];
   // Don't re-add -- if the object is already mapped (could be direct or through a proxy)
   // move on to the next one
@@ -68,8 +70,7 @@ function _addHandler(obj, pj) {
       }), pj.what))) {
     return dfds;
   }
-  const model = (CMS.Models[binding.loader.model_name] ||
-    GGRC.Models[binding.loader.model_name]);
+  const model = mappingModels[binding.loader.model_name];
   const inst = pj.what instanceof model
     ? pj.what
     : new model({
@@ -95,7 +96,7 @@ function _addHandler(obj, pj) {
 }
 
 function _removeHandler(obj, pj) {
-  const binding = obj.get_binding(pj.through);
+  const binding = Mappings.get_binding(pj.through, obj);
   const dfds = [];
   can.map(binding.list, function (boundObj) {
     let blOptionAttr = binding.loader.option_attr;

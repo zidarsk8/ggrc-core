@@ -11,9 +11,9 @@ import {
   getDate,
 } from '../../plugins/utils/date-util';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
-import '../mixins/contactable';
-import '../mixins/timeboxed';
-import '../mixins/access-control-list';
+import contactable from '../mixins/contactable';
+import timeboxed from '../mixins/timeboxed';
+import accessControlList from '../mixins/access-control-list';
 import Stub from '../stub';
 
 export default Cacheable('CMS.Models.TaskGroupTask', {
@@ -24,7 +24,7 @@ export default Cacheable('CMS.Models.TaskGroupTask', {
   update: 'PUT /api/task_group_tasks/{id}',
   destroy: 'DELETE /api/task_group_tasks/{id}',
 
-  mixins: ['contactable', 'timeboxed', 'accessControlList'],
+  mixins: [contactable, timeboxed, accessControlList],
   permalink_options: {
     url: '<%= base.viewLink %>#task_group/' +
     'task_group/<%= instance.task_group.id %>',

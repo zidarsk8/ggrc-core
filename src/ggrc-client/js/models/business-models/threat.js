@@ -4,10 +4,10 @@
  */
 
 import Cacheable from '../cacheable';
-import '../mixins/unique-title';
-import '../mixins/ca-update';
-import '../mixins/access-control-list';
-import '../mixins/base-notifications';
+import uniqueTitle from '../mixins/unique-title';
+import caUpdate from '../mixins/ca-update';
+import accessControlList from '../mixins/access-control-list';
+import baseNotifications from '../mixins/base-notifications';
 import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Threat', {
@@ -20,10 +20,10 @@ export default Cacheable('CMS.Models.Threat', {
   update: 'PUT /api/threats/{id}',
   destroy: 'DELETE /api/threats/{id}',
   mixins: [
-    'unique_title',
-    'ca_update',
-    'accessControlList',
-    'base-notifications',
+    uniqueTitle,
+    caUpdate,
+    accessControlList,
+    baseNotifications,
   ],
   is_custom_attributable: true,
   isRoleable: true,

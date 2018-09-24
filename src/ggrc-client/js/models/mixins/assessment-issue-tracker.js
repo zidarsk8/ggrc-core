@@ -11,7 +11,7 @@ import {
 } from '../../plugins/utils/query-api-utils';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
-export default Mixin('assessmentIssueTracker',
+export default Mixin(
   issueTrackerUtils.issueTrackerStaticFields,
   {
     'after:init': function () {

@@ -4,11 +4,11 @@
  */
 
 import Cacheable from '../cacheable';
-import '../mixins/unique-title';
-import '../mixins/ca-update';
-import '../mixins/access-control-list';
-import '../mixins/base-notifications';
-import '../mixins/proposable';
+import uniqueTitle from '../mixins/unique-title';
+import caUpdate from '../mixins/ca-update';
+import accessControlList from '../mixins/access-control-list';
+import baseNotifications from '../mixins/base-notifications';
+import proposable from '../mixins/proposable';
 import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Risk', {
@@ -21,11 +21,11 @@ export default Cacheable('CMS.Models.Risk', {
   update: 'PUT /api/risks/{id}',
   destroy: 'DELETE /api/risks/{id}',
   mixins: [
-    'unique_title',
-    'ca_update',
-    'accessControlList',
-    'base-notifications',
-    'proposable',
+    uniqueTitle,
+    caUpdate,
+    accessControlList,
+    baseNotifications,
+    proposable,
   ],
   is_custom_attributable: true,
   isRoleable: true,

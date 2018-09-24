@@ -4,7 +4,7 @@
  */
 
 import Cacheable from '../cacheable';
-import '../mixins/contactable';
+import contactable from '../mixins/contactable';
 import Stub from '../stub';
 
 export default Cacheable('CMS.Models.TaskGroup', {
@@ -16,7 +16,7 @@ export default Cacheable('CMS.Models.TaskGroup', {
   create: 'POST /api/task_groups',
   update: 'PUT /api/task_groups/{id}',
   destroy: 'DELETE /api/task_groups/{id}',
-  mixins: ['contactable'],
+  mixins: [contactable],
   permalink_options: {
     url: '<%= base.viewLink %>#task_group/' +
     'task_group/<%= instance.id %>',

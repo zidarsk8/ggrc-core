@@ -27,28 +27,4 @@ Stub.List = can.List.extend({
   },
 });
 
-can.Observe.prototype.reify = function () {
-  let type;
-  let model;
-
-  if (this instanceof can.Model) {
-    return this;
-  }
-
-  type = this.type;
-  model = CMS.Models[type] || GGRC.Models[type];
-
-  if (!model) {
-    console.debug('`reify()` called with unrecognized type', this);
-  } else {
-    return model.model(this);
-  }
-};
-
-can.Observe.List.prototype.reify = function () {
-  return new can.Observe.List(can.map(this, function (obj) {
-    return obj.reify();
-  }));
-};
-
 export default Stub;
