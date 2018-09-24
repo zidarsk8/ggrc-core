@@ -21,11 +21,28 @@ from ggrc.app import app
 from ggrc.services.common import Resource
 
 
+def wrap_client_calls(client):
+  """Wrap all client api calls with app_context."""
+  def wrapper(func):
+    """Wrapper function for api client calls."""
+    def new_call(*args, **kwargs):
+      with app.app_context():
+        return func(*args, **kwargs)
+    return new_call
+
+  client.get = wrapper(client.get)
+  client.post = wrapper(client.post)
+  client.put = wrapper(client.put)
+  client.delete = wrapper(client.delete)
+  client.head = wrapper(client.head)
+
+
 class Api(object):
   """Test api class."""
 
   def __init__(self):
     self.client = app.test_client()
+    wrap_client_calls(self.client)
     self.client.get("/login")
     self.resource = Resource()
     self.headers = {'Content-Type': 'application/json',
