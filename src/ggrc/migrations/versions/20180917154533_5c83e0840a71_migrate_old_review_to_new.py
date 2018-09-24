@@ -328,7 +328,7 @@ def process_migrated_unreviewed(conn, migrator_id):
 
 def process_non_migrated(conn, migrator_id, state):
   """Process objects that had state and not migrated"""
-  for reviewable, obj_type in MIGRATED_REVIEWABLES:
+  for reviewable, obj_type in NON_MIGRATED_REVIEWABLES:
     print "Processing -> {} : {}".format(obj_type, state)
     for data in get_object_mapping_info(conn, reviewable,
                                         obj_type, state):
