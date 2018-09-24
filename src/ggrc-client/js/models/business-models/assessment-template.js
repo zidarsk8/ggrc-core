@@ -90,6 +90,8 @@ export default Cacheable('CMS.Models.AssessmentTemplate', {
       order: 71,
     }],
     attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
+    add_item_view: GGRC.mustache_path +
+              '/assessment_templates/tree_add_item.mustache',
   },
 
   /**

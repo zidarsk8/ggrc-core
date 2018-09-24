@@ -215,30 +215,14 @@ _.assign(CoreExtension, {
     };
 
     extraContentOptions = applyMixins({
-      business_objects: {
-        Audit: {
-          add_item_view: path + '/audits/tree_add_item.mustache',
-        },
-      },
       Program: {
-        _mixins: [
-          'business_objects',
-        ],
         Person: {
           allow_creating: true,
         },
       },
       Audit: {
-        _mixins: ['business_objects'],
         Program: {
           allow_creating: false,
-        },
-        Assessment: {
-          add_item_view: path + '/assessments/tree_add_item.mustache',
-        },
-        AssessmentTemplate: {
-          add_item_view: GGRC.mustache_path +
-            '/assessment_templates/tree_add_item.mustache',
         },
         Person: {
           content_controller_options: {
@@ -246,86 +230,15 @@ _.assign(CoreExtension, {
           },
         },
       },
-      Regulation: {
-        _mixins: ['business_objects'],
-      },
-      Standard: {
-        _mixins: ['business_objects'],
-      },
-      Policy: {
-        _mixins: ['business_objects'],
-      },
-      Contract: {
-        _mixins: ['business_objects'],
-      },
-      Requirement: {
-        _mixins: ['business_objects'],
-      },
-      Objective: {
-        _mixins: ['business_objects'],
-      },
-      Control: {
-        _mixins: ['business_objects'],
-      },
       Assessment: {
-        _mixins: ['business_objects'],
         Audit: {
           allow_creating: false,
-          add_item_view: path + '/audits/tree_add_item.mustache',
         },
       },
       AssessmentTemplate: {
         Audit: {
           allow_creating: false,
         },
-      },
-      Risk: {
-        _mixins: ['business_objects'],
-      },
-      Threat: {
-        _mixins: ['business_objects'],
-      },
-      Issue: {
-        _mixins: ['business_objects'],
-      },
-      AccessGroup: {
-        _mixins: ['business_objects'],
-      },
-      DataAsset: {
-        _mixins: ['business_objects'],
-      },
-      Facility: {
-        _mixins: ['business_objects'],
-      },
-      Market: {
-        _mixins: ['business_objects'],
-      },
-      Metric: {
-        _mixins: ['business_objects'],
-      },
-      OrgGroup: {
-        _mixins: ['business_objects'],
-      },
-      Vendor: {
-        _mixins: ['business_objects'],
-      },
-      Process: {
-        _mixins: ['business_objects'],
-      },
-      Product: {
-        _mixins: ['business_objects'],
-      },
-      ProductGroup: {
-        _mixins: ['business_objects'],
-      },
-      Project: {
-        _mixins: ['business_objects'],
-      },
-      System: {
-        _mixins: ['business_objects'],
-      },
-      TechnologyEnvironment: {
-        _mixins: ['business_objects'],
       },
     });
 
