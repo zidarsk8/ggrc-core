@@ -7,29 +7,14 @@ import ddt
 from flask.json import dumps
 
 from ggrc.converters import get_importables
-from ggrc.models import inflector
+from ggrc.models import inflector, all_models
+from ggrc.models.mixins import ScopeObject
 from ggrc.models.reflection import AttributeInfo
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
-
-SCOPING_OBJECTS = {
-    "Access Group",
-    "Data Asset",
-    "Facility",
-    "Market",
-    "Metric",
-    "Org Group",
-    "Process",
-    "Product",
-    "ProductGroup",
-    "Project",
-    "System",
-    "TechnologyEnvironment",
-    "Vendor",
-}
 
 
 class TestExportEmptyTemplate(TestCase):
@@ -529,6 +514,9 @@ class TestExportMultipleObjects(TestCase):
       else:
         self.assertNotIn(",Cheese ipsum ch {},".format(i), response.data)
 
+  SCOPING_MODELS_NAMES = [m.__name__ for m in all_models.all_models
+                          if issubclass(m, ScopeObject)]
+
   @ddt.data(
       "Assessment",
       "Policy",
@@ -575,7 +563,7 @@ class TestExportMultipleObjects(TestCase):
       ]))
       if model == "Control":
         import_queries[-1]["Assertions"] = "Privacy"
-      if model in SCOPING_OBJECTS:
+      if model.replace(" ", "") in self.SCOPING_MODELS_NAMES:
         import_queries[-1]["Assignee"] = "user@example.com"
         import_queries[-1]["Verifier"] = "user@example.com"
 
