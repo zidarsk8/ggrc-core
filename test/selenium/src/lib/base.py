@@ -6,7 +6,6 @@
 
 import random
 
-import nerodia
 import pytest
 from selenium import webdriver
 from selenium.common import exceptions
@@ -14,7 +13,7 @@ from selenium.webdriver.common import keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote import webelement
 
-from lib import constants, exception, mixin, url, environment
+from lib import constants, exception, mixin, url, environment, browsers
 from lib.constants import messages, objects
 from lib.constants.element import MappingStatusAttrs
 from lib.constants.locator import CommonDropdownMenu
@@ -353,21 +352,19 @@ class DropdownStatic(Element):
 class WithBrowser(InstanceRepresentation):
   """Class to contain a driver and browser instances"""
 
-  def __init__(self, driver):
-    """Args: driver"""
+  def __init__(self, _driver=None):
     super(WithBrowser, self).__init__()
-    self._driver = driver
-    self._browser = nerodia.browser.Browser(browser=self._driver)
+    self._driver = browsers.get_driver()
+    self._browser = browsers.get_browser()
 
 
 class Component(WithBrowser):
   """Component class is container for elements."""
 
-  def __init__(self, driver):
-    """Args: driver"""
-    super(Component, self).__init__(driver)
-    if driver.title:  # only Login page doesn't have title and jQuery
-      selenium_utils.wait_for_js_to_load(driver)
+  def __init__(self, _driver=None):
+    super(Component, self).__init__()
+    if self._driver.title:  # only Login page doesn't have title and jQuery
+      selenium_utils.wait_for_js_to_load(self._driver)
 
 
 class AnimatedComponent(Component):
@@ -446,17 +443,14 @@ class AbstractPage(Component):
   """Represent page that can be navigated to, but we don't necessarily know
  it's url in advance."""
 
-  def __init__(self, driver):
-    """
-    Args: driver (CustomDriver)
-    """
-    super(AbstractPage, self).__init__(driver)
-    self.url = driver.current_url
+  def __init__(self, _driver=None):
+    super(AbstractPage, self).__init__()
+    self.url = self._driver.current_url
 
   def navigate_to(self, custom_url=None):
     """Navigate to url."""
     url_to_use = self.url if custom_url is None else custom_url
-    selenium_utils.open_url(self._driver, url_to_use)
+    selenium_utils.open_url(url_to_use)
     return self
 
 
@@ -551,11 +545,8 @@ class MultiInputItem(Element):
 class Widget(AbstractPage):
   """Page like class for which we don't know initial url."""
 
-  def __init__(self, driver):
-    """
-    Args: driver (CustomDriver)
-    """
-    super(Widget, self).__init__(driver)
+  def __init__(self, _driver=None):
+    super(Widget, self).__init__()
     self.source_url = url.Utils.get_src_obj_url(self.url)
     url_parts = url.Utils.split_url_into_parts(self.url)
     self.source_obj_from_url = url_parts["source_obj_from_url"]

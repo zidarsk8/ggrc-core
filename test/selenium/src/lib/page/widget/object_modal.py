@@ -10,13 +10,14 @@ from lib.entities import entity
 from lib.page.modal import unified_mapper
 
 
-def get_modal_obj(obj_type, selenium):
+def get_modal_obj(obj_type, _selenium=None):
   """Gets modal obj for `obj_type`."""
   mapping = {
       "assessment": AssessmentModal,
-      "control": ControlModal
+      "control": ControlModal,
+      "workflow": WorkflowModal
   }
-  return mapping.get(obj_type.lower(), BaseObjectModal)(selenium)
+  return mapping.get(obj_type.lower(), BaseObjectModal)()
 
 
 _FIELD_METHOD_MAPPING = {
@@ -25,15 +26,16 @@ _FIELD_METHOD_MAPPING = {
     "status": "set_state",
     "slug": "set_code",
     "assertions": "select_assertions",
-    "mapped_objects": "map_objects"
+    "mapped_objects": "map_objects",
+    "first_task_group_title": "set_first_task_group_title"  # workflow
 }
 
 
 class BaseObjectModal(base.WithBrowser):
   """Represents object modal."""
 
-  def __init__(self, driver):
-    super(BaseObjectModal, self).__init__(driver)
+  def __init__(self, _driver=None):
+    super(BaseObjectModal, self).__init__()
     self._root = self._browser.element(css=".modal[style*='display: block']")
     self.title_field = self._root.text_field(name="title")
     self.description_field = self._root.div(
@@ -80,8 +82,8 @@ class BaseObjectModal(base.WithBrowser):
 class ControlModal(BaseObjectModal):
   """Represents control object modal."""
 
-  def __init__(self, driver):
-    super(ControlModal, self).__init__(driver)
+  def __init__(self, _driver=None):
+    super(ControlModal, self).__init__()
     self._fields = ["title", "description", "status", "slug", "assertions"]
 
   def select_assertions(self, assertions):
@@ -97,8 +99,8 @@ class ControlModal(BaseObjectModal):
 class AssessmentModal(BaseObjectModal):
   """Represents assessment object modal."""
 
-  def __init__(self, driver):
-    super(AssessmentModal, self).__init__(driver)
+  def __init__(self, _driver=None):
+    super(AssessmentModal, self).__init__()
     self._fields = ["title", "description", "slug", "mapped_objects"]
 
   def map_objects(self, objs):
@@ -117,3 +119,19 @@ class AssessmentModal(BaseObjectModal):
     """Gets titles of mapped snapshots."""
     els = self._root.elements(class_name="modal-mapped-objects-item")
     return [el.element(class_name="title").text for el in els]
+
+
+class WorkflowModal(BaseObjectModal):
+  """Represents workflow object modal."""
+
+  def __init__(self):
+    super(WorkflowModal, self).__init__()
+    self._fields = ["title", "first_task_group_title"]
+
+  def set_first_task_group_title(self, first_task_group_title):
+    """Sets First task group's title field."""
+    label_el = self._root.element(
+        class_name="ggrc-form-item__label", text="First task group's title")
+    text_field = label_el.following_sibling(
+        class_name="input-block-level").to_subtype()
+    text_field.set(first_task_group_title)

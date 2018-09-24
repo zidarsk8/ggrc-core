@@ -11,7 +11,7 @@ from selenium.webdriver.common import action_chains
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from lib import constants, exception, url as url_module, users
+from lib import constants, exception, url as url_module, users, browsers
 from lib.constants import messages, locator as locators
 from lib.constants import value_aliases as alias
 
@@ -29,11 +29,12 @@ def hover_over_element(driver, element):
   action_chains.ActionChains(driver).move_to_element(element).perform()
 
 
-def open_url(driver, url, is_via_js=False):
+def open_url(url, is_via_js=False):
   """Open URL in current browser session, window, tab if this URL hasn't been
   opened yet and wait till the moment when web document will be fully loaded.
   If 'is_via_js' then use JS to perform opening.
   """
+  driver = browsers.get_driver()
   _login_if_needed(driver)
   if driver.current_url != url:
     if not is_via_js:

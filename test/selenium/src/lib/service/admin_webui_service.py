@@ -35,7 +35,7 @@ class PeopleAdminWebUiService(AdminWebUiService):
   def _open_admin_people_tab(self):
     """Open People widget on Admin dashboard.
       - Return: lib.page.widget.admin_widget.People"""
-    selenium_utils.open_url(self._driver, url.Urls().admin_people_tab)
+    selenium_utils.open_url(url.Urls().admin_people_tab)
     return dashboard.AdminDashboard(self._driver).select_people()
 
   def _create_new_person_on_modal(self, person):
