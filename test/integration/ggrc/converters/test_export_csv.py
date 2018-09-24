@@ -421,6 +421,75 @@ class TestExportMultipleObjects(TestCase):
         self.assertNotIn(programs[i], response.data)
         self.assertNotIn(regulations[i], response.data)
 
+  def test_exportable_items(self):
+    """Test multi export with exportable items."""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      regulation = factories.RegulationFactory()
+
+    data = [{
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "="},
+                "right": program.title
+            },
+        },
+        "fields": "all",
+    }, {
+        "object_name": "Regulation",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "="},
+                "right": regulation.title
+            },
+        },
+        "fields": "all",
+    }]
+    response = self.export_csv(
+        data,
+        exportable_objects=[1]
+    )
+    response_data = response.data
+    self.assertIn(regulation.title, response_data)
+    self.assertNotIn(program.title, response_data)
+
+  def test_exportable_items_incorrect(self):
+    """Test export with exportable items and incorrect index"""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      regulation = factories.RegulationFactory()
+
+    data = [{
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "="},
+                "right": program.title
+            },
+        },
+        "fields": "all",
+    }, {
+        "object_name": "Regulation",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "="},
+                "right": regulation.title
+            },
+        },
+        "fields": "all",
+    }]
+    response = self.export_csv(
+        data,
+        exportable_objects=[3]
+    )
+    response_data = response.data
+    self.assertEquals(response_data, "")
+
   def test_relevant_to_previous_export(self):
     """Test relevant to previous export"""
     res = self._import_file("data_for_export_testing_relevant_previous.csv")
