@@ -348,6 +348,13 @@ class Revision(base.ContextRBAC, Base, db.Model):
     return {"status": statuses_mapping.get(self._content.get("status"),
                                            "Draft")}
 
+  def populate_review_status(self):
+    """Replace os_state with review state for old revisions"""
+    result = {}
+    if "os_state" in self._content:
+      result = {"review_status": self._content["os_state"]}
+    return result
+
   def _document_evidence_hack(self):
     """Update display_name on evideces
 
@@ -533,6 +540,7 @@ class Revision(base.ContextRBAC, Base, db.Model):
     populated_content.update(self.populate_folder())
     populated_content.update(self.populate_labels())
     populated_content.update(self.populate_status())
+    populated_content.update(self.populate_review_status())
     populated_content.update(self._document_evidence_hack())
     populated_content.update(self.populate_categoies("categories"))
     populated_content.update(self.populate_categoies("assertions"))
