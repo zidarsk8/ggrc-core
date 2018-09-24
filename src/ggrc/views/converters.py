@@ -128,10 +128,11 @@ def handle_export_request():
   with benchmark("handle export request data"):
     data = parse_export_request()
     objects = data.get("objects")
+    exportable_objects = data.get("exportable_objects", [])
     export_to = data.get("export_to")
     current_time = data.get("current_time")
   with benchmark("Generate CSV string"):
-    csv_string, object_names = make_export(objects)
+    csv_string, object_names = make_export(objects, exportable_objects)
   with benchmark("Make response."):
     filename = "{}_{}.csv".format(object_names, current_time)
     return export_file(export_to, filename, csv_string)
@@ -161,11 +162,14 @@ def handle_export_csv_template_request():
   return export_file(export_to, filename, csv_string)
 
 
-def make_export(objects):
+def make_export(objects, exportable_objects=None):
   """Make export"""
   query_helper = QueryHelper(objects)
   ids_by_type = query_helper.get_ids()
-  converter = ExportConverter(ids_by_type=ids_by_type)
+  converter = ExportConverter(
+      ids_by_type=ids_by_type,
+      exportable_queries=exportable_objects
+  )
   csv_data = converter.export_csv_data()
   object_names = "_".join(converter.get_object_names())
   return csv_data, object_names
@@ -232,7 +236,7 @@ def check_for_previous_run():
     raise InternalServerError(app_errors.PREVIOUS_RUN_FAILED)
 
 
-def run_export(objects, ie_id, user_id, url_root):
+def run_export(objects, ie_id, user_id, url_root, exportable_objects):
   """Run export"""
   with app.app_context():
     try:
@@ -241,7 +245,7 @@ def run_export(objects, ie_id, user_id, url_root):
       ie = import_export.get(ie_id)
       check_for_previous_run()
 
-      content, _ = make_export(objects)
+      content, _ = make_export(objects, exportable_objects)
       db.session.refresh(ie)
       if ie.status == "Stopped":
         return
@@ -527,7 +531,9 @@ def handle_export_get(**kwargs):
 def handle_export_post(**kwargs):
   """Handle export post"""
   check_import_export_headers()
-  objects = request.json.get("objects")
+  request_json = request.json
+  objects = request_json.get("objects")
+  exportable_objects = request_json.get("exportable_objects", [])
   current_time = request.json.get("current_time")
   user = get_current_user()
   if user.system_wide_role == 'No Access':
@@ -547,6 +553,7 @@ def handle_export_post(**kwargs):
                    ie.id,
                    user.id,
                    get_url_root(),
+                   exportable_objects,
                    _queue="ggrcImport")
     return make_import_export_response(ie.log_json())
   except Exception as e:
