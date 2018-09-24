@@ -127,19 +127,6 @@ viewModel = can.Map.extend({
         return this.attr('options').parent_instance;
       },
     },
-    allow_creating: {
-      type: Boolean,
-      get: function () {
-        let allowCreating = true;
-        let options = this.attr('options');
-
-        if ('allow_creating' in options) {
-          allowCreating = options.allow_creating;
-        }
-
-        return allowCreating;
-      },
-    },
     noResults: {
       type: Boolean,
       get: function () {

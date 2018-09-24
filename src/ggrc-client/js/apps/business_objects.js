@@ -37,7 +37,6 @@ _.assign(CoreExtension, {
     let possibleModelType;
     let farModels;
     let extraDescriptorOptions;
-    let extraContentOptions;
 
     // Info and summary widgets display the object information instead of listing
     // connected objects.
@@ -122,48 +121,6 @@ _.assign(CoreExtension, {
       });
     });
 
-    function applyMixins(definitions) {
-      let mappings = {};
-
-      // Recursively handle mixins
-      function reifyMixins(definition) {
-        let finalDefinition = {};
-        if (definition._mixins) {
-          can.each(definition._mixins, function (mixin) {
-            if (typeof (mixin) === 'string') {
-              // If string, recursive lookup
-              if (!definitions[mixin]) {
-                console.warn(`Undefined mixin: ${mixin} ${definitions}`);
-              } else {
-                can.extend(
-                  finalDefinition,
-                  reifyMixins(definitions[mixin])
-                );
-              }
-            } else if (can.isFunction(mixin)) {
-              // If function, call with current definition state
-              mixin(finalDefinition);
-            } else {
-              // Otherwise, assume object and extend
-              can.extend(finalDefinition, mixin);
-            }
-          });
-        }
-        can.extend(finalDefinition, definition);
-        delete finalDefinition._mixins;
-        return finalDefinition;
-      }
-
-      can.each(definitions, function (definition, name) {
-        // Only output the mappings if it's a model, e.g., uppercase first letter
-        if (name[0] === name[0].toUpperCase()) {
-          mappings[name] = reifyMixins(definition);
-        }
-      });
-
-      return mappings;
-    }
-
     // the assessments_view only needs the Assessments widget
     if (/^\/assessments_view/.test(window.location.pathname)) {
       farModels = ['Assessment'];
@@ -214,46 +171,6 @@ _.assign(CoreExtension, {
       },
     };
 
-    extraContentOptions = applyMixins({
-      Program: {
-        Person: {
-          allow_creating: true,
-        },
-      },
-      Audit: {
-        Program: {
-          allow_creating: false,
-        },
-        Person: {
-          content_controller_options: {
-            allow_creating: false,
-          },
-        },
-      },
-      Assessment: {
-        Audit: {
-          allow_creating: false,
-        },
-      },
-      AssessmentTemplate: {
-        Audit: {
-          allow_creating: false,
-        },
-      },
-    });
-
-    // Disable editing on profile pages, as long as it isn't audits on the dashboard
-    if (getPageInstance() instanceof businessModels.Person) {
-      let personOptions = extraContentOptions.Person;
-      can.each(personOptions, function (options, modelName) {
-        if (modelName !== 'Audit' || !/dashboard/.test(window.location)) {
-          can.extend(options, {
-            allow_creating: false,
-          });
-        }
-      });
-    }
-
     can.each(farModels, function (modelName) {
       let widgetConfig = getWidgetConfig(modelName);
       modelName = widgetConfig.name;
@@ -285,13 +202,6 @@ _.assign(CoreExtension, {
           extraDescriptorOptions[object.constructor.shortName][modelName]);
       }
 
-      if (extraContentOptions[object.constructor.shortName] &&
-          extraContentOptions[object.constructor.shortName][modelName]) {
-        $.extend(true, descriptor, {
-          content_controller_options:
-          extraContentOptions[object.constructor.shortName][modelName],
-        });
-      }
       descriptor.widgetType = 'treeview';
       widgetList.add_widget(
         object.constructor.shortName, widgetId, descriptor);

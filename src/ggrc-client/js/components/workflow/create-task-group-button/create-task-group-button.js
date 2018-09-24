@@ -12,14 +12,12 @@ const viewModel = can.Map.extend({
       get() {
         const workflow = this.attr('workflow');
         return (
-          this.attr('allowCreating') &&
           Permission.is_allowed_for('update', workflow) &&
           workflow.attr('status') !== 'Inactive'
         );
       },
     },
   },
-  allowCreating: false,
   workflow: null,
   needToUpdateRelatedItems: false,
   lastAddedTaskGroup: null,

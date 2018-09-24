@@ -31,8 +31,6 @@ export default TreeLoader({
     start_expanded: false, // true
     find_function: null,
     options_property: 'tree_view_options',
-    allow_reading: true,
-    allow_creating: true,
     child_options: [], // this is how we can make nested configs. if you want to use an existing
     // example child option:
     // { property: "controls", model: Control, }

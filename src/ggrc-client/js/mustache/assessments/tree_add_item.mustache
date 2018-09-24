@@ -5,7 +5,6 @@
 
   {{#if_instance_of parent_instance 'Audit'}}
     {{^if instance.archived}}
-    {{#if allow_creating}}
     {{#is_allowed 'update' parent_instance}}
       <a href="javascript://"
          class="section-create action-button create-button"
@@ -35,6 +34,5 @@
         </a>
       {{/is_auditor}}
     {{/is_allowed}}
-    {{/if}}
     {{/if}}
   {{/if_instance_of}}

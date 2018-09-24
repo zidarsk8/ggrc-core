@@ -2,8 +2,8 @@
     Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
+
 {{#if_instance_of parent_instance 'Program'}}
-    {{#if allow_creating}}
     {{#is_allowed 'update' parent_instance}}
       <a href="javascript://"
          class="section-create action-button create-button"
@@ -29,7 +29,6 @@
         Create
       </a>
     {{/is_allowed}}
-    {{/if}}
 {{else}}
     {{#is_allowed_to_map parent_instance model.shortName}}
       <a
