@@ -302,7 +302,6 @@ export default can.Component.extend({
 
           // remove unneeded attrs
           item.removeAttr('_stamp');
-          item.removeAttr('isDraft');
         });
       } else {
         // remove all "createdItems" from "items" with the same "_stamp"

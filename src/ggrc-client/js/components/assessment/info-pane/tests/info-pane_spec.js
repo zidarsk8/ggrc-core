@@ -657,19 +657,15 @@ describe('assessment-info-pane component', () => {
     beforeEach(() => {
       items = [{
         data: 'Fake data 1',
-        isDraft: false,
         _stamp: 1,
       }, {
         data: 'Fake data 2',
-        isDraft: false,
         _stamp: 2,
       }, {
         data: 'Fake data 3',
-        isDraft: false,
         _stamp: 3,
       }, {
         data: 'Fake data 4',
-        isDraft: false,
         _stamp: 4,
       }];
 
@@ -686,11 +682,9 @@ describe('assessment-info-pane component', () => {
     it('should remove all unsaved items from list', () => {
       let newItems = new can.List([{
         data: 'Updated data 2',
-        isDraft: true,
         _stamp: 2,
       }, {
         data: 'Update data 4',
-        isDraft: true,
         _stamp: 4,
       }]);
 
@@ -709,15 +703,12 @@ describe('assessment-info-pane component', () => {
     it('should update items with the same stam in list', () => {
       let newItems = new can.List([{
         data: 'Updated data 2',
-        isDraft: true,
         _stamp: 2,
       }, {
         data: 'Update data 4',
-        isDraft: true,
         _stamp: 4,
       }, {
         data: 'No stamp item',
-        isDraft: true,
       }]);
 
       let event = {
@@ -734,10 +725,9 @@ describe('assessment-info-pane component', () => {
       expect(actualItems[3].attr('data')).toEqual(newItems[1].data);
     });
 
-    it('should remove "isDraft" and "_stamp" attrs from updated items', () => {
+    it('should remove "_stamp" attrs from updated items', () => {
       let newItems = new can.List([{
         data: 'Updated data 1',
-        isDraft: true,
         _stamp: 1,
       }]);
 
@@ -749,7 +739,6 @@ describe('assessment-info-pane component', () => {
       vm.afterCreate(event, itemsType);
       let actualItems = vm.attr(itemsType);
       expect(actualItems[0].attr('data')).toEqual(newItems[0].data);
-      expect(actualItems[0].attr('isDraft')).toBeUndefined();
       expect(actualItems[0].attr('_stamp')).toBeUndefined();
     });
   });
