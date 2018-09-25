@@ -14,7 +14,7 @@ let _CONDITIONS_MAP = {
     let list_value = instance[args.list_property] || [];
     let i;
     for (i = 0; i < list_value.length; i++) {
-      if (list_value[i].id == value.id) {
+      if (list_value[i].id === value.id) {
         return true;
       }
     }
@@ -30,7 +30,7 @@ let _CONDITIONS_MAP = {
         }
         return value;
       }, instance);
-    return value == propertyValue;
+    return value === propertyValue;
   },
   'in': function (instance, args) {
     let value = Permission._resolve_permission_variable(args.value);
@@ -106,9 +106,9 @@ const Permission = can.Construct({
   },
 
   _resolve_permission_variable: function (value) {
-    if ($.type(value) == 'string') {
-      if (value[0] == '$') {
-        if (value == '$current_user') {
+    if ($.type(value) === 'string') {
+      if (value[0] === '$') {
+        if (value === '$current_user') {
           return getInstance('Person', GGRC.current_user.id);
         }
         throw new Error('unknown permission variable: ' + value);

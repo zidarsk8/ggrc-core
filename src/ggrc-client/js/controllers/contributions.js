@@ -365,7 +365,7 @@ const userRolesModalSelector = can.Control.extend({
   match_join: function (optionId, join) {
     return (
       join[this.options.option_attr] &&
-      join[this.options.option_attr].id == optionId
+      join[this.options.option_attr].id === optionId
     );
   },
 
