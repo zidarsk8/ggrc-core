@@ -5,10 +5,10 @@
 
 import Component from '../import';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import * as ieUtils from '../import-export-utils';
+import * as ieUtils from '../../../plugins/utils/import-export-utils';
 import {
   jobStatuses,
-} from '../import-export-utils';
+} from '../../../plugins/utils/import-export-utils';
 import {backendGdriveClient} from '../../../plugins/ggrc-gapi-client';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
 

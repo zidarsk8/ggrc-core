@@ -4,7 +4,7 @@
 */
 
 import template from './current-exports.mustache';
-import {jobStatuses} from '../import-export-utils';
+import {jobStatuses} from '../../../plugins/utils/import-export-utils';
 
 export default can.Component.extend({
   tag: 'current-exports',
