@@ -348,7 +348,7 @@ class TestCase(BaseTestCase, object):
       self._check_csv_response(response, {})
     return response
 
-  def export_csv(self, data):
+  def export_csv(self, data, exportable_objects=None):
     """Export csv handle
 
     return post action response to export_csv service with data argument as
@@ -356,7 +356,8 @@ class TestCase(BaseTestCase, object):
     """
     request_body = {
         "export_to": "csv",
-        "objects": data
+        "objects": data,
+        "exportable_objects": exportable_objects or []
     }
     return self.client.post("/_service/export_csv",
                             data=json.dumps(request_body),
