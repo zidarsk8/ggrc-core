@@ -1540,11 +1540,14 @@ Mustache.registerHelper('get_default_attr_value',
     let DATE_ATTRS = Object.freeze({
       due_on: 1,
       end_date: 1,
+      due_date: 1,
       finished_date: 1,
       start_date: 1,
+      created_at: 1,
       updated_at: 1,
       verified_date: 1,
       last_deprecated_date: 1,
+      last_assessment_date: 1,
     });
 
     // attribute names considered "default" and not representing a date
