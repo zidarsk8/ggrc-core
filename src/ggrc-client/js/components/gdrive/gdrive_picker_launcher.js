@@ -38,20 +38,7 @@ export default can.Component.extend({
     disabled: false,
     isUploading: false,
 
-    beforeCreateHandler: function (files) {
-      let tempFiles = files.map(function (file) {
-        return {
-          title: file.title,
-          link: file.url,
-          created_at: new Date(),
-          isDraft: true,
-        };
-      });
-      this.dispatch({
-        type: 'onBeforeAttach',
-        items: tempFiles,
-      });
-    },
+
     onKeyup(element, event) {
       const ESCAPE_KEY_CODE = 27;
       const escapeKeyWasPressed = event.keyCode === ESCAPE_KEY_CODE;
@@ -94,8 +81,6 @@ export default can.Component.extend({
           return files;
         })
         .then((files) => {
-          this.beforeCreateHandler(files);
-
           return this.createDocumentModel(files);
         })
         .then(stopFn)
@@ -143,8 +128,6 @@ export default can.Component.extend({
               return files;
             })
             .then(function (files) {
-              that.beforeCreateHandler(files);
-
               return that.createDocumentModel(files);
             })
             .then(stopFn)
@@ -180,7 +163,7 @@ export default can.Component.extend({
       let modelType = this.attr('modelType');
       let ModelClass = businessModels[modelType];
 
-      let dfdDocs = files.map(function (file) {
+      let models = files.map((file) => {
         let model = new ModelClass({
           context: new Context({id: contextId}),
           title: file.title,
@@ -190,8 +173,17 @@ export default can.Component.extend({
             id: instanceId,
             type: instanceType,
           },
+          created_at: new Date(),
         });
+        return model;
+      });
 
+      this.dispatch({
+        type: 'beforeAttach',
+        items: models,
+      });
+
+      let dfdDocs = models.map((model) => {
         return backendGdriveClient.withAuth(() => {
           return model.save();
         });

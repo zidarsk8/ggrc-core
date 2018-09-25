@@ -120,7 +120,7 @@
                                         {edit-mode}="editMode">
                             <attach-button
                                         (before-create)="addItems(%event, 'files')"
-                                        (refresh-evidences)="updateItems('files')"
+                                        (finish)="verifyObjects('files', 'Evidence')"
                                         {is-attach-action-disabled}="isUpdatingFiles"
                                         {confirmation-callback}="@confirmEdit"
                                         {instance}="instance"></attach-button>

@@ -20,6 +20,7 @@ import Permission from '../../../../permission';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../../../../plugins/utils/custom-attribute/custom-attribute-config';
 import * as NotifiersUtils from '../../../../plugins/utils/notifiers-utils';
 import * as businessModels from '../../../../models/business-models';
+import Evidence from '../../../../models/business-models/evidence';
 
 describe('assessment-info-pane component', () => {
   let vm;
@@ -392,29 +393,6 @@ describe('assessment-info-pane component', () => {
     });
   });
 
-  describe('getCommentQuery() method', () => {
-    beforeEach(function () {
-      spyOn(vm, 'getQuery');
-    });
-
-    it('returns result of getQuery method', function () {
-      const fakeQuery = {};
-      vm.getQuery.and.returnValue(fakeQuery);
-      const result = vm.getCommentQuery();
-      expect(result).toBe(fakeQuery);
-    });
-
-    it('sets "Comment" type and sortObj for getQuery method', function () {
-      const type = 'Comment';
-      const sortObj = {sort: [{
-        key: 'created_at',
-        direction: 'desc',
-      }]};
-      vm.getCommentQuery();
-      expect(vm.getQuery).toHaveBeenCalledWith(type, sortObj);
-    });
-  });
-
   describe('getSnapshotQuery() method', () => {
     beforeEach(function () {
       spyOn(vm, 'getQuery');
@@ -535,28 +513,6 @@ describe('assessment-info-pane component', () => {
     });
   });
 
-  describe('loadComments() method', () => {
-    beforeEach(function () {
-      spyOn(vm, 'requestQuery');
-      spyOn(vm, 'getCommentQuery');
-    });
-
-    it('returns result of the comments query', function () {
-      const expectedResult = Promise.resolve();
-      vm.requestQuery.and.returnValue(expectedResult);
-      const result = vm.loadComments();
-      expect(result).toBe(expectedResult);
-    });
-
-    it('uses query for Comments and "comments" type', function () {
-      const query = {field: 'f1'};
-      const type = 'comments';
-      vm.getCommentQuery.and.returnValue(query);
-      vm.loadComments();
-      expect(vm.requestQuery).toHaveBeenCalledWith(query, type);
-    });
-  });
-
   describe('loadFiles() method', () => {
     beforeEach(function () {
       spyOn(vm, 'requestQuery');
@@ -657,11 +613,6 @@ describe('assessment-info-pane component', () => {
       };
       expect(closure).not.toThrow();
     });
-
-    it('refreshes counts for Evidence', function () {
-      vm.updateItems();
-      expect(vm.refreshCounts).toHaveBeenCalledWith(['Evidence']);
-    });
   });
 
   describe('isAllowedToMap attribute', () => {
@@ -706,19 +657,15 @@ describe('assessment-info-pane component', () => {
     beforeEach(() => {
       items = [{
         data: 'Fake data 1',
-        isDraft: false,
         _stamp: 1,
       }, {
         data: 'Fake data 2',
-        isDraft: false,
         _stamp: 2,
       }, {
         data: 'Fake data 3',
-        isDraft: false,
         _stamp: 3,
       }, {
         data: 'Fake data 4',
-        isDraft: false,
         _stamp: 4,
       }];
 
@@ -735,11 +682,9 @@ describe('assessment-info-pane component', () => {
     it('should remove all unsaved items from list', () => {
       let newItems = new can.List([{
         data: 'Updated data 2',
-        isDraft: true,
         _stamp: 2,
       }, {
         data: 'Update data 4',
-        isDraft: true,
         _stamp: 4,
       }]);
 
@@ -758,15 +703,12 @@ describe('assessment-info-pane component', () => {
     it('should update items with the same stam in list', () => {
       let newItems = new can.List([{
         data: 'Updated data 2',
-        isDraft: true,
         _stamp: 2,
       }, {
         data: 'Update data 4',
-        isDraft: true,
         _stamp: 4,
       }, {
         data: 'No stamp item',
-        isDraft: true,
       }]);
 
       let event = {
@@ -783,10 +725,9 @@ describe('assessment-info-pane component', () => {
       expect(actualItems[3].attr('data')).toEqual(newItems[1].data);
     });
 
-    it('should remove "isDraft" and "_stamp" attrs from updated items', () => {
+    it('should remove "_stamp" attrs from updated items', () => {
       let newItems = new can.List([{
         data: 'Updated data 1',
-        isDraft: true,
         _stamp: 1,
       }]);
 
@@ -798,7 +739,6 @@ describe('assessment-info-pane component', () => {
       vm.afterCreate(event, itemsType);
       let actualItems = vm.attr(itemsType);
       expect(actualItems[0].attr('data')).toEqual(newItems[0].data);
-      expect(actualItems[0].attr('isDraft')).toBeUndefined();
       expect(actualItems[0].attr('_stamp')).toBeUndefined();
     });
   });
@@ -1207,7 +1147,10 @@ describe('assessment-info-pane component', () => {
       let data;
 
       beforeEach(() => {
-        data = {};
+        data = {
+          'Evidence:FILE': [],
+          'Evidence:URL': [],
+        };
         dfd.resolve(data);
       });
 
@@ -1227,19 +1170,39 @@ describe('assessment-info-pane component', () => {
       });
 
       it('replaces files list with loaded files', function () {
-        data['Evidence:FILE'] = {data: '1'};
+        let evidenceData = {data: '1'};
+        data['Evidence:FILE'] = [evidenceData];
         vm.updateRelatedItems();
         expect(vm.attr('files').serialize()).toEqual([
-          data['Evidence:FILE'],
+          (new Evidence(evidenceData)).serialize(),
         ]);
       });
 
+      it('creates Evidence model for each loaded file', function () {
+        data['Evidence:FILE'] = [{data: '1'}, {data: '2'}];
+        vm.updateRelatedItems();
+
+        vm.attr('files').forEach((file) => {
+          expect(file).toEqual(jasmine.any(Evidence));
+        });
+      });
+
       it('replaces urls list with loaded urls', function () {
-        data['Evidence:URL'] = {data: '1'};
+        let evidenceData = {data: '1'};
+        data['Evidence:URL'] = [evidenceData];
         vm.updateRelatedItems();
         expect(vm.attr('urls').serialize()).toEqual([
-          data['Evidence:URL'],
+          (new Evidence(evidenceData)).serialize(),
         ]);
+      });
+
+      it('creates Evidence model for each loaded url', function () {
+        data['Evidence:URL'] = [{data: '1'}, {data: '2'}];
+        vm.updateRelatedItems();
+
+        vm.attr('urls').forEach((url) => {
+          expect(url).toEqual(jasmine.any(Evidence));
+        });
       });
 
       it('sets isUpdatingRelatedItems to false', function () {
@@ -1973,6 +1936,49 @@ describe('assessment-info-pane component', () => {
 
       let formFields = vm.attr('formFields');
       expect(formFields.length).toBe(currentFormFields.length);
+    });
+  });
+
+  describe('verifyObjects() method', () => {
+    it('removes new objects', () => {
+      let obj1 = new Evidence({id: 1});
+      let obj2 = new Evidence({id: 2});
+      let obj3 = new Evidence();
+
+      vm.attr('files', [obj1, obj3, obj2]);
+
+      vm.verifyObjects('files');
+
+      expect(vm.attr('files').serialize()).toEqual(new can.List([
+        obj1, obj2,
+      ]).serialize());
+    });
+
+    it('turns off "isUpdating" flag for requested type', () => {
+      vm.attr('urls', []);
+      vm.attr('isUpdatingUrls', true);
+
+      vm.verifyObjects('urls');
+
+      expect(vm.attr('isUpdatingUrls')).toBe(false);
+    });
+
+    it('does not refresh counts if count key is not provided', () => {
+      vm.attr('urls', []);
+      spyOn(vm, 'refreshCounts');
+
+      vm.verifyObjects('urls');
+
+      expect(vm.refreshCounts).not.toHaveBeenCalled();
+    });
+
+    it('refreshes counts if count key is provided', () => {
+      vm.attr('urls', []);
+      spyOn(vm, 'refreshCounts');
+
+      vm.verifyObjects('urls', 'Evidence');
+
+      expect(vm.refreshCounts).toHaveBeenCalledWith(['Evidence']);
     });
   });
 });
