@@ -58,7 +58,7 @@ WorkflowExtension.init_widgets = function () {
   let treeWidgets = TreeViewConfig.base_widgets_by_type;
   let subTrees = TreeViewConfig.sub_tree_for;
   let models = ['TaskGroup', 'Workflow',
-    'CycleTaskGroupObjectTask', 'CycleTaskGroupObject', 'CycleTaskGroup'];
+    'CycleTaskGroupObjectTask', 'CycleTaskGroup'];
   _.forEach(_workflowObjectTypes, function (type) {
     let widget;
     if (!type || !treeWidgets[type]) {
