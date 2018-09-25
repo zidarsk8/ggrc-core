@@ -106,6 +106,7 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
     },
   },
   tree_view_options: {
+    add_item_view: _mustachePath + '/tree_add_item.mustache',
     attr_view: _mustachePath + '/tree-item-attr.mustache',
     attr_list: [
       {

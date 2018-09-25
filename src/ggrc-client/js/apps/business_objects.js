@@ -15,9 +15,32 @@ import {widgetModules} from '../plugins/utils/widgets-utils';
 import {
   getPageInstance,
   getPageModel,
+  isAllObjects,
 } from '../plugins/utils/current-page-utils';
 import * as businessModels from '../models/business-models/index';
 import TreeViewConfig from '../apps/base_widgets';
+
+const summaryWidgetViews = Object.freeze({
+  audits: GGRC.mustache_path + '/audits/summary.mustache',
+});
+
+const infoWidgetViews = Object.freeze({
+  programs: GGRC.mustache_path + '/programs/info.mustache',
+  audits: GGRC.mustache_path + '/audits/info.mustache',
+  people: GGRC.mustache_path + '/people/info.mustache',
+  policies: GGRC.mustache_path + '/policies/info.mustache',
+  controls: GGRC.mustache_path + '/controls/info.mustache',
+  systems: GGRC.mustache_path + '/systems/info.mustache',
+  processes: GGRC.mustache_path + '/processes/info.mustache',
+  products: GGRC.mustache_path + '/products/info.mustache',
+  assessments: GGRC.mustache_path + '/assessments/info.mustache',
+  assessment_templates:
+    GGRC.mustache_path + '/assessment_templates/info.mustache',
+  issues: GGRC.mustache_path + '/issues/info.mustache',
+  evidence: GGRC.mustache_path + '/evidence/info.mustache',
+  documents: GGRC.mustache_path + '/documents/info.mustache',
+  risks: GGRC.mustache_path + '/risks/info.mustache',
+});
 
 let CoreExtension = {};
 
@@ -31,8 +54,6 @@ _.assign(CoreExtension, {
     let objectTable = objectClass && objectClass.table_plural;
     let object = getPageInstance();
     let path = GGRC.mustache_path;
-    let infoWidgetViews;
-    let summaryWidgetViews;
     let modelNames;
     let possibleModelType;
     let farModels;
@@ -40,53 +61,24 @@ _.assign(CoreExtension, {
 
     // Info and summary widgets display the object information instead of listing
     // connected objects.
-    summaryWidgetViews = {
-      audits: path + '/audits/summary.mustache',
-    };
     if (summaryWidgetViews[objectTable]) {
       widgetList.add_widget(object.constructor.shortName, 'summary', {
-        widget_id: 'summary',
         content_controller: SummaryWidgetController,
         instance: object,
         widget_view: summaryWidgetViews[objectTable],
-        order: 3,
-        uncountable: true,
       });
     }
     if (isDashboardEnabled(object)) {
       widgetList.add_widget(object.constructor.shortName, 'dashboard', {
-        widget_id: 'dashboard',
         content_controller: DashboardWidget,
         instance: object,
         widget_view: path + '/base_objects/dashboard_widget.mustache',
-        order: 6,
-        uncountable: true,
       });
     }
-    infoWidgetViews = {
-      programs: path + '/programs/info.mustache',
-      audits: path + '/audits/info.mustache',
-      people: path + '/people/info.mustache',
-      policies: path + '/policies/info.mustache',
-      controls: path + '/controls/info.mustache',
-      systems: path + '/systems/info.mustache',
-      processes: path + '/processes/info.mustache',
-      products: path + '/products/info.mustache',
-      assessments: path + '/assessments/info.mustache',
-      assessment_templates:
-        path + '/assessment_templates/info.mustache',
-      issues: path + '/issues/info.mustache',
-      evidence: path + '/evidence/info.mustache',
-      documents: path + '/documents/info.mustache',
-      risks: path + '/risks/info.mustache',
-    };
     widgetList.add_widget(object.constructor.shortName, 'info', {
-      widget_id: 'info',
       content_controller: InfoWidget,
       instance: object,
       widget_view: infoWidgetViews[objectTable],
-      order: 5,
-      uncountable: true,
     });
     modelNames = can.Map.keys(baseWidgetsByType);
     modelNames.sort();
@@ -139,6 +131,21 @@ _.assign(CoreExtension, {
           },
           AssessmentTemplate: {
             treeViewDepth: 0,
+          },
+          Workflow: {
+            treeViewDepth: 0,
+          },
+          CycleTaskGroupObjectTask: {
+            widget_name: () => {
+              if (object instanceof businessModels.Person) {
+                return 'Tasks';
+              }
+              return 'Workflow Tasks';
+            },
+            treeViewDepth: 1,
+            content_controller_options: {
+              showBulkUpdate: !isAllObjects(),
+            },
           },
         };
 

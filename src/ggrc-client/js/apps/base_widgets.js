@@ -37,6 +37,8 @@ let allCoreTypes = [
   'TechnologyEnvironment',
   'Threat',
   'Vendor',
+  'Workflow',
+  'CycleTaskGroupObjectTask',
 ];
 // NOTE: Widgets that have the order value are sorted by an increase values,
 // the rest of widgets are sorted alphabetically
