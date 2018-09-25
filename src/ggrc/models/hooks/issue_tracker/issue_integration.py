@@ -235,17 +235,20 @@ def detach_issue(new_ticket_id, old_ticket_id):
 
 
 # pylint: disable=too-many-locals
-def update_issue_handler(obj, initial_state, new_it_info=None):  # noqa
+def update_issue_handler(obj, initial_state, new_issuetracker_info=None):  # noqa
   """Event handler for issue object renewal."""
   # TODO: refactor this handler to be not so complex and more generic
-  if not new_it_info:
+  if not new_issuetracker_info:
     return
 
   it_object = all_models.IssuetrackerIssue.get_issue("Issue", obj.id)
   old_ticket_id = None
   if it_object:
     old_ticket_id = int(it_object.issue_id) if it_object.issue_id else None
-  get_id = new_it_info.get("issue_id") if new_it_info else None
+
+  get_id = new_issuetracker_info.get("issue_id") if new_issuetracker_info \
+      else None
+
   new_ticket_id = int(get_id) if get_id else None
 
   # We should create new ticket if new ticket_id is empty, we don't store
@@ -254,7 +257,7 @@ def update_issue_handler(obj, initial_state, new_it_info=None):  # noqa
                    (not old_ticket_id) or (not new_ticket_id)
 
   if needs_creation:
-    create_issue_handler(obj, new_it_info)
+    create_issue_handler(obj, new_issuetracker_info)
     if not obj.warnings:
       it_issue = all_models.IssuetrackerIssue.get_issue(
           obj.__class__.__name__, obj.id
@@ -267,8 +270,8 @@ def update_issue_handler(obj, initial_state, new_it_info=None):  # noqa
   if not it_object:
     return
 
-  if (new_ticket_id != old_ticket_id) and new_it_info["enabled"]:
-    link_issue(obj, new_ticket_id, new_it_info)
+  if (new_ticket_id != old_ticket_id) and new_issuetracker_info["enabled"]:
+    link_issue(obj, new_ticket_id, new_issuetracker_info)
     if not obj.warnings:
       detach_issue(new_ticket_id, old_ticket_id)
     return
@@ -283,7 +286,7 @@ def update_issue_handler(obj, initial_state, new_it_info=None):  # noqa
   issue_tracker_params = builder.build_update_issue_tracker_params(
       obj,
       initial_state,
-      new_it_info,
+      new_issuetracker_info,
       current_issue_tracker_info
   )
 
