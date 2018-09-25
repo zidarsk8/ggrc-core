@@ -33,6 +33,10 @@ import {getMappableTypes} from '../ggrc_utils';
 import {caDefTypeName} from './custom-attribute/custom-attribute-config';
 import Cacheable from '../../models/cacheable';
 import * as businessModels from '../../models/business-models';
+import {
+  fileSafeCurrentDate,
+  runExport,
+} from './import-export-utils';
 
 /**
 * TreeView-specific utils.
@@ -687,6 +691,30 @@ function _getTreeViewOperation(objectName, relevantToType) {
   }
 }
 
+function startExport(modelName, parent, filter, request, transformToSnapshot) {
+  let params = buildParam(
+    modelName,
+    {},
+    makeRelevantExpression(modelName, parent.type, parent.id),
+    'all',
+    filter
+  );
+
+  if (transformToSnapshot ||
+    (isSnapshotScope(parent) && isSnapshotModel(modelName))) {
+    params = transformQuery(params);
+  }
+
+  let requestData = request.slice() || can.List();
+  requestData.push(params);
+
+  runExport({
+    objects: requestData.serialize(),
+    current_time: fileSafeCurrentDate(),
+    exportable_objects: [requestData.length - 1],
+  });
+}
+
 export {
   getColumnsForModel,
   setColumnsForModel,
@@ -697,4 +725,5 @@ export {
   makeRelevantExpression,
   getVisibleColumnsConfig,
   isDirectlyRelated,
+  startExport,
 };

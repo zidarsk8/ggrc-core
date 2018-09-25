@@ -7,11 +7,13 @@ import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
+import * as NotifierUtils from '../../../plugins/utils/notifiers-utils';
 import tracker from '../../../tracker';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../tree-widget-container';
 import Relationship from '../../../models/service-models/relationship';
 import DisplayPrefs from '../../../models/local-storage/display-prefs';
+import exportMessage from '../templates/export-message.mustache';
 
 describe('tree-widget-container component', function () {
   'use strict';
@@ -728,6 +730,51 @@ describe('tree-widget-container component', function () {
       vm.showLastPage();
 
       expect(vm.attr('pageInfo.current')).toBe(count);
+    });
+  });
+
+  describe('export() method', () => {
+    let modelName;
+    let parent;
+    let filter;
+    let request;
+    let loadSnapshots;
+
+    beforeEach(() => {
+      spyOn(TreeViewUtils, 'startExport');
+      spyOn(NotifierUtils, 'notifier');
+
+      modelName = 'testModelName';
+      parent = new can.Map({testParent: true});
+      filter = new can.Map({testFilter: true});
+      request = new can.List([{testRequest: true}]);
+
+      vm.attr('model', {
+        shortName: modelName,
+      });
+      vm.attr('options', {
+        parent_instance: parent,
+      });
+      vm.attr('advancedSearch', {
+        filter,
+        request,
+      });
+    });
+
+    it('starts export correctly', () => {
+      vm.export();
+
+      expect(TreeViewUtils.startExport).toHaveBeenCalledWith(
+        modelName, parent, filter, request, loadSnapshots);
+    });
+
+    it('shows info message', () => {
+      vm.export();
+
+      expect(NotifierUtils.notifier).toHaveBeenCalledWith(
+        'info',
+        exportMessage,
+        true);
     });
   });
 });

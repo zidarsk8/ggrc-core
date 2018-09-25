@@ -149,6 +149,7 @@
       clear: both;
       text-transform: none;
       a,
+      span,
       .unmap-link {
         @include transition(background 0.2s ease, color 0.2s ease);
         display: block;
