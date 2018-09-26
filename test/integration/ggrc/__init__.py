@@ -25,6 +25,7 @@ from ggrc import settings
 from ggrc.converters.import_helper import read_csv_file
 from ggrc.views.converters import check_import_file
 from ggrc.models import Revision, all_models
+from integration.ggrc import api_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.models import factories
 
@@ -175,6 +176,7 @@ class TestCase(BaseTestCase, object):
     self.clear_data()
     self._custom_headers = {}
     self.headers = {}
+    api_helper.wrap_client_calls(self.client)
 
   def tearDown(self):  # pylint: disable=no-self-use
     db.session.remove()
