@@ -52,6 +52,7 @@ import Cacheable from '../../models/cacheable';
 import Relationship from '../../models/service-models/relationship';
 import DisplayPrefs from '../../models/local-storage/display-prefs';
 import * as businessModels from '../../models/business-models';
+import exportMessage from './templates/export-message.mustache';
 
 let viewModel;
 
@@ -589,6 +590,18 @@ viewModel = can.Map.extend({
     const lastPageIndex = this.attr('pageInfo.count');
 
     this.attr('pageInfo.current', lastPageIndex);
+  },
+  export() {
+    let modelName = this.attr('modelName');
+    let parent = this.attr('parent_instance');
+    let filter = this.attr('currentFilter');
+    let request = this.attr('advancedSearch.request');
+    let loadSnapshots = this.attr('options.objectVersion');
+
+    TreeViewUtils
+      .startExport(modelName, parent, filter, request, loadSnapshots);
+
+    notifier('info', exportMessage, true);
   },
 });
 
