@@ -29,8 +29,6 @@ from ggrc.utils import referenced_objects
 logger = logging.getLogger(__name__)
 
 
-_ISSUE_URL_TMPL = settings.ISSUE_TRACKER_BUG_URL_TMPL or 'http://issue/%s'
-
 _ISSUE_TRACKER_ENABLED = bool(settings.ISSUE_TRACKER_ENABLED)
 if not _ISSUE_TRACKER_ENABLED:
   logger.debug('IssueTracker integration is disabled.')
@@ -757,8 +755,9 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
       }
       assessment.add_warning('Unable to create a ticket.')
     else:
+      issue_url = integration_utils.build_issue_tracker_url(issue_id)
       issue_tracker_info['issue_id'] = issue_id
-      issue_tracker_info['issue_url'] = _ISSUE_URL_TMPL % issue_id
+      issue_tracker_info['issue_url'] = issue_url
   else:
     issue_tracker_info = {
         'enabled': False,

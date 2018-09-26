@@ -20,6 +20,19 @@ class WorkflowColumnHandler(handlers.ParentColumnHandler):
 
   parent = all_models.Workflow
 
+  def parse_item(self):
+    """Workflow column shouldn't be changed for TaskGroup."""
+    obj = self.row_converter.obj
+    workflow = db.session.query(
+        wf_models.Workflow.slug
+    ).filter_by(
+        id=obj.workflow_id
+    ).first()
+    if workflow and workflow.slug != self.raw_value:
+      self.add_error(errors.TASKGROUP_MAPPED_TO_ANOTHER_WORKFLOW,
+                     slug=obj.slug)
+    return super(WorkflowColumnHandler, self).parse_item()
+
 
 class TaskGroupColumnHandler(handlers.ParentColumnHandler):
   """Handler for task group column in task group tasks."""
@@ -169,7 +182,6 @@ class ObjectsColumnHandler(multi_object.ObjectsColumnHandler):
       all_models.Policy.__name__,
       all_models.Standard.__name__,
       all_models.Contract.__name__,
-      all_models.Clause.__name__,
       all_models.Requirement.__name__,
       all_models.Control.__name__,
       all_models.Objective.__name__,

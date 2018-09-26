@@ -89,10 +89,6 @@ const NO_DEFAULT_SORTING_LIST = Object.freeze([
   'CycleTaskGroupObjectTask',
 ]);
 
-let treeViewExcess = {
-  AssessmentTemplate: ['os_state'],
-};
-
 allTypes.forEach(function (type) {
   let related = baseWidgets[type].slice(0);
 
@@ -123,21 +119,6 @@ function getSubTreeFields(parent, child) {
 
 function hasNoFieldsLimit(type) {
   return NO_FIELDS_LIMIT_LIST.indexOf(type) > -1;
-}
-
-/**
- * Skip attrs which unused in current model name tree
- * @param {String} modelName - Name of current page.
- * @param {String} attrList - Attr list.
- * @return {Object} Changed attr list.
- */
-function skipUnusable(modelName, attrList) {
-  if (treeViewExcess[modelName]) {
-    attrList = attrList.filter(function (item) {
-      return treeViewExcess[modelName].indexOf(item.attr_name) < 0;
-    });
-  }
-  return attrList;
 }
 
 /**
@@ -190,9 +171,6 @@ function getColumnsForModel(modelType, displayPrefs, modelName) {
     }
     return a.order - b.order;
   });
-
-  // skip attrs which unused in current model name tree
-  attrs = skipUnusable(modelName, attrs);
 
   // add custom attributes information
   customAttrs = disableConfiguration ?
@@ -337,7 +315,7 @@ function getSortingForModel(modelType) {
   let key = DEFAULT_SORT_KEY;
   let direction = DEFAULT_SORT_DIRECTION;
 
-  if (NO_DEFAULT_SORTING_LIST.indexOf(modelType) != -1) {
+  if (NO_DEFAULT_SORTING_LIST.indexOf(modelType) !== -1) {
     key = null;
     direction = null;
   }

@@ -36,16 +36,16 @@
       // loading gapi client libraries
       can.each({
         drivedfd: 'drive',
-        o2dfd: 'oauth2'
-      }, function (p, d) {
-        if (!that[d]) {
-          that[d] = new $.Deferred();
+        o2dfd: 'oauth2',
+      }, function (value, key) {
+        if (!that[key]) {
+          that[key] = new $.Deferred();
           that.gapidfd.done(function () {
-            window.gapi.client.load(p, 'v2', function (result) {
+            window.gapi.client.load(value, 'v2', function (result) {
               if (!result) {
-                that[d].resolve();
+                that[key].resolve();
               } else {
-                that[d].reject(result);
+                that[key].reject(result);
               }
             });
           });
@@ -59,18 +59,18 @@
             .then(() => {
               $('<div class="modal hide">').modal_form()
                 .appendTo(document.body).ggrc_controllers_gapi_modal({
-                scopes: scopes,
-                modal_title: 'Please log in to Google API',
-                new_object_form: true,
-                onAccept: () => {
-                  that.doGAuth_step2(null, true);
-                  return that.oauth_dfd;
-                },
-                onDecline: () => {
-                  that.oauth_dfd.reject('User canceled operation');
-                },
-              });
-          });
+                  scopes: scopes,
+                  modal_title: 'Please log in to Google API',
+                  new_object_form: true,
+                  onAccept: () => {
+                    that.doGAuth_step2(null, true);
+                    return that.oauth_dfd;
+                  },
+                  onDecline: () => {
+                    that.oauth_dfd.reject('User canceled operation');
+                  },
+                });
+            });
         } else {
           $modal.modal_form('show');
         }
@@ -89,7 +89,7 @@
           client_id: GGRC.config.GAPI_CLIENT_ID,
           scope: scopes.serialize(),
           immediate: !usePopup,
-          login_hint: GGRC.current_user && GGRC.current_user.email
+          login_hint: GGRC.current_user && GGRC.current_user.email,
         }).then(function (authresult) {
           authdfd.resolve(authresult);
         }, function () {
@@ -104,37 +104,39 @@
       }.bind(this));
 
       $.when(authdfd, this.o2dfd)
-      .then(function (authresult) {
-        let o2d = new $.Deferred();
+        .then(function (authresult) {
+          let o2d = new $.Deferred();
 
-        gapi.client.oauth2.userinfo.get().execute(function (user) {
-          if (user.error) {
-            $(document.body).trigger('ajax:flash', {error: user.error});
-            o2d.reject(user.error);
-          } else {
-            o2d.resolve(user);
+          gapi.client.oauth2.userinfo.get().execute(function (user) {
+            if (user.error) {
+              $(document.body).trigger('ajax:flash', {error: user.error});
+              o2d.reject(user.error);
+            } else {
+              o2d.resolve(user);
+            }
+          });
+
+          return $.when(authresult, o2d);
+        })
+        .done(function (authresult, o2result) { // success
+          if (!authresult) {
+            return; // assume we had to do a non-immediate auth
           }
-        });
 
-        return $.when(authresult, o2d);
-      })
-      .done(function (authresult, o2result) { // success
-        if (!authresult) {
-          return; // assume we had to do a non-immediate auth
-        }
-
-        if (o2result.email.toLowerCase().trim() !==
-          GGRC.current_user.email.toLowerCase().trim()) {
-          $(document.body).trigger(
-            'ajax:flash', {warning: ['You are signed into GGRC as',
-              GGRC.current_user.email, 'and into Google Apps as',
-              o2result.email,
-              '. You may experience problems uploading evidence.'
-              ].join(' ')
-            });
-        }
-        this.oauth_dfd.resolve(authresult, o2result);
-      }.bind(this));
+          if (o2result.email.toLowerCase().trim() !==
+            GGRC.current_user.email.toLowerCase().trim()) {
+            $(document.body).trigger(
+              'ajax:flash', {
+                warning: ['You are signed into GGRC as',
+                  GGRC.current_user.email,
+                  'and into Google Apps as',
+                  o2result.email,
+                  '. You may experience problems uploading evidence.']
+                  .join(' '),
+              });
+          }
+          this.oauth_dfd.resolve(authresult, o2result);
+        }.bind(this));
     },
     gapi_request_with_auth: function (params) {
       let that = this;
@@ -166,7 +168,7 @@
         window.gapi.client.request(params);
         return dfd.promise();
       });
-    }
+    },
   }, {
     init: function () {
       this._super(...arguments);
@@ -175,7 +177,7 @@
       }
 
       this.doGAuthWithScopes = _.debounce(this.constructor.doGAuth.bind(
-          this.constructor, this.options.scopes, false), 500);
+        this.constructor, this.options.scopes, false), 500);
     },
     authorize: function (newscopes, force) {
       let dfd = this.constructor.oauth_dfd;
@@ -203,6 +205,6 @@
     },
     '{scopes} change': function (scopes, ev) {
       this.doGAuthWithScopes(); // debounce in case we push several scopes in sequence
-    }
+    },
   });
 })(window.CMS, window.GGRC, window.can, window.can.$);

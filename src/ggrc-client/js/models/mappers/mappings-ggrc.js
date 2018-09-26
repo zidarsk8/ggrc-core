@@ -28,21 +28,18 @@ import AccessControlRole from '../custom-roles/access-control-role';
         'related_object', 'assignable',
       ],
       orphaned_objects: Multi([
-        'related_objects', 'clauses', 'controls', 'programs', 'objectives',
+        'related_objects', 'controls', 'programs', 'objectives',
       ]),
     },
     Objective: {
       _mixins: ['related_object'],
       orphaned_objects: Multi([
-        'related_objects', 'clauses', 'contracts', 'controls',
+        'related_objects', 'contracts', 'controls',
         'objectives', 'policies', 'programs', 'regulations',
         'requirements', 'standards',
       ]),
     },
     Requirement: {
-      _mixins: ['related_object'],
-    },
-    Clause: {
       _mixins: ['related_object'],
     },
     Document: {
@@ -61,7 +58,7 @@ import AccessControlRole from '../custom-roles/access-control-role';
           'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
           'Product', 'ProductGroup', 'Project', 'System', 'Regulation',
           'Policy', 'Contract', 'Standard', 'Program', 'Issue', 'Control',
-          'Requirement', 'Clause', 'Objective', 'Audit', 'Assessment',
+          'Requirement', 'Objective', 'Audit', 'Assessment',
           'AssessmentTemplate', 'AccessGroup', 'Risk', 'Threat', 'Document',
           'Metric', 'TechnologyEnvironment',
         ],
@@ -102,7 +99,6 @@ import AccessControlRole from '../custom-roles/access-control-role';
       programs: TypeFilter('related_objects', 'Program'),
       controls: TypeFilter('related_objects', 'Control'),
       requirements: TypeFilter('related_objects', 'Requirement'),
-      clauses: TypeFilter('related_objects', 'Clause'),
       objectives: TypeFilter('related_objects', 'Objective'),
       risks: TypeFilter('related_objects', 'Risk'),
       threats: TypeFilter('related_objects', 'Threat'),
@@ -174,7 +170,6 @@ import AccessControlRole from '../custom-roles/access-control-role';
       ],
       orphaned_objects: Multi([
         'related_objects', 'controls', 'objectives', 'requirements',
-        'clauses',
       ]),
     },
     AccessGroup: {
@@ -295,7 +290,7 @@ import AccessControlRole from '../custom-roles/access-control-role';
           'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
           'Product', 'ProductGroup', 'Project', 'System', 'Regulation',
           'Policy', 'Contract', 'Standard', 'Program', 'Issue', 'Control',
-          'Requirement', 'Clause', 'Objective', 'Audit', 'Assessment',
+          'Requirement', 'Objective', 'Audit', 'Assessment',
           'AssessmentTemplate', 'AccessGroup', 'Risk', 'Threat', 'Document',
           'Metric', 'TechnologyEnvironment', 'Workflow', 'Evidence', 'Person',
           'TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask',

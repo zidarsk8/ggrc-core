@@ -81,14 +81,15 @@ def get_objects_by_query():
   for result in results:
     model = get_model(result["object_name"])
 
-    collection = build_collection_representation(
-        model,
-        {
-            field: result[field] for field in collection_fields
-            if field in result
-        }
-    )
-    collections.append(collection)
+    if model is not None:
+      collection = build_collection_representation(
+          model,
+          {
+              field: result[field] for field in collection_fields
+              if field in result
+          }
+      )
+      collections.append(collection)
 
   return json_success_response(collections, last_modified)
 

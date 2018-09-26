@@ -3,6 +3,8 @@
 
 """Editor permissions. """
 
+# pylint: disable=invalid-name
+
 scope = "System"
 description = """
   This role grants a user basic object creation and editing permission.
@@ -56,7 +58,6 @@ permissions = {
         "Project",
         "Relationship",
         "Requirement",
-        "Clause",
         "SystemOrProcess",
         "System",
         "Process",
@@ -116,7 +117,6 @@ permissions = {
         "Project",
         "Relationship",
         "Requirement",
-        "Clause",
         "SystemOrProcess",
         "System",
         "Process",
@@ -128,6 +128,7 @@ permissions = {
         "ProductGroup",
         "UserRole",
         "Context",
+        "Review"
     ],
     "update": [
         {
@@ -179,7 +180,6 @@ permissions = {
         "TechnologyEnvironment",
         "Relationship",
         "Requirement",
-        "Clause",
         "SystemOrProcess",
         "System",
         "Process",
@@ -234,7 +234,6 @@ permissions = {
         "Project",
         "Relationship",
         "Requirement",
-        "Clause",
         "SystemOrProcess",
         "System",
         "Process",

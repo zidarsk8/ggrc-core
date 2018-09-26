@@ -34,20 +34,20 @@ describe('object-mapper component', function () {
 
     it(`initializes join_object_id with "join-object-id"
     if isNew flag is not passed`,
-      function () {
-        parentViewModel.attr('general.join-object-id', 'testId');
-        let result = Component.prototype.viewModel({}, parentViewModel)();
-        expect(result.join_object_id).toBe('testId');
-      });
+    function () {
+      parentViewModel.attr('general.join-object-id', 'testId');
+      let result = Component.prototype.viewModel({}, parentViewModel)();
+      expect(result.join_object_id).toBe('testId');
+    });
 
     it(`initializes join_object_id with page instance id if
     "join-object-id" and "isNew" are not passed`,
-      function () {
-        spyOn(CurrentPageUtils, 'getPageInstance')
-          .and.returnValue({id: 'testId'});
-        let result = Component.prototype.viewModel({}, parentViewModel)();
-        expect(result.join_object_id).toBe('testId');
-      });
+    function () {
+      spyOn(CurrentPageUtils, 'getPageInstance')
+        .and.returnValue({id: 'testId'});
+      let result = Component.prototype.viewModel({}, parentViewModel)();
+      expect(result.join_object_id).toBe('testId');
+    });
 
     it('initializes join_object_id with null if isNew flag is passed',
       function () {

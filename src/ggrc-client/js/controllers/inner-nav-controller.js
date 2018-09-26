@@ -209,7 +209,7 @@ export default can.Control({
       widget = new can.Observe({
         selector: '#' + $widget.attr('id'),
         count: count,
-        has_count: count != null,
+        has_count: !!count,
         placeInAddTab: false,
       });
     }

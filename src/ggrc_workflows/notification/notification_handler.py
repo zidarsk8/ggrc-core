@@ -23,7 +23,6 @@ from ggrc.models.notification import Notification
 from ggrc.models import all_models
 from ggrc import db
 
-from ggrc_workflows import models
 from ggrc_workflows.notification import pusher
 
 
@@ -54,7 +53,7 @@ def handle_workflow_modify(sender, obj=None, src=None, service=None):
       pusher.push(task, notif_type, task.start_date)
 
 
-def done_tasks_notify(tasks):
+def done_tasks_notify(tasks, day):
   """Notification handling for tasks that moved in done state.
 
   It will
@@ -63,7 +62,9 @@ def done_tasks_notify(tasks):
   """
   if not tasks:
     return
-  pusher.get_notification_query(*tasks).delete(synchronize_session="fetch")
+  pusher.get_notification_query(*tasks).delete(
+      synchronize_session=False
+  )
   cycle_tasks_dict = collections.defaultdict(list)
   cycles_dict = {}
   task_ids = []
@@ -87,12 +88,26 @@ def done_tasks_notify(tasks):
 
   done_cycles = [cycle for cycle, cycle_tasks in cycle_tasks_dict.iteritems()
                  if all(task.is_done for task in cycle_tasks)]
+
+  # this filtration is required for correct work of
+  # '/admin/generate_wf_tasks_notifications' endpoint
+  existing_notifications = pusher.get_notification_query(
+      *done_cycles,
+      **{"notification_names": ["all_cycle_tasks_completed"]}
+  ).all()
+  cycles_with_notifications_ids = [notif.object_id
+                                   for notif in existing_notifications]
+  done_cycles_without_notifs = [cycle for cycle in done_cycles
+                                if cycle.id not in
+                                cycles_with_notifications_ids]
+
   pusher.create_notifications_for_objects("all_cycle_tasks_completed",
                                           datetime.date.today(),
-                                          *done_cycles)
+                                          *done_cycles_without_notifs,
+                                          day=day)
 
 
-def not_done_tasks_notify(tasks):
+def not_done_tasks_notify(tasks, day):
   """Notification handling for tasks that moved to active state.
 
   It will
@@ -101,24 +116,24 @@ def not_done_tasks_notify(tasks):
   """
   if not tasks:
     return
-  cycles = set()
-  declined_tasks = set()
-  for task in tasks:
-    cycles.add(task.cycle)
-    if task.status == models.CycleTaskGroupObjectTask.DECLINED:
-      declined_tasks.add(task)
+  cycles = {task.cycle for task in tasks}
   # delete all notifications for cycles about all tasks completed
   if cycles:
     pusher.get_notification_query(
         *(list(cycles)),
         **{"notification_names": ["all_cycle_tasks_completed"]}
     ).delete(
-        synchronize_session="fetch"
+        synchronize_session=False
     )
-  if declined_tasks:
-    pusher.create_notifications_for_objects(
-        pusher.get_notification_type("cycle_task_declined"),
-        datetime.date.today(), *(list(declined_tasks))
+  # recreate notifications if it's necessary
+  for task in tasks:
+    pusher.update_or_create_notifications(
+        task,
+        task.end_date,
+        get_notif_name_by_wf(task.cycle.workflow),
+        "cycle_task_due_today",
+        "cycle_task_overdue",
+        day=day
     )
 
 
@@ -140,15 +155,13 @@ def handle_cycle_task_created(ctask):
 
 def handle_cycle_task_status_change(*objs):
   """Notification handling for task's status change."""
-  done_tasks = []
-  not_done_tasks = []
-  for obj in objs:
-    if obj.is_done:
-      done_tasks.append(obj)
-    else:
-      not_done_tasks.append(obj)
-  done_tasks_notify(done_tasks)
-  not_done_tasks_notify(not_done_tasks)
+  declined_status = all_models.CycleTaskGroupObjectTask.DECLINED
+  declined_tasks = {obj for obj in objs
+                    if obj.status == declined_status}
+  pusher.create_notifications_for_objects(
+      pusher.get_notification_type("cycle_task_declined"),
+      datetime.date.today(), *(declined_tasks)
+  )
 
 
 def handle_cycle_task_group_object_task_put(obj):

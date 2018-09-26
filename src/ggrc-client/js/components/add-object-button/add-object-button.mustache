@@ -25,8 +25,7 @@
         data-modal-reset="reset"
         data-modal-class="modal-wide"
         data-object-singular="{{singular}}"
-        data-object-plural="{{plural}}"
-        {{^if noparams}} data-object-params='{ "{{instance.class.table_singular}}": {"id" : {{instance.id}}, "type" : "{{instance.class.model_singular}}" }, "context": { "id" : {{firstnonempty instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}" } }'{{/if}}>
+        data-object-plural="{{plural}}">
             {{content}}
     </a>
   {{/is}}
@@ -44,8 +43,7 @@
             data-modal-reset="reset"
             data-modal-class="modal-wide"
             data-object-singular="{{singular}}"
-            data-object-plural="{{plural}}"
-            {{^if noparams}} data-object-params='{ "{{instance.class.table_singular}}": {"id" : {{instance.id}}, "type" : "{{instance.class.model_singular}}" }, "context": { "id" : {{firstnonempty instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}" } }'{{/if}}>
+            data-object-plural="{{plural}}">
                 {{content}}
         </a>
       {{/is_auditor}}

@@ -129,25 +129,25 @@ describe('rich-text component', () => {
 
         it(`should not call history.undo() if current
           length is less than max length`, () => {
-            viewModel.attr('maxLength', 10);
-            spyOn(viewModel, 'getLength').and.returnValue(9);
-            viewModel.restrictMaxLength(editor);
+          viewModel.attr('maxLength', 10);
+          spyOn(viewModel, 'getLength').and.returnValue(9);
+          viewModel.restrictMaxLength(editor);
 
-            callback();
+          callback();
 
-            expect(editor.history.undo).not.toHaveBeenCalled();
-          });
+          expect(editor.history.undo).not.toHaveBeenCalled();
+        });
 
         it(`should call history.undo() if current
           length is greather than max length`, () => {
-            viewModel.attr('maxLength', 9);
-            spyOn(viewModel, 'getLength').and.returnValue(10);
-            viewModel.restrictMaxLength(editor);
+          viewModel.attr('maxLength', 9);
+          spyOn(viewModel, 'getLength').and.returnValue(10);
+          viewModel.restrictMaxLength(editor);
 
-            callback();
+          callback();
 
-            expect(editor.history.undo).toHaveBeenCalled();
-          });
+          expect(editor.history.undo).toHaveBeenCalled();
+        });
       });
     });
 

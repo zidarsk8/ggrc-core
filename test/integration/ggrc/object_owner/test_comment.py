@@ -7,18 +7,18 @@ from integration.ggrc import TestCase
 from integration.ggrc import generator
 
 
-class TestCommentObjectOwner(TestCase):
+class TestCommentAdmin(TestCase):
 
-  """Test object owner of comments."""
+  """Test Admin role on comments."""
 
   def setUp(self):
     """Setup test case."""
-    super(TestCommentObjectOwner, self).setUp()
+    super(TestCommentAdmin, self).setUp()
     self.response = self.client.get("/login")
     self.generator = generator.ObjectGenerator()
 
-  def test_object_owner(self):
-    """Test object owner and its revision of assessment comment."""
+  def test_admin_role(self):
+    """Test comment Admin and its revision of assessment comment."""
     acr_comment_id = all_models.AccessControlRole.query.filter_by(
         object_type="Comment",
         name="Admin"

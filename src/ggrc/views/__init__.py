@@ -9,6 +9,8 @@ import collections
 import json
 import logging
 
+from datetime import date
+
 import sqlalchemy
 from sqlalchemy import true
 from flask import flash
@@ -41,6 +43,8 @@ from ggrc.models.background_task import queued_task
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.revision import Revision
 from ggrc.rbac import permissions
+
+from ggrc.notifications.common import generate_cycle_tasks_notifs
 from ggrc.services.common import as_json
 from ggrc.services.common import inclusion_filter
 from ggrc.query import views as query_views
@@ -246,6 +250,15 @@ def start_update_audit_issues(audit_id, message):
       queued_callback=update_audit_issues
   )
   task.start()
+
+
+@app.route("/_background_tasks/generate_wf_tasks_notifications",
+           methods=["POST"])
+@queued_task
+def generate_wf_tasks_notifications(_):
+  """Generate notifications for wf cycle tasks."""
+  generate_cycle_tasks_notifs(date.today())
+  return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 
 @helpers.without_sqlalchemy_cache
@@ -696,7 +709,6 @@ def contributed_object_views():
       object_view(models.Assessment),
       object_view(models.AssessmentTemplate),
       object_view(models.Audit),
-      object_view(models.Clause),
       object_view(models.Contract),
       object_view(models.Control),
       object_view(models.DataAsset),
@@ -903,3 +915,16 @@ def validate_bulk_sync_data(json_data):
     from ggrc.models.mixins import issue_tracker
     if not issubclass(model, issue_tracker.IssueTracked):
       raise exceptions.BadRequest("Provided object is not IssueTracked.")
+
+
+@app.route("/admin/generate_wf_tasks_notifications", methods=["POST"])
+@login_required
+@admin_required
+def generate_wf_tasks_notifs():
+  """Generate notifications for updated wf cycle tasks."""
+  task_queue = create_task("generate_wf_tasks_notifications",
+                           url_for(generate_wf_tasks_notifications.__name__),
+                           generate_wf_tasks_notifications)
+  return task_queue.make_response(
+      app.make_response(("scheduled %s" % task_queue.name, 200,
+                        [('Content-Type', 'text/html')])))

@@ -627,25 +627,25 @@ describe('revisions-comparer companent', function () {
 
       it(`highlights blocks of grants if list of people was empty
         in the old revision`, () => {
-          $rolesPanes = $blockEmpty.add($blockNotEmpty);
-          spyOn($target, 'find').and.returnValue($rolesPanes);
+        $rolesPanes = $blockEmpty.add($blockNotEmpty);
+        spyOn($target, 'find').and.returnValue($rolesPanes);
 
-          viewModel.highlightCustomRoles($target);
+        viewModel.highlightCustomRoles($target);
 
-          expect($rolesPanes.find(`${blockSelector}${highlightSelector}`)
-            .length).toEqual(2);
-        });
+        expect($rolesPanes.find(`${blockSelector}${highlightSelector}`)
+          .length).toEqual(2);
+      });
 
       it(`highlights blocks of grants if list of people is empty
         in the new revision`, () => {
-          $rolesPanes = $blockNotEmpty.add($blockEmpty);
-          spyOn($target, 'find').and.returnValue($rolesPanes);
+        $rolesPanes = $blockNotEmpty.add($blockEmpty);
+        spyOn($target, 'find').and.returnValue($rolesPanes);
 
-          viewModel.highlightCustomRoles($target);
+        viewModel.highlightCustomRoles($target);
 
-          expect($rolesPanes.find(`${blockSelector}${highlightSelector}`)
-            .length).toEqual(2);
-        });
+        expect($rolesPanes.find(`${blockSelector}${highlightSelector}`)
+          .length).toEqual(2);
+      });
     });
   });
 });

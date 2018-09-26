@@ -60,7 +60,6 @@ permissions = {
         "Project",
         "Relationship",
         "Requirement",
-        "Clause",
         "SystemOrProcess",
         "System",
         "Process",
@@ -175,7 +174,6 @@ permissions = {
             "condition": "relationship",
         },
         "Requirement",
-        "Clause",
         "SystemOrProcess",
         "System",
         "Process",
@@ -187,6 +185,7 @@ permissions = {
         "Role",
         "Context",
         "BackgroundTask",
+        "Review"
     ],
     "update": owner_update,
     "delete": owner_update,

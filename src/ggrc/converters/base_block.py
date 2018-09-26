@@ -236,29 +236,6 @@ class BlockConverter(object):
       self._ticket_tracker_cache = self._create_ticket_tracker_cache()
     return self._ticket_tracker_cache
 
-  def _create_owners_cache(self):
-    """Create a cache of emails for all object owners."""
-    owner_ids = set()
-    for row_converter in self.row_converters:
-      owners = getattr(row_converter.obj, "object_owners", None)
-      if owners:
-        owner_ids |= {o.person_id for o in owners}
-    if not owner_ids:
-      return {}
-    query = db.session.query(
-        models.Person.id,
-        models.Person.email
-    ).filter(
-        models.Person.id.in_(owner_ids)
-    )
-    return dict(query)
-
-  def get_owners_cache(self):
-    """Get object owners email cache."""
-    if self._owners_cache is None:
-      self._owners_cache = self._create_owners_cache()
-    return self._owners_cache
-
   @cached_property
   def mapped_snapshots(self):
     """Cached property of mapped to audit snapshots"""

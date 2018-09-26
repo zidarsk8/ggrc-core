@@ -130,11 +130,11 @@ describe('tree-actions component', () => {
 
     it(`returns false when user does not have update permissions
       and is not auditor`, () => {
-        spyOn(Permission, 'is_allowed').and.returnValue(false);
-        spyOn(AclUtils, 'isAuditor').and.returnValue(false);
+      spyOn(Permission, 'is_allowed').and.returnValue(false);
+      spyOn(AclUtils, 'isAuditor').and.returnValue(false);
 
-        expect(vm.attr('showImport')).toBeFalsy();
-      });
+      expect(vm.attr('showImport')).toBeFalsy();
+    });
 
     it('returns true when user has update permissions but is not auditor',
       () => {
@@ -146,11 +146,11 @@ describe('tree-actions component', () => {
 
     it(`returns true when user has auditor rights
       but does not have update permissions`, () => {
-        spyOn(Permission, 'is_allowed').and.returnValue(false);
-        spyOn(AclUtils, 'isAuditor').and.returnValue(true);
+      spyOn(Permission, 'is_allowed').and.returnValue(false);
+      spyOn(AclUtils, 'isAuditor').and.returnValue(true);
 
-        expect(vm.attr('showImport')).toBeTruthy();
-      });
+      expect(vm.attr('showImport')).toBeTruthy();
+    });
   });
 
   describe('show3bbs get() method', () => {

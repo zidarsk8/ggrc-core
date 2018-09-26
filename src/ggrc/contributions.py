@@ -6,12 +6,13 @@
 from ggrc.integrations import synchronization_jobs
 from ggrc.models import import_export
 from ggrc.notifications import common
+from ggrc.notifications import fast_digest
 from ggrc.notifications import notification_handlers
 from ggrc.notifications import data_handlers
-from ggrc.utils import proposal
 
 
 NIGHTLY_CRON_JOBS = [
+    common.generate_cycle_tasks_notifs,
     common.send_daily_digest_notifications,
     import_export.clear_overtimed_tasks,
 ]
@@ -22,7 +23,7 @@ HOURLY_CRON_JOBS = [
 ]
 
 HALF_HOUR_CRON_JOBS = [
-    proposal.send_notification,
+    fast_digest.send_notification,
 ]
 
 NOTIFICATION_LISTENERS = [
@@ -35,4 +36,5 @@ def contributed_notifications():
   return {
       "Assessment": data_handlers.get_assignable_data,
       "Comment": data_handlers.get_comment_data,
+      "Review": lambda x: {}
   }

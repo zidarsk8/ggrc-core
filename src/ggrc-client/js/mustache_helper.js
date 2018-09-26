@@ -33,6 +33,7 @@ import Option from './models/service-models/option';
 import Search from './models/service-models/search';
 import Person from './models/business-models/person';
 import modalModels from './models/modal-models';
+import {isScopeModel} from './plugins/utils/models-utils';
 
 // Chrome likes to cache AJAX requests for Mustaches.
 let mustacheUrls = {};
@@ -439,26 +440,22 @@ function deferRender(tagPrefix, funcs, deferred) {
   return ['<', tagPrefix, ' ', hook, '>', '</', tagName, '>'].join('');
 };
 
-can.each(['with_page_object_as', 'with_current_user_as'], function (fname) {
-  Mustache.registerHelper(fname, function (name, options) {
-    if (!options) {
-      options = name;
-      name = fname.replace(/with_(.*)_as/, '$1');
-    }
-    let pageObject = (fname === 'with_current_user_as'
-      ? (Person.findInCacheById(GGRC.current_user.id)
-                          || Person.model(GGRC.current_user))
-      : getPageInstance()
-    );
-    if (pageObject) {
-      let po = {};
-      po[name] = pageObject;
-      options.contexts = options.contexts.add(po);
-      return options.fn(options.contexts);
-    } else {
-      return options.inverse(options.contexts);
-    }
-  });
+Mustache.registerHelper('with_current_user_as', function (name, options) {
+  if (!options) {
+    options = name;
+    name = 'current_user';
+  }
+  let pageObject = Person.findInCacheById(GGRC.current_user.id) ||
+    Person.model(GGRC.current_user);
+
+  if (pageObject) {
+    let po = {};
+    po[name] = pageObject;
+    options.contexts = options.contexts.add(po);
+    return options.fn(options.contexts);
+  } else {
+    return options.inverse(options.contexts);
+  }
 });
 
 Mustache.registerHelper('option_select',
@@ -908,7 +905,7 @@ Mustache.registerHelper('is_allowed_to_map',
 
 Mustache.registerHelper('is_allowed_to_map_task', (sourceType, options) => {
   const mappableTypes = ['Program', 'Regulation', 'Policy', 'Standard',
-    'Contract', 'Clause', 'Requirement', 'Request', 'Control', 'Objective',
+    'Contract', 'Requirement', 'Control', 'Objective',
     'OrgGroup', 'Vendor', 'AccessGroup', 'System', 'Process', 'DataAsset',
     'Product', 'ProductGroup', 'Project', 'Facility', 'Market', 'Metric',
     'TechnologyEnvironment'];
@@ -1354,37 +1351,6 @@ Mustache.registerHelper('switch', function (value, options) {
   });
 });
 
-Mustache.registerHelper('current_cycle_assignee',
-  function (instance, options) {
-    let mapping;
-    let approvalCycle;
-    let binding;
-    let finish;
-    let progress;
-
-    instance = Mustache.resolve(instance);
-    mapping = instance.get_mapping('current_approval_cycles');
-
-    if (!mapping || !mapping.length) {
-      return options.inverse();
-    }
-    approvalCycle = mapping[0].instance;
-    binding = approvalCycle.get_binding('cycle_task_groups');
-
-    finish = function (tasks) {
-      return options.fn(options.contexts.add({
-        person: tasks[0].instance.contact,
-      }));
-    };
-    progress = function () {
-      return options.inverse(options.contexts);
-    };
-
-    return deferRender('span', {
-      done: finish, progress: progress,
-    }, binding.refresh_instances());
-  });
-
 Mustache.registerHelper('with_mapping_count',
   function (instance, mappingName, options) {
     let relevant;
@@ -1591,7 +1557,7 @@ Mustache.registerHelper('get_default_attr_value',
       last_deprecated_date: 1,
     });
 
-      // attribute names considered "default" and not representing a date
+    // attribute names considered "default" and not representing a date
     let NON_DATE_ATTRS = Object.freeze({
       kind: 1,
       title: 1,
@@ -1602,7 +1568,7 @@ Mustache.registerHelper('get_default_attr_value',
       status: 1,
       url: 1,
       verified: 1,
-      os_state: 1,
+      review_status: 1,
       archived: 1,
       last_comment: 1,
     });
@@ -1877,4 +1843,10 @@ Mustache.registerHelper('user_roles', (person, parentInstance, options) => {
     rolesStr: allRoleNames.join(', '),
     rolesList: allRoleNames.join('\n'),
   });
+});
+
+Mustache.registerHelper('isScopeModel', function (instance, options) {
+  const modelName = Mustache.resolve(instance).type;
+
+  return isScopeModel(modelName) ? options.fn(this) : options.inverse(this);
 });

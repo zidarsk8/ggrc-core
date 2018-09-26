@@ -12,7 +12,9 @@
         <tab-panel {(panels)}="panels" title-text="Attributes">
           <div class="info-pane__body">
             <div class="info-pane__main-content {{^if isSnapshot}}info-pane__main-content-with-sidebar{{/if}}">
-              {{>'/static/mustache/base_objects/object-review.mustache'}}
+              {{^isScopeModel instance}}
+                <object-review {instance}="instance"></object-review>
+              {{/isScopeModel}}
               {{>'/static/mustache/base_objects/description.mustache'}}
               {{>'/static/mustache/base_objects/test_plan.mustache'}}
               {{>'/static/mustache/base_objects/notes.mustache'}}
@@ -122,7 +124,7 @@
               <related-revisions {instance}="instance"></related-revisions>
             </tab-panel>
           {{/if_instance_of}}
-          <tab-panel {(panels)}="panels" title-text="Change Log">
+          <tab-panel tab-id="change-log" {(panels)}="panels" title-text="Change Log">
               <revision-log {instance}="instance"></revision-log>
           </tab-panel>
         {{/if}}

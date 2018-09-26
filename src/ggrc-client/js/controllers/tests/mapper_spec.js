@@ -91,30 +91,30 @@ describe('ObjectMapper', function () {
 
       it(`extends generalConfig with "object", "type" "isNew" and "relevantTo"
       'if data has is_new`,
-        function (done) {
-          let args;
-          method(_.assign(fakeData, {
-            is_new: true,
-          }), false);
+      function (done) {
+        let args;
+        method(_.assign(fakeData, {
+          is_new: true,
+        }), false);
 
-          args = fakeCtrlInst.launch.calls.argsFor(0);
+        args = fakeCtrlInst.launch.calls.argsFor(0);
 
-          // so hard:(
-          updateScopeObject.resolve().then(function () {
-            expect(args[1]).toEqual(
-              jasmine.objectContaining({
-                general: jasmine.objectContaining({
-                  object: fakeData.join_object_type,
-                  type: fakeData.join_option_type,
-                  isNew: true,
-                  relevantTo: jasmine.any(Array),
-                }),
-              })
-            );
-            expect(args[1].general['join-object-id']).toBeNull();
-            done();
-          });
+        // so hard:(
+        updateScopeObject.resolve().then(function () {
+          expect(args[1]).toEqual(
+            jasmine.objectContaining({
+              general: jasmine.objectContaining({
+                object: fakeData.join_object_type,
+                type: fakeData.join_option_type,
+                isNew: true,
+                relevantTo: jasmine.any(Array),
+              }),
+            })
+          );
+          expect(args[1].general['join-object-id']).toBeNull();
+          done();
         });
+      });
 
       it('throws Error with message if data.join_object_id does not exist',
         function () {

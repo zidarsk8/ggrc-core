@@ -30,7 +30,6 @@ GGRC.config = {
     'Risk',
     'Facility',
     'Process',
-    'Clause',
     'Requirement',
     'DataAsset',
     'AccessGroup',
@@ -51,9 +50,6 @@ GGRC.Bootstrap = {
   exportable: [{
     title_plural: 'Audits',
     model_singular: 'Audit',
-  }, {
-    title_plural: 'Clauses',
-    model_singular: 'Clause',
   }, {
     title_plural: 'Contracts',
     model_singular: 'Contract',
@@ -115,9 +111,6 @@ GGRC.Bootstrap = {
     title_plural: 'Regulations',
     model_singular: 'Regulation',
   }, {
-    title_plural: 'Requests',
-    model_singular: 'Request',
-  }, {
     title_plural: 'Risk Assessments',
     model_singular: 'RiskAssessment',
   }, {
@@ -151,9 +144,6 @@ GGRC.Bootstrap = {
   importable: [{
     title_plural: 'Audits',
     model_singular: 'Audit',
-  }, {
-    title_plural: 'Clauses',
-    model_singular: 'Clause',
   }, {
     title_plural: 'Contracts',
     model_singular: 'Contract',
@@ -205,9 +195,6 @@ GGRC.Bootstrap = {
   }, {
     title_plural: 'Regulations',
     model_singular: 'Regulation',
-  }, {
-    title_plural: 'Requests',
-    model_singular: 'Request',
   }, {
     title_plural: 'Risk Assessments',
     model_singular: 'RiskAssessment',

@@ -48,15 +48,13 @@ import * as businessModels from '../models/business-models/index';
         issue: businessModels.Issue,
         objective: businessModels.Objective,
         requirement: businessModels.Requirement,
-        clause: businessModels.Clause,
         person: businessModels.Person,
         product_group: businessModels.ProductGroup,
         role: Role,
         technology_environment: businessModels.TechnologyEnvironment,
         threat: businessModels.Threat,
         risk: businessModels.Risk,
-        vulnerability: businessModels.Vulnerability,
-        template: businessModels.Template,
+        workflow: businessModels.Workflow,
       };
     },
     init_widgets: function () {
@@ -235,15 +233,6 @@ import * as businessModels from '../models/business-models/index';
 
           return all;
         })(),
-        Contract: {
-          Clause: {
-            widget_name: function () {
-              let $objectArea = $('.object-area');
-              return $objectArea.hasClass('dashboard-area') ?
-                'Clauses' : 'Mapped Clauses';
-            },
-          },
-        },
         Program: {
           Person: {
             widget_id: 'person',
@@ -389,9 +378,6 @@ import * as businessModels from '../models/business-models/index';
           Requirement: {
             draw_children: true,
           },
-          Clause: {
-            draw_children: true,
-          },
         },
         Program: {
           _mixins: [
@@ -422,9 +408,6 @@ import * as businessModels from '../models/business-models/index';
             allow_creating: false,
           },
           Requirement: {
-            draw_children: true,
-          },
-          Clause: {
             draw_children: true,
           },
           Threat: {
@@ -464,9 +447,6 @@ import * as businessModels from '../models/business-models/index';
           Requirement: {
             draw_children: true,
           },
-          Clause: {
-            draw_children: true,
-          },
           Audit: {
             draw_children: true,
           },
@@ -482,12 +462,6 @@ import * as businessModels from '../models/business-models/index';
         },
         Contract: {
           _mixins: ['directive', 'issues'],
-        },
-        Clause: {
-          _mixins: ['governance_objects', 'business_objects', 'issues'],
-          Audit: {
-            draw_children: true,
-          },
         },
         Requirement: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
@@ -516,9 +490,6 @@ import * as businessModels from '../models/business-models/index';
             add_item_view: path + '/audits/tree_add_item.mustache',
           },
           Requirement: {
-            draw_children: true,
-          },
-          Clause: {
             draw_children: true,
           },
         },
@@ -613,11 +584,6 @@ import * as businessModels from '../models/business-models/index';
             draw_children: true,
           },
           Requirement: {
-            add_item_view:
-              GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
-            draw_children: true,
-          },
-          Clause: {
             add_item_view:
               GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
             draw_children: true,

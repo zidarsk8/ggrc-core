@@ -11,9 +11,9 @@ const path = GGRC.mustache_path || '/static/mustache';
 const BUTTON_VIEW_DONE = `${path}/modals/done_buttons.mustache`;
 const BUTTON_VIEW_CLOSE = `${path}/modals/close_buttons.mustache`;
 const BUTTON_VIEW_SAVE_CANCEL = `${path}/modals/save_cancel_buttons.mustache`;
-const BUTTON_VIEW_SAVE_CANCEL_DELETE =
+const BUTTON_VIEW_SAVE_CANCEL_DELETE = // eslint-disable-line
   `${path}/modals/save_cancel_delete_buttons.mustache`;
-const BUTTON_VIEW_CONFIRM_CANCEL =
+const BUTTON_VIEW_CONFIRM_CANCEL = // eslint-disable-line
   `${path}/modals/confirm_cancel_buttons.mustache`;
 const CONTENT_VIEW_WARNING =
   `${path}/base_objects/confirm_warning.mustache`;
@@ -86,7 +86,7 @@ function warning(options, success, fail, extra) {
   return confirmResult;
 }
 
-function confirm (options, success, dismiss) {
+function confirm(options, success, dismiss) {
   let $target = $('<div class="modal hide ' +
     options.extraCssClass +
     '"></div>');
@@ -119,7 +119,7 @@ function confirm (options, success, dismiss) {
         });
     });
 
-    return $target;
+  return $target;
 }
 
 // default static const settings
@@ -132,7 +132,7 @@ warning.settings = Object.freeze({
   confirmTextForTyping: 'I confirm',
   content_view: CONTENT_VIEW_WARNING,
   button_view: BUTTON_VIEW_CONFIRM,
-  buttonExtraClasses: 'disabled'
+  buttonExtraClasses: 'disabled',
 });
 
 function _setupWarning(confirm, settings) {
@@ -142,28 +142,28 @@ function _setupWarning(confirm, settings) {
   let buttonSelector = '[data-toggle=' + operation + ']';
 
   confirm.on('change paste keyup', 'input[data-edit=confirm]',
-  function (e) {
-    let confirmButton = confirm.find(buttonSelector);
-    let text = $(this)
-      .val()
+    function (e) {
+      let confirmButton = confirm.find(buttonSelector);
+      let text = $(this)
+        .val()
         .trim()
         .toLowerCase();
 
-    if (text === confirmText) {
-      confirmButton.removeClass(toggleClasses);
-    } else {
-      confirmButton.addClass(toggleClasses);
-    }
-  })
-  .on('keyup', (e) => {
-    // handle pressing enter
-    if (e.keyCode === 13) {
-      let confirmButton = confirm.find(buttonSelector);
-      if (!confirmButton.attr('disabled')) {
-        confirmButton.trigger('click');
+      if (text === confirmText) {
+        confirmButton.removeClass(toggleClasses);
+      } else {
+        confirmButton.addClass(toggleClasses);
       }
-    }
-  });
+    })
+    .on('keyup', (e) => {
+      // handle pressing enter
+      if (e.keyCode === 13) {
+        let confirmButton = confirm.find(buttonSelector);
+        if (!confirmButton.attr('disabled')) {
+          confirmButton.trigger('click');
+        }
+      }
+    });
 }
 
 export {

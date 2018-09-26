@@ -2,7 +2,6 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Base TestCase for automatic review status update."""
-import unittest
 
 import ddt
 
@@ -12,6 +11,7 @@ from integration.ggrc import TestCase, generator
 from integration.ggrc.models import factories
 
 from integration.ggrc.api_helper import Api
+from integration.ggrc.review import build_reviewer_acl
 
 
 def build_related_object_data(role, title):
@@ -63,9 +63,8 @@ class TestReviewStatusUpdate(TestCase):
     super(TestReviewStatusUpdate, self).setUp()
     self.api = Api()
     self.api.client.get("/login")
-    self.obj_gen = generator.ObjectGenerator()
+    self.generator = generator.ObjectGenerator()
 
-  @unittest.skip("Skipped until control not Reviewable")
   @ddt.data(
       ("title", "new title"),
       ("description", "new description"),
@@ -100,7 +99,6 @@ class TestReviewStatusUpdate(TestCase):
     review = all_models.Review.query.get(review_id)
     self.assertEqual(review.status, all_models.Review.STATES.UNREVIEWED)
 
-  @unittest.skip("Skipped until control not Reviewable")
   def test_gca(self):
     """if GCA of reviewable is changed review -> unreviewed"""
     with factories.single_commit():
@@ -134,7 +132,6 @@ class TestReviewStatusUpdate(TestCase):
     review = all_models.Review.query.get(review_id)
     self.assertEqual(review.status, all_models.Review.STATES.UNREVIEWED)
 
-  @unittest.skip("Skipped until control not Reviewable")
   def test_reference_url(self):
     """If reference url is updated state should not updated"""
     with factories.single_commit():
@@ -157,7 +154,6 @@ class TestReviewStatusUpdate(TestCase):
     review = all_models.Review.query.get(review_id)
     self.assertEqual(review.status, all_models.Review.STATES.REVIEWED)
 
-  @unittest.skip("Skipped until control not Reviewable")
   def test_acl_roles(self):
     """Update of reviewable ACL shouldn't change review status"""
     with factories.single_commit():
@@ -177,7 +173,8 @@ class TestReviewStatusUpdate(TestCase):
 
     self.api.modify_object(
         control, {
-            "access_control_list": [{
+            "access_control_list":
+            [{
                 "ac_role_id": ac_role_id,
                 "person": {
                     "id": user_id
@@ -188,7 +185,6 @@ class TestReviewStatusUpdate(TestCase):
     review = all_models.Review.query.get(review_id)
     self.assertEqual(review.status, all_models.Review.STATES.REVIEWED)
 
-  @unittest.skip("Skipped until control not Reviewable")
   def test_comments(self):
     """Add comment to reviewable shouldn't update review state"""
     with factories.single_commit():
@@ -198,14 +194,13 @@ class TestReviewStatusUpdate(TestCase):
       )
     review_id = review.id
 
-    self.obj_gen.generate_comment(
+    self.generator.generate_comment(
         control, "Verifiers", "some comment", send_notification="false"
     )
 
     review = all_models.Review.query.get(review_id)
     self.assertEqual(review.status, all_models.Review.STATES.REVIEWED)
 
-  @unittest.skip("Skipped until control not Reviewable")
   def test_mapping_non_snapshotable(self):
     """Map non-snapshotable shouldn't change review status"""
     with factories.single_commit():
@@ -222,7 +217,6 @@ class TestReviewStatusUpdate(TestCase):
     review = all_models.Review.query.get(review_id)
     self.assertEqual(review.status, all_models.Review.STATES.REVIEWED)
 
-  @unittest.skip("Skipped until control not Reviewable")
   @ddt.data(
       "Standard",
       "Regulation",
@@ -241,7 +235,7 @@ class TestReviewStatusUpdate(TestCase):
       "Policy",
       "Risk",
       "Threat",
-      "Vendor",
+      "Vendor"
   )
   def test_map_snapshotable(self, snapshotable):
     """Map '{}' should change review status"""
@@ -252,7 +246,7 @@ class TestReviewStatusUpdate(TestCase):
       )
       review_id = review.id
 
-    self.obj_gen.generate_relationship(
+    self.generator.generate_relationship(
         source=control,
         destination=factories.get_model_factory(snapshotable)(),
         context=None,
@@ -261,15 +255,25 @@ class TestReviewStatusUpdate(TestCase):
     review = all_models.Review.query.get(review_id)
     self.assertEqual(review.status, all_models.Review.STATES.UNREVIEWED)
 
-  @unittest.skip("Skipped until control not Reviewable")
   def test_unmap_snapshotable(self):
     """Unmap snapshotable should change review status"""
-    with factories.single_commit():
-      control = factories.ControlFactory()
-      review = factories.ReviewFactory(reviewable=control)
-      review_id = review.id
+    control = factories.ControlFactory()
+    resp, review = self.generator.generate_object(
+        all_models.Review,
+        {
+            "reviewable": {
+                "type": control.type,
+                "id": control.id,
+            },
+            "context": None,
+            "status": all_models.Review.STATES.UNREVIEWED,
+            "access_control_list": build_reviewer_acl(),
+            "notification_type": all_models.Review.NotificationTypes.EMAIL_TYPE
+        },
+    )
+    review_id = review.id
 
-    _, rel = self.obj_gen.generate_relationship(
+    _, rel = self.generator.generate_relationship(
         source=control,
         destination=factories.ProductFactory(),
         context=None,
@@ -286,7 +290,6 @@ class TestReviewStatusUpdate(TestCase):
     review = all_models.Review.query.get(review_id)
     self.assertEqual(review.status, all_models.Review.STATES.UNREVIEWED)
 
-  @unittest.skip("Skipped until control not Reviewable")
   @ddt.data(
       "Assessment",
       "Issue",
@@ -299,18 +302,27 @@ class TestReviewStatusUpdate(TestCase):
   )
   def test_map_nonsnapshotable(self, nonsnapshotable):
     """Map '{}' shouldn't change review status"""
-    with factories.single_commit():
-      control = factories.ControlFactory()
-      review = factories.ReviewFactory(
-          status=all_models.Review.STATES.REVIEWED, reviewable=control
-      )
-      review_id = review.id
+    control = factories.ControlFactory()
+    _, review = self.generator.generate_object(
+        all_models.Review,
+        {
+            "reviewable": {
+                "type": control.type,
+                "id": control.id,
+            },
+            "context": None,
+            "status": all_models.Review.STATES.REVIEWED,
+            "access_control_list": build_reviewer_acl(),
+            "notification_type": all_models.Review.NotificationTypes.EMAIL_TYPE
+        },
+    )
+    review_id = review.id
 
     review = all_models.Review.query.get(review_id)
 
     self.assertEqual(review.status, all_models.Review.STATES.REVIEWED)
 
-    self.obj_gen.generate_relationship(
+    self.generator.generate_relationship(
         source=control,
         destination=factories.get_model_factory(nonsnapshotable)(),
         context=None,
@@ -319,15 +331,24 @@ class TestReviewStatusUpdate(TestCase):
     review = all_models.Review.query.get(review_id)
     self.assertEqual(review.status, all_models.Review.STATES.REVIEWED)
 
-  @unittest.skip("Skipped until control not Reviewable")
   def test_unmap_nonsnapshotable(self):
     """Unmap nonsnapshotable shouldn't change review status"""
-    with factories.single_commit():
-      control = factories.ControlFactory()
-      review = factories.ReviewFactory(reviewable=control)
-      review_id = review.id
-
-    _, rel = self.obj_gen.generate_relationship(
+    control = factories.ControlFactory()
+    resp, review = self.generator.generate_object(
+        all_models.Review,
+        {
+            "reviewable": {
+                "type": control.type,
+                "id": control.id,
+            },
+            "context": None,
+            "status": all_models.Review.STATES.REVIEWED,
+            "access_control_list": build_reviewer_acl(),
+            "notification_type": all_models.Review.NotificationTypes.EMAIL_TYPE
+        },
+    )
+    review_id = review.id
+    _, rel = self.generator.generate_relationship(
         source=control,
         destination=factories.ProgramFactory(),
         context=None,
@@ -346,27 +367,34 @@ class TestReviewStatusUpdate(TestCase):
     review = all_models.Review.query.get(review_id)
     self.assertEqual(review.status, all_models.Review.STATES.REVIEWED)
 
-  @unittest.skip("Skipped until control not Reviewable")
   def test_proposal_apply(self):
     """Reviewable object changed via proposal -> review.state-> UNREVIEWED"""
-    with factories.single_commit():
-      control = factories.ControlFactory()
-      review = factories.ReviewFactory(
-          status=all_models.Review.STATES.REVIEWED, reviewable=control
-      )
-      review_id = review.id
+    control = factories.ControlFactory()
+    _, review = self.generator.generate_object(
+        all_models.Review,
+        {
+            "reviewable": {
+                "type": control.type,
+                "id": control.id,
+            },
+            "context": None,
+            "status": all_models.Review.STATES.UNREVIEWED,
+            "access_control_list": build_reviewer_acl(),
+            "notification_type": all_models.Review.NotificationTypes.EMAIL_TYPE
+        },
+    )
 
-      proposal_content = {
-          "fields": {
-              "title": "new title"
-          },
-      }
-      proposal = factories.ProposalFactory(instance=control,
-                                           content=proposal_content,
-                                           agenda="agenda content")
-    self.api.modify_object(proposal, {
-        "status": proposal.STATES.APPLIED
-    })
+    review_id = review.id
+
+    proposal_content = {
+        "fields": {
+            "title": "new title"
+        },
+    }
+    proposal = factories.ProposalFactory(
+        instance=control, content=proposal_content, agenda="agenda content"
+    )
+    self.api.modify_object(proposal, {"status": proposal.STATES.APPLIED})
 
     review = all_models.Review.query.get(review_id)
     self.assertEqual(review.status, all_models.Review.STATES.UNREVIEWED)

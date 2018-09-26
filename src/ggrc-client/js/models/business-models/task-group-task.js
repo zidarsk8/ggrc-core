@@ -109,8 +109,7 @@ export default Cacheable('CMS.Models.TaskGroupTask', {
       if (instance instanceof that) {
         taskGroup = instance.task_group && instance.task_group.reify();
         if (taskGroup
-          && taskGroup.selfLink
-          && !taskGroup.attr('deleted')) {
+          && taskGroup.selfLink) {
           instance.task_group.reify().refresh();
           instance._refresh_workflow_people();
         }

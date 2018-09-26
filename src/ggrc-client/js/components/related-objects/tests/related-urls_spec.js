@@ -35,13 +35,13 @@ describe('related-urls component', function () {
 
     it(`returns false if user can update instance 
         but edit is disabled in the component`, () => {
-        Permission.is_allowed_for.and.returnValue(true);
-        viewModel.attr('isNotEditable', true);
+      Permission.is_allowed_for.and.returnValue(true);
+      viewModel.attr('isNotEditable', true);
 
-        let result = viewModel.attr('canAddUrl');
+      let result = viewModel.attr('canAddUrl');
 
-        expect(result).toBe(false);
-      });
+      expect(result).toBe(false);
+    });
 
     it('returns true if user can update instance and edit is not denied',
       () => {
@@ -69,35 +69,35 @@ describe('related-urls component', function () {
 
     it(`returns false if user can update instance 
         but edit is disabled in the component`, () => {
-        Permission.is_allowed_for.and.returnValue(true);
-        viewModel.attr('isNotEditable', true);
+      Permission.is_allowed_for.and.returnValue(true);
+      viewModel.attr('isNotEditable', true);
 
-        let result = viewModel.attr('canRemoveUrl');
+      let result = viewModel.attr('canRemoveUrl');
 
-        expect(result).toBe(false);
-      });
+      expect(result).toBe(false);
+    });
 
     it(`returns false if user can update instance, edit is is not denied,
         but removal is disabled by flag`, () => {
-        Permission.is_allowed_for.and.returnValue(true);
-        viewModel.attr('isNotEditable', false);
-        viewModel.attr('allowToRemove', false);
+      Permission.is_allowed_for.and.returnValue(true);
+      viewModel.attr('isNotEditable', false);
+      viewModel.attr('allowToRemove', false);
 
-        let result = viewModel.attr('canRemoveUrl');
+      let result = viewModel.attr('canRemoveUrl');
 
-        expect(result).toBe(false);
-      });
+      expect(result).toBe(false);
+    });
 
     it(`returns true if user can update instance, edit is not denied,
         and removal is not disabled`, () => {
-        Permission.is_allowed_for.and.returnValue(true);
-        viewModel.attr('isNotEditable', false);
-        viewModel.attr('allowToRemove', true);
+      Permission.is_allowed_for.and.returnValue(true);
+      viewModel.attr('isNotEditable', false);
+      viewModel.attr('allowToRemove', true);
 
-        let result = viewModel.attr('canRemoveUrl');
+      let result = viewModel.attr('canRemoveUrl');
 
-        expect(result).toBe(true);
-      });
+      expect(result).toBe(true);
+    });
   });
 
   describe('createUrl() method', function () {

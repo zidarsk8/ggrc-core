@@ -12,12 +12,13 @@ from ggrc.converters import errors
 from ggrc.models import all_models
 from ggrc_workflows import models
 from integration.ggrc.models import factories
-from integration.ggrc_workflows.helpers import workflow_test_case
+from integration.ggrc_workflows.helpers.workflow_test_case \
+    import WorkflowTestCase
 from integration.ggrc_workflows.models import factories as wf_factories
 
 
 @ddt.ddt
-class TestTaskGroupImport(workflow_test_case.WorkflowTestCase):
+class TestTaskGroupImport(WorkflowTestCase):
   """Tests related to TaskGroup import."""
 
   @ddt.data(
@@ -36,7 +37,6 @@ class TestTaskGroupImport(workflow_test_case.WorkflowTestCase):
       (all_models.Policy.__name__, True),
       (all_models.Standard.__name__, True),
       (all_models.Contract.__name__, True),
-      (all_models.Clause.__name__, True),
       (all_models.Requirement.__name__, True),
       (all_models.Control.__name__, True),
       (all_models.Objective.__name__, True),
@@ -85,7 +85,7 @@ class TestTaskGroupImport(workflow_test_case.WorkflowTestCase):
 
 
 @ddt.ddt
-class TestTaskGroupTaskImport(workflow_test_case.WorkflowTestCase):
+class TestTaskGroupTaskImport(WorkflowTestCase):
   """Tests related to TaskGroupTask import."""
 
   def setUp(self):
@@ -183,3 +183,56 @@ class TestTaskGroupTaskImport(workflow_test_case.WorkflowTestCase):
     self._check_csv_response(response, expected_messages)
     self.assertEquals(start_date_before, start_date_after)
     self.assertEquals(end_date_before, end_date_after)
+
+
+class TestImportTasksGroupsWithExistingSlugs(WorkflowTestCase):
+  """
+  Test case when task groups with existing slugs
+  are imported.
+  """
+  def test_import_tgs_with_existing_slugs(self):
+    """
+    When tgs with existing slugs are imported
+    they shouldn't be unmapped from the previous wf.
+    Proper error should be displayed.
+    """
+    # pylint: disable=invalid-name
+    first_wf_slug = "WORKFLOW-1"
+    first_tg_slug = "TASKGROUP-1"
+    with factories.single_commit():
+      # create first workflow, it's tg and tgt
+      first_wf = wf_factories.WorkflowFactory(slug=first_wf_slug)
+      first_task_group = wf_factories.TaskGroupFactory(slug=first_tg_slug,
+                                                       workflow=first_wf)
+      wf_factories.TaskGroupTaskFactory(task_group=first_task_group)
+
+    second_wf_slug = "WORKFLOW-2"
+
+    # create second workflow
+    wf_factories.WorkflowFactory(slug=second_wf_slug)
+
+    # second tg has slug equals to the slug of the first tg
+    second_tg_data = collections.OrderedDict([
+        ("object_type", all_models.TaskGroup.__name__),
+        ("code", first_tg_slug),
+        ("workflow", second_wf_slug)
+    ])
+    response = self.import_data(second_tg_data)
+
+    expected_error = (u"Line 3: TaskGroup '%s' already "
+                      u"exists in the system and mapped "
+                      u"to another workflow. Please, "
+                      u"use different code for this TaskGroup" % first_tg_slug)
+    self.assertEquals([expected_error], response[0]['row_errors'])
+
+    first_wf = db.session.query(models.Workflow).filter(
+        models.Workflow.slug == first_wf_slug
+    ).one()
+    second_wf = db.session.query(models.Workflow).filter(
+        models.Workflow.slug == second_wf_slug
+    ).one()
+
+    self.assertEqual(db.session.query(models.TaskGroup).filter(
+        models.TaskGroup.workflow_id == first_wf.id).count(), 1)
+    self.assertEqual(db.session.query(models.TaskGroup).filter(
+        models.TaskGroup.workflow_id == second_wf.id).count(), 0)

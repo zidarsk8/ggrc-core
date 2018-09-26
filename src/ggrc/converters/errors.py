@@ -168,3 +168,9 @@ DISALLOW_EVIDENCE_FILE = (u"Line {line}: 'Evidence File' can't be changed "
 DISALLOW_DOCUMENT_FILE = (u"Line {line}: 'Document File' can't be changed "
                           u"via import. Please go on {parent} page and "
                           u"make changes manually. The column will be skipped")
+
+TASKGROUP_MAPPED_TO_ANOTHER_WORKFLOW = (u"Line {line}: TaskGroup '{slug}' "
+                                        u"already exists in the system "
+                                        u"and mapped to another "
+                                        u"workflow. Please, use different "
+                                        u"code for this TaskGroup")
