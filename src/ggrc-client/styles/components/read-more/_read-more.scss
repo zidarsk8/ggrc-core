@@ -20,20 +20,19 @@ read-more {
 
   .read-more {
     &.overflowing {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
   }
 
   .read-more__body {
-    display: block;
     overflow: hidden;
     box-sizing: border-box;
     word-break: break-word;
   }
 
   .read-more__controls {
-    position: absolute;
-    right: 0;
+    display: flex;
+    justify-content: flex-end;
     line-height: 20px;
     text-align: right;
 
