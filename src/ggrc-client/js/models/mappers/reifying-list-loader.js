@@ -13,8 +13,9 @@ import Mappings from './mappings';
 
       if (source instanceof GGRC.ListLoaders.ListBinding) {
         this.source_binding = source;
-      } else
+      } else {
         this.source = source;
+      }
     },
     insert_from_source_binding: function (binding, results) {
       let self = this;
