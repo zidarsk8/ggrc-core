@@ -1,8 +1,10 @@
-[//]: <> (updated 9/18/2018)
+[//]: <> (updated 9/26/2018)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 
-[Linking assessments with other issue tracking systems in bulk (v1.23.0, 09/18/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.y0lq3b9v0o2u)
+[Enhanced object review flow (v1.24.0, 09/26/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.l4dezngquz60)
+
+[Linking assessments with other issue tracking systems in bulk (v1.23.0, 09/18/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.12djjl6l1y2a)
 
 [Roles reorganization for scoping objects (v1.22.0, 09/18/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.4dqw7c51mjir)
 
@@ -58,13 +60,17 @@ Our product team is working hard to engineer compliance @ scale and make your da
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
 
+### Enhanced object review flow (v1.24.0, 09/26/2018)
+
+Once reviewer can be assigned for any object like control. The system will inform them through email, that their review has been requested. User with edit rights to object will also be able to mark it reviewed. When an object is modified (i.e. new mappings or attribute edits), the system will revert its state to ‘Unreviewed’ and inform admins, primary contacts and secondary contacts about this through email.
+
 ### Linking assessments with other issue tracking systems in bulk (v1.23.0, 09/18/2018)
 
 You can link all existing assessments in scope of a particular audit with other issue tracking/ticketing systems in bulk, to receive notifications about their updates. You need to click ‘Generate’ button on audit info pane, and the system will auto-generate tickets using a background job for all audit’s assessments, which are not linked to tickets yet. The system will send an email once this process is complete or if there are errors.  
 
 ### Roles reorganization for scoping objects (v1.22.0, 09/18/2018)
 
-In addition to all the new roles added last release, there will be two new roles for scoping objects: ‘Assignee’ and ‘Verifiers’. These fields will be mandatory and accept only one person and will be used in GGRCQ for integration with ticket tracking system.
+In addition to all the new roles added last release, there will be two new roles for scoping objects: ‘Assignee’ and ‘Verifier’. These fields will be mandatory and accept only one person and will be used in GGRCQ for integration with ticket tracking system.
 
 People from ‘Primary Contacts’ and ‘Secondary Contacts’ fields will be migrated into a new role ‘Compliance Contacts’.
 
