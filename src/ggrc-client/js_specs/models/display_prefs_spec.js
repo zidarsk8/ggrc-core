@@ -53,7 +53,7 @@ describe('display prefs model', function () {
       });
 
       it('makes a nested path of can.Observes when the key has multiple levels', function () {
-        let newval = display_prefs.makeObject('baz', 'quux');
+        display_prefs.makeObject('baz', 'quux');
         expect(display_prefs.baz.quux instanceof can.Observe).toBeTruthy();
       });
 
