@@ -712,16 +712,18 @@ describe('mapper-results component', function () {
         ids: [123],
       },
     };
+
     let expectedResult = [{
       id: 123,
       type: 'program',
     }];
+
     let filters = {
       program: {
         ids: [123],
       },
     };
-    let resultDfd;
+
     let dfdRequest;
 
     beforeEach(function () {
@@ -730,8 +732,7 @@ describe('mapper-results component', function () {
       spyOn(QueryAPI, 'batchRequests');
       spyOn(can, 'when')
         .and.returnValue(dfdRequest.promise());
-      spyOn(viewModel, 'getModelKey')
-        .and.returnValue('program');
+
       spyOn(viewModel, 'getQuery')
         .and.returnValue({
           queryIndex: 0,
@@ -743,9 +744,11 @@ describe('mapper-results component', function () {
     });
 
     it('rerturns promise with items', function (done) {
+      spyOn(viewModel, 'getModelKey')
+        .and.returnValue('program');
       dfdRequest.resolve(data, filters);
       viewModel.attr('objectGenerator', true);
-      resultDfd = viewModel.loadAllItemsIds();
+      let resultDfd = viewModel.loadAllItemsIds();
       expect(resultDfd.state()).toEqual('resolved');
       resultDfd.then(function (result) {
         expect(result).toEqual(expectedResult);
@@ -753,11 +756,45 @@ describe('mapper-results component', function () {
       });
     });
 
+    it('returns promise with snapshot items', (done) => {
+      let data = {
+        snapshot: {
+          ids: [123],
+        },
+      };
+
+      let filters = {
+        snapshot: {
+          ids: [],
+        },
+      };
+
+      let expectedResult = [{
+        id: 123,
+        type: 'snapshot',
+        child_type: 'program',
+      }];
+
+      spyOn(viewModel, 'getModelKey')
+        .and.returnValue('snapshot');
+      viewModel.attr('type', 'program');
+      viewModel.attr('useSnapshots', true);
+      dfdRequest.resolve(data, filters);
+      let resultDfd = viewModel.loadAllItemsIds();
+      expect(resultDfd.state()).toEqual('resolved');
+      resultDfd.then((result) => {
+        expect(result).toEqual(expectedResult);
+        done();
+      });
+    });
+
     it('performs extra mapping validation in case Assessment generation',
       function (done) {
+        spyOn(viewModel, 'getModelKey')
+          .and.returnValue('program');
         dfdRequest.resolve(data, filters);
         viewModel.attr('objectGenerator', false);
-        resultDfd = viewModel.loadAllItemsIds();
+        let resultDfd = viewModel.loadAllItemsIds();
         expect(resultDfd.state()).toEqual('resolved');
         resultDfd.then(function (result) {
           expect(result).toEqual([]);
@@ -769,7 +806,7 @@ describe('mapper-results component', function () {
       function (done) {
         dfdRequest.reject();
         viewModel.attr('objectGenerator', true);
-        resultDfd = viewModel.loadAllItemsIds();
+        let resultDfd = viewModel.loadAllItemsIds();
         expect(resultDfd.state()).toEqual('resolved');
         resultDfd.then(function (result) {
           expect(result).toEqual([]);
