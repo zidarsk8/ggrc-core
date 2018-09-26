@@ -3,6 +3,8 @@
 
 """Module for Relationship model and related classes."""
 
+import logging
+
 import collections
 import sqlalchemy as sa
 from sqlalchemy import or_, and_
@@ -16,6 +18,8 @@ from ggrc.models.mixins import Base
 from ggrc.models.mixins import ScopeObject
 from ggrc.models import reflection
 from ggrc.models.exceptions import ValidationError
+
+logger = logging.getLogger(__name__)
 
 
 class Relationship(base.ContextRBAC, Base, db.Model):
@@ -54,6 +58,14 @@ class Relationship(base.ContextRBAC, Base, db.Model):
 
   @property
   def source(self):
+    """Source getter."""
+    if not hasattr(self, self.source_attr):
+      logger.warning(
+          "Relationship source attr '%s' does not exist. "
+          "This indicates invalid data in our database!",
+          self.source_attr
+      )
+      return None
     return getattr(self, self.source_attr)
 
   @source.setter
@@ -69,6 +81,14 @@ class Relationship(base.ContextRBAC, Base, db.Model):
 
   @property
   def destination(self):
+    """Destination getter."""
+    if not hasattr(self, self.destination_attr):
+      logger.warning(
+          "Relationship destination attr '%s' does not exist. "
+          "This indicates invalid data in our database!",
+          self.destination_attr
+      )
+      return None
     return getattr(self, self.destination_attr)
 
   @destination.setter
@@ -231,8 +251,10 @@ class Relatable(object):
       A set (or subset if _types is specified) of related objects.
     """
     # pylint: disable=not-an-iterable
-    source_objs = [obj.source for obj in self.related_sources]
-    dest_objs = [obj.destination for obj in self.related_destinations]
+    source_objs = [obj.source for obj in self.related_sources
+                   if obj.source is not None]
+    dest_objs = [obj.destination for obj in self.related_destinations
+                 if obj.destination is not None]
     related = source_objs + dest_objs
 
     if _types:

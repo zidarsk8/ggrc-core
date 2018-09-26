@@ -15,11 +15,5 @@ export default can.Component.extend({
     text: '@',
     singular: '@',
     plural: '@',
-    define: {
-      noparams: {
-        type: 'htmlbool',
-        value: false,
-      },
-    },
   },
 });
