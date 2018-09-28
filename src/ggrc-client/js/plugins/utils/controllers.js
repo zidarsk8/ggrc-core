@@ -43,7 +43,7 @@ function becameDeprecated(instance, prevStatus) {
 function hasWarningType(instance) {
   return (
     instance &&
-    hasQuestions(instance.attr('type'))
+    hasQuestions(instance)
   );
 }
 

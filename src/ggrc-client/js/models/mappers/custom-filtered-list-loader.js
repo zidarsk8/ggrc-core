@@ -4,6 +4,7 @@
  */
 
 import RefreshQueue from '../refresh_queue';
+import Mappings from './mappings';
 
 (function (GGRC, can) {
   /*
@@ -52,7 +53,9 @@ import RefreshQueue from '../refresh_queue';
         }
 
         if (typeof this.source === 'string') {
-          binding.source_binding = binding.instance.get_binding(this.source);
+          binding.source_binding = Mappings.get_binding(
+            this.source,
+            binding.instance);
         } else {
           binding.source_binding = this.source;
         }

@@ -9,13 +9,11 @@
 
 /**
  * Determine whether model type could have mapped questions.
- * @param {String} type - The model name
+ * @param {can.Model} model - The model
  * @return {Boolean} True or False
  */
-function hasQuestions(type) {
-  const model = CMS.Models[type];
-
-  return model && model.isQuestionnaireable;
+function hasQuestions(model) {
+  return model && model.constructor && model.constructor.isQuestionnaireable;
 }
 
 /**

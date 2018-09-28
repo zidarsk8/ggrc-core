@@ -16,7 +16,7 @@ class TestLhn(base.Test):
   @pytest.mark.smoke_tests
   def test_destructive_obj_count(self, selenium):
     """Checks if count updates in LHN after creating new program."""
-    selenium_utils.open_url(selenium, url.Urls().dashboard)
+    selenium_utils.open_url(url.Urls().dashboard)
     count_before = dashboard.Header(selenium).open_lhn_menu(
     ).select_my_objects().toggle_programs.members_count
     rest_facade.create_program()

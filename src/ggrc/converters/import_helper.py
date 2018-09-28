@@ -224,9 +224,14 @@ def count_objects(csv_data):
   return counts, blocks_info, failed
 
 
-def get_export_filename(objects, current_time):
+def get_export_filename(objects, current_time, exportable_objects):
   """Generate export file name"""
-  object_names = "_".join(obj['object_name'] for obj in objects)
+  if exportable_objects:
+    object_names = "_".join(obj['object_name']
+                            for index, obj in enumerate(objects)
+                            if index in exportable_objects)
+  else:
+    object_names = "_".join(obj['object_name'] for obj in objects)
   return "{}_{}.csv".format(object_names, current_time)
 
 

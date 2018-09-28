@@ -5,6 +5,9 @@
 
 import * as module from '../../../plugins/utils/tree-view-utils';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
+import * as ImportExportUtils from '../../../plugins/utils/import-export-utils';
+import * as QueryApiUtils from '../../../plugins/utils/query-api-utils';
+
 import CycleTaskGroupObjectTask from '../../../models/business-models/cycle-task-group-object-task';
 
 describe('TreeViewUtils module', function () {
@@ -175,6 +178,56 @@ describe('TreeViewUtils module', function () {
       result = module.getModelsForSubTier('CycleTaskGroupObjectTask');
       expect(result.available.length).toEqual(2);
       expect(result.selected.length).toEqual(2);
+    });
+  });
+
+  describe('startExport() method', () => {
+    let modelName;
+    let parent;
+    let filter;
+    let request;
+
+    beforeEach(() => {
+      spyOn(ImportExportUtils, 'runExport');
+      spyOn(ImportExportUtils, 'fileSafeCurrentDate');
+      spyOn(QueryApiUtils, 'buildParam');
+      spyOn(module, 'makeRelevantExpression')
+        .and.returnValue('testRelevantExpression');
+
+      modelName = 'testModelName';
+      parent = {
+        type: 'testParentType',
+        id: 'testParentId',
+      };
+      filter = {testFilter: true};
+      request = new can.List();
+    });
+
+    it('builds request params correctly', () => {
+      module.startExport(modelName, parent, filter, request);
+
+      expect(QueryApiUtils.buildParam).toHaveBeenCalledWith(
+        modelName,
+        {},
+        {type: parent.type, id: parent.id, operation: 'owned'},
+        'all',
+        filter);
+    });
+
+    it('runs export correctly', () => {
+      request = new can.List(['testRequest1']);
+      ImportExportUtils.fileSafeCurrentDate
+        .and.returnValue('testFileSafeCurrentDate');
+      QueryApiUtils.buildParam
+        .and.returnValue('testRequest2');
+
+      module.startExport(modelName, parent, filter, request);
+
+      expect(ImportExportUtils.runExport).toHaveBeenCalledWith({
+        objects: ['testRequest1', 'testRequest2'],
+        current_time: 'testFileSafeCurrentDate',
+        exportable_objects: [1],
+      });
     });
   });
 });

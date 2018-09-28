@@ -2,9 +2,6 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Audit RBAC Factory."""
-import sqlalchemy as sa
-
-from ggrc import db
 from ggrc.models import all_models
 from integration.ggrc import Api
 from integration.ggrc.models import factories
@@ -53,6 +50,7 @@ class BaseRBACFactory(object):
         parent: Model name in scope of which objects should be set up.
     """
     # pylint: disable=attribute-defined-outside-init
+    acr_id = acr.id
     with factories.single_commit():
       self.workflow = wf_factories.WorkflowFactory()
       self.workflow_id = self.workflow.id
@@ -67,6 +65,7 @@ class BaseRBACFactory(object):
 
     self.generate_cycle(self.workflow_id)
     cycle_task = all_models.CycleTaskGroupObjectTask.query.first()
+    acr = all_models.AccessControlRole.query.get(acr_id)
     self.assign_person(cycle_task, acr, user_id)
 
   @staticmethod
@@ -89,9 +88,6 @@ class BaseRBACFactory(object):
   @staticmethod
   def assign_person(object_, acr, person_id):
     """Assign person to object."""
-    if sa.inspect(acr).detached:
-      db.session.add(acr)
-    acr = all_models.AccessControlRole.query.get(acr.id)
     if object_.type == acr.object_type:
       factories.AccessControlListFactory(
           object=object_,

@@ -9,25 +9,11 @@ from collections import OrderedDict
 import ddt
 
 from ggrc import models
+from ggrc.models import all_models
+from ggrc.models.mixins import ScopeObject
 from ggrc.converters import errors
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
-
-SCOPING_OBJECTS = {
-    "Access Group",
-    "Data Asset",
-    "Facility",
-    "Market",
-    "Metric",
-    "Org Group",
-    "Process",
-    "Product",
-    "ProductGroup",
-    "Project",
-    "System",
-    "TechnologyEnvironment",
-    "Vendor",
-}
 
 
 @ddt.ddt
@@ -192,15 +178,19 @@ class TestACLImportExport(TestCase):
   @staticmethod
   def _generate_role_import_dict(roles, object_type="Market"):
     """Generate simple import dict with all roles and emails."""
+    scoping_models_names = [m.__name__ for m in all_models.all_models
+                            if issubclass(m, ScopeObject)]
+
     import_dict = OrderedDict([
         ("object_type", object_type),
         ("code", "{}-1".format(object_type.lower())),
+        ("title", "Title"),
         ("title", "Title"),
         ("Admin", "user@example.com"),
     ])
     if object_type == "Control":
       import_dict["Assertions*"] = "Privacy"
-    if object_type in SCOPING_OBJECTS:
+    if object_type in scoping_models_names:
       import_dict["Assignee"] = "user@example.com"
       import_dict["Verifier"] = "user@example.com"
     for role_name, emails in roles.items():

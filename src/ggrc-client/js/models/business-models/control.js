@@ -4,14 +4,14 @@
 */
 
 import Cacheable from '../cacheable';
-import '../mixins/unique-title';
-import '../mixins/ca-update';
-import '../mixins/timeboxed';
-import '../mixins/access-control-list';
-import '../mixins/base-notifications';
-import '../mixins/proposable';
-import '../mixins/assertions-categories';
-import '../mixins/related-assessments-loader';
+import uniqueTitle from '../mixins/unique-title';
+import caUpdate from '../mixins/ca-update';
+import timeboxed from '../mixins/timeboxed';
+import accessControlList from '../mixins/access-control-list';
+import baseNotifications from '../mixins/base-notifications';
+import proposable from '../mixins/proposable';
+import assertionsCategories from '../mixins/assertions-categories';
+import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
 import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Control', {
@@ -24,14 +24,14 @@ export default Cacheable('CMS.Models.Control', {
   update: 'PUT /api/controls/{id}',
   destroy: 'DELETE /api/controls/{id}',
   mixins: [
-    'unique_title',
-    'ca_update',
-    'timeboxed',
-    'accessControlList',
-    'base-notifications',
-    'proposable',
-    'assertions_categories',
-    'relatedAssessmentsLoader',
+    uniqueTitle,
+    caUpdate,
+    timeboxed,
+    accessControlList,
+    baseNotifications,
+    proposable,
+    assertionsCategories,
+    relatedAssessmentsLoader,
   ],
   is_custom_attributable: true,
   isRoleable: true,

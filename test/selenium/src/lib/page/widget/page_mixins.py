@@ -26,9 +26,13 @@ class WithPageElements(base.WithBrowser):
     """Return CommentArea page element"""
     return page_elements.CommentArea(self._browser)
 
-  def _description_field(self):
-    """Returns DescriptionField page element."""
-    return page_elements.DescriptionField(self._browser)
+  def _simple_field(self, label):
+    """Returns SimpleField page element."""
+    return page_elements.SimpleField(self._browser, label)
+
+  def _info_pane_form_field(self, label):
+    """Returns InfoPaneFormField page element."""
+    return page_elements.InfoPaneFormField(self._browser, label)
 
   def _assessment_form_field(self, label):
     """Returns AssessmentFormField page element."""

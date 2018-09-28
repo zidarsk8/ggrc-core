@@ -116,14 +116,15 @@ describe('external-data-autocomplete component', () => {
     });
 
     describe('onItemPicked() method', () => {
-      let saveDfd;
       let item;
+      let created;
+
       beforeEach(() => {
-        saveDfd = can.Deferred();
         item = {
           test: true,
         };
-        spyOn(viewModel, 'createOrGet').and.returnValue(saveDfd);
+        created = Promise.resolve(item);
+        spyOn(viewModel, 'createOrGet').and.returnValue(created);
       });
 
       it('turns on "saving" flag', () => {
@@ -140,76 +141,79 @@ describe('external-data-autocomplete component', () => {
         expect(viewModel.createOrGet).toHaveBeenCalledWith(item);
       });
 
-      it('dispatches event when istance was saved', () => {
+      it('dispatches event when istance was saved', (done) => {
         spyOn(viewModel, 'dispatch');
 
         viewModel.onItemPicked(item);
 
-        saveDfd.resolve(item).then(() => {
+        created.then(() => {
           expect(viewModel.dispatch).toHaveBeenCalledWith({
             type: 'itemSelected',
             selectedItem: item,
           });
+          done();
         });
       });
 
-      it('turns off "saving" flag', () => {
+      it('turns off "saving" flag', (done) => {
         viewModel.attr('saving', true);
 
         viewModel.onItemPicked(item);
 
-        saveDfd.resolve().then(() => {
+        created.then().finally(() => {
           expect(viewModel.attr('saving')).toBe(false);
+          done();
         });
       });
 
-      it('cleans search criteria if "autoClean" is turned on', () => {
+      it('cleans search criteria if "autoClean" is turned on', (done) => {
         viewModel.attr('searchCriteria', 'someText');
         viewModel.attr('autoClean', true);
 
         viewModel.onItemPicked(item);
 
-        saveDfd.resolve().then(() => {
+        created.then(() => {
           expect(viewModel.attr('searchCriteria')).toBe('');
+          done();
         });
       });
 
-      it('does not clean search criteria if "autoClean" is turned on', () => {
-        viewModel.attr('searchCriteria', 'someText');
-        viewModel.attr('autoClean', false);
+      it('does not clean search criteria if "autoClean" is turned on',
+        (done) => {
+          viewModel.attr('searchCriteria', 'someText');
+          viewModel.attr('autoClean', false);
 
-        viewModel.onItemPicked(item);
+          viewModel.onItemPicked(item);
 
-        saveDfd.resolve().then(() => {
-          expect(viewModel.attr('searchCriteria')).toBe('someText');
+          created.then(() => {
+            expect(viewModel.attr('searchCriteria')).toBe('someText');
+            done();
+          });
         });
-      });
     });
 
     describe('createOrGet() method', () => {
-      let originalModels;
-      let createDfd;
       let item;
-      let response;
       let model;
 
       beforeEach(() => {
-        createDfd = can.Deferred();
         item = new can.Map({test: true});
         viewModel.attr('type', 'TestType');
-        businessModels.TestType = can.Map.extend({
-          create: jasmine.createSpy().and.returnValue(createDfd),
-          root_object: 'test',
-          cache: {},
-        }, {});
         model = {
           id: 'testId',
         };
-        response = [[201,
+
+        let response = [[201,
           {
             test: model,
           },
         ]];
+        businessModels.TestType = can.Map.extend({
+          create: jasmine.createSpy()
+            .and.returnValue(Promise.resolve(response)),
+          root_object: 'test',
+          cache: {},
+        }, {});
       });
 
       afterEach(() => {
@@ -239,41 +243,32 @@ describe('external-data-autocomplete component', () => {
       });
 
       it('returns new model if there is no value in cache', (done) => {
-        let resultDfd = viewModel.createOrGet(item);
-
-        createDfd.resolve(response);
-
-        resultDfd.then((resultModel) => {
-          expect(resultModel.attr('id')).toBe('testId');
-          expect(resultModel instanceof businessModels.TestType).toBe(true);
-          done();
-        });
+        viewModel.createOrGet(item)
+          .then((resultModel) => {
+            expect(resultModel.attr('id')).toBe('testId');
+            expect(resultModel instanceof businessModels.TestType).toBe(true);
+            done();
+          });
       });
 
       it('returns cached model if there is value in cache', (done) => {
         businessModels.TestType.cache['testId'] = {cached: true};
 
-        let resultDfd = viewModel.createOrGet(item);
-
-        createDfd.resolve(response);
-
-        resultDfd.then((resultModel) => {
-          expect(resultModel).toBe(businessModels.TestType.cache['testId']);
-          done();
-        });
+        viewModel.createOrGet(item)
+          .then((resultModel) => {
+            expect(resultModel).toBe(businessModels.TestType.cache['testId']);
+            done();
+          });
       });
 
       it('calls model reify', (done) => {
         model.reify = jasmine.createSpy('reify').and.returnValue(model);
 
-        let resultDfd = viewModel.createOrGet(item);
-
-        createDfd.resolve(response);
-
-        resultDfd.then((resultModel) => {
-          expect(model.reify).toHaveBeenCalled();
-          done();
-        });
+        viewModel.createOrGet(item)
+          .then((resultModel) => {
+            expect(model.reify).toHaveBeenCalled();
+            done();
+          });
       });
     });
   });

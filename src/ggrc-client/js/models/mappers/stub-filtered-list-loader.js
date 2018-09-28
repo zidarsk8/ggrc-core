@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import Mappings from './mappings';
+
 (function (GGRC, can) {
   GGRC.ListLoaders.BaseListLoader('GGRC.ListLoaders.StubFilteredListLoader', {},
     {
@@ -17,7 +19,9 @@
         let matchingResults;
 
         if (typeof this.source === 'string') {
-          binding.source_binding = binding.instance.get_binding(this.source);
+          binding.source_binding = Mappings.get_binding(
+            this.source,
+            binding.instance);
         } else {
           binding.source_binding = this.source;
         }

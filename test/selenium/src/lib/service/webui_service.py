@@ -11,7 +11,7 @@ from lib.constants import objects, messages, element, regex
 from lib.constants.locator import WidgetInfoAssessment
 from lib.element.tab_containers import DashboardWidget
 from lib.entities.entity import Representation
-from lib.page import dashboard
+from lib.page import dashboard, export_page
 from lib.page.widget import object_modal
 from lib.page.widget.info_widget import SnapshotedInfoPanel
 from lib.utils import selenium_utils, file_utils, conftest_utils
@@ -120,7 +120,7 @@ class BaseWebUiService(object):
     """
     generic_widget_url = self.url_mapped_objs.format(src_obj_url=src_obj.url)
     # todo fix freezing when navigate through tabs by URLs and using driver.get
-    selenium_utils.open_url(self.driver, generic_widget_url, is_via_js=True)
+    selenium_utils.open_url(generic_widget_url, is_via_js=True)
     return self.generic_widget_cls(self.driver, self.obj_name)
 
   def open_info_page_of_obj(self, obj):
@@ -129,7 +129,7 @@ class BaseWebUiService(object):
     """
     info_page_url = self.url_obj_info_page.format(
         obj_url=obj.url)
-    selenium_utils.open_url(self.driver, info_page_url)
+    selenium_utils.open_url(info_page_url)
     return self.info_widget_cls(self.driver)
 
   def open_info_panel_of_obj_by_title(self, src_obj, obj):
@@ -204,15 +204,16 @@ class BaseWebUiService(object):
 
   def export_objs_via_tree_view(self, path_to_export_dir, src_obj):
     # pylint: disable=fixme
-    """Open generic widget of mapped objects, open modal of export from
-    Tree View, fill data according to 'src_objs' (filter by mapping to source
-    objects), 'mapped_objs' (export objects' types, export objects' filter
-    queries) and export objects to test's temporary directory as CSV file.
+    """Open generic widget of mapped objects
+    and export objects to test's temporary directory as CSV file.
     Get and return path to the exported file.
     """
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
-    path_to_exported_file = objs_widget.tree_view.open_3bbs().select_export(
-    ).export_objs_to_csv(path_to_export_dir)
+    objs_widget.tree_view.open_3bbs().select_export()
+    export_page_object = export_page.ExportPage(self.driver)
+    export_page_object.open_export_page()
+    path_to_exported_file = export_page_object.download_obj_to_csv(
+        path_to_export_dir)
     # FIXME: Filename was "{obj_type} {snapshot_obj_type}
     # before migration of export page on background job.
     # Current behavior may be a bug.

@@ -9,7 +9,7 @@
     </div>
     <div class="action-toolbar__controls">
         {{#unless instance.archived}}
-          {{#unless document.isDraft}}
+          {{#unless document.isNew}}
             {{#is_allowed 'update' instance context='for'}}
               <content></content>
             {{/is_allowed}}

@@ -3,10 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {
-  getModelByType,
-  getMappableTypes,
-} from '../../plugins/ggrc_utils';
+import {getMappableTypes} from '../../plugins/ggrc_utils';
+import {getModelByType} from '../../plugins/utils/models-utils';
+import Join from '../join-models/join';
 
 /*
   class Mappings
@@ -174,12 +173,12 @@ export default can.Construct.extend({
   */
   get_canonical_mapping: function (object, option) {
     let mapping = null;
-    can.each(this.modules, function (mod, name) {
+    can.each(this.modules, (mod, name) => {
       if (mod._canonical_mappings && mod._canonical_mappings[object] &&
         mod._canonical_mappings[object][option]) {
-        mapping =
-          CMS.Models[object]
-            .get_mapper(mod._canonical_mappings[object][option]);
+        mapping = this.get_mapper(
+          mod._canonical_mappings[object][option],
+          object);
         return false;
       }
     });
@@ -211,15 +210,127 @@ export default can.Construct.extend({
   */
   get_canonical_mappings_for: function (object) {
     let mappings = {};
-    can.each(this.modules, function (mod, name) {
+    can.each(this.modules, (mod, name) => {
       if (mod._canonical_mappings && mod._canonical_mappings[object]) {
-        can.each(mod._canonical_mappings[object],
-          function (mappingName, option) {
-            mappings[option] = CMS.Models[object].get_mapper(mappingName);
-          });
+        can.each(mod._canonical_mappings[object], (mappingName, option) => {
+          mappings[option] = this.get_mapper(
+            mappingName,
+            object);
+        });
       }
     });
     return mappings;
+  },
+  get_mapper: function (mappingName, type) {
+    let mapper;
+    let mappers = this.get_mappings_for(type);
+    if (mappers) {
+      mapper = mappers[mappingName];
+      return mapper;
+    }
+  },
+  _get_binding_attr: function (mapper) {
+    if (typeof (mapper) === 'string') {
+      return '_' + mapper + '_binding';
+    }
+  },
+  // checks if binding exists without throwing debug statements
+  // modeled after what get_binding is doing
+  has_binding: function (mapper, model) {
+    let binding;
+    let mapping;
+    let bindingAttr = this._get_binding_attr(mapper);
+
+    if (bindingAttr) {
+      binding = model[bindingAttr];
+    }
+
+    if (!binding) {
+      if (typeof (mapper) === 'string') {
+        mapping = this.get_mapper(mapper, model.constructor.shortName);
+        if (!mapping) {
+          return false;
+        }
+      } else if (!(mapper instanceof GGRC.ListLoaders.BaseListLoader)) {
+        return false;
+      }
+    }
+
+    return true;
+  },
+  get_binding: function (mapper, model) {
+    let mapping;
+    let binding;
+    let bindingAttr = this._get_binding_attr(mapper);
+
+    if (bindingAttr) {
+      binding = model[bindingAttr];
+    }
+
+    if (!binding) {
+      if (typeof (mapper) === 'string') {
+      // Lookup and attach named mapper
+        mapping = this.get_mapper(mapper, model.constructor.shortName);
+        if (!mapping) {
+          console.debug(
+            'No such mapper:  ' + model.constructor.shortName + '.' + mapper);
+        } else {
+          binding = mapping.attach(model);
+        }
+      } else if (mapper instanceof GGRC.ListLoaders.BaseListLoader) {
+      // Loader directly provided, so just attach
+        binding = mapper.attach(model);
+      } else {
+        console.debug('Invalid mapper specified:', mapper);
+      }
+      if (binding && bindingAttr) {
+        model[bindingAttr] = binding;
+        binding.name = model.constructor.shortName + '.' + mapper;
+      }
+    }
+    return binding;
+  },
+  get_list_loader: function (name, model) {
+    let binding = this.get_binding(name, model);
+    return binding.refresh_list();
+  },
+  get_mapping: function (name, model) {
+    let binding = this.get_binding(name, model);
+    if (binding) {
+      binding.refresh_list();
+      return binding.list;
+    }
+    return [];
+  },
+  get_orphaned_count: function (model) {
+    if (!this.get_binding('orphaned_objects', model)) {
+      return can.Deferred().reject();
+    }
+    return this.get_list_loader('orphaned_objects', model).then((list) => {
+      function isJoin(mapping) {
+        if (mapping.mappings.length > 0) {
+          for (let i = 0, child; child = mapping.mappings[i]; i++) {
+            if (child = isJoin(child)) {
+              return child;
+            }
+          }
+        }
+        return mapping.instance &&
+          mapping.instance instanceof Join &&
+          mapping.instance;
+      }
+
+      const mappings = [];
+      can.each(list, (mapping) => {
+        const inst = isJoin(mapping);
+
+        if (inst) {
+          mappings.push(inst);
+        }
+      });
+
+      return mappings.length;
+    });
   },
 }, {
   /*

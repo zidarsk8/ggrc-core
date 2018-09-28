@@ -4,7 +4,7 @@
 */
 
 import Cacheable from '../cacheable';
-import '../mixins/is-overdue';
+import isOverdue from '../mixins/is-overdue';
 import Stub from '../stub';
 
 export default Cacheable('CMS.Models.CycleTaskGroup', {
@@ -16,7 +16,7 @@ export default Cacheable('CMS.Models.CycleTaskGroup', {
   create: 'POST /api/cycle_task_groups',
   update: 'PUT /api/cycle_task_groups/{id}',
   destroy: 'DELETE /api/cycle_task_groups/{id}',
-  mixins: ['isOverdue'],
+  mixins: [isOverdue],
   attributes: {
     cycle: Stub,
     task_group: Stub,

@@ -15,4 +15,4 @@ echo -e "\nRunning access control integration tests"
 nosetests integration.ggrc.access_control \
   --with-xunit \
   --logging-clear-handlers \
-  -v ${@:1}
+  ${@:1}

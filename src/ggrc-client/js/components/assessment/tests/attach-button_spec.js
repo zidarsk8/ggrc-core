@@ -21,20 +21,13 @@ describe('attach-button component', function () {
     );
   });
 
-  describe('refresh() method', function () {
-    it('dispatches "refreshInstance" event', function () {
-      spyOn(viewModel.instance, 'dispatch');
-      viewModel.refresh();
+  describe('finish() method', function () {
+    it('dispatches "finish" event', function () {
+      spyOn(viewModel, 'dispatch');
+      viewModel.finish();
 
-      expect(viewModel.instance.dispatch)
-        .toHaveBeenCalledWith('refreshInstance');
-    });
-
-    it('does not throw error if instance is not provided', function () {
-      viewModel.removeAttr('instance');
-
-      expect(viewModel.refresh.bind(viewModel))
-        .not.toThrowError();
+      expect(viewModel.dispatch)
+        .toHaveBeenCalledWith('finish');
     });
   });
 

@@ -4,6 +4,7 @@
 */
 
 import RefreshQueue from '../refresh_queue';
+import Mappings from './mappings';
 
 (function (GGRC, can) {
   GGRC.ListLoaders.BaseListLoader('GGRC.ListLoaders.ReifyingListLoader', {}, {
@@ -12,8 +13,9 @@ import RefreshQueue from '../refresh_queue';
 
       if (source instanceof GGRC.ListLoaders.ListBinding) {
         this.source_binding = source;
-      } else
+      } else {
         this.source = source;
+      }
     },
     insert_from_source_binding: function (binding, results) {
       let self = this;
@@ -33,8 +35,12 @@ import RefreshQueue from '../refresh_queue';
 
       if (this.source_binding) {
         binding.source_binding = this.source_binding;
-      } else
-        binding.source_binding = binding.instance.get_binding(this.source);
+      } else {
+        binding.source_binding = Mappings.get_binding(
+          this.source,
+          binding.instance);
+      }
+
       this.insert_from_source_binding(binding, binding.source_binding.list, 0);
 
       binding.source_binding.list.bind('add', function (ev, results, index) {

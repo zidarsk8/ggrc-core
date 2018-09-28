@@ -10,6 +10,7 @@ import {
 import Permission from '../../permission';
 import DisplayPrefs from '../../models/local-storage/display-prefs';
 import TreeViewOptions from './tree-view-options';
+import Mappings from '../../models/mappers/mappings';
 
 (function (can, $) {
   CMS.Controllers.TreeLoader.extend('CMS.Controllers.TreeView', {
@@ -77,16 +78,6 @@ import TreeViewOptions from './tree-view-options';
       active
         .removeClass('active')
         .removeClass('maximized-info-pane');
-      this.update_hash_fragment(active.length);
-    },
-    update_hash_fragment: function (status) {
-      let hash;
-      if (!status) {
-        return;
-      }
-      hash = window.location.hash.split('/');
-      hash.pop();
-      window.location.hash = hash.join('/');
     },
 
     init: function (el, opts) {
@@ -262,8 +253,9 @@ import TreeViewOptions from './tree-view-options';
           // TODO investigate why is this method sometimes called twice
           return undefined; // not ready, will try again
         }
-        this.find_all_deferred =
-          this.options.parent_instance.get_list_loader(this.options.mapping);
+        this.find_all_deferred = Mappings.get_list_loader(
+          this.options.mapping,
+          this.options.parent_instance);
       } else if (this.options.list_loader) {
         this.find_all_deferred =
           this.options.list_loader(this.options.parent_instance);

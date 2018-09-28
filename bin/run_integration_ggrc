@@ -19,4 +19,4 @@ nosetests integration \
   -e "^ggrc_workflows$" \
   --with-xunit \
   --logging-clear-handlers \
-  -v ${@:1}
+  ${@:1}

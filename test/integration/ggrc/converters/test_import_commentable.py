@@ -4,10 +4,12 @@
 # pylint: disable=maybe-no-member, invalid-name
 
 """Test import of commentable fields."""
+
 from collections import OrderedDict
 
+from ggrc.models import all_models
 from ggrc.models import inflector
-from ggrc.models.mixins import Described
+from ggrc.models.mixins import Described, ScopeObject
 from ggrc.models.mixins.audit_relationship import AuditRelationship
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
@@ -25,21 +27,9 @@ COMMENTABLE_MODELS = [
     "Threat",
 ]
 
-SCOPING_MODELS = [
-    "AccessGroup",
-    "DataAsset",
-    "Facility",
-    "Market",
-    "System",
-    "OrgGroup",
-    "Process",
-    "Product",
-    "Project",
-    "Vendor",
-    "Metric",
-    "TechnologyEnvironment",
-    "ProductGroup",
-]
+SCOPING_MODELS_NAMES = [m.__name__ for m in all_models.all_models
+                        if issubclass(m, ScopeObject) and
+                        not issubclass(m, all_models.SystemOrProcess)]
 
 RECIPIENTS = ["Admin", "Primary Contacts", "Secondary Contacts"]
 
@@ -61,7 +51,7 @@ class TestCommentableImport(TestCase):
     with factories.single_commit():
       for model in COMMENTABLE_MODELS:
         self.import_model(model, audit, ",".join(RECIPIENTS), True)
-      for model in SCOPING_MODELS:
+      for model in SCOPING_MODELS_NAMES:
         self.import_model(model, audit, ",".join(SCOPING_RECIPIENTS), True)
 
   def import_model(self, model_name, audit, recipients, send_by_default):
@@ -76,7 +66,7 @@ class TestCommentableImport(TestCase):
         ("Send by default", send_by_default),
     ]
     model_cls = inflector.get_model(model_name)
-    if model_name in SCOPING_MODELS:
+    if model_name in SCOPING_MODELS_NAMES:
       import_data.append(("Assignee", "user@example.com"))
       import_data.append(("Verifier", "user@example.com"))
     if model_name == "Control":
@@ -97,7 +87,7 @@ class TestCommentableImport(TestCase):
       self.assertEqual(sorted(obj.recipients.split(",")),
                        sorted(RECIPIENTS))
       self.assertEqual(obj.send_by_default, True)
-    for model_name in SCOPING_MODELS:
+    for model_name in SCOPING_MODELS_NAMES:
       model_cls = inflector.get_model(model_name)
       obj = model_cls.query.first()
       self.assertEqual(sorted(obj.recipients.split(",")),

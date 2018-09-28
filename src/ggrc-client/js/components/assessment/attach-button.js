@@ -38,12 +38,8 @@ export default can.Component.extend({
       let items = event.items;
       this.dispatch({type: 'beforeCreate', items: items});
     },
-    refresh: function () {
-      this.dispatch('refreshEvidences');
-
-      if (this.attr('instance')) {
-        this.attr('instance').dispatch('refreshInstance');
-      }
+    finish: function () {
+      this.dispatch('finish');
     },
     checkFolder: function () {
       let self = this;

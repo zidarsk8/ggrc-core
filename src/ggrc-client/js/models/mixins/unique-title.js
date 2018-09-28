@@ -5,7 +5,7 @@
 
 import Mixin from './mixin';
 
-export default Mixin('unique_title', {
+export default Mixin({
   'after:init': function () {
     this.validate(['title', '_transient.title'], function (newVal, prop) {
       if (prop === 'title') {

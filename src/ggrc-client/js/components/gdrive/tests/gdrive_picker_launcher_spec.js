@@ -110,7 +110,6 @@ describe('gdrive-picker-launcher', function () {
       beforeEach(function () {
         createModelDfd = can.Deferred();
         viewModel.attr('isUploading', true);
-        spyOn(viewModel, 'beforeCreateHandler');
         spyOn(viewModel, 'createDocumentModel').and.returnValue(createModelDfd);
       });
 
@@ -170,7 +169,6 @@ describe('gdrive-picker-launcher', function () {
     describe('sets "isUploading" flag to false', function () {
       beforeEach(function () {
         viewModel.attr('isUploading', true);
-        spyOn(viewModel, 'beforeCreateHandler');
       });
 
       it('after uploadFiles() success', function () {

@@ -8,6 +8,8 @@ import json
 import ddt
 
 from ggrc.models import all_models
+from ggrc.models.inflector import get_model
+from ggrc.models.mixins import ScopeObject
 from ggrc.models.exceptions import ValidationError
 
 from integration.ggrc import TestCase
@@ -91,7 +93,7 @@ class TestRelationship(TestCase):
     self.assertEqual(url_list, [])
 
   def test_relationship_disallowed_type(self):
-    """Validation fails when source-destination types pair disallowed."""
+    """Validation fails when source-destination are snapshottable."""
     audit = factories.AuditFactory()
     snapshottable = factories.ControlFactory()
 
@@ -111,6 +113,7 @@ class TestRelationship(TestCase):
       factories.RelationshipFactory(source=snapshot, destination=snapshottable)
 
 
+@ddt.ddt
 class TestExternalRelationship(TestCase):
   """Integration test suite for External Relationship."""
   # pylint: disable=invalid-name
@@ -136,6 +139,11 @@ class TestExternalRelationship(TestCase):
       "X-appengine-inbound-appid": "test_external_app",
   }
   REL_URL = "/api/relationships"
+  SCOPING_MODELS_NAMES = [m.__name__ for m in all_models.all_models
+                          if issubclass(m, ScopeObject) and
+                          not issubclass(m, all_models.SystemOrProcess)]
+  SCOPING_OBJECT_FACTORIES = [
+      factories.get_model_factory(name) for name in SCOPING_MODELS_NAMES]
 
   @staticmethod
   def build_relationship_json(source, destination, is_external):
@@ -303,3 +311,84 @@ class TestExternalRelationship(TestCase):
     self.assert200(response)
     relationship = all_models.Relationship.query.get(rel.id)
     self.assertIsNone(relationship)
+
+  SCOPING_MAPPINGS = [(scoping_factory, directive_factory)
+                      for scoping_factory in SCOPING_OBJECT_FACTORIES
+                      for directive_factory in (factories.StandardFactory,
+                                                factories.RegulationFactory)]
+
+  @ddt.data(*SCOPING_MAPPINGS)
+  @ddt.unpack
+  def text_local_delete_relationship_scoping_directive(
+      self, scoping_factory, directive_factory
+  ):
+    """Test that deleteion of relationship disabled for local users."""
+    # Set up relationships
+    self.api.set_user(self.person_ext)
+    with factories.single_commit():
+      scoping_object = scoping_factory()
+      directive = directive_factory()
+    mappings = [(scoping_object, directive), (directive, scoping_object)]
+    relationship_ids = []
+    for source, destination in mappings:
+      rel = self.create_relationship(source, destination,
+                                     True, self.person_ext)
+      relationship_ids.append(rel.id)
+
+    self.api.set_user(self.person)
+    for rel_id in relationship_ids:
+      relationship = all_models.Relationship.query.get(rel_id)
+      response = self.api.delete(relationship)
+      self.assert400(response)
+
+      # relationship allowed to be deleted when source or
+      # destination objects are deleted
+      directive_model = get_model(relationship.destination_type)
+      directive = directive_model.query.get(relationship.destination_id)
+      self.assertIsNone(directive)
+      response = self.api.delete(directive)
+      self.assert200(response)
+      relationship = all_models.Relationship.query.get(rel.id)
+      self.assertIsNone(relationship)
+
+  @ddt.data(*SCOPING_MAPPINGS)
+  @ddt.unpack
+  def text_local_create_relationship_scoping_directive(
+      self, scoping_factory, directive_factory
+  ):
+    """Test that creation of relationship disabled for local users."""
+    self.api.set_user(self.person)
+    with factories.single_commit():
+      scoping_object = scoping_factory()
+      directive = directive_factory()
+    mappings = [(scoping_object, directive), (directive, scoping_object)]
+    for source, destination in mappings:
+      with self.assertRaises(ValidationError):
+        self.api.set_user(self.person)
+        factories.RelationshipFactory(source=source,
+                                      destination=destination)
+
+  @ddt.data(*SCOPING_MAPPINGS)
+  @ddt.unpack
+  def test_ext_create_delete_relationship_scoping_directive(
+      self, scoping_factory, directive_factory
+  ):
+    """Test that creation and deletion of relationship allowed
+       for external users."""
+    self.api.set_user(self.person_ext)
+    with factories.single_commit():
+      scoping_object = scoping_factory()
+      directive = directive_factory()
+    mappings = [(scoping_object, directive), (directive, scoping_object)]
+    for source, destination in mappings:
+      response = self.api.client.post(
+          self.REL_URL,
+          data=self.build_relationship_json(source, destination, True),
+          headers=self.HEADERS)
+      self.assert200(response)
+      rel = all_models.Relationship.query.get(
+          response.json[0][-1]["relationship"]["id"])
+      response = self.api.delete(rel)
+      self.assert200(response)
+      relationship = all_models.Relationship.query.get(rel.id)
+      self.assertIsNone(relationship)
