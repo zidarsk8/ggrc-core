@@ -6,6 +6,9 @@
 import template from './templates/cycle-task-group-object-task.mustache';
 import '../../object-change-state/object-change-state';
 import '../../dropdown/dropdown';
+import '../../comment/comment-data-provider';
+import '../../comment/comment-add-form';
+import '../../comment/mapped-comments';
 import RefreshQueue from '../../../models/refresh_queue';
 import {updateStatus} from '../../../plugins/utils/workflow-utils';
 import {getPageInstance} from '../../../plugins/utils/current-page-utils';
