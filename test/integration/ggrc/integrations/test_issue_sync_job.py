@@ -208,10 +208,7 @@ class TestIssueIntegration(ggrc.TestCase):
                 "priority": "P2",
                 "severity": "S2",
                 "custom_fields": [{
-                    "name": "Due Date",
-                    "value": due_date,
-                    "type": "Date",
-                    "display_string": "Due Date",
+                    "Due Date": due_date
                 }],
             },
             "2": {
