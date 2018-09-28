@@ -94,7 +94,7 @@ def _get_plural(singulars):
   plurals = []
   for name in singulars:
     name = inflection.underscore(name)
-    if name == "people":
+    if name == "person":
       plural = PEOPLE
     elif name == "policy":
       plural = POLICIES
@@ -132,17 +132,11 @@ def get_plural(singular, title=False):
   return _plural
 
 
-def get_normal_form(obj_name, with_space=True):
-  """Transform object name to title form.
- Example:
- if with_space=True then risk_assessments -> Risk Assessments
- if with_space=False then risk_assessments -> RiskAssessments
- """
-  normal = obj_name.replace("_", " ").title()
-  if with_space is True:
-    return normal
-  elif with_space is False:
-    return normal.replace(" ", "")
+def get_normal_form(obj_name):
+  """Transforms object name to title form
+  (risk_assessments -> Risk Assessments).
+  """
+  return obj_name.replace("_", " ").title()
 
 
 ALL_PLURAL = [k for k in globals().keys() if

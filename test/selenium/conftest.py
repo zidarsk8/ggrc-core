@@ -19,8 +19,9 @@ from lib import dynamic_fixtures, environment, url, users, browsers
 from lib.constants import element
 from lib.constants.test_runner import DESTRUCTIVE_TEST_METHOD_PREFIX
 from lib.custom_pytest_scheduling import CustomPytestScheduling
-from lib.entities import entities_factory
+from lib.entities import entities_factory, app_entity_factory
 from lib.page import dashboard
+from lib.rest import workflow_rest_service, person_rest_service
 from lib.service import rest_service, rest_facade
 from lib.service.rest import session_pool
 from lib.utils import conftest_utils, help_utils, selenium_utils
@@ -598,3 +599,27 @@ def obj(request):
   with indirect is used.
   """
   return request.getfixturevalue(request.param)
+
+
+# New fixtures
+
+@pytest.fixture()
+def app_workflow():
+  """Creates a Workflow."""
+  workflow = app_entity_factory.WorkflowFactory().create()
+  return workflow_rest_service.create_workflow(workflow)
+
+
+@pytest.fixture()
+def app_task_group(app_workflow):
+  """Creates a Task Group within `workflow`."""
+  task_group = app_entity_factory.TaskGroupFactory().create(
+      workflow=app_workflow)
+  return workflow_rest_service.create_task_group(task_group)
+
+
+@pytest.fixture()
+def app_person():
+  """Creates a Person."""
+  person = app_entity_factory.PersonFactory().create()
+  return person_rest_service.create_person(person)

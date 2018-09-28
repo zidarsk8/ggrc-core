@@ -76,19 +76,24 @@ class SimpleField(object):
 class RelatedPeopleList(object):
   """Represents related people element"""
 
-  def __init__(self, container, acr_name):
+  def __init__(self, container, acr_name, with_inline_edit=True):
     self._root = container.element(
         class_name="people-group__title", text=acr_name).parent(
             class_name="people-group")
-    self._inline_edit = InlineEdit(self._root)
+    if with_inline_edit:
+      self._inline_edit = InlineEdit(self._root)
+    else:
+      self._inline_edit = None
 
   def add_person(self, person):
-    """Add person to Related People list"""
-    self._inline_edit.open()
+    """Adds person to Related People list."""
+    if self._inline_edit:
+      self._inline_edit.open()
     email = person.email
     self._root.text_field(placeholder="Add person").set(email)
     ui_utils.select_user(self._root, email)
-    self._inline_edit.confirm()
+    if self._inline_edit:
+      self._inline_edit.confirm()
 
   def get_people_emails(self):
     """Get emails of people"""

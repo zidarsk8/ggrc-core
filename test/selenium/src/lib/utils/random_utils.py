@@ -15,7 +15,11 @@ def get_title(obj_type):
 
 def get_email(domain=users.DEFAULT_EMAIL_DOMAIN):
   """Returns a random email with domain `domain`."""
-  return "{}{}@{}".format(get_string(), _current_time(), domain)
+  # Only lowercase letters are used as app converts upcase to lowercase in
+  # most places.
+  email_allowed_chars = string.ascii_lowercase + string.digits
+  email_local_part = get_string(chars=email_allowed_chars) + _current_time()
+  return "{}@{}".format(email_local_part, domain)
 
 
 STANDARD_CHARS = string.ascii_letters + string.punctuation + string.digits
