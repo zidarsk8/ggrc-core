@@ -289,7 +289,7 @@ def do_reindex(with_reindex_snapshots=False):
         handled_ids += len(ids_chunk)
         logger.info("%s: %s / %s", model.__name__, handled_ids, ids_count)
         model.bulk_record_update_for(ids_chunk)
-        db.session.commit()
+        db.session.plain_commit()
 
   if with_reindex_snapshots:
     logger.info("Updating index for: %s", "Snapshot")
