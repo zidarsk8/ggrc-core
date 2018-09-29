@@ -41,7 +41,7 @@ def get_due_date(assessment_state):
     return {
         "name": "Due Date",
         "value": due_date.strftime("%Y-%m-%d"),
-        "type": "Date",
+        "type": "DATE",
         "display_string": "Due Date",
     }
   return None
