@@ -96,7 +96,11 @@ def sync_assessment_attributes():  # noqa
         custom_fields.append(due_date)
 
       if custom_fields:
-        issue_payload["custom_fields"] = custom_fields
+        issue_payload.update({
+            "custom_fields": custom_fields,
+            "component_id": int(issue_info["component_id"])
+            if issue_info["component_id"] else None
+        })
 
       if all(
           issue_payload.get(field) == issuetracker_state.get(field)

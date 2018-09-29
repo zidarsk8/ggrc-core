@@ -58,6 +58,7 @@ def collect_issue_tracker_info(model_name, include_object=False,
 
     issue_params[iti.issue_id] = {
         "object_id": sync_object.id,
+        "component_id": iti.component_id,
         "state": {
             "status": status_value,
             "type": iti.issue_type,

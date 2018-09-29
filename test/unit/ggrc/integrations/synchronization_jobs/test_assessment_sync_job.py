@@ -21,6 +21,7 @@ class BaseClientTest(unittest.TestCase):
     assessment1_mock = mock.MagicMock(id=1, status='In Review')
     issue1_mock = mock.MagicMock(
         issue_tracked_obj=assessment1_mock,
+        component_id='1',
         issue_id='t1',
         issue_type='bug1',
         issue_priority='P1',
@@ -29,6 +30,7 @@ class BaseClientTest(unittest.TestCase):
     )
     issue2_mock = mock.MagicMock(
         issue_tracked_obj=None,
+        component_id=None,
         issue_id='t2',
         issue_type='bug2',
         issue_priority='P3',
@@ -48,6 +50,7 @@ class BaseClientTest(unittest.TestCase):
       self.assertEquals(actual, {
           't1': {
               'object_id': 1,
+              'component_id': '1',
               'state': {
                   'status': 'In Review',
                   'type': 'bug1',
