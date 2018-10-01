@@ -11,9 +11,18 @@ import '../../comment/comment-add-form';
 import '../../comment/mapped-comments';
 import {updateStatus} from '../../../plugins/utils/workflow-utils';
 import {getPageType} from '../../../plugins/utils/current-page-utils';
+import Permission from '../../../permission';
 
 let viewModel = can.Map.extend({
   define: {
+    isEditDenied: {
+      get() {
+        const instance = this.attr('instance');
+        return !Permission
+          .is_allowed_for('update', instance) ||
+          instance.attr('is_in_history');
+      },
+    },
     showWorkflowLink: {
       get() {
         return getPageType() !== 'Workflow';
