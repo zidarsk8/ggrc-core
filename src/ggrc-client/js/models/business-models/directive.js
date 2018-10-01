@@ -22,29 +22,41 @@ export default Cacheable('CMS.Models.Directive', {
   tree_view_options: {
     attr_view: GGRC.mustache_path + '/directives/tree-item-attr.mustache',
     attr_list: Cacheable.attr_list.concat([
-      {attr_title: 'Reference URL', attr_name: 'reference_url'},
-      {attr_title: 'Effective Date', attr_name: 'start_date'},
-      {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       {
         attr_title: 'State',
         attr_name: 'status',
         order: 40,
       }, {
+        attr_title: 'Review State',
+        attr_name: 'review_status',
+        order: 80,
+      }, {
+        attr_title: 'Effective Date',
+        attr_name: 'start_date',
+        order: 85,
+      }, {
+        attr_title: 'Reference URL',
+        attr_name: 'reference_url',
+        order: 90,
+      }, {
         attr_title: 'Description',
         attr_name: 'description',
         disable_sorting: true,
+        order: 95,
       }, {
         attr_title: 'Notes',
         attr_name: 'notes',
         disable_sorting: true,
+        order: 100,
       }, {
         attr_title: 'Assessment Procedure',
         attr_name: 'test_plan',
         disable_sorting: true,
+        order: 105,
       }, {
-        attr_title: 'Review State',
-        attr_name: 'review_status',
-        order: 80,
+        attr_title: 'Last Deprecated Date',
+        attr_name: 'end_date',
+        order: 110,
       }]),
     add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
   },
