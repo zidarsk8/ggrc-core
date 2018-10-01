@@ -20,7 +20,7 @@ import * as businessModels from '../business-models';
       _mixins : [ <mixin name>, ... ],
       _canonical : { <option type> : <name of mapping in parent object>, ... }
       <mapping name> : Proxy(...) | Direct(...)
-                      | Multi(...) | Cross(...)
+                      | Multi(...)
                       | CustomFilter(...),
       ...
     }

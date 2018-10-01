@@ -7,7 +7,6 @@ import './mapping-result';
 import './list-binding';
 import './base-list-loader';
 import './stub-filtered-list-loader';
-import './cross-list-loader';
 import './custom-filtered-list-loader';
 import './multi-list-loader';
 import './proxy-list-loader';

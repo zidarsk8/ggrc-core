@@ -16,8 +16,6 @@
    *    `binding.loader` contains information about the filter.
    *    `binding.instance`, then, is the instance on which the original,
    *    unfiltered list is specified.
-   *  For CrossListLoader, the mappings are (`result`, `binding`), where
-   *    `binding` is the "remote binding" which
    */
   can.Map.extend('GGRC.ListLoaders.MappingResult', {}, {
     init: function (instance, mappings, binding) {
@@ -126,7 +124,7 @@
 
     //  `get_mappings`, `mappings_compute`, and `get_mappings_compute`
     //  - Returns a list of first-level mapping instances, even if they're
-    //    several levels down due to virtual mappers like Multi or Cross
+    //    several levels down due to virtual mappers like Multi
     //  - "First-level mappings" are the objects whose existence causes the
     //    `binding.instance` to be in the current `binding.list`.  (E.g.,
     //    if any of the "first-level mappings" exist, the instance will
@@ -166,7 +164,7 @@
 
     //  `walk_instances`
     //  - `binding.mappings` can have several "virtual" levels due to mappers
-    //    like `Multi`, `Cross`, and `Filter` -- e.g., mappers which just
+    //    like `Multi` and `Filter` -- e.g., mappers which just
     //    aggregate or filter results of other mappers.  `walk_instances`
     //    iterates over these "virtual" levels to emit instances only once
     //    per time they appear in a traversal path of `binding.mappings`.

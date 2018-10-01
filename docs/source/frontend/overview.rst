@@ -570,9 +570,3 @@ Each type of mapping is defined below:
    resolves to a truthy value. The filter function is re-run whenever an
    instance in the source mapping changes, and adds and removes a
    mapping to that instance accordingly.
-
--  **Cross** :src:`ggrc/assets/javascripts/models/mappers/cross-list-loader.js`:
-   Similar to Proxy mapping, but joins across other mappings.
-   For example, the result of ``m = Cross("a", "b")`` would be the
-   union of the “b” mappings for every instance in the root object’s “a”
-   result set.

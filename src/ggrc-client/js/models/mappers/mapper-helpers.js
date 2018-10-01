@@ -28,16 +28,11 @@ function CustomFilter(source, filterFn) {
   return new GGRC.ListLoaders.CustomFilteredListLoader(source, filterFn);
 }
 
-function Cross(localMapping, remoteMapping) {
-  return new GGRC.ListLoaders.CrossListLoader(localMapping, remoteMapping);
-}
-
 export {
   Proxy,
   Direct,
   Search,
   Multi,
   CustomFilter,
-  Cross,
 };
 
