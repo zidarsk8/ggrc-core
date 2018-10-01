@@ -14,7 +14,7 @@ Assumes app.yaml is configured with:
 E.g., ``login: required`` must be specified *at least* for the '/login' route.
 """
 
-import json
+import logging
 
 from google.appengine.api import users
 import flask
@@ -27,6 +27,10 @@ from ggrc import settings
 from ggrc.utils.user_generator import find_or_create_ext_app_user
 from ggrc.utils.user_generator import find_or_create_user_by_email
 from ggrc.utils.user_generator import is_external_app_user_email
+from ggrc.utils.user_generator import parse_user_email
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_user():
@@ -73,25 +77,17 @@ def request_loader(request):
                                 "untrusted application id: {}"
                                 .format(inbound_appid))
 
-  user = request.headers.get("X-GGRC-user")
-  if not user:
-    # no user provided
-    raise exceptions.BadRequest("X-GGRC-user should be set, contains {!r} "
-                                "instead."
-                                .format(user))
-
-  try:
-    user = json.loads(user)
-    email = str(user["email"])
-  except (TypeError, ValueError, KeyError):
-    # user provided in invalid syntax
-    raise exceptions.BadRequest("X-GGRC-user should have JSON object like "
-                                "{{'email': str}}, contains {!r} instead."
-                                .format(user))
+  email = parse_user_email(request, "X-GGRC-user", mandatory=True)
 
   # External Application User should be created if doesn't exist.
   if is_external_app_user_email(email):
     db_user = find_or_create_ext_app_user()
+    try:
+      # Create in the DB external app user provided in X-external-user header.
+      parse_user_email(request, "X-external-user", mandatory=False)
+    except exceptions.BadRequest as exp:
+      logger.error("Creation of external user has failed. %s", exp.message)
+      raise
   else:
     db_user = all_models.Person.query.filter_by(email=email).first()
   if not db_user:
