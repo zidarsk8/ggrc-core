@@ -14,7 +14,6 @@ import {
   Direct,
   Multi,
   CustomFilter,
-  Cross,
 } from '../models/mappers/mapper-helpers';
 import Mappings from '../models/mappers/mappings';
 import Cycle from '../models/business-models/cycle';
@@ -22,8 +21,6 @@ import CycleTaskGroupObjectTask from '../models/business-models/cycle-task-group
 import TaskGroup from '../models/business-models/task-group';
 import Workflow from '../models/business-models/workflow';
 import Person from '../models/business-models/person';
-import Stub from '../models/stub';
-import * as businessModels from '../models/business-models';
 
 (function ($, CMS, GGRC) {
   let WorkflowExtension = {};
@@ -145,27 +142,11 @@ import * as businessModels from '../models/business-models';
 
     // Insert `workflows` mappings to all business object types
     can.each(_workflowObjectTypes, function (type) {
-      const workflowsMapper = Cross('task_groups', 'workflow');
-      let model = businessModels[type];
-      if (model === undefined || model === null) {
-        return;
-      }
       mappings[type] = {
-        task_groups:
-        new GGRC.ListLoaders.ProxyListLoader(
-          'TaskGroupObject',
-          'object',
-          'task_group',
-          'task_group_objects',
-          null
-        ),
-        workflows: workflowsMapper,
         _canonical: {
           task_groups: 'TaskGroup',
         },
       };
-
-      businessModels[type].attributes.task_group_objects = Stub.List;
     });
     new Mappings('ggrc_workflows', mappings);
   };
