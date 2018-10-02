@@ -59,10 +59,14 @@ let viewModel = can.Map.extend({
     this.attr('displayPrefs').setTreeViewStates(widgetId, selectedStates);
   },
   setStatesDropdown(states) {
-    let statuses = this.attr('filterStates');
-    statuses.forEach((item) => {
+    let statuses = this.attr('filterStates').map((item) => {
       item.attr('checked', (states.indexOf(item.value) > -1));
+
+      return item;
     });
+
+    // need to trigget change event for 'filterStates' attr
+    this.attr('filterStates', statuses);
   },
   setStatesRoute(states) {
     let allStates = this.attr('allStates');
@@ -80,6 +84,14 @@ let viewModel = can.Map.extend({
       StateUtils.buildStatusFilter(states, modelName) :
       null;
     this.attr('options.query', query);
+  },
+  selectItems(event) {
+    let selectedStates = event.selected.map((state) => state.value);
+
+    this.buildSearchQuery(selectedStates);
+    this.saveTreeStates(selectedStates);
+    this.setStatesRoute(selectedStates);
+    this.dispatch('filter');
   },
 });
 
@@ -113,15 +125,6 @@ export default can.Component.extend({
         vm.setStatesDropdown(defaultStates);
         vm.setStatesRoute(defaultStates);
       });
-    },
-    'multiselect-dropdown multiselect:closed'(el, ev, selected) {
-      ev.stopPropagation();
-      let selectedStates = selected.map((state) => state.value);
-
-      this.viewModel.buildSearchQuery(selectedStates);
-      this.viewModel.saveTreeStates(selectedStates);
-      this.viewModel.setStatesRoute(selectedStates);
-      this.viewModel.dispatch('filter');
     },
     '{viewModel} disabled'() {
       if (this.viewModel.attr('disabled')) {

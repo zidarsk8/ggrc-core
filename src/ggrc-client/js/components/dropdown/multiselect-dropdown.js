@@ -10,11 +10,10 @@ export default can.Component.extend({
   template,
   viewModel: {
     disabled: false,
-    _stateWasUpdated: '',
+    _stateWasUpdated: false,
     selected: [],
-    plural: '@',
-    placeholder: '@',
-    element: '',
+    options: [],
+    placeholder: '',
     define: {
       _displayValue: {
         get: function () {
@@ -33,20 +32,11 @@ export default can.Component.extend({
         type: 'boolean',
         value: false,
         get: function () {
-          let options = this.attr('options') || [];
+          let options = this.attr('options');
 
-          return Array.prototype.every.call(options, function (item) {
+          return _.every(options, function (item) {
             return item.attr('checked');
           });
-        },
-        set: function (value) {
-          let options = this.attr('options') || [];
-
-          options.forEach(function (option) {
-            option.attr('checked', value);
-          });
-
-          return value;
         },
       },
       isOpen: {
@@ -54,51 +44,37 @@ export default can.Component.extend({
         value: false,
       },
       options: {
-        type: '*',
-        set: function (value) {
-          let self = this;
-          this.attr('selected', []);
-          if (value) {
-            value.forEach(function (item) {
-              self.updateSelected(item);
-            });
+        value: [],
+        set: function (value, setValue) {
+          setValue(value);
 
-            return value;
-          }
-
-          return [];
+          this.attr('selected', _.filter(value,
+            (item) => item.checked));
         },
       },
     },
-    updateSelected: function (item) {
-      let selected = this.attr('selected');
-      let index = -1;
-      let duplicates;
+    selectAll: function () {
+      let options = this.attr('options');
+      let value = !this.attr('_selectedAll');
 
+      options.forEach(function (option) {
+        option.attr('checked', value);
+      });
+
+      this.updateSelected();
+    },
+    updateSelected: function () {
       this.attr('_stateWasUpdated', true);
 
-      if (item.checked) {
-        duplicates = selected.filter(function (selectedItem) {
-          return selectedItem.attr('value') === item.value;
-        });
+      this.attr('selected', _.filter(this.attr('options'),
+        (item) => item.checked));
 
-        if (duplicates.length > 0) {
-          return;
-        }
-
-        selected.push(item);
-        return;
-      }
-
-      index = selected.map(function (selectedItem) {
-        return selectedItem.value;
-      }).indexOf(item.value);
-
-      if (index > -1) {
-        selected.splice(index, 1);
-      }
+      this.dispatch({
+        type: 'selectedChanged',
+        selected: this.attr('selected'),
+      });
     },
-    dropdownClosed: function (el, ev, scope) {
+    dropdownClosed: function () {
       // don't trigger event if state didn't change
       if (!this.attr('_stateWasUpdated')) {
         return;
@@ -107,7 +83,7 @@ export default can.Component.extend({
       let selected = this.attr('selected');
 
       this.attr('_stateWasUpdated', false);
-      can.trigger(el, 'multiselect:closed', [selected]);
+
       this.dispatch({
         type: 'dropdownClose',
         selected: selected,
@@ -122,41 +98,28 @@ export default can.Component.extend({
       } else {
         this.attr('isOpen', false);
         this.attr('canBeOpen', false);
-        this.dropdownClosed(this.element);
+        this.dropdownClosed();
       }
     },
-    openDropdown: function (el) {
+    openDropdown: function () {
       if (this.attr('disabled')) {
         return;
-      }
-      // we should save element of component.
-      // it necessary for 'can.trigger'
-      if (el && !this.element) {
-        this.element = el;
       }
 
       // this attr needed when page has any components
       this.attr('canBeOpen', true);
     },
+    optionChange: function (item) {
+      // click event triggered before new value of input is saved
+      item.attr('checked', !item.checked);
+
+      this.updateSelected();
+    },
     dropdownBodyClick: function (ev) {
       ev.stopPropagation();
     },
   },
-  events:
-  {
-    '{options} change': function (scope, ev, propertyName) {
-      let target = ev.target;
-
-      // igore all propetries except 'checked'
-      if (propertyName.indexOf('checked') === -1) {
-        return;
-      }
-
-      this.viewModel.updateSelected(target);
-
-      can.trigger(this.element, 'multiselect:changed',
-        [this.viewModel.attr('selected')]);
-    },
+  events: {
     '{window} click': function () {
       if (this.viewModel.attr('disabled')) {
         return;
