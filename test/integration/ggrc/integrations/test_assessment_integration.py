@@ -137,7 +137,9 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
               'priority': u'P4',
               'type': None,
               'severity': u'S3',
-              'ccs': []
+              'ccs': [],
+              'custom_fields': [],
+              'component_id': 11111
           })
 
   # pylint: disable=unused-argument

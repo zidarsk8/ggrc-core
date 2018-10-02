@@ -274,4 +274,7 @@ class BaseClientTest(unittest.TestCase):
             'type': 'BUG2',
             'priority': 'P2',
             'severity': 'S2',
+            'ccs': [],
+            'component_id': None,
+            'custom_fields': []
         })
