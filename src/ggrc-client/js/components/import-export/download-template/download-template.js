@@ -6,9 +6,13 @@
 import '../../dropdown/multiselect-dropdown';
 import template from './download-template.mustache';
 import {downloadTemplate, download} from '../../../plugins/utils/import-export-utils';
+import {backendGdriveClient} from '../../../plugins/ggrc-gapi-client';
+import {confirm} from '../../../plugins/utils/modals';
 
 const tag = 'download-template';
 const CSV_FILE_NAME = 'import_template.csv';
+const CSV_FORMAT = 'csv';
+const SHEET_FORMAT = 'gdrive';
 const importOptions = GGRC.Bootstrap.importable.map((el) => {
   return {
     name: el.model_singular,
@@ -43,13 +47,9 @@ const viewModel = can.Map.extend({
       this.attr('selected', selected);
     }
   },
-  downloadCSV() {
+  prepareSelected() {
     let selected = this.attr('selected');
     let objects = [];
-
-    if (!selected.length) {
-      return;
-    }
 
     objects = Array.from(selected).map(({name}) => {
       return {
@@ -57,12 +57,42 @@ const viewModel = can.Map.extend({
       };
     });
 
+    return objects;
+  },
+  downloadCSV() {
+    let objects = this.prepareSelected();
+
     return downloadTemplate({
       data: {
         objects,
+        export_to: CSV_FORMAT,
       },
     }).then(function (data) {
       download(CSV_FILE_NAME, data);
+    }).always(() => {
+      this.close();
+    });
+  },
+  downloadSheet() {
+    let objects = this.prepareSelected();
+
+    return backendGdriveClient.withAuth(() => {
+      return downloadTemplate({
+        data: {
+          objects,
+          export_to: SHEET_FORMAT,
+        },
+      });
+    }).then((data) => {
+      let link = `https://docs.google.com/spreadsheets/d/${data.id}`;
+
+      confirm({
+        modal_title: 'File Generated',
+        modal_description: `GDrive file is generated successfully.
+         Click button below to view the file.`,
+        gDriveLink: link,
+        button_view: `${GGRC.mustache_path}/modals/open_sheet.mustache`,
+      });
     }).always(() => {
       this.close();
     });

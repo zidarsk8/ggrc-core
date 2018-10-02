@@ -6,6 +6,8 @@
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from './download-template';
 import * as Utils from '../../../plugins/utils/import-export-utils';
+import {backendGdriveClient} from '../../../plugins/ggrc-gapi-client';
+import * as ModalsUtils from '../../../plugins/utils/modals';
 
 describe('download-template component', () => {
   let vm;
@@ -62,6 +64,7 @@ describe('download-template component', () => {
                 {object_name: 'Bar'},
                 {object_name: 'Baz'},
               ],
+              export_to: 'csv',
             },
           });
         expect(Utils.download)
@@ -70,18 +73,6 @@ describe('download-template component', () => {
 
         done();
       });
-    });
-
-    it('should not do ajax call if nothing selected', () => {
-      spyOn(Utils, 'downloadTemplate');
-      spyOn(Utils, 'download');
-
-      vm.attr('selected', []);
-
-      vm.downloadCSV();
-
-      expect(Utils.downloadTemplate).not.toHaveBeenCalled();
-      expect(Utils.download).not.toHaveBeenCalled();
     });
 
     it('should not download CSV and should close the modal after error during' +
@@ -95,6 +86,59 @@ describe('download-template component', () => {
       vm.downloadCSV().fail(() => {
         expect(Utils.downloadTemplate).toHaveBeenCalled();
         expect(Utils.download).not.toHaveBeenCalled();
+        expect(vm.attr('modalState.open')).toEqual(false);
+
+        done();
+      });
+    });
+  });
+
+  describe('downloadSheet method', () => {
+    let downloadSpy;
+
+    beforeEach(() => {
+      spyOn(backendGdriveClient, 'withAuth').and.callFake((callback) => {
+        return callback();
+      });
+      spyOn(ModalsUtils, 'confirm');
+      downloadSpy = spyOn(Utils, 'downloadTemplate');
+    });
+
+    it('should do ajax call in proper format', (done) => {
+      downloadSpy.and.returnValue(can.Deferred().resolve('FooBar'));
+
+      vm.attr('selected', [{name: 'Foo'}, {name: 'Bar'}, {name: 'Baz'}]);
+
+      vm.downloadSheet().then(() => {
+        expect(backendGdriveClient.withAuth).toHaveBeenCalled();
+        expect(Utils.downloadTemplate)
+          .toHaveBeenCalledWith({
+            data: {
+              objects: [
+                {object_name: 'Foo'},
+                {object_name: 'Bar'},
+                {object_name: 'Baz'},
+              ],
+              export_to: 'gdrive',
+            },
+          });
+        expect(ModalsUtils.confirm).toHaveBeenCalled();
+        expect(vm.attr('modalState.open')).toEqual(false);
+
+        done();
+      });
+    });
+
+    it('should not download Sheet and should close the modal after error' +
+      'during "downloadTemplate" phase', (done) => {
+      downloadSpy.and.returnValue(can.Deferred().reject());
+
+      vm.attr('selected', [1, 2, 3]);
+
+      vm.downloadSheet().fail(() => {
+        expect(backendGdriveClient.withAuth).toHaveBeenCalled();
+        expect(Utils.downloadTemplate).toHaveBeenCalled();
+        expect(ModalsUtils.confirm).not.toHaveBeenCalled();
         expect(vm.attr('modalState.open')).toEqual(false);
 
         done();
