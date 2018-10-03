@@ -30,7 +30,9 @@ _FIELD_METHOD_MAPPING = {
     "assertions": "select_assertions",
     "mapped_objects": "map_objects",
     "task_groups": "set_first_task_group_title",  # workflow,
-    "assignees": "set_assignees"  # task
+    "assignees": "set_assignees",  # task
+    "start_date": "set_start_date",  # task
+    "due_date": "set_due_date"  # task
 }
 
 
@@ -149,7 +151,11 @@ class TaskGroupTaskModal(BaseObjectModal):
 
   def __init__(self):
     super(TaskGroupTaskModal, self).__init__()
-    self._fields = ["title", "assignees"]
+    self._fields = ["title", "assignees", "start_date", "due_date"]
+    self._start_date_picker = page_elements.Datepicker(
+        self._root.element(date="instance.start_date"))
+    self._due_date_picker = page_elements.Datepicker(
+        self._root.element(date="instance.end_date"))
 
   def set_assignees(self, people):
     """Adds assignees to the list of assignees."""
@@ -157,3 +163,19 @@ class TaskGroupTaskModal(BaseObjectModal):
       related_people_el = page_elements.RelatedPeopleList(
           self._root, "Task Assignees", with_inline_edit=False)
       related_people_el.add_person(person)
+
+  def get_start_date(self):
+    """Returns a displayed start date."""
+    return self._start_date_picker.get_value()
+
+  def set_start_date(self, date):
+    """Sets a date in the start date datepicker."""
+    self._start_date_picker.set_value(date)
+
+  def get_due_date(self):
+    """Returns a displayed due date."""
+    return self._due_date_picker.get_value()
+
+  def set_due_date(self, date):
+    """Sets a date in the due date datepicker."""
+    self._due_date_picker.set_value(date)

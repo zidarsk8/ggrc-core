@@ -1,9 +1,11 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Factories for app_entity."""
+import datetime
+
 from lib import users
 from lib.entities import app_entity
-from lib.utils import random_utils
+from lib.utils import random_utils, date_utils
 
 
 class _BaseFactory(object):
@@ -82,9 +84,12 @@ class TaskGroupTaskFactory(_BaseFactory):
   @property
   def _random_attrs(self):
     """See superclass."""
+    closest_working_day = date_utils.closest_working_day()
     return {
         "title": self._obj_title,
-        "assignees": [users.current_person()]
+        "assignees": [users.current_person()],
+        "start_date": closest_working_day,
+        "due_date": closest_working_day + datetime.timedelta(days=14)
     }
 
 

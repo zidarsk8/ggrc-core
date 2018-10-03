@@ -1,7 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Generate random stuff."""
-from datetime import datetime
+import datetime
 import random
 import string
 
@@ -31,7 +31,7 @@ def _current_time():
   """Returns current time, to be included into strings in order to check when
   they were created.
   """
-  return datetime.now().strftime("%H%M%S.%f")[:-3]
+  return datetime.datetime.now().strftime("%H%M%S.%f")[:-3]
 
 
 def get_string(size=15, chars=STANDARD_CHARS):

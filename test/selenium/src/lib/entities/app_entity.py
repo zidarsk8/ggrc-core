@@ -57,33 +57,35 @@ class _Base(object):
 
 
 @attr.s
-class Workflow(_Base):
-  """Represents Workflow entity."""
+class _WithTitleAndCode(object):
+  """Represents a part of object with title and code."""
+  # pylint: disable=too-few-public-methods
   title = attr.ib()
+  code = attr.ib()
+
+
+@attr.s
+class Workflow(_Base, _WithTitleAndCode):
+  """Represents Workflow entity."""
   admins = attr.ib()
   wf_members = attr.ib()
   repeat_wf = attr.ib()
   task_groups = attr.ib()
-  code = attr.ib()
 
 
 @attr.s
-class TaskGroup(_Base):
+class TaskGroup(_Base, _WithTitleAndCode):
   """Represents TaskGroup entity."""
-  title = attr.ib()
   assignee = attr.ib()
-  code = attr.ib()
   workflow = attr.ib()
 
 
 @attr.s
-class TaskGroupTask(_Base):
+class TaskGroupTask(_Base, _WithTitleAndCode):
   """Represents TaskGroupTask entity."""
-  title = attr.ib()
   assignees = attr.ib()
   start_date = attr.ib()
   due_date = attr.ib()
-  code = attr.ib()
   task_group = attr.ib()
 
 

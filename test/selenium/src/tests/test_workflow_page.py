@@ -3,13 +3,15 @@
 """Workflow smoke tests."""
 # pylint: disable=no-self-use
 # pylint: disable=unused-argument
+import datetime
+
 import pytest
 
 from lib import base
-from lib.entities import app_entity_factory
-from lib.page.widget import workflow_tabs
+from lib.entities import app_entity_factory, ui_dict_convert
+from lib.page.widget import workflow_tabs, object_modal
 from lib.ui import workflow_ui_facade, ui_facade
-from lib.utils import test_utils
+from lib.utils import test_utils, date_utils
 
 
 class TestCreateWorkflow(base.Test):
@@ -45,6 +47,20 @@ class TestCreateWorkflow(base.Test):
 
 class TestWorkflowPage(base.Test):
   """Test workflow page."""
+
+  def test_default_values_in_create_task_popup(
+      self, app_workflow, app_task_group, selenium
+  ):
+    """Test expected default values in Create Task popup."""
+    # pylint: disable=invalid-name
+    workflow_ui_facade.open_create_task_group_task_popup(app_task_group)
+    task_modal = object_modal.get_modal_obj("task_group_task")
+    actual_start_date = ui_dict_convert.str_to_date(
+        task_modal.get_start_date())
+    actual_due_date = ui_dict_convert.str_to_date(
+        task_modal.get_due_date())
+    assert actual_start_date == date_utils.closest_working_day()
+    assert actual_due_date == actual_start_date + datetime.timedelta(days=7)
 
   def test_create_task_group_task(
       self, app_workflow, app_task_group, app_person, selenium

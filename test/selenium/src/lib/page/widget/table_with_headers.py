@@ -21,7 +21,7 @@ class TableWithHeaders(object):
         **self._header_locator)]
 
   def get_table_row_by(self, **conditions):
-    """Returns a table row that matches conditions"""
+    """Returns a table row that matches conditions."""
     for table_row in self._table_rows():
       if table_row.matches_conditions(**conditions):
         return table_row

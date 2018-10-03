@@ -24,17 +24,29 @@ class SetupTab(object):
       return self.task_group_rows()[-1].text_for_header("Assignee") != ""
     test_utils.wait_for(is_assignee_set)
 
+  def open_task_group(self, task_group):
+    """Opens task group."""
+    self._task_group_tree.get_tree_item_by(title=task_group.title).select()
+
+  def open_create_task_group_task_modal(self, task_group):
+    """Opens a Create Task modal."""
+    # pylint: disable=invalid-name
+    self.open_task_group(task_group)
+    self.task_group_panel.click_create_task()
+
   def create_task_group_task(self, task_group_task):
     """Creates a task group task on the tab."""
-    task_group = task_group_task.task_group
-    self._task_group_tree.get_tree_item_by(title=task_group.title).select()
-    panel = task_group_info_panel.TaskGroupInfoPanel()
-    panel.click_create_task()
+    self.open_create_task_group_task_modal(task_group_task.task_group)
     object_modal.get_modal_obj("task_group_task").submit_obj(task_group_task)
 
   def task_group_rows(self):
     """Returns task group rows."""
     return self._task_group_tree.tree_items()
+
+  @property
+  def task_group_panel(self):
+    """Returns task group panel."""
+    return task_group_info_panel.TaskGroupInfoPanel()
 
 
 class TaskGroupTree(tree_widget.TreeWidget):
