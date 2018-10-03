@@ -17,8 +17,11 @@ def closest_working_day():
 def _is_weekend(date):
   """Returns whether the date is a weekend."""
   return date.isoweekday() in (6, 7)
+<<<<<<< HEAD
 
 
 def str_to_date(date_str, date_format):
   """Converts string in format `format` to date."""
   return datetime.datetime.strptime(date_str, date_format).date()
+=======
+>>>>>>> Fix review comments in PR
