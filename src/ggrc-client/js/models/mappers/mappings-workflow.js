@@ -70,16 +70,11 @@ let mappings = {
       ['related_objects_as_source', 'related_objects_as_destination']
     ),
     /**
-     * "cycle", "cycle_task_entries" mappers are needed for mapped
-     * comments and objects under CycleTaskGroupObjectTask into
-     * mapping-tree-view component.
+     * "cycle" mapper is needed for mapped objects under
+     * CycleTaskGroupObjectTask into mapping-tree-view component.
      */
     cycle: Direct(
       'Cycle', 'cycle_task_group_object_tasks', 'cycle'),
-    cycle_task_entries: Direct(
-      'CycleTaskEntry',
-      'cycle_task_group_object_task',
-      'cycle_task_entries'),
     /**
      * This mapping name is needed for objects mapped to CTGOT.
      * It helps to filter results of objects mapped to CTGOT.
@@ -90,7 +85,6 @@ let mappings = {
       function (relatedObjects) {
         return !_.includes([
           'CycleTaskGroup',
-          'CycleTaskEntry',
           'Comment',
           'Document',
           'Person',

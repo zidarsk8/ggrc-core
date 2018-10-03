@@ -60,7 +60,6 @@ describe('Mappings', function () {
         'TaskGroup',
         'TaskGroupTask',
         'Workflow',
-        'CycleTaskEntry',
         'CycleTaskGroupObjectTask',
         'CycleTaskGroupObject',
         'CycleTaskGroup',
@@ -69,7 +68,6 @@ describe('Mappings', function () {
         'Workflow',
         'TaskGroup',
         'TaskGroupTask',
-        'CycleTaskEntry',
         'CycleTaskGroupObjectTask',
         'CycleTaskGroupObject',
         'CycleTaskGroup',
@@ -141,7 +139,7 @@ describe('Mappings', function () {
     TechnologyEnvironment: _.difference(filtered, ['Standard', 'Regulation']),
     Threat: filtered,
     Vendor: _.difference(filtered, ['Standard', 'Regulation']),
-    MultitypeSearch: _.difference(allTypes, ['CycleTaskEntry', 'CycleTaskGroup',
+    MultitypeSearch: _.difference(allTypes, ['CycleTaskGroup',
       'CycleTaskGroupObject', 'RiskAssessment']),
   };
 
@@ -160,7 +158,6 @@ describe('Mappings', function () {
     let types = allTypes.concat('MultitypeSearch');
     let modelsForTests = _.difference(types, [
       'TaskGroupTask',
-      'CycleTaskEntry',
       'CycleTaskGroup',
       'CycleTaskGroupObject',
       'Workflow',

@@ -98,7 +98,6 @@ const adminListDescriptors = {
       show_view:
       GGRC.mustache_path +
       '/custom_attribute_definitions/subtree.mustache',
-      footer_view: null,
       add_item_view: null,
     }],
   },
@@ -119,7 +118,6 @@ const adminListDescriptors = {
       mapping: 'access_control_roles',
       show_view:
       GGRC.mustache_path + '/access_control_roles/subtree.mustache',
-      footer_view: null,
       add_item_view: null,
     }],
   },
