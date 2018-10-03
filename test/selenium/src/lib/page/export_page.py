@@ -65,6 +65,7 @@ class ExportPage(base.AbstractPage):
       difference = set(os.listdir(path_to_export_dir)) - set(downloads_before)
       if len(difference) == 1:
         filename = list(difference)[0]
-        return os.path.join(path_to_export_dir, filename)
+        if not filename.endswith("crdownload"):  # file is not fully downloaded
+          return os.path.join(path_to_export_dir, filename)
       return None
     return test_utils.wait_for(path_to_downloaded_file)
