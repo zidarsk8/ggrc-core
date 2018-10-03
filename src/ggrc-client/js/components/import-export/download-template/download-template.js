@@ -26,9 +26,13 @@ const viewModel = can.Map.extend({
     open: false,
     result: {},
   },
+  isLoading: false,
   selected: [],
   importableModels: importOptions,
   close() {
+    if (this.attr('isLoading')) {
+      return;
+    }
     this.attr('modalState.open', false);
     this.attr('selected').replace([]);
     this.attr('importableModels').forEach((element) => {
@@ -62,6 +66,8 @@ const viewModel = can.Map.extend({
   downloadCSV() {
     let objects = this.prepareSelected();
 
+    this.attr('isLoading', true);
+
     return downloadTemplate({
       data: {
         objects,
@@ -70,11 +76,14 @@ const viewModel = can.Map.extend({
     }).then(function (data) {
       download(CSV_FILE_NAME, data);
     }).always(() => {
+      this.attr('isLoading', false);
       this.close();
     });
   },
   downloadSheet() {
     let objects = this.prepareSelected();
+
+    this.attr('isLoading', true);
 
     return backendGdriveClient.withAuth(() => {
       return downloadTemplate({
@@ -94,6 +103,7 @@ const viewModel = can.Map.extend({
         button_view: `${GGRC.mustache_path}/modals/open_sheet.mustache`,
       });
     }).always(() => {
+      this.attr('isLoading', false);
       this.close();
     });
   },

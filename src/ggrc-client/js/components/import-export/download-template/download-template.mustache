@@ -38,7 +38,7 @@
   </div>
 
   <div class="simple-modal__footer">
-    <div class="simple-modal__toolbar">
+    <div class="simple-modal__toolbar {{#if isLoading}}disabled{{/if}}">
       <button class="btn btn-small btn-white simple-modal__toolbar-item" ($click)="close()">
         Cancel
       </button>
@@ -52,6 +52,7 @@
               ($click)="downloadSheet">
         Download Sheet
       </button>
+      {{#if isLoading}}<spinner {toggle}="true"></spinner>{{/if}}
     </div>
   </div>
 </simple-modal>
