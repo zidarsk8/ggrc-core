@@ -208,20 +208,18 @@
             </div>
           </div>
 
-          {{#if showLink}}
-            {{#if workflow}}
+          {{#if showWorkflowLink}}
               <div class="row-fluid wrap-row">
                 <div class="span12">
                   <h6>Part of the workflow</h6>
                   <p>
-                    <a href="{{workflow.viewLink}}">
-                      {{workflow.title}}
+                    <a href="{{workflowLink}}">
+                      {{instance.workflow_title}}
                       <i class="fa fa-long-arrow-right smallmargin"></i>
                     </a>
                   </p>
                 </div>
               </div>
-            {{/if}}
           {{/if}}
         </div>
         <div class="info-pane__sidebar">
