@@ -19,6 +19,7 @@ down_revision = 'cb58d1d52368'
 
 
 def _populate_base_id():
+  """Populate base_id values for existing ACL entries."""
   acl_table = sa.sql.table(
       "access_control_list",
       sa.sql.column('id', sa.Integer),
