@@ -8,6 +8,7 @@ import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../revision-log';
 import Person from '../../../models/business-models/person';
 import Review from '../../../models/service-models/review';
+import Mappings from '../../../models/mappers/mappings';
 
 describe('revision-log component', function () {
   'use strict';
@@ -924,32 +925,32 @@ describe('revision-log component', function () {
             mapping: 'related_verifiers',
           }],
         },
-        get_binding: function (mappingName) {
-          let bindingData = {
-            related_requesters: {
-              list: [
-                {
-                  instance: {id: 166},
-                },
-              ],
-            },
-            related_assignees: {
-              list: [
-                {
-                  instance: {id: 166},
-                },
-              ],
-            },
-            related_verifiers: {
-              list: [
-                {
-                  instance: {id: 166},
-                },
-              ],
-            },
-          };
-          return bindingData[mappingName];
-        },
+      });
+      spyOn(Mappings, 'get_binding').and.callFake((mappingName) => {
+        let bindingData = {
+          related_requesters: {
+            list: [
+              {
+                instance: {id: 166},
+              },
+            ],
+          },
+          related_assignees: {
+            list: [
+              {
+                instance: {id: 166},
+              },
+            ],
+          },
+          related_verifiers: {
+            list: [
+              {
+                instance: {id: 166},
+              },
+            ],
+          },
+        };
+        return bindingData[mappingName];
       });
     });
 

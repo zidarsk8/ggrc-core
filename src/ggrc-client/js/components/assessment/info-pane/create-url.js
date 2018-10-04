@@ -29,7 +29,6 @@ export default can.Component.extend({
         context: this.attr('context') || new Context({id: null}),
         kind: 'URL',
         created_at: new Date(),
-        isDraft: true,
         _stamp: Date.now(),
       };
 

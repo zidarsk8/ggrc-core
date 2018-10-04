@@ -8,9 +8,6 @@ import Cacheable from '../cacheable';
 /**
  * A "mixin" denoting a model type that can be assigned custom roles.
  *
- * It inherits from Cacheable model, because it needs get_binding() to
- * correctly display AccessControlRole instances as children in tree views.
- *
  * This "mixin" is thus applied to models in a slightly different way - a
  * model needs to have a static property named `isRoleable` set to true.
  *

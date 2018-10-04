@@ -5,9 +5,7 @@
 <object-list {(selected-item)}="selectedItem" {items}="mappedItems">
     <business-object-list-item {instance}="instance">
         {{^if withoutDetails}}
-            <div class="description">
-                {{{itemData.description}}}
-            </div>
+            <read-more class="description" {text}="itemData.description"></read-more>
             <div class="more-information-wrapper">
                 <button class="btn btn-link more-information-button">More Information</button>
             </div>

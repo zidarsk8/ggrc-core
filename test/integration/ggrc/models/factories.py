@@ -141,7 +141,7 @@ class IssueTrackerIssueFactory(TitledFactory):
     model = all_models.IssuetrackerIssue
 
   issue_tracked_obj = factory.LazyAttribute(lambda m: AssessmentFactory())
-  issue_id = factory.LazyAttribute(lambda _: random_str(length=5))
+  issue_id = factory.LazyAttribute(lambda _: random.randint(1, 1000))
 
 
 class AssessmentFactory(TitledFactory):
@@ -160,7 +160,6 @@ class ControlCategoryFactory(ModelFactory):
   name = factory.LazyAttribute(lambda m: random_str(prefix='name'))
   lft = None
   rgt = None
-  scope_id = None
   depth = None
   required = None
 

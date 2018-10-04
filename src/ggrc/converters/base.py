@@ -115,11 +115,12 @@ class ExportConverter(BaseConverter):
   blocks and columns are handled in the correct order.
   """
 
-  def __init__(self, ids_by_type):
+  def __init__(self, ids_by_type, exportable_queries=None):
     super(ExportConverter, self).__init__()
     self.dry_run = True  # TODO: fix ColumnHandler to not use it for exports
     self.block_converters = []
     self.ids_by_type = ids_by_type
+    self.exportable_queries = exportable_queries or []
 
   def get_object_names(self):
     return [c.name for c in self.block_converters]
@@ -136,11 +137,12 @@ class ExportConverter(BaseConverter):
     ids and store it to an instance variable.
     """
     object_map = {o.__name__: o for o in self.exportable.values()}
-    for object_data in self.ids_by_type:
+    exportable_queries = self._get_exportable_queries()
+    for object_data in exportable_queries:
       class_name = object_data["object_name"]
       object_class = object_map[class_name]
       object_ids = object_data.get("ids", [])
-      fields = object_data.get("fields")
+      fields = object_data.get("fields", "all")
       if class_name == "Snapshot":
         self.block_converters.append(
             SnapshotBlockConverter(self, object_ids, fields=fields)
@@ -160,7 +162,10 @@ class ExportConverter(BaseConverter):
     with benchmark("Initialize block converters."):
       self.initialize_block_converters()
     with benchmark("Build csv data."):
-      return self.build_csv_from_row_data()
+      try:
+        return self.build_csv_from_row_data()
+      except ValueError:
+        return ""
 
   def build_csv_from_row_data(self):
     """Export each block separated by empty lines."""
@@ -185,3 +190,24 @@ class ExportConverter(BaseConverter):
       csv_string_builder.append_line([])
 
     return csv_string_builder.get_csv_string()
+
+  def _get_exportable_queries(self):
+    """Get a list of filtered object queries regarding exportable items.
+
+    self.ids_by_type should contain a list of object queries.
+
+    self.exportable_queries should contain indexes of exportable queries
+    regarding self.ids_by_type
+
+    Returns:
+      list of dicts: filtered object queries regarding self.exportable_queries
+    """
+    if self.exportable_queries:
+      queries = [
+          object_query
+          for index, object_query in enumerate(self.ids_by_type)
+          if index in self.exportable_queries
+      ]
+    else:
+      queries = self.ids_by_type
+    return queries

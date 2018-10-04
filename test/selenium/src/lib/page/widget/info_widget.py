@@ -14,17 +14,18 @@ from lib.constants.locator import WidgetInfoAssessment, WidgetInfoControl
 from lib.element import widget_info, tab_containers, tables
 from lib.page.modal import update_object
 from lib.page.modal.set_value_for_asmt_ca import SetValueForAsmtDropdown
-from lib.page.widget import page_tab, page_elements, object_modal
+from lib.page.widget import page_tab, page_elements, object_modal, object_page
 from lib.page.widget.page_mixins import (WithAssignFolder, WithObjectReview,
                                          WithPageElements)
-from lib.utils import selenium_utils, string_utils, help_utils, ui_utils
+from lib.utils import selenium_utils, help_utils, ui_utils
 
 
-class InfoWidget(WithPageElements, base.Widget):
+class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
   """Abstract class of common info for Info pages and Info panels.
   For labels (headers) Will be used actual unicode elements from UI or pseudo
   string elements from 'lib.element' module in upper case.
   """
+  # pylint: disable=too-many-public-methods
   # pylint: disable=too-many-instance-attributes
   # pylint: disable=protected-access
   _locators = locator.CommonWidgetInfo
@@ -34,8 +35,8 @@ class InfoWidget(WithPageElements, base.Widget):
   _reference_url_label = "Reference URL"
   _evidence_url_label = "Evidence URL"
 
-  def __init__(self, driver):
-    super(InfoWidget, self).__init__(driver)
+  def __init__(self, _driver=None):
+    super(InfoWidget, self).__init__()
     self.child_cls_name = self.__class__.__name__
     self.obj_name = objects.get_singular(self.child_cls_name)
     self.is_asmts_info_widget = (
@@ -48,37 +49,21 @@ class InfoWidget(WithPageElements, base.Widget):
     self.info_widget_elem = selenium_utils.get_when_visible(
         self._driver, self.info_widget_locator)
     # common for all objects
-    self.title = base.Element(
-        self.info_widget_elem, self._locators.TITLE_ENTERED)
     self.state_lbl_txt = self._elements.STATE.upper()
-    self.state_txt = self.get_state_txt()
     self._extend_list_all_scopes(
         ["TITLE", self.state_lbl_txt],
-        [self.title.text, self.state_txt])
+        [self.title(), self.status()])
     self.info_3bbs_btn = self._browser.element(
         xpath=self._locators.BUTTON_3BBS_XPATH)
     self.inline_edit_controls = self._browser.elements(
         class_name="set-editable-group")
     # for Info Page
     if self.is_info_page:
-      self.info_page_footer = base.Label(
-          self.info_widget_elem, self._locators.TXT_FOOTER_CSS)
-      self.modified_by = selenium_utils.get_when_visible(
-          self.info_widget_elem, self._locators.TXT_MODIFIED_BY_CSS)
-      _created_at_txt, _updated_at_txt = (
-          self.info_page_footer.text.split(
-              string_utils.Symbols.WHITESPACE * 6))
-      self.created_at_txt = (
-          re.sub(element.Common.CREATED_AT, string_utils.Symbols.BLANK,
-                 _created_at_txt))
-      self.updated_at_txt = (
-          _updated_at_txt.splitlines()[2].replace(
-              "on ", string_utils.Symbols.BLANK))
       self._extend_list_all_scopes(
           [self._elements.CREATED_AT.upper(),
            self._elements.MODIFIED_BY.upper(),
            self._elements.UPDATED_AT.upper()],
-          [self.created_at_txt, self.modified_by.text, self.updated_at_txt])
+          [self.created_at(), self.modified_by(), self.updated_at()])
     # for Info Panel
     else:
       self.panel = (
@@ -105,12 +90,40 @@ class InfoWidget(WithPageElements, base.Widget):
         [Controls, Programs, Regulations, Objectives, Contracts,
          Policies, Risks, Standards, Threats, Requirements]):
       self._extend_list_all_scopes_by_review_state()
-    if not self.is_asmts_info_widget:
-      self._extend_list_all_scopes_by_code()
     self.comment_area = self._comment_area()
     self.edit_popup = object_modal.get_modal_obj(self.obj_name, self._driver)
-    self.top_tabs = page_tab.Tabs(self._browser, page_tab.Tabs.TOP)
     self.tabs = page_tab.Tabs(self._browser, page_tab.Tabs.INTERNAL)
+
+  def title(self):
+    """Returns object title."""
+    return self._browser.element(class_name="pane-header__title").h3().text
+
+  def status(self):
+    """Returns object status."""
+    return self._browser.element(
+        class_name=re.compile("state-value state")).text_content
+
+  def code(self):
+    """Returns code."""
+    return self._simple_field("Code").text
+
+  def created_at(self):
+    """Return created date as shown in UI."""
+    return self._extract_text_from_footer(1)
+
+  def modified_by(self):
+    """Return user that updated the object last."""
+    return self._extract_text_from_footer(2)
+
+  def updated_at(self):
+    """Return last updated date."""
+    return self._extract_text_from_footer(3)
+
+  def _extract_text_from_footer(self, group_idx):
+    """Returns some text part from footer."""
+    footer_regexp = r"Created date (.+) {4}Last updated by\n(.+)\non (.+)"
+    footer_text = self._browser.element(class_name="info-widget-footer").text
+    return re.search(footer_regexp, footer_text).group(group_idx)
 
   def wait_save(self):
     """Wait for object to be saved and page to be updated.
@@ -120,37 +133,12 @@ class InfoWidget(WithPageElements, base.Widget):
     """
     self._browser.element(class_name="spinner").wait_until_not_present()
 
-  def get_state_txt(self):
-    """Get object's state text from Info Widget."""
-    return objects.get_normal_form(
-        base.Label(self.info_widget_elem, self._locators.STATE).text)
-
   def get_review_state_txt(self):
     """Get object's review state text from Info Widget checking if exact UI
     elements are existed.
     """
     return (element.ReviewStates.REVIEWED if self._browser.element(
         class_name="state-reviewed") else element.ReviewStates.UNREVIEWED)
-
-  def _get_url_match(self):
-    """Returns instance of re.MatchObject for current page url."""
-    current_url = self._browser.url
-    pattern = r"/{}/(\d+)".format(objects.get_plural(self.obj_name))
-    return re.search(pattern, current_url)
-
-  def get_url(self):
-    """Gets url of the page if it is info page."""
-    match = self._get_url_match()
-    if match:
-      return match.string
-    return None
-
-  def get_obj_id(self):
-    """Gets id of the object (if possible)."""
-    match = self._get_url_match()
-    if match:
-      return match.group(1)
-    return None
 
   def show_related_assessments(self):
     """Click `Assessments` button on control or objective page and return
@@ -238,7 +226,7 @@ class InfoWidget(WithPageElements, base.Widget):
 
   def description(self):
     """Returns the text of description."""
-    return self._description_field().text
+    return self._simple_field("Description").text
 
   @property
   def admins(self):
@@ -298,7 +286,8 @@ class InfoWidget(WithPageElements, base.Widget):
         "description": self.description(),
         "custom_attributes": self.global_custom_attributes(),
         "url": self.get_url(),
-        "id": self.get_obj_id()
+        "id": self.get_obj_id(),
+        "Code": self.code()
     }
     self.update_obj_scope(scope)
     return scope
@@ -319,15 +308,6 @@ class InfoWidget(WithPageElements, base.Widget):
     """Extend 'list all scopes' by headers' text and values' text."""
     self.list_all_headers_txt.extend(help_utils.convert_to_list(headers))
     self.list_all_values_txt.extend(help_utils.convert_to_list(values))
-
-  def _extend_list_all_scopes_by_code(self):
-    """Set attributes related to 'code' and extend 'list all scopes'
-    accordingly.
-    """
-    self.code_lbl_txt, self.code_txt = (
-        self.get_header_and_value_txt_from_custom_scopes(
-            self._elements.CODE.upper()))
-    self._extend_list_all_scopes(self.code_lbl_txt, self.code_txt)
 
   def _extend_list_all_scopes_by_review_state(self):
     """Set attributes related to 'review state' and extend
@@ -405,10 +385,6 @@ class Programs(WithObjectReview, InfoWidget):
             self._elements.PROGRAM_MANAGERS.upper()))
     self._extend_list_all_scopes(
         self.manager, self.manager_entered)
-    self.code = base.Label(
-        self.tab_container.active_tab_elem, self._locators.CODE)
-    self.code_entered = base.Label(
-        self.tab_container.active_tab_elem, self._locators.CODE_ENTERED)
     self.effective_date = base.Label(
         self.tab_container.active_tab_elem, self._locators.EFFECTIVE_DATE)
     self.reference_urls = self._related_urls(self._reference_url_label)
@@ -431,18 +407,38 @@ class Programs(WithObjectReview, InfoWidget):
             self.reference_urls.add_button] + list(self.inline_edit_controls)
 
 
-class Workflows(InfoWidget):
+class Workflow(InfoWidget):
   """Model for Workflow object Info pages and Info panels."""
   _locators = locator.WidgetInfoWorkflow
 
-  def __init__(self, driver):
-    super(Workflows, self).__init__(driver)
+  def __init__(self, _driver=None):
+    super(Workflow, self).__init__()
 
   def _extend_list_all_scopes_by_review_state(self):
     """Method overriding without action due to Workflows don't have
     'review states'.
     """
     pass
+
+  def obj_scope(self):
+    """Returns obj scope."""
+    return {
+        "obj_id": self.get_obj_id(),
+        "title": self.title(),
+        "status": self.status(),
+        "description": self.description(),
+        "admins": self.admins.get_people_emails(),
+        "workflow_members": self.workflow_members.get_people_emails(),
+        "code": self.code(),
+        "created_at": self.created_at(),
+        "modified_by": self.modified_by(),
+        "updated_at": self.updated_at()
+    }
+
+  @property
+  def workflow_members(self):
+    """Returns Workflow Members page element."""
+    return self._related_people_list("Workflow Member")
 
 
 class Audits(WithAssignFolder, InfoWidget):
@@ -534,6 +530,11 @@ class Assessments(InfoWidget):
     self.tabs.ensure_tab(self._other_attributes_tab_name)
     return self._assessment_form_field("Description").text
 
+  def code(self):
+    """Switch to tab with code and return the text of code."""
+    self.tabs.ensure_tab(self._other_attributes_tab_name)
+    return self._info_pane_form_field("Code").text
+
   @property
   def evidence_urls(self):
     """Switch to tab with evidence urls and return a page element"""
@@ -569,7 +570,6 @@ class Assessments(InfoWidget):
         element.AssessmentTabContainer.OTHER_ATTRS_TAB)
     self.core_elem = self.tab_container.active_tab_elem
     self.mapped_objects_titles_txt += self._get_mapped_objs_titles_txt()
-    self._extend_list_all_scopes_by_code()
     obj_scope = self.obj_scope()
     obj_scope.update(zip(self.list_all_headers_txt, self.list_all_values_txt))
     return obj_scope
@@ -651,12 +651,6 @@ class AssessmentTemplates(InfoWidget):
 
   def __init__(self, driver):
     super(AssessmentTemplates, self).__init__(driver)
-
-  def _extend_list_all_scopes_by_code(self):
-    """Method overriding without action due to Assessment Templates don't have
-    'code'.
-    """
-    pass
 
   def _extend_list_all_scopes_by_review_state(self):
     """Method overriding without action due to Assessment Templates don't have

@@ -16,4 +16,4 @@ nosetests integration \
   -e "^ggrc$" \
   --with-xunit \
   --logging-clear-handlers \
-  -v ${@:1}
+  ${@:1}

@@ -11,9 +11,9 @@ import collections
 import hashlib
 import itertools
 import json
+import logging
 import time
 
-from logging import getLogger
 from wsgiref.handlers import format_date_time
 from urllib import urlencode
 
@@ -49,7 +49,7 @@ from ggrc.utils import errors as ggrc_errors
 
 
 # pylint: disable=invalid-name
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 CACHE_EXPIRY_COLLECTION = 60
@@ -1392,7 +1392,9 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
   """
 
   if user_permissions is None:
-    user_permissions = permissions.permissions_for(get_current_user())
+    user_permissions = permissions.permissions_for(
+        get_current_user(use_external_user=False)
+    )
 
   if isinstance(resource, (list, tuple)):
     filtered = []
@@ -1469,7 +1471,7 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
 
 
 def _is_creator():
-  current_user = get_current_user()
+  current_user = get_current_user(use_external_user=False)
   return hasattr(current_user, 'system_wide_role') \
       and current_user.system_wide_role == "Creator"
 

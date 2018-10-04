@@ -26,6 +26,22 @@ ASSESSMENT_STATUSES_MAPPING = {
 }
 
 
+def _compare_ccs(ccs_payload, ccs_issuetracker):
+  """Validate CCs on payload and from third party server.
+
+  Args:
+    - ccs_payload: CCs on Issue Tracker Payload
+    - ccs_issuetracker: CCs from Issue Tracker
+
+  Returns:
+    bool object with validate or not indicator (True/False)
+  """
+  ccs_payload = frozenset(cc.strip() for cc in ccs_payload)
+  ccs_issuetracker = frozenset(cc.strip() for cc in ccs_issuetracker)
+
+  return bool(ccs_payload == ccs_issuetracker)
+
+
 def sync_assessment_statuses():
   """Synchronizes issue tracker ticket statuses with the Assessment statuses.
 
@@ -33,7 +49,10 @@ def sync_assessment_statuses():
   updates their statuses in accordance to the corresponding Assessments
   if differ.
   """
-  assessment_issues = sync_utils.collect_issue_tracker_info("Assessment")
+  assessment_issues = sync_utils.collect_issue_tracker_info(
+      "Assessment",
+      include_ccs=True
+  )
   if not assessment_issues:
     return
   logger.debug('Syncing state of %d issues.', len(assessment_issues))
@@ -66,6 +85,9 @@ def sync_assessment_statuses():
       if all(
           assessment_state.get(field) == issuetracker_state.get(field)
           for field in FIELDS_TO_CHECK
+      ) and _compare_ccs(
+          assessment_state.get("ccs", []),
+          issuetracker_state.get("ccs", [])
       ):
         continue
 

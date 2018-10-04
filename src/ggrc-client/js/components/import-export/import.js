@@ -16,7 +16,7 @@ import {
   download,
   deleteImportJob,
   stopImportJob,
-} from './import-export-utils';
+} from '../../plugins/utils/import-export-utils';
 import '../show-more/show-more';
 import './download-template/download-template';
 import './import-history/import-history';

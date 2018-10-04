@@ -408,10 +408,16 @@ export default can.Component.extend({
           let relatedData = responseArr[query.relatedQueryIndex];
           let values = data[modelKey][queryType];
           let result = values.map((item) => {
-            return {
+            let object = {
               id: item,
               type: modelKey,
             };
+
+            if (this.attr('useSnapshots')) {
+              object.child_type = this.attr('type');
+            }
+
+            return object;
           });
           // Do not perform extra mapping validation in case object generation
           if (!this.attr('objectGenerator') && relatedData) {

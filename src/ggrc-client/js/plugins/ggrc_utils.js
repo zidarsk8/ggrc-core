@@ -196,33 +196,6 @@ function hasPending(parentInstance, instance, how) {
   });
 }
 
-function isMapped(target, destination, mapping) {
-  let tablePlural;
-  let bindings;
-
-  // Should check all passed arguments are presented
-  if (!target || !destination) {
-    console.error('Incorrect arguments list: ', arguments); // eslint-disable-line
-    return false;
-  }
-  if (_.isUndefined(mapping)) {
-    tablePlural = CMS.Models[destination.type].table_plural;
-    mapping = (target.has_binding(tablePlural) ? '' : 'related_') +
-      tablePlural;
-  }
-  bindings = target.get_binding(mapping);
-  if (bindings && bindings.list && bindings.list.length) {
-    return _.find(bindings.list, function (item) {
-      return item.instance.id === destination.id;
-    });
-  }
-  if (target.objects && target.objects.length) {
-    return _.find(target.objects, function (item) {
-      return item.id === destination.id && item.type === destination.type;
-    });
-  }
-}
-
 /**
  * Get list of mappable objects for certain type
  *
@@ -381,20 +354,6 @@ function getType(object) {
 }
 
 /**
- * Return Model Constructor Instance
- * @param {String} type - Model type
- * @return {CMS.Model.Cacheble|null} - Return Model Constructor
- */
-function getModelByType(type) {
-  if (!type || typeof type !== 'string') {
-    console.debug('Type is not provided or has incorrect format',
-      'Value of Type is: ', type);
-    return null;
-  }
-  return CMS.Models[type] || GGRC.Models[type];
-}
-
-/**
  * Remove all HTML tags from the string
  * @param {String} originalText - original string for parsing
  * @return {string} - plain text without tags
@@ -489,11 +448,9 @@ export {
   getPickerElement,
   loadScript,
   hasPending,
-  isMapped,
   getMappableTypes,
   isMappableType,
   allowedToMap,
-  getModelByType,
   getPlainText,
   getHighestAssigneeRole,
   getAssigneeType,

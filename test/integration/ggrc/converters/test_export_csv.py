@@ -7,29 +7,14 @@ import ddt
 from flask.json import dumps
 
 from ggrc.converters import get_importables
-from ggrc.models import inflector
+from ggrc.models import inflector, all_models
+from ggrc.models.mixins import ScopeObject
 from ggrc.models.reflection import AttributeInfo
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
-
-SCOPING_OBJECTS = {
-    "Access Group",
-    "Data Asset",
-    "Facility",
-    "Market",
-    "Metric",
-    "Org Group",
-    "Process",
-    "Product",
-    "ProductGroup",
-    "Project",
-    "System",
-    "TechnologyEnvironment",
-    "Vendor",
-}
 
 
 class TestExportEmptyTemplate(TestCase):
@@ -421,6 +406,75 @@ class TestExportMultipleObjects(TestCase):
         self.assertNotIn(programs[i], response.data)
         self.assertNotIn(regulations[i], response.data)
 
+  def test_exportable_items(self):
+    """Test multi export with exportable items."""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      regulation = factories.RegulationFactory()
+
+    data = [{
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "="},
+                "right": program.title
+            },
+        },
+        "fields": "all",
+    }, {
+        "object_name": "Regulation",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "="},
+                "right": regulation.title
+            },
+        },
+        "fields": "all",
+    }]
+    response = self.export_csv(
+        data,
+        exportable_objects=[1]
+    )
+    response_data = response.data
+    self.assertIn(regulation.title, response_data)
+    self.assertNotIn(program.title, response_data)
+
+  def test_exportable_items_incorrect(self):
+    """Test export with exportable items and incorrect index"""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      regulation = factories.RegulationFactory()
+
+    data = [{
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "="},
+                "right": program.title
+            },
+        },
+        "fields": "all",
+    }, {
+        "object_name": "Regulation",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "="},
+                "right": regulation.title
+            },
+        },
+        "fields": "all",
+    }]
+    response = self.export_csv(
+        data,
+        exportable_objects=[3]
+    )
+    response_data = response.data
+    self.assertEquals(response_data, "")
+
   def test_relevant_to_previous_export(self):
     """Test relevant to previous export"""
     res = self._import_file("data_for_export_testing_relevant_previous.csv")
@@ -529,6 +583,9 @@ class TestExportMultipleObjects(TestCase):
       else:
         self.assertNotIn(",Cheese ipsum ch {},".format(i), response.data)
 
+  SCOPING_MODELS_NAMES = [m.__name__ for m in all_models.all_models
+                          if issubclass(m, ScopeObject)]
+
   @ddt.data(
       "Assessment",
       "Policy",
@@ -575,7 +632,7 @@ class TestExportMultipleObjects(TestCase):
       ]))
       if model == "Control":
         import_queries[-1]["Assertions"] = "Privacy"
-      if model in SCOPING_OBJECTS:
+      if model.replace(" ", "") in self.SCOPING_MODELS_NAMES:
         import_queries[-1]["Assignee"] = "user@example.com"
         import_queries[-1]["Verifier"] = "user@example.com"
 

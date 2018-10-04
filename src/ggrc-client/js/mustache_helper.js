@@ -34,6 +34,7 @@ import Search from './models/service-models/search';
 import Person from './models/business-models/person';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
+import Mappings from './models/mappers/mappings';
 
 // Chrome likes to cache AJAX requests for Mustaches.
 let mustacheUrls = {};
@@ -656,7 +657,7 @@ Mustache.registerHelper('with_mapping', function (binding, options) {
     return;
   }
   binding = Mustache.resolve(binding);
-  loader = context.get_binding(binding);
+  loader = Mappings.get_binding(binding, context);
   if (!loader) {
     return;
   }

@@ -5,7 +5,7 @@
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from './download-template';
-import * as Utils from '../import-export-utils';
+import * as Utils from '../../../plugins/utils/import-export-utils';
 
 describe('download-template component', () => {
   let vm;

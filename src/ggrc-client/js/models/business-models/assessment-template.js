@@ -5,10 +5,10 @@
 
 import Cacheable from '../cacheable';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
-import '../mixins/in-scope-objects';
-import '../mixins/in-scope-objects-preload';
-import '../mixins/refetch-hash';
-import '../mixins/assessment-issue-tracker';
+import inScopeObjects from '../mixins/in-scope-objects';
+import inScopeObjectsPreload from '../mixins/in-scope-objects-preload';
+import refetchHash from '../mixins/refetch-hash';
+import assessmentIssueTracker from '../mixins/assessment-issue-tracker';
 import Stub from '../stub';
 
 /**
@@ -28,10 +28,10 @@ export default Cacheable('CMS.Models.AssessmentTemplate', {
   table_singular: 'assessment_template',
   table_plural: 'assessment_templates',
   mixins: [
-    'inScopeObjects',
-    'inScopeObjectsPreload',
-    'refetchHash',
-    'assessmentIssueTracker',
+    inScopeObjects,
+    inScopeObjectsPreload,
+    refetchHash,
+    assessmentIssueTracker,
   ],
   findOne: 'GET /api/assessment_templates/{id}',
   findAll: 'GET /api/assessment_templates',

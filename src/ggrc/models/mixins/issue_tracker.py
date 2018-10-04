@@ -69,6 +69,10 @@ class IssueTracked(object):
   def add_warning(self, message):
     self._warnings.append(message)
 
+  @simple_property
+  def warnings(self):
+    return self._warnings
+
 
 class IssueTrackedWithUrl(IssueTracked):
   """Class that identifies IssueTracked models that have url."""

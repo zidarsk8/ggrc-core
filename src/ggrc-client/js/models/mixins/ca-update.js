@@ -5,7 +5,7 @@
 
 import Mixin from './mixin';
 
-export default Mixin('ca_update', {}, {
+export default Mixin({}, {
   after_save: function () {
     this.dispatch('readyForRender');
   },

@@ -5,12 +5,12 @@
 
 import Cacheable from '../cacheable';
 import {getRole} from '../../plugins/utils/acl-utils';
-import '../mixins/access-control-list';
-import '../mixins/unique-title';
-import '../mixins/ca-update';
-import '../mixins/timeboxed';
-import '../mixins/mapping-limit';
-import '../mixins/issue-tracker.js';
+import accessControlList from '../mixins/access-control-list';
+import uniqueTitle from '../mixins/unique-title';
+import caUpdate from '../mixins/ca-update';
+import timeboxed from '../mixins/timeboxed';
+import mappingLimit from '../mixins/mapping-limit';
+import issueTracker from '../mixins/issue-tracker';
 import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Audit', {
@@ -23,12 +23,12 @@ export default Cacheable('CMS.Models.Audit', {
   destroy: 'DELETE /api/audits/{id}',
   create: 'POST /api/audits',
   mixins: [
-    'accessControlList',
-    'unique_title',
-    'ca_update',
-    'timeboxed',
-    'mapping-limit',
-    'issueTracker',
+    accessControlList,
+    uniqueTitle,
+    caUpdate,
+    timeboxed,
+    mappingLimit,
+    issueTracker,
   ],
   is_custom_attributable: true,
   is_clonable: true,

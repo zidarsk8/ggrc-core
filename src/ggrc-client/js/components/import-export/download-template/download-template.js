@@ -5,7 +5,7 @@
 
 import '../../dropdown/multiselect-dropdown';
 import template from './download-template.mustache';
-import {downloadTemplate, download} from '../import-export-utils';
+import {downloadTemplate, download} from '../../../plugins/utils/import-export-utils';
 
 const tag = 'download-template';
 const CSV_FILE_NAME = 'import_template.csv';

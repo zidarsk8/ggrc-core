@@ -4,9 +4,9 @@
  */
 
 import Cacheable from '../cacheable';
-import '../mixins/ca-update';
-import '../mixins/timeboxed';
-import '../mixins/base-notifications';
+import caUpdate from '../mixins/ca-update';
+import timeboxed from '../mixins/timeboxed';
+import baseNotifications from '../mixins/base-notifications';
 import Stub from '../stub';
 
 const path = GGRC.mustache_path + '/risk_assessments';
@@ -15,7 +15,7 @@ export default Cacheable('CMS.Models.RiskAssessment', {
   root_object: 'risk_assessment',
   root_collection: 'risk_assessments',
   category: 'risk_assessment',
-  mixins: ['ca_update', 'timeboxed', 'base-notifications'],
+  mixins: [caUpdate, timeboxed, baseNotifications],
   findAll: 'GET /api/risk_assessments',
   findOne: 'GET /api/risk_assessments/{id}',
   create: 'POST /api/risk_assessments',

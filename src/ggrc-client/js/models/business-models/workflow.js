@@ -5,16 +5,16 @@
 
 import Cacheable from '../cacheable';
 import TaskGroup from './task-group';
-import '../mixins/ca-update';
-import '../mixins/timeboxed';
-import '../mixins/access-control-list';
+import caUpdate from '../mixins/ca-update';
+import timeboxed from '../mixins/timeboxed';
+import accessControlList from '../mixins/access-control-list';
 import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Workflow', {
   root_object: 'workflow',
   root_collection: 'workflows',
   category: 'workflow',
-  mixins: ['ca_update', 'timeboxed', 'accessControlList'],
+  mixins: [caUpdate, timeboxed, accessControlList],
   findAll: 'GET /api/workflows',
   findOne: 'GET /api/workflows/{id}',
   create: 'POST /api/workflows',

@@ -5,6 +5,7 @@
 
 import RefreshQueue from '../../js/models/refresh_queue';
 import Cacheable from '../../js/models/cacheable';
+import Mappings from '../../js/models/mappers/mappings';
 
 describe('mappers', function () {
 
@@ -771,7 +772,8 @@ describe('mappers', function () {
       it('sets up source_binding from the binding via get_binding, if the source_binding property does not exist', function () {
         rll = new LL.ReifyingListLoader('dummy_binding');
         spyOn(rll, 'insert_from_source_binding');
-        binding = {instance: {get_binding: function () {return source_binding;}}};
+        binding = {};
+        spyOn(Mappings, 'get_binding').and.returnValue(source_binding);
         rll.init_listeners(binding);
         expect(binding.source_binding).toBe(source_binding);
         expect(rll.insert_from_source_binding).toHaveBeenCalledWith(binding, source_binding.list, 0);

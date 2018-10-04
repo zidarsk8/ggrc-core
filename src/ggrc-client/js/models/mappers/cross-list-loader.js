@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import Mappings from './mappings';
+
 (function (GGRC, can) {
   GGRC.ListLoaders.BaseListLoader('GGRC.ListLoaders.CrossListLoader', {}, {
     init: function (localMapping, remoteMapping) {
@@ -19,7 +21,9 @@
           this.proxy('remove_from_source_binding', binding);
       }
 
-      binding.source_binding = binding.instance.get_binding(this.local_mapping);
+      binding.source_binding = Mappings.get_binding(
+        this.local_mapping,
+        binding.instance);
 
       binding.source_binding.list.bind(
         'add', binding.bound_insert_from_source_binding);
@@ -58,8 +62,9 @@
         }
       }
 
-      remoteBinding =
-        localResult.instance.get_binding(self.remote_mapping);
+      remoteBinding = Mappings.get_binding(
+        self.remote_mapping,
+        localResult.instance);
       remoteBinding.bound_insert_from_remote_binding =
         this.proxy('insert_from_remote_binding', binding, remoteBinding);
       remoteBinding.bound_remove_from_remote_binding =

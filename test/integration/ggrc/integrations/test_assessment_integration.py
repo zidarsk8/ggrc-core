@@ -12,6 +12,7 @@ import sqlalchemy as sa
 
 from ggrc import db
 from ggrc import models
+from ggrc.app import app
 from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import assessment_integration
 from ggrc.integrations.synchronization_jobs import sync_utils
@@ -136,6 +137,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
               'priority': u'P4',
               'type': None,
               'severity': u'S3',
+              'ccs': []
           })
 
   # pylint: disable=unused-argument
@@ -256,6 +258,98 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       self.assertEqual(issue.assignee, email1)
       self.assertEqual(issue.cc_list, "")
 
+  def test_collect_audit_emails(self):
+    """Test _collect_audit_emails function."""
+    audit_captains = factories.PersonFactory.create_batch(3)
+    auditors = factories.PersonFactory.create_batch(3)
+
+    audit_captain_role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Audit Captains",
+        all_models.AccessControlRole.object_type == "Audit",
+    ).one().id
+    auditor_role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Auditors",
+        all_models.AccessControlRole.object_type == "Audit",
+    ).one().id
+
+    acl_data = self._prepare_acl(
+        {
+            audit_captain_role_id: audit_captains,
+            auditor_role_id: auditors
+        }
+    )
+    with app.app_context():
+      # pylint: disable=protected-access
+      reporter_email, cc_list = assessment_integration._collect_audit_emails(
+          acl_data
+      )
+    audit_reporter = audit_captains[0].email
+    audit_ccs = set(captain.email for captain in audit_captains[1:])
+    self.assertEquals(reporter_email, audit_reporter)
+    self.assertEquals(set(cc_list), audit_ccs)
+
+  def test_audit_emails_wh_captains(self):
+    """Test _collect_audit_emails without Audit Captains."""
+    auditors = factories.PersonFactory.create_batch(3)
+    auditor_role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Auditors",
+        all_models.AccessControlRole.object_type == "Audit",
+    ).one().id
+
+    acl_data = self._prepare_acl(
+        {
+            auditor_role_id: auditors,
+        }
+    )
+    with app.app_context():
+      # pylint: disable=protected-access
+      reporter_email, cc_list = assessment_integration._collect_audit_emails(
+          acl_data
+      )
+    self.assertEquals(reporter_email, "")
+    self.assertEquals(cc_list, [])
+
+  def test_audit_emails_wh_auditors(self):
+    """Test _collect_audit_emails without Auditors."""
+    audit_captains = factories.PersonFactory.create_batch(3)
+    audit_captain_role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Audit Captains",
+        all_models.AccessControlRole.object_type == "Audit",
+    ).one().id
+
+    acl_data = self._prepare_acl(
+        {
+            audit_captain_role_id: audit_captains
+        }
+    )
+    with app.app_context():
+      # pylint: disable=protected-access
+      reporter_email, cc_list = assessment_integration._collect_audit_emails(
+          acl_data
+      )
+    audit_reporter = audit_captains[0].email
+    audit_ccs = set(captain.email for captain in audit_captains[1:])
+    self.assertEquals(reporter_email, audit_reporter)
+    self.assertEquals(set(cc_list), audit_ccs)
+
+  @staticmethod
+  def _prepare_acl(configurations):
+    """Prepare ACL payload.
+    Args:
+      - configurations: Dictionary with key - ACR id,
+      and value - list of persons regarding ACR id
+    Returns:
+      -
+    """
+    acl_data = [
+        {
+            "ac_role_id": role_id,
+            "person": {"id": person.id, "type": "Person"}
+        } for role_id, persons in configurations.items()
+        for person in persons
+    ]
+    return acl_data
+
   @mock.patch('ggrc.integrations.issues.Client.create_issue')
   @mock.patch('ggrc.integrations.issues.Client.update_issue')
   def test_basic_import(self, mock_create_issue, mock_update_issue):
@@ -306,6 +400,105 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       )
       result = self.api.delete(audit)
       self.assert200(result)
+
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_update_ccs_many_audit_captains(self, mock_update_issue):
+    """CCS of assessment should include secondary audit captains."""
+    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
+                           return_value=True):
+      audit = factories.AuditFactory()
+      audit_captains = factories.PersonFactory.create_batch(2)
+      audit_captain_role = all_models.AccessControlRole.query.filter_by(
+          name="Audit Captains",
+          object_type="Audit"
+      ).one()
+      response_audit = self.api.put(
+          audit,
+          {
+              "access_control_list": [
+                  {
+                      "ac_role_id": audit_captain_role.id,
+                      "person": {
+                          "id": audit_captain.id,
+                          "type": "Person"
+                      }
+                  } for audit_captain in audit_captains]
+          }
+      )
+      self.assert200(response_audit)
+      issue_tracker_audit = all_models.IssuetrackerIssue.query.filter_by(
+          object_id=audit.id,
+          object_type=audit.type
+      ).one()
+      audit_cc = issue_tracker_audit.cc_list
+      self.assertEqual(
+          audit_cc,
+          audit_captains[1].email
+      )
+
+      assessment = factories.AssessmentFactory(
+          audit=audit
+      )
+      assessment_issue = factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=assessment,
+          component_id="11111",
+          hotlist_id="222222",
+      )
+      assessment_persons = factories.PersonFactory.create_batch(3)
+      assignee_role = all_models.AccessControlRole.query.filter_by(
+          name="Assignees",
+          object_type="Assessment"
+      ).one()
+      creator_role = all_models.AccessControlRole.query.filter_by(
+          name="Creators",
+          object_type="Assessment"
+      ).one()
+      response_assessment = self.api.put(
+          assessment,
+          {
+              "issue_tracker": {
+                  "component_id": "11111",
+                  "enabled": True,
+                  "hotlist_id": "222222",
+                  "issue_priority": "P2",
+                  "issue_severity": "S2",
+                  "issue_type": "PROCESS",
+                  "issue_id": assessment_issue.issue_id
+              },
+              "access_control_list": [
+                  {
+                      "ac_role_id": creator_role.id
+                      if not index else assignee_role.id,
+                      "id": index + 1,
+                      "person": {
+                          "context_id": None,
+                          "href": "/api/people/{}".format(
+                              person.id
+                          ),
+                          "id": person.id,
+                          "type": "Person"
+                      },
+                      "person_email": person.email,
+                      "person_id": person.id,
+                      "person_name": person.name,
+                      "type": "AccessControlList"
+                  }
+                  for index, person in enumerate(assessment_persons)]
+          }
+      )
+      self.assert200(response_assessment)
+      issue_tracker_assessment = all_models.IssuetrackerIssue.query.filter_by(
+          object_id=assessment.id,
+          object_type=assessment.type
+      ).one()
+      issue_tracker_cc = issue_tracker_assessment.cc_list.split(',')[0]
+      assessment_emails = [person.email for person in assessment_persons]
+      self.assertIn(issue_tracker_cc, assessment_emails)
+      self.assertItemsEqual(
+          mock_update_issue.call_args[0][1]["ccs"],
+          [issue_tracker_cc, audit_cc]
+      )
 
 
 @mock.patch('ggrc.models.hooks.issue_tracker.'

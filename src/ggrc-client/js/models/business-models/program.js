@@ -5,11 +5,11 @@
 
 import Cacheable from '../cacheable';
 import {getRole} from '../../plugins/utils/acl-utils';
-import '../mixins/unique-title';
-import '../mixins/ca-update';
-import '../mixins/timeboxed';
-import '../mixins/access-control-list';
-import '../mixins/base-notifications';
+import uniqueTitle from '../mixins/unique-title';
+import caUpdate from '../mixins/ca-update';
+import timeboxed from '../mixins/timeboxed';
+import accessControlList from '../mixins/access-control-list';
+import baseNotifications from '../mixins/base-notifications';
 import Stub from '../stub';
 
 export default Cacheable('CMS.Models.Program', {
@@ -22,11 +22,11 @@ export default Cacheable('CMS.Models.Program', {
   update: 'PUT /api/programs/{id}',
   destroy: 'DELETE /api/programs/{id}',
   mixins: [
-    'unique_title',
-    'ca_update',
-    'timeboxed',
-    'accessControlList',
-    'base-notifications',
+    uniqueTitle,
+    caUpdate,
+    timeboxed,
+    accessControlList,
+    baseNotifications,
   ],
   is_custom_attributable: true,
   isRoleable: true,

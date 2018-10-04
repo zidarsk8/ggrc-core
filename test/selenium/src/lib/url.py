@@ -10,6 +10,8 @@ from urlparse import urldefrag
 from lib import environment
 from lib.constants import regex
 from lib.constants.objects import *  # noqa; the names are later exported
+from lib.entities import entity_operations
+
 
 # URL's parts for work with objects and REST API queries
 API = "api"
@@ -42,6 +44,20 @@ class Widget(object):
   CONTROLS = "#!control"
   ISSUES = "#!issue"
   PROGRAMS = "#!program"
+
+
+def dashboard():
+  """Returns an url for the dashboard page."""
+  return environment.app_url + DASHBOARD
+
+
+def obj_tab_url(app_obj, obj_tab):
+  """Returns an url to the `obj_tab` of `obj`."""
+  tab_hash = {
+      "Setup": "task_group"
+  }[obj_tab]
+  obj_url = entity_operations.obj_url(app_obj)
+  return "{}#!{}".format(obj_url, tab_hash)
 
 
 class Urls(object):

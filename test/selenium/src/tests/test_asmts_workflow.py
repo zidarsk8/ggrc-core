@@ -9,6 +9,7 @@
 # pylint: disable=redefined-outer-name
 
 import random
+import time
 
 import pytest
 
@@ -814,9 +815,14 @@ class TestRelatedAssessments(base.Test):
       -> Asmt-1 mapped to Obj, asmt type="obj_type"
       -> Asmt-2 mapped to Obj, asmt type="obj_type"
     Check Related Assessments on Obj's page"""
-    assessments = [_create_mapped_asmt(
-        audit=audit, assessment_type=obj.type, objs_to_map=[obj])
-        for _ in xrange(2)]
+    assessments = []
+    for i in xrange(2):
+      assessments.append(_create_mapped_asmt(
+          audit=audit, assessment_type=obj.type, objs_to_map=[obj]))
+      if i == 0:
+        # If two assessments are created within the same second, they may have
+        # the same `created_at` so will be sorted in an unexpected order.
+        time.sleep(0.8)
     related_asmts_titles = [
         (assessment.title, obj.title, audit.title)
         for assessment in assessments]

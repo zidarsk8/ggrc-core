@@ -4,7 +4,10 @@
 """Collection of utils for login and user generation.
 """
 
+import json
+
 from email.utils import parseaddr
+from werkzeug import exceptions
 
 from sqlalchemy import orm
 
@@ -13,6 +16,7 @@ from ggrc.integrations import client
 from ggrc.login import get_current_user_id
 from ggrc.models.person import Person
 from ggrc.rbac import SystemWideRoles
+from ggrc.utils import errors
 from ggrc.utils.log_event import log_event
 from ggrc_basic_permissions import basic_roles
 from ggrc_basic_permissions.models import UserRole
@@ -48,10 +52,10 @@ def add_creator_role(user):
 
 
 def create_user(email, **kwargs):
-  """Create User
+  """Creates a user.
 
-  attr:
-      email (string) required
+  Args:
+    email: (string) mandatory user email
   """
   user = Person(email=email, **kwargs)
   db.session.add(user)
@@ -68,13 +72,13 @@ def is_authorized_domain(email):
   return user_domain.lower() == settings.AUTHORIZED_DOMAIN.lower()
 
 
-def find_or_create_user_by_email(email, name):
+def find_or_create_user_by_email(email, name, modifier=None):
   """Generates or find user for selected email."""
   user = find_user_by_email(email)
   if not user:
-    user = create_user(email,
-                       name=name,
-                       modified_by_id=get_current_user_id())
+    if not modifier:
+      modifier = get_current_user_id()
+    user = create_user(email, name=name, modified_by_id=modifier)
   if is_authorized_domain(email) and \
      user.system_wide_role == SystemWideRoles.NO_ACCESS:
     add_creator_role(user)
@@ -84,8 +88,8 @@ def find_or_create_user_by_email(email, name):
 def search_user(email):
   """Search user by Integration Service
 
-    Returns:
-        string: user name for success, None otherwise
+  Returns:
+    string: user name for success, None otherwise
   """
   service = client.PersonClient()
   if is_authorized_domain(email):
@@ -110,7 +114,7 @@ def find_or_create_external_user(email, name):
 
 
 def find_or_create_ext_app_user():
-  """Find or generate external application user after verification."""
+  """Find or generate external application user."""
   name, email = parseaddr(settings.EXTERNAL_APP_USER)
   user = find_user_by_email(email)
   if not user:
@@ -118,7 +122,39 @@ def find_or_create_ext_app_user():
   return user
 
 
-def find_user(email):
+def parse_user_email(request, header, mandatory):
+  """Parses a user email from the request header.
+
+  Retrieves user email from the request header and
+  validates it based on being mandatory or not.
+
+  Args:
+      request: the original request.
+      header: a header name with a person email.
+      mandatory: flag that header value is mandatory or not.
+
+  Returns:
+      A parsed user email.
+
+  Raises:
+     BadRequest: Raised when validation on email has failed.
+  """
+  user = request.headers.get(header)
+  if mandatory and not user:
+    raise exceptions.BadRequest(
+        errors.MANDATORY_HEADER.format(header, user))
+  if not user:
+    return None
+  try:
+    user = json.loads(user)
+    email = str(user["email"])
+  except (TypeError, ValueError, KeyError):
+    raise exceptions.BadRequest(
+        errors.WRONG_PERSON_HEADER_FORMAT.format(header, user))
+  return email
+
+
+def find_user(email, modifier=None):
   """Find or generate user.
 
   If Integration Server is specified not found in DB user is generated
@@ -134,7 +170,7 @@ def find_user(email):
     name = search_user(email)
     if not name:
       return None
-    return find_or_create_user_by_email(email, name)
+    return find_or_create_user_by_email(email, name, modifier)
   return find_user_by_email(email)
 
 

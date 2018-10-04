@@ -6,7 +6,7 @@
 import Mixin from './mixin';
 import {isSnapshot} from '../../plugins/utils/snapshot-utils';
 
-export default Mixin('relatedAssessmentsLoader', {}, {
+export default Mixin({}, {
   /**
    *
    * @param {Array} limit - Limit of loaded numbers

@@ -9,16 +9,16 @@ import {getRole} from '../../plugins/utils/acl-utils';
 import {sortByName} from '../../plugins/utils/label-utils';
 import tracker from '../../tracker';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
-import '../mixins/unique-title';
-import '../mixins/ca-update';
-import '../mixins/auto-status-changeable';
-import '../mixins/timeboxed';
-import '../mixins/mapping-limit';
-import '../mixins/in-scope-objects';
-import '../mixins/access-control-list';
-import '../mixins/refetch-hash';
-import '../mixins/assessment-issue-tracker';
-import '../mixins/related-assessments-loader';
+import uniqueTitle from '../mixins/unique-title';
+import caUpdate from '../mixins/ca-update';
+import autoStatusChangeable from '../mixins/auto-status-changeable';
+import timeboxed from '../mixins/timeboxed';
+import mappingLimit from '../mixins/mapping-limit';
+import inScopeObjects from '../mixins/in-scope-objects';
+import accessControlList from '../mixins/access-control-list';
+import refetchHash from '../mixins/refetch-hash';
+import assessmentIssueTracker from '../mixins/assessment-issue-tracker';
+import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
 import {getInstance} from '../../plugins/utils/models-utils';
 
 export default Cacheable('CMS.Models.Assessment', {
@@ -31,10 +31,10 @@ export default Cacheable('CMS.Models.Assessment', {
   destroy: 'DELETE /api/assessments/{id}',
   create: 'POST /api/assessments',
   mixins: [
-    'unique_title', 'ca_update',
-    'autoStatusChangeable', 'timeboxed', 'mapping-limit',
-    'inScopeObjects', 'accessControlList', 'refetchHash',
-    'assessmentIssueTracker', 'relatedAssessmentsLoader',
+    uniqueTitle, caUpdate,
+    autoStatusChangeable, timeboxed, mappingLimit,
+    inScopeObjects, accessControlList, refetchHash,
+    assessmentIssueTracker, relatedAssessmentsLoader,
   ],
   is_custom_attributable: true,
   isRoleable: true,

@@ -8,6 +8,7 @@ backends
 """
 
 import json
+import logging
 import re
 from functools import wraps
 from werkzeug.exceptions import Forbidden
@@ -18,6 +19,9 @@ from flask import request
 from flask import redirect
 from ggrc.extensions import get_extension_module_for
 from ggrc.rbac import SystemWideRoles
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_login_module():
@@ -42,14 +46,16 @@ def init_app(app):
   # pylint: disable=unused-variable
   @app.login_manager.unauthorized_handler
   def unauthorized():
-    """Called when the user tries to access an endpoint guarded with
-       login_required but they are not authorized.
+    """Redirects to the login page and generates an error.
 
-       Endpoints like /dashboard, /program/1, etc. redirect the user to the
-       /login page.
+    Called when the user tries to access an endpoint guarded with
+    login_required but they are not authorized.
 
-       Endpoints like /api /query, /import, etc. resolve with 401 UNAUTHORIZED
-       and a simple json error object.
+    Endpoints like /dashboard, /program/1, etc. redirect the user to the
+    /login page.
+
+    Endpoints like /api /query, /import, etc. resolve with 401 UNAUTHORIZED
+    and a simple json error object.
     """
     if (re.match(r'^(\/api|\/query|\/search)', request.path) or
        request.headers.get('X-Requested-By') == 'GGRC'):
@@ -67,24 +73,59 @@ def init_app(app):
   # app.context_processor(login_module.session_context)
 
 
-def get_current_user():
-  """Get user.
+def get_current_user(use_external_user=True):
+  """Gets current user.
 
-  used for a deferred function
-  that might contain usage of get_current_user
+  Retrieves the current logged-in user or the external user given
+  in the X-external-user header based on the provided flag.
+
+  Args:
+    use_external_user: indicates should we use external user or not.
+
+  Returns:
+    current user.
   """
+
+  logged_in_user = _get_current_logged_user()
+  if use_external_user and is_external_app_user():
+    try:
+      from ggrc.utils.user_generator import parse_user_email
+      external_user_email = parse_user_email(request,
+                                             "X-external-user",
+                                             mandatory=False)
+      if external_user_email:
+        from ggrc.utils.user_generator import find_user
+        ext_user = find_user(external_user_email, modifier=logged_in_user.id)
+        if ext_user:
+          return ext_user
+    except RuntimeError:
+      logger.info("Working outside of request context.")
+  return logged_in_user
+
+
+def _get_current_logged_user():
+  """Gets current logged-in user."""
   if hasattr(g, '_current_user'):
     return getattr(g, '_current_user')
-
   if get_login_module():
     return flask_login.current_user
   return None
 
 
-def get_current_user_id():
-  """Get currently logged in user id."""
-  user = get_current_user()
-  if bool(user) and not user.is_anonymous():
+def get_current_user_id(use_external_user=True):
+  """Gets current user id.
+
+  Retrieves the current logged-in user id or the external user id
+  based on the provided flag.
+
+  Args:
+    use_external_user: indicates should we use external user or not.
+
+  Returns:
+    current user id.
+  """
+  user = get_current_user(use_external_user)
+  if user and not user.is_anonymous():
     return user.id
   return None
 
@@ -97,13 +138,15 @@ def login_required(func):
 
 
 def admin_required(func):
-  """Adming required decorator
+  """Admin rights required decorator.
 
-    Raises Forbidden if the current user is not an admin"""
+  Raises:
+     Forbidden: if the current user is not an admin.
+  """
   @wraps(func)
   def admin_check(*args, **kwargs):
     """Helper function that performs the admin check"""
-    user = get_current_user()
+    user = _get_current_logged_user()
     role = getattr(user, 'system_wide_role', None)
     if role not in SystemWideRoles.admins:
       raise Forbidden()
@@ -113,7 +156,7 @@ def admin_required(func):
 
 def is_creator():
   """Check if the current user has global role Creator."""
-  current_user = get_current_user()
+  current_user = _get_current_logged_user()
   return (hasattr(current_user, 'system_wide_role') and
           current_user.system_wide_role == SystemWideRoles.CREATOR)
 
@@ -124,7 +167,7 @@ def is_external_app_user():
   Account for external application is defined in settings. External application
   requests require special processing and validations.
   """
-  user = get_current_user()
+  user = _get_current_logged_user()
   if not user or user.is_anonymous():
     return False
 

@@ -5,7 +5,7 @@
 
 import Mixin from './mixin';
 
-export default Mixin('inScopeObjectsPreload', {}, {
+export default Mixin({}, {
   'after:info_pane_preload': function () {
     if (this.updateScopeObject) {
       this.updateScopeObject();

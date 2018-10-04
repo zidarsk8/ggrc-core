@@ -52,7 +52,7 @@ class TestSnapshots(base.Test):
   @pytest.fixture(scope="function")
   def lhn_menu(self, selenium):
     """Open LHN menu and return LHN page objects model."""
-    selenium_utils.open_url(selenium, url.Urls().dashboard)
+    selenium_utils.open_url(url.Urls().dashboard)
     return dashboard.Dashboard(selenium).open_lhn_menu()
 
   @pytest.fixture(scope="function")

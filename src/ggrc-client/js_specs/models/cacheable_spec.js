@@ -19,7 +19,7 @@ describe('Cacheable model', function () {
 
   beforeEach(function () {
     origGcaDefs = GGRC.custom_attr_defs;
-    dummyable = Mixin('dummyable');
+    dummyable = Mixin({}, {});
     spyOn(dummyable, 'add_to');
 
     DummyModel = makeFakeModel({
@@ -33,7 +33,7 @@ describe('Cacheable model', function () {
         findOne: 'GET /api/dummy_models/{id}',
         findAll: 'GET /api/dummy_models/',
         update: 'PUT /api/dummy_models/{id}',
-        mixins: ['dummyable'],
+        mixins: [dummyable],
         attributes: {dummy_attribute: 'dummy_convert'},
         is_custom_attributable: true,
       },

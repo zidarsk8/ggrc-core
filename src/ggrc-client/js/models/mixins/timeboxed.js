@@ -8,7 +8,7 @@ import Mixin from './mixin';
 /**
  * A mixin to use for objects that can have a time limit imposed on them.
  */
-export default Mixin('timeboxed', {
+export default Mixin({
   'extend:attributes': {
     start_date: 'date',
     end_date: 'date',
