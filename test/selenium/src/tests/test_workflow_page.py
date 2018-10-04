@@ -71,3 +71,15 @@ class TestWorkflowPage(base.Test):
     workflow_ui_facade.create_task_group_task(task)
     actual_tasks = workflow_ui_facade.get_task_group_tasks_objs()
     test_utils.list_obj_assert(actual_tasks, [task])
+
+  def test_add_obj_to_task_group(
+      self, app_workflow, app_task_group, app_control, selenium
+  ):
+    """Test mapping of object to a task group."""
+    workflow_ui_facade.add_obj_to_task_group(
+        obj=app_control, task_group=app_task_group)
+    selenium.refresh()  # reload page to check mapping is saved
+    objs = workflow_ui_facade.get_objs_added_to_task_group(app_task_group)
+    if not objs:
+      pytest.xfail("This is a bug, see GGRC-6125")
+    test_utils.list_obj_assert(objs, [app_control])

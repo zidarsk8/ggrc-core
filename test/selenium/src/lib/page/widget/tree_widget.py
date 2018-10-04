@@ -19,9 +19,13 @@ class TreeWidget(base.WithBrowser):
       self._table_row_cls = TreeItem
     self._table = table_with_headers.TableWithHeaders(
         self._root,
-        header_locator={"class_name": "tree-header-titles__text"},
+        header_elements=self._tree_header_elements,
         table_rows=self.tree_items
     )
+
+  def _tree_header_elements(self):
+    """Returns tree header elements."""
+    return self._root.elements(class_name="tree-header-titles__text")
 
   def get_tree_item_by(self, **conditions):
     """Returns a table row that matches conditions."""

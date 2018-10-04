@@ -29,5 +29,15 @@ def send_create_obj_request(obj, rest_obj_dict):
 
 def _create_obj_api_url(obj):
   """Returns API url for object creation."""
-  obj_plural_name = obj.plural_obj_name()
-  return "api/{}".format(obj_plural_name)
+  return _api_url(obj.plural_obj_name())
+
+
+def get_obj_collection(collection_name):
+  """Returns a requested collection."""
+  response = api_client.send_get(_api_url(collection_name))
+  return response["{}_collection".format(collection_name)][collection_name]
+
+
+def _api_url(url):
+  """Appends `/api` to the url."""
+  return "api/{}".format(url)

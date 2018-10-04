@@ -2,7 +2,6 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Page objects for child elements of pages"""
 # pylint: disable=too-few-public-methods
-import datetime
 import time
 
 from lib.constants import objects

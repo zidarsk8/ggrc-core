@@ -21,7 +21,8 @@ from lib.constants.test_runner import DESTRUCTIVE_TEST_METHOD_PREFIX
 from lib.custom_pytest_scheduling import CustomPytestScheduling
 from lib.entities import entities_factory, app_entity_factory
 from lib.page import dashboard
-from lib.rest import workflow_rest_service, person_rest_service
+from lib.rest import (
+    workflow_rest_service, person_rest_service, control_rest_service)
 from lib.service import rest_service, rest_facade
 from lib.service.rest import session_pool
 from lib.utils import conftest_utils, help_utils, selenium_utils
@@ -623,3 +624,10 @@ def app_person():
   """Creates a Person."""
   person = app_entity_factory.PersonFactory().create()
   return person_rest_service.create_person(person)
+
+
+@pytest.fixture()
+def app_control():
+  """Creates a control."""
+  control = app_entity_factory.ControlFactory().create()
+  return control_rest_service.create_control(control)
