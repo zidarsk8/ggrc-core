@@ -58,11 +58,13 @@ def collect_issue_tracker_info(model_name, include_object=False,
 
     issue_params[iti.issue_id] = {
         "object_id": sync_object.id,
+        "component_id": iti.component_id,
         "state": {
             "status": status_value,
             "type": iti.issue_type,
             "priority": iti.issue_priority,
             "severity": iti.issue_severity,
+            "due_date": iti.due_date,
         },
     }
 
@@ -112,6 +114,7 @@ def iter_issue_batches(ids, include_emails=False):
           'type': state.get('type'),
           'priority': state.get('priority'),
           'severity': state.get('severity'),
+          'custom_fields': state.get('custom_fields', []),
           'ccs': state.get('ccs', [])
       }
 
