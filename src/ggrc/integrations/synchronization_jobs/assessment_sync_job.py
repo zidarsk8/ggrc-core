@@ -27,11 +27,11 @@ ASSESSMENT_STATUSES_MAPPING = {
 }
 
 
-def _get_statuses(assessment_state):
-  """Get assessment's statuses"""
-  status_value = ASSESSMENT_STATUSES_MAPPING.get(
+def _get_status(assessment_state):
+  """Get assessment's status"""
+  status_value = ASSESSMENT_STATUSES_MAPPING[
       assessment_state["status"]
-  )
+  ]
   return status_value
 
 
@@ -82,7 +82,7 @@ def _prepare_issue_payload(issue_info):
       for field in FIELDS_TO_CHECK if field in assessment_state
   }
   issue_payload.update({
-      "status": _get_statuses(assessment_state),
+      "status": _get_status(assessment_state),
       "component_id": int(issue_info["component_id"])
       if issue_info.get("component_id") else None,
       "ccs": assessment_state.get("ccs", [])
