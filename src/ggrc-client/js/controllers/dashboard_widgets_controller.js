@@ -45,6 +45,7 @@ export default can.Control({
     this.element
       .addClass('widget')
       .addClass(this.options.object_category)
+      .addClass(this.options.widgetType)
       .attr('id', this.options.widget_id);
 
     if (this.options.widgetType && this.options.widgetType === 'treeview') {
