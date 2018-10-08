@@ -149,13 +149,10 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
   @classmethod
   def _populate_query(cls, query):
     return query.options(
-        orm.Load(cls).undefer_group(
-            "Assessment_complete",
-        ),
-        orm.Load(cls).joinedload(
-            "audit"
-        ).undefer_group(
-            "Audit_complete",
+        orm.Load(cls).undefer_group("Assessment_complete"),
+        orm.Load(cls).joinedload("audit").undefer_group("Audit_complete"),
+        orm.Load(cls).joinedload("audit").joinedload(
+            audit.Audit.issuetracker_issue
         ),
     )
 
