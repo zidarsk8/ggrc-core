@@ -51,13 +51,12 @@ def dashboard():
   return environment.app_url + DASHBOARD
 
 
-def obj_tab_url(app_obj, obj_tab):
-  """Returns an url to the `obj_tab` of `obj`."""
-  tab_hash = {
-      "Setup": "task_group"
-  }[obj_tab]
+def obj_tab_url(app_obj, url_fragment):
+  """Returns an url to the object tab that corresponds to `url_fragment`
+  of object `app_obj`.
+  """
   obj_url = entity_operations.obj_url(app_obj)
-  return "{}#!{}".format(obj_url, tab_hash)
+  return "{}#!{}".format(obj_url, url_fragment)
 
 
 class Urls(object):

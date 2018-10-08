@@ -1,7 +1,6 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Constants related to people objects"""
-from lib.entities import app_entity
 
 DEFAULT_EMAIL_DOMAIN = "example.com"
 SUPERUSER_EMAIL = "user@" + DEFAULT_EMAIL_DOMAIN
@@ -28,8 +27,10 @@ def current_user():
 
 def current_person():
   """Gets current person (app_entity)."""
+  from lib.entities import app_entity_factory
   user = current_user()
-  return app_entity.Person(obj_id=user.id, email=user.email)
+  return app_entity_factory.PersonFactory().create_empty(
+      obj_id=user.id, name=user.name, email=user.email)
 
 
 def set_current_logged_in_user(track, user):

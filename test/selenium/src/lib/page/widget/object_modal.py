@@ -8,6 +8,7 @@
 from lib import base
 from lib.entities import entity
 from lib.page.modal import unified_mapper
+from lib.page.widget import page_elements
 
 
 def get_modal_obj(obj_type, _selenium=None):
@@ -15,7 +16,8 @@ def get_modal_obj(obj_type, _selenium=None):
   mapping = {
       "assessment": AssessmentModal,
       "control": ControlModal,
-      "workflow": WorkflowModal
+      "workflow": WorkflowModal,
+      "task_group_task": TaskGroupTaskModal
   }
   return mapping.get(obj_type.lower(), BaseObjectModal)()
 
@@ -27,7 +29,10 @@ _FIELD_METHOD_MAPPING = {
     "slug": "set_code",
     "assertions": "select_assertions",
     "mapped_objects": "map_objects",
-    "first_task_group_title": "set_first_task_group_title"  # workflow
+    "task_groups": "set_first_task_group_title",  # workflow,
+    "assignees": "set_assignees",  # task
+    "start_date": "set_start_date",  # task
+    "due_date": "set_due_date"  # task
 }
 
 
@@ -60,7 +65,11 @@ class BaseObjectModal(base.WithBrowser):
   def save_and_close(self):
     """Clicks Save & Close button and waits for changes to happen."""
     self._root.link(data_toggle="modal-submit", text="Save & Close").click()
-    self._root.element(class_name="spinner").wait_until_not_present()
+    self._root.wait_until(lambda modal: not modal.exists)
+    # Spinner sometimes appears for loading content after modal is closed.
+    # Though it's not a responsibility of modal to wait for it, it looks
+    # to be safe as long as implementation is general.
+    self._browser.element(class_name="spinner").wait_until_not_present()
 
   def set_title(self, title):
     """Sets title."""
@@ -126,12 +135,47 @@ class WorkflowModal(BaseObjectModal):
 
   def __init__(self):
     super(WorkflowModal, self).__init__()
-    self._fields = ["title", "first_task_group_title"]
+    self._fields = ["title", "task_groups"]
 
-  def set_first_task_group_title(self, first_task_group_title):
+  def set_first_task_group_title(self, task_groups):
     """Sets First task group's title field."""
     label_el = self._root.element(
         class_name="ggrc-form-item__label", text="First task group's title")
     text_field = label_el.following_sibling(
         class_name="input-block-level").to_subtype()
-    text_field.set(first_task_group_title)
+    text_field.set(task_groups[0].title)
+
+
+class TaskGroupTaskModal(BaseObjectModal):
+  """Represents task group task object modal."""
+
+  def __init__(self):
+    super(TaskGroupTaskModal, self).__init__()
+    self._fields = ["title", "assignees", "start_date", "due_date"]
+    self._start_date_picker = page_elements.Datepicker(
+        self._root.element(date="instance.start_date"))
+    self._due_date_picker = page_elements.Datepicker(
+        self._root.element(date="instance.end_date"))
+
+  def set_assignees(self, people):
+    """Adds assignees to the list of assignees."""
+    for person in people:
+      related_people_el = page_elements.RelatedPeopleList(
+          self._root, "Task Assignees", with_inline_edit=False)
+      related_people_el.add_person(person)
+
+  def get_start_date(self):
+    """Returns a displayed start date."""
+    return self._start_date_picker.get_value()
+
+  def set_start_date(self, date):
+    """Sets a date in the start date datepicker."""
+    self._start_date_picker.set_value(date)
+
+  def get_due_date(self):
+    """Returns a displayed due date."""
+    return self._due_date_picker.get_value()
+
+  def set_due_date(self, date):
+    """Sets a date in the due date datepicker."""
+    self._due_date_picker.set_value(date)
