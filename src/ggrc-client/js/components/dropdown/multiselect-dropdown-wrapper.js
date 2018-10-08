@@ -11,7 +11,8 @@ export default can.Component.extend({
   viewModel: {
     placeholder: '',
     selected: [],
-    'class': '',
+    selectedInternal: [],
+    preparedOptions: [],
     define: {
       /*
         Multiselect-dropdown wrapper when data should be fetched first
@@ -59,26 +60,17 @@ export default can.Component.extend({
       // converted into multiselect-dropdown format
       this.attr('selectedInternal', selectedInternal);
     },
-  },
-  events: {
-    /*
-      Update received from multiselect-dropdown
-      Retrieved from Model.cache by Id and sent up to parent`s 'selected'
-    */
-    'multiselect-dropdown multiselect:changed':
-      function (element, event, newSelected) {
-        let self = this;
+    selectedChanged(event) {
+      let newSelected = event.selected;
+      let selected = [];
+      let model = this.attr('modelConstructor');
 
-        /* reuse object to allow sort-by properly react
-        on selected change */
-        let selected = self.viewModel.attr('selected');
-        // remove all old items
-        selected.splice(0);
-        // add all new items from Cache
-        newSelected.forEach((item) => {
-          selected.push(self.viewModel.modelConstructor
-            .findInCacheById(item.id));
-        });
-      },
+      // add all new items from Cache
+      newSelected.forEach((item) => {
+        selected.push(model.findInCacheById(item.id));
+      });
+
+      this.attr('selected', selected);
+    },
   },
 });
