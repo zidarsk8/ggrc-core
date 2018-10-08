@@ -50,7 +50,7 @@ export default Cacheable('CMS.Models.Cycle', {
       attr_name: 'title',
       order: 10,
     }, {
-      attr_title: 'State ',
+      attr_title: 'State',
       attr_name: 'status',
       order: 15,
     }, {

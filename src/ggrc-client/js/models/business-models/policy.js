@@ -3,7 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Cacheable from '../cacheable';
 import Directive from './directive';
 import accessControlList from '../mixins/access-control-list';
 
@@ -37,33 +36,14 @@ export default Directive('CMS.Models.Policy', {
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
     can.extend(this.attributes, Directive.attributes);
-    can.extend(this.tree_view_options, Directive.tree_view_options);
-    this.tree_view_options.attr_list = Cacheable.attr_list.concat([
-      {
-        attr_title: 'Kind/Type',
-        attr_name: 'kind',
-        attr_sort_field: 'kind',
-      },
-      {attr_title: 'Effective Date', attr_name: 'start_date'},
-      {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url'},
-      {
-        attr_title: 'Description',
-        attr_name: 'description',
-        disable_sorting: true,
-      }, {
-        attr_title: 'Notes',
-        attr_name: 'notes',
-        disable_sorting: true,
-      }, {
-        attr_title: 'Assessment Procedure',
-        attr_name: 'test_plan',
-        disable_sorting: true,
-      }, {
-        attr_title: 'Review State',
-        attr_name: 'review_status',
-        order: 80,
-      }]);
+    can.extend(true, this.tree_view_options, Directive.tree_view_options);
+
+    this.tree_view_options.attr_list.push({
+      attr_title: 'Kind/Type',
+      attr_name: 'kind',
+      attr_sort_field: 'kind',
+      order: 86,
+    });
     this._super(...arguments);
   },
 }, {});
