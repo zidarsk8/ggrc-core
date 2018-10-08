@@ -164,7 +164,7 @@ def find_user(email, modifier=None):
     return find_or_create_ext_app_user()
 
   if settings.INTEGRATION_SERVICE_URL == 'mock':
-    return find_user_by_email(email)
+    return find_or_create_user_by_email(email, email, modifier)
 
   if settings.INTEGRATION_SERVICE_URL:
     name = search_user(email)
