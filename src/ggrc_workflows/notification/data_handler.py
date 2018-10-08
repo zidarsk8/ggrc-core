@@ -578,10 +578,15 @@ def get_cycle_task_dict(cycle_task, del_rels_cache=None):
         Revision.resource_type == removed_object_type,
         Revision.resource_id == removed_object_id,
     ).order_by(Revision.id.desc()).first()
-
-    object_titles.append(
-        u"{} [removed from task]".format(object_data.content["display_name"])
-    )
+    if object_data:
+      object_titles.append(
+          u"{} [removed from task]".format(object_data.content["display_name"])
+      )
+    else:
+      logger.warning(
+          "Unmapped %s id %s from CycleTask id % has no revisions logged. ",
+          removed_object_type, removed_object_id, cycle_task.id
+      )
 
   return {
       "title": cycle_task.title,
