@@ -21,13 +21,12 @@ import flask
 import flask_login
 from werkzeug import exceptions
 
+from ggrc import db
+from ggrc import settings
 from ggrc.login import common
 from ggrc.models import all_models
-from ggrc import settings
-from ggrc.utils.user_generator import find_or_create_ext_app_user
-from ggrc.utils.user_generator import find_or_create_user_by_email
-from ggrc.utils.user_generator import is_external_app_user_email
-from ggrc.utils.user_generator import parse_user_email
+from ggrc.utils.user_generator import find_or_create_ext_app_user, \
+    find_or_create_user_by_email, is_external_app_user_email, parse_user_email
 
 
 logger = logging.getLogger(__name__)
@@ -45,6 +44,8 @@ def get_user():
 def login():
   """Log in current user."""
   user = get_user()
+  if user.id is None:
+    db.session.commit()
   if user.system_wide_role != 'No Access':
     flask_login.login_user(user)
     return flask.redirect(common.get_next_url(

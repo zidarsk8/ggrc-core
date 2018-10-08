@@ -1118,6 +1118,9 @@ class Resource(ModelView):
             created_people.append(response_part)
 
           if any_created:
+            with benchmark("person collection commit"):
+              log_event(db.session)
+              db.session.commit()
             return self.json_success_response(created_people)
           return current_app.make_response(
               (self.as_json(created_people),

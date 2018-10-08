@@ -5,6 +5,7 @@
 """
 
 import json
+import flask
 
 from email.utils import parseaddr
 from werkzeug import exceptions
@@ -42,13 +43,18 @@ def find_user_by_email(email):
 
 def add_creator_role(user):
   """Add creator role for sent user."""
+  if not hasattr(flask.g, "user_creator_roles_cache"):
+    flask.g.user_creator_roles_cache = {}
+
+  if user.email in flask.g.user_creator_roles_cache:
+    return flask.g.user_creator_roles_cache[user.email]
+
   user_creator_role = UserRole(
       person=user,
       role=basic_roles.creator(),
   )
+  flask.g.user_creator_roles_cache[user.email] = user
   db.session.add(user_creator_role)
-  db.session.commit()
-  log_event(db.session, user_creator_role, user_creator_role.id)
 
 
 def create_user(email, **kwargs):
@@ -57,11 +63,15 @@ def create_user(email, **kwargs):
   Args:
     email: (string) mandatory user email
   """
+  if not hasattr(flask.g, "user_cache"):
+    flask.g.user_cache = {}
+
+  if email in flask.g.user_cache:
+    return flask.g.user_cache[email]
+
   user = Person(email=email, **kwargs)
+  flask.g.user_cache[email] = user
   db.session.add(user)
-  db.session.flush()
-  log_event(db.session, user, user.id)
-  db.session.commit()
   return user
 
 
@@ -213,10 +223,22 @@ def find_users(emails):
                        modified_by_id=get_current_user_id())
     users.append(user)
 
+  # bulk create people
+  if new_users:
+    log_event(db.session)
+    db.session.commit()
+
+  creator_role_granted = False
   # Grant Creator role to all users
   for user in users:
     if user.system_wide_role == SystemWideRoles.NO_ACCESS:
       add_creator_role(user)
+      creator_role_granted = True
+
+  # bulk create people roles
+  if creator_role_granted:
+    log_event(db.session)
+    db.session.commit()
 
   return users
 
