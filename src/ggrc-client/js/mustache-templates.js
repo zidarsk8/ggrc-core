@@ -7,9 +7,14 @@ GGRC.Templates = GGRC.Templates || {};
 
 let mustacheTemplates = require.context('./mustache/', true, /\.mustache/); // eslint-disable-line
 
+let prefix = './';
+let postfix = '.mustache';
+
 mustacheTemplates.keys().forEach((key) => {
-  let newKey = key.match(/(?<=\.\/)(.*?)(?=\.mustache)/g);
-  if (newKey[0]) {
-    GGRC.Templates[newKey[0]] = mustacheTemplates(key);
-  }
+  let prefixPos = key.indexOf(prefix);
+  let postfixPos = key.lastIndexOf(postfix);
+
+  let newKey = key.slice(prefixPos + prefix.length, postfixPos);
+
+  GGRC.Templates[newKey] = mustacheTemplates(key);
 });
