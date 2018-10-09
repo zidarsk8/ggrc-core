@@ -62,7 +62,6 @@ export default Cacheable('CMS.Models.Cycle', {
     disable_columns_configuration: true,
   },
   init: function () {
-    let that = this;
     this._super(...arguments);
     this.bind('created', refreshAttrWrap('workflow').bind(this));
   },

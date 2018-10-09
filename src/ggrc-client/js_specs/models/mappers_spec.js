@@ -829,7 +829,6 @@ describe('mappers', function () {
     describe('_refresh_stubs', function () {
 
       it("gets results from binding's source binding", function () {
-        let mock_inst = new GGRC.Jasmine.MockModel({value: 'a'});
         spyOn(binding.source_binding, 'refresh_instances').and.returnValue(new $.Deferred().reject());
 
         cfll._refresh_stubs(binding);
