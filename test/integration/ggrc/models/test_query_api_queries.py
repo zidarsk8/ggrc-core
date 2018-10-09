@@ -46,7 +46,7 @@ class TestAllModels(WithQueryApi, TestCase):
       'Regulation': 15,
       'TaskGroup': 11,
       'TaskGroupObject': 4,
-      'TaskGroupTask': 19,
+      'TaskGroupTask': 9,
       'Workflow': 14,
       'TechnologyEnvironment': 8,
       'Product': 14,
@@ -78,7 +78,7 @@ class TestAllModels(WithQueryApi, TestCase):
       wf_factories.CycleTaskGroupFactory,
       # wf_factories.CycleTaskFactory,
       wf_factories.TaskGroupFactory,
-      # wf_factories.TaskGroupTaskFactory,
+      wf_factories.TaskGroupTaskFactory,
       wf_factories.WorkflowFactory,
   ]
 

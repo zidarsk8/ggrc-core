@@ -312,10 +312,14 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
     """
     query = super(CycleTaskGroupObjectTask, cls).eager_query()
     return query.options(
+        orm.subqueryload('cycle_task_entries'),
+        orm.joinedload('cycle')
+           .undefer_group('Cycle_complete'),
+        orm.joinedload('cycle')
+           .joinedload('contact'),
         orm.joinedload('cycle')
            .joinedload('workflow')
            .undefer_group('Workflow_complete'),
-        orm.subqueryload('cycle_task_entries'),
         orm.joinedload('cycle_task_group')
            .undefer_group('CycleTaskGroup_complete'),
     )
