@@ -47,13 +47,12 @@ const scopingObjects = [
     },
 
     Program: {
-      _mixins: [
-        'relatedObject', 'relatedMappings',
-      ],
+      _mixins: ['relatedObject'],
       _canonical: {
         related_objects_as_source:
-          [...coreObjects, 'Audit', 'Document'],
+          [...coreObjects, 'Document'],
       },
+      _related: ['Audit', 'Person', 'TaskGroup', 'Workflow'],
     },
 
     Document: {
@@ -177,10 +176,9 @@ const scopingObjects = [
     Audit: {
       _mixins: ['relatedObject'],
       _canonical: {
-        related_objects_as_source: [...coreObjects,
-          'Assessment', 'AssessmentTemplate'],
+        related_objects_as_source: [...coreObjects, 'AssessmentTemplate'],
       },
-      _related: ['Evidence', 'Person', 'Program'],
+      _related: ['Assessment', 'Evidence', 'Person', 'Program'],
     },
     Assessment: {
       _mixins: ['relatedObject'],

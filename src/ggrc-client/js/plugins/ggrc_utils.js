@@ -182,16 +182,11 @@ function getMappableTypes(type, options) {
   let result;
   let canonical = Mappings.get_canonical_mappings_for(type);
   let list = TreeViewConfig.attr('base_widgets_by_type')[type];
-  let forbidden;
-  let forbiddenList = {
-    Program: ['Audit'],
-    Audit: ['Assessment', 'Program'],
-  };
   options = options || {};
   if (!type) {
     return [];
   }
-  forbidden = _.union(forbiddenList[type] || [], options.forbidden || []);
+  let forbidden = options.forbidden || [];
   const compacted = _.compact([_.keys(canonical), list]);
   result = _.intersection(...compacted);
 
@@ -251,10 +246,6 @@ function allowedToMap(source, target, options) {
       // but unmap can be possible
       'issue audit': !(options && options.isIssueUnmap),
     }),
-    // NOTE: the names in every type pair must be sorted alphabetically!
-    twoWay: Object.freeze({
-      'audit program': true,
-    }),
   });
 
   targetType = getType(target);
@@ -266,14 +257,6 @@ function allowedToMap(source, target, options) {
   // - mapping an Audit to a Issue is not allowed
   // (but vice versa is allowed)
   if (FORBIDDEN.oneWay[types.join(' ')]) {
-    return false;
-  }
-
-  // Two-way check:
-  // special case check:
-  // - mapping an Audit to a Program is not allowed
-  // (and vice versa)
-  if (FORBIDDEN.twoWay[types.sort().join(' ')]) {
     return false;
   }
 

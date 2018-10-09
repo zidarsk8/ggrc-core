@@ -3,82 +3,15 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {makeFakeInstance} from '../../../js_specs/spec_helpers';
-import Permission from '../../permission';
 import * as aclUtils from '../utils/acl-utils';
 import {
   getMappableTypes,
   isMappableType,
-  allowedToMap,
   getAssigneeType,
 } from '../ggrc_utils';
 import Mappings from '../../models/mappers/mappings';
-import Program from '../../models/business-models/program';
-import Audit from '../../models/business-models/audit';
-import Person from '../../models/business-models/person';
 
 'use strict';
-
-describe('allowedToMap() method', function () {
-  let fakeOptions;
-  let fakeProgram;
-  let fakeAudit;
-
-  beforeEach(function () {
-    fakeOptions = {};
-  });
-
-  describe('given an Audit and Program pair', function () {
-    beforeEach(function () {
-      fakeProgram = makeFakeInstance({model: Program})({
-        type: 'Program',
-      });
-      fakeAudit = makeFakeInstance({model: Audit})({
-        type: 'Program',
-      });
-
-      spyOn(Mappings, 'get_canonical_mapping_name')
-        .and.returnValue('audits');
-
-      spyOn(Permission, 'is_allowed_for').and.returnValue(true);
-    });
-
-    it('returns false for Audit as source and Program as target', function () {
-      let result = allowedToMap(fakeAudit, fakeProgram, fakeOptions);
-      expect(result).toBe(false);
-    });
-
-    it('returns false for Program as source and Audit as target', function () {
-      let result = allowedToMap(fakeProgram, fakeAudit, fakeOptions);
-      expect(result).toBe(false);
-    });
-  });
-
-  describe('given a Person instance', function () {
-    let origShortName;
-    let otherInstance;
-    let person;
-
-    beforeAll(function () {
-      origShortName = can.Model.shortName;
-      can.Model.shortName = 'cacheable';
-    });
-
-    afterAll(function () {
-      can.Model.shortName = origShortName;
-    });
-
-    beforeEach(function () {
-      person = makeFakeInstance({model: Person})({type: 'Person'});
-      otherInstance = new can.Model({type: 'Foo'});
-    });
-
-    it('returns false for any object', function () {
-      let result = allowedToMap(otherInstance, person);
-      expect(result).toBe(false);
-    });
-  });
-});
 
 describe('getMappableTypes() method', function () {
   beforeAll(function () {
