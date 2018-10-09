@@ -5,7 +5,7 @@
 
 GGRC.Templates = GGRC.Templates || {};
 
-let mustacheTemplates = require.context('./mustache/', true, /\.mustache/); // eslint-disable-line
+let mustacheTemplates = require.context('./mustache/', true, /\.mustache/);
 
 mustacheTemplates.keys().forEach((key) => {
   let newKey = key.match(/(?<=\.\/)(.*?)(?=\.mustache)/g);
