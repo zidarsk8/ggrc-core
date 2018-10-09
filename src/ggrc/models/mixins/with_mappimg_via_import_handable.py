@@ -14,7 +14,7 @@ class WithMappingImportHandable(object):
   __lazy_init__ = True
 
   # pylint: disable=invalid-name
-  def handle_mapping_via_import_created(self):
+  def handle_mapping_via_import_created(self, counterparty):
     """Proposal mapping via import handler"""
     raise NotImplementedError
 
@@ -25,4 +25,7 @@ class WithMappingImportHandable(object):
     @signals.Import.mapping_created.connect_via(model)
     def mapping_created(*args, **kwargs):
       """proposal_applied handler"""
-      model.handle_mapping_via_import_created(kwargs["instance"])
+      model.handle_mapping_via_import_created(
+          kwargs["instance"],
+          kwargs["counterparty"]
+      )
