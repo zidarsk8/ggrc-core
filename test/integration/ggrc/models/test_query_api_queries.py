@@ -31,10 +31,9 @@ class TestAllModels(WithQueryApi, TestCase):
       'Comment': 8,
       'Contract': 15,
       'Control': 18,
-      'Cycle': 7,
-      # 'CycleTaskEntry': 19, 29
-      # 'CycleTaskGroup': 27, 47
-      # 'CycleTaskGroupObjectTask': 49, 89
+      'Cycle': 9,
+      'CycleTaskGroup': 10,
+      'CycleTaskGroupObjectTask': 14,
       'Document': 9,
       'Issue': 14,
       'Market': 14,
@@ -45,9 +44,9 @@ class TestAllModels(WithQueryApi, TestCase):
       'Process': 14,
       'Program': 17,
       'Regulation': 15,
-      # 'TaskGroup': 27, 47
+      'TaskGroup': 11,
       'TaskGroupObject': 4,
-      # 'TaskGroupTask': 28, 48
+      'TaskGroupTask': 19,
       'Workflow': 14,
       'TechnologyEnvironment': 8,
       'Product': 14,
@@ -75,11 +74,10 @@ class TestAllModels(WithQueryApi, TestCase):
       ggrc_factories.MetricFactory,
       ggrc_factories.ProductFactory,
       ggrc_factories.ProductGroupFactory,
-      # wf_factories.CycleFactory,
-      # wf_factories.CycleTaskGroupFactory,
-      # wf_factories.CycleTaskEntryFactory,
+      wf_factories.CycleFactory,
+      wf_factories.CycleTaskGroupFactory,
       # wf_factories.CycleTaskFactory,
-      # wf_factories.TaskGroupFactory,
+      wf_factories.TaskGroupFactory,
       # wf_factories.TaskGroupTaskFactory,
       wf_factories.WorkflowFactory,
   ]

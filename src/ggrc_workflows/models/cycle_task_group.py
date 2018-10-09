@@ -197,5 +197,7 @@ class CycleTaskGroup(roleable.Roleable,
     """
     query = super(CycleTaskGroup, cls).eager_query()
     return query.options(
-        orm.joinedload('cycle_task_group_tasks')
+        orm.subqueryload("cycle_task_group_tasks"),
+        orm.joinedload("cycle").undefer_group("Cycle_complete"),
+        orm.joinedload("cycle").joinedload("contact")
     )

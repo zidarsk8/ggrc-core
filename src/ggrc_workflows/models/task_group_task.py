@@ -186,7 +186,9 @@ class TaskGroupTask(roleable.Roleable,
   def eager_query(cls):
     query = super(TaskGroupTask, cls).eager_query()
     return query.options(
-        orm.subqueryload('task_group'),
+        orm.Load(cls).joinedload("task_group")
+                     .undefer_group("TaskGroup_complete"),
+        orm.Load(cls).joinedload("task_group").joinedload("workflow")
     )
 
   def _display_name(self):

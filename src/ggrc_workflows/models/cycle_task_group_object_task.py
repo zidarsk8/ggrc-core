@@ -315,7 +315,9 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
         orm.joinedload('cycle')
            .joinedload('workflow')
            .undefer_group('Workflow_complete'),
-        orm.joinedload('cycle_task_entries'),
+        orm.subqueryload('cycle_task_entries'),
+        orm.joinedload('cycle_task_group')
+           .undefer_group('CycleTaskGroup_complete'),
     )
 
   @classmethod
