@@ -2,9 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Bootstrap for ggrc db."""
-import flask
 import threading
-
+import flask
 from flask.ext.sqlalchemy import SQLAlchemy
 
 from ggrc.utils import benchmark
@@ -29,7 +28,7 @@ class CommitHooksEnableFlag(threading.local):
   __nonzero__ = __bool__
 
 
-def get_db():
+def get_db():  # noqa
   """Get modified db object."""
   database = SQLAlchemy()
 
@@ -67,6 +66,8 @@ def get_db():
     with benchmark("post commit hooks"):
       if not database.session.commit_hooks_enable_flag:
         return
+      # delete flask caches in order to avoid
+      # using cached instances after commit
       if hasattr(flask.g, "user_cache"):
         del flask.g.user_cache
       if hasattr(flask.g, "user_creator_roles_cache"):

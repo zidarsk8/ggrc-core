@@ -25,6 +25,7 @@ from ggrc import db
 from ggrc import settings
 from ggrc.login import common
 from ggrc.models import all_models
+from ggrc.utils.log_event import log_event
 from ggrc.utils.user_generator import find_or_create_ext_app_user, \
     find_or_create_user_by_email, is_external_app_user_email, parse_user_email
 
@@ -45,6 +46,8 @@ def login():
   """Log in current user."""
   user = get_user()
   if user.id is None:
+    db.session.flush()
+    log_event(db.session, user, user.id)
     db.session.commit()
   if user.system_wide_role != 'No Access':
     flask_login.login_user(user)
@@ -83,9 +86,21 @@ def request_loader(request):
   # External Application User should be created if doesn't exist.
   if is_external_app_user_email(email):
     db_user = find_or_create_ext_app_user()
+    if db_user.id is None:
+      db.session.flush()
+      log_event(db.session, db_user, db_user.id)
+      db.session.commit()
     try:
       # Create in the DB external app user provided in X-external-user header.
-      parse_user_email(request, "X-external-user", mandatory=False)
+      external_user_email = parse_user_email(
+          request, "X-external-user", mandatory=False
+      )
+      if external_user_email:
+        from ggrc.utils.user_generator import find_user
+        ext_user = find_user(external_user_email, modifier=db_user.id)
+        if ext_user.id is None:
+          log_event(db.session, ext_user, db_user.id)
+          db.session.commit()
     except exceptions.BadRequest as exp:
       logger.error("Creation of external user has failed. %s", exp.message)
       raise

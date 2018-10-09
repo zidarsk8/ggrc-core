@@ -5,9 +5,8 @@
 """
 
 import json
-import flask
-
 from email.utils import parseaddr
+import flask
 from werkzeug import exceptions
 
 from sqlalchemy import orm
@@ -41,17 +40,19 @@ def find_user_by_email(email):
   return _base_user_query().filter(Person.email == email).first()
 
 
-def add_creator_role(user):
+def add_creator_role(user, **kwargs):
   """Add creator role for sent user."""
   if not hasattr(flask.g, "user_creator_roles_cache"):
     flask.g.user_creator_roles_cache = {}
 
   if user.email in flask.g.user_creator_roles_cache:
-    return flask.g.user_creator_roles_cache[user.email]
+    # we have this role in the cache so no need to create it
+    return
 
   user_creator_role = UserRole(
       person=user,
       role=basic_roles.creator(),
+      **kwargs
   )
   flask.g.user_creator_roles_cache[user.email] = user
   db.session.add(user_creator_role)
@@ -91,7 +92,7 @@ def find_or_create_user_by_email(email, name, modifier=None):
     user = create_user(email, name=name, modified_by_id=modifier)
   if is_authorized_domain(email) and \
      user.system_wide_role == SystemWideRoles.NO_ACCESS:
-    add_creator_role(user)
+    add_creator_role(user, modified_by_id=modifier)
   return user
 
 
