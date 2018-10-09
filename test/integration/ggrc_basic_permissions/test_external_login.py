@@ -154,7 +154,9 @@ class TestExternalPermissions(TestCase):
 
   @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
   @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
-  def test_post_invalid_modifier(self):
+  @ddt.data("new_ext_user@example.com",
+            json.dumps({"email": "external_app"}))
+  def test_post_invalid_modifier(self, email):
     """Test that validation is working for X-external-user."""
     model = all_models.Market
     headers = {
@@ -162,7 +164,7 @@ class TestExternalPermissions(TestCase):
         "X-requested-by": "GGRC",
         "X-appengine-inbound-appid": self.allowed_appid,
         "X-ggrc-user": json.dumps({"email": "external_app@example.com"}),
-        "X-external-user": "new_ext_user@example.com"
+        "X-external-user": email
     }
 
     model_plural = model._inflector.table_plural
