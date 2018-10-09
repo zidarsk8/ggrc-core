@@ -7,8 +7,6 @@ import './export-panel';
 import template from './templates/export-group.mustache';
 import panelModel from './panel';
 
-let url = can.route.deparam(window.location.search.substr(1));
-
 export default can.Component.extend('exportGroup', {
   tag: 'export-group',
   template,
@@ -49,8 +47,8 @@ export default can.Component.extend('exportGroup', {
   events: {
     inserted: function () {
       this.viewModel.addObjectType({
-        type: url.model_type || 'Program',
-        isSnapshots: url.isSnapshots,
+        type: 'Program',
+        isSnapshots: false,
       });
     },
   },

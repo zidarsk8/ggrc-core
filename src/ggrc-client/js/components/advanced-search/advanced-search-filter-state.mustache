@@ -18,8 +18,8 @@
   <div class="filter-state__value">
     <multiselect-dropdown
             {options}="filterStates"
-            placeholder="Filter by State"
-            plural="States">
+            (selected-changed)="statesChanged(%event)"
+            {placeholder}="'Filter by State'">
     </multiselect-dropdown>
   </div>
   {{#if statusTooltipVisible}}
