@@ -150,6 +150,15 @@ class Roleable(object):
         ).undefer_group(
             'AccessControlRole_complete'
         ),
+        orm.subqueryload(
+            '_access_control_list'
+        ).joinedload(
+            "access_control_people"
+        ).joinedload(
+            "person"
+        ).undefer_group(
+            'Person_complete'
+        ),
     )
 
   @property
