@@ -10,7 +10,7 @@ import {
   buildParam,
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
-import {allowedToMap} from '../../plugins/ggrc_utils';
+import Mappings from '../../models/mappers/mappings';
 import {
   getPageInstance,
   navigate,
@@ -42,7 +42,7 @@ export default can.Component.extend({
       open: false,
     },
     canUnmap() {
-      return allowedToMap(this.attr('issueInstance'),
+      return Mappings.allowedToMap(this.attr('issueInstance'),
         this.attr('target'), {isIssueUnmap: true});
     },
 
