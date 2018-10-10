@@ -6,7 +6,7 @@
 import {getComponentVM} from '../../../../../js_specs/spec_helpers';
 import Component from '../date-form-field';
 
-describe('date-form-field component', function () {
+describe('date-form-field component', () => {
   'use strict';
   let viewModel;
 
@@ -16,17 +16,17 @@ describe('date-form-field component', function () {
     viewModel.attr('fieldId', 'id');
   });
 
-  it('does not fire valueChanged event on first value assignation', function () {
+  it('does not fire valueChanged event on first value assignation', () => {
     viewModel.attr('value', '');
     expect(viewModel.dispatch).not.toHaveBeenCalled();
   });
 
-  it('sets the value of the input', function () {
+  it('sets the value of the input', () => {
     viewModel.attr('value', 'test');
     expect(viewModel.attr('inputValue')).toEqual('test');
   });
 
-  it('does not fire valueChanged event if value wasn\'t changed', function () {
+  it('does not fire valueChanged event if value wasn\'t changed', () => {
     viewModel.attr('value', '');
     viewModel.attr('inputValue', 'newValue');
     viewModel.dispatch.calls.reset();
@@ -34,7 +34,7 @@ describe('date-form-field component', function () {
     expect(viewModel.dispatch).not.toHaveBeenCalled();
   });
 
-  it('fires valueChanged event on input value change', function () {
+  it('fires valueChanged event on input value change', () => {
     viewModel.attr('value', '');
     viewModel.attr('inputValue', 'newValue');
     expect(viewModel.dispatch).toHaveBeenCalledWith({

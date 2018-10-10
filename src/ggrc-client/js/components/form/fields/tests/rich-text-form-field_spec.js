@@ -6,7 +6,7 @@
 import {getComponentVM} from '../../../../../js_specs/spec_helpers';
 import Component from '../rich-text-form-field';
 
-describe('rich-text-form-field', function () {
+describe('rich-text-form-field', () => {
   'use strict';
   let viewModel;
 
@@ -16,17 +16,17 @@ describe('rich-text-form-field', function () {
     viewModel.attr('fieldId', 'id');
   });
 
-  it('does not fire valueChanged event on first value assignation', function () {
+  it('does not fire valueChanged event on first value assignation', () => {
     viewModel.attr('value', '');
     expect(viewModel.dispatch).not.toHaveBeenCalled();
   });
 
-  it('sets the value of the input', function () {
+  it('sets the value of the input', () => {
     viewModel.attr('value', 'test');
     expect(viewModel.attr('inputValue')).toEqual('test');
   });
 
-  it('fires valueChanged event on input value change', function () {
+  it('fires valueChanged event on input value change', () => {
     viewModel.attr('value', '');
     viewModel.attr('inputValue', 'newValue');
     viewModel.onBlur();
