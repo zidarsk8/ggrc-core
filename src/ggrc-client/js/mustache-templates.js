@@ -5,7 +5,7 @@
 
 GGRC.Templates = GGRC.Templates || {};
 
-let mustacheTemplates = require.context('./mustache/', true, /\.mustache/); // eslint-disable-line
+let mustacheTemplates = require.context('./mustache/', true, /\.mustache/);
 
 let prefix = './';
 let postfix = '.mustache';
