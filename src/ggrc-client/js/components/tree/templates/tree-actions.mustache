@@ -21,12 +21,10 @@
       {{/if}}
       {{#if showExport}}
         <li>
-          <a href="/export?model_type={{model.model_singular}}&relevant_type={{parentInstance.type}}&relevant_id={{parentInstance.id}}{{#if isSnapshots}}&isSnapshots=true{{/if}}"
-              target="_blank"
-              class="section-import">
+          <span class="section-import" ($click)="export">
             <i class="fa fa-fw fa-download"></i>
             Export {{model.title_plural}}
-          </a>
+          </span>
         </li>
       {{/if}}
       {{#if showGenerateAssessments}}

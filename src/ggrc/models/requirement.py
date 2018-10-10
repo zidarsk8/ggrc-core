@@ -3,6 +3,8 @@
 
 """Module with Requirement model."""
 
+from sqlalchemy import orm
+
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
@@ -52,6 +54,12 @@ class Requirement(Roleable,
   _api_attrs = reflection.ApiAttributes('notes')
   _sanitize_html = ['notes']
   _include_links = []
+
+  @classmethod
+  def eager_query(cls):
+    """Define fields to be loaded eagerly to lower the count of DB queries."""
+    query = super(Requirement, cls).eager_query()
+    return query.options(orm.undefer('notes'))
 
   @classmethod
   def _filter_by_directive(cls, predicate):

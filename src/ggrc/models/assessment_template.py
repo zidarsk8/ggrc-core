@@ -13,11 +13,11 @@ from ggrc import login
 from ggrc.builder import simple_property
 from ggrc.models import assessment
 from ggrc.models import audit
-from ggrc.models import issuetracker_issue
 from ggrc.models import mixins
 from ggrc.models import relationship
 from ggrc.models.mixins import base
 from ggrc.models.mixins import clonable
+from ggrc.models.mixins import issue_tracker
 from ggrc.models.exceptions import ValidationError
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models import reflection
@@ -27,10 +27,17 @@ from ggrc.fulltext.mixin import Indexed
 from ggrc.rbac.permissions import permissions_for
 
 
-class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
-                         mixins.Titled, mixins.CustomAttributable,
-                         Roleable, base.ContextRBAC, mixins.Slugged,
-                         mixins.Stateful, clonable.MultiClonable, Indexed,
+class AssessmentTemplate(assessment.AuditRelationship,
+                         relationship.Relatable,
+                         mixins.Titled,
+                         mixins.CustomAttributable,
+                         Roleable,
+                         issue_tracker.IssueTrackedWithUrl,
+                         base.ContextRBAC,
+                         mixins.Slugged,
+                         mixins.Stateful,
+                         clonable.MultiClonable,
+                         Indexed,
                          db.Model):
   """A class representing the assessment template entity.
 
@@ -163,7 +170,10 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
   def eager_query(cls):
     query = super(AssessmentTemplate, cls).eager_query()
     return query.options(
-        orm.Load(cls).joinedload("audit").undefer_group("Audit_complete")
+        orm.Load(cls).joinedload("audit").undefer_group("Audit_complete"),
+        orm.Load(cls).joinedload("audit").joinedload(
+            audit.Audit.issuetracker_issue
+        ),
     )
 
   @classmethod
@@ -259,13 +269,6 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
     if hasattr(self, 'context') and hasattr(self.context, 'related_object'):
       return getattr(self.context.related_object, 'archived', False)
     return False
-
-  @simple_property
-  def issue_tracker(self):
-    """Returns representation of issue tracker related info as a dict."""
-    issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
-        'AssessmentTemplate', self.id)
-    return issue_obj.to_dict() if issue_obj is not None else {}
 
 
 def create_audit_relationship(audit_stub, obj):

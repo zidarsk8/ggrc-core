@@ -18,21 +18,42 @@ import Mappings from './mappings';
 import CustomAttributeDefinition from '../custom-attributes/custom-attribute-definition';
 import AccessControlRole from '../custom-roles/access-control-role';
 
+const businessObjects = [
+  'Metric', 'TechnologyEnvironment', 'AccessGroup',
+  'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
+  'Product', 'ProductGroup', 'Project', 'System', 'Regulation',
+  'Policy', 'Contract', 'Standard', 'Program', 'Issue', 'Control',
+  'Requirement', 'Objective', 'Audit', 'Assessment',
+  'AssessmentTemplate', 'Risk', 'Threat', 'Document',
+];
+
+const scopingObjects = [
+  'Metric', 'TechnologyEnvironment', 'AccessGroup',
+  'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
+  'Product', 'ProductGroup', 'Project', 'System',
+];
+
 (function (GGRC, can) {
   new Mappings('ggrc_core', {
     base: {},
-
+    relatedMappings: {
+      _related: ['Person', 'Workflow'],
+    },
+    Person: {
+      _related: ['TaskGroupTask', 'Workflow',
+        ...GGRC.roleableTypes.map((model) => model.model_singular)],
+    },
     // Governance
     Control: {
       _mixins: [
-        'related_object', 'assignable',
+        'related_object', 'assignable', 'relatedMappings',
       ],
       orphaned_objects: Multi([
         'related_objects', 'controls', 'programs', 'objectives',
       ]),
     },
     Objective: {
-      _mixins: ['related_object'],
+      _mixins: ['related_object', 'relatedMappings'],
       orphaned_objects: Multi([
         'related_objects', 'contracts', 'controls',
         'objectives', 'policies', 'programs', 'regulations',
@@ -40,10 +61,11 @@ import AccessControlRole from '../custom-roles/access-control-role';
       ]),
     },
     Requirement: {
-      _mixins: ['related_object'],
+      _mixins: ['related_object', 'relatedMappings'],
     },
     Document: {
-      _mixins: ['business_object'],
+      _mixins: ['related_object'],
+      _related: ['Person'],
     },
     assignable: {
       info_related_objects: CustomFilter('related_objects',
@@ -54,14 +76,7 @@ import AccessControlRole from '../custom-roles/access-control-role';
     },
     related_object: {
       _canonical: {
-        related_objects_as_source: [
-          'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
-          'Product', 'ProductGroup', 'Project', 'System', 'Regulation',
-          'Policy', 'Contract', 'Standard', 'Program', 'Issue', 'Control',
-          'Requirement', 'Objective', 'Audit', 'Assessment',
-          'AssessmentTemplate', 'AccessGroup', 'Risk', 'Threat', 'Document',
-          'Metric', 'TechnologyEnvironment',
-        ],
+        related_objects_as_source: businessObjects,
       },
       related_objects_as_source: Proxy(
         null, 'destination', 'Relationship', 'source', 'related_destinations'),
@@ -106,11 +121,10 @@ import AccessControlRole from '../custom-roles/access-control-role';
     // Program
     Program: {
       _mixins: [
-        'related_object',
+        'related_object', 'relatedMappings',
       ],
       _canonical: {
         audits: 'Audit',
-        context: 'Context',
       },
       related_issues: TypeFilter('related_objects', 'Issue'),
       audits: Direct('Audit', 'program', 'audits'),
@@ -142,7 +156,7 @@ import AccessControlRole from '../custom-roles/access-control-role';
     },
     directive_object: {
       _mixins: [
-        'related_object',
+        'related_object', 'relatedMappings',
       ],
       orphaned_objects: Multi([
         'controls', 'objectives', 'related_objects',
@@ -152,12 +166,22 @@ import AccessControlRole from '../custom-roles/access-control-role';
     // Directives
     Regulation: {
       _mixins: ['directive_object'],
+      _canonical: {
+        related_objects_as_source: _.difference(
+          businessObjects, scopingObjects),
+      },
+      _related: _.concat(scopingObjects, ['Person', 'Workflow']),
     },
     Contract: {
       _mixins: ['directive_object'],
     },
     Standard: {
       _mixins: ['directive_object'],
+      _canonical: {
+        related_objects_as_source: _.difference(
+          businessObjects, scopingObjects),
+      },
+      _related: _.concat(scopingObjects, ['Person', 'Workflow']),
     },
     Policy: {
       _mixins: ['directive_object'],
@@ -168,6 +192,11 @@ import AccessControlRole from '../custom-roles/access-control-role';
       _mixins: [
         'related_object',
       ],
+      _canonical: {
+        related_objects_as_source: _.difference(businessObjects,
+          ['Standard', 'Regulation']),
+      },
+      _related: ['Workflow', 'Person', 'Standard', 'Regulation'],
       orphaned_objects: Multi([
         'related_objects', 'controls', 'objectives', 'requirements',
       ]),
@@ -230,7 +259,6 @@ import AccessControlRole from '../custom-roles/access-control-role';
     Audit: {
       _canonical: {
         _program: 'Program',
-        context: 'Context',
         evidence: 'Evidence',
       },
       _mixins: [
@@ -259,6 +287,7 @@ import AccessControlRole from '../custom-roles/access-control-role';
       _canonical: {
         evidence: 'Evidence',
       },
+      _related: ['Person'],
       _mixins: [
         'related_object', 'assignable',
       ],
@@ -274,10 +303,12 @@ import AccessControlRole from '../custom-roles/access-control-role';
         null, 'destination', 'Relationship', 'source', 'related_destinations',
       ),
     },
-    AssessmentTemplate: {},
+    AssessmentTemplate: {
+      _related: ['Audit'],
+    },
     Issue: {
       _mixins: [
-        'related_object', 'assignable',
+        'related_object', 'assignable', 'relatedMappings',
       ],
       audits: TypeFilter('related_objects', 'Audit'),
     },

@@ -4,6 +4,7 @@
 """Assessment integration functionality via cron job."""
 
 import logging
+import datetime
 
 from ggrc.integrations import issues, integrations_errors
 from ggrc.integrations.synchronization_jobs import sync_utils
@@ -26,62 +27,245 @@ ASSESSMENT_STATUSES_MAPPING = {
 }
 
 
-def sync_assessment_statuses():
+def _get_status(assessment_state):
+  """Get assessment's status"""
+  status_value = ASSESSMENT_STATUSES_MAPPING[
+      assessment_state["status"]
+  ]
+  return status_value
+
+
+def _get_due_date(assessment_state):
+  """Get assessment's due_date"""
+  due_date = assessment_state["due_date"]
+  if due_date is not None:
+    return {
+        "name": "Due Date",
+        "value": due_date.strftime("%Y-%m-%d"),
+        "type": "DATE",
+        "display_string": "Due Date",
+    }
+  return None
+
+
+def _get_issue_info_by_issue_id(issue_id, assessment_issues):
+  """Get Issue information by issue id.
+
+  Args:
+    - issue_id: id of Issue object
+    - assessment_issues: Dictionary with Issue information
+
+  Returns:
+      - issue_id: id of Issue object convert to string.
+      - issue_info: information by current issue_id
+  """
+  issue_id = str(issue_id)
+  issue_info = assessment_issues.get(issue_id)
+
+  return issue_id, issue_info
+
+
+def _prepare_issue_payload(issue_info):
+  """Prepare issue payload,
+
+  Args:
+    - issue_info: Dictionary with Issue Information.
+
+  Returns:
+    - issue_payload: Dictionary with information
+    for Issue payload.
+  """
+  assessment_state = issue_info["state"]
+
+  issue_payload = {
+      field: assessment_state[field]
+      for field in FIELDS_TO_CHECK if field in assessment_state
+  }
+  issue_payload.update({
+      "status": _get_status(assessment_state),
+      "component_id": int(issue_info["component_id"])
+      if issue_info.get("component_id") else None,
+      "ccs": assessment_state.get("ccs", [])
+  })
+
+  due_date = _get_due_date(assessment_state)
+  if due_date is not None:
+    issue_payload["custom_fields"] = [due_date]
+  else:
+    issue_payload["custom_fields"] = []
+
+  return issue_payload
+
+
+def _extract_date(date_in_string):
+  """Extract date from string."""
+  try:
+    current_date = datetime.datetime.strptime(
+        date_in_string,
+        "%Y-%m-%d"
+    )
+  except ValueError:
+    current_date = None
+
+  return current_date
+
+
+def _compare_custom_fields(custom_fields_payload, custom_fields_issuetracker):
+  """Validate custom fields on payload and from third party server.
+
+  Args:
+    - custom_fields_payload: custom_fields on Issue Tracker Payload
+    - custom_fields_issuetracker: custom_fields from Issue Tracker
+
+  Returns:
+    bool object with validate or not indicator (True/False)
+  """
+  if any(custom_fields_payload):
+    due_date_payload = _extract_date(
+        custom_fields_payload[0]["value"].strip()
+    )
+  else:
+    due_date_payload = None
+
+  if any(custom_fields_issuetracker):
+    due_date_issuetracker = _extract_date(
+        custom_fields_issuetracker[0]["Due Date"].strip()
+    )
+  else:
+    due_date_issuetracker = None
+
+  return due_date_payload == due_date_issuetracker
+
+
+def _compare_ccs(ccs_payload, ccs_issuetracker):
+  """Validate CCs on payload and from third party server.
+
+  Args:
+    - ccs_payload: CCs on Issue Tracker Payload
+    - ccs_issuetracker: CCs from Issue Tracker
+
+  Returns:
+    bool object with validate or not indicator (True/False)
+  """
+  ccs_payload = set(cc.strip() for cc in ccs_payload)
+  ccs_issuetracker = set(cc.strip() for cc in ccs_issuetracker)
+
+  return ccs_payload == ccs_issuetracker
+
+
+def _is_need_synchronize_issue(object_id, issue_payload, issuetracker_state):
+  """Function that check necessity of issue synchronization.
+
+  Args:
+    - issue_payload: Dictionary with information
+    for Issue payload.
+
+    - object_id: Id of related object for IssueTracker
+    - issuetracker_state: Current state of IssueTracker
+
+  Returns:
+    bool object with validate or not indicator (True/False)
+  """
+  if not issue_payload.get("status"):
+    logger.error(
+        "Inexistent Issue Tracker status for assessment ID=%d "
+        "with status: %s.", object_id, issue_payload.get("status")
+    )
+    return False
+  if all(
+      issue_payload.get(field) == issuetracker_state.get(field)
+      for field in FIELDS_TO_CHECK
+  ) and _compare_custom_fields(
+      issue_payload.get("custom_fields", []),
+      issuetracker_state.get("custom_fields", [])
+  ) and _compare_ccs(
+      issue_payload.get("ccs", []),
+      issuetracker_state.get("ccs", [])
+  ):
+    return False
+  return True
+
+
+def _update_issue(cli, issue_id, object_id, issue_payload):
+  """Update issue tracker with logging state.
+
+  Args:
+    - cli: object of Issue Tracker Client
+    - issue_id: Id of IssueTracker
+    - object_id: Id of related object for IssueTracker
+    - issue_payload: Dictionary with information for Issue payload.
+
+  Returns:
+    -
+  """
+  try:
+    sync_utils.update_issue(cli, issue_id, issue_payload)
+  except integrations_errors.Error as error:
+    logger.error(
+        "Unable to update status of Issue Tracker issue ID=%s for "
+        "assessment ID=%d: %r",
+        issue_id, object_id, error)
+
+
+def _check_missing_ids(assessment_issues, processed_ids):
+  """Check issue tracker objects that hadn't process.
+
+  Args:
+    - assessment_issues: Dictionary with Issue information
+    - processed_ids: Issue Tracker ids that was processed
+
+  Returns:
+    -
+  """
+  missing_ids = set(assessment_issues) - processed_ids
+  if missing_ids:
+    logger.warning(
+        "Some issues are linked to Assessments "
+        "but were not found in Issue Tracker: %s",
+        ", ".join(str(missing_id) for missing_id in missing_ids))
+
+
+def sync_assessment_attributes():  # noqa
   """Synchronizes issue tracker ticket statuses with the Assessment statuses.
 
   Checks for Assessments which are in sync with Issue Tracker issues and
   updates their statuses in accordance to the corresponding Assessments
   if differ.
   """
-  assessment_issues = sync_utils.collect_issue_tracker_info("Assessment")
+  assessment_issues = sync_utils.collect_issue_tracker_info(
+      "Assessment",
+      include_ccs=True
+  )
   if not assessment_issues:
     return
-  logger.debug('Syncing state of %d issues.', len(assessment_issues))
+  logger.debug("Syncing state of %d issues.", len(assessment_issues))
 
   cli = issues.Client()
   processed_ids = set()
   for batch in sync_utils.iter_issue_batches(assessment_issues.keys()):
     for issue_id, issuetracker_state in batch.iteritems():
-      issue_id = str(issue_id)
-      issue_info = assessment_issues.get(issue_id)
+      issue_id, issue_info = _get_issue_info_by_issue_id(
+          issue_id,
+          assessment_issues
+      )
       if not issue_info:
         logger.warning(
-            'Got an unexpected issue from Issue Tracker: %s', issue_id)
-        continue
-
-      processed_ids.add(issue_id)
-      assessment_state = issue_info['state']
-
-      status_value = ASSESSMENT_STATUSES_MAPPING.get(
-          assessment_state["status"]
-      )
-      if not status_value:
-        logger.error(
-            'Inexistent Issue Tracker status for assessment ID=%d '
-            'with status: %s.', issue_info['object_id'], status_value
+            "Got an unexpected issue from Issue Tracker: %s", issue_id
         )
         continue
 
-      assessment_state["status"] = status_value
-      if all(
-          assessment_state.get(field) == issuetracker_state.get(field)
-          for field in FIELDS_TO_CHECK
+      object_id = issue_info["object_id"]
+      processed_ids.add(issue_id)
+      issue_payload = _prepare_issue_payload(issue_info)
+
+      if not _is_need_synchronize_issue(
+          object_id,
+          issue_payload,
+          issuetracker_state
       ):
         continue
 
-      try:
-        sync_utils.update_issue(cli, issue_id, assessment_state)
-      except integrations_errors.Error as error:
-        logger.error(
-            'Unable to update status of Issue Tracker issue ID=%s for '
-            'assessment ID=%d: %r',
-            issue_id, issue_info['object_id'], error)
+      _update_issue(cli, issue_id, object_id, issue_payload)
 
-  logger.debug('Sync is done, %d issue(s) were processed.', len(processed_ids))
-
-  missing_ids = set(assessment_issues) - processed_ids
-  if missing_ids:
-    logger.warning(
-        'Some issues are linked to Assessments '
-        'but were not found in Issue Tracker: %s',
-        ', '.join(str(i) for i in missing_ids))
+  logger.debug("Sync is done, %d issue(s) were processed.", len(processed_ids))
+  _check_missing_ids(assessment_issues, processed_ids)

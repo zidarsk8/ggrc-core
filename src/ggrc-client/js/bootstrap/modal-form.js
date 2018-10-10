@@ -6,6 +6,7 @@
 import {confirm} from '../plugins/utils/modals';
 import {hasPending as hasPendingUtil} from '../plugins/ggrc_utils';
 import {navigate} from '../plugins/utils/current-page-utils';
+import {changeUrl} from '../router';
 
 (function ($) {
   'use strict';
@@ -41,9 +42,14 @@ import {navigate} from '../plugins/utils/current-page-utils';
         }.bind(this))
         .on('keypress', 'form', $.proxy(this.keypress_submit, this))
         .on('keyup', 'form', $.proxy(this.keyup_escape, this))
-        .on('click.modal-form.close', '[data-dismiss="modal"]', $.proxy(this.hide, this))
-        .on('click.modal-form.reset', 'input[type=reset], [data-dismiss="modal-reset"]', $.proxy(this.reset, this))
-        .on('click.modal-form.submit', 'input[type=submit], [data-toggle="modal-submit"]', $.proxy(this.submit, this))
+        .on('click.modal-form.close', '[data-dismiss="modal"]',
+          $.proxy(this.hide, this))
+        .on('click.modal-form.reset',
+          'input[type=reset], [data-dismiss="modal-reset"]',
+          $.proxy(this.reset, this))
+        .on('click.modal-form.submit',
+          'input[type=submit], [data-toggle="modal-submit"]',
+          $.proxy(this.submit, this))
         .on('shown.modal-form', $.proxy(this.focus_first_input, this))
         .on('loaded.modal-form', $.proxy(this.focus_first_input, this))
         .on('delete-object', $.proxy(this.delete_object, this))
@@ -154,7 +160,8 @@ import {navigate} from '../plugins/utils/current-page-utils';
     },
 
     keyup_escape: function (e) {
-      if ($(document.activeElement).is('select, [data-toggle=datepicker]') && e.which === 27) {
+      if ($(document.activeElement).is(
+        'select, [data-toggle=datepicker]') && e.which === 27) {
         this.$element.attr('tabindex', -1).focus();
         e.stopPropagation();
       }
@@ -248,9 +255,10 @@ import {navigate} from '../plugins/utils/current-page-utils';
         $first_input = that.$element.find('*[autofocus]');
         if (!$first_input.length) {
           $first_input = that.$element
-            .find('input[type="text"], input[type="checkbox"], select, textarea')
-            .not('[placeholder*=autofill], label:contains(autofill) + *, [disabled]')
-            .first();
+            .find('input[type="text"], input[type="checkbox"], ' +
+                  'select, textarea')
+            .not('[placeholder*=autofill], label:contains(autofill) + *, ' +
+                 '[disabled]').first();
         }
         if ($first_input.length && (!ev || that.$element.is(ev.target))) {
           $first_input.get(0).focus();
@@ -267,7 +275,8 @@ import {navigate} from '../plugins/utils/current-page-utils';
         $this.data(), typeof option === 'object' && option);
 
       if (!data) {
-        $this.data('modal_form', (data = new ModalForm(this, options, trigger)));
+        $this.data(
+          'modal_form', (data = new ModalForm(this, options, trigger)));
       }
       if (typeof option === 'string') {
         data[option]();
@@ -285,15 +294,19 @@ import {navigate} from '../plugins/utils/current-page-utils';
    * =================== */
 
   $(function () {
-    $('body').on('click.modal-form.data-api', '[data-toggle="modal-form"]', function (e) {
-      let $this = $(this);
-      let href;
-      let $target = $($this.attr('data-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')); // strip for ie7
-      let option = $target.data('modal-form') ? 'toggle' : $.extend({}, $target.data(), $this.data());
+    $('body').on('click.modal-form.data-api',
+      '[data-toggle="modal-form"]', function (e) {
+        let $this = $(this);
+        let href;
+        let $target = $($this.attr('data-target') ||
+          (href = $this.attr('href')) &&
+           href.replace(/.*(?=#[^\s]+$)/, '')); // strip for ie7
+        let option = $target.data('modal-form') ?
+          'toggle' : $.extend({}, $target.data(), $this.data());
 
-      e.preventDefault();
-      $target.modal_form(option);
-    });
+        e.preventDefault();
+        $target.modal_form(option);
+      });
   });
 
   // Default flash handler
@@ -450,7 +463,7 @@ import {navigate} from '../plugins/utils/current-page-utils';
                   $link.on('click', function () {
                     if (redirectLink) {
                       $('html').addClass('no-js');
-                      window.location.href = redirectLink;
+                      changeUrl(redirectLink);
                     }
                     window.location.reload();
                   });
@@ -472,7 +485,8 @@ import {navigate} from '../plugins/utils/current-page-utils';
     });
 
     $('body').on('ajax:html', '.modal > form', function (e, html, xhr) {
-      let sel = "script[type='text/javascript'], script[language='javascript'], script:not([type])";
+      let sel = 'script[type="text/javascript"], ' +
+                'script[language="javascript"], script:not([type])';
       let $frag = $(html);
       $frag.filter(sel).add($frag.find(sel)).each(function () {
         $(this).remove();

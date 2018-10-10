@@ -64,7 +64,7 @@ tree-widget-container {
         opacity: .7;
       }
 
-      a {
+      a, span {
         font-size: 13px;
         color: $black;
       }
@@ -81,6 +81,7 @@ tree-widget-container {
 
   .tree-footer {
     padding: 5px 8px;
+    margin: 0 40px;
   }
 }
 
@@ -106,9 +107,16 @@ tree-view {
     color: rgba(0, 0, 0, 1);
   }
 
-  tree-item:first-child {
-    .open-item {
-      margin-top: 0;
+  tree-item {
+    &:first-child {
+      .open-item {
+        margin-top: 0;
+      } 
+    }
+    &:last-of-type {
+      .open-item {
+        margin-bottom: 0;
+      }
     }
   }
 }
@@ -121,6 +129,10 @@ tree-view {
   margin: 0 8px;
 }
 
+tree-no-results {
+  margin: 0 40px;
+}
+
 tree-item {
   tree-field {
     .tree-field__item {
@@ -130,6 +142,7 @@ tree-item {
     }
   }
   >.tree-item-wrapper {
+    margin: 0 40px;
     background-color: $white;
     cursor: pointer;
 
@@ -141,7 +154,7 @@ tree-item {
 
     &.open-item {
       box-shadow: 0 0 6px rgba(0,0,0,.16), 0 6px 12px rgba(0,0,0,.32);
-      margin: 25px -20px;
+      margin: 25px 20px;
     }
   }
 

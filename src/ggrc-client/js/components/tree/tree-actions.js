@@ -89,4 +89,7 @@ export default can.Component.extend({
     model: null,
     showedItems: [],
   },
+  export() {
+    this.dispatch('export');
+  },
 });

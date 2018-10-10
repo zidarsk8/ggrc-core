@@ -54,6 +54,14 @@ class IssueTracked(object):
         uselist=False,
     )
 
+  @classmethod
+  def eager_query(cls):
+    """Define fields to be loaded eagerly to lower the count of DB queries."""
+    query = super(IssueTracked, cls).eager_query()
+    return query.options(
+        orm.joinedload('issuetracker_issue')
+    )
+
   @simple_property
   def issue_tracker(self):
     """Returns representation of issue tracker related info as a dict."""
@@ -68,6 +76,10 @@ class IssueTracked(object):
 
   def add_warning(self, message):
     self._warnings.append(message)
+
+  @simple_property
+  def warnings(self):
+    return self._warnings
 
 
 class IssueTrackedWithUrl(IssueTracked):

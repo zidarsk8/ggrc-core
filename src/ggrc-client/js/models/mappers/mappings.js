@@ -6,6 +6,7 @@
 import {getMappableTypes} from '../../plugins/ggrc_utils';
 import {getModelByType} from '../../plugins/utils/models-utils';
 import Join from '../join-models/join';
+import * as businessModels from '../business-models';
 
 /*
   class Mappings
@@ -93,6 +94,18 @@ export default can.Construct.extend({
    */
   getMappingType: function (type) {
     return this.groupTypes([type]);
+  },
+  /**
+   * Returns the list of allowed direct mapping models
+   * with possible related mapping models
+   * @param {String} type - base model type
+   * @return {Array} - list of available mappings
+   */
+  getAvailableMappings(type) {
+    let canonical = this.get_canonical_mappings_for(type);
+    let related = this.get_related_mappings_for(type);
+
+    return Object.assign({}, canonical, related);
   },
   /**
    * Return grouped types.
@@ -206,17 +219,16 @@ export default can.Construct.extend({
     return all canonical mappings (suitable for joining) from all modules for an object type.
     object - a string representing the object type's shortName
 
-    return: a keyed object of all mappings (instances of GGRC.ListLoaders.BaseListLoader) by option type
+    return: a keyed object of all mappings (instances of CMS.Models)
   */
   get_canonical_mappings_for: function (object) {
     let mappings = {};
     can.each(this.modules, (mod, name) => {
       if (mod._canonical_mappings && mod._canonical_mappings[object]) {
-        can.each(mod._canonical_mappings[object], (mappingName, option) => {
-          mappings[option] = this.get_mapper(
-            mappingName,
-            object);
-        });
+        can.each(mod._canonical_mappings[object],
+          (mappingName, model) => {
+            mappings[model] = businessModels[model];
+          });
       }
     });
     return mappings;
@@ -332,6 +344,24 @@ export default can.Construct.extend({
       return mappings.length;
     });
   },
+  /*
+    return all related mappings from all modules for an object type.
+    object - a string representing the object type's shortName
+
+    return: a keyed object of all related mappings (instances of CMS.Models)
+  */
+  get_related_mappings_for(object) {
+    let mappings = {};
+    can.each(this.modules, (mod) => {
+      if (mod._related_mappings && mod._related_mappings[object]) {
+        can.each(mod._related_mappings[object],
+          (mappingName, model) => {
+            mappings[model] = businessModels[model];
+          });
+      }
+    });
+    return mappings;
+  },
 }, {
   /*
     On init:
@@ -342,6 +372,7 @@ export default can.Construct.extend({
     let that = this;
     this.constructor.modules[name] = this;
     this._canonical_mappings = {};
+    this._related_mappings = {};
     if (this.groups) {
       can.each(this.groups, function (group, name) {
         if (typeof group === 'function') {
@@ -352,21 +383,31 @@ export default can.Construct.extend({
     createdMappings = this.create_mappings(opts);
     can.each(createdMappings, function (mappings, objectType) {
       if (mappings._canonical) {
-        if (!that._canonical_mappings[objectType]) {
-          that._canonical_mappings[objectType] = {};
-        }
-        can.each(mappings._canonical || [],
-          function (optionTypes, mappingName) {
-            if (!can.isArray(optionTypes)) {
-              optionTypes = [optionTypes];
-            }
-            can.each(optionTypes, function (optionType) {
-              that._canonical_mappings[objectType][optionType] = mappingName;
-            });
-          });
+        that._fillInMappings(objectType,
+          mappings._canonical, that._canonical_mappings);
+      }
+
+      if (mappings._related) {
+        that._fillInMappings(objectType,
+          mappings._related, that._related_mappings);
       }
     });
     $.extend(this, createdMappings);
+  },
+  _fillInMappings(objectType, config, mappings) {
+    if (!mappings[objectType]) {
+      mappings[objectType] = {};
+    }
+
+    can.each(config || [],
+      (optionTypes, mappingName) => {
+        if (!can.isArray(optionTypes)) {
+          optionTypes = [optionTypes];
+        }
+        can.each(optionTypes, (optionType) => {
+          mappings[objectType][optionType] = mappingName;
+        });
+      });
   },
   // Recursively handle mixins -- this function should not be called directly.
   reify_mixins: function (definition, definitions) {

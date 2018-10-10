@@ -129,6 +129,11 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
       u"This bug was linked to a GGRC Issue. Use the following link to find "
       u"the issue - {issue_link}."
   )
+  DETACH_TMPL = (
+      u"Another bug {new_ticket_id} has been linked to track changes to the"
+      u" GGRC Issue. Changes to the GGRC Issue will no longer be tracked"
+      u" within this bug."
+  )
 
   def _build_allowed_emails(self, obj):
     """Handle emails from object.
@@ -225,6 +230,10 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
         model=sync_obj.__class__.__name__,
         link=self.get_ggrc_object_url(sync_obj),
     ))
+    return self.params
+
+  def build_detach_comment(self, new_ticket):
+    self.params.add_comment(self.DETACH_TMPL.format(new_ticket_id=new_ticket))
     return self.params
 
   def _handle_emails_from_response(self, response):

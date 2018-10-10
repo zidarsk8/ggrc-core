@@ -2,6 +2,9 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """A collection of hooks to process IssueTracker related events."""
+# pylint: disable=too-many-lines
+# this module will be refactored in the future when we will merge two sync
+# mechanisms into generic one
 
 import collections
 import itertools
@@ -53,6 +56,11 @@ _ISSUE_TRACKER_UPDATE_FIELDS = (
 _INITIAL_COMMENT_TMPL = (
     'This bug was auto-generated to track a GGRC assessment (a.k.a PBC Item). '
     'Use the following link to find the assessment - %s.'
+)
+
+_LINK_COMMENT_TMPL = (
+    'This bug was linked to a GGRC assessment (a.k.a PBC Item). Use the '
+    'following link to find the assessment - %s'
 )
 
 _STATUS_CHANGE_COMMENT_TMPL = (
@@ -250,6 +258,9 @@ def _handle_audit_post(sender, objects=None, sources=None):
     issue_tracker_info = src.get('issue_tracker')
     if not issue_tracker_info:
       continue
+    _, issue_tracker_info["cc_list"] = _collect_audit_emails(
+        src.get("access_control_list", [])
+    )
     integration_utils.validate_issue_tracker_info(issue_tracker_info)
     all_models.IssuetrackerIssue.create_or_update_from_dict(
         obj, issue_tracker_info)
@@ -260,6 +271,9 @@ def _handle_audit_put(sender, obj=None, src=None, service=None):
   del sender, service  # Unused
   issue_tracker_info = src.get('issue_tracker')
   if issue_tracker_info:
+    _, issue_tracker_info["cc_list"] = _collect_audit_emails(
+        src.get("access_control_list", [])
+    )
     integration_utils.validate_issue_tracker_info(issue_tracker_info)
     all_models.IssuetrackerIssue.create_or_update_from_dict(
         obj, issue_tracker_info)
@@ -309,7 +323,7 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):
       _create_issuetracker_info(obj, issue_tracker_info)
       return
 
-    _, issue_tracker_info['cc_list'] = _collect_issue_emails(obj)
+    _, issue_tracker_info['cc_list'] = _collect_assessment_emails(obj)
 
   else:
     issue_tracker_info['enabled'] = False
@@ -317,6 +331,8 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):
   initial_assessment = kwargs.pop('initial_state', None)
 
   issue_tracker_info['title'] = obj.title
+  if not issue_tracker_info.get('due_date'):
+    issue_tracker_info['due_date'] = obj.start_date
 
   try:
     _update_issuetracker_issue(
@@ -471,7 +487,7 @@ def _get_roles(assessment):
   return all_roles
 
 
-def _collect_issue_emails(assessment):
+def _collect_assessment_emails(assessment):
   """Returns emails related to given assessment.
 
   The lexicographical first Assignee is used for assignee_email.
@@ -490,6 +506,78 @@ def _collect_issue_emails(assessment):
   cc_list = sorted(cc_list) if cc_list else []
   assignee_email = cc_list.pop(0) if cc_list else None
   return assignee_email, cc_list
+
+
+def _collect_audit_emails(acl_payload):
+  """Returns emails related to audit.
+
+  Args:
+    acl_payload: Dict with ACL data
+
+  Returns:
+    A tuple of (reporter_email, [related_people_emails])
+  """
+  role_id = access_control.role.get_ac_roles_for(
+      "Audit"
+  )["Audit Captains"].id
+
+  person_ids = [
+      acl["person"]["id"] for acl in acl_payload
+      if acl.get("ac_role_id") == role_id and acl.get("person", {}).get("id")
+  ]
+
+  if person_ids:
+    reporter_id = person_ids[0]
+
+    persons = db.session.query(
+        all_models.Person.id,
+        all_models.Person.email
+    ).filter(
+        all_models.Person.id.in_(person_ids)
+    )
+
+    persons = {person[0]: person[1]
+               for person in persons}
+    reporter_email = persons.pop(reporter_id)
+    cc_list = persons.values()
+
+    return reporter_email, cc_list
+  return "", []
+
+
+def get_audit_ccs(assessment):
+  """Returns audit CCs regarding assessment.
+
+  Args:
+    assessment: An instance of Assessment model.
+
+  Returns:
+    List of audit ccs
+  """
+  audit_issuetracker_issue = assessment.audit.issuetracker_issue
+  if audit_issuetracker_issue is not None and audit_issuetracker_issue.cc_list:
+    audit_ccs = audit_issuetracker_issue.cc_list.split(",")
+  else:
+    audit_ccs = []
+
+  return audit_ccs
+
+
+def group_cc_emails(audit_ccs, assessment_ccs):
+  """Returns grouped cc emails between audit and assessment.
+
+  Args:
+    audit_ccs: List of audit ccs
+    assessment_ccs: List of assessment ccs
+
+  Returns:
+    Grouped list of ccs
+  """
+  audit_ccs = frozenset(audit_ccs)
+  assessment_ccs = frozenset(assessment_ccs)
+  grouped_ccs = list(audit_ccs.union(assessment_ccs))
+
+  return grouped_ccs
 
 
 def _get_assessment_url(assessment):
@@ -651,16 +739,17 @@ def get_reporter_email(assessment):
   return reporter_email
 
 
-def create_asmnt_comment(assessment):
+def create_asmnt_comment(assessment, issue_id):
   """Create comment for generated IssueTracker issue related to assessment.
 
   Args:
       assessment: Instance of Assessment for which comment should be created.
-
+      issue_id: Issue Tracker ticket ID
   Returns:
       String with created comments separated with '\n'.
   """
-  comments = [_INITIAL_COMMENT_TMPL % _get_assessment_url(assessment)]
+  comment_tmpl = _LINK_COMMENT_TMPL if issue_id else _INITIAL_COMMENT_TMPL
+  comments = [comment_tmpl % _get_assessment_url(assessment)]
   test_plan = assessment.test_plan
   if test_plan:
     comments.extend([
@@ -691,13 +780,13 @@ def prepare_issue_json(assessment, issue_tracker_info=None):
 
   integration_utils.normalize_issue_tracker_info(issue_tracker_info)
 
-  assignee_email, cc_list = _collect_issue_emails(assessment)
+  assignee_email, cc_list = _collect_assessment_emails(assessment)
   if assignee_email is not None:
     issue_tracker_info['assignee'] = assignee_email
     issue_tracker_info['cc_list'] = cc_list
 
   hotlist_id = issue_tracker_info.get('hotlist_id')
-
+  issue_id = issue_tracker_info.get('issue_id') if issue_tracker_info else None
   issue_params = {
       'component_id': issue_tracker_info['component_id'],
       'hotlist_ids': [hotlist_id] if hotlist_id else [],
@@ -710,8 +799,21 @@ def prepare_issue_json(assessment, issue_tracker_info=None):
       'verifier': '',
       'status': issue_tracker_info['status'],
       'ccs': [],
-      'comment': create_asmnt_comment(assessment),
+      'comment': create_asmnt_comment(assessment, issue_id),
   }
+  custom_fields = []
+
+  due_date = issue_tracker_info.get('due_date')
+  if due_date:
+    custom_fields.append({
+        "name": "Due Date",
+        "value": due_date.strftime("%Y-%m-%d"),
+        "type": "DATE",
+        "display_string": "Due Date"
+    })
+
+  if custom_fields:
+    issue_params['custom_fields'] = custom_fields
 
   assignee = issue_tracker_info.get('assignee')
   if assignee:
@@ -720,54 +822,105 @@ def prepare_issue_json(assessment, issue_tracker_info=None):
     issue_params['assignee'] = assignee
     issue_params['verifier'] = assignee
 
-  cc_list = issue_tracker_info.get('cc_list')
-  if cc_list is not None:
-    issue_params['ccs'] = cc_list
+  cc_list = issue_tracker_info.get('cc_list', [])
+  audit_ccs = get_audit_ccs(assessment)
+  grouped_ccs = group_cc_emails(audit_ccs, cc_list)
+
+  if grouped_ccs:
+    issue_params['ccs'] = grouped_ccs
 
   return issue_params
 
 
-def _create_issuetracker_issue(assessment, issue_tracker_info):
-  """Collects information and sends a request to create external issue."""
+def _link_assessment(assessment, issue_tracker_info):
+  """Link Assessment to existing IssueTracker ticket"""
+  ticket_id = issue_tracker_info['issue_id']
+  if integration_utils.is_already_linked(ticket_id):
+    logger.error(
+        "Unable to link a ticket while creating object ID=%d: %s ticket ID is "
+        "already linked to another GGRC object",
+        assessment.id,
+        ticket_id,
+    )
+    assessment.add_warning(
+        "Unable to link to issue tracker. Ticket is already linked to another"
+        "GGRC object"
+    )
+    issue_tracker_info['enabled'] = False
+    return
+
+  try:
+    issues.Client().get_issue(ticket_id)
+  except integrations_errors.Error as error:
+    logger.error(
+        "Unable to link a ticket while creating object ID=%d: %s",
+        assessment.id,
+        error,
+    )
+    assessment.add_warning(
+        "Ticket tracker ID does not exist or you do not have access to it."
+    )
+    issue_tracker_info['enabled'] = False
+    return
+
   issue_params = prepare_issue_json(assessment, issue_tracker_info)
-  res = issues.Client().create_issue(issue_params)
-  return res['issueId']
+
+  try:
+    issues.Client().update_issue(ticket_id, issue_params)
+  except integrations_errors.Error as error:
+    logger.error(
+        'Unable to link a ticket while creating assessment ID=%d: %s',
+        assessment.id, error)
+    issue_tracker_info['enabled'] = False
+    assessment.add_warning('Unable to link a ticket.')
+  else:
+    issue_url = integration_utils.build_issue_tracker_url(ticket_id)
+    issue_tracker_info['issue_id'] = ticket_id
+    issue_tracker_info['issue_url'] = issue_url
+
+
+def _create_new_issuetracker_ticket(assessment, issue_tracker_info):
+  """Create new IssueTracker ticket for assessment"""
+  issue_tracker_request = prepare_issue_json(assessment, issue_tracker_info)
+  try:
+    res = issues.Client().create_issue(issue_tracker_request)
+  except integrations_errors.Error as error:
+    logger.error(
+        'Unable to create a ticket while creating assessment ID=%d: %s',
+        assessment.id, error)
+    issue_tracker_info['enabled'] = False
+    assessment.add_warning('Unable to create a ticket.')
+  else:
+    issue_id = res['issueId']
+    issue_url = integration_utils.build_issue_tracker_url(issue_id)
+    issue_tracker_info['issue_id'] = issue_id
+    issue_tracker_info['issue_url'] = issue_url
 
 
 def _create_issuetracker_info(assessment, issue_tracker_info):
   """Creates an entry for IssueTracker model."""
   if not issue_tracker_info.get('title'):
     issue_tracker_info['title'] = assessment.title
+  if not issue_tracker_info.get('due_date'):
+    issue_tracker_info['due_date'] = assessment.start_date
   issue_tracker_info['status'] = ASSESSMENT_STATUSES_MAPPING.get(
       assessment.status
   )
 
   if (issue_tracker_info.get('enabled') and
           _is_issue_tracker_enabled(audit=assessment.audit)):
-    try:
-      issue_id = _create_issuetracker_issue(assessment, issue_tracker_info)
-    except integrations_errors.Error as error:
-      logger.error(
-          'Unable to create a ticket while creating assessment ID=%d: %s',
-          assessment.id, error)
-      issue_tracker_info = {
-          'enabled': False,
-      }
-      assessment.add_warning('Unable to create a ticket.')
+    if issue_tracker_info.get("issue_id"):
+      _link_assessment(assessment, issue_tracker_info)
     else:
-      issue_url = integration_utils.build_issue_tracker_url(issue_id)
-      issue_tracker_info['issue_id'] = issue_id
-      issue_tracker_info['issue_url'] = issue_url
+      _create_new_issuetracker_ticket(assessment, issue_tracker_info)
   else:
-    issue_tracker_info = {
-        'enabled': False,
-    }
+    issue_tracker_info = {'enabled': False}
 
   all_models.IssuetrackerIssue.create_or_update_from_dict(
       assessment, issue_tracker_info)
 
 
-def _update_issuetracker_issue(assessment, issue_tracker_info,
+def _update_issuetracker_issue(assessment, issue_tracker_info,  # noqa
                                initial_assessment, initial_info, request):
   """Collects information and sends a request to update external issue."""
   # pylint: disable=too-many-locals
@@ -813,12 +966,30 @@ def _update_issuetracker_issue(assessment, issue_tracker_info,
     issue_params['hotlist_ids'] = [hotlist_id] if hotlist_id else []
 
   # handle assignee and cc_list update
-  assignee_email, cc_list = _collect_issue_emails(assessment)
+  assignee_email, cc_list = _collect_assessment_emails(assessment)
+  audit_ccs = get_audit_ccs(assessment)
+  grouped_ccs = group_cc_emails(audit_ccs, cc_list)
+
   if assignee_email is not None:
     issue_tracker_info['assignee'] = assignee_email
     issue_params['assignee'] = assignee_email
     issue_params['verifier'] = assignee_email
-    issue_params['ccs'] = cc_list
+    issue_params['ccs'] = grouped_ccs
+
+  custom_fields = []
+
+  # handle due_date update
+  due_date = issue_tracker_info.get('due_date')
+  if due_date:
+    custom_fields.append({
+        "name": "Due Date",
+        "value": due_date.strftime("%Y-%m-%d"),
+        "type": "DATE",
+        "display_string": "Due Date"
+    })
+
+  if custom_fields:
+    issue_params['custom_fields'] = custom_fields
 
   if issue_params:
     # Resend all properties upon any change.

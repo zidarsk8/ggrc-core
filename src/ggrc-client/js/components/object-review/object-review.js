@@ -38,7 +38,7 @@ export default can.Component.extend({
           return this.attr('reviewStatus') === 'reviewed';
         },
       },
-      wasReviewed: {
+      showLastReviewInfo: {
         get() {
           return !!this.attr('review.last_reviewed_by');
         },
@@ -46,14 +46,12 @@ export default can.Component.extend({
       showButtons: {
         get() {
           return !this.attr('isReviewed') &&
-            !isSnapshot(this.attr('instance')) &&
             this.attr('hasUpdatePermission');
         },
       },
-      showHistoryLink: {
+      isSnapshot: {
         get() {
-          return !this.attr('isReviewed') &&
-            !isSnapshot(this.attr('instance'));
+          return isSnapshot(this.attr('instance'));
         },
       },
       hasUpdatePermission: {
@@ -85,7 +83,7 @@ export default can.Component.extend({
     loadReview() {
       const review = this.attr('instance.review');
 
-      if (review) {
+      if (!this.attr('isSnapshot') && review) {
         this.attr('loading', true);
 
         new Review(review)

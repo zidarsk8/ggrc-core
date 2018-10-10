@@ -50,7 +50,7 @@
   &.mapped-snapshot-item {
     background: $snapshotBgnd;
     border: 1px solid $shapshotBorder;
-    border-radius: 2px
+    border-radius: 2px;
   }
 
   .title {
@@ -79,6 +79,7 @@
   .description {
     width: 100%;
     padding: 0 8px 0 28px;
+    line-height: 18px;
     box-sizing: border-box;
     word-wrap: break-word;
   }
@@ -86,7 +87,7 @@
   .more-information-wrapper {
     display: flex;
     justify-content: flex-end;
-    height: 18px;
+    height: 24px;
 
     .more-information-button {
       line-height: 12px;

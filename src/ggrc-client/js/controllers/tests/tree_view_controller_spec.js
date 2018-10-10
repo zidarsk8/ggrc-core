@@ -5,7 +5,6 @@
 
 import '../tree/tree-loader';
 import '../tree/tree-view';
-import DisplayPrefs from '../../models/local-storage/display-prefs';
 
 describe('CMS.Controllers.TreeView', function () {
   'use strict';
@@ -14,35 +13,6 @@ describe('CMS.Controllers.TreeView', function () {
 
   beforeAll(function () {
     Ctrl = CMS.Controllers.TreeView;
-  });
-
-  describe('init() method', function () {
-    let ctrlInst; // fake controller instance
-    let dfdSingleton;
-    let method;
-    let options;
-    let $element;
-
-    beforeEach(function () {
-      options = {};
-      $element = $('<div></div>');
-
-      ctrlInst = {
-        element: $element,
-        widget_hidden: jasmine.createSpy('widget_hidden'),
-        widget_shown: jasmine.createSpy('widget_shown'),
-        options: new can.Map(options),
-      };
-
-      method = Ctrl.prototype.init.bind(ctrlInst);
-
-      dfdSingleton = new can.Deferred();
-      spyOn(
-        DisplayPrefs, 'getSingleton'
-      ).and.returnValue(dfdSingleton);
-    });
-
-    // test cases here...
   });
 
   describe('{original_list} remove event handler', function () {

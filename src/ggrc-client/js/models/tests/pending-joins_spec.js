@@ -77,7 +77,8 @@ describe('pending-joins module', () => {
         instance = jasmine.createSpyObj('instance',
           ['isNew', 'refresh', 'attr', 'dispatch']);
         binding = jasmine.createSpyObj('binding', ['refresh_stubs']);
-        instance._pending_joins = [{what: dummy, how: 'remove', through: 'foo'}];
+        instance._pending_joins = [{
+          what: dummy, how: 'remove', through: 'foo'}];
         instance.isNew.and.returnValue(false);
         spyOn(Mappings, 'get_binding').and.returnValue(binding);
         binding.loader = {model_name: 'DummyJoin'};

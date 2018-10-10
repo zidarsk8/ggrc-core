@@ -14,7 +14,7 @@ import {
   downloadExportContent,
   deleteExportJob,
   jobStatuses,
-} from './import-export-utils';
+} from '../../plugins/utils/import-export-utils';
 import {
   isConnectionLost,
   handleAjaxError,

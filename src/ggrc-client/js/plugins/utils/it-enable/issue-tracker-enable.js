@@ -36,7 +36,8 @@ const request = async (url, body) => {
   let response = await fetch(url, params);
   return response.json();
 };
-const getRelatedAssessmentsIds = async (filters = relevantToAuditFilter, limit) => {
+const getRelatedAssessmentsIds = async (filters = relevantToAuditFilter,
+  limit) => {
   let query = {
     object_name: 'Assessment',
     filters,

@@ -139,8 +139,9 @@
         if (depth === 1) {
           if (instance === true) {
             mappings.push(self.instance);
-          } else
+          } else {
             mappings.push(instance);
+          }
         }
       });
       return mappings;

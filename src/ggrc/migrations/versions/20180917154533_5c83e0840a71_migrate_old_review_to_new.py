@@ -70,7 +70,8 @@ def get_object_mapping_info(conn, table, obj_type, review_status):
             r.source_type="{obj_type}" AND
             r.destination_type="CycleTaskGroupObjectTask"
           JOIN cycle_task_group_object_tasks ctgot ON
-            ctgot.id = r.destination_id
+            ctgot.id = r.destination_id AND
+            ctgot.title like 'Object review for%'
           JOIN cycles cy ON cy.id = ctgot.cycle_id
           JOIN workflows w ON w.id = cy.workflow_id
           JOIN cycle_task_groups ctg ON cy.id = ctg.cycle_id
@@ -95,7 +96,8 @@ def get_object_mapping_info(conn, table, obj_type, review_status):
           r.destination_type="{obj_type}" AND
           r.source_type="CycleTaskGroupObjectTask"
         JOIN cycle_task_group_object_tasks ctgot ON
-          ctgot.id = r.source_id
+          ctgot.id = r.source_id AND
+          ctgot.title like 'Object review for%'
         JOIN cycles cy ON cy.id = ctgot.cycle_id
         JOIN workflows w ON w.id = cy.workflow_id
         JOIN cycle_task_groups ctg ON cy.id = ctg.cycle_id
@@ -326,7 +328,7 @@ def process_migrated_unreviewed(conn, migrator_id):
 
 def process_non_migrated(conn, migrator_id, state):
   """Process objects that had state and not migrated"""
-  for reviewable, obj_type in MIGRATED_REVIEWABLES:
+  for reviewable, obj_type in NON_MIGRATED_REVIEWABLES:
     print "Processing -> {} : {}".format(obj_type, state)
     for data in get_object_mapping_info(conn, reviewable,
                                         obj_type, state):

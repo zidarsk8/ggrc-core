@@ -50,7 +50,7 @@ export default Cacheable('CMS.Models.Cycle', {
       attr_name: 'title',
       order: 10,
     }, {
-      attr_title: 'State ',
+      attr_title: 'State',
       attr_name: 'status',
       order: 15,
     }, {
@@ -62,7 +62,6 @@ export default Cacheable('CMS.Models.Cycle', {
     disable_columns_configuration: true,
   },
   init: function () {
-    let that = this;
     this._super(...arguments);
     this.bind('created', refreshAttrWrap('workflow').bind(this));
   },

@@ -4,6 +4,12 @@
  */
 
 .widget {
+  &.dashboard_widgets {
+    margin: 0 40px;
+    &.treeview {
+      margin: 0;
+    }
+  }
   .header {
     @extend %row-fluid-fix;
     height: 30px;

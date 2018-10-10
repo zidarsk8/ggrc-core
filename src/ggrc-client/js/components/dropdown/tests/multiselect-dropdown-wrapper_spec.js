@@ -138,9 +138,7 @@ describe('multiselect-dropdown-wrapper component', function () {
     });
   });
 
-  describe('events', () => {
-    let events;
-    let handler;
+  describe('selectedChanged() method', () => {
     let newSelected;
 
     beforeEach(function () {
@@ -158,32 +156,22 @@ describe('multiselect-dropdown-wrapper component', function () {
         },
       ]);
 
-      events = Component.prototype.events;
-      handler = events['multiselect-dropdown multiselect:changed']
-        .bind({viewModel: viewModel});
-
       newSelected = [{id: 1}];
     });
 
     it('should call findInCacheById', () => {
-      handler({}, {}, newSelected);
+      viewModel.selectedChanged({selected: newSelected});
 
       expect(TestType.findInCacheById).toHaveBeenCalled();
     });
 
     it('should get model from cache', () => {
-      handler({}, {}, newSelected);
+      viewModel.selectedChanged({selected: newSelected});
 
       expect(viewModel.selected.length).toEqual(newSelected.length);
       expect(viewModel.selected[0].id).toEqual('testId');
       expect(viewModel.selected[0].name).toEqual('testName');
       expect(viewModel.selected[0].extra).toEqual('extra');
-    });
-
-    it('should keep an object', () => {
-      let initialObj = viewModel.selected;
-      handler({}, {}, newSelected);
-      expect(viewModel.selected).toEqual(initialObj);
     });
   });
 });

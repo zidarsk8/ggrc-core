@@ -26,9 +26,9 @@
         >
           <multiselect-dropdown
             {options}="filterStates"
-            placeholder="Filter by State"
-            plural="States"
-            {disabled}="advancedSearch.filter">
+            {placeholder}="'Filter by State'"
+            {disabled}="advancedSearch.filter"
+            (dropdown-close)="selectItems(%event)">
           </multiselect-dropdown>
           {{#if statusTooltipVisible}}
             <i class="fa fa-question-circle" rel="tooltip"
@@ -46,6 +46,7 @@
       {options}="options"
       {model}="model"
       {showed-items}="showedItems"
+      (export)="export"
     ></tree-actions>
 
     <simple-modal {state}="advancedSearch" modal-title="'{{model.title_singular}} Advanced Search'" extra-css-class="advanced-search">

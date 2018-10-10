@@ -57,14 +57,14 @@ class TestComprehensiveSheets(TestCase):
   LIMIT_DICT = {
       "LIST": {
           all_models.Revision: 67,
-          all_models.Event: 66,
+          all_models.Event: 67,
       },
       "SINGLE": {}
   }
   DEFAULT_LIMIT = 39
 
   def test_queries_per_api_call(self):
-    """Import comprehensive_sheet1 and count db requests per {0.__name__}
+    """Import comprehensive_sheet1 and count db requests per model.
 
     collection get
     Query count should be <LIMIT for all model types.

@@ -25,7 +25,7 @@ let viewModel = can.Map.extend({
       set: function (state) {
         if (!state.attr('items')) {
           let defaultStates =
-            StateUtils.getDefaultStatesForModel(this.attr('modelName'));
+            StateUtils.getStatesForModel(this.attr('modelName'));
           state.attr('items', defaultStates);
         }
         if (!state.attr('operator')) {
@@ -37,16 +37,23 @@ let viewModel = can.Map.extend({
           'Launch Status' : 'State';
         state.attr('label', stateLabel);
 
+        return state;
+      },
+    },
+    filterStates: {
+      get() {
+        let items = this.attr('stateModel.items') || [];
         let allStates =
           StateUtils.getStatesForModel(this.attr('modelName'));
-        this.attr('filterStates', allStates.map(function (filterState) {
+
+        let filterStates = allStates.map((filterState) => {
           return {
             value: filterState,
-            checked: (state.attr('items').indexOf(filterState) > -1),
+            checked: (items.indexOf(filterState) > -1),
           };
-        }));
+        });
 
-        return state;
+        return filterStates;
       },
     },
     /**
@@ -101,6 +108,13 @@ let viewModel = can.Map.extend({
 
     this.attr('stateModel.items', states);
   },
+  /**
+   * handler is passed to child component, which is dispatched when items changed
+   * @param {Object} event - event which contains array of selected items.
+   */
+  statesChanged(event) {
+    this.saveTreeStates(event.selected);
+  },
 });
 
 /**
@@ -110,16 +124,4 @@ export default can.Component.extend({
   tag: 'advanced-search-filter-state',
   template: template,
   viewModel: viewModel,
-  events: {
-    /**
-     * Saves selected states.
-     * @param {object} el - clicked element.
-     * @param {object} ev - event object.
-     * @param {Array} selected - selected items.
-     */
-    'multiselect-dropdown multiselect:changed': function (el, ev, selected) {
-      ev.stopPropagation();
-      this.viewModel.saveTreeStates(selected);
-    },
-  },
 });
