@@ -316,10 +316,11 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
         orm.joinedload('cycle')
            .undefer_group('Cycle_complete'),
         orm.joinedload('cycle')
-           .joinedload('contact'),
-        orm.joinedload('cycle')
            .joinedload('workflow')
            .undefer_group('Workflow_complete'),
+        orm.joinedload('cycle')
+           .joinedload('workflow')
+           .joinedload('access_control_list'),
         orm.joinedload('cycle_task_group')
            .undefer_group('CycleTaskGroup_complete'),
     )
