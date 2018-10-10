@@ -54,21 +54,6 @@ export default can.Construct.extend({
    * @return {Array} - list of allowed for mapping Models
    */
   getMappingList: function (type, include, exclude) {
-    let baseModel = getModelByType(type);
-    exclude = exclude || [];
-    include = include || [];
-    if (!baseModel) {
-      return [];
-    }
-
-    if (_.isFunction(baseModel.getAllowedMappings)) {
-      return baseModel
-        .getAllowedMappings()
-        .filter(function (model) {
-          return exclude.indexOf(model) < 0;
-        })
-        .concat(include);
-    }
     return getMappableTypes(type, {
       whitelist: include,
       forbidden: exclude,

@@ -13,7 +13,6 @@ import uniqueTitle from '../mixins/unique-title';
 import caUpdate from '../mixins/ca-update';
 import autoStatusChangeable from '../mixins/auto-status-changeable';
 import timeboxed from '../mixins/timeboxed';
-import mappingLimit from '../mixins/mapping-limit';
 import inScopeObjects from '../mixins/in-scope-objects';
 import accessControlList from '../mixins/access-control-list';
 import refetchHash from '../mixins/refetch-hash';
@@ -32,7 +31,7 @@ export default Cacheable('CMS.Models.Assessment', {
   create: 'POST /api/assessments',
   mixins: [
     uniqueTitle, caUpdate,
-    autoStatusChangeable, timeboxed, mappingLimit,
+    autoStatusChangeable, timeboxed,
     inScopeObjects, accessControlList, refetchHash,
     assessmentIssueTracker, relatedAssessmentsLoader,
   ],
