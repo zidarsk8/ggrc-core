@@ -9,16 +9,15 @@ from lib import decorator
 class TableWithHeaders(object):
   """Represents generic table with headers."""
 
-  def __init__(self, container, header_locator, table_rows):
+  def __init__(self, container, header_elements, table_rows):
     self._root = container
-    self._header_locator = header_locator
+    self._header_elements = header_elements
     self._table_rows = table_rows
 
   def table_header_names(self):
     """Returns names of table headers."""
     # JS `text_content` is used as displayed text is capitalized using CSS
-    return [el.text_content for el in self._root.elements(
-        **self._header_locator)]
+    return [el.text_content for el in self._header_elements()]
 
   def get_table_row_by(self, **conditions):
     """Returns a table row that matches conditions."""

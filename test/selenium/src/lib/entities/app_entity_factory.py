@@ -8,6 +8,13 @@ from lib.entities import app_entity
 from lib.utils import random_utils, date_utils
 
 
+def get_factory_by_obj_name(obj_name):
+  """Returns factory class by object name."""
+  return {
+      "control": ControlFactory
+  }[obj_name]
+
+
 class _BaseFactory(object):
   """Base factory for app entities."""
 
@@ -18,10 +25,13 @@ class _BaseFactory(object):
 
   @property
   def _random_attrs(self):
-    """Returns a dict with additional default arguments to pass to app entity's
-    constructor. To be overridden in subclass.
+    """Returns a valid dict of attributes:
+    * mandatory attributes set to random values
+    * other attributes set to empty not-None values (e.g. empty lists or
+    dicts).
+    May be overridden in subclass.
     """
-    raise NotImplementedError
+    return {}
 
   def create(self, **attrs):
     """Creates a random app entity with `args`."""
@@ -104,3 +114,23 @@ class PersonFactory(_BaseFactory):
         "name": self._obj_title,
         "email": random_utils.get_email()
     }
+
+
+class ControlFactory(_BaseFactory):
+  """Factory for Control entities."""
+  _entity_cls = app_entity.Control
+
+  @property
+  def _random_attrs(self):
+    """See superclass."""
+    from lib.rest import control_assertions
+    return {
+        "title": self._obj_title,
+        "admins": [users.current_person()],
+        "assertions": [control_assertions.assertion_with_name("Security")]
+    }
+
+
+class ControlAssertionFactory(_BaseFactory):
+  """Factory for Control Assertions."""
+  _entity_cls = app_entity.ControlAssertion

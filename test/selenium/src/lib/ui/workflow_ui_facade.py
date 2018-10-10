@@ -44,3 +44,17 @@ def get_task_group_tasks_objs():
   return [ui_dict_convert.task_group_task_ui_to_app(task_row.obj_dict())
           for task_row
           in task_group_info_panel.TaskGroupInfoPanel().task_rows()]
+
+
+def add_obj_to_task_group(obj, task_group):
+  """Map existing object `obj` to the task group `task_group`."""
+  setup_tab = workflow_tabs.SetupTab()
+  setup_tab.open_via_url(task_group.workflow)
+  setup_tab.add_obj_to_task_group(obj=obj, task_group=task_group)
+
+
+def get_objs_added_to_task_group(task_group):
+  """Returns list of objects mapped to the task group."""
+  setup_tab = workflow_tabs.SetupTab()
+  setup_tab.open_via_url(task_group.workflow)
+  return setup_tab.get_objs_added_to_task_group(task_group)

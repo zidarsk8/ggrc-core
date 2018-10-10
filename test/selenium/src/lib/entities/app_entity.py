@@ -94,3 +94,18 @@ class Person(_Base):
   """Represents Person entity."""
   name = attr.ib()
   email = attr.ib()
+
+
+@attr.s
+class Control(_Base):
+  """Represents Control entity."""
+  title = attr.ib()
+  admins = attr.ib()
+  code = attr.ib()
+  assertions = attr.ib()
+
+
+@attr.s
+class ControlAssertion(_Base):
+  """Represents control assertion."""
+  name = attr.ib()

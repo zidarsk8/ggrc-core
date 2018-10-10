@@ -1,6 +1,6 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""REST facade for Workflow objects."""
+"""REST service for Workflow objects."""
 from lib.rest import rest_convert, base_rest_service
 
 
