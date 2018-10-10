@@ -34,7 +34,7 @@ const scopingObjects = [
   new Mappings('ggrc_core', {
     base: {},
     relatedMappings: {
-      _related: ['Person', 'TaskGroup', 'Workflow'],
+      _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
     },
     relatedObject: {
       related_objects_as_source: Proxy(
@@ -67,7 +67,8 @@ const scopingObjects = [
     coreObjectsMappings: {
       _mixins: ['relatedObject', 'relatedMappings'],
       _canonical: {
-        related_objects_as_source: businessObjects,
+        related_objects_as_source:
+          _.difference(businessObjects, ['Assessment']),
       },
     },
 
@@ -81,7 +82,8 @@ const scopingObjects = [
     Contract: {
       _mixins: ['coreObjectsMappings'],
       _canonical: {
-        related_objects_as_source: _.difference(businessObjects, ['Contract']),
+        related_objects_as_source:
+          _.difference(businessObjects, ['Assessment', 'Contract']),
       },
     },
     Control: {
@@ -93,7 +95,8 @@ const scopingObjects = [
     Policy: {
       _mixins: ['coreObjectsMappings'],
       _canonical: {
-        related_objects_as_source: _.difference(businessObjects, ['Policy']),
+        related_objects_as_source:
+          _.difference(businessObjects, ['Assessment', 'Policy']),
       },
     },
     Requirement: {
@@ -103,9 +106,11 @@ const scopingObjects = [
       _mixins: ['relatedObject'],
       _canonical: {
         related_objects_as_source:
-          _.difference(businessObjects, [...scopingObjects, 'Regulation']),
+          _.difference(businessObjects,
+            [...scopingObjects, 'Assessment', 'Regulation']),
       },
-      _related: [...scopingObjects, 'Person', 'TaskGroup', 'Workflow'],
+      _related:
+        [...scopingObjects, 'Assessment', 'Person', 'TaskGroup', 'Workflow'],
     },
     Risk: {
       _mixins: ['coreObjectsMappings'],
@@ -114,9 +119,11 @@ const scopingObjects = [
       _mixins: ['relatedObject'],
       _canonical: {
         related_objects_as_source:
-          _.difference(businessObjects, [...scopingObjects, 'Standard']),
+          _.difference(businessObjects,
+            [...scopingObjects, 'Assessment', 'Standard']),
       },
-      _related: [...scopingObjects, 'Person', 'TaskGroup', 'Workflow'],
+      _related:
+        [...scopingObjects, 'Assessment', 'Person', 'TaskGroup', 'Workflow'],
     },
     Threat: {
       _mixins: ['coreObjectsMappings'],
@@ -127,16 +134,18 @@ const scopingObjects = [
       _mixins: ['relatedObject'],
       _canonical: {
         related_objects_as_source:
-          _.difference(businessObjects, ['Standard', 'Regulation']),
+          _.difference(businessObjects,
+            ['Assessment', 'Standard', 'Regulation']),
       },
-      _related: ['Person', 'Regulation', 'Standard', 'TaskGroup', 'Workflow'],
+      _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
+        'Workflow'],
     },
     AccessGroup: {
       _mixins: ['scopingObjectsMappings'],
       _canonical: {
         related_objects_as_source:
           _.difference(businessObjects,
-            ['AccessGroup', 'Standard', 'Regulation']),
+            ['Assessment', 'AccessGroup', 'Standard', 'Regulation']),
       },
     },
     DataAsset: {

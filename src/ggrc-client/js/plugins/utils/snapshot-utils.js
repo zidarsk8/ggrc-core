@@ -20,11 +20,6 @@ import * as businessModels from '../../models/business-models';
  */
 
 const inScopeModels = ['Assessment', 'AssessmentTemplate'];
-const outOfScopeModels = ['Person', 'Program'];
-
-function getInScopeModels() {
-  return inScopeModels;
-}
 
 /**
  * Set extra attrs for snapshoted objects or snapshots
@@ -272,8 +267,6 @@ function getSnapshotsCounts(instance) {
 }
 
 export {
-  getInScopeModels,
-  outOfScopeModels,
   isSnapshot,
   isSnapshotScope,
   isSnapshotParent,

@@ -44,7 +44,7 @@ describe('Mappings', function () {
         'TechnologyEnvironment',
         'Threat',
       ],
-      notMappable: ['AssessmentTemplate', 'Evidence', 'Person'],
+      notMappable: ['Assessment', 'AssessmentTemplate', 'Evidence', 'Person'],
       scope: [
         'Metric', 'TechnologyEnvironment', 'AccessGroup', 'DataAsset',
         'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
