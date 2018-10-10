@@ -151,6 +151,9 @@ def parse_user_email(request, header, mandatory):
   except (TypeError, ValueError, KeyError):
     raise exceptions.BadRequest(
         errors.WRONG_PERSON_HEADER_FORMAT.format(header, user))
+  if '@' not in parseaddr(email)[1]:
+    raise exceptions.BadRequest(
+        errors.WRONG_PERSON_HEADER_FORMAT.format(header, user))
   return email
 
 
