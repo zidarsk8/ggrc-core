@@ -91,7 +91,7 @@ class TestUserGenerator(TestCase):
     self.assert_profiles_restrictions()
     emails = ['aturing@example.com', ]
     self.assert_person_profile_created(emails)
-    self.assertEqual(all_models.Event.query.count(), 3)
+    self.assertEqual(all_models.Event.query.count(), 1)
 
   @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
   @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')

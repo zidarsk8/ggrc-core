@@ -6,9 +6,12 @@
 Login as example user for development mode.
 """
 
-import flask_login
 import json
+import flask_login
 from flask import url_for, redirect, request, session, g, flash
+
+from ggrc import db
+from ggrc.utils.log_event import log_event
 
 default_user_name = 'Example User'
 default_user_email = 'user@example.com'
@@ -39,9 +42,13 @@ def before_request(*args, **kwargs):
 
 def login():
   from ggrc.login.common import get_next_url
-  user = get_user()
-  if user.system_wide_role != 'No Access':
-    flask_login.login_user(user)
+  db_user = get_user()
+  if db_user.id is None:
+    db.session.flush()
+    log_event(db.session, db_user, db_user.id)
+    db.session.commit()
+  if db_user.system_wide_role != 'No Access':
+    flask_login.login_user(db_user)
     return redirect(get_next_url(request, default_url=url_for('dashboard')))
   else:
     flash(u'You do not have access. Please contact your administrator.',
