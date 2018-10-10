@@ -240,25 +240,16 @@ function allowedToMap(source, target, options) {
   let sourceContext;
   let createContexts;
 
-  let FORBIDDEN = Object.freeze({
-    oneWay: Object.freeze({
-      // mapping audit to issue is not allowed,
-      // but unmap can be possible
-      'issue audit': !(options && options.isIssueUnmap),
-    }),
+  const MAPPING_RULES = Object.freeze({
+    // mapping audit and assessment to issue is not allowed,
+    // but unmap can be possible
+    'issue audit': (options && options.isIssueUnmap),
+    'issue assessment': (options && options.isIssueUnmap),
   });
 
   targetType = getType(target);
   sourceType = getType(source);
   types = [sourceType.toLowerCase(), targetType.toLowerCase()];
-
-  // One-way check
-  // special case check:
-  // - mapping an Audit to a Issue is not allowed
-  // (but vice versa is allowed)
-  if (FORBIDDEN.oneWay[types.join(' ')]) {
-    return false;
-  }
 
   // special check for snapshot:
   if (options &&
@@ -269,8 +260,17 @@ function allowedToMap(source, target, options) {
     return false;
   }
 
-  if (!isMappableType(sourceType, targetType)) {
-    return false;
+  let oneWayProp = types.join(' ');
+  if (MAPPING_RULES.hasOwnProperty(oneWayProp)) {
+    // One-way check
+    // special case check:
+    // - mapping an Audit and Assessment to a Issue is not allowed
+    // (but vice versa is allowed)
+    return MAPPING_RULES[oneWayProp];
+  } else {
+    if (!isMappableType(sourceType, targetType)) {
+      return false;
+    }
   }
 
   targetContext = _.exists(target, 'context.id');

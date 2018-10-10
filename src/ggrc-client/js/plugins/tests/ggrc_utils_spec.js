@@ -8,8 +8,11 @@ import {
   getMappableTypes,
   isMappableType,
   getAssigneeType,
+  allowedToMap,
 } from '../ggrc_utils';
 import Mappings from '../../models/mappers/mappings';
+import Permission from '../../permission';
+import TreeViewConfig from '../../apps/base_widgets';
 
 'use strict';
 
@@ -68,6 +71,66 @@ describe('isMappableType() method', function () {
   it('returns true for Program and Control', function () {
     let result = isMappableType('Program', 'Control');
     expect(result).toBe(true);
+  });
+});
+
+describe('allowedToMap() method', () => {
+  let baseWidgets;
+
+  beforeAll(() => {
+    baseWidgets = TreeViewConfig.attr('base_widgets_by_type');
+    TreeViewConfig.attr('base_widgets_by_type', {
+      Type1: ['Type2'],
+    });
+  });
+
+  afterAll(() => {
+    TreeViewConfig.attr('base_widgets_by_type', baseWidgets);
+  });
+
+  it('checks mapping rules', () => {
+    spyOn(Permission, 'is_allowed_for');
+    spyOn(Mappings, 'get_canonical_mappings_for');
+    let result = allowedToMap('Issue', 'Audit', {isIssueUnmap: false});
+    expect(result).toBeFalsy();
+    expect(Mappings.get_canonical_mappings_for).not.toHaveBeenCalled();
+    expect(Permission.is_allowed_for).not.toHaveBeenCalled();
+  });
+
+  it('checks mappable types when there is no additional mapping rules', () => {
+    spyOn(Permission, 'is_allowed_for');
+    spyOn(Mappings, 'get_canonical_mappings_for');
+    let result = allowedToMap('Type1', 'Type2');
+    expect(result).toBeFalsy();
+    expect(Mappings.get_canonical_mappings_for).toHaveBeenCalledWith('Type1');
+    expect(Permission.is_allowed_for).not.toHaveBeenCalled();
+  });
+
+  it('checks permissions to update source', () => {
+    spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+    spyOn(Mappings, 'get_canonical_mappings_for')
+      .and.returnValue({Type2: true});
+    let result = allowedToMap('Type1', 'Type2');
+    expect(result).toBeTruthy();
+    expect(Mappings.get_canonical_mappings_for).toHaveBeenCalledWith('Type1');
+    expect(Permission.is_allowed_for).toHaveBeenCalledWith('update', 'Type1');
+    expect(Permission.is_allowed_for.calls.count()).toEqual(1);
+  });
+
+  it('checks permissions to update target', () => {
+    spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+    spyOn(Mappings, 'get_canonical_mappings_for')
+      .and.returnValue({Type2: true});
+    let source = new can.Map({type: 'Type1'});
+    let target = new can.Map({type: 'Type2'});
+    let result = allowedToMap(source, target);
+    expect(result).toBeTruthy();
+    expect(Mappings.get_canonical_mappings_for).toHaveBeenCalledWith('Type1');
+    expect(Permission.is_allowed_for.calls.count()).toEqual(2);
+    expect(Permission.is_allowed_for.calls.argsFor(0))
+      .toEqual(['update', source]);
+    expect(Permission.is_allowed_for.calls.argsFor(1))
+      .toEqual(['update', target]);
   });
 });
 
