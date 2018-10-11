@@ -25,7 +25,7 @@ let viewModel = can.Map.extend({
       set: function (state) {
         if (!state.attr('items')) {
           let defaultStates =
-            StateUtils.getDefaultStatesForModel(this.attr('modelName'));
+            StateUtils.getStatesForModel(this.attr('modelName'));
           state.attr('items', defaultStates);
         }
         if (!state.attr('operator')) {

@@ -39,6 +39,42 @@ describe('Model states test', function () {
   });
 });
 
+describe('Model "status" attr test', function () {
+  const objectsWithState = ['Assessment', 'AssessmentTemplate', 'Audit',
+    'Contract', 'Control', 'Cycle', 'Document', 'Evidence', 'Issue',
+    'Objective', 'Policy', 'Program', 'Regulation', 'Risk', 'RiskAssessment',
+    'Requirement', 'Standard', 'Threat', 'Workflow'];
+  const objectsWithLaunchStatus = ['AccessGroup', 'DataAsset', 'Facility',
+    'Market', 'Metric', 'OrgGroup', 'Process', 'Product', 'ProductGroup',
+    'Project', 'System', 'TechnologyEnvironment', 'Vendor'];
+
+  objectsWithState.forEach(function (object) {
+    it(`checks if ${object} has State in attr_list`, () => {
+      const attrList = businessModels[object].tree_view_options.attr_list;
+
+      expect(_.map(attrList, 'attr_title')).toContain('State');
+      expect(_.map(attrList, 'attr_name')).toContain('status');
+    });
+  });
+
+  objectsWithLaunchStatus.forEach(function (object) {
+    it(`checks if ${object} has Launch Status in attr_list`, () => {
+      const attrList = businessModels[object].tree_view_options.attr_list;
+
+      expect(_.map(attrList, 'attr_title')).toContain('Launch Status');
+      expect(_.map(attrList, 'attr_name')).toContain('status');
+    });
+  });
+
+  it('checks if CycleTaskGroupObjectTask has Task State in attr_list', () => {
+    const attrList = businessModels['CycleTaskGroupObjectTask']
+      .tree_view_options.attr_list;
+
+    expect(_.map(attrList, 'attr_title')).toContain('Task State');
+    expect(_.map(attrList, 'attr_name')).toContain('status');
+  });
+});
+
 describe('Model review state test', function () {
   const reviewObjects = ['Contract', 'Control', 'Objective',
     'Policy', 'Program', 'Regulation', 'Risk', 'Requirement', 'Standard',

@@ -180,7 +180,8 @@ export default can.Component.extend({
           files[0].mimeType !== 'application/vnd.google-apps.folder'
       ) {
         $(document.body).trigger('ajax:flash', {
-          error: 'ERROR: Something other than a Drive folder was chosen for a folder slot.  Please choose a folder.',
+          error: 'ERROR: Something other than a Drive folder was chosen ' +
+                 'for a folder slot. Please choose a folder.',
         });
         return;
       }

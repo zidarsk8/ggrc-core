@@ -31,7 +31,6 @@ export default can.Component.extend({
             object: 'Audit',
             type: 'Control',
             'join-object-id': instance.id,
-            'join-mapping': 'program_controls',
             relevantTo: [{
               readOnly: true,
               type: instance.type,

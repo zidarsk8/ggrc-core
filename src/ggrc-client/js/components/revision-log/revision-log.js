@@ -179,7 +179,7 @@ export default can.Component.extend({
       }.bind(this));
     },
     /**
-     * Fetch revisions of indirect mappings ('Cross').
+     * Fetch revisions of indirect mappings.
      *
      * @param {Array} mappedObjects - the list of object instances to fetch
      *   mappings to (objects mapped to the current instance).

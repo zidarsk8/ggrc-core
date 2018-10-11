@@ -26,7 +26,10 @@ export default can.Component.extend({
       open: false,
     },
     hide: function () {
-      this.attr('state.open', false);
+      if (this.attr('state.open')) {
+        this.attr('state.open', false);
+        this.dispatch('hide');
+      }
     },
     show: function () {
       this.attr('state.open', true);

@@ -5,7 +5,8 @@
     "es6": true,
     "browser": true,
     "jasmine": true,
-    "jquery": true
+    "jquery": true,
+    "amd": true
   },
 
   "parser": "babel-eslint",

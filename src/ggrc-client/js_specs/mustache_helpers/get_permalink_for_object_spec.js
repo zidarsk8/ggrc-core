@@ -4,14 +4,9 @@
 */
 
 describe('can.mustache.helper.get_permalink_for_object', function () {
-  let fakeOptions;
   let helper;
 
   beforeAll(function () {
-    fakeOptions = {
-      fn: jasmine.createSpy(),
-    };
-
     helper = can.Mustache._helpers['get_permalink_for_object'].fn;
   });
 

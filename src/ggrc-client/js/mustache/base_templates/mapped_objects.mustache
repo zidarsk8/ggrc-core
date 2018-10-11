@@ -1,0 +1,43 @@
+{{!
+    Copyright (C) 2018 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<h6>Mapped objects</h6>
+
+<mapping-tree-view
+  parent-instance="instance"
+  mapping="instance.class.info_pane_options.mapped_objects.mapping"
+  item-template="instance.class.info_pane_options.mapped_objects.show_view"
+  tree-view-class="tree-structure new-tree mapped-objects-tree">
+</mapping-tree-view>
+
+{{#if_equals instance.type 'CycleTaskGroupObjectTask'}}
+  {{^if_in instance.status "Finished,Verified"}}
+    {{#is_allowed 'update' instance context='for'}}
+      <a
+        class="btn btn-white btn-small"
+        href="javascript://"
+        data-placement="right"
+        data-toggle="unified-mapper"
+        data-join-object-id="{{instance.id}}"
+        data-join-object-type="{{instance.class.shortName}}">
+        Map Objects
+      </a>
+    {{/is_allowed}}
+  {{/if_in}}
+{{else}}
+  {{#is_allowed 'update' instance context='for'}}
+  <a
+    class="btn btn-white btn-small"
+    href="javascript://"
+    data-type="Program"
+    data-placement="right"
+    data-toggle="unified-mapper"
+    data-join-option-type="{{model.shortName}}"
+    data-join-object-id="{{instance.id}}"
+    data-join-object-type="{{instance.class.shortName}}">
+    Map Objects
+  </a>
+  {{/is_allowed}}
+{{/if_equals}}

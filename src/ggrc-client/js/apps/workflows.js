@@ -13,9 +13,7 @@ import {
   Proxy,
   Direct,
   Multi,
-  TypeFilter,
   CustomFilter,
-  Cross,
 } from '../models/mappers/mapper-helpers';
 import Mappings from '../models/mappers/mappings';
 import Cycle from '../models/business-models/cycle';
@@ -23,8 +21,6 @@ import CycleTaskGroupObjectTask from '../models/business-models/cycle-task-group
 import TaskGroup from '../models/business-models/task-group';
 import Workflow from '../models/business-models/workflow';
 import Person from '../models/business-models/person';
-import Stub from '../models/stub';
-import * as businessModels from '../models/business-models';
 
 (function ($, CMS, GGRC) {
   let WorkflowExtension = {};
@@ -142,61 +138,15 @@ import * as businessModels from '../models/business-models';
           }
         ),
       },
-      CycleTaskEntry: {
-        related_objects_as_source: Proxy(
-          null,
-          'destination', 'Relationship',
-          'source', 'related_destinations'
-        ),
-        related_objects_as_destination: Proxy(
-          null,
-          'source', 'Relationship',
-          'destination', 'related_sources'
-        ),
-        related_objects: Multi(
-          ['related_objects_as_source', 'related_objects_as_destination']
-        ),
-        destinations: Direct('Relationship', 'source', 'related_destinations'),
-        sources: Direct('Relationship', 'destination', 'related_sources'),
-        relationships: Multi(['sources', 'destinations']),
-        documents: TypeFilter('related_objects', 'Document'),
-        cycle: Direct(
-          'Cycle', 'cycle_task_entries', 'cycle'),
-        cycle_task_group_object_task: Direct(
-          'CycleTaskGroupObjectTask',
-          'cycle_task_entries',
-          'cycle_task_group_object_task'),
-        workflow: Cross('cycle', 'workflow'),
-      },
     };
 
     // Insert `workflows` mappings to all business object types
     can.each(_workflowObjectTypes, function (type) {
-      const workflowsMapper = Cross('task_groups', 'workflow');
-      let model = businessModels[type];
-      if (model === undefined || model === null) {
-        return;
-      }
       mappings[type] = {
-        task_groups:
-        new GGRC.ListLoaders.ProxyListLoader(
-          'TaskGroupObject',
-          'object',
-          'task_group',
-          'task_group_objects',
-          null
-        ),
-        workflows: workflowsMapper,
         _canonical: {
           task_groups: 'TaskGroup',
         },
-        orphaned_objects: Multi([
-          Mappings.get_mappings_for(type).orphaned_objects,
-          workflowsMapper,
-        ]),
       };
-
-      businessModels[type].attributes.task_group_objects = Stub.List;
     });
     new Mappings('ggrc_workflows', mappings);
   };

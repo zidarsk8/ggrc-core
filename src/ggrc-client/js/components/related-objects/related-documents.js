@@ -115,17 +115,6 @@ export default can.Component.extend({
 
       this.attr('documents').replace(documents);
     },
-    removeDocument: function (event) {
-      let item = event.item;
-      let index = this.attr('documents').indexOf(item);
-      this.attr('isLoading', true);
-      return this.attr('documents').splice(index, 1);
-    },
-    addDocuments: function (event) {
-      let items = event.items;
-      this.attr('isLoading', true);
-      return this.attr('documents').unshift(...items);
-    },
     createDocument: function (data) {
       let date = new Date();
       let modelType = this.attr('modelType');

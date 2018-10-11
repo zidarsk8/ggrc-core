@@ -1,0 +1,25 @@
+{{!
+    Copyright (C) 2018 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div>
+  {{#if modal_description}}
+  <p>
+    {{modal_description}}
+  </p>
+  {{/if}}
+  <p>
+    If there are any compliance/on-boarding Questionnaires related to
+    <strong>
+      {{objectShortInfo}}
+    </strong>
+    in <a href="https://ggrc-q.googleplex.com/">GGRC Questionnaires</a> they will be deprecated too!
+  </p>
+  <p>
+    Please type <strong>{{confirmTextForTyping}}</strong> in the box below to confirm {{operation}}.
+  </p>
+  <form>
+    <input class="" type="text" placeholder="{{confirmTextForTyping}}" data-edit="confirm">
+  </form>
+</div>

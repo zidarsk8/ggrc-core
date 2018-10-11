@@ -11,11 +11,6 @@ import TaskGroupTask from '../../../../models/business-models/task-group-task';
 
 describe('task-list component', () => {
   let viewModel;
-  let staticVmProps;
-
-  beforeAll(function () {
-    staticVmProps = Component.prototype.viewModel;
-  });
 
   beforeEach(function () {
     viewModel = getComponentVM(Component);

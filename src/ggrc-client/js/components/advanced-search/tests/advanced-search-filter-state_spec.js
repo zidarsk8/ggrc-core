@@ -21,10 +21,10 @@ describe('advanced-search-filter-state component', function () {
     let statesSpy;
 
     beforeEach(() => {
-      statesSpy = spyOn(StateUtils, 'getDefaultStatesForModel');
+      statesSpy = spyOn(StateUtils, 'getStatesForModel');
     });
 
-    it('assigns defaultStates to items of stateModel if items is not defined',
+    it('assigns states to items of stateModel if items is not defined',
       function () {
         let states = ['state1', 'state2', 'state3'];
         statesSpy.and.returnValue(states);

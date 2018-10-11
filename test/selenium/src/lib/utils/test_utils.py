@@ -6,7 +6,7 @@ import itertools
 import re
 import uuid
 
-import waiting
+import tenacity
 
 from lib import constants
 
@@ -30,11 +30,28 @@ class HtmlParser(object):
     return re.sub(r'\s+', " ", text)
 
 
-def wait_for(*args, **kwargs):
+def wait_for(func):
   """Waits for function to return truthy value."""
-  if "timeout_seconds" not in kwargs:
-    kwargs["timeout_seconds"] = constants.ux.MAX_USER_WAIT_SECONDS
-  return waiting.wait(*args, **kwargs)
+  def is_falsy(value):
+    """Return whether value if falsy (None or False)."""
+    return not value
+  return tenacity.Retrying(
+      stop=tenacity.stop_after_delay(constants.ux.MAX_USER_WAIT_SECONDS),
+      retry=tenacity.retry_if_result(is_falsy))(func)
+
+
+def assert_wait(func, exc_type=AssertionError):
+  """Waits for function to succeed (not raise `exc_type`)."""
+  return tenacity.Retrying(
+      stop=tenacity.stop_after_delay(constants.ux.MAX_USER_WAIT_SECONDS),
+      retry=tenacity.retry_if_exception_type((exc_type, tenacity.TryAgain)))(
+      func)
+
+
+def list_obj_assert(actual_list, expected_list):
+  """Assert that list `actual_obj_list` is the same as `expected_obj_list`."""
+  for actual, expected in itertools.izip_longest(actual_list, expected_list):
+    obj_assert(actual, expected)
 
 
 def obj_assert(actual_obj, expected_obj):

@@ -2,32 +2,44 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Tree view."""
 
-from lib import base, decorator
+from lib import base
+from lib.page.widget import table_with_headers
 from lib.utils import test_utils
 
 
 class TreeWidget(base.WithBrowser):
   """Tree widget."""
 
-  def tree_header_titles(self):
-    """Returns tree header titles."""
-    return [el.text_content for el in self._browser.elements(
-        class_name="tree-header-titles__text")]
+  def __init__(self, table_row_cls=None):
+    super(TreeWidget, self).__init__()
+    self._root = self._browser
+    if table_row_cls:
+      self._table_row_cls = table_row_cls
+    else:
+      self._table_row_cls = TreeItem
+    self._table = table_with_headers.TableWithHeaders(
+        self._root,
+        header_elements=self._tree_header_elements,
+        table_rows=self.tree_items
+    )
 
-  def _tree_item_els(self):
-    """Returns Tree Item elements. Tree Item element knows only about cell
-    contents. It doesn't know about names of cells. So an object can't
-    be built using it.
-    """
-    return [TreeItemEl(el) for el in self._browser.elements(
-        tag_name="tree-item")]
+  def _tree_header_elements(self):
+    """Returns tree header elements."""
+    return self._root.elements(class_name="tree-header-titles__text")
+
+  def get_tree_item_by(self, **conditions):
+    """Returns a table row that matches conditions."""
+    return self._table.get_table_row_by(**conditions)
 
   def tree_items(self):
-    """Returns wrappers for tree item that knows about headers and cells."""
+    """Returns tree items."""
     self._wait_loading()
-    headers = self.tree_header_titles()
-    return [TreeItem(headers, tree_item_el)
-            for tree_item_el in self._tree_item_els()]
+    return [self._table_row_cls(row, self._table.table_header_names())
+            for row in self._tree_item_rows()]
+
+  def _tree_item_rows(self):
+    """Returns tree item elements."""
+    return self._root.elements(tag_name="tree-item")
 
   def _wait_loading(self):
     """Wait for elements to load."""
@@ -35,48 +47,32 @@ class TreeWidget(base.WithBrowser):
       """Return if results are present."""
       if self._browser.element(class_name="tree-no-results-message").present:
         return True
-      if len(self._tree_item_els()) > 0:
+      if list(self._tree_item_rows()):
         return True
       return False
     test_utils.wait_for(results_present)
 
 
-class TreeItemEl(object):
-  """Represents tree item element."""
-  # pylint: disable=too-few-public-methods
-
-  def __init__(self, item_row):
-    self._root = item_row
-
-  def contents(self):
-    """Returns the list with contents of all attr cells."""
-    return [el.text for el in self._root.elements(
-        class_name="attr-content")]
-
-
 class TreeItem(object):
-  """A wrapper for tree item that knows also about headers.
-  That allows to build object from it.
-  """
+  """Tree item."""
 
-  def __init__(self, headers, tree_item_el):
-    self._headers = headers
-    self._tree_item_el = tree_item_el
+  def __init__(self, row_el, table_header_names, header_attr_mapping=None):
+    self._table_row = table_with_headers.TableRow(
+        container=row_el,
+        table_header_names=table_header_names,
+        cell_locator={"class_name": "attr-content"},
+        header_attr_mapping=header_attr_mapping
+    )
+    self.text_for_header = self._table_row.text_for_header
 
-  def title(self):
-    """Returns title."""
-    try:
-      return self._cell_value("Title")
-    except ValueError:
-      # Title is named Summary on Workflow task group page (GGRC-6042)
-      return self._cell_value("Summary")
+  def matches_conditions(self, **conditions):
+    """Returns whether a row matches conditions."""
+    return self._table_row.matches_conditions(self, **conditions)
 
-  def _cell_value(self, header_name):
-    """Returns value of cell with header `header_name`."""
-    idx = self._headers.index(header_name)
-    return self.contents()[idx]
+  def obj_dict(self):
+    """Returns an obj dict."""
+    return self._table_row.obj_dict(self)
 
-  @decorator.memoize
-  def contents(self):
-    """Returns the list with contents of all attr cells."""
-    return self._tree_item_el.contents()
+  def select(self):
+    """Clicks tree item to open info panel."""
+    self._table_row.root.element(class_name="selectable-attrs").click()
