@@ -36,7 +36,7 @@ class TestTotalReindex(TestCase):
       # for workflow objects the additional queries are counted
       # TODO: rewrite test
       'CycleTaskEntry': 45,
-      'CycleTaskGroup': 10,
+      'CycleTaskGroup': 11,
       'CycleTaskGroupObjectTask': 26,
       'Evidence': 25,
       'Document': 5,
