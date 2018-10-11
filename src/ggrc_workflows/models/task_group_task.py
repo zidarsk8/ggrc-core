@@ -183,11 +183,18 @@ class TaskGroupTask(roleable.Roleable,
     return self._get_view_date(self.end_date)
 
   @classmethod
-  def eager_query(cls):
-    query = super(TaskGroupTask, cls).eager_query()
+  def _populate_query(cls, query):
     return query.options(
-        orm.subqueryload('task_group'),
+        orm.Load(cls).joinedload("task_group")
+                     .undefer_group("TaskGroup_complete"),
+        orm.Load(cls).joinedload("task_group")
+                     .joinedload("workflow")
+                     .undefer_group("Workflow_complete"),
     )
+
+  @classmethod
+  def eager_query(cls):
+    return cls._populate_query(super(TaskGroupTask, cls).eager_query())
 
   def _display_name(self):
     return self.title + '<->' + self.task_group.display_name
