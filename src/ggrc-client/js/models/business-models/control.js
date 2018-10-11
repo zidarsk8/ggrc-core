@@ -125,19 +125,7 @@ export default Cacheable('CMS.Models.Control', {
   },
 }, {
   init: function () {
-    let that = this;
     this._super(...arguments);
-    this.bind('change', function (ev, attr, how, newVal, oldVal) {
-      // Emit the 'orphaned' event when the directive attribute is removed
-      if (attr === 'directive' && how === 'remove' && oldVal &&
-        newVal === undefined) {
-        // It is necessary to temporarily add the attribute back for orphaned
-        // processing to work properly.
-        that.directive = oldVal;
-        can.trigger(that.constructor, 'orphaned', that);
-        delete that.directive;
-      }
-    });
     this.bind('refreshInstance', this.refresh.bind(this));
   },
 });
