@@ -155,7 +155,7 @@ def handle_export_csv_template_request():
   """Export template request handler"""
   data = parse_export_request()
   objects = data.get("objects")
-  export_to = "csv"
+  export_to = data.get("export_to")
   csv_string, object_names = get_csv_template(objects)
   filename = "{}_template.csv".format(object_names)
   return export_file(export_to, filename, csv_string)
