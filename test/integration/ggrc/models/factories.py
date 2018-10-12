@@ -169,8 +169,6 @@ class CategorizationFactory(ModelFactory):
   class Meta:
     model = all_models.Categorization
 
-  category = None
-  categorizable = None
   category_id = None
   categorizable_id = None
   categorizable_type = None

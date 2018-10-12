@@ -115,10 +115,9 @@ class Reviewable(rest_handable.WithPutHandable,
 
   def _update_status_on_mapping(self, counterparty):
     """Update review status on mapping to reviewable"""
-    from ggrc.snapshotter.rules import Types
     from ggrc.models import all_models
     if self.review_status != all_models.Review.STATES.UNREVIEWED:
-      if counterparty.type in Types.all:
+      if self._is_counterparty_snapshottable(counterparty):
         self._set_review_status_unreviewed()
 
   def _set_review_status_unreviewed(self):
@@ -127,6 +126,12 @@ class Reviewable(rest_handable.WithPutHandable,
     if self.review:
       self.review.status = all_models.Review.STATES.UNREVIEWED
       self.add_email_notification()
+
+  @staticmethod
+  def _is_counterparty_snapshottable(counterparty):
+    """Check that counterparty is snapshottable."""
+    from ggrc.snapshotter.rules import Types
+    return bool(counterparty.type in Types.all)
 
   def handle_put(self):
     self._update_status_on_attr()
@@ -140,8 +145,9 @@ class Reviewable(rest_handable.WithPutHandable,
   def handle_proposal_applied(self):
     self._set_review_status_unreviewed()
 
-  def handle_mapping_via_import_created(self):
-    self._set_review_status_unreviewed()
+  def handle_mapping_via_import_created(self, counterparty):
+    if self._is_counterparty_snapshottable(counterparty):
+      self._set_review_status_unreviewed()
 
 
 class Review(mixins.person_relation_factory("last_reviewed_by"),
