@@ -33,7 +33,7 @@
     <h4>Choose Templates</h4>
     <multiselect-dropdown {options}="importableModels"
                           {placeholder}="'Choose Templates'"
-                          (dropdown-close)="selectItems(%event)">
+                          (selected-changed)="selectItems(%event)">
     </multiselect-dropdown>
   </div>
 
