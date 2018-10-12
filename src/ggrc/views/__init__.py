@@ -282,14 +282,14 @@ def do_reindex(with_reindex_snapshots=False):
     logger.info("Updating index for: %s", model_name)
     with benchmark("Create records for %s" % model_name):
       model = indexed_models[model_name]
-      ids = [obj.id for obj in model.query]
+      ids = [id_[0] for id_ in db.session.query(model.id)]
       ids_count = len(ids)
       handled_ids = 0
       for ids_chunk in utils.list_chunks(ids, chunk_size=REINDEX_CHUNK_SIZE):
         handled_ids += len(ids_chunk)
         logger.info("%s: %s / %s", model.__name__, handled_ids, ids_count)
         model.bulk_record_update_for(ids_chunk)
-        db.session.commit()
+        db.session.plain_commit()
 
   if with_reindex_snapshots:
     logger.info("Updating index for: %s", "Snapshot")
