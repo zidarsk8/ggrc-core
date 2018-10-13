@@ -9,7 +9,7 @@ import time
 from sqlalchemy.sql import expression
 
 from ggrc import models
-from ggrc.integrations import integrations_errors
+from ggrc.integrations import integrations_errors, constants
 from ggrc.integrations import issues
 
 logger = logging.getLogger(__name__)
@@ -169,3 +169,12 @@ def create_issue(cli, params, max_attempts=5, interval=1):
   else:
     logger.warning("Attempts limit(%s) was reached.", max_attempts)
   raise last_error
+
+
+def parse_due_date(custom_fields_issuetracker):
+  """Parse custom fields for return due date."""
+  for row in custom_fields_issuetracker:
+    due_date_value = row.get(constants.CUSTOM_FIELDS_DUE_DATE)
+    if due_date_value:
+      return due_date_value.strip()
+  return None
