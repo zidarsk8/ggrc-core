@@ -47,14 +47,14 @@ describe('tab-panel component', function () {
   });
 
   describe('lazyTrigger property', () => {
-    it ('should be "true" for active tab', () => {
+    it('should be "true" for active tab', () => {
       viewModel.attr('preRender', false);
       viewModel.attr('active', true);
 
       expect(viewModel.attr('lazyTrigger')).toBeTruthy();
     });
 
-    it ('should be "true" for active tab', () => {
+    it('should be "true" for active tab', () => {
       viewModel.attr('preRender', true);
       viewModel.attr('active', true);
 
