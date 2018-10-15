@@ -55,7 +55,7 @@ export default can.Control({
           this.options.content_controller_options.countsName) ||
         this.options.model.shortName;
 
-      this.options.widget_count.attr('count', '' + counts.attr(countsName));
+      this.options.widget_count.attr('count', counts.attr(countsName));
 
       counts.on(countsName, function (ev, newVal, oldVal) {
         can.trigger(this.element, 'updateCount', [newVal]);
@@ -124,6 +124,6 @@ export default can.Control({
     return this._display_deferred;
   },
   updateCount: function (el, ev, count, updateCount) {
-    this.options.widget_count.attr('count', '' + count);
+    this.options.widget_count.attr('count', count);
   },
 });
