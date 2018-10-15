@@ -1503,7 +1503,7 @@ Mustache.registerHelper('debugger', function () {
   // This just gives you a helper that you can wrap around some code in a
   // template to see what's in the context. Dev tools need to be open for this
   // to work (in Chrome at least).
-  debugger;
+  debugger; // eslint-disable-line no-debugger
 
   let options = arguments[arguments.length - 1];
   return options.fn(options.contexts);
