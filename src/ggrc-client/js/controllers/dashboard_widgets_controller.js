@@ -93,8 +93,7 @@ export default can.Control({
 
       if (this.content_controller.prepare) {
         return this.content_controller.prepare();
-      }
-      else {
+      } else {
         return new $.Deferred().resolve();
       }
     }
