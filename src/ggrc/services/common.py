@@ -55,27 +55,6 @@ logger = logging.getLogger(__name__)
 CACHE_EXPIRY_COLLECTION = 60
 
 
-def set_ids_for_new_custom_attributes(parent_obj):
-  """
-  When we are creating custom attribute values and definitions for
-  POST requests, parent object ID is not yet defined. This is why we update
-  custom attribute values at this point and set the correct attributable_id
-
-  Args:
-    parent_obj: parent object to be set as attributable
-
-  Returns:
-    None
-  """
-  if not hasattr(parent_obj, "PER_OBJECT_CUSTOM_ATTRIBUTABLE"):
-    return
-  for obj in get_modified_objects(db.session).new:
-    if obj.type == "CustomAttributeValue":
-      obj.attributable = parent_obj
-    elif obj.type == "CustomAttributeDefinition":
-      obj.definition = parent_obj
-
-
 def inclusion_filter(obj):
   return permissions.is_allowed_read(obj.__class__.__name__,
                                      obj.id, obj.context_id)
@@ -609,8 +588,6 @@ class Resource(ModelView):
           obj.__class__, obj=obj, src=src, service=self)
     with benchmark("Get modified objects"):
       modified_objects = get_modified_objects(db.session)
-    with benchmark("Update custom attribute values"):
-      set_ids_for_new_custom_attributes(obj)
     with benchmark("Log event"):
       event = log_event(db.session, obj, force_obj=True)
     with benchmark("Update memcache before commit for collection PUT"):
@@ -1011,8 +988,6 @@ class Resource(ModelView):
         with benchmark("Send model POSTed event"):
           signals.Restful.model_posted.send(
               obj.__class__, obj=obj, src=src, service=self)
-        with benchmark("Update custom attribute values"):
-          set_ids_for_new_custom_attributes(obj)
 
         obj.modified_by = get_current_user()
         objects.append(obj)
