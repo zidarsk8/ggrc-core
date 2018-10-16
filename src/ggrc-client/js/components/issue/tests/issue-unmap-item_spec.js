@@ -304,7 +304,8 @@ describe('issue-unmap-item component', () => {
             unmap: () => Promise.resolve(),
           }));
         viewModel.attr('issueInstance.viewLink', 'temp url');
-        CurrentPageUtils.getPageInstance.and.returnValue(viewModel.attr('issueInstance'));
+        CurrentPageUtils.getPageInstance.and.returnValue(
+          viewModel.attr('issueInstance'));
         await viewModel.unmap();
         expect(CurrentPageUtils.navigate).toHaveBeenCalledWith(
           viewModel.attr('issueInstance.viewLink')

@@ -5,6 +5,7 @@
 
 
 from sqlalchemy import or_
+from sqlalchemy import orm
 from sqlalchemy.ext import hybrid
 
 from ggrc import db
@@ -169,6 +170,14 @@ class TaskGroup(roleable.Roleable,
       ))
 
     return target
+
+  @classmethod
+  def eager_query(cls):
+    query = super(TaskGroup, cls).eager_query()
+    return query.options(
+        orm.Load(cls).subqueryload('task_group_objects'),
+        orm.Load(cls).subqueryload('task_group_tasks')
+    )
 
   @classmethod
   def _filter_by_workflow(cls, predicate):

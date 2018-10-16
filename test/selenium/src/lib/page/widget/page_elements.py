@@ -2,12 +2,11 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Page objects for child elements of pages"""
 # pylint: disable=too-few-public-methods
-import datetime
 import time
 
 from lib.constants import objects
 from lib.constants.element import AdminWidgetCustomAttributes
-from lib.utils import selenium_utils, ui_utils
+from lib.utils import selenium_utils, ui_utils, date_utils
 
 
 class InlineEdit(object):
@@ -73,22 +72,61 @@ class SimpleField(object):
     return self._root.text[len(self._label_text):].strip()
 
 
+class Datepicker(object):
+  """Represents datepicker."""
+
+  def __init__(self, container):
+    self._root = container
+
+  def get_value(self):
+    """Gets a date."""
+    return self._root.text_field().value
+
+  def set_value(self, date):
+    """Sets a date in JQuery UI Datepicker."""
+    self._open_datepicker()
+    self._set_date(date)
+    self._click_active_date()
+
+  def _open_datepicker(self):
+    """Opens JQuery UI datepicker."""
+    self._root.text_field().focus()
+
+  def _set_date(self, date):
+    """Sets active date in datepicker using JQuery UI Datepicker API."""
+    jquery_ui_picker_el = self._root.element(class_name="datepicker__calendar")
+    self._root.browser.execute_script("""
+      var datepicker_el = $(arguments[0]);
+      var date = arguments[1];
+      datepicker_el.datepicker("setDate", date);
+    """, jquery_ui_picker_el, date.strftime("%Y-%m-%d"))
+
+  def _click_active_date(self):
+    """Clicks date that is marked as active."""
+    self._root.element(class_name="ui-state-active").click()
+
+
 class RelatedPeopleList(object):
   """Represents related people element"""
 
-  def __init__(self, container, acr_name):
+  def __init__(self, container, acr_name, with_inline_edit=True):
     self._root = container.element(
         class_name="people-group__title", text=acr_name).parent(
             class_name="people-group")
-    self._inline_edit = InlineEdit(self._root)
+    if with_inline_edit:
+      self._inline_edit = InlineEdit(self._root)
+    else:
+      self._inline_edit = None
 
   def add_person(self, person):
-    """Add person to Related People list"""
-    self._inline_edit.open()
+    """Adds person to Related People list."""
+    if self._inline_edit:
+      self._inline_edit.open()
     email = person.email
     self._root.text_field(placeholder="Add person").set(email)
     ui_utils.select_user(self._root, email)
-    self._inline_edit.confirm()
+    if self._inline_edit:
+      self._inline_edit.confirm()
 
   def get_people_emails(self):
     """Get emails of people"""
@@ -326,28 +364,19 @@ class DateCAActionsStrategy(CAActionsStrategy):
 
   def __init__(self, *args):
     super(DateCAActionsStrategy, self).__init__(*args)
-    self._datepicker_field = self._root.element(class_name="datepicker__input")
-    self._datepicker_opts = self._root.element(
-        class_name="datepicker__calendar").elements(
-        data_handler="selectDay")
+    self._datepicker = Datepicker(self._root)
 
   def get_lcas_from_inline(self):
     """Gets value of inline LCA field."""
-    return self._datepicker_field.value
+    return self._datepicker.get_value()
 
   def set_lcas_from_inline(self, value):
     """Sets value of inline LCA field."""
-    self._select_date(value)
+    self._fill_input_field(value)
 
   def _fill_input_field(self, value):
     """Fills input field."""
-    self._select_date(value)
-
-  def _select_date(self, value):
-    """Selects day in current month."""
-    self._datepicker_field.click()
-    self._datepicker_opts[
-        datetime.datetime.strptime(value, "%Y-%m-%d").day - 1].click()
+    self._datepicker.set_value(date_utils.str_to_date(value, "%Y-%m-%d"))
 
 
 class CheckboxCAActionsStrategy(CAActionsStrategy):

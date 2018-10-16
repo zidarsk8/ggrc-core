@@ -153,7 +153,8 @@ import * as businessModels from '../models/business-models/index';
         });
         GGRC.tree_view.sub_tree_for.attr(name, {
           model_list: child_model_list,
-          display_list: businessModels[name].tree_view_options.child_tree_display_list || w_list,
+          display_list: businessModels[name]
+            .tree_view_options.child_tree_display_list || w_list,
         });
       });
 
@@ -684,21 +685,29 @@ import * as businessModels from '../models/business-models/index';
         }
 
         // Custom overrides
-        if (extraDescriptorOptions.all && extraDescriptorOptions.all[model_name]) {
+        if (extraDescriptorOptions.all &&
+            extraDescriptorOptions.all[model_name]) {
           $.extend(descriptor, extraDescriptorOptions.all[model_name]);
         }
 
-        if (extraDescriptorOptions[object.constructor.shortName] && extraDescriptorOptions[object.constructor.shortName][model_name]) {
-          $.extend(descriptor, extraDescriptorOptions[object.constructor.shortName][model_name]);
+        if (extraDescriptorOptions[object.constructor.shortName] &&
+            extraDescriptorOptions[object.constructor.shortName][model_name]) {
+          $.extend(descriptor,
+            extraDescriptorOptions[object.constructor.shortName][model_name]);
         }
 
-        if (extraContentControllerOptions[object.constructor.shortName] && extraContentControllerOptions[object.constructor.shortName][model_name]) {
+        if (extraContentControllerOptions[object.constructor.shortName] &&
+            extraContentControllerOptions[
+              object.constructor.shortName][model_name]) {
           $.extend(true, descriptor, {
-            content_controller_options: extraContentControllerOptions[object.constructor.shortName][model_name],
+            content_controller_options:
+            extraContentControllerOptions[
+              object.constructor.shortName][model_name],
           });
         }
         descriptor.widgetType = 'treeview';
-        widgetList.add_widget(object.constructor.shortName, widget_id, descriptor);
+        widgetList.add_widget(
+          object.constructor.shortName, widget_id, descriptor);
       });
     },
   });

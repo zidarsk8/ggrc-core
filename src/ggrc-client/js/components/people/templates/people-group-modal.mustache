@@ -3,7 +3,13 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<simple-modal modal-title="title" state="modalState" replace-content="true" extra-css-class="people-group-modal">
+<simple-modal 
+  modal-title="title" 
+  state="modalState" 
+  replace-content="true" 
+  extra-css-class="people-group-modal"
+  (hide)="cancel"
+>
   <div class="simple-modal__header flex-box flex-row">
     <div class="simple-modal__header-text flex-size-1">
       <div class="simple-modal__title">

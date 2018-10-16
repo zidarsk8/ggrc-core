@@ -26,7 +26,8 @@ export default can.Component.extend({
   events: {
     init: function () {
       this.viewModel.attr('controller', this);
-      this.viewModel.attr('model', this.viewModel.model || this.viewModel.instance.constructor);
+      this.viewModel.attr('model', this.viewModel.model ||
+          this.viewModel.instance.constructor);
       if (!this.viewModel.instance._transient) {
         // only refresh if there's not currently an edit modal spawned.
         this.viewModel.instance.refresh();
@@ -72,7 +73,8 @@ export default can.Component.extend({
           .attr(el.attr('name'))
           .replace(
             can.map(
-              this.element.find("input[name='" + el.attr('name') + "']:checked"),
+              this.element.find(
+                'input[name="' + el.attr('name') + '"]:checked'),
               function (el) {
                 return $(el).val();
               }

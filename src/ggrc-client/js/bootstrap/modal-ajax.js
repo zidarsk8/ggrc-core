@@ -19,7 +19,6 @@ import {
   navigate,
 } from '../plugins/utils/current-page-utils';
 import modalModels from '../models/modal-models';
-import Mappings from '../models/mappers/mappings';
 import {changeUrl} from '../router';
 
 (function (can, $, GGRC) {
@@ -36,7 +35,6 @@ import {changeUrl} from '../router';
     deleteform: function ($target, $trigger, option) {
       let model = modalModels[$trigger.attr('data-object-singular')];
       let instance;
-      let deleteCounts = new can.Map({loading: true, counts: ''});
       let modalSettings;
 
       if ($trigger.attr('data-object-id') === 'page') {
@@ -44,13 +42,6 @@ import {changeUrl} from '../router';
       } else {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
-
-      Mappings.get_orphaned_count(instance).done(function (counts) {
-        deleteCounts.attr('loading', false);
-        deleteCounts.attr('counts', counts);
-      }).fail(function () {
-        deleteCounts.attr('loading', false);
-      });
 
       modalSettings = {
         $trigger: $trigger,
@@ -60,7 +51,6 @@ import {changeUrl} from '../router';
           GGRC.mustache_path + '/modals/delete_cancel_buttons.mustache',
         model: model,
         instance: instance,
-        delete_counts: deleteCounts,
         modal_title: 'Delete ' + $trigger.attr('data-object-singular'),
         content_view:
           GGRC.mustache_path + '/base_objects/confirm_delete.mustache',

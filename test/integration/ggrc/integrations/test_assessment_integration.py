@@ -2,6 +2,9 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Integration tests for assessments with IssueTracker integration."""
+# pylint: disable=too-many-lines
+# this module will be refactored in the future when we make base testcase class
+# for issuetracker integration.
 
 from collections import OrderedDict
 
@@ -15,6 +18,8 @@ from ggrc import models
 from ggrc.app import app
 from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import assessment_integration
+from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder \
+    as params_builder
 from ggrc.integrations.synchronization_jobs import sync_utils
 from ggrc.integrations import synchronization_jobs
 from ggrc.access_control.role import AccessControlRole
@@ -24,7 +29,10 @@ from integration.ggrc import generator
 from integration.ggrc.access_control import acl_helper
 from integration.ggrc.snapshotter import SnapshotterBaseTestCase
 
+TICKET_ID = 123
 
+
+# pylint: disable=too-many-public-methods
 @ddt.ddt
 class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
   """Test set for IssueTracker integration functionality."""
@@ -38,6 +46,277 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     super(TestIssueTrackerIntegration, self).setUp()
 
     self.client.get('/login')
+
+  DEFAULT_ASSESSMENT_ATTRS = {
+      "title": "title1",
+      "context": None,
+      "status": "Draft",
+      "enabled": True,
+      "component_id": 1234,
+      "hotlist_id": 4321,
+      "issue_id": 654321,
+      "issue_type": "PROCESS",
+      "issue_priority": "P2",
+      "issue_severity": "S1",
+  }
+
+  DEFAULT_TICKET_ATTRS = {
+      "component_id": 1234,
+      "hotlist_id": 4321,
+      "issue_id": 654321,
+      "status": "new",
+      "issue_type": "Default Issue type",
+      "issue_priority": "P1",
+      "issue_severity": "S2",
+      "title": "test title",
+      "verifier": "user@example.com",
+      "assignee": "user@example.com",
+      "ccs": ["user@example.com"],
+  }
+
+  def request_payload_builder(self, issue_attrs, audit):
+    """Build payload for update request to Issue Tracker"""
+    payload_attrs = dict(self.DEFAULT_ASSESSMENT_ATTRS, **issue_attrs)
+    payload = {"assessment": {
+        "title": payload_attrs["title"],
+        "context": None,
+        "audit": {
+            "id": audit.id,
+            "type": audit.type,
+        },
+        "status": "Completed",
+        "issue_tracker": {
+            "enabled": payload_attrs["enabled"],
+            "component_id": payload_attrs["component_id"],
+            "hotlist_id": payload_attrs["hotlist_id"],
+            "issue_id": payload_attrs["issue_id"],
+            "issue_type": payload_attrs["issue_type"],
+            "issue_priority": payload_attrs["issue_priority"],
+            "issue_severity": payload_attrs["issue_severity"],
+            "title": payload_attrs["title"],
+        }
+    }}
+    return payload
+
+  def response_payload_builder(self, ticket_attrs):
+    """Build payload for response from Issue Tracker via get_issue method"""
+    payload_attrs = dict(self.DEFAULT_TICKET_ATTRS, **ticket_attrs)
+    payload = {"issueState": {
+        "component_id": payload_attrs["component_id"],
+        "hotlist_id": payload_attrs["hotlist_id"],
+        "issue_id": payload_attrs["issue_id"],
+        "status": payload_attrs["status"],
+        "issue_type": payload_attrs["issue_type"],
+        "issue_priority": payload_attrs["issue_priority"],
+        "issue_severity": payload_attrs["issue_severity"],
+        "title": payload_attrs["title"],
+        "verifier": payload_attrs["verifier"],
+        "assignee": payload_attrs["assignee"],
+        "ccs": payload_attrs["ccs"],
+    }}
+    return payload
+
+  def put_request_payload_builder(self, issue_attrs):
+    """Build payload for PUT request to Issue Tracker"""
+    payload_attrs = dict(self.DEFAULT_ASSESSMENT_ATTRS, **issue_attrs)
+    payload = {
+        "issue_tracker": {
+            "enabled": payload_attrs["enabled"],
+            "status": payload_attrs["status"],
+            "component_id": payload_attrs["component_id"],
+            "hotlist_id": payload_attrs["hotlist_id"],
+            "issue_id": payload_attrs["issue_id"],
+            "issue_type": payload_attrs["issue_type"],
+            "issue_priority": payload_attrs["issue_priority"],
+            "issue_severity": payload_attrs["issue_severity"],
+            "title": payload_attrs["title"],
+        }
+    }
+    return payload
+
+  def check_issuetracker_issue_fields(self,
+                                      issue_tracker_issue,
+                                      assmt_attrs):
+    """Checks issuetracker_issue were updated correctly.
+
+    Make assertions to check if issue tracker fields were updated according
+    our business logic.
+    For Assessment model we should get all attributes from linked assessment.
+    """
+    self.assertTrue(issue_tracker_issue.enabled)
+    # According to our business logic all attributes should be taken
+    # from assessment attributes
+    self.assertEqual(
+        issue_tracker_issue.title,
+        assmt_attrs["assessment"]["title"]
+    )
+    self.assertEqual(
+        int(issue_tracker_issue.component_id),
+        assmt_attrs["assessment"]["issue_tracker"]["component_id"]
+    )
+    self.assertEqual(
+        int(issue_tracker_issue.hotlist_id),
+        assmt_attrs["assessment"]["issue_tracker"]["hotlist_id"]
+    )
+    self.assertEqual(
+        issue_tracker_issue.issue_priority,
+        assmt_attrs["assessment"]["issue_tracker"]["issue_priority"]
+    )
+    self.assertEqual(
+        issue_tracker_issue.issue_severity,
+        assmt_attrs["assessment"]["issue_tracker"]["issue_severity"]
+    )
+    self.assertEqual(
+        int(issue_tracker_issue.issue_id),
+        assmt_attrs["assessment"]["issue_tracker"]["issue_id"]
+    )
+    self.assertEqual(
+        issue_tracker_issue.issue_type,
+        assmt_attrs["assessment"]["issue_tracker"]["issue_type"]
+    )
+
+  @ddt.data(
+      ({"title": "first_title"}, {"title": "other_title"}),
+      ({"issue_type": "type1"}, {"issue_type": "process"}),
+      ({"issue_severity": "S0"}, {"issue_severity": "S1"}),
+      ({"issue_priority": "P0"}, {"issue_priority": "P1"}),
+      ({"hotlist_id": 1234}, {"hotlist_id": 4321}),
+      ({"component_id": 1234}, {"component_id": 4321}),
+      ({"status": "Draft"}, {"status": "fixed"}),
+  )
+  @ddt.unpack
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_new_linked_assessment(self, assmt_attrs, ticket_attrs, upd_mock):
+    """Test link new Assessment to IssueTracker ticket sets correct fields"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=audit
+      )
+
+    assmt_request_payload = self.request_payload_builder(assmt_attrs, audit)
+    response_payload = self.response_payload_builder(ticket_attrs)
+
+    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
+                           return_value=True):
+      with mock.patch("ggrc.integrations.issues.Client.get_issue",
+                      return_value=response_payload) as get_mock:
+        response = self.api.post(all_models.Assessment, assmt_request_payload)
+
+    get_mock.assert_called_once()
+    upd_mock.assert_called_once()
+    self.assertEqual(response.status_code, 201)
+    assmt_id = response.json.get("assessment").get("id")
+    it_issue = models.IssuetrackerIssue.get_issue("Assessment", assmt_id)
+    self.check_issuetracker_issue_fields(it_issue, assmt_request_payload)
+
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_existing_assmt_link(self, update_mock):
+    """Test Assessment link to another ticket """
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=audit
+      )
+      iti = factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_id=TICKET_ID,
+          issue_tracked_obj=factories.AssessmentFactory(audit=audit)
+      )
+
+    new_ticket_id = TICKET_ID + 1
+    new_data = {"issue_id": new_ticket_id}
+    issue_request_payload = self.put_request_payload_builder(new_data)
+    response_payload = self.response_payload_builder(new_data)
+    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
+                           return_value=True):
+      with mock.patch("ggrc.integrations.issues.Client.get_issue",
+                      return_value=response_payload) as get_mock:
+        response = self.api.put(iti.issue_tracked_obj, issue_request_payload)
+    get_mock.assert_called_once()
+    self.assert200(response)
+
+    # check if data was changed in our DB
+    issue_id = response.json.get("assessment").get("id")
+    issue_tracker_issue = models.IssuetrackerIssue.get_issue(
+        "Assessment",
+        issue_id,
+    )
+    self.assertEqual(int(issue_tracker_issue.issue_id), new_ticket_id)
+
+    # check detach comment was sent
+    detach_comment_tmpl = params_builder.AssessmentParamsBuilder.DETACH_TMPL
+    comment = detach_comment_tmpl.format(new_ticket_id=new_ticket_id)
+    expected_args = (TICKET_ID, {"comment": comment})
+    self.assertEqual(expected_args, update_mock.call_args[0])
+
+  @mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
+                     return_value=True)
+  def test_already_linked_ticket(self, enabled_mock):
+    """Test Assessment w/o IT couldn't be linked to already linked ticket"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=audit
+      )
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_id=TICKET_ID,
+          issue_tracked_obj=factories.AssessmentFactory(audit=audit)
+      )
+      new_assmt = factories.AssessmentFactory()
+
+    issue_data = {"issue_id": TICKET_ID}
+    issue_request_payload = self.put_request_payload_builder(issue_data)
+    response = self.api.put(new_assmt, issue_request_payload)
+    self.assert200(response)
+    self.assertTrue(response.json["assessment"]["issue_tracker"]["_warnings"])
+    issue_id = response.json.get("assessment").get("id")
+    issue_tracker_issue = models.IssuetrackerIssue.get_issue(
+        "Assessment",
+        issue_id,
+    )
+    self.assertFalse(issue_tracker_issue)
+    enabled_mock.assert_called()
+
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_creating_new_ticket_for_linked_issue(self, update_mock):
+    """Test create new ticket for already linked assessment"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=audit
+      )
+      iti = factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_id=TICKET_ID,
+          issue_tracked_obj=factories.AssessmentFactory(audit=audit)
+      )
+    new_data = {"issue_id": ''}
+    issue_request_payload = self.put_request_payload_builder(new_data)
+    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
+                           return_value=True):
+      with mock.patch("ggrc.integrations.issues.Client.create_issue",
+                      return_value={"issueId": TICKET_ID + 1}) as create_mock:
+        response = self.api.put(iti.issue_tracked_obj, issue_request_payload)
+    self.assert200(response)
+
+    # Detach comment should be sent to previous ticket
+    update_mock.assert_called_once()
+    self.assertEqual(TICKET_ID, update_mock.call_args[0][0])
+    create_mock.assert_called_once()
+
+    # check if data was changed in our DB
+    issue_id = response.json.get("assessment").get("id")
+    issue_tracker_issue = models.IssuetrackerIssue.get_issue(
+        "Assessment",
+        issue_id,
+    )
+    self.assertNotEqual(int(issue_tracker_issue.issue_id), TICKET_ID)
 
   @mock.patch('ggrc.integrations.issues.Client.create_issue')
   def test_complete_assessment_create_issue(self, mock_create_issue):
@@ -138,7 +417,6 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
               'type': None,
               'severity': u'S3',
               'ccs': [],
-              'custom_fields': [],
               'component_id': 11111
           })
 

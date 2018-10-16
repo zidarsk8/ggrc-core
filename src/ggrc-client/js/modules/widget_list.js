@@ -53,37 +53,36 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
 
         if (ctrl && ctrl === InfoWidget) {
           descriptors[widgetId] = GGRC.WidgetDescriptor.make_info_widget(
-            options && options.instance || widget.instance,
+            options && options.instance ||
+              widget.instance,
             options && options.widget_view || widget.widget_view
           );
         } else if (ctrl && ctrl === SummaryWidgetController) {
           descriptors[widgetId] = GGRC.WidgetDescriptor.make_summary_widget(
-            options &&
-            options.instance ||
-            widget.instance,
-            options &&
-            options.widget_view ||
-            widget.widget_view
+            options && options.instance ||
+              widget.instance,
+            options && options.widget_view || widget.widget_view
           );
         } else if (ctrl && ctrl === DashboardWidget) {
           descriptors[widgetId] = GGRC.WidgetDescriptor.make_dashboard_widget(
-            options &&
-            options.instance ||
-            widget.instance,
-            options &&
-            options.widget_view ||
-            widget.widget_view
+            options && options.instance ||
+              widget.instance,
+            options && options.widget_view || widget.widget_view
           );
         } else if (ctrl && ctrl === GGRC.Controllers.TreeView) {
           descriptors[widgetId] = GGRC.WidgetDescriptor.make_tree_view(
-            options && (options.instance || options.parent_instance) || widget.instance,
-            options && options.model || widget.far_model || widget.model,
+            options && (options.instance || options.parent_instance) ||
+              widget.instance,
+            options && options.model || widget.far_model ||
+              widget.model,
             widget
           );
         } else if (widget.widgetType === 'treeview') {
           descriptors[widgetId] = GGRC.WidgetDescriptor.make_tree_view(
-            options && (options.instance || options.parent_instance) || widget.instance,
-            options && options.model || widget.far_model || widget.model,
+            options && (options.instance || options.parent_instance) ||
+              widget.instance,
+            options && options.model || widget.far_model ||
+              widget.model,
             widget,
             widgetId
           );

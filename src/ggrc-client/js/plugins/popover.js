@@ -37,11 +37,13 @@ import Spinner from 'spin.js';
           trigger: 'sticky-hover',
           placement: function () {
             let $el = this.$element;
-            let spaceLeft = $(document).width() - ($el.offset().left + $el.width());
+            let spaceLeft = $(document).width() -
+              ($el.offset().left + $el.width());
             let spaceRight = $el.offset().left;
             let popover_size = 620;
             // Display on right if there is enough space
-            if ($el.closest('.widget-area:first-child').length && spaceLeft > popover_size) {
+            if ($el.closest('.widget-area:first-child').length &&
+                spaceLeft > popover_size) {
               return 'right';
             } else if (spaceRight > popover_size) {
               return 'left';
@@ -92,7 +94,8 @@ import Spinner from 'spin.js';
   $.fn.modal_showhide = showhide('.modal', '.hidden-fields-area');
   $.fn.widget_showhide = showhide('.info', '.hidden-fields-area');
   $.fn.widget_showhide_custom = showhide('.info', '.hidden-fields-area-custom');
-  $.fn.widget_showhide_mapped = showhide('.custom-attr-wrap', '.hidden-fields-area');
+  $.fn.widget_showhide_mapped = showhide('.custom-attr-wrap',
+    '.hidden-fields-area');
   $.fn.issue_tracker_modal_showhide = showhide('.modal',
     '.hidden-issue-tracker-fields-area');
 
@@ -104,12 +107,14 @@ import Spinner from 'spin.js';
     '.expand-issue-tracker-link a', $.fn.issue_tracker_modal_showhide);
 
   // Show/hide tree leaf content
-  body.on('click', '.tree-structure .oneline, .tree-structure .description, .tree-structure .view-more', oneline);
+  body.on('click', '.tree-structure .oneline, .tree-structure .description, ' +
+                   '.tree-structure .view-more', oneline);
 
   function oneline(command) {
     $(this).each(function () {
       let $this = $(this);
-      let $leaf = $this.closest('[class*=span]').parent().children('[class*=span]:first');
+      let $leaf = $this.closest('[class*=span]').parent()
+        .children('[class*=span]:first');
       let $title = $leaf.find('.oneline');
       let $description = $leaf.find('.description');
       let $view = $leaf.closest('.row-fluid').find('.view-more');

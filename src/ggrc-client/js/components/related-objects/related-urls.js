@@ -15,8 +15,8 @@ export default can.Component.extend({
     define: {
       canAddUrl: {
         get() {
-          let canEditInstance = Permission
-            .is_allowed_for('update', this.attr('instance'));
+          let canEditInstance = this.attr('instance').isNew() ||
+            Permission.is_allowed_for('update', this.attr('instance'));
           let isNotEditable = this.attr('isNotEditable');
 
           return canEditInstance && !isNotEditable;
@@ -24,8 +24,8 @@ export default can.Component.extend({
       },
       canRemoveUrl: {
         get() {
-          let canEditInstance = Permission
-            .is_allowed_for('update', this.attr('instance'));
+          let canEditInstance = this.attr('instance').isNew() ||
+            Permission.is_allowed_for('update', this.attr('instance'));
           let isNotEditable = this.attr('isNotEditable');
           let allowToRemove = this.attr('allowToRemove');
 

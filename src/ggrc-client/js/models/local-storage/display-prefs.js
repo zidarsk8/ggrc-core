@@ -281,8 +281,8 @@ export default LocalStorage('CMS.Models.DisplayPrefs', {
     let that = this;
     can.each([COLLAPSE, LHN_SIZE, OBJ_SIZE, SORTS],
       function (key) {
-        that.makeObject(key)
-          .attr(pageId, new can.Observe(that.makeObject(path, key).serialize()));
+        that.makeObject(key).attr(
+          pageId, new can.Observe(that.makeObject(path, key).serialize()));
       });
     this.save();
     return this;

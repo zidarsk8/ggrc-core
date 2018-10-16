@@ -22,8 +22,6 @@ class TestExternalPermissions(TestCase):
   def setUp(self):
     """Set up request mock and mock dependencies."""
     self.allowed_appid = "ggrcq-id"
-    self.person = factories.PersonFactory()
-
     self.settings_patcher = mock.patch("ggrc.login.appengine.settings")
     self.settings_mock = self.settings_patcher.start()
     self.settings_mock.ALLOWED_QUERYAPI_APP_IDS = [self.allowed_appid]
@@ -101,27 +99,29 @@ class TestExternalPermissions(TestCase):
           headers=headers)
       self.assertEqual(response.status_code, 201)
 
-    # check object modifier
-    person = all_models.Person.query.filter_by(
+    ext_person = all_models.Person.query.filter_by(
         email="new_ext_user@example.com"
     ).first()
-    person_id = person.id
+    ext_person_id = ext_person.id
 
+    # check that external user has Creator role
+    self.assertEqual(ext_person.system_wide_role, "Creator")
+
+    # check model modifier
     model_json = response.json[model_singular]
-    self.assertEqual(model_json['modified_by']['id'], person_id)
-    self.assertEqual(person.system_wide_role, "Creator")
+    self.assertEqual(model_json['modified_by']['id'], ext_person_id)
 
-    # check revision modifier
-    revision = all_models.Revision.query.filter(
+    # check model revision modifier
+    model_revision = all_models.Revision.query.filter(
         all_models.Revision.resource_type == model.__name__).order_by(
         all_models.Revision.id.desc()).first()
-    self.assertEqual(revision.modified_by_id, person_id)
+    self.assertEqual(model_revision.modified_by_id, ext_person_id)
 
-    # check event modifier
+    # check model event modifier
     event = all_models.Event.query.filter(
         all_models.Event.resource_type == model.__name__).order_by(
         all_models.Event.id.desc()).first()
-    self.assertEqual(event.modified_by_id, person_id)
+    self.assertEqual(event.modified_by_id, ext_person_id)
 
     # check relationship post
     destination = factories.SystemFactory()
@@ -147,14 +147,16 @@ class TestExternalPermissions(TestCase):
     self.assertEqual(relationship.destination_type, "System")
     self.assertEqual(relationship.destination_id, destination.id)
     self.assertTrue(relationship.is_external)
-    self.assertEqual(relationship.modified_by_id, person_id)
+    self.assertEqual(relationship.modified_by_id, ext_person_id)
     self.assertIsNone(relationship.parent_id)
     self.assertIsNone(relationship.automapping_id)
     self.assertIsNone(relationship.context_id)
 
   @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
   @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
-  def test_post_invalid_modifier(self):
+  @ddt.data("new_ext_user@example.com",
+            json.dumps({"email": "external_app"}))
+  def test_post_invalid_modifier(self, email):
     """Test that validation is working for X-external-user."""
     model = all_models.Market
     headers = {
@@ -162,7 +164,7 @@ class TestExternalPermissions(TestCase):
         "X-requested-by": "GGRC",
         "X-appengine-inbound-appid": self.allowed_appid,
         "X-ggrc-user": json.dumps({"email": "external_app@example.com"}),
-        "X-external-user": "new_ext_user@example.com"
+        "X-external-user": email
     }
 
     model_plural = model._inflector.table_plural
