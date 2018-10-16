@@ -155,11 +155,14 @@ function _setupWarning(confirm, settings) {
         confirmButton.addClass(toggleClasses);
       }
     })
-    .on('keyup', (e) => {
+    .on('keydown', (e) => {
       // handle pressing enter
       if (e.keyCode === 13) {
+        // prevent triggering of form submit event
+        e.preventDefault();
+
         let confirmButton = confirm.find(buttonSelector);
-        if (!confirmButton.attr('disabled')) {
+        if (!confirmButton.hasClass('disabled')) {
           confirmButton.trigger('click');
         }
       }
