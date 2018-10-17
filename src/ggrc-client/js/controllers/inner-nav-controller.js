@@ -175,54 +175,31 @@ export default can.Control({
   },
 
   update_widget: function (widgetElement, index) {
-    let $widget = $(widgetElement);
-    let widget = this.widget_by_selector('#' + $widget.attr('id'));
-    let $header = $widget.find('.header h2');
-    let icon = $header.find('i').attr('class');
-    let menuItem = $header.text().trim();
-    let match = menuItem ?
-      menuItem.match(/\s*(\S.*?)\s*(?:\((?:(\d+)|\.*)(\/\d+)?\))?$/) : {};
-    let title = match[1];
-    let count = match[2] || undefined;
+    let widgetOptions = $(widgetElement).control('dashboard_widgets').options;
+    let widgetId = widgetOptions.widget_id;
+    let widget = this.widget_by_selector('#' + widgetId);
+    let widgetName = widgetOptions.widget_name;
+    let title = typeof widgetName === 'function' ? widgetName() : widgetName;
     let existingIndex;
-    let widgetOptions;
-    let widgetName;
-
-    function getWidgetType(widgetId) {
-      return isObjectVersion(widgetId) ? 'version' : '';
-    }
-
-    // If the metadata is unrendered, find it via options
-    if (!title) {
-      widgetOptions = $widget.control('dashboard_widgets').options;
-      widgetName = widgetOptions.widget_name;
-      icon = icon || widgetOptions.widget_icon;
-      // Strips html
-      title = $('<div>')
-        .html(typeof widgetName === 'function' ?
-          widgetName() : (String(widgetName))).text();
-    }
-    title = title.replace(/^(Mapped|Linked|My)\s+/, '');
 
     // Only create the observable once, this gets updated elsewhere
     if (!widget) {
       widget = new can.Observe({
-        selector: '#' + $widget.attr('id'),
-        count: count,
-        has_count: !!count,
+        selector: '#' + widgetId,
+        has_count: false,
         placeInAddTab: false,
       });
     }
     existingIndex = this.options.widget_list.indexOf(widget);
 
     widget.attr({
-      internav_icon: icon,
-      widgetType: getWidgetType(widgetOptions.widget_id),
-      internav_display: title,
-      internav_id: widgetOptions.widget_id,
-      internav_href: buildUrl({widget: widgetOptions.widget_id}),
+      internav_icon: widgetOptions.widget_icon,
+      widgetType: isObjectVersion(widgetId) ? 'version' : '',
+      internav_display: title.replace(/^(Mapped|Linked|My)\s+/, ''),
+      internav_id: widgetId,
+      internav_href: buildUrl({widget: widgetId}),
       forceRefetch: widgetOptions && widgetOptions.forceRefetch,
-      spinner: this.options.spinners['#' + $widget.attr('id')],
+      spinner: this.options.spinners['#' + widgetId],
       model: widgetOptions && widgetOptions.model,
       order: (widgetOptions || widget).order,
       uncountable: (widgetOptions || widget).uncountable,
