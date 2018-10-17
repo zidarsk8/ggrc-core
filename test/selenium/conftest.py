@@ -166,14 +166,14 @@ def chrome_options(chrome_options, pytestconfig):
 # `environment.app_url` and `current user` should be already set.
 environment.app_url = os.environ["DEV_URL"]
 environment.app_url = urlparse.urljoin(environment.app_url, "/")
-users.set_current_user(users.FakeSuperUser())
+users.set_current_user(users.FAKE_SUPER_USER)
 
 
 @pytest.fixture(autouse=True)
 def set_superuser_as_current_user():
   """Set super user as a current user"""
   # pylint: disable=protected-access
-  users._current_user = users.FakeSuperUser()
+  users._current_user = users.FAKE_SUPER_USER
   users.set_current_user(entities_factory.PeopleFactory.superuser)
 
 

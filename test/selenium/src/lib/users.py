@@ -1,10 +1,12 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Constants related to people objects"""
+from lib.entities import entity
 
 DEFAULT_EMAIL_DOMAIN = "example.com"
-SUPERUSER_EMAIL = "user@" + DEFAULT_EMAIL_DOMAIN
 MIGRATOR_USER_EMAIL = "migrator@" + DEFAULT_EMAIL_DOMAIN
+
+FAKE_SUPER_USER = entity.PersonEntity(email="user@" + DEFAULT_EMAIL_DOMAIN)
 
 UI_USER = "UI user"
 
@@ -50,11 +52,3 @@ def reset_logged_in_users():
   # pylint: disable=invalid-name, global-statement
   global _logged_in_user_tracks
   _logged_in_user_tracks = {}
-
-
-class FakeSuperUser(object):
-  """REST services perform requests under current_user.
-  So current user should be set before using REST.
-  """
-  # pylint: disable=too-few-public-methods
-  email = SUPERUSER_EMAIL

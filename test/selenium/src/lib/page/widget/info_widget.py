@@ -15,7 +15,7 @@ from lib.element import widget_info, tab_containers, tables
 from lib.page.modal import update_object
 from lib.page.modal.set_value_for_asmt_ca import SetValueForAsmtDropdown
 from lib.page.widget import (
-    tab_element, page_elements, object_modal, object_page)
+    tab_element, page_elements, object_modal, related_proposals, object_page)
 from lib.page.widget.page_mixins import (WithAssignFolder, WithObjectReview,
                                          WithPageElements)
 from lib.utils import selenium_utils, help_utils, ui_utils
@@ -737,6 +737,7 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
         [self.admin_entered_text, self.primary_contact_entered_text,
          self.assertions_entered_text])
     self._add_obj_review_to_lsopes()
+    self.proposals_tab = "Change Proposals"
 
   def _add_obj_review_to_lsopes(self):
     """Extend list of scopes by object review section """
@@ -782,6 +783,10 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
     comments_elem.click()
     comments_elem.send_keys(comment_msg)
 
+  def click_propose_changes(self):
+    """Click on Propose Changes button."""
+    self._browser.element(tag_name="create-proposal-button").link().click()
+
   def els_shown_for_editor(self):
     """Elements shown for user with edit permissions"""
     return [self.request_review_btn,
@@ -789,6 +794,12 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
             self.comment_area.add_section,
             self.reference_urls.add_button,
             self.assign_folder_button] + list(self.inline_edit_controls)
+
+  def related_proposals(self):
+    """Open related proposals tab."""
+    self.tabs.ensure_tab(self.proposals_tab)
+    selenium_utils.wait_for_js_to_load(self._driver)
+    return related_proposals.RelatedProposals()
 
 
 class Objectives(InfoWidget):
