@@ -140,5 +140,6 @@ class Import(object):
       "Mapping created",
       """
         :instance: The object that mapped via import.
+        :counterparty: The counterparty for object that mapped via import.
       """,
   )

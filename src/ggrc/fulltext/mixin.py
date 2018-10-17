@@ -37,17 +37,18 @@ class Indexed(object):
     return (self.__class__.__name__, self.id)
 
   @classmethod
-  def get_insert_query_for(cls, ids):
-    """Return insert class record query. It will return None, if it's empty."""
-    if not ids:
-      return None
-    instances = cls.indexed_query().filter(cls.id.in_(ids))
+  def insert_records(cls, ids):
+    """Calculate and insert records into fulltext_record_properties table."""
+    instances = cls.indexed_query().filter(cls.id.in_(ids)).all()
     indexer = fulltext.get_indexer()
     rows = itertools.chain(*[indexer.records_generator(i) for i in instances])
     values = list(rows)
-    if not values:
-      return None
-    return indexer.record_type.__table__.insert().values(values)
+    query = """
+        INSERT INTO fulltext_record_properties (
+          `key`, type, tags, property, subproperty, content
+        ) VALUES (:key, :type, :tags, :property, :subproperty, :content)
+    """
+    db.session.execute(query, values)
 
   @classmethod
   def get_delete_query_for(cls, ids):
@@ -62,13 +63,23 @@ class Indexed(object):
     )
 
   @classmethod
+  def delete_records(cls, ids):
+    """Delete records from fulltext_record_properties table."""
+    query = """
+        DELETE FROM fulltext_record_properties
+        WHERE fulltext_record_properties.type = :obj_type AND
+              fulltext_record_properties.key IN :obj_ids
+    """
+    db.session.execute(query, {"obj_type": cls.__name__, "obj_ids": ids})
+
+  @classmethod
   def bulk_record_update_for(cls, ids):
     """Bulky update index records for current class"""
-    delete_query = cls.get_delete_query_for(ids)
-    insert_query = cls.get_insert_query_for(ids)
-    for query in [delete_query, insert_query]:
-      if query is not None:
-        db.session.execute(query)
+    if not ids:
+      return
+
+    cls.delete_records(ids)
+    cls.insert_records(ids)
 
   @classmethod
   def indexed_query(cls):

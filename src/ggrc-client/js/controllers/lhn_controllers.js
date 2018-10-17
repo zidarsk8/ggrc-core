@@ -820,7 +820,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       let initialVisibleList = null;
 
 
-      self.options.results_lists[modelName].replace(results);
+      self.options.results_lists[modelName].attr(results, true);
       initialVisibleList =
           self.options.results_lists[modelName].slice(0, self.options.limit);
 

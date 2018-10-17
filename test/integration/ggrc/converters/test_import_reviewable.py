@@ -59,7 +59,6 @@ class TestImportReviewable(TestCase):
     Review -> UNREVIEWED
     Email Notification added
     """
-
     control = factories.ControlFactory(title="Test control")
 
     resp, review = self.generator.generate_object(
@@ -98,15 +97,17 @@ class TestImportReviewable(TestCase):
     ).one()
     self.assertTrue(notification)
 
-  def test_mapping(self):
-    """Reviewable mapped to snapshotable via import
+  def test_snapshottable_import(self):
+    """Revert state for snapshottable object via import.
     Review -> UNREVIEWED
     Email Notification added
     """
+    control = factories.ControlFactory(
+        title="Test control"
+    )
+    product = factories.ProductFactory()
+    product_slug = product.slug
 
-    control = factories.ControlFactory(title="Test control")
-    issue = factories.IssueFactory()
-    issue_slug = issue.slug
     resp, review = self.generator.generate_object(
         all_models.Review,
         {
@@ -127,6 +128,127 @@ class TestImportReviewable(TestCase):
         [
             ("object_type", "Control"),
             ("Code*", control.slug),
+            ("map:Product", product_slug)
+        ]
+    )
+    response = self.import_data(import_data)
+    self._check_csv_response(response, {})
+    control = all_models.Control.query.get(control_id)
+    self.assertEqual(
+        all_models.Review.STATES.UNREVIEWED,
+        control.review_status
+    )
+    notification = all_models.Notification.query.filter_by(
+        object_id=review.id, object_type="Review"
+    ).one()
+    self.assertTrue(notification)
+
+  def test_comment_import(self):
+    """Don't revert state when comment added.
+    Review -> REVIEWED
+    """
+    control = factories.ControlFactory(
+        title="Test control"
+    )
+    resp, review = self.generator.generate_object(
+        all_models.Review,
+        {
+            "reviewable": {
+                "type": control.type,
+                "id": control.id,
+            },
+            "context": None,
+            "notification_type":
+            all_models.Review.NotificationTypes.EMAIL_TYPE,
+            "status": all_models.Review.STATES.REVIEWED,
+            "access_control_list": build_reviewer_acl(),
+        },
+    )
+    del review
+    control_id = control.id
+    self.assertEqual(201, resp.status_code)
+    import_data = OrderedDict(
+        [
+            ("object_type", "Control"),
+            ("Code*", control.slug),
+            ("comments", "some comments")
+        ]
+    )
+    response = self.import_data(import_data)
+    self._check_csv_response(response, {})
+    control = all_models.Control.query.get(control_id)
+    self.assertEqual(
+        all_models.Review.STATES.REVIEWED,
+        control.review_status
+    )
+
+  def test_reference_url_import(self):
+    """Don't revert state when reference url added.
+    Review -> REVIEWED
+    """
+    control = factories.ControlFactory(
+        title="Test control"
+    )
+    resp, review = self.generator.generate_object(
+        all_models.Review,
+        {
+            "reviewable": {
+                "type": control.type,
+                "id": control.id,
+            },
+            "context": None,
+            "notification_type":
+            all_models.Review.NotificationTypes.EMAIL_TYPE,
+            "status": all_models.Review.STATES.REVIEWED,
+            "access_control_list": build_reviewer_acl(),
+        },
+    )
+    del review
+    control_id = control.id
+    self.assertEqual(201, resp.status_code)
+    import_data = OrderedDict(
+        [
+            ("object_type", "Control"),
+            ("Code*", control.slug),
+            ("reference url", "test@test.com")
+        ]
+    )
+    response = self.import_data(import_data)
+    self._check_csv_response(response, {})
+    control = all_models.Control.query.get(control_id)
+    self.assertEqual(
+        all_models.Review.STATES.REVIEWED,
+        control.review_status
+    )
+
+  def test_non_snapshottable_import(self):
+    """Reviewable mapped to non snapshotable via import
+    Review -> REVIEWED
+    """
+    control = factories.ControlFactory(title="Test control")
+    issue = factories.IssueFactory()
+    issue_slug = issue.slug
+    resp, review = self.generator.generate_object(
+        all_models.Review,
+        {
+            "reviewable": {
+                "type": control.type,
+                "id": control.id,
+            },
+            "context": None,
+            "notification_type":
+            all_models.Review.NotificationTypes.EMAIL_TYPE,
+            "status": all_models.Review.STATES.REVIEWED,
+            "access_control_list": build_reviewer_acl(),
+        },
+    )
+    del review
+    control_id = control.id
+    self.assertEqual(201, resp.status_code)
+    import_data = OrderedDict(
+        [
+            ("object_type", "Control"),
+            ("Code*", control.slug),
             ("map:Issue", issue_slug),
         ]
     )
@@ -134,9 +256,133 @@ class TestImportReviewable(TestCase):
     self._check_csv_response(response, {})
     control = all_models.Control.query.get(control_id)
     self.assertEqual(
-        all_models.Review.STATES.UNREVIEWED, control.review_status
+        all_models.Review.STATES.REVIEWED, control.review_status
     )
-    notification = all_models.Notification.query.filter_by(
-        object_id=review.id, object_type="Review"
-    ).one()
-    self.assertTrue(notification)
+
+  def test_without_changes_import(self):
+    """Import snapshotable without changes.
+    Review -> REVIEWED
+    """
+    control = factories.ControlFactory(
+        title="Test control"
+    )
+    resp, review = self.generator.generate_object(
+        all_models.Review,
+        {
+            "reviewable": {
+                "type": control.type,
+                "id": control.id,
+            },
+            "context": None,
+            "notification_type":
+            all_models.Review.NotificationTypes.EMAIL_TYPE,
+            "status": all_models.Review.STATES.REVIEWED,
+            "access_control_list": build_reviewer_acl(),
+        },
+    )
+    del review
+    control_id = control.id
+    self.assertEqual(201, resp.status_code)
+    import_data = OrderedDict(
+        [
+            ("object_type", "Control"),
+            ("Code*", control.slug),
+        ]
+    )
+    response = self.import_data(import_data)
+    self._check_csv_response(response, {})
+    control = all_models.Control.query.get(control_id)
+    self.assertEqual(
+        all_models.Review.STATES.REVIEWED,
+        control.review_status
+    )
+
+  def test_change_acl_import(self):
+    """Change acl via import
+    Review -> REVIEWED
+    """
+    control = factories.ControlFactory(
+        title="Test control"
+    )
+    resp, review = self.generator.generate_object(
+        all_models.Review,
+        {
+            "reviewable": {
+                "type": control.type,
+                "id": control.id,
+            },
+            "context": None,
+            "notification_type":
+            all_models.Review.NotificationTypes.EMAIL_TYPE,
+            "status": all_models.Review.STATES.REVIEWED,
+            "access_control_list": build_reviewer_acl(),
+        },
+    )
+    del review
+    control_id = control.id
+    self.assertEqual(201, resp.status_code)
+
+    person = factories.PersonFactory()
+    import_data = OrderedDict(
+        [
+            ("object_type", "Control"),
+            ("Code*", control.slug),
+            ("admin", person.email)
+        ]
+    )
+    response = self.import_data(import_data)
+    self._check_csv_response(response, {})
+    control = all_models.Control.query.get(control_id)
+    self.assertEqual(
+        all_models.Review.STATES.REVIEWED,
+        control.review_status
+    )
+
+  def test_assertions_import(self):
+    """
+    Change control assertions via import
+    Review -> UNREVIEWED
+    """
+    control = factories.ControlFactory(
+        title="Test control"
+    )
+    resp, review = self.generator.generate_object(
+        all_models.Review,
+        {
+            "reviewable": {
+                "type": control.type,
+                "id": control.id,
+            },
+            "context": None,
+            "notification_type":
+            all_models.Review.NotificationTypes.EMAIL_TYPE,
+            "status": all_models.Review.STATES.REVIEWED,
+            "access_control_list": build_reviewer_acl(),
+        },
+    )
+    del review
+    control_id = control.id
+    self.assertEqual(201, resp.status_code)
+
+    control_categories = factories.ControlCategoryFactory.create_batch(6)
+    for category in control_categories:
+      factories.CategorizationFactory(
+          category_id=category.id,
+          categorizable_id=control_id,
+          categorizable_type="Control",
+          category_type="ControlAssertion"
+      )
+    import_data = OrderedDict(
+        [
+            ("object_type", "Control"),
+            ("Code*", control.slug),
+            ("Assertions*", "Availability")
+        ]
+    )
+    response = self.import_data(import_data)
+    self._check_csv_response(response, {})
+    control = all_models.Control.query.get(control_id)
+    self.assertEqual(
+        all_models.Review.STATES.UNREVIEWED,
+        control.review_status
+    )
