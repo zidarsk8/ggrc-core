@@ -14,6 +14,8 @@ import {
   downloadExportContent,
   deleteExportJob,
   jobStatuses,
+  PRIMARY_TIMEOUT,
+  SECONDARY_TIMEOUT,
 } from '../../plugins/utils/import-export-utils';
 import {
   isConnectionLost,
@@ -27,8 +29,6 @@ import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 import './current-exports/current-exports';
 import {connectionLostNotifier} from './connection-lost-notifier';
 import router from '../../router';
-
-const DEFAULT_TIMEOUT = 2000;
 
 export default can.Component.extend({
   tag: 'csv-export',
@@ -54,7 +54,7 @@ export default can.Component.extend({
     isFilterActive: false,
     currentExports: [],
     disabledItems: {},
-    timeout: DEFAULT_TIMEOUT,
+    timeout: PRIMARY_TIMEOUT,
     getInProgressJobs() {
       return this.attr('currentExports').filter((el) => {
         return el.status === jobStatuses.IN_PROGRESS;
@@ -63,7 +63,6 @@ export default can.Component.extend({
     getExports(ids) {
       return getExportsHistory(ids)
         .then((exports) => {
-          const timeout = this.attr('timeout');
           if (ids) {
             let exportsMap = exports
               .reduce((map, job) => {
@@ -80,12 +79,12 @@ export default can.Component.extend({
             this.attr('currentExports').replace(exports);
           }
           if (this.getInProgressJobs().length) {
-            this.attr('timeout', timeout * 2);
+            this.attr('timeout', SECONDARY_TIMEOUT);
             this.attr('isInProgress', true);
             this.trackExportsStatus();
           } else {
             this.attr('isInProgress', false);
-            this.attr('timeout', DEFAULT_TIMEOUT);
+            this.attr('timeout', PRIMARY_TIMEOUT);
           }
         })
         .fail((jqxhr, textStatus, errorThrown) => {
