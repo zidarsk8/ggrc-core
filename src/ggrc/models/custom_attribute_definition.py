@@ -126,7 +126,7 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     data = {
         "title": self.title,
         "definition_type": self.definition_type,
-        "definition_id": target.id,
+        "definition": target,
         "context": target.context,
         "attribute_type": self.attribute_type,
         "multi_choice_options": self.multi_choice_options,

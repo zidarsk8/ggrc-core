@@ -221,9 +221,8 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
   def _clone(self, obj):
     """Clone a custom value to a new object."""
     data = {
-        "custom_attribute_id": self.custom_attribute_id,
-        "attributable_id": obj.id,
-        "attributable_type": self.attributable_type,
+        "custom_attribute": self.custom_attribute,
+        "attributable": obj,
         "attribute_value": self.attribute_value,
         "attribute_object_id": self.attribute_object_id
     }
