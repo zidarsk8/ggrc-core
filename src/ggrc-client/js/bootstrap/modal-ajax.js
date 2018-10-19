@@ -529,7 +529,7 @@ import {changeUrl} from '../router';
     }
   };
 
-  GGRC.register_modal_hook = function (toggle, launchFn) {
+  function registerModalHook(toggle, launchFn) {
     $(function () {
       $('body').on(
         'click.modal-ajax.data-api keydown.modal-ajax.data-api',
@@ -593,7 +593,8 @@ import {changeUrl} from '../router';
             });
         });
     });
-  };
+  }
+
   $(function () {
     can.each({
       '': handlers.modal,
@@ -602,7 +603,7 @@ import {changeUrl} from '../router';
       archiveform: handlers.archiveform,
     },
     function (launchFn, toggle) {
-      GGRC.register_modal_hook(toggle, launchFn);
+      registerModalHook(toggle, launchFn);
     });
   });
 })(window.can, window.can.$, window.GGRC);
