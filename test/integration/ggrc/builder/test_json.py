@@ -32,6 +32,7 @@ class TestBuilder(TestCase):
     cls.__mro__ = (cls, ) + mro
     if _publish_attrs:
       cls._api_attrs = ggrc.models.reflection.ApiAttributes(*_publish_attrs)
+      cls._api_attrs_complete = None
     cls.__bases__ = parents
     self.mock_builders.append(name)
     return cls

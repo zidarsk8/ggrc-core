@@ -23,7 +23,9 @@ from ggrc.models.mixins import Base
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Stateful
 from ggrc.models.types import CompressedType
+from ggrc.models import reflection
 from ggrc.utils import benchmark
+
 
 logger = getLogger(__name__)
 
@@ -65,6 +67,8 @@ class BackgroundTask(base.ContextRBAC, Base, Stateful, db.Model):
       backref='bg_task',
       uselist=False
   )
+
+  _api_attrs_complete = reflection.ApiAttributes("id", "status", "type")
 
   _aliases = {
       "status": {
