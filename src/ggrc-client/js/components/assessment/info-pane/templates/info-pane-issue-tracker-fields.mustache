@@ -3,18 +3,6 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#if instance.issueCreated}}
-    <div class="ggrc-form-item">
-        <div class="ggrc-form-item__row">
-            <div class="issue-tracker-url">
-                <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
-                    Ticket
-                </a>
-            </div>
-        </div>
-    </div>
-{{/if}}
-
 <div class="ggrc-form-item">
   <div class="ggrc-form-item__multiple-row">
     <issue-tracker-switcher
@@ -42,11 +30,16 @@
                   {edit-mode}="editMode"
                   {is-edit-icon-denied}="isEditIconDenied"
                   (set-edit-mode-inline)="confirmEdit()">
-                    <div>
-                      <div class="ggrc-form__title">Ticket Tracker</div>
+                    <div class="ticket-info-header">
+                      <span class="ggrc-form__title">Ticket Tracker</span>
+                      {{#if instance.issueCreated}}
+                          <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
+                              Open Ticket
+                          </a>
+                      {{/if}}
                         <div class="ggrc-form-item__small-text">
                           <small>
-                            <em>If turned on, one bug will be created for each assessment.</em>
+                            <em>Turns on Ticket Tracker integration.</em>
                           </small>
                         </div>
                     </div>
@@ -58,6 +51,28 @@
 </div>
 
 {{#if instance.issue_tracker.enabled}}
+<div class="ggrc-form-item">
+  <div class="ggrc-form-item__multiple-row--double">
+    <assessment-inline-item
+      type="number"
+      prop-name="issue_tracker.issue_id"
+      is-confirmation-needed="false"
+      {set-in-progress}="@setInProgressState"
+      {on-state-change-dfd}="onStateChangeDfd"
+      {is-edit-icon-denied}="isEditDenied"
+      {value}="instance.issue_tracker.issue_id"
+      {instance}="instance">
+        <div>
+          <div class="ggrc-form__title">Ticket ID</div>
+          <div class="ggrc-form-item__small-text">
+            <small>
+              <em>If you would like to keep the existing bug linked to this assessment do not edit this attribute. If you would like to link to a different ticket, either clear this attribute to generate new or provide an existing ticket number.</em>
+            </small>
+          </div>
+        <div>
+    </assessment-inline-item>
+  </div>
+</div>
 <div class="ggrc-form-item">
   <div class="ggrc-form-item__multiple-row">
     <assessment-inline-item
@@ -96,7 +111,7 @@
         <base-inline-control-title
           class="inline__header"
           is-edit-icon-denied="true">
-            <div class="ggrc-form__title">Issue Type</div>
+            <div class="ggrc-form__title">Ticket Type</div>
         </base-inline-control-title>
         <span>{{instance.issue_tracker.issue_type}}</span>
       </div>
@@ -115,7 +130,7 @@
       {is-edit-icon-denied}="isEditDenied"
       {value}="instance.issue_tracker.issue_priority"
       {instance}="instance">
-        <div class="ggrc-form__title">Issue Priority</div>
+        <div class="ggrc-form__title">Ticket Priority</div>
     </assessment-inline-item>
   </div>
   <div class="ggrc-form-item__multiple-row">
@@ -129,7 +144,7 @@
       {is-edit-icon-denied}="isEditDenied"
       {value}="instance.issue_tracker.issue_severity"
       {instance}="instance">
-        <div class="ggrc-form__title">Issue Severity</div>
+        <div class="ggrc-form__title">Ticket Severity</div>
     </assessment-inline-item>
   </div>
   <div class="ggrc-form-item__multiple-row">
@@ -145,7 +160,7 @@
       {value}="instance.issue_tracker.title"
       {instance}="instance">
         <div class="ggrc-form__title form-label required-label">
-          Issue Title
+          Ticket Title
           <i class="fa fa-asterisk"></i>
         </div>
     </assessment-inline-item>
