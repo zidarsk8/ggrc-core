@@ -97,7 +97,7 @@ export default can.Component.extend({
 
       self.attr('isSaving', true);
       comment = self.updateComment(comment);
-      self.dispatch({type: 'beforeCreate', items: [comment.attr()]});
+      self.dispatch({type: 'beforeCreate', items: [comment]});
 
       comment.save()
         .done(function () {
