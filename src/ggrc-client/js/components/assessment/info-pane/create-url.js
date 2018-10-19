@@ -28,7 +28,6 @@ export default can.Component.extend({
         title: value,
         context: this.attr('context') || new Context({id: null}),
         kind: 'URL',
-        _stamp: Date.now(),
       };
 
       evidence = new Evidence(attrs);

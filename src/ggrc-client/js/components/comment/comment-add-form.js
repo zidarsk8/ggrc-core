@@ -66,7 +66,6 @@ export default can.Component.extend({
         send_notification: this.attr('sendNotifications'),
         context: source.context,
         assignee_type: getAssigneeType(source),
-        _stamp: Date.now(),
       };
     },
     updateComment: function (comment) {
