@@ -15,6 +15,7 @@ class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
   """Class representing IssuetrackerIssue."""
 
   __tablename__ = 'issuetracker_issues'
+  DEFAULT_ISSUE_TYPE = "PROCESS"
 
   object_id = db.Column(db.Integer, nullable=False)
   object_type = db.Column(db.String(250), nullable=False)
@@ -23,7 +24,11 @@ class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
   title = db.Column(db.String(250), nullable=True)
   component_id = db.Column(db.String(50), nullable=True)
   hotlist_id = db.Column(db.String(50), nullable=True)
-  issue_type = db.Column(db.String(50), nullable=True)
+  issue_type = db.Column(
+      db.String(50),
+      nullable=True,
+      default=DEFAULT_ISSUE_TYPE
+  )
   issue_priority = db.Column(db.String(50), nullable=True)
   issue_severity = db.Column(db.String(50), nullable=True)
   assignee = db.Column(db.String(250), nullable=True)
