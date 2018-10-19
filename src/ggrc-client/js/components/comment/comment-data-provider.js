@@ -54,8 +54,8 @@ export default can.Component.extend('commentDataProvider', {
     },
     removeComment(commentToRemove) {
       let comments = this.attr('comments');
-      comments.replace(comments.filter(function (comment) {
-        return comment._stamp !== commentToRemove._stamp;
+      comments.replace(comments.filter((comment) => {
+        return comment !== commentToRemove;
       }));
     },
     processComment(event) {
