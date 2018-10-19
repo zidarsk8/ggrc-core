@@ -141,18 +141,6 @@ In :src:`ggrc/assets/mustache/dashboard/lhn.mustache` add the line:
 
     {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="NewObject" li_class="class"}}}
 
-If you are inside a module, you have to create a hook:
-
-..  code-block:: javascript
-
-    {{{render_hooks 'LHN.Sections_new_object'}}}
-
-And then init the hook inside your module:
-
-..  code-block:: javascript
-
-    registerHook("LHN.Sections_new_object", GGRC.mustache_path + "/dashboard/lhn_new_object");
-
 Create mustache files
 ---------------------
 
