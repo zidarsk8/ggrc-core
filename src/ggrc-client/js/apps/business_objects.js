@@ -21,42 +21,6 @@ import * as businessModels from '../models/business-models/index';
   CoreExtension.name = 'core"';
   GGRC.extensions.push(CoreExtension);
   _.assign(CoreExtension, {
-    object_type_decision_tree: function () {
-      return {
-        program: businessModels.Program,
-        audit: businessModels.Audit,
-        contract: businessModels.Contract,
-        policy: businessModels.Policy,
-        standard: businessModels.Standard,
-        regulation: businessModels.Regulation,
-        org_group: businessModels.OrgGroup,
-        vendor: businessModels.Vendor,
-        project: businessModels.Project,
-        facility: businessModels.Facility,
-        product: businessModels.Product,
-        data_asset: businessModels.DataAsset,
-        document: businessModels.Document,
-        evidence: businessModels.Evidence,
-        access_group: businessModels.AccessGroup,
-        market: businessModels.Market,
-        metric: businessModels.Metric,
-        system: businessModels.System,
-        process: businessModels.Process,
-        control: businessModels.Control,
-        assessment: businessModels.Assessment,
-        assessment_template: businessModels.AssessmentTemplate,
-        issue: businessModels.Issue,
-        objective: businessModels.Objective,
-        requirement: businessModels.Requirement,
-        person: businessModels.Person,
-        product_group: businessModels.ProductGroup,
-        role: Role,
-        technology_environment: businessModels.TechnologyEnvironment,
-        threat: businessModels.Threat,
-        risk: businessModels.Risk,
-        workflow: businessModels.Workflow,
-      };
-    },
     init_widgets: function () {
       let baseWidgetsByType = GGRC.tree_view.base_widgets_by_type;
       let widgetList = new GGRC.WidgetList('ggrc_core');
