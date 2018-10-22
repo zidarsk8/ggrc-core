@@ -4,6 +4,7 @@
  */
 
 import template from './document-object-list-item.mustache';
+import '../spinner/spinner';
 
 const tag = 'document-object-list-item';
 /**
@@ -37,9 +38,8 @@ export default can.Component.extend({
         },
       },
       itemCreationDate: {
-        type: 'date',
         get: function () {
-          return new Date(this.attr('itemData.created_at'));
+          return this.attr('itemData.created_at');
         },
       },
     },
