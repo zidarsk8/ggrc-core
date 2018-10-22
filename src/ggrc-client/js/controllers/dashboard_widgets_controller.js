@@ -27,7 +27,7 @@ export default can.Control({
   },
 }, {
   init: function () {
-    if (!this.options.model && GGRC.page_model) {
+    if (!this.options.model) {
       this.options.model = inferObjectType(GGRC.page_object);
     }
 

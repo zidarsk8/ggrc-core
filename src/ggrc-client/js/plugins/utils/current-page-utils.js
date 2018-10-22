@@ -18,7 +18,7 @@ import {
   getWidgetConfigs,
 } from './object-versions-utils';
 import Mappings from '../../models/mappers/mappings';
-import {makeModelInstance} from './models-utils';
+import {inferObjectType} from './models-utils';
 import PersistentNotifier from '../persistent_notifier';
 import Person from '../../models/business-models/person';
 import {changeUrl, reloadPage} from '../../router';
@@ -43,11 +43,13 @@ let CUSTOM_COUNTERS = {
   ALL_OBJECTS: () => _getCurrentUser().getWidgetCountForAllObjectPage(),
 };
 
+let pageInstance = null;
 function getPageInstance() {
-  if (!GGRC._page_instance && GGRC.page_object) {
-    GGRC._page_instance = makeModelInstance(GGRC.page_object);
+  if (!pageInstance && GGRC.page_object) {
+    pageInstance = inferObjectType(GGRC.page_object)
+      .model($.extend({}, GGRC.page_object));
   }
-  return GGRC._page_instance;
+  return pageInstance;
 }
 
 function initMappedInstances() {

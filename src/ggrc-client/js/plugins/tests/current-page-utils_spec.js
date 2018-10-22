@@ -13,24 +13,26 @@ import Audit from '../../models/business-models/audit';
 
 describe('GGRC Utils CurrentPage', function () {
   let pageType;
-  let pageInstance;
+  let pageObject;
 
   beforeAll(() => {
-    pageInstance = GGRC._page_instance;
+    pageObject = GGRC.page_object;
     pageType = GGRC.pageType;
   });
 
   afterAll(function () {
     GGRC.pageType = pageType;
-    GGRC._page_instance = pageInstance;
+    GGRC.page_object = pageObject;
   });
 
   beforeEach(function () {
     GGRC.pageType = undefined;
-    GGRC._page_instance = makeFakeInstance({model: Audit})({
-      id: 1,
-      type: 'Audit',
-    });
+    GGRC.page_object = {
+      audit: {
+        id: 1,
+        type: 'Audit',
+      },
+    };
   });
   describe('getPageType() method', function () {
     let method;

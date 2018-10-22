@@ -3,7 +3,6 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {makeModelInstance} from '../plugins/utils/models-utils';
 import {getPageInstance} from '../plugins/utils/current-page-utils';
 import Role from '../models/service-models/role';
 import Person from '../models/business-models/person';
@@ -149,7 +148,6 @@ const userRolesModalSelector = can.Control.extend({
         actives: this.active_list,
         selected_object: null,
         selected_option: null,
-        page_model: GGRC.page_model,
       }, this.options));
     }
     return this.context;
@@ -412,7 +410,7 @@ function getOptionSet(name, data) {
     extraJoinQuery = {context_id: context.id};
   } else if (GGRC.page_object && !GGRC.page_object.person) {
     // Otherwise use the page context
-    context = makeModelInstance(GGRC.page_object).context;
+    context = getPageInstance().context;
     if (!context) {
       throw new Error('`context` is required for Assignments model');
     }
