@@ -4,18 +4,12 @@
  */
 
 import {
+  widgetModules,
   initCounts,
   getPageInstance,
 } from '../plugins/utils/current-page-utils';
 
 import InfoWidget from '../controllers/info_widget_controller';
-import {
-  Proxy,
-  Direct,
-  Multi,
-  CustomFilter,
-} from '../models/mappers/mapper-helpers';
-import Mappings from '../models/mappers/mappings';
 import Cycle from '../models/business-models/cycle';
 import CycleTaskGroupObjectTask from '../models/business-models/cycle-task-group-object-task';
 import TaskGroup from '../models/business-models/task-group';
@@ -37,11 +31,11 @@ let historyWidgetFilter = 'is_current = 0';
 let currentWidgetFilter = 'is_current = 1';
 
 // Register `workflows` extension with GGRC
-GGRC.extensions.push(WorkflowExtension);
+widgetModules.push(WorkflowExtension);
 
 WorkflowExtension.name = 'workflows';
 
-WorkflowExtension.countsMap = {
+let countsMap = {
   history: {
     name: 'Cycle',
     countsName: historyWidgetCountsName,
@@ -53,101 +47,6 @@ WorkflowExtension.countsMap = {
     additionalFilter: currentWidgetFilter,
   },
   taskGroup: 'TaskGroup',
-};
-
-
-// Configure mapping extensions for ggrc_workflows
-WorkflowExtension.init_mappings = function () {
-  // Add mappings for basic workflow objects
-  let mappings = {
-    TaskGroup: {
-      /**
-       * @property {string[]} _canonical.objects - "objects" is a mapper name.
-       * This field contains collection of model names.
-       */
-      _canonical: {
-        objects: _workflowObjectTypes,
-      },
-      /**
-       * Mapper, which will be used for appropriate canonical mapper name
-       * "objects".
-       */
-      objects: Proxy(
-        null, 'object', 'TaskGroupObject', 'task_group',
-        'task_group_objects'),
-    },
-    TaskGroupTask: {
-      _related: ['Workflow'],
-    },
-    Workflow: {
-      _related: ['TaskGroup', 'TaskGroupTask'],
-    },
-    CycleTaskGroupObjectTask: {
-      _canonical: {
-        // It is needed for an object list generation. This object list
-        // describes which objects can be mapped to CycleTaskGroupObjectTask.
-        // Types placed within this collection will be intersected
-        // with GGRC.tree_view.base_widgets_by_type["CycleTaskGroupObjectTask"]
-        // collection. The result of the operation is the total list.
-        related_objects_as_source: _workflowObjectTypes.concat('Audit'),
-      },
-      // Needed for related_objects mapper
-      related_objects_as_source: Proxy(
-        null,
-        'destination', 'Relationship',
-        'source', 'related_destinations'
-      ),
-      // Needed for related_objects mapper
-      related_objects_as_destination: Proxy(
-        null,
-        'source', 'Relationship',
-        'destination', 'related_sources'
-      ),
-      // Needed to show mapped objects for CycleTaskGroupObjectTask
-      related_objects: Multi(
-        ['related_objects_as_source', 'related_objects_as_destination']
-      ),
-      /**
-       * "cycle", "cycle_task_entries" mappers are needed for mapped
-       * comments and objects under CycleTaskGroupObjectTask into
-       * mapping-tree-view component.
-       */
-      cycle: Direct(
-        'Cycle', 'cycle_task_group_object_tasks', 'cycle'),
-      cycle_task_entries: Direct(
-        'CycleTaskEntry',
-        'cycle_task_group_object_task',
-        'cycle_task_entries'),
-      /**
-       * This mapping name is needed for objects mapped to CTGOT.
-       * It helps to filter results of objects mapped to CTGOT.
-       * We can just remove some objects from results.
-       */
-      info_related_objects: CustomFilter(
-        'related_objects',
-        function (relatedObjects) {
-          return !_.includes([
-            'CycleTaskGroup',
-            'CycleTaskEntry',
-            'Comment',
-            'Document',
-            'Person',
-          ],
-          relatedObjects.instance.type);
-        }
-      ),
-    },
-  };
-
-  // Insert `workflows` mappings to all business object types
-  can.each(_workflowObjectTypes, function (type) {
-    mappings[type] = {
-      _canonical: {
-        task_groups: 'TaskGroup',
-      },
-    };
-  });
-  new Mappings('ggrc_workflows', mappings);
 };
 
 // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
@@ -334,9 +233,9 @@ WorkflowExtension.init_widgets_for_workflow_page = function () {
   newWidgetDescriptors.current = currentWidgetDescriptor;
 
   initCounts([
-    WorkflowExtension.countsMap.history,
-    WorkflowExtension.countsMap.activeCycles,
-    WorkflowExtension.countsMap.taskGroup,
+    countsMap.history,
+    countsMap.activeCycles,
+    countsMap.taskGroup,
   ],
   object.type,
   object.id);
@@ -390,4 +289,6 @@ WorkflowExtension.init_widgets_for_person_page = function () {
   new GGRC.WidgetList('ggrc_workflows', descriptor);
 };
 
-WorkflowExtension.init_mappings();
+export {
+  countsMap,
+};

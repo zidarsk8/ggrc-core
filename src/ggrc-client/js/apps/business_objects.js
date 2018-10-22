@@ -11,15 +11,17 @@ import {
   getWidgetConfig,
 } from '../plugins/utils/object-versions-utils';
 import {inferObjectType} from '../plugins/utils/models-utils';
-import {getPageInstance} from '../plugins/utils/current-page-utils';
-import Role from '../models/service-models/role';
+import {
+  widgetModules,
+  getPageInstance,
+} from '../plugins/utils/current-page-utils';
 import * as businessModels from '../models/business-models/index';
 
 (function (can, $) {
   let CoreExtension = {};
 
   CoreExtension.name = 'core"';
-  GGRC.extensions.push(CoreExtension);
+  widgetModules.push(CoreExtension);
   _.assign(CoreExtension, {
     init_widgets: function () {
       let baseWidgetsByType = GGRC.tree_view.base_widgets_by_type;

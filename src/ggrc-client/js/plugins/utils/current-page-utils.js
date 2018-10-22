@@ -276,11 +276,12 @@ function _getCurrentUser() {
   return Person.findInCacheById(userId);
 }
 
+const widgetModules = [];
 function initWidgets() {
   // Ensure each extension has had a chance to initialize widgets
-  can.each(GGRC.extensions, function (extension) {
-    if (extension.init_widgets) {
-      extension.init_widgets();
+  can.each(widgetModules, function (module) {
+    if (module.init_widgets) {
+      module.init_widgets();
     }
   });
 }
@@ -336,6 +337,7 @@ export {
   getCounts,
   initWidgetCounts as initCounts,
   refreshCounts,
+  widgetModules,
   initWidgets,
   navigate,
   delayLeavingPageUntil,

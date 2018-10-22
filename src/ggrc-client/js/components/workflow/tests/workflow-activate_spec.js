@@ -8,6 +8,7 @@ import Component from '../workflow-activate';
 import * as helpers from '../../../plugins/utils/workflow-utils';
 import Permission from '../../../permission';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
+import {countsMap as workflowCountsMap} from '../../../apps/workflows';
 
 describe('workflow-activate component', function () {
   let viewModel;
@@ -189,35 +190,26 @@ describe('workflow-activate component', function () {
   });
 
   describe('updateActiveCycleCounts() method', () => {
-    let originalExt;
-    let extension;
     let workflow;
 
     beforeEach(function () {
-      originalExt = GGRC.extensions;
       workflow = {};
-      extension = {
-        name: 'workflows',
-        countsMap: {},
-      };
-      GGRC.extensions = [extension];
       spyOn(CurrentPageUtils, 'initCounts');
     });
 
-    afterEach(function () {
-      GGRC.extensions = originalExt;
-    });
-
     it('updates counts for active cycles', function () {
-      extension.countsMap.activeCycles = 1234;
+      let activeCycleCount = workflowCountsMap.activeCycles;
+
+      workflowCountsMap.activeCycles = 1234;
       Object.assign(workflow, {
         type: 'Type of workflow',
         id: 4321,
       });
       viewModel.updateActiveCycleCounts(workflow);
-      expect(CurrentPageUtils.initCounts).toHaveBeenCalledWith([
-        extension.countsMap.activeCycles
-      ], workflow.type, workflow.id);
+      expect(CurrentPageUtils.initCounts)
+        .toHaveBeenCalledWith([1234], workflow.type, workflow.id);
+
+      workflowCountsMap.activeCycles = activeCycleCount;
     });
 
     it('returns result of update operation', async function (done) {

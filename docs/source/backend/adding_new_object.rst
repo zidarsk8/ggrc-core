@@ -117,7 +117,7 @@ Create a ModuleExtension object:
 
       },
     }
-    GGRC.extensions.push(ModuleExtension);
+    widgetModules.push(ModuleExtension);
 
     // Add mappings:
 

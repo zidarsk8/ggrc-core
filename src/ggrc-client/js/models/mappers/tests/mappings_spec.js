@@ -5,6 +5,7 @@
 
 import * as Utils from '../../../plugins/utils/models-utils';
 import Mappings from '../mappings';
+import {widgetModules} from '../../../plugins/utils/current-page-utils';
 
 describe('Mappings', function () {
   let allTypes = [];
@@ -145,9 +146,9 @@ describe('Mappings', function () {
 
   beforeAll(function () {
     // init all modules
-    can.each(GGRC.extensions, function (extension) {
-      if (modules[extension.name] && extension.init_widgets) {
-        extension.init_widgets();
+    can.each(widgetModules, function (module) {
+      if (modules[module.name] && module.init_widgets) {
+        module.init_widgets();
       }
     });
   });

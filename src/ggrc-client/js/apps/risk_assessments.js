@@ -3,14 +3,17 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {getPageInstance} from '../plugins/utils/current-page-utils';
+import {
+  widgetModules,
+  getPageInstance,
+} from '../plugins/utils/current-page-utils';
 import RiskAssessment from '../models/business-models/risk-assessment';
 import Program from '../models/business-models/program';
 import Stub from '../models/stub';
 
 let RiskAssessmentsExtension = {};
 let allowedObjectTypes = ['Program'];
-GGRC.extensions.push(RiskAssessmentsExtension);
+widgetModules.push(RiskAssessmentsExtension);
 
 RiskAssessmentsExtension.name = 'risk_assessments';
 Program.attributes.risk_assessments = Stub.List;
