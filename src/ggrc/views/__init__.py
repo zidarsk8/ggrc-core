@@ -692,7 +692,7 @@ def admin_create_missing_revisions():
   bg_task = background_task.create_task(
       name="create_missing_revisions",
       url=flask.url_for(create_missing_revisions.__name__),
-      queued_callback=create_missing_revisions
+      queued_callback=create_missing_revisions,
   )
   db.session.commit()
   return bg_task.make_response(
@@ -1003,7 +1003,7 @@ def generate_wf_tasks_notifs():
   bg_task = background_task.create_task(
       name="generate_wf_tasks_notifications",
       url=flask.url_for(generate_wf_tasks_notifications.__name__),
-      queued_callback=generate_wf_tasks_notifications
+      queued_callback=generate_wf_tasks_notifications,
   )
   db.session.commit()
   return bg_task.make_response(
