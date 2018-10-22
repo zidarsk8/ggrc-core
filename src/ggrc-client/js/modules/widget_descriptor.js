@@ -9,6 +9,7 @@ import InfoWidget from '../controllers/info_widget_controller';
 import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
 import Program from '../models/business-models/program';
 
+const widgetDescriptors = {};
 // A widget descriptor has the minimum five properties:
 // widget_id:  the unique ID string for the widget
 // widget_name: the display title for the widget in the UI
@@ -175,20 +176,20 @@ can.Construct('GGRC.WidgetDescriptor', {
       id = opts.widget_id;
     }
 
-    if (GGRC.widget_descriptors[id]) {
-      if (GGRC.widget_descriptors[id] instanceof this) {
-        $.extend(GGRC.widget_descriptors[id], opts);
+    if (widgetDescriptors[id]) {
+      if (widgetDescriptors[id] instanceof this) {
+        $.extend(widgetDescriptors[id], opts);
       } else {
         ret = this._super.apply(this);
-        $.extend(ret, GGRC.widget_descriptors[id], opts);
-        GGRC.widget_descriptors[id] = ret;
+        $.extend(ret, widgetDescriptors[id], opts);
+        widgetDescriptors[id] = ret;
       }
-      return GGRC.widget_descriptors[id];
+      return widgetDescriptors[id];
     }
 
     ret = this._super(...arguments);
     $.extend(ret, opts);
-    GGRC.widget_descriptors[id] = ret;
+    widgetDescriptors[id] = ret;
     return ret;
   },
 }, {});

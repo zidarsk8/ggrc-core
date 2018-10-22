@@ -5,8 +5,4 @@
 
 GGRC.mustache_path = '/static/mustache';
 
-if (!GGRC.widget_descriptors) {
-  GGRC.widget_descriptors = {};
-}
-
 
