@@ -21,7 +21,7 @@ export default can.Component.extend({
         title: obj.title,
         icon: businessModels[obj.type].table_singular,
       };
-    })
+    });
     this.viewModel.attr('items', items);
   },
 });
