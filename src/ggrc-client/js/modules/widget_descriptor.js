@@ -18,7 +18,7 @@ const widgetDescriptors = {};
 // content_controller_options: options passed directly to the content controller; the
 //   precise options depend on the controller itself.  They usually require instance
 //   and/or model and some view.
-can.Construct('GGRC.WidgetDescriptor', {
+export default can.Construct.extend({
   /*
     make an info widget descriptor for a GGRC object
     You must provide:
