@@ -9,8 +9,6 @@ import collections
 import json
 import logging
 
-from datetime import date
-
 import sqlalchemy
 from sqlalchemy import true
 from flask import flash
@@ -260,7 +258,7 @@ def start_update_audit_issues(audit_id, message):
 @queued_task
 def generate_wf_tasks_notifications(_):
   """Generate notifications for wf cycle tasks."""
-  generate_cycle_tasks_notifs(date.today())
+  generate_cycle_tasks_notifs()
   return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 
