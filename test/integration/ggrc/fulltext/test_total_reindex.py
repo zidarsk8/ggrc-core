@@ -30,8 +30,8 @@ class TestTotalReindex(TestCase):
       'AssessmentTemplate': 6,
       'Audit': 7,
       'Comment': 4,
-      'Contract': 19,  # was 9
-      'Control': 21,  # was 11
+      'Contract': 10,
+      'Control': 12,
       'Cycle': 4,
       # for cycle workflow objects the additional queries are counted
       # TODO: rewrite test
@@ -42,19 +42,19 @@ class TestTotalReindex(TestCase):
       'Document': 5,
       'Issue': 8,
       'Market': 8,
-      'Objective': 19,  # was 9
+      'Objective': 10,
       'OrgGroup': 8,
       'Person': 5,
-      'Policy': 19,  # was 9
+      'Policy': 10,
       'Process': 8,
-      'Program': 17,  # was 7
-      'Regulation': 19,  # was 9
+      'Program': 8,
+      'Regulation': 10,
       'TaskGroup': 4,
       'TaskGroupObject': 5,
       'TaskGroupTask': 4,
       'Workflow': 6,
       'TechnologyEnvironment': 8,
-      'Product': 18,
+      'Product': 9,
       'Metric': 8,
       'ProductGroup': 8,
   }
