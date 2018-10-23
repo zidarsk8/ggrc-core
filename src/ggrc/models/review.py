@@ -123,6 +123,25 @@ class Reviewable(rest_handable.WithPutHandable,
       if changed - self.ATTRS_TO_IGNORE:
         self._set_review_status_unreviewed()
 
+  def _update_status_on_custom_attrs(self):
+    """Update review status when reviewable custom attrs are changed"""
+    if not hasattr(self, "custom_attribute_values"):
+      return
+    if (self.review and
+            self.review.status != Review.STATES.UNREVIEWED):
+      if self._has_custom_attr_changes():
+        self._set_review_status_unreviewed()
+
+  def _has_custom_attr_changes(self):
+    """Check if any custom attribute changed based on history"""
+    for value in self.custom_attribute_values:
+      for attr_name in ("attribute_value", "attribute_object_id"):
+        history = db.inspect(
+            value).attrs.get(attr_name).history
+        if history.has_changes():
+          return True
+    return False
+
   def add_email_notification(self):
     """Add email notification of type STATUS_UNREVIEWED"""
     review_notif_type = self.review.notification_type
@@ -152,6 +171,7 @@ class Reviewable(rest_handable.WithPutHandable,
 
   def handle_put(self):
     self._update_status_on_attr()
+    self._update_status_on_custom_attrs()
 
   def handle_relationship_post(self, counterparty):
     self._update_status_on_mapping(counterparty)
