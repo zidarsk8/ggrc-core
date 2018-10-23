@@ -3,7 +3,7 @@
 """Rows of tree widgets on workflow tabs."""
 
 from lib.entities import app_entity_factory
-from lib.page.widget import tree_widget
+from lib.page.widget import tree_widget, table_with_headers
 from lib.utils import ui_utils, date_utils
 
 
@@ -13,6 +13,11 @@ class WorkflowCycleRow(tree_widget.TreeItem):
   def __init__(self, row_el, table_header_names):
     super(WorkflowCycleRow, self).__init__(row_el, table_header_names)
     self._table_header_names = table_header_names
+
+  @property
+  def due_date(self):
+    """Returns workflow cycle due date."""
+    return date_utils.str_to_date(self.text_for_header("End Date"), "%m/%d/%Y")
 
   def expand(self):
     """Expands workflow cycle row to show cycle task group rows."""
@@ -29,18 +34,24 @@ class WorkflowCycleRow(tree_widget.TreeItem):
     return [_CycleTaskGroupRow(row_el, self._table_header_names)
             for row_el in task_group_row_els]
 
+  def get_cycle_task_group_row_by(self, **conditions):
+    """Returns a cycle task group row by conditions."""
+    return table_with_headers.get_sub_row_by(
+        rows=self.cycle_task_group_rows, **conditions)
+
   def build_obj_with_tree(self):
     """Builds an object from a WorkflowCycle entity object.
     Will also build objects from subtrees if they are expanded.
     """
-    obj_dict = self.obj_dict()
+    dict_keys = ["title", "state", "due_date"]
+    obj_dict = self.obj_dict_from_keys(dict_keys)
     cycle_task_groups = [cycle_task_group_row.build_obj_with_tasks()
                          for cycle_task_group_row
                          in self.cycle_task_group_rows()]
     return app_entity_factory.WorkflowCycleFactory().create_empty(
         title=obj_dict["title"],
         state=obj_dict["state"],
-        due_date=date_utils.str_to_date(obj_dict["end_date"], "%m/%d/%Y"),
+        due_date=obj_dict["due_date"],
         cycle_task_groups=cycle_task_groups
     )
 
@@ -75,6 +86,11 @@ class _CycleTaskGroupRow(_BaseCycleSubRow):
     return [_CycleTaskRow(row_el, self._table_header_names)
             for row_el in task_group_row_els]
 
+  def get_cycle_task_row_by(self, **conditions):
+    """Returns a cycle task group row by conditions."""
+    return table_with_headers.get_sub_row_by(
+        rows=self.cycle_task_rows, **conditions)
+
   def build_obj_with_tasks(self):
     """Builds an object from a CycleTaskGroup entity object.
     Will also build child task objects if trees are expanded.
@@ -103,6 +119,10 @@ class _CycleTaskRow(_BaseCycleSubRow):
         state=self.state,
         due_date=date_utils.str_to_date(self.due_date, "%m/%d/%Y"),
     )
+
+  def select(self):
+    """Clicks cycle task to open cycle task info panel."""
+    self._root.element(class_name="columns").click()
 
 
 class SetupTaskGroupTreeItem(tree_widget.TreeItem):

@@ -4,6 +4,7 @@
 # pylint: disable=useless-super-delegation
 
 import re
+import time
 
 from selenium.webdriver.common.by import By
 
@@ -12,6 +13,7 @@ from lib.constants import (
     locator, objects, element, roles, regex, messages)
 from lib.constants.locator import WidgetInfoAssessment, WidgetInfoControl
 from lib.element import widget_info, tab_containers, tables
+from lib.entities import app_entity_factory
 from lib.page.modal import update_object
 from lib.page.modal.set_value_for_asmt_ca import SetValueForAsmtDropdown
 from lib.page.widget import (
@@ -442,6 +444,42 @@ class Workflow(InfoWidget):
   def workflow_members(self):
     """Returns Workflow Members page element."""
     return self._related_people_list("Workflow Member")
+
+
+class CycleTask(InfoWidget):
+  """Model for CycleTask object Info panel."""
+
+  def obj_scope(self):
+    """Returns obj scope."""
+    return {
+        "title": self.title(),
+        "status": self.status(),
+        "due_date": self.due_date
+    }
+
+  @property
+  def due_date(self):
+    """Returns Task Due Date."""
+    return self._simple_field("Task Due date").text
+
+  def click_map_objs(self):
+    """Clicks `Map Objects` button."""
+    self._browser.link(text="Map Objects").click()
+
+  def mapped_objs(self):
+    """Returns objects mapped to the cycle task."""
+    # HACK: it's not possible to determine by looking at DOM whether
+    #   the list of mapped objects was fully loaded or not.
+    time.sleep(1)
+    objs = []
+    row_els = self._browser.element(text="Mapped objects").next_sibling().lis()
+    for obj_row in row_els:
+      obj_id = int(obj_row.data_id)
+      entity_obj_name = obj_row.data_object_type
+      obj_title = obj_row.text
+      factory = app_entity_factory.get_factory_by_obj_name(entity_obj_name)()
+      objs.append(factory.create_empty(obj_id=obj_id, title=obj_title))
+    return objs
 
 
 class Audits(WithAssignFolder, InfoWidget):

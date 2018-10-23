@@ -49,8 +49,7 @@ class _Base(object):
       """Convert an obj to dict replacing circular references."""
       if attr.has(obj):
         if id(obj) in seen_entity_obj_ids:
-          return "{} with object id {} was here".format(
-              obj.obj_type(), id(obj))
+          return "{} was here".format(obj.obj_type())
         seen_entity_obj_ids.add(id(obj))
         return collections.OrderedDict(
             (attr_name, process_obj(attr_value, seen_entity_obj_ids))
@@ -111,6 +110,7 @@ class WorkflowCycle(_Base):
   state = attr.ib()
   due_date = attr.ib()
   cycle_task_groups = attr.ib()
+  workflow = attr.ib()
 
 
 @attr.s
@@ -119,6 +119,8 @@ class CycleTaskGroup(_Base):
   title = attr.ib()
   state = attr.ib()
   cycle_tasks = attr.ib()
+  workflow_cycle = attr.ib()
+  task_group = attr.ib()
 
 
 @attr.s
@@ -127,6 +129,8 @@ class CycleTask(_Base):
   title = attr.ib()
   state = attr.ib()
   due_date = attr.ib()
+  cycle_task_group = attr.ib()
+  task_group_task = attr.ib()
 
 
 @attr.s
