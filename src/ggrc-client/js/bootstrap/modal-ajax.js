@@ -202,7 +202,7 @@ import {changeUrl} from '../router';
           if (!document.contains($trigger[0])) {
             $trigger = $('[data-link-purpose="open-edit-modal"]');
             if (_.isEmpty($trigger)) {
-              console.warn(WARN_MSG); // eslint-disable-line
+              console.warn(WARN_MSG);
               return;
             }
           }
@@ -403,7 +403,17 @@ import {changeUrl} from '../router';
     let that = this;
     let $el = this.$element;
     let shownevents;
-    let keyevents;
+
+    let classList = $el && $el[0] && $el[0].classList;
+    if (!classList.contains('modal')) {
+      // class 'modal' is needed for proper 'preventdoubleescape' handling
+      // (yes, thats how we handle esc on modals right now - finding
+      // closest element with 'modal' class)
+      //
+      // class 'no-border' is to remove border that comes with 'modal'
+      classList.add('modal', 'no-border');
+    }
+
     if (!(shownevents = $._data($el[0], 'events').shown) ||
       $(shownevents).filter(function () {
         return $.inArray('arrange', this.namespace.split('.')) > -1;
@@ -421,10 +431,12 @@ import {changeUrl} from '../router';
     }
 
     // prevent form submissions when descendant elements are also modals.
-    if (!(keyevents = $._data($el[0], 'events').keypress) ||
-      $(keyevents).filter(function () {
-        return $.inArray('preventdoublesubmit', this.namespace.split('.')) > -1;
-      }).length < 1) {
+    let keypressEvents = $._data($el[0], 'events').keypress;
+    let hasPreventDblSubmitEvent = _.find(keypressEvents, (el) => {
+      return el.namespace.indexOf('preventdoublesubmit') > -1;
+    });
+
+    if (!hasPreventDblSubmitEvent) {
       $el.on('keypress.preventdoublesubmit', function (ev) {
         if (ev.which === 13 &&
           !$(document.activeElement).hasClass('create-form__input') &&
@@ -438,10 +450,13 @@ import {changeUrl} from '../router';
         }
       });
     }
-    if (!(keyevents = $._data($el[0], 'events').keyup) ||
-      $(keyevents).filter(function () {
-        return $.inArray('preventdoubleescape', this.namespace.split('.')) > -1;
-      }).length < 1) {
+
+    let keyupEvents = $._data($el[0], 'events').keyup;
+    let hasPreventDblEscEvent = _.find(keyupEvents, (el) => {
+      return el.namespace.indexOf('preventdoubleescape') > -1;
+    });
+
+    if (!hasPreventDblEscEvent) {
       $el.on('keyup.preventdoubleescape', function (ev) {
         if (ev.which === 27 && $(ev.target).closest('.modal').length) {
           $(ev.target).closest('.modal').attr('tabindex', -1).focus();
@@ -456,15 +471,19 @@ import {changeUrl} from '../router';
       if (!$el.attr('tabindex')) {
         $el.attr('tabindex', -1);
       }
-      setTimeout(function () {
-        $el.focus();
-      }, 1);
     }
     // This is a hack to stop propagation for
     // modals when we dismiss modal
     $(document).on('keyup.dismiss.modal', (e) => {
       e.stopPropagation();
     });
+
+    // to make sure opened modal is always in focus
+    // thus esc will be triggered on the correct one
+    setTimeout(function () {
+      $el.focus();
+    }, 0);
+
     originalModalShow.apply(this, arguments);
   };
 

@@ -536,9 +536,11 @@ class MappingColumnHandler(ColumnHandler):
           mapping = all_models.Relationship(source=current_obj,
                                             destination=obj)
           signals.Import.mapping_created.send(obj.__class__,
-                                              instance=obj)
+                                              instance=obj,
+                                              counterparty=current_obj)
           signals.Import.mapping_created.send(current_obj.__class__,
-                                              instance=current_obj)
+                                              instance=current_obj,
+                                              counterparty=obj)
           relationships.append(mapping)
           db.session.add(mapping)
         else:
@@ -847,8 +849,10 @@ class PersonUnmappingColumnHandler(ObjectPersonColumnHandler):
 
 
 class CategoryColumnHandler(ColumnHandler):
+  """"Base class for column handler with category."""
 
   def parse_item(self):
+    """Parse cell item."""
     names = [v.strip() for v in self.raw_value.split("\n")]
     names = [name for name in names if name != ""]
     categories = all_models.CategoryBase.query.filter(
@@ -871,12 +875,30 @@ class CategoryColumnHandler(ColumnHandler):
       return None
     return categories
 
+  def _is_assertions_same(self):
+    """Compare current and previous assertions state."""
+    current_assertions = getattr(self.row_converter.obj, self.key)
+    assertion_names = [
+        assertion.name
+        for assertion in current_assertions
+    ]
+    assertion_new_names = [
+        assertion.name
+        for assertion in self.value
+    ]
+
+    return set(assertion_names) == set(assertion_new_names)
+
   def set_obj_attr(self):
+    """Set object attribute."""
     if self.value is None:
+      return
+    elif self.key == "assertions" and self._is_assertions_same():
       return
     setattr(self.row_converter.obj, self.key, self.value)
 
   def get_value(self):
+    """Get value in string representation."""
     categories = getattr(self.row_converter.obj, self.key, self.value)
     categorie_names = [c.name for c in categories]
     return "\n".join(categorie_names)

@@ -34,7 +34,7 @@
                     {{#if instance.issueCreated}}
                         <div class="issue-tracker-url">
                             <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
-                                Ticket
+                                Open Ticket
                             </a>
                         </div>
                     {{/if}}
@@ -470,8 +470,10 @@
                               </a>
                           </div>
                           <div class="hidden-fields-area">
+                            <div class="info-pane__section-ticket-tracker">
                               <info-pane-issue-tracker-fields {instance}="instance">
                               </info-pane-issue-tracker-fields>
+                            </div>
                           </div>
                       </div>
                     </div>

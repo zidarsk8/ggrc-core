@@ -32,7 +32,7 @@
           {{^new_object_form}}
             <a
               tabindex="25"
-              class="btn btn-small btn-green preventdoubleclick {{disable_if_errors instance}}"
+              class="btn btn-small btn-green {{disable_if_errors instance}}"
               data-toggle="modal-submit"
               href="javascript://"
               >Save &amp; Close</a>
@@ -41,14 +41,14 @@
             {{^if_equals model.shortName "AssessmentTemplate"}}
             <a
               tabindex="24"
-              class="btn btn-small btn-lightBlue preventdoubleclick {{disable_if_errors instance}}"
+              class="btn btn-small btn-lightBlue {{disable_if_errors instance}}"
               data-toggle="modal-submit-addmore"
               href="javascript://"
               >Save &amp; Add Another</a>
             {{/if_equals}}
             <a
               tabindex="25"
-              class="btn btn-small btn-green preventdoubleclick {{disable_if_errors instance}}"
+              class="btn btn-small btn-green {{disable_if_errors instance}}"
               data-toggle="modal-submit"
               href="javascript://"
               >Save &amp; Close</a>
