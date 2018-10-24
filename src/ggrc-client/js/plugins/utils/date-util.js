@@ -67,7 +67,7 @@ function getDate(date, format = DATE_FORMAT.MOMENT_ISO_DATE) {
  * @param {string} format - date format string ('YYYY-MM-DDTHH:mm:ss' default value)
  * @return {string} - formatted date string in UTC
  */
-function getUtcDate(date, format = DATE_FORMAT.ISO_SHORT) {
+function getFormattedUtcDate(date, format = DATE_FORMAT.ISO_SHORT) {
   return moment.utc(date).format(format);
 }
 
@@ -86,6 +86,6 @@ export {
   DATE_FORMAT,
   getClosestWeekday,
   getDate,
-  getUtcDate,
+  getFormattedUtcDate,
   getFormattedLocalDate,
 };
