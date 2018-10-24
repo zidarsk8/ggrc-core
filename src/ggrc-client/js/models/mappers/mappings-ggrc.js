@@ -11,6 +11,7 @@ import {
 import Mappings from './mappings';
 import CustomAttributeDefinition from '../custom-attributes/custom-attribute-definition';
 import AccessControlRole from '../custom-roles/access-control-role';
+import {getRoleableModels} from '../../plugins/utils/models-utils';
 
 const businessObjects = [
   'Assessment', 'AccessGroup', 'Audit', 'Contract', 'Control', 'DataAsset',
@@ -42,7 +43,7 @@ const scopingObjects = [
 
     Person: {
       _related: ['CycleTaskGroupObjectTask', 'TaskGroupTask', 'Workflow',
-        ...GGRC.roleableTypes.map((model) => model.model_singular)],
+        ...getRoleableModels().map((model) => model.model_singular)],
     },
 
     Program: {

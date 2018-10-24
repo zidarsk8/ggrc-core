@@ -208,6 +208,16 @@ can.Observe.List.prototype.reify = function () {
   }));
 };
 
+/**
+ * Returns models with custom roles
+ * @return {Array} list of models
+ */
+function getRoleableModels() {
+  return Object.keys(businessModels)
+    .filter((modelName) => businessModels[modelName].isRoleable)
+    .map((modelName) => businessModels[modelName]);
+}
+
 export {
   getModelInstance,
   hasRelatedAssessments,
@@ -216,4 +226,5 @@ export {
   getInstance,
   isScopeModel,
   getModelByType,
+  getRoleableModels,
 };

@@ -305,14 +305,6 @@ export default can.Model('can.Model.Cacheable', {
         }
       );
     }
-
-    // register this type as Roleable if applicable
-    if (this.isRoleable) {
-      if (!GGRC.roleableTypes) {
-        GGRC.roleableTypes = [];
-      }
-      GGRC.roleableTypes.push(can.extend({}, this));
-    }
   },
 
   findInCacheById: function (id) {
