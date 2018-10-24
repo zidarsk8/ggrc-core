@@ -7,7 +7,7 @@ import {warning} from './modals';
 import {hasQuestions} from './ggrcq-utils';
 
 /**
- * Utils methods shared between GGRC controllers (GGRC.Controllers)
+ * Utils methods shared between GGRC controllers
  */
 
 function checkPreconditions(options, success) {
