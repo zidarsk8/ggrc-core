@@ -6,6 +6,7 @@
 import SummaryWidgetController from '../controllers/summary_widget_controller';
 import DashboardWidget from '../controllers/dashboard_widget_controller';
 import InfoWidget from '../controllers/info_widget_controller';
+import WidgetList from '../modules/widget_list';
 import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
 import {
   getWidgetConfig,
@@ -25,7 +26,7 @@ import * as businessModels from '../models/business-models/index';
   _.assign(CoreExtension, {
     init_widgets: function () {
       let baseWidgetsByType = GGRC.tree_view.base_widgets_by_type;
-      let widgetList = new GGRC.WidgetList('ggrc_core');
+      let widgetList = new WidgetList('ggrc_core');
       let objectClass = inferObjectType(GGRC.page_object);
       let objectTable = objectClass && objectClass.table_plural;
       let object = getPageInstance();

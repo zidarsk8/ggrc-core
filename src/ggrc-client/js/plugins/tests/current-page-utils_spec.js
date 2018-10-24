@@ -3,13 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 import * as TreeViewUtils from '../utils/tree-view-utils';
 import * as SnapshotUtils from '../utils/snapshot-utils';
 import * as CurrentPageUtils from '../utils/current-page-utils';
 import * as QueryAPI from '../utils/query-api-utils';
 import Mappings from '../../models/mappers/mappings';
-import Audit from '../../models/business-models/audit';
+import WidgetList from '../../modules/widget_list';
 
 describe('GGRC Utils CurrentPage', function () {
   let pageType;
@@ -138,7 +137,7 @@ describe('GGRC Utils CurrentPage', function () {
     let method;
 
     beforeEach(function () {
-      spyOn(GGRC.WidgetList, 'get_widget_list_for')
+      spyOn(WidgetList, 'get_widget_list_for')
         .and.returnValue({
           control: {},
           Assessment: {},
@@ -203,7 +202,7 @@ describe('GGRC Utils CurrentPage', function () {
     let method;
 
     beforeEach(function () {
-      spyOn(GGRC.WidgetList, 'get_widget_list_for')
+      spyOn(WidgetList, 'get_widget_list_for')
         .and.returnValue({
           control: {
             widgetType: 'treeview',
@@ -508,7 +507,7 @@ describe('GGRC Utils CurrentPage', function () {
           },
         };
 
-      spyOn(GGRC.WidgetList, 'get_widget_list_for')
+      spyOn(WidgetList, 'get_widget_list_for')
         .and.returnValue(widgets);
 
       spyOn(can, 'ajax')

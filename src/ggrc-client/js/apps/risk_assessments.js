@@ -10,6 +10,7 @@ import {
 import RiskAssessment from '../models/business-models/risk-assessment';
 import Program from '../models/business-models/program';
 import Stub from '../models/stub';
+import WidgetList from '../modules/widget_list';
 
 let RiskAssessmentsExtension = {};
 let allowedObjectTypes = ['Program'];
@@ -50,5 +51,5 @@ RiskAssessmentsExtension.init_widgets = function () {
       },
     };
   }
-  new GGRC.WidgetList('ggrc_risk_assessments', descriptor);
+  new WidgetList('ggrc_risk_assessments', descriptor);
 };

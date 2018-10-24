@@ -22,6 +22,7 @@ import {inferObjectType} from './models-utils';
 import PersistentNotifier from '../persistent_notifier';
 import Person from '../../models/business-models/person';
 import {changeUrl, reloadPage} from '../../router';
+import WidgetList from '../../modules/widget_list';
 
 /**
  * Util methods for work with Current Page.
@@ -137,7 +138,7 @@ function getWidgetList(modelName, path) {
   if (!modelName) {
     return widgetList;
   }
-  widgetList = GGRC.WidgetList.get_widget_list_for(modelName);
+  widgetList = WidgetList.get_widget_list_for(modelName);
   // Needs refactoring: Should be removed and replaced with Routing!!!
   isAssessmentsView = /^\/assessments_view/.test(path);
 

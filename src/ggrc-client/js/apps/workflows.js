@@ -10,6 +10,7 @@ import {
 } from '../plugins/utils/current-page-utils';
 
 import InfoWidget from '../controllers/info_widget_controller';
+import WidgetList from '../modules/widget_list';
 import Cycle from '../models/business-models/cycle';
 import CycleTaskGroupObjectTask from '../models/business-models/cycle-task-group-object-task';
 import TaskGroup from '../models/business-models/task-group';
@@ -136,7 +137,7 @@ WorkflowExtension.init_widgets_for_other_pages = function () {
     };
   }
 
-  new GGRC.WidgetList('ggrc_workflows', descriptor);
+  new WidgetList('ggrc_workflows', descriptor);
 };
 
 WorkflowExtension.init_widgets_for_workflow_page = function () {
@@ -149,7 +150,7 @@ WorkflowExtension.init_widgets_for_workflow_page = function () {
   let object = getPageInstance();
 
   can.each(
-    GGRC.WidgetList.get_current_page_widgets(),
+    WidgetList.get_current_page_widgets(),
     function (descriptor, name) {
       if (~newDefaultWidgets.indexOf(name)) {
         newWidgetDescriptors[name] = descriptor;
@@ -240,7 +241,7 @@ WorkflowExtension.init_widgets_for_workflow_page = function () {
   object.type,
   object.id);
 
-  new GGRC.WidgetList(
+  new WidgetList(
     'ggrc_workflows',
     {Workflow: newWidgetDescriptors}
   );
@@ -286,7 +287,7 @@ WorkflowExtension.init_widgets_for_person_page = function () {
       },
     };
   }
-  new GGRC.WidgetList('ggrc_workflows', descriptor);
+  new WidgetList('ggrc_workflows', descriptor);
 };
 
 export {
