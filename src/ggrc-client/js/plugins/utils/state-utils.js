@@ -7,6 +7,7 @@ import {
   isMyAssessments,
   isMyWork,
 } from './current-page-utils';
+import QueryParser from '../../generated/ggrc_filter_query_parser';
 
 /**
  * Utils for state.
@@ -243,7 +244,7 @@ function buildAssessmentFilter(statuses, builder) {
     },
   };
 
-  let result = statuses.length ? GGRC.query_parser.join_queries(
+  let result = statuses.length ? QueryParser.joinQueries(
     builder(statuses, 'Assessment'), completedStateExpression, 'OR')
     : completedStateExpression;
 

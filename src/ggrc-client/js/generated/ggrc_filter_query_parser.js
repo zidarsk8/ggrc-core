@@ -11,36 +11,29 @@ see: src/parser/generate_parser.js
 
 */
 
-GGRC.query_parser = {
-  parse: function parse(query) {
+export default {
+  parse(query) {
     try {
       return this.generated.parse(query);
     } catch (e) {
-      // force texst search if anything goes wrong
+      // force text search if anything goes wrong
       return this.generated.parse("~" + query);
     }
   },
-  join_queries: function(left, right, op_key) {
-    let expression = null;
-    let op = {};
+  joinQueries(left, right, op = 'AND') {
     if (!left.expression.op){
       return right;
     }
     if (!right.expression.op){
       return left;
     }
-    if (op_key && op_key == "OR") {
-      op = {name: "OR"};
-    } else {
-      op = {name: "AND"};
-    }
-    expression = {
+    let expression = {
       left: left.expression,
-      op: op,
+      op: {name: op},
       right: right.expression,
     }
     return {
-      expression: expression,
+      expression,
     }
   },
   generated: /*

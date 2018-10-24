@@ -54,6 +54,7 @@ import Cacheable from '../../models/cacheable';
 import Relationship from '../../models/service-models/relationship';
 import * as businessModels from '../../models/business-models';
 import exportMessage from './templates/export-message.mustache';
+import QueryParser from '../../generated/ggrc_filter_query_parser';
 
 let viewModel;
 
@@ -83,8 +84,7 @@ viewModel = can.Map.extend({
         }
 
         if (additionalFilter) {
-          additionalFilter = GGRC.query_parser
-            .parse(additionalFilter);
+          additionalFilter = QueryParser.parse(additionalFilter);
         }
 
         return filters.filter(function (options) {
@@ -338,7 +338,7 @@ viewModel = can.Map.extend({
    */
   _concatFilters: function (filter, options) {
     if (filter) {
-      filter = GGRC.query_parser.join_queries(
+      filter = QueryParser.joinQueries(
         filter,
         options.query.attr(),
         'AND');
@@ -516,7 +516,7 @@ viewModel = can.Map.extend({
     this.attr('advancedSearch.appliedFilterItems', filters);
     this.attr('advancedSearch.appliedMappingItems', mappings);
 
-    advancedFilters = GGRC.query_parser.join_queries(
+    advancedFilters = QueryParser.joinQueries(
       AdvancedSearch.buildFilter(filters, request),
       AdvancedSearch.buildFilter(mappings, request)
     );

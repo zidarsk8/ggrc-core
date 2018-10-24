@@ -11,6 +11,7 @@ import Pagination from '../../base-objects/pagination';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../mapper-results';
 import Program from '../../../models/business-models/program';
+import QueryParser from '../../../generated/ggrc_filter_query_parser';
 
 describe('mapper-results component', function () {
   'use strict';
@@ -322,8 +323,8 @@ describe('mapper-results component', function () {
       spyOn(QueryAPI, 'buildParam')
         .and.returnValue({});
       spyOn(AdvancedSearch, 'buildFilter');
-      spyOn(GGRC.query_parser, 'parse');
-      spyOn(GGRC.query_parser, 'join_queries');
+      spyOn(QueryParser, 'parse');
+      spyOn(QueryParser, 'joinQueries');
     });
 
     it('builds advanced filters', function () {
@@ -418,7 +419,7 @@ describe('mapper-results component', function () {
       spyOn(viewModel, 'prepareUnlockedFilter').and.returnValue('unlocked');
       viewModel.getQuery();
 
-      expect(GGRC.query_parser.join_queries.calls.argsFor(2)[1])
+      expect(QueryParser.joinQueries.calls.argsFor(2)[1])
         .toBe('unlocked');
     });
 
@@ -433,7 +434,7 @@ describe('mapper-results component', function () {
 
       viewModel.getQuery();
 
-      expect(GGRC.query_parser.join_queries.calls.argsFor(2)[1]).toEqual({
+      expect(QueryParser.joinQueries.calls.argsFor(2)[1]).toEqual({
         expression: {
           object_name: 'Person',
           op: {
