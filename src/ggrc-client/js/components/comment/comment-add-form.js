@@ -11,6 +11,7 @@ import {COMMENT_CREATED} from '../../events/eventTypes';
 import tracker from '../../tracker';
 import {getAssigneeType} from '../../plugins/ggrc_utils';
 import {notifier} from '../../plugins/utils/notifiers-utils';
+import {getFormattedUtcDate} from '../../plugins/utils/date-util';
 
 const tag = 'comment-add-form';
 
@@ -67,7 +68,7 @@ export default can.Component.extend({
         send_notification: this.attr('sendNotifications'),
         context: source.context,
         assignee_type: getAssigneeType(source),
-        created_at: new Date(),
+        created_at: getFormattedUtcDate(),
         modified_by: {type: 'Person', id: GGRC.current_user.id},
         _stamp: Date.now(),
       };
