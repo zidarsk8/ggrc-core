@@ -68,14 +68,6 @@ export default can.Construct.extend({
             widget.instance,
           options && options.widget_view || widget.widget_view
         );
-      } else if (ctrl && ctrl === GGRC.Controllers.TreeView) {
-        descriptors[widgetId] = WidgetDescriptor.make_tree_view(
-          options && (options.instance || options.parent_instance) ||
-            widget.instance,
-          options && options.model || widget.far_model ||
-            widget.model,
-          widget
-        );
       } else if (widget.widgetType === 'treeview') {
         descriptors[widgetId] = WidgetDescriptor.make_tree_view(
           options && (options.instance || options.parent_instance) ||
