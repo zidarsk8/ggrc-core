@@ -14,7 +14,6 @@ import '../apps/risk_assessments';
 import '../apps/workflow-config';
 import '../apps/workflows';
 import '../controllers/dashboard_page';
-import '../controllers/workflow_page';
 import '../workflow_mustache_helpers';
 import '../components/workflow/workflow_clone';
 import '../components/workflow/taskgroup_clone';

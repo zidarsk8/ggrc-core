@@ -159,10 +159,6 @@ WorkflowExtension.init_widgets_for_workflow_page = function () {
     }
   );
 
-  // Initialize controller -- probably this should go in a separate
-  // initialization area
-  $(document.body).ggrc_controllers_workflow_page();
-
   $.extend(
     true,
     newWidgetDescriptors,
