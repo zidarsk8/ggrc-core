@@ -18,6 +18,7 @@ import AccessControlRole from '../../models/custom-roles/access-control-role';
 import Roleable from '../../models/custom-roles/roleable';
 import Person from '../../models/business-models/person';
 import WidgetList from '../../modules/widget_list';
+import ListView from '../../controllers/tree/list_view_controller';
 
 const path = GGRC.mustache_path || '/static/mustache';
 const HEADER_VIEW = `${path}/base_objects/page_header.mustache`;
@@ -127,7 +128,7 @@ new WidgetList('ggrc_admin', {
   admin: {
     people: {
       model: Person,
-      content_controller: GGRC.Controllers.ListView,
+      content_controller: ListView,
       content_controller_options: adminListDescriptors.people,
       widget_id: 'people_list',
       widget_icon: 'person',
@@ -141,7 +142,7 @@ new WidgetList('ggrc_admin', {
     },
     roles: {
       model: Role,
-      content_controller: GGRC.Controllers.ListView,
+      content_controller: ListView,
       content_controller_options: adminListDescriptors.roles,
       widget_id: 'roles_list',
       widget_icon: 'role',
@@ -155,7 +156,7 @@ new WidgetList('ggrc_admin', {
     },
     events: {
       model: Event,
-      content_controller: GGRC.Controllers.ListView,
+      content_controller: ListView,
       content_controller_options: adminListDescriptors.events,
       widget_id: 'events_list',
       widget_icon: 'event',

@@ -9,7 +9,6 @@ import '../commons';
 import '../../controllers/tree/tree-loader';
 import '../../controllers/tree/tree-view';
 import '../../controllers/tree/tree-view-node';
-import '../../controllers/tree/list_view_controller';
 
 // Modules and Apps
 import '../../apps/business_objects';
