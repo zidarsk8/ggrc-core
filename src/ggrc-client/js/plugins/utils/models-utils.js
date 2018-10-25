@@ -218,6 +218,16 @@ function getRoleableModels() {
     .map((modelName) => businessModels[modelName]);
 }
 
+/**
+ * Returns models with custom roles
+ * @return {Array} list of models
+ */
+function getCustomAttributableModels() { // eslint-disable-line
+  return Object.keys(businessModels)
+    .filter((modelName) => businessModels[modelName].is_custom_attributable)
+    .map((modelName) => businessModels[modelName]);
+}
+
 export {
   getModelInstance,
   hasRelatedAssessments,
@@ -227,4 +237,5 @@ export {
   isScopeModel,
   getModelByType,
   getRoleableModels,
+  getCustomAttributableModels,
 };

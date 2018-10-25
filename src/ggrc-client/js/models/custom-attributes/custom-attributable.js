@@ -4,6 +4,7 @@
 */
 
 import Cacheable from '../cacheable';
+import {getCustomAttributableModels} from '../../plugins/utils/models-utils';
 
 /* class CustomAttributable
   *
@@ -15,11 +16,11 @@ import Cacheable from '../cacheable';
   */
 export default Cacheable('CMS.Models.CustomAttributable', {
   findAll: function () {
-    let types = _.orderBy(GGRC.custom_attributable_types,
+    let types = _.orderBy(getCustomAttributableModels(),
       'category', false);
 
     return can.when(can.map(types, (type, i) => {
-      return new this(can.extend(type, {
+      return new this(can.extend({}, type, {
         id: i,
       }));
     }));

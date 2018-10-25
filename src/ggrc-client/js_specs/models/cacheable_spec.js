@@ -105,15 +105,6 @@ describe('Cacheable model', () => {
     });
   });
 
-  describe('::init', () => {
-    it('sets custom attributes', () => {
-      // NB using $.extend here creates a new object with all of the static properties of the function.
-      //  This is how the custom attributable is implemented in setup.
-      expect(GGRC.custom_attributable_types)
-        .toContain($.extend({}, DummyModel));
-    });
-  });
-
   describe('::update', () => {
     let _obj;
 
