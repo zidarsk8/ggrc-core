@@ -5,9 +5,6 @@
 
 import '../commons';
 
-// Controllers
-import '../../controllers/tree/tree-view-node';
-
 // Modules and Apps
 import '../../apps/business_objects';
 

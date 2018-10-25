@@ -9,6 +9,7 @@ import {
 } from '../../plugins/utils/widgets-utils';
 import Permission from '../../permission';
 import TreeLoader from './tree-loader';
+import TreeViewNode from './tree-view-node';
 import TreeViewOptions from './tree-view-options';
 import Mappings from '../../models/mappers/mappings';
 
@@ -441,9 +442,8 @@ export default TreeLoader({
     items = can.makeArray(optionsList);
 
     items = _.map(items, function (options) {
-      let control;
       let elem = document.createElement('li');
-      control = new CMS.Controllers.TreeViewNode(elem, options);
+      let control = new TreeViewNode(elem, options);
       drawItemsDfds.push(control._draw_node_deferred);
       filteredItems.push(control);
       return control.element[0];
