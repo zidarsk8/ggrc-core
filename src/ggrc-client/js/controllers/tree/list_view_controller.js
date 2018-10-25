@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import TreeLoader from './tree-loader';
+
 function modelListLoader(controller, params) {
   let model = controller.options.model;
   let page = new $.Deferred();
@@ -16,7 +18,7 @@ function modelListLoader(controller, params) {
   return page;
 }
 
-export default CMS.Controllers.TreeLoader({
+export default TreeLoader({
   defaults: {
     is_related: false,
     model: null,
