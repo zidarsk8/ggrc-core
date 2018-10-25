@@ -20,7 +20,6 @@ from ggrc.models.mixins import with_proposal_handable
 from ggrc.models.mixins import with_mappimg_via_import_handable
 
 from ggrc.models.relationship import Relatable
-from ggrc.fulltext import mixin as ft_mixin
 
 from ggrc.notifications import add_notification
 
@@ -84,6 +83,24 @@ class Reviewable(rest_handable.WithPutHandable,
         sa.orm.joinedload("review")
     )
 
+  @classmethod
+  def indexed_query(cls):
+    return super(Reviewable, cls).indexed_query().options(
+        sa.orm.Load(cls).subqueryload(
+            "review"
+        ).load_only(
+            "status",
+            "notification_type",
+        ),
+        sa.orm.Load(cls).subqueryload(
+            "review"
+        ).joinedload(
+            "issuetracker_issue"
+        ).load_only(
+            "issue_url",
+        ),
+    )
+
   def log_json(self):
     """Serialize to JSON"""
     out_json = super(Reviewable, self).log_json()
@@ -93,7 +110,7 @@ class Reviewable(rest_handable.WithPutHandable,
     return out_json
 
   ATTRS_TO_IGNORE = {"review", "updated_at", "modified_by_id",
-                     "slug", "_access_control_list"}
+                     "slug", "_access_control_list", "folder"}
 
   def _update_status_on_attr(self):
     """Update review status when reviewable attrs are changed"""
@@ -105,6 +122,25 @@ class Reviewable(rest_handable.WithPutHandable,
 
       if changed - self.ATTRS_TO_IGNORE:
         self._set_review_status_unreviewed()
+
+  def _update_status_on_custom_attrs(self):
+    """Update review status when reviewable custom attrs are changed"""
+    if not hasattr(self, "custom_attribute_values"):
+      return
+    if (self.review and
+            self.review.status != Review.STATES.UNREVIEWED):
+      if self._has_custom_attr_changes():
+        self._set_review_status_unreviewed()
+
+  def _has_custom_attr_changes(self):
+    """Check if any custom attribute changed based on history"""
+    for value in self.custom_attribute_values:
+      for attr_name in ("attribute_value", "attribute_object_id"):
+        history = db.inspect(
+            value).attrs.get(attr_name).history
+        if history.has_changes():
+          return True
+    return False
 
   def add_email_notification(self):
     """Add email notification of type STATUS_UNREVIEWED"""
@@ -135,6 +171,7 @@ class Reviewable(rest_handable.WithPutHandable,
 
   def handle_put(self):
     self._update_status_on_attr()
+    self._update_status_on_custom_attrs()
 
   def handle_relationship_post(self, counterparty):
     self._update_status_on_mapping(counterparty)
@@ -161,7 +198,6 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
              Relatable,
              mixins.base.ContextRBAC,
              mixins.Base,
-             ft_mixin.Indexed,
              db.Model):
   """Review object"""
   # pylint: disable=too-few-public-methods
@@ -213,11 +249,6 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
       "issuetracker_issue",
       "status",
   )
-
-  _fulltext_attrs = [
-      "reviewable_id",
-      "reviewable_type",
-  ]
 
   def validate_acl(self):
     """Reviewer is mandatory Role"""
