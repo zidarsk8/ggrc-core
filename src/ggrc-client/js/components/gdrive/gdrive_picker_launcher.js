@@ -17,7 +17,7 @@ import {
 } from '../../plugins/utils/notifiers-utils';
 import Context from '../../models/service-models/context';
 import * as businessModels from '../../models/business-models';
-import {getFormattedUtcDate} from '../../plugins/utils/date-util';
+import {getFormattedUtcDate} from '../../plugins/utils/date-utils';
 
 export default can.Component.extend({
   tag: 'ggrc-gdrive-picker-launcher',

@@ -28,14 +28,16 @@ import {
   allowedToMap,
   getHooks,
 } from './plugins/ggrc_utils';
-import {formatDate} from './plugins/utils/date-util';
 import Option from './models/service-models/option';
 import Search from './models/service-models/search';
 import Person from './models/business-models/person';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
 import Mappings from './models/mappers/mappings';
-import {getFormattedLocalDate} from './plugins/utils/date-util';
+import {
+  getFormattedLocalDate,
+  formatDate,
+} from './plugins/utils/date-utils';
 
 // Chrome likes to cache AJAX requests for Mustaches.
 let mustacheUrls = {};

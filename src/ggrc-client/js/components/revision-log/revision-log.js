@@ -14,7 +14,7 @@ import Revision from '../../models/service-models/revision';
 import Person from '../../models/business-models/person';
 import Stub from '../../models/stub';
 import Mappings from '../../models/mappers/mappings';
-import {formatDate} from '../../plugins/utils/date-util';
+import {formatDate} from '../../plugins/utils/date-utils';
 
 const EMPTY_DIFF_VALUE = '—';
 

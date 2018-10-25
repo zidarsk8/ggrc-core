@@ -18,7 +18,7 @@ import Permission from '../../permission';
 import template from './create-document-button.mustache';
 import Document from '../../models/business-models/document';
 import Context from '../../models/service-models/context';
-import {getFormattedUtcDate} from '../../plugins/utils/date-util';
+import {getFormattedUtcDate} from '../../plugins/utils/date-utils';
 
 const viewModel = can.Map.extend({
   parentInstance: null,

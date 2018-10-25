@@ -11,7 +11,7 @@ import {COMMENT_CREATED} from '../../events/eventTypes';
 import tracker from '../../tracker';
 import {getAssigneeType} from '../../plugins/ggrc_utils';
 import {notifier} from '../../plugins/utils/notifiers-utils';
-import {getFormattedUtcDate} from '../../plugins/utils/date-util';
+import {getFormattedUtcDate} from '../../plugins/utils/date-utils';
 
 const tag = 'comment-add-form';
 

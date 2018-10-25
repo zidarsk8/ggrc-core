@@ -6,7 +6,7 @@
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 import Context from '../../../models/service-models/context';
 import Evidence from '../../../models/business-models/evidence';
-import {getFormattedUtcDate} from '../../../plugins/utils/date-util';
+import {getFormattedUtcDate} from '../../../plugins/utils/date-utils';
 
 export default can.Component.extend({
   tag: 'create-url',

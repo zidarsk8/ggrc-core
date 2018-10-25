@@ -4,7 +4,7 @@
  */
 
 import Comment from '../../models/service-models/comment';
-import {getFormattedUtcDate} from '../../plugins/utils/date-util';
+import {getFormattedUtcDate} from '../../plugins/utils/date-utils';
 
 const tag = 'comment-add-button';
 const template = `<button class="btn btn-small btn-gray"

@@ -21,7 +21,7 @@ import Context from '../../models/service-models/context';
 import Evidence from '../../models/business-models/evidence';
 import Document from '../../models/business-models/document';
 import * as businessModels from '../../models/business-models';
-import {getFormattedUtcDate} from '../../plugins/utils/date-util';
+import {getFormattedUtcDate} from '../../plugins/utils/date-utils';
 
 let DOCUMENT_KIND_MAP = {
   FILE: 'documents_file',

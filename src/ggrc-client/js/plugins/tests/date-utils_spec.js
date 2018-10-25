@@ -8,7 +8,7 @@ import {
   getDate,
   getFormattedUtcDate,
   formatDate,
-} from '../utils/date-util';
+} from '../utils/date-utils';
 
 describe('GGRC DateUtil', () => {
   describe('getClosestWeekday() method', () => {

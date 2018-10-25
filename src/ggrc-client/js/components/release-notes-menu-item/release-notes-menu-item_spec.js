@@ -6,7 +6,7 @@
 import Component from './release-notes-menu-item';
 import {getComponentVM} from '../../../js_specs/spec_helpers';
 import * as UserUtils from '../../plugins/utils/user-utils';
-import {getFormattedUtcDate} from '../../plugins/utils/date-util';
+import {getFormattedUtcDate} from '../../plugins/utils/date-utils';
 
 describe('"release-notes-menu-item" component', () => {
   let vm;

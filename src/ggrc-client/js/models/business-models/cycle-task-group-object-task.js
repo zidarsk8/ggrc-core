@@ -8,7 +8,7 @@ import CycleTaskGroup from './cycle-task-group';
 import {getRole} from '../../plugins/utils/acl-utils';
 import {REFRESH_SUB_TREE} from '../../events/eventTypes';
 import {getPageType} from '../../plugins/utils/current-page-utils';
-import {getClosestWeekday} from '../../plugins/utils/date-util';
+import {getClosestWeekday} from '../../plugins/utils/date-utils';
 import timeboxed from '../mixins/timeboxed';
 import isOverdue from '../mixins/is-overdue';
 import accessControlList from '../mixins/access-control-list';

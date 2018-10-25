@@ -6,7 +6,7 @@
 import Cacheable from '../../../models/cacheable';
 import {helpers} from './../tree-item-custom-attribute';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
-import * as DateUtils from '../../../plugins/utils/date-util';
+import * as DateUtils from '../../../plugins/utils/date-utils';
 
 describe('helpers.getCustomAttrValue', () => {
   let helper;
