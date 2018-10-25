@@ -12,8 +12,9 @@ import TreeLoader from './tree-loader';
 import TreeViewOptions from './tree-view-options';
 import Mappings from '../../models/mappers/mappings';
 
-export default TreeLoader('CMS.Controllers.TreeView', {
+export default TreeLoader({
   // static properties
+  pluginName: 'cms_controllers_tree_view',
   defaults: {
     model: null,
     show_view: null,

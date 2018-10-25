@@ -261,7 +261,7 @@ import TreeViewOptions from './tree-view-options';
       let childTreeDfds = [];
       let that = this;
 
-      this.element.find('.' + CMS.Controllers.TreeView._fullName)
+      this.element.find('.cms_controllers_tree_view')
         .each(function (_, el) {
           let $el = $(el);
           let childTreeControl;

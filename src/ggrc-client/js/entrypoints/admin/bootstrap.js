@@ -19,6 +19,7 @@ import Roleable from '../../models/custom-roles/roleable';
 import Person from '../../models/business-models/person';
 import WidgetList from '../../modules/widget_list';
 import ListView from '../../controllers/tree/list_view_controller';
+import TreeView from '../../controllers/tree/tree-view';
 
 const path = GGRC.mustache_path || '/static/mustache';
 const HEADER_VIEW = `${path}/base_objects/page_header.mustache`;
@@ -171,7 +172,7 @@ new WidgetList('ggrc_admin', {
       widget_id: 'custom_attribute',
       widget_name: 'Custom Attributes',
       widget_icon: 'workflow',
-      content_controller: CMS.Controllers.TreeView,
+      content_controller: TreeView,
       content_controller_selector: 'ul',
       model: CustomAttributable,
       widget_initial_content:
@@ -185,7 +186,7 @@ new WidgetList('ggrc_admin', {
       widget_id: 'custom_roles',
       widget_name: 'Custom Roles',
       widget_icon: 'unlock',
-      content_controller: CMS.Controllers.TreeView,
+      content_controller: TreeView,
       content_controller_selector: 'ul',
       content_controller_options: adminListDescriptors.custom_roles,
       model: Roleable,

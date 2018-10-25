@@ -6,7 +6,6 @@
 import '../commons';
 
 // Controllers
-import '../../controllers/tree/tree-view';
 import '../../controllers/tree/tree-view-node';
 
 // Modules and Apps
