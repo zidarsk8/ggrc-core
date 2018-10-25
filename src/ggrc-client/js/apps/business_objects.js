@@ -17,6 +17,7 @@ import {
   getPageModel,
 } from '../plugins/utils/current-page-utils';
 import * as businessModels from '../models/business-models/index';
+import TreeViewConfig from '../apps/base_widgets';
 
 let CoreExtension = {};
 
@@ -24,7 +25,7 @@ CoreExtension.name = 'core"';
 widgetModules.push(CoreExtension);
 _.assign(CoreExtension, {
   init_widgets: function () {
-    let baseWidgetsByType = GGRC.tree_view.base_widgets_by_type;
+    let baseWidgetsByType = TreeViewConfig.attr('base_widgets_by_type');
     let widgetList = new WidgetList('ggrc_core');
     let objectClass = getPageModel();
     let objectTable = objectClass && objectClass.table_plural;
@@ -96,7 +97,7 @@ _.assign(CoreExtension, {
       let childModelList = [];
       let widgetConfig = getWidgetConfig(name);
       name = widgetConfig.name;
-      GGRC.tree_view.basic_model_list.push({
+      TreeViewConfig.attr('basic_model_list').push({
         model_name: name,
         display_name: widgetConfig.widgetName,
       });
@@ -114,7 +115,7 @@ _.assign(CoreExtension, {
           });
         }
       });
-      GGRC.tree_view.sub_tree_for.attr(name, {
+      TreeViewConfig.attr('sub_tree_for').attr(name, {
         model_list: childModelList,
         display_list: businessModels[name]
           .tree_view_options.child_tree_display_list || wList,
@@ -187,7 +188,7 @@ _.assign(CoreExtension, {
           },
         };
 
-        let defOrder = GGRC.tree_view.attr('defaultOrderTypes');
+        let defOrder = TreeViewConfig.attr('defaultOrderTypes');
         Object.keys(defOrder).forEach(function (type) {
           if (!all[type]) {
             all[type] = {};

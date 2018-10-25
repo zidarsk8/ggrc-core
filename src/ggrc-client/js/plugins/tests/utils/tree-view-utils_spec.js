@@ -7,6 +7,7 @@ import * as module from '../../../plugins/utils/tree-view-utils';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
 import * as ImportExportUtils from '../../../plugins/utils/import-export-utils';
 import * as QueryApiUtils from '../../../plugins/utils/query-api-utils';
+import TreeViewConfig from '../../../apps/base_widgets';
 
 import CycleTaskGroupObjectTask from '../../../models/business-models/cycle-task-group-object-task';
 
@@ -140,17 +141,17 @@ describe('TreeViewUtils module', function () {
     let origFilter;
 
     beforeAll(function () {
-      baseWidgetsByType = GGRC.tree_view.attr('base_widgets_by_type');
+      baseWidgetsByType = TreeViewConfig.attr('base_widgets_by_type');
       origFilter = CycleTaskGroupObjectTask
         .sub_tree_view_options.default_filter;
 
-      GGRC.tree_view.attr('base_widgets_by_type', {
+      TreeViewConfig.attr('base_widgets_by_type', {
         CycleTaskGroupObjectTask: ['Audit', 'Program'],
       });
     });
 
     afterAll(function () {
-      GGRC.tree_view.attr('base_widgets_by_type', baseWidgetsByType);
+      TreeViewConfig.attr('base_widgets_by_type', baseWidgetsByType);
       CycleTaskGroupObjectTask
         .sub_tree_view_options.default_filter = origFilter;
     });

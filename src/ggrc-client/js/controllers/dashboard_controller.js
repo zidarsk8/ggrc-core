@@ -11,6 +11,7 @@ import {
 } from '../plugins/utils/current-page-utils';
 import {getChildTreeDisplayList} from '../plugins/utils/display-prefs-utils';
 import {clear as clearLocalStorage} from '../plugins/utils/local-storage-utils';
+import TreeViewConfig from '../apps/base_widgets';
 
 const Dashboard = can.Control({
   pluginName: 'cms_controllers_dashboard',
@@ -41,12 +42,12 @@ const Dashboard = can.Control({
       return;
     }
 
-    validModels = can.Map.keys(GGRC.tree_view.base_widgets_by_type);
+    validModels = can.Map.keys(TreeViewConfig.attr('base_widgets_by_type'));
     // only change the display list
     can.each(validModels, function (mName) {
       savedChildTreeDisplayList = getChildTreeDisplayList(mName);
       if (savedChildTreeDisplayList !== null) {
-        GGRC.tree_view.sub_tree_for.attr(mName + '.display_list',
+        TreeViewConfig.attr('sub_tree_for').attr(mName + '.display_list',
           savedChildTreeDisplayList);
       }
     });

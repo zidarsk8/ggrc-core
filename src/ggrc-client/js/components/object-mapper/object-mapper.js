@@ -32,6 +32,7 @@ import {
 import {allowedToMap} from '../../plugins/ggrc_utils';
 import {mapObjects as mapObjectsUtil} from '../../plugins/utils/mapper-utils';
 import * as businessModels from '../../models/business-models';
+import TreeViewConfig from '../../apps/base_widgets';
 
 let DEFAULT_OBJECT_MAP = {
   Assessment: 'Control',
@@ -66,7 +67,7 @@ let DEFAULT_OBJECT_MAP = {
 };
 
 let getDefaultType = function (type, object) {
-  let treeView = GGRC.tree_view.sub_tree_for[object];
+  let treeView = TreeViewConfig.attr('sub_tree_for')[object];
   let defaultType =
     (businessModels[type] && type) ||
     DEFAULT_OBJECT_MAP[object] ||
