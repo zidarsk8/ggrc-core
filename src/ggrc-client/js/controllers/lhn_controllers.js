@@ -17,7 +17,8 @@ import {
 import * as businessModels from '../models/business-models';
 import '../components/recently-viewed/recently-viewed';
 
-can.Control('CMS.Controllers.LHN', {
+can.Control.extend({
+  pluginName: 'cms_controllers_lhn',
   defaults: {},
 }, {
   init: function () {
@@ -158,7 +159,7 @@ can.Control('CMS.Controllers.LHN', {
       .cms_controllers_lhn_search({
         observer: this.obs,
       })
-      .control('lhn_search')
+      .control('cms_controllers_lhn_search')
       .display();
 
     $lhs.cms_controllers_lhn_tooltips();
@@ -352,7 +353,8 @@ can.Control('CMS.Controllers.LHN', {
   },
 });
 
-can.Control('CMS.Controllers.LHN_Search', {
+can.Control.extend({
+  pluginName: 'cms_controllers_lhn_search',
   defaults: {
     list_view: GGRC.mustache_path + '/base_objects/search_result.mustache',
     actions_view: GGRC.mustache_path + '/base_objects/search_actions.mustache',
