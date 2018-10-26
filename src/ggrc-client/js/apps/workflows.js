@@ -4,11 +4,12 @@
  */
 
 import {
-  widgetModules,
-  initCounts,
   getPageInstance,
 } from '../plugins/utils/current-page-utils';
-
+import {
+  widgetModules,
+  initCounts,
+} from '../plugins/utils/widgets-utils';
 import InfoWidget from '../controllers/info_widget_controller';
 import WidgetList from '../modules/widget_list';
 import Cycle from '../models/business-models/cycle';

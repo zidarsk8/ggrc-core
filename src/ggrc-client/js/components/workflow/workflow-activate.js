@@ -9,7 +9,7 @@ import {
 } from '../../plugins/utils/workflow-utils';
 import {
   initCounts,
-} from '../../plugins/utils/current-page-utils';
+} from '../../plugins/utils/widgets-utils';
 import Permission from '../../permission';
 import {countsMap as workflowCountsMap} from '../../apps/workflows';
 

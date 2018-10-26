@@ -20,9 +20,9 @@ import {
   isSnapshotParent,
 } from '../../plugins/utils/snapshot-utils';
 import {
-  refreshCounts,
   getPageInstance,
 } from '../../plugins/utils/current-page-utils';
+import {refreshCounts} from '../../plugins/utils/widgets-utils';
 import RefreshQueue from '../../models/refresh_queue';
 import {
   BEFORE_MAPPING,

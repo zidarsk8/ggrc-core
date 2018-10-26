@@ -8,9 +8,9 @@ import {
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import {
-  initCounts,
   getPageInstance,
 } from '../../plugins/utils/current-page-utils';
+import {initCounts} from '../../plugins/utils/widgets-utils';
 import {
   REFRESH_MAPPING,
   DESTINATION_UNMAPPED,

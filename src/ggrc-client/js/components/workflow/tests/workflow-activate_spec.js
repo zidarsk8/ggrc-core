@@ -7,7 +7,7 @@ import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../workflow-activate';
 import * as helpers from '../../../plugins/utils/workflow-utils';
 import Permission from '../../../permission';
-import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
+import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
 import {countsMap as workflowCountsMap} from '../../../apps/workflows';
 
 describe('workflow-activate component', function () {
@@ -194,7 +194,7 @@ describe('workflow-activate component', function () {
 
     beforeEach(function () {
       workflow = {};
-      spyOn(CurrentPageUtils, 'initCounts');
+      spyOn(WidgetsUtils, 'initCounts');
     });
 
     it('updates counts for active cycles', function () {
@@ -206,7 +206,7 @@ describe('workflow-activate component', function () {
         id: 4321,
       });
       viewModel.updateActiveCycleCounts(workflow);
-      expect(CurrentPageUtils.initCounts)
+      expect(WidgetsUtils.initCounts)
         .toHaveBeenCalledWith([1234], workflow.type, workflow.id);
 
       workflowCountsMap.activeCycles = activeCycleCount;
@@ -215,7 +215,7 @@ describe('workflow-activate component', function () {
     it('returns result of update operation', async function (done) {
       const expectedResult = {};
       let result;
-      CurrentPageUtils.initCounts.and.returnValue(expectedResult);
+      WidgetsUtils.initCounts.and.returnValue(expectedResult);
       result = await viewModel.updateActiveCycleCounts(workflow);
       expect(result).toBe(expectedResult);
       done();

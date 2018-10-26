@@ -5,7 +5,7 @@
 
 import {
   initWidgets,
-} from '../../plugins/utils/current-page-utils';
+} from '../../plugins/utils/widgets-utils';
 import '../../controllers/dashboard_controller';
 import {RouterConfig} from '../../router';
 import routes from './routes';

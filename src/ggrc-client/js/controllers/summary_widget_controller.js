@@ -6,9 +6,9 @@
 import '../components/add-object-button/add-object-button';
 import '../components/assessment/assessment-generator-button';
 import {
-  getCounts,
   getPageInstance,
 } from '../plugins/utils/current-page-utils';
+import {getCounts} from '../plugins/utils/widgets-utils';
 import router from '../router';
 import {
   getDefaultStatesForModel,

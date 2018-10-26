@@ -4,9 +4,9 @@
 */
 
 import {
-  initCounts,
   getPageInstance,
 } from '../../plugins/utils/current-page-utils';
+import {initCounts} from '../../plugins/utils/widgets-utils';
 import {countsMap as workflowCountsMap} from '../../apps/workflows';
 
 /**

@@ -5,7 +5,7 @@
 
 import {
   getCounts,
-} from '../plugins/utils/current-page-utils';
+} from '../plugins/utils/widgets-utils';
 import {inferObjectType} from '../plugins/utils/models-utils';
 
 export default can.Control({

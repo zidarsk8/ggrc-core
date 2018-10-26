@@ -4,9 +4,9 @@
  */
 
 import {
-  widgetModules,
   getPageInstance,
 } from '../plugins/utils/current-page-utils';
+import {widgetModules} from '../plugins/utils/widgets-utils';
 import RiskAssessment from '../models/business-models/risk-assessment';
 import Program from '../models/business-models/program';
 import Stub from '../models/stub';
@@ -19,7 +19,6 @@ widgetModules.push(RiskAssessmentsExtension);
 RiskAssessmentsExtension.name = 'risk_assessments';
 Program.attributes.risk_assessments = Stub.List;
 
-// Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
 // Initialize widgets for risk assessment page
 RiskAssessmentsExtension.init_widgets = function () {
   let descriptor = {};

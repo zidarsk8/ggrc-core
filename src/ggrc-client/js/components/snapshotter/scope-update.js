@@ -12,7 +12,7 @@ import {
 } from '../../plugins/utils/snapshot-utils';
 import {
   refreshCounts,
-} from '../../plugins/utils/current-page-utils';
+} from '../../plugins/utils/widgets-utils';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
 export default can.Component.extend({

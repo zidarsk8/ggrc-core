@@ -5,7 +5,7 @@
 
 import * as Utils from '../../../plugins/utils/models-utils';
 import Mappings from '../mappings';
-import {widgetModules} from '../../../plugins/utils/current-page-utils';
+import {widgetModules} from '../../../plugins/utils/widgets-utils';
 
 describe('Mappings', function () {
   let allTypes = [];

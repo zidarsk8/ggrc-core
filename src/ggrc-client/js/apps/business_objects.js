@@ -12,8 +12,8 @@ import {
   getWidgetConfig,
 } from '../plugins/utils/object-versions-utils';
 import {inferObjectType} from '../plugins/utils/models-utils';
+import {widgetModules} from '../plugins/utils/widgets-utils';
 import {
-  widgetModules,
   getPageInstance,
 } from '../plugins/utils/current-page-utils';
 import * as businessModels from '../models/business-models/index';
