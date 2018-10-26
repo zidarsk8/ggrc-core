@@ -90,12 +90,6 @@
     padding: 4px 0 0 0;
     li {
       margin-left: -4px;
-      .info-action {
-        @include opacity(1);
-        i {
-          margin-top: 0;
-        }
-      }
       a {
         width: auto;
         display: inline;

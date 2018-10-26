@@ -103,6 +103,17 @@
       &.disabled {
         opacity: 0.1
       }
+
+      .fa {
+        color: #444;
+        opacity: 0.75;
+      }
+
+      &:hover {
+        .fa {
+          opacity: 1;
+        }    
+      }
     }
 
     .editable-people-group__inline {
@@ -148,7 +159,6 @@
 
   .people-group-modal__unmap {
     margin-left: 4px;
-    opacity: 1;
 
     .fa {
       color: $unmapIcon;

@@ -609,26 +609,3 @@ ul.new-tree {
   padding-left: 5px;
 }
 
-.info-action {
-  @include opacity(0.6);
-  font-size:11px;
-  text-transform:uppercase;
-  font-weight:bold;
-  color:#111;
-  i.fa-pencil-square-o {
-    margin-top:5px;
-  }
-  &:hover {
-    @include opacity(1);
-    text-decoration:none;
-  }
-  &.relevant-action {
-    @include opacity(0.5);
-    padding-right: 20px;
-    color: $subTitle;
-    &:hover {
-      @include opacity(1);
-      color: $subTitle;
-    }
-  }
-}
