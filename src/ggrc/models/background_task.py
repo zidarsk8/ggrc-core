@@ -216,6 +216,9 @@ def create_task(name, url, **kwargs):
         task.get_result()
     elif queued_callback:
       queued_callback(bg_task)
+    else:
+      raise ValueError("Either queued_callback should be provided "
+                       "or APP_ENGINE set to true.")
     return bg_task
 
 
