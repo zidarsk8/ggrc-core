@@ -29,6 +29,13 @@ let relatedToCurrentInstance = new can.Map({
   },
 });
 
+function getPageModel() {
+  if (GGRC.page_object) {
+    return inferObjectType(GGRC.page_object);
+  }
+  return null;
+}
+
 let pageInstance = null;
 function getPageInstance() {
   if (!pageInstance && GGRC.page_object) {
@@ -147,6 +154,7 @@ function _goToUrl(url) {
 
 export {
   relatedToCurrentInstance as related,
+  getPageModel,
   getPageInstance,
   initMappedInstances,
   getPageType,

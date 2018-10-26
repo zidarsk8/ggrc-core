@@ -5,26 +5,15 @@
 
 import {getDashboards} from '../plugins/utils/dashboards-utils';
 import {
-  inferObjectType,
-} from '../plugins/utils/models-utils';
-import {getPageInstance} from '../plugins/utils/current-page-utils';
+  getPageModel,
+  getPageInstance,
+} from '../plugins/utils/current-page-utils';
 
 export default can.Control({
   defaults: {
-    model: null,
-    instance: null,
+    model: getPageModel(),
+    instance: getPageInstance(),
     isLoading: true,
-  },
-  init: function () {
-    let that = this;
-    $(function () {
-      if (GGRC.page_object) {
-        $.extend(that.defaults, {
-          model: inferObjectType(GGRC.page_object),
-          instance: getPageInstance(),
-        });
-      }
-    });
   },
 }, {
   init: function () {

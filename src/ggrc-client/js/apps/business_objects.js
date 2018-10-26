@@ -11,10 +11,10 @@ import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
 import {
   getWidgetConfig,
 } from '../plugins/utils/object-versions-utils';
-import {inferObjectType} from '../plugins/utils/models-utils';
 import {widgetModules} from '../plugins/utils/widgets-utils';
 import {
   getPageInstance,
+  getPageModel,
 } from '../plugins/utils/current-page-utils';
 import * as businessModels from '../models/business-models/index';
 
@@ -27,7 +27,7 @@ import * as businessModels from '../models/business-models/index';
     init_widgets: function () {
       let baseWidgetsByType = GGRC.tree_view.base_widgets_by_type;
       let widgetList = new WidgetList('ggrc_core');
-      let objectClass = inferObjectType(GGRC.page_object);
+      let objectClass = getPageModel();
       let objectTable = objectClass && objectClass.table_plural;
       let object = getPageInstance();
       let path = GGRC.mustache_path;
@@ -39,10 +39,6 @@ import * as businessModels from '../models/business-models/index';
       let extraDescriptorOptions;
       let extraContentOptions;
 
-      // TODO: Really ugly way to avoid executing IIFE - needs cleanup
-      if (!GGRC.page_object) {
-        return;
-      }
       // Info and summary widgets display the object information instead of listing
       // connected objects.
       summaryWidgetViews = {

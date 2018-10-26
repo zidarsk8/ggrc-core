@@ -6,6 +6,7 @@
 import '../components/add-object-button/add-object-button';
 import '../components/assessment/assessment-generator-button';
 import {
+  getPageModel,
   getPageInstance,
 } from '../plugins/utils/current-page-utils';
 import {getCounts} from '../plugins/utils/widgets-utils';
@@ -14,16 +15,13 @@ import {
   getDefaultStatesForModel,
 } from '../plugins/utils/state-utils';
 import {loadScript} from '../plugins/ggrc_utils';
-import {
-  inferObjectType,
-} from '../plugins/utils/models-utils';
 import Relationship from '../models/service-models/relationship';
 import Assessment from '../models/business-models/assessment';
 
 export default can.Control({
   defaults: {
-    model: null,
-    instance: null,
+    model: getPageModel(),
+    instance: getPageInstance(),
     widget_view: GGRC.mustache_path + '/base_objects/summary.mustache',
     isLoading: true,
     isShown: false,
@@ -48,17 +46,6 @@ export default can.Control({
         position: 'none',
       },
     },
-  },
-  init: function () {
-    let that = this;
-    $(function () {
-      if (GGRC.page_object) {
-        $.extend(that.defaults, {
-          model: inferObjectType(GGRC.page_object),
-          instance: getPageInstance(),
-        });
-      }
-    });
   },
 }, {
   init: function () {
