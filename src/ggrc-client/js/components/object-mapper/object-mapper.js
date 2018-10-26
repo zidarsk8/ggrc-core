@@ -238,8 +238,7 @@ export default can.Component.extend({
       }
     },
     deferredSave: function (objects) {
-      let source = this.viewModel.attr('deferred_to').instance ||
-        this.viewModel.attr('object');
+      let source = this.viewModel.attr('deferred_to').instance;
       const deferredObjects = _.compact(_.map(
         objects,
         function (desination) {
