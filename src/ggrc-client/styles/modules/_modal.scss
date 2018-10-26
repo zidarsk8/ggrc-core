@@ -100,42 +100,6 @@
     }
     width:960px;
     margin-left:-480px;
-    .modal-content {
-      .linked-people {
-        @extend %reset-list;
-        background:$white;
-        border:1px solid #ddd;
-        height:400px;
-        overflow:auto;
-        li {
-          small {
-            font-weight:normal;
-            font-size:$f-regular;
-          }
-          select.role {
-            margin:5px 5px 0 0;
-            width:120px;
-          }
-          a {
-            display:block;
-            padding-left:10px;
-            line-height:38px;
-            border-bottom:1px solid $lightGray;
-            &:hover {
-             text-decoration:none;
-             background:lighten(#c8edfc,5%);
-             border-color:darken(#c8edfc,5%);
-            }
-          }
-          &.not-applicable {
-            background:#fffcc3;
-            font-size:$f-subTitle;
-            text-align:center;
-            line-height:120px;
-          }
-        }
-      }
-    }
     .code {
       font-size:$f-small;
     }
@@ -443,34 +407,6 @@
       margin-bottom: 20px;
     }
     .selector-info {
-      h4.simple-url {
-        font-weight:normal;
-      }
-      .pull-right {
-        .btn {
-          margin-left:4px;
-        }
-      }
-      .rtf {
-        overflow:auto;
-        max-height:240px;
-        font-size:12px;
-        word-break: break-word;
-        p {
-          line-height:16px;
-        }
-        li {
-          line-height:16px;
-        }
-
-      }
-      .no-content {
-        padding-top:160px;
-        h4, p {
-          color:#666;
-          text-align:center;
-        }
-      }
       .selector-person-info {
         h3 {
           @extend %oneline;
@@ -489,10 +425,6 @@
           font-size: 16px;
           font-weight: normal;
           margin-bottom: 4px;
-        }
-        h3 a,
-        h4 a {
-          color: $black;
         }
       }
     }
@@ -531,11 +463,6 @@
           label {
             font-weight: bold;
           }
-        }
-      }
-      &.third-part {
-        li {
-          width: 33.33%;
         }
       }
     }
@@ -745,27 +672,6 @@
     }
    }
  }
-}
-
-.selector-info {
-  h4 {
-    .code-info {
-      font-style: italic;
-      font-size: $f-small;
-      display: block;
-    }
-  }
-}
-
-.selector-list {
-  .tree-title-area {
-    .code-info {
-      font-size: $f-small;
-      font-style: italic;
-      color: $tabTitle;
-      font-weight: bold;
-    }
-  }
 }
 
 .expand-issue-tracker-link,

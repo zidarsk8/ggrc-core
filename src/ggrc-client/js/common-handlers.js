@@ -236,10 +236,7 @@ $(function () {
       ev.stopPropagation();
 
       // Trigger the controller
-      userRolesModalSelector.launch($this, options)
-        .on('relationshipcreated relationshipdestroyed', function (ev, data) {
-          // $this.trigger("modal:" + ev.type, data);
-        });
+      userRolesModalSelector.launch($this, options);
     });
 });
 
