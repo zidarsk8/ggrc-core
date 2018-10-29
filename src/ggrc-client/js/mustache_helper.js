@@ -1407,15 +1407,6 @@ Mustache.registerHelper('debugger', function () {
   return options.fn(options.contexts);
 });
 
-Mustache.registerHelper('update_link', function (instance, options) {
-  instance = Mustache.resolve(instance);
-  if (instance.viewLink) {
-    let link = window.location.host + instance.viewLink;
-    instance.attr('link', link);
-  }
-  return options.fn(options.contexts);
-});
-
 /**
    * Retrieve the string value of an attribute of the given instance.
    *

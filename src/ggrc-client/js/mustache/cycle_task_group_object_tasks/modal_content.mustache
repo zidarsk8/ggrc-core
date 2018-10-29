@@ -56,11 +56,9 @@
               ($click)="removeMappings(.)">
               <i class="fa fa-trash"></i>
             </a>
-            {{#update_link .}}
-              <a class="url" href="{{schemed_url link}}" target="_blank">
-                {{firstexist title name email link}}
-              </a>
-            {{/update_link}}
+            <a class="url" href="{{viewLink}}" target="_blank">
+              {{title}}
+            </a>
           </div>
         {{/each}}
         {{^list.length}}
