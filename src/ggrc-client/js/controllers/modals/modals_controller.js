@@ -28,7 +28,7 @@ import '../../components/external-data-autocomplete/external-data-autocomplete';
 import '../../components/person/person-data';
 import '../../components/rich_text/rich_text';
 import '../../components/modal_wrappers/checkboxes_to_list';
-import '../../components/modal-connector';
+import '../../components/deferred-mapper';
 import '../../components/modal_wrappers/assessment-modal';
 import '../../components/assessment/map-button-using-assessment-type';
 import '../../components/gca-controls/gca-controls';

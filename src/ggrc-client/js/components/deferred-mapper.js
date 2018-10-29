@@ -24,7 +24,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
  be resolved and we won't worry about the transient state we use anymore.
  */
 export default can.Component.extend({
-  tag: 'ggrc-modal-connector',
+  tag: 'deferred-mapper',
   // <content> in a component template will be replaced with whatever is contained
   //  within the component tag.  Since the views for the original uses of these components
   //  were already created with content, we just used <content> instead of making

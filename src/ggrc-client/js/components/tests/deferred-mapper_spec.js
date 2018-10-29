@@ -3,10 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Component from '../modal-connector';
+import Component from '../deferred-mapper';
 import {getComponentVM} from '../../../js_specs/spec_helpers';
 
-describe('ggrc-modal-connector component', function () {
+describe('deferred-mapper component', function () {
   let viewModel;
 
   beforeEach(function () {

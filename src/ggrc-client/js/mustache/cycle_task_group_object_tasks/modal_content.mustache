@@ -43,7 +43,7 @@
         <option value="menu" {{#if_equals instance.task_type 'menu'}}selected="selected"{{/if_equals}}>Dropdown</option>
         <option value="checkbox" {{#if_equals instance.task_type 'checkbox'}}selected="selected"{{/if_equals}}>Checkbox</option>
       </select>
-      <ggrc-modal-connector
+      <deferred-mapper
           {instance}="instance"
           {mapped-objects}="mappedObjects"
           {pre-mapped-objects}="preMappedObjects"
@@ -85,7 +85,7 @@
             {{/if_in}}
           </div>
         </div>
-      </ggrc-modal-connector>
+      </deferred-mapper>
     </div>
     <div class="span4">
       <div class="{{#instance.computed_errors.contact}} field-failure {{/instance.computed_errors.contact}}">

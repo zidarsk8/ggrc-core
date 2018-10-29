@@ -86,7 +86,7 @@ Naming conventions in the forms:
 
 ``mark_for_deletion``/``mark_for_addition`` in ``cacheable.js``
 adds/removes items into ``_pending_joins``. These pending joins are then
-handled in ``ggrc-modal-connector`` component.
+handled in ``deferred-mapper`` component.
 
 ``ggrc_modal_connector`` Component used for mapping audits inside
 modals. Double layer of indirection in this case because context is not
