@@ -1078,8 +1078,8 @@ class Resource(ModelView):
           task = create_task(
               name=request.method,
               url=request.full_path,
-              queued_callback=None,
-              payload=request.data,
+              queued_callback=lambda _: None,
+              parameters=request.data,
           )
           db.session.commit()
           if getattr(settings, 'APP_ENGINE', False):
@@ -1096,7 +1096,7 @@ class Resource(ModelView):
                 503,
                 [('Content-Type', 'text/html')]
             ))
-          body = self.request.json
+          body = json.loads(task.parameters)
         task.start()
         no_result = True
       else:
@@ -1201,13 +1201,13 @@ class Resource(ModelView):
         result = current_app.make_response(
             (self.as_json(res), status, headers))
 
-      with benchmark("collection post > return result"):
-        if 'X-GGRC-BackgroundTask' in request.headers:
+      if 'X-GGRC-BackgroundTask' in request.headers:
+        with benchmark("collection post > finish BackgroundTask"):
           if status == 200:
             task.finish("Success", result)
           else:
             task.finish("Failure", result)
-        return result
+      return result
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
