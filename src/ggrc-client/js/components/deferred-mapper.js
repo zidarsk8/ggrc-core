@@ -25,11 +25,6 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
  */
 export default can.Component.extend({
   tag: 'deferred-mapper',
-  // <content> in a component template will be replaced with whatever is contained
-  //  within the component tag.  Since the views for the original uses of these components
-  //  were already created with content, we just used <content> instead of making
-  //  new view template files.
-  template: '<isolate-form><content/></isolate-form>',
   viewModel: {
     useSnapshots: false,
     instance: null,
