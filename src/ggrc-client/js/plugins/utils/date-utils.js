@@ -17,6 +17,7 @@ const DATE_FORMAT = {
   PICKER_ISO_DATE: 'yy-mm-dd',
   PICKER_DISPLAY_FMT: 'mm/dd/yy',
   ISO_SHORT: 'YYYY-MM-DDTHH:mm:ss',
+  DATETIME_DISPLAY_FMT: 'MM/DD/YYYY hh:mm:ss A Z',
 };
 
 /**
@@ -60,18 +61,62 @@ function getDate(date, format = DATE_FORMAT.MOMENT_ISO_DATE) {
 
 /**
  * Convert given Date to UTC string.
+ * Uses current time if Date is not passed.
  *
  * @param {Date|string} date - Date or string in ISO date format
  * @param {string} format - date format string ('YYYY-MM-DDTHH:mm:ss' default value)
  * @return {string} - formatted date string in UTC
  */
-function getUtcDate(date, format = DATE_FORMAT.ISO_SHORT) {
+function getFormattedUtcDate(date, format = DATE_FORMAT.ISO_SHORT) {
   return moment.utc(date).format(format);
+}
+
+/**
+ * Convert given UTC date string in ISO format to local date string
+ * @param {string} date - UTC date string in ISO date format
+ * @param {string} format - date format string ('MM/DD/YYYY hh:mm:ss A Z' default value)
+ * @return {string} converted date string in local time
+*/
+function getFormattedLocalDate(date,
+  format = DATE_FORMAT.DATETIME_DISPLAY_FMT) {
+  return moment.utc(date).local().format(format);
+}
+
+function formatDate(date, hideTime) {
+  let currentTimezone = moment.tz.guess();
+  let formats = [
+    'YYYY-MM-DD',
+    'YYYY-MM-DDTHH:mm:ss',
+    'YYYY-MM-DDTHH:mm:ss.SSSSSS',
+  ];
+  let inst;
+
+  if ( !date ) {
+    return '';
+  }
+
+  if (typeof date === 'string') {
+    // string dates are assumed to be in ISO format
+
+    if (hideTime) {
+      return moment.utc(date, formats, true).format('MM/DD/YYYY');
+    }
+    return moment.utc(date, formats, true)
+      .format('MM/DD/YYYY hh:mm:ss A Z');
+  }
+
+  inst = moment(new Date(date.isComputed ? date() : date));
+  if (hideTime === true) {
+    return inst.format('MM/DD/YYYY');
+  }
+  return inst.tz(currentTimezone).format('MM/DD/YYYY hh:mm:ss A Z');
 }
 
 export {
   DATE_FORMAT,
   getClosestWeekday,
   getDate,
-  getUtcDate,
+  getFormattedUtcDate,
+  getFormattedLocalDate,
+  formatDate,
 };

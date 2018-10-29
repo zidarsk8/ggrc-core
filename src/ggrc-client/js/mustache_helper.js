@@ -24,7 +24,6 @@ import {
   batchRequests,
 } from './plugins/utils/query-api-utils';
 import {
-  formatDate,
   isMappableType,
   allowedToMap,
   getHooks,
@@ -35,6 +34,10 @@ import Person from './models/business-models/person';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
 import Mappings from './models/mappers/mappings';
+import {
+  getFormattedLocalDate,
+  formatDate,
+} from './plugins/utils/date-utils';
 
 // Chrome likes to cache AJAX requests for Mustaches.
 let mustacheUrls = {};
@@ -749,6 +752,17 @@ Mustache.registerHelper('date', function (date, hideTime) {
 });
 
 /**
+ *  Helper for rendering datetime values in current local time
+ *
+ *  @return {String} - datetime string in the following format:
+ *  (MM/DD/YYYY hh:mm:ss [PM|AM] [local timezone])
+ */
+Mustache.registerHelper('dateTime', function (date) {
+  date = Mustache.resolve(date);
+  return getFormattedLocalDate(date);
+});
+
+/**
  * Checks permissions.
  * Usage:
  *  {{#is_allowed ACTION [ACTION2 ACTION3...] RESOURCE_TYPE_STRING context=CONTEXT_ID}} content {{/is_allowed}}
@@ -971,18 +985,13 @@ function localizeDate(date, options, tmpl, allowNonISO) {
   return '';
 }
 
-can.each({
-  localize_date: 'MM/DD/YYYY',
-  localize_datetime: 'MM/DD/YYYY hh:mm:ss A Z',
-}, function (tmpl, fn) {
-  Mustache.registerHelper(fn, function (date, allowNonISO, options) {
-    // allowNonIso was not passed
-    if (!options) {
-      options = allowNonISO;
-      allowNonISO = false;
-    }
-    return localizeDate(date, options, tmpl, allowNonISO);
-  });
+Mustache.registerHelper('localize_date', function (date, allowNonISO, options) {
+  // allowNonIso was not passed
+  if (!options) {
+    options = allowNonISO;
+    allowNonISO = false;
+  }
+  return localizeDate(date, options, 'MM/DD/YYYY', allowNonISO);
 });
 
 /**
