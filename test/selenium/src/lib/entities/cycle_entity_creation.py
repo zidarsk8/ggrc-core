@@ -4,6 +4,7 @@
 """
 from lib.constants import object_states
 from lib.entities import app_entity_factory
+from lib.utils import date_utils
 
 
 def create_workflow_cycle(workflow):
@@ -40,6 +41,6 @@ def _create_from_task(task_group_task):
   return app_entity_factory.CycleTaskFactory().create_empty(
       title=task_group_task.title,
       state=object_states.ASSIGNED,
-      due_date=task_group_task.due_date,
+      due_date=date_utils.first_working_day(task_group_task.due_date),
       task_group_task=task_group_task
   )

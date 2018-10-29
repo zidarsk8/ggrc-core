@@ -59,7 +59,8 @@ class TestWorkflowPage(base.Test):
         task_modal.get_start_date())
     actual_due_date = ui_dict_convert.str_to_date(
         task_modal.get_due_date())
-    assert actual_start_date == date_utils.closest_working_day()
+    assert actual_start_date == date_utils.first_not_weekend_day(
+        datetime.date.today())
     assert actual_due_date == actual_start_date + datetime.timedelta(days=7)
 
   def test_create_task_group_task(
