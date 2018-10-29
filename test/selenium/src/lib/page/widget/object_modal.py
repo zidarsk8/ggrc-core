@@ -94,7 +94,7 @@ class BaseObjectModal(base.WithBrowser):
 
   def set_state(self, state):
     """Sets value in state dropdown."""
-    self.state_select.select(state)
+    self.state_select.wait_until(lambda e: e.exists).select(state)
 
   def set_code(self, code):
     """Sets code."""
