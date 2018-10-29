@@ -8,7 +8,8 @@ def create_workflow(workflow):
   """Creates workflow via REST."""
   return base_rest_service.create_obj(
       workflow,
-      access_control_list=rest_convert.build_access_control_list(workflow),
+      access_control_list=rest_convert.build_access_control_list(
+          workflow, acr_mapping={"wf_members": "Workflow Member"}),
       title=workflow.title,
       context=rest_convert.default_context())
 
@@ -29,7 +30,7 @@ def create_task_group_task(task_group_task):
   return base_rest_service.create_obj(
       task_group_task,
       access_control_list=rest_convert.build_access_control_list(
-          task_group_task),
+          task_group_task, acr_mapping={"assignees": "Task Assignees"}),
       title=task_group_task.title,
       start_date=task_group_task.start_date.isoformat(),
       end_date=task_group_task.due_date.isoformat(),

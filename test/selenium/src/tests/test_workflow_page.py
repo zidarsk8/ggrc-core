@@ -8,7 +8,8 @@ import datetime
 import pytest
 
 from lib import base
-from lib.entities import app_entity_factory, ui_dict_convert
+from lib.entities import (
+    app_entity_factory, ui_dict_convert, cycle_entity_creation)
 from lib.page.widget import workflow_tabs, object_modal, object_page
 from lib.ui import workflow_ui_facade, ui_facade
 from lib.utils import test_utils, date_utils
@@ -116,6 +117,18 @@ class TestActivateWorkflow(base.Test):
     """Test active cycles tree."""
     workflow_cycles = workflow_ui_facade.get_workflow_cycles(
         app_workflow)
-    expected_workflow_cycle = app_entity_factory.WorkflowCycleFactory(
-    ).create_from_workflow(app_workflow)
+    expected_workflow_cycle = cycle_entity_creation.create_workflow_cycle(
+        app_workflow)
     test_utils.list_obj_assert(workflow_cycles, [expected_workflow_cycle])
+
+  def test_map_obj_to_cycle_task(
+      self, activate_workflow, app_workflow, app_control, selenium
+  ):
+    """Test mapping of obj to a cycle task."""
+    cycle_task = cycle_entity_creation.create_workflow_cycle(
+        app_workflow).cycle_task_groups[0].cycle_tasks[0]
+    workflow_ui_facade.map_obj_to_cycle_task(
+        obj=app_control, cycle_task=cycle_task)
+    selenium.refresh()  # reload page to check mapping is saved
+    objs = workflow_ui_facade.get_objs_mapped_to_cycle_task(cycle_task)
+    test_utils.list_obj_assert(objs, [app_control])

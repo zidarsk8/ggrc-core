@@ -81,3 +81,19 @@ def get_workflow_cycles(workflow):
   active_cycles_tab = workflow_tabs.ActiveCyclesTab()
   active_cycles_tab.open_via_url(workflow)
   return active_cycles_tab.get_workflow_cycles()
+
+
+def map_obj_to_cycle_task(obj, cycle_task):
+  """Maps object to the cycle task."""
+  active_cycles_tab = workflow_tabs.ActiveCyclesTab()
+  active_cycles_tab.open_via_url(
+      cycle_task.task_group_task.task_group.workflow)
+  active_cycles_tab.map_obj_to_cycle_task(obj=obj, cycle_task=cycle_task)
+
+
+def get_objs_mapped_to_cycle_task(cycle_task):
+  """Get objects mapped to the cycle task."""
+  active_cycles_tab = workflow_tabs.ActiveCyclesTab()
+  active_cycles_tab.open_via_url(
+      cycle_task.task_group_task.task_group.workflow)
+  return active_cycles_tab.get_objs_mapped_to_cycle_task(cycle_task)

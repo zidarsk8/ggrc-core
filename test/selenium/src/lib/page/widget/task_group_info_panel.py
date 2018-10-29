@@ -43,11 +43,11 @@ class TaskGroupInfoPanel(base.WithBrowser):
     """Returns objects added to the task group."""
     objs = []
     for obj_row in self._root.element(class_name="tree-structure").lis():
-      obj_id = obj_row.data_object_id
+      obj_id = int(obj_row.data_object_id)
       obj_name = obj_row.data_object_type
       obj_title = obj_row.text
-      factory_cls = app_entity_factory.get_factory_by_obj_name(obj_name)
-      objs.append(factory_cls.create_empty(obj_id=obj_id, title=obj_title))
+      factory = app_entity_factory.get_factory_by_obj_name(obj_name)()
+      objs.append(factory.create_empty(obj_id=obj_id, title=obj_title))
     return objs
 
   def _task_header_elements(self):

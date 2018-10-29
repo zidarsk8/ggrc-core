@@ -4,6 +4,7 @@
 from lib.page.modal import object_mapper
 from lib.page.widget import (
     task_group_info_panel, object_modal, workflow_tree_widgets, object_page)
+from lib.ui import internal_ui_operations
 from lib.utils import test_utils
 
 
@@ -32,6 +33,33 @@ class ActiveCyclesTab(object_page.ObjectPage):
         cycle_task_group_row.expand()
       workflow_cycles.append(workflow_cycle_row.build_obj_with_tree())
     return workflow_cycles
+
+  def map_obj_to_cycle_task(self, obj, cycle_task):
+    """Maps object to the cycle task."""
+    self._open_cycle_task_panel(cycle_task)
+    cycle_task_panel = internal_ui_operations.info_widget_cls(cycle_task)
+    cycle_task_panel.click_map_objs()
+    object_mapper.ObjectMapper().map_obj(obj)
+
+  def get_objs_mapped_to_cycle_task(self, cycle_task):
+    """Get objects mapped to the cycle task."""
+    self._open_cycle_task_panel(cycle_task)
+    cycle_task_panel = internal_ui_operations.info_widget_cls(cycle_task)
+    return cycle_task_panel.mapped_objs()
+
+  def _open_cycle_task_panel(self, cycle_task):
+    """Opens Cycle task panel."""
+    cycle_task_group = cycle_task.cycle_task_group
+    workflow_cycle = cycle_task_group.workflow_cycle
+    # Cycles of `Repeat On` workflow have different `Due Date`s
+    workflow_row = self._tree_widget.get_workflow_cycle_row_by(
+        due_date=workflow_cycle.due_date)
+    workflow_row.expand()
+    task_group_row = workflow_row.get_cycle_task_group_row_by(
+        title=cycle_task_group.title)
+    task_group_row.expand()
+    task_row = task_group_row.get_cycle_task_row_by(title=cycle_task.title)
+    task_row.select()
 
 
 class SetupTab(object_page.ObjectPage):
