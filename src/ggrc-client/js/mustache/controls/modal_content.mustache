@@ -126,17 +126,24 @@
           {{{option_select this "kind" "control_kind"}}}
         </div>
       </div>
+
       <div data-test-id="control_fraud_9cc51ca3" data-id="fraud_related_hidden" class="span3 hidable">
         <label>
           Fraud Related
           <i class="fa fa-question-circle" rel="tooltip" title="Is control fraud related?"></i>
           <a data-id="hide_fraud_related_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        </label>
-        <select data-id="fraud_related_dd" class="input-block-level" name="fraud_related" null-if-empty="null-if-empty" tabindex="8">
-          <option value="" {{#if_equals fraud_related ""}}selected{{/if_equals}}>---</option>
-          <option value="0" {{#if_equals fraud_related "0"}}selected{{/if_equals}}>No</option>
-          <option value="1" {{#if_equals fraud_related "1"}}selected{{/if_equals}}>Yes</option>
-        </select>
+        </label>        
+        <boolean-dropdown-wrapper class="input-block-level"
+          {(selected)}="instance.fraud_related">
+          <dropdown
+            name="selectedInternal"
+            {options-list}="model.fraudRelatedOptions"
+            {tab-index}="8"
+            {no-value}="true"
+            {no-value-label}="'---'"
+            ($change)="onChange"
+            ></dropdown>
+          </boolean-dropdown-wrapper>
       </div>
       <div data-test-id="control_significance_18f15545" data-id="significance_hidden" class="span3 hidable">
         <label>
@@ -144,11 +151,17 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Is this Control a Key Control?"></i>
           <a data-id="hide_significance_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-        <select data-id="significance_dd" class="input-block-level" name="key_control" null-if-empty="null-if-empty" tabindex="9">
-          <option value="" {{#if_equals key_control ""}}selected{{/if_equals}}>---</option>
-          <option value="0" {{#if_equals key_control "0"}}selected{{/if_equals}}>Non-Key</option>
-          <option value="1" {{#if_equals key_control "1"}}selected{{/if_equals}}>Key</option>
-        </select>
+        <boolean-dropdown-wrapper class="input-block-level"
+          {(selected)}="instance.key_control">
+          <dropdown
+            name="selectedInternal"
+            {options-list}="model.keyControlOptions"
+            {tab-index}="9"
+            {no-value}="true"
+            {no-value-label}="'---'"
+            ($change)="onChange"
+            ></dropdown>
+          </boolean-dropdown-wrapper>
       </div>
       <div data-test-id="control_type_means_2ffa1b64" data-id="type_means_hidden" class="span3 hidable">
         <label>

@@ -108,6 +108,10 @@ export default Cacheable('CMS.Models.Control', {
     default_filter: ['Objective'],
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
+  fraudRelatedOptions:
+    [{title: 'No', value: false}, {title: 'Yes', value: true}],
+  keyControlOptions:
+    [{title: 'Non-Key', value: false}, {title: 'Key', value: true}],
   init: function () {
     this.validateNonBlank('title');
 
