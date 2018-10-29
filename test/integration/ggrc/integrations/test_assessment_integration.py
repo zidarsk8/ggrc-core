@@ -226,7 +226,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
           issue_tracked_obj=audit,
           component_id=213,
           hotlist_id=333,
-          issue_type="BUG",
+          issue_type=all_models.IssuetrackerIssue.DEFAULT_ISSUE_TYPE,
           issue_priority="S0",
           issue_severity="P0",
       )
@@ -259,7 +259,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
           issue_tracked_obj=audit,
           component_id=213,
           hotlist_id=333,
-          issue_type="BUG",
+          issue_type=all_models.IssuetrackerIssue.DEFAULT_ISSUE_TYPE,
           issue_priority="P0",
           issue_severity="S0",
       )
@@ -282,7 +282,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
         'title': assmt.title,
         'hotlist_ids': [333, ],
         'priority': u'P0',
-        'type': u'BUG',
+        'type': all_models.IssuetrackerIssue.DEFAULT_ISSUE_TYPE,
     }
     self.assertEqual(expected_info, with_info)
     self.assertEqual(without_info, with_info)
@@ -581,7 +581,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
           iti_issue_id[0], {
               'status': 'ASSIGNED',
               'priority': u'P4',
-              'type': None,
+              'type': all_models.IssuetrackerIssue.DEFAULT_ISSUE_TYPE,
               'severity': u'S3',
               'ccs': [],
               'component_id': 11111

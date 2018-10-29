@@ -61,7 +61,7 @@ class TestBulkIssuesSync(TestCase):
           enabled=enabled,
           issue_tracked_obj=audit,
           issue_id=issue_id,
-          issue_type="BUG",
+          issue_type=all_models.IssuetrackerIssue.DEFAULT_ISSUE_TYPE,
           component_id=12345,
           hotlist_id=12345,
           issue_priority="P2",
@@ -172,7 +172,10 @@ class TestBulkIssuesSync(TestCase):
       self.assertEqual(issue.title, obj.title)
       self.assertEqual(issue.component_id, component_id)
       self.assertEqual(issue.hotlist_id, hotlist_id)
-      self.assertEqual(issue.issue_type, "BUG")
+      self.assertEqual(
+          issue.issue_type,
+          all_models.IssuetrackerIssue.DEFAULT_ISSUE_TYPE
+      )
       self.assertEqual(issue.issue_priority, "P2")
       self.assertEqual(issue.issue_severity, "S2")
       self.assertEqual(issue.assignee, assignee)
@@ -789,7 +792,7 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
       issue.title = ""
       issue.component_id = "1"
       issue.hotlist_id = "1"
-      issue.issue_type = "BUG"
+      issue.issue_type = all_models.IssuetrackerIssue.DEFAULT_ISSUE_TYPE
       issue.issue_priority = "P2"
       issue.issue_severity = "S2"
       issue.assignee = "test@example.com"

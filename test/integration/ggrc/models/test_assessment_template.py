@@ -67,7 +67,7 @@ class TestAssessmentTemplate(TestCase):
                 u"hotlist_id": u"some host id",
                 u"issue_id": u"some issue id",
                 u"issue_priority": None,
-                u"issue_type": None,
+                u"issue_type": all_models.IssuetrackerIssue.DEFAULT_ISSUE_TYPE,
                 u"issue_url": None,
                 u"title": "some title"
             }
