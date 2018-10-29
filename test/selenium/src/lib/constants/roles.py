@@ -70,21 +70,35 @@ class ACLRolesIDsMetaClass(type):
   # pylint: disable=not-an-iterable
   # pylint: disable=no-value-for-parameter
 
-  @lazy_property
   def roles(cls):
-    """Return ACL roles"""
+    """Return ACL roles."""
     acr_url = "/".join([url.API, url.ACCESS_CONTROL_ROLES])
     return RestClient("").get_object(acr_url).json()[
         "{}_collection".format(url.ACCESS_CONTROL_ROLES)][
         url.ACCESS_CONTROL_ROLES]
 
-  def id_of_role(cls, object_type, name):
-    """Get id of the role by `object_type` and `name`"""
-    for role in cls.roles:
+  @lazy_property
+  def standard_roles(cls):
+    """Return standard ACL roles."""
+    return cls.roles()
+
+  def _role_id_from_list(cls, roles, object_type, name):
+    """Get id of the role by `object_type` and `name` from roles."""
+    for role in roles:
       if role["object_type"] == object_type and role["name"] == name:
-        return role["id"]
-    raise ValueError("Invalid role. name {0}, object_type {1}".format(
-        name, object_type))
+        role_id = role["id"]
+        break
+    return role_id
+
+  def id_of_role(cls, object_type, name):
+    """Get id of the role by `object_type` and `name`."""
+    role_id = cls._role_id_from_list(cls.standard_roles, object_type, name)
+    if not role_id:
+      role_id = cls._role_id_from_list(cls.roles(), object_type, name)
+    if not role_id:
+      raise ValueError("Invalid role. name {0}, object_type {1}".format(
+          name, object_type))
+    return role_id
 
   @property
   def CONTROL_ADMINS(cls):

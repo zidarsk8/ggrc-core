@@ -100,6 +100,11 @@ class BaseObjectModal(base.WithBrowser):
     """Sets code."""
     self.code_field.set(code)
 
+  def click_propose(self):
+    """Click propose button."""
+    self._root.link(text="Propose").click()
+    self._wait_for_submit_changes()
+
 
 class ControlModal(BaseObjectModal):
   """Represents control object modal."""
