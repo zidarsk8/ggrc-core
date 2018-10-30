@@ -7,16 +7,49 @@
   <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
     <div class="tier-content">
       {{>'/static/mustache/base_objects/general-page-header.mustache'}}
-
+      
       <tab-container {instance}="instance">
         <tab-panel {(panels)}="panels" title-text="Attributes">
           <div class="info-pane__body">
             <div class="info-pane__main-content {{^if isSnapshot}}info-pane__main-content-with-sidebar{{/if}}">
-              {{^isScopeModel instance}}
-                <object-review {instance}="instance"></object-review>
-              {{/isScopeModel}}
+              <object-review {instance}="instance"></object-review>
               {{>'/static/mustache/base_objects/description.mustache'}}
               {{>'/static/mustache/base_objects/test_plan.mustache'}}
+
+              <div class="row-fluid wrap-row">
+                <div class="span12">
+                  <h6>Risk Type</h6>
+                  <read-more {text}="risk_type"></read-more>
+                </div>
+              </div>
+
+              {{#if_helpers '\n #if' threat_source '\n or #if' isRevision}}
+                <div class="row-fluid wrap-row">
+                  <div class="span12">
+                    <h6>Threat Source</h6>
+                    <read-more {text}="threat_source"></read-more>
+                  </div>
+                </div>
+              {{/if_helpers}}
+
+              {{#if_helpers '\n #if' threat_event '\n or #if' isRevision}}
+                <div class="row-fluid wrap-row">
+                  <div class="span12">
+                    <h6>Threat Event</h6>
+                    <read-more {text}="threat_event"></read-more>
+                  </div>
+                </div>
+              {{/if_helpers}}
+
+              {{#if_helpers '\n #if' vulnerability '\n or #if' isRevision}}
+                <div class="row-fluid wrap-row">
+                  <div class="span12">
+                    <h6>Vulnerability</h6>
+                    <read-more {text}="vulnerability"></read-more>
+                  </div>
+                </div>
+              {{/if_helpers}}
+
               {{>'/static/mustache/base_objects/notes.mustache'}}
               {{>'/static/mustache/base_objects/contacts.mustache'}}
               {{>'/static/mustache/base_objects/reference-urls.mustache'}}
@@ -105,6 +138,24 @@
           </div>
         </tab-panel>
         {{^if isSnapshot}}
+          <tab-panel
+            warning-text="Some proposals are pending approval"
+            title-text="Change Proposals"
+            extra-classes="proposal proposal__tab-warning"
+            tab-id="tab-related-proposals"
+            {(panels)}="panels"
+            {parent-instance}="instance"
+            {can-display-warning}="true"
+            {pre-render-content}="true">
+              <related-proposals
+                (update-proposals-warning)="updateWarningState(%event)"
+                {base-instance}="instance">
+              </related-proposals>
+          </tab-panel>
+          <tab-panel {(panels)}="panels" title-text="Version History">
+            <related-revisions {instance}="instance"></related-revisions>
+          </tab-panel>
+
           <tab-panel tab-id="change-log" {(panels)}="panels" title-text="Change Log">
               <revision-log {instance}="instance"></revision-log>
           </tab-panel>
