@@ -1,8 +1,10 @@
-[//]: <> (updated 10/24/2018)
+[//]: <> (updated 10/30/2018)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 
-[Link existing tickets to track assessments and issues (v1.28.0, 10/24/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.9cm5fsgdlmne)
+[New roles for scoping objects (v1.29.0, 10/30/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.fvuapgweci23)
+
+[Link existing tickets to track assessments and issues (v1.28.0, 10/24/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.7101oq4j5iuv)
 
 [Changes to the mapping flow from scope to directives (v1.25.0, 10/04/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.eg0wu7janrz)
 
@@ -63,6 +65,13 @@ Our product team is working hard to engineer compliance @ scale and make your da
 [Linking assessments with other issue tracking systems (v0.10.36, 12/12/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.9ry21bbez6aa)
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
+
+### New roles for scoping objects (v1.29.0, 10/30/2018)
+
+All scoping objects (like product, systems, entities etc.) will have the following people roles associated with them. Multiple people can be added within each role.  
+
+- Vice Presidents;
+- Line of Defense One Contacts.
 
 ### Link existing tickets to track assessments and issues (v1.28.0, 10/24/2018)
 
