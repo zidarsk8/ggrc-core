@@ -362,6 +362,7 @@ def get_local_cads(definition_type, instance_id):
   return [i.log_json() for i in _get_query_for(definition_type, instance_id)]
 
 
+@memcache.cached
 def get_model_name_inflector_dict():
   return {m: i for i, m in get_inflector_model_name_pairs()}
 
@@ -377,7 +378,8 @@ def get_custom_attributes_for(model_name, instance_id=None):
   if not definition_type:
     return []
   cads = get_global_cads(definition_type)
-  if instance_id is not None:
+  if instance_id is not None and \
+     model_name in models.mixins.CustomAttributable.MODELS_WITH_LOCAL_CADS:
     cads.extend(get_local_cads(definition_type, instance_id))
   return cads
 
