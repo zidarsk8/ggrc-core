@@ -146,12 +146,12 @@ class TaskGroupTaskFactory(_BaseFactory):
   @property
   def _default_attrs(self):
     """See superclass."""
-    closest_working_day = date_utils.closest_working_day()
+    start_date = date_utils.first_not_weekend_day(datetime.date.today())
     return {
         "title": self._obj_title,
         "assignees": [users.current_person()],
-        "start_date": closest_working_day,
-        "due_date": closest_working_day + datetime.timedelta(days=14)
+        "start_date": start_date,
+        "due_date": start_date + datetime.timedelta(days=14)
     }
 
   def _post_obj_init(self, obj):
