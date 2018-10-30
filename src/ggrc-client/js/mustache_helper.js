@@ -422,7 +422,7 @@ function deferRender(tagPrefix, funcs, deferred) {
 
   hook = can.view.hook(hookup);
   return ['<', tagPrefix, ' ', hook, '>', '</', tagName, '>'].join('');
-};
+}
 
 Mustache.registerHelper('with_current_user_as', function (name, options) {
   if (!options) {
