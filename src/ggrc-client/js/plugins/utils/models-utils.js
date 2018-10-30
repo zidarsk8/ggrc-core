@@ -17,6 +17,41 @@ const allModels = Object.assign({},
 
 const relatedAssessmentsTypes = Object.freeze(['Control', 'Objective']);
 
+const objectTypeDecisionTree = Object.freeze({
+  program: businessModels.Program,
+  audit: businessModels.Audit,
+  contract: businessModels.Contract,
+  policy: businessModels.Policy,
+  standard: businessModels.Standard,
+  regulation: businessModels.Regulation,
+  org_group: businessModels.OrgGroup,
+  vendor: businessModels.Vendor,
+  project: businessModels.Project,
+  facility: businessModels.Facility,
+  product: businessModels.Product,
+  data_asset: businessModels.DataAsset,
+  document: businessModels.Document,
+  evidence: businessModels.Evidence,
+  access_group: businessModels.AccessGroup,
+  market: businessModels.Market,
+  metric: businessModels.Metric,
+  system: businessModels.System,
+  process: businessModels.Process,
+  control: businessModels.Control,
+  assessment: businessModels.Assessment,
+  assessment_template: businessModels.AssessmentTemplate,
+  issue: businessModels.Issue,
+  objective: businessModels.Objective,
+  requirement: businessModels.Requirement,
+  person: businessModels.Person,
+  product_group: businessModels.ProductGroup,
+  role: serviceModels.Role,
+  technology_environment: businessModels.TechnologyEnvironment,
+  threat: businessModels.Threat,
+  risk: businessModels.Risk,
+  workflow: businessModels.Workflow,
+});
+
 const getModelInstance = (id, type, requiredAttr) => {
   const promise = new Promise((resolve, reject) => {
     let modelInstance;
@@ -49,26 +84,11 @@ const getModelInstance = (id, type, requiredAttr) => {
 };
 
 const inferObjectType = (data) => {
-  let decisionTree = _(GGRC.extensions)
-    .filter((extension) => extension.object_type_decision_tree)
-    .reduce((tree, extension) =>
-      Object.assign(tree, extension.object_type_decision_tree()), {});
-
   if (!data) {
     return null;
   } else {
     return can.reduce(Object.keys(data), (a, b) =>
-      a || decisionTree[b] || null, null);
-  }
-};
-
-const makeModelInstance = (data) => {
-  if (!data) {
-    return null;
-  } else if (!!GGRC.page_model && GGRC.page_object === data) {
-    return GGRC.page_model;
-  } else {
-    return GGRC.page_model = inferObjectType(data).model($.extend({}, data));
+      a || objectTypeDecisionTree[b] || null, null);
   }
 };
 
@@ -192,7 +212,6 @@ export {
   getModelInstance,
   hasRelatedAssessments,
   relatedAssessmentsTypes,
-  makeModelInstance,
   inferObjectType,
   getInstance,
   isScopeModel,

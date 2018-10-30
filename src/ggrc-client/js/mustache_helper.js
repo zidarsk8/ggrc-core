@@ -26,7 +26,6 @@ import {
 import {
   isMappableType,
   allowedToMap,
-  getHooks,
 } from './plugins/ggrc_utils';
 import Option from './models/service-models/option';
 import Search from './models/service-models/search';
@@ -374,25 +373,6 @@ Mustache.registerHelper('renderLive', function (template, context, options) {
   return can.view.render(template, options.contexts);
 });
 
-// Renders one or more "hooks", which are templates registered under a
-//  particular key using registerHook, using the current context.
-//  Hook keys can be composed with dot separators by passing in multiple
-//  positional parameters.
-//
-// Example: {{{render_hooks 'Audit' 'test_info'}}}  renders all hooks registered
-//  with registerHook("Audit.test_info", <template path>)
-Mustache.registerHelper('render_hooks', function () {
-  let args = can.makeArray(arguments);
-  let options = args.splice(args.length - 1, 1)[0];
-  let hook = can.map(args, Mustache.resolve).join('.');
-
-  return can.map(can.getObject(hook, getHooks()) || [], function (hookTmpl) {
-    return can.Mustache.getHelper('renderLive', options.contexts)
-      .fn(hookTmpl, options.contexts, options);
-  }).join('\n');
-});
-
-let deferRender = Mustache.defer_render =
 function deferRender(tagPrefix, funcs, deferred) {
   let hook;
   let tagName = tagPrefix.split(' ')[0];

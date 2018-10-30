@@ -5,14 +5,14 @@
 
 import {
   getPageType,
-  getCounts,
+  getPageInstance,
 } from '../plugins/utils/current-page-utils';
+import {getCounts} from '../plugins/utils/widgets-utils';
 import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
 import {isObjectVersion} from '../plugins/utils/object-versions-utils';
 import router, {buildUrl} from '../router';
 import '../components/add-tab-button/add-tab-button';
 import pubSub from '../pub-sub';
-import {getPageInstance} from '../plugins/utils/current-page-utils';
 
 export default can.Control({
   defaults: {

@@ -16,3 +16,4 @@ import './reifying-list-loader';
 import './mapper-helpers';
 import './mappings';
 import './mappings-ggrc';
+import './mappings-workflow';

@@ -12,28 +12,17 @@ import '../components/related-objects/proposals/related-proposals-item';
 import '../components/related-objects/revisions/related-revisions';
 import '../components/revision-history/restore-revision';
 import {
-  inferObjectType,
-} from '../plugins/utils/models-utils';
-import {getPageInstance} from '../plugins/utils/current-page-utils';
+  getPageInstance,
+  getPageModel,
+} from '../plugins/utils/current-page-utils';
 import * as businessModels from '../models/business-models';
 
 export default can.Control({
   pluginName: 'ggrc_controllers_info_widget',
   defaults: {
-    model: null,
-    instance: null,
+    model: getPageModel(),
+    instance: getPageInstance(),
     widget_view: GGRC.mustache_path + '/base_objects/info.mustache',
-  },
-  init: function () {
-    let that = this;
-    can.$(function () {
-      if (GGRC.page_object) {
-        can.extend(that.defaults, {
-          model: inferObjectType(GGRC.page_object),
-          instance: getPageInstance(),
-        });
-      }
-    });
   },
 }, {
   init: function () {

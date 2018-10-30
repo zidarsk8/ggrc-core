@@ -314,7 +314,7 @@ the UI is created.
 
 -  ``info.mustache`` - Defines the “Info” widget on each object’s page.
     Defined per-widget in GGRC.Controllers.InfoWidget as the
-   ``widget_view`` option, and specified using ``GGRC.WidgetList``
+   ``widget_view`` option, and specified using ``WidgetList``
    definitions.
 -  ``extended_info.mustache`` - Defines the content of an object’s
    tooltip/popover in the LHN lists.  Specified as the ``tooltip_view``

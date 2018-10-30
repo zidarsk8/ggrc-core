@@ -8,6 +8,7 @@ import Component from '../add-issue-button';
 import '../add-issue-button';
 import {REFRESH_RELATED} from '../../../events/eventTypes';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
+import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
 import Issue from '../../../models/business-models/issue';
 
 describe('add-issue-button component', function () {
@@ -48,7 +49,7 @@ describe('add-issue-button component', function () {
 
       beforeEach(function () {
         fakeIssueInstance = new Issue();
-        spyOn(CurrentPageUtils, 'initCounts');
+        spyOn(WidgetsUtils, 'initCounts');
         spyOn(CurrentPageUtils, 'getPageInstance')
           .and.returnValue(fakePageInstance);
       });
@@ -57,7 +58,7 @@ describe('add-issue-button component', function () {
         'and update Issues tab counts',
       function () {
         handler({}, {}, fakeIssueInstance);
-        expect(CurrentPageUtils.initCounts).toHaveBeenCalledWith(
+        expect(WidgetsUtils.initCounts).toHaveBeenCalledWith(
           [issueWidgetName],
           fakePageInstance.type,
           fakePageInstance.id

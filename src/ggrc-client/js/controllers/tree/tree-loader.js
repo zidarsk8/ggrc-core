@@ -179,46 +179,12 @@
     },
 
     enqueue_items: function (items, forcePrepareChildren) {
-      let childTreeDisplayList = [];
-      let filteredItems = [];
-      let i;
-      let parentModelName;
-      let parentInstanceType;
-
-      // find current widget model and check if first layer tree
-      if (GGRC.page_object && this.options.parent) { // this is a second label tree
-        parentModelName = this.options.parent.options.model.shortName;
-        parentInstanceType = this.options.parent.options.instance.type;
-        childTreeDisplayList =
-          (GGRC.tree_view.sub_tree_for[parentModelName] ||
-            GGRC.tree_view.sub_tree_for[parentInstanceType] ||
-            {} // all hope is lost, skip filtering
-          ).display_list;
-
-        // check if no objects selected, then skip filter
-        if (!childTreeDisplayList) {
-          // skip filter
-          filteredItems = items;
-        } else if (childTreeDisplayList.length === 0) { // no item is selected to filter, so just return
-          return can.Deferred().resolve();
-        } else {
-          for (i = 0; i < items.length; i++) {
-            if (childTreeDisplayList
-              .indexOf(items[i].instance.class.model_singular) !== -1) {
-              filteredItems.push(items[i]);
-            }
-          }
-        }
-      } else {
-        filteredItems = items;
-      }
-
       if (!this._pending_items) {
         this._pending_items = [];
         this._loading_started();
       }
 
-      this.insert_items(filteredItems, forcePrepareChildren)
+      this.insert_items(items, forcePrepareChildren)
         .then(this._ifNotRemoved(this.proxy('_loading_finished')));
 
       return this._loading_deferred;

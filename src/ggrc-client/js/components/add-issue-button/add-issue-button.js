@@ -6,9 +6,9 @@
 import {REFRESH_RELATED} from '../../events/eventTypes';
 import template from './add-issue-button.mustache';
 import {
-  initCounts,
   getPageInstance,
 } from '../../plugins/utils/current-page-utils';
+import {initCounts} from '../../plugins/utils/widgets-utils';
 import Issue from '../../models/business-models/issue';
 
 export default can.Component.extend({

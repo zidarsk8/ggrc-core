@@ -4,6 +4,7 @@
 */
 
 GGRC.Templates = GGRC.Templates || {};
+GGRC.mustache_path = '/static/mustache';
 
 let mustacheTemplates = require.context('./mustache/', true, /\.mustache/);
 
