@@ -13,17 +13,16 @@ from performance.assessment import const
 class AuditTestsBase(locust.TaskSet):
   """Tests for assessment read operations."""
 
-  # glob creator on mihaz acl with mem
-  self.session = (
+  session = (
       "session="  # noqa
   )
-  self.sacsid = (
+  sacsid = (
       "SACSID="  # noqa
   )
-  self.user_id = 402
+  user_id = 402
 
   def __init__(self, *args, **kwargs):
-    super(AssessmentGET, self).__init__(*args, **kwargs)
+    super(AuditTestsBase, self).__init__(*args, **kwargs)
 
     self.header_base = {
         "pragma":
@@ -63,18 +62,94 @@ class AuditTestsBase(locust.TaskSet):
     self.headers_text["cookie"] = cookie
 
   def post_assessments(self):
-    self.post_assessment(49)
-    self.post_assessment(4567)
+    self.post_assessment(49, 1)
+    self.post_assessment(4567, 1)
+    self.post_assessment(49, 10)
+    self.post_assessment(4567, 10)
+    self.post_assessment(49, 50)
+    self.post_assessment(4567, 50)
 
-  def post_assessment(self, audit_id=49):
+  def post_audits(self):
+    self.post_audit(71, 1)
+    self.post_audit(2009, 1)
+    self.post_audit(71, 10)
+    self.post_audit(2009, 10)
+    self.post_audit(71, 50)
+    self.post_audit(2009, 50)
+
+
+  def post_audit(self, program_id, people_count):
+    prefix = "Program {:>4}, {:>2} * 3 people".format(program_id, people_count)
+    audit_json = copy.deepcopy(const.audit_payload)
+    audit = audit_json[0]["audit"]
+    audit["title"] = generator.random_str()
+    audit["program"]["id"] = program_id
+    audit["access_control_list"] = self._get_audit_acl(people_count)
+    self.client.post(
+        "/api/audits",
+        json=audit_json,
+        headers=self.headers,
+        name="{} - Create Audit".format(prefix),
+    )
+    audit_count = copy.deepcopy(const.program_audit_tree_view_query)
+    audit_count[0]["filters"]["expression"]["ids"] = [str(program_id)]
+    self.client.post(
+        "/query",
+        json=audit_count,
+        headers=self.headers,
+      name="Program {:>4} - Audits tab query".format(program_id),
+    )
+    pass
+
+  @classmethod
+  def _get_audit_acl(cls, people_count):
+    roles = [128, 129]
+    people_list = []
+    for i in range(people_count):
+      for role_id in roles:
+        people_list.append(
+            {
+                "ac_role_id": role_id,
+                "person": {
+                    "id": const.people_ids[i + role_id]
+                },
+                "person_id": const.people_ids[i + role_id]
+            }
+        )
+    return people_list
+
+  @classmethod
+  def _get_assessment_acl(cls, people_count):
+    # creators_role_id = 124
+    # assignees_role_id = 120
+    # verifiers_role_id = 121
+    roles = [124, 120, 121]
+    people_list = []
+    for i in range(people_count):
+      for role_id in roles:
+        people_list.append(
+            {
+                "ac_role_id": role_id,
+                "person": {
+                    "id": const.people_ids[i + role_id]
+                },
+                "person_id": const.people_ids[i + role_id]
+            }
+        )
+    return people_list
+
+  def post_assessment(self, audit_id, people_count=1):
+    prefix = "Audit {:>4}, {:>2} * 3 people".format(audit_id, people_count)
     assessment_json = copy.deepcopy(const.assessment_payload)
-    assessment_json[0]["assessment"]["title"] = generator.random_str()
-    assessment_json[0]["assessment"]["audit"]["id"] = audit_id
+    assessment = assessment_json[0]["assessment"]
+    assessment["title"] = generator.random_str()
+    assessment["audit"]["id"] = audit_id
+    assessment["access_control_list"] = self._get_assessment_acl(people_count)
     self.client.post(
         "/api/assessments",
         json=assessment_json,
         headers=self.headers,
-        name="Create Assessment on Audit {}".format(audit_id),
+        name="{} - Create Assessment".format(prefix),
     )
     assessment_count = copy.deepcopy(const.audit_assessment_tree_view_query)
     assessment_count[0]["filters"]["expression"]["ids"] = [str(audit_id)]
@@ -82,7 +157,7 @@ class AuditTestsBase(locust.TaskSet):
         "/query",
         json=assessment_count,
         headers=self.headers,
-        name="Audit 49 Assessments tab query",
+      name="Audit {:>4} - Assessments tab query".format(audit_id),
     )
 
   def get_audits(self):
