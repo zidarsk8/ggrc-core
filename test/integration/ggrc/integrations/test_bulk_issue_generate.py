@@ -32,7 +32,7 @@ class TestBulkIssuesSync(TestCase):
     }
     self.issue_id = "42"
 
-  def setup_assessments(self, asmnt_count):
+  def setup_assessments(self, asmnt_count, issue_id=None, enabled=True):
     """Create Audit with couple of Assessments and linked IssueTrackerIssues.
 
     Args:
@@ -49,9 +49,10 @@ class TestBulkIssuesSync(TestCase):
           person=self.role_people["Audit Captains"],
       )
       factories.IssueTrackerIssueFactory(
+          enabled=enabled,
           issue_tracked_obj=audit,
+          issue_id=issue_id,
           issue_type="BUG",
-          issue_id=None,
           component_id=12345,
           hotlist_id=12345,
           issue_priority="P2",
@@ -69,12 +70,29 @@ class TestBulkIssuesSync(TestCase):
               person=self.role_people[role_name],
           )
         factories.IssueTrackerIssueFactory(
+            enabled=enabled,
             issue_tracked_obj=asmnt,
-            issue_id=None,
+            issue_id=issue_id,
             title=None,
         )
         assessment_ids.append(asmnt.id)
       return audit.id, assessment_ids
+
+  @staticmethod
+  def setup_issues(issue_count, issue_id=None, enabled=True):
+    """Create issues with enabled integration."""
+    with factories.single_commit():
+      issue_ids = []
+      for _ in range(issue_count):
+        issue = factories.IssueFactory()
+        factories.IssueTrackerIssueFactory(
+            enabled=enabled,
+            issue_tracked_obj=issue,
+            issue_id=issue_id,
+            title=None,
+        )
+        issue_ids.append(issue.id)
+      return issue_ids
 
   def issuetracker_sync_mock(self, sync_func_name):
     """IssueTracker sync method mock."""
@@ -100,7 +118,7 @@ class TestBulkIssuesSync(TestCase):
           api_link="/generate_children_issues",
           data={
               "parent": {"type": parent_type, "id": parent_id},
-              "child_type": child_type
+              "child_type": child_type,
           }
       )
 
@@ -205,6 +223,28 @@ class TestBulkIssuesSync(TestCase):
 class TestBulkIssuesGenerate(TestBulkIssuesSync):
   """Test bulk issues generation."""
 
+  def test_get_objects_method_assmt(self):
+    """Test get_issuetracked_objects() for not linked assessments."""
+    _, assessment_ids_enabled = self.setup_assessments(3)
+    _, assessment_ids_disabled = self.setup_assessments(2, enabled=False)
+    assessment_ids = assessment_ids_enabled + assessment_ids_disabled
+    creator = issuetracker_bulk_sync.IssueTrackerBulkCreator
+
+    result = creator.get_issuetracked_objects("Assessment", assessment_ids)
+    result_ids = [assmt.id for assmt in result]
+    self.assertEqual(set(assessment_ids_enabled), set(result_ids))
+
+  def test_get_objects_method_issue(self):
+    """Test get_issuetracked_objects() for not linked issues."""
+    issue_ids_enabled = self.setup_issues(3)
+    issue_ids_disabled = self.setup_issues(2, enabled=False)
+    issue_ids = issue_ids_enabled + issue_ids_disabled
+    creator = issuetracker_bulk_sync.IssueTrackerBulkCreator
+
+    result = creator.get_issuetracked_objects("Issue", issue_ids)
+    result_ids = [issue.id for issue in result]
+    self.assertEqual(set(issue_ids_enabled), set(result_ids))
+
   def test_asmnt_bulk_generate(self):
     """Test bulk generation of issues for Assessments."""
     _, assessment_ids = self.setup_assessments(3)
@@ -267,6 +307,7 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
               person=person,
           )
         factories.IssueTrackerIssueFactory(
+            enabled=True,
             issue_tracked_obj=issue,
             issue_id=None,
             component_id=12345,
@@ -337,6 +378,30 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
 @ddt.ddt
 class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
   """Test bulk issues generation for child objects."""
+
+  def test_get_objects_method_assmt(self):
+    """Test get_issuetracked_objects() for linked assessments."""
+    _, assessment_ids_enabled = self.setup_assessments(3, issue_id=123)
+    _, assessment_ids_disabled = self.setup_assessments(2,
+                                                        issue_id=123,
+                                                        enabled=False)
+    assessment_ids = assessment_ids_enabled + assessment_ids_disabled
+    updater = issuetracker_bulk_sync.IssueTrackerBulkUpdater
+
+    result = updater.get_issuetracked_objects("Assessment", assessment_ids)
+    result_ids = [assmt.id for assmt in result]
+    self.assertEqual(set(assessment_ids_enabled), set(result_ids))
+
+  def test_get_objects_method_issue(self):
+    """Test get_issuetracked_objects() for linked issues."""
+    issue_ids_enabled = self.setup_issues(3, issue_id=123)
+    issue_ids_disabled = self.setup_issues(2, issue_id=123, enabled=False)
+    issue_ids = issue_ids_enabled + issue_ids_disabled
+    updater = issuetracker_bulk_sync.IssueTrackerBulkUpdater
+
+    result = updater.get_issuetracked_objects("Issue", issue_ids)
+    result_ids = [issue.id for issue in result]
+    self.assertEqual(set(issue_ids_enabled), set(result_ids))
 
   def test_asmnt_bulk_child_generate(self):
     """Test generation of issues for all Assessments in Audit."""
@@ -605,6 +670,7 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
       for _ in range(3):
         issue = factories.IssueFactory()
         factories.IssueTrackerIssueFactory(
+            enabled=True,
             issue_tracked_obj=issue,
             issue_id=self.issue_id,
             component_id=12345,
