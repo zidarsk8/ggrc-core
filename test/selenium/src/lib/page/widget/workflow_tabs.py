@@ -36,15 +36,13 @@ class ActiveCyclesTab(object_page.ObjectPage):
 
   def map_obj_to_cycle_task(self, obj, cycle_task):
     """Maps object to the cycle task."""
-    self._open_cycle_task_panel(cycle_task)
-    cycle_task_panel = internal_ui_operations.info_widget_cls(cycle_task)
+    cycle_task_panel = self._open_cycle_task_panel(cycle_task)
     cycle_task_panel.click_map_objs()
     object_mapper.ObjectMapper().map_obj(obj)
 
   def get_objs_mapped_to_cycle_task(self, cycle_task):
     """Get objects mapped to the cycle task."""
-    self._open_cycle_task_panel(cycle_task)
-    cycle_task_panel = internal_ui_operations.info_widget_cls(cycle_task)
+    cycle_task_panel = self._open_cycle_task_panel(cycle_task)
     return cycle_task_panel.mapped_objs()
 
   def _open_cycle_task_panel(self, cycle_task):
@@ -60,6 +58,9 @@ class ActiveCyclesTab(object_page.ObjectPage):
     task_group_row.expand()
     task_row = task_group_row.get_cycle_task_row_by(title=cycle_task.title)
     task_row.select()
+    cycle_task_panel = internal_ui_operations.info_widget_cls(cycle_task)
+    cycle_task_panel.wait_to_be_init()
+    return cycle_task_panel
 
 
 class SetupTab(object_page.ObjectPage):

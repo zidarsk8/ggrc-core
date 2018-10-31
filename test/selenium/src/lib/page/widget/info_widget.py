@@ -393,6 +393,11 @@ class CycleTask(InfoWidget):
         "due_date": self.due_date
     }
 
+  def wait_to_be_init(self):
+    """Waits for page object to be initialized."""
+    self._root.element(class_name="tab-container_hidden-tabs").wait_until(
+        lambda e: not e.exists)
+
   @property
   def due_date(self):
     """Returns Task Due Date."""
