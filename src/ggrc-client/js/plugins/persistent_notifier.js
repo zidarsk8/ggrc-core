@@ -5,7 +5,6 @@
 
 export default can.Construct({
   defaults: {
-    one_time_cbs: true,
     while_queue_has_elements: function () {},
     when_queue_empties: function () {},
   },
@@ -38,9 +37,7 @@ export default can.Construct({
         ~i && that.dfds.splice(i, 1);
         if (that.dfds.length < 1) {
           can.each(that.list_empty_cbs, Function.prototype.call);
-          if (that.one_time_cbs) {
-            that.list_empty_cbs = [];
-          }
+          that.list_empty_cbs = [];
           that.when_queue_empties();
         }
       });
@@ -50,11 +47,10 @@ export default can.Construct({
     }
   },
   on_empty: function (fn) {
-    if (!this.one_time_cbs || this.dfds.length < 1) {
+    if (this.dfds.length < 1) {
       fn();
     }
-    if ((this.dfds.length > 0 || !this.one_time_cbs) &&
-      !~this.list_empty_cbs.indexOf(fn)) {
+    if (this.dfds.length > 0 && !~this.list_empty_cbs.indexOf(fn)) {
       this.list_empty_cbs.push(fn);
     }
   },
