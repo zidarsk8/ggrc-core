@@ -11,7 +11,7 @@ from integration.ggrc import TestCase, generator
 from integration.ggrc.models import factories
 
 from integration.ggrc.api_helper import Api
-from integration.ggrc.review import build_reviewer_acl
+from integration.ggrc.review import generate_review_object
 
 
 def build_related_object_data(role, title):
@@ -125,6 +125,212 @@ class TestReviewStatusUpdate(TestCase):
             [{
                 "custom_attribute_id": gca.id,
                 "attribute_value": "new_value",
+            }],
+        }
+    )
+
+    review = all_models.Review.query.get(review_id)
+    self.assertEqual(review.status, all_models.Review.STATES.UNREVIEWED)
+
+  def test_update_gca(self):
+    """if existing GCA value changed review -> unreviewed"""
+    with factories.single_commit():
+      ca_factory = factories.CustomAttributeDefinitionFactory
+      gca = ca_factory(
+          definition_type="control",
+          title="rich_test_gca",
+          attribute_type="Rich Text"
+      )
+      control = factories.ControlFactory()
+
+      control.custom_attribute_values = [{
+          "attribute_value": "starting_value",
+          "custom_attribute_id": gca.id
+      }]
+      review = factories.ReviewFactory(
+          status=all_models.Review.STATES.REVIEWED, reviewable=control
+      )
+    review_id = review.id
+    reviewable = review.reviewable
+
+    review = all_models.Review.query.get(review_id)
+
+    self.assertEqual(review.status, all_models.Review.STATES.REVIEWED)
+
+    self.api.modify_object(
+        reviewable, {
+            "custom_attribute_values":
+            [{
+                "custom_attribute_id": gca.id,
+                "attribute_value": "new_value",
+            }],
+        }
+    )
+
+    review = all_models.Review.query.get(review_id)
+    self.assertEqual(review.status, all_models.Review.STATES.UNREVIEWED)
+
+  @ddt.data("custom attr", "slug", "self")
+  def test_gca_with_varying_titles(self, title):
+    """if GCA with any title is changed review -> unreviewed"""
+    with factories.single_commit():
+      ca_factory = factories.CustomAttributeDefinitionFactory
+      gca = ca_factory(
+          definition_type="control",
+          title=title,
+          attribute_type="Rich Text"
+      )
+      control = factories.ControlFactory()
+
+      control.custom_attribute_values = [{
+          "attribute_value": "starting_value",
+          "custom_attribute_id": gca.id
+      }]
+      review = factories.ReviewFactory(
+          status=all_models.Review.STATES.REVIEWED, reviewable=control
+      )
+    review_id = review.id
+    reviewable = review.reviewable
+
+    review = all_models.Review.query.get(review_id)
+
+    self.assertEqual(review.status, all_models.Review.STATES.REVIEWED)
+
+    self.api.modify_object(
+        reviewable, {
+            "custom_attribute_values":
+            [{
+                "custom_attribute_id": gca.id,
+                "attribute_value": "new_value",
+            }],
+        }
+    )
+
+    review = all_models.Review.query.get(review_id)
+    self.assertEqual(review.status, all_models.Review.STATES.UNREVIEWED)
+
+  def test_map_person_gca(self):
+    """if Map:Person GCA value added review -> unreviewed"""
+    with factories.single_commit():
+      ca_factory = factories.CustomAttributeDefinitionFactory
+      gca = ca_factory(
+          definition_type="control",
+          title="map_test_gca",
+          attribute_type="Map:Person"
+      )
+
+      user_id = all_models.Person.query.filter_by(
+          email="user@example.com"
+      ).one().id
+
+      control = factories.ControlFactory()
+      review = factories.ReviewFactory(
+          status=all_models.Review.STATES.REVIEWED, reviewable=control
+      )
+
+    review_id = review.id
+    reviewable = review.reviewable
+    review = all_models.Review.query.get(review_id)
+
+    self.assertEqual(review.status, all_models.Review.STATES.REVIEWED)
+
+    self.api.modify_object(
+        reviewable, {
+            "custom_attribute_values":
+            [{
+                "custom_attribute_id": gca.id,
+                "attribute_object_id": user_id,
+                "attribute_value": "Person",
+            }],
+        }
+    )
+
+    review = all_models.Review.query.get(review_id)
+    self.assertEqual(review.status, all_models.Review.STATES.UNREVIEWED)
+
+  def test_update_map_person_gca(self):
+    """if existing Map:Person GCA value changed review -> unreviewed"""
+    with factories.single_commit():
+      ca_factory = factories.CustomAttributeDefinitionFactory
+      gca = ca_factory(
+          definition_type="control",
+          title="map_test_gca",
+          attribute_type="Map:Person"
+      )
+
+      first_user_id = all_models.Person.query.filter_by(
+          email="user@example.com"
+      ).one().id
+      second_user_id = factories.PersonFactory().id
+
+      control = factories.ControlFactory()
+      control.custom_attribute_values = [{
+          "attribute_object_id": first_user_id,
+          "custom_attribute_id": gca.id,
+          "attribute_value": "Person"
+      }]
+      review = factories.ReviewFactory(
+          status=all_models.Review.STATES.REVIEWED, reviewable=control
+      )
+
+    review_id = review.id
+    reviewable = review.reviewable
+    review = all_models.Review.query.get(review_id)
+
+    self.assertEqual(review.status, all_models.Review.STATES.REVIEWED)
+
+    self.api.modify_object(
+        reviewable, {
+            "custom_attribute_values":
+            [{
+                "custom_attribute_id": gca.id,
+                "attribute_object_id": second_user_id,
+                "attribute_value": "Person",
+            }],
+        }
+    )
+
+    review = all_models.Review.query.get(review_id)
+    self.assertEqual(review.status, all_models.Review.STATES.UNREVIEWED)
+
+  def test_delete_map_person_gca(self):
+    """if existing Map:Person GCA value deleted review -> unreviewed"""
+    with factories.single_commit():
+      ca_factory = factories.CustomAttributeDefinitionFactory
+      gca = ca_factory(
+          definition_type="control",
+          title="map_test_gca",
+          attribute_type="Map:Person"
+      )
+
+      user_id = all_models.Person.query.filter_by(
+          email="user@example.com"
+      ).one().id
+
+      control = factories.ControlFactory()
+      control.custom_attribute_values = [{
+          "attribute_object_id": user_id,
+          "custom_attribute_id": gca.id,
+          "attribute_value": "Person"
+      }]
+      review = factories.ReviewFactory(
+          status=all_models.Review.STATES.REVIEWED, reviewable=control
+      )
+
+    review_id = review.id
+    reviewable = review.reviewable
+    review = all_models.Review.query.get(review_id)
+
+    self.assertEqual(review.status, all_models.Review.STATES.REVIEWED)
+
+    self.api.modify_object(
+        reviewable, {
+            "custom_attribute_values":
+            [{
+                "custom_attribute_id": gca.id,
+                "attribute_object_id": None,
+                "attribute_object": None,
+                "attribute_value": "Person",
             }],
         }
     )
@@ -258,19 +464,7 @@ class TestReviewStatusUpdate(TestCase):
   def test_unmap_snapshotable(self):
     """Unmap snapshotable should change review status"""
     control = factories.ControlFactory()
-    resp, review = self.generator.generate_object(
-        all_models.Review,
-        {
-            "reviewable": {
-                "type": control.type,
-                "id": control.id,
-            },
-            "context": None,
-            "status": all_models.Review.STATES.UNREVIEWED,
-            "access_control_list": build_reviewer_acl(),
-            "notification_type": all_models.Review.NotificationTypes.EMAIL_TYPE
-        },
-    )
+    resp, review = generate_review_object(control)
     review_id = review.id
 
     _, rel = self.generator.generate_relationship(
@@ -303,19 +497,8 @@ class TestReviewStatusUpdate(TestCase):
   def test_map_nonsnapshotable(self, nonsnapshotable):
     """Map '{}' shouldn't change review status"""
     control = factories.ControlFactory()
-    _, review = self.generator.generate_object(
-        all_models.Review,
-        {
-            "reviewable": {
-                "type": control.type,
-                "id": control.id,
-            },
-            "context": None,
-            "status": all_models.Review.STATES.REVIEWED,
-            "access_control_list": build_reviewer_acl(),
-            "notification_type": all_models.Review.NotificationTypes.EMAIL_TYPE
-        },
-    )
+    _, review = generate_review_object(
+        control, state=all_models.Review.STATES.REVIEWED)
     review_id = review.id
 
     review = all_models.Review.query.get(review_id)
@@ -334,19 +517,8 @@ class TestReviewStatusUpdate(TestCase):
   def test_unmap_nonsnapshotable(self):
     """Unmap nonsnapshotable shouldn't change review status"""
     control = factories.ControlFactory()
-    resp, review = self.generator.generate_object(
-        all_models.Review,
-        {
-            "reviewable": {
-                "type": control.type,
-                "id": control.id,
-            },
-            "context": None,
-            "status": all_models.Review.STATES.REVIEWED,
-            "access_control_list": build_reviewer_acl(),
-            "notification_type": all_models.Review.NotificationTypes.EMAIL_TYPE
-        },
-    )
+    resp, review = generate_review_object(
+        control, state=all_models.Review.STATES.REVIEWED)
     review_id = review.id
     _, rel = self.generator.generate_relationship(
         source=control,
@@ -370,19 +542,7 @@ class TestReviewStatusUpdate(TestCase):
   def test_proposal_apply(self):
     """Reviewable object changed via proposal -> review.state-> UNREVIEWED"""
     control = factories.ControlFactory()
-    _, review = self.generator.generate_object(
-        all_models.Review,
-        {
-            "reviewable": {
-                "type": control.type,
-                "id": control.id,
-            },
-            "context": None,
-            "status": all_models.Review.STATES.UNREVIEWED,
-            "access_control_list": build_reviewer_acl(),
-            "notification_type": all_models.Review.NotificationTypes.EMAIL_TYPE
-        },
-    )
+    _, review = generate_review_object(control)
 
     review_id = review.id
 
@@ -398,3 +558,14 @@ class TestReviewStatusUpdate(TestCase):
 
     review = all_models.Review.query.get(review_id)
     self.assertEqual(review.status, all_models.Review.STATES.UNREVIEWED)
+
+  def test_review_status_update(self):
+    """Test updating folder preserves review status"""
+    control = factories.ControlFactory()
+    factories.ReviewFactory(
+        reviewable=control,
+        status=all_models.Review.STATES.REVIEWED,
+    )
+    self.api.put(control, {"folder": factories.random_str()})
+    control = all_models.Control.query.get(control.id)
+    self.assertEqual(control.review.status, all_models.Review.STATES.REVIEWED)
