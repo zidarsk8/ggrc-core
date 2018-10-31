@@ -236,21 +236,21 @@ class TestRevisions(TestCase):
                                      attribute_value,
                                      is_global):
     """Population cavs and cads depend on is_global flag and send params."""
-    control = factories.ControlFactory()
-    control_id = control.id
+    asmnt = factories.AssessmentFactory()
+    asmnt_id = asmnt.id
     cad_params = {
         "title": "test_cad",
-        "definition_type": "control",
+        "definition_type": "assessment",
         "attribute_type": attribute_type
     }
     if not is_global:
-      cad_params["definition_id"] = control_id
+      cad_params["definition_id"] = asmnt_id
     with factories.single_commit():
       cad = factories.CustomAttributeDefinitionFactory(**cad_params)
     cad_id = cad.id
     revisions = ggrc.models.Revision.query.filter(
-        ggrc.models.Revision.resource_id == control_id,
-        ggrc.models.Revision.resource_type == "Control",
+        ggrc.models.Revision.resource_id == asmnt_id,
+        ggrc.models.Revision.resource_type == "Assessment",
     ).order_by(ggrc.models.Revision.id.desc()).all()
     self.assertEqual(1, len(revisions))
     revision = revisions[0]
@@ -262,8 +262,8 @@ class TestRevisions(TestCase):
     self.assertIn("custom_attribute_values", revision.content)
     self.assertEqual(
         [{
-            'attributable_id': control_id,
-            'attributable_type': u'Control',
+            'attributable_id': asmnt_id,
+            'attributable_type': 'Assessment',
             'attribute_object': None,
             'attribute_object_id': None,
             'attribute_value': attribute_value,
@@ -312,27 +312,27 @@ class TestRevisions(TestCase):
   def test_revisions_invalid_cavs(self, value, _):
     """Test filtering of Checkbox CAVs."""
     with factories.single_commit():
-      program = factories.ProgramFactory()
+      asmnt = factories.AssessmentFactory()
       ca_def = factories.CustomAttributeDefinitionFactory(
-          definition_id=program.id,
-          definition_type="program",
+          definition_id=asmnt.id,
+          definition_type="assessment",
           title="CA",
           attribute_type="Checkbox",
       )
 
     self.gen.api.modify_object(
-        program, {
+        asmnt, {
             "custom_attribute_values": [{
-                "attributable_id": program.id,
-                "attributable_type": "program",
+                "attributable_id": asmnt.id,
+                "attributable_type": "assessment",
                 "attribute_value": value,
                 "custom_attribute_id": ca_def.id,
             }, ],
         },
     )
     revisions = ggrc.models.Revision.query.filter(
-        ggrc.models.Revision.resource_id == program.id,
-        ggrc.models.Revision.resource_type == "Program",
+        ggrc.models.Revision.resource_id == asmnt.id,
+        ggrc.models.Revision.resource_type == "Assessment",
     ).order_by(ggrc.models.Revision.id.desc()).all()
     content = revisions[0].content
     self.assertEqual(
