@@ -44,7 +44,7 @@ def get_expected_proposal_email(obj, proposal, proposal_author):
 def assert_proposal_apply_btns_exist(
     selenium, obj, proposals, apply_btn_exists
 ):
-  """Check proposal apply buttons existing."""
+  """Check proposal apply buttons existence."""
   actual_apply_btns_existence = [
       proposal_ui_service.ProposalsService(
           selenium).has_proposal_apply_btn(obj, proposal)
