@@ -43,7 +43,13 @@ class ProposalsService(base.WithBrowser):
 
   def apply_proposal(self, obj, proposal):
     """Apply an obj proposal."""
-    self.open_obj_change_proposals_tab(obj).click_apply_btn(proposal)
+    self.open_obj_change_proposals_tab(obj).click_review_apply_btn(proposal)
     apply_decline_proposal.CompareApplyDeclineModal().click_apply_btn()
     proposal.status = object_states.APPLIED
     proposal.changes[0]["cur_value"] = proposal.changes[0]["proposed_value"]
+
+  def decline_proposal(self, obj, proposal):
+    """Decline an obj proposal."""
+    self.open_obj_change_proposals_tab(obj).click_review_apply_btn(proposal)
+    apply_decline_proposal.CompareApplyDeclineModal().click_decline_btn()
+    proposal.status = object_states.DECLINED

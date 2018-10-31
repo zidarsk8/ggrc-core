@@ -14,9 +14,16 @@ class CompareApplyDeclineModal(base.Modal):
     super(CompareApplyDeclineModal, self).__init__(driver)
     self._modal = self._browser.div(class_name="compare-modal")
     self._apply_btn = self._modal.button(text="Apply")
+    self._decline_btn = self._modal.button(text="Decline")
 
   def click_apply_btn(self):
     """Click on the apply button."""
     selenium_utils.wait_for_js_to_load(self._driver)
     self._apply_btn.click()
+    self._modal.wait_until_not_present()
+
+  def click_decline_btn(self):
+    """Click on the decline button."""
+    selenium_utils.wait_for_js_to_load(self._driver)
+    self._decline_btn.click()
     self._modal.wait_until_not_present()
