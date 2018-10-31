@@ -850,10 +850,8 @@ export default can.Model('can.Model.Cacheable', {
     return this.notifier.queue(dfd);
   },
   _save: function (_super) {
-    let that = this;
     let isNew = this.isNew();
-    let xhr;
-    let dfd = this._dfd;
+    let saveDfd = this._dfd;
 
     this.dispatch('modelBeforeSave');
 
@@ -866,37 +864,35 @@ export default can.Model('can.Model.Cacheable', {
       }
     }
 
-    xhr = _super.call(that)
-      .then(function (result) {
-        if (isNew) {
-          that.after_create && that.after_create();
-        } else {
-          that.after_update && that.after_update();
+    let saveXHR = _super.call(this)
+      .then((result) => {
+        if (!isNew) {
+          this.after_update && this.after_update();
         }
-        that.after_save && that.after_save();
+        this.after_save && this.after_save();
         return result;
-      }, function (xhr, status, message) {
-        that.save_error && that.save_error(xhr.responseText);
+      }, (xhr, status, message) => {
+        this.save_error && this.save_error(xhr.responseText);
         return new can.Deferred().reject(xhr, status, message);
       })
-      .fail(function (response) {
-        that.notifier.on_empty(function () {
-          dfd.reject(that, response);
+      .fail((response) => {
+        this.notifier.on_empty(() => {
+          saveDfd.reject(this, response);
         });
       })
-      .done(function () {
-        that.notifier.on_empty(function () {
-          dfd.resolve(that);
+      .done(() => {
+        this.notifier.on_empty(() => {
+          saveDfd.resolve(this);
         });
       })
-      .always(function () {
-        that.dispatch('modelAfterSave');
+      .always(() => {
+        this.dispatch('modelAfterSave');
       });
 
-    delayLeavingPageUntil(xhr);
-    delayLeavingPageUntil(dfd);
+    delayLeavingPageUntil(saveXHR);
+    delayLeavingPageUntil(saveDfd);
 
-    return dfd;
+    return saveDfd;
   },
   save: function () {
     Array.prototype.push.call(arguments, this._super);
