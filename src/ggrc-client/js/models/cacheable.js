@@ -849,61 +849,53 @@ export default can.Model('can.Model.Cacheable', {
   delay_resolving_save_until: function (dfd) {
     return this.notifier.queue(dfd);
   },
-  _save: function () {
+  _save: function (_super) {
     let that = this;
-    let _super = Array.prototype.pop.call(arguments);
     let isNew = this.isNew();
     let xhr;
     let dfd = this._dfd;
-    let preSaveNotifier =
-      new PersistentNotifier({name:
-      this.constructor.model_singular + ' (pre-save)'});
 
-    that.dispatch('modelBeforeSave');
+    this.dispatch('modelBeforeSave');
 
-    if (this.before_save) {
-      this.before_save(preSaveNotifier);
-    }
     if (isNew) {
       this.attr('provisional_id', 'provisional_' + Date.now());
       can.getObject('provisional_cache',
         can.Model.Cacheable, true)[this.provisional_id] = this;
       if (this.before_create) {
-        this.before_create(preSaveNotifier);
+        this.before_create();
       }
     }
 
-    preSaveNotifier.on_empty(function () {
-      xhr = _super.apply(that, arguments)
-        .then(function (result) {
-          if (isNew) {
-            that.after_create && that.after_create();
-          } else {
-            that.after_update && that.after_update();
-          }
-          that.after_save && that.after_save();
-          return result;
-        }, function (xhr, status, message) {
-          that.save_error && that.save_error(xhr.responseText);
-          return new can.Deferred().reject(xhr, status, message);
-        })
-        .fail(function (response) {
-          that.notifier.on_empty(function () {
-            dfd.reject(that, response);
-          });
-        })
-        .done(function () {
-          that.notifier.on_empty(function () {
-            dfd.resolve(that);
-          });
-        })
-        .always(function () {
-          that.dispatch('modelAfterSave');
+    xhr = _super.call(that)
+      .then(function (result) {
+        if (isNew) {
+          that.after_create && that.after_create();
+        } else {
+          that.after_update && that.after_update();
+        }
+        that.after_save && that.after_save();
+        return result;
+      }, function (xhr, status, message) {
+        that.save_error && that.save_error(xhr.responseText);
+        return new can.Deferred().reject(xhr, status, message);
+      })
+      .fail(function (response) {
+        that.notifier.on_empty(function () {
+          dfd.reject(that, response);
         });
+      })
+      .done(function () {
+        that.notifier.on_empty(function () {
+          dfd.resolve(that);
+        });
+      })
+      .always(function () {
+        that.dispatch('modelAfterSave');
+      });
 
-      delayLeavingPageUntil(xhr);
-      delayLeavingPageUntil(dfd);
-    });
+    delayLeavingPageUntil(xhr);
+    delayLeavingPageUntil(dfd);
+
     return dfd;
   },
   save: function () {
