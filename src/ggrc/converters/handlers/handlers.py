@@ -1009,3 +1009,15 @@ class ExportOnlyIssueTrackerColumnHandler(ExportOnlyColumnHandler):
   def get_value(self):
     cache = self.row_converter.block_converter.get_ticket_tracker_cache()
     return cache.get(self.row_converter.obj.id, "")
+
+
+class ReviewersColumnHandler(ExportOnlyColumnHandler):
+
+  def get_value(self):
+    reviewers = self.row_converter.obj.reviewers
+    if not reviewers:
+      return ''
+
+    return '\n'.join(sorted(
+      reviewer.person.email for reviewer in reviewers
+    ))

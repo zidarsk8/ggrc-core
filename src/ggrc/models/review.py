@@ -43,12 +43,22 @@ class Reviewable(rest_handable.WithPutHandable,
       "review_status": {
           "display_name": "Review State",
           "mandatory": False
+      },
+      "reviewers": {
+          "display_name": "Reviewers",
+          "mandatory": False
       }
   }
 
   @builder.simple_property
   def review_status(self):
     return self.review.status if self.review else Review.STATES.UNREVIEWED
+
+  @builder.simple_property
+  def reviewers(self):
+    if self.review:
+      return self.review.access_control_list
+    return []
 
   @builder.simple_property
   def review_issue_link(self):
