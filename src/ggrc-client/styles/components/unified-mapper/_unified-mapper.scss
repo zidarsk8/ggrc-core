@@ -513,12 +513,14 @@ mapper-results-columns-configuration {
       }
     }
     .modal-body {
+      .autocomplete-dropdown__input {
+        margin: 10px 14px 14px 12px;
+      }
       border-top: 1px solid #E0E0E0;
       padding: 20px !important;
       select, input, .input-block-level {
         margin: 0;
       }
-
       .well.well-small {
         font-size: 13px;
         padding: 9px 16px 7px;
