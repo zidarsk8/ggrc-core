@@ -395,8 +395,11 @@ class CycleTask(InfoWidget):
 
   def wait_to_be_init(self):
     """Waits for page object to be initialized."""
-    self._root.element(class_name="tab-container_hidden-tabs").wait_until(
-        lambda e: not e.exists)
+    # Element with class `nav-tabs` appears in DOM at start of panel rendering.
+    # But a class "tab-container_hidden-tabs" that makes it "display: none"
+    #   is removed only at end.
+    self._root.element(class_name="nav-tabs").wait_until(
+        lambda e: e.present)
 
   @property
   def due_date(self):
