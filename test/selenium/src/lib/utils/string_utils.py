@@ -1,7 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Utility functions for string operations."""
-
+import cgi
 import random
 import string
 import uuid
@@ -208,3 +208,9 @@ class StringMethods(object):
         cls.update_dicts_values(val, old_values_list, new_value)
       elif val in old_values_list:
         dic[key] = new_value
+
+
+def escape_html(str_to_escape):
+  """Replaces <, > and & characters with HTML-safe sequences (&lt, &gt; &amp;).
+  """
+  return cgi.escape(str_to_escape)
