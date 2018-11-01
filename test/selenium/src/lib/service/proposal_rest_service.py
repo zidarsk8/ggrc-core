@@ -6,6 +6,7 @@ from lib import url
 from lib.constants import objects
 from lib.service import rest_service
 from lib.service.rest import query
+from lib.utils import string_utils
 
 
 class ProposalsService(rest_service.HelpRestService):
@@ -26,12 +27,9 @@ class ProposalsService(rest_service.HelpRestService):
 
   def get_proposal_creation_date(self, obj, proposal):
     """Get proposal creation date."""
-    datetime = None
-    for prop in self.get_obj_proposals(obj):
-      if (
-          proposal.changes[0]["proposed_value"] in
-          prop["content"]["fields"]["description"]
-      ):
-        datetime = parser.parse(prop["created_at"]).replace(tzinfo=tz.tzutc())
-        break
-    return datetime
+    actual_proposal = next(
+        prop for prop in self.get_obj_proposals(obj)
+        if string_utils.escape_html(proposal.changes[0]["proposed_value"])
+        in prop["content"]["fields"]["description"])
+    return parser.parse(actual_proposal["created_at"]).replace(
+        tzinfo=tz.tzutc())
