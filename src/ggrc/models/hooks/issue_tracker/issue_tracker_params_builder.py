@@ -13,6 +13,8 @@ import html2text
 from ggrc import utils as ggrc_utils
 from ggrc.integrations import issues
 from ggrc.integrations import integrations_errors
+from ggrc.integrations.constants import DEFAULT_ISSUETRACKER_VALUES as \
+    default_values
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.models.hooks.issue_tracker import \
     issue_tracker_params_container as params_container
@@ -74,12 +76,27 @@ class BaseIssueTrackerParamsBuilder(object):
 
   def handle_issue_tracker_info(self, obj, issue_tracker_info):
     """Handle issue tracker information."""
-    self.params.component_id = issue_tracker_info.get("component_id")
-    self.params.hotlist_id = issue_tracker_info.get("hotlist_id")
-    self.params.title = issue_tracker_info.get("title", obj.title)
-    self.params.issue_type = issue_tracker_info.get("issue_type")
-    self.params.issue_priority = issue_tracker_info.get("issue_priority")
-    self.params.issue_severity = issue_tracker_info.get("issue_severity")
+    issue_component_id = issue_tracker_info.get("component_id")
+    self.params.component_id = issue_component_id or \
+        default_values["component_id"]
+
+    issue_hotlist_id = issue_tracker_info.get("hotlist_id")
+    self.params.hotlist_id = issue_hotlist_id or \
+        default_values["hotlist_id"]
+
+    issue_type = issue_tracker_info.get("issue_type")
+    self.params.issue_type = issue_type or \
+        default_values["issue_type"]
+
+    issue_priority = issue_tracker_info.get("issue_priority")
+    self.params.issue_priority = issue_priority or \
+        default_values["issue_priority"]
+
+    issue_severity = issue_tracker_info.get("issue_severity")
+    self.params.issue_severity = issue_severity or \
+        default_values["issue_severity"]
+
+    self.params.title = issue_tracker_info.get("title") or obj.title
     self.params.enabled = issue_tracker_info.get("enabled")
 
   def _update_issue_tracker_info(self, new_issue_tracker_info,
