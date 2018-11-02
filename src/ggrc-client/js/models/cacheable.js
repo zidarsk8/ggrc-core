@@ -876,12 +876,12 @@ export default can.Model('can.Model.Cacheable', {
         return new can.Deferred().reject(xhr, status, message);
       })
       .fail((response) => {
-        this.notifier.on_empty(() => {
+        this.notifier.onEmpty(() => {
           saveDfd.reject(this, response);
         });
       })
       .done(() => {
-        this.notifier.on_empty(() => {
+        this.notifier.onEmpty(() => {
           saveDfd.resolve(this);
         });
       })

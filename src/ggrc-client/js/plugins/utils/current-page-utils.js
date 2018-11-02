@@ -129,10 +129,10 @@ function _onbeforeunload(evnt) {
 }
 
 const notifier = new PersistentNotifier({
-  while_queue_has_elements() {
+  whileQueueHasElements() {
     window.onbeforeunload = _onbeforeunload;
   },
-  when_queue_empties() {
+  whenQueueEmpties() {
     window.onbeforeunload = $.noop;
   },
   name: 'GGRC/window',
@@ -141,7 +141,7 @@ const notifier = new PersistentNotifier({
 const delayLeavingPageUntil = $.proxy(notifier, 'queue');
 
 function navigate(url) {
-  notifier.on_empty(_goToUrl.bind(null, url));
+  notifier.onEmpty(_goToUrl.bind(null, url));
 }
 
 function _goToUrl(url) {
