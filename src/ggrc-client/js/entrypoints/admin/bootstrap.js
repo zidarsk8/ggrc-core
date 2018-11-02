@@ -5,7 +5,7 @@
 
 import {
   initWidgets,
-} from '../../plugins/utils/current-page-utils';
+} from '../../plugins/utils/widgets-utils';
 import '../../controllers/dashboard_controller';
 import {RouterConfig} from '../../router';
 import routes from './routes';
@@ -17,6 +17,7 @@ import CustomAttributeDefinition from '../../models/custom-attributes/custom-att
 import AccessControlRole from '../../models/custom-roles/access-control-role';
 import Roleable from '../../models/custom-roles/roleable';
 import Person from '../../models/business-models/person';
+import WidgetList from '../../modules/widget_list';
 
 const path = GGRC.mustache_path || '/static/mustache';
 const HEADER_VIEW = `${path}/base_objects/page_header.mustache`;
@@ -122,7 +123,7 @@ const adminListDescriptors = {
   },
 };
 
-new GGRC.WidgetList('ggrc_admin', {
+new WidgetList('ggrc_admin', {
   admin: {
     people: {
       model: Person,
@@ -198,7 +199,7 @@ new GGRC.WidgetList('ggrc_admin', {
 });
 
 $area.cms_controllers_dashboard({
-  widget_descriptors: GGRC.WidgetList.get_widget_list_for('admin'),
+  widget_descriptors: WidgetList.get_widget_list_for('admin'),
   menu_tree_spec: GGRC.admin_menu_spec,
   header_view: HEADER_VIEW,
   default_widgets: [

@@ -7,7 +7,7 @@ import {
   inViewport,
   isInnerClick,
 } from '../../plugins/ggrc_utils';
-import {DATE_FORMAT} from '../../plugins/utils/date-util';
+import {DATE_FORMAT} from '../../plugins/utils/date-utils';
 import template from './datepicker.mustache';
 
 export default can.Component.extend({

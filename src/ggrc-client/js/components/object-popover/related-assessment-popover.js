@@ -25,10 +25,6 @@ export default can.Component.extend({
     selectedAssessment: {},
     popoverTitleInfo: 'Assessment Title: ',
     define: {
-      hideTitle: {
-        type: Boolean,
-        value: false,
-      },
       popoverDirection: {
         type: String,
         value: 'right',

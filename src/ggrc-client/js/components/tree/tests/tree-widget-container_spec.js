@@ -5,7 +5,7 @@
 
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
-import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
+import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 import * as NotifierUtils from '../../../plugins/utils/notifiers-utils';
 import tracker from '../../../tracker';
@@ -178,7 +178,7 @@ describe('tree-widget-container component', function () {
     describe('for any viewModel except Issue', function () {
       beforeEach(function () {
         let modelName = 'Model';
-        spyOn(CurrentPageUtils, 'getCounts').and.returnValue(
+        spyOn(WidgetsUtils, 'getCounts').and.returnValue(
           _.set({}, modelName, 123)
         );
         vm.attr({
@@ -212,7 +212,7 @@ describe('tree-widget-container component', function () {
         vm.attr('pageInfo', {
           total: 123,
         });
-        spyOn(CurrentPageUtils, 'getCounts').and.returnValue(
+        spyOn(WidgetsUtils, 'getCounts').and.returnValue(
           _.set({}, modelName, 123)
         );
       });
@@ -240,7 +240,7 @@ describe('tree-widget-container component', function () {
         vm.attr('pageInfo', {
           total: 123,
         });
-        spyOn(CurrentPageUtils, 'getCounts').and.returnValue(
+        spyOn(WidgetsUtils, 'getCounts').and.returnValue(
           _.set({}, modelName, 123)
         );
       });
@@ -270,7 +270,7 @@ describe('tree-widget-container component', function () {
         vm.attr('pageInfo', {
           total: 123,
         });
-        spyOn(CurrentPageUtils, 'getCounts').and.returnValue(
+        spyOn(WidgetsUtils, 'getCounts').and.returnValue(
           _.set({}, modelName, 124)
         );
       });

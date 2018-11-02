@@ -3,7 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import '../ggrc_base';
+// Common templates
+import '../mustache-templates';
+
 import '../apps/base_widgets';
 import '../tracker';
 import '../plugins/canjs_extensions';
@@ -33,5 +35,4 @@ import './user';
 // Common components
 import '../components/model-loader/model-loader';
 
-// Common templates
-import '../mustache-templates';
+

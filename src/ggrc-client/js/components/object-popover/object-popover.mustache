@@ -4,22 +4,9 @@
 }}
 {{#if isActive}}
     <div class="object-popover-wrapper active" style="{{openStyle}}">
-        <div class="object-popover-body">
-            {{^hideTitle}}
-                <div class="object-popover-title">
-                    {{popoverTitleInfo}}<a href="{{popoverLink}}" target="_blank"
-                                           title="{{popoverTitle}}">{{popoverTitle}}</a>
-                    {{#showSnapshotInfo}}
-                        <span class="state-value snapshot">
-                            {{snapshot.type}} version as on {{date snapshot.updated_at}}
-                        </span>
-                    {{/showSnapshotInfo}}
-                </div>
-            {{/hideTitle}}
-            <div class="object-popover-content flex-box flex-col flex-box-single"
-                 style="max-height: {{maxInnerHeight}}px;">
-                <content>No Component or Template is provided</content>
-            </div>
+        <div class="object-popover-content flex-box flex-col flex-box-single"
+                style="max-height: {{maxInnerHeight}}px;">
+            <content>No Component or Template is provided</content>
         </div>
     </div>
 {{/if}}

@@ -4,16 +4,18 @@
  */
 
 import {
-  getWidgetList,
-  getDefaultWidgets,
-  getWidgetModels,
   getPageType,
-  initCounts,
-  initWidgets,
   isMyAssessments,
   isMyWork,
   getPageInstance,
 } from '../../plugins/utils/current-page-utils';
+import {
+  getWidgetList,
+  getDefaultWidgets,
+  getWidgetModels,
+  initCounts,
+  initWidgets,
+} from '../../plugins/utils/widgets-utils';
 import {RouterConfig} from '../../router';
 import routes from './routes';
 import '../../plugins/utils/it-enable/issue-tracker-enable';

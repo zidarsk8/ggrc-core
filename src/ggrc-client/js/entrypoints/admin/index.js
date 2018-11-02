@@ -12,7 +12,6 @@ import '../../controllers/tree/tree-view-node';
 import '../../controllers/tree/list_view_controller';
 
 // Modules and Apps
-import '../../modules/widget_descriptor';
 import '../../pbc/workflow_controller';
 import '../../apps/business_objects';
 

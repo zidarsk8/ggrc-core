@@ -72,6 +72,68 @@ def _parse_object_data(object_data):
   return object_type, permissions
 
 
+def _get_acr(**filters):
+  """Get access control entry that matches provided filters.
+
+  Filters that don't matches ACR columns will be ignored.
+
+  Args:
+    filters: dictionary with parameters for query building
+
+  Returns:
+    ACR object regarding filters
+
+  Example:
+    acr = _get_acr(name='Auditors', object_type='Evidence')
+  """
+  connection = op.get_bind()
+  query_filters = [
+      getattr(ACR_TABLE.c, field) == value
+      for field, value in filters.items()
+      if hasattr(ACR_TABLE.c, field)
+  ]
+  query = ACR_TABLE.select().where(
+      sa.and_(*query_filters)
+  )
+
+  result = connection.execute(query)
+
+  return result.fetchone()
+
+
+def _update_acr(acr_id, **fields):
+  """Update access control entry with given id DB.
+
+  Fields that don't matches ACR columns will be ignored.
+
+  Args:
+    acr_id: id of ACR entry
+    fields: dictionary with new values for fields
+
+  Returns:
+    ACR object regarding filters
+
+  Example:
+    _update_acr(acr_id, read=True, update=False)
+  """
+  update_fields = {
+      name: value
+      for name, value in fields.items()
+      if hasattr(ACR_TABLE.c, name)
+  }
+
+  if update_fields:
+    connection = op.get_bind()
+    query = ACR_TABLE.update().where(
+        ACR_TABLE.c.id == acr_id
+    ).values(
+        updated_at=datetime.datetime.utcnow(),
+        **update_fields
+    )
+
+    connection.execute(query)
+
+
 def _add_subtree(tree, role_name, parent_id, with_update):
   """Add propagated roles for the given tree.
   keys of the tree must contain object data in form of "object_type RUD"
@@ -79,15 +141,18 @@ def _add_subtree(tree, role_name, parent_id, with_update):
   """
   connection = op.get_bind()
   role_name = "{}*{}*".format(role_name.rstrip("*"), parent_id)
+
   for object_data_list, subtree in tree.items():
     if isinstance(object_data_list, basestring):
       object_data_list = [object_data_list]
+
     for object_data in object_data_list:
       object_type, permissions_dict = _parse_object_data(object_data)
 
-      acr = None
       if with_update:
-        acr = _get_acr(object_type, role_name)
+        acr = _get_acr(object_type=object_type, name=role_name)
+      else:
+        acr = None
 
       if not acr:
         insert = connection.execute(
@@ -102,24 +167,13 @@ def _add_subtree(tree, role_name, parent_id, with_update):
                 **permissions_dict
             )
         )
+      else:
+        _update_acr(acr.id, **permissions_dict)
 
       _add_subtree(subtree,
                    role_name,
                    acr.id if acr else insert.lastrowid,
                    with_update)
-
-
-def _get_acr(object_type, name):
-  """Get access control entry for a given role on object."""
-  connection = op.get_bind()
-  return connection.execute(
-      ACR_TABLE.select().where(
-          sa.and_(
-              ACR_TABLE.c.name == name,
-              ACR_TABLE.c.object_type == object_type,
-          )
-      )
-  ).fetchone()
 
 
 def _propagate_object_roles(object_type, roles_tree, with_update):
@@ -151,7 +205,7 @@ def _propagate_object_roles(object_type, roles_tree, with_update):
       role_names = [role_names]
 
     for role_name in role_names:
-      role = _get_acr(object_type, role_name)
+      role = _get_acr(object_type=object_type, name=role_name)
       _add_subtree(propagation_tree, role.name, role.id, with_update)
 
 

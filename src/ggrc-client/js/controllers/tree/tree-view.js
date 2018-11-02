@@ -6,7 +6,7 @@
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {
   getCounts,
-} from '../../plugins/utils/current-page-utils';
+} from '../../plugins/utils/widgets-utils';
 import Permission from '../../permission';
 import TreeViewOptions from './tree-view-options';
 import Mappings from '../../models/mappers/mappings';

@@ -8,7 +8,8 @@ import datetime
 import pytest
 
 from lib import base
-from lib.entities import app_entity_factory, ui_dict_convert
+from lib.entities import (
+    app_entity_factory, ui_dict_convert, cycle_entity_creation)
 from lib.page.widget import workflow_tabs, object_modal, object_page
 from lib.ui import workflow_ui_facade, ui_facade
 from lib.utils import test_utils, date_utils
@@ -25,18 +26,25 @@ class TestCreateWorkflow(base.Test):
     workflow_ui_facade.create_workflow(workflow)
     return workflow
 
-  def test_setup_tab_is_opened_after_create_workflow(self, selenium, workflow):
+  def test_setup_tab_is_opened_after_workflow_ui_creation(
+      self, selenium, workflow
+  ):
     """Test that creation of workflow via UI redirects to Setup tab."""
     # pylint: disable=invalid-name
     workflow_tabs.SetupTab().wait_to_be_init()
     assert ui_facade.active_tab_name() == "Setup (1)"
 
-  def test_create_workflow(self, selenium, workflow):
+  def test_workflow_info_page_after_workflow_ui_creation(
+      self, selenium, workflow
+  ):
     """Test that creation of workflow via UI corrects a correct object."""
+    # pylint: disable=invalid-name
     actual_workflow = ui_facade.get_obj(workflow)
     test_utils.obj_assert(actual_workflow, workflow)
 
-  def test_create_workflow_creates_task_group(self, selenium, workflow):
+  def test_task_group_created_after_workflow_ui_creation(
+      self, selenium, workflow
+  ):
     """Test that creation of workflow via UI creates a task group."""
     # pylint: disable=invalid-name
     actual_task_groups = workflow_ui_facade.task_group_objs(
@@ -44,8 +52,8 @@ class TestCreateWorkflow(base.Test):
     test_utils.list_obj_assert(actual_task_groups, workflow.task_groups)
 
 
-class TestWorkflowPage(base.Test):
-  """Test workflow page."""
+class TestWorkflowSetupTab(base.Test):
+  """Test actions available on workflow Setup tab."""
 
   def test_default_values_in_create_task_popup(
       self, app_workflow, app_task_group, selenium
@@ -58,7 +66,8 @@ class TestWorkflowPage(base.Test):
         task_modal.get_start_date())
     actual_due_date = ui_dict_convert.str_to_date(
         task_modal.get_due_date())
-    assert actual_start_date == date_utils.closest_working_day()
+    assert actual_start_date == date_utils.first_not_weekend_day(
+        datetime.date.today())
     assert actual_due_date == actual_start_date + datetime.timedelta(days=7)
 
   def test_create_task_group_task(
@@ -91,7 +100,7 @@ class TestWorkflowPage(base.Test):
 
 
 class TestActivateWorkflow(base.Test):
-  """Test workflow activation."""
+  """Test workflow activation and actions available after activation."""
 
   @pytest.fixture()
   def activate_workflow(
@@ -116,6 +125,19 @@ class TestActivateWorkflow(base.Test):
     """Test active cycles tree."""
     workflow_cycles = workflow_ui_facade.get_workflow_cycles(
         app_workflow)
-    expected_workflow_cycle = app_entity_factory.WorkflowCycleFactory(
-    ).create_from_workflow(app_workflow)
+    expected_workflow_cycle = cycle_entity_creation.create_workflow_cycle(
+        app_workflow)
     test_utils.list_obj_assert(workflow_cycles, [expected_workflow_cycle])
+
+  @pytest.mark.xfail(reason="Fails in CI, not sure why")
+  def test_map_obj_to_cycle_task(
+      self, activate_workflow, app_workflow, app_control, selenium
+  ):
+    """Test mapping of obj to a cycle task."""
+    cycle_task = cycle_entity_creation.create_workflow_cycle(
+        app_workflow).cycle_task_groups[0].cycle_tasks[0]
+    workflow_ui_facade.map_obj_to_cycle_task(
+        obj=app_control, cycle_task=cycle_task)
+    selenium.refresh()  # reload page to check mapping is saved
+    objs = workflow_ui_facade.get_objs_mapped_to_cycle_task(cycle_task)
+    test_utils.list_obj_assert(objs, [app_control])

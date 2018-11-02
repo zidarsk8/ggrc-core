@@ -29,7 +29,7 @@
       object_display: null,
       parent_display: null,
       header_view: null,
-      list_view: '/static/mustache/dashboard/object_list.mustache',
+      list_view: null,
       list_objects: null,
       list_loader: null,
       tooltip_view: '/static/mustache/dashboard/object_tooltip.mustache',

@@ -11,7 +11,8 @@ from lib import environment, factory, url
 from lib.constants import objects, messages, roles
 from lib.entities import entities_factory
 from lib.entities.entities_factory import (
-    PeopleFactory, CustomAttributeDefinitionsFactory, AssessmentsFactory)
+    PeopleFactory, CustomAttributeDefinitionsFactory, AssessmentsFactory,
+    AccessControlRolesFactory)
 from lib.entities.entity import Representation
 from lib.service.rest import client, query
 from lib.utils import help_utils
@@ -243,13 +244,28 @@ class CustomAttributeDefinitionsService(BaseRestService):
 
 
 class PeopleService(BaseRestService):
+  """Service for working with People entities."""
   def __init__(self):
     super(PeopleService, self).__init__(url.PEOPLE)
 
 
 class UserRolesService(BaseRestService):
+  """Service for working with User Roles entities."""
   def __init__(self):
     super(UserRolesService, self).__init__(url.USER_ROLES)
+
+
+class AccessControlRolesService(BaseRestService):
+  """Service for working with Access Control Roles entities."""
+  def __init__(self):
+    super(AccessControlRolesService, self).__init__(url.ACL_ROLES)
+
+  def create_acl_role(self, **attrs):
+    """Create ACL role."""
+    acl_factory = AccessControlRolesFactory()
+    acr_name = acl_factory.generate_string(attrs["object_type"])
+    return self.create_obj(
+        acl_factory.create(name=acr_name, **attrs).__dict__)
 
 
 class RelationshipsService(HelpRestService):

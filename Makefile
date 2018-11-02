@@ -89,9 +89,6 @@ dev_virtualenv_packages : dev_virtualenv src/requirements-dev.txt src/requiremen
 		pip install -r src/requirements-dev.txt; \
 		pip install -r src/requirements-selenium.txt
 
-git_submodules :
-	git submodule update --init
-
 linked_packages : dev_virtualenv_packages
 	mkdir -p $(DEV_PREFIX)/opt/linked_packages
 	source bin/init_env; \
@@ -119,7 +116,6 @@ misspell :
 		! -path "./*.gz"\
 		! -path "./*.ini"\
 		! -path "./venv/*"\
-		! -path "./src/ggrc/assets/vendor/*"\
 		! -path "./src/ggrc/static/*"\
 		! -path "./src/ggrc-client/vendor/*"\
 		! -path "./test/*.out"\
@@ -131,7 +127,7 @@ misspell :
 
 ## Deployment!
 
-src/ggrc/assets/assets.manifest : src/ggrc/assets
+src/ggrc/assets/assets.manifest :
 	source "bin/init_env"; \
 		GGRC_SETTINGS_MODULE="$(SETTINGS_MODULE)" bin/build_assets
 

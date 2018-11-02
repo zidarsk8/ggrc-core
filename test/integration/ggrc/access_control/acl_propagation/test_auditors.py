@@ -90,9 +90,9 @@ class TestAuditorsPropagation(base.TestACLPropagation):
           "Evidence Audit": {
               "create_and_map": False,
               "read": True,
-              "update": True,
+              "update": False,
               "delete": False,
-              "add_comment": True,
+              "add_comment": False,
               "read_comments": True
           },
           "Evidence Assessment": {
@@ -178,9 +178,9 @@ class TestAuditorsPropagation(base.TestACLPropagation):
           "Evidence Audit": {
               "create_and_map": False,
               "read": True,
-              "update": True,
+              "update": False,
               "delete": False,
-              "add_comment": True,
+              "add_comment": False,
               "read_comments": True
           },
           "Evidence Assessment": {

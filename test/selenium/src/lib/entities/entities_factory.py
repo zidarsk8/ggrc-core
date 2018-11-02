@@ -51,6 +51,8 @@ class EntitiesFactory(object):
     update acl roles.
     """
     obj = self._set_attrs(is_add_rest_attrs, **attrs)
+    if "custom_roles" in attrs:
+      self._acl_roles.extend(attrs["custom_roles"])
     for acr_name, role_id, default_list in self._acl_roles:
       if acr_name in attrs:
         people_list = attrs[acr_name]
@@ -118,7 +120,7 @@ class PeopleFactory(EntitiesFactory):
       """Return Person instance for default system superuser."""
       from lib.service import rest_service
       return rest_service.ObjectsInfoService().get_person(
-          users.SUPERUSER_EMAIL)
+          users.FAKE_SUPER_USER.email)
 
   @staticmethod
   def extract_people_emails(people):
@@ -152,13 +154,24 @@ class PeopleFactory(EntitiesFactory):
 
 
 class UserRolesFactory(EntitiesFactory):
-  """Factory class for user roles"""
+  """Factory class for user roles."""
 
   def __init__(self):
     super(UserRolesFactory, self).__init__(objects.USER_ROLES)
 
   def _create_random_obj(self, is_add_rest_attrs):
-    """Create user role entity"""
+    """Create user role entity."""
+    return self.obj_inst()
+
+
+class AccessControlRolesFactory(EntitiesFactory):
+  """Factory class for ACL roles."""
+
+  def __init__(self):
+    super(AccessControlRolesFactory, self).__init__(objects.ACL_ROLES)
+
+  def _create_random_obj(self, is_add_rest_attrs):
+    """Create ACL role entity."""
     return self.obj_inst()
 
 
@@ -416,6 +429,7 @@ class RisksFactory(EntitiesFactory):
     obj = self.obj_inst().update_attrs(
         title=self.obj_title, slug=self.obj_slug,
         description=self.generate_string("description"),
+        risk_type=self.generate_string("risk_type"),
         status=unicode(object_states.DRAFT))
     if is_add_rest_attrs:
       obj.update_attrs(
@@ -681,3 +695,16 @@ class IssuesFactory(EntitiesFactory):
               unicode(roles.ADMIN), unicode(roles.PRIMARY_CONTACTS),
               unicode(roles.SECONDARY_CONTACTS))))
     return issue_obj
+
+
+class ProposalsFactory(EntitiesFactory):
+  """Factory class for Proposals entities."""
+
+  def __init__(self):
+    super(ProposalsFactory, self).__init__(objects.PROPOSALS)
+
+  def _create_random_obj(self, is_add_rest_attrs):
+    """Create Proposal entity."""
+    return self.obj_inst().update_attrs(
+        is_allow_none=False, author=users.current_user().email,
+        status=unicode(object_states.PROPOSED))

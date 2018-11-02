@@ -87,18 +87,19 @@ class Representation(object):
         els.STATUS: "status", els.LAST_UPDATED: "updated_at",
         els.AUDIT_CAPTAINS: "audit_captains",
         els.AUDITORS: "auditors",
-        els.MAPPED_OBJECTS: "mapped_objects", els.ASSIGNEES: "assignees",
-        els.CREATORS: "creators", els.VERIFIERS: "verifiers",
-        els.COMMENTS_HEADER: "comments", els.CREATED_AT: "created_at",
-        els.MODIFIED_BY: "modified_by", els.LAST_UPDATED_BY: "modified_by",
-        els.UPDATED_AT: "updated_at", els.ASMT_TYPE: "assessment_type",
+        "MAPPED_OBJECTS": "mapped_objects", els.ASSIGNEES: "assignees",
+        els.CREATORS: "creators", "VERIFIERS": "verifiers",
+        "COMMENTS": "comments", "CREATED_AT": "created_at",
+        els.MODIFIED_BY: "modified_by", "LAST_UPDATED_BY": "modified_by",
+        "UPDATED_AT": "updated_at", "ASSESSMENT_TYPE": "assessment_type",
+        "IS_VERIFIED": "verified",
         "CUSTOM_ATTRIBUTES": "custom_attributes",
         "DESCRIPTION": "description",
         "EVIDENCE_URLS": "evidence_urls",
         "ASSERTIONS": "assertions",
         "PRIMARY_CONTACTS": "primary_contacts",
         "URL": "url",
-        "ID": "id"
+        "ID": "id", "RISK_TYPE": "risk_type"
     }
     csv_remap_items = {
         csv.REVISION_DATE: "updated_at"
@@ -630,8 +631,8 @@ class Entity(Representation):
     return (
         PersonEntity, CustomAttributeDefinitionEntity, ProgramEntity,
         ControlEntity, AuditEntity, AssessmentEntity, AssessmentTemplateEntity,
-        IssueEntity, CommentEntity, ObjectiveEntity, RiskEntity,
-        OrgGroupEntity)
+        IssueEntity, CommentEntity, ObjectiveEntity, AccessControlRoleEntity,
+        RiskEntity, OrgGroupEntity, ProposalEntity)
 
   def __lt__(self, other):
     return self.slug < other.slug
@@ -673,6 +674,18 @@ class UserRoleEntity(Representation):
     self.set_attrs(
         "type", "id", "created_at", "updated_at", "modified_by",
         "person", "role")
+
+
+class AccessControlRoleEntity(Representation):
+  """Class that represents model for ACL role entity."""
+
+  def __init__(self):
+    super(AccessControlRoleEntity, self).__init__()
+    self.set_attrs(
+        "context", "created_at", "default_to_current_user", "delete", "id",
+        "mandatory", "modified_by", "my_work", "name", "non_editable",
+        "object_type", "parent_type", "read", "selfLink", "tooltip", "type",
+        "update", "updated_at")
 
 
 class CustomAttributeDefinitionEntity(Representation):
@@ -732,6 +745,11 @@ class ObjectiveEntity(Entity):
 class RiskEntity(Entity):
   """Class that represent model for Risk entity."""
 
+  def __init__(self, **attrs):
+    super(RiskEntity, self).__init__()
+    self.set_attrs(
+        "risk_type", "threat_source", "threat_event", "vulnerability", **attrs)
+
 
 class OrgGroupEntity(Entity):
   """Class that represent model for Org Group entity."""
@@ -779,3 +797,23 @@ class AssessmentEntity(Entity):
 
 class IssueEntity(Entity):
   """Class that represent model for Issue entity."""
+
+
+class ProposalEntity(Representation):
+  """Proposal entity from UI.
+
+  Changes attribute should be an array of dictionaries with keys obj_attr_type,
+  cur_value, proposed_value.
+  """
+  def __init__(self, **attrs):
+    super(ProposalEntity, self).__init__()
+    self.set_attrs(
+        "status", "author", "datetime", "changes", "comment", **attrs)
+
+
+class ProposalEmailUI(Representation):
+  """Proposal notification email."""
+  def __init__(self, **attrs):
+    super(ProposalEmailUI, self).__init__()
+    self.set_attrs(
+        "recipient_email", "author", "obj_type", "changes", "comment", **attrs)

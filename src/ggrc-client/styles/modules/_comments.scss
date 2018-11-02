@@ -70,12 +70,6 @@
         display: inline-block;
       }
     }
-    .info-action {
-      @include opacity(1);
-      i.fa-pencil-square-o {
-        margin-top: 7px;
-      }
-    }
     .evidence-list {
       margin-top: 5px;
     }

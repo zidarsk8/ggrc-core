@@ -9,13 +9,13 @@
 
 import pytest
 
-from lib import base, url
-from lib.constants import messages, objects, object_states
+from lib import base, url, users
+from lib.constants import messages, objects, object_states, roles
 from lib.constants.element import Lhn, MappingStatusAttrs
 from lib.entities.entity import Representation
 from lib.factory import get_cls_webui_service, get_cls_rest_service
 from lib.page import dashboard
-from lib.service import webui_service
+from lib.service import webui_service, rest_facade
 from lib.utils import selenium_utils
 from lib.utils.filter_utils import FilterUtils
 
@@ -546,6 +546,13 @@ class TestSnapshots(base.Test):
       self.get_controls_and_general_assert(
           controls_ui_service, expected_control, source_obj_for_controls)
 
+  @pytest.fixture()
+  def ge_user(self):
+    """Create GE user and set him as current."""
+    user = rest_facade.create_user_with_role(roles.EDITOR)
+    users.set_current_user(user)
+    return user
+
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
       "dynamic_objects, dynamic_relationships",
@@ -563,7 +570,8 @@ class TestSnapshots(base.Test):
            "via mapped Controls' Tree View"],
       indirect=True)
   def test_export_of_snapshoted_control_from_src_objs_pages_via_tree_view(
-      self, create_tmp_dir, create_audit_with_control_and_update_control,
+      self, ge_user, create_tmp_dir,
+      create_audit_with_control_and_update_control,
       dynamic_objects, dynamic_relationships, selenium
   ):
     """Check if snapshoted Control can be exported from (Audit's, Issue's,
