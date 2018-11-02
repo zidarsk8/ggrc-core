@@ -176,6 +176,7 @@ class BooleanFullTextAttr(ValueMapFullTextAttr):
     value = super(ValueMapFullTextAttr, self).get_value_for(instance)
     if value is not None:
       return self.value_map.get(value, None)
+    return None
 
   def get_attribute_revisioned_value(self, content):
     """Get attribute value from the given revision content
@@ -184,7 +185,7 @@ class BooleanFullTextAttr(ValueMapFullTextAttr):
     """
     rev_val = content[self.alias]
     if rev_val is None:
-      return
+      return None
     if not isinstance(rev_val, bool):
       rev_val = bool(int(str(rev_val)))
     return self.value_map.get(rev_val, None)
@@ -201,7 +202,7 @@ class CustomRoleAttr(FullTextAttr):
     """Returns index properties of all custom roles for a given instance"""
     results = {}
     sorted_roles = defaultdict(list)
-    for acl in getattr(instance, self.alias, []):
+    for person, acl in getattr(instance, self.alias, []):
       if not acl.ac_role:
         # If acl is not properly set the acl record was *most likely* created
         # through acl propagation hook and probably shouldn't be indexed at
@@ -219,12 +220,12 @@ class CustomRoleAttr(FullTextAttr):
                        instance.id, acl.ac_role.object_type)
         continue
       ac_role = acl.ac_role.name
-      person_id = acl.person.id
+      person_id = person.id
       if not results.get(acl.ac_role.name, None):
         results[acl.ac_role.name] = {}
-      sorted_roles[ac_role].append(acl.person.email)
-      results[ac_role]["{}-email".format(person_id)] = acl.person.email
-      results[ac_role]["{}-name".format(person_id)] = acl.person.name
+      sorted_roles[ac_role].append(person.email)
+      results[ac_role]["{}-email".format(person_id)] = person.email
+      results[ac_role]["{}-name".format(person_id)] = person.name
     for role in sorted_roles:
       results[role]["__sort__"] = u':'.join(sorted(sorted_roles[role]))
     return results
@@ -286,7 +287,7 @@ class DatetimeValue(object):
     """returns parsed datetime pairs for selected operation"""
     converted_pairs = date_parsers.parse_date(unicode(value))
     if not converted_pairs:
-      return
+      return None
     date_dict = {
         "=": converted_pairs,
         "~": converted_pairs,
@@ -309,7 +310,7 @@ class DateValue(DatetimeValue):
   def get_filter_value(self, value, operation):
     results = super(DateValue, self).get_filter_value(value, operation)
     if not results:
-      return
+      return None
     return [i.date() if i else i for i in results]
 
 
@@ -344,6 +345,7 @@ class DatetimeFullTextAttr(TimezonedDatetimeValue, FullTextAttr):
     """
     if self.prop_getter in content:
       return content[self.alias].replace("T", " ")
+    return None
 
 
 DateFullTextAttr = type("DateFullTextAttr", (DateValue, FullTextAttr), {})

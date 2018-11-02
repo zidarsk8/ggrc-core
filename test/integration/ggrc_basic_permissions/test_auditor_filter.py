@@ -25,18 +25,12 @@ class TestFilterByAuditor(TestCase):
     self.api = Api()
     self.generator = ObjectGenerator()
     _, self.auditor = self.generator.generate_person(user_role="Creator")
-    auditor_role = all_models.AccessControlRole.query.filter_by(
-        name="Auditors").one()
     with factories.single_commit():
       self.audit = factories.AuditFactory(status="In Progress")
       self.audit_id = self.audit.id
       audit_context = factories.ContextFactory()
       self.audit.context = audit_context
-      factories.AccessControlListFactory(
-          ac_role=auditor_role,
-          object=self.audit,
-          person=self.auditor
-      )
+      self.audit.add_person_with_role_name(self.auditor, "Auditors")
     self.api.set_user(self.auditor)
 
   def test_query_audits_by_auditor(self):

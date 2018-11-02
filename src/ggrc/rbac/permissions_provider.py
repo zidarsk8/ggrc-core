@@ -17,7 +17,7 @@ Permission = namedtuple(
     'action resource_type resource_id context_id'
 )
 
-_contributing_resource_types = {}
+_CONTRIBUTING_RESOURCE_TYPES = {}
 
 
 def get_contributing_resource_types(resource_type):
@@ -25,7 +25,7 @@ def get_contributing_resource_types(resource_type):
      This is needed because permissions may be given for, e.g., "Contract", but
      the restriction on join is done knowing only "Directive".
   """
-  resource_types = _contributing_resource_types.get(resource_type, None)
+  resource_types = _CONTRIBUTING_RESOURCE_TYPES.get(resource_type, None)
   if resource_types is None:
     resource_types = [resource_type]
     resource_model = get_model(resource_type)
@@ -35,7 +35,7 @@ def get_contributing_resource_types(resource_type):
           manager.class_.__name__
           for manager in resource_manager.subclass_managers(True)
       )
-    _contributing_resource_types[resource_type] = resource_types
+    _CONTRIBUTING_RESOURCE_TYPES[resource_type] = resource_types
   return resource_types
 
 
@@ -43,7 +43,7 @@ class DefaultUserPermissionsProvider(object):
   def __init__(self, settings):
     pass
 
-  def permissions_for(self, user):
+  def permissions_for(self, _):
     return DefaultUserPermissions()
 
 
@@ -163,9 +163,11 @@ def is_auditor(instance, **_):
   exists_query = db.session.query(
       all_models.AccessControlList
   ).join(
+      all_models.AccessControlPerson
+  ).join(
       all_models.AccessControlRole
   ).filter(
-      all_models.AccessControlList.person_id == current_user.id,
+      all_models.AccessControlPerson.person_id == current_user.id,
       all_models.AccessControlList.object_type == instance.audit.type,
       all_models.AccessControlList.object_id == instance.audit.id,
       all_models.AccessControlRole.name == "Auditors",
@@ -175,8 +177,8 @@ def is_auditor(instance, **_):
 
 def is_workflow_admin(instance, **_):
   """Check if current user has Admin role in scope of parent Workflow object"""
-  return any(acl for acl in instance.workflow.access_control_list
-             if acl.ac_role.name == "Admin" and acl.person == current_user)
+  return any(acl for person, acl in instance.workflow.access_control_list
+             if acl.ac_role.name == "Admin" and person == current_user)
 
 
 def is_allowed_based_on(instance, property_name, action, **_):

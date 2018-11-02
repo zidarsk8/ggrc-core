@@ -512,16 +512,17 @@ def _get_roles(assessment):
 
   ac_list = access_control.list.AccessControlList
   ac_role = access_control.role.AccessControlRole
+  ac_people = access_control.people.AccessControlPerson
   query = db.session.query(
-      ac_list.person_id,
+      ac_people.person_id,
       ac_role.name,
       all_models.Person.email
   ).join(
+      ac_list,
+  ).join(
       ac_role,
-      ac_role.id == ac_list.ac_role_id
   ).join(
       all_models.Person,
-      all_models.Person.id == ac_list.person_id
   ).filter(
       ac_list.object_type == _ASSESSMENT_MODEL_NAME,
       ac_list.object_id == assessment.id,
@@ -756,20 +757,21 @@ def get_issue_info(obj):
 
 def get_reporter_email(assessment):
   """Get reporter email for assessment."""
-  person, acl, acr = (all_models.Person, all_models.AccessControlList,
-                      all_models.AccessControlRole)
+  person = all_models.Person
+  acl = all_models.AccessControlList
+  acr = all_models.AccessControlRole
+  acp = all_models.AccessControlPerson
+
   reporter_email = db.session.query(
       person.email,
   ).join(
+      acp
+  ).join(
       acl,
-      person.id == acl.person_id,
   ).join(
       acr,
-      sa.and_(
-          acl.ac_role_id == acr.id,
-          acr.name == "Audit Captains",
-      ),
   ).filter(
+      acr.name == "Audit Captains",
       acl.object_id == assessment.audit_id,
       acl.object_type == all_models.Audit.__name__,
   ).order_by(

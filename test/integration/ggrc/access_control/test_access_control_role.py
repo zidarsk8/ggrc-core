@@ -37,9 +37,10 @@ class TestAccessControlRole(TestCase):
           data={"name": name}, user_role=name)
       self.people[name] = user
 
-  def _post_role(self):
+  def _post_role(self, name=None):
     """Helper function for POSTing roles"""
-    name = random_str(prefix="Access Control Role - ")
+    if name is None:
+      name = random_str(prefix="Access Control Role - ")
     return self.api.post(AccessControlRole, {
         "access_control_role": {
             "name": name,
@@ -48,6 +49,15 @@ class TestAccessControlRole(TestCase):
             "read": True
         },
     })
+
+  def test_create_after_objects(self):
+    """Test eager creation of ACLs on existing objects with new ACR."""
+    control_id = factories.ControlFactory().id
+    role_name = "New Custom Role"
+    self._post_role(name=role_name)
+    control = all_models.Control.query.get(control_id)
+    self.assertIn(role_name, control.acr_name_acl_map.keys())
+    self.assertIsNotNone(control.acr_name_acl_map[role_name])
 
   def test_create(self):
     """Test Access Control Role creation"""
@@ -72,19 +82,18 @@ class TestAccessControlRole(TestCase):
   @ddt.unpack
   def test_mandatory_delete(self, mandatory, exp_response):
     """Test set empty field via import if acr mandatory is {mandatory}"""
+    role = factories.AccessControlRoleFactory(
+        name=ROLE_NAME,
+        object_type="Control",
+        mandatory=mandatory,
+    )
     with factories.single_commit():
       user = factories.PersonFactory()
       control = factories.ControlFactory()
-      role = factories.AccessControlRoleFactory(
-          name=ROLE_NAME,
-          object_type="Control",
-          mandatory=mandatory,
-      )
       role_id = role.id
-      factories.AccessControlListFactory(
+      factories.AccessControlPersonFactory(
+          ac_list=control.acr_name_acl_map[ROLE_NAME],
           person=user,
-          ac_role_id=role.id,
-          object=control,
       )
     response = self.import_data(OrderedDict([
         ("object_type", "Control"),
@@ -93,8 +102,9 @@ class TestAccessControlRole(TestCase):
     ]))
     self._check_csv_response(response, exp_response)
     db_data = defaultdict(set)
-    for acl in all_models.Control.query.get(control.id).access_control_list:
-      db_data[acl.ac_role_id].add(acl.person_id)
+    control = all_models.Control.query.get(control.id)
+    for person, acl in control.access_control_list:
+      db_data[acl.ac_role_id].add(person.id)
     if mandatory:
       cur_user = all_models.Person.query.filter_by(
           email="user@example.com").first()

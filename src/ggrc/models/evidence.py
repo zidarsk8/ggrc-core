@@ -161,6 +161,8 @@ class Evidence(Roleable, Relatable, mixins.Titled,
 
   @simple_property
   def parent_obj(self):
+    """Getter for local parent object property."""
+    # pylint: disable=attribute-defined-outside-init
     return self._parent_obj
 
   @parent_obj.setter
@@ -236,7 +238,7 @@ class Evidence(Roleable, Relatable, mixins.Titled,
       if self.kind == Evidence.FILE and self.source_gdrive_id:
         self.exec_gdrive_file_copy_flow(parent)
       self._build_relationship(parent)
-      self._parent_obj = None
+      self._parent_obj = None  # pylint: disable=attribute-defined-outside-init
 
   def exec_gdrive_file_copy_flow(self, parent):
     """Execute google gdrive file copy flow
@@ -258,13 +260,7 @@ class Evidence(Roleable, Relatable, mixins.Titled,
 
   def add_admin_role(self):
     """Add current user as Evidence admin"""
-    from ggrc.models import all_models
-    admin_role = db.session.query(all_models.AccessControlRole).filter_by(
-        name="Admin", object_type=self.type).one()
-    self.extend_access_control_list([{
-        "ac_role": admin_role,
-        "person": login.get_current_user()
-    }])
+    self.add_person_with_role_name(login.get_current_user(), "Admin")
 
   def handle_before_flush(self):
     """Handler that called  before SQLAlchemy flush event"""

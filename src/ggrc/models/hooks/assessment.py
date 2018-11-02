@@ -146,27 +146,16 @@ def generate_assignee_relations(assessment,
       all_models.Person.id.in_(people)
   )}
 
-  person_roles = []
   for person_id in people:
     person = person_dict.get(person_id)
     if person is None:
       continue
-    if person_id in assignee_ids:
-      person_roles.append((person, "Assignees"))
+    if person.id in assignee_ids:
+      assessment.add_person_with_role_name(person, "Assignees")
     if person_id in verifier_ids:
-      person_roles.append((person, "Verifiers"))
+      assessment.add_person_with_role_name(person, "Verifiers")
     if person_id in creator_ids:
-      person_roles.append((person, "Creators"))
-
-  ac_roles = access_control.role.get_ac_roles_for(assessment.type)
-
-  db.session.add_all(
-      all_models.AccessControlList(
-          ac_role=ac_roles[role],
-          person=person,
-          object=assessment
-      ) for person, role in person_roles
-  )
+      assessment.add_person_with_role_name(person, "Creators")
 
 
 def get_people_ids_based_on_role(assignee_role,
@@ -212,11 +201,11 @@ def generate_role_object_dict(snapshot, audit):
     acl_dict[acr].append(acl["person_id"])
 
   # populate Access Control List by generated role from the related Audit
-  acl_dict["Audit Lead"].extend([acl.person_id
-                                 for acl in audit.access_control_list
+  acl_dict["Audit Lead"].extend([person.id
+                                 for person, acl in audit.access_control_list
                                  if acl.ac_role_id == leads_role])
   auditors = [
-      acl.person_id for acl in audit.access_control_list
+      person.id for person, acl in audit.access_control_list
       if acl.ac_role_id == auditors_role
   ]
   acl_dict["Auditors"].extend(auditors or acl_dict["Audit Lead"])

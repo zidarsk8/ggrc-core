@@ -5,7 +5,6 @@
 
 from ggrc import login
 from ggrc.models import all_models
-from ggrc.access_control import role
 from ggrc.services import signals
 
 
@@ -21,12 +20,6 @@ def init_hook():
     the front-end through access_control_list property.
     """
     # pylint: disable=unused-argument
-    comment_roles = role.get_ac_roles_for(all_models.Comment.__name__)
-    comment_admin = comment_roles["Admin"]
     user = login.get_current_user()
     for comment in objects:
-      all_models.AccessControlList(
-          ac_role=comment_admin,
-          person=user,
-          object=comment,
-      )
+      comment.add_person_with_role_name(user, "Admin")

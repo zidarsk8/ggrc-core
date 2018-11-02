@@ -101,7 +101,7 @@ class ImportRowConverter(RowConverter):
           self.block_converter.unique_values[attr_name][value] = self.line
     item.check_unique_consistency()
 
-  def handle_raw_data(self):
+  def _handle_raw_data(self):
     """Pass raw values into column handlers for all cell in the row."""
     row_headers = {attr_name: (idx, header_dict)
                    for idx, (attr_name, header_dict)
@@ -112,7 +112,8 @@ class ImportRowConverter(RowConverter):
       idx, header_dict = row_headers[attr_name]
       self.handle_raw_cell(attr_name, idx, header_dict)
 
-  def update_new_obj_cache(self):
+  def _update_new_obj_cache(self):
+    """Update local cache with newly created objects."""
     if not self.is_new or not getattr(self.obj, self.id_key):
       return
     self.is_new_object_set = True
@@ -148,7 +149,7 @@ class ImportRowConverter(RowConverter):
     message = template.format(line=self.line, **kwargs)
     self.block_converter.row_warnings.append(message)
 
-  def check_mandatory_fields(self):
+  def _check_mandatory_fields(self):
     """Check if the new object contains all mandatory columns."""
     if not self.is_new or self.is_delete or self.ignore:
       return
@@ -168,6 +169,7 @@ class ImportRowConverter(RowConverter):
     return self.object_class.query.filter_by(**{key: value}).first()
 
   def get_value(self, key):
+    """Get the value for the row object key."""
     item = self.attrs.get(key) or self.objects.get(key)
     if item:
       return item.value
@@ -242,13 +244,14 @@ class ImportRowConverter(RowConverter):
 
   def process_row(self):
     """Parse, set, validate and commit data specified in self.row."""
-    self.handle_raw_data()
-    self.check_mandatory_fields()
+    self._handle_raw_data()
+    self._check_mandatory_fields()
     if self.ignore:
+      db.session.rollback()
       return
-    self.update_new_obj_cache()
-    self.setup_object()
-    self.check_object()
+    self._update_new_obj_cache()
+    self._setup_object()
+    self._check_object()
     try:
       if self.ignore and self.obj in db.session:
         db.session.expunge(self.obj)
@@ -260,7 +263,7 @@ class ImportRowConverter(RowConverter):
     self.setup_secondary_objects()
     self.commit_object()
 
-  def check_object(self):
+  def _check_object(self):
     """Check object if it has any pre commit checks.
 
     The check functions can mutate the row_converter object and mark it
@@ -323,7 +326,7 @@ class ImportRowConverter(RowConverter):
                        message=exp.message)
       db.session.commit_hooks_enable_flag.disable()
       db.session.commit()
-      self.block_converter._store_revision_ids(import_event)
+      self.block_converter.store_revision_ids(import_event)
       cache_utils.update_memcache_after_commit(self.block_converter)
       update_snapshot_index(modified_objects)
     except exc.SQLAlchemyError as err:
@@ -334,7 +337,7 @@ class ImportRowConverter(RowConverter):
     else:
       self.send_post_commit_signals(event=import_event)
 
-  def setup_object(self):
+  def _setup_object(self):
     """ Set the object values or relate object values
 
     Set all object attributes to the value specified in attrs. If the value
@@ -440,6 +443,7 @@ class ExportRowConverter(RowConverter):
                                              headers, options)
 
   def handle_obj_row_data(self):
+    """Create handlers for cells in the current row."""
     for attr_name, header_dict in self.headers.items():
       handler = header_dict["handler"]
       item = handler(self, attr_name, **header_dict)

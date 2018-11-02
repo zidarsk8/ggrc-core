@@ -6,7 +6,6 @@ import ddt
 import mock
 
 from ggrc import db
-from ggrc.access_control import role
 from ggrc.integrations import integrations_errors, issuetracker_bulk_sync
 from ggrc.integrations.synchronization_jobs import sync_utils
 from ggrc.models import all_models, inflector
@@ -43,10 +42,9 @@ class TestBulkIssuesSync(TestCase):
     """
     with factories.single_commit():
       audit = factories.AuditFactory()
-      factories.AccessControlListFactory(
-          object=audit,
-          ac_role=role.get_ac_roles_for(audit.type)["Audit Captains"],
-          person=self.role_people["Audit Captains"],
+      audit.add_person_with_role_name(
+          self.role_people["Audit Captains"],
+          "Audit Captains",
       )
       factories.IssueTrackerIssueFactory(
           enabled=enabled,
@@ -64,10 +62,9 @@ class TestBulkIssuesSync(TestCase):
         asmnt = factories.AssessmentFactory(audit=audit)
         factories.RelationshipFactory(source=audit, destination=asmnt)
         for role_name in ["Creators", "Assignees", "Verifiers"]:
-          factories.AccessControlListFactory(
-              object=asmnt,
-              ac_role=role.get_ac_roles_for(asmnt.type)[role_name],
-              person=self.role_people[role_name],
+          asmnt.add_person_with_role_name(
+              self.role_people[role_name],
+              role_name,
           )
         factories.IssueTrackerIssueFactory(
             enabled=enabled,
@@ -265,12 +262,8 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
 
     with factories.single_commit():
       for id_ in with_rights_ids:
-        factories.AccessControlListFactory(
-            object_id=id_,
-            object_type="Assessment",
-            ac_role_id=role.get_ac_roles_for("Assessment")["Creators"].id,
-            person_id=assignee_user.id,
-        )
+        assessment = all_models.Assessment.query.get(id_)
+        assessment.add_person_with_role_name(assignee_user, "Creators")
 
     self.api.set_user(assignee_user)
 
@@ -301,11 +294,7 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
       for _ in range(3):
         issue = factories.IssueFactory(modified_by=person)
         for role_name in ["Admin", "Primary Contacts"]:
-          factories.AccessControlListFactory(
-              object=issue,
-              ac_role=role.get_ac_roles_for(issue.type)[role_name],
-              person=person,
-          )
+          issue.add_person_with_role_name(person, role_name)
         factories.IssueTrackerIssueFactory(
             enabled=True,
             issue_tracked_obj=issue,
@@ -431,23 +420,22 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
     norights_asmnt_ids = assessment_ids[1:]
     _, assignee_user = self.gen.generate_person(user_role="Creator")
 
+    audit_role = factories.AccessControlRoleFactory(
+        name="Edit Role",
+        object_type="Audit",
+        update=True
+    )
     with factories.single_commit():
-      factories.AccessControlListFactory(
-          object_id=changed_asmnt_id,
-          object_type="Assessment",
-          ac_role_id=role.get_ac_roles_for("Assessment")["Creators"].id,
-          person_id=assignee_user.id,
-      )
-      audit_role = factories.AccessControlRoleFactory(
-          name="Edit Role",
-          object_type="Audit",
-          update=True
-      )
-      factories.AccessControlListFactory(
+      assessment = all_models.Assessment.query.get(changed_asmnt_id)
+      assessment.add_person_with_role_name(assignee_user, "Creators")
+      acl = factories.AccessControlListFactory(
           object_id=audit_id,
           object_type="Audit",
           ac_role_id=audit_role.id,
-          person_id=assignee_user.id,
+      )
+      factories.AccessControlPersonFactory(
+          person=assignee_user,
+          ac_list=acl,
       )
 
     self.api.set_user(assignee_user)
@@ -686,11 +674,7 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
       for issue in all_models.Issue.query.all():
         issue.modified_by = person
         for role_name in ["Admin", "Primary Contacts"]:
-          factories.AccessControlListFactory(
-              object=issue,
-              ac_role=role.get_ac_roles_for(issue.type)[role_name],
-              person=person,
-          )
+          issue.add_person_with_role_name(person, role_name)
 
     # Verify that IssueTracker issues hasn't updated data
     issues = all_models.IssuetrackerIssue.query.filter(
