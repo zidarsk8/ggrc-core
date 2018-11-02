@@ -116,6 +116,7 @@ class AttributeInfo(object):
       "status",
       "labels",
       "review_status",
+      "reviewers",
       "assertions",
       "categories",
       "contact",
