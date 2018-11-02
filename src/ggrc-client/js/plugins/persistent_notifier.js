@@ -21,20 +21,21 @@ export default can.Construct({
     });
   },
   queue: function (dfd) {
-    let idx;
     let oldlen = this.list_empty_cbs.length;
     let that = this;
     if (!dfd || !dfd.then) {
       throw new Error('ERROR: attempted to queue something other than a ' +
                       'Deferred or Promise');
     }
-    idx = this.dfds.indexOf(dfd);
 
-    if (!~idx) { // enforce uniqueness
+    if (!_.includes(this.dfds, dfd)) {
       this.dfds.push(dfd);
       dfd.always(function () {
         let i = that.dfds.indexOf(dfd);
-        ~i && that.dfds.splice(i, 1);
+        if (i > -1) {
+          that.dfds.splice(i, 1);
+        }
+
         if (that.dfds.length < 1) {
           can.each(that.list_empty_cbs, Function.prototype.call);
           that.list_empty_cbs = [];
@@ -50,7 +51,7 @@ export default can.Construct({
     if (this.dfds.length < 1) {
       fn();
     }
-    if (this.dfds.length > 0 && !~this.list_empty_cbs.indexOf(fn)) {
+    if (this.dfds.length > 0 && !_.includes(this.list_empty_cbs, fn)) {
       this.list_empty_cbs.push(fn);
     }
   },
