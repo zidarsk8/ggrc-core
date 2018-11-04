@@ -49,6 +49,7 @@ class ImportConverter(BaseConverter):
       "task_type",
       "audit",
       "assessment_template",
+      "title"
   ]
 
   def __init__(self, dry_run=True, csv_data=None):
