@@ -890,14 +890,16 @@ export default can.Model('can.Model.Cacheable', {
       });
 
     delayLeavingPageUntil(saveXHR);
-    delayLeavingPageUntil(saveDfd);
 
     return saveDfd;
   },
   save: function () {
-    Array.prototype.push.call(arguments, this._super);
     this._dfd = new can.Deferred();
+    delayLeavingPageUntil(this._dfd);
+
+    Array.prototype.push.call(arguments, this._super);
     GGRC.SaveQueue.enqueue(this, arguments);
+
     return this._dfd;
   },
   refresh_all: function () {

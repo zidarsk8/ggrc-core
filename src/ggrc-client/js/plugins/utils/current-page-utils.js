@@ -117,23 +117,17 @@ function isObjectContextPage() {
   return !GGRC.pageType;
 }
 
-function _onbeforeunload(evnt) {
-  evnt = evnt || window.event;
-  let message = 'There are operations in progress. ' +
-  'Are you sure you want to leave the page?';
-
-  if (evnt) {
-    evnt.returnValue = message;
-  }
-  return message;
+function _beforeUnloadHandler(event) {
+  event.preventDefault();
+  event.returnValue = '';
 }
 
 const notifier = new PersistentNotifier({
   whileQueueHasElements() {
-    window.onbeforeunload = _onbeforeunload;
+    window.addEventListener('beforeunload', _beforeUnloadHandler);
   },
   whenQueueEmpties() {
-    window.onbeforeunload = $.noop;
+    window.removeEventListener('beforeunload', _beforeUnloadHandler);
   },
   name: 'GGRC/window',
 });
