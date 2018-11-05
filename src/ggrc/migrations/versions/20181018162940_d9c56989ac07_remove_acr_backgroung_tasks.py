@@ -26,20 +26,32 @@ ROLE_NAME = "Admin"
 OBJECT_TYPE = "BackgroundTask"
 
 
-def remove_acl_acr_of_bg_tasks():
+def remove_acp_acl_acr_of_bg_tasks():
   """Remove ACL and ACR related to BackgroundTask objects"""
   condition = sa.and_(
       acr_propagation.ACR_TABLE.c.name == ROLE_NAME,
       acr_propagation.ACR_TABLE.c.object_type == OBJECT_TYPE,
   )
-  op.execute(
-      acr_propagation.ACL_TABLE.delete().where(
-          acr_propagation.ACL_TABLE.c.ac_role_id.in_(
-              sa.select([acr_propagation.ACR_TABLE.c.id]).where(condition)
-          )
+  acl_join_acr = sa.join(
+      acr_propagation.ACL_TABLE,
+      acr_propagation.ACR_TABLE,
+      acr_propagation.ACL_TABLE.c.ac_role_id == acr_propagation.ACR_TABLE.c.id
+  )
+  delete_acp = acr_propagation.ACP_TABLE.delete().where(
+      acr_propagation.ACP_TABLE.c.ac_list_id.in_(
+          sa.select([acr_propagation.ACL_TABLE.c.id], condition, acl_join_acr)
       )
   )
-  op.execute(acr_propagation.ACR_TABLE.delete().where(condition))
+  delete_acl = acr_propagation.ACL_TABLE.delete().where(
+      acr_propagation.ACL_TABLE.c.ac_role_id.in_(
+          sa.select([acr_propagation.ACR_TABLE.c.id], condition)
+      )
+  )
+  delete_acr = acr_propagation.ACR_TABLE.delete().where(condition)
+
+  op.execute(delete_acp)
+  op.execute(delete_acl)
+  op.execute(delete_acr)
 
 
 def alter_name_column():
@@ -80,7 +92,7 @@ def add_payload_column():
 
 def upgrade():
   """Downgrade database schema and/or data back to the previous revision."""
-  remove_acl_acr_of_bg_tasks()
+  remove_acp_acl_acr_of_bg_tasks()
   alter_name_column()
   add_payload_column()
 
