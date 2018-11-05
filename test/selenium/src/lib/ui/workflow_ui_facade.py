@@ -1,7 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Workflow UI facade."""
-from lib import url
+from lib import url, users
 from lib.entities import ui_dict_convert
 from lib.page import dashboard
 from lib.page.widget import workflow_tabs, task_group_info_panel, workflow_page
@@ -108,3 +108,4 @@ def archive_workflow(workflow):
   test_utils.wait_for(lambda: info_widget.is_archived)
   workflow.is_archived = True
   workflow.recurrences_started = False
+  workflow.modified_by = users.current_person()

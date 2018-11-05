@@ -22,6 +22,11 @@ def workflow_ui_to_app(ui_dict):
       is_archived=ui_dict["is_archived"],
       admins=emails_to_app_people(ui_dict["admins"]),
       wf_members=emails_to_app_people(ui_dict["workflow_members"]),
+      created_at=date_utils.ui_str_with_zone_to_datetime(
+          ui_dict["created_at"]),
+      updated_at=date_utils.ui_str_with_zone_to_datetime(
+          ui_dict["updated_at"]),
+      modified_by=email_to_app_person(ui_dict["modified_by"]),
       task_groups=[],
       code=ui_dict["code"]
   )

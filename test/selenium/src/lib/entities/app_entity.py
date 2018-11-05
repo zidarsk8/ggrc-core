@@ -21,6 +21,9 @@ from lib.constants import objects
 class _Base(object):
   """Represents entity."""
   obj_id = attr.ib()
+  created_at = attr.ib()
+  updated_at = attr.ib()
+  modified_by = attr.ib()
   # `context` in REST. It is required to be properly set in some REST queries
   # (e.g. create task group)
   rest_context = attr.ib()

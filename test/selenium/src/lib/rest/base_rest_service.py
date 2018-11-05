@@ -4,13 +4,20 @@
 from lib.constants import objects
 from lib.entities import app_entity_factory
 from lib.rest import api_client
+from lib.utils import date_utils
+
+
+def get_service_by_entity_cls(entity_cls):
+  """Returns rest service by `app_entity` class."""
+  return next(service_cls for service_cls in ObjectRestService.__subclasses__()
+              if service_cls.app_entity_cls == entity_cls)()
 
 
 class ObjectRestService(object):
   """Base REST service for manipulating `app_entity` objects."""
 
   @property
-  def _app_entity_cls(self):
+  def app_entity_cls(self):
     """Returns an `app_entity` class that this service is expected to handle.
     Should be overridden in subclass.
     """
@@ -19,7 +26,7 @@ class ObjectRestService(object):
   @property
   def _obj_name(self):
     """Returns object name. May be overridden in subclass."""
-    return self._app_entity_cls.obj_name()
+    return self.app_entity_cls.obj_name()
 
   @staticmethod
   def _map_to_rest_for_create_obj(obj):
@@ -54,7 +61,12 @@ class ObjectRestService(object):
     May be overridden in subclass.
     """
     # pylint: disable=unused-argument
-    return {"obj_id": rest_dict["id"]}
+    return {
+        "obj_id": rest_dict["id"],
+        "rest_context": rest_dict["context"],
+        "created_at": date_utils.iso8601_to_datetime(rest_dict["created_at"]),
+        "updated_at": date_utils.iso8601_to_datetime(rest_dict["updated_at"])
+    }
 
   def create(self, obj):
     """Sends request to create an object."""
@@ -108,6 +120,10 @@ class ObjectRestService(object):
   def _set_attrs_from_response(obj, result_dict):
     """Sets `obj`'s attributes generated on back-end."""
     obj.obj_id = result_dict["id"]
+    obj.created_at = date_utils.iso8601_to_datetime(result_dict["created_at"])
+    obj.updated_at = date_utils.iso8601_to_datetime(result_dict["updated_at"])
+    obj.modified_by = app_entity_factory.PersonFactory().create_empty(
+        obj_id=result_dict["modified_by"]["id"])
     if hasattr(obj, "code") and not obj.code:
       obj.code = result_dict["slug"]
     obj.rest_context = result_dict["context"]
@@ -132,7 +148,7 @@ class ObjectRestService(object):
   def _create_obj_from_rest_dict(self, rest_dict):
     """Create an `app_entity` object from response dict."""
     return app_entity_factory.get_factory_by_entity_cls(
-        self._app_entity_cls)().create_empty(**self._map_from_rest(rest_dict))
+        self.app_entity_cls).create_empty(**self._map_from_rest(rest_dict))
 
   @staticmethod
   def _api_url(url):

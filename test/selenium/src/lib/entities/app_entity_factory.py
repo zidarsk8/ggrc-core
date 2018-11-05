@@ -17,10 +17,10 @@ def get_factory_by_obj_name(obj_name):
 
 
 def get_factory_by_entity_cls(entity_cls):
-  """Returns a factory class by entity class."""
+  """Returns an object of factory class by entity class."""
   # pylint: disable=protected-access
   return next(factory_cls for factory_cls in _BaseFactory.__subclasses__()
-              if factory_cls._entity_cls == entity_cls)
+              if factory_cls._entity_cls == entity_cls)()
 
 
 class _BaseFactory(object):

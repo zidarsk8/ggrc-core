@@ -50,11 +50,15 @@ def _raise_if_value_is_person(key, value):
     """Returns whether the argument is a person."""
     return isinstance(maybe_person, app_entity.Person)
 
+  def should_convert(maybe_whitelisted_key):
+    """Returns whether the key should be considered a name of ACR."""
+    return maybe_whitelisted_key != "modified_by"
+
   def is_list_of_people(maybe_list):
     """Returns whether the argument is a list."""
     is_list = isinstance(maybe_list, list)
     return is_list and maybe_list and all(is_person(item) for item in value)
-  if is_person(value) or is_list_of_people(value):
+  if (is_person(value) or is_list_of_people(value)) and should_convert(key):
     raise ValueError("Value with key `{}` is a person or a list of people but "
                      "is not present in ACR mapping.".format(key))
 

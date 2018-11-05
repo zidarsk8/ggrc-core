@@ -129,7 +129,7 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
 
   def _extract_text_from_footer(self, group_idx):
     """Returns some text part from footer."""
-    footer_regexp = r"Created date (.+) {4}Last updated by\n(.+)\non (.+)"
+    footer_regexp = r"Created date (.+)   {4}Last updated by\n(.+)\non (.+)"
     footer_el = self._browser.element(class_name="info-widget-footer")
     footer_el.element(class_name="person-name").wait_until_present()
     return re.search(footer_regexp, footer_el.text).group(group_idx)
