@@ -7,10 +7,12 @@ import datetime
 
 import pytest
 
-from lib import base
+from lib import base, users
+from lib.constants import roles
 from lib.entities import (
     app_entity_factory, ui_dict_convert, cycle_entity_creation)
 from lib.page.widget import workflow_tabs, object_modal, object_page
+from lib.rest_facades import person_rest_facade
 from lib.ui import workflow_ui_facade, ui_facade
 from lib.utils import test_utils, date_utils, ui_utils
 
@@ -55,7 +57,14 @@ class TestCreateWorkflow(base.Test):
 class TestWorkflowInfoPageActions(base.Test):
   """Test actions available on workflow Info page."""
 
-  def test_edit_workflow(self, app_workflow, selenium):
+  @pytest.fixture(params=[roles.CREATOR, roles.READER])
+  def creator_or_reader(self, request):
+    """Returns a user with a global role."""
+    person = person_rest_facade.create_person_with_role(
+        role_name=request.param)
+    users.set_current_person(person)
+
+  def test_edit_workflow(self, creator_or_reader, app_workflow, selenium):
     """Test editing workflow."""
     new_title = "[EDITED]" + app_workflow.title
     ui_facade.edit_obj(app_workflow, title=new_title)
@@ -63,14 +72,20 @@ class TestWorkflowInfoPageActions(base.Test):
     app_workflow.title = new_title
     test_utils.obj_assert(actual_workflow, app_workflow)
 
-  def test_delete_workflow(self, app_workflow, selenium):
+  def test_delete_workflow(self, creator_or_reader, app_workflow, selenium):
     """Test deletion of workflow."""
     ui_facade.delete_obj(app_workflow)
     ui_facade.open_obj(app_workflow)
     assert ui_utils.is_error_404()
 
-  def test_archive_workflow(self, activated_repeat_on_workflow, selenium):
-    """Test archiving of workflow."""
+  def test_destructive_archive_workflow(
+      self, creator_or_reader, activated_repeat_on_workflow, selenium
+  ):
+    """Test archiving of workflow.
+    This test is marked as destructive as different users can't edit different
+    objects in parallel (GGRC-6305).
+    """
+    # pylint: disable=invalid-name
     workflow_ui_facade.archive_workflow(activated_repeat_on_workflow)
     actual_workflow = ui_facade.get_obj(activated_repeat_on_workflow)
     test_utils.obj_assert(actual_workflow, activated_repeat_on_workflow)

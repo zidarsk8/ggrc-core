@@ -144,6 +144,22 @@ class Person(_Base):
   """Represents Person entity."""
   name = attr.ib()
   email = attr.ib()
+  global_role_name = attr.ib()
+
+
+@attr.s
+class GlobalRole(_Base):
+  """Represents global Role entity in the app."""
+  name = attr.ib()
+
+
+@attr.s
+class UserRole(_Base):
+  """Represents a UserRole entity in the app.
+  (UserRole is a mapping between person and global role).
+  """
+  person = attr.ib()
+  role = attr.ib()
 
 
 @attr.s

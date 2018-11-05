@@ -220,6 +220,16 @@ class PersonFactory(_BaseFactory):
     }
 
 
+class GlobalRoleFactory(_BaseFactory):
+  """Factory for GlobalRole entities."""
+  _entity_cls = app_entity.GlobalRole
+
+
+class UserRoleFactory(_BaseFactory):
+  """Factory for UserRole entities."""
+  _entity_cls = app_entity.UserRole
+
+
 class ControlFactory(_BaseFactory):
   """Factory for Control entities."""
   _entity_cls = app_entity.Control

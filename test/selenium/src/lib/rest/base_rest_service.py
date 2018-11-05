@@ -54,7 +54,7 @@ class ObjectRestService(object):
     May be overridden in subclass.
     """
     # pylint: disable=unused-argument
-    return {}
+    return {"obj_id": rest_dict["id"]}
 
   def create(self, obj):
     """Sends request to create an object."""
@@ -80,7 +80,7 @@ class ObjectRestService(object):
     rest_dict = response.json()
     assert self._obj_name in rest_dict
     self._set_headers_from_response(obj, response)
-    return self._create_obj_from_rest_dict(rest_dict)
+    return self._create_obj_from_rest_dict(rest_dict[self._obj_name])
 
   def edit(self, obj):
     """Sends request to edit the object."""
