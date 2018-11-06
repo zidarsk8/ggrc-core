@@ -13,6 +13,7 @@ import timeboxed from '../mixins/timeboxed';
 import isOverdue from '../mixins/is-overdue';
 import accessControlList from '../mixins/access-control-list';
 import caUpdate from '../mixins/ca-update';
+import cycleTaskNotifications from '../mixins/cycle-task-notifications';
 import Stub from '../stub';
 
 const _mustachePath = GGRC.mustache_path + '/cycle_task_group_object_tasks';
@@ -67,7 +68,13 @@ function populateFromWorkflow(form, workflow) {
 export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
   root_object: 'cycle_task_group_object_task',
   root_collection: 'cycle_task_group_object_tasks',
-  mixins: [timeboxed, isOverdue, accessControlList, caUpdate],
+  mixins: [
+    timeboxed,
+    isOverdue,
+    accessControlList,
+    caUpdate,
+    cycleTaskNotifications,
+  ],
   category: 'workflow',
   findAll: 'GET /api/cycle_task_group_object_tasks',
   findOne: 'GET /api/cycle_task_group_object_tasks/{id}',
