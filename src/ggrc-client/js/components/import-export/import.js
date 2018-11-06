@@ -83,6 +83,7 @@ export default can.Component.extend({
       },
     },
     quickTips,
+    importedObjectsCount: 0,
     importDetails: null,
     fileId: '',
     fileName: '',
@@ -137,6 +138,7 @@ export default can.Component.extend({
         this.attr('message', messages.EMPTY_FILE);
       } else {
         this.attr('importStatus', errorLevel);
+        this.attr('importedObjectsCount', rows);
       }
     },
     resetFile: function () {
@@ -199,6 +201,9 @@ export default can.Component.extend({
           this.attr('jobId', jobInfo.id);
 
           if (counts.some((number) => number > 0)) {
+            const importedObjectsCount = counts.reduce((a, b) => a + b, 0);
+
+            this.attr('importedObjectsCount', importedObjectsCount);
             this.attr('message', messages.FILE_STATS(response.objects));
           } else {
             this.processLoadedInfo(jobInfo.results);
