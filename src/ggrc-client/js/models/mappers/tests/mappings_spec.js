@@ -67,6 +67,7 @@ describe('Mappings', function () {
       ],
       notMappable: [
         'Workflow',
+        'TaskGroup',
         'TaskGroupTask',
         'CycleTaskEntry',
         'CycleTaskGroupObjectTask',
@@ -75,7 +76,7 @@ describe('Mappings', function () {
       ],
     },
   };
-  let directives = ['Contract', 'Policy', 'Regulation', 'Standard'];
+
   let mappingRules;
   let filtered;
 
@@ -101,18 +102,18 @@ describe('Mappings', function () {
     AccessGroup: _.difference(filtered, ['AccessGroup', 'Standard',
       'Regulation']),
     Assessment: _.difference(filtered, ['Audit', 'Person', 'Program', 'Project',
-      'TaskGroup', 'Workflow', 'Assessment', 'Document']),
+      'Workflow', 'Assessment', 'Document']),
     AssessmentTemplate: [],
     Audit: _.difference(filtered, ['Audit', 'Person', 'Program', 'Project',
-      'TaskGroup', 'Workflow', 'Assessment', 'Document']),
-    Contract: _.difference(filtered, directives),
+      'Workflow', 'Assessment', 'Document']),
+    Contract: _.difference(filtered, ['Contract']),
     Control: filtered,
     CycleTaskGroupObjectTask: _.difference(filtered, ['Person',
-      'TaskGroup', 'Workflow', 'Assessment', 'Document']),
+      'Workflow', 'Assessment', 'Document']),
     DataAsset: _.difference(filtered, ['Standard', 'Regulation']),
-    Evidence: ['Assessment', 'Audit'],
+    Evidence: [],
     Document: _.difference(filtered,
-      ['Audit', 'Assessment', 'Document', 'Person', 'Workflow', 'TaskGroup']),
+      ['Audit', 'Assessment', 'Document', 'Person', 'Workflow']),
     Facility: _.difference(filtered, ['Standard', 'Regulation']),
     Issue: _.difference(filtered, [
       'Audit', 'Person', 'Workflow', 'Assessment']),
@@ -121,7 +122,7 @@ describe('Mappings', function () {
     Objective: filtered,
     OrgGroup: _.difference(filtered, ['Standard', 'Regulation']),
     Person: [],
-    Policy: _.difference(filtered, directives),
+    Policy: _.difference(filtered, ['Policy']),
     Process: _.difference(filtered, ['Standard', 'Regulation']),
     Product: _.difference(filtered, ['Standard', 'Regulation']),
     ProductGroup: _.difference(filtered, ['Standard', 'Regulation']),
@@ -129,14 +130,14 @@ describe('Mappings', function () {
       ['Program', 'Audit', 'RiskAssessment', 'Assessment', 'Person']
         .concat(modules.core.notMappable, modules.workflows.notMappable)),
     Project: _.difference(filtered, ['Standard', 'Regulation']),
-    Regulation: _.difference(filtered, directives.concat(modules.core.scope)),
+    Regulation: _.difference(filtered, [...modules.core.scope, 'Regulation']),
     Risk: filtered,
     RiskAssessment: [],
     Requirement: filtered,
-    Standard: _.difference(filtered, directives.concat(modules.core.scope)),
+    Standard: _.difference(filtered, [...modules.core.scope, 'Standard']),
     System: _.difference(filtered, ['Standard', 'Regulation']),
     TaskGroup: _.difference(filtered, ['Audit', 'Person',
-      'TaskGroup', 'Workflow', 'Assessment', 'Document']),
+      'Workflow', 'Assessment', 'Document']),
     TechnologyEnvironment: _.difference(filtered, ['Standard', 'Regulation']),
     Threat: filtered,
     Vendor: _.difference(filtered, ['Standard', 'Regulation']),
@@ -183,8 +184,6 @@ describe('Mappings', function () {
       category: 'category',
       title_plural: 'title_plural',
       model_singular: 'model_singular',
-      table_plural: 'table_plural',
-      title_singular: 'title_singular',
     };
     let expectedResult = {
       category: 'category',
@@ -192,8 +191,6 @@ describe('Mappings', function () {
       value: 'model_singular',
       plural: 'title_plural',
       singular: 'model_singular',
-      table_plural: 'table_plural',
-      title_singular: 'title_singular',
     };
 
     it('returns specified object', function () {
