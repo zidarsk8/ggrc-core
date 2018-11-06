@@ -183,9 +183,11 @@ Copyright (C) 2018 Google Inc.
             {{#is_info_pin}}
                 {{#unless options.isSubTreeItem}}
                     <div>
-                        <prev-next-buttons {(current-index)}="options.selectedItem"
-                                        {(total-count)}="options.pageInfo.total"
-                        is-subtree-item="isSubTreeItem">
+                        <prev-next-buttons
+                            {disabled}="isInfoPaneSaving"
+                            {(current-index)}="options.selectedItem"
+                            {(total-count)}="options.pageInfo.total"
+                            is-subtree-item="isSubTreeItem">
                         </prev-next-buttons>
                     </div>
                 {{/unless}}
