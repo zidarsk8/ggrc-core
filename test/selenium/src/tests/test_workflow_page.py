@@ -12,7 +12,8 @@ from lib.constants import roles
 from lib.entities import (
     app_entity_factory, ui_dict_convert, cycle_entity_creation)
 from lib.page.widget import workflow_tabs, object_modal, object_page
-from lib.rest_facades import person_rest_facade, object_rest_facade
+from lib.rest_facades import (
+    object_rest_facade, person_rest_facade, workflow_rest_facade)
 from lib.ui import workflow_ui_facade, ui_facade
 from lib.utils import test_utils, date_utils, ui_utils
 
@@ -55,8 +56,8 @@ class TestCreateWorkflow(base.Test):
     test_utils.list_obj_assert(actual_task_groups, workflow.task_groups)
 
 
-class TestWorkflowInfoPageActions(base.Test):
-  """Test actions available on workflow Info page."""
+class TestWorkflowInfoPage(base.Test):
+  """Test workflow Info page."""
 
   @pytest.fixture(params=[roles.CREATOR, roles.READER])
   def creator_or_reader(self, request):
@@ -65,14 +66,24 @@ class TestWorkflowInfoPageActions(base.Test):
         role_name=request.param)
     users.set_current_person(person)
 
+  @pytest.mark.parametrize("member_role", [roles.CREATOR, roles.READER])
+  def test_read_workflow_as_member(self, member_role, selenium):
+    """Test opening workflow as workflow member."""
+    wf_member = person_rest_facade.create_person_with_role(
+        role_name=member_role)
+    workflow = workflow_rest_facade.create_workflow(wf_members=[wf_member])
+    object_rest_facade.set_attrs_via_get(workflow.modified_by, ["email"])
+    users.set_current_person(wf_member)
+    actual_workflow = ui_facade.get_obj(workflow)
+    test_utils.obj_assert(actual_workflow, workflow)
+
   def test_edit_workflow(self, creator_or_reader, app_workflow, selenium):
     """Test editing workflow."""
     new_title = "[EDITED]" + app_workflow.title
     ui_facade.edit_obj(app_workflow, title=new_title)
     app_workflow.title = new_title
     actual_workflow = ui_facade.get_obj(app_workflow)
-    app_workflow.updated_at = object_rest_facade.get_obj(
-        app_workflow).updated_at
+    object_rest_facade.set_attrs_via_get(app_workflow, ["updated_at"])
     test_utils.obj_assert(actual_workflow, app_workflow)
 
   def test_delete_workflow(self, creator_or_reader, app_workflow, selenium):
@@ -91,8 +102,8 @@ class TestWorkflowInfoPageActions(base.Test):
     # pylint: disable=invalid-name
     workflow_ui_facade.archive_workflow(activated_repeat_on_workflow)
     actual_workflow = ui_facade.get_obj(activated_repeat_on_workflow)
-    activated_repeat_on_workflow.updated_at = object_rest_facade.get_obj(
-        activated_repeat_on_workflow).updated_at
+    object_rest_facade.set_attrs_via_get(
+        activated_repeat_on_workflow, ["updated_at"])
     test_utils.obj_assert(actual_workflow, activated_repeat_on_workflow)
 
 
