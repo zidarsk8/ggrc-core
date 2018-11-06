@@ -4,7 +4,6 @@
 */
 
 import tracker from '../tracker';
-import BackgroundTask from '../models/service-models/background-task';
 
 (function (can, $) {
   /*  GGRC.SaveQueue
@@ -63,13 +62,10 @@ import BackgroundTask from '../models/service-models/background-task';
           }
           if ('background_task' in data) {
             stopFn(true);
-            return BackgroundTask.findOne({
-              id: data.background_task.id,
-            }).then(function (task) {
-              // Resolve all the dfds with the task
-              can.each(objs, function (obj) {
-                obj._dfd.resolve(task);
-              });
+            let task = data.background_task;
+            // Resolve all the dfds with the task
+            can.each(objs, function (obj) {
+              obj._dfd.resolve(task);
             });
           }
 
