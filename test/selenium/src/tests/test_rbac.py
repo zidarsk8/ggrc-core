@@ -84,6 +84,7 @@ class TestRBAC(base.Test):
     """Test that various users have possibility to add an evidence url into
     assessment.
     """
+    # pylint: disable=too-many-arguments
     login_user = rest_facade.create_user_with_role(login_role)
     obj_args = {obj_role: [login_user]}
     audit = rest_facade.create_audit(
@@ -113,7 +114,7 @@ class TestAuditorRole(base.Test):
     Code is copied from conftest.py.
     """
     # pylint: disable=protected-access
-    users._current_user = users.FakeSuperUser()
+    users._current_user = users.FAKE_SUPER_USER
     users.set_current_user(entities_factory.PeopleFactory.superuser)
 
   @pytest.fixture(scope="class")

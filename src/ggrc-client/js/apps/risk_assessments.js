@@ -3,19 +3,22 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {getPageInstance} from '../plugins/utils/current-page-utils';
+import {
+  getPageInstance,
+} from '../plugins/utils/current-page-utils';
+import {widgetModules} from '../plugins/utils/widgets-utils';
 import RiskAssessment from '../models/business-models/risk-assessment';
 import Program from '../models/business-models/program';
 import Stub from '../models/stub';
+import WidgetList from '../modules/widget_list';
 
 let RiskAssessmentsExtension = {};
 let allowedObjectTypes = ['Program'];
-GGRC.extensions.push(RiskAssessmentsExtension);
+widgetModules.push(RiskAssessmentsExtension);
 
 RiskAssessmentsExtension.name = 'risk_assessments';
 Program.attributes.risk_assessments = Stub.List;
 
-// Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
 // Initialize widgets for risk assessment page
 RiskAssessmentsExtension.init_widgets = function () {
   let descriptor = {};
@@ -47,5 +50,5 @@ RiskAssessmentsExtension.init_widgets = function () {
       },
     };
   }
-  new GGRC.WidgetList('ggrc_risk_assessments', descriptor);
+  new WidgetList('ggrc_risk_assessments', descriptor);
 };

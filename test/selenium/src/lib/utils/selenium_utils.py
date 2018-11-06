@@ -50,7 +50,14 @@ def _login_if_needed(driver):
   current_logged_in_user = users.current_logged_in_user(users.UI_USER)
   if (not current_logged_in_user or
      current_logged_in_user.email != current_user.email):
+    # Load another page to stop new cookies being set by the previous page.
+    # Page could be any - GAE login page was chosen because it's loaded fast
+    driver.get(url_module.Urls().gae_login(current_user))
+    # remove `session` cookie
     driver.delete_all_cookies()
+    # set `dev_appserver_login` cookie
+    # `session` cookie will be set by any subsequent request based
+    # on `dev_appserver_login` cookie
     driver.get(url_module.Urls().gae_login(current_user))
     users.set_current_logged_in_user(users.UI_USER, users.current_user())
 

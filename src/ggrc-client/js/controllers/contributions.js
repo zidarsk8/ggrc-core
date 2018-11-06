@@ -3,12 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {makeModelInstance} from '../plugins/utils/models-utils';
-import {getPageInstance} from '../plugins/utils/current-page-utils';
 import Role from '../models/service-models/role';
 import Person from '../models/business-models/person';
 import UserRole from '../models/join-models/user-role';
-import Stub from '../models/stub';
 
 /* Role Assignment Modal Selector
   *
@@ -16,64 +13,32 @@ import Stub from '../models/stub';
   *   Templates:
   *     base_modal_view:
   *     option_column_view:
-  *     active_column_view:
-  *     option_object_view:
-  *     active_object_view:
   *     option_detail_view:
   *
   *   Models and Queries:
   *     option_model: The model being "selected" (the "many")
-  *     option_query:
-  *       Any additional parameters needed to restrict valid options
-  *     active_query:
-  *       Any additional parameters needed to restrict active options
   *     join_model: The model representing the join table
-  *     extra_join_query:
-  *       Any additional parameters needed to restrict the join results
-  *     extra_join_params:
-  *       And additional parameters to be POSTed in the join object
   *
   *   Customizable text components:
   *     modal_title:
-  *     option_list_title:
-  *     active_list_title:
-  *     new_object_title:
   */
 const userRolesModalSelector = can.Control.extend({
-  _templates: [
-    'base_modal_view',
-    'option_column_view',
-    'active_column_view',
-    'option_object_view',
-    'active_object_view',
-    'option_detail_view',
-  ],
-
   defaults: {
     base_modal_view:
-      GGRC.mustache_path + '/selectors/base_modal.mustache',
+      GGRC.mustache_path + '/people_roles/base_modal.mustache',
     option_column_view:
-      GGRC.mustache_path + '/selectors/option_column.mustache',
-    active_column_view:
-      GGRC.mustache_path + '/selectors/active_column.mustache',
-    option_object_view: null,
-    active_object_view: null,
-    option_detail_view:
-      GGRC.mustache_path + '/selectors/option_detail.mustache',
+      GGRC.mustache_path + '/people_roles/option_column.mustache',
+    object_detail_view:
+      GGRC.mustache_path + '/people_roles/object_detail.mustache',
 
-    option_model: null,
-    option_query: {},
-    active_query: {},
-    join_model: null,
-    join_query: {},
-    join_object: null,
-
+    option_model: Role,
+    object_model: Person,
+    join_model: UserRole,
+    join_id_field: 'person_id',
+    option_attr: 'role',
+    join_attr: 'person',
     selected_id: null,
-
-    modal_title: null,
-    option_list_title: null,
-    active_list_title: null,
-    new_object_title: null,
+    modal_title: 'User Role Assignments',
   },
 
   launch: function ($trigger, options) {
@@ -84,9 +49,7 @@ const userRolesModalSelector = can.Control.extend({
     let $target = $(
       '<div id="' + modalId + '" class="modal modal-selector hide"></div>'
     );
-    let scope = $trigger.attr('data-modal-scope') || null;
 
-    options.scope = scope;
     $target.modal_form({}, $trigger);
     this.newInstance($target[0], $.extend({$trigger: $trigger}, options));
     return $target;
@@ -104,7 +67,6 @@ const userRolesModalSelector = can.Control.extend({
     this.init_data();
   },
 
-  '.object_column li click': 'select_object',
   '.option_column li click': 'select_option',
   '.confirm-buttons a.btn:not(.disabled) click': 'change_option',
 
@@ -149,7 +111,6 @@ const userRolesModalSelector = can.Control.extend({
         actives: this.active_list,
         selected_object: null,
         selected_option: null,
-        page_model: GGRC.page_model,
       }, this.options));
     }
     return this.context;
@@ -180,74 +141,35 @@ const userRolesModalSelector = can.Control.extend({
   },
 
   refresh_option_list: function () {
-    let self = this;
-    let instance = getPageInstance();
-    let params = {};
-
-    // If this is a private model, set the scope
-    if (self.options.scope) {
-      params.scope = self.options.scope;
-    } else if (
-      instance &&
-      instance.constructor.shortName === 'Workflow' &&
-      instance.context
-    ) {
-      params.scope = 'Workflow';
-    } else if (
-      instance &&
-      instance.constructor.shortName === 'Program' &&
-      instance.context
-    ) {
-      params.scope = 'Private Program';
-    } else if (/admin/.test(window.location)) {
-      params.scope__in = 'System,Admin';
-    } else if (instance) {
-      params.scope = instance.constructor.shortName;
-    }
+    let params = {
+      scope__in: 'System,Admin',
+    };
 
     return this.options.option_model.findAll(
-      $.extend(params, this.option_query),
-      function (options) {
-        let description;
-
+      params,
+      (options) => {
         options = can.makeArray(_.sortBy(options, 'role_order'));
+        let description =
+          'This role allows a user access to the MyWork dashboard and ' +
+          'applications Help files.';
 
-        if (params.scope === 'Private Program') {
-          description =
-            'A person with no role will not be able to see the program, ' +
-            'unless they have a system wide role (Reader, Editor, Admin) ' +
-            'that allows it.';
-        } else if (params.scope === 'Workflow') {
-          description =
-            'A person with the No Role role will not be able to update ' +
-            'or contribute to this Workflow.';
-        } else {
-          description =
-            'This role allows a user access to the MyWork dashboard and ' +
-            'applications Help files.';
-        }
         options.unshift({
           name: 'No role',
           id: 0,
           description: description,
           scope: params.scope || 'System',
         });
-        self.option_list.replace(options);
+        this.option_list.replace(options);
       });
   },
 
   refresh_join_list: function () {
     let self = this;
     let joinObject = this.get_join_object();
-    let joinQuery;
+    let joinQuery = {};
 
     if (joinObject) {
-      joinQuery = can.extend({}, this.options.extra_join_query);
       joinQuery[this.options.join_id_field] = this.get_join_object_id();
-      if (this.options.join_type_field) {
-        joinQuery[this.options.join_type_field] =
-          this.get_join_object_type();
-      }
 
       return this.options.join_model.findAll(
         $.extend({}, joinQuery),
@@ -276,12 +198,6 @@ const userRolesModalSelector = can.Control.extend({
         this.context.attr('selected_id', id);
       }
     }.bind(this));
-  },
-
-  select_object: function (el) {
-    el.closest('.object_column').find('li').removeClass('selected');
-    el.addClass('selected');
-    this.context.attr('selected_object', el.data('object'));
   },
 
   select_option: function (el) {
@@ -315,7 +231,6 @@ const userRolesModalSelector = can.Control.extend({
           return join.destroy();
         }).then(function () {
           self.refresh_object_list();
-          self.element.trigger('relationshipdestroyed', join);
         });
       }
     });
@@ -332,12 +247,7 @@ const userRolesModalSelector = can.Control.extend({
           self.join_list.push(join);
           self.refresh_option_list();
           self.refresh_object_list();
-          self.element.trigger('relationshipcreated', join);
         });
-      });
-    } else {
-      $.when(...deleteDfds).then(function () {
-        $('body').trigger('treeupdate');
       });
     }
   },
@@ -401,74 +311,16 @@ const userRolesModalSelector = can.Control.extend({
 
 function getOptionSet(name, data) {
   // Construct options for Authorizations selector
-  let context;
   let objectQuery = {};
-  let baseModalView;
-  let extraJoinQuery;
-
-  // Set object-specific context if requested (for Audits)
-  if (data.params && data.params.context) {
-    context = data.params.context;
-    extraJoinQuery = {context_id: context.id};
-  } else if (GGRC.page_object && !GGRC.page_object.person) {
-    // Otherwise use the page context
-    context = makeModelInstance(GGRC.page_object).context;
-    if (!context) {
-      throw new Error('`context` is required for Assignments model');
-    }
-    context = new Stub(context);
-    extraJoinQuery = {context_id: context.id};
-  } else {
-    context = {id: null};
-    extraJoinQuery = {context_id__in: [context.id, 0]};
-  }
-
   if (data.person_id) {
     objectQuery = {id: data.person_id};
   }
 
-  baseModalView = '/people_roles/base_modal.mustache';
-
   return {
-    base_modal_view: GGRC.mustache_path + baseModalView,
-    option_column_view:
-      GGRC.mustache_path + '/people_roles/option_column.mustache',
-    option_detail_view:
-      GGRC.mustache_path + '/people_roles/option_detail.mustache',
-    active_column_view:
-      GGRC.mustache_path + '/people_roles/active_column.mustache',
-    object_detail_view:
-      GGRC.mustache_path + '/people_roles/object_detail.mustache',
-
-    new_object_title: 'Person',
-    modal_title: data.modal_title || 'User Role Assignments',
-
-    related_model_singular: 'Person',
-    related_table_plural: 'people',
-    related_title_singular: 'Person',
-    related_title_plural: 'People',
-
-    object_model: Person,
-    option_model: Role,
-    join_model: UserRole,
-
     object_query: objectQuery,
-
-    // join_object_attr
-    option_attr: 'role',
-    // join_option_attr
-    join_attr: 'person',
-    // join_option_id_field
-    option_id_field: 'role_id',
-    option_type_field: null,
-    // join_object_id_field
-    join_id_field: 'person_id',
-    join_type_field: null,
-
     extra_join_fields: {
-      context: context,
+      context: {id: null},
     },
-    extra_join_query: extraJoinQuery,
   };
 }
 

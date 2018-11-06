@@ -6,7 +6,7 @@
 import Component from './release-notes-menu-item';
 import {getComponentVM} from '../../../js_specs/spec_helpers';
 import * as UserUtils from '../../plugins/utils/user-utils';
-import {getUtcDate} from '../../plugins/utils/date-util';
+import {getFormattedUtcDate} from '../../plugins/utils/date-utils';
 
 describe('"release-notes-menu-item" component', () => {
   let vm;
@@ -63,7 +63,7 @@ describe('"release-notes-menu-item" component', () => {
 
         it('calls updateUserProfile with RELEASE_NOTES_DATE', async (done) => {
           let updatedProfile = {
-            last_seen_whats_new: getUtcDate(releaseDateObj),
+            last_seen_whats_new: getFormattedUtcDate(releaseDateObj),
           };
           await handler();
 

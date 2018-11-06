@@ -74,6 +74,10 @@ class TreeItem(object):
     """Returns an obj dict."""
     dict_keys = [inflection.underscore(header_name.replace(" ", ""))
                  for header_name in self._table_header_names]
+    return self.obj_dict_from_keys(dict_keys)
+
+  def obj_dict_from_keys(self, dict_keys):
+    """Returns an obj dict based on the list of keys."""
     return self._table_row.obj_dict(self, dict_keys=dict_keys)
 
   def select(self):

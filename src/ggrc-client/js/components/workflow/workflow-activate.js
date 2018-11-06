@@ -9,8 +9,9 @@ import {
 } from '../../plugins/utils/workflow-utils';
 import {
   initCounts,
-} from '../../plugins/utils/current-page-utils';
+} from '../../plugins/utils/widgets-utils';
 import Permission from '../../permission';
+import {countsMap as workflowCountsMap} from '../../apps/workflows';
 
 const viewModel = can.Map.extend({
   instance: {},
@@ -24,12 +25,8 @@ const viewModel = can.Map.extend({
     return workflow.save();
   },
   async updateActiveCycleCounts(workflow) {
-    const WorkflowExtension =
-      _.find(GGRC.extensions, (extension) => extension.name === 'workflows');
-
-    return initCounts([
-      WorkflowExtension.countsMap.activeCycles,
-    ], workflow.type, workflow.id);
+    return initCounts([workflowCountsMap.activeCycles],
+      workflow.type, workflow.id);
   },
   redirectToFirstCycle(workflow) {
     const cycleStub = workflow.attr('cycles')[0];

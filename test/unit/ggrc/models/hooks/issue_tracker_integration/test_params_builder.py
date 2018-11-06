@@ -13,6 +13,7 @@ import mock
 
 from ggrc.models import exceptions
 from ggrc.models.hooks.issue_tracker import integration_utils
+from ggrc.integrations.constants import DEFAULT_ISSUETRACKER_VALUES
 from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder \
     as params_builder
 
@@ -37,7 +38,6 @@ class TestBaseIssueTrackerParamsBuilder(unittest.TestCase):
 
   def test_handle_issue_tracker_info(self):
     """Test 'handle_issue_tracker_info' method."""
-    # Arrange test data.
     mock_object = mock.MagicMock()
     issue_tracker_info = {
         "component_id": "123",
@@ -56,10 +56,35 @@ class TestBaseIssueTrackerParamsBuilder(unittest.TestCase):
         "severity": "S2",
     }
 
-    # Perform action.
     self.builder.handle_issue_tracker_info(mock_object, issue_tracker_info)
 
-    # Assert results.
+    self.assertEquals(
+        self.builder.params.get_issue_tracker_params(),
+        expected_result
+    )
+
+  def test_handle_issue_tracker_info_default_values(self):
+    """Test handle_issue_tracker_info method set default values.
+
+    If we created issue_tracker_issue with missed parameters, we should set
+    this parameters with default values. Now we have default values for
+    component_id, hotlist_id, issue_type, priority and severity.
+    """
+    mock_object = mock.MagicMock()
+    issue_tracker_info = {
+        "title": "test_title",
+    }
+    expected_result = {
+        "component_id": DEFAULT_ISSUETRACKER_VALUES["component_id"],
+        "hotlist_ids": [DEFAULT_ISSUETRACKER_VALUES["hotlist_id"], ],
+        "title": "test_title",
+        "type": DEFAULT_ISSUETRACKER_VALUES["issue_type"],
+        "priority": DEFAULT_ISSUETRACKER_VALUES["issue_priority"],
+        "severity": DEFAULT_ISSUETRACKER_VALUES["issue_severity"],
+    }
+
+    self.builder.handle_issue_tracker_info(mock_object, issue_tracker_info)
+
     self.assertEquals(
         self.builder.params.get_issue_tracker_params(),
         expected_result

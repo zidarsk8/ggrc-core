@@ -8,9 +8,9 @@ import {
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import {
-  initCounts,
   getPageInstance,
 } from '../../plugins/utils/current-page-utils';
+import {initCounts} from '../../plugins/utils/widgets-utils';
 import {
   REFRESH_MAPPING,
   DESTINATION_UNMAPPED,
@@ -21,6 +21,7 @@ import Context from '../../models/service-models/context';
 import Evidence from '../../models/business-models/evidence';
 import Document from '../../models/business-models/document';
 import * as businessModels from '../../models/business-models';
+import {getFormattedUtcDate} from '../../plugins/utils/date-utils';
 
 let DOCUMENT_KIND_MAP = {
   FILE: 'documents_file',
@@ -116,12 +117,12 @@ export default can.Component.extend({
       this.attr('documents').replace(documents);
     },
     createDocument: function (data) {
-      let date = new Date();
+      let date = getFormattedUtcDate();
       let modelType = this.attr('modelType');
       let document = new businessModels[modelType]({
         link: data,
         title: data,
-        created_at: date.toISOString(),
+        created_at: date,
         context: this.instance.context || new Context({
           id: null,
         }),

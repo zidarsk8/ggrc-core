@@ -4,7 +4,7 @@
 */
 
 import Ctrl from '../summary_widget_controller';
-import * as CurrentPageUtils from '../../plugins/utils/current-page-utils';
+import * as WidgetsUtils from '../../plugins/utils/widgets-utils';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 import Relationship from '../../models/service-models/relationship';
@@ -122,7 +122,7 @@ describe('SummaryWidgetController', function () {
         prepareLegend: jasmine.createSpy(),
       };
       method = Ctrl.prototype.reloadChart.bind(ctrlInst);
-      spyOn(CurrentPageUtils, 'getCounts')
+      spyOn(WidgetsUtils, 'getCounts')
         .and.returnValue(new can.Map({Assessment: 3}));
     });
 

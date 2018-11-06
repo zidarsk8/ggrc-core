@@ -6,11 +6,13 @@
 import {
   isSnapshotType,
 } from '../plugins/utils/snapshot-utils';
-import {
-  handlePendingJoins,
-} from '../models/pending-joins';
 import Mappings from '../models/mappers/mappings';
-import * as businessModels from '../models/business-models';
+import * as MapperUtils from '../plugins/utils/mapper-utils';
+import {
+  REFRESH_MAPPING,
+  REFRESH_SUB_TREE,
+} from '../events/eventTypes';
+import {getPageInstance} from '../plugins/utils/current-page-utils';
 
 /*
  Below this line we're defining a can.Component, which is in this file
@@ -28,125 +30,132 @@ export default can.Component.extend({
   //  new view template files.
   template: '<isolate-form><content/></isolate-form>',
   viewModel: {
-    define: {
-      customRelatedLoader: {
-        type: Boolean,
-        value: false,
-      },
-    },
+    useSnapshots: false,
     instance: null,
-    source_mapping: '@',
-    default_mappings: [], // expects array of objects
-    mapping: '@',
     list: [],
-    needToInstanceRefresh: true,
+    preMappedObjects: [],
+    mappedObjects: [],
     // the following are just for the case when we have no object to start with,
     changes: [],
-    makeDelayedResolving() {
-      const instance = this.attr('instance');
-      const dfd = handlePendingJoins(instance);
-      instance.delay_resolving_save_until(dfd);
+    performMapActions(instance, objects) {
+      let pendingMap = Promise.resolve();
+
+      if (objects.length > 0) {
+        pendingMap = MapperUtils.mapObjects(instance, objects, {
+          useSnapshots: this.attr('useSnapshots'),
+        });
+      }
+
+      return pendingMap;
     },
-  },
-  events: {
-    init: function () {
-      let that = this;
-      let vm = this.viewModel;
-      vm.attr('controller', this);
-      if (vm.instance.reify) {
-        vm.attr('instance', vm.instance.reify());
+    performUnmapActions(instance, objects) {
+      let pendingUnmap = Promise.resolve();
+
+      if (objects.length > 0) {
+        pendingUnmap = MapperUtils.unmapObjects(instance, objects);
       }
 
-      const instance = vm.attr('instance');
-      vm.default_mappings.forEach(function (defaultMapping) {
-        let model;
-        let objectToAdd;
-        if (defaultMapping.id && defaultMapping.type) {
-          model = businessModels[defaultMapping.type];
-          objectToAdd = model.findInCacheById(defaultMapping.id);
-          instance
-            .mark_for_addition('related_objects_as_source', objectToAdd, {});
-          that.addListItem(objectToAdd);
-        }
-      });
-
-      if (!vm.source_mapping) {
-        vm.attr('source_mapping', vm.mapping);
-      }
-
-      if (!vm.attr('customRelatedLoader')) {
-        Mappings.get_binding(vm.source_mapping, instance)
-          .refresh_instances()
-          .then(function (list) {
-            this.setListItems(list);
-          }.bind(this));
-      }
-
-      this.on();
+      return pendingUnmap;
     },
-    setListItems: function (list) {
-      let currentList = this.viewModel.attr('list');
-      this.viewModel.attr('list', currentList.concat(can.map(list,
-        function (binding) {
-          return binding.instance || binding;
-        })));
-    },
-    deferred_update: function () {
-      const viewModel = this.viewModel;
-      let changes = viewModel.changes;
-      let instance = viewModel.instance;
-
-      if (!changes.length) {
-        const hasPendingJoins = _.get(instance, '_pending_joins.length') > 0;
-        if (hasPendingJoins) {
-          viewModel.makeDelayedResolving();
-        }
-        return;
-      }
-      // Add pending operations
-      can.each(changes, (item) => {
-        let mapping = viewModel.mapping ||
+    preparePendingJoins() {
+      can.each(this.attr('changes'), (item) => {
+        let mapping = this.mapping ||
             Mappings.get_canonical_mapping_name(
-              viewModel.instance.constructor.shortName,
+              this.instance.constructor.shortName,
               item.what.constructor.shortName);
         if (item.how === 'add') {
-          viewModel.instance
+          this.instance
             .mark_for_addition(mapping, item.what, item.extra);
         } else {
-          viewModel.instance.mark_for_deletion(mapping, item.what);
+          this.instance.mark_for_deletion(mapping, item.what);
         }
       });
-
-      viewModel.makeDelayedResolving();
     },
-    '{instance} updated': 'deferred_update',
-    '{instance} created': 'deferred_update',
-    '[data-toggle=unmap] click': function (el, ev) {
-      ev.stopPropagation();
+    afterDeferredUpdate(objects) {
+      const instance = this.attr('instance');
+      const objectTypes = _.uniq(objects
+        .map((object) => object.constructor.shortName)
+      );
 
-      can.map(el.find('.result'), function (resultEl) {
-        let obj = $(resultEl).data('result');
-        let len = this.viewModel.list.length;
+      objectTypes.forEach((objectType) => {
+        instance.dispatch({
+          ...REFRESH_MAPPING,
+          destinationType: objectType,
+        });
+      });
+      instance.dispatch(REFRESH_SUB_TREE);
 
-        this.viewModel.changes.push({what: obj, how: 'remove'});
-        for (; len >= 0; len--) {
-          if (this.viewModel.list[len] === obj) {
-            this.viewModel.list.splice(len, 1);
-          }
+      const pageInstance = getPageInstance();
+
+      if (objects.includes(pageInstance)) {
+        pageInstance.dispatch({
+          ...REFRESH_MAPPING,
+          destinationType: instance.type,
+        });
+      }
+    },
+    handlePendingOperations(pendingJoins) {
+      const instance = this.attr('instance');
+      const getObject = (pj) => pj.what;
+      const objectsForMap = pendingJoins.filter((pj) => pj.how === 'add')
+        .map(getObject);
+      const objectsForUnmap = pendingJoins.filter((pj) => pj.how === 'remove')
+        .map(getObject);
+
+      return Promise.all([
+        this.performMapActions(instance, objectsForMap),
+        this.performUnmapActions(instance, objectsForUnmap),
+      ]);
+    },
+    async deferredUpdate() {
+      const instance = this.attr('instance');
+
+      this.preparePendingJoins();
+
+      // We need to remove all _pending_joins from the instance (via splice())
+      // in order to resolveDeferredBindings util after instance.save
+      // via modal functionality doesn't handle it second time.
+      const pendingJoins = instance._pending_joins.splice(0);
+      await this.handlePendingOperations(pendingJoins);
+      const objects = pendingJoins.map((pj) => pj.what);
+      this.afterDeferredUpdate(objects);
+    },
+    addMappings(objects) {
+      can.each(objects, (obj) => {
+        const changes = this.attr('changes');
+        const indexOfRemoveChange = this.findObjectInChanges(obj, 'remove');
+
+        if (indexOfRemoveChange !== -1) {
+          // remove "remove" change
+          changes.splice(indexOfRemoveChange, 1);
+        } else {
+          // add "add" change
+          changes.push({what: obj, how: 'add'});
         }
-      }.bind(this));
-    },
-    'a[data-object-source] modal:success': 'addMapings',
-    'defer:add': 'addMapings',
-    addMapings: function (el, ev, data) {
-      ev.stopPropagation();
 
-      can.each(data.arr || [data], function (obj) {
-        this.viewModel.changes.push({what: obj, how: 'add'});
         this.addListItem(obj);
-      }, this);
+      });
     },
-    addListItem: function (item) {
+    removeMappings(obj) {
+      let len = this.attr('list').length;
+      const changes = this.attr('changes');
+      const indexOfAddChange = this.findObjectInChanges(obj, 'add');
+
+      if (indexOfAddChange !== -1) {
+        // remove "add" change
+        changes.splice(indexOfAddChange, 1);
+      } else {
+        // add "remove" change
+        changes.push({what: obj, how: 'remove'});
+      }
+
+      for (; len >= 0; len--) {
+        if (this.attr('list')[len] === obj) {
+          this.attr('list').splice(len, 1);
+        }
+      }
+    },
+    addListItem(item) {
       let snapshotObject;
 
       if (isSnapshotType(item) &&
@@ -163,7 +172,46 @@ export default can.Component.extend({
         item = item.reify();
       }
 
-      this.viewModel.list.push(item);
+      this.attr('list').push(item);
+    },
+    updateObjectList() {
+      const updatedList = this.attr('preMappedObjects')
+        .concat(this.attr('mappedObjects'));
+      this.attr('list').replace(updatedList);
+    },
+    findObjectInChanges(object, changeType) {
+      return _.findIndex(this.attr('changes'), (change) => {
+        const {what} = change;
+        return (
+          what.id === object.id &&
+          what.type === object.type &&
+          change.how === changeType
+        );
+      });
+    },
+  },
+  events: {
+    init() {
+      const viewModel = this.viewModel;
+      viewModel.attr('controller', this);
+      viewModel.addMappings(viewModel.attr('preMappedObjects'));
+    },
+    '{viewModel} mappedObjects'() {
+      this.viewModel.updateObjectList();
+    },
+    '{instance} updated'() {
+      this.viewModel.deferredUpdate();
+    },
+    '{instance} created'() {
+      this.viewModel.deferredUpdate();
+    },
+    'a[data-object-source] modal:success'(el, ev, object) {
+      ev.stopPropagation();
+      this.viewModel.addMappings([object]);
+    },
+    'defer:add'(el, ev, {arr: objects}) {
+      ev.stopPropagation();
+      this.viewModel.addMappings(objects);
     },
   },
 });

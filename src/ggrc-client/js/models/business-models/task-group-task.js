@@ -9,7 +9,7 @@ import {getRole} from '../../plugins/utils/acl-utils';
 import {
   getClosestWeekday,
   getDate,
-} from '../../plugins/utils/date-util';
+} from '../../plugins/utils/date-utils';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import contactable from '../mixins/contactable';
 import timeboxed from '../mixins/timeboxed';

@@ -4,6 +4,14 @@
 import inflection
 
 
+def get_sub_row_by(rows, **conditions):
+  """Returns a table row that matches conditions."""
+  for table_row in rows():
+    if table_row.matches_conditions(**conditions):
+      return table_row
+  return None
+
+
 class TableWithHeaders(object):
   """Represents generic table with headers."""
 
@@ -19,10 +27,7 @@ class TableWithHeaders(object):
 
   def get_table_row_by(self, **conditions):
     """Returns a table row that matches conditions."""
-    for table_row in self._table_rows():
-      if table_row.matches_conditions(**conditions):
-        return table_row
-    return None
+    return get_sub_row_by(rows=self._table_rows, **conditions)
 
 
 class TableRow(object):

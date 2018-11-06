@@ -85,9 +85,8 @@ Create a CMS.Models.Cacheable object
 
     });
 
-1. Add ``new_object`` to ``object_type_decision_tree`` in
-   assets/javascripts/ggrc-base.js or extended it in your module (see
-   below).
+1. Add ``new_object`` to ``objectTypeDecisionTree`` in
+   plugins/utils/model-utils.js.
 2. Add ``new_object`` to ``business_object.js``
 
    ``baseWidgetsByType`` is where you define the attributes shown in
@@ -111,11 +110,6 @@ Create a ModuleExtension object:
 
     var ModuleExtension = {
       name: "module",
-      object_type_decision_tree: function() {
-        return {
-          NewModel: CMS.Models.NewModel
-        }
-      },
       init_widgets: function() {
 
       },
@@ -123,7 +117,7 @@ Create a ModuleExtension object:
 
       },
     }
-    GGRC.extensions.push(ModuleExtension);
+    widgetModules.push(ModuleExtension);
 
     // Add mappings:
 
@@ -140,18 +134,6 @@ In :src:`ggrc/assets/mustache/dashboard/lhn.mustache` add the line:
 ..  code-block:: javascript
 
     {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="NewObject" li_class="class"}}}
-
-If you are inside a module, you have to create a hook:
-
-..  code-block:: javascript
-
-    {{{render_hooks 'LHN.Sections_new_object'}}}
-
-And then init the hook inside your module:
-
-..  code-block:: javascript
-
-    registerHook("LHN.Sections_new_object", GGRC.mustache_path + "/dashboard/lhn_new_object");
 
 Create mustache files
 ---------------------

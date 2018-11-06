@@ -26,6 +26,8 @@ class Events(Widget):
     """Get list of elements that displayed in Tree View on Event widget."""
     selenium_utils.get_when_clickable(
         self._driver, self._locators.FIRST_TREE_VIEW_ITEM)
+    self._browser.elements(class_name="event-owner")[0].element(
+        class_name="person-name").wait_until(lambda e: "@" in e.text)
     return self._driver.find_elements(*self._locators.TREE_VIEW_ITEMS)
 
 

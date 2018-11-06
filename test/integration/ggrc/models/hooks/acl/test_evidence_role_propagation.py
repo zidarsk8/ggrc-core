@@ -54,34 +54,47 @@ class TestEvidenceRolePropagation(TestCase):
     self.assertEquals(new_description, evidence.description)
     self.assertEquals(reader.id, evidence.modified_by_id)
 
-  @ddt.data("Audit Captains", "Auditors")
-  def test_audit_role_propagation_edit(self, role):
-    """Audit user with role '{0}' should be able to edit related evidence"""
-    _, reader = self.generator.generate_person(user_role="Reader")
+  @ddt.data(
+      ("Creator", "Audit Captains", 200),
+      ("Creator", "Auditors", 403),
+      ("Reader", "Audit Captains", 200),
+      ("Reader", "Auditors", 403),
+      ("Editor", "Audit Captains", 200),
+      ("Editor", "Auditors", 200),
+  )
+  @ddt.unpack
+  def test_audit_role_propagation_edit(self, user_role, audit_role,
+                                       status_code):
+    """'{0}' assigned as '{1}' should get '{2}' when editing audit evidence"""
+    _, user = self.generator.generate_person(user_role=user_role)
     assignees_role = all_models.AccessControlRole.query.filter_by(
-        object_type=all_models.Audit.__name__, name=role
+        object_type=all_models.Audit.__name__, name=audit_role
     ).first()
     with factories.single_commit():
       audit = factories.AuditFactory()
       factories.AccessControlListFactory(
           ac_role=assignees_role,
           object=audit,
-          person=reader
+          person=user
       )
       evidence = factories.EvidenceFactory()
       evidence_id = evidence.id
 
     factories.RelationshipFactory(source=audit, destination=evidence)
 
-    self.api.set_user(reader)
+    self.api.set_user(user)
 
     evidence = all_models.Evidence.query.get(evidence_id)
     new_description = 'new description'
     resp = self.api.modify_object(evidence, {'description': new_description})
     evidence = self.refresh_object(evidence)
-    self.assert200(resp)
-    self.assertEquals(new_description, evidence.description)
-    self.assertEquals(reader.id, evidence.modified_by_id)
+
+    if status_code == 200:
+      self.assert200(resp)
+      self.assertEquals(new_description, evidence.description)
+      self.assertEquals(user.id, evidence.modified_by_id)
+    else:
+      self.assertStatus(resp, status_code)
 
   def test_audit_role_propagation_not_delete(self, role="Auditors"):
     """Audit user with role Auditors can NOT delete related evidence"""

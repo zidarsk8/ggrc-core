@@ -6,8 +6,9 @@
 import {
   getClosestWeekday,
   getDate,
-  getUtcDate,
-} from '../utils/date-util';
+  getFormattedUtcDate,
+  formatDate,
+} from '../utils/date-utils';
 
 describe('GGRC DateUtil', () => {
   describe('getClosestWeekday() method', () => {
@@ -95,7 +96,7 @@ describe('GGRC DateUtil', () => {
       });
   });
 
-  describe('getUtcDate() method', () => {
+  describe('getFormattedUtcDate() method', () => {
     let date;
     let result;
     let expectedDefaultResult;
@@ -106,25 +107,34 @@ describe('GGRC DateUtil', () => {
     });
 
     it('returns ISO_SHORT format when no format provided', () => {
-      result = getUtcDate(date);
+      result = getFormattedUtcDate(date);
 
       expect(result).toEqual(expectedDefaultResult);
     });
 
     it('returns string when Date object passed', () => {
       let dateObj = new Date(date);
-      result = getUtcDate(dateObj);
+      result = getFormattedUtcDate(dateObj);
 
       expect(result).toEqual(expectedDefaultResult);
     });
 
     it('returns string of specific format', () => {
       let format = 'MM/DD/YYYY';
-      result = getUtcDate(date, format);
+      result = getFormattedUtcDate(date, format);
 
       let expectedFormat = '07/24/2018';
 
       expect(result).toEqual(expectedFormat);
+    });
+  });
+  describe('formatDate() method', function () {
+    it('should return empty string for false values', () => {
+      expect(formatDate(null)).toEqual('');
+      expect(formatDate(undefined)).toEqual('');
+      expect(formatDate('')).toEqual('');
+      expect(formatDate(false)).toEqual('');
+      expect(formatDate(0)).toEqual('');
     });
   });
 });

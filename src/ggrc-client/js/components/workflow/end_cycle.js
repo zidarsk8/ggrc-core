@@ -4,9 +4,10 @@
 */
 
 import {
-  initCounts,
   getPageInstance,
 } from '../../plugins/utils/current-page-utils';
+import {initCounts} from '../../plugins/utils/widgets-utils';
+import {countsMap as workflowCountsMap} from '../../apps/workflows';
 
 /**
  * A component that wraps a button for ending a Workflow cycle, and
@@ -39,18 +40,12 @@ export default can.Component.extend({
         })
         .then(function () {
           let pageInstance = getPageInstance();
-          let WorkflowExtension =
-            GGRC.extensions.find(function (extension) {
-              return extension.name === 'workflows';
-            });
-
           can.trigger(el, 'refreshTree');
 
-          return initCounts([
-            WorkflowExtension.countsMap.history,
-          ],
-          pageInstance.type,
-          pageInstance.id);
+          return initCounts(
+            [workflowCountsMap.history],
+            pageInstance.type,
+            pageInstance.id);
         });
     },
   },

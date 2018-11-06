@@ -83,9 +83,7 @@ class TestAssessmentsWorkflow(base.Test):
         status=object_states.IN_PROGRESS).repr_ui()
     actual_asmt = asmts_ui_service.get_obj_from_info_page(obj=expected_asmt)
     # 'actual_asmt': audit (None)
-    self.general_equal_assert(expected_asmt, actual_asmt, "audit", "comments")
-    self.xfail_equal_assert(
-        expected_asmt, actual_asmt, "Issue in app GGRC-3094", "comments")
+    self.general_equal_assert(expected_asmt, actual_asmt, "audit")
 
   @pytest.mark.smoke_tests
   def test_asmt_logs(
@@ -358,7 +356,7 @@ class TestAssessmentsWorkflow(base.Test):
   ):
     """Test that mapped objects appear in modal after mapping."""
     webui_service.AssessmentsService(selenium).open_info_page_of_obj(
-        assessment).open_info_3bbs().select_edit()
+        assessment).three_bbs.select_edit()
     edit_asmt_modal = object_modal.AssessmentModal(selenium)
     edit_asmt_modal.map_objects([control_mapped_to_program])
     actual_titles = edit_asmt_modal.get_mapped_snapshots_titles()

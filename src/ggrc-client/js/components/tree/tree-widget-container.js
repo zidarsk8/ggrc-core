@@ -38,10 +38,12 @@ import {
 } from '../../events/eventTypes';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
-  getCounts,
-  initCounts,
   initMappedInstances,
 } from '../../plugins/utils/current-page-utils';
+import {
+  getCounts,
+  initCounts,
+} from '../../plugins/utils/widgets-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import Pagination from '../base-objects/pagination';
 import tracker from '../../tracker';

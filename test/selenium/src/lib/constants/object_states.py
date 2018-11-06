@@ -26,6 +26,11 @@ READY_FOR_EXT_REVIEW = "Ready for External Review"
 FIXED = "Fixed"
 FIXED_AND_VERIFIED = "Fixed and Verified"
 
+# For Proposal
+PROPOSED = "PROPOSED"
+APPLIED = "APPLIED"
+DECLINED = "DECLINED"
+
 # For Workflow
 INACTIVE = "Inactive"
 

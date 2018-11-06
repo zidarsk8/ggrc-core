@@ -5,8 +5,8 @@
 
 import {
   getCounts,
-} from '../plugins/utils/current-page-utils';
-import {inferObjectType} from '../plugins/utils/models-utils';
+} from '../plugins/utils/widgets-utils';
+import {getPageModel} from '../plugins/utils/current-page-utils';
 
 export default can.Control({
   pluginName: 'dashboard_widgets',
@@ -27,8 +27,8 @@ export default can.Control({
   },
 }, {
   init: function () {
-    if (!this.options.model && GGRC.page_model) {
-      this.options.model = inferObjectType(GGRC.page_object);
+    if (!this.options.model) {
+      this.options.model = getPageModel();
     }
 
     if (!this.options.widget_icon && this.options.model) {

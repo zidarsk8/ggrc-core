@@ -4,7 +4,6 @@
 import datetime
 
 from lib import users
-from lib.constants import object_states
 from lib.entities import app_entity
 from lib.utils import random_utils, date_utils
 
@@ -43,6 +42,7 @@ class _BaseFactory(object):
   def _post_obj_init(self, obj):
     """Run operations after creating an object (e.g. when creating a workflow
     set workflow for task group).
+    May be overridden in subclass.
     """
     pass
 
@@ -146,12 +146,12 @@ class TaskGroupTaskFactory(_BaseFactory):
   @property
   def _default_attrs(self):
     """See superclass."""
-    closest_working_day = date_utils.closest_working_day()
+    start_date = date_utils.first_not_weekend_day(datetime.date.today())
     return {
         "title": self._obj_title,
         "assignees": [users.current_person()],
-        "start_date": closest_working_day,
-        "due_date": closest_working_day + datetime.timedelta(days=14)
+        "start_date": start_date,
+        "due_date": start_date + datetime.timedelta(days=14)
     }
 
   def _post_obj_init(self, obj):
@@ -166,49 +166,34 @@ class WorkflowCycleFactory(_BaseFactory):
   """Factory for WorflowCycle entities."""
   _entity_cls = app_entity.WorkflowCycle
 
-  def create_from_workflow(self, workflow):
-    """Creates expected WorkflowCycle entity from Workflow entity."""
-    cycle_task_groups = [
-        CycleTaskGroupFactory().create_from_task_group(task_group)
-        for task_group in workflow.task_groups]
-    cycle_tasks = [cycle_task for cycle_task_group in cycle_task_groups
-                   for cycle_task in cycle_task_group.cycle_tasks]
-    return self.create_empty(
-        title=workflow.title,
-        admins=workflow.admins,
-        wf_members=workflow.wf_members,
-        state=object_states.ASSIGNED,
-        due_date=max(cycle_task.due_date for cycle_task in cycle_tasks),
-        cycle_task_groups=cycle_task_groups
-    )
+  def _post_obj_init(self, obj):
+    """Set WorkflowCycle for each associated CycleTaskGroup."""
+    for cycle_task_group in obj.cycle_task_groups:
+      cycle_task_group.workflow_cycle = obj
 
 
 class CycleTaskGroupFactory(_BaseFactory):
   """Factory for CycleTaskGroup entities."""
   _entity_cls = app_entity.CycleTaskGroup
 
-  def create_from_task_group(self, task_group):
-    """Creates expected CycleTaskGroup entity from TaskGroup entity."""
-    cycle_tasks = [CycleTaskFactory().create_from_task(task)
-                   for task in task_group.task_group_tasks]
-    return self.create_empty(
-        title=task_group.title,
-        state=object_states.ASSIGNED,
-        cycle_tasks=cycle_tasks
-    )
+  def _post_obj_init(self, obj):
+    """Add CycleTaskGroup to associated WorkflowCycle.
+    Set CycleTaskGroup for each associated CycleTask.
+    """
+    if obj.workflow_cycle:
+      obj.workflow_cycle.cycle_task_groups.append(obj)
+    for cycle_task in obj.cycle_tasks:
+      cycle_task.cycle_task_group = obj
 
 
 class CycleTaskFactory(_BaseFactory):
   """Factory for CycleTask entities."""
   _entity_cls = app_entity.CycleTask
 
-  def create_from_task(self, task_group_task):
-    """Creates expected CycleTask entity from TaskGroupTask entity."""
-    return self.create_empty(
-        title=task_group_task.title,
-        state=object_states.ASSIGNED,
-        due_date=task_group_task.due_date
-    )
+  def _post_obj_init(self, obj):
+    """Add CycleTask to associated CycleTaskGroup."""
+    if obj.cycle_task_group:
+      obj.cycle_task_group.cycle_tasks.append(obj)
 
 
 class PersonFactory(_BaseFactory):

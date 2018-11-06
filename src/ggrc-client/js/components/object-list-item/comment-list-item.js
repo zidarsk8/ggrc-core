@@ -40,9 +40,8 @@ export default can.Component.extend({
         },
       },
       commentCreationDate: {
-        type: 'date',
         get: function () {
-          return new Date(this.attr('itemData.created_at'));
+          return this.attr('itemData.created_at');
         },
       },
       commentAuthor: {

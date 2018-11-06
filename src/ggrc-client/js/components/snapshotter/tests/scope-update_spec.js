@@ -4,7 +4,7 @@
 */
 
 import * as ModalsUtils from '../../../plugins/utils/modals';
-import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
+import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../scope-update';
 
@@ -84,14 +84,14 @@ describe('snapshot-scope-updater component', function () {
     beforeEach(function () {
       method = updaterViewModel._refreshContainers.bind(updaterViewModel);
       refreshDfd = new $.Deferred().resolve();
-      spyOn(CurrentPageUtils, 'refreshCounts').and.returnValue(refreshDfd);
+      spyOn(WidgetsUtils, 'refreshCounts').and.returnValue(refreshDfd);
     });
 
     it('refreshes all page counters', function (done) {
       let result = method();
       result.then(
         function () {
-          expect(CurrentPageUtils.refreshCounts).toHaveBeenCalled();
+          expect(WidgetsUtils.refreshCounts).toHaveBeenCalled();
           done();
         }
       );
