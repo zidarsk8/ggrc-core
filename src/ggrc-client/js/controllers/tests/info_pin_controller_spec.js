@@ -10,7 +10,7 @@ import {
   pinContentMinimizedClass,
 } from '../info_pin_controller';
 
-describe('CMS.Controllers.InfoPin', function () {
+describe('InfoPin Controller', function () {
   let ctrlInst;
 
   beforeEach(function () {

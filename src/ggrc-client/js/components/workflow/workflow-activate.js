@@ -28,10 +28,6 @@ const viewModel = can.Map.extend({
     return initCounts([workflowCountsMap.activeCycles],
       workflow.type, workflow.id);
   },
-  redirectToFirstCycle(workflow) {
-    const cycleStub = workflow.attr('cycles')[0];
-    redirectToCycle(cycleStub);
-  },
   async repeatOnHandler(workflow) {
     let result = Promise.resolve();
     this.attr('waiting', true);
@@ -40,7 +36,7 @@ const viewModel = can.Map.extend({
       await Permission.refresh();
       await this.updateActiveCycleCounts(workflow);
       await workflow.refresh_all('task_groups', 'task_group_tasks');
-      this.redirectToFirstCycle(workflow);
+      redirectToCycle();
     } catch (err) {
       result = Promise.reject(err);
     } finally {

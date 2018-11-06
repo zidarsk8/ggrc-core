@@ -37,15 +37,11 @@ function createCycle(workflow) {
 }
 
 /**
- * Redirects to cycle with certain id.
- * @param {Cycle|CycleStub} cycle - an object containing cycle id.
- * @param {number} id - cycle id.
+ * Redirects to cycle tab.
  */
-function redirectToCycle({id}) {
+function redirectToCycle() {
   changeHash({
     widget: 'current',
-    infoPaneType: 'cycle',
-    infoPaneId: id,
   });
 }
 
