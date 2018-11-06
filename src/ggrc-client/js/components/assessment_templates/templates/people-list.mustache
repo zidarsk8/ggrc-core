@@ -1,0 +1,50 @@
+{{!
+  Copyright (C) 2018 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="span6 bottom-spacing">
+  <label>
+    {{labelName}}
+  </label>
+  <dropdown
+    {class-name}="'input-block-level js-toggle-field'"
+    {options-list}="peopleValues"
+    name="selectedValue"
+    ($change)="dropdownChanged"
+    {no-value}="hasEmptyValue"
+  ></dropdown>
+</div>
+
+<div class="span6 {{#validation_error instance.computed_errors peopleListAttr}}field-failure{{/validation_error}}">
+<label>&nbsp;</label>
+{{#if_equals selectedValue 'other'}}
+  {{^if_config_exist 'external_services.Person'}}
+    <autocomplete
+      {search-items-type}="'Person'"
+      (item-selected)="personAdded(%event)"
+      {placeholder}="'Enter text to search for {{listName}}'"
+    ></autocomplete>
+  {{else}}
+    <external-data-autocomplete
+      {type}="'Person'"
+      {placeholder}="'Enter text to search for {{listName}}'"
+      {min-length}="2"
+      (item-selected)="personAdded(%event)">
+    </external-data-autocomplete>
+  {{/if_config_exist}}
+
+  {{#validation_error instance.computed_errors peopleListAttr}}
+    <label class="help-inline warning">{{errors.0}}</label>
+  {{/validation_error}}
+
+  {{#each peopleList}}
+    <person-data {person-id}="{{.}}">
+      <a href="javascript://" class="unmap" title="Remove"
+        ($click)="removePerson(person)">
+      <i class="fa fa-trash"></i>
+      </a>
+    </person-data>
+  {{/each}}
+{{/if_equals}}
+</div>
