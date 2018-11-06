@@ -12,7 +12,7 @@ Create Date: 2018-10-30 11:44:39.104118
 from alembic import op
 
 revision = '87bcc96974cd'
-down_revision = '871aaab0de41'
+down_revision = '005108819b75'
 
 
 def upgrade():
