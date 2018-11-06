@@ -23,13 +23,13 @@ def get_obj(obj):
 def edit_obj(obj, **changes):
   """Updates object."""
   open_obj(obj)
-  internal_ui_operations.info_widget_cls(obj).edit_obj(**changes)
+  internal_ui_operations.info_widget_page(obj).edit_obj(**changes)
 
 
 def delete_obj(obj):
   """Deletes object."""
   open_obj(obj)
-  internal_ui_operations.info_widget_cls(obj).delete_obj()
+  internal_ui_operations.info_widget_page(obj).delete_obj()
 
 
 def active_tab_name():

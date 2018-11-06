@@ -58,7 +58,7 @@ class ActiveCyclesTab(object_page.ObjectPage):
     task_group_row.expand()
     task_row = task_group_row.get_cycle_task_row_by(title=cycle_task.title)
     task_row.select()
-    cycle_task_panel = internal_ui_operations.info_widget_cls(cycle_task)
+    cycle_task_panel = internal_ui_operations.info_widget_page(cycle_task)
     cycle_task_panel.wait_to_be_init()
     return cycle_task_panel
 

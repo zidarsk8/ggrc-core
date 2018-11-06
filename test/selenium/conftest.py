@@ -26,7 +26,7 @@ from lib.rest_facades import (
     control_rest_facade, person_rest_facade, workflow_rest_facade)
 from lib.service import rest_service, rest_facade
 from lib.service.rest import session_pool
-from lib.utils import conftest_utils, help_utils, selenium_utils
+from lib.utils import conftest_utils, help_utils, selenium_utils, app_utils
 from lib.utils.selenium_utils import get_full_screenshot_as_base64
 
 
@@ -634,8 +634,8 @@ def activated_repeat_on_workflow(app_repeat_on_workflow):
   task_group = workflow_rest_facade.create_task_group(
       workflow=app_repeat_on_workflow)
   workflow_rest_facade.create_task_group_task(task_group=task_group)
-  workflow_rest_service.WorkflowRestService().activate(
-      app_repeat_on_workflow)
+  app_utils.workaround_edit_without_non_api_request()
+  workflow_rest_service.WorkflowRestService().activate(app_repeat_on_workflow)
   return app_repeat_on_workflow
 
 

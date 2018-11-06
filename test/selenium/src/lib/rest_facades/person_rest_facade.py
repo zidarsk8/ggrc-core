@@ -9,3 +9,16 @@ def create_person(**attrs):
   """Creates Person via REST."""
   person = app_entity_factory.PersonFactory().create(**attrs)
   return person_rest_service.PersonRestService().create(person)
+
+
+def create_person_with_role(role_name, **person_attrs):
+  """Creates person with role `role_name` and Person attributes `person_attrs`
+  via REST.
+  """
+  person = create_person(**person_attrs)
+  role = person_rest_service.global_role_with_name(role_name)
+  user_role = app_entity_factory.UserRoleFactory().create_empty(
+      person=person, role=role)
+  person_rest_service.UserRoleRestService().create(user_role)
+  person.global_role_name = role_name
+  return person

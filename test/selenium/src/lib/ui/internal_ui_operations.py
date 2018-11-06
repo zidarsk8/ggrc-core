@@ -18,10 +18,10 @@ def submit_obj(obj):
 
 def build_obj(app_obj):
   """Builds the object from the page and returns it."""
-  obj_dict = info_widget_cls(app_obj).obj_scope()
+  obj_dict = info_widget_page(app_obj).obj_scope()
   return ui_dict_convert.ui_to_app(app_obj.obj_name(), obj_dict)
 
 
-def info_widget_cls(obj):
+def info_widget_page(obj):
   """Returns a corresponding page object from info_widget module."""
   return factory.get_cls_widget(object_name=obj.obj_name(), is_info=True)()
