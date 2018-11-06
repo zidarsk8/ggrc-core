@@ -236,9 +236,6 @@ export default can.Component.extend({
     }
   },
   events: {
-    '{viewModel.instance} resolvePendingBindings': function () {
-      this.viewModel.refreshRelatedDocuments();
-    },
     [`{viewModel.instance} ${REFRESH_MAPPING.type}`](instance, event) {
       if (this.viewModel.attr('modelType') === event.destinationType) {
         this.viewModel.refreshRelatedDocuments();

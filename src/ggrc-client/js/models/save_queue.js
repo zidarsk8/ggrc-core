@@ -4,7 +4,6 @@
 */
 
 import tracker from '../tracker';
-import {resolveDeferredBindings} from './pending-joins';
 import BackgroundTask from '../models/service-models/background-task';
 
 (function (can, $) {
@@ -99,7 +98,7 @@ import BackgroundTask from '../models/service-models/background-task';
         let cb = function (single) {
           return function () {
             this.created(single[1][bucket.type]);
-            return $.when(resolveDeferredBindings(this));
+            return can.Deferred().resolve(this);
           };
         };
         can.each(objs, function (obj, idx) {

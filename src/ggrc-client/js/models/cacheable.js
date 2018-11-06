@@ -266,25 +266,22 @@ export default can.Model('can.Model.Cacheable', {
     //  This leads to conflicts not actually rejecting because on the second go-round
     //  the local and remote objects look the same.  --BM 2015-02-06
     this.update = async function (id, params) {
-      const {resolveDeferredBindings} = await import('./pending-joins');
       let ret = _update
         .call(this, id, this.process_args(params))
-        .then(resolveDeferredBindings,
-          function (xhr) {
+        .then((obj) => obj,
+          (xhr) => {
             if (xhr.status === 409) {
-              return resolveConflict(xhr, this.findInCacheById(id));
+              let dfd = resolveConflict(xhr, this.findInCacheById(id));
+              return dfd;
             }
             return xhr;
-          }.bind(this)
-        );
+          });
       delete ret.hasFailCallback;
       return ret;
     };
     this.create = async function (params) {
-      const {resolveDeferredBindings} = await import('./pending-joins');
       let ret = _create
-        .call(this, this.process_args(params))
-        .then(resolveDeferredBindings);
+        .call(this, this.process_args(params));
       delete ret.hasFailCallback;
       return ret;
     };
