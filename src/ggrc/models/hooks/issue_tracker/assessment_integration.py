@@ -1068,6 +1068,31 @@ def bulk_children_gen_allowed(obj):
   ])
 
 
+# pylint: disable=invalid-name
+def create_missing_issuetrackerissues(parent_type, parent_id):
+  """We need to create issue_tracker_info for related assessments.
+
+  Assessment created without issuetracker_issue if parent Audit's
+  issuetracker_issue is disabled. But load_issuetracked_objects assumes that
+  each Assessment has issuetracker_issue.
+  """
+  if parent_type != "Audit":
+    return
+
+  audit = all_models.Audit.query.get(parent_id)
+  if audit.issuetracker_issue and audit.assessments:
+    issue_tracker_info = audit.issuetracker_issue.get_issue(
+        parent_type, parent_id
+    ).to_dict()
+    for assessment in audit.assessments:
+      if assessment.issuetracker_issue is None:
+        all_models.IssuetrackerIssue.create_or_update_from_dict(
+            assessment, issue_tracker_info)
+    # flush is needed here to 'load_issuetracked_objects' be able to load
+    # missing assessments
+    db.session.flush()
+
+
 def load_issuetracked_objects(parent_type, parent_id):
   """Fetch issuetracked objects from db."""
   if parent_type != "Audit":
