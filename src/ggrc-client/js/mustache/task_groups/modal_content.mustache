@@ -8,9 +8,9 @@
 
   <div class="row-fluid">
     <div class="span8">
-      <label>
+      <label class="form-labell">
         Summary
-        <span class="required">*</span>
+        <i class="fa fa-asterisk"></i>
         <i class="fa fa-question-circle" rel="tooltip" title=""></i>
       </label>
       <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1" autofocus>
@@ -18,9 +18,9 @@
       <br>
     </div>
     <div class="span4">
-      <label for="task_group_assignee">
+      <label for="task_group_assignee" class="form-label">
         Assignee:
-        <span class="required">*</span>
+        <i class="fa fa-asterisk"></i>
       </label>
         {{#using assignee=instance.contact model_singular=model.model_singular}}
         <div class="objective-selector">
@@ -69,9 +69,9 @@
     <div class="span4">
       {{#if_helpers '\n ^if' instance.id '\n and ^if' object_params.workflow}}
         {{#using workflow=instance.workflow}}
-        <label>
+        <label class="form-label">
           Workflow
-          <span class="required">*</span>
+          <i class="fa fa-asterisk"></i>
           <i class="fa fa-question-circle" rel="tooltip" title="Workflow containing this Task Group"></i>
         </label>
         <input tabindex="4" class="input-block-level" name="workflow.title" data-lookup="Workflow" placeholder="Choose Workflow" type="text" value="{{firstexist workflow.title ''}}" />
