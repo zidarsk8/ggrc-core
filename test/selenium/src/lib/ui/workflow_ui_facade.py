@@ -2,7 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Workflow UI facade."""
 from lib import url, users
-from lib.entities import ui_dict_convert
+from lib.constants import object_states
+from lib.entities import cycle_entity_population, ui_dict_convert
 from lib.page import dashboard
 from lib.page.widget import workflow_tabs, task_group_info_panel, workflow_page
 from lib.ui import internal_ui_operations, ui_facade
@@ -98,6 +99,16 @@ def get_objs_mapped_to_cycle_task(cycle_task):
   active_cycles_tab.open_via_url(
       cycle_task.task_group_task.task_group.workflow)
   return active_cycles_tab.get_objs_mapped_to_cycle_task(cycle_task)
+
+
+def start_cycle_task(cycle_task):
+  """Starts the cycle task."""
+  active_cycles_tab = workflow_tabs.ActiveCyclesTab()
+  active_cycles_tab.open_via_url(
+      cycle_task.task_group_task.task_group.workflow)
+  active_cycles_tab.start_cycle_task(cycle_task)
+  cycle_task.state = object_states.IN_PROGRESS
+  cycle_entity_population.propagate_task_state_change(cycle_task)
 
 
 def archive_workflow(workflow):

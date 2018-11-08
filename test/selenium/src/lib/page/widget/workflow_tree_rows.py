@@ -4,7 +4,7 @@
 
 from lib.entities import app_entity_factory
 from lib.page.widget import tree_widget, table_with_headers
-from lib.utils import ui_utils, date_utils
+from lib.utils import date_utils, test_utils, ui_utils
 
 
 class WorkflowCycleRow(tree_widget.TreeItem):
@@ -15,14 +15,20 @@ class WorkflowCycleRow(tree_widget.TreeItem):
     self._table_header_names = table_header_names
 
   @property
-  def due_date(self):
-    """Returns workflow cycle due date."""
-    return date_utils.str_to_date(self.text_for_header("End Date"), "%m/%d/%Y")
+  def state(self):
+    """Returns workflow cycle state."""
+    return self.text_for_header("State")
 
   def expand(self):
     """Expands workflow cycle row to show cycle task group rows."""
-    self.select()
-    ui_utils.wait_for_spinner_to_disappear()
+    if not self.is_expanded:
+      self.select()
+      ui_utils.wait_for_spinner_to_disappear()
+
+  @property
+  def due_date(self):
+    """Returns workflow cycle due date."""
+    return date_utils.str_to_date(self.text_for_header("End Date"), "%m/%d/%Y")
 
   def cycle_task_group_rows(self):
     """Returns cycle task group rows."""
@@ -31,7 +37,8 @@ class WorkflowCycleRow(tree_widget.TreeItem):
     task_group_row_els = [
         row_el for row_el in all_sub_row_els
         if not row_el.element(class_name="tree-item__overdue").exists]
-    return [_CycleTaskGroupRow(row_el, self._table_header_names)
+    return [_CycleTaskGroupRow(row_el, self._table_header_names,
+                               parent_row=self)
             for row_el in task_group_row_els]
 
   def get_cycle_task_group_row_by(self, **conditions):
@@ -59,6 +66,10 @@ class WorkflowCycleRow(tree_widget.TreeItem):
 class _BaseCycleSubRow(tree_widget.TreeItem):
   """Base row for cycle task group and cycle task classes."""
 
+  def __init__(self, row_el, table_header_names, parent_row):
+    super(_BaseCycleSubRow, self).__init__(row_el, table_header_names)
+    self._parent_row = parent_row
+
   @property
   def title(self):
     """Returns task group title."""
@@ -75,15 +86,16 @@ class _CycleTaskGroupRow(_BaseCycleSubRow):
   """
 
   def expand(self):
-    """Expands task group row to show cycle task rows."""
-    self._root.element(class_name="columns").click()
-    ui_utils.wait_for_spinner_to_disappear()
+    """Expands cycle task group row to show cycle task rows."""
+    if not self.is_expanded:
+      self._root.element(class_name="columns").click()
+      ui_utils.wait_for_spinner_to_disappear()
 
   def cycle_task_rows(self):
     """Returns cycle task rows."""
     task_group_row_els = self._root.next_sibling(
         class_name="sub-tier").elements(class_name="tree-item-element")
-    return [_CycleTaskRow(row_el, self._table_header_names)
+    return [_CycleTaskRow(row_el, self._table_header_names, parent_row=self)
             for row_el in task_group_row_els]
 
   def get_cycle_task_row_by(self, **conditions):
@@ -123,6 +135,17 @@ class _CycleTaskRow(_BaseCycleSubRow):
   def select(self):
     """Clicks cycle task to open cycle task info panel."""
     self._root.element(class_name="columns").click()
+
+  def start(self):
+    """Starts this cycle task."""
+    def workflow_state():
+      """Returns workflow cycle state."""
+      # pylint: disable=protected-access
+      return self._parent_row._parent_row.state
+    initial_workflow_state = workflow_state()
+    self._root.hover()
+    self._root.button(text="Start").click()
+    test_utils.wait_for(lambda: workflow_state() != initial_workflow_state)
 
 
 class SetupTaskGroupTreeItem(tree_widget.TreeItem):

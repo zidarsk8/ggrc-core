@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """REST service for Workflow objects (functions take entity objects)."""
 from lib.constants import object_states
-from lib.entities import app_entity, cycle_entity_creation
+from lib.entities import app_entity, cycle_entity_population
 from lib.rest import rest_convert, base_rest_service
 
 
@@ -42,7 +42,7 @@ class WorkflowRestService(base_rest_service.ObjectRestService):
       workflow.recurrences_started = True
       self.edit(workflow)
     else:
-      cycle = cycle_entity_creation.create_workflow_cycle(workflow)
+      cycle = cycle_entity_population.create_workflow_cycle(workflow)
       WorkflowCycleRestService().create(cycle)
 
 

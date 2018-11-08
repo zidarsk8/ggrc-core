@@ -1,7 +1,6 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Methods to create expected workflow cycle entities from workflow entities.
-"""
+"""Functions to create and modify expected workflow cycle entities."""
 from lib.constants import object_states
 from lib.entities import app_entity_factory
 from lib.utils import date_utils
@@ -44,3 +43,17 @@ def _create_from_task(task_group_task):
       due_date=date_utils.first_working_day(task_group_task.due_date),
       task_group_task=task_group_task
   )
+
+
+def propagate_task_state_change(cycle_task):
+  """Propagates change of cycle task state to cycle task group and
+  workflow cycle.
+  """
+  cycle_task_group = cycle_task.cycle_task_group
+  if all(task.state == cycle_task.state
+         for task in cycle_task_group.cycle_tasks):
+    cycle_task_group.state = cycle_task.state
+  workflow_cycle = cycle_task_group.workflow_cycle
+  if all(task_group.state == cycle_task.state
+         for task_group in workflow_cycle.cycle_task_groups):
+    workflow_cycle.state = cycle_task.state
