@@ -8,7 +8,7 @@ from lib.rest import base_rest_service, rest_convert
 
 class ControlRestService(base_rest_service.ObjectRestService):
   """REST service for Control app entities."""
-  _app_entity_cls = app_entity.Control
+  app_entity_cls = app_entity.Control
 
   @staticmethod
   def _map_to_rest_for_create_obj(obj):
@@ -24,7 +24,7 @@ class ControlRestService(base_rest_service.ObjectRestService):
 
 class ControlAssertionRestService(base_rest_service.ObjectRestService):
   """REST service for ControlAssertion app entities."""
-  _app_entity_cls = app_entity.ControlAssertion
+  app_entity_cls = app_entity.ControlAssertion
 
   @staticmethod
   def _map_from_rest(rest_dict):

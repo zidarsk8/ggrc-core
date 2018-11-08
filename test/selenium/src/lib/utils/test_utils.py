@@ -91,3 +91,11 @@ def _value_assert(current_key, actual_value, expected_value):
     _dict_assert(actual_value, expected_value)
   else:
     assert actual_value == expected_value, "key: {}".format(current_key)
+
+
+def set_unknown_attrs_to_none(obj):
+  """After creation of object via UI, `created_at` and `updated_at`
+  are unknown. So they can't be compared with object retrieved from UI.
+  """
+  obj.created_at = None
+  obj.updated_at = None

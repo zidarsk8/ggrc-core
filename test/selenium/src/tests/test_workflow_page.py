@@ -12,7 +12,7 @@ from lib.constants import roles
 from lib.entities import (
     app_entity_factory, ui_dict_convert, cycle_entity_creation)
 from lib.page.widget import workflow_tabs, object_modal, object_page
-from lib.rest_facades import person_rest_facade
+from lib.rest_facades import person_rest_facade, object_rest_facade
 from lib.ui import workflow_ui_facade, ui_facade
 from lib.utils import test_utils, date_utils, ui_utils
 
@@ -42,6 +42,7 @@ class TestCreateWorkflow(base.Test):
     """Test that creation of workflow via UI corrects a correct object."""
     # pylint: disable=invalid-name
     actual_workflow = ui_facade.get_obj(workflow)
+    test_utils.set_unknown_attrs_to_none(actual_workflow)
     test_utils.obj_assert(actual_workflow, workflow)
 
   def test_task_group_created_after_workflow_ui_creation(
@@ -68,8 +69,10 @@ class TestWorkflowInfoPageActions(base.Test):
     """Test editing workflow."""
     new_title = "[EDITED]" + app_workflow.title
     ui_facade.edit_obj(app_workflow, title=new_title)
-    actual_workflow = ui_facade.get_obj(app_workflow)
     app_workflow.title = new_title
+    actual_workflow = ui_facade.get_obj(app_workflow)
+    app_workflow.updated_at = object_rest_facade.get_obj(
+        app_workflow).updated_at
     test_utils.obj_assert(actual_workflow, app_workflow)
 
   def test_delete_workflow(self, creator_or_reader, app_workflow, selenium):
@@ -88,6 +91,8 @@ class TestWorkflowInfoPageActions(base.Test):
     # pylint: disable=invalid-name
     workflow_ui_facade.archive_workflow(activated_repeat_on_workflow)
     actual_workflow = ui_facade.get_obj(activated_repeat_on_workflow)
+    activated_repeat_on_workflow.updated_at = object_rest_facade.get_obj(
+        activated_repeat_on_workflow).updated_at
     test_utils.obj_assert(actual_workflow, activated_repeat_on_workflow)
 
 

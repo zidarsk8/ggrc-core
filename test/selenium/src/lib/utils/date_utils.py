@@ -4,6 +4,7 @@
 import datetime
 
 import holidays
+from dateutil import tz
 
 
 def first_not_weekend_day(date):
@@ -37,3 +38,23 @@ def str_to_date(date_str, date_format):
 def str_to_datetime(datetime_str, datetime_format):
   """Converts string in format to datetime."""
   return datetime.datetime.strptime(datetime_str, datetime_format)
+
+
+def ui_str_with_zone_to_datetime(datetime_str):
+  """Converts datetime string with zone offset to datetime.
+  Datetimes shown in UI are in local timezone.
+  """
+  # Last 7 symbols are the UTC offset in +(-)HH:MM format. It is not
+  # needed to be converted because all datetimes in UI should be shown
+  # in user's local timezone.
+  # %z directive doesn't seem to work in Python 2.7
+  return str_to_datetime(datetime_str[:-7], "%m/%d/%Y %I:%M:%S %p").replace(
+      tzinfo=tz.tzlocal())
+
+
+def iso8601_to_datetime(iso8601_str):
+  """Converts ISO 8601 (yyyy-mm-ddThh:mm:ss) string to datetime.
+  Datetimes returned by API are in UTC.
+  """
+  return str_to_datetime(iso8601_str, "%Y-%m-%dT%H:%M:%S").replace(
+      tzinfo=tz.tzutc())

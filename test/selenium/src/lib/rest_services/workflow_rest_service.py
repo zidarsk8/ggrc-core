@@ -8,7 +8,7 @@ from lib.rest import rest_convert, base_rest_service
 
 class WorkflowRestService(base_rest_service.ObjectRestService):
   """REST service for Workflow app entities."""
-  _app_entity_cls = app_entity.Workflow
+  app_entity_cls = app_entity.Workflow
 
   @staticmethod
   def _map_to_rest_for_create_obj(obj):
@@ -48,7 +48,7 @@ class WorkflowRestService(base_rest_service.ObjectRestService):
 
 class TaskGroupRestService(base_rest_service.ObjectRestService):
   """REST service for TaskGroup app entities."""
-  _app_entity_cls = app_entity.TaskGroup
+  app_entity_cls = app_entity.TaskGroup
 
   @staticmethod
   def _map_to_rest_for_create_obj(obj):
@@ -63,7 +63,7 @@ class TaskGroupRestService(base_rest_service.ObjectRestService):
 
 class TaskGroupTaskRestService(base_rest_service.ObjectRestService):
   """REST service for TaskGroupTask app entities."""
-  _app_entity_cls = app_entity.TaskGroupTask
+  app_entity_cls = app_entity.TaskGroupTask
 
   @staticmethod
   def _map_to_rest_for_create_obj(obj):
@@ -81,7 +81,7 @@ class TaskGroupTaskRestService(base_rest_service.ObjectRestService):
 
 class WorkflowCycleRestService(base_rest_service.ObjectRestService):
   """REST service for WorkflowCycle app entities."""
-  _app_entity_cls = app_entity.WorkflowCycle
+  app_entity_cls = app_entity.WorkflowCycle
   _obj_name = "cycle"
 
   @staticmethod

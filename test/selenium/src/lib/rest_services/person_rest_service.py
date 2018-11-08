@@ -8,7 +8,7 @@ from lib.rest import base_rest_service, rest_convert
 
 class PersonRestService(base_rest_service.ObjectRestService):
   """REST service for Person app entities."""
-  _app_entity_cls = app_entity.Person
+  app_entity_cls = app_entity.Person
 
   @staticmethod
   def _map_to_rest_for_create_obj(obj):
@@ -19,10 +19,19 @@ class PersonRestService(base_rest_service.ObjectRestService):
         context=rest_convert.default_context()
     )
 
+  def _map_from_rest(self, rest_dict):
+    """See superclass."""
+    mapping = super(PersonRestService, self)._map_from_rest(rest_dict)
+    mapping.update(
+        name=rest_dict["name"],
+        email=rest_dict["email"]
+    )
+    return mapping
+
 
 class GlobalRoleRestService(base_rest_service.ObjectRestService):
   """REST service for GlobalRole app entities."""
-  _app_entity_cls = app_entity.GlobalRole
+  app_entity_cls = app_entity.GlobalRole
   _obj_name = "role"
 
   @staticmethod
@@ -47,7 +56,7 @@ def global_role_with_name(name):
 
 class UserRoleRestService(base_rest_service.ObjectRestService):
   """REST service for UserRole app entities."""
-  _app_entity_cls = app_entity.UserRole
+  app_entity_cls = app_entity.UserRole
 
   @staticmethod
   def _map_to_rest_for_create_obj(obj):
