@@ -828,14 +828,14 @@ def generate_children_issues():
   Assessments in some Audit.
   """
   validate_child_bulk_gen_data(flask.request.json)
-  task_queue = background_task.create_task(
+  bg_task = background_task.create_task(
       "generate_children_issues",
       flask.url_for(run_children_issues_generation.__name__),
       run_children_issues_generation,
       flask.request.json,
       operation_type="generate_children_issues",
   )
-  return task_queue.task_scheduled_response()
+  return bg_task.task_scheduled_response()
 
 
 @app.route("/generate_issues", methods=["POST"])
@@ -847,13 +847,32 @@ def generate_issues():
   (if such tickets haven't been created before).
   """
   validate_bulk_sync_data(flask.request.json)
-  task_queue = background_task.create_task(
+  bg_task = background_task.create_task(
       "generate_issues",
       flask.url_for(run_issues_generation.__name__),
       run_issues_generation,
       flask.request.json,
   )
-  return task_queue.task_scheduled_response()
+  return bg_task.task_scheduled_response()
+
+
+def background_generate_issues(parameters=None):
+  """Bulk generate linked issuetracker issues for provided objects.
+
+  This function creates issuetracker tickets for all provided objects
+  (if such tickets haven't been created before). Can be called inside import
+  task.
+  """
+  method = "POST"
+  validate_bulk_sync_data(parameters)
+  bg_task = background_task.create_task(
+      "generate_issues",
+      "/_background_tasks/run_issues_generation",
+      run_issues_generation,
+      parameters=parameters,
+      method=method,
+  )
+  return bg_task.task_scheduled_response()
 
 
 @app.route("/update_issues", methods=["POST"])
@@ -865,13 +884,32 @@ def update_issues():
   to the current state in the app.
   """
   validate_bulk_sync_data(flask.request.json)
-  task_queue = background_task.create_task(
+  bg_task = background_task.create_task(
       "update_issues",
       flask.url_for(run_issues_update.__name__),
       run_issues_update,
       flask.request.json,
   )
-  return task_queue.task_scheduled_response()
+  return bg_task.task_scheduled_response()
+
+
+def background_update_issues(parameters=None):
+  """Bulk update linked issuetracker issues for provided objects.
+
+  This function update issuetracker tickets for all provided objects
+  to the current state in the app. Can be called inside import
+  task.
+  """
+  method = "POST"
+  validate_bulk_sync_data(parameters)
+  bg_task = background_task.create_task(
+      "update_issues",
+      "/_background_tasks/run_issues_update",
+      run_issues_update,
+      parameters=parameters,
+      method=method,
+  )
+  return bg_task.task_scheduled_response()
 
 
 def validate_child_bulk_gen_data(json_data):

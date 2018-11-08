@@ -7,7 +7,12 @@ import unittest
 import ddt
 import mock
 
+from flask import g
+
 from ggrc import db
+from ggrc import views
+from ggrc.app import app
+
 from ggrc.integrations import integrations_errors, issuetracker_bulk_sync
 from ggrc.integrations.synchronization_jobs import sync_utils
 from ggrc.models import all_models, inflector
@@ -219,6 +224,7 @@ class TestBulkIssuesSync(TestCase):
       self.assertEqual(issue.title, None)
 
 
+@ddt.ddt
 class TestBulkIssuesGenerate(TestBulkIssuesSync):
   """Test bulk issues generation."""
 
@@ -243,6 +249,36 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
     result = creator.get_issuetracked_objects("Issue", issue_ids)
     result_ids = [issue.id for issue in result]
     self.assertEqual(set(issue_ids_enabled), set(result_ids))
+
+  @ddt.data(
+      ("IssueTrackerBulkCreator", "background_generate_issues"),
+      ("IssueTrackerBulkUpdater", "background_update_issues"),
+  )
+  @ddt.unpack
+  def test_issue_generate_call(self, class_name, func_name):
+    """Test generate_issue call creates task for bulk generate."""
+    user = all_models.Person.query.filter_by(email="user@example.com").one()
+    setattr(g, '_current_user', user)
+    _, assessment_ids = self.setup_assessments(3)
+
+    data = {
+        "objects": [{
+            "type": "Assessment",
+            "id": id_,
+        } for id_ in assessment_ids],
+    }
+
+    response = app.make_response(("success", 200, ))
+    func_addr = ("ggrc.integrations.issuetracker_bulk_sync." +
+                 class_name + ".sync_issuetracker")
+    with mock.patch(func_addr, return_value=response) as generate_mock:
+      callable_func = getattr(views, func_name)
+      result = callable_func(data)
+
+    self.assert200(result)
+    bg_task = all_models.BackgroundTask.query.one()
+    self.assertEqual(bg_task.status, "Success")
+    generate_mock.assert_called_once()
 
   def test_asmnt_bulk_generate(self):
     """Test bulk generation of issues for Assessments."""
