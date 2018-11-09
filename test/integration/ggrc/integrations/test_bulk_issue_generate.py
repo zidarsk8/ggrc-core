@@ -562,13 +562,10 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
     self.assertEqual("S2", assess1.issuetracker_issue.issue_severity)
     assess2 = all_models.Assessment.query.get(assess2_id)
 
-    # Currently all values for assessment are taken from audit
-    #  and it wrong behavior.
-    # Will be fixed in a different PR
-    self.assertEqual("12345", assess2.issuetracker_issue.component_id)
-    self.assertEqual("54321", assess2.issuetracker_issue.hotlist_id)
-    self.assertEqual("P2", assess2.issuetracker_issue.issue_priority)
-    self.assertEqual("S2", assess2.issuetracker_issue.issue_severity)
+    self.assertEqual("9999", assess2.issuetracker_issue.component_id)
+    self.assertEqual("7777", assess2.issuetracker_issue.hotlist_id)
+    self.assertEqual("P1", assess2.issuetracker_issue.issue_priority)
+    self.assertEqual("S1", assess2.issuetracker_issue.issue_severity)
 
   def test_bg_operation_status(self):
     """Test background operation status endpoint."""
