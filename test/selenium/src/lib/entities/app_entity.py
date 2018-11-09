@@ -52,19 +52,21 @@ class _Base(object):
     """
     def process_obj(obj, seen_entity_obj_ids):
       """Convert an obj to dict replacing circular references."""
+      # `seen_entity_obj_ids` is a list of entity object ids from the root
+      #   `obj` to the current obj
       if attr.has(obj):
         if id(obj) in seen_entity_obj_ids:
           return "{} was here".format(obj.obj_type())
-        seen_entity_obj_ids.add(id(obj))
-        return collections.OrderedDict(
-            (attr_name, process_obj(attr_value, seen_entity_obj_ids))
-            for attr_name, attr_value
-            in attr.asdict(obj, recurse=False).iteritems())
+        obj_dict = collections.OrderedDict()
+        for name, value in attr.asdict(obj, recurse=False).iteritems():
+          obj_dict[name] = process_obj(
+              value, seen_entity_obj_ids=seen_entity_obj_ids + [id(obj)])
+        return obj_dict
       if isinstance(obj, list):
         return [process_obj(list_elem, seen_entity_obj_ids)
                 for list_elem in obj]
       return obj
-    return process_obj(self, seen_entity_obj_ids=set())
+    return process_obj(self, seen_entity_obj_ids=[])
 
   @classmethod
   def fields(cls):
@@ -137,6 +139,7 @@ class CycleTask(_Base):
   """Represents Cycle TaskGroupTask entity."""
   title = attr.ib()
   state = attr.ib()
+  assignees = attr.ib()
   due_date = attr.ib()
   cycle_task_group = attr.ib()
   task_group_task = attr.ib()

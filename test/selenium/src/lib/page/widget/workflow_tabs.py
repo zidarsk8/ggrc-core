@@ -16,6 +16,10 @@ class ActiveCyclesTab(object_page.ObjectPage):
     """See superclass."""
     return "current"
 
+  def open_using_cycle_task(self, cycle_task):
+    """Opens Active Cycles tab of cycle task's workflow."""
+    self.open_via_url(cycle_task.task_group_task.task_group.workflow)
+
   @property
   def _tree_widget(self):
     """Returns tree widget with active cycles."""
@@ -39,6 +43,11 @@ class ActiveCyclesTab(object_page.ObjectPage):
     cycle_task_row = self._expand_to_cycle_task(cycle_task)
     cycle_task_row.start()
 
+  def get_cycle_task(self, cycle_task):
+    """Opens cycle task info panel, builds and returns the entity object."""
+    self._open_cycle_task_panel(cycle_task)
+    return internal_ui_operations.build_obj(cycle_task)
+
   def map_obj_to_cycle_task(self, obj, cycle_task):
     """Maps object to the cycle task."""
     cycle_task_panel = self._open_cycle_task_panel(cycle_task)
@@ -49,6 +58,11 @@ class ActiveCyclesTab(object_page.ObjectPage):
     """Get objects mapped to the cycle task."""
     cycle_task_panel = self._open_cycle_task_panel(cycle_task)
     return cycle_task_panel.mapped_objs()
+
+  def add_assignee_to_cycle_task(self, assignee, cycle_task):
+    """Adds a task assignee to the cycle task."""
+    cycle_task_panel = self._open_cycle_task_panel(cycle_task)
+    cycle_task_panel.assignees.add_person(assignee)
 
   def _open_cycle_task_panel(self, cycle_task):
     """Opens Cycle task panel."""

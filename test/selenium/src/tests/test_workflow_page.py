@@ -25,6 +25,12 @@ def creator_or_reader(request):
   return person_rest_facade.create_person_with_role(role_name=request.param)
 
 
+@pytest.fixture()
+def login_as_creator_or_reader(creator_or_reader):
+  """Logs in as the creator or reader."""
+  users.set_current_person(creator_or_reader)
+
+
 class TestCreateWorkflow(base.Test):
   """Tests for checking results of workflow creation."""
 
@@ -74,11 +80,6 @@ class TestWorkflowInfoPage(base.Test):
     users.set_current_person(creator_or_reader)
     actual_workflow = ui_facade.get_obj(workflow)
     test_utils.obj_assert(actual_workflow, workflow)
-
-  @pytest.fixture()
-  def login_as_creator_or_reader(self, creator_or_reader):
-    """Logs in as creator or reader."""
-    users.set_current_person(creator_or_reader)
 
   def test_edit_workflow(
       self, login_as_creator_or_reader, app_workflow, selenium
@@ -209,7 +210,7 @@ class TestActiveCyclesTab(base.Test):
     test_utils.list_obj_assert(objs, [app_control])
 
   def test_move_cycle_task_to_another_state(
-      self, creator_or_reader, activated_workflow, selenium
+      self, login_as_creator_or_reader, activated_workflow, selenium
   ):
     """Test starting a cycle task."""
     # pylint: disable=invalid-name
@@ -221,3 +222,21 @@ class TestActiveCyclesTab(base.Test):
     actual_workflow_cycles = workflow_ui_facade.get_workflow_cycles(
         activated_workflow)
     test_utils.list_obj_assert(actual_workflow_cycles, [workflow_cycle])
+
+  @pytest.fixture()
+  def some_creator(self):
+    """Creates some global creator."""
+    return person_rest_facade.create_person_with_role(roles.CREATOR)
+
+  def test_add_cycle_task_assignee(
+      self, some_creator, login_as_creator_or_reader, activated_workflow,
+      selenium
+  ):
+    """Test adding a cycle task assignee."""
+    cycle_task = cycle_entity_population.create_workflow_cycle(
+        activated_workflow).cycle_task_groups[0].cycle_tasks[0]
+    workflow_ui_facade.add_assignee_to_cycle_task(
+        assignee=some_creator, cycle_task=cycle_task)
+    selenium.refresh()  # reload page to check change is saved
+    actual_cycle_task = workflow_ui_facade.get_cycle_task(cycle_task)
+    test_utils.obj_assert(actual_cycle_task, cycle_task)
