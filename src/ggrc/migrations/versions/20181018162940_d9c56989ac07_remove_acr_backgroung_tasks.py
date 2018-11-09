@@ -19,8 +19,8 @@ from ggrc.migrations.utils import acr_propagation
 
 
 # revision identifiers, used by Alembic.
-revision = 'd9c56989ac07'
-down_revision = '871aaab0de41'
+revision = "d9c56989ac07"
+down_revision = "9beabcd92f34"
 
 ROLE_NAME = "Admin"
 OBJECT_TYPE = "BackgroundTask"
@@ -66,25 +66,26 @@ def alter_name_column():
   sql = """
       UPDATE background_tasks b1
       JOIN background_tasks b2
-      ON b1.name = b2.name AND b1.id != b2.id AND b1.id > b2.id
+      ON b1.name = b2.name AND b1.id > b2.id
       SET b1.name = CONCAT(UUID(), "_", b1.name)
   """
   op.execute(sql)
 
   op.alter_column(
-      'background_tasks',
-      'name',
+      "background_tasks",
+      "name",
       existing_type=mysql.VARCHAR(length=250),
       nullable=False
   )
-  op.create_unique_constraint(None, 'background_tasks', ['name'])
+  op.create_unique_constraint("uq_background_tasks_name",
+                              "background_tasks", ["name"])
 
 
 def add_payload_column():
   """Add 'payload' column to BackgroundTask"""
   op.add_column(
-      'background_tasks',
-      sa.Column('payload',
+      "background_tasks",
+      sa.Column("payload",
                 CompressedType(length=16777215),
                 nullable=True)
   )
