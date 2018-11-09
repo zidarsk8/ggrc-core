@@ -5,13 +5,13 @@
 
 <div>
   {{#if label}}
-    <label>
+    <label class="form-label">
       {{label}}
+      {{#if required}}
+        <i class="fa fa-asterisk"></i>
+      {{/if}}
       {{#if helptext}}
         <i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>
-      {{/if}}
-      {{#if required}}
-        <span class="required">*</span>
       {{/if}}
     </label>
   {{/if}}
