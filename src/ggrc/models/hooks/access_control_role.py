@@ -90,13 +90,9 @@ def handle_role_acls(role, filter_=False):
     query = _get_missing_models_query(role, filter_=filter_)
     if not query:
       return
-    query_generator = utils.generate_query_chunks(
-        query,
-        chunk_size=1000,
-        include_order=False,
-    )
-    for query_chunk in query_generator:
-      for roleable_obj in query_chunk:
+
+    while query.count():
+      for roleable_obj in query.limit(1000):
         db.session.add(all_models.AccessControlList(
             ac_role=role,
             object=roleable_obj,
