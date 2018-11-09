@@ -147,5 +147,5 @@ class AdminDashboard(widget_bar.AdminDashboard, GenericHeader):
   """Admin Dashboard page model."""
   # pylint: disable=abstract-method
 
-  def __init__(self, driver):
+  def __init__(self, driver=None):
     super(AdminDashboard, self).__init__(driver)

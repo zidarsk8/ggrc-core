@@ -5,9 +5,10 @@
 
 from lib import base, exception
 from lib.constants import locator, objects
+from lib.constants.element import AdminWidgetEvents
 from lib.entities.entities_factory import PeopleFactory
 from lib.page.widget import widget_base
-from lib.utils import selenium_utils
+from lib.utils import date_utils, selenium_utils, string_utils
 
 
 class Widget(base.Widget):
@@ -22,13 +23,81 @@ class Events(Widget):
     super(Events, self).__init__(driver)
     self.widget_header = base.Label(driver, self._locators.TREE_VIEW_HEADER)
 
-  def get_events(self):
-    """Get list of elements that displayed in Tree View on Event widget."""
-    selenium_utils.get_when_clickable(
-        self._driver, self._locators.FIRST_TREE_VIEW_ITEM)
-    self._browser.elements(class_name="event-owner")[0].element(
-        class_name="person-name").wait_until(lambda e: "@" in e.text)
-    return self._driver.find_elements(*self._locators.TREE_VIEW_ITEMS)
+  def _wait_to_be_init(self):
+    """Wait when all rows will be visible and ppl emails will be loaded into
+    last row.
+    """
+    selenium_utils.wait_for_js_to_load(self._driver)
+    selenium_utils.get_when_all_visible(
+        self._driver, self._locators.TREE_VIEW_ITEMS_W_PPL)
+
+  @property
+  def events_raw(self):
+    """Returns list of strings that displayed in Tree View on Event widget."""
+    self._wait_to_be_init()
+    events = self._browser.elements(css=self._locators.TREE_VIEW_ITEMS)
+    return [event.text for event in events]
+
+  @property
+  def events(self):
+    """Returns parsed list of dicts for event log records."""
+    return [self.parse_event(event_str) for event_str in self.events_raw]
+
+  @staticmethod
+  def parse_event(event_str, is_strict=False):
+    """Returns parsed event string row based on event regular expression as
+    dict of matched groups. If string doesn't match
+    regular expression tries to parse 2nd time w/o action in case
+    :parameter is_strict = False. Return None for unsuccessful parsing.
+    """
+    def parse_time(value):
+      """Parse string value for "time" to datetime."""
+      value["time"] = date_utils.ui_str_with_zone_to_datetime(value["time"])
+
+    parsed_value = string_utils.parse_str_by_reg_exp(
+        event_str, AdminWidgetEvents.TREE_VIEW_ROW_REGEXP, True)
+    # to workaround migration events and parse them w/o action
+    if not parsed_value and is_strict:
+      return parsed_value
+    if parsed_value:
+      parse_time(parsed_value)
+      return parsed_value
+    parsed_value = string_utils.parse_str_by_reg_exp(
+        event_str,
+        AdminWidgetEvents.TREE_VIEW_ROW_REGEXP_WO_ACTION, True)
+    parse_time(parsed_value)
+    return parsed_value
+
+  @property
+  def event_datetimes(self):
+    """Get list of datetimes for events on the page of Events widget."""
+    return [event["time"] for event in self.events]
+
+  @property
+  def paging_buttons(self):
+    """Get navigation buttons on the tab."""
+    self._wait_to_be_init()
+    return self._browser.element(id="events_list").elements(
+        class_name="view-more-paging")
+
+  def _get_btn_by_name(self, btn_name):
+    """Returns buttons by provided name, otherwise None."""
+    return next(btn for btn in self.paging_buttons if btn.text == btn_name)
+
+  def _go_to_page(self, btn_name):
+    """Find navigation button by name on click if such button exists
+    otherwise raise an AttributeError exception.
+    """
+    self._get_btn_by_name(btn_name).click()
+    return self
+
+  def go_to_next_page(self):
+    """Go to next page."""
+    return self._go_to_page("NEXT PAGE")
+
+  def go_to_prev_page(self):
+    """Go to previous page."""
+    return self._go_to_page("PREVIOUS PAGE")
 
 
 class People(Widget):
