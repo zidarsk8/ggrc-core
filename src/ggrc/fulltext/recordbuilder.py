@@ -153,7 +153,8 @@ class RecordBuilder(object):
       if cad.attribute_type == "Map:Person":
         # pylint: disable=protected-access
         if cav and cav.attribute_object_id is not None and \
-           cav._attribute_object_attr is not None:
+                cav._attribute_object_attr is not None and \
+                cav.attribute_object is not None:
           properties[attribute_name] = self.build_person_subprops(
               cav.attribute_object
           )

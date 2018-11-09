@@ -134,7 +134,7 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
     """
     try:
       return getattr(self, self._attribute_object_attr)
-    except:
+    except:  # pylint: disable=bare-except
       return None
 
   @attribute_object.setter
