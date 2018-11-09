@@ -141,20 +141,6 @@ class RecordBuilder(object):
     content = ":".join(sorted(emails))
     return {"__sort__": content}
 
-  def get_custom_attribute_properties(self, definition, value):
-    """Get property value in case of indexing CA
-    """
-    # The name of the attribute property needs to be unique for each object,
-    # the value comes from the custom_attribute_value
-    attribute_name = definition.title
-    properties = {}
-    if value and definition.attribute_type == "Map:Person":
-      properties[attribute_name] = self.build_person_subprops(value)
-      properties[attribute_name].update(self.build_list_sort_subprop([value]))
-    else:
-      properties[attribute_name] = {"": definition.get_indexed_value(value)}
-    return properties
-
   def _get_cav_properties(self, obj):
     """Return cav properties for sent object."""
     if not isinstance(obj, CustomAttributable):
