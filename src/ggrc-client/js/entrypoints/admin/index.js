@@ -5,14 +5,7 @@
 
 import '../commons';
 
-// Controllers
-import '../../controllers/tree/tree-loader';
-import '../../controllers/tree/tree-view';
-import '../../controllers/tree/tree-view-node';
-import '../../controllers/tree/list_view_controller';
-
 // Modules and Apps
-import '../../pbc/workflow_controller';
 import '../../apps/business_objects';
 
 // Components

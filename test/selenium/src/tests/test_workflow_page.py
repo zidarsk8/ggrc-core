@@ -7,12 +7,15 @@ import datetime
 
 import pytest
 
-from lib import base
+from lib import base, users
+from lib.constants import roles
 from lib.entities import (
     app_entity_factory, ui_dict_convert, cycle_entity_creation)
 from lib.page.widget import workflow_tabs, object_modal, object_page
+from lib.rest_facades import (
+    object_rest_facade, person_rest_facade, workflow_rest_facade)
 from lib.ui import workflow_ui_facade, ui_facade
-from lib.utils import test_utils, date_utils
+from lib.utils import test_utils, date_utils, ui_utils
 
 
 class TestCreateWorkflow(base.Test):
@@ -40,6 +43,7 @@ class TestCreateWorkflow(base.Test):
     """Test that creation of workflow via UI corrects a correct object."""
     # pylint: disable=invalid-name
     actual_workflow = ui_facade.get_obj(workflow)
+    test_utils.set_unknown_attrs_to_none(actual_workflow)
     test_utils.obj_assert(actual_workflow, workflow)
 
   def test_task_group_created_after_workflow_ui_creation(
@@ -50,6 +54,57 @@ class TestCreateWorkflow(base.Test):
     actual_task_groups = workflow_ui_facade.task_group_objs(
         workflow)
     test_utils.list_obj_assert(actual_task_groups, workflow.task_groups)
+
+
+class TestWorkflowInfoPage(base.Test):
+  """Test workflow Info page."""
+
+  @pytest.fixture(params=[roles.CREATOR, roles.READER])
+  def creator_or_reader(self, request):
+    """Returns a user with a global role."""
+    person = person_rest_facade.create_person_with_role(
+        role_name=request.param)
+    users.set_current_person(person)
+
+  @pytest.mark.parametrize("member_role", [roles.CREATOR, roles.READER])
+  def test_read_workflow_as_member(self, member_role, selenium):
+    """Test opening workflow as workflow member."""
+    wf_member = person_rest_facade.create_person_with_role(
+        role_name=member_role)
+    workflow = workflow_rest_facade.create_workflow(wf_members=[wf_member])
+    object_rest_facade.set_attrs_via_get(workflow.modified_by, ["email"])
+    users.set_current_person(wf_member)
+    actual_workflow = ui_facade.get_obj(workflow)
+    test_utils.obj_assert(actual_workflow, workflow)
+
+  def test_edit_workflow(self, creator_or_reader, app_workflow, selenium):
+    """Test editing workflow."""
+    new_title = "[EDITED]" + app_workflow.title
+    ui_facade.edit_obj(app_workflow, title=new_title)
+    app_workflow.title = new_title
+    actual_workflow = ui_facade.get_obj(app_workflow)
+    object_rest_facade.set_attrs_via_get(app_workflow, ["updated_at"])
+    test_utils.obj_assert(actual_workflow, app_workflow)
+
+  def test_delete_workflow(self, creator_or_reader, app_workflow, selenium):
+    """Test deletion of workflow."""
+    ui_facade.delete_obj(app_workflow)
+    ui_facade.open_obj(app_workflow)
+    assert ui_utils.is_error_404()
+
+  def test_destructive_archive_workflow(
+      self, creator_or_reader, activated_repeat_on_workflow, selenium
+  ):
+    """Test archiving of workflow.
+    This test is marked as destructive as different users can't edit different
+    objects in parallel (GGRC-6305).
+    """
+    # pylint: disable=invalid-name
+    workflow_ui_facade.archive_workflow(activated_repeat_on_workflow)
+    actual_workflow = ui_facade.get_obj(activated_repeat_on_workflow)
+    object_rest_facade.set_attrs_via_get(
+        activated_repeat_on_workflow, ["updated_at"])
+    test_utils.obj_assert(actual_workflow, activated_repeat_on_workflow)
 
 
 class TestWorkflowSetupTab(base.Test):
@@ -129,13 +184,17 @@ class TestActivateWorkflow(base.Test):
         app_workflow)
     test_utils.list_obj_assert(workflow_cycles, [expected_workflow_cycle])
 
+
+class TestActiveCyclesTab(base.Test):
+  """Test Active Cycles tab."""
+
   @pytest.mark.xfail(reason="Fails in CI, not sure why")
   def test_map_obj_to_cycle_task(
-      self, activate_workflow, app_workflow, app_control, selenium
+      self, activated_workflow, app_control, selenium
   ):
     """Test mapping of obj to a cycle task."""
     cycle_task = cycle_entity_creation.create_workflow_cycle(
-        app_workflow).cycle_task_groups[0].cycle_tasks[0]
+        activated_workflow).cycle_task_groups[0].cycle_tasks[0]
     workflow_ui_facade.map_obj_to_cycle_task(
         obj=app_control, cycle_task=cycle_task)
     selenium.refresh()  # reload page to check mapping is saved

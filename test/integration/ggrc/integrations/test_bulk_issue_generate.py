@@ -2,11 +2,17 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Test bulk issuetracker synchronization."""
+import unittest
+
 import ddt
 import mock
 
+from flask import g
+
 from ggrc import db
-from ggrc.access_control import role
+from ggrc import views
+from ggrc.app import app
+
 from ggrc.integrations import integrations_errors, issuetracker_bulk_sync
 from ggrc.integrations.synchronization_jobs import sync_utils
 from ggrc.models import all_models, inflector
@@ -43,10 +49,9 @@ class TestBulkIssuesSync(TestCase):
     """
     with factories.single_commit():
       audit = factories.AuditFactory()
-      factories.AccessControlListFactory(
-          object=audit,
-          ac_role=role.get_ac_roles_for(audit.type)["Audit Captains"],
-          person=self.role_people["Audit Captains"],
+      audit.add_person_with_role_name(
+          self.role_people["Audit Captains"],
+          "Audit Captains",
       )
       factories.IssueTrackerIssueFactory(
           enabled=enabled,
@@ -64,10 +69,9 @@ class TestBulkIssuesSync(TestCase):
         asmnt = factories.AssessmentFactory(audit=audit)
         factories.RelationshipFactory(source=audit, destination=asmnt)
         for role_name in ["Creators", "Assignees", "Verifiers"]:
-          factories.AccessControlListFactory(
-              object=asmnt,
-              ac_role=role.get_ac_roles_for(asmnt.type)[role_name],
-              person=self.role_people[role_name],
+          asmnt.add_person_with_role_name(
+              self.role_people[role_name],
+              role_name,
           )
         factories.IssueTrackerIssueFactory(
             enabled=enabled,
@@ -220,6 +224,7 @@ class TestBulkIssuesSync(TestCase):
       self.assertEqual(issue.title, None)
 
 
+@ddt.ddt
 class TestBulkIssuesGenerate(TestBulkIssuesSync):
   """Test bulk issues generation."""
 
@@ -245,6 +250,36 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
     result_ids = [issue.id for issue in result]
     self.assertEqual(set(issue_ids_enabled), set(result_ids))
 
+  @ddt.data(
+      ("IssueTrackerBulkCreator", "background_generate_issues"),
+      ("IssueTrackerBulkUpdater", "background_update_issues"),
+  )
+  @ddt.unpack
+  def test_issue_generate_call(self, class_name, func_name):
+    """Test generate_issue call creates task for bulk generate."""
+    user = all_models.Person.query.filter_by(email="user@example.com").one()
+    setattr(g, '_current_user', user)
+    _, assessment_ids = self.setup_assessments(3)
+
+    data = {
+        "objects": [{
+            "type": "Assessment",
+            "id": id_,
+        } for id_ in assessment_ids],
+    }
+
+    response = app.make_response(("success", 200, ))
+    func_addr = ("ggrc.integrations.issuetracker_bulk_sync." +
+                 class_name + ".sync_issuetracker")
+    with mock.patch(func_addr, return_value=response) as generate_mock:
+      callable_func = getattr(views, func_name)
+      result = callable_func(data)
+
+    self.assert200(result)
+    bg_task = all_models.BackgroundTask.query.one()
+    self.assertEqual(bg_task.status, "Success")
+    generate_mock.assert_called_once()
+
   def test_asmnt_bulk_generate(self):
     """Test bulk generation of issues for Assessments."""
     _, assessment_ids = self.setup_assessments(3)
@@ -256,6 +291,7 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
     self.assertEqual(response.json.get("errors"), [])
     self.assert_obj_issues(asmnt_issuetracker_info, "assignees@example.com")
 
+  @unittest.skip("Not implemented.")
   def test_permission_check(self):
     """Test generation if user has rights on part of objects."""
     _, assessment_ids = self.setup_assessments(3)
@@ -265,12 +301,8 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
 
     with factories.single_commit():
       for id_ in with_rights_ids:
-        factories.AccessControlListFactory(
-            object_id=id_,
-            object_type="Assessment",
-            ac_role_id=role.get_ac_roles_for("Assessment")["Creators"].id,
-            person_id=assignee_user.id,
-        )
+        assessment = all_models.Assessment.query.get(id_)
+        assessment.add_person_with_role_name(assignee_user, "Creators")
 
     self.api.set_user(assignee_user)
 
@@ -301,15 +333,12 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
       for _ in range(3):
         issue = factories.IssueFactory(modified_by=person)
         for role_name in ["Admin", "Primary Contacts"]:
-          factories.AccessControlListFactory(
-              object=issue,
-              ac_role=role.get_ac_roles_for(issue.type)[role_name],
-              person=person,
-          )
+          issue.add_person_with_role_name(person, role_name)
         factories.IssueTrackerIssueFactory(
             enabled=True,
             issue_tracked_obj=issue,
             issue_id=None,
+            title='',
             component_id=12345,
             hotlist_id=54321,
             issue_priority="P2",
@@ -431,23 +460,22 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
     norights_asmnt_ids = assessment_ids[1:]
     _, assignee_user = self.gen.generate_person(user_role="Creator")
 
+    audit_role = factories.AccessControlRoleFactory(
+        name="Edit Role",
+        object_type="Audit",
+        update=True
+    )
     with factories.single_commit():
-      factories.AccessControlListFactory(
-          object_id=changed_asmnt_id,
-          object_type="Assessment",
-          ac_role_id=role.get_ac_roles_for("Assessment")["Creators"].id,
-          person_id=assignee_user.id,
-      )
-      audit_role = factories.AccessControlRoleFactory(
-          name="Edit Role",
-          object_type="Audit",
-          update=True
-      )
-      factories.AccessControlListFactory(
+      assessment = all_models.Assessment.query.get(changed_asmnt_id)
+      assessment.add_person_with_role_name(assignee_user, "Creators")
+      acl = factories.AccessControlListFactory(
           object_id=audit_id,
           object_type="Audit",
           ac_role_id=audit_role.id,
-          person_id=assignee_user.id,
+      )
+      factories.AccessControlPersonFactory(
+          person=assignee_user,
+          ac_list=acl,
       )
 
     self.api.set_user(assignee_user)
@@ -489,6 +517,55 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
         all_models.IssuetrackerIssue.issue_id.isnot(None)
     )
     self.assertEqual(query.count(), 0)
+
+  def test_related_assessments(self):
+    """Assessment with empty issuetracker_issue should be synced"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=audit,
+          issue_id=None,
+          component_id=12345,
+          hotlist_id=54321,
+          issue_priority="P2",
+          issue_severity="S2",
+      )
+      assess1 = factories.AssessmentFactory(audit=audit)
+      assess1_id = assess1.id
+      assess2 = factories.AssessmentFactory(audit=audit)
+      assess2_id = assess2.id
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=assess2,
+          issue_id=None,
+          component_id=9999,
+          hotlist_id=7777,
+          issue_priority="P1",
+          issue_severity="S1",
+      )
+
+    self.assertIsNone(assess1.issuetracker_issue)
+    response = self.generate_children_issues_for(
+        audit.type, audit.id, assess1.type
+    )
+    self.assert200(response)
+    self.assertEqual(response.json.get("errors"), [])
+    assess1 = all_models.Assessment.query.get(assess1_id)
+    self.assertIsNotNone(
+        assess1.issuetracker_issue,
+        "issuetracker_issue was not created for assessment {}".format(
+            assess1.id
+        )
+    )
+    self.assertEqual("12345", assess1.issuetracker_issue.component_id)
+    self.assertEqual("54321", assess1.issuetracker_issue.hotlist_id)
+    self.assertEqual("P2", assess1.issuetracker_issue.issue_priority)
+    self.assertEqual("S2", assess1.issuetracker_issue.issue_severity)
+    assess2 = all_models.Assessment.query.get(assess2_id)
+
+    self.assertEqual("9999", assess2.issuetracker_issue.component_id)
+    self.assertEqual("7777", assess2.issuetracker_issue.hotlist_id)
+    self.assertEqual("P1", assess2.issuetracker_issue.issue_priority)
+    self.assertEqual("S1", assess2.issuetracker_issue.issue_severity)
 
   def test_bg_operation_status(self):
     """Test background operation status endpoint."""
@@ -630,6 +707,7 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
     )
 
 
+@ddt.ddt
 class TestBulkIssuesUpdate(TestBulkIssuesSync):
   """Test bulk issues update."""
 
@@ -643,12 +721,12 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
     )
     for issue in issues:
       issue.enabled = 1
-      issue.title = "test title"
+      issue.title = ""
       issue.component_id = "1"
       issue.hotlist_id = "1"
-      issue.issue_type = "test tipe"
-      issue.issue_priority = "P1"
-      issue.issue_severity = "S1"
+      issue.issue_type = "BUG"
+      issue.issue_priority = "P2"
+      issue.issue_severity = "S2"
       issue.assignee = "test@example.com"
       issue.cc_list = ""
       issue.issue_id = 123
@@ -661,7 +739,7 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
     response = self.update_issues_for(asmnt_issuetracker_info)
     self.assert200(response)
     self.assertEqual(response.json.get("errors"), [])
-    self.assert_obj_issues(asmnt_issuetracker_info, "assignees@example.com")
+    self.assert_obj_issues(asmnt_issuetracker_info)
 
   def test_issue_bulk_generate(self):
     """Test bulk update of issues for Issues."""
@@ -673,6 +751,7 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
             enabled=True,
             issue_tracked_obj=issue,
             issue_id=self.issue_id,
+            title="",
             component_id=12345,
             hotlist_id=54321,
             issue_priority="P2",
@@ -682,15 +761,10 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
 
     with factories.single_commit():
       person = factories.PersonFactory()
-      person_email = person.email
       for issue in all_models.Issue.query.all():
         issue.modified_by = person
         for role_name in ["Admin", "Primary Contacts"]:
-          factories.AccessControlListFactory(
-              object=issue,
-              ac_role=role.get_ac_roles_for(issue.type)[role_name],
-              person=person,
-          )
+          issue.add_person_with_role_name(person, role_name)
 
     # Verify that IssueTracker issues hasn't updated data
     issues = all_models.IssuetrackerIssue.query.filter(
@@ -717,7 +791,6 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
     for issue in issues:
       parent_obj = issue.Issue_issue_tracked
       self.assertEqual(issue.title, parent_obj.title)
-      self.assertEqual(issue.assignee, person_email)
       self.assertEqual(issue.cc_list, "")
 
   def test_rate_limited_update(self):
@@ -751,3 +824,32 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
     self.assertEqual(response.json.get("errors"), expected_errors)
     # 10 times for each assessment
     self.assertEqual(update_issue_mock.call_count, 30)
+
+  @ddt.data("Issue", "Assessment")
+  def test_get_issue_json(self, model):
+    """Test get_issue_json method issue's update"""
+    with factories.single_commit():
+      factory = factories.get_model_factory(model)
+      obj = factory()
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=obj,
+          title='title',
+          component_id=111,
+          hotlist_id=222,
+          issue_type="BUG",
+          issue_priority="P2",
+          issue_severity="S2",
+      )
+    expected_result = {
+        'component_id': 111,
+        'severity': u'S2',
+        'title': u'title',
+        'hotlist_ids': [222],
+        'priority': u'P2',
+        'type': u'BUG'
+    }
+    updater = issuetracker_bulk_sync.IssueTrackerBulkUpdater()
+    # pylint: disable=protected-access
+    result = updater._get_issue_json(obj)
+    self.assertEqual(expected_result, result)

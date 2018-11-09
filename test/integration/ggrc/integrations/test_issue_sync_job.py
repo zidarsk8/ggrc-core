@@ -85,20 +85,14 @@ class TestIssueIntegration(ggrc.TestCase):
         issue_tracked_obj=factories.IssueFactory(status="Draft")
     )
 
-    # Add Admin into issue.
-    factories.AccessControlListFactory(
-        ac_role=self.admin_role,
-        object=iti.issue_tracked_obj,
-        person=self.verifier
+    iti.issue_tracked_obj.add_person_with_role(
+        self.verifier,
+        self.admin_role
     )
-
-    # Add primary contact into issue.
-    factories.AccessControlListFactory(
-        ac_role=self.primary_contact_role,
-        object=iti.issue_tracked_obj,
-        person=self.assignee,
+    iti.issue_tracked_obj.add_person_with_role(
+        self.assignee,
+        self.primary_contact_role
     )
-
     return iti
 
   def test_sync_verifier_email(self):
@@ -131,7 +125,7 @@ class TestIssueIntegration(ggrc.TestCase):
       admin_emails = [
           person.email for person in issue.get_persons_for_rolename("Admin")
       ]
-      self.assertListEqual(
+      self.assertItemsEqual(
           admin_emails,
           [new_verifier.email, ]
       )
@@ -140,7 +134,7 @@ class TestIssueIntegration(ggrc.TestCase):
           person.email
           for person in issue.get_persons_for_rolename("Primary Contacts")
       ]
-      self.assertListEqual(primary_contacts_emails, [self.assignee.email])
+      self.assertItemsEqual(primary_contacts_emails, [self.assignee.email])
 
   def test_sync_assignee_email(self):
     """Test adding new assignee email into Issue ACL."""
@@ -173,14 +167,14 @@ class TestIssueIntegration(ggrc.TestCase):
       admin_emails = [
           person.email for person in issue.get_persons_for_rolename("Admin")
       ]
-      self.assertListEqual(admin_emails, [self.verifier.email, ])
+      self.assertItemsEqual(admin_emails, [self.verifier.email, ])
 
       # Check changed primary contacts
       primary_contacts_emails = [
           person.email
           for person in issue.get_persons_for_rolename("Primary Contacts")
       ]
-      self.assertListEqual(
+      self.assertItemsEqual(
           primary_contacts_emails,
           [new_assignee.email, ]
       )
@@ -254,10 +248,9 @@ class TestIssueIntegration(ggrc.TestCase):
     self.verifier.name = "A" + self.verifier.name
     second_verifier.name = "B" + second_verifier.name
 
-    factories.AccessControlListFactory(
-        ac_role=self.admin_role,
-        object=iti.issue_tracked_obj,
-        person=second_verifier
+    iti.issue_tracked_obj.add_person_with_role(
+        second_verifier,
+        self.admin_role,
     )
 
     # Add more primary contacts into issue.
@@ -266,10 +259,9 @@ class TestIssueIntegration(ggrc.TestCase):
     self.assignee.name = "A" + self.assignee.name
     second_assignee.name = "B" + second_assignee.name
 
-    factories.AccessControlListFactory(
-        ac_role=self.primary_contact_role,
-        object=iti.issue_tracked_obj,
-        person=second_assignee
+    iti.issue_tracked_obj.add_person_with_role(
+        second_assignee,
+        self.primary_contact_role,
     )
 
     batches = [
@@ -297,7 +289,7 @@ class TestIssueIntegration(ggrc.TestCase):
       admin_emails = [
           person.email for person in issue.get_persons_for_rolename("Admin")
       ]
-      self.assertListEqual(
+      self.assertItemsEqual(
           admin_emails,
           [second_verifier.email, new_verifier.email, ]
       )
@@ -307,7 +299,7 @@ class TestIssueIntegration(ggrc.TestCase):
           person.email
           for person in issue.get_persons_for_rolename("Primary Contacts")
       ]
-      self.assertListEqual(
+      self.assertItemsEqual(
           primary_contacts_emails,
           [second_assignee.email, new_assignee.email, ]
       )

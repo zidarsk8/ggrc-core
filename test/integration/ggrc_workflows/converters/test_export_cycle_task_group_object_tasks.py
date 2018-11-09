@@ -40,14 +40,8 @@ class TestExportTasks(TestCase):
             name="user for group {}".format(idx)
         )
         task = factories.CycleTaskFactory()
-        ct_roles = all_models.AccessControlRole.query.filter(
-            all_models.AccessControlRole.name.in_(
-                ("Task Assignees", "Task Secondary Assignees")),
-            all_models.AccessControlRole.object_type == task.type,
-        )
-        for role in ct_roles:
-          ggrc_factories.AccessControlListFactory(
-              ac_role=role, object=task, person=person)
+        for role_name in ("Task Assignees", "Task Secondary Assignees"):
+          task.add_person_with_role_name(person, role_name)
         results.append(task.id)
     return results
 
@@ -90,8 +84,8 @@ class TestExportTasks(TestCase):
           all_models.AccessControlRole.name == "Task Assignees",
           all_models.AccessControlRole.object_type == task.type,
       ).one()
-      assignees = [i.person for i in task.access_control_list
-                   if i.ac_role_id == role.id]
+      assignees = [person for person, acl in task.access_control_list
+                   if acl.ac_role_id == role.id]
       self.assertEqual(1, len(assignees))
       self.assert_slugs("task assignees", assignees[0].email, [task.slug])
       self.assert_slugs("task assignees", assignees[0].name, [task.slug])
@@ -109,8 +103,8 @@ class TestExportTasks(TestCase):
           all_models.AccessControlRole.name == "Task Secondary Assignees",
           all_models.AccessControlRole.object_type == task.type,
       ).one()
-      s_assignees = [i.person for i in task.access_control_list
-                     if i.ac_role_id == role.id]
+      s_assignees = [person for person, acl in task.access_control_list
+                     if acl.ac_role_id == role.id]
       self.assertEqual(1, len(s_assignees))
       self.assert_slugs("task secondary assignees",
                         s_assignees[0].email, [task.slug])

@@ -7,7 +7,7 @@ import Stub from '../../models/stub';
 
 /*
   This component is for quickly updating the properties of an object through form fields.
-  It works similar to GGRC.Controllers.QuickForm but has an extra feature: if the instance
+  It works similar to QuickForm controller but has an extra feature: if the instance
   we're working with is a join object, and the option type is changed, it will work around
   the lack of support in proxy mappers for join objects being changed like that, and
   destroy the join object while creating a new one.
@@ -54,7 +54,7 @@ export default can.Component.extend({
         });
       });
     },
-    // null-if-empty attributes are a pattern carried over from GGRC.Controllers.Modals
+    // null-if-empty attributes are a pattern carried over from Modals controller
     // Useful for connected objects.
     'input[null-if-empty] change': function (el) {
       if (!el.val()) {

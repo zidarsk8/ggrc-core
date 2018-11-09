@@ -38,10 +38,10 @@ let mappings = {
       'task_group_objects'),
   },
   TaskGroupTask: {
-    _related: ['Workflow'],
+    _related: ['Person', 'Workflow'],
   },
   Workflow: {
-    _related: ['TaskGroup', 'TaskGroupTask'],
+    _related: ['Person', 'TaskGroup', 'TaskGroupTask'],
   },
   CycleTaskGroupObjectTask: {
     _canonical: {
@@ -52,6 +52,7 @@ let mappings = {
       // collection. The result of the operation is the total list.
       related_objects_as_source: _workflowObjectTypes.concat('Audit'),
     },
+    _related: ['Person'],
     // Needed for related_objects mapper
     related_objects_as_source: Proxy(
       null,
@@ -69,16 +70,11 @@ let mappings = {
       ['related_objects_as_source', 'related_objects_as_destination']
     ),
     /**
-     * "cycle", "cycle_task_entries" mappers are needed for mapped
-     * comments and objects under CycleTaskGroupObjectTask into
-     * mapping-tree-view component.
+     * "cycle" mapper is needed for mapped objects under
+     * CycleTaskGroupObjectTask into mapping-tree-view component.
      */
     cycle: Direct(
       'Cycle', 'cycle_task_group_object_tasks', 'cycle'),
-    cycle_task_entries: Direct(
-      'CycleTaskEntry',
-      'cycle_task_group_object_task',
-      'cycle_task_entries'),
     /**
      * This mapping name is needed for objects mapped to CTGOT.
      * It helps to filter results of objects mapped to CTGOT.
@@ -89,7 +85,6 @@ let mappings = {
       function (relatedObjects) {
         return !_.includes([
           'CycleTaskGroup',
-          'CycleTaskEntry',
           'Comment',
           'Document',
           'Person',
@@ -100,12 +95,4 @@ let mappings = {
   },
 };
 
-// Insert `workflows` mappings to all business object types
-can.each(_workflowObjectTypes, function (type) {
-  mappings[type] = {
-    _canonical: {
-      task_groups: 'TaskGroup',
-    },
-  };
-});
 new Mappings('ggrc_workflows', mappings);

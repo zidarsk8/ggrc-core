@@ -2,19 +2,32 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Roleable model"""
+
+import logging
 from collections import defaultdict
+from collections import namedtuple
 from sqlalchemy import and_
 from sqlalchemy import orm
+from sqlalchemy import inspect
 from sqlalchemy.orm import remote
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.ext.hybrid import hybrid_property
+from cached_property import cached_property
+from werkzeug.exceptions import BadRequest
+
 
 from ggrc import db
 from ggrc.access_control.list import AccessControlList
 from ggrc.access_control import role
 from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc.models import reflection
-from ggrc.utils.referenced_objects import get
+from ggrc import utils
+from ggrc.utils import errors
+from ggrc.utils import referenced_objects
+
+logger = logging.getLogger(__name__)
+
+
+AclRecord = namedtuple("AclRecord", "person, acl_item")
 
 
 class Roleable(object):
@@ -24,12 +37,28 @@ class Roleable(object):
   control list includes a list of AccessControlList objects.
   """
 
-  _update_raw = _include_links = ['access_control_list', ]
+  # pylint: disable=not-an-iterable
+  # this pylint disable rule is here because of multiple usages of
+  # _access_control_list in this file which gives off a false warning.
+
+  _update_raw = ['access_control_list', ]
   _fulltext_attrs = [CustomRoleAttr('access_control_list'), ]
   _api_attrs = reflection.ApiAttributes(
       reflection.Attribute('access_control_list', True, True, True))
   MAX_ASSIGNEE_NUM = 1
   MAX_VERIFIER_NUM = 1
+
+  _custom_publish = {
+      'access_control_list': lambda obj: obj.acl_json,
+  }
+
+  def __init__(self, *args, **kwargs):
+    for ac_role in role.get_ac_roles_for(self.type).values():
+      AccessControlList(
+          object=self,
+          ac_role=ac_role,
+      )
+    super(Roleable, self).__init__(*args, **kwargs)
 
   @declared_attr
   def _access_control_list(cls):  # pylint: disable=no-self-argument
@@ -45,9 +74,25 @@ class Roleable(object):
         backref='{0}_object'.format(cls.__name__),
         cascade='all, delete-orphan')
 
-  @hybrid_property
+  @property
   def access_control_list(self):
-    return self._access_control_list
+    return [
+        AclRecord(acp.person, acp.ac_list)
+        for acl in self._access_control_list
+        for acp in acl.access_control_people
+    ]
+
+  @cached_property
+  def acr_acl_map(self):
+    return {acl.ac_role: acl for acl in self._access_control_list}
+
+  @cached_property
+  def acr_name_acl_map(self):
+    return {acl.ac_role.name: acl for acl in self._access_control_list}
+
+  @cached_property
+  def acr_id_acl_map(self):
+    return {acl.ac_role.id: acl for acl in self._access_control_list}
 
   @access_control_list.setter
   def access_control_list(self, values):
@@ -60,106 +105,37 @@ class Roleable(object):
     if values is None:
       return
 
-    new_values = self._parse_values(values)
-    old_values = self._get_old_values()
-    self._remove_values(old_values - new_values)
-    self._add_values(new_values - old_values)
-
-  def extend_access_control_list(self, values):
-    """Extend access control list.
-
-    Args:
-        values: List of access control roles or dicts containing json
-        representation of custom attribute values.
-    """
-    if values is None:
-      return
-
-    new_values = self._parse_values(values)
-    old_values = self._get_old_values()
-    self._add_values(new_values - old_values)
-
-  def _get_old_values(self):
-    """Return Set of tuples (Role, Person)"""
-    return {(acl.ac_role, acl.person) for acl in self.access_control_list}
-
-  @staticmethod
-  def _parse_values(values):
-    """ Parse list of (ac_role, user) in form of:
-    e.g
-    [{
-        "ac_role_id": admin_role_id,
-        "person": {
-            "id": user_id
-        }
-    }]
-    or
-    [{
-        "ac_role": AccessControlRole(),
-        "person": Person()
-    }]
-
-    Return set of tuples(AccessControlRole, Person)"""
-
-    result = set()
+    new_acl_people_map = defaultdict(set)
     for value in values:
-      if ("ac_role_id" in value and
-              "person" in value and "id" in value["person"]):
-        result.add((get("AccessControlRole", value["ac_role_id"]),
-                    get("Person", value["person"]["id"])))
-      elif "ac_role" in value and "person" in value:
-        result.add((value["ac_role"], value["person"]))
-      else:
-        raise ValueError("Unknown values format")
+      if value["ac_role_id"] not in self.acr_id_acl_map:
+        raise BadRequest(errors.BAD_PARAMS)
+      person = referenced_objects.get("Person", value["person"]["id"])
+      acl = self.acr_id_acl_map[value["ac_role_id"]]
+      new_acl_people_map[acl].add(person)
 
-    return result
-
-  def _add_values(self, values):
-    """Attach new custom role values to current object."""
-    for ac_role, person in values:
-      AccessControlList(
-          object=self,
-          person=person,
-          ac_role=ac_role
-      )
-
-  def _remove_values(self, values):
-    """Remove custom role values from current object."""
-    val_map = {(acl.ac_role, acl.person): acl
-               for acl in self.access_control_list}
-    for value in values:
-      self._access_control_list.remove(val_map[value])
+    for acl in self._access_control_list:
+      acl.update_people(new_acl_people_map[acl])
 
   @classmethod
   def eager_query(cls):
     """Eager Query"""
     query = super(Roleable, cls).eager_query()
-    return cls.eager_inclusions(
-        query,
-        Roleable._include_links
-    ).options(
-        orm.subqueryload(
-            '_access_control_list'
-        ).joinedload(
-            "person"
-        ).undefer_group(
-            'Person_complete'
-        ),
-        orm.subqueryload(
-            '_access_control_list'
-        ).joinedload(
-            "person"
-        ).subqueryload(
-            "contexts"
-        ).undefer_group(
-            'Context_complete'
-        ),
+    return query.options(
         orm.subqueryload(
             '_access_control_list'
         ).joinedload(
             "ac_role"
         ).undefer_group(
             'AccessControlRole_complete'
+        ),
+        orm.subqueryload(
+            '_access_control_list'
+        ).joinedload(
+            "access_control_people"
+        ).joinedload(
+            "person"
+        ).undefer_group(
+            'Person_complete'
         ),
     )
 
@@ -169,59 +145,81 @@ class Roleable(object):
     query = super(Roleable, cls).indexed_query()
     return query.options(
         orm.subqueryload(
-            "_access_control_list"
-        ).load_only(
-            "id",
-            "person_id",
-            "ac_role_id",
-        ),
-        orm.subqueryload(
-            '_access_control_list'
-        ).joinedload(
-            "person"
-        ).load_only(
-            "id", "name", "email"
-        ),
-        orm.subqueryload(
             '_access_control_list'
         ).joinedload(
             "ac_role"
         ).load_only(
             "id", "name", "object_type", "internal"
         ),
+        orm.subqueryload(
+            '_access_control_list'
+        ).joinedload(
+            "access_control_people"
+        ).joinedload(
+            "person"
+        ).load_only(
+            "id", "name", "email"
+        ),
     )
+
+  @property
+  def acl_json(self):
+    """Get json representation of access_control_list.
+
+    This function is a hack to preserve backwards compatibility with old
+    revision logs.
+    """
+    acl_json = []
+    for person, acl in self.access_control_list:
+      person_entry = acl.log_json()
+      person_entry["person"] = utils.create_stub(person)
+      person_entry["person_email"] = person.email
+      person_entry["person_id"] = person.id
+      person_entry["person_name"] = person.name
+      acl_json.append(person_entry)
+    return acl_json
 
   def log_json(self):
     """Log custom attribute values."""
     # pylint: disable=not-an-iterable
     res = super(Roleable, self).log_json()
-    res["access_control_list"] = [
-        value.log_json() for value in self.access_control_list]
+    res["access_control_list"] = self.acl_json
     return res
 
   def get_persons_for_rolename(self, role_name):
     """Return list of persons that are valid for send role_name."""
-    for role_id, name in role.get_custom_roles_for(self.type).iteritems():
-      if name != role_name:
-        continue
-      return [i.person for i in self.access_control_list
-              if i.ac_role_id == role_id]
-    return []
+    return [
+        acp.person
+        for acp in self.acr_name_acl_map[role_name].access_control_people
+    ]
 
   def get_person_ids_for_rolename(self, role_name):
     """Return list of persons that are valid for send role_name."""
-    for role_id, name in role.get_custom_roles_for(self.type).iteritems():
-      if name != role_name:
-        continue
-      # TODO: use ac_role_id as temporary solution until GGRC-3784 implemented
-      return [i.person.id for i in self.access_control_list
-              if (i.ac_role and i.ac_role.id == role_id) or
-              (i.ac_role_id and i.ac_role_id == role_id)]
-    return []
+    if role_name not in self.acr_name_acl_map:
+      # This will be removed
+      return []
+    acps = self.acr_name_acl_map[role_name].access_control_people
+    return [acp.person.id for acp in acps]
+
+  def has_acl_changes(self):
+    """Check if the object has had any acl changes in the session.
+
+    Since access_control_list is now a normal property it no longer stores any
+    history info that is needed for notifications. This helper function is
+    meant to replace history check on access_control_list property.
+
+    Returns:
+      boolean flag signifying if there are any access control people changes
+      in the current session.
+    """
+    return any(
+        inspect(acl).attrs["access_control_people"].history.has_changes()
+        for acl in self._access_control_list
+    )
 
   def validate_acl(self):
     """Check correctness of access_control_list."""
-    for acl in self.access_control_list:
+    for _, acl in self.access_control_list:
       if acl.object_type != acl.ac_role.object_type:
         raise ValueError(
             "Access control list has different object_type '{}' with "
@@ -238,9 +236,11 @@ class Roleable(object):
     Args:
       _import: if True than function return list of errors for 'add_error'
     """
-    errors = []
+    # This can now be fully refactored due to ACP, I am leaving this for the
+    # end though.
+    validation_errors = []
     count_roles = defaultdict(int)
-    for acl in self.access_control_list:
+    for _, acl in self.access_control_list:
       count_roles[acl.ac_role.name] += 1
 
     for _role in count_roles.keys():
@@ -250,8 +250,49 @@ class Roleable(object):
         message = "{} role must have only {} person(s) assigned".format(_role,
                                                                         _max)
         if _import:
-          errors.append((_role, message))
+          validation_errors.append((_role, message))
         else:
           raise ValueError(message)
     if _import:
-      return errors
+      return validation_errors
+    return None
+
+  def add_person_with_role(self, person, ac_role):
+    """Add a person to ACL object with a given role."""
+    acl = self.acr_acl_map.get(ac_role)
+    if not acl:
+      logger.warning(
+          "Trying to add invalid ac_role '%s' with id %s to %s(%s)",
+          getattr(ac_role, "name", None),
+          getattr(ac_role, "id", None),
+          self.type,
+          self.id,
+      )
+      return
+    acl.add_person(person)
+
+  def add_person_with_role_id(self, person, ac_role_id):
+    """Add a person to ACL object with a given role id."""
+    acl = self.acr_id_acl_map.get(ac_role_id)
+    if not acl:
+      logger.warning(
+          "Trying to add invalid role by id %s to %s(%s)",
+          ac_role_id,
+          self.type,
+          self.id,
+      )
+      return
+    acl.add_person(person)
+
+  def add_person_with_role_name(self, person, ac_role_name):
+    """Add a person to ACL object with a given role name."""
+    acl = self.acr_name_acl_map.get(ac_role_name)
+    if not acl:
+      logger.warning(
+          "Trying to add invalid role by name %s to %s(%s)",
+          ac_role_name,
+          self.type,
+          self.id,
+      )
+      return
+    acl.add_person(person)

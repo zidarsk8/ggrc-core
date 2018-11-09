@@ -65,7 +65,7 @@ class AuditRBACFactory(base.BaseRBACFactory):
     """Clone existing Audit with Assessment Templates."""
     return self.api.post(all_models.Audit, {
         "audit": {
-            "program": {"id": self.program_id},
+            "program": {"id": self.program_id, "type": "Program"},
             "context": None,
             "operation": "clone",
             "cloneOptions": {
@@ -101,11 +101,14 @@ class AuditRBACFactory(base.BaseRBACFactory):
     """Map new snapshot of Control to Audit."""
     with factories.single_commit():
       control = factories.ControlFactory()
-      factories.AccessControlListFactory(
-          ac_role_id=self.admin_control_id,
-          object_id=control.id,
-          object_type="Control",
-          person_id=self.user_id
+      acl = [
+          acl
+          for acl in control._access_control_list
+          if acl.ac_role_id == self.admin_control_id
+      ][0]
+      factories.AccessControlPersonFactory(
+          person_id=self.user_id,
+          ac_list=acl
       )
     audit = all_models.Audit.query.get(self.audit_id)
 

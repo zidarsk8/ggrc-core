@@ -189,7 +189,7 @@ viewModel = can.Map.extend({
    */
   limitDepthTree: 0,
   /**
-   * Legacy options which were built for a previous implementation of TreeView based on CMS.Controllers.TreeView
+   * Legacy options which were built for a previous implementation of TreeView based on TreeView controller
    */
   options: {},
   $el: null,

@@ -11,6 +11,7 @@ This resource works with the following queries:
     - optional: order_by=field_name,(asc|desc),[field_name,(asc|desc)]
 """
 
+import logging
 from collections import defaultdict
 
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -28,6 +29,9 @@ from ggrc.rbac import permissions
 from ggrc.services import common
 from ggrc.query import pagination
 from ggrc.query.exceptions import BadQueryException
+
+
+logger = logging.getLogger(__name__)
 
 
 class RelatedAssessmentsResource(common.Resource):
@@ -62,10 +66,17 @@ class RelatedAssessmentsResource(common.Resource):
         raise Forbidden()
       acl = models.all_models.AccessControlList
       acr = models.all_models.AccessControlRole
-      ids_query = db.session.query(acl.object_id).join(acr).filter(
+      acp = models.all_models.AccessControlPerson
+      ids_query = db.session.query(
+          acl.object_id
+      ).join(
+          acr
+      ).join(
+          acp
+      ).filter(
           acr.read == 1,
           acl.object_type == "Assessment",
-          acl.person_id == get_current_user_id(),
+          acp.person_id == get_current_user_id(),
           acl.object_id.in_(ids_query),
       )
 
@@ -359,10 +370,11 @@ class RelatedAssessmentsResource(common.Resource):
 
           return self.json_success_response(response_object, )
 
-      except (ValueError, TypeError, AttributeError, BadQueryException):
+      except (ValueError, TypeError, AttributeError, BadQueryException) as err:
         # Type Error and Value Error are for invalid integer values,
         # Attribute error is for invalid models passed, which return None type
         # that does not have query attribute.
         # Bad query exception is for invalid parameters for limit such as
         # negative numbers.
+        logger.exception(err)
         raise BadRequest()

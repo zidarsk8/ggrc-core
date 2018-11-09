@@ -39,7 +39,7 @@ class TestExport(TestCase):
     }
     extr_comment = factories.CommentFactory(description="bad_desc")
     extr_assessment = factories.AssessmentFactory()
-    db.engine.execute(
+    db.session.execute(
         'update assessments set '
         'updated_at = "2010-10-10", '
         'created_at = "2010-10-10";'
@@ -53,6 +53,13 @@ class TestExport(TestCase):
     )
     self.rel = factories.RelationshipFactory(source=self.comment,
                                              destination=self.assessment)
+
+  # pylint: disable=too-many-arguments
+  def assert_filter_by_datetime(self, alias, datetime_value, slugs,
+                                formats=None, operator=None):
+    """Assert slugs for each date format ent datetime"""
+    for date_string in self.generate_date_strings(datetime_value, formats):
+      self.assert_slugs(alias, date_string, slugs, operator)
 
   def test_search_by_comment(self):
     self.assert_slugs("comment",

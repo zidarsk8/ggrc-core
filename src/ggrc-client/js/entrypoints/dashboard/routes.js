@@ -8,10 +8,6 @@ const routes = [
     template: ':widget',
     defaults: {},
   },
-  {
-    template: ':widget/:infoPaneType/:infoPaneId',
-    defaults: {},
-  },
 ];
 
 export default routes;

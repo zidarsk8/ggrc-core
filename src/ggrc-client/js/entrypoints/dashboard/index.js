@@ -9,7 +9,6 @@ import '../commons';
 import '../../controllers/dashboard_controller';
 
 // Modules and Apps
-import '../../pbc/workflow_controller';
 import '../../apps/business_objects';
 
 // Components

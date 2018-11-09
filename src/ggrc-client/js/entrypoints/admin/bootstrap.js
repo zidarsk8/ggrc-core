@@ -18,6 +18,8 @@ import AccessControlRole from '../../models/custom-roles/access-control-role';
 import Roleable from '../../models/custom-roles/roleable';
 import Person from '../../models/business-models/person';
 import WidgetList from '../../modules/widget_list';
+import ListView from '../../controllers/tree/list_view_controller';
+import TreeView from '../../controllers/tree/tree-view';
 
 const path = GGRC.mustache_path || '/static/mustache';
 const HEADER_VIEW = `${path}/base_objects/page_header.mustache`;
@@ -96,7 +98,6 @@ const adminListDescriptors = {
       show_view:
       GGRC.mustache_path +
       '/custom_attribute_definitions/subtree.mustache',
-      footer_view: null,
       add_item_view: null,
     }],
   },
@@ -117,7 +118,6 @@ const adminListDescriptors = {
       mapping: 'access_control_roles',
       show_view:
       GGRC.mustache_path + '/access_control_roles/subtree.mustache',
-      footer_view: null,
       add_item_view: null,
     }],
   },
@@ -127,7 +127,7 @@ new WidgetList('ggrc_admin', {
   admin: {
     people: {
       model: Person,
-      content_controller: GGRC.Controllers.ListView,
+      content_controller: ListView,
       content_controller_options: adminListDescriptors.people,
       widget_id: 'people_list',
       widget_icon: 'person',
@@ -141,7 +141,7 @@ new WidgetList('ggrc_admin', {
     },
     roles: {
       model: Role,
-      content_controller: GGRC.Controllers.ListView,
+      content_controller: ListView,
       content_controller_options: adminListDescriptors.roles,
       widget_id: 'roles_list',
       widget_icon: 'role',
@@ -155,7 +155,7 @@ new WidgetList('ggrc_admin', {
     },
     events: {
       model: Event,
-      content_controller: GGRC.Controllers.ListView,
+      content_controller: ListView,
       content_controller_options: adminListDescriptors.events,
       widget_id: 'events_list',
       widget_icon: 'event',
@@ -170,7 +170,7 @@ new WidgetList('ggrc_admin', {
       widget_id: 'custom_attribute',
       widget_name: 'Custom Attributes',
       widget_icon: 'workflow',
-      content_controller: CMS.Controllers.TreeView,
+      content_controller: TreeView,
       content_controller_selector: 'ul',
       model: CustomAttributable,
       widget_initial_content:
@@ -184,7 +184,7 @@ new WidgetList('ggrc_admin', {
       widget_id: 'custom_roles',
       widget_name: 'Custom Roles',
       widget_icon: 'unlock',
-      content_controller: CMS.Controllers.TreeView,
+      content_controller: TreeView,
       content_controller_selector: 'ul',
       content_controller_options: adminListDescriptors.custom_roles,
       model: Roleable,

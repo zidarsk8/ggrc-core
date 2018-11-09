@@ -97,9 +97,9 @@ class TestCase(BaseTestCase, object):
   def get_persons_for_role_name(self, obj, role_name):
     """Generator. Return persons releated to sent instance and role_name."""
     role_id = self.get_role_id_for_obj(obj, role_name)
-    for acl in obj.access_control_list:
+    for person, acl in obj.access_control_list:
       if acl.ac_role_id == role_id:
-        yield acl.person
+        yield person
 
   @contextlib.contextmanager
   def custom_headers(self, headers=None):
@@ -442,13 +442,6 @@ class TestCase(BaseTestCase, object):
     for f_string in formats:
       yield f_string.format(**kwargs)
 
-  # pylint: disable=too-many-arguments
-  def assert_filter_by_datetime(self, alias, datetime_value, slugs,
-                                formats=None, operator=None):
-    """Assert slugs for each date format ent datetime"""
-    for date_string in self.generate_date_strings(datetime_value, formats):
-      self.assert_slugs(alias, date_string, slugs, operator)
-
   @staticmethod
   def _get_latest_object_revisions(objects):
     """Get latest revisions of given objects."""
@@ -490,7 +483,7 @@ class TestCase(BaseTestCase, object):
   def assert_roles(self, obj, **roles):
     """Assert if persons have required role for object"""
     acl_person_roles = [
-        (acl.ac_role.name, acl.person) for acl in obj.access_control_list
+        (acl.ac_role.name, person) for person, acl in obj.access_control_list
     ]
     for role, person in roles.items():
       self.assertTrue((role, person) in acl_person_roles)
@@ -514,21 +507,15 @@ class TestCase(BaseTestCase, object):
     Returns:
       [(person, acr_role), ...] A list of persons with their roles.
     """
-    from ggrc.access_control.role import get_custom_roles_for
-    ac_roles = {
-        acr_name: acr_id
-        for acr_id, acr_name in get_custom_roles_for(obj.type).items()
-    }
     assignees = []
     with factories.single_commit():
       for person, roles in persons:
         person = factories.PersonFactory(email=person)
 
         for role in roles.split(","):
-          factories.AccessControlListFactory(
+          factories.AccessControlPersonFactory(
+              ac_list=obj.acr_name_acl_map[role],
               person=person,
-              ac_role_id=ac_roles[role],
-              object=obj
           )
           assignees.append((person, role))
     return assignees

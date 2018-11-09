@@ -34,7 +34,6 @@ export default can.Component.extend({
       },
     },
     relatedInstance: {},
-    snapshots: [],
   },
   events: {
     refreshIssueList: function (window, event, instance) {

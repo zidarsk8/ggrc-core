@@ -11,7 +11,7 @@ import Requirement from '../../models/business-models/requirement';
 import Assessment from '../../models/business-models/assessment';
 import Objective from '../../models/business-models/objective';
 
-describe('CMS.Controllers.InnerNav', function () {
+describe('InnerNav Controller', function () {
   'use strict';
 
   describe('sortWidgets() method', function () {

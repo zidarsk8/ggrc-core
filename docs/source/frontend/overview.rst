@@ -313,7 +313,7 @@ But these templates are the main templates from which the majority of
 the UI is created.
 
 -  ``info.mustache`` - Defines the “Info” widget on each object’s page.
-    Defined per-widget in GGRC.Controllers.InfoWidget as the
+    Defined per-widget in InfoWidget controller as the
    ``widget_view`` option, and specified using ``WidgetList``
    definitions.
 -  ``extended_info.mustache`` - Defines the content of an object’s

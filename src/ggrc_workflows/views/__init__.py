@@ -31,6 +31,7 @@ logger = getLogger(__name__)
 
 
 def get_user_task_count():
+  """Optimized function for fetching current user task count."""
   with benchmark("Get user task count RAW"):
     current_user = get_current_user()
 
@@ -46,8 +47,6 @@ def get_user_task_count():
             CycleTaskGroupObjectTask.__name__,
             all_models.AccessControlList.object_id ==
             CycleTaskGroupObjectTask.id,
-            all_models.AccessControlList.person_id ==
-            current_user.id
         ),
     ).join(
         all_models.AccessControlRole,
@@ -58,6 +57,14 @@ def get_user_task_count():
             CycleTaskGroupObjectTask.__name__,
             all_models.AccessControlRole.name.in_(
                 ("Task Assignees", "Task Secondary Assignees")),
+        )
+    ).join(
+        all_models.AccessControlPerson,
+        sa.and_(
+            all_models.AccessControlList.id ==
+            all_models.AccessControlPerson.ac_list_id,
+            all_models.AccessControlPerson.person_id ==
+            current_user.id,
         )
     ).filter(
         CycleTaskGroupObjectTask.status.in_(

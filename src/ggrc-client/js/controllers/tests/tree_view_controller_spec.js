@@ -3,17 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../tree/tree-loader';
-import '../tree/tree-view';
+import Ctrl from '../tree/tree-view';
 
-describe('CMS.Controllers.TreeView', function () {
+describe('TreeView Controller', function () {
   'use strict';
-
-  let Ctrl; // the controller under test
-
-  beforeAll(function () {
-    Ctrl = CMS.Controllers.TreeView;
-  });
 
   describe('{original_list} remove event handler', function () {
     let ctrlInst; // fake controller instance

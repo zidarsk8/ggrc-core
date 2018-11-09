@@ -27,12 +27,21 @@ def current_user():
   return _current_user
 
 
+def set_current_person(person):
+  """Set user as the current `app_entity.Person`."""
+  user = entity.PersonEntity(
+      id=person.obj_id, name=person.name, email=person.email,
+      system_wide_role=person.global_role_name)
+  set_current_user(user)
+
+
 def current_person():
   """Gets current person (app_entity)."""
   from lib.entities import app_entity_factory
   user = current_user()
   return app_entity_factory.PersonFactory().create_empty(
-      obj_id=user.id, name=user.name, email=user.email)
+      obj_id=user.id, name=user.name, email=user.email,
+      global_role_name=user.system_wide_role)
 
 
 def set_current_logged_in_user(track, user):
