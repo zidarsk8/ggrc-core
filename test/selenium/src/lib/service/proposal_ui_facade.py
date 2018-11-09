@@ -79,3 +79,11 @@ def assert_proposal_notification_connects_to_obj(
   base.Test.general_equal_assert(
       copy.deepcopy(obj).repr_ui(), actual_obj,
       "modified_by", *Representation.tree_view_attrs_to_exclude)
+
+
+def assert_proposal_comparison_window_has_correct_info(
+    selenium, obj, proposal
+):
+  """Check if proposal comparison window has correct info."""
+  proposal_ui_service.ProposalsService(
+      selenium).assert_objs_diff_corresponds_to_proposal(obj, proposal)

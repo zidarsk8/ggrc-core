@@ -100,9 +100,12 @@ class BaseWebUiService(object):
     """Submits object modal with `obj`."""
     object_modal.get_modal_obj(obj.type, self.driver).submit_obj(obj)
 
-  def build_obj_from_page(self):
+  def build_obj_from_page(self, root_elem=None):
     """Builds obj from opened page."""
-    info_page = self.info_widget_cls(self.driver)
+    info_page = (
+        self.info_widget_cls(self.driver, root_elem) if
+        self.info_widget_cls.__name__ == objects.CONTROLS.title() else
+        self.info_widget_cls(self.driver))
     scope = info_page.get_info_widget_obj_scope()
     return self._create_list_objs(
         entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
