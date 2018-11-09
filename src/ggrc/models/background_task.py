@@ -264,7 +264,7 @@ def _enqueue_task(name, url, bg_task=None, queued_callback=None,
       logger.warning(error)
       if bg_task:
         bg_task.status = "Failure"
-    if not getattr(settings, "PROD_APPSERVER", False):
+    if not getattr(settings, "CLOUD_APPSERVER", False):
       # On local SDK development appserver we need to wait result to
       # enqueue task. In Google Cloud async adding tasks works properly.
       queue_task.get_result()

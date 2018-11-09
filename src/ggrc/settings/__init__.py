@@ -49,7 +49,8 @@ ABOUT_TEXT = os.environ.get("GGRC_ABOUT_TEXT")
 EXTERNAL_HELP_URL = os.environ.get("GGRC_EXTERNAL_HELP_URL")
 EXTERNAL_IMPORT_HELP_URL = os.environ.get("GGRC_EXTERNAL_IMPORT_HELP_URL")
 SERVER_SOFTWARE = os.environ.get('SERVER_SOFTWARE', '')
-PROD_APPSERVER = SERVER_SOFTWARE.startswith('Google App Engine/')
+# whether the code is running in production or in the local development server
+CLOUD_APPSERVER = SERVER_SOFTWARE.startswith('Google App Engine/')
 
 if len(SETTINGS_MODULE.strip()) == 0:
   raise RuntimeError("Specify your settings using the `GGRC_SETTINGS_MODULE` "
