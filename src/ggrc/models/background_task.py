@@ -248,7 +248,8 @@ def _enqueue_task(name, url, bg_task=None, queued_callback=None,
   if getattr(settings, "APP_ENGINE", False):
     from google.appengine.api import taskqueue
     headers = collect_task_headers()
-    headers.add("X-Task-Name", name)
+    if bg_task:
+      headers.add("X-Task-Name", bg_task.name)
     try:
       task = taskqueue.Task(
           url=url,
