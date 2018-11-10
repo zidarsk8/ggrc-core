@@ -83,3 +83,10 @@ class TreeItem(object):
   def select(self):
     """Clicks tree item to open info panel."""
     self._root.element(class_name="selectable-attrs").click()
+
+  @property
+  def is_expanded(self):
+    """Returns whether the row is expanded."""
+    actions_el = self._root.element(tag_name="tree-item-actions")
+    js_script = "return $(arguments[0]).viewModel().expanded"
+    return actions_el.execute_script(js_script, actions_el) is True

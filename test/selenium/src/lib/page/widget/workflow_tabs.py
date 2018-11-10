@@ -34,6 +34,11 @@ class ActiveCyclesTab(object_page.ObjectPage):
       workflow_cycles.append(workflow_cycle_row.build_obj_with_tree())
     return workflow_cycles
 
+  def start_cycle_task(self, cycle_task):
+    """Starts the cycle task."""
+    cycle_task_row = self._expand_to_cycle_task(cycle_task)
+    cycle_task_row.start()
+
   def map_obj_to_cycle_task(self, obj, cycle_task):
     """Maps object to the cycle task."""
     cycle_task_panel = self._open_cycle_task_panel(cycle_task)
@@ -47,20 +52,26 @@ class ActiveCyclesTab(object_page.ObjectPage):
 
   def _open_cycle_task_panel(self, cycle_task):
     """Opens Cycle task panel."""
-    cycle_task_group = cycle_task.cycle_task_group
-    workflow_cycle = cycle_task_group.workflow_cycle
-    # Cycles of `Repeat On` workflow have different `Due Date`s
-    workflow_row = self._tree_widget.get_workflow_cycle_row_by(
-        due_date=workflow_cycle.due_date)
-    workflow_row.expand()
-    task_group_row = workflow_row.get_cycle_task_group_row_by(
-        title=cycle_task_group.title)
-    task_group_row.expand()
-    task_row = task_group_row.get_cycle_task_row_by(title=cycle_task.title)
-    task_row.select()
+    cycle_task_row = self._expand_to_cycle_task(cycle_task)
+    cycle_task_row.select()
     cycle_task_panel = internal_ui_operations.info_widget_page(cycle_task)
     cycle_task_panel.wait_to_be_init()
     return cycle_task_panel
+
+  def _expand_to_cycle_task(self, cycle_task):
+    """Expands the tree to see cycle task row that corresponds to `cycle_task`.
+    Returns this cycle task row.
+    """
+    cycle_task_group = cycle_task.cycle_task_group
+    workflow_cycle = cycle_task_group.workflow_cycle
+    # All workflow cycles of `Repeat On` workflow have different `Due Date`s
+    workflow_cycle_row = self._tree_widget.get_workflow_cycle_row_by(
+        due_date=workflow_cycle.due_date)
+    workflow_cycle_row.expand()
+    cycle_task_group_row = workflow_cycle_row.get_cycle_task_group_row_by(
+        title=cycle_task_group.title)
+    cycle_task_group_row.expand()
+    return cycle_task_group_row.get_cycle_task_row_by(title=cycle_task.title)
 
 
 class SetupTab(object_page.ObjectPage):
