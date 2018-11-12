@@ -106,6 +106,8 @@ class ImportConverter(BaseConverter):
     # import.
     revisions = all_models.Revision
     iti = all_models.IssuetrackerIssue
+    comments = all_models.Comment
+
     issue_tracked_objects = db.session.query(
         revisions.resource_type,
         revisions.resource_id,
@@ -130,11 +132,45 @@ class ImportConverter(BaseConverter):
 
     objects = issue_tracked_objects.union(iti_related_objects).all()
 
-    if not objects:
+    imported_comments_src = db.session.query(
+        revisions.destination_type,
+        revisions.destination_id,
+        comments.description,
+    ).join(
+        comments,
+        revisions.source_id == comments.id,
+    ).filter(
+        revisions.resource_type == "Relationship",
+        revisions.source_type == "Comment",
+        revisions.id.in_(revision_ids),
+        revisions.destination_type.in_(issuetracked_models)
+    )
+
+    imported_comments_dst = db.session.query(
+        revisions.source_type,
+        revisions.source_id,
+        comments.description,
+    ).join(
+        comments,
+        revisions.destination_id == comments.id,
+    ).filter(
+        revisions.resource_type == "Relationship",
+        revisions.destination_type == "Comment",
+        revisions.id.in_(revision_ids),
+        revisions.source_type.in_(issuetracked_models)
+    )
+    comments = imported_comments_dst.union(imported_comments_src).all()
+
+    if not (objects or comments):
       return
 
     arg_list = {
-        "objects": [{"type": obj[0], "id": int(obj[1])} for obj in objects]
+        "objects": [{"type": obj[0], "id": int(obj[1])} for obj in objects],
+        "comments": [{
+            "type": obj[0],
+            "id": int(obj[1]),
+            "comment_description": obj[2]
+        } for obj in comments]
     }
     filename = getattr(self.ie_job, "title", '')
     user_email = getattr(self.user, "email", '')
