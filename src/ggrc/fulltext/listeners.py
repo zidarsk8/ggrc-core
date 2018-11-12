@@ -14,7 +14,8 @@ from ggrc import fulltext
 from ggrc import utils
 from ggrc.models import all_models, get_model
 from ggrc.fulltext import mixin
-from ggrc.utils import benchmark, helpers
+from ggrc.models.background_task import running_in_background
+from ggrc.utils import benchmark, helpers, request_storage
 
 ACTIONS = ['after_insert', 'after_delete', 'after_update']
 
@@ -59,11 +60,24 @@ class ReindexSet(threading.local):
           continue
         if obj.id in self.model_ids_to_reindex.get(obj.type, set()):
           db.session.expire(obj)
-      for model_name in self.model_ids_to_reindex.keys():
-        ids = self.model_ids_to_reindex.pop(model_name)
-        chunk_list = utils.list_chunks(list(ids), chunk_size=self.CHUNK_SIZE)
-        for ids_chunk in chunk_list:
-          get_model(model_name).bulk_record_update_for(ids_chunk)
+      if self.model_ids_to_reindex:
+        if running_in_background():
+          update_ft_records(self.model_ids_to_reindex)
+        else:
+          reindex_ids = request_storage.get("indexing", {})
+          for model, ids in self.model_ids_to_reindex.items():
+            if model not in reindex_ids:
+              reindex_ids[model] = set()
+            reindex_ids[model].update(set(ids))
+
+
+def update_ft_records(model_ids_to_reindex):
+  with benchmark("indexing. push ft records"):
+    for model_name in model_ids_to_reindex.keys():
+      ids = model_ids_to_reindex.pop(model_name)
+      chunk_list = utils.list_chunks(list(ids), chunk_size=50)
+      for ids_chunk in chunk_list:
+        get_model(model_name).bulk_record_update_for(ids_chunk)
 
 
 def _runner(mapper, content, target):  # pylint:disable=unused-argument

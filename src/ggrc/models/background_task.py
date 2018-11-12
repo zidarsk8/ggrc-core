@@ -350,3 +350,16 @@ def queued_task(func):
     task.finish("Success", result)
     return result
   return decorated_view
+
+
+def running_in_background():
+  """Check that current request running in background task"""
+  from flask import request
+  value = False
+  try:
+    if (not hasattr(request, "current_app") or
+          request.path.startswith("/_background_tasks/")):
+      value = True  # running in BackgroundTask
+  except RuntimeError:
+    value = True  # running not in flask(deferred task)
+  return value

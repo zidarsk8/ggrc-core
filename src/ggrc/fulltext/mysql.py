@@ -13,7 +13,6 @@ from ggrc.fulltext.sql import SqlIndexer
 from ggrc.models import all_models
 from ggrc.query import my_objects
 from ggrc.rbac import permissions
-from ggrc.utils import benchmark
 
 
 # pylint: disable=too-few-public-methods
@@ -218,16 +217,6 @@ class MysqlIndexer(SqlIndexer):
 
 
 Indexer = MysqlIndexer
-
-
-@event.listens_for(db.session.__class__, 'before_commit')
-def update_indexer(session):  # pylint:disable=unused-argument
-  """General function to update index
-
-  for all updated related instance before commit"""
-  if hasattr(db.session, "reindex_set"):
-    with benchmark("Update indexer before commit"):
-      db.session.reindex_set.warmup()
 
 
 # pylint:disable=unused-argument
