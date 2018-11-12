@@ -118,7 +118,7 @@ export default can.Component.extend({
         };
       });
       vm.attr('filterStates', filterStates);
-      
+
       let defaultStates = vm.getDefaultStates();
       vm.buildSearchQuery(defaultStates);
       vm.setStatesDropdown(defaultStates);

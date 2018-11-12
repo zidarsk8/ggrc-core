@@ -25,7 +25,7 @@ const path = GGRC.mustache_path || '/static/mustache';
 const HEADER_VIEW = `${path}/base_objects/page_header.mustache`;
 
 const $area = $('.area').first();
-const sortByNameEmail = list => {
+const sortByNameEmail = (list) => {
   return new list.constructor(can.makeArray(list).sort(function (a, b) {
     a = a.person || a;
     b = b.person || b;

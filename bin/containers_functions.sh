@@ -266,7 +266,7 @@ code_style_tests () {
   echo "Running eslint"
   docker exec -i ${PROJECT}_cleandev_1 su -c "
     export PATH=\$PATH:/vagrant-dev/node_modules/.bin
-    /vagrant/bin/check_eslint_diff
+    /vagrant/bin/check_eslint
   " && eslint_rc=$? || eslint_rc=$?
 
   if [[ eslint_rc -eq 0 ]]; then

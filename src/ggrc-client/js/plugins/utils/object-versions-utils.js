@@ -28,7 +28,7 @@ function isObjectVersion(modelName) {
 /**
  * Check provided parent model name.
  * Returns true if parent model has object versions tabs
- * @param {String} modelName - model to check
+ * @param {String} parentModelName - parent model to check
  * @return {Boolean} True or False
  */
 function parentHasObjectVersions(parentModelName) {

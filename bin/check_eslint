@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# Copyright (C) 2018 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+set -o nounset
+set -o errexit
+
+# runs ESLint on the sources and extract the number of code style issues found
+function eslint_issues() {
+  ISSUES_FOUND=$(eslint --format compact src/ | tail -1 | cut -d' ' -f1)
+  if [[ -z "$ISSUES_FOUND" ]]; then
+    ISSUES_FOUND=0
+  fi
+  echo $ISSUES_FOUND
+}
+
+echo "*** Javascript code style check ***"
+
+echo "Running ESLint on the current branch... "
+N_ISSUES_PR=$(eslint_issues)
+
+if [[ "$N_ISSUES_PR" -gt 0 ]]; then
+  MSG="FAIL: The PR has $N_ISSUES_PR ESLint issues."
+  EXIT_CODE=1
+else
+  MSG="PASS: The PR has no ESLint issues."
+  EXIT_CODE=0
+fi
+
+echo $MSG
+exit $EXIT_CODE

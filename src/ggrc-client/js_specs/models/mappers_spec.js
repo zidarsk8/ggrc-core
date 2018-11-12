@@ -11,7 +11,7 @@ describe('mappers', function () {
   let LL;
   beforeEach(function () {
     LL = GGRC.ListLoaders;
-    if(!GGRC.Jasmine || !GGRC.Jasmine.MockModel) {
+    if (!GGRC.Jasmine || !GGRC.Jasmine.MockModel) {
       Cacheable('GGRC.Jasmine.MockModel', {}, {});
     }
   });
@@ -586,7 +586,7 @@ describe('mappers', function () {
               mappings: ['a', 'b'],
               remove_mapping: function (mapping) {
                 let idx = can.inArray(mapping, this.mappings);
-                if(~idx) {
+                if (~idx) {
                   this.mappings.splice(idx, 1);
                   return true;
                 }
@@ -605,7 +605,7 @@ describe('mappers', function () {
               mappings: ['a', 'b'],
               remove_mapping: function (mapping) {
                 let idx = can.inArray(mapping, this.mappings);
-                if(~idx) {
+                if (~idx) {
                   this.mappings.splice(idx, 1);
                   return true;
                 }
@@ -635,7 +635,7 @@ describe('mappers', function () {
           expect(data).toBe(binding.list);
           sanity = true;
         });
-        if(!sanity) {
+        if (!sanity) {
           fail('sanity check failed for done callback from returned promise');
         }
       });
@@ -651,7 +651,7 @@ describe('mappers', function () {
           expect(data).toBe(binding.list);
           sanity = true;
         });
-        if(!sanity) {
+        if (!sanity) {
           fail('sanity check failed for done callback from returned promise');
         }
         expect(ll._refresh_stubs).toHaveBeenCalled();
@@ -670,7 +670,7 @@ describe('mappers', function () {
           expect(data).toBe(binding.list);
           sanity = true;
         });
-        if(!sanity) {
+        if (!sanity) {
           fail('sanity check failed for done callback from returned promise');
         }
       });
@@ -686,7 +686,7 @@ describe('mappers', function () {
           expect(data).toBe(binding.list);
           sanity = true;
         });
-        if(!sanity) {
+        if (!sanity) {
           fail('sanity check failed for done callback from returned promise');
         }
         expect(ll._refresh_instances).toHaveBeenCalled();
@@ -708,7 +708,7 @@ describe('mappers', function () {
           expect(data).toEqual(['a']);
           sanity = true;
         });
-        if(!sanity) {
+        if (!sanity) {
           fail('sanity check failed for done callback from returned promise');
         }
       });

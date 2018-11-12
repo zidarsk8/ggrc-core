@@ -108,7 +108,7 @@ Code style checks
 
 The `ESLint <http://eslint.org/>`_ tool is used for checking the
 Javascript code quality. You must assure that your pull request does not
-increase the number of ESLint issues found.
+have ESLint issues found.
 
 To check the code quality of a particular file, run the following in the
 development container's console:
@@ -130,18 +130,14 @@ numbers. Sample output::
 
     ✖ 74 problems (73 errors, 1 warning)
 
-You need to resolve at least the issues in the line(s) you have
-modified, but it is strongly encouraged to also improve *all* the lines
-in every function/method you have touched.
+You need to resolve all the issues in the line(s) you have
+modified.
 
 When you submit a new pull request, a script will check how many
-Javascript code issues there are on the PR branch, and how many there
-were at the point when the PR branch was forked from the target branch
-(i.e. the *merge base*). The target branch is the one the PR will be
-sent to, usually ``develop``.
+Javascript code issues there are on the PR branch.
 
-If the issue count difference is positive, the check will fail, because
-new code should not increase the number of Javascript issues. To avoid
+If there are any issue found, the check will fail, because
+new code should not introduce Javascript issues. To avoid
 that and preemptively perform the same check locally, do the following:
 
 -   Make sure that you are currently on a branch containing the changes
@@ -153,15 +149,7 @@ that and preemptively perform the same check locally, do the following:
 
     ..  code-block:: bash
 
-        check_eslint_diff
-
-    If the PR branch was forked from (and will be sent to) a branch other
-    than ``develop``, you should specify this with a ``-t`` (or
-    ``--merge-target``) option when running the script:
-
-    ..  code-block:: bash
-
-        check_eslint_diff -t release/foo-0.0.1
+        check_eslint
 
 Running the tests
 ~~~~~~~~~~~~~~~~~
