@@ -11,6 +11,7 @@ import * as MapperUtils from '../plugins/utils/mapper-utils';
 import {
   REFRESH_MAPPING,
   REFRESH_SUB_TREE,
+  DEFERRED_MAP_OBJECTS,
 } from '../events/eventTypes';
 import {getPageInstance} from '../plugins/utils/current-page-utils';
 
@@ -193,7 +194,6 @@ export default can.Component.extend({
   events: {
     init() {
       const viewModel = this.viewModel;
-      viewModel.attr('controller', this);
       viewModel.addMappings(viewModel.attr('preMappedObjects'));
     },
     '{viewModel} mappedObjects'() {
@@ -209,8 +209,7 @@ export default can.Component.extend({
       ev.stopPropagation();
       this.viewModel.addMappings([object]);
     },
-    'defer:add'(el, ev, {arr: objects}) {
-      ev.stopPropagation();
+    [`{instance} ${DEFERRED_MAP_OBJECTS.type}`](el, {objects}) {
       this.viewModel.addMappings(objects);
     },
   },

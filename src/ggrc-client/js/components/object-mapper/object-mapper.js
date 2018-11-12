@@ -27,6 +27,7 @@ import {
   REFRESH_MAPPING,
   REFRESH_SUB_TREE,
   BEFORE_MAPPING,
+  DEFERRED_MAP_OBJECTS,
 } from '../../events/eventTypes';
 import {allowedToMap} from '../../plugins/ggrc_utils';
 import {mapObjects as mapObjectsUtil} from '../../plugins/utils/mapper-utils';
@@ -237,25 +238,18 @@ export default can.Component.extend({
       }
     },
     deferredSave: function (objects) {
-      let source = this.viewModel.attr('deferred_to').instance ||
-        this.viewModel.attr('object');
-      let data = {};
+      let source = this.viewModel.attr('deferred_to').instance;
+      const deferredObjects = objects
+        .filter((destination) => allowedToMap(source, destination))
+        .map((object) => {
+          object.isNeedRefresh = true;
+          return object;
+        });
 
-      data = {
-        arr: _.compact(_.map(
-          objects,
-          function (desination) {
-            if (allowedToMap(source, desination)) {
-              desination.isNeedRefresh = true;
-              return desination;
-            }
-          }
-        )),
-      };
-
-      // Send data to modal-connector component
-      this.viewModel.attr('deferred_to').controller.element.trigger(
-        'defer:add', [data]);
+      source.dispatch({
+        ...DEFERRED_MAP_OBJECTS,
+        objects: deferredObjects,
+      });
       this.closeModal();
     },
     '.modal-footer .btn-map click': function (el, ev) {
