@@ -119,13 +119,15 @@ export default can.Component.extend({
     createDocument: function (data) {
       let date = getFormattedUtcDate();
       let modelType = this.attr('modelType');
+      let context = modelType === 'Evidence'
+        ? this.instance.context
+        : new Context({id: null});
+
       let document = new businessModels[modelType]({
         link: data,
         title: data,
         created_at: date,
-        context: this.instance.context || new Context({
-          id: null,
-        }),
+        context,
         kind: this.kind,
       });
       return document;
