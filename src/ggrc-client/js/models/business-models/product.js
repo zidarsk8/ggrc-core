@@ -15,7 +15,7 @@ import Stub from '../stub';
 export default Cacheable('CMS.Models.Product', {
   root_object: 'product',
   root_collection: 'products',
-  category: 'business',
+  category: 'scope',
   findAll: 'GET /api/products',
   findOne: 'GET /api/products/{id}',
   create: 'POST /api/products',

@@ -15,7 +15,7 @@ import Stub from '../stub';
 export default Cacheable('CMS.Models.ProductGroup', {
   root_object: 'product_group',
   root_collection: 'product_groups',
-  category: 'business',
+  category: 'scope',
   findAll: '/api/product_groups',
   findOne: '/api/product_groups/{id}',
   create: 'POST /api/product_groups',

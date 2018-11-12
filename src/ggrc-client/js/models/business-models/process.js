@@ -21,7 +21,7 @@ export default Cacheable('CMS.Models.Process', {
   model_singular: 'Process',
   title_singular: 'Process',
   table_singular: 'process',
-  category: 'business',
+  category: 'scope',
   findAll: 'GET /api/processes',
   findOne: 'GET /api/processes/{id}',
   create: 'POST /api/processes',

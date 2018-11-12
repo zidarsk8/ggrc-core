@@ -15,7 +15,7 @@ import Stub from '../stub';
 export default Cacheable('CMS.Models.OrgGroup', {
   root_object: 'org_group',
   root_collection: 'org_groups',
-  category: 'business',
+  category: 'scope',
   findAll: 'GET /api/org_groups',
   findOne: 'GET /api/org_groups/{id}',
   create: 'POST /api/org_groups',
