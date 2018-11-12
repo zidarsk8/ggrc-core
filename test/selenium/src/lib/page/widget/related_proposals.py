@@ -35,7 +35,7 @@ class RelatedProposals(base.WithBrowser):
     """Check if proposal apply button exists."""
     return self.proposal_row(proposal).has_review_apply_btn()
 
-  def click_apply_btn(self, proposal):
+  def click_review_apply_btn(self, proposal):
     """Click on the proposal apply button."""
     self.proposal_row(proposal).click_review_apply_btn()
 
