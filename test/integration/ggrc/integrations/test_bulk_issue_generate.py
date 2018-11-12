@@ -13,6 +13,7 @@ from ggrc import db
 from ggrc import views
 from ggrc.app import app
 
+from ggrc.notifications import data_handlers
 from ggrc.integrations import integrations_errors, issuetracker_bulk_sync
 from ggrc.integrations.synchronization_jobs import sync_utils
 from ggrc.models import all_models, inflector
@@ -403,6 +404,51 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
       # 10 times for each assessment
       self.assertEqual(create_issue_mock.call_count, 30)
 
+  def test_exception_notification(self):
+    """Test notification about failed bulk update."""
+    filename = "test.csv"
+    updater = issuetracker_bulk_sync.IssueTrackerBulkUpdater()
+    with mock.patch("ggrc.notifications.common.send_email") as send_mock:
+      updater.send_notification(filename, "user@example.com", failed=True)
+
+    self.assertEqual(send_mock.call_count, 1)
+    (email, _, body), _ = send_mock.call_args_list[0]
+    self.assertEqual(email, "user@example.com")
+    self.assertIn(updater.ERROR_TITLE.format(filename=filename), body)
+    self.assertIn(updater.EXCEPTION_TEXT, body)
+
+  def test_succeeded_notification(self):
+    """Test notification about succeeded bulk generation."""
+    creator = issuetracker_bulk_sync.IssueTrackerBulkCreator()
+    filename = "test_file.csv"
+    recipient = "user@example.com"
+    with mock.patch("ggrc.notifications.common.send_email") as send_mock:
+      creator.send_notification(filename, recipient)
+
+    self.assertEqual(send_mock.call_count, 1)
+    (email, _, body), _ = send_mock.call_args_list[0]
+    self.assertEqual(email, recipient)
+    self.assertIn(creator.SUCCESS_TITLE.format(filename=filename), body)
+    self.assertIn(creator.SUCCESS_TEXT, body)
+
+  def test_error_notification(self):
+    """Test notification about bulk generation with errors"""
+    creator = issuetracker_bulk_sync.IssueTrackerBulkCreator()
+    filename = "test_file.csv"
+    recipient = "user@example.com"
+    assmt = factories.AssessmentFactory()
+
+    with mock.patch("ggrc.notifications.common.send_email") as send_mock:
+      creator.send_notification(filename, recipient, errors=[(assmt, "")])
+
+    self.assertEqual(send_mock.call_count, 1)
+    (email, _, body), _ = send_mock.call_args_list[0]
+    self.assertEqual(email, recipient)
+    self.assertIn(creator.ERROR_TITLE.format(filename=filename), body)
+    self.assertIn(assmt.slug, body)
+    self.assertIn(assmt.title, body)
+    self.assertIn(data_handlers.get_object_url(assmt), body)
+
 
 @ddt.ddt
 class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
@@ -671,7 +717,7 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
         [["Assessment", id_, "500 Test Error"] for id_ in assessment_ids]
     )
 
-  def test_err_notification(self):
+  def test_child_err_notification(self):
     """Test notification about failed bulk child generation."""
     audit_id, _ = self.setup_assessments(3)
     _, side_user = self.gen.generate_person(user_role="Creator")
@@ -688,7 +734,7 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
     self.assertEqual(title, issuetracker_bulk_sync.ISSUETRACKER_SYNC_TITLE)
     self.assertIn("There were some errors in generating tickets", body)
 
-  def test_succeeded_notification(self):
+  def test_child_notification(self):
     """Test notification about succeeded bulk child generation."""
     audit_id, _ = self.setup_assessments(3)
     with mock.patch("ggrc.notifications.common.send_email") as send_mock:
