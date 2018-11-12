@@ -51,7 +51,7 @@ class ReindexSet(threading.local):
       self.model_ids_to_reindex[type_name].add(id_value)
 
   @helpers.without_sqlalchemy_cache
-  def push_ft_records(self):
+  def indexing_hook(self):
     """Function that clear and push new full text records in DB."""
     with benchmark("push ft records into DB"):
       self.warmup()
@@ -72,7 +72,8 @@ class ReindexSet(threading.local):
 
 
 def update_ft_records(model_ids_to_reindex):
-  with benchmark("indexing. push ft records"):
+  """Update fulltext records in DB"""
+  with benchmark("indexing. update ft records in db"):
     for model_name in model_ids_to_reindex.keys():
       ids = model_ids_to_reindex.pop(model_name)
       chunk_list = utils.list_chunks(list(ids), chunk_size=50)

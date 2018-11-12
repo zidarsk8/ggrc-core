@@ -277,7 +277,7 @@ def _display_request_time():
 
 def register_indexing():
   from ggrc.models import background_task
-  from ggrc.views import bg_push_ft_records
+  from ggrc.views import bg_update_ft_records
 
   @app.after_request
   def create_indexing_bg_task(response):
@@ -286,9 +286,9 @@ def register_indexing():
       with benchmark("Create indexing bg task"):
         bg_task = background_task.create_task(
             name="indexing",
-            url=url_for(bg_push_ft_records.__name__),
+            url=url_for(bg_update_ft_records.__name__),
             parameters={"models_ids": model_ids},
-            queued_callback=bg_push_ft_records
+            queued_callback=bg_update_ft_records
         )
         db.session.expunge_all()
         db.session.add(bg_task)

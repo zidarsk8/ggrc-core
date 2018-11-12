@@ -104,7 +104,7 @@ def compute_attributes(*_, **kwargs):
 
 @app.route("/_background_tasks/indexing", methods=["POST"])
 @background_task.queued_task
-def bg_push_ft_records(task):
+def bg_update_ft_records(task):
   """Background indexing endpoint"""
   fulltext.listeners.update_ft_records(task.parameters.get("models_ids", {}))
   db.session.plain_commit()

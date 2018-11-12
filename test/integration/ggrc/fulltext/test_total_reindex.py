@@ -143,7 +143,7 @@ class TestTotalReindex(TestCase):
     for instance in query:
       db.session.reindex_set.add(instance)
     with QueryCounter() as counter:
-      db.session.reindex_set.push_ft_records()
+      db.session.reindex_set.indexing_hook()
       self.assertNotEqual(counter.get, 0)
       self.assertLessEqual(
           counter.get,
