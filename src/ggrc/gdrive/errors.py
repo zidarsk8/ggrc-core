@@ -22,6 +22,6 @@ MISSING_KEYS = (u"Unable to validate gdrive api "
 
 GOOGLE_API_MESSAGE_MAP = {
     u"The user does not have sufficient permissions for this file.":
-        (u"You do not have access to create or edit in the attach folder, "
-         u"please request edit access from folder owner.")
+        (u"You do not have access to the file, please request edit access "
+         u"from the file owner")
 }
