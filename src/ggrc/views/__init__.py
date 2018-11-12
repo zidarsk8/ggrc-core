@@ -190,8 +190,10 @@ def run_issues_update(task):
   """Update linked IssueTracker issues for provided objects."""
   try:
     from ggrc.integrations import issuetracker_bulk_sync
+    comment_updater = issuetracker_bulk_sync.IssueTrackerCommentUpdater()
     bulk_updater = issuetracker_bulk_sync.IssueTrackerBulkUpdater()
     params = getattr(task, "parameters", {})
+    comment_updater.sync_issuetracker(params)
     return bulk_updater.sync_issuetracker(params)
   except integrations_errors.Error as error:
     logger.error('Bulk issue update failed with error: %s', error.message)

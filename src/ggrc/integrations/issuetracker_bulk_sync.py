@@ -606,7 +606,7 @@ class IssueTrackerCommentUpdater(IssueTrackerBulkUpdater):
     Returns:
         flask.wrappers.Response - response with result of generation.
     """
-    objects_data = request_data.get("comments")
+    objects_data = request_data.get("comments", [])
     author = request_data.get("mail_data", {}).get("user_email", '')
     issuetracked_info = []
     with benchmark("Load issuetracked objects from database"):
@@ -614,7 +614,7 @@ class IssueTrackerCommentUpdater(IssueTrackerBulkUpdater):
       for obj_type, obj_id_info in objects_info.items():
         for obj in self.get_issuetracked_objects(obj_type,
                                                  obj_id_info.keys()):
-          for comment in obj_id_info:
+          for comment in obj_id_info[obj.id]:
             issuetracked_info.append({
                 "obj": obj,
                 "comment": comment
