@@ -196,7 +196,6 @@ class TestActivateWorkflow(base.Test):
 class TestActiveCyclesTab(base.Test):
   """Test Active Cycles tab."""
 
-  @pytest.mark.xfail(reason="Fails in CI, not sure why")
   def test_map_obj_to_cycle_task(
       self, activated_workflow, app_control, selenium
   ):
