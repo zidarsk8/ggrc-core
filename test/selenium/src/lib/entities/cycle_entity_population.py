@@ -40,6 +40,7 @@ def _create_from_task(task_group_task):
   return app_entity_factory.CycleTaskFactory().create_empty(
       title=task_group_task.title,
       state=object_states.ASSIGNED,
+      assignees=task_group_task.assignees,
       due_date=date_utils.first_working_day(task_group_task.due_date),
       task_group_task=task_group_task
   )

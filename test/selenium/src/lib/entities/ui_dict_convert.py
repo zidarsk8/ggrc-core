@@ -8,7 +8,8 @@ from lib.utils import date_utils
 def ui_to_app(obj_name, ui_dict):
   """Converts ui_dict to app_entity."""
   method_name = {
-      "workflow": workflow_ui_to_app
+      "workflow": workflow_ui_to_app,
+      "cycle_task": cycle_task_ui_to_app
   }[obj_name]
   return method_name(ui_dict)
 
@@ -47,6 +48,16 @@ def task_group_task_ui_to_app(ui_dict):
       title=ui_dict["title"],
       assignees=emails_to_app_people(ui_dict.get("assignees")),
       start_date=str_to_date(ui_dict["start_date"]),
+      due_date=str_to_date(ui_dict["due_date"])
+  )
+
+
+def cycle_task_ui_to_app(ui_dict):
+  """Converts CycleTask ui dict to App entity."""
+  return app_entity_factory.CycleTaskFactory().create_empty(
+      title=ui_dict["title"],
+      state=ui_dict["state"],
+      assignees=emails_to_app_people(ui_dict.get("assignees")),
       due_date=str_to_date(ui_dict["due_date"])
   )
 

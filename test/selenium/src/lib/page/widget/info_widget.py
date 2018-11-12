@@ -394,6 +394,11 @@ class Workflow(InfoWidget):
     """Returns whether workflow is archived."""
     return self._browser.element(class_name="state-archived").present
 
+  def archive(self):
+    """Archives the workflow."""
+    self.three_bbs.select_archive()
+    selenium_utils.wait_for_js_to_load(self._driver)
+
   @property
   def workflow_members(self):
     """Returns Workflow Members page element."""
@@ -407,7 +412,8 @@ class CycleTask(InfoWidget):
     """Returns obj scope."""
     return {
         "title": self.title(),
-        "status": self.status(),
+        "state": self.status(),
+        "assignees": self.assignees.get_people_emails(),
         "due_date": self.due_date
     }
 
@@ -442,6 +448,11 @@ class CycleTask(InfoWidget):
       factory = app_entity_factory.get_factory_by_obj_name(entity_obj_name)()
       objs.append(factory.create_empty(obj_id=obj_id, title=obj_title))
     return objs
+
+  @property
+  def assignees(self):
+    """Returns Task Assignees page element."""
+    return self._related_people_list("Task Assignees")
 
 
 class Audits(WithAssignFolder, InfoWidget):
