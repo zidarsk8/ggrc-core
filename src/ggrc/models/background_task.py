@@ -40,12 +40,8 @@ BANNED_HEADERS = {
     "X-Task-Name",
 }
 
-RETRY_OPTIONS = {
-    "min_backoff_seconds": 30,
-    "max_backoff_seconds": 3600,
-    "max_doublings": 5,
-    "task_retry_limit": 10,
-}
+RETRY_OPTIONS = settings.RETRY_OPTIONS
+DEFAULT_QUEUE = settings.DEFAULT_QUEUE
 
 
 class BackgroundTask(base.ContextRBAC, Base, Stateful, db.Model):
@@ -143,7 +139,7 @@ def collect_task_headers():
 # pylint: disable=too-many-arguments
 def create_task(name, url, queued_callback=None, parameters=None,
                 method="POST", operation_type=None, payload=None,
-                queue="ggrc", retry_options=None):
+                queue=DEFAULT_QUEUE, retry_options=None):
   """Create and enqueue a background task."""
   with benchmark("Create background task"):
     parameters = parameters or dict()
@@ -240,7 +236,7 @@ def _create_bg_task(name, parameters=None, payload=None, bg_operation=None):
 # pylint: disable=too-many-arguments
 def _enqueue_task(name, url, bg_task=None, queued_callback=None,
                   parameters=None, method="POST", payload=None,
-                  queue="ggrc", retry_options=None):
+                  queue=DEFAULT_QUEUE, retry_options=None):
   """Create task in queue if running in AppEngine,
   otherwise execute queued_callback() """
   parameters = parameters or dict()
