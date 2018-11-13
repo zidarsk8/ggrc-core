@@ -42,7 +42,7 @@ class Generator(object):
       data = {}
     response = self.api.post(obj_class, data)
     response_obj = None
-    if response.json:
+    if response.status_code == 201 and response.json:
       try:
         response_obj = obj_class.query.get(response.json[obj_name]['id'])
       except TypeError:
