@@ -30,9 +30,11 @@ class TestRelationships(workflow_test_case.WorkflowTestCase):
       task_group_task = wf_factories.TaskGroupTaskFactory(
           task_group=task_group
       )
-      wf_factories.CycleTaskFactory(cycle=cycle,
-                                    cycle_task_group=cycle_task_group,
-                                    task_group_task=task_group_task)
+      wf_factories.CycleTaskGroupObjectTaskFactory(
+          cycle=cycle,
+          cycle_task_group=cycle_task_group,
+          task_group_task=task_group_task
+      )
 
     cycle_task = all_models.CycleTaskGroupObjectTask.query.one()
     instance = getattr(all_models, model_name).query.one()

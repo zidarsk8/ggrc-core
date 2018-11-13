@@ -39,7 +39,7 @@ class TestExportTasks(TestCase):
         person = ggrc_factories.PersonFactory(
             name="user for group {}".format(idx)
         )
-        task = factories.CycleTaskFactory()
+        task = factories.CycleTaskGroupObjectTaskFactory()
         for role_name in ("Task Assignees", "Task Secondary Assignees"):
           task.add_person_with_role_name(person, role_name)
         results.append(task.id)

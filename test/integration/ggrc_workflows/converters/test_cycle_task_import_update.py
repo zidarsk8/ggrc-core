@@ -566,7 +566,7 @@ class TestCycleTaskImportUpdateAssignee(BaseTestCycleTaskImportUpdate):
   """Test cases for update assignee column on import cycle tasks"""
 
   def setUp(self):
-    self.instance = factories.CycleTaskFactory()
+    self.instance = factories.CycleTaskGroupObjectTaskFactory()
     self.assignee = ggrc_factories.PersonFactory()
     self.s_assignee = ggrc_factories.PersonFactory()
     self.query = CycleTaskGroupObjectTask.query.filter(

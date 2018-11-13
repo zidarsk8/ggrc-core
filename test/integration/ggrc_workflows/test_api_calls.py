@@ -72,7 +72,7 @@ class TestStatusApiPost(TestCase):
           cycle=self.cycle,
           context=self.cycle.workflow.context
       )
-      self.task = wf_factories.CycleTaskFactory(
+      self.task = wf_factories.CycleTaskGroupObjectTaskFactory(
           cycle=self.cycle,
           cycle_task_group=self.group,
           context=self.cycle.workflow.context
