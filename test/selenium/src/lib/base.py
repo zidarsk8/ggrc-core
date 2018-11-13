@@ -357,7 +357,7 @@ class DropdownAutocomplete(Element):
     """Selects autocomplete dropdown element based on element value."""
     self.element.click()
     selenium_utils.get_when_visible(self._driver, (
-        By.CSS_SELECTOR, "label[value={}]".format(
+        By.CSS_SELECTOR, "div[value={}]".format(
             value_name))).click()
 
 
