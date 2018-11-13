@@ -5,12 +5,10 @@
 
 """Tests wf data_handler module."""
 import mock
-
-from integration.ggrc import TestCase
-
 from ggrc import db
 from ggrc.models.revision import Revision
 from ggrc_workflows.notification.data_handler import get_cycle_task_dict
+from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 from integration.ggrc_workflows.models import factories as wf_factories
 

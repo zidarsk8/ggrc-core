@@ -35,7 +35,7 @@ DENY_VERIFIED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "
 
 
 class BaseTestCycleTaskImportUpdate(TestCase):
-
+  """Base class for CycleTask imports"""
   @staticmethod
   def generate_expected_warning(*columns):
     return {

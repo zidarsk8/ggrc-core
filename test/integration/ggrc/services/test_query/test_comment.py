@@ -24,16 +24,16 @@ class TestCommentQueries(TestCase):
     """Check ordering for comment"""
     with factories.single_commit():
       cgot = wf_factories.CycleTaskGroupObjectTaskFactory()
-      c1 = factories.CommentFactory(
+      comment1 = factories.CommentFactory(
           description="comment 1",
           created_at=datetime.datetime(2017, 1, 1, 7, 31, 32)
       )
-      c2 = factories.CommentFactory(
+      comment2 = factories.CommentFactory(
           description="comment 2",
           created_at=datetime.datetime(2017, 1, 1, 7, 31, 42)
       )
-      factories.RelationshipFactory(source=c1, destination=cgot)
-      factories.RelationshipFactory(source=c2, destination=cgot)
+      factories.RelationshipFactory(source=comment1, destination=cgot)
+      factories.RelationshipFactory(source=comment2, destination=cgot)
 
     query_request_data = [
         {
