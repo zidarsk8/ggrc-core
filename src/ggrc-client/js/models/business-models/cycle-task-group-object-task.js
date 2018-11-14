@@ -200,6 +200,12 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
         }
 
         ctg.dispatch(REFRESH_SUB_TREE);
+
+        // All set's status is dependant on newly created Cycle Task,
+        // thus needs to refresh all after new CT was created.
+        // Example: Cycle, Cycle Task Group and Cycle Task are
+        // in FINISHED state, create new CT: Cycle, CTG should
+        // change status to In Progress.
         instance.refresh_all_force('cycle_task_group', 'cycle', 'workflow');
       }
     });
