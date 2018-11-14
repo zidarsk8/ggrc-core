@@ -129,6 +129,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "issue_severity": issue_tracker.IssueTrackerWithValidStates,
     "issue_title": issue_tracker.IssueTrackerTitleColumnHandler,
     "issue_type": issue_tracker.IssueTrackerWithValidStates,
+    "enabled": issue_tracker.IssueTrackerEnabledHandler,
 
     # Mapping column handlers
     "__mapping__:person": handlers.PersonMappingColumnHandler,
