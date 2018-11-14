@@ -56,8 +56,9 @@ class Reviewable(rest_handable.WithPutHandable,
 
   @builder.simple_property
   def reviewers(self):
+    """Return list of reviewer persons"""
     if self.review:
-      return self.review.access_control_list
+      return self.review.get_persons_for_rolename('Reviewer')
     return []
 
   @builder.simple_property

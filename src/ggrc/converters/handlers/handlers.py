@@ -969,6 +969,7 @@ class LabelsHandler(ColumnHandler):
 
 
 class ExportOnlyColumnHandler(ColumnHandler):
+  """Only on export column handler base class"""
 
   def __init__(self, *args, **kwargs):
     kwargs["view_only"] = True
@@ -1012,6 +1013,7 @@ class ExportOnlyIssueTrackerColumnHandler(ExportOnlyColumnHandler):
 
 
 class ReviewersColumnHandler(ExportOnlyColumnHandler):
+  """Only on export handler for Reviewers column"""
 
   def get_value(self):
     reviewers = self.row_converter.obj.reviewers
@@ -1019,5 +1021,5 @@ class ReviewersColumnHandler(ExportOnlyColumnHandler):
       return ''
 
     return '\n'.join(sorted(
-      reviewer.person.email for reviewer in reviewers
+        reviewer.email for reviewer in reviewers
     ))

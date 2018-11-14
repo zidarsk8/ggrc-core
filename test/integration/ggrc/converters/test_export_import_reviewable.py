@@ -3,9 +3,10 @@
 
 """Tests export reviewable."""
 import collections
-from integration.ggrc import TestCase
+
 from ggrc.models import all_models
 
+from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
 
@@ -17,31 +18,21 @@ class TestExportReviewable(TestCase):
     super(TestExportReviewable, self).setUp()
 
     with factories.single_commit():
-        role = factories.AccessControlRoleFactory(
-            object_type="Review",
-        )
-        person1 = factories.PersonFactory()
-        self.person1_email = person1.email
-        person2 = factories.PersonFactory()
-        self.person2_email = person2.email
-        control = factories.ControlFactory(title="Test control")
-        review = factories.ReviewFactory(reviewable=control)
+      person1 = factories.PersonFactory()
+      self.person1_email = person1.email
+      person2 = factories.PersonFactory()
+      self.person2_email = person2.email
+      control = factories.ControlFactory(title="Test control")
+      review = factories.ReviewFactory(reviewable=control)
 
-        factories.AccessControlListFactory(
-            ac_role_id=role.id,
-            person=person1,
-            object=review,
-        )
-        factories.AccessControlListFactory(
-            ac_role_id=role.id,
-            person=person2,
-            object=review,
-        )
+      review.add_person_with_role_name(person1, 'Reviewer')
+      review.add_person_with_role_name(person2, 'Reviewer')
 
     self.client.get("/login")
 
   def test_simple_export(self):
-    """Reviewable should contain Review State and Reviewers in exported csv and nothing"""
+    """Reviewable should contain Review State and Reviewers
+    in exported csv and nothing"""
 
     data = [
         {
@@ -63,7 +54,9 @@ class TestExportReviewable(TestCase):
 
   # pylint: disable=invalid-name
   def test_simple_export_not_reviewable(self):
-    """NON Reviewable should NOT contain Review State and Reviewers in exported csv"""
+    """NON Reviewable should NOT contain Review State and Reviewers
+    in exported csv"""
+
     factories.AuditFactory(title="Test audit")
     data = [
         {
@@ -90,7 +83,7 @@ class TestImportReviewable(TestCase):
     super(TestImportReviewable, self).setUp()
     self.client.get("/login")
 
-  def test_import_reviewable_not_imported(self):
+  def test_import_reviewable(self):
     """Review State and Reviewers should be non imported."""
 
     control = factories.ControlFactory()
