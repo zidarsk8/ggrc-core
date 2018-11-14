@@ -1,8 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Rows of tree widgets on workflow tabs."""
-
-from lib.entities import app_entity_factory
+from lib.app_entity_factory import workflow_entity_factory
 from lib.page.widget import tree_widget, table_with_headers
 from lib.utils import date_utils, test_utils, ui_utils
 
@@ -55,7 +54,7 @@ class WorkflowCycleRow(tree_widget.TreeItem):
     cycle_task_groups = [cycle_task_group_row.build_obj_with_tasks()
                          for cycle_task_group_row
                          in self.cycle_task_group_rows()]
-    return app_entity_factory.WorkflowCycleFactory().create_empty(
+    return workflow_entity_factory.WorkflowCycleFactory().create_empty(
         title=obj_dict["title"],
         state=obj_dict["state"],
         due_date=obj_dict["due_date"],
@@ -109,7 +108,7 @@ class _CycleTaskGroupRow(_BaseCycleSubRow):
     """
     cycle_tasks = [cycle_task_row.build_obj()
                    for cycle_task_row in self.cycle_task_rows()]
-    return app_entity_factory.CycleTaskGroupFactory().create_empty(
+    return workflow_entity_factory.CycleTaskGroupFactory().create_empty(
         title=self.title,
         state=self.state,
         cycle_tasks=cycle_tasks
@@ -126,7 +125,7 @@ class _CycleTaskRow(_BaseCycleSubRow):
 
   def build_obj(self):
     """Builds an object from a CycleTask entity object."""
-    return app_entity_factory.CycleTaskFactory().create_empty(
+    return workflow_entity_factory.CycleTaskFactory().create_empty(
         title=self.title,
         state=self.state,
         due_date=date_utils.str_to_date(self.due_date, "%m/%d/%Y"),

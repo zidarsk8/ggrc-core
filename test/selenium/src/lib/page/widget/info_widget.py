@@ -9,12 +9,12 @@ import time
 from selenium.webdriver.common.by import By
 
 from lib import base
+from lib.app_entity_factory import entity_factory_common
 from lib.constants import (
     locator, objects, element, roles, regex, messages)
 from lib.constants.locator import WidgetInfoAssessment, WidgetInfoControl
 from lib.element import (
     info_widget_three_bbs, page_elements, tables, tab_element, tab_containers)
-from lib.entities import app_entity_factory
 from lib.page.modal.set_value_for_asmt_ca import SetValueForAsmtDropdown
 from lib.page.widget import (
     info_panel, object_modal, object_page, related_proposals)
@@ -281,6 +281,8 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
         "state": self.status(),
         "title": self.title()
     }
+    if self.is_comments_panel_present:
+      scope["comments"] = self.comments_panel.scopes
     if self.is_info_page:
       scope.update(
           created_at=self.created_at(),
@@ -334,6 +336,17 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
   def delete_obj(self):
     """Deletes object."""
     self.three_bbs.select_delete().confirm_delete()
+
+  @property
+  def comments_panel(self):
+    """Returns comments panel."""
+    return base.CommentsPanel(self._root.locate(),
+                              (By.CSS_SELECTOR, "comment-data-provider"))
+
+  @property
+  def is_comments_panel_present(self):
+    """Returns whether comments panel exists on the page."""
+    return self._comment_area().exists
 
 
 class Programs(WithObjectReview, InfoWidget):
@@ -414,7 +427,8 @@ class CycleTask(InfoWidget):
         "title": self.title(),
         "state": self.status(),
         "assignees": self.assignees.get_people_emails(),
-        "due_date": self.due_date
+        "due_date": self.due_date,
+        "comments": self.comments_panel.scopes
     }
 
   def wait_to_be_init(self):
@@ -445,7 +459,8 @@ class CycleTask(InfoWidget):
       obj_id = int(obj_row.data_id)
       entity_obj_name = obj_row.data_object_type
       obj_title = obj_row.text
-      factory = app_entity_factory.get_factory_by_obj_name(entity_obj_name)()
+      factory = entity_factory_common.get_factory_by_obj_name(
+          entity_obj_name)()
       objs.append(factory.create_empty(obj_id=obj_id, title=obj_title))
     return objs
 
@@ -512,7 +527,6 @@ class Assessments(InfoWidget):
         creators=self.creators.get_people_emails(),
         assignees=self.assignees.get_people_emails(),
         verifiers=self.verifiers.get_people_emails(),
-        comments=self.comments_panel.scopes,
         custom_attributes=self.custom_attributes(),
         primary_contacts=self.primary_contacts.get_people_emails(),
         mapped_objects=self.mapped_objects_titles()
@@ -561,6 +575,12 @@ class Assessments(InfoWidget):
     self.tabs.ensure_tab(self._assessment_tab_name)
     return base.CommentsPanel(
         self._root.locate(), self._locators.COMMENTS_CSS)
+
+  @property
+  def is_comments_panel_present(self):
+    """Returns whether comments panel exists on the page."""
+    self.tabs.ensure_tab(self._assessment_tab_name)
+    return self._comment_area().exists
 
   def description(self):
     """Switch to tab with description and return a text of description."""

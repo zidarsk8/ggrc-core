@@ -64,6 +64,11 @@ class ActiveCyclesTab(object_page.ObjectPage):
     cycle_task_panel = self._open_cycle_task_panel(cycle_task)
     cycle_task_panel.assignees.add_person(assignee)
 
+  def add_comment_to_cycle_task(self, comment, cycle_task):
+    """Adds a comment the cycle task."""
+    cycle_task_panel = self._open_cycle_task_panel(cycle_task)
+    cycle_task_panel.comments_panel.add_comments([comment.description])
+
   def _open_cycle_task_panel(self, cycle_task):
     """Opens Cycle task panel."""
     cycle_task_row = self._expand_to_cycle_task(cycle_task)
