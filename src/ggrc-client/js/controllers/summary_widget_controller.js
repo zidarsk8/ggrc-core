@@ -260,8 +260,8 @@ export default can.Control({
       statusObj = statuses.find((el) => {
         return el.name === statusName;
       });
-      statusObj.assessments = item.assessments;
-      statusObj.evidence = item.evidence;
+      statusObj.assessments += item.assessments;
+      statusObj.evidence += item.evidence;
     });
 
     return {

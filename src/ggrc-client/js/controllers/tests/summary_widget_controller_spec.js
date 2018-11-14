@@ -333,6 +333,46 @@ describe('SummaryWidgetController', function () {
           .toHaveBeenCalledWith('Assessment');
         expect(result).toEqual(expecteResult);
       });
+
+      it('contains object statuses with default names and summarized counsts' +
+         ' of assessments w/ verified flag set to 0 and 1', () => {
+        let expectedResult;
+        let statuses = [
+          'Not Started', 'In Progress', 'In Review', 'Deprecated',
+          'Rework Needed',
+        ];
+
+        const statusesList = statuses.reduce((acc, status) => {
+          const values = [0, 1].map((verified) => ({
+            name: status,
+            assessments: 2,
+            evidence: 2,
+            verified,
+          }));
+          return acc.concat(values);
+        }, []);
+
+        raw = {
+          total: 'info',
+          statuses: statusesList,
+        };
+
+        spy.and.returnValue(statuses);
+
+        expectedResult = jasmine.objectContaining({
+          statuses: statuses.map((status) => ({
+            name: status,
+            assessments: 4,
+            evidence: 4,
+          })),
+        });
+
+        result = method('Assessment', raw);
+
+        expect(StateUtils.getDefaultStatesForModel)
+          .toHaveBeenCalledWith('Assessment');
+        expect(result).toEqual(expectedResult);
+      });
     });
   });
 });
