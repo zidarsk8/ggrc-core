@@ -23,6 +23,7 @@ from ggrc import db
 from ggrc.app import app
 from ggrc import settings
 from ggrc.converters.import_helper import read_csv_file
+from ggrc.fulltext import listeners
 from ggrc.views.converters import check_import_file
 from ggrc.models import Revision, all_models
 from integration.ggrc import api_helper
@@ -177,6 +178,7 @@ class TestCase(BaseTestCase, object):
     self._custom_headers = {}
     self.headers = {}
     api_helper.wrap_client_calls(self.client)
+    listeners.reindex_in_commit = lambda: True
 
   def tearDown(self):  # pylint: disable=no-self-use
     db.session.remove()

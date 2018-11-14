@@ -14,7 +14,7 @@ from ggrc import fulltext
 from ggrc import utils
 from ggrc.models import all_models, get_model
 from ggrc.fulltext import mixin
-from ggrc.models.background_task import running_in_background
+from ggrc.models.background_task import reindex_in_commit
 from ggrc.utils import benchmark, helpers, request_storage
 
 ACTIONS = ['after_insert', 'after_delete', 'after_update']
@@ -52,16 +52,12 @@ class ReindexSet(threading.local):
 
   @helpers.without_sqlalchemy_cache
   def indexing_hook(self):
-    """Function that clear and push new full text records in DB."""
-    with benchmark("push ft records into DB"):
+    """Function that collect changed models for after request hook
+    or push new full text records in DB in case of background request."""
+    with benchmark("pre commit indexing hook"):
       self.warmup()
-      for obj in db.session:
-        if not isinstance(obj, mixin.Indexed):
-          continue
-        if obj.id in self.model_ids_to_reindex.get(obj.type, set()):
-          db.session.expire(obj)
       if self.model_ids_to_reindex:
-        if running_in_background():
+        if reindex_in_commit():
           update_ft_records(self.model_ids_to_reindex)
         else:
           reindex_ids = request_storage.get("indexing", {})
@@ -71,8 +67,14 @@ class ReindexSet(threading.local):
             reindex_ids[model].update(set(ids))
 
 
+@helpers.without_sqlalchemy_cache
 def update_ft_records(model_ids_to_reindex):
   """Update fulltext records in DB"""
+  with benchmark("indexing. expire objects in session"):
+    for obj in db.session:
+      if (isinstance(obj, mixin.Indexed) and
+              obj.id in model_ids_to_reindex.get(obj.type, set())):
+        db.session.expire(obj)
   with benchmark("indexing. update ft records in db"):
     for model_name in model_ids_to_reindex.keys():
       ids = model_ids_to_reindex.pop(model_name)
