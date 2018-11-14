@@ -53,9 +53,11 @@ class TestExportTasks(TestCase):
                 person=person,
                 ac_role_id=self.get_role_id_for_obj(task_group_task, r_name)
             )
-          task = factories.CycleTaskFactory(cycle=cycle,
-                                            cycle_task_group=cycle_task_group,
-                                            task_group_task=task_group_task)
+          task = factories.CycleTaskGroupObjectTaskFactory(
+              cycle=cycle,
+              cycle_task_group=cycle_task_group,
+              task_group_task=task_group_task
+          )
           for r_name in role_names:
             ggrc_factories.AccessControlListFactory(
                 object=task,

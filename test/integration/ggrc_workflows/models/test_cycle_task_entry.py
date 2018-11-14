@@ -19,7 +19,7 @@ class TestCommentApiCalls(workflow_test_case.WorkflowTestCase):
     with factories.single_commit():
       workflow = self.setup_helper.setup_workflow((rbac_helper.GE_RNAME,))
       cycle = wf_factories.CycleFactory(workflow=workflow)
-      wf_factories.CycleTaskFactory(cycle=cycle)
+      wf_factories.CycleTaskGroupObjectTaskFactory(cycle=cycle)
 
     g_editor = self.setup_helper.get_person(rbac_helper.GE_RNAME,
                                             ac_roles.workflow.ADMIN_NAME)

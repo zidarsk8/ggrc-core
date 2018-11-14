@@ -72,13 +72,46 @@ class CycleTaskGroupFactory(TitledFactory):
 
 
 class CycleTaskFactory(TitledFactory):
+  """Deprecated. Please use CycleTaskGroupObjectTask
 
+  Reasons:
+  1) Confusing naming
+  2) Creates 3 workflow object
+  """
   class Meta:
     model = models.CycleTaskGroupObjectTask
 
   cycle = factory.SubFactory(CycleFactory)
   cycle_task_group = factory.SubFactory(CycleTaskGroupFactory)
   task_group_task = factory.SubFactory(TaskGroupTaskFactory)
+  status = "Assigned"
+  task_type = "text"
+  start_date = date(2015, 12, 4)
+  end_date = date(2015, 12, 27)
+  context = factory.LazyAttribute(lambda ct: ct.cycle.context)
+
+
+class CycleTaskGroupObjectTaskFactory(TitledFactory):
+  """ Generate CycleTaskGroupObjectTask obj with related cycle, workflow etc.
+
+  Use this factory instead of CycleTaskFactory.
+
+  Reasons:
+  1) Proper naming
+  2) Creates 1 workflow object
+  """
+  class Meta:
+    model = models.CycleTaskGroupObjectTask
+
+  task_group_task = factory.SubFactory(TaskGroupTaskFactory)
+
+  cycle = factory.LazyAttribute(
+      lambda ct: CycleFactory(workflow=ct.task_group_task.task_group.workflow)
+  )
+  cycle_task_group = factory.LazyAttribute(
+      lambda ct: CycleTaskGroupFactory(cycle=ct.cycle)
+  )
+
   status = "Assigned"
   task_type = "text"
   start_date = date(2015, 12, 4)
