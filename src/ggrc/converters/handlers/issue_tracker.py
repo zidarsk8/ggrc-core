@@ -94,3 +94,30 @@ class IssueTrackerTitleColumnHandler(IssueTrackerColumnHandler):
     if self.dry_run or not self.value:
       return
     self.row_converter.issue_tracker["title"] = self.value
+
+
+class IssueTrackerEnabledHandler(IssueTrackerColumnHandler):
+  """Column handler for integration enabled column.
+
+  Enabled flag stored as tinyint(1) in our DB.
+  """
+  _true = "true"
+  _false = "false"
+
+  TRUE_VALUES = {"yes", _true}
+  FALSE_VALUES = {"no", _false}
+
+  def get_value(self):
+    if self.row_converter.issue_tracker.get(self.key, ""):
+      return self._true
+    return self._false
+
+  def parse_item(self):
+    value = self.raw_value.strip().lower()
+
+    if value in self.TRUE_VALUES:
+      return True
+    if value not in self.FALSE_VALUES:
+      self.add_warning(errors.WRONG_VALUE_DEFAULT,
+                       column_name=self.display_name)
+    return False
