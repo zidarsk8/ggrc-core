@@ -474,19 +474,6 @@ Mustache.registerHelper('option_select',
     return deferRender(tagPrefix, getSelectHtml, optionsDfd);
   });
 
-Mustache.registerHelper('get_permalink_url', function () {
-  return window.location.href;
-});
-
-Mustache.registerHelper('get_permalink_for_object',
-  function (instance, options) {
-    instance = resolveComputed(instance);
-    if (!instance.viewLink) {
-      return '';
-    }
-    return window.location.origin + instance.viewLink;
-  });
-
 /**
    * Generate an anchor element that opens the instance's view page in a
    * new browser tab/window.
