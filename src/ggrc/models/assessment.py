@@ -216,7 +216,6 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
           "mandatory": False,
           "view_only": True,
       },
-      "issue_title": "Issue Title",
   }
 
   @simple_property

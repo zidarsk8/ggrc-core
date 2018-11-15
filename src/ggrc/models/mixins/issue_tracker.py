@@ -26,14 +26,6 @@ class IssueTracked(object):
       reflection.Attribute("issue_tracker", create=False, update=False),
   )
 
-  _aliases = {
-      "issue_priority": "Priority",
-      "issue_severity": "Severity",
-      "issue_type": "Issue Type",
-      "component_id": "Component ID",
-      "hotlist_id": "Hotlist ID",
-  }
-
   def __init__(self, *args, **kwargs):
     super(IssueTracked, self).__init__(*args, **kwargs)
     self._warnings = []
@@ -91,7 +83,15 @@ class IssueTracked(object):
 
 class IssueTrackedWithUrl(IssueTracked):
   """Class that identifies IssueTracked models that have url."""
-  pass
+
+  _aliases = {
+      "component_id": "Component ID",
+      "hotlist_id": "Hotlist ID",
+      "issue_priority": "Priority",
+      "issue_severity": "Severity",
+      "issue_title": "Issue Title",
+      "issue_type": "Issue Type",
+  }
 
 
 class IssueTrackedWithConfig(IssueTracked):
