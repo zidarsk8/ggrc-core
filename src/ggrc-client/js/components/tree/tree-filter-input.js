@@ -4,6 +4,7 @@
  */
 
 import template from './templates/tree-filter-input.mustache';
+import QueryParser from '../../generated/ggrc_filter_query_parser';
 
 let viewModel = can.Map.extend({
   define: {
@@ -49,7 +50,7 @@ let viewModel = can.Map.extend({
     this.dispatch('submit');
   },
   onFilterChange: function (newValue) {
-    let filter = GGRC.query_parser.parse(newValue);
+    let filter = QueryParser.parse(newValue);
     let isExpression =
       !!filter && !!filter.expression.op &&
       filter.expression.op.name !== 'text_search' &&

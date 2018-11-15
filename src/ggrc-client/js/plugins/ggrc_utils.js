@@ -9,6 +9,7 @@ import {getRolesForType} from '../plugins/utils/acl-utils';
 import Mappings from '../models/mappers/mappings';
 import {notifier} from '../plugins/utils/notifiers-utils';
 import Person from '../models/business-models/person';
+import TreeViewConfig from '../apps/base_widgets';
 
 /**
  * A module containing various utility functions.
@@ -180,7 +181,7 @@ function hasPending(parentInstance, instance, how) {
 function getMappableTypes(type, options) {
   let result;
   let canonical = Mappings.get_canonical_mappings_for(type);
-  let list = GGRC.tree_view.base_widgets_by_type[type];
+  let list = TreeViewConfig.attr('base_widgets_by_type')[type];
   let forbidden;
   let forbiddenList = {
     Program: ['Audit'],

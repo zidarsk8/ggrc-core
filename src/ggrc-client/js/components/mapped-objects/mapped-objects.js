@@ -11,6 +11,7 @@ import '../object-list/object-list';
 import {applyTypeFilter} from '../../plugins/ggrc_utils';
 import template from './mapped-objects.mustache';
 import Mappings from '../../models/mappers/mappings';
+import QueryParser from '../../generated/ggrc_filter_query_parser';
 
 const tag = 'mapped-objects';
 /**
@@ -110,7 +111,7 @@ export default can.Component.extend({
         };
       });
       includeTypes.forEach(function (type) {
-        includeFilters = GGRC.query_parser.join_queries({
+        includeFilters = QueryParser.joinQueries({
           expression: {
             op: {name: '='},
             left: 'child_type',

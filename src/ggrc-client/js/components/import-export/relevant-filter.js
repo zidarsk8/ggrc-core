@@ -5,6 +5,7 @@
 
 import template from './templates/relevant-filter.mustache';
 import * as businessModels from '../../models/business-models';
+import TreeViewConfig from '../../apps/base_widgets';
 
 export default can.Component.extend({
   tag: 'relevant-filter',
@@ -36,7 +37,7 @@ export default can.Component.extend({
     menu: function () {
       // find all widget types and manually add Cycle since it's missing
       // convert names to CMS models and prune invalid (undefined)
-      let models = can.Map.keys(GGRC.tree_view.base_widgets_by_type);
+      let models = can.Map.keys(TreeViewConfig.attr('base_widgets_by_type'));
       models = _.difference(_.uniq(models),
         ['CycleTaskGroupObject']);
       models = _.map(models, function (mapping) {

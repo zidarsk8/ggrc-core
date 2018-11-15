@@ -13,6 +13,7 @@ import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../tree-widget-container';
 import Relationship from '../../../models/service-models/relationship';
 import exportMessage from '../templates/export-message.mustache';
+import QueryParser from '../../../generated/ggrc_filter_query_parser';
 
 describe('tree-widget-container component', function () {
   'use strict';
@@ -335,7 +336,7 @@ describe('tree-widget-container component', function () {
         .and.callFake(function (items, request) {
           request.push({name: 'item'});
         });
-      spyOn(GGRC.query_parser, 'join_queries');
+      spyOn(QueryParser, 'joinQueries');
     });
 
     it('copies filter and mapping items to applied', function () {
@@ -348,7 +349,7 @@ describe('tree-widget-container component', function () {
     });
 
     it('initializes advancedSearch.filter property', function () {
-      GGRC.query_parser.join_queries.and.returnValue({
+      QueryParser.joinQueries.and.returnValue({
         name: 'test',
       });
       vm.attr('advancedSearch.filter', null);

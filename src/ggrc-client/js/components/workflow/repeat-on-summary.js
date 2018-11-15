@@ -4,6 +4,7 @@
  */
 
 import template from './templates/repeat-on-summary.mustache';
+import {unitOptions as workflowUnitOptions} from '../../apps/workflow-config';
 
 export default can.Component.extend({
   tag: 'repeat-on-summary',
@@ -14,9 +15,9 @@ export default can.Component.extend({
         get: function () {
           let result = '';
           let repeatEvery = this.attr('repeatEvery');
-          let unit = _.find(GGRC.Workflow.unitOptions, function (option) {
+          let unit = _.find(workflowUnitOptions, (option) => {
             return option.value === this.attr('unit');
-          }.bind(this));
+          });
 
           if (unit) {
             if (repeatEvery > 1) {

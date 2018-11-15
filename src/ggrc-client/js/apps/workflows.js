@@ -17,6 +17,7 @@ import CycleTaskGroupObjectTask from '../models/business-models/cycle-task-group
 import TaskGroup from '../models/business-models/task-group';
 import Workflow from '../models/business-models/workflow';
 import Person from '../models/business-models/person';
+import TreeViewConfig from '../apps/base_widgets';
 
 let WorkflowExtension = {};
 let _workflowObjectTypes = [
@@ -51,12 +52,11 @@ let countsMap = {
   taskGroup: 'TaskGroup',
 };
 
-// Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
 // Initialize widgets for workflow page
 WorkflowExtension.init_widgets = function () {
   let pageInstance = getPageInstance();
-  let treeWidgets = GGRC.tree_view.base_widgets_by_type;
-  let subTrees = GGRC.tree_view.sub_tree_for;
+  let treeWidgets = TreeViewConfig.base_widgets_by_type;
+  let subTrees = TreeViewConfig.sub_tree_for;
   let models = ['TaskGroup', 'Workflow',
     'CycleTaskGroupObjectTask', 'CycleTaskGroupObject', 'CycleTaskGroup'];
   _.forEach(_workflowObjectTypes, function (type) {
@@ -89,7 +89,7 @@ WorkflowExtension.init_widgets = function () {
     treeWidgets.attr(item, updatedTreeWidgets);
     subTrees.attr(item, {
       display_list: updatedTreeWidgets,
-      model_list: GGRC.tree_view.basic_model_list,
+      model_list: TreeViewConfig.basic_model_list,
     });
   });
 

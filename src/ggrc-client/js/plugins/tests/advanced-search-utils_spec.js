@@ -5,6 +5,7 @@
 
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import * as StateUtils from '../../plugins/utils/state-utils';
+import QueryParser from '../../generated/ggrc_filter_query_parser';
 
 describe('AdvancedSearch', () => {
   describe('buildFilter() method', () => {
@@ -392,11 +393,11 @@ describe('AdvancedSearch', () => {
       });
 
       it('joins results to single expression', () => {
-        spyOn(GGRC.query_parser, 'join_queries').and.returnValue('joined');
+        spyOn(QueryParser, 'joinQueries').and.returnValue('joined');
 
         let result = AdvancedSearch.builders.group(items);
 
-        expect(GGRC.query_parser.join_queries).toHaveBeenCalled();
+        expect(QueryParser.joinQueries).toHaveBeenCalled();
         expect(result).toBe('joined');
       });
     });

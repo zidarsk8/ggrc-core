@@ -48,7 +48,7 @@ let mappings = {
       // It is needed for an object list generation. This object list
       // describes which objects can be mapped to CycleTaskGroupObjectTask.
       // Types placed within this collection will be intersected
-      // with GGRC.tree_view.base_widgets_by_type["CycleTaskGroupObjectTask"]
+      // with TreeViewConfig.base_widgets_by_type["CycleTaskGroupObjectTask"]
       // collection. The result of the operation is the total list.
       related_objects_as_source: _workflowObjectTypes.concat('Audit'),
     },

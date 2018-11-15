@@ -11,6 +11,7 @@ import RiskAssessment from '../models/business-models/risk-assessment';
 import Program from '../models/business-models/program';
 import Stub from '../models/stub';
 import WidgetList from '../modules/widget_list';
+import TreeViewConfig from '../apps/base_widgets';
 
 let RiskAssessmentsExtension = {};
 let allowedObjectTypes = ['Program'];
@@ -23,7 +24,7 @@ Program.attributes.risk_assessments = Stub.List;
 RiskAssessmentsExtension.init_widgets = function () {
   let descriptor = {};
   let pageInstance = getPageInstance();
-  let treeWidgets = GGRC.tree_view.base_widgets_by_type;
+  let treeWidgets = TreeViewConfig.attr('base_widgets_by_type');
 
   _.forEach(allowedObjectTypes, function (type) {
     if (!type || !treeWidgets[type]) {
