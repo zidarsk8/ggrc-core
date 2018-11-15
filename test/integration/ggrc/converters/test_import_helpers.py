@@ -385,11 +385,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated By",
         "Folder",
         "Last Deprecated Date",
-        "Component ID",
-        "Hotlist ID",
-        "Severity",
-        "Priority",
-        "Issue Type",
     }
     expected_fields = {
         "mandatory": {
@@ -424,11 +419,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated By",
         "Delete",
         "State",
-        "Component ID",
-        "Hotlist ID",
-        "Severity",
-        "Priority",
-        "Issue Type",
     }
     expected_fields = {
         "mandatory": {

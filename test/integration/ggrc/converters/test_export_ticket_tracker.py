@@ -90,7 +90,7 @@ class TestTicketTrackerExport(TestCase):
       self.assertIn("Ticket Tracker", response.data)
       self.assertIn(issue_url, response.data)
 
-  @ddt.data("Issue", "Assessment", "AssessmentTemplate", "Audit")
+  @ddt.data("Issue", "Assessment")
   def test_issue_export(self, model_name):
     """Test export for issuetracked attributes.
 
