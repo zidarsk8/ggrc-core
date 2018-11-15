@@ -3,7 +3,6 @@
 
 """Tests for background_task model."""
 
-from ggrc.models import all_models
 from integration.ggrc import api_helper
 from integration.ggrc import TestCase
 
@@ -18,6 +17,8 @@ class TestBackgroundTask(TestCase):
 
   def test_bg_task_from_post(self):
     """Test filtering of GET response for BackgroundTask"""
+    from ggrc.models import all_models
+
     control_dict = {
         "control": {
             "title": "Control title",

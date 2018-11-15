@@ -23,6 +23,7 @@ class TestBuilder(TestCase):
     setattr(ggrc.services, name, svc)
     return svc
 
+  # pylint: disable=protected-access
   def mock_class(self, name, bases=(), _publish_attrs=None, parents=()):
     cls = MagicMock()
     cls.__name__ = name
