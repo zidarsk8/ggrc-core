@@ -6,6 +6,7 @@
 
 import re
 import time
+from collections import defaultdict
 
 from logging import getLogger
 from logging.config import dictConfig as setup_logging
@@ -285,13 +286,15 @@ def register_indexing():
     """Create background task for indexing
     Adds header 'X-GGRC-Indexing-Task-Id' with BG task id
     """
-    model_ids = request_storage.get("indexing", {})
+    model_ids = request_storage.get("indexing", defaultdict(set))
     if model_ids:
       with benchmark("Create indexing bg task"):
+        chunk_size = db.session.reindex_set.CHUNK_SIZE
         bg_task = background_task.create_task(
             name="indexing",
             url=url_for(bg_update_ft_records.__name__),
-            parameters={"models_ids": model_ids},
+            parameters={"models_ids": model_ids,
+                        "chunk_size": chunk_size},
             queued_callback=bg_update_ft_records
         )
         db.session.expunge_all()  # improves plain_commit time

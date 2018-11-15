@@ -106,7 +106,8 @@ def compute_attributes(*_, **kwargs):
 @background_task.queued_task
 def bg_update_ft_records(task):
   """Background indexing endpoint"""
-  fulltext.listeners.update_ft_records(task.parameters.get("models_ids", {}))
+  fulltext.listeners.update_ft_records(task.parameters.get("models_ids", {}),
+                                       task.parameters.get("chunk_size"))
   db.session.plain_commit()
   return app.make_response(('success', 200, [('Content-Type', 'text/html')]))
 

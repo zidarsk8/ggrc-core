@@ -58,17 +58,15 @@ class ReindexSet(threading.local):
       self.warmup()
       if self.model_ids_to_reindex:
         if reindex_in_commit():
-          update_ft_records(self.model_ids_to_reindex)
+          update_ft_records(self.model_ids_to_reindex, self.CHUNK_SIZE)
         else:
-          reindex_ids = request_storage.get("indexing", {})
+          reindex_ids = request_storage.get("indexing", defaultdict(set))
           for model, ids in self.model_ids_to_reindex.items():
-            if model not in reindex_ids:
-              reindex_ids[model] = set()
             reindex_ids[model].update(set(ids))
 
 
 @helpers.without_sqlalchemy_cache
-def update_ft_records(model_ids_to_reindex):
+def update_ft_records(model_ids_to_reindex, chunk_size):
   """Update fulltext records in DB"""
   with benchmark("indexing. expire objects in session"):
     for obj in db.session:
@@ -78,7 +76,7 @@ def update_ft_records(model_ids_to_reindex):
   with benchmark("indexing. update ft records in db"):
     for model_name in model_ids_to_reindex.keys():
       ids = model_ids_to_reindex.pop(model_name)
-      chunk_list = utils.list_chunks(list(ids), chunk_size=50)
+      chunk_list = utils.list_chunks(list(ids), chunk_size=chunk_size)
       for ids_chunk in chunk_list:
         get_model(model_name).bulk_record_update_for(ids_chunk)
 
