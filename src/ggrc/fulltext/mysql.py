@@ -137,6 +137,7 @@ class MysqlIndexer(SqlIndexer):
       model_names.append(model_name)
     return model_names
 
+  # pylint: disable=too-many-arguments
   def search(self, terms, types=None, permission_type='read',
              contact_id=None, extra_params=None):
     """Prepare the search query and return the results set based on the
@@ -178,6 +179,7 @@ class MysqlIndexer(SqlIndexer):
     return db.session.execute(
         select([all_queries.c.key, all_queries.c.type]).distinct())
 
+  # pylint: disable=too-many-arguments
   def counts(self, terms, types=None, contact_id=None,
              extra_params=None, extra_columns=None):
     """Prepare the search query, but return only count for each of

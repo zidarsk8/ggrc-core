@@ -165,7 +165,6 @@ def create_task(name, url, queued_callback=None, parameters=None,
           bg_task=bg_task,
           queued_callback=queued_callback,
           queue=queue,
-
           retry_options=retry_options)
     return bg_task
 
@@ -354,7 +353,6 @@ def queued_task(func):
 
 def reindex_in_commit():
   """Check that current request running in background task"""
-  from flask import request
   value = False
   try:
     if request.path.startswith("/_background_tasks/"):

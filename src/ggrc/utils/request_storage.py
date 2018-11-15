@@ -7,6 +7,10 @@ import flask
 
 
 def get(name, default=None):
+  """Returns object from storage.
+  It is expected that object is mutable(by default returns dict)"""
+  if default is None:
+    default = {}
   if hasattr(flask.g, "request_storage"):
     storage = flask.g.request_storage
   else:

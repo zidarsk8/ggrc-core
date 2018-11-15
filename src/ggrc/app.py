@@ -281,6 +281,7 @@ def register_indexing():
   from ggrc.models import background_task
   from ggrc.views import bg_update_ft_records
 
+  # pylint: disable=unused-variable
   @app.after_request
   def create_indexing_bg_task(response):
     """Create background task for indexing

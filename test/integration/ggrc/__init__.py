@@ -23,7 +23,6 @@ from ggrc import db
 from ggrc.app import app
 from ggrc import settings
 from ggrc.converters.import_helper import read_csv_file
-from ggrc.fulltext import listeners
 from ggrc.views.converters import check_import_file
 from ggrc.models import Revision, all_models
 from integration.ggrc import api_helper
@@ -174,6 +173,8 @@ class TestCase(BaseTestCase, object):
 
   def setUp(self):
     """Setup method."""
+    from ggrc.fulltext import listeners
+
     self.clear_data()
     self._custom_headers = {}
     self.headers = {}
