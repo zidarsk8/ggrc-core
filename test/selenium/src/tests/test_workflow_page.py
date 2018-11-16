@@ -193,6 +193,21 @@ class TestActivateWorkflow(base.Test):
         app_workflow)
     test_utils.list_obj_assert(workflow_cycles, [expected_workflow_cycle])
 
+  def test_activate_repeat_on_workflow(self, app_repeat_on_workflow, selenium):
+    """Test activation of repeat on workflow.
+    It should be checked separately as different requests are sent when
+    repeat off and repeat on workflows are activated.
+    """
+    task_group = workflow_rest_facade.create_task_group(
+        workflow=app_repeat_on_workflow)
+    workflow_rest_facade.create_task_group_task(task_group=task_group)
+    workflow_ui_facade.activate_workflow(app_repeat_on_workflow)
+    workflow_cycles = workflow_ui_facade.get_workflow_cycles(
+        app_repeat_on_workflow)
+    expected_workflow_cycle = cycle_entity_population.create_workflow_cycle(
+        app_repeat_on_workflow)
+    test_utils.list_obj_assert(workflow_cycles, [expected_workflow_cycle])
+
 
 class TestActiveCyclesTab(base.Test):
   """Test Active Cycles tab."""
