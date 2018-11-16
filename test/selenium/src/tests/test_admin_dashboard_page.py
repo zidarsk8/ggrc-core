@@ -8,6 +8,7 @@
 # pylint: disable=unused-argument
 
 import random
+from datetime import timedelta
 
 import pytest
 
@@ -17,7 +18,7 @@ from lib.constants.element import AdminWidgetCustomAttributes
 from lib.entities import entities_factory
 from lib.page import dashboard
 from lib.service import admin_webui_service, rest_facade
-from lib.utils import date_utils, selenium_utils
+from lib.utils import date_utils, selenium_utils, string_utils
 
 
 class TestAdminDashboardPage(base.Test):
@@ -48,17 +49,18 @@ class TestAdminDashboardPage(base.Test):
   def test_events_widget_tree_view_has_data(self, admin_dashboard):
     """Confirms tree view has at least one data row in valid format."""
     admin_events_tab = admin_dashboard.select_events()
-    list_items = admin_events_tab.events_raw
+    list_items = admin_events_tab.events
     assert list_items
     items_with_incorrect_format = [
-        item for item in list_items if not
-        admin_events_tab.parse_event(item, is_strict=True)]
+        item
+        for item in list_items
+        if any(value in ["", []] for value in item.itervalues())]
     assert len(items_with_incorrect_format) in [0, 1]
     if len(items_with_incorrect_format) == 1:
       # A line with incorrect format is created during DB migration.
       # We decided it's OK.
-      assert items_with_incorrect_format[0].startswith(
-          "by\n{}".format(users.MIGRATOR_USER_EMAIL))
+      assert (items_with_incorrect_format[0]["user_email"] ==
+              users.MIGRATOR_USER_EMAIL)
     expected_header_text = self._event_el.WIDGET_HEADER
     actual_header_text = admin_events_tab.widget_header.text
     assert expected_header_text == actual_header_text
@@ -113,11 +115,12 @@ class TestEventLogTabDestructive(base.Test):
 
   @classmethod
   def get_event_tab(cls):
+    """Return Event tab page object."""
     selenium_utils.open_url(url.Urls().admin_dashboard)
     return dashboard.AdminDashboard().select_events()
 
   @pytest.fixture()
-  def tested_events(self):
+  def tested_events(self, selenium):
     """Create events to verify events functionality:
     0. Save event log count before test data creation,
     1. Create control editor role, create 2 users with global creator role
@@ -125,13 +128,13 @@ class TestEventLogTabDestructive(base.Test):
     2. Create control#1 under global creator#1 and set global creator#2 to
     newly created control editor role
     3. Create control#2 under global creator#2 and map it control#1
-    4. TODO Delete control#1 under global creator#2
     """
     if not self.__class__._data:
       # generate enough data, so test can be executed independently
       for _ in xrange(6):
         rest_facade.create_user_with_role(roles.READER)
 
+      initial_count = self.get_event_tab().tab_events.count
       ctrl1_creator = rest_facade.create_user_with_role(roles.CREATOR)
       ctrl2_creator = rest_facade.create_user_with_role(roles.CREATOR)
       ctrl_editor_role = rest_facade.create_access_control_role(
@@ -150,19 +153,71 @@ class TestEventLogTabDestructive(base.Test):
       rest_facade.map_objs(ctrl1, ctrl2)
 
       users.set_current_user(admin)
+      # generate expected event data
+      acl_roles_len = 7
+      exp_event_data = [
+          {"actions": sorted(
+              [ctrl1_creator.email + " created", u"PersonProfile created"]),
+           "user_email": admin.email,
+           "time": date_utils.iso8601_to_local_datetime(
+               ctrl1_creator.updated_at)},
+          {"actions": ["Creator linked to " + ctrl1_creator.email],
+           "user_email": admin.email,
+           "time": date_utils.iso8601_to_local_datetime(
+           ctrl1_creator.updated_at)},
+          {"actions": sorted(
+              [ctrl2_creator.email + " created", u"PersonProfile created"]),
+           "user_email": admin.email,
+           "time": date_utils.iso8601_to_local_datetime(
+               ctrl2_creator.updated_at)},
+          {"actions": ["Creator linked to " + ctrl2_creator.email],
+           "user_email": admin.email,
+           "time": date_utils.iso8601_to_local_datetime(
+               ctrl2_creator.updated_at)},
+          {"actions": [ctrl_editor_role.name + " created"],
+           "user_email": admin.email,
+           "time": date_utils.iso8601_to_local_datetime(
+               ctrl_editor_role.updated_at)},
+          {"actions": [u"AccessControlList created"] * acl_roles_len +
+                      [u"AccessControlPerson created"] * 2 +
+                      [ctrl1.title + " created",
+                       u"Security created"],
+           "user_email": ctrl1_creator.email,
+           "time": date_utils.iso8601_to_local_datetime(ctrl1.updated_at)},
+          {"actions": [u"AccessControlList created"] * acl_roles_len +
+                      [u"AccessControlPerson created",
+                       ctrl2.title + " created",
+                       u"Security created"],
+           "user_email": ctrl2_creator.email,
+           "time": date_utils.iso8601_to_local_datetime(ctrl2.updated_at)},
+          {"actions": [u"Control:{id2} linked to Control:{id1}".format(
+              id1=ctrl1.id, id2=ctrl2.id)],
+           "user_email": ctrl2_creator.email,
+           "time": date_utils.iso8601_to_local_datetime(ctrl2.updated_at)}
+      ]
+      exp_event_data.reverse()
       self.__class__._data = {
           "ctrl1_creator": ctrl1_creator,
           "ctrl2_creator": ctrl2_creator,
           "ctrl_editor_role": ctrl_editor_role,
           "ctrl1": ctrl1,
           "ctrl2": ctrl2,
+          "exp_added_events": exp_event_data,
+          "initial_count": initial_count
       }
     return self.__class__._data
+
+  @pytest.fixture()
+  def exp_act_events(self, tested_events, selenium):
+    """Store actual added events to data attribute."""
+    self._data["act_added_events"] = self.get_event_tab().events[:(
+        len(tested_events["exp_added_events"]))]
+    return self._data
 
   def test_chronological_sequence_1st_page(self, tested_events, selenium):
     """Verify that items on 1st page is presented on tab in chronological
     order."""
-    datetime_list = self.get_event_tab().event_datetimes
+    datetime_list = self.get_event_tab().event_attrs("time")
     date_utils.assert_chronological_order(datetime_list)
 
   def test_btns_at_1st_page(self, tested_events, selenium):
@@ -176,9 +231,9 @@ class TestEventLogTabDestructive(base.Test):
   def test_chronological_sequence_2nd_page(self, tested_events, selenium):
     """Verify that chronological order is continue at 2nd page too."""
     page_1 = self.get_event_tab()
-    last_event_datetime_page_1 = page_1.event_datetimes[-1]
+    last_event_datetime_page_1 = page_1.event_attrs("time")[-1]
     event_tab_page_2 = page_1.go_to_next_page()
-    event_datetimes_page_2 = event_tab_page_2.event_datetimes
+    event_datetimes_page_2 = event_tab_page_2.event_attrs("time")
     assert last_event_datetime_page_1 >= event_datetimes_page_2[0]
     date_utils.assert_chronological_order(event_datetimes_page_2)
 
@@ -192,6 +247,32 @@ class TestEventLogTabDestructive(base.Test):
     assert events_on_1st_page == events_on_prev_page, (
         messages.AssertionMessages.
         format_err_msg_equal(events_on_1st_page, events_on_prev_page))
+
+  def test_events_data_wo_datetime(self, exp_act_events):
+    """Verify that last data in event log represent performed actions."""
+    keys = ["actions", "user_email"]
+    exp_events_wo_time = string_utils.extract_items(
+        exp_act_events["exp_added_events"], *keys)
+    act_events_wo_time = string_utils.extract_items(
+        exp_act_events["act_added_events"], *keys)
+    assert act_events_wo_time == exp_events_wo_time
+
+  def test_events_datetime_only(self, exp_act_events):
+    """Check times of added events."""
+    key = "time"
+    exp_events_times = string_utils.extract_items(
+        exp_act_events["exp_added_events"], key)
+    act_event_times = string_utils.extract_items(
+        exp_act_events["act_added_events"], key)
+    for act, exp in zip(act_event_times, exp_events_times):
+      assert pytest.approx(act == exp, rel=timedelta(seconds=1))
+
+  def test_events_increased(self, tested_events, selenium):
+    """Verify that count at event tab increased correctly."""
+    act_count = self.get_event_tab().tab_events.count
+    exp_count = tested_events["initial_count"] + len(
+        tested_events["exp_added_events"])
+    assert act_count == exp_count
 
 
 class TestPeopleAdministration(base.Test):
@@ -220,7 +301,7 @@ class TestPeopleAdministration(base.Test):
     """
     self.general_equal_assert(ppl_data["exp_person"], ppl_data["act_person"])
 
-  @pytest.mark.xfail(reason="GGRC-1234 Issue in app.")
+  @pytest.mark.xfail(reason="GGRC-6528 Issue in app.")
   def test_destructive_tab_count_increased(self, ppl_data):
     """Check that tab count will be increased correctly."""
     assert ppl_data["exp_ppl_count"] == ppl_data["act_ppl_count"]

@@ -229,9 +229,16 @@ def parse_str_by_reg_exp(str_to_parse, reg_exp, return_as_dict):
   """Parse string by regular expression if match returns dict or string,
   else returns None.
   """
-  matched_str = re.compile(reg_exp).match(str_to_parse)
+  matched_str = re.compile(reg_exp, re.DOTALL).match(str_to_parse)
   if not matched_str:
     return matched_str
   if return_as_dict:
     return matched_str.groupdict()
   return matched_str.string
+
+
+def extract_items(list_of_dicts, *keys_to_keep):
+  """Return new list of discts by removing keys that not in keep list."""
+  return ([item[keys_to_keep[0]] for item in list_of_dicts]
+          if len(keys_to_keep) == 1 else
+          [{key: item[key] for key in keys_to_keep} for item in list_of_dicts])
