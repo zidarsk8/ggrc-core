@@ -398,7 +398,7 @@ def _add_missing_acl_entries():
   for role in roles:
     logger.info("Add missing acl entries on %s for role %s",
                 role.object_type, role.name)
-    access_control_role.handle_role_acls(role, filter_=True)
+    access_control_role.handle_role_acls(role)
 
 
 @helpers.without_sqlalchemy_cache

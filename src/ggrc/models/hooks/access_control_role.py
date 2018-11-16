@@ -35,7 +35,7 @@ from ggrc.services import signals
 logger = logging.getLogger(__name__)
 
 
-def _get_missing_models_query(role, filter_=False):
+def _get_missing_models_query(role):
   """Get query for objects with a missing ACL entry for the given role.
 
   Note that the filter flag here is just for optimization. When creating a new
@@ -59,9 +59,6 @@ def _get_missing_models_query(role, filter_=False):
                 role.name, role.object_type)
     return None
 
-  if not filter_:
-    return model.query.order_by(model.id)
-
   query = model.query.outerjoin(
       all_models.AccessControlList,
       sa.and_(
@@ -78,7 +75,7 @@ def _get_missing_models_query(role, filter_=False):
   return query
 
 
-def handle_role_acls(role, filter_=False):
+def handle_role_acls(role):
   """Handle creation of ACL entries for the given role.
 
   This function takes care of eager acl creation when a new role is created.
@@ -87,7 +84,7 @@ def handle_role_acls(role, filter_=False):
   """
   with utils.benchmark("Generating ACL entries on {} for role {}".format(
           role.object_type, role.name)):
-    query = _get_missing_models_query(role, filter_=filter_)
+    query = _get_missing_models_query(role)
     if not query:
       return
 
