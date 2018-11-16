@@ -14,6 +14,7 @@ from ggrc import settings, models
 from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import assessment_integration
 from ggrc.converters import errors
+from ggrc.converters.handlers import issue_tracker
 from ggrc.integrations.constants import DEFAULT_ISSUETRACKER_VALUES as \
     default_values
 
@@ -79,6 +80,99 @@ class TestIssueTrackedImport(ggrc.TestCase):
     obj = models.get_model(model).query.one()
     self._check_csv_response(response, {})
     self.assertEqual(str(obj.issue_tracker[field]), str(value))
+
+  def _assert_integration_state(self, obj, value):
+    """Make assertion to check integration enabled field"""
+    expected_res = bool(value in
+                        issue_tracker.IssueTrackerEnabledHandler.TRUE_VALUES)
+
+    self.assertEqual(bool(obj.issue_tracker["enabled"]),
+                     expected_res)
+
+  @ddt.data(
+      ("Issue", "yes"),
+      ("Issue", "no"),
+      ("Issue", "true"),
+      ("Issue", "false"),
+      ("Assessment", "yes"),
+      ("Assessment", "no"),
+      ("Assessment", "true"),
+      ("Assessment", "false"),
+  )
+  @ddt.unpack
+  def test_import_enabled_update_succeed(self, model, value):
+    """Test {0} integration state {1} set correctly during update via import"""
+    with factories.single_commit():
+      factory = factories.get_model_factory(model)
+      obj = factory()
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=obj,
+      )
+
+    response = self.import_data(OrderedDict([
+        ("object_type", model),
+        ("Code*", obj.slug),
+        ("Integration Enabled", value),
+    ]))
+    obj = models.get_model(model).query.one()
+    self._check_csv_response(response, {})
+    self._assert_integration_state(obj, value)
+
+  @ddt.data("yes", "no", "true", "false")
+  def test_enabled_state_issue_create_succeed(self, value):
+    """Test Issue integration state set correctly during create via import."""
+    response = self.import_data(OrderedDict([
+        ("object_type", "Issue"),
+        ("Code*", "OBJ-1"),
+        ("Admin", "user@example.com"),
+        ("Title", "Object Title"),
+        ("Integration Enabled", value),
+    ]))
+
+    self._check_csv_response(response, {})
+    obj = all_models.Issue.query.one()
+    self._assert_integration_state(obj, value)
+
+  @ddt.data("yes", "no", "true", "false")
+  def test_enabled_state_assmt_create_succeed(self, value):
+    """Test Assessment integration state set correctly during create."""
+    audit = factories.AuditFactory()
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", "OBJ-1"),
+        ("Audit*", audit.slug),
+        ("Assignees*", "user@example.com"),
+        ("Creators", "user@example.com"),
+        ("Title", "Object Title"),
+        ("Integration Enabled", value),
+    ]))
+
+    self._check_csv_response(response, {})
+    obj = all_models.Assessment.query.one()
+    self._assert_integration_state(obj, value)
+
+  @ddt.data("Issue", "Assessment")
+  def test_enabled_state_default_value(self, model):
+    """Test correct default value was set to {0} Issue Title during import"""
+    factory = factories.get_model_factory(model)
+    obj = factory(title="Object Title")
+    expected_warning = (
+        errors.WRONG_VALUE_DEFAULT.format(line=3,
+                                          column_name="Integration Enabled")
+    )
+    expected_messages = {
+        model: {
+            "row_warnings": {expected_warning},
+        }
+    }
+    response = self.import_data(OrderedDict([
+        ("object_type", model),
+        ("Code*", obj.slug),
+        ("Integration Enabled", ""),
+    ]))
+    self._check_csv_response(response, expected_messages)
+    obj = models.get_model(model).query.one()
+    self.assertEqual(obj.issue_tracker["enabled"], False)
 
   @ddt.data(
       ("component_id", "Component ID", 123),
