@@ -477,6 +477,12 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Labels",
         "Last Comment",
         "Ticket Tracker",
+        "Component ID",
+        "Hotlist ID",
+        "Severity",
+        "Priority",
+        "Issue Type",
+        "Issue Title",
     }
     expected_fields = {
         "mandatory": {
@@ -522,6 +528,12 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated By",
         "Ticket Tracker",
         "Folder",
+        "Component ID",
+        "Hotlist ID",
+        "Severity",
+        "Priority",
+        "Issue Type",
+        "Issue Title",
     }
     expected_fields = {
         "mandatory": {

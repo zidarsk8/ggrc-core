@@ -481,9 +481,10 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
   def test_asmnt_bulk_child_generate(self):
     """Test generation of issues for all Assessments in Audit."""
     audit_id, assessment_ids = self.setup_assessments(3)
-    response = self.generate_children_issues_for(
-        "Audit", audit_id, "Assessment"
-    )
+    with mock.patch("ggrc.notifications.common.send_email"):
+      response = self.generate_children_issues_for(
+          "Audit", audit_id, "Assessment"
+      )
     self.assert200(response)
     self.assertEqual(response.json.get("errors"), [])
     self.assert_children_asmnt_issues(assessment_ids)
@@ -541,18 +542,19 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
     audit_id, assessment_ids = self.setup_assessments(3)
 
     error = error.format("12345")
-    with mock.patch(
-        "ggrc.integrations.issues.Client.create_issue",
-        side_effect=integrations_errors.HttpError(error)
-    ) as create_issue_mock:
-      response = self.api.send_request(
-          self.api.client.post,
-          api_link="/generate_children_issues",
-          data={
-              "parent": {"type": "Audit", "id": audit_id},
-              "child_type": "Assessment"
-          }
-      )
+    with mock.patch("ggrc.notifications.common.send_email"):
+      with mock.patch(
+          "ggrc.integrations.issues.Client.create_issue",
+          side_effect=integrations_errors.HttpError(error)
+      ) as create_issue_mock:
+        response = self.api.send_request(
+            self.api.client.post,
+            api_link="/generate_children_issues",
+            data={
+                "parent": {"type": "Audit", "id": audit_id},
+                "child_type": "Assessment"
+            }
+        )
     self.assert200(response)
     self.assertEqual(
         response.json.get("errors"),
@@ -590,9 +592,11 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
       )
 
     self.assertIsNone(assess1.issuetracker_issue)
-    response = self.generate_children_issues_for(
-        audit.type, audit.id, assess1.type
-    )
+
+    with mock.patch("ggrc.notifications.common.send_email"):
+      response = self.generate_children_issues_for(
+          audit.type, audit.id, assess1.type
+      )
     self.assert200(response)
     self.assertEqual(response.json.get("errors"), [])
     assess1 = all_models.Assessment.query.get(assess1_id)

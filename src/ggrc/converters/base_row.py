@@ -18,6 +18,7 @@ from ggrc.converters import pre_commit_checks
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.models.exceptions import StatusValidationError
+from ggrc.models.mixins import issue_tracker
 from ggrc.rbac import permissions
 from ggrc.services import signals
 from ggrc.snapshotter import create_snapshots
@@ -34,7 +35,7 @@ logger = getLogger(__name__)
 
 class RowConverter(object):
   """Base class for handling row data."""
-  # pylint: disable=too-few-public-methods
+  # pylint: disable=too-few-public-methods,too-many-instance-attributes
   def __init__(self, block_converter, object_class, headers, options):
     self.block_converter = block_converter
     self.object_class = object_class
@@ -43,6 +44,7 @@ class RowConverter(object):
     self.attrs = collections.OrderedDict()
     self.objects = collections.OrderedDict()
     self.old_values = {}
+    self.issue_tracker = {}
 
 
 class ImportRowConverter(RowConverter):
@@ -434,6 +436,10 @@ class ImportRowConverter(RowConverter):
       return
     for secondary_object in self.objects.values():
       secondary_object.insert_object()
+    if self.issue_tracker:
+      all_models.IssuetrackerIssue.create_or_update_from_dict(
+          self.obj, self.issue_tracker
+      )
 
 
 class ExportRowConverter(RowConverter):
@@ -441,6 +447,8 @@ class ExportRowConverter(RowConverter):
   def __init__(self, block_converter, object_class, headers, **options):
     super(ExportRowConverter, self).__init__(block_converter, object_class,
                                              headers, options)
+    if issubclass(type(self.obj), issue_tracker.IssueTracked):
+      self.issue_tracker = self.obj.issue_tracker
 
   def handle_obj_row_data(self):
     """Create handlers for cells in the current row."""
@@ -455,7 +463,7 @@ class ExportRowConverter(RowConverter):
   def to_array(self, fields):
     """Get an array representation of the current row.
 
-    Fiter the values to match the fields array and return the string
+    Filter the values to match the fields array and return the string
     representation of the values.
 
     Args:
@@ -465,7 +473,7 @@ class ExportRowConverter(RowConverter):
 
     Returns:
       list of strings where each cell contains a string value of the
-      coresponding field.
+      corresponding field.
     """
     row = []
     for field in fields:
