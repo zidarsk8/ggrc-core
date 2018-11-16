@@ -10,6 +10,10 @@
            target="_blank"
            rel="tooltip"
            data-original-title="{{itemTitle}}">{{itemTitle}}</a>
-        <span class="date">{{localize_date itemCreationDate}}</span>
+        {{#if itemCreationDate}}
+            <span class="date">{{localize_date itemCreationDate}}</span>
+        {{else}}
+            <spinner {toggle}="true"></spinner>
+        {{/if}}
     </div>
 </div>
