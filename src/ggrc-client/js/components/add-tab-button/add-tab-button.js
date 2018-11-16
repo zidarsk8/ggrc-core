@@ -56,6 +56,10 @@ const viewModel = can.Map.extend({
     return prohibitedMapList[instanceType] &&
       prohibitedMapList[instanceType].includes(shortName);
   },
+  sortWidgets() {
+    this.attr('widgetList',
+      _.sortBy(this.attr('widgetList'), 'internav_display'));
+  },
 });
 
 export default can.Component.extend({
@@ -80,5 +84,8 @@ export default can.Component.extend({
 
       return options.inverse(options.contexts);
     },
+  },
+  init() {
+    this.viewModel.sortWidgets();
   },
 });
