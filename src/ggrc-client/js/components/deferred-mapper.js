@@ -6,7 +6,6 @@
 import {
   isSnapshotType,
 } from '../plugins/utils/snapshot-utils';
-import Mappings from '../models/mappers/mappings';
 import * as MapperUtils from '../plugins/utils/mapper-utils';
 import {
   REFRESH_MAPPING,
@@ -15,24 +14,26 @@ import {
 } from '../events/eventTypes';
 import {getPageInstance} from '../plugins/utils/current-page-utils';
 
-/*
- Below this line we're defining a can.Component, which is in this file
- because it works in tandem with the modals form controller.
-
- The purpose of this component is to allow for pending adds/removes of connected
- objects while the modal is visible.  On save, the actual pending actions will
- be resolved and we won't worry about the transient state we use anymore.
- */
 export default can.Component.extend({
   tag: 'deferred-mapper',
   viewModel: {
+    define: {
+      instance: {
+        set(instance) {
+          // _pendingJoins is set to instance only to check
+          // whether instance is dirty on modals
+          if (instance) {
+            instance.attr('_pendingJoins', []);
+          }
+          return instance;
+        },
+      },
+    },
     useSnapshots: false,
     instance: null,
     list: [],
     preMappedObjects: [],
     mappedObjects: [],
-    // the following are just for the case when we have no object to start with,
-    changes: [],
     performMapActions(instance, objects) {
       let pendingMap = Promise.resolve();
 
@@ -53,20 +54,6 @@ export default can.Component.extend({
 
       return pendingUnmap;
     },
-    preparePendingJoins() {
-      can.each(this.attr('changes'), (item) => {
-        let mapping = this.mapping ||
-            Mappings.get_canonical_mapping_name(
-              this.instance.constructor.shortName,
-              item.what.constructor.shortName);
-        if (item.how === 'add') {
-          this.instance
-            .mark_for_addition(mapping, item.what, item.extra);
-        } else {
-          this.instance.mark_for_deletion(mapping, item.what);
-        }
-      });
-    },
     afterDeferredUpdate(objects) {
       const instance = this.attr('instance');
       const objectTypes = _.uniq(objects
@@ -82,72 +69,81 @@ export default can.Component.extend({
       instance.dispatch(REFRESH_SUB_TREE);
 
       const pageInstance = getPageInstance();
+      const pageInstanceIndex = _.findIndex(objects, ({id, type}) =>
+        id === pageInstance.id &&
+        type === pageInstance.type
+      );
 
-      if (objects.includes(pageInstance)) {
+      if (pageInstanceIndex !== -1) {
         pageInstance.dispatch({
           ...REFRESH_MAPPING,
           destinationType: instance.type,
         });
       }
     },
-    handlePendingOperations(pendingJoins) {
-      const instance = this.attr('instance');
-      const getObject = (pj) => pj.what;
-      const objectsForMap = pendingJoins.filter((pj) => pj.how === 'add')
-        .map(getObject);
-      const objectsForUnmap = pendingJoins.filter((pj) => pj.how === 'remove')
-        .map(getObject);
-
-      return Promise.all([
-        this.performMapActions(instance, objectsForMap),
-        this.performUnmapActions(instance, objectsForUnmap),
-      ]);
-    },
     async deferredUpdate() {
       const instance = this.attr('instance');
+      const pendingJoins = instance.attr('_pendingJoins');
+      const objectsToMap =
+        _.filter(pendingJoins, ({how}) => how === 'map')
+          .map(({what}) => what);
+      const objectsToUnmap =
+        _.filter(pendingJoins, ({how}) => how === 'unmap')
+          .map(({what}) => what);
 
-      this.preparePendingJoins();
 
-      // Extract _pending_joins from instance
-      const pendingJoins = instance._pending_joins.splice(0);
-      await this.handlePendingOperations(pendingJoins);
-      const objects = pendingJoins.map((pj) => pj.what);
+      await Promise.all([
+        this.performMapActions(instance, objectsToMap),
+        this.performUnmapActions(instance, objectsToUnmap),
+      ]);
+
+      instance.attr('_pendingJoins', []);
+
+      const objects = objectsToMap.concat(objectsToUnmap);
       this.afterDeferredUpdate(objects);
     },
+    _indexOfPendingJoin(object, action) {
+      return _.findIndex(this.attr('instance._pendingJoins'),
+        ({what, how}) =>
+          what.id === object.id &&
+          what.type === object.type &&
+          how === action
+      );
+    },
     addMappings(objects) {
-      can.each(objects, (obj) => {
-        const changes = this.attr('changes');
-        const indexOfRemoveChange = this.findObjectInChanges(obj, 'remove');
+      const pendingJoins = this.attr('instance._pendingJoins');
 
-        if (indexOfRemoveChange !== -1) {
-          // remove "remove" change
-          changes.splice(indexOfRemoveChange, 1);
+      objects.forEach((obj) => {
+        const indexOfUnmap = this._indexOfPendingJoin(obj, 'unmap');
+
+        if (indexOfUnmap !== -1) {
+          pendingJoins.splice(indexOfUnmap, 1);
         } else {
-          // add "add" change
-          changes.push({what: obj, how: 'add'});
+          pendingJoins.push({
+            what: obj,
+            how: 'map',
+          });
         }
 
         this.addListItem(obj);
       });
     },
     removeMappings(obj) {
-      let len = this.attr('list').length;
-      const changes = this.attr('changes');
-      const indexOfAddChange = this.findObjectInChanges(obj, 'add');
+      const pendingJoins = this.attr('instance._pendingJoins');
+      const indexOfMap = this._indexOfPendingJoin(obj, 'map');
 
-      if (indexOfAddChange !== -1) {
-        // remove "add" change
-        changes.splice(indexOfAddChange, 1);
+      if (indexOfMap !== -1) {
+        pendingJoins.splice(indexOfMap, 1);
       } else {
-        // add "remove" change
-        changes.push({what: obj, how: 'remove'});
+        pendingJoins.push({
+          what: obj,
+          how: 'unmap',
+        });
       }
 
-      for (; len >= 0; len--) {
-        if (this.attr('list')[len] === obj) {
-          this.attr('list').splice(len, 1);
-        }
-      }
+      const indexInList = _.findIndex(this.attr('list'),
+        ({id, type}) => id === obj.id && type === obj.type);
+      this.attr('list').splice(indexInList, 1);
     },
     addListItem(item) {
       let snapshotObject;
@@ -172,16 +168,6 @@ export default can.Component.extend({
       const updatedList = this.attr('preMappedObjects')
         .concat(this.attr('mappedObjects'));
       this.attr('list').replace(updatedList);
-    },
-    findObjectInChanges(object, changeType) {
-      return _.findIndex(this.attr('changes'), (change) => {
-        const {what} = change;
-        return (
-          what.id === object.id &&
-          what.type === object.type &&
-          change.how === changeType
-        );
-      });
     },
   },
   events: {
