@@ -32,11 +32,11 @@ class IssueTrackerWithValidStates(IssueTrackerColumnHandler):
   """Column handler for columns with available valid states"""
 
   available_items = {
-      'issue_type':
+      "issue_type":
           params_container.IssueTrackerParamsContainer.AVAILABLE_TYPES,
-      'issue_priority':
+      "issue_priority":
           params_container.IssueTrackerParamsContainer.AVAILABLE_PRIORITIES,
-      'issue_severity':
+      "issue_severity":
           params_container.IssueTrackerParamsContainer.AVAILABLE_SEVERITIES,
   }
 
@@ -80,7 +80,7 @@ class IssueTrackerTitleColumnHandler(IssueTrackerColumnHandler):
     value = self.clean_whitespaces(value)
     if not value:
       value = self.row_converter.obj.title or \
-          self.row_converter.attrs['title'].value
+          self.row_converter.attrs["title"].value
       self.add_warning(errors.WRONG_VALUE_DEFAULT,
                        column_name=self.display_name)
     return value
@@ -88,7 +88,7 @@ class IssueTrackerTitleColumnHandler(IssueTrackerColumnHandler):
   @staticmethod
   def clean_whitespaces(value):
     """Change multiply whitespaces with single one in the value string."""
-    return re.sub(r'\s+', " ", value)
+    return re.sub(r"\s+", " ", value)
 
   def set_obj_attr(self):
     if self.dry_run or not self.value:
