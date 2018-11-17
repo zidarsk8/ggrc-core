@@ -107,6 +107,11 @@ class IssueTrackerEnabledHandler(IssueTrackerColumnHandler):
   TRUE_VALUES = {"yes", _true}
   FALSE_VALUES = {"no", _false}
 
+  def set_obj_attr(self):
+    if self.dry_run:
+      return
+    self.row_converter.issue_tracker[self.key] = self.value
+
   def get_value(self):
     if self.row_converter.issue_tracker.get(self.key, ""):
       return self._true
