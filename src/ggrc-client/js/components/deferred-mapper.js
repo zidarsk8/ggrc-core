@@ -28,12 +28,35 @@ export default can.Component.extend({
           return instance;
         },
       },
+      // objects which should be mapped to new instance
+      // in this case 'mappedObjects' should be empty
+      preMappedObjects: {
+        value: [],
+        set(objects) {
+          if (objects.length) {
+            this.addMappings(objects);
+            this.updateListWith(objects);
+          }
+
+          return objects;
+        },
+      },
+      // objects which already mapped to 'instance'
+      // in this case 'preMappedObjects' should be empty
+      mappedObjects: {
+        value: [],
+        set(objects) {
+          if (objects.length) {
+            this.updateListWith(objects);
+          }
+
+          return objects;
+        },
+      },
     },
     useSnapshots: false,
     instance: null,
     list: [],
-    preMappedObjects: [],
-    mappedObjects: [],
     performMapActions(instance, objects) {
       let pendingMap = Promise.resolve();
 
@@ -164,20 +187,12 @@ export default can.Component.extend({
 
       this.attr('list').push(item);
     },
-    updateObjectList() {
-      const updatedList = this.attr('preMappedObjects')
-        .concat(this.attr('mappedObjects'));
-      this.attr('list').replace(updatedList);
+    updateListWith(objects = []) {
+      this.attr('list', []);
+      objects.forEach((obj) => this.addListItem(obj));
     },
   },
   events: {
-    init() {
-      const viewModel = this.viewModel;
-      viewModel.addMappings(viewModel.attr('preMappedObjects'));
-    },
-    '{viewModel} mappedObjects'() {
-      this.viewModel.updateObjectList();
-    },
     '{instance} updated'() {
       this.viewModel.deferredUpdate();
     },
