@@ -189,6 +189,7 @@ permissions = {
         "Role",
         "UserRole",
         "Context",
+        "Review",
     ],
     "delete": [
         {
