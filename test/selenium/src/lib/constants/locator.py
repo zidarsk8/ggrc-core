@@ -799,7 +799,7 @@ class WidgetInfoProgram(WidgetInfoPanel):
   PRIVATE_PROGRAM = (By.CSS_SELECTOR,
                      '[data-test-id="title_private_ec758af9"] h6')
   ICON_LOCK = (By.CSS_SELECTOR, '[data-test-id="icon_private_ec758af9"]')
-  ALERT_LINK_COPIED = (By.CSS_SELECTOR, ".alert.alert-success")
+  ALERT_LINK_COPIED = (By.CSS_SELECTOR, ".alert.alert-info")
   MODAL_DELETE = (By.ID, '[id="ajax-lhn_modal-javascript:--"]')
   MODAL_DELETE_CLOSE = (By.CSS_SELECTOR, ".lhn_modal .grcicon-x-grey")
 
