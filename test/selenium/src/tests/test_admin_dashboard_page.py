@@ -22,6 +22,7 @@ from lib.utils import selenium_utils
 
 class TestAdminDashboardPage(base.Test):
   """Tests for admin dashboard page."""
+
   _role_el = constants.element.AdminWidgetRoles
   _event_el = constants.element.AdminWidgetEvents
 
@@ -98,3 +99,17 @@ class TestAdminDashboardPage(base.Test):
     actual_person = admin_webui_service.PeopleAdminWebUiService(
         selenium).create_new_person(expected_person)
     self.general_equal_assert(expected_person, actual_person)
+
+  @pytest.mark.smoke_tests
+  def test_custom_roles_widget(self, admin_dashboard):
+    """Check count and content of roles scopes."""
+    expected_set = set(
+        [objects.get_normal_form(item) for
+         item in objects.ALL_OBJS_W_CUSTOM_ROLES]
+    )
+    actual_set = \
+        admin_dashboard.select_custom_roles().get_objects_text_as_set()
+    assert admin_dashboard.tab_custom_roles.member_count == len(expected_set)
+    assert expected_set == actual_set, (
+        messages.AssertionMessages.
+        format_err_msg_equal(expected_set, actual_set))
