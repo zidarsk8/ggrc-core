@@ -191,7 +191,10 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
     });
 
     this.bind('created', (ev, instance) => {
-      if (instance instanceof this) {
+      if (
+        instance instanceof this &&
+        getPageType() === 'Workflow'
+      ) {
         const ctgId = instance.attr('cycle_task_group.id');
         const ctg = CycleTaskGroup.findInCacheById(ctgId);
 
