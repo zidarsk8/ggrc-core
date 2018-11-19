@@ -4,7 +4,6 @@
 */
 
 import {
-  Proxy,
   Direct,
   Search,
 } from '../mappers/mapper-helpers';
@@ -35,10 +34,6 @@ new Mappings('ggrc_core', {
   relatedMappings: {
     _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
-  relatedObject: {
-    related_objects_as_source: Proxy(
-      null, 'destination', 'Relationship', 'source', 'related_destinations'),
-  },
 
   Person: {
     _related: ['CycleTaskGroupObjectTask', 'TaskGroupTask', 'Workflow',
@@ -46,44 +41,28 @@ new Mappings('ggrc_core', {
   },
 
   Program: {
-    _mixins: ['relatedObject'],
-    _canonical: {
-      related_objects_as_source:
-        [...coreObjects, 'Document'],
-    },
+    _canonical: [...coreObjects, 'Document'],
     _related: ['Audit', 'Person', 'TaskGroup', 'Workflow'],
   },
 
   Document: {
-    _mixins: ['relatedObject'],
-    _canonical: {
-      related_objects_as_source: [...coreObjects, 'Program'],
-    },
+    _canonical: [...coreObjects, 'Program'],
     _related: ['Person'],
   },
 
   // Core objects
   coreObjectsMappings: {
-    _mixins: ['relatedObject', 'relatedMappings'],
-    _canonical: {
-      related_objects_as_source:
-        _.difference(businessObjects, ['Assessment']),
-    },
+    _mixins: ['relatedMappings'],
+    _canonical: _.difference(businessObjects, ['Assessment']),
   },
 
   Issue: {
-    _mixins: ['relatedObject'],
-    _canonical: {
-      related_objects_as_source: [...coreObjects, 'Document', 'Program'],
-    },
+    _canonical: [...coreObjects, 'Document', 'Program'],
     _related: ['Assessment', 'Audit', 'Person', 'TaskGroup', 'Workflow'],
   },
   Contract: {
     _mixins: ['coreObjectsMappings'],
-    _canonical: {
-      related_objects_as_source:
-        _.difference(businessObjects, ['Assessment', 'Contract']),
-    },
+    _canonical: _.difference(businessObjects, ['Assessment', 'Contract']),
   },
   Control: {
     _mixins: ['coreObjectsMappings'],
@@ -93,21 +72,14 @@ new Mappings('ggrc_core', {
   },
   Policy: {
     _mixins: ['coreObjectsMappings'],
-    _canonical: {
-      related_objects_as_source:
-        _.difference(businessObjects, ['Assessment', 'Policy']),
-    },
+    _canonical: _.difference(businessObjects, ['Assessment', 'Policy']),
   },
   Requirement: {
     _mixins: ['coreObjectsMappings'],
   },
   Regulation: {
-    _mixins: ['relatedObject'],
-    _canonical: {
-      related_objects_as_source:
-        _.difference(businessObjects,
-          [...scopingObjects, 'Assessment', 'Regulation']),
-    },
+    _canonical: _.difference(businessObjects,
+      [...scopingObjects, 'Assessment', 'Regulation']),
     _related:
       [...scopingObjects, 'Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
@@ -115,12 +87,8 @@ new Mappings('ggrc_core', {
     _mixins: ['coreObjectsMappings'],
   },
   Standard: {
-    _mixins: ['relatedObject'],
-    _canonical: {
-      related_objects_as_source:
-        _.difference(businessObjects,
-          [...scopingObjects, 'Assessment', 'Standard']),
-    },
+    _canonical: _.difference(businessObjects,
+      [...scopingObjects, 'Assessment', 'Standard']),
     _related:
       [...scopingObjects, 'Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
@@ -130,22 +98,15 @@ new Mappings('ggrc_core', {
 
   // Scoping objects
   scopingObjectsMappings: {
-    _mixins: ['relatedObject'],
-    _canonical: {
-      related_objects_as_source:
-        _.difference(businessObjects,
-          ['Assessment', 'Standard', 'Regulation']),
-    },
+    _canonical: _.difference(businessObjects,
+      ['Assessment', 'Standard', 'Regulation']),
     _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
       'Workflow'],
   },
   AccessGroup: {
     _mixins: ['scopingObjectsMappings'],
-    _canonical: {
-      related_objects_as_source:
-        _.difference(businessObjects,
-          ['Assessment', 'AccessGroup', 'Standard', 'Regulation']),
-    },
+    _canonical: _.difference(businessObjects,
+      ['Assessment', 'AccessGroup', 'Standard', 'Regulation']),
   },
   DataAsset: {
     _mixins: ['scopingObjectsMappings'],
@@ -187,17 +148,13 @@ new Mappings('ggrc_core', {
   // Audit
   Audit: {
     _mixins: ['relatedObject'],
-    _canonical: {
-      related_objects_as_source: coreObjects,
-    },
+    _canonical: coreObjects,
     _related:
       ['Assessment', 'AssessmentTemplate', 'Evidence', 'Person', 'Program'],
   },
   Assessment: {
     _mixins: ['relatedObject'],
-    _canonical: {
-      related_objects_as_source: coreObjects,
-    },
+    _canonical: coreObjects,
     _related: ['Audit', 'Evidence', 'Person'],
   },
   Evidence: {
@@ -213,18 +170,16 @@ new Mappings('ggrc_core', {
     role: Direct('Role', 'user_roles', 'role'),
   },
   MultitypeSearch: {
-    _canonical: {
-      related_objects_as_source: [
-        'AccessGroup', 'Assessment', 'AssessmentTemplate', 'Audit',
-        'Contract', 'Control', 'CycleTaskGroupObjectTask', 'DataAsset',
-        'Document', 'Evidence', 'Facility', 'Issue', 'Market', 'Metric',
-        'Objective', 'OrgGroup', 'Person', 'Process', 'Product',
-        'ProductGroup', 'Project', 'Policy', 'Program', 'Regulation',
-        'Requirement', 'Risk', 'Standard', 'System', 'TaskGroup',
-        'TaskGroupTask', 'TechnologyEnvironment', 'Threat',
-        'Vendor', 'Workflow',
-      ],
-    },
+    _canonical: [
+      'AccessGroup', 'Assessment', 'AssessmentTemplate', 'Audit',
+      'Contract', 'Control', 'CycleTaskGroupObjectTask', 'DataAsset',
+      'Document', 'Evidence', 'Facility', 'Issue', 'Market', 'Metric',
+      'Objective', 'OrgGroup', 'Person', 'Process', 'Product',
+      'ProductGroup', 'Project', 'Policy', 'Program', 'Regulation',
+      'Requirement', 'Risk', 'Standard', 'System', 'TaskGroup',
+      'TaskGroupTask', 'TechnologyEnvironment', 'Threat',
+      'Vendor', 'Workflow',
+    ],
   },
   // Used by Custom Attributes widget
   CustomAttributable: {

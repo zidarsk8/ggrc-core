@@ -22,20 +22,7 @@ const _workflowObjectTypes = [
 // Add mappings for basic workflow objects
 let mappings = {
   TaskGroup: {
-    /**
-     * @property {string[]} _canonical.objects - "objects" is a mapper name.
-     * This field contains collection of model names.
-     */
-    _canonical: {
-      objects: _workflowObjectTypes,
-    },
-    /**
-     * Mapper, which will be used for appropriate canonical mapper name
-     * "objects".
-     */
-    objects: Proxy(
-      null, 'object', 'TaskGroupObject', 'task_group',
-      'task_group_objects'),
+    _canonical: _workflowObjectTypes,
   },
   TaskGroupTask: {
     _related: ['Person', 'Workflow'],
@@ -44,14 +31,12 @@ let mappings = {
     _related: ['Person', 'TaskGroup', 'TaskGroupTask'],
   },
   CycleTaskGroupObjectTask: {
-    _canonical: {
-      // It is needed for an object list generation. This object list
-      // describes which objects can be mapped to CycleTaskGroupObjectTask.
-      // Types placed within this collection will be intersected
-      // with TreeViewConfig.base_widgets_by_type["CycleTaskGroupObjectTask"]
-      // collection. The result of the operation is the total list.
-      related_objects_as_source: _workflowObjectTypes.concat('Audit'),
-    },
+    // It is needed for an object list generation. This object list
+    // describes which objects can be mapped to CycleTaskGroupObjectTask.
+    // Types placed within this collection will be intersected
+    // with TreeViewConfig.base_widgets_by_type["CycleTaskGroupObjectTask"]
+    // collection. The result of the operation is the total list.
+    _canonical: _workflowObjectTypes.concat('Audit'),
     _related: ['Person'],
     // Needed for related_objects mapper
     related_objects_as_source: Proxy(
