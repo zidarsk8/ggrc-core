@@ -168,7 +168,6 @@
                 <map-button-using-assessment-type
                   {{data "deferred_to"}}
                   {instance}="instance">
-                    {{#if instance.audit}}
                       <a class="section-add section-sticky btn btn-small btn-white assessment-map-btn"
                         href="javascript://"
                         data-placement="left"
@@ -183,20 +182,6 @@
                       >
                         Map Objects
                       </a>
-                    {{else}}
-                      <a class="section-add section-sticky btn btn-small btn-white assessment-map-btn"
-                        href="javascript://"
-                        data-placement="left"
-                        data-deferred="true"
-                        data-object-source="true"
-                        data-is-new="{{new_object_form}}"
-                        data-join-object-id="{{instance.id}}"
-                        data-join-object-type="{{instance.class.model_singular}}"
-                        tabindex="8"
-                      >
-                        Map Objects
-                      </a>
-                    {{/if}}
                 </map-button-using-assessment-type>
               </div>
             {{/is_allowed}}
