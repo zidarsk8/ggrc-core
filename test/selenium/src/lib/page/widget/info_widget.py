@@ -131,7 +131,7 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
     """Returns some text part from footer."""
     footer_regexp = r"Created date (.+)   {4}Last updated by\n(.+)\non (.+)"
     footer_el = self._browser.element(class_name="info-widget-footer")
-    footer_el.element(class_name="person-name").wait_until_present()
+    footer_el.element(class_name="person-name").wait_until(lambda e: e.present)
     return re.search(footer_regexp, footer_el.text).group(group_idx)
 
   @staticmethod
@@ -175,7 +175,7 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
     # pylint: disable=expression-not-assigned
     _header_msg, _value_msg = (
         "people header: {}, count: {}", "people list: {}, count: {}")
-    people_scopes = self._active_tab_root.locate().find_elements(
+    people_scopes = self._active_tab_root.wd.find_elements(
         *self._locators.PEOPLE_HEADERS_AND_VALUES_CSS)
     [selenium_utils.wait_until_stops_moving(people_scope)
      for people_scope in people_scopes]
@@ -324,7 +324,7 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
     """Returns changelog validation result."""
     self.tabs.ensure_tab(self._changelog_tab_name)
     return tab_containers.changelog_tab_validate(
-        self._browser.driver, self._active_tab_root.locate())
+        self._browser.driver, self._active_tab_root.wd)
 
   def edit_obj(self, **changes):
     """Makes changes `changes` to object."""
@@ -340,7 +340,7 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
   @property
   def comments_panel(self):
     """Returns comments panel."""
-    return base.CommentsPanel(self._root.locate(),
+    return base.CommentsPanel(self._root.wd,
                               (By.CSS_SELECTOR, "comment-data-provider"))
 
   @property
@@ -573,8 +573,7 @@ class Assessments(InfoWidget):
   def comments_panel(self):
     """Returns comments panel."""
     self.tabs.ensure_tab(self._assessment_tab_name)
-    return base.CommentsPanel(
-        self._root.locate(), self._locators.COMMENTS_CSS)
+    return base.CommentsPanel(self._root.wd, self._locators.COMMENTS_CSS)
 
   @property
   def is_comments_panel_present(self):
@@ -638,14 +637,14 @@ class Assessments(InfoWidget):
     """
     self.tabs.ensure_tab(self._related_assessments_tab_name)
     return tables.AssessmentRelatedAsmtsTable(
-        self._browser.driver, self._active_tab_root.locate())
+        self._browser.driver, self._active_tab_root.wd)
 
   @property
   def related_issues_table(self):
     """Switches to Related Issues tab and returns RelatedIssuesTable."""
     self.tabs.ensure_tab(self._related_issues_tab_name)
     return tables.AssessmentRelatedIssuesTable(
-        self._browser.driver, self._active_tab_root.locate())
+        self._browser.driver, self._active_tab_root.wd)
 
   def fill_global_cas_inline(self, custom_attributes):
     """Fills GCAs inline."""

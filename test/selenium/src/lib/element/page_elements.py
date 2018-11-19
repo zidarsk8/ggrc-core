@@ -18,7 +18,7 @@ class InlineEdit(object):
     """Opens inline edit."""
     # Hovering over element and clicking on it using Selenium / Nerodia
     # doesn't open the inline edit control for some reason
-    self._root.wait_until_present()
+    self._root.wait_until(lambda e: e.present)
     self._root.element(class_name="fa-pencil").js_click()
 
   def confirm(self):
