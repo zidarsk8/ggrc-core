@@ -344,7 +344,11 @@ def process_sent_notifications(notif_list):
     notif_list (list of Notification): List of notification for which we want
       to modify sent_at field.
   """
+  from ggrc.models import all_models
   for notif in notif_list:
+    if notif.object_type == "CycleTaskGroupObjectTask" and \
+       notif.object.status == all_models.CycleTaskGroupObjectTask.DEPRECATED:
+      continue
     if notif.repeating:
       notif.sent_at = datetime.utcnow()
     else:
