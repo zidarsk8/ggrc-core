@@ -108,6 +108,16 @@ def add_assignee_to_cycle_task(assignee, cycle_task):
   cycle_task.assignees.append(assignee)
 
 
+def add_comment_to_cycle_task(comment, cycle_task):
+  """Adds a comment to the cycle task."""
+  active_cycles_tab = workflow_tabs.ActiveCyclesTab()
+  active_cycles_tab.open_using_cycle_task(cycle_task)
+  active_cycles_tab.add_comment_to_cycle_task(
+      comment=comment, cycle_task=cycle_task)
+  comment.modified_by = users.current_person()
+  cycle_task.comments.append(comment)
+
+
 def get_cycle_task(cycle_task):
   """Returns Task Assignees of cycle task."""
   active_cycles_tab = workflow_tabs.ActiveCyclesTab()

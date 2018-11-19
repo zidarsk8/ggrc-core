@@ -18,7 +18,7 @@ from lib.constants import objects
 
 
 @attr.s
-class _Base(object):
+class Base(object):
   """Represents entity."""
   obj_id = attr.ib()
   created_at = attr.ib()
@@ -75,107 +75,8 @@ class _Base(object):
 
 
 @attr.s
-class _WithTitleAndCode(object):
+class WithTitleAndCode(object):
   """Represents a part of object with title and code."""
   # pylint: disable=too-few-public-methods
   title = attr.ib()
   code = attr.ib()
-
-
-@attr.s
-class Workflow(_Base, _WithTitleAndCode):
-  """Represents Workflow entity."""
-  state = attr.ib()
-  admins = attr.ib()
-  wf_members = attr.ib()
-  is_archived = attr.ib()
-  repeat_unit = attr.ib()
-  repeat_every = attr.ib()
-  task_groups = attr.ib()
-  recurrences_started = attr.ib()
-
-
-@attr.s
-class TaskGroup(_Base, _WithTitleAndCode):
-  """Represents TaskGroup entity."""
-  assignee = attr.ib()
-  workflow = attr.ib()
-  task_group_tasks = attr.ib()
-
-
-@attr.s
-class TaskGroupTask(_Base, _WithTitleAndCode):
-  """Represents TaskGroupTask entity."""
-  assignees = attr.ib()
-  start_date = attr.ib()
-  due_date = attr.ib()
-  task_group = attr.ib()
-
-
-@attr.s
-class WorkflowCycle(_Base):
-  """Represents Cycle Workflow entity."""
-  title = attr.ib()
-  admins = attr.ib()
-  wf_members = attr.ib()
-  state = attr.ib()
-  due_date = attr.ib()
-  cycle_task_groups = attr.ib()
-  workflow = attr.ib()
-
-
-@attr.s
-class CycleTaskGroup(_Base):
-  """Represents Cycle TaskGroup entity."""
-  title = attr.ib()
-  state = attr.ib()
-  cycle_tasks = attr.ib()
-  workflow_cycle = attr.ib()
-  task_group = attr.ib()
-
-
-@attr.s
-class CycleTask(_Base):
-  """Represents Cycle TaskGroupTask entity."""
-  title = attr.ib()
-  state = attr.ib()
-  assignees = attr.ib()
-  due_date = attr.ib()
-  cycle_task_group = attr.ib()
-  task_group_task = attr.ib()
-
-
-@attr.s
-class Person(_Base):
-  """Represents Person entity."""
-  name = attr.ib()
-  email = attr.ib()
-  global_role_name = attr.ib()
-
-
-@attr.s
-class GlobalRole(_Base):
-  """Represents global Role entity in the app."""
-  name = attr.ib()
-
-
-@attr.s
-class UserRole(_Base):
-  """Represents a UserRole entity in the app.
-  (UserRole is a mapping between person and global role).
-  """
-  person = attr.ib()
-  role = attr.ib()
-
-
-@attr.s
-class Control(_Base, _WithTitleAndCode):
-  """Represents Control entity."""
-  admins = attr.ib()
-  assertions = attr.ib()
-
-
-@attr.s
-class ControlAssertion(_Base):
-  """Represents control assertion."""
-  name = attr.ib()

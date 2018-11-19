@@ -2,13 +2,13 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """REST service for Control app entities."""
 from lib import decorator
-from lib.entities import app_entity
+from lib.app_entity import control_entity
 from lib.rest import base_rest_service, rest_convert
 
 
 class ControlRestService(base_rest_service.ObjectRestService):
   """REST service for Control app entities."""
-  app_entity_cls = app_entity.Control
+  app_entity_cls = control_entity.Control
 
   @staticmethod
   def _map_to_rest_for_create_obj(obj):
@@ -24,7 +24,7 @@ class ControlRestService(base_rest_service.ObjectRestService):
 
 class ControlAssertionRestService(base_rest_service.ObjectRestService):
   """REST service for ControlAssertion app entities."""
-  app_entity_cls = app_entity.ControlAssertion
+  app_entity_cls = control_entity.ControlAssertion
 
   @staticmethod
   def _map_from_rest(rest_dict):

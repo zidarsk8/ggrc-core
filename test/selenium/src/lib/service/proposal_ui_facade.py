@@ -73,7 +73,9 @@ def assert_proposal_notification_connects_to_obj(
   proposal_digest_service.open_proposal_digest()
   proposal_email = get_expected_proposal_email(obj, proposal, proposal_author)
   assert proposal_email in ProposalDigest().get_proposal_emails()
+  actual_obj = proposal_digest_service.opened_obj(obj, proposal_email)
+  # when proposals are added, comments for them are not added to `obj`
+  actual_obj.comments = None
   base.Test.general_equal_assert(
-      copy.deepcopy(obj).repr_ui(),
-      proposal_digest_service.opened_obj(obj, proposal_email),
+      copy.deepcopy(obj).repr_ui(), actual_obj,
       "modified_by", *Representation.tree_view_attrs_to_exclude)

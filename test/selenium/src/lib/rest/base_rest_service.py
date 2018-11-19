@@ -1,8 +1,9 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Base REST services."""
+from lib.app_entity_factory import (
+    person_entity_factory, entity_factory_common)
 from lib.constants import objects
-from lib.entities import app_entity_factory
 from lib.rest import api_client
 from lib.utils import date_utils
 
@@ -122,7 +123,7 @@ class ObjectRestService(object):
     obj.obj_id = result_dict["id"]
     obj.created_at = date_utils.iso8601_to_datetime(result_dict["created_at"])
     obj.updated_at = date_utils.iso8601_to_datetime(result_dict["updated_at"])
-    obj.modified_by = app_entity_factory.PersonFactory().create_empty(
+    obj.modified_by = person_entity_factory.PersonFactory().create_empty(
         obj_id=result_dict["modified_by"]["id"])
     if hasattr(obj, "code") and not obj.code:
       obj.code = result_dict["slug"]
@@ -147,7 +148,7 @@ class ObjectRestService(object):
 
   def _create_obj_from_rest_dict(self, rest_dict):
     """Create an `app_entity` object from response dict."""
-    return app_entity_factory.get_factory_by_entity_cls(
+    return entity_factory_common.get_factory_by_entity_cls(
         self.app_entity_cls).create_empty(**self._map_from_rest(rest_dict))
 
   @staticmethod

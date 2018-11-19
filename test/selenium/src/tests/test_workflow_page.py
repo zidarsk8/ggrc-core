@@ -9,9 +9,10 @@ import datetime
 import pytest
 
 from lib import base, users
+from lib.app_entity_factory import (
+    entity_factory_common, workflow_entity_factory)
 from lib.constants import roles
-from lib.entities import (
-    app_entity_factory, cycle_entity_population, ui_dict_convert)
+from lib.entities import cycle_entity_population, ui_dict_convert
 from lib.page.widget import workflow_tabs, object_modal, object_page
 from lib.rest_facades import (
     object_rest_facade, person_rest_facade, workflow_rest_facade)
@@ -37,8 +38,8 @@ class TestCreateWorkflow(base.Test):
   @pytest.fixture()
   def workflow(self):
     """Create workflow via UI."""
-    workflow = app_entity_factory.WorkflowFactory().create()
-    app_entity_factory.TaskGroupFactory().create(workflow=workflow)
+    workflow = workflow_entity_factory.WorkflowFactory().create()
+    workflow_entity_factory.TaskGroupFactory().create(workflow=workflow)
     workflow_ui_facade.create_workflow(workflow)
     return workflow
 
@@ -137,7 +138,7 @@ class TestWorkflowSetupTab(base.Test):
       self, app_workflow, app_task_group, app_person, selenium
   ):
     """Test creation of Task Group Task."""
-    task = app_entity_factory.TaskGroupTaskFactory().create(
+    task = workflow_entity_factory.TaskGroupTaskFactory().create(
         task_group=app_task_group, assignees=[app_person])
     workflow_ui_facade.create_task_group_task(task)
     actual_tasks = workflow_ui_facade.get_task_group_tasks_objs()
@@ -238,4 +239,19 @@ class TestActiveCyclesTab(base.Test):
         assignee=some_creator, cycle_task=cycle_task)
     selenium.refresh()  # reload page to check change is saved
     actual_cycle_task = workflow_ui_facade.get_cycle_task(cycle_task)
+    test_utils.obj_assert(actual_cycle_task, cycle_task)
+
+  def test_add_comment_to_cycle_task(
+      self, login_as_creator_or_reader, activated_workflow, selenium
+  ):
+    """Test adding a comment to the cycle task."""
+    cycle_task = cycle_entity_population.create_workflow_cycle(
+        activated_workflow).cycle_task_groups[0].cycle_tasks[0]
+    comment = entity_factory_common.CommentFactory().create(
+        description="comment")
+    workflow_ui_facade.add_comment_to_cycle_task(
+        comment=comment, cycle_task=cycle_task)
+    selenium.refresh()  # reload page to check change is saved
+    actual_cycle_task = workflow_ui_facade.get_cycle_task(cycle_task)
+    test_utils.set_unknown_attrs_to_none(actual_cycle_task.comments[0])
     test_utils.obj_assert(actual_cycle_task, cycle_task)
