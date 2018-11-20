@@ -61,7 +61,6 @@ describe('Mappings', function () {
         'TaskGroupTask',
         'Workflow',
         'CycleTaskGroupObjectTask',
-        'CycleTaskGroupObject',
         'CycleTaskGroup',
       ],
       notMappable: [
@@ -69,7 +68,6 @@ describe('Mappings', function () {
         'TaskGroup',
         'TaskGroupTask',
         'CycleTaskGroupObjectTask',
-        'CycleTaskGroupObject',
         'CycleTaskGroup',
       ],
     },
@@ -140,7 +138,7 @@ describe('Mappings', function () {
     Threat: filtered,
     Vendor: _.difference(filtered, ['Standard', 'Regulation']),
     MultitypeSearch: _.difference(allTypes, ['CycleTaskGroup',
-      'CycleTaskGroupObject', 'RiskAssessment']),
+      'RiskAssessment']),
   };
 
   beforeAll(function () {
@@ -159,7 +157,6 @@ describe('Mappings', function () {
     let modelsForTests = _.difference(types, [
       'TaskGroupTask',
       'CycleTaskGroup',
-      'CycleTaskGroupObject',
       'Workflow',
     ]);
 

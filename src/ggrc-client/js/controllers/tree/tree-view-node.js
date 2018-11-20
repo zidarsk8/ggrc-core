@@ -36,7 +36,6 @@ export default can.Control.extend({
     show_view: null,
     expanded: false,
     subTreeLoading: false,
-    draw_children: true,
     child_options: [],
   },
 }, {
@@ -144,14 +143,6 @@ export default can.Control.extend({
     this._draw_node_in_progress = false;
   },
 
-  should_draw_children: function () {
-    let drawChildren = this.options.draw_children;
-    if (can.isFunction(drawChildren)) {
-      return drawChildren.apply(this.options);
-    }
-    return drawChildren;
-  },
-
   // add all child options to one TreeViewOptions object
   add_child_lists_to_child: function () {
     let originalChildList = this.options.child_options;
@@ -166,25 +157,23 @@ export default can.Control.extend({
       originalChildList = [originalChildList];
     }
 
-    if (this.should_draw_children()) {
-      can.each(originalChildList, function (data, i) {
-        let options = new can.Map();
-        data.each(function (v, k) {
-          options.attr(k, v);
-        });
-        this.add_child_list(this.options, options);
-        options.attr({
-          options_property: this.options.options_property,
-          single_object: false,
-          parent: this,
-          parent_instance: this.options.instance,
-        });
-        newChildList.push(options);
-      }.bind(this));
+    can.each(originalChildList, function (data, i) {
+      let options = new can.Map();
+      data.each(function (v, k) {
+        options.attr(k, v);
+      });
+      this.add_child_list(this.options, options);
+      options.attr({
+        options_property: this.options.options_property,
+        single_object: false,
+        parent: this,
+        parent_instance: this.options.instance,
+      });
+      newChildList.push(options);
+    }.bind(this));
 
-      this.options.attr('child_options', newChildList);
-      this.options.attr('_added_child_list', true);
-    }
+    this.options.attr('child_options', newChildList);
+    this.options.attr('_added_child_list', true);
   },
 
   // data is an entry from child options.  if child options is an array, run once for each.

@@ -44,7 +44,6 @@ export default Cacheable('CMS.Models.Cycle', {
     context: Stub,
   },
   tree_view_options: {
-    draw_children: true,
     attr_list: [{
       attr_title: 'Title',
       attr_name: 'title',

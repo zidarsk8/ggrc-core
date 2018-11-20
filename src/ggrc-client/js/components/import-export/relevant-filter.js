@@ -38,8 +38,7 @@ export default can.Component.extend({
       // find all widget types and manually add Cycle since it's missing
       // convert names to CMS models and prune invalid (undefined)
       let models = can.Map.keys(TreeViewConfig.attr('base_widgets_by_type'));
-      models = _.difference(_.uniq(models),
-        ['CycleTaskGroupObject']);
+      models = _.uniq(models);
       models = _.map(models, function (mapping) {
         return businessModels[mapping];
       });

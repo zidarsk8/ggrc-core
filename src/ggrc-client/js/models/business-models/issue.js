@@ -64,7 +64,6 @@ export default Cacheable('CMS.Models.Issue', {
         disable_sorting: true,
       }]),
     attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
-    add_item_view: GGRC.mustache_path + '/issues/tree_add_item.mustache',
     display_attr_names: ['title', 'Admin', 'status', 'updated_at'],
   },
   sub_tree_view_options: {

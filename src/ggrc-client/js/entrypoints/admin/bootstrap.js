@@ -62,7 +62,6 @@ const adminListDescriptors = {
     // includes only the filter, not the column headers
       '/static/mustache/people/filters.mustache',
     list_view: '/static/mustache/people/object_list.mustache',
-    draw_children: true,
     fetch_post_process: sortByNameEmail,
   },
   roles: {
@@ -91,7 +90,6 @@ const adminListDescriptors = {
     list_loader: function () {
       return CustomAttributable.findAll();
     },
-    draw_children: true,
     child_options: [{
       model: CustomAttributeDefinition,
       mapping: 'custom_attribute_definitions',
@@ -112,7 +110,6 @@ const adminListDescriptors = {
     list_loader: function () {
       return Roleable.findAll();
     },
-    draw_children: true,
     child_options: [{
       model: AccessControlRole,
       mapping: 'access_control_roles',

@@ -8,6 +8,10 @@ import '../cycle-task-actions/cycle-task-actions';
 import './tree-item-custom-attribute';
 import BaseTreeItemVM from './tree-item-base-vm';
 import template from './templates/tree-item.mustache';
+import * as businessModels from '../../models/business-models';
+
+const DEFAULT_ATTR_TEMPLATE =
+  GGRC.mustache_path + '/base_objects/tree-item-attr.mustache';
 
 let viewModel = BaseTreeItemVM.extend({
   define: {
@@ -47,7 +51,15 @@ let viewModel = BaseTreeItemVM.extend({
         return result;
       },
     },
+    attrTemplate: {
+      type: String,
+      get() {
+        let Model = businessModels[this.attr('instance.type')];
+        return Model.tree_view_options.attr_view || DEFAULT_ATTR_TEMPLATE;
+      },
+    },
   },
+  instance: null,
   selectedColumns: [],
   mandatory: [],
   disableConfiguration: null,

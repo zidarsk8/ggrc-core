@@ -36,7 +36,7 @@ export default Cacheable('CMS.Models.Objective', {
     modified_by: Stub,
   },
   tree_view_options: {
-    attr_view: GGRC.mustache_path + '/objectives/tree-item-attr.mustache',
+    attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
     attr_list: Cacheable.attr_list.concat([
       {
         attr_title: 'Last Assessment Date',
@@ -69,11 +69,7 @@ export default Cacheable('CMS.Models.Objective', {
       }]),
     display_attr_names: ['title', 'status', 'last_assessment_date',
       'updated_at'],
-    add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
-    create_link: true,
     show_related_assessments: true,
-    // draw_children: true,
-    start_expanded: false,
   },
   sub_tree_view_options: {
     default_filter: ['Control'],

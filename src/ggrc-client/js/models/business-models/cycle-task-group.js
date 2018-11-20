@@ -25,10 +25,6 @@ export default Cacheable('CMS.Models.CycleTaskGroup', {
     context: Stub,
   },
 
-  tree_view_options: {
-    draw_children: true,
-  },
-
   init: function () {
     this._super(...arguments);
     this.validateNonBlank('contact');
