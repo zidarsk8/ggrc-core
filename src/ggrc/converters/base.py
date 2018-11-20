@@ -94,7 +94,7 @@ class ImportConverter(BaseConverter):
         revision_ids.extend(converter.revision_ids)
       self.response_data.append(converter.get_info())
     self._start_compute_attributes_job(revision_ids)
-    if not self.dry_run:
+    if not self.dry_run and settings.ISSUE_TRACKER_ENABLED:
       self._start_issuetracker_update(revision_ids)
     self.drop_cache()
 
