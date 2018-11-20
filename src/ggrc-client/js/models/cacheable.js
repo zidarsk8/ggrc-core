@@ -243,11 +243,13 @@ export default can.Model('can.Model.Cacheable', {
   },
 
   init: function () {
+    this.cache = {};
+
     let idKey = this.id;
     let _update = this.update;
     let _create = this.create;
     this.bind('created', function (ev, newObj) {
-      let cache = can.getObject('cache', newObj.constructor, true);
+      let cache = newObj.constructor.cache;
       if (newObj[idKey] || newObj[idKey] === 0) {
         if (!isSnapshot(newObj)) {
           cache[newObj[idKey]] = newObj;
@@ -258,7 +260,7 @@ export default can.Model('can.Model.Cacheable', {
       }
     });
     this.bind('destroyed', function (ev, oldObj) {
-      delete can.getObject('cache', oldObj.constructor, true)[oldObj[idKey]];
+      delete oldObj.constructor.cache[oldObj[idKey]];
     });
 
     // FIXME:  This gets set up in a chain of multiple calls to the function defined
@@ -303,7 +305,7 @@ export default can.Model('can.Model.Cacheable', {
   },
 
   findInCacheById: function (id) {
-    return can.getObject('cache', this, true)[id];
+    return this.cache[id];
   },
 
   removeFromCacheById: function (key) {
@@ -311,7 +313,7 @@ export default can.Model('can.Model.Cacheable', {
   },
 
   newInstance: function (args) {
-    let cache = can.getObject('cache', this, true);
+    let cache = this.cache;
     let isKeyExists = args && args[this.id];
     let isObjectExists = isKeyExists && cache[args[this.id]];
     let notSnapshot = args && !isSnapshot(args);
@@ -567,7 +569,7 @@ export default can.Model('can.Model.Cacheable', {
   },
 }, {
   init: function () {
-    let cache = can.getObject('cache', this.constructor, true);
+    let cache = this.constructor.cache;
     let idKey = this.constructor.id;
     setAttrs(this);
     if ((this[idKey] || this[idKey] === 0) &&
